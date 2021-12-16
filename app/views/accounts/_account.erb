@@ -8,10 +8,10 @@
   </div>
 <% end %>
 <div>
-  <%== Sanitize.fragment([
+  <%== [
         ('<i data-toggle="tooltip" title="Admin" class="fa fa-key"></i>' if defined?(membership) && membership.admin?),
         account.age ? %(<span data-toggle="tooltip" title="#{account.age} years old">#{account.age}</span>) : nil,
-        account.facebook_profile_url ? %(<a style="color: #5870AB" href="#{account.facebook_profile_url}" target="_blank"><i class="fa fa-facebook-official"></i></a>) : nil,
-        (membership.shifts.map { |shift| %(<a href="/g/#{@gathering.slug}/rotas/#{shift.rota_id}"><i data-toggle="tooltip" title="#{shift.rota.name} shift, #{shift.rslot.name}" class="fa fa-hand-paper-o"></i></a>) }.join(' ') if defined?(membership) && membership && membership.shifts.count.positive?)
-      ].compact.join(' &middot; '), Sanitize::Config::DANDELION) %>
+        account.facebook_profile_url ? %(<a style="color: #5870AB" href="#{Sanitize.fragment(account.facebook_profile_url)}" target="_blank"><i class="fa fa-facebook-official"></i></a>) : nil,
+        (membership.shifts.map { |shift| %(<a href="/g/#{@gathering.slug}/rotas/#{shift.rota_id}"><i data-toggle="tooltip" title="#{Sanitize.fragment(shift.rota.name)} shift, #{Sanitize.fragment(shift.rslot.name)}" class="fa fa-hand-paper-o"></i></a>) }.join(' ') if defined?(membership) && membership && membership.shifts.count.positive?)
+      ].compact.join(' &middot; ') %>
 </div>
