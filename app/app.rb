@@ -232,10 +232,5 @@ module Dandelion
     get '/graph' do
       erb :graph
     end
-
-    get '/cookie-ok' do
-      session[:cookie_ok] = true
-      200
-    end
   end
 end
