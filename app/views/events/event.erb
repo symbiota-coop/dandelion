@@ -31,12 +31,10 @@
         $(window).scroll(function () {
           if ((window.scrollY + window.innerHeight) > $('#purchase').offset()['top']) {
             $('#buy-tickets').addClass('d-none').removeClass('d-block')
-            if (typeof Intercom !== 'undefined')
-              Intercom('update', {hide_default_launcher: false})
+            $('#discord-link').show()
           } else {
             $('#buy-tickets').addClass('d-block').removeClass('d-none')
-            if (typeof Intercom !== 'undefined')
-              Intercom('update', {hide_default_launcher: true})
+            $('#discord-link').hide()
           }
         })
         $(window).scroll()

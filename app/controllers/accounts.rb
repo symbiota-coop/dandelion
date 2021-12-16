@@ -292,7 +292,7 @@ Dandelion::App.controller do
     @date = params[:date] ? Date.parse(params[:date]) : Date.current
     @hide_nav = true
     @minimal_container = true
-    @no_intercom = true
+    @no_discord = true
     erb :'accounts/habits', layout: :minimal
   end
 

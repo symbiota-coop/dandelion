@@ -70,8 +70,7 @@ module Dandelion
       end
       @og_desc = 'Dandelion is a platform for ticketed events and co-created gatherings created by the not-for-profit worker co-operative Dandelion Collective'
       @og_image = "#{ENV['BASE_URI']}/images/black-on-white-link.png"
-      # @no_intercom = true if params[:minimal]
-      @no_intercom = true
+      @no_discord = true if params[:minimal]
       current_account.set(last_active: Time.now) if current_account
     end
 

@@ -88,7 +88,6 @@ Dandelion::App.controller do
     @og_desc = when_details(@event)
     kick! unless @event.organisation
     event_admins_only! if @event.draft?
-    @no_intercom = true
     @title = @event.name
     @organisation = @event.organisation
     if params[:success] && params[:order_id] && (@order = Order.find(params[:order_id]))

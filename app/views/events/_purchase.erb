@@ -139,7 +139,7 @@
                   </div>
                   <%= number_field_tag :donation_amount, id: 'donation_amount', min: 0, class: 'form-control', style: 'width: 5em', value: @event.suggested_donation %>
                 </div>
-                <% if Padrino.env == :development || @organisation.verified? %>
+                <% if (Padrino.env == :development || @organisation.verified?) && (@event.donation_text || @event.organisation.donation_text) %>
                   <%== @event.donation_text || @event.organisation.donation_text %>
                 <% else %>
                   <%== Sanitize.fragment(@event.donation_text || @event.organisation.donation_text, Sanitize::Config::DANDELION) %>

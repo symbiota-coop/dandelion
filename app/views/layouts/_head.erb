@@ -19,9 +19,6 @@
   <script src="/infinite_admin/plugins/bootstrap/bootstrap4/js/bootstrap.js"></script>
   <script src="/infinite_admin/plugins/scrollbar/slimscroll/jquery.slimscroll.min.js"></script>
   <script src="/infinite_admin/js/apps.js?<%= @cachebuster %>"></script>
-  <% unless @no_intercom %>
-    <%= partial :'layouts/intercom' %>
-  <% end %>
 
   <script>
     $(function () {
