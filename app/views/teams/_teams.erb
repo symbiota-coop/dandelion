@@ -21,7 +21,7 @@
         <% team.teamships.each { |teamship| account = teamship.account; %>
         <% if params[:view] == 'names' %>
           <% y << capture do %>
-            <%= account.name %>
+            <%= Sanitize.fragment(account.name) %>
           <% end %>
         <% else %>
           <% y << capture do %>
@@ -30,10 +30,10 @@
         <% end %>
         <% } %>
         <% if params[:view] == 'names' %>
-          <%= y.map(&:strip).join(' &middot; ') %>
+          <%== y.map(&:strip).join(' &middot; ') %>
         <% else %>
           <div class="image-wall">
-            <%= y.map(&:strip).join('') %>
+            <%== y.map(&:strip).join('') %>
           </div>
         <% end %>
       <% else %>

@@ -72,7 +72,7 @@
         <% y << capture do %>
           <% if @membership.admin? %>
             <a href="/g/<%= @gathering.slug %>/optionships/<%= optionship.id %>/edit">
-              <%= account.name %>
+              <%= Sanitize.fragment(account.name) %>
             </a>
           <% else %>
             <%= partial :'accounts/square', locals: { account: account, width: '50px' } %>
@@ -82,7 +82,7 @@
         <% y << capture do %>
           <% if @membership.admin? %>
             <a href="/g/<%= @gathering.slug %>/optionships/<%= optionship.id %>/edit">
-              <img title="<%= account.name %>" style="width: 50px;" src="<%= u account.picture_thumb_or_gravatar_url %>">
+              <img title="<%= Sanitize.fragment(account.name) %>" style="width: 50px;" src="<%= u account.picture_thumb_or_gravatar_url %>">
             </a>
           <% else %>
             <%= partial :'accounts/square', locals: { account: account, width: '50px' } %>
@@ -91,10 +91,10 @@
       <% end %>
       <% } %>
       <% if params[:view] == 'names' %>
-        <%= y.map(&:strip).join(' &middot; ') %>
+        <%== y.map(&:strip).join(' &middot; ') %>
       <% else %>
         <div class="image-wall">
-          <%= y.map(&:strip).join('') %>
+          <%== y.map(&:strip).join('') %>
         </div>
       <% end %>
     </td>

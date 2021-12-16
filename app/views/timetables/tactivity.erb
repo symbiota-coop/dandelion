@@ -25,7 +25,7 @@
     <% end %>
     <% } %>
     <div class="image-wall">
-      <%= y.map(&:strip).join('') %>
+      <%== y.map(&:strip).join('') %>
     </div>
     <% if @tactivity.attendances.find_by(account: current_account) %>
       <a class="btn btn-primary" href="/tactivities/<%= @tactivity.id %>/unattend">No longer interested</a>
