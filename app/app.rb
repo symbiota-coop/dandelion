@@ -110,6 +110,10 @@ module Dandelion
       erb :privacy
     end
 
+    get '/cookies' do
+      erb :cookies
+    end
+
     get '/contact' do
       erb :contact
     end
