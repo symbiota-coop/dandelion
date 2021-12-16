@@ -14,9 +14,9 @@ GIT
 
 GIT
   remote: https://github.com/stephenreid321/activate-admin.git
-  revision: 75ebdd64fa547977e3b6752d7dc9ce3625628549
+  revision: f7fe39993c6a3b97cec463c8316329d238d98e33
   specs:
-    activate-admin (0.0.7)
+    activate-admin (0.0.8)
       activate-tools
       padrino
       will_paginate
@@ -46,15 +46,15 @@ GIT
 GEM
   remote: https://rubygems.org/
   specs:
-    actionview (6.1.4.1)
-      activesupport (= 6.1.4.1)
+    actionview (6.1.4.4)
+      activesupport (= 6.1.4.4)
       builder (~> 3.1)
       erubi (~> 1.4)
       rails-dom-testing (~> 2.0)
       rails-html-sanitizer (~> 1.1, >= 1.2.0)
-    activemodel (6.1.4.1)
-      activesupport (= 6.1.4.1)
-    activesupport (6.1.4.1)
+    activemodel (6.1.4.4)
+      activesupport (= 6.1.4.4)
+    activesupport (6.1.4.4)
       concurrent-ruby (~> 1.0, >= 1.0.2)
       i18n (>= 1.6, < 2)
       minitest (>= 5.1)
@@ -231,7 +231,7 @@ GEM
     mime-types-data (3.2021.1115)
     mini_mime (1.1.2)
     mini_portile2 (2.6.1)
-    minitest (5.14.4)
+    minitest (5.15.0)
     minitest-rg (5.2.0)
       minitest (~> 5.0)
     moneta (1.1.1)
@@ -423,7 +423,7 @@ GEM
       gli
       hashie
       websocket-driver
-    smart_properties (1.16.3)
+    smart_properties (1.17.0)
     stripe (5.42.0)
     strong_password (0.0.10)
     thor (1.1.0)
