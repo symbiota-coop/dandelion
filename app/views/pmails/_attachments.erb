@@ -1,0 +1,23 @@
+<table class="table table-borderless">
+  <% attachments = @organisation.attachments %>
+  <% attachments = attachments.and(file_name: /#{::Regexp.escape(params[:file_q])}/i) if params[:file_q] %>
+  <% attachments = attachments.order('created_at desc').paginate(page: params[:page], per_page: 5) %>
+  <% attachments.each { |attachment| %>
+  <tr>
+    <td style="width: 1px">
+      <% if %w{png jpg gif jpeg}.any? { |x| attachment.file.name.downcase.ends_with? ".#{x}" } %>
+        <img style="max-width: 100px" src="<%= attachment.file.url %>">
+      <% else %>
+        <a href="<%= attachment.file.url %>"><%= attachment.file.name %></a>
+      <% end %>
+    </td>
+    <td>
+      <input type="text" class="form-control" value="<%= u attachment.file.url %>">
+    </td>
+    <td style="width: 1px">
+      <a data-confirm="Are you sure?" class="btn btn-danger pagelet-trigger" href="/pmails/<%= @organisation.id %>/attachments/<%= attachment.id %>/destroy?<%= @scope %>"><i class="fa fa-times"></i></a>
+    </td>
+  </tr>
+  <% } %>
+</table>
+<%= will_paginate attachments, inner_window: 0, outer_window: 0, renderer: WillPaginate::ViewHelpers::BootstrapRenderer %>

@@ -1,0 +1,12 @@
+<div class="main">
+  <p>Hi %recipient.firstname%,</p>
+  <p>
+    You've been accepted to the <%= activity.name %> activity
+    and
+    can now <a href="<%= ENV['BASE_URI'] %>/activities/<%= activity.id %>?sign_in_token=%recipient.token%">book tickets to <%= activity.name %> events</a>.
+  </p>
+  <% if activity.extra_info_for_acceptance_email %>
+    <%= activity.extra_info_for_acceptance_email %>
+  <% end %>
+</div>
+<div class="footer"></div>

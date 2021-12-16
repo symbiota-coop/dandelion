@@ -1,0 +1,48 @@
+<% if countable.count > 0 %>
+  <canvas id="canvas"></canvas>
+  <script>
+    <% earliest = countable.min(:created_at).to_date
+       d = [Date.new(earliest.year, earliest.month, 1) - 1.month]
+       if earliest < 12.months.ago
+         earliest = 12.months.ago
+         d = [Date.new(earliest.year, earliest.month, 1)]
+       end
+       d << (d.last + 1.month) while d.last < Date.new(Date.today.year, Date.today.month, 1) %>
+
+      var config = {
+        type: 'line',
+        data: {
+          labels: <%= d.map { |x| "#{Date::MONTHNAMES[x.month]} #{x.year}" } %>,
+          datasets: [
+            {
+              label: 'Followers',
+              backgroundColor: '#00B963',
+              borderColor: '#00B963',
+              data: <%= d.map { |x| countable.and(:created_at.lt => (x + 1.month)).count } %>,
+              fill: false,
+            }
+          ],
+        },
+        options: {
+          responsive: true,
+          legend: {
+            display: false
+          },
+          scales: {
+            xAxes: [{
+                display: true,
+                scaleLabel: {
+                  display: true,
+                  labelString: 'Month'
+                }
+              }]
+          }
+        }
+      };
+
+      window.onload = function () {
+        var ctx = document.getElementById("canvas").getContext("2d");
+        window.myLine = new Chart(ctx, config);
+      };
+  </script>
+<% end %>

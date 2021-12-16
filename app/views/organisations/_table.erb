@@ -1,0 +1,41 @@
+<table class="table table-hr">
+  <% if @organisation.website %>
+    <tr>
+      <td>Website</td>
+      <td>
+        <a target="_blank" href="<%= @organisation.website %>"><%= @organisation.website %></a>
+      </td>
+    </tr>
+  <% end %>
+  <% if @organisation.telegram_group %>
+    <tr>
+      <td>Telegram group</td>
+      <td>
+        <a target="_blank" href="<%= @organisation.telegram_group %>"><%= @organisation.telegram_group %></a>
+      </td>
+    </tr>
+  <% end %>
+  <% if @organisation.location %>
+    <tr>
+      <td>Location</td>
+      <td>
+        <a target="_blank" href="https://www.google.co.uk/maps?q=<%= @organisation.location %>"><%= @organisation.location %></a>
+      </td>
+    </tr>
+  <% end %>
+  <% if organisation_admin? or @organisation.admins.count > 0 %>
+    <tr>
+      <td>Admins</td>
+      <td>
+        <%= partial :'accounts/add', locals: {
+              role: 'admin',
+              accounts: @organisation.admins.order('name asc'),
+              add_and_remove: organisation_admin?,
+              new_object: Organisationship.new,
+              new_url: "/o/#{@organisation.slug}/organisationships/admin",
+              destroy_url: "/o/#{@organisation.slug}/organisationships/unadmin"
+            } %>
+      </td>
+    </tr>
+  <% end %>
+</table>

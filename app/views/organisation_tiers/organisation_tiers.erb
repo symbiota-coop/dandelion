@@ -1,0 +1,33 @@
+<%= partial :'organisations/nav', locals: { organisation: @organisation } %>
+<div style="margin: 10px 0">
+  <a class="btn btn-primary" href="javascript:;" onclick="$(this).hide().next().show()"><i class="fa fa-plus-circle"></i> Create a tier</a>
+  <div style="display: none" class="tier-form">
+    <%= partial :'organisation_tiers/build' %>
+  </div>
+</div>
+<table class="table">
+  <thead>
+    <tr>
+      <th>Tier name</th>
+      <th>Threshold</th>
+      <th>Discount</th>
+    </tr>
+  </thead>
+  <% @organisation.organisation_tiers(true).order('threshold asc').each { |organisation_tier| %>
+  <tr>
+    <td>
+      <a href="/o/<%= @organisation.slug %>/organisation_tiers/<%= organisation_tier.id %>/edit">
+        <%= organisation_tier.name %>
+      </a>
+      <br>
+      <%= organisation_tier.description %>
+    </td>
+    <td>
+      <%= m organisation_tier.threshold, @organisation.currency %>
+    </td>
+    <td>
+      <%= organisation_tier.discount %>%
+    </td>
+  </tr>
+  <% } %>
+</table>

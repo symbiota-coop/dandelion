@@ -1,0 +1,12 @@
+<ul class="fa-ul">
+  <% tickets.order('created_at desc').each { |ticket| %>
+  <li><i class="fa fa-li fa-ticket"></i>
+    <a href="/events/<%= ticket.event_id %>/tickets">
+      <%= ticket.event.summary %>
+      <% if ticket.discounted_price %>
+        (<%= m ticket.discounted_price, ticket.order.currency %>)
+      <% end %>
+    </a>
+  </li>
+  <% } %>
+</ul>

@@ -1,0 +1,5 @@
+<% form_for @teamship ||= Teamship.new, @teamship.new_record? ? "/g/#{@gathering.slug}/teamships/new" : "/g/#{@gathering.slug}/teamships/#{@teamship.id}/edit" do |f| %>
+  <%= f.select_block :account_id, options: @gathering.members.order('name asc').map { |account| [account.name, account.id] } %>
+  <%= f.select_block :team_id, options: @gathering.teams.map { |team| [team.name, team.id] } %>
+  <%= f.submit_block button_text: (@teamship.new_record? ? 'Add this person' : 'Save teamship'), destroy_url: "/g/#{@gathering.slug}/teamships/#{@teamship.id}/destroy" %>
+<% end %>

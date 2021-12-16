@@ -1,0 +1,116 @@
+<%= partial :'organisations/nav', locals: { organisation: @organisation } %>
+<style>
+  #organisation_minimal_head { height: 5em }
+</style>
+<script>
+  $(function () {
+    var autocomplete = new google.maps.places.Autocomplete($('#organisation_location')[0]);
+
+    $('#organisation_slug, #organisation_name').keyup(function () {
+      $('#slug-replace-organisation-url').text('<%= ENV['BASE_URI'] %>/o/' + $('#organisation_slug').val());
+    }).keyup();
+
+    $('#organisation_location').keydown(function (e) {
+      if (e.which == 13 && $('.pac-container:visible').length)
+        return false;
+    })
+
+    autosize($('#organisation_minimal_head')[0])
+
+  })
+</script>
+<div class="row">
+  <div class="<%= @organisation.persisted? ? 'col-sm-8' : 'col-sm-12' %>">
+    <% form_for @organisation, @organisation.new_record? ? '/o/new' : "/o/#{@organisation.slug}/edit" do  |f| %>
+      <%= f.text_block :name %>
+      <%= f.slug_block :slug %>
+      <p class="text-muted" style="margin-top: -0.75rem">Organisation URL:
+        <span id="slug-replace-organisation-url"></span>
+      </p>
+      <%= f.wysiwyg_block :intro_text %>
+      <%= f.url_block :website %>
+      <%= f.url_block :telegram_group %>
+      <%= f.text_block :location %>
+      <%= f.image_block :image %>
+      <% if @organisation.persisted? %>
+        <%= f.select_block :currency %>
+        <%= f.text_block :stripe_pk %>
+        <%= f.text_block :stripe_sk %>
+        <%= f.text_block :stripe_endpoint_secret %>
+        <%= f.text_block :stripe_client_id %>
+        <%= f.text_block :coinbase_api_key %>
+        <%= f.text_block :coinbase_webhook_secret %>
+        <%= f.text_block :seeds_username %>
+        <%= f.text_block :xdai_address %>
+        <%= f.text_block :mailgun_api_key %>
+        <%= f.text_block :mailgun_domain %>
+        <%= f.select_block :mailgun_region %>
+        <%= f.text_block :google_analytics_id %>
+        <%= f.text_block :facebook_pixel_id %>
+        <%= f.text_block :gocardless_access_token %>
+        <%= f.text_block :patreon_api_key %>
+        <%= f.text_block :slack_api_key %>
+        <%= f.text_block :reply_to %>
+        <%= f.wysiwyg_block :ticket_email_greeting %>
+        <%= f.wysiwyg_block :feedback_email_body %>
+        <%= f.wysiwyg_block :extra_info_for_ticket_email %>
+        <%= f.wysiwyg_block :event_footer %>
+        <%= f.wysiwyg_block :extra_info_for_booking_email %>
+        <%= f.text_area_block :carousels %>
+        <%= f.text_block :add_a_donation_to %>
+        <%= f.text_block :donation_text %>
+        <%= f.url_block :become_a_member_url %>
+        <%= f.check_box_block :send_ticket_emails_from_organisation %>
+        <%= f.check_box_block :hide_sign_in_link_from_ticket_emails %>
+        <%= f.check_box_block :collect_location %>
+        <%= f.check_box_block :auto_comment_sending %>
+        <% if Padrino.env == :development || @organisation.verified? %>
+          <%= f.text_area_block :minimal_head %>
+          <%= f.text_area_block :events_banner %>
+          <%= f.number_block :affiliate_credit_percentage %>
+          <%= f.number_block :monthly_donor_affiliate_reward %>
+          <%= f.wysiwyg_block :affiliate_intro %>
+          <%= f.url_block :affiliate_share_image_url %>
+        <% end %>
+      <% end %>
+      <div class="my-3">
+        <%= f.submit_block button_text: (@organisation.persisted? ? 'Update organisation' : 'Save and enter API keys'), destroy_url: "/o/#{@organisation.slug}/destroy" %>
+      </div>
+    <% end %>
+  </div>
+  <% if @organisation.persisted? %>
+    <div class="col-sm-4">
+      <div class="card mb-3" style="position: sticky; top: 3.75rem">
+        <div class="card-header text-white bg-primary">
+          <h4 class="my-0">Want to take payments? Do this first</h4>
+        </div>
+        <div class="card-body">
+          <h4>Stripe</h4>
+          <ul>
+            <li>
+              Go to <code>Developers</code> > <code>Webhooks</code> > <code>Add endpoint</code> and add
+              <span style="text-decoration: underline dotted">https://dandelion.earth/o/<%= @organisation.slug %>/stripe_webhook</span>
+              with
+              <code>Events to send</code>
+              <span style="text-decoration: underline dotted">checkout.session.completed</span>
+            </li>
+          </ul>
+          <h5>For automated revenue sharing (optional)</h5>
+          <ul>
+            <li>
+              Go to <code>Settings</code> > <code>Connect</code> > <code>Redirects</code> > <code>Add URI</code> and add
+              <span style="text-decoration: underline dotted">https://dandelion.earth/o/<%= @organisation.slug %>/stripe_connect</span>
+            </li>
+            <li>Under <code>OAuth settings</code>, check <code>OAuth for Standard accounts</code></li>
+          </ul>
+          <h4>Coinbase Commerce</h4>
+          <ul>
+            <li>Go to <code>Settings</code> > <code>Webhook subscriptions</code> > <code>Add an endpoint</code> and add
+              <span style="text-decoration: underline dotted">https://dandelion.earth/o/<%= @organisation.slug %>/coinbase_webhook</span>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  <% end %>
+</div>

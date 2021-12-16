@@ -1,0 +1,341 @@
+/* Checkbox & Radio Button Setting */
+
+.checkbox, .radio {
+    position: relative;
+    display: block;
+    margin-top: 0.625rem;
+    margin-bottom: 0.625rem;
+}
+.checkbox label, .radio label,
+.checkbox-inline label, .radio-inline label {
+	min-height: 1rem;
+}
+.checkbox-inline label, 
+.radio-inline label {
+	font-weight: 400;
+}
+.checkbox input[type=checkbox], 
+.checkbox-inline input[type=checkbox], 
+.radio input[type=radio], 
+.radio-inline input[type=radio] {
+	display: none;
+}
+.checkbox label, 
+.radio label,
+.checkbox-inline label, 
+.radio-inline label {
+	padding-left: 1.5625rem;
+}
+.checkbox-inline, 
+.radio-inline {
+	padding-left: 0;
+}
+.checkbox input + label,
+.radio input + label,
+.checkbox-inline input + label,
+.radio-inline input + label {
+	position: relative;
+}
+.checkbox + .checkbox, 
+.radio + .radio {
+    margin-top: -0.3125rem;
+}
+.checkbox-inline, .radio-inline {
+    position: relative;
+    display: inline-block;
+    font-weight: 400;
+    vertical-align: middle;
+    cursor: pointer;
+}
+.checkbox-inline + .checkbox-inline, 
+.radio-inline + .radio-inline {
+    margin-top: 0;
+    margin-left: 0.625rem;
+}
+.checkbox input + label:before,
+.checkbox-inline input + label:before {
+	content: '';
+	position: absolute;
+	top: 0;
+	left: 0;
+	width: 1.125rem;
+	height: 1.125rem;
+	background: $color_white;
+	border: 1px solid #C8C7CC;
+	@include transition(all .2s linear);
+	@include border-radius(0.25rem);
+}
+.checkbox input:checked + label:after,
+.checkbox-inline input:checked + label:after {
+	content: "\e013";
+	position: absolute;
+	left: 0;
+	top: 0;
+	width: 1.125rem;
+	height: 1.125rem;
+	padding-right: 1px;
+	text-align: center;
+	line-height: 1.125rem;
+	font-family: 'Glyphicons Halflings';
+    font-style: normal;
+    font-weight: 400;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    color: $color_white;
+}
+.checkbox input:checked + label:before,
+.checkbox-inline input:checked + label:before {
+	background: $color_primary;
+	border-color: $color_primary;
+}
+.checkbox.checkbox-success input:checked + label:before,
+.checkbox-inline.checkbox-success input:checked + label:before {
+	background: #4ED964;
+	border-color: #4ED964;
+}
+.checkbox.checkbox-purple input:checked + label:before,
+.checkbox-inline.checkbox-purple input:checked + label:before {
+	background: $color_purple;
+	border-color: $color_purple;
+}
+.checkbox.checkbox-info input:checked + label:before,
+.checkbox-inline.checkbox-info input:checked + label:before {
+	background: $color_info;
+	border-color: $color_info;
+}
+.checkbox.checkbox-danger input:checked + label:before,
+.checkbox-inline.checkbox-danger input:checked + label:before {
+	background: #fe3b30;
+	border-color: #fe3b30;
+}
+.checkbox.checkbox-warning input:checked + label:before,
+.checkbox-inline.checkbox-warning input:checked + label:before {
+	background: $color_warning;
+	border-color: $color_warning;
+}
+.checkbox.checkbox-yellow input:checked + label:before,
+.checkbox-inline.checkbox-yellow input:checked + label:before {
+	background: $color_yellow;
+	border-color: $color_yellow;
+}
+.checkbox.checkbox-pink input:checked + label:before,
+.checkbox-inline.checkbox-pink input:checked + label:before {
+	background: $color_pink;
+	border-color: $color_pink;
+}
+.checkbox.checkbox-inverse input:checked + label:before,
+.checkbox-inline.checkbox-inverse input:checked + label:before {
+	background: $color_inverse;
+	border-color: $color_inverse;
+}
+.radio input + label:before,
+.radio-inline input + label:before {
+	content: '';
+	position: absolute;
+	top: 0;
+	left: 0;
+	width: 1.125rem;
+	height: 1.125rem;
+	background: $color_white;
+	border: 1px solid #C8C7CC;
+	@include transition(all .2s linear);
+	@include border-radius(1.125rem);
+}
+.radio input:checked + label:before,
+.radio-inline input:checked + label:before {
+	background: $color_primary;
+	border-color: $color_primary;
+}
+.radio.radio-success input:checked + label:before,
+.radio-inline.radio-success input:checked + label:before {
+	background: #4ED964;
+	border-color: #4ED964;
+}
+.radio.radio-purple input:checked + label:before,
+.radio-inline.radio-purple input:checked + label:before {
+	background: $color_purple;
+	border-color: $color_purple;
+}
+.radio.radio-info input:checked + label:before,
+.radio-inline.radio-info input:checked + label:before {
+	background: $color_info;
+	border-color: $color_info;
+}
+.radio.radio-danger input:checked + label:before,
+.radio-inline.radio-danger input:checked + label:before {
+	background: #fe3b30;
+	border-color: #fe3b30;
+}
+.radio.radio-warning input:checked + label:before,
+.radio-inline.radio-warning input:checked + label:before {
+	background: $color_warning;
+	border-color: $color_warning;
+}
+.radio.radio-yellow input:checked + label:before,
+.radio-inline.radio-yellow input:checked + label:before {
+	background: $color_yellow;
+	border-color: $color_yellow;
+}
+.radio.radio-pink input:checked + label:before,
+.radio-inline.radio-pink input:checked + label:before {
+	background: $color_pink;
+	border-color: $color_pink;
+}
+.radio.radio-inverse input:checked + label:before,
+.radio-inline.radio-inverse input:checked + label:before {
+	background: $color_inverse;
+	border-color: $color_inverse;
+}
+.radio input + label:after,
+.radio-inline input + label:after {
+	content: '';
+	position: absolute;
+	width: 0.5rem;
+	height: 0.5rem;
+	left: 0.3125rem;
+	top: 0.3125rem;
+	@include transition(all .2s linear);
+	@include border-radius(0.625rem);
+}
+.radio input:checked + label:after,
+.radio-inline input:checked + label:after {
+	background: $color_white;
+	@include box-shadow(0 1px 0.125rem rgba(0,0,0,0.25));
+}
+fieldset[disabled] input[type=checkbox] + label, 
+fieldset[disabled] input[type=radio] + label, 
+input[type=checkbox].disabled + label, 
+input[type=checkbox][disabled] + label, 
+input[type=radio].disabled + label, 
+input[type=radio][disabled] + label {
+	cursor: not-allowed;
+	@include opacity(0.5);
+}
+.has-success .checkbox, 
+.has-success .checkbox-inline, 
+.has-success .control-label, 
+.has-success .help-block, 
+.has-success .radio, 
+.has-success .radio-inline, 
+.has-success.checkbox label, 
+.has-success.checkbox-inline label, 
+.has-success.radio label, 
+.has-success.radio-inline label {
+	color: #379646;
+}
+.has-success .form-control {
+	border-color: #379646;
+	@include box-shadow(none);
+}
+.has-success .form-control:focus {
+	border-color: #205829;
+	@include box-shadow(0 0 0 0.125rem rgba(55, 150, 70, 0.35));
+}
+.has-warning .checkbox, 
+.has-warning .checkbox-inline, 
+.has-warning .control-label, 
+.has-warning .help-block, 
+.has-warning .radio, 
+.has-warning .radio-inline, 
+.has-warning.checkbox label, 
+.has-warning.checkbox-inline label, 
+.has-warning.radio label, 
+.has-warning.radio-inline label {
+	color: #ca7702;
+}
+.has-warning .form-control {
+	border-color: #ca7702;
+	@include box-shadow(none);
+}
+.has-warning .form-control:focus {
+	border-color: #864f01;
+	@include box-shadow(0 0 0 0.125rem rgba(202, 119, 2, 0.35));
+}
+.has-error .checkbox, 
+.has-error .checkbox-inline, 
+.has-error .control-label, 
+.has-error .help-block, 
+.has-error .radio, 
+.has-error .radio-inline, 
+.has-error.checkbox label, 
+.has-error.checkbox-inline label, 
+.has-error.radio label, 
+.has-error.radio-inline label {
+	color: #e2342a;
+}
+.has-error .form-control {
+	border-color: #e2342a;
+	@include box-shadow(none);
+}
+.has-error .form-control:focus {
+	border-color: #b92a21;
+	@include box-shadow(0 0 0 0.125rem rgba(226, 52, 42, 0.35));
+}
+.has-success .checkbox input:not(:checked) + label:before, 
+.has-success .checkbox-inline input:not(:checked) + label:before {
+	border-color: #379646;
+}
+.has-warning .checkbox input:not(:checked) + label:before, 
+.has-warning .checkbox-inline input:not(:checked) + label:before {
+	border-color: #ca7702;
+}
+.has-error .checkbox input:not(:checked) + label:before, 
+.has-error .checkbox-inline input:not(:checked) + label:before {
+	border-color: #e2342a;
+}
+.has-success .radio input:not(:checked) + label:before, 
+.has-success .radio-inline input:not(:checked) + label:before {
+	border-color: #379646;
+}
+.has-warning .radio input:not(:checked) + label:before, 
+.has-warning .radio-inline input:not(:checked) + label:before {
+	border-color: #ca7702;
+}
+.has-error .radio input:not(:checked) + label:before, 
+.has-error .radio-inline input:not(:checked) + label:before {
+	border-color: #e2342a;
+}
+.has-feedback {
+    position: relative;
+}
+.form-control-feedback,
+.form-control-feedback.glyphicon {
+    position: absolute;
+    top: 0;
+    right: 0;
+    z-index: 2;
+    display: block;
+    width: 2.125rem;
+    height: 2.125rem;
+    line-height: 2.125rem;
+    text-align: center;
+    pointer-events: none;
+}
+.form-group-lg .form-control + .form-control-feedback, 
+.input-group-lg + .form-control-feedback, .input-lg + .form-control-feedback {
+    width: 2.875rem;
+    height: 2.875rem;
+    line-height: 2.875rem;
+}
+.has-feedback label~.form-control-feedback {
+	top: 1.375rem;
+}
+.input-group-addon {
+	line-height: 1.3333;
+	font-size: 0.875rem;
+}
+.has-success .input-group-addon {
+	background: #e5ffe9;
+	border-color: #379646;
+	color: #379646;
+}
+.has-warning .input-group-addon {
+	background: #fff5e6;
+	border-color: #ca7702;
+	color: #ca7702;
+}
+.has-error .input-group-addon {
+	background: #ffe8e7;
+	border-color: #e2342a;
+	color: #e2342a;
+}

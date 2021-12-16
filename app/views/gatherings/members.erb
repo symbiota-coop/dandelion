@@ -1,0 +1,153 @@
+<%= partial :'gatherings/nav', locals: { gathering: @gathering, membership: @membership } %>
+<div class="mb-3">
+  <% form_tag '', method: 'get', class: 'submitOnChange searchForm form-inline' do %>
+    <div class="form-group">
+      <label>Search members</label>
+      <%= text_field_tag :q, class: 'form-control', value: params[:q] %>
+    </div>
+    <div class="form-group">
+      <label>View as</label>
+      <%= select_tag :view, class: 'form-control', options: %w[details pictures dietary_requirements map emails list].map { |view| [view.to_s.humanize.capitalize, view] }, selected: params[:view] %>
+    </div>
+    <% if @membership.admin? %>
+      <a class="mb-1 btn btn-outline-primary" href="<%= request.path %>.csv?<%= request.query_string %>">Download results as CSV</a>
+    <% end %>
+
+    <style>
+    @media(max-width: 575px) {
+      .searchForm .checkbox-inline { margin-top: 0 }
+    }
+    </style>
+    <div class="mt-3 mb-1" style="font-size: 13px;">
+      <% @gathering.radio_scopes.each_with_index { |el,i| k,v,t,r = *el %>
+      <div class="radio-inline ml-3 mb-2">
+        <%= radio_button_tag k, value: v, checked: (params[k] == v.to_s), id: "#{k}-#{v}" %>
+        <label for="<%= k %>-<%= v %>">
+          <%= t %>&nbsp;<strong><%= r.count %></strong>
+        </label>
+      </div>
+      <% } %>
+      <% @gathering.check_box_scopes.each_with_index { |el,i| k,t,r = *el %>
+      <div class="checkbox-inline ml-3 mb-2">
+        <%= check_box_tag k, value: true, checked: params[k], onclick: 'this.form.submit()', id: k %>
+        <label for="<%= k %>" style="font-weight: normal">
+          <%= t %>&nbsp;<strong><%= r.count %></strong>
+        </label>
+      </div>
+      <% } %>
+    </div>
+  <% end %>
+  <%= partial :'gatherings/invite' %>
+</div>
+<% case (params[:view] || 'details'); when 'pictures' %>
+<div style="margin-top: 15px" class="row">
+  <% (Account.and(:id.in => @memberships.pluck(:account_id)).and(:picture_uid.ne => nil).shuffle + Account.and(:id.in => @memberships.pluck(:account_id)).and(picture_uid: nil).shuffle).each { |account| %>
+  <%= partial :'accounts/picture', locals: { account: account } %>
+  <% } %>
+</div>
+<% when 'emails' %>
+<pre style="margin-top: 15px;"><%= Account.and(:id.in => @memberships.pluck(:account_id)).map { |account| "#{account.name} &lt;#{account.email}&gt;" }.join(', ') %></pre>
+<% when 'dietary_requirements' %>
+<table class="table table-striped">
+  <thead>
+    <tr>
+      <th style="width: 1px">Name</th>
+      <th>Dietary requirements</th>
+    </tr>
+  </thead>
+  <% @memberships.and(:account_id.in => Account.and(:dietary_requirements.ne => nil).pluck(:id)).each { |membership| account = membership.account %>
+  <tr>
+    <td>
+      <%= partial :'accounts/account', object: account, locals: { membership: membership, show_email: viewable?(account, :email) } %>
+      <div>
+        <% membership.teamships.each { |teamship| %>
+        <a href="/g/<%= @gathering.slug %>/teams">
+          <span class="label label-primary d-inline-block mb-1"><%= teamship.team.name %></span>
+        </a>
+        <% } %>
+      </div>
+    </td>
+    <td>
+      <%= account.dietary_requirements %>
+    </td>
+  </tr>
+  <% } %>
+</table>
+<% when 'map' %>
+<%= partial :'maps/map', locals: { points: Account.and(:id.in => @memberships.pluck(:account_id)).and(:coordinates.ne => nil) } %>
+<% when 'list' %>
+<ul class="search-result-list">
+  <% Account.and(:id.in => @memberships.pluck(:account_id)).order('name asc').each { |account| %>
+  <li>
+    <div class="search-result-media" style="height: auto">
+      <%= partial :'accounts/square', locals: { account: account, style: 'display: block;' } %>
+    </div>
+    <div class="search-result-content">
+      <h2>
+        <a class="text-dark" href="/u/<%= account.username %>"><%= account.name %></a>
+      </h2>
+      <%= partial :'accounts/buttons', locals: { account: account } %>
+    </div>
+  </li>
+  <% } %>
+</ul>
+<% when 'details'; @memberships = @memberships.per_page(10).page(params[:page]) %>
+<table class="table table-striped">
+  <thead>
+    <tr>
+      <th style="width: 1px">Name</th>
+      <th>Following</th>
+      <th>Proposed by</th>
+      <th>Accepted at</th>
+      <% if @gathering.democratic_threshold %>
+        <th>Suggested magic number</th>
+      <% end %>
+      <% if @gathering.enable_contributions %>
+        <th>Choices</th>
+      <% end %>
+      <th>Requested contribution</th>
+      <th>Paid</th>
+      <% if (admin? || @membership.admin?) || !@gathering.hide_invitations %>
+        <th>Invitations</th>
+      <% end %>
+      <% if @gathering.facebook_group_url %>
+        <th>Member of Facebook group</th>
+      <% end %>
+      <% if @membership.admin? %>
+        <th></th>
+      <% end %>
+    </tr>
+  </thead>
+  <% @memberships.each { |membership| account = membership.account %>
+  <tr data-pagelet-url="/membership_row/<%= membership.id %>">
+    <%= partial :'gatherings/membership_row', locals: { membership: membership } %>
+  </tr>
+  <% } %>
+  <tr>
+    <th style="width: 1px"></th>
+    <th></th>
+    <th></th>
+    <th></th>
+    <% if @gathering.democratic_threshold %>
+      <th></th>
+    <% end %>
+    <% if @gathering.enable_contributions %>
+      <th></th>
+    <% end %>
+    <th></th>
+    <th>
+      <%= m @gathering.memberships.pluck(:paid).compact.sum, @gathering.currency %>
+      (<%= m @gathering.processed_via_dandelion, @gathering.currency %> processed via Dandelion)
+    </th>
+    <% if @gathering.facebook_group_url %>
+      <th></th>
+    <% end %>
+    <% if @membership.admin? %>
+      <th></th>
+    <% end %>
+  </tr>
+</table>
+<div style="text-align: center">
+  <%= will_paginate @memberships, renderer: WillPaginate::ViewHelpers::BootstrapRenderer %>
+</div>
+<% end %>

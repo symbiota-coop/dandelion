@@ -1,0 +1,48 @@
+<table class="table table-striped">
+  <thead>
+    <tr>
+      <th>Team</th>
+      <th>Members</th>
+    </tr>
+  </thead>
+  <% @gathering.teams.order('name asc').each { |team| %>
+  <tr>
+    <td>
+      <a href="/g/<%= @gathering.slug %>/teams/<%= team.id %>">
+        <%= team.name %>
+      </a>
+      <div class="wysiwyg">
+        <%== Sanitize.fragment(team.intro, Sanitize::Config::DANDELION) %>
+      </div>
+    </td>
+    <td>
+      <% if team.teamships.count > 0 %>
+        <% y = [] %>
+        <% team.teamships.each { |teamship| account = teamship.account; %>
+        <% if params[:view] == 'names' %>
+          <% y << capture do %>
+            <%= account.name %>
+          <% end %>
+        <% else %>
+          <% y << capture do %>
+            <%= partial :'accounts/square', locals: { account: account, width: '50px' } %>
+          <% end %>
+        <% end %>
+        <% } %>
+        <% if params[:view] == 'names' %>
+          <%= y.map(&:strip).join(' &middot; ') %>
+        <% else %>
+          <div class="image-wall">
+            <%= y.map(&:strip).join('') %>
+          </div>
+        <% end %>
+      <% else %>
+        n/a
+      <% end %>
+    </td>
+  </tr>
+  <% } %>
+</table>
+<% if params[:view] != 'names' %>
+  <a onclick="$(this).closest('[data-pagelet-url]').attr('data-pagelet-url', '/g/<%= @gathering.slug %>/teams?view=names')" href="#" class="pagelet-trigger">Show names instead of pictures</a>
+<% end %>

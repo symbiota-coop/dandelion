@@ -1,0 +1,8 @@
+<% if account.private? %>
+  <div class="alert alert-warning mt-2">
+    <p class="mb-0">
+      Your profile is currently private and visible only to you.
+      <a href="/accounts/unhide" class="alert-link">Make my profile public</a>
+    </p>
+  </div>
+<% end %>

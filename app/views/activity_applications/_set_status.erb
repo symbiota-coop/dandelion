@@ -1,0 +1,10 @@
+<big>
+  <%= partial :'activity_applications/status', locals: { status: @activity_application.status } %>
+  <% if @activity_application.statused_by %>
+    by <%= @activity_application.statused_by.name %>
+    on <%= @activity_application.statused_at %>
+  <% end %>
+</big>
+<% form_tag "/activities/#{@activity.id}/activity_applications/#{@activity_application.id}/set_status", class: 'form-inline', style: 'display: inline' do %>
+  <%= select_tag :status, class: 'form-control', options: [''] + ActivityApplication.statuses, onchange: '$(this.form).submit()' %>
+<% end %>

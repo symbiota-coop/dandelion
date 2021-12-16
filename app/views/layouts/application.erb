@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<!--[if IE 8]> <html lang="en" class="ie8"> <![endif]-->
+<!--[if !IE]><!-->
+<html lang="en">
+  <!--<![endif]-->
+  <%= partial :'layouts/head' %>
+  <body>
+    <div id="fb-root"></div>
+    <script>
+      (function (d, s, id) {
+              var js, fjs = d.getElementsByTagName(s)[0];
+              if (d.getElementById(id))
+                return;
+              js = d.createElement(s);
+              js.id = id;
+              js.src = 'https://connect.facebook.net/en_GB/sdk.js#xfbml=1&version=v3.2&appId=1498399346894704&autoLogAppEvents=1';
+              fjs.parentNode.insertBefore(js, fjs);
+            }(document, 'script', 'facebook-jssdk'));
+    </script>
+    <!-- BEGIN #page-container -->
+    <div id="page-container" class="page-header-fixed page-sidebar-fixed <% if session[:sidebar_minified] == 'minified' || (!session[:sidebar_minified] && !current_account) %> page-sidebar-minified <% end %>  ">
+      <%= partial :alert %>
+      <!-- BEGIN #header -->
+      <div id="header" class="header navbar navbar-inverse navbar-fixed-top">
+        <!-- BEGIN container-fluid -->
+        <div class="container-fluid">
+          <!-- BEGIN mobile sidebar expand / collapse button -->
+          <div class="navbar-header">
+            <a href="/" class="navbar-brand">
+              <img style="max-height: 1.75rem; position: relative; top: -0.25rem" src="/images/white-on-black.png">
+            </a>
+            <button type="button" class="navbar-toggle" data-click="sidebar-toggled">
+              <span class="icon-bar"></span>
+              <span class="icon-bar"></span>
+            </button>
+          </div>
+          <!-- END mobile sidebar expand / collapse button -->
+          <!-- BEGIN header navigation right -->
+          <div class="navbar-xs-justified">
+            <%= partial :nav_top %>
+          </div>
+          <!-- END header navigation right -->
+        </div>
+        <!-- END container-fluid -->
+        <!-- BEGIN header-search-bar -->
+        <div class="header-search-bar">
+          <form action="/search" name="search_bar_form">
+            <div class="form-group">
+              <div class="left-icon"><i class="ti-search"></i></div>
+              <input name="q" type="text" class="form-control" id="header-search">
+              <a href="javascript:;" data-dismiss="search-bar" class="right-icon"><i class="ti-close"></i></a>
+            </div>
+          </form>
+        </div>
+        <!-- END header-search-bar -->
+      </div>
+      <!-- END #header -->
+      <!-- BEGIN #sidebar -->
+      <div id="sidebar" class="sidebar sidebar-inverse">
+        <!-- BEGIN scrollbar -->
+        <div data-scrollbar="true" data-height="100%">
+          <%= partial :nav %>
+        </div>
+        <!-- END scrollbar -->
+        <!-- BEGIN sidebar-minify-btn -->
+        <a onclick="$.post('/sidebar', {minified: $('#page-container').hasClass('page-sidebar-minified') ? false : true});
+            $('#sidebar ul.nav li a[data-toggle]').tooltip($('#page-container').hasClass('page-sidebar-minified') ? 'disable' : 'enable')
+           " href="#" class="sidebar-minify-btn" data-click="sidebar-minify"><i class="ti-arrow-left"></i></a>
+        <!-- END sidebar-minify-btn -->
+      </div>
+      <!-- END #sidebar -->
+      <!-- BEGIN #content -->
+      <div id="content" class="content">
+        <%= content_blocks[:content.to_sym].present? ? yield_content(:content) : yield %>
+      </div>
+      <!-- END #content -->
+    </div>
+    <!-- END #page-container -->
+
+    <div class="modal fade" tabindex="-1" role="dialog" id="modal">
+      <div class="modal-dialog" role="document">
+        <div class="modal-content">
+        </div>
+        <!-- /.modal-content -->
+      </div>
+      <!-- /.modal-dialog -->
+    </div>
+    <!-- /.modal -->
+
+    <% if !current_account && !session[:set_time_zone] %>
+      <script>
+        $(function() {
+          if (Intl.DateTimeFormat().resolvedOptions().timeZone && Intl.DateTimeFormat().resolvedOptions().timeZone != 'Europe/London') {
+            var a = $('<a class="btn btn-sm btn-outline-light">Set time zone to '+Intl.DateTimeFormat().resolvedOptions().timeZone.replace('_',' ')+'</a>').attr('href', '/time_zone?time_zone=' + Intl.DateTimeFormat().resolvedOptions().timeZone)
+            $(a).prependTo('body')
+            $(a).wrap('<div id="set-time-zone" style="z-index: 9999; background: #222" class="text-center fixed-bottom text-white p-3"></div>')
+          }
+        })
+      </script>
+    <% end %>
+
+    <% unless current_account || Padrino.env == :test || session[:cookie_ok] %>
+      <div id="cookies" style="z-index: 9999; background: #222" class="fixed-bottom text-white p-3">
+        By using Dandelion, you agree to the use of cookies to allow registration, login and analytics.
+        <a href="javascript:;" onclick="$.get('/cookie-ok');$(this).parent().hide()" id="cookie-ok" class="ml-1 btn btn-sm btn-outline-light">OK</a>
+      </div>
+    <% end %>
+
+  </body>
+</html>

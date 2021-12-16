@@ -1,0 +1,11 @@
+<div class="main">
+  <p>
+    <a href="<%= ENV['BASE_URI'] %>/accounts/<%= habit_completion_like.account_id %>"><%= habit_completion_like.account.name %></a> liked your completion of <a href="<%= ENV['BASE_URI'] %>/habits/<%= habit.id %>"><%= habit.name %></a> on <%= habit_completion.date %>. <a href="<%= ENV['BASE_URI'] %>/habits">View habits</a>
+  </p>
+  <% if habit_completion.comment %>
+    <blockquote><%= habit_completion.comment %></blockquote>
+  <% end %>
+</div>
+<div class="footer">
+  <a href="<%= ENV['BASE_URI'] %>/accounts/subscriptions?sign_in_token=%recipient.token%">Opt out of email notifications when people like my habit completions</a>
+</div>

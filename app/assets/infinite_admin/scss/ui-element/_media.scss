@@ -1,0 +1,11 @@
+/* Media Setting */
+
+.media + .media {
+	margin-top: 0.9375rem;
+}
+.media-left, .media > .pull-left {
+    padding-right: 0.625rem;
+}
+.media-right, .media > .pull-right {
+    padding-left: 0.625rem;
+}

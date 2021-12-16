@@ -1,0 +1,12 @@
+<% if @gathering.threshold %>
+  <p>
+    Applications are visible to all existing members, and are accepted upon receiving <%= @gathering.threshold %> <%= @gathering.vouchers %>.
+    <% if @gathering.democratic_threshold %>
+      This number is decided democratically by all gathering members.
+    <% end %>
+  </p>
+<% else %>
+  <p>
+    Applications are visible to all existing members.
+  </p>
+<% end %>

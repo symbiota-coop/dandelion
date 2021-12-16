@@ -1,0 +1,30 @@
+/* Scroll Top Button Setting */
+
+.btn-scroll-top {
+	position: fixed;
+	bottom: 1.5625rem;
+	right: 1.5625rem;
+	width: 2.25rem;
+	height: 2.25rem;
+	z-index: 1000;
+	background: #666;
+	color: $color_white;
+	text-align: center;
+	line-height: 2.25rem;
+	text-decoration: none;
+	@include border-radius(1.125rem);
+	
+	&:hover,
+	&:focus {
+		background: $color_primary;
+		color: $color_white;
+		text-decoration: none;
+	}
+}
+@media (max-width: 767px) {
+	.btn-scroll-top {
+		bottom: 3.6875rem;
+		right: 0.9375rem;
+		z-index: 9999;
+	}
+}

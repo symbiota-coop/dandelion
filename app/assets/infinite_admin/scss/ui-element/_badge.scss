@@ -1,0 +1,46 @@
+/* Badge Setting */
+
+.badge {
+	background: $color_grey;
+	color: #fff;
+	display: inline-block;
+    min-width: 0.625rem;
+    padding: 0.1875rem 0.4375rem;
+    font-weight: 700;
+    line-height: 1;
+    color: #fff;
+    text-align: center;
+    white-space: nowrap;
+    vertical-align: middle;
+    background-color: #777;
+    font-size: $body_font_size;
+	@include border-radius(1rem);
+}
+.btn-primary .badge,
+.list-group-item.active > .badge, 
+.nav-pills > .active > a > .badge {
+	color: $color_primary;
+}
+.badge-default { background: #8A8A8F; }
+.badge-default[href]:focus, .badge-default[href]:hover { background: #737377; }
+.badge-light { color: #000; background-color: #f8f9fa; }
+.badge-light[href]:focus, .badge-light[href]:hover { background: #f8f9fa; color: #000; }
+.badge-primary { background: $color_primary; }
+.badge-primary[href]:focus, .badge-primary[href]:hover { background: $color_primary_hover; }
+.badge-success { background: #4CD964; }
+.badge-success[href]:focus, .badge-success[href]:hover { background: #45c35a; }
+.badge-info { background: #5AC8FA; }
+.badge-info[href]:focus, .badge-info[href]:hover { background: #50b3e0; }
+.badge-warning { background: #FF9500; }
+.badge-warning[href]:focus, .badge-warning[href]:hover { background: #e68701; }
+.badge-danger { background: #FF3B30; }
+.badge-danger[href]:focus, .badge-danger[href]:hover { background: #e4352b; }
+.badge-purple { background: #5856D6; }
+.badge-purple[href]:focus, .badge-purple[href]:hover { background: #4c4bb7; }
+.badge-pink { background: #FF2D55; }
+.badge-pink[href]:focus, .badge-pink[href]:hover { background: #de2649; }
+.badge-yellow { background: #FFCC00; }
+.badge-yellow[href]:focus, .badge-yellow[href]:hover { background: #e6b801; }
+.badge-inverse, .badge-dark { background: #000; }
+.badge-inverse[href]:focus, .badge-inverse[href]:hover,
+.badge-dark[href]:focus, .badge-dark[href]:hover { background: #333; }

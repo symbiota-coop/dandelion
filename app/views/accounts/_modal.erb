@@ -1,0 +1,12 @@
+<div class="modal-header">
+  <h3 class="modal-title">
+    <a class="text-dark" href="/u/<%= @account.username %>"><%= @account.name %></a>
+    <small class="text-muted">@<%= @account.username %></small>
+  </h3>
+  <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+    <span aria-hidden="true">&times;</span>
+  </button>
+</div>
+<div class="modal-body">
+  <%= partial :'accounts/top', locals: { account: @account, modal: true } %>
+</div>

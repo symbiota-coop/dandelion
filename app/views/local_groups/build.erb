@@ -1,0 +1,23 @@
+<%= partial :'local_groups/nav', locals: { local_group: @local_group } %>
+<% form_for @local_group, @local_group.new_record ? '/local_groups/new' : "/local_groups/#{@local_group.id}/edit" do |f| %>
+  <%= f.text_block :name %>
+  <%= f.wysiwyg_block :intro_text %>
+  <%= f.url_block :telegram_group %>
+  <%= f.text_area_block :geometry %>
+  <%= f.lookup_block :organisation_id, lookup_url: '/organisations.json', placeholder: 'Search organisations', selected_link: (%(<a class="d-inline-block mt-1" target="_blank" href="/o/#{@local_group.organisation.slug}">View organisation</a>) if @local_group.organisation_id) %>
+  <script>
+    $(function () {
+      $('#local_group_organisation_id').change(function () {
+        if ($(this).val().length > 0) {
+          $('#organisation-options').show()
+        } else {
+          $('#organisation-options').hide()
+        }
+      })
+      $('#local_group_organisation_id').change()
+    })
+  </script>
+  <%= f.check_box_block :hide_members %>
+  <%= f.check_box_block :hide_discussion %>
+  <%= f.submit_block destroy_url: "/local_groups/#{@local_group.id}/destroy" %>
+<% end %>

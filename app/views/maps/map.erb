@@ -1,0 +1,43 @@
+<% if current_account %>
+  <div class="row justify-content-between mb-3">
+    <div class="col">
+      <% if current_account.location %>
+        <div>
+          <p>Your profile location: <a href="javascript:;" onclick="$(this).parent().parent().hide().next().show().find('input').focus()"><%= current_account.location %></a></p>
+          <% if current_account.number_at_this_location > 50 %>
+            <div class="mt-3 alert alert-warning">There are too many people to display at this location. Please provide something more specific.</div>
+          <% end %>
+        </div>
+      <% end %>
+      <% form_tag '/accounts/update_location', class: 'mb-3', style: ('display: none' if current_account.location) do %>
+        <script>
+          $(function () {
+
+            var autocomplete = new google.maps.places.Autocomplete($('#location')[0]);
+            google.maps.event.addListener(autocomplete, 'place_changed', function () {
+              $('#location')[0].form.submit()
+            });
+          })
+        </script>
+        <%= text_field_tag :location, id: 'location', class: 'form-control', placeholder: 'Enter your location' %>
+      <% end %>
+    </div>
+    <div class="col-auto">
+      <a class="btn btn-primary mt-1 mt-sm-0" href="javascript:;" onclick="$(this).hide();
+                    $('#place-build').show().find('input').first().focus()"><i class="fa fa-plus-circle"></i> Add a place</a>
+    </div>
+  </div>
+  <div id="place-build" style="display: none" class="my-3">
+    <%= partial :'places/build' %>
+  </div>
+<% end %>
+<% if params[:u] %>
+  <h3><%= @account.name %>'s places</h3>
+<% elsif params[:uncategorised_id] %>
+  <h3><%= Account.find(params[:uncategorised_id]).name %>'s uncategorised places</h3>
+<% elsif params[:placeship_category_id]; placeship_category = PlaceshipCategory.find(params[:placeship_category_id]) %>
+  <h3><%= placeship_category.account.name %>'s <%= placeship_category.name %></h3>
+<% end %>
+<div data-pagelet-url="/map?<%= Rack::Utils.parse_nested_query(request.query_string).merge({ places: true }).to_query %>">
+  <%= partial :'maps/map', locals: { dynamic: true, trigger_bounds_changed: true } %>
+</div>

@@ -1,0 +1,9 @@
+<% if comment.file %>
+  <div style="margin-top: 10px">
+    <% if %w{png jpg gif jpeg}.any? { |x| comment.file.name.downcase.ends_with? ".#{x}" } %>
+      <img style="max-width: 100%;" src="<%= comment.file.url %>">
+    <% else %>
+      <i class="fa fa-paperclip"></i> <a href="<%= comment.file.url %>"><%= comment.file.name %></a>
+    <% end %>
+  </div>
+<% end %>

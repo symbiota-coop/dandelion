@@ -1,0 +1,104 @@
+<% if timetable.hide_schedule? %>
+  <div class="row" style="margin-top: 15px">
+    <% timetable.tactivities.sort_by { |tactivity| -tactivity.attendances.count }.each { |tactivity| %>
+    <div class="col-sm-3">
+      <%= partial :'timetables/tactivity', object: tactivity %>
+    </div>
+    <% } %>
+  </div>
+<% else %>
+  <% if (admin? || @membership.admin?) or timetable.scheduling_by_all %>
+    <script>
+      $(function () {
+        if ($(window).width() > 768) {
+          $('.tactivity').draggable({revert: "invalid"});
+          $('.tactivity-accept').droppable({
+            drop: function (event, ui) {
+              var tactivity = $(ui.draggable)
+              var accept = $(this)
+              $.post('/tactivities/' + $(tactivity).attr('data-tactivity-id') + '/schedule', {tslot_id: $(accept).attr('data-tslot-id'), space_id: $(accept).attr('data-space-id')}, function () {
+                $(accept).droppable("option", "disabled", true);
+                if (tactivity.parent().hasClass('tactivity-accept'))
+                  $(tactivity.parent()).droppable("option", "disabled", false);
+                $(tactivity).detach().css({top: 0, left: 0}).appendTo(accept);
+              })
+            }
+          });
+          $('.tactivity-accept[data-tactivity-id]').droppable("option", "disabled", true);
+        }
+      });
+    </script>
+  <% end %>
+  <% unscheduled = timetable.tactivities.and(space_id: nil); if unscheduled.count > 0 %>
+  <h3>Unscheduled</h3>
+  <div class="row mt-3">
+    <% unscheduled.sort_by { |tactivity| -tactivity.attendances.count }.each { |tactivity| %>
+    <div class="col-6 col-sm-3 mb-3">
+      <%= partial :'timetables/tactivity', object: tactivity %>
+    </div>
+    <% } %>
+  </div>
+  <h3>Scheduled</h3>
+<% end %>
+<table class="table table-striped">
+  <tr>
+    <td></td>
+    <% timetable.spaces.order('o asc').each { |space| %>
+    <td>
+      <strong>
+        <% if @membership.admin? %>
+          <a class="pagelet-trigger" data-confirm="Delete this space?" href="/spaces/<%= space.id %>/destroy">
+            <%= space.name %>
+          </a>
+        <% else %>
+          <%= space.name %>
+        <% end %>
+      </strong>
+    </td>
+    <% } %>
+    <% if @membership.admin? %>
+      <td style="width: 1px">
+        <% form_tag "/spaces/create?timetable_id=#{timetable.id}", class: 'form-inline', style: 'display: inline' do %>
+          <%= text_field_tag :name, class: 'form-control', style: 'width: 10em', placeholder: 'New space' %>
+        <% end %>
+      </td>
+    <% end %>
+  </tr>
+  <% timetable.tslots.order('o asc').each { |tslot| %>
+  <tr>
+    <td style="width: 1px">
+      <strong>
+        <% if @membership.admin? %>
+          <a class="pagelet-trigger" data-confirm="Delete this slot?" href="/tslots/<%= tslot.id %>/destroy">
+            <%= tslot.name %>
+          </a>
+        <% else %>
+          <%= tslot.name %>
+        <% end %>
+      </strong>
+    </td>
+    <% timetable.spaces.order('o asc').each { |space| tactivity = Tactivity.find_by(tslot: tslot, space: space) %>
+    <td>
+      <div class="tactivity-accept" style="background: #ddd;" <% if tactivity %> data-tactivity-id="<%= tactivity.id %>"<% end %> data-tslot-id="<%= tslot.id %>" data-space-id="<%= space.id %>">
+        <% if tactivity %>
+          <%= partial :'timetables/tactivity', object: tactivity %>
+        <% end %>
+      </div>
+    </td>
+    <% } %>
+    <% if @membership.admin? %>
+      <td></td>
+    <% end %>
+  </tr>
+  <% } %>
+  <% if @membership.admin? %>
+    <tr>
+      <td>
+        <% form_tag "/tslots/create?timetable_id=#{timetable.id}", class: 'form-inline', style: 'display: inline' do %>
+          <%= text_field_tag :name, class: 'form-control', style: 'width: 10em', placeholder: 'New slot' %>
+        <% end %>
+      </td>
+    </tr>
+  <% end %>
+</table>
+<% end %>

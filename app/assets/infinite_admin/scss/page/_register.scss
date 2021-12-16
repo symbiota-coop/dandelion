@@ -1,0 +1,122 @@
+/* Register Page Setting */
+
+.register {
+	position: absolute;
+	top: 0;
+	left: 0;
+	right: 0;
+	bottom: 0;
+	color: $color_white;
+}
+.register-cover {
+	background: url('../img/register-cover.jpg');
+	background-size: 100%;
+	background-repeat: no-repeat;
+	background-attachment: fixed;
+	background-position: center center;
+	position: fixed;
+	right: 0;
+	top: 0;
+	left: 0;
+	bottom: 0;
+	
+	&:before {
+		content: '';
+		display: block;
+		position: absolute;
+		top: 0;
+		left: 0;
+		right: 0;
+		bottom: 0;
+		background: linear-gradient(to bottom, rgba(0,0,0,0.3) 0%, rgba(0,0,0,0.85) 100%);
+	}
+}
+.register-content {
+	width: 45rem;
+	position: absolute;
+	left: 50%;
+	margin-left: -22.5rem;
+	top: 3.125rem;
+	padding: 1.25rem;
+}
+.inverse-mode .register-brand a,
+.inverse-mode .register-brand a:hover,
+.inverse-mode .register-brand a:focus,
+.register-brand a,
+.register-brand a:hover,
+.register-brand a:focus {
+	display: block;
+	color: $color_white;
+	text-decoration: none;
+}
+.register-brand {
+	font-size: 1rem;
+	line-height: 1.75rem;
+	margin-bottom: 1.875rem;
+	
+	& i {
+		float: left;
+		width: 1.75rem;
+		line-height: 1.75rem;
+		font-size: 1.75rem;
+		margin-right: 0.625rem;
+	}
+}
+.register .form-control,
+.inverse-mode .register .form-control,
+.register select.form-control:not([size]):not([multiple]),
+.inverse-mode .register select.form-control:not([size]):not([multiple]) {
+	background: rgba(255,255,255,0.3);
+	border-color: transparent;
+	color: $color_white;
+}
+.register .control-label {
+	color: $color_white;
+}
+.register .form-control:focus {
+	@include box-shadow(0 0 0px 2px rgba(102,175,233,1));
+}
+.checkbox input + label:before, .checkbox-inline input + label:before {
+	background: none;
+}
+.register-desc {
+	color: rgba(255,255,255,0.5);
+	margin-bottom: 0.3125rem;
+}
+.register h3 span {
+	border-bottom: 0.125rem solid rgba(255,255,255,0.25);
+	padding-bottom: 0.3125rem;
+}
+.register .form-control::-webkit-input-placeholder {
+	color: rgba(255,255,255,0.75);
+}
+.register .form-control::-moz-placeholder {
+	color: rgba(255,255,255,0.75);
+}
+.register .form-control:-ms-input-placeholder {
+	color: rgba(255,255,255,0.75);
+}
+.register .form-control:-moz-placeholder {
+	color: rgba(255,255,255,0.75);
+}
+@media (max-width: 1024px) {
+	.register-cover {
+		background-size: auto 100%;
+	}
+}
+@media (max-width: 767px) {
+	.register-content {
+		width: 30rem;
+		margin-left: -15rem;
+	}
+}	
+@media (max-width: 480px) {
+	.register-content {
+		width: auto;
+		left: 0;
+		margin-left: 0;
+		right: 0;
+		top: 0;
+		padding: 1.25rem;
+	}
+}

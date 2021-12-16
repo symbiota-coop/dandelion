@@ -1,0 +1,70 @@
+<% if @membership.confirmed? and !current_account.not_on_facebook and @gathering.facebook_group_url and !@membership.member_of_facebook_group %>
+  <div class="card mt-3">
+    <div class="card-body p-3">
+      <p>Have you joined the <a target="_blank" href="<%= @gathering.facebook_group_url %>">the Facebook group</a>?</p>
+      <div class="d-inline d-sm-block mb-sm-1">
+        <a class="btn btn-primary btn-sm" href="/g/<%= @gathering.slug %>/joined_facebook_group">Yes, I'm a member</a>
+      </div>
+      <div class="d-inline d-sm-block">
+        <a class="btn btn-secondary btn-sm" href="/accounts/not_on_facebook">I don't use Facebook</a>
+      </div>
+    </div>
+  </div>
+<% end %>
+<table class="table table-borderless">
+  <% if @gathering.enable_contributions? && @gathering.options.count > 0 %>
+    <tr>
+      <th>
+        Your options
+      </th>
+      <td>
+        <% if @membership && @membership.optionships.count > 0 %>
+          <% @membership.optionships.each { |optionship| %>
+          <a title="<%= optionship.option.type %>" href="/g/<%= @gathering.slug %>/options" class="label label-primary text-white d-inline-block mb-1">
+            <i class="fa <%= optionship.option.icon %>"></i> <%= optionship.option.name %> (<%= m optionship.option.cost_per_person, @gathering.currency %>)
+          </a>
+          <% } %>
+        <% else %>
+          <a href="/g/<%= @gathering.slug %>/options">Select options</a>
+        <% end %>
+      </td>
+    </tr>
+  <% end %>
+  <% if @gathering.enable_teams? && @gathering.teams.count > 0 %>
+    <tr>
+      <th>
+        Your teams
+      </th>
+      <td>
+        <% if @membership && @membership.teamships.count > 0 %>
+          <% @membership.teamships.each { |teamship| %>
+          <a href="/g/<%= @gathering.slug %>/teams/<%= teamship.team_id %>" class="label label-primary text-white d-inline-block mb-1">
+            <%= teamship.team.name %>
+          </a>
+          <% } %>
+        <% else %>
+          <a href="/g/<%= @gathering.slug %>/teams">Join teams</a>
+        <% end %>
+      </td>
+    </tr>
+  <% end %>
+  <% if @gathering.enable_rotas? && @gathering.rotas.count > 0 %>
+    <tr>
+      <th>
+        Your shifts
+      </th>
+      <td>
+        <% if @membership && @membership.shifts.count > 0 %>
+          <% @membership.shifts.each { |shift| %>
+          <a href="/g/<%= @gathering.slug %>/rotas/<%= shift.rota_id %>" class="label label-primary text-white d-inline-block mb-1">
+            <%= shift.rota.name %>, <%= shift.rslot.name %>
+          </a>
+          <% } %>
+        <% else %>
+          <a href="/g/<%= @gathering.slug %>/rotas">Sign up to shifts</a>
+        <% end %>
+      </td>
+    </tr>
+  <% end %>
+</table>
+<%= partial :'gatherings/owed' %>

@@ -1,0 +1,40 @@
+<% if notifications.empty? %>
+  <p class="text-center lead mb-3">Your newsfeed is empty.</p>
+<% else %>
+  <ul class="list-unstyled">
+    <% notifications.each_with_index { |notification,i| %>
+    <li>
+      <div class="media">
+        <span style="border-radius: 6px; height: 18px; width: 18px; font-size: 12px" class="text-center bg-dark text-white"><i class="fa <%= notification.icon %>"></i></span>
+        <div class="media-body ml-2">
+          <p class="my-0 mb-1">
+            <a class="text-dark" href="<%= notification.link[1] %>">
+              <%= notification.sentence %>
+              <% if include_circle_name %>
+                <% if notification.circle.is_a?(Gathering) %>
+                  in <strong><%= notification.circle.name %></strong>
+                <% end %>
+              <% end %>
+            </a>
+            <% if notification.type.to_sym == :applied; mapplication = notification.notifiable %>
+              <span class="float-right label label-<%= mapplication.label %>"><%= mapplication.status.capitalize %></span>
+            <% end %>
+            <span style="font-size: 11px" class="text-muted"><%= timeago(notification.created_at) %></span>
+          </p>
+          <% if notification.type == 'commented'; comment = notification.notifiable %>
+            <div class="media ml-2 my-2">
+              <%= partial :'accounts/square', locals: { account: notification.notifiable.account, style: 'display: block; width: 32px' } %>
+              <div class="media-body ml-2">
+                <%= partial :'comments/body', locals: { comment: comment } %>
+                <div data-pagelet-url="/comments/<%= comment.id %>/reactions" class="mt-3"></div>
+              </div>
+            </div>
+          <% end %>
+        </div>
+      </div>
+      <hr class="my-3" style="border-top-color: rgba(0,0,0,0.1)">
+    </li>
+    <% } %>
+  </ul>
+  <%= will_paginate notifications, inner_window: 0, outer_window: 0, renderer: WillPaginate::ViewHelpers::BootstrapRenderer %>
+<% end %>

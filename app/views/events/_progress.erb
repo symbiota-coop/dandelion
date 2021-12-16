@@ -1,0 +1,32 @@
+<% if event.tickettailor_id %>
+  <a target="_blank" href="https://app.tickettailor.com/event/<%= event.tickettailor_id %>">
+    <span class="label label-primary">TicketTailor</span>
+  </a>
+<% elsif (event.live? or event.tickets.count > 0) %>
+  <a href="/events/<%= event.id %>/tickets">
+    <% if defined?(full_width) && !event.capacity %>
+      <%= event.tickets.count %> tickets
+    <% elsif !defined?(full_width) %>
+      <%= event.tickets.count %><% if event.capacity %>/<%= event.capacity %><% end %>
+    <% end %>
+  </a>
+  <% if event.capacity; w = ((event.tickets.count/event.capacity.to_f)*100).round %>
+    <a class="d-block" style="text-decoration: none" href="/events/<%= event.id %>/tickets">
+      <div class="progress" data-toggle="tooltip" title="<%= event.tickets.count %>/<%= event.capacity %> tickets sold">
+        <div class="progress-bar" role="progressbar" style="width: <%= "#{w}%" %>;">
+          <% if defined?(full_width) %>
+            <%= event.tickets.count %>/<%= event.capacity %>
+          <% end %>
+        </div>
+      </div>
+    </a>
+  <% end %>
+  <% if event.orders.incomplete.count > 0 %>
+    <i class="fa fa-spin fa-circle-o-notch"></i>
+  <% end %>
+  <% if event.sold_out? %>
+    <div class="mt-1">
+      <span class="label label-success">Sold out</span>
+    </div>
+  <% end %>
+<% end %>

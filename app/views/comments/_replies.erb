@@ -1,0 +1,3 @@
+<% post.comments.order('created_at asc').skip(1).each { |comment| %>
+<%= partial :'comments/comment', locals: { comment: comment } %>
+<% } %>

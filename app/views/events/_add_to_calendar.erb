@@ -1,0 +1,7 @@
+<a target="_blank" href="https://www.google.com/calendar/render?action=TEMPLATE&text=<%= ERB::Util.url_encode(@event.name) %>&details=<%= ERB::Util.url_encode("#{ENV['BASE_URI']}/events/#{@event.id}") %>&location=<%= ERB::Util.url_encode(@event.location) %>&dates=<%= ERB::Util.url_encode("#{@event.start_time.utc.iso8601.gsub('-', '').gsub(':', '')}/#{@event.end_time.utc.iso8601.gsub('-', '').gsub(':', '')}") %>">
+  <%= defined?(add_to) ? 'Add to Google Calendar' : 'Google' %>
+</a>
+&middot;
+<a target="_blank" href="/events/<%= @event.id %>.ics">
+  <%= defined?(add_to) ? 'Add as ICS' : 'ICS' %>
+</a>

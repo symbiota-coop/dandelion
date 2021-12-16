@@ -1,0 +1,207 @@
+<% points_limit = 500 %>
+<script>
+  $(function () {
+    mapTimer = null;
+    map = new google.maps.Map(document.getElementById("map-canvas"), {
+      mapTypeId: google.maps.MapTypeId.ROADMAP,
+      mapTypeControl: false,
+      scaleControl: true,
+      streetViewControl: false,
+      fullscreenControl: false,
+      maxZoom: 16,
+      minZoom: <%= defined?(minZoom) && minZoom ? minZoom : 1 %>
+    });
+    var bounds = new google.maps.LatLngBounds();
+
+    var models = []
+  <% [Place, Account, Gathering, ActivityApplication].each { |model| %>
+      models.push({
+        name: '<%= model.to_s %>',
+        color: '<%= model.marker_color %>',
+        icon: '<%= model.marker_icon %>',
+      })
+  <% } %>
+
+    var points = []
+  <% if defined?(points) && (!defined?(dynamic) || (defined?(points_count) && points_count <= points_limit)) %>
+  <% points.each { |point| %>
+        points.push({
+          model_name: '<%= point.class.to_s %>',
+          id: '<%= point.id %>',
+          lat: <%= point.lat + (point.is_a?(Account) || point.is_a?(ActivityApplication) ? (rand - 0.5) * 0.0035 : 0) %>,
+          lng: <%= point.lng + (point.is_a?(Account) || point.is_a?(ActivityApplication) ? (rand - 0.5) * 0.0035 : 0) %>,
+        })
+  <% } %>
+  <% end %>
+
+    var polygonPaths = []
+  <% if defined?(polygonables) %>
+  <% polygonables.each { |polygonable| %>
+    <% polygonable.polygons.each { |polygon| %>
+          polygonPaths.push([
+      <% polygon.coordinates[0].each { |coordinate| %>
+              {lat: <%= coordinate[1] %>, lng: <%= coordinate[0] %>},
+      <% } %>
+          ])
+    <% } %>
+  <% } %>
+  <% end %>
+
+    var infowindow = new google.maps.InfoWindow();
+    var markers = []
+    for (i = 0; i < points.length; i++) {
+      var point = points[i];
+      var marker = new mapIcons.Marker({
+        model_name: point.model_name,
+        id: point.id,
+        position: new google.maps.LatLng(point.lat, point.lng),
+        icon: {
+          path: mapIcons.shapes.MAP_PIN,
+          fillColor: models.find(model => model.name == point.model_name)['color'],
+          fillOpacity: 1,
+          strokeColor: '',
+          strokeWeight: 0
+        },
+        map_icon_label: '<span class="' + models.find(model => model.name == point.model_name)['icon'] + '"></span>'
+      });
+      google.maps.event.addListener(marker, 'click', function (marker) {
+        return function () {
+          infowindow.setContent('<i class="fa fa-spin fa-circle-o-notch"></i>');
+          infowindow.open(map, marker);
+          setTimeout(function () {
+            clearTimeout(mapTimer)
+          }, 750)
+          $.get('/point/' + marker.model_name + '/' + marker.id, function (data) {
+            infowindow.setContent('<div class="infowindow">' + data + '</div>');
+          })
+        }
+      }(marker));
+  <% if (!defined?(polygonables) || polygonables.empty?) %>
+        bounds.extend(marker.getPosition());
+  <% end %>
+      markers.push(marker);
+    }
+    var polygons = []
+    for (i = 0; i < polygonPaths.length; i++) {
+      var polygon = new google.maps.Polygon({
+        map: map,
+        paths: polygonPaths[i],
+        strokeColor: '#FBAE3B',
+        strokeOpacity: 0.8,
+        strokeWeight: 2,
+        fillColor: '#FBAE3B',
+        fillOpacity: 0.35
+      });
+      var paths = polygon.getPaths();
+      for (var ii = 0; ii < paths.getLength(); ii++) {
+        var path = paths.getAt(ii);
+        for (var iii = 0; iii < path.getLength(); iii++) {
+          bounds.extend(path.getAt(iii));
+        }
+      }
+      polygons.push(polygon);
+    }
+
+    var clusterStyles = [
+      {
+        textColor: 'white',
+        textSize: 16,
+        fontFamily: 'Circular Std',
+        url: '/images/cluster-green.png',
+        height: 50,
+        width: 50
+      },
+      {
+        textColor: 'white',
+        textSize: 16,
+        fontFamily: 'Circular Std',
+        url: '/images/cluster-yellow.png',
+        height: 50,
+        width: 50
+      },
+      {
+        textColor: 'white',
+        textSize: 14,
+        fontFamily: 'Circular Std',
+        url: '/images/cluster-red.png',
+        height: 50,
+        width: 50
+      }
+    ];
+
+    var markerClusterer = new MarkerClusterer(map, markers, {styles: clusterStyles, maxZoom: 14});
+  <% if defined?(centre) && centre %>
+      map.setCenter(new google.maps.LatLng(<%= centre.lat %>, <%= centre.lng %>))
+      map.setZoom(<%= zoom %>)
+  <% elsif defined?(bounds) && bounds %>
+      map.fitBounds({south: <%= bounds[:south] %>, west: <%= bounds[:west] %>, north: <%= bounds[:north] %>, east: <%= bounds[:east] %>});
+  <% elsif (!defined?(points) || points.empty? || (defined?(points_count) && points_count > points_limit)) && (!defined?(polygonables) || polygonables.empty?) %>
+      map.setCenter(new google.maps.LatLng(35, 0));
+      map.setZoom(2)
+  <% else %>
+      map.fitBounds(bounds);
+  <% end %>
+
+  <% if defined?(dynamic) && dynamic %>
+      var pagelet = $('#map-container').closest('[data-pagelet-url]')
+      var query = pagelet.attr('data-pagelet-url').split('?')[1]
+      var params = $.deparam(query)
+
+      google.maps.event.addListenerOnce(map, 'idle', function () {
+        map.addListener('bounds_changed', function () {
+          var center = map.getCenter().toJSON()
+          var zoom = map.getZoom()
+          var bounds = map.getBounds().toJSON()
+          delete params['triggered_bounds_changed']
+          var q = {lat: center['lat'], lng: center['lng'], zoom: zoom, south: bounds['south'], west: bounds['west'], north: bounds['north'], east: bounds['east']}
+  <% if defined?(trigger_bounds_changed) %>
+            q['triggered_bounds_changed'] = true
+  <% end %>
+          jQuery.extend(params, q);
+          pagelet.attr('data-pagelet-url', '/map?' + $.param(params))
+
+          clearTimeout(mapTimer);
+          mapTimer = setTimeout(function () {
+            map.setOptions({draggable: false, zoomControl: false, scrollwheel: false, disableDoubleClickZoom: true})
+            pagelet.css('opacity', '0.3')
+            pagelet.load(pagelet.attr('data-pagelet-url'), function () {
+              pagelet.css('opacity', '1')
+            })
+          }, 750)
+        })
+  <% if defined?(trigger_bounds_changed) %>
+          google.maps.event.trigger(map, 'bounds_changed');
+  <% end %>
+
+  <% if defined?(points_count) && points_count > points_limit %>
+          if (params['triggered_bounds_changed']) {
+            navigator.geolocation.getCurrentPosition(function (position) {
+              if (position) {
+                map.setCenter(new google.maps.LatLng(position.coords.latitude, position.coords.longitude))
+                map.setZoom(10)
+                google.maps.event.trigger(map, 'bounds_changed');
+              }
+            }, function () {
+              $('#points-warning').show()
+            })
+          } else {
+            $('#points-warning').show()
+          }
+  <% end %>
+
+      });
+  <% end %>
+
+  });
+</script>
+<div id="map-container">
+  <div id="map-canvas" style="height: 68vh"></div>
+  <div id="points-warning" style="display: none" class="mt-3 alert alert-warning">There are too many points to display, please zoom in</div>
+</div>
+<% if defined?(places) && places %>
+  <% if @places.count <= 16 %>
+    <div class="mt-3">
+      <%= partial :'places/blocks', locals: { places: @places } %>
+    </div>
+  <% end %>
+<% end %>

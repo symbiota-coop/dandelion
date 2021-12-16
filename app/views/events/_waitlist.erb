@@ -1,0 +1,27 @@
+<div class="card">
+  <h3 class="card-header bg-primary text-white">This event is sold out</h3>
+  <div class="card-body">
+    <p class="lead">
+      Missed out on tickets to <%= @event.name %>?
+      <mark>Join the waitlist and we'll let you know when tickets become available to this event or future events.</mark>
+    </p>
+    <script>
+      $(function () {
+
+        $('#waitlist-form').submit(function () {
+          if (!grecaptcha || grecaptcha.getResponse().length == 0) {
+            alert('Please confirm you are not a robot');
+            return false
+          }
+        })
+
+      })
+    </script>
+    <% form_for Waitship.new, "/events/#{@event.id}/waitship/new", id: 'waitlist-form'  do |f| %>
+      <%= f.text_block :name %>
+      <%= f.text_block :email %>
+      <div class="g-recaptcha mb-2" data-sitekey="<%= ENV['RECAPTCHA_SITE_KEY'] %>"></div>
+      <%= f.submit_block button_text: 'Submit' %>
+    <% end %>
+  </div>
+</div>

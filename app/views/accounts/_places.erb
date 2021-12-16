@@ -1,0 +1,42 @@
+<% c = @account.placeship_categories.count %>
+<% if c == 0 %>
+  <%= partial :'places/blocks', locals: { places: Place.and(:id.in => @account.placeships.pluck(:place_id)).shuffle, block_class: (block_class if defined?(block_class)) } %>
+<% else %>
+  <% (@account.placeship_categories + ['uncategorised']).each_with_index { |placeship_category, i| %>
+  <% placeships = (i < c ? placeship_category.placeships : @account.placeships.and(placeship_category_id: nil)) %>
+  <% if placeships.count > 0 %>
+    <div class="placeship_category card" style="border-bottom-width: 0; border-radius: 0; <% if i == 0 %>border-top-left-radius: 5px; border-top-right-radius: 5px; <% end %>">
+      <div class="card-header">
+        <div class="row justify-content-between">
+          <div class="col">
+            <h4 class="mb-0">
+              <% if i < c %>
+                <a class="text-dark" href="/placeship_categories/<%= placeship_category.id %>/edit"><%= placeship_category.name %></a>
+              <% else %>
+                Uncategorised
+              <% end %>
+            </h4>
+          </div>
+          <div class="col-auto">
+            <a class="text-dark" target="_blank" href="
+              <% if i < c %>
+                   /map?placeship_category_id=<%= placeship_category.id %>
+                 <% else %>
+                   /map?uncategorised_id=<%= @account.id %>
+                 <% end %>
+                 "><i class="fa fa-map"></i></a>
+          </div>
+        </div>
+      </div>
+      <div class="card-body pb-0">
+        <%= partial :'places/blocks', locals: { places: Place.and(:id.in => placeships.pluck(:place_id)).shuffle, block_class: (block_class if defined?(block_class)) } %>
+      </div>
+    </div>
+  <% end %>
+  <% } %>
+  <script>
+    $(function () {
+      $('.placeship_category.card').last().css('border-bottom-width', '1px').css('border-bottom-left-radius', '5px').css('border-bottom-right-radius', '5px')
+    })
+  </script>
+<% end %>

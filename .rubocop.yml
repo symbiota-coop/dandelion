@@ -1,0 +1,23 @@
+Layout/EndAlignment:
+  AutoCorrect: true
+Style/SymbolArray:
+  MinSize: 3
+
+Metrics:
+  Enabled: false
+Style/FrozenStringLiteralComment:
+  Enabled: false
+Style/SafeNavigation:
+  Enabled: false
+Style/RedundantBegin:
+  Enabled: false
+Style/Documentation:
+  Enabled: false
+Layout/LineLength:
+  Enabled: false
+Lint/ShadowingOuterLocalVariable:
+  Enabled: false
+Lint/Debugger:
+  Enabled: false
+Lint/UriEscapeUnescape:
+  Enabled: false

@@ -1,0 +1,60 @@
+<%= partial :'organisations/nav', locals: { organisation: @organisation } %>
+
+<a href="/pmail_tests/new?<%= @scope %>" class="btn btn-primary"><i class="fa fa-bar-chart"></i> New A/B test</a>
+<table class="table table-hover table-striped mt-3">
+  <thead>
+    <tr>
+      <th>Name</th>
+      <th>To</th>
+      <th>Created by</th>
+      <th style="width: 33%">Status</th>
+    </tr>
+  </thead>
+  <tbody>
+    <% @pmail_tests.each { |pmail_test| %>
+    <% edit_url = "/pmail_tests/#{pmail_test.id}?#{@scope}" %>
+    <tr>
+      <td>
+        <a href="<%= edit_url %>"><%= pmail_test.name %></a>
+      </td>
+      <td>
+        <% if !(pmail_test.pmails.all? { |pmail| pmail.organisation == pmail_test.organisation } &&
+            pmail_test.pmails.map(&:to_selected).uniq.count == 1) %>
+        <i class="fa fa-warning"></i> These emails have different lists!
+      <% else %>
+        <%= partial :'pmails/to', locals: { pmail: pmail_test.pmails.first } %>
+      <% end %>
+    </td>
+    <td>
+      <a href="/u/<%= pmail_test.account.username %>"><%= pmail_test.account.name %></a>
+    </td>
+    <td>
+      <% if pmail_test.sent_at %>
+        <a class="btn btn-primary mr-1 mb-1" href="<%= edit_url %>">
+          <i class="fa fa-check"></i> Sent
+        </a>
+        <div class="mt-1">
+          Queued for sending at <%= pmail_test.requested_send_at %> <br>
+          Sent at <%= pmail_test.sent_at %>
+        </div>
+      <% elsif pmail_test.requested_send_at %>
+        <a class="btn btn-secondary mr-1 mb-1" href="<%= edit_url %>">
+          <i class="fa fa-spin fa-circle-o-notch"></i> Sending
+        </a>
+        <div class="mt-1">
+          Queued for sending at <%= pmail_test.requested_send_at %> <br>
+        </div>
+      <% else %>
+        <a class="btn btn-secondary" href="<%= edit_url %>">
+          <i class="fa fa-edit"></i> Edit
+        </a>
+        <div class="mt-1">
+          Created at <%= pmail_test.created_at %><br>
+        </div>
+      <% end %>
+    </td>
+  </tr>
+  <% } %>
+</tbody>
+</table>
+<%= will_paginate @pmail_tests, renderer: WillPaginate::ViewHelpers::BootstrapRenderer %>

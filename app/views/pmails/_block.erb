@@ -1,0 +1,8 @@
+<div class="block">
+  <h4 class="block-title">
+    <a class="text-dark" target="_blank" href="<%= "/pmails/#{pmail.id}" %>" onclick="event.stopPropagation();"><%= pmail.subject %></a>
+    <small>
+      <%= pmail.sent_at.to_date %>
+    </small>
+  </h4>
+</div>

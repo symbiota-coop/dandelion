@@ -1,0 +1,22 @@
+<% if activity.persisted? && activity_admin?(activity) %>
+  <% unless defined?(inline) %>
+    <%== '<div class="mb-3">' %>
+  <% end %>
+  <% if organisation_admin?(activity.organisation) && !defined?(hide_organisation_nav) %>
+    <%= partial :'organisations/nav', locals: { organisation: activity.organisation, inline: true } %>
+  <% end %>
+  <%= dropdown_nav [
+        ['View activity', "/activities/#{activity.id}"],
+        ['Settings', "/activities/#{activity.id}/edit"],
+        ([%(Applications <span class="badge badge-primary">#{activity.activity_applications.outstanding.count}</span>), "/activities/#{activity.id}/applications"] if activity.privacy == 'closed'),
+        [%(Followers <span class="badge badge-primary">#{activity.activityships.count}</span>), "/activities/#{activity.id}/followers"],
+        ['Discount codes', "/activities/#{activity.id}/discount_codes"],
+        ['Event stats', "/activities/#{activity.id}/events/stats"],
+        ['Audience stats', "/activities/#{activity.id}/stats"],
+        ['Feedback', "/activities/#{activity.id}/feedback"],
+        ['Mailer', "/activities/#{activity.id}/pmails"]
+      ].compact, button_text: %(#{activity.name} <i class="fa fa-caret-down"></i>), container_class: 'btn-group mb-1' %>
+  <% unless defined?(inline) %>
+    <%== '</div>' %>
+  <% end %>
+<% end %>

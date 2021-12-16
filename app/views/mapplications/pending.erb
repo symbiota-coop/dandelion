@@ -1,0 +1,20 @@
+<%= partial :'gatherings/nav', locals: { gathering: @gathering, membership: @membership } %>
+<div data-pagelet-url="/g/<%= @gathering.slug %>/threshold">
+  <%= partial :'mapplications/threshold' %>
+</div>
+<div class="mb-3">
+  <% form_tag '', method: 'get', class: 'submitOnChange searchForm form-inline' do %>
+    <div class="form-group">
+      <label>Search applicants</label>
+      <%= text_field_tag :q, class: 'form-control', value: params[:q] %>
+    </div>
+    <div class="form-group">
+      <label>View as</label>
+      <%= select_tag :view, class: 'form-control', options: %w[table pictures emails].map { |view| [view.to_s.humanize.capitalize, view] }, selected: params[:view] %>
+    </div>
+  <% end %>
+</div>
+<%= partial :'mapplications/mapplications' %>
+<% if @gathering.mapplications.paused.count > 0 %>
+  <a href="/g/<%= @gathering.slug %>/applications/paused">View <%= pluralize(@gathering.mapplications.paused.count, 'paused application') %></a>
+<% end %>

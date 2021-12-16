@@ -1,0 +1,41 @@
+/* Colorpicker Setting */
+
+body .colorpicker {
+	padding: 0.3125rem;
+	@include border-radius(0.5rem);
+}
+body .colorpicker-saturation,
+body .colorpicker-alpha, 
+body .colorpicker-hue,
+body .colorpicker-color div,
+body .colorpicker-selectors i {
+	@include border-radius(0.125rem);
+}
+body .colorpicker-element .add-on i, 
+body .colorpicker-element .input-group-addon i {
+	margin: 0 -0.125rem;
+	@include border-radius(0.1875rem);
+}
+body .colorpicker:before,
+body .colorpicker:after {
+	border-width: 0.625rem;
+	top: -1.25rem;
+	left: 0.9375rem;
+}
+body .colorpicker:before {
+	border-bottom-color: rgba(0,0,0,0.1);
+	top: -1.3125rem;
+}	
+body .colorpicker.colorpicker-right:before,
+body .colorpicker.colorpicker-right:after {
+	right: 0.9375rem;
+	left: auto;
+}
+body .colorpicker.colorpicker-bottom:before,
+body .colorpicker.colorpicker-bottom:after {
+	top: auto;
+	bottom: -0.625rem;
+}
+body .colorpicker.colorpicker-bottom:before {
+	bottom: -0.6875rem;
+}

@@ -1,0 +1,110 @@
+/* Widget Theme Panel Setting */
+
+.theme-panel {
+	position: fixed;
+	right: -12.5rem;
+	top: 50%;
+	margin-top: -10.875rem;
+	@include transition(all .2s linear);
+	
+	&.active {
+		right: 0;
+	}
+	& .theme-collapse-btn {
+		position: absolute;
+		top: 2.25rem;
+		left: -2.25rem;
+		width: 2.25rem;
+		height: 2.25rem;
+		line-height: 2.25rem;
+		background: #fff;
+		text-align: center;
+		font-size: 1.125rem;
+		color: #333;
+		text-decoration: none;
+		@include box-shadow(-0.625rem 0.125rem 1.5rem 0 rgba(0,0,0,0.08));
+		@include border-radius(0.25rem 0 0 0.25rem);
+		
+		& i {
+			line-height: 2.25rem;
+		}
+	}
+	& .theme-panel-content {
+		padding: 0.9375rem;
+		background: #fff;
+		width: 12.5rem;
+		z-index: 10;
+		@include box-shadow(0 0.125rem 2.5rem 0 rgba(0,0,0,0.08));
+		@include border-radius(0.375rem 0 0 0.375rem);
+		
+		& .widget {
+			margin: 0 -0.9275rem;
+		}
+	}
+	& .theme-list {
+		list-style-type: none;
+		margin: -0.125rem;
+		padding: 0;
+		
+		& > li {
+			float: left;
+			width: 16.66667%;
+			padding: 0.125rem;
+			
+			& a {
+				display: block;
+				text-decoration: none;
+				border-radius: 0.5rem;
+				padding-top: 100%;
+				position: relative;
+				
+				&:before {
+					content: '\e64c';
+					position: absolute;
+					top: 50%;
+					left: 0;
+					right: 0;
+					text-align: center;
+					font-size: 1rem;
+					line-height: 1.25rem;
+					margin-top: -0.625rem;
+					color: transparent;
+					font-family: 'themify';
+					speak: none;
+					font-style: normal;
+					font-weight: normal;
+					font-variant: normal;
+					text-transform: none;
+					-webkit-font-smoothing: antialiased;
+					-moz-osx-font-smoothing: grayscale;
+				}
+				&:hover:before,
+				&:focus:before {
+					color: rgba(255,255,255,0.5);
+				}
+			}
+			&.active a:before,
+			&.active a:hover:before,
+			&.active a:focus:before {
+				color: #fff;
+			}
+		}
+	}
+	& .divider {
+		margin: 0.9375rem -0.9375rem;
+		height: 1px;
+		background: #eee;
+	}
+	& .widget.widget-list {
+		border-top: 1px solid #EFEFF4;
+		border-bottom: 1px solid #EFEFF4;
+		margin-bottom: 0.9375rem;
+		
+		& .widget-list-container > div:first-child {
+			padding-left: 0.9375rem;
+		}
+		& .widget-list-container > div:last-child {
+			padding-right: 0.9375rem;
+		}
+	}
+}

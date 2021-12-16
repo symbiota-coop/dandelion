@@ -1,0 +1,36 @@
+<% if !comment.comment_reactions.find_by(account: current_account) %>
+  <a data-toggle="tooltip" title="React" style="background: white; text-decoration: none" class="rounded p-1 border border-primary" href="javascript:;" onclick="$(this).hide().next().css('display', 'inline')">
+    <i class="fa fa-heart-o"></i>
+  </a>
+  <% form_tag "/comments/#{comment.id}/react", class: 'form-inline', style: 'display: none;' do %>
+    <div class="row align-items-center">
+      <div class="col-auto">
+        <% %w[💚 👍 🙏 👀 🙌 🎉].each { |e| %>
+        <a style="text-decoration: none; background: white" class="rounded p-1 border border-light" href="javascript:;" onclick="$(this).closest('form').find('input').val($(this).text()).closest('form').submit()"><%= e %></a>
+        <% } %>
+      </div>
+      <div class="col-auto mr-1">
+        or enter a word/emoji
+      </div>
+      <div class="col-auto">
+        <div class="input-group mb-1" style="width: 5rem;">
+          <%= text_field_tag :body, class: 'form-control form-control-sm d-inline' %>
+          <div class="input-group-append">
+            <button class="btn btn-primary" style="height: 1.875rem" type="submit"><i class="fa fa-chevron-right"></i></button>
+          </div>
+        </div>
+      </div>
+    </div>
+  <% end %>
+<% end %>
+<% if comment.comment_reactions.count > 0 %>
+  <% comment.comment_reactions.pluck(:body).uniq.each { |body| comment_reactions = comment.comment_reactions.and(body: body) %>
+  <% c = 'd-inline-block border rounded p-1 text-dark' %>
+  <a data-toggle="tooltip" style="text-decoration: none; background: white" <% if comment_reactions.find_by(account: current_account) %> class="pagelet-trigger border-primary <%= c %>" href="/comments/<%= comment.id %>/unreact" onclick="$(this).tooltip('hide')" <% else %> class="<%= c %> border-light" <% end %>>
+    <%= body == '❤' ? '❤️' : body %> <%= comment_reactions.count %>
+  </a>
+  <span style="display: none">
+    <%= comment_reactions.map { |comment_reaction| comment_reaction.account.name }.join('<br />') %>
+  </span>
+  <% } %>
+<% end %>

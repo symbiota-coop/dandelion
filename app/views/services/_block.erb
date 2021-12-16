@@ -1,0 +1,45 @@
+<div class="row block no-gutters align-items-center <% if service.draft? %>bg-grey-transparent-2<% else %>bg-white<% end %>">
+  <div class="col-auto order-md-2 mb-2 mb-md-0">
+    <% if service.account.picture %>
+      <div class="p-3">
+        <a target="_parent" href="/services/<%= service.id %>"><img style="max-width: 200px" class="w-100 rounded-circle" src="<%= u service.account.picture.thumb('500x500#').url %>"></a>
+      </div>
+    <% end %>
+  </div>
+  <div class="col order-md-1">
+    <table style="width: 100%; height: 100%">
+      <tr>
+        <td style="vertical-align: top">
+          <div class="row justify-content-between">
+            <div class="col ml-1 p-sm-3">
+              <h4 class="block-title">
+                <a class="text-dark" target="_parent" href="<%= "/services/#{service.id}" %>" onclick="event.stopPropagation();">
+                  <%= service.name_with_provider %>
+                </a>
+                <% if service_admin?(service) %>
+                  <a class="text-dark block-edit" style="display: none" target="_parent" href="<%= "/services/#{service.id}/edit" %>" onclick="event.stopPropagation();">
+                    <i class="fa fa-pencil"></i>
+                  </a>
+                <% end %>
+              </h4>
+              <% if service.draft? %>
+                <span class="label label-default mb-1 d-inline-block">Draft</span>
+              <% end %>
+              <ul style="margin-left: 1.66em; font-size: 1rem" class="fa-ul text-dark">
+                <% unless @organisation %>
+                  <li>
+                    <i class="fa fa-li fa-flag"></i>
+                    <% organisations = []; organisations << %(<a class="text-dark" href="/o/#{Sanitize.fragment(event.organisation.slug)}">#{Sanitize.fragment(event.organisation.name)}</a>) %>
+                    <% event.cohosts.each { |organisation| organisations << %(<a class="text-dark" href="/o/#{Sanitize.fragment(organisation.slug)}">#{Sanitize.fragment(organisation.name)}</a></li>) } %>
+                    <%== organisations.join(', ') %>
+                  <% end %>
+                  <li><i class="fa fa-li fa-clock-o"></i> <%= service.duration_in_minutes %>min</li>
+                  <li><i class="fa fa-li fa-credit-card"></i> <%= m service.price, service.currency %></li>
+                </ul>
+              </div>
+            </div>
+          </td>
+        </tr>
+      </table>
+    </div>
+  </div>

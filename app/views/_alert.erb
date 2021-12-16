@@ -1,0 +1,20 @@
+<% unless @hide_alert %>
+  <style>
+    #alert-wrap { position: absolute; z-index: 9999; top: 0; left: 50%; width: 90%; margin-left: -45% }
+    @media(min-width: 768px) {
+      #alert-wrap { width: 50%; margin-left: -25% }
+    }
+  </style>
+  <div id="alert-wrap" class="mt-3">
+    <div class="container">
+      <%= partial :flash %>
+    </div>
+  </div>
+  <script>
+    $(function () {
+      window.setTimeout(function () {
+        $("#alert-wrap .alert").alert('close');
+      }, 3000);
+    });
+  </script>
+<% end %>

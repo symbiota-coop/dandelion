@@ -1,0 +1,26 @@
+<h2>Messages</h2>
+<table class="table">
+  <thead>
+    <tr>
+      <th>To</th>
+      <th>From</th>
+      <th>Message</th>
+    </tr>
+  </thead>
+  <tbody>
+    <% @messages.each { |message| %>
+    <tr>
+      <td>
+        <a href="/u/<%= message.messenger.username %>"><%= message.messenger.name %></a>
+      </td>
+      <td>
+        <a href="/u/<%= message.messengee.username %>"><%= message.messengee.name %></a>
+      </td>
+      <td>
+        <%= message.body %>
+      </td>
+    </tr>
+    <% } %>
+  </tbody>
+</table>
+<%= will_paginate @messages, renderer: WillPaginate::ViewHelpers::BootstrapRenderer %>

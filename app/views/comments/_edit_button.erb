@@ -1,0 +1,6 @@
+<a href="javascript:;" onclick="
+    var c = $(this).closest('.comment');
+    $('.comment-body', c).hide();
+    $('.comment-edit', c).show();
+    autosize($('textarea', c))
+      "> <i class="fa fa-pencil"></i></a>

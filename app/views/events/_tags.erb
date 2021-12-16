@@ -1,0 +1,14 @@
+<div class="form-group">
+  <label for="event_tag_names">
+    Tags
+  </label>
+  <%= hidden_field_tag :'event[tag_names]', id: 'event_tag_names', value: @event.event_tagships.map(&:event_tag_name).join(',') %>
+</div>
+<script>
+  $(function () {
+    $("#event_tag_names").select2({
+      tags: <%= EventTag.and(:id.in => EventTagship.pluck(:event_tag_id)).order('name asc').pluck(:name) %>,
+      width: '100%'
+    });
+  })
+</script>

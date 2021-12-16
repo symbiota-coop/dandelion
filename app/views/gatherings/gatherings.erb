@@ -1,0 +1,15 @@
+<% if !current_account || current_account.memberships.count == 0 %>
+  <h1>Gatherings</h1>
+<% end %>
+<% if current_account %>
+  <a class="btn btn-primary mt-1 mt-sm-0 mb-3" href="/g/new"><i class="fa fa-plus-circle"></i> Create a gathering</a>
+<% end %>
+<% if current_account && current_account.memberships.count > 0 %>
+  <h2>Your gatherings</h2>
+  <% gatherings = current_account.memberships.sort_by { |membership| membership.gathering.notifications_as_circle.order('created_at desc').first.try(:created_at).try(:to_i) or 0 }.reverse.map(&:gathering) %>
+  <%= partial :'gatherings/blocks', locals: { gatherings: gatherings } %>
+<% end %>
+<% if current_account && current_account.memberships.count && @gatherings.count > 0 %>
+  <h2>All gatherings</h2>
+<% end %>
+<%= partial :'gatherings/blocks', locals: { gatherings: @gatherings } %>

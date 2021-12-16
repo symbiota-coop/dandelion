@@ -1,0 +1,55 @@
+<h2>Accounts</h2>
+<table class="table">
+  <thead>
+    <tr>
+      <th>Account</th>
+      <th>Website</th>
+      <th>Location</th>
+      <th>Organisations</th>
+      <th>Gatherings</th>
+      <th>Gathering applications</th>
+      <th>Created at</th>
+    </tr>
+  </thead>
+  <tbody>
+    <% @accounts.each { |account| %>
+    <tr>
+      <td>
+        <a href="/u/<%= account.username %>">
+          <%= partial :'accounts/square', locals: { account: account, style: 'display: block; width: 100px' } %>
+        </a>
+        <a href="/u/<%= account.username %>"><%= account.name %></a>
+      </td>
+      <td>
+        <% if account.website %>
+          <a href="<%= account.website %>"><%= account.website %></a>
+        <% end %>
+      </td>
+      <td>
+        <% if account.location %>
+          <%= account.location %>
+        <% end %>
+      </td>
+      <td>
+        <% account.organisationships.each { |organisationship| %>
+        <span class="label" style="background-color: #<%= Digest::MD5.hexdigest("Organisation#{organisationship.organisation_id}")[0..5] %>"><%= organisationship.organisation.name %></span>
+        <% } %>
+      </td>
+      <td>
+        <% account.memberships.each { |membership| %>
+        <span class="label" style="background-color: #<%= Digest::MD5.hexdigest("Gathering#{membership.gathering_id}")[0..5] %>"><%= membership.gathering.name %></span>
+        <% } %>
+      </td>
+      <td>
+        <% account.mapplications.each { |mapplication| %>
+        <span class="label" style="background-color: #<%= Digest::MD5.hexdigest("Gathering#{mapplication.gathering_id}")[0..5] %>"><%= mapplication.gathering.name %></span>
+        <% } %>
+      </td>
+      <td>
+        <%= account.created_at %>
+      </td>
+    </tr>
+    <% } %>
+  </tbody>
+</table>
+<%= will_paginate @accounts, renderer: WillPaginate::ViewHelpers::BootstrapRenderer %>

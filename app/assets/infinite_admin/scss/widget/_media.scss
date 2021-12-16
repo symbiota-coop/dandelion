@@ -1,0 +1,78 @@
+/* Widget Media Setting */
+
+.widget-media.square {
+	display: block;
+	padding-top: 100%;
+	position: relative;
+	@include border-radius(0.375rem);
+	
+	&.icon i {
+		position: absolute;
+		top: 50%;
+		font-size: 4rem;
+		text-align: center;
+		left: 0;
+		right: 0;
+		margin-top: -2rem;
+		line-height: 4rem;
+	}
+	& img {
+		position: absolute;
+		top: 0;
+		left: 0;
+		right: 0;
+		max-width: 100%;
+	}
+}
+.widget-media .widget-media-container { 
+	position: absolute;
+	top: 0;
+	left: 0;
+	right: 0;
+	bottom: 0;
+	overflow: hidden;
+	z-index: 10;
+	@include border-radius(0.375rem);
+}
+.widget-media .widget-media-icon {
+	position: absolute;
+	right: 0.3125rem;
+	bottom: 0.3125rem;
+	width: 1.5rem;
+	height: 1.5rem;
+	text-align: center;
+	line-height: 1.5rem;
+	background: rgba(144, 144, 144, 0.85);
+	color: $color_white;
+	z-index: 20;
+	@include border-radius(0.75rem);
+	
+	& i {
+		display: block;
+		line-height: 1.5rem;
+		font-size: 0.875rem;
+		top: 0;
+	}
+}
+.widget-media-cover {
+	position: absolute;
+	left: 0;
+	top: 0;
+	right: 0;
+	bottom: 0;
+	background: rgba(0,0,0,0.5);
+	z-index: 10;
+}
+.widget-list-media-img {
+	width: 3rem;
+	height: 3rem;
+	position: relative;
+	@include border-radius(0.375rem);
+	
+	& img {
+		position: absolute;
+		left: 0;
+		top: 0;
+		max-width: 100%;
+	}
+}

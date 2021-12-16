@@ -1,0 +1,43 @@
+<div id="messengee" class="media mb-3">
+  <%= partial :'accounts/square', locals: { account: @account, style: 'display: block; width: 64px' } %>
+  <div class="media-body ml-3">
+    <h4 class="my-0"><a class="text-dark" href="/u/<%= @account.username %>"><%= @account.name %></a></h4>
+  </div>
+</div>
+<div id="thread-scroll" class="p-1">
+  <ul class="widget-chat">
+    <% messages = Message.all.or({ messenger: current_account, messengee_id: @account }, { messenger: @account, messengee_id: current_account }).order('created_at asc') %>
+    <% messages.each_with_index { |message,i| %>
+    <% if message.messenger_id == @account.id %>
+      <li>
+        <div class="widget-chat-media">
+          <%= partial :'accounts/square', locals: { account: @account, style: 'display: block; width: 64px' } %>
+        </div>
+        <div class="widget-chat-content">
+          <div class="linkify compact-urls widget-chat-message last" data-toggle="tooltip" title="<%= message.created_at %>">
+            <%== Sanitize.fragment(Rinku.auto_link(message.body.gsub("\n", '<br />')), Sanitize::Config::DANDELION) %>
+          </div>
+        </div>
+      </li>
+    <% else %>
+      <li class="reply">
+        <div class="widget-chat-content">
+          <div class="linkify compact-urls widget-chat-message last" data-toggle="tooltip" title="<%= message.created_at %>">
+            <%== Sanitize.fragment(Rinku.auto_link(message.body.gsub("\n", '<br />')), Sanitize::Config::DANDELION) %>
+          </div>
+          <% if i == messages.count-1 && (message_receipt = MessageReceipt.find_by(messenger: current_account, messengee: @account)) && message_receipt.received_at > message.created_at %>
+            <div class="widget-chat-status">
+              <b>Read</b> <%= timeago(message_receipt.received_at) %>
+            </div>
+          <% end %>
+        </div>
+      </li>
+    <% end %>
+    <% } %>
+  </ul>
+</div>
+<script>
+  $(function () {
+    doSlimscroll()
+  });
+</script>

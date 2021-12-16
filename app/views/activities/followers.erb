@@ -1,0 +1,69 @@
+<%= partial :'activities/nav', locals: { activity: @activity } %>
+
+<div class="mb-3">
+  <div class="row">
+    <div class="col">
+      <% form_tag '', method: 'get', class: 'submitOnChange searchForm form-inline' do %>
+        <div class="form-group">
+          <label>Name</label>
+          <%= text_field_tag :name, class: 'form-control', style: 'width: auto;', value: params[:name] %>
+        </div>
+        <div class="form-group">
+          <label>Email</label>
+          <%= text_field_tag :email, class: 'form-control', style: 'width: auto;', value: params[:email] %>
+        </div>
+        <%= checkbox 'Subscribed to mailer' %>
+        <%= submit_tag 'Search', class: 'btn btn-primary' %>
+      <% end %>
+    </div>
+    <div class="col-auto">
+      <a class="btn btn-primary" href="javascript:;" onclick="
+          alert('CSV, two columns, with headers: name, email');
+          $(this).hide();
+          $('#member-upload').show().find('input').click()
+         ">Upload CSV</a>
+      <a class="btn btn-primary" href="/activities/<%= @activity.id %>/followers.csv">Download CSV</a>
+    </div>
+  </div>
+  <% form_tag '', class: 'mt-3', style: 'display: none', id: 'member-upload', multipart: true do %>
+    <%= file_field_tag :csv, onchange: '$(this.form).submit()' %>
+  <% end %>
+</div>
+<p><%== page_entries_info @activityships, model: 'Person' %></p>
+<table class="table">
+  <thead>
+    <tr>
+      <th>Name</th>
+      <th>Subscribed to mailer</th>
+      <th>Subscribed to discussion</th>
+      <th>Following since</th>
+      <th></th>
+    </tr>
+  </thead>
+  <% @activityships.each { |activityship| account = activityship.account %>
+  <tr>
+    <td>
+      <%= partial :'accounts/account', locals: { account: account, show_email: organisation_admin?(@activity.organisation) } %>
+    </td>
+    <td>
+      <div data-pagelet-url="/activities/<%= @activity.id %>/subscribed/<%= activityship.id %>">
+        <%= partial :'activities/subscribed', locals: { activityship: activityship } %>
+      </div>
+    </td>
+    <td>
+      <div data-pagelet-url="/activities/<%= @activity.id %>/subscribed_discussion/<%= activityship.id %>">
+        <%= partial :'activities/subscribed_discussion', locals: { activityship: activityship } %>
+      </div>
+    </td>
+    <td>
+      <%= activityship.created_at %>
+    </td>
+    <td>
+      <a data-confirm="Are you sure you want to remove this person from this activity?" class="btn btn-danger btn-sm" href="/activityships/<%= activityship.id %>/destroy"><i class="fa fa-times"></i></a>
+    </td>
+  </tr>
+  <% } %>
+</table>
+<%= will_paginate @activityships, renderer: WillPaginate::ViewHelpers::BootstrapRenderer %>
+
+<%= partial :chart, locals: { countable: params[:subscribed_to_mailer] ? @activity.activityships.and(:account_id.in => @activity.subscribed_accounts.pluck(:id)) : @activity.activityships } %>

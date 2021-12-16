@@ -1,0 +1,45 @@
+/* Alert Setting */
+
+.alert {
+	padding: 0.625rem;
+}
+.alert.alert-outline {
+	background: none;
+}
+.alert-success {
+    color: $color_primary;
+    background-color: #E6F8EF;
+    border-color: $color_primary;
+}
+.alert-success .alert-link {
+    color: $color_primary;
+}
+.alert-info {
+    color: #398cb3;
+    background-color: #e8f7ff;
+    border-color: $color_info;
+}
+.alert-info .alert-link {
+    color: #50b0dc;
+}
+.alert-warning {
+    color: #ca7702;
+    background-color: #fff5e6;
+    border-color: $color_warning;
+}
+.alert-warning .alert-link {
+    color: #e28502;
+}
+.alert-danger {
+    color: #e2342a;
+    background-color: #ffe8e7;
+    border-color: #fe3b30;
+}
+.alert-danger .alert-link {
+    color: #e2342a;
+}
+.alert-inverse {
+    color: $color_inverse;
+    background-color: #f5f5f5;
+    border-color: $color_inverse;
+}

@@ -1,0 +1,6 @@
+<% form_for @tactivity ||= Tactivity.new, @tactivity.new_record? ? "/tactivities/create?timetable_id=#{timetable.id}" : "/tactivities/#{@tactivity.id}/edit" do |f| %>
+  <%= f.text_block :name %>
+  <%= f.text_area_block :description %>
+  <%= f.image_block :image %>
+  <%= f.submit_block button_text: @tactivity.new_record? ? 'Create activity' : 'Update activity', destroy_url: ("/tactivities/#{@tactivity.id}/destroy" if admin? || @membership.admin?) %>
+<% end %>

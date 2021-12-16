@@ -1,0 +1,15 @@
+<% if @team.intro %>
+  <div style="margin-bottom: 20px">
+    <div class="wysiwyg">
+      <%== Sanitize.fragment(@team.intro, Sanitize::Config::DANDELION) %>
+    </div>
+  </div>
+<% end %>
+<% if @team.budget %>
+  <div style="margin-bottom: 20px">
+    <i class="fa fa-money"></i> This team has spent <%= m @team.spent, @gathering.currency %> of a budget of <%= m @team.budget, @gathering.currency %>
+  </div>
+<% end %>
+<div data-pagelet-url="/commentable?commentable_type=Team&commentable_id=<%= @team.id %>">
+  <%= partial :'comments/commentable', locals: { commentable: @team } %>
+</div>

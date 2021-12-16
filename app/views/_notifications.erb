@@ -1,0 +1,24 @@
+<ul class="dropdown-menu dropdown-lg no-padding">
+  <% current_account.network_notifications.order('created_at desc').limit(5).each_with_index { |notification,i| %>
+  <li class="notification">
+    <a href="<%= notification.link[1] %>">
+      <div class="notification-icon bg-dark text-white"><i class="fa <%= notification.icon %>"></i></div>
+      <div class="notification-info">
+        <h4 class="notification-title"><%= notification.sentence %></h4>
+        <p class="notification-desc">
+          <%= notification.circle.name %>
+          <span class="notification-time"><%= timeago(notification.created_at) %></span>
+        </p>
+      </div>
+    </a>
+  </li>
+  <% } %>
+  <li class="text-center"><a href="/">All notifications <i class="fa fa-long-arrow-right"></i></a></li>
+</ul>
+<% if current_account.unread_notifications? %>
+  <script>
+    $(function () {
+      $('#notifications-a').addClass('with-label')
+    })
+  </script>
+<% end %>

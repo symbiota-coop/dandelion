@@ -1,0 +1,5 @@
+<% if teamship.unsubscribed %>
+  <a class="pagelet-trigger btn btn-outline-primary mb-1" href="/teamships/<%= teamship.id %>/set_subscribe?team_id=<%= teamship.team_id %>">Email notifications off</a>
+<% else %>
+  <a class="pagelet-trigger btn btn-primary mb-1" href="/teamships/<%= teamship.id %>/unsubscribe?team_id=<%= teamship.team_id %>">Email notifications on <i class="fa fa-envelope"></i></a>
+<% end %>

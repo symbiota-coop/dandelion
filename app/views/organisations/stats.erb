@@ -1,0 +1,9 @@
+<%= partial :'organisations/nav', locals: { organisation: @organisation } %>
+
+<%= partial :stats, locals: { accounts: @organisation.members } %>
+
+<h2>Locations</h2>
+
+<div data-pagelet-url="/map?organisation_id=<%= @organisation.id %>&admin=1">
+  <%= partial :'maps/map', locals: { dynamic: true, trigger_bounds_changed: true } %>
+</div>

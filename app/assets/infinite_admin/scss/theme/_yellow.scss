@@ -1,0 +1,29 @@
+/*
+Template Name: Infinite Admin - Responsive Admin Dashboard Template build with Twitter Bootstrap 3.3.7 & Bootstrap 4
+Version: 1.3.0
+Author: Sean Ngu
+Website: http://www.seantheme.com/infinite-admin/admin/html/
+*/
+.sidebar .nav > li.active > a, 
+.sidebar .nav > li.active > a:hover, 
+.sidebar .nav > li.active > a:focus, 
+.sidebar.sidebar-inverse .nav > li.active > a, 
+.sidebar.sidebar-inverse .nav > li.active > a:hover, 
+.sidebar.sidebar-inverse .nav > li.active > a:focus,
+.media-list.media-stat .media .media-icon, 
+.navbar .with-label:before, 
+.navbar .navbar-brand i.navbar-logo,
+.widget.with-cover .widget-cover-bg, 
+.pace .pace-progress, 
+.bg-theme {
+	color: #fff !important;
+	background: rgb(253,117,20) !important;
+	background: -moz-linear-gradient(-45deg, rgba(253,117,20,1) 0%, rgba(239,231,7,1) 100%) !important;
+	background: -webkit-linear-gradient(-45deg, rgba(253,117,20,1) 0%,rgba(239,231,7,1) 100%) !important;
+	background: linear-gradient(135deg, rgba(253,117,20,1) 0%,rgba(239,231,7,1) 100%) !important;
+	filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#fd7514', endColorstr='#efe707',GradientType=1) !important;
+}
+.navbar .navbar-brand i.navbar-logo {
+	-webkit-background-clip: text !important;
+    -webkit-text-fill-color: transparent !important;
+}

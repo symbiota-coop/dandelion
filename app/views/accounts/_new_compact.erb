@@ -1,0 +1,35 @@
+<div class="card mb-3">
+  <div class="hw card-header text-white bg-primary">
+    <h4 class="my-0">
+      <% %w{organisation activity local_group event}.each { |r| if instance_variable_get("@#{r}") %>
+      Get email updates from <%= instance_variable_get("@#{r}").name %>
+      <% if instance_variable_get("@#{r}").respond_to?(:organisation) %>
+        and <%= instance_variable_get("@#{r}").organisation.name %>
+      <% end %>
+      <% break; end; } %>
+    </h4>
+  </div>
+  <script>
+    $(function () {
+
+      $('#new-account-form').submit(function () {
+        if (!grecaptcha || grecaptcha.getResponse().length == 0) {
+          alert('Please confirm you are not a robot');
+          return false
+        }
+      })
+
+    })
+  </script>
+  <div class="card-body">
+    <% form_tag '/accounts/new', id: 'new-account-form' do |f| %>
+      <% %w{organisation activity local_group event}.each { |r| if instance_variable_get("@#{r}") %>
+      <%= hidden_field_tag :"#{r}_id", value: instance_variable_get("@#{r}").id %>
+    <% end; } %>
+    <%= text_field_tag :'account[name]', class: 'form-control mr-1 mb-1', required: true, placeholder: 'Name' %>
+    <%= email_field_tag :'account[email]', class: 'form-control mr-1 mb-1', required: true, placeholder: 'Email' %>
+    <div class="g-recaptcha" style="margin-bottom: 2px" data-sitekey="<%= ENV['RECAPTCHA_SITE_KEY'] %>"></div>
+    <%= submit_tag 'Subscribe', class: 'btn d-block d-sm-inline btn-primary mb-1' %>
+  <% end %>
+</div>
+</div>

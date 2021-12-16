@@ -1,0 +1,8 @@
+<div class="image-wall">
+  <% accounts = accounts.order('picture_uid desc').paginate(page: params[:page], per_page: 50); accounts.each { |account| %>
+  <%= partial :'accounts/square', locals: { account: account, width: '50px' } %>
+  <% } %>
+</div>
+<div class="mt-3">
+  <%= will_paginate accounts, inner_window: 0, outer_window: 0, renderer: WillPaginate::ViewHelpers::BootstrapRenderer %>
+</div>

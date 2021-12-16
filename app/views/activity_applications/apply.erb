@@ -1,0 +1,55 @@
+<% if @activityship %>
+  <script>
+    $(function () {
+      $('form[action$=apply] .btn-primary').prop('disabled', true)
+    });
+  </script>
+  <div class="card mb-3">
+    <div class="card-body">
+      <strong>Preview of application form (you are already a member of <%= @activity.name %>)</strong>
+    </div>
+  </div>
+<% end %>
+<% if params[:applied] %>
+  <h1>Thanks for applying to <a href="/activities/<%= @activity.id %>"><%= @activity.name %></a></h1>
+  <% if @activity.thank_you_message %>
+    <div class="wysiwyg">
+      <%== Sanitize.fragment(@activity.thank_you_message, Sanitize::Config::DANDELION) %>
+    </div>
+  <% end %>
+<% else %>
+  <h1>Apply to <a href="/activities/<%= @activity.id %>"><%= @activity.name %></a></h1>
+  <% if @activity.extra_info_for_application_form %>
+    <%= @activity.extra_info_for_application_form %>
+  <% end %>
+  <% form_for @account, "/activities/#{@activity.id}/apply", id: 'application-form', class: 'mt-3' do |f| %>
+    <script>
+      $(function () {
+
+        var autocomplete = new google.maps.places.Autocomplete($('#account_location')[0]);
+        $('#account_location').keydown(function (e) {
+          if (e.which == 13 && $('.pac-container:visible').length)
+            return false;
+        });
+
+      })
+    </script>
+    <%= f.text_block :name %>
+    <%= f.email_block :email %>
+    <%= f.image_block :picture %>
+    <%= f.text_block :location %>
+    <%= f.date_block :date_of_birth %>
+    <%= f.select_block :gender %>
+    <% @activity.application_questions_a.each_with_index { |q,i| %>
+    <div class="form-group">
+      <label>
+        <%== Sanitize.fragment(Rinku.auto_link(q), Sanitize::Config::DANDELION) %>*
+      </label>
+      <div>
+        <%= text_area_tag "answers[#{i}]", required: true, class: 'autosize form-control', value: (params[:answers][i.to_s] if params[:answers]) %>
+      </div>
+    </div>
+    <% } %>
+    <%= f.submit_block button_text: 'Apply' %>
+  <% end %>
+<% end %>

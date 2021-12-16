@@ -1,0 +1,14 @@
+<% account = activity_application.account %>
+<table>
+  <tr>
+    <td style="padding-right: 10px">
+      <%= partial :'accounts/square', locals: { account: account, width: '64px' } %>
+    </td>
+    <td>
+      <h4 class="mt-0"><a target="_parent" href="/activities/<%= activity_application.activity_id %>/activity_applications/<%= activity_application.id %>"><%= account.name %></a></h4>
+      <% if viewable?(account, :location) && account.mappable? && !account.location.match(/[0-9]/) %>
+        <p><%= account.location %></p>
+      <% end %>
+    </td>
+  </tr>
+</table>

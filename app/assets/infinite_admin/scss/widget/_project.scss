@@ -1,0 +1,41 @@
+/* Widget Project Setting */
+
+.project {
+	padding: 0.9375rem;
+	
+	& .project-title {
+		margin: 0 0 0.125rem;
+		font-size: 0.875rem;
+	}
+	& .project-desc {
+		font-size: $body-font-size*0.92;
+		margin: 0 0 0.625rem;
+		color: $color_grey;
+	}
+	& .progress {
+		margin: 0 0 0.125rem;
+	}
+	& .progress-text {
+		font-size: $body-font-size*0.84;
+	}
+	& .project-left {
+		float: left;
+		width: 2.75rem;
+		height: 2.75rem;
+		text-align: center;
+		color: $color_white;
+		@include border-radius(0.375rem);
+		
+		& i {
+			line-height: 2.75rem;
+			font-size: 1.75rem;
+			display: block;
+		}
+		& + .project-info {
+			margin-left: 3.6875rem;
+		}
+	}
+}
+.progress {
+	@include box-shadow(none);
+}

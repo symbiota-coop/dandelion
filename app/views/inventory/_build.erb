@@ -1,0 +1,6 @@
+<% form_for @inventory_item, @inventory_item.new_record? ? "/g/#{@gathering.slug}/inventory_items/new" : "/g/#{@gathering.slug}/inventory_items/#{@inventory_item.id}/edit", class: 'no-trigger' do |f| %>
+  <%= f.text_block :name %>
+  <%= f.text_area_block :description %>
+  <%= f.select_block :team_id, options: @gathering.teams.order('name asc').map { |team| [team.name, team.id] } %>
+  <%= f.submit_block destroy_url: "/g/#{@gathering.slug}/inventory_items/#{@inventory_item.id}/destroy" %>
+<% end %>

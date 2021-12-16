@@ -1,0 +1,10 @@
+<% if @event.activity && (events = @event.activity.events.future.and(:id.nin => [@event.id])).count > 0 %>
+  <div class="card mt-3">
+    <h3 class="card-header bg-primary text-white">Upcoming <%= @event.activity.name %> events</h3>
+    <div class="card-body">
+      <% events.each { |event| next if event.draft? && !event_admin?(event) %>
+      <%= partial :'events/block_main', locals: { event: event } %>
+      <% } %>
+    </div>
+  </div>
+<% end %>

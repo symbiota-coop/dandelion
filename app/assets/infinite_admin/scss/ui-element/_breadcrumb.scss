@@ -1,0 +1,10 @@
+/* Breadcrumb Setting */
+
+.breadcrumb {
+    font-weight: bold;
+    font-size: $body-font-size*0.84;
+    margin-bottom: 0.625rem;
+    padding: 0;
+    background: none;
+    @include border-radius(0);
+}

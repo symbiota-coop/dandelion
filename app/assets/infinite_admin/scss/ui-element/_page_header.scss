@@ -1,0 +1,16 @@
+/* Page Header Setting */
+
+.page-header {
+	color: $color_inverse;
+	padding: 0;
+	border: none;
+	margin: 0 0 0.9375rem;
+	font-size: 1.125rem;
+	font-weight: 500;
+}
+.page-header small {
+	color: #467BF3;
+	font-size: $body_font_size;
+	color: #777;
+	font-weight: normal;
+}

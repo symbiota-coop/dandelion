@@ -1,0 +1,22 @@
+<% messenger_ids = [] %>
+<% m = 0 %>
+<ul class="dropdown-menu dropdown-lg no-padding">
+  <% current_account.messages.order('created_at desc').each_with_index { |message,i| %>
+  <% account = (current_account.id == message.messenger_id ? message.messengee : message.messenger) # the other person %>
+  <% next if messenger_ids.include?(account.id) %>
+  <% m += 1 %>
+  <li class="notification">
+    <%= partial :'messages/preview', locals: { message: message } %>
+  </li>
+  <% messenger_ids << account.id %>
+  <% break if m == 5 %>
+  <% } %>
+  <li class="text-center"><a href="/messages">All messages <i class="fa fa-long-arrow-right"></i></a></li>
+</ul>
+<% if current_account.unread_messages? %>
+  <script>
+    $(function () {
+      $('#messages-a').addClass('with-label')
+    })
+  </script>
+<% end %>

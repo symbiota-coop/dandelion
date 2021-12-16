@@ -1,0 +1,38 @@
+/* General Setting */
+
+.footer {
+	position: absolute;
+	left: 14.375rem;
+	right: 0;
+	bottom: 0;
+	line-height: 0.9375rem;
+	padding: 0.9375rem 1.5625rem;
+	background: #eaeaea;
+	border-top: 1px solid #C8C7CC;
+}
+.page-full-width .footer {
+	left: 0;
+}
+.page-sidebar-minified .footer {
+	left: 3.75rem;
+}
+.page-with-footer,
+.page-with-fixed-footer {
+	padding-bottom: 2.875rem;
+}
+.page-with-fixed-footer .footer {
+	position: fixed;
+}
+
+
+/* Footer Responsive Setting */
+
+@media (max-width: 767px) {
+	.page-with-footer,
+	.page-with-fixed-footer {
+		padding-bottom: 0;
+	}
+	.footer {
+		display: none;
+	}
+}

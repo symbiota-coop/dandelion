@@ -1,0 +1,41 @@
+/* Widget Image List Setting */
+
+.widget.widget-img-list {
+	list-style-type: none;
+	margin: 0px;
+	padding: 0.5px;
+	
+	@include clearfix();
+	
+	& .widget-header {
+		margin: -0.5px;
+		background: $color_white;
+		width: 100%;
+		padding: 0.625rem;
+	}
+}
+.inverse-mode.widget.widget-img-list .widget-header,
+.inverse-mode .widget.widget-img-list .widget-header  {
+	background: $color_inverse;
+}
+.widget.widget-img-list > li {
+	float: left;
+	padding: 0.5px;
+	width: 20%;
+}
+.widget-img-container a {
+	display: block;
+	text-decoration: none;
+	padding-top: 100%;
+	position: relative;
+	overflow: hidden;
+	
+	& img {
+		position: absolute;
+		top: 0;
+		left: 0;
+		right: 0;
+		bottom: 0;
+		max-width: 100%;
+	}
+}

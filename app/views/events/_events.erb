@@ -1,0 +1,7 @@
+<% if @events.count == 0 %>
+  <em>No events</em>
+<% else %>
+  <% @events = @events.paginate(page: params[:page], per_page: 20) %>
+  <%= partial :'events/blocks', locals: { events: @events } %>
+  <%= will_paginate @events, inner_window: 0, outer_window: 0, renderer: WillPaginate::ViewHelpers::BootstrapRenderer %>
+<% end %>

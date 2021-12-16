@@ -1,0 +1,39 @@
+<div class="card mb-3">
+  <h3 class="card-header bg-primary text-white">Thanks for booking!</h3>
+  <div class="card-body">
+    <h4 class="mb-3">Check your inbox for the confirmation email with your tickets.</h4>
+    <% if @event.redirect_url %>
+      <p>Redirecting to <a href="<%= @event.redirect_url %>"><%= @event.redirect_url %></a> <i class="fa fa-spin fa-circle-o-notch"></i></p>
+      <script>
+        $(function () {
+          setTimeout(function () {
+            window.location = '<%= @event.redirect_url %>'
+          }, 3000)
+        })
+      </script>
+    <% else %>
+      <% if @order %>
+        <p>If you don't see anything in your inbox,
+          <span class="highlight">please look in your spam folder</a>.</p>
+        <% if @event.affiliate_credit_percentage %>
+          <% affiliate_link = "#{ENV['BASE_URI']}/events/#{@event.id}?affiliate_type=Account&affiliate_id=#{@order.account_id}" %>
+          <p>
+            <a href="<%= affiliate_link %>">Here's your affiliate link for this event.</a>
+            For each person who buys a ticket via this link,
+            you receive credit that can used to attend future events equal to <%= @event.affiliate_credit_percentage %>% of the order value.
+          </p>
+          <div class="mb-3">
+            <h5>Share your link</h5>
+            <%= partial :share, locals: { share_url: affiliate_link } %>
+          </div>
+        <% end %>
+      <% end %>
+      <h5 class="mb-1">Add to calendar</h5>
+      <p class="mb-1"><%= partial :'events/add_to_calendar' %></p>
+      <% if !@event.secret? && !(@order && @event.affiliate_credit_percentage) %>
+        <h5 class="mb-1">Share this event</h5>
+        <%= partial :share %>
+      <% end %>
+    <% end %>
+  </div>
+</div>

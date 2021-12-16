@@ -1,0 +1,5 @@
+<% if organisationship.subscribed_discussion %>
+  <a href="/o/<%= organisationship.organisation.slug %>/unsubscribe_discussion" class="pagelet-trigger btn btn-primary mb-1">Email notifications on <i class="fa fa-envelope"></i></a>
+<% else %>
+  <a href="/o/<%= organisationship.organisation.slug %>/set_subscribe_discussion" class="pagelet-trigger btn btn-outline-primary mb-1">Email notifications off</a>
+<% end %>

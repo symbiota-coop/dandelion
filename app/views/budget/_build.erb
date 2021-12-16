@@ -1,0 +1,14 @@
+<% form_for @spend, @spend.new_record? ? "/g/#{@gathering.slug}/spends/new" : "/g/#{@gathering.slug}/spends/#{@spend.id}/edit", class: 'no-trigger' do |f| %>
+  <%= f.text_block :item %>
+  <%= f.number_block :amount %>
+  <%= f.select_block :team_id, options: @gathering.teams.order('name asc').map { |team| [team.name, team.id] } %>
+  <% if @membership.admin? %>
+    <%= f.select_block :account_id, options: @gathering.members.order('name asc').map { |account| [account.name, account.id] } %>
+  <% end %>
+  <% if @spend.persisted? %>
+    <div class="mb-2">
+      <%= f.check_box_block :reimbursed %>
+    </div>
+  <% end %>
+  <%= f.submit_block destroy_url: "/g/#{@gathering.slug}/spends/#{@spend.id}/destroy" %>
+<% end %>

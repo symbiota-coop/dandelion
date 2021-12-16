@@ -1,0 +1,6 @@
+<% form_tag "/local_groups/#{@local_group.id}/subscribed_discussion/#{local_groupship.id}" do %>
+  <div class="switcher">
+    <%= check_box_tag :subscribed_discussion, id: "local_groupship-subscribed-discussion-#{local_groupship.id}", class: 'form-check-input', checked: local_groupship.subscribed_discussion, onclick: '$(this.form).submit()' %>
+    <label for="<%= "local_groupship-subscribed-discussion-#{local_groupship.id}" %>"></label>
+  </div>
+<% end %>

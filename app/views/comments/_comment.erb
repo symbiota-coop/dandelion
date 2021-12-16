@@ -1,0 +1,34 @@
+<% if comment.commentable.is_a?(Gathering) or comment.commentable.respond_to?(:gathering) %>
+  <% comment.read_receipts.create account: current_account %>
+<% end %>
+<div class="media" style="padding: 10px 10px 0 10px; margin: 0">
+  <span class="mr-2">
+    <%= partial :'accounts/square', locals: { account: comment.account, width: '32px', klass: 'media-object' } %>
+  </span>
+  <div class="media-body comment" data-comment-id="<%= comment.id %>">
+    <% if comment_admin?(comment) %>
+      <span class="float-right">
+        <% if !comment.sent_at %>
+          <a title="Send comment" href="/comments/<%= comment.id %>/send"><i class="fa fa-envelope"></i></a>
+        <% end %>
+      </span>
+    <% end %>
+    <strong><a href="/accounts/<%= comment.account_id %>"><%= comment.account.name %></a></strong>
+    <small class="subtle">
+      <%= timeago(comment.created_at) %>
+      <% if admin? or (current_account && comment.account_id == current_account.id) %>
+        &middot;
+        <%= partial :'comments/edit_button' %>
+      <% end %>
+    </small>
+    <div class="mb-3">
+      <%= partial :'comments/body', locals: { comment: comment } %>
+    </div>
+    <div class="row justify-content-between align-items-center">
+      <div data-pagelet-url="/comments/<%= comment.id %>/reactions" class="col-auto"></div>
+      <% if comment.commentable.is_a?(Gathering) or comment.commentable.respond_to?(:gathering) %>
+        <div data-pagelet-url="/comments/<%= comment.id %>/read_receipts" class="col-auto"></div>
+      <% end %>
+    </div>
+  </div>
+</div>

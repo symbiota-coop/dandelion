@@ -1,0 +1,1 @@
+<%= cp(:'events/block', locals: { event: event }, key: "/events/#{event.id}?timezone=#{Time.zone.name}&event_admin=#{event_admin?(event) ? 1 : 0}") %>

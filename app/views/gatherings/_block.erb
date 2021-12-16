@@ -1,0 +1,7 @@
+<%= partial :block, locals: {
+      title: gathering.name,
+      image: gathering.image,
+      view_url: "/g/#{gathering.slug}",
+      edit_url: "/g/#{gathering.slug}/edit",
+      admin: gathering_admin?(gathering)
+    } %>

@@ -1,0 +1,19 @@
+<% image = tactivity.image %>
+<% if tactivity.attendances.count > 0 %>
+  <span class="<% if image %>text-white<% else %>text-dark<% end %>" data-toggle="tooltip" title="<%= tactivity.attendances.map { |attendance| attendance.account.name }.join('<br />') %>">
+    <% if tactivity.attendances.find_by(account: current_account) %>
+      <% if tactivity.attendances.count == 1 %>
+        You're interested
+      <% else %>
+        You and <%= pluralize(tactivity.attendances.count - 1, 'other') %> interested
+      <% end %>
+    <% else %>
+      <%= pluralize(tactivity.attendances.count, 'person') %> interested
+    <% end %>
+  </span>
+<% end %>
+<% if tactivity.attendances.find_by(account: current_account) %>
+  <a class="pagelet-trigger <% if image %>text-white<% else %>text-dark<% end %>" title="No longer interested" href="/tactivities/<%= tactivity.id %>/unattend"><i class="fa fa-times"></i></a>
+<% else %>
+  <a class="pagelet-trigger <% if image %>text-white<% else %>text-dark<% end %>" title="Interested" href="/tactivities/<%= tactivity.id %>/attend"><i class="fa fa-thumbs-o-up"></i></a>
+<% end %>

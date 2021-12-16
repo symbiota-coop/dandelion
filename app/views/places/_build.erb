@@ -1,0 +1,14 @@
+<% form_for @place, @place.new_record? ? '/places/new' : "/places/#{@place.id}/edit" do  |f| %>
+  <%= f.text_block :name %>
+  <%= f.text_block :location %>
+  <%= f.url_block :website %>
+  <script>
+    $(function () {
+      var autocomplete = new google.maps.places.Autocomplete($('#place_location')[0]);
+    })
+  </script>
+  <%= f.image_block :image %>
+  <div class="my-3">
+    <%= f.submit_block destroy_url: "/places/#{@place.id}/destroy" %>
+  </div>
+<% end %>

@@ -1,0 +1,15 @@
+<%= partial :'organisations/nav', locals: { organisation: @organisation } %>
+<% form_tag '', method: 'get', class: 'submitOnChange searchForm form-inline mb-3' do %>
+  <div class="form-group">
+    <label>Search orders</label>
+    <%= text_field_tag :q, class: 'form-control', value: params[:q] %>
+  </div>
+  <%= checkbox 'Coinbase' %>
+  <%= checkbox 'SEEDS' %>
+  <%= checkbox 'xDai' %>
+  <%= hidden_field_tag :search, value: 1 %>
+  <%= submit_tag 'Search', class: 'btn btn-primary' %>
+<% end %>
+<div data-pagelet-url="/o/<%= @organisation.slug %>/orders?<%= request.query_string %>" data-pagelet-refresh="60">
+  <%= partial :'events/orders', locals: { orders: @orders, event_name: true, show_emails: true } %>
+</div>

@@ -1,0 +1,6 @@
+<%= ul_nav [
+      ['View profile', "/u/#{current_account.username}"],
+      ['Edit profile', '/accounts/edit'],
+      ['Subscriptions', '/accounts/subscriptions'],
+      ['Sign out', '/accounts/sign_out']
+    ].compact, ul_class: ul_class, li_class: '', a_class: '' %>

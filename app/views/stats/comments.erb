@@ -1,0 +1,51 @@
+<h2>Comments</h2>
+<% h = {}; Comment.and(:created_at.gte => 1.month.ago).each do |comment|
+             if comment.commentable.respond_to?(:gathering)
+               if !h[comment.commentable.gathering_id]
+                 h[comment.commentable.gathering_id] = 1
+               else
+                 h[comment.commentable.gathering_id] += 1
+               end
+             end
+           end; active_gatherings = h.select { |_id, count| count >= 3 } %>
+<p class="lead">
+  <%= pluralize active_gatherings.count, 'active gathering' %> in the last month
+  <small>
+    <% active_gatherings.each { |id,count| %>
+    <span class="label" style="background-color: #<%= Digest::MD5.hexdigest("Gathering#{id}")[0..5] %>"><%= Gathering.find(id).name %></span>
+    <% } %>
+  </small>
+</p>
+<table class="table">
+  <thead>
+    <tr>
+      <th>Subject</th>
+      <th>Account</th>
+      <th>Comment</th>
+      <th>Created at</th>
+    </tr>
+  </thead>
+  <tbody>
+    <% @comments.each { |comment|
+      c = comment.commentable.respond_to?(:gathering) ? "Gathering#{comment.commentable.gathering_id}" : "#{comment.commentable_type}#{comment.commentable_id}" %>
+    <tr>
+      <td class="subject">
+        <a href="<%= comment.post.url %>">
+          <span class="label" style="background-color: #<%= Digest::MD5.hexdigest(c)[0..5] %>"><%= comment.first_in_post.email_subject.split(']').first.split('[').last %></span>
+          <%= comment.first_in_post.email_subject.split(']').last %>
+        </a>
+      </td>
+      <td>
+        <a href="/u/<%= comment.account.username %>"><%= comment.account.name %></a>
+      </td>
+      <td>
+        <div class="comment-body compact-urls linkify nl2br tagify"><%= comment.body %></div>
+      </td>
+      <td>
+        <%= comment.created_at %>
+      </td>
+    </tr>
+    <% } %>
+  </tbody>
+</table>
+<%= will_paginate @comments, renderer: WillPaginate::ViewHelpers::BootstrapRenderer %>

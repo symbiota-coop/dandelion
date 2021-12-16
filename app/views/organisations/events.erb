@@ -1,0 +1,114 @@
+<% unless params[:minimal] %>
+  <%= partial :'organisations/nav', locals: { organisation: @organisation } %>
+  <div class="row align-items-center justify-content-center mb-3">
+    <div class="col-12 col-sm-auto text-center">
+      <% if @organisation.image %>
+        <a href="/o/<%= @organisation.slug %>"><img src="<%= u @organisation.image.thumb('200x200').url %>"></a>
+      <% end %>
+    </div>
+    <div class="col-12 col-sm text-center text-sm-left">
+      <h1>
+        <a href="/o/<%= @organisation.slug %>"><%= @organisation.name %></a>'s events
+      </h1>
+      <% if current_account %>
+        <div class="d-inline-block mb-1" data-pagelet-url="/o/<%= @organisation.slug %>/organisationship">
+          <%= partial :'organisations/organisationship', locals: { organisation: @organisation } %>
+        </div>
+        <% if organisation_assistant? %>
+          <a class="btn btn-primary" href="/events/new?organisation_id=<%= @organisation.id %>">Create an event</a>
+        <% end %>
+      <% else %>
+        <%= partial :'accounts/new_compact' %>
+      <% end %>
+    </div>
+  </div>
+<% end %>
+<% if params[:minimal] %>
+  <%== '<div id="events-container" class="container-fluid">' %>
+<% end %>
+<% if params[:minimal] %>
+  <script>
+    $(function () {
+      $('#events-container a').attr('target', '_blank')
+    })
+  </script>
+<% end %>
+
+<% if @organisation.verified? && @organisation.events_banner && (!current_account || ((organisationship = @organisation.organisationships.find_by(account: current_account)) && !organisationship.monthly_donor?)) %>
+  <%== @organisation.events_banner %>
+<% end %>
+
+<% unless params[:no_search] %>
+  <div id="events-search" class="<%= params[:minimal] ? 'pb-3 pt-1' : 'py-3' %>">
+    <% form_tag '', method: 'get', class: 'submitOnChange searchForm form-inline' do %>
+      <%= hidden_field_tag :minimal, value: params[:minimal] %>
+      <div class="form-group">
+        <label>Show events from</label>
+        <%= text_field_tag :from, class: 'form-control datepicker', value: @from.to_s(:db) %>
+      </div>
+      <div class="form-group">
+        <label>containing the word</label>
+        <%= text_field_tag :q, class: 'form-control', value: params[:q] %>
+      </div>
+      <% if @organisation.event_tags.count > 1 %>
+        <div class="form-group">
+          <label>tagged</label>
+          <%= select_tag :event_tag_id, options: [''] + @organisation.event_tags.and(:id.in => EventTagship.and(:event_id.in => @organisation.events_for_search.future_and_current_featured.pluck(:id)).pluck(:event_tag_id)).order('name asc').map { |event_tag| [event_tag.name, event_tag.id] }, selected: params[:event_tag_id], class: 'form-control' %>
+        </div>
+      <% end %>
+      <% if (local_groups = @organisation.local_groups.order('name asc').and(:id.in => [params[:local_group_id]].compact + @organisation.events_for_search.future_and_current_featured.pluck(:local_group_id))).count > 0 %>
+        <div class="form-group">
+          <label>Local group</label>
+          <%= select_tag :local_group_id, options: [''] + local_groups.order('name asc').map { |local_group| [local_group.name, local_group.id] }, selected: params[:local_group_id], class: 'form-control' %>
+        </div>
+      <% end %>
+      <% if (activities = @organisation.activities.order('name asc').and(:id.in => [params[:activity_id]].compact + @organisation.events_for_search.future_and_current_featured.pluck(:activity_id))).count > 0 %>
+        <div class="form-group">
+          <label>Activity</label>
+          <%= select_tag :activity_id, options: [''] + activities.map { |activity| [activity.name, activity.id] }, selected: params[:activity_id], class: 'form-control' %>
+        </div>
+      <% end %>
+      <div class="form-group">
+        <label>Sort by</label>
+        <%= select_tag :order, options: { 'Event date' => 'date', 'Most recently created' => 'created_at' }, selected: params[:order], class: 'form-control mx-1' %>
+      </div>
+      <%= checkbox 'Online' %>
+      <%= checkbox "Members' events" %>
+      <%= submit_tag 'Search', class: 'btn btn-primary' %>
+      <%= hidden_field_tag :search, value: 1 %>
+    <% end %>
+  </div>
+  <div class="mb-3">
+    <a class="badge badge-primary" style="font-weight: normal" id="ical" target="_blank" data-toggle="tooltip" href="<%= ENV['BASE_URI'] %><%= request.path %>.ics?<%= request.query_string %>">
+      iCal <i class="fa fa-external-link"></i>
+    </a>
+  </div>
+<% end %>
+<% if @events.count == 0 %>
+  <em>No events</em>
+<% else %>
+  <% if !params[:search] && !params[:event_tag_id] %>
+    <div data-with-placeholder data-pagelet-url="/o/<%= @organisation.slug %>/carousels/featured">
+      <%= partial :'events/carousel_placeholder' %>
+    </div>
+    <% if @organisation.carousels %>
+      <% @organisation.carousels.split("\n").reject(&:blank?).each_with_index { |line,i| %>
+      <div data-with-placeholder data-pagelet-url="/o/<%= @organisation.slug %>/carousels/<%= i %>">
+        <%= partial :'events/carousel_placeholder' %>
+      </div>
+      <% } %>
+    <% end %>
+  <% end %>
+  <% unless params[:minimal] %>
+    <% @events = @events.paginate(page: params[:page], per_page: 20) %>
+  <% end %>
+  <%= partial :'events/blocks', locals: { events: @events } %>
+  <% unless params[:minimal] %>
+    <div class="mt-3">
+      <%= will_paginate @events, inner_window: 0, outer_window: 0, renderer: WillPaginate::ViewHelpers::BootstrapRenderer %>
+    </div>
+  <% end %>
+<% end %>
+<% if params[:minimal] %>
+  <%== '</div>' %>
+<% end %>

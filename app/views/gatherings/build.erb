@@ -1,0 +1,220 @@
+<% if @gathering.persisted? %>
+  <%= partial :'gatherings/nav', locals: { gathering: @gathering, membership: @membership } %>
+<% end %>
+<h1><%= @gathering.persisted? ? '' : 'Create a gathering' %></h1>
+<script>
+  $(function () {
+
+    $('#gathering_slug, #gathering_name').keyup(function () {
+      $('#slug-replace-gathering-url').text('<%= ENV['BASE_URI'] %>/g/' + $('#gathering_slug').val());
+      $('#slug-replace-stripe-webhook').text('<%= ENV['BASE_URI'] %>/g/' + $('#gathering_slug').val() + '/stripe_webhook');
+      $('#slug-replace-coinbase-webhook').text('<%= ENV['BASE_URI'] %>/g/' + $('#gathering_slug').val() + '/coinbase_webhook');
+    }).keyup();
+
+  <% if @gathering.new_record? %>
+      $('.tab-pane').each(function () {
+        var tabPane = this
+        $('<a href="javascript:;" class="next btn btn-primary">Next</a>').appendTo(tabPane)
+        $(this).find('a.next').click(function () {
+          $('#gathering-build-nav a[href="#' + $(tabPane).next().attr('id') + '"]').tab('show')
+        })
+      })
+      $('#tab5').find('a.next').remove()
+      $('#gathering_name').focus().attr('autocomplete', 'off')
+  <% end %>
+
+    var pairs = []
+    $.each(pairs, function (i, pair) {
+      var a = pair[0]
+      var b = pair[1]
+      $(a).click(function () {
+        if ($(a).is(':checked'))
+          $(b).parent().parent().show()
+        else
+          $(b).parent().parent().hide()
+      });
+      if ($(a).is(':checked'))
+        $(b).parent().parent().show()
+      else
+        $(b).parent().parent().hide()
+    });
+
+    $('#gathering_privacy').change(function () {
+      if ($(this).val() == 'closed')
+        $('#application-options').show()
+      else
+        $('#application-options').hide()
+      if ($(this).val() == 'closed' || $(this).val() == 'open')
+        $('#closed-and-open-options').show()
+      else
+        $('#closed-and-open-options').hide()
+    })
+    if ($('#gathering_privacy').val() == 'closed')
+      $('#application-options').show()
+    else
+      $('#application-options').hide()
+    if ($('#gathering_privacy').val() == 'closed' || $('#gathering_privacy').val() == 'open')
+      $('#closed-and-open-options').show()
+    else
+      $('#closed-and-open-options').hide()
+
+    $('#gathering_enable_supporters').click(function () {
+      if ($(this).is(':checked'))
+        $('#supporters-options').show()
+      else
+        $('#supporters-options').hide()
+    })
+    if ($('#gathering_enable_supporters').is(':checked'))
+      $('#supporters-options').show()
+    else
+      $('#supporters-options').hide()
+
+    $('#gathering_democratic_threshold').click(function () {
+      if ($(this).is(':checked'))
+        $('#gathering_fixed_threshold').prop('disabled', true)
+      else
+        $('#gathering_fixed_threshold').prop('disabled', false)
+    })
+    if ($('#gathering_democratic_threshold').is(':checked'))
+      $('#gathering_fixed_threshold').prop('disabled', true)
+    else
+      $('#gathering_fixed_threshold').prop('disabled', false)
+
+  })
+</script>
+<% form_for @gathering, @gathering.new_record? ? '/g/new' : "/g/#{@gathering.slug}/edit", multipart: true do |f| %>
+  <ul id="gathering-build-nav" class="nav nav-tabs" role="tablist">
+    <li role="presentation" class="nav-item"><a class="nav-link active" href="#tab1" role="tab" data-toggle="tab">Basics</a></li>
+    <li role="presentation" class="nav-item"><a class="nav-link" href="#tab2" role="tab" data-toggle="tab">Joining</a></li>
+    <li role="presentation" class="nav-item"><a class="nav-link" href="#tab3" role="tab" data-toggle="tab">Welcome</a></li>
+    <li role="presentation" class="nav-item"><a class="nav-link" href="#tab4" role="tab" data-toggle="tab">Payments</a></li>
+    <li role="presentation" class="nav-item"><a class="nav-link" href="#tab5" role="tab" data-toggle="tab">Features</a></li>
+  </ul>
+  <div class="container">
+    <div class="tab-content" style="margin-top: 20px">
+      <div role="tabpanel" class="tab-pane active" id="tab1">
+        <%= f.text_block :name %>
+        <%= f.slug_block :slug %>
+        <p class="text-muted" style="margin-top: -0.75rem">Gathering URL:
+          <span id="slug-replace-gathering-url"></span>
+        </p>
+        <script>
+          $(function () {
+            var autocomplete = new google.maps.places.Autocomplete($('#gathering_location')[0]);
+            $('#gathering_location').keydown(function (e) {
+              if (e.which == 13 && $('.pac-container:visible').length)
+                return false;
+            });
+          })
+        </script>
+        <%= f.text_block :location %>
+        <%= f.image_block :image %>
+        <% if @gathering.new_record? %>
+          <%= f.select_block :currency %>
+        <% end %>
+      </div>
+      <div role="tabpanel" class="tab-pane" id="tab2">
+        <%= f.wysiwyg_block :intro_for_non_members %>
+        <%= f.number_block :member_limit %>
+        <div class="mb-2">
+          <script>
+            $(function () {
+              $('#gathering_privacy').change(function () {
+                if ($(this).val() == 'secret')
+                  $('#gathering_listed').prop('checked', false).attr('disabled', true);
+                else
+                  $('#gathering_listed').removeAttr('disabled');
+              }).change();
+            })
+          </script>
+          <%= f.select_block :privacy %>
+          <%= f.check_box_block :listed %>
+        </div>
+        <div id="closed-and-open-options" style="display: none">
+          <%= f.check_box_block :ask_for_facebook_profile_url %>
+        </div>
+        <div id="application-options" style="display: none">
+          <%= f.text_area_block :application_questions %>
+          <%= f.check_box_block :require_reason_proposer %>
+          <%= f.check_box_block :enable_supporters %>
+          <div id="supporters-options" style="display: none">
+            <%= f.check_box_block :require_reason_supporter %>
+            <%= f.check_box_block :anonymise_supporters %>
+          </div>
+          <div class="mt-2">
+            <%= f.number_block :fixed_threshold %>
+          </div>
+          <div class="mb-2">
+            <%= f.check_box_block :democratic_threshold %>
+          </div>
+          <%= f.number_block :proposing_delay %>
+          <%= f.check_box_block :hide_members_on_application_form %>
+        </div>
+        <div class="mb-2">
+          <%= f.number_block :invitations_granted %>
+          <%= f.check_box_block :hide_invitations %>
+        </div>
+      </div>
+      <div role="tabpanel" class="tab-pane" id="tab3">
+        <%= f.wysiwyg_block :welcome_email %>
+        <%= f.wysiwyg_block :intro_for_members %>
+      </div>
+      <div role="tabpanel" class="tab-pane" id="tab4">
+        <div class="row">
+          <div class="col-sm-8">
+            <%= f.text_block :stripe_pk %>
+            <%= f.text_block :stripe_sk %>
+            <%= f.text_block :stripe_endpoint_secret %>
+            <%= f.text_block :coinbase_api_key %>
+            <%= f.text_block :coinbase_webhook_secret %>
+            <%= f.text_block :seeds_username %>
+            <%= f.text_block :xdai_address %>
+          </div>
+          <div class="col-sm-4">
+            <div class="card mb-3">
+              <div class="card-header text-white bg-primary">
+                <h4 class="my-0">Want to take payments? Do this first</h4>
+              </div>
+              <div class="card-body">
+                <h4>Stripe</h4>
+                <ul>
+                  <li>Go to <code>Developers</code> > <code>Webhooks</code> > <code>Add endpoint</code> and add
+                    <span style="text-decoration: underline dotted">
+                      <span id="slug-replace-stripe-webhook"></span>
+                    </span>
+                    with
+                    <code>Events to send</code>
+                    <span style="text-decoration: underline dotted">checkout.session.completed</span>
+                  </li>
+                </ul>
+                <h4>Coinbase Commerce</h4>
+                <ul>
+                  <li>Go to <code>Settings</code> > <code>Webhook subscriptions</code> > <code>Add an endpoint</code> and add
+                    <span style="text-decoration: underline dotted">
+                      <span id="slug-replace-coinbase-webhook"></span>
+                    </span>
+                  </li>
+                </ul>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div role="tabpanel" class="tab-pane" id="tab5">
+        <% Gathering.enablable.each { |x| %>
+        <%= f.check_box_block "enable_#{x}".to_sym %>
+        <% } %>
+        <%= f.check_box_block :demand_payment %>
+        <div class="mt-2">
+          <%= f.url_block :facebook_group_url %>
+        </div>
+        <% if @gathering.new_record? %>
+          <%= f.submit_block %>
+        <% end %>
+      </div>
+    </div>
+    <% if @gathering.persisted? %>
+      <%= f.submit_block destroy_url: "/g/#{@gathering.slug}/destroy" %>
+    <% end %>
+  <% end %>
+</div>

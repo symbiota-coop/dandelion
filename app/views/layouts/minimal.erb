@@ -1,0 +1,20 @@
+<!doctype html>
+<html lang="en">
+  <%= partial :'layouts/head' %>
+  <% if @organisation && @organisation.verified? && @organisation.minimal_head %>
+    <%== @organisation.minimal_head %>
+  <% end %>
+  <style>
+    html, body, #map-container, #map-canvas { height: 100% !important }
+  </style>
+  <body class="bg-white">
+    <% if @minimal_container %>
+      <%== '<div class="container-fluid">' %>
+    <% end %>
+    <%= yield %>
+    <% if @minimal_container %>
+      <%== '</div>' %>
+    <% end %>
+    <a data-iframe-height></a>
+  </body>
+</html>

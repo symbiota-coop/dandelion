@@ -1,0 +1,41 @@
+
+<% if !current_account.able_to_message %>
+    <p class="lead">You must coıfirm your email address, and join a gathering or attend an event before messaging.</p>
+<% else %>
+  <% form_tag "/messages/#{@account.id}/send", id: 'compose', class: 'mt-3' do %>
+    <div class="row">
+      <div class="col">
+        <%= text_area_tag :body, id: 'message-body', placeholder: 'Type a message...', class: 'form-control' %>
+      </div>
+      <div class="col-auto align-self-end">
+        <button class="btn btn-primary" type="submit"><i class="fa fa-send"></i></button>
+      </div>
+    </div>
+  <% end %>
+<% end %>
+
+<script>
+  function doSlimscroll() {
+    $('#thread-scroll').slimScroll({
+      height: $(window).height() - $('#header').outerHeight(true) - ($(window).width() > 768 ? 2 : 3)*parseFloat($('#content').css('paddingTop')) - $('#message-breadcrumbs').outerHeight(true) - $('#messengee').outerHeight(true) - $('#message-send').outerHeight(true),
+      start: 'bottom',
+      wheelStep: ($(window).width() > 768 ? 10 : 100)
+    })
+  }
+
+  $(function () {
+    autosize($('#message-body'));
+
+    doSlimscroll()
+
+    $('#message-body').on('autosize:resized', function () {
+      doSlimscroll()
+    })
+    $(window).resize(function () {
+      doSlimscroll()
+    })
+
+    if ($(window).width() > 768)
+      $('#message-body').focus()
+  })
+</script>

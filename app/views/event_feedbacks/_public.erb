@@ -1,0 +1,11 @@
+<% q = @event_feedback.event.feedback_questions_a[params[:i].to_i]
+
+   public_a = nil
+   if @event_feedback.public_answers
+     public_qa = @event_feedback.public_answers.detect { |k, _v| k == q }
+     public_a = public_qa[1] if public_qa
+   end %>
+<% form_tag "/event_feedbacks/#{@event_feedback.id}/public/#{params[:i]}" do %>
+  <%= text_area_tag :public, onblur: '$(this).next().click()', class: 'form-control autosize', value: public_a, placeholder: 'Feedback to show publicly' %>
+  <%= submit_tag 'Save', class: 'd-none' %>
+<% end %>

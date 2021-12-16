@@ -1,0 +1,30 @@
+<% if event_admin? %>
+  <% if event.organisation %>
+    <%= partial :'organisations/nav', locals: { organisation: event.organisation, inline: true } %>
+  <% end %>
+  <% if event.activity %>
+    <%= partial :'activities/nav', locals: { activity: event.activity, hide_organisation_nav: true, inline: true } %>
+  <% end %>
+  <% if event.local_group %>
+    <%= partial :'local_groups/nav', locals: { local_group: event.local_group, hide_organisation_nav: true, inline: true } %>
+  <% end %>
+  <%= dropdown_nav [
+        ['View event', "/events/#{event.id}"],
+        ['Edit event', "/events/#{event.id}/edit"],
+        ['Discount codes', "/events/#{event.id}/discount_codes"],
+        ([%(Orders <span class="badge badge-primary">#{event.orders.count}</span>), "/events/#{event.id}/orders"] if event.orders.count.positive?),
+        ([%(Tickets <span class="badge badge-primary">#{event.tickets.count}</span>), "/events/#{event.id}/tickets"] if event.ticket_types.count.positive? || event.tickets.count.positive?),
+        ([%(Donations <span class="badge badge-primary">#{event.donations.count}</span>), "/events/#{event.id}/donations"] if event.donations.count.positive?),
+        ([%(Waitlist <span class="badge badge-primary">#{event.waitships.count}</span>), "/events/#{event.id}/waitlist"] if event.waitships.count.positive?),
+        ([%(Feedback <span class="badge badge-primary">#{event.event_feedbacks.count}</span>), "/events/#{event.id}/feedback"] if event.event_feedbacks.count.positive?),
+        (['Preview confirmation email', "/events/#{event.id}/ticket_email"] if event.ticket_types.count.positive?),
+        ['Audience stats', "/events/#{event.id}/stats"],
+        ([%(Check-in), "/events/#{event.id}/check_in"] if event.ticket_types.count.positive? || event.tickets.count.positive?),
+        ['Duplicate', "/events/#{event.id}/duplicate"],
+        ['Mailer', "/events/#{event.id}/pmails"]
+      ].compact, button_text: %(#{event.name} <i class="fa fa-caret-down"></i>), container_class: 'btn-group mb-1' %>
+  <style>
+    #event_stats thead th { border-top: none }
+  </style>
+  <%= partial :'events/event_stats', locals: { events: Event.and(:id.in => [event.id]) } %>
+<% end %>

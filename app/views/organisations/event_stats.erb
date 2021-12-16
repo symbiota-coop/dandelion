@@ -1,0 +1,55 @@
+<%= partial :'organisations/nav', locals: { organisation: @organisation } %>
+<% form_tag '', method: 'get', class: 'searchForm form-inline' do %>
+  <div class="form-group">
+    <label>Events between</label>
+    <%= text_field_tag :from, class: 'form-control datepicker mx-1', value: @from.to_s(:db) %>
+  </div>
+  <div class="form-group">
+    <label>and</label>
+    <%= text_field_tag :to, class: 'form-control datepicker mx-1', value: (@to.to_s(:db) if @to) %>
+  </div>
+  <div class="form-group">
+    <label>containing the word</label>
+    <%= text_field_tag :q, class: 'form-control mx-1', value: params[:q] %>
+  </div>
+  <% if @organisation.event_tags.count > 0 %>
+    <div class="form-group">
+      <label>tagged</label>
+      <%= select_tag :event_tag_id, options: [''] + @organisation.event_tags.order('name asc').map { |event_tag| [event_tag.name, event_tag.id] }, selected: params[:event_tag_id], class: 'form-control' %>
+    </div>
+  <% end %>
+  <% if @organisation.local_groups.count > 0 %>
+    <div class="form-group">
+      <label>Local group</label>
+      <%= select_tag :local_group_id, options: [''] + @organisation.local_groups.order('name asc').map { |local_group| [local_group.name, local_group.id] }, selected: params[:local_group_id], class: 'form-control mx-1' %>
+    </div>
+  <% end %>
+  <% if @organisation.activities.count > 0 %>
+    <div class="form-group">
+      <label>Activity</label>
+      <%= select_tag :activity_id, options: [''] + @organisation.activities.order('name asc').map { |activity| [activity.name, activity.id] }, selected: params[:activity_id], class: 'form-control mx-1' %>
+    </div>
+  <% end %>
+  <div class="form-group">
+    <label>Coordinator</label>
+    <%= select_tag :coordinator_id, options: [''] + @organisation.admins.order('name asc').map { |account| [account.name, account.id] }, selected: params[:coordinator_id], class: 'form-control mx-1' %>
+  </div>
+  <div class="form-group">
+    <label>Sort by</label>
+    <%= select_tag :order, options: { 'Event date' => 'date', 'Most recently created' => 'created_at' }, selected: params[:order], class: 'form-control mx-1' %>
+  </div>
+  <%= checkbox 'Online' %>
+  <%= checkbox 'No coordinator' %>
+  <%= hidden_field_tag :search, value: 1 %>
+  <%= submit_tag 'Search', class: 'btn btn-primary' %>
+<% end %>
+<h2 class="my-3">
+  <span class="badge badge-primary"><%= pluralize @events.count, 'event' %></span>
+</h2>
+<script>
+  $(function () {
+    if ($(window).width() > 768)
+      $('#event_stats').stickyTableHeaders({zIndex: 9999})
+  })
+</script>
+<%= partial :'events/event_stats', locals: { events: @events } %>

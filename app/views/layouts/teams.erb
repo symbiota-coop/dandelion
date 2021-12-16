@@ -1,0 +1,33 @@
+<% content_for :content do %>
+  <%= partial :'gatherings/nav', locals: { gathering: @gathering, membership: @membership } %>
+  <div class="row">
+    <div class="col-sm-9 order-sm-0">
+      <% if @team and @team.persisted? %>
+        <h2># <%= @team.name %></h2>
+      <% end %>
+      <%= yield %>
+    </div>
+    <div class="col-sm-3 order-sm-1">
+      <% if @team and @team.persisted? %>
+        <h2 class="mt-3 mt-sm-0">Team members</h2>
+        <div class="image-wall">
+          <% @team.members.order('last_active desc').each { |account| %>
+          <%= partial :'accounts/square', locals: { account: account, content: ("Active #{time_ago_in_words account.last_active} ago" if account.last_active), width: '75px' } %>
+          <% } %>
+        </div>
+        <div class="mt-3">
+          <% if (teamship = @team.teamships.find_by(account: current_account)) %>
+            <div class="d-inline-block" data-pagelet-url="/teamships/<%= teamship.id %>/subscribe">
+              <%= partial :'teams/subscribe', locals: { teamship: teamship } %>
+            </div>
+            <a class="btn btn-primary mb-1" href="/teamships/<%= teamship.id %>/destroy?team_id=<%= @team.id %>">Leave team</a>
+          <% else %>
+            <a class="btn btn-primary mb-1" href="/teamships/create?team_id=<%= @team.id %>">Join</a>
+          <% end %>
+          <a class="btn btn-primary mb-1" href="/g/<%= @gathering.slug %>/teams/<%= @team.id %>/edit">Edit team</a>
+        </div>
+      <% end %>
+    </div>
+  </div>
+<% end %>
+<%= render 'layouts/application' %>

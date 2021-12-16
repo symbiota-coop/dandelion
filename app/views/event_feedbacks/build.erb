@@ -1,0 +1,97 @@
+<div class="row justify-content-center">
+  <div class="col-12 col-md-8">
+    <h1>Feedback on <%= @event.summary %></h1>
+    <% form_for @event_feedback, "/events/#{@event.id}/give_feedback" do |f| %>
+      <%= f.hidden_field :account_id %>
+      <style>
+        .rating {
+          display: inline-block;
+          position: relative;
+          height: 50px;
+          line-height: 50px;
+          font-size: 50px;
+        }
+
+        .rating label {
+          position: absolute;
+          top: 0;
+          left: 0;
+          height: 100%;
+          cursor: pointer;
+        }
+
+        .rating label:last-child {
+          position: static;
+        }
+
+        .rating label:nth-child(1) {
+          z-index: 5;
+        }
+
+        .rating label:nth-child(2) {
+          z-index: 4;
+        }
+
+        .rating label:nth-child(3) {
+          z-index: 3;
+        }
+
+        .rating label:nth-child(4) {
+          z-index: 2;
+        }
+
+        .rating label:nth-child(5) {
+          z-index: 1;
+        }
+
+        .rating label input {
+          position: absolute;
+          top: 0;
+          left: 0;
+          opacity: 0;
+        }
+
+        .rating label .fa.fa-star {
+          float: left;
+          color: transparent;
+        }
+
+        .rating label:last-child .fa.fa-star {
+          color: #bbb;
+        }
+
+        .rating:not(:hover) label input:checked ~ .fa.fa-star,
+        .rating:hover label:hover input ~ .fa.fa-star {
+          color: #f5b041;
+        }
+
+        .rating label input:focus:not(:checked) ~ .fa.fa-star:last-child {
+          color: #bbb;
+        }
+      </style>
+      <div class="rating">
+        <% 1.upto(5) do |i| %>
+          <label>
+            <input type="radio" name="event_feedback[rating]" required="required" value="<%= i %>">
+            <% i.times do %>
+              <i class="fa fa-star"></i>
+            <% end %>
+          </label>
+        <% end %>
+      </div>
+      <% @event.feedback_questions_a.each_with_index { |q,i| %>
+      <div class="form-group">
+        <label style="font-size: 1.1rem">
+          <%== Sanitize.fragment(Rinku.auto_link(q), Sanitize::Config::DANDELION) %>
+        </label>
+        <div>
+          <%= text_area_tag "answers[#{i}]", class: 'autosize form-control', style: 'font-size: 1.1rem' %>
+        </div>
+      </div>
+      <% } %>
+      <%= checkbox 'Allow this feedback to be quoted publicly', slug: :public, checked: true %>
+      <%= checkbox 'Anonymise this feedback', slug: :anonymise %>
+      <%= f.submit_block button_text: 'Submit' %>
+    <% end %>
+  </div>
+</div>

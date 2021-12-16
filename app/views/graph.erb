@@ -1,0 +1,96 @@
+<% {
+     'cytoscape/3.9.4' => 'cytoscape.min.js',
+     'chroma-js/2.0.6' => 'chroma.min.js'
+   }.each { |k,v| %>
+<% v.split(' ').each { |f| u = "https://cdnjs.cloudflare.com/ajax/libs/#{k}/#{f}" %>
+<script src="<%= u %>"></script>
+<% } %>
+<% } %>
+
+<% [
+     '//rawcdn.githack.com/tgdwyer/WebCola/aab7e61cd9580c4c89180cc0a30594e12743a242/WebCola/cola.min.js',
+     '//rawcdn.githack.com/cytoscape/cytoscape.js-cola/8c78f9d5c11ff6162b7d902f0639e1f787277b9f/cytoscape-cola.js'
+   ].each { |f| %>
+<script src="<%= f %>"></script>
+<% } %>
+
+<% models = Dir.entries("#{PADRINO_ROOT}/models").select { |filename| filename.ends_with?('.rb') }.map { |filename| filename.split('.rb').first.camelize.constantize } %>
+
+<script>
+  function drawNetwork() {
+
+  scale = chroma.scale(['#00B963', '#00B963']);
+  scale(0.5).hex(); // #FF7F7F
+
+  node_min_width = 0
+  node_min_color = 0
+  node_color_scale = 50
+  edge_min_color = 0
+  edge_color_scale = 10
+  edge_min_opacity = 0.1
+  edge_opacity_scale = 10
+
+          cy = cytoscape({
+
+          container: $('#cy'),
+                  elements: [
+  <% models.each { |model| %>
+                    {
+                      data: {
+                      id: '<%= model.name.parameterize %>',
+                      name: '<%= model.name %>',
+                      weight: <%= w = model.fields.count + model.reflect_on_all_associations(:belongs_to).count %>,
+                      width: (node_min_width +<%= w %>),
+                      color: scale(node_min_color + <%= w %>/node_color_scale).hex()}
+                    },
+                    <% model.reflect_on_all_associations(:has_many).each_with_index { |assoc,i| %>
+                    {
+                      data: {
+                        id: '<%= assoc.class_name.parameterize %>-<%= model.name.parameterize %>-<%= i %>',
+                        source: '<%= assoc.class_name.parameterize %>',
+                        target: '<%= model.name.parameterize %>',
+                        weight: <%= w = 1 %>,
+                        color: scale(edge_min_color + <%= w %>/edge_color_scale).hex(),
+                        opacity: (edge_min_opacity + <%= w %>/edge_opacity_scale)
+                      }
+                    },
+                    <% } %>
+  <% } %>
+                  ],
+                  style: [
+                  {
+                  selector: 'node',
+                  style: {
+                      'background-color': 'data(color)',
+                      'opacity': 0.75,
+                      'label': 'data(name)',
+                      'width': 'data(width)',
+                      'height': 'data(width)'
+                    }
+                  },
+                  {
+                  selector: 'edge',
+                  style: {
+                      'opacity': 'data(opacity)',
+                      'line-color': 'data(color)',
+                    }
+                  }
+                  ],
+                  layout: {
+                  name: 'cola',
+                          //infinite: true,
+                          nodeSpacing: function(node){ return 40; },
+                  }
+
+          });
+  //cy.$('[weight < 2]').hide()
+  cy.minZoom(0.5)
+
+  }
+
+  $(function() {
+  drawNetwork()
+          $(window).one('focus', function() { drawNetwork() })
+  })
+</script>
+<div id="cy" class="card shadow-sm" style="height: 700px"></div>

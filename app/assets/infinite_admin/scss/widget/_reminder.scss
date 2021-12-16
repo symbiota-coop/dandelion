@@ -1,0 +1,60 @@
+/* Widget Reminder Setting */
+
+.widget-reminder-header {
+	background: #EFEFF4;
+	padding: 0.625rem;
+	font-size: $body-font-size*0.84;
+	font-weight: bold;
+	color: $color_grey;
+}
+.widget-reminder-container {
+	position: relative;
+	
+	@include clearfix();
+	
+	& + .widget-reminder-container {
+		border-top: 1px solid #EFEFF4;
+	}
+}
+.inverse-mode .widget-reminder-container + .widget-reminder-container {
+	border-color: #333;
+}
+.inverse-mode .widget-reminder-header {
+	background: #212121;
+}
+.widget-reminder-time,
+.widget-reminder-content {
+	padding: 0.625rem;
+}
+.widget-reminder-time {
+	width: 5rem;
+	float: left;
+	text-align: right;
+	font-size: $body-font-size*0.84;
+}
+.widget-reminder-divider {
+	position: absolute;
+	top: 0;
+	bottom: 0;
+	left: 5rem;
+	width: 0.125rem;
+	background: #EFEFF4;
+}
+.widget-reminder-content {
+	margin-left: 5.125rem;
+}
+.widget .widget-header {
+	padding: 0.625rem;
+}
+.widget-header-title {
+	margin: 0;
+	font-size: $body_font_size;
+	font-weight: 500;
+}
+a.widget-header-title {
+	color: $color_inverse;
+	text-decoration: none;
+	display: block;
+	margin: -0.625rem;
+	padding: 0.625rem;
+}

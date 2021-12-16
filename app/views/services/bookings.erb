@@ -1,0 +1,15 @@
+<%= partial :'services/nav', locals: { service: @service } %>
+<% form_tag '', method: 'get', class: 'submitOnChange searchForm form-inline mb-3' do %>
+  <div class="form-group">
+    <label>Search bookings</label>
+    <%= text_field_tag :q, class: 'form-control', value: params[:q] %>
+  </div>
+  <%= hidden_field_tag :search, value: 1 %>
+  <%= submit_tag 'Search', class: 'btn btn-primary' %>
+<% end %>
+<% if service_admin? %>
+  <pre>
+    <%== Account.and(:id.in => @bookings.pluck(:account_id)).map { |account| "#{Sanitize.fragment(account.name)} &lt;#{Sanitize.fragment(account.email)}&gt;" }.join(', ') %>
+  </pre>
+<% end %>
+<%= partial :'services/bookings', locals: { bookings: @bookings, show_emails: service_admin? } %>

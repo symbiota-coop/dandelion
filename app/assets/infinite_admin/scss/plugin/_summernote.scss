@@ -1,0 +1,23 @@
+/* Summernote Setting */
+
+.note-editor.note-frame {
+	border: none !important;
+	margin: 0 !important;
+}
+.panel-heading.note-toolbar {
+	padding: 0.3125rem 0.625rem 0.625rem 0.9375rem !important;
+	background: #f5f5f5 !important;
+	border-bottom: 1px solid #eaeaea;
+}
+.panel .panel .panel-heading.note-toolbar {
+	border-top: 1px solid #eaeaea;
+}
+.note-editor.note-frame .note-editing-area {
+	padding: 0.3125rem;
+}
+.note-btn.dropdown-toggle:after {
+	display: none;
+}
+.note-btn-group .btn-group {
+	display: inline-block;
+}

@@ -1,0 +1,8 @@
+<p class="text-center lead mt-3">
+  <a href="/accounts/new">Sign up</a> or <a href="/accounts/sign_in">sign in</a> to
+  <% if commentable.posts.count > 1 %>
+    view the <%= commentable.posts.count %> posts
+  <% else %>
+    get involved with the discussion
+  <% end %>
+</p>

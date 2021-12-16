@@ -1,0 +1,94 @@
+<div class="main">
+  <p style="color: white; font-size: 1px; margin-bottom: 0">Reply above this line</p>
+  <% if comment.post.comments.count == 1 %>
+    <p><%= comment.description %></p>
+    <h1 style="margin-top: 0">
+      <%= comment.post.subject %>
+    </h1>
+  <% else %>
+    <h1 style="margin-top: 0">
+      <%= comment.post.subject %>
+    </h1>
+    <p><%= comment.description %></p>
+  <% end %>
+  <p><%= comment.body_with_additions %></p>
+  <% if comment.file %>
+    <p>
+      <% if %w{png jpg gif jpeg}.any? { |x| comment.file.name.downcase.ends_with? ".#{x}" } %>
+        <img style="max-width: 100%;" src="<%= comment.file.url %>">
+      <% else %>
+        <a href="<%= comment.file.url %>"><%= comment.file.name %></a>
+      <% end %>
+    </p>
+  <% end %>
+  <% close_divs = ''; comment.post.comments.order_by(:created_at.desc)[1..].each { |comment| %>
+  <p>On <%= comment.created_at %>, <%= comment.account.name %> wrote:</p>
+  <%= '<div style="border-left: 1px solid #ccc; margin-left: 1em; padding-left: 1em">' %>
+  <p><%= comment.body_with_additions %></p>
+  <% if comment.file %>
+    <p>
+      <% if %w{png jpg gif jpeg}.any? { |x| comment.file.name.downcase.ends_with? ".#{x}" } %>
+        <img style="max-width: 100%;" src="<%= comment.file.url %>">
+      <% else %>
+        <a href="<%= comment.file.url %>"><%= comment.file.name %></a>
+      <% end %>
+    </p>
+  <% end %>
+  <% close_divs << '</div>' %>
+  <% } %>
+  <%= close_divs %>
+  <p style="font-size: 13px">To continue the conversation, <a href="<%= comment.post.url %>?sign_in_token=%recipient.token%">view the post</a> or reply to this email.</p>
+</div>
+<div class="footer">
+  <a href="<%= ENV['BASE_URI'] %>/posts/<%= comment.post_id %>/unsubscribe?sign_in_token=%recipient.token%">
+    Unsubscribe from this post
+  </a>
+  <% if comment.commentable.is_a?(Account) %>
+    &middot;
+    <a href="<%= ENV['BASE_URI'] %>/u/<%= commentable.username %>/unsubscribe?sign_in_token=%recipient.token%">
+      Unsubscribe from <%= commentable.name %>
+    </a>
+  <% end %>
+  <% if comment.commentable.is_a?(Event) %>
+    <% event = comment.commentable %>
+    &middot;
+    <a href="<%= ENV['BASE_URI'] %>/events/<%= event.id %>/unsubscribe_discussion?sign_in_token=%recipient.token%">
+      Unsubscribe from this event
+    </a>
+  <% end %>
+  <% if comment.commentable.is_a?(Activity) %>
+    <% activity = comment.commentable %>
+    &middot;
+    <a href="<%= ENV['BASE_URI'] %>/activities/<%= activity.id %>/unsubscribe_discussion?sign_in_token=%recipient.token%">
+      Unsubscribe from this activity
+    </a>
+  <% end %>
+  <% if comment.commentable.is_a?(LocalGroup) %>
+    <% local_group = comment.commentable %>
+    &middot;
+    <a href="<%= ENV['BASE_URI'] %>/local_groups/<%= local_group.id %>/unsubscribe_discussion?sign_in_token=%recipient.token%">
+      Unsubscribe from this local group
+    </a>
+  <% end %>
+  <% if comment.commentable.is_a?(Organisation) %>
+    <% organisation = comment.commentable %>
+    &middot;
+    <a href="<%= ENV['BASE_URI'] %>/o/<%= organisation.slug %>/unsubscribe_discussion?sign_in_token=%recipient.token%">
+      Unsubscribe from <%= organisation.name %> members' area
+    </a>
+  <% end %>
+  <% if comment.commentable.is_a?(Team) %>
+    <% gathering = comment.commentable.gathering %>
+    &middot;
+    <a href="<%= ENV['BASE_URI'] %>/g/<%= gathering.slug %>/teams/<%= comment.commentable_id %>/unsubscribe?sign_in_token=%recipient.token%">
+      Unsubscribe from this team
+    </a>
+  <% end %>
+  <% if comment.commentable.is_a?(Gathering) || (comment.commentable.respond_to?(:gathering) && comment.commentable.gathering) %>
+    <% gathering = (comment.commentable.is_a?(Gathering) ? comment.commentable : comment.commentable.gathering) %>
+    &middot;
+    <a href="<%= ENV['BASE_URI'] %>/g/<%= gathering.slug %>/unsubscribe?sign_in_token=%recipient.token%">
+      Unsubscribe from this gathering
+    </a>
+  <% end %>
+</div>

@@ -1,0 +1,20 @@
+<% @dates.each { |date| %>
+<h3 class="mt-3"><%= date.to_s(:no_year) %></h3>
+<% if current_account.habit_completions.and(date: date).count == 0 %>
+  <em>No habits completed on this day</em>
+<% end %>
+<ul class="fa-ul">
+  <% current_account.habits.order('o asc').each { |habit| %>
+  <% if (completed = habit.habit_completions.find_by(:date => date)) %>
+    <li>
+      <% if habit.public? %>
+        <i class="fa fa-li fa-check"></i>
+      <% else %>
+        <i class="fa fa-li fa-lock"></i>
+      <% end %>
+      <a href="/habits/<%= habit.id %>"><%= habit.name %></a><% if completed.comment %>: <%= completed.comment %><% end %>
+    </li>
+  <% end %>
+  <% } %>
+</ul>
+<% } %>

@@ -1,0 +1,71 @@
+<% if @organisation %>
+  <%= partial :'organisations/nav', locals: { organisation: @organisation } %>
+<% elsif @activity %>
+  <%= partial :'activities/nav', locals: { activity: @activity } %>
+<% elsif @local_group %>
+  <%= partial :'local_groups/nav', locals: { local_group: @local_group } %>
+<% elsif @event %>
+  <%= partial :'events/nav', locals: { event: @event } %>
+<% end %>
+<a href="/pmails/new?<%= @scope %>" class="btn btn-primary"><i class="fa fa-pencil"></i> New message</a>
+<table class="table table-hover table-striped mt-3">
+  <thead>
+    <tr>
+      <th>To</th>
+      <th>From</th>
+      <th>Subject</th>
+      <th>Created by</th>
+      <th style="width: 33%">Status</th>
+    </tr>
+  </thead>
+  <tbody>
+    <% @pmails.each { |pmail| %>
+    <% edit_url = "/pmails/#{pmail.id}/edit?#{@scope}" %>
+    <tr>
+      <td>
+        <%= partial :'pmails/to', locals: { pmail: pmail } %>
+      </td>
+      <td>
+        <%= escape_html pmail.from %>
+      </td>
+      <td>
+        <a href="<%= edit_url %>"><%= pmail.subject %></a>
+      </td>
+      <td>
+        <a href="/u/<%= pmail.account.username %>"><%= pmail.account.name %></a>
+      </td>
+      <td>
+        <% if pmail.sent_at %>
+          <a class="btn btn-primary mr-1 mb-1" href="<%= edit_url %>">
+            <i class="fa fa-check"></i> Sent
+          </a>
+          <div class="mt-1">
+            Created at <%= pmail.created_at %><br>
+            Last saved at <%= pmail.updated_at %><br>
+            Queued for sending at <%= pmail.requested_send_at %> <br>
+            Sent at <%= pmail.sent_at %>
+          </div>
+        <% elsif pmail.requested_send_at %>
+          <a class="btn btn-secondary mr-1 mb-1" href="<%= edit_url %>">
+            <i class="fa fa-spin fa-circle-o-notch"></i> Sending
+          </a>
+          <div class="mt-1">
+            Created at <%= pmail.created_at %><br>
+            Last saved at <%= pmail.updated_at %><br>
+            Queued for sending at <%= pmail.requested_send_at %>
+          </div>
+        <% else %>
+          <a class="btn btn-secondary" href="<%= edit_url %>">
+            <i class="fa fa-edit"></i> Edit
+          </a>
+          <div class="mt-1">
+            Created at <%= pmail.created_at %><br>
+            Last saved at <%= pmail.updated_at %>
+          </div>
+        <% end %>
+      </td>
+    </tr>
+    <% } %>
+  </tbody>
+</table>
+<%= will_paginate @pmails, renderer: WillPaginate::ViewHelpers::BootstrapRenderer %>

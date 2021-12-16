@@ -1,0 +1,9 @@
+<a class="btn btn-primary" target="_blank" href="https://www.google.com/calendar/render?action=TEMPLATE&text=
+<%= ERB::Util.url_encode("#{service.name}: #{booking.account.name}") %>
+&details=<%= ERB::Util.url_encode(
+               "<p>Client's email: #{booking.account.email}</p>#{booking.client_note ? %(<p>Client's note: #{booking.client_note}</p>) : ''}<p>Your instructions:</p>#{service.extra_info_for_booking_email}#{service.organisation.extra_info_for_booking_email}"
+             ) %>
+  &dates=<%= ERB::Util.url_encode("#{booking.start_time.utc.iso8601.gsub('-', '').gsub(':', '')}/#{booking.end_time.utc.iso8601.gsub('-', '').gsub(':', '')}") %>
+  ">
+  <i class="fa fa-calendar-plus-o"></i> Add to Google Calendar
+</a>

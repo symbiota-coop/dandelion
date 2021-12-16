@@ -1,0 +1,16 @@
+<%= partial :'gatherings/nav', locals: { gathering: @gathering, membership: @membership } %>
+<% if @membership.admin? %>
+  <div class="my-3">
+    <a class="btn btn-primary show mb-1" href="javascript:;" onclick="$(this).parent().find('a.show').hide(); $(this).next().show()"><i class="fa fa-plus-circle"></i> Add an option</a>
+    <div style="display: none" class="option-form">
+      <%= partial :'options/build' %>
+    </div>
+    <a class="btn btn-primary show mb-1" href="javascript:;" onclick="$(this).parent().find('a.show').hide(); $(this).next().show()"><i class="fa fa-user-plus"></i> Add someone to an option</a>
+    <div style="display: none" class="option-form mt-3">
+      <%= partial :'options/optionship' %>
+    </div>
+  </div>
+<% end %>
+<div data-pagelet-url="/g/<%= @gathering.slug %>/options">
+  <%= partial :'options/options' %>
+</div>

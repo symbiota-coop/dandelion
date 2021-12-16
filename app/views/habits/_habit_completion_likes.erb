@@ -1,0 +1,12 @@
+<% if !habit_completion.habit_completion_likes.find_by(account: current_account) %>
+  <a class="pagelet-trigger subtle" href="/habit_completions/<%= habit_completion.id %>/like" title="Like this post">Like</a>
+<% else %>
+  <a class="pagelet-trigger subtle" href="/habit_completions/<%= habit_completion.id %>/unlike" title="Remove your like">Unlike</a>
+<% end %>
+<% if habit_completion.habit_completion_likes.count > 0 %>
+  &middot;
+  <a class="subtle" href="javascript:;" data-toggle="tooltip"><i class="fa fa-thumbs-o-up"></i> <%= pluralize(habit_completion.habit_completion_likes.count, 'person') %> liked this</a>
+  <span style="display: none">
+    <%= habit_completion.habit_completion_likes.map { |habit_completion_like| habit_completion_like.account.name }.join('<br />') %>
+  </span>
+<% end %>

@@ -1,0 +1,124 @@
+<% base_paint = '#57B98C' %>
+
+<% youngest = accounts.and(:date_of_birth.ne => nil, :date_of_birth.lte => Date.today).order('date_of_birth desc').first
+oldest = accounts.and(:date_of_birth.ne => nil, :date_of_birth.gte => 99.years.ago).order('date_of_birth asc').first
+if youngest && oldest %>
+
+  <h2>Ages</h2>
+
+  <div class="row">
+    <div class="col-sm-4">
+
+      <% sum = accounts.count %>
+      <table class="table">
+        <thead>
+          <tr>
+            <th>Age</th>
+            <th>#</th>
+            <th>%</th>
+          </tr>
+        </thead>
+        <% data = {}; (youngest.age.to_s[0].to_i).upto(oldest.age.to_s[0].to_i) { |p|; p = "#{p}0".to_i %>
+        <tr>
+          <td>People in their <%= p %>s</td>
+          <td><%= n = accounts.and(:date_of_birth.lte => (Date.current - p.years)).and(:date_of_birth.gt => (Date.current - (p + 10).years)).count %></td>
+          <td><%= number_to_percentage 100 * (n.to_f / sum), precision: 1 %></td>
+        </tr>
+        <% data[p] = n } %>
+        <tr>
+          <td>Unknown</td>
+          <td><%= n = accounts.and(date_of_birth: nil).count %></td>
+          <td><%= number_to_percentage 100 * (n.to_f / sum), precision: 1 %></td>
+        </tr>
+      </table>
+
+    </div>
+    <div class="col-sm-8">
+
+      <canvas id="canvas-age" class="mb-3"></canvas>
+      <script>
+        $(function() {
+          var ctx = document.getElementById("canvas-age").getContext("2d");
+          var config = {
+            type: 'doughnut',
+            data: {
+              labels: <%= data.keys.map { |p| "People in their #{p}s" } %>,
+              datasets: [{
+              data: <%= data.values %>,
+              backgroundColor: <%== 0.upto(data.values.length).map do |i|
+                                     begin
+                                       base_paint.paint.spin((i.to_f / (data.values.length - 1)) * (360 - (360 / data.values.length))).to_s(:hex)
+                                     rescue StandardError
+                                       '#eee'
+                                     end
+                                   end.to_json %>
+              }],
+            },
+            options: {
+              responsive: true,
+            }
+          };
+          window.ageChart = new Chart(ctx, config);
+        })
+      </script>
+
+    </div>
+  </div>
+
+<% end %>
+
+<h2>Genders</h2>
+
+<div class="row">
+  <div class="col-sm-4">
+
+    <% women = accounts.and(:gender.in => ['Woman', 'Cis Woman']).count
+       men = accounts.and(:gender.in => ['Man', 'Cis Man']).count
+       other = accounts.and(:gender.nin => ['Woman', 'Cis Woman', 'Man', 'Cis Man', nil]).count
+       unknown = accounts.and(gender: nil).count
+       sum = [women, men, other, unknown].sum %>
+    <table class="table">
+      <thead>
+        <tr>
+          <th>Gender</th>
+          <th>#</th>
+          <th>%</th>
+        </tr>
+      </thead>
+      <% %w[women men other unknown].each { |x| %>
+      <tr>
+        <td><%= x.titleize %></td>
+        <td><%= binding.local_variable_get(x) %></td>
+        <td><%= number_to_percentage 100 * (binding.local_variable_get(x).to_f / sum), precision: 1 %></td>
+      </tr>
+      <% } %>
+    </table>
+
+  </div>
+  <div class="col-sm-8">
+
+    <canvas id="canvas-gender" class="mb-3"></canvas>
+    <script>
+      $(function() {
+        var ctx = document.getElementById("canvas-gender").getContext("2d");
+        var config = {
+          type: 'doughnut',
+          data: {
+            labels: ['Women', 'Men', 'Other'],
+            datasets: [{
+            data: <%= [women, men, other] %>,
+            backgroundColor: <%== 0.upto(2).map do |i|
+                                   base_paint.paint.spin((i.to_f / 2) * (360 - (360 / 3))).to_s(:hex)
+                                 end.to_json %>
+            }],
+          },
+          options: {
+            responsive: true,
+          }
+        };
+        window.genderChart = new Chart(ctx, config);
+      })
+    </script>
+
+  </div>
+</div>

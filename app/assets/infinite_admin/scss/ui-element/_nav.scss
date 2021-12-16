@@ -1,0 +1,31 @@
+/* Nav Setting */
+
+.nav {
+	font-size: 0.875rem;
+	
+	& .nav-divider {
+		height: 1px;
+		margin: 0.5625rem 0;
+		overflow: hidden;
+		background: #ccc;	
+	}
+	& > li > a {
+		position: relative;
+		display: block;
+		text-decoration: none;
+	}
+	& > li > a:focus, 
+	& > li > a:hover {
+		background: #EFEFF4;
+	}
+	& .open > a, 
+	& .open > a:focus, 
+	& .open > a:hover {
+		border-color: $color_primary;
+	}
+}
+.nav-pills > li.active > a, 
+.nav-pills > li.active > a:focus, 
+.nav-pills > li.active > a:hover {
+	background: $color_primary;
+}

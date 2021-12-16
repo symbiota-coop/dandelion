@@ -1,0 +1,87 @@
+<form action="/search" id="search-form">
+  <div class="search-input">
+    <a href="javascript:;" onclick="$(this).next().val('').focus()" class="search-close">×</a>
+    <input name="q" type="text" class="form-control input-lg" value="<%= params[:q] %>">
+  </div>
+  <input type="hidden" name="type" id="type" value="<%= @type %>">
+</form>
+<ul class="search-tab">
+  <% { 'People' => 'accounts', 'Events' => 'events', 'Organisations' => 'organisations', 'Places' => 'places', 'Gatherings' => 'gatherings' }.each { |k,v| %>
+  <li <% if @type == v %> class="active" <% end %>><a href="javascript:;" onclick="$('#type').val('<%= v %>');
+          $('#search-form').submit()"><%= k %></a></li>
+  <% } %>
+</ul>
+<% if params[:q] %>
+  <% case @type; when 'accounts' %>
+  <ul class="search-result-list">
+    <% @accounts.each { |account| %>
+    <li>
+      <%= partial 'accounts/search_result', locals: { account: account } %>
+    </li>
+    <% } %>
+  </ul>
+  <div class="mt-3">
+    <%= will_paginate @accounts, renderer: WillPaginate::ViewHelpers::BootstrapRenderer %>
+  </div>
+  <% when 'organisations' %>
+  <ul class="search-result-list">
+    <% @organisations.each { |organisation| %>
+    <li>
+      <% if organisation.image %>
+        <div class="search-result-media" style="height: auto">
+          <a href="/o/<%= organisation.slug %>"><img src="<%= u organisation.image.thumb('400x400').url %>"></a>
+        </div>
+      <% end %>
+      <div class="search-result-content">
+        <h2>
+          <a class="text-dark" href="/o/<%= organisation.slug %>"><%= organisation.name %></a>
+        </h2>
+      </div>
+    </li>
+    <% } %>
+  </ul>
+  <div class="mt-3">
+    <%= will_paginate @organisations, renderer: WillPaginate::ViewHelpers::BootstrapRenderer %>
+  </div>
+  <% when 'places' %>
+  <ul class="search-result-list">
+    <% @places.each { |place| %>
+    <li>
+      <% if place.image %>
+        <div class="search-result-media" style="height: auto">
+          <a href="/places/<%= place.id %>"><img src="<%= u place.image.thumb('400x400').url %>"></a>
+        </div>
+      <% end %>
+      <div class="search-result-content">
+        <h2>
+          <a class="text-dark" href="/places/<%= place.id %>"><%= place.name %></a>
+        </h2>
+      </div>
+    </li>
+    <% } %>
+  </ul>
+  <div class="mt-3">
+    <%= will_paginate @places, renderer: WillPaginate::ViewHelpers::BootstrapRenderer %>
+  </div>
+  <% when 'gatherings' %>
+  <ul class="search-result-list">
+    <% @gatherings.each { |gathering| %>
+    <li>
+      <% if gathering.image %>
+        <div class="search-result-media" style="height: auto">
+          <a href="/g/<%= gathering.slug %>"><img src="<%= u gathering.image.thumb('400x400').url %>"></a>
+        </div>
+      <% end %>
+      <div class="search-result-content">
+        <h2>
+          <a class="text-dark" href="/g/<%= gathering.slug %>"><%= gathering.name %></a>
+        </h2>
+      </div>
+    </li>
+    <% } %>
+  </ul>
+  <div class="mt-3">
+    <%= will_paginate @gatherings, renderer: WillPaginate::ViewHelpers::BootstrapRenderer %>
+  </div>
+<% end %>
+<% end %>

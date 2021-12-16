@@ -1,0 +1,21 @@
+<div class="main">
+  <h1 style="margin-top: 0">
+    <%= event.name %>
+  </h1>
+  <p>
+    Feedback from <% if event_feedback.anonymise? %>Anonymous<% else %><a href="<%= ENV['BASE_URI'] %>/u/<%= event_feedback.account.username %>"><%= event_feedback.account.name %></a><% end %>
+  </p>
+  <p style="color: #F5B042">
+    <%= event_feedback.rating.times.each.map { '★' }.join if event_feedback.rating %>
+  </p>
+  <table>
+    <%= event_feedback.event.feedback_questions_a.each_with_index.map do |q, _i|
+          %(<tr><th>#{q}</th><td>#{event_feedback.answers.detect { |k, _v| k == q }[1]}</td></tr>)
+        end.join %>
+  </table>
+  <p><a href="<%= ENV['BASE_URI'] %>/events/<%= event.id %>/feedback">See all feedback for this event</a></p>
+</div>
+<div class="footer"></div>
+<div class="tagline">
+  <%= event_feedback.rating %> star feedback
+</div>

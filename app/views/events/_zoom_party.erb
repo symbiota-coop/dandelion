@@ -1,0 +1,45 @@
+<script>
+  $(function () {
+    $('#zoomships').dataTable({bInfo: false, paging: false, searching: false, order: [[0, "desc"], [1, "asc"]]});
+  })
+</script>
+<table class="table" id="zoomships">
+  <thead>
+    <tr>
+      <th></th>
+      <th>Local group</th>
+      <th>Link</th>
+      <th>Attending</th>
+    </tr>
+  </thead>
+  <% my_local_group_ids_in_this_organisation = current_account.local_groupships.and(:local_group_id.in => @event.organisation.local_groups.pluck(:id)).pluck(:local_group_id) %>
+  <% my_ticket = @event.tickets.find_by(account: current_account) %>
+  <% @event.zoomships.each { |zoomship| %>
+  <tr <% if my_local_group_ids_in_this_organisation.include?(zoomship.local_group.id) %> class="bg-primary-transparent-1"<% end %>>
+    <td style="width: 1px" data-sort="<%= 1 if my_local_group_ids_in_this_organisation.include?(zoomship.local_group.id) %>">
+    </td>
+    <td class="text-dark">
+      <a href="/local_groups/<%= zoomship.local_group.id %>"><%= zoomship.local_group.name %></a>
+    </td>
+    <td class="text-dark">
+      <a target="_blank" href="<%= zoomship.link %>"><%= zoomship.link %></a>
+    </td>
+    <td class="text-dark">
+      <% t = zoomship.tickets_count %>
+      <% if my_ticket && my_ticket.zoomship_id == zoomship.id %>
+        You + <%= zoomship.tickets_count - 1 %>
+        <br>
+        <small><a class="pagelet-trigger" href="/zoom_parties/unattend?event_id=<%= @event.id %>">Not attending</a></small>
+      <% else %>
+        <% if t > 0 %>
+          <%= zoomship.tickets_count %>
+          <br>
+        <% end %>
+        <% if !my_ticket %>
+          <a class="text-white btn btn-primary btn-sm pagelet-trigger" href="/zoom_parties/attending?event_id=<%= @event.id %>&zoomship_id=<%= zoomship.id %>">Attending</a>
+        <% end %>
+      <% end %>
+    </td>
+  </tr>
+  <% } %>
+</table>

@@ -1,0 +1,115 @@
+<%= partial :'events/nav', locals: { event: @event } %>
+<% form_tag '', method: 'get', class: 'submitOnChange searchForm form-inline mb-3' do %>
+  <div class="form-group">
+    <label>Search tickets</label>
+    <%= text_field_tag :q, class: 'form-control', value: params[:q] %>
+  </div>
+  <%= hidden_field_tag :search, value: 1 %>
+  <%= submit_tag 'Search', class: 'btn btn-primary' %>
+<% end %>
+<% if event_email_viewer? %>
+  <pre>
+    <%== Account.and(:id.in => @tickets.pluck(:account_id)).map { |account| "#{Sanitize.fragment(account.name)} &lt;#{Sanitize.fragment(account.email)}&gt;" }.join(', ') %>
+  </pre>
+<% end %>
+<%= partial :'events/ticket_types_progress' %>
+<% @tickets = @tickets.order('created_at desc')
+   @tickets = @tickets.paginate(page: params[:page], per_page: 50) %>
+<% if @event %>
+  <div class="row justify-content-between">
+    <div class="col">
+      <p><%== page_entries_info @tickets, model: 'Ticket' %></p>
+    </div>
+    <div class="col-auto">
+      <a class="btn btn-primary" href="/events/<%= @event.id %>/tickets.csv"><i class="fa fa-download"></i> CSV</a>
+      <a class="btn btn-primary" href="/events/<%= @event.id %>/tickets.pdf"><i class="fa fa-download"></i> PDF</a>
+    </div>
+  </div>
+<% else %>
+  <p><%== page_entries_info @tickets, model: 'Ticket' %></p>
+<% end %>
+<script>
+  $(function () {
+    $('#tickets').dataTable({bInfo: false, paging: false, searching: false, order: [[3, "desc"]]});
+  })
+</script>
+<table class="table" id="tickets">
+  <thead>
+    <tr>
+      <th>Name</th>
+      <th>Ticket type</th>
+      <th>Price</th>
+      <th>Created at</th>
+      <th>Checked in</th>
+      <th>Feedback</th>
+      <th></th>
+    </tr>
+  </thead>
+  <% @tickets.each { |ticket| %>
+  <tr>
+    <td>
+      <%= partial :'accounts/account', locals: { account: ticket.account, width: '50px', show_email: ticket_email_viewer?(ticket) } %>
+    </td>
+    <td>
+      <%= ticket.ticket_type.try(:name) %>
+    </td>
+    <td data-sort="<%= ticket.discounted_price %>">
+      <% if ticket.discounted_price %>
+        <%= m ticket.discounted_price, ticket.order.currency %>
+      <% end %>
+      <% if ticket.order %>
+        <% if ticket.order.percentage_discount %>
+          <span data-toggle="tooltip" class="label label-default mr-1" title="<%= "#{ticket.order.percentage_discount}%" %> discount code applied<% if ticket.order.discount_code %>: <%=ticket.order.discount_code.code%><% end %>">
+            <%= "#{ticket.order.percentage_discount}%" %>
+          </span>
+        <% end %>
+        <% if ticket.order.percentage_discount_monthly_donor %>
+          <span data-toggle="tooltip" class="label label-default mr-1" title="<%= "#{ticket.order.percentage_discount_monthly_donor}%" %> monthly donor discount applied">
+            <%= "#{ticket.order.percentage_discount_monthly_donor}%" %>
+          </span>
+        <% end %>
+        <% if ticket.order.coinbase_checkout_id %>
+          <span class="label label-default bg-coinbase mr-1">Coinbase</span>
+        <% elsif ticket.order.seeds_secret %>
+          <span class="label label-default bg-seeds mr-1">SEEDS</span>
+        <% elsif ticket.order.xdai_secret %>
+          <span class="label label-default bg-secondary mr-1">xDai</span>
+        <% end %>
+        <% if ticket.order.incomplete? %><i title="Payment processing" class="fa fa-spin fa-circle-o-notch"></i><% end %>
+      <% end %>
+    </td>
+    <td data-sort="<%= ticket.created_at.iso8601 %>">
+      <%= ticket.created_at %>
+    </td>
+    <td>
+      <div data-pagelet-url="/events/<%= @event.id %>/check_in_toggle/<%= ticket.id %>">
+        <%= partial :'events/check_in_toggle', locals: { ticket: ticket } %>
+      </div>
+    </td>
+    <td>
+      <% if (event_feedback = @event.event_feedbacks.find_by(account: ticket.account)) && !event_feedback.anonymise %>
+        <a href="/event_feedbacks/<%= event_feedback.id %>">
+          <% if event_feedback.rating %>
+            <% event_feedback.rating.times do %><i class="fa fa-star"></i><% end %>
+          <% else %>
+            <%= event_feedback.id %>
+          <% end %>
+        </a>
+      <% elsif ticket.event.past? %>
+        <a href="<%= ENV['BASE_URI'] %>/events/<%= ticket.event_id %>/resend_feedback_email/<%= ticket.account_id %>">Resend feedback email</a>
+      <% end %>
+    </td>
+    <td>
+      <a class="btn btn-danger" href="/events/<%= @event.id %>/tickets/<%= ticket.id %>/destroy" data-confirm="Are you sure you want to delete this ticket?<% if ticket.event.refund_deleted_orders && ticket.order && ticket.order.session_id %> Please note that deleting a ticket does not refund the associated order - for that, go to Orders.<% end %>"><i class="fa fa-times"></i></a>
+    </td>
+  </tr>
+  <% } %>
+</table>
+<%= will_paginate @tickets, renderer: WillPaginate::ViewHelpers::BootstrapRenderer %>
+<h2 class="mt-5">Create ticket</h2>
+<% form_for @event.tickets.new, "/events/#{@event.id}/create_ticket" do |f| %>
+  <%= f.text_block :name %>
+  <%= f.text_block :email %>
+  <%= f.select_block :ticket_type_id, options: @event.ticket_types.map { |ticket_type| [ticket_type.name, ticket_type.id] } %>
+  <%= f.submit_block %>
+<% end %>

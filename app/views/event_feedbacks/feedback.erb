@@ -1,0 +1,60 @@
+<%= partial :'events/nav', locals: { event: @event_feedback.event } %>
+<table class="table">
+  <tr>
+    <th style="width: 20%">
+      Feedback ID
+    </th>
+    <td>
+      <%= @event_feedback.id %>
+    </td>
+  </tr>
+  <tr>
+    <th style="width: 20%">
+      Event
+    </th>
+    <td>
+      <a href="/events/<%= @event_feedback.event_id %>/feedback"><%= @event_feedback.event.name %> (<%= when_details(@event_feedback.event) %>)</a>
+    </td>
+  </tr>
+  <tr>
+    <th>
+      Attendee
+    </th>
+    <td>
+      <% if @event_feedback.anonymise %>
+        Anonymous
+      <% else %>
+        <a target="_blank" href="/u/<%= @event_feedback.account.username %>"><%= @event_feedback.account.name %> (<%= @event_feedback.account.email %>)</a>
+      <% end %>
+    </td>
+  </tr>
+  <% if @event_feedback.rating %>
+    <tr>
+      <th>
+        Rating
+      </th>
+      <td>
+        <% @event_feedback.rating.times do %><i class="fa fa-star"></i><% end %>
+      </td>
+    </tr>
+  <% end %>
+  <% @event_feedback.event.feedback_questions_a.each_with_index { |q,i| %>
+  <tr>
+    <th>
+      <%== Sanitize.fragment(Rinku.auto_link(q), Sanitize::Config::DANDELION) %>
+    </th>
+    <td>
+      <% qa = @event_feedback.answers.detect { |k, _v| k == q }
+         a = qa[1] if qa %>
+         <% if a %>
+          <%== Sanitize.fragment(Rinku.auto_link(a), Sanitize::Config::DANDELION) %>
+        <% end %>
+      <% if @event_feedback.public? %>
+        <div class="mt-3">
+          <div data-pagelet-url="/event_feedbacks/<%= @event_feedback.id %>/public/<%= i %>"></div>
+        </div>
+      <% end %>
+    </td>
+  </tr>
+  <% } %>
+</table>

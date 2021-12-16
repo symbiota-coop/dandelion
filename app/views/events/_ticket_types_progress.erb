@@ -1,0 +1,27 @@
+<table class="table">
+  <% @event.ticket_types.order('order asc, price desc').and(:quantity.gt => 0).each { |ticket_type| %>
+  <tr>
+    <td style="width: 1px; white-space: nowrap" class="pr-3">
+      <% if ticket_type.hidden %>
+        <a href="/events/<%= @event.id %>?ticket_type_id=<%= ticket_type.id %>"><%= ticket_type.name %></a>
+        <% if ticket_type.ticket_group %>
+          <span class="label label-primary"><%=ticket_type.ticket_group.name%></span>
+        <% end %>        
+        <span class="label label-default">Hidden</span>
+      <% else %>
+        <%= ticket_type.name %>
+        <% if ticket_type.ticket_group %>
+          <span class="label label-primary"><%=ticket_type.ticket_group.name%></span>
+        <% end %>
+      <% end %>
+    </td>
+    <td>
+      <%= ticket_type.tickets.count %>/<%= ticket_type.quantity %>
+      <% w = ((ticket_type.tickets.count / ticket_type.quantity.to_f) * 100).round %>
+      <div class="progress">
+        <div class="progress-bar" role="progressbar" style="width: <%= "#{w}%" %>;"></div>
+      </div>
+    </td>
+  </tr>
+  <% } %>
+</table>

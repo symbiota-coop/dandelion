@@ -1,0 +1,9 @@
+<%= partial :'local_groups/nav', locals: { local_group: @local_group } %>
+
+<%= partial :stats, locals: { accounts: @local_group.members } %>
+
+<h2>Locations</h2>
+
+<div data-pagelet-url="/map?local_group_id=<%= @local_group.id %>&admin=1">
+  <%= partial :'maps/map', locals: { dynamic: true, trigger_bounds_changed: true } %>
+</div>

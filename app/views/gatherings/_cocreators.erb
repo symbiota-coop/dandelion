@@ -1,0 +1,17 @@
+<div style="margin-bottom: 15px">
+  <h2 style="margin-top: 0">
+    Co-creators
+    <small>
+      <% if @gathering.member_limit %>
+        <span class="label label-primary d-inline-block mb-1"><%= @gathering.memberships.count %>/<%= @gathering.member_limit %></span>
+      <% else %>
+        <span class="label label-primary d-inline-block mb-1"><%= @gathering.memberships.count %></span>
+      <% end %>
+    </small>
+  </h2>
+  <div class="image-wall">
+    <% (Account.and(:id.in => @gathering.memberships.pluck(:account_id)).and(:picture_uid.ne => nil).shuffle + Account.and(:id.in => @gathering.memberships.pluck(:account_id)).and(picture_uid: nil).shuffle).each { |account| %>
+    <%= partial :'accounts/square', locals: { account: account, width: '50px' } %>
+    <% } %>
+  </div>
+</div>

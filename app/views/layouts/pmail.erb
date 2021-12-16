@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta content="width=700, maximum-scale=1.0" name="viewport">
+    <title><%= pmail.subject %></title>
+    <style>
+      <%= File.read(Padrino.root('app/assets/stylesheets/email.css')) %>
+      td { line-height: 0 }
+      em > a { color: #222; text-decoration: none !important }
+    </style>
+  </head>
+  <body>
+    <div class="tagline">
+      <%= pmail.preview_text %>
+    </div>
+    <div style="text-align: center">
+      <% if pmail.organisation.image %>
+        <a href="<% pmail.organisation.website || "#{ENV['BASE_URI']}/o/#{pmail.organisation.slug}" %>">
+          <img src="<%= pmail.organisation.image.url %>" style="max-width: 100px; padding-top: 16px">
+        </a>
+      <% else %>
+        <h1 style="margin: 0; padding-top: 16px; padding-bottom: 0">
+          <a style="color: #222; text-decoration: none" href="<%= pmail.organisation.website || "#{ENV['BASE_URI']}/o/#{pmail.organisation.slug}" %>">
+            <%= pmail.organisation.name %>
+          </a>
+        </h1>
+      <% end %>
+    </div>
+    <div class="preview">
+      <% if defined?(share_buttons) && share_buttons %>
+        %share_buttons%
+        <div style="text-align: center; margin-top: 16px">
+          <small><a href="<%= ENV['BASE_URI'] %>/o/<%= pmail.organisation.slug %>">Subscribe to <%= pmail.organisation.name %></a></small>
+        </div>
+      <% else %>
+        <small>
+          <a href="<%= ENV['BASE_URI'] %>/pmails/<%= pmail.id %>">Read and share this email in your browser</a>
+        </small>
+      <% end %>
+    </div>
+    <div class="container">
+      <div class="main">
+        <%= markdown = Redcarpet::Markdown.new(Redcarpet::Render::HTML.new(hard_wrap: true), autolink: true, tables: true)
+            markdown.render(pmail.body) %>
+      </div>
+    </div>
+    <div class="footer">
+      <a href="<%= ENV['BASE_URI'] %>">Sent with Dandelion</a>
+      &middot;
+      <a href="<%= ENV['BASE_URI'] %>/accounts/edit?sign_in_token=%recipient.token%">%recipient.view_or_activate%</a>
+      <br>
+      You're receiving this email because you're <%= pmail.reason %>
+      <br>
+      <a href="<%= ENV['BASE_URI'] %>/accounts/subscriptions?sign_in_token=%recipient.token%">Manage your subscriptions</a>
+      &middot;
+      <a href="<%= ENV['BASE_URI'] %>/o/<%= pmail.organisation.slug %>/unsubscribe?sign_in_token=%recipient.token%">Unsubscribe from <%= pmail.organisation.name %></a>
+    </div>
+  </body>
+</html>

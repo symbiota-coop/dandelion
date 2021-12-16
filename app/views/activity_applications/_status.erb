@@ -1,0 +1,13 @@
+<% case status; when 'Accepted' %>
+<span class="badge badge-success">Accepted</span>
+<% when 'Rejected, contacted' %>
+<span class="badge badge-danger">Rejected, contacted</span>
+<% when 'Rejected, to contact' %>
+<span class="badge badge-danger">Rejected, to contact</span>
+<% when 'To interview' %>
+<span class="badge badge-primary">To interview</span>
+<% when 'On hold' %>
+<span class="badge badge-warning">On hold</span>
+<% else %>
+  <span class="badge badge-primary">Pending</span>
+<% end %>

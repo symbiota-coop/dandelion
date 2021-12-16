@@ -1,0 +1,70 @@
+/* Vertical Box Setting */
+
+.vertical-box {
+    display: table; 
+    table-layout: fixed; 
+    border-spacing: 0; 
+    height: 100%;
+    width: 100%;
+}
+.vertical-box-column {
+    display: table-cell;
+    vertical-align: top;
+    height: 100%;
+}
+.vertical-box-row {
+    display: table-row;
+    height: 100%;
+}
+.vertical-box-row > .vertical-box-cell {
+    position: relative;
+    height: 100%;
+    width: 100%;
+    float: none;
+}
+.vertical-box-row > .vertical-box-cell > .vertical-box-inner-cell {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    overflow: hidden;
+}
+.panel-expand .vertical-box .vertical-box-column {
+    display: table-cell;
+}
+.vertical-box.with-border .vertical-box-column {
+	border-left: 1px solid #C8C7CC;
+	border-right: 1px solid #C8C7CC;
+}
+.vertical-box.with-border .wrapper + .vertical-box-row > .vertical-box-cell,
+.vertical-box.with-border .vertical-box-row + .wrapper {
+	border-top: 1px solid #C8C7CC;
+}
+.vertical-box.with-border .vertical-box-column:first-child {
+	border-left: none;
+}
+.vertical-box.with-border .vertical-box-column:last-child {
+	border-right: none;
+}
+.vertical-box.with-border .vertical-box-column + div {
+	border-left: none;
+}
+@media (max-width: 767px) {
+	.vertical-box,
+	.vertical-box-column,
+	.vertical-box-row,
+	.vertical-box-cell,
+	.vertical-box-inner-cell {
+		display: block !important;
+		width: auto !important;
+		height: auto !important;
+		position: initial !important;
+		overflow: initial !important;
+		border-left: none !important;
+		border-right: none !important;
+	}
+	.vertical-box.with-border .vertical-box-column + .vertical-box-column {
+		border-top: 1px solid #C8C7CC;
+	}
+}

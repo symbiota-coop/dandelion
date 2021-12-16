@@ -1,0 +1,12 @@
+/* Widget Divider Setting */
+
+.widget-divider {
+	margin: 0.9375rem 0;
+	background: #EFEFF4;
+	height: 1px;
+	
+	@include clearfix();
+}
+.inverse-mode .widget-divider {
+	background: rgba(255,255,255,0.25);
+}

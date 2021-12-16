@@ -1,0 +1,36 @@
+<% image = tactivity.image %>
+<div class="tactivity" data-attendances-count="<%= tactivity.attendances.count %>" data-tactivity-id="<%= tactivity.id %>"
+     style="
+     position: relative;
+     z-index: 99;
+     margin-bottom: 10px;
+     <% if !image %>background: white; border: 2px solid #343a40;<% end %>
+     <% if image %>background: linear-gradient( rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5) ), url('<%= image.thumb('400x400').url %>'); background-size: cover; background-position: center center;<% end %>
+     ">
+  <div style="position: absolute; bottom: 10px; left: 10px; color: white">
+    <h3 style="margin-top: 0; margin-bottom: 0; position: relative" data-toggle="tooltip">
+      <a class="<% if image %>text-white<% else %>text-dark<% end %>" href="/g/<%= @gathering.slug %>/tactivities/<%= tactivity.id %>"><%= tactivity.name %></a>
+    </h3>
+    <% if tactivity.description %>
+      <span style="display: none"><%= tactivity.description.truncate(150) %></span>
+    <% end %>
+    <span class="<% if image %>text-white<% else %>text-dark<% end %>">
+      by
+      <a class="<% if image %>text-white<% else %>text-dark<% end %>" href="/accounts/<%= tactivity.account_id %>"><%= tactivity.account.name %></a>
+    </span>
+    <div>
+      <div class="<% if image %>text-white<% else %>text-dark<% end %>" style="display: inline-block" data-pagelet-url="/tactivities/<%= tactivity.id %>/attendees"></div>
+    </div>
+  </div>
+  <div style="position: absolute; right: 10px; bottom: 10px;" class="text-white">
+    <% if tactivity.comments.count > 0 %>
+      <a class="<% if image %>text-white<% else %>text-dark<% end %>" data-toggle="tooltip" title="<%= pluralize(tactivity.comments.count, 'comment') %>" href="/g/<%= @gathering.slug %>/tactivities/<%= tactivity.id %>"><i class="fa fa-comment"></i> <%= tactivity.comments.count %></a>
+      &middot;
+    <% end %>
+    <% if tactivity.space_id and (@membership.admin? or tactivity.timetable.scheduling_by_all) %>
+      <a class="pagelet-trigger <% if image %>text-white<% else %>text-dark<% end %>" data-confirm="Are you sure you want to unschedule this activity?" title="Unschedule" href="/tactivities/<%= tactivity.id %>/unschedule"><i class="fa fa-calendar-minus-o"></i></a>
+      &middot;
+    <% end %>
+    <a class="<% if image %>text-white<% else %>text-dark<% end %>" title="Edit" href="/tactivities/<%= tactivity.id %>/edit"><i class="fa fa-pencil"></i></a>
+  </div>
+</div>

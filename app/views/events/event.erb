@@ -1,0 +1,309 @@
+<% if event_admin? %>
+  <%= partial :'events/nav', locals: { event: @event } %>
+  <div data-pagelet-url="/events/<%= @event.id %>/notes" class="mb-3">
+    <%= partial :'events/notes' %>
+  </div>
+<% else %>
+  <style>
+    #event-image { margin-top: -1.5625rem }
+  </style>
+<% end %>
+<% sidebar = false %>
+<% if !params[:success] %>
+  <% sidebar = true if @event.sold_out? %>
+  <% buy_tickets_style = 'class="fixed-bottom bg-white p-3 w-100 d-block d-md-none" style="z-index: 1019; box-shadow: 0px -2px 4px 0px rgba(0,0,0,0.3);"' %>
+  <% if @event.tickettailor_id %>
+    <div id="buy-tickets" <%== buy_tickets_style %>>
+      <a target="_blank" href="https://www.tickettailor.com/events/thepsychedelicsociety/<%= @event.tickettailor_id %>" class="btn btn-primary btn-block">Buy tickets on TicketTailor</a>
+    </div>
+    <style>
+      @media(max-width: 767px) { #content { padding-bottom: 4rem } }
+    </style>
+  <% elsif (params[:ticket_type_id] || !@event.sold_out?) && @event.ticket_types.count > 0 %>
+    <% sidebar = true %>
+    <div id="buy-tickets" <%== buy_tickets_style %>>
+      <a href="javascript:;" onclick="$(this).parent().hide();
+          $(window).scrollTop($('#purchase').offset()['top'] - $('#header').height() - 17)
+         " class="btn btn-primary btn-block">Get tickets</a>
+    </div>
+    <script>
+      $(function () {
+        $(window).scroll(function () {
+          if ((window.scrollY + window.innerHeight) > $('#purchase').offset()['top']) {
+            $('#buy-tickets').addClass('d-none').removeClass('d-block')
+            if (typeof Intercom !== 'undefined')
+              Intercom('update', {hide_default_launcher: false})
+          } else {
+            $('#buy-tickets').addClass('d-block').removeClass('d-none')
+            if (typeof Intercom !== 'undefined')
+              Intercom('update', {hide_default_launcher: true})
+          }
+        })
+        $(window).scroll()
+      })
+    </script>
+  <% end %>
+<% end %>
+<div class="row justify-content-center">
+  <div class="col-md-10">
+    <% if @event.image %>
+      <img id="event-image" class="w-100 mb-3" src="<%= u @event.image.url %>">
+    <% end %>
+    <% if params[:success] %>
+      <%= partial :'events/success' %>
+    <% end %>
+  </div>
+</div>
+<div class="row">
+  <div class="<%= sidebar ? 'col-md-7' : 'col-md-12' %>">
+    <% n = 1; if @event.organisation %>
+    <% events = @event.organisation.events_for_search.future.and(name: @event.name); n = events.count %>
+  <% end %>
+  <h1 class="mb-1">
+    <%= @event.name %>
+    <% if n > 1 %>
+      <span class="badge badge-primary"><%= pluralize(n, 'dates') %></span>
+    <% end %>
+  </h1>
+  <ul style="margin-left: 1.66em; font-size: 1rem" class="fa-ul text-dark mb-1">
+    <li>
+      <i <% if n > 1 %> style="top: 0.55em"<% end %> data-toggle="tooltip" title="Dates/times" class="fa fa-li fa-calendar"></i>
+      <% if n > 1 %>
+        <%= select_tag :event_id, options: events.map { |event| [when_details(event), event.id] }, selected: @event.id, class: 'form-control mb-1', style: 'font-size: 1rem; padding: 0.375rem;', onchange: "window.location = '/events/'+$(this).val()" %>
+      <% else %>
+        <%= when_details(@event) %>
+      <% end %>
+    </li>
+    <li><i data-toggle="tooltip" title="Location" class="fa fa-li fa-map-marker"></i>
+      <% if @event.location == 'Online' %>
+        Online
+      <% elsif @event.location =~ URI::regexp %>
+        <span class="compact-urls"><a href="<%= @event.location %>"><%= @event.location %></a></span>
+      <% else %>
+        <a target="_blank" href="https://www.google.co.uk/maps?q=<%= @event.location %>"><%= @event.location %></a>
+      <% end %>
+    </li>
+  </ul>
+  <div>
+    <%= partial :'events/tag_labels', locals: { event: @event } %>
+  </div>
+  <table class="table table-hr">
+    <tr>
+      <td>Hosted by</td>
+      <td>
+        <% if @event.organisation.image %>
+          <a href="/o/<%= @event.organisation.slug %>/events"><img src="<%= u @event.organisation.image.thumb('500x500#').url %>" style="width: 50px"></a>
+        <% end %>
+        <a href="/o/<%= @event.organisation.slug %>/events"><%= @event.organisation.name %></a>
+        <% if event_admin? && @event.revenue_sharer && !(organisationship = @event.organisation.organisationships.find_by(:account => @event.revenue_sharer, :stripe_connect_json.ne => nil)) %>
+          <span class="label label-danger">
+            <i class="fa fa-warning"></i> Revenue sharer not connect to this organisation
+          </span>
+        <% end %>
+        <%= partial :'organisations/add', locals: {
+              role: 'co-host',
+              organisations: @event.cohosts.order('name asc'),
+              add_and_remove: event_admin?,
+              new_object: Cohostship.new,
+              new_url: "/events/#{@event.id}/cohostships/new",
+              destroy_url: "/events/#{@event.id}/cohostships/destroy"
+            } %>
+      </td>
+    </tr>
+    <% if @event.activity %>
+      <tr>
+        <td>Activity</td>
+        <td>
+          <a href="/activities/<%= @event.activity_id %>"><%= @event.activity.name %></a>
+        </td>
+      </tr>
+    <% end %>
+    <% if @event.local_group %>
+      <tr>
+        <td>Local group</td>
+        <td>
+          <a href="/local_groups/<%= @event.local_group_id %>"><%= @event.local_group.name %></a>
+        </td>
+      </tr>
+    <% end %>
+    <% if @event.facebook_event_id %>
+      <tr>
+        <td>Facebook event</td>
+        <td>
+          <a target="_blank" href="http://facebook.com/events/<%= @event.facebook_event_id %>"><i class="fa fa-facebook-square"></i></a>
+        </td>
+      </tr>
+    <% end %>
+    <% if @event.email %>
+      <tr>
+        <td>Enquiries to</td>
+        <td>
+          <a target="_blank" href="mailto:<%= @event.email %>"><%= @event.email %></a>
+        </td>
+      </tr>
+    <% end %>
+    <% if event_admin? or @event.event_facilitations.count > 0 %>
+      <tr>
+        <td>Facilitators</td>
+        <td>
+          <%= partial :'accounts/add', locals: {
+                role: 'event facilitator',
+                accounts: @event.event_facilitators.order('name asc'),
+                add_and_remove: event_admin?,
+                new_object: EventFacilitation.new,
+                new_url: "/events/#{@event.id}/event_facilitations/new",
+                destroy_url: "/events/#{@event.id}/event_facilitations/destroy"
+              } %>
+        </td>
+      </tr>
+    <% end %>
+    <% unless params[:success] %>
+      <tr>
+        <td>
+          Add to calendar
+          <td>
+            <%= partial :'events/add_to_calendar' %>
+          </td>
+        </tr>
+        <% unless @event.secret? %>
+          <tr>
+            <td>Share</td>
+            <td><%= partial :share %></td>
+          </tr>
+        <% end %>
+      <% end %>
+    </table>
+    <% if @event.tickettailor_id %>
+      <a target="_blank" href="https://www.tickettailor.com/events/thepsychedelicsociety/<%= @event.tickettailor_id %>" class="d-none d-md-block btn btn-primary btn-block mb-3">Buy tickets on TicketTailor</a>
+    <% end %>
+    <% if @event.description || @event.organisation.event_footer %>
+      <div class="wysiwyg">
+        <big>
+          <% if @event.description %>
+          <%== Sanitize.fragment(Rinku.auto_link(
+                (@event.description.include?('<p') || @event.description.include?('<br') ? @event.description : "<p>#{@event.description.gsub("\n", '<br />')}</p>")
+                .gsub(%r{<a (href=".+?")>\[\[(.+?)\]\]</a>}, '<a \1 class="btn btn-primary">\2</a>')
+              ), Sanitize::Config::DANDELION) %>
+          <% end %>
+          <% if @event.organisation.event_footer && !@event.zoom_party? %>
+            <%== Sanitize.fragment(Rinku.auto_link(@event.organisation.event_footer), Sanitize::Config::DANDELION) %>
+          <% end %>
+        </big>
+      </div>
+    <% end %>
+    <% unless @event.hide_attendees? %>
+      <div data-pagelet-url="/events/<%= @event.id %>/attendees">
+        <%= partial :'events/attendees' %>
+      </div>
+    <% end %>
+    <% if @event.zoom_party? %>
+      <% if current_account %>
+        <div data-pagelet-url="/zoom_parties?event_id=<%= @event.id %>"></div>
+      <% else %>
+        <p class="text-center lead mt-3">
+          <a href="/accounts/new?event_id=<%= @event.id %>">Sign up</a> or <a href="/accounts/sign_in">sign in</a> to see the videocall links for this event
+        </p>
+      <% end %>
+    <% end %>
+  </div>
+  <% if sidebar %>
+    <div class="col-md-5">
+      <div id="purchase">
+        <% if current_account && (orders =  @event.orders.complete.and(account: current_account)).count > 0 %>
+          <div class="card mb-3">
+            <h3 class="card-header bg-primary text-white">Your orders</h3>
+            <div class="card-body">
+              <p>Click an order to review the confirmation email.</p>
+              <ul class="fa-ul mb-0">
+                <% orders.each { |order| %>
+                <li><i class="fa fa-li fa-ticket"></i><a target="_blank" href="/orders/<%= order.id %>"><%= d = order.description_elements; d.empty? ? order.created_at : d.join(', ') %></a></li>
+                <% } %>
+              </ul>
+            </div>
+          </div>
+        <% end %>
+        <% if @event.sold_out? && !params[:ticket_type_id] %>
+          <% if params[:added_to_waitlist] %>
+            <div class="card">
+              <h3 class="card-header bg-primary text-white">Thanks!</h3>
+              <div class="card-body">
+                <p class="lead mb-0">
+                  We'll be in touch if we are able to issue more tickets.
+                </p>
+              </div>
+            </div>
+          <% else %>
+            <%= partial :'events/waitlist' %>
+            <%= partial :'events/upcoming' %>
+          <% end %>
+        <% elsif @event.ticket_types.count > 0 %>
+          <% if @event.monthly_donors_only && !(current_account && @event.organisation.organisationships.find_by(:account => current_account, :monthly_donation_method.ne => nil)) %>
+            <div class="card">
+              <h3 class="card-header bg-primary text-white">Select tickets</h3>
+              <div class="card-body">
+                <p class="lead mb-0">
+                  <% if current_account %>
+                    You must be a monthly donor to
+                  <% else %>
+                    You must be signed in and a monthly donor to
+                  <% end %>
+                  <a href="/o/<%= @event.organisation.slug %>"><%= @event.organisation.name %></a> to book tickets to this event.
+                  <% if !current_account %><a href="/accounts/sign_in">Sign in</a> &middot;<% end %>
+                  <% if @event.organisation.become_a_member_url %>
+                    <a href="<%= @event.organisation.become_a_member_url %>">Become a Member</a>
+                  <% end %>
+                </p>
+              </div>
+            </div>
+          <% elsif @event.activity && @event.activity.privacy != 'open' && !(current_account && @event.activity.activityships.find_by(account: current_account)) %>
+            <div class="card">
+              <h3 class="card-header bg-primary text-white">Select tickets</h3>
+              <div class="card-body">
+                <p class="lead mb-0">
+                  <% if current_account %>
+                    You must be a member of the
+                  <% else %>
+                    You must be signed in and a member of the
+                  <% end %>
+                  <a href="/activities/<%= @event.activity_id %>"><%= @event.activity.name %></a> activity to book tickets to this event.
+                  <% if !current_account %><a href="/accounts/sign_in">Sign in</a> &middot; <% end %>
+                  <a href="/activities/<%= @event.activity_id %>/apply">Apply</a>
+                </p>
+              </div>
+            </div>
+          <% else %>
+            <%= partial :'events/purchase' %>
+            <% if @event.past? %>
+              <%= partial :'events/upcoming' %>
+            <% end %>
+          <% end %>
+        <% end %>
+      </div>
+    </div>
+  <% end %>
+</div>
+<% if @event.activity && @event.activity.event_feedbacks.count > 0 %>
+  <h2 class="mt-5">Feedback on <%= @event.activity.name %></h2>
+  <div class="mt-3" data-pagelet-url="/activities/<%= @event.activity_id %>/show_feedback"></div>
+<% end %>
+<% if !@event.hide_discussion %>
+  <% if event_participant? %>
+    <% pmails = @event.pmails_as_mailable.and(:sent_at.ne => nil).order('sent_at desc') %>
+    <% if pmails.count > 0 %>
+      <h2 class="mt-5">Emails to attendees</h2>
+      <%= partial :'pmails/blocks', locals: { pmails: pmails } %>
+    <% end %>
+
+    <h2 class="mt-5">Private discussion for attendees and facilitators</h2>
+    <% if (ticket = @event.tickets.find_by(account: current_account)) %>
+      <div data-pagelet-url="/events/<%= @event.id %>/subscribe_discussion">
+        <%= partial :'events/subscribe_discussion' %>
+      </div>
+    <% end %>
+    <div class="mt-3" data-pagelet-url="/commentable?commentable_type=Event&commentable_id=<%= @event.id %>">
+      <%= partial :'comments/commentable', locals: { commentable: @event } %>
+    </div>
+  <% end %>
+<% end %>
+</div>
+</div>

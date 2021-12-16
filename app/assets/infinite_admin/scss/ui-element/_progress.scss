@@ -1,0 +1,50 @@
+/* Progress Setting */
+
+.progress {
+}
+.progress-bar {
+	background: $color_primary;
+	@include box-shadow(none);
+	@include border-radius(2.5rem);
+}
+.progress.without-rounded-corner .progress-bar {
+	@include border-radius(0);
+}
+.progress-bar-success {
+	background: $color_success;
+}
+.progress-bar-info {
+	background: $color_info;
+}
+.progress-bar-warning {
+	background: $color_warning;
+}
+.progress-bar-danger {
+	background: $color_danger;
+}
+.progress-bar-purple {
+	background: $color_purple;
+}
+.progress-bar-yellow {
+	background: $color_yellow;
+}
+.progress-bar-pink {
+	background: $color_pink;
+}
+.progress-bar-inverse {
+	background: $color_inverse;
+}
+.progress.progress-sm {
+	height: 0.75rem;
+}
+.progress.progress-sm .progress-bar {
+	height: 0.75rem;
+	line-height: 0.75rem;
+	font-size: 0.5625rem;
+}
+.progress.progress-xs {
+	height: 0.25rem;
+}
+.progress.progress-xs .progress-bar {
+	height: 0.25rem;
+}

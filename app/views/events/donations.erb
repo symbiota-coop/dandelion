@@ -1,0 +1,45 @@
+<%= partial :'events/nav', locals: { event: @event } %>
+<% form_tag '', method: 'get', class: 'submitOnChange searchForm form-inline mb-3' do %>
+  <div class="form-group">
+    <label>Search donations</label>
+    <%= text_field_tag :q, class: 'form-control', value: params[:q] %>
+  </div>
+  <%= hidden_field_tag :search, value: 1 %>
+  <%= submit_tag 'Search', class: 'btn btn-primary' %>
+<% end %>
+<% if event_email_viewer? %>
+  <pre>
+    <%== Account.and(:id.in => @donations.pluck(:account_id)).map { |account| "#{Sanitize.fragment(account.name)} &lt;#{Sanitize.fragment(account.email)}&gt;" }.join(', ') %>
+  </pre>
+<% end %>
+<p>
+  <strong>Donations from this event:</strong>
+  <%= m @event.donation_revenue, @event.currency %>
+</p>
+<% @donations = @donations.order('created_at desc')
+   @donations = @donations.paginate(page: params[:page], per_page: 50) %>
+<p><%== page_entries_info @donations, model: 'Donation' %></p>
+<table class="table">
+  <thead>
+    <tr>
+      <th>Name</th>
+      <th>Donation</th>
+      <th>Created at</th>
+    </tr>
+  </thead>
+  <% @donations.each { |donation| %>
+  <tr>
+    <td>
+      <%= partial :'accounts/account', locals: { account: donation.account, width: '50px', show_email: donation_email_viewer?(donation) } %>
+    </td>
+    <td>
+      <%= m donation.amount, donation.order.currency %>
+      <% if donation.order.incomplete? %><i title="Payment processing" class="fa fa-spin fa-circle-o-notch"></i><% end %>
+    </td>
+    <td data-sort="<%= donation.created_at.iso8601 %>">
+      <%= donation.created_at %>
+    </td>
+  </tr>
+  <% } %>
+</table>
+<%= will_paginate @donations, renderer: WillPaginate::ViewHelpers::BootstrapRenderer %>

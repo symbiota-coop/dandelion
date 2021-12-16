@@ -1,0 +1,80 @@
+/* Modal Setting */
+
+.modal-dialog.modal-full {
+	max-width: 100%;
+	width: 100%;
+}
+.modal-dialog.modal-full .modal-content {
+	@include border-radius(0);
+}
+.close {
+	text-shadow: none;
+}
+.modal.modal-inverse .close {
+	color: $color_white;
+}
+.modal .modal-content {
+	@include box-shadow(none);
+	border: none;
+}
+.modal.modal-inverse .modal-content {
+	background: #3a3a3a;
+	color: $color_white;
+}
+.modal.modal-transparent .modal-content {
+	background: rgba(255,255,255,0.95);
+}
+.modal.modal-inverse.modal-transparent .modal-content {
+	background: rgba(255,255,255,0.95);
+}
+.modal.modal-inverse .modal-header,
+.modal.modal-inverse .modal-footer {
+	border-color: #666;
+}
+.modal-header .close {
+	margin: 0;
+	padding: 0;
+}
+.modal.modal-cover .modal-dialog {
+	display: table;
+	height: 100%;
+	margin-top: 0;
+	margin-bottom: 0;
+}
+.modal.modal-cover .modal-content {
+	display: table-cell;
+	vertical-align: middle;
+	background: none;
+}
+.modal.modal-cover {
+	background: rgba(255,255,255,0.95);
+}
+.modal.modal-inverse.modal-cover {
+	background: rgba(0,0,0,0.95);
+}
+.modal.modal-cover .modal-header,
+.modal.modal-cover .modal-footer {
+	border: none;
+}
+.modal.modal-cover .modal-header + .modal-body {
+	padding-top: 0;
+}
+.modal.modal-cover .modal-body + .modal-footer {
+	padding-top: 0;
+}
+@media (min-width: 768px) {
+	.modal-dialog {
+		width: 37.5rem;
+		max-width: 37.5rem;
+	}
+	.modal-sm {
+		width: 18.75rem;
+		max-width: 18.75rem;
+	}
+}
+@media (min-width: 992px) {
+	.modal-lg {
+		width: 56.25rem;
+		max-width: 56.25rem;
+	}
+}

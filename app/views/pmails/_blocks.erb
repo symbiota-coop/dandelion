@@ -1,0 +1,8 @@
+<div class="row" id="pmails">
+  <% pmails.each { |pmail| %>
+  <div class="col-12 <%= block_class if defined?(block_class) %>" id="<%= pmail.id %>">
+    <%= partial :'pmails/block', locals: { pmail: pmail } %>
+    <hr class="my-3">
+  </div>
+  <% } %>
+</div>

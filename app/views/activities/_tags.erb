@@ -1,0 +1,14 @@
+<div class="form-group">
+  <label for="activity_tag_names">
+    Tags
+  </label>
+  <%= hidden_field_tag :'activity[tag_names]', id: 'activity_tag_names', value: @activity.activity_tagships.map(&:activity_tag_name).join(',') %>
+</div>
+<script>
+  $(function () {
+    $("#activity_tag_names").select2({
+      tags: <%= ActivityTag.and(:id.in => ActivityTagship.pluck(:activity_tag_id)).order('name asc').pluck(:name) %>,
+      width: '100%'
+    });
+  })
+</script>

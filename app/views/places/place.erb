@@ -1,0 +1,56 @@
+<div class="row">
+  <div class="col-12 col-sm-auto text-center">
+    <% if @place.image %>
+      <img src="<%= u @place.image.thumb('200x200').url %>">
+    <% end %>
+  </div>
+  <div class="col-12 col-sm">
+    <div class="text-center text-sm-left">
+      <h1>
+        <%= @place.name %>
+      </h1>
+      <div class="mb-2">
+        <div class="d-inline-block mb-1" data-pagelet-url="/placeship/<%= @place.id %>">
+          <%= partial :'places/placeship', locals: { place: @place } %>
+        </div>
+        <% if current_account && (admin? || @place.account_id == current_account.id) %>
+          <a class="btn btn-primary" href="/places/<%= @place.id %>/edit"><i class="fa fa-pencil"></i> Edit place</a>
+        <% end %>
+      </div>
+    </div>
+    <table class="table table-hr">
+      <tr>
+        <td>Location</td>
+        <td>
+          <a target="_blank" href="https://www.google.co.uk/maps?q=<%= @place.name %>, <%= @place.location.gsub(/#{@place.name}[\w ]*,/i, '') %>"><%= @place.location.gsub(/#{@place.name}[\w ]*,/i, '') %></a>
+        </td>
+      </tr>
+      <% if @place.website %>
+        <tr>
+          <td>Website</td>
+          <td>
+            <a target="_blank" href="<%= @place.website %>"><%= @place.website %></a>
+          </td>
+        </tr>
+      <% end %>
+      <tr>
+        <td>Listed by</td>
+        <td>
+          <a href="/u/<%= @place.account.username %>"><%= @place.account.name %></a>
+        </td>
+      </tr>
+    </table>
+  </div>
+</div>
+<div data-pagelet-url="/map?place_id=<%= @place.id %>">
+  <%= partial :'maps/map', locals: { dynamic: true, trigger_bounds_changed: true } %>
+</div>
+<style>
+  #map-canvas { height: 50vh !important; margin-top: 1rem; margin-bottom: 1rem }
+</style>
+<% if current_account %>
+  <h2 class="mt-5">Discussion</h2>
+  <div data-pagelet-url="/commentable?commentable_type=Place&commentable_id=<%= @place.id %>">
+    <%= partial :'comments/commentable', locals: { commentable: @place } %>
+  </div>
+<% end %>

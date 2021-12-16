@@ -1,0 +1,49 @@
+name: Ruby
+
+on:
+  push:
+    branches: [ master ]
+  pull_request:
+    branches: [ master ]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Git checkout
+      uses: actions/checkout@v2
+
+    - name: Install Ruby
+      uses: ruby/setup-ruby@v1
+      with:
+        ruby-version: 2.7.3
+
+    - name: Install MongoDB
+      uses: supercharge/mongodb-github-action@1.3.0
+      with:
+        mongodb-version: 4.2.13
+
+    - name: Cache gems
+      uses: actions/cache@v1
+      with:
+        path: vendor/bundle
+        key: ${{ runner.os }}-gem-${{ hashFiles('**/Gemfile.lock') }}
+        restore-keys: |
+          ${{ runner.os }}-gem-
+
+    - name: Install gems
+      run: |
+        bundle config path vendor/bundle
+        bundle install --jobs 4 --retry 3
+
+    - name: Run RuboCop
+      run: bundle exec rubocop --fail-level warning --display-only-fail-level-offenses
+
+    - name: Run tests
+      env:
+        RACK_ENV: test
+        PORT: 8020
+        BASE_URI: http://127.0.0.1:8020
+        SESSION_SECRET: xxx
+        CI: true
+      run: bundle exec rake test

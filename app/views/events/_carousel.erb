@@ -1,0 +1,55 @@
+<% carousel_id = "carousel-#{SecureRandom.uuid}" %>
+<script>
+  $(function () {
+    $('#<%= carousel_id %> .slick-responsive').slick({
+      speed: 300,
+      dots: true,
+      prevArrow:"<button type='button' class='rounded-circle slick-prev pull-left'><i class='fa fa-angle-left' aria-hidden='true'></i></button>",
+      nextArrow:"<button type='button' class='rounded-circle slick-next pull-right'><i class='fa fa-angle-right' aria-hidden='true'></i></button>",
+      slidesToShow: 3,
+      slidesToScroll: 3,
+      responsive: [
+        {
+          breakpoint: 768,
+          settings: {
+            slidesToShow: 2,
+            slidesToScroll: 2
+          }
+        }, {
+          breakpoint: 576,
+          settings: {
+            slidesToShow: 1,
+            slidesToScroll: 1
+          }
+        }
+      ]
+    });
+
+  })
+</script>
+<% if events.count > 0 %>
+  <div class="slick-container mt-5 mb-sm-5" id="<%= carousel_id %>">
+    <% if defined? title %>
+      <% unless params[:hide_featured_title] && title == 'Featured' %>
+        <h2 class="text-center"><%= title %></h2>
+      <% end %>
+    <% end %>
+    <div class="slick-responsive row justify-content-center">
+      <% events.each { |event| %>
+      <div class="col-12 col-sm-6 col-md-4 slick-item">
+        <div style="position: relative;">
+          <a target="_parent" href="/events/<%= event.id %>">
+            <img class="w-100" src="<%= u event.image.thumb('500x500').url %>">
+          </a>
+          <span data-toggle="tooltip" title="<%= when_details(event) %>" class="label label-primary" style="opacity: 0.85; border-radius: 0; position: absolute; top: 0; right: 0">
+            <% if event.start_time.to_date != event.end_time.to_date %>
+              Starts
+            <% end %>
+            <%= event.start_time.to_date.to_s(:no_year) %>
+          </span>
+        </div>
+      </div>
+      <% } %>
+    </div>
+  </div>
+<% end %>

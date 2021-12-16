@@ -1,0 +1,14 @@
+<div class="main">
+  <p>Hi %recipient.firstname%,</p>
+  <p>Thanks for booking <%= service.name_with_provider %> from <%= booking.when_details(booking.account.time_zone) %>.</p>
+  <% if service.extra_info_for_booking_email %>
+    <%= service.extra_info_for_booking_email %>
+  <% end %>
+  <% if service.organisation.extra_info_for_booking_email %>
+    <%= service.organisation.extra_info_for_booking_email %>
+  <% end %>
+  <p>
+    <%= add_to_calendar %>
+  </p>
+</div>
+<div class="footer"></div>

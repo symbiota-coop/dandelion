@@ -1,0 +1,41 @@
+<div style="margin: 10px 0">
+  <a class="btn btn-primary" href="javascript:;" onclick="$(this).hide().next().show()"><i class="fa fa-plus-circle"></i> List item</a>
+  <div style="display: none">
+    <%= partial :'inventory/build' %>
+  </div>
+</div>
+<table class="table">
+  <tr>
+    <th>Item</th>
+    <th>Team</th>
+    <th>Listed by</th>
+    <th>Responsible person</th>
+  </tr>
+  <% @gathering.inventory_items(true).sort_by { |inventory_item| inventory_item.team.try(:name) || '' }.each { |inventory_item| %>
+  <tr>
+    <td>
+      <a href="/g/<%= @gathering.slug %>/inventory_items/<%= inventory_item.id %>/edit">
+        <%= inventory_item.name %>
+      </a>
+      <% if inventory_item.description %>
+        <br>
+        <%= inventory_item.description %>
+      <% end %>
+    </td>
+    <td>
+      <% if inventory_item.team %>
+        <a href="/g/<%= @gathering.slug %>/teams/<%= inventory_item.team_id %>"><%= inventory_item.team.name %></a>
+      <% end %>
+    </td>
+    <td><a href="/accounts/<%= inventory_item.account_id %>"><%= inventory_item.account.name %></a></td>
+    <td>
+      <% if inventory_item.responsible %>
+        <a href="javascript:;" onclick="$(this).hide().next().show()"><%= inventory_item.responsible.name %></a>
+      <% end %>
+      <% form_tag "/g/#{@gathering.slug}/inventory_items/#{inventory_item.id}/provided", style: ('display:none' if inventory_item.responsible) do %>
+        <%= select_tag :responsible_id, class: 'form-control', options: [''] + @gathering.members.order('name asc').map { |account| [account.name, account.id] }, selected: inventory_item.responsible.try(:id), onchange: '$(this.form).submit()' %>
+      <% end %>
+    </td>
+  </tr>
+  <% } %>
+</table>

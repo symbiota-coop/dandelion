@@ -1,0 +1,164 @@
+<%= partial :'activities/nav', locals: { activity: @activity } %>
+<div class="row">
+  <div class="col-12 col-sm-auto text-center">
+    <% if @activity.image %>
+      <img src="<%= u @activity.image.thumb('200x200').url %>">
+    <% end %>
+  </div>
+  <div class="col-12 col-sm">
+    <div class="text-center text-sm-left">
+      <h1>
+        <%= @activity.name %>
+      </h1>
+      <% if activity_admin? %>
+        <div class="mb-2">
+          <%= partial :'activities/tag_labels', locals: { activity: @activity } %>
+        </div>
+      <% end %>
+      <% if current_account %>
+        <div class="mb-2">
+          <div class="d-inline-block mb-1" data-pagelet-url="/activities/<%= @activity.id %>/activityship">
+            <%= partial :'activities/activityship', locals: { activity: @activity } %>
+          </div>
+          <% if current_account && activityship = @activity.activityships.find_by(account: current_account) %>
+            <% if !activityship.hide_membership? %>
+              <a class="btn btn-primary" href="/activities/<%= @activity.id %>/hide_membership">Membership public</a>
+            <% else %>
+              <a class="btn btn-outline-primary" href="/activities/<%= @activity.id %>/show_membership">Membership hidden</a>
+            <% end %>
+          <% end %>
+        </div>
+      <% else %>
+        <% if @activity.privacy == 'open' %>
+          <%= partial :'accounts/new_compact' %>
+        <% end %>
+      <% end %>
+    </div>
+    <table class="table table-hr">
+      <tr>
+        <td>Organisation</td>
+        <td>
+          <% if @activity.organisation.image %>
+            <a href="/o/<%= @activity.organisation.slug %>"><img src="<%= u @activity.organisation.image.thumb('500x500#').url %>" style="width: 50px"></a>
+          <% end %>
+          <a href="/o/<%= @activity.organisation.slug %>"><%= @activity.organisation.name %></a>
+        </td>
+      </tr>
+      <% if activity_admin? || @activity.admins.count > 0 %>
+        <tr>
+          <td>Admins</td>
+          <td>
+            <%= partial :'accounts/add', locals: {
+                  role: 'admin',
+                  accounts: @activity.admins.order('name asc'),
+                  add_and_remove: activity_admin?,
+                  new_object: Activityship.new,
+                  new_url: "/activities/#{@activity.id}/activityships/admin",
+                  destroy_url: "/activities/#{@activity.id}/activityships/unadmin"
+                } %>
+          </td>
+        </tr>
+      <% end %>
+      <% if @activity.email %>
+        <tr>
+          <td>Contact email</td>
+          <td>
+            <a target="_blank" href="mailto:<%= @activity.email %>"><%= @activity.email %></a>
+          </td>
+        </tr>
+      <% end %>
+      <% if @activity.website %>
+        <tr>
+          <td>Website</td>
+          <td>
+            <a target="_blank" href="<%= @activity.website %>"><%= @activity.website %></a>
+          </td>
+        </tr>
+      <% end %>
+      <% if @activity.telegram_group %>
+        <tr>
+          <td>Telegram group</td>
+          <td>
+            <a target="_blank" href="<%= @activity.telegram_group %>"><%= @activity.telegram_group %></a>
+          </td>
+        </tr>
+      <% end %>
+    </table>
+  </div>
+</div>
+<div class="wysiwyg mt-3">
+  <%== Sanitize.fragment(@activity.intro_text, Sanitize::Config::DANDELION) %>
+</div>
+
+<% if !current_account && @activity.privacy == 'closed' %>
+  <div class="text-center">
+    <a class="btn-lg btn btn-primary" href="/activities/<%= @activity.id %>/apply">Apply</a>
+  </div>
+<% end %>
+
+<h2 class="mt-5">Events</h2>
+<a class="btn btn-primary mb-3" href="/o/<%= @activity.organisation.slug %>/events?activity_id=<%= @activity.id %>">All events</a>
+<% if activity_admin? %>
+  <a class="btn btn-primary mb-3" href="/events/new?activity_id=<%= @activity.id %>">Create an event</a>
+<% end %>
+
+<% upcoming_events = @activity.events.live.public.future_and_current_featured.paginate(page: params[:upcoming_events_page], per_page: 5) %>
+<% past_events = @activity.events.live.public.past.paginate(page: params[:past_events_page], per_page: 3) %>
+
+<% if past_events.count > 0 %>
+  <h3 class="mb-3">Upcoming events</h3>
+<% end %>
+
+<% if upcoming_events.count > 0 %>
+  <%= partial :'events/blocks', locals: { events: upcoming_events } %>
+  <div class="mt-3">
+    <%= will_paginate upcoming_events, param_name: 'upcoming_events_page', inner_window: 0, outer_window: 0, renderer: WillPaginate::ViewHelpers::BootstrapRenderer %>
+  </div>
+<% else %>
+  <div class="mb-3">
+    <em>No upcoming events</em>
+  </div>
+<% end %>
+
+<% if past_events.count > 0 %>
+  <h3 class="mb-3">Past events</h3>
+  <%= partial :'events/blocks', locals: { events: past_events } %>
+  <div class="mt-3">
+    <%= will_paginate past_events, param_name: 'past_events_page', inner_window: 0, outer_window: 0, renderer: WillPaginate::ViewHelpers::BootstrapRenderer %>
+  </div>
+<% end %>
+
+<% if @activity.event_feedbacks.count > 0 %>
+  <h2 class="mt-5">Feedback</h2>
+  <div class="mt-3" data-pagelet-url="/activities/<%= @activity.id %>/show_feedback"></div>
+<% end %>
+
+<% if @activityship || @activity.privacy == 'open' %>
+  <% unless params[:e] or @activity.hide_members? %>
+    <% visible_members = Account.mappable.and(:id.in => @activity.activityships.and(:hide_membership.ne => true).pluck(:account_id)) %>
+    <% if visible_members.count > 0 %>
+      <h2 class="mt-5">People following <%= @activity.name %></h2>
+      <div data-pagelet-url="/map?activity_id=<%= @activity.id %>">
+        <%= partial :'maps/map', locals: { dynamic: true, trigger_bounds_changed: true } %>
+      </div>
+      <style>
+        #map-canvas { height: 50vh !important; margin-top: 1rem; margin-bottom: 1rem }
+      </style>
+    <% end %>
+  <% end %>
+  <% if !@activity.hide_discussion %>
+    <% if current_account %>
+      <h2 class="mt-5">Discussion</h2>
+      <% if @activityship %>
+        <div data-pagelet-url="/activities/<%= @activity.id %>/subscribe_discussion">
+          <%= partial :'activities/subscribe_discussion', locals: { activityship: activityship } %>
+        </div>
+      <% end %>
+      <div class="mt-3" data-pagelet-url="/commentable?commentable_type=Activity&commentable_id=<%= @activity.id %>">
+        <%= partial :'comments/commentable', locals: { commentable: @activity } %>
+      </div>
+    <% else %>
+      <%= partial :'comments/sign_in', locals: { commentable: @activity } %>
+    <% end %>
+  <% end %>
+<% end %>

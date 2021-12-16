@@ -1,0 +1,40 @@
+<% unless env['omniauth.auth'] %>
+  <div class="text-center">
+    <div class="mb-3">
+      <a href="/accounts/sign_in">Already a member? Sign in</a>
+    </div>
+    <% if !Provider.registered.empty? %>
+      <% Provider.registered.each { |provider| %>
+      <a class="btn btn-primary mb-1" href="/auth/<%= provider.omniauth_name %>"><i class="fa fa-<%= provider.icon %>"></i> Sign up via <%= provider.display_name %></a>
+      <% } %>
+    <% end %>
+  </div>
+<% end %>
+<% form_for @account, '/accounts/new', class: 'mt-3', id: 'new-account-form', multipart: true do |f| %>
+  <% %w{organisation activity local_group event}.each { |r| if instance_variable_get("@#{r}") %>
+  <%= hidden_field_tag :"#{r}_id", value: instance_variable_get("@#{r}").id %>
+<% end; } %>
+<script>
+  $(function () {
+
+  $('#new-account-form').submit(function() {
+    if(!grecaptcha || grecaptcha.getResponse().length == 0) {
+        alert('Please confirm you are not a robot');
+        return false
+    }
+  })
+
+     var autocomplete = new google.maps.places.Autocomplete($('#account_location')[0]);
+     $('#account_location').keydown(function (e) {
+   if (e.which == 13 && $('.pac-container:visible').length)
+     return false;
+     });
+  })
+</script>
+<%= f.text_block :name %>
+<%= f.email_block :email %>
+<%= f.password_block :password, required: true %>
+<%= f.text_block :location %>
+<div class="g-recaptcha mb-3" data-sitekey="<%= ENV['RECAPTCHA_SITE_KEY'] %>"></div>
+<%= f.submit_block button_text: 'Sign up' %>
+<% end %>

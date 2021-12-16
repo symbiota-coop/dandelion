@@ -1,0 +1,114 @@
+<%= partial :'organisations/nav', locals: { organisation: @organisation } %>
+<div class="row">
+  <div class="col-12 col-sm-auto text-center">
+    <% if @organisation.image %>
+      <img src="<%= u @organisation.image.thumb('200x200').url %>">
+    <% end %>
+  </div>
+  <div class="col-12 col-sm">
+    <div class="text-center text-sm-left">
+      <h1>
+        <a href="/o/<%= @organisation.slug %>"><%= @organisation.name %></a> members' area
+      </h1>
+      <div class="d-inline-block" data-pagelet-url="/o/<%= @organisation.slug %>/subscribe_discussion">
+        <%= partial :'organisations/subscribe_discussion', locals: { organisationship: @organisationship } %>
+      </div>
+      <% if !@organisationship.hide_membership? %>
+        <a class="btn btn-primary mb-1" href="/o/<%= @organisation.slug %>/show_membership/0">Membership public</a>
+      <% else %>
+        <a class="btn btn-outline-primary mb-1" href="/o/<%= @organisation.slug %>/show_membership/1">Membership hidden</a>
+      <% end %>
+      <div class="d-block d-sm-inline-block">
+        <% if @organisationship.referrer %>
+          <a href="javascript:;" onclick="$(this).hide();
+              $('#set_referrer').show()">Referred by <%= @organisationship.referrer.name %></a>
+        <% end %>
+        <% if @organisationship.hide_referrer %>
+          <a class="btn btn-primary mb-1" href="javascript:;" onclick="$(this).hide();
+              $('#set_referrer').show()">Credit referrer</a>
+        <% end %>
+      </div>
+      <% if @organisationship.credit_balance > 0 %>
+        <div class="mt-1 mb-2">
+          <a class="label label-primary text-white" href="/organisationships/<%= @organisationship.id %>/credit_balance"><big><%= m @organisationship.credit_balance, @organisation.currency %> credit</big></a>
+        </div>
+      <% end %>
+      <div class="card" id="set_referrer" <% if @organisationship.referrer || @organisationship.hide_referrer %> style="display: none"<% end %>>
+        <div class="card-body">
+          <h4 class="card-title">Credit someone for suggesting you join <%= @organisation.name %></h4>
+          <% form_for @organisationship, "/organisationships/#{@organisationship.id}/referrer" do |f| %>
+            <%= f.lookup_block :referrer_id, lookup_url: '/accounts.json', placeholder: 'Search accounts' %>
+            <button class="btn btn-primary" type="submit">Submit</button>
+            <a href="/organisationships/<%= @organisationship.id %>/hide_referrer" class="btn btn-danger">Hide</a>
+          <% end %>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<ul class="nav nav-tabs mt-3" role="tablist">
+  <% events_active = nil %>
+  <% if organisation_admin? or @organisation.events_for_search.future_and_current_featured.and(:monthly_donors_only => true).count > 0 %>
+    <% events_active = true %>
+    <li class="nav-item">
+      <a class="nav-link active" id="tab-events" data-toggle="tab" href="#panel-events" role="tab">
+        Events
+      </a>
+    </li>
+  <% end %>
+  <li class="nav-item">
+    <a class="nav-link <%= 'active' unless events_active %>" id="tab-discussion" data-toggle="tab" href="#panel-discussion" role="tab">
+      Discussion
+    </a>
+  </li>
+  <% visible_members = @organisation.monthly_donors %>
+  <% if visible_members.count > 0 %>
+    <li class="nav-item">
+      <a class="nav-link" id="tab-map" data-toggle="tab" href="#panel-map" role="tab">
+        Member map
+      </a>
+    </li>
+  <% end %>
+  <% if @organisation.monthly_donor_affiliate_reward %>
+    <li class="nav-item">
+      <a class="nav-link" id="tab-referral" data-toggle="tab" href="#panel-referral" role="tab">
+        Referral link
+      </a>
+    </li>
+  <% end %>
+</ul>
+<div class="tab-content">
+  <% if organisation_admin? or @organisation.events_for_search.future_and_current_featured.and(:monthly_donors_only => true).count > 0 %>
+    <div class="tab-pane fade show active" id="panel-events" role="tabpanel">
+      <div data-pagelet-url="/o/<%= @organisation.slug %>/events?members_events=1"></div>
+    </div>
+  <% end %>
+  <div class="tab-pane fade <%= 'show active' unless events_active %>" id="panel-discussion" role="tabpanel">
+    <div class="mt-3" data-pagelet-url="/commentable?commentable_type=Organisation&commentable_id=<%= @organisation.id %>">
+      <%= partial :'comments/commentable', locals: { commentable: @organisation } %>
+    </div>
+  </div>
+  <% if visible_members.count > 0 %>
+    <div class="tab-pane fade" id="panel-map" role="tabpanel">
+      <div data-pagelet-url="/map?organisation_id=<%= @organisation.id %>&monthly_donors=1">
+        <%= partial :'maps/map', locals: { dynamic: true, trigger_bounds_changed: true } %>
+      </div>
+      <style>
+        #map-canvas { height: 50vh !important; margin-top: 1rem; margin-bottom: 1rem }
+      </style>
+    </div>
+  <% end %>
+  <% if @organisation.monthly_donor_affiliate_reward %>
+    <div class="tab-pane fade" id="panel-referral" role="tabpanel">
+      <h2>Your referral link</h2>
+      <p class="lead">
+        <a href="<%= ENV['BASE_URI'] %>/o/<%= @organisation.slug %>/via/<%= current_account.username %>"><%= ENV['BASE_URI'] %>/o/<%= @organisation.slug %>/via/<%= current_account.username %></a>
+      </p>
+      <p class="lead">
+        When someone becomes a member via this link, you both receive
+        <strong><%= m @organisation.monthly_donor_affiliate_reward, @organisation.currency %> credit</strong>
+        to spend on <%= @organisation.name %>'s events.
+      </p>
+    </div>
+  <% end %>
+</div>

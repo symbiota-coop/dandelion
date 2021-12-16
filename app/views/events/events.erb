@@ -1,0 +1,51 @@
+<div class="row justify-content-between mb-3">
+  <div class="col">
+    <h1>Events</h1>
+  </div>
+</div>
+<% form_tag '/events', method: 'get', class: 'submitOnChange searchForm form-inline  mb-3' do %>
+  <div class="form-group">
+    <label>Show events from</label>
+    <%= text_field_tag :from, class: 'form-control datepicker', value: @from.to_s(:db) %>
+  </div>
+  <div class="form-group">
+    <label>containing the word</label>
+    <%= text_field_tag :q, class: 'form-control', value: params[:q] %>
+  </div>
+  <% if (event_tags = EventTag.and(:id.in => EventTagship.and(:event_id.in => Event.live.public.legit.future.pluck(:id)).pluck(:event_tag_id)).order('name asc')).count > 1 %>
+    <div class="form-group">
+      <label>tagged</label>
+      <%= select_tag :event_tag_id, options: [''] + event_tags.map { |event_tag| [event_tag.name, event_tag.id] }, selected: params[:event_tag_id], class: 'form-control' %>
+    </div>
+  <% end %>
+  <div class="form-group">
+    <label>Sort by</label>
+    <%= select_tag :order, options: { 'Event date' => 'date', 'Most recently created' => 'created_at' }, selected: params[:order], class: 'form-control mx-1' %>
+  </div>
+  <%= checkbox 'Online' %>
+  <%= submit_tag 'Search', class: 'btn btn-primary' %>
+  <%= hidden_field_tag :search, value: 1 %>
+<% end %>
+<div class="mb-3">
+  <a class="badge badge-primary" style="font-weight: normal" id="ical" target="_blank" data-toggle="tooltip" href="<%= ENV['BASE_URI'] %><%= request.path %>.ics?<%= request.query_string %>">
+    iCal <i class="fa fa-external-link"></i>
+  </a>
+</div>
+
+<% if current_account && !params[:search] && !params[:event_tag_id] %>
+
+  <% if (organisations = Organisation.and(:id.in =>
+  current_account.organisationships.and(:hide_membership.ne => true).pluck(:organisation_id) +
+  current_account.organisationships.and(:admin => true).pluck(:organisation_id)
+).and(:id.in =>
+  Event.live.public.future.pluck(:organisation_id)
+)
+).count > 0 %>
+  <%= partial :'events/carousel_organisations', locals: { organisations: organisations } %>
+<% end %>
+
+<% end %>
+
+<div data-pagelet-url="/events?<%= request.query_string %>">
+  <%= partial :'events/events' %>
+</div>

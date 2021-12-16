@@ -1,0 +1,19 @@
+<% if services.count > 0 %>
+  <div class="fake-container-fluid mb-3">
+    <div class="row bg-grey-transparent-2 pt-4 px-5" id="services">
+      <% services.each { |service| next if service.draft? && !service_admin?(service) %>
+      <div class="col-12 <%= block_class if defined?(block_class) %>" id="<%= service.id %>">
+        <div class="mb-4">
+          <%= partial :'services/block', locals: { service: service } %>
+        </div>
+      </div>
+      <% } %>
+    </div>
+  </div>
+  <style>
+    @media(max-width: 767px) {
+      .fake-container-fluid > .px-5 { padding-left: 1rem !important; padding-right: 1rem !important }
+      .fake-container-fluid > .bg-grey-transparent-2 { background: white !important }
+    }
+  </style>
+<% end %>

@@ -1,0 +1,18 @@
+<a style="text-decoration: none" href="javascript:;" data-toggle="modal" data-target="#photo-<%= photo.id %>">
+  <img class="mb-1 mr-1" src="<%= u photo.image.thumb(defined?(dimensions) ? dimensions : '200x200#').url %>">
+</a>
+<div class="modal fade" id="photo-<%= photo.id %>" tabindex="-1" role="dialog">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-body">
+        <img class="w-100" src="<%= photo.image.url %>">
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+        <% if photo.account_id == current_account.id %>
+          <a class="btn btn-danger" data-confirm="Are you sure you want to delete this image?" href="/photos/<%= photo.id %>/destroy">Delete</a>
+        <% end %>
+      </div>
+    </div>
+  </div>
+</div>

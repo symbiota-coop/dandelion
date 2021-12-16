@@ -1,0 +1,33 @@
+<div class="row">
+  <% if current_account.messages.count > 0 %>
+    <div id="preview-panel" class="col-md-3 <% if @account %>d-none d-md-block <% end %>">
+      <div class="d-block d-md-none">
+        <ul class="breadcrumb">
+          <li class="breadcrumb-item active">Messages</li>
+        </ul>
+      </div>
+      <div data-pagelet-scroll="false" data-pagelet-url="/messages/index">
+        <%= partial :'messages/index' %>
+      </div>
+    </div>
+  <% end %>
+  <div id="thread-panel" class="<% if current_account.messages.count > 0 %>col-md-9<% else %>col-md-12<% end %>">
+    <div style="position: sticky; top: 3.75rem">
+      <% if @account %>
+        <div class="d-block d-md-none">
+          <ul id="message-breadcrumbs" class="breadcrumb">
+            <li class="breadcrumb-item"><a href="javascript:;" onclick="$('#thread-panel').hide();
+                $('#preview-panel').removeClass('d-none')">Messages</a></li>
+            <li class="breadcrumb-item active"><%= @account.name %></li>
+          </ul>
+        </div>
+        <div data-pagelet-url="/messages/<%= @account.id %>" data-pusher-channel="message.<%= @account.id %>.<%= current_account.id %>">
+          <%= partial :'messages/thread' %>
+        </div>
+        <div id="message-send" data-pagelet-url="/messages/<%= @account.id %>/send">
+          <%= partial :'messages/send' %>
+        </div>
+      <% end %>
+    </div>
+  </div>
+</div>

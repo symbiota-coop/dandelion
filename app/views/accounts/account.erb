@@ -1,0 +1,151 @@
+<% viewer_in_network = current_account && @account.network.find(current_account.id) %>
+<%= partial :'accounts/top', locals: { account: @account } %>
+<% if @account.coordinates && viewable?(@account, :location) && @account.mappable? %>
+  <style>
+    #map-canvas { height: 200px !important; margin-bottom: 1rem; margin-top: 1rem }
+  </style>
+  <%= partial :'maps/map', locals: { points: [@account] } %>
+<% end %>
+<% if current_account %>
+  <div class="mt-3" data-pagelet-url="/commentable?commentable_type=Account&commentable_id=<%= @account.id %>">
+    <%= partial :'comments/commentable', locals: { commentable: @account } %>
+  </div>
+<% end %>
+<% if (events = Event.and(:id.in => @account.event_facilitations.pluck(:event_id)).live.public.future_and_current_featured).count > 0 %>
+  <h2>Upcoming events</h2>
+  <%= partial :'events/blocks', locals: { events: events } %>
+<% end %>
+<% if @account.event_feedbacks_as_facilitator.count > 0 %>
+  <h2 class="mt-5">Feedback</h2>
+  <div class="mt-3" data-pagelet-url="/accounts/<%= @account.id %>/show_feedback"></div>
+<% end %>
+<% if (habits = @account.habits.and(public: true).and(:archived.ne => true)).count > 0 %>
+  <h2 class="mt-5" id="habits">Habits</h2>
+  <%= partial :'habits/blocks', locals: { habits: habits } %>
+<% end %>
+
+<% if (organisations = Organisation.and(:id.in => @account.organisationships.and(:hide_membership.ne => true).pluck(:organisation_id))).count > 0 %>
+  <% if viewable?(@account, :organisations, viewer_in_network: viewer_in_network) %>
+    <div class="mt-5 row justify-content-between no-gutters">
+      <div class="col">
+        <h2>Organisations</h2>
+      </div>
+      <% if current_account && current_account.id == @account.id %>
+        <div class="col-auto">
+          <div data-pagelet-url="/accounts/privacyable/organisations"></div>
+        </div>
+      <% end %>
+    </div>
+    <%= partial :'organisations/blocks', locals: { organisations: organisations } %>
+  <% end %>
+<% end %>
+
+<% if (local_groups = LocalGroup.and(:id.in => @account.local_groupships.and(:hide_membership.ne => true).pluck(:local_group_id))).count > 0 %>
+  <% if viewable?(@account, :local_groups, viewer_in_network: viewer_in_network) %>
+    <div class="mt-5 row justify-content-between no-gutters">
+      <div class="col">
+        <h2>Local groups</h2>
+      </div>
+      <% if current_account && current_account.id == @account.id %>
+        <div class="col-auto">
+          <div data-pagelet-url="/accounts/privacyable/local_groups"></div>
+        </div>
+      <% end %>
+    </div>
+    <%= partial :'local_groups/blocks', locals: { local_groups: local_groups } %>
+  <% end %>
+<% end %>
+
+<% if (activities = Activity.and(:id.in => @account.activityships.and(:hide_membership.ne => true).pluck(:activity_id))).count > 0 %>
+  <% if viewable?(@account, :activities, viewer_in_network: viewer_in_network) %>
+    <div class="mt-5 row justify-content-between no-gutters">
+      <div class="col">
+        <h2>Activities</h2>
+      </div>
+      <% if current_account && current_account.id == @account.id %>
+        <div class="col-auto">
+          <div data-pagelet-url="/accounts/privacyable/activities"></div>
+        </div>
+      <% end %>
+    </div>
+    <%= partial :'activities/blocks', locals: { activities: activities } %>
+  <% end %>
+<% end %>
+
+<% if (gatherings = Gathering.and(:id.in => @account.memberships.pluck(:gathering_id)).and(listed: true).and(:privacy.ne => 'secret')).count > 0 %>
+  <% if viewable?(@account, :gatherings, viewer_in_network: viewer_in_network) %>
+    <div class="mt-5 row justify-content-between no-gutters">
+      <div class="col">
+        <h2>Gatherings</h2>
+      </div>
+      <% if current_account && current_account.id == @account.id %>
+        <div class="col-auto">
+          <div data-pagelet-url="/accounts/privacyable/gatherings"></div>
+        </div>
+      <% end %>
+    </div>
+    <div class="row">
+      <% gatherings.each { |gathering| %>
+      <div class="col-6 col-sm-3 mb-3">
+        <%= partial :'gatherings/gathering', object: gathering %>
+      </div>
+      <% } %>
+    </div>
+  <% end %>
+<% end %>
+
+<% if @account.places_following.count > 0 %>
+  <% if viewable?(@account, :places, viewer_in_network: viewer_in_network) %>
+    <div class="mt-5 row justify-content-between no-gutters">
+      <div class="col">
+        <h2>Places</h2>
+        <% if current_account && current_account.id == @account.id %>
+          <div class="mb-3">
+            <a class="btn btn-primary" href="javascript:;" onclick="$(this).hide().next().show().find('input').first().focus()"><i class="fa fa-plus-circle"></i> Add a category</a>
+            <div style="display: none" class="mt-3">
+              <%= partial :'placeship_categories/build' %>
+            </div>
+          </div>
+        <% end %>
+      </div>
+      <% if current_account && current_account.id == @account.id %>
+        <div class="col-auto">
+          <div data-pagelet-url="/accounts/privacyable/places"></div>
+        </div>
+      <% end %>
+    </div>
+    <div data-pagelet-url="/accounts/<%= @account.id %>/places"></div>
+  <% end %>
+<% end %>
+
+<% if @account.follows_as_follower.count > 0 %>
+  <% if viewable?(@account, :following, viewer_in_network: viewer_in_network) %>
+    <div class="mt-5 row justify-content-between no-gutters">
+      <div class="col">
+        <h2>Following</h2>
+      </div>
+      <% if current_account && current_account.id == @account.id %>
+        <div class="col-auto">
+          <div data-pagelet-url="/accounts/privacyable/following"></div>
+        </div>
+      <% end %>
+    </div>
+    <div data-pagelet-url="/accounts/<%= @account.id %>/following"></div>
+  <% end %>
+<% end %>
+
+<% if @account.follows_as_followee.count > 0 %>
+  <% if viewable?(@account, :followers, viewer_in_network: viewer_in_network) %>
+    <div class="mt-5 row justify-content-between no-gutters">
+      <div class="col">
+        <h2>Followers</h2>
+      </div>
+      <% if current_account && current_account.id == @account.id %>
+        <div class="col-auto">
+          <div data-pagelet-url="/accounts/privacyable/followers"></div>
+        </div>
+      <% end %>
+    </div>
+    <div data-pagelet-url="/accounts/<%= @account.id %>/followers"></div>
+  <% end %>
+<% end %>

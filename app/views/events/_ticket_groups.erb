@@ -1,0 +1,71 @@
+<div class="form-group">
+  <label>
+    Ticket groups
+  </label>
+  <div>
+    <div id="ticket_groups">
+      <% f.fields_for :ticket_groups do |o| %>
+        <div class="ticket_group <%= 'has-error' if o.object.invalid? %>">
+          <div><%= o.text_field :name, class: 'form-control', placeholder: 'Name' %></div>
+          <div><%= o.number_field :capacity, class: 'form-control ml-1', placeholder: 'Capacity' %></div>
+          <% if o.object.new_record? %>
+            <span>
+              <i style="cursor: pointer" onclick="$(this).closest('.ticket_group').remove()" class="fa fa-times"></i>
+            </span>
+          <% else %>
+            <span>
+              <i style="cursor: pointer" onclick="$(this).siblings().last().prop('checked', true).closest('.ticket_group').hide()" class="fa fa-times"></i>
+              <%= o.check_box '_destroy', style: 'display: none' %>
+            </span>
+          <% end %>
+        </div>
+      <% end %>
+    </div>
+    <div id="ticket_groups_add">
+      <i style="cursor: pointer" class="text-muted fa fa-plus-square"></i>
+      <a class="text-muted" href="javascript:;">Add ticket group</a>
+    </div>
+    <p style="display: none" id="ticket_groups_save" class="my-1">
+      <em>Save the event to add tickets to these ticket groups.</em>
+    </p>
+    <style>
+      .ticket_group { margin-bottom: 10px; padding-left: 10px; border-left: 4px solid #ddd; }
+      .ticket_group > div, .ticket_group > label { display: inline-block; margin-bottom: 5px; margin-right: 5px }
+      .ticket_group input[name$='[name]'] { display: inline-block; width: auto }
+      .ticket_group input[name$='[capacity]'] { display: inline-block; width: 7em }
+    </style>
+    <script>
+      $(function () {
+
+        $('#ticket_groups_add').click(function () {
+          $('#ticket_groups_save').show()
+          var c = $('.ticket_group').length
+
+          var d = $('<div class="ticket_group"/>');
+
+          var nameDiv = $('<div></div>')
+          var nameInput = $('<input type="text" />');
+          nameInput.attr('name', 'event[ticket_groups_attributes][' + c + '][name]');
+          nameInput.attr('id', 'event_ticket_groups_attributes_' + c + '_name');
+          nameInput.attr('placeholder', 'Name');
+          nameInput.addClass('form-control');
+          nameInput.appendTo(nameDiv);
+          nameDiv.appendTo(d);
+
+          var capacityDiv = $('<div></div>')
+          var capacityInput = $('<input type="number" step="any" />');
+          capacityInput.attr('name', 'event[ticket_groups_attributes][' + c + '][capacity]');
+          capacityInput.attr('id', 'event_ticket_groups_attributes_' + c + '_capacity');
+          capacityInput.attr('placeholder', 'Capacity');
+          capacityInput.addClass('form-control ml-1');
+          capacityInput.appendTo(capacityDiv);
+          capacityDiv.appendTo(d);
+
+          $('<span><i style="cursor: pointer" onclick="$(this).closest(\'.ticket_group\').remove()" class="fa fa-times"></i></span>').appendTo(d);
+
+          d.appendTo('#ticket_groups');
+        });
+      });
+    </script>
+  </div>
+</div>

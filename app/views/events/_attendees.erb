@@ -1,0 +1,31 @@
+<% if (current_account && ticket = @event.tickets.find_by(account: current_account)) || (@event.organisation && @event.public_attendees.count > 0) %>
+  <div class="my-3">
+    <div class="row no-gutters">
+      <div class="col">
+        <h2>Attending</h2>
+      </div>
+      <div class="col-auto">
+        <% if ticket %>
+          <% if @event.tickets.and(account: current_account).all? { |ticket| ticket.hide_attendance? } %>
+            <a class="pagelet-trigger btn btn-sm btn-outline-primary mb-1" href="/events/<%= @event.id %>/show_attendance">Attendance hidden</a>
+          <% else %>
+            <a class="pagelet-trigger btn btn-sm btn-primary mb-1" href="/events/<%= @event.id %>/hide_attendance">Attendance public</a>
+          <% end %>
+        <% end %>
+      </div>
+    </div>
+    <div class="image-wall">
+      <% @event.public_attendees.each { |account| %>
+      <%= partial :'accounts/square', locals: { account: account, width: '50px' } %>
+      <% }; x = @event.public_attendees.count %>
+      <% if (y = @event.private_attendees.count) > 0 %>
+        <big>
+          <% if x > 0 %>
+            +
+          <% end %>
+          <%= pluralize(y, 'person') %>
+        <% end %>
+      </big>
+    </div>
+  </div>
+<% end %>

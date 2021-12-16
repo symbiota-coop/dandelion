@@ -1,0 +1,17 @@
+<% account = (current_account.id == message.messenger_id ? message.messengee : message.messenger) # the other person %>
+<div class="media">
+  <%= partial :'accounts/square', locals: { account: account, content: (account.last_active ? "Active #{time_ago_in_words account.last_active} ago" : 'Never logged in'), style: 'display: block; width: 32px' } %>
+  <div class="media-body ml-3">
+    <a class="<%= klass if defined?(klass) %> message-preview text-dark <% if account.id == message.messenger_id && Message.unread?(account, current_account) %> unread <% end %>" style="text-decoration: none" href="/messages/<%= account.id %>">
+      <h5 class="my-0"><%= account.name %></h5>
+      <p class="text-muted mb-1">
+        <%= HTML_Truncator.truncate(message.body, 40, length_in_chars: true) %>
+      </p>
+      <p class="mb-0 mr-1 text-right text-muted">
+        <small>
+          <%= timeago(message.created_at) %>
+        </small>
+      </p>
+    </a>
+  </div>
+</div>

@@ -1,0 +1,30 @@
+/* Widget Rating Star Setting */
+
+.widget-rating-star {
+	list-style-type: none;
+	margin: 0;
+	padding: 0;
+	white-space: nowrap;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	font-size: 0.5625rem;
+	color: #C8C7CC;
+	line-height: 0.875rem;
+	
+	& > li {
+		display: inline-block;
+		
+		& + li {
+			margin-left: -1px;
+		}
+		&.active {
+			color: $color_warning;
+		}
+		&.text {
+			color: $color_grey;
+		}
+	}
+}
+.invese-mode .widget-rating-star > li.text {
+	color: rgba(255,255,255,0.75);
+}

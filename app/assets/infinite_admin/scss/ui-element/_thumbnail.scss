@@ -1,0 +1,7 @@
+/* Thumbnail Setting */
+
+a.thumbnail.active, 
+a.thumbnail:focus, 
+a.thumbnail:hover {
+    border-color: $color_primary;
+}

@@ -1,0 +1,35 @@
+<% if current_account %>
+  <% organisationship = current_account.organisationships.find_by(organisation: organisation)
+     state_options = {
+       'not_following' => 'Follow',
+       'follow_without_subscribing' => 'Following',
+       'follow_and_subscribe' => 'Following with email updates <i class="fa fa-envelope"></i>'
+     }
+     current_state = if organisationship
+                       organisationship.unsubscribed ? 'follow_without_subscribing' : 'follow_and_subscribe'
+                     else
+                       'not_following'
+                     end
+     text = state_options[current_state]
+     action_options = {
+       'not_following' => 'Unfollow',
+       'follow_without_subscribing' => 'Follow',
+       'follow_and_subscribe' => 'Follow with email updates <i class="fa fa-envelope"></i>'
+     }
+
+     action_options.delete('not_following') if organisationship && (organisationship.admin? || organisationship.monthly_donor?) %>
+  <% if current_state == 'not_following' %>
+    <a class="pagelet-trigger btn btn-outline-primary <%= btn_class if defined?(btn_class) %>" href="/o/<%= organisation.slug %>/organisationship?f=follow_and_subscribe">Follow</a>
+  <% else %>
+    <div class="dropdown d-inline-block">
+      <button class="btn <%= btn_class if defined?(btn_class) %> <%= current_state == 'not_following' ? 'btn-outline-primary' : 'btn-primary' %> dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+        <%== text %>
+      </button>
+      <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+        <% action_options.invert.each { |text,value| %>
+        <a class="pagelet-trigger dropdown-item" href="/o/<%= organisation.slug %>/organisationship?f=<%= value %>"><%== text %></a>
+        <% } %>
+      </div>
+    </div>
+  <% end %>
+<% end %>

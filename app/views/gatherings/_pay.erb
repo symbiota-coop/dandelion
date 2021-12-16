@@ -1,0 +1,173 @@
+<% form_tag '', class: 'form-inline no-trigger', id: 'pay-form' do %>
+  <div class="form-group mb-1 mr-1">
+    <div class="input-group">
+      <div class="input-group-prepend">
+        <span class="input-group-text"><%= Money.new(0, @gathering.currency).symbol %></span>
+      </div>
+      <%= number_field_tag :amount, value: (amount if defined?(amount)), style: 'width: 5em;', required: 'required', class: 'form-control', id: 'amount' %>
+    </div>
+  </div>
+  <% if @gathering.stripe_sk && FIAT_CURRENCIES.include?(@gathering.currency) %>
+    <button data-payment-method="stripe" type="submit" class="btn btn-default mb-1 ml-0 mr-1" style="height: 2.125rem">
+      Pay with card
+      <i class="fa fa-spin fa-circle-o-notch" style="display: none"></i>
+    </button>
+    <%= hidden_field_tag :payment_method, value: 'stripe', disabled: true %>
+  <% end %>
+  <% if @gathering.coinbase_api_key && (FIAT_CURRENCIES.include?(@gathering.currency) || COINBASE_CURRENCIES.include?(@gathering.currency)) %>
+    <button data-payment-method="coinbase" type="submit" class="btn btn-default mb-1 ml-0 mr-1" style="height: 2.125rem">
+      Pay with crypto
+      <i class="fa fa-spin fa-circle-o-notch" style="display: none"></i>
+    </button>
+    <%= hidden_field_tag :payment_method, value: 'coinbase', disabled: true %>
+  <% end %>
+  <% if @gathering.seeds_username && @gathering.currency == 'SEEDS' %>
+    <button data-payment-method="seeds" type="submit" class="btn btn-default mb-1 ml-0 mr-1" style="height: 2.125rem">
+      <span>Pay with SEEDS</span>
+      <i class="fa fa-spin fa-circle-o-notch" style="display: none"></i>
+    </button>
+    <%= hidden_field_tag :payment_method, value: 'seeds', disabled: true %>
+  <% end %>
+  <% if @gathering.xdai_address && XDAI_CURRENCIES.include?(@gathering.currency) %>
+    <button data-payment-method="xdai" type="submit" class="btn btn-default mb-1 ml-0 mr-1" style="height: 2.125rem">
+      <span>Pay with xDai</span>
+      <i class="fa fa-spin fa-circle-o-notch" style="display: none"></i>
+    </button>
+    <%= hidden_field_tag :payment_method, value: 'xdai', disabled: true %>
+  <% end %>
+
+
+<% end %>
+
+<script>
+  $(function () {
+
+    currency = <%== @gathering.currency.to_json %>
+    currencySymbol = <%== Money.new(0, @gathering.currency).symbol.to_json %>
+
+    $('#pay-form button[data-payment-method]').click(function () {
+      $('input[type=hidden][name=payment_method]').attr('disabled', true)
+      $('input[type=hidden][name=payment_method][value=' + $(this).attr('data-payment-method') + ']').removeAttr('disabled')
+      $(this).attr('data-payment-method-clicked', true)
+    })
+
+    $('#pay-form').submit(function () {
+      $('#pay-form button[data-payment-method-clicked] i').show()
+      $.post('/g/<%= @gathering.slug %>/pay', $(this).serializeObject(), function (data) {
+        if (data['session_id']) {
+          // Stripe
+          var stripe = Stripe('<%= @gathering.stripe_pk %>');
+          stripe.redirectToCheckout({sessionId: data['session_id']})
+        } else if (data['checkout_id']) {
+          // Coinbase
+          window.location = 'https://commerce.coinbase.com/checkout/' + data['checkout_id']
+        } else if (data['seeds_secret']) {
+          // SEEDS
+          seedsUsername = <%== @gathering.seeds_username.to_json %>
+          $('#owed').hide()
+          $('#pay-with-seeds').show()
+          $('#pay-with-seeds').find('.card-body p.lead.please').html('Open the SEEDS app and send <strong>' + data['seeds_amount'] + ' SEEDS</strong> to <strong>' + seedsUsername + '</strong> with the memo')
+          $('#pay-with-seeds').find('.card-body p.lead.memo').html(data['seeds_secret'])
+          var offset = $('#pay-with-seeds').offset()
+          window.scrollTo(0, offset['top'] - $('#header').height() - 10);
+          setInterval(function() {
+            if (Date.now() < data['payment_attempt_expiry'])
+              $.getJSON('/g/<%=@gathering.slug%>/payment_attempts/' + data['payment_attempt_id'] , function(_data) {
+                if (_data['payment_completed'])
+                  window.location = '/g/<%=@gathering.slug%>/options'
+              })
+          }, 30 * 1000);
+        } else if (data['xdai_secret']) {
+          // xDai
+          xdaiAddress = <%== @gathering.xdai_address.to_json %>
+          contractAddress = <%== XDAI_CONTRACT_ADDRESSES[@gathering.currency].to_json %>
+          $('#owed').hide()
+          $('#pay-with-xdai').show()
+          $('#pay-with-xdai').find('.card-body p.lead.please').html('Send EXACTLY <strong>' + data['xdai_amount'] + ' ' + currency + '</strong> to <strong>' + xdaiAddress + '</strong>')
+          var offset = $('#pay-with-xdai').offset()
+          window.scrollTo(0, offset['top'] - $('#header').height() - 10);
+
+          var web3 = new Web3(ethereum);
+
+          web3.eth.net.getId().then(networkId => {
+            if (networkId != 100) {
+              $('#pay-with-xdai').find('.card-body p.metamask').html('<mark>Please switch to xDai</mark>')
+              ethereum.on('chainChanged', function() {
+                console.log('chainChanged')
+                web3.eth.net.getId().then(networkId => {
+                  if (networkId == 100)
+                    connectMetamask()
+                })
+              });
+            } else if (networkId == 100) {
+              connectMetamask()
+            }
+          })
+
+          function connectMetamask() {
+            if (!ethereum.selectedAddress) {
+              console.log('connecting')
+              $('#pay-with-xdai').find('.card-body p.metamask').html('<a href="javascript:;">Connect to Metamask</a>')
+              $('#pay-with-xdai').find('.card-body p.metamask a').click(function() {
+                ethereum.request({
+                  method: 'eth_requestAccounts'
+                }).then(pay)
+              }).click()
+            } else {
+              pay()
+            }
+          }
+
+          function pay() {
+            console.log('paying')
+            $('#pay-with-xdai').find('.card-body p.metamask').remove()
+
+            var abi = [{
+              "constant": false,
+              "inputs": [{
+                  "name": "_to",
+                  "type": "address"
+                },
+                {
+                  "name": "_value",
+                  "type": "uint256"
+                }
+              ],
+              "name": "transfer",
+              "outputs": [{
+                "name": "",
+                "type": "bool"
+              }],
+              "type": "function"
+            }];
+
+            var toAddress = xdaiAddress
+            var fromAddress = ethereum.selectedAddress
+            var amount = parseInt(data['xdai_wei']).toString()
+
+            var contractInstance = new web3.eth.Contract(abi, contractAddress);
+            contractInstance.methods.transfer(toAddress, amount).send({
+              from: fromAddress
+            })
+          }
+
+          setInterval(function() {
+            if (Date.now() < data['payment_attempt_expiry'])
+              $.getJSON('/g/<%=@gathering.slug%>/payment_attempts/' + data['payment_attempt_id'] , function(_data) {
+                if (_data['payment_completed'])
+                  window.location = '/g/<%=@gathering.slug%>/options'
+              })
+          }, 30 * 1000);
+        }
+      }).fail(function () {
+        $('#pay-form').hide()
+      }).always(function () {
+        $('#pay-form').css('opacity', 1)
+      })
+
+      return false
+
+    })
+    console.log('paying')
+  })
+</script>

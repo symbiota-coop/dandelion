@@ -1,0 +1,126 @@
+<%= partial :'activities/nav', locals: { activity: @activity } %>
+<div class="mb-3">
+  <% form_tag '', method: 'get', class: 'submitOnChange searchForm form-inline' do %>
+    <div class="form-group">
+      <label>Applications between</label>
+      <%= text_field_tag :from, class: 'form-control datepicker mx-1', value: (@from.to_s(:db) if @from) %>
+    </div>
+    <div class="form-group">
+      <label>and</label>
+      <%= text_field_tag :to, class: 'form-control datepicker mx-1', value: (@to.to_s(:db) if @to) %>
+    </div>
+    <div class="form-group">
+      <label>Name</label>
+      <%= text_field_tag :name, class: 'form-control', value: params[:name] %>
+    </div>
+    <div class="form-group">
+      <label>Email</label>
+      <%= text_field_tag :email, class: 'form-control', value: params[:email] %>
+    </div>
+    <div class="form-group">
+      <label>Gender</label>
+      <%= select_tag :gender, class: 'form-control', selected: @gender, options: %w[All Woman Man Other] %>
+    </div>
+    <div class="form-group">
+      <label>Status</label>
+      <%= select_tag :status, class: 'form-control', selected: @status, options: ActivityApplication.statuses.map { |s| ["#{s} (#{@activity.activity_applications.and(status: s).count})", s] } + [["All (#{@activity.activity_applications.count})", 'All']] %>
+    </div>
+    <% if @activity.activity_applications.and(:statused_by.ne => nil).count > 0 %>
+    <div class="form-group">
+      <label>Processed by</label>
+      <%= select_tag :statused_by, class: 'form-control', selected: params[:statused_by], options: [''] + @activity.activity_applications.pluck(:statused_by).compact.uniq.map { |account_id| ["#{Account.find(account_id).name} (#{@activity.activity_applications.and(statused_by: account_id).count})", account_id] } %>
+    </div>
+    <% end %>
+    <div class="form-group">
+      <label>Min word count</label>
+      <%= number_field_tag :min_word_count, class: 'form-control', value: params[:min_word_count] %>
+    </div>
+    <div class="form-group">
+      <label>Max word count</label>
+      <%= number_field_tag :max_word_count, class: 'form-control', value: params[:max_word_count] %>
+    </div>
+    <div class="form-group">
+      <label>Sort by</label>
+      <%= select_tag :order, class: 'form-control', selected: @order, options: [['Application date', 'created_at'], ['Word count', 'word_count']] %>
+    </div>
+    <%= checkbox 'Photo' %>
+    <%= checkbox 'Location' %>
+    <%= submit_tag 'Search', class: 'btn btn-primary' %>
+  <% end %>
+</div>
+
+<pre>
+  <%== Account.and(:id.in => @activity_applications.pluck(:account_id)).map { |account| "#{Sanitize.fragment(account.name)} &lt;#{Sanitize.fragment(account.email)}&gt;" }.join(', ') %>
+</pre>
+
+<div class="my-3">
+  <a class="btn btn-primary" href="/activities/<%= @activity.id %>/applications.csv">Download CSV</a>
+  <a href="javascript:;" onclick="$(this).hide().next().show()" class="btn btn-primary"><i class="fa fa-map"></i> Show map</a>
+  <div style="display:none" class="mt-3">
+    <%= partial :'maps/map', locals: { points: @points } %>
+  </div>
+</div>
+
+<% @activity_applications = @activity_applications.paginate(page: params[:page], per_page: 25) %>
+<p><%== page_entries_info @activity_applications, model: 'Application' %></p>
+
+<table class="table">
+  <thead>
+    <tr>
+      <th>Name</th>
+      <th>Email</th>
+      <th>Location</th>
+      <th>Gender</th>
+      <th>Application date</th>
+      <th>Word count</th>
+      <th>Status</th>
+      <th>Tickets</th>
+      <th></th>
+    </tr>
+  </thead>
+  <% @activity_applications.each { |activity_application| account = activity_application.account %>
+  <tr>
+    <td>
+      <a href="/activities/<%= @activity.id %>/activity_applications/<%= activity_application.id %>">
+        <img data-toggle="tooltip" title="<%= account.name %>" style="width: 100px;" src="<%= u account.picture_thumb_or_gravatar_url %>">
+      </a>
+      <br>
+      <a href="/activities/<%= @activity.id %>/activity_applications/<%= activity_application.id %>">
+        <%= account.name %>
+      </a>
+    </td>
+    <td>
+      <%= account.email %>
+    </td>
+    <td>
+      <%= account.location %>
+    </td>
+    <td>
+      <%= account.gender %>
+    </td>
+    <td>
+      <a href="/activities/<%= @activity.id %>/activity_applications/<%= activity_application.id %>"><%= activity_application.created_at %></a>
+    </td>
+    <td>
+      <%= activity_application.word_count %>
+    </td>
+    <td>
+      <a href="/activities/<%= @activity.id %>/activity_applications/<%= activity_application.id %>">
+        <%= partial :'activity_applications/status', locals: { status: activity_application.status } %>
+      </a>
+      <% if activity_application.statused_by %>
+        <br>
+        by <%= activity_application.statused_by.name %>
+        on <%= activity_application.statused_at %>
+      <% end %>
+    </td>
+    <td>
+      <%= partial :'events/ticket_summary', locals: { tickets: activity_application.account.tickets.and(:event_id.in => @activity.events.pluck(:id)) } %>
+    </td>
+    <td>
+      <a class="btn btn-danger" href="/activities/<%= @activity.id %>/activity_applications/<%= activity_application.id %>/destroy"><i class="fa fa-times"></i></a>
+    </td>
+  </tr>
+  <% } %>
+</table>
+<%= will_paginate @activity_applications, renderer: WillPaginate::ViewHelpers::BootstrapRenderer %>

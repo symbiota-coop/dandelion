@@ -1,0 +1,22 @@
+<% if pmail.monthly_donors %>
+  Monthly donors
+<% elsif pmail.not_monthly_donors %>
+  People who aren't monthly donors
+<% elsif pmail.facilitators %>
+  Facilitators
+<% elsif pmail.mailable %>
+  <% if pmail.mailable.is_a?(Activity) %>
+    Activity: <a href="/activities/<%= pmail.mailable_id %>"><%= pmail.mailable.name %></a>
+  <% elsif pmail.mailable.is_a?(ActivityTag) %>
+    Activity tag:
+    <span class="text-white label label-primary d-inline-block mb-1"><%= pmail.mailable.name %></span>
+  <% elsif pmail.mailable.is_a?(LocalGroup) %>
+    Local group: <a href="/local_groups/<%= pmail.mailable_id %>"><%= pmail.mailable.name %></a>
+  <% elsif pmail.mailable.is_a?(Event) %>
+    Event: <a href="/events/<%= pmail.mailable_id %>"><%= pmail.mailable.name %></a>
+    <br>
+    <small><%= concise_when_details(pmail.mailable) %></small>
+  <% end %>
+<% else %>
+  Everyone in <%= pmail.organisation.name %>
+<% end %>

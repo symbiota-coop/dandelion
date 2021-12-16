@@ -1,0 +1,32 @@
+/* Caret Setting */
+
+.caret,
+.dropup .caret {
+	border-color: transparent;
+	font-family: 'themify';
+	speak: none;
+	font-style: normal;
+	font-weight: normal;
+	font-variant: normal;
+	text-transform: none;
+	line-height: inherit;
+	-webkit-font-smoothing: antialiased;
+	-moz-osx-font-smoothing: grayscale;
+	border: none;
+	font-size: $body-font-size*0.84;
+	min-width: 0.625rem;
+	width: auto;
+	height: auto;
+}
+.caret:before {
+	content: "\e64b";
+	position: relative;
+}
+.dropup .caret:before {
+	content: "\e648";
+	position: relative;
+}
+.dropdown-toggle:after,
+.dropup .dropdown-toggle:after {
+	display: none;
+}

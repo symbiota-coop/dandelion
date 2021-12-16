@@ -1,0 +1,33 @@
+<% if (shift = Shift.find_by(rslot: rslot, role: role)) %>
+  <% account = shift.account %>
+  <% if (shift.account and shift.account_id == current_account.id) or @membership.admin? %>
+    <% if shift.account %>
+      <a data-confirm="<% if shift.account_id == current_account.id %>Resign from this shift?<% else %>Remove this person from this shift?<% end %>" class="pagelet-trigger" href="/shifts/<%= shift.id %>/destroy">
+        <% if params[:view] == 'names' %>
+          <%= account.name %>
+        <% else %>
+          <img title="<%= account.name %>" style="width: 50px;" src="<%= u account.picture_thumb_or_gravatar_url %>">
+        <% end %>
+      </a>
+    <% else %>
+      <a class="pagelet-trigger" href="/shifts/<%= shift.id %>/destroy">
+        n/a
+      </a>
+    <% end %>
+  <% else %>
+    <% if shift.account %>
+      <% if params[:view] == 'names' %>
+        <%= account.name %>
+      <% else %>
+        <%= partial :'accounts/square', locals: { account: account, width: '50px' } %>
+      <% end %>
+    <% else %>
+      n/a
+    <% end %>
+  <% end %>
+<% else %>
+  <a class="pagelet-trigger btn btn-primary btn-sm" href="/shifts/create?rota_id=<%= rota.id %>&rslot_id=<%= rslot.id %>&role_id=<%= role.id %>">Sign up</a>
+  <% if @membership.admin? %>
+    <a class="pagelet-trigger btn btn-primary btn-sm" href="/shifts/create?rota_id=<%= rota.id %>&rslot_id=<%= rslot.id %>&role_id=<%= role.id %>&na=true">n/a</a>
+  <% end %>
+<% end %>

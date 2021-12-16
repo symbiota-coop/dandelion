@@ -1,0 +1,65 @@
+/* Settings Page Setting */
+
+.setting-list {
+	list-style-type: none;
+	margin: 0;
+	padding: 0;
+	
+	& > li {
+		border-top: 1px solid #C8C7CC;
+		border-bottom: 1px solid #C8C7CC;
+		
+		& + li {
+			margin-top: -1px;
+		}
+		&.setting-title { 
+			background: $color_grey;
+			color: $color_white;
+			padding: 0.1875rem 0.375rem;
+			margin-top: -1px;
+			font-weight: bold;
+			font-size: $body-font-size*0.84;
+			position: relative;
+			border: none;
+		}
+		& + li.setting-title,
+		&.setting-title + li {
+			border-top: none;
+		}
+		& .field,
+		& .value,
+		& .action {
+			display: table-cell;
+			padding: 0.5rem 0.9375rem;
+			vertical-align: top;
+		}
+		& .field {
+			width: 12.5rem;
+		}
+		& .action {
+			width: 1%;
+		}
+	}
+}
+@media (max-width: 767px) {
+	.setting-list {
+		margin: 0 -0.9375rem;
+		
+		& > li.setting-title {
+			padding: 0.3125rem 0.9375rem;
+		}
+		& > li .field, 
+		& > li .value, 
+		& > li .action {
+			display: block;
+			padding: 0.625rem 0.9375rem;
+		}
+		& > li .field {
+			font-weight: bold;
+			padding-bottom: 0;
+		}
+		& > li .value {
+			padding-top: 0;
+		}
+	}
+}

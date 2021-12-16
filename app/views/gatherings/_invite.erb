@@ -1,0 +1,14 @@
+<% unless @membership.admin? %>
+  <p class="lead">You have <%= pluralize(@membership.invitations_remaining <= 0 ? 0 : @membership.invitations_remaining, 'invitation') %> remaining</p>
+<% end %>
+<% if (@membership.invitations_remaining > 0 or @membership.admin?) && (!@gathering.member_limit or @gathering.memberships.count < @gathering.member_limit) %>
+  <a class="btn btn-primary" href="javascript:;" onclick="$(this).hide().next().show().find('input[name=email]').focus()">
+    <i class="fa fa-plus-circle"></i> Add member
+  </a>
+  <div style="display:none" id="add-member" class="my-3">
+    <% form_tag "/g/#{@gathering.slug}/add_member", class: 'form-inline' do %>
+      <%= email_field_tag :email, class: 'form-control mr-1', placeholder: 'Email' %>
+      <%= submit_tag 'Add member', class: 'btn btn-primary' %>
+    <% end %>
+  </div>
+<% end %>

@@ -1,0 +1,19 @@
+/* Well Setting */
+
+.well {
+	background: #f5f5f5;
+    border: 1px solid #dadade;
+    min-height: 1.25rem;
+    padding: 1.1875rem;
+    margin-bottom: 1.25rem;
+    @include border-radius(0.25rem);
+	@include box-shadow(none);
+}
+.well-lg {
+    padding: 1.5rem;
+    border-radius: 0.375rem;
+}
+.well-sm {
+    padding: 0.5625rem;
+    border-radius: 0.1875rem;
+}

@@ -1,0 +1,7 @@
+<div class="row" id="organisations">
+  <% organisations.each { |organisation| %>
+  <div class="col-6 col-sm-3 mb-3 <%= block_class if defined?(block_class) %>" id="<%= organisation.id %>">
+    <%= partial :'organisations/block', locals: { organisation: organisation } %>
+  </div>
+  <% } %>
+</div>

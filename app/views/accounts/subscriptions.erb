@@ -1,0 +1,82 @@
+<%= partial :'accounts/nav' %>
+<%= @hide_alert = true; partial :flash %>
+<% form_for @account, '/accounts/subscriptions' do |f| %>
+  <%= f.check_box_block :unsubscribed_messages %>
+  <%= f.check_box_block :unsubscribed_feedback %>
+  <%= f.check_box_block :unsubscribed_reminders %>
+  <%= f.check_box_block :unsubscribed_habit_completion_likes %>
+  <%= f.check_box_block :unsubscribed %>
+  <%= f.submit_block button_text: 'Save preferences' %>
+<% end %>
+<style>
+  #subscriptions li { margin-top: 0.5rem }
+</style>
+
+<div id="subscriptions">
+  <% if @account.organisationships.count > 0 %>
+    <h2 class="my-3">Organisations</h2>
+    <ul>
+      <% @account.organisationships.each { |organisationship| organisation = organisationship.organisation %>
+      <li>
+        <a href="/o/<%= organisation.slug %>"><%= organisation.name %></a>
+        <div class="d-inline-block" data-pagelet-url="/o/<%= organisation.slug %>/organisationship"></div>
+        <% if organisationship.monthly_donor? %>
+          <ul>
+            <li>
+              <a href="/o/<%= organisation.slug %>/members"><%= organisation.name %> discussion</a>
+              <div class="d-inline-block" data-pagelet-url="/o/<%= organisation.slug %>/subscribe_discussion"></div>
+            </li>
+          </ul>
+        <% end %>
+        <ul>
+          <% @account.activityships.and(:activity_id.in => organisation.activities.pluck(:id)).each { |activityship| activity = activityship.activity %>
+          <li>
+            <a href="/activities/<%= activity.id %>"><%= activity.name %></a>
+            <div class="d-inline-block" data-pagelet-url="/activities/<%= activity.id %>/activityship"></div>
+            <ul>
+              <li>
+                <a href="/activities/<%= activity.id %>"><%= activity.name %> discussion</a>
+                <div class="d-inline-block" data-pagelet-url="/activities/<%= activity.id %>/subscribe_discussion"></div>
+              </li>
+            </ul>
+          </li>
+          <% } %>
+        </ul>
+        <ul>
+          <% @account.local_groupships.and(:local_group_id.in => organisation.local_groups.pluck(:id)).each { |local_groupship| local_group = local_groupship.local_group %>
+          <li>
+            <a href="/local_groups/<%= local_group.id %>"><%= local_group.name %></a>
+            <div class="d-inline-block" data-pagelet-url="/local_groups/<%= local_group.id %>/local_groupship"></div>
+            <ul>
+              <li>
+                <a href="/local_groups/<%= local_group.id %>"><%= local_group.name %> discussion</a>
+                <div class="d-inline-block" data-pagelet-url="/local_groups/<%= local_group.id %>/subscribe_discussion"></div>
+              </li>
+            </ul>
+          </li>
+          <% } %>
+        </ul>
+      </li>
+      <% } %>
+    </ul>
+  <% end %>
+  <% if @account.memberships.count > 0 %>
+    <h2 class="my-3">Gatherings</h2>
+    <ul>
+      <% @account.memberships.each { |membership| gathering = membership.gathering %>
+      <li>
+        <a href="/g/<%= gathering.slug %>"><%= gathering.name %></a>
+        <div class="d-inline-block" data-pagelet-url="/g/<%= gathering.slug %>/subscribe"></div>
+        <ul>
+          <% @account.teamships.and(:team_id.in => gathering.teams.pluck(:id)).each { |teamship| team = teamship.team %>
+          <li>
+            <a href="/g/<%= gathering.slug %>/teams/<%= team.id %>"><%= team.name %></a>
+            <div class="d-inline-block" data-pagelet-url="/teamships/<%= teamship.id %>/subscribe"></div>
+          </li>
+          <% } %>
+        </ul>
+      </li>
+      <% } %>
+    </ul>
+  <% end %>
+</div>

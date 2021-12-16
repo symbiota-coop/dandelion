@@ -1,0 +1,23 @@
+/* Jumbotron Setting */
+
+.jumbotron {
+	padding-left: 3.75rem;
+	padding-right: 3.75rem;
+	
+	& p {
+		margin-bottom: 0.9375rem;
+		font-size: 1.3125rem;
+		font-weight: 300;
+	}
+}
+@media (max-width: 767px) {
+	.jumbotron {
+		padding: 1.875rem;
+	}
+}
+@media screen and (min-width: 768px) {
+	.jumbotron .h1, 
+	.jumbotron h1 {
+		font-size: 3.9375rem;
+	}
+}

@@ -1,0 +1,16 @@
+<div class="main">
+  <p>Hi %recipient.firstname%,</p>
+  <p>
+    Welcome to Dandelion, created by the not-for-profit worker co-operative Dandelion Collective.
+    This is a confirmation that you've just activated your account.
+  </p>
+  <p>
+    <strong>Your privacy is important to us.</strong>
+    You can <a href="<%= ENV['BASE_URI'] %>/accounts/edit?sign_in_token=%recipient.token%">visit the edit profile page</a> to choose what you share, make your profile private and visible only to you, or delete your account.
+  </p>
+  <p>
+    Best wishes,<br>
+    Dandelion
+  </p>
+</div>
+<div class="footer"></div>

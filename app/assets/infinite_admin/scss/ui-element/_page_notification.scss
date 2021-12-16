@@ -1,0 +1,151 @@
+/* Page Notification Setting */
+
+.page-notification-container {
+	position: fixed;
+	top: 3.6875rem;
+	right: 0.9375rem;
+	width: 20rem;
+	z-index: 8;
+	
+	& .page-notification {
+		@include box-shadow(0 0 0.625rem 0 rgba(0,0,0,0.15));
+	}
+}
+
+.page-notification {
+	background: #f0f0f0;
+	display: table;
+	width: 100%;
+	margin-bottom: 0.625rem;
+	@include border-radius(0.5rem);
+	
+	
+	& .notification-media,
+	& .notification-info,
+	& .notification-btn {
+		display: table-cell;
+		vertical-align: middle;
+	}
+	& .notification-media {
+		padding: 0.9375rem 0.625rem 0.9375rem 0.9375rem;
+		text-align: center;
+		vertical-align: middle;
+		width: 3.8125rem;
+		
+		& img {
+			max-width: 2.25rem;
+			max-height: 2.25rem;
+			@include border-radius(0.375rem);
+		}
+		& i {
+			text-align: center;
+			display: block;
+			line-height: 1.75rem;
+			width: 2.25rem;
+			height: 2.25rem;
+			line-height: 2.25rem;
+			text-align: center;
+			overflow: hidden;
+			color: $color_inverse;
+			font-size: 1.5rem;
+			background: rgba(0,0,0,0.15);
+			top: 0;
+			@include border-radius(0.375rem);
+		}
+	}
+	& .notification-info {
+		padding: 0.9375rem;
+	}
+	& .notification-media + .notification-info {
+		padding-left: 0;
+	}
+	& .notification-title,
+	& .notification-desc {
+		margin: 0;
+		white-space: nowrap;
+		overflow: hidden;
+		text-overflow: ellipsis;
+		max-width: 12.5rem;
+	}
+	& .notification-media + .notification-info .notification-title,
+	& .notification-media + .notification-info .notification-desc {
+		max-width: 10.5625rem;
+	}
+	& .notification-title {
+		font-size: 0.8125rem;
+		font-weight: 600;
+		margin-top: 0.125rem;
+	}
+	& .notification-desc {
+		font-weight: 500;
+		font-size: $body-font-size*0.92;
+		margin-top: 0.125rem;
+	}
+	& .notification-title,
+	& .notification-title a,
+	& .notification-desc,
+	& .notification-desc a {
+		color: #504e4d;
+	}
+	& .notification-btn {
+		vertical-align: middle;
+		width: 4.6875rem;
+		border-left: 1px solid #dbdbdb;
+		
+		&.single-btn a {
+			padding: 1.5625rem 0.9375rem;
+		}
+		& a {
+			padding: 0.625rem 0.9375rem;
+			display: block;
+			color: #737171;
+			font-size: $body_font_size;
+			font-weight: bold;
+			text-decoration: none;
+			line-height: 1;
+			text-align: center;
+		}
+	}
+	& .notification-btn a:hover,
+	& .notification-btn a:focus,
+	& .notification-btn a:active,
+	&.page-notification-inverse .notification-btn a:hover,
+	&.page-notification-inverse .notification-btn a:focus,
+	&.page-notification-inverse .notification-btn a:active {
+		color: $color_primary;
+	}
+	.page-notification .notification-btn a + a {
+		border-top: 1px solid #dbdbdb;
+	}
+	&.page-notification-inverse {
+		background: #212121;
+		color: #C8C7CC;
+			
+		& .notification-btn,
+		& .notification-btn a + a {
+			border-color: #444;
+		}
+		& .notification-title,
+		& .notification-title a,
+		& .notification-desc,
+		& .notification-desc a,
+		& .notification-btn a {
+			color: #C8C7CC;
+		}
+		& .notification-media i {
+			background: rgba(255,255,255,0.25);
+			color: $color_white;
+		}
+	}
+}
+@media (max-width: 767px) {
+	.page-notification-container {
+		top: 6.5625rem
+	}
+}
+@media (max-width: 320px) {
+	.page-notification-container {
+		width: 19.375rem;
+		right: 0.3125rem;
+	}
+}

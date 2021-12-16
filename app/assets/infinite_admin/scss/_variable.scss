@@ -1,0 +1,158 @@
+/* Body Style */
+
+$body_bg: #eaeaea !default;
+$body_text: #000 !default;
+$body_font_size: 0.75rem !default;
+$body_font_family: -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif !default;
+
+
+/* Color */
+
+$color_default_border: #dfdfe0 !default;
+$color_default_hover: #f3f3f3 !default;
+$color_default_text: #212121 !default;
+$color_default_border_hover: #dfdfe0 !default;
+
+$color_link_hover: #1D62F0 !default;
+
+$color_danger: #FF3B30 !default;
+$color_danger_hover: #e4352b !default;
+$color_danger_transparent_9: rgba(255, 59, 48, 0.9) !default;
+$color_danger_transparent_8: rgba(255, 59, 48, 0.8) !default;
+$color_danger_transparent_7: rgba(255, 59, 48, 0.7) !default;
+$color_danger_transparent_6: rgba(255, 59, 48, 0.6) !default;
+$color_danger_transparent_5: rgba(255, 59, 48, 0.5) !default;
+$color_danger_transparent_4: rgba(255, 59, 48, 0.4) !default;
+$color_danger_transparent_3: rgba(255, 59, 48, 0.3) !default;
+$color_danger_transparent_2: rgba(255, 59, 48, 0.2) !default;
+$color_danger_transparent_1: rgba(255, 59, 48, 0.1) !default;
+
+$color_warning: #FF9500 !default;
+$color_warning_hover: #e68701 !default;
+$color_warning_transparent_9: rgba(255, 149, 0, 0.9) !default;
+$color_warning_transparent_8: rgba(255, 149, 0, 0.8) !default;
+$color_warning_transparent_7: rgba(255, 149, 0, 0.7) !default;
+$color_warning_transparent_6: rgba(255, 149, 0, 0.6) !default;
+$color_warning_transparent_5: rgba(255, 149, 0, 0.5) !default;
+$color_warning_transparent_4: rgba(255, 149, 0, 0.4) !default;
+$color_warning_transparent_3: rgba(255, 149, 0, 0.3) !default;
+$color_warning_transparent_2: rgba(255, 149, 0, 0.2) !default;
+$color_warning_transparent_1: rgba(255, 149, 0, 0.1) !default;
+
+$color_yellow: #FFCC00 !default;
+$color_yellow_hover: #e6b801 !default;
+$color_yellow_transparent_9: rgba(255, 204, 0, 0.9) !default;
+$color_yellow_transparent_8: rgba(255, 204, 0, 0.8) !default;
+$color_yellow_transparent_7: rgba(255, 204, 0, 0.7) !default;
+$color_yellow_transparent_6: rgba(255, 204, 0, 0.6) !default;
+$color_yellow_transparent_5: rgba(255, 204, 0, 0.5) !default;
+$color_yellow_transparent_4: rgba(255, 204, 0, 0.4) !default;
+$color_yellow_transparent_3: rgba(255, 204, 0, 0.3) !default;
+$color_yellow_transparent_2: rgba(255, 204, 0, 0.2) !default;
+$color_yellow_transparent_1: rgba(255, 204, 0, 0.1) !default;
+
+$color_success: #4CD964 !default;
+$color_success_hover: #45c35a !default;
+$color_success_transparent_9: rgba(76, 217, 100, 0.9) !default;
+$color_success_transparent_8: rgba(76, 217, 100, 0.8) !default;
+$color_success_transparent_7: rgba(76, 217, 100, 0.7) !default;
+$color_success_transparent_6: rgba(76, 217, 100, 0.6) !default;
+$color_success_transparent_5: rgba(76, 217, 100, 0.5) !default;
+$color_success_transparent_4: rgba(76, 217, 100, 0.4) !default;
+$color_success_transparent_3: rgba(76, 217, 100, 0.3) !default;
+$color_success_transparent_2: rgba(76, 217, 100, 0.2) !default;
+$color_success_transparent_1: rgba(76, 217, 100, 0.1) !default;
+
+$color_info: #5AC8FA !default;
+$color_info_hover: #50b3e0 !default;
+$color_info_transparent_9: rgba(90, 200, 250, 0.9) !default;
+$color_info_transparent_8: rgba(90, 200, 250, 0.8) !default;
+$color_info_transparent_7: rgba(90, 200, 250, 0.7) !default;
+$color_info_transparent_6: rgba(90, 200, 250, 0.6) !default;
+$color_info_transparent_5: rgba(90, 200, 250, 0.5) !default;
+$color_info_transparent_4: rgba(90, 200, 250, 0.4) !default;
+$color_info_transparent_3: rgba(90, 200, 250, 0.3) !default;
+$color_info_transparent_2: rgba(90, 200, 250, 0.2) !default;
+$color_info_transparent_1: rgba(90, 200, 250, 0.1) !default;
+
+$color_primary: #007AFF !default;
+$color_primary_hover: #1D62F0 !default;
+$color_primary_transparent_9: rgba(0, 185, 99, 0.9) !default;
+$color_primary_transparent_8: rgba(0, 185, 99, 0.8) !default;
+$color_primary_transparent_7: rgba(0, 185, 99, 0.7) !default;
+$color_primary_transparent_6: rgba(0, 185, 99, 0.6) !default;
+$color_primary_transparent_5: rgba(0, 185, 99, 0.5) !default;
+$color_primary_transparent_4: rgba(0, 185, 99, 0.4) !default;
+$color_primary_transparent_3: rgba(0, 185, 99, 0.3) !default;
+$color_primary_transparent_2: rgba(0, 185, 99, 0.2) !default;
+$color_primary_transparent_1: rgba(0, 185, 99, 0.1) !default;
+
+$color_purple: #5856D6 !default;
+$color_purple_hover: #4c4bb7 !default;
+$color_purple_transparent_9: rgba(88, 86, 214, 0.9) !default;
+$color_purple_transparent_8: rgba(88, 86, 214, 0.8) !default;
+$color_purple_transparent_7: rgba(88, 86, 214, 0.7) !default;
+$color_purple_transparent_6: rgba(88, 86, 214, 0.6) !default;
+$color_purple_transparent_5: rgba(88, 86, 214, 0.5) !default;
+$color_purple_transparent_4: rgba(88, 86, 214, 0.4) !default;
+$color_purple_transparent_3: rgba(88, 86, 214, 0.3) !default;
+$color_purple_transparent_2: rgba(88, 86, 214, 0.2) !default;
+$color_purple_transparent_1: rgba(88, 86, 214, 0.1) !default;
+
+$color_pink: #FF2D55 !default;
+$color_pink_hover: #de2649 !default;
+$color_pink_transparent_9: rgba(255, 45, 85, 0.9) !default;
+$color_pink_transparent_8: rgba(255, 45, 85, 0.8) !default;
+$color_pink_transparent_7: rgba(255, 45, 85, 0.7) !default;
+$color_pink_transparent_6: rgba(255, 45, 85, 0.6) !default;
+$color_pink_transparent_5: rgba(255, 45, 85, 0.5) !default;
+$color_pink_transparent_4: rgba(255, 45, 85, 0.4) !default;
+$color_pink_transparent_3: rgba(255, 45, 85, 0.3) !default;
+$color_pink_transparent_2: rgba(255, 45, 85, 0.2) !default;
+$color_pink_transparent_1: rgba(255, 45, 85, 0.1) !default;
+
+$color_grey: #8a8a8f !default;
+$color_grey_hover: #737377 !default;
+$color_grey_transparent_9: rgba(138, 138, 143, 0.9) !default;
+$color_grey_transparent_8: rgba(138, 138, 143, 0.8) !default;
+$color_grey_transparent_7: rgba(138, 138, 143, 0.7) !default;
+$color_grey_transparent_6: rgba(138, 138, 143, 0.6) !default;
+$color_grey_transparent_5: rgba(138, 138, 143, 0.5) !default;
+$color_grey_transparent_4: rgba(138, 138, 143, 0.4) !default;
+$color_grey_transparent_3: rgba(138, 138, 143, 0.3) !default;
+$color_grey_transparent_2: rgba(138, 138, 143, 0.2) !default;
+$color_grey_transparent_1: rgba(138, 138, 143, 0.1) !default;
+
+$color_muted: #C7C7CC !default;
+$color_muted_transparent_9: rgba(200, 199, 204, 0.9) !default;
+$color_muted_transparent_8: rgba(200, 199, 204, 0.8) !default;
+$color_muted_transparent_7: rgba(200, 199, 204, 0.7) !default;
+$color_muted_transparent_6: rgba(200, 199, 204, 0.6) !default;
+$color_muted_transparent_5: rgba(200, 199, 204, 0.5) !default;
+$color_muted_transparent_4: rgba(200, 199, 204, 0.4) !default;
+$color_muted_transparent_3: rgba(200, 199, 204, 0.3) !default;
+$color_muted_transparent_2: rgba(200, 199, 204, 0.2) !default;
+$color_muted_transparent_1: rgba(200, 199, 204, 0.1) !default;
+
+$color_inverse: #000 !default;
+$color_inverse_hover: #333 !default;
+$color_inverse_transparent_9: rgba(0, 0, 0, 0.9) !default;
+$color_inverse_transparent_8: rgba(0, 0, 0, 0.8) !default;
+$color_inverse_transparent_7: rgba(0, 0, 0, 0.7) !default;
+$color_inverse_transparent_6: rgba(0, 0, 0, 0.6) !default;
+$color_inverse_transparent_5: rgba(0, 0, 0, 0.5) !default;
+$color_inverse_transparent_4: rgba(0, 0, 0, 0.4) !default;
+$color_inverse_transparent_3: rgba(0, 0, 0, 0.3) !default;
+$color_inverse_transparent_2: rgba(0, 0, 0, 0.2) !default;
+$color_inverse_transparent_1: rgba(0, 0, 0, 0.1) !default;
+
+$color_white: #fff !default;
+$color_white_transparent_9: rgba(255, 255, 255, 0.9) !default;
+$color_white_transparent_8: rgba(255, 255, 255, 0.8) !default;
+$color_white_transparent_7: rgba(255, 255, 255, 0.7) !default;
+$color_white_transparent_6: rgba(255, 255, 255, 0.6) !default;
+$color_white_transparent_5: rgba(255, 255, 255, 0.5) !default;
+$color_white_transparent_4: rgba(255, 255, 255, 0.4) !default;
+$color_white_transparent_3: rgba(255, 255, 255, 0.3) !default;
+$color_white_transparent_2: rgba(255, 255, 255, 0.2) !default;
+$color_white_transparent_1: rgba(255, 255, 255, 0.1) !default;

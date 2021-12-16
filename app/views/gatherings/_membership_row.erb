@@ -1,0 +1,122 @@
+<% account = membership.account %>
+<td>
+  <%= partial :'accounts/account', object: account, locals: { membership: membership, show_email: viewable?(account, :email) } %>
+  <% if admin? && !account.picture %>
+    <% form_tag "/accounts/#{account.id}/picture", multipart: true do %>
+      <%= file_field_tag :picture, onchange: 'this.form.submit()' %>
+    <% end %>
+  <% end %>
+  <div>
+    <% membership.teamships.each { |teamship| unless teamship.team.name == 'General' %>
+    <a href="/g/<%= @gathering.slug %>/teams/<%= teamship.team_id %>">
+      <span class="label label-primary d-inline-block mb-1"><%= teamship.team.name %></span>
+    </a>
+  <% end } %>
+</div>
+</td>
+<td>
+  <%= partial :'accounts/buttons', locals: { account: account, btn_class: 'btn-sm' } %>
+</td>
+<td>
+  <%= membership.proposed_by.map(&:name).to_sentence if membership.proposed_by %>
+</td>
+<td>
+  <% mapplication = membership.mapplication; if mapplication and mapplication.answers %>
+  <a href="javascript:;" onclick="$('#modal .modal-content').load('/g/<%= @gathering.slug %>/mapplications/<%= mapplication.id %>', function () {
+          $('#modal').modal('show')
+        });">
+    <%= membership.created_at %>
+  </a>
+<% else %>
+  <%= membership.created_at %>
+<% end %>
+<% if mapplication %>
+  <span title="Accepted at <%= mapplication.verdicts.proposers.count + mapplication.verdicts.supporters.count %> <%= @gathering.vouchers %>" class="label label-primary d-inline-block mb-1"><%= mapplication.verdicts.proposers.count + mapplication.verdicts.supporters.count %></span>
+<% end %>
+</td>
+<% if @gathering.democratic_threshold %>
+  <td><%= membership.desired_threshold %></td>
+<% end %>
+<% if @gathering.enable_contributions %>
+  <td>
+    <% membership.optionships.each { |optionship| %>
+    <a title="<%= optionship.option.type %>" href="/g/<%= @gathering.slug %>/options" class="label label-primary text-white d-inline-block mb-1">
+      <i class="fa <%= optionship.option.icon %>"></i> <%= optionship.option.name %> (<%= m optionship.option.cost_per_person, @gathering.currency %>)
+    </a>
+    <% } %>
+  </td>
+<% end %>
+<td>
+  <%= m membership.requested_contribution, @gathering.currency %>
+</td>
+<td>
+  <% if @membership.admin? %>
+    <% if membership.paid %>
+      <a href="javascript:;" onclick="$(this).hide().next().show().find('input').focus()"><%= m membership.paid, @gathering.currency.to_s if membership.paid %></a>
+    <% end %>
+    <% form_tag "/memberships/#{membership.id}/paid", style: ('display:none' if membership.paid) do %>
+      <div class="input-group">
+        <div class="input-group-prepend">
+          <span class="input-group-text"><%= Money.new(0, @gathering.currency).symbol %></span>
+        </div>
+        <%= number_field_tag :paid, class: 'form-control', style: 'width: 6em', value: membership.paid, onblur: '$(this.form).submit()' %>
+      </div>
+    <% end %>
+  <% else %>
+    <%= m membership.paid, @gathering.currency.to_s if membership.paid %>
+  <% end %>
+</td>
+<% if (admin? || @membership.admin?) || !@gathering.hide_invitations %>
+  <td>
+    <% if @membership.admin? %>
+      <% if membership.smart_invitations_granted %>
+        <%= membership.invitations_extended %>/<a href="javascript:;" onclick="$(this).hide().next().css('display', 'inline').find('input').focus()"><%= membership.smart_invitations_granted %></a>
+      <% end %>
+      <% form_tag "/memberships/#{membership.id}/invitations_granted", class: 'form-inline', style: 'display:none' do %>
+        <%= number_field_tag :invitations_granted, class: 'form-control', style: 'width: 6em', min: 0, value: membership.smart_invitations_granted, onblur: '$(this.form).submit()' %>
+      <% end %>
+    <% else %>
+      <%= membership.invitations_extended %>/<%= membership.smart_invitations_granted %>
+    <% end %>
+  </td>
+<% end %>
+<% if @gathering.facebook_group_url %>
+  <td>
+    <% if @membership.admin? %>
+      <% if membership.account.not_on_facebook %>
+        Doesn't use Facebook
+      <% else %>
+        <% if membership.member_of_facebook_group %>
+          <i style="cursor: pointer" class="fa fa-check" onclick="$(this).hide().next().show().find('input').click()"></i>
+        <% end %>
+        <% form_tag "/memberships/#{membership.id}/member_of_facebook_group", style: ('display:none' if membership.member_of_facebook_group) do %>
+          <%= check_box_tag :member_of_facebook_group, value: true, checked: membership.member_of_facebook_group, onclick: '$(this.form).submit()' %>
+        <% end %>
+      <% end %>
+    <% else %>
+      <% if membership.account.not_on_facebook %>
+        Doesn't use Facebook
+      <% elsif membership.member_of_facebook_group %>
+        <i class="fa fa-check"></i>
+      <% end %>
+    <% end %>
+  </td>
+<% end %>
+<% if @membership.admin? %>
+  <td style="font-size: 13px">
+    <% y = [] %>
+    <% if membership.admin %>
+      <% y << capture do %>
+        <a class="btn btn-outline-primary mb-1" href="/memberships/<%= membership.id %>/unadmin">Unadmin</a>
+      <% end %>
+    <% else %>
+      <% y << capture do %>
+        <a class="btn btn-outline-primary mb-1" href="/memberships/<%= membership.id %>/make_admin">Make admin</a>
+      <% end %>
+    <% end %>
+    <% y << capture do %>
+      <a class="btn btn-outline-primary mb-1" data-confirm="Are you sure you want to remove this person from the gathering?" href="/memberships/<%= membership.id %>/remove">Remove</a>
+    <% end %>
+    <%== y.map(&:strip).join(' ') %>
+  </td>
+<% end %>

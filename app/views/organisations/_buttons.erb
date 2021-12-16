@@ -1,0 +1,43 @@
+<div class="d-inline-block" data-pagelet-url="/o/<%= @organisation.slug %>/organisationship?btn_class=mb-1">
+  <%= partial :'organisations/organisationship', locals: { organisation: @organisation, btn_class: 'mb-1' } %>
+</div>
+<% if current_account && organisationship = @organisation.organisationships.find_by(account: current_account) %>
+  <% if !organisationship.hide_membership? %>
+    <a class="btn btn-primary mb-1" href="/o/<%= @organisation.slug %>/show_membership/0">Membership public</a>
+  <% else %>
+    <a class="btn btn-outline-primary mb-1" href="/o/<%= @organisation.slug %>/show_membership/1">Membership hidden</a>
+  <% end %>
+  <% if organisationship.admin? %>
+    <% if organisationship.receive_feedback? %>
+      <a class="btn btn-primary mb-1" href="/o/<%= @organisation.slug %>/receive_feedback/0">Receiving feedback</a>
+    <% else %>
+      <a class="btn btn-outline-primary mb-1" href="/o/<%= @organisation.slug %>/receive_feedback/1">Not receiving feedback</a>
+    <% end %>
+  <% end %>
+  <% if current_account && organisationship = @organisation.organisationships.find_by(account: current_account) %>
+    <% if organisationship.credit_balance > 0 %>
+      <div class="mt-1 mb-2">
+        <a class="label label-primary text-white" href="/organisationships/<%= organisationship.id %>/credit_balance"><big><%= m organisationship.credit_balance, @organisation.currency %> credit</big></a>
+      </div>
+    <% end %>
+  <% end %>
+<% end %>
+<span class="d-inline-block d-sm-none">
+  <% if organisation_monthly_donor_plus? %>
+    <a class="btn btn-outline-primary mb-1" href="/o/<%= @organisation.slug %>/members">Members' area</a>
+  <% end %>
+</span>
+<% if @organisation.stripe_client_id %>
+  <% if (organisationship = @organisation.organisationships.find_by(:account => current_account, :stripe_connect_json.ne => nil)) %>
+    <div class="card my-1">
+      <div class="card-body p-3">
+        <big class="d-block mb-1">
+          <i class="fa fa-credit-card"></i> Connected to <%= organisationship.stripe_account_name || 'Stripe' %>
+        </big>
+        <a class="btn btn-danger btn-sm" href="/organisationships/<%= organisationship.id %>/disconnect">Disconnect</a>
+      </div>
+    </div>
+  <% elsif current_account %>
+    <a class="btn btn-outline-primary mb-1" href="https://connect.stripe.com/oauth/authorize?response_type=code&client_id=<%= @organisation.stripe_client_id %>&scope=read_write">Connect Stripe</a>
+  <% end %>
+<% end %>

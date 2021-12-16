@@ -1,0 +1,38 @@
+<a class="d-inline-block mb-3" href="/activities/<%= @activity.id %>/applications"><i class="fa fa-arrow-left"></i> Return to <%= @activity.name %> applications</a>
+<div class="row">
+  <div class="col-12 col-sm-auto text-center">
+    <img title="<%= @account.name %>" style="width: 200px; background: white; border: 3px solid white" src="<%= u @account.picture_thumb_or_gravatar_url %>">
+  </div>
+  <div class="col-12 col-sm">
+    <div class="mb-3">
+      <h1 class="my-0">
+        <a class="text-dark" href="/u/<%= @account.username %>"><%= @account.name %></a>'s application to
+        <a class="text-dark" href="/activities/<%= @activity.id %>"><%= @activity.name %></a>
+      </h1>
+      <div data-pagelet-url="/activities/<%= @activity.id %>/activity_applications/<%= @activity_application.id %>/set_status">
+        <%= partial :'activity_applications/set_status' %>
+      </div>
+    </div>
+    <div class="mt-2">
+      <%= partial :'accounts/table', locals: { account: @account } %>
+      <% if @activity_application.answers %>
+        <div class="mb-5">
+          <% @activity_application.answers.each { |q,a| if a %>
+          <p style="font-size: 16px;">
+            <strong>
+              <%== Sanitize.fragment(Rinku.auto_link(q), Sanitize::Config::DANDELION) %>
+            </strong>
+          </p>
+          <p style="font-size: 16px; font-weight: 300">
+            <%== Sanitize.fragment(Rinku.auto_link(a.gsub("\n", '<br />')), Sanitize::Config::DANDELION) %>
+          </p>
+        <% end } if @activity_application.answers %>
+      </div>
+    <% end %>
+  </div>
+</div>
+</div>
+<h2 class="mb-3">Discussion</h2>
+<div data-pagelet-url="/commentable?commentable_type=ActivityApplication&commentable_id=<%= @activity_application.id %>">
+  <%= partial :'comments/commentable', locals: { commentable: @activity_application } %>
+</div>

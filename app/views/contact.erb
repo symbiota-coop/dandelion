@@ -1,0 +1,17 @@
+<%= partial :about %>
+<h2 class="mb-3">Contact us</h2>
+<p>
+  Dandelion is a web platform that hosts events from many different organisations.<br>
+  <strong><mark>If your question relates to a specific event</mark></strong>, please contact the event organiser.<br>
+  <strong><mark>If your question relates to a specific organisation</mark></strong>, please contact the organisation.<br>
+  <strong><mark>For example, if your question relates to the Psychedelic Society</mark></strong>, please contact <a href="mailto:enquiries@psychedelicsociety.org.uk">enquiries@psychedelicsociety.org.uk</a><br>
+  <strong>If you have a question related to the Dandelion platform</strong> (for example, you require technical assistance), you are welcome
+  to get in touch by one of the following means:
+</p>
+<ul>
+  <% unless @no_intercom %>
+    <li><a href="javascript:;" class="intercomLauncher">Chat with us</a></li>
+  <% end %>
+  <li>Email us: <a href="mailto:contact@dandelion.earth">contact@dandelion.earth</a></li>
+</ul>
+<a href="/privacy">Read our privacy policy</a>

@@ -1,0 +1,4 @@
+<% form_tag "/organisationships/#{organisationship.id}/notes" do %>
+  <%= text_area_tag :notes, style: 'width: 15em', onblur: '$(this).next().click()', class: 'form-control autosize', value: organisationship.notes, placeholder: 'Notes' %>
+  <%= submit_tag 'Save', class: 'd-none' %>
+<% end %>

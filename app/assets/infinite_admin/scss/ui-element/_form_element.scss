@@ -1,0 +1,138 @@
+/* Form Control Setting */
+
+.form-control {
+	border-color: #C8C7CC;
+	color: $color_inverse;
+	font-size: $body_font_size;
+	height: 2.125rem;
+    @include transition('border-color ease-in-out .15s,box-shadow ease-in-out .15s,background ease-in-out .15s');
+	@include box-shadow(none);
+	
+	&:focus {
+		border-color: $color_primary;
+		outline: none;
+		@include box-shadow(0 0 0 0.125rem rgba(102,175,233,.6));
+	}
+	&.input-lg,
+	&.form-control-lg {
+		font-size: 1rem;
+	}
+	&.input-inverse {
+		border-color: rgba(255,255,255,0.5);
+		color: $color_white;
+	}
+	&.input-outline {
+		background: none;
+	}
+	&.no-border {
+		border-color: transparent;
+	}
+}
+select.form-control:not([size]):not([multiple]) {
+	border-color: #C8C7CC;
+	color: #000;
+	font-size: $body_font_size;
+	height: 2.125rem;
+    @include transition('border-color ease-in-out .15s,box-shadow ease-in-out .15s,background ease-in-out .15s');
+	@include box-shadow(none);
+}
+textarea.form-control,
+select[multiple], select[size] {
+    height: auto;
+}
+.input-lg,
+.form-control-lg,
+select.input-lg:not([size]):not([multiple]),
+select.form-control-lg:not([size]):not([multiple]),
+.input-group-lg > .form-control {
+	font-size: 1rem;
+    height: 2.875rem;
+    padding: 0.625rem 1rem;
+    line-height: 1.3333333;
+    border-radius: 0.375rem;
+}
+.input-group-lg > .input-group-addon, 
+.input-group-lg > .input-group-btn > .btn {
+    height: 2.875rem;
+    padding: 0.625rem 1rem;
+    line-height: 1.3333333;
+}
+.input-sm,
+.form-control-sm,
+select.input-sm:not([size]):not([multiple]),
+select.form-control-sm:not([size]):not([multiple]),
+.input-group-sm > .form-control {
+    height: 1.875rem;
+    line-height: 1.875rem;
+}
+.input-group-sm > .input-group-addon, 
+.input-group-sm > .input-group-btn > .btn {
+    height: 1.875rem;
+    line-height: 1.875rem;
+}
+.form-control-static {
+    min-height: 2.125rem;
+    padding-top: 0.4375rem;
+    padding-bottom: 0.4375rem;
+    margin-bottom: 0;
+}
+@media (min-width: 768px) {
+	.form-inline .form-group + .form-group {
+		margin-left: 0.625rem;
+	}
+	.form-inline label + .form-control {
+		margin-left: 0.3125rem;
+	}
+	.form-inline .form-group + .btn {
+		margin-left: 0.625rem;
+	}
+}
+
+
+/* Form Grid Setting */
+
+.form-grid {
+	display: table;
+	width: 100%;
+	
+	& .form-group {
+		display: table-row;
+	}
+	& .form-group + .form-group .control-label,
+	& .form-group + .form-group .input-container {
+		border-top: 1px solid #EFEFF4;
+	}
+	& .control-label,
+	& .input-container {
+		display: table-cell;
+		vertical-align: middle;
+	}
+	& .form-control {
+		border: none;
+	}
+	& .control-label {
+		width: 1%;
+		white-space: nowrap;
+		padding-top: 0.5rem;
+		padding-bottom: 0.5rem;
+	}
+}
+.panel > .form-grid .control-label {
+	padding-left: 0.9375rem;
+	padding-right: 0.9375rem;
+}
+.panel > .form-grid .form-control {
+	padding-right: 0.9375rem;
+}
+.panel > .form-grid .checkbox,
+.panel > .form-grid .radio,
+.panel > .form-grid .checkbox-inline,
+.panel > .form-grid .radio-inline {
+	padding-left: 0.75rem;
+}
+.panel > .form-grid .switcher {
+	padding: 0.625rem 0.9375rem;
+}
+label.control-label {
+	color: #212121;
+}

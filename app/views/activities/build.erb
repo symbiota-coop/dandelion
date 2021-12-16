@@ -1,0 +1,52 @@
+<% if @activity.persisted? %>
+  <%= partial :'activities/nav', locals: { activity: @activity } %>
+<% end %>
+<script>
+  $(function () {
+    $('#activity_privacy').change(function () {
+      if ($(this).val() == 'closed') {
+        $('#application-options').show()
+      } else {
+        $('#application-options').hide()
+      }
+    })
+    $('#activity_privacy').change()
+  })
+</script>
+<% form_for @activity, @activity.new_record ? '/activities/new' : "/activities/#{@activity.id}/edit" do |f| %>
+  <%= f.text_block :name %>
+  <%= f.wysiwyg_block :intro_text %>
+  <%= f.url_block :website %>
+  <%= f.url_block :telegram_group %>
+  <%= f.email_block :email %>
+  <%= f.image_block :image %>
+  <%= f.lookup_block :organisation_id, lookup_url: '/organisations.json', placeholder: 'Search organisations', selected_link: (%(<a class="d-inline-block mt-1" target="_blank" href="/o/#{@activity.organisation.slug}">View organisation</a>) if @activity.organisation_id) %>
+  <script>
+    $(function () {
+
+      $('#activity_organisation_id').change(function () {
+        if ($(this).val().length > 0) {
+          $('#organisation-options').show()
+        } else {
+          $('#organisation-options').hide()
+        }
+      })
+      $('#activity_organisation_id').change()
+
+    })
+  </script>
+  <%= partial :'activities/tags', locals: { f: f } %>
+  <%= f.check_box_block :hidden %>
+  <%= f.check_box_block :hide_members %>
+  <%= f.check_box_block :hide_discussion %>
+  <div class="mb-2">
+    <%= f.select_block :privacy %>
+  </div>
+  <div id="application-options" style="display: none">
+    <%= f.text_area_block :application_questions %>
+    <%= f.wysiwyg_block :extra_info_for_application_form %>
+    <%= f.wysiwyg_block :thank_you_message %>
+    <%= f.wysiwyg_block :extra_info_for_acceptance_email %>
+  </div>
+  <%= f.submit_block destroy_url: "/activities/#{@activity.id}/destroy" %>
+<% end %>

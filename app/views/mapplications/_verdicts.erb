@@ -1,0 +1,37 @@
+<% [%w[proposer propose], %w[supporter support]].each { |noun, verb| %>
+<% if @gathering.send("enable_#{noun.pluralize}") %>
+  <div style="margin-bottom: 10px">
+    <%= pluralize(mapplication.verdicts.send(noun.pluralize).count, noun) %>
+    <% if noun == 'proposer' and @gathering.proposing_delay and (Time.now - mapplication.created_at) < @gathering.proposing_delay.hours %>
+      &middot; <small>Proposers accepted in <%= distance_of_time_in_words((mapplication.created_at + @gathering.proposing_delay * 60 * 60), Time.now) %></small>
+    <% elsif (verdict = current_account.verdicts.send(noun.pluralize).find_by(mapplication: mapplication)) %>
+      &middot; <a class="pagelet-trigger" href="/verdicts/<%= verdict.id %>/destroy"><%= "Un#{verb}" %></a>
+    <% elsif !current_account.verdicts.find_by(mapplication: mapplication) %>
+      &middot;
+      <a href="javascript:;" onclick="$(this).hide().next().show().find('textarea').focus()"><%= verb.capitalize %></a>
+      <% form_for mapplication.verdicts.build(type: noun), "/mapplications/#{mapplication.id}/verdicts/create", style: 'display:none', class: 'mt-2' do |f| %>
+        <%= f.hidden_field :type %>
+        <%= f.text_area_block :reason, container_class: 'mb-2', label_class: 'd-none', placeholder: "Explain your decision (#{@gathering.send("require_reason_#{noun}") ? 'required' : 'optional'})", required: @gathering.send("require_reason_#{noun}") %>
+        <%= f.submit_block button_text: 'Submit' %>
+      <% end %>
+    <% end %>
+    <div class="image-wall">
+      <% mapplication.verdicts.send(noun.pluralize).each { |verdict| account = verdict.account %>
+      <a href="javascript:;" onclick="$('#modal .modal-content').load('/g/<%= @gathering.slug %>/mapplications/<%= mapplication.id %>', function () {
+                $('#modal').modal('show')
+              });">
+        <% if @gathering.send("anonymise_#{noun.pluralize}") %>
+          <i class="fa fa-user-circle" style="font-size: 20px; <% if verdict.reason %> color: #007bff <% end %>"></i>
+        <% else %>
+          <% if verdict.reason %>
+            <img style="width: 50px; border-bottom: 2px solid #007bff" src="<%= u account.picture_thumb_or_gravatar_url %>">
+          <% else %>
+            <img style="width: 50px;" src="<%= u account.picture_thumb_or_gravatar_url %>">
+          <% end %>
+        <% end %>
+      </a>
+      <% } %>
+    </div>
+  </div>
+<% end %>
+<% } %>

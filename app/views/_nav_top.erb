@@ -1,0 +1,70 @@
+<style>
+  #feedback-li, #docs-li { display: none }
+  @media(min-width: 768px) { #feedback-li, #docs-li { display: list-item } }
+</style>
+<ul class="nav navbar-nav navbar-right">
+  <% if current_account %>
+    <li id="docs-li">
+      <a target="_blank" href="https://docs.dandelion.earth/">
+        Docs
+      </a>
+    </li>
+    <li id="feedback-li">
+      <a data-nolt="modal" href="https://dandelion.nolt.io">
+        Feedback?
+      </a>
+    </li>
+    <li>
+      <a href="javascript:;" data-toggle="search-bar" class="navbar-icon">
+        <i class="ti-search"></i>
+      </a>
+    </li>
+    <li class="dropdown">
+      <a id="notifications-a" href="javascript:;" data-toggle="dropdown" class="dropdown-toggle navbar-icon" onclick="$(this).removeClass('with-label');
+          $.post('/checked_notifications')">
+        <i class="ti-bell"></i>
+      </a>
+      <style>
+        #notifications .fa-spin { display: none }
+      </style>
+      <div id="notifications" data-pagelet-url="/notifications" data-pagelet-refresh="60"></div>
+    </li>
+    <li class="dropdown">
+      <a id="messages-a" href="javascript:;" data-toggle="dropdown" class="dropdown-toggle navbar-icon" onclick="$(this).removeClass('with-label');
+          $.post('/checked_messages')">
+        <i class="ti-comment"></i>
+      </a>
+      <style>
+        #messages .fa-spin { display: none }
+      </style>
+      <div id="messages" data-pagelet-refresh="60" data-pagelet-url="/messages">
+        <%= cp(:'messages/dropdown', key: "/messages?account_id=#{current_account.id}", expires: 1.minute.from_now) %>
+      </div>
+    </li>
+    <li>
+      <a href="/habits" class="navbar-icon">
+        <i class="ti-check-box"></i>
+      </a>
+    </li>
+    <li class="d-none d-md-inline dropdown">
+      <a href="javascript:;" data-toggle="dropdown">
+        <span class="navbar-user-img online pull-left">
+          <img src="<%= u current_account.picture_thumb_or_gravatar_url %>">
+        </span>
+        <span class="hidden-xs "><%= current_account.name %> <b class="caret"></b></span>
+      </a>
+      <%= partial :nav_profile, locals: { ul_class: 'dropdown-menu' } %>
+    </li>
+  <% else %>
+    <li>
+      <a href="/accounts/new">
+        Sign up
+      </a>
+    </li>
+    <li>
+      <a href="/accounts/sign_in">
+        Sign in
+      </a>
+    </li>
+  <% end %>
+</ul>

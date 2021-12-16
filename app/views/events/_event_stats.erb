@@ -1,0 +1,23 @@
+<table id="event_stats" class="table table-striped table-hover table-sm" style="font-size: 0.9em">
+  <thead class="bg-white">
+    <tr>
+      <th>Name</th>
+      <th></th>
+      <th>Date</th>
+      <th>Coordinator</th>
+      <th>Tags</th>
+      <th>Activity</th>
+      <th>Local group</th>
+      <th>Facebook event</th>
+      <th>Tickets sold</th>
+      <th>Ticket revenue</th>
+      <th>Revenue sharer</th>
+      <th>Credit due</th>
+      <th>Donations</th>
+      <th>Feedback</th>
+    </tr>
+  </thead>
+  <% events.each { |event| %>
+  <tr data-pagelet-url="/events/<%= event.id %>/stats_row"><% if @event %><%= cp(:'events/event_stats_row', locals: { event: @event }, key: "/events/#{@event.id}/stats_row?timezone=#{Time.zone.name}") %><% end %></tr>
+  <% } %>
+</table>

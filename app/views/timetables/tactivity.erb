@@ -1,0 +1,36 @@
+<%= partial :'gatherings/nav', locals: { gathering: @gathering, membership: @membership } %>
+<h2>
+  <a href="/g/<%= @gathering.slug %>/timetables/<%= @timetable.id %>"><%= @timetable.name %></a>
+</h2>
+<div class="row">
+  <div class="col-sm-8">
+    <%= partial :'timetables/tactivity', object: @tactivity %>
+    <% if @tactivity.description %>
+      <p style="font-size: 16px; font-weight: 300">
+        <%== Sanitize.fragment(Rinku.auto_link(@tactivity.description.gsub("\n", '<br />')), Sanitize::Config::DANDELION) %>
+      </p>
+    <% end %>
+    <div data-pagelet-url="/commentable?commentable_type=Tactivity&commentable_id=<%= @tactivity.id %>">
+      <%= partial :'comments/commentable', locals: { commentable: @tactivity } %>
+    </div>
+  </div>
+  <div class="col-sm-4">
+    <h3 style="margin-top: 0">Host</h3>
+    <%= partial :'accounts/square', locals: { account: @tactivity.account, width: '75px' } %>
+    <h3 class="mt-3">Interested</h3>
+    <% y = [] %>
+    <% @tactivity.attendances.each { |attendance| account = attendance.account; %>
+    <% y << capture do %>
+      <%= partial :'accounts/square', locals: { account: account, width: '75px' } %>
+    <% end %>
+    <% } %>
+    <div class="image-wall">
+      <%= y.map(&:strip).join('') %>
+    </div>
+    <% if @tactivity.attendances.find_by(account: current_account) %>
+      <a class="btn btn-primary" href="/tactivities/<%= @tactivity.id %>/unattend">No longer interested</a>
+    <% else %>
+      <a class="btn btn-primary" href="/tactivities/<%= @tactivity.id %>/attend">Interested</a>
+    <% end %>
+  </div>
+</div>

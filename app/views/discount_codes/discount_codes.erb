@@ -1,0 +1,40 @@
+<% if @organisation %>
+  <%= partial :'organisations/nav', locals: { organisation: @organisation } %>
+<% elsif @activity %>
+  <%= partial :'activities/nav', locals: { activity: @activity } %>
+<% elsif @local_group %>
+  <%= partial :'local_groups/nav', locals: { local_group: @local_group } %>
+<% elsif @event %>
+  <%= partial :'events/nav', locals: { event: @event } %>
+<% end %>
+<div style="margin: 10px 0">
+  <a class="btn btn-primary" href="/discount_codes/new?<%=@scope%>"><i class="fa fa-plus-circle"></i> Create a discount code</a>
+</div>
+<table class="table">
+  <thead>
+    <tr>
+      <th>Code</th>
+      <th>Percentage discount</th>
+      <th>Created by</th>
+    </tr>
+  </thead>
+  <% @discount_codes.each { |discount_code| %>
+  <tr>
+    <td>
+      <a href="/discount_codes/<%= discount_code.id %>/edit?<%=@scope%>">
+        <%= discount_code.code %>
+      </a>
+      <br>
+      <%= discount_code.description %>
+    </td>
+    <td>
+      <%= discount_code.percentage_discount %>%
+    </td>
+    <td>
+      <% if discount_code.account %>
+        <a href="/u/<%= discount_code.account.username %>"><%= discount_code.account.name %></a>
+      <% end %>
+    </td>
+  </tr>
+  <% } %>
+</table>

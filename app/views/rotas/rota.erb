@@ -1,0 +1,68 @@
+<%= partial :'gatherings/nav', locals: { gathering: @gathering, membership: @membership } %>
+<h2>
+  <%= @rota.name %>
+</h2>
+<% if @membership.admin? %>
+  <a style="border-bottom: 1px dotted; text-decoration: none" href="/g/<%= @gathering.slug %>/rotas/<%= @rota.id %>/edit">
+    Edit rota
+  </a>
+<% end %>
+<% if @rota.description %>
+  <div style="margin: 15px 0">
+    <div class="wysiwyg">
+      <%== Sanitize.fragment(@rota.description, Sanitize::Config::DANDELION) %>
+    </div>
+  </div>
+<% end %>
+<div data-pagelet-url="/g/<%= @gathering.slug %>/rotas/<%= @rota.id %>">
+  <%= partial :'rotas/rota', locals: { rota: @rota } %>
+</div>
+<% if @membership.admin? %>
+  <style>
+    .roles li, .rslots li { cursor: move }
+  </style>
+  <script>
+    $(function () {
+
+      $(".roles").sortable({
+        update: function (event, ui) {
+          $.post('/roles/order', {rota_id: $(event.target).attr('data-rota-id'), role_ids: $(event.target).sortable("toArray")}, function () {
+            $(event.target).next().show()
+          })
+        }
+      });
+
+      $(".rslots").sortable({
+        update: function (event, ui) {
+          $.post('/rslots/order', {rota_id: $(event.target).attr('data-rota-id'), rslot_ids: $(event.target).sortable("toArray")}, function () {
+            $(event.target).next().show()
+          })
+        }
+      });
+
+    })
+  </script>
+  <div style="margin-top: 10px">
+    <a class="btn btn-primary" href="javascript:;" onclick="$(this).hide().next().show()"><i class="fa fa-exchange"></i> Reorder</a>
+    <div style="display: none" class="tactivity-form">
+      <h3>Reorder roles</h3>
+      <ul class="roles" data-rota-id="<%= @rota.id %>">
+        <% @rota.roles.order('o asc').each { |role| %>
+        <li id="<%= role.id %>"><%= role.name %></li>
+        <% } %>
+      </ul>
+      <p style="display: none">
+        <em>Refresh the page to see your changes</em>
+      </p>
+      <h3>Reorder slots</h3>
+      <ul class="rslots" data-rota-id="<%= @rota.id %>">
+        <% @rota.rslots.order('o asc').each { |rslot| %>
+        <li id="<%= rslot.id %>"><%= rslot.name %></li>
+        <% } %>
+      </ul>
+      <p style="display: none">
+        <em>Refresh the page to see your changes</em>
+      </p>
+    </div>
+  </div>
+<% end %>

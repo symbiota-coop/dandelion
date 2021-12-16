@@ -1,0 +1,131 @@
+<%= partial :'organisations/nav', locals: { organisation: @organisation } %>
+<% organisation = @organisation %>
+<% pmail = @pmail_test.pmails.first %>
+
+<div class="row justify-content-between no-gutters">
+  <div class="col">
+    <h1><%= @pmail_test.name %></h1>
+  </div>
+  <div class="col-auto">
+    <a href="/pmail_tests/<%= @pmail_test.id %>/edit?<%= @scope %>" class="btn btn-primary">
+      <i class="fa fa-pencil"></i>
+      Edit
+    </a>
+  </div>
+</div>
+
+<table class="table mt-3">
+
+  <tr>
+    <th>
+      Emails to include
+    </th>
+    <td>
+
+      <ul class="list-unstyled mb-1">
+        <% @pmail_test.pmail_testships.each { |pmail_testship| pmail = pmail_testship.pmail %>
+        <li>
+          <a href="/pmails/<%= pmail.id %>/edit?organisation_id=<%= organisation.id %>"><%= pmail.subject %></a>
+          <% if pmail_testship.account_ids %>
+            <span class="badge badge-primary">
+              <%= pluralize(pmail_testship.account_ids.count.round, 'person') %>
+            </span>
+          <% end %>
+        </li>
+        <% } %>
+      </ul>
+
+      <div>
+        <a id="add-pmail" href="javascript:;" onclick="$(this).hide().next().show();
+        $('#remove-pmail').hide()"><i class="fa fa-plus-square"></i></a>
+        <div style="display: none">
+          <% form_for PmailTestship.new, "/pmail_tests/#{@pmail_test.id}/add" do |f| %>
+            <%= hidden_field_tag :organisation_id, value: @organisation.id %>
+            <%= f.lookup_block :pmail_id, lookup_url: "/o/#{@organisation.slug}/pmails.json", placeholder: 'Search pmails' %>
+            <%= f.submit_block button_text: 'Add' %>
+          <% end %>
+        </div>
+        <a id="remove-pmail" href="javascript:;" onclick="$(this).hide().next().show();
+        $('#add-pmail').hide()"><i class="fa fa-minus-square"></i></a>
+        <div style="display: none">
+          <% form_tag "/pmail_tests/#{@pmail_test.id}/remove", class: 'form-inline' do |f| %>
+            <%= hidden_field_tag :organisation_id, value: @organisation.id %>
+            <%= select_tag :pmail_id, options: @pmail_test.pmails.map { |pmail| [pmail.subject.to_s, pmail.id] }, class: 'form-control mr-1' %>
+            <%= submit_tag 'Remove', class: 'btn btn-danger' %>
+          <% end %>
+        </div>
+      </div>
+
+    </td>
+  </tr>
+
+  <tr>
+    <th>
+      List
+    </th>
+    <td>
+      <% if pmail %>
+        <% different_lists = nil; unless @pmail_test.pmails.all? { |pmail| pmail.organisation == @pmail_test.organisation } &&
+          @pmail_test.pmails.map(&:to_selected).uniq.count == 1 %>
+        <% different_lists = true %>
+        <i class="fa fa-warning"></i> These emails have different lists!
+      <% else %>
+        <div class="mb-1">
+          <%= partial :'pmails/to', locals: { pmail: pmail } %>
+        </div>
+        <span class="badge badge-primary"><%= pluralize(pmail.to_with_unsubscribes.count, 'person') %></span>
+      <% end %>
+    <% end %>
+  </td>
+</tr>
+
+<tr>
+  <th>Test fraction</th>
+  <td>
+    <% if @pmail_test.fraction %>
+      <div class="mb-1">
+        <%= number_to_percentage @pmail_test.fraction * 100, precision: 0 %>
+      </div>
+      <% if pmail %>
+        <% unless different_lists %>
+          <span class="badge badge-primary">
+            <% if @pmail_test.account_ids.count > 0 %>
+              <%= pluralize(@pmail_test.account_ids.count.round, 'person') %>
+            <% else %>
+              <%= pluralize((pmail.to_with_unsubscribes.count * @pmail_test.fraction).round, 'person') %>
+            <% end %>
+          </span>
+        <% end %>
+      <% end %>
+    <% end %>
+  </td>
+</tr>
+
+<% if !@pmail_test.winner && !different_lists %>
+  <tr>
+    <th>
+    </th>
+    <td>
+      <% if @pmail_test.sent_at %>
+        Sent at <%= @pmail_test.sent_at %>
+      <% elsif @pmail_test.requested_send_at %>
+        Queued for sending at <%= @pmail_test.requested_send_at %>
+      <% else %>
+        <a class="btn btn-primary" href="/pmail_tests/<%= @pmail_test.id %>/assign_and_send?<%= @scope %>">Start A/B test</a>
+      <% end %>
+    </td>
+  </tr>
+<% end %>
+
+<% if @pmail_test.winner %>
+  <tr>
+    <th>
+      Winner
+    </th>
+    <td>
+      <a href="/pmails/<%= @pmail_test.winner.id %>/edit?<%= @scope %>"><%= @pmail_test.winner.subject %></a>
+    </td>
+  </tr>
+<% end %>
+
+</table>

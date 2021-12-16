@@ -1,0 +1,149 @@
+<div class="row">
+  <div class="col-sm-6">
+    <h2>Projected incomings</h2>
+    <table class="table">
+      <tr>
+        <th style="width: 50%">Item</th>
+        <th>Amount</th>
+      </tr>
+      <% Option.types.each { |type| %>
+      <% options = @gathering.options.and(type: type).select { |option| option.optionships.count > 0 }; if options.count > 0 %>
+      <tr>
+        <td colspan="2">
+          <em><%= type == 'Ticket' ? 'Tickets' : type %></em>
+        </td>
+      </tr>
+    <% end %>
+    <% options.each { |option| %>
+    <tr>
+      <td>
+        <% if option.split_cost %>
+          <%= option.name %>
+        <% else %>
+          <%= option.name %> x <%= option.optionships.count %>
+        <% end %>
+      </td>
+      <td>
+        <% if option.split_cost %>
+          <%= m option.cost, @gathering.currency %>
+        <% else %>
+          <%= m option.cost * option.optionships.count, @gathering.currency %>
+        <% end %>
+      </td>
+    </tr>
+    <% } %>
+    <% } %>
+    <tr>
+      <th></th>
+      <th>
+        <%= m @gathering.incomings, @gathering.currency %>
+      </th>
+    </tr>
+  </table>
+  <h2>Actual incomings</h2>
+  <table class="table">
+    <tr>
+      <th style="width: 50%"></th>
+      <th>
+        <%= m @gathering.memberships.pluck(:paid).compact.sum, @gathering.currency %>
+        (<%= m @gathering.processed_via_dandelion, @gathering.currency %> processed via Dandelion)
+      </th>
+    </tr>
+  </table>
+</div>
+<div class="col-sm-6">
+  <h2>Projected outgoings</h2>
+  <table class="table">
+    <tr>
+      <th style="width: 50%">Team</th>
+      <th>Budget</th>
+      <th>Spent</th>
+    </tr>
+    <% @gathering.teams.order('name asc').each { |team| %>
+    <tr <% if team.budget and team.spent > team.budget %> class="danger"<% end %>>
+      <td><a href="/g/<%= @gathering.slug %>/teams/<%= team.id %>"><%= team.name %></a></td>
+      <td>
+        <% if team.budget %>
+          <a href="javascript:;" onclick="$(this).hide().next().show().find('input').focus()">
+            <% if team.budget %>
+              <%= m team.budget, @gathering.currency %>
+            <% end %>
+          </a>
+        <% end %>
+        <% form_tag "/teams/#{team.id}/budget", style: ('display:none' if team.budget) do %>
+          <div class="input-group">
+            <div class="input-group-prepend">
+              <span class="input-group-text"><%= Money.new(0, @gathering.currency).symbol %></span>
+            </div>
+            <%= number_field_tag :budget, class: 'form-control', style: 'width: 6em', value: team.budget, onblur: '$(this.form).submit()' %>
+          </div>
+        <% end %>
+      </td>
+      <td>
+        <%= m team.spent, @gathering.currency %>
+      </td>
+    </tr>
+    <% } %>
+    <tr>
+      <th></th>
+      <th>
+        <%= m @gathering.teams.map(&:budget).compact.sum, @gathering.currency %>
+      </th>
+      <th>
+        <%= m @gathering.teams.map(&:spent).sum, @gathering.currency %>
+      </th>
+    </tr>
+  </table>
+  <h2>Actual outgoings</h2>
+  <div style="margin: 10px 0">
+    <a class="btn btn-primary" href="javascript:;" onclick="$(this).hide().next().show()"><i class="fa fa-plus-circle"></i> List expense</a>
+    <div style="display: none">
+      <%= partial :'budget/build' %>
+    </div>
+  </div>
+  <table class="table">
+    <tr>
+      <th style="width: 50%">Item</th>
+      <th>Cost</th>
+      <th>Team</th>
+      <th>Paid by</th>
+      <th>Reimbursed?</th>
+    </tr>
+    <% @gathering.spends.sort_by { |spend| [spend.reimbursed ? 1 : 0, spend.team.try(:name) || '', -spend.amount] }.each { |spend| %>
+    <tr>
+      <td>
+        <a href="/g/<%= @gathering.slug %>/spends/<%= spend.id %>/edit">
+          <%= spend.item %>
+        </a>
+      </td>
+      <td>
+        <%= m spend.amount, @gathering.currency %>
+      </td>
+      <td>
+        <% if spend.team %>
+          <a href="/g/<%= @gathering.slug %>/teams/<%= spend.team_id %>"><%= spend.team.name %></a>
+        <% end %>
+      </td>
+      <td><a href="/accounts/<%= spend.account_id %>"><%= spend.account.name %></a></td>
+      <td>
+        <% if spend.reimbursed %>
+          <i style="cursor: pointer" class="fa fa-check" onclick="$(this).hide().next().show().find('input').click()"></i>
+        <% end %>
+        <% form_tag "/spends/#{spend.id}/reimbursed", style: ('display:none' if spend.reimbursed) do %>
+          <%= check_box_tag :reimbursed, value: true, checked: spend.reimbursed, onclick: '$(this.form).submit()' %>
+        <% end %>
+      </td>
+    </tr>
+    <% } %>
+    <tr>
+      <th></th>
+      <th>
+        <%= m @gathering.spends.pluck(:amount).sum, @gathering.currency %>
+      </th>
+      <th></th>
+      <th></th>
+      <th></th>
+    </tr>
+  </table>
+</div>
+</div>

@@ -1,0 +1,19 @@
+<div class="row justify-content-center">
+  <div class="col col-sm-auto">
+    <%= @hide_alert = true; partial :flash %>
+    <div class="card">
+      <div class="hw card-header text-white bg-primary">
+        <h2 class="text-center my-0">Get a sign in link</h2>
+      </div>
+      <div class="card-body">
+        <% form_tag '/accounts/sign_in_link' do %>
+          <div class="form-group mb-1">
+            <label class="sr-only">Email</label>
+            <%= email_field_tag :email, class: 'form-control mr-sm-2', placeholder: 'Email' %>
+          </div>
+          <button class="btn btn-primary" type="submit">Submit</button>
+        <% end %>
+      </div>
+    </div>
+  </div>
+</div>

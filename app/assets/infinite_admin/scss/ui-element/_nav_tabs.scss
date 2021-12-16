@@ -1,0 +1,132 @@
+/* Nav Tabs Setting */
+
+.nav-tabs {
+	border-bottom: 1px solid #dadade;
+}
+.tab-content {
+	padding: 0.9375rem;
+	
+	&.tab-content-bordered {
+		padding: 0.9375rem;
+		border: 1px solid #dadade;
+		border-top: none;
+	}
+}
+.nav-tabs > li > a:hover {
+	border-color: #EFEFF4 #EFEFF4 #dadade;
+}
+.nav-tabs > li.active > a, 
+.nav-tabs > li.active > a:focus, 
+.nav-tabs > li.active > a:hover {
+	border: 1px solid #dadade;
+	border-bottom-color: transparent;
+}
+.nav-tabs-left {
+	display: table;
+	width: 100%;
+	
+	
+	& .nav.nav-tabs {
+		display: table-cell;
+		border-bottom: none;
+		border-right: 1px solid #dadade;
+		vertical-align: top;
+	}
+	& .tab-content {
+		display: table-cell;
+		border: 1px solid #dadade;
+		border-left: none;
+		vertical-align: top;
+	}
+	& .nav-tabs > li {
+		float: none;
+		margin: 0 -1px 0 0;
+	}
+	& .nav-tabs > li > a {
+		margin-right: 0;
+		margin-bottom: 0.125rem;
+		white-space: nowrap;
+		@include border-radius(0.25rem 0 0 0.25rem);
+	}
+	& .nav-tabs > li.active > a, 
+	& .nav-tabs > li.active > a:focus, 
+	& .nav-tabs > li.active > a:hover,
+	& .nav-tabs > li > a.active, 
+	& .nav-tabs > li > a.active:focus, 
+	& .nav-tabs > li > a.active:hover,
+	& .nav-item.show .nav-link, 
+	& .nav-link.active {
+		border: 1px solid #dadade;
+		border-right-color: transparent;
+	}
+	& .nav-tabs > li > a:hover {
+		border-color: #EFEFF4 #dadade #EFEFF4 #EFEFF4;
+	}
+}
+.nav-tabs-right {
+	display: table;
+	width: 100%;
+	
+	& .nav.nav-tabs {
+		display: table-cell;
+		border-bottom: none;
+		border-left: 1px solid #dadade;
+		vertical-align: top;
+	}
+	& .tab-content {
+		display: table-cell;
+		border: 1px solid #dadade;
+		border-right: none;
+		vertical-align: top;
+	}
+	& .nav-tabs > li {
+		float: none;
+		margin: 0 0 0 -1px;
+	}
+	& .nav-tabs > li > a {
+		margin-right: 0;
+		margin-bottom: 0.125rem;
+		white-space: nowrap;
+		@include border-radius(0 0.25rem 0.25rem 0);
+	}
+	& .nav-tabs > li.active > a, 
+	& .nav-tabs > li.active > a:focus, 
+	& .nav-tabs > li.active > a:hover,
+	& .nav-tabs > li > a.active, 
+	& .nav-tabs > li > a.active:focus, 
+	& .nav-tabs > li > a.active:hover,
+	& .nav-item.show .nav-link, 
+	& .nav-link.active {
+		border: 1px solid #dadade;
+		border-left-color: transparent;
+	}
+	& .nav-tabs > li > a:hover {
+		border-color: #EFEFF4 #EFEFF4 #EFEFF4 #dadade;
+	}
+}
+.nav-tabs-bottom {
+	& .nav-tabs {
+		border-top: 1px solid #dadade;
+		border-bottom: none;
+	}
+	& .tab-content.tab-content-bordered {
+		padding: 0.9375rem;
+		border: 1px solid #dadade;
+		border-bottom: none;
+	}
+	& .nav-tabs > li > a {
+		margin-bottom: 0;
+		margin-top: -1px;
+		@include border-radius(0 0 0.25rem 0.25rem);
+		
+		&:hover {
+			border-color: #dadade #EFEFF4 #EFEFF4;
+		}
+	}
+	& .nav-tabs > li.active > a, 
+	& .nav-tabs > li.active > a:focus, 
+	& .nav-tabs > li.active > a:hover {
+		border: 1px solid #dadade;
+		border-top-color: transparent;
+	}
+}

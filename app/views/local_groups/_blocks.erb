@@ -1,0 +1,8 @@
+<div class="row" id="local_groups">
+  <% local_groups.each { |local_group| %>
+  <div class="col-12 <%= block_class if defined?(block_class) %>" id="<%= local_group.id %>">
+    <%= partial :'local_groups/block', locals: { local_group: local_group } %>
+    <hr class="my-3">
+  </div>
+  <% } %>
+</div>

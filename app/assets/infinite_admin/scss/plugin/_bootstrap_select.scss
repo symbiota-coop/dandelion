@@ -1,0 +1,36 @@
+/* Bootstrap Select Setting */
+
+body .bootstrap-select .dropdown-toggle {
+	@include transition('border-color ease-in-out .15s,box-shadow ease-in-out .15s');
+}
+body .bootstrap-select .dropdown-toggle:focus {
+	border-color: $color_primary !important;
+	outline: none !important;
+	@include box-shadow(0 0 0 0.125rem rgba(102,175,233,.6));
+}
+body .bootstrap-select.btn-group .dropdown-menu.inner {
+	margin: 0 !important;
+	display: block;
+}
+body .bootstrap-select.btn-group > .dropdown-menu {
+	overflow: initial !important;
+}
+body .bootstrap-select.btn-group > .dropdown-menu .dropdown-menu:before,
+body .bootstrap-select.btn-group > .dropdown-menu .dropdown-menu:after {
+	border: none;
+}
+body .bs-actionsbox, 
+body .bs-donebutton, 
+body .bs-searchbox {
+	padding: 0 0.5rem 0.5rem;
+}
+body .bootstrap-select .notify {
+	border: none !important;
+	padding: 0.3125rem 0.625rem !important;
+	background: $color_yellow !important;
+	@include box-shadow(none !important);
+	@include border-radius(0.25rem);
+}
+body .bootstrap-select.btn-group .dropdown-toggle .caret {
+	margin-top: -0.4375rem;
+}

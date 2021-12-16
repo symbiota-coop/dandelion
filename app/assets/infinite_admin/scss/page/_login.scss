@@ -1,0 +1,107 @@
+/* Login Page Setting */
+
+.login {
+	position: absolute;
+	top: 0;
+	left: 0;
+	right: 0;
+	bottom: 0;
+	color: $color_white;
+}
+.login-cover {
+	background: url('../img/login-cover.jpg');
+	background-size: 100%;
+	background-repeat: no-repeat;
+	background-attachment: fixed;
+	background-position: center center;
+	position: fixed;
+	right: 0;
+	top: 0;
+	left: 0;
+	bottom: 0;
+	
+	&:before {
+		content: '';
+		display: block;
+		position: absolute;
+		top: 0;
+		left: 0;
+		right: 0;
+		bottom: 0;
+		background: linear-gradient(to bottom, rgba(0,0,0,0.3) 0%, rgba(0,0,0,0.85) 100%);
+	}
+}
+.login-content {
+	width: 20rem;
+	position: absolute;
+	left: 50%;
+	margin-left: -10rem;
+	top: 50%;
+	margin-top: -10rem;
+}
+.login-brand {
+	font-size: 1rem;
+	line-height: 1.75rem;
+	margin-bottom: 0.9375rem;
+	
+	& a,
+	& a:hover,
+	& a:focus {
+		display: block;
+		color: $color_white !important;
+		text-decoration: none;
+	}
+	& i {
+		float: left;
+		width: 1.75rem;
+		line-height: 1.75rem;
+		font-size: 1.75rem;
+		margin-right: 0.625rem;
+	}
+}
+.login .form-control,
+.inverse-mode .login .form-control,
+.login select.form-control:not([size]):not([multiple]),
+.inverse-mode .login select.form-control:not([size]):not([multiple]) {
+	background: rgba(255,255,255,0.3);
+	border-color: transparent;
+	color: $color_white;
+}
+.login .control-label {
+	color: $color_white;
+}
+.login .form-control:focus {
+	@include box-shadow(0 0 0px 2px rgba(102,175,233,1));
+}
+.checkbox input + label:before, .checkbox-inline input + label:before {
+	background: none;
+}
+.login-desc {
+	color: rgba(255,255,255,0.5);
+	margin-bottom: 0.3125rem;
+}
+.login .form-control::-webkit-input-placeholder {
+	color: rgba(255,255,255,0.75);
+}
+.login .form-control::-moz-placeholder {
+	color: rgba(255,255,255,0.75);
+}
+.login .form-control:-ms-input-placeholder {
+	color: rgba(255,255,255,0.75);
+}
+.login .form-control:-moz-placeholder {
+	color: rgba(255,255,255,0.75);
+}
+@media (max-width: 480px) {
+	.login-content {
+		width: auto;
+		margin-left: 0;
+		padding: 0 1.25rem;
+		left: 0;
+		right: 0;
+	}
+	.login-cover {
+		background-size: auto 100%;
+	}
+}
+

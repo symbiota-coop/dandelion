@@ -1,0 +1,70 @@
+<%= partial :'gatherings/nav', locals: { gathering: @gathering, membership: @membership } %>
+<h2>
+  <%= @timetable.name %>
+</h2>
+<% if @membership.admin? %>
+  <a style="border-bottom: 1px dotted; text-decoration: none" href="/g/<%= @gathering.slug %>/timetables/<%= @timetable.id %>/edit">
+    Edit timetable
+  </a>
+<% end %>
+<% if @timetable.description %>
+  <div style="margin: 15px 0">
+    <div class="wysiwyg">
+      <%== Sanitize.fragment(@timetable.description, Sanitize::Config::DANDELION) %>
+    </div>
+  </div>
+<% end %>
+<div style="margin: 15px 0">
+  <a class="btn btn-primary" href="javascript:;" onclick="$(this).hide().next().show()"><i class="fa fa-plus-circle"></i> Propose an activity</a>
+  <div style="display: none" class="tactivity-form">
+    <%= partial :'timetables/tactivity_form', locals: { timetable: @timetable } %>
+  </div>
+  <div class="mt-2">
+    <div data-pagelet-url="/g/<%= @gathering.slug %>/timetables/<%= @timetable.id %>">
+      <%= partial :'timetables/timetable', locals: { timetable: @timetable } %>
+    </div>
+    <% if (admin? || @membership.admin?) and !@timetable.hide_schedule? %>
+      <script>
+        $(function () {
+          $(".spaces").sortable({
+            update: function (event, ui) {
+              $.post('/spaces/order', {timetable_id: $(event.target).attr('data-timetable-id'), space_ids: $(event.target).sortable("toArray")}, function () {
+                $(event.target).next().show()
+              })
+            }
+          });
+
+          $(".tslots").sortable({
+            update: function (event, ui) {
+              $.post('/tslots/order', {timetable_id: $(event.target).attr('data-timetable-id'), tslot_ids: $(event.target).sortable("toArray")}, function () {
+                $(event.target).next().show()
+              })
+            }
+          });
+        });
+      </script>
+      <style>
+        .spaces li, .tslots li { cursor: move }
+      </style>
+      <a class="btn btn-primary" href="javascript:;" onclick="$(this).hide().next().show()"><i class="fa fa-exchange"></i> Reorder</a>
+      <div style="display: none" class="tactivity-form">
+        <h3>Reorder spaces</h3>
+        <ul class="spaces" data-timetable-id="<%= @timetable.id %>">
+          <% @timetable.spaces.order('o asc').each { |space| %>
+          <li id="<%= space.id %>"><%= space.name %></li>
+          <% } %>
+        </ul>
+        <p style="display: none">
+          <em>Refresh the page to see your changes</em>
+        </p>
+        <h3>Reorder slots</h3>
+        <ul class="tslots" data-timetable-id="<%= @timetable.id %>">
+          <% @timetable.tslots.order('o asc').each { |tslot| %>
+          <li id="<%= tslot.id %>"><%= tslot.name %></li>
+          <% } %>
+        </ul>
+        <p style="display: none">
+          <em>Refresh the page to see your changes</em>
+        </p>
+      </div>
+    <% end %>

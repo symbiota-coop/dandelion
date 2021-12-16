@@ -1,0 +1,33 @@
+<% if organisation.persisted? && organisation_admin?(organisation) %>
+<% unless defined?(inline) %>
+  <%== '<div class="mb-3">' %>
+<% end %>
+  <%= dropdown_nav [
+        ['<i class="fa fa-flag"></i> View organisation', "/o/#{organisation.slug}"],
+        ['<i class="fa fa-cogs"></i>  Settings', "/o/#{organisation.slug}/edit"],
+        [%(<i class="fa fa-users"></i> Followers <span class="badge badge-primary">#{organisation.organisationships.count}</span>), "/o/#{organisation.slug}/followers"],
+        [],
+        ['<i class="fa fa-envelope"></i> Mailer', "/o/#{organisation.slug}/pmails"],
+        ['A/B tests', "/o/#{organisation.slug}/pmail_tests"],
+        [],
+        ['<i class="fa fa-calendar-o"></i>  Events', "/o/#{organisation.slug}/events"],
+        ['Event stats', "/o/#{organisation.slug}/events/stats"],
+        ['Orders', "/o/#{organisation.slug}/orders"],
+        ['Discount codes', "/o/#{organisation.slug}/discount_codes"],
+        ['Feedback', "/o/#{organisation.slug}/feedback"],
+        [],
+        ['<i class="fa fa-handshake-o"></i> Services', "/o/#{organisation.slug}/services"],
+        ['Service stats', "/o/#{organisation.slug}/services/stats"],
+        ['Bookings', "/o/#{organisation.slug}/bookings"],
+        [],
+        ['Activities', "/o/#{organisation.slug}/activities"],
+        ['Local groups', "/o/#{organisation.slug}/local_groups"],
+        ['Tiers', "/o/#{organisation.slug}/tiers"],
+        ['Welcome emails', "/o/#{organisation.slug}/emails"],
+        ['Bans', "/o/#{organisation.slug}/banned_emails"],
+        ['Audience stats', "/o/#{organisation.slug}/stats"]
+      ].compact, button_text: %(#{organisation.name} <i class="fa fa-caret-down"></i>), container_class: 'btn-group mb-1' %>
+  <% unless defined?(inline) %>
+    <%== '</div>' %>
+  <% end %>
+<% end %>

@@ -1,0 +1,93 @@
+/* General Setting */
+
+.content {
+	margin-left: 14.375rem;
+	padding: 1.5625rem;
+	position: relative;
+	height: 100%;
+	
+	&.content-inverse-mode,
+	&.content-inverse-mode .page-header,
+	&.content-inverse-mode .breadcrumb .active {
+		color: $color_white;
+	}
+}
+.page-full-width .content {
+	margin: 0;
+}
+.page-header-fixed.page-sidebar-fixed .content {
+	// overflow: scroll;
+}
+.content-container {
+	position: relative;
+	z-index: 10;
+}
+.content-cover {
+	position: absolute;
+	top: 0;
+	left: 0;
+	right: 0;
+	bottom: 0;
+}
+.page-content-full-height .content {
+    position: absolute;
+    left: 0;
+    top: 3.375rem;
+    right: 0;
+    bottom: 0;
+    @include transform(translateZ(0));
+}
+.panel-expand .page-content-full-height .content {
+    @include transform(none);
+}
+
+
+/* 5.2 Content Responsive Setting */
+
+@media (min-width: 1280px) {
+	.page-with-bg {
+		background: url('../img/bg.jpg');
+		background-size: 100%;
+		background-position: top center;
+		background-attachment: fixed;
+		background-repeat: no-repeat;
+	}
+	.page-boxed-layout {
+		background: #eaeaea;
+	}
+	.page-boxed-layout,
+	.page-boxed-layout .header {
+		max-width: 80rem;
+		margin: 0 auto;
+	}
+	.page-boxed-layout .sidebar {
+		left: auto;
+	}
+	.page-boxed-layout.page-with-fixed-footer .footer {
+		width: 65.625rem;
+		left: auto;
+		right: auto;
+		margin-left: 14.375rem;
+	}
+	.page-boxed-layout.page-with-fixed-footer.page-sidebar-minified .footer {
+		margin-left: 3.75rem;
+		width: 76.25rem;
+	}
+	.page-boxed-layout.page-with-fixed-footer.page-full-width .footer {
+		margin-left: 0;
+	}
+}
+@media (max-width: 767px) {
+	.content,
+	.page-header-fixed.page-sidebar-fixed .content {
+		margin-left: 0;
+		padding: 0.9375rem 0.9375rem 0.9375rem;
+		overflow: initial;
+		height: auto;
+	}
+	.content-cover {
+		bottom: 0;
+		top: 5.625rem;
+		position: fixed;
+	}
+}

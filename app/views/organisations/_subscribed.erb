@@ -1,0 +1,6 @@
+<% form_tag "/o/#{@organisation.slug}/subscribed/#{organisationship.id}" do %>
+  <div class="switcher">
+    <%= check_box_tag :subscribed, id: "organisationship-subscribed-#{organisationship.id}", class: 'form-check-input', checked: !organisationship.unsubscribed, onclick: '$(this.form).submit()' %>
+    <label for="<%= "organisationship-subscribed-#{organisationship.id}" %>"></label>
+  </div>
+<% end %>

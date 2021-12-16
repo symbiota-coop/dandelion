@@ -1,0 +1,190 @@
+<table class="table table-hr">
+  <% viewer_in_network = current_account && account.network.find(current_account.id) %>
+  <% if viewable?(account, :email, viewer_in_network: viewer_in_network) %>
+    <tr>
+      <td>Email</td>
+      <td>
+        <div class="row justify-content-between no-gutters">
+          <div class="col">
+            <a target="_blank" href="mailto:<%= account.email %>"><%= account.email %></a>
+          </div>
+          <% if current_account && current_account.id == account.id %>
+            <div class="col-auto">
+              <div data-pagelet-url="/accounts/privacyable/email"></div>
+            </div>
+          <% end %>
+        </div>
+      </td>
+    </tr>
+  <% end %>
+  <% if viewable?(account, :phone, viewer_in_network: viewer_in_network) %>
+    <tr>
+      <td>Phone</td>
+      <td>
+        <div class="row justify-content-between no-gutters">
+          <div class="col">
+            <a target="_blank" href="tel:<%= account.phone %>"><%= account.phone %></a>
+          </div>
+          <% if current_account && current_account.id == account.id %>
+            <div class="col-auto">
+              <div data-pagelet-url="/accounts/privacyable/phone"></div>
+            </div>
+          <% end %>
+        </div>
+      </td>
+    </tr>
+  <% end %>
+  <% if viewable?(account, :telegram_username, viewer_in_network: viewer_in_network) %>
+    <tr>
+      <td>Telegram</td>
+      <td>
+        <div class="row justify-content-between no-gutters">
+          <div class="col">
+            <a target="_blank" href="https://t.me/<%= account.telegram_username %>"><%= account.telegram_username %></a>
+          </div>
+          <% if current_account && current_account.id == account.id %>
+            <div class="col-auto">
+              <div data-pagelet-url="/accounts/privacyable/telegram_username"></div>
+            </div>
+          <% end %>
+        </div>
+      </td>
+    </tr>
+  <% end %>
+  <% if viewable?(account, :website, viewer_in_network: viewer_in_network) %>
+    <tr>
+      <td>Website</td>
+      <td>
+        <div class="row justify-content-between no-gutters">
+          <div class="col">
+            <a target="_blank" href="<%= account.website %>"><%= account.website %></a>
+          </div>
+          <% if current_account && current_account.id == account.id %>
+            <div class="col-auto">
+              <div data-pagelet-url="/accounts/privacyable/website"></div>
+            </div>
+          <% end %>
+        </div>
+      </td>
+    </tr>
+  <% end %>
+  <% if viewable?(account, :facebook_profile_url, viewer_in_network: viewer_in_network) %>
+    <tr>
+      <td>Facebook</td>
+      <td>
+        <div class="row justify-content-between no-gutters">
+          <div class="col">
+            <a target="_blank" href="<%= account.facebook_profile_url %>"><%= account.facebook_profile_url.include?('profile.php') ? account.facebook_profile_url.split('/')[2..].join('/').gsub('www.', '') : account.facebook_profile_url.split('/')[3..].join('/').split('?').first %></a>
+          </div>
+          <% if current_account && current_account.id == account.id %>
+            <div class="col-auto">
+              <div data-pagelet-url="/accounts/privacyable/facebook_profile_url"></div>
+            </div>
+          <% end %>
+        </div>
+      </td>
+    </tr>
+  <% end %>
+  <% if viewable?(account, :date_of_birth, viewer_in_network: viewer_in_network) %>
+    <tr>
+      <td>Age</td>
+      <td>
+        <div class="row justify-content-between no-gutters">
+          <div class="col">
+            <%= account.age %>
+          </div>
+          <% if current_account && current_account.id == account.id %>
+            <div class="col-auto">
+              <div data-pagelet-url="/accounts/privacyable/date_of_birth"></div>
+            </div>
+          <% end %>
+        </div>
+      </td>
+    </tr>
+  <% end %>
+  <% if viewable?(account, :gender, viewer_in_network: viewer_in_network) %>
+    <tr>
+      <td>Gender</td>
+      <td>
+        <div class="row justify-content-between no-gutters">
+          <div class="col">
+            <%= account.gender %>
+          </div>
+          <% if current_account && current_account.id == account.id %>
+            <div class="col-auto">
+              <div data-pagelet-url="/accounts/privacyable/gender"></div>
+            </div>
+          <% end %>
+        </div>
+      </td>
+    </tr>
+  <% end %>
+  <% if viewable?(account, :sexuality, viewer_in_network: viewer_in_network) %>
+    <tr>
+      <td>Sexuality</td>
+      <td>
+        <div class="row justify-content-between no-gutters">
+          <div class="col">
+            <%= account.sexuality %>
+          </div>
+          <% if current_account && current_account.id == account.id %>
+            <div class="col-auto">
+              <div data-pagelet-url="/accounts/privacyable/sexuality"></div>
+            </div>
+          <% end %>
+        </div>
+      </td>
+    </tr>
+  <% end %>
+  <% if viewable?(account, :location, viewer_in_network: viewer_in_network) && account.mappable? && !account.location.match(/[0-9]/) %>
+    <tr>
+      <td>Location</td>
+      <td>
+        <div class="row justify-content-between no-gutters">
+          <div class="col">
+            <%= account.location %>
+          </div>
+          <% if current_account && current_account.id == account.id %>
+            <div class="col-auto">
+              <div data-pagelet-url="/accounts/privacyable/location"></div>
+            </div>
+          <% end %>
+        </div>
+      </td>
+    </tr>
+  <% end %>
+  <% if viewable?(account, :open_to, viewer_in_network: viewer_in_network) && account.open_to.count > 0 %>
+    <tr>
+      <td>Open to</td>
+      <td>
+        <div class="row justify-content-between no-gutters">
+          <div class="col">
+            <%== account.open_to.map { |x| %(<span class="text-white label label-primary d-inline-block mb-1 mb-sm-0">#{x.humanize}</span>) }.join(' ') %>
+          </div>
+          <% if current_account && current_account.id == account.id %>
+            <div class="col-auto">
+              <div data-pagelet-url="/accounts/privacyable/open_to"></div>
+            </div>
+          <% end %>
+        </div>
+      </td>
+    </tr>
+  <% end %>
+  <% if viewable?(account, :last_active, viewer_in_network: viewer_in_network) %>
+    <tr>
+      <td>Last active</td>
+      <td>
+        <div class="row justify-content-between no-gutters">
+          <div class="col">
+            <%= time_ago_in_words account.last_active %> ago
+          </div>
+          <% if current_account && current_account.id == account.id %>
+            <div class="col-auto">
+              <div data-pagelet-url="/accounts/privacyable/last_active"></div>
+            </div>
+          <% end %>
+        </div>
+      </td>
+    </tr>
+  <% end %>
+</table>

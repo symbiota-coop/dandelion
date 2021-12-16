@@ -1,0 +1,39 @@
+/* Widget User List Setting */
+
+.widget-user-list {
+	list-style-type: none;
+	margin: 0;
+	padding: 0;
+	white-space: nowrap;
+	overflow: hidden;
+	
+	& > li {
+		display: inline-block;
+		
+		& + li {
+			margin-left: -1.125rem;
+		}
+		& a {
+			display: block;
+			border: 0.125rem solid #fff;
+			overflow: hidden;
+			width: 2.25rem;
+			height: 2.25rem;
+			margin-bottom: -0.3125rem;
+			line-height: 2rem;
+			text-align: center;
+			text-decoration: none;
+			@include border-radius(2.25rem);
+			
+			
+			& img {
+				display: block;
+				max-width: 100%;
+			}
+		}
+		&.number a {
+			background: $color_muted;
+			color: $color_white;
+		}
+	}
+}

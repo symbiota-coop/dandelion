@@ -1,0 +1,42 @@
+/* Slider Setting */
+
+body .slider.slider-horizontal {
+	height: 1.5rem;
+	width: 100%;
+}
+body .slider.slider-disabled .slider-track {
+	@include opacity(0.5);
+}
+body .slider.slider-disabled .slider-handle {
+	@include box-shadow(0 1px 0.1875rem rgba(0,0,0,0.15));
+}
+body .slider-track {
+	@include box-shadow(none);
+}
+body .slider.slider-horizontal .slider-track {
+	height: 0.125rem;
+	@include box-shadow(none);
+	background: #dfdfdf;
+	margin-top: -1px;
+}
+body .slider.slider-vertical .slider-track {
+	left: 50%;
+	margin-left: -1px;
+}
+body .slider-selection {
+	background: $color_primary;
+	@include box-shadow(none !important);
+}
+body .slider-handle,
+body .slider.slider-disabled .slider-handle {
+	background: $color_white;
+	@include box-shadow(0 1px 0.1875rem rgba(0,0,0,0.25));
+	width: 1.5rem;
+	height: 1.5rem;
+}
+body .slider.slider-vertical .slider-track {
+	width: 0.125rem;
+}
+body .slider.slider-vertical {
+	width: 1.5rem;
+}

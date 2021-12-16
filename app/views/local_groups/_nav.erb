@@ -1,0 +1,21 @@
+<% if local_group.persisted? && local_group_admin?(local_group) %>
+  <% unless defined?(inline) %>
+    <%== '<div class="mb-3">' %>
+  <% end %>
+  <% if organisation_admin?(local_group.organisation) && !defined?(hide_organisation_nav) %>
+    <%= partial :'organisations/nav', locals: { organisation: local_group.organisation, inline: true } %>
+  <% end %>
+  <%= dropdown_nav [
+        ['View local group', "/local_groups/#{local_group.id}"],
+        ['Settings', "/local_groups/#{local_group.id}/edit"],
+        [%(Followers <span class="badge badge-primary">#{local_group.local_groupships.count}</span>), "/local_groups/#{local_group.id}/followers"],
+        ['Discount codes', "/local_groups/#{local_group.id}/discount_codes"],
+        ['Event stats', "/local_groups/#{local_group.id}/events/stats"],
+        ['Audience stats', "/local_groups/#{local_group.id}/stats"],
+        ['Feedback', "/local_groups/#{local_group.id}/feedback"],
+        ['Mailer', "/local_groups/#{local_group.id}/pmails"]
+      ].compact, button_text: %(#{local_group.name} <i class="fa fa-caret-down"></i>), container_class: 'btn-group mb-1' %>
+  <% unless defined?(inline) %>
+    <%== '</div>' %>
+  <% end %>
+<% end %>

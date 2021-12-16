@@ -1,0 +1,44 @@
+<% if @membership %>
+  <script>
+    $(function () {
+      $('form[action$=join] .btn-primary').prop('disabled', true)
+    });
+  </script>
+  <div class="card mt-3">
+    <div class="card-body">
+      <strong>Preview of joining form (you are already a member of <%= @gathering.name %>)</strong>
+    </div>
+  </div>
+<% end %>
+<div class="row" style="margin-top: 15px">
+  <div class="col-sm-4 order-sm-1">
+    <%= partial :'gatherings/cocreators' %>
+  </div>
+  <div class="col-sm-8 order-sm-0">
+    <% if @gathering.intro_for_non_members %>
+      <div class="wysiwyg">
+        <%== Sanitize.fragment(@gathering.intro_for_non_members, Sanitize::Config::DANDELION) %>
+      </div>
+    <% end %>
+    <% if @gathering.member_limit and @gathering.memberships.count >= @gathering.member_limit %>
+      <p><em><%= @gathering.name %> is now full with all <%= @gathering.member_limit %> places taken</em></p>
+    <% else %>
+      <% form_for @account, "/g/#{@gathering.slug}/join", style: 'margin-top: 20px' do |f| %>
+        <script>
+          $(function () {
+            $('.form-group > div.col-sm-6').removeClass('col-sm-6').addClass('col-sm-8')
+          })
+        </script>
+        <% if !current_account or @membership %>
+          <%= f.text_block :name %>
+          <%= f.email_block :email %>
+          <%= f.image_block :picture %>
+          <% if @gathering.ask_for_facebook_profile_url %>
+            <%= f.url_block :facebook_profile_url %>
+          <% end %>
+        <% end %>
+        <%= f.submit_block button_text: 'Join' %>
+      <% end %>
+    <% end %>
+  </div>
+</div>

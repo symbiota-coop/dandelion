@@ -1,0 +1,45 @@
+<% if average_rating = event_feedbacks.average_rating %>
+  <span style="font-size: 2em">
+    <%= average_rating %><small class="text-muted">/5 from <%= pluralize event_feedbacks.count, 'rating' %></small>
+    <% average_rating.round.times do %><i class="fa fa-star"></i><% end %>
+  </span>
+<% end %>
+<% event_feedbacks = event_feedbacks.and(:rating.ne => nil).order('created_at desc').paginate(page: params[:page], per_page: 10) %>
+<table class="table table-condensed mt-3">
+  <% event_feedbacks.each { |event_feedback| account = event_feedback.account %>
+  <tr>
+    <td>
+      <% if event_feedback.anonymise? %>
+        Anonymous
+      <% else %>
+        <% if account.public? %>
+          <% if account.picture %>
+            <%= partial :'accounts/square', locals: { account: account, width: '50px' } %>
+          <% end %>
+          <a href="/u/<%= account.username %>"><%= account.name %></a>
+        <% else %>
+          <%= account.abbrname %>
+        <% end %>
+      <% end %>
+      <% if event_feedback.event %>
+        on <a href="/events/<%= event_feedback.event.id %>"><%= event_feedback.event.name %></a>
+      <% end %>
+    </td>
+    <td style="white-space: nowrap;"><% event_feedback.rating.times do %><i class="fa fa-star"></i><% end %></td>
+    <td><small><%= timeago event_feedback.created_at %></small></td>
+  </tr>
+  <% if event_feedback.public_answers %>
+    <tr>
+      <td colspan="3" style="border-top: 0">
+        <div class="row mb-3">
+          <div class="col-auto"><i class="fa fa-quote-left"></i></div>
+          <div class="col">
+            <p class="lead mb-0"><%= event_feedback.public_answers[0][1] %></p>
+          </div>
+        </div>
+      </td>
+    </tr>
+  <% end %>
+  <% } %>
+</table>
+<%= will_paginate event_feedbacks, inner_window: 0, outer_window: 0, renderer: WillPaginate::ViewHelpers::BootstrapRenderer %>

@@ -1,0 +1,108 @@
+/* Email Inbox Page Setting */
+
+.email-list {
+	list-style-type: none;
+	margin: 0;
+	padding: 0;
+	background: $color_white;
+	
+	& .email-checkbox,
+	& .email-message {
+		padding: 0.625rem 1.25rem;
+	}
+	& .email-checkbox {
+		float: left;
+	}
+	& .email-message {
+		margin-left: 3.625rem;
+	}
+	& .email-checkbox label {
+		padding-left: 1.125rem;
+	}
+	& > li {
+		@include clearfix();
+	}
+	& > li + li {
+		border-top: 1px solid #d1d1d4;
+	}
+	& > li:hover {
+		background: #f9f9f9;
+	}
+	& > li:last-child {
+		border-bottom: 1px solid #d1d1d4;
+	}
+	& .email-message > a {
+		display: block;
+		color: $color_inverse;
+		margin: -0.625rem -1.25rem;
+		padding: 0.625rem 1.25rem;
+		text-decoration: none;
+		position: relative;
+	}
+	& .unread .email-sender {
+		font-weight: 600;
+	}
+	& .unread a:before {
+		content: '';
+		position: absolute;
+		top: 1rem;
+		left: 1px;
+		width: 0.5rem;
+		height: 0.5rem;
+		background: $color_primary;
+		@include border-radius(0.375rem);
+	}
+	& .has-attachment a:after {
+		content: '\e647';
+		position: absolute;
+		top: 1rem;
+		left: -0.125rem;
+		width: 0.625rem;
+		height: 0.625rem;
+		font-size: 0.875rem;
+		color: $color_grey;
+		font-family: 'themify';
+		speak: none;
+		font-style: normal;
+		font-weight: normal;
+		font-variant: normal;
+		text-transform: none;
+		line-height: 0.625rem;
+		-webkit-font-smoothing: antialiased;
+		-moz-osx-font-smoothing: grayscale;
+	}
+	& .unread.has-attachment a:after {
+		top: 2.125rem;
+	}
+}
+
+.email-message .email-sender {
+	font-size: 0.875rem;
+	white-space: nowrap;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	position: relative;
+}
+.email-message .email-time {
+	float: right;
+	font-size: $body_font_size;
+	font-weight: normal;
+	color: #666;
+	margin-left: 0.625rem;
+}
+.email-message .email-desc {
+	color: $color_grey;
+	white-space: nowrap;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	position: relative;
+}
+@media (max-width: 767px) {
+	.email-list .email-checkbox, 
+	.email-list .email-message {
+		padding: 0.625rem 0.9375rem;
+	}
+	.email-list .email-message {
+		margin-left: 3.125rem;
+	}
+}

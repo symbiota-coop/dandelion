@@ -1,0 +1,80 @@
+/* Switcher Setting */
+
+.switcher {
+	display: inline-block;
+	
+	
+	& label {
+		display: block;
+		margin: 0;
+		width: 2.625rem;
+		height: 1.5rem;
+		position: relative;
+		
+		&:before {
+			content: '';
+			display: block;
+			width: 2.625rem;
+			height: 1.5rem;
+			background: #EFEFF4;
+			border: 0.125rem solid #f1f1f1;
+			@include border-radius(2.5rem);
+			@include transition(all .2s linear);
+		}
+		&:after {
+			content: '';
+			height: 1.25rem;
+			width: 1.25rem;
+			position: absolute;
+			left: 0.125rem;
+			top: 0.125rem;
+			background: $color_white;
+			@include border-radius(2.5rem);
+			@include box-shadow(0 0.125rem 0.125rem rgba(0,0,0,0.5));
+			@include transition(all .1s linear);
+		}
+	}
+	& input {
+		display: none;
+	}
+	& input:checked + label:before {
+		content: '';
+		background: $color_primary;
+		border: 0.125rem solid $color_primary;
+	}
+	&.switcher-success input:checked + label:before {
+		background: $color_success;
+		border-color: $color_success;
+	}
+	&.switcher-purple input:checked + label:before {
+		background: $color_purple;
+		border-color: $color_purple;
+	}
+	&.switcher-inverse input:checked + label:before {
+		background: $color_inverse;
+		border-color: $color_inverse;
+	}
+	&.switcher-warning input:checked + label:before {
+		background: $color_warning;
+		border-color: $color_warning;
+	}
+	&.switcher-danger input:checked + label:before {
+		background: $color_danger;
+		border-color: $color_danger;
+	}
+	&.switcher-info input:checked + label:before {
+		background: $color_info;
+		border-color: $color_info;
+	}
+	&.switcher-pink input:checked + label:before {
+		background: $color_pink;
+		border-color: $color_pink;
+	}
+	&.switcher-yellow input:checked + label:before {
+		background: $color_yellow;
+		border-color: $color_yellow;
+	}
+	& input:checked + label:after {
+		left: 1.25rem;
+	}
+}

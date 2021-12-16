@@ -1,0 +1,109 @@
+<%= partial :'gatherings/owed' %>
+<table class="table">
+  <thead>
+    <tr>
+      <th>Option</th>
+      <th>Cost</th>
+      <th>Places taken</th>
+      <th></th>
+      <th style="width: 33%" class="d-none d-sm-table-cell">People</th>
+    </tr>
+  </thead>
+  <% Option.types.each { |type| if (options = @gathering.options.and(type: type)).count > 0 %>
+  <tr class="bg-white">
+    <td colspan="5">
+      <h3 class="mb-0"><i class="fa <%= Option.icon(type) %>"></i> <%= type == 'Tier' ? 'Tiers' : type %></h3>
+    </td>
+  </tr>
+  <% options.order('cost asc, name asc').each { |option| %>
+  <tr>
+    <td>
+      <% if @membership.admin? %>
+        <a href="/g/<%= @gathering.slug %>/options/<%= option.id %>/edit">
+          <%= option.name %>
+        </a>
+      <% else %>
+        <%= option.name %>
+      <% end %>
+      <% if option.description %>
+        <br>
+        <%== Sanitize.fragment(Rinku.auto_link(option.description.gsub("\n", '<br />')), Sanitize::Config::DANDELION) %>
+      <% end %>
+    </td>
+    <td>
+      <% if option.split_cost %>
+        <%= m option.cost, @gathering.currency %> total
+        <% if option.cost_per_person %>
+          (<%= m option.cost_per_person, @gathering.currency %>/person)
+        <% end %>
+      <% else %>
+        <%= m option.cost, @gathering.currency %>/person
+      <% end %>
+    </td>
+    <td>
+      <a href="javascript:;" onclick="$('#modal .modal-content').load('/g/<%= @gathering.slug %>/options/<%= option.id %>', function () {
+                  $('#modal').modal('show')
+                });">
+        <%= option.optionships.count %>/<%= option.capacity || '&infin;' %>
+      </a>
+      <% if option.capacity %>
+        <% if option.full? %>
+          <span class="label label-danger">Full</span>
+        <% else %>
+          <span class="label label-success">Spaces</span>
+        <% end %>
+      <% end %>
+    </td>
+    <td>
+      <% if (optionship = @gathering.optionships.find_by(option: option, account: current_account)) %>
+        <a class="pagelet-trigger btn btn-outline-primary" href="/optionships/<%= optionship.id %>/destroy">Leave</a>
+      <% elsif !option.full? %>
+        <% if option.by_invitation %>
+          <span class="label label-primary">By invitation</span>
+        <% else %>
+          <a class="pagelet-trigger btn btn-primary" onclick="window.scrollTo(0, 0)" href="/optionships/create?option_id=<%= option.id %>">Join</a>
+        <% end %>
+      <% end %>
+    </td>
+    <td class="d-none d-sm-table-cell">
+      <% y = [] %>
+      <% option.optionships.shuffle.each { |optionship| account = optionship.account; %>
+      <% if params[:view] == 'names' %>
+        <% y << capture do %>
+          <% if @membership.admin? %>
+            <a href="/g/<%= @gathering.slug %>/optionships/<%= optionship.id %>/edit">
+              <%= account.name %>
+            </a>
+          <% else %>
+            <%= partial :'accounts/square', locals: { account: account, width: '50px' } %>
+          <% end %>
+        <% end %>
+      <% else %>
+        <% y << capture do %>
+          <% if @membership.admin? %>
+            <a href="/g/<%= @gathering.slug %>/optionships/<%= optionship.id %>/edit">
+              <img title="<%= account.name %>" style="width: 50px;" src="<%= u account.picture_thumb_or_gravatar_url %>">
+            </a>
+          <% else %>
+            <%= partial :'accounts/square', locals: { account: account, width: '50px' } %>
+          <% end %>
+        <% end %>
+      <% end %>
+      <% } %>
+      <% if params[:view] == 'names' %>
+        <%= y.map(&:strip).join(' &middot; ') %>
+      <% else %>
+        <div class="image-wall">
+          <%= y.map(&:strip).join('') %>
+        </div>
+      <% end %>
+    </td>
+  </tr>
+  <% } %>
+<% end } %>
+</table>
+<% if params[:view] != 'names' %>
+  <div class="d-none d-sm-block">
+    <a onclick="$(this).closest('[data-pagelet-url]').attr('data-pagelet-url', '/g/<%= @gathering.slug %>/options?view=names')" href="#" class="pagelet-trigger">Show names instead of pictures</a>
+  </div>
+<% end %>

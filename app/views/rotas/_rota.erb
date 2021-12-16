@@ -1,0 +1,60 @@
+<table class="table table-striped" style="margin-top: 15px">
+  <tr>
+    <td></td>
+    <% rota.roles.order('o asc').each { |role| %>
+    <td>
+      <strong>
+        <% if @membership.admin? %>
+          <a class="pagelet-trigger" data-confirm="Delete this role?" href="/roles/<%= role.id %>/destroy">
+            <%= role.name %>
+          </a>
+        <% else %>
+          <%= role.name %>
+        <% end %>
+      </strong>
+    </td>
+    <% } %>
+    <% if @membership.admin? %>
+      <td>
+        <% form_tag "/roles/create?rota_id=#{rota.id}", class: 'form-inline', style: 'display: inline' do %>
+          <%= text_field_tag :name, class: 'form-control', style: 'width: 10em', placeholder: 'New role' %>
+        <% end %>
+      </td>
+    <% end %>
+  </tr>
+  <% rota.rslots.order('o asc').each { |rslot| %>
+  <tr>
+    <td>
+      <strong>
+        <% if @membership.admin? %>
+          <a class="pagelet-trigger" data-confirm="Delete this slot?" href="/rslots/<%= rslot.id %>/destroy">
+            <%= rslot.name %>
+          </a>
+        <% else %>
+          <%= rslot.name %>
+        <% end %>
+      </strong>
+    </td>
+    <% rota.roles.order('o asc').each { |role| %>
+    <td>
+      <%= partial :'rotas/rota_rslot_role', locals: { rota: rota, rslot: rslot, role: role } %>
+    </td>
+    <% } %>
+    <% if @membership.admin? %>
+      <td></td>
+    <% end %>
+  </tr>
+  <% } %>
+  <% if @membership.admin? %>
+    <tr>
+      <td>
+        <% form_tag "/rslots/create?rota_id=#{rota.id}", class: 'form-inline', style: 'display: inline' do %>
+          <%= text_field_tag :name, class: 'form-control', style: 'width: 10em', placeholder: 'New slot' %>
+        <% end %>
+      </td>
+    </tr>
+  <% end %>
+</table>
+<% if params[:view] != 'names' %>
+  <a onclick="$(this).closest('[data-pagelet-url]').attr('data-pagelet-url', '/g/<%= @gathering.slug %>/rotas/<%= rota.id %>?view=names')" href="#" class="pagelet-trigger">Show names instead of pictures</a>
+<% end %>

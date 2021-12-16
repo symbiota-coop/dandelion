@@ -1,0 +1,26 @@
+<% if @organisation %>
+  <%= partial :'organisations/nav', locals: { organisation: @organisation } %>
+<% elsif @activity %>
+  <%= partial :'activities/nav', locals: { activity: @activity } %>
+<% elsif @local_group %>
+  <%= partial :'local_groups/nav', locals: { local_group: @local_group } %>
+<% elsif @event %>
+  <%= partial :'events/nav', locals: { event: @event } %>
+<% end %>
+<div class="container-fluid">
+  <% form_for @discount_code, @discount_code.new_record? ? '/discount_codes/new' : "/discount_codes/#{@discount_code.id}/edit", multipart: true do |f| %>
+    <% if @organisation %>
+      <%= hidden_field_tag :organisation_id, value: @organisation.id %>
+    <% elsif @activity %>
+      <%= hidden_field_tag :activity_id, value: @activity.id %>
+    <% elsif @local_group %>
+      <%= hidden_field_tag :local_group_id, value: @local_group.id %>
+    <% elsif @event %>
+      <%= hidden_field_tag :event_id, value: @event.id %>
+    <% end %>
+    <%= f.text_block :code %>
+    <%= f.text_block :description %>
+    <%= f.text_block :percentage_discount %>
+    <%= f.submit_block destroy_url: "/discount_codes/#{@discount_code.id}/destroy?#{@scope}" %>
+  <% end %>
+</div>

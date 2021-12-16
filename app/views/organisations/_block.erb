@@ -1,0 +1,7 @@
+<%= partial :block, locals: {
+      title: organisation.name,
+      image: organisation.image,
+      view_url: request.path == '/events' ? "/o/#{organisation.slug}/events" : "/o/#{organisation.slug}",
+      edit_url: "/o/#{organisation.slug}/edit",
+      admin: organisation_admin?(organisation)
+    } %>

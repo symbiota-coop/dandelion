@@ -1,0 +1,62 @@
+<% comment = post.comments.order('created_at asc').first %>
+<% if comment.commentable.is_a?(Gathering) or comment.commentable.respond_to?(:gathering) %>
+  <% comment.read_receipts.create account: current_account %>
+<% end %>
+<div class="card mb-5" id="post-<%= post.id %>">
+  <div class="card-header text-white bg-primary">
+    <h4 class="mb-0"><%= post.subject %></h4>
+  </div>
+  <div class="card-body p-0">
+    <div class="media" style="padding: 10px 10px 0 10px;">
+      <span class="mr-2">
+        <%= partial :'accounts/square', locals: { account: comment.account, width: '32px', klass: 'media-object' } %>
+      </span>
+      <div class="media-body comment" data-comment-id="<%= comment.id %>">
+        <span class="float-right">
+          <% if (subscription = comment.post.subscriptions.find_by(account: current_account)) %>
+            <a title="Email notifications on; click to turn off" class="pagelet-trigger mr-1" href="/subscriptions/<%= subscription.id %>/destroy"><i class="fa fa-eye"></i></a>
+          <% else %>
+            <a style="opacity: 0.3" title="Email notifications off; click to turn on" class="pagelet-trigger mr-1" href="/subscriptions/create?post_id=<%= comment.post_id %>"><i class="fa fa-eye-slash"></i></a>
+          <% end %>
+          <% if comment_admin?(comment) %>
+            <% if !comment.sent_at %>
+              <a title="Send comment" href="/comments/<%= comment.id %>/send"><i class="fa fa-envelope"></i></a>
+            <% end %>
+          <% end %>
+        </span>
+        <strong><a href="/accounts/<%= comment.account_id %>"><%= comment.account.name %></a></strong>
+        <small class="subtle">
+          <a class="text-muted" href="#post-<%= post.id %>"><%= timeago(comment.created_at) %></a>
+          <% if admin? or (current_account && comment.account_id == current_account.id) %>
+            &middot;
+            <%= partial :'comments/edit_button' %>
+          <% end %>
+        </small>
+        <div class="mb-3">
+          <%= partial :'comments/body', locals: { comment: comment } %>
+        </div>
+        <div class="mb-2">
+          <div class="row justify-content-between align-items-center">
+            <div data-pagelet-url="/comments/<%= comment.id %>/reactions" class="col-auto"></div>
+            <% if comment.commentable.is_a?(Gathering) or comment.commentable.respond_to?(:gathering) %>
+              <div data-pagelet-url="/comments/<%= comment.id %>/read_receipts" class="col-auto"></div>
+            <% end %>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div style="background: #e9ecef">
+      <div data-pagelet-url="/posts/<%= post.id %>/replies" data-pusher-channel="post.<%= post.id %>">
+        <%= partial :'comments/replies', locals: { post: post } %>
+      </div>
+      <div class="media" style="padding: 10px 10px 0 10px; margin: 0">
+        <span class="mr-2">
+          <%= partial :'accounts/square', locals: { account: current_account, width: '32px', klass: 'media-object' } %>
+        </span>
+        <div class="media-body">
+          <%= partial :'comments/comment_form', locals: { comment: post.comments.build(commentable_type: post.commentable_type, commentable_id: post.commentable_id), reply: true } %>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

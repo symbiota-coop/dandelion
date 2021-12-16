@@ -1,0 +1,40 @@
+<h2 class="mt-5">Activities</h2>
+<div class="row no-gutters mb-3">
+  <div class="col">
+    <script>
+      $(function () {
+        $('#activities_form').submit(function () {
+          var url = '/o/<%= @organisation.slug %>/activities?' + $.param({q: $('input[name=q]', this).val()})
+          $(this).closest('[data-pagelet-url]').attr('data-pagelet-url', url)
+        })
+      })
+    </script>
+    <% form_tag '', id: 'activities_form', class: 'mx-2 no-submit form-inline' do %>
+      <div class="input-group">
+        <%= text_field_tag :q, class: 'form-control', value: params[:q] %>
+        <div class="input-group-append">
+          <button class="btn btn-primary"><i class="fa fa-search"></i></button>
+        </div>
+      </div>
+    <% end %>
+  </div>
+  <div class="col-auto">
+    <% if organisation_admin? %>
+      <a class="btn btn-primary mr-2" href="/activities/new?organisation_id=<%= @organisation.id %>">Create an activity</a>
+    <% end %>
+  </div>
+</div>
+<% activities = @activities.paginate(page: params[:page], per_page: 16) %>
+<%= partial :'activities/blocks', locals: { activities: activities } %>
+<div class="mt-3">
+  <%= will_paginate activities, inner_window: 0, outer_window: 0, renderer: WillPaginate::ViewHelpers::BootstrapRenderer %>
+</div>
+<% if organisation_admin? %>
+  <% if (hidden_activities = @organisation.activities.inactive.order('name asc')).count > 0 %>
+    <a class="btn btn-secondary" href="javascript:;" onclick="$(this).hide().next().show()">Show <%= pluralize(hidden_activities.count, 'hidden activity') %></a>
+    <div style="display: none">
+      <h3>Hidden activities</h3>
+      <%= partial :'activities/blocks', locals: { activities: hidden_activities } %>
+    </div>
+  <% end %>
+<% end %>

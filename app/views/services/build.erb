@@ -1,0 +1,25 @@
+<% if @service.persisted? %>
+  <%= partial :'services/nav', locals: { service: @service } %>
+<% end %>
+
+<% form_for @service, @service.new_record ? '/services/new' : "/services/#{@service.id}/edit" do |f| %>
+  <%= f.text_block :name %>
+  <%= f.lookup_block :account_id, lookup_url: '/accounts.json', placeholder: 'Search accounts', selected_link: (%(<a class="d-inline-block mt-1" target="_blank" href="/u/#{@service.account.username}">View account</a>) if @service.account_id) %>
+  <%= f.number_block :duration_in_minutes %>
+  <p><strong>Days available</strong></p>
+  <% (Date::DAYNAMES[1..] + Date::DAYNAMES[0..0]).each do |dayname| %>
+    <%= f.check_box_block :"available_#{dayname.downcase}" %>
+  <% end %>
+  <%= f.number_block :start_hour %>
+  <%= f.number_block :end_hour %>
+  <%= f.number_block :price %>
+  <%= f.select_block :currency %>
+  <%= f.wysiwyg_block :description %>
+  <%= f.lookup_block :organisation_id, lookup_url: '/organisations.json', placeholder: 'Search organisations', selected_link: (%(<a class="d-inline-block mt-1" target="_blank" href="/o/#{@service.organisation.slug}">View organisation</a>) if @service.organisation_id) %>
+  <%= f.number_block :organisation_revenue_share %>
+  <%= f.wysiwyg_block :extra_info_for_booking_email %>
+  <%= f.check_box_block :secret %>
+  <%= f.check_box_block :draft %>
+  <%= f.check_box_block :refund_deleted_orders %>
+  <%= f.submit_block destroy_url: "/services/#{@service.id}/destroy" %>
+<% end %>

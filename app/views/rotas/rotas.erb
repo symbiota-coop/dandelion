@@ -1,0 +1,13 @@
+<%= partial :'gatherings/nav', locals: { gathering: @gathering, membership: @membership } %>
+<% if @membership.admin? %>
+  <div style="margin: 10px 0">
+    <a class="btn btn-primary" href="/g/<%= @gathering.slug %>/rotas/new"><i class="fa fa-plus-circle"></i> Create a rota</a>
+  </div>
+<% end %>
+<% @gathering.rotas.each { |rota| %>
+<h2>
+  <a href="/g/<%= @gathering.slug %>/rotas/<%= rota.id %>">
+    <%= rota.name %>
+  </a>
+</h2>
+<% } %>

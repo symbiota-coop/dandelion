@@ -1,0 +1,26 @@
+/* SlimScrollBar Setting */
+
+.slimScrollBar {
+	background: none !important;
+	width: 0.5rem !important;
+	right: 0 !important;
+	@include opacity(0 !important);
+	@include transition(opacity .2s linear);
+}
+.slimScrollDiv .slimScrollBar:hover,
+.slimScrollDiv .slimScrollBar:focus,
+.slimScrollDiv .slimScrollBar:active {
+	width: 0.625rem !important;
+	@include opacity(0.75 !important);
+}
+.slimScrollBar:before {
+	content: '';
+	position: absolute;
+	top: 0.125rem;
+	left: 0;
+	right: 0.125rem;
+	bottom: 0.125rem;
+	background: $color_inverse;
+	@include opacity(0.5);
+	@include border-radius(2.5rem);
+}

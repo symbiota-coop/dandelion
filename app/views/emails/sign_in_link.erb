@@ -1,0 +1,10 @@
+<div class="main">
+  <p>Hi %recipient.firstname%,</p>
+  <p>Someone (hopefully you) requested a sign in link for Dandelion. Visit this link to sign in:</p>
+  <p>
+    <%= ENV['BASE_URI'] %>/?sign_in_token=%recipient.token%
+  </p>
+  <p>Best wishes,<br>
+    The Dandelion team</p>
+</div>
+<div class="footer"></div>
