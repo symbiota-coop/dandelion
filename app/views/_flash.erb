@@ -1,7 +1,7 @@
 <% { error: 'alert-danger', warning: 'alert-warning', notice: 'alert-success' }.each { |k,v| %>
 <% if flash[k] %>
   <div class="alert fade show <%= v %> alert-dismissable">
-    <%= flash[k] %>
+    <%== Sanitize.fragment(flash[k], Sanitize::Config::DANDELION) %>
     <% unless @hide_alert %>
       <button type="button" class="close" data-dismiss="alert" aria-label="Close">
         <span aria-hidden="true">&times;</span>
