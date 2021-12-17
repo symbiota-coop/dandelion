@@ -3,7 +3,7 @@
   <meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" name="viewport">
   <link rel="manifest" href="/manifest.json">
 
-  <% if Padrino.env == :production %>
+  <% if !params[:minimal] && Padrino.env == :production %>
     <script
       type="text/javascript"
       src="https://app.termly.io/embed.min.js"
@@ -11,6 +11,7 @@
       data-website-uuid="e3781b47-56e6-4a03-987b-1ce448a36930"
       ></script>
   <% end %>
+
 
   <%= partial :'layouts/ga' %>
   <%= partial :'layouts/pixel' %>
