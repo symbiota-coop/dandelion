@@ -404,6 +404,10 @@ class Account
     Account.and(:id.in => follows_as_follower.pluck(:followee_id))
   end
 
+  def following_starred
+    Account.and(:id.in => follows_as_follower.where(starred: true).pluck(:followee_id))
+  end
+
   def followers
     Account.and(:id.in => follows_as_followee.pluck(:follower_id))
   end

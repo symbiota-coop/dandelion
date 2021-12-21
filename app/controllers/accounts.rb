@@ -273,7 +273,7 @@ Dandelion::App.controller do
 
   get '/accounts/:id/following' do
     @account = Account.find(params[:id]) || not_found
-    partial :'accounts/following', locals: { accounts: @account.following }
+    partial :'accounts/following', locals: { accounts: @account.following, starred: @account.following_starred }
   end
 
   get '/accounts/:id/places' do
