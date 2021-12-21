@@ -34,7 +34,7 @@
     </li>
     <% if event.event_facilitations.count > 0 %>
     <li>
-      <i data-toggle="tooltip" title="Facilitators" class="fa fa-li fa-users"></i>
+      <div class="mt-2">
       <%= partial :'accounts/add', locals: {
             role: 'event facilitator',
             accounts: event.event_facilitators.order('name asc'),
@@ -43,7 +43,7 @@
             new_url: "/events/#{event.id}/event_facilitations/new",
             destroy_url: "/events/#{event.id}/event_facilitations/destroy"
           } %>
-
+        </div>
     </li>
     <% end %>
   </ul>
