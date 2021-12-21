@@ -36,6 +36,15 @@
       <a href="/u/<%= event.coordinator.username %>"><%= event.coordinator.name %></a>
     <% end %>
   </td>
+  <td style="text-align: center">
+    <% if event.event_facilitations.count > 0 %>
+      <% event.event_facilitations.each { |event_facilitation| %>
+          <%= partial :'accounts/square', locals: { account: event_facilitation.account, width: '50px' } %>
+          <br>
+          <a href="/u/<%= event_facilitation.account.username %>"><%= event_facilitation.account.name %></a>
+        <% } %>
+    <% end %>
+  </td>
   <td>
     <%= partial :'events/tag_labels', locals: { event: event } %>
   </td>
