@@ -14,9 +14,9 @@ GIT
 
 GIT
   remote: https://github.com/stephenreid321/activate-admin.git
-  revision: f7fe39993c6a3b97cec463c8316329d238d98e33
+  revision: 289fa820ba84f2f7b6a860912a6b2e02b2da5bc6
   specs:
-    activate-admin (0.0.8)
+    activate-admin (0.0.9)
       activate-tools
       padrino
       will_paginate
@@ -94,8 +94,8 @@ GEM
       faraday (~> 0.10)
     concurrent-ruby (1.1.9)
     connection_pool (2.2.5)
-    countries (4.1.1)
-      i18n_data (~> 0.13.1)
+    countries (4.1.2)
+      i18n_data (~> 0.15.0)
       sixarm_ruby_unaccent (~> 1.1)
     crass (1.0.6)
     css_parser (1.11.0)
@@ -194,7 +194,8 @@ GEM
     httpclient (2.8.3)
     i18n (1.8.11)
       concurrent-ruby (~> 1.0)
-    i18n_data (0.13.1)
+    i18n_data (0.15.0)
+      simple_po_parser (~> 1.1)
     incoming (0.2.0)
       mail (~> 2.4)
       rack
@@ -408,6 +409,7 @@ GEM
       faraday (>= 0.17.3, < 2.0)
       jwt (>= 1.5, < 3.0)
       multi_json (~> 1.10)
+    simple_po_parser (1.1.5)
     simpleidn (0.2.1)
       unf (~> 0.1.4)
     sinatra (2.1.0)
