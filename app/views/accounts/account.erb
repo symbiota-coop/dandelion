@@ -11,8 +11,8 @@
     <%= partial :'comments/commentable', locals: { commentable: @account } %>
   </div>
 <% end %>
-<% if (events = Event.and(:id.in => @account.event_facilitations.pluck(:event_id)).live.public.future_and_current_featured).count > 0 %>
-  <h2>Upcoming events</h2>
+<% if (events = Event.and(:id.in => EventFacilitation.where(:account_id.in => [@account.id] + @account.following_starred.pluck(:id)).pluck(:event_id)).live.public.future_and_current_featured).count > 0 %>
+  <h2>Upcoming events <% if @account.following_starred.count > 0 %>featuring <%=@account.firstname%> and his stars<% end %></h2>
   <%= partial :'events/blocks', locals: { events: events } %>
 <% end %>
 <% if @account.event_feedbacks_as_facilitator.count > 0 %>
