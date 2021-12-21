@@ -32,4 +32,18 @@
         <a target="_blank" href="https://www.google.co.uk/maps?q=<%= event.location %>"><%= event.location %></a>
       <% end %>
     </li>
+    <% if event.event_facilitations.count > 0 %>
+    <li>
+      <div class="mt-2">
+      <%= partial :'accounts/add', locals: {
+            role: 'event facilitator',
+            accounts: event.event_facilitators.order('name asc'),
+            add_and_remove: false,
+            new_object: EventFacilitation.new,
+            new_url: "/events/#{event.id}/event_facilitations/new",
+            destroy_url: "/events/#{event.id}/event_facilitations/destroy"
+          } %>
+        </div>
+    </li>
+    <% end %>
   </ul>
