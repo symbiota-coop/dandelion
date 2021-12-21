@@ -15,18 +15,21 @@
   <%= partial :'events/tag_labels', locals: { event: event } %>
 </div>
 <ul style="margin-left: 1.66em; font-size: 1rem" class="fa-ul text-dark">
-  <% unless @organisation %>
+
     <li>
       <i data-toggle="tooltip" title="Host/facilitators" class="fa fa-li fa-flag"></i>
       <% if event.event_facilitations.count > 0 %>
         <%== event.event_facilitations.map { |event_facilitation|
           %(<a class="text-dark" href="/u/#{event_facilitation.account.username}">#{Sanitize.fragment(event_facilitation.account.name)}</a>)
         }.to_sentence %>
-        in collaboration with
+        <% unless @organisation %>
+          in collaboration with
+        <% end %>
       <% end %>
+    <% unless @organisation %>
       <% organisations = []; organisations << %(<a class="text-dark" href="/o/#{Sanitize.fragment(event.organisation.slug)}">#{Sanitize.fragment(event.organisation.name)}</a>) %>
       <% event.cohosts.each { |organisation| organisations << %(<a class="text-dark" href="/o/#{Sanitize.fragment(organisation.slug)}">#{Sanitize.fragment(organisation.name)}</a></li>) } %>
-      <%== organisations.join(', ') %>
+      <%== organisations.to_sentence %>
     <% end %>
     <li><i data-toggle="tooltip" title="Dates/times" class="fa fa-li fa-calendar"></i><%= when_details(event) %></li>
     <li><i data-toggle="tooltip" title="Location" class="fa fa-li fa-map-marker"></i>
