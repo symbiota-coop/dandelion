@@ -6,7 +6,7 @@
     <%= partial :'accounts/square', locals: { account: account, width: '100%' } %>
     <div class="my-1 ml-1" style="position: absolute; bottom: 0; left: 0;">
       <% if account.facebook_profile_url %>
-        <%= %(<a class="btn btn-outline-primary btn-sm" href="#{account.facebook_profile_url}" target="_blank"><i class="fa fa-facebook-official"></i></a>) %>
+        <a class="btn btn-outline-primary btn-sm" href="<%=account.facebook_profile_url%>" target="_blank"><i class="fa fa-facebook-official"></i></a>
       <% end %>
     </div>
     <div class="my-1 mr-1" style="position: absolute; bottom: 0; right: 0;">
