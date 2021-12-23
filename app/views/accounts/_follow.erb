@@ -32,8 +32,8 @@
       </div>
     <% end %>
     <% if %w{follow_without_subscribing follow_and_subscribe}.include?(current_state) %>
-      <div class="d-block d-sm-inline-block mt-1 mt-sm-0" data-pagelet-url="/follow/starred/<%= follow.id %>">
-        <%= partial :'accounts/star', locals: { follow: follow } %>
+      <div class="d-block d-sm-inline-block mt-1 mt-sm-0" data-pagelet-url="/follow/starred/<%= follow.id %>?btn_class=<%= btn_class if defined?(btn_class) %>">
+        <%= partial :'accounts/star', locals: { follow: follow, btn_class: (btn_class if defined?(btn_class)) } %>
       </div>
     <% end %>
   <% end %>

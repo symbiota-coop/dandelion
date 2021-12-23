@@ -27,7 +27,7 @@ Dandelion::App.controller do
   get '/follow/starred/:id' do
     sign_in_required!
     follow = current_account.follows_as_follower.find(params[:id])
-    partial :'accounts/star', locals: { follow: follow }
+    partial :'accounts/star', locals: { follow: follow, btn_class: params[:btn_class] }
   end
 
   get '/follow/star/:id' do
