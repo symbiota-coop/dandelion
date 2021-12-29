@@ -16,7 +16,7 @@ Dandelion::App.controller do
 
     if event['type'] == 'checkout.session.completed'
       session = event['data']['object']
-      if (payment_attempt = PaymentAttempt.find_by(session_id: session.id))
+      if (payment_attempt = @gathering.payment_attempts.find_by(session_id: session.id))
         begin
           Payment.create!(payment_attempt: payment_attempt)
         rescue StandardError => e
@@ -43,7 +43,7 @@ Dandelion::App.controller do
       halt 400
     end
 
-    if event.type == 'charge:confirmed' && event.data.respond_to?(:checkout) && (payment_attempt = PaymentAttempt.find_by(coinbase_checkout_id: event.data.checkout.id))
+    if event.type == 'charge:confirmed' && event.data.respond_to?(:checkout) && (payment_attempt = @gathering.payment_attempts.find_by(coinbase_checkout_id: event.data.checkout.id))
       Payment.create!(payment_attempt: payment_attempt)
     end
     halt 200

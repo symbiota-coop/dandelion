@@ -15,13 +15,13 @@ Dandelion::App.controller do
 
     if event['type'] == 'checkout.session.completed'
       session = event['data']['object']
-      if (@order = Order.find_by(:session_id => session.id, :payment_completed.ne => true))
+      if (@order = @organisation.orders.find_by(:session_id => session.id, :payment_completed.ne => true))
         @order.set(payment_completed: true)
         @order.update_destination_payment
         @order.send_tickets
         @order.create_order_notification
         halt 200
-      elsif (@order = Order.deleted.find_by(:session_id => session.id, :payment_completed.ne => true))
+      elsif (@order = @organisation.orders.deleted.find_by(:session_id => session.id, :payment_completed.ne => true))
         begin
           @order.restore_and_complete
           # raise Order::Restored
@@ -29,7 +29,7 @@ Dandelion::App.controller do
           Airbrake.notify(e, event: event)
           halt 200
         end
-      elsif (@booking = Booking.find_by(:session_id => session.id, :payment_completed.ne => true))
+      elsif (@booking = @organisation.bookings.find_by(:session_id => session.id, :payment_completed.ne => true))
         @booking.set(payment_completed: true)
         @booking.send_confirmation_email
         halt 200
@@ -72,7 +72,7 @@ Dandelion::App.controller do
     end
 
     if event.type == 'charge:confirmed' && event.data.respond_to?(:checkout)
-      if (@order = Order.find_by(coinbase_checkout_id: event.data.checkout.id))
+      if (@order = @organisation.orders.find_by(coinbase_checkout_id: event.data.checkout.id))
         @order.set(payment_completed: true)
         @order.send_tickets
         @order.create_order_notification
