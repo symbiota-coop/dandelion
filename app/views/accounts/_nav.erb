@@ -1,4 +1,6 @@
 <ul class="nav nav-tabs mb-3" role="tablist">
   <li role="presentation" class="nav-item"><a class="nav-link <%= 'active' if request.path == '/accounts/edit' %>" href="/accounts/edit">Edit profile</a></li>
   <li role="presentation" class="nav-item"><a class="nav-link <%= 'active' if request.path == '/accounts/subscriptions' %>" href="/accounts/subscriptions">Subscriptions</a></li>
+  <li role="presentation" class="nav-item"><a class="nav-link <%= 'active' if request.path == '/accounts/calendars' %>" href="/accounts/calendars">Linked calendars</a></li>  
+  <li role="presentation" class="nav-item"><a class="nav-link <%= 'active' if request.path == '/accounts/delete' %>" href="/accounts/delete">Delete account</a></li>
 </ul>

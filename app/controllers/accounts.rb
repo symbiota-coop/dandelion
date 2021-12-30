@@ -176,6 +176,18 @@ Dandelion::App.controller do
     erb :'accounts/subscriptions'
   end
 
+  get '/accounts/calendars' do
+    sign_in_required!
+    @account = current_account
+    erb :'accounts/calendars'
+  end
+
+  get '/accounts/delete' do
+    sign_in_required!
+    @account = current_account
+    erb :'accounts/delete'
+  end
+
   post '/accounts/subscriptions' do
     sign_in_required!
     @account = current_account
@@ -345,7 +357,7 @@ Dandelion::App.controller do
       session.clear
       redirect '/'
     else
-      flash[:notice] = "The email you typed didn't match the email on this account"
+      flash[:error] = "The email you typed didn't match the email on this account"
       redirect back
     end
   end
@@ -370,12 +382,12 @@ Dandelion::App.controller do
   post '/calendars/add' do
     sign_in_required!
     current_account.calendars.create(url: params[:url])
-    redirect '/accounts/edit#calendars'
+    redirect back
   end
 
   get '/calendars/:id/destroy' do
     sign_in_required!
     current_account.calendars.find(params[:id]).try(:destroy)
-    redirect '/accounts/edit#calendars'
+    redirect back
   end
 end

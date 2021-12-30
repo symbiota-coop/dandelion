@@ -1,0 +1,14 @@
+<%= partial :'accounts/nav' %>
+
+<% form_tag '/calendars/add', class: 'form-inline' do %>
+  <%= url_field_tag :url, class: 'form-control mr-1', placeholder: 'iCal URL' %>
+  <%= submit_tag 'Add', class: 'btn btn-primary' %>
+<% end %>
+<table class="table table-borderless mt-3">
+  <% @account.calendars.each { |calendar| %>
+  <tr>
+    <td><a href="<%= calendar.url %>"><%= calendar.url %></a></td>
+    <td><a data-confirm="Are you sure you want to unlink this calendar?" class="btn btn-danger" href="/calendars/<%= calendar.id %>/destroy"><i class="fa fa-times"></i></a></td>
+  </tr>
+  <% } %>
+</table>
