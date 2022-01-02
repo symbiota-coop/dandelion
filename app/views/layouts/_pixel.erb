@@ -31,7 +31,7 @@
     fbq('track', 'PageView');
 
       <% if @pixel_purchase %>
-      fbq('track', 'Purchase', <%== @pixel_purchase.to_json %>);
+      fbq('track', 'Purchase', <%== @pixel_purchase.to_json %>, {eventID: '<%= @order.id%>'});
       <% end %>
   </script>
   <!-- End Facebook Pixel Code -->
