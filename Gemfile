@@ -75,7 +75,7 @@ gem 'timezone'
 
 # Geography
 gem 'countries'
-gem 'geocoder'
+gem 'geocoder', '1.7.0'
 
 # Formatting
 gem 'addressable'
