@@ -3,7 +3,7 @@
 <% if @event %>
   <div class="row justify-content-between">
     <div class="col">
-      <p><%== page_entries_info orders, model: 'Order' %></p>
+      <p><%== pagination_details orders, model: 'Order' %></p>
     </div>
     <div class="col-auto">
       <a class="btn btn-primary" href="/events/<%= @event.id %>/orders.csv"><i class="fa fa-download"></i> CSV</a>
@@ -11,7 +11,7 @@
     </div>
   </div>
 <% else %>
-  <p><%== page_entries_info orders, model: 'Order' %></p>
+  <p><%== pagination_details orders, model: 'Order' %></p>
 <% end %>
 <script>
   $(function () {

@@ -15,7 +15,7 @@
 <% v = event_email_viewer?
    @waitships = @waitships.order('created_at desc')
    @waitships = @waitships.paginate(page: params[:page], per_page: 50) %>
-<p><%== page_entries_info @waitships, model: 'Person' %></p>
+<p><%== pagination_details @waitships, model: 'Person' %></p>
 <table class="table">
   <thead>
     <tr>

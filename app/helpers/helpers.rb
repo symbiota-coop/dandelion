@@ -11,6 +11,21 @@ Dandelion::App.helpers do
     whenable.send(:when_details, current_account ? current_account.time_zone : session[:time_zone])
   end
 
+  def pagination_details(collection, model: nil)
+    if collection.total_pages < 2
+      case collection.to_a.length
+      when 0
+        "No #{model.pluralize.downcase} found"
+      when 1
+        "Displaying <b>1</b> #{model.downcase}"
+      else
+        "Displaying <b>all #{collection.count}</b> #{model.pluralize.downcase}"
+      end
+    else
+      "Displaying #{model.pluralize.downcase} <b>#{collection.offset + 1} - #{collection.offset + collection.to_a.length}</b> of <b>#{collection.count}</b> in total"
+    end
+  end
+
   def partial(*args)
     if admin?
       t1 = Time.now

@@ -36,7 +36,7 @@
   <% end %>
 </div>
 <% organisationships = @organisationships.paginate(page: params[:page], per_page: 25) %>
-<p><%== page_entries_info organisationships, model: 'Person' %></p>
+<p><%== pagination_details organisationships, model: 'Person' %></p>
 <div class="table-responsive">
   <table class="table">
     <thead>

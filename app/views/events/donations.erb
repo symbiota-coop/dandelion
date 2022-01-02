@@ -18,7 +18,7 @@
 </p>
 <% @donations = @donations.order('created_at desc')
    @donations = @donations.paginate(page: params[:page], per_page: 50) %>
-<p><%== page_entries_info @donations, model: 'Donation' %></p>
+<p><%== pagination_details @donations, model: 'Donation' %></p>
 <table class="table">
   <thead>
     <tr>

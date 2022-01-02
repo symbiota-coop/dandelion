@@ -62,7 +62,7 @@
 </div>
 
 <% @activity_applications = @activity_applications.paginate(page: params[:page], per_page: 25) %>
-<p><%== page_entries_info @activity_applications, model: 'Application' %></p>
+<p><%== pagination_details @activity_applications, model: 'Application' %></p>
 
 <table class="table">
   <thead>

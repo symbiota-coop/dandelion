@@ -3,7 +3,7 @@
 <% if @service %>
   <div class="row justify-content-between">
     <div class="col">
-      <p><%== page_entries_info bookings, model: 'Booking' %></p>
+      <p><%== pagination_details bookings, model: 'Booking' %></p>
     </div>
     <div class="col-auto">
       <a class="btn btn-primary" href="/services/<%= @service.id %>/bookings.csv"><i class="fa fa-download"></i> CSV</a>
@@ -11,7 +11,7 @@
     </div>
   </div>
 <% else %>
-  <p><%== page_entries_info bookings, model: 'Booking' %></p>
+  <p><%== pagination_details bookings, model: 'Booking' %></p>
 <% end %>
 <script>
   $(function () {

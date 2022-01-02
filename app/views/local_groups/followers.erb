@@ -29,7 +29,7 @@
     <%= file_field_tag :csv, onchange: '$(this.form).submit()' %>
   <% end %>
 </div>
-<p><%== page_entries_info @local_groupships, model: 'Person' %></p>
+<p><%== pagination_details @local_groupships, model: 'Person' %></p>
 <table class="table">
   <thead>
     <tr>

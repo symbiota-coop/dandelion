@@ -1,6 +1,6 @@
 <% if !current_account || current_account.organisationships.count == 0 %>
   <h1>Organisations</h1>
-  <p><%== page_entries_info @organisations, model: 'Organisation' %></p>
+  <p><%== pagination_details @organisations, model: 'Organisation' %></p>
 <% end %>
 <% if current_account %>
   <a class="btn btn-primary mt-1 mt-sm-0 mb-3" href="/o/new"><i class="fa fa-plus-circle"></i> Create an organisation</a>
