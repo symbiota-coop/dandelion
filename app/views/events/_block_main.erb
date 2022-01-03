@@ -15,11 +15,11 @@
   <%= partial :'events/tag_labels', locals: { event: event } %>
 </div>
 <ul style="margin-left: 1.66em; font-size: 1rem" class="fa-ul text-dark">
-  <% if event.event_facilitations.count > 0 || !@organisation %>
+  <% if (ef = event.event_facilitations.select { |event_facilitation| event_facilitation.account.lastname }).count > 0 || !@organisation %>
     <li>
       <i data-toggle="tooltip" title="Host/facilitators" class="fa fa-li fa-flag"></i>
-      <% if event.event_facilitations.count > 0 %>
-        <%== event.event_facilitations.map { |event_facilitation|
+      <% if ef.count > 0 %>
+        <%== ef.map { |event_facilitation|
           %(<a target="_parent" class="text-dark" href="/u/#{event_facilitation.account.username}">#{Sanitize.fragment(event_facilitation.account.name)}</a>)
         }.to_sentence %>
         <% unless @organisation %>
