@@ -72,7 +72,7 @@ namespace :events do
   end
 
   task send_reminders: :environment do
-    Event.and(:start_time.gte => Date.tomorrow, :end_time.lt => Date.tomorrow + 1).each do |event|
+    Event.and(:start_time.gte => Date.tomorrow, :start_time.lt => Date.tomorrow + 1).each do |event|
       event.send_reminders
     end
   end
