@@ -33,14 +33,16 @@ class Gathering
   field :seeds_username, type: String
 
   def self.enablable
-    %w[teams timetables rotas contributions inventory budget comments_on_gathering_homepage]
+    %w[teams timetables rotas contributions inventory budget]
   end
   enablable.each do |x|
-    field :"enable_#{x}", type: Boolean; index({ "enable_#{x}" => 1 })
+    field :"enable_#{x}", type: Boolean
+    index({ "enable_#{x}" => 1 })
   end
 
-  %w[enable_supporters anonymise_supporters democratic_threshold require_reason_proposer require_reason_supporter demand_payment hide_members_on_application_form hide_invitations ask_for_facebook_profile_url listed].each do |b|
-    field b.to_sym, type: Boolean; index({ b.to_s => 1 })
+  %w[enable_comments_on_gathering_homepage enable_supporters anonymise_supporters democratic_threshold require_reason_proposer require_reason_supporter demand_payment hide_members_on_application_form hide_invitations ask_for_facebook_profile_url listed].each do |b|
+    field b.to_sym, type: Boolean
+    index({ b.to_s => 1 })
   end
 
   def self.admin_fields
