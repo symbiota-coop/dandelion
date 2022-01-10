@@ -44,7 +44,7 @@
       <a href="javascript:;" onclick="$('#modal .modal-content').load('/g/<%= @gathering.slug %>/options/<%= option.id %>', function () {
                   $('#modal').modal('show')
                 });">
-        <%= option.optionships.count %>/<%== option.capacity.to_s || '&infin;' %>
+        <%= option.optionships.count %>/<%== (option.capacity || '&infin;').to_s %>
       </a>
       <% if option.capacity %>
         <% if option.full? %>
