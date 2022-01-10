@@ -149,6 +149,8 @@ Dandelion::App.controller do
         flash[:error] = "There's already an account registered under that email address. You can request a sign in link below."
         redirect '/accounts/sign_in_link'
       end
+    elsif params[:recaptcha_skip_secret]
+      400
     else
       flash.now[:error] = '<strong>Oops.</strong> Some errors prevented the account from being saved.'
       erb :'accounts/new'
