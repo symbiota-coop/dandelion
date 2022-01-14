@@ -3,9 +3,13 @@ Sanitize::Config::DANDELION = Sanitize::Config.merge(Sanitize::Config::RELAXED,
                                                      attributes: Sanitize::Config::RELAXED[:attributes].merge(
                                                        {
                                                          :all => ['class'],
-                                                         'oembed' => ['url']
+                                                         'oembed' => ['url'],
+                                                         'figure' => ['style']
                                                        }
                                                      ),
+                                                     css: {
+                                                       'properties' => ['width']
+                                                     },
                                                      protocols: Sanitize::Config::RELAXED[:protocols].merge(
                                                        {
                                                          'oembed' => { 'url' => %w[http https] }
