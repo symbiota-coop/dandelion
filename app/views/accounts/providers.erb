@@ -4,7 +4,6 @@
 <div class="row align-items-center">
   <div class="col-auto">
     <%= provider.display_name %>
-    <i class="<%= provider.icon %>"></i>
   </div>
   <div class="col">
     <% if (provider_link = @account.provider_links.select { |provider_link| provider_link.provider == provider.display_name }[0]) %>
@@ -16,7 +15,7 @@
         <a class="btn btn-danger mb-1" href="/accounts/disconnect/<%= provider.omniauth_name %>">Disconnect</a>
       <% end %>
     <% else %>
-      <a class="btn btn-primary mb-1" href="/auth/<%= provider.omniauth_name %>">Connect</a>
+      <a class="btn btn-primary mb-1" href="/auth/<%= provider.omniauth_name %>">Connect <i class="<%= provider.icon %>"></i></a>
     <% end %>
   </div>
 </div>
