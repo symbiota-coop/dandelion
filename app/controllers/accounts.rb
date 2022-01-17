@@ -184,6 +184,12 @@ Dandelion::App.controller do
     erb :'accounts/calendars'
   end
 
+  get '/accounts/providers' do
+    sign_in_required!
+    @account = current_account
+    erb :'accounts/providers'
+  end
+
   get '/accounts/delete' do
     sign_in_required!
     @account = current_account
@@ -336,7 +342,7 @@ Dandelion::App.controller do
     @account = current_account
     if @account.provider_links.find_by(provider: @provider.display_name).destroy
       flash[:notice] = "<i class=\"#{@provider.icon}\"></i> Disconnected!"
-      redirect '/accounts/edit'
+      redirect '/accounts/providers'
     else
       flash.now[:error] = "<strong>Oops.</strong> The disconnect wasn't successful."
       erb :'accounts/edit'

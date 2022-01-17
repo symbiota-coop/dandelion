@@ -1,6 +1,9 @@
 <ul class="nav nav-tabs mb-3" role="tablist">
   <li role="presentation" class="nav-item"><a class="nav-link <%= 'active' if request.path == '/accounts/edit' %>" href="/accounts/edit">Edit profile</a></li>
   <li role="presentation" class="nav-item"><a class="nav-link <%= 'active' if request.path == '/accounts/subscriptions' %>" href="/accounts/subscriptions">Subscriptions</a></li>
+  <% if Provider.all.count > 0 %>
+    <li role="presentation" class="nav-item"><a class="nav-link <%= 'active' if request.path == '/accounts/providers' %>" href="/accounts/providers">Sign in with other services</a></li>
+  <% end %>
   <% if !current_account.services.empty? %>
     <li role="presentation" class="nav-item"><a class="nav-link <%= 'active' if request.path == '/accounts/calendars' %>" href="/accounts/calendars">Linked calendars</a></li>
   <% end %>

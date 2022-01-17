@@ -25,7 +25,7 @@ Dandelion::App.controller do
             flash[:error] = 'There was an error connecting the account'
           end
         end
-        redirect '/accounts/edit'
+        redirect '/accounts/providers'
       elsif account # not signed in
         account.sign_ins.create(env: env_yaml)
         session[:account_id] = account.id.to_s

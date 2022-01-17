@@ -133,32 +133,4 @@
   })
 </script>
 
-<% if %w{organisation activity local_group event}.all? { |r| !instance_variable_get("@#{r}") } %>
-
-  <% if Provider.all.count > 0 %>
-    <h2 class="mt-5">Sign in with other services</h2>
-    <table class="table table-borderless mt-3">
-      <% Provider.all.each { |provider| %>
-      <tr>
-        <td><%= provider.display_name %></td>
-        <td>
-          <% if (provider_link = @account.provider_links.select { |provider_link| provider_link.provider == provider.display_name }[0]) %>
-            <a target="_blank" href="<%= provider.profile_url.call(provider_link.omniauth_hash) %>"><%= provider.nickname.call(provider_link.omniauth_hash) %></a>
-            <br>
-            <% if current_account %>
-              <a class="btn btn-secondary mb-1" href="/accounts/disconnect/<%= provider.omniauth_name %>">Disconnect</a>
-            <% end %>
-          <% else %>
-            <span>Not connected</span>
-            <br>
-            <a class="btn btn-secondary mb-1" href="/auth/<%= provider.omniauth_name %>">Connect</a>
-          <% end %>
-        </td>
-      </tr>
-      <% } %>
-    </table>
-  <% end %>
-
-  <p class="mt-3 text-sm-right">Your account ID: <%= @account.id %></p>
-
-<% end %>
+<p class="mt-3 text-sm-right">Your account ID: <%= @account.id %></p>
