@@ -36,7 +36,7 @@ Dandelion::App.controller do
           redirect '/'
         end
       else
-        flash.now[:notice] = "<i class=\"#{@provider.icon}\"></i> We need a few more details to finish creating your account&hellip;"
+        flash.now[:notice] = "<i class=\"#{@provider.icon}\"></i> There's no account connected to that address. Let's create one for you!"
         session['omniauth.auth'] = env['omniauth.auth']
         @account = Account.new
         @account.name = env['omniauth.auth']['info']['name']
