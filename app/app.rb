@@ -16,8 +16,7 @@ module Dandelion
     use Dragonfly::Middleware
     use OmniAuth::Builder do
       provider :account
-      provider :facebook, ENV['FACEBOOK_KEY'], ENV['FACEBOOK_SECRET']
-      provider :twitter, ENV['TWITTER_KEY'], ENV['TWITTER_SECRET'], { image_size: 'original' }
+      provider :ethereum
     end
     use Rack::Cors do
       allow do

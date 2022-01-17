@@ -13,16 +13,8 @@ class Provider
     @@all << self
   end
 
-  def registered?
-    ENV["#{display_name.upcase}_KEY"] && ENV["#{display_name.upcase}_SECRET"]
-  end
-
   def self.all
     @@all
-  end
-
-  def self.registered
-    all.select { |provider| provider.registered? }
   end
 
   def self.object(omniauth_name)
@@ -30,5 +22,4 @@ class Provider
   end
 end
 
-Provider.new('Twitter',  icon: 'twitter')
-Provider.new('Facebook', icon: 'facebook-square', nickname: ->(hash) { hash['info']['name'] }, image: ->(hash) { "#{hash['info']['image']}#{hash['info']['image'].include?('?') ? '&' : '?'}type=large" }, profile_url: ->(hash) { "https://facebook.com/#{hash['uid']}" })
+Provider.new('Ethereum', icon: 'fab fa-ethereum')

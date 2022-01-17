@@ -135,10 +135,10 @@
 
 <% if %w{organisation activity local_group event}.all? { |r| !instance_variable_get("@#{r}") } %>
 
-  <% if Provider.registered.count > 0 %>
+  <% if Provider.all.count > 0 %>
     <h2 class="mt-5">Sign in with other services</h2>
     <table class="table table-borderless mt-3">
-      <% Provider.registered.each { |provider| %>
+      <% Provider.all.each { |provider| %>
       <tr>
         <td><%= provider.display_name %></td>
         <td>

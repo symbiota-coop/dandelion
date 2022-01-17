@@ -3,9 +3,9 @@
     <div class="mb-3">
       <a href="/accounts/sign_in">Already a member? Sign in</a>
     </div>
-    <% if !Provider.registered.empty? %>
-      <% Provider.registered.each { |provider| %>
-      <a class="btn btn-primary mb-1" href="/auth/<%= provider.omniauth_name %>"><i class="fa fa-<%= provider.icon %>"></i> Sign up via <%= provider.display_name %></a>
+    <% if !Provider.all.empty? %>
+      <% Provider.all.each { |provider| %>
+      <a class="btn btn-primary mb-1" href="/auth/<%= provider.omniauth_name %>"><i class="<%= provider.icon %>"></i> Sign up via <%= provider.display_name %></a>
       <% } %>
     <% end %>
   </div>

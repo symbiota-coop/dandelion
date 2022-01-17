@@ -457,7 +457,7 @@ class Event
     content = ERB.new(File.read(Padrino.root('app/views/emails/feedback.erb'))).result(binding)
     batch_message.from 'Dandelion <feedback@dandelion.earth>'
     batch_message.reply_to event.organisation.reply_to if event.organisation.reply_to
-    batch_message.subject "Feedback on #{event.name}?"
+    batch_message.subject "Feedback on #{event.name}"
     batch_message.body_html Premailer.new(ERB.new(File.read(Padrino.root('app/views/layouts/email.erb'))).result(binding), with_html_string: true, adapter: 'nokogiri', input_encoding: 'UTF-8').to_inline_css
 
     (account_id ? attendees.and(:unsubscribed.ne => true).and(:unsubscribed_feedback.ne => true).and(id: account_id) : attendees.and(:unsubscribed.ne => true).and(:unsubscribed_feedback.ne => true)).each do |account|

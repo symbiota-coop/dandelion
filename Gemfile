@@ -23,8 +23,7 @@ gem 'mongoid_paranoia'
 # Authentication
 gem 'bcrypt'
 gem 'omniauth'
-gem 'omniauth-facebook'
-gem 'omniauth-twitter'
+gem 'omniauth-ethereum', github: 'stephenreid321/omniauth-ethereum.rb'
 gem 'strong_password'
 
 # Validation and testing

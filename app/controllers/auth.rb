@@ -20,7 +20,7 @@ Dandelion::App.controller do
           current_account.provider_links.build(provider: @provider.display_name, provider_uid: env['omniauth.auth']['uid'], omniauth_hash: env['omniauth.auth'])
           # current_account.picture_url = @provider.image.call(env['omniauth.auth']) unless current_account.picture
           if current_account.save
-            flash[:notice] = "<i class=\"fa fa-#{@provider.icon}\"></i> Connected!"
+            flash[:notice] = "<i class=\"#{@provider.icon}\"></i> Connected!"
           else
             flash[:error] = 'There was an error connecting the account'
           end
@@ -36,7 +36,7 @@ Dandelion::App.controller do
           redirect '/'
         end
       else
-        flash.now[:notice] = "<i class=\"fa fa-#{@provider.icon}\"></i> We need a few more details to finish creating your account&hellip;"
+        flash.now[:notice] = "<i class=\"#{@provider.icon}\"></i> We need a few more details to finish creating your account&hellip;"
         session['omniauth.auth'] = env['omniauth.auth']
         @account = Account.new
         @account.name = env['omniauth.auth']['info']['name']
