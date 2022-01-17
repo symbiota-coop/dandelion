@@ -44,6 +44,16 @@
       </div>
     </div>
 
+    <% unless (provider_link = current_account.provider_links.find_by(provider: 'Ethereum')) %>
+    <div class="card mb-3">
+      <h3 class="card-header bg-primary text-white">Connect wallet</h3>
+      <div class="card-body">
+        <p>Connect your <a href="https://metamask.io/">wallet</a> to sign in with Ethereum</p>
+        <a class="btn btn-primary" href="/auth/ethereum">Connect <i class="fab fa-ethereum"></i></a>
+      </div>
+    </div>
+    <% end %>
+
     <div class="card mb-3">
       <h3 class="card-header bg-primary text-white">Special offers from partners</h3>
       <div class="card-body">
