@@ -2,5 +2,6 @@
       ['View profile', "/u/#{current_account.username}"],
       ['Edit profile', '/accounts/edit'],
       ['Subscriptions', '/accounts/subscriptions'],
+      (['Connect <i class="fab fa-ethereum"></i>', '/accounts/providers'] unless current_account.provider_links.find_by(provider: 'Ethereum')),
       ['Sign out', '/accounts/sign_out']
     ].compact, ul_class: ul_class, li_class: '', a_class: '' %>
