@@ -79,7 +79,7 @@ Dandelion::App.controller do
     sign_in_required!
     @organisation = current_account.organisations.build(params[:organisation])
     if @organisation.save
-      redirect "/o/#{@organisation.slug}/edit"
+      redirect "/o/#{@organisation.slug}/edit?tab=2"
     else
       flash.now[:error] = 'There was an error saving the organisation.'
       erb :'organisations/build'

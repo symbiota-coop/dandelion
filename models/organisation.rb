@@ -116,7 +116,7 @@ class Organisation
   has_many :discount_codes, class_name: 'DiscountCode', as: :codeable, dependent: :destroy
 
   def self.currencies
-    [''] + CURRENCIES
+    CURRENCIES
   end
 
   def banned_emails_a

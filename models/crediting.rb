@@ -21,6 +21,6 @@ class Crediting
   validates_presence_of :amount, :currency
 
   def self.currencies
-    [''] + CURRENCIES
+    CURRENCIES
   end
 end

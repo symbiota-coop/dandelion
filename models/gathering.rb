@@ -154,7 +154,7 @@ class Gathering
     self
   end
 
-  validates_presence_of :name, :slug
+  validates_presence_of :name, :slug, :currency
   validates_uniqueness_of :slug
   validates_format_of :slug, with: /\A[a-z0-9\-]+\z/
 
