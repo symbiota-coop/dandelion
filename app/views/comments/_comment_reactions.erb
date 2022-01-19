@@ -29,8 +29,8 @@
   <a data-toggle="tooltip" style="text-decoration: none; background: white" <% if comment_reactions.find_by(account: current_account) %> class="pagelet-trigger border-primary <%= c %>" href="/comments/<%= comment.id %>/unreact" onclick="$(this).tooltip('hide')" <% else %> class="<%= c %> border-light" <% end %>>
     <%= body == '❤' ? '❤️' : body %> <%= comment_reactions.count %>
   </a>
-  <span style="display: none">
-    <%= comment_reactions.map { |comment_reaction| comment_reaction.account.name }.join('<br />') %>
-  </span>
-  <% } %>
-<% end %>
+    <span style="display: none">
+      <%= comment_reactions.map { |comment_reaction| comment_reaction.account.name }.join('<br />') %>
+    </span>
+    <% } %>
+  <% end %>

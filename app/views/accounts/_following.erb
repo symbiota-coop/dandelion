@@ -1,9 +1,8 @@
-
 <% if defined?(starred) && !starred.empty? %>
   <h3>Starred</h3>
   <div class="image-wall">
     <% starred.each { |account| %>
-      <%= partial :'accounts/square', locals: { account: account, width: '50px' } %>
+    <%= partial :'accounts/square', locals: { account: account, width: '50px' } %>
     <% } %>
   </div>
   <h3 class="mt-2">Everyone</h3>

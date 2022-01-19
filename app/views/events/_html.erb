@@ -1,8 +1,8 @@
 <table style="width: 100%; border-collapse: separate">
   <% i = 0; @events.and(:image_uid.ne => nil).each { |event| %>
-    <% if i.even? %>
-  <%== '<tr>' %>
-    <% end %>
+  <% if i.even? %>
+    <%== '<tr>' %>
+  <% end %>
   <td style="line-height: 0; width: 50%"><a href="<%= ENV['BASE_URI'] %>/events/<%= event.id %>"><img style="width: 100%" src="<%= u event.image.thumb('500x500').url %>"></a></td>
   <% if i.odd? %>
     <%== '</tr>' %>

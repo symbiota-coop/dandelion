@@ -5,69 +5,69 @@
 </div>
 <div class="row">
   <div class="col-sm-8">
-  <%= cp(:'organisations/carousel', key: "/organisations/carousel/#{current_account.id}") %>
-  <div data-pagelet-url="/" data-pagelet-refresh="60" class="mt-1 mb-3"></div>
-</div>
-<div class="col-sm-4">
-  <div style="position: sticky; top: 3.75rem">
-
-    <div class="card mb-3">
-      <h3 class="card-header bg-primary text-white">Your upcoming events</h3>
-      <div class="card-body">
-        <% if current_account.upcoming_events.count > 0 %>
-          <table class="table">
-            <% current_account.upcoming_events.each { |event| %>
-            <tr>
-              <td style="width: 1px">
-                <a href="/events/<%= event.id %>" class="calendar-date">
-                  <span class="day"><%= event.start_time.day %></span>
-                  <br>
-                  <span class="month"><%= event.start_time.strftime('%b') %></span>
-                </a>
-              </td>
-              <td>
-                <h4>
-                  <a href="/events/<%= event.id %>"><%= event.name %></a>
-                </h4>
-                <% if event_admin?(event) %>
-                  <%= partial :'events/progress', locals: { event: event, full_width: true, link: true } %>
-                <% end %>
-              </td>
-            </tr>
-            <% } %>
-          </table>
-        <% else %>
-          <p class="text-center mb-0">Nothing upcoming.
-            <a href="/events">Browse events</a>
-          </p>
-        <% end %>
-      </div>
-    </div>
-
-    <% unless (provider_link = current_account.provider_links.find_by(provider: 'Ethereum')) %>
-    <div class="card mb-3">
-      <h3 class="card-header bg-primary text-white">Connect wallet</h3>
-      <div class="card-body">
-        <p>Connect your <a target="_blank" href="https://metamask.io/">wallet</a> to sign in with Ethereum</p>
-        <a class="btn btn-primary" href="/auth/ethereum">Connect <i class="fab fa-ethereum"></i></a>
-      </div>
-    </div>
-    <% end %>
-
-    <div class="card mb-3">
-      <h3 class="card-header bg-primary text-white">Special offers from partners</h3>
-      <div class="card-body">
-        <ul class="fa-ul mb-0">
-          <li>
-            <i class="fa-li fa fa-star"></i>
-            Use the code DANDELIONGROWS to receive a 10% discount off the Psychedelic Society's
-            <a href="https://psychedelicsociety.org.uk/mushroom-cultivation-for-beginners">Shroomshop: Mushroom Cultivation for Beginners</a>
-            online course
-          </li>
-        </ul>
-      </div>
-    </div>
-
+    <%= cp(:'organisations/carousel', key: "/organisations/carousel/#{current_account.id}") %>
+    <div data-pagelet-url="/" data-pagelet-refresh="60" class="mt-1 mb-3"></div>
   </div>
-</div>
+  <div class="col-sm-4">
+    <div style="position: sticky; top: 3.75rem">
+
+      <div class="card mb-3">
+        <h3 class="card-header bg-primary text-white">Your upcoming events</h3>
+        <div class="card-body">
+          <% if current_account.upcoming_events.count > 0 %>
+            <table class="table">
+              <% current_account.upcoming_events.each { |event| %>
+              <tr>
+                <td style="width: 1px">
+                  <a href="/events/<%= event.id %>" class="calendar-date">
+                    <span class="day"><%= event.start_time.day %></span>
+                    <br>
+                    <span class="month"><%= event.start_time.strftime('%b') %></span>
+                  </a>
+                </td>
+                <td>
+                  <h4>
+                    <a href="/events/<%= event.id %>"><%= event.name %></a>
+                  </h4>
+                  <% if event_admin?(event) %>
+                    <%= partial :'events/progress', locals: { event: event, full_width: true, link: true } %>
+                  <% end %>
+                </td>
+              </tr>
+              <% } %>
+            </table>
+          <% else %>
+            <p class="text-center mb-0">Nothing upcoming.
+              <a href="/events">Browse events</a>
+            </p>
+          <% end %>
+        </div>
+      </div>
+
+      <% unless (provider_link = current_account.provider_links.find_by(provider: 'Ethereum')) %>
+        <div class="card mb-3">
+          <h3 class="card-header bg-primary text-white">Connect wallet</h3>
+          <div class="card-body">
+            <p>Connect your <a target="_blank" href="https://metamask.io/">wallet</a> to sign in with Ethereum</p>
+            <a class="btn btn-primary" href="/auth/ethereum">Connect <i class="fab fa-ethereum"></i></a>
+          </div>
+        </div>
+      <% end %>
+
+      <div class="card mb-3">
+        <h3 class="card-header bg-primary text-white">Special offers from partners</h3>
+        <div class="card-body">
+          <ul class="fa-ul mb-0">
+            <li>
+              <i class="fa-li fa fa-star"></i>
+              Use the code DANDELIONGROWS to receive a 10% discount off the Psychedelic Society's
+              <a href="https://psychedelicsociety.org.uk/mushroom-cultivation-for-beginners">Shroomshop: Mushroom Cultivation for Beginners</a>
+              online course
+            </li>
+          </ul>
+        </div>
+      </div>
+
+    </div>
+  </div>
 </div>

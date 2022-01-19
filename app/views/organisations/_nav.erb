@@ -1,7 +1,7 @@
 <% if organisation.persisted? && organisation_admin?(organisation) %>
-<% unless defined?(inline) %>
-  <%== '<div class="mb-3">' %>
-<% end %>
+  <% unless defined?(inline) %>
+    <%== '<div class="mb-3">' %>
+  <% end %>
   <%= dropdown_nav [
         ['<i class="fa fa-flag"></i> View organisation', "/o/#{organisation.slug}"],
         ['<i class="fa fa-cogs"></i>  Settings', "/o/#{organisation.slug}/edit"],

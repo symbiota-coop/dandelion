@@ -59,9 +59,9 @@
           <br>
           <% qa = event_feedback.answers.detect { |k, _v| k == q }
              a = qa[1] if qa %>
-             <% if a %>
-              <%== Sanitize.fragment(Rinku.auto_link(a), Sanitize::Config::DANDELION) %>
-            <% end %>
+          <% if a %>
+            <%== Sanitize.fragment(Rinku.auto_link(a), Sanitize::Config::DANDELION) %>
+          <% end %>
         </p>
         <% if event_feedback.public? %>
           <div class="my-3">
@@ -77,8 +77,8 @@
           </strong>
           <br>
           <% if a %>
-           <%== Sanitize.fragment(Rinku.auto_link(a), Sanitize::Config::DANDELION) %>
-         <% end %>
+            <%== Sanitize.fragment(Rinku.auto_link(a), Sanitize::Config::DANDELION) %>
+          <% end %>
         </p>
         <% if event_feedback.public_answers %>
           <% qa = event_feedback.public_answers.detect { |k, _v| k == q }

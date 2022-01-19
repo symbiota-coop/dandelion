@@ -179,7 +179,7 @@
       <div class="wysiwyg">
         <big>
           <% if @event.description %>
-          <%== Sanitize.fragment(Rinku.auto_link(
+            <%== Sanitize.fragment(Rinku.auto_link(
                 (@event.description.include?('<p') || @event.description.include?('<br') ? @event.description : "<p>#{@event.description.gsub("\n", '<br />')}</p>")
                 .gsub(%r{<a (href=".+?")>\[\[(.+?)\]\]</a>}, '<a \1 class="btn btn-primary">\2</a>')
               ), Sanitize::Config::DANDELION) %>

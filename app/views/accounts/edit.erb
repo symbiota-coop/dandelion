@@ -86,12 +86,12 @@
 
   <% if @account.memberships.count > 0 %>
     <script>
-    $(function() {
-      var label = $('label[for=account_dietary_requirements]').css('display', 'block');
-      $(label).wrapInner('<div class="row justify-content-between no-gutters"><div class="col ml-2"></div></div>')
-      $('.row', label).append('<div class="col-auto"></div>')
-      $('.col-auto', label).append('<span class="font-weight-normal">Only visible to people in your gatherings</span>')
-    })
+      $(function() {
+        var label = $('label[for=account_dietary_requirements]').css('display', 'block');
+        $(label).wrapInner('<div class="row justify-content-between no-gutters"><div class="col ml-2"></div></div>')
+        $('.row', label).append('<div class="col-auto"></div>')
+        $('.col-auto', label).append('<span class="font-weight-normal">Only visible to people in your gatherings</span>')
+      })
     </script>
     <%= f.wysiwyg_block :dietary_requirements %>
   <% end %>

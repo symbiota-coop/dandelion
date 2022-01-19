@@ -30,10 +30,10 @@
 <% end %>
 
 <script>
-$(function() {
-  $('.contribution-label').text('<%=%(#{m (@membership.paid or 0), @gathering.currency}/#{m @membership.requested_contribution, @gathering.currency})%>').removeClass('label-danger')
-  <% if @membership.requested_contribution and @membership.requested_contribution > 0 and (!@membership.paid or (@membership.paid < @membership.requested_contribution)) %>
-    $('.contribution-label').addClass('label-danger')
-  <% end %>
-})
+  $(function() {
+    $('.contribution-label').text('<%=%(#{m (@membership.paid or 0), @gathering.currency}/#{m @membership.requested_contribution, @gathering.currency})%>').removeClass('label-danger')
+    <% if @membership.requested_contribution and @membership.requested_contribution > 0 and (!@membership.paid or (@membership.paid < @membership.requested_contribution)) %>
+      $('.contribution-label').addClass('label-danger')
+    <% end %>
+  })
 </script>
