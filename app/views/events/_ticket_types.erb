@@ -33,6 +33,11 @@
               <%= o.check_box '_destroy', style: 'display: none' %>
             </span>
           <% end %>
+          <% if o.object.hidden? %>
+            <a target="_blank" class="ml-1 text-dark" href="/events/<%= @event.id %>?ticket_type_id=<%= o.object.id %>">
+              <i data-toggle="tooltip" title="Link to hidden ticket type" class="fa fa-link"></i>
+            </a>
+          <% end %>
         </div>
       <% end %>
     </div>
@@ -41,7 +46,8 @@
       <a class="text-muted" href="javascript:;">Add ticket type</a>
     </div>
     <style>
-      .ticket_type { margin-bottom: 10px; padding-left: 10px; border-left: 4px solid #ddd; }
+      .ticket_type { font-size: 0; margin-bottom: 10px; padding-left: 10px; border-left: 4px solid #ddd; }
+      .ticket_type > * { font-size: 14.45px }
       .ticket_type > div, .ticket_type > label { display: inline-block; margin-bottom: 5px; margin-right: 5px }
       .ticket_type input[name$='[name]'] { display: inline-block; width: auto }
       .ticket_type input[name$='[price]'] { display: inline-block; width: 5em }
