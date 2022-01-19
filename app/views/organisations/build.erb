@@ -2,7 +2,6 @@
 <style>
   #organisation_minimal_head { height: 5em }
 </style>
-<h1><%= @organisation.persisted? ? '' : 'Create an organisation' %></h1>
 <script>
   $(function () {
 
@@ -142,6 +141,6 @@
         <% end %>
       <% end %>
     </div>
-    <%= f.submit_block button_text: (@organisation.persisted? ? 'Update organisation' : 'Save and enter API keys'), destroy_url: "/o/#{@organisation.slug}/destroy" %>
+    <%= f.submit_block button_text: (@organisation.persisted? ? 'Update organisation' : 'Save and continue'), destroy_url: "/o/#{@organisation.slug}/destroy" %>
   </div>
 <% end %>

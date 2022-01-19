@@ -1,7 +1,6 @@
 <% if @gathering.persisted? %>
   <%= partial :'gatherings/nav', locals: { gathering: @gathering, membership: @membership } %>
 <% end %>
-<h1><%= @gathering.persisted? ? '' : 'Create a gathering' %></h1>
 <script>
   $(function () {
 
