@@ -226,10 +226,10 @@ body { background: white }
 .slick-next:before { content: none }
 .slick-prev:before { content: none }
 .slick-prev {
-  left: -18px
+  left: 0px
 }
 .slick-next {
-  right: -18px
+  right: 0px
 }
 .slick-next:focus, .slick-next:hover, .slick-prev:focus, .slick-prev:hover {
   color: black;
