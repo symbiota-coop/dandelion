@@ -599,7 +599,8 @@ class Event
       donation_text: 'Below donation field',
       time_zone: 'Display time zone',
       start_time: 'Start date/time',
-      end_time: 'End date/time'
+      end_time: 'End date/time',
+      extra_info_for_ticket_email: 'Extra info for ticket confirmation email'
     }[attr.to_sym] || super
   end
 

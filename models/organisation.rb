@@ -410,6 +410,7 @@ class Organisation
 
   def self.human_attribute_name(attr, options = {})
     {
+      extra_info_for_ticket_email: 'Extra info for ticket confirmation email',
       extra_info_for_booking_email: 'Extra info for service booking confirmation email',
       google_analytics_id: 'Google Analytics ID',
       facebook_pixel_id: 'Facebook Pixel ID',

@@ -6,7 +6,6 @@
     <% rescue CurrencyUnavailable %>
   <% end %>
 <% end %>
-
 <% if @event.errors.count > 0 %>
   <div class="alert alert-danger">
     <ul class="mb-0">
@@ -18,10 +17,20 @@
 <% end %>
 <script>
   $(function () {
-    $('#event_start_time').siblings('small').text("<%=js_escape_html "#{Time.zone.name.include?('London') ? 'UK time' : "in #{Time.zone.name}"} (UTC #{Time.zone.now.formatted_offset})" %> (your profile's time zone)")
-    $('#event_end_time').siblings('small').text("<%=js_escape_html "#{Time.zone.name.include?('London') ? 'UK time' : "in #{Time.zone.name}"} (UTC #{Time.zone.now.formatted_offset})" %> (your profile's time zone)")
 
+    <% if @event.new_record? %>
+        $('.tab-pane').each(function () {
+          var tabPane = this
+          $('<a href="javascript:;" class="next btn btn-primary">Next</a>').appendTo(tabPane)
+          $(this).find('a.next').click(function () {
+            $('#event-build-nav a[href="#' + $(tabPane).next().attr('id') + '"]').tab('show')
+          })
+        })
+        $('#tab5').find('a.next').remove()
+    <% end %>
 
+    $('#event_start_time').siblings('small').text("<%==js_escape_html "#{Time.zone.name.include?('London') ? 'UK time' : "in #{Time.zone.name}"} (UTC #{Time.zone.now.formatted_offset})" %> (your profile's time zone)")
+    $('#event_end_time').siblings('small').text("<%==js_escape_html "#{Time.zone.name.include?('London') ? 'UK time' : "in #{Time.zone.name}"} (UTC #{Time.zone.now.formatted_offset})" %> (your profile's time zone)")
 
     var autocomplete = new google.maps.places.Autocomplete($('#event_location')[0]);
     $('#event_location').keydown(function (e) {
@@ -59,132 +68,158 @@
   })
 </script>
 <% form_for @event, @event.new_record ? '/events/new' : "/events/#{@event.id}/edit" do |f| %>
-  <%= f.text_block :name %>
-  <%= f.datetime_block :start_time %>
-  <%= f.datetime_block :end_time %>
-  <%= f.select_block :time_zone %>
-  <%= f.text_block :location %>
-  <%= f.select_block :currency %>
-  <%= f.email_block :email %>
-  <%= f.image_block :image %>
-  <%= f.wysiwyg_block :description %>
-  <%= f.wysiwyg_block :extra_info_for_ticket_email %>
-  <%= f.number_block :facebook_event_id %>
-  <%= f.number_block :facebook_pixel_id %>
-  <%= partial :'events/tags', locals: { f: f } %>
-  <%= f.lookup_block :organisation_id, lookup_url: '/organisations.json', placeholder: 'Search organisations', selected_link: (%(<a class="d-inline-block mt-1" target="_blank" href="/o/#{@event.organisation.slug}">View organisation</a>) if @event.organisation_id) %>
-  <script>
-    $(function () {
-      $('#event_organisation_id').change(function () {
-        if ($(this).val().length > 0) {
+  <ul id="event-build-nav" class="nav nav-tabs" role="tablist">
+    <li role="presentation" class="nav-item"><a class="nav-link active" href="#tab1" role="tab" data-toggle="tab">Basics</a></li>
+    <li role="presentation" class="nav-item"><a class="nav-link" href="#tab2" role="tab" data-toggle="tab">Description and confirmation email</a></li>
+    <li role="presentation" class="nav-item"><a class="nav-link" href="#tab3" role="tab" data-toggle="tab">Tickets</a></li>
+    <li role="presentation" class="nav-item"><a class="nav-link" href="#tab4" role="tab" data-toggle="tab">Questions</a></li>
+    <li role="presentation" class="nav-item"><a class="nav-link" href="#tab5" role="tab" data-toggle="tab">Everything else</a></li>
+  </ul>
+  <div class="container">
+    <div class="tab-content mt-3">
+      <div role="tabpanel" class="tab-pane active" id="tab1">
+        <%= f.text_block :name %>
+        <%= f.datetime_block :start_time %>
+        <%= f.datetime_block :end_time %>
+        <%= f.select_block :time_zone %>
+        <%= f.text_block :location %>
+        <%= f.select_block :currency %>
+        <%= f.email_block :email %>
+        <%= f.image_block :image %>
+        <%= f.number_block :facebook_event_id %>
+        <%= partial :'events/tags', locals: { f: f } %>
+        <%= f.lookup_block :organisation_id, lookup_url: '/organisations.json', placeholder: 'Search organisations', selected_link: (%(<a class="d-inline-block mt-1" target="_blank" href="/o/#{@event.organisation.slug}">View organisation</a>) if @event.organisation_id) %>
+        <%= f.lookup_block :coordinator_id, lookup_url: '/accounts.json', placeholder: 'Search accounts', selected_link: (%(<a class="d-inline-block mt-1" target="_blank" href="/u/#{@event.coordinator.username}">View account</a>) if @event.coordinator) %>
+        <script>
+          $(function () {
+            $('#event_organisation_id').change(function () {
+              if ($(this).val().length > 0) {
 
-          $('#event_coordinator_id').select2("destroy").removeClass('lookupd').lookup({
-            lookup_url: '/accounts.json',
-            id_param: 'id'
-          });
+                $('#event_coordinator_id').select2("destroy").removeClass('lookupd').lookup({
+                  lookup_url: '/accounts.json',
+                  id_param: 'id'
+                });
 
-          $('#event_activity_id').select2("destroy").removeClass('lookupd').lookup({
-            lookup_url: '/o/' + $('#event_organisation_id').val() + '/activities.json',
-            id_param: 'id'
-          });
+                $('#event_activity_id').select2("destroy").removeClass('lookupd').lookup({
+                  lookup_url: '/o/' + $('#event_organisation_id').val() + '/activities.json',
+                  id_param: 'id'
+                });
 
-          $('#event_local_group_id').select2("destroy").removeClass('lookupd').lookup({
-            lookup_url: '/o/' + $('#event_organisation_id').val() + '/local_groups.json',
-            id_param: 'id'
-          });
+                $('#event_local_group_id').select2("destroy").removeClass('lookupd').lookup({
+                  lookup_url: '/o/' + $('#event_organisation_id').val() + '/local_groups.json',
+                  id_param: 'id'
+                });
 
-        }
-      })
-      $('#event_organisation_id').change()
-    })
-  </script>
-  <%= f.lookup_block :activity_id, lookup_url: "/o/#{@event.organisation_id}/activities.json", placeholder: 'Search activities', selected_link: (%(<a class="d-inline-block mt-1" target="_blank" href="/activities/#{@event.activity_id}">View activity</a>) if @event.activity_id) %>
-  <script>
-    $(function () {
+              }
+            })
+            $('#event_organisation_id').change()
+          })
+        </script>
+        <%= f.lookup_block :activity_id, lookup_url: "/o/#{@event.organisation_id}/activities.json", placeholder: 'Search activities', selected_link: (%(<a class="d-inline-block mt-1" target="_blank" href="/activities/#{@event.activity_id}">View activity</a>) if @event.activity_id) %>
+        <script>
+          $(function () {
 
-      $('#event_local_group_id').closest('.form-group').css('margin-bottom', '0.25rem')
-      $('#do-zoom-party a').click(function () {
-        $('#event_zoom_party').click()
-      })
-      $('#event_zoom_party').change(function () {
-        if ($(this).is(':checked')) {
-          $('#local-group-select').hide()
-          $('#do-zoom-party').hide()
-          $('#zoom-party-checkbox').show()
-          $('#not-zoom-party').hide()
-        } else {
-          $('#local-group-select').show()
-          $('#do-zoom-party').show()
-          $('#zoom-party-checkbox').hide()
-          $('#not-zoom-party').show()
-        }
-      })
-      $('#event_zoom_party').change()
+            $('#event_local_group_id').closest('.form-group').css('margin-bottom', '0.25rem')
+            $('#do-zoom-party a').click(function () {
+              $('#event_zoom_party').click()
+            })
+            $('#event_zoom_party').change(function () {
+              if ($(this).is(':checked')) {
+                $('#local-group-select').hide()
+                $('#do-zoom-party').hide()
+                $('#zoom-party-checkbox').show()
+                $('#not-zoom-party').hide()
+              } else {
+                $('#local-group-select').show()
+                $('#do-zoom-party').show()
+                $('#zoom-party-checkbox').hide()
+                $('#not-zoom-party').show()
+              }
+            })
+            $('#event_zoom_party').change()
 
-      <% if !organisation_admin?(@event.organisation) %>
-        $('#do-zoom-party').hide()
-        $('input[name="event[zoom_party]"').prop('disabled', true)
-        $('input[name="event[monthly_donors_only]"').prop('disabled', true)
-        $('input[name="event[no_discounts]"').prop('disabled', true)
-        $('input[name="event[include_in_parent]"').prop('disabled', true)
-        $('input[name="event[affiliate_credit_percentage]"').prop('disabled', true)
-        $('input[name="event[featured]"').prop('disabled', true)
-        $('input[name="event[show_emails]"').prop('disabled', true)
-        $('input[name="event[opt_in_facilitator]"').prop('disabled', true)
-        $('input[name="event[refund_deleted_orders]"').prop('disabled', true)
-      <% end %>
+            <% if !organisation_admin?(@event.organisation) %>
+              $('#do-zoom-party').hide()
+              $('input[name="event[zoom_party]"').prop('disabled', true)
+              $('input[name="event[monthly_donors_only]"').prop('disabled', true)
+              $('input[name="event[no_discounts]"').prop('disabled', true)
+              $('input[name="event[include_in_parent]"').prop('disabled', true)
+              $('input[name="event[affiliate_credit_percentage]"').prop('disabled', true)
+              $('input[name="event[featured]"').prop('disabled', true)
+              $('input[name="event[show_emails]"').prop('disabled', true)
+              $('input[name="event[opt_in_facilitator]"').prop('disabled', true)
+              $('input[name="event[refund_deleted_orders]"').prop('disabled', true)
+            <% end %>
 
-    })
-  </script>
-  <div id="local-group-select">
-    <%= f.lookup_block :local_group_id, lookup_url: "/o/#{@event.organisation_id}/local_groups.json", placeholder: 'Search local groups', selected_link: (%(<a class="d-inline-block mt-1" target="_blank" href="/local_groups/#{@event.local_group_id}">View local group</a>) if @event.local_group_id) %>
-  </div>
-  <p id="do-zoom-party">or <a href="javascript:;">turn this event into an synchronous online event for all local groups</a></p>
-  <div id="zoom-party-checkbox">
-    <%= f.check_box_block :zoom_party %>
-  </div>
-  <%= f.lookup_block :coordinator_id, lookup_url: '/accounts.json', placeholder: 'Search accounts', selected_link: (%(<a class="d-inline-block mt-1" target="_blank" href="/u/#{@event.coordinator.username}">View account</a>) if @event.coordinator) %>
-  <div id="not-zoom-party">
-    <%= f.lookup_block :revenue_sharer_id, lookup_url: '/accounts.json', placeholder: 'Search accounts', selected_link: (%(<a class="d-inline-block mt-1" target="_blank" href="/u/#{@event.revenue_sharer.username}">View account</a>) if @event.revenue_sharer_id) %>
-    <script>
-      $(function () {
-        $('#event_revenue_sharer_id').change(function () {
-          if ($(this).val().length > 0) {
-            $('#organisation-revenue-share').show()
-          } else {
-            $('#organisation-revenue-share').hide()
-          }
-        })
-        $('#event_revenue_sharer_id').change()
-      })
-    </script>
-    <div id="organisation-revenue-share">
-      <%= f.number_block :organisation_revenue_share %>
+          })
+        </script>
+        <div id="local-group-select">
+          <%= f.lookup_block :local_group_id, lookup_url: "/o/#{@event.organisation_id}/local_groups.json", placeholder: 'Search local groups', selected_link: (%(<a class="d-inline-block mt-1" target="_blank" href="/local_groups/#{@event.local_group_id}">View local group</a>) if @event.local_group_id) %>
+        </div>
+        <p id="do-zoom-party">or <a href="javascript:;">turn this event into an synchronous online event for all local groups</a></p>
+        <div id="zoom-party-checkbox">
+          <%= f.check_box_block :zoom_party %>
+        </div>
+        <div id="not-zoom-party">
+          <%= f.lookup_block :revenue_sharer_id, lookup_url: '/accounts.json', placeholder: 'Search accounts', selected_link: (%(<a class="d-inline-block mt-1" target="_blank" href="/u/#{@event.revenue_sharer.username}">View account</a>) if @event.revenue_sharer_id) %>
+          <script>
+            $(function () {
+              $('#event_revenue_sharer_id').change(function () {
+                if ($(this).val().length > 0) {
+                  $('#organisation-revenue-share').show()
+                } else {
+                  $('#organisation-revenue-share').hide()
+                }
+              })
+              $('#event_revenue_sharer_id').change()
+            })
+          </script>
+          <div id="organisation-revenue-share">
+            <%= f.number_block :organisation_revenue_share %>
+          </div>
+        </div>
+      </div>
+      <div role="tabpanel" class="tab-pane" id="tab2">
+        <%= f.wysiwyg_block :description %>
+        <%= f.wysiwyg_block :extra_info_for_ticket_email %>
+      </div>
+        <div role="tabpanel" class="tab-pane" id="tab3">
+          <%= partial :'events/ticket_types', locals: { f: f } %>
+          <%= partial :'events/ticket_groups', locals: { f: f } %>
+          <%= f.number_block :capacity %>
+        </div>
+        <div role="tabpanel" class="tab-pane" id="tab4">
+        <%= f.text_area_block :questions %>
+        <%= f.text_area_block :feedback_questions %>
+        </div>
+      <div role="tabpanel" class="tab-pane" id="tab5">
+      <%= f.text_block :add_a_donation_to %>
+      <%= f.number_block :suggested_donation %>
+      <%= f.text_block :donation_text %>
+      <%= f.url_block :redirect_url %>
+        <%= f.number_block :facebook_pixel_id %>
+        <%= f.check_box_block :featured %>
+        <%= f.check_box_block :secret %>
+        <%= f.check_box_block :draft %>
+        <%= f.check_box_block :hide_attendees %>
+        <%= f.check_box_block :hide_discussion %>
+        <%= f.check_box_block :monthly_donors_only %>
+        <%= f.check_box_block :no_discounts %>
+        <%= f.check_box_block :include_in_parent %>
+        <%= f.check_box_block :show_emails %>
+        <%= f.check_box_block :opt_in_facilitator %>
+        <%= f.check_box_block :refund_deleted_orders %>
+        <%= f.text_area_block :notes %>
+        <% if Padrino.env == :development || @event.organisation.verified? %>
+          <%= f.number_block :affiliate_credit_percentage %>
+        <% end %>
+        <% if @event.new_record? %>
+          <%= f.submit_block %>
+        <% end %>
+      </div>
     </div>
-    <%= partial :'events/ticket_types', locals: { f: f } %>
-    <%= partial :'events/ticket_groups', locals: { f: f } %>
-    <%= f.number_block :capacity %>
-    <%= f.text_block :add_a_donation_to %>
-    <%= f.number_block :suggested_donation %>
-    <%= f.text_block :donation_text %>
-    <% if Padrino.env == :development || @event.organisation.verified? %>
-      <%= f.number_block :affiliate_credit_percentage %>
+    <% if @event.persisted? %>
+    <%= f.submit_block destroy_url: "/events/#{@event.id}/destroy" %>
     <% end %>
-    <%= f.url_block :redirect_url %>
   </div>
-  <%= f.text_area_block :questions %>
-  <%= f.text_area_block :feedback_questions %>
-  <%= f.check_box_block :featured %>
-  <%= f.check_box_block :secret %>
-  <%= f.check_box_block :draft %>
-  <%= f.check_box_block :hide_attendees %>
-  <%= f.check_box_block :hide_discussion %>
-  <%= f.check_box_block :monthly_donors_only %>
-  <%= f.check_box_block :no_discounts %>
-  <%= f.check_box_block :include_in_parent %>
-  <%= f.check_box_block :show_emails %>
-  <%= f.check_box_block :opt_in_facilitator %>
-  <%= f.check_box_block :refund_deleted_orders %>
-  <%= f.text_area_block :notes %>
-  <%= f.submit_block destroy_url: "/events/#{@event.id}/destroy" %>
 <% end %>
