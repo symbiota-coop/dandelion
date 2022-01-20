@@ -125,6 +125,7 @@ module Dandelion
           erb :home_signed_in
         end
       else
+        @og_image = "#{ENV['BASE_URI']}/images/dandelion.jpg"
         @from = Date.today
         @events = Event.live.public.legit.future(@from)
         @accounts = []
