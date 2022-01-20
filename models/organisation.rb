@@ -306,7 +306,31 @@ class Organisation
     self.feedback_email_body = feedback_email_body_default unless feedback_email_body
     errors.add(:affiliate_credit_percentage, 'must be between 1 and 100') if affiliate_credit_percentage && (affiliate_credit_percentage < 1 || affiliate_credit_percentage > 100)
     errors.add(:stripe_sk, 'must be present if Stripe public key is present') if stripe_pk && !stripe_sk
-    errors.add(:stripe_endpoint_secret, 'must be present if Stripe public key is present') if stripe_pk && !stripe_endpoint_secret
+  end
+
+  after_save :create_stripe_webhook_if_necessary, if: :stripe_sk
+  def create_stripe_webhook_if_necessary
+    Stripe.api_key = stripe_sk
+
+    webhooks = []
+    has_more = true
+    starting_after = nil
+    while has_more
+      w = Stripe::WebhookEndpoint.list({ limit: 100, starting_after: starting_after })
+      webhooks += w['data']
+      has_more = w['has_more']
+      starting_after = w['data'].last['id']
+    end
+
+    unless webhooks.find { |w| w['url'] == "https://dandelion.earth/o/#{slug}/stripe_webhook" && w['enabled_events'].include?('checkout.session.completed') }
+      w = Stripe::WebhookEndpoint.create({
+                                           url: "https://dandelion.earth/o/#{slug}/stripe_webhook",
+                                           enabled_events: [
+                                             'checkout.session.completed'
+                                           ]
+                                         })
+      update_attribute(:stripe_endpoint_secret, w['secret'])
+    end
   end
 
   def import_from_csv(csv)
@@ -410,6 +434,8 @@ class Organisation
 
   def self.human_attribute_name(attr, options = {})
     {
+      intro_text: 'Intro text for organisation homepage',
+      telegram_group: 'Telegram group URL',
       extra_info_for_ticket_email: 'Extra info for ticket confirmation email',
       extra_info_for_booking_email: 'Extra info for service booking confirmation email',
       google_analytics_id: 'Google Analytics ID',

@@ -163,7 +163,6 @@
           <div class="col-sm-8">
             <%= f.text_block :stripe_pk %>
             <%= f.text_block :stripe_sk %>
-            <%= f.text_block :stripe_endpoint_secret %>
             <%= f.text_block :coinbase_api_key %>
             <%= f.text_block :coinbase_webhook_secret %>
             <%= f.text_block :seeds_username %>
@@ -172,28 +171,13 @@
           <div class="col-sm-4">
             <div class="card mb-3">
               <div class="card-header text-white bg-primary">
-                <h4 class="my-0">Want to take payments? Do this first</h4>
+                <h4 class="my-0">Want to take payments via Coinbase Commerce? Do this first</h4>
               </div>
               <div class="card-body">
-                <h4>Stripe</h4>
-                <ul>
-                  <li>Go to <code>Developers</code> > <code>Webhooks</code> > <code>Add endpoint</code> and add
-                    <span style="text-decoration: underline dotted">
-                      <span id="slug-replace-stripe-webhook"></span>
-                    </span>
-                    with
-                    <code>Events to send</code>
-                    <span style="text-decoration: underline dotted">checkout.session.completed</span>
-                  </li>
-                </ul>
-                <h4>Coinbase Commerce</h4>
-                <ul>
-                  <li>Go to <code>Settings</code> > <code>Webhook subscriptions</code> > <code>Add an endpoint</code> and add
-                    <span style="text-decoration: underline dotted">
-                      <span id="slug-replace-coinbase-webhook"></span>
-                    </span>
-                  </li>
-                </ul>
+              Go to <code>Settings</code> > <code>Webhook subscriptions</code> > <code>Add an endpoint</code> and add
+                <span style="text-decoration: underline dotted">
+                  <span id="slug-replace-coinbase-webhook"></span>
+                </span>
               </div>
             </div>
           </div>

@@ -311,6 +311,31 @@ class Gathering
     true
   end
 
+  after_save :create_stripe_webhook_if_necessary, if: :stripe_sk
+  def create_stripe_webhook_if_necessary
+    Stripe.api_key = stripe_sk
+
+    webhooks = []
+    has_more = true
+    starting_after = nil
+    while has_more
+      w = Stripe::WebhookEndpoint.list({ limit: 100, starting_after: starting_after })
+      webhooks += w['data']
+      has_more = w['has_more']
+      starting_after = w['data'].last['id']
+    end
+
+    unless webhooks.find { |w| w['url'] == "https://dandelion.earth/g/#{slug}/stripe_webhook" && w['enabled_events'].include?('checkout.session.completed') }
+      w = Stripe::WebhookEndpoint.create({
+                                           url: "https://dandelion.earth/g/#{slug}/stripe_webhook",
+                                           enabled_events: [
+                                             'checkout.session.completed'
+                                           ]
+                                         })
+      update_attribute(:stripe_endpoint_secret, w['secret'])
+    end
+  end
+
   def median_threshold
     array = memberships.pluck(:desired_threshold).compact
     if array.length > 0
