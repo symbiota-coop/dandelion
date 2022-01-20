@@ -18,7 +18,7 @@
           $('#gathering-build-nav a[href="#' + $(tabPane).next().attr('id') + '"]').tab('show')
         })
       })
-      $('#tab6').find('a.next').remove()
+      $('#tab5').find('a.next').remove()
       $('#gathering_name').focus().attr('autocomplete', 'off')
   <% end %>
 
@@ -88,7 +88,6 @@
     <li role="presentation" class="nav-item"><a class="nav-link" href="#tab3" role="tab" data-toggle="tab">Welcome</a></li>
     <li role="presentation" class="nav-item"><a class="nav-link" href="#tab4" role="tab" data-toggle="tab">Payments</a></li>
     <li role="presentation" class="nav-item"><a class="nav-link" href="#tab5" role="tab" data-toggle="tab">Features</a></li>
-    <li role="presentation" class="nav-item"><a class="nav-link" href="#tab6" role="tab" data-toggle="tab">Experimental</a></li>
   </ul>
   <div class="container">
     <div class="tab-content mt-3">
@@ -184,6 +183,15 @@
             <%= f.text_block :coinbase_webhook_secret %>
           </div>
         </div>
+        <div class="card mb-3">
+          <div class="card-header text-white bg-primary">
+            <h4 class="my-0">Experimental</h4>
+          </div>
+          <div class="card-body pb-0">
+            <%= f.text_block :seeds_username %>
+            <%= f.text_block :xdai_address %>
+          </div>
+        </div>
       </div>
       <div role="tabpanel" class="tab-pane" id="tab5">
         <% Gathering.enablable.each { |x| %>
@@ -193,13 +201,9 @@
         <div class="mt-2">
           <%= f.url_block :facebook_group_url %>
         </div>
-      </div>
-      <div role="tabpanel" class="tab-pane" id="tab6">
-        <%= f.text_block :seeds_username %>
-        <%= f.text_block :xdai_address %>
         <% if @gathering.new_record? %>
           <%= f.submit_block %>
-        <% end %>        
+        <% end %>
       </div>
     </div>
     <% if @gathering.persisted? %>
