@@ -589,7 +589,7 @@ class Event
       questions: 'Booking questions',
       facebook_event_id: 'Facebook event ID',
       facebook_pixel_id: 'Facebook Pixel ID',
-      show_emails: 'Allow event admins to view email addresses of attendees',
+      show_emails: 'Allow all event admins to view email addresses of attendees',
       opt_in_facilitator: 'Allow people to opt in to emails from facilitators',
       refund_deleted_orders: 'Attempt to refund deleted orders on Stripe',
       redirect_url: 'Redirect URL after successful payment',

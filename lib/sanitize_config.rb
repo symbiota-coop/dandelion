@@ -4,7 +4,8 @@ Sanitize::Config::DANDELION = Sanitize::Config.merge(Sanitize::Config::RELAXED,
                                                        {
                                                          :all => ['class'],
                                                          'oembed' => ['url'],
-                                                         'figure' => ['style']
+                                                         'figure' => ['style'],
+                                                         'span' => ['style']
                                                        }
                                                      ),
                                                      css: {
