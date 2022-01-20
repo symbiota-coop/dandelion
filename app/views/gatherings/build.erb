@@ -193,13 +193,13 @@
         <div class="mt-2">
           <%= f.url_block :facebook_group_url %>
         </div>
-        <% if @gathering.new_record? %>
-          <%= f.submit_block %>
-        <% end %>
       </div>
       <div role="tabpanel" class="tab-pane" id="tab6">
         <%= f.text_block :seeds_username %>
         <%= f.text_block :xdai_address %>
+        <% if @gathering.new_record? %>
+          <%= f.submit_block %>
+        <% end %>        
       </div>
     </div>
     <% if @gathering.persisted? %>
