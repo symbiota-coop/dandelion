@@ -11,9 +11,7 @@
     <h3 style="margin-top: 0; margin-bottom: 0; position: relative" data-toggle="tooltip">
       <a class="<% if image %>text-white<% else %>text-dark<% end %>" href="/g/<%= @gathering.slug %>/tactivities/<%= tactivity.id %>"><%= tactivity.name %></a>
     </h3>
-    <% if tactivity.description %>
-      <span style="display: none"><%= tactivity.description.truncate(150) %></span>
-    <% end %>
+    <span style="display: none"><%= tactivity.description.truncate(150) if tactivity.description %></span>
     <span class="<% if image %>text-white<% else %>text-dark<% end %>">
       by
       <a class="<% if image %>text-white<% else %>text-dark<% end %>" href="/accounts/<%= tactivity.account_id %>"><%= tactivity.account.name %></a>
