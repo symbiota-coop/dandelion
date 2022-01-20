@@ -24,10 +24,12 @@ class CoreTest < ActiveSupport::TestCase
     execute_script %{$('#event_start_time').val('#{@event.start_time.to_s(:db)}')}
     execute_script %{$('#event_end_time').val('#{@event.end_time.to_s(:db)}')}
     fill_in 'Location*', with: @event.location
+    click_link 'Tickets'
     execute_script %{$("a:contains('Add ticket type')").click()}
     fill_in 'event_ticket_types_attributes_0_name', with: @ticket_type.name
     fill_in 'event_ticket_types_attributes_0_price', with: @ticket_type.price
     fill_in 'event_ticket_types_attributes_0_quantity', with: @ticket_type.quantity
+    click_link 'Everything else'
     click_button 'Create event'
     assert page.has_content? 'Add to calendar'
   end

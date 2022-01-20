@@ -5,7 +5,7 @@
   <div>
     <div id="ticket_types">
       <% f.fields_for :ticket_types, f.object.ticket_types.sort_by(&:order) do |o| %>
-        <div class="ticket_type <%= 'has-error' if o.object.invalid? %>">
+        <div style="font-size: 0" class="ticket_type <%= 'has-error' if o.object.invalid? %>">
           <%= o.hidden_field :order %>
           <div>
             <%= o.text_field :name, class: 'form-control', placeholder: 'Name' %>
