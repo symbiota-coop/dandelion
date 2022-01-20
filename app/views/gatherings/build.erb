@@ -159,40 +159,32 @@
         <%= f.wysiwyg_block :intro_for_members %>
       </div>
       <div role="tabpanel" class="tab-pane" id="tab4">
-
-      <div class="card mb-3">
-        <div class="card-header text-white bg-primary">
-          <h4 class="my-0">Card payments</h4>
+        <div class="card mb-3">
+          <div class="card-header text-white bg-primary">
+            <h4 class="my-0">Card payments</h4>
+          </div>
+          <div class="card-body pb-0">
+            <%= f.text_block :stripe_pk %>
+            <%= f.text_block :stripe_sk %>
+          </div>
         </div>
-        <div class="card-body pb-0">
-          <%= f.text_block :stripe_pk %>
-          <%= f.text_block :stripe_sk %>
-      </div>
-    </div>
-
-      <div class="card mb-3">
-        <div class="card-header text-white bg-primary">
-          <h4 class="my-0">Crypto payments</h4>
+        <div class="card mb-3">
+          <div class="card-header text-white bg-primary">
+            <h4 class="my-0">Crypto payments</h4>
+          </div>
+          <div class="card-body pb-0">
+            <p>
+              For Coinbase Commerce, first go to <code>Settings</code> > <code>Webhook subscriptions</code> > <code>Add an endpoint</code> and add
+              <span style="text-decoration: underline dotted">
+                <span id="slug-replace-coinbase-webhook"></span>
+              </span>
+            </p>
+            <%= f.text_block :coinbase_api_key %>
+            <%= f.text_block :coinbase_webhook_secret %>
+            <%= f.text_block :seeds_username %>
+            <%= f.text_block :xdai_address %>
+          </div>
         </div>
-        <div class="card-body pb-0">
-
-          <p>
-          For Coinbase Commerce, first go to <code>Settings</code> > <code>Webhook subscriptions</code> > <code>Add an endpoint</code> and add
-          <span style="text-decoration: underline dotted">
-            <span id="slug-replace-coinbase-webhook"></span>
-          </span>
-          </p>
-
-          <%= f.text_block :coinbase_api_key %>
-          <%= f.text_block :coinbase_webhook_secret %>
-          <%= f.text_block :seeds_username %>
-          <%= f.text_block :xdai_address %>
-      </div>
-    </div>
-
-
-
-
       </div>
       <div role="tabpanel" class="tab-pane" id="tab5">
         <% Gathering.enablable.each { |x| %>
