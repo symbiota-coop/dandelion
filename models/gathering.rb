@@ -325,9 +325,9 @@ class Gathering
       starting_after = w['data'].last['id']
     end
 
-    unless webhooks.find { |w| w['url'] == "https://dandelion.earth/g/#{slug}/stripe_webhook" && w['enabled_events'].include?('checkout.session.completed') }
+    unless webhooks.find { |w| w['url'] == "#{ENV['BASE_URI']}/g/#{slug}/stripe_webhook" && w['enabled_events'].include?('checkout.session.completed') }
       w = Stripe::WebhookEndpoint.create({
-                                           url: "https://dandelion.earth/g/#{slug}/stripe_webhook",
+                                           url: "#{ENV['BASE_URI']}/g/#{slug}/stripe_webhook",
                                            enabled_events: [
                                              'checkout.session.completed'
                                            ]

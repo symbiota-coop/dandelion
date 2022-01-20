@@ -52,7 +52,7 @@
           <%= f.select_block :currency %>
           <div class="card mb-3">
             <div class="card-header text-white bg-primary">
-              <h4 class="my-0">Card payments</h4>
+              <h4 class="my-0">Card payments via Stripe</h4>
             </div>
             <div class="card-body pb-0">
               <%= f.text_block :stripe_pk %>
@@ -61,11 +61,11 @@
           </div>
           <div class="card mb-3">
             <div class="card-header text-white bg-primary">
-              <h4 class="my-0">Crypto payments</h4>
+              <h4 class="my-0">Crypto payments via Coinbase Commerce</h4>
             </div>
             <div class="card-body pb-0">
               <p>First go to <code>Settings</code> > <code>Webhook subscriptions</code> > <code>Add an endpoint</code> and add
-                <span style="text-decoration: underline dotted">https://dandelion.earth/o/<%= @organisation.slug %>/coinbase_webhook</span></p>
+                <span style="text-decoration: underline dotted"><%=ENV['BASE_URI']%>/o/<%= @organisation.slug %>/coinbase_webhook</span></p>
               <%= f.text_block :coinbase_api_key %>
               <%= f.text_block :coinbase_webhook_secret %>
             </div>

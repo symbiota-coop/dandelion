@@ -18,7 +18,7 @@
           $('#gathering-build-nav a[href="#' + $(tabPane).next().attr('id') + '"]').tab('show')
         })
       })
-      $('#tab5').find('a.next').remove()
+      $('#tab6').find('a.next').remove()
       $('#gathering_name').focus().attr('autocomplete', 'off')
   <% end %>
 
@@ -88,6 +88,7 @@
     <li role="presentation" class="nav-item"><a class="nav-link" href="#tab3" role="tab" data-toggle="tab">Welcome</a></li>
     <li role="presentation" class="nav-item"><a class="nav-link" href="#tab4" role="tab" data-toggle="tab">Payments</a></li>
     <li role="presentation" class="nav-item"><a class="nav-link" href="#tab5" role="tab" data-toggle="tab">Features</a></li>
+    <li role="presentation" class="nav-item"><a class="nav-link" href="#tab6" role="tab" data-toggle="tab">Experimental</a></li>
   </ul>
   <div class="container">
     <div class="tab-content mt-3">
@@ -161,7 +162,7 @@
       <div role="tabpanel" class="tab-pane" id="tab4">
         <div class="card mb-3">
           <div class="card-header text-white bg-primary">
-            <h4 class="my-0">Card payments</h4>
+            <h4 class="my-0">Card payments via Stripe</h4>
           </div>
           <div class="card-body pb-0">
             <%= f.text_block :stripe_pk %>
@@ -170,19 +171,17 @@
         </div>
         <div class="card mb-3">
           <div class="card-header text-white bg-primary">
-            <h4 class="my-0">Crypto payments</h4>
+            <h4 class="my-0">Crypto payments via Coinbase Commerce</h4>
           </div>
           <div class="card-body pb-0">
             <p>
-              For Coinbase Commerce, first go to <code>Settings</code> > <code>Webhook subscriptions</code> > <code>Add an endpoint</code> and add
+              First go to <code>Settings</code> > <code>Webhook subscriptions</code> > <code>Add an endpoint</code> and add
               <span style="text-decoration: underline dotted">
                 <span id="slug-replace-coinbase-webhook"></span>
               </span>
             </p>
             <%= f.text_block :coinbase_api_key %>
             <%= f.text_block :coinbase_webhook_secret %>
-            <%= f.text_block :seeds_username %>
-            <%= f.text_block :xdai_address %>
           </div>
         </div>
       </div>
@@ -197,6 +196,10 @@
         <% if @gathering.new_record? %>
           <%= f.submit_block %>
         <% end %>
+      </div>
+      <div role="tabpanel" class="tab-pane" id="tab6">
+        <%= f.text_block :seeds_username %>
+        <%= f.text_block :xdai_address %>
       </div>
     </div>
     <% if @gathering.persisted? %>
