@@ -49,7 +49,6 @@
   <% if !@account.email_confirmed? %>
     <p style="margin-top: -0.75rem"><a href="/confirm_email">Resend confirmation email</a></p>
   <% end %>
-  <%= f.password_block :password %>
   <script>
     $(function () {
       var autocomplete = new google.maps.places.Autocomplete($('#account_location')[0]);

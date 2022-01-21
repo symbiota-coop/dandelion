@@ -17,7 +17,6 @@ class CoreTest < ActiveSupport::TestCase
     visit '/accounts/new'
     fill_in 'Name', with: @account.name
     fill_in 'Email', with: @account.email
-    fill_in 'Password', with: @account.password
     fill_in 'Location', with: @account.location
     click_button 'Sign up'
     assert page.has_content? 'Your account was created successfully'

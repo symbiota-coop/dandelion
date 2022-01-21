@@ -36,19 +36,15 @@ Dandelion::App.controller do
     erb :'accounts/sign_in'
   end
 
-  get '/accounts/sign_in_link' do
-    @hide_right_nav = true
-    erb :'accounts/sign_in_link'
-  end
-
   post '/accounts/sign_in_link' do
     if params[:email] && (@account = Account.find_by(email: params[:email].downcase))
       @account.sign_in_link!
-      flash[:notice] = "A sign in link was sent to #{@account.email}"
+      flash.now[:notice] = "A sign in link was sent to #{@account.email}. Please check your email app ✨"
+      erb :'accounts/requested_sign_in_link'
     else
       flash[:error] = "There's no account registered under that email address."
+      redirect '/accounts/sign_in'
     end
-    redirect '/'
   end
 
   get '/accounts/sign_out' do
@@ -81,6 +77,7 @@ Dandelion::App.controller do
 
   post '/accounts/new' do
     @account = Account.new(mass_assigning(params[:account], Account))
+    @account.password = Account.generate_password # not used
     if params[:organisation_id]
       @organisation = Organisation.find(params[:organisation_id])
     elsif params[:activity_id]
@@ -147,7 +144,7 @@ Dandelion::App.controller do
         200
       else
         flash[:error] = "There's already an account registered under that email address. You can request a sign in link below."
-        redirect '/accounts/sign_in_link'
+        redirect '/accounts/sign_in'
       end
     elsif params[:recaptcha_skip_secret]
       400

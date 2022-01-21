@@ -64,7 +64,7 @@ module Dandelion
           session[:account_id] = account.id.to_s
           account.update_attribute(:sign_in_token, SecureRandom.uuid)
         elsif !current_account
-          kick! notice: 'Please sign in or <a href="/accounts/sign_in_link">get a sign in link</a> to continue.'
+          kick! notice: 'Please sign in to continue.'
         end
       end
       @og_desc = 'Dandelion is a platform for ticketed events and co-created gatherings created by the not-for-profit worker co-operative Dandelion Collective'

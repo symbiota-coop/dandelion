@@ -33,7 +33,6 @@
 </script>
 <%= f.text_block :name %>
 <%= f.email_block :email %>
-<%= f.password_block :password, required: true %>
 <%= f.text_block :location %>
 <div class="g-recaptcha mb-3" data-sitekey="<%= ENV['RECAPTCHA_SITE_KEY'] %>"></div>
 <%= f.submit_block button_text: 'Sign up' %>
