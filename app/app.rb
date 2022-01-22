@@ -155,6 +155,7 @@ module Dandelion
 
     post '/checked_notifications' do
       sign_in_required!
+      Fragment.find_by(key: "/notifications?account_id=#{current_account.id}").try(:destroy)
       current_account.update_attribute(:last_checked_notifications, Time.now)
       200
     end
