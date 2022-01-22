@@ -610,7 +610,8 @@ class Event
       end_time: "in &hellip; (your profile's time zone)",
       time_zone: "Time zone to use for people that aren't signed in or haven't set a time zone",
       add_a_donation_to: "Text to display above the 'Add a donation' field (leave blank to use organisation default)",
-      donation_text: "Text to display below the 'Add a donation' field  (leave blank to use organisation default)"
+      donation_text: "Text to display below the 'Add a donation' field  (leave blank to use organisation default)",
+      suggested_donation: 'If this is empty the donation field will not be shown'
     }
   end
 
