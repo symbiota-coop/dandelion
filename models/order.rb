@@ -151,7 +151,7 @@ class Order
 
   def description
     d = description_elements
-    "#{event.name}, #{event.when_details(account.time_zone)}#{" at #{event.location}" if event.location != 'Online'}#{": #{d.join(', ')}" unless d.empty?}"
+    "#{event.name}, #{event.when_details(account.try(:time_zone)}#{" at #{event.location}" if event.location != 'Online'}#{": #{d.join(', ')}" unless d.empty?}"
   end
 
   before_validation do
