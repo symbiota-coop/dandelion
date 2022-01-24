@@ -5,7 +5,7 @@
 <% elsif (event.live? or event.tickets.count > 0) %>
   <a href="/events/<%= event.id %>/tickets">
     <% if defined?(full_width) && !event.capacity %>
-      <%= event.tickets.count %> tickets
+      <%= pluralize(event.tickets.count, 'ticket') %>
     <% elsif !defined?(full_width) %>
       <%= event.tickets.count %><% if event.capacity %>/<%= event.capacity %><% end %>
     <% end %>
