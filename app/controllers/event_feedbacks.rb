@@ -37,7 +37,8 @@ Dandelion::App.controller do
   get '/event_feedbacks/:id/destroy' do
     @event_feedback = EventFeedback.find(params[:id]) || not_found
     @event = @event_feedback.event
-    event_admins_only!
+    @organisation = @event.organisation
+    organisation_admins_only!
     @event_feedback.destroy
     redirect back
   end
