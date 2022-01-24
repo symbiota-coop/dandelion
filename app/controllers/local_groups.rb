@@ -75,6 +75,14 @@ Dandelion::App.controller do
     erb :'local_groups/stats'
   end
 
+  get '/local_groups/:id/receive_feedback/:f' do
+    @local_group = LocalGroup.find(params[:id]) || not_found
+    local_group_admins_only!
+    @local_groupship = @local_group.local_groupships.find_by(account: current_account) || not_found
+    @local_groupship.update_attribute(:receive_feedback, params[:f].to_i == 1)
+    redirect back
+  end
+
   post '/local_groups/:id/local_groupships/admin' do
     @local_group = LocalGroup.find(params[:id]) || not_found
     local_group_admins_only!

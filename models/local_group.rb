@@ -126,6 +126,10 @@ class LocalGroup
     Account.and(:id.in => local_groupships.and(admin: true).pluck(:account_id))
   end
 
+  def admins_receiving_feedback
+    Account.and(:id.in => local_groupships.and(admin: true).and(receive_feedback: true).pluck(:account_id))
+  end
+
   def send_followers_csv(account)
     csv = CSV.generate do |csv|
       csv << %w[name email]

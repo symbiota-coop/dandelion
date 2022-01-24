@@ -596,8 +596,8 @@ Dandelion::App.controller do
   end
 
   get '/o/:slug/receive_feedback/:f' do
-    sign_in_required!
     @organisation = Organisation.find_by(slug: params[:slug]) || not_found
+    organisation_admins_only!
     @organisationship = @organisation.organisationships.find_by(account: current_account) || not_found
     @organisationship.update_attribute(:receive_feedback, params[:f].to_i == 1)
     redirect back

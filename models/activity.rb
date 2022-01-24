@@ -183,6 +183,10 @@ class Activity
     Account.and(:id.in => activityships.and(admin: true).pluck(:account_id))
   end
 
+  def admins_receiving_feedback
+    Account.and(:id.in => activityships.and(admin: true).and(receive_feedback: true).pluck(:account_id))
+  end
+
   def sync_activityships
     if privacy == 'open'
       events.each do |event|

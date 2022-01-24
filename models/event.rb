@@ -253,8 +253,8 @@ class Event
     a = [account, revenue_sharer, coordinator].compact
     a += event_facilitators
     a += organisation.admins_receiving_feedback
-    a += activity.admins if activity
-    a += local_group.admins if local_group
+    a += activity.admins_receiving_feedback if activity
+    a += local_group.admins_receiving_feedback if local_group
     a
   end
 

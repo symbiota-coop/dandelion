@@ -17,7 +17,8 @@ class Organisationship
   field :notes, type: String
 
   %w[admin unsubscribed subscribed_discussion hide_membership receive_feedback why_i_joined_public sent_welcome sent_monthly_donation_welcome hide_referrer slack_member].each do |b|
-    field b.to_sym, type: Boolean; index({ b.to_s => 1 })
+    field b.to_sym, type: Boolean
+    index({ b.to_s => 1 })
   end
   index({ monthly_donation_method: 1 })
 

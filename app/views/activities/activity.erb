@@ -26,6 +26,13 @@
             <% else %>
               <a class="btn btn-outline-primary" href="/activities/<%= @activity.id %>/show_membership">Membership hidden</a>
             <% end %>
+            <% if activityship.admin? %>
+              <% if activityship.receive_feedback? %>
+                <a class="btn btn-primary" href="/activities/<%= @activity.id %>/receive_feedback/0">Receiving feedback</a>
+              <% else %>
+                <a class="btn btn-outline-primary" href="/activities/<%= @activity.id %>/receive_feedback/1">Not receiving feedback</a>
+              <% end %>
+            <% end %>
           <% end %>
         </div>
       <% else %>

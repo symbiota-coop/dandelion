@@ -80,6 +80,14 @@ Dandelion::App.controller do
     erb :'activities/stats'
   end
 
+  get '/activities/:id/receive_feedback/:f' do
+    @activity = Activity.find(params[:id]) || not_found
+    activity_admins_only!
+    @activityship = @activity.activityships.find_by(account: current_account) || not_found
+    @activityship.update_attribute(:receive_feedback, params[:f].to_i == 1)
+    redirect back
+  end
+
   post '/activities/:id/activityships/admin' do
     @activity = Activity.find(params[:id]) || not_found
     activity_admins_only!
