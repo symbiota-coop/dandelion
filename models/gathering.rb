@@ -320,9 +320,11 @@ class Gathering
     starting_after = nil
     while has_more
       w = Stripe::WebhookEndpoint.list({ limit: 100, starting_after: starting_after })
-      webhooks += w['data']
       has_more = w['has_more']
-      starting_after = w['data'].last['id']
+      unless w['data'].empty?
+        webhooks += w['data']
+        starting_after = w['data'].last['id']
+      end
     end
 
     unless webhooks.find { |w| w['url'] == "#{ENV['BASE_URI']}/g/#{slug}/stripe_webhook" && w['enabled_events'].include?('checkout.session.completed') }
