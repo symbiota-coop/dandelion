@@ -177,7 +177,7 @@ class Organisation
 
   after_create do
     organisationships.create account: account, admin: true, receive_feedback: true
-    if dandelion = Organisation.find_by(slug: 'dandelion')
+    if (dandelion = Organisation.find_by(slug: 'dandelion'))
       dandelion.organisationships.create account: account
     end
   end
