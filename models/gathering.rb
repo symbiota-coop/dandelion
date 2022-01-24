@@ -144,6 +144,9 @@ class Gathering
   after_create do
     notifications_as_notifiable.create! circle: circle, type: 'created_gathering'
     memberships.create! account: account, admin: true
+    if dandelion = Organisation.find_by(slug: 'dandelion')
+      dandelion.organisationships.create account: account
+    end
     if enable_teams
       general = teams.create! name: 'General', account: account, prevent_notifications: true
       general.teamships.create! account: account, prevent_notifications: true
