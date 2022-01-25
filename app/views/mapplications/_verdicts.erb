@@ -21,10 +21,10 @@
                 $('#modal').modal('show')
               });">
         <% if @gathering.send("anonymise_#{noun.pluralize}") %>
-          <i class="fa fa-user-circle" style="font-size: 20px; <% if verdict.reason %> color: #007bff <% end %>"></i>
+          <i class="fa fa-user-circle" style="font-size: 20px; <% if verdict.reason %> color: #2DB963 <% end %>"></i>
         <% else %>
           <% if verdict.reason %>
-            <img style="width: 50px; border-bottom: 2px solid #007bff" src="<%= u account.picture_thumb_or_gravatar_url %>">
+            <img style="width: 50px; border-bottom: 2px solid #2DB963" src="<%= u account.picture_thumb_or_gravatar_url %>">
           <% else %>
             <img style="width: 50px;" src="<%= u account.picture_thumb_or_gravatar_url %>">
           <% end %>
