@@ -18,7 +18,7 @@
   <%= partial :'accounts/buttons', locals: { account: account, btn_class: 'btn-sm' } %>
 </td>
 <td>
-  <%= membership.proposed_by.map(&:name).to_sentence if membership.proposed_by %>
+  <%= membership.proposed_by.map(&:name).to_sentence(last_word_connector: ' and ') if membership.proposed_by %>
 </td>
 <td>
   <% mapplication = membership.mapplication; if mapplication and mapplication.answers %>
