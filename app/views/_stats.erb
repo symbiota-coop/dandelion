@@ -9,7 +9,7 @@ if youngest && oldest %>
   <div class="row">
     <div class="col-sm-4">
 
-      <% sum = accounts.count %>
+      <% sum = accounts.where(:date_of_birth.ne => nil).count %>
       <table class="table">
         <thead>
           <tr>
@@ -28,7 +28,7 @@ if youngest && oldest %>
         <tr>
           <td>Unknown</td>
           <td><%= n = accounts.and(date_of_birth: nil).count %></td>
-          <td><%= number_to_percentage 100 * (n.to_f / sum), precision: 1 %></td>
+          <td></td>
         </tr>
       </table>
 
@@ -42,7 +42,7 @@ if youngest && oldest %>
           var config = {
             type: 'doughnut',
             data: {
-              labels: <%= data.keys.map { |p| "People in their #{p}s" } %>,
+              labels: <%== data.keys.map { |p| "People in their #{p}s" }.to_json %>,
               datasets: [{
               data: <%= data.values %>,
               backgroundColor: <%== 0.upto(data.values.length).map do |i|
@@ -76,7 +76,7 @@ if youngest && oldest %>
        men = accounts.and(:gender.in => ['Man', 'Cis Man']).count
        other = accounts.and(:gender.nin => ['Woman', 'Cis Woman', 'Man', 'Cis Man', nil]).count
        unknown = accounts.and(gender: nil).count
-       sum = [women, men, other, unknown].sum %>
+       sum = [women, men, other].sum %>
     <table class="table">
       <thead>
         <tr>
@@ -89,7 +89,11 @@ if youngest && oldest %>
       <tr>
         <td><%= x.titleize %></td>
         <td><%= binding.local_variable_get(x) %></td>
-        <td><%= number_to_percentage 100 * (binding.local_variable_get(x).to_f / sum), precision: 1 %></td>
+        <td>
+          <% unless x == 'unknown' %>
+            <%= number_to_percentage 100 * (binding.local_variable_get(x).to_f / sum), precision: 1 %>
+          <% end %>
+        </td>
       </tr>
       <% } %>
     </table>
