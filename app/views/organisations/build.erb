@@ -18,6 +18,17 @@
 
     autosize($('#organisation_minimal_head')[0])
 
+    $('#organisation-build-nav a[data-toggle="tab"]').on('show.bs.tab', function (e) {
+      var form = $('#organisation-build-nav').closest('form')[0]
+        if (form.reportValidity()) {
+          // continue
+        } else {
+          e.preventDefault()
+          $(window).scrollTop($(form).find(":invalid").first().offset()['top'] - $('#header').height() - 40)
+          $(form).find(":invalid").first().focus()
+        }
+    });
+
   })
 </script>
 <% if @organisation.errors.count > 0 %>

@@ -9,18 +9,23 @@
 <script>
   $(function () {
 
+    $('#event-build-nav a[data-toggle="tab"]').on('show.bs.tab', function (e) {
+      var form = $('#event-build-nav').closest('form')[0]
+        if (form.reportValidity()) {
+          // continue
+        } else {
+          e.preventDefault()
+          $(window).scrollTop($(form).find(":invalid").first().offset()['top'] - $('#header').height() - 40)
+          $(form).find(":invalid").first().focus()          
+        }
+    });
+
     <% if @event.new_record? %>
         $('.tab-pane').each(function () {
           var tabPane = this
           $('<a href="javascript:;" class="next btn btn-primary">Next</a>').appendTo(tabPane)
           $(this).find('a.next').click(function () {
-            var form = $(this).closest('form')[0]
-            if (form.reportValidity()) {
-              $('#event-build-nav a[href="#' + $(tabPane).next().attr('id') + '"]').tab('show')
-            } else {
-              $(window).scrollTop($(form).find(":invalid").first().offset()['top'] - $('#header').height() - 40)
-              $(form).find(":invalid").first().focus()
-            }
+            $('#event-build-nav a[href="#' + $(tabPane).next().attr('id') + '"]').tab('show')
           })
         })
         $('#tab6').find('a.next').remove()

@@ -10,18 +10,23 @@
       $('#slug-replace-coinbase-webhook').text('<%= ENV['BASE_URI'] %>/g/' + $('#gathering_slug').val() + '/coinbase_webhook');
     }).keyup();
 
+    $('#gathering-build-nav a[data-toggle="tab"]').on('show.bs.tab', function (e) {
+      var form = $('#gathering-build-nav').closest('form')[0]
+        if (form.reportValidity()) {
+          // continue
+        } else {
+          e.preventDefault()
+          $(window).scrollTop($(form).find(":invalid").first().offset()['top'] - $('#header').height() - 40)
+          $(form).find(":invalid").first().focus()
+        }
+    });
+
   <% if @gathering.new_record? %>
       $('.tab-pane').each(function () {
         var tabPane = this
         $('<a href="javascript:;" class="next btn btn-primary">Next</a>').appendTo(tabPane)
         $(this).find('a.next').click(function () {
-          var form = $(this).closest('form')[0]
-          if (form.reportValidity()) {
-            $('#gathering-build-nav a[href="#' + $(tabPane).next().attr('id') + '"]').tab('show')
-          } else {
-            $(window).scrollTop($(form).find(":invalid").first().offset()['top'] - $('#header').height() - 40)
-            $(form).find(":invalid").first().focus()
-          }
+          $('#gathering-build-nav a[href="#' + $(tabPane).next().attr('id') + '"]').tab('show')
         })
       })
       $('#tab5').find('a.next').remove()
