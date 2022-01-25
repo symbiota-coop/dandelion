@@ -129,12 +129,15 @@ class Gathering
   end
 
   before_validation do
+    errors.add(:fixed_threshold, 'must be at greater then zero') if fixed_threshold <= 0
     self.listed = nil if privacy == 'secret'
     self.balance = 0 if balance.nil?
     self.invitations_granted = 0 if invitations_granted.nil?
     self.processed_via_dandelion = 0 if processed_via_dandelion.nil?
     self.enable_teams = true if enable_budget
     self.member_limit = memberships.count if member_limit && (member_limit < memberships.count)
+    self.fixed_threshold = nil if democratic_threshold
+    true
   end
 
   def self.admin?(gathering, account)
@@ -307,11 +310,6 @@ class Gathering
 
   def threshold
     democratic_threshold ? median_threshold : fixed_threshold
-  end
-
-  before_validation do
-    self.fixed_threshold = nil if democratic_threshold
-    true
   end
 
   after_save :create_stripe_webhook_if_necessary, if: :stripe_sk
