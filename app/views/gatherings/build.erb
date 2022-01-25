@@ -15,7 +15,13 @@
         var tabPane = this
         $('<a href="javascript:;" class="next btn btn-primary">Next</a>').appendTo(tabPane)
         $(this).find('a.next').click(function () {
-          $('#gathering-build-nav a[href="#' + $(tabPane).next().attr('id') + '"]').tab('show')
+          var form = $(this).closest('form')[0]
+          if (form.reportValidity()) {
+            $('#gathering-build-nav a[href="#' + $(tabPane).next().attr('id') + '"]').tab('show')
+          } else {
+            $(window).scrollTop($(form).find(":invalid").first().offset()['top'] - $('#header').height() - 40)
+            $(form).find(":invalid").first().focus()
+          }
         })
       })
       $('#tab5').find('a.next').remove()

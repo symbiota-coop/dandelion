@@ -67,7 +67,7 @@ module Dandelion
           kick! notice: 'Please sign in to continue.'
         end
       end
-      @og_desc = 'Dandelion is a platform for ticketed events and co-created gatherings created by the not-for-profit worker co-operative Dandelion Collective'
+      @og_desc = 'Dandelion is an open-source platform for ticketed events and co-created gatherings created by the not-for-profit worker co-operative Dandelion Collective'
       @og_image = "#{ENV['BASE_URI']}/images/black-on-white-link.png"
       @no_discord = true if params[:minimal]
       current_account.set(last_active: Time.now) if current_account
