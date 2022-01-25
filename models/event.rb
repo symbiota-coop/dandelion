@@ -213,7 +213,6 @@ class Event
   end
 
   after_create do
-    event_facilitations.create account: revenue_sharer if revenue_sharer
     activity.update_attribute(:hidden, false) if activity
     organisation.update_paid_up
   end
@@ -223,6 +222,7 @@ class Event
   end
 
   after_save do
+    event_facilitations.create account: revenue_sharer if revenue_sharer
     if zoom_party
       organisation.local_groups.and(type: 'euro').each do |local_group|
         zoomships.create local_group: local_group
