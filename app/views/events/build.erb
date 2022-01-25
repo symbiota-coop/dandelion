@@ -6,15 +6,6 @@
     <% rescue CurrencyUnavailable %>
   <% end %>
 <% end %>
-<% if @event.errors.count > 0 %>
-  <div class="alert alert-danger">
-    <ul class="mb-0">
-      <% @event.errors.full_messages.each { |message| %>
-      <li><%= message %></li>
-      <% } %>
-    </ul>
-  </div>
-<% end %>
 <script>
   $(function () {
 
@@ -73,6 +64,15 @@
 
   })
 </script>
+<% if @event.errors.count > 0 %>
+  <div class="alert alert-danger">
+    <ul class="mb-0">
+      <% @event.errors.full_messages.each { |message| %>
+      <li><%= message %></li>
+      <% } %>
+    </ul>
+  </div>
+<% end %>
 <% form_for @event, @event.new_record ? '/events/new' : "/events/#{@event.id}/edit" do |f| %>
   <ul id="event-build-nav" class="nav nav-tabs" role="tablist">
     <li role="presentation" class="nav-item"><a class="nav-link active" href="#tab1" role="tab" data-toggle="tab">Basics</a></li>

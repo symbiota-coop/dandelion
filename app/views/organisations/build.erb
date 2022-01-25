@@ -20,6 +20,15 @@
 
   })
 </script>
+<% if @organisation.errors.count > 0 %>
+  <div class="alert alert-danger">
+    <ul class="mb-0">
+      <% @organisation.errors.full_messages.each { |message| %>
+      <li><%= message %></li>
+      <% } %>
+    </ul>
+  </div>
+<% end %>
 <% form_for @organisation, @organisation.new_record? ? '/o/new' : "/o/#{@organisation.slug}/edit" do  |f| %>
   <% if @organisation.persisted? %>
     <ul id="organisation-build-nav" class="nav nav-tabs" role="tablist">

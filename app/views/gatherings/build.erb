@@ -87,6 +87,15 @@
 
   })
 </script>
+<% if @gathering.errors.count > 0 %>
+  <div class="alert alert-danger">
+    <ul class="mb-0">
+      <% @gathering.errors.full_messages.each { |message| %>
+      <li><%= message %></li>
+      <% } %>
+    </ul>
+  </div>
+<% end %>
 <% form_for @gathering, @gathering.new_record? ? '/g/new' : "/g/#{@gathering.slug}/edit", multipart: true do |f| %>
   <ul id="gathering-build-nav" class="nav nav-tabs" role="tablist">
     <li role="presentation" class="nav-item"><a class="nav-link active" href="#tab1" role="tab" data-toggle="tab">Basics</a></li>
