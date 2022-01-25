@@ -213,6 +213,7 @@ class Event
   end
 
   after_create do
+    event_facilitations.create account: revenue_sharer if revenue_sharer
     activity.update_attribute(:hidden, false) if activity
     organisation.update_paid_up
   end
