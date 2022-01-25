@@ -11,6 +11,16 @@
     </div>
   </div>
 <% end %>
+
+<% if @gathering.demand_payment && @membership.paid == 0 %>
+  <div class="alert alert-danger">
+    Make a payment to access gathering content.
+    <% if @membership.optionships.empty? %>
+      <a href="/g/<%= @gathering.slug %>/options">Choose & Pay</a>
+    <% end %>
+  </div>
+<% end %>
+
 <table class="table table-borderless">
   <% if @gathering.enable_contributions? && @gathering.options.count > 0 %>
     <tr>
@@ -25,7 +35,7 @@
           </a>
           <% } %>
         <% else %>
-          <a href="/g/<%= @gathering.slug %>/options">Select options</a>
+          <a href="/g/<%= @gathering.slug %>/options">Choose & Pay</a>
         <% end %>
       </td>
     </tr>
