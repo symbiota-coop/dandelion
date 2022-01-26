@@ -14,7 +14,8 @@ class Membership
   field :invitations_granted, type: Integer
 
   %w[admin unsubscribed member_of_facebook_group hide_from_sidebar].each do |b|
-    field b.to_sym, type: Boolean; index({ b.to_s => 1 })
+    field b.to_sym, type: Boolean
+    index({ b.to_s => 1 })
   end
 
   def self.admin_fields
@@ -100,6 +101,12 @@ class Membership
     if mapplication
       mapplication.prevent_notifications = true
       mapplication.destroy
+    end
+    gathering.subscriptions.where(account: account).destroy_all
+    %w[teams tactivities mapplications].each do |items|
+      gathering.send(items).each do |item|
+        item.subscriptions.where(account: account).destroy_all
+      end
     end
   end
 
