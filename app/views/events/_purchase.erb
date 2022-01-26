@@ -229,7 +229,7 @@
       <% unless current_account && @event.organisation_and_cohosts.all? { |organisation| current_account.organisationships.find_by(organisation: organisation) } %>
         <script>
           $(function () {
-            $('#opt-in-organisation label').text('Get email updates from <%= @event.organisation_and_cohosts.map(&:name).to_sentence(last_word_connector: ' and ') %>')
+            $('#opt-in-organisation label').text('Get email updates from <%= @event.organisation_and_cohosts.map { |organisation| Sanitize.fragment(organisation.name) }.to_sentence(last_word_connector: ' and ') %>')
             $('#opt-in-organisation').show()
           })
         </script>
