@@ -46,7 +46,9 @@
   <% } %>
 </div>
 <% when 'emails' %>
-<pre style="margin-top: 15px;"><%= Account.and(:id.in => @memberships.pluck(:account_id)).map { |account| "#{account.name} &lt;#{account.email}&gt;" }.join(', ') %></pre>
+<pre style="margin-top: 15px;">
+  <%== Account.and(:id.in => @memberships.pluck(:account_id)).map { |account| "#{Sanitize.fragment(account.name)} &lt;#{Sanitize.fragment(account.email)}&gt;" }.join(', ') %>
+</pre>
 <% when 'dietary_requirements' %>
 <table class="table table-striped">
   <thead>
