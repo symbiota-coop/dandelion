@@ -18,7 +18,7 @@ Dandelion::App.controller do
     if @place.save
       placeship = current_account.placeships.find_by(place: @place) || current_account.placeships.create(place: @place)
       placeship.update_attribute(:unsubscribed, true)
-      redirect '/map'
+      redirect "/places/#{@place.id}"
     else
       flash.now[:error] = 'There was an error saving the place.'
       erb :'maps/map'
