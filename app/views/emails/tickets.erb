@@ -9,6 +9,7 @@
         .gsub(' [at_event_location_if_not_online]', event.online? ? '' : " at #{event.location}")
         .gsub('[tickets_are]', order.tickets.length == 1 ? 'ticket is' : 'tickets are') %>
   <% if event.extra_info_for_ticket_email %>
+    <hr>
     <%= event.extra_info_for_ticket_email %>
   <% end %>
   <% if event.organisation.extra_info_for_ticket_email %>
