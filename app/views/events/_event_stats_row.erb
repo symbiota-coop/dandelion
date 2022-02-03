@@ -97,7 +97,7 @@
       <% end %>
     </td>
     <td>
-      <% if event.donations.count > 0 && !event.tickettailor_id %>
+      <% if event.donations.count > 0 && !event.purchase_url %>
         <%= m event.donation_revenue, event.currency %>
       <% end %>
     </td>

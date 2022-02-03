@@ -11,11 +11,11 @@
 <% end %>
 <% sidebar = false %>
 <% if !params[:success] %>
-  <% sidebar = true if @event.sold_out? %>
+  <% sidebar = true if @event.sold_out? || @event.purchase_url %>
   <% buy_tickets_style = 'class="fixed-bottom bg-white p-3 w-100 d-block d-md-none" style="z-index: 1019; box-shadow: 0px -2px 4px 0px rgba(0,0,0,0.3);"' %>
-  <% if @event.tickettailor_id %>
+  <% if @event.purchase_url %>
     <div id="buy-tickets" <%== buy_tickets_style %>>
-      <a target="_blank" href="https://www.tickettailor.com/events/thepsychedelicsociety/<%= @event.tickettailor_id %>" class="btn btn-primary btn-block">Buy tickets on TicketTailor</a>
+      <a target="_blank" href="<%=@event.purchase_url%>" class="btn btn-primary btn-block">Buy tickets on <%=URI(@event.purchase_url).host%></a>
     </div>
     <style>
       @media(max-width: 767px) { #content { padding-bottom: 4rem } }
@@ -172,9 +172,6 @@
         <% end %>
       <% end %>
     </table>
-    <% if @event.tickettailor_id %>
-      <a target="_blank" href="https://www.tickettailor.com/events/thepsychedelicsociety/<%= @event.tickettailor_id %>" class="d-none d-md-block btn btn-primary btn-block mb-3">Buy tickets on TicketTailor</a>
-    <% end %>
     <% if @event.description || @event.organisation.event_footer %>
       <div class="wysiwyg">
         <big>
@@ -221,7 +218,14 @@
             </div>
           </div>
         <% end %>
-        <% if @event.sold_out? && !params[:ticket_type_id] %>
+        <% if @event.purchase_url %>
+          <div class="card">
+            <h3 class="card-header bg-primary text-white">Select tickets</h3>
+            <div class="card-body">
+              <a target="_blank" href="<%= @event.purchase_url %>" class="d-none d-md-block btn btn-outline-primary btn-block mb-3">Buy tickets on <%=URI(@event.purchase_url).host%></a>
+            </div>
+          </div>
+        <% elsif @event.sold_out? && !params[:ticket_type_id] %>
           <% if params[:added_to_waitlist] %>
             <div class="card">
               <h3 class="card-header bg-primary text-white">Thanks!</h3>

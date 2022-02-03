@@ -210,7 +210,7 @@
         <%= f.text_block :donation_text %>
       </div>
       <div role="tabpanel" class="tab-pane" id="tab6">
-      <%= f.url_block :redirect_url %>
+        <%= f.url_block :redirect_url %>
         <%= f.number_block :facebook_pixel_id %>
         <%= f.check_box_block :featured %>
         <%= f.check_box_block :secret %>
@@ -225,6 +225,7 @@
         <%= f.check_box_block :refund_deleted_orders %>
         <%= f.text_area_block :notes %>
         <% if Padrino.env == :development || @event.organisation.verified? %>
+          <%= f.url_block :purchase_url %>
           <%= f.number_block :affiliate_credit_percentage %>
         <% end %>
         <% if @event.new_record? %>

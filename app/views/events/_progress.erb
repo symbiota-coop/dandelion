@@ -1,6 +1,6 @@
-<% if event.tickettailor_id %>
-  <a target="_blank" href="https://app.tickettailor.com/event/<%= event.tickettailor_id %>">
-    <span class="label label-primary">TicketTailor</span>
+<% if event.purchase_url %>
+  <a target="_blank" href="<%= event.purchase_url %>">
+    <span class="label label-primary"><%=URI(event.purchase_url).host%></span>
   </a>
 <% elsif (event.live? or event.tickets.count > 0) %>
   <a href="/events/<%= event.id %>/tickets">

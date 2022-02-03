@@ -28,9 +28,9 @@ class Event
   field :affiliate_credit_percentage, type: Integer
   field :extra_info_for_ticket_email, type: String
   field :ps_event_id, type: String
-  field :tickettailor_id, type: String
   field :notes, type: String
   field :redirect_url, type: String
+  field :purchase_url, type: String
   field :currency, type: String
   field :facebook_pixel_id, type: String
   field :time_zone, type: String
@@ -63,8 +63,8 @@ class Event
       capacity: :number,
       notes: :text_area,
       ps_event_id: :text,
-      tickettailor_id: :text,
       redirect_url: :url,
+      purchase_url: :url,
       draft: :check_box,
       secret: :check_box,
       questions: :text_area,
