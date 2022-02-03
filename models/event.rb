@@ -601,7 +601,8 @@ class Event
       time_zone: 'Display time zone',
       start_time: 'Start date/time',
       end_time: 'End date/time',
-      extra_info_for_ticket_email: 'Extra info for ticket confirmation email'
+      extra_info_for_ticket_email: 'Extra info for ticket confirmation email',
+      purchase_url: 'Purchase URL'
     }[attr.to_sym] || super
   end
 
