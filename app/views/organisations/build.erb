@@ -45,7 +45,7 @@
     <ul id="organisation-build-nav" class="nav nav-tabs" role="tablist">
       <li role="presentation" class="nav-item"><a class="nav-link <%= 'active' if !params[:tab] || params[:tab].to_i == 1%>" href="#tab1" role="tab" data-toggle="tab">Basics</a></li>
       <li role="presentation" class="nav-item"><a class="nav-link <%= 'active' if params[:tab].to_i == 2%>" href="#tab2" role="tab" data-toggle="tab">Payments</a></li>
-      <li role="presentation" class="nav-item"><a class="nav-link <%= 'active' if params[:tab].to_i == 3%>" href="#tab3" role="tab" data-toggle="tab">API keys</a></li>
+      <li role="presentation" class="nav-item"><a class="nav-link <%= 'active' if params[:tab].to_i == 3%>" href="#tab3" role="tab" data-toggle="tab">Other services</a></li>
       <li role="presentation" class="nav-item"><a class="nav-link <%= 'active' if params[:tab].to_i == 4%>" href="#tab4" role="tab" data-toggle="tab">Emails</a></li>
       <li role="presentation" class="nav-item"><a class="nav-link <%= 'active' if params[:tab].to_i == 4%>" href="#tab5" role="tab" data-toggle="tab">Everything else</a></li>
       <% if Padrino.env == :development || @organisation.verified? %>
