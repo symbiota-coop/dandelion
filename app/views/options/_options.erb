@@ -42,7 +42,7 @@
         <%= m option.cost, @gathering.currency %>/person
       <% end %>
     </td>
-    <td>
+    <td nowrap>
       <a href="javascript:;" onclick="$('#modal .modal-content').load('/g/<%= @gathering.slug %>/options/<%= option.id %>', function () {
                   $('#modal').modal('show')
                 });">
