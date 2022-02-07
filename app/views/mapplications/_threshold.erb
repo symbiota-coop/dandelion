@@ -13,7 +13,7 @@
     <% if @gathering.democratic_threshold %>
       What do you think the magic number should be?
       <% form_tag "/g/#{@gathering.slug}/threshold", style: 'display: inline' do %>
-        <%= number_field_tag :desired_threshold, min: 1, class: 'form-control', value: @membership.desired_threshold, style: 'display: inline-block; width: 4em', onchange: '$(this.form).submit()' %>
+        <%= number_field_tag :desired_threshold, min: 0, class: 'form-control', value: @membership.desired_threshold, style: 'display: inline-block; width: 4em', onchange: '$(this.form).submit()' %>
       <% end %>
     <% end %>
   <% end %>
