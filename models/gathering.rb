@@ -33,7 +33,7 @@ class Gathering
   field :seeds_username, type: String
 
   def self.enablable
-    %w[teams timetables rotas contributions inventory budget]
+    %w[teams timetables rotas contributions inventory budget partial_payments]
   end
   enablable.each do |x|
     field :"enable_#{x}", type: Boolean

@@ -4,7 +4,12 @@
       <div class="input-group-prepend">
         <span class="input-group-text"><%= Money.new(0, @gathering.currency).symbol %></span>
       </div>
-      <%= number_field_tag :amount, value: (amount if defined?(amount)), style: 'width: 5em;', required: 'required', class: 'form-control', id: 'amount' %>
+      <% if @gathering.enable_partial_payments %>
+        <%= number_field_tag :amount, value: (amount if defined?(amount)), style: 'width: 5em;', required: 'required', class: 'form-control', id: 'amount' %>
+      <% else %>
+        <%= number_field_tag :amount, value: (amount if defined?(amount)), style: 'width: 5em;', disabled: true, class: 'form-control' %>
+        <%= hidden_field_tag :amount, value: (amount if defined?(amount)), id: 'amount' %>
+      <% end %>
     </div>
   </div>
   <% if @gathering.stripe_sk && FIAT_CURRENCIES.include?(@gathering.currency) %>
