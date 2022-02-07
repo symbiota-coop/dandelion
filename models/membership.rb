@@ -38,7 +38,7 @@ class Membership
 
   before_validation do
     errors.add(:gathering, 'is full') if new_record? && gathering.member_limit && (gathering.memberships(true).count >= gathering.member_limit)
-    self.desired_threshold = 1 if desired_threshold && (desired_threshold < 1)
+    self.desired_threshold = 0 if desired_threshold && (desired_threshold < 0)
     self.paid = 0 if paid.nil?
     self.requested_contribution = 0 if requested_contribution.nil?
   end
