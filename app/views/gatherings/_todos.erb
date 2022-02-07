@@ -14,10 +14,7 @@
 
 <% if @gathering.demand_payment && @membership.paid == 0 %>
   <div class="alert alert-danger">
-    Make a payment to access gathering content.
-    <% if @membership.optionships.empty? %>
-      <a href="/g/<%= @gathering.slug %>/options">Choose & Pay</a>
-    <% end %>
+    Make a payment to access gathering content. <a href="/g/<%= @gathering.slug %>/options">Choose & Pay</a>
   </div>
 <% end %>
 

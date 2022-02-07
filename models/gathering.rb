@@ -274,7 +274,8 @@ class Gathering
       stripe_sk: '<code>Developers</code> > <code>API keys</code> > <code>Secret key</code>. Starts <code>sk_</code>',
       stripe_endpoint_secret: '<code>Developers</code> > <code>Webhooks</code> > <code>Signing secret</code>. Starts <code>whsec_</code>',
       coinbase_api_key: '<code>Settings</code> > <code>API keys</code>',
-      coinbase_webhook_secret: '<code>Settings</code> > <code>Webhook subscriptions</code> > <code>Show shared secret</code>'
+      coinbase_webhook_secret: '<code>Settings</code> > <code>Webhook subscriptions</code> > <code>Show shared secret</code>',
+      redirect_on_acceptance: 'Experimental'
     }
   end
 
