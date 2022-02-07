@@ -237,13 +237,17 @@ Dandelion::App.controller do
     if params[:i] == 'featured'
       partial :'events/carousel', locals: { title: 'Featured', events: @organisation.featured_events }
     else
-      line = @organisation.carousels.split("\n").reject { |line| line.blank? }[params[:i].to_i]
-      title, tags = line.split(':')
-      title, w = title.split('[')
-      w = w ? w.split(']').first.to_i : 8
-      tags = tags.split(',').map(&:strip)
-      @events = @organisation.events_for_search.future_and_current_featured.and(:draft.ne => true).and(:start_time.lt => w.weeks.from_now).and(:image_uid.ne => nil).and(:id.in => EventTagship.and(:event_tag_id.in => EventTag.and(:name.in => tags).pluck(:id)).pluck(:event_id)).limit(20)
-      partial :'events/carousel', locals: { title: title, events: @events }
+      begin
+        line = @organisation.carousels.split("\n").reject { |line| line.blank? }[params[:i].to_i]
+        title, tags = line.split(':')
+        title, w = title.split('[')
+        w = w ? w.split(']').first.to_i : 8
+        tags = tags.split(',').map(&:strip)
+        @events = @organisation.events_for_search.future_and_current_featured.and(:draft.ne => true).and(:start_time.lt => w.weeks.from_now).and(:image_uid.ne => nil).and(:id.in => EventTagship.and(:event_tag_id.in => EventTag.and(:name.in => tags).pluck(:id)).pluck(:event_id)).limit(20)
+        partial :'events/carousel', locals: { title: title, events: @events }
+      rescue StandardError
+        500
+      end
     end
   end
 

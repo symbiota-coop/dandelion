@@ -18,13 +18,15 @@
   <% options.order('cost asc, name asc').each { |option| %>
   <tr>
     <td>
-      <% if @membership.admin? %>
-        <a href="/g/<%= @gathering.slug %>/options/<%= option.id %>/edit">
+      <strong>
+        <% if @membership.admin? %>
+          <a href="/g/<%= @gathering.slug %>/options/<%= option.id %>/edit">
+            <%= option.name %>
+          </a>
+        <% else %>
           <%= option.name %>
-        </a>
-      <% else %>
-        <%= option.name %>
-      <% end %>
+        <% end %>
+      </strong>
       <% if option.description %>
         <br>
         <%== Sanitize.fragment(Rinku.auto_link(option.description.gsub("\n", '<br />')), Sanitize::Config::DANDELION) %>
