@@ -58,7 +58,7 @@ Dandelion::App.controller do
       if @mapplication.save
         if @mapplication.acceptable? && @mapplication.meets_threshold
           @mapplication.accept
-          redirect "/g/#{@gathering.slug}/apply?accepted=true"
+          redirect(@gathering.redirect_on_acceptance || "/g/#{@gathering.slug}/apply?accepted=true")
         else
           redirect "/g/#{@gathering.slug}/apply?applied=true"
         end

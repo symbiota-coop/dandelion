@@ -31,6 +31,7 @@ class Gathering
   field :coinbase_webhook_secret, type: String
   field :xdai_address, type: String
   field :seeds_username, type: String
+  field :redirect_on_acceptance, type: String
 
   def self.enablable
     %w[teams timetables rotas contributions inventory budget partial_payments]
@@ -77,6 +78,7 @@ class Gathering
       ask_for_facebook_profile_url: :check_box,
       listed: :check_box,
       paypal_email: :text,
+      redirect_on_acceptance: :text,
       currency: :select,
       facebook_group_url: :url,
       account_id: :lookup,
