@@ -61,7 +61,7 @@
         <a class="pagelet-trigger btn btn-outline-primary" href="/optionships/<%= optionship.id %>/destroy">Leave</a>
       <% elsif !option.full? %>
         <% if option.by_invitation %>
-          <span class="label label-secondary">By invitation</span>
+          <span class="label label-default">By invitation</span>
         <% else %>
           <a class="pagelet-trigger btn btn-primary" onclick="window.scrollTo(0, 0)" href="/optionships/create?option_id=<%= option.id %>">Join</a>
         <% end %>
