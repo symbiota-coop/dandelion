@@ -56,7 +56,12 @@ Dandelion::App.controller do
     else
       @mapplication = @gathering.mapplications.build account: @account, status: 'pending', answers: (params[:answers].map { |i, x| [@gathering.application_questions_a[i.to_i], x] } if params[:answers])
       if @mapplication.save
-        redirect "/g/#{@gathering.slug}/apply?applied=true"
+        if @mapplication.acceptable? && @mapplication.meets_threshold
+          @mapplication.accept
+          redirect "/g/#{@gathering.slug}/apply?accepted=true"
+        else
+          redirect "/g/#{@gathering.slug}/apply?applied=true"
+        end
       else
         flash.now[:error] = 'There was a problem saving the application'
         halt 400, erb(:'mapplications/apply')

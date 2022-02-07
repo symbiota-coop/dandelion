@@ -17,7 +17,10 @@
     </div>
   <% end %>
   <div class="<%= @gathering.hide_members_on_application_form ? 'col-sm-12' : 'col-sm-8' %> order-sm-0">
-    <% if params[:applied] or (current_account and @gathering.mapplications.find_by(:status.ne => 'accepted', :account => current_account)) %>
+    <% if params[:accepted] %>
+      <h2>You've been accepted to <%=@gathering.name%></h2>
+      <p>Check your email app for a sign in link.</p>
+    <% elsif params[:applied] or (current_account and @gathering.mapplications.find_by(:status.ne => 'accepted', :account => current_account)) %>
       <h2>Thanks for applying</h2>
       <%= partial :'mapplications/threshold_info' %>
     <% else %>
@@ -51,11 +54,13 @@
         </div>
         <% } %>
         <%= f.submit_block button_text: 'Apply' %>
-        <div class="row mt-2">
-          <div class="col" style="font-style: italic">
-            <%= partial :'mapplications/threshold_info' %>
+        <% if @gathering.threshold > 0 %>
+          <div class="row mt-2">
+            <div class="col" style="font-style: italic">
+              <%= partial :'mapplications/threshold_info' %>
+            </div>
           </div>
-        </div>
+        <% end %>
       <% end %>
     <% end %>
   </div>
