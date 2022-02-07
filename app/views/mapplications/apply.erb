@@ -54,7 +54,7 @@
         </div>
         <% } %>
         <%= f.submit_block button_text: 'Apply' %>
-        <% if @gathering.threshold > 0 %>
+        <% if @gathering.threshold && @gathering.threshold > 0 %>
           <div class="row mt-2">
             <div class="col" style="font-style: italic">
               <%= partial :'mapplications/threshold_info' %>
