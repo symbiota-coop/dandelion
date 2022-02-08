@@ -11,6 +11,7 @@ module Dandelion
     Sass::Plugin.options[:css_location] = Padrino.root('app', 'assets', 'stylesheets')
     use Sass::Plugin::Rack
 
+    use Rack::Session::Cookie, expire_after: 1.year.to_i
     use Rack::UTF8Sanitizer
     use RackSessionAccess::Middleware if Padrino.env == :test
     use Dragonfly::Middleware
@@ -28,7 +29,6 @@ module Dandelion
       OmniAuth::FailureEndpoint.new(env).redirect_to_failure
     }
 
-    set :sessions, expire_after: 1.year
     set :public_folder, Padrino.root('app', 'assets')
     set :default_builder, 'ActivateFormBuilder'
     set :protection, except: :frame_options
