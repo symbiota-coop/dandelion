@@ -356,7 +356,7 @@ class Gathering
   def clear_up_optionships!
     memberships.each do |membership|
       membership.optionships.each do |optionship|
-        optionship.destroy if optionship.created_at < 1.hour.ago && membership.paid < optionship.option.cost
+        optionship.destroy if optionship.created_at < 1.hour.ago && optionship.option.cost > membership.paid
       end
     end
   end
