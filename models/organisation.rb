@@ -207,7 +207,7 @@ class Organisation
   end
 
   def featured_events
-    events_for_search.future_and_current_featured.and(:draft.ne => true).and(:image_uid.ne => nil).and(featured: true).limit(20).shuffle.reject(&:sold_out?)
+    events_for_search.future_and_current_featured.and(:draft.ne => true).and(:image_uid.ne => nil).and(featured: true).limit(20).reject(&:sold_out?)
   end
 
   def services_for_search(draft: false, secret: false)
