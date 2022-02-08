@@ -95,10 +95,11 @@ class Ticket
     if event.organisation.send_ticket_emails_from_organisation && event.organisation.reply_to && event.organisation.image
       header_image_url = event.organisation.image.url
       batch_message.from event.organisation.reply_to
+      batch_message.reply_to event.email
     else
       header_image_url = "#{ENV['BASE_URI']}/images/black-on-transparent-sq.png"
       batch_message.from 'Dandelion <tickets@dandelion.earth>'
-      batch_message.reply_to event.organisation.reply_to if event.organisation.reply_to
+      batch_message.reply_to(event.email || event.organisation.reply_to)
     end
 
     batch_message.body_html Premailer.new(ERB.new(File.read(Padrino.root('app/views/layouts/email.erb'))).result(binding), with_html_string: true, adapter: 'nokogiri', input_encoding: 'UTF-8').to_inline_css
