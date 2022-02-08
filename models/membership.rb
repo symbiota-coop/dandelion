@@ -102,10 +102,10 @@ class Membership
       mapplication.prevent_notifications = true
       mapplication.destroy
     end
-    gathering.subscriptions.where(account: account).destroy_all
+    gathering.subscriptions.and(account: account).destroy_all
     %w[teams tactivities mapplications].each do |items|
       gathering.send(items).each do |item|
-        item.subscriptions.where(account: account).destroy_all
+        item.subscriptions.and(account: account).destroy_all
       end
     end
   end

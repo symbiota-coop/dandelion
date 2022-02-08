@@ -405,7 +405,7 @@ class Account
   end
 
   def following_starred
-    Account.and(:id.in => follows_as_follower.where(starred: true).pluck(:followee_id))
+    Account.and(:id.in => follows_as_follower.and(starred: true).pluck(:followee_id))
   end
 
   def followers
