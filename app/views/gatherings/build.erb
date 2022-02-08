@@ -221,6 +221,7 @@
         <%= f.check_box_block "enable_#{x}".to_sym %>
         <% } %>
         <%= f.check_box_block :demand_payment %>
+        <%= f.check_box_block :clear_up_optionships %>
         <div class="mt-2">
           <%= f.url_block :facebook_group_url %>
           <%= f.url_block :redirect_on_acceptance %>

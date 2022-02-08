@@ -35,6 +35,12 @@ namespace :services do
 end
 
 namespace :gatherings do
+  task clear_up_optionships: :environment do
+    Gathering.and(clear_up_optionships: true).each do |gathering|
+      gathering.clear_up_optionships!
+    end
+  end
+
   task check_seeds_accounts: :environment do
     Gathering.and(:seeds_username.ne => nil).each do |gathering|
       gathering.check_seeds_account

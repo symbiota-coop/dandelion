@@ -41,7 +41,7 @@ class Gathering
     index({ "enable_#{x}" => 1 })
   end
 
-  %w[enable_comments_on_gathering_homepage enable_supporters anonymise_supporters democratic_threshold require_reason_proposer require_reason_supporter demand_payment hide_members_on_application_form hide_invitations ask_for_facebook_profile_url listed].each do |b|
+  %w[enable_comments_on_gathering_homepage enable_supporters clear_up_optionships anonymise_supporters democratic_threshold require_reason_proposer require_reason_supporter demand_payment hide_members_on_application_form hide_invitations ask_for_facebook_profile_url listed].each do |b|
     field b.to_sym, type: Boolean
     index({ b.to_s => 1 })
   end
@@ -73,6 +73,7 @@ class Gathering
       application_questions: :text_area,
       enable_supporters: :check_box,
       anonymise_supporters: :check_box,
+      clear_up_optionships: :check_box,
       demand_payment: :check_box,
       hide_members_on_application_form: :check_box,
       ask_for_facebook_profile_url: :check_box,
@@ -293,6 +294,7 @@ class Gathering
       hide_members_on_application_form: "Don't show existing members on the application form",
       invitations_granted: 'People may invite this many others by default',
       hide_invitations: 'Make the number of invitations granted visible to admins only',
+      clear_up_optionships: 'Periodically remove people from unpaid options',
       stripe_endpoint_secret: 'Stripe endpoint secret',
       stripe_pk: 'Stripe public key',
       stripe_sk: 'Stripe secret key',
@@ -348,6 +350,14 @@ class Gathering
       sorted = array.sort
       len = sorted.length
       ((sorted[(len - 1) / 2] + sorted[len / 2]) / 2.0).round
+    end
+  end
+
+  def clear_up_optionships!
+    memberships.each do |membership|
+      membership.optionships.each do |optionship|
+        optionship.destroy if membership.paid < optionship.option.cost
+      end
     end
   end
 
