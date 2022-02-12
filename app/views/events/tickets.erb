@@ -51,7 +51,12 @@
       <%= partial :'accounts/account', locals: { account: ticket.account, width: '50px', show_email: ticket_email_viewer?(ticket) } %>
     </td>
     <td>
-      <%= ticket.ticket_type.try(:name) %>
+      <% if ticket_type = ticket.ticket_type %>
+        <%= ticket_type.name %>
+        <% if ticket_type.ticket_group %>
+          <span class="label label-primary"><%=ticket_type.ticket_group.name%></span>
+        <% end %>
+      <% end %>
     </td>
     <td data-sort="<%= ticket.discounted_price %>">
       <% if ticket.discounted_price %>
