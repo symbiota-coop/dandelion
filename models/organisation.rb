@@ -646,7 +646,7 @@ class Organisation
         csv << [
           organisationship.account.name,
           Organisation.admin?(self, account) ? organisationship.account.email : '',
-          organisationship.unsubscribed
+          (1 if organisationship.unsubscribed)
         ]
       end
     end

@@ -141,7 +141,7 @@ class LocalGroup
         csv << [
           local_groupship.account.name,
           Organisation.admin?(organisation, account) ? local_groupship.account.email : '',
-          local_groupship.unsubscribed
+          (1 if local_groupship.unsubscribed)
         ]
       end
     end

@@ -218,7 +218,7 @@ class Activity
         csv << [
           activityship.account.name,
           Organisation.admin?(organisation, account) ? activityship.account.email : '',
-          activityship.unsubscribed
+          (1 if activityship.unsubscribed)
         ]
       end
     end
