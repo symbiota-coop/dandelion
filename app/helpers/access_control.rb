@@ -167,7 +167,12 @@ Dandelion::App.helpers do
 
   def membership_required!(gathering = nil, account = current_account)
     gathering ||= @gathering
-    kick!(notice: 'You must be a member of that gathering to access that page') unless account && gathering && gathering.memberships.find_by(account: account)
+    unless account && gathering && gathering.memberships.find_by(account: account)
+      kick!(
+        notice: 'You must be a member of that gathering to access that page',
+        r: ("/g/#{gathering.slug}" if %w[open closed].include?(gathering.privacy))
+      )
+    end
   end
 
   def confirmed_membership_required!(gathering = nil, account = current_account)
