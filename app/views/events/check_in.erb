@@ -6,7 +6,7 @@
     <canvas style="width: 100%" id="canvas" hidden></canvas>
     <div id="output" hidden class="text-center">
       <div id="outputMessage">No QR code detected.</div>
-      <div hidden><b>Ticket ID:</b> 
+      <div hidden><b>Ticket ID:</b>
         <span id="outputData"></span>
       </div>
     </div>
@@ -42,8 +42,8 @@
         if (!code)
           return
         checkingIn = true
-        $.post('/events/<%=@event.id%>/check_in/' + code, {checked_in: true}, function(data, textStatus, jqXHR) {
-          alert('Ticket ' + code + ' checked in')
+        $.post('/events/<%=@event.id%>/check_in/' + code, {checked_in: true}, function(accountName, textStatus, jqXHR) {
+          alert(accountName + ' checked in')
         }).fail(function(data, textStatus, jqXHR) {
           switch (data.status) {
           case 403:

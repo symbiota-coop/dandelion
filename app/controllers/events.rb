@@ -209,7 +209,7 @@ Dandelion::App.controller do
       else
         ticket.set(checked_in: nil)
       end
-      200
+      ticket.account.name
     end
   end
 
