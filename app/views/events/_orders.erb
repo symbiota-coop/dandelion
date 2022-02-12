@@ -6,8 +6,8 @@
       <p><%== pagination_details orders, model: 'Order' %></p>
     </div>
     <div class="col-auto">
-      <a class="btn btn-primary" href="/events/<%= @event.id %>/orders.csv"><i class="fa fa-download"></i> CSV</a>
-      <a class="btn btn-primary" href="/events/<%= @event.id %>/orders.pdf"><i class="fa fa-download"></i> PDF</a>
+      <a class="btn btn-primary" href="/events/<%= @event.id %>/orders.csv?<%= request.query_string %>"><i class="fa fa-download"></i> CSV</a>
+      <a class="btn btn-primary" href="/events/<%= @event.id %>/orders.pdf?<%= request.query_string %>"><i class="fa fa-download"></i> PDF</a>
     </div>
   </div>
 <% else %>

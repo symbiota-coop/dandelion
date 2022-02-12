@@ -473,16 +473,16 @@ Dandelion::App.controller do
     @organisation = Organisation.find_by(slug: params[:slug]) || not_found
     organisation_admins_only!
     @organisationships = @organisation.organisationships.order('created_at desc')
+    @organisationships = @organisationships.and(:account_id.in => Account.and(name: /#{::Regexp.escape(params[:name])}/i).pluck(:id)) if params[:name]
+    @organisationships = @organisationships.and(:account_id.in => Account.and(email: /#{::Regexp.escape(params[:email])}/i).pluck(:id)) if params[:email]
+    @organisationships = @organisationships.and(:monthly_donation_method.ne => nil) if params[:monthly_donor]
+    @organisationships = @organisationships.and(monthly_donation_method: nil) if params[:not_a_monthly_donor]
+    @organisationships = @organisationships.and(:slack_member.ne => nil) if params[:slack_member]
+    @organisationships = @organisationships.and(slack_member: nil) if params[:not_a_slack_member]
+    @organisationships = @organisationships.and(:stripe_connect_json.ne => nil) if params[:connected_to_stripe]
+    @organisationships = @organisationships.and(:account_id.in => @organisation.subscribed_accounts.pluck(:id)) if params[:subscribed_to_mailer]
     case content_type
     when :html
-      @organisationships = @organisationships.and(:account_id.in => Account.and(name: /#{::Regexp.escape(params[:name])}/i).pluck(:id)) if params[:name]
-      @organisationships = @organisationships.and(:account_id.in => Account.and(email: /#{::Regexp.escape(params[:email])}/i).pluck(:id)) if params[:email]
-      @organisationships = @organisationships.and(:monthly_donation_method.ne => nil) if params[:monthly_donor]
-      @organisationships = @organisationships.and(monthly_donation_method: nil) if params[:not_a_monthly_donor]
-      @organisationships = @organisationships.and(:slack_member.ne => nil) if params[:slack_member]
-      @organisationships = @organisationships.and(slack_member: nil) if params[:not_a_slack_member]
-      @organisationships = @organisationships.and(:stripe_connect_json.ne => nil) if params[:connected_to_stripe]
-      @organisationships = @organisationships.and(:account_id.in => @organisation.subscribed_accounts.pluck(:id)) if params[:subscribed_to_mailer]
       erb :'organisations/followers'
     when :csv
       @organisation.send_followers_csv(current_account)
