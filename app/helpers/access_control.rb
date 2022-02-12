@@ -180,7 +180,7 @@ Dandelion::App.helpers do
     unless account && gathering && ((membership = gathering.memberships.find_by(account: account)) && membership.confirmed?)
       kick!(
         notice: (membership ? 'You must make a payment before accessing that page.' : 'You must be a member of the gathering to access that page.'),
-        r: ("/g/#{gathering.slug}" if membership)
+        r: ("/g/#{gathering.slug}" if %w[open closed].include?(gathering.privacy))
       )
     end
   end
