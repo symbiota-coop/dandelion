@@ -639,7 +639,7 @@ class Organisation
     end
   end
 
-  def send_followers_csv(account)
+  def send_followers_csv(organisationships, account)
     csv = CSV.generate do |csv|
       csv << %w[name email]
       organisationships.each do |organisationship|

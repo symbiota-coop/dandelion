@@ -211,7 +211,7 @@ class Activity
     }[attr.to_sym] || super
   end
 
-  def send_followers_csv(account)
+  def send_followers_csv(activityships, account)
     csv = CSV.generate do |csv|
       csv << %w[name email]
       activityships.each do |activityship|
