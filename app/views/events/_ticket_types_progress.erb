@@ -5,13 +5,13 @@
       <% if ticket_type.hidden %>
         <a href="/events/<%= @event.id %>?ticket_type_id=<%= ticket_type.id %>"><%= ticket_type.name %></a>
         <% if ticket_type.ticket_group %>
-          <span class="label label-primary"><%=ticket_type.ticket_group.name%></span>
+          <span class="label label-outline-primary"><%=ticket_type.ticket_group.name%></span>
         <% end %>
         <span class="label label-default">Hidden</span>
       <% else %>
         <%= ticket_type.name %>
         <% if ticket_type.ticket_group %>
-          <span class="label label-primary"><%=ticket_type.ticket_group.name%></span>
+          <span class="label label-outline-primary"><%=ticket_type.ticket_group.name%></span>
         <% end %>
       <% end %>
     </td>
