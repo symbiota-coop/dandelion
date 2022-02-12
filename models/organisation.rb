@@ -639,10 +639,10 @@ class Organisation
     end
   end
 
-  def send_followers_csv(organisationships, account)
+  def send_followers_csv(organisationship_ids, account)
     csv = CSV.generate do |csv|
       csv << %w[name email]
-      organisationships.each do |organisationship|
+      organisationships.and(:id.in => organisationship_ids).each do |organisationship|
         csv << [
           organisationship.account.name,
           Organisation.admin?(self, account) ? organisationship.account.email : ''
