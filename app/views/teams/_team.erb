@@ -1,7 +1,7 @@
 <% if @team.intro %>
   <div style="margin-bottom: 20px">
     <div class="wysiwyg">
-      <%== Sanitize.fragment(@team.intro, Sanitize::Config::DANDELION) %>
+      <%== Sanitize.fragment(Rinku.auto_link(@team.intro), Sanitize::Config::DANDELION) %>
     </div>
   </div>
 <% end %>
