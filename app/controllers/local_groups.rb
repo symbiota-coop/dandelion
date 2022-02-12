@@ -183,7 +183,7 @@ Dandelion::App.controller do
       @local_groupships = @local_groupships.paginate(page: params[:page], per_page: 25)
       erb :'local_groups/followers'
     when :csv
-      @local_group.send_followers_csv(@local_groupships.pluck(:id), current_account)
+      @local_group.send_followers_csv(current_account)
       flash[:notice] = 'You will receive the CSV via email shortly.'
       redirect back
     end

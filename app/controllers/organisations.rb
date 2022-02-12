@@ -485,7 +485,7 @@ Dandelion::App.controller do
     when :html
       erb :'organisations/followers'
     when :csv
-      @organisation.send_followers_csv(@organisationships.pluck(:id), current_account)
+      @organisation.send_followers_csv(current_account)
       flash[:notice] = 'You will receive the CSV via email shortly.'
       redirect back
     end

@@ -211,13 +211,14 @@ class Activity
     }[attr.to_sym] || super
   end
 
-  def send_followers_csv(activityship_ids, account)
+  def send_followers_csv(account)
     csv = CSV.generate do |csv|
-      csv << %w[name email]
-      activityships.and(:id.in => activityship_ids).each do |activityship|
+      csv << %w[name email unsubscribed]
+      activityships.each do |activityship|
         csv << [
           activityship.account.name,
-          Organisation.admin?(organisation, account) ? activityship.account.email : ''
+          Organisation.admin?(organisation, account) ? activityship.account.email : '',
+          activityship.unsubscribed
         ]
       end
     end
