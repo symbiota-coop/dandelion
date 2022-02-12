@@ -327,7 +327,7 @@ class Order
     cm = 10 * unit
     width = 21 * cm
     margin = 1 * cm
-    qr_size = width / 2
+    qr_size = width / 1.5
     Prawn::Document.new(page_size: 'A4', margin: margin) do |pdf|
       order.tickets.each_with_index do |ticket, i|
         pdf.start_new_page unless i == 0
