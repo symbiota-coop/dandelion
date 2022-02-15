@@ -195,15 +195,15 @@
         <%= f.wysiwyg_block :description %>
         <%= f.wysiwyg_block :extra_info_for_ticket_email %>
       </div>
-        <div role="tabpanel" class="tab-pane" id="tab3">
-          <%= partial :'events/ticket_types', locals: { f: f } %>
-          <%= partial :'events/ticket_groups', locals: { f: f } %>
-          <%= f.number_block :capacity %>
-        </div>
-        <div role="tabpanel" class="tab-pane" id="tab4">
+      <div role="tabpanel" class="tab-pane" id="tab3">
+        <%= partial :'events/ticket_types', locals: { f: f } %>
+        <%= partial :'events/ticket_groups', locals: { f: f } %>
+        <%= f.number_block :capacity %>
+      </div>
+      <div role="tabpanel" class="tab-pane" id="tab4">
         <%= f.text_area_block :questions %>
         <%= f.text_area_block :feedback_questions %>
-        </div>
+      </div>
       <div role="tabpanel" class="tab-pane" id="tab5">
         <%= f.text_block :add_a_donation_to %>
         <%= f.number_block :suggested_donation %>
@@ -234,7 +234,7 @@
       </div>
     </div>
     <% if @event.persisted? %>
-    <%= f.submit_block destroy_url: "/events/#{@event.id}/destroy" %>
+      <%= f.submit_block destroy_url: "/events/#{@event.id}/destroy" %>
     <% end %>
   </div>
 <% end %>
