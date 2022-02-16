@@ -101,12 +101,8 @@
       <% if order.http_referrer && "#{URI(order.http_referrer).host}#{URI(order.http_referrer).path}" != "#{URI(ENV['BASE_URI']).host}/events/#{order.event_id}"  %>
         <a href="<%=order.http_referrer%>">
           <% if URI(order.http_referrer).host == URI(ENV['BASE_URI']).host %>
-            <% if (match = URI(order.http_referrer).path.match(%r{\A/events/([a-z0-9]+)\Z})) %>
-              <% if event = Event.find(match[1]) %>
-                <%=event.name %>
-              <% else %>
-                <%= URI(order.http_referrer).path %>
-              <% end %>
+            <% if (match = URI(order.http_referrer).path.match(%r{\A/events/([a-z0-9]+)\Z})) && event = Event.find(match[1]) %>
+              <%=event.name %>
             <% else %>
               <%= URI(order.http_referrer).path %>
             <% end %>
