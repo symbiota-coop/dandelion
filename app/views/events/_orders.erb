@@ -99,7 +99,7 @@
         <a href="/o/<%= order.affiliate.slug %>"><%= order.affiliate.name %></a><br />
       <% end; end %>
       <% if order.http_referrer %>
-        <a href="<%=order.http_referrer%>"><%= URI(order.http_referrer).host unless URI(order.http_referrer).host == 'dandelion.earth' %><%= URI(order.http_referrer).path.truncate(50) %></a><br />
+        <a href="<%=order.http_referrer%>"><%= URI(order.http_referrer).host unless URI(order.http_referrer).host == 'dandelion.earth' %><%= URI(order.http_referrer).path.truncate(20) %></a><br />
       <% end %>
     </td>
     <% if @event %>
