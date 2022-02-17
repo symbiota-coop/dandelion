@@ -4,6 +4,9 @@
   <% if @organisation && @organisation.verified? && @organisation.minimal_head %>
     <%== @organisation.minimal_head %>
   <% end %>
+  <% if @account && @account.admin? && @account.minimal_head %>
+    <%== @account.minimal_head %>
+  <% end %>
   <style>
     html, body, #map-container, #map-canvas { height: 100% !important }
   </style>

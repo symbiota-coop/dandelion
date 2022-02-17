@@ -42,6 +42,7 @@ class Account
   field :bio, type: String
   field :can_message, type: Boolean
   field :failed_sign_in_attempts, type: Integer
+  field :minimal_head, type: String
 
   %w[email_confirmed
      updated_profile
@@ -117,7 +118,8 @@ class Account
       tickets: :collection,
       orders: :collection,
       last_active: :datetime,
-      stripe_connect_json: :text_area
+      stripe_connect_json: :text_area,
+      minimal_head: :text_area
     }
   end
 
