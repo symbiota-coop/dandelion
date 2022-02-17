@@ -47,7 +47,7 @@ class Ticket
   attr_accessor :complementary, :prevent_notifications
 
   def summary
-    "#{event.name} : #{account.email} : #{ticket_type.try(:name)}"
+    "#{event.try(:name)} : #{account.email} : #{ticket_type.try(:name)}"
   end
 
   has_many :notifications, as: :notifiable, dependent: :destroy
