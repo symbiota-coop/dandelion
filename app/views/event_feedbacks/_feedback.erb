@@ -13,7 +13,7 @@
         Anonymous
       <% else %>
         <% if account.public? %>
-          <% if account.picture %>
+          <% if account.picture && !params[:hide_pictures] %>
             <%= partial :'accounts/square', locals: { account: account, width: '50px' } %>
           <% end %>
           <a href="/u/<%= account.username %>"><%= account.name %></a>
