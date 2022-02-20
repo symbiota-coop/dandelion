@@ -1,8 +1,10 @@
 <% if average_rating = event_feedbacks.average_rating %>
-  <span id="average-rating" style="font-size: 2em">
+  <div id="average-rating" style="font-size: 2em">
     <%= average_rating %><small class="text-muted">/5 from <%= pluralize event_feedbacks.count, 'rating' %></small>
-    <% average_rating.round.times do %><i class="fa fa-star"></i><% end %>
-  </span>
+    <div class="d-sm-inline">
+      <% average_rating.round.times do %><i class="fa fa-star"></i><% end %>
+    </div>
+  </div>
 <% end %>
 <% event_feedbacks = event_feedbacks.and(:rating.ne => nil).order('created_at desc').paginate(page: params[:page], per_page: 10) %>
 <table class="table table-condensed mt-3">
