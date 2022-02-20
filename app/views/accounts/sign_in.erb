@@ -6,8 +6,8 @@
         <h2 class="text-center my-0">Sign in</h2>
       </div>
       <div class="card-body">
-        <div id="t1" <% if true or Padrino.env == :production %> class="text-center" <% end %>>
-          <% if true or Padrino.env == :production %>
+        <div id="t1" <% if Padrino.env == :production %> class="text-center" <% end %>>
+          <% if Padrino.env == :production %>
             <div class="mb-1">
               We've gone <a target="_blank" href="https://magic.link/docs/introduction/what-is-magic#why-passwordless">passwordless</a>!
             </div>
