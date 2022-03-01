@@ -146,7 +146,7 @@
             <%= event_feedback.id %>
           <% end %>
         </a>
-      <% elsif order.event.past? %>
+      <% elsif order.event.past? && !order.account.unsubscribed_feedback %>
         <a href="<%= ENV['BASE_URI'] %>/events/<%= order.event_id %>/resend_feedback_email/<%= order.account_id %>">Resend feedback email</a>
       <% end %>
     <% end %>
