@@ -205,9 +205,25 @@
         <%= f.text_area_block :feedback_questions %>
       </div>
       <div role="tabpanel" class="tab-pane" id="tab5">
+        <script>
+          $(function() {
+            $('#event_suggested_donation').keyup(function () {
+              if ($(this).val().length > 0)
+                $('#donation-options').show()
+              else
+                $('#donation-options').hide()
+            })
+            if ($('#event_suggested_donation').val().length > 0)
+              $('#donation-options').show()
+            else
+              $('#donation-options').hide()
+          })
+        </script>
         <%= f.number_block :suggested_donation %>
-        <%= f.text_block :add_a_donation_to %>
-        <%= f.text_block :donation_text %>
+        <div id="donation-options">
+          <%= f.text_block :add_a_donation_to %>
+          <%= f.text_block :donation_text %>
+        </div>
       </div>
       <div role="tabpanel" class="tab-pane" id="tab6">
         <%= f.url_block :redirect_url %>
