@@ -549,7 +549,7 @@ class Event
       zone = zone.name unless zone.is_a?(String)
       start_time = self.start_time.in_time_zone(zone)
       end_time = self.end_time.in_time_zone(zone)
-      z = "#{zone.include?('London') ? 'UK time' : zone} (UTC #{start_time.formatted_offset})"
+      z = "#{zone.include?('London') ? 'UK time' : zone.gsub('_', ' ')} (UTC #{start_time.formatted_offset})"
       if start_time.to_date == end_time.to_date
         "#{start_time.to_date}, #{start_time.to_s(:no_double_zeros)} – #{end_time.to_s(:no_double_zeros)} #{z}"
       else
