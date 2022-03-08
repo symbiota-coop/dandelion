@@ -56,59 +56,59 @@
               </tr>
             <% end %>
             <% } %>
-            <% unless @event.no_discounts %>
-              <% if @event.all_discount_codes.count > 0 %>
-                <tr>
-                  <td></td>
-                  <td></td>
-                  <td>
-                    <strong>Apply a code</strong>
-                    <% if params[:discount_code] &&
+            <% if @event.all_discount_codes.count > 0 %>
+              <tr>
+                <td></td>
+                <td></td>
+                <td>
+                  <strong>Apply a code</strong>
+                  <% if params[:discount_code] &&
                             (discount_code = @event.all_discount_codes.find_by(code: params[:discount_code])) &&
                             (discount_code.applies_to?(@event)) %>
-                    <div class="input-group" style="margin: 5px 0">
-                      <%= text_field_tag :discount_code_display, id: 'discount_code_display', class: 'form-control', style: 'width: 5em', disabled: true, value: params[:discount_code] %>
-                      <%= hidden_field_tag :discount_code_id, id: 'discount_code_id', value: discount_code.id %>
-                      <div class="input-group-append">
-                        <button class="btn btn-outline-secondary" type="button" onclick="
+                  <div class="input-group" style="margin: 5px 0">
+                    <%= text_field_tag :discount_code_display, id: 'discount_code_display', class: 'form-control', style: 'width: 5em', disabled: true, value: params[:discount_code] %>
+                    <%= hidden_field_tag :discount_code_id, id: 'discount_code_id', value: discount_code.id %>
+                    <div class="input-group-append">
+                      <button class="btn btn-outline-secondary" type="button" onclick="
                               var qs = $.deparam(window.location.search.substring(1))
                               delete qs['discount_code']
                               window.location = window.location.pathname + '?' + $.param(qs) + '#select-tickets'
                               ">Remove</button>
+                    </div>
+                  </div>
+                  <strong>Discount applied</strong>
+                  <div class="input-group" style="margin: 5px 0">
+                    <% if discount_code.fixed_discount %>
+                      <% show_balance = true %>
+                      <div class="input-group-prepend">
+                        <span class="py-0 input-group-text">
+                          <%= Money.new(0, @event.currency).symbol %>
+                        </span>
                       </div>
-                    </div>
-                    <strong>Discount applied</strong>
-                    <div class="input-group" style="margin: 5px 0">
-                      <% if discount_code.fixed_discount %>
-                        <% show_balance = true %>
-                        <div class="input-group-prepend">
-                          <span class="py-0 input-group-text">
-                            <%= Money.new(0, @event.currency).symbol %>
-                          </span>
-                        </div>
-                        <%= number_field_tag :fixed_discount, id: 'fixed_discount', class: 'form-control', style: 'width: 5em', disabled: true, value: discount_code.fixed_discount %>
-                      <% elsif discount_code.percentage_discount %>
-                        <%= number_field_tag :percentage_discount, id: 'percentage_discount', class: 'form-control', style: 'width: 5em', disabled: true, value: discount_code.percentage_discount %>
-                        <div class="input-group-append">
-                          <span class="py-0 input-group-text">%</span>
-                        </div>
-                      <% end %>
-                    </div>
-                  <% else %>
-                    <div class="input-group" style="margin: 5px 0">
-                      <%= text_field_tag :discount_code, id: 'discount_code', class: 'form-control', style: 'width: 5em' %>
+                      <%= number_field_tag :fixed_discount, id: 'fixed_discount', class: 'form-control', style: 'width: 5em', disabled: true, value: discount_code.fixed_discount %>
+                    <% elsif discount_code.percentage_discount %>
+                      <%= number_field_tag :percentage_discount, id: 'percentage_discount', class: 'form-control', style: 'width: 5em', disabled: true, value: discount_code.percentage_discount %>
                       <div class="input-group-append">
-                        <button class="btn btn-outline-secondary" type="button" onclick="
+                        <span class="py-0 input-group-text">%</span>
+                      </div>
+                    <% end %>
+                  </div>
+                <% else %>
+                  <div class="input-group" style="margin: 5px 0">
+                    <%= text_field_tag :discount_code, id: 'discount_code', class: 'form-control', style: 'width: 5em' %>
+                    <div class="input-group-append">
+                      <button class="btn btn-outline-secondary" type="button" onclick="
                               var qs = $.deparam(window.location.search.substring(1))
                               qs['discount_code'] = $('#discount_code').val()
                               window.location = window.location.pathname + '?' + $.param(qs) + '#select-tickets'
                               ">Apply</button>
-                      </div>
-                    <% end %>
-                  </div>
-                </td>
-              </tr>
-            <% end %>
+                    </div>
+                  <% end %>
+                </div>
+              </td>
+            </tr>
+          <% end %>
+          <% unless @event.no_discounts %>
             <% if current_account && (organisationship = @event.organisation.organisationships.find_by(account: current_account)) && organisationship.monthly_donor? && organisationship.monthly_donor_discount > 0 %>
               <tr>
                 <td></td>

@@ -469,8 +469,8 @@ class Organisation
       monthly_donation_welcome_body: 'Welcome email for new monthly donors body',
       auto_comment_sending: "Send comments in the Members' Area automatically",
       become_a_member_url: 'Become a Member URL',
-      add_a_donation_to: 'Above donation field',
-      donation_text: 'Below donation field'
+      add_a_donation_to: 'Text above donation field',
+      donation_text: 'Text below donation field'
     }[attr.to_sym] || super
   end
 

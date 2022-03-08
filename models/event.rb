@@ -223,6 +223,7 @@ class Event
 
   after_save do
     event_facilitations.create account: revenue_sharer if revenue_sharer
+    event_feedbacks.update_all(activity_id: activity_id)
     if zoom_party
       organisation.local_groups.and(type: 'euro').each do |local_group|
         zoomships.create local_group: local_group
@@ -602,7 +603,8 @@ class Event
       start_time: 'Start date/time',
       end_time: 'End date/time',
       extra_info_for_ticket_email: 'Extra info for ticket confirmation email',
-      purchase_url: 'Purchase URL'
+      purchase_url: 'Purchase URL',
+      no_discounts: 'No discounts for monthly donors'
     }[attr.to_sym] || super
   end
 

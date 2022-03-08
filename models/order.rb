@@ -165,11 +165,9 @@ class Order
       # self.seeds_value = (Money.new(value * 100, currency).exchange_to('USD').dollars.to_i / seeds_usd).round
     end
     self.discount_code = nil if discount_code && !discount_code.applies_to?(event)
-    unless event.no_discounts
-      self.percentage_discount = discount_code.percentage_discount if discount_code
-      if account && event && event.organisation && (organisationship = event.organisation.organisationships.find_by(account: account)) && (organisationship.monthly_donor? && organisationship.monthly_donor_discount > 0)
-        self.percentage_discount_monthly_donor = organisationship.monthly_donor_discount
-      end
+    self.percentage_discount = discount_code.percentage_discount if discount_code
+    if !event.no_discounts && (account && event && event.organisation && (organisationship = event.organisation.organisationships.find_by(account: account)) && (organisationship.monthly_donor? && organisationship.monthly_donor_discount > 0))
+      self.percentage_discount_monthly_donor = organisationship.monthly_donor_discount
     end
     if affiliate_type && %w[Account Organisation].include?(affiliate_type)
       unless affiliate_type.constantize.find(affiliate_id)

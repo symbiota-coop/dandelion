@@ -286,7 +286,7 @@
   <% end %>
 </div>
 <% if @event.activity && @event.activity.event_feedbacks.count > 0 %>
-  <h2 class="mt-5">Feedback on <%= @event.activity.name %></h2>
+  <h2 class="mt-5">Feedback on <%= @event.activity.name %> events</h2>
   <div class="mt-3" data-pagelet-url="/activities/<%= @event.activity_id %>/show_feedback"></div>
 <% end %>
 <% if !@event.hide_discussion %>
