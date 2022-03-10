@@ -9,7 +9,7 @@
       <a class="btn btn-primary" href="javascript:;" onclick="$(this).hide().next().show()"><i class="fa fa-plus-circle"></i> Create an event</a>
       <% form_tag '/events/new', style: 'display: none', method: :get, class: 'form-inline' do %>
         <span class="mr-1">Create an event under</span>
-        <%= select_tag :organisation_id, onchange: "window.location = '/events/new?organisation_id=' + $(this).val()", class: 'form-control', options: ['']+current_account.organisations.map { |organisation| [organisation.name, organisation.id] } %>
+        <%= select_tag :organisation_id, onchange: "window.location = '/events/new?organisation_id=' + $(this).val()", class: 'form-control', options: ['']+current_account.organisations.order('name asc').map { |organisation| [organisation.name, organisation.id] } %>
       <% end %>
     <% end %>
   </div>
