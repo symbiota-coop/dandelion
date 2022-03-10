@@ -51,8 +51,6 @@
                   });">
           <%= option.optionships.count %>/<%== (option.capacity || '&infin;').to_s %>
         </a>
-      <% else %>
-        <%= option.optionships.count %>/<%== (option.capacity || '&infin;').to_s %>
       <% end %>
       <% if option.capacity %>
         <% if option.full? %>
