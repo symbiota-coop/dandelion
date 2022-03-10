@@ -6,7 +6,9 @@
       <th>Cost</th>
       <th>Places taken</th>
       <th></th>
-      <th style="width: 33%" class="d-none d-sm-table-cell">People</th>
+      <% if @membership.confirmed? %>
+        <th style="width: 33%" class="d-none d-sm-table-cell">People</th>
+      <% end %>
     </tr>
   </thead>
   <% Option.types.each { |type| if (options = @gathering.options.and(type: type)).count > 0 %>
@@ -43,11 +45,15 @@
       <% end %>
     </td>
     <td nowrap>
-      <a href="javascript:;" onclick="$('#modal .modal-content').load('/g/<%= @gathering.slug %>/options/<%= option.id %>', function () {
-                  $('#modal').modal('show')
-                });">
+      <% if @membership.confirmed? %>
+        <a href="javascript:;" onclick="$('#modal .modal-content').load('/g/<%= @gathering.slug %>/options/<%= option.id %>', function () {
+                    $('#modal').modal('show')
+                  });">
+          <%= option.optionships.count %>/<%== (option.capacity || '&infin;').to_s %>
+        </a>
+      <% else %>
         <%= option.optionships.count %>/<%== (option.capacity || '&infin;').to_s %>
-      </a>
+      <% end %>
       <% if option.capacity %>
         <% if option.full? %>
           <span class="label label-danger">Full</span>
@@ -67,39 +73,41 @@
         <% end %>
       <% end %>
     </td>
-    <td class="d-none d-sm-table-cell">
-      <% y = [] %>
-      <% option.optionships.shuffle.each { |optionship| account = optionship.account; %>
-      <% if params[:view] == 'names' %>
-        <% y << capture do %>
-          <% if @membership.admin? %>
-            <a href="/g/<%= @gathering.slug %>/optionships/<%= optionship.id %>/edit">
-              <%= Sanitize.fragment(account.name) %>
-            </a>
-          <% else %>
-            <%= partial :'accounts/square', locals: { account: account, width: '50px' } %>
+    <% if @membership.confirmed? %>
+      <td class="d-none d-sm-table-cell">
+        <% y = [] %>
+        <% option.optionships.shuffle.each { |optionship| account = optionship.account; %>
+        <% if params[:view] == 'names' %>
+          <% y << capture do %>
+            <% if @membership.admin? %>
+              <a href="/g/<%= @gathering.slug %>/optionships/<%= optionship.id %>/edit">
+                <%= Sanitize.fragment(account.name) %>
+              </a>
+            <% else %>
+              <%= partial :'accounts/square', locals: { account: account, width: '50px' } %>
+            <% end %>
+          <% end %>
+        <% else %>
+          <% y << capture do %>
+            <% if @membership.admin? %>
+              <a href="/g/<%= @gathering.slug %>/optionships/<%= optionship.id %>/edit">
+                <img title="<%= Sanitize.fragment(account.name) %>" style="width: 50px;" src="<%= u account.picture_thumb_or_gravatar_url %>">
+              </a>
+            <% else %>
+              <%= partial :'accounts/square', locals: { account: account, width: '50px' } %>
+            <% end %>
           <% end %>
         <% end %>
-      <% else %>
-        <% y << capture do %>
-          <% if @membership.admin? %>
-            <a href="/g/<%= @gathering.slug %>/optionships/<%= optionship.id %>/edit">
-              <img title="<%= Sanitize.fragment(account.name) %>" style="width: 50px;" src="<%= u account.picture_thumb_or_gravatar_url %>">
-            </a>
-          <% else %>
-            <%= partial :'accounts/square', locals: { account: account, width: '50px' } %>
-          <% end %>
+        <% } %>
+        <% if params[:view] == 'names' %>
+          <%== y.map(&:strip).join(' &middot; ') %>
+        <% else %>
+          <div class="image-wall">
+            <%== y.map(&:strip).join('') %>
+          </div>
         <% end %>
-      <% end %>
-      <% } %>
-      <% if params[:view] == 'names' %>
-        <%== y.map(&:strip).join(' &middot; ') %>
-      <% else %>
-        <div class="image-wall">
-          <%== y.map(&:strip).join('') %>
-        </div>
-      <% end %>
-    </td>
+      </td>
+    <% end %>
   </tr>
   <% } %>
 <% end } %>
