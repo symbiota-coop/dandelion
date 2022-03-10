@@ -31,10 +31,18 @@
 
 </div>
 
-<h2 class="text-center mt-4 mb-0 mb-sm-4"><%= pluralize(@events.count, 'upcoming event') %></h2>
+<h2 class="text-center mt-4 mb-3"><%= pluralize(@events.count, 'upcoming event') %></h2>
 
-<p class="lead text-center">
-  Want to list an event? First you'll need to <a href="/o/new">create an organisation</a>
+<p class="text-center">
+  <a class="btn btn-primary btn-lg" href="/o/new">List an event</a>
+</p>
+<p class="lead text-center mb-1">
+  <mark>We operate on a donation/gift economy basis.</mark><br />
+</p>
+<p class="text-center mb-0 mb-sm-4">
+  You just pay processing fees via
+  <a target="_blank" href="https://stripe.com/gb/pricing">Stripe</a> or
+  <a target="_blank" href="https://help.coinbase.com/en/commerce/getting-started/fees">Coinbase Commerce</a>.
 </p>
 
 <div data-pagelet-url="/events"></div>
