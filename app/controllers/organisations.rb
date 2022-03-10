@@ -70,7 +70,7 @@ Dandelion::App.controller do
   end
 
   get '/o/new' do
-    sign_in_required!
+    sign_in_required!(r: '/accounts/new?create_an_organisation=1')
     @organisation = current_account.organisations.build(params[:organisation])
     erb :'organisations/build'
   end
@@ -103,7 +103,8 @@ Dandelion::App.controller do
     organisation_admins_only!
     if @organisation.update_attributes(mass_assigning(params[:organisation], Organisation))
       flash[:notice] = 'The organisation was saved.'
-      redirect "/o/#{@organisation.slug}/edit"
+
+      redirect(current_account.organisations.count == 1 ? "/o/#{@organisation.slug}" : "/o/#{@organisation.slug}/edit")
     else
       flash.now[:error] = 'There was an error saving the organisation.'
       erb :'organisations/build'

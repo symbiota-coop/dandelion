@@ -1,3 +1,15 @@
+<% if current_account.organisations.count == 0 %>
+  <div class="alert alert-success">
+    <p class="lead">
+      Let's create your first organisation!
+    </p>
+    <p class="mb-0">
+      Once you're done, you'll be able to list events under this organsation. <br />
+      (All events on Dandelion are listed under an organisation.)
+    </p>
+  </div>
+<% end %>
+
 <%= partial :'organisations/nav', locals: { organisation: @organisation } %>
 <style>
   #organisation_minimal_head { height: 5em }
@@ -63,7 +75,9 @@
         </p>
         <%= f.wysiwyg_block :intro_text %>
         <%= f.url_block :website %>
-        <%= f.url_block :telegram_group %>
+        <% unless @organisation.new_record? %>
+          <%= f.url_block :telegram_group %>
+        <% end %>
         <%= f.text_block :location %>
         <%= f.image_block :image %>
       </div>

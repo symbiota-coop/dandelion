@@ -32,6 +32,11 @@
 </div>
 
 <h2 class="text-center mt-4 mb-0 mb-sm-4"><%= pluralize(@events.count, 'upcoming event') %></h2>
+
+<p class="lead text-center">
+  Want to list an event? First you'll need to <a href="/o/new">create an organisation</a>
+</p>
+
 <div data-pagelet-url="/events"></div>
 <div class="my-3" data-pagelet-url="/map">
   <%= partial :'maps/map', locals: { dynamic: true, trigger_bounds_changed: true } %>

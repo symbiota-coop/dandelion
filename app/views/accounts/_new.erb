@@ -11,6 +11,9 @@
   </div>
 <% end %>
 <% form_for @account, '/accounts/new', class: 'mt-3', id: 'new-account-form', multipart: true do |f| %>
+  <% if params[:create_an_organisation] %>
+    <%= hidden_field_tag :create_an_organisation, value: true %>
+  <% end %>
   <% %w{organisation activity local_group event}.each { |r| if instance_variable_get("@#{r}") %>
   <%= hidden_field_tag :"#{r}_id", value: instance_variable_get("@#{r}").id %>
 <% end; } %>

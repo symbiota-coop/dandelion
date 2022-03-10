@@ -13,11 +13,11 @@ Dandelion::App.helpers do
     )
   end
 
-  def kick!(notice: "You don't have access to that page", r: nil)
+  def kick!(notice: "You don't have access to that page", r: nil, notice_type: :error)
     if request.xhr?
       halt 403
     else
-      flash[:error] = notice
+      flash[notice_type] = notice
       session[:return_to] = request.url
       redirect((r || (current_account ? '/' : '/accounts/sign_in')))
     end
@@ -161,8 +161,8 @@ Dandelion::App.helpers do
     kick! unless comment_admin?
   end
 
-  def sign_in_required!
-    kick! unless current_account
+  def sign_in_required!(notice: 'Please sign up or sign in to continue', r: '/accounts/new', notice_type: :notice)
+    kick!(notice: notice, r: r, notice_type: notice_type) unless current_account
   end
 
   def membership_required!(gathering = nil, account = current_account)

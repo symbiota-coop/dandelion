@@ -110,7 +110,9 @@ Dandelion::App.controller do
         @account.sign_ins.create(env: env_yaml)
         session[:account_id] = @account.id.to_s
       end
-      if params[:organisation_id]
+      if params[:create_an_organisation]
+        redirect '/o/new'
+      elsif params[:organisation_id]
         @organisation = Organisation.find(params[:organisation_id])
         organisationship = @organisation.organisationships.create account: @account, skip_welcome: params[:skip_welcome], referrer_id: params[:referrer_id]
         if organisationship.referrer
