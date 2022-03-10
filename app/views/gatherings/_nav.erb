@@ -26,7 +26,7 @@
         ([%(Applications #{%(<span class="label label-inverse">#{gathering.mapplications.pending.count}</span>) if gathering.mapplications.pending.count.positive?}), "/g/#{gathering.slug}/applications"] if (gathering.privacy == 'closed') || gathering.mapplications.and(:status.ne => 'accepted').count.positive?),
         ([
           %(
-          Choose & Pay
+            #{@gathering.choose_and_pay_label || 'Choose & Pay'}
           <span class="contribution-label label label-inverse
           #{'label-danger' if @membership.requested_contribution and @membership.requested_contribution > 0 and (!@membership.paid or (@membership.paid < @membership.requested_contribution))}
           ">#{m (@membership.paid or 0), @gathering.currency}/#{m @membership.requested_contribution, @gathering.currency}</span>
