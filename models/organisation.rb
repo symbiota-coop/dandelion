@@ -222,9 +222,13 @@ class Organisation
     events.and(:id.in => Order.and(:value.gt => 0, :event_id.in => events.pluck(:id)).pluck(:event_id))
   end
 
+  def self.contribution_requested_per_event
+    Money.new(15 * 100, 'GBP')
+  end
+
   def contribution_requested
     c = contributable_events.count
-    Money.new(c * 10 * 100, 'GBP').exchange_to(currency)
+    Money.new(c * 15 * 100, 'GBP').exchange_to(currency)
   end
 
   def contribution_paid
