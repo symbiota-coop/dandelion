@@ -45,7 +45,7 @@ Dandelion::App.controller do
   end
 
   get '/events/new' do
-    sign_in_required!
+    sign_in_required!(r: '/accounts/new?list_an_event=1')
     @event = Event.new
     if params[:organisation_id]
       @event.organisation = Organisation.find(params[:organisation_id]) || not_found
@@ -56,7 +56,13 @@ Dandelion::App.controller do
       @event.local_group = LocalGroup.find(params[:local_group_id]) || not_found
       @event.organisation = @event.local_group.organisation
     end
-    redirect '/organisations' unless @event.organisation
+    unless @event.organisation
+      if current_account.organisations.count == 0
+        redirect '/o/new'
+      else
+        redirect '/events'
+      end
+    end
     @event.time_zone = current_account.time_zone
     @event.location = 'Online'
     @event.feedback_questions = 'Comments/suggestions'

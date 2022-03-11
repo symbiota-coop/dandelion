@@ -70,7 +70,7 @@ Dandelion::App.controller do
   end
 
   get '/o/new' do
-    sign_in_required!(r: '/accounts/new?create_an_organisation=1')
+    sign_in_required!
     @organisation = current_account.organisations.build(params[:organisation])
     erb :'organisations/build'
   end
