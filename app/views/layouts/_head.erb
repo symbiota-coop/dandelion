@@ -37,7 +37,7 @@
     });
   </script>
 
-  <% unless Padrino.env == :development %>
+  <% if Padrino.env == :production %>
     <script src="https://js.pusher.com/4.0/pusher.min.js"></script>
     <script>
       if(typeof Pusher != 'undefined') {

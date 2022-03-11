@@ -9,6 +9,8 @@ FactoryBot.define do
   factory :organisation do
     sequence(:name) { |n| "Organisation #{n}" }
     sequence(:slug) { |n| "organisation-#{n}" }
+    sequence(:stripe_pk) { |n| "pk_test_#{n}" }
+    sequence(:stripe_sk) { |n| "sk_test_#{n}" }
     account
   end
 

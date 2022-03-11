@@ -317,7 +317,7 @@ class Organisation
 
   after_save :create_stripe_webhook_if_necessary, if: :stripe_sk
   def create_stripe_webhook_if_necessary
-    return if Padrino.env == :development
+    return unless Padrino.env == :production
 
     Stripe.api_key = stripe_sk
 
