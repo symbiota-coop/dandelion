@@ -37,6 +37,28 @@
     });
   </script>
 
+  <% unless Padrino.env == :development %>
+    <script src="https://js.pusher.com/4.0/pusher.min.js"></script>
+    <script>
+      if(typeof Pusher != 'undefined') {
+        <% if Padrino.env == :development %>
+          Pusher.logToConsole = true;
+        <% end %>
+        pusher = new Pusher('<%= ENV['PUSHER_KEY'] %>', { cluster: '<%= ENV['PUSHER_CLUSTER'] %>', encrypted: true });
+      }
+    </script>
+  <% end %>
+
+  <% if current_account && ENV['NOLT_SSO_SECRET'] %>
+    <script async src="https://cdn.nolt.io/widgets.js"></script>
+    <script>
+      window.noltQueue=window.noltQueue||[];function nolt(){noltQueue.push(arguments)}
+    </script>
+    <script>
+      nolt('identify', { jwt: '<%= generate_nolt_token %>' });
+    </script>
+  <% end %>
+
   <% {
        'jquery-timeago/1.4.3' => 'jquery.timeago.min.js',
        'moment.js/2.17.1' => 'moment.min.js locale/en-gb.js',
@@ -89,26 +111,6 @@
    ].each { |f| %>
 <script src="<%= f %>"></script>
 <% } %>
-
-<% unless Padrino.env == :development %>
-  <script src="https://js.pusher.com/4.0/pusher.min.js"></script>
-  <script>
-    <% if Padrino.env == :development %>
-      Pusher.logToConsole = true;
-    <% end %>
-    pusher = new Pusher('<%= ENV['PUSHER_KEY'] %>', { cluster: '<%= ENV['PUSHER_CLUSTER'] %>', encrypted: true });
-  </script>
-<% end %>
-
-<% if current_account && ENV['NOLT_SSO_SECRET'] %>
-  <script async src="https://cdn.nolt.io/widgets.js"></script>
-  <script>
-    window.noltQueue=window.noltQueue||[];function nolt(){noltQueue.push(arguments)}
-  </script>
-  <script>
-    nolt('identify', { jwt: '<%= generate_nolt_token %>' });
-  </script>
-<% end %>
 
 <%= favicon_tag 'black-on-transparent-sq.png' %>
 <title>
