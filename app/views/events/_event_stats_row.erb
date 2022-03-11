@@ -29,10 +29,8 @@
 <td style="text-align: center">
   <% if event.coordinator %>
     <a href="/u/<%= event.coordinator.username %>">
-      <% if event.coordinator.picture %>
-        <%= partial :'accounts/square', locals: { account: event.coordinator, width: '50px' } %>
-        <br>
-      <% end %>
+      <%= partial :'accounts/square', locals: { account: event.coordinator, width: '50px' } %>
+      <br>
       <a href="/u/<%= event.coordinator.username %>"><%= event.coordinator.name %></a>
     <% end %>
   </td>
@@ -80,12 +78,8 @@
   <td>
     <% if event.revenue_sharer && event.organisation_revenue_share %>
       <a href="/u/<%= event.revenue_sharer.username %>">
-        <% if event.revenue_sharer.picture %>
-          <a href="/u/<%= event.revenue_sharer.username %>">
-            <img src="<%= u event.revenue_sharer.picture.thumb('500x500#').url %>" style="width: 50px">
-          </a>
-          <br>
-        <% end %>
+        <%= partial :'accounts/square', locals: { account: event.revenue_sharer, width: '50px' } %>
+        <br />
         <a href="/u/<%= event.revenue_sharer.username %>"><%= event.revenue_sharer.name %></a>
         <br>
         <%= ((1 - event.organisation_revenue_share) * 100).round %>:<%= (event.organisation_revenue_share * 100).round %>
