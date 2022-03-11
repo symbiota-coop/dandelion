@@ -13,7 +13,7 @@ gem 'activate-tools', github: 'stephenreid321/activate-tools'
 gem 'will_paginate', github: 'mislav/will_paginate'
 
 # Data storage
-gem 'activemodel'
+gem 'activemodel', '~> 6.0'
 gem 'delayed_job_mongoid'
 gem 'dragonfly'
 gem 'dragonfly-s3_data_store'
