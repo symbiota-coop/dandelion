@@ -119,6 +119,10 @@ class Booking
     end
   end
 
+  after_create do
+    service.organisation.organisationships.create account: account if opt_in_organisation
+  end
+
   def restore_and_complete
     restore
     set(payment_completed: true)
