@@ -226,7 +226,9 @@
         </div>
       </div>
       <% } %>
-      <% unless current_account && @event.organisation_and_cohosts.all? { |organisation| current_account.organisationships.find_by(organisation: organisation) } %>
+      <% if current_account && @event.organisation_and_cohosts.all? { |organisation| current_account.organisationships.find_by(organisation: organisation) } %>
+        <%= f.hidden_field :opt_in_organisation, value: 1 %>
+      <% else %>
         <script>
           $(function () {
             $('#opt-in-organisation label').html('Get email updates from <%== @event.organisation_and_cohosts.map { |organisation| Sanitize.fragment(organisation.name) }.to_sentence(last_word_connector: ' and ') %>')
