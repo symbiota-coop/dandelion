@@ -45,7 +45,8 @@
   <a target="_blank" href="https://help.coinbase.com/en/commerce/getting-started/fees">Coinbase Commerce</a>.
 </p>
 
-<h2 class="text-center mt-4 mb-3"><%= pluralize(@events.count, 'upcoming event') %></h2>
+
+<%= cp :events_count %>
 
 <div data-pagelet-url="/events"></div>
 <div class="my-3" data-pagelet-url="/map">
