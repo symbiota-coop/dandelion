@@ -31,10 +31,20 @@
 
 </div>
 
+
+<script>
+  $(function() {
+    var c = new countUp.CountUp('ticket-count', <%=Ticket.count%>);
+    c.start();
+    var c = new countUp.CountUp('worth-count', <%=Order.all.sum { |o| (o.value && FIAT_CURRENCIES.include?(o.currency)) ? Money.new(o.value*100, o.currency) : 0 }.to_i%>);
+    c.start();
+  })
+</script>
+
 <h2 class="text-center mt-4 mb-3">
-  <%= pluralize number_with_delimiter(Ticket.count), 'ticket' %>
+  <span id="ticket-count">0</span> tickets
   worth
-  <%= m (Order.all.sum { |o| (o.value && FIAT_CURRENCIES.include?(o.currency)) ? Money.new(o.value*100, o.currency) : 0 }), 'GBP' %>+
+  £<span id="worth-count">0</span>+
   sold via Dandelion
 </h2>
 
