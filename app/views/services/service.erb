@@ -160,7 +160,9 @@
 
             <%= f.text_area_block :client_note %>
 
-            <% unless current_account && current_account.organisationships.find_by(organisation: @service.organisation) %>
+            <% if current_account && current_account.organisationships.find_by(organisation: @service.organisation) %>
+              <%= f.hidden_field :opt_in_organisation, value: 1 %>
+            <% else %>
               <script>
                 $(function () {
                   $('#opt-in-organisation label').text('Get email updates from <%= @service.organisation.name %>')
