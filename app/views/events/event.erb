@@ -207,9 +207,22 @@
       <div id="purchase">
         <% if current_account && (orders =  @event.orders.complete.and(account: current_account)).count > 0 %>
           <div class="card mb-3">
-            <h3 class="card-header bg-primary text-white">Your orders</h3>
+            <h3 class="card-header bg-primary text-white">
+              <% if @event.past? %>
+                Thanks for attending!
+              <% else %>
+                Your orders
+              <% end %>
+            </h3>
             <div class="card-body">
-              <p>Click an order to review the confirmation email.</p>
+              <% if @event.past? %>
+                <% if event_feedback = @event.event_feedbacks.find_by(account: current_account) %>
+                  <p>Your rating: <% event_feedback.rating.times do %><i class="fa fa-star"></i><% end %></p>
+                <% else %>
+                <p><a href="/events/<%=@event.id%>/give_feedback">Give feedback</a></p>
+                <% end %>
+              <% end %>
+              <p class="mb-1">Click an order to review the confirmation email:</p>
               <ul class="fa-ul mb-0">
                 <% orders.each { |order| %>
                 <li><i class="fa fa-li fa-ticket"></i><a target="_blank" href="/orders/<%= order.id %>"><%= d = order.description_elements; d.empty? ? order.created_at : d.join(', ') %></a></li>
