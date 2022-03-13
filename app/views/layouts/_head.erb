@@ -140,4 +140,34 @@
     }
   </style>
 <% end %>
+
+  <% if @event && @event.persisted? %>
+    <link rel="canonical" href="<%=ENV['BASE_URI']%>/events/<%=@event.id%>" />
+    <script type="application/ld+json">
+    <%==
+    {
+      "@context": 'https://schema.org',
+      "@type": 'Event',
+      "name": @event.name,
+      "startDate": @event.start_time.iso8601,
+      "endDate": @event.end_time.iso8601,
+      "eventAttendanceMode": @event.online? ? 'https://schema.org/OnlineEventAttendanceMode' : 'https://schema.org/OfflineEventAttendanceMode',
+      "location": (unless @event.online?
+                     {
+                       "@type": 'Place',
+                       "name": @event.location.split(',').first
+                     }
+                   end),
+      "image": @event.image.try(:url),
+      "description": @event.description,
+      "organizer": {
+        "@type": 'Organization',
+        "name": @event.organisation.name,
+        "url": @event.organisation.website
+      }
+    }.to_json
+    %>
+    </script>
+
+  <% end %>
 </head>
