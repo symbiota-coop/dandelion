@@ -46,7 +46,7 @@ class Notification
   end
 
   def self.types
-    %w[created_gathering applied joined_gathering created_team created_timetable created_tactivity created_rota created_option created_spend created_place updated_profile updated_place completed_a_habit liked_a_habit_completion joined_team signed_up_to_a_shift interested_in_tactivity scheduled_tactivity unscheduled_tactivity made_admin unadmined commented reacted_to_a_comment left_gathering created_payment created_inventory_item mapplication_removed created_event updated_event created_organisation created_order]
+    %w[created_gathering applied joined_gathering created_team created_timetable created_tactivity created_rota created_option created_spend created_place created_profile updated_profile updated_place completed_a_habit liked_a_habit_completion joined_team signed_up_to_a_shift interested_in_tactivity scheduled_tactivity unscheduled_tactivity made_admin unadmined commented reacted_to_a_comment left_gathering created_payment created_inventory_item mapplication_removed created_event updated_event created_organisation created_order]
   end
 
   def self.mailable_types
@@ -112,6 +112,9 @@ class Notification
     when :created_place
       place = notifiable
       "<strong>#{place.account.name}</strong> listed the place <strong>#{place.name}</strong>"
+    when :created_profile
+      account = notifiable
+      "<strong>#{account.name}</strong> joined Dandelion!"
     when :updated_profile
       account = notifiable
       "<strong>#{account.name}</strong> updated #{account.pronoun} profile"
@@ -244,6 +247,8 @@ class Notification
       ['View budget', "#{ENV['BASE_URI']}/g/#{circle.slug}/budget"]
     when :created_place
       ['View place', "#{ENV['BASE_URI']}/places/#{notifiable.id}"]
+    when :created_profile
+      ['View profile', "#{ENV['BASE_URI']}/u/#{notifiable.username}"]
     when :updated_profile
       ['View profile', "#{ENV['BASE_URI']}/u/#{notifiable.username}"]
     when :updated_place
@@ -311,6 +316,8 @@ class Notification
       'fa-money'
     when :created_place
       'fa-map-marker'
+    when :created_profile
+      'fa-user-circle-o'
     when :updated_profile
       'fa-user-circle-o'
     when :updated_place

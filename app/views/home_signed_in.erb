@@ -1,17 +1,23 @@
+
+<% if !current_account.seen_intro_tour %>
+  <%= partial :intro_tour %>
+  <% current_account.update_attribute(:seen_intro_tour, true) %>
+<% end %>
+
 <div id="a2hs" class="card mb-3 d-md-none" style="display: none">
   <div class="card-body text-center">
     <a id="a2hs-btn" class="btn btn-primary" href="javascript:;">Add Dandelion to your home screen</a>
   </div>
 </div>
 <div class="row">
-  <div class="col-sm-8">
+  <div  class="col-sm-8">
     <%= cp(:'organisations/carousel', key: "/organisations/carousel/#{current_account.id}") %>
-    <div data-pagelet-url="/" data-pagelet-refresh="60" class="mt-1 mb-3"></div>
+    <div id="newsfeed" data-pagelet-url="/" data-pagelet-refresh="60" class="mt-1 mb-3"></div>
   </div>
   <div class="col-sm-4">
     <div style="position: sticky; top: 3.75rem">
 
-      <div class="card mb-3">
+      <div id="upcoming-events" class="card mb-3">
         <h3 class="card-header bg-primary text-white">Your upcoming events</h3>
         <div class="card-body">
           <% if current_account.upcoming_events.count > 0 %>
@@ -38,7 +44,7 @@
             </table>
           <% else %>
             <p class="text-center mb-0">Nothing upcoming.
-              <a href="/events">Browse events</a>
+              <a id="browse-events" href="/events">Browse events</a>
             </p>
           <% end %>
         </div>

@@ -234,6 +234,8 @@ Dandelion::App.controller do
                  "/local_groups/#{@local_group.id}"
                elsif @event
                  "/events/#{@event.id}"
+               elsif @account.sign_ins_count == 1
+                 '/'
                else
                  '/accounts/edit'
                end)

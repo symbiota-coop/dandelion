@@ -60,7 +60,8 @@ class Account
      open_to_open_relating
      hide_location
      block_reply_by_email
-     hidden].each do |b|
+     hidden
+     seen_intro_tour].each do |b|
     field b.to_sym, type: Boolean
     index({ b.to_s => 1 })
   end
@@ -228,6 +229,10 @@ class Account
   end
   after_validation do
     geocode || (self.coordinates = nil) if ENV['GOOGLE_MAPS_API_KEY']
+  end
+
+  after_create do
+    notifications_as_notifiable.create! circle: self, type: 'created_profile'
   end
 
   after_create :send_confirmation_email

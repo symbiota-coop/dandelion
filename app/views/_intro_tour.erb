@@ -1,0 +1,27 @@
+<script>
+
+$(function() {
+
+  if($(window).width() > 768) {
+
+    introJs().setOptions({
+      steps: [{
+        title: "Hi <%=current_account.firstname%>!",
+        intro: "Welcome to Dandelion!"
+      }, {
+        element: $('#newsfeed')[0],
+        intro: "Here's the newsfeed, where you'll see activity relevant to you"
+      }, {
+        element: $('#upcoming-events')[0],
+        intro: "Here's where you'll see your upcoming events"
+      }, <% if current_account.upcoming_events.count == 0 %> {
+        element: $("#browse-events")[0],
+        intro: "Time to find your first event!"
+      } <% end %>]
+    }).start();
+
+  }
+
+})
+
+</script>
