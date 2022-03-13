@@ -4,10 +4,14 @@
 <% if via or @account.sign_ins_count == 1 %>
   <% if via %>
     <% %w{organisation activity local_group event}.each { |r| if instance_variable_get("@#{r}") %>
-    <p class="lead">
-      Thanks for your interest in
-      <%= instance_variable_get("@#{r}").name %>. Complete your profile to get the most out of Dandelion:
-    </p>
+    <div class="alert alert-success">
+      <p class="lead">
+        Thanks for your interest in <%= instance_variable_get("@#{r}").name %>!
+      </p>
+      <p class="mb-0">
+        Complete your profile to get the most out of Dandelion:
+      </p>
+    </div>
     <% break; end; } %>
   <% elsif @account.sign_ins_count == 1 %>
 
