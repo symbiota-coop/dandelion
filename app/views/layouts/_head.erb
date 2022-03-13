@@ -148,6 +148,7 @@
     JSON.pretty_generate({
       "@context": 'https://schema.org',
       "@type": 'Event',
+      "eventStatus": "https://schema.org/EventScheduled",
       "name": @event.name,
       "startDate": @event.start_time.iso8601,
       "endDate": @event.end_time.iso8601,
@@ -170,7 +171,16 @@
         "@type": 'Organization',
         "name": @event.organisation.name,
         "url": @event.organisation.website
-      }
+      },
+      "offers": (@event.ticket_types.map { |ticket_type|
+        {
+          "@type": "Offer",
+          "url": "#{ENV['BASE_URI']}/events/#{@event.id}",
+          "price": ticket_type.price,
+          "priceCurrency": @event.currency,
+          "availability": ticket_type.number_of_tickets_available_in_single_purchase > 0 ? "https://schema.org/InStock" : "https://schema.org/SoldOut",
+        }
+      })
     })
     %>
     </script>
