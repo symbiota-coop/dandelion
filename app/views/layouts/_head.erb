@@ -145,7 +145,7 @@
     <link rel="canonical" href="<%=ENV['BASE_URI']%>/events/<%=@event.id%>" />
     <script type="application/ld+json">
     <%==
-    {
+    JSON.pretty_generate({
       "@context": 'https://schema.org',
       "@type": 'Event',
       "name": @event.name,
@@ -155,17 +155,23 @@
       "location": (unless @event.online?
                      {
                        "@type": 'Place',
-                       "name": @event.location.split(',').first
+                       "name": @event.location.split(', ').first,
+                       "address": {
+                           "@type": "PostalAddress",
+                           "name": @event.location.split(', ')[1..-1].join(', ')
+                          }
                      }
                    end),
       "image": @event.image.try(:url),
-      "description": @event.description,
+      "description": (if @event.description
+                        Nokogiri::HTML(@event.description).search('p').first.try(:text)
+                      end),
       "organizer": {
         "@type": 'Organization',
         "name": @event.organisation.name,
         "url": @event.organisation.website
       }
-    }.to_json
+    })
     %>
     </script>
 
