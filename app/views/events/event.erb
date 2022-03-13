@@ -219,7 +219,7 @@
                 <% if event_feedback = @event.event_feedbacks.find_by(account: current_account) %>
                   <p>Your rating: <% event_feedback.rating.times do %><i class="fa fa-star"></i><% end %></p>
                 <% else %>
-                <p><a href="/events/<%=@event.id%>/give_feedback">Give feedback</a></p>
+                  <p><a href="/events/<%=@event.id%>/give_feedback">Give feedback</a></p>
                 <% end %>
               <% end %>
               <p class="mb-1">Click an order to review the confirmation email:</p>
