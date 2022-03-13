@@ -1,9 +1,3 @@
-
-<% if !current_account.seen_intro_tour %>
-  <%= partial :intro_tour %>
-  <% current_account.update_attribute(:seen_intro_tour, true) %>
-<% end %>
-
 <div id="a2hs" class="card mb-3 d-md-none" style="display: none">
   <div class="card-body text-center">
     <a id="a2hs-btn" class="btn btn-primary" href="javascript:;">Add Dandelion to your home screen</a>

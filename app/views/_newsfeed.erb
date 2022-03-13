@@ -38,3 +38,8 @@
   </ul>
   <%= will_paginate notifications, inner_window: 0, outer_window: 0, renderer: WillPaginate::ViewHelpers::BootstrapRenderer %>
 <% end %>
+
+<% if !current_account.seen_intro_tour %>
+  <%= partial :intro_tour %>
+  <% current_account.update_attribute(:seen_intro_tour, true) %>
+<% end %>
