@@ -97,7 +97,7 @@
     <td>
       <%= event_feedback.created_at %>
     </td>
-    <% if organisation_admin?(event_feedback.event.organisation) %>
+    <% if organisation_admin?(event_feedback.event.try(:organisation)) %>
       <td data-sort="<%= event_feedback.created_at.iso8601 %>">
         <a class="btn btn-danger" href="/event_feedbacks/<%= event_feedback.id %>/destroy" data-confirm="Are you sure you want to delete this feedback?"><i class="fa fa-times"></i></a>
       </td>
