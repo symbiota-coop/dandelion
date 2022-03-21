@@ -33,12 +33,14 @@
           </td>
         </tr>
       <% end %>
-      <tr>
-        <td>Listed by</td>
-        <td>
-          <a href="/u/<%= @place.account.username %>"><%= @place.account.name %></a>
-        </td>
-      </tr>
+      <% if @place.account %>
+        <tr>
+          <td>Listed by</td>
+          <td>
+            <a href="/u/<%= @place.account.username %>"><%= @place.account.name %></a>
+          </td>
+        </tr>
+      <% end %>
     </table>
   </div>
 </div>
