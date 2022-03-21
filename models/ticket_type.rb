@@ -6,6 +6,7 @@ class TicketType
   belongs_to :ticket_group, optional: true, index: true
 
   field :name, type: String
+  field :description, type: String
   field :price, type: Float
   field :quantity, type: Integer
   field :order, type: Integer
@@ -15,6 +16,7 @@ class TicketType
   def self.admin_fields
     {
       name: :text,
+      description: :text,
       price: :number,
       quantity: :number,
       order: :number,

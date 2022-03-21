@@ -22,7 +22,7 @@
                 <% unless no_ticket_groups %>
                   <% tg = ticket_type.ticket_group.try(:name) || 'Other tickets'; if tg != previous_ticket_group %>
                   <tr>
-                    <td colspan="3" style="text-transform: uppercase; font-size: 80%" class="text-center font-weight-bold"><%= tg %></td>
+                    <td colspan="3" style="text-transform: uppercase; font-size: 80%" class="bg-primary text-white text-center font-weight-bold"><%= tg %></td>
                   </tr>
                   <% previous_ticket_group = ticket_type.ticket_group.try(:name) %>
                 <% end %>
@@ -54,6 +54,13 @@
                   <% end %>
                 </td>
               </tr>
+              <% if ticket_type.description %>
+              <tr>
+                <td style="border: 0; padding-top: 0" class="text-muted" colspan="3">
+                  <%= ticket_type.description %>
+                </td>
+              </tr>
+              <% end %>
             <% end %>
             <% } %>
             <% if @event.all_discount_codes.count > 0 %>
