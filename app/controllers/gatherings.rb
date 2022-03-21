@@ -28,7 +28,7 @@ Dandelion::App.controller do
       @gathering.send("enable_#{x}=", true)
     end
     @gathering.listed = true
-    @gathering.partial_payments = true
+    @gathering.enable_partial_payments = true
     @gathering.enable_comments_on_gathering_homepage = false
     erb :'gatherings/build'
   end
