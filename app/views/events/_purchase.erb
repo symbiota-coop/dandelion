@@ -11,7 +11,6 @@
         <%= hidden_field_tag :affiliate_type, value: params[:affiliate_type] %>
         <%= hidden_field_tag :affiliate_id, value: params[:affiliate_id] %>
         <table class="table">
-            <tr>
               <% no_ticket_groups = @event.ticket_types.all? { |ticket_type| !ticket_type.ticket_group } %>
               <% previous_ticket_group = 'Other tickets'; @event.ticket_types.order('order asc, price desc').each_with_index { |ticket_type,i| %>
               <% if !ticket_type.hidden or params[:ticket_type_id] == ticket_type.id.to_s %>
