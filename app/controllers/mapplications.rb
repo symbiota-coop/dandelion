@@ -24,6 +24,7 @@ Dandelion::App.controller do
     @membership = @gathering.memberships.find_by(account: current_account)
     redirect '/' if @gathering.privacy == 'secret'
     redirect "/g/#{@gathering.slug}/join" if @gathering.privacy == 'open'
+    @title = @gathering.name
     @og_desc = "#{@gathering.name} is being co-created on Dandelion"
     @og_image = @gathering.image.url if @gathering.image
     @account = Account.new

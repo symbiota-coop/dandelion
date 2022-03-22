@@ -27,18 +27,18 @@
             Hidden? <%= o.check_box :hidden %>
           </label>
           <% if o.object.new_record? %>
-            <span>
-              <i style="cursor: pointer" onclick="$(this).closest('.ticket_type').remove()" class="fa fa-times"></i>
+            <a class="btn btn-sm btn-outline-danger" href="javascript:;" onclick="$(this).closest('.ticket_type').remove()">
+              <i class="fa fa-times"></i>
             </span>
           <% else %>
-            <span>
-              <i style="cursor: pointer" onclick="$(this).siblings().last().prop('checked', true).closest('.ticket_type').hide()" class="fa fa-times"></i>
+            <a class="btn btn-sm btn-outline-danger" href="javascript:;" onclick="$(this).children().last().prop('checked', true).closest('.ticket_type').hide()">
+              <i class="fa fa-times"></i>
               <%= o.check_box '_destroy', style: 'display: none' %>
-            </span>
+            </a>
           <% end %>
           <% if o.object.hidden? %>
-            <a target="_blank" class="ml-1 text-dark" href="/events/<%= @event.id %>?ticket_type_id=<%= o.object.id %>">
-              <i data-toggle="tooltip" title="Link to hidden ticket type" class="fa fa-link"></i>
+            <a target="_blank" data-toggle="tooltip" title="Link to hidden ticket type" class="ml-1 btn btn-sm btn-outline-primary" href="/events/<%= @event.id %>?ticket_type_id=<%= o.object.id %>">
+              <i class="fa fa-link"></i>
             </a>
           <% end %>
         </div>
@@ -58,6 +58,7 @@
       .ticket_type input[name$='[quantity]'] { display: inline-block; width: 7em }
       .ticket_type input[name$='[max_quantity_per_transaction]'] { display: inline-block; width: 5em }
       .ticket_type select[name$='[ticket_group_id]'] { display: inline-block; width: auto }
+      .ticket_type a.btn { margin-bottom: 5px }
     </style>
     <script>
       $(function () {
@@ -146,7 +147,7 @@
           hiddenInput1.appendTo(hiddenDiv);
           hiddenDiv.appendTo(d);
 
-          $('<span><i style="cursor: pointer" onclick="$(this).closest(\'.ticket_type\').remove()" class="fa fa-times"></i></span>').appendTo(d);
+          $('<a class="btn btn-sm btn-outline-danger" href="javascript:;" onclick="$(this).closest(\'.ticket_type\').remove()"><i class="fa fa-times"></i></a>').appendTo(d);
 
           d.appendTo('#ticket_types');
         });
