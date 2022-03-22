@@ -1,18 +1,42 @@
+
+<% if !defined?(bottom_url) && !admin %>
+
+<a target="_parent" href="<%= view_url %>" class="p-2 d-block block"
+     style="
+     text-decoration: none;
+     height: 180px; overflow: hidden;
+     <% if !image %>border: 2px solid #343a40;<% end %>
+     <% if image %>background: linear-gradient( rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5) ), url('<%= image.thumb('400x400').url %>'); background-size: cover; background-position: center center;<% end %>
+     ">
+
+<% else %>
+
 <div class="p-2 d-block block"
      style="
      height: 180px; overflow: hidden;
      <% if !image %>border: 2px solid #343a40;<% end %>
      <% if image %>background: linear-gradient( rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5) ), url('<%= image.thumb('400x400').url %>'); background-size: cover; background-position: center center;<% end %>
      ">
+
+ <% end %>
+
   <table style="width: 100%; height: 100%">
     <tr>
       <td style="vertical-align: top">
         <div class="row justify-content-between">
           <div class="col">
             <h4 class="block-title">
+
+              <% if !defined?(bottom_url) && !admin %>
+              <span class="<% if image %>text-white<% else %>text-dark<% end %>">
+                <%= title %>
+              </span>
+              <% else %>
               <a class="<% if image %>text-white<% else %>text-dark<% end %>" target="_parent" href="<%= view_url %>" onclick="event.stopPropagation();">
                 <%= title %>
               </a>
+              <% end %>
+
               <% if admin %>
                 <a class="<% if image %>text-white<% else %>text-dark<% end %> block-edit" style="display: none" href="<%= edit_url %>" onclick="event.stopPropagation();">
                   <i class="fa fa-pencil"></i>
@@ -34,4 +58,9 @@
       </tr>
     <% end %>
   </table>
-</div>
+
+<% if !defined?(bottom_url) && !admin %>
+  </a>
+<% else %>
+  </div>
+<% end %>
