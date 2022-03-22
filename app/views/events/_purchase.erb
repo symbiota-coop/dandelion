@@ -11,13 +11,9 @@
         <%= hidden_field_tag :affiliate_type, value: params[:affiliate_type] %>
         <%= hidden_field_tag :affiliate_id, value: params[:affiliate_id] %>
         <table class="table">
-          <tr>
-            <th style="border-top: 0">Ticket type</th>
-            <th style="border-top: 0">Price</th>
-            <th style="border-top: 0; width: 50%">Quantity</th>
             <tr>
               <% no_ticket_groups = @event.ticket_types.all? { |ticket_type| !ticket_type.ticket_group } %>
-              <% previous_ticket_group = 'Other tickets'; @event.ticket_types.order('order asc, price desc').each { |ticket_type| %>
+              <% previous_ticket_group = 'Other tickets'; @event.ticket_types.order('order asc, price desc').each_with_index { |ticket_type,i| %>
               <% if !ticket_type.hidden or params[:ticket_type_id] == ticket_type.id.to_s %>
                 <% unless no_ticket_groups %>
                   <% tg = ticket_type.ticket_group.try(:name) || 'Other tickets'; if tg != previous_ticket_group %>
@@ -28,16 +24,16 @@
                 <% end %>
               <% end %>
               <tr>
-                <td>
+                <td <% if i == 0 %>style="border-top: 0"<% end %>>
                   <%= ticket_type.name %>
                   <% if ticket_type.hidden %>
                     <i class="fa fa-lock"></i>
                   <% end %>
                 </td>
-                <td>
+                <td <% if i == 0 %>style="border-top: 0"<% end %>>
                   <%= m ticket_type.price, @event.currency %>
                 </td>
-                <td>
+                <td style="width: 50%; <% if i == 0 %>border-top: 0<% end %>">
                   <% if ticket_type.number_of_tickets_available_in_single_purchase > 0 %>
                     <div class="row justify-content-between align-items-center">
                       <div class="col">
