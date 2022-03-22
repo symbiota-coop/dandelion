@@ -38,7 +38,7 @@ class TicketType
   end
 
   def remaining
-    quantity - tickets.count
+    (quantity || 0) - tickets.count
   end
 
   def number_of_tickets_available_in_single_purchase
