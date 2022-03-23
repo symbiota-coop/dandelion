@@ -60,7 +60,7 @@
       </td>
     <% end %>
     <% unless @organisation %>
-      <td>
+      <td class="text-center">
         <% if order.event.organisation.image %>
           <img src="<%=order.event.organisation.image.thumb('500x500#').url%>" style="max-width: 50px;">
           <br />
