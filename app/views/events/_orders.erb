@@ -26,6 +26,9 @@
       <% if defined?(event_name) %>
         <th>Event</th>
       <% end %>
+      <% unless @organisation %>
+        <th>Organisation</th>
+      <% end %>
       <th>Value</th>
       <th>Via</th>
       <% if @event %>
@@ -54,6 +57,15 @@
         <div class="mt-1">
           <%= partial :'events/progress', locals: { event: order.event, full_width: true } %>
         </div>
+      </td>
+    <% end %>
+    <% unless @organisation %>
+      <td>
+        <% if order.event.organisation.image %>
+          <img src="<%=order.event.organisation.image.thumb('500x500#').url%>" style="max-width: 50px;">
+          <br />
+        <% end %>
+        <a href="/o/<%=order.event.organisation.slug%>"><%= order.event.organisation.name%></a>
       </td>
     <% end %>
     <td data-sort="<%= order.value %>">
