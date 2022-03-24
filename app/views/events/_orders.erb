@@ -26,7 +26,7 @@
       <% if defined?(event_name) %>
         <th>Event</th>
       <% end %>
-      <% unless @organisation %>
+      <% if defined?(organisation_name) %>
         <th>Organisation</th>
       <% end %>
       <th>Value</th>
@@ -59,7 +59,7 @@
         </div>
       </td>
     <% end %>
-    <% unless @organisation %>
+    <% if defined?(organisation_name) %>
       <td class="text-center">
         <% if order.event.organisation.image %>
           <img src="<%=order.event.organisation.image.thumb('500x500#').url%>" style="max-width: 50px;">
