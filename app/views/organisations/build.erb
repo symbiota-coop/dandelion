@@ -26,10 +26,6 @@
 <script>
   $(function () {
 
-    window.onbeforeunload = function() {
-        return true;
-    };
-
     var autocomplete = new google.maps.places.Autocomplete($('#organisation_location')[0]);
 
     $('#organisation_slug, #organisation_name').keyup(function () {

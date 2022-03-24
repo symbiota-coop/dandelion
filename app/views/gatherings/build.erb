@@ -13,10 +13,6 @@
 <script>
   $(function () {
 
-    window.onbeforeunload = function() {
-        return true;
-    };        
-
     $('#gathering_slug, #gathering_name').keyup(function () {
       $('#slug-replace-gathering-url').text('<%= ENV['BASE_URI'] %>/g/' + $('#gathering_slug').val());
       $('#slug-replace-stripe-webhook').text('<%= ENV['BASE_URI'] %>/g/' + $('#gathering_slug').val() + '/stripe_webhook');
