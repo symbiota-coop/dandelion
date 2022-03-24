@@ -19,6 +19,10 @@
 <script>
   $(function () {
 
+    window.onbeforeunload = function() {
+        return true;
+    };
+
     $('#event-build-nav a[data-toggle="tab"]').on('show.bs.tab', function (e) {
       var form = $('#event-build-nav').closest('form')[0]
         if (form.reportValidity()) {
