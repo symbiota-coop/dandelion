@@ -49,7 +49,7 @@
 <%= cp :events_count %>
 
 <div data-pagelet-url="/events"></div>
-<div class="my-3" data-pagelet-url="/map">
+<div class="my-3" data-pagelet-url="/map?places=1">
   <%= partial :'maps/map', locals: { dynamic: true, trigger_bounds_changed: true } %>
 </div>
 <h2 style="font-size: 1.7rem" class="mt-4 mb-3 text-center">Some of the places that are important to our community</h2>

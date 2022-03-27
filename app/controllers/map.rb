@@ -43,6 +43,8 @@ Dandelion::App.controller do
       @place = Place.find(params[:place_id]) || not_found
       @places = Place.and(id: @place.id)
       @accounts = Account.mappable.and(:id.in => @place.placeships.pluck(:account_id))
+    elsif params[:places]
+      @places = Place.order('created_at desc')
     else
       @places = Place.order('created_at desc')
       @accounts = Account.mappable
