@@ -608,7 +608,7 @@ class Event
 
   def self.new_tips
     {
-      questions: 'One per line',
+      questions: 'One per line. Wrap in [square brackets] to turn into a checkbox',
       feedback_questions: 'One per line'
     }
   end

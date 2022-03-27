@@ -222,10 +222,17 @@
       <%= f.hidden_field :http_referrer, value: request.referrer %>
       <% @event.questions_a.each_with_index { |q,i| %>
       <div class="form-group">
-        <label><%== Sanitize.fragment(Rinku.auto_link(q), Sanitize::Config::DANDELION) %>*</label>
-        <div>
-          <%= text_area_tag "answers[#{i}]", required: true, class: 'autosize form-control' %>
-        </div>
+        <% if q =~ /\[.*\]/ %>
+          <div class="checkbox-inline">
+            <%= check_box_tag "answers[#{i}]", id: "answers-#{i}" %>
+            <label class="font-weight-bold" for="answers-<%=i%>"><%== Sanitize.fragment(Rinku.auto_link(q), Sanitize::Config::DANDELION) %></label>
+           </div>
+        <% else %>
+          <label><%== Sanitize.fragment(Rinku.auto_link(q), Sanitize::Config::DANDELION) %>*</label>
+          <div>
+            <%= text_area_tag "answers[#{i}]", required: true, class: 'autosize form-control' %>
+          </div>
+        <% end %>
       </div>
       <% } %>
       <% if current_account && @event.organisation_and_cohosts.all? { |organisation| current_account.organisationships.find_by(organisation: organisation) } %>

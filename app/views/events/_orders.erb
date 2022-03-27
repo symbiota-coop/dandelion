@@ -136,11 +136,19 @@
         <% order.answers.each { |q,a| if a %>
         <p>
           <strong>
-            <%== Sanitize.fragment(Rinku.auto_link(q), Sanitize::Config::DANDELION) %>
+            <% if m = q.match(/\[(.*)\]/) %>
+              <%== Sanitize.fragment(Rinku.auto_link(m[1]), Sanitize::Config::DANDELION) %>
+            <% else %>
+              <%== Sanitize.fragment(Rinku.auto_link(q), Sanitize::Config::DANDELION) %>
+            <% end %>
           </strong>
         </p>
         <p>
-          <%== Sanitize.fragment(Rinku.auto_link(a.gsub("\n", '<br />')), Sanitize::Config::DANDELION) %>
+          <% if q =~ /\[.*\]/ %>
+            <i class="fa fa-check"></i>
+          <% else %>
+            <%== Sanitize.fragment(Rinku.auto_link(a.gsub("\n", '<br />')), Sanitize::Config::DANDELION) %>
+          <% end %>
         </p>
       <% end } if order.answers %>
     </td>
