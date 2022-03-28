@@ -20,7 +20,7 @@
 <% else %>
   <h1>Apply to <a href="/activities/<%= @activity.id %>"><%= @activity.name %></a></h1>
   <% if @activity.extra_info_for_application_form %>
-    <%= @activity.extra_info_for_application_form %>
+    <%== Sanitize.fragment(@activity.extra_info_for_application_form, Sanitize::Config::DANDELION) %>
   <% end %>
   <% form_for @account, "/activities/#{@activity.id}/apply", id: 'application-form', class: 'mt-3' do |f| %>
     <script>
