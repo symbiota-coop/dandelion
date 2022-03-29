@@ -114,7 +114,7 @@ Dandelion::App.controller do
 
       if @event.posts.empty?
         post = @event.posts.create!(subject: "Chat for #{@event.name}", account: @event.account)
-        comment = post.comments.create!(account: @event.account)
+        post.comments.create!(account: @event.account)
       end
 
       if params[:ticket_form_only]
