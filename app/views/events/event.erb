@@ -327,20 +327,19 @@
           </div>
         <% end %>
       </div>
-      <div class="d-none d-xs-block" id="chat-spacer" style="margin-bottom: 400px"></div>
+      <div class="d-none d-sm-block" id="chat-spacer" style="margin-bottom: 400px"></div>
 
     <% else %>
 
-
-          <h2 class="mt-5">Private discussion for attendees and facilitators</h2>
-          <% if (ticket = @event.tickets.find_by(account: current_account)) %>
-            <div data-pagelet-url="/events/<%= @event.id %>/subscribe_discussion">
-              <%= partial :'events/subscribe_discussion' %>
-            </div>
-          <% end %>
-          <div class="mt-3" data-pagelet-url="/commentable?commentable_type=Event&commentable_id=<%= @event.id %>">
-            <%= partial :'comments/commentable', locals: { commentable: @event } %>
-          </div>
+      <h2 class="mt-5">Private discussion for attendees and facilitators</h2>
+      <% if (ticket = @event.tickets.find_by(account: current_account)) %>
+        <div data-pagelet-url="/events/<%= @event.id %>/subscribe_discussion">
+          <%= partial :'events/subscribe_discussion' %>
+        </div>
+      <% end %>
+      <div class="mt-3" data-pagelet-url="/commentable?commentable_type=Event&commentable_id=<%= @event.id %>">
+        <%= partial :'comments/commentable', locals: { commentable: @event } %>
+      </div>
 
     <% end %>
 
