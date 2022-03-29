@@ -48,7 +48,7 @@
       <span class="nav-link-text">Events</span>
     </a>
   </li>
-  <% if !current_account %>
+  <% if !current_account || current_account.organisationships.count > 20 %>
     <li class="<%= 'active' if request.path == '/organisations' %>">
       <a href="/organisations" data-toggle="tooltip" title="Organisations" data-placement="right">
         <i class="fa fa-flag"></i>
