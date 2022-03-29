@@ -321,11 +321,6 @@
         <div class="mt-3" data-pagelet-url="/commentable?commentable_type=Event&commentable_id=<%= @event.id %>&chat=true">
           <%= partial :'comments/commentable', locals: { commentable: @event, chat: true } %>
         </div>
-        <% if (ticket = @event.tickets.find_by(account: current_account)) %>
-          <div style="padding-left: 1em; padding-bottom: 1em" data-pagelet-url="/events/<%= @event.id %>/subscribe_discussion">
-            <%= partial :'events/subscribe_discussion' %>
-          </div>
-        <% end %>
       </div>
       <div class="d-none d-sm-block" id="chat-spacer" style="margin-bottom: 400px"></div>
 
