@@ -11,7 +11,7 @@ Dandelion::App.controller do
 
   get '/commentable' do
     @commentable = params[:commentable_type].constantize.find(params[:commentable_id])
-    partial :'comments/commentable', locals: { commentable: @commentable }
+    partial :'comments/commentable', locals: { commentable: @commentable, chat: params[:chat] }
   end
 
   post '/comment' do

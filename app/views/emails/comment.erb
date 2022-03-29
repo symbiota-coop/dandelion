@@ -21,7 +21,7 @@
       <% end %>
     </p>
   <% end %>
-  <% close_divs = ''; comment.post.comments.order_by(:created_at.desc)[1..].each { |comment| %>
+  <% close_divs = ''; comment.post.comments.order_by(:created_at.desc)[1..].each { |comment| next if comment.body.nil? %>
   <p>On <%= comment.created_at %>, <%= comment.account.name %> wrote:</p>
   <%= '<div style="border-left: 1px solid #ccc; margin-left: 1em; padding-left: 1em">' %>
   <p><%= comment.body_with_additions %></p>

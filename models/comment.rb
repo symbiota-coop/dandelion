@@ -205,6 +205,7 @@ class Comment
 
   after_create :send_comment, if: proc { |comment| !comment.commentable.respond_to?(:auto_comment_sending) || comment.commentable.auto_comment_sending }
   def send_comment
+    return if body.nil?
     return if sent_at
 
     mg_client = Mailgun::Client.new ENV['MAILGUN_API_KEY'], 'api.eu.mailgun.net'

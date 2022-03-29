@@ -224,6 +224,10 @@ class Event
   after_save do
     event_facilitations.create account: revenue_sharer if revenue_sharer
 
+    if changes['name'] && (post = posts.find_by(subject: "Chat for #{changes['name'][0]}"))
+      post.update_attribute(:subject, "Chat for #{name}")
+    end
+
     if changes['activity_id']
       if activity && activity.privacy == 'open' && changes['activity_id'][0]
         previous_activity = Activity.find(changes['activity_id'][0])

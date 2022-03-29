@@ -1,5 +1,7 @@
-<% if @event.tickets.and(account: current_account).all? { |ticket| ticket.subscribed_discussion } %>
-  <a href="/events/<%= @event.id %>/unsubscribe_discussion" class="pagelet-trigger btn btn-primary mb-1">Email notifications on <i class="fa fa-envelope"></i></a>
-<% else %>
-  <a href="/events/<%= @event.id %>/set_subscribe_discussion" class="pagelet-trigger btn btn-outline-primary mb-1">Email notifications off</a>
-<% end %>
+<small>
+  <% if @event.tickets.and(account: current_account).all? { |ticket| ticket.subscribed_discussion } %>
+    <a href="/events/<%= @event.id %>/unsubscribe_discussion" class="pagelet-trigger">Email notifications on</a>
+  <% else %>
+    <a href="/events/<%= @event.id %>/set_subscribe_discussion" class="text-muted pagelet-trigger">Email notifications off</a>
+  <% end %>
+</small>

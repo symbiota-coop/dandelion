@@ -5,8 +5,10 @@
   <% if defined?(from_homepage) %>
     <%= hidden_field_tag :from_homepage, value: true %>
   <% end %>
-  <% if defined?(reply) %>
-    <%= f.text_area_block :body, placeholder: 'Write a comment... (optional)', label_class: 'd-none' %>
+  <% if defined?(chat) && chat %>
+    <%= f.text_block :body, placeholder: 'Write a comment...', label_class: 'd-none' %>
+  <% elsif defined?(reply) %>
+    <%= f.text_area_block :body, placeholder: 'Write a comment...', label_class: 'd-none' %>
   <% else %>
     <% if comment.new_record? && comment.first_in_post? %>
       <div id="comment-subject-container" <% if defined?(from_homepage) %> style="display: none"<% end %>>
