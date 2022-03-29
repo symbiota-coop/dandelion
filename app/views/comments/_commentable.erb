@@ -20,6 +20,7 @@
     <% else %>
       <a class="text-muted pagelet-trigger" href="/subscriptions/create?post_id=<%= post.id %>">Email notifications off</a>
     <% end %>
+    <span class="text-muted">&middot; <%= pluralize(post.subscriptions.count, 'person') %> subscribed</span>
   </div>
   <script>
     $(function() {
