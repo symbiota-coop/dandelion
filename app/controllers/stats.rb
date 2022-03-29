@@ -9,7 +9,7 @@ Dandelion::App.controller do
   end
 
   get '/stats/comments' do
-    @comments = Comment.order('created_at desc').paginate(page: params[:page], per_page: 50)
+    @comments = Comment.and(:body.ne => nil).order('created_at desc').paginate(page: params[:page], per_page: 50)
     erb :'stats/comments'
   end
 
