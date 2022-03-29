@@ -314,15 +314,35 @@
 
       <style>
       @media(min-width: 768px) {
-        #chat { border-radius: 0.25rem; box-shadow: #666 0 0 5px; background: white; position: fixed; bottom: 0.5625rem; right: 0.5625rem; width: 410px; height: 400px; overflow: auto }
+        #chat-container { border-radius: 0.25rem; box-shadow: #666 0 0 5px; background: white; position: fixed; width: 411px; bottom: 0.475rem; right: 0.5625rem;  }
+        #chat { height: 400px; overflow: auto }
       }
       </style>
-      <div id="chat">
-        <div class="mt-3" data-pagelet-url="/commentable?commentable_type=Event&commentable_id=<%= @event.id %>&chat=true">
-          <%= partial :'comments/commentable', locals: { commentable: @event, chat: true } %>
+      <div id="chat-container">
+        <div class="d-none d-sm-block p-2 bg-primary" style="border-radius: 0.25rem 0.25rem 0 0;">
+
+          <a class="text-white" href="javascript:;" onclick="$('#chat').hide();$(this).hide().next().show();$('#chat-spacer').removeClass('d-sm-block');$('#select-tickets').addClass('mb-4')">
+            <span class="float-right"><i class="fa fa-angle-double-down"></i></span>
+            <span class="text-white font-weight-bold">
+              Private discussion for attendees and facilitators
+            </span>
+          </a>
+
+          <a style="display:none"  class="text-white" href="javascript:;" onclick="$('#chat').show();$(this).hide().prev().show();$('#chat-spacer').addClass('d-sm-block');$('#select-tickets').removeClass('mb-4')">
+            <span class="float-right"><i class="fa fa-angle-double-up"></i></span>
+            <span class="text-white font-weight-bold">
+              Private discussion for attendees and facilitators
+            </span>
+          </a>
+
+        </div>
+        <div id="chat">
+          <div class="mt-3" data-pagelet-url="/commentable?commentable_type=Event&commentable_id=<%= @event.id %>&chat=true">
+            <%= partial :'comments/commentable', locals: { commentable: @event, chat: true } %>
+          </div>
         </div>
       </div>
-      <div class="d-none d-sm-block" id="chat-spacer" style="margin-bottom: 400px"></div>
+      <div class="d-none d-sm-block" id="chat-spacer" style="margin-bottom: 410px"></div>
 
     <% else %>
 
