@@ -337,7 +337,7 @@
 
         </div>
         <div id="chat">
-          <div class="mt-3" data-pagelet-url="/commentable?commentable_type=Event&commentable_id=<%= @event.id %>&chat=true">
+          <div data-pagelet-url="/commentable?commentable_type=Event&commentable_id=<%= @event.id %>&chat=true">
             <%= partial :'comments/commentable', locals: { commentable: @event, chat: true } %>
           </div>
         </div>
