@@ -1,5 +1,5 @@
 <h2>Comments</h2>
-<% h = {}; Comment.and(:created_at.gte => 1.month.ago).each do |comment|
+<% h = {}; Comment.and(:created_at.gte => 1.month.ago, :body.ne => nil).each do |comment|
              if comment.commentable.respond_to?(:gathering)
                if !h[comment.commentable.gathering_id]
                  h[comment.commentable.gathering_id] = 1
