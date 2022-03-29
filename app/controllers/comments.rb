@@ -152,7 +152,7 @@ Dandelion::App.controller do
     200
   end
 
-  get '/subscriptions/:id/destroy' do
+  get '/subscriptions/:id/unsubscribe' do
     sign_in_required!
     @subscription = Subscription.find(params[:id]) || not_found
     @subscription.destroy

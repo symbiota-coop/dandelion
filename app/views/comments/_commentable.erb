@@ -16,7 +16,7 @@
   </div>
   <div style="padding-left: 1em; padding-bottom: 1em; font-size: 90%">
     <% if (subscription = post.subscriptions.find_by(account: current_account)) %>
-      <a class="pagelet-trigger" href="/subscriptions/<%= subscription.id %>/destroy">Email notifications on</a>
+      <a class="pagelet-trigger" href="/subscriptions/<%= subscription.id %>/unsubscribe">Email notifications on</a>
     <% else %>
       <a class="text-muted pagelet-trigger" href="/subscriptions/create?post_id=<%= post.id %>">Email notifications off</a>
     <% end %>
