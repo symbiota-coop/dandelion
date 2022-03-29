@@ -9,12 +9,9 @@
         <a style="text-decoration: none; background: white" class="rounded p-1 border border-light" href="javascript:;" onclick="$(this).closest('form').find('input').val($(this).text()).closest('form').submit()"><%= e %></a>
         <% } %>
       </div>
-      <div class="col-auto mr-1">
-        or enter a word/emoji
-      </div>
       <div class="col-auto">
-        <div class="input-group mb-1" style="width: 5rem;">
-          <%= text_field_tag :body, class: 'form-control form-control-sm d-inline' %>
+        <div class="input-group mb-1" style="width: 7.5rem;">
+          <%= text_field_tag :body, class: 'form-control form-control-sm d-inline', placeholder: 'word/emoji' %>
           <div class="input-group-append">
             <button class="btn btn-primary" style="height: 1.875rem" type="submit"><i class="fa fa-chevron-right"></i></button>
           </div>
