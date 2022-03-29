@@ -310,7 +310,7 @@
       <%= partial :'pmails/blocks', locals: { pmails: pmails } %>
     <% end %>
 
-    <% if @event.posts.count == 1 && @event.posts.first.subject == "Chat for #{@event.name}" %>
+    <% if Padrino.env != :test && @event.posts.count == 1 && @event.posts.first.subject == "Chat for #{@event.name}" %>
 
       <style>
       @media(min-width: 768px) {
