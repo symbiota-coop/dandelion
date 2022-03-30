@@ -13,6 +13,7 @@ class Event
   belongs_to :last_saved_by, class_name: 'Account', inverse_of: :events_last_saver, index: true
 
   field :name, type: String
+  field :slug, type: String
   field :start_time, type: Time
   field :end_time, type: Time
   field :location, type: String
@@ -42,6 +43,7 @@ class Event
     {
       summary: { type: :text, index: false, edit: false },
       name: { type: :text, full: true },
+      slug: :slug,
       start_time: :datetime,
       end_time: :datetime,
       location: :text,
@@ -514,6 +516,8 @@ class Event
 
   validates_presence_of :name, :start_time, :end_time, :location, :currency
   validates_uniqueness_of :ps_event_id, allow_nil: true
+  validates_uniqueness_of :slug
+  validates_format_of :slug, with: /\A[a-z0-9\-]+\z/
 
   def future?(from = Date.today)
     start_time >= from
@@ -612,6 +616,7 @@ class Event
 
   def self.new_tips
     {
+      slug: 'Lowercase letters, numbers and dashes only (no spaces)',
       questions: 'One per line. Wrap in [square brackets] to turn into a checkbox',
       feedback_questions: 'One per line'
     }
@@ -624,6 +629,7 @@ class Event
   def self.human_attribute_name(attr, options = {})
     {
       name: 'Event title',
+      slug: 'Short URL',
       email: 'Contact email',
       questions: 'Booking questions',
       facebook_event_id: 'Facebook event ID',

@@ -82,6 +82,12 @@
         <a target="_blank" href="https://www.google.co.uk/maps?q=<%= @event.location %>"><%= @event.location %></a>
       <% end %>
     </li>
+    <% if @event.slug %>
+      <li>
+        <i data-toggle="tooltip" title="Short URL" class="fa fa-li fa-link"></i>
+        <a data-toggle="tooltip" title="Short URL" href="<%=ENV['BASE_URI']%>/e/<%=@event.slug%>"><%=ENV['BASE_URI']%>/e/<%=@event.slug%></a>
+      </li>
+    <% end %>
   </ul>
   <div>
     <%= partial :'events/tag_labels', locals: { event: @event } %>

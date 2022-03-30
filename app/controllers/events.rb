@@ -88,6 +88,11 @@ Dandelion::App.controller do
     end
   end
 
+  get '/e/:slug' do
+    @event = Event.find_by(slug: params[:slug]) || not_found
+    redirect "/events/#{@event.id}"
+  end
+
   get '/events/:id', provides: %i[html ics json] do
     session[:return_to] = request.url
     @event = Event.find(params[:id]) || not_found

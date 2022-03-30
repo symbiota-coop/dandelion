@@ -23,9 +23,9 @@ GIT
 
 GIT
   remote: https://github.com/stephenreid321/activate-tools.git
-  revision: 93e23930edc3de8518bbf6aadc062c1f0e018b41
+  revision: 1013b414a15408f8f318948fdfd8854b0bbf1c7c
   specs:
-    activate-tools (0.0.14)
+    activate-tools (0.0.16)
       padrino
 
 GIT
@@ -100,7 +100,7 @@ GEM
     chunky_png (1.4.0)
     coinbase_commerce (0.8.7)
       faraday (~> 0.10)
-    concurrent-ruby (1.1.9)
+    concurrent-ruby (1.1.10)
     connection_pool (2.2.5)
     countries (4.2.2)
       i18n_data (~> 0.15.0)

@@ -26,6 +26,10 @@ a.text-primary:hover, a.text-primary:focus { color: $color_primary_hover !import
 
 ul.pagination { justify-content: center; }
 
+.shorturl { display:inline; height: auto; width: auto; border: 0; border-radius: 0; border-bottom: 1px dotted #C8C7CC; padding: 0; padding-left: 0.375rem }
+.shorturl:focus { outline: none; box-shadow: none; -webkit-box-shadow: none }
+.shorturl + a { color: $body_text }
+
 .grecaptcha-badge { visibility: hidden; }
 
 .no-spinner .fa.fa-spin.fa-circle-o-notch { display: none }

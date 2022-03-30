@@ -194,6 +194,23 @@ $(function() {
     });
   });
 
+  $('input[type=text].shorturl').each(function() {
+    var input = $(this)
+    var stem = $(this).prev()
+    var link = $(this).next()
+    link.attr('data-toggle', 'tooltip')
+    link.attr('title', 'Click to copy')
+    link.click(function() {
+      navigator.clipboard.writeText(stem.text() + input.val());
+      link.attr('title', 'Copied!')
+      link.tooltip('dispose').tooltip().tooltip('show');
+      return false
+    })
+    input.keydown(function() {
+      link.hide()
+    });
+  });
+
   $(document).on('click', 'a.popup', function(e) {
     window.open(this.href, null, 'scrollbars=yes,width=600,height=600,left=150,top=150').focus();
     return false;

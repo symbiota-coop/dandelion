@@ -149,6 +149,7 @@ class Organisation
 
   def self.new_tips
     {
+      slug: 'Lowercase letters, numbers and dashes only (no spaces)',
       carousels: 'To create a carousel with the title X showing tags a and b, type X: a, b',
       banned_emails: 'One per line'
     }
