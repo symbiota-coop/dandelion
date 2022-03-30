@@ -67,6 +67,7 @@ class Organisation
   field :feedback_email_body, type: String
   field :verified, type: Boolean
   field :contribution_not_required, type: Boolean
+  field :contribution_requested_per_event_gbp, type: Integer
 
   def self.admin_fields
     {
@@ -109,7 +110,8 @@ class Organisation
       event_footer: :wysiwyg,
       banned_emails: :text_area,
       verified: :check_box,
-      contribution_not_required: :check_box
+      contribution_not_required: :check_box,
+      contribution_requested_per_event_gbp: :number
     }
   end
 
@@ -222,13 +224,13 @@ class Organisation
     events.and(:id.in => Order.and(:value.gt => 0, :event_id.in => events.pluck(:id)).pluck(:event_id))
   end
 
-  def self.contribution_requested_per_event
-    Money.new(15 * 100, 'GBP')
+  def self.contribution_requested_per_event_gbp
+    15
   end
 
   def contribution_requested
     c = contributable_events.count
-    Money.new(c * 15 * 100, 'GBP').exchange_to(currency)
+    Money.new(c * (contribution_requested_per_event_gbp || Organisation.contribution_requested_per_event_gbp) * 100, 'GBP').exchange_to(currency)
   end
 
   def contribution_paid

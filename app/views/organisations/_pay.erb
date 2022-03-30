@@ -8,13 +8,13 @@
     <div class="card-body p-2">
       <p class="lead">
         <mark class="px-0">Dandelion operates on a donation/gift economy basis</mark>,
-        with a suggested a donation of <%= m Organisation.contribution_requested_per_event, organisation.currency %> per event.
+        with a suggested a donation of <%= m Money.new(organisation.contribution_requested_per_event_gbp || Organisation.contribution_requested_per_event_gbp * 100, 'GBP'), organisation.currency %> per event.
         <br />
         <%= organisation.name %> has sold tickets to a total of <%= pluralize(c, 'event') %>
         and contributed
         <%= m p, organisation.currency %>
         of a suggested
-        <%= m r.cents / 100, organisation.currency %>, leaving a balance of <%= m balance, organisation.currency %>.
+        <%= m r, organisation.currency %>, leaving a balance of <%= m balance, organisation.currency %>.
         <% if ((r * 0.5) - p) > 0 %>
           <br>
           <mark class="px-0">Contribute <% if p > 0 %>a further <% end %><%= m ((r * 0.5) - p).cents / 100, organisation.currency %>+ and as a thank you we'll show your events in the main events section and on the Dandelion homepage.</mark>
