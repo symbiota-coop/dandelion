@@ -516,7 +516,7 @@ class Event
 
   validates_presence_of :name, :start_time, :end_time, :location, :currency
   validates_uniqueness_of :ps_event_id, allow_nil: true
-  validates_uniqueness_of :slug
+  validates_uniqueness_of :slug, allow_nil: true
   validates_format_of :slug, with: /\A[a-z0-9\-]+\z/
 
   def future?(from = Date.today)
