@@ -101,7 +101,6 @@
     <div class="tab-content mt-3">
       <div role="tabpanel" class="tab-pane active" id="tab1">
         <%= f.text_block :name %>
-        <%= f.shorturl_block :slug, stem: "#{ENV['BASE_URI']}/e/" %>
         <%= f.datetime_block :start_time %>
         <%= f.datetime_block :end_time %>
         <%= f.select_block :time_zone %>
@@ -237,6 +236,7 @@
         </div>
       </div>
       <div role="tabpanel" class="tab-pane" id="tab6">
+        <%= f.shorturl_block :slug, stem: "#{ENV['BASE_URI']}/e/" %>
         <%= f.url_block :redirect_url %>
         <%= f.number_block :facebook_pixel_id %>
         <%= f.check_box_block :featured %>
