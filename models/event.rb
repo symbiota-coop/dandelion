@@ -172,6 +172,9 @@ class Event
       errors.add(:local_group, '- you are not an admin of this local group') if local_group && !LocalGroup.admin?(local_group, account)
     end
 
+    errors.add(:image, 'must be at least 800px wide') if image && image.width < 800
+    errors.add(:image, 'must be more wide than high') if image && image.height > image.width
+
     begin
       self.image = image.encode('jpg') if image && !%w[jpg jpeg].include?(image.format)
     rescue StandardError
@@ -642,7 +645,7 @@ class Event
       zoom_party: 'Synchronous online event for all local groups',
       add_a_donation_to: 'Text above donation field',
       donation_text: 'Text below donation field',
-      time_zone: 'Display time zone',
+      time_zone: 'Visitor time zone',
       start_time: 'Start date/time',
       end_time: 'End date/time',
       extra_info_for_ticket_email: 'Extra info for ticket confirmation email',

@@ -30,7 +30,9 @@
                   <% end %>
                 </td>
                 <td <% if i == 0 %>style="border-top: 0"<% end %>>
-                  <%= m ticket_type.price, @event.currency %>
+                  <% unless ticket_type.price == 0 %>
+                    <%= m ticket_type.price, @event.currency %>
+                  <% end %>
                 </td>
                 <td style="width: 50%; <% if i == 0 %>border-top: 0<% end %>">
                   <% if ticket_type.number_of_tickets_available_in_single_purchase > 0 %>

@@ -68,9 +68,14 @@
         image.onload = function () {
           var height = this.height;
           var width = this.width;
-          console.log(width)
+
           if (width < 800) {
-            alert('Please choose an image that is at least 800px wide');
+            alert('Please use an image that is at least 800px wide');
+            $(fileUpload).val('')
+          }
+
+          if (height > width) {
+            alert('Please use an image that is more high than wide');
             $(fileUpload).val('')
           }
         };
@@ -103,7 +108,6 @@
         <%= f.text_block :name %>
         <%= f.datetime_block :start_time %>
         <%= f.datetime_block :end_time %>
-        <%= f.select_block :time_zone %>
         <%= f.text_block :location %>
         <%= f.select_block :currency %>
         <%= f.email_block :email %>
@@ -237,6 +241,7 @@
       </div>
       <div role="tabpanel" class="tab-pane" id="tab6">
         <%= f.shorturl_block :slug, stem: "#{ENV['BASE_URI']}/e/" %>
+        <%= f.select_block :time_zone %>
         <%= f.url_block :redirect_url %>
         <%= f.number_block :facebook_pixel_id %>
         <%= f.check_box_block :featured %>
