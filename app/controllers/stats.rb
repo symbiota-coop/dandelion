@@ -8,6 +8,11 @@ Dandelion::App.controller do
     erb :'stats/orders'
   end
 
+  get '/stats/places' do
+    @places = Place.order('created_at desc').paginate(page: params[:page], per_page: 50)
+    erb :'stats/places'
+  end
+
   get '/stats/comments' do
     @comments = Comment.and(:body.ne => nil).order('created_at desc').paginate(page: params[:page], per_page: 50)
     erb :'stats/comments'
