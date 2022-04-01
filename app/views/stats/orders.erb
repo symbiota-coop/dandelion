@@ -1,1 +1,26 @@
+<% tickets = Ticket.and(:created_at.gte => 1.month.ago) %>
+<% organisations = Organisation.and(:id.in => Event.where(:id.in => tickets.pluck(:event_id)).pluck(:organisation_id)) %>
+<p class="lead">
+  <%= pluralize(organisations.count, 'organisation') %> sold
+  <%= pluralize(tickets.count, 'ticket') %>
+  in the last month
+</p>
+
+<table class="table">
+<thead>
+  <tr>
+    <th>Organisation</th>
+    <th>Tickets<th>
+    </tr>
+  </thead>
+  <% organisations.each { |organisation| %>
+  <tr>
+    <td>
+      <a href="/o/<%=organisation.slug%>"><%=organisation.name%></a>
+    </td>
+    <td><%=Ticket.and(:event_id.in => organisation.events.pluck(:id), :created_at.gte => 1.month.ago).count%></td>
+  </tr>
+  <% } %>
+</table>
+
 <%= partial :'events/orders', locals: { orders: @orders, event_name: true, organisation_name: true, show_emails: true } %>
