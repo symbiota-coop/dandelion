@@ -597,6 +597,15 @@ Dandelion::App.controller do
     redirect back
   end
 
+  get '/o/:slug/show_feedback' do
+    @organisation = Organisation.find_by(slug: params[:slug]) || not_found
+    if request.xhr?
+      partial :'event_feedbacks/feedback', locals: { event_feedbacks: @organisation.event_feedbacks }
+    else
+      redirect "/o/#{@organisation.slug}"
+    end
+  end
+
   get '/o/:slug/receive_feedback/:f' do
     @organisation = Organisation.find_by(slug: params[:slug]) || not_found
     organisation_admins_only!
