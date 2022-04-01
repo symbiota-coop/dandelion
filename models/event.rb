@@ -556,8 +556,13 @@ class Event
 
   def self.legit
     self.and(:organisation_id.in =>
-      Organisation.and(:hidden.ne => true).pluck(:id)).and(:organisation_id.in =>
-      Event.and(:id.in => TicketType.pluck(:event_id)).pluck(:organisation_id))
+      Organisation.and(:hidden.ne => true).pluck(:id)).and(
+        :organisation_id.in => Event.and(:id.in => TicketType.pluck(:event_id)).pluck(:organisation_id)
+      ).and(:organisation_id.in =>
+      Organisation.and(:stripe_endpoint_secret.ne => nil).pluck(:id) +
+      Organisation.and(:coinbase_webhook_secret.ne => nil).pluck(:id) +
+      Organisation.and(:seeds_username.ne => nil).pluck(:id) +
+      Organisation.and(:xdai_address.ne => nil).pluck(:id))
   end
 
   def self.draft
