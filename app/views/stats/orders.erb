@@ -1,4 +1,4 @@
-<% tickets = Ticket.and(:created_at.gte => 1.month.ago) %>
+<% tickets = Ticket.and(:created_at.gte => 1.month.ago, :price.gt => 0) %>
 <% organisations = Organisation.and(:id.in => Event.where(:id.in => tickets.pluck(:event_id)).pluck(:organisation_id)) %>
 <p class="lead">
   <%= pluralize(organisations.count, 'organisation') %> sold
@@ -6,11 +6,17 @@
   in the last month
 </p>
 
-<table class="table">
-<thead>
-  <tr>
-    <th>Organisation</th>
-    <th>Tickets<th>
+<script>
+  $(function () {
+    var colIndex = $("#summary th").toArray().indexOf($("th[data-col-name='tickets']")[0])
+    $('#summary').dataTable({bInfo: false, paging: false, searching: false, order: [[colIndex, "desc"]]});
+  })
+</script>
+<table class="table" id="summary">
+  <thead>
+    <tr>
+      <th>Organisation</th>
+      <th data-col-name="tickets">Tickets</th>
     </tr>
   </thead>
   <% organisations.each { |organisation| %>
@@ -18,7 +24,7 @@
     <td>
       <a href="/o/<%=organisation.slug%>"><%=organisation.name%></a>
     </td>
-    <td><%=Ticket.and(:event_id.in => organisation.events.pluck(:id), :created_at.gte => 1.month.ago).count%></td>
+    <td><%=Ticket.and(:event_id.in => organisation.events.pluck(:id), :created_at.gte => 1.month.ago, :price.gt => 0).count%></td>
   </tr>
   <% } %>
 </table>
