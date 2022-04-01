@@ -209,24 +209,6 @@ Dandelion::App.controller do
     redirect "/events/#{duplicated_event.id}/edit"
   end
 
-  get '/events/:id/cohosts' do
-    @event = Event.find(params[:id]) || not_found
-    event_admins_only!
-    erb :'events/cohosts'
-  end
-
-  post '/events/:id/cohostships/:cohostship_id' do
-    @event = Event.find(params[:id]) || not_found
-    event_admins_only!
-    @cohostship = @event.cohostships.find(params[:cohostship_id])
-    if @cohostship.update_attributes(mass_assigning(params[:cohostship], Cohostship))
-      redirect "/events/#{@event.id}/cohosts"
-    else
-      flash.now[:error] = 'There was an error saving the cohost.'
-      erb :'events/cohosts'
-    end
-  end
-
   get '/events/:id/check_in' do
     @event = Event.find(params[:id]) || not_found
     event_admins_only!
@@ -583,6 +565,24 @@ Dandelion::App.controller do
     @event.cohostships.find_by(organisation_id: params[:organisation_id]).try(:destroy)
     redirect back
   end
+
+  get '/events/:id/cohosts' do
+    @event = Event.find(params[:id]) || not_found
+    event_admins_only!
+    erb :'events/cohosts'
+  end
+
+  post '/events/:id/cohostships/:cohostship_id' do
+    @event = Event.find(params[:id]) || not_found
+    event_admins_only!
+    @cohostship = @event.cohostships.find(params[:cohostship_id])
+    if @cohostship.update_attributes(mass_assigning(params[:cohostship], Cohostship))
+      redirect "/events/#{@event.id}/cohosts"
+    else
+      flash.now[:error] = 'There was an error saving the cohost.'
+      erb :'events/cohosts'
+    end
+  end  
 
   get '/events/:id/notes' do
     @event = Event.find(params[:id]) || not_found
