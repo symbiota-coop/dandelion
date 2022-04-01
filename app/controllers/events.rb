@@ -582,7 +582,7 @@ Dandelion::App.controller do
       flash.now[:error] = 'There was an error saving the cohost.'
       erb :'events/cohosts'
     end
-  end  
+  end
 
   get '/events/:id/notes' do
     @event = Event.find(params[:id]) || not_found
