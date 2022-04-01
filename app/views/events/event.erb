@@ -363,7 +363,10 @@
           </div>
         </div>
       </div>
-      <div class="d-none d-sm-block" id="chat-spacer" style="margin-bottom: 410px"></div>
+      <div class="d-none
+      <% if @event.posts.first.comments.count > 1 %>
+        d-sm-block
+      <% end %>" id="chat-spacer" style="margin-bottom: 410px"></div>
 
 
     <% else %>
