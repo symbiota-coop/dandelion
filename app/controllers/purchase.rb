@@ -67,6 +67,12 @@ Dandelion::App.controller do
 
           Stripe.api_key = @event.organisation.stripe_sk
 
+          if ticketForm[:cohost] && (cohost = Organisation.find_by(slug: ticketForm[:cohost])) && (cohostship = @event.cohostships.find_by(organisation: cohost)) && cohostship.image
+            @event_image = cohostship.image
+          elsif @event.image
+            @event_image = @event.image
+          end
+
           stripe_session_hash = {
             payment_method_types: ['card'],
             customer_email: @account.email,
@@ -76,7 +82,7 @@ Dandelion::App.controller do
             line_items: [{
               name: @event.name,
               description: @order.description,
-              images: [@event.image.try(:url)].compact,
+              images: [@event_image.try(:url)].compact,
               amount: (@order.total * 100).round,
               currency: @order.currency,
               quantity: 1

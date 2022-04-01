@@ -1,6 +1,8 @@
 <div class="row block no-gutters align-items-center <% if event.draft? %>bg-grey-transparent-2<% else %>bg-white<% end %>">
   <div class="col-md-6 order-md-2 mb-2 mb-md-0">
-    <% if event.image %>
+    <% if @organisation && (cohostship = event.cohostships.find_by(organisation: @organisation)) && cohostship.image %>
+      <a target="_parent" href="/events/<%= event.id %>?cohost=<%=@organisation.slug%>"><img class="w-100" src="<%= u cohostship.image.thumb('500x500').url %>"></a>
+    <% elsif event.image %>
       <a target="_parent" href="/events/<%= event.id %>"><img class="w-100" src="<%= u event.image.thumb('500x500').url %>"></a>
     <% end %>
   </div>

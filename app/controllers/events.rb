@@ -108,7 +108,11 @@ Dandelion::App.controller do
       end
       @pixel_purchase = { value: (@order.value || 0), currency: @order.currency }
     end
-    if @event.image
+    if params[:cohost] && (cohost = Organisation.find_by(slug: params[:cohost])) && (cohostship = @event.cohostships.find_by(organisation: cohost)) && cohostship.image
+      @event_image = cohostship.image
+      @og_image = cohostship.image.url
+    elsif @event.image
+      @event_image = @event.image
       @og_image = @event.image.url
     elsif @event.organisation && @event.organisation.image
       @og_image = @event.organisation.image.url
@@ -157,8 +161,9 @@ Dandelion::App.controller do
 
   get '/events/:id/stats_row' do
     @event = Event.find(params[:id]) || not_found
+    @organisation = params[:organisation_id] ? Organisation.find(params[:organisation_id]) : nil
     event_admins_only!
-    cp(:'events/event_stats_row', locals: { event: @event }, key: "/events/#{@event.id}/stats_row?timezone=#{Time.zone.name}")
+    cp(:'events/event_stats_row', locals: { event: @event }, key: "/events/#{@event.id}/stats_row?timezone=#{Time.zone.name}#{"&organisation_id=#{@organisation.id}" if @organisation}")
   end
 
   get '/events/:id/edit' do
@@ -202,6 +207,24 @@ Dandelion::App.controller do
     duplicated_event = @event.duplicate!(current_account)
     flash[:notice] = 'Event duplicated as a draft'
     redirect "/events/#{duplicated_event.id}/edit"
+  end
+
+  get '/events/:id/cohosts' do
+    @event = Event.find(params[:id]) || not_found
+    event_admins_only!
+    erb :'events/cohosts'
+  end
+
+  post '/events/:id/cohostships/:cohostship_id' do
+    @event = Event.find(params[:id]) || not_found
+    event_admins_only!
+    @cohostship = @event.cohostships.find(params[:cohostship_id])
+    if @cohostship.update_attributes(mass_assigning(params[:cohostship], Cohostship))
+      redirect "/events/#{@event.id}/cohosts"
+    else
+      flash.now[:error] = 'There was an error saving the cohost.'
+      erb :'events/cohosts'
+    end
   end
 
   get '/events/:id/check_in' do

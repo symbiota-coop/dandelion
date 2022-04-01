@@ -13,6 +13,7 @@
           ['View event', "/events/#{event.id}"],
           ['Edit event', "/events/#{event.id}/edit"],
           ['Discount codes', "/events/#{event.id}/discount_codes"],
+          (['Co-hosts', "/events/#{event.id}/cohosts"] if event.cohostships.count.positive?),
           ([%(Orders <span class="badge badge-primary">#{event.orders.count}</span>), "/events/#{event.id}/orders"] if event.orders.count.positive?),
           ([%(Tickets <span class="badge badge-primary">#{event.tickets.count}</span>), "/events/#{event.id}/tickets"] if event.ticket_types.count.positive? || event.tickets.count.positive?),
           ([%(Donations <span class="badge badge-primary">#{event.donations.count}</span>), "/events/#{event.id}/donations"] if event.donations.count.positive?),

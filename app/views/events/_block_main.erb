@@ -1,5 +1,5 @@
 <h4 class="block-title">
-  <a class="text-dark" target="_parent" href="<%= "/events/#{event.id}" %>" onclick="event.stopPropagation();">
+  <a class="text-dark" target="_parent" href="<%= "/events/#{event.id}#{if @organisation && @organisation != event.organisation; "?cohost=#{@organisation.slug}"; end }"%>" onclick="event.stopPropagation();">
     <%= event.name %>
   </a>
   <% if event_admin?(event) %>

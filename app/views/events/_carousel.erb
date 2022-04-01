@@ -39,7 +39,11 @@
       <div class="col-12 col-sm-6 col-md-4 slick-item">
         <div style="position: relative;">
           <a target="_parent" href="/events/<%= event.id %>">
-            <img class="w-100" src="<%= u event.image.thumb('500x500').url %>">
+            <% if @organisation && (cohostship = event.cohostships.find_by(organisation: @organisation)) && cohostship.image %>
+              <img class="w-100" src="<%= u cohostship.image.thumb('500x500').url %>">
+            <% else %>
+              <img class="w-100" src="<%= u event.image.thumb('500x500').url %>">
+            <% end %>
           </a>
           <span data-toggle="tooltip" title="<%= when_details(event) %>" class="label label-primary" style="opacity: 0.85; border-radius: 0; position: absolute; top: 0; right: 0">
             <% if event.start_time.to_date != event.end_time.to_date %>

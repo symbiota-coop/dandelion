@@ -1,0 +1,45 @@
+<%= partial :'events/nav', locals: { event: @event } %>
+
+<% if @cohostship && @cohostship.errors.count > 0 %>
+  <div class="alert alert-danger">
+    <ul class="mb-0">
+      <% @cohostship.errors.full_messages.each { |message| %>
+        <li><%= message %></li>
+      <% } %>
+    </ul>
+  </div>
+<% end %>
+
+<style>
+  #cohosts label { display: none }
+  #cohosts button { display: none }
+</style>
+<script>
+  $(function() {
+    $('#cohosts input[type=file]').change(function() {
+      this.form.submit()
+    })
+  })
+</script>
+<table id="cohosts" class="table">
+  <thead>
+    <th>Name</th>
+    <th>Image</th>
+  </thead>
+  <% @event.cohostships.each { |cohostship| organisation = cohostship.organisation %>
+    <tr>
+      <td>
+        <% if organisation.image %>
+          <a href="/o/<%= organisation.slug %>/events"><img src="<%= u organisation.image.thumb('500x500#').url %>" style="width: 50px"></a>
+        <% end %>
+        <a href="/o/<%= organisation.slug %>/events"><%= organisation.name %></a>
+      </td>
+      <td>
+        <% form_for cohostship, "/events/#{@event.id}/cohostships/#{cohostship.id}" do |f| %>
+          <%= f.image_block :image %>
+          <%= f.submit_block %>
+        <% end %>
+      </td>
+    </tr>
+  <% } %>
+</table>

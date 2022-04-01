@@ -19,6 +19,6 @@
     </tr>
   </thead>
   <% events.each { |event| %>
-  <tr data-pagelet-url="/events/<%= event.id %>/stats_row"><% if @event %><%= cp(:'events/event_stats_row', locals: { event: @event }, key: "/events/#{@event.id}/stats_row?timezone=#{Time.zone.name}") %><% end %></tr>
+    <tr data-pagelet-url="/events/<%= event.id %>/stats_row<%= "#{"?organisation_id=#{@organisation.id}" if @organisation}" %>"><% if @event %><%= cp(:'events/event_stats_row', locals: { event: @event }, key: "/events/#{@event.id}/stats_row?timezone=#{Time.zone.name}#{"&organisation_id=#{@organisation.id}" if @organisation}") %><% end %></tr>
   <% } %>
 </table>

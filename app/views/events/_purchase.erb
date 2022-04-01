@@ -8,6 +8,7 @@
     <% end %>
     <div id="ticket-types">
       <% form_tag '' do %>
+        <%= hidden_field_tag :cohost, value: params[:cohost] %>
         <%= hidden_field_tag :affiliate_type, value: params[:affiliate_type] %>
         <%= hidden_field_tag :affiliate_id, value: params[:affiliate_id] %>
         <table class="table">

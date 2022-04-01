@@ -290,7 +290,7 @@ Dandelion::App.controller do
     organisation_admins_only!
     @from = params[:from] ? Date.parse(params[:from]) : Date.today
     @to = params[:to] ? Date.parse(params[:to]) : nil
-    @events = @organisation.events
+    @events = @organisation.events_including_cohosted
     @events = params[:order] == 'created_at' ? @events.order('created_at desc') : @events.order('start_time asc')
     q_ids = []
     if params[:q]

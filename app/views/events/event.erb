@@ -45,8 +45,8 @@
 <% end %>
 <div class="row justify-content-center">
   <div class="col-md-10">
-    <% if @event.image %>
-      <img id="event-image" class="w-100 mb-3" src="<%= u @event.image.url %>">
+    <% if @event_image %>
+      <img id="event-image" class="w-100 mb-3" src="<%= u @event_image.url %>">
     <% end %>
     <% if params[:success] %>
       <%= partial :'events/success' %>
