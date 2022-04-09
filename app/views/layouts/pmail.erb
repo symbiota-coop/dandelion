@@ -15,7 +15,7 @@
     </div>
     <div style="text-align: center">
       <% if pmail.organisation.image %>
-        <a href="<% pmail.organisation.website || "#{ENV['BASE_URI']}/o/#{pmail.organisation.slug}" %>">
+        <a href="<%= pmail.organisation.website || "#{ENV['BASE_URI']}/o/#{pmail.organisation.slug}" %>">
           <img src="<%= pmail.organisation.image.url %>" style="max-width: 100px; padding-top: 16px">
         </a>
       <% else %>
