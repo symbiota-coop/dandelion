@@ -23,8 +23,9 @@
             Limit per order <%= o.number_field :max_quantity_per_transaction, class: 'form-control' %>
           </label><% if f.object.ticket_groups.select(&:persisted?).length > 0 %><label>
               Group <%= o.select :ticket_group_id, options: [''] + f.object.ticket_groups.select(&:persisted?).map { |ticket_group| [ticket_group.name, ticket_group.id] }, class: 'form-control ml-1' %>
-            </label><% end %><label>
-            Hidden? <%= o.check_box :hidden %>
+            </label><% end %><label onclick="$(this).tooltip('hide')" data-toggle="tooltip" title="Allow only people with the link to this ticket type to purchase">
+            Hidden?
+            <%= o.check_box :hidden %>
           </label>
           <% if o.object.new_record? %>
             <a class="btn btn-sm btn-outline-danger" href="javascript:;" onclick="$(this).closest('.ticket_type').remove()">
@@ -137,7 +138,7 @@
             ticketGroupDiv.appendTo(d);
       <% end %>
 
-          var hiddenDiv = $('<label>Hidden? </label>')
+          var hiddenDiv = $('<label onclick="$(this).tooltip(\'hide\')" data-toggle="tooltip" title="Allow only people with the link to this ticket type to purchase">Hidden? </label>')
           var hiddenInput0 = $('<input type="hidden" value="0">')
           hiddenInput0.attr('name', 'event[ticket_types_attributes][' + c + '][hidden]');
           var hiddenInput1 = $('<input type="checkbox" value="1">')
@@ -146,6 +147,7 @@
           hiddenInput0.appendTo(hiddenDiv);
           hiddenInput1.appendTo(hiddenDiv);
           hiddenDiv.appendTo(d);
+          hiddenDiv.tooltip();
 
           $('<a class="btn btn-sm btn-outline-danger" href="javascript:;" onclick="$(this).closest(\'.ticket_type\').remove()"><i class="fa fa-times"></i></a>').appendTo(d);
 

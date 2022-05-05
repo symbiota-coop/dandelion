@@ -7,7 +7,7 @@
         <% if ticket_type.ticket_group %>
           <span class="label label-outline-primary"><%=ticket_type.ticket_group.name%></span>
         <% end %>
-        <span class="label label-default">Hidden</span>
+        <i data-toggle="tooltip" title="Hidden ticket type" class="fa fa-lock"></i>
       <% else %>
         <%= ticket_type.name %>
         <% if ticket_type.ticket_group %>
