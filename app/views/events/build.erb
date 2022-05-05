@@ -182,7 +182,7 @@
         <div id="local-group-select">
           <%= f.lookup_block :local_group_id, lookup_url: "/o/#{@event.organisation_id}/local_groups.json", placeholder: 'Search local groups', selected_link: (%(<a class="d-inline-block mt-1" target="_blank" href="/local_groups/#{@event.local_group_id}">View local group</a>) if @event.local_group_id) %>
         </div>
-        <p id="do-zoom-party">or <a href="javascript:;">turn this event into an synchronous online event for all local groups</a></p>
+        <p id="do-zoom-party">or <a href="javascript:;">turn this event into a Zoom party (experimental)</a></p>
         <div id="zoom-party-checkbox">
           <%= f.check_box_block :zoom_party %>
         </div>
