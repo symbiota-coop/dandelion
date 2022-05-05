@@ -73,7 +73,7 @@ class Activity
   before_validation do
     if image
       begin
-        image.format
+        %w[jpeg png gif pam].include?(image.format)
       rescue StandardError
         self.image = nil
         errors.add(:image, 'must be an image')

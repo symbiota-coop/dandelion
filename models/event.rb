@@ -440,7 +440,7 @@ class Event
   before_validation do
     if image
       begin
-        image.format
+        %w[jpeg png gif pam].include?(image.format)
       rescue StandardError
         self.image = nil
         errors.add(:image, 'must be an image')
@@ -647,7 +647,7 @@ class Event
       refund_deleted_orders: 'Attempt to refund deleted orders on Stripe',
       redirect_url: 'Redirect URL after successful payment',
       include_in_parent: 'Include in parent organisation event listings',
-      zoom_party: 'Synchronous online event for all local groups',
+      zoom_party: 'Zoom party',
       add_a_donation_to: 'Text above donation field',
       donation_text: 'Text below donation field',
       time_zone: 'Visitor time zone',
