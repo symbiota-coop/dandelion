@@ -474,7 +474,7 @@ class Account
   before_validation do
     if picture
       begin
-        %w[jpeg png gif pam].include?(picture.format)
+        errors.add(:picture, 'must be an image') unless %w[jpeg png gif pam].include?(picture.format)
       rescue StandardError
         self.picture = nil
         errors.add(:picture, 'must be an image')

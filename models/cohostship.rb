@@ -16,26 +16,25 @@ class Cohostship
     }
   end
 
-  before_validation do
-    errors.add(:image, 'must be at least 800px wide') if image && image.width < 800
-    errors.add(:image, 'must be more wide than high') if image && image.height > image.width
-
-    begin
-      self.image = image.encode('jpg') if image && !%w[jpg jpeg].include?(image.format)
-    rescue StandardError
-      self.image = nil
-    end
-  end
-
   dragonfly_accessor :image
   before_validation do
     if image
       begin
-        %w[jpeg png gif pam].include?(image.format)
+        errors.add(:image, 'must be an image') unless %w[jpeg png gif pam].include?(image.format)
       rescue StandardError
         self.image = nil
         errors.add(:image, 'must be an image')
       end
+
+      begin
+        self.image = image.encode('jpg') if image && !%w[jpg jpeg].include?(image.format)
+      rescue StandardError
+        self.image = nil
+      end
+
+      errors.add(:image, 'must be at least 800px wide') if image && image.width < 800
+      errors.add(:image, 'must be more wide than high') if image && image.height > image.width
+
     end
   end
 

@@ -172,15 +172,6 @@ class Event
       errors.add(:local_group, '- you are not an admin of this local group') if local_group && !LocalGroup.admin?(local_group, account)
     end
 
-    errors.add(:image, 'must be at least 800px wide') if image && image.width < 800
-    errors.add(:image, 'must be more wide than high') if image && image.height > image.width
-
-    begin
-      self.image = image.encode('jpg') if image && !%w[jpg jpeg].include?(image.format)
-    rescue StandardError
-      self.image = nil
-    end
-
     if zoom_party?
       self.local_group = nil
       self.capacity = nil
@@ -440,11 +431,20 @@ class Event
   before_validation do
     if image
       begin
-        %w[jpeg png gif pam].include?(image.format)
+        errors.add(:image, 'must be an image') unless %w[jpeg png gif pam].include?(image.format)
       rescue StandardError
         self.image = nil
         errors.add(:image, 'must be an image')
       end
+
+      begin
+        self.image = image.encode('jpg') if image && !%w[jpg jpeg].include?(image.format)
+      rescue StandardError
+        self.image = nil
+      end
+
+      errors.add(:image, 'must be at least 800px wide') if image && image.width < 800
+      errors.add(:image, 'must be more wide than high') if image && image.height > image.width
     end
   end
 
