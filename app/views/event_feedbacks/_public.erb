@@ -6,6 +6,6 @@
      public_a = public_qa[1] if public_qa
    end %>
 <% form_tag "/event_feedbacks/#{@event_feedback.id}/public/#{params[:i]}" do %>
-  <%= text_area_tag :public, onblur: '$(this).next().click()', class: 'form-control autosize', value: public_a, placeholder: 'Feedback to show publicly' %>
+  <%= text_area_tag :public, onblur: '$(this).next().click()', class: 'form-control autosize', value: public_a, placeholder: 'Paste an extract here to show it publicly' %>
   <%= submit_tag 'Save', class: 'd-none' %>
 <% end %>
