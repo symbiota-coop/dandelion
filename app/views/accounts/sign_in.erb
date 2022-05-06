@@ -6,31 +6,25 @@
         <h2 class="text-center my-0">Sign in</h2>
       </div>
       <div class="card-body">
-        <div id="t1" <% if Padrino.env == :production %> class="text-center" <% end %>>
-          <% if Padrino.env == :production %>
-            <div class="mb-1">
-              We've gone <a target="_blank" href="https://magic.link/docs/introduction/what-is-magic#why-passwordless">passwordless</a>!
+        <div id="t1">
+          <% form_tag '/auth/account/callback' do %>
+            <div class="form-group mb-1">
+              <label class="sr-only">Email</label>
+              <%= email_field_tag :email, id: 'email', class: 'form-control', placeholder: 'Email' %>
             </div>
-            <a href="javascript:;" onclick="$('#t1').hide();$('#t2').show().find('input').focus()" class="btn btn-primary">Get a sign in link</a>
-          <% else %>
-            <% form_tag '/auth/account/callback' do %>
-              <div class="form-group mb-1">
-                <label class="sr-only">Email</label>
-                <%= email_field_tag :email, id: 'email', class: 'form-control', placeholder: 'Email' %>
-              </div>
-              <div class="form-group mb-1">
-                <label class="sr-only">Password</label>
-                <%= password_field_tag :password, id: 'password', class: 'form-control', placeholder: 'Password' %>
-              </div>
-              <button class="btn btn-primary" type="submit">Sign in</button>
-            <% end %>
+            <div class="form-group mb-1">
+              <label class="sr-only">Password</label>
+              <%= password_field_tag :password, id: 'password', class: 'form-control', placeholder: 'Password' %>
+            </div>
+            <button class="btn btn-primary" type="submit">Sign in</button>
           <% end %>
+          <a href="javascript:;" onclick="$('#t1').hide();$('#t2').show().find('input').focus()" class="mt-3 mb-1 btn btn-primary">Get a sign in link via email <i class="fa fa-envelope"></i> </a>
           <% if !Provider.all.empty? %>
-            <p class="mt-3">
               <% Provider.all.each { |provider| %>
-              <a class="btn btn-primary mb-1" href="/auth/<%= provider.omniauth_name %>"><i class="<%= provider.icon %>"></i> Sign in with <%= provider.display_name %></a>
+              <p>
+                <a class="btn btn-primary" href="/auth/<%= provider.omniauth_name %>">Sign in with <%= provider.display_name %> <i class="<%= provider.icon %>"></i></a>
+              </p>
               <% } %>
-            </p>
           <% end %>
           <a href="/accounts/new" class="btn btn-outline-primary">
             Not yet registered? Sign up here
