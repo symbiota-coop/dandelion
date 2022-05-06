@@ -333,7 +333,7 @@ Dandelion::App.controller do
     if params[:q]
       @tickets = @tickets.and(:account_id.in => Account.all.or(
         { name: /#{::Regexp.escape(params[:q])}/i },
-        { email: params[:q].downcase }
+        { email: /#{::Regexp.escape(params[:q])}/i }
       ).pluck(:id))
     end
     case content_type
@@ -436,7 +436,7 @@ Dandelion::App.controller do
     if params[:q]
       @orders = @orders.and(:account_id.in => Account.all.or(
         { name: /#{::Regexp.escape(params[:q])}/i },
-        { email: params[:q].downcase }
+        { email: /#{::Regexp.escape(params[:q])}/i }
       ).pluck(:id))
     end
 
@@ -486,7 +486,7 @@ Dandelion::App.controller do
     if params[:q]
       @donations = @donations.and(:account_id.in => Account.all.or(
         { name: /#{::Regexp.escape(params[:q])}/i },
-        { email: params[:q].downcase }
+        { email: /#{::Regexp.escape(params[:q])}/i }
       ).pluck(:id))
     end
     erb :'events/donations'
@@ -505,7 +505,7 @@ Dandelion::App.controller do
     if params[:q]
       @waitships = @waitships.and(:account_id.in => Account.all.or(
         { name: /#{::Regexp.escape(params[:q])}/i },
-        { email: params[:q].downcase }
+        { email: /#{::Regexp.escape(params[:q])}/i }
       ).pluck(:id))
     end
     erb :'events/waitlist'

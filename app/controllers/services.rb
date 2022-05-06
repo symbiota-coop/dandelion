@@ -53,7 +53,7 @@ Dandelion::App.controller do
     if params[:q]
       @bookings = @bookings.and(:account_id.in => Account.all.or(
         { name: /#{::Regexp.escape(params[:q])}/i },
-        { email: params[:q].downcase }
+        { email: /#{::Regexp.escape(params[:q])}/i }
       ).pluck(:id))
     end
     v = service_admin?

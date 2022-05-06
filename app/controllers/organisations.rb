@@ -259,7 +259,7 @@ Dandelion::App.controller do
     if params[:q]
       @orders = @orders.and(:account_id.in => Account.all.or(
         { name: /#{::Regexp.escape(params[:q])}/i },
-        { email: params[:q].downcase }
+        { email: /#{::Regexp.escape(params[:q])}/i }
       ).pluck(:id))
     end
     @orders = @orders.and(:coinbase_checkout_id.ne => nil) if params[:coinbase]
@@ -275,7 +275,7 @@ Dandelion::App.controller do
     if params[:q]
       @bookings = @bookings.and(:account_id.in => Account.all.or(
         { name: /#{::Regexp.escape(params[:q])}/i },
-        { email: params[:q].downcase }
+        { email: /#{::Regexp.escape(params[:q])}/i }
       ).pluck(:id))
     end
     if request.xhr?
