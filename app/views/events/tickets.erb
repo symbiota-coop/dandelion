@@ -33,7 +33,9 @@
     <%== Account.and(:id.in => @tickets.pluck(:account_id)).map { |account| "#{Sanitize.fragment(account.name)} &lt;#{Sanitize.fragment(account.email)}&gt;" }.join(', ') %>
   </pre>
 <% end %>
-<%= partial :'events/ticket_types_progress' %>
+<% unless params[:search] %>
+  <%= partial :'events/ticket_types_progress' %>
+<% end %>
 <% @tickets = @tickets.order('created_at desc')
    @tickets = @tickets.paginate(page: params[:page], per_page: 50) %>
 <% if @event %>

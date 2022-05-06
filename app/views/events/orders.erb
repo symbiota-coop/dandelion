@@ -22,5 +22,7 @@
     <%== Account.and(:id.in => @orders.pluck(:account_id)).map { |account| "#{Sanitize.fragment(account.name)} &lt;#{Sanitize.fragment(account.email)}&gt;" }.join(', ') %>
   </pre>
 <% end %>
-<%= partial :'events/ticket_types_progress' %>
+<% unless params[:search] %>
+  <%= partial :'events/ticket_types_progress' %>
+<% end %>
 <%= partial :'events/orders', locals: { orders: @orders, show_emails: event_email_viewer? } %>
