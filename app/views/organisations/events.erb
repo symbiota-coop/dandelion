@@ -87,7 +87,7 @@
 <% if @events.count == 0 %>
   <em>No events</em>
 <% else %>
-  <% if !params[:search] && !params[:event_tag_id] %>
+  <% if !params[:search] && !params[:event_tag_id] && !params[:page] %>
     <div data-with-placeholder data-pagelet-url="/o/<%= @organisation.slug %>/carousels/featured">
       <%= partial :'events/carousel_placeholder' %>
     </div>
