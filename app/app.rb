@@ -188,7 +188,7 @@ module Dandelion
           @accounts = @accounts.and(:id.in => Account.all.or(
             { name: /#{::Regexp.escape(@q)}/i },
             { name_transliterated: /#{::Regexp.escape(@q)}/i },
-            { email: /#{::Regexp.escape(@q)}/i }
+            { email: /#{::Regexp.escape(@q)}/i },
             { username: /#{::Regexp.escape(@q)}/i }
           ).pluck(:id))
           @accounts = @accounts.paginate(page: params[:page], per_page: 10).order('last_active desc')
