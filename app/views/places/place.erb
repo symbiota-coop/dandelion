@@ -10,11 +10,13 @@
         <%= @place.name %>
       </h1>
       <div class="mb-2">
-        <div class="d-inline-block mb-1" data-pagelet-url="/placeship/<%= @place.id %>">
-          <%= partial :'places/placeship', locals: { place: @place } %>
-        </div>
-        <% if current_account && (admin? || @place.account_id == current_account.id) %>
-          <a class="btn btn-primary" href="/places/<%= @place.id %>/edit"><i class="fa fa-pencil"></i> Edit place</a>
+        <% if current_account %>
+          <div class="d-inline-block mb-1" data-pagelet-url="/placeship/<%= @place.id %>">
+            <%= partial :'places/placeship', locals: { place: @place } %>
+          </div>
+          <% if (admin? || @place.account_id == current_account.id) %>
+            <a class="btn btn-primary" href="/places/<%= @place.id %>/edit"><i class="fa fa-pencil"></i> Edit place</a>
+          <% end %>
         <% end %>
       </div>
     </div>
