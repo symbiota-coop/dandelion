@@ -323,7 +323,13 @@ Dandelion::App.controller do
   get '/events/:id/tickets', provides: %i[html csv pdf] do
     @event = Event.find(params[:id]) || not_found
     event_admins_only!
-    @tickets = @event.tickets
+    @tickets = if params[:ticket_type_id]
+                 @event.ticket_types.find(params[:ticket_type_id]).tickets
+               elsif params[:ticket_group_id]
+                 @event.ticket_groups.find(params[:ticket_group_id]).tickets
+               else
+                 @event.tickets
+               end
     if params[:q]
       @tickets = @tickets.and(:account_id.in => Account.all.or(
         { name: /#{::Regexp.escape(params[:q])}/i },
