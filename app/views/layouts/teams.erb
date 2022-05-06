@@ -15,7 +15,12 @@
             <%= partial :'accounts/square', locals: { account: account, content: ("Active #{time_ago_in_words account.last_active} ago" if account.last_active), width: '75px' } %>
           <% } %>
         </div>
-        <%= will_paginate @members, param_name: 'members_page', page_links: false, renderer: WillPaginate::ViewHelpers::BootstrapRenderer %>
+        <style>
+          #member-pagination ul.pagination { justify-content: left }
+        </style>
+        <div id="member-pagination">
+          <%= will_paginate @members, param_name: 'members_page', page_links: false, renderer: WillPaginate::ViewHelpers::BootstrapRenderer %>
+        </div>
         <div class="mt-3">
           <% if (teamship = @team.teamships.find_by(account: current_account)) %>
             <div class="d-inline-block" data-pagelet-url="/teamships/<%= teamship.id %>/subscribe">
