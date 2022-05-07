@@ -1,6 +1,6 @@
 <table class="table">
   <% @event.ticket_types.order('order asc, price desc').and(:quantity.gt => 0).each { |ticket_type| %>
-  <tr <% if params[:ticket_type_id] == ticket_type.id.to_s %> <% elsif params[:ticket_type_id] || params[:ticket_group_id] %>style="opacity: 0.5" <% end %>>
+  <tr <% if params[:ticket_type_id] == ticket_type.id.to_s %> <% elsif params[:ticket_type_id] || params[:ticket_group_id] %>style="opacity: 0.4" <% end %>>
     <td style="width: 1px; white-space: nowrap" class="pr-3">
       <% if ticket_type.hidden %>
         <a href="/events/<%= @event.id %>?ticket_type_id=<%= ticket_type.id %>"><%= ticket_type.name %></a>
@@ -27,7 +27,7 @@
   </tr>
   <% } %>
   <% @event.ticket_groups.each { |ticket_group| %>
-    <tr <% if params[:ticket_group_id] == ticket_group.id.to_s %> <% elsif params[:ticket_type_id] || params[:ticket_group_id] %>style="opacity: 0.5" <% end %>>
+    <tr <% if params[:ticket_group_id] == ticket_group.id.to_s %> <% elsif params[:ticket_type_id] || params[:ticket_group_id] %>style="opacity: 0.4" <% end %>>
       <td style="width: 1px; white-space: nowrap" class="pr-3">
         <span class="label label-outline-primary"><%=ticket_group.name%></span>
       </td>

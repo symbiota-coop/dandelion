@@ -6,7 +6,7 @@
   <% start_time = Time.use_zone(@service.account.time_zone || 'London') { Time.zone.parse "#{date.to_s(:db)} #{format('%02d', h)}:00" }.in_time_zone(Time.zone) %>
   <% end_time = (start_time + @service.duration_in_minutes.minutes).in_time_zone(Time.zone) %>
   <% if !@service.send("available_#{Date::DAYNAMES[date.wday].downcase}") || !@service.available?(start_time, end_time) %>
-    <span class="time text-center card p-3 mb-3" style="opacity: 0.5; font-weight: bold; font-size: 1rem">
+    <span class="time text-center card p-3 mb-3" style="opacity: 0.4; font-weight: bold; font-size: 1rem">
       <%= start_time.strftime('%H:%M') %>
       <br>
       <small>Unavailable</small>
