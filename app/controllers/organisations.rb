@@ -172,64 +172,69 @@ Dandelion::App.controller do
     erb :'organisations/service_stats'
   end
 
+  get '/o/:slug/events_block' do
+    @organisation = Organisation.find_by(slug: params[:slug]) || not_found
+    @events = @organisation.events_for_search(include_all_local_group_events: (true if params[:local_group_id])).future_and_current_featured
+    @events = @events.and(monthly_donors_only: true) if params[:members_events]
+    partial :'organisations/events_block'
+  end
+
   get '/o/:slug/events', provides: %i[html ics] do
     @organisation = Organisation.find_by(slug: params[:slug]) || not_found
-    if request.xhr?
-      @events = @organisation.events_for_search(include_all_local_group_events: (true if params[:local_group_id])).future_and_current_featured
-      @events = @events.and(monthly_donors_only: true) if params[:members_events]
-      partial :'organisations/events'
-    else
-      @events = @organisation.events_for_search(include_all_local_group_events: (true if params[:local_group_id]))
-      @from = params[:from] ? Date.parse(params[:from]) : Date.today
-      @events = params[:order] == 'created_at' ? @events.order('created_at desc') : @events.order('start_time asc')
-      q_ids = []
-      if params[:q]
-        q_ids += Event.all.or(
-          { name: /#{::Regexp.escape(params[:q])}/i },
-          { description: /#{::Regexp.escape(params[:q])}/i }
-        ).pluck(:id)
-      end
-      event_tag_ids = []
-      event_tag_ids = EventTagship.and(event_tag_id: params[:event_tag_id]).pluck(:event_id) if params[:event_tag_id]
-      event_ids = (!q_ids.empty? && !event_tag_ids.empty? ? (q_ids & event_tag_ids) : (q_ids + event_tag_ids))
-      @events = @events.and(:id.in => event_ids) unless event_ids.empty?
-      @events = @events.and(local_group_id: params[:local_group_id]) if params[:local_group_id]
-      @events = @events.and(activity_id: params[:activity_id]) if params[:activity_id]
-      @events = @events.online if params[:online]
-      @events = @events.and(monthly_donors_only: true) if params[:members_events]
-      @events = @events.and(featured: true) if params[:featured]
-      if params[:featured_or_course]
-        @events = @events.and(:id.in =>
-          @organisation.events.and(featured: true).pluck(:id) +
-          @organisation.events.course.pluck(:id))
-      end
-      case content_type
-      when :html
-        @events = if params[:past]
-                    @events.past
-                  else
-                    @events.future_and_current_featured(@from)
-                  end
+    @events = @organisation.events_for_search(include_all_local_group_events: (true if params[:local_group_id]))
+    @from = params[:from] ? Date.parse(params[:from]) : Date.today
+    @events = params[:order] == 'created_at' ? @events.order('created_at desc') : @events.order('start_time asc')
+    q_ids = []
+    if params[:q]
+      q_ids += Event.all.or(
+        { name: /#{::Regexp.escape(params[:q])}/i },
+        { description: /#{::Regexp.escape(params[:q])}/i }
+      ).pluck(:id)
+    end
+    event_tag_ids = []
+    event_tag_ids = EventTagship.and(event_tag_id: params[:event_tag_id]).pluck(:event_id) if params[:event_tag_id]
+    event_ids = (!q_ids.empty? && !event_tag_ids.empty? ? (q_ids & event_tag_ids) : (q_ids + event_tag_ids))
+    @events = @events.and(:id.in => event_ids) unless event_ids.empty?
+    @events = @events.and(local_group_id: params[:local_group_id]) if params[:local_group_id]
+    @events = @events.and(activity_id: params[:activity_id]) if params[:activity_id]
+    @events = @events.online if params[:online]
+    @events = @events.and(monthly_donors_only: true) if params[:members_events]
+    @events = @events.and(featured: true) if params[:featured]
+    if params[:featured_or_course]
+      @events = @events.and(:id.in =>
+        @organisation.events.and(featured: true).pluck(:id) +
+        @organisation.events.course.pluck(:id))
+    end
+    case content_type
+    when :html
+      @events = if params[:past]
+                  @events.past
+                else
+                  @events.future_and_current_featured(@from)
+                end
+      if request.xhr?
+        partial :'organisations/events'
+      else
         erb :'organisations/events', layout: ('minimal' if params[:minimal])
-      when :ics
-        @events = @events.current(3.months.ago)
-        cal = RiCal.Calendar do |rcal|
-          rcal.add_x_property('X-WR-CALNAME', 'Dandelion')
-          @events.each do |event|
-            next if event.draft?
+      end
+    when :ics
+      @events = @events.current(3.months.ago)
+      cal = RiCal.Calendar do |rcal|
+        rcal.add_x_property('X-WR-CALNAME', 'Dandelion')
+        @events.each do |event|
+          next if event.draft?
 
-            rcal.event do |revent|
-              revent.summary = (event.start_time.to_date == event.end_time.to_date ? event.name : "#{event.name} starts")
-              revent.dtstart = (event.start_time.to_date == event.end_time.to_date ? event.start_time : event.start_time.to_date)
-              revent.dtend = (event.start_time.to_date == event.end_time.to_date ? event.end_time : event.start_time.to_date)
-              revent.location = event.location
-              revent.description = %(#{ENV['BASE_URI']}/events/#{event.id})
-              revent.uid = event.id.to_s
-            end
+          rcal.event do |revent|
+            revent.summary = (event.start_time.to_date == event.end_time.to_date ? event.name : "#{event.name} starts")
+            revent.dtstart = (event.start_time.to_date == event.end_time.to_date ? event.start_time : event.start_time.to_date)
+            revent.dtend = (event.start_time.to_date == event.end_time.to_date ? event.end_time : event.start_time.to_date)
+            revent.location = event.location
+            revent.description = %(#{ENV['BASE_URI']}/events/#{event.id})
+            revent.uid = event.id.to_s
           end
         end
-        cal.export
       end
+      cal.export
     end
   end
 

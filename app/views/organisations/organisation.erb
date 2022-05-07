@@ -40,7 +40,7 @@
   <div data-pagelet-url="/o/<%= @organisation.slug %>/news"></div>
 <% end %>
 <% if organisation_admin? or @organisation.events_for_search.future_and_current_featured.count > 0 %>
-  <div data-pagelet-url="/o/<%= @organisation.slug %>/events"></div>
+  <div data-pagelet-url="/o/<%= @organisation.slug %>/events_block"></div>
 <% end %>
 <% if organisation_admin? or @organisation.activities.active.count > 0 %>
   <div data-pagelet-url="/o/<%= @organisation.slug %>/activities"></div>

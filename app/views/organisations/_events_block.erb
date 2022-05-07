@@ -1,0 +1,12 @@
+<% unless params[:members_events] %>
+  <h2 class="mt-5">Events</h2>
+<% end %>
+<a class="btn btn-primary mb-3" href="/o/<%= @organisation.slug %>/events">All events</a>
+<% if organisation_assistant? %>
+  <a class="btn btn-primary mb-3" href="/events/new?organisation_id=<%= @organisation.id %>">Create an event</a>
+<% end %>
+<% events = @events.paginate(page: params[:events_page], per_page: 10) %>
+<%= partial :'events/blocks', locals: { events: events } %>
+<div class="mt-3">
+  <%= will_paginate events, param_name: 'events_page', inner_window: 0, outer_window: 0, renderer: WillPaginate::ViewHelpers::BootstrapRenderer %>
+</div>

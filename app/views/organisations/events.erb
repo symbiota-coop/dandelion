@@ -84,33 +84,11 @@
     </a>
   </div>
 <% end %>
-<% if @events.count == 0 %>
-  <em>No events</em>
-<% else %>
-  <% if !params[:search] && !params[:event_tag_id] && !params[:page] %>
-    <div data-with-placeholder data-pagelet-url="/o/<%= @organisation.slug %>/carousels/featured">
-      <%= partial :'events/carousel_placeholder' %>
-    </div>
-    <% if @organisation.carousels %>
-      <% @organisation.carousels.split("\n").reject(&:blank?).each_with_index { |line,i| next if params[:first_carousel_only] && i > 0 %>
-      <div data-with-placeholder data-pagelet-url="/o/<%= @organisation.slug %>/carousels/<%= i %>">
-        <%= partial :'events/carousel_placeholder' %>
-      </div>
-      <% } %>
-    <% end %>
-  <% end %>
-  <% unless params[:no_listings] %>
-    <% unless params[:minimal] %>
-      <% @events = @events.paginate(page: params[:page], per_page: 20) %>
-    <% end %>
-    <%= partial :'events/blocks', locals: { events: @events } %>
-    <% unless params[:minimal] %>
-      <div class="mt-3">
-        <%= will_paginate @events, inner_window: 0, outer_window: 0, renderer: WillPaginate::ViewHelpers::BootstrapRenderer %>
-      </div>
-    <% end %>
-  <% end %>
-<% end %>
+
+<div data-pagelet-url="/o/<%=@organisation.slug%>/events?<%= request.query_string %>">
+  <%= partial :'organisations/events' %>
+</div>
+
 <% if params[:minimal] %>
   <%== '</div>' %>
 <% end %>
