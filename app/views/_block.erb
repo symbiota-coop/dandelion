@@ -29,6 +29,11 @@
                     <%= title %>
                   </a>
                 <% end %>
+                <% if defined?(icon) && icon %>
+                  <span class="<% if image %>text-white<% else %>text-dark<% end %>">
+                    <%== icon %>
+                  </span>
+                <% end %>
                 <% if admin %>
                   <a class="<% if image %>text-white<% else %>text-dark<% end %> block-edit" style="display: none" href="<%= edit_url %>" onclick="event.stopPropagation();">
                     <i class="fa fa-pencil"></i>
