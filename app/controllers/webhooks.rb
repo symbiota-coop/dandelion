@@ -100,6 +100,7 @@ Dandelion::App.controller do
   end
 
   post '/o/:slug/gocardless_webhook' do
+    @organisation = Organisation.find_by(slug: params[:slug]) || not_found
     webhook_endpoint_secret = @organisation.gocardless_endpoint_secret
     request_body = request.body.tap(&:rewind).read
     signature_header = request.env['HTTP_WEBHOOK_SIGNATURE']
