@@ -80,7 +80,7 @@
 <div class="tab-content">
   <% if organisation_admin? or @organisation.events_for_search.future_and_current_featured.and(:monthly_donors_only => true).count > 0 %>
     <div class="tab-pane fade show active" id="panel-events" role="tabpanel">
-      <div data-pagelet-url="/o/<%= @organisation.slug %>/events?members_events=1"></div>
+      <div data-pagelet-url="/o/<%= @organisation.slug %>/events_block?members_events=1"></div>
     </div>
   <% end %>
   <div class="tab-pane fade <%= 'show active' unless events_active %>" id="panel-discussion" role="tabpanel">
