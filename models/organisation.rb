@@ -505,25 +505,32 @@ class Organisation
     end
 
     subscriptions.each do |subscription|
-      mandate = client.mandates.get(subscription.links.mandate)
-      customer = client.customers.get(mandate.links.customer)
-
-      name = "#{customer.given_name} #{customer.family_name}"
-      email = customer.email
-      amount = subscription.amount
-      currency = subscription.currency
-      start_date = subscription.start_date
-
-      puts "#{name} #{email} #{amount} #{currency} #{start_date}"
-      account = Account.find_by(email: email.downcase) || Account.create(name: name, email: email)
-      organisationship = organisationships.find_by(account: account) || organisationships.create(account: account)
-
-      organisationship.monthly_donation_method = 'GoCardless'
-      organisationship.monthly_donation_amount = amount.to_f / 100
-      organisationship.monthly_donation_currency = currency
-      organisationship.monthly_donation_start_date = start_date
-      organisationship.save
+      gocardless_subscribe(subscription: subscription)
     end
+  end
+
+  def gocardless_subscribe(subscription: nil, subscription_id: nil)
+    client = GoCardlessPro::Client.new(access_token: gocardless_access_token)
+
+    subscription = client.subscriptions.get(subscription_id) if subscription_id
+    mandate = client.mandates.get(subscription.links.mandate)
+    customer = client.customers.get(mandate.links.customer)
+
+    name = "#{customer.given_name} #{customer.family_name}"
+    email = customer.email
+    amount = subscription.amount
+    currency = subscription.currency
+    start_date = subscription.start_date
+    puts "#{name} #{email} #{amount} #{currency} #{start_date}"
+
+    account = Account.find_by(email: email.downcase) || Account.create(name: name, email: email)
+    organisationship = organisationships.find_by(account: account) || organisationships.create(account: account)
+
+    organisationship.monthly_donation_method = 'GoCardless'
+    organisationship.monthly_donation_amount = amount.to_f / 100
+    organisationship.monthly_donation_currency = currency
+    organisationship.monthly_donation_start_date = start_date
+    organisationship.save
   end
 
   def sync_with_patreon
