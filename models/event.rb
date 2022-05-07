@@ -38,6 +38,7 @@ class Event
   field :questions, type: String
   field :add_a_donation_to, type: String
   field :donation_text, type: String
+  field :carousel_text, type: String
 
   def self.admin_fields
     {
@@ -49,6 +50,7 @@ class Event
       location: :text,
       add_a_donation_to: :text,
       donation_text: :text,
+      carousel_text: :text,
       image: :image,
       description: :wysiwyg,
       email: :email,
@@ -666,6 +668,7 @@ class Event
       time_zone: "Time zone to use for people that aren't signed in or haven't set a time zone",
       add_a_donation_to: "Text to display above the 'Add a donation' field (leave blank to use organisation default)",
       donation_text: "Text to display below the 'Add a donation' field  (leave blank to use organisation default)",
+      carousel_text: 'Text to show when hovering over this event in a carousel',
       suggested_donation: 'If this is blank, the donation field will not be shown'
     }
   end

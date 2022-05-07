@@ -38,7 +38,7 @@
       <% events.each { |event| %>
       <div class="col-12 col-sm-6 col-md-4 slick-item">
         <div style="position: relative;">
-          <a target="_parent" href="/events/<%= event.id %>">
+          <a target="_parent" href="/events/<%= event.id %>" <% if event.carousel_text %> data-toggle="tooltip" title="<%=event.carousel_text%>" <% end %>>
             <% if @organisation && (cohostship = event.cohostships.find_by(organisation: @organisation)) && cohostship.image %>
               <img class="w-100" src="<%= u cohostship.image.thumb('500x500').url %>">
             <% else %>
