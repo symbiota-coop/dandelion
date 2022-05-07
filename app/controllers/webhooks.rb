@@ -107,7 +107,7 @@ Dandelion::App.controller do
     events = GoCardlessPro::Webhook.parse(request_body: request_body, signature_header: signature_header, webhook_endpoint_secret: webhook_endpoint_secret)
 
     events.each do |event|
-      gocardless_subscribe(event.links.subscription) if event.resource_type == 'subscriptions' && event.action == 'created'
+      gocardless_subscribe(subscription_id: event.links.subscription) if event.resource_type == 'subscriptions' && event.action == 'created'
     end
   end
 end
