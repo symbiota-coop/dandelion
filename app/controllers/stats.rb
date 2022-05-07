@@ -3,6 +3,11 @@ Dandelion::App.controller do
     admins_only!
   end
 
+  get '/stats/feedback' do
+    @event_feedbacks = EventFeedback.order('created_at desc')
+    erb :'stats/feedback'
+  end
+
   get '/stats/orders' do
     @orders = Order.order('created_at desc').paginate(page: params[:page], per_page: 50)
     erb :'stats/orders'
