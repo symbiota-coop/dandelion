@@ -1,5 +1,5 @@
 <% tickets = Ticket.and(:created_at.gte => 1.month.ago, :price.gt => 0) %>
-<% organisations = Organisation.and(:id.in => Event.where(:id.in => tickets.pluck(:event_id)).pluck(:organisation_id)) %>
+<% organisations = Organisation.and(:id.in => Event.and(:id.in => tickets.pluck(:event_id)).pluck(:organisation_id)) %>
 <p class="lead">
   <%= pluralize(organisations.count, 'organisation') %> sold
   <%= pluralize(tickets.count, 'ticket') %>

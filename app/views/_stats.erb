@@ -9,7 +9,7 @@ if youngest && oldest %>
   <div class="row">
     <div class="col-sm-4">
 
-      <% sum = accounts.where(:date_of_birth.ne => nil).count %>
+      <% sum = accounts.and(:date_of_birth.ne => nil).count %>
       <table class="table">
         <thead>
           <tr>
