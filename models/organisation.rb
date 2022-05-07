@@ -22,6 +22,7 @@ class Organisation
   field :coinbase_api_key, type: String
   field :coinbase_webhook_secret, type: String
   field :gocardless_access_token, type: String
+  field :gocardless_endpoint_secret, type: String
   field :patreon_api_key, type: String
   field :mailgun_api_key, type: String
   field :mailgun_domain, type: String
@@ -89,6 +90,7 @@ class Organisation
       stripe_pk: :text,
       stripe_sk: :text,
       gocardless_access_token: :text,
+      gocardless_endpoint_secret: :text,
       patreon_api_key: :text,
       mailgun_api_key: :text,
       mailgun_domain: :text,

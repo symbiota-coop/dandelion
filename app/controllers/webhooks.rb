@@ -98,4 +98,20 @@ Dandelion::App.controller do
       halt 200
     end
   end
+
+  post '/o/:slug/gocardless_webhook' do
+    webhook_endpoint_secret = @organisation.gocardless_endpoint_secret
+    request_body = request.body.tap(&:rewind).read
+    signature_header = request.env['HTTP_WEBHOOK_SIGNATURE']
+    events = GoCardlessPro::Webhook.parse(request_body: request_body, signature_header: signature_header, webhook_endpoint_secret: webhook_endpoint_secret)
+
+    events.each do |event|
+      begin
+        raise event.inspect
+      rescue StandardError => e
+        Airbrake.notify(e)
+        halt 200
+      end
+    end
+  end
 end
