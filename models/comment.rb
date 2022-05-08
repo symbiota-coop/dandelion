@@ -130,6 +130,8 @@ class Comment
       "<strong>#{account.name}</strong> commented on <strong>#{commentable.account.name}</strong>'s application"
     elsif post.comments.count == 1
       "<strong>#{account.name}</strong> started a thread"
+    elsif first_real_comment?
+      "<strong>#{account.name}</strong> commented"
     else
       "<strong>#{account.name}</strong> replied"
     end.html_safe
@@ -141,6 +143,11 @@ class Comment
 
   def first_in_post
     post.comments.order('created_at asc').first
+  end
+
+  def first_real_comment?
+    comments = post.comments.order('created_at asc')
+    comments[0].body.nil? && comments[1].id == id
   end
 
   after_create do
@@ -196,7 +203,7 @@ class Comment
       end
       s << '] '
     end
-    s << if first_in_post?
+    s << if first_in_post? || first_real_comment?
            post.subject
          else
            "Re: #{post.subject}"
