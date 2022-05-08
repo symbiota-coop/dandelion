@@ -28,7 +28,6 @@ class Organisation
   field :mailgun_domain, type: String
   field :mailgun_region, type: String
   field :mailgun_sto, type: Boolean
-  field :slack_api_key, type: String
   field :location, type: String
   field :coordinates, type: Array
   field :collect_location, type: Boolean
@@ -465,7 +464,6 @@ class Organisation
       coinbase_webhook_secret: 'Coinbase Commerce webhook secret',
       patreon_api_key: 'Patreon API key',
       mailgun_api_key: 'Mailgun API key',
-      slack_api_key: 'Slack API key',
       xdai_address: 'xDai address',
       seeds_username: 'SEEDS username',
       collect_location: 'Ask for location of ticket buyers',
@@ -579,31 +577,6 @@ class Organisation
       organisationship.monthly_donation_amount = amount.to_f / 100
       organisationship.monthly_donation_currency = currency
       organisationship.monthly_donation_start_date = start_date
-      organisationship.save
-    end
-  end
-
-  def sync_with_slack
-    organisationships.set(slack_member: nil)
-
-    Slack.configure do |config|
-      config.token = slack_api_key
-    end
-    client = Slack::Web::Client.new
-
-    all_members = []
-    client.users_list do |response|
-      all_members.concat(response.members)
-    end
-    all_members.each do |member|
-      name = member.name
-      email = member.profile.email
-      next unless email
-
-      puts "#{name} #{email}"
-      account = Account.find_by(email: email.downcase) || Account.create(name: name, email: email)
-      organisationship = organisationships.find_by(account: account) || organisationships.create(account: account)
-      organisationship.slack_member = true
       organisationship.save
     end
   end

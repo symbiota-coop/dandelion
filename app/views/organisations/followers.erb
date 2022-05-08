@@ -13,10 +13,6 @@
         </div>
         <%= checkbox 'Monthly donor' %>
         <%= checkbox 'Not a monthly donor' %>
-        <% if @organisation.slack_api_key %>
-          <%= checkbox 'Slack member' %>
-          <%= checkbox 'Not a Slack member' %>
-        <% end %>
         <%= checkbox 'Connected to Stripe' %>
         <%= checkbox 'Subscribed to mailer' %>
         <%= submit_tag 'Search', class: 'btn btn-primary' %>
@@ -43,9 +39,6 @@
       <tr>
         <th>Name</th>
         <th>Monthly donation</th>
-        <% if @organisation.slack_api_key %>
-          <th>Slack member</th>
-        <% end %>
         <th>Activities</th>
         <th>Subscribed to mailer</th>
         <th>Subscribed to discussion</th>
@@ -69,13 +62,6 @@
           <% end %>
         <% end %>
       </td>
-      <% if @organisation.slack_api_key %>
-        <td>
-          <% if organisationship.slack_member %>
-            <i class="fa fa-check"></i>
-          <% end %>
-        </td>
-      <% end %>
       <td>
         <% Activityship.and(:account => account, :activity_id.in => @organisation.activities.pluck(:id)).each { |activityship| %>
         <a href="/activities/<%= activityship.activity_id %>" class="label label-primary text-white d-inline-block mb-1"><%= activityship.activity.name %></a>

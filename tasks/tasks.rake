@@ -23,9 +23,6 @@ namespace :organisations do
     Organisation.and(:patreon_api_key.ne => nil).each do |organisation|
       organisation.sync_with_patreon
     end
-    Organisation.and(:slack_api_key.ne => nil).each do |organisation|
-      organisation.sync_with_slack
-    end
   end
 end
 
