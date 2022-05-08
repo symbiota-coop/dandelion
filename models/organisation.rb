@@ -513,6 +513,8 @@ class Organisation
     client = GoCardlessPro::Client.new(access_token: gocardless_access_token)
 
     subscription = client.subscriptions.get(subscription_id) if subscription_id
+    return unless subscription.status == 'active'
+
     mandate = client.mandates.get(subscription.links.mandate)
     customer = client.customers.get(mandate.links.customer)
 
