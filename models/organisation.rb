@@ -510,7 +510,11 @@ class Organisation
   def gocardless_subscribe(subscription: nil, subscription_id: nil)
     client = GoCardlessPro::Client.new(access_token: gocardless_access_token)
 
-    subscription = client.subscriptions.get(subscription_id) if subscription_id
+    begin
+      subscription = client.subscriptions.get(subscription_id) if subscription_id
+    rescue GoCardlessPro::InvalidApiUsageError # to handle test webhooks
+      return
+    end
     return unless subscription.status == 'active'
 
     mandate = client.mandates.get(subscription.links.mandate)
