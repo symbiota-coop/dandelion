@@ -83,7 +83,7 @@
     </td>
     <td data-sort="<%= ticket.discounted_price %>">
       <% if ticket.discounted_price %>
-        <%= m ticket.discounted_price, ticket.order.currency %>
+        <%= m ticket.discounted_price, (ticket.order ? ticket.order.currency : ticket.event.currency) %>
       <% end %>
       <% if ticket.order %>
         <% if ticket.order.percentage_discount %>

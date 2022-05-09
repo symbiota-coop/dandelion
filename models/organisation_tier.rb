@@ -14,7 +14,7 @@ class OrganisationTier
     {
       name: :text,
       description: :text_area,
-      gocardless_urk: :url,
+      gocardless_url: :url,
       threshold: :number,
       discount: :number,
       organisation_id: :lookup
