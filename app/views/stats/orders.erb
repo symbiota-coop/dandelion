@@ -1,9 +1,9 @@
-<% tickets = Ticket.and(:created_at.gte => 1.month.ago, :price.gt => 0) %>
+<% tickets = Ticket.and(:created_at.gte => '2022-02-01', :created_at.lt => '2022-05-01', :price.gt => 0) %>
 <% organisations = Organisation.and(:id.in => Event.and(:id.in => tickets.pluck(:event_id)).pluck(:organisation_id)) %>
 <p class="lead">
   <%= pluralize(organisations.count, 'organisation') %> sold
   <%= pluralize(tickets.count, 'ticket') %>
-  in the last month
+  from Feb-Apr 2022
 </p>
 
 <script>
