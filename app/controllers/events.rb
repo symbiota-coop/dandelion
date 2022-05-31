@@ -16,6 +16,7 @@ Dandelion::App.controller do
       @events = @events.and("#{r}_id": params[:"#{r}_id"]) if params[:"#{r}_id"]
     end
     @events = @events.online if params[:online]
+    @events = @events.in_person if params[:in_person]
     content_type = (parts = URI(request.url).path.split('.')
                     parts.length == 2 ? parts.last.to_sym : :html)
     case content_type

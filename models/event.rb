@@ -556,6 +556,14 @@ class Event
     location == 'Online'
   end
 
+  def self.in_person
+    self.and(:location.ne => 'Online')
+  end
+
+  def in_person?
+    location != 'Online'
+  end
+
   def self.legit
     self.and(:organisation_id.in =>
       Organisation.and(:hidden.ne => true).pluck(:id)).and(

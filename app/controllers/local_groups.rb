@@ -48,6 +48,7 @@ Dandelion::App.controller do
     @events = @events.and(:start_time.gte => @from)
     @events = @events.and(:start_time.lt => @to + 1) if @to
     @events = @events.online if params[:online]
+    @events = @events.in_person if params[:in_person]
     erb :'local_groups/event_stats'
   end
 

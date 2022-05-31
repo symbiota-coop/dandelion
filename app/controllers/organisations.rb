@@ -198,6 +198,7 @@ Dandelion::App.controller do
     @events = @events.and(local_group_id: params[:local_group_id]) if params[:local_group_id]
     @events = @events.and(activity_id: params[:activity_id]) if params[:activity_id]
     @events = @events.online if params[:online]
+    @events = @events.in_person if params[:in_person]
     @events = @events.and(monthly_donors_only: true) if params[:members_events]
     @events = @events.and(featured: true) if params[:featured]
     if params[:featured_or_course]
@@ -316,6 +317,7 @@ Dandelion::App.controller do
     @events = @events.and(:start_time.gte => @from)
     @events = @events.and(:start_time.lt => @to + 1) if @to
     @events = @events.online if params[:online]
+    @events = @events.in_person if params[:in_person]
     erb :'organisations/event_stats'
   end
 

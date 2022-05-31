@@ -27,6 +27,7 @@
     <%= select_tag :order, options: { 'Event date' => 'date', 'Most recently created' => 'created_at' }, selected: params[:order], class: 'form-control mx-1' %>
   </div>
   <%= checkbox 'Online' %>
+  <%= checkbox 'In person' %>
   <%= checkbox 'No coordinator' %>
   <%= hidden_field_tag :search, value: 1 %>
   <%= submit_tag 'Search', class: 'btn btn-primary' %>
