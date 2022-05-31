@@ -169,6 +169,10 @@ class Order
     if !event.no_discounts && (account && event && event.organisation && (organisationship = event.organisation.organisationships.find_by(account: account)) && (organisationship.monthly_donor? && organisationship.monthly_donor_discount > 0))
       self.percentage_discount_monthly_donor = organisationship.monthly_donor_discount
     end
+    if cohost && !affiliate_type && !affiliate_id
+      self.affiliate_type = 'Organisation'
+      self.affiliate_id = Organisation.find_by(slug: cohost).try(:id)
+    end
     if affiliate_type && %w[Account Organisation].include?(affiliate_type)
       unless affiliate_type.constantize.find(affiliate_id)
         self.affiliate_id = nil
@@ -250,7 +254,7 @@ class Order
     end
   end
 
-  attr_accessor :prevent_refund
+  attr_accessor :prevent_refund, :cohost
 
   after_destroy :refund
   def refund

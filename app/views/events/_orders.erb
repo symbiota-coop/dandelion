@@ -107,7 +107,6 @@
       <% if order.affiliate; if order.affiliate.is_a?(Account) %>
         <a href="/u/<%= order.affiliate.username %>"><%= order.affiliate.name %></a><br />
       <% elsif order.affiliate.is_a?(Organisation) %>
-        <br>
         <a href="/o/<%= order.affiliate.slug %>"><%= order.affiliate.name %></a><br />
       <% end; end %>
       <% if order.http_referrer && "#{URI(order.http_referrer).host}#{URI(order.http_referrer).path}" != "#{URI(ENV['BASE_URI']).host}/events/#{order.event_id}"  %>

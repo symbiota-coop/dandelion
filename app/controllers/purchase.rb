@@ -32,6 +32,7 @@ Dandelion::App.controller do
         currency: @event.currency,
         organisation_revenue_share: @event.organisation_revenue_share,
         revenue_sharer: (@event.revenue_sharer_organisationship.account if @event.revenue_sharer_organisationship),
+        cohost: ticketForm[:cohost],
         affiliate_type: ticketForm[:affiliate_type],
         affiliate_id: ticketForm[:affiliate_id],
         discount_code_id: ticketForm[:discount_code_id],
