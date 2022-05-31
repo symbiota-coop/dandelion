@@ -41,6 +41,10 @@ class TicketType
     (quantity || 0) - tickets.count
   end
 
+  def wiser_remaining
+    [remaining, ticket_group ? ticket_group.places_remaining : nil, event.places_remaining].compact.min
+  end
+
   def number_of_tickets_available_in_single_purchase
     [remaining, ticket_group ? ticket_group.places_remaining : nil, event.places_remaining, max_quantity_per_transaction || nil].compact.min
   end

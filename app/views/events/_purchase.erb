@@ -41,9 +41,9 @@
                       <div class="col">
                         <%= select_tag :"quantities[#{ticket_type.id}]", 'data-price': ticket_type.price, style: 'width: auto; display: inline-block', class: 'form-control', options: (0..ticket_type.number_of_tickets_available_in_single_purchase).to_a %>
                       </div>
-                      <% if !ticket_type.max_quantity_per_transaction && ticket_type.number_of_tickets_available_in_single_purchase <= 3 %>
+                      <% if ticket_type.wiser_remaining <= 3 %>
                         <div class="col-auto">
-                          <span class="badge badge-secondary"><%= ticket_type.number_of_tickets_available_in_single_purchase %> left</span>
+                          <span class="badge badge-secondary"><%= ticket_type.wiser_remaining %> left</span>
                         </div>
                       <% end %>
                     </div>
