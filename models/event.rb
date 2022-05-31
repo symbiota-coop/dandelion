@@ -634,18 +634,6 @@ class Event
     end
   end
 
-  def self.new_tips
-    {
-      slug: 'Lowercase letters, numbers and dashes only (no spaces)',
-      questions: 'One per line. Wrap in [square brackets] to turn into a checkbox',
-      feedback_questions: 'One per line'
-    }
-  end
-
-  def self.edit_tips
-    {}.merge(new_tips)
-  end
-
   def self.human_attribute_name(attr, options = {})
     {
       name: 'Event title',
@@ -671,6 +659,16 @@ class Event
     }[attr.to_sym] || super
   end
 
+  def self.new_tips
+    {
+      slug: 'Lowercase letters, numbers and dashes only (no spaces)'
+    }
+  end
+
+  def self.edit_tips
+    {}.merge(new_tips)
+  end
+
   def self.new_hints
     {
       start_time: "in &hellip; (your profile's time zone)",
@@ -679,7 +677,9 @@ class Event
       add_a_donation_to: "Text to display above the 'Add a donation' field (leave blank to use organisation default)",
       donation_text: "Text to display below the 'Add a donation' field  (leave blank to use organisation default)",
       carousel_text: 'Text to show when hovering over this event in a carousel',
-      suggested_donation: 'If this is blank, the donation field will not be shown'
+      suggested_donation: 'If this is blank, the donation field will not be shown',
+      questions: 'Questions to ask participants upon booking. One question per line. Wrap in [square brackets] to turn into a checkbox.',
+      feedback_questions: 'Questions to ask participants in the post-event feedback form. One question per line.'
     }
   end
 
