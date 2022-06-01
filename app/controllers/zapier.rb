@@ -1,7 +1,7 @@
 Dandelion::App.controller do
   get '/z', provides: :json do
     sign_in_required!
-    { account_id: current_account.id }.to_json
+    { account_id: current_account.id.to_s }.to_json
   end
 
   get '/z/event_orders', provides: :json do
@@ -9,7 +9,7 @@ Dandelion::App.controller do
     event_admins_only!
     @event.orders.complete.map do |order|
       {
-        id: order.id,
+        id: order.id.to_s,
         name: order.account.name,
         created_at: order.created_at
       }
