@@ -4,8 +4,19 @@ Dandelion::App.controller do
     { account_id: current_account.id.to_s }.to_json
   end
 
-  get '/z/event_orders', provides: :json do
-    @event = Event.find(params[:event_id])
+  get '/z/organisation_events', provides: :json do
+    @organisation = Organisation.find_by(slug: params[:organisation_slug])
+    @organisation.events_for_search.map do |event|
+      {
+        id: event.id,
+        name: event.name
+      }
+    end.to_json
+  end
+
+  get '/z/organisation_event_orders', provides: :json do
+    @organisation = Organisation.find_by(slug: params[:organisation_slug])
+    @event = @organisation.events.find(params[:event_id])
     event_admins_only!
     @event.orders.complete.order('created_at desc').map do |order|
       {
