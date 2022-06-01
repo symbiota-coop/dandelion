@@ -6,6 +6,15 @@
         <p class="mb-0">This event started <%= time_ago_in_words @event.start_time %> ago</p>
       </div>
     <% end %>
+    <% if @event.select_tickets_intro %>
+      <table class="table table-borderless mb-0">
+        <tr>
+          <td>
+            <%= Sanitize.fragment(Rinku.auto_link(@event.select_tickets_intro), Sanitize::Config::DANDELION) %>
+          </td>
+        </tr>
+      </table>
+    <% end %>
     <div id="ticket-types">
       <% form_tag '' do %>
         <%= hidden_field_tag :cohost, value: params[:cohost] %>
@@ -209,6 +218,15 @@
         </table>
       <% end %>
     </div>
+    <% if @event.select_tickets_outro %>
+      <table class="table table-borderless mb-0">
+        <tr>
+          <td>
+            <%= Sanitize.fragment(Rinku.auto_link(@event.select_tickets_outro), Sanitize::Config::DANDELION) %>
+          </td>
+        </tr>
+      </table>
+    <% end %>
   </div>
   <h3 class="card-header bg-primary text-white">Your details</h3>
   <div class="card-body" id="details">

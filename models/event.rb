@@ -40,6 +40,8 @@ class Event
   field :add_a_donation_to, type: String
   field :donation_text, type: String
   field :carousel_text, type: String
+  field :select_tickets_intro, type: String
+  field :select_tickets_outro, type: String
 
   def self.admin_fields
     {
@@ -52,6 +54,8 @@ class Event
       add_a_donation_to: :text,
       donation_text: :text,
       carousel_text: :text,
+      select_tickets_intro: :text,
+      select_tickets_outro: :text,
       image: :image,
       description: :wysiwyg,
       email: :email,
@@ -683,6 +687,8 @@ class Event
       add_a_donation_to: "Text to display above the 'Add a donation' field (leave blank to use organisation default)",
       donation_text: "Text to display below the 'Add a donation' field  (leave blank to use organisation default)",
       carousel_text: 'Text to show when hovering over this event in a carousel',
+      select_tickets_intro: 'Text to show at the top of the Select tickets panel',
+      select_tickets_outro: 'Text to show at the bottom of the Select tickets panel',
       suggested_donation: 'If this is blank, the donation field will not be shown',
       questions: 'Questions to ask participants upon booking. One question per line. Wrap in [square brackets] to turn into a checkbox.',
       feedback_questions: 'Questions to ask participants in the post-event feedback form. One question per line.'
