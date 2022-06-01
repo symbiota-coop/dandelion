@@ -242,7 +242,7 @@ class Organisation
   def update_paid_up
     update_attribute(:paid_up, nil)
     begin
-      update_attribute(:paid_up, contribution_not_required? || contribution_requested.zero? || contributable_events == 1 || contribution_paid >= 0.5 * contribution_requested)
+      update_attribute(:paid_up, contribution_not_required? || contribution_requested.zero? || contributable_events.count == 1 || contribution_paid >= 0.5 * contribution_requested)
     rescue CurrencyUnavailable
       update_attribute(:paid_up, true)
     end
