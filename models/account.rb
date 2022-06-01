@@ -24,6 +24,7 @@ class Account
   field :picture_uid, type: String
   field :sign_ins_count, type: Integer
   field :sign_in_token, type: String
+  field :api_key, type: String
   field :facebook_name, type: String
   field :facebook_profile_url, type: String
   field :last_active, type: Time

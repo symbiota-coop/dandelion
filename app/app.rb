@@ -66,6 +66,12 @@ module Dandelion
         elsif !current_account
           kick! notice: 'Please sign in to continue.'
         end
+      elsif params[:api_key]
+        if (account = Account.find_by(api_key: params[:api_key]))
+          session[:account_id] = account.id.to_s
+        elsif !current_account
+          403
+        end
       end
       @og_desc = 'Dandelion is an open-source platform for ticketed events and co-created gatherings created by the not-for-profit worker co-operative Dandelion Collective'
       @og_image = "#{ENV['BASE_URI']}/images/black-on-white-link.png"
@@ -96,10 +102,6 @@ module Dandelion
 
     not_found do
       erb :not_found, layout: :application
-    end
-
-    get '/zapier', provides: :json do
-      { authenticated: true }.to_json
     end
 
     get '/not_found' do
