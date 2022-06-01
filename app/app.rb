@@ -90,16 +90,16 @@ module Dandelion
       redirect back
     end
 
-    get '/activities/5f3ab46e866bcd0015deb3cb' do
-      redirect '/o/the-psychedelic-society/members'
-    end
-
     get '/error' do
       erb :error, layout: :application
     end
 
     not_found do
       erb :not_found, layout: :application
+    end
+
+    get '/zapier' do
+      200
     end
 
     get '/not_found' do
