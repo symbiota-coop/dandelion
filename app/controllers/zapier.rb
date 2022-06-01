@@ -9,6 +9,7 @@ Dandelion::App.controller do
     event_admins_only!
     @event.orders.complete.map do |order|
       {
+        id: order.id,
         name: order.account.name,
         created_at: order.created_at
       }
