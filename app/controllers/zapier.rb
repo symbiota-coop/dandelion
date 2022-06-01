@@ -8,7 +8,7 @@ Dandelion::App.controller do
     @organisation = Organisation.find_by(slug: params[:organisation_slug])
     @organisation.events_for_search.map do |event|
       {
-        id: event.id,
+        id: event.id.to_s,
         name: event.name
       }
     end.to_json
