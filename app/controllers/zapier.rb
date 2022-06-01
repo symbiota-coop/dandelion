@@ -1,7 +1,11 @@
 Dandelion::App.controller do
   get '/z', provides: :json do
     sign_in_required!
-    { account_id: current_account.id.to_s }.to_json
+    {
+      id: current_account.id.to_s,
+      name: current_account.name,
+      email: current_account.email
+    }.to_json
   end
 
   get '/z/organisation_events', provides: :json do
