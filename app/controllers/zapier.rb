@@ -16,8 +16,7 @@ Dandelion::App.controller do
                else
                  ''
                end,
-        value: m((order.value || 0), order.currency),
-        created_at: order.created_at.to_s(:db)
+        created_at: order.created_at.iso8601
       }
     end.to_json
   end
