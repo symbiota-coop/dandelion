@@ -9,7 +9,7 @@ Dandelion::App.controller do
     @organisation.events_for_search.map do |event|
       {
         id: event.id.to_s,
-        name: "#{event.name} (#{event.concise_when_details})"
+        name: "#{event.name} (#{event.concise_when_details(nil)})"
       }
     end.to_json
   end
