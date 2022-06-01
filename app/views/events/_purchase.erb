@@ -234,10 +234,10 @@
       <%= f.hidden_field :http_referrer, value: request.referrer %>
       <% @event.questions_a.each_with_index { |q,i| %>
       <div class="form-group">
-        <% if q =~ /\[.*\]/ %>
+        <% if m = q.match(/\[(.*)\]/)  %>
           <div class="checkbox-inline">
             <%= check_box_tag "answers[#{i}]", id: "answers-#{i}" %>
-            <label class="font-weight-bold" for="answers-<%=i%>"><%== Sanitize.fragment(Rinku.auto_link(q), Sanitize::Config::DANDELION) %></label>
+            <label class="font-weight-bold" for="answers-<%=i%>"><%== Sanitize.fragment(Rinku.auto_link(m[1]), Sanitize::Config::DANDELION) %></label>
            </div>
         <% else %>
           <label><%== Sanitize.fragment(Rinku.auto_link(q), Sanitize::Config::DANDELION) %>*</label>

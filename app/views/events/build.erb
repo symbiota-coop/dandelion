@@ -215,7 +215,15 @@
         <%= f.number_block :capacity %>
       </div>
       <div role="tabpanel" class="tab-pane" id="tab4">
-        <%= f.text_area_block :questions %>
+        <script>
+          $(function () {
+            $('#event_questions').attr('rows', '3')
+            $('#event_feedback_questions').attr('rows', '3')
+            autosize($('#event_questions')[0])
+            autosize($('#event_feedback_questions')[0])
+          })
+        </script>
+        <%= f.text_area_block :questions, placeholder: "e.g. Any dietary requirements?\n[Check this box to agree to the terms and conditions]" %>
         <%= f.text_area_block :feedback_questions %>
       </div>
       <div role="tabpanel" class="tab-pane" id="tab5">
@@ -234,8 +242,8 @@
           })
         </script>
         <%= f.number_block :suggested_donation %>
-        <%= f.number_block :minimum_donation %>
         <div id="donation-options">
+          <%= f.number_block :minimum_donation %>
           <%= f.text_block :add_a_donation_to %>
           <%= f.text_block :donation_text %>
         </div>

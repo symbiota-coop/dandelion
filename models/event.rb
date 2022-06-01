@@ -172,6 +172,7 @@ class Event
   before_validation do
     self.name = name.strip if name
     self.suggested_donation = suggested_donation.round(2) if suggested_donation
+    self.minimum_donation = nil unless suggested_donation
     self.minimum_donation = minimum_donation.round(2) if minimum_donation
 
     if new_record? && !duplicate
