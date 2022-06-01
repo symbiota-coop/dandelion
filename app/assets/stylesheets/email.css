@@ -8,6 +8,10 @@ blockquote { border-left: 8px solid #F8F9FA; padding-left: 1em }
 .password { font-size: 200%; font-weight: bold; }
 .preview { padding: 16px; text-align: center; }
 
+p.action { text-align: center }
+p.action a { background: #00B963; color: white; text-decoration: none; padding: 10px; border-radius: 5px }
+p.action a:hover { background: #2BA457 !important; }
+
 body { background-color: #f7f7f7 }
 .tagline { display:none; font-size: 1px; color: #f7f7f7; line-height:1px; max-height: 0px; max-width: 0px; opacity: 0; overflow:hidden; }
 .container {  max-width: 650px; margin: 0 auto; }
