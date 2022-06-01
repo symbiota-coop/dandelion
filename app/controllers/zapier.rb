@@ -7,7 +7,7 @@ Dandelion::App.controller do
   get '/z/event_orders', provides: :json do
     @event = Event.find(params[:event_id])
     event_admins_only!
-    @event.orders.complete.map do |order|
+    @event.orders.complete.order('created_at desc').map do |order|
       {
         id: order.id.to_s,
         name: order.account.name,
