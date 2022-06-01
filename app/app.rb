@@ -99,7 +99,7 @@ module Dandelion
     end
 
     get '/zapier', provides: :json do
-      {authenticated: true}
+      { authenticated: true }.to_json
     end
 
     get '/not_found' do
