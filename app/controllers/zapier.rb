@@ -10,8 +10,14 @@ Dandelion::App.controller do
     @event.orders.complete.order('created_at desc').map do |order|
       {
         id: order.id.to_s,
-        name: order.account.name,
-        created_at: order.created_at
+        name: order.account ? order.account.name : '',
+        email: if order_email_viewer?(order)
+                 order.account ? order.account.email : ''
+               else
+                 ''
+               end,
+        value: m((order.value || 0), order.currency),
+        created_at: order.created_at.to_s(:db)
       }
     end.to_json
   end
