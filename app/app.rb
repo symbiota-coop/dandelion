@@ -98,8 +98,8 @@ module Dandelion
       erb :not_found, layout: :application
     end
 
-    get '/zapier' do
-      200
+    get '/zapier', provides: :json do
+      {authenticated: true}
     end
 
     get '/not_found' do
