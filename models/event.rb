@@ -24,6 +24,7 @@ class Event
   field :facebook_event_id, type: String
   field :feedback_questions, type: String
   field :suggested_donation, type: Float
+  field :minimum_donation, type: Float
   field :capacity, type: Integer
   field :organisation_revenue_share, type: Float
   field :affiliate_credit_percentage, type: Integer
@@ -64,6 +65,7 @@ class Event
       no_discounts: :check_box,
       extra_info_for_ticket_email: :wysiwyg,
       suggested_donation: :number,
+      minimum_donation: :number,
       capacity: :number,
       notes: :text_area,
       ps_event_id: :text,
@@ -168,6 +170,10 @@ class Event
   end
 
   before_validation do
+    self.name = name.strip if name
+    self.suggested_donation = suggested_donation.round(2) if suggested_donation
+    self.minimum_donation = minimum_donation.round(2) if minimum_donation
+
     if new_record? && !duplicate
       errors.add(:organisation, '- you are not an admin of this organisation') if !local_group && !activity && !Organisation.admin?(organisation, account)
       errors.add(:activity, '- you are not an admin of this activity') if activity && !Activity.admin?(activity, account)
@@ -185,9 +191,7 @@ class Event
     errors.add(:organisation_revenue_share, 'must be between 0 and 1') if organisation_revenue_share && (organisation_revenue_share < 0 || organisation_revenue_share > 1)
     errors.add(:affiliate_credit_percentage, 'must be between 1 and 100') if affiliate_credit_percentage && (affiliate_credit_percentage < 1 || affiliate_credit_percentage > 100)
     errors.add(:capacity, 'must be greater than 0') if capacity && capacity.zero?
-
-    self.name = name.strip
-    self.suggested_donation = suggested_donation.round(2) if suggested_donation
+    errors.add(:suggested_donation, 'cannot be less than the minimum donation') if suggested_donation && minimum_donation && suggested_donation < minimum_donation
 
     {
       zoom_party: false,
@@ -367,6 +371,7 @@ class Event
       email: email,
       feedback_questions: feedback_questions,
       suggested_donation: suggested_donation,
+      minimum_donation: minimum_donation,
       affiliate_credit_percentage: affiliate_credit_percentage,
       capacity: capacity,
       organisation_revenue_share: organisation_revenue_share,

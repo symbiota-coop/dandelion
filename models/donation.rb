@@ -27,6 +27,7 @@ class Donation
   before_validation do
     self.amount = amount.round(2)
     errors.add(:amount, 'minimum is 0.01') if amount < 0.01
+    errors.add(:amount, 'is insufficient') if event.minimum_donation && amount < event.minimum_donation
   end
 
   def summary
