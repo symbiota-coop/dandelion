@@ -574,6 +574,14 @@ class Event
     location != 'Online'
   end
 
+  def self.trending
+    live.public.legit.future.and(:image_uid.ne => nil).and(
+      :organisation_id.in => Organisation.or({ paid_up: true }, { verified: true }).pluck(:id)
+    ).sort_by do |event|
+      -event.orders.and(:created_at.gt => 1.week.ago).count
+    end
+  end
+
   def self.legit
     self.and(:organisation_id.in =>
       Organisation.and(:hidden.ne => true).pluck(:id)).and(

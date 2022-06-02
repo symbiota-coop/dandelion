@@ -9,7 +9,7 @@ Dandelion::App.controller do
                   { description: /#{::Regexp.escape(params[:q])}/i }
                 ).pluck(:id))
               else
-                @events.and(:organisation_id.in => Organisation.and(paid_up: true).pluck(:id))
+                @events.and(:organisation_id.in => Organisation.or({ paid_up: true }, { verified: true }).pluck(:id))
               end
     @events = @events.and(:id.in => EventTagship.and(event_tag_id: params[:event_tag_id]).pluck(:event_id)) if params[:event_tag_id]
     %i[organisation activity local_group].each do |r|

@@ -1,0 +1,3 @@
+<% Event.trending[0..2].each { |event| %>
+    <a target="_parent" href="/events/<%= event.id %>"><img class="w-100 mb-1" src="<%= u event.image.thumb('500x500').url %>"></a>
+<% }  %>
