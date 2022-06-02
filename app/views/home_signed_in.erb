@@ -62,7 +62,7 @@
       <div class="card mb-3">
         <h3 class="card-header bg-primary text-white">Trending</h3>
         <div class="card-body">
-          <%= cp(:'events/trending', key: '/events/trending') %>
+          <%= cp(:'events/trending', key: '/events/trending', expires: 1.day.from_now) %>
         </div>
       </div>
 
