@@ -28,11 +28,14 @@ class Post
   end
 
   def self.commentable_types
-    %w[Team Tactivity Mapplication Account Habit Place Gathering Activity Event LocalGroup Organisation ActivityApplication]
+    %w[DocPage Team Tactivity Mapplication Account Habit Place Gathering Activity Event LocalGroup Organisation ActivityApplication]
   end
 
   def url
-    if commentable.is_a?(Team)
+    if commentable.is_a?(DocPage)
+      doc_page = commentable
+      "#{ENV['BASE_URI']}/docs/#{doc_page.slug}#post-#{id}"
+    elsif commentable.is_a?(Team)
       team = commentable
       "#{ENV['BASE_URI']}/g/#{team.gathering.slug}/teams/#{team.id}#post-#{id}"
     elsif commentable.is_a?(Gathering)

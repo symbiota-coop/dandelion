@@ -1,0 +1,28 @@
+class DocPage
+  include Mongoid::Document
+  include Mongoid::Timestamps
+
+  field :name, type: String
+  field :slug, type: String
+  field :body, type: String
+
+  validates_presence_of :name, :slug
+  validates_uniqueness_of :slug
+
+  def self.admin_fields
+    {
+      name: :text,
+      slug: :slug,
+      body: :text_area
+    }
+  end
+
+  has_many :posts, as: :commentable, dependent: :destroy
+  has_many :subscriptions, as: :commentable, dependent: :destroy
+  has_many :comments, as: :commentable, dependent: :destroy
+  has_many :comment_reactions, as: :commentable, dependent: :destroy
+
+  def discussers
+    Account.and(admin: true)
+  end
+end
