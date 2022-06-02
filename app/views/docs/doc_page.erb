@@ -5,9 +5,12 @@
     </div>
   </div>
   <div class="col">
-    <div class="row no-gutters justify-content-between">
+    <div class="row no-gutters justify-content-between" style="border-bottom: 2px solid #ddd">
       <div class="col">
-        <h1><%=@doc_page.name%></h1>
+        <h1>
+          <%=@doc_page.name%>
+           <i class="fas fa-book"></i>
+        </h1>
       </div>
       <div class="col-auto">
         <% if admin? %>
