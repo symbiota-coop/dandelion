@@ -1,7 +1,7 @@
 <% last_completed_contribution = current_account.account_contributions.and(payment_completed: true).order('created_at desc').first %>
 <% if !last_completed_contribution || last_completed_contribution.created_at < 1.month.ago %>
-  <div class="card p-3 my-3">
-    <div class="card-body p-2">
+  <div class="p-3 my-3">
+    <div class="p-2">
       <p class="lead mb-1">
         <mark class="px-0">Dandelion operates on a donation/gift economy basis.</mark>
       </p>
@@ -13,8 +13,13 @@
           </small>
         </p>
       <% else %>
-        <p class="lead">
-          Please chip in so we can remain free.
+        <p class="lead mb-0">
+          <small>
+            Please chip in so we can remain free
+            <small>
+              (and we won't ask again for a month).
+            </small>
+          </small>
         </p>
       <% end %>
       <% form_tag '', class: 'form-inline', id: 'pay-form' do %>
