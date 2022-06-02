@@ -39,6 +39,9 @@
   <% end %>
   <%= partial :'gatherings/invite' %>
 </div>
+
+<%= partial :'gatherings/joining_info' %>
+
 <% case (params[:view] || 'details'); when 'pictures' %>
 <div style="margin-top: 15px" class="row">
   <% (Account.and(:id.in => @memberships.pluck(:account_id)).and(:picture_uid.ne => nil).shuffle + Account.and(:id.in => @memberships.pluck(:account_id)).and(picture_uid: nil).shuffle).each { |account| %>

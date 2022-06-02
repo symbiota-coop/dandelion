@@ -1,0 +1,10 @@
+<% case @gathering.privacy; when 'open' %>
+<p class="lead">
+  Non-members can join via <a href="<%= "#{ENV['BASE_URI']}/g/#{@gathering.slug}/join" %>"><%= "#{ENV['BASE_URI']}/g/#{@gathering.slug}/join" %></a>
+</p>
+<% when 'closed' %>
+<p class="lead">
+  Non-members can apply via <a href="<%= "#{ENV['BASE_URI']}/g/#{@gathering.slug}/apply" %>"><%= "#{ENV['BASE_URI']}/g/#{@gathering.slug}/apply" %></a>
+</p>
+<% when 'secret' %>
+<% end %>

@@ -48,16 +48,6 @@
       <% end %>
       <a class="btn btn-primary mb-1" data-confirm="Are you sure you want to leave the gathering?" href="/g/<%= @gathering.slug %>/leave">Leave gathering</a>
     </div>
-    <% case @gathering.privacy; when 'open' %>
-    <p class="lead">
-      Non-members can join at <a href="<%= "#{ENV['BASE_URI']}/g/#{@gathering.slug}/join" %>"><%= "#{ENV['BASE_URI']}/g/#{@gathering.slug}/join" %></a>
-    </p>
-    <% when 'closed' %>
-    <p class="lead">
-      Non-members can apply at <a href="<%= "#{ENV['BASE_URI']}/g/#{@gathering.slug}/apply" %>"><%= "#{ENV['BASE_URI']}/g/#{@gathering.slug}/apply" %></a>
-    </p>
-    <% when 'secret' %>
-  <% end %>
   <% if @membership.admin? or @gathering.photos.count > 0 %>
     <div class="my-3">
       <%= partial :'photos/photos', locals: { photoable: @gathering, add_photo_if: @membership.admin?, dimensions: '100x100#' } %>
