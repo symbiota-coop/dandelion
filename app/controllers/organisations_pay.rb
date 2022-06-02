@@ -10,7 +10,7 @@ Dandelion::App.controller do
     rescue JSON::ParserError
       halt 400
     rescue Stripe::SignatureVerificationError
-      halt 400
+      halt 200
     end
 
     if event['type'] == 'checkout.session.completed'
