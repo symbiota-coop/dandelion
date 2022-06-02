@@ -1,6 +1,6 @@
 Dandelion::App.controller do
   get '/docs' do
-    erb :'docs/docs'
+    redirect "/docs/#{DocPage.order('priority desc').first.slug}"
   end
 
   get '/docs/:slug' do

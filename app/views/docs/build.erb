@@ -1,6 +1,7 @@
 <% form_for @doc_page, "/docs/#{@doc_page.slug}/edit" do  |f| %>
   <%= f.text_block :name %>
   <%= f.slug_block :slug %>
+  <%= f.number_block :priority %>
   <%= f.wysiwyg_block :body %>
   <%= f.submit_block %>
 <% end %>
