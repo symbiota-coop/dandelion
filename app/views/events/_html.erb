@@ -3,7 +3,7 @@
   <% if i.even? %>
     <%== '<tr>' %>
   <% end %>
-  <td style="line-height: 0; width: 50%"><a href="<%= ENV['BASE_URI'] %>/events/<%= event.id %>"><img style="width: 100%" src="<%= u event.image.thumb('500x500').url %>"></a></td>
+  <td style="line-height: 0; width: 50%"><a href="<%= ENV['BASE_URI'] %>/events/<%= event.id %>"><img style="width: 100%" src="<%= u event.image.thumb('640x640').url %>"></a></td>
   <% if i.odd? %>
     <%== '</tr>' %>
   <% end %>
