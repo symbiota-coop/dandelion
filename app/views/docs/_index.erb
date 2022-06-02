@@ -1,0 +1,5 @@
+<p class="lead">
+<% DocPage.each { |doc_page| %>
+  <a href="/docs/<%=doc_page.slug%>"><%=doc_page.name %></a><br />
+<% } %>
+</p>

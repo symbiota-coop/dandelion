@@ -1,22 +1,29 @@
-<div class="row no-gutters justify-content-between">
-  <div class="col">
-    <h1><%=@doc_page.name%></h1>
-  </div>
+<div class="row">
   <div class="col-auto">
-    <% if admin? %>
-      <a class="btn btn-primary" href="/docs/<%=@doc_page.slug%>/edit">Edit <i class="fa fa-pencil"></i></a>
+    <div class="mr-3">
+      <%= partial :'docs/index' %>
+    </div>
+  </div>
+  <div class="col">
+    <div class="row no-gutters justify-content-between">
+      <div class="col">
+        <h1><%=@doc_page.name%></h1>
+      </div>
+      <div class="col-auto">
+        <% if admin? %>
+          <a class="btn btn-primary" href="/docs/<%=@doc_page.slug%>/edit">Edit <i class="fa fa-pencil"></i></a>
+        <% end %>
+      </div>
+    </div>
+    <% if @doc_page.body %>
+      <div class="my-3">
+        <%== @doc_page.body %>
+      </div>
+    <% end %>
+    <% if current_account %>
+      <div data-pagelet-url="/commentable?commentable_type=DocPage&commentable_id=<%= @doc_page.id %>">
+        <%= partial :'comments/commentable', locals: { commentable: @doc_page } %>
+      </div>
     <% end %>
   </div>
 </div>
-
-<% if @doc_page.body %>
-  <div class="my-3">
-    <%== @doc_page.body %>
-  </div>
-<% end %>
-
-<% if current_account %>
-  <div data-pagelet-url="/commentable?commentable_type=DocPage&commentable_id=<%= @doc_page.id %>">
-    <%= partial :'comments/commentable', locals: { commentable: @doc_page } %>
-  </div>
-<% end %>
