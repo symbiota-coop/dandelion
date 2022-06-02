@@ -20,7 +20,7 @@
     </div>
     <% if @doc_page.body %>
       <div class="my-3" style="font-size: 120%">
-        <%== @doc_page.body %>
+        <%== Rinku.auto_link @doc_page.body %>
       </div>
     <% end %>
     <% if current_account %>
