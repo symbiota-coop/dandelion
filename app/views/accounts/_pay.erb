@@ -1,0 +1,73 @@
+<% last_completed_contribution = current_account.account_contributions.and(payment_completed: true).order('created_at desc').first %>
+<% if !last_completed_contribution || last_completed_contribution.created_at < 1.month.ago %>
+  <div class="card p-3 my-3">
+    <div class="card-body p-2">
+      <p class="lead mb-1">
+        <mark class="px-0">Dandelion operates on a donation/gift economy basis.</mark>
+      </p>
+      <% if last_completed_contribution %>
+        <p class="lead">
+          <small>
+            Thanks for contributing <%= time_ago_in_words last_completed_contribution.created_at %> ago.
+            Will you chip in again so we can remain free?
+          </small>
+        </p>
+      <% else %>
+        <p class="lead">
+          Please chip in so we can remain free.
+        </p>
+      <% end %>
+      <% form_tag '', class: 'form-inline', id: 'pay-form' do %>
+        <div class="form-group mb-1 mr-1">
+          <div class="input-group">
+            <div class="input-group-prepend">
+              <span class="input-group-text"><%= Money.new(0, current_account.default_currency || 'GBP').symbol %></span>
+            </div>
+            <%= hidden_field_tag :currency, value: current_account.default_currency || 'GBP' %>
+            <%= number_field_tag :amount, value: 10, style: 'width: 5em;', required: 'required', class: 'form-control', id: 'amount' %>
+          </div>
+        </div>
+        <button data-payment-method="stripe" type="submit" class="btn btn-primary mb-1 ml-0 mr-1" style="height: 2.125rem">
+          Contribute via card
+          <i class="fa fa-spin fa-circle-o-notch" style="display: none"></i>
+        </button>
+        <%= hidden_field_tag :payment_method, value: 'stripe', disabled: true %>
+        <button data-payment-method="coinbase" type="submit" class="btn btn-primary mb-1" style="height: 2.125rem">
+          Contribute with crypto
+          <i class="fa fa-spin fa-circle-o-notch" style="display: none"></i>
+        </button>
+        <%= hidden_field_tag :payment_method, value: 'coinbase', disabled: true %>
+      <% end %>
+      <script>
+        $(function () {
+
+          $('#pay-form button[data-payment-method]').click(function () {
+            $('input[type=hidden][name=payment_method]').attr('disabled', true)
+            $('input[type=hidden][name=payment_method][value=' + $(this).attr('data-payment-method') + ']').removeAttr('disabled')
+            $(this).attr('data-payment-method-clicked', true)
+          })
+
+          $('#pay-form').submit(function () {
+            $('#pay-form button[data-payment-method-clicked] i').show()
+            $.post('/accounts/<%= account.id %>/pay', $(this).serializeObject(), function (data) {
+              if (data['session_id']) {
+                var stripe = Stripe('<%= ENV['STRIPE_PK'] %>');
+                stripe.redirectToCheckout({sessionId: data['session_id']})
+              } else if (data['checkout_id']) {
+                window.location = 'https://commerce.coinbase.com/checkout/' + data['checkout_id']
+              }
+            }).fail(function () {
+              $('#pay-form').hide()
+            }).always(function () {
+              $('#pay-form').css('opacity', 1)
+            })
+
+            return false
+
+          })
+          console.log('paying')
+        })
+      </script>
+    </div>
+  </div>
+<% end %>
