@@ -24,7 +24,7 @@
       </div>
     <% end %>
     <% if current_account %>
-      <div data-pagelet-url="/commentable?commentable_type=DocPage&commentable_id=<%= @doc_page.id %>">
+      <div class="mt-5" data-pagelet-url="/commentable?commentable_type=DocPage&commentable_id=<%= @doc_page.id %>">
         <%= partial :'comments/commentable', locals: { commentable: @doc_page } %>
       </div>
     <% end %>
