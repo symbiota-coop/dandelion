@@ -578,7 +578,7 @@ class Event
     live.public.legit.future.and(:image_uid.ne => nil).and(
       :organisation_id.in => Organisation.or({ paid_up: true }, { verified: true }).pluck(:id)
     ).sort_by do |event|
-      -event.orders.completed.and(:created_at.gt => 1.week.ago).count
+      -event.orders.complete.and(:created_at.gt => 1.week.ago).count
     end
   end
 
