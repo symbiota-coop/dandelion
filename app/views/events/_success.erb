@@ -34,11 +34,11 @@
         <h5 class="mb-1">Share this event</h5>
         <%= partial :share %>
       <% end %>
-
-      <div class="my-3">
-        <%= partial :'accounts/pay', locals: { account: @order.account } %>
-      </div>
-
+      <% if @order %>
+        <div class="my-3">
+          <%= partial :'accounts/pay', locals: { account: @order.account } %>
+        </div>
+      <% end %>
     <% end %>
   </div>
 </div>
