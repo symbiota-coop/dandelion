@@ -1,7 +1,5 @@
-<% last_completed_contribution = current_account.account_contributions.and(payment_completed: true).order('created_at desc').first %>
+<% last_completed_contribution = account.account_contributions.and(payment_completed: true).order('created_at desc').first %>
 <% if !last_completed_contribution || last_completed_contribution.created_at < 1.month.ago %>
-  <div class="p-3 my-3">
-    <div class="p-2">
       <p class="lead mb-1">
         <mark class="px-0">Dandelion operates on a donation/gift economy basis.</mark>
       </p>
@@ -15,10 +13,11 @@
       <% else %>
         <p class="lead mb-0">
           <small>
-            Please chip in so we can remain free
+            Please chip in so we can remain free<% if !current_account %>.<% else %>
             <small>
               (and we won't ask again for a month).
             </small>
+            <% end %>
           </small>
         </p>
       <% end %>
@@ -26,9 +25,9 @@
         <div class="form-group mb-1 mr-1">
           <div class="input-group">
             <div class="input-group-prepend">
-              <span class="input-group-text"><%= Money.new(0, current_account.default_currency || 'GBP').symbol %></span>
+              <span class="input-group-text"><%= Money.new(0, account.default_currency || 'GBP').symbol %></span>
             </div>
-            <%= hidden_field_tag :currency, value: current_account.default_currency || 'GBP' %>
+            <%= hidden_field_tag :currency, value: account.default_currency || 'GBP' %>
             <%= number_field_tag :amount, value: 10, style: 'width: 5em;', required: 'required', class: 'form-control', id: 'amount' %>
           </div>
         </div>
@@ -73,6 +72,5 @@
           console.log('paying')
         })
       </script>
-    </div>
-  </div>
+
 <% end %>
