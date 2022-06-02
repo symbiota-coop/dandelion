@@ -576,7 +576,7 @@ class Event
 
   def self.trending
     live.public.legit.future.and(:image_uid.ne => nil).and(
-      :organisation_id.in => Organisation.or({ paid_up: true }, { verified: true }).pluck(:id)
+      :organisation_id.in => Organisation.and(paid_up: true).pluck(:id)
     ).sort_by do |event|
       -event.orders.complete.and(:created_at.gt => 1.week.ago).count
     end
