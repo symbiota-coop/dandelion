@@ -30,7 +30,7 @@
           <% if o.object.new_record? %>
             <a class="btn btn-sm btn-outline-danger" href="javascript:;" onclick="$(this).closest('.ticket_type').remove()">
               <i class="fa fa-times"></i>
-            </span>
+            </a>
           <% else %>
             <a class="btn btn-sm btn-outline-danger" href="javascript:;" onclick="$(this).children().last().prop('checked', true).closest('.ticket_type').hide()">
               <i class="fa fa-times"></i>
