@@ -1,4 +1,20 @@
 <table class="table">
+  <% @event.ticket_groups.each { |ticket_group| %>
+    <tr <% if params[:ticket_group_id] == ticket_group.id.to_s %> <% elsif params[:ticket_type_id] || params[:ticket_group_id] %>style="opacity: 0.4" <% end %>>
+      <td style="width: 1px; white-space: nowrap" class="pr-3">
+        <span class="label label-outline-primary"><%=ticket_group.name%></span>
+      </td>
+      <td>
+        <% w = ((ticket_group.tickets.count / ticket_group.capacity.to_f) * 100).round %>
+        <a href="/events/<%=@event.id%>/tickets?ticket_group_id=<%=ticket_group.id%>">
+          <%= ticket_group.tickets.count %>/<%= ticket_group.capacity %>
+          <div class="progress">
+            <div class="progress-bar" role="progressbar" style="width: <%= "#{w}%" %>;"></div>
+          </div>
+        </a>
+      </td>
+    </tr>
+  <% } %>  
   <% @event.ticket_types.order('order asc, price desc').and(:quantity.gt => 0).each { |ticket_type| %>
   <tr <% if params[:ticket_type_id] == ticket_type.id.to_s %> <% elsif params[:ticket_type_id] || params[:ticket_group_id] %>style="opacity: 0.4" <% end %>>
     <td style="width: 1px; white-space: nowrap" class="pr-3">
@@ -25,21 +41,5 @@
       </a>
     </td>
   </tr>
-  <% } %>
-  <% @event.ticket_groups.each { |ticket_group| %>
-    <tr <% if params[:ticket_group_id] == ticket_group.id.to_s %> <% elsif params[:ticket_type_id] || params[:ticket_group_id] %>style="opacity: 0.4" <% end %>>
-      <td style="width: 1px; white-space: nowrap" class="pr-3">
-        <span class="label label-outline-primary"><%=ticket_group.name%></span>
-      </td>
-      <td>
-        <% w = ((ticket_group.tickets.count / ticket_group.capacity.to_f) * 100).round %>
-        <a href="/events/<%=@event.id%>/tickets?ticket_group_id=<%=ticket_group.id%>">
-          <%= ticket_group.tickets.count %>/<%= ticket_group.capacity %>
-          <div class="progress">
-            <div class="progress-bar" role="progressbar" style="width: <%= "#{w}%" %>;"></div>
-          </div>
-        </a>
-      </td>
-    </tr>
   <% } %>
 </table>
