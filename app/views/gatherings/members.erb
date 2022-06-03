@@ -1,4 +1,7 @@
 <%= partial :'gatherings/nav', locals: { gathering: @gathering, membership: @membership } %>
+
+<%= partial :'gatherings/joining_info' %>
+
 <div class="mb-3">
   <% form_tag '', method: 'get', class: 'submitOnChange searchForm form-inline' do %>
     <div class="form-group">
@@ -40,7 +43,6 @@
   <%= partial :'gatherings/invite' %>
 </div>
 
-<%= partial :'gatherings/joining_info' %>
 
 <% case (params[:view] || 'details'); when 'pictures' %>
 <div style="margin-top: 15px" class="row">

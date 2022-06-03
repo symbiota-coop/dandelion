@@ -1,12 +1,12 @@
 <div style="margin: 10px 0">
   <% if @gathering.member_limit %>
-    <p style="font-size: 20px; margin: 0">
+    <p class="lead" style="margin: 0">
       <%= pluralize(@gathering.member_limit - @gathering.memberships.count, 'place') %> remaining
     </p>
   <% end %>
   <% if @gathering.fixed_threshold or @gathering.democratic_threshold %>
     <% if @gathering.threshold %>
-      <p style="font-size: 20px; margin: 0">
+      <p class="lead" style="margin: 0">
         Automatically accepting applications with <%= @gathering.threshold %> <%= @gathering.vouchers %>
       </p>
     <% end %>

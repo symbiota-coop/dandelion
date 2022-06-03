@@ -1,4 +1,7 @@
 <%= partial :'gatherings/nav', locals: { gathering: @gathering, membership: @membership } %>
+
+<%= partial :'gatherings/joining_info' %>
+
 <div data-pagelet-url="/g/<%= @gathering.slug %>/threshold">
   <%= partial :'mapplications/threshold' %>
 </div>
@@ -14,8 +17,6 @@
     </div>
   <% end %>
 </div>
-
-<%= partial :'gatherings/joining_info' %>
 
 <%= partial :'mapplications/mapplications' %>
 <% if @gathering.mapplications.paused.count > 0 %>
