@@ -1,5 +1,5 @@
 <% Event.trending[0..2].each { |event| %>
     <div class="mb-1">
-      <%= partial :'events/block_carousel', locals: {event: event} %>
+      <%= partial :'events/block_carousel', locals: {event: event}, key: "/events/trending?timezone=#{Time.zone.name}" %>
     </div>
 <% }  %>
