@@ -170,7 +170,7 @@ class Event
   end
 
   def revenue_sharer_organisationship
-    organisation.organisationships.find_by(:account => revenue_sharer, :stripe_connect_json.ne => nil) if revenue_sharer && organisation_revenue_share
+    organisation.organisationships.find_by(:account => revenue_sharer, :stripe_connect_json.ne => nil) if organisation && revenue_sharer && organisation_revenue_share
   end
 
   before_validation do
