@@ -1,3 +1,5 @@
 <% Event.trending[0..2].each { |event| %>
-    <%= partial :'events/block_carousel', locals: {event: event} %>
+    <div class="mb-1">
+      <%= partial :'events/block_carousel', locals: {event: event} %>
+    </div>
 <% }  %>
