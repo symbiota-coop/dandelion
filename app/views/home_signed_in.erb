@@ -24,7 +24,7 @@
               <% current_account.upcoming_events.each { |event| %>
               <tr>
                 <td style="width: 1px">
-                  <a href="/events/<%= event.id %>" class="calendar-date">
+                  <a href="/events/<%= event.id %>" class="calendar-date" data-toggle="tooltip" title="in <%=distance_of_time_in_words event.start_time - Time.now %>">
                     <span class="day"><%= event.start_time.day %></span>
                     <br>
                     <span class="month"><%= event.start_time.strftime('%b') %></span>
