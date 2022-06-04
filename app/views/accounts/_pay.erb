@@ -11,7 +11,7 @@
           </small>
         </p>
       <% else %>
-        <p class="lead mb-0">
+        <p class="lead mb-1">
           <small>
             Please chip in so we can remain free<% if !current_account || (defined?(force) && force) %>.<% else %>
             <small>
@@ -42,6 +42,16 @@
         </button>
         <%= hidden_field_tag :payment_method, value: 'coinbase', disabled: true %>
       <% end %>
+      <p class="lead">
+        <small>
+          <small>
+          Other crypto options:
+          <a target="_blank" href="https://gitcoin.co/grants/564/dandelion">Gitcoin</a>
+          &middot;
+          <a target="_blank" href="https://giveth.io/project/dandelion">Giveth</a>
+          </small>
+        </small>
+      </p>
       <script>
         $(function () {
 
