@@ -17,7 +17,7 @@
         <%= m r, organisation.currency %>, leaving a balance of <%= m balance, organisation.currency %>.
         <% if ((r * 0.5) - p) > 0 %>
           <br>
-          <mark class="px-0">Contribute <% if p > 0 %>a further <% end %><%= m ((r * 0.5) - p), organisation.currency %>+ and as a thank you we'll continue to show your events in the main events section and on the Dandelion homepage.</mark>
+          <mark class="px-0">Contribute <% if p > 0 %>at least <% end %><%= m ((r * 0.5) - p), organisation.currency %>+ and as a thank you we'll<%= ' continue to' if organisation.contributable_events.count == 1 %> show your events in the main events section and on the Dandelion homepage.</mark>
         <% end %>
       </p>
 
