@@ -19,6 +19,13 @@
           <div class="ticket-type-description">
             <%= o.text_field :description, class: 'form-control', placeholder: 'Description' %>
           </div>
+          <% if @event.organisation.gocardless_access_token || @event.organisation.patreon_api_key %>
+            <div class="ticket-type-minimum-monthly-donation">
+              <strong>Minimum monthly donation</strong>
+              <span><%= Money.new(0, f.object.currency).symbol %><span>
+              <%= o.number_field :minimum_monthly_donation, class: 'form-control ml-1', step: 'any' %>
+            </div>
+          <% end %>
           <label>
             Limit per order <%= o.number_field :max_quantity_per_transaction, class: 'form-control' %>
           </label><% if f.object.ticket_groups.select(&:persisted?).length > 0 %><label>
@@ -53,11 +60,12 @@
       .ticket_type { margin-bottom: 10px; padding: 15px; padding-bottom: 10px; border: 1px solid #DADADE; border-radius: 5px }
       .ticket_type > * { font-size: 14.45px }
       .ticket_type > div, .ticket_type > label { display: inline-block; margin-bottom: 5px; margin-right: 5px }
-      .ticket_type > .ticket-type-description { display: block; margin-right: 0 }
+      .ticket_type > .ticket-type-description, .ticket_type > .ticket-type-minimum-monthly-donation { display: block; margin-right: 0 }
       .ticket_type input[name$='[name]'] { display: inline-block; width: auto }
       .ticket_type input[name$='[price]'] { display: inline-block; width: 6em }
       .ticket_type input[name$='[quantity]'] { display: inline-block; width: 7em }
       .ticket_type input[name$='[max_quantity_per_transaction]'] { display: inline-block; width: 5em }
+      .ticket_type input[name$='[minimum_monthly_donation]'] { display: inline-block; width: 5em }
       .ticket_type select[name$='[ticket_group_id]'] { display: inline-block; width: auto }
       .ticket_type a.btn { margin-bottom: 5px }
     </style>
@@ -81,59 +89,59 @@
           orderInput.appendTo(d);
 
           var nameDiv = $('<div></div>')
-          var nameInput = $('<input type="text" />');
+          var nameInput = $('<input type="text" class="form-control" placeholder="Name" />');
           nameInput.attr('name', 'event[ticket_types_attributes][' + c + '][name]');
           nameInput.attr('id', 'event_ticket_types_attributes_' + c + '_name');
-          nameInput.attr('placeholder', 'Name');
-          nameInput.addClass('form-control');
           nameInput.appendTo(nameDiv);
           nameDiv.appendTo(d);
 
           var priceDiv = $('<div><%= Money.new(0, f.object.currency).symbol %></div>')
-          var priceInput = $('<input type="number" step="any" />');
+          var priceInput = $('<input type="number" step="any" class="form-control ml-1" placeholder="Price" />');
           priceInput.attr('name', 'event[ticket_types_attributes][' + c + '][price]');
           priceInput.attr('id', 'event_ticket_types_attributes_' + c + '_price');
-          priceInput.attr('placeholder', 'Price');
-          priceInput.attr('step', 'any');
-          priceInput.addClass('form-control ml-1');
           priceInput.appendTo(priceDiv);
           priceDiv.appendTo(d);
 
           var quantityDiv = $('<div>&times;</div>')
-          var quantityInput = $('<input type="number" step="any" />');
+          var quantityInput = $('<input type="number" step="any" class="form-control ml-1" placeholder="Quantity" />');
           quantityInput.attr('name', 'event[ticket_types_attributes][' + c + '][quantity]');
           quantityInput.attr('id', 'event_ticket_types_attributes_' + c + '_quantity');
-          quantityInput.attr('placeholder', 'Quantity');
-          quantityInput.addClass('form-control ml-1');
           quantityInput.appendTo(quantityDiv);
           quantityDiv.appendTo(d);
 
           var descriptionDiv = $('<div class="ticket-type-description"></div>')
-          var descriptionInput = $('<input type="text" />');
+          var descriptionInput = $('<input type="text" class="form-control" placeholder="Description" />');
           descriptionInput.attr('name', 'event[ticket_types_attributes][' + c + '][description]');
           descriptionInput.attr('id', 'event_ticket_types_attributes_' + c + '_description');
-          descriptionInput.attr('placeholder', 'Description');
-          descriptionInput.addClass('form-control');
           descriptionInput.appendTo(descriptionDiv);
           descriptionDiv.appendTo(d);
 
+          <% if @event.organisation.gocardless_access_token || @event.organisation.patreon_api_key %>
+            var minimumMonthlyDonationDiv = $('<div class="ticket-type-minimum-monthly-donation"></div>')
+            minimumMonthlyDonationStrong = $('<strong>Minimum monthly donation</strong> <span><%= Money.new(0, f.object.currency).symbol %></span>')
+            minimumMonthlyDonationStrong.appendTo(minimumMonthlyDonationDiv);
+            var minimumMonthlyDonationInput = $('<input type="number" step="any" class="form-control ml-1" />');
+            minimumMonthlyDonationInput.attr('name', 'event[ticket_types_attributes][' + c + '][minimum_monthly_donation]');
+            minimumMonthlyDonationInput.attr('id', 'event_ticket_types_attributes_' + c + '_minimum_monthly_donation');
+            minimumMonthlyDonationInput.appendTo(minimumMonthlyDonationDiv);
+            minimumMonthlyDonationDiv.appendTo(d);
+          <% end %>
+
           var maxQuantityPerTransactionDiv = $('<label>Limit per order </label>')
-          var maxQuantityPerTransactionInput = $('<input type="number" step="any" />');
+          var maxQuantityPerTransactionInput = $('<input type="number" step="any" class="form-control" />');
           maxQuantityPerTransactionInput.attr('name', 'event[ticket_types_attributes][' + c + '][max_quantity_per_transaction]');
           maxQuantityPerTransactionInput.attr('id', 'event_ticket_types_attributes_' + c + '_max_quantity_per_transaction');
-          maxQuantityPerTransactionInput.addClass('form-control');
           maxQuantityPerTransactionInput.appendTo(maxQuantityPerTransactionDiv);
           maxQuantityPerTransactionDiv.appendTo(d);
 
       <% if f.object.ticket_groups.select(&:persisted?).length > 0 %>
             var ticketGroupDiv = $('<label>Group </label>')
-            var ticketGroupInput = $('<select><option></option></select>');
+            var ticketGroupInput = $('<select class="form-control ml-1"><option></option></select>');
         <% f.object.ticket_groups.select(&:persisted?).each { |ticket_group| %>
               ticketGroupInput.append('<option value="<%= ticket_group.id %>"><%= escape_html ticket_group.name %></option>')
         <% } %>
             ticketGroupInput.attr('name', 'event[ticket_types_attributes][' + c + '][ticket_group_id]');
             ticketGroupInput.attr('id', 'event_ticket_types_attributes_' + c + '_ticket_group_id');
-            ticketGroupInput.addClass('form-control ml-1');
             ticketGroupInput.appendTo(ticketGroupDiv);
             ticketGroupDiv.appendTo(d);
       <% end %>

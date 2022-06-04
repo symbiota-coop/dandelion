@@ -21,102 +21,105 @@
         <%= hidden_field_tag :affiliate_type, value: params[:affiliate_type] %>
         <%= hidden_field_tag :affiliate_id, value: params[:affiliate_id] %>
         <table class="table">
-              <% no_ticket_groups = @event.ticket_types.all? { |ticket_type| !ticket_type.ticket_group } %>
-              <% previous_ticket_group = 'Other tickets'; @event.ticket_types.order('order asc, price desc').each_with_index { |ticket_type,i| %>
-              <% if !ticket_type.hidden or params[:ticket_type_id] == ticket_type.id.to_s %>
-                <% unless no_ticket_groups %>
-                  <% tg = ticket_type.ticket_group.try(:name) || 'Other tickets'; if tg != previous_ticket_group %>
-                  <tr>
-                    <td colspan="3" style="text-transform: uppercase; font-size: 80%" class="bg-primary text-white text-center font-weight-bold"><%= tg %></td>
-                  </tr>
-                  <% previous_ticket_group = ticket_type.ticket_group.try(:name) %>
-                <% end %>
-              <% end %>
-              <tr>
-                <td <% if i == 0 %>style="border-top: 0"<% end %>>
-                  <%= ticket_type.name %>
-                  <% if ticket_type.hidden %>
-                    <i class="fa fa-lock"></i>
-                  <% end %>
-                </td>
-                <td <% if i == 0 %>style="border-top: 0"<% end %>>
-                  <% unless ticket_type.price == 0 %>
-                    <%= m ticket_type.price, @event.currency %>
-                  <% end %>
-                </td>
-                <td style="width: 50%; <% if i == 0 %>border-top: 0<% end %>">
-                  <% if ticket_type.number_of_tickets_available_in_single_purchase > 0 %>
-                    <div class="row justify-content-between align-items-center">
-                      <div class="col">
-                        <%= select_tag :"quantities[#{ticket_type.id}]", 'data-ticket-type-id': ticket_type.id, 'data-price': ticket_type.price, style: 'width: auto; display: inline-block', class: 'form-control', options: (0..ticket_type.number_of_tickets_available_in_single_purchase).to_a, value: (params[:quantities][ticket_type.id.to_s] if params[:quantities]) %>
-                      </div>
-                      <% if ticket_type.wiser_remaining <= 3 %>
-                        <div class="col-auto">
-                          <span class="badge badge-secondary"><%= ticket_type.wiser_remaining %> left</span>
-                        </div>
-                      <% end %>
-                    </div>
-                  <% else %>
-                    <span class="badge badge-primary">Sold out</span>
-                  <% end %>
-                </td>
-              </tr>
-              <% if ticket_type.description %>
-              <tr>
-                <td style="border: 0; padding-top: 0" class="text-muted" colspan="3">
-                  <%= ticket_type.description %>
-                </td>
-              </tr>
-              <% end %>
+          <% no_ticket_groups = @event.ticket_types.all? { |ticket_type| !ticket_type.ticket_group } %>
+          <% previous_ticket_group = 'Other tickets'; @event.ticket_types.order('order asc, price desc').each_with_index { |ticket_type,i| %>
+          <% next if ticket_type.hidden && params[:ticket_type_id] != ticket_type.id.to_s; %>
+          <% next if ticket_type.minimum_monthly_donation && !((organisationship = @event.organisation.organisationships.find_by(account: current_account)) && Money.new(organisationship.monthly_donation_amount * 100, organisationship.monthly_donation_currency) >= Money.new(ticket_type.minimum_monthly_donation * 100, @event.currency)) %>
+          <% unless no_ticket_groups %>
+            <% tg = ticket_type.ticket_group.try(:name) || 'Other tickets'; if tg != previous_ticket_group %>
+            <tr>
+              <td colspan="3" style="text-transform: uppercase; font-size: 80%" class="bg-primary text-white text-center font-weight-bold"><%= tg %></td>
+            </tr>
+            <% previous_ticket_group = ticket_type.ticket_group.try(:name) %>
+          <% end %>
+        <% end %>
+        <tr>
+          <td <% if i == 0 %>style="border-top: 0"<% end %>>
+            <%= ticket_type.name %>
+            <% if ticket_type.hidden %>
+              <i data-toggle="tooltip" title="Available to you as you used a special link" class="fa fa-lock"></i>
             <% end %>
-            <% } %>
-            <% if @event.all_discount_codes.count > 0 %>
-              <tr>
-                <td></td>
-                <td></td>
-                <td>
-                  <strong>Apply a code</strong>
-                  <% if params[:discount_code] &&
+            <% if ticket_type.minimum_monthly_donation %>
+              <i data-toggle="tooltip" title="Available to you for donating <%=m ticket_type.minimum_monthly_donation, @event.currency%>+/month" class="fa fa-star-o"></i>
+            <% end %>
+          </td>
+          <td <% if i == 0 %>style="border-top: 0"<% end %>>
+            <% unless ticket_type.price == 0 %>
+              <%= m ticket_type.price, @event.currency %>
+            <% end %>
+          </td>
+          <td style="width: 50%; <% if i == 0 %>border-top: 0<% end %>">
+            <% if ticket_type.number_of_tickets_available_in_single_purchase > 0 %>
+              <div class="row justify-content-between align-items-center">
+                <div class="col">
+                  <%= select_tag :"quantities[#{ticket_type.id}]", 'data-ticket-type-id': ticket_type.id, 'data-price': ticket_type.price, style: 'width: auto; display: inline-block', class: 'form-control', options: (0..ticket_type.number_of_tickets_available_in_single_purchase).to_a, value: (params[:quantities][ticket_type.id.to_s] if params[:quantities]) %>
+                </div>
+                <% if ticket_type.wiser_remaining <= 3 %>
+                  <div class="col-auto">
+                    <span class="badge badge-secondary"><%= ticket_type.wiser_remaining %> left</span>
+                  </div>
+                <% end %>
+              </div>
+            <% else %>
+              <span class="badge badge-primary">Sold out</span>
+            <% end %>
+          </td>
+        </tr>
+        <% if ticket_type.description %>
+          <tr>
+            <td style="border: 0; padding-top: 0" class="text-muted" colspan="3">
+              <%= ticket_type.description %>
+            </td>
+          </tr>
+        <% end %>
+        <% } %>
+        <% if @event.all_discount_codes.count > 0 %>
+          <tr>
+            <td></td>
+            <td></td>
+            <td>
+              <strong>Apply a code</strong>
+              <% if params[:discount_code] &&
                             (discount_code = @event.all_discount_codes.find_by(code: params[:discount_code])) &&
                             (discount_code.applies_to?(@event)) %>
-                  <div class="input-group" style="margin: 5px 0">
-                    <%= text_field_tag :discount_code_display, id: 'discount_code_display', class: 'form-control', style: 'width: 5em', disabled: true, value: params[:discount_code] %>
-                    <%= hidden_field_tag :discount_code_id, id: 'discount_code_id', value: discount_code.id %>
-                    <div class="input-group-append">
-                      <button class="btn btn-outline-secondary" type="button" onclick="
+              <div class="input-group" style="margin: 5px 0">
+                <%= text_field_tag :discount_code_display, id: 'discount_code_display', class: 'form-control', style: 'width: 5em', disabled: true, value: params[:discount_code] %>
+                <%= hidden_field_tag :discount_code_id, id: 'discount_code_id', value: discount_code.id %>
+                <div class="input-group-append">
+                  <button class="btn btn-outline-secondary" type="button" onclick="
                               var qs = $.deparam(window.location.search.substring(1))
                               delete qs['discount_code']
                               var quantities = {}
                               $('#ticket-types form select[data-ticket-type-id]').each(function() {
                                 quantities[$(this).attr('data-ticket-type-id')] = $(this).val()
                               })
-                              qs['quantities'] = quantities                              
+                              qs['quantities'] = quantities
                               window.location = window.location.pathname + '?' + $.param(qs) + '#select-tickets'
                               ">Remove</button>
-                    </div>
+                </div>
+              </div>
+              <strong>Discount applied</strong>
+              <div class="input-group" style="margin: 5px 0">
+                <% if discount_code.fixed_discount %>
+                  <% show_balance = true %>
+                  <div class="input-group-prepend">
+                    <span class="py-0 input-group-text">
+                      <%= Money.new(0, @event.currency).symbol %>
+                    </span>
                   </div>
-                  <strong>Discount applied</strong>
-                  <div class="input-group" style="margin: 5px 0">
-                    <% if discount_code.fixed_discount %>
-                      <% show_balance = true %>
-                      <div class="input-group-prepend">
-                        <span class="py-0 input-group-text">
-                          <%= Money.new(0, @event.currency).symbol %>
-                        </span>
-                      </div>
-                      <%= number_field_tag :fixed_discount, id: 'fixed_discount', class: 'form-control', style: 'width: 5em', disabled: true, value: discount_code.fixed_discount %>
-                    <% elsif discount_code.percentage_discount %>
-                      <%= number_field_tag :percentage_discount, id: 'percentage_discount', class: 'form-control', style: 'width: 5em', disabled: true, value: discount_code.percentage_discount %>
-                      <div class="input-group-append">
-                        <span class="py-0 input-group-text">%</span>
-                      </div>
-                    <% end %>
+                  <%= number_field_tag :fixed_discount, id: 'fixed_discount', class: 'form-control', style: 'width: 5em', disabled: true, value: discount_code.fixed_discount %>
+                <% elsif discount_code.percentage_discount %>
+                  <%= number_field_tag :percentage_discount, id: 'percentage_discount', class: 'form-control', style: 'width: 5em', disabled: true, value: discount_code.percentage_discount %>
+                  <div class="input-group-append">
+                    <span class="py-0 input-group-text">%</span>
                   </div>
-                <% else %>
-                  <div class="input-group" style="margin: 5px 0">
-                    <%= text_field_tag :discount_code, id: 'discount_code', class: 'form-control', style: 'width: 5em' %>
-                    <div class="input-group-append">
-                      <button class="btn btn-outline-secondary" type="button" onclick="
+                <% end %>
+              </div>
+            <% else %>
+              <div class="input-group" style="margin: 5px 0">
+                <%= text_field_tag :discount_code, id: 'discount_code', class: 'form-control', style: 'width: 5em' %>
+                <div class="input-group-append">
+                  <button class="btn btn-outline-secondary" type="button" onclick="
                               var qs = $.deparam(window.location.search.substring(1))
                               qs['discount_code'] = $('#discount_code').val()
                               var quantities = {}
@@ -126,216 +129,216 @@
                               qs['quantities'] = quantities
                               window.location = window.location.pathname + '?' + $.param(qs) + '#select-tickets'
                               ">Apply</button>
-                    </div>
-                  <% end %>
                 </div>
-              </td>
-            </tr>
-          <% end %>
-          <% unless @event.no_discounts %>
-            <% if current_account && (organisationship = @event.organisation.organisationships.find_by(account: current_account)) && organisationship.monthly_donor? && organisationship.monthly_donor_discount > 0 %>
-              <tr>
-                <td></td>
-                <td></td>
-                <td>
-                  <strong><%= organisationship.organisation_tier.name %> discount</strong>
-                  <div class="input-group" style="margin: 5px 0">
-                    <%= number_field_tag :discount, id: 'discount', class: 'form-control', style: 'width: 5em', disabled: true, value: organisationship.monthly_donor_discount %>
-                    <div class="input-group-append">
-                      <span class="py-0 input-group-text">%</span>
-                    </div>
-                  </div>
-                </td>
-              </tr>
-            <% end %>
-          <% end %>
-          <% if @event.suggested_donation %>
-            <tr>
-              <td></td>
-              <td></td>
-              <td>
-                <strong>
-                  <%== Sanitize.fragment(@event.add_a_donation_to || @event.organisation.add_a_donation_to || "Add a donation to #{@event.organisation.name}", Sanitize::Config::DANDELION) %>
-                  <%= "(minimum #{m @event.minimum_donation, @event.currency})" if @event.minimum_donation %>
-                </strong>
-                <div class="input-group" style="margin: 5px 0">
-                  <div class="input-group-prepend">
-                    <span class="input-group-text"><%= Money.new(0, @event.currency).symbol %></span>
-                  </div>
-                  <script>
-                    $(function() {
-                      $('#donation_amount').change(function() {
-                        if ($(this).val() < <%=@event.minimum_donation%>)
-                          $(this).val('<%=@event.minimum_donation%>')
-                      })
-                    })
-                  </script>
-                  <%= number_field_tag :donation_amount, id: 'donation_amount', class: 'form-control', style: 'width: 5em', value: @event.suggested_donation, min: (@event.minimum_donation || 0) %>
-                </div>
-                <% if (Padrino.env == :development || @organisation.verified?) && (@event.donation_text || @event.organisation.donation_text) %>
-                  <%== @event.donation_text || @event.organisation.donation_text %>
-                <% else %>
-                  <%== Sanitize.fragment(@event.donation_text || @event.organisation.donation_text, Sanitize::Config::DANDELION) %>
-                <% end %>
-              </td>
-            </tr>
-          <% end %>
+              <% end %>
+            </div>
+          </td>
+        </tr>
+      <% end %>
+      <% unless @event.no_discounts %>
+        <% if current_account && (organisationship = @event.organisation.organisationships.find_by(account: current_account)) && organisationship.monthly_donor? && organisationship.monthly_donor_discount > 0 %>
           <tr>
             <td></td>
             <td></td>
             <td>
-              <strong>Total</strong>
+              <strong><%= organisationship.organisation_tier.name %> discount</strong>
               <div class="input-group" style="margin: 5px 0">
-                <div class="input-group-prepend">
-                  <span class="input-group-text"><%= Money.new(0, @event.currency).symbol %></span>
+                <%= number_field_tag :discount, id: 'discount', class: 'form-control', style: 'width: 5em', disabled: true, value: organisationship.monthly_donor_discount %>
+                <div class="input-group-append">
+                  <span class="py-0 input-group-text">%</span>
                 </div>
-                <%= number_field_tag :totalDisplay, id: 'totalDisplay', class: 'form-control', style: 'width: 5em', disabled: true %>
-                <%= hidden_field_tag :total, id: 'total' %>
               </div>
             </td>
           </tr>
-          <% if current_account && (organisationship = @event.organisation.organisationships.find_by(account: current_account)) && organisationship.credit_balance > 0 && FIAT_CURRENCIES.include?(@event.currency) %>
-            <% show_balance = true %>
-            <tr>
-              <td></td>
-              <td></td>
-              <td>
-                <strong>Credit</strong>
-                <div class="input-group" style="margin: 5px 0">
-                  <div class="input-group-prepend">
-                    <span class="input-group-text"><%= Money.new(0, @event.currency).symbol %></span>
-                  </div>
-                  <%= number_field_tag :credit, id: 'credit', class: 'form-control', style: 'width: 5em', disabled: true, value: format('%.2f', (organisationship.credit_balance.exchange_to(@event.currency).cents.to_f / 100)) %>
-                </div>
-              </td>
-            </tr>
-          <% end %>
-          <% if show_balance %>
-            <tr>
-              <td></td>
-              <td></td>
-              <td>
-                <strong>Balance</strong>
-                <div class="input-group" style="margin: 5px 0">
-                  <div class="input-group-prepend">
-                    <span class="input-group-text"><%= Money.new(0, @event.currency).symbol %></span>
-                  </div>
-                  <%= number_field_tag :balance, id: 'balance', class: 'form-control', style: 'width: 5em', disabled: true %>
-                </div>
-              </td>
-            </tr>
-          <% end %>
-        </table>
+        <% end %>
       <% end %>
-    </div>
-    <% if @event.select_tickets_outro %>
-      <table class="table table-borderless mb-0">
+      <% if @event.suggested_donation %>
         <tr>
+          <td></td>
+          <td></td>
           <td>
-            <%= Sanitize.fragment(Rinku.auto_link(@event.select_tickets_outro), Sanitize::Config::DANDELION) %>
+            <strong>
+              <%== Sanitize.fragment(@event.add_a_donation_to || @event.organisation.add_a_donation_to || "Add a donation to #{@event.organisation.name}", Sanitize::Config::DANDELION) %>
+              <%= "(minimum #{m @event.minimum_donation, @event.currency})" if @event.minimum_donation %>
+            </strong>
+            <div class="input-group" style="margin: 5px 0">
+              <div class="input-group-prepend">
+                <span class="input-group-text"><%= Money.new(0, @event.currency).symbol %></span>
+              </div>
+              <script>
+                $(function() {
+                  $('#donation_amount').change(function() {
+                    if ($(this).val() < <%=@event.minimum_donation%>)
+                      $(this).val('<%=@event.minimum_donation%>')
+                  })
+                })
+              </script>
+              <%= number_field_tag :donation_amount, id: 'donation_amount', class: 'form-control', style: 'width: 5em', value: @event.suggested_donation, min: (@event.minimum_donation || 0) %>
+            </div>
+            <% if (Padrino.env == :development || @organisation.verified?) && (@event.donation_text || @event.organisation.donation_text) %>
+              <%== @event.donation_text || @event.organisation.donation_text %>
+            <% else %>
+              <%== Sanitize.fragment(@event.donation_text || @event.organisation.donation_text, Sanitize::Config::DANDELION) %>
+            <% end %>
           </td>
         </tr>
-      </table>
-    <% end %>
-  </div>
-  <h3 class="card-header bg-primary text-white">Your details</h3>
-  <div class="card-body" id="details">
-    <script>
-      $(function () {
-        $('#account_name').attr('required', 'required')
-      })
-    </script>
-    <% form_for (@account = current_account || Account.new(country: 'United Kingdom of Great Britain and Northern Ireland')), '' do |f| %>
-      <% if current_account %>
-        <p class="lead">Signed in as <%= current_account.name %> (<%= current_account.email %>)</p>
-        <%= f.hidden_field :name %>
-        <%= f.hidden_field :email %>
-      <% else %>
-        <%= f.text_block :name %>
-        <%= f.email_block :email %>
-        <% if @event.organisation.collect_location %>
-          <%= f.text_block :postcode %>
-          <%= f.select_block :country %>
-        <% end %>
       <% end %>
-      <%= f.text_block :hear_about %>
-      <%= f.hidden_field :http_referrer, value: request.referrer %>
-      <% @event.questions_a.each_with_index { |q,i| %>
-      <div class="form-group">
-        <% if m = q.match(/\[(.*)\]/)  %>
-          <div class="checkbox-inline">
-            <%= check_box_tag "answers[#{i}]", id: "answers-#{i}" %>
-            <label class="font-weight-bold" for="answers-<%=i%>"><%== Sanitize.fragment(Rinku.auto_link(m[1]), Sanitize::Config::DANDELION) %></label>
-           </div>
-        <% else %>
-          <label><%== Sanitize.fragment(Rinku.auto_link(q), Sanitize::Config::DANDELION) %>*</label>
-          <div>
-            <%= text_area_tag "answers[#{i}]", required: true, class: 'autosize form-control' %>
+      <tr>
+        <td></td>
+        <td></td>
+        <td>
+          <strong>Total</strong>
+          <div class="input-group" style="margin: 5px 0">
+            <div class="input-group-prepend">
+              <span class="input-group-text"><%= Money.new(0, @event.currency).symbol %></span>
+            </div>
+            <%= number_field_tag :totalDisplay, id: 'totalDisplay', class: 'form-control', style: 'width: 5em', disabled: true %>
+            <%= hidden_field_tag :total, id: 'total' %>
           </div>
-        <% end %>
-      </div>
-      <% } %>
-      <% if current_account && @event.organisation_and_cohosts.all? { |organisation| current_account.organisationships.find_by(organisation: organisation) } %>
-        <%= f.hidden_field :opt_in_organisation, value: 1 %>
+        </td>
+      </tr>
+      <% if current_account && (organisationship = @event.organisation.organisationships.find_by(account: current_account)) && organisationship.credit_balance > 0 && FIAT_CURRENCIES.include?(@event.currency) %>
+        <% show_balance = true %>
+        <tr>
+          <td></td>
+          <td></td>
+          <td>
+            <strong>Credit</strong>
+            <div class="input-group" style="margin: 5px 0">
+              <div class="input-group-prepend">
+                <span class="input-group-text"><%= Money.new(0, @event.currency).symbol %></span>
+              </div>
+              <%= number_field_tag :credit, id: 'credit', class: 'form-control', style: 'width: 5em', disabled: true, value: format('%.2f', (organisationship.credit_balance.exchange_to(@event.currency).cents.to_f / 100)) %>
+            </div>
+          </td>
+        </tr>
+      <% end %>
+      <% if show_balance %>
+        <tr>
+          <td></td>
+          <td></td>
+          <td>
+            <strong>Balance</strong>
+            <div class="input-group" style="margin: 5px 0">
+              <div class="input-group-prepend">
+                <span class="input-group-text"><%= Money.new(0, @event.currency).symbol %></span>
+              </div>
+              <%= number_field_tag :balance, id: 'balance', class: 'form-control', style: 'width: 5em', disabled: true %>
+            </div>
+          </td>
+        </tr>
+      <% end %>
+    </table>
+  <% end %>
+</div>
+<% if @event.select_tickets_outro %>
+  <table class="table table-borderless mb-0">
+    <tr>
+      <td>
+        <%= Sanitize.fragment(Rinku.auto_link(@event.select_tickets_outro), Sanitize::Config::DANDELION) %>
+      </td>
+    </tr>
+  </table>
+<% end %>
+</div>
+<h3 class="card-header bg-primary text-white">Your details</h3>
+<div class="card-body" id="details">
+  <script>
+    $(function () {
+      $('#account_name').attr('required', 'required')
+    })
+  </script>
+  <% form_for (@account = current_account || Account.new(country: 'United Kingdom of Great Britain and Northern Ireland')), '' do |f| %>
+    <% if current_account %>
+      <p class="lead">Signed in as <%= current_account.name %> (<%= current_account.email %>)</p>
+      <%= f.hidden_field :name %>
+      <%= f.hidden_field :email %>
+    <% else %>
+      <%= f.text_block :name %>
+      <%= f.email_block :email %>
+      <% if @event.organisation.collect_location %>
+        <%= f.text_block :postcode %>
+        <%= f.select_block :country %>
+      <% end %>
+    <% end %>
+    <%= f.text_block :hear_about %>
+    <%= f.hidden_field :http_referrer, value: request.referrer %>
+    <% @event.questions_a.each_with_index { |q,i| %>
+    <div class="form-group">
+      <% if m = q.match(/\[(.*)\]/)  %>
+        <div class="checkbox-inline">
+          <%= check_box_tag "answers[#{i}]", id: "answers-#{i}" %>
+          <label class="font-weight-bold" for="answers-<%=i%>"><%== Sanitize.fragment(Rinku.auto_link(m[1]), Sanitize::Config::DANDELION) %></label>
+        </div>
       <% else %>
-        <script>
-          $(function () {
-            $('#opt-in-organisation label').html('Get email updates from <%== @event.organisation_and_cohosts.map { |organisation| Sanitize.fragment(organisation.name) }.to_sentence(last_word_connector: ' and ') %>')
-            $('#opt-in-organisation').show()
-          })
-        </script>
-        <div id="opt-in-organisation" style="display: none">
-          <%= f.check_box_block :opt_in_organisation %>
+        <label><%== Sanitize.fragment(Rinku.auto_link(q), Sanitize::Config::DANDELION) %>*</label>
+        <div>
+          <%= text_area_tag "answers[#{i}]", required: true, class: 'autosize form-control' %>
         </div>
       <% end %>
-      <% if @event.opt_in_facilitator && @event.event_facilitators.count > 0 %>
-        <script>
-          $(function () {
-            $('#opt-in-facilitator label').text('Get email updates from <%= @event.event_facilitators.map(&:firstname).to_sentence(last_word_connector: ' and ') %>')
-            $('#opt-in-facilitator').show()
-          })
-        </script>
-        <div id="opt-in-facilitator" style="display: none">
-          <%= f.check_box_block :opt_in_facilitator %>
-        </div>
-      <% end %>
-      <button class="btn btn-primary btn-block mb-1" type="submit" data-payment-method="rsvp">
-        <span>RSVP</span>
+    </div>
+    <% } %>
+    <% if current_account && @event.organisation_and_cohosts.all? { |organisation| current_account.organisationships.find_by(organisation: organisation) } %>
+      <%= f.hidden_field :opt_in_organisation, value: 1 %>
+    <% else %>
+      <script>
+        $(function () {
+          $('#opt-in-organisation label').html('Get email updates from <%== @event.organisation_and_cohosts.map { |organisation| Sanitize.fragment(organisation.name) }.to_sentence(last_word_connector: ' and ') %>')
+          $('#opt-in-organisation').show()
+        })
+      </script>
+      <div id="opt-in-organisation" style="display: none">
+        <%= f.check_box_block :opt_in_organisation %>
+      </div>
+    <% end %>
+    <% if @event.opt_in_facilitator && @event.event_facilitators.count > 0 %>
+      <script>
+        $(function () {
+          $('#opt-in-facilitator label').text('Get email updates from <%= @event.event_facilitators.map(&:firstname).to_sentence(last_word_connector: ' and ') %>')
+          $('#opt-in-facilitator').show()
+        })
+      </script>
+      <div id="opt-in-facilitator" style="display: none">
+        <%= f.check_box_block :opt_in_facilitator %>
+      </div>
+    <% end %>
+    <button class="btn btn-primary btn-block mb-1" type="submit" data-payment-method="rsvp">
+      <span>RSVP</span>
+      <i class="fa fa-spin fa-circle-o-notch" style="display: none"></i>
+    </button>
+    <% if @event.organisation.stripe_sk && FIAT_CURRENCIES.include?(@event.currency) %>
+      <button class="btn btn-primary btn-block mb-1" type="submit" data-payment-method="stripe">
+        <span>Pay</span>
         <i class="fa fa-spin fa-circle-o-notch" style="display: none"></i>
       </button>
-      <% if @event.organisation.stripe_sk && FIAT_CURRENCIES.include?(@event.currency) %>
-        <button class="btn btn-primary btn-block mb-1" type="submit" data-payment-method="stripe">
-          <span>Pay</span>
-          <i class="fa fa-spin fa-circle-o-notch" style="display: none"></i>
-        </button>
-        <%= hidden_field_tag :payment_method, value: 'stripe', disabled: true %>
-      <% end %>
-      <% if @event.organisation.coinbase_api_key && (FIAT_CURRENCIES.include?(@event.currency) || COINBASE_CURRENCIES.include?(@event.currency)) %>
-        <button class="btn btn-primary btn-block mb-1 btn-dotted" type="submit" data-payment-method="coinbase">
-          <span>Pay with Crypto</span>
-          <i class="fa fa-spin fa-circle-o-notch" style="display: none"></i>
-        </button>
-        <%= hidden_field_tag :payment_method, value: 'coinbase', disabled: true %>
-      <% end %>
-      <% if @event.organisation.seeds_username && @event.currency == 'SEEDS' %>
-        <button class="btn btn-primary btn-block mb-1 btn-dotted" type="submit" data-payment-method="seeds">
-          <span>Pay with SEEDS</span>
-          <i class="fa fa-spin fa-circle-o-notch" style="display: none"></i>
-        </button>
-        <%= hidden_field_tag :payment_method, value: 'seeds', disabled: true %>
-      <% end %>
-      <% if @event.organisation.xdai_address && XDAI_CURRENCIES.include?(@event.currency) %>
-        <button class="btn btn-primary btn-block mb-1 btn-dotted" type="submit" data-payment-method="xdai">
-          <span>Pay with xDai</span>
-          <i class="fa fa-spin fa-circle-o-notch" style="display: none"></i>
-        </button>
-        <%= hidden_field_tag :payment_method, value: 'xdai', disabled: true %>
-      <% end %>
-      <%= hidden_field_tag :utm_source, value: params[:utm_source] %>
-      <%= hidden_field_tag :utm_medium, value: params[:utm_medium] %>
-      <%= hidden_field_tag :utm_campaign, value: params[:utm_campaign] %>
+      <%= hidden_field_tag :payment_method, value: 'stripe', disabled: true %>
     <% end %>
-  </div>
+    <% if @event.organisation.coinbase_api_key && (FIAT_CURRENCIES.include?(@event.currency) || COINBASE_CURRENCIES.include?(@event.currency)) %>
+      <button class="btn btn-primary btn-block mb-1 btn-dotted" type="submit" data-payment-method="coinbase">
+        <span>Pay with Crypto</span>
+        <i class="fa fa-spin fa-circle-o-notch" style="display: none"></i>
+      </button>
+      <%= hidden_field_tag :payment_method, value: 'coinbase', disabled: true %>
+    <% end %>
+    <% if @event.organisation.seeds_username && @event.currency == 'SEEDS' %>
+      <button class="btn btn-primary btn-block mb-1 btn-dotted" type="submit" data-payment-method="seeds">
+        <span>Pay with SEEDS</span>
+        <i class="fa fa-spin fa-circle-o-notch" style="display: none"></i>
+      </button>
+      <%= hidden_field_tag :payment_method, value: 'seeds', disabled: true %>
+    <% end %>
+    <% if @event.organisation.xdai_address && XDAI_CURRENCIES.include?(@event.currency) %>
+      <button class="btn btn-primary btn-block mb-1 btn-dotted" type="submit" data-payment-method="xdai">
+        <span>Pay with xDai</span>
+        <i class="fa fa-spin fa-circle-o-notch" style="display: none"></i>
+      </button>
+      <%= hidden_field_tag :payment_method, value: 'xdai', disabled: true %>
+    <% end %>
+    <%= hidden_field_tag :utm_source, value: params[:utm_source] %>
+    <%= hidden_field_tag :utm_medium, value: params[:utm_medium] %>
+    <%= hidden_field_tag :utm_campaign, value: params[:utm_campaign] %>
+  <% end %>
+</div>
 </div>
 <div class="card" id="card-error" style="display: none">
   <h3 class="card-header bg-danger text-white">There was an error processing the transaction</h3>

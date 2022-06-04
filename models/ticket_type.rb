@@ -12,6 +12,7 @@ class TicketType
   field :order, type: Integer
   field :hidden, type: Boolean
   field :max_quantity_per_transaction, type: Integer
+  field :minimum_monthly_donation, type: Float
 
   def self.admin_fields
     {
@@ -20,6 +21,7 @@ class TicketType
       price: :number,
       quantity: :number,
       order: :number,
+      minimum_monthly_donation: :number,
       hidden: :check_box,
       max_quantity_per_transaction: :number,
       event_id: :lookup,
