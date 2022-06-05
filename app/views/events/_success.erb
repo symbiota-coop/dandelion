@@ -20,10 +20,10 @@
             <div class="mb-3">
               <% @order.tickets.each_with_index { |ticket,i| %>
                   <div class="row mb-1">
-                    <div class="col">
+                    <div class="col-6">
                       <div data-pagelet-url="/events/<%=@event.id%>/orders/<%=@order.id%>/ticketholders/<%=ticket.id%>/name"></div>
                     </div>
-                    <div class="col-7">
+                    <div class="col-6">
                       <div data-pagelet-url="/events/<%=@event.id%>/orders/<%=@order.id%>/ticketholders/<%=ticket.id%>/email"></div>
                     </div>
                   </div>
