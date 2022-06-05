@@ -69,14 +69,14 @@
   <tr>
     <td>
       <%= partial :'accounts/account', locals: { account: ticket.account, width: '50px', show_email: ticket_email_viewer?(ticket) } %>
-      <% if ticket.name || ticket.email %>
+      <% if ticket.name || (ticket.email && ticket_email_viewer?(ticket)) %>
         <div class="mt-1">
           on behalf of
           <% if ticket.name %>
             <br />
             <strong><%= ticket.name %></strong>
           <% end %>
-          <% if ticket.email %>
+          <% if ticket.email && ticket_email_viewer?(ticket) %>
             <br />
             <small><%=ticket.email %></small>
           <% end %>
