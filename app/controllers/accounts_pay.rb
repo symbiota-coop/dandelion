@@ -58,7 +58,7 @@ Dandelion::App.controller do
           currency: params[:currency],
           quantity: 1
         }],
-        customer_email: current_account.email,
+        customer_email: (current_account.email if current_account),
         success_url: (ENV['BASE_URI']).to_s,
         cancel_url: (ENV['BASE_URI']).to_s
       }
