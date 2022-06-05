@@ -111,7 +111,7 @@
           <button type="submit" name="preview" value="1" class="btn btn-primary">Preview</button>
           <button type="submit" name="duplicate" value="1" class="btn btn-primary">Duplicate</button>
           <button type="submit" name="send_test" value="1" class="btn btn-primary">Send test to <%= current_account.email %></button>
-          <button type="submit" name="send" value="1" class="btn btn-primary" data-confirm="Are you sure you want to send this mail to <%= pluralize(@pmail.to_with_unsubscribes_less_ab_tests.count, 'person') %>?">Send</button>
+          <button type="submit" name="send" value="1" class="btn btn-primary" data-confirm="Are you sure you want to send this mail to <%= pluralize(@pmail.send_count, 'person') %>?">Send</button>
         </div>
       <% end %>
     <% end %>
@@ -237,7 +237,7 @@
       </div>
     <% end %>
     <% if @pmail.persisted? %>
-      <span class="mb-3 badge badge-primary"><%= pluralize(@pmail.to_with_unsubscribes_less_ab_tests.count, 'person') %></span>
+      <span class="mb-3 badge badge-primary"><%= pluralize(@pmail.send_count, 'person') %></span>
     <% end %>
     <%= f.text_block :from %>
     <%= f.text_block :subject %>

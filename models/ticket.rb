@@ -13,6 +13,27 @@ class Ticket
   field :hide_attendance, type: Boolean
   field :subscribed_discussion, type: Boolean
   field :checked_in, type: Boolean
+  field :name, type: String
+  field :email, type: String
+
+  before_validation do
+    if email
+      e = EmailAddress.error(email)
+      errors.add(:email, "- #{e}") if e
+    end
+  end
+
+  def firstname
+    unless name.blank?
+      parts = name.split(' ')
+      n = if parts.count > 1 && %w[mr mrs ms dr].include?(parts[0].downcase.gsub('.', ''))
+            parts[1]
+          else
+            parts[0]
+          end
+      n.capitalize
+    end
+  end
 
   def self.admin_fields
     {
@@ -20,6 +41,8 @@ class Ticket
       price: :number,
       hide_attendance: :check_box,
       checked_in: :check_box,
+      name: :text,
+      email: :email,
       event_id: :lookup,
       account_id: :lookup,
       order_id: :lookup,

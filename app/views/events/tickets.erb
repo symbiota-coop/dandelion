@@ -1,5 +1,4 @@
 <%= partial :'events/nav', locals: { event: @event } %>
-
 <div class="row">
   <div class="col">
     <% form_tag '', method: 'get', class: 'submitOnChange searchForm form-inline mb-3' do %>
@@ -20,14 +19,12 @@
     $(function() { $('#create-ticket-button').click() })
   </script>
 <% end %>
-
 <% form_for @event.tickets.new, "/events/#{@event.id}/create_ticket", id: 'create-ticket', style: 'display: none', class: 'mb-5' do |f| %>
   <%= f.text_block :name %>
   <%= f.text_block :email %>
   <%= f.select_block :ticket_type_id, options: @event.ticket_types.map { |ticket_type| [ticket_type.name, ticket_type.id] } %>
   <%= f.submit_block %>
 <% end %>
-
 <% if event_email_viewer? %>
   <pre>
     <%== Account.and(:id.in => @tickets.pluck(:account_id)).map { |account| "#{Sanitize.fragment(account.name)} &lt;#{Sanitize.fragment(account.email)}&gt;" }.join(', ') %>
@@ -72,6 +69,19 @@
   <tr>
     <td>
       <%= partial :'accounts/account', locals: { account: ticket.account, width: '50px', show_email: ticket_email_viewer?(ticket) } %>
+      <% if ticket.name || ticket.email %>
+        <div class="mt-1">
+          on behalf of
+          <% if ticket.name %>
+            <br />
+            <strong><%= ticket.name %></strong>
+          <% end %>
+          <% if ticket.email %>
+            <br />
+            <small><%=ticket.email %></small>
+          <% end %>
+        </div>
+      <% end %>
     </td>
     <td>
       <% if ticket_type = ticket.ticket_type %>

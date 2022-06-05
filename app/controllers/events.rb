@@ -640,4 +640,21 @@ Dandelion::App.controller do
     @scope = "event_id=#{@event.id}"
     erb :'discount_codes/discount_codes'
   end
+
+  get '/events/:id/orders/:order_id/ticketholders/:ticket_id/:f' do
+    @event = Event.find(params[:id]) || not_found
+    @order = @event.orders.find(params[:order_id]) || not_found
+    @ticket = @order.tickets.find(params[:ticket_id])
+    @n = @order.tickets.order('created_at asc').pluck(:id).index(@ticket.id) + 1
+    partial :"events/ticketholder_#{params[:f]}"
+  end
+
+  post '/events/:id/orders/:order_id/ticketholders/:ticket_id/:f' do
+    @event = Event.find(params[:id]) || not_found
+    @order = @event.orders.find(params[:order_id]) || not_found
+    @ticket = @order.tickets.find(params[:ticket_id]) || not_found
+    @ticket.send(:"#{params[:f]}=", params[params[:f]])
+    @ticket.save
+    200
+  end
 end

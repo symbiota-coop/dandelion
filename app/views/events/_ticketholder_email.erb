@@ -1,0 +1,3 @@
+<% form_tag "/events/#{@event.id}/orders/#{@order.id}/ticketholders/#{@ticket.id}/email", id: 'ticketholders', class: 'mb-0' do %>
+  <%= email_field_tag :email, value: @ticket.email, onchange: '$(this.form).submit()', class: 'form-control', placeholder: "Ticketholder #{@n} email" %>
+<% end %>

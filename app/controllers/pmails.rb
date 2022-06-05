@@ -99,7 +99,7 @@ Dandelion::App.controller do
 
   get '/pmails/:pmail_id/preview' do
     @pmail = @pmails.find(params[:pmail_id]) || not_found
-    @pmail.html.gsub('%recipient.firstname%', 'there').gsub(/%recipient\.\w+%/, '_')
+    @pmail.html.gsub('%recipient.firstname%', 'there').gsub('%recipient.footer_class%', 'd-none')
   end
 
   get '/pmails/:pmail_id/destroy' do

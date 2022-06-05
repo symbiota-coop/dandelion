@@ -13,8 +13,24 @@
       </script>
     <% else %>
       <% if @order %>
-        <p>If you don't see anything in your inbox,
-          <span class="highlight">please look in your spam folder</a>.</p>
+        <p>If you don't see anything in your inbox, <span class="highlight">please look in your spam folder</a>.</p>
+
+          <% if @order.tickets.count > 1 %>
+            <p class="mb-3"><strong>Optionally, you can let us know the names and email addresses of ticketholders so they hear about any important updates to the event:</strong></p>
+            <div class="mb-3">
+              <% @order.tickets.each_with_index { |ticket,i| %>
+                  <div class="row mb-1">
+                    <div class="col">
+                      <div data-pagelet-url="/events/<%=@event.id%>/orders/<%=@order.id%>/ticketholders/<%=ticket.id%>/name"></div>
+                    </div>
+                    <div class="col-7">
+                      <div data-pagelet-url="/events/<%=@event.id%>/orders/<%=@order.id%>/ticketholders/<%=ticket.id%>/email"></div>
+                    </div>
+                  </div>
+              <% } %>
+            </div>
+          <% end %>
+
         <% if @event.affiliate_credit_percentage %>
           <% affiliate_link = "#{ENV['BASE_URI']}/events/#{@event.id}?affiliate_type=Account&affiliate_id=#{@order.account_id}" %>
           <p>

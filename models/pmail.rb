@@ -5,8 +5,8 @@ class Pmail
   belongs_to :organisation, index: true
   belongs_to :account, index: true
   belongs_to :mailable, polymorphic: true, index: true, optional: true
-  belongs_to :event, index: true, optional: true, inverse_of: :pmails_as_exclusion
-  belongs_to :activity, index: true, optional: true, inverse_of: :pmails_as_exclusion
+  belongs_to :event, index: true, optional: true, inverse_of: :pmails_as_exclusion # Exclude people attending an event
+  belongs_to :activity, index: true, optional: true, inverse_of: :pmails_as_exclusion # Exclude people attending upcoming events in an activity
 
   field :from, type: String
   field :subject, type: String
@@ -149,6 +149,12 @@ class Pmail
     end
   end
 
+  def send_count
+    c = to_with_unsubscribes_less_ab_tests.count
+    c += mailable.tickets.and(:email.ne => nil).count if mailable.is_a?(Event)
+    c
+  end
+
   def to_with_unsubscribes_less_ab_tests
     if pmail_test && pmail_test.sent_at
       to_with_unsubscribes.and(:id.nin => pmail_test.pmail_testships.map(&:account_ids).flatten)
@@ -227,12 +233,17 @@ class Pmail
 
     if test_to
       accounts = test_to
+    elsif ab_test
+      accounts = accounts.and(:id.in => pmail_testship.account_ids)
     else
-      accounts = to_with_unsubscribes
-      if ab_test
-        accounts = accounts.and(:id.in => pmail_testship.account_ids)
-      elsif pmail_test && pmail_test.sent_at
-        accounts = to_with_unsubscribes_less_ab_tests
+      accounts = to_with_unsubscribes_less_ab_tests
+      if mailable.is_a?(Event)
+        mailable.tickets.and(:email.ne => nil).each do |ticket|
+          batch_message.add_recipient(:to, ticket.email, {
+                                        'firstname' => (ticket.firstname || 'there'),
+                                        'footer_class' => 'd-none'
+                                      })
+        end
       end
     end
 
