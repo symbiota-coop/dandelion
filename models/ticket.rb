@@ -65,7 +65,11 @@ class Ticket
 
     if new_record?
       errors.add(:ticket_type, 'is full') if ticket_type && (ticket_type.number_of_tickets_available_in_single_purchase == 0)
-      if ticket_type && ticket_type.minimum_monthly_donation && !((organisationship = event.organisation.organisationships.find_by(account: account)) && Money.new(organisationship.monthly_donation_amount * 100, organisationship.monthly_donation_currency) >= Money.new(ticket_type.minimum_monthly_donation * 100, event.currency))
+      if ticket_type && ticket_type.minimum_monthly_donation && (
+          !account ||
+          !(organisationship = event.organisation.organisationships.find_by(account: account)) ||
+          !(Money.new(organisationship.monthly_donation_amount * 100, organisationship.monthly_donation_currency) >= Money.new(ticket_type.minimum_monthly_donation * 100, event.currency))
+        )
         errors.add(:ticket_type, 'is not available to someone donating this amount')
       end
       errors.add(:account, 'already has a ticket to this event') if event && zoomship && event.tickets(true).find_by(account: account)

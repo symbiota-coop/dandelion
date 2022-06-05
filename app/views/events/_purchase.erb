@@ -24,7 +24,6 @@
           <% no_ticket_groups = @event.ticket_types.all? { |ticket_type| !ticket_type.ticket_group } %>
           <% previous_ticket_group = 'Other tickets'; @event.ticket_types.order('order asc, price desc').each_with_index { |ticket_type,i| %>
           <% next if ticket_type.hidden && params[:ticket_type_id] != ticket_type.id.to_s; %>
-          <% next if ticket_type.minimum_monthly_donation && !((organisationship = @event.organisation.organisationships.find_by(account: current_account)) && Money.new(organisationship.monthly_donation_amount * 100, organisationship.monthly_donation_currency) >= Money.new(ticket_type.minimum_monthly_donation * 100, @event.currency)) %>
           <% unless no_ticket_groups %>
             <% tg = ticket_type.ticket_group.try(:name) || 'Other tickets'; if tg != previous_ticket_group %>
             <tr>
@@ -40,7 +39,7 @@
               <i data-toggle="tooltip" title="Available to you as you used a special link" class="fa fa-lock"></i>
             <% end %>
             <% if ticket_type.minimum_monthly_donation %>
-              <i data-toggle="tooltip" title="Available to you for donating <%=m ticket_type.minimum_monthly_donation, @event.currency%>+/month" class="fa fa-star-o"></i>
+              <i data-toggle="tooltip" title="Available to those donating <%=m ticket_type.minimum_monthly_donation, @event.currency%>+/month" class="fa fa-star-o"></i>
             <% end %>
           </td>
           <td <% if i == 0 %>style="border-top: 0"<% end %>>
@@ -50,16 +49,26 @@
           </td>
           <td style="width: 50%; <% if i == 0 %>border-top: 0<% end %>">
             <% if ticket_type.number_of_tickets_available_in_single_purchase > 0 %>
-              <div class="row justify-content-between align-items-center">
-                <div class="col">
-                  <%= select_tag :"quantities[#{ticket_type.id}]", 'data-ticket-type-id': ticket_type.id, 'data-price': ticket_type.price, style: 'width: auto; display: inline-block', class: 'form-control', options: (0..ticket_type.number_of_tickets_available_in_single_purchase).to_a, value: (params[:quantities][ticket_type.id.to_s] if params[:quantities]) %>
-                </div>
-                <% if ticket_type.wiser_remaining <= 3 %>
-                  <div class="col-auto">
-                    <span class="badge badge-secondary"><%= ticket_type.wiser_remaining %> left</span>
-                  </div>
+              <% if ticket_type.minimum_monthly_donation && (
+                  !current_account ||
+                  !(organisationship = @event.organisation.organisationships.find_by(account: current_account)) ||
+                  !(Money.new(organisationship.monthly_donation_amount * 100, organisationship.monthly_donation_currency) >= Money.new(ticket_type.minimum_monthly_donation * 100, @event.currency))
+                ) %>
+                <% if !current_account %>
+                  <a href="/accounts/sign_in">Sign in</a>
                 <% end %>
-              </div>
+              <% else %>
+                <div class="row justify-content-between align-items-center">
+                  <div class="col">
+                    <%= select_tag :"quantities[#{ticket_type.id}]", 'data-ticket-type-id': ticket_type.id, 'data-price': ticket_type.price, style: 'width: auto; display: inline-block', class: 'form-control', options: (0..ticket_type.number_of_tickets_available_in_single_purchase).to_a, value: (params[:quantities][ticket_type.id.to_s] if params[:quantities]) %>
+                  </div>
+                  <% if ticket_type.wiser_remaining <= 3 %>
+                    <div class="col-auto">
+                      <span class="badge badge-secondary"><%= ticket_type.wiser_remaining %> left</span>
+                    </div>
+                  <% end %>
+                </div>
+              <% end %>
             <% else %>
               <span class="badge badge-primary">Sold out</span>
             <% end %>
