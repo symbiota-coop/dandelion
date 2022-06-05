@@ -343,11 +343,13 @@ Dandelion::App.controller do
       erb :'events/tickets'
     when :csv
       CSV.generate do |csv|
-        csv << %w[name email ticket_type price created_at]
+        csv << %w[name email on_behalf_of_name on_behalf_of_email ticket_type price created_at]
         @tickets.each do |ticket|
           csv << [
             ticket.account.name,
             ticket_email_viewer?(ticket) ? ticket.account.email : '',
+            ticket.name,
+            ticket_email_viewer?(ticket) ? ticket.email : '',
             ticket.ticket_type.try(:name),
             m(ticket.discounted_price || 0, ticket.order ? ticket.order.currency : ticket.event.currency),
             ticket.created_at.to_s(:db)
@@ -357,11 +359,13 @@ Dandelion::App.controller do
     when :pdf
       @tickets = @tickets.sort_by { |ticket| ticket.account.name }
       Prawn::Document.new do |pdf|
-        pdf.table([%w[name email ticket_type price created_at]] +
+        pdf.table([%w[name email on_behalf_of_name on_behalf_of_email ticket_type price created_at]] +
             @tickets.map do |ticket|
               [
                 ticket.account.name_transliterated,
                 ticket_email_viewer?(ticket) ? ticket.account.email : '',
+                I18n.transliterate(ticket.name),
+                ticket_email_viewer?(ticket) ? ticket.email : '',
                 ticket.ticket_type.try(:name),
                 m(ticket.discounted_price || 0, ticket.order ? ticket.order.currency : ticket.event.currency),
                 ticket.created_at.to_s(:db)
