@@ -358,7 +358,7 @@ Dandelion::App.controller do
       end
     when :pdf
       @tickets = @tickets.sort_by { |ticket| ticket.account.name }
-      Prawn::Document.new do |pdf|
+      Prawn::Document.new(page_layout: :landscape) do |pdf|
         pdf.table([%w[name email on_behalf_of_name on_behalf_of_email ticket_type price created_at]] +
             @tickets.map do |ticket|
               [
