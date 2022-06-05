@@ -1,3 +1,3 @@
 <% form_tag "/events/#{@event.id}/orders/#{@order.id}/ticketholders/#{@ticket.id}/name", id: 'ticketholders', class: 'mb-0' do %>
-  <%= text_field_tag :name, value: @ticket.name, onchange: '$(this.form).submit()', class: 'form-control', placeholder: "Ticketholder #{@n} name" %>
+  <%= text_field_tag :name, value: @ticket.name, onchange: '$(this.form).submit()', class: 'form-control', placeholder: "Name ##{@n}" %>
 <% end %>
