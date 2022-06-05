@@ -364,7 +364,7 @@ Dandelion::App.controller do
               [
                 ticket.account.name_transliterated,
                 ticket_email_viewer?(ticket) ? ticket.account.email : '',
-                I18n.transliterate(ticket.name),
+                (I18n.transliterate(ticket.name) if ticket.name),
                 ticket_email_viewer?(ticket) ? ticket.email : '',
                 ticket.ticket_type.try(:name),
                 m(ticket.discounted_price || 0, ticket.order ? ticket.order.currency : ticket.event.currency),
