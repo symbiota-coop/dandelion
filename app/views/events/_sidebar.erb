@@ -1,0 +1,93 @@
+<div class="col-md-5">
+  <div id="purchase">
+    <% if current_account && (orders =  @event.orders.complete.and(account: current_account)).count > 0 %>
+      <div class="card mb-3">
+        <h3 class="card-header bg-primary text-white">
+          <% if @event.past? %>
+            Thanks for attending!
+          <% else %>
+            Your orders
+          <% end %>
+        </h3>
+        <div class="card-body">
+          <% if @event.past? %>
+            <% if event_feedback = @event.event_feedbacks.find_by(account: current_account) %>
+              <p>Your rating: <% event_feedback.rating.times do %><i class="fa fa-star"></i><% end %></p>
+            <% else %>
+              <p><a href="/events/<%=@event.id%>/give_feedback">Give feedback</a></p>
+            <% end %>
+          <% end %>
+          <p class="mb-1">Click an order to review the confirmation email:</p>
+          <ul class="fa-ul mb-0">
+            <% orders.each { |order| %>
+            <li><i class="fa fa-li fa-ticket"></i><a target="_blank" href="/orders/<%= order.id %>"><%= d = order.description_elements; d.empty? ? order.created_at : d.join(', ') %></a></li>
+            <% } %>
+          </ul>
+        </div>
+      </div>
+    <% end %>
+    <% if @event.purchase_url %>
+      <div class="card">
+        <h3 class="card-header bg-primary text-white">Select tickets</h3>
+        <div class="card-body">
+          <a target="_blank" href="<%= @event.purchase_url %>" class="d-none d-md-block btn btn-outline-primary btn-block mb-3">Buy tickets on <%=URI(@event.purchase_url).host%></a>
+        </div>
+      </div>
+    <% elsif @event.sold_out? && !params[:ticket_type_id] %>
+      <% if params[:added_to_waitlist] %>
+        <div class="card">
+          <h3 class="card-header bg-primary text-white">Thanks!</h3>
+          <div class="card-body">
+            <p class="lead mb-0">
+              We'll be in touch if we are able to issue more tickets.
+            </p>
+          </div>
+        </div>
+      <% else %>
+        <%= partial :'events/waitlist' %>
+        <%= partial :'events/upcoming' %>
+      <% end %>
+    <% elsif @event.ticket_types.count > 0 %>
+      <% if @event.monthly_donors_only && !(current_account && @event.organisation.organisationships.find_by(:account => current_account, :monthly_donation_method.ne => nil)) %>
+        <div class="card">
+          <h3 class="card-header bg-primary text-white">Select tickets</h3>
+          <div class="card-body">
+            <p class="lead mb-0">
+              <% if current_account %>
+                You must be a monthly donor to
+              <% else %>
+                You must be signed in and a monthly donor to
+              <% end %>
+              <a href="/o/<%= @event.organisation.slug %>"><%= @event.organisation.name %></a> to book tickets to this event.
+              <% if !current_account %><a href="/accounts/sign_in">Sign in</a> &middot;<% end %>
+              <% if @event.organisation.become_a_member_url %>
+                <a href="<%= @event.organisation.become_a_member_url %>">Become a Member</a>
+              <% end %>
+            </p>
+          </div>
+        </div>
+      <% elsif @event.activity && @event.activity.privacy != 'open' && !(current_account && @event.activity.activityships.find_by(account: current_account)) %>
+        <div class="card">
+          <h3 class="card-header bg-primary text-white">Select tickets</h3>
+          <div class="card-body">
+            <p class="lead mb-0">
+              <% if current_account %>
+                You must be a member of the
+              <% else %>
+                You must be signed in and a member of the
+              <% end %>
+              <a href="/activities/<%= @event.activity_id %>"><%= @event.activity.name %></a> activity to book tickets to this event.
+              <% if !current_account %><a href="/accounts/sign_in">Sign in</a> &middot; <% end %>
+              <a href="/activities/<%= @event.activity_id %>/apply">Apply</a>
+            </p>
+          </div>
+        </div>
+      <% else %>
+        <%= partial :'events/purchase' %>
+        <% if @event.past? %>
+          <%= partial :'events/upcoming' %>
+        <% end %>
+      <% end %>
+    <% end %>
+  </div>
+</div>

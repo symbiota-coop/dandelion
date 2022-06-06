@@ -1,0 +1,84 @@
+<table class="table table-hr">
+  <tr>
+    <td>Hosted by</td>
+    <td>
+      <% if @event.organisation.image %>
+        <a href="/o/<%= @event.organisation.slug %>/events"><img src="<%= u @event.organisation.image.thumb('500x500#').url %>" style="width: 50px"></a>
+      <% end %>
+      <a href="/o/<%= @event.organisation.slug %>/events"><%= @event.organisation.name %></a>
+      <% if event_admin? && @event.revenue_sharer && !(organisationship = @event.organisation.organisationships.find_by(:account => @event.revenue_sharer, :stripe_connect_json.ne => nil)) %>
+        <span class="label label-danger">
+          <i class="fa fa-warning"></i> Revenue sharer not connect to this organisation
+        </span>
+      <% end %>
+      <%= partial :'organisations/add', locals: {
+          role: 'co-host',
+          organisations: @event.cohosts.order('name asc'),
+          add_and_remove: event_admin?,
+          new_object: Cohostship.new,
+          new_url: "/events/#{@event.id}/cohostships/new",
+          destroy_url: "/events/#{@event.id}/cohostships/destroy"
+        } %>
+    </td>
+  </tr>
+  <% if @event.activity %>
+    <tr>
+      <td>Activity</td>
+      <td>
+        <a href="/activities/<%= @event.activity_id %>"><%= @event.activity.name %></a>
+      </td>
+    </tr>
+  <% end %>
+  <% if @event.local_group %>
+    <tr>
+      <td>Local group</td>
+      <td>
+        <a href="/local_groups/<%= @event.local_group_id %>"><%= @event.local_group.name %></a>
+      </td>
+    </tr>
+  <% end %>
+  <% if @event.facebook_event_id %>
+    <tr>
+      <td>Facebook event</td>
+      <td>
+        <a target="_blank" href="http://facebook.com/events/<%= @event.facebook_event_id %>"><i class="fa fa-facebook-square"></i></a>
+      </td>
+    </tr>
+  <% end %>
+  <% if @event.email %>
+    <tr>
+      <td>Enquiries to</td>
+      <td>
+        <a target="_blank" href="mailto:<%= @event.email %>"><%= @event.email %></a>
+      </td>
+    </tr>
+  <% end %>
+  <% if event_admin? or @event.event_facilitations.count > 0 %>
+    <tr>
+      <td>Facilitators</td>
+      <td>
+        <%= partial :'accounts/add', locals: {
+            role: 'event facilitator',
+            accounts: @event.event_facilitators.order('name asc'),
+            add_and_remove: event_admin?,
+            new_object: EventFacilitation.new,
+            new_url: "/events/#{@event.id}/event_facilitations/new",
+            destroy_url: "/events/#{@event.id}/event_facilitations/destroy"
+          } %>
+      </td>
+    </tr>
+  <% end %>
+  <tr>
+    <td>
+      Add to calendar
+      <td>
+        <%= partial :'events/add_to_calendar' %>
+      </td>
+    </tr>
+    <% unless @event.secret? %>
+      <tr>
+        <td>Share</td>
+        <td><%= partial :share %></td>
+      </tr>
+    <% end %>
+  </table>
