@@ -7,9 +7,22 @@
   <div  class="col-sm-8">
     <%= cp(:'organisations/carousel', key: "/organisations/carousel/#{current_account.id}") %>
 
-    <div class="px-4 mb-5 pt-3">
-      <%= partial :'accounts/pay', locals: { account: current_account } %>
-    </div>
+    <% if params[:thanks] %>
+      <div class="px-4 mb-5 pt-3">
+        <p class="lead mb-1">
+          <mark class="px-0">Thank you so much for donating!</mark> 🎉
+        </p>
+        <p class="lead mb-0">
+          <small>
+            You're welcome to <a target="_blank" href="https://dandelion.nolt.io/">make suggestions of how we can improve Dandelion on our Nolt board</a>.</p>
+          </small>
+        </p>
+      </div>
+    <% else %>
+      <div class="px-4 mb-5 pt-3">
+        <%= partial :'accounts/pay', locals: { account: current_account } %>
+      </div>
+    <% end %>
 
     <div id="newsfeed" data-pagelet-url="/" data-pagelet-refresh="60" class="mt-1 mb-3"></div>
   </div>

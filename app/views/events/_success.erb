@@ -12,60 +12,54 @@
         })
       </script>
     <% else %>
-      <% if @order %>
-        <p>If you don't see anything in your inbox, <span class="highlight">please look in your spam folder</a>.</p>
-
-          <% if @order.tickets.count > 1 %>
-            <p class="mb-3"><strong>You're welcome to let us know the names and email addresses of ticketholders so they hear about any important updates to the event (we won't use these details for anything else):</strong></p>
-            <div class="mb-3">
-              <% @order.tickets.each_with_index { |ticket,i| %>
-                <div class="bg-primary text-white p-2 rounded mb-2">
-                <p class="mb-1">
-                    <i class="fa fa-ticket"></i>
-                    <%=ticket.ticket_type.name%>
-                  </span>
-                </p>
-                  <div class="row">
-                    <div class="col-6">
-                      <div data-pagelet-url="/events/<%=@event.id%>/orders/<%=@order.id%>/ticketholders/<%=ticket.id%>/name">
-                        <%= partial :"events/ticketholder_name", locals: { ticket: ticket } %>
-                      </div>
-                    </div>
-                    <div class="col-6">
-                      <div data-pagelet-url="/events/<%=@event.id%>/orders/<%=@order.id%>/ticketholders/<%=ticket.id%>/email">
-                        <%= partial :"events/ticketholder_email", locals: { ticket: ticket } %>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              <% } %>
-            </div>
-          <% end %>
-
-        <% if @event.affiliate_credit_percentage %>
-          <% affiliate_link = "#{ENV['BASE_URI']}/events/#{@event.id}?affiliate_type=Account&affiliate_id=#{@order.account_id}" %>
-          <p>
-            <a href="<%= affiliate_link %>">Here's your affiliate link for this event.</a>
-            For each person who buys a ticket via this link,
-            you receive credit that can used to attend future events equal to <%= @event.affiliate_credit_percentage %>% of the order value.
+      <p>If you don't see anything in your inbox, <span class="highlight">please look in your spam folder</a>.</p>
+      <% if @order.tickets.count > 1 %>
+        <p class="mb-3"><strong>You're welcome to let us know the names and email addresses of ticketholders so they hear about any important updates to the event (we won't use these details for anything else):</strong></p>
+        <div class="mb-3">
+          <% @order.tickets.each_with_index { |ticket,i| %>
+          <div class="bg-primary text-white p-2 rounded mb-2">
+            <p class="mb-1">
+              <i class="fa fa-ticket"></i>
+              <%=ticket.ticket_type.name%>
+            </span>
           </p>
-          <div class="mb-3">
-            <h5>Share your link</h5>
-            <%= partial :share, locals: { share_url: affiliate_link } %>
+          <div class="row">
+            <div class="col-6">
+              <div data-pagelet-url="/events/<%=@event.id%>/orders/<%=@order.id%>/ticketholders/<%=ticket.id%>/name">
+                <%= partial :"events/ticketholder_name", locals: { ticket: ticket } %>
+              </div>
+            </div>
+            <div class="col-6">
+              <div data-pagelet-url="/events/<%=@event.id%>/orders/<%=@order.id%>/ticketholders/<%=ticket.id%>/email">
+                <%= partial :"events/ticketholder_email", locals: { ticket: ticket } %>
+              </div>
+            </div>
           </div>
-        <% end %>
-      <% end %>
-      <h5 class="mb-1">Add to calendar</h5>
-      <p class="mb-1"><%= partial :'events/add_to_calendar' %></p>
-      <% if !@event.secret? && !(@order && @event.affiliate_credit_percentage) %>
-        <h5 class="mb-1">Share this event</h5>
-        <%= partial :share %>
-      <% end %>
-      <% if @order %>
-        <div class="my-3">
-          <%= partial :'accounts/pay', locals: { account: @order.account } %>
         </div>
-      <% end %>
+        <% } %>
+      </div>
     <% end %>
+    <% if @event.affiliate_credit_percentage %>
+      <% affiliate_link = "#{ENV['BASE_URI']}/events/#{@event.id}?affiliate_type=Account&affiliate_id=#{@order.account_id}" %>
+      <p>
+        <a href="<%= affiliate_link %>">Here's your affiliate link for this event.</a>
+        For each person who buys a ticket via this link,
+        you receive credit that can used to attend future events equal to <%= @event.affiliate_credit_percentage %>% of the order value.
+      </p>
+      <div class="mb-3">
+        <h5>Share your link</h5>
+        <%= partial :share, locals: { share_url: affiliate_link } %>
+      </div>
+    <% end %>
+  <% end %>
+  <h5 class="mb-1">Add to calendar</h5>
+  <p class="mb-1"><%= partial :'events/add_to_calendar' %></p>
+  <% if !@event.secret? && !(@order && @event.affiliate_credit_percentage) %>
+    <h5 class="mb-1">Share this event</h5>
+    <%= partial :share %>
+  <% end %>
+  <div class="my-3">
+    <%= partial :'accounts/pay', locals: { account: @order.account } %>
   </div>
+</div>
 </div>

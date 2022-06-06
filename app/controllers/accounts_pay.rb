@@ -58,8 +58,8 @@ Dandelion::App.controller do
           currency: params[:currency],
           quantity: 1
         }],
-        customer_email: (current_account.email if current_account),
-        success_url: (ENV['BASE_URI']).to_s,
+        customer_email: @account.email,
+        success_url: "#{ENV['BASE_URI']}?thanks=true",
         cancel_url: (ENV['BASE_URI']).to_s
       }
       session = Stripe::Checkout::Session.create(stripe_session_hash)
