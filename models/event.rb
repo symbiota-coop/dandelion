@@ -724,11 +724,11 @@ class Event
   end
 
   def public_attendees
-    Account.and(:id.in => tickets.and(:hide_attendance.ne => true).pluck(:account_id)).and(:hidden.ne => true)
+    Account.and(:id.in => tickets.and(show_attendance: true).pluck(:account_id)).and(:hidden.ne => true)
   end
 
   def private_attendees
-    Account.and(:id.in => tickets.and(hide_attendance: true).pluck(:account_id))
+    Account.and(:id.in => tickets.and(:show_attendance.ne => true).pluck(:account_id))
   end
 
   def discounted_ticket_revenue

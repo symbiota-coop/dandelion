@@ -6,10 +6,10 @@
       </div>
       <div class="col-auto">
         <% if ticket %>
-          <% if @event.tickets.and(account: current_account).all? { |ticket| ticket.hide_attendance? } %>
-            <a class="pagelet-trigger btn btn-sm btn-outline-primary mb-1" href="/events/<%= @event.id %>/show_attendance">Attendance hidden</a>
-          <% else %>
+          <% if @event.tickets.and(account: current_account).all? { |ticket| ticket.show_attendance? } %>
             <a class="pagelet-trigger btn btn-sm btn-primary mb-1" href="/events/<%= @event.id %>/hide_attendance">Attendance public</a>
+          <% else %>
+            <a class="pagelet-trigger btn btn-sm btn-outline-primary mb-1" href="/events/<%= @event.id %>/show_attendance">Attendance hidden</a>
           <% end %>
         <% end %>
       </div>

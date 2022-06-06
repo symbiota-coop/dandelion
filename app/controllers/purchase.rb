@@ -46,7 +46,7 @@ Dandelion::App.controller do
       ticketForm[:quantities].each do |ticket_type_id, quantity|
         ticket_type = @event.ticket_types.find(ticket_type_id)
         quantity.to_i.times do
-          @order.tickets.create!(event: @event, account: @account, ticket_type: ticket_type, hide_attendance: true)
+          @order.tickets.create!(event: @event, account: @account, ticket_type: ticket_type)
         end
       end
       raise Order::NoTickets if @order.tickets.count == 0

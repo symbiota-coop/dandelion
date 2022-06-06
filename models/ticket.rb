@@ -10,7 +10,7 @@ class Ticket
   belongs_to :zoomship, index: true, optional: true
 
   field :price, type: Float
-  field :hide_attendance, type: Boolean
+  field :show_attendance, type: Boolean
   field :subscribed_discussion, type: Boolean
   field :checked_in, type: Boolean
   field :name, type: String
@@ -39,7 +39,7 @@ class Ticket
     {
       summary: { type: :text, edit: false },
       price: :number,
-      hide_attendance: :check_box,
+      show_attendance: :check_box,
       checked_in: :check_box,
       name: :text,
       email: :email,

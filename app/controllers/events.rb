@@ -546,14 +546,14 @@ Dandelion::App.controller do
   get '/events/:id/hide_attendance' do
     sign_in_required!
     @event = Event.find(params[:id]) || not_found
-    @event.tickets.and(account: current_account).update_all(hide_attendance: true)
+    @event.tickets.and(account: current_account).update_all(show_attendance: nil)
     200
   end
 
   get '/events/:id/show_attendance' do
     sign_in_required!
     @event = Event.find(params[:id]) || not_found
-    @event.tickets.and(account: current_account).update_all(hide_attendance: nil)
+    @event.tickets.and(account: current_account).update_all(show_attendance: true)
     200
   end
 
