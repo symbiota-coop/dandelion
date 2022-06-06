@@ -98,12 +98,13 @@ Dandelion::App.controller do
   get '/events/:id', provides: %i[html ics json] do
     session[:return_to] = request.url
     @event = Event.find(params[:id]) || not_found
+    @order = (Order.find(params[:order_id]) || not_found) if params[:order_id]
     @og_desc = when_details(@event)
     kick! unless @event.organisation
     event_admins_only! if @event.draft?
     @title = @event.name
     @organisation = @event.organisation
-    if params[:success] && params[:order_id] && (@order = Order.find(params[:order_id]))
+    if @order && params[:success]
       @ga_transaction = { id: @order.id.to_s, affiliation: @event.organisation.name, revenue: (@order.value || 0), currency: @order.currency }
       @ga_items = @order.tickets.map do |ticket|
         { id: ticket.id.to_s, name: "#{ticket.event.name}: #{ticket.ticket_type.try(:name) || 'Complementary'}", price: (ticket.discounted_price || 0), quantity: 1 }
@@ -343,7 +344,7 @@ Dandelion::App.controller do
       erb :'events/tickets'
     when :csv
       CSV.generate do |csv|
-        csv << %w[name email on_behalf_of_name on_behalf_of_email ticket_type price created_at]
+        csv << %w[name email ordered_for_name ordered_for_email ticket_type price created_at]
         @tickets.each do |ticket|
           csv << [
             ticket.account.name,
@@ -359,7 +360,7 @@ Dandelion::App.controller do
     when :pdf
       @tickets = @tickets.sort_by { |ticket| ticket.account.name }
       Prawn::Document.new(page_layout: :landscape) do |pdf|
-        pdf.table([%w[name email on_behalf_of_name on_behalf_of_email ticket_type price created_at]] +
+        pdf.table([%w[name email ordered_for_name ordered_for_email ticket_type price created_at]] +
             @tickets.map do |ticket|
               [
                 ticket.account.name_transliterated,
@@ -649,8 +650,7 @@ Dandelion::App.controller do
     @event = Event.find(params[:id]) || not_found
     @order = @event.orders.find(params[:order_id]) || not_found
     @ticket = @order.tickets.find(params[:ticket_id])
-    @n = @order.tickets.order('created_at asc').pluck(:id).index(@ticket.id) + 1
-    partial :"events/ticketholder_#{params[:f]}"
+    partial :"events/ticketholder_#{params[:f]}", locals: { ticket: @ticket }
   end
 
   post '/events/:id/orders/:order_id/ticketholders/:ticket_id/:f' do

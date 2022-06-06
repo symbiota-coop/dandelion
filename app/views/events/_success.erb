@@ -16,17 +16,28 @@
         <p>If you don't see anything in your inbox, <span class="highlight">please look in your spam folder</a>.</p>
 
           <% if @order.tickets.count > 1 %>
-            <p class="mb-3"><strong>Optionally, you can let us know the names and email addresses of ticketholders so they hear about any important updates to the event:</strong></p>
+            <p class="mb-3"><strong>You're welcome to let us know the names and email addresses of ticketholders so they hear about any important updates to the event (we won't use these details for anything else):</strong></p>
             <div class="mb-3">
               <% @order.tickets.each_with_index { |ticket,i| %>
-                  <div class="row mb-1">
+                <div class="bg-primary text-white p-2 rounded mb-2">
+                <p class="mb-1">
+                    <i class="fa fa-ticket"></i>
+                    <%=ticket.ticket_type.name%>
+                  </span>
+                </p>
+                  <div class="row">
                     <div class="col-6">
-                      <div data-pagelet-url="/events/<%=@event.id%>/orders/<%=@order.id%>/ticketholders/<%=ticket.id%>/name"></div>
+                      <div data-pagelet-url="/events/<%=@event.id%>/orders/<%=@order.id%>/ticketholders/<%=ticket.id%>/name">
+                        <%= partial :"events/ticketholder_name", locals: { ticket: ticket } %>
+                      </div>
                     </div>
                     <div class="col-6">
-                      <div data-pagelet-url="/events/<%=@event.id%>/orders/<%=@order.id%>/ticketholders/<%=ticket.id%>/email"></div>
+                      <div data-pagelet-url="/events/<%=@event.id%>/orders/<%=@order.id%>/ticketholders/<%=ticket.id%>/email">
+                        <%= partial :"events/ticketholder_email", locals: { ticket: ticket } %>
+                      </div>
                     </div>
                   </div>
+                </div>
               <% } %>
             </div>
           <% end %>

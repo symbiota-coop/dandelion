@@ -16,6 +16,11 @@
     <hr>
     <%= event.organisation.extra_info_for_ticket_email %>
   <% end %>
+  <% if event.organisation.show_ticketholder_link_in_ticket_emails && order.tickets.length > 1 %>
+    <p>
+      <a href="<%=ENV['BASE_URI']%>/events/<%=event.id%>?order_id=<%=order.id%>">Visit this page to add details of ticketholders.</a>
+    </p>
+  <% end %>
   <% if event.affiliate_credit_percentage %>
     <% affiliate_link = "#{ENV['BASE_URI']}/events/#{event.id}?affiliate_type=Account&affiliate_id=#{order.account_id}" %>
     <p>
@@ -23,8 +28,8 @@
       For each person who buys a ticket via this link,
       you receive credit that can used to attend future events equal to <%= event.affiliate_credit_percentage %>% of the order value.
     </p>
-  <% end %>
-  <% unless event.organisation.hide_sign_in_link_from_ticket_emails %>
+  <% end %>  
+  <% if event.organisation.show_sign_in_link_in_ticket_emails %>
     <p>
       <% if account.sign_ins_count == 0 %>
         <a href="<%= ENV['BASE_URI'] %>/accounts/edit?sign_in_token=%recipient.token%&event_id=<%= event.id %>">Click here to create a profile on Dandelion and connect with others attending the event.</a>

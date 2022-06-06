@@ -141,7 +141,8 @@
           <%= f.wysiwyg_block :feedback_email_body %>
           <%= f.text_block :reply_to %>
           <%= f.check_box_block :send_ticket_emails_from_organisation %>
-          <%= f.check_box_block :hide_sign_in_link_from_ticket_emails %>
+          <%= f.check_box_block :show_ticketholder_link_in_ticket_emails %>
+          <%= f.check_box_block :show_sign_in_link_in_ticket_emails %>
         </div>
         <div role="tabpanel" class="tab-pane <%= 'active' if params[:tab].to_i == 5%>" id="tab5">
           <%= f.wysiwyg_block :event_footer %>

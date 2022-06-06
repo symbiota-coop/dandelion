@@ -71,7 +71,7 @@
       <%= partial :'accounts/account', locals: { account: ticket.account, width: '50px', show_email: ticket_email_viewer?(ticket) } %>
       <% if ticket.name || (ticket.email && ticket_email_viewer?(ticket)) %>
         <div class="mt-1">
-          on behalf of
+          ordered for
           <% if ticket.name %>
             <br />
             <strong><%= ticket.name %></strong>

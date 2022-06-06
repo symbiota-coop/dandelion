@@ -10,7 +10,7 @@
   </style>
 <% end %>
 <% sidebar = false %>
-<% if !params[:success] %>
+<% if !@order %>
   <% sidebar = true if @event.sold_out? || @event.purchase_url %>
   <% buy_tickets_style = 'class="fixed-bottom bg-white p-3 w-100 d-block d-md-none" style="z-index: 1019; box-shadow: 0px -2px 4px 0px rgba(0,0,0,0.3);"' %>
   <% if @event.purchase_url %>
@@ -48,12 +48,12 @@
     <% if @event_image %>
       <a href="/events/<%=@event.id%><% if params[:cohost] %>?cohost=<%=params[:cohost]%><% end %>"><img id="event-image" class="w-100 mb-3" src="<%= u @event_image.url %>"></a>
     <% end %>
-    <% if params[:success] %>
+    <% if @order %>
       <%= partial :'events/success' %>
     <% end %>
   </div>
 </div>
-<% unless params[:success] %>
+<% unless @order %>
   <div class="row">
     <div class="<%= sidebar ? 'col-md-7' : 'col-md-12' %>">
       <% n = 1; if @event.organisation %>
@@ -163,20 +163,18 @@
           </td>
         </tr>
       <% end %>
-      <% unless params[:success] %>
-        <tr>
+      <tr>
+        <td>
+          Add to calendar
           <td>
-            Add to calendar
-            <td>
-              <%= partial :'events/add_to_calendar' %>
-            </td>
+            <%= partial :'events/add_to_calendar' %>
+          </td>
+        </tr>
+        <% unless @event.secret? %>
+          <tr>
+            <td>Share</td>
+            <td><%= partial :share %></td>
           </tr>
-          <% unless @event.secret? %>
-            <tr>
-              <td>Share</td>
-              <td><%= partial :share %></td>
-            </tr>
-          <% end %>
         <% end %>
       </table>
       <% if @event.description || @event.organisation.event_footer %>

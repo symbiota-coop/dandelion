@@ -62,7 +62,8 @@ class Organisation
   field :banned_emails, type: String
   field :paid_up, type: Boolean
   field :send_ticket_emails_from_organisation, type: Boolean
-  field :hide_sign_in_link_from_ticket_emails, type: Boolean
+  field :show_sign_in_link_in_ticket_emails, type: Boolean
+  field :show_ticketholder_link_in_ticket_emails, type: Boolean
   field :ticket_email_greeting, type: String
   field :feedback_email_body, type: String
   field :verified, type: Boolean
@@ -479,7 +480,8 @@ class Organisation
       auto_comment_sending: "Send comments in the Members' Area automatically",
       become_a_member_url: 'Become a Member URL',
       add_a_donation_to: 'Text above donation field',
-      donation_text: 'Text below donation field'
+      donation_text: 'Text below donation field',
+      show_ticketholder_link_in_ticket_emails: 'Show link for people to provide details of ticketholders in ticket emails'
     }[attr.to_sym] || super
   end
 
