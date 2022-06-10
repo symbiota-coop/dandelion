@@ -5,10 +5,20 @@
     <title><%= pmail.subject %></title>
     <style data-premailer="ignore">
       .d-none { display: none }
+      th, td { width: 50% }
+      td p { padding-left: 10px; padding-right: 10px }
+      @media(max-width: 700px) {
+        th, td { width: 100%; display: inline-block;  }
+        td p { padding-left: 0; padding-right: 0 }
+      }
     </style>
     <style>
-      <%= File.read(Padrino.root('app/assets/stylesheets/email.css')) %>      
+      <%= File.read(Padrino.root('app/assets/stylesheets/email.css')) %>
       em > a { color: #222; text-decoration: none !important }
+      table { width: 100% }
+      th { text-align: left }
+      td { line-height: 1px }
+      td p { line-height: normal; }
     </style>
   </head>
   <body>
