@@ -102,6 +102,8 @@
         <% else %>
           <i data-toggle="tooltip" title="Payment processing" class="fa fa-spin fa-circle-o-notch"></i>
         <% end %>
+      <% elsif order.deleted? %>
+        <i data-toggle="tooltip" title="Deleted" class="fa fa-trash"></i>
       <% end %>
     </td>
     <td>
