@@ -69,7 +69,7 @@
       </td>
     <% end %>
     <td data-sort="<%= order.value %>">
-      <abbr data-toggle="tooltip" title="<%= order.description %>">
+      <abbr data-toggle="tooltip" title="<%= order.original_description %>">
         <%= m (order.value || 0), order.currency %>
       </abbr>
       <% if order.application_fee_amount %>
