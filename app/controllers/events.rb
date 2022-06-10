@@ -439,7 +439,10 @@ Dandelion::App.controller do
   get '/events/:id/orders', provides: %i[html csv pdf] do
     @event = Event.find(params[:id]) || not_found
     event_admins_only!
-    @orders = params[:deleted] ? @event.orders.deleted : @event.orders
+    @orders = @event.orders
+    @orders =  @orders.deleted if params[:deleted]
+    @orders =  @orders.complete if params[:complete]
+    @orders =  @orders.incomplete if params[:incomplete]
     if params[:q]
       @orders = @orders.and(:account_id.in => Account.all.or(
         { name: /#{::Regexp.escape(params[:q])}/i },

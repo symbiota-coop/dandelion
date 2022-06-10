@@ -96,8 +96,12 @@
       <% elsif order.xdai_secret %>
         <span class="label label-default bg-secondary mr-1">xDai</span>
       <% end %>
-      <% if order.incomplete? && !order.deleted? %>
-        <i title="Payment processing" class="fa fa-spin fa-circle-o-notch"></i>
+      <% if order.incomplete? %>
+        <% if order.deleted? %>
+          <i data-toggle="tooltip" title="Timed out" class="fa fa-warning"></i>
+        <% else %>
+          <i data-toggle="tooltip" title="Payment processing" class="fa fa-spin fa-circle-o-notch"></i>
+        <% end %>
       <% end %>
     </td>
     <td>
