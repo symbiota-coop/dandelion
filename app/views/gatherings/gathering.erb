@@ -16,7 +16,7 @@
     <% end %>
     <% if @gathering.coordinates %>
       <style>
-        #map-canvas { height: 200px !important; margin-top: 1rem }
+        #map-canvas { height: 200px !important; margin-top: 1rem; margin-bottom: 0.25rem }
       </style>
       <%= partial :'maps/map', locals: { points: [@gathering] } %>
       <p class="text-muted" style="font-size: 90%"><%= @gathering.location %></p>
