@@ -2,6 +2,10 @@
   <%= partial :'gatherings/nav', locals: { gathering: @gathering, membership: @membership } %>
 <% end %>
 
+<% if @gathering.new_record? %>
+  <%= partial :'gatherings/explain' %>
+<% end %>
+
 <p>
   <a target="_blank" href="https://calendly.com/stephenreid321/dandelion-support">
     <i class="fa fa-phone"></i>
