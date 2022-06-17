@@ -1,5 +1,5 @@
 <% form_for @optionship ||= Optionship.new, @optionship.new_record? ? "/g/#{@gathering.slug}/optionships/new" : "/g/#{@gathering.slug}/optionships/#{@optionship.id}/edit" do |f| %>
-  <%= f.select_block :account_id, disabled: true, options: @gathering.members.order('name asc').map { |account| [account.name, account.id] } %>
+  <%= f.select_block :account_id, disabled: @optionship.persisted?, options: @gathering.members.order('name asc').map { |account| [account.name, account.id] } %>
   <%= f.select_block :option_id, options: ([@optionship.try(:option)] + @gathering.options.reject(&:full?)).compact.uniq.map { |option| ["#{option.name} (#{option.type})", option.id] } %>
   <%= f.submit_block button_text: (@optionship.new_record? ? 'Create contribution' : 'Save contribution'), destroy_url: "/g/#{@gathering.slug}/optionships/#{@optionship.id}/destroy" %>
 <% end %>
