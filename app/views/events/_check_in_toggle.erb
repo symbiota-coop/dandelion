@@ -1,5 +1,8 @@
 <% form_tag "/events/#{@event.id}/check_in/#{ticket.id}" do %>
-  <div class="switcher">
+  <div class="switcher" <% if ticket.checked_in %>
+    title="<%= ticket.checked_in_at %>"
+    data-toggle="tooltip"
+  <% end %>>
     <%= check_box_tag :checked_in, id: "check-in-#{ticket.id}", class: 'form-check-input', checked: ticket.checked_in, onclick: '$(this.form).submit()' %>
     <label for="<%= "check-in-#{ticket.id}" %>"></label>
   </div>

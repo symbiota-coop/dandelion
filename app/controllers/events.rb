@@ -218,6 +218,13 @@ Dandelion::App.controller do
     erb :'events/check_in'
   end
 
+  get '/events/:id/check_in_toggle/:ticket_id' do
+    @event = Event.find(params[:id]) || not_found
+    event_admins_only!
+    ticket = @event.tickets.find(params[:ticket_id])
+    partial :'events/check_in_toggle', locals: { ticket: ticket }
+  end
+
   post '/events/:id/check_in/:ticket_id' do
     @event = Event.find(params[:id]) || not_found
     event_admins_only!
@@ -231,6 +238,7 @@ Dandelion::App.controller do
     else
       if params[:checked_in]
         ticket.set(checked_in: true)
+        ticket.set(checked_in_at: Time.now)
       else
         ticket.set(checked_in: nil)
       end
