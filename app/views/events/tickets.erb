@@ -58,6 +58,7 @@
     <tr>
       <th>Name</th>
       <th>Ticket type</th>
+      <th>Ticket ID</th>
       <th>Price</th>
       <th>Created at</th>
       <th>Checked in</th>
@@ -90,6 +91,11 @@
           <span class="label label-outline-primary"><%=ticket_type.ticket_group.name%></span>
         <% end %>
       <% end %>
+    </td>
+    <td nowrap>
+      <abbr title="<%= ticket.id %>" data-toggle="tooltip">
+        <%= ticket.id.to_s[0..3] %>&hellip;<%= ticket.id.to_s[-4..-1] %>
+      </abbr>
     </td>
     <td data-sort="<%= ticket.discounted_price %>">
       <% if ticket.discounted_price %>

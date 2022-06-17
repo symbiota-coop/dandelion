@@ -334,10 +334,17 @@ Dandelion::App.controller do
                  @event.tickets
                end
     if params[:q]
-      @tickets = @tickets.and(:account_id.in => Account.all.or(
-        { name: /#{::Regexp.escape(params[:q])}/i },
-        { email: /#{::Regexp.escape(params[:q])}/i }
-      ).pluck(:id))
+      @tickets = @tickets.and(:id.in =>
+        Ticket.collection.aggregate([
+                                      { '$addFields' => { 'id' => { '$toString' => '$_id' } } },
+                                      { '$match' => { 'id' => { '$regex' => /#{::Regexp.escape(params[:q])}/i } } }
+                                    ]).pluck(:id) +
+        Ticket.and(
+          :account_id.in => Account.all.or(
+            { name: /#{::Regexp.escape(params[:q])}/i },
+            { email: /#{::Regexp.escape(params[:q])}/i }
+          ).pluck(:id)
+        ).pluck(:id))
     end
     case content_type
     when :html
