@@ -19,7 +19,7 @@
           <div class="ticket-type-description">
             <%= o.text_field :description, class: 'form-control', placeholder: 'Description' %>
           </div>
-          <% if @event.organisation.gocardless_access_token || @event.organisation.patreon_api_key %>
+          <% if @event.organisation && (@event.organisation.gocardless_access_token || @event.organisation.patreon_api_key) %>
             <div class="ticket-type-minimum-monthly-donation">
               <strong>Minimum monthly donation</strong>
               <span><%= Money.new(0, f.object.currency).symbol %><span>
@@ -116,7 +116,7 @@
           descriptionInput.appendTo(descriptionDiv);
           descriptionDiv.appendTo(d);
 
-          <% if @event.organisation.gocardless_access_token || @event.organisation.patreon_api_key %>
+          <% if @event.organisation && (@event.organisation.gocardless_access_token || @event.organisation.patreon_api_key) %>
             var minimumMonthlyDonationDiv = $('<div class="ticket-type-minimum-monthly-donation"></div>')
             minimumMonthlyDonationStrong = $('<strong>Minimum monthly donation</strong> <span><%= Money.new(0, f.object.currency).symbol %></span>')
             minimumMonthlyDonationStrong.appendTo(minimumMonthlyDonationDiv);
