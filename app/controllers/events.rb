@@ -375,6 +375,7 @@ Dandelion::App.controller do
     when :pdf
       @tickets = @tickets.sort_by { |ticket| ticket.account.name }
       Prawn::Document.new(page_layout: :landscape) do |pdf|
+        pdf.font "#{Padrino.root}/app/assets/fonts/circular-ttf/CircularStd-Book.ttf"
         pdf.table([%w[name email ordered_for_name ordered_for_email ticket_type price created_at]] +
             @tickets.map do |ticket|
               [
@@ -487,6 +488,7 @@ Dandelion::App.controller do
     when :pdf
       @orders = @orders.sort_by { |order| order.account.name }
       Prawn::Document.new do |pdf|
+        pdf.font "#{Padrino.root}/app/assets/fonts/circular-ttf/CircularStd-Book.ttf"
         pdf.table([%w[name email value created_at]] +
             @orders.map do |order|
               [

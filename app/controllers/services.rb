@@ -75,6 +75,7 @@ Dandelion::App.controller do
     when :pdf
       @bookings = @bookings.sort_by { |booking| booking.account.name }
       Prawn::Document.new do |pdf|
+        pdf.font "#{Padrino.root}/app/assets/fonts/circular-ttf/CircularStd-Book.ttf"
         pdf.table([%w[name email value created_at]] +
             @bookings.map do |booking|
               [
