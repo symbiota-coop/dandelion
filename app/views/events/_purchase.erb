@@ -169,7 +169,7 @@
           <td>
             <strong>
               <%== Sanitize.fragment(@event.add_a_donation_to || @event.organisation.add_a_donation_to || "Add a donation to #{@event.organisation.name}", Sanitize::Config::DANDELION) %>
-              <%= "(minimum #{m @event.minimum_donation, @event.currency})" if @event.minimum_donation %>
+              <%= "(minimum #{m @event.minimum_donation, @event.currency})" if @event.minimum_donation && @event.minimum_donation > 0 %>
             </strong>
             <div class="input-group" style="margin: 5px 0">
               <div class="input-group-prepend">
