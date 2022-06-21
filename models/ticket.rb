@@ -92,6 +92,7 @@ class Ticket
       if ticket_type && ticket_type.minimum_monthly_donation && (
           !account ||
           !(organisationship = event.organisation.organisationships.find_by(account: account)) ||
+          !organisationship.monthly_donation_amount ||
           !(Money.new(organisationship.monthly_donation_amount * 100, organisationship.monthly_donation_currency) >= Money.new(ticket_type.minimum_monthly_donation * 100, event.currency))
         )
         errors.add(:ticket_type, 'is not available to someone donating this amount')

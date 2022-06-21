@@ -52,6 +52,7 @@
               <% if ticket_type.minimum_monthly_donation && (
                   !current_account ||
                   !(organisationship = @event.organisation.organisationships.find_by(account: current_account)) ||
+                  !(organisationship.monthly_donation_amount) ||
                   !(Money.new(organisationship.monthly_donation_amount * 100, organisationship.monthly_donation_currency) >= Money.new(ticket_type.minimum_monthly_donation * 100, @event.currency))
                 ) %>
                 <% if !current_account %>
