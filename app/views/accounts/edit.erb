@@ -100,20 +100,22 @@
     <%= f.wysiwyg_block :dietary_requirements %>
   <% end %>
 
-  <p><em>These questions are entirely optional:</em></p>
-  <%= f.select_block :sexuality %>
-  <div class="row justify-content-between no-gutters my-3">
-    <div class="col ml-2 labelize">
-      <%= f.check_box_block :open_to_new_friends %>
-      <%= f.check_box_block :open_to_short_term_dating %>
-      <%= f.check_box_block :open_to_long_term_dating %>
-      <%= f.check_box_block :open_to_hookups %>
-      <%= f.check_box_block :open_to_open_relating %>
+  <% unless @account.organisations.count == 1 && @account.organisations.first.slug == 'refi-spring' %>
+    <p><em>These questions are entirely optional:</em></p>
+    <%= f.select_block :sexuality %>
+    <div class="row justify-content-between no-gutters my-3">
+      <div class="col ml-2 labelize">
+        <%= f.check_box_block :open_to_new_friends %>
+        <%= f.check_box_block :open_to_short_term_dating %>
+        <%= f.check_box_block :open_to_long_term_dating %>
+        <%= f.check_box_block :open_to_hookups %>
+        <%= f.check_box_block :open_to_open_relating %>
+      </div>
+      <div class="col-auto">
+        <div data-pagelet-url="/accounts/privacyable/open_to"></div>
+      </div>
     </div>
-    <div class="col-auto">
-      <div data-pagelet-url="/accounts/privacyable/open_to"></div>
-    </div>
-  </div>
+  <% end %>
 
   <div class="mt-3">
     <button class="btn btn-primary btn-lg" type="submit">Save profile</button>
@@ -121,7 +123,9 @@
 
 <% end %>
 
-<% Account.privacyables.select { |p| %w[email location phone telegram_username website facebook_profile_url date_of_birth gender sexuality bio].include?(p) }.each { |p| %>
+<% Account.privacyables.select { |p| %w[email location phone telegram_username website facebook_profile_url date_of_birth gender sexuality bio].include?(p) }.each { |p|
+next if p == 'sexuality' && @account.organisations.count == 1 && @account.organisations.first.slug == 'refi-spring'
+   %>
 <div style="font-weight: normal" data-privacy="<%= p %>" data-pagelet-url="/accounts/privacyable/<%= p %>"></div>
 <% } %>
 <script>
