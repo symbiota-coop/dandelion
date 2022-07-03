@@ -471,7 +471,7 @@ Dandelion::App.controller do
       erb :'events/orders'
     when :csv
       CSV.generate do |csv|
-        csv << %w[name email value created_at]
+        csv << %w[name email value opt_in_organisation opt_in_facilitator created_at]
         @orders.each do |order|
           csv << [
             order.account ? order.account.name : '',
@@ -481,6 +481,8 @@ Dandelion::App.controller do
               ''
             end,
             m((order.value || 0), order.currency),
+            order.opt_in_organisation,
+            order.opt_in_facilitator,
             order.created_at.to_s(:db)
           ]
         end

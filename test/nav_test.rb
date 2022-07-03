@@ -16,7 +16,7 @@ class NavTest < ActiveSupport::TestCase
     @account = FactoryBot.create(:account)
     login_as(@account)
     visit '/'
-    hrefs = all('#header .nav a', visible: :all).map { |a| a['href'] }.reject { |a| a == 'javascript:; ' }
+    hrefs = all('#header .nav a', visible: :all).map { |a| a['href'] }.reject { |a| a == 'javascript:;' }
     hrefs.each do |href|
       puts URI(href).path
       visit href
@@ -30,7 +30,7 @@ class NavTest < ActiveSupport::TestCase
     @gathering = FactoryBot.create(:gathering, account: @account)
     login_as(@account)
     visit '/'
-    hrefs = all('#sidebar .nav a', visible: :all).map { |a| a['href'] }.reject { |a| a == 'javascript:; ' }
+    hrefs = all('#sidebar .nav a', visible: :all).map { |a| a['href'] }.reject { |a| a == 'javascript:;' }
     hrefs.each do |href|
       puts URI(href).path
       visit href
@@ -43,7 +43,7 @@ class NavTest < ActiveSupport::TestCase
     @organisation = FactoryBot.create(:organisation, account: @account)
     login_as(@account)
     visit "/o/#{@organisation.slug}"
-    hrefs = all('#content .dropdown-menu', visible: :all)[0].all('a', visible: :all).map { |a| a['href'] }.reject { |a| a == 'javascript:; ' }
+    hrefs = all('#content .dropdown-menu', visible: :all)[0].all('a', visible: :all).map { |a| a['href'] }.reject { |a| a == 'javascript:;' }
     hrefs.each do |href|
       puts URI(href).path
       visit href
@@ -57,7 +57,7 @@ class NavTest < ActiveSupport::TestCase
     @activity = FactoryBot.create(:activity, organisation: @organisation, account: @account)
     login_as(@account)
     visit "/activities/#{@activity.id}"
-    hrefs = all('#content .dropdown-menu', visible: :all)[1].all('a', visible: :all).map { |a| a['href'] }.reject { |a| a == 'javascript:; ' }
+    hrefs = all('#content .dropdown-menu', visible: :all)[1].all('a', visible: :all).map { |a| a['href'] }.reject { |a| a == 'javascript:;' }
     hrefs.each do |href|
       puts URI(href).path
       visit href
@@ -71,7 +71,7 @@ class NavTest < ActiveSupport::TestCase
     @local_group = FactoryBot.create(:local_group, organisation: @organisation, account: @account)
     login_as(@account)
     visit "/local_groups/#{@local_group.id}"
-    hrefs = all('#content .dropdown-menu', visible: :all)[1].all('a', visible: :all).map { |a| a['href'] }.reject { |a| a == 'javascript:; ' }
+    hrefs = all('#content .dropdown-menu', visible: :all)[1].all('a', visible: :all).map { |a| a['href'] }.reject { |a| a == 'javascript:;' }
     hrefs.each do |href|
       puts URI(href).path
       visit href
@@ -85,7 +85,7 @@ class NavTest < ActiveSupport::TestCase
     @event = FactoryBot.create(:event, organisation: @organisation, account: @account, last_saved_by: @account)
     login_as(@account)
     visit "/events/#{@event.id}"
-    hrefs = all('#content .dropdown-menu', visible: :all)[1].all('a', visible: :all).map { |a| a['href'] }.reject { |a| a == 'javascript:; ' }
+    hrefs = all('#content .dropdown-menu', visible: :all)[1].all('a', visible: :all).map { |a| a['href'] }.reject { |a| a == 'javascript:;' }
     hrefs.each do |href|
       puts URI(href).path
       visit href
@@ -98,7 +98,7 @@ class NavTest < ActiveSupport::TestCase
     @gathering = FactoryBot.create(:gathering, account: @account)
     login_as(@account)
     visit "/g/#{@gathering.slug}"
-    hrefs = all('#gathering-nav a', visible: :all).map { |a| a['href'] }.reject { |a| a == 'javascript:; ' }
+    hrefs = all('#gathering-nav a', visible: :all).map { |a| a['href'] }.reject { |a| a == 'javascript:;' }
     hrefs.each do |href|
       puts URI(href).path
       visit href
