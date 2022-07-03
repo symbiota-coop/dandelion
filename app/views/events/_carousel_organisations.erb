@@ -36,9 +36,7 @@
 <% if organisations.count > 0 %>
   <div class="slick-container mb-5" id="<%= carousel_id %>">
     <% if defined? title %>
-      <% unless params[:hide_featured_title] && title == 'Featured' %>
-        <h2 class="text-center"><%= title %></h2>
-      <% end %>
+      <h2 class="text-center"><%= title %></h2>
     <% end %>
     <div class="slick-responsive row justify-content-center">
       <% organisations.each { |organisation| %>
