@@ -74,7 +74,9 @@
       </div>
       <%= checkbox 'Online' %>
       <%= checkbox 'In person' %>
-      <%= checkbox "Members' events" %>
+      <% if @organisation.monthly_donors.count > 0 %>
+        <%= checkbox "Members' events" %>
+      <% end %>
       <%= submit_tag 'Search', class: 'btn btn-primary' %>
       <%= hidden_field_tag :search, value: 1 %>
     <% end %>
