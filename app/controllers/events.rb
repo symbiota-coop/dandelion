@@ -99,7 +99,7 @@ Dandelion::App.controller do
   post '/o/:slug/events/quick' do
     @organisation = Organisation.find_by(slug: params[:slug]) || not_found
 
-    account_hash = { email: params[:event][:email] }
+    account_hash = { name: params[:event][:email], email: params[:event][:email] }
     @account = if account_hash[:email] && (account = Account.find_by(email: account_hash[:email].downcase))
                  account
                else
