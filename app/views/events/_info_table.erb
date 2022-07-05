@@ -53,7 +53,7 @@
       </td>
     </tr>
   <% end %>
-  <% if event_admin? or @event.event_facilitations.count > 0 %>
+  <% if event_admin? || (@event.event_facilitations.count > 0 && @event.event_facilitations.any? { |event_facilitation| event_facilitation.account.public? }) %>
     <tr>
       <td>Facilitators</td>
       <td>

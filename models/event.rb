@@ -136,7 +136,7 @@ class Event
       (local_group ? local_group.discount_codes.pluck(:id) : []))
   end
 
-  attr_accessor :prevent_notifications, :tag_names, :duplicate
+  attr_accessor :prevent_notifications, :tag_names, :duplicate, :quick_create
 
   has_many :notifications, as: :notifiable, dependent: :destroy
   after_create do
@@ -180,7 +180,7 @@ class Event
     self.minimum_donation = minimum_donation.round(2) if minimum_donation
 
     if new_record? && !duplicate
-      errors.add(:organisation, '- you are not an admin of this organisation') if !local_group && !activity && !Organisation.admin?(organisation, account)
+      errors.add(:organisation, '- you are not an admin of this organisation') if !local_group && !activity && !quick_create && !Organisation.admin?(organisation, account)
       errors.add(:activity, '- you are not an admin of this activity') if activity && !Activity.admin?(activity, account)
       errors.add(:local_group, '- you are not an admin of this local group') if local_group && !LocalGroup.admin?(local_group, account)
     end
@@ -230,6 +230,7 @@ class Event
 
   after_save do
     event_facilitations.create account: revenue_sharer if revenue_sharer
+    event_facilitations.create account: account if quick_create
 
     if changes['name'] && (post = posts.find_by(subject: "Chat for #{changes['name'][0]}"))
       post.update_attribute(:subject, "Chat for #{name}")
@@ -529,7 +530,7 @@ class Event
     errors.add(:end_time, 'must be after the start time') if end_time && start_time && end_time <= start_time
   end
 
-  validates_presence_of :name, :start_time, :end_time, :location, :currency
+  validates_presence_of :name, :start_time, :end_time, :location
   validates_uniqueness_of :ps_event_id, allow_nil: true
   validates_uniqueness_of :slug, allow_nil: true
   validates_format_of :slug, with: /\A[a-z0-9\-]+\z/, if: :slug

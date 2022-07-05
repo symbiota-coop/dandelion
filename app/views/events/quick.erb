@@ -1,0 +1,65 @@
+<script>
+  $(function () {
+    $('#event_start_time').siblings('small').text("<%==js_escape_html "#{Time.zone.name.include?('London') ? 'UK time' : "in #{Time.zone.name}"} (UTC #{Time.zone.now.formatted_offset})" %>")
+    $('#event_end_time').siblings('small').text("<%==js_escape_html "#{Time.zone.name.include?('London') ? 'UK time' : "in #{Time.zone.name}"} (UTC #{Time.zone.now.formatted_offset})" %>")
+
+    var autocomplete = new google.maps.places.Autocomplete($('#event_location')[0]);
+    $('#event_location').keydown(function (e) {
+      if (e.which == 13 && $('.pac-container:visible').length)
+        return false;
+    })
+
+    $('#event_image').change(function() {
+      fileUpload = this
+      var reader = new FileReader();
+
+      //Read the contents of Image File.
+      reader.readAsDataURL(fileUpload.files[0]);
+      reader.onload = function (e) {
+
+        //Initiate the JavaScript Image object.
+        var image = new Image();
+
+        //Set the Base64 string return from FileReader as source.
+        image.src = e.target.result;
+
+        //Validate the File Height and Width.
+        image.onload = function () {
+          var height = this.height;
+          var width = this.width;
+
+          if (width < 800) {
+            alert('Please use an image that is at least 800px wide');
+            $(fileUpload).val('')
+          }
+
+          if (height > width) {
+            alert('Please use an image that is more wide than high');
+            $(fileUpload).val('')
+          }
+        };
+      };
+    })
+  })
+</script>
+
+<% if @event.errors.count > 0 %>
+  <div class="alert alert-danger">
+    <ul class="mb-0">
+      <% @event.errors.full_messages.each { |message| %>
+      <li><%= message %></li>
+      <% } %>
+    </ul>
+  </div>
+<% end %>
+<% form_for @event, @event.new_record ? "/o/#{@organisation.slug}/events/quick" : "/events/#{@event.id}/quick" do |f| %>
+  <%= f.hidden_field :organisation_id %>
+  <%= f.text_block :name %>
+  <%= f.datetime_block :start_time %>
+  <%= f.datetime_block :end_time %>
+  <%= f.text_block :location %>
+  <%= f.email_block :email %>
+  <%= f.image_block :image %>
+  <%= f.wysiwyg_block :description %>
+  <%= f.submit_block %>
+<% end %>
