@@ -673,7 +673,7 @@ class Event
       start_time: 'Start date/time',
       end_time: 'End date/time',
       extra_info_for_ticket_email: 'Extra info for ticket confirmation email',
-      purchase_url: 'Purchase URL',
+      purchase_url: 'Ticket purchase URL',
       no_discounts: 'No discounts for monthly donors'
     }[attr.to_sym] || super
   end

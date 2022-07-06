@@ -1,6 +1,12 @@
 <table class="table table-hr">
   <tr>
-    <td>Hosted by</td>
+    <td>
+      <% if @event.purchase_url %>
+        Promoted by
+        <% else %>
+          Hosted by
+        <% end %>
+    </td>
     <td>
       <% if @event.organisation.image %>
         <a href="/o/<%= @event.organisation.slug %>/events"><img src="<%= u @event.organisation.image.thumb('500x500#').url %>" style="width: 50px"></a>
