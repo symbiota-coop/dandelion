@@ -68,8 +68,8 @@
     <% end %>
   </td>
   <td>
-    <% if event.facebook_event_id %>
-      <a target="_blank" href="http://facebook.com/events/<%= event.facebook_event_id %>"><i class="fa fa-facebook-square"></i></a>
+    <% if event.facebook_event_url %>
+      <a target="_blank" href="<%= event.facebook_event_url %>"><i class="fa fa-facebook-square"></i></a>
     <% end %>
   </td>
   <td>

@@ -21,7 +21,7 @@ class Event
   field :image_uid, type: String
   field :description, type: String
   field :email, type: String
-  field :facebook_event_id, type: String
+  field :facebook_event_url, type: String
   field :feedback_questions, type: String
   field :suggested_donation, type: Float
   field :minimum_donation, type: Float
@@ -59,7 +59,7 @@ class Event
       image: :image,
       description: :wysiwyg,
       email: :email,
-      facebook_event_id: :number,
+      facebook_event_url: :url,
       organisation_revenue_share: :number,
       feedback_questions: :text_area,
       hide_attendees: :check_box,
@@ -659,7 +659,7 @@ class Event
       slug: 'Short URL',
       email: 'Contact email',
       questions: 'Booking questions',
-      facebook_event_id: 'Facebook event ID',
+      facebook_event_url: 'Facebook event URL',
       facebook_pixel_id: 'Facebook Pixel ID',
       show_emails: 'Allow all event admins to view email addresses of attendees',
       opt_in_facilitator: 'Allow people to opt in to emails from facilitators',

@@ -112,7 +112,7 @@
         <%= f.select_block :currency %>
         <%= f.email_block :email %>
         <%= f.image_block :image %>
-        <%= f.number_block :facebook_event_id %>
+        <%= f.url_block :facebook_event_url %>
         <%= partial :'events/tags', locals: { f: f } %>
         <%= f.lookup_block :organisation_id, lookup_url: '/organisations.json', placeholder: 'Search organisations', selected_link: (%(<a class="d-inline-block mt-1" target="_blank" href="/o/#{@event.organisation.slug}">View organisation</a>) if @event.organisation_id) %>
         <%= f.lookup_block :coordinator_id, lookup_url: '/accounts.json', placeholder: 'Search accounts', selected_link: (%(<a class="d-inline-block mt-1" target="_blank" href="/u/#{@event.coordinator.username}">View account</a>) if @event.coordinator) %>
@@ -254,7 +254,7 @@
         <%= f.url_block :redirect_url %>
         <%= f.number_block :facebook_pixel_id %>
         <%= f.text_block :select_tickets_intro %>
-        <%= f.text_block :select_tickets_outro %>                
+        <%= f.text_block :select_tickets_outro %>
         <%= f.text_block :carousel_text %>
         <%= f.check_box_block :featured %>
         <%= f.check_box_block :secret %>
