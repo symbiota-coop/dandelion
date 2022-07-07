@@ -65,7 +65,7 @@ body[contenteditable] { background: white }
 
 .label-outline-primary { color: $color_primary; border: 1px solid $color_primary; }
 
-.map-icon-label .fa { color: white; font-size: 26px !important; position: relative; top: -14px }
+.map-icon-label .fa { color: white; font-size: 20px !important; position: relative; top: -18px }
 .map-icon-label .map-icon { color: white; font-size: 22px !important; position: relative; top: -4px }
 
 .navbar-brand .hw {
@@ -253,3 +253,5 @@ body { background: white }
 }
 
 .float-sub-menu { z-index: 99 }
+
+.infowindow .row { margin: 0 }

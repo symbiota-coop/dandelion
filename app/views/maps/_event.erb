@@ -1,1 +1,1 @@
-<%= cp(:'events/block', locals: { event: event }, key: "/events/#{event.id}?organisation_id=#{@organisation.try(:id)}&timezone=#{Time.zone.name}&event_admin=#{event_admin?(event) ? 1 : 0}") %>
+<%= cp(:'events/block', locals: { full_width: true, event: event }, key: "/events/#{event.id}?organisation_id=#{@organisation.try(:id)}&timezone=#{Time.zone.name}&event_admin=#{event_admin?(event) ? 1 : 0}&full_width=1") %>

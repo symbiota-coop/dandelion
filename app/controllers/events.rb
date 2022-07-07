@@ -23,7 +23,23 @@ Dandelion::App.controller do
     when :html
       @events = @events.future(@from)
       if request.xhr?
-        partial :'events/events'
+        if params[:display] == 'map'
+          @lat = params[:lat]
+          @lng = params[:lng]
+          @zoom = params[:zoom]
+          @south = params[:south]
+          @west = params[:west]
+          @north = params[:north]
+          @east = params[:east]
+          box = [[@west.to_f, @south.to_f], [@east.to_f, @north.to_f]]
+
+          @events = @events.and(coordinates: { '$geoWithin' => { '$box' => box } }) unless @events.empty?
+          @points_count = @events.count
+          @points = @events.to_a
+          partial :'maps/map', locals: { stem: '/events', dynamic: true, points: @points, points_count: @points_count, centre: (OpenStruct.new(lat: @lat, lng: @lng) if @lat && @lng), zoom: @zoom }
+        else
+          partial :'events/events'
+        end
       else
         erb :'events/events'
       end

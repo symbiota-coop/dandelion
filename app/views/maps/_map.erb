@@ -14,7 +14,7 @@
     var bounds = new google.maps.LatLngBounds();
 
     var models = []
-  <% [Place, Account, Gathering, ActivityApplication].each { |model| %>
+  <% [Place, Account, Gathering, ActivityApplication, Event].each { |model| %>
       models.push({
         name: '<%= model.to_s %>',
         color: '<%= model.marker_color %>',
@@ -28,8 +28,8 @@
         points.push({
           model_name: '<%= point.class.to_s %>',
           id: '<%= point.id %>',
-          lat: <%= point.lat + (point.is_a?(Account) || point.is_a?(ActivityApplication) ? (rand - 0.5) * 0.0035 : 0) %>,
-          lng: <%= point.lng + (point.is_a?(Account) || point.is_a?(ActivityApplication) ? (rand - 0.5) * 0.0035 : 0) %>,
+          lat: <%= point.lat + ([Account, ActivityApplication, Event].include?(point.class) ? (rand - 0.5) * 0.0035 : 0) %>,
+          lng: <%= point.lng + ([Account, ActivityApplication, Event].include?(point.class) ? (rand - 0.5) * 0.0035 : 0) %>,
         })
   <% } %>
   <% end %>
@@ -158,7 +158,7 @@
             q['triggered_bounds_changed'] = true
   <% end %>
           jQuery.extend(params, q);
-          pagelet.attr('data-pagelet-url', '/map?' + $.param(params))
+          pagelet.attr('data-pagelet-url', '<%=defined?(stem) && stem ? stem : '/map' %>/?' + $.param(params))
 
           clearTimeout(mapTimer);
           mapTimer = setTimeout(function () {

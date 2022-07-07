@@ -103,7 +103,7 @@ class Event
   end
 
   def self.marker_color
-    '#206CA0'
+    '#FF5241'
   end
 
   def self.marker_icon
