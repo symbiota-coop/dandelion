@@ -505,6 +505,7 @@ class Event
   handle_asynchronously :send_reminders
 
   def send_feedback_requests(account_id: nil)
+    return if feedback_questions.nil?
     return unless organisation
 
     mg_client = Mailgun::Client.new ENV['MAILGUN_API_KEY'], 'api.eu.mailgun.net'
@@ -700,7 +701,7 @@ class Event
       select_tickets_outro: 'Text to show at the bottom of the Select tickets panel',
       suggested_donation: 'If this is blank, the donation field will not be shown',
       questions: 'Questions to ask participants upon booking. One question per line. Wrap in [square brackets] to turn into a checkbox.',
-      feedback_questions: 'Questions to ask participants in the post-event feedback form. One question per line.'
+      feedback_questions: 'Questions to ask participants in the post-event feedback form. One question per line. Leave blank to disable feedback.'
     }
   end
 
