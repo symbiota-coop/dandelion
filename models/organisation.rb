@@ -69,6 +69,7 @@ class Organisation
   field :verified, type: Boolean
   field :contribution_not_required, type: Boolean
   field :contribution_requested_per_event_gbp, type: Integer
+  field :ical_full, type: Boolean
 
   def self.admin_fields
     {

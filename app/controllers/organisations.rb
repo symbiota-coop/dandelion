@@ -244,9 +244,15 @@ Dandelion::App.controller do
           next if event.draft?
 
           rcal.event do |revent|
-            revent.summary = (event.start_time.to_date == event.end_time.to_date ? event.name : "#{event.name} starts")
-            revent.dtstart = (event.start_time.to_date == event.end_time.to_date ? event.start_time : event.start_time.to_date)
-            revent.dtend = (event.start_time.to_date == event.end_time.to_date ? event.end_time : event.start_time.to_date)
+            if @organisation.ical_full
+              revent.summary = event.name
+              revent.dtstart = event.start_time
+              revent.dtend = event.end_time
+            else
+              revent.summary = "#{event.name} starts"
+              revent.dtstart = event.start_time.to_date
+              revent.dtend = event.start_time.to_date
+            end
             revent.location = event.location
             revent.description = %(#{ENV['BASE_URI']}/events/#{event.id})
             revent.uid = event.id.to_s
