@@ -140,9 +140,6 @@ GEM
       money-tree (~> 0.10)
       rlp (~> 0.7)
       scrypt (~> 3.0)
-    eu_central_bank (1.7.0)
-      money (~> 6.13, >= 6.13.6)
-      nokogiri (~> 1.9)
     excon (0.91.0)
     factory_bot (6.2.0)
       activesupport (>= 5.0.0)
@@ -254,6 +251,8 @@ GEM
       i18n (>= 0.6.4, <= 2)
     money-tree (0.10.0)
       ffi
+    money-uphold-bank (0.0.6)
+      money (~> 6.12)
     mongo (2.17.0)
       bson (>= 4.8.2, < 5.0.0)
     mongoid (7.3.4)
@@ -464,7 +463,6 @@ DEPENDENCIES
   dragonfly-s3_data_store
   email_address
   erb_lint
-  eu_central_bank
   factory_bot
   geocoder (= 1.7.0)
   gocardless_pro
@@ -479,6 +477,7 @@ DEPENDENCIES
   mechanize
   minitest-rg
   money
+  money-uphold-bank
   mongoid
   mongoid_paranoia
   omniauth

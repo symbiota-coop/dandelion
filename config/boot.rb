@@ -7,6 +7,7 @@ require 'rubygems' unless defined?(Gem)
 require 'bundler/setup'
 require 'open-uri'
 require 'active_support/time'
+require 'money/bank/uphold'
 Bundler.require(:default, RACK_ENV)
 
 #  Dir['app/views/**/*.erb'].each { |p| puts p; `htmlbeautifier #{p} -b 2` }
@@ -20,9 +21,8 @@ Delayed::Worker.max_attempts = 1
 
 Geocoder.configure(lookup: :google, api_key: ENV['GOOGLE_MAPS_API_KEY'])
 
-eu_bank = EuCentralBank.new
-Money.default_bank = eu_bank
-eu_bank.update_rates
+bank = Money::Bank::Uphold.new
+Money.default_bank = bank
 
 Time.zone = 'London'
 
