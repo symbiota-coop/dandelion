@@ -212,7 +212,7 @@ class Order
     if (organisationship = event.organisation.organisationships.find_by(account: account))
       begin
         credit_balance = organisationship.credit_balance.exchange_to(currency)
-      rescue CurrencyUnavailable
+      rescue Money::Bank::UnknownRate
         return
       end
       if credit_balance > 0

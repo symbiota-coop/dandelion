@@ -2,7 +2,7 @@
 
 <% begin %>
   <%= partial :'organisations/pay', locals: { organisation: @event.organisation } %>
-  <% rescue CurrencyUnavailable %>
+  <% rescue Money::Bank::UnknownRate %>
 <% end %>
 
 
