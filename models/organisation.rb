@@ -570,6 +570,8 @@ class Organisation
     end
 
     all_pledges.each do |pledge|
+      next unless pledge.declined_since.nil?
+
       name = pledge.patron.full_name
       email = pledge.patron.email
       amount = pledge.amount_cents
