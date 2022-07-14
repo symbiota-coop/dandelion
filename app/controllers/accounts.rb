@@ -139,7 +139,7 @@ Dandelion::App.controller do
       else
         redirect '/accounts/edit'
       end
-    elsif (account = Account.find_by(email: @account.email.downcase))
+    elsif @account.email && (account = Account.find_by(email: @account.email.downcase))
       if params[:recaptcha_skip_secret] && params[:organisation_id]
         @organisation = Organisation.find(params[:organisation_id])
         @organisation.organisationships.create account: account, skip_welcome: params[:skip_welcome], referrer_id: params[:referrer_id]
