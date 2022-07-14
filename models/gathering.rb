@@ -134,6 +134,7 @@ class Gathering
 
   before_validation do
     errors.add(:fixed_threshold, 'cannot be negative') if fixed_threshold && fixed_threshold.negative?
+    errors.add(:member_limit, 'must be positive') if fixed_threshold && !fixed_threshold.positive?
     self.listed = nil if privacy == 'secret'
     self.balance = 0 if balance.nil?
     self.invitations_granted = 0 if invitations_granted.nil?
