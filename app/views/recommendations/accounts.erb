@@ -1,24 +1,9 @@
-<%
-events = Event.where(:id.in => @account.tickets.pluck(:event_id) + @account.event_facilitations.pluck(:event_id))
-friends = {}
-events.each { |event|
-  (event.attendees + event.event_facilitators).each { |attendee|
-    next if attendee.id == @account.id
-    if !friends[attendee.id]
-      friends[attendee.id] = [event.id]
-    else
-      friends[attendee.id] << event.id
-    end
-  }
-}
-friends = friends.select { |k,v| v.count > 1 }
-friends = friends.sort_by { |k,v| -v.count }
-%>
 
-<p class="lead">People you've attended the same events as</p>
+<%= partial :'recommendations/nav' %>
+
 <ul class="search-result-list">
-  <% friends.each { |k,v| account = Account.find(k) %>
-  <li>
+  <% @friends.select { |_k, v| v.count > 1 }.first(50).each_with_index { |x,i| k,v = x; account = Account.find(k) %>
+  <li <% if i == 0 %> style="border-top: 0" <% end %>>
     <div class="search-result-media" style="height: auto">
       <%= partial :'accounts/square', locals: { account: account, style: 'display: block;' } %>
     </div>

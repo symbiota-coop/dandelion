@@ -43,4 +43,8 @@
       <a target="_blank" href="https://www.google.co.uk/maps?q=<%= event.location %>"><%= event.location %></a>
     <% end %>
   </li>
+<% if defined?(skip_final_ul) && skip_final_ul %>
+
+<% else %>
 </ul>
+<% end %>

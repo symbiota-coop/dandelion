@@ -1,0 +1,82 @@
+<%
+events = Event.live.public.future
+events = events.map { |event|
+  if event.attendees.include?(@account) || event.event_facilitators.include?(@account)
+    nil
+  else
+    participant_ids = event.attendees.pluck(:id) + event.event_facilitators.pluck(:id)
+    [event.id, @friends.select { |k,v| participant_ids.include?(k) }]
+  end
+}.compact
+events = events.select { |event_id, friends| friends.map { |k,v| v }.flatten.count > 0 }
+events = events.sort_by { |event_id, friends| -friends.map { |k,v| v }.flatten.count }.first(10)
+show_image = false
+%>
+
+<%= partial :'recommendations/nav' %>
+
+<% if events.count == 0 %>
+  <em>No recommended events</em>
+<% else %>
+  <div class="fake-container-fluid mb-3">
+    <div class="row bg-grey-transparent-2 pt-4 px-5" id="events">
+      <% events.each { |event_id,friends|  event = Event.find(event_id); next if event.draft? && !event_admin?(event) %>
+      <div class="col-12 <%= block_class if defined?(block_class) %>" id="<%= event.id %>">
+        <div class="mb-4">
+
+          <div class="row block no-gutters align-items-center <% if event.draft? %>bg-grey-transparent-2<% else %>bg-white<% end %>">
+            <% if show_image %>
+              <% if !event.image && (defined?(full_width) && full_width) %>
+
+              <% else %>
+                <div class="col-md-6 order-md-2 mb-2 mb-md-0">
+                  <% if @organisation && (cohostship = event.cohostships.find_by(organisation: @organisation)) && cohostship.image && (cohostship.image.width >= cohostship.image.height) %>
+                    <a target="_parent" href="/events/<%= event.id %>?cohost=<%=@organisation.slug%>"><img class="w-100" src="<%= u cohostship.image.thumb('640x640').url %>"></a>
+                  <% elsif event.image && (event.image.width >= event.image.height) %>
+                    <a target="_parent" href="/events/<%= event.id %>"><img class="w-100" src="<%= u event.image.thumb('640x640').url %>"></a>
+                  <% end %>
+                </div>
+              <% end %>
+            <% end %>
+            <div class="<% if show_image && !event.image && (defined?(full_width) && full_width) %>col-md-12<% else %>col-md-6<% end %> order-md-1">
+              <table style="width: 100%; height: 100%">
+                <tr>
+                  <td style="vertical-align: top">
+                    <div class="row justify-content-between">
+                      <div class="col ml-1 p-sm-3">
+                        <%= partial :'events/block_main', locals: { event: event, skip_final_ul: true } %>
+
+                    <li><i data-toggle="tooltip" title="People" class="fa fa-li fa-user"></i>
+                          <% friends.each { |k,v| account = Account.find(k) %>
+                            <a href="/u/<%=account.username%>"><%=account.name%></a>,
+                            <span data-toggle="tooltip">
+                              <%=pluralize v.count, 'past event'%> in common
+                            </span>
+                            <span class="d-none">
+                              <%== Event.where(:id.in => v).map { |event| "#{event.name}" }.join('<br />')%>
+                            </span>
+                            <br />
+                          <% } %>
+                      </li>
+                    </ul>
+
+                      </div>
+                    </div>
+                  </td>
+                </tr>
+              </table>
+            </div>
+          </div>
+
+        </div>
+      </div>
+      <% } %>
+    </div>
+  </div>
+  <style>
+    @media(max-width: 767px) {
+      .fake-container-fluid > .px-5 { padding-left: 1rem !important; padding-right: 1rem !important }
+      .fake-container-fluid > .bg-grey-transparent-2 { background: white !important }
+    }
+  </style>
+<% end %>
