@@ -10,7 +10,7 @@ events = events.map { |event|
 }.compact
 events = events.select { |event_id, friends| friends.map { |k,v| v }.flatten.count > 0 }
 events = events.sort_by { |event_id, friends| -friends.map { |k,v| v }.flatten.count }.first(10)
-show_image = false
+show_image = (Padrino.env == :production)
 %>
 
 <%= partial :'recommendations/nav' %>
