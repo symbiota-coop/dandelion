@@ -1,0 +1,37 @@
+<%
+events = Event.where(:id.in => @account.tickets.pluck(:event_id) + @account.event_facilitations.pluck(:event_id))
+friends = {}
+events.each { |event|
+  (event.attendees + event.event_facilitators).each { |attendee|
+    next if attendee.id == @account.id
+    if !friends[attendee.id]
+      friends[attendee.id] = [event.id]
+    else
+      friends[attendee.id] << event.id
+    end
+  }
+}
+friends = friends.sort_by { |k,v| -v.count }
+%>
+
+<p class="lead">People you've attended the same events as</p>
+<ul class="search-result-list">
+  <% friends.each { |k,v| account = Account.find(k) %>
+  <li>
+    <div class="search-result-media" style="height: auto">
+      <%= partial :'accounts/square', locals: { account: account, style: 'display: block;' } %>
+    </div>
+    <div class="search-result-content">
+      <h2>
+        <a class="text-dark" href="/u/<%= account.username %>"><%= account.name %></a>
+      </h2>
+      <%= partial :'accounts/buttons', locals: { account: account } %>
+      <ul class="fa-ul mt-3">
+        <% v.map { |event_id| Event.find(event_id) }.sort_by { |event| event.start_time }.reverse.each { |event| %>
+          <li><i class="fa fa-li fa-calendar"></i> <a href="/events/<%= event.id %>"><%= event.name %></a>, <%=concise_when_details(event) %></li>
+        <% } %>
+      </ul>
+    </div>
+  </li>
+  <% } %>
+</ul>

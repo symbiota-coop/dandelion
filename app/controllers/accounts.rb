@@ -399,4 +399,10 @@ Dandelion::App.controller do
     current_account.calendars.find(params[:id]).try(:destroy)
     redirect back
   end
+
+  get '/recommendations' do
+    sign_in_required!
+    @account = current_account
+    erb :'accounts/recommendations'
+  end
 end
