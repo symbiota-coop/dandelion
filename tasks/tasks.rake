@@ -53,6 +53,18 @@ namespace :gatherings do
 end
 
 namespace :events do
+  task recommend: :environment do
+    events_with_participant_ids = Event.live.public.future.map do |event|
+      [event.id.to_s, event.attendees.pluck(:id).map(&:to_s) + event.event_facilitators.pluck(:id).map(&:to_s)]
+    end
+    c = Account.recommendable.count
+    Account.recommendable.each_with_index do |account, i|
+      puts "#{i + 1}/#{c}"
+      account.recommended_people
+      account.recommended_events(events_with_participant_ids)
+    end
+  end
+
   task check_seeds_accounts: :environment do
     Organisation.and(:seeds_username.ne => nil).each do |organisation|
       organisation.check_seeds_account if Order.and(:payment_completed.ne => true, :seeds_secret.ne => nil, :event_id.in => organisation.events.pluck(:id)).count > 0

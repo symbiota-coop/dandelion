@@ -2,7 +2,7 @@
 <%= partial :'recommendations/nav' %>
 
 <ul class="search-result-list">
-  <% @friends.select { |_k, v| v.count > 1 }.first(50).each_with_index { |x,i| k,v = x; account = Account.find(k) %>
+  <% @account.recommended_people_cache.first(50).each_with_index { |x,i| k,v = x; account = Account.find(k) %>
   <li <% if i == 0 %> style="border-top: 0" <% end %>>
     <div class="search-result-media" style="height: auto">
       <%= partial :'accounts/square', locals: { account: account, style: 'display: block;' } %>
@@ -13,7 +13,7 @@
       </h2>
       <%= partial :'accounts/buttons', locals: { account: account } %>
       <ul class="fa-ul mt-3">
-        <% v.map { |event_id| Event.find(event_id) }.sort_by { |event| event.start_time }.reverse.each { |event| %>
+        <% Event.where(:id.in => v).order('start_time desc').each { |event| %>
           <li><i class="fa fa-li fa-calendar"></i> <a href="/events/<%= event.id %>"><%= event.name %></a>, <%=concise_when_details(event) %></li>
         <% } %>
       </ul>

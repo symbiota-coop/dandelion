@@ -72,6 +72,16 @@
         </div>
       <% end %>
 
+      <% if current_account.recommended_events_cache %>
+        <div class="card mb-3">
+          <h3 class="card-header bg-primary text-white">Recommended for you</h3>
+          <div class="card-body">
+            <%= cp(:'events/recommended', key: "/events/recommended?account_id=#{current_account.id}", expires: 1.day.from_now) %>
+            <p class="mt-3 mb-0"><a href="/recommendations/events">More recommendations &rarr;</a></p>
+          </div>
+        </div>
+      <% end %>
+
       <div class="card mb-3">
         <h3 class="card-header bg-primary text-white">Trending</h3>
         <div class="card-body">

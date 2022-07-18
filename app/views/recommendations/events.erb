@@ -1,26 +1,16 @@
 <%
-events = Event.live.public.future
-events = events.map { |event|
-  if event.attendees.include?(@account) || event.event_facilitators.include?(@account)
-    nil
-  else
-    participant_ids = event.attendees.pluck(:id) + event.event_facilitators.pluck(:id)
-    [event.id, @friends.select { |k,v| participant_ids.include?(k) }]
-  end
-}.compact
-events = events.select { |event_id, friends| friends.map { |k,v| v }.flatten.count > 0 }
-events = events.sort_by { |event_id, friends| -friends.map { |k,v| v }.flatten.count }.first(10)
+recommended_events = @account.recommended_events_cache
 show_image = (Padrino.env == :production)
 %>
 
 <%= partial :'recommendations/nav' %>
 
-<% if events.count == 0 %>
+<% if recommended_events.count == 0 %>
   <em>No recommended events</em>
 <% else %>
   <div class="fake-container-fluid mb-3">
     <div class="row bg-grey-transparent-2 pt-4 px-5" id="events">
-      <% events.each { |event_id,friends|  event = Event.find(event_id); next if event.draft? && !event_admin?(event) %>
+      <% recommended_events.each { |event_id,people|  event = Event.find(event_id) %>
       <div class="col-12 <%= block_class if defined?(block_class) %>" id="<%= event.id %>">
         <div class="mb-4">
 
@@ -47,7 +37,7 @@ show_image = (Padrino.env == :production)
                         <%= partial :'events/block_main', locals: { event: event, skip_final_ul: true } %>
 
                     <li><i data-toggle="tooltip" title="People" class="fa fa-li fa-user"></i>
-                          <% friends.each { |k,v| account = Account.find(k) %>
+                          <% people.each { |k,v| account = Account.find(k) %>
                             <a href="/u/<%=account.username%>"><%=account.name%></a>,
                             <span data-toggle="tooltip">
                               <%=pluralize v.count, 'past event'%> in common

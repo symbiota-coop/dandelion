@@ -44,6 +44,8 @@ class Account
   field :can_message, type: Boolean
   field :failed_sign_in_attempts, type: Integer
   field :minimal_head, type: String
+  field :recommended_people_cache, type: Array
+  field :recommended_events_cache, type: Array
 
   %w[email_confirmed
      updated_profile
@@ -724,6 +726,43 @@ Two Spirit).split("\n")
     end
 
     batch_message.finalize if ENV['MAILGUN_API_KEY']
+  end
+
+  def self.recommendable
+    Account.where(:id.in => Ticket.pluck(:account_id) + EventFacilitation.pluck(:account_id))
+  end
+
+  def recommended_people
+    events = Event.where(:id.in => tickets.pluck(:event_id) + event_facilitations.pluck(:event_id))
+    people = {}
+    events.each do |event|
+      (event.attendees.pluck(:id) + event.event_facilitators.pluck(:id)).each do |attendee_id|
+        next if attendee_id == id
+
+        if !people[attendee_id.to_s]
+          people[attendee_id.to_s] = [event.id.to_s]
+        else
+          people[attendee_id.to_s] << event.id.to_s
+        end
+      end
+    end
+    people = people.sort_by { |_k, v| -v.count }
+    update_attribute(:recommended_people_cache, people)
+  end
+
+  def recommended_events(events_with_participant_ids = Event.live.public.future.map do |event|
+    [event.id.to_s, event.attendees.pluck(:id).map(&:to_s) + event.event_facilitators.pluck(:id).map(&:to_s)]
+  end, people = recommended_people_cache)
+    events = events_with_participant_ids.map do |event_id, participant_ids|
+      if participant_ids.include?(id.to_s)
+        nil
+      else
+        [event_id, people.select { |k, _v| participant_ids.include?(k) }]
+      end
+    end.compact
+    events = events.select { |_event_id, people| people.map { |_k, v| v }.flatten.count > 0 }
+    events = events.sort_by { |_event_id, people| -people.map { |_k, v| v }.flatten.count }
+    update_attribute(:recommended_events_cache, events)
   end
 
   private

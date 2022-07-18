@@ -1,0 +1,7 @@
+<% i = 0; current_account.recommended_events_cache.each { |event_id,people| event = Event.find(event_id);
+  next unless event.image_uid
+%>
+  <div class="mb-1">
+    <%= partial :'events/block_carousel', locals: {event: event} %>
+  </div>
+<% i += 1; if i == 3; break; end  }  %>
