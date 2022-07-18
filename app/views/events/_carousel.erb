@@ -28,7 +28,7 @@
   })
 </script>
 <% if events.count > 0 %>
-  <div class="slick-container mt-5 mb-sm-5" id="<%= carousel_id %>">
+  <div class="slick-container <% unless defined?(skip_margin) %> mt-5 <% end %> mb-sm-5" id="<%= carousel_id %>">
     <% if defined? title %>
       <% unless defined?(hide_featured_title) && hide_featured_title && title == 'Featured' %>
         <h2 class="text-center"><%= title %></h2>
