@@ -56,7 +56,7 @@
     if event.image_uid && (!event.draft? || event_admin?(event))
       event
     end
-  }.compact.first(8) } %>
+  }.compact.first(9) } %>
 <% end %>
 
 <% if (organisations = Organisation.and(:id.in =>
