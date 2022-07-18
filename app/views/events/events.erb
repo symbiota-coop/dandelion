@@ -50,7 +50,7 @@
 
 <% if current_account && !params[:search] && !params[:event_tag_id] %>
 
-<% if current_account.recommended_events_cache %>
+<% if current_account.recommended_events_cache && current_account.recommended_events_cache.count > 0 %>
   <%= partial :'events/carousel', locals: { skip_margin: true, crop: '640x360#nw', title: 'Recommended for you', events: current_account.recommended_events_cache.map { |event_id,people|
     event = Event.find(event_id)
     if event.image_uid && (!event.draft? || event_admin?(event))

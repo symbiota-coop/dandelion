@@ -72,7 +72,7 @@
         </div>
       <% end %>
 
-      <% if current_account.recommended_events_cache %>
+      <% if current_account.recommended_events_cache && current_account.recommended_events_cache.count > 0 %>
         <div class="card mb-3">
           <h3 class="card-header bg-primary text-white">Recommended for you</h3>
           <div class="card-body">
