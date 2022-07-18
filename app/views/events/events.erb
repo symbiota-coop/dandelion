@@ -61,7 +61,7 @@
 <% end %>
 
 <% if current_account.recommended_events_cache %>
-  <%= partial :'events/carousel', locals: { events: current_account.recommended_events_cache.map { |event_id,people|
+  <%= partial :'events/carousel', locals: { crop: '640x360#', events: current_account.recommended_events_cache.map { |event_id,people|
     event = Event.find(event_id)
     if event.image_uid && (!event.draft? || event_admin?(event))
       event

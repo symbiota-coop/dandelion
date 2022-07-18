@@ -37,7 +37,7 @@
     <div class="slick-responsive row justify-content-center">
       <% events.each { |event| %>
       <div class="col-12 col-sm-6 col-md-4 slick-item">
-        <%= partial :'events/block_carousel', locals: {event: event} %>
+        <%= partial :'events/block_carousel', locals: {crop: (crop if defined?(crop)), event: event} %>
       </div>
       <% } %>
     </div>
