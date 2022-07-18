@@ -733,10 +733,10 @@ Two Spirit).split("\n")
   end
 
   def recommended_people
-    events = Event.where(:id.in => tickets.pluck(:event_id) + event_facilitations.pluck(:event_id))
+    events = Event.where(:id.in => tickets.pluck(:event_id))
     people = {}
     events.each do |event|
-      (event.attendees.pluck(:id) + event.event_facilitators.pluck(:id)).each do |attendee_id|
+      event.attendees.pluck(:id).each do |attendee_id|
         next if attendee_id == id
 
         if !people[attendee_id.to_s]
@@ -751,7 +751,7 @@ Two Spirit).split("\n")
   end
 
   def recommended_events(events_with_participant_ids = Event.live.public.future.map do |event|
-    [event.id.to_s, event.attendees.pluck(:id).map(&:to_s) + event.event_facilitators.pluck(:id).map(&:to_s)]
+    [event.id.to_s, event.attendees.pluck(:id).map(&:to_s)]
   end, people = recommended_people_cache)
     events = events_with_participant_ids.map do |event_id, participant_ids|
       if participant_ids.include?(id.to_s)
