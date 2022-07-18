@@ -1,4 +1,5 @@
 <% i = 0; current_account.recommended_events_cache.each { |event_id,people| event = Event.find(event_id);
+  next if event.draft? && !event_admin?(event)
   next unless event.image_uid
 %>
   <div class="mb-1">

@@ -10,7 +10,7 @@ show_image = (Padrino.env == :production)
 <% else %>
   <div class="fake-container-fluid mb-3">
     <div class="row bg-grey-transparent-2 pt-4 px-5" id="events">
-      <% recommended_events.each { |event_id,people|  event = Event.find(event_id) %>
+      <% recommended_events.each { |event_id,people|  event = Event.find(event_id); next if event.draft? && !event_admin?(event) %>
       <div class="col-12 <%= block_class if defined?(block_class) %>" id="<%= event.id %>">
         <div class="mb-4">
 
