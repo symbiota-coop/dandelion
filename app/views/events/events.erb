@@ -50,15 +50,6 @@
 
 <% if current_account && !params[:search] && !params[:event_tag_id] %>
 
-<% if current_account.recommended_events_cache && current_account.recommended_events_cache.count > 0 %>
-  <%= partial :'events/carousel', locals: { skip_margin: true, crop: '640x360#nw', title: 'Recommended for you', events: current_account.recommended_events_cache.map { |event_id,people|
-    event = Event.find(event_id)
-    if event.image_uid && (!event.draft? || event_admin?(event))
-      event
-    end
-  }.compact.first(9) } %>
-<% end %>
-
 <% if (organisations = Organisation.and(:id.in =>
 current_account.organisationships.and(:hide_membership.ne => true).pluck(:organisation_id) +
 current_account.organisationships.and(:admin => true).pluck(:organisation_id)
@@ -66,8 +57,7 @@ current_account.organisationships.and(:admin => true).pluck(:organisation_id)
 Event.live.public.future.pluck(:organisation_id)
 )
 ).count > 0 %>
-<h2 class="text-center">Organisations with live events</h2>
-<%= partial :'events/carousel_organisations', locals: { organisations: organisations } %>
+  <%= partial :'events/carousel_organisations', locals: { organisations: organisations } %>
 <% end %>
 
 <% end %>
