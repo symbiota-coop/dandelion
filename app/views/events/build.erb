@@ -258,9 +258,9 @@
       </div>
       <div role="tabpanel" class="tab-pane" id="tab6">
         <%= f.shorturl_block :slug, stem: "#{ENV['BASE_URI']}/e/" %>
-        <%= f.select_block :time_zone %>
         <%= f.url_block :redirect_url %>
         <%= f.number_block :facebook_pixel_id %>
+        <%= f.select_block :time_zone %>
         <%= f.text_block :select_tickets_intro %>
         <%= f.text_block :select_tickets_outro %>
         <%= f.text_block :carousel_text %>

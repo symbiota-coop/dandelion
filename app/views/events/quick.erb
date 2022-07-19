@@ -3,6 +3,10 @@
     $('#event_start_time').siblings('small').text("<%==js_escape_html "#{Time.zone.name.include?('London') ? 'UK time' : "in #{Time.zone.name}"} (UTC #{Time.zone.now.formatted_offset})" %>")
     $('#event_end_time').siblings('small').text("<%==js_escape_html "#{Time.zone.name.include?('London') ? 'UK time' : "in #{Time.zone.name}"} (UTC #{Time.zone.now.formatted_offset})" %>")
 
+    $('#event_start_time').change(function() {
+      $('#event_end_time')[0]._flatpickr.set('minDate', $('#event_start_time')[0]._flatpickr.selectedDates[0])
+    })    
+
     var autocomplete = new google.maps.places.Autocomplete($('#event_location')[0]);
     $('#event_location').keydown(function (e) {
       if (e.which == 13 && $('.pac-container:visible').length)

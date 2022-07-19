@@ -656,6 +656,7 @@ class Event
 
   def self.human_attribute_name(attr, options = {})
     {
+      description: 'Public event description',
       name: 'Event title',
       slug: 'Short URL',
       email: 'Contact email',
@@ -675,7 +676,8 @@ class Event
       end_time: 'End date/time',
       extra_info_for_ticket_email: 'Extra info for ticket confirmation email',
       purchase_url: 'Ticket purchase URL',
-      no_discounts: 'No discounts for monthly donors'
+      no_discounts: 'No discounts for monthly donors',
+      notes: 'Private notes'
     }[attr.to_sym] || super
   end
 
@@ -696,12 +698,28 @@ class Event
       time_zone: "Time zone to use for people that aren't signed in or haven't set a time zone",
       add_a_donation_to: "Text to display above the 'Add a donation' field (leave blank to use organisation default)",
       donation_text: "Text to display below the 'Add a donation' field  (leave blank to use organisation default)",
-      carousel_text: 'Text to show when hovering over this event in a carousel',
+      carousel_text: 'Text to show when hovering over the event in a carousel',
       select_tickets_intro: 'Text to show at the top of the Select tickets panel',
       select_tickets_outro: 'Text to show at the bottom of the Select tickets panel',
       suggested_donation: 'If this is blank, the donation field will not be shown',
       questions: 'Questions to ask participants upon booking. One question per line. Wrap in [square brackets] to turn into a checkbox.',
-      feedback_questions: 'Questions to ask participants in the post-event feedback form. One question per line. Leave blank to disable feedback.'
+      feedback_questions: 'Questions to ask participants in the post-event feedback form. One question per line. Leave blank to disable feedback.',
+      image: 'At least 800px wide, and more wide than high',
+      extra_info_for_ticket_email: 'This is the place to enter Zoom links, directions to the venue, etc.',
+      featured: "Feature the event on the organisation's events page",
+      secret: 'Hide the event from all public listings',
+      draft: 'Make the event visible to admins only',
+      hide_attendees: 'Hide the list of attendees (in any case, individuals must opt in)',
+      hide_discussion: 'Hide the private discussion for attendees and facilitators',
+      show_emails: 'Allow all event admins to view attendee emails (by default, only organisation admins see them)',
+      opt_in_facilitator: "Allow people to opt in to receive emails from any facilitators' personal lists",
+      monthly_donors_only: 'Only allow people making a monthly donation to the organisation to purchase tickets',
+      no_discounts: "Don't apply any standard discounts for monthly donors to the event",
+      include_in_parent: 'If the event has a local group, show it in the event listings of the parent organisation',
+      refund_deleted_orders: 'Attempt to refund deleted orders via Stripe, and all orders if the event is deleted',
+      redirect_url: 'Optional. By default people will be shown a thank you page on Dandelion.',
+      facebook_pixel_id: 'Your Facebook Pixel ID for tracking sales',
+      purchase_url: "URL where people can buy tickets (if you're not selling tickets on Dandelion)"
     }
   end
 
