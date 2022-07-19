@@ -50,6 +50,10 @@
         return false;
     })
 
+    $('#event_start_time').change(function() {
+      $('#event_end_time')[0]._flatpickr.set('minDate', $('#event_start_time')[0]._flatpickr.selectedDates[0])
+    })
+
     $('#event_image').change(function() {
       fileUpload = this
       var reader = new FileReader();
@@ -179,30 +183,34 @@
 
           })
         </script>
-        <div id="local-group-select">
+        <div id="local-group-select" <% unless @event.organisation.verified? %> class="mb-3" <% end %>>
           <%= f.lookup_block :local_group_id, lookup_url: "/o/#{@event.organisation_id}/local_groups.json", placeholder: 'Search local groups', selected_link: (%(<a class="d-inline-block mt-1" target="_blank" href="/local_groups/#{@event.local_group_id}">View local group</a>) if @event.local_group_id) %>
         </div>
-        <p id="do-zoom-party">or <a href="javascript:;">turn this event into a Zoom party (experimental)</a></p>
-        <div id="zoom-party-checkbox">
-          <%= f.check_box_block :zoom_party %>
-        </div>
-        <div id="not-zoom-party">
-          <%= f.lookup_block :revenue_sharer_id, lookup_url: '/accounts.json', placeholder: 'Search accounts', selected_link: (%(<a class="d-inline-block mt-1" target="_blank" href="/u/#{@event.revenue_sharer.username}">View account</a>) if @event.revenue_sharer_id) %>
-          <script>
-            $(function () {
-              $('#event_revenue_sharer_id').change(function () {
-                if ($(this).val().length > 0) {
-                  $('#organisation-revenue-share').show()
-                } else {
-                  $('#organisation-revenue-share').hide()
-                }
-              })
-              $('#event_revenue_sharer_id').change()
-            })
-          </script>
-          <div id="organisation-revenue-share">
-            <%= f.number_block :organisation_revenue_share %>
+        <% if @event.organisation.verified? %>
+          <p id="do-zoom-party">or <a href="javascript:;">turn this event into a Zoom party (experimental)</a></p>
+          <div id="zoom-party-checkbox">
+            <%= f.check_box_block :zoom_party %>
           </div>
+        <% end %>
+        <div id="not-zoom-party">
+          <% if @event.organisation.stripe_client_id %>
+            <%= f.lookup_block :revenue_sharer_id, lookup_url: '/accounts.json', placeholder: 'Search accounts', selected_link: (%(<a class="d-inline-block mt-1" target="_blank" href="/u/#{@event.revenue_sharer.username}">View account</a>) if @event.revenue_sharer_id) %>
+            <script>
+              $(function () {
+                $('#event_revenue_sharer_id').change(function () {
+                  if ($(this).val().length > 0) {
+                    $('#organisation-revenue-share').show()
+                  } else {
+                    $('#organisation-revenue-share').hide()
+                  }
+                })
+                $('#event_revenue_sharer_id').change()
+              })
+            </script>
+            <div id="organisation-revenue-share">
+              <%= f.number_block :organisation_revenue_share %>
+            </div>
+          <% end %>
         </div>
       </div>
       <div role="tabpanel" class="tab-pane" id="tab2">
