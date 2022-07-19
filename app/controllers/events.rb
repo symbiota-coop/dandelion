@@ -99,7 +99,7 @@ Dandelion::App.controller do
     @event.account = current_account
     @event.last_saved_by = current_account
     if @event.save
-      redirect "/events/#{@event.id}"
+      redirect "/events/#{@event.id}?created=1"
     else
       flash.now[:error] = 'There was an error saving the event'
       erb :'events/build'

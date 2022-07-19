@@ -207,6 +207,8 @@ class Activity
 
   def self.human_attribute_name(attr, options = {})
     {
+      privacy: 'Access',
+      telegram_group: 'Telegram group/channel URL',
       email: 'Contact email'
     }[attr.to_sym] || super
   end

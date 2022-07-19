@@ -10,6 +10,31 @@
   </div>
 <% end %>
 
+<% if params[:created] && current_account.organisations.count == 1 %>
+  <script>
+  $(function() {
+
+    if($(window).width() > 768) {
+
+      introJs().setOptions({
+        steps: [{
+          title: "Nice one!",
+          intro: "You've created your first organisation 🎉"
+        }, {
+          element: $('#content button.dropdown-toggle')[0],
+          intro: "Here's the admin dropdown for the organisation"
+        }, {
+          intro: "To accept payments, now add your Stripe and/or Coinbase Commerce details.",
+        }]
+      }).start();
+
+    }
+
+  })
+  </script>
+<% end %>
+
+
 <%= partial :'organisations/nav', locals: { organisation: @organisation } %>
 
 <p>
@@ -144,7 +169,7 @@
           <% if !@organisation.mailgun_api_key %>
             <div class="alert alert-warning">
               <p class="m-0">
-                <i class="fa fa-warning"></i> 
+                <i class="fa fa-warning"></i>
                 If you'd like to use Dandelion's mailer to email everyone following your organisation, or people following your organisation's
                 activities and local groups, you'll need to link a Mailgun account.
                 (You can email all attendees of an event without providing these details.)
