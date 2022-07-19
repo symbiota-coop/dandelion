@@ -216,6 +216,9 @@
       <div role="tabpanel" class="tab-pane" id="tab2">
         <%= f.wysiwyg_block :description %>
         <%= f.wysiwyg_block :extra_info_for_ticket_email %>
+        <% if @event.persisted? %>
+          <p style="margin-top: -1rem"><a target="_blank" href="/events/<%=@event.id%>/ticket_email">Preview ticket confirmation email &rarr;</p>
+        <% end %>
       </div>
       <div role="tabpanel" class="tab-pane" id="tab3">
         <%= partial :'events/ticket_types', locals: { f: f } %>
