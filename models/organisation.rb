@@ -130,6 +130,7 @@ class Organisation
 
   def self.new_hints
     {
+      image: 'Square images look best',
       stripe_pk: '<code>Developers</code> > <code>API keys</code> > <code>Publishable key</code>. Starts <code>pk_live_</code>',
       stripe_sk: '<code>Developers</code> > <code>API keys</code> > <code>Secret key</code>. Starts <code>sk_live_</code>',
       stripe_endpoint_secret: '<code>Developers</code> > <code>Webhooks</code> > <code>Signing secret</code>. Starts <code>whsec_</code>',
@@ -142,7 +143,10 @@ class Organisation
       monthly_donor_affiliate_reward: 'When an existing monthly donor gets a friend to sign up via their affiliate link, credit of this amount is issued to both the existing monthly donor and the friend/new member.',
       add_a_donation_to: "Text to display above the 'Add a donation' field",
       donation_text: "Text to display below the 'Add a donation' field",
-      send_ticket_emails_from_organisation: 'Requires image and reply address'
+      send_ticket_emails_from_organisation: 'Requires image and reply address',
+      gocardless_access_token: 'Registers people with active GoCardless subscriptions as monthly donors',
+      patreon_api_key: 'Registers people with active Patreon subscriptions as monthly donors',
+      become_a_member_url: 'Link to direct non-members to when they attempt to buy tickets to a members-only event'
     }
   end
 
@@ -452,7 +456,7 @@ class Organisation
   def self.human_attribute_name(attr, options = {})
     {
       intro_text: 'Intro text for organisation homepage',
-      telegram_group: 'Telegram group URL',
+      telegram_group: 'Telegram group/channel URL',
       extra_info_for_ticket_email: 'Extra info for ticket confirmation email',
       extra_info_for_booking_email: 'Extra info for service booking confirmation email',
       google_analytics_id: 'Google Analytics ID',

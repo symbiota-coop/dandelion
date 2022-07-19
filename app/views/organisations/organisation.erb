@@ -49,7 +49,7 @@
 <% if organisation_admin? or @organisation.local_groups.count > 0 %>
   <div data-pagelet-url="/o/<%= @organisation.slug %>/local_groups"></div>
 <% end %>
-<% if organisation_admin? or @organisation.services_for_search.count > 0 %>
+<% if (Padrino.env == :development || @organisation.verified?) && organisation_admin? or @organisation.services_for_search.count > 0 %>
   <div data-pagelet-url="/o/<%= @organisation.slug %>/services"></div>
 <% end %>
 <% visible_members = Account.mappable.and(organisation_ids_public_cache: @organisation.id) %>
