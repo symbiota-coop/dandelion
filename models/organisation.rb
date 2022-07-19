@@ -146,7 +146,10 @@ class Organisation
       send_ticket_emails_from_organisation: 'Requires image and reply address',
       gocardless_access_token: 'Registers people with active GoCardless subscriptions as monthly donors',
       patreon_api_key: 'Registers people with active Patreon subscriptions as monthly donors',
-      become_a_member_url: 'Link to direct non-members to when they attempt to buy tickets to a members-only event'
+      become_a_member_url: 'Link to direct non-members to when they attempt to buy tickets to a members-only event',
+      event_footer: 'Included at the end of all public event descriptions',
+      carousels: "To create a carousel on your organisation's events page with the title X showing event tags a and b, type X: a, b",
+      banned_emails: 'One per line'
     }
   end
 
@@ -156,9 +159,7 @@ class Organisation
 
   def self.new_tips
     {
-      slug: 'Lowercase letters, numbers and dashes only (no spaces)',
-      carousels: 'To create a carousel with the title X showing tags a and b, type X: a, b',
-      banned_emails: 'One per line'
+      slug: 'Lowercase letters, numbers and dashes only (no spaces)'
     }
   end
 
