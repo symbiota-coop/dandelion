@@ -2,22 +2,26 @@ Dandelion::App.controller do
   before do
     if params[:organisation_id]
       @organisation = Organisation.find(params[:organisation_id]) || not_found
+      @_organisation = @organisation
       @scope = "organisation_id=#{@organisation.id}"
       organisation_admins_only!
       @pmails = @organisation.pmails
       @pmail_tests = @organisation.pmail_tests
     elsif params[:activity_id]
       @activity = Activity.find(params[:activity_id]) || not_found
+      @_organisation = @activity.organisation
       @scope = "activity_id=#{@activity.id}"
       activity_admins_only!
       @pmails = @activity.pmails_including_events
     elsif params[:local_group_id]
       @local_group = LocalGroup.find(params[:local_group_id]) || not_found
+      @_organisation = @local_group.organisation
       @scope = "local_group_id=#{@local_group.id}"
       local_group_admins_only!
       @pmails = @local_group.pmails_including_events
     elsif params[:event_id]
       @event = Event.find(params[:event_id]) || not_found
+      @_organisation = @event.organisation
       @scope = "event_id=#{@event.id}"
       event_admins_only!
       @pmails = @event.pmails_as_mailable

@@ -595,6 +595,7 @@ Dandelion::App.controller do
 
   get '/o/:slug/pmails', provides: [:html, :json] do
     @organisation = Organisation.find_by(slug: params[:slug]) || not_found
+    @_organisation = @organisation
     organisation_admins_only!
     @pmails = @organisation.pmails
     @pmails = @pmails.and(subject: /#{::Regexp.escape(params[:q])}/i) if params[:q]
