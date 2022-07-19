@@ -89,7 +89,7 @@ class Event
   end
 
   def self.currencies
-    [''] + CURRENCIES
+    [''] + CURRENCIES_HASH
   end
 
   def questions_a

@@ -11,6 +11,14 @@ XDAI_CURRENCIES = XDAI_CONTRACT_ADDRESSES.keys.freeze
 CRYPTOCURRENCIES = (COINBASE_CURRENCIES + XDAI_CURRENCIES + %w[SEEDS]).freeze
 FIAT_CURRENCIES = %w[GBP EUR USD SEK DKK INR MXN].freeze
 CURRENCIES = (FIAT_CURRENCIES + CRYPTOCURRENCIES).freeze
+CURRENCIES_HASH = CURRENCIES.map do |currency|
+  ["#{currency} (#{[
+    ('Stripe' if FIAT_CURRENCIES.include?(currency)),
+    ('Coinbase Commerce' if FIAT_CURRENCIES.include?(currency) || COINBASE_CURRENCIES.include?(currency)),
+    ('Gnosis Chain' if XDAI_CURRENCIES.include?(currency)),
+    ('SEEDS' if currency == 'SEEDS')
+  ].compact.join('/')})", currency]
+end
 
 XDAI_CURRENCIES.each do |c|
   Money::Currency.register({

@@ -254,7 +254,7 @@ class Gathering
   end
 
   def self.currencies
-    CURRENCIES
+    CURRENCIES_HASH
   end
 
   def admins

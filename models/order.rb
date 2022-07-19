@@ -83,7 +83,7 @@ class Order
   validates_uniqueness_of :xdai_secret, scope: :xdai_value, allow_nil: true
 
   def self.currencies
-    [''] + CURRENCIES
+    [''] + CURRENCIES_HASH
   end
 
   has_many :tickets, dependent: :destroy

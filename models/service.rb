@@ -37,7 +37,7 @@ class Service
   end
 
   def self.currencies
-    [''] + CURRENCIES
+    [''] + CURRENCIES_HASH
   end
 
   has_many :bookings, dependent: :destroy

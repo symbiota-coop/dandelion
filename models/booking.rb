@@ -40,7 +40,7 @@ class Booking
   end
 
   def self.currencies
-    [''] + CURRENCIES
+    [''] + CURRENCIES_HASH
   end
 
   before_validation do

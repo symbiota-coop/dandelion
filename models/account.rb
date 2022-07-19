@@ -530,7 +530,7 @@ class Account
   validates_uniqueness_of :ps_account_id, allow_nil: true
 
   def self.default_currencies
-    [''] + CURRENCIES
+    [''] + CURRENCIES_HASH
   end
 
   def self.new_hints
