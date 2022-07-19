@@ -166,7 +166,7 @@
           <%= f.check_box_block :ask_for_facebook_profile_url %>
         </div>
         <div id="application-options" style="display: none">
-          <%= f.text_area_block :application_questions %>
+          <%= f.text_area_block :application_questions, placeholder: "e.g. How did you hear about this gathering?\nWhy do you want to participate?" %>
           <%= f.check_box_block :require_reason_proposer %>
           <%= f.check_box_block :enable_supporters %>
           <div id="supporters-options" style="display: none">
@@ -192,6 +192,11 @@
         <%= f.wysiwyg_block :intro_for_members %>
       </div>
       <div role="tabpanel" class="tab-pane" id="tab4">
+      <% if !@gathering.stripe_sk && !@gathering.coinbase_api_key %>
+        <div class="alert alert-warning">
+          <p class="m-0"><i class="fa fa-warning"></i> To accept payments, you must add either Stripe or Coinbase Commerce details.</p>
+        </div>
+      <% end %>
         <div class="card mb-3">
           <div class="card-header text-white bg-primary">
             <h4 class="my-0">Card payments via Stripe</h4>

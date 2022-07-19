@@ -35,7 +35,7 @@ class Gathering
   field :choose_and_pay_label, type: String
 
   def self.enablable
-    %w[teams timetables rotas contributions inventory budget partial_payments]
+    %w[contributions teams timetables rotas inventory budget partial_payments]
   end
   enablable.each do |x|
     field :"enable_#{x}", type: Boolean
@@ -263,13 +263,13 @@ class Gathering
 
   def self.new_tips
     {
-      slug: 'Lowercase letters, numbers and dashes only (no spaces)',
-      application_questions: 'One per line'
+      slug: 'Lowercase letters, numbers and dashes only (no spaces)'
     }
   end
 
   def self.new_hints
     {
+      application_questions: 'Questions to ask applicants. One question per line.',
       currency: 'This cannot be changed, choose wisely',
       fixed_threshold: 'Automatically accept applications with this number of proposers + supporters (with at least one proposer)',
       proposing_delay: 'Accept proposers on applications only once the application is this many hours old',
@@ -278,7 +278,13 @@ class Gathering
       stripe_endpoint_secret: '<code>Developers</code> > <code>Webhooks</code> > <code>Signing secret</code>. Starts <code>whsec_</code>',
       coinbase_api_key: '<code>Settings</code> > <code>API keys</code>',
       coinbase_webhook_secret: '<code>Settings</code> > <code>Webhook subscriptions</code> > <code>Show shared secret</code>',
-      redirect_on_acceptance: 'Experimental'
+      redirect_on_acceptance: 'Experimental',
+      enable_teams: 'Create Slack/Facebook-like channels to organise different aspects of the gathering',
+      enable_timetables: 'Co-create unconference-style timetables of workshops and activities',
+      enable_rotas: 'Allow people to sign up for shifts, for example cooking, washing or community care',
+      enable_contributions: 'Allow people to select and pay for core costs, accommodation and transport',
+      enable_inventory: 'Allow people to list useful items and take responsibility for bringing them',
+      enable_budget: "Show a live and transparent budget of the gathering's finances"
     }
   end
 
@@ -297,13 +303,16 @@ class Gathering
       invitations_granted: 'People may invite this many others by default',
       hide_invitations: 'Make the number of invitations granted visible to admins only',
       clear_up_optionships: 'Periodically remove people from unpaid options',
+      enable_contributions: 'Enable Choose & Pay',
       stripe_endpoint_secret: 'Stripe endpoint secret',
       stripe_pk: 'Stripe public key',
       stripe_sk: 'Stripe secret key',
       coinbase_api_key: 'Coinbase Commerce API key',
       coinbase_webhook_secret: 'Coinbase Commerce webhook secret',
       xdai_address: 'xDai address',
-      seeds_username: 'SEEDS username'
+      seeds_username: 'SEEDS username',
+      privacy: 'Access',
+      listed: 'List this event publicly'
     }[attr.to_sym] || super
   end
 
