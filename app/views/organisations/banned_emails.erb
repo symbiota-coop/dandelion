@@ -1,6 +1,8 @@
 <%= partial :'organisations/nav', locals: { organisation: @organisation } %>
 
-<p>Prevent the following email addresses from purchasing tickets to your events. One email address per line.</p>
+<p class="lead">
+  Prevent the following email addresses from purchasing tickets to your events. One email address per line.
+</p>
 
 <% form_for @organisation, "/o/#{@organisation.slug}/banned_emails" do  |f| %>
   <%= f.text_area_block :banned_emails %>

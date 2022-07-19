@@ -1,4 +1,9 @@
 <%= partial :'organisations/nav', locals: { organisation: @organisation } %>
+
+<p class="lead">
+  Tiers allow you to give discounts to people making regular donations to your organisation. 
+</p>
+
 <div style="margin: 10px 0">
   <a class="btn btn-primary" href="javascript:;" onclick="$(this).hide().next().show()"><i class="fa fa-plus-circle"></i> Create a tier</a>
   <div style="display: none" class="tier-form">
