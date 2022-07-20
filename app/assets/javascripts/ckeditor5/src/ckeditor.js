@@ -35,6 +35,7 @@ import Font from '@ckeditor/ckeditor5-font/src/font';
 import SimpleUploadAdapter from '@ckeditor/ckeditor5-upload/src/adapters/simpleuploadadapter';
 import ImageResize from '@ckeditor/ckeditor5-image/src/imageresize';
 import HtmlEmbed from '@ckeditor/ckeditor5-html-embed/src/htmlembed';
+import CodeBlock from '@ckeditor/ckeditor5-code-block/src/codeblock';
 
 export default class ClassicEditor extends ClassicEditorBase {}
 
@@ -68,7 +69,8 @@ ClassicEditor.builtinPlugins = [
   Font,
   SimpleUploadAdapter,
   ImageResize,
-  HtmlEmbed
+  HtmlEmbed,
+  CodeBlock
 ];
 
 // Editor configuration.
@@ -93,6 +95,7 @@ ClassicEditor.defaultConfig = {
 			'mediaEmbed',
       'htmlEmbed',
 			'blockQuote',
+      'codeBlock',
 			'insertTable',
 			'undo',
 			'redo'

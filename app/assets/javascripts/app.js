@@ -162,7 +162,7 @@ $(function() {
 
 
 
-
+  hljs.highlightAll();
 
   $('input[type=hidden].lookup').each(function() {
     $(this).lookup({

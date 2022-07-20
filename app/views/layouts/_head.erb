@@ -70,7 +70,8 @@
        'iframe-resizer/4.2.10' => 'iframeResizer.contentWindow.min.js',
        'slick-carousel/1.8.1' => 'slick.min.js slick.min.css slick-theme.min.css',
        'Chart.js/2.7.0' => 'Chart.bundle.min.js',
-       'web3/1.3.4' => 'web3.min.js'
+       'web3/1.3.4' => 'web3.min.js',
+       'highlight.js/11.6.0' => 'highlight.min.js styles/atom-one-dark.min.css'
      }.each { |k,v| %>
   <% v.split(' ').each { |f| u = "https://cdnjs.cloudflare.com/ajax/libs/#{k}/#{f}" %>
   <% case f.split('.').last.to_sym; when :js %>
