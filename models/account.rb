@@ -346,11 +346,11 @@ class Account
   has_many :activity_applications, class_name: 'ActivityApplication', inverse_of: :account, dependent: :destroy
   has_many :statused_activity_applications, class_name: 'ActivityApplication', inverse_of: :statused_by, dependent: :nullify
 
-  has_many :services, dependent: :destroy
+  has_many :services, dependent: :nullify
   has_many :bookings, dependent: :destroy, inverse_of: :account
   has_many :bookings_as_service_provider, class_name: 'Booking', dependent: :destroy, inverse_of: :service_provider
 
-  has_many :events, class_name: 'Event', inverse_of: :account, dependent: :destroy
+  has_many :events, class_name: 'Event', inverse_of: :account, dependent: :nullify
   has_many :events_coordinating, class_name: 'Event', inverse_of: :coordinator, dependent: :nullify
   has_many :events_revenue_sharing, class_name: 'Event', inverse_of: :revenue_sharer, dependent: :nullify
   has_many :events_last_saver, class_name: 'Event', inverse_of: :last_saved_by, dependent: :nullify
