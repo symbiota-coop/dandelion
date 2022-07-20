@@ -14,7 +14,8 @@ class DocPage
     {
       name: :text,
       slug: :slug,
-      body: :text_area
+      body: :text_area,
+      priority: :number
     }
   end
 
