@@ -729,11 +729,11 @@ Two Spirit).split("\n")
   end
 
   def self.recommendable
-    Account.where(:id.in => Ticket.pluck(:account_id) + EventFacilitation.pluck(:account_id))
+    Account.and(:id.in => Ticket.pluck(:account_id) + EventFacilitation.pluck(:account_id))
   end
 
   def recommended_people
-    events = Event.where(:id.in => tickets.pluck(:event_id))
+    events = Event.and(:id.in => tickets.pluck(:event_id))
     people = {}
     events.each do |event|
       event.attendees.pluck(:id).each do |attendee_id|

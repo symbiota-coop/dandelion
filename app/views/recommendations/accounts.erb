@@ -19,7 +19,7 @@ recommended_people = @account.recommended_people_cache || []
         </h2>
         <%= partial :'accounts/buttons', locals: { account: account } %>
         <ul class="fa-ul mt-3">
-          <% Event.where(:id.in => v).order('start_time desc').each { |event| %>
+          <% Event.and(:id.in => v).order('start_time desc').each { |event| %>
             <li><i class="fa fa-li fa-calendar"></i> <a href="/events/<%= event.id %>"><%= event.name %></a>, <%=concise_when_details(event) %></li>
           <% } %>
         </ul>
