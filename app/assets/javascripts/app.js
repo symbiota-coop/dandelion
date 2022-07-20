@@ -224,7 +224,10 @@ $(function() {
     ClassicEditor.create(textarea, {
       simpleUpload: {
         uploadUrl: '/upload'
-      }
+      },
+      mediaEmbed: {
+                 removeProviders: [ 'facebook', 'twitter', 'instagram', 'googleMaps', 'flickr' ]
+             }
     }).catch(error => {
       console.error(error);
     });
