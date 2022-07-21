@@ -10,7 +10,7 @@
   </div>
 <% end %>
 
-<% if params[:created] && current_account.organisations.count == 1 %>
+<% if Padrino.env == :production && params[:created] && current_account.organisations.count == 1 %>
   <script>
   $(function() {
 
@@ -137,7 +137,7 @@
             </div>
             <div class="card-body pb-0">
               <p>
-                Not sure where to find your Stripe API keys? <a target="_blank" href="https://support.stripe.com/questions/locate-api-keys-in-the-dashboard">Check this help page on Stripe's site</a>
+                Don't know where to find your Stripe API keys? <a target="_blank" href="https://support.stripe.com/questions/locate-api-keys-in-the-dashboard">Check this help page on Stripe's site</a>
               </p>
               <%= f.text_block :stripe_pk %>
               <%= f.text_block :stripe_sk %>

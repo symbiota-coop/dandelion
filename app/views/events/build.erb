@@ -109,6 +109,7 @@
   <div class="container">
     <div class="tab-content mt-3">
       <div role="tabpanel" class="tab-pane active" id="tab1">
+        <%= f.hidden_field :organisation_id, value: @event.organisation_id %>
         <%= f.text_block :name %>
         <%= f.datetime_block :start_time %>
         <%= f.datetime_block :end_time %>
@@ -118,33 +119,15 @@
         <%= f.image_block :image %>
         <%= f.url_block :facebook_event_url %>
         <%= partial :'events/tags', locals: { f: f } %>
-        <%= f.lookup_block :organisation_id, lookup_url: '/organisations.json', placeholder: 'Search organisations', selected_link: (%(<a class="d-inline-block mt-1" target="_blank" href="/o/#{@event.organisation.slug}">View organisation</a>) if @event.organisation_id) %>
         <%= f.lookup_block :coordinator_id, lookup_url: '/accounts.json', placeholder: 'Search accounts', selected_link: (%(<a class="d-inline-block mt-1" target="_blank" href="/u/#{@event.coordinator.username}">View account</a>) if @event.coordinator) %>
-        <script>
-          $(function () {
-            $('#event_organisation_id').change(function () {
-              if ($(this).val().length > 0) {
-
-                $('#event_coordinator_id').select2("destroy").removeClass('lookupd').lookup({
-                  lookup_url: '/accounts.json',
-                  id_param: 'id'
-                });
-
-                $('#event_activity_id').select2("destroy").removeClass('lookupd').lookup({
-                  lookup_url: '/o/' + $('#event_organisation_id').val() + '/activities.json',
-                  id_param: 'id'
-                });
-
-                $('#event_local_group_id').select2("destroy").removeClass('lookupd').lookup({
-                  lookup_url: '/o/' + $('#event_organisation_id').val() + '/local_groups.json',
-                  id_param: 'id'
-                });
-
-              }
-            })
-            $('#event_organisation_id').change()
-          })
-        </script>
+        <div class="form-group">
+          <label for="event_organisation" class="">
+            Organisation
+          </label>
+          <div>
+            <input type="text" value="<%=@event.organisation.name%>" class="form-control " disabled="disabled">
+          </div>
+        </div>
         <%= f.lookup_block :activity_id, lookup_url: "/o/#{@event.organisation_id}/activities.json", placeholder: 'Search activities', selected_link: (%(<a class="d-inline-block mt-1" target="_blank" href="/activities/#{@event.activity_id}">View activity</a>) if @event.activity_id) %>
         <script>
           $(function () {
