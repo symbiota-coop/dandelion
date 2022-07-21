@@ -136,7 +136,7 @@ class Account
   end
 
   def able_to_message
-    email_confirmed && (can_message || tickets.count > 0 || memberships.count > 0)
+    email_confirmed && (can_message || tickets.count > 0 || memberships.count > 0 || account_contributions.count > 0)
   end
 
   def self.public
