@@ -70,6 +70,7 @@ class Organisation
   field :contribution_not_required, type: Boolean
   field :contribution_requested_per_event_gbp, type: Integer
   field :ical_full, type: Boolean
+  field :allow_purchase_url, type: Boolean
 
   def self.admin_fields
     {
@@ -113,6 +114,7 @@ class Organisation
       event_footer: :wysiwyg,
       banned_emails: :text_area,
       verified: :check_box,
+      allow_purchase_url: :check_box,
       contribution_not_required: :check_box,
       contribution_requested_per_event_gbp: :number
     }
