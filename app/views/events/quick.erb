@@ -5,7 +5,7 @@
 
     $('#event_start_time').change(function() {
       $('#event_end_time')[0]._flatpickr.set('minDate', $('#event_start_time')[0]._flatpickr.selectedDates[0])
-    })    
+    })
 
     var autocomplete = new google.maps.places.Autocomplete($('#event_location')[0]);
     $('#event_location').keydown(function (e) {
@@ -64,6 +64,7 @@
   <%= f.text_block :location %>
   <%= f.email_block :email %>
   <%= f.image_block :image %>
+  <%= partial :'events/tags', locals: { f: f } %>
   <%= f.url_block :purchase_url %>
   <%= f.wysiwyg_block :description %>
   <%= f.submit_block %>

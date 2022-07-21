@@ -114,6 +114,7 @@ Dandelion::App.controller do
 
   post '/o/:slug/events/quick' do
     @organisation = Organisation.find_by(slug: params[:slug]) || not_found
+    @event = @organisation.events.build(mass_assigning(params[:event], Event))
 
     account_hash = { name: params[:event][:email], email: params[:event][:email] }
     @account = if account_hash[:email] && (account = Account.find_by(email: account_hash[:email].downcase))
@@ -129,7 +130,6 @@ Dandelion::App.controller do
                                 end
 
     if successful_update_or_save
-      @event = @organisation.events.build(mass_assigning(params[:event], Event))
       @event.account = @account
       @event.last_saved_by = @account
       @event.quick_create = true

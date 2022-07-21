@@ -113,7 +113,6 @@
         <%= f.datetime_block :start_time %>
         <%= f.datetime_block :end_time %>
         <%= f.text_block :location %>
-        <%= f.select_block :currency %>
         <%= f.email_block :email %>
         <%= f.image_block :image %>
         <%= f.url_block :facebook_event_url %>
@@ -203,6 +202,7 @@
         <% end %>
       </div>
       <div role="tabpanel" class="tab-pane" id="tab3">
+        <%= f.select_block :currency %>
         <%= partial :'events/ticket_types', locals: { f: f } %>
         <%= partial :'events/ticket_groups', locals: { f: f } %>
         <%= f.number_block :capacity %>
