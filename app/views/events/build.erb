@@ -244,7 +244,7 @@
       <div role="tabpanel" class="tab-pane" id="tab6">
         <%= f.shorturl_block :slug, stem: "#{ENV['BASE_URI']}/e/" %>
         <%= f.url_block :redirect_url %>
-        <% if @event.purchase_url || @event.organsation.allow_purchase_url? || (Padrino.env == :development || @event.organisation.verified?) %>
+        <% if @event.purchase_url || @event.organisation.allow_purchase_url? || (Padrino.env == :development || @event.organisation.verified?) %>
           <%= f.url_block :purchase_url %>
         <% end %>
         <%= f.number_block :facebook_pixel_id %>
