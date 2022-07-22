@@ -264,9 +264,9 @@
         <%= f.check_box_block :no_discounts %>
         <%= f.check_box_block :show_emails %>
         <%= f.check_box_block :opt_in_facilitator %>
-        <%= f.check_box_block :ask_hear_about %>
         <%= f.check_box_block :include_in_parent %>
         <%= f.check_box_block :refund_deleted_orders %>
+        <%= f.check_box_block :ask_hear_about %>        
         <%= f.text_area_block :notes %>
         <% if Padrino.env == :development || @event.organisation.verified? %>
           <%= f.number_block :affiliate_credit_percentage %>
