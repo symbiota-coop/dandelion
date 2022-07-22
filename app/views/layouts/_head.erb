@@ -71,7 +71,8 @@
        'slick-carousel/1.8.1' => 'slick.min.js slick.min.css slick-theme.min.css',
        'Chart.js/2.7.0' => 'Chart.bundle.min.js',
        'web3/1.3.4' => 'web3.min.js',
-       'highlight.js/11.6.0' => 'highlight.min.js styles/atom-one-dark.min.css'
+       'highlight.js/11.6.0' => 'highlight.min.js styles/atom-one-dark.min.css',
+       'intro.js/6.0.0' => 'intro.min.js introjs.min.css'
      }.each { |k,v| %>
   <% v.split(' ').each { |f| u = "https://cdnjs.cloudflare.com/ajax/libs/#{k}/#{f}" %>
   <% case f.split('.').last.to_sym; when :js %>
@@ -85,7 +86,6 @@
 <% [
      '//rawcdn.githack.com/scottdejonge/map-icons/dbf6fd7caedd60d11b5bfb5f267a114a6847d012/dist/css/map-icons.min.css',
      '//cdn.jsdelivr.net/npm/easymde@2.10.1/dist/easymde.min.css',
-     '//unpkg.com/intro.js/minified/introjs.min.css',
      '/stylesheets/share.css',
      "/stylesheets/app.css?#{@cachebuster}"
    ].each { |f| %>
@@ -103,7 +103,6 @@
      '//rawcdn.githack.com/scottdejonge/map-icons/dbf6fd7caedd60d11b5bfb5f267a114a6847d012/dist/js/map-icons.js',
      '//rawcdn.githack.com/euangoddard/clipboard2markdown/2d46aadd373f8b5cdb5fa0763090135ac31def13/to-markdown.js',
      '//cdn.jsdelivr.net/npm/easymde@2.10.1/dist/easymde.min.js',
-     '//unpkg.com/intro.js/minified/intro.min.js',
      '/javascripts/linkify.min.js',
      '/javascripts/linkify-jquery.min.js',
      '/javascripts/jquery-deparam.js',
