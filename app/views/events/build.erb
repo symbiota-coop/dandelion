@@ -249,6 +249,9 @@
         <% end %>
         <%= f.number_block :facebook_pixel_id %>
         <%= f.select_block :time_zone %>
+        <% if @event.organisation.change_select_tickets_title || (Padrino.env == :development || @event.organisation.verified?) %>
+          <%= f.text_block :select_tickets_title %>
+        <% end %>
         <%= f.text_block :select_tickets_intro %>
         <%= f.text_block :select_tickets_outro %>
         <%= f.text_block :carousel_text %>
@@ -261,6 +264,7 @@
         <%= f.check_box_block :no_discounts %>
         <%= f.check_box_block :show_emails %>
         <%= f.check_box_block :opt_in_facilitator %>
+        <%= f.check_box_block :ask_hear_about %>
         <%= f.check_box_block :include_in_parent %>
         <%= f.check_box_block :refund_deleted_orders %>
         <%= f.text_area_block :notes %>

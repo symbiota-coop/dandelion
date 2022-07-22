@@ -76,6 +76,9 @@
     <%= partial :'events/progress', locals: { event: event } %>
   </td>
   <td>
+    <%= partial :'events/checked_in', locals: { event: event } %>
+  </td>
+  <td>
     <% if event.discounted_ticket_revenue > 0 %>
       <%= m event.discounted_ticket_revenue, event.currency %>
     <% end %>

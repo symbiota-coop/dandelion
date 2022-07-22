@@ -71,6 +71,7 @@ class Organisation
   field :contribution_requested_per_event_gbp, type: Integer
   field :ical_full, type: Boolean
   field :allow_purchase_url, type: Boolean
+  field :change_select_tickets_title, type: Boolean
 
   def self.admin_fields
     {

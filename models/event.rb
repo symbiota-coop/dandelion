@@ -42,6 +42,8 @@ class Event
   field :carousel_text, type: String
   field :select_tickets_intro, type: String
   field :select_tickets_outro, type: String
+  field :select_tickets_title, type: String
+  field :ask_hear_about, type: Boolean
 
   def self.admin_fields
     {
@@ -677,7 +679,8 @@ class Event
       extra_info_for_ticket_email: 'Extra info for ticket confirmation email',
       purchase_url: 'Ticket purchase URL',
       no_discounts: 'No discounts for monthly donors',
-      notes: 'Private notes'
+      notes: 'Private notes',
+      ask_hear_about: 'Ask people how they heard about the event'
     }[attr.to_sym] || super
   end
 
@@ -699,8 +702,10 @@ class Event
       add_a_donation_to: "Text to display above the 'Add a donation' field (leave blank to use organisation default)",
       donation_text: "Text to display below the 'Add a donation' field  (leave blank to use organisation default)",
       carousel_text: 'Text to show when hovering over the event in a carousel',
-      select_tickets_intro: 'Text to show at the top of the Select tickets panel',
-      select_tickets_outro: 'Text to show at the bottom of the Select tickets panel',
+      select_tickets_title: 'Title of the Select Tickets panel',
+      select_tickets_intro: 'Text to show at the top of the Select Tickets panel',
+      select_tickets_outro: 'Text to show at the bottom of the Select Tickets panel',
+      ask_hear_about: 'Ask people how they heard about the event on the order form',
       suggested_donation: 'If this is blank, the donation field will not be shown',
       questions: 'Questions to ask participants upon booking. One question per line. Wrap in [square brackets] to turn into a checkbox.',
       feedback_questions: 'Questions to ask participants in the post-event feedback form. One question per line. Leave blank to disable feedback.',

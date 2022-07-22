@@ -1,5 +1,5 @@
 <div class="card mb-3" id="select-tickets">
-  <h3 class="card-header bg-primary text-white">Select tickets</h3>
+  <h3 class="card-header bg-primary text-white"><%= @event.select_tickets_title || 'Select tickets' %></h3>
   <div class="card-body">
     <% if @event.past? %>
       <div class="alert alert-danger">
@@ -271,7 +271,9 @@
         <%= f.select_block :country %>
       <% end %>
     <% end %>
-    <%= f.text_block :hear_about %>
+    <% if @event.ask_hear_about %>
+      <%= f.text_block :hear_about %>
+    <% end %>
     <%= f.hidden_field :http_referrer, value: request.referrer %>
     <% @event.questions_a.each_with_index { |q,i| %>
     <div class="form-group">

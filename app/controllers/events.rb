@@ -89,6 +89,7 @@ Dandelion::App.controller do
     @event.suggested_donation = 0
     @event.coordinator = current_account
     @event.refund_deleted_orders = true
+    @event.ask_hear_about = true
     @event.include_in_parent = true if organisation_admin?(@event.organisation)
     erb :'events/build'
   end
@@ -292,10 +293,10 @@ Dandelion::App.controller do
       409
     else
       if params[:checked_in]
-        ticket.set(checked_in: true)
-        ticket.set(checked_in_at: Time.now)
+        ticket.update_attribute(:checked_in, true)
+        ticket.update_attribute(:checked_in_at, Time.now)
       else
-        ticket.set(checked_in: nil)
+        ticket.update_attribute(:checked_in, nil)
       end
       ticket.account.name
     end
