@@ -1,5 +1,5 @@
 <td>
-  <%= partial :'accounts/account', locals: { account: (account = mapplication.account), show_email: viewable?(account, :email) } %>
+  <%= partial :'accounts/account', locals: { account: (account = mapplication.account), show_email: (@membership.admin? || viewable?(account, :email)) } %>
 </td>
 <td>
   <a href="javascript:;" onclick="$('#modal .modal-content').load('/g/<%= @gathering.slug %>/mapplications/<%= mapplication.id %>', function () {
