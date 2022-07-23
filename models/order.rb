@@ -343,6 +343,8 @@ class Order
           pdf.print_qr_code ticket.id.to_s, extent: qr_size
         end
         pdf.move_down 0.5 * cm
+        pdf.text ticket.account.name, align: :center, size: 14
+        pdf.move_down 0.5 * cm
         pdf.text ticket.ticket_type.name, align: :center, size: 14
         pdf.move_down 0.5 * cm
         pdf.text ticket.id.to_s, align: :center, size: 10
