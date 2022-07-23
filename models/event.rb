@@ -562,6 +562,14 @@ class Event
     self.and(:start_time.lt => from).order('start_time desc')
   end
 
+  def finished?(from = Date.today)
+    end_time < from
+  end
+
+  def self.finished(from = Date.today)
+    self.and(:end_time.lt => from).order('start_time desc')
+  end
+
   def self.online
     self.and(location: 'Online')
   end
