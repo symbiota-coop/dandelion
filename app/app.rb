@@ -222,7 +222,7 @@ module Dandelion
     post '/upload' do
       sign_in_required!
       upload = current_account.uploads.create(file: params[:upload])
-      { url: upload.file.url }.to_json
+      { default: upload.file.url }.to_json
     end
 
     get '/donate' do
