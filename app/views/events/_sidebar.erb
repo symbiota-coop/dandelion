@@ -27,10 +27,10 @@
       </div>
     <% end %>
     <% if @event.purchase_url %>
-      <div class="card">
+      <div class="card d-none d-md-block">
         <h3 class="card-header bg-primary text-white"><%= @event.select_tickets_title || 'Select tickets' %></h3>
         <div class="card-body">
-          <a target="_blank" href="<%= @event.purchase_url %>" class="d-none d-md-block btn btn-outline-primary btn-block mb-3">Buy tickets on <%=URI(@event.purchase_url).host%></a>
+          <a target="_blank" href="<%= @event.purchase_url %>" class="btn btn-outline-primary btn-block mb-3">Select tickets on <%=URI(@event.purchase_url).host%></a>
         </div>
       </div>
     <% elsif @event.sold_out? && !params[:ticket_type_id] %>
