@@ -72,6 +72,8 @@ class Organisation
   field :ical_full, type: Boolean
   field :allow_purchase_url, type: Boolean
   field :change_select_tickets_title, type: Boolean
+  field :event_image_required_height, type: Integer
+  field :event_image_required_width, type: Integer
 
   def self.admin_fields
     {
@@ -117,7 +119,9 @@ class Organisation
       verified: :check_box,
       allow_purchase_url: :check_box,
       contribution_not_required: :check_box,
-      contribution_requested_per_event_gbp: :number
+      contribution_requested_per_event_gbp: :number,
+      event_image_required_height: :number,
+      event_image_required_width: :number
     }
   end
 
@@ -152,7 +156,9 @@ class Organisation
       become_a_member_url: 'Link to direct non-members to when they attempt to buy tickets to a members-only event',
       event_footer: 'Included at the end of all public event descriptions',
       carousels: "To create a carousel on your organisation's events page with the title X showing event tags a and b, type X: a, b",
-      banned_emails: 'One per line'
+      banned_emails: 'One per line',
+      event_image_required_width: 'Required width for event images in px',
+      event_image_required_height: 'Required height for event images in px'
     }
   end
 
@@ -490,7 +496,9 @@ class Organisation
       become_a_member_url: 'Become a Member URL',
       add_a_donation_to: 'Text above donation field',
       donation_text: 'Text below donation field',
-      show_ticketholder_link_in_ticket_emails: 'Show link for people to provide details of ticketholders in ticket emails'
+      show_ticketholder_link_in_ticket_emails: 'Show link for people to provide details of ticketholders in ticket emails',
+      event_image_required_width: 'Event image width',
+      event_image_required_height: 'Event image height'
     }[attr.to_sym] || super
   end
 

@@ -41,6 +41,21 @@
             alert('Please use an image that is more wide than high');
             $(fileUpload).val('')
           }
+
+          <% if @event.organisation && @event.organisation.event_image_required_width %>
+            if (width != <%=@event.organisation.event_image_required_width%>) {
+              alert('Please use an image that is <%=@event.organisation.event_image_required_width%>px wide');
+              $(fileUpload).val('')
+            }
+          <% end %>
+
+          <% if @event.organisation && @event.organisation.event_image_required_height %>
+            if (height != <%=@event.organisation.event_image_required_height%>) {
+              alert('Please use an image that is <%=@event.organisation.event_image_required_height%>px high');
+              $(fileUpload).val('')
+            }
+          <% end %>
+                    
         };
       };
     })

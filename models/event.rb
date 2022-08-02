@@ -460,6 +460,10 @@ class Event
 
       errors.add(:image, 'must be at least 800px wide') if image && image.width < 800
       errors.add(:image, 'must be more wide than high') if image && image.height > image.width
+
+      errors.add(:image, "must be #{organisation.event_image_required_width}px wide") if organisation && organisation.event_image_required_width && !(image && image.width == organisation.event_image_required_width)
+      errors.add(:image, "must be #{organisation.event_image_required_height}px high") if organisation && organisation.event_image_required_height && !(image && image.height == organisation.event_image_required_height)
+
     end
   end
 
@@ -717,7 +721,6 @@ class Event
       suggested_donation: 'If this is blank, the donation field will not be shown',
       questions: 'Questions to ask participants upon booking. One question per line. Wrap in [square brackets] to turn into a checkbox.',
       feedback_questions: 'Questions to ask participants in the post-event feedback form. One question per line. Leave blank to disable feedback.',
-      image: 'At least 800px wide, and more wide than high',
       extra_info_for_ticket_email: 'This is the place to enter Zoom links, directions to the venue, etc.',
       featured: "Feature the event on the organisation's events page",
       secret: 'Hide the event from all public listings',

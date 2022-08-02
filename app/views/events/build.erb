@@ -81,6 +81,21 @@
             alert('Please use an image that is more wide than high');
             $(fileUpload).val('')
           }
+
+          <% if @event.organisation && @event.organisation.event_image_required_width %>
+            if (width != <%=@event.organisation.event_image_required_width%>) {
+              alert('Please use an image that is <%=@event.organisation.event_image_required_width%>px wide');
+              $(fileUpload).val('')
+            }
+          <% end %>
+
+          <% if @event.organisation && @event.organisation.event_image_required_height %>
+            if (height != <%=@event.organisation.event_image_required_height%>) {
+              alert('Please use an image that is <%=@event.organisation.event_image_required_height%>px high');
+              $(fileUpload).val('')
+            }
+          <% end %>
+
         };
       };
     })
@@ -266,7 +281,7 @@
         <%= f.check_box_block :opt_in_facilitator %>
         <%= f.check_box_block :include_in_parent %>
         <%= f.check_box_block :refund_deleted_orders %>
-        <%= f.check_box_block :ask_hear_about %>        
+        <%= f.check_box_block :ask_hear_about %>
         <%= f.text_area_block :notes %>
         <% if Padrino.env == :development || @event.organisation.verified? %>
           <%= f.number_block :affiliate_credit_percentage %>
