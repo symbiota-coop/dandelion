@@ -708,6 +708,7 @@ class Event
 
   def self.new_hints
     {
+      image: 'At least 800px wide, and more wide than high',
       start_time: "in &hellip; (your profile's time zone)",
       end_time: "in &hellip; (your profile's time zone)",
       time_zone: "Time zone to use for people that aren't signed in or haven't set a time zone",

@@ -1,6 +1,6 @@
 <% if event.purchase_url %>
   <a target="_blank" href="<%= event.purchase_url %>">
-    <span class="label label-primary"><%=URI(event.purchase_url).host%></span>
+    <span class="label label-primary"><%=URI(event.purchase_url).host.gsub('www.','')%></span>
   </a>
 <% elsif (event.live? or event.tickets.count > 0) %>
   <a href="/events/<%= event.id %>/tickets">
