@@ -401,7 +401,16 @@ class Event
       local_group: local_group,
       coordinator: coordinator,
       revenue_sharer: revenue_sharer,
-      tag_names: event_tags.pluck(:name).join(',')
+      tag_names: event_tags.pluck(:name).join(','),
+      add_a_donation_to: add_a_donation_to,
+      donation_text: donation_text,
+      carousel_text: carousel_text,
+      select_tickets_intro: select_tickets_intro,
+      select_tickets_outro: select_tickets_outro,
+      select_tickets_title: select_tickets_title,
+      ask_hear_about: ask_hear_about,
+      time_zone: time_zone,
+      questions: questions
     )
     event_facilitations.each do |event_facilitation|
       event.event_facilitations.create(
