@@ -18,7 +18,8 @@ Dandelion::App.controller do
     else
       begin
         @account.save!
-      rescue StandardError
+      rescue StandardError => e
+        Airbrake.notify(e)
         halt 400
       end
     end
