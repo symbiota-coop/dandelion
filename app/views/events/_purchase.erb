@@ -175,14 +175,16 @@
               <div class="input-group-prepend">
                 <span class="input-group-text"><%= Money.new(0, @event.currency).symbol %></span>
               </div>
-              <script>
-                $(function() {
-                  $('#donation_amount').change(function() {
-                    if ($(this).val() < <%=@event.minimum_donation%>)
-                      $(this).val('<%=@event.minimum_donation%>')
+              <% if @event.minimum_donation %>
+                <script>
+                  $(function() {
+                    $('#donation_amount').change(function() {
+                      if ($(this).val() < <%=@event.minimum_donation%>)
+                        $(this).val('<%=@event.minimum_donation%>')
+                    })
                   })
-                })
-              </script>
+                </script>
+              <% end %>
               <%= number_field_tag :donation_amount, id: 'donation_amount', class: 'form-control', style: 'width: 5em', value: @event.suggested_donation, min: (@event.minimum_donation || 0) %>
             </div>
             <% if (Padrino.env == :development || @organisation.verified?) && (@event.donation_text || @event.organisation.donation_text) %>
