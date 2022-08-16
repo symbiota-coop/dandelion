@@ -383,6 +383,7 @@ Dandelion::App.controller do
       response = Mechanize.new.post 'https://connect.stripe.com/oauth/token', client_secret: @organisation.stripe_sk, code: params[:code], grant_type: 'authorization_code'
       @organisationship.update_attribute(:stripe_connect_json, response.body)
       Stripe.api_key = @organisation.stripe_sk
+      Stripe.api_version = '2020-08-27'
       @organisationship.update_attribute(:stripe_account_json, Stripe::Account.retrieve(@organisationship.stripe_user_id).to_json)
       flash[:notice] = "Connected to #{@organisation.name}!"
     rescue StandardError

@@ -334,6 +334,7 @@ class Gathering
   after_save :create_stripe_webhook_if_necessary, if: :stripe_sk
   def create_stripe_webhook_if_necessary
     Stripe.api_key = stripe_sk
+    Stripe.api_version = '2020-08-27'
 
     webhooks = []
     has_more = true

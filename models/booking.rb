@@ -103,6 +103,7 @@ class Booking
     if service.refund_deleted_orders && !prevent_refund && service.organisation && value && value > 0 && payment_completed && payment_intent
       begin
         Stripe.api_key = service.organisation.stripe_sk
+        Stripe.api_version = '2020-08-27'
         pi = Stripe::PaymentIntent.retrieve payment_intent
         if service.organisationship
           Stripe::Refund.create(

@@ -340,6 +340,7 @@ class Organisation
     return unless Padrino.env == :production
 
     Stripe.api_key = stripe_sk
+    Stripe.api_version = '2020-08-27'
 
     webhooks = []
     has_more = true

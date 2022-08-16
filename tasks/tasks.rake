@@ -132,6 +132,7 @@ namespace :stripe do
     from = Date.today - 2
     to = Date.today - 1
     Stripe.api_key = ENV['STRIPE_PS_SK']
+    Stripe.api_version = '2020-08-27'
     charges = Stripe::Charge.list(created: { gte: Time.utc(from.year, from.month, from.day).to_i, lt: Time.utc(to.year, to.month, to.day).to_i })
 
     session = GoogleDrive::Session.from_config(OpenStruct.new(
@@ -176,6 +177,7 @@ namespace :stripe do
     from = Date.today - 2
     to = Date.today - 1
     Stripe.api_key = ENV['STRIPE_PS_SK']
+    Stripe.api_version = '2020-08-27'
 
     run = Stripe::Reporting::ReportRun.create({
                                                 report_type: 'balance_change_from_activity.itemized.1',

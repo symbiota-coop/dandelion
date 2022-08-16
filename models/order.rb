@@ -240,10 +240,12 @@ class Order
 
     begin
       Stripe.api_key = event.organisation.stripe_sk
+      Stripe.api_version = '2020-08-27'
       pi = Stripe::PaymentIntent.retrieve payment_intent
       transfer = Stripe::Transfer.retrieve pi.charges.first.transfer
 
       Stripe.api_key = JSON.parse(event.revenue_sharer_organisationship.stripe_connect_json)['access_token']
+      Stripe.api_version = '2020-08-27'
       destination_payment = Stripe::Charge.retrieve transfer.destination_payment
       Stripe::Charge.update(destination_payment.id, {
                               description: "#{account.name}: #{description}",
@@ -261,6 +263,7 @@ class Order
     if event.refund_deleted_orders && !prevent_refund && event.organisation && value && value > 0 && payment_completed && payment_intent
       begin
         Stripe.api_key = event.organisation.stripe_sk
+        Stripe.api_version = '2020-08-27'
         pi = Stripe::PaymentIntent.retrieve payment_intent
         if event.revenue_sharer_organisationship
           Stripe::Refund.create(
@@ -312,6 +315,7 @@ class Order
     if event.revenue_sharer_organisationship && credit_payable_to_revenue_sharer && credit_payable_to_revenue_sharer > 0
 
       Stripe.api_key = event.organisation.stripe_sk
+      Stripe.api_version = '2020-08-27'
       transfer = Stripe::Transfer.create({
                                            amount: (credit_payable_to_revenue_sharer * 100).round,
                                            currency: currency,

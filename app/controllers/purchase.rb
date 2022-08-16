@@ -67,6 +67,7 @@ Dandelion::App.controller do
         when 'stripe'
 
           Stripe.api_key = @event.organisation.stripe_sk
+          Stripe.api_version = '2020-08-27'
 
           if ticketForm[:cohost] && (cohost = Organisation.find_by(slug: ticketForm[:cohost])) && (cohostship = @event.cohostships.find_by(organisation: cohost)) && cohostship.image
             @event_image = cohostship.image

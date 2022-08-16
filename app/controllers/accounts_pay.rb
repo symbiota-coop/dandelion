@@ -49,6 +49,7 @@ Dandelion::App.controller do
     when 'stripe'
 
       Stripe.api_key = ENV['STRIPE_SK']
+      Stripe.api_version = '2020-08-27'
       stripe_session_hash = {
         payment_method_types: ['card'],
         line_items: [{
