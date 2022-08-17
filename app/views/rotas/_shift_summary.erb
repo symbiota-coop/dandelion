@@ -5,12 +5,12 @@
 <% shifts.each { |shift| %>
   <div>
     <% if defined?(show_title) && show_title %>
-      <span class="label label-primary text-white d-inline-block mb-1">
+      <a data-confirm="<% if shift.account_id == current_account.id %>Resign from this shift?<% else %>Remove this person from this shift?<% end %>" class="pagelet-trigger label label-primary text-white d-inline-block mb-1" href="/shifts/<%= shift.id %>/destroy">
         <%= shift.description %>
-      </span>
+      </a>
       <% if @gathering.enable_shift_worth %>
         <%= partial :'rotas/shift_worth', locals: {shift: shift} %>
-      <% end %>      
+      <% end %>
       <a data-confirm="<% if shift.account_id == current_account.id %>Resign from this shift?<% else %>Remove this person from this shift?<% end %>" class="pagelet-trigger label label-danger text-white d-inline-block mb-1" href="/shifts/<%= shift.id %>/destroy">
         <i class="fa fa-times"></i>
       </a>
