@@ -2,6 +2,6 @@
 <div class="container">
   <% form_for @rslot, "/rslots/#{@rslot.id}/edit" do |f| %>
     <%= f.text_block :name %>
-    <%= f.submit_block destroy_url: ("/rslots/#{@rslot.id}/destroy" if admin? || @membership.admin?) %>
+    <%= f.submit_block button_text: 'Update slot', destroy_url: ("/rslots/#{@rslot.id}/destroy" if admin? || @membership.admin?) %>
   <% end %>
 </div>
