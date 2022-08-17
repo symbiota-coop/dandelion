@@ -2,7 +2,7 @@
   <a href="/g/<%= @gathering.slug %>/rotas/<%= shift.rota_id %>" class="label label-primary text-white d-inline-block mb-1">
     <%= shift.description %>
   </a>
-  <% if membership.gathering.enable_shift_worth %>
+  <% if @gathering.enable_shift_worth %>
     <%= partial :'rotas/shift_worth', locals: {shift: shift} %>
   <% end %>
 <% } %>
