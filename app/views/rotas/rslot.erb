@@ -2,6 +2,7 @@
 <div class="container">
   <% form_for @rslot, "/rslots/#{@rslot.id}/edit" do |f| %>
     <%= f.text_block :name %>
+    <%= f.number_block :worth %>
     <%= f.submit_block button_text: 'Update slot', destroy_url: ("/rslots/#{@rslot.id}/destroy" if admin? || @membership.admin?) %>
   <% end %>
 </div>

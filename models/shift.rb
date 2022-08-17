@@ -33,6 +33,14 @@ class Shift
     notifications.create! circle: circle, type: 'signed_up_to_a_shift' if account
   end
 
+  def worth
+    (rslot.worth || 1) * (role.worth || 1)
+  end
+
+  def description
+    "#{rota.name}, #{role.name}, #{rslot.name}"
+  end
+
   def circle
     rota.gathering
   end

@@ -35,7 +35,7 @@ class Gathering
   field :choose_and_pay_label, type: String
 
   def self.enablable
-    %w[contributions teams timetables rotas inventory budget partial_payments]
+    %w[contributions teams timetables rotas inventory budget partial_payments shift_worth]
   end
   enablable.each do |x|
     field :"enable_#{x}", type: Boolean
@@ -286,6 +286,7 @@ class Gathering
       enable_inventory: 'Allow people to list useful items and take responsibility for bringing them',
       enable_budget: "Show a live and transparent budget of the gathering's finances",
       enable_partial_payments: 'Allow people to pay just a part of any outstanding payment requests',
+      enable_shift_worth: 'Show the points value of shifts',
       demand_payment: 'Require members to make a payment before accessing features like teams or timetables',
       clear_up_optionships: 'Remove people from any unpaid tiers, accommodation and transport options every hour'
     }

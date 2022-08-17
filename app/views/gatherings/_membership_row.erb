@@ -66,6 +66,11 @@
     <%= m membership.paid, @gathering.currency.to_s if membership.paid %>
   <% end %>
 </td>
+<% if @gathering.enable_rotas? && @gathering.rotas.count > 0 %>
+  <td>
+    <%= partial :'rotas/shift_summary', locals: {membership: @membership} %>
+  </td>
+<% end %>
 <% if (admin? || @membership.admin?) || !@gathering.hide_invitations %>
   <td>
     <% if @membership.admin? %>

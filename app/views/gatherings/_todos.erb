@@ -64,11 +64,7 @@
       </th>
       <td>
         <% if @membership && @membership.shifts.count > 0 %>
-          <% @membership.shifts.each { |shift| %>
-          <a href="/g/<%= @gathering.slug %>/rotas/<%= shift.rota_id %>" class="label label-primary text-white d-inline-block mb-1">
-            <%= shift.rota.name %>, <%= shift.role.name %>, <%= shift.rslot.name %>
-          </a>
-          <% } %>
+          <%= partial :'rotas/shift_summary', locals: {membership: @membership} %>
         <% else %>
           <a href="/g/<%= @gathering.slug %>/rotas">Sign up to shifts</a>
         <% end %>

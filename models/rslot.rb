@@ -7,11 +7,13 @@ class Rslot
 
   field :name, type: String
   field :o, type: Integer
+  field :worth, type: Integer
 
   def self.admin_fields
     {
       name: :text,
       o: :number,
+      worth: :number,
       rota_id: :lookup,
       gathering_id: :lookup
     }
