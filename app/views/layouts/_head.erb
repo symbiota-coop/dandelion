@@ -152,8 +152,8 @@
       "@type": 'Event',
       "eventStatus": "https://schema.org/EventScheduled",
       "name": @event.name,
-      "startDate": @event.start_time.iso8601,
-      "endDate": @event.end_time.iso8601,
+      "startDate": @event.start_time.try(:iso8601),
+      "endDate": @event.end_time.try(:iso8601),
       "eventAttendanceMode": @event.online? ? 'https://schema.org/OnlineEventAttendanceMode' : 'https://schema.org/OfflineEventAttendanceMode',
       "location": (unless @event.online?
                      {
