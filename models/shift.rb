@@ -38,7 +38,7 @@ class Shift
   end
 
   def description
-    "#{rota.name}, #{role.name}, #{rslot.name}"
+    "#{rota.name}: #{role.name}, #{rslot.name}"
   end
 
   def circle
