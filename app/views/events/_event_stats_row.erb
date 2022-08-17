@@ -9,6 +9,9 @@
   <% if event.monthly_donors_only? %>
     <span class="label label-default">Monthly donors only</span>
   <% end %>
+  <% if @organisation && @organisation != event.organisation %>
+    <span class="label label-yellow">Co-host</span>
+  <% end %>
 </td>
 <td nowrap>
   <a data-toggle="tooltip" title="Edit event" class="btn btn-sm btn-primary" href="/events/<%= event.id %>/edit"><i class="fa fa-pencil"></i></a>

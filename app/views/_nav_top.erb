@@ -6,7 +6,7 @@
   <% if current_account %>
     <li id="docs-li">
       <a href="/docs">
-        Docs
+        How to use Dandelion
       </a>
     </li>
     <li id="feedback-li">
@@ -56,6 +56,11 @@
       <%= partial :nav_profile, locals: { ul_class: 'dropdown-menu' } %>
     </li>
   <% else %>
+    <li id="docs-li">
+      <a href="/docs">
+        How to use Dandelion
+      </a>
+    </li>
     <li>
       <a href="/accounts/new">
         Sign up
