@@ -1,0 +1,7 @@
+<h2>Edit slot</h2>
+<div class="container">
+  <% form_for @rslot, "/rslots/#{@rslot.id}/edit" do |f| %>
+    <%= f.text_block :name %>
+    <%= f.submit_block destroy_url: ("/rslots/#{@rslot.id}/destroy" if admin? || @membership.admin?) %>
+  <% end %>
+</div>

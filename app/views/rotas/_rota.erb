@@ -5,7 +5,7 @@
     <td>
       <strong>
         <% if @membership.admin? %>
-          <a class="pagelet-trigger" data-confirm="Delete this role?" href="/roles/<%= role.id %>/destroy">
+          <a href="/roles/<%= role.id %>/edit">
             <%= role.name %>
           </a>
         <% else %>
@@ -27,7 +27,7 @@
     <td>
       <strong>
         <% if @membership.admin? %>
-          <a class="pagelet-trigger" data-confirm="Delete this slot?" href="/rslots/<%= rslot.id %>/destroy">
+          <a href="/rslots/<%= rslot.id %>/edit">
             <%= rslot.name %>
           </a>
         <% else %>

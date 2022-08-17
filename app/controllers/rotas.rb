@@ -90,13 +90,34 @@ Dandelion::App.controller do
     200
   end
 
+  get '/roles/:id/edit' do
+    @role = Role.find(params[:id]) || not_found
+    @gathering = @role.rota.gathering
+    @membership = @gathering.memberships.find_by(account: current_account)
+    gathering_admins_only!
+    erb :'rotas/role'
+  end
+
+  post '/roles/:id/edit' do
+    @role = Role.find(params[:id]) || not_found
+    @gathering = @role.rota.gathering
+    @membership = @gathering.memberships.find_by(account: current_account)
+    gathering_admins_only!
+    if @role.update_attributes(mass_assigning(params[:role], Role))
+      redirect "/g/#{@gathering.slug}/rotas/#{@role.rota_id}"
+    else
+      flash.now[:error] = '<strong>Oops.</strong> Some errors prevented the slot from being saved.'
+      erb :'rotas/role'
+    end
+  end
+
   get '/roles/:id/destroy' do
     @role = Role.find(params[:id]) || not_found
     @gathering = @role.gathering
     @membership = @gathering.memberships.find_by(account: current_account)
     gathering_admins_only!
     @role.destroy
-    200
+    redirect "/g/#{@gathering.slug}/rotas/#{@role.rota_id}"
   end
 
   post '/rslots/order' do
@@ -119,13 +140,34 @@ Dandelion::App.controller do
     200
   end
 
+  get '/rslots/:id/edit' do
+    @rslot = Rslot.find(params[:id]) || not_found
+    @gathering = @rslot.rota.gathering
+    @membership = @gathering.memberships.find_by(account: current_account)
+    gathering_admins_only!
+    erb :'rotas/rslot'
+  end
+
+  post '/rslots/:id/edit' do
+    @rslot = Rslot.find(params[:id]) || not_found
+    @gathering = @rslot.rota.gathering
+    @membership = @gathering.memberships.find_by(account: current_account)
+    gathering_admins_only!
+    if @rslot.update_attributes(mass_assigning(params[:rslot], Rslot))
+      redirect "/g/#{@gathering.slug}/rotas/#{@rslot.rota_id}"
+    else
+      flash.now[:error] = '<strong>Oops.</strong> Some errors prevented the slot from being saved.'
+      erb :'rotas/rslot'
+    end
+  end
+
   get '/rslots/:id/destroy' do
     @rslot = Rslot.find(params[:id]) || not_found
     @gathering = @rslot.gathering
     @membership = @gathering.memberships.find_by(account: current_account)
     gathering_admins_only!
     @rslot.destroy
-    200
+    redirect "/g/#{@gathering.slug}/rotas/#{@rslot.rota_id}"
   end
 
   get '/rota/rslot/role/:rota_id/:rslot_id/:role_id' do
