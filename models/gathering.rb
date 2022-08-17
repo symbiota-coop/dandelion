@@ -315,7 +315,8 @@ class Gathering
       xdai_address: 'xDai address',
       seeds_username: 'SEEDS username',
       privacy: 'Access',
-      listed: 'List this gathering publicly'
+      listed: 'List this gathering publicly',
+      enable_rotas: 'Enable shifts'
     }[attr.to_sym] || super
   end
 

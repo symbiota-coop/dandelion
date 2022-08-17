@@ -48,7 +48,7 @@
             )]
          end),
         (if gathering.enable_rotas
-           ['Rotas',
+           ['Shifts',
             (
               gathering.rotas(true).map { |rota| [rota.name, "/g/#{gathering.slug}/rotas/#{rota.id}"] } + (membership.admin? ? [['Create a rota', "/g/#{gathering.slug}/rotas/new"]] : [])
             )]
