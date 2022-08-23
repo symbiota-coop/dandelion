@@ -258,3 +258,24 @@ body { background: white }
 .float-sub-menu { z-index: 99 }
 
 .infowindow .row { margin: 0 }
+
+.ck-progress-bar {
+  height: 100% !important;
+  width: 100% !important;
+  background: white !important;
+  animation-name: opacity;
+  animation-duration: 2s;
+  animation-iteration-count: infinite;
+}
+
+@keyframes opacity {
+  0% {
+    opacity: 0.5;
+  }
+  50% {
+    opacity: 0.75;
+  }
+  100% {
+    opacity: 0.5;
+  }
+}

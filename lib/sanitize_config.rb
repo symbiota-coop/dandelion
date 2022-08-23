@@ -5,6 +5,7 @@ Sanitize::Config::DANDELION = Sanitize::Config.merge(Sanitize::Config::RELAXED,
                                                          :all => ['class'],
                                                          'oembed' => ['url'],
                                                          'figure' => ['style'],
+                                                         'span' => ['style'],
                                                          'h1' => ['style'],
                                                          'h2' => ['style'],
                                                          'h3' => ['style'],
@@ -14,7 +15,7 @@ Sanitize::Config::DANDELION = Sanitize::Config.merge(Sanitize::Config::RELAXED,
                                                        }
                                                      ),
                                                      css: {
-                                                       'properties' => %w[width text-align]
+                                                       'properties' => %w[width text-align color background-color]
                                                      },
                                                      protocols: Sanitize::Config::RELAXED[:protocols].merge(
                                                        {
