@@ -170,7 +170,7 @@
                 if (_data['payment_completed'])
                   window.location = '/g/<%=@gathering.slug%>/options'
               })
-          }, 30 * 1000);
+          }, 10 * 1000);
         }
       }).fail(function () {
         $('#pay-form').hide()

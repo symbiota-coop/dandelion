@@ -462,13 +462,13 @@ class Gathering
       items = j['items']
       items.each do |item|
         h = Nokogiri::HTML(item)
-        to = h.search('[data-test=token_transfer] [data-address-hash]')[1].attr('data-address-hash').downcase
-        token = h.search('[data-test=token_link]').text
+        puts to = h.search('[data-test=token_transfer] [data-address-hash]')[1].attr('data-address-hash').downcase
+        puts token = h.search('[data-test=token_link]').text.upcase
         next unless to == evm_address.downcase
 
-        amount = h.search('[data-test=token_transfer] > span')[1].text.split(' ').first.gsub(',', '')
+        puts amount = h.search('[data-test=token_transfer] > span')[1].text.split(' ').first.gsub(',', '')
 
-        Payment.create!(payment_attempt: @payment_attempt) if (@payment_attempt = payment_attempts.find_by(currency: token, evm_amount: amount))
+        Payment.create(payment_attempt: @payment_attempt) if (@payment_attempt = payment_attempts.find_by(currency: token, evm_amount: amount))
       end
     end
   end

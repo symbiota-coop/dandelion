@@ -20,6 +20,7 @@ class PaymentAttempt
 
   def self.admin_fields
     {
+      id: { type: :text, edit: false },
       session_id: :text,
       payment_intent: :text,
       coinbase_checkout_id: :text,
