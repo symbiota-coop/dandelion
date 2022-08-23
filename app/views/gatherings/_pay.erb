@@ -33,12 +33,12 @@
     </button>
     <%= hidden_field_tag :payment_method, value: 'seeds', disabled: true %>
   <% end %>
-  <% if @gathering.xdai_address && XDAI_CURRENCIES.include?(@gathering.currency) %>
-    <button data-payment-method="xdai" type="submit" class="btn btn-default mb-1 ml-0 mr-1" style="height: 2.125rem">
-      <span>Pay with xDai</span>
+  <% if @gathering.evm_address && EVM_CURRENCIES.include?(@gathering.currency) %>
+    <button data-payment-method="evm" type="submit" class="btn btn-default mb-1 ml-0 mr-1" style="height: 2.125rem">
+      <span>Pay with Metamask</span>
       <i class="fa fa-spin fa-circle-o-notch" style="display: none"></i>
     </button>
-    <%= hidden_field_tag :payment_method, value: 'xdai', disabled: true %>
+    <%= hidden_field_tag :payment_method, value: 'evm', disabled: true %>
   <% end %>
 
 
@@ -82,29 +82,37 @@
                   window.location = '/g/<%=@gathering.slug%>/options'
               })
           }, 30 * 1000);
-        } else if (data['xdai_secret']) {
-          // xDai
-          xdaiAddress = <%== @gathering.xdai_address.to_json %>
-          contractAddress = <%== XDAI_CONTRACT_ADDRESSES[@gathering.currency].to_json %>
+        } else if (data['evm_secret']) {
+          // EVM
+          evmAddress = <%== @gathering.evm_address.to_json %>
+          contractAddress = <%== EVM_CONTRACT_ADDRESSES[@gathering.currency].to_json %>
+          networkId = <%= EVM_NETWORK_IDS[
+            if XDAI_CURRENCIES.include?(@gathering.currency)
+              'XDAI'
+            elsif CELO_CURRENCIES.include?(@gathering.currency)
+              'CELO'
+            end
+          ] %>
+          networkName = '<%= if XDAI_CURRENCIES.include?(@gathering.currency); 'Gnosis Chain'; elsif CELO_CURRENCIES.include?(@gathering.currency); 'Celo'; end %>'
           $('#owed').hide()
-          $('#pay-with-xdai').show()
-          $('#pay-with-xdai').find('.card-body p.lead.please').html('Send EXACTLY <strong>' + data['xdai_amount'] + ' ' + currency + '</strong> to <strong>' + xdaiAddress + '</strong>')
-          var offset = $('#pay-with-xdai').offset()
+          $('#pay-with-evm').show()
+          $('#pay-with-evm').find('.card-body p.lead.please').html('Send EXACTLY <strong>' + data['evm_amount'] + ' ' + currency + '</strong> to <strong>' + evmAddress + '</strong>')
+          var offset = $('#pay-with-evm').offset()
           window.scrollTo(0, offset['top'] - $('#header').height() - 10);
 
           var web3 = new Web3(ethereum);
 
-          web3.eth.net.getId().then(networkId => {
-            if (networkId != 100) {
-              $('#pay-with-xdai').find('.card-body p.metamask').html('<mark>Please switch to xDai</mark>')
+          web3.eth.net.getId().then(thisNetworkId => {
+            if (thisNetworkId != networkId) {
+              $('#pay-with-evm').find('.card-body p.metamask').html('<mark>Please switch to ' + networkName + '</mark>')
               ethereum.on('chainChanged', function() {
                 console.log('chainChanged')
-                web3.eth.net.getId().then(networkId => {
-                  if (networkId == 100)
+                web3.eth.net.getId().then(thisNetworkId => {
+                  if (thisNetworkId == networkId)
                     connectMetamask()
                 })
               });
-            } else if (networkId == 100) {
+            } else if (thisNetworkId == networkId) {
               connectMetamask()
             }
           })
@@ -112,8 +120,8 @@
           function connectMetamask() {
             if (!ethereum.selectedAddress) {
               console.log('connecting')
-              $('#pay-with-xdai').find('.card-body p.metamask').html('<a href="javascript:;">Connect to Metamask</a>')
-              $('#pay-with-xdai').find('.card-body p.metamask a').click(function() {
+              $('#pay-with-evm').find('.card-body p.metamask').html('<a href="javascript:;">Connect to Metamask</a>')
+              $('#pay-with-evm').find('.card-body p.metamask a').click(function() {
                 ethereum.request({
                   method: 'eth_requestAccounts'
                 }).then(pay)
@@ -125,7 +133,7 @@
 
           function pay() {
             console.log('paying')
-            $('#pay-with-xdai').find('.card-body p.metamask').remove()
+            $('#pay-with-evm').find('.card-body p.metamask').remove()
 
             var abi = [{
               "constant": false,
@@ -146,9 +154,9 @@
               "type": "function"
             }];
 
-            var toAddress = xdaiAddress
+            var toAddress = evmAddress
             var fromAddress = ethereum.selectedAddress
-            var amount = parseInt(data['xdai_wei']).toString()
+            var amount = parseInt(data['evm_wei']).toString()
 
             var contractInstance = new web3.eth.Contract(abi, contractAddress);
             contractInstance.methods.transfer(toAddress, amount).send({

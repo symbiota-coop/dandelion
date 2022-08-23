@@ -341,12 +341,12 @@
       </button>
       <%= hidden_field_tag :payment_method, value: 'seeds', disabled: true %>
     <% end %>
-    <% if @event.organisation.xdai_address && XDAI_CURRENCIES.include?(@event.currency) %>
-      <button class="btn btn-primary btn-block mb-1 btn-dotted" type="submit" data-payment-method="xdai">
-        <span>Pay with xDai</span>
+    <% if @event.organisation.evm_address && EVM_CURRENCIES.include?(@event.currency) %>
+      <button class="btn btn-primary btn-block mb-1 btn-dotted" type="submit" data-payment-method="evm">
+        <span>Pay with Metamask</span>
         <i class="fa fa-spin fa-circle-o-notch" style="display: none"></i>
       </button>
-      <%= hidden_field_tag :payment_method, value: 'xdai', disabled: true %>
+      <%= hidden_field_tag :payment_method, value: 'evm', disabled: true %>
     <% end %>
     <%= hidden_field_tag :utm_source, value: params[:utm_source] %>
     <%= hidden_field_tag :utm_medium, value: params[:utm_medium] %>
@@ -370,8 +370,8 @@
     <p>Looking for your transaction... <i class="fa fa-spin fa-circle-o-notch"></i></p>
   </div>
 </div>
-<div class="card" id="pay-with-xdai" style="display: none">
-  <h3 class="card-header bg-primary text-white">Pay with xDai</h3>
+<div class="card" id="pay-with-evm" style="display: none">
+  <h3 class="card-header bg-primary text-white">Pay with Metamask</h3>
   <div class="card-body">
     <p class="lead please"></p>
     <p class="metamask"></p>
@@ -390,8 +390,16 @@
     stripePk = <%== @event.organisation.stripe_pk.to_json %>
     coinbase = <%= @event.organisation.coinbase_api_key ? true : false %>
     seedsUsername = <%== @event.organisation.seeds_username.to_json %>
-    xdaiAddress = <%== @event.organisation.xdai_address.to_json %>
-    contractAddress = <%== XDAI_CONTRACT_ADDRESSES[@event.currency].to_json %>
+    evmAddress = <%== @event.organisation.evm_address.to_json %>
+    contractAddress = <%== EVM_CONTRACT_ADDRESSES[@event.currency].to_json %>
+    networkId = <%= EVM_NETWORK_IDS[
+      if XDAI_CURRENCIES.include?(@event.currency)
+        'XDAI'
+      elsif CELO_CURRENCIES.include?(@event.currency)
+        'CELO'
+      end
+    ] %>
+    networkName = '<%= if XDAI_CURRENCIES.include?(@event.currency); 'Gnosis Chain'; elsif CELO_CURRENCIES.include?(@event.currency); 'Celo'; end %>'
     signedIn = <%= current_account ? true : false %>
 </script>
 <script src="/javascripts/purchase.js?<%= @cachebuster %>"></script>

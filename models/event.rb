@@ -615,7 +615,7 @@ class Event
         Organisation.all.or(
           { :stripe_pk.ne => nil },
           { :coinbase_api_key.ne => nil },
-          { :xdai_address.ne => nil },
+          { :evm_address.ne => nil },
           { :seeds_username.ne => nil }
         ).pluck(:id))
   end

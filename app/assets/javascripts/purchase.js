@@ -50,17 +50,17 @@ $(function() {
       $('#details form button[data-payment-method=stripe]').hide()
       $('#details form button[data-payment-method=coinbase]').hide()
       $('#details form button[data-payment-method=seeds]').hide()
-      $('#details form button[data-payment-method=xdai]').hide()
+      $('#details form button[data-payment-method=evm]').hide()
     } else if (b == 0) {
       $('#details form button[data-payment-method=rsvp]').show().find('span').text('Use credit')
       $('#details form button[data-payment-method=stripe]').hide()
       $('#details form button[data-payment-method=coinbase]').hide()
       $('#details form button[data-payment-method=seeds]').hide()
-      $('#details form button[data-payment-method=xdai]').hide()
+      $('#details form button[data-payment-method=evm]').hide()
     } else if (b > 0) {
       $('#balance').val((+b).toFixed(2))
       var via_card
-      if (coinbase || seedsUsername || xdaiAddress)
+      if (coinbase || seedsUsername || evmAddress)
         via_card = ' via card'
       else
         via_card = ''
@@ -69,7 +69,7 @@ $(function() {
       $('#details form button[data-payment-method=stripe]').show().find('span').text('Pay ' + currencySymbol + (+b).toFixed(2) + via_card)
       $('#details form button[data-payment-method=coinbase]').show()
       $('#details form button[data-payment-method=seeds]').show()
-      $('#details form button[data-payment-method=xdai]').show()
+      $('#details form button[data-payment-method=evm]').show()
     }
 
   }
@@ -159,27 +159,27 @@ $(function() {
                   window.location = '?success=true&order_id=' + data['order_id']
               })
           }, 30 * 1000);
-        } else if (data['xdai_secret']) {
-          // xDai
+        } else if (data['evm_secret']) {
+          // EVM
           $('#select-tickets').hide()
-          $('#pay-with-xdai').show()
-          $('#pay-with-xdai').find('.card-body p.lead.please').html('Send EXACTLY <strong>' + data['xdai_value'] + ' ' + currency + '</strong> to <strong>' + xdaiAddress + '</strong>')
-          var offset = $('#pay-with-xdai').offset()
+          $('#pay-with-evm').show()
+          $('#pay-with-evm').find('.card-body p.lead.please').html('Send EXACTLY <strong>' + data['evm_value'] + ' ' + currency + '</strong> to <strong>' + evmAddress + '</strong>')
+          var offset = $('#pay-with-evm').offset()
           window.scrollTo(0, offset['top'] - $('#header').height() - 10);
 
           var web3 = new Web3(ethereum);
 
-          web3.eth.net.getId().then(networkId => {
-            if (networkId != 100) {
-              $('#pay-with-xdai').find('.card-body p.metamask').html('<mark>Please switch to xDai</mark>')
+          web3.eth.net.getId().then(thisNetworkId => {
+            if (thisNetworkId != networkId) {
+              $('#pay-with-evm').find('.card-body p.metamask').html('<mark>Please switch to ' + networkName + '</mark>')
               ethereum.on('chainChanged', function() {
                 console.log('chainChanged')
-                web3.eth.net.getId().then(networkId => {
-                  if (networkId == 100)
+                web3.eth.net.getId().then(thisNetworkId => {
+                  if (thisNetworkId == networkId)
                     connectMetamask()
                 })
               });
-            } else if (networkId == 100) {
+            } else if (thisNetworkId == networkId) {
               connectMetamask()
             }
           })
@@ -187,8 +187,8 @@ $(function() {
           function connectMetamask() {
             if (!ethereum.selectedAddress) {
               console.log('connecting')
-              $('#pay-with-xdai').find('.card-body p.metamask').html('<a href="javascript:;">Connect to Metamask</a>')
-              $('#pay-with-xdai').find('.card-body p.metamask a').click(function() {
+              $('#pay-with-evm').find('.card-body p.metamask').html('<a href="javascript:;">Connect to Metamask</a>')
+              $('#pay-with-evm').find('.card-body p.metamask a').click(function() {
                 ethereum.request({
                   method: 'eth_requestAccounts'
                 }).then(pay)
@@ -200,7 +200,7 @@ $(function() {
 
           function pay() {
             console.log('paying')
-            $('#pay-with-xdai').find('.card-body p.metamask').remove()
+            $('#pay-with-evm').find('.card-body p.metamask').remove()
 
             var abi = [{
               "constant": false,
@@ -221,9 +221,9 @@ $(function() {
               "type": "function"
             }];
 
-            var toAddress = xdaiAddress
+            var toAddress = evmAddress
             var fromAddress = ethereum.selectedAddress
-            var amount = parseInt(data['xdai_wei']).toString()
+            var amount = parseInt(data['evm_wei']).toString()
 
             var contractInstance = new web3.eth.Contract(abi, contractAddress);
             contractInstance.methods.transfer(toAddress, amount).send({
@@ -237,7 +237,7 @@ $(function() {
                 if (_data['payment_completed'])
                   window.location = '?success=true&order_id=' + data['order_id']
               })
-          }, 30 * 1000);
+          }, 10 * 1000);
         }
       } else {
         // RSVP

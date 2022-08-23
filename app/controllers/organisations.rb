@@ -294,7 +294,7 @@ Dandelion::App.controller do
     end
     @orders = @orders.and(:coinbase_checkout_id.ne => nil) if params[:coinbase]
     @orders = @orders.and(:seeds_secret.ne => nil) if params[:seeds]
-    @orders = @orders.and(:xdai_secret.ne => nil) if params[:xdai]
+    @orders = @orders.and(:evm_secret.ne => nil) if params[:evm]
     erb :'organisations/orders'
   end
 

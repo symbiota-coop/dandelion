@@ -26,8 +26,8 @@ class Order
   field :coinbase_checkout_id, type: String
   field :seeds_secret, type: String
   field :seeds_value, type: Float
-  field :xdai_secret, type: String
-  field :xdai_value, type: BigDecimal
+  field :evm_secret, type: String
+  field :evm_value, type: BigDecimal
   field :payment_completed, type: Boolean
   field :application_fee_amount, type: Float
   field :currency, type: String
@@ -55,8 +55,8 @@ class Order
       coinbase_checkout_id: :text,
       seeds_secret: :text,
       seeds_value: :number,
-      xdai_secret: :text,
-      xdai_value: :number,
+      evm_secret: :text,
+      evm_value: :number,
       payment_completed: :check_box,
       opt_in_organisation: :check_box,
       opt_in_facilitator: :check_box,
@@ -80,7 +80,7 @@ class Order
 
   validates_uniqueness_of :session_id, :payment_intent, :coinbase_checkout_id, allow_nil: true
   validates_uniqueness_of :seeds_secret, scope: :seeds_value, allow_nil: true
-  validates_uniqueness_of :xdai_secret, scope: :xdai_value, allow_nil: true
+  validates_uniqueness_of :evm_secret, scope: :evm_value, allow_nil: true
 
   def self.currencies
     [''] + CURRENCIES_HASH
@@ -114,11 +114,11 @@ class Order
         Order.and(:payment_intent.ne => nil).and(:payment_completed.ne => true).pluck(:id) +
         Order.and(:coinbase_checkout_id.ne => nil).and(:payment_completed.ne => true).pluck(:id) +
         Order.and(:seeds_secret.ne => nil).and(:payment_completed.ne => true).pluck(:id) +
-        Order.and(:xdai_secret.ne => nil).and(:payment_completed.ne => true).pluck(:id))
+        Order.and(:evm_secret.ne => nil).and(:payment_completed.ne => true).pluck(:id))
   end
 
   def incomplete?
-    (payment_intent && !payment_completed) || (coinbase_checkout_id && !payment_completed) || (seeds_secret && !payment_completed) || (xdai_secret && !payment_completed)
+    (payment_intent && !payment_completed) || (coinbase_checkout_id && !payment_completed) || (seeds_secret && !payment_completed) || (evm_secret && !payment_completed)
   end
 
   def self.complete
@@ -155,7 +155,7 @@ class Order
   end
 
   before_validation do
-    self.xdai_value = value.to_d + xdai_secret.to_i(36).to_d / 1e15.to_d if xdai_secret && !xdai_value
+    self.evm_value = value.to_d + evm_secret.to_i(36).to_d / 1e15.to_d if evm_secret && !evm_value
     if seeds_secret && !seeds_value
       self.seeds_value = value
       # agent = Mechanize.new

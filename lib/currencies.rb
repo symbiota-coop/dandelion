@@ -5,22 +5,34 @@ XDAI_CONTRACT_ADDRESSES = {
   'PAN' => '0x981fB9BA94078a2275A8fc906898ea107B9462A8',
   'HAUS' => '0xb0C5f3100A4d9d9532a4CfD68c55F1AE8da987Eb'
 }.freeze
+XDAI_CURRENCIES = XDAI_CONTRACT_ADDRESSES.keys.freeze
+
+CELO_CONTRACT_ADDRESSES = {
+  'CUSD' => '0x765DE816845861e75A25fCA122bb6898B8B1282a'
+}.freeze
+CELO_CURRENCIES = CELO_CONTRACT_ADDRESSES.keys.freeze
+
+EVM_CONTRACT_ADDRESSES = {}.merge(XDAI_CONTRACT_ADDRESSES).merge(CELO_CONTRACT_ADDRESSES).freeze
+EVM_CURRENCIES = (XDAI_CURRENCIES + CELO_CURRENCIES).freeze
+EVM_NETWORK_IDS = { 'XDAI' => 100, 'CELO' => 42_220 }.freeze
 
 COINBASE_CURRENCIES = %w[BTC ETH].freeze
-XDAI_CURRENCIES = XDAI_CONTRACT_ADDRESSES.keys.freeze
-CRYPTOCURRENCIES = (COINBASE_CURRENCIES + XDAI_CURRENCIES + %w[SEEDS]).freeze
+CRYPTOCURRENCIES = (COINBASE_CURRENCIES + EVM_CURRENCIES + %w[SEEDS]).freeze
+
 FIAT_CURRENCIES = %w[GBP EUR USD SEK DKK INR MXN].freeze
+
 CURRENCIES = (FIAT_CURRENCIES + CRYPTOCURRENCIES).freeze
 CURRENCIES_HASH = CURRENCIES.map do |currency|
   ["#{currency} (#{[
     ('Stripe' if FIAT_CURRENCIES.include?(currency)),
     ('Coinbase Commerce' if FIAT_CURRENCIES.include?(currency) || COINBASE_CURRENCIES.include?(currency)),
     ('Gnosis Chain' if XDAI_CURRENCIES.include?(currency)),
+    ('Celo' if CELO_CURRENCIES.include?(currency)),
     ('SEEDS' if currency == 'SEEDS')
   ].compact.join('/')})", currency]
 end
 
-XDAI_CURRENCIES.each do |c|
+EVM_CURRENCIES.each do |c|
   Money::Currency.register({
                              priority: 1,
                              iso_code: c,

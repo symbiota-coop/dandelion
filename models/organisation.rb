@@ -53,7 +53,7 @@ class Organisation
   field :monthly_donation_welcome_subject, type: String
   field :monthly_donation_welcome_body, type: String
   field :seeds_username, type: String
-  field :xdai_address, type: String
+  field :evm_address, type: String
   field :carousels, type: String
   field :add_a_donation_to, type: String
   field :donation_text, type: String
@@ -481,7 +481,7 @@ class Organisation
       coinbase_webhook_secret: 'Coinbase Commerce webhook secret',
       patreon_api_key: 'Patreon API key',
       mailgun_api_key: 'Mailgun API key',
-      xdai_address: 'xDai address',
+      evm_address: 'EVM address',
       seeds_username: 'SEEDS username',
       collect_location: 'Ask for location of ticket buyers',
       reply_to: 'Reply address for ticket emails',
@@ -631,28 +631,32 @@ class Organisation
     end
   end
 
-  def check_xdai_account
+  def check_evm_account
     agent = Mechanize.new
-    j = JSON.parse(agent.get("https://blockscout.com/poa/xdai/address/#{xdai_address}/token-transfers?type=JSON").body)
-    items = j['items']
-    items.each do |item|
-      h = Nokogiri::HTML(item)
-      to = h.search('[data-test=token_transfer] [data-address-hash]')[1].attr('data-address-hash').downcase
-      token = h.search('[data-test=token_link]').text
-      next unless to == xdai_address.downcase
+    [
+      JSON.parse(agent.get("https://blockscout.com/poa/xdai/address/#{evm_address}/token-transfers?type=JSON").body),
+      JSON.parse(agent.get("https://explorer.celo.org/address/#{evm_address}/token-transfers?type=JSON").body)
+    ].each do |j|
+      items = j['items']
+      items.each do |item|
+        puts h = Nokogiri::HTML(item)
+        puts to = h.search('[data-test=token_transfer] [data-address-hash]')[1].attr('data-address-hash').downcase
+        puts token = h.search('[data-test=token_link]').text.upcase
+        next unless to == evm_address.downcase
 
-      amount = h.search('[data-test=token_transfer] > span')[1].text.split(' ').first.gsub(',', '')
+        puts amount = h.search('[data-test=token_transfer] > span')[1].text.split(' ').first.gsub(',', '')
 
-      if (@order = Order.find_by(:payment_completed.ne => true, :currency => token, :xdai_value => amount))
-        @order.set(payment_completed: true)
-        @order.send_tickets
-        @order.create_order_notification
-      elsif (@order = Order.deleted.find_by(:payment_completed.ne => true, :xdai_value => amount))
-        begin
-          @order.restore_and_complete
-          # raise Order::Restored
-        rescue StandardError => e
-          Airbrake.notify(e, order: @order)
+        if (@order = Order.find_by(:payment_completed.ne => true, :currency => token, :evm_value => amount))
+          @order.set(payment_completed: true)
+          @order.send_tickets
+          @order.create_order_notification
+        elsif (@order = Order.deleted.find_by(:payment_completed.ne => true, :evm_value => amount))
+          begin
+            @order.restore_and_complete
+            # raise Order::Restored
+          rescue StandardError => e
+            Airbrake.notify(e, order: @order)
+          end
         end
       end
     end

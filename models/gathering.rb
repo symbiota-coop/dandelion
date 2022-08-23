@@ -29,7 +29,7 @@ class Gathering
   field :stripe_sk, type: String
   field :coinbase_api_key, type: String
   field :coinbase_webhook_secret, type: String
-  field :xdai_address, type: String
+  field :evm_address, type: String
   field :seeds_username, type: String
   field :redirect_on_acceptance, type: String
   field :choose_and_pay_label, type: String
@@ -313,7 +313,7 @@ class Gathering
       stripe_sk: 'Stripe secret key',
       coinbase_api_key: 'Coinbase Commerce API key',
       coinbase_webhook_secret: 'Coinbase Commerce webhook secret',
-      xdai_address: 'xDai address',
+      evm_address: 'EVM address',
       seeds_username: 'SEEDS username',
       privacy: 'Access',
       listed: 'List this gathering publicly',
@@ -453,19 +453,23 @@ class Gathering
     end
   end
 
-  def check_xdai_account
+  def check_evm_account
     agent = Mechanize.new
-    j = JSON.parse(agent.get("https://blockscout.com/poa/xdai/address/#{xdai_address}/token-transfers?type=JSON").body)
-    items = j['items']
-    items.each do |item|
-      h = Nokogiri::HTML(item)
-      to = h.search('[data-test=token_transfer] [data-address-hash]')[1].attr('data-address-hash').downcase
-      token = h.search('[data-test=token_link]').text
-      next unless to == xdai_address.downcase
+    [
+      JSON.parse(agent.get("https://blockscout.com/poa/xdai/address/#{evm_address}/token-transfers?type=JSON").body),
+      JSON.parse(agent.get("https://explorer.celo.org/address/#{evm_address}/token-transfers?type=JSON").body)
+    ].each do |j|
+      items = j['items']
+      items.each do |item|
+        h = Nokogiri::HTML(item)
+        to = h.search('[data-test=token_transfer] [data-address-hash]')[1].attr('data-address-hash').downcase
+        token = h.search('[data-test=token_link]').text
+        next unless to == evm_address.downcase
 
-      amount = h.search('[data-test=token_transfer] > span')[1].text.split(' ').first.gsub(',', '')
+        amount = h.search('[data-test=token_transfer] > span')[1].text.split(' ').first.gsub(',', '')
 
-      Payment.create!(payment_attempt: @payment_attempt) if (@payment_attempt = payment_attempts.find_by(currency: token, xdai_amount: amount))
+        Payment.create!(payment_attempt: @payment_attempt) if (@payment_attempt = payment_attempts.find_by(currency: token, evm_amount: amount))
+      end
     end
   end
 end

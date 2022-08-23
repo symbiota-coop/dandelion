@@ -483,7 +483,7 @@ Dandelion::App.controller do
     @event = Event.find(params[:id]) || not_found
     @order = @event.orders.find(params[:order_id])
     @event.organisation.check_seeds_account if @order.seeds_secret && @event.organisation.seeds_username
-    @event.organisation.check_xdai_account if @order.xdai_secret && @event.organisation.xdai_address
+    @event.organisation.check_evm_account if @order.evm_secret && @event.organisation.evm_address
     { id: @order.id.to_s, payment_completed: @order.payment_completed }.to_json
   end
 

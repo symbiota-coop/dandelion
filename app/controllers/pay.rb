@@ -104,15 +104,15 @@ Dandelion::App.controller do
       )
       { seeds_secret: payment_attempt.seeds_secret, seeds_amount: payment_attempt.seeds_amount, payment_attempt_id: payment_attempt.id.to_s, payment_attempt_expiry: (payment_attempt.created_at + 1.hour).to_datetime.strftime('%Q') }.to_json
 
-    when 'xdai'
+    when 'evm'
 
-      xdai_secret = Array.new(5) { [*'a'..'z', *'0'..'9'].sample }.join
+      evm_secret = Array.new(5) { [*'a'..'z', *'0'..'9'].sample }.join
       payment_attempt = @membership.payment_attempts.create!(
         amount: params[:amount].to_i,
         currency: @gathering.currency,
-        xdai_secret: xdai_secret
+        evm_secret: evm_secret
       )
-      { xdai_secret: payment_attempt.xdai_secret, xdai_amount: payment_attempt.xdai_amount, xdai_wei: (payment_attempt.xdai_amount * 1e18.to_d).to_i, payment_attempt_id: payment_attempt.id.to_s, payment_attempt_expiry: (payment_attempt.created_at + 1.hour).to_datetime.strftime('%Q') }.to_json
+      { evm_secret: payment_attempt.evm_secret, evm_amount: payment_attempt.evm_amount, evm_wei: (payment_attempt.evm_amount * 1e18.to_d).to_i, payment_attempt_id: payment_attempt.id.to_s, payment_attempt_expiry: (payment_attempt.created_at + 1.hour).to_datetime.strftime('%Q') }.to_json
 
     end
   end
@@ -123,7 +123,7 @@ Dandelion::App.controller do
     membership_required!
     @payment_attempt = @gathering.payment_attempts.find(params[:payment_attempt_id])
     @gathering.check_seeds_account if @payment_attempt.seeds_secret && @gathering.seeds_username
-    @gathering.check_xdai_account if @payment_attempt.xdai_secret && @gathering.xdai_address
+    @gathering.check_evm_account if @payment_attempt.evm_secret && @gathering.evm_address
     { id: @payment_attempt.id.to_s, payment_completed: @gathering.payments.find_by(payment_attempt: @payment_attempt) ? true : false }.to_json
   end
 end
