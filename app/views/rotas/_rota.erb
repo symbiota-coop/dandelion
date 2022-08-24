@@ -1,3 +1,11 @@
+
+<% w = 100*@rota.shifts.count/(@rota.roles.count*@rota.rslots.count)%>
+<div class="progress my-3"  data-toggle="tooltip" title="<%=@rota.shifts.count%>/<%=pluralize(@rota.roles.count*@rota.rslots.count,'shift')%> filled" >
+  <div class="progress-bar" role="progressbar" style="width: <%= "#{w}%" %>;">
+    <%=@rota.shifts.count%>/<%=@rota.roles.count*@rota.rslots.count%>
+  </div>
+</div>
+
 <div class="my-3">
   <%= partial :'rotas/shift_summary', locals: {membership: @membership, rota: @rota, show_title: true} %>
 </div>

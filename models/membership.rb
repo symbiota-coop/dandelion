@@ -12,6 +12,7 @@ class Membership
   field :desired_threshold, type: Integer
   field :requested_contribution, type: Integer
   field :invitations_granted, type: Integer
+  field :shift_points_required, type: Integer
 
   %w[admin unsubscribed member_of_facebook_group hide_from_sidebar].each do |b|
     field b.to_sym, type: Boolean
@@ -162,5 +163,9 @@ class Membership
 
   def self.protected_attributes
     %w[admin]
+  end
+
+  def shift_points
+    shifts.map(&:worth).sum
   end
 end

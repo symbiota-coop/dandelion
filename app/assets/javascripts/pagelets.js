@@ -1,4 +1,4 @@
-/*global $*/
+'hide'/*global $*/
 /*global pusher*/
 
 $(function() {
@@ -16,6 +16,7 @@ $(function() {
     var pagelet = $(form).closest('[data-pagelet-url]')
     pagelet.css('opacity', '0.3')
     if ($(this).hasClass('no-submit')) {
+      $('[data-toggle="tooltip"]', pagelet).tooltip('hide')
       pagelet.load(pagelet.attr('data-pagelet-url'), function() {
         pagelet.css('opacity', '1')
       })
@@ -29,6 +30,7 @@ $(function() {
           url: $(form).attr('action'),
           data: formData,
           success: function() {
+            $('[data-toggle="tooltip"]', pagelet).tooltip('hide')
             pagelet.load(pagelet.attr('data-pagelet-url'), function() {
               pagelet.css('opacity', '1')
             })
@@ -36,6 +38,7 @@ $(function() {
         });
       } else {
         $.post($(form).attr('action'), $(form).serialize(), function() {
+          $('[data-toggle="tooltip"]', pagelet).tooltip('hide')
           pagelet.load(pagelet.attr('data-pagelet-url'), function() {
             pagelet.css('opacity', '1')
           })
@@ -54,6 +57,7 @@ $(function() {
     var pagelet = $(a).closest('[data-pagelet-url]')
     pagelet.css('opacity', '0.3')
     $.get($(a).attr('href'), function() {
+      $('[data-toggle="tooltip"]', pagelet).tooltip('hide')
       pagelet.load(pagelet.attr('data-pagelet-url'), function() {
         pagelet.css('opacity', '1')
       })
@@ -65,6 +69,7 @@ $(function() {
     var a = this
     var pagelet = $(a).closest('[data-pagelet-url]')
     pagelet.css('opacity', '0.3')
+    $('[data-toggle="tooltip"]', pagelet).tooltip('hide')
     pagelet.load($(a).attr('href'), function() {
       pagelet.css('opacity', '1')
       var offset = pagelet.offset()

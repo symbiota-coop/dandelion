@@ -173,6 +173,16 @@ Dandelion::App.controller do
     200
   end
 
+  post '/memberships/:id/shift_points_required' do
+    membership = Membership.find(params[:id]) || not_found
+    @gathering = membership.gathering
+    @membership = @gathering.memberships.find_by(account: current_account)
+    gathering_admins_only!
+    membership.shift_points_required = params[:shift_points_required]
+    membership.save
+    200
+  end
+
   post '/memberships/:id/member_of_facebook_group' do
     membership = Membership.find(params[:id]) || not_found
     @gathering = membership.gathering
