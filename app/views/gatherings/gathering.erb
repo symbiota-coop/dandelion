@@ -9,7 +9,7 @@
         <h5 class="card-header text-white bg-primary">Welcome to <%= @gathering.name %>!</h5>
         <div class="card-body pb-0">
           <div class="wysiwyg">
-            <%== Sanitize.fragment(@gathering.intro_for_members, Sanitize::Config::DANDELION) %>
+            <%== Sanitize.fragment(Rinku.auto_link(@gathering.intro_for_members), Sanitize::Config::DANDELION) %>
           </div>
         </div>
       </div>

@@ -17,7 +17,7 @@
   <div class="col-sm-8 order-sm-0">
     <% if @gathering.intro_for_non_members %>
       <div class="wysiwyg">
-        <%== Sanitize.fragment(@gathering.intro_for_non_members, Sanitize::Config::DANDELION) %>
+        <%== Sanitize.fragment(Rinku.auto_link(@gathering.intro_for_non_members), Sanitize::Config::DANDELION) %>
       </div>
     <% end %>
     <% if @gathering.member_limit and @gathering.memberships.count >= @gathering.member_limit %>
