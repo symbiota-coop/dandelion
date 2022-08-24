@@ -158,7 +158,9 @@ class Organisation
       carousels: "To create a carousel on your organisation's events page with the title X showing event tags a and b, type X: a, b",
       banned_emails: 'One per line',
       event_image_required_width: 'Required width for event images in px',
-      event_image_required_height: 'Required height for event images in px'
+      event_image_required_height: 'Required height for event images in px',
+      evm_address: 'Ethereum-compatible wallet address for receiving tokens via Gnosis Chain and Celo',
+      seeds_username: 'SEEDS/Telos username for receiving SEEDS via Telos'
     }
   end
 
