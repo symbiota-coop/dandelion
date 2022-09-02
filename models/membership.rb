@@ -82,7 +82,7 @@ class Membership
                         %(<a href="#{ENV['BASE_URI']}/g/#{gathering.slug}?sign_in_token=%recipient.token%">Sign in to get involved with the co-creation!</a>)
                       end
 
-    content = gathering.welcome_email
+    content = gathering.welcome_email || ''
     content = content.gsub('%gathering.name%', gathering.name)
     content = content.gsub('%sign_in_details%', sign_in_details)
     batch_message.from 'Dandelion <notifications@dandelion.earth>'
