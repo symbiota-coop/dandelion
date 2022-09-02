@@ -377,7 +377,7 @@
     <p class="metamask"></p>
     <% if CELO_CURRENCIES.include?(@event.currency) %>
       <div class="qr mb-3">
-        <p class="mb-1">or use this QR code for Valora:</p>
+        <p class="mb-1">or use this QR code with Valora:</p>
         <div id="qrcode"></div>
         <script type="text/javascript">
           new QRCode(document.getElementById("qrcode"), "celo://wallet/pay?address=<%=@event.organisation.evm_address%>");
