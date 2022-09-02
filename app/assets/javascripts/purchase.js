@@ -171,24 +171,24 @@ $(function() {
 
           web3.eth.net.getId().then(thisNetworkId => {
             if (thisNetworkId != networkId) {
-              $('#pay-with-evm').find('.card-body p.metamask').html("<mark>Please switch your web3 wallet's network to " + networkName + '</mark>')
+              $('#pay-with-evm').find('.card-body p.web3wallet').html("<mark>Please switch your web3 wallet's network to " + networkName + '</mark>')
               ethereum.on('chainChanged', function() {
                 console.log('chainChanged')
                 web3.eth.net.getId().then(thisNetworkId => {
                   if (thisNetworkId == networkId)
-                    connectMetamask()
+                    connectWeb3Wallet()
                 })
               });
             } else if (thisNetworkId == networkId) {
-              connectMetamask()
+              connectWeb3Wallet()
             }
           })
 
-          function connectMetamask() {
+          function connectWeb3Wallet() {
             if (!ethereum.selectedAddress) {
               console.log('connecting')
-              $('#pay-with-evm').find('.card-body p.metamask').html('<a href="javascript:;">Connect your web3 wallet</a>')
-              $('#pay-with-evm').find('.card-body p.metamask a').click(function() {
+              $('#pay-with-evm').find('.card-body p.web3wallet').html('<a href="javascript:;">Connect your web3 wallet</a>')
+              $('#pay-with-evm').find('.card-body p.web3wallet a').click(function() {
                 ethereum.request({
                   method: 'eth_requestAccounts'
                 }).then(pay)
@@ -200,7 +200,7 @@ $(function() {
 
           function pay() {
             console.log('paying')
-            $('#pay-with-evm').find('.card-body p.metamask').remove()
+            $('#pay-with-evm').find('.card-body p.web3wallet').remove()
 
             var abi = [{
               "constant": false,
