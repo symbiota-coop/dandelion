@@ -187,7 +187,7 @@ $(function() {
           function connectMetamask() {
             if (!ethereum.selectedAddress) {
               console.log('connecting')
-              $('#pay-with-evm').find('.card-body p.metamask').html('<a href="javascript:;">Connect to Metamask</a>')
+              $('#pay-with-evm').find('.card-body p.metamask').html('<a href="javascript:;">Connect your web3 wallet</a>')
               $('#pay-with-evm').find('.card-body p.metamask a').click(function() {
                 ethereum.request({
                   method: 'eth_requestAccounts'
