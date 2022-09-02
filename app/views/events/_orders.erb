@@ -94,7 +94,7 @@
       <% elsif order.seeds_secret %>
         <span class="label label-default bg-seeds mr-1">SEEDS: <%= order.seeds_secret %></span>
       <% elsif order.evm_secret %>
-        <span class="label label-default bg-secondary mr-1">EVM</span>
+        <span class="label label-default bg-secondary mr-1">EVM: <%= order.evm_secret %></span>
       <% end %>
       <% if order.incomplete? %>
         <% if order.deleted? %>

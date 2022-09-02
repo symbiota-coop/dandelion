@@ -115,9 +115,9 @@
         <% if ticket.order.coinbase_checkout_id %>
           <span class="label label-default bg-coinbase mr-1">Coinbase</span>
         <% elsif ticket.order.seeds_secret %>
-          <span class="label label-default bg-seeds mr-1">SEEDS</span>
+          <span class="label label-default bg-seeds mr-1">SEEDS: <%= ticket.order.seeds_secret %></span>
         <% elsif ticket.order.evm_secret %>
-          <span class="label label-default bg-secondary mr-1">EVM</span>
+          <span class="label label-default bg-secondary mr-1">EVM: <%= ticket.order.evm_secret %></span>
         <% end %>
         <% if ticket.order.incomplete? %><i title="Payment processing" class="fa fa-spin fa-circle-o-notch"></i><% end %>
       <% end %>
