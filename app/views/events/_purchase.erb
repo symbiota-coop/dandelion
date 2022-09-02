@@ -375,6 +375,15 @@
   <div class="card-body">
     <p class="lead please"></p>
     <p class="metamask"></p>
+    <% if CELO_CURRENCIES.include?(@event.currency) %>
+      <div class="qr mb-3">
+        <p class="mb-1">or use this QR code for Valora:</p>
+        <div id="qrcode"></div>
+        <script type="text/javascript">
+          new QRCode(document.getElementById("qrcode"), "celo://wallet/pay?address=<%=@event.organisation.evm_address%>");
+        </script>
+      </div>
+    <% end %>
     <p>Making a manual transaction with Metamask? You will find pasting these details easier if you 'Expand view' first.</p>
     <p>Looking for your transaction... <i class="fa fa-spin fa-circle-o-notch"></i></p>
   </div>

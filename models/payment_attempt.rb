@@ -37,12 +37,20 @@ class PaymentAttempt
   validates_uniqueness_of :seeds_secret, scope: :seeds_amount, allow_nil: true
   validates_uniqueness_of :evm_secret, scope: :evm_amount, allow_nil: true
 
+  def evm_offset
+    if CELO_CURRENCIES.include?(currency)
+      evm_secret[0..2].to_i(36).to_d / 1e8
+    else
+      evm_secret.to_i(36).to_d / 1e15
+    end
+  end
+
   before_validation do
     self.account = membership.account if membership
     self.gathering = membership.gathering if membership
     self.gathering_name = gathering.name if gathering
 
-    self.evm_amount = amount.to_d + evm_secret.to_i(36).to_d / 1e15.to_d if evm_secret && !evm_amount
+    self.evm_amount = amount.to_d + evm_offset if evm_secret && !evm_amount
     self.seeds_amount = amount if seeds_secret && !seeds_amount
   end
 end
