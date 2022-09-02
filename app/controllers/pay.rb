@@ -96,7 +96,7 @@ Dandelion::App.controller do
 
     when 'seeds'
 
-      seeds_secret = Array.new(5) { [*'a'..'z', *'0'..'9'].sample }.join
+      seeds_secret = Array.new(6) { [*'1'..'9'].sample }.join
       payment_attempt = @membership.payment_attempts.create!(
         amount: params[:amount].to_i,
         currency: @gathering.currency,
@@ -106,7 +106,7 @@ Dandelion::App.controller do
 
     when 'evm'
 
-      evm_secret = Array.new(3) { [*'a'..'z', *'0'..'9'].sample }.join
+      evm_secret = Array.new(6) { [*'1'..'9'].sample }.join
       payment_attempt = @membership.payment_attempts.create!(
         amount: params[:amount].to_i,
         currency: @gathering.currency,

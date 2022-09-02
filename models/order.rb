@@ -156,9 +156,9 @@ class Order
 
   def evm_offset
     if CELO_CURRENCIES.include?(currency)
-      evm_secret.to_i(36).to_d / 1e8
+      evm_secret.to_d / 1e8
     else
-      evm_secret.to_i(36).to_d / 1e15
+      evm_secret.to_d / 1e15
     end
   end
 
