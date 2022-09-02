@@ -1,6 +1,21 @@
 <% form_for @tactivity ||= Tactivity.new, @tactivity.new_record? ? "/tactivities/create?timetable_id=#{timetable.id}" : "/tactivities/#{@tactivity.id}/edit" do |f| %>
+
+  <% if @tactivity.errors.count > 0 %>
+    <div class="alert alert-danger">
+      <ul class="mb-0">
+        <% @tactivity.errors.full_messages.each { |message| %>
+        <li><%= message %></li>
+        <% } %>
+      </ul>
+    </div>
+  <% end %>
+
   <%= f.text_block :name %>
   <%= f.text_area_block :description %>
   <%= f.image_block :image %>
+  <% if @tactivity.persisted? %>
+    <%= f.select_block :space_id, options: @tactivity.space_ids %>
+    <%= f.select_block :tslot_id, options: @tactivity.tslot_ids %>
+  <% end %>
   <%= f.submit_block button_text: @tactivity.new_record? ? 'Create activity' : 'Update activity', destroy_url: ("/tactivities/#{@tactivity.id}/destroy" if admin? || @membership.admin?) %>
 <% end %>

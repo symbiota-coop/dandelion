@@ -16,6 +16,14 @@ class Tactivity
   field :description, type: String
   field :image_uid, type: String
 
+  def tslot_ids
+    [''] + timetable.tslots.map { |tslot| [tslot.name, tslot.id] }
+  end
+
+  def space_ids
+    [''] + timetable.spaces.map { |space| [space.name, space.id] }
+  end
+
   def self.admin_fields
     {
       name: :text,
@@ -39,6 +47,9 @@ class Tactivity
     self.timetable = space.timetable if space
     self.gathering = timetable.gathering if timetable
     self.membership = gathering.memberships.find_by(account: account) if gathering && account && !membership
+
+    self.space = nil if tslot.nil?
+    self.tslot = nil if space.nil?
   end
 
   dragonfly_accessor :image
@@ -76,7 +87,8 @@ class Tactivity
 
   def self.human_attribute_name(attr, options = {})
     {
-      name: 'Activity name'
+      name: 'Activity name',
+      tslot_id: 'Slot'
     }[attr.to_sym] || super
   end
 end
