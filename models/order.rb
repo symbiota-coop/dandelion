@@ -154,8 +154,16 @@ class Order
     "#{event.name}, #{event.when_details(account.try(:time_zone))}#{" at #{event.location}" if event.location != 'Online'}#{": #{d.join(', ')}" unless d.empty?}"
   end
 
+  def evm_shift
+    if CELO_CURRENCIES.include?(currency)
+      1e8
+    else
+      1e15
+    end
+  end
+
   before_validation do
-    self.evm_value = value.to_d + evm_secret.to_i(36).to_d / 1e15.to_d if evm_secret && !evm_value
+    self.evm_value = value.to_d + evm_secret.to_i(36).to_d / evm_shift.to_d if evm_secret && !evm_value
     if seeds_secret && !seeds_value
       self.seeds_value = value
       # agent = Mechanize.new

@@ -343,7 +343,7 @@
     <% end %>
     <% if @event.organisation.evm_address && EVM_CURRENCIES.include?(@event.currency) %>
       <button class="btn btn-primary btn-block mb-1 btn-dotted" type="submit" data-payment-method="evm">
-        <span>Pay with Metamask</span>
+        <span>Pay with your web3 wallet</span>
         <i class="fa fa-spin fa-circle-o-notch" style="display: none"></i>
       </button>
       <%= hidden_field_tag :payment_method, value: 'evm', disabled: true %>
@@ -371,7 +371,7 @@
   </div>
 </div>
 <div class="card" id="pay-with-evm" style="display: none">
-  <h3 class="card-header bg-primary text-white">Pay with Metamask</h3>
+  <h3 class="card-header bg-primary text-white">Pay with your web3 wallet</h3>
   <div class="card-body">
     <p class="lead please"></p>
     <p class="metamask"></p>
