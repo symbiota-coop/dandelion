@@ -505,6 +505,10 @@ class Organisation
     }[attr.to_sym] || super
   end
 
+  def payment_method?
+    stripe_pk || coinbase_api_key || evm_address || seeds_username
+  end
+
   def sync_with_gocardless
     organisationships.and(monthly_donation_method: 'GoCardless').set(
       monthly_donation_method: nil,
