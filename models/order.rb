@@ -43,6 +43,7 @@ class Order
   def self.admin_fields
     {
       value: :number,
+      currency: :text,
       credit_applied: :number,
       percentage_discount: :number,
       percentage_discount_monthly_donor: :number,
