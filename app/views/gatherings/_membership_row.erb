@@ -69,7 +69,7 @@
 <% if @gathering.enable_rotas? && @gathering.rotas.count > 0 %>
   <td>
 
-    <%= partial :'rotas/shift_summary', locals: {membership: @membership} %>
+    <%= partial :'rotas/shift_summary', locals: {membership: membership} %>
 
     <% if @gathering.enable_shift_worth %>
       <span data-toggle="tooltip" title="<%= membership.shift_points %>/<%= pluralize(membership.shift_points_required || '?', 'shift point') %>">
