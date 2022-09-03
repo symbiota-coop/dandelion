@@ -112,7 +112,7 @@
       <% if @gathering.enable_contributions %>
         <th>Choices</th>
         <th>Requested contribution</th>
-        <th>Paid</th>        
+        <th>Paid</th>
       <% end %>
       <% if @gathering.enable_rotas? && @gathering.rotas.count > 0 %>
         <th>Shifts</th>
@@ -143,12 +143,12 @@
     <% end %>
     <% if @gathering.enable_contributions %>
       <th></th>
+      <th></th>
+      <th>
+        <%= m @gathering.memberships.pluck(:paid).compact.sum, @gathering.currency %>
+        (<%= m @gathering.processed_via_dandelion, @gathering.currency %> processed via Dandelion)
+      </th>      
     <% end %>
-    <th></th>
-    <th>
-      <%= m @gathering.memberships.pluck(:paid).compact.sum, @gathering.currency %>
-      (<%= m @gathering.processed_via_dandelion, @gathering.currency %> processed via Dandelion)
-    </th>
     <% if @gathering.facebook_group_url %>
       <th></th>
     <% end %>
