@@ -147,7 +147,13 @@
       <th>
         <%= m @gathering.memberships.pluck(:paid).compact.sum, @gathering.currency %>
         (<%= m @gathering.processed_via_dandelion, @gathering.currency %> processed via Dandelion)
-      </th>      
+      </th>
+    <% end %>
+    <% if @gathering.enable_rotas? && @gathering.rotas.count > 0 %>
+      <th></th>
+    <% end %>
+    <% if (admin? || @membership.admin?) || !@gathering.hide_invitations %>
+      <th></th>
     <% end %>
     <% if @gathering.facebook_group_url %>
       <th></th>
