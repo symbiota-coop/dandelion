@@ -19,7 +19,9 @@
   </div>
 
   <div class="card" id="pay-with-evm" style="display: none">
-    <h3 class="card-header bg-primary text-white">Pay with your web3 wallet</h3>
+    <h3 class="card-header bg-primary text-white">
+      Pay with <%= if XDAI_CURRENCIES.include?(@gathering.currency); 'Gnosis Chain'; elsif CELO_CURRENCIES.include?(@gathering.currency); 'Celo'; end %>
+    </h3>
     <div class="card-body">
       <p class="lead please"></p>
       <p class="web3wallet"></p>
