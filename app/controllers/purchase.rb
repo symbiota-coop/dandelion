@@ -29,7 +29,7 @@ Dandelion::App.controller do
       @order = Order.create!(
         event: @event,
         account: @account,
-        currency: @event.currency,
+        currency: (params[:detailsForm][:payment_method] == 'evm' && @event.currency == 'USD' ? 'CUSD' : @event.currency),
         organisation_revenue_share: @event.organisation_revenue_share,
         revenue_sharer: (@event.revenue_sharer_organisationship.account if @event.revenue_sharer_organisationship),
         cohost: ticketForm[:cohost],

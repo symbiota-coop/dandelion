@@ -163,7 +163,7 @@ $(function() {
           // EVM
           $('#select-tickets').hide()
           $('#pay-with-evm').show()
-          $('#pay-with-evm').find('.card-body p.lead.please').html('Send EXACTLY <strong>' + data['evm_value'] + ' ' + currency + '</strong> to <strong>' + evmAddress + '</strong>')
+          $('#pay-with-evm').find('.card-body p.lead.please').html('Send EXACTLY <strong>' + data['evm_value'] + ' ' + (currency == 'USD' ? 'CUSD' : currency) + '</strong> to <strong>' + evmAddress + '</strong>')
           var offset = $('#pay-with-evm').offset()
           window.scrollTo(0, offset['top'] - $('#header').height() - 10);
 

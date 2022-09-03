@@ -341,9 +341,9 @@
       </button>
       <%= hidden_field_tag :payment_method, value: 'seeds', disabled: true %>
     <% end %>
-    <% if @event.organisation.evm_address && EVM_CURRENCIES.include?(@event.currency) %>
+    <% if @event.organisation.evm_address && (EVM_CURRENCIES.include?(@event.currency) || (@event.currency == 'USD')) %>
       <button class="btn btn-primary btn-block mb-1 btn-dotted" type="submit" data-payment-method="evm">
-        <span>Pay with your web3 wallet</span>
+        <span>Pay with <%= if XDAI_CURRENCIES.include?(@event.currency); 'Gnosis Chain'; elsif (CELO_CURRENCIES.include?(@event.currency) || @event.currency == 'USD'); 'Celo'; end %></span>
         <i class="fa fa-spin fa-circle-o-notch" style="display: none"></i>
       </button>
       <%= hidden_field_tag :payment_method, value: 'evm', disabled: true %>
@@ -371,11 +371,13 @@
   </div>
 </div>
 <div class="card" id="pay-with-evm" style="display: none">
-  <h3 class="card-header bg-primary text-white">Pay with your web3 wallet</h3>
+  <h3 class="card-header bg-primary text-white">
+    Pay with <%= if XDAI_CURRENCIES.include?(@event.currency); 'Gnosis Chain'; elsif (CELO_CURRENCIES.include?(@event.currency) || @event.currency == 'USD'); 'Celo'; end %>
+  </h3>
   <div class="card-body">
     <p class="lead please"></p>
     <p class="web3wallet"></p>
-    <% if CELO_CURRENCIES.include?(@event.currency) %>
+    <% if @event.organisation.evm_address && (CELO_CURRENCIES.include?(@event.currency) || @event.currency == 'USD') %>
       <div class="qr mb-3">
         <p class="mb-1">or use this QR code with Valora:</p>
         <div id="qrcode"></div>
@@ -400,15 +402,15 @@
     coinbase = <%= @event.organisation.coinbase_api_key ? true : false %>
     seedsUsername = <%== @event.organisation.seeds_username.to_json %>
     evmAddress = <%== @event.organisation.evm_address.to_json %>
-    contractAddress = <%== EVM_CONTRACT_ADDRESSES[@event.currency].to_json %>
+    contractAddress = <%== EVM_CONTRACT_ADDRESSES[@event.currency == 'USD' ? 'CUSD' : @event.currency].to_json %>
     networkId = <%= EVM_NETWORK_IDS[
       if XDAI_CURRENCIES.include?(@event.currency)
         'XDAI'
-      elsif CELO_CURRENCIES.include?(@event.currency)
+      elsif (CELO_CURRENCIES.include?(@event.currency) || @event.currency == 'USD')
         'CELO'
       end
     ] %>
-    networkName = '<%= if XDAI_CURRENCIES.include?(@event.currency); 'Gnosis Chain'; elsif CELO_CURRENCIES.include?(@event.currency); 'Celo'; end %>'
+    networkName = '<%= if XDAI_CURRENCIES.include?(@event.currency); 'Gnosis Chain'; elsif (CELO_CURRENCIES.include?(@event.currency) || @event.currency == 'USD'); 'Celo'; end %>'
     signedIn = <%= current_account ? true : false %>
 </script>
 <script src="/javascripts/purchase.js?<%= @cachebuster %>"></script>
