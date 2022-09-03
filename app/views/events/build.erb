@@ -227,6 +227,14 @@
       </div>
       <div role="tabpanel" class="tab-pane" id="tab3">
         <%= f.select_block :currency %>
+        <p id="event-currency-changed" style="margin-top: -0.75rem; display: none">
+          <em>Save the event to update the currency symbol.</em>
+        <p>
+        <script>
+          $(function() {
+            $('#event_currency').change(function() { $('#event-currency-changed').show() })
+          })
+        </script>
         <%= partial :'events/ticket_types', locals: { f: f } %>
         <%= partial :'events/ticket_groups', locals: { f: f } %>
         <%= f.number_block :capacity %>
