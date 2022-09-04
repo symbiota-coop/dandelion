@@ -98,7 +98,7 @@
   </li>
   <% } %>
 </ul>
-<% when 'details'; @memberships = @memberships.per_page(10).page(params[:page]) %>
+<% when 'details'; @memberships = @memberships.per_page(50).page(params[:page]) %>
 <table class="table table-striped">
   <thead>
     <tr>
@@ -129,9 +129,7 @@
     </tr>
   </thead>
   <% @memberships.each { |membership| account = membership.account %>
-  <tr data-pagelet-url="/membership_row/<%= membership.id %>">
-    <%= partial :'gatherings/membership_row', locals: { membership: membership } %>
-  </tr>
+  <tr data-pagelet-url="/membership_row/<%= membership.id %>"></tr>
   <% } %>
   <tr>
     <th style="width: 1px"></th>
