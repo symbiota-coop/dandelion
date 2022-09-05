@@ -43,9 +43,10 @@
                     <span class="month"><%= event.start_time.strftime('%b') %></span>
                   </a>
                 </td>
-                <td>
+                <td class="block">
                   <h4>
                     <a href="/events/<%= event.id %>"><%= event.name %></a>
+                    <div data-with-placeholder class="d-inline event-star" data-pagelet-url="/events/<%=event.id%>/star?block_edit=1"><i class="fa fa-star-o" style="opacity: 0.3"></i></div>
                   </h4>
                   <% if event_admin?(event) %>
                     <%= partial :'events/progress', locals: { event: event, full_width: true, link: true } %>
