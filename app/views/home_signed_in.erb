@@ -35,7 +35,7 @@
           <% if current_account.upcoming_events.count > 0 %>
             <table class="table">
               <% current_account.upcoming_events.each { |event| %>
-              <tr>
+              <tr class="block">
                 <td style="width: 1px">
                   <a href="/events/<%= event.id %>" class="calendar-date" data-toggle="tooltip" title="in <%=distance_of_time_in_words event.start_time - Time.now %>">
                     <span class="day"><%= event.start_time.day %></span>
@@ -43,7 +43,7 @@
                     <span class="month"><%= event.start_time.strftime('%b') %></span>
                   </a>
                 </td>
-                <td class="block">
+                <td>
                   <h4>
                     <a href="/events/<%= event.id %>"><%= event.name %></a>
                     <div data-with-placeholder class="d-inline event-star" data-pagelet-url="/events/<%=event.id%>/star?block_edit=1"><i class="fa fa-star-o" style="opacity: 0.3"></i></div>
