@@ -63,9 +63,9 @@
       <% if @event.organisation.event_image_required_width && @event.organisation.event_image_required_height %>
         $('#event_image').closest('.form-group').find('small').text("Required image dimensions: <%==js_escape_html "#{@event.organisation.event_image_required_width}px x #{@event.organisation.event_image_required_height}px" %>")
       <% elsif @event.organisation.event_image_required_width %>
-        $('#event_image').closest('.form-group').find('small')..text("Image must be <%==js_escape_html "#{@event.organisation.event_image_required_width}px wide" %>")
+        $('#event_image').closest('.form-group').find('small').text("Image must be <%==js_escape_html "#{@event.organisation.event_image_required_width}px wide" %>")
       <% elsif @event.organisation.event_image_required_height %>
-        $('#event_image').closest('.form-group').find('small')..text("Image must be <%==js_escape_html "#{@event.organisation.event_image_required_height}px high" %>")
+        $('#event_image').closest('.form-group').find('small').text("Image must be <%==js_escape_html "#{@event.organisation.event_image_required_height}px high" %>")
       <% end %>
     <% end %>
 
