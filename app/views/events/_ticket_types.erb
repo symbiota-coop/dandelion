@@ -14,7 +14,7 @@
             <%= Money.new(0, f.object.currency).symbol %><%= o.number_field :price, class: 'form-control ml-1', placeholder: 'Price', step: 'any' %>
           </div>
           <div>
-            &times;<%= o.number_field :quantity, class: 'form-control ml-1', placeholder: 'Quantity' %>
+            &times;<%= o.number_field :quantity, :class => 'form-control ml-1', :'data-toggle' => 'tooltip', :title => 'Total number of tickets of this type you want to issue', :placeholder => 'Quantity' %>
           </div>
           <div class="ticket-type-description">
             <%= o.text_field :description, class: 'form-control', placeholder: 'Description' %>
@@ -103,11 +103,12 @@
           priceDiv.appendTo(d);
 
           var quantityDiv = $('<div>&times;</div>')
-          var quantityInput = $('<input type="number" step="any" class="form-control ml-1" placeholder="Quantity" />');
+          var quantityInput = $('<input type="number" step="any" class="form-control ml-1" placeholder="Quantity" data-toggle="tooltip" title="Total number of tickets of this type you want to issue" />');
           quantityInput.attr('name', 'event[ticket_types_attributes][' + c + '][quantity]');
           quantityInput.attr('id', 'event_ticket_types_attributes_' + c + '_quantity');
           quantityInput.appendTo(quantityDiv);
-          quantityDiv.appendTo(d);
+          quantityInput.tooltip();
+          quantityDiv.appendTo(d);          
 
           var descriptionDiv = $('<div class="ticket-type-description"></div>')
           var descriptionInput = $('<input type="text" class="form-control" placeholder="Description" />');
