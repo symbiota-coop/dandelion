@@ -2,7 +2,9 @@
   <a class="text-dark" target="_parent" href="<%= "/events/#{event.id}#{if @organisation && @organisation != event.organisation; "?cohost=#{@organisation.slug}"; end }"%>" onclick="event.stopPropagation();">
     <%= event.name %>
   </a>
-  <div data-with-placeholder class="d-inline event-star" data-pagelet-url="/events/<%=event.id%>/star?block_edit=1"><i class="fa fa-star-o" style="opacity: 0.3"></i></div>
+  <% if current_account %>
+    <div data-with-placeholder class="d-inline event-star" data-pagelet-url="/events/<%=event.id%>/star?block_edit=1"><i class="fa fa-star-o" style="opacity: 0.3"></i></div>
+  <% end %>
   <% if event_admin?(event) %>
     <a class="text-dark block-edit" style="display: none" target="_parent" href="<%= "/events/#{event.id}/edit" %>" onclick="event.stopPropagation();">
       <i class="fa fa-pencil"></i>
