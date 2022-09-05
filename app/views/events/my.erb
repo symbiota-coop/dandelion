@@ -1,0 +1,25 @@
+<% upcoming_events = current_account.upcoming_events.paginate(page: params[:upcoming_events_page], per_page: 10) %>
+<% past_events = current_account.previous_events.paginate(page: params[:past_events_page], per_page: 10) %>
+
+<% if past_events.count > 0 %>
+  <h3 class="mb-3">Upcoming events</h3>
+<% end %>
+
+<% if upcoming_events.count > 0 %>
+  <%= partial :'events/blocks', locals: { events: upcoming_events } %>
+  <div class="mt-3">
+    <%= will_paginate upcoming_events, param_name: 'upcoming_events_page', inner_window: 0, outer_window: 0, renderer: WillPaginate::ViewHelpers::BootstrapRenderer %>
+  </div>
+<% else %>
+  <div class="mb-3">
+    <em>No upcoming events</em>
+  </div>
+<% end %>
+
+<% if past_events.count > 0 %>
+  <h3 class="mb-3">Past events</h3>
+  <%= partial :'events/blocks', locals: { events: past_events } %>
+  <div class="mt-3">
+    <%= will_paginate past_events, param_name: 'past_events_page', inner_window: 0, outer_window: 0, renderer: WillPaginate::ViewHelpers::BootstrapRenderer %>
+  </div>
+<% end %>

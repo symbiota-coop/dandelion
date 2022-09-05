@@ -475,6 +475,15 @@ class Account
         event_stars.pluck(:event_id))
   end
 
+  def previous_events
+    Event.past.and(:id.in =>
+        tickets.pluck(:event_id) +
+        event_facilitations.pluck(:event_id) +
+        events_coordinating.pluck(:id) +
+        events_revenue_sharing.pluck(:id) +
+        event_stars.pluck(:event_id))
+  end
+
   has_many :discount_codes, dependent: :nullify
 
   dragonfly_accessor :picture

@@ -55,9 +55,13 @@
               </tr>
               <% } %>
             </table>
+            <p class="mb-0"><a href="/events/my">See all your events &rarr;</a></p>
           <% else %>
-            <p class="text-center mb-0">Nothing upcoming.
-              <a id="browse-events" href="/events">Browse events</a>
+            <p class="mb-0">
+              Nothing upcoming. <a id="browse-events" href="/events">Browse events</a>
+              <% if current_account.previous_events.count > 0 %>
+                or <a href="/events/my">see your past events &rarr;</a>
+              <% end %>
             </p>
           <% end %>
         </div>

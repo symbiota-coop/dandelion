@@ -62,6 +62,11 @@ Dandelion::App.controller do
     end
   end
 
+  get '/events/my' do
+    sign_in_required!
+    erb :'events/my'
+  end
+
   get '/events/new' do
     sign_in_required!(r: '/accounts/new?list_an_event=1')
     @event = Event.new
