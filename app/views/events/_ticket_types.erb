@@ -31,7 +31,7 @@
           </label><% if f.object.ticket_groups.select(&:persisted?).length > 0 %><label>
               Group <%= o.select :ticket_group_id, options: [''] + f.object.ticket_groups.select(&:persisted?).map { |ticket_group| [ticket_group.name, ticket_group.id] }, class: 'form-control ml-1' %>
             </label><% end %><label onclick="$(this).tooltip('hide')" data-toggle="tooltip" title="Allow only people with the link to this ticket type to purchase">
-            Hidden?
+            Secret?
             <%= o.check_box :hidden %>
           </label>
           <% if o.object.new_record? %>
@@ -45,7 +45,7 @@
             </a>
           <% end %>
           <% if o.object.hidden? %>
-            <a target="_blank" data-toggle="tooltip" title="Link to hidden ticket type" class="ml-1 btn btn-sm btn-outline-primary" href="/events/<%= @event.id %>?ticket_type_id=<%= o.object.id %>">
+            <a target="_blank" data-toggle="tooltip" title="Link to secret ticket type" class="ml-1 btn btn-sm btn-outline-primary" href="/events/<%= @event.id %>?ticket_type_id=<%= o.object.id %>">
               <i class="fa fa-link"></i>
             </a>
           <% end %>
@@ -108,7 +108,7 @@
           quantityInput.attr('id', 'event_ticket_types_attributes_' + c + '_quantity');
           quantityInput.appendTo(quantityDiv);
           quantityInput.tooltip();
-          quantityDiv.appendTo(d);          
+          quantityDiv.appendTo(d);
 
           var descriptionDiv = $('<div class="ticket-type-description"></div>')
           var descriptionInput = $('<input type="text" class="form-control" placeholder="Description" />');
@@ -147,7 +147,7 @@
             ticketGroupDiv.appendTo(d);
       <% end %>
 
-          var hiddenDiv = $('<label onclick="$(this).tooltip(\'hide\')" data-toggle="tooltip" title="Allow only people with the link to this ticket type to purchase">Hidden? </label>')
+          var hiddenDiv = $('<label onclick="$(this).tooltip(\'hide\')" data-toggle="tooltip" title="Allow only people with the link to this ticket type to purchase">Secret? </label>')
           var hiddenInput0 = $('<input type="hidden" value="0">')
           hiddenInput0.attr('name', 'event[ticket_types_attributes][' + c + '][hidden]');
           var hiddenInput1 = $('<input type="checkbox" value="1">')
