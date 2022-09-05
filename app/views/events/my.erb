@@ -45,6 +45,9 @@
                       <div class="row justify-content-between">
                         <div class="col ml-1 p-sm-3">
                           <%= partial :'events/block_main', locals: { event: event, skip_final_ul: true } %>
+
+                          <% if event.attendees.include?(current_account) %>
+
                           <li>
 
                             <% if (event_feedback = event.event_feedbacks.find_by(account: current_account)) %>
@@ -76,6 +79,9 @@
                               <a href="/events/<%=event.id%>/give_feedback?t=<%=current_account.id%>">Give feedback</a>
                             <% end %>
                           </li>
+
+                          <% end %>
+                          
                         </ul>
 
 
