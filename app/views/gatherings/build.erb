@@ -234,6 +234,27 @@
         </div>
       </div>
       <div role="tabpanel" class="tab-pane" id="tab5">
+      <script>
+      $(function() {
+
+        $('#gathering_enable_rotas').click(function () {
+          if ($(this).is(':checked')) {
+            $('#gathering_enable_shift_worth').removeAttr('disabled')
+          }
+          else {
+            $('#gathering_enable_shift_worth').prop('checked', false );
+            $('#gathering_enable_shift_worth').attr('disabled',true)
+          }
+      })
+      if ($('#gathering_enable_rotas').is(':checked')) {
+        $('#gathering_enable_shift_worth').removeAttr('disabled')
+      }
+      else {
+        $('#gathering_enable_shift_worth').prop('checked', false );
+        $('#gathering_enable_shift_worth').attr('disabled',true)
+      }
+      })
+      </script>
         <% Gathering.enablable.each { |x| %>
         <%= f.check_box_block "enable_#{x}".to_sym %>
         <% } %>

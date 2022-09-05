@@ -35,7 +35,7 @@ class Gathering
   field :choose_and_pay_label, type: String
 
   def self.enablable
-    %w[contributions teams timetables rotas inventory budget partial_payments shift_worth]
+    %w[contributions teams timetables rotas shift_worth inventory budget partial_payments]
   end
   enablable.each do |x|
     field :"enable_#{x}", type: Boolean
