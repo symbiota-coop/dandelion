@@ -349,6 +349,7 @@ class Event
   has_many :zoomships, dependent: :destroy
 
   has_many :event_tagships, dependent: :destroy
+  has_many :event_stars, dependent: :destroy
 
   after_save :update_event_tags
   def update_event_tags

@@ -740,4 +740,26 @@ Dandelion::App.controller do
     @ticket.save
     200
   end
+
+  get '/events/:id/star' do
+    sign_in_required!
+    @event = Event.find(params[:id]) || not_found
+    @event_star = @event.event_stars.find_by(account: current_account)
+    partial :'events/star', locals: { event: @event, event_star: @event_star, block_edit: params[:block_edit] }
+  end
+
+  get '/events/:id/do_star' do
+    sign_in_required!
+    @event = Event.find(params[:id]) || not_found
+    @event.event_stars.create(account: current_account)
+    200
+  end
+
+  get '/events/:id/unstar' do
+    sign_in_required!
+    @event = Event.find(params[:id]) || not_found
+    @event_star = @event.event_stars.find_by(account: current_account)
+    @event_star.try(:destroy)
+    200
+  end
 end

@@ -84,6 +84,11 @@
       <% if n > 1 %>
         <span class="badge badge-primary"><%= pluralize(n, 'dates') %></span>
       <% end %>
+      <small>
+        <div class="d-inline float-right" data-pagelet-url="/events/<%=@event.id%>/star">
+          <%= partial :'events/star', locals: {event: @event} %>
+        </div>
+      </small>
     </h1>
     <ul style="margin-left: 1.66em; font-size: 1rem" class="fa-ul text-dark mb-1">
       <li>

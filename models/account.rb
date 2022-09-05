@@ -354,6 +354,7 @@ class Account
   has_many :events_coordinating, class_name: 'Event', inverse_of: :coordinator, dependent: :nullify
   has_many :events_revenue_sharing, class_name: 'Event', inverse_of: :revenue_sharer, dependent: :nullify
   has_many :events_last_saver, class_name: 'Event', inverse_of: :last_saved_by, dependent: :nullify
+  has_many :event_stars, dependent: :destroy
   has_many :zoomships, dependent: :destroy
   has_many :event_facilitations, dependent: :destroy
   has_many :waitships, dependent: :destroy
@@ -470,7 +471,8 @@ class Account
         tickets.pluck(:event_id) +
         event_facilitations.pluck(:event_id) +
         events_coordinating.pluck(:id) +
-        events_revenue_sharing.pluck(:id))
+        events_revenue_sharing.pluck(:id) +
+        event_stars.pluck(:event_id))
   end
 
   has_many :discount_codes, dependent: :nullify
