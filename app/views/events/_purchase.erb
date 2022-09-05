@@ -36,7 +36,7 @@
           <td <% if i == 0 %>style="border-top: 0"<% end %>>
             <%= ticket_type.name %>
             <% if ticket_type.hidden %>
-              <i data-toggle="tooltip" title="Available to you as you used a special link" class="fa fa-lock"></i>
+              <i data-toggle="tooltip" title="Available to you as you used a secret link" class="fa fa-lock"></i>
             <% end %>
             <% if ticket_type.minimum_monthly_donation %>
               <i data-toggle="tooltip" title="Available to those donating <%=m ticket_type.minimum_monthly_donation, @event.currency%>+/month" class="fa fa-star-o"></i>
