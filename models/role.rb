@@ -7,7 +7,7 @@ class Role
 
   field :name, type: String
   field :o, type: Integer
-  field :worth, type: Integer
+  field :worth, type: Float
 
   def self.admin_fields
     {
