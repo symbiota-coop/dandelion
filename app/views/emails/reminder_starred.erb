@@ -1,0 +1,7 @@
+<div class="main">
+  <p>Hi %recipient.firstname%,</p>
+  <p>Just a reminder that <a href="<%= ENV['BASE_URI'] %>/events/<%= event.id %>"><%= event.name %></a> takes place a week from now.</p>
+</div>
+<div class="footer">
+  <a href="<%= ENV['BASE_URI'] %>/accounts/subscriptions?sign_in_token=%recipient.token%">Opt out of reminders</a>
+</div>

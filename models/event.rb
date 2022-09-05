@@ -522,6 +522,27 @@ class Event
   end
   handle_asynchronously :send_reminders
 
+  def send_star_reminders(account_id: nil)
+    return unless organisation
+
+    mg_client = Mailgun::Client.new ENV['MAILGUN_API_KEY'], 'api.eu.mailgun.net'
+    batch_message = Mailgun::BatchMessage.new(mg_client, 'notifications.dandelion.earth')
+
+    event = self
+    content = ERB.new(File.read(Padrino.root('app/views/emails/reminder_starred.erb'))).result(binding)
+    batch_message.from 'Dandelion <reminders@dandelion.earth>'
+    batch_message.reply_to(event.email || event.organisation.reply_to)
+    batch_message.subject "#{event.name} is next week"
+    batch_message.body_html Premailer.new(ERB.new(File.read(Padrino.root('app/views/layouts/email.erb'))).result(binding), with_html_string: true, adapter: 'nokogiri', input_encoding: 'UTF-8').to_inline_css
+
+    (account_id ? starrers.and(:unsubscribed.ne => true).and(:unsubscribed_reminders.ne => true).and(id: account_id) : starrers.and(:unsubscribed.ne => true).and(:unsubscribed_reminders.ne => true)).each do |account|
+      batch_message.add_recipient(:to, account.email, { 'firstname' => (account.firstname || 'there'), 'token' => account.sign_in_token, 'id' => account.id.to_s })
+    end
+
+    batch_message.finalize if ENV['MAILGUN_API_KEY']
+  end
+  handle_asynchronously :send_star_reminders
+
   def send_feedback_requests(account_id: nil)
     return if feedback_questions.nil?
     return unless organisation
@@ -770,6 +791,10 @@ class Event
 
   def attendees
     Account.and(:id.in => tickets.pluck(:account_id))
+  end
+
+  def starrers
+    Account.and(:id.in => event_stars.pluck(:account_id))
   end
 
   def public_attendees

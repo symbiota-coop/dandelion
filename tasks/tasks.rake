@@ -93,6 +93,12 @@ namespace :events do
     end
   end
 
+  task send_star_reminders: :environment do
+    Event.and(:start_time.gte => Date.tomorrow + 6, :start_time.lt => Date.tomorrow + 7).each do |event|
+      event.send_star_reminders
+    end
+  end
+
   task transfer_events: :environment do
     session = GoogleDrive::Session.from_config(OpenStruct.new(
                                                  client_id: ENV['GOOGLE_DRIVE_CLIENT_ID'],
