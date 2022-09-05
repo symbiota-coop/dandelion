@@ -254,7 +254,7 @@ class Gathering
   end
 
   def self.currencies
-    CURRENCIES_HASH
+    CURRENCIES_HASH_WITHOUT_CELO_USD
   end
 
   def admins

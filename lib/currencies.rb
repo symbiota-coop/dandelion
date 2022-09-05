@@ -32,6 +32,16 @@ CURRENCIES_HASH = CURRENCIES.map do |currency|
   ].compact.join('/')})", currency]
 end
 
+CURRENCIES_HASH_WITHOUT_CELO_USD = CURRENCIES.map do |currency|
+  ["#{currency} (#{[
+    ('Stripe' if FIAT_CURRENCIES.include?(currency)),
+    ('Coinbase Commerce' if FIAT_CURRENCIES.include?(currency) || COINBASE_CURRENCIES.include?(currency)),
+    ('Gnosis Chain' if XDAI_CURRENCIES.include?(currency)),
+    ('Celo' if CELO_CURRENCIES.include?(currency)),
+    ('SEEDS' if currency == 'SEEDS')
+  ].compact.join('/')})", currency]
+end
+
 EVM_CURRENCIES.each do |c|
   Money::Currency.register({
                              priority: 1,
