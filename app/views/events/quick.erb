@@ -59,6 +59,11 @@
       };
     })
 
+    $('label[for=event_email]').text('Contact email*')
+    $('label[for=event_image]').text('Image*')
+    $('#event_email').attr('required', 'required')
+    $('#event_image').attr('required', 'required')
+
     <% if @event.organisation %>
       <% if @event.organisation.event_image_required_width && @event.organisation.event_image_required_height %>
         $('#event_image').closest('.form-group').find('small').text("Required image dimensions: <%==js_escape_html "#{@event.organisation.event_image_required_width}px x #{@event.organisation.event_image_required_height}px" %>")
