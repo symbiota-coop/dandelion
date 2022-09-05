@@ -7,7 +7,7 @@
 
 <% unless params[:past_events_page] %>
   <% if past_events.count > 0 %>
-    <h3 class="mb-3">Upcoming events</h3>
+    <h2 class="mb-3">Upcoming events</h2>
   <% end %>
   <% if upcoming_events.count > 0 %>
     <%= partial :'events/blocks', locals: { events: upcoming_events } %>
@@ -23,7 +23,7 @@
 
 <% unless params[:upcoming_events_page] %>
 <% if past_events.count > 0; events = past_events %>
-  <h3 class="mb-3">Past events</h3>
+  <h2 class="mb-3">Past events</h2>
 
   <% if events.count > 0 %>
     <div class="fake-container-fluid mb-3">
