@@ -1,23 +1,29 @@
 <% upcoming_events = current_account.upcoming_events.paginate(page: params[:upcoming_events_page], per_page: 10) %>
 <% past_events = current_account.previous_events.paginate(page: params[:past_events_page], per_page: 10) %>
 
-<% if past_events.count > 0 %>
-  <h3 class="mb-3">Upcoming events</h3>
+<% if params[:past_events_page] || params[:upcoming_events_page] %>
+  <p><a href="/events/my">&larr; All your events</a></p>
 <% end %>
 
-<% if upcoming_events.count > 0 %>
-  <%= partial :'events/blocks', locals: { events: upcoming_events } %>
-  <div class="mt-3">
-    <%= will_paginate upcoming_events, param_name: 'upcoming_events_page', inner_window: 0, outer_window: 0, renderer: WillPaginate::ViewHelpers::BootstrapRenderer %>
-  </div>
-<% else %>
-  <div class="mb-3">
-    <em>No upcoming events</em>
-  </div>
+<% unless params[:past_events_page] %>
+  <% if past_events.count > 0 %>
+    <h3 class="mb-3">Upcoming events</h3>
+  <% end %>
+  <% if upcoming_events.count > 0 %>
+    <%= partial :'events/blocks', locals: { events: upcoming_events } %>
+    <div class="mt-3">
+      <%= will_paginate upcoming_events, param_name: 'upcoming_events_page', inner_window: 0, outer_window: 0, renderer: WillPaginate::ViewHelpers::BootstrapRenderer %>
+    </div>
+  <% else %>
+    <div class="mb-3">
+      <em>No upcoming events</em>
+    </div>
+  <% end %>
 <% end %>
 
+<% unless params[:upcoming_events_page] %>
 <% if past_events.count > 0; events = past_events %>
-  <h3 class="mb-3" id="past-events">Past events</h3>
+  <h3 class="mb-3">Past events</h3>
 
   <% if events.count > 0 %>
     <div class="fake-container-fluid mb-3">
@@ -81,7 +87,7 @@
                           </li>
 
                           <% end %>
-                          
+
                         </ul>
 
 
@@ -110,10 +116,9 @@
 
 
 
-  <div class="mt-3" id="past-events-pagination">
+  <div class="mt-3">
     <%= will_paginate past_events, param_name: 'past_events_page', inner_window: 0, outer_window: 0, renderer: WillPaginate::ViewHelpers::BootstrapRenderer %>
   </div>
-  <script>
-    $(function() { $('#past-events-pagination a').each(function() {  $(this).attr('href',$(this).attr('href')+'#past-events') } )})
-  </script>
+<% end %>
+
 <% end %>
