@@ -1,6 +1,7 @@
 source 'https://rubygems.org'
 
 ruby '2.7.3'
+gem 'irb'
 gem 'padrino'
 gem 'puma'
 gem 'rake'
