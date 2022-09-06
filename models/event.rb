@@ -725,7 +725,8 @@ class Event
       purchase_url: 'Ticket purchase URL',
       no_discounts: 'No discounts for monthly donors',
       notes: 'Private notes',
-      ask_hear_about: 'Ask people how they heard about the event'
+      ask_hear_about: 'Ask people how they heard about the event',
+      capacity: 'Total capacity'
     }[attr.to_sym] || super
   end
 
@@ -769,7 +770,8 @@ class Event
       refund_deleted_orders: 'Attempt to refund deleted orders via Stripe, and all orders if the event is deleted',
       redirect_url: 'Optional. By default people will be shown a thank you page on Dandelion.',
       facebook_pixel_id: 'Your Facebook Pixel ID for tracking sales',
-      purchase_url: "URL where people can buy tickets (if you're not selling tickets on Dandelion)"
+      purchase_url: "URL where people can buy tickets (if you're not selling tickets on Dandelion)",
+      capacity: 'Caps the total number of tickets issued across all ticket types. Optional'
     }
   end
 
