@@ -12,7 +12,7 @@ class Membership
   field :desired_threshold, type: Integer
   field :requested_contribution, type: Integer
   field :invitations_granted, type: Integer
-  field :shift_points_required, type: Integer
+  field :shift_points_required, type: Float
 
   %w[admin unsubscribed member_of_facebook_group hide_from_sidebar].each do |b|
     field b.to_sym, type: Boolean
