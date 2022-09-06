@@ -20,7 +20,7 @@
   <% end %>
   <div class="form-group">
     <label>Coordinator</label>
-    <%= select_tag :coordinator_id, options: [''] + @local_group.admins.order('name asc').map { |account| [account.name, account.id] }, selected: params[:coordinator_id], class: 'form-control mx-1' %>
+    <%= select_tag :coordinator_id, options: [''] + Account.and(:id.in => @local_group.events.pluck(:coordinator_id)).order('name asc').map { |account| [account.name, account.id] }, selected: params[:coordinator_id], class: 'form-control mx-1' %>
   </div>
   <div class="form-group">
     <label>Sort by</label>
