@@ -3,6 +3,8 @@
 <p class="lead">
   <%= pluralize(organisations.count, 'organisation') %> sold
   <%= pluralize(tickets.count, 'ticket') %>
+  worth
+  <%= m Order.and(:created_at.gte => 3.months.ago).sum { |o| (o.value && FIAT_CURRENCIES.include?(o.currency)) ? Money.new(o.value*100, o.currency) : 0 }, 'GBP' %>
   in the last 3 months
 </p>
 
