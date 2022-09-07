@@ -42,7 +42,7 @@ class TicketType
   def send_payment_reminder
     email = name.split(' ').last
     return if EmailAddress.error(email)
-    return if ticket_type.remaining <= 0
+    return if remaining <= 0
 
     mg_client = Mailgun::Client.new ENV['MAILGUN_API_KEY'], 'api.eu.mailgun.net'
     batch_message = Mailgun::BatchMessage.new(mg_client, 'notifications.dandelion.earth')
