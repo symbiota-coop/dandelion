@@ -39,6 +39,28 @@ class TicketType
     errors.add(:max_quantity_per_transaction, 'must not be not be < 0') if max_quantity_per_transaction && max_quantity_per_transaction < 0
   end
 
+  def send_payment_reminder
+    email = name.split(' ').last
+    return if EmailAddress.error(email)
+    return if ticket_type.remaining <= 0
+
+    mg_client = Mailgun::Client.new ENV['MAILGUN_API_KEY'], 'api.eu.mailgun.net'
+    batch_message = Mailgun::BatchMessage.new(mg_client, 'notifications.dandelion.earth')
+
+    ticket_type = self
+    event = self.event
+    content = ERB.new(File.read(Padrino.root('app/views/emails/payment_reminder.erb'))).result(binding)
+    batch_message.from 'Dandelion <reminders@dandelion.earth>'
+    batch_message.reply_to(event.email || event.organisation.reply_to)
+    batch_message.subject "Payment requested for #{event.name}"
+    batch_message.body_html Premailer.new(ERB.new(File.read(Padrino.root('app/views/layouts/email.erb'))).result(binding), with_html_string: true, adapter: 'nokogiri', input_encoding: 'UTF-8').to_inline_css
+
+    batch_message.add_recipient(:to, email)
+
+    batch_message.finalize if ENV['MAILGUN_API_KEY']
+  end
+  handle_asynchronously :send_payment_reminder
+
   def remaining
     (quantity || 0) - tickets.count
   end

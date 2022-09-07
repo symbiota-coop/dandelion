@@ -97,6 +97,11 @@ namespace :events do
     Event.and(:start_time.gte => Date.tomorrow + 6, :start_time.lt => Date.tomorrow + 7).each do |event|
       event.send_star_reminders
     end
+
+    task send_payment_reminders: :environment do
+      TicketType.and(:event_id.in => Event.future.pluck(:id)).and(:name => /payment plan/i).each do |ticket_type|
+        ticket_type.send_payment_reminder
+      end
   end
 
   task transfer_events: :environment do
