@@ -99,9 +99,10 @@ namespace :events do
     end
 
     task send_payment_reminders: :environment do
-      TicketType.and(:event_id.in => Event.future.pluck(:id)).and(:name => /payment plan/i).each do |ticket_type|
+      TicketType.and(:event_id.in => Event.future.pluck(:id)).and(name: /payment plan/i).each do |ticket_type|
         ticket_type.send_payment_reminder
       end
+    end
   end
 
   task transfer_events: :environment do
