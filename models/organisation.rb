@@ -74,6 +74,7 @@ class Organisation
   field :change_select_tickets_title, type: Boolean
   field :event_image_required_height, type: Integer
   field :event_image_required_width, type: Integer
+  field :allow_quick, type: Boolean
 
   def self.admin_fields
     {

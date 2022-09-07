@@ -114,12 +114,14 @@ Dandelion::App.controller do
 
   get '/o/:slug/events/quick' do
     @organisation = Organisation.find_by(slug: params[:slug]) || not_found
+    kick! unless @organisation.allow_quick?
     @event = @organisation.events.build
     erb :'events/quick'
   end
 
   post '/o/:slug/events/quick' do
     @organisation = Organisation.find_by(slug: params[:slug]) || not_found
+    kick! unless @organisation.allow_quick?
     @event = @organisation.events.build(mass_assigning(params[:event], Event))
 
     account_hash = { name: params[:event][:email], email: params[:event][:email] }
