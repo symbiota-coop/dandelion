@@ -6,7 +6,7 @@
 <div class="d-inline-block" data-pagelet-url="/o/<%= @organisation.slug %>/organisationship?btn_class=mb-1">
   <%= partial :'organisations/organisationship', locals: { organisation: @organisation, btn_class: 'mb-1' } %>
 </div>
-<% if current_account %>
+<% if current_account && organisationship %>
   <% if !organisationship.hide_membership? %>
     <a class="btn btn-primary mb-1" href="/o/<%= @organisation.slug %>/show_membership/0">Membership public</a>
   <% else %>
