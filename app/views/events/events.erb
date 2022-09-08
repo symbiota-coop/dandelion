@@ -1,7 +1,11 @@
 <div class="row justify-content-between mb-3">
   <div class="col">
     <h1>Events</h1>
-    <% if !current_account || current_account.organisations.count == 0 %>
+    <% if !current_account %>
+      <p>
+        <a class="btn btn-primary" href="/accounts/new?list_an_event=1">List an event</a>
+      </p>
+    <% elsif current_account.organisations.count == 0 %>
       <p class="lead">
         Want to list an event? First you'll need to <a href="/o/new">create an organisation</a>
       </p>
