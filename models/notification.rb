@@ -256,7 +256,7 @@ class Notification
     when :created_tactivity
       ['View activity', "#{ENV['BASE_URI']}/g/#{circle.slug}/tactivities/#{notifiable.id}"]
     when :signed_up_to_a_shift
-      ['View rotas', "#{ENV['BASE_URI']}/g/#{circle.slug}/rotas/#{notifiable.rota_id}"]
+      ['View rotas', "#{ENV['BASE_URI']}/g/#{circle.slug}/rotas"]
     when :interested_in_tactivity
       ['View activity', "#{ENV['BASE_URI']}/g/#{circle.slug}/tactivities/#{notifiable.tactivity_id}"]
     when :created_team
