@@ -3,7 +3,7 @@ Dandelion::App.controller do
     @events = Event.live.public.legit
     @from = params[:from] ? Date.parse(params[:from]) : Date.today
     @events = params[:order] == 'created_at' ? @events.order('created_at desc') : @events.order('start_time asc')
-    @events = if params[:q]
+    @events = if params[:search]
                 @events.and(:id.in => Event.all.or(
                   { name: /#{::Regexp.escape(params[:q])}/i },
                   { description: /#{::Regexp.escape(params[:q])}/i }

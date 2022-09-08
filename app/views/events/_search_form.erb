@@ -1,12 +1,10 @@
 <% form_tag '/events', method: 'get', class: 'submitOnChange searchForm form-inline  mb-3' do %>
-<% unless request.path == '/' %>
   <div class="form-group">
     <label>Show events from</label>
     <%= text_field_tag :from, class: 'form-control datepicker', value: @from.to_s(:db) %>
   </div>
-<% end %>
   <div class="form-group">
-    <label><% if request.path == '/' %>Search events<% else %>containing the word<% end %></label>
+    <label>containing the word</label>
     <%= text_field_tag :q, class: 'form-control', value: params[:q] %>
   </div>
   <% if (event_tags = EventTag.and(:id.in => EventTagship.and(:event_id.in => Event.live.public.legit.future.pluck(:id)).pluck(:event_tag_id)).order('name asc')).count > 1 %>
