@@ -54,6 +54,12 @@
 
 <%= cp :events_count %>
 
+<div class="row justify-content-center">
+  <div class="col-sm-11">
+    <%= partial :'events/search_form' %>
+  </div>
+</div>
+
 <div data-pagelet-url="/events"></div>
 <div class="my-3" data-pagelet-url="/map?places=1">
   <%= partial :'maps/map', locals: { dynamic: true, trigger_bounds_changed: true } %>

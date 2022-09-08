@@ -171,7 +171,7 @@ module Dandelion
 
     get '/search' do
       sign_in_required!
-      @type = params[:type] || 'accounts'
+      @type = params[:type] || 'events'
       if (@q = params[:q])
         case @type
         when 'gatherings'
@@ -184,7 +184,11 @@ module Dandelion
           @organisations = Organisation.and(name: /#{::Regexp.escape(@q)}/i)
           @organisations = @organisations.paginate(page: params[:page], per_page: 10).order('name asc')
         when 'events'
-          redirect "/events?q=#{@q}"
+          @events = Event.live.public.legit.future.and(:id.in => Event.all.or(
+            { name: /#{::Regexp.escape(params[:q])}/i },
+            { description: /#{::Regexp.escape(params[:q])}/i }
+          ).pluck(:id))
+          @events = @events.paginate(page: params[:page], per_page: 10).order('start_time asc')
         else
           @accounts = Account.public
           @accounts = @accounts.and(:id.in => Account.all.or(

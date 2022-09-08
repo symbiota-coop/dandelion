@@ -1,12 +1,15 @@
 <form action="/search" id="search-form">
-  <div class="search-input">
+  <div class="search-input <% if @type == 'events' %>mb-1<% end %>">
     <a href="javascript:;" onclick="$(this).next().val('').focus()" class="search-close">×</a>
     <input name="q" type="text" class="form-control input-lg" value="<%= params[:q] %>">
   </div>
+  <% if @type == 'events' %>
+    <p class="mb-3">Showing matching future events. <a href="/events?q=<%=@q%>&search=1">Search past events, change sorting and display options and more</a></p>
+  <% end %>
   <input type="hidden" name="type" id="type" value="<%= @type %>">
 </form>
 <ul class="search-tab">
-  <% { 'People' => 'accounts', 'Events' => 'events', 'Organisations' => 'organisations', 'Places' => 'places', 'Gatherings' => 'gatherings' }.each { |k,v| %>
+  <% { 'Events' => 'events', 'People' => 'accounts', 'Organisations' => 'organisations', 'Places' => 'places', 'Gatherings' => 'gatherings' }.each { |k,v| %>
   <li <% if @type == v %> class="active" <% end %>><a href="javascript:;" onclick="$('#type').val('<%= v %>');
           $('#search-form').submit()"><%= k %></a></li>
   <% } %>
@@ -22,6 +25,11 @@
   </ul>
   <div class="mt-3">
     <%= will_paginate @accounts, renderer: WillPaginate::ViewHelpers::BootstrapRenderer %>
+  </div>
+  <% when 'events' %>
+    <%= partial 'events/blocks', locals: { events: @events } %>
+  <div class="mt-3">
+    <%= will_paginate @events, renderer: WillPaginate::ViewHelpers::BootstrapRenderer %>
   </div>
   <% when 'organisations' %>
   <ul class="search-result-list">
