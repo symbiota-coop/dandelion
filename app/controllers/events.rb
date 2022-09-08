@@ -3,12 +3,12 @@ Dandelion::App.controller do
     @events = Event.live.public.legit
     @from = params[:from] ? Date.parse(params[:from]) : Date.today
     @events = params[:order] == 'created_at' ? @events.order('created_at desc') : @events.order('start_time asc')
-    @events = if params[:search]
+    @events = if params[:q]
                 @events.and(:id.in => Event.all.or(
                   { name: /#{::Regexp.escape(params[:q])}/i },
                   { description: /#{::Regexp.escape(params[:q])}/i }
                 ).pluck(:id))
-              else
+              elsif !params[:search]
                 @events.and(:organisation_id.in => Organisation.and(paid_up: true).pluck(:id))
               end
     @events = @events.and(:id.in => EventTagship.and(event_tag_id: params[:event_tag_id]).pluck(:event_id)) if params[:event_tag_id]
