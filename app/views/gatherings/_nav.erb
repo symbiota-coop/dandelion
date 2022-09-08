@@ -34,11 +34,12 @@
         (if gathering.enable_teams
            ['Teams',
             (
+              [['Overview', "/g/#{gathering.slug}/teams"], ['Create a team', "/g/#{gathering.slug}/teams/new"]] +
               gathering.teams(true).order('name asc').map do |team|
                 [%(
               #&nbsp;#{team.name}
               ), "/g/#{gathering.slug}/teams/#{team.id}"]
-              end + [['Overview', "/g/#{gathering.slug}/teams"], ['Create a team', "/g/#{gathering.slug}/teams/new"]]
+              end
             )]
          end),
         (if gathering.enable_timetables
@@ -50,7 +51,7 @@
         (if gathering.enable_rotas
            ['Shifts',
             (
-              gathering.rotas(true).map { |rota| [rota.name, "/g/#{gathering.slug}/rotas/#{rota.id}"] } + (membership.admin? ? [['Create a rota', "/g/#{gathering.slug}/rotas/new"]] : [])
+              [['Overview', "/g/#{gathering.slug}/rotas"]] + gathering.rotas(true).map { |rota| [rota.name, "/g/#{gathering.slug}/rotas/#{rota.id}"] } + (membership.admin? ? [['Create a rota', "/g/#{gathering.slug}/rotas/new"]] : [])
             )]
          end),
         (['Inventory', "/g/#{gathering.slug}/inventory"] if gathering.enable_inventory),
