@@ -27,6 +27,9 @@ t = (@rota.roles.count*@rota.rslots.count) - @rota.shifts.where(:account => nil)
         <% else %>
           <%= role.name %>
         <% end %>
+        <% if @gathering.enable_shift_worth %>
+          <span data-toggle="tooltip" title="<%=pluralize sprintf('%g', role.worth || 1), 'point'%>" class="label label-yellow text-white d-inline-block mb-1"><i class="fa fa-coins"></i> <%=sprintf('%g', role.worth || 1)%></span>
+        <% end %>
       </strong>
     </td>
     <% } %>
@@ -48,6 +51,9 @@ t = (@rota.roles.count*@rota.rslots.count) - @rota.shifts.where(:account => nil)
           </a>
         <% else %>
           <%= rslot.name %>
+        <% end %>
+        <% if @gathering.enable_shift_worth %>
+          <span data-toggle="tooltip" title="<%=pluralize sprintf('%g', rslot.worth || 1), 'point'%>" class="label label-yellow text-white d-inline-block mb-1"><i class="fa fa-coins"></i> <%=sprintf('%g', rslot.worth || 1)%></span>
         <% end %>
       </strong>
     </td>
