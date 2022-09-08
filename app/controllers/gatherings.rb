@@ -51,6 +51,8 @@ Dandelion::App.controller do
     if @membership
       if request.xhr?
         partial :newsfeed, locals: { notifications: @gathering.notifications_as_circle.order('created_at desc').page(params[:page]), include_circle_name: false }
+      elsif @gathering.redirect_home
+        redirect @gathering.redirect_home
       else
         erb :'gatherings/gathering'
       end

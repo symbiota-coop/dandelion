@@ -32,6 +32,7 @@ class Gathering
   field :evm_address, type: String
   field :seeds_username, type: String
   field :redirect_on_acceptance, type: String
+  field :redirect_home, type: String
   field :choose_and_pay_label, type: String
 
   def self.enablable
