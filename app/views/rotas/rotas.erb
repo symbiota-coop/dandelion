@@ -4,19 +4,18 @@
     <a class="btn btn-primary" href="/g/<%= @gathering.slug %>/rotas/new"><i class="fa fa-plus-circle"></i> Create a rota</a>
   </div>
 <% end %>
-<table class="table">
+
 <% @gathering.rotas.each { |rota| %>
-  <tr>
-    <td style="width: 1px; white-space: nowrap;">
+  <div class="row">
+    <div class="col-sm-6">
 <h2>
   <a href="/g/<%= @gathering.slug %>/rotas/<%= rota.id %>">
     <%= rota.name %>
   </a>
 </h2>
-</td>
-<td>
+</div>
+<div class="col-sm-6">
 <%= partial :'rotas/progress', locals: {rota: rota} %>
-</td>
-</tr>
+</div>
+</div>
 <% } %>
-</table>
