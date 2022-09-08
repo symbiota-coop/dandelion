@@ -1,14 +1,5 @@
 
-<%
-s = @rota.shifts.where(:account.ne => nil).count
-t = (@rota.roles.count*@rota.rslots.count) - @rota.shifts.where(:account => nil).count
-%>
-<% w = t > 0 ? 100*s/t : 0 %>
-<div class="progress my-3"  data-toggle="tooltip" title="<%=s%>/<%=pluralize(t,'shift')%> filled" >
-  <div class="progress-bar" role="progressbar" style="width: <%= "#{w}%" %>;">
-    <%=s%>/<%=t%>
-  </div>
-</div>
+<%= partial :'rotas/progress', locals: {rota: @rota} %>
 
 <div class="my-3">
   <%= partial :'rotas/shift_summary', locals: {membership: @membership, rota: @rota, show_title: true} %>
