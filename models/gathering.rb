@@ -136,6 +136,11 @@ class Gathering
   before_validation do
     errors.add(:fixed_threshold, 'cannot be negative') if fixed_threshold && fixed_threshold.negative?
     errors.add(:member_limit, 'must be positive') if fixed_threshold && !fixed_threshold.positive?
+
+    errors.add(:stripe_sk, 'must start with sk_') if stripe_sk && !stripe_sk.starts_with?('sk_')
+    errors.add(:stripe_pk, 'must start with pk_') if stripe_pk && !stripe_pk.starts_with?('pk_')
+    errors.add(:stripe_sk, 'must be present if Stripe public key is present') if stripe_pk && !stripe_sk
+
     self.listed = nil if privacy == 'secret'
     self.balance = 0 if balance.nil?
     self.invitations_granted = 0 if invitations_granted.nil?

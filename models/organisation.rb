@@ -335,6 +335,9 @@ class Organisation
     self.ticket_email_greeting = ticket_email_greeting_default unless ticket_email_greeting
     self.feedback_email_body = feedback_email_body_default unless feedback_email_body
     errors.add(:affiliate_credit_percentage, 'must be between 1 and 100') if affiliate_credit_percentage && (affiliate_credit_percentage < 1 || affiliate_credit_percentage > 100)
+
+    errors.add(:stripe_sk, 'must start with sk_') if stripe_sk && !stripe_sk.starts_with?('sk_')
+    errors.add(:stripe_pk, 'must start with pk_') if stripe_pk && !stripe_pk.starts_with?('pk_')
     errors.add(:stripe_sk, 'must be present if Stripe public key is present') if stripe_pk && !stripe_sk
   end
 
