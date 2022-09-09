@@ -80,10 +80,10 @@ Dandelion::App.controller do
 
         case t
         when 'gathering' then redirect "/g/#{@gatherings.first.slug}"
-        when 'place' then redirect "/places/#{@places.first.id}" if @places.count == 1
-        when 'organisation' then redirect "/o/#{@organisations.first.slug}" if @organisations.count == 1
-        when 'event' then redirect "/events/#{@events.first.id}" if @events.count == 1
-        when 'account' then redirect "/u/#{@accounts.first.username}" if @accounts.count == 1
+        when 'place' then redirect "/places/#{@places.first.id}"
+        when 'organisation' then redirect "/o/#{@organisations.first.slug}"
+        when 'event' then redirect "/events/#{@events.first.id}"
+        when 'account' then redirect "/u/#{@accounts.first.username}"
         end
       end
 
