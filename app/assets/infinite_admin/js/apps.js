@@ -210,7 +210,13 @@ var handleHeaderSearchBar = function () {
   $('#header-search').autocomplete({
     html: true,
     source: '/search',
-    minLength: 0,
+    minLength: 3,
+    search: function() {
+      $('.header-search-bar .right-icon').html('<i class="fa fa-spin fa-circle-o-notch"></i>')
+    },
+    response: function() {
+      $('.header-search-bar .right-icon').html('<i class="ti-close"></i>')
+    },
     select: function(event, ui) {
         $('#header-search').val(ui.item.value);
         $('#header-search').closest('form').submit();
