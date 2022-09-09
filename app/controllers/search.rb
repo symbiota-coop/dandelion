@@ -16,7 +16,7 @@ Dandelion::App.controller do
       @organisations = Organisation.and(name: /#{::Regexp.escape(@q)}/i)
       results += @organisations.limit(10).map { |organisation| { label: %(<i class="fa fa-fw fa-flag"></i> #{organisation.name}), value: %(organisation:"#{organisation.name}") } }
 
-      @events = Event.live.public.legit.future.and(:id.in => Event.all.or(
+      @events = Event.live.public.legit.future(1.month.ago).and(:id.in => Event.all.or(
         { name: /#{::Regexp.escape(@q)}/i },
         { description: /#{::Regexp.escape(@q)}/i }
       ).pluck(:id))
@@ -55,7 +55,7 @@ Dandelion::App.controller do
           @organisations = @organisations.paginate(page: params[:page], per_page: 10).order('name asc')
           redirect "/o/#{@organisations.first.slug}" if @organisations.count == 1
         when 'events'
-          @events = Event.live.public.legit.future.and(:id.in => Event.all.or(
+          @events = Event.live.public.legit.future(1.month.ago).and(:id.in => Event.all.or(
             { name: /#{::Regexp.escape(@q)}/i },
             { description: /#{::Regexp.escape(@q)}/i }
           ).pluck(:id))
