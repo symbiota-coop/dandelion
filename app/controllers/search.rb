@@ -25,7 +25,7 @@ Dandelion::App.controller do
         { username: /#{::Regexp.escape(@q)}/i }
       ).pluck(:id))
 
-      results += @events.limit(5).map { |event| { label: %(<i class="fa fa-fw fa-calendar"></i> #{event.name}), value: %(event:"#{event.name}") } }
+      results += @events.limit(5).map { |event| { label: %(<i class="fa fa-fw fa-calendar"></i> #{event.name} (#{concise_when_details(event)})), value: %(event:"#{event.name}") } }
       results += @accounts.limit(5).map { |account| { label: %(<i class="fa fa-fw fa-user"></i> #{account.name}), value: %(account:"#{account.name}") } }
       results += @organisations.limit(5).map { |organisation| { label: %(<i class="fa fa-fw fa-flag"></i> #{organisation.name}), value: %(organisation:"#{organisation.name}") } }
       results += @gatherings.limit(5).map { |gathering| { label: %(<i class="fa fa-fw fa-moon"></i> #{gathering.name}), value: %(gathering:"#{gathering.name}") } }
