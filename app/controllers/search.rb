@@ -36,7 +36,7 @@ Dandelion::App.controller do
       @type = params[:type] || 'events'
       if (@q = params[:q])
         %w[gathering place organisation event account].each do |t|
-          if @q.starts_with?("#{t}:")
+          if params[:q].starts_with?("#{t}:")
             @q = @q.match(/#{t}:"(.+)"/)[1]
             @type = t.pluralize
           end
@@ -70,7 +70,7 @@ Dandelion::App.controller do
       end
 
       %w[gathering place organisation event account].each do |t|
-        next unless @q.starts_with?("#{t}:")
+        next unless params[:q].starts_with?("#{t}:")
 
         case t
         when 'gathering' then redirect "/g/#{@gatherings.first.slug}" if @gatherings.count == 1
