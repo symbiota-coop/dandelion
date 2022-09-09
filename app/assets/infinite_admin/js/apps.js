@@ -211,6 +211,9 @@ var handleHeaderSearchBar = function () {
     html: true,
     source: '/search',
     minLength: 3,
+    open: function(event, ui) {
+  		$(this).autocomplete("widget").css({"width": ($(this).width() + "px")})
+    },
     search: function() {
       $('.header-search-bar .right-icon').html('<i class="fa fa-spin fa-circle-o-notch"></i>')
     },
