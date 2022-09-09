@@ -34,6 +34,7 @@ Dandelion::App.controller do
       results.to_json
     else
       @type = params[:type] || 'events'
+      @results = []
       if (@q = params[:q])
         %w[gathering place organisation event account].each do |t|
           if @q.starts_with?("#{t}:")
@@ -45,22 +46,22 @@ Dandelion::App.controller do
         when 'gatherings'
           @gatherings = Gathering.and(name: /#{::Regexp.escape(@q)}/i).and(listed: true).and(:privacy.ne => 'secret')
           @gatherings = @gatherings.paginate(page: params[:page], per_page: 10).order('name asc')
-          redirect "/g/#{@gatherings.first.slug}" if @gatherings.count == 1
+          @results += @gatherings
         when 'places'
           @places = Place.and(name: /#{::Regexp.escape(@q)}/i)
           @places = @places.paginate(page: params[:page], per_page: 10).order('name asc')
-          redirect "/places/#{@places.first.id}" if @places.count == 1
+          @results += @places
         when 'organisations'
           @organisations = Organisation.and(name: /#{::Regexp.escape(@q)}/i)
           @organisations = @organisations.paginate(page: params[:page], per_page: 10).order('name asc')
-          redirect "/o/#{@organisations.first.slug}" if @organisations.count == 1
+          @results += @organisations
         when 'events'
           @events = Event.live.public.legit.future(1.month.ago).and(:id.in => Event.all.or(
             { name: /#{::Regexp.escape(@q)}/i },
             { description: /#{::Regexp.escape(@q)}/i }
           ).pluck(:id))
           @events = @events.paginate(page: params[:page], per_page: 10).order('start_time asc')
-          redirect "/events/#{@events.first.id}" if @events.count == 1
+          @results += @events
         when 'accounts'
           @accounts = Account.public
           @accounts = @accounts.and(:id.in => Account.all.or(
@@ -70,9 +71,22 @@ Dandelion::App.controller do
             { username: /#{::Regexp.escape(@q)}/i }
           ).pluck(:id))
           @accounts = @accounts.paginate(page: params[:page], per_page: 10).order('last_active desc')
-          redirect "/u/#{@accounts.first.username}" if @accounts.count == 1
+          @results += @accounts
         end
       end
+
+      %w[gathering place organisation event account].each do |t|
+        next unless @q.starts_with?("#{t}:") && @results.count == 1
+
+        case t
+        when 'gathering' then redirect "/g/#{@gatherings.first.slug}"
+        when 'place' then redirect "/places/#{@places.first.id}" if @places.count == 1
+        when 'organisation' then redirect "/o/#{@organisations.first.slug}" if @organisations.count == 1
+        when 'event' then redirect "/events/#{@events.first.id}" if @events.count == 1
+        when 'account' then redirect "/u/#{@accounts.first.username}" if @accounts.count == 1
+        end
+      end
+
       erb :search
     end
   end
