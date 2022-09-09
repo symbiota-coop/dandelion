@@ -1,6 +1,5 @@
 Dandelion::App.controller do
   get '/search' do
-    sign_in_required!
     if request.xhr?
       @q = params[:term]
       halt if @q.nil? || @q.length < 3
