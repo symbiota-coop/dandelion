@@ -169,40 +169,6 @@ module Dandelion
       200
     end
 
-    get '/search' do
-      sign_in_required!
-      @type = params[:type] || 'events'
-      if (@q = params[:q])
-        case @type
-        when 'gatherings'
-          @gatherings = Gathering.and(name: /#{::Regexp.escape(@q)}/i).and(listed: true).and(:privacy.ne => 'secret')
-          @gatherings = @gatherings.paginate(page: params[:page], per_page: 10).order('name asc')
-        when 'places'
-          @places = Place.and(name: /#{::Regexp.escape(@q)}/i)
-          @places = @places.paginate(page: params[:page], per_page: 10).order('name asc')
-        when 'organisations'
-          @organisations = Organisation.and(name: /#{::Regexp.escape(@q)}/i)
-          @organisations = @organisations.paginate(page: params[:page], per_page: 10).order('name asc')
-        when 'events'
-          @events = Event.live.public.legit.future.and(:id.in => Event.all.or(
-            { name: /#{::Regexp.escape(params[:q])}/i },
-            { description: /#{::Regexp.escape(params[:q])}/i }
-          ).pluck(:id))
-          @events = @events.paginate(page: params[:page], per_page: 10).order('start_time asc')
-        else
-          @accounts = Account.public
-          @accounts = @accounts.and(:id.in => Account.all.or(
-            { name: /#{::Regexp.escape(@q)}/i },
-            { name_transliterated: /#{::Regexp.escape(@q)}/i },
-            { email: /#{::Regexp.escape(@q)}/i },
-            { username: /#{::Regexp.escape(@q)}/i }
-          ).pluck(:id))
-          @accounts = @accounts.paginate(page: params[:page], per_page: 10).order('last_active desc')
-        end
-      end
-      erb :search
-    end
-
     get '/network', provides: :json do
       sign_in_required!
       if (@q = params[:q])

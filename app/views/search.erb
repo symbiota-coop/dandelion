@@ -1,7 +1,7 @@
 <form action="/search" id="search-form">
   <div class="search-input <% if @type == 'events' %>mb-1<% end %>">
     <a href="javascript:;" onclick="$(this).next().val('').focus()" class="search-close">×</a>
-    <input name="q" type="text" class="form-control input-lg" value="<%= params[:q] %>">
+    <input name="q" type="text" class="form-control input-lg" value="<%= @q %>">
   </div>
   <% if @type == 'events' %>
     <p class="mb-3">Showing matching future events. <a href="/events?q=<%=@q%>&search=1">Search past events, change sorting and display options and more</a></p>
@@ -14,7 +14,7 @@
           $('#search-form').submit()"><%= k %></a></li>
   <% } %>
 </ul>
-<% if params[:q] %>
+<% if @q %>
   <% case @type; when 'accounts' %>
   <ul class="search-result-list">
     <% @accounts.each { |account| %>

@@ -6,7 +6,7 @@
  ----------------------------
  APPS CONTENT TABLE
  ----------------------------
- 
+
  <!-- ======== GLOBAL SCRIPT SETTING ======== -->
  01. Global Variable
  02. Handle Scrollbar
@@ -22,7 +22,7 @@
  12. Handle Tooltip & Popover Activation
  13. Handle Scroll to Top Button Activation
  14. Handle Page Load Fade In
- 
+
  <!-- ======== APPLICATION SETTING ======== -->
  Application Controller
  */
@@ -207,11 +207,14 @@ var handleHeaderSearchBar = function () {
       $(this).remove();
     });
   });
-  // var searchTags = ['Report', 'Analytic', 'Product', 'Project', 'Sales', 'Mobile App Development', 'Build Website', 'Helper', 'Profile', 'Setting']; 
-  var searchTags = []
   $('#header-search').autocomplete({
-    source: searchTags,
-    minLength: 0
+    html: true,
+    source: '/search',
+    minLength: 0,
+    select: function(event, ui) {
+        $('#header-search').val(ui.item.value);
+        $('#header-search').closest('form').submit();
+      }
   }).on('focus', function () {
     $(this).autocomplete('search');
   });
