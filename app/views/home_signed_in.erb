@@ -19,9 +19,7 @@
         </p>
       </div>
     <% else %>
-      <div class="px-4 mb-5 pt-3">
-        <%= partial :'accounts/pay', locals: { account: current_account } %>
-      </div>
+      <%= partial :'accounts/pay', locals: {div_class: 'px-4 mb-5 pt-3', account: current_account } %>
     <% end %>
 
     <div id="newsfeed" data-pagelet-url="/" data-pagelet-refresh="60" class="mt-1 mb-3"></div>

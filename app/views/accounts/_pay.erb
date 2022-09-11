@@ -1,5 +1,6 @@
 <% last_completed_contribution = account.account_contributions.and(payment_completed: true).order('created_at desc').first %>
 <% if (defined?(force) && force) || !last_completed_contribution || last_completed_contribution.created_at < 1.month.ago %>
+<div class="<%=div_class if defined?(div_class)%>">
       <p class="lead mb-1">
         <mark class="px-0">Dandelion operates on a donation/gift economy basis.</mark>
       </p>
@@ -82,5 +83,5 @@
           console.log('paying')
         })
       </script>
-
+</div>
 <% end %>
