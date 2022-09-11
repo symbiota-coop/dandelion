@@ -17,6 +17,7 @@ Dandelion::App.controller do
       session = event['data']['object']
       if (account_contribution = AccountContribution.find_by(session_id: session.id))
         account_contribution.set(payment_completed: true)
+        account_contribution.send_notification
       end
     end
     halt 200
