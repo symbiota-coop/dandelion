@@ -25,12 +25,13 @@ class AccountContribution
 
   validates_presence_of :amount, :currency
 
-  def send_notification
+  def send_notificationn
     mg_client = Mailgun::Client.new ENV['MAILGUN_API_KEY'], 'api.eu.mailgun.net'
     batch_message = Mailgun::BatchMessage.new(mg_client, 'notifications.dandelion.earth')
 
     batch_message.from 'Dandelion <notifications@dandelion.earth>'
     batch_message.subject "[Account] #{account.name} made a contribution of #{amount} #{currency}"
+    batch_message.body_text '💸'
 
     Account.and(admin: true).each do |account|
       batch_message.add_recipient(:to, account.email, { 'firstname' => (account.firstname || 'there'), 'token' => account.sign_in_token, 'id' => account.id.to_s })
