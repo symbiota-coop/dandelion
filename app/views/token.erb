@@ -83,7 +83,7 @@ organisations_remaining = Organisation.sum(:tokens) - @organisations.sum(:tokens
 <code>organisation_orders.sum { sqrt(order_value) } + donations_organisation_made_to_dandelion.sum { sqrt(donation_value) }</code>
 </pre>
 
-<% if current_account %>
+<% if current_account && current_account.tokens %>
 <p class="lead">
     You are in line to receive
     <%= "#{(100*current_account.tokens/t2).round(2)}%"%>
