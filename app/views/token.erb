@@ -112,7 +112,7 @@ with the top-placed organisation to receive no more than 4x the number of tokens
     <% elsif x.is_a?(Organisation) %>
       <a href="/o/<%=x.slug%>"><%= x.name %></a>
     <% end %>
-    &Dstrok;<%=number_with_delimiter x.tokens.round%><br>
+    <span style="font-weight: 500">&Dstrok;</span><%=number_with_delimiter x.tokens.round%><br>
     <% } %>
   </div>
   <% } %>
