@@ -5,7 +5,7 @@
     );
     c.start();
     var c = new countUp.CountUp('worth-count',
-      <%= Float("%.3g" % Order.all.sum { |o| (o.value && FIAT_CURRENCIES.include?(o.currency)) ? Money.new(o.value*100, o.currency) : 0 }).to_i%>
+      <%= Float("%.3g" % Order.and(:value.ne => nil, :currency.in => MAJOR_CURRENCIES).sum { |o| Money.new(o.value*100, o.currency) }).to_i%>
     );
     c.start();
   })

@@ -47,6 +47,12 @@ class Account
   field :recommended_people_cache, type: Array
   field :recommended_events_cache, type: Array
 
+  field :tokens, type: Float
+  index({ tokens: 1 })
+  def calculate_tokens
+    orders.and(:value.ne => nil, :currency.in => MAJOR_CURRENCIES).sum { |o| Math.sqrt(Money.new(o.value * 100, o.currency).exchange_to('GBP').cents) }
+  end
+
   %w[email_confirmed
      updated_profile
      admin
