@@ -52,7 +52,7 @@ class Account
   index({ tokens: 1 })
   def calculate_tokens
     orders.and(:value.ne => nil, :currency.in => MAJOR_CURRENCIES).sum { |o| Math.sqrt(Money.new(o.value * 100, o.currency).exchange_to('GBP').cents) } +
-      Order.and(:event_id.in => event_facilitations.pluck(:event_id), :value.ne => nil, :currency.in => MAJOR_CURRENCIES).sum { |o| 0.1 * Math.sqrt(Money.new(o.value * 100, o.currency).exchange_to('GBP').cents) } +
+      Order.and(:event_id.in => event_facilitations.pluck(:event_id), :value.ne => nil, :currency.in => MAJOR_CURRENCIES).sum { |o| 0.25 * Math.sqrt(Money.new(o.value * 100, o.currency).exchange_to('GBP').cents) } +
       payments.and(:amount.ne => nil, :currency.in => MAJOR_CURRENCIES).sum { |p| 4 * Math.sqrt(Money.new(p.amount * 100, p.currency).exchange_to('GBP').cents) } +
       account_contributions.and(:amount.ne => nil, :currency.in => MAJOR_CURRENCIES).sum { |p| Math.sqrt(Money.new(p.amount * 100, p.currency).exchange_to('GBP').cents) }
   end

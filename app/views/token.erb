@@ -73,7 +73,7 @@ organisations_remaining = Organisation.sum(:tokens) - @organisations.sum(:tokens
   The proposed distribution formula for individuals is:
 </p>
 <pre class="mb-0">
-<code>your_orders.sum { sqrt(order_value) } + orders_of_events_you_facilitated.sum { 0.1 * sqrt(order_value) } + gathering_payments.sum { 4 * sqrt(payment_value) } + donations_you_made_to_dandelion.sum { sqrt(donation_value) }</code>
+<code>your_orders.sum { sqrt(order_value) } + orders_of_events_you_facilitated.sum { 0.25 * sqrt(order_value) } + gathering_payments.sum { 4 * sqrt(payment_value) } + donations_you_made_to_dandelion.sum { sqrt(donation_value) }</code>
 </pre>
 
 <p class="lead">
