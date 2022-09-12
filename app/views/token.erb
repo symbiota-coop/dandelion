@@ -25,7 +25,7 @@ organisations_remaining = Organisation.sum(:tokens) - @organisations.sum(:tokens
                                    0.upto(n).map { |i| (k == 'Unknown' ? '#666' : '#2DB963'.paint.spin(v + i * spin)).to_s }
                                  end.sum + ['#2DB963'.paint.spin(team_spin).to_s]).to_json %>
           }],
-          labels: <%== (@accounts.pluck(:name) + ['Other accounts'] + @organisations.pluck(:name) + ['Other organisations'] + ['Dandelion team']).to_json %>,
+          labels: <%== (@accounts.pluck(:name) + ['Other individuals'] + @organisations.pluck(:name) + ['Other organisations'] + ['Dandelion team']).to_json %>,
       },
       options: {
         responsive: true,
