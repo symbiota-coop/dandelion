@@ -206,5 +206,9 @@ module Dandelion
     get '/graph' do
       erb :graph
     end
+
+    get '/token' do
+      erb :token
+    end
   end
 end

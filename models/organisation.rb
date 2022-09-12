@@ -76,6 +76,13 @@ class Organisation
   field :event_image_required_width, type: Integer
   field :allow_quick, type: Boolean
 
+  field :tokens, type: Float
+  index({ tokens: 1 })
+  def calculate_tokens
+    Order.and(:event_id.in => events.pluck(:id), :value.ne => nil, :currency.in => MAJOR_CURRENCIES).sum { |o| Math.sqrt(Money.new(o.value * 100, o.currency).exchange_to('GBP').cents) } +
+      organisation_contributions.and(:amount.ne => nil, :currency.in => MAJOR_CURRENCIES).sum { |p| Math.sqrt(Money.new(p.amount * 100, p.currency).exchange_to('GBP').cents) }
+  end
+
   def self.admin_fields
     {
       name: :text,
