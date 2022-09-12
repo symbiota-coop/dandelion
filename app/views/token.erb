@@ -69,19 +69,22 @@ organisations_remaining = Organisation.sum(:tokens) - @organisations.sum(:tokens
 <p class="lead">
   Here you can view the proposed initial distribution of the DNDLN token.</p>
 
-<p class="lead">
+<p class="lead mb-1">
   The proposed distribution formula for individuals is:
 </p>
 <pre class="mb-0">
 <code>your_orders.sum { sqrt(order_value) } + orders_of_events_you_facilitated.sum { 0.25 * sqrt(order_value) } + gathering_payments.sum { 4 * sqrt(payment_value) } + donations_you_made_to_dandelion.sum { sqrt(donation_value) }</code>
 </pre>
 
-<p class="lead">
+<p class="lead mb-1">
   The proposed distribution formula for organisations is:
 </p>
 <pre class="mb-0">
 <code>organisation_orders.sum { sqrt(order_value) } + donations_organisation_made_to_dandelion.sum { sqrt(donation_value) }</code>
 </pre>
+<p class="lead" style="margin-top: -0.75em">
+with the top-placed organisation to receive no more than 4x the number of tokens of the second-placed organisation.
+</p>
 
 <% if current_account && current_account.tokens %>
 <p class="lead">
