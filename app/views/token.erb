@@ -64,7 +64,7 @@ organisations_remaining = Organisation.sum(:tokens) - @organisations.sum(:tokens
   })
 </script>
 
-<h1>DNDLN token</h1>
+<h1>DNDLN token: &Dstrok;</h1>
 
 <p class="lead">
   Here you can view the proposed initial distribution of the DNDLN token.</p>
@@ -112,7 +112,7 @@ with the top-placed organisation to receive no more than 4x the number of tokens
     <% elsif x.is_a?(Organisation) %>
       <a href="/o/<%=x.slug%>"><%= x.name %></a>
     <% end %>
-    <%=number_with_delimiter x.tokens.round%><br>
+    &Dstrok;<%=number_with_delimiter x.tokens.round%><br>
     <% } %>
   </div>
   <% } %>
