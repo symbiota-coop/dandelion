@@ -1,6 +1,6 @@
 <%
 t1 = Account.sum(:tokens) + Organisation.sum(:tokens)
-team_fraction = 0.1
+team_fraction = 0.2
 t2 = t1/(1-team_fraction)
 team_tokens = team_fraction * t2
 
