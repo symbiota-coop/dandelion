@@ -187,7 +187,11 @@ class Event
       errors.add(:local_group, '- you are not an admin of this local group') if local_group && !LocalGroup.admin?(local_group, account)
     end
 
-    errors.add(:organisation, 'does not have any payment methods set up, so you can currently only issue free tickets') if ticket_types.any? { |ticket_type| ticket_type.price && ticket_type.price > 0 } && !organisation.payment_method?
+    unless organisation.payment_method?
+      errors.add(:organisation, 'does not have any payment methods set up, so you can currently only issue free tickets') if ticket_types.any? { |ticket_type| ticket_type.price && ticket_type.price > 0 }
+      self.suggested_donation = nil
+      self.minimum_donation = nil
+    end
 
     if zoom_party?
       self.local_group = nil
