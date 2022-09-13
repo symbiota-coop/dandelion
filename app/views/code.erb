@@ -1,3 +1,5 @@
+<p class="lead">Dandelion is an open-source project. <a target="_blank" href="https://github.com/dandelion-collective/dandelion">View the code on Github</a></p>
+
 <% {
      'cytoscape/3.9.4' => 'cytoscape.min.js',
      'chroma-js/2.0.6' => 'chroma.min.js'
@@ -61,6 +63,7 @@
                   {
                   selector: 'node',
                   style: {
+                      'color': 'white',
                       'background-color': 'data(color)',
                       'opacity': 0.75,
                       'label': 'data(name)',
@@ -93,4 +96,4 @@
           $(window).one('focus', function() { drawNetwork() })
   })
 </script>
-<div id="cy" class="card shadow-sm" style="height: 700px"></div>
+<div id="cy" class="card shadow-sm" style="background-color: #222; height: 700px"></div>

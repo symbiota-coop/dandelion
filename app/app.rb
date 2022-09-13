@@ -203,8 +203,8 @@ module Dandelion
       RQRCode::QRCode.new(params[:id]).as_png(border_modules: 0, module_px_size: 5).to_blob
     end
 
-    get '/graph' do
-      erb :graph
+    get '/code' do
+      erb :code
     end
 
     get '/token' do
