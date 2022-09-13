@@ -86,7 +86,7 @@ organisations_remaining = Organisation.sum(:tokens) - @organisations.sum(:tokens
 with the top-placed organisation to receive no more than 4x the number of tokens of the second-placed organisation.
 </p>
 
-<% if current_account && current_account.tokens %>
+<% if current_account && current_account.tokens && current_account.tokens > 0 %>
 <p class="lead">
     You are in line to receive
     <%= "#{(100*current_account.tokens/t2).round(2)}%"%>
