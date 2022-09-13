@@ -139,7 +139,7 @@
       </td>
       <td>
         <% order.answers.each { |q,a| if a %>
-        <p>
+        <p style="width: 400px">
           <strong>
             <% if m = q.match(/\[(.*)\]/) %>
               <%== Sanitize.fragment(Rinku.auto_link(m[1]), Sanitize::Config::DANDELION) %>
