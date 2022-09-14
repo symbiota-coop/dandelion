@@ -7,12 +7,12 @@
   </div>
   <div class="form-group">
     <label>containing the word</label>
-    <%= text_field_tag :q, class: 'form-control', value: params[:q] %>
+    <%= text_field_tag :q, class: 'form-control', value: params[:q], style: 'max-width: 12em' %>
   </div>
   <% if (event_tags = EventTag.and(:id.in => EventTagship.and(:event_id.in => Event.live.public.legit.future.pluck(:id)).pluck(:event_tag_id)).order('name asc')).count > 0 %>
     <div class="form-group">
       <label>tagged</label>
-      <%= select_tag :event_tag_id, options: [''] + event_tags.map { |event_tag| [event_tag.name, event_tag.id] }, selected: params[:event_tag_id], class: 'form-control', style: 'max-width: 11em' %>
+      <%= select_tag :event_tag_id, options: [''] + event_tags.map { |event_tag| [event_tag.name, event_tag.id] }, selected: params[:event_tag_id], class: 'form-control', style: 'max-width: 12em' %>
     </div>
   <% end %>
   <%= checkbox 'Online' %>
