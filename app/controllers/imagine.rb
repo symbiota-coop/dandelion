@@ -1,5 +1,6 @@
 Dandelion::App.controller do
   before do
+    sign_in_required!
     @replicate = Faraday.new(
       url: 'https://api.replicate.com/v1',
       headers: { 'Authorization': "Token #{ENV['REPLICATE_API_KEY']}", 'Content-Type': 'application/json' }
