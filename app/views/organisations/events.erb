@@ -23,16 +23,6 @@
     </div>
   </div>
 <% end %>
-<% if params[:minimal] %>
-  <%== '<div id="events-container" class="container-fluid">' %>
-<% end %>
-<% if params[:minimal] %>
-  <script>
-    $(function () {
-      $('#events-container a').attr('target', '_blank')
-    })
-  </script>
-<% end %>
 <% if !params[:no_events_banner] && @organisation.verified? && @organisation.events_banner && (!current_account || ((organisationship = @organisation.organisationships.find_by(account: current_account)) && !organisationship.monthly_donor?)) %>
   <%== @organisation.events_banner %>
 <% end %>
@@ -96,6 +86,14 @@
   <%= partial :'events/view_options' %>
 <% end %>
 
+<% if params[:minimal] %>
+  <%== '<div id="events-container" class="container-fluid">' %>
+  <script>
+    $(function () {
+      $('#events-container a').attr('target', '_blank')
+    })
+  </script>
+<% end %>
 <% if params[:display] == 'map' %>
   <div data-pagelet-url="/o/<%=@organisation.slug%>/events?<%= request.query_string %>">
     <%= partial :'maps/map', locals: { stem: "/o/#{@organisation.slug}/events", dynamic: true, trigger_bounds_changed: true } %>
