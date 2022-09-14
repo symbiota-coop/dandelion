@@ -1,18 +1,6 @@
 <% if @events.count == 0 %>
   <em>No events</em>
 <% else %>
-  <% if !params[:search] && !params[:event_tag_id] && !params[:page] %>
-    <div data-with-placeholder data-pagelet-url="/o/<%= @organisation.slug %>/carousels/featured?hide_featured_title=<%=params[:hide_featured_title]%>">
-      <%= partial :'events/carousel_placeholder' %>
-    </div>
-    <% if @organisation.carousels %>
-      <% @organisation.carousels.split("\n").reject(&:blank?).each_with_index { |line,i| next if params[:first_carousel_only] && i > 0 %>
-      <div data-with-placeholder data-pagelet-url="/o/<%= @organisation.slug %>/carousels/<%= i %>">
-        <%= partial :'events/carousel_placeholder' %>
-      </div>
-      <% } %>
-    <% end %>
-  <% end %>
   <% unless params[:no_listings] %>
     <% unless params[:minimal] %>
       <% @events = @events.paginate(page: params[:page], per_page: 20) %>

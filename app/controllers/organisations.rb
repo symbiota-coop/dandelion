@@ -266,7 +266,7 @@ Dandelion::App.controller do
   get '/o/:slug/carousels/:i' do
     @organisation = Organisation.find_by(slug: params[:slug]) || not_found
     if params[:i] == 'featured'
-      partial :'events/carousel', locals: { title: 'Featured', events: @organisation.featured_events, hide_featured_title: params[:hide_featured_title] }
+      partial :'events/carousel', locals: { title: 'Featured', events: @organisation.featured_events, hide_featured_title: params[:hide_featured_title], skip_margin: true }
     else
       begin
         line = @organisation.carousels.split("\n").reject { |line| line.blank? }[params[:i].to_i]
