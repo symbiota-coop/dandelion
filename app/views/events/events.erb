@@ -41,6 +41,19 @@ Event.live.public.future.pluck(:organisation_id)
 
 <% end %>
 
+<ul class="mb-3 nav nav-tabs" role="tablist">
+  <li class="nav-item">
+    <a class="nav-link <%='active' if params[:display] != 'map' %>" href="?<%= q = Rack::Utils.parse_nested_query(request.query_string); q.delete('search'); q.delete('display'); q.merge({ search: 1, display: 'list' }).to_query %>">
+      <i class="fa fa-list"></i> List
+    </a>
+  </li>
+  <li class="nav-item">
+    <a class="nav-link <%='active' if params[:display] == 'map' %>" href="?<%= q = Rack::Utils.parse_nested_query(request.query_string); q.delete('search'); q.delete('display'); q.merge({ search: 1, display: 'map' }).to_query %>">
+      <i class="fa fa-map-marker"></i> Map
+    </a>
+  </li>
+</ul>
+
 <% if params[:display] == 'map' %>
   <div data-pagelet-url="/events?<%= request.query_string %>">
     <%= partial :'maps/map', locals: { stem: "/events", dynamic: true, trigger_bounds_changed: true } %>

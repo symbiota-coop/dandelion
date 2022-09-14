@@ -33,14 +33,14 @@
     })
   </script>
 <% end %>
-
 <% if !params[:no_events_banner] && @organisation.verified? && @organisation.events_banner && (!current_account || ((organisationship = @organisation.organisationships.find_by(account: current_account)) && !organisationship.monthly_donor?)) %>
   <%== @organisation.events_banner %>
 <% end %>
-
 <% unless params[:no_search] %>
   <div id="events-search" class="<%= params[:minimal] ? 'pb-3 pt-1' : 'py-3' %>">
     <% form_tag '', method: 'get', class: 'submitOnChange searchForm form-inline' do %>
+      <%= hidden_field_tag :display, value: params[:display] %>
+      <%= hidden_field_tag :order, value: params[:order] %>
       <%= hidden_field_tag :minimal, value: params[:minimal] %>
       <div class="form-group">
         <label>Show events from</label>
@@ -68,14 +68,6 @@
           <%= select_tag :activity_id, options: [''] + activities.map { |activity| [activity.name, activity.id] }, selected: params[:activity_id], class: 'form-control' %>
         </div>
       <% end %>
-      <div class="form-group">
-        <label>Sort by</label>
-        <%= select_tag :order, options: { 'Event date' => 'date', 'Most recently created' => 'created_at' }, selected: params[:order], class: 'form-control mx-1' %>
-      </div>
-      <div class="form-group">
-        <label>Display</label>
-        <%= select_tag :display, options: { 'List' => 'list', 'Map' => 'map' }, selected: params[:display], class: 'form-control mx-1' %>
-      </div>
       <%= checkbox 'Online' %>
       <%= checkbox 'In person' %>
       <% if @organisation.monthly_donors.count > 0 %>
@@ -85,12 +77,39 @@
       <%= hidden_field_tag :search, value: 1 %>
     <% end %>
   </div>
-  <div class="mb-3">
-    <a class="badge badge-primary" style="font-weight: normal" id="ical" target="_blank" data-toggle="tooltip" href="<%= ENV['BASE_URI'] %><%= request.path %>.ics?<%= request.query_string %>">
-      iCal <i class="fa fa-external-link"></i>
-    </a>
-  </div>
 <% end %>
+<div class="row justify-content-between">
+  <div class="col">
+    <ul class="mb-3 nav nav-pills" role="tablist">
+      <li class="nav-item">
+        <a class="nav-link <%='active' if params[:display] != 'map' %>" href="?<%= q = Rack::Utils.parse_nested_query(request.query_string); q.delete('search'); q.delete('display'); q.merge({search: 1, display: 'list' }).to_query %>">
+          <i class="fa fa-list"></i> List
+        </a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link <%='active' if params[:display] == 'map' %>" href="?<%= q = Rack::Utils.parse_nested_query(request.query_string); q.delete('search'); q.delete('display'); q.merge({search: 1, display: 'map' }).to_query %>">
+          <i class="fa fa-map-marker"></i> Map
+        </a>
+      </li>
+    </ul>
+  </div>
+
+  <% if params[:display] != 'map' %>
+    <div class="col-auto">
+      <% form_tag '', method: 'get', class: 'form-inline submitOnChange' do %>
+        <% params.each { |k,v| next if %w[order slug].include?(k) %>
+        <%= hidden_field_tag k, value: v %>
+        <% } %>
+        <label>Sort by</label>
+        <%= select_tag :order, options: { 'Event date' => 'date', 'Most recently created' => 'created_at' }, selected: params[:order], class: 'form-control' %>
+        <a class="ml-3 badge badge-primary" style="font-weight: normal" id="ical" target="_blank" data-toggle="tooltip" href="<%= ENV['BASE_URI'] %><%= request.path %>.ics?<%= request.query_string %>">
+          iCal <i class="fa fa-external-link"></i>
+        </a>
+      <% end %>
+    </div>
+  <% end %>
+
+</div>
 
 <% if params[:display] == 'map' %>
   <div data-pagelet-url="/o/<%=@organisation.slug%>/events?<%= request.query_string %>">
@@ -101,7 +120,6 @@
     <%= partial :'organisations/events' %>
   </div>
 <% end %>
-
 <% if params[:minimal] %>
   <%== '</div>' %>
 <% end %>

@@ -1,6 +1,6 @@
 <% organisationship = @organisation.organisationships.find_by(account: current_account) %>
 
-<% if @organisation.allow_quick? && !organisationship.admin? %>
+<% if @organisation.allow_quick? && (!organisationship || !organisationship.admin?) %>
   <a class="btn btn-primary mb-1" href="/o/<%= @organisation.slug %>/events/quick">List an event</a>
 <% end %>
 <div class="d-inline-block" data-pagelet-url="/o/<%= @organisation.slug %>/organisationship?btn_class=mb-1">
