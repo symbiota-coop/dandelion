@@ -1,0 +1,74 @@
+<div class="row justify-content-center mt-5">
+  <div class="col col-sm-6">
+    <% form_tag '', id: 'prompt-form' do %>
+      <div class="input-group mb-3">
+        <%= text_field_tag :prompt, class: 'form-control form-control-lg', placeholder: 'What do you imagine?', autocomplete: 'off', required: true %>
+        <div class="input-group-append">
+          <button class="btn btn-primary" type="submit"><i class="fa fa-search"></i></button>
+        </div>
+      </div>
+    <% end %>
+  </div>
+</div>
+<script>
+  $(function() {
+    var interval;
+    $('#prompt-form').submit(function() {
+      $('#result').html('<div style="display: none" id="blob"></div>')
+      $('#blob').fadeIn('slow')
+      $.post('/imagine', {prompt: $('input[name=prompt]').val()}, function(id) {
+
+        interval = setInterval(function() {
+          $.get('/imagine/'+id, function(url) {
+            if (url) {
+              $('#result').html('<img src="'+url+'">')
+              clearInterval(interval)
+            }
+          }).fail(function(jqXHR) {
+            $('#result').html('<p>'+jqXHR.responseText+'</p>')
+            clearInterval(interval)
+          })
+        }, 1000)
+
+      })
+      return false
+    })
+  })
+</script>
+<style>
+  #blob {
+    margin: auto;
+  	background: rgb(0, 185, 99);
+  	border-radius: 50%;
+  	height: 50px;
+  	width: 50px;
+
+  	box-shadow: 0 0 0 0 rgb(0, 185, 99, 1);
+  	transform: scale(1);
+  	animation: pulse 2s infinite;
+  }
+
+  @keyframes pulse {
+  	0% {
+  		transform: scale(0.85);
+  		box-shadow: 0 0 0 0 rgb(0, 185, 99, 0.7);
+  	}
+
+  	70% {
+  		transform: scale(1);
+  		box-shadow: 0 0 0 20px rgb(0, 185, 99, 0);
+  	}
+
+  	100% {
+  		transform: scale(0.85);
+  		box-shadow: 0 0 0 0 rgb(0, 185, 99, 0);
+  	}
+  }
+</style>
+<div class="mt-5">
+  <div class="row justify-content-center">
+    <div class="col-auto" id="result">
+      <span style="font-size: 90%">Powered by <a target="_blank" href="https://stability.ai/blog/stable-diffusion-public-release">Stable Diffusion</a> via <a target="_blank" href="https://replicate.com/">Replicate</a></span>
+    </div>
+  </div>
+</div>
