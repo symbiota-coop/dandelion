@@ -92,7 +92,9 @@
   <% end %>
 <% end %>
 
-<%= partial :'events/view_options' %>
+<% unless params[:no_listings] %>
+  <%= partial :'events/view_options' %>
+<% end %>
 
 <% if params[:display] == 'map' %>
   <div data-pagelet-url="/o/<%=@organisation.slug%>/events?<%= request.query_string %>">
