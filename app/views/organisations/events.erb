@@ -78,38 +78,8 @@
     <% end %>
   </div>
 <% end %>
-<div class="row justify-content-between">
-  <div class="col">
-    <ul class="mb-3 nav nav-pills" role="tablist">
-      <li class="nav-item">
-        <a class="nav-link <%='active' if params[:display] != 'map' %>" href="?<%= q = Rack::Utils.parse_nested_query(request.query_string); q.delete('search'); q.delete('display'); q.merge({search: 1, display: 'list' }).to_query %>">
-          <i class="fa fa-list"></i> List
-        </a>
-      </li>
-      <li class="nav-item">
-        <a class="nav-link <%='active' if params[:display] == 'map' %>" href="?<%= q = Rack::Utils.parse_nested_query(request.query_string); q.delete('search'); q.delete('display'); q.merge({search: 1, display: 'map' }).to_query %>">
-          <i class="fa fa-map-marker"></i> Map
-        </a>
-      </li>
-    </ul>
-  </div>
 
-  <% if params[:display] != 'map' %>
-    <div class="col-auto">
-      <% form_tag '', method: 'get', class: 'form-inline submitOnChange' do %>
-        <% params.each { |k,v| next if %w[order slug].include?(k) %>
-        <%= hidden_field_tag k, value: v %>
-        <% } %>
-        <label>Sort by</label>
-        <%= select_tag :order, options: { 'Event date' => 'date', 'Most recently created' => 'created_at' }, selected: params[:order], class: 'form-control' %>
-        <a class="ml-3 badge badge-primary" style="font-weight: normal" id="ical" target="_blank" data-toggle="tooltip" href="<%= ENV['BASE_URI'] %><%= request.path %>.ics?<%= request.query_string %>">
-          iCal <i class="fa fa-external-link"></i>
-        </a>
-      <% end %>
-    </div>
-  <% end %>
-
-</div>
+<%= partial :'events/view_options' %>
 
 <% if params[:display] == 'map' %>
   <div data-pagelet-url="/o/<%=@organisation.slug%>/events?<%= request.query_string %>">

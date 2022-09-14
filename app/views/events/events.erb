@@ -21,12 +21,6 @@
 
 <%= partial :'events/search_form' %>
 
-<div class="mb-3">
-  <a class="badge badge-primary" style="font-weight: normal" id="ical" target="_blank" data-toggle="tooltip" href="<%= ENV['BASE_URI'] %><%= request.path %>.ics?<%= request.query_string %>">
-    iCal <i class="fa fa-external-link"></i>
-  </a>
-</div>
-
 <% if current_account && !params[:search] && !params[:event_tag_id] %>
 
 <% if (organisations = Organisation.and(:id.in =>
@@ -41,18 +35,7 @@ Event.live.public.future.pluck(:organisation_id)
 
 <% end %>
 
-<ul class="mb-3 nav nav-tabs" role="tablist">
-  <li class="nav-item">
-    <a class="nav-link <%='active' if params[:display] != 'map' %>" href="?<%= q = Rack::Utils.parse_nested_query(request.query_string); q.delete('search'); q.delete('display'); q.merge({ search: 1, display: 'list' }).to_query %>">
-      <i class="fa fa-list"></i> List
-    </a>
-  </li>
-  <li class="nav-item">
-    <a class="nav-link <%='active' if params[:display] == 'map' %>" href="?<%= q = Rack::Utils.parse_nested_query(request.query_string); q.delete('search'); q.delete('display'); q.merge({ search: 1, display: 'map' }).to_query %>">
-      <i class="fa fa-map-marker"></i> Map
-    </a>
-  </li>
-</ul>
+<%= partial :'events/view_options' %>
 
 <% if params[:display] == 'map' %>
   <div data-pagelet-url="/events?<%= request.query_string %>">
