@@ -137,7 +137,7 @@
       <% end %>
 
         <div class="mt-5 row no-gutters" id="favs">
-          <% PredictionFav.order('created_at desc').each { |prediction_fav| prediction = prediction_fav.prediction; f = prediction_fav.index %>
+          <% PredictionFav.order('created_at desc').shuffle.each { |prediction_fav| prediction = prediction_fav.prediction; f = prediction_fav.index %>
               <div class="col-6 col-sm-3">
                 <div class="mr-3 mb-3">
                   <a href="/imagine/<%=prediction.id%>/<%=prediction_fav.index%>"><img src="<%=prediction.result['output'][f]%>"></a>
