@@ -15,6 +15,10 @@ class PredictionFav
     }
   end
 
+  def name
+    'Imagine'
+  end
+
   has_many :posts, as: :commentable, dependent: :destroy
   has_many :subscriptions, as: :commentable, dependent: :destroy
   has_many :comments, as: :commentable, dependent: :destroy
