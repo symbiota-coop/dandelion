@@ -13,15 +13,21 @@ Dandelion::App.controller do
   end
 
   get '/imagine/:id' do
-    @prediction = Prediction.find(params[:id])
-    @prediction.fetch! unless @prediction.finished?
-    if @prediction.result['error']
-      halt 400, @prediction.result['error']
-    elsif @prediction.result['output']
-      content_type 'application/json'
-      @prediction.result['output'].to_json
+    if request.xhr?
+      @prediction = Prediction.find(params[:id])
+      @prediction.fetch! unless @prediction.finished?
+      if @prediction.result['error']
+        halt 400, @prediction.result['error']
+      elsif @prediction.result['output']
+        content_type 'application/json'
+        @prediction.result['output'].to_json
+      else
+        200
+      end
     else
-      200
+      @prediction = Prediction.find(params[:id])
+      @f = @prediction.favs.first if @prediction.favs.count == 1
+      erb :imagine
     end
   end
 

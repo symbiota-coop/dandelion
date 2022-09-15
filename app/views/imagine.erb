@@ -100,9 +100,17 @@
 
       <% if @prediction %>
         <div class="mt-5">
-          <img src="<%=@prediction.result['output'][@f]%>">
+          <% if @f %>
+            <img src="<%=@prediction.result['output'][@f]%>">
+          <% else %>
+            <div class="row">
+              <% @prediction.favs.each { |f| %>
+                <div class="col-12 col-sm-6"><div class="mr-3 mb-3"><a href="/imagine/<%=@prediction.id%>/<%=f%>"><img src="<%=@prediction.result['output'][f]%>"></a></div></div>
+              <% } %>
+            </div>
+          <% end %>
           <p class="mt-1">"<%=@prediction.prompt%>" <br /> by <a href="/u/<%=@prediction.account.username%>"><%=@prediction.account.name%></a></p>
-          <% if @prediction.account == current_account %>
+          <% if @f && @prediction.account == current_account %>
             <p><a class="btn btn-primary btn-sm" href="/imagine/<%=@prediction.id%>/<%=@f%>/unsave">Unsave</a></p>
           <% end %>
         </div>
