@@ -1,12 +1,10 @@
 Dandelion::App.controller do
-  before do
-    sign_in_required!
-  end
   get '/imagine' do
     erb :imagine
   end
 
   post '/imagine' do
+    sign_in_required!
     halt 400, 'Please enter a prompt.' unless params[:prompt]
     halt 400, 'You have reached your limit of 100 generations in the past 24 hours.' if current_account.predictions.and(:created_at.gt => 24.hours.ago).count > 100
     current_account.predictions.create(prompt: params[:prompt]).id.to_s
@@ -14,6 +12,7 @@ Dandelion::App.controller do
 
   get '/imagine/:id' do
     if request.xhr?
+      sign_in_required!
       @prediction = Prediction.find(params[:id])
       @prediction.fetch! unless @prediction.finished?
       if @prediction.result['error']
@@ -32,7 +31,8 @@ Dandelion::App.controller do
   end
 
   post '/imagine/:id/:f' do
-    @prediction = Prediction.find(params[:id])
+    sign_in_required!
+    @prediction = current_account.predictions.find(params[:id])
     @prediction.favs ||= []
     @prediction.favs << params[:f].to_i unless @prediction.favs.include?(params[:f].to_i)
     @prediction.save
@@ -46,7 +46,8 @@ Dandelion::App.controller do
   end
 
   get '/imagine/:id/:f/unsave' do
-    @prediction = Prediction.find(params[:id])
+    sign_in_required!
+    @prediction = current_account.predictions.find(params[:id])
     @prediction.favs = @prediction.favs - [params[:f].to_i]
     @prediction.save
     redirect '/imagine'
