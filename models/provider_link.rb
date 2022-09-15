@@ -18,6 +18,6 @@ class ProviderLink
   end
 
   validates_presence_of :provider, :provider_uid, :omniauth_hash
-  validates_uniqueness_of :provider, scope: :account_id
+  validates_uniqueness_of :provider, scope: :account
   validates_uniqueness_of :provider_uid, scope: :provider
 end

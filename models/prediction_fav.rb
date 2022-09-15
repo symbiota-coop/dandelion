@@ -25,6 +25,7 @@ class PredictionFav
   has_many :comment_reactions, as: :commentable, dependent: :destroy
 
   validates_presence_of :index
+  validates_uniqueness_of :index, scope: :prediction
 
   before_validation do
     self.account = prediction.account unless account

@@ -22,7 +22,7 @@ class Calendar
   end
 
   validates_presence_of :url
-  validates_uniqueness_of :url, scope: :account_id
+  validates_uniqueness_of :url, scope: :account
 
   def events
     RiCal.parse(open(url)).first.events.select { |e| e.dtstart > Time.now }.sort_by { |e| e.dtstart }
