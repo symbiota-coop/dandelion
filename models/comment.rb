@@ -101,7 +101,7 @@ class Comment
       commentable.gathering
     elsif %w[Account Gathering Activity LocalGroup Organisation Place].include?(commentable_type)
       commentable
-    elsif %w[Habit].include?(commentable_type)
+    elsif %w[Habit PredictionFav].include?(commentable_type)
       commentable.account
     end
   end
