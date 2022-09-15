@@ -1,64 +1,63 @@
 <% if current_account %>
-<div class="row justify-content-center mt-4">
-  <div class="col col-sm-6">
-    <% form_tag '', id: 'prompt-form' do %>
-      <div class="input-group mb-3">
-        <%= text_field_tag :prompt, class: 'form-control form-control-lg', placeholder: 'What do you imagine?', required: true %>
-        <div class="input-group-append">
-          <button class="btn btn-primary" type="submit"><i class="fa fa-search"></i></button>
+  <div class="row justify-content-center mt-4">
+    <div class="col col-sm-6">
+      <% form_tag '', id: 'prompt-form' do %>
+        <div class="input-group mb-3">
+          <%= text_field_tag :prompt, class: 'form-control form-control-lg', placeholder: 'What do you imagine?', required: true %>
+          <div class="input-group-append">
+            <button class="btn btn-primary" type="submit"><i class="fa fa-search"></i></button>
+          </div>
         </div>
-      </div>
-    <% end %>
+      <% end %>
+    </div>
   </div>
-</div>
-<script>
-  $(function() {
-    var interval;
-    $('#prompt-form').submit(function() {
-      $('#result').html('<div style="display: none" id="blob">7</div>')
-      countdown = setInterval(function() {
-        if ($('#blob').text() > 0)
-          $('#blob').text($('#blob').text() - 1)
-      }, 2000);
-      $('#blob').fadeIn('slow')
-      $.post('/imagine', {prompt: $('input[name=prompt]').val()}, function(id) {
+  <script>
+    $(function() {
+      var interval;
+      $('#prompt-form').submit(function() {
+        $('#result').html('<div style="display: none" id="blob">7</div>')
+        countdown = setInterval(function() {
+          if ($('#blob').text() > 0)
+            $('#blob').text($('#blob').text() - 1)
+        }, 2000);
+        $('#blob').fadeIn('slow')
+        $.post('/imagine', {prompt: $('input[name=prompt]').val()}, function(id) {
 
-        interval = setInterval(function() {
-          $.get('/imagine/'+id, function(urls) {
-            if (urls) {
-              clearInterval(countdown)
-              $('#result').html('<p class="text-center">Click any you find inspiring to save</p><div class="row no-gutters"></div>')
-              $.each(urls, function(i,url) {
-                $('#result .row').append('<div class="col-12 col-sm-6"><div class="mr-3 mb-3"><a data-index="'+i+'" href="javascript:;"><img src="'+url+'"></a></div></div>')
-              })
-              $('#result a').click(function() {
-                var a = this;
-                $.post('/imagine/'+id+'/' + $(a).attr('data-index'), function() {
-                  $('img', a).attr('title','Saved!').tooltip().tooltip('show')
-                  setTimeout(function() {
-                    $('img', a).tooltip('hide').on('hidden.bs.tooltip', function () {
-                      $(this).tooltip('dispose')
-                    })
-                  }, 1000)
+          interval = setInterval(function() {
+            $.get('/imagine/'+id, function(urls) {
+              if (urls) {
+                clearInterval(countdown)
+                $('#result').html('<p class="text-center">Click any you find inspiring to save</p><div class="row no-gutters"></div>')
+                $.each(urls, function(i,url) {
+                  $('#result .row').append('<div class="col-12 col-sm-6"><div class="text-center mr-3 mb-3"><a data-index="'+i+'" href="javascript:;"><img src="'+url+'"></a></div></div>')
                 })
-              })
+                $('#result a').click(function() {
+                  var a = this;
+                  $.post('/imagine/'+id+'/' + $(a).attr('data-index'), function() {
+                    $('img', a).attr('title','Saved!').tooltip().tooltip('show')
+                    setTimeout(function() {
+                      $('img', a).tooltip('hide').on('hidden.bs.tooltip', function () {
+                        $(this).tooltip('dispose')
+                      })
+                    }, 1000)
+                  })
+                })
+                clearInterval(interval)
+              }
+            }).fail(function(jqXHR) {
+              $('#result').html('<p class="text-center">'+jqXHR.responseText+'</p>')
               clearInterval(interval)
-            }
-          }).fail(function(jqXHR) {
-            $('#result').html('<p class="text-center">'+jqXHR.responseText+'</p>')
-            clearInterval(interval)
-          })
-        }, 1000)
+            })
+          }, 1000)
 
-      }).fail(function(jqXHR) {
-        $('#result').html('<p class="text-center">'+jqXHR.responseText+'</p>')
+        }).fail(function(jqXHR) {
+          $('#result').html('<p class="text-center">'+jqXHR.responseText+'</p>')
+        })
+        return false
       })
-      return false
     })
-  })
-</script>
+  </script>
 <% end %>
-
 <style>
   #favs img { max-width: 100% }
   #result img { max-width: 100% }
@@ -98,53 +97,49 @@
 <div>
   <div class="row justify-content-center">
     <div class="col" id="result">
-
-<% if current_account %>
-<div class="text-center">
-      <span style="font-size: 90%">Powered by <a target="_blank" href="https://stability.ai/blog/stable-diffusion-public-release">Stable Diffusion</a> via <a target="_blank" href="https://replicate.com/">Replicate</a></span>
-    </div>
-<% else %>
-  <p class="text-center lead mb-0"><a href="/accounts/new">Sign up</a> or <a href="/accounts/sign_in">sign in</a> to start imagining with us</p>
-  <% end %>
-
+      <% if current_account %>
+        <div class="text-center">
+          <span style="font-size: 90%">Powered by <a target="_blank" href="https://stability.ai/blog/stable-diffusion-public-release">Stable Diffusion</a> via <a target="_blank" href="https://replicate.com/">Replicate</a></span>
+        </div>
+      <% else %>
+        <p class="text-center lead mb-0"><a href="/accounts/new">Sign up</a> or <a href="/accounts/sign_in">sign in</a> to start imagining with us</p>
+      <% end %>
       <% if @prediction %>
         <div class="mt-5">
           <% if @prediction_fav %>
-          <div class="text-center">
-            <img src="<%=@prediction.result['output'][@f]%>">
-          </div>
+            <div class="text-center">
+              <img src="<%=@prediction.result['output'][@f]%>">
+            </div>
           <% else %>
             <div class="row">
-              <% @prediction.prediction_favs.pluck(:index).each { |f| %>
-                <div class="col-12 col-sm-6"><div class="mr-3 mb-3"><a href="/imagine/<%=@prediction.id%>/<%=f%>"><img src="<%=@prediction.result['output'][f]%>"></a></div></div>
+              <% @prediction.result['output'].each_with_index { |url, i| %>
+              <div class="col-12 col-sm-6">
+                <div class="text-center mr-3 mb-3"><a href="/imagine/<%=@prediction.id%>/<%=i%>"><img src="<%=url%>"></a></div>
+              </div>
               <% } %>
             </div>
           <% end %>
-          <p class="text-center mt-1">"<%=@prediction.prompt%>" <br /> by <a href="/u/<%=@prediction.account.username%>"><%=@prediction.account.name%></a></p>
-
+          <p class="text-center mt-1">"<%=@prediction.prompt%>" <br />
+             by <a href="/u/<%=@prediction.account.username%>"><%=@prediction.account.name%></a></p>
           <% if @prediction_fav && current_account %>
-
-          <% if @prediction.account == current_account %>
-            <p class="text-center"><a class="btn btn-primary btn-sm" href="/imagine/<%=@prediction.id%>/<%=@f%>/unsave">Unsave</a></p>
-          <% end %>
-
+            <% if @prediction.account == current_account %>
+              <p class="text-center"><a class="btn btn-primary btn-sm" href="/imagine/<%=@prediction.id%>/<%=@f%>/unsave">Unsave</a></p>
+            <% end %>
             <div class="mt-5" data-pagelet-url="/commentable?commentable_type=PredictionFav&commentable_id=<%= @prediction_fav.id %>">
               <%= partial :'comments/commentable', locals: { commentable: @prediction_fav } %>
             </div>
-
           <% end %>
         </div>
       <% end %>
-
-        <div class="mt-5 row no-gutters" id="favs">
-          <% PredictionFav.order('created_at desc').shuffle.each { |prediction_fav| prediction = prediction_fav.prediction; f = prediction_fav.index %>
-              <div class="col-6 col-sm-3">
-                <div class="mr-3 mb-3">
-                  <a href="/imagine/<%=prediction.id%>/<%=prediction_fav.index%>"><img src="<%=prediction.result['output'][f]%>"></a>
-                </div>
-              </div>
-          <% } %>
+      <div class="mt-5 row no-gutters" id="favs">
+        <% PredictionFav.order('created_at desc').shuffle.each { |prediction_fav| prediction = prediction_fav.prediction; f = prediction_fav.index %>
+        <div class="col-6 col-sm-3">
+          <div class="text-center mr-3 mb-3">
+            <a href="/imagine/<%=prediction.id%>/<%=prediction_fav.index%>"><img src="<%=prediction.result['output'][f]%>"></a>
+          </div>
         </div>
+        <% } %>
+      </div>
     </div>
   </div>
 </div>
