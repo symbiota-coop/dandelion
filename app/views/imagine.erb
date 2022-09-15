@@ -45,13 +45,13 @@
               clearInterval(interval)
             }
           }).fail(function(jqXHR) {
-            $('#result').html('<p>'+jqXHR.responseText+'</p>')
+            $('#result').html('<p class="text-center">'+jqXHR.responseText+'</p>')
             clearInterval(interval)
           })
         }, 1000)
 
       }).fail(function(jqXHR) {
-        $('#result').html('<p>'+jqXHR.responseText+'</p>')
+        $('#result').html('<p class="text-center">'+jqXHR.responseText+'</p>')
       })
       return false
     })
