@@ -76,7 +76,7 @@ class Comment
 
   def self.admin?(comment, account)
     comment && account && (
-      if %w[DocPage].include?(comment.commentable_type)
+      if %w[DocPage PredictionFav].include?(comment.commentable_type)
         account.admin?
       elsif %w[Organisation].include?(comment.commentable_type)
         Organisation.admin?(comment.commentable, account)
@@ -158,7 +158,10 @@ class Comment
 
   def email_subject
     s = ''
-    if commentable.is_a?(DocPage)
+    if commentable.is_a?(PredictionFav)
+      prediction_fav = commentable
+      s << '[Imagine] '
+    elsif commentable.is_a?(DocPage)
       doc_page = commentable
       s << "[#{doc_page.name}] "
     elsif commentable.is_a?(Event)

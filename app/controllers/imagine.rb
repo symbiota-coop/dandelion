@@ -25,7 +25,7 @@ Dandelion::App.controller do
       end
     else
       @prediction = Prediction.find(params[:id])
-      @f = @prediction.favs.first if @prediction.favs.count == 1
+      @f = @prediction.prediction_favs.first.index if @prediction.prediction_favs.count == 1
       erb :imagine
     end
   end
@@ -33,23 +33,21 @@ Dandelion::App.controller do
   post '/imagine/:id/:f' do
     sign_in_required!
     @prediction = current_account.predictions.find(params[:id])
-    @prediction.favs ||= []
-    @prediction.favs << params[:f].to_i unless @prediction.favs.include?(params[:f].to_i)
-    @prediction.save
+    @prediction.prediction_favs.create(index: params[:f])
     200
   end
 
   get '/imagine/:id/:f' do
     @prediction = Prediction.find(params[:id])
-    @f = params[:f].to_i
+    @prediction_fav = @prediction.prediction_favs.find_by(index: params[:f])
+    @f = @prediction_fav.index
     erb :imagine
   end
 
   get '/imagine/:id/:f/unsave' do
     sign_in_required!
     @prediction = current_account.predictions.find(params[:id])
-    @prediction.favs = @prediction.favs - [params[:f].to_i]
-    @prediction.save
+    @prediction.prediction_favs.find_by(index: params[:f]).destroy
     redirect '/imagine'
   end
 end

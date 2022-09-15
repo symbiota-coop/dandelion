@@ -97,41 +97,51 @@
 </style>
 <div>
   <div class="row justify-content-center">
-    <div class="col text-center" id="result">
+    <div class="col" id="result">
 
 <% if current_account %>
+<div class="text-center">
       <span style="font-size: 90%">Powered by <a target="_blank" href="https://stability.ai/blog/stable-diffusion-public-release">Stable Diffusion</a> via <a target="_blank" href="https://replicate.com/">Replicate</a></span>
+    </div>
 <% else %>
   <p class="lead mb-0"><a href="/accounts/new">Sign up</a> or <a href="/accounts/sign_in">sign in</a> to start imagining with us</p>
   <% end %>
 
       <% if @prediction %>
         <div class="mt-5">
-          <% if @f %>
+          <% if @prediction_fav %>
+          <div class="text-center">
             <img src="<%=@prediction.result['output'][@f]%>">
+          </div>
           <% else %>
             <div class="row">
-              <% @prediction.favs.each { |f| %>
+              <% @prediction.prediction_favs.pluck(:index).each { |f| %>
                 <div class="col-12 col-sm-6"><div class="mr-3 mb-3"><a href="/imagine/<%=@prediction.id%>/<%=f%>"><img src="<%=@prediction.result['output'][f]%>"></a></div></div>
               <% } %>
             </div>
           <% end %>
-          <p class="mt-1">"<%=@prediction.prompt%>" <br /> by <a href="/u/<%=@prediction.account.username%>"><%=@prediction.account.name%></a></p>
-          <% if @f && current_account && @prediction.account == current_account %>
-            <p><a class="btn btn-primary btn-sm" href="/imagine/<%=@prediction.id%>/<%=@f%>/unsave">Unsave</a></p>
+          <p class="text-center mt-1">"<%=@prediction.prompt%>" <br /> by <a href="/u/<%=@prediction.account.username%>"><%=@prediction.account.name%></a></p>
+          
+          <% if @prediction_fav && current_account %>
+
+            <div class="mt-5" data-pagelet-url="/commentable?commentable_type=PredictionFav&commentable_id=<%= @prediction_fav.id %>">
+              <%= partial :'comments/commentable', locals: { commentable: @prediction_fav } %>
+            </div>
+
+            <% if @prediction.account == current_account %>
+              <p><a class="btn btn-primary btn-sm" href="/imagine/<%=@prediction.id%>/<%=@f%>/unsave">Unsave</a></p>
+            <% end %>
           <% end %>
         </div>
       <% end %>
 
         <div class="mt-5 row no-gutters" id="favs">
-          <% Prediction.and(:favs.ne => nil).order('created_at desc').each { |prediction| %>
-            <% prediction.favs.each { |f| %>
+          <% PredictionFav.order('created_at desc').each { |prediction_fav| prediction = prediction_fav.prediction; f = prediction_fav.index %>
               <div class="col-6 col-sm-3">
                 <div class="mr-3 mb-3">
-                  <a href="/imagine/<%=prediction.id%>/<%=f%>"><img src="<%=prediction.result['output'][f]%>"></a>
+                  <a href="/imagine/<%=prediction.id%>/<%=prediction_fav.index%>"><img src="<%=prediction.result['output'][f]%>"></a>
                 </div>
               </div>
-            <% } %>
           <% } %>
         </div>
     </div>

@@ -1,29 +1,23 @@
 class Prediction
   include Mongoid::Document
   include Mongoid::Timestamps
-  extend Dragonfly::Model
 
   belongs_to :account, optional: true, index: true
+  has_many :prediction_favs, dependent: :destroy
 
   field :prompt, type: String
   field :replicate_id, type: String
   field :result, type: Hash
-  field :favs, type: Array
 
   def self.admin_fields
     {
       prompt: :text,
       replicate_id: { type: :text, disabled: true },
       result: { type: :text_area, disabled: true },
-      favs: { type: :text_area, disabled: true },
+      prediction_favs: :collection,
       account_id: :lookup
     }
   end
-
-  has_many :posts, as: :commentable, dependent: :destroy
-  has_many :subscriptions, as: :commentable, dependent: :destroy
-  has_many :comments, as: :commentable, dependent: :destroy
-  has_many :comment_reactions, as: :commentable, dependent: :destroy
 
   validates_presence_of :prompt, :replicate_id
 
