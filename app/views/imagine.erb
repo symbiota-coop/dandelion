@@ -27,7 +27,7 @@
             $.get('/imagine/'+id, function(urls) {
               if (urls) {
                 clearInterval(countdown)
-                $('#result').html('<p class="text-center">Click any you find inspiring to save</p><div class="row no-gutters"></div>')
+                $('#result').html('<p class="text-center">Click images you find inspiring to save them to the public gallery</p><div class="row no-gutters"></div>')
                 $.each(urls, function(i,url) {
                   $('#result .row').append('<div class="col-12 col-sm-6"><div class="text-center mr-3 mb-3"><a data-index="'+i+'" href="javascript:;"><img src="'+url+'"></a></div></div>')
                 })
