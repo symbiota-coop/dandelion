@@ -1,8 +1,8 @@
-<div class="row justify-content-center mt-5">
+<div class="row justify-content-center mt-4">
   <div class="col col-sm-6">
     <% form_tag '', id: 'prompt-form' do %>
       <div class="input-group mb-3">
-        <%= text_field_tag :prompt, class: 'form-control form-control-lg', placeholder: 'What do you imagine?', autocomplete: 'off', required: true %>
+        <%= text_field_tag :prompt, class: 'form-control form-control-lg', placeholder: 'What do you imagine?', required: true %>
         <div class="input-group-append">
           <button class="btn btn-primary" type="submit"><i class="fa fa-search"></i></button>
         </div>
@@ -14,14 +14,33 @@
   $(function() {
     var interval;
     $('#prompt-form').submit(function() {
-      $('#result').html('<div style="display: none" id="blob"></div>')
+      $('#result').html('<div style="display: none" id="blob">7</div>')
+      countdown = setInterval(function() {
+        if ($('#blob').text() > 0)
+          $('#blob').text($('#blob').text() - 1)
+      }, 2000);
       $('#blob').fadeIn('slow')
       $.post('/imagine', {prompt: $('input[name=prompt]').val()}, function(id) {
 
         interval = setInterval(function() {
-          $.get('/imagine/'+id, function(url) {
-            if (url) {
-              $('#result').html('<img src="'+url+'">')
+          $.get('/imagine/'+id, function(urls) {
+            if (urls) {
+              clearInterval(countdown)
+              $('#result').html('<p>Click any you find inspiring to save</p><div class="row no-gutters"></div>')
+              $.each(urls, function(i,url) {
+                $('#result .row').append('<div class="col-12 col-sm-6"><div class="mr-3 mb-3"><a data-index="'+i+'" href="javascript:;"><img src="'+url+'"></a></div></div>')
+              })
+              $('#result a').click(function() {
+                var a = this;
+                $.post('/imagine/'+id+'/' + $(a).attr('data-index'), function() {
+                  $('img', a).attr('title','Saved!').tooltip().tooltip('show')
+                  setTimeout(function() {
+                    $('img', a).tooltip('hide').on('hidden.bs.tooltip', function () {
+                      $(this).tooltip('dispose')
+                    })
+                  }, 1000)
+                })
+              })
               clearInterval(interval)
             }
           }).fail(function(jqXHR) {
@@ -30,16 +49,24 @@
           })
         }, 1000)
 
+      }).fail(function(jqXHR) {
+        $('#result').html('<p>'+jqXHR.responseText+'</p>')
       })
       return false
     })
   })
 </script>
 <style>
+  #favs img { max-width: 100% }
+  #result img { max-width: 100% }
   #blob {
+    font-size: 25px;
+    color: white;
+    text-align: center;
     margin: auto;
   	background: rgb(0, 185, 99);
   	border-radius: 50%;
+    padding-top: 7px;
   	height: 50px;
   	width: 50px;
 
@@ -54,9 +81,9 @@
   		box-shadow: 0 0 0 0 rgb(0, 185, 99, 0.7);
   	}
 
-  	70% {
+  	50% {
   		transform: scale(1);
-  		box-shadow: 0 0 0 20px rgb(0, 185, 99, 0);
+  		box-shadow: 0 0 0 15px rgb(0, 185, 99, 0);
   	}
 
   	100% {
@@ -65,10 +92,33 @@
   	}
   }
 </style>
-<div class="mt-5">
+<div>
   <div class="row justify-content-center">
-    <div class="col-auto" id="result">
+    <div class="col text-center" id="result">
+
       <span style="font-size: 90%">Powered by <a target="_blank" href="https://stability.ai/blog/stable-diffusion-public-release">Stable Diffusion</a> via <a target="_blank" href="https://replicate.com/">Replicate</a></span>
+
+      <% if @prediction %>
+        <div class="mt-5">
+          <img src="<%=@prediction.result['output'][@f]%>">
+          <p class="mt-1">"<%=@prediction.prompt%>" <br /> by <a href="/u/<%=@prediction.account.username%>"><%=@prediction.account.name%></a></p>
+          <% if @prediction.account == current_account %>
+            <p><a class="btn btn-primary btn-sm" href="/imagine/<%=@prediction.id%>/<%=@f%>/unsave">Unsave</a></p>
+          <% end %>
+        </div>
+      <% end %>
+
+        <div class="mt-5 row no-gutters" id="favs">
+          <% Prediction.and(:favs.ne => nil).order('created_at desc').each { |prediction| %>
+            <% prediction.favs.each { |f| %>
+              <div class="col-6 col-sm-3">
+                <div class="mr-3 mb-3">
+                  <a href="/imagine/<%=prediction.id%>/<%=f%>"><img src="<%=prediction.result['output'][f]%>"></a>
+                </div>
+              </div>
+            <% } %>
+          <% } %>
+        </div>
     </div>
   </div>
 </div>
