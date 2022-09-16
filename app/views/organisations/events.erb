@@ -49,13 +49,13 @@
       <% if (local_groups = @organisation.local_groups.order('name asc').and(:id.in => [params[:local_group_id]].compact + @organisation.events_for_search.future_and_current_featured.pluck(:local_group_id))).count > 0 %>
         <div class="form-group">
           <label>Local group</label>
-          <%= select_tag :local_group_id, options: [''] + local_groups.order('name asc').map { |local_group| [local_group.name, local_group.id] }, selected: params[:local_group_id], class: 'form-control' %>
+          <%= select_tag :local_group_id, options: [''] + local_groups.order('name asc').map { |local_group| [local_group.name, local_group.id] }, selected: params[:local_group_id], class: 'form-control', style: 'max-width: 12em' %>
         </div>
       <% end %>
       <% if (activities = @organisation.activities.order('name asc').and(:id.in => [params[:activity_id]].compact + @organisation.events_for_search.future_and_current_featured.pluck(:activity_id))).count > 0 %>
         <div class="form-group">
           <label>Activity</label>
-          <%= select_tag :activity_id, options: [''] + activities.map { |activity| [activity.name, activity.id] }, selected: params[:activity_id], class: 'form-control' %>
+          <%= select_tag :activity_id, options: [''] + activities.map { |activity| [activity.name, activity.id] }, selected: params[:activity_id], class: 'form-control', style: 'max-width: 12em' %>
         </div>
       <% end %>
       <%= checkbox 'Online' %>
