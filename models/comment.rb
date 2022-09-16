@@ -159,7 +159,7 @@ class Comment
   def email_subject
     s = ''
     if commentable.is_a?(PredictionFav)
-      prediction_fav = commentable
+      # prediction_fav = commentable
       s << '[Imagine] '
     elsif commentable.is_a?(DocPage)
       doc_page = commentable
