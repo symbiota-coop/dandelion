@@ -19,16 +19,17 @@
         </p>
       </div>
     <% else %>
-    <p class="lead text-center my-4"><a href="/imagine">Try Dandelion Imagine, our new AI art generator</a></p>
-      <%=
-      # partial :'accounts/pay', locals: {div_class: 'px-4 mb-5 pt-3', account: current_account }
-      %>
+      <%= partial :'accounts/pay', locals: {div_class: 'px-4 mb-5 pt-3', account: current_account } %>
     <% end %>
 
     <div id="newsfeed" data-pagelet-url="/" data-pagelet-refresh="60" class="mt-1 mb-3"></div>
   </div>
   <div class="col-sm-4">
     <div style="position: sticky; top: 3.75rem">
+
+      <div style="margin-top: -0.25em;">
+        <%= partial :performance_lab, locals: {sponsored: :bottom} %>
+      </div>
 
       <div id="upcoming-events" class="card mb-3">
         <h3 class="card-header bg-primary text-white">Your upcoming events</h3>
