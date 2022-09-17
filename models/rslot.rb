@@ -19,6 +19,10 @@ class Rslot
     }
   end
 
+  before_validation do
+    self.worth = 1 unless worth
+  end
+
   has_many :shifts, dependent: :destroy
 
   validates_presence_of :name, :o

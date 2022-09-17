@@ -34,7 +34,7 @@ class Shift
   end
 
   def worth
-    (rslot.worth || 1) * (role.worth || 1)
+    rslot.worth * role.worth
   end
 
   def description
