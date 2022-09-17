@@ -5,6 +5,12 @@
   </div>
 <% end %>
 
+<div class="mb-3">
+  <h2>Your shifts</h2>
+  <%= partial :'rotas/shift_summary', locals: {membership: @membership} %>
+</div>
+
+<h2>Sign up to shifts</h2>
 <% @gathering.rotas.each { |rota| %>
   <div class="row">
     <div class="col-sm-6">
