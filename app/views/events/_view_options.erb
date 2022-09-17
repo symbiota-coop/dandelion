@@ -1,5 +1,5 @@
 <div class="row justify-content-between">
-  <div class="col">
+  <div class="col-12 col-sm">
     <ul class="mb-3 nav nav-pills" role="tablist">
       <li class="nav-item">
         <a class="nav-link <%='active' if params[:display] != 'map' %>" href="<%= path if defined?(path) %>?<%= q = Rack::Utils.parse_nested_query(request.query_string); q.delete('search'); q.delete('display'); q.merge({search: 1, display: 'list' }).to_query %>">
@@ -15,7 +15,7 @@
   </div>
 
   <% if params[:display] != 'map' %>
-    <div class="col-auto">
+    <div class="col-12 col-sm-auto">
       <% form_tag (defined?(path) ? path : ''), method: 'get', class: 'form-inline submitOnChange' do %>
         <% params.each { |k,v| next if %w[format search order slug].include?(k) %>
           <%= hidden_field_tag k, value: v %>
@@ -23,7 +23,7 @@
         <%= hidden_field_tag :search, value: 1 %>
         <label>Sort by</label>
         <%= select_tag :order, options: { 'Event date' => 'date', 'Most recently created' => 'created_at' }, selected: params[:order], class: 'form-control' %>
-        <a class="ml-3 badge badge-primary" style="font-weight: normal" id="ical" target="_blank" data-toggle="tooltip" href="<%= defined?(path) ? path : request.path %>.ics?<%= request.query_string %>">
+        <a class="mt-2 mt-sm-0 ml-sm-3 badge badge-primary" style="font-weight: normal" id="ical" target="_blank" data-toggle="tooltip" href="<%= defined?(path) ? path : request.path %>.ics?<%= request.query_string %>">
           iCal <i class="fa fa-external-link"></i>
         </a>
       <% end %>
