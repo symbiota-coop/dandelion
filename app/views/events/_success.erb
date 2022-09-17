@@ -64,7 +64,7 @@
       <%= partial :'accounts/pay', locals: { account: @order.account } %>
     </div>
 
-    <%= partial :performance_lab, locals: {sponsored: :top} %>
+    <%= partial :"sponsors/#{Dir['app/views/sponsors/*'].map { |f| f.split('/_').last.gsub('.erb','') }.sample}", locals: {sponsored: :top} %>
 
   <% end %>
 </div>

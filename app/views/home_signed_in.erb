@@ -28,7 +28,7 @@
     <div style="position: sticky; top: 3.75rem">
 
       <div style="margin-top: -0.25em;">
-        <%= partial :performance_lab, locals: {sponsored: :bottom} %>
+        <%= partial :"sponsors/#{Dir['app/views/sponsors/*'].map { |f| f.split('/_').last.gsub('.erb','') }.sample}", locals: {sponsored: :bottom} %>
       </div>
 
       <div id="upcoming-events" class="card mb-3">
