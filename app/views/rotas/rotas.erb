@@ -5,7 +5,6 @@
   </div>
 <% end %>
 
-<% if @membership && @membership.shifts.count > 0 %>
 <div class="mb-3">
   <h2>
     Your shifts
@@ -15,11 +14,14 @@
       </span>
     <% end %>
   </h2>
-  <%= partial :'rotas/shift_summary', locals: {membership: @membership} %>
+  <% if @membership && @membership.shifts.count > 0 %>
+    <%= partial :'rotas/shift_summary', locals: {membership: @membership} %>
+  <% else %>
+    Sign up below!
+  <% end %>
 </div>
-<h2>Sign up to shifts</h2>
-<% end %>
 
+<h2>Sign up to shifts</h2>
 <% @gathering.rotas.each { |rota| %>
   <div class="row">
     <div class="col-sm-6">
