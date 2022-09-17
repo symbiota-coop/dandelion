@@ -27,11 +27,9 @@
   <div class="col-sm-4">
     <div style="position: sticky; top: 3.75rem">
 
-      <div style="margin-top: -0.25em;">
-        <%= partial :"sponsors/#{Dir['app/views/sponsors/*'].map { |f| f.split('/_').last.gsub('.erb','') }.sample}", locals: {sponsored: :bottom} %>
-      </div>
+      <%= partial :"sponsors/#{Dir['app/views/sponsors/*'].map { |f| f.split('/_').last.gsub('.erb','') }.sample}", locals: {border: true, sponsored: :bottom} %>
 
-      <div id="upcoming-events" class="card mb-3">
+      <div id="upcoming-events" class="card mb-1">
         <h3 class="card-header bg-primary text-white">Your upcoming events</h3>
         <div class="card-body">
           <% if current_account.upcoming_events.count > 0 %>
@@ -70,7 +68,7 @@
       </div>
 
       <% unless (provider_link = current_account.provider_links.find_by(provider: 'Ethereum')) %>
-        <div class="card mb-3">
+        <div class="card mb-1">
           <h3 class="card-header bg-primary text-white">Connect wallet</h3>
           <div class="card-body">
             <p>Connect your <a target="_blank" href="https://metamask.io/">wallet</a> to sign in with Ethereum</p>
@@ -80,7 +78,7 @@
       <% end %>
 
       <% if current_account.recommended_events_cache && current_account.recommended_events_cache.count > 0 %>
-        <div class="card mb-3">
+        <div class="card mb-1">
           <h3 class="card-header bg-primary text-white">Recommended for you</h3>
           <div class="card-body">
             <%= cp(:'events/recommended', key: "/events/recommended?account_id=#{current_account.id}", expires: 1.day.from_now) %>
@@ -89,7 +87,7 @@
         </div>
       <% end %>
 
-      <div class="card mb-3">
+      <div class="card mb-1">
         <h3 class="card-header bg-primary text-white">Trending</h3>
         <div class="card-body">
           <%= cp(:'events/trending', key: '/events/trending', expires: 1.day.from_now) %>
