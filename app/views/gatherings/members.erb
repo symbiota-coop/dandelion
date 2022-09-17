@@ -109,6 +109,9 @@
       <% if @gathering.democratic_threshold %>
         <th>Suggested magic number</th>
       <% end %>
+      <% if @gathering.events.count > 0 %>
+        <th>Tickets</th>
+      <% end %>
       <% if @gathering.enable_contributions %>
         <th>Choices</th>
         <th>Requested contribution</th>

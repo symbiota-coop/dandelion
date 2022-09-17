@@ -11,6 +11,7 @@ class Event
   belongs_to :coordinator, class_name: 'Account', inverse_of: :events_coordinating, index: true, optional: true
   belongs_to :revenue_sharer, class_name: 'Account', inverse_of: :events_revenue_sharing, index: true, optional: true
   belongs_to :last_saved_by, class_name: 'Account', inverse_of: :events_last_saver, index: true
+  belongs_to :gathering, optional: true, index: true
 
   field :name, type: String
   field :slug, type: String
@@ -730,7 +731,8 @@ class Event
       no_discounts: 'No discounts for monthly donors',
       notes: 'Private notes',
       ask_hear_about: 'Ask people how they heard about the event',
-      capacity: 'Total capacity'
+      capacity: 'Total capacity',
+      gathering_id: 'Add people that buy tickets to this gathering'
     }[attr.to_sym] || super
   end
 

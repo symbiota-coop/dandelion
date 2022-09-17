@@ -287,6 +287,9 @@
         <%= f.text_block :select_tickets_intro %>
         <%= f.text_block :select_tickets_outro %>
         <%= f.text_block :carousel_text %>
+        <% if current_account.memberships.and(admin: true).count > 0 %>
+          <%= f.select_block :gathering_id, options: [''] + current_account.memberships.and(admin: true).map { |m| [m.gathering.name, m.gathering_id] }.sort_by { |a,b| a } %>
+        <% end %>
         <%= f.check_box_block :featured %>
         <%= f.check_box_block :secret %>
         <%= f.check_box_block :draft %>
