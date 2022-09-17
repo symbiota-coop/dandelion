@@ -41,7 +41,7 @@ Dandelion::App.helpers do
   end
 
   def organisation_admins_only!
-    kick! unless organisation_admin?
+    kick!(r: "/o/#{@organisation.slug}") unless organisation_admin?
   end
 
   def activity_admin?(activity = nil, account = current_account)
@@ -50,7 +50,7 @@ Dandelion::App.helpers do
   end
 
   def activity_admins_only!
-    kick! unless activity_admin?
+    kick!(r: "/activities/#{@activity.id}") unless activity_admin?
   end
 
   def local_group_admin?(local_group = nil, account = current_account)
@@ -59,7 +59,7 @@ Dandelion::App.helpers do
   end
 
   def local_group_admins_only!
-    kick! unless local_group_admin?
+    kick!(r: "/local_groups/#{@local_group.id}") unless local_group_admin?
   end
 
   def organisation_assistant?(organisation = nil, account = current_account)
@@ -95,7 +95,7 @@ Dandelion::App.helpers do
   end
 
   def event_admins_only!
-    kick! unless event_admin?
+    kick!(r: "/events/#{@event.id}") unless event_admin?
   end
 
   def event_email_viewer?(event = nil, account = current_account)
@@ -149,7 +149,7 @@ Dandelion::App.helpers do
   end
 
   def gathering_admins_only!
-    kick! unless gathering_admin?
+    kick!(r: "/g/#{@gathering.slug}") unless gathering_admin?
   end
 
   def comment_admin?(comment = nil, account = current_account)
