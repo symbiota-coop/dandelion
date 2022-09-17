@@ -204,6 +204,7 @@
           <%= f.url_block :become_a_member_url %>
           <%= f.check_box_block :collect_location %>
           <%= f.check_box_block :auto_comment_sending %>
+          <%= f.check_box_block :restrict_cohosting %>
         </div>
         <% if Padrino.env == :development || @organisation.verified? %>
           <div role="tabpanel" class="tab-pane <%= 'active' if params[:tab].to_i == 7%>" id="tab7">

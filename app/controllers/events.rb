@@ -655,7 +655,8 @@ Dandelion::App.controller do
 
   post '/events/:id/cohostships/new' do
     @event = Event.find(params[:id]) || not_found
-    event_admins_only!
+    @organisation = Organisation.find(params[:cohostship][:organisation_id]) || not_found
+    @organisation.restrict_cohosting? ? organisation_admins_only! : event_admins_only!
     @event.cohostships.create(organisation_id: params[:cohostship][:organisation_id])
     redirect back
   end

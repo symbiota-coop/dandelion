@@ -75,6 +75,7 @@ class Organisation
   field :event_image_required_height, type: Integer
   field :event_image_required_width, type: Integer
   field :allow_quick, type: Boolean
+  field :restrict_cohosting, type: Boolean
 
   field :tokens, type: Float
   index({ tokens: 1 })
@@ -168,7 +169,8 @@ class Organisation
       event_image_required_width: 'Required width for event images in px',
       event_image_required_height: 'Required height for event images in px',
       evm_address: 'Ethereum-compatible wallet address for receiving tokens via Gnosis Chain and Celo',
-      seeds_username: 'SEEDS/Telos username for receiving SEEDS via Telos'
+      seeds_username: 'SEEDS/Telos username for receiving SEEDS via Telos',
+      restrict_cohosting: 'When checked, only admins can add the organisation as a co-host of events'
     }
   end
 
@@ -512,7 +514,8 @@ class Organisation
       donation_text: 'Text below donation field',
       show_ticketholder_link_in_ticket_emails: 'Show link for people to provide details of ticketholders in ticket emails',
       event_image_required_width: 'Event image width',
-      event_image_required_height: 'Event image height'
+      event_image_required_height: 'Event image height',
+      restrict_cohosting: 'Restrict cohosting to admins'
     }[attr.to_sym] || super
   end
 
