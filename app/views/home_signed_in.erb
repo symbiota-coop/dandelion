@@ -65,13 +65,6 @@
           <% end %>
         </div>
       </div>
-      <% unless (provider_link = current_account.provider_links.find_by(provider: 'Ethereum')) %>
-        <h3 class="card-header bg-primary text-white">Connect wallet</h3>
-        <div class="card-body">
-          <p>Connect your <a target="_blank" href="https://metamask.io/">wallet</a> to sign in with Ethereum</p>
-          <a class="btn btn-primary" href="/auth/ethereum">Connect <i class="fab fa-ethereum"></i></a>
-        </div>
-      <% end %>
       <% if current_account.recommended_events_cache && current_account.recommended_events_cache.count > 0 %>
         <h3 class="card-header bg-primary text-white">Recommended for you</h3>
         <div class="card-body">
@@ -83,6 +76,13 @@
       <div class="card-body">
         <%= cp(:'events/trending', key: '/events/trending', expires: 1.day.from_now) %>
       </div>
+      <% unless (provider_link = current_account.provider_links.find_by(provider: 'Ethereum')) %>
+        <h3 class="card-header bg-primary text-white">Connect wallet</h3>
+        <div class="card-body">
+          <p>Connect your <a target="_blank" href="https://metamask.io/">wallet</a> to sign in with Ethereum</p>
+          <a class="btn btn-primary" href="/auth/ethereum">Connect <i class="fab fa-ethereum"></i></a>
+        </div>
+      <% end %>      
     </div>
   </div>
 </div>
