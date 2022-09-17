@@ -7,7 +7,14 @@
 
 <% if @membership && @membership.shifts.count > 0 %>
 <div class="mb-3">
-  <h2>Your shifts</h2>
+  <h2>
+    Your shifts
+    <% if @gathering.enable_shift_worth %>
+      <span class="badge <% if @membership.shift_points >= (@membership.shift_points_required || 0) %>badge-primary<% else %>badge-danger<% end %>" data-toggle="tooltip" title="<%= sprintf('%g', @membership.shift_points) %>/<%= pluralize(@membership.shift_points_required ? sprintf('%g', @membership.shift_points_required) : '?', 'shift point') %>">
+        <%= sprintf('%g', @membership.shift_points) %>/<%= @membership.shift_points_required ? sprintf('%g', @membership.shift_points_required) : '?' %>
+      </span>
+    <% end %>
+  </h2>
   <%= partial :'rotas/shift_summary', locals: {membership: @membership} %>
 </div>
 <h2>Sign up to shifts</h2>
