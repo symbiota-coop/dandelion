@@ -10,7 +10,7 @@
     </div>
     <div class="form-group">
       <label>View as</label>
-      <%= select_tag :view, class: 'form-control', options: %w[details pictures dietary_requirements map emails list].map { |view| [view.to_s.humanize.capitalize, view] }, selected: params[:view] %>
+      <%= select_tag :view, class: 'form-control', options: %w[details pictures dietary_requirements map list].map { |view| [view.to_s.humanize.capitalize, view] }, selected: params[:view] %>
     </div>
     <% if @membership.admin? %>
       <a class="mb-1 btn btn-outline-primary" href="<%= request.path %>.csv?<%= request.query_string %>">Download results as CSV</a>
@@ -43,6 +43,11 @@
   <%= partial :'gatherings/invite' %>
 </div>
 
+<% if @membership.admin? %>
+  <pre style="margin-top: 15px;">
+    <%== Account.and(:id.in => @memberships.pluck(:account_id)).map { |account| "#{Sanitize.fragment(account.name)} &lt;#{Sanitize.fragment(account.email)}&gt;" }.join(', ') %>
+  </pre>
+<% end %>
 
 <% case (params[:view] || 'details'); when 'pictures' %>
 <div style="margin-top: 15px" class="row">
@@ -50,10 +55,6 @@
   <%= partial :'accounts/picture', locals: { account: account } %>
   <% } %>
 </div>
-<% when 'emails' %>
-<pre style="margin-top: 15px;">
-  <%== Account.and(:id.in => @memberships.pluck(:account_id)).map { |account| "#{Sanitize.fragment(account.name)} &lt;#{Sanitize.fragment(account.email)}&gt;" }.join(', ') %>
-</pre>
 <% when 'dietary_requirements' %>
 <table class="table table-striped">
   <thead>
