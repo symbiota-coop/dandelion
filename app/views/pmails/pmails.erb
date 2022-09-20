@@ -7,7 +7,7 @@
 <% elsif @event %>
   <%= partial :'events/nav', locals: { event: @event } %>
 <% end %>
-<% if Padrino.env == :test || @_organisation.mailgun_api_key %>
+<% if Padrino.env == :test || @event || @_organisation.mailgun_api_key %>
   <a href="/pmails/new?<%= @scope %>" class="btn btn-primary"><i class="fa fa-pencil"></i> New message</a>
 <% else %>
   <a href="/o/<%=@_organisation.slug%>/edit">Link a Mailgun account to get started</a>
