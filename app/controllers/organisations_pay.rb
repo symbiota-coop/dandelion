@@ -1,4 +1,9 @@
 Dandelion::App.controller do
+  get '/o/:slug/contribute' do
+    @organisation = Organisation.find_by(slug: params[:slug]) || not_found
+    erb :'organisations/contribute'
+  end
+
   post '/organisations/stripe_webhook' do
     payload = request.body.read
     event = nil
