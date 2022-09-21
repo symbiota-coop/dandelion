@@ -12,9 +12,9 @@ Dandelion::App.controller do
                  Account.new(account_hash.merge(skip_confirmation_email: true))
                end
     if @account.persisted?
-      @account.update_attributes!(Hash[account_hash.map do |k, v|
-                                         [k, v] if v
-                                       end.compact])
+      @account.update_attributes!(account_hash.map do |k, v|
+                                    [k, v] if v
+                                  end.compact.to_h)
     else
       begin
         @account.save!
@@ -36,7 +36,7 @@ Dandelion::App.controller do
         affiliate_type: ticketForm[:affiliate_type],
         affiliate_id: ticketForm[:affiliate_id],
         discount_code_id: ticketForm[:discount_code_id],
-        opt_in_organisation: (detailsForm[:account][:opt_in_organisation] == '1' || detailsForm[:account][:opt_in_organisation].is_a?(Array) && detailsForm[:account][:opt_in_organisation].include?('1')),
+        opt_in_organisation: (detailsForm[:account][:opt_in_organisation] == '1' || (detailsForm[:account][:opt_in_organisation].is_a?(Array) && detailsForm[:account][:opt_in_organisation].include?('1'))),
         opt_in_facilitator: (detailsForm[:account][:opt_in_facilitator].is_a?(Array) && detailsForm[:account][:opt_in_facilitator].include?('1')),
         hear_about: detailsForm[:account][:hear_about],
         http_referrer: detailsForm[:account][:http_referrer],

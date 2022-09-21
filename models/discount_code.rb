@@ -37,9 +37,6 @@ class DiscountCode
     %w[Organisation Activity LocalGroup Event]
   end
 
-  before_validation do
-  end
-
   def applies_to?(event)
     event.all_discount_codes.include?(self)
   end

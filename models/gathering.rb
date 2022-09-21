@@ -91,9 +91,9 @@ class Gathering
       rotas: :collection,
       teams: :collection
     }
-    h.merge(Hash[enablable.map do |x|
-                   ["enable_#{x}".to_sym, :check_box]
-                 end])
+    h.merge(enablable.map do |x|
+              ["enable_#{x}".to_sym, :check_box]
+            end.to_h)
   end
 
   dragonfly_accessor :image

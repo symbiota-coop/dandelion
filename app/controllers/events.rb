@@ -134,7 +134,7 @@ Dandelion::App.controller do
                end
 
     successful_update_or_save = if @account.persisted?
-                                  @account.update_attributes(mass_assigning(Hash[account_hash.map { |k, v| [k, v] if v }.compact], Account))
+                                  @account.update_attributes(mass_assigning(account_hash.map { |k, v| [k, v] if v }.compact.to_h, Account))
                                 else
                                   @account.save
                                 end
@@ -379,7 +379,7 @@ Dandelion::App.controller do
                  Account.new(account_hash)
                end
     if if @account.persisted?
-         @account.update_attributes(mass_assigning(Hash[account_hash.map { |k, v| [k, v] if v }.compact], Account))
+         @account.update_attributes(mass_assigning(account_hash.map { |k, v| [k, v] if v }.compact.to_h, Account))
        else
          @account.save
        end
@@ -469,7 +469,7 @@ Dandelion::App.controller do
                end
 
     successful_update_or_save = if @account.persisted?
-                                  @account.update_attributes(mass_assigning(Hash[account_hash.map { |k, v| [k, v] if v }.compact], Account))
+                                  @account.update_attributes(mass_assigning(account_hash.map { |k, v| [k, v] if v }.compact.to_h, Account))
                                 else
                                   @account.save
                                 end

@@ -128,7 +128,12 @@ Dandelion::App.controller do
     @membership = @gathering.memberships.find_by(account: current_account)
     halt unless (@teamship.account.id == current_account.id) || @membership.admin?
     @teamship.update_attribute(:unsubscribed, nil)
-    request.xhr? ? 200 : (flash[:notice] = "You'll now receive email notifications of new posts in #{@team.name}"; redirect('/accounts/subscriptions'))
+    if request.xhr?
+      200
+    else
+      (flash[:notice] = "You'll now receive email notifications of new posts in #{@team.name}"
+       redirect('/accounts/subscriptions'))
+    end
   end
 
   get '/teamships/:id/unsubscribe' do
@@ -139,6 +144,11 @@ Dandelion::App.controller do
     halt unless (@teamship.account.id == current_account.id) || @membership.admin?
     @teamship.update_attribute(:unsubscribed, true)
     @team.subscriptions.and(account: current_account).destroy_all
-    request.xhr? ? 200 : (flash[:notice] = "OK! You won't receive emails about #{@team.name}"; redirect('/accounts/subscriptions'))
+    if request.xhr?
+      200
+    else
+      (flash[:notice] = "OK! You won't receive emails about #{@team.name}"
+       redirect('/accounts/subscriptions'))
+    end
   end
 end

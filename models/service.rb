@@ -33,7 +33,7 @@ class Service
       organisation_revenue_share: :number,
       organisation_id: :lookup,
       account_id: :lookup
-    }.merge(Hash[Date::DAYNAMES.map { |dayname| [:"available_#{dayname.downcase}", :check_box] }])
+    }.merge(Date::DAYNAMES.map { |dayname| [:"available_#{dayname.downcase}", :check_box] }.to_h)
   end
 
   def self.currencies
@@ -110,6 +110,6 @@ class Service
   def self.human_attribute_name(attr, options = {})
     {
       refund_deleted_orders: 'Attempt to refund deleted bookings on Stripe'
-    }.merge(Hash[Date::DAYNAMES.map { |dayname| [:"available_#{dayname.downcase}", dayname] }])[attr.to_sym] || super
+    }.merge(Date::DAYNAMES.map { |dayname| [:"available_#{dayname.downcase}", dayname] }.to_h)[attr.to_sym] || super
   end
 end

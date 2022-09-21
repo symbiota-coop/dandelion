@@ -1,5 +1,7 @@
 AllCops:
   NewCops: enable
+  Exclude:
+    - "**/*.erb"  
 Layout/EndAlignment:
   AutoCorrect: true
 Style/SymbolArray:
@@ -22,4 +24,6 @@ Lint/ShadowingOuterLocalVariable:
 Lint/Debugger:
   Enabled: false
 Lint/UriEscapeUnescape:
+  Enabled: false
+Lint/DuplicateBranch:
   Enabled: false

@@ -181,12 +181,12 @@ class Account
   before_validation do
     unless username
       u = Bazaar.super_object.parameterize.underscore
-      if !Account.find_by(username: u)
-        self.username = u
-      else
+      if Account.find_by(username: u)
         n = 1
         n += 1 while Account.find_by(username: "#{u}_#{n}")
         self.username = "#{u}_#{n}"
+      else
+        self.username = u
       end
     end
 
@@ -763,10 +763,10 @@ Two Spirit).split("\n")
       event.attendees.pluck(:id).each do |attendee_id|
         next if attendee_id == id
 
-        if !people[attendee_id.to_s]
-          people[attendee_id.to_s] = [event.id.to_s]
-        else
+        if people[attendee_id.to_s]
           people[attendee_id.to_s] << event.id.to_s
+        else
+          people[attendee_id.to_s] = [event.id.to_s]
         end
       end
     end

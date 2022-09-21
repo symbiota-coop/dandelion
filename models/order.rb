@@ -305,11 +305,11 @@ class Order
   end
 
   def total
-    (discounted_ticket_revenue + donation_revenue).cents.to_f / 100 - (credit_applied || 0)
+    ((discounted_ticket_revenue + donation_revenue).cents.to_f / 100) - (credit_applied || 0)
   end
 
   def calculate_application_fee_amount
-    ((discounted_ticket_revenue.cents * organisation_revenue_share) + donation_revenue.cents).to_f / 100 - (credit_payable_to_organisation || 0)
+    (((discounted_ticket_revenue.cents * organisation_revenue_share) + donation_revenue.cents).to_f / 100) - (credit_payable_to_organisation || 0)
   end
 
   def credit_payable_to_organisation

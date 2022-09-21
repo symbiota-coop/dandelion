@@ -73,7 +73,7 @@ class LocalGroup
       account ||= Account.new(account_hash)
       begin
         if account.persisted?
-          account.update_attributes!(Hash[account_hash.map { |k, v| [k, v] if v }.compact])
+          account.update_attributes!(account_hash.map { |k, v| [k, v] if v }.compact.to_h)
         else
           account.save!
         end

@@ -50,9 +50,9 @@ class EventFeedback
   end
 
   def self.ratings
-    Hash[1.upto(5).map do |i|
-           [i.times.map { '<i class="fa fa-star"></i>' }.join, i]
-         end]
+    1.upto(5).map do |i|
+      [i.times.map { '<i class="fa fa-star"></i>' }.join, i]
+    end.to_h
   end
 
   after_create :send_feedback

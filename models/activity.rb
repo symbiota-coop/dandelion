@@ -142,9 +142,9 @@ class Activity
                 end
       begin
         if account.persisted?
-          account.update_attributes!(Hash[account_hash.map do |k, v|
-                                            [k, v] if v
-                                          end.compact])
+          account.update_attributes!(account_hash.map do |k, v|
+                                       [k, v] if v
+                                     end.compact.to_h)
         else
           account.save!
         end

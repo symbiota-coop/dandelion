@@ -12,7 +12,7 @@ Dandelion::App.controller do
 
     if (account = Account.find_by(email: params[:account][:email].downcase))
       @account = account
-      unless @account.update_attributes(mass_assigning(Hash[params[:account].map { |k, v| [k, v] if v }.compact], Account))
+      unless @account.update_attributes(mass_assigning(params[:account].map { |k, v| [k, v] if v }.compact.to_h, Account))
         flash.now[:error] = 'There was a problem saving the application'
         halt 400, erb(:'activity_applications/apply')
       end
