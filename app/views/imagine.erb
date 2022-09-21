@@ -122,7 +122,7 @@
           <p class="text-center mt-1">"<%=@prediction.prompt%>" <br />
              by <a href="/u/<%=@prediction.account.username%>"><%=@prediction.account.name%></a></p>
           <% if @prediction_fav && current_account %>
-            <% if @prediction.account == current_account %>
+            <% if admin? || @prediction.account == current_account %>
               <p class="text-center"><a class="btn btn-primary btn-sm" href="/imagine/<%=@prediction.id%>/<%=@f%>/unsave">Unsave</a></p>
             <% end %>
             <div class="mt-5" data-pagelet-url="/commentable?commentable_type=PredictionFav&commentable_id=<%= @prediction_fav.id %>">
