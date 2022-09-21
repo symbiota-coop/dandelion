@@ -1,7 +1,5 @@
 AllCops:
-  NewCops: enable
-  Exclude:
-    - "**/*.erb"  
+  NewCops: enable 
 Layout/EndAlignment:
   AutoCorrect: true
 Style/SymbolArray:

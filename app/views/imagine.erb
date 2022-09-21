@@ -116,11 +116,11 @@
               <div class="col-12 col-sm-6">
                 <div class="text-center mr-3 mb-3"><a href="/imagine/<%=@prediction.id%>/<%=i%>"><img src="<%=url%>"></a></div>
               </div>
-              <% } %>
+              <% } if @prediction.result['output' %>
             </div>
           <% end %>
           <p class="text-center mt-1">"<%=@prediction.prompt%>" <br />
-             by <a href="/u/<%=@prediction.account.username%>"><%=@prediction.account.name%></a></p>
+            by <a href="/u/<%=@prediction.account.username%>"><%=@prediction.account.name%></a></p>
           <% if @prediction_fav && current_account %>
             <% if admin? || @prediction.account == current_account %>
               <p class="text-center"><a class="btn btn-primary btn-sm" href="/imagine/<%=@prediction.id%>/<%=@f%>/unsave">Unsave</a></p>
