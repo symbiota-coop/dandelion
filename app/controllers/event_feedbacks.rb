@@ -39,6 +39,7 @@ Dandelion::App.controller do
     @event = @event_feedback.event
     @organisation = @event.organisation
     organisation_admins_only!
+    @event_feedback.send_destroy_notification(current_account)
     @event_feedback.destroy
     redirect back
   end
