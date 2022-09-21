@@ -1,5 +1,5 @@
 <div class="main">
-  <p><%= destroyed_by.name %> deleted feedback for the event <%= event.name %>, <%= event.when_details(nil) %>:</p>
+  <p><strong><%= destroyed_by.name %></strong> deleted feedback for the event <strong><a href="<%= ENV['BASE_URI'] %>/events/<%=event.id%>"><%= event.name %>, <%= event.when_details(nil) %></a></strong>:</p>
   <p>
     Feedback from <% if event_feedback.anonymise? %>Anonymous<% else %><a href="<%= ENV['BASE_URI'] %>/u/<%= event_feedback.account.username %>"><%= event_feedback.account.name %></a><% end %>
   </p>
