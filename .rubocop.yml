@@ -1,3 +1,5 @@
+AllCops:
+  NewCops: enable
 Layout/EndAlignment:
   AutoCorrect: true
 Style/SymbolArray:
