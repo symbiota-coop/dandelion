@@ -5,12 +5,14 @@
         <span class="label label-outline-primary"><%=ticket_group.name%></span>
       </td>
       <td>
-        <% w = ((ticket_group.tickets.count / ticket_group.capacity.to_f) * 100).round %>
         <a href="/events/<%=@event.id%>/tickets?ticket_group_id=<%=ticket_group.id%>">
           <%= ticket_group.tickets.count %>/<%= ticket_group.capacity %>
-          <div class="progress">
-            <div class="progress-bar" role="progressbar" style="width: <%= "#{w}%" %>;"></div>
-          </div>
+          <% if ticket_group.capacity > 0 %>
+            <% w = ((ticket_group.tickets.count / ticket_group.capacity.to_f) * 100).round %>
+            <div class="progress">
+              <div class="progress-bar" role="progressbar" style="width: <%= "#{w}%" %>;"></div>
+            </div>
+          <% end %>
         </a>
       </td>
     </tr>
