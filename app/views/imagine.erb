@@ -116,7 +116,7 @@
               <div class="col-12 col-sm-6">
                 <div class="text-center mr-3 mb-3"><a href="/imagine/<%=@prediction.id%>/<%=i%>"><img src="<%=url%>"></a></div>
               </div>
-              <% } if @prediction.result['output' %>
+              <% } if @prediction.result['output'] %>
             </div>
           <% end %>
           <p class="text-center mt-1">"<%=@prediction.prompt%>" <br />
