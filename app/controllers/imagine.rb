@@ -13,7 +13,7 @@ Dandelion::App.controller do
   get '/imagine/:id' do
     if request.xhr?
       sign_in_required!
-      @prediction = Prediction.find(params[:id])
+      @prediction = Prediction.find(params[:id]) || not_found
       @prediction.fetch! unless @prediction.finished?
       if @prediction.result['error']
         halt 400, @prediction.result['error']
@@ -24,7 +24,7 @@ Dandelion::App.controller do
         200
       end
     else
-      @prediction = Prediction.find(params[:id])
+      @prediction = Prediction.find(params[:id]) || not_found
       @f = @prediction.prediction_favs.first.index if @prediction.prediction_favs.count == 1
       erb :imagine
     end
@@ -32,21 +32,21 @@ Dandelion::App.controller do
 
   post '/imagine/:id/:f' do
     sign_in_required!
-    @prediction = current_account.predictions.find(params[:id])
+    @prediction = current_account.predictions.find(params[:id]) || not_found
     @prediction.prediction_favs.create(index: params[:f])
     200
   end
 
   get '/imagine/:id/:f' do
-    @prediction = Prediction.find(params[:id])
-    @prediction_fav = @prediction.prediction_favs.find_by(index: params[:f])
+    @prediction = Prediction.find(params[:id]) || not_found
+    @prediction_fav = @prediction.prediction_favs.find_by(index: params[:f]) || not_found
     @f = @prediction_fav.index
     erb :imagine
   end
 
   get '/imagine/:id/:f/unsave' do
     sign_in_required!
-    @prediction = Prediction.find(params[:id])
+    @prediction = Prediction.find(params[:id]) || not_found
     halt 400 unless @prediction.account == current_account || admin?
     @prediction.prediction_favs.find_by(index: params[:f]).destroy
     redirect '/imagine'

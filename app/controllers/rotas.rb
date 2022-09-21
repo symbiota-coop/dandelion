@@ -192,7 +192,8 @@ Dandelion::App.controller do
     @shift = Shift.find(params[:id]) || not_found
     @gathering = @shift.rota.gathering
     @membership = @gathering.memberships.find_by(account: current_account)
-    halt unless (@shift.account && (@shift.account.id == current_account.id)) || @membership.admin?
+    confirmed_membership_required!
+    halt unless (@shift.account && (@shift.account_id == current_account.id)) || @membership.admin?
     @shift.destroy
     200
   end
