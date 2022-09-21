@@ -76,7 +76,11 @@ Dandelion::App.controller do
     @event_feedback.answers = (params[:answers].map { |i, x| [@event.feedback_questions_a[i.to_i], x] } if params[:answers])
     @event_feedback.save
     flash[:notice] = 'Thanks for your feedback!'
-    redirect "/o/#{@event.organisation.slug}/events?gave_feedback=1"
+    if @event.organisation.events_for_search.future_and_current_featured.count > 0
+      redirect "/o/#{@event.organisation.slug}/events?gave_feedback=1"
+    else
+      redirect '/events'
+    end
   end
 
   get '/event_feedbacks/:id/public/:i' do
