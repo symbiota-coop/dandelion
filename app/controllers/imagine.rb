@@ -46,7 +46,8 @@ Dandelion::App.controller do
 
   get '/imagine/:id/:f/unsave' do
     sign_in_required!
-    @prediction = current_account.predictions.find(params[:id])
+    @prediction = Prediction.find(params[:id])
+    halt 400 unless @prediction.account == current_account || admin?
     @prediction.prediction_favs.find_by(index: params[:f]).destroy
     redirect '/imagine'
   end
