@@ -28,7 +28,7 @@
               <span class="input-group-text"><%= Money.new(0, organisation.currency).symbol %></span>
             </div>
             <%= hidden_field_tag :currency, value: organisation.currency %>
-            <%= number_field_tag :amount, value: balance.cents / 100, style: 'width: 5em;', required: 'required', class: 'form-control', id: 'amount' %>
+            <%= number_field_tag :amount, style: 'width: 5em;', required: 'required', class: 'form-control', id: 'amount' %>
           </div>
         </div>
         <button data-payment-method="stripe" type="submit" class="btn btn-primary mb-1 ml-0 mr-1" style="height: 2.125rem">
