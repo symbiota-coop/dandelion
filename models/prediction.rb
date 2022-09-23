@@ -16,7 +16,7 @@ class Prediction
       result: { type: :text_area, disabled: true },
       prediction_favs: :collection,
       account_id: :lookup
-    }
+    }    
   end
 
   validates_presence_of :prompt, :replicate_id
