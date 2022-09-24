@@ -40,11 +40,20 @@
 
 </div>
 
+<style>
+  #just-pay { line-height: 1 }
+  #just-pay > span { font-size: 0.6em; }
+  @media(min-width: 768px) {
+    #just-pay { line-height: 1.2 }
+    #just-pay > span { font-size: 0.75em }
+  }
+</style>
+
 <p class="lead text-center mt-3 mb-1">
   <mark>Unlike our competitors, we operate on a donation/gift economy basis.</mark><br />
 </p>
-<p class="lead text-center mb-4" style="line-height: 1.2">
-  <span style="font-size: 0.75em">
+<p class="lead text-center mb-4" id="just-pay">
+  <span>
     You just pay processing fees via
     <a target="_blank" href="https://stripe.com/gb/pricing">Stripe</a> or
     <a target="_blank" href="https://help.coinbase.com/en/commerce/getting-started/fees">Coinbase Commerce</a>
