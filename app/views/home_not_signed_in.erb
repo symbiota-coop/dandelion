@@ -5,15 +5,21 @@
 <div id="banner" style="padding-top: 2.5vw; padding-bottom: 2.5vw; background: url('/images/dandelion.jpg'); background-position: 50% 62.5%; background-size: cover">
 
   <style>
+    .strapline { font-size: 1.25rem; }
     .strapline > span { padding: 0.05rem }
-    @media(min-width: 768px) { .strapline { line-height: 130% } .strapline > span { padding: 0.25rem } }
+    @media(min-width: 768px) {
+      .strapline { font-size: 1.55rem; line-height: 130% }
+      .strapline > span { padding: 0.25rem }
+    }
   </style>
 
   <div class="row justify-content-center">
     <div class="col-12 col-sm-10 col-md-10">
-      <p class="strapline mb-0" style="font-size: 1.55rem; text-align: center;">
-        <span class="d-md-inline-block" style="background: rgba(255,255,255,0.75)">
-          Use Dandelion to find and host 
+      <p class="strapline mb-0" style="text-align: center;">
+        <span class="d-inline-block" style="background: rgba(255,255,255,0.75)">
+          Use Dandelion to find and host
+          <span class="d-sm-none"><br />
+          </span>
           <strong>regenerative events</strong> and
           <span class="d-sm-none"><br />
           </span>
@@ -34,7 +40,7 @@
   <div class="row justify-content-center">
     <div class="col-12 col-sm-10 col-md-10">
       <p class="strapline mb-0" style="font-size: 0.85rem; text-align: center;">
-        <span class="d-md-inline-block" style="background: rgba(255,255,255,0.75)">
+        <span class="d-inline-block" style="background: rgba(255,255,255,0.75)">
           Proudly made by a <a href="https://dandelion.coop/">not-for-profit worker co-operative</a>
           <span class="d-none d-sm-inline">and <a target="_blank" href="https://github.com/dandelion-collective/dandelion">open-source</a>.</span>
         </span>
@@ -58,7 +64,7 @@
 </p>
 <p class="lead text-center mb-4" id="just-pay">
   <span>
-    You just pay processing fees via
+    Hosts just pay processing fees via
     <a target="_blank" href="https://stripe.com/gb/pricing">Stripe</a> or
     <a target="_blank" href="https://help.coinbase.com/en/commerce/getting-started/fees">Coinbase Commerce</a>
     <br />
@@ -75,8 +81,10 @@
 
 <h2 class="text-center mt-4 mb-3">
   <%= cp :tickets_count %>
-  <br />
-  <%= cp :events_count %>
+  <div class="d-none d-sm-block">
+    <br />
+    <%= cp :events_count %>
+  </div>
 </h2>
 <%= partial :'events/search_form' %>
 <%= partial :'events/view_options', locals: {path: '/events'} %>
