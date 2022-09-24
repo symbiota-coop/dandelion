@@ -45,7 +45,7 @@
   <tr>
     <td>
       <% if order.account %>
-        <%= partial :'accounts/account', locals: { account: order.account, width: '50px', show_email: ((defined?(show_emails) && show_emails) || order_email_viewer?(order)) } %>
+        <%= partial :'accounts/account', locals: { account: order.account, show_email: ((defined?(show_emails) && show_emails) || order_email_viewer?(order)) } %>
       <% end %>
     </td>
     <% if defined?(event_name) %>

@@ -1,0 +1,25 @@
+<a class="d-inline-block mb-3" href="/g/<%= @gathering.slug %>/rotas/<%= @shift.rota_id %>"><i class="fa fa-arrow-left"></i> Return to rota</a>
+
+<h2 class="mb-3"><%=@shift.account.name%>'s <%=@shift.rota.name%> shift</h2>
+
+<% form_for @shift, "/shifts/#{@shift.id}/edit" do |f| %>
+
+  <div class="mb-3">
+    <%= partial :'accounts/account', locals: { account: @shift.account } %>
+  </div>
+
+  <% if @shift.errors.count > 0 %>
+    <div class="alert alert-danger">
+      <ul class="mb-0">
+        <% @shift.errors.full_messages.each { |message| %>
+        <li><%= message %></li>
+        <% } %>
+      </ul>
+    </div>
+  <% end %>
+
+  <%= f.select_block :role_id, options: @shift.role_ids %>
+  <%= f.select_block :rslot_id, options: @shift.rslot_ids %>
+  <%= f.submit_block button_text: 'Update shift', destroy_url: "/shifts/#{@shift.id}/destroy" %>
+
+<% end %>

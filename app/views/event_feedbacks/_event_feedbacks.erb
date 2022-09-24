@@ -4,7 +4,7 @@
       <th>Name</th>
       <% if defined?(organisation_name) %>
         <th>Organisation</th>
-      <% end %>      
+      <% end %>
       <% if defined?(event_name) %>
         <th>Event</th>
       <% end %>
@@ -26,7 +26,7 @@
       <% if event_feedback.anonymise? %>
         Anonymous
       <% else %>
-        <%= partial :'accounts/account', locals: { account: account, width: '50px', show_email: (v || (event_feedback.event ? event_email_viewer?(event_feedback.event) : false)) } %>
+        <%= partial :'accounts/account', locals: { account: account, show_email: (v || (event_feedback.event ? event_email_viewer?(event_feedback.event) : false)) } %>
       <% end %>
     </td>
     <% if defined?(organisation_name) %>

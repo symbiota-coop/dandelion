@@ -188,6 +188,29 @@ Dandelion::App.controller do
     200
   end
 
+  get '/shifts/:id/edit' do
+    @shift = Shift.find(params[:id]) || not_found
+    @gathering = @shift.rota.gathering
+    @membership = @gathering.memberships.find_by(account: current_account)
+    confirmed_membership_required!
+    halt unless (@shift.account && (@shift.account_id == current_account.id)) || @membership.admin?
+    erb :'rotas/shift'
+  end  
+
+  post '/shifts/:id/edit' do
+    @shift = Shift.find(params[:id]) || not_found
+    @gathering = @shift.rota.gathering
+    @membership = @gathering.memberships.find_by(account: current_account)
+    confirmed_membership_required!
+    halt unless (@shift.account && (@shift.account_id == current_account.id)) || @membership.admin?
+    if @shift.update_attributes(mass_assigning(params[:shift], Shift))
+      redirect "/g/#{@gathering.slug}/rotas/#{@shift.rota_id}"
+    else
+      flash.now[:error] = 'There was an error saving the shift'
+      erb :'rotas/shift'
+    end
+  end    
+
   get '/shifts/:id/destroy' do
     @shift = Shift.find(params[:id]) || not_found
     @gathering = @shift.rota.gathering
@@ -195,6 +218,6 @@ Dandelion::App.controller do
     confirmed_membership_required!
     halt unless (@shift.account && (@shift.account_id == current_account.id)) || @membership.admin?
     @shift.destroy
-    200
+    redirect "/g/#{@gathering.slug}/rotas/#{@shift.rota_id}"
   end
 end

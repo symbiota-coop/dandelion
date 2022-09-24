@@ -2,7 +2,7 @@
   <% account = shift.account %>
   <% if (shift.account && shift.account_id == current_account.id) || @membership.admin? %>
     <% if shift.account %>
-      <a data-confirm="<% if shift.account_id == current_account.id %>Resign from this shift?<% else %>Remove this person from this shift?<% end %>" class="pagelet-trigger" href="/shifts/<%= shift.id %>/destroy">
+      <a href="/shifts/<%= shift.id %>/edit">
         <% if params[:view] == 'names' %>
           <%= account.name %>
         <% else %>
@@ -10,7 +10,7 @@
         <% end %>
       </a>
     <% else %>
-      <a class="pagelet-trigger" href="/shifts/<%= shift.id %>/destroy">
+      <a href="/shifts/<%= shift.id %>/edit">
         n/a
       </a>
     <% end %>

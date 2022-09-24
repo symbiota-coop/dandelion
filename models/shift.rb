@@ -20,7 +20,7 @@ class Shift
     }
   end
 
-  validates_uniqueness_of :role, scope: :rslot
+  validates_uniqueness_of :rslot, scope: :role
 
   before_validation do
     self.rota = role.rota if role
@@ -44,4 +44,19 @@ class Shift
   def circle
     rota.gathering
   end
+
+  def rslot_ids
+    [''] + rota.rslots.map { |rslot| [rslot.name, rslot.id] }
+  end
+
+  def role_ids
+    [''] + rota.roles.map { |role| [role.name, role.id] }
+  end
+
+  def self.human_attribute_name(attr, options = {})
+    {
+      rslot_id: 'Slot'
+    }[attr.to_sym] || super
+  end  
+
 end

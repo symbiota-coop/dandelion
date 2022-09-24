@@ -26,7 +26,7 @@
   <% @waitships.each { |waitship| %>
   <tr>
     <td>
-      <%= partial :'accounts/account', locals: { account: waitship.account, width: '50px', show_email: v } %>
+      <%= partial :'accounts/account', locals: { account: waitship.account, show_email: v } %>
     </td>
     <td>
       <%= waitship.created_at %>

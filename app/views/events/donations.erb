@@ -30,7 +30,7 @@
   <% @donations.each { |donation| %>
   <tr>
     <td>
-      <%= partial :'accounts/account', locals: { account: donation.account, width: '50px', show_email: donation_email_viewer?(donation) } %>
+      <%= partial :'accounts/account', locals: { account: donation.account, show_email: donation_email_viewer?(donation) } %>
     </td>
     <td>
       <%= m donation.amount, donation.order.currency %>

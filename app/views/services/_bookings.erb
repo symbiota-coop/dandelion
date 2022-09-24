@@ -40,7 +40,7 @@
       </td>
     <% end %>
     <td>
-      <%= partial :'accounts/account', locals: { account: booking.account, width: '50px', show_email: (defined?(show_emails) && show_emails) } %>
+      <%= partial :'accounts/account', locals: { account: booking.account, show_email: (defined?(show_emails) && show_emails) } %>
     </td>
     <td>
       <%= when_details(booking) %>

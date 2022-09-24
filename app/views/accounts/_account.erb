@@ -1,5 +1,5 @@
 <a href="/u/<%= account.username %>">
-  <%= partial :'accounts/square', locals: { account: account, style: 'display: block; width: 100px' } %>
+  <%= partial :'accounts/square', locals: { account: account, style: "display: block; width: #{defined?(width) ? width : '100px'}" } %>
 </a>
 <strong><%= account.name %></strong>
 <% if defined?(show_email) && show_email %>
