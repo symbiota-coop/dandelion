@@ -5,8 +5,11 @@
 <% if @membership.admin? %>
   <a style="border-bottom: 1px dotted; text-decoration: none" href="/g/<%= @gathering.slug %>/rotas/<%= @rota.id %>/edit">
     Edit rota
-  </a>
+  </a> &middot;
 <% end %>
+<a style="border-bottom: 1px dotted; text-decoration: none" href="/g/<%= @gathering.slug %>/rotas/<%= @rota.id %>.csv">
+  Export as CSV
+</a>
 
 <% if @rota.description %>
   <div style="margin: 15px 0">

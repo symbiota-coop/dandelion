@@ -2,45 +2,53 @@
   #banner { padding-left: 0.9375rem; padding-right: 0.9375rem; margin-top: -0.9375rem; margin-left: -0.9375rem; margin-right: -0.9375rem; }
   @media(min-width: 768px) { #banner { padding-left: 1.5625rem; padding-right: 1.5625rem; margin-top: -1.5625rem; margin-left: -1.5625rem; margin-right: -1.5625rem; } }
 </style>
-<div id="banner" style="padding-top: 5vw; padding-bottom: 5vw; background: url('/images/dandelion.jpg'); background-position: 50% 70%; background-size: cover">
+<div id="banner" style="padding-top: 2.5vw; padding-bottom: 2.5vw; background: url('/images/dandelion.jpg'); background-position: 50% 62.5%; background-size: cover">
 
   <style>
-    @media(min-width: 768px) { #strapline { line-height: 130% } }
+    @media(min-width: 768px) { .strapline { line-height: 130% } .strapline > span { padding: 0.25rem } }
   </style>
+
   <div class="row justify-content-center">
-    <div class="col-12 col-sm-10 col-md-8">
-      <p id="strapline" style="font-size: 1.4rem; text-align: center;">
+    <div class="col-12 col-sm-10 col-md-10">
+      <p class="strapline mb-0" style="font-size: 1.55rem; text-align: center;">
         <span class="d-md-inline-block" style="background: rgba(255,255,255,0.75)">
-          Dandelion is an open-source platform for <strong>regenerative events</strong> and <strong>co-created gatherings</strong>
-          created by the
-          <mark style="padding: 0; background: rgba(253,255,170,0.5)">not-for-profit worker co-operative</mark>
-          <a href="https://dandelion.coop/">Dandelion Collective</a>.
+          Use Dandelion to find and host 
+          <strong>regenerative events</strong> and <strong>co-created gatherings</strong>
         </span>
       </p>
     </div>
   </div>
 
   <div class="row justify-content-center">
-    <div class="col-auto text-center">
-      <a class="btn btn-primary btn-lg" href="/accounts/new">Sign up</a>
-      <a class="btn btn-primary btn-lg" href="/accounts/sign_in">Sign in</a>
-      <br />
-      <a class="btn btn-primary btn-lg mt-1" href="/auth/ethereum"><i class="fab fa-ethereum"></i> Sign in with Ethereum</a>
+    <div class="col-4 col-sm-3 col-md-2">
+      <div class="m-3 p-2 rounded-circle" style="background: rgba(255,255,255,0.75);">
+        <a target="_blank" href="https://www.uk.coop/start-new-co-op/support/start-worker-co-op"><img src="/images/coop.png" class="w-100"></a>
+      </div>
+    </div>
+  </div>
+
+  <div class="row justify-content-center">
+    <div class="col-12 col-sm-10 col-md-10">
+      <p class="strapline mb-0" style="font-size: 0.85rem; text-align: center;">
+        <span class="d-md-inline-block" style="background: rgba(255,255,255,0.75)">
+          Proudly made by a <a href="https://dandelion.coop/">not-for-profit worker co-operative</a> and <a target="_blank" href="https://github.com/dandelion-collective/dandelion">open-source</a>.
+        </span>
+      </p>
     </div>
   </div>
 
 </div>
 
-<%= cp :tickets_count %>
-<p class="lead text-center mb-1">
-  <mark>We operate on a donation/gift economy basis.</mark><br />
+<p class="lead text-center mt-3 mb-1">
+  <mark>Unlike our competitors, we operate on a donation/gift economy basis.</mark><br />
 </p>
 <p class="lead text-center mb-4" style="line-height: 1.2">
   <span style="font-size: 0.75em">
     You just pay processing fees via
     <a target="_blank" href="https://stripe.com/gb/pricing">Stripe</a> or
     <a target="_blank" href="https://help.coinbase.com/en/commerce/getting-started/fees">Coinbase Commerce</a>
-    <br />(or choose fee-free crypto payments via <a href="https://celo.org/">Celo</a> and <a href="https://www.gnosischain.com/evm">Gnosis Chain</a>)
+    <br />
+    (or choose fee-free crypto payments via <a href="https://celo.org/">Celo</a> and <a href="https://www.gnosischain.com/evm">Gnosis Chain</a>)
   </span>
 </p>
 
@@ -48,11 +56,14 @@
   <a class="btn btn-primary btn-lg" href="/events/new">List an event</a>
 </p>
 <p class="text-center">
-  or <a href="/docs/events">watch our 1-minute how-to video</a>
+  <a href="/docs/events">Watch the 1-minute how-to video</a>
 </p>
 
-
-<%= cp :events_count %>
+<h2 class="text-center mt-4 mb-3">
+  <%= cp :tickets_count %>
+  <br />
+  <%= cp :events_count %>
+</h2>
 <%= partial :'events/search_form' %>
 <%= partial :'events/view_options', locals: {path: '/events'} %>
 

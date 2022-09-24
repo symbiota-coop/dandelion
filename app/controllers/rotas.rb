@@ -28,15 +28,34 @@ Dandelion::App.controller do
     erb :'rotas/rotas'
   end
 
-  get '/g/:slug/rotas/:id' do
+  get '/g/:slug/rotas/:id', provides: [:html, :csv] do
     @gathering = Gathering.find_by(slug: params[:slug]) || not_found
     @membership = @gathering.memberships.find_by(account: current_account)
     confirmed_membership_required!
     @rota = @gathering.rotas.find(params[:id]) || not_found
+
     if request.xhr?
       partial :'rotas/rota', locals: { rota: @rota }
     else
-      erb :'rotas/rota'
+      case content_type
+      when :html
+        erb :'rotas/rota'
+      when :csv
+        CSV.generate do |csv|
+          csv << ([''] + @rota.roles.order('o asc').map(&:name))
+          @rota.rslots.order('o asc').each do |rslot|
+            row = [rslot.name]
+            @rota.roles.order('o asc').each do |role|
+              row << if (shift = Shift.find_by(rslot: rslot, role: role))
+                       "#{shift.account.name} #{shift.account.phone}"
+                     else
+                       ''
+                     end
+            end
+            csv << row
+          end
+        end
+      end
     end
   end
 
@@ -195,7 +214,7 @@ Dandelion::App.controller do
     confirmed_membership_required!
     halt unless (@shift.account && (@shift.account_id == current_account.id)) || @membership.admin?
     erb :'rotas/shift'
-  end  
+  end
 
   post '/shifts/:id/edit' do
     @shift = Shift.find(params[:id]) || not_found
@@ -209,7 +228,7 @@ Dandelion::App.controller do
       flash.now[:error] = 'There was an error saving the shift'
       erb :'rotas/shift'
     end
-  end    
+  end
 
   get '/shifts/:id/destroy' do
     @shift = Shift.find(params[:id]) || not_found
