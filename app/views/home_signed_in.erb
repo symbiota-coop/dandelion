@@ -68,16 +68,16 @@
       <% if current_account.recommended_events_cache && current_account.recommended_events_cache.count > 0 %>
         <h3 class="card-header bg-primary text-white">Recommended for you</h3>
         <div class="card-body">
-          <%= cp(:'events/recommended', key: "/events/recommended?account_id=#{current_account.id}", expires: 1.day.from_now) %>
+          <%= cp(:'events/recommended', key: "/events/recommended?account_id=#{current_account.id}", expires: 12.hours.from_now) %>
           <p class="mt-3 mb-0"><a href="/recommendations/events">More recommendations &rarr;</a></p>
         </div>
       <% end %>
       <h3 class="card-header bg-primary text-white">Trending</h3>
       <div class="card-body">
-        <%= cp(:'events/trending', key: '/events/trending', expires: 1.day.from_now) %>
+        <%= cp(:'events/trending', key: '/events/trending', expires: 12.hours.from_now) %>
       </div>
     </div>
-      <% unless (provider_link = current_account.provider_links.find_by(provider: 'Ethereum')) %>
+    <% unless (provider_link = current_account.provider_links.find_by(provider: 'Ethereum')) %>
       <div class="card mt-3">
         <h3 class="card-header bg-primary text-white">Connect wallet</h3>
         <div class="card-body">
@@ -85,7 +85,7 @@
           <a class="btn btn-primary" href="/auth/ethereum">Connect <i class="fab fa-ethereum"></i></a>
         </div>
       </div>
-      <% end %>
-    </div>
+    <% end %>
   </div>
+</div>
 </div>
