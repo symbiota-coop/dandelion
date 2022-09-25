@@ -133,7 +133,6 @@ module Dandelion
         @events = Event.live.public.legit.future(@from)
         @accounts = []
         @places = Place.all.order('created_at desc')
-        @hide_right_nav = true
         if request.xhr?
           400
         else
