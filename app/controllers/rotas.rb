@@ -46,7 +46,7 @@ Dandelion::App.controller do
           @rota.rslots.order('o asc').each do |rslot|
             row = [rslot.name]
             @rota.roles.order('o asc').each do |role|
-              row << if (shift = Shift.find_by(rslot: rslot, role: role))
+              row << if (shift = Shift.find_by(rslot: rslot, role: role)) && shift.account
                        "#{shift.account.name} #{shift.account.phone}"
                      else
                        ''
