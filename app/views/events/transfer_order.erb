@@ -1,0 +1,10 @@
+<p><a href="/events/<%=@order.event_id%>/orders">&larr; Return to event</a></p>
+
+<h2>Transfer <%=@order.account.name%>'s order</h2>
+
+<% form_for @order, "/orders/#{@order.id}/transfer" do |f| %>
+  <%= f.select_block :event_id, options: @order.event.organisation.events_for_search.future_and_current_featured.order('name asc').map { |event|
+   event_admin?(event) ? [event.summary, event.id] : nil
+  }.compact %>
+  <%= f.submit_block %>
+<% end %>

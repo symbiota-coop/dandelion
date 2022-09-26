@@ -359,6 +359,33 @@ Dandelion::App.controller do
     redirect back
   end
 
+  get '/orders/:id/transfer' do
+    @order = Order.find(params[:id])
+    @event = @order.event
+    event_admins_only!
+    erb :'events/transfer_order'
+  end
+
+  post '/orders/:id/transfer' do
+    @order = Order.find(params[:id])
+    @event = @order.event
+    @organisation = @event.organisation
+    original_event_id = @order.event_id
+    event_admins_only!
+    new_event = @event.organisation.events.find(params[:order][:event_id]) || not_found
+    halt 400 unless event_admin?(new_event)
+    @order.update_attribute(:event, new_event)
+    @order.tickets.each do |ticket|
+      ticket.update_attribute(:event, new_event)
+      ticket.update_attribute(:ticket_type, nil)
+    end
+    @order.donations.each do |donation|
+      donation.update_attribute(:event, new_event)
+    end
+    flash[:notice] = 'The order was transferred.'
+    redirect "/events/#{original_event_id}/orders"
+  end
+
   post '/events/:id/waitship/new' do
     @event = Event.find(params[:id]) || not_found
 
