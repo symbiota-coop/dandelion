@@ -145,9 +145,13 @@
   </style>
 <% end %>
 
-  <% if @event && @event.persisted? %>
+<% if @event && @event.persisted? %>
+  <% if params[:cohost] %>
+    <link rel="canonical" href="<%=ENV['BASE_URI']%>/events/<%=@event.id%>?cohost=<%=params[:cohost]%>" />
+  <% else %>
     <link rel="canonical" href="<%=ENV['BASE_URI']%>/events/<%=@event.id%>" />
-    <script type="application/ld+json">
+  <% end %>
+  <script type="application/ld+json">
     <%==
     JSON.pretty_generate({
       "@context": 'https://schema.org',
@@ -187,7 +191,7 @@
       })
     })
     %>
-    </script>
+  </script>
 
-  <% end %>
+<% end %>
 </head>
