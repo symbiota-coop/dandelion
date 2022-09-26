@@ -16,7 +16,7 @@ class Prediction
       result: { type: :text_area, disabled: true },
       prediction_favs: :collection,
       account_id: :lookup
-    }    
+    }
   end
 
   validates_presence_of :prompt, :replicate_id
@@ -57,7 +57,7 @@ class Prediction
 
     batch_message.from 'Dandelion <notifications@dandelion.earth>'
     batch_message.subject "[Imagine] #{account.name}"
-    batch_message.body_text "#{ENV['BASE_URI']}/imagine/#{id}"
+    batch_message.body_text "#{prompt} #{ENV['BASE_URI']}/imagine/#{id}"
 
     Account.and(admin: true).each do |account|
       batch_message.add_recipient(:to, account.email, { 'firstname' => (account.firstname || 'there'), 'token' => account.sign_in_token, 'id' => account.id.to_s })
