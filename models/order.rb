@@ -317,7 +317,7 @@ class Order
   end
 
   def credit_payable_to_revenue_sharer
-    ((discounted_ticket_revenue / (discounted_ticket_revenue + donation_revenue)) * credit_applied * (1 - organisation_revenue_share)).to_f if organisation_revenue_share && credit_applied && credit_applied > 0
+    ((discounted_ticket_revenue / (discounted_ticket_revenue + donation_revenue)) * credit_applied * (1 - organisation_revenue_share)).to_f if organisation_revenue_share && credit_applied && credit_applied > 0 && ((discounted_ticket_revenue + donation_revenue) > 0)
   end
 
   def make_transfer
