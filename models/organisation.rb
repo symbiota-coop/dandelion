@@ -41,6 +41,7 @@ class Organisation
   field :monthly_donors_count, type: Integer
   field :monthly_donations_count, type: String
   field :currency, type: String
+  field :enable_discussion, type: Boolean
   field :auto_comment_sending, type: Boolean
   field :affiliate_credit_percentage, type: Integer
   field :affiliate_intro, type: String
@@ -508,6 +509,7 @@ class Organisation
       monthly_donation_welcome_from: 'Welcome email for new monthly donors from',
       monthly_donation_welcome_subject: 'Welcome email for new monthly donors subject',
       monthly_donation_welcome_body: 'Welcome email for new monthly donors body',
+      enable_discussion: "Enable discussion feature in the Members' Area",
       auto_comment_sending: "Send comments in the Members' Area automatically",
       become_a_member_url: 'Become a Member URL',
       add_a_donation_to: 'Text above donation field',

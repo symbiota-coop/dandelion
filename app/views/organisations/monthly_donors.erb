@@ -10,9 +10,11 @@
       <h1>
         <a href="/o/<%= @organisation.slug %>"><%= @organisation.name %></a> members' area
       </h1>
-      <div class="d-inline-block" data-pagelet-url="/o/<%= @organisation.slug %>/subscribe_discussion">
-        <%= partial :'organisations/subscribe_discussion', locals: { organisationship: @organisationship } %>
-      </div>
+      <% if @organisation.enable_discussion? %>
+        <div class="d-inline-block" data-pagelet-url="/o/<%= @organisation.slug %>/subscribe_discussion">
+          <%= partial :'organisations/subscribe_discussion', locals: { organisationship: @organisationship } %>
+        </div>
+      <% end %>
       <% if !@organisationship.hide_membership? %>
         <a class="btn btn-primary mb-1" href="/o/<%= @organisation.slug %>/show_membership/0">Membership public</a>
       <% else %>
@@ -56,11 +58,13 @@
       </a>
     </li>
   <% end %>
-  <li class="nav-item">
-    <a class="nav-link <%= 'active' unless events_active %>" id="tab-discussion" data-toggle="tab" href="#panel-discussion" role="tab">
-      Discussion
-    </a>
-  </li>
+  <% if @organisation.enable_discussion? %>
+    <li class="nav-item">
+      <a class="nav-link <%= 'active' unless events_active %>" id="tab-discussion" data-toggle="tab" href="#panel-discussion" role="tab">
+        Discussion
+      </a>
+    </li>
+  <% end %>
   <% visible_members = @organisation.monthly_donors %>
   <% if visible_members.count > 0 %>
     <li class="nav-item">
@@ -83,11 +87,13 @@
       <div data-pagelet-url="/o/<%= @organisation.slug %>/events_block?members_events=1"></div>
     </div>
   <% end %>
-  <div class="tab-pane fade <%= 'show active' unless events_active %>" id="panel-discussion" role="tabpanel">
-    <div class="mt-3" data-pagelet-url="/commentable?commentable_type=Organisation&commentable_id=<%= @organisation.id %>">
-      <%= partial :'comments/commentable', locals: { commentable: @organisation } %>
+  <% if @organisation.enable_discussion? %>
+    <div class="tab-pane fade <%= 'show active' unless events_active %>" id="panel-discussion" role="tabpanel">
+      <div class="mt-3" data-pagelet-url="/commentable?commentable_type=Organisation&commentable_id=<%= @organisation.id %>">
+        <%= partial :'comments/commentable', locals: { commentable: @organisation } %>
+      </div>
     </div>
-  </div>
+  <% end %>
   <% if visible_members.count > 0 %>
     <div class="tab-pane fade" id="panel-map" role="tabpanel">
       <div data-pagelet-url="/map?organisation_id=<%= @organisation.id %>&monthly_donors=1">
