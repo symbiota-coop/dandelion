@@ -8,19 +8,35 @@
       var ticketRevenue = $("#event_stats th").toArray().indexOf($("th[data-col-name='ticket-revenue']")[0])
       var donations = $("#event_stats th").toArray().indexOf($("th[data-col-name='donations']")[0])
       $(document).ajaxStop(function() {
-        $('#event_stats:not(.dataTable)').dataTable({
+        var table = $('#event_stats:not(.dataTable)').dataTable({
           bInfo: false,
           paging: false,
           oLanguage: {
             sSearch: "Search"
-          },
-          drawCallback: function () {
-              var api = this.api();
-              $('tfoot th').eq(ticketsSold).html(api.column(ticketsSold).nodes().sum());
-              $('tfoot th').eq(ticketRevenue).html('<%= Money.new(0, @organisation.currency).symbol %>' + api.column(ticketRevenue).nodes().sum().toLocaleString());
-              $('tfoot th').eq(donations).html('<%= Money.new(0, @organisation.currency).symbol %>' + api.column(donations).nodes().sum().toLocaleString());
           }
-        });
+        })
+        table.on('draw.dt', function() {
+          var api = table.api();
+          // tickets sold
+          var sum = 0
+          $('#event_stats tbody tr').each(function() {
+            sum += parseFloat($('td:eq('+ticketsSold+')', this).attr('data-sort'))
+          })
+          $('tfoot th').eq(ticketsSold).html(sum);
+          // ticket revenue
+          var sum = 0
+          $('#event_stats tbody tr').each(function() {
+            sum += parseFloat($('td:eq('+ticketRevenue+')', this).attr('data-sort'))
+          })
+          $('tfoot th').eq(ticketRevenue).html('<%= Money.new(0, @organisation.currency).symbol %>' + sum.toLocaleString());
+          // donations
+          var sum = 0
+          $('#event_stats tbody tr').each(function() {
+            sum += parseFloat($('td:eq('+donations+')', this).attr('data-sort'))
+          })
+          $('tfoot th').eq(donations).html('<%= Money.new(0, @organisation.currency).symbol %>' + sum.toLocaleString());
+        })
+        $('#event_stats').DataTable().draw(false);
       })
     })
   </script>

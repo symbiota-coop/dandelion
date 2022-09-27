@@ -10,14 +10,6 @@ function br2nl(str) {
   return str.replace(/<br>/g, "\r\n");
 }
 
-jQuery.fn.dataTable.Api.register('sum()', function () {
-  return this.flatten().reduce(function (a, b) {
-    var x = parseFloat(a) || 0;
-    var y = parseFloat($(b).attr('data-sort')) || 0;
-    return x + y
-  }, 0);
-});
-
 $.fn.serializeObject = function () {
   var o = {};
   var a = this.serializeArray();
