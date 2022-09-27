@@ -1,4 +1,7 @@
 <% if @organisation %>
+  <style>
+    #event_stats_filter label { font-weight: bold }
+  </style>
   <script>
     $(function () {
       var ticketsSold = $("#event_stats th").toArray().indexOf($("th[data-col-name='tickets-sold']")[0])
@@ -8,6 +11,9 @@
         $('#event_stats:not(.dataTable)').dataTable({
           bInfo: false,
           paging: false,
+          oLanguage: {
+            sSearch: "Search"
+          },
           drawCallback: function () {
               var api = this.api();
               $('tfoot th').eq(ticketsSold).html(api.column(ticketsSold).nodes().sum());
