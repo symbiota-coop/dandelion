@@ -44,7 +44,7 @@
 <% unless @order %>
   <% sidebar = false %>
   <% sidebar = true if @event.sold_out? || @event.purchase_url %>
-  <% buy_tickets_style = 'class="fixed-bottom bg-white p-3 w-100 d-block d-lg-none" style="z-index: 1019; box-shadow: 0px -2px 4px 0px rgba(0,0,0,0.3);"' %>
+  <% buy_tickets_style = 'class="fixed-bottom bg-white p-3 w-100 d-block d-md-none" style="z-index: 1019; box-shadow: 0px -2px 4px 0px rgba(0,0,0,0.3);"' %>
   <% if @event.purchase_url %>
     <div id="buy-tickets" <%== buy_tickets_style %>>
       <a target="_blank" href="<%=@event.purchase_url%>" class="btn btn-primary btn-block">Select tickets on <%=URI(@event.purchase_url).host.gsub('www.','')%></a>
