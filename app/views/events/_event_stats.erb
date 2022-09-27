@@ -22,32 +22,4 @@
   <% events.each { |event| %>
   <tr data-pagelet-url="/events/<%= event.id %>/stats_row<%= "#{"?organisation_id=#{@organisation.id}" if @organisation}" %>"><% if @event %><%= cp(:'events/event_stats_row', locals: { event: @event }, key: "/events/#{@event.id}/stats_row?timezone=#{Time.zone.name}#{"&organisation_id=#{@organisation.id}" if @organisation}") %><% end %></tr>
   <% } %>
-  <% if @organisation %>
-    <% events.each { |event| %>
-    <tr>
-      <th></th>
-      <th></th>
-      <th></th>
-      <th></th>
-      <th></th>
-      <th></th>
-      <th></th>
-      <th></th>
-      <th></th>
-      <th>
-        <%=events.sum { |event| event.tickets.count }%>
-      </th>
-      <th></th>
-      <th>
-        <%= m events.sum { |event| Money.new(event.discounted_ticket_revenue, event.currency) }, @organisation.currency%>
-      </th>
-      <th></th>
-      <th></th>
-      <th>
-        <%= m events.sum { |event| Money.new(event.donation_revenue, event.currency) }, @organisation.currency%>
-      </th>
-      <th></th>
-    </tr>
-    <% } %>
-  <% end %>
 </table>
