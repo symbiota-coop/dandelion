@@ -13,7 +13,7 @@ function br2nl(str) {
 jQuery.fn.dataTable.Api.register('sum()', function () {
   return this.flatten().reduce(function (a, b) {
     var x = parseFloat(a) || 0;
-    var y = parseFloat($(b).attr('data-sum')) || 0;
+    var y = parseFloat($(b).attr('data-sort')) || 0;
     return x + y
   }, 0);
 });

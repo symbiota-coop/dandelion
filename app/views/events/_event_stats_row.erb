@@ -75,13 +75,13 @@
       <a target="_blank" href="<%= event.facebook_event_url %>"><i class="fa fa-facebook-square"></i></a>
     <% end %>
   </td>
-  <td data-sum="<%=event.tickets.count%>">
+  <td data-sort="<%=event.tickets.count%>">
     <%= partial :'events/progress', locals: { event: event } %>
   </td>
   <td>
     <%= partial :'events/checked_in', locals: { event: event } %>
   </td>
-  <td data-sum="<%=event.discounted_ticket_revenue.exchange_to(event.organisation.currency)%>">
+  <td data-sort="<%=event.discounted_ticket_revenue.exchange_to(event.organisation.currency)%>">
     <% if event.discounted_ticket_revenue > 0 %>
       <%= m event.discounted_ticket_revenue, event.currency %>
     <% end %>
@@ -101,7 +101,7 @@
         <%= m event.credit_payable_to_revenue_sharer, event.currency %>
       <% end %>
     </td>
-    <td data-sum="<%=event.donation_revenue.exchange_to(event.organisation.currency)%>">
+    <td data-sort="<%=event.donation_revenue.exchange_to(event.organisation.currency)%>">
       <% if event.donations.count > 0 && !event.purchase_url %>
         <%= m event.donation_revenue, event.currency %>
       <% end %>
