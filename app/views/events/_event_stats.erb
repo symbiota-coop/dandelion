@@ -17,7 +17,6 @@
             }
           })
           table.on('draw.dt', function() {
-            var api = table.api();
             $.each([ticketsSold, ticketRevenue, donations], function(i,index) {
               var sum = 0
               $('#event_stats tbody tr').each(function() {
