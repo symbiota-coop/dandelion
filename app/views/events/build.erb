@@ -1,4 +1,3 @@
-
 <%= partial :'events/nav', locals: { event: @event } %>
 
 <% if @event.new_record? %>
@@ -72,8 +71,8 @@
           var height = this.height;
           var width = this.width;
 
-          if (width < 800) {
-            alert('Please use an image that is at least 800px wide');
+          if (width < 992 {
+            alert('Please use an image that is at least 992px wide');
             $(fileUpload).val('')
           }
 
@@ -229,90 +228,90 @@
         <%= f.select_block :currency %>
         <p id="event-currency-changed" style="margin-top: -0.75rem; display: none">
           <em>Save the event to update the currency symbol.</em>
-        <p>
-        <script>
-          $(function() {
-            $('#event_currency').change(function() { $('#event-currency-changed').show() })
-          })
-        </script>
-        <%= partial :'events/ticket_types', locals: { f: f } %>
-        <%= partial :'events/ticket_groups', locals: { f: f } %>
-        <%= f.number_block :capacity %>
-      </div>
-      <div role="tabpanel" class="tab-pane" id="tab4">
-        <script>
-          $(function () {
-            $('#event_questions').attr('rows', '3')
-            $('#event_feedback_questions').attr('rows', '3')
-            autosize($('#event_questions')[0])
-            autosize($('#event_feedback_questions')[0])
-          })
-        </script>
-        <%= f.text_area_block :questions, placeholder: "e.g. Any dietary requirements?\n[Check this box to agree to the terms and conditions]" %>
-        <%= f.text_area_block :feedback_questions %>
-      </div>
-      <div role="tabpanel" class="tab-pane" id="tab5">
-        <script>
-          $(function() {
-            $('#event_suggested_donation').keyup(function () {
-              if ($(this).val().length > 0)
-                $('#donation-options').show()
-              else
-                $('#donation-options').hide()
-            })
-            if ($('#event_suggested_donation').val().length > 0)
-              $('#donation-options').show()
-            else
-              $('#donation-options').hide()
-          })
-        </script>
-        <%= f.number_block :suggested_donation %>
-        <div id="donation-options">
-          <%= f.number_block :minimum_donation %>
-          <%= f.text_block :add_a_donation_to %>
-          <%= f.text_block :donation_text %>
+          <p>
+            <script>
+              $(function() {
+                $('#event_currency').change(function() { $('#event-currency-changed').show() })
+              })
+            </script>
+            <%= partial :'events/ticket_types', locals: { f: f } %>
+            <%= partial :'events/ticket_groups', locals: { f: f } %>
+            <%= f.number_block :capacity %>
+          </div>
+          <div role="tabpanel" class="tab-pane" id="tab4">
+            <script>
+              $(function () {
+                $('#event_questions').attr('rows', '3')
+                $('#event_feedback_questions').attr('rows', '3')
+                autosize($('#event_questions')[0])
+                autosize($('#event_feedback_questions')[0])
+              })
+            </script>
+            <%= f.text_area_block :questions, placeholder: "e.g. Any dietary requirements?\n[Check this box to agree to the terms and conditions]" %>
+            <%= f.text_area_block :feedback_questions %>
+          </div>
+          <div role="tabpanel" class="tab-pane" id="tab5">
+            <script>
+              $(function() {
+                $('#event_suggested_donation').keyup(function () {
+                  if ($(this).val().length > 0)
+                    $('#donation-options').show()
+                  else
+                    $('#donation-options').hide()
+                })
+                if ($('#event_suggested_donation').val().length > 0)
+                  $('#donation-options').show()
+                else
+                  $('#donation-options').hide()
+              })
+            </script>
+            <%= f.number_block :suggested_donation %>
+            <div id="donation-options">
+              <%= f.number_block :minimum_donation %>
+              <%= f.text_block :add_a_donation_to %>
+              <%= f.text_block :donation_text %>
+            </div>
+          </div>
+          <div role="tabpanel" class="tab-pane" id="tab6">
+            <%= f.shorturl_block :slug, stem: "#{ENV['BASE_URI']}/e/" %>
+            <%= f.url_block :redirect_url %>
+            <% if @event.purchase_url || @event.organisation.allow_purchase_url? || (Padrino.env == :development || @event.organisation.verified?) %>
+              <%= f.url_block :purchase_url %>
+            <% end %>
+            <%= f.number_block :facebook_pixel_id %>
+            <%= f.select_block :time_zone %>
+            <% if @event.organisation.change_select_tickets_title || (Padrino.env == :development || @event.organisation.verified?) %>
+              <%= f.text_block :select_tickets_title %>
+            <% end %>
+            <%= f.text_block :select_tickets_intro %>
+            <%= f.text_block :select_tickets_outro %>
+            <%= f.text_block :carousel_text %>
+            <% if current_account.memberships.and(admin: true).count > 0 %>
+              <%= f.select_block :gathering_id, options: [''] + current_account.memberships.and(admin: true).map { |m| [m.gathering.name, m.gathering_id] }.sort_by { |a,b| a } %>
+            <% end %>
+            <%= f.check_box_block :featured %>
+            <%= f.check_box_block :secret %>
+            <%= f.check_box_block :draft %>
+            <%= f.check_box_block :hide_attendees %>
+            <%= f.check_box_block :hide_discussion %>
+            <%= f.check_box_block :monthly_donors_only %>
+            <%= f.check_box_block :no_discounts %>
+            <%= f.check_box_block :show_emails %>
+            <%= f.check_box_block :opt_in_facilitator %>
+            <%= f.check_box_block :include_in_parent %>
+            <%= f.check_box_block :refund_deleted_orders %>
+            <%= f.check_box_block :ask_hear_about %>
+            <%= f.text_area_block :notes %>
+            <% if Padrino.env == :development || @event.organisation.verified? %>
+              <%= f.number_block :affiliate_credit_percentage %>
+            <% end %>
+            <% if @event.new_record? %>
+              <%= f.submit_block %>
+            <% end %>
+          </div>
         </div>
-      </div>
-      <div role="tabpanel" class="tab-pane" id="tab6">
-        <%= f.shorturl_block :slug, stem: "#{ENV['BASE_URI']}/e/" %>
-        <%= f.url_block :redirect_url %>
-        <% if @event.purchase_url || @event.organisation.allow_purchase_url? || (Padrino.env == :development || @event.organisation.verified?) %>
-          <%= f.url_block :purchase_url %>
-        <% end %>
-        <%= f.number_block :facebook_pixel_id %>
-        <%= f.select_block :time_zone %>
-        <% if @event.organisation.change_select_tickets_title || (Padrino.env == :development || @event.organisation.verified?) %>
-          <%= f.text_block :select_tickets_title %>
-        <% end %>
-        <%= f.text_block :select_tickets_intro %>
-        <%= f.text_block :select_tickets_outro %>
-        <%= f.text_block :carousel_text %>
-        <% if current_account.memberships.and(admin: true).count > 0 %>
-          <%= f.select_block :gathering_id, options: [''] + current_account.memberships.and(admin: true).map { |m| [m.gathering.name, m.gathering_id] }.sort_by { |a,b| a } %>
-        <% end %>
-        <%= f.check_box_block :featured %>
-        <%= f.check_box_block :secret %>
-        <%= f.check_box_block :draft %>
-        <%= f.check_box_block :hide_attendees %>
-        <%= f.check_box_block :hide_discussion %>
-        <%= f.check_box_block :monthly_donors_only %>
-        <%= f.check_box_block :no_discounts %>
-        <%= f.check_box_block :show_emails %>
-        <%= f.check_box_block :opt_in_facilitator %>
-        <%= f.check_box_block :include_in_parent %>
-        <%= f.check_box_block :refund_deleted_orders %>
-        <%= f.check_box_block :ask_hear_about %>
-        <%= f.text_area_block :notes %>
-        <% if Padrino.env == :development || @event.organisation.verified? %>
-          <%= f.number_block :affiliate_credit_percentage %>
-        <% end %>
-        <% if @event.new_record? %>
-          <%= f.submit_block %>
+        <% if @event.persisted? %>
+          <%= f.submit_block destroy_url: "/events/#{@event.id}/destroy" %>
         <% end %>
       </div>
-    </div>
-    <% if @event.persisted? %>
-      <%= f.submit_block destroy_url: "/events/#{@event.id}/destroy" %>
     <% end %>
-  </div>
-<% end %>

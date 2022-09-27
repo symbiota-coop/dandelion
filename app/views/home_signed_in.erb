@@ -1,8 +1,11 @@
-<div id="a2hs" class="card mb-3 d-lg-none" style="display: none">
-  <div class="card-body text-center">
-    <a id="a2hs-btn" class="btn btn-primary" href="javascript:;">Add Dandelion to your home screen</a>
+<% if request.user_agent =~ /Mobile/ %>
+  <div id="a2hs" class="card mb-3 d-lg-none">
+    <div class="card-body text-center">
+      <a id="a2hs-btn" class="btn btn-primary" href="javascript:;">Add Dandelion to your home screen</a>
+    </div>
   </div>
-</div>
+<% end %>
+
 <div class="row">
   <div class="col-lg-8">
     <%= cp(:'organisations/carousel', key: "/organisations/carousel/#{current_account.id}") %>
@@ -20,7 +23,22 @@
   <% else %>
     <%= partial :'accounts/pay', locals: {div_class: 'px-4 mb-5 pt-3', account: current_account } %>
   <% end %>
-  <div id="newsfeed" data-pagelet-url="/" data-pagelet-refresh="60" class="mt-1 mb-3"></div>
+  <div data-with-placeholder id="newsfeed" data-pagelet-url="/" data-pagelet-refresh="60" class="mt-1 mb-3">
+    <% 10.times do %>
+      <style>
+        @keyframes flickerAnimation {
+          0%   { opacity:1; }
+          50%  { opacity:0.5; }
+          100% { opacity:1; }
+        }
+        .flicker {
+            animation: flickerAnimation 2s infinite;
+        }
+      </style>
+      <div class="flicker" style="width: 75%; background: rgba(0,0,0,0.1)">&nbsp;</div>
+      <hr class="my-3" style="border-top-color: rgba(0,0,0,0.1)">
+    <% end %>
+  </div>
 </div>
 <div class="col-lg-4">
   <div style="position: sticky; top: 3.75rem">

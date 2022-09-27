@@ -32,7 +32,7 @@ class Cohostship
         self.image = nil
       end
 
-      errors.add(:image, 'must be at least 800px wide') if image && image.width < 800
+      errors.add(:image, 'must be at least 992px wide') if image && image.width < 992
       errors.add(:image, 'must be more wide than high') if image && image.height > image.width
 
     end

@@ -475,7 +475,7 @@ class Event
         self.image = nil
       end
 
-      errors.add(:image, 'must be at least 800px wide') if image && image.width < 800
+      errors.add(:image, 'must be at least 992px wide') if image && image.width < 992
       errors.add(:image, 'must be more wide than high') if image && image.height > image.width
 
       errors.add(:image, "must be #{organisation.event_image_required_width}px wide") if organisation && organisation.event_image_required_width && !(image && image.width == organisation.event_image_required_width)
@@ -748,7 +748,7 @@ class Event
 
   def self.new_hints
     {
-      image: 'At least 800px wide, and more wide than high',
+      image: 'At least 992px wide, and more wide than high',
       start_time: "in &hellip; (your profile's time zone)",
       end_time: "in &hellip; (your profile's time zone)",
       time_zone: "Time zone to use for people that aren't signed in or haven't set a time zone",
