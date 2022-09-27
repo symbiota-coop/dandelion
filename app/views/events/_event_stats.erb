@@ -4,6 +4,7 @@
   </style>
   <script>
     $(function () {
+      var date = $("#event_stats th").toArray().indexOf($("th[data-col-name='date']")[0])
       var ticketsSold = $("#event_stats th").toArray().indexOf($("th[data-col-name='tickets-sold']")[0])
       var ticketRevenue = $("#event_stats th").toArray().indexOf($("th[data-col-name='ticket-revenue']")[0])
       var donations = $("#event_stats th").toArray().indexOf($("th[data-col-name='donations']")[0])
@@ -12,6 +13,7 @@
           var table = $('#event_stats').dataTable({
             bInfo: false,
             paging: false,
+            order: [[date, "asc"]],
             oLanguage: {
               sSearch: "Search"
             }
@@ -39,7 +41,7 @@
     <tr>
       <th>Name</th>
       <th></th>
-      <th>Date</th>
+      <th data-col-name="date">Date</th>
       <th>Coordinator</th>
       <th>Facilitators</th>
       <th>Tags</th>
