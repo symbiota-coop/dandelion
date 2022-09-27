@@ -1,3 +1,24 @@
+<% if @organisation %>
+  <script>
+    $(function () {
+      var ticketsSold = $("#event_stats th").toArray().indexOf($("th[data-col-name='tickets-sold']")[0])
+      var ticketRevenue = $("#event_stats th").toArray().indexOf($("th[data-col-name='ticket-revenue']")[0])
+      var donations = $("#event_stats th").toArray().indexOf($("th[data-col-name='donations']")[0])
+      $(document).ajaxStop(function() {
+        $('#event_stats:not(.dataTable)').dataTable({
+          bInfo: false,
+          paging: false,
+          drawCallback: function () {
+              var api = this.api();
+              $('tfoot th').eq(ticketsSold).html(api.column(ticketsSold).nodes().sum());
+              $('tfoot th').eq(ticketRevenue).html('<%= Money.new(0, @organisation.currency).symbol %>' + api.column(ticketRevenue).nodes().sum().toLocaleString());
+              $('tfoot th').eq(donations).html('<%= Money.new(0, @organisation.currency).symbol %>' + api.column(donations).nodes().sum().toLocaleString());
+          }
+        });
+      })
+    })
+  </script>
+<% end %>
 <table id="event_stats" class="table table-striped table-hover table-sm" style="font-size: 0.9em">
   <thead class="bg-white">
     <tr>
@@ -10,16 +31,38 @@
       <th>Activity</th>
       <th>Local group</th>
       <th>Facebook event</th>
-      <th>Tickets sold</th>
+      <th data-col-name="tickets-sold">Tickets sold</th>
       <th>Checked in</th>
-      <th>Ticket revenue</th>
+      <th data-col-name="ticket-revenue">Ticket revenue</th>
       <th>Revenue sharer</th>
       <th>Credit due</th>
-      <th>Donations</th>
+      <th data-col-name="donations">Donations</th>
       <th>Feedback</th>
     </tr>
   </thead>
   <% events.each { |event| %>
   <tr data-pagelet-url="/events/<%= event.id %>/stats_row<%= "#{"?organisation_id=#{@organisation.id}" if @organisation}" %>"><% if @event %><%= cp(:'events/event_stats_row', locals: { event: @event }, key: "/events/#{@event.id}/stats_row?timezone=#{Time.zone.name}#{"&organisation_id=#{@organisation.id}" if @organisation}") %><% end %></tr>
   <% } %>
+  <% if @organisation %>
+    <tfoot>
+      <tr>
+        <th></th>
+        <th></th>
+        <th></th>
+        <th></th>
+        <th></th>
+        <th></th>
+        <th></th>
+        <th></th>
+        <th></th>
+        <th></th>
+        <th></th>
+        <th></th>
+        <th></th>
+        <th></th>
+        <th></th>
+        <th></th>
+      </tr>
+    </tfoot>
+  <% end %>
 </table>

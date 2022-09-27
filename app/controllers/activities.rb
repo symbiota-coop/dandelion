@@ -32,6 +32,7 @@ Dandelion::App.controller do
 
   get '/activities/:id/events/stats' do
     @activity = Activity.find(params[:id]) || not_found
+    @organisation = @activity.organisation
     activity_admins_only!
     @from = params[:from] ? Date.parse(params[:from]) : Date.today
     @to = params[:to] ? Date.parse(params[:to]) : nil

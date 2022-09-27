@@ -27,6 +27,7 @@ Dandelion::App.controller do
 
   get '/local_groups/:id/events/stats' do
     @local_group = LocalGroup.find(params[:id]) || not_found
+    @organisation = @local_group.organisation
     local_group_admins_only!
     @from = params[:from] ? Date.parse(params[:from]) : Date.today
     @to = params[:to] ? Date.parse(params[:to]) : nil
