@@ -8,27 +8,29 @@
       var ticketRevenue = $("#event_stats th").toArray().indexOf($("th[data-col-name='ticket-revenue']")[0])
       var donations = $("#event_stats th").toArray().indexOf($("th[data-col-name='donations']")[0])
       $(document).ajaxStop(function() {
-        var table = $('#event_stats:not(.dataTable)').dataTable({
-          bInfo: false,
-          paging: false,
-          oLanguage: {
-            sSearch: "Search"
-          }
-        })
-        table.on('draw.dt', function() {
-          var api = table.api();
-          $.each([ticketsSold, ticketRevenue, donations], function(i,index) {
-            var sum = 0
-            $('#event_stats tbody tr').each(function() {
-              sum += parseFloat($('td:eq('+index+')', this).attr('data-sort'))
-            })
-            if (i == 0)
-              $('tfoot th').eq(index).html(sum);
-            else
-              $('tfoot th').eq(index).html('<%= Money.new(0, @organisation.currency).symbol %>' + sum.toLocaleString());
-          });
-        })
-        $('#event_stats').DataTable().draw(false);
+        if (!$('#event_stats').hasClass('dataTable')) {
+          var table = $('#event_stats').dataTable({
+            bInfo: false,
+            paging: false,
+            oLanguage: {
+              sSearch: "Search"
+            }
+          })
+          table.on('draw.dt', function() {
+            var api = table.api();
+            $.each([ticketsSold, ticketRevenue, donations], function(i,index) {
+              var sum = 0
+              $('#event_stats tbody tr').each(function() {
+                sum += parseFloat($('td:eq('+index+')', this).attr('data-sort'))
+              })
+              if (i == 0)
+                $('tfoot th').eq(index).html(sum);
+              else
+                $('tfoot th').eq(index).html('<%= Money.new(0, @organisation.currency).symbol %>' + sum.toLocaleString());
+            });
+          })
+          $('#event_stats').DataTable().draw(false);
+        }
       })
     })
   </script>
