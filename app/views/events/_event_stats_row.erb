@@ -46,8 +46,9 @@
     <% if event.event_facilitations.count > 0 %>
       <% event.event_facilitations.each { |event_facilitation| %>
       <%= partial :'accounts/square', locals: { account: event_facilitation.account, width: '50px' } %>
-      <br>
+      <br />
       <a href="/u/<%= event_facilitation.account.username %>"><%= event_facilitation.account.name %></a>
+      <br />
       <% } %>
     <% end %>
   </td>
