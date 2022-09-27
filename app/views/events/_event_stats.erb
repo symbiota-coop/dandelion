@@ -28,7 +28,7 @@
                 $('tfoot th').eq(index).html('<%= Money.new(0, @organisation.currency).symbol %>' + sum.toLocaleString());
             });
           })
-          $('#event_stats').DataTable().draw(false);
+          $('#event_stats').DataTable().draw();
         }
       })
     })
