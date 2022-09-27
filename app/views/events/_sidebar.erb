@@ -1,4 +1,4 @@
-<div class="col-md-5">
+<div class="col-lg-5">
   <div id="purchase">
     <% if current_account && (orders =  @event.orders.complete.and(account: current_account)).count > 0 %>
       <div class="card mb-3">
@@ -27,7 +27,7 @@
       </div>
     <% end %>
     <% if @event.purchase_url %>
-      <div class="card d-none d-md-block">
+      <div class="card d-none d-lg-block">
         <h3 class="card-header bg-primary text-white"><%= @event.select_tickets_title || 'Select tickets' %></h3>
         <div class="card-body">
           <a target="_blank" href="<%= @event.purchase_url %>" class="btn btn-outline-primary btn-block mb-3">Select tickets on <%=URI(@event.purchase_url).host.gsub('www.','')%></a>

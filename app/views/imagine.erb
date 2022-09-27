@@ -1,6 +1,6 @@
 <% if current_account %>
   <div class="row justify-content-center mt-4">
-    <div class="col col-sm-6">
+    <div class="col col-lg-6">
       <% form_tag '', id: 'prompt-form' do %>
         <div class="input-group mb-3">
           <%= text_field_tag :prompt, class: 'form-control form-control-lg', placeholder: 'What do you imagine?', required: true %>
@@ -29,7 +29,7 @@
                 clearInterval(countdown)
                 $('#result').html('<p class="text-center">Click images you find inspiring to save them to the public gallery</p><div class="row no-gutters"></div>')
                 $.each(urls, function(i,url) {
-                  $('#result .row').append('<div class="col-12 col-sm-6"><div class="text-center mr-3 mb-3"><a data-index="'+i+'" href="javascript:;"><img src="'+url+'"></a></div></div>')
+                  $('#result .row').append('<div class="col-12 col-lg-6"><div class="text-center mr-3 mb-3"><a data-index="'+i+'" href="javascript:;"><img src="'+url+'"></a></div></div>')
                 })
                 $('#result a').click(function() {
                   var a = this;
@@ -113,7 +113,7 @@
           <% else %>
             <div class="row">
               <% @prediction.result['output'].each_with_index { |url, i| %>
-              <div class="col-12 col-sm-6">
+              <div class="col-12 col-lg-6">
                 <div class="text-center mr-3 mb-3"><a href="/imagine/<%=@prediction.id%>/<%=i%>"><img src="<%=url%>"></a></div>
               </div>
               <% } if @prediction.result['output'] %>
@@ -133,7 +133,7 @@
       <% end %>
       <div class="mt-5 row no-gutters" id="favs">
         <% PredictionFav.order('created_at desc').shuffle.each { |prediction_fav| prediction = prediction_fav.prediction; f = prediction_fav.index %>
-        <div class="col-6 col-sm-3">
+        <div class="col-6 col-lg-3">
           <div class="text-center mr-3 mb-3">
             <a href="/imagine/<%=prediction.id%>/<%=prediction_fav.index%>"><img src="<%=prediction.result['output'][f]%>"></a>
           </div>

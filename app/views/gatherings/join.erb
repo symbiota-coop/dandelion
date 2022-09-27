@@ -11,10 +11,10 @@
   </div>
 <% end %>
 <div class="row" style="margin-top: 15px">
-  <div class="col-sm-4 order-sm-1">
+  <div class="col-lg-4 order-lg-1">
     <%= partial :'gatherings/cocreators' %>
   </div>
-  <div class="col-sm-8 order-sm-0">
+  <div class="col-lg-8 order-lg-0">
     <% if @gathering.intro_for_non_members %>
       <div class="wysiwyg">
         <%== Sanitize.fragment(Rinku.auto_link(@gathering.intro_for_non_members), Sanitize::Config::DANDELION) %>
@@ -26,7 +26,7 @@
       <% form_for @account, "/g/#{@gathering.slug}/join", style: 'margin-top: 20px' do |f| %>
         <script>
           $(function () {
-            $('.form-group > div.col-sm-6').removeClass('col-sm-6').addClass('col-sm-8')
+            $('.form-group > div.col-lg-6').removeClass('col-lg-6').addClass('col-lg-8')
           })
         </script>
         <% if !current_account or @membership %>

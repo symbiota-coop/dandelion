@@ -15,13 +15,13 @@
   </div>
 
   <% if params[:display] != 'map' %>
-    <div class="col-12 col-sm-auto">
+    <div class="col-12 col-lg-auto">
       <% form_tag (defined?(path) ? path : ''), method: 'get', class: 'form-inline submitOnChange' do %>
         <% params.each { |k,v| next if %w[format search order slug].include?(k) %>
-          <%= hidden_field_tag k, value: v %>
+        <%= hidden_field_tag k, value: v %>
         <% } %>
         <%= hidden_field_tag :search, value: 1 %>
-        <label>Sort by</label>
+        <label class="mr-sm-2">Sort by</label>
         <%= select_tag :order, options: { 'Event date' => 'date', 'Most recently created' => 'created_at' }, selected: params[:order], class: 'form-control' %>
         <a class="mt-2 mt-sm-0 ml-sm-3 badge badge-primary" style="font-weight: normal" id="ical" target="_blank" data-toggle="tooltip" href="<%= defined?(path) ? path : request.path %>.ics?<%= request.query_string %>">
           iCal <i class="fa fa-external-link"></i>

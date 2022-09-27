@@ -23,16 +23,16 @@
 
 <h2>Sign up to shifts</h2>
 <% @gathering.rotas.each { |rota| %>
-  <div class="row">
-    <div class="col-sm-6">
-<h2>
-  <a href="/g/<%= @gathering.slug %>/rotas/<%= rota.id %>">
-    <%= rota.name %>
-  </a>
-</h2>
-</div>
-<div class="col-sm-6">
-<%= partial :'rotas/progress', locals: {rota: rota} %>
-</div>
+<div class="row">
+  <div class="col-lg-6">
+    <h2>
+      <a href="/g/<%= @gathering.slug %>/rotas/<%= rota.id %>">
+        <%= rota.name %>
+      </a>
+    </h2>
+  </div>
+  <div class="col-lg-6">
+    <%= partial :'rotas/progress', locals: {rota: rota} %>
+  </div>
 </div>
 <% } %>

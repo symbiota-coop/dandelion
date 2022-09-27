@@ -12,11 +12,11 @@
 <% end %>
 <div class="row">
   <% unless @gathering.hide_members_on_application_form %>
-    <div class="col-sm-4 order-sm-1">
+    <div class="col-lg-4 order-lg-1">
       <%= partial :'gatherings/cocreators' %>
     </div>
   <% end %>
-  <div class="<%= @gathering.hide_members_on_application_form ? 'col-sm-12' : 'col-sm-8' %> order-sm-0">
+  <div class="<%= @gathering.hide_members_on_application_form ? 'col-lg-12' : 'col-lg-8' %> order-lg-0">
     <% if params[:accepted] %>
       <h2>You've been accepted to <%=@gathering.name%></h2>
       <p>Check your email app for a sign in link.</p>
@@ -32,7 +32,7 @@
       <% form_for @account, "/g/#{@gathering.slug}/apply", class: 'mt-3' do |f| %>
         <script>
           $(function () {
-            $('.form-group > div.col-sm-6').removeClass('col-sm-6').addClass('col-sm-8')
+            $('.form-group > div.col-lg-6').removeClass('col-lg-6').addClass('col-lg-8')
           })
         </script>
         <% if !current_account or @membership %>

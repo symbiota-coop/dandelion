@@ -83,21 +83,21 @@ organisations_remaining = Organisation.sum(:tokens) - @organisations.sum(:tokens
 <code>organisation_orders.sum { sqrt(order_value) } + donations_organisation_made_to_dandelion.sum { sqrt(donation_value) }</code>
 </pre>
 <p class="lead" style="margin-top: -0.75em">
-with the top-placed organisation to receive no more than 4x the number of tokens of the second-placed organisation.
+  with the top-placed organisation to receive no more than 4x the number of tokens of the second-placed organisation.
 </p>
 
 <% if current_account && current_account.tokens && current_account.tokens > 0 %>
-<p class="lead">
+  <p class="lead">
     You are in line to receive
     <%= "#{(100*current_account.tokens/t2).round(2)}%"%>
     of the total supply, putting you #<%=Account.and(:tokens.ne => nil, :tokens.gt => 0).order('tokens desc').pluck(:id).index(current_account.id) + 1 %> across all individual tokenholders.
-</p>
+  </p>
 <% end %>
 
 <div class="row justify-content-center">
 
   <% spins.each { |k,v| %>
-  <div class="col-12 col-md-6 mb-5">
+  <div class="col-12 col-lg-6 mb-5">
     <h2>Top
       <% if k == :@accounts %>
         individuals
@@ -116,7 +116,7 @@ with the top-placed organisation to receive no more than 4x the number of tokens
     <% } %>
   </div>
   <% } %>
-  <div class="col-12 col-md-8">
+  <div class="col-12 col-lg-8">
     <canvas style="width: 100%" id="chart-area"></canvas>
   </div>
 </div>

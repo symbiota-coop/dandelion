@@ -1,5 +1,5 @@
 <div class="row justify-content-center">
-  <div class="col-12 col-md-8">
+  <div class="col-12 col-lg-8">
     <h1>Feedback on <%= @event.summary %></h1>
     <% form_for @event_feedback, "/events/#{@event.id}/give_feedback" do |f| %>
       <%= f.hidden_field :account_id %>

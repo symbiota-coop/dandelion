@@ -1,11 +1,11 @@
 <div class="row">
-  <div class="col-12 col-sm-auto text-center">
+  <div class="col-12 col-lg-auto text-center">
     <% if @habit.image %>
       <img src="<%= u @habit.image.thumb('200x200').url %>">
     <% end %>
   </div>
   <div class="col-12 col-sm">
-    <div class="text-center text-sm-left">
+    <div class="text-center text-lg-left">
       <h1>
         <%= @habit.name %>
         <% if !@habit.public? %>

@@ -1,17 +1,17 @@
 <div class="row">
-  <div class="col-12 col-sm-auto text-center">
+  <div class="col-12 col-lg-auto text-center">
     <img title="<%= account.name %>" style="width: 200px; background: white; border: 3px solid white" src="<%= u account.picture_thumb_or_gravatar_url %>">
   </div>
   <div class="col-12 col-sm">
     <% if defined?(modal) %>
     <% else %>
-      <div class="mb-2 text-center text-sm-left">
+      <div class="mb-2 text-center text-lg-left">
         <h1 class="my-0 d-inline">
           <a class="text-dark" href="/u/<%= account.username %>"><%= account.name %></a>
           <small class="text-muted">@<%= account.username %></small>
         </h1>
         <% if current_account && (follow = Follow.find_by(follower: account, followee: current_account)) %>
-          <small class="d-inline-block mt-1 mt-sm-0 label label-default"><%= follow.unsubscribed ? 'Follows you' : 'Follows and subscribes to you' %></small>
+          <small class="d-inline-block mt-1 mt-lg-0 label label-default"><%= follow.unsubscribed ? 'Follows you' : 'Follows and subscribes to you' %></small>
         <% end %>
       </div>
     <% end %>

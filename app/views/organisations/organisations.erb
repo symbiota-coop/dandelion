@@ -3,7 +3,7 @@
   <p><%== pagination_details @organisations, model: 'Organisation' %></p>
 <% end %>
 <% if current_account %>
-  <a class="btn btn-primary mt-1 mt-sm-0 mb-3" href="/o/new"><i class="fa fa-plus-circle"></i> Create an organisation</a>
+  <a class="btn btn-primary mt-1 mt-lg-0 mb-3" href="/o/new"><i class="fa fa-plus-circle"></i> Create an organisation</a>
 <% end %>
 <% if current_account && current_account.organisationships.count > 0 %>
   <h2>Your organisations</h2>

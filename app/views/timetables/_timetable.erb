@@ -1,7 +1,7 @@
 <% if timetable.hide_schedule? %>
   <div class="row" style="margin-top: 15px">
     <% timetable.tactivities.sort_by { |tactivity| -tactivity.attendances.count }.each { |tactivity| %>
-    <div class="col-sm-3">
+    <div class="col-lg-3">
       <%= partial :'timetables/tactivity', object: tactivity %>
     </div>
     <% } %>
@@ -10,7 +10,7 @@
   <% if (admin? || @membership.admin?) or timetable.scheduling_by_all %>
     <script>
       $(function () {
-        if ($(window).width() > 768) {
+        if ($(window).width() > 992) {
           $('.tactivity').draggable({revert: "invalid"});
           $('.tactivity-accept').droppable({
             drop: function (event, ui) {
@@ -33,7 +33,7 @@
   <h3>Unscheduled</h3>
   <div class="row mt-3">
     <% unscheduled.sort_by { |tactivity| -tactivity.attendances.count }.each { |tactivity| %>
-    <div class="col-6 col-sm-3 mb-3">
+    <div class="col-6 col-lg-3 mb-3">
       <%= partial :'timetables/tactivity', object: tactivity %>
     </div>
     <% } %>

@@ -18,10 +18,10 @@
          'follow_and_subscribe' => 'Follow with email updates <i class="fa fa-envelope"></i>'
        } %>
     <% if current_state == 'not_following' %>
-      <a class="pagelet-trigger d-block d-sm-inline-block w-100 w-sm-auto mb-1 btn btn-outline-primary <%= btn_class if defined?(btn_class) %>" href="/follow/<%= account.id %>?f=follow_and_subscribe">Follow</a>
+      <a class="pagelet-trigger d-block d-lg-inline-block w-100 w-lg-auto mb-1 btn btn-outline-primary <%= btn_class if defined?(btn_class) %>" href="/follow/<%= account.id %>?f=follow_and_subscribe">Follow</a>
     <% else %>
-      <div class="dropdown d-block d-sm-inline-block">
-        <button class="d-block d-sm-inline-block w-100 w-sm-auto mb-1 btn <%= btn_class if defined?(btn_class) %> <%= current_state == 'not_following' ? 'btn-outline-primary' : 'btn-primary' %> dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+      <div class="dropdown d-block d-lg-inline-block">
+        <button class="d-block d-lg-inline-block w-100 w-lg-auto mb-1 btn <%= btn_class if defined?(btn_class) %> <%= current_state == 'not_following' ? 'btn-outline-primary' : 'btn-primary' %> dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
           <%== text %>
         </button>
         <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
@@ -32,7 +32,7 @@
       </div>
     <% end %>
     <% if %w{follow_without_subscribing follow_and_subscribe}.include?(current_state) %>
-      <div class="d-block d-sm-inline-block mt-1 mt-sm-0" data-pagelet-url="/follow/starred/<%= follow.id %>?btn_class=<%= btn_class if defined?(btn_class) %>">
+      <div class="d-block d-lg-inline-block mt-1 mt-lg-0" data-pagelet-url="/follow/starred/<%= follow.id %>?btn_class=<%= btn_class if defined?(btn_class) %>">
         <%= partial :'accounts/star', locals: { follow: follow, btn_class: (btn_class if defined?(btn_class)) } %>
       </div>
     <% end %>

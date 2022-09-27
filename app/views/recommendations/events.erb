@@ -22,7 +22,7 @@ show_image = (Padrino.env == :production)
               <% if !event.image && (defined?(full_width) && full_width) %>
 
               <% else %>
-                <div class="col-md-6 order-md-2 mb-2 mb-md-0">
+                <div class="col-lg-6 order-lg-2 mb-2 mb-lg-0">
                   <% if @organisation && (cohostship = event.cohostships.find_by(organisation: @organisation)) && cohostship.image && (cohostship.image.width >= cohostship.image.height) %>
                     <a target="_parent" href="/events/<%= event.id %>?cohost=<%=@organisation.slug%>"><img class="w-100" src="<%= u cohostship.image.thumb('640x640').url %>"></a>
                   <% elsif event.image && (event.image.width >= event.image.height) %>
@@ -31,45 +31,45 @@ show_image = (Padrino.env == :production)
                 </div>
               <% end %>
             <% end %>
-            <div class="<% if show_image && !event.image && (defined?(full_width) && full_width) %>col-md-12<% else %>col-md-6<% end %> order-md-1">
+            <div class="<% if show_image && !event.image && (defined?(full_width) && full_width) %>col-lg-12<% else %>col-lg-6<% end %> order-lg-1">
               <table style="width: 100%; height: 100%">
                 <tr>
                   <td style="vertical-align: top">
                     <div class="row justify-content-between">
-                      <div class="col ml-1 p-sm-3">
+                      <div class="col ml-1 p-lg-3">
                         <%= partial :'events/block_main', locals: { event: event, skip_final_ul: true } %>
 
-                    <li><i data-toggle="tooltip" title="People" class="fa fa-li fa-user"></i>
+                        <li><i data-toggle="tooltip" title="People" class="fa fa-li fa-user"></i>
                           <% people.each { |k,v| account = Account.find(k) %>
-                            <a href="/u/<%=account.username%>"><%=account.name%></a>,
-                            <span data-toggle="tooltip">
-                              <%=pluralize v.count, 'past event'%> in common
-                            </span>
-                            <span class="d-none">
-                              <%== Event.and(:id.in => v).map { |event| "#{event.name}" }.join('<br />')%>
-                            </span>
-                            <br />
+                          <a href="/u/<%=account.username%>"><%=account.name%></a>,
+                          <span data-toggle="tooltip">
+                            <%=pluralize v.count, 'past event'%> in common
+                          </span>
+                          <span class="d-none">
+                            <%== Event.and(:id.in => v).map { |event| "#{event.name}" }.join('<br />')%>
+                          </span>
+                          <br />
                           <% } %>
-                      </li>
-                    </ul>
+                        </li>
+                      </ul>
 
-                      </div>
                     </div>
-                  </td>
-                </tr>
-              </table>
-            </div>
+                  </div>
+                </td>
+              </tr>
+            </table>
           </div>
-
         </div>
+
       </div>
-      <% } %>
     </div>
+    <% } %>
   </div>
-  <style>
-    @media(max-width: 767px) {
-      .fake-container-fluid > .px-5 { padding-left: 1rem !important; padding-right: 1rem !important }
-      .fake-container-fluid > .bg-grey-transparent-2 { background: white !important }
-    }
-  </style>
+</div>
+<style>
+  @media(max-width: 991px) {
+    .fake-container-fluid > .px-5 { padding-left: 1rem !important; padding-right: 1rem !important }
+    .fake-container-fluid > .bg-grey-transparent-2 { background: white !important }
+  }
+</style>
 <% end %>

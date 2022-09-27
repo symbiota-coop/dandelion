@@ -1,7 +1,7 @@
 <% if average_rating = event_feedbacks.average_rating %>
   <div id="average-rating" style="font-size: 2em">
     <%= average_rating %><small class="text-muted">/5 from <%= pluralize event_feedbacks.count, 'rating' %></small>
-    <div class="d-sm-inline">
+    <div class="d-lg-inline">
       <% average_rating.round.times do %><i class="fa fa-star"></i><% end %>
     </div>
   </div>

@@ -1,7 +1,7 @@
-<% form_tag "/follow/star/#{follow.id}", class: 'd-block d-sm-inline-block w-100' do %>
+<% form_tag "/follow/star/#{follow.id}", class: 'd-block d-lg-inline-block w-100' do %>
   <% if !follow.starred %>
-    <a class="pagelet-trigger d-block d-sm-inline-block w-100 w-sm-auto mb-1 btn btn-outline-primary <%= btn_class if defined?(btn_class) %>" href="/follow/star/<%= follow.id %>">Star <i class="fa fa-star-o"></i></a>
+    <a class="pagelet-trigger d-block d-lg-inline-block w-100 w-lg-auto mb-1 btn btn-outline-primary <%= btn_class if defined?(btn_class) %>" href="/follow/star/<%= follow.id %>">Star <i class="fa fa-star-o"></i></a>
   <% else %>
-    <a class="pagelet-trigger d-block d-sm-inline-block w-100 w-sm-auto mb-1 btn btn-primary <%= btn_class if defined?(btn_class) %>" href="/follow/unstar/<%= follow.id %>">Starred <i class="fa fa-star"></i></a>
+    <a class="pagelet-trigger d-block d-lg-inline-block w-100 w-lg-auto mb-1 btn btn-primary <%= btn_class if defined?(btn_class) %>" href="/follow/unstar/<%= follow.id %>">Starred <i class="fa fa-star"></i></a>
   <% end %>
 <% end %>

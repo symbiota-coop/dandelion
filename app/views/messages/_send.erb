@@ -16,9 +16,9 @@
 <script>
   function doSlimscroll() {
     $('#thread-scroll').slimScroll({
-      height: $(window).height() - $('#header').outerHeight(true) - ($(window).width() > 768 ? 2 : 3)*parseFloat($('#content').css('paddingTop')) - $('#message-breadcrumbs').outerHeight(true) - $('#messengee').outerHeight(true) - $('#message-send').outerHeight(true),
+      height: $(window).height() - $('#header').outerHeight(true) - ($(window).width() > 992 ? 2 : 3)*parseFloat($('#content').css('paddingTop')) - $('#message-breadcrumbs').outerHeight(true) - $('#messengee').outerHeight(true) - $('#message-send').outerHeight(true),
       start: 'bottom',
-      wheelStep: ($(window).width() > 768 ? 10 : 100)
+      wheelStep: ($(window).width() > 992 ? 10 : 100)
     })
   }
 
@@ -34,7 +34,7 @@
       doSlimscroll()
     })
 
-    if ($(window).width() > 768)
+    if ($(window).width() > 992)
       $('#message-body').focus()
   })
 </script>

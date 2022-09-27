@@ -1,11 +1,11 @@
 <% if defined?(modal) && modal %>
-  <a href="/u/<%= account.username %>" class="d-block d-sm-inline-block mb-1 <%= btn_class if defined?(btn_class) %> btn btn-primary">View full profile</a>
+  <a href="/u/<%= account.username %>" class="d-block d-lg-inline-block mb-1 <%= btn_class if defined?(btn_class) %> btn btn-primary">View full profile</a>
 <% end %>
 <% unless current_account && current_account.id == account.id %>
   <% if current_account %>
-    <div class="d-block d-sm-inline-block " data-pagelet-url="/follow/<%= account.id %>?btn_class=<%= btn_class if defined?(btn_class) %>">
+    <div class="d-block d-lg-inline-block " data-pagelet-url="/follow/<%= account.id %>?btn_class=<%= btn_class if defined?(btn_class) %>">
       <%= partial :'accounts/follow', locals: { account: account, btn_class: (btn_class if defined?(btn_class)) } %>
     </div>
   <% end %>
-  <a href="/messages/<%= account.id %>" class="d-block d-sm-inline-block mb-1 <%= btn_class if defined?(btn_class) %> btn btn-outline-primary"><i class="ti-comment"></i> Message</a>
+  <a href="/messages/<%= account.id %>" class="d-block d-lg-inline-block mb-1 <%= btn_class if defined?(btn_class) %> btn btn-outline-primary"><i class="ti-comment"></i> Message</a>
 <% end %>

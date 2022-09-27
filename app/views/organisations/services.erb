@@ -1,11 +1,11 @@
 <%= partial :'organisations/nav', locals: { organisation: @organisation } %>
 <div class="row align-items-center justify-content-center mb-3">
-  <div class="col-12 col-sm-auto text-center">
+  <div class="col-12 col-lg-auto text-center">
     <% if @organisation.image %>
       <a href="/o/<%= @organisation.slug %>"><img src="<%= u @organisation.image.thumb('200x200').url %>"></a>
     <% end %>
   </div>
-  <div class="col-12 col-sm text-center text-sm-left">
+  <div class="col-12 col-sm text-center text-lg-left">
     <h1>
       <a href="/o/<%= @organisation.slug %>"><%= @organisation.name %></a>'s services
     </h1>

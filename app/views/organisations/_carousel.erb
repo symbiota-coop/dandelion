@@ -16,7 +16,7 @@
       slidesToScroll: 3,
       responsive: [
         {
-          breakpoint: 768,
+          breakpoint: 992,
           settings: {
             slidesToShow: 2,
             slidesToScroll: 2
@@ -37,7 +37,7 @@
     <% end %>
     <div class="slick-responsive row justify-content-center">
       <% organisations.each { |organisation| %>
-      <div class="col-6 col-sm-6 col-md-4 slick-item">
+      <div class="col-6 col-lg-4 slick-item">
         <%= partial :'organisations/block', locals: { organisation: organisation } %>
       </div>
       <% } %>

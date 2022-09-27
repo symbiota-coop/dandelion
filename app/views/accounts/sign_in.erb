@@ -1,5 +1,5 @@
 <div class="row justify-content-center">
-  <div class="col col-sm-4">
+  <div class="col col-lg-4">
     <%= @hide_alert = true; partial :flash %>
     <div class="card" id="sign_in">
       <div class="hw card-header text-white bg-primary">
@@ -20,11 +20,11 @@
           <% end %>
           <a href="javascript:;" onclick="$('#t1').hide();$('#t2').show().find('input').focus()" class="mt-3 mb-1 btn btn-primary">Get a sign in link via email <i class="fa fa-envelope"></i> </a>
           <% if !Provider.all.empty? %>
-              <% Provider.all.each { |provider| %>
-              <p>
-                <a class="btn btn-primary" href="/auth/<%= provider.omniauth_name %>">Sign in with <%= provider.display_name %> <i class="<%= provider.icon %>"></i></a>
-              </p>
-              <% } %>
+            <% Provider.all.each { |provider| %>
+            <p>
+              <a class="btn btn-primary" href="/auth/<%= provider.omniauth_name %>">Sign in with <%= provider.display_name %> <i class="<%= provider.icon %>"></i></a>
+            </p>
+            <% } %>
           <% end %>
           <a href="/accounts/new" class="btn btn-outline-primary">
             Not yet registered? Sign up here
@@ -34,7 +34,7 @@
           <% form_tag '/accounts/sign_in_link' do %>
             <div class="form-group mb-1">
               <label class="sr-only">Email</label>
-              <%= email_field_tag :email, class: 'form-control mr-sm-2', placeholder: 'Email' %>
+              <%= email_field_tag :email, class: 'form-control', placeholder: 'Email' %>
             </div>
             <button class="btn btn-primary" type="submit">Submit</button>
           <% end %>

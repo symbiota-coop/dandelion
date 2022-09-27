@@ -22,103 +22,101 @@
 <% end %>
 
 <% unless params[:upcoming_events_page] %>
-<% if past_events.count > 0; events = past_events %>
-  <h2 class="mb-3">Past events</h2>
+  <% if past_events.count > 0; events = past_events %>
+    <h2 class="mb-3">Past events</h2>
 
-  <% if events.count > 0 %>
-    <div class="fake-container-fluid mb-3">
-      <div class="row bg-grey-transparent-2 pt-4 px-5" id="events">
-        <% events.each { |event| next if event.draft? && !event_admin?(event) %>
-        <div class="col-12 <%= block_class if defined?(block_class) %>" id="<%= event.id %>">
-          <div class="mb-4">
+    <% if events.count > 0 %>
+      <div class="fake-container-fluid mb-3">
+        <div class="row bg-grey-transparent-2 pt-4 px-5" id="events">
+          <% events.each { |event| next if event.draft? && !event_admin?(event) %>
+          <div class="col-12 <%= block_class if defined?(block_class) %>" id="<%= event.id %>">
+            <div class="mb-4">
 
-            <div class="row block no-gutters align-items-center <% if event.draft? %>bg-grey-transparent-2<% else %>bg-white<% end %>">
-              <% if !event.image && (defined?(full_width) && full_width) %>
+              <div class="row block no-gutters align-items-center <% if event.draft? %>bg-grey-transparent-2<% else %>bg-white<% end %>">
+                <% if !event.image && (defined?(full_width) && full_width) %>
 
-              <% else %>
-                <div class="col-md-6 order-md-2 mb-2 mb-md-0">
-                  <% if @organisation && (cohostship = event.cohostships.find_by(organisation: @organisation)) && cohostship.image && (cohostship.image.width >= cohostship.image.height) %>
-                    <a target="_parent" href="/events/<%= event.id %>?cohost=<%=@organisation.slug%>"><img class="w-100" src="<%= u cohostship.image.thumb('640x640').url %>"></a>
-                  <% elsif event.image && (event.image.width >= event.image.height) %>
-                    <a target="_parent" href="/events/<%= event.id %>"><img class="w-100" src="<%= u event.image.thumb('640x640').url %>"></a>
-                  <% end %>
-                </div>
-              <% end %>
-              <div class="<% if !event.image && (defined?(full_width) && full_width) %>col-md-12<% else %>col-md-6<% end %> order-md-1">
-                <table style="width: 100%; height: 100%">
-                  <tr>
-                    <td style="vertical-align: top">
-                      <div class="row justify-content-between">
-                        <div class="col ml-1 p-sm-3">
-                          <%= partial :'events/block_main', locals: { event: event, skip_final_ul: true } %>
+                <% else %>
+                  <div class="col-lg-6 order-lg-2 mb-2 mb-lg-0">
+                    <% if @organisation && (cohostship = event.cohostships.find_by(organisation: @organisation)) && cohostship.image && (cohostship.image.width >= cohostship.image.height) %>
+                      <a target="_parent" href="/events/<%= event.id %>?cohost=<%=@organisation.slug%>"><img class="w-100" src="<%= u cohostship.image.thumb('640x640').url %>"></a>
+                    <% elsif event.image && (event.image.width >= event.image.height) %>
+                      <a target="_parent" href="/events/<%= event.id %>"><img class="w-100" src="<%= u event.image.thumb('640x640').url %>"></a>
+                    <% end %>
+                  </div>
+                <% end %>
+                <div class="<% if !event.image && (defined?(full_width) && full_width) %>col-lg-12<% else %>col-lg-6<% end %> order-lg-1">
+                  <table style="width: 100%; height: 100%">
+                    <tr>
+                      <td style="vertical-align: top">
+                        <div class="row justify-content-between">
+                          <div class="col ml-1 p-lg-3">
+                            <%= partial :'events/block_main', locals: { event: event, skip_final_ul: true } %>
 
-                          <% if event.attendees.include?(current_account) %>
+                            <% if event.attendees.include?(current_account) %>
 
-                          <li>
+                              <li>
 
-                            <% if (event_feedback = event.event_feedbacks.find_by(account: current_account)) %>
-                            <div class="mt-1">
-                            <% if event_feedback.rating %>
-                              <% event_feedback.rating.times do %><i class="fa fa-star"></i><% end %>
-                            <% end %>
+                                <% if (event_feedback = event.event_feedbacks.find_by(account: current_account)) %>
+                                  <div class="mt-1">
+                                    <% if event_feedback.rating %>
+                                      <% event_feedback.rating.times do %><i class="fa fa-star"></i><% end %>
+                                    <% end %>
 
-                              <% event_feedback.event.feedback_questions_a.each_with_index { |q,i|
+                                    <% event_feedback.event.feedback_questions_a.each_with_index { |q,i|
                                 qa = event_feedback.answers.detect { |k, _v| k == q }
                                    a = qa[1] if qa
                                    if a
                                    %>
-                              <p class="mt-1">
-                                <strong>
-                                  <%== Sanitize.fragment(Rinku.auto_link(q), Sanitize::Config::DANDELION) %>
-                                </strong>
-                                <br>
-                                <%  %>
-                                <% if a %>
-                                  <%== Sanitize.fragment(Rinku.auto_link(a), Sanitize::Config::DANDELION) %>
-                                <% end %>
-                              </p>
+                                    <p class="mt-1">
+                                      <strong>
+                                        <%== Sanitize.fragment(Rinku.auto_link(q), Sanitize::Config::DANDELION) %>
+                                      </strong>
+                                      <br>
+                                      <%  %>
+                                      <% if a %>
+                                        <%== Sanitize.fragment(Rinku.auto_link(a), Sanitize::Config::DANDELION) %>
+                                      <% end %>
+                                    </p>
 
-                              <% end } %>
-                            </div>
-                            <% else %>
-                              <i data-toggle="tooltip" title="Location" class="fa fa-li fa-star-o"></i>
-                              <a href="/events/<%=event.id%>/give_feedback">Give feedback</a>
-                            <% end %>
-                          </li>
+                                  <% end } %>
+                                </div>
+                              <% else %>
+                                <i data-toggle="tooltip" title="Location" class="fa fa-li fa-star-o"></i>
+                                <a href="/events/<%=event.id%>/give_feedback">Give feedback</a>
+                              <% end %>
+                            </li>
 
                           <% end %>
 
                         </ul>
 
 
-                        </div>
                       </div>
-                    </td>
-                  </tr>
-                </table>
-              </div>
+                    </div>
+                  </td>
+                </tr>
+              </table>
             </div>
-
-
-
           </div>
+
+
         </div>
-        <% } %>
       </div>
+      <% } %>
     </div>
-    <style>
-      @media(max-width: 767px) {
-        .fake-container-fluid > .px-5 { padding-left: 1rem !important; padding-right: 1rem !important }
-        .fake-container-fluid > .bg-grey-transparent-2 { background: white !important }
-      }
-    </style>
-  <% end %>
-
-
-
-  <div class="mt-3">
-    <%= will_paginate past_events, param_name: 'past_events_page', inner_window: 0, outer_window: 0, renderer: WillPaginate::ViewHelpers::BootstrapRenderer %>
   </div>
+  <style>
+    @media(max-width: 991px) {
+      .fake-container-fluid > .px-5 { padding-left: 1rem !important; padding-right: 1rem !important }
+      .fake-container-fluid > .bg-grey-transparent-2 { background: white !important }
+    }
+  </style>
+<% end %>
+
+
+<div class="mt-3">
+  <%= will_paginate past_events, param_name: 'past_events_page', inner_window: 0, outer_window: 0, renderer: WillPaginate::ViewHelpers::BootstrapRenderer %>
+</div>
 <% end %>
 
 <% end %>

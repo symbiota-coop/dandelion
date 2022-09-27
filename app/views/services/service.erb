@@ -3,7 +3,7 @@
 <% end %>
 
 <div class="row">
-  <div class="col-12 col-sm-9">
+  <div class="col-12 col-lg-9">
 
     <h2>
       <%= @service.name_with_provider %>
@@ -72,7 +72,7 @@
     <% end %>
 
   </div>
-  <div class="col-12 col-sm-3 text-center">
+  <div class="col-12 col-lg-3 text-center">
     <img title="<%= @service.account.name %>" class="rounded-circle" style="max-width: 200px; width: 100%; background: white; border: 3px solid white" src="<%= u @service.account.picture_thumb_or_gravatar_url %>">
   </div>
 </div>
@@ -118,7 +118,7 @@
         <%= text_field_tag :date, id: 'dateSelect', style: 'display: none' %>
       </div>
     </div>
-    <div class="col-12 col-sm-4" id="booking">
+    <div class="col-12 col-lg-4" id="booking">
       <% form_for @booking, '', style: 'display: none' do |f| %>
         <%= f.text_block :start_time %>
         <%= f.text_block :end_time %>
@@ -129,7 +129,7 @@
         </div>
       </div>
     </div>
-    <div class="col-12 col-sm-4">
+    <div class="col-12 col-lg-4">
       <h4>&nbsp;</h4>
       <div class="card mb-3" id="details">
         <h3 class="card-header bg-primary text-white">Your details</h3>

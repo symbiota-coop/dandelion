@@ -1,7 +1,7 @@
 <div class="row">
   <% if current_account.messages.count > 0 %>
-    <div id="preview-panel" class="col-md-3 <% if @account %>d-none d-md-block <% end %>">
-      <div class="d-block d-md-none">
+    <div id="preview-panel" class="col-lg-3 <% if @account %>d-none d-lg-block <% end %>">
+      <div class="d-block d-lg-none">
         <ul class="breadcrumb">
           <li class="breadcrumb-item active">Messages</li>
         </ul>
@@ -11,10 +11,10 @@
       </div>
     </div>
   <% end %>
-  <div id="thread-panel" class="<% if current_account.messages.count > 0 %>col-md-9<% else %>col-md-12<% end %>">
+  <div id="thread-panel" class="<% if current_account.messages.count > 0 %>col-lg-9<% else %>col-lg-12<% end %>">
     <div style="position: sticky; top: 3.75rem">
       <% if @account %>
-        <div class="d-block d-md-none">
+        <div class="d-block d-lg-none">
           <ul id="message-breadcrumbs" class="breadcrumb">
             <li class="breadcrumb-item"><a href="javascript:;" onclick="$('#thread-panel').hide();
                 $('#preview-panel').removeClass('d-none')">Messages</a></li>

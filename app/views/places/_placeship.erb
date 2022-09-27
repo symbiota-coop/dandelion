@@ -31,7 +31,7 @@
     </div>
   <% end %>
   <% if %w{follow_without_subscribing follow_and_subscribe}.include?(current_state) && current_account.placeship_categories.count > 0 %>
-    <div class="d-inline-block mr-2 mt-1 mt-sm-0" data-pagelet-url="/placeship/categorise/<%= placeship.id %>">
+    <div class="d-inline-block mr-2 mt-1 mt-lg-0" data-pagelet-url="/placeship/categorise/<%= placeship.id %>">
       <%= partial :'placeship_categories/categorise', locals: { placeship: placeship } %>
     </div>
   <% end %>

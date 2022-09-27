@@ -159,7 +159,7 @@
       <td>
         <div class="row justify-content-between no-gutters">
           <div class="col">
-            <%== account.open_to.map { |x| %(<span class="text-white label label-primary d-inline-block mb-1 mb-sm-0">#{x.humanize}</span>) }.join(' ') %>
+            <%== account.open_to.map { |x| %(<span class="text-white label label-primary d-inline-block mb-1 mb-lg-0">#{x.humanize}</span>) }.join(' ') %>
           </div>
           <% if current_account && current_account.id == account.id %>
             <div class="col-auto">

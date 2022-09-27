@@ -1,18 +1,18 @@
 <% content_for :content do %>
   <%= partial :'gatherings/nav', locals: { gathering: @gathering, membership: @membership } %>
   <div class="row">
-    <div class="col-sm-9 order-sm-0">
+    <div class="col-lg-9 order-lg-0">
       <% if @team and @team.persisted? %>
         <h2># <%= @team.name %></h2>
       <% end %>
       <%= yield %>
     </div>
-    <div class="col-sm-3 order-sm-1">
+    <div class="col-lg-3 order-lg-1">
       <% if @team and @team.persisted? %>
-        <h2 class="mt-3 mt-sm-0">Team members</h2>
+        <h2 class="mt-3 mt-lg-0">Team members</h2>
         <div class="image-wall">
           <% (@members = @team.members.order('last_active desc').paginate(page: params[:members_page], per_page: 21)).each { |account| %>
-            <%= partial :'accounts/square', locals: { account: account, content: ("Active #{time_ago_in_words account.last_active} ago" if account.last_active), width: '75px' } %>
+          <%= partial :'accounts/square', locals: { account: account, content: ("Active #{time_ago_in_words account.last_active} ago" if account.last_active), width: '75px' } %>
           <% } %>
         </div>
         <style>

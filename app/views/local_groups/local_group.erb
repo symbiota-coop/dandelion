@@ -1,7 +1,7 @@
 <%= partial :'local_groups/nav', locals: { local_group: @local_group } %>
 <div class="row">
   <div class="col-12 col-sm">
-    <div class="text-center text-sm-left">
+    <div class="text-center text-lg-left">
       <h1>
         <%= @local_group.name %> group of <a href="/o/<%= @local_group.organisation.slug %>"><%= @local_group.organisation.name %></a>
       </h1>

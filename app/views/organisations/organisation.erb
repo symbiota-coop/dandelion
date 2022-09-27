@@ -1,23 +1,23 @@
 <%= partial :'organisations/nav', locals: { organisation: @organisation } %>
 <div class="row">
-  <div class="col-12 col-sm-auto text-center">
+  <div class="col-12 col-lg-auto text-center">
     <% if @organisation.image %>
       <img src="<%= u @organisation.image.thumb('200x200').url %>">
     <% end %>
   </div>
   <div class="col-12 col-sm">
-    <div class="text-center text-sm-left">
+    <div class="text-center text-lg-left">
       <h1>
         <%= @organisation.name %>
         <span style="font-size: 60%" ><%= partial :'organisations/check', locals: {organisation: @organisation} %></span>
       </h1>
       <% if current_account %>
         <div class="row no-gutters">
-          <div class="col ml-sm-2">
+          <div class="col ml-lg-2">
             <%= partial :'organisations/buttons' %>
           </div>
           <div class="col-auto">
-            <div class="d-none d-sm-block">
+            <div class="d-none d-lg-block">
               <% if organisation_monthly_donor_plus? %>
                 <a class="btn btn-outline-primary" href="/o/<%= @organisation.slug %>/members">Members' area</a>
               <% end %>

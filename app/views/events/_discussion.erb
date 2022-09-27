@@ -7,22 +7,22 @@
     <% end %>
     <% if Padrino.env != :test && @event.posts.count == 1 && @event.posts.first.subject == "Chat for #{@event.name}" %>
       <style>
-        @media(max-width: 767px) {
+        @media(max-width: 991px) {
             #chat { display: block !important }
         }
-        @media(min-width: 768px) {
+        @media(min-width: 992px) {
           #chat-container { border-radius: 0.25rem; box-shadow: #666 0 0 5px; background: white; position: fixed; width: 411px; bottom: 0.475rem; right: 0.475rem;  }
           #chat { height: 400px; overflow: auto }
         }
       </style>
-      <h2 class="d-sm-none mt-5">Private discussion for attendees and facilitators</h2>
+      <h2 class="d-lg-none mt-5">Private discussion for attendees and facilitators</h2>
       <div id="chat-container">
-        <div class="d-none d-sm-block p-2 bg-primary" style="border-radius: 0.25rem 0.25rem 0 0;">
+        <div class="d-none d-lg-block p-2 bg-primary" style="border-radius: 0.25rem 0.25rem 0 0;">
           <a id="chat-hide"
         <% if @event.posts.first.comments.count == 1 %>
             style="display:none"
         <% end %>
-        class="text-white" href="javascript:;" onclick="$('#chat').hide();$(this).hide().next().show();$('#chat-spacer').removeClass('d-sm-block');$('#select-tickets').addClass('mb-4')">
+        class="text-white" href="javascript:;" onclick="$('#chat').hide();$(this).hide().next().show();$('#chat-spacer').removeClass('d-lg-block');$('#select-tickets').addClass('mb-4')">
             <span class="float-right"><i class="fa fa-angle-double-down"></i></span>
             <span class="text-white font-weight-bold">
               Private discussion for attendees and facilitators
@@ -32,7 +32,7 @@
         <% if @event.posts.first.comments.count > 1 %>
             style="display:none"
         <% end %>
-          class="text-white" href="javascript:;" onclick="$('#chat').show();$(this).hide().prev().show();$('#chat-spacer').addClass('d-sm-block');$('#select-tickets').removeClass('mb-4')">
+          class="text-white" href="javascript:;" onclick="$('#chat').show();$(this).hide().prev().show();$('#chat-spacer').addClass('d-lg-block');$('#select-tickets').removeClass('mb-4')">
             <span class="float-right"><i class="fa fa-angle-double-up"></i></span>
             <span class="text-white font-weight-bold">
               Private discussion for attendees and facilitators
@@ -47,7 +47,7 @@
       </div>
       <div class="d-none
     <% if @event.posts.first.comments.count > 1 %>
-      d-sm-block
+      d-lg-block
     <% end %>" id="chat-spacer" style="margin-bottom: 410px"></div>
     <% else %>
       <h2 class="mt-5">Private discussion for attendees and facilitators</h2>

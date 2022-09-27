@@ -10,7 +10,7 @@
 </div>
 <% if params[:registered] %>
   <div class="row justify-content-center">
-    <div class="col-12 col-md-8">
+    <div class="col-12 col-lg-8">
       <div class="card mb-3">
         <div class="card-body">
           <% buttons = @organisation.organisation_tiers.order('threshold asc').map { |organisation_tier| %(<a target="_blank" class="btn btn-primary btn-lg mb-1" href="#{organisation_tier.gocardless_url}">#{m organisation_tier.threshold, @organisation.currency}</a>) }.join(' ') %>
@@ -28,7 +28,7 @@
   </div>
 <% else %>
   <div class="row justify-content-center">
-    <div class="col-12 col-md-8">
+    <div class="col-12 col-lg-8">
       <div class="card mb-3">
         <div class="card-body">
           <h4 class="card-title">
@@ -58,7 +58,7 @@
             <%= text_field_tag :'account[name]', class: 'form-control mr-1 mb-1', required: true, placeholder: 'Name' %>
             <%= email_field_tag :'account[email]', class: 'form-control mr-1 mb-1', required: true, placeholder: 'Email' %>
             <div class="g-recaptcha" style="margin-bottom: 2px" data-sitekey="<%= ENV['RECAPTCHA_SITE_KEY'] %>"></div>
-            <%= submit_tag 'Subscribe', class: 'btn d-block d-sm-inline btn-primary mb-1' %>
+            <%= submit_tag 'Subscribe', class: 'btn d-block d-lg-inline btn-primary mb-1' %>
           <% end %>
         </div>
       </div>

@@ -7,7 +7,7 @@
       <th>Places</th>
       <th></th>
       <% if @membership.confirmed? %>
-        <th style="width: 33%" class="d-none d-sm-table-cell">People</th>
+        <th style="width: 33%" class="d-none d-lg-table-cell">People</th>
       <% end %>
     </tr>
   </thead>
@@ -72,7 +72,7 @@
       <% end %>
     </td>
     <% if @membership.confirmed? %>
-      <td class="d-none d-sm-table-cell">
+      <td class="d-none d-lg-table-cell">
         <% y = [] %>
         <% option.optionships.shuffle.each { |optionship| account = optionship.account; %>
         <% if params[:view] == 'names' %>
@@ -111,7 +111,7 @@
 <% end } %>
 </table>
 <% if params[:view] != 'names' %>
-  <div class="d-none d-sm-block">
+  <div class="d-none d-lg-block">
     <a onclick="$(this).closest('[data-pagelet-url]').attr('data-pagelet-url', '/g/<%= @gathering.slug %>/options?view=names')" href="#" class="pagelet-trigger">Show names instead of pictures</a>
   </div>
 <% end %>

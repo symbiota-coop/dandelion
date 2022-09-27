@@ -1,17 +1,17 @@
 <div class="row block no-gutters align-items-center <% if service.draft? %>bg-grey-transparent-2<% else %>bg-white<% end %>">
-  <div class="col-auto order-md-2 mb-2 mb-md-0">
+  <div class="col-auto order-lg-2 mb-2 mb-lg-0">
     <% if service.account.picture %>
       <div class="p-3">
         <a target="_parent" href="/services/<%= service.id %>"><img style="max-width: 200px" class="w-100 rounded-circle" src="<%= u service.account.picture.thumb('500x500#').url %>"></a>
       </div>
     <% end %>
   </div>
-  <div class="col order-md-1">
+  <div class="col order-lg-1">
     <table style="width: 100%; height: 100%">
       <tr>
         <td style="vertical-align: top">
           <div class="row justify-content-between">
-            <div class="col ml-1 p-sm-3">
+            <div class="col ml-1 p-lg-3">
               <h4 class="block-title">
                 <a class="text-dark" target="_parent" href="<%= "/services/#{service.id}" %>" onclick="event.stopPropagation();">
                   <%= service.name_with_provider %>

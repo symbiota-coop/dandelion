@@ -1,27 +1,27 @@
 <style>
   #banner { padding-left: 0.9375rem; padding-right: 0.9375rem; margin-top: -0.9375rem; margin-left: -0.9375rem; margin-right: -0.9375rem; }
-  @media(min-width: 768px) { #banner { padding-left: 1.5625rem; padding-right: 1.5625rem; margin-top: -1.5625rem; margin-left: -1.5625rem; margin-right: -1.5625rem; } }
+  @media(min-width: 992px) { #banner { padding-left: 1.5625rem; padding-right: 1.5625rem; margin-top: -1.5625rem; margin-left: -1.5625rem; margin-right: -1.5625rem; } }
 </style>
 <div id="banner" style="padding-top: 2.5vw; padding-bottom: 2.5vw; background: url('/images/dandelion.jpg'); background-position: 50% 62.5%; background-size: cover">
 
   <style>
     .strapline { font-size: 1.25rem; }
     .strapline > span { padding: 0.05rem }
-    @media(min-width: 768px) {
+    @media(min-width: 992px) {
       .strapline { font-size: 1.55rem; line-height: 130% }
       .strapline > span { padding: 0.25rem }
     }
   </style>
 
   <div class="row justify-content-center">
-    <div class="col-12 col-sm-10 col-md-10">
+    <div class="col-12 col-lg-10">
       <p class="strapline mb-0" style="text-align: center;">
-        <span class="d-sm-inline-block" style="background: rgba(255,255,255,0.75)">
+        <span class="d-lg-inline-block" style="background: rgba(255,255,255,0.75)">
           Use Dandelion to find and host
-          <span class="d-sm-none"><br />
+          <span class="d-lg-none"><br />
           </span>
           <strong>regenerative events</strong> and
-          <span class="d-sm-none"><br />
+          <span class="d-lg-none"><br />
           </span>
           <strong>co-created gatherings</strong>
         </span>
@@ -30,7 +30,7 @@
   </div>
 
   <div class="row justify-content-center">
-    <div class="col-4 col-sm-3 col-md-2">
+    <div class="col-4 col-lg-2">
       <div class="m-3 p-2 rounded-circle" style="background: rgba(255,255,255,0.75);">
         <a target="_blank" href="https://www.uk.coop/start-new-co-op/support/start-worker-co-op"><img src="/images/coop.png" class="w-100"></a>
       </div>
@@ -38,11 +38,11 @@
   </div>
 
   <div class="row justify-content-center">
-    <div class="col-12 col-sm-10 col-md-10">
+    <div class="col-12 col-lg-10">
       <p class="strapline mb-0" style="font-size: 0.85rem; text-align: center;">
-        <span class="d-sm-inline-block" style="background: rgba(255,255,255,0.75)">
+        <span class="d-lg-inline-block" style="background: rgba(255,255,255,0.75)">
           Proudly made by a <a href="https://dandelion.coop/">not-for-profit worker co-operative</a>
-          <span class="d-none d-sm-inline">and <a target="_blank" href="https://github.com/dandelion-collective/dandelion">open-source</a>.</span>
+          <span class="d-none d-lg-inline">and <a target="_blank" href="https://github.com/dandelion-collective/dandelion">open-source</a>.</span>
         </span>
       </p>
     </div>
@@ -53,7 +53,7 @@
 <style>
   #just-pay { line-height: 1 }
   #just-pay > span { font-size: 0.6em; }
-  @media(min-width: 768px) {
+  @media(min-width: 992px) {
     #just-pay { line-height: 1.2 }
     #just-pay > span { font-size: 0.75em }
   }
@@ -81,7 +81,7 @@
 
 <h2 class="text-center mt-4 mb-3">
   <%= cp :tickets_count %>
-  <div class="d-none d-sm-block">
+  <div class="d-none d-lg-block">
     <%= cp :events_count %>
   </div>
 </h2>

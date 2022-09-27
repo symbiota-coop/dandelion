@@ -6,33 +6,33 @@
 <% else %>
   <style>
     #event-image { margin-top: -0.9375rem }
-    @media(min-width: 768px) { #event-image { margin-top: -1.5625rem } }
+    @media(min-width: 992px) { #event-image { margin-top: -1.5625rem } }
   </style>
 <% end %>
 
 <% if Padrino.env == :production && params[:created] && current_account && current_account.events.count == 1 %>
   <script>
-  $(function() {
+    $(function() {
 
-    if($(window).width() > 768) {
+      if($(window).width() > 992) {
 
-      introJs().setOptions({
-        steps: [{
-          title: "Nice one!",
-          intro: "You've created your first event 🎉"
-        }, {
-          element: $('#content button.dropdown-toggle').last()[0],
-          intro: "Here's the admin dropdown for the event"
-        }]
-      }).start();
+        introJs().setOptions({
+          steps: [{
+            title: "Nice one!",
+            intro: "You've created your first event 🎉"
+          }, {
+            element: $('#content button.dropdown-toggle').last()[0],
+            intro: "Here's the admin dropdown for the event"
+          }]
+        }).start();
 
-    }
-  })
+      }
+    })
   </script>
 <% end %>
 
 <div class="row justify-content-center">
-  <div class="col-md-10">
+  <div class="col-lg-10">
     <% if @event_image %>
       <a href="/events/<%=@event.id%><% if params[:cohost] %>?cohost=<%=params[:cohost]%><% end %>"><img id="event-image" class="w-100 mb-3" src="<%= u @event_image.url %>"></a>
     <% end %>
@@ -44,13 +44,13 @@
 <% unless @order %>
   <% sidebar = false %>
   <% sidebar = true if @event.sold_out? || @event.purchase_url %>
-  <% buy_tickets_style = 'class="fixed-bottom bg-white p-3 w-100 d-block d-md-none" style="z-index: 1019; box-shadow: 0px -2px 4px 0px rgba(0,0,0,0.3);"' %>
+  <% buy_tickets_style = 'class="fixed-bottom bg-white p-3 w-100 d-block d-lg-none" style="z-index: 1019; box-shadow: 0px -2px 4px 0px rgba(0,0,0,0.3);"' %>
   <% if @event.purchase_url %>
     <div id="buy-tickets" <%== buy_tickets_style %>>
       <a target="_blank" href="<%=@event.purchase_url%>" class="btn btn-primary btn-block">Select tickets on <%=URI(@event.purchase_url).host.gsub('www.','')%></a>
     </div>
     <style>
-      @media(max-width: 767px) { #content { padding-bottom: 4rem } }
+      @media(max-width: 991px) { #content { padding-bottom: 4rem } }
     </style>
   <% elsif (params[:ticket_type_id] || !@event.sold_out?) && @event.ticket_types.count > 0 %>
     <% sidebar = true %>
@@ -75,7 +75,7 @@
     </script>
   <% end %>
   <div class="row">
-    <div class="<%= sidebar ? 'col-md-7' : 'col-md-12' %>">
+    <div class="<%= sidebar ? 'col-lg-7' : 'col-lg-12' %>">
       <% n = 1; if @event.organisation %>
       <% events = ([@event] + @event.organisation.events_for_search.future.and(name: @event.name)).uniq; n = events.count %>
     <% end %>

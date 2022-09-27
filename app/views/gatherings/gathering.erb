@@ -1,6 +1,6 @@
 <%= partial :'gatherings/nav', locals: { gathering: @gathering, membership: @membership } %>
 <div class="row">
-  <div class="col-sm-4 order-sm-2 mb-3">
+  <div class="col-lg-4 order-lg-2 mb-3">
     <div data-pagelet-url="/g/<%= @gathering.slug %>/todos">
       <%= partial :'gatherings/todos' %>
     </div>
@@ -37,7 +37,7 @@
       </div>
     <% end %>
   </div>
-  <div class="col-sm-8 order-sm-1">
+  <div class="col-lg-8 order-lg-1">
     <div class="mb-3">
       <div data-pagelet-url="/g/<%= @gathering.slug %>/subscribe" style="display: inline">
         <%= partial :'gatherings/subscribe', locals: { membership: @membership } %>
@@ -49,19 +49,19 @@
       <% end %>
       <a class="btn btn-primary mb-1" data-confirm="Are you sure you want to leave the gathering?" href="/g/<%= @gathering.slug %>/leave">Leave gathering</a>
     </div>
-  <% if @membership.admin? or @gathering.photos.count > 0 %>
-    <div class="my-3">
-      <%= partial :'photos/photos', locals: { photoable: @gathering, add_photo_if: @membership.admin?, dimensions: '100x100#' } %>
-    </div>
-  <% end %>
-  <% if @gathering.enable_comments_on_gathering_homepage %>
-    <div data-pagelet-url="/commentable?commentable_type=Gathering&commentable_id=<%= @gathering.id %>">
-      <%= partial :'comments/commentable', locals: { commentable: @gathering } %>
-    </div>
-  <% else %>
-    <div data-pagelet-url="/g/<%= @gathering.slug %>" data-pagelet-refresh="60">
-      <%= partial :newsfeed, locals: { notifications: @gathering.notifications_as_circle.order('created_at desc').page(params[:page]), include_circle_name: false } %>
-    </div>
-  <% end %>
-</div>
+    <% if @membership.admin? or @gathering.photos.count > 0 %>
+      <div class="my-3">
+        <%= partial :'photos/photos', locals: { photoable: @gathering, add_photo_if: @membership.admin?, dimensions: '100x100#' } %>
+      </div>
+    <% end %>
+    <% if @gathering.enable_comments_on_gathering_homepage %>
+      <div data-pagelet-url="/commentable?commentable_type=Gathering&commentable_id=<%= @gathering.id %>">
+        <%= partial :'comments/commentable', locals: { commentable: @gathering } %>
+      </div>
+    <% else %>
+      <div data-pagelet-url="/g/<%= @gathering.slug %>" data-pagelet-refresh="60">
+        <%= partial :newsfeed, locals: { notifications: @gathering.notifications_as_circle.order('created_at desc').page(params[:page]), include_circle_name: false } %>
+      </div>
+    <% end %>
+  </div>
 </div>

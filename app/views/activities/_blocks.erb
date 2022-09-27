@@ -1,6 +1,6 @@
 <div class="row" id="activities">
   <% activities.each { |activity| %>
-  <div class="col-6 col-sm-3 mb-3 <%= block_class if defined?(block_class) %>" id="<%= activity.id %>">
+  <div class="col-6 col-lg-3 mb-3 <%= block_class if defined?(block_class) %>" id="<%= activity.id %>">
     <%= partial :'activities/block', locals: { activity: activity } %>
   </div>
   <% } %>

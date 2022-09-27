@@ -12,25 +12,25 @@
 
 <% if Padrino.env == :production && params[:created] && current_account.organisations.count == 1 %>
   <script>
-  $(function() {
+    $(function() {
 
-    if($(window).width() > 768) {
+      if($(window).width() > 992) {
 
-      introJs().setOptions({
-        steps: [{
-          title: "Nice one!",
-          intro: "You've created your first organisation 🎉"
-        }, {
-          element: $('#content button.dropdown-toggle')[0],
-          intro: "Here's the admin dropdown for the organisation"
-        }, {
-          intro: "To accept payments, now add your Stripe and/or Coinbase Commerce details.",
-        }]
-      }).start();
+        introJs().setOptions({
+          steps: [{
+            title: "Nice one!",
+            intro: "You've created your first organisation 🎉"
+          }, {
+            element: $('#content button.dropdown-toggle')[0],
+            intro: "Here's the admin dropdown for the organisation"
+          }, {
+            intro: "To accept payments, now add your Stripe and/or Coinbase Commerce details.",
+          }]
+        }).start();
 
-    }
+      }
 
-  })
+    })
   </script>
 <% end %>
 

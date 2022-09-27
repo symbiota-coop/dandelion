@@ -1,12 +1,12 @@
 <%= partial :'organisations/nav', locals: { organisation: @organisation } %>
 <div class="row">
-  <div class="col-12 col-sm-auto text-center">
+  <div class="col-12 col-lg-auto text-center">
     <% if @organisation.image %>
       <img src="<%= u @organisation.image.thumb('200x200').url %>">
     <% end %>
   </div>
   <div class="col-12 col-sm">
-    <div class="text-center text-sm-left">
+    <div class="text-center text-lg-left">
       <h1>
         <a href="/o/<%= @organisation.slug %>"><%= @organisation.name %></a> members' area
       </h1>
@@ -18,7 +18,7 @@
       <% else %>
         <a class="btn btn-outline-primary mb-1" href="/o/<%= @organisation.slug %>/show_membership/1">Membership hidden</a>
       <% end %>
-      <div class="d-block d-sm-inline-block">
+      <div class="d-block d-lg-inline-block">
         <% if @organisationship.referrer %>
           <a href="javascript:;" onclick="$(this).hide();
               $('#set_referrer').show()">Referred by <%= @organisationship.referrer.name %></a>

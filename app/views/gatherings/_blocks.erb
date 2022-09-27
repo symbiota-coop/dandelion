@@ -1,6 +1,6 @@
 <div class="row" id="gatherings">
   <% gatherings.each { |gathering| %>
-  <div class="col-6 col-sm-3 mb-3 <%= block_class if defined?(block_class) %>" id="<%= gathering.id %>">
+  <div class="col-6 col-lg-3 mb-3 <%= block_class if defined?(block_class) %>" id="<%= gathering.id %>">
     <%= partial :'gatherings/block', locals: { gathering: gathering } %>
   </div>
   <% } %>
