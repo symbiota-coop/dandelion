@@ -46,14 +46,14 @@ class CoreTest < ActiveSupport::TestCase
     assert page.has_content? name
   end
 
-  test 'RSVPing to an event' do
+  test 'Booking onto a free event' do
     @account = FactoryBot.create(:account)
     @organisation = FactoryBot.create(:organisation, account: @account)
     @event = FactoryBot.create(:event, organisation: @organisation, account: @account, last_saved_by: @account)
     login_as(@account)
     visit "/events/#{@event.id}"
     select 1, from: "quantities[#{@event.ticket_types.first.id}]"
-    click_button 'RSVP'
+    click_button 'Book your place'
     assert page.has_content? 'Thanks for booking!'
   end
 end
