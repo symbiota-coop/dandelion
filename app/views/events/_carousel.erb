@@ -10,7 +10,7 @@
       slidesToScroll: 3,
       responsive: [
         {
-          breakpoint: 992,
+          breakpoint: 768,
           settings: {
             slidesToShow: 2,
             slidesToScroll: 2
@@ -28,7 +28,7 @@
   })
 </script>
 <% if events.count > 0 %>
-  <div class="slick-container <% unless defined?(skip_margin) %> mt-5 <% end %> mb-lg-5" id="<%= carousel_id %>">
+  <div class="slick-container <% unless defined?(skip_margin) %> mt-5 <% end %> mb-sm-5" id="<%= carousel_id %>">
     <% if defined? title %>
       <% unless defined?(hide_featured_title) && hide_featured_title && title == 'Featured' %>
         <h2 class="text-center"><%= title %></h2>
@@ -36,7 +36,7 @@
     <% end %>
     <div class="slick-responsive row justify-content-center">
       <% events.each { |event| %>
-      <div class="col-12 col-sm-6 col-lg-4 slick-item">
+      <div class="col-12 col-sm-6 col-md-4 slick-item">
         <%= partial :'events/block_carousel', locals: {crop: (crop if defined?(crop)), event: event} %>
       </div>
       <% } %>
