@@ -17,24 +17,16 @@
         })
         table.on('draw.dt', function() {
           var api = table.api();
-          // tickets sold
-          var sum = 0
-          $('#event_stats tbody tr').each(function() {
-            sum += parseFloat($('td:eq('+ticketsSold+')', this).attr('data-sort'))
-          })
-          $('tfoot th').eq(ticketsSold).html(sum);
-          // ticket revenue
-          var sum = 0
-          $('#event_stats tbody tr').each(function() {
-            sum += parseFloat($('td:eq('+ticketRevenue+')', this).attr('data-sort'))
-          })
-          $('tfoot th').eq(ticketRevenue).html('<%= Money.new(0, @organisation.currency).symbol %>' + sum.toLocaleString());
-          // donations
-          var sum = 0
-          $('#event_stats tbody tr').each(function() {
-            sum += parseFloat($('td:eq('+donations+')', this).attr('data-sort'))
-          })
-          $('tfoot th').eq(donations).html('<%= Money.new(0, @organisation.currency).symbol %>' + sum.toLocaleString());
+          $.each([ticketsSold, ticketRevenue, donations], function(i,index) {
+            var sum = 0
+            $('#event_stats tbody tr').each(function() {
+              sum += parseFloat($('td:eq('+index+')', this).attr('data-sort'))
+            })
+            if (i == 0)
+              $('tfoot th').eq(index).html(sum);
+            else
+              $('tfoot th').eq(index).html('<%= Money.new(0, @organisation.currency).symbol %>' + sum.toLocaleString());
+          });
         })
         $('#event_stats').DataTable().draw(false);
       })
