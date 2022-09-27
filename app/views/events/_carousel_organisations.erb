@@ -12,6 +12,12 @@
         {
           breakpoint: 992,
           settings: {
+            slidesToShow: 3,
+            slidesToScroll: 3
+          }
+        }, {
+          breakpoint: 576,
+          settings: {
             slidesToShow: 2,
             slidesToScroll: 2
           }
@@ -24,10 +30,8 @@
 <style>
   .slick-container .slick-item:nth-child(1) { display: block; }
   .slick-container .slick-item:nth-child(2) { display: block; }
-  @media(min-width: 992px) {
-    .slick-container .slick-item:nth-child(3) { display: block; }
-    .slick-container .slick-item:nth-child(4) { display: block; }
-  }
+  @media(min-width: 576px) { .slick-container .slick-item:nth-child(3) { display: block; } }
+  @media(min-width: 992px) { .slick-container .slick-item:nth-child(4) { display: block; } }
 </style>
 <% if organisations.count > 0 %>
   <div class="slick-container mb-5" id="<%= carousel_id %>">
