@@ -60,26 +60,28 @@
     <% end %>
     <% } %>
   </td>
-  <td>
-    <%= m membership.requested_contribution, @gathering.currency %>
-  </td>
-  <td>
-    <% if @membership.admin? %>
-      <% if membership.paid %>
-        <a href="javascript:;" onclick="$(this).hide().next().show().find('input').focus()"><%= m membership.paid, @gathering.currency.to_s if membership.paid %></a>
-      <% end %>
-      <% form_tag "/memberships/#{membership.id}/paid", style: ('display:none' if membership.paid) do %>
-        <div class="input-group">
-          <div class="input-group-prepend">
-            <span class="input-group-text"><%= Money.new(0, @gathering.currency).symbol %></span>
+  <% if @membership.admin? || !@gathering.hide_paid %>
+    <td>
+      <%= m membership.requested_contribution, @gathering.currency %>
+    </td>
+    <td>
+      <% if @membership.admin? %>
+        <% if membership.paid %>
+          <a href="javascript:;" onclick="$(this).hide().next().show().find('input').focus()"><%= m membership.paid, @gathering.currency.to_s if membership.paid %></a>
+        <% end %>
+        <% form_tag "/memberships/#{membership.id}/paid", style: ('display:none' if membership.paid) do %>
+          <div class="input-group">
+            <div class="input-group-prepend">
+              <span class="input-group-text"><%= Money.new(0, @gathering.currency).symbol %></span>
+            </div>
+            <%= number_field_tag :paid, class: 'form-control', style: 'width: 6em', value: membership.paid, onblur: '$(this.form).submit()' %>
           </div>
-          <%= number_field_tag :paid, class: 'form-control', style: 'width: 6em', value: membership.paid, onblur: '$(this.form).submit()' %>
-        </div>
+        <% end %>
+      <% else %>
+        <%= m membership.paid, @gathering.currency.to_s if membership.paid %>
       <% end %>
-    <% else %>
-      <%= m membership.paid, @gathering.currency.to_s if membership.paid %>
-    <% end %>
-  </td>
+    </td>
+  <% end %>
 <% end %>
 <% if @gathering.enable_rotas? && @gathering.rotas.count > 0 %>
   <td>

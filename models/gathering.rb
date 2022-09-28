@@ -34,6 +34,7 @@ class Gathering
   field :redirect_on_acceptance, type: String
   field :redirect_home, type: String
   field :choose_and_pay_label, type: String
+  field :hide_paid, type: Boolean
 
   def self.enablable
     %w[contributions teams timetables rotas shift_worth inventory budget partial_payments]
@@ -294,7 +295,8 @@ class Gathering
       enable_partial_payments: 'Allow people to pay just a part of any outstanding payment requests',
       enable_shift_worth: 'Show the points value of shifts',
       demand_payment: 'Require members to make a payment before accessing features like teams or timetables',
-      clear_up_optionships: 'Remove people from any unpaid tiers, accommodation and transport options every hour'
+      clear_up_optionships: 'Remove people from any unpaid tiers, accommodation and transport options every hour',
+      hide_paid: 'Hides any amounts paid via Choose & Pay from all except admins'
     }
   end
 
@@ -323,7 +325,8 @@ class Gathering
       seeds_username: 'SEEDS username',
       privacy: 'Access',
       listed: 'List this gathering publicly',
-      enable_rotas: 'Enable shifts'
+      enable_rotas: 'Enable shifts',
+      hide_paid: 'Hide amounts paid via Choose & Pay'
     }[attr.to_sym] || super
   end
 

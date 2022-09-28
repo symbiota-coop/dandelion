@@ -191,11 +191,11 @@
         <%= f.wysiwyg_block :intro_for_members %>
       </div>
       <div role="tabpanel" class="tab-pane" id="tab4">
-      <% if !@gathering.stripe_sk && !@gathering.coinbase_api_key %>
-        <div class="alert alert-warning">
-          <p class="m-0"><i class="fa fa-warning"></i> To accept payments, you must add either Stripe or Coinbase Commerce details.</p>
-        </div>
-      <% end %>
+        <% if !@gathering.stripe_sk && !@gathering.coinbase_api_key %>
+          <div class="alert alert-warning">
+            <p class="m-0"><i class="fa fa-warning"></i> To accept payments, you must add either Stripe or Coinbase Commerce details.</p>
+          </div>
+        <% end %>
         <div class="card mb-3">
           <div class="card-header text-white bg-primary">
             <h4 class="my-0">Card payments via Stripe</h4>
@@ -234,30 +234,32 @@
         </div>
       </div>
       <div role="tabpanel" class="tab-pane" id="tab5">
-      <script>
-      $(function() {
+        <script>
+          $(function() {
 
-        $('#gathering_enable_rotas').click(function () {
-          if ($(this).is(':checked')) {
+            $('#gathering_enable_rotas').click(function () {
+              if ($(this).is(':checked')) {
+                $('#gathering_enable_shift_worth').removeAttr('disabled')
+              }
+              else {
+                $('#gathering_enable_shift_worth').prop('checked', false );
+                $('#gathering_enable_shift_worth').attr('disabled',true)
+              }
+          })
+          if ($('#gathering_enable_rotas').is(':checked')) {
             $('#gathering_enable_shift_worth').removeAttr('disabled')
           }
           else {
             $('#gathering_enable_shift_worth').prop('checked', false );
             $('#gathering_enable_shift_worth').attr('disabled',true)
           }
-      })
-      if ($('#gathering_enable_rotas').is(':checked')) {
-        $('#gathering_enable_shift_worth').removeAttr('disabled')
-      }
-      else {
-        $('#gathering_enable_shift_worth').prop('checked', false );
-        $('#gathering_enable_shift_worth').attr('disabled',true)
-      }
-      })
-      </script>
+
+          })
+        </script>
         <% Gathering.enablable.each { |x| %>
         <%= f.check_box_block "enable_#{x}".to_sym %>
         <% } %>
+        <%= f.check_box_block :hide_paid %>
         <%= f.check_box_block :demand_payment %>
         <%= f.check_box_block :clear_up_optionships %>
         <div class="mt-2">
