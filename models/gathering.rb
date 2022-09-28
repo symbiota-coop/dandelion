@@ -296,7 +296,7 @@ class Gathering
       enable_shift_worth: 'Show the points value of shifts',
       demand_payment: 'Require members to make a payment before accessing features like teams or timetables',
       clear_up_optionships: 'Remove people from any unpaid tiers, accommodation and transport options every hour',
-      hide_paid: 'Hides the Requested contribution/Paid columns in the member list'
+      hide_paid: 'Hides the Requested contribution/Paid columns in the member list from non-admins'
     }
   end
 

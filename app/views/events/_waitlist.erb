@@ -3,7 +3,12 @@
   <div class="card-body">
     <p class="lead">
       Missed out on tickets to <%= @event.name %>?
-      <mark>Join the waitlist and we'll let you know when tickets become available to this event or future events.</mark>
+      <% if next_event = @event.organisation.events_for_search.future.and(:id.nin => [@event.id]).and(name: @event.name).first %>
+        It's happening again on <a href="/events/<%=next_event.id%>"><%=when_details(next_event)%></a>.
+        If that date doesn't work for you, <mark>join the waitlist and we'll let you know when tickets become available to this event or future events.</mark>
+      <% else %>
+        <mark>Join the waitlist and we'll let you know when tickets become available to this event or future events.</mark>
+      <% end %>
     </p>
     <script>
       $(function () {
