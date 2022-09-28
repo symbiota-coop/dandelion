@@ -46,11 +46,15 @@
     </td>
     <td nowrap>
       <% if @membership.confirmed? %>
-        <a href="javascript:;" onclick="$('#modal .modal-content').load('/g/<%= @gathering.slug %>/options/<%= option.id %>', function () {
+        <% if !@membership.admin? && option.hide_members? %>
+          <%= option.optionships.count %>/<%== (option.capacity || '&infin;').to_s %>
+        <% else%>
+          <a href="javascript:;" onclick="$('#modal .modal-content').load('/g/<%= @gathering.slug %>/options/<%= option.id %>', function () {
                     $('#modal').modal('show')
                   });">
-          <%= option.optionships.count %>/<%== (option.capacity || '&infin;').to_s %>
-        </a>
+            <%= option.optionships.count %>/<%== (option.capacity || '&infin;').to_s %>
+          </a>
+        <% end %>
       <% end %>
       <% if option.capacity %>
         <% if option.full? %>
@@ -73,36 +77,40 @@
     </td>
     <% if @membership.confirmed? %>
       <td class="d-none d-lg-table-cell">
-        <% y = [] %>
-        <% option.optionships.shuffle.each { |optionship| account = optionship.account; %>
-        <% if params[:view] == 'names' %>
-          <% y << capture do %>
-            <% if @membership.admin? %>
-              <a href="/g/<%= @gathering.slug %>/optionships/<%= optionship.id %>/edit">
-                <%= Sanitize.fragment(account.name) %>
-              </a>
-            <% else %>
-              <%= partial :'accounts/square', locals: { account: account, width: '50px' } %>
+        <% if !@membership.admin? && option.hide_members? %>
+          <%= pluralize option.optionships.count, 'person' %>
+        <% else %>
+          <% y = [] %>
+          <% option.optionships.shuffle.each { |optionship| account = optionship.account; %>
+          <% if params[:view] == 'names' %>
+            <% y << capture do %>
+              <% if @membership.admin? %>
+                <a href="/g/<%= @gathering.slug %>/optionships/<%= optionship.id %>/edit">
+                  <%= Sanitize.fragment(account.name) %>
+                </a>
+              <% else %>
+                <%= partial :'accounts/square', locals: { account: account, width: '50px' } %>
+              <% end %>
+            <% end %>
+          <% else %>
+            <% y << capture do %>
+              <% if @membership.admin? %>
+                <a href="/g/<%= @gathering.slug %>/optionships/<%= optionship.id %>/edit">
+                  <img title="<%= Sanitize.fragment(account.name) %>" style="width: 50px;" src="<%= u account.picture_thumb_or_gravatar_url %>">
+                </a>
+              <% else %>
+                <%= partial :'accounts/square', locals: { account: account, width: '50px' } %>
+              <% end %>
             <% end %>
           <% end %>
-        <% else %>
-          <% y << capture do %>
-            <% if @membership.admin? %>
-              <a href="/g/<%= @gathering.slug %>/optionships/<%= optionship.id %>/edit">
-                <img title="<%= Sanitize.fragment(account.name) %>" style="width: 50px;" src="<%= u account.picture_thumb_or_gravatar_url %>">
-              </a>
-            <% else %>
-              <%= partial :'accounts/square', locals: { account: account, width: '50px' } %>
-            <% end %>
+          <% } %>
+          <% if params[:view] == 'names' %>
+            <%== y.map(&:strip).join(' &middot; ') %>
+          <% else %>
+            <div class="image-wall">
+              <%== y.map(&:strip).join('') %>
+            </div>
           <% end %>
-        <% end %>
-        <% } %>
-        <% if params[:view] == 'names' %>
-          <%== y.map(&:strip).join(' &middot; ') %>
-        <% else %>
-          <div class="image-wall">
-            <%== y.map(&:strip).join('') %>
-          </div>
         <% end %>
       </td>
     <% end %>

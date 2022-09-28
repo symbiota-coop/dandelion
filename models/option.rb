@@ -12,6 +12,7 @@ class Option
   field :split_cost, type: Boolean
   field :type, type: String
   field :by_invitation, type: Boolean
+  field :hide_members, type: Boolean
 
   def self.admin_fields
     {

@@ -40,18 +40,24 @@
 <% if @gathering.events.count > 0 %>
   <td>
     <% @gathering.events.each { |event| %>
-      <% event.tickets.and(account: account).each { |ticket| %>
-        <a href="/events/<%=event.id%>/tickets" class="text-white label label-primary mb-1 d-inline-block" style="text-decoration: none"><i class="fa fa-ticket"></i> <%= (ticket.ticket_type.name + ', ') if ticket.ticket_type%><%= event.name %></a>
-      <% } %>
+    <% event.tickets.and(account: account).each { |ticket| %>
+    <a href="/events/<%=event.id%>/tickets" class="text-white label label-primary mb-1 d-inline-block" style="text-decoration: none"><i class="fa fa-ticket"></i> <%= (ticket.ticket_type.name + ', ') if ticket.ticket_type%><%= event.name %></a>
+    <% } %>
     <% } %>
   </td>
 <% end %>
 <% if @gathering.enable_contributions %>
   <td>
-    <% membership.optionships.each { |optionship| %>
-    <a title="<%= optionship.option.type %>" href="/g/<%= @gathering.slug %>/options" class="label label-primary text-white d-inline-block mb-1">
-      <i class="fa <%= optionship.option.icon %>"></i> <%= optionship.option.name %> (<%= m optionship.option.cost_per_person, @gathering.currency %>)
-    </a>
+    <% membership.optionships.each { |optionship| option = optionship.option %>
+    <% if !@membership.admin? && optionship.option.hide_members? %>
+      <a href="/g/<%= @gathering.slug %>/options" class="label label-default text-white d-inline-block mb-1">
+        <i class="fa <%= optionship.option.icon %>"></i> <%= optionship.option.type %>
+      </a>
+    <% else %>
+      <a title="<%= optionship.option.type %>" href="/g/<%= @gathering.slug %>/options" class="label label-primary text-white d-inline-block mb-1">
+        <i class="fa <%= optionship.option.icon %>"></i> <%= optionship.option.name %> (<%= m optionship.option.cost_per_person, @gathering.currency %>)
+      </a>
+    <% end %>
     <% } %>
   </td>
   <td>
