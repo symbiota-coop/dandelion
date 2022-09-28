@@ -145,6 +145,9 @@
     <% if @gathering.democratic_threshold %>
       <th></th>
     <% end %>
+    <% if @gathering.events.count > 0 %>
+      <th></th>
+    <% end %>
     <% if @gathering.enable_contributions %>
       <th></th>
       <% if @membership.admin? || !@gathering.hide_paid %>
