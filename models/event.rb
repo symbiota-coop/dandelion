@@ -475,10 +475,8 @@ class Event
         self.image = nil
       end
 
-      unless image_uid
-        errors.add(:image, 'must be at least 992px wide') if image && image.width < 800
-        errors.add(:image, 'must be more wide than high') if image && image.height > image.width
-      end
+      errors.add(:image, 'must be at least 992px wide') if image && image.width < 800
+      errors.add(:image, 'must be more wide than high') if image && image.height > image.width
 
       errors.add(:image, "must be #{organisation.event_image_required_width}px wide") if organisation && organisation.event_image_required_width && !(image && image.width == organisation.event_image_required_width)
       errors.add(:image, "must be #{organisation.event_image_required_height}px high") if organisation && organisation.event_image_required_height && !(image && image.height == organisation.event_image_required_height)
