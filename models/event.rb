@@ -268,7 +268,7 @@ class Event
       attendees.each do |account|
         next unless (previous_local_groupship = previous_local_group.local_groupships.find_by(account: account))
 
-        local_group.local_groupships.create.create(
+        local_group.local_groupships.create(
           account: account,
           unsubscribed: previous_local_groupship.unsubscribed,
           subscribed_discussion: previous_local_groupship.subscribed_discussion,
