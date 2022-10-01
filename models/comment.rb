@@ -140,7 +140,7 @@ class Comment
   end
 
   def first_in_post?
-    !post or post.new_record? or post.comments.order('created_at asc').first.id == id
+    !post || post.new_record? || ((comment = post.comments.order('created_at asc').first) && comment.id == id)
   end
 
   def first_in_post
