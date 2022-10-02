@@ -232,7 +232,6 @@
         </div>
         <% if Padrino.env == :development || @organisation.verified? %>
           <div role="tabpanel" class="tab-pane <%= 'active' if params[:tab].to_i == 7%>" id="tab7">
-            <%= f.wysiwyg_block :extra_info_for_booking_email %>
             <%= f.text_block :stripe_client_id %>
             <%= f.text_area_block :minimal_head %>
             <%= f.text_area_block :events_banner %>

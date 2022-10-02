@@ -177,12 +177,6 @@ Dandelion::App.controller do
     erb :'accounts/subscriptions'
   end
 
-  get '/accounts/calendars' do
-    sign_in_required!
-    @account = current_account
-    erb :'accounts/calendars'
-  end
-
   get '/accounts/providers' do
     sign_in_required!
     @account = current_account
@@ -386,17 +380,5 @@ Dandelion::App.controller do
   get '/u/:username/feedback' do
     @account = Account.find_by(username: params[:username]) || not_found
     erb :'accounts/feedback', layout: ('minimal' if params[:minimal])
-  end
-
-  post '/calendars/add' do
-    sign_in_required!
-    current_account.calendars.create(url: params[:url])
-    redirect back
-  end
-
-  get '/calendars/:id/destroy' do
-    sign_in_required!
-    current_account.calendars.find(params[:id]).try(:destroy)
-    redirect back
   end
 end

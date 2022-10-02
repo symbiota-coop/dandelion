@@ -29,22 +29,9 @@ Dandelion::App.controller do
           Airbrake.notify(e, event: event)
           halt 200
         end
-      elsif (@booking = @organisation.bookings.find_by(:session_id => session.id, :payment_completed.ne => true))
-        @booking.set(payment_completed: true)
-        @booking.send_confirmation_email
-        halt 200
-      elsif (@booking = Booking.deleted.find_by(:session_id => session.id, :payment_completed.ne => true))
-        begin
-          @booking.restore_and_complete
-          raise Booking::Restored
-        rescue StandardError => e
-          Airbrake.notify(e, event: event)
-          halt 200
-        end
       else
         # begin
         #   raise Order::OrderNotFound
-        #   raise Booking::BookingNotFound
         # rescue StandardError => e
         #   Airbrake.notify(e, event: event)
         #   halt 200

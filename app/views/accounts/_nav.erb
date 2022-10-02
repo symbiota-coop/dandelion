@@ -4,8 +4,5 @@
   <% if Provider.all.count > 0 %>
     <li role="presentation" class="nav-item"><a class="nav-link <%= 'active' if request.path == '/accounts/providers' %>" href="/accounts/providers">Sign in with other services</a></li>
   <% end %>
-  <% if !current_account.services.empty? %>
-    <li role="presentation" class="nav-item"><a class="nav-link <%= 'active' if request.path == '/accounts/calendars' %>" href="/accounts/calendars">Linked calendars</a></li>
-  <% end %>
   <li role="presentation" class="nav-item"><a class="nav-link <%= 'active' if request.path == '/accounts/delete' %>" href="/accounts/delete">Delete account</a></li>
 </ul>

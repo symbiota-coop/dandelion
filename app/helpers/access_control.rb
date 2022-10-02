@@ -80,15 +80,6 @@ Dandelion::App.helpers do
     kick! unless organisation_monthly_donor_plus?
   end
 
-  def service_admin?(service = nil, account = current_account)
-    service ||= @service
-    Service.admin?(service, account)
-  end
-
-  def service_admins_only!
-    kick! unless service_admin?
-  end
-
   def event_admin?(event = nil, account = current_account)
     event ||= @event
     Event.admin?(event, account)

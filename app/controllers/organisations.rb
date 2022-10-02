@@ -149,31 +149,6 @@ Dandelion::App.controller do
     end
   end
 
-  get '/o/:slug/services' do
-    @organisation = Organisation.find_by(slug: params[:slug]) || not_found
-    @services = @organisation.services_for_search
-    if request.xhr?
-      partial :'organisations/services'
-    else
-      erb :'organisations/services'
-    end
-  end
-
-  get '/o/:slug/services/stats' do
-    @organisation = Organisation.find_by(slug: params[:slug]) || not_found
-    organisation_admins_only!
-    @services = @organisation.services
-    q_ids = []
-    if params[:q]
-      q_ids += Service.all.or(
-        { name: /#{::Regexp.escape(params[:q])}/i },
-        { description: /#{::Regexp.escape(params[:q])}/i }
-      ).pluck(:id)
-      @services = @services.and(:id.in => q_ids)
-    end
-    erb :'organisations/service_stats'
-  end
-
   get '/o/:slug/events_block' do
     @organisation = Organisation.find_by(slug: params[:slug]) || not_found
     @events = @organisation.events_for_search(include_all_local_group_events: (true if params[:local_group_id])).future_and_current_featured
@@ -296,23 +271,6 @@ Dandelion::App.controller do
     @orders = @orders.and(:seeds_secret.ne => nil) if params[:seeds]
     @orders = @orders.and(:evm_secret.ne => nil) if params[:evm]
     erb :'organisations/orders'
-  end
-
-  get '/o/:slug/bookings' do
-    @organisation = Organisation.find_by(slug: params[:slug]) || not_found
-    organisation_admins_only!
-    @bookings = @organisation.bookings
-    if params[:q]
-      @bookings = @bookings.and(:account_id.in => Account.all.or(
-        { name: /#{::Regexp.escape(params[:q])}/i },
-        { email: /#{::Regexp.escape(params[:q])}/i }
-      ).pluck(:id))
-    end
-    if request.xhr?
-      partial :'services/bookings', locals: { bookings: @bookings, service_name: true, show_emails: true }
-    else
-      erb :'organisations/bookings'
-    end
   end
 
   get '/o/:slug/events/stats' do

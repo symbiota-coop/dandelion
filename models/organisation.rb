@@ -33,7 +33,6 @@ class Organisation
   field :collect_location, type: Boolean
   field :post_url, type: String
   field :extra_info_for_ticket_email, type: String
-  field :extra_info_for_booking_email, type: String
   field :event_footer, type: String
   field :minimal_head, type: String
   field :subscribed_accounts_count, type: Integer
@@ -243,13 +242,6 @@ class Organisation
     events_for_search.future_and_current_featured.and(:draft.ne => true).and(:image_uid.ne => nil).and(featured: true).limit(20).reject(&:sold_out?)
   end
 
-  def services_for_search(draft: false, secret: false)
-    s = services
-    s = s.live unless draft
-    s = s.public unless secret
-    s
-  end
-
   has_many :organisation_contributions, dependent: :destroy
   def contributable_events
     events.and(:id.in => Order.and(:value.gt => 0, :event_id.in => events.pluck(:id)).pluck(:event_id))
@@ -275,11 +267,6 @@ class Organisation
     rescue Money::Bank::UnknownRate
       update_attribute(:paid_up, true)
     end
-  end
-
-  has_many :services, dependent: :destroy
-  def bookings
-    Booking.and(:service_id.in => services.pluck(:id))
   end
 
   has_many :cohostships, dependent: :destroy
@@ -485,7 +472,6 @@ class Organisation
       intro_text: 'Intro text for organisation homepage',
       telegram_group: 'Telegram group/channel URL',
       extra_info_for_ticket_email: 'Extra info for ticket confirmation email',
-      extra_info_for_booking_email: 'Extra info for service booking confirmation email',
       google_analytics_id: 'Google Analytics ID',
       facebook_pixel_id: 'Facebook Pixel ID',
       stripe_client_id: 'Stripe client ID',

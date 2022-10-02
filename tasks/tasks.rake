@@ -26,12 +26,6 @@ namespace :organisations do
   end
 end
 
-namespace :services do
-  task delete_stale_uncompleted_bookings: :environment do
-    Booking.incomplete.and(:created_at.lt => 1.hour.ago).destroy_all
-  end
-end
-
 namespace :gatherings do
   task clear_up_optionships: :environment do
     Gathering.and(clear_up_optionships: true).each do |gathering|
