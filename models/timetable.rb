@@ -24,6 +24,8 @@ class Timetable
     }
   end
 
+  validates_presence_of :name
+
   has_many :spaces, dependent: :destroy
   has_many :tslots, dependent: :destroy
   has_many :tactivities, dependent: :destroy
