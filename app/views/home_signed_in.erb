@@ -42,9 +42,6 @@
 </div>
 <div class="col-lg-4">
   <div style="position: sticky; top: 3.75rem">
-    <div class="mb-3">
-      <%= partial :"sponsors/#{Dir['app/views/sponsors/*'].map { |f| f.split('/_').last.gsub('.erb','') }.sample}", locals: {border: true, sponsored: :bottom} %>
-    </div>
     <div class="card">
       <div id="upcoming-events">
         <h3 class="card-header bg-primary text-white">Your upcoming events</h3>

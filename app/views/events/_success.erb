@@ -63,9 +63,6 @@
     <div class="my-5">
       <%= partial :'accounts/pay', locals: { account: @order.account } %>
     </div>
-
-    <%= partial :"sponsors/#{Dir['app/views/sponsors/*'].map { |f| f.split('/_').last.gsub('.erb','') }.sample}", locals: {sponsored: :top} %>
-
   <% end %>
 </div>
 </div>
