@@ -5,16 +5,21 @@
       <p>
         <a class="btn btn-primary" href="/accounts/new?list_an_event=1">List an event</a>
       </p>
-    <% elsif current_account.organisations.count == 0 %>
-      <p class="lead">
-        Want to list an event? First you'll need to <a href="/o/new">create an organisation</a>
-      </p>
     <% else %>
-      <a class="btn btn-primary" href="javascript:;" onclick="$(this).hide().next().show()"><i class="fa fa-plus-circle"></i> Create an event</a>
-      <% form_tag '/events/new', style: 'display: none', method: :get, class: 'form-inline' do %>
-        <span class="mr-1">Create an event under</span>
-        <%= select_tag :organisation_id, onchange: "window.location = '/events/new?organisation_id=' + $(this).val()", class: 'form-control', options: ['']+current_account.organisations.order('name asc').map { |organisation| [organisation.name, organisation.id] } %>
+      <% if current_account.organisations.count == 0 %>
+        <p class="lead">
+          Want to list an event? First you'll need to <a href="/o/new">create an organisation</a>
+        </p>
+      <% else %>
+        <p>
+          <a class="btn btn-primary" href="javascript:;" onclick="$(this).hide().next().show()"><i class="fa fa-plus-circle"></i> Create an event</a>
+          <% form_tag '/events/new', style: 'display: none', method: :get, class: 'form-inline' do %>
+            <span class="mr-1">Create an event under</span>
+            <%= select_tag :organisation_id, onchange: "window.location = '/events/new?organisation_id=' + $(this).val()", class: 'form-control', options: ['']+current_account.organisations.order('name asc').map { |organisation| [organisation.name, organisation.id] } %>
+          <% end %>
+        </p>
       <% end %>
+      <p><a href="/events/my">View your upcoming and past events</a></p>
     <% end %>
   </div>
 </div>
@@ -23,13 +28,13 @@
 
 <% if current_account && !params[:search] && !params[:event_tag_id] %>
 
-<% if (organisations = Organisation.and(:id.in =>
-current_account.organisationships.and(:hide_membership.ne => true).pluck(:organisation_id) +
-current_account.organisationships.and(:admin => true).pluck(:organisation_id)
-).and(:id.in =>
-Event.live.public.future.pluck(:organisation_id)
-)
-).count > 0 %>
+  <% if (organisations = Organisation.and(:id.in =>
+  current_account.organisationships.and(:hide_membership.ne => true).pluck(:organisation_id) +
+  current_account.organisationships.and(:admin => true).pluck(:organisation_id)
+  ).and(:id.in =>
+  Event.live.public.future.pluck(:organisation_id)
+  )
+  ).count > 0 %>
   <%= partial :'events/carousel_organisations', locals: { organisations: organisations } %>
 <% end %>
 
