@@ -423,8 +423,10 @@ class Gathering
     if enable_rotas
       y << [:with_shifts, 'With shifts', memberships.and(:account_id.in => shifts.pluck(:account_id))]
       y << [:without_shifts, 'Without shifts', memberships.and(:account_id.nin => shifts.pluck(:account_id))]
-      y << [:sufficient_points, 'Sufficient shift points', memberships.and(:id.in => memberships.select { |m| m.shift_points >= (m.shift_points_required || 0) }.pluck(:id))]
-      y << [:insufficient_points, 'Insufficient shift points', memberships.and(:id.in => memberships.select { |m| m.shift_points < (m.shift_points_required || 0) }.pluck(:id))]
+      if enable_shift_worth
+        y << [:sufficient_points, 'Sufficient shift points', memberships.and(:id.in => memberships.select { |m| m.shift_points >= (m.shift_points_required || 0) }.pluck(:id))]
+        y << [:insufficient_points, 'Insufficient shift points', memberships.and(:id.in => memberships.select { |m| m.shift_points < (m.shift_points_required || 0) }.pluck(:id))]
+      end
     end
 
     if enable_teams
