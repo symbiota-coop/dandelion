@@ -433,7 +433,7 @@ class Gathering
     end
 
     if enable_contributions
-      %w[Tier Accommodation Transport Food].each do |o|
+      %w[Tier Accommodation Transport Food Extra].each do |o|
         if optionships.and(:option_id.in => options.and(type: o).pluck(:id)).count > 0
           y << [:"with_#{o.downcase}", "With #{o.downcase}", memberships.and(:account_id.in => optionships.and(:option_id.in => options.and(type: o).pluck(:id)).pluck(:account_id))]
           y << [:"without_#{o.downcase}", "Without #{o.downcase}", memberships.and(:account_id.nin => optionships.and(:option_id.in => options.and(type: o).pluck(:id)).pluck(:account_id))]

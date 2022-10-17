@@ -47,7 +47,7 @@ class Option
   end
 
   def self.types
-    %w[Tier Accommodation Transport Food]
+    %w[Tier Accommodation Transport Food Extra]
   end
 
   def self.icon(type)
@@ -60,6 +60,8 @@ class Option
       'fa-bus'
     when 'Food'
       'fa-cutlery'
+    when 'Extra'
+      'fa-plus-circle'
     end
   end
 
