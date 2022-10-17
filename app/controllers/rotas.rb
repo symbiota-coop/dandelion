@@ -25,6 +25,7 @@ Dandelion::App.controller do
     @gathering = Gathering.find_by(slug: params[:slug]) || not_found
     @membership = @gathering.memberships.find_by(account: current_account)
     confirmed_membership_required!
+    redirect "/g/#{@gathering.slug}/rotas/#{@gathering.rotas.first.id}" if @gathering.rotas.count == 1
     erb :'rotas/rotas'
   end
 

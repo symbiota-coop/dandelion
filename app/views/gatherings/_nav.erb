@@ -51,7 +51,7 @@
         (if gathering.enable_rotas
            ['Shifts',
             (
-              [['Overview', "/g/#{gathering.slug}/rotas"]] + gathering.rotas(true).map { |rota| [rota.name, "/g/#{gathering.slug}/rotas/#{rota.id}"] } + (membership.admin? ? [['Create a rota', "/g/#{gathering.slug}/rotas/new"]] : [])
+              (gathering.rotas.count > 1 ? [['Overview', "/g/#{gathering.slug}/rotas"]] : []) + gathering.rotas(true).map { |rota| [rota.name, "/g/#{gathering.slug}/rotas/#{rota.id}"] } + (membership.admin? ? [['Create a rota', "/g/#{gathering.slug}/rotas/new"]] : [])
             )]
          end),
         (['Inventory', "/g/#{gathering.slug}/inventory"] if gathering.enable_inventory),
