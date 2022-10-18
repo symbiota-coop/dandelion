@@ -13,7 +13,10 @@
     </style>
     <script>
       $(function () {
-        $('a[href^="/events"]').attr('target', '_blank')
+        $(document).on('click', 'a[target]', function(event) {
+          var a = this
+          $(a).attr('target', '_blank')
+        });
       })
     </script>
     <% if @minimal_container %>
