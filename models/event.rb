@@ -818,7 +818,7 @@ class Event
     orders.each { |order| r += order.discounted_ticket_revenue }
     r
   rescue Money::Bank::UnknownRate
-    0
+    Money.new(0, DEFAULT_CURRENCY)
   end
 
   def donation_revenue
@@ -826,7 +826,7 @@ class Event
     orders.each { |order| r += order.donation_revenue }
     r
   rescue Money::Bank::UnknownRate
-    0
+    Money.new(0, DEFAULT_CURRENCY)
   end
 
   def organisation_discounted_ticket_revenue
@@ -834,7 +834,7 @@ class Event
     orders.each { |order| r += order.organisation_discounted_ticket_revenue }
     r
   rescue Money::Bank::UnknownRate
-    0
+    Money.new(0, DEFAULT_CURRENCY)
   end
 
   def credit_payable_to_revenue_sharer
@@ -842,6 +842,6 @@ class Event
     orders.each { |order| r += Money.new((order.credit_payable_to_revenue_sharer || 0) * 100, order.currency) }
     r
   rescue Money::Bank::UnknownRate
-    0
+    Money.new(0, DEFAULT_CURRENCY)
   end
 end
