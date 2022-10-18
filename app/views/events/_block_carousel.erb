@@ -1,5 +1,5 @@
 <div style="position: relative;">
-  <a target="_parent" href="/events/<%= event.id %>" <% if event.carousel_text %> data-toggle="tooltip" title="<%=event.carousel_text%>" <% end %>>
+  <a target="_blank" href="/events/<%= event.id %>" <% if event.carousel_text %> data-toggle="tooltip" title="<%=event.carousel_text%>" <% end %>>
     <% if @organisation && (cohostship = event.cohostships.find_by(organisation: @organisation)) && cohostship.image %>
       <img class="w-100" src="<%= u cohostship.image.thumb((crop if defined?(crop) && crop) || '992x992').url %>">
   <% else %>
