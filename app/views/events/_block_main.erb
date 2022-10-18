@@ -1,12 +1,12 @@
 <h4 class="block-title">
-  <a class="text-dark" target="_parent" href="<%= "/events/#{event.id}#{if @organisation && @organisation != event.organisation; "?cohost=#{@organisation.slug}"; end }"%>" onclick="event.stopPropagation();">
+  <a class="text-dark" target="_parent" href="<%= "/events/#{event.id}#{if @organisation && @organisation != event.organisation; "?cohost=#{@organisation.slug}"; end }"%>">
     <%= event.name %>
   </a>
   <% if current_account %>
     <div data-with-placeholder class="d-inline event-star" data-pagelet-url="/events/<%=event.id%>/star?block_edit=1"><i class="fa fa-star-o" style="opacity: 0.3"></i></div>
   <% end %>
   <% if event_admin?(event) %>
-    <a class="text-dark block-edit" style="display: none" target="_parent" href="<%= "/events/#{event.id}/edit" %>" onclick="event.stopPropagation();">
+    <a class="text-dark block-edit" style="display: none" target="_parent" href="<%= "/events/#{event.id}/edit" %>">
       <i class="fa fa-pencil"></i>
     </a>
   <% end %>
@@ -46,8 +46,8 @@
       <a target="_blank" href="https://www.google.co.uk/maps?q=<%= event.location %>"><%= event.location %></a>
     <% end %>
   </li>
-<% if defined?(skip_final_ul) && skip_final_ul %>
+  <% if defined?(skip_final_ul) && skip_final_ul %>
 
-<% else %>
-</ul>
+  <% else %>
+  </ul>
 <% end %>
