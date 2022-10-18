@@ -88,11 +88,6 @@
 
 <% if params[:minimal] %>
   <%== '<div id="events-container" class="container-fluid">' %>
-  <script>
-    $(function () {
-      $('#events-container a').attr('target', '_blank')
-    })
-  </script>
 <% end %>
 <% if params[:display] == 'map' %>
   <div data-pagelet-url="/o/<%=@organisation.slug%>/events?<%= request.query_string %>">

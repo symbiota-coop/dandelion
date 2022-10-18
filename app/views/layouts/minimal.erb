@@ -1,16 +1,21 @@
 <!doctype html>
 <html lang="en">
   <%= partial :'layouts/head' %>
-  <% if @organisation && @organisation.verified? && @organisation.minimal_head %>
-    <%== @organisation.minimal_head %>
-  <% end %>
-  <% if @account && @account.admin? && @account.minimal_head %>
-    <%== @account.minimal_head %>
-  <% end %>
-  <style>
-    html, body, #map-container, #map-canvas { height: 100% !important }
-  </style>
   <body>
+    <% if @organisation && @organisation.verified? && @organisation.minimal_head %>
+      <%== @organisation.minimal_head %>
+    <% end %>
+    <% if @account && @account.admin? && @account.minimal_head %>
+      <%== @account.minimal_head %>
+    <% end %>
+    <style>
+      html, body, #map-container, #map-canvas { height: 100% !important }
+    </style>
+    <script>
+      $(function () {
+        $('a[href^="/events"]').attr('target', '_blank')
+      })
+    </script>
     <% if @minimal_container %>
       <%== '<div class="container-fluid">' %>
     <% end %>
