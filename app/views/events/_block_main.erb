@@ -1,12 +1,12 @@
 <h4 class="block-title">
-  <a class="text-dark" href="<%= "/events/#{event.id}#{if @organisation && @organisation != event.organisation; "?cohost=#{@organisation.slug}"; end }"%>" onclick="event.stopPropagation();">
+  <a class="text-dark" target="_parent" href="<%= "/events/#{event.id}#{if @organisation && @organisation != event.organisation; "?cohost=#{@organisation.slug}"; end }"%>" onclick="event.stopPropagation();">
     <%= event.name %>
   </a>
   <% if current_account %>
     <div data-with-placeholder class="d-inline event-star" data-pagelet-url="/events/<%=event.id%>/star?block_edit=1"><i class="fa fa-star-o" style="opacity: 0.3"></i></div>
   <% end %>
   <% if event_admin?(event) %>
-    <a class="text-dark block-edit" style="display: none" href="<%= "/events/#{event.id}/edit" %>" onclick="event.stopPropagation();">
+    <a class="text-dark block-edit" style="display: none" target="_parent" href="<%= "/events/#{event.id}/edit" %>" onclick="event.stopPropagation();">
       <i class="fa fa-pencil"></i>
     </a>
   <% end %>
@@ -23,15 +23,15 @@
       <i data-toggle="tooltip" title="Host/facilitators" class="fa fa-li fa-flag"></i>
       <% if ef.count > 0 %>
         <%== ef.map { |event_facilitation|
-          %(<a class="text-dark" href="/u/#{event_facilitation.account.username}">#{Sanitize.fragment(event_facilitation.account.name)}</a>)
+          %(<a target="_parent" class="text-dark" href="/u/#{event_facilitation.account.username}">#{Sanitize.fragment(event_facilitation.account.name)}</a>)
         }.to_sentence(last_word_connector: ' and ') %>
         <% unless @organisation %>
           in collaboration with
         <% end %>
       <% end %>
       <% unless @organisation %>
-        <% organisations = []; organisations << %(<a class="text-dark" href="/o/#{Sanitize.fragment(event.organisation.slug)}">#{Sanitize.fragment(event.organisation.name)}</a>) %>
-        <% event.cohosts.each { |organisation| organisations << %(<a class="text-dark" href="/o/#{Sanitize.fragment(organisation.slug)}">#{Sanitize.fragment(organisation.name)}</a>) } %>
+        <% organisations = []; organisations << %(<a target="_parent" class="text-dark" href="/o/#{Sanitize.fragment(event.organisation.slug)}">#{Sanitize.fragment(event.organisation.name)}</a>) %>
+        <% event.cohosts.each { |organisation| organisations << %(<a target="_parent" class="text-dark" href="/o/#{Sanitize.fragment(organisation.slug)}">#{Sanitize.fragment(organisation.name)}</a>) } %>
         <%== organisations.to_sentence(last_word_connector: ' and ') %>
       <% end %>
     </li>
@@ -46,8 +46,8 @@
       <a target="_blank" href="https://www.google.co.uk/maps?q=<%= event.location %>"><%= event.location %></a>
     <% end %>
   </li>
-  <% if defined?(skip_final_ul) && skip_final_ul %>
+<% if defined?(skip_final_ul) && skip_final_ul %>
 
-  <% else %>
-  </ul>
+<% else %>
+</ul>
 <% end %>

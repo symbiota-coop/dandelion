@@ -38,9 +38,9 @@
                 <% else %>
                   <div class="col-lg-6 order-lg-2 mb-2 mb-lg-0">
                     <% if @organisation && (cohostship = event.cohostships.find_by(organisation: @organisation)) && cohostship.image && (cohostship.image.width >= cohostship.image.height) %>
-                      <a href="/events/<%= event.id %>?cohost=<%=@organisation.slug%>"><img class="w-100" src="<%= u cohostship.image.thumb('992x992').url %>"></a>
+                      <a target="_parent" href="/events/<%= event.id %>?cohost=<%=@organisation.slug%>"><img class="w-100" src="<%= u cohostship.image.thumb('992x992').url %>"></a>
                     <% elsif event.image && (event.image.width >= event.image.height) %>
-                      <a href="/events/<%= event.id %>"><img class="w-100" src="<%= u event.image.thumb('992x992').url %>"></a>
+                      <a target="_parent" href="/events/<%= event.id %>"><img class="w-100" src="<%= u event.image.thumb('992x992').url %>"></a>
                     <% end %>
                   </div>
                 <% end %>
