@@ -38,7 +38,7 @@
       <% if option.split_cost %>
         <%= m option.cost, @gathering.currency %> total
         <% if option.cost_per_person %>
-          (<%= m option.cost_per_person, @gathering.currency %>/person)
+          (currently <%= m option.cost_per_person, @gathering.currency %>/person)
         <% end %>
       <% else %>
         <%= m option.cost, @gathering.currency %>/person
