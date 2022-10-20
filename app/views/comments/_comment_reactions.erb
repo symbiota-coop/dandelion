@@ -27,7 +27,7 @@
     <%= body == '❤' ? '❤️' : body %> <%= comment_reactions.count %>
   </a>
     <span style="display: none">
-      <%= comment_reactions.map { |comment_reaction| comment_reaction.account.name }.join('<br />') %>
+      <%== Sanitize.fragment comment_reactions.map { |comment_reaction| comment_reaction.account.name }.join('<br />') %>
     </span>
     <% } %>
   <% end %>
