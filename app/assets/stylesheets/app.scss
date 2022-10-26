@@ -609,8 +609,9 @@ body {
   animation-iteration-count: infinite;
 }
 
-figure.image {
-  margin-bottom: 1em
+figure.image,
+.ck-content .image {
+  margin-bottom: 1em !important
 }
 
 @keyframes opacity {
