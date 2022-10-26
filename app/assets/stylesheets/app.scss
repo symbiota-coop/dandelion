@@ -609,6 +609,10 @@ body {
   animation-iteration-count: infinite;
 }
 
+figure.image {
+  margin-bottom: 1em
+}
+
 @keyframes opacity {
   0% {
     opacity: 0.5;
