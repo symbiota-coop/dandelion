@@ -166,7 +166,7 @@ Dandelion::App.controller do
     @order = (Order.find(params[:order_id]) || not_found) if params[:order_id]
     @og_desc = when_details(@event)
     kick! unless @event.organisation
-    event_admins_only! if @event.draft?
+    kick!(r: "/o/#{@event.organisation.slug}/events") if @event.draft? && !event_admin?
     @title = @event.name
     @organisation = @event.organisation
     if @order && params[:success]
