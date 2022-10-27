@@ -12,6 +12,7 @@
     <%= dropdown_nav [
           ['View event', "/events/#{event.id}"],
           ['Edit event', "/events/#{event.id}/edit"],
+          ['Duplicate event', "/events/#{event.id}/duplicate"],
           ['Discount codes', "/events/#{event.id}/discount_codes"],
           (['Co-hosts', "/events/#{event.id}/cohosts"] if event.cohostships.count.positive?),
           ([%(Orders <span class="badge badge-primary">#{event.orders.count}</span>), "/events/#{event.id}/orders"] if event.orders.count.positive?),
@@ -22,7 +23,6 @@
           (['Preview confirmation email', "/events/#{event.id}/ticket_email"] if event.ticket_types.count.positive?),
           ['Audience stats', "/events/#{event.id}/stats"],
           ([%(Check-in), "/events/#{event.id}/check_in"] if event.ticket_types.count.positive? || event.tickets.count.positive?),
-          ['Duplicate', "/events/#{event.id}/duplicate"],
           ['Mailer', "/events/#{event.id}/pmails"]
         ].compact, button_text: %(#{event.name} <i class="fa fa-caret-down"></i>), container_class: 'btn-group mb-1' %>
     <style>
