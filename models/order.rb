@@ -135,7 +135,7 @@ class Order
   def description_elements
     d = []
     TicketType.and(:id.in => tickets.pluck(:ticket_type_id)).each do |ticket_type|
-      d << "#{ticket_type.name} ticket #{Money.new(ticket_type.price * 100, currency).format(no_cents_if_whole: true)}x#{tickets.and(ticket_type: ticket_type).count}"
+      d << "#{"#{ticket_type.name} ticket " if ticket_type}#{Money.new(ticket_type.price * 100, currency).format(no_cents_if_whole: true)}x#{tickets.and(ticket_type: ticket_type).count}"
     end
 
     d << "#{percentage_discount}% discount" if percentage_discount
@@ -357,8 +357,10 @@ class Order
         end
         pdf.move_down 0.5 * cm
         pdf.text ticket.account.name, align: :center, size: 14
-        pdf.move_down 0.5 * cm
-        pdf.text ticket.ticket_type.name, align: :center, size: 14
+        if ticket.ticket_type
+          pdf.move_down 0.5 * cm
+          pdf.text ticket.ticket_type.name, align: :center, size: 14
+        end
         pdf.move_down 0.5 * cm
         pdf.text ticket.id.to_s, align: :center, size: 10
       end
