@@ -57,8 +57,8 @@
         <div class="my-1">
           <%= partial :'events/progress', locals: { event: order.event, full_width: true } %>
         </div>
-        <% if event.discounted_ticket_revenue > 0 %>
-          <%= m event.discounted_ticket_revenue, event.currency %>
+        <% if order.event.discounted_ticket_revenue > 0 %>
+          <%= m order.event.discounted_ticket_revenue, order.event.currency %>
         <% end %>
       </td>
     <% end %>
