@@ -181,6 +181,7 @@ class Event
     self.suggested_donation = suggested_donation.round(2) if suggested_donation
     self.minimum_donation = nil unless suggested_donation
     self.minimum_donation = minimum_donation.round(2) if minimum_donation
+    self.description = description.gsub('style="background-color:transparent;color:#1155cc;"', '') if description #  google docs link color
 
     if new_record? && !duplicate
       errors.add(:organisation, '- you are not an admin of this organisation') if !local_group && !activity && !quick_create && !Organisation.admin?(organisation, account)
