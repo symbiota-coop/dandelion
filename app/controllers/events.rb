@@ -580,7 +580,7 @@ Dandelion::App.controller do
         end
       end
     when :pdf
-      @orders = @orders.sort_by { |order| order.account.name }
+      @orders = @orders.sort_by { |order| order.account.try(:name) || '' }
       Prawn::Document.new do |pdf|
         pdf.font "#{Padrino.root}/app/assets/fonts/circular-ttf/CircularStd-Book.ttf"
         pdf.table([%w[name email value created_at]] +
