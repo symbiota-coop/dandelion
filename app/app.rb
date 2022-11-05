@@ -90,12 +90,6 @@ module Dandelion
       erb :error, layout: :application
     end
 
-    get '/time_zone' do
-      session[:set_time_zone] = true
-      session[:time_zone] = params[:time_zone]
-      redirect back
-    end
-
     get '/error' do
       erb :error, layout: :application
     end

@@ -87,23 +87,6 @@
     </div>
     <!-- /.modal -->
 
-    <% if !current_account && !session[:set_time_zone] %>
-      <script>
-        $(function() {
-          if (Intl.DateTimeFormat().resolvedOptions().timeZone && Intl.DateTimeFormat().resolvedOptions().timeZone != 'Europe/London') {
-            var a = $('<a class="btn btn-sm btn-outline-light">Set time zone to '+Intl.DateTimeFormat().resolvedOptions().timeZone.replace('_',' ')+'</a>').attr('href', '/time_zone?time_zone=' + Intl.DateTimeFormat().resolvedOptions().timeZone)
-            <% if @event %>
-              $(a).insertBefore('.content')
-              $(a).wrap('<div id="set-time-zone" style="z-index: 9999; background: #222" class="text-center text-white py-2"></div>')
-            <% else %>
-              $(a).prependTo('body')
-              $(a).wrap('<div id="set-time-zone" style="z-index: 9999; background: #222" class="text-center fixed-bottom text-white p-3"></div>')
-            <% end %>
-          }
-        })
-      </script>
-    <% end %>
-
     <% unless @no_discord %>
       <%= partial :'layouts/discord' %>
     <% end %>
