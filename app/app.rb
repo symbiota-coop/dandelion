@@ -39,8 +39,8 @@ module Dandelion
       begin
         Time.zone = if current_account && current_account.time_zone
                       current_account.time_zone
-                    elsif session[:time_zone]
-                      session[:time_zone]
+                    elsif request.location && request.location.first.data['time_zone']
+                      request.location.first.data['time_zone']
                     else
                       'London'
                     end

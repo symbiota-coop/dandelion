@@ -19,7 +19,12 @@ Mongoid.raise_not_found_error = false
 
 Delayed::Worker.max_attempts = 1
 
-Geocoder.configure(lookup: :google, api_key: ENV['GOOGLE_MAPS_API_KEY'])
+Geocoder.configure(
+  lookup: :google,
+  google: {
+    api_key: ENV['GOOGLE_MAPS_API_KEY']
+  }
+)
 
 bank = Money::Bank::Uphold.new
 Money.default_bank = bank

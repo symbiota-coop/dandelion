@@ -165,7 +165,7 @@ GEM
       fog-core
       nokogiri (>= 1.5.11, < 2.0.0)
     formatador (1.1.0)
-    geocoder (1.7.0)
+    geocoder (1.8.1)
     gocardless_pro (2.29.0)
       faraday (>= 0.9.2, < 2)
     google-apis-core (0.4.2)
@@ -471,7 +471,7 @@ DEPENDENCIES
   email_address
   erb_lint
   factory_bot
-  geocoder (= 1.7.0)
+  geocoder
   gocardless_pro
   google_drive
   html_truncator
