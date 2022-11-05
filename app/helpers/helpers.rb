@@ -4,11 +4,11 @@ Dandelion::App.helpers do
   end
 
   def concise_when_details(whenable)
-    whenable.send(:concise_when_details, Time.zone)
+    whenable.send(:concise_when_details, Time.zone.name)
   end
 
   def when_details(whenable)
-    whenable.send(:when_details, Time.zone)
+    whenable.send(:when_details, Time.zone.name)
   end
 
   def pagination_details(collection, model: nil)
