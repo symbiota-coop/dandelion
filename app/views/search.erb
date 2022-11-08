@@ -4,7 +4,7 @@
     <input name="q" type="text" class="form-control input-lg" value="<%= @q %>">
   </div>
   <% if @type == 'events' %>
-    <p class="mb-3">Showing matching future events. <a href="/events?q=<%=@q%>&search=1">Search past events, change sorting and display options and more</a></p>
+    <p class="mb-3">Showing matching recent and future events. <a href="/events?q=<%=@q%>&search=1">Search past events, change sorting and display options and more</a></p>
   <% end %>
   <input type="hidden" name="type" id="type" value="<%= @type %>">
 </form>
@@ -27,7 +27,7 @@
     <%= will_paginate @accounts, renderer: WillPaginate::ViewHelpers::BootstrapRenderer %>
   </div>
   <% when 'events' %>
-    <%= partial 'events/blocks', locals: { events: @events } %>
+  <%= partial 'events/blocks', locals: { events: @events } %>
   <div class="mt-3">
     <%= will_paginate @events, renderer: WillPaginate::ViewHelpers::BootstrapRenderer %>
   </div>
