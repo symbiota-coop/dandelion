@@ -57,10 +57,6 @@ class LocalGroup
     end
   end
 
-  before_validation do
-    errors.add(:organisation, '- you are not an admin of this organisation') if organisation && !Organisation.admin?(organisation, account)
-  end
-
   def event_tags
     EventTag.and(:id.in => EventTagship.and(:event_id.in => events.pluck(:id)).pluck(:event_tag_id))
   end
