@@ -563,7 +563,7 @@ Dandelion::App.controller do
       erb :'events/orders'
     when :csv
       CSV.generate do |csv|
-        csv << %w[name email value opt_in_organisation opt_in_facilitator created_at]
+        csv << %w[name email value opt_in_organisation opt_in_facilitator hear_about created_at]
         @orders.each do |order|
           csv << [
             order.account ? order.account.name : '',
@@ -575,6 +575,7 @@ Dandelion::App.controller do
             m((order.value || 0), order.currency),
             order.opt_in_organisation,
             order.opt_in_facilitator,
+            order.hear_about,
             order.created_at.to_s(:db)
           ]
         end
@@ -583,7 +584,7 @@ Dandelion::App.controller do
       @orders = @orders.sort_by { |order| order.account.try(:name) || '' }
       Prawn::Document.new do |pdf|
         pdf.font "#{Padrino.root}/app/assets/fonts/circular-ttf/CircularStd-Book.ttf"
-        pdf.table([%w[name email value created_at]] +
+        pdf.table([%w[name email value hear_about created_at]] +
             @orders.map do |order|
               [
                 order.account.name_transliterated,
@@ -593,6 +594,7 @@ Dandelion::App.controller do
                   ''
                 end,
                 m((order.value || 0), order.currency),
+                order.hear_about,
                 order.created_at.to_s(:db)
               ]
             end)
