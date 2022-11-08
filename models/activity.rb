@@ -65,10 +65,6 @@ class Activity
     EventTag.and(:id.in => EventTagship.and(:event_id.in => events.pluck(:id)).pluck(:event_tag_id))
   end
 
-  before_validation do
-    errors.add(:organisation, '- you are not an admin of this organisation') if organisation && account && !Organisation.admin?(organisation, account)
-  end
-
   dragonfly_accessor :image
   before_validation do
     if image
