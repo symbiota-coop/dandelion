@@ -32,6 +32,7 @@ class Account
   field :last_checked_notifications, type: Time
   field :last_checked_messages, type: Time
   field :location, type: String
+  index({ location: 1 })
   field :number_at_this_location, type: Integer
   index({ number_at_this_location: 1 })
   field :coordinates, type: Array
