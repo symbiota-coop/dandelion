@@ -638,3 +638,21 @@ figure.image,
     margin: 0 -1.2rem
   }
 }
+
+@keyframes flickerAnimation {
+  0% {
+    opacity: 1;
+  }
+
+  50% {
+    opacity: 0.5;
+  }
+
+  100% {
+    opacity: 1;
+  }
+}
+
+.flicker {
+  animation: flickerAnimation 2s infinite;
+}

@@ -60,8 +60,10 @@
 </style>
 
 <p class="lead text-center mt-3 mb-1">
-  <mark>Unlike our competitors,<span class="d-lg-none"><br />
-    </span> we operate on a donation/gift economy basis.</mark><br />
+  <mark>Unlike our competitors,
+    <span class="d-lg-none"><br />
+    </span>
+     we operate on a donation/gift economy basis.</mark><br />
 </p>
 <p class="lead text-center mb-4" id="just-pay">
   <span>
@@ -89,7 +91,9 @@
 <%= partial :'events/search_form' %>
 <%= partial :'events/view_options', locals: {path: '/events'} %>
 
-<div data-pagelet-url="/events"></div>
+<div data-with-placeholder data-pagelet-url="/events">
+  <%= partial :'events/blocks_placeholder' %>
+</div>
 <div class="my-3" data-pagelet-url="/map?places=1">
   <%= partial :'maps/map', locals: { dynamic: true, trigger_bounds_changed: true } %>
 </div>
