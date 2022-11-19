@@ -44,7 +44,7 @@
           <% if w > 0 %><%= w.to_f.round %>%<% end %>
         </div>
       </div>
-      <p class="text-center"><%= monthly_contributions.format(no_cents: true) %> raised of <%=m Money.new(target*100,'GBP'), account.default_currency || 'GBP'%> monthly target</p>
+      <p class="mt-1 text-center"><%= monthly_contributions.format(no_cents: true) %> raised of <%=m Money.new(target*100,'GBP'), account.default_currency || 'GBP'%> monthly target</p>
     <% end %>
 
     <% form_tag '', class: 'form-inline', id: 'pay-form' do %>
