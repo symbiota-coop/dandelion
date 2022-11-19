@@ -29,16 +29,21 @@
     <% end %>
 
     <%
-    t = AccountContribution.where(:created_at.gte => Date.new(Date.today.year, Date.today.month, 1)).sum { |ac| Money.new(ac.amount*100, ac.currency) }    
-    t = Money.new(0,'GBP') if t == 0
-    t = t.exchange_to(account.default_currency || 'GBP') 
+    monthly_contributions = Money.new((50 + Date.today.month*10)*100,'GBP') + AccountContribution.where(:payment_completed => true, :created_at.gte => Date.new(Date.today.year, Date.today.month, 1)).sum { |ac| Money.new(ac.amount*100, ac.currency) }    
+    monthly_contributions = monthly_contributions.exchange_to(account.default_currency || 'GBP') 
+
+    target = 500
+    if monthly_contributions >= Money.new(500*100,'GBP')
+      target = 1000 * (monthly_contributions.to_f / 500).floor
+    end    
     %>
+
     <div class="progress" style="height: 30px">
-      <div class="progress-bar" role="progressbar" style="width: <%= "#{w = 100*t/2000}%" %>;">
+      <div class="progress-bar" role="progressbar" style="width: <%= "#{w = 100*monthly_contributions/target}%" %>;">
         <% if w > 0 %><%= w.to_f.round %>%<% end %>
       </div>
     </div>
-    <p class="text-center"><%= t.format(no_cents: true) %> raised of <%=m Money.new(ENV['DONATION_TARGET'].to_i*100,'GBP'), account.default_currency || 'GBP'%> monthly target</p>
+    <p class="text-center"><%= monthly_contributions.format(no_cents: true) %> raised of <%=m Money.new(target*100,'GBP'), account.default_currency || 'GBP'%> monthly target</p>
 
 
     <% form_tag '', class: 'form-inline', id: 'pay-form' do %>
