@@ -46,7 +46,7 @@ Dandelion::App.helpers do
       fragment.try(:destroy)
       begin
         Fragment.create(key: key, value: partial(slug, locals: locals), expires: expires).value
-      rescue Mongo::Error::OperationFailure
+      rescue Mongo::Error::OperationFailure # protect against race condition
         Fragment.find_by(key: key).try(:value)
       end
     end.html_safe
