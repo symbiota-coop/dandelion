@@ -192,11 +192,11 @@ class Notification
     when :reacted_to_a_comment
       comment_reaction = notifiable
       if comment_reaction.commentable.is_a?(Account)
-        "<strong>#{comment_reaction.account.name}</strong> reacted with #{comment_reaction.body} to <strong>#{comment_reaction.comment.account.name}'s</strong> comment in <strong>#{comment_reaction.comment.post.subject}</strong>"
+        "<strong>#{comment_reaction.account.name}</strong> reacted with #{comment_reaction.body == '💚' ? '<i class="text-primary fa fa-heart"></i>' : comment_reaction.body} to <strong>#{comment_reaction.comment.account.name}'s</strong> comment in <strong>#{comment_reaction.comment.post.subject}</strong>"
       elsif comment_reaction.commentable.is_a?(Activity) || comment_reaction.commentable.is_a?(LocalGroup)
-        "<strong>#{comment_reaction.account.name}</strong> reacted with #{comment_reaction.body} to <strong>#{comment_reaction.comment.account.name}'s</strong> comment in <strong>#{comment_reaction.commentable.organisation.name}/#{comment_reaction.commentable.name}/#{comment_reaction.comment.post.subject}</strong>"
+        "<strong>#{comment_reaction.account.name}</strong> reacted with #{comment_reaction.body == '💚' ? '<i class="text-primary fa fa-heart"></i>' : comment_reaction.body} to <strong>#{comment_reaction.comment.account.name}'s</strong> comment in <strong>#{comment_reaction.commentable.organisation.name}/#{comment_reaction.commentable.name}/#{comment_reaction.comment.post.subject}</strong>"
       else
-        "<strong>#{comment_reaction.account.name}</strong> reacted with #{comment_reaction.body} to <strong>#{comment_reaction.comment.account.name}'s</strong> comment in <strong>#{comment_reaction.commentable.name}/#{comment_reaction.comment.post.subject}</strong>"
+        "<strong>#{comment_reaction.account.name}</strong> reacted with #{comment_reaction.body == '💚' ? '<i class="text-primary fa fa-heart"></i>' : comment_reaction.body} to <strong>#{comment_reaction.comment.account.name}'s</strong> comment in <strong>#{comment_reaction.commentable.name}/#{comment_reaction.comment.post.subject}</strong>"
       end
     when :left_gathering
       account = notifiable
