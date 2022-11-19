@@ -44,7 +44,11 @@ Dandelion::App.helpers do
       fragment.value
     else
       fragment.try(:destroy)
-      Fragment.create(key: key, value: partial(slug, locals: locals), expires: expires).value
+      begin
+        Fragment.create(key: key, value: partial(slug, locals: locals), expires: expires).value
+      rescue Mongo::Error::OperationFailure
+        Fragment.find_by(key: key).try(:value)
+      end
     end.html_safe
   end
 
