@@ -300,7 +300,7 @@ class Event
       w = w ? w.split(']').first.to_i : 8
       tags = tags.split(',').map(&:strip)
       intersection = event_tags.pluck(:name) & tags
-      if intersection.count > 0
+      if coordinator && intersection.count > 0
         account = Account.find_by(username: coordinator.strip)
         break
       end
