@@ -14,7 +14,7 @@ class Order
   belongs_to :account, class_name: 'Account', inverse_of: :orders, index: true, optional: true
   belongs_to :revenue_sharer, class_name: 'Account', inverse_of: :orders_as_revenue_sharer, index: true, optional: true
   belongs_to :affiliate, polymorphic: true, index: true, optional: true
-  belongs_to :discount_code, index: true, optional: true
+  belongs_to :discount_code, optional: true # removed index
 
   field :value, type: Float
   field :original_description, type: String
