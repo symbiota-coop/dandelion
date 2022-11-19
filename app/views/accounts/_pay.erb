@@ -1,87 +1,123 @@
 <% last_completed_contribution = account.account_contributions.and(payment_completed: true).order('created_at desc').first %>
-<% if (defined?(force) && force) || !last_completed_contribution || last_completed_contribution.created_at < 1.month.ago %>
-<div class="<%=div_class if defined?(div_class)%>">
-      <p class="lead mb-1">
-        <mark class="px-0">Dandelion operates on a donation/gift economy basis.</mark>
-      </p>
-      <% if last_completed_contribution %>
-        <p class="lead">
+<% if (defined?(force) && force) || !last_completed_contribution || last_completed_contribution.created_at < 1.minute.ago %>
+  <div class="<%=div_class if defined?(div_class)%>">
+    <p class="lead mb-1">
+      <mark class="px-0">
+        Dandelion operates on a donation/gift economy basis.
+      </mark>
+    </p>
+    <% if last_completed_contribution %>
+      <p class="lead">
+        <small>
+          Thanks for contributing <%= time_ago_in_words last_completed_contribution.created_at %> ago.
+          Will you chip in again so we can remain free? 
           <small>
-            Thanks for contributing <%= time_ago_in_words last_completed_contribution.created_at %> ago.
-            Will you chip in again so we can remain free?
+            (and we won't ask again for a month)
           </small>
-        </p>
-      <% else %>
-        <p class="lead mb-1">
-          <small>
-            Please chip in so we can remain free<% if !current_account || (defined?(force) && force) %>.<% else %>
+        </small>
+      </p>
+    <% else %>
+      <p class="lead mb-1">
+        <small>
+          Please chip in so we can remain free<% if !current_account || (defined?(force) && force) %>.<% else %>
             <small>
               (and we won't ask again for a month).
             </small>
-            <% end %>
-          </small>
-        </p>
-      <% end %>
-      <% form_tag '', class: 'form-inline', id: 'pay-form' do %>
-        <div class="form-group mb-1 mr-1">
-          <div class="input-group">
-            <div class="input-group-prepend">
-              <span class="input-group-text"><%= Money.new(0, account.default_currency || 'GBP').symbol %></span>
-            </div>
-            <%= hidden_field_tag :currency, value: account.default_currency || 'GBP' %>
-            <%= number_field_tag :amount, value: 10, style: 'width: 5em;', required: 'required', class: 'form-control', id: 'amount' %>
+          <% end %>
+        </small>
+      </p>
+    <% end %>
+
+    <%
+    t = AccountContribution.where(:created_at.gte => Date.new(Date.today.year, Date.today.month, 1)).sum { |ac| Money.new(ac.amount*100, ac.currency) }    
+    t = Money.new(0,'GBP') if t == 0
+    t = t.exchange_to(account.default_currency || 'GBP') 
+    %>
+    <div class="progress" style="height: 30px">
+      <div class="progress-bar" role="progressbar" style="width: <%= "#{w = 100*t/2000}%" %>;">
+        <% if w > 0 %><%= w.to_i.round %>%<% end %>
+      </div>
+    </div>
+    <p class="text-center"><%= t.format(no_cents: true) %> raised of <%=m Money.new(200000,'GBP'), account.default_currency || 'GBP'%> monthly target</p>
+
+
+    <% form_tag '', class: 'form-inline', id: 'pay-form' do %>
+      <div class="form-group mb-1 mr-1">
+        <div class="input-group">
+          <div class="input-group-prepend">
+            <span class="input-group-text"><%= Money.new(0, account.default_currency || 'GBP').symbol %></span>
           </div>
+          <%= hidden_field_tag :currency, value: account.default_currency || 'GBP' %>
+          <%= number_field_tag :amount, value: 10, style: 'width: 5em;', required: 'required', class: 'form-control', id: 'amount' %>
         </div>
-        <button data-payment-method="stripe" type="submit" class="btn btn-primary mb-1 ml-0 mr-1" style="height: 2.125rem">
-          Contribute via card
-          <i class="fa fa-spin fa-circle-o-notch" style="display: none"></i>
-        </button>
-        <%= hidden_field_tag :payment_method, value: 'stripe', disabled: true %>
+      </div>
+      <button data-payment-method="stripe" type="submit" class="btn btn-primary mb-1 ml-0 mr-1" style="height: 2.125rem">
+        Contribute via card
+        <i class="fa fa-spin fa-circle-o-notch" style="display: none"></i>
+      </button>
+      <%= hidden_field_tag :payment_method, value: 'stripe', disabled: true %>
+      <div class="d-none d-lg-block">
         <button data-payment-method="coinbase" type="submit" class="btn btn-primary mb-1" style="height: 2.125rem">
           Contribute with crypto
           <i class="fa fa-spin fa-circle-o-notch" style="display: none"></i>
         </button>
         <%= hidden_field_tag :payment_method, value: 'coinbase', disabled: true %>
-      <% end %>
+      </div>
+    <% end %>
+    <div class="d-none d-lg-block">
       <p class="lead mb-0">
         <small>
           <small>
-          Other crypto options:
-          <a target="_blank" href="https://gitcoin.co/grants/564/dandelion">Gitcoin</a>
-          &middot;
-          <a target="_blank" href="https://giveth.io/project/dandelion">Giveth</a>
+            Other crypto options:
+            <a target="_blank" href="https://gitcoin.co/grants/564/dandelion">Gitcoin</a>
+            &middot;
+            <a target="_blank" href="https://giveth.io/project/dandelion">Giveth</a>
           </small>
         </small>
       </p>
-      <script>
-        $(function () {
+    </div>
+    <div class="d-lg-none">
+      <p class="lead mb-0">
+        <small>
+          <small>
+            Crypto options:
+            <a target="_blank" href="https://gitcoin.co/grants/564/dandelion">Gitcoin</a>
+            &middot;
+            <a target="_blank" href="https://giveth.io/project/dandelion">Giveth</a>
+          </small>
+        </small>
+      </p>
+    </div>
 
-          $('#pay-form button[data-payment-method]').click(function () {
-            $('input[type=hidden][name=payment_method]').attr('disabled', true)
-            $('input[type=hidden][name=payment_method][value=' + $(this).attr('data-payment-method') + ']').removeAttr('disabled')
-            $(this).attr('data-payment-method-clicked', true)
-          })
+    <script>
+      $(function () {
 
-          $('#pay-form').submit(function () {
-            $('#pay-form button[data-payment-method-clicked] i').show()
-            $.post('/accounts/<%= account.id %>/pay', $(this).serializeObject(), function (data) {
-              if (data['session_id']) {
-                var stripe = Stripe('<%= ENV['STRIPE_PK'] %>');
-                stripe.redirectToCheckout({sessionId: data['session_id']})
-              } else if (data['checkout_id']) {
-                window.location = 'https://commerce.coinbase.com/checkout/' + data['checkout_id']
-              }
-            }).fail(function () {
-              $('#pay-form').hide()
-            }).always(function () {
-              $('#pay-form').css('opacity', 1)
-            })
-
-            return false
-
-          })
-          console.log('paying')
+        $('#pay-form button[data-payment-method]').click(function () {
+          $('input[type=hidden][name=payment_method]').attr('disabled', true)
+          $('input[type=hidden][name=payment_method][value=' + $(this).attr('data-payment-method') + ']').removeAttr('disabled')
+          $(this).attr('data-payment-method-clicked', true)
         })
-      </script>
-</div>
+
+        $('#pay-form').submit(function () {
+          $('#pay-form button[data-payment-method-clicked] i').show()
+          $.post('/accounts/<%= account.id %>/pay', $(this).serializeObject(), function (data) {
+            if (data['session_id']) {
+              var stripe = Stripe('<%= ENV['STRIPE_PK'] %>');
+              stripe.redirectToCheckout({sessionId: data['session_id']})
+            } else if (data['checkout_id']) {
+              window.location = 'https://commerce.coinbase.com/checkout/' + data['checkout_id']
+            }
+          }).fail(function () {
+            $('#pay-form').hide()
+          }).always(function () {
+            $('#pay-form').css('opacity', 1)
+          })
+
+          return false
+
+        })
+        console.log('paying')
+      })
+    </script>
+  </div>
 <% end %>
