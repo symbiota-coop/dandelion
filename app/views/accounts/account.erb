@@ -21,7 +21,7 @@
 <% end %>
 <% if (habits = @account.habits.and(public: true).and(:archived.ne => true)).count > 0 %>
   <h2 class="mt-5" id="habits">Habits</h2>
-  <%= partial :'habits/blocks', locals: { habits: habits } %>
+  <div data-pagelet-url="/accounts/<%= @account.id %>/habits"></div>
 <% end %>
 
 <% if (organisations = Organisation.and(:id.in => @account.organisationships.and(:hide_membership.ne => true).pluck(:organisation_id))).count > 0 %>
@@ -36,7 +36,7 @@
         </div>
       <% end %>
     </div>
-    <%= partial :'organisations/blocks', locals: { organisations: organisations } %>
+    <div data-pagelet-url="/accounts/<%= @account.id %>/organisations"></div>
   <% end %>
 <% end %>
 
@@ -52,7 +52,7 @@
         </div>
       <% end %>
     </div>
-    <%= partial :'local_groups/blocks', locals: { local_groups: local_groups } %>
+    <div data-pagelet-url="/accounts/<%= @account.id %>/local_groups"></div>
   <% end %>
 <% end %>
 
@@ -68,7 +68,7 @@
         </div>
       <% end %>
     </div>
-    <%= partial :'activities/blocks', locals: { activities: activities } %>
+    <div data-pagelet-url="/accounts/<%= @account.id %>/activities"></div>
   <% end %>
 <% end %>
 
@@ -84,13 +84,7 @@
         </div>
       <% end %>
     </div>
-    <div class="row">
-      <% gatherings.each { |gathering| %>
-      <div class="col-6 col-lg-3 mb-3">
-        <%= partial :'gatherings/gathering', object: gathering %>
-      </div>
-      <% } %>
-    </div>
+    <div data-pagelet-url="/accounts/<%= @account.id %>/gatherings"></div>
   <% end %>
 <% end %>
 

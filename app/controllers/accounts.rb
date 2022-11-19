@@ -286,35 +286,49 @@ Dandelion::App.controller do
     end
   end
 
-  get '/accounts/:id/events' do
-    @account = Account.find(params[:id]) || not_found
-    events = Event.and(:id.in => EventFacilitation.and(:account_id.in => [@account.id] + @account.following_starred.pluck(:id)).pluck(:event_id)).live.public.future_and_current_featured
-    partial :'events/blocks', locals: { events: events }, layout: 'minimal'
-  end
-
   get '/accounts/:id/following' do
     @account = Account.find(params[:id]) || not_found
     partial :'accounts/following', locals: { accounts: @account.following, starred: @account.following_starred }
   end
+
+  get '/accounts/:id/habits' do
+    @account = Account.find(params[:id]) || not_found
+    habits = @account.habits.and(public: true).and(:archived.ne => true)
+    partial :'habits/blocks', locals: { habits: habits }
+  end  
 
   get '/accounts/:id/places' do
     @account = Account.find(params[:id]) || not_found
     partial :'accounts/places'
   end
 
+  get '/accounts/:id/organisations' do
+    @account = Account.find(params[:id]) || not_found
+    organisations = Organisation.and(:id.in => @account.organisationships.and(:hide_membership.ne => true).pluck(:organisation_id))
+    partial :'organisations/blocks', locals: { organisations: organisations }
+  end
+
+  get '/accounts/:id/local_groups' do
+    @account = Account.find(params[:id]) || not_found
+    local_groups = LocalGroup.and(:id.in => @account.local_groupships.and(:hide_membership.ne => true).pluck(:local_group_id))
+    partial :'local_groups/blocks', locals: { local_groups: local_groups }
+  end
+
+  get '/accounts/:id/activities' do
+    @account = Account.find(params[:id]) || not_found
+    activities = Activity.and(:id.in => @account.activityships.and(:hide_membership.ne => true).pluck(:activity_id))
+    partial :'activities/blocks', locals: { activities: activities }
+  end
+
+  get '/accounts/:id/gatherings' do
+    @account = Account.find(params[:id]) || not_found
+    gatherings = Gathering.and(:id.in => @account.memberships.pluck(:gathering_id)).and(listed: true).and(:privacy.ne => 'secret')
+    partial :'gatherings/blocks', locals: { gatherings: gatherings }
+  end
+
   get '/accounts/:id/followers' do
     @account = Account.find(params[:id]) || not_found
     partial :'accounts/following', locals: { accounts: @account.followers }
-  end
-
-  get '/u/:username/habits' do
-    @account = Account.find_by(username: params[:username]) || not_found
-    @habits = @account.habits.and(public: true).and(:archived.ne => true)
-    @date = params[:date] ? Date.parse(params[:date]) : Date.current
-    @hide_nav = true
-    @minimal_container = true
-    @no_discord = true
-    erb :'accounts/habits', layout: :minimal
   end
 
   get '/accounts/use_picture/:provider' do
@@ -377,8 +391,27 @@ Dandelion::App.controller do
     partial :'event_feedbacks/feedback', locals: { event_feedbacks: @account.event_feedbacks_as_facilitator }
   end
 
+  # minimal
+
   get '/u/:username/feedback' do
     @account = Account.find_by(username: params[:username]) || not_found
     erb :'accounts/feedback', layout: ('minimal' if params[:minimal])
   end
+
+  get '/accounts/:id/events' do
+    @account = Account.find(params[:id]) || not_found
+    events = Event.and(:id.in => EventFacilitation.and(:account_id.in => [@account.id] + @account.following_starred.pluck(:id)).pluck(:event_id)).live.public.future_and_current_featured
+    partial :'events/blocks', locals: { events: events }, layout: 'minimal'
+  end
+    
+  get '/u/:username/habits' do
+    @account = Account.find_by(username: params[:username]) || not_found
+    @habits = @account.habits.and(public: true).and(:archived.ne => true)
+    @date = params[:date] ? Date.parse(params[:date]) : Date.current
+    @hide_nav = true
+    @minimal_container = true
+    @no_discord = true
+    erb :'accounts/habits', layout: :minimal
+  end
+
 end
