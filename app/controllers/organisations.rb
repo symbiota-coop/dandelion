@@ -247,7 +247,7 @@ Dandelion::App.controller do
         line = @organisation.carousels.split("\n").reject { |line| line.blank? }[params[:i].to_i]
         title, tags = line.split(':')
         title, w = title.split('[')
-        tags, coordinator = tags.split('@')
+        tags, _coordinator = tags.split('@')
         w = w ? w.split(']').first.to_i : 8
         tags = tags.split(',').map(&:strip)
         @events = @organisation.events_for_search.future_and_current_featured.and(:draft.ne => true).and(:start_time.lt => w.weeks.from_now).and(:image_uid.ne => nil).and(:id.in => EventTagship.and(:event_tag_id.in => EventTag.and(:name.in => tags).pluck(:id)).pluck(:event_id)).limit(20)
