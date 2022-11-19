@@ -1,6 +1,3 @@
-<% unless params[:members_events] %>
-  <h2 class="mt-5">Events</h2>
-<% end %>
 <a class="btn btn-primary mb-3" href="/o/<%= @organisation.slug %>/events">All events</a>
 <% if organisation_assistant? %>
   <a class="btn btn-primary mb-3" href="/events/new?organisation_id=<%= @organisation.id %>">Create an event</a>
