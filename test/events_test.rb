@@ -34,6 +34,16 @@ class CoreTest < ActiveSupport::TestCase
     assert page.has_content? 'Add to calendar'
   end
 
+  test 'creating an event from /events' do
+    @account = FactoryBot.create(:account)
+    @organisation = FactoryBot.create(:organisation, account: @account)
+    login_as(@account)
+    visit '/events'
+    click_link 'Create an event'
+    select @organisation.name, from: 'organisation_id'
+    assert page.has_content? 'Event title*'
+  end
+
   test 'editing an event' do
     @account = FactoryBot.create(:account)
     @organisation = FactoryBot.create(:organisation, account: @account)
