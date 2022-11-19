@@ -28,14 +28,11 @@ class Post
   end
 
   def self.commentable_types
-    %w[DocPage PredictionFav Team Tactivity Mapplication Account Habit Place Gathering Activity Event LocalGroup Organisation ActivityApplication]
+    %w[DocPage Team Tactivity Mapplication Account Habit Place Gathering Activity Event LocalGroup Organisation ActivityApplication]
   end
 
   def url
-    if commentable.is_a?(PredictionFav)
-      prediction_fav = commentable
-      "#{ENV['BASE_URI']}/imagine/#{prediction_fav.prediction_id}/#{prediction_fav.index}"
-    elsif commentable.is_a?(DocPage)
+    if commentable.is_a?(DocPage)
       doc_page = commentable
       "#{ENV['BASE_URI']}/docs/#{doc_page.slug}#post-#{id}"
     elsif commentable.is_a?(Team)

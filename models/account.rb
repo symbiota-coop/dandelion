@@ -327,9 +327,6 @@ class Account
     )
   end
 
-  has_many :predictions, dependent: :nullify
-  has_many :prediction_favs, dependent: :destroy
-
   has_many :account_contributions, dependent: :destroy
 
   has_many :sign_ins, dependent: :destroy
