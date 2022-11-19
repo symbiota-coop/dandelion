@@ -1,6 +1,3 @@
-<% if request.xhr? %>
-  <h2 class="mt-5 mb-3">News</h2>
-<% end %>
 <% pmails = @organisation.news.paginate(page: params[:pmails_page], per_page: 5) %>
 <%= partial :'pmails/blocks', locals: { pmails: pmails } %>
 <div class="mt-3">
