@@ -84,7 +84,9 @@
 <div class="tab-content">
   <% if organisation_admin? or @organisation.events_for_search.future_and_current_featured.and(:monthly_donors_only => true).count > 0 %>
     <div class="tab-pane fade show active" id="panel-events" role="tabpanel">
-      <div data-pagelet-url="/o/<%= @organisation.slug %>/events_block?members_events=1"></div>
+      <div data-with-placeholder data-pagelet-url="/o/<%= @organisation.slug %>/events_block?members_events=1">
+        <%= partial :'events/blocks_placeholder' %>
+      </div>
     </div>
   <% end %>
   <% if @organisation.enable_discussion? %>
