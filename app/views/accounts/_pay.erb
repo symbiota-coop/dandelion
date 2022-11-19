@@ -38,7 +38,7 @@
         <% if w > 0 %><%= w.to_f.round %>%<% end %>
       </div>
     </div>
-    <p class="text-center"><%= t.format(no_cents: true) %> raised of <%=m Money.new(200000,'GBP'), account.default_currency || 'GBP'%> monthly target</p>
+    <p class="text-center"><%= t.format(no_cents: true) %> raised of <%=m Money.new(ENV['DONATION_TARGET'].to_i*100,'GBP'), account.default_currency || 'GBP'%> monthly target</p>
 
 
     <% form_tag '', class: 'form-inline', id: 'pay-form' do %>
