@@ -291,6 +291,23 @@ class Event
     Fragment.and(key: %r{/events/#{id}}).destroy_all
   end
 
+  def carousel_coordinator
+    account = nil
+    organisation.carousels.split("\n").reject { |line| line.blank? }.each do |line|
+      title, tags = line.split(':')
+      title, w = title.split('[')
+      tags, coordinator = tags.split('@')
+      w = w ? w.split(']').first.to_i : 8
+      tags = tags.split(',').map(&:strip)
+      intersection = event_tags.pluck(:name) & tags
+      if intersection.count > 0
+        account = Account.find_by(username: coordinator.strip)
+        break
+      end
+    end
+    account
+  end
+
   def self.admin?(event, account)
     account &&
       event &&
