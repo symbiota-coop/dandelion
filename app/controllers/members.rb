@@ -183,15 +183,6 @@ Dandelion::App.controller do
     200
   end
 
-  post '/memberships/:id/member_of_facebook_group' do
-    membership = Membership.find(params[:id]) || not_found
-    @gathering = membership.gathering
-    @membership = @gathering.memberships.find_by(account: current_account)
-    gathering_admins_only!
-    membership.update_attribute(:member_of_facebook_group, params[:member_of_facebook_group])
-    200
-  end
-
   get '/membership_row/:id' do
     membership = Membership.find(params[:id]) || not_found
     @gathering = membership.gathering

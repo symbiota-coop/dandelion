@@ -253,12 +253,6 @@ Dandelion::App.controller do
     200
   end
 
-  get '/accounts/not_on_facebook' do
-    sign_in_required!
-    current_account.update_attribute(:not_on_facebook, true)
-    redirect back
-  end
-
   get '/accounts/unhide' do
     sign_in_required!
     current_account.update_attribute(:hidden, nil)

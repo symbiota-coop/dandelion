@@ -117,28 +117,6 @@
     <% end %>
   </td>
 <% end %>
-<% if @gathering.facebook_group_url %>
-  <td>
-    <% if @membership.admin? %>
-      <% if membership.account.not_on_facebook %>
-        Doesn't use Facebook
-      <% else %>
-        <% if membership.member_of_facebook_group %>
-          <i style="cursor: pointer" class="fa fa-check" onclick="$(this).hide().next().show().find('input').click()"></i>
-        <% end %>
-        <% form_tag "/memberships/#{membership.id}/member_of_facebook_group", style: ('display:none' if membership.member_of_facebook_group) do %>
-          <%= check_box_tag :member_of_facebook_group, value: true, checked: membership.member_of_facebook_group, onclick: '$(this.form).submit()' %>
-        <% end %>
-      <% end %>
-    <% else %>
-      <% if membership.account.not_on_facebook %>
-        Doesn't use Facebook
-      <% elsif membership.member_of_facebook_group %>
-        <i class="fa fa-check"></i>
-      <% end %>
-    <% end %>
-  </td>
-<% end %>
 <% if @membership.admin? %>
   <td style="font-size: 13px">
     <% y = [] %>

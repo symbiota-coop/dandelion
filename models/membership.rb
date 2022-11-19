@@ -14,7 +14,7 @@ class Membership
   field :invitations_granted, type: Integer
   field :shift_points_required, type: Float
 
-  %w[admin unsubscribed member_of_facebook_group hide_from_sidebar].each do |b|
+  %w[admin unsubscribed hide_from_sidebar].each do |b|
     field b.to_sym, type: Boolean
     index({ b.to_s => 1 })
   end
@@ -30,8 +30,7 @@ class Membership
       requested_contribution: :number,
       invitations_granted: :number,
       unsubscribed: :check_box,
-      hide_from_sidebar: :check_box,
-      member_of_facebook_group: :check_box
+      hide_from_sidebar: :check_box
     }
   end
 

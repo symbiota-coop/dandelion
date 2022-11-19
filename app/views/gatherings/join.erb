@@ -33,9 +33,6 @@
           <%= f.text_block :name %>
           <%= f.email_block :email %>
           <%= f.image_block :picture %>
-          <% if @gathering.ask_for_facebook_profile_url %>
-            <%= f.url_block :facebook_profile_url %>
-          <% end %>
         <% end %>
         <%= f.submit_block button_text: 'Join' %>
       <% end %>

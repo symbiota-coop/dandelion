@@ -161,9 +161,7 @@
           <%= f.select_block :privacy %>
           <%= f.check_box_block :listed %>
         </div>
-        <div id="closed-and-open-options" style="display: none">
-          <%= f.check_box_block :ask_for_facebook_profile_url %>
-        </div>
+        <% # <div id="closed-and-open-options" style="display: none"></div> %>
         <div id="application-options" style="display: none">
           <%= f.text_area_block :application_questions, placeholder: "e.g. How did you hear about this gathering?\nWhy do you want to participate?" %>
           <%= f.check_box_block :require_reason_proposer %>
@@ -263,7 +261,6 @@
         <%= f.check_box_block :demand_payment %>
         <%= f.check_box_block :clear_up_optionships %>
         <div class="mt-2">
-          <%= f.url_block :facebook_group_url %>
           <%= f.url_block :redirect_on_acceptance %>
         </div>
         <% if @gathering.new_record? %>

@@ -77,7 +77,6 @@
   <%= f.text_block :phone %>
   <%= f.text_block :telegram_username %>
   <%= f.url_block :website %>
-  <%= f.url_block :facebook_profile_url %>
   <%= f.date_block :date_of_birth %>
   <%= f.select_block :gender %>
   <%= f.wysiwyg_block :bio %>
@@ -85,7 +84,6 @@
   <div class="my-3">
     <%= f.check_box_block :hidden %>
     <%= f.check_box_block :hide_location %>
-    <%= f.check_box_block :not_on_facebook %>
   </div>
 
   <% if @account.memberships.count > 0 %>
@@ -123,7 +121,7 @@
 
 <% end %>
 
-<% Account.privacyables.select { |p| %w[email location phone telegram_username website facebook_profile_url date_of_birth gender sexuality bio].include?(p) }.each { |p|
+<% Account.privacyables.select { |p| %w[email location phone telegram_username website date_of_birth gender sexuality bio].include?(p) }.each { |p|
 next if p == 'sexuality' && @account.organisations.count == 1 && @account.organisations.first.slug == 'refi-spring'
    %>
 <div style="font-weight: normal" data-privacy="<%= p %>" data-pagelet-url="/accounts/privacyable/<%= p %>"></div>

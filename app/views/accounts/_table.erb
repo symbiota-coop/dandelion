@@ -68,23 +68,6 @@
       </td>
     </tr>
   <% end %>
-  <% if viewable?(account, :facebook_profile_url, viewer_in_network: viewer_in_network) %>
-    <tr>
-      <td>Facebook</td>
-      <td>
-        <div class="row justify-content-between no-gutters">
-          <div class="col">
-            <a target="_blank" href="<%= account.facebook_profile_url %>"><%= account.facebook_profile_url.include?('profile.php') ? account.facebook_profile_url.split('/')[2..].join('/').gsub('www.', '') : account.facebook_profile_url.split('/')[3..].join('/').split('?').first %></a>
-          </div>
-          <% if current_account && current_account.id == account.id %>
-            <div class="col-auto">
-              <div data-pagelet-url="/accounts/privacyable/facebook_profile_url"></div>
-            </div>
-          <% end %>
-        </div>
-      </td>
-    </tr>
-  <% end %>
   <% if viewable?(account, :date_of_birth, viewer_in_network: viewer_in_network) %>
     <tr>
       <td>Age</td>

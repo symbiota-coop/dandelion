@@ -10,7 +10,6 @@
 <div>
   <%== [
         ('<i data-toggle="tooltip" title="Admin" class="fa fa-key"></i>' if defined?(membership) && membership.admin?),
-        account.age ? %(<span data-toggle="tooltip" title="#{account.age} years old">#{account.age}</span>) : nil,
-        account.facebook_profile_url ? %(<a style="color: #5870AB" href="#{Sanitize.fragment(account.facebook_profile_url)}" target="_blank"><i class="fa fa-facebook-official"></i></a>) : nil,
+        account.age ? %(<span data-toggle="tooltip" title="#{account.age} years old">#{account.age}</span>) : nil
       ].compact.join(' &middot; ') %>
 </div>

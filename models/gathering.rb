@@ -22,7 +22,6 @@ class Gathering
   field :balance, type: Float
   field :paypal_email, type: String
   field :currency, type: String
-  field :facebook_group_url, type: String
   field :invitations_granted, type: Integer
   field :stripe_endpoint_secret, type: String
   field :stripe_pk, type: String
@@ -44,7 +43,7 @@ class Gathering
     index({ "enable_#{x}" => 1 })
   end
 
-  %w[enable_comments_on_gathering_homepage enable_supporters clear_up_optionships anonymise_supporters democratic_threshold require_reason_proposer require_reason_supporter demand_payment hide_members_on_application_form hide_invitations ask_for_facebook_profile_url listed].each do |b|
+  %w[enable_comments_on_gathering_homepage enable_supporters clear_up_optionships anonymise_supporters democratic_threshold require_reason_proposer require_reason_supporter demand_payment hide_members_on_application_form hide_invitations listed].each do |b|
     field b.to_sym, type: Boolean
     index({ b.to_s => 1 })
   end
@@ -79,12 +78,10 @@ class Gathering
       clear_up_optionships: :check_box,
       demand_payment: :check_box,
       hide_members_on_application_form: :check_box,
-      ask_for_facebook_profile_url: :check_box,
       listed: :check_box,
       paypal_email: :text,
       redirect_on_acceptance: :text,
       currency: :select,
-      facebook_group_url: :url,
       account_id: :lookup,
       memberships: :collection,
       mapplications: :collection,
@@ -302,12 +299,10 @@ class Gathering
 
   def self.human_attribute_name(attr, options = {})
     {
-      ask_for_facebook_profile_url: 'Ask for Facebook profile URL',
       intro_for_non_members: 'Intro for non-members',
       paypal_email: 'PayPal email',
       fixed_threshold: 'Magic number',
       democratic_threshold: 'Allow all gathering members to suggest a magic number, and use the median',
-      facebook_group_url: 'Facebook group URL',
       require_reason_proposer: 'Proposers must provide a reason',
       require_reason_supporter: 'Supporters must provide a reason',
       demand_payment: 'Members must make a payment to access gathering content',
@@ -441,11 +436,6 @@ class Gathering
           y << [:"without_#{o.downcase}", "Without #{o.downcase}", memberships.and(:account_id.nin => optionships.and(:option_id.in => options.and(type: o).pluck(:id)).pluck(:account_id))]
         end
       end
-    end
-
-    if facebook_group_url
-      y << [:member_of_facebook_group, 'Member of Facebook group', memberships.and(member_of_facebook_group: true)]
-      y << [:not_member_of_facebook_group, 'Not member of Facebook group', memberships.and(:member_of_facebook_group.ne => true)]
     end
 
     y << [:threshold, 'Suggesting magic number', memberships.and(:desired_threshold.ne => nil)] if democratic_threshold

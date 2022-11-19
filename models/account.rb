@@ -26,8 +26,6 @@ class Account
   field :sign_in_token, type: String
   index({ sign_in_token: 1 })
   field :api_key, type: String
-  field :facebook_name, type: String
-  field :facebook_profile_url, type: String
   field :last_active, type: Time
   field :last_checked_notifications, type: Time
   field :last_checked_messages, type: Time
@@ -66,7 +64,6 @@ class Account
      unsubscribed_messages
      unsubscribed_feedback
      unsubscribed_reminders
-     not_on_facebook
      open_to_hookups
      open_to_new_friends
      open_to_short_term_dating
@@ -81,7 +78,7 @@ class Account
   end
 
   def self.privacyables
-    %w[email location phone telegram_username website facebook_profile_url date_of_birth gender sexuality bio open_to last_active organisations local_groups activities gatherings places following followers]
+    %w[email location phone telegram_username website date_of_birth gender sexuality bio open_to last_active organisations local_groups activities gatherings places following followers]
   end
 
   def self.privacy_levels
@@ -99,7 +96,6 @@ class Account
       name_transliterated: { type: :text, disabled: true },
       ps_account_id: :text,
       updated_profile: :check_box,
-      facebook_name: :text,
       default_currency: :select,
       phone: :text,
       location: :text,
@@ -109,7 +105,6 @@ class Account
       gender: :select,
       sexuality: :select,
       date_of_birth: :date,
-      facebook_profile_url: :text,
       dietary_requirements: :text,
       picture: :image,
       can_message: :check_box,
@@ -119,7 +114,6 @@ class Account
       unsubscribed_messages: :check_box,
       unsubscribed_feedback: :check_box,
       unsubscribed_reminders: :check_box,
-      not_on_facebook: :check_box,
       hide_location: :check_box,
       hidden: :check_box,
       block_reply_by_email: :check_box,
@@ -223,10 +217,6 @@ class Account
     if !password && !crypted_password
       self.password = Account.generate_password # if there's no password, just set one
     end
-
-    errors.add(:facebook_profile_url, 'must contain facebook.com') if facebook_profile_url && !facebook_profile_url.include?('facebook.com')
-    self.facebook_profile_url = "https://#{facebook_profile_url}" if facebook_profile_url && facebook_profile_url !~ %r{\Ahttps?://}
-    self.facebook_profile_url = facebook_profile_url.gsub('m.facebook.com', 'facebook.com') if facebook_profile_url
 
     errors.add(:date_of_birth, 'is invalid') if age && age <= 0
   end
@@ -550,7 +540,6 @@ class Account
     {
       location: 'Locations are offset for privacy, and locations with numbers in (e.g. postcodes) are never displayed publicly.',
       date_of_birth: 'We use this to calculate your age. Your full date of birth is never displayed.',
-      not_on_facebook: 'Hides some Facebook-related features',
       time_zone: 'Dates/times will be displayed in this time zone'
     }
   end
@@ -648,8 +637,6 @@ Two Spirit).split("\n")
   def self.human_attribute_name(attr, options = {})
     {
       picture: 'Photo',
-      facebook_profile_url: 'Facebook profile URL',
-      not_on_facebook: "I don't use Facebook",
       unsubscribed: 'Opt out of all emails from Dandelion',
       unsubscribed_habit_completion_likes: 'Opt out of email notifications when people like my habit completions',
       unsubscribed_messages: 'Opt out of email notifications of direct messages',

@@ -143,14 +143,6 @@ Dandelion::App.controller do
     redirect "/g/#{@gathering.slug}"
   end
 
-  get '/g/:slug/joined_facebook_group' do
-    @gathering = Gathering.find_by(slug: params[:slug]) || not_found
-    @membership = @gathering.memberships.find_by(account: current_account)
-    confirmed_membership_required!
-    @membership.update_attribute(:member_of_facebook_group, true)
-    redirect "/g/#{@gathering.slug}"
-  end
-
   get '/g/:slug/map' do
     @gathering = Gathering.find_by(slug: params[:slug]) || not_found
     @membership = @gathering.memberships.find_by(account: current_account)

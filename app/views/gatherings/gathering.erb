@@ -27,9 +27,6 @@
       <%= partial :'accounts/square', locals: { account: account, content: ("#{time_ago_in_words account.last_active} ago" if account.last_active), width: '75px' } %>
       <% } %>
     </div>
-    <% if @gathering.facebook_group_url %>
-      <div class="fb-group mt-3" data-href="<%= @gathering.facebook_group_url %>" data-width="300" data-show-social-context="true" data-show-metadata="false"></div>
-    <% end %>
     <% if @gathering.enable_comments_on_gathering_homepage %>
       <h2 class="mt-3 mb-3">Newsfeed</h2>
       <div data-pagelet-url="/g/<%= @gathering.slug %>" data-pagelet-refresh="60">
