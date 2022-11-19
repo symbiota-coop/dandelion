@@ -15,11 +15,15 @@
         <%= m p, organisation.currency %>
         of a suggested
         <%= m r, organisation.currency %>, leaving a balance of <%= m balance, organisation.currency %>.
-        <% if ((r * 0.5) - p) > 0 %>
-          <br>
-          <mark class="px-0">Contribute <% if p > 0 %>a further <% end %><%= m ((r * 0.5) - p), organisation.currency %>+ and as a thank you we'll<%= ' continue to' if organisation.contributable_events.count == 1 %> show your events in the main events section and on the Dandelion homepage.</mark>
-        <% end %>
       </p>
+
+      <% if p > 0 %>
+        <div class="progress my-3" style="height: 30px">
+          <div class="progress-bar" role="progressbar" style="width: <%= "#{w = 100*p.to_f/r.to_f}%" %>;">
+            <% if w > 0 %><%= w.to_f.round %>%<% end %>
+          </div>
+        </div>
+      <% end %>
 
       <% form_tag '', class: 'form-inline', id: 'pay-form' do %>
         <div class="form-group mb-1 mr-1">
@@ -28,7 +32,7 @@
               <span class="input-group-text"><%= Money.new(0, organisation.currency).symbol %></span>
             </div>
             <%= hidden_field_tag :currency, value: organisation.currency %>
-            <%= number_field_tag :amount, style: 'width: 5em;', required: 'required', class: 'form-control', id: 'amount' %>
+            <%= text_field_tag :amount, style: 'width: 5em;', required: 'required', class: 'form-control', id: 'amount', value: balance %>
           </div>
         </div>
         <button data-payment-method="stripe" type="submit" class="btn btn-primary mb-1 ml-0 mr-1" style="height: 2.125rem">
@@ -42,6 +46,15 @@
         </button>
         <%= hidden_field_tag :payment_method, value: 'coinbase', disabled: true %>
       <% end %>
+
+
+      <p class="mb-0">
+        <% if ((r * 0.5) - p) > 0 %>
+          <br>
+          <mark class="px-0">If you can't pay the full <%= m balance, organisation.currency %> right now, contribute <%= m ((r * 0.5) - p), organisation.currency %>+ and as a thank you we'll<%= ' continue to' if organisation.contributable_events.count == 1 %> show your events in the main events section and on the Dandelion homepage.</mark>
+        <% end %>
+      </p>
+
       <script>
         $(function () {
 

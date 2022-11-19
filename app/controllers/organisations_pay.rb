@@ -63,7 +63,7 @@ Dandelion::App.controller do
         line_items: [{
           name: 'Dandelion',
           description: 'Contribution to Dandelion',
-          amount: params[:amount].to_i * 100,
+          amount: (params[:amount].to_f * 100).round,
           currency: params[:currency],
           quantity: 1
         }],
@@ -72,7 +72,7 @@ Dandelion::App.controller do
         cancel_url: "#{ENV['BASE_URI']}/events/new?organisation_id=#{@organisation.id}"
       }
       session = Stripe::Checkout::Session.create(stripe_session_hash)
-      @organisation.organisation_contributions.create! amount: params[:amount].to_i, currency: params[:currency], session_id: session.id, payment_intent: session.payment_intent
+      @organisation.organisation_contributions.create! amount: params[:amount].to_f, currency: params[:currency], session_id: session.id, payment_intent: session.payment_intent
       { session_id: session.id }.to_json
 
     when 'coinbase'
@@ -84,12 +84,12 @@ Dandelion::App.controller do
         description: 'Contribution to Dandelion',
         pricing_type: 'fixed_price',
         local_price: {
-          amount: params[:amount].to_i,
+          amount: params[:amount].to_f,
           currency: params[:currency]
         },
         requested_info: %w[email]
       )
-      @organisation.organisation_contributions.create! amount: params[:amount].to_i, currency: params[:currency], coinbase_checkout_id: checkout.id
+      @organisation.organisation_contributions.create! amount: params[:amount].to_f, currency: params[:currency], coinbase_checkout_id: checkout.id
       { checkout_id: checkout.id }.to_json
 
     end

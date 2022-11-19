@@ -35,7 +35,7 @@
     %>
     <div class="progress" style="height: 30px">
       <div class="progress-bar" role="progressbar" style="width: <%= "#{w = 100*t/2000}%" %>;">
-        <% if w > 0 %><%= w.to_i.round %>%<% end %>
+        <% if w > 0 %><%= w.to_f.round %>%<% end %>
       </div>
     </div>
     <p class="text-center"><%= t.format(no_cents: true) %> raised of <%=m Money.new(200000,'GBP'), account.default_currency || 'GBP'%> monthly target</p>

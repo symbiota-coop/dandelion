@@ -2,7 +2,8 @@
   <h3 class="card-header bg-primary text-white">Thanks for booking!</h3>
   <div class="card-body">
     <p class="lead mb-3"><strong>Check your inbox for the confirmation email with your tickets.</strong></p>
-    <p>If you don't see anything in your inbox, <span class="highlight">please look in your spam folder</a>.</p>
+    <p>If you don't see anything in your inbox, 
+      <span class="highlight">please look in your spam folder</a>.</p>
     <% if @event.redirect_url %>
       <p>Redirecting you to <a href="<%= @event.redirect_url %>"><%= @event.redirect_url %></a>&hellip; <i class="fa fa-spin fa-circle-o-notch"></i></p>
       <script>
@@ -60,9 +61,7 @@
       <h5 class="mb-1">Share this event</h5>
       <%= partial :share %>
     <% end %>
-    <div class="my-5">
-      <%= partial :'accounts/pay', locals: { account: @order.account } %>
-    </div>
+    <%= partial :'accounts/pay', locals: {div_class: 'my-5',  account: @order.account } %>
   <% end %>
 </div>
 </div>

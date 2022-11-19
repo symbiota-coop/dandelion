@@ -4,7 +4,7 @@ class AccountContribution
 
   belongs_to :account, index: true
 
-  field :amount, type: Integer
+  field :amount, type: Float
   field :currency, type: String
   field :session_id, type: String
   field :payment_intent, type: String
