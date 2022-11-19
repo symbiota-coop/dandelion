@@ -12,9 +12,7 @@
       <label>View as</label>
       <%= select_tag :view, class: 'form-control', options: %w[details pictures dietary_requirements map list].map { |view| [view.to_s.humanize.capitalize, view] }, selected: params[:view] %>
     </div>
-    <% if @membership.admin? %>
-      <a class="mb-1 btn btn-outline-primary" href="<%= request.path %>.csv?<%= request.query_string %>">Download results as CSV</a>
-    <% end %>
+    <%= submit_tag 'Search', class: 'btn btn-primary mr-2' %>
 
     <style>
       @media(max-width: 575px) {
@@ -40,8 +38,34 @@
       <% } %>
     </div>
   <% end %>
-  <%= partial :'gatherings/invite' %>
+
+  <div class="row justify-content-between">
+    <div class="col">
+      <% if (@membership.invitations_remaining > 0 || @membership.admin?) && (!@gathering.member_limit || @gathering.memberships.count < @gathering.member_limit) %>
+        <a class="btn btn-primary" href="javascript:;" onclick="$(this).hide().next().show().find('input[name=email]').focus()">
+          <i class="fa fa-plus-circle"></i> Add member
+        </a>
+        <% if !@membership.admin? && @membership.invitations_remaining > 0 %>
+          <%= pluralize(@membership.invitations_remaining <= 0 ? 0 : @membership.invitations_remaining, 'invitation') %> remaining
+        <% end %>
+        <div style="display:none" id="add-member" class="my-3">
+          <% form_tag "/g/#{@gathering.slug}/add_member", class: 'form-inline' do %>
+            <%= email_field_tag :email, class: 'form-control mr-1', placeholder: 'Email' %>
+            <%= submit_tag 'Add member', class: 'btn btn-primary' %>
+          <% end %>
+        </div>
+      <% end %>
+    </div>
+    <div class="col-auto">
+      <% if @membership.admin? %>
+        <a class="btn btn-outline-primary" href="<%= request.path %>.csv?<%= request.query_string %>"><i class="fa fa-download"></i> Download results as CSV</a>
+      <% end %>
+    </div>
+  </div>
+
+
 </div>
+
 
 <% if @membership.admin? %>
   <pre style="margin-top: 15px;">
