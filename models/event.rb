@@ -294,7 +294,7 @@ class Event
   def carousel_coordinator
     account = nil
     organisation.carousels.split("\n").reject { |line| line.blank? }.each do |line|
-      title, tags = line.split(':')
+      _title, tags = line.split(':')
       tags, coordinator = tags.split('@')
       tags = tags.split(',').map(&:strip)
       next unless coordinator
