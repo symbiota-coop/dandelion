@@ -63,7 +63,7 @@ h6 {
 
 a.text-primary:hover,
 a.text-primary:focus {
-  color: $color_primary_hover  !important
+  color: $color_primary_hover !important
 }
 
 ul.pagination {
@@ -202,16 +202,16 @@ body[contenteditable] {
 }
 
 .subtle {
-  color: $color_grey  !important
+  color: $color_grey !important
 }
 
 .subtle.active,
 .subtle:hover {
-  color: $color_primary  !important
+  color: $color_primary !important
 }
 
 .habit-completion-likes a:hover {
-  color: $color_grey_hover  !important
+  color: $color_grey_hover !important
 }
 
 .message-preview:hover,
@@ -220,7 +220,7 @@ body[contenteditable] {
 }
 
 .message-preview.unread {
-  background: $color_theme_transparent  !important
+  background: $color_theme_transparent !important
 }
 
 .table-hr td:first-child {
@@ -510,13 +510,6 @@ body {
   border-radius: 0.25rem
 }
 
-@media(min-width: 992px) {
-  .fake-container-fluid {
-    margin: 0 -1.2rem
-  }
-}
-
-
 
 .slick-container .slick-responsive {
   margin-bottom: 25px
@@ -626,5 +619,22 @@ figure.image,
 
   100% {
     opacity: 0.5;
+  }
+}
+
+@media(max-width: 991px) {
+  .fake-container-fluid>.px-5 {
+    padding-left: 1rem !important;
+    padding-right: 1rem !important
+  }
+
+  .fake-container-fluid>.bg-grey-transparent-2 {
+    background: white !important
+  }
+}
+
+@media(min-width: 992px) {
+  .fake-container-fluid {
+    margin: 0 -1.2rem
   }
 }
