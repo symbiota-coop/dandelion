@@ -29,7 +29,9 @@
     <% end %>
 
     <%
-    monthly_contributions = Money.new(0,'GBP') + AccountContribution.where(:payment_completed => true, :created_at.gte => Date.new(Date.today.year, Date.today.month, 1)).sum { |ac| Money.new(ac.amount*100, ac.currency) }    
+    monthly_contributions = Money.new(0,'GBP') +
+      AccountContribution.where(:payment_completed => true, :created_at.gte => Date.new(Date.today.year, Date.today.month, 1)).sum { |ac| Money.new(ac.amount*100, ac.currency) } +
+      OrganisationContribution.where(:payment_completed => true, :created_at.gte => Date.new(Date.today.year, Date.today.month, 1)).sum { |oc| Money.new(oc.amount*100, oc.currency) }    
     monthly_contributions = monthly_contributions.exchange_to(account.default_currency || 'GBP') 
 
     target = 500
