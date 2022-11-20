@@ -97,6 +97,12 @@ class LocalGroup
   has_many :comments, as: :commentable, dependent: :destroy
   has_many :comment_reactions, as: :commentable, dependent: :destroy
 
+  def self.human_attribute_name(attr, options = {})
+    {
+      telegram_group: 'Telegram group/channel URL'
+    }[attr.to_sym] || super
+  end
+
   def self.admin?(local_group, account)
     account && local_group &&
       (
