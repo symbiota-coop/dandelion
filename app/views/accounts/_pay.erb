@@ -102,7 +102,7 @@
       </a> 👾
     </p>
 
-    <% unless @event %>
+    <% if !@event || @event.organisation.psychedelic? %>
       <p class="mb-0">
         <a target="_blank" href="https://www.martianmushrooms.co.uk/?ref=9">
           Receive 10% off supplies at Martian Mushrooms with the code DANDELION

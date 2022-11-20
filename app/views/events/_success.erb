@@ -62,11 +62,6 @@
       <%= partial :share %>
     <% end %>
     <%= partial :'accounts/pay', locals: {div_class: 'my-5',  account: @order.account } %>
-    <% if @event.organisation.psychedelic? %>
-      <div class="mt-5">
-        <%= partial :'sponsors/martian', locals: {sponsored: :top} %>
-      </div>
-    <% end %>
   <% end %>
 </div>
 </div>
