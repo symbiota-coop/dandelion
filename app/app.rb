@@ -17,7 +17,7 @@ module Dandelion
     use Dragonfly::Middleware
     use OmniAuth::Builder do
       provider :account
-      provider :ethereum
+      provider :ethereum, { custom_title: 'Sign in with Ethereum' }
     end
     use Rack::Cors do
       allow do

@@ -23,6 +23,7 @@ gem 'mongoid_paranoia'
 
 # Authentication
 gem 'bcrypt'
+gem 'bech32'
 gem 'omniauth'
 gem 'omniauth-ethereum', github: 'stephenreid321/omniauth-ethereum.rb'
 gem 'strong_password'
