@@ -255,7 +255,7 @@ class Organisation
 
   def contribution_requested
     c = contributable_events.count
-    Money.new(c * (contribution_requested_per_event_gbp || Organisation.contribution_requested_per_event_gbp) * 100, 'GBP').exchange_to(currency)
+    Money.new(c * (contribution_requested_per_event_gbp || Organisation.contribution_requested_per_event_gbp) * 100, 'GBP').exchange_to(MAJOR_CURRENCIES.include?(currency) ? currency : ENV['DEFAULT_CURRENCY'])
   end
 
   def contribution_paid

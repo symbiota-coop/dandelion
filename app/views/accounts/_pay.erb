@@ -1,3 +1,5 @@
+<% currency = MAJOR_CURRENCIES.include?(account.default_currency) ? account.default_currency : ENV['DEFAULT_CURRENCY'] %>
+
 <% last_completed_contribution = account.account_contributions.and(payment_completed: true).order('created_at desc').first %>
 <% if (defined?(force) && force) || !last_completed_contribution || last_completed_contribution.created_at < 1.month.ago %>
   <div class="<%=div_class if defined?(div_class)%>">
@@ -32,7 +34,7 @@
     monthly_contributions = Money.new(0,'GBP') +
       AccountContribution.where(:payment_completed => true, :created_at.gte => Date.new(Date.today.year, Date.today.month, 1)).sum { |ac| Money.new(ac.amount*100, ac.currency) } +
       OrganisationContribution.where(:payment_completed => true, :created_at.gte => Date.new(Date.today.year, Date.today.month, 1)).sum { |oc| Money.new(oc.amount*100, oc.currency) }    
-    monthly_contributions = monthly_contributions.exchange_to(account.default_currency || 'GBP') 
+    monthly_contributions = monthly_contributions.exchange_to(currency) 
 
     target = Money.new(500*100,'GBP')
     if monthly_contributions >= Money.new(500*100,'GBP')
@@ -46,16 +48,16 @@
           <% if w > 0 %><%= w.to_f.round %>%<% end %>
         </div>
       </div>
-      <p class="mt-1 text-center"><%= monthly_contributions.format(no_cents: true) %> raised of <%=m target, account.default_currency || 'GBP'%> monthly target</p>
+      <p class="mt-1 text-center"><%= monthly_contributions.format(no_cents: true) %> raised of <%=m target, currency%> monthly target</p>
     <% end %>
 
     <% form_tag '', class: 'form-inline', id: 'pay-form' do %>
       <div class="form-group mb-1 mr-1">
         <div class="input-group">
           <div class="input-group-prepend">
-            <span class="input-group-text"><%= Money.new(0, account.default_currency || 'GBP').symbol %></span>
+            <span class="input-group-text"><%= Money.new(0, currency).symbol %></span>
           </div>
-          <%= hidden_field_tag :currency, value: account.default_currency || 'GBP' %>
+          <%= hidden_field_tag :currency, value: currency %>
           <%= number_field_tag :amount, value: 10, style: 'width: 5em;', required: 'required', class: 'form-control', id: 'amount' %>
         </div>
       </div>

@@ -1,3 +1,5 @@
+<% currency = MAJOR_CURRENCIES.include?(organisation.currency) ? organisation.currency : ENV['DEFAULT_CURRENCY'] %>
+
 <% c = organisation.contributable_events.count %>
 <% r = organisation.contribution_requested %>
 <% p = organisation.contribution_paid %>
@@ -8,13 +10,13 @@
     <div class="card-body p-2">
       <p class="lead">
         <mark class="px-0">Dandelion operates on a donation/gift economy basis</mark>,
-        with a suggested donation of <%= m Money.new((organisation.contribution_requested_per_event_gbp || Organisation.contribution_requested_per_event_gbp) * 100, 'GBP'), organisation.currency %> per event.
+        with a suggested donation of <%= m Money.new((organisation.contribution_requested_per_event_gbp || Organisation.contribution_requested_per_event_gbp) * 100, 'GBP'), currency %> per event.
         <br />
         <%= organisation.name %> has sold tickets to a total of <%= pluralize(c, 'event') %>
         and contributed
-        <%= m p, organisation.currency %>
+        <%= m p, currency %>
         of a suggested
-        <%= m r, organisation.currency %>, leaving a balance of <%= m balance, organisation.currency %>.
+        <%= m r, currency %>, leaving a balance of <%= m balance, currency %>.
       </p>
 
       <% if p > 0 %>
@@ -29,9 +31,9 @@
         <div class="form-group mb-1 mr-1">
           <div class="input-group">
             <div class="input-group-prepend">
-              <span class="input-group-text"><%= Money.new(0, organisation.currency).symbol %></span>
+              <span class="input-group-text"><%= Money.new(0, currency).symbol %></span>
             </div>
-            <%= hidden_field_tag :currency, value: organisation.currency %>
+            <%= hidden_field_tag :currency, value: currency %>
             <%= text_field_tag :amount, style: 'width: 5em;', required: 'required', class: 'form-control', id: 'amount', value: balance %>
           </div>
         </div>
@@ -51,7 +53,7 @@
       <p class="mb-0">
         <% if ((r * 0.5) - p) > 0 %>
           <br>
-          <mark class="px-0">If you can't pay the full <%= m balance, organisation.currency %> right now, contribute <%= m ((r * 0.5) - p), organisation.currency %>+ and as a thank you we'll<%= ' continue to' if organisation.contributable_events.count == 1 %> show your events in the main events section and on the Dandelion homepage.</mark>
+          <mark class="px-0">If you can't pay the full <%= m balance, currency %> right now, contribute <%= m ((r * 0.5) - p), currency %>+ and as a thank you we'll<%= ' continue to' if organisation.contributable_events.count == 1 %> show your events in the main events section and on the Dandelion homepage.</mark>
         <% end %>
       </p>
 
