@@ -76,6 +76,7 @@ class Organisation
   field :event_image_required_width, type: Integer
   field :allow_quick, type: Boolean
   field :restrict_cohosting, type: Boolean
+  field :psychedelic, type: Boolean
 
   field :tokens, type: Float
   index({ tokens: 1 })
@@ -130,7 +131,8 @@ class Organisation
       contribution_not_required: :check_box,
       contribution_requested_per_event_gbp: :number,
       event_image_required_height: :number,
-      event_image_required_width: :number
+      event_image_required_width: :number,
+      psychedelic: :check_box
     }
   end
 
