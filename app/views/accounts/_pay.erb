@@ -34,9 +34,9 @@
       OrganisationContribution.where(:payment_completed => true, :created_at.gte => Date.new(Date.today.year, Date.today.month, 1)).sum { |oc| Money.new(oc.amount*100, oc.currency) }    
     monthly_contributions = monthly_contributions.exchange_to(account.default_currency || 'GBP') 
 
-    target = 500
+    target = Money.new(500*100,'GBP')
     if monthly_contributions >= Money.new(500*100,'GBP')
-      target = 1000 * (monthly_contributions.to_f / 500).floor
+      target = Money.new(1000*100,'GBP') * (monthly_contributions.exchange_to('GBP').to_f / 500).floor
     end    
     %>
 
@@ -46,7 +46,7 @@
           <% if w > 0 %><%= w.to_f.round %>%<% end %>
         </div>
       </div>
-      <p class="mt-1 text-center"><%= monthly_contributions.format(no_cents: true) %> raised of <%=m Money.new(target*100,'GBP'), account.default_currency || 'GBP'%> monthly target</p>
+      <p class="mt-1 text-center"><%= monthly_contributions.format(no_cents: true) %> raised of <%=m target, account.default_currency || 'GBP'%> monthly target</p>
     <% end %>
 
     <% form_tag '', class: 'form-inline', id: 'pay-form' do %>
