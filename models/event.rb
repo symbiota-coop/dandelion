@@ -293,16 +293,18 @@ class Event
 
   def carousel_coordinator
     account = nil
-    organisation.carousels.split("\n").reject { |line| line.blank? }.each do |line|
-      _title, tags = line.split(':')
-      tags, coordinator = tags.split('@')
-      tags = tags.split(',').map(&:strip)
-      next unless coordinator
+    if organisation.carousels
+      organisation.carousels.split("\n").reject { |line| line.blank? }.each do |line|
+        _title, tags = line.split(':')
+        tags, coordinator = tags.split('@')
+        tags = tags.split(',').map(&:strip)
+        next unless coordinator
 
-      intersection = event_tags.pluck(:name) & tags
-      if intersection.count > 0
-        account = Account.find_by(username: coordinator.strip)
-        break
+        intersection = event_tags.pluck(:name) & tags
+        if intersection.count > 0
+          account = Account.find_by(username: coordinator.strip)
+          break
+        end
       end
     end
     account
