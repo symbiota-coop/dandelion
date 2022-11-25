@@ -94,10 +94,7 @@
 <div data-with-placeholder data-pagelet-url="/events">
   <%= partial :'events/blocks_placeholder' %>
 </div>
-<div class="my-3" data-pagelet-url="/map?places=1">
-  <%= partial :'maps/map', locals: { dynamic: true, trigger_bounds_changed: true } %>
+
+<div data-pagelet-url="/events?display=map">
+  <%= partial :'maps/map', locals: { stem: "/events", dynamic: true, trigger_bounds_changed: true } %>
 </div>
-<h2 style="font-size: 1.7rem" class="mt-4 mb-3 text-center">Some of the places that are important to our community</h2>
-<p class="mt-3 lead text-center" style="font-size: 18px">
-  <%== Place.order('name_transliterated asc').each.map { |place| %(<a href="/places/#{place.id}">#{Sanitize.fragment(place.name)}</a>) }.join(' &middot; ') %>
-</p>
