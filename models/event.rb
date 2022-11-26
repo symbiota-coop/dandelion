@@ -80,6 +80,7 @@ class Event
       purchase_url: :url,
       draft: :check_box,
       secret: :check_box,
+      hide_few_left: :check_box,
       questions: :text_area,
       zoom_party: :check_box,
       show_emails: :check_box,
@@ -100,7 +101,7 @@ class Event
     q.empty? ? [] : q
   end
 
-  %w[no_discounts hide_attendees hide_discussion refund_deleted_orders monthly_donors_only draft secret zoom_party show_emails include_in_parent featured opt_in_facilitator].each do |b|
+  %w[no_discounts hide_attendees hide_discussion refund_deleted_orders monthly_donors_only draft secret zoom_party show_emails include_in_parent featured opt_in_facilitator hide_few_left].each do |b|
     field b.to_sym, type: Boolean
     index({ b.to_s => 1 })
   end
@@ -786,7 +787,7 @@ class Event
       featured: "Feature the event on the organisation's events page",
       secret: 'Hide the event from all public listings',
       draft: 'Make the event visible to admins only',
-      hide_attendees: 'Hide the list of attendees (in any case, individuals must opt in)',
+      hide_attendees: 'Hide the public list of attendees (in any case, individuals must opt in)',
       hide_discussion: 'Hide the private discussion for attendees and facilitators',
       show_emails: 'Allow all event admins to view attendee emails (by default, only organisation admins see them)',
       opt_in_facilitator: "Allow people to opt in to receive emails from any facilitators' personal lists",
