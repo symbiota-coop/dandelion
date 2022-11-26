@@ -421,6 +421,7 @@ class Event
       zoom_party: zoom_party,
       show_emails: show_emails,
       include_in_parent: include_in_parent,
+      opt_in_facilitator: opt_in_facilitator,
       draft: true,
       secret: secret,
       account: account,
