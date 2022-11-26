@@ -63,7 +63,7 @@
                 <div class="col">
                   <%= select_tag :"quantities[#{ticket_type.id}]", 'data-ticket-type-id': ticket_type.id, 'data-price': ticket_type.price, style: 'width: auto; display: inline-block', class: 'form-control', options: (0..ticket_type.number_of_tickets_available_in_single_purchase).to_a, value: (params[:quantities][ticket_type.id.to_s] if params[:quantities]) %>
                 </div>
-                <% if !event.hide_few_left && ticket_type.wiser_remaining <= 3 %>
+                <% if !@event.hide_few_left && ticket_type.wiser_remaining <= 3 %>
                   <div class="col-auto">
                     <span class="badge badge-secondary"><%= ticket_type.wiser_remaining %> left</span>
                   </div>
