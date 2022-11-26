@@ -29,7 +29,7 @@ Geocoder.configure(
 bank = Money::Bank::Uphold.new
 Money.default_bank = bank
 
-Time.zone = 'London'
+Time.zone = ENV['DEFAULT_TIME_ZONE']
 
 PUSHER = Pusher::Client.new(app_id: ENV['PUSHER_APP_ID'], key: ENV['PUSHER_KEY'], secret: ENV['PUSHER_SECRET'], cluster: ENV['PUSHER_CLUSTER'], encrypted: true) if ENV['PUSHER_APP_ID']
 

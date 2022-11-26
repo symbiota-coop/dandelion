@@ -44,10 +44,10 @@ module Dandelion
                     elsif request.location && request.location.data['timezone']
                       session[:time_zone] = request.location.data['timezone']
                     else
-                      'London'
+                      ENV['DEFAULT_TIME_ZONE']
                     end
       rescue StandardError
-        Time.zone = 'London'
+        Time.zone = ENV['DEFAULT_TIME_ZONE']
       end
       fix_params!
       @_params = params; # force controllers to inherit the fixed params

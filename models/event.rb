@@ -701,7 +701,7 @@ class Event
 
   def when_details(zone)
     if start_time && end_time
-      zone ||= (time_zone || 'London')
+      zone ||= (time_zone || ENV['DEFAULT_TIME_ZONE'])
       zone = zone.name unless zone.is_a?(String)
       start_time = self.start_time.in_time_zone(zone)
       end_time = self.end_time.in_time_zone(zone)
@@ -716,7 +716,7 @@ class Event
 
   def concise_when_details(zone)
     if start_time && end_time
-      zone ||= (time_zone || 'London')
+      zone ||= (time_zone || ENV['DEFAULT_TIME_ZONE'])
       zone = zone.name unless zone.is_a?(String)
       start_time = self.start_time.in_time_zone(zone)
       end_time = self.end_time.in_time_zone(zone)
