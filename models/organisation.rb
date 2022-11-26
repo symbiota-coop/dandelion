@@ -77,6 +77,7 @@ class Organisation
   field :allow_quick, type: Boolean
   field :restrict_cohosting, type: Boolean
   field :psychedelic, type: Boolean
+  field :hide_few_left, type: Boolean
 
   field :tokens, type: Float
   index({ tokens: 1 })
