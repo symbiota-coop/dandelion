@@ -56,7 +56,7 @@ class CoreTest < ActiveSupport::TestCase
     assert page.has_content? name
   end
 
-  test 'Booking onto a free event' do
+  test 'booking onto a free event' do
     @account = FactoryBot.create(:account)
     @organisation = FactoryBot.create(:organisation, account: @account)
     @event = FactoryBot.create(:event, organisation: @organisation, account: @account, last_saved_by: @account)
