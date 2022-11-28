@@ -38,7 +38,7 @@
 <%= comment_reactions.count %>
 </a>
 <span style="display: none">
-  <%== Sanitize.fragment comment_reactions.map { |comment_reaction| comment_reaction.account.name }.join('<br />') %>
+  <%== comment_reactions.map { |comment_reaction| Sanitize.fragment(comment_reaction.account.name) }.join('<br />') %>
 </span>
 <% } %>
 <% end %>
