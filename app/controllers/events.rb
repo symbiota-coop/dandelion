@@ -202,7 +202,8 @@ Dandelion::App.controller do
     when :json
       {
         name: @event.name,
-        date: @event.start_time.to_date.to_s(:db),
+        start_date: @event.start_time.to_date.to_s(:db),
+        end_date: @event.end_time.to_date.to_s(:db),
         activity: ("#{@event.activity.name} (#{@event.activity_id})" if @event.activity),
         event_coordinator: ("#{@event.coordinator.name} (#{@event.coordinator_id})" if @event.coordinator),
         carousel_coordinator: ("#{@event.carousel_coordinator.name} (#{@event.carousel_coordinator.id})" if @event.carousel_coordinator),
