@@ -54,6 +54,26 @@ class ActivityApplication
     }[attr.to_sym] || super
   end
 
+  def send_notification
+    mg_client = Mailgun::Client.new ENV['MAILGUN_API_KEY'], 'api.eu.mailgun.net'
+    batch_message = Mailgun::BatchMessage.new(mg_client, 'notifications.dandelion.earth')
+
+    activity_application = self
+    activity = activity_application.activity
+    account = activity_application.account
+    content = ERB.new(File.read(Padrino.root('app/views/emails/activity_application.erb'))).result(binding)
+    batch_message.from 'Dandelion <notifications@dandelion.earth>'
+    batch_message.subject "Application to #{activity.name}"
+    batch_message.body_html Premailer.new(ERB.new(File.read(Padrino.root('app/views/layouts/email.erb'))).result(binding), with_html_string: true, adapter: 'nokogiri', input_encoding: 'UTF-8').to_inline_css
+
+    activity.admins.each do |account|
+      batch_message.add_recipient(:to, account.email, { 'firstname' => (account.firstname || 'there'), 'token' => account.sign_in_token, 'id' => account.id.to_s })
+    end
+
+    batch_message.finalize if ENV['MAILGUN_API_KEY']
+  end
+  handle_asynchronously :send_notification
+
   def accept
     activity.activityships.create account: account
 
