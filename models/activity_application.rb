@@ -54,6 +54,7 @@ class ActivityApplication
     }[attr.to_sym] || super
   end
 
+  after_create :send_notification
   def send_notification
     mg_client = Mailgun::Client.new ENV['MAILGUN_API_KEY'], 'api.eu.mailgun.net'
     batch_message = Mailgun::BatchMessage.new(mg_client, 'notifications.dandelion.earth')
