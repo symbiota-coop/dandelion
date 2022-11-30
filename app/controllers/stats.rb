@@ -11,7 +11,7 @@ Dandelion::App.controller do
   get '/stats/orders' do
     @tickets = Ticket.and(:created_at.gte => 3.months.ago, :price.gt => 0)
     @organisations = Organisation.and(:id.in => Event.and(:id.in => @tickets.pluck(:event_id)).pluck(:organisation_id))
-    @orders = Order.order('created_at desc').paginate(page: params[:page], per_page: 50)
+    @orders = Order.order('created_at desc').paginate(page: params[:page], per_page: 20)
     erb :'stats/orders'
   end
 
