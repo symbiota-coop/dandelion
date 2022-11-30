@@ -1,0 +1,22 @@
+<script>
+  $(function () {
+    var colIndex = $("#summary th").toArray().indexOf($("th[data-col-name='tickets']")[0])
+    $('#summary').dataTable({bInfo: false, paging: false, searching: false, order: [[colIndex, "desc"]]});
+  })
+</script>
+<table class="table" id="summary">
+  <thead>
+    <tr>
+      <th>Organisation</th>
+      <th data-col-name="tickets">Tickets</th>
+    </tr>
+  </thead>
+  <% organisations.each { |organisation| %>
+  <tr>
+    <td>
+      <a href="/o/<%=organisation.slug%>"><%=organisation.name%></a>
+    </td>
+    <td><%=Ticket.and(:event_id.in => organisation.events.pluck(:id), :created_at.gte => 3.months.ago, :price.gt => 0).count%></td>
+  </tr>
+  <% } %>
+</table>
