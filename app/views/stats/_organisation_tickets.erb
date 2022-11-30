@@ -9,6 +9,7 @@
     <tr>
       <th>Organisation</th>
       <th data-col-name="tickets">Tickets</th>
+      <th data-col-name="created_at">Created at</th>
     </tr>
   </thead>
   <% @organisations.each { |organisation| %>
@@ -17,6 +18,7 @@
       <a href="/o/<%=organisation.slug%>"><%=organisation.name%></a>
     </td>
     <td><%=Ticket.and(:event_id.in => organisation.events.pluck(:id), :created_at.gte => 3.months.ago, :price.gt => 0).count%></td>
+    <td data-sort="<%=organisation.created_at.to_s(:db)%>"><%=organisation.created_at%></td>
   </tr>
   <% } %>
 </table>
