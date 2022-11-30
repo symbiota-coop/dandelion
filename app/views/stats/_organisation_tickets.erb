@@ -11,7 +11,7 @@
       <th data-col-name="tickets">Tickets</th>
     </tr>
   </thead>
-  <% organisations.each { |organisation| %>
+  <% @organisations.each { |organisation| %>
   <tr>
     <td>
       <a href="/o/<%=organisation.slug%>"><%=organisation.name%></a>
