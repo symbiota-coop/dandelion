@@ -128,7 +128,7 @@
                 .gsub(%r{<a (href=".+?")>\[\[(.+?)\]\]</a>}, '<a \1 class="btn btn-primary">\2</a>')
               ), Sanitize::Config::DANDELION) %>
           <% end %>
-          <% if @event.organisation.event_footer && !@event.zoom_party? %>
+          <% if !@event.hide_organisation_footer && @event.organisation.event_footer && !@event.zoom_party? %>
             <%== Sanitize.fragment(Rinku.auto_link(@event.organisation.event_footer), Sanitize::Config::DANDELION) %>
           <% end %>
         </big>

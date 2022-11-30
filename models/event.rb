@@ -85,6 +85,7 @@ class Event
       zoom_party: :check_box,
       show_emails: :check_box,
       opt_in_facilitator: :check_box,
+      hide_organisation_footer: :check_box,
       account_id: :lookup,
       organisation_id: :lookup,
       activity_id: :lookup,
@@ -101,7 +102,7 @@ class Event
     q.empty? ? [] : q
   end
 
-  %w[no_discounts hide_attendees hide_discussion refund_deleted_orders monthly_donors_only draft secret zoom_party show_emails include_in_parent featured opt_in_facilitator hide_few_left].each do |b|
+  %w[no_discounts hide_attendees hide_discussion refund_deleted_orders monthly_donors_only draft secret zoom_party show_emails include_in_parent featured opt_in_facilitator hide_few_left hide_organisation_footer].each do |b|
     field b.to_sym, type: Boolean
     index({ b.to_s => 1 })
   end
