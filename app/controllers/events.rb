@@ -229,6 +229,12 @@ Dandelion::App.controller do
     end
   end
 
+  get '/events/:id/progress' do
+    @event = Event.find(params[:id]) || not_found
+    event_admins_only!
+    partial :'events/progress', locals: { event: @event, full_width: params[:full_width] }
+  end
+
   get '/events/:id/stats_row' do
     @event = Event.find(params[:id]) || not_found
     @organisation = params[:organisation_id] ? Organisation.find(params[:organisation_id]) : nil

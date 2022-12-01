@@ -54,9 +54,7 @@
         <div>
           <span data-toggle="tooltip" title="<%= d = (order.event.start_time.to_date - Date.today).to_i; pluralize(d, 'day') %> to go" class="text-primary"><% d.times do %><i class="fa fa-square mr-1"></i><% end %></span>
         </div>
-        <div class="my-1">
-          <%= partial :'events/progress', locals: { event: order.event, full_width: true } %>
-        </div>
+        <div data-pagelet-url="/events/<%=event.id%>/progress?full_width=true" class="my-1"></div>
         <% if order.event.discounted_ticket_revenue > 0 %>
           <%= m order.event.discounted_ticket_revenue, order.event.currency %>
         <% end %>
