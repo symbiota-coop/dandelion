@@ -1,21 +1,23 @@
+<% tc = event.tickets.count %>
+
 <% if event.purchase_url %>
   <a target="_blank" href="<%= event.purchase_url %>">
     <span class="label label-primary"><%=URI(event.purchase_url).host.gsub('www.','')%></span>
   </a>
-<% elsif (event.live? or event.tickets.count > 0) %>
+<% elsif (event.live? || tc > 0) %>
   <a href="/events/<%= event.id %>/tickets">
     <% if defined?(full_width) && !event.capacity %>
-      <%= pluralize(event.tickets.count, 'ticket') %>
+      <%= pluralize(tc, 'ticket') %>
     <% elsif !defined?(full_width) %>
-      <%= event.tickets.count %><% if event.capacity %>/<%= event.capacity %><% end %>
+      <%= tc %><% if event.capacity %>/<%= event.capacity %><% end %>
     <% end %>
   </a>
-  <% if event.capacity; w = ((event.tickets.count/event.capacity.to_f)*100).round %>
+  <% if event.capacity; w = ((tc/event.capacity.to_f)*100).round %>
     <a class="d-block" style="text-decoration: none" href="/events/<%= event.id %>/tickets">
-      <div class="progress" data-toggle="tooltip" title="<%= event.tickets.count %>/<%= event.capacity %> tickets sold">
+      <div class="progress" data-toggle="tooltip" title="<%= tc %>/<%= event.capacity %> tickets sold">
         <div class="progress-bar" role="progressbar" style="width: <%= "#{w}%" %>;">
           <% if defined?(full_width) %>
-            <%= event.tickets.count %>/<%= event.capacity %>
+            <%= tc %>/<%= event.capacity %>
           <% end %>
         </div>
       </div>
