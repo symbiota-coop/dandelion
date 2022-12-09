@@ -108,6 +108,8 @@ GEM
       i18n_data (~> 0.15.0)
       sixarm_ruby_unaccent (~> 1.1)
     crass (1.0.6)
+    crawler_detect (1.2.2)
+      qonfig (~> 0.24)
     css_parser (1.11.0)
       addressable
     declarative (0.0.20)
@@ -342,6 +344,7 @@ GEM
       multi_json (~> 1.15)
       pusher-signature (~> 0.1.8)
     pusher-signature (0.1.8)
+    qonfig (0.28.0)
     racc (1.6.0)
     rack (2.2.4)
     rack-cors (1.1.1)
@@ -469,6 +472,7 @@ DEPENDENCIES
   chroma
   coinbase_commerce
   countries
+  crawler_detect
   delayed_job_mongoid
   dragonfly
   dragonfly-s3_data_store

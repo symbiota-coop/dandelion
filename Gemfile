@@ -93,3 +93,4 @@ gem 'rack-utf8_sanitizer'
 #  Everything else
 gem 'bazaar'
 gem 'chroma'
+gem 'crawler_detect'
