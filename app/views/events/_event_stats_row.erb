@@ -76,6 +76,7 @@
       <a target="_blank" href="<%= event.facebook_event_url %>"><i class="fa fa-facebook-square"></i></a>
     <% end %>
   </td>
+  <td data-with-placeholder data-pagelet-url="/events/<%=event.id%>/page_views_count" data-sort="<%=event.page_views_count%>"></td>
   <td data-sort="<%=event.tickets.count%>">
     <%= partial :'events/progress', locals: { event: event } %>
   </td>
