@@ -1,0 +1,12 @@
+<div class="main">
+  <p>Hi %recipient.firstname%,</p>
+  <p>
+    <%= account.name %> booked onto <%=event.name%>, <%=event.when_details(order.account.time_zone)%>.
+  </p>
+  <blockquote>
+    <%= order.original_description %>
+  </blockquote>
+  <a href="<%= ENV['BASE_URI'] %>/events/<%=event.id%>/orders?sign_in_token=%recipient.token%">View all orders</a>
+</p>
+</div>
+<div class="footer"></div>

@@ -411,7 +411,28 @@ class Order
   handle_asynchronously :send_tickets
 
   def create_order_notification
+    send_notification if event.send_order_notifications
     Notification.and(type: 'created_order').and(:notifiable_id.in => event.orders.and(account: account).pluck(:id)).destroy_all
     notifications.create! circle: circle, type: 'created_order' if account.public?
   end
+
+  def send_notification
+    mg_client = Mailgun::Client.new ENV['MAILGUN_API_KEY'], 'api.eu.mailgun.net'
+    batch_message = Mailgun::BatchMessage.new(mg_client, 'notifications.dandelion.earth')
+
+    order = self
+    event = order.event
+    account = order.account
+    content = ERB.new(File.read(Padrino.root('app/views/emails/order.erb'))).result(binding)
+    batch_message.from 'Dandelion <notifications@dandelion.earth>'
+    batch_message.subject "New order for #{event.name}"
+    batch_message.body_html Premailer.new(ERB.new(File.read(Padrino.root('app/views/layouts/email.erb'))).result(binding), with_html_string: true, adapter: 'nokogiri', input_encoding: 'UTF-8').to_inline_css
+
+    event.accounts_receiving_feedback.each do |account|
+      batch_message.add_recipient(:to, account.email, { 'firstname' => (account.firstname || 'there'), 'token' => account.sign_in_token, 'id' => account.id.to_s })
+    end
+
+    batch_message.finalize if ENV['MAILGUN_API_KEY']
+  end
+  handle_asynchronously :send_notification
 end
