@@ -805,7 +805,8 @@ class Event
       redirect_url: 'Optional. By default people will be shown a thank you page on Dandelion.',
       facebook_pixel_id: 'Your Facebook Pixel ID for tracking sales',
       purchase_url: "URL where people can buy tickets (if you're not selling tickets on Dandelion)",
-      capacity: 'Caps the total number of tickets issued across all ticket types. Optional'
+      capacity: 'Caps the total number of tickets issued across all ticket types. Optional',
+      send_order_notifications: 'Send email notifications of orders to event admins'
     }
   end
 
