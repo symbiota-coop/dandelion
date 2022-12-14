@@ -1,4 +1,9 @@
+<% if params[:minimal] %>
+  <%== '<div class="container-fluid">' %>
+<% end %>
+
 <div class="row justify-content-between">
+
   <div class="col-12 col-sm">
     <ul class="mb-3 nav nav-pills" role="tablist">
       <li class="nav-item">
@@ -31,3 +36,7 @@
   <% end %>
 
 </div>
+
+<% if params[:minimal] %>
+  <%== '</div>' %>
+<% end %>
