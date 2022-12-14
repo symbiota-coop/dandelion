@@ -1,0 +1,6 @@
+<% if (e = Event.past.and(:id.in => account.tickets.pluck(:event_id)).count) > 0 %>
+  <small class="d-inline-block mt-1 mt-lg-0 label label-default">Attended <%= pluralize(e,'event') %></small>
+<% end %>
+<% if current_account && (follow = Follow.find_by(follower: account, followee: current_account)) %>
+  <small class="d-inline-block mt-1 mt-lg-0 label label-default"><%= follow.unsubscribed ? 'Follows you' : 'Follows and subscribes to you' %></small>
+<% end %>
