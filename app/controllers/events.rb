@@ -1,4 +1,8 @@
 Dandelion::App.controller do
+  get '/e/futurecraft-residency' do
+    redirect '/events/63876b53222f66000bbd3e19?cohost=stephen-reid'
+  end
+
   get '/events', provides: %i[html ics] do
     @events = Event.live.public.legit
     @from = params[:from] ? Date.parse(params[:from]) : Date.today
