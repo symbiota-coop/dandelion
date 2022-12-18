@@ -215,8 +215,8 @@ Dandelion::App.controller do
 
   get '/activities/:id/show_feedback' do
     @activity = Activity.find(params[:id]) || not_found
-    if request.xhr?
-      partial :'event_feedbacks/feedback', locals: { event_feedbacks: @activity.event_feedbacks }
+    if request.xhr? || params[:minimal]
+      partial :'event_feedbacks/feedback', locals: { event_feedbacks: @activity.event_feedbacks }, layout: ('minimal' if params[:minimal])
     else
       redirect "/activities/#{@activity.id}"
     end

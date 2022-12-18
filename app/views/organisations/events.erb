@@ -82,7 +82,7 @@
   <% end %>
 <% end %>
 
-<% unless params[:no_listings] %>
+<% unless params[:no_listings] || params[:no_view_options]  %>
   <%= partial :'events/view_options' %>
 <% end %>
 

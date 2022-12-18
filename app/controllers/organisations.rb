@@ -589,8 +589,8 @@ Dandelion::App.controller do
 
   get '/o/:slug/show_feedback' do
     @organisation = Organisation.find_by(slug: params[:slug]) || not_found
-    if request.xhr?
-      partial :'event_feedbacks/feedback', locals: { event_feedbacks: @organisation.event_feedbacks }
+    if request.xhr? || params[:minimal]
+      partial :'event_feedbacks/feedback', locals: { event_feedbacks: @organisation.event_feedbacks }, layout: ('minimal' if params[:minimal])
     else
       redirect "/o/#{@organisation.slug}"
     end
