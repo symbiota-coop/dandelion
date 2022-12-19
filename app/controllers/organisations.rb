@@ -59,7 +59,7 @@ Dandelion::App.controller do
     if request.xhr?
       partial :'organisations/news'
     else
-      erb :'organisations/news', layout: ('minimal' if params[:minimal])
+      erb :'organisations/news', layout: (params[:minimal] ? 'minimal' : false)
     end
   end
 
@@ -209,7 +209,7 @@ Dandelion::App.controller do
           partial :'organisations/events'
         end
       else
-        erb :'organisations/events', layout: ('minimal' if params[:minimal])
+        erb :'organisations/events', layout: (params[:minimal] ? 'minimal' : false)
       end
     when :ics
       @events = @events.current(3.months.ago)
@@ -590,7 +590,7 @@ Dandelion::App.controller do
   get '/o/:slug/show_feedback' do
     @organisation = Organisation.find_by(slug: params[:slug]) || not_found
     if request.xhr? || params[:minimal]
-      partial :'event_feedbacks/feedback', locals: { event_feedbacks: @organisation.event_feedbacks }, layout: ('minimal' if params[:minimal])
+      partial :'event_feedbacks/feedback', locals: { event_feedbacks: @organisation.event_feedbacks }, layout: (params[:minimal] ? 'minimal' : false)
     else
       redirect "/o/#{@organisation.slug}"
     end

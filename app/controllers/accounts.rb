@@ -389,7 +389,7 @@ Dandelion::App.controller do
 
   get '/u/:username/feedback' do
     @account = Account.find_by(username: params[:username]) || not_found
-    erb :'accounts/feedback', layout: ('minimal' if params[:minimal])
+    erb :'accounts/feedback', layout: (params[:minimal] ? 'minimal' : false)
   end
 
   get '/accounts/:id/events' do
