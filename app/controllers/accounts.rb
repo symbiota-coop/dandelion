@@ -289,7 +289,7 @@ Dandelion::App.controller do
     @account = Account.find(params[:id]) || not_found
     habits = @account.habits.and(public: true).and(:archived.ne => true)
     partial :'habits/blocks', locals: { habits: habits }
-  end  
+  end
 
   get '/accounts/:id/places' do
     @account = Account.find(params[:id]) || not_found
@@ -389,7 +389,7 @@ Dandelion::App.controller do
 
   get '/u/:username/feedback' do
     @account = Account.find_by(username: params[:username]) || not_found
-    erb :'accounts/feedback', layout: (params[:minimal] ? 'minimal' : false)
+    erb :'accounts/feedback', layout: (params[:minimal] ? 'minimal' : nil)
   end
 
   get '/accounts/:id/events' do
@@ -397,7 +397,7 @@ Dandelion::App.controller do
     events = Event.and(:id.in => EventFacilitation.and(:account_id.in => [@account.id] + @account.following_starred.pluck(:id)).pluck(:event_id)).live.public.future_and_current_featured
     partial :'events/blocks', locals: { events: events }, layout: 'minimal'
   end
-    
+
   get '/u/:username/habits' do
     @account = Account.find_by(username: params[:username]) || not_found
     @habits = @account.habits.and(public: true).and(:archived.ne => true)
@@ -407,5 +407,4 @@ Dandelion::App.controller do
     @no_discord = true
     erb :'accounts/habits', layout: :minimal
   end
-
 end

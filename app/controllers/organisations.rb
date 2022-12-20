@@ -59,7 +59,7 @@ Dandelion::App.controller do
     if request.xhr?
       partial :'organisations/news'
     else
-      erb :'organisations/news', layout: (params[:minimal] ? 'minimal' : false)
+      erb :'organisations/news', layout: (params[:minimal] ? 'minimal' : nil)
     end
   end
 
@@ -209,7 +209,7 @@ Dandelion::App.controller do
           partial :'organisations/events'
         end
       else
-        erb :'organisations/events', layout: (params[:minimal] ? 'minimal' : false)
+        erb :'organisations/events', layout: (params[:minimal] ? 'minimal' : nil)
       end
     when :ics
       @events = @events.current(3.months.ago)
