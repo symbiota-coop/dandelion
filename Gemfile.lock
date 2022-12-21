@@ -490,6 +490,7 @@ DEPENDENCIES
   koala
   mail
   mailgun-ruby
+  matrix
   mechanize
   minitest-rg
   money
