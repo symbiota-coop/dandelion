@@ -806,7 +806,7 @@ class Event
       facebook_pixel_id: 'Your Facebook Pixel ID for tracking sales',
       purchase_url: "URL where people can buy tickets (if you're not selling tickets on Dandelion)",
       capacity: 'Caps the total number of tickets issued across all ticket types. Optional',
-      send_order_notifications: 'Send email notifications of orders to event admins'
+      send_order_notifications: 'Send email notifications of orders to event facilitators'
     }
   end
 
