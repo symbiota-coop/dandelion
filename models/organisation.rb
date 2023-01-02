@@ -521,7 +521,8 @@ class Organisation
       monthly_donation_method: nil,
       monthly_donation_amount: nil,
       monthly_donation_currency: nil,
-      monthly_donation_start_date: nil
+      monthly_donation_start_date: nil,
+      monthly_donation_postcode: nil
     )
 
     client = GoCardlessPro::Client.new(access_token: gocardless_access_token)
@@ -555,6 +556,7 @@ class Organisation
 
     name = "#{customer.given_name} #{customer.family_name}"
     email = customer.email
+    postcode = customer.postal_code
     amount = subscription.amount
     currency = subscription.currency
     start_date = subscription.start_date
@@ -567,6 +569,7 @@ class Organisation
     organisationship.monthly_donation_amount = amount.to_f / 100
     organisationship.monthly_donation_currency = currency
     organisationship.monthly_donation_start_date = start_date
+    organisationship.monthly_donation_postcode = postcode
     organisationship.save
   end
 
@@ -575,7 +578,8 @@ class Organisation
       monthly_donation_method: nil,
       monthly_donation_amount: nil,
       monthly_donation_currency: nil,
-      monthly_donation_start_date: nil
+      monthly_donation_start_date: nil,
+      monthly_donation_postcode: nil
     )
 
     api_client = Patreon::API.new(patreon_api_key)

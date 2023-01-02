@@ -1,6 +1,7 @@
 class Organisationship
   include Mongoid::Document
   include Mongoid::Timestamps
+  include Geocoder::Model::Mongoid
 
   belongs_to :organisation, index: true
   belongs_to :account, inverse_of: :organisationships, index: true
@@ -12,6 +13,8 @@ class Organisationship
   field :monthly_donation_amount, type: Float
   field :monthly_donation_currency, type: String
   field :monthly_donation_start_date, type: Date
+  field :monthly_donation_postcode, type: String
+  field :coordinates, type: Array
   field :why_i_joined, type: String
   field :why_i_joined_edited, type: String
   field :notes, type: String
@@ -26,6 +29,28 @@ class Organisationship
   after_destroy :clear_cache
   def clear_cache
     Fragment.and(key: %r{/organisations/carousel/#{account_id}}).destroy_all
+  end
+
+  # Geocoder
+  geocoded_by :monthly_donation_postcode
+
+  def lat
+    coordinates[1] if coordinates
+  end
+
+  def lng
+    coordinates[0] if coordinates
+  end
+  after_validation do
+    geocode || (self.coordinates = nil) if ENV['GOOGLE_MAPS_API_KEY']
+  end
+
+  def self.marker_color
+    '#00B963'
+  end
+
+  def self.marker_icon
+    'fa fa-user'
   end
 
   def self.admin_fields
@@ -46,6 +71,7 @@ class Organisationship
       monthly_donation_currency: :text,
       monthly_donation_method: :select,
       monthly_donation_start_date: :date,
+      monthly_donation_postcode: :text,
       why_i_joined: :text_area,
       why_i_joined_public: :check_box,
       why_i_joined_edited: :text_area

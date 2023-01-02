@@ -14,7 +14,7 @@
     var bounds = new google.maps.LatLngBounds();
 
     var models = []
-  <% [Place, Account, Gathering, ActivityApplication, Event].each { |model| %>
+  <% [Place, Account, Gathering, ActivityApplication, Event, Organisationship].each { |model| %>
       models.push({
         name: '<%= model.to_s %>',
         color: '<%= model.marker_color %>',
@@ -28,8 +28,8 @@
         points.push({
           model_name: '<%= point.class.to_s %>',
           id: '<%= point.id %>',
-          lat: <%= point.lat + ([Account, ActivityApplication, Event].include?(point.class) ? (rand - 0.5) * 0.0035 : 0) %>,
-          lng: <%= point.lng + ([Account, ActivityApplication, Event].include?(point.class) ? (rand - 0.5) * 0.0035 : 0) %>,
+          lat: <%= point.lat + ([Account, ActivityApplication, Event, Organisationship].include?(point.class) ? (rand - 0.5) * 0.0035 : 0) %>,
+          lng: <%= point.lng + ([Account, ActivityApplication, Event, Organisationship].include?(point.class) ? (rand - 0.5) * 0.0035 : 0) %>,
         })
   <% } %>
   <% end %>
