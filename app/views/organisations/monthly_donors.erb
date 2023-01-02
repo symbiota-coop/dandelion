@@ -98,7 +98,7 @@
   <% end %>
   <% if visible_members.count > 0 %>
     <div class="tab-pane fade" id="panel-map" role="tabpanel">
-      <%= partial :'maps/map', locals: { points: @organisation.organisationships.and(:monthly_donation_postcode.ne => nil) } %>
+      <%= partial :'maps/map', locals: { points: @organisation.organisationships.and(:coordinates.ne => nil) } %>
       <style>
         #map-canvas { height: 50vh !important; margin-top: 1rem; margin-bottom: 1rem }
       </style>
