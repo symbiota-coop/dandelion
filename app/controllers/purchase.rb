@@ -76,7 +76,7 @@ Dandelion::App.controller do
           end
 
           stripe_session_hash = {
-            payment_method_types: ['card', 'klarna'],
+            payment_method_types: ['card'],
             customer_email: @account.email,
             success_url: "#{ENV['BASE_URI']}/events/#{@event.id}?success=true&order_id=#{@order.id}&utm_source=#{params[:detailsForm][:utm_source]}&utm_medium=#{params[:detailsForm][:utm_medium]}&utm_campaign=#{params[:detailsForm][:utm_campaign]}",
             cancel_url: "#{ENV['BASE_URI']}/events/#{@event.id}?cancelled=true",

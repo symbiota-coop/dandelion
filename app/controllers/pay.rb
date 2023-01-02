@@ -60,7 +60,7 @@ Dandelion::App.controller do
       Stripe.api_key = @gathering.stripe_sk
       Stripe.api_version = '2020-08-27'
       stripe_session_hash = {
-        payment_method_types: ['card', 'klarna'],
+        payment_method_types: ['card'],
         line_items: [{
           name: 'Dandelion',
           description: "Payment for #{@gathering.name}",
