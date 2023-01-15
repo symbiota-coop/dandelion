@@ -86,7 +86,7 @@ class Organisationship
       credits << [Money.new(crediting.amount * 100, crediting.currency), "on #{crediting.created_at} by #{crediting.account.name}"]
     end
     account.orders_as_affiliate.and(:payment_completed => true, :event_id.in => organisation.events.pluck(:id)).each do |order|
-      credits << [Money.new(order.event.affiliate_credit_percentage.to_f / 100 * order.value * 100, order.currency), "for #{order.account.name}'s order to #{order.event.name} at #{order.created_at}"] if order.event.affiliate_credit_percentage
+      credits << [Money.new(order.event.affiliate_credit_percentage.to_f / 100 * order.value * 100, order.currency), "for #{order.account ? order.account.name : 'deleted account'}'s order to #{order.event.name} at #{order.created_at}"] if order.event.affiliate_credit_percentage
     end
     if organisation.monthly_donor_affiliate_reward && monthly_donor?
       if referrer && (referrer_organisationship = organisation.organisationships.find_by(account: referrer)) && referrer_organisationship.monthly_donor?
