@@ -268,7 +268,7 @@ Dandelion::App.controller do
         { email: /#{::Regexp.escape(params[:q])}/i }
       ).pluck(:id))
     end
-    @orders = @orders.and(affiliate_type: 'Organisation') if params[:via_affiliate]
+    @orders = @orders.and(affiliate_type: 'Organisation', affiliate_id: params[:affiliate_id]) if params[:affiliate_id]
     erb :'organisations/orders'
   end
 

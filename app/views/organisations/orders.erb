@@ -4,7 +4,10 @@
     <label>Search orders</label>
     <%= text_field_tag :q, class: 'form-control', value: params[:q] %>
   </div>
-  <%= checkbox 'Via affiliate' %>
+  <div class="form-group">
+    <label>via affiliate</label>
+    <%= select_tag :affiliate_id, selected: params[:affiliate_id], options: [''] + @organisation.orders.and(:affiliate_type => 'Organisation').pluck(:affiliate_id).map { |organisation_id| if organisation = Organisation.find(organisation_id); [organisation.name, organisation.id]; end }.compact, class: 'form-control' %>
+  </div>
   <%= hidden_field_tag :search, value: 1 %>
   <%= submit_tag 'Search', class: 'btn btn-primary' %>
 <% end %>
