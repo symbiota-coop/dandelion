@@ -4,9 +4,7 @@
     <label>Search orders</label>
     <%= text_field_tag :q, class: 'form-control', value: params[:q] %>
   </div>
-  <%= checkbox 'Coinbase' %>
-  <%= checkbox 'SEEDS' %>
-  <%= checkbox 'EVM' %>
+  <%= checkbox 'Via affiliate' %>
   <%= hidden_field_tag :search, value: 1 %>
   <%= submit_tag 'Search', class: 'btn btn-primary' %>
 <% end %>
