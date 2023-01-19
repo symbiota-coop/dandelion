@@ -258,7 +258,7 @@ Dandelion::App.controller do
     end
   end
 
-  get '/o/:slug/orders' do
+  get '/o/:slug/orders', provides: %i[html csv] do
     @organisation = Organisation.find_by(slug: params[:slug]) || not_found
     organisation_admins_only!
     @from = params[:from] ? Date.parse(params[:from]) : nil
@@ -273,7 +273,30 @@ Dandelion::App.controller do
     @orders = @orders.and(:created_at.gte => @from) if @from
     @orders = @orders.and(:created_at.lt => @to + 1) if @to
     @orders = @orders.and(affiliate_type: 'Organisation', affiliate_id: params[:affiliate_id]) if params[:affiliate_id]
-    erb :'organisations/orders'
+    case content_type
+    when :html
+      erb :'organisations/orders'
+    when :csv
+      CSV.generate do |csv|
+        csv << %w[name email value opt_in_organisation opt_in_facilitator hear_about answers created_at]
+        @orders.each do |order|
+          csv << [
+            order.account ? order.account.name : '',
+            if order_email_viewer?(order)
+              order.account ? order.account.email : ''
+            else
+              ''
+            end,
+            m((order.value || 0), order.currency),
+            order.opt_in_organisation,
+            order.opt_in_facilitator,
+            order.hear_about,
+            order.answers,
+            order.created_at.to_s(:db)
+          ]
+        end
+      end
+    end
   end
 
   get '/o/:slug/events/stats' do
