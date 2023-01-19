@@ -123,10 +123,14 @@
       <div class="wysiwyg">
         <big>
           <% if @event.description %>
-            <%== Sanitize.fragment(Rinku.auto_link(
+            <% d = Rinku.auto_link(
                 (@event.description.include?('<p') || @event.description.include?('<br') ? @event.description : "<p>#{@event.description.gsub("\n", '<br />')}</p>")
-                .gsub(%r{<a (href=".+?")>\[\[(.+?)\]\]</a>}, '<a \1 class="btn btn-primary">\2</a>')
-              ), Sanitize::Config::DANDELION) %>
+                .gsub(%r{<a (href=".+?")>\[\[(.+?)\]\]</a>}, '<a \1 class="btn btn-primary">\2</a>')) %>
+            <% if @event.raw_description %>
+              <%= d %>
+            <% else %>
+              <%== Sanitize.fragment(d, Sanitize::Config::DANDELION) %>
+            <% end %>
           <% end %>
           <% if !@event.hide_organisation_footer && @event.organisation.event_footer && !@event.zoom_party? %>
             <%== Sanitize.fragment(Rinku.auto_link(@event.organisation.event_footer), Sanitize::Config::DANDELION) %>
