@@ -1,12 +1,20 @@
 <%= partial :'organisations/nav', locals: { organisation: @organisation } %>
 <% form_tag '', method: 'get', class: 'submitOnChange searchForm form-inline mb-3' do %>
   <div class="form-group">
-    <label>Search orders</label>
-    <%= text_field_tag :q, class: 'form-control', value: params[:q] %>
+    <label>Search orders between</label>
+    <%= text_field_tag :from, class: 'form-control datepicker mx-1', value: (@from.to_s(:db) if @from) %>
+  </div>
+  <div class="form-group">
+    <label>and</label>
+    <%= text_field_tag :to, class: 'form-control datepicker mx-1', value: (@to.to_s(:db) if @to) %>
+  </div>
+  <div class="form-group">
+    <label>containing the word</label>
+    <%= text_field_tag :q, class: 'form-control mx-1', value: params[:q] %>
   </div>
   <div class="form-group">
     <label>via affiliate</label>
-    <%= select_tag :affiliate_id, selected: params[:affiliate_id], options: [''] + @organisation.orders.and(:affiliate_type => 'Organisation').pluck(:affiliate_id).uniq.map { |organisation_id| if organisation = Organisation.find(organisation_id); [organisation.name, organisation.id]; end }.compact, class: 'form-control' %>
+    <%= select_tag :affiliate_id, selected: params[:affiliate_id], options: [''] + @organisation.orders.and(:affiliate_type => 'Organisation').pluck(:affiliate_id).uniq.map { |organisation_id| if organisation = Organisation.find(organisation_id); [organisation.name, organisation.id]; end }.compact, class: 'form-control mx-1' %>
   </div>
   <%= hidden_field_tag :search, value: 1 %>
   <%= submit_tag 'Search', class: 'btn btn-primary' %>

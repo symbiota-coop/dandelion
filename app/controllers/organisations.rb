@@ -261,6 +261,8 @@ Dandelion::App.controller do
   get '/o/:slug/orders' do
     @organisation = Organisation.find_by(slug: params[:slug]) || not_found
     organisation_admins_only!
+    @from = params[:from] ? Date.parse(params[:from]) : nil
+    @to = params[:to] ? Date.parse(params[:to]) : nil
     @orders = @organisation.orders
     if params[:q]
       @orders = @orders.and(:account_id.in => Account.all.or(
@@ -268,6 +270,8 @@ Dandelion::App.controller do
         { email: /#{::Regexp.escape(params[:q])}/i }
       ).pluck(:id))
     end
+    @orders = @orders.and(:created_at.gte => @from) if @from
+    @orders = @orders.and(:created_at.lt => @to + 1) if @to
     @orders = @orders.and(affiliate_type: 'Organisation', affiliate_id: params[:affiliate_id]) if params[:affiliate_id]
     erb :'organisations/orders'
   end
