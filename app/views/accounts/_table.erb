@@ -1,6 +1,6 @@
 <table class="table table-hr">
   <% viewer_in_network = current_account && account.network.find(current_account.id) %>
-  <% if viewable?(account, :email, viewer_in_network: viewer_in_network) %>
+  <% if (defined?(include_email) && include_email) || viewable?(account, :email, viewer_in_network: viewer_in_network) %>
     <tr>
       <td>Email</td>
       <td>

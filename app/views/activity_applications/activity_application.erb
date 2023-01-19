@@ -14,7 +14,7 @@
       </div>
     </div>
     <div class="mt-2">
-      <%= partial :'accounts/table', locals: { account: @account } %>
+      <%= partial :'accounts/table', locals: { account: @account, include_email: true } %>
       <% if @activity_application.answers %>
         <div class="mb-5">
           <% @activity_application.answers.each { |q,a| if a %>
