@@ -127,7 +127,7 @@
                 (@event.description.include?('<p') || @event.description.include?('<br') ? @event.description : "<p>#{@event.description.gsub("\n", '<br />')}</p>")
                 .gsub(%r{<a (href=".+?")>\[\[(.+?)\]\]</a>}, '<a \1 class="btn btn-primary">\2</a>')) %>
             <% if @event.raw_description %>
-              <%= d %>
+              <%== d %>
             <% else %>
               <%== Sanitize.fragment(d, Sanitize::Config::DANDELION) %>
             <% end %>
