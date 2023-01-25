@@ -2,9 +2,6 @@
   <small class="d-inline-block mt-1 mt-lg-0 label label-default">Facilitated <%= pluralize(e,'event') %></small>
 <% end %>
 
-<%= partial :'event_feedbacks/average_rating', locals: { event_feedbacks: account.event_feedbacks_as_facilitator } %>
-
-
 <%
 event_tags = EventTag.and(:id.in => EventTagship.and(:event_id.in => events.pluck(:id)).pluck(:event_tag_id))
 # get frequency of ids
@@ -16,3 +13,7 @@ event_tags_freq = event_tags_freq.sort_by { |k,v| v }.reverse
 <% event_tags_freq.first(5).each { |event_tag, freq| %>
 <a href="/events?event_tag_id=<%= event_tag.id %>" class="text-white label label-primary d-inline-block mb-1"><%== Sanitize.fragment(event_tag.name) %></a>
 <% } %>
+
+
+<%= partial :'event_feedbacks/average_rating', locals: { event_feedbacks: account.event_feedbacks_as_facilitator } %>
+
