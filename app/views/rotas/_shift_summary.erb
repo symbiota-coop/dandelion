@@ -1,4 +1,4 @@
-<% shifts = defined?(rota) ? membership.shifts.where(rota: rota) : membership.shifts %>
+<% shifts = defined?(rota) ? membership.shifts.and(rota: rota) : membership.shifts %>
 <% if defined?(show_title) && show_title && shifts.count > 0 %>
   <h3>Your shifts</h3>
 <% end %>

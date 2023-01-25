@@ -1,6 +1,6 @@
 <%
-s = rota.shifts.where(:account.ne => nil).count
-t = (rota.roles.count*rota.rslots.count) - rota.shifts.where(:account => nil).count
+s = rota.shifts.and(:account.ne => nil).count
+t = (rota.roles.count*rota.rslots.count) - rota.shifts.and(:account => nil).count
 %>
 <% w = t > 0 ? 100*s/t : 0 %>
 <a href="/g/<%=rota.gathering.slug%>/rotas/<%=rota.id%>">
