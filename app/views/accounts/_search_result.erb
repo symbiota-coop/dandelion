@@ -8,7 +8,7 @@
   <%= partial :'accounts/buttons', locals: { account: account } %>
   <div class="mt-2">
     <% if defined?(facilitator_info) && facilitator_info %>
-      <%= partial :'accounts/facilitator_info', locals: { account: account } %>
+      <%= cp(:'accounts/facilitator_info', key: "/facilitator_info?account_id=#{account.id}", locals: { account: account }) %>
     <% else %>
       <%= partial :'accounts/table', locals: { account: account } %>
     <% end %>

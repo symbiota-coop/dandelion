@@ -4,6 +4,7 @@ Dandelion::App.controller do
   end
 
   get '/facilitators' do
+    @event_tags = EventTag.all
     erb :'events/facilitators'
   end
 
