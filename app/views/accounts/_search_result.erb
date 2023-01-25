@@ -6,10 +6,11 @@
     <a class="text-dark" href="/u/<%= account.username %>"><%= account.name %></a>
   </h2>
   <%= partial :'accounts/buttons', locals: { account: account } %>
-  <% if defined?(facilitator_info) && facilitator_info %>
-    <%= partial :'accounts/facilitator_info', locals: { account: account } %>
-  <% end %>
   <div class="mt-2">
-    <%= partial :'accounts/table', locals: { account: account } %>
+    <% if defined?(facilitator_info) && facilitator_info %>
+      <%= partial :'accounts/facilitator_info', locals: { account: account } %>
+    <% else %>
+      <%= partial :'accounts/table', locals: { account: account } %>
+    <% end %>
   </div>
 </div>
