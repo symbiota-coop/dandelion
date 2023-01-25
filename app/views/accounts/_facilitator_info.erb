@@ -3,17 +3,17 @@
 <% end %>
 
 <%
-event_tags = EventTag.and(:id.in => EventTagship.and(:event_id.in => events.pluck(:id)).pluck(:event_tag_id))
+event_tags = EventTag.all
+event_tagships = EventTagship.and(:event_id.in => events.pluck(:id))
 # get frequency of ids
-event_tags_freq = event_tags.inject(Hash.new(0)) { |h,v| h[v] += 1; h }
+event_tags_freq = event_tagships.inject(Hash.new(0)) { |h,v| h[v.event_tag_id] += 1; h }
 # sort by frequency
 event_tags_freq = event_tags_freq.sort_by { |k,v| v }.reverse
 %>
 
-<% event_tags_freq.first(5).each { |event_tag, freq| %>
+<% event_tags_freq.first(5).each { |event_tag_id, freq| event_tag = event_tags.find { |event_tag| event_tag.id == event_tag_id }  %>
 <a href="/events?event_tag_id=<%= event_tag.id %>" class="text-white label label-primary d-inline-block mb-1"><%== Sanitize.fragment(event_tag.name) %></a>
 <% } %>
 
 
 <%= partial :'event_feedbacks/average_rating', locals: { event_feedbacks: account.event_feedbacks_as_facilitator } %>
-
