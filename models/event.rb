@@ -453,6 +453,12 @@ class Event
         account: event_facilitation.account
       )
     end
+    cohostships.each do |cohostship|
+      event.cohostships.create(
+        organisation: cohostship.organisation,
+        image: cohostship.image
+      )
+    end
     ticket_groups.each do |ticket_group|
       event.ticket_groups.create(
         name: ticket_group.name,
