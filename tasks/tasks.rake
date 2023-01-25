@@ -24,6 +24,14 @@ namespace :organisations do
       organisation.sync_with_patreon
     end
   end
+
+  task stripe_transfers: :environment do
+    Organisation.and(:google_sheets_key.ne => nil).each do |organisation|
+      organisation.transfer_events
+      organisation.transfer_charges
+      organisation.transfer_transactions
+    end
+  end
 end
 
 namespace :gatherings do
@@ -98,14 +106,6 @@ namespace :events do
       TicketType.and(name: /payment plan/i).each do |ticket_type|
         ticket_type.send_payment_reminder
       end
-    end
-  end
-
-  task stripe_transfers: :environment do
-    Organisation.and(:google_sheets_key.ne => nil).each do |organisation|
-      organisation.transfer_events
-      organisation.transfer_charges
-      organisation.transfer_transactions
     end
   end
 end
