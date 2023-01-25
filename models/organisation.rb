@@ -78,6 +78,11 @@ class Organisation
   field :restrict_cohosting, type: Boolean
   field :psychedelic, type: Boolean
   field :hide_few_left, type: Boolean
+  field :google_drive_client_id, type: String
+  field :google_drive_client_secret, type: String
+  field :google_drive_refresh_token, type: String
+  field :google_drive_scope, type: String
+  field :google_sheets_key, type: String
 
   field :tokens, type: Float
   index({ tokens: 1 })
@@ -717,4 +722,142 @@ class Organisation
     file.unlink
   end
   handle_asynchronously :send_followers_csv
+
+  def transfer_events
+    session = GoogleDrive::Session.from_config(OpenStruct.new(
+                                                 client_id: google_drive_client_id,
+                                                 client_secret: google_drive_client_secret,
+                                                 refresh_token: google_drive_refresh_token,
+                                                 scope: google_drive_scope.split(',')
+                                               ))
+
+    worksheet_name = 'Dandelion events'
+    worksheet = session.spreadsheet_by_key(google_sheets_key).worksheets.find { |worksheet| worksheet.title == worksheet_name }
+    rows = []
+
+    event_ids = worksheet.instance_variable_get(:@session).sheets_service.get_spreadsheet_values(
+      worksheet.spreadsheet.id,
+      'Dandelion events!A2:A'
+    ).values.flatten
+
+    events.live.and(:id.nin => event_ids, :start_time.gte => '2020-06-01').each do |event|
+      row = { id: event.id.to_s }
+      rows << row
+    end
+
+    worksheet.instance_variable_get(:@session).sheets_service.append_spreadsheet_value(
+      worksheet.spreadsheet.id,
+      worksheet_name,
+      Google::Apis::SheetsV4::ValueRange.new(values: rows.reverse.map(&:values)),
+      value_input_option: 'USER_ENTERED'
+    )
+
+    # worksheet.insert_rows(worksheet.num_rows + 1, rows.reverse.map(&:values))
+    # worksheet.save
+  end
+
+  def transfer_charges
+    from = Date.today - 2
+    to = Date.today - 1
+    Stripe.api_key = stripe_sk
+    Stripe.api_version = '2020-08-27'
+    charges = Stripe::Charge.list(created: { gte: Time.utc(from.year, from.month, from.day).to_i, lt: Time.utc(to.year, to.month, to.day).to_i })
+
+    session = GoogleDrive::Session.from_config(OpenStruct.new(
+                                                 client_id: google_drive_client_id,
+                                                 client_secret: google_drive_client_secret,
+                                                 refresh_token: google_drive_refresh_token,
+                                                 scope: google_drive_scope.split(',')
+                                               ))
+
+    worksheet_name = 'Stripe charges'
+    worksheet = session.spreadsheet_by_key(google_sheets_key).worksheets.find { |worksheet| worksheet.title == worksheet_name }
+    rows = []
+    charges.auto_paging_each do |charge|
+      row = {}
+      %w[id amount application_fee application_fee_amount balance_transaction created currency customer description destination payment_intent].each do |f|
+        row[f] = case f
+                 when 'created'
+                   Time.at(charge[f]).utc.strftime('%Y-%m-%d %H:%M:%S +0000')
+                 else
+                   charge[f]
+                 end
+      end
+      %w[de_event_id de_order_id de_account_id de_donation_revenue de_ticket_revenue de_discounted_ticket_revenue de_percentage_discount de_percentage_discount_monthly_donor de_credit_applied].each do |f|
+        row[f] = charge['metadata'][f]
+      end
+      puts row['created']
+      rows << row
+    end
+
+    worksheet.instance_variable_get(:@session).sheets_service.append_spreadsheet_value(
+      worksheet.spreadsheet.id,
+      worksheet_name,
+      Google::Apis::SheetsV4::ValueRange.new(values: rows.reverse.map(&:values)),
+      value_input_option: 'USER_ENTERED'
+    )
+
+    # worksheet.insert_rows(worksheet.num_rows + 1, rows.reverse.map(&:values))
+    # worksheet.save
+  end
+
+  def transfer_transactions
+    from = Date.today - 2
+    to = Date.today - 1
+    Stripe.api_key = stripe_sk
+    Stripe.api_version = '2020-08-27'
+
+    run = Stripe::Reporting::ReportRun.create({
+                                                report_type: 'balance_change_from_activity.itemized.1',
+                                                parameters: {
+                                                  interval_start: Time.utc(from.year, from.month, from.day).to_i,
+                                                  interval_end: Time.utc(to.year, to.month, to.day).to_i
+                                                }
+                                              })
+
+    until run.result
+      sleep 5
+      run = Stripe::Reporting::ReportRun.retrieve(run.id)
+    end
+
+    uri = URI(run.result.url)
+    csv = nil
+    Net::HTTP.start(uri.host, uri.port, use_ssl: true) do |http|
+      request = Net::HTTP::Get.new uri.request_uri
+      request.basic_auth stripe_sk, ''
+      response = http.request request
+      csv = CSV.parse(response.body.encode('utf-8', invalid: :replace, undef: :replace, replace: '_'), headers: true, header_converters: :symbol)
+    end
+
+    session = GoogleDrive::Session.from_config(OpenStruct.new(
+                                                 client_id: google_drive_client_id,
+                                                 client_secret: google_drive_client_secret,
+                                                 refresh_token: google_drive_refresh_token,
+                                                 scope: google_drive_scope.split(',')
+                                               ))
+
+    worksheet_name = 'Stripe transactions'
+    worksheet = session.spreadsheet_by_key(google_sheets_key).worksheets.find { |worksheet| worksheet.title == worksheet_name }
+    rows = []
+    csv.each do |row|
+      row = row.to_hash
+      %w[created_utc available_on_utc].each do |f|
+        row[f.to_sym] = "#{row[f.to_sym]} +0000"
+      end
+      %w[gross fee net].each do |f|
+        row["#{f}_gbp".to_sym] = Money.new(row[f.to_sym].to_f * 100, row[:currency]).exchange_to('GBP').cents.to_f / 100.to_f
+      end
+      rows << row
+    end
+
+    worksheet.instance_variable_get(:@session).sheets_service.append_spreadsheet_value(
+      worksheet.spreadsheet.id,
+      worksheet_name,
+      Google::Apis::SheetsV4::ValueRange.new(values: rows.map(&:values)),
+      value_input_option: 'USER_ENTERED'
+    )
+
+    # worksheet.insert_rows(worksheet.num_rows + 1, rows.map(&:values))
+    # worksheet.save
+  end
 end
