@@ -107,6 +107,12 @@
                  a_active_class: '' %>
     </li>
   <% end %>
+  <li class="<%= 'active' if request.path == '/facilitators' %>">
+    <a href="/facilitators" data-toggle="tooltip" title="Facilitators" data-placement="right">
+      <i class="fa fa-graduation-cap"></i>
+      <span class="nav-link-text">Facilitators</span>
+    </a>
+  </li>
   <li class="<%= 'active' if request.path == '/map' %>">
     <a href="/map" data-toggle="tooltip" title="Map" data-placement="right">
       <i class="fa fa-map"></i>

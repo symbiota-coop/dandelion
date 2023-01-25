@@ -1,0 +1,16 @@
+<%
+account_ids = EventFacilitation.pluck(:account_id)
+# get frequency of ids
+account_ids_freq = account_ids.inject(Hash.new(0)) { |h,v| h[v] += 1; h }
+# sort by frequency
+account_ids_freq = account_ids_freq.sort_by { |k,v| v }.reverse
+%>
+
+<% accounts = Account.where(:id.in => account_ids_freq.first(50).map { |id, freq| id }) %>
+<ul class="search-result-list">
+  <% account_ids_freq.first(50).each { |id, freq|; account = accounts.find { |a| a.id == id } %>
+  <li>
+    <%= partial 'accounts/search_result', locals: { account: account, facilitator_info: true } %>
+  </li>
+  <% } %>
+</ul>

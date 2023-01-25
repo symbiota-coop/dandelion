@@ -1,0 +1,7 @@
+<div class="mb-2">
+  <% if (e = Event.past.and(:id.in => account.event_facilitations.pluck(:event_id)).count) > 0 %>
+    <small class="d-inline-block mt-1 mt-lg-0 label label-default">Facilitated <%= pluralize(e,'event') %></small>
+  <% end %>
+</div>
+
+<%= partial :'event_feedbacks/average_rating', locals: { event_feedbacks: account.event_feedbacks_as_facilitator } %>
