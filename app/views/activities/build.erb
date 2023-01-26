@@ -20,7 +20,6 @@
   <%= f.url_block :telegram_group %>
   <%= f.email_block :email %>
   <%= f.image_block :image %>
-  <%= f.lookup_block :organisation_id, lookup_url: '/organisations.json', placeholder: 'Search organisations', selected_link: (%(<a class="d-inline-block mt-1" target="_blank" href="/o/#{@activity.organisation.slug}">View organisation</a>) if @activity.organisation_id) %>
   <script>
     $(function () {
 
