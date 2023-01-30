@@ -1,10 +1,16 @@
 <div class="card mb-3" id="select-tickets">
   <h3 class="card-header bg-primary text-white"><%= @event.select_tickets_title || 'Select tickets' %></h3>
   <div class="card-body">
-    <% if @event.past? && !@event.recording? %>
-      <div class="alert alert-danger">
-        <p class="mb-0">This event started <%= time_ago_in_words @event.start_time %> ago</p>
-      </div>
+    <% if @event.past? %>
+      <% if @event.recording? %>
+        <div class="alert alert-success">
+          <p class="mb-0">This event happened <%= time_ago_in_words @event.start_time %> ago, but you can purchase the recording 🍿</p>
+        </div>
+      <% else %>
+        <div class="alert alert-danger">
+          <p class="mb-0">This event started <%= time_ago_in_words @event.start_time %> ago</p>
+        </div>
+      <% end %>
     <% end %>
     <% if @event.select_tickets_intro %>
       <table class="table table-borderless mb-0">
