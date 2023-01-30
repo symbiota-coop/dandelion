@@ -1,46 +1,8 @@
 <div class="card">
-  <div id="upcoming-events">
+  <div id="upcoming-events" class="d-none d-lg-block">
     <h3 class="card-header bg-primary text-white">Your upcoming events</h3>
     <div class="card-body">
-      <% if current_account.upcoming_events.count > 0 %>
-        <table class="table">
-          <% current_account.upcoming_events.each { |event| %>
-          <tr class="block">
-            <td style="width: 1px">
-              <a href="/events/<%= event.id %>" class="calendar-date" data-toggle="tooltip" title="in <%=distance_of_time_in_words event.start_time - Time.now %>">
-                <span class="day"><%= event.start_time.day %></span>
-                <br>
-                <span class="month"><%= event.start_time.strftime('%b') %></span>
-              </a>
-            </td>
-            <td>
-              <h4>
-                <a href="/events/<%= event.id %>"><%= event.name %></a>
-                <div data-with-placeholder class="d-inline event-star" data-pagelet-url="/events/<%=event.id%>/star?block_edit=1"><i class="fa fa-star-o" style="opacity: 0.3"></i></div>
-              </h4>
-              <% if event_admin?(event) %>
-                <div class="mb-3">
-                  <%= partial :'events/progress', locals: { event: event, full_width: true, link: true } %>
-                </div>
-              <% end %>
-              <ul class="fa-ul mb-0">
-                <% event.orders.complete.and(account: current_account).each { |order| %>
-                <li><i class="fa fa-li fa-ticket"></i><a target="_blank" href="/orders/<%= order.id %>"><%= d = order.description_elements; d.empty? ? order.created_at : d.join(', ') %></a></li>
-                <% } %>
-              </ul>
-            </td>
-          </tr>
-          <% } %>
-        </table>
-        <p class="mb-0"><a href="/events/my">See all your events &rarr;</a></p>
-      <% else %>
-        <p class="mb-0">
-          Nothing upcoming. <a id="browse-events" href="/events">Browse events</a>
-          <% if current_account.previous_events.count > 0 %>
-            or <a href="/events/my">see your past events &rarr;</a>
-          <% end %>
-        </p>
-      <% end %>
+      <%= partial :'events/my_upcoming' %>
     </div>
   </div>
   <% if current_account.recommended_events_cache && current_account.recommended_events_cache.count > 0 %>

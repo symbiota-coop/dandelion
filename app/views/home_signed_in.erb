@@ -9,6 +9,14 @@
 <div class="row">
   <div class="col-lg-8">
     <%= cp(:'organisations/carousel', key: "/organisations/carousel/#{current_account.id}") %>
+
+    <div class="card mb-3 d-lg-none">
+      <h3 class="card-header bg-primary text-white">Your upcoming events</h3>
+      <div class="card-body">
+        <%= partial :'events/my_upcoming' %>
+      </div>
+    </div>
+
     <% if params[:thanks] %>
       <div class="px-4 mb-5 pt-3">
         <p class="lead mb-1">
