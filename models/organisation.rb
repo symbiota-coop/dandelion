@@ -65,6 +65,7 @@ class Organisation
   field :show_sign_in_link_in_ticket_emails, type: Boolean
   field :show_ticketholder_link_in_ticket_emails, type: Boolean
   field :ticket_email_greeting, type: String
+  field :recording_email_greeting, type: String
   field :feedback_email_body, type: String
   field :verified, type: Boolean
   field :contribution_not_required, type: Boolean
@@ -328,6 +329,11 @@ class Organisation
 <p>Thanks for booking onto [event_name], [event_when] [at_event_location_if_not_online]. Your [tickets_are] attached.</p>'
   end
 
+  def recording_email_greeting_default
+    '<p>Hi [firstname],</p>
+<p>Thanks for purchasing the recording of [event_name], [event_when] [at_event_location_if_not_online].</p>'
+  end
+
   def feedback_email_body_default
     '<p>Hi [firstname],</p>
 <p>Thanks for attending [event_name].</p>
@@ -338,6 +344,7 @@ class Organisation
   before_validation do
     self.currency = 'GBP' unless currency
     self.ticket_email_greeting = ticket_email_greeting_default unless ticket_email_greeting
+    self.recording_email_greeting = recording_email_greeting_default unless recording_email_greeting
     self.feedback_email_body = feedback_email_body_default unless feedback_email_body
     errors.add(:affiliate_credit_percentage, 'must be between 1 and 100') if affiliate_credit_percentage && (affiliate_credit_percentage < 1 || affiliate_credit_percentage > 100)
 

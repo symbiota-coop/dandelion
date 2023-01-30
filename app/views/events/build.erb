@@ -304,6 +304,7 @@
             <%= f.check_box_block :ask_hear_about %>
             <%= f.text_area_block :notes %>
             <% if Padrino.env == :development || @event.organisation.verified? %>
+              <%= f.wysiwyg_block :extra_info_for_recording_email %>
               <%= f.number_block :affiliate_credit_percentage %>
             <% end %>
             <% if @event.new_record? %>

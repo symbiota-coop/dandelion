@@ -1,5 +1,5 @@
 <div class="main">
-  <%= event.organisation.ticket_email_greeting
+  <%= (event.recording? ? event.organisation.recording_email_greeting : event.organisation.ticket_email_greeting)
         .gsub('[firstname]', order.account.firstname)
         .gsub('[lastname]', order.account.lastname || '')
         .gsub('[fullname]', order.account.name)
@@ -8,16 +8,23 @@
         .gsub('[event_location]', event.location)
         .gsub(' [at_event_location_if_not_online]', event.online? ? '' : " at #{event.location}")
         .gsub('[tickets_are]', order.tickets.length == 1 ? 'ticket is' : 'tickets are') %>
-  <% if event.extra_info_for_ticket_email %>
-    <hr>
-    <%= event.extra_info_for_ticket_email %>
+  <% if event.recording? %>
+    <% if event.extra_info_for_recording_email %>
+      <hr>
+      <%= event.extra_info_for_recording_email %>
+    <% end %>
+  <% else %>
+    <% if event.extra_info_for_ticket_email %>
+      <hr>
+      <%= event.extra_info_for_ticket_email %>
+    <% end %>
   <% end %>
   <% if !event.hide_organisation_footer %>
     <% if event.organisation.extra_info_for_ticket_email %>
       <hr>
       <%= event.organisation.extra_info_for_ticket_email %>
     <% end %>
-    <% if event.organisation.show_ticketholder_link_in_ticket_emails && order.tickets.length > 1 %>
+    <% if !event.recording? && event.organisation.show_ticketholder_link_in_ticket_emails && order.tickets.length > 1 %>
       <p>
         <a href="<%=ENV['BASE_URI']%>/events/<%=event.id%>?order_id=<%=order.id%>">Visit this page to add details of ticketholders.</a>
       </p>
@@ -34,9 +41,9 @@
   <% if event.organisation.show_sign_in_link_in_ticket_emails %>
     <p>
       <% if account.sign_ins_count == 0 %>
-        <a href="<%= ENV['BASE_URI'] %>/accounts/edit?sign_in_token=%recipient.token%&event_id=<%= event.id %>">Click here to create a profile on Dandelion and connect with others attending the event.</a>
+        <a href="<%= ENV['BASE_URI'] %>/accounts/edit?sign_in_token=%recipient.token%&event_id=<%= event.id %>">Click here to create a profile on Dandelion and connect with others <%= event.recording? ? 'who attended' : 'attending' %> the event.</a>
       <% else %>
-        <a href="<%= ENV['BASE_URI'] %>/events/<%= event.id %>?sign_in_token=%recipient.token%">Sign in to Dandelion to show or hide your attendance and connect with others attending the event.</a>
+        <a href="<%= ENV['BASE_URI'] %>/events/<%= event.id %>?sign_in_token=%recipient.token%">Sign in to Dandelion to show or hide your attendance and connect with others <%= event.recording? ? 'who attended' : 'attending' %> the event.</a>
       <% end %>
     </p>
   <% end %>

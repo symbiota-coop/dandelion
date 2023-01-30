@@ -30,6 +30,7 @@ class Event
   field :organisation_revenue_share, type: Float
   field :affiliate_credit_percentage, type: Integer
   field :extra_info_for_ticket_email, type: String
+  field :extra_info_for_recording_email, type: String
   field :ps_event_id, type: String
   field :notes, type: String
   field :redirect_url, type: String
@@ -70,6 +71,7 @@ class Event
       monthly_donors_only: :check_box,
       no_discounts: :check_box,
       extra_info_for_ticket_email: :wysiwyg,
+      extra_info_for_recording_email: :wysiwyg,
       suggested_donation: :number,
       minimum_donation: :number,
       capacity: :number,
@@ -177,6 +179,10 @@ class Event
   end
   after_validation do
     geocode || (self.coordinates = nil) if ENV['GOOGLE_MAPS_API_KEY']
+  end
+
+  def recording?
+    past? && extra_info_for_recording_email
   end
 
   def revenue_sharer_organisationship
@@ -424,6 +430,7 @@ class Event
       monthly_donors_only: monthly_donors_only,
       no_discounts: no_discounts,
       extra_info_for_ticket_email: extra_info_for_ticket_email,
+      extra_info_for_recording_email: extra_info_for_recording_email,
       zoom_party: zoom_party,
       show_emails: show_emails,
       include_in_parent: include_in_parent,
@@ -761,6 +768,7 @@ class Event
       start_time: 'Start date/time',
       end_time: 'End date/time',
       extra_info_for_ticket_email: 'Extra info for ticket confirmation email',
+      extra_info_for_recording_email: 'Extra info for recording confirmation email',
       purchase_url: 'Ticket purchase URL',
       no_discounts: 'No discounts for monthly donors',
       notes: 'Private notes',
@@ -798,6 +806,7 @@ class Event
       questions: 'Questions to ask participants upon booking. One question per line. Wrap in [square brackets] to turn into a checkbox.',
       feedback_questions: 'Questions to ask participants in the post-event feedback form. One question per line. Leave blank to disable feedback.',
       extra_info_for_ticket_email: 'This is the place to enter Zoom links, directions to the venue, etc.',
+      extra_info_for_recording_email: 'This is the place to enter the link to the recording.',
       featured: "Feature the event on the organisation's events page",
       secret: 'Hide the event from all public listings',
       draft: 'Make the event visible to admins only',
