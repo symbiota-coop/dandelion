@@ -1,7 +1,7 @@
 <div class="card mb-3" id="select-tickets">
   <h3 class="card-header bg-primary text-white"><%= @event.select_tickets_title || 'Select tickets' %></h3>
   <div class="card-body">
-    <% if @event.past? %>
+    <% if @event.past? && !@event.recording? %>
       <div class="alert alert-danger">
         <p class="mb-0">This event started <%= time_ago_in_words @event.start_time %> ago</p>
       </div>
@@ -391,7 +391,7 @@
     </div>
   </div>
   <script>
-    <% if @event.past? %>
+    <% if @event.past? && !@event.recording? %>
       timeAgo = '<%= time_ago_in_words @event.start_time %>'
     <% end %>
       eventId = <%== @event.id.to_s.to_json %>
