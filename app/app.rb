@@ -11,7 +11,7 @@ module Dandelion
     Sass::Plugin.options[:css_location] = Padrino.root('app', 'assets', 'stylesheets')
     use Sass::Plugin::Rack
 
-    use Rack::Session::Cookie, expire_after: 1.year.to_i
+    use Rack::Session::Cookie, expire_after: 1.year.to_i, secret: ENV['SESSION_SECRET']
     use Rack::UTF8Sanitizer
     use Rack::CrawlerDetect
     use RackSessionAccess::Middleware if Padrino.env == :test
