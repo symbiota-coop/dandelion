@@ -23,6 +23,7 @@ class Organisation
   field :coinbase_webhook_secret, type: String
   field :gocardless_access_token, type: String
   field :gocardless_endpoint_secret, type: String
+  field :gocardless_filter, type: String
   field :patreon_api_key, type: String
   field :mailgun_api_key, type: String
   field :mailgun_domain, type: String
@@ -113,6 +114,7 @@ class Organisation
       stripe_sk: :text,
       gocardless_access_token: :text,
       gocardless_endpoint_secret: :text,
+      gocardless_filter: :text,
       patreon_api_key: :text,
       mailgun_api_key: :text,
       mailgun_domain: :text,
@@ -562,6 +564,8 @@ class Organisation
       return
     end
     return unless subscription.status == 'active'
+
+    return if gocardless_filter && !subscription.name.include?(gocardless_filter)
 
     mandate = client.mandates.get(subscription.links.mandate)
     customer = client.customers.get(mandate.links.customer)
