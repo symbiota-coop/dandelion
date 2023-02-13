@@ -211,8 +211,8 @@ Dandelion::App.controller do
     when :json
       {
         name: @event.name,
-        start_date: @event.start_time.to_date.to_s(:db),
-        end_date: @event.end_time.to_date.to_s(:db),
+        start_date: @event.start_time.to_date.to_fs(:db),
+        end_date: @event.end_time.to_date.to_fs(:db),
         activity: ("#{@event.activity.name} (#{@event.activity_id})" if @event.activity),
         event_coordinator: ("#{@event.coordinator.name} (#{@event.coordinator_id})" if @event.coordinator),
         carousel_coordinator: ("#{@event.carousel_coordinator.name} (#{@event.carousel_coordinator.id})" if @event.carousel_coordinator),
@@ -482,7 +482,7 @@ Dandelion::App.controller do
             ticket_email_viewer?(ticket) ? ticket.email : '',
             ticket.ticket_type.try(:name),
             m(ticket.discounted_price || 0, ticket.order ? ticket.order.currency : ticket.event.currency),
-            ticket.created_at.to_s(:db)
+            ticket.created_at.to_fs(:db)
           ]
         end
       end
@@ -499,7 +499,7 @@ Dandelion::App.controller do
                 ticket_email_viewer?(ticket) ? ticket.email : '',
                 ticket.ticket_type.try(:name),
                 m(ticket.discounted_price || 0, ticket.order ? ticket.order.currency : ticket.event.currency),
-                ticket.created_at.to_s(:db)
+                ticket.created_at.to_fs(:db)
               ]
             end)
       end.render
@@ -599,7 +599,7 @@ Dandelion::App.controller do
             order.opt_in_facilitator,
             order.hear_about,
             order.answers,
-            order.created_at.to_s(:db)
+            order.created_at.to_fs(:db)
           ]
         end
       end
@@ -617,7 +617,7 @@ Dandelion::App.controller do
                   ''
                 end,
                 m((order.value || 0), order.currency),
-                order.created_at.to_s(:db)
+                order.created_at.to_fs(:db)
               ]
             end)
       end.render

@@ -33,7 +33,7 @@
   "><i class="fa fa-image"></i></a>
   <% end %>
 </td>
-<td data-sort="<%=event.start_time.to_s(:db)%>"><%= when_details(event) %></td>
+<td data-sort="<%=event.start_time.to_fs(:db)%>"><%= when_details(event) %></td>
 <td style="text-align: center">
   <% if event.coordinator %>
     <a href="/u/<%= event.coordinator.username %>">

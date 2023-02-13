@@ -34,7 +34,7 @@
       <%= hidden_field_tag :minimal, value: params[:minimal] %>
       <div class="form-group">
         <label>Show events from</label>
-        <%= text_field_tag :from, class: 'form-control datepicker', value: @from.to_s(:db) %>
+        <%= text_field_tag :from, class: 'form-control datepicker', value: @from.to_fs(:db) %>
       </div>
       <div class="form-group">
         <label>containing the word</label>

@@ -23,7 +23,7 @@ Dandelion::App.controller do
             membership.account.name,
             membership.account.email,
             (membership.proposed_by.map(&:name).to_sentence(last_word_connector: ' and ') if membership.proposed_by),
-            membership.created_at.to_s(:db),
+            membership.created_at.to_fs(:db),
             (membership.mapplication.answers if membership.mapplication && membership.mapplication.answers),
             membership.optionships.map { |optionship| [optionship.option.name, optionship.option.cost_per_person] },
             membership.requested_contribution,

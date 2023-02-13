@@ -253,11 +253,11 @@ class Activity
           activity_application.account.email,
           activity_application.account.location,
           activity_application.account.gender,
-          activity_application.created_at.to_s(:db),
+          activity_application.created_at.to_fs(:db),
           activity_application.word_count,
           activity_application.status,
           activity_application.statused_by.try(:name),
-          (activity_application.statused_at.to_s(:db) if activity_application.statused_at),
+          (activity_application.statused_at.to_fs(:db) if activity_application.statused_at),
           activity_application.answers
         ]
       end

@@ -10,7 +10,7 @@
   <% if event.start_time.to_date != event.end_time.to_date %>
     Starts
   <% end %>
-  <%= event.start_time.to_date.to_s(:no_year) %>
+  <%= event.start_time.to_date.to_fs(:no_year) %>
 </span>
 <% if event.sold_out? %>
   <span class="label label-danger" style="opacity: 0.85; border-radius: 0; position: absolute; bottom: 0; right: 0">
