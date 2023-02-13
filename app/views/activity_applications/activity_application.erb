@@ -17,7 +17,7 @@
       <%= partial :'accounts/table', locals: { account: @account, include_email: true } %>
       <% if @activity_application.answers %>
         <div class="mb-5">
-          <% @activity_application.answers.each { |q,a| if a %>
+          <% @activity_application.answers.each { |q,a| if q && a %>
           <p style="font-size: 16px;">
             <strong>
               <%== Sanitize.fragment(Rinku.auto_link(q), Sanitize::Config::DANDELION) %>

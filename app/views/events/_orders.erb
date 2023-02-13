@@ -148,7 +148,7 @@
         <% if order.opt_in_facilitator %><i class="fa fa-check"></i><% end %>
       </td>
       <td>
-        <% order.answers.each { |q,a| if a %>
+        <% order.answers.each { |q,a| if q && a %>
         <p style="width: 400px">
           <strong>
             <% if m = q.match(/\[(.*)\]/) %>
