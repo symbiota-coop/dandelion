@@ -4,7 +4,7 @@ class Organisation
   include Geocoder::Model::Mongoid
   extend Dragonfly::Model
 
-  belongs_to :account, index: true  
+  belongs_to :account, index: true
 
   field :name, type: String
   field :slug, type: String

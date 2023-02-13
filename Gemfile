@@ -1,6 +1,6 @@
 source 'https://rubygems.org'
 
-ruby '2.7.3'
+ruby '2.7.7'
 gem 'irb'
 gem 'padrino'
 gem 'puma'
@@ -14,7 +14,7 @@ gem 'activate-tools', github: 'stephenreid321/activate-tools'
 gem 'will_paginate', github: 'mislav/will_paginate'
 
 # Data storage
-gem 'activemodel', '~> 6.0'
+gem 'activemodel'
 gem 'delayed_job_mongoid'
 gem 'dragonfly'
 gem 'dragonfly-s3_data_store'

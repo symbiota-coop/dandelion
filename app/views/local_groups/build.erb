@@ -1,21 +1,10 @@
 <%= partial :'local_groups/nav', locals: { local_group: @local_group } %>
 <% form_for @local_group, @local_group.new_record ? '/local_groups/new' : "/local_groups/#{@local_group.id}/edit" do |f| %>
+  <%= hidden_field_tag :'local_group[organisation_id]', value: @local_group.organisation_id %>
   <%= f.text_block :name %>
   <%= f.wysiwyg_block :intro_text %>
   <%= f.url_block :telegram_group %>
   <%= f.text_area_block :geometry %>
-  <script>
-    $(function () {
-      $('#local_group_organisation_id').change(function () {
-        if ($(this).val().length > 0) {
-          $('#organisation-options').show()
-        } else {
-          $('#organisation-options').hide()
-        }
-      })
-      $('#local_group_organisation_id').change()
-    })
-  </script>
   <%= f.check_box_block :hide_members %>
   <%= f.check_box_block :hide_discussion %>
   <%= f.submit_block destroy_url: "/local_groups/#{@local_group.id}/destroy" %>

@@ -21,7 +21,7 @@
         <% team.teamships.each { |teamship| account = teamship.account; %>
         <% if params[:view] == 'names' %>
           <% y << capture do %>
-            <%= Sanitize.fragment(account.name) %>
+            <%== Sanitize.fragment(account.name) %>
           <% end %>
         <% else %>
           <% y << capture do %>

@@ -14,26 +14,13 @@
   })
 </script>
 <% form_for @activity, @activity.new_record ? '/activities/new' : "/activities/#{@activity.id}/edit" do |f| %>
+  <%= hidden_field_tag :'activity[organisation_id]', value: @activity.organisation_id %>
   <%= f.text_block :name %>
   <%= f.wysiwyg_block :intro_text %>
   <%= f.url_block :website %>
   <%= f.url_block :telegram_group %>
   <%= f.email_block :email %>
   <%= f.image_block :image %>
-  <script>
-    $(function () {
-
-      $('#activity_organisation_id').change(function () {
-        if ($(this).val().length > 0) {
-          $('#organisation-options').show()
-        } else {
-          $('#organisation-options').hide()
-        }
-      })
-      $('#activity_organisation_id').change()
-
-    })
-  </script>
   <%= partial :'activities/tags', locals: { f: f } %>
   <%= f.check_box_block :hidden %>
   <%= f.check_box_block :hide_members %>
