@@ -14,9 +14,9 @@ GIT
 
 GIT
   remote: https://github.com/stephenreid321/activate-admin.git
-  revision: ef109899438aeacbd8bcb3f0c82f7e24e99588b1
+  revision: 7b8eebdf046346c37b2e12c04fd7ea1cf05a1a12
   specs:
-    activate-admin (0.0.11)
+    activate-admin (0.0.12)
       activate-tools
       padrino
       will_paginate
@@ -288,7 +288,7 @@ GEM
       net-protocol
     netrc (0.11.0)
     nio4r (2.5.8)
-    nokogiri (1.14.1)
+    nokogiri (1.14.2)
       mini_portile2 (~> 2.8.0)
       racc (~> 1.4)
     omniauth (2.1.1)
@@ -358,7 +358,7 @@ GEM
     qonfig (0.28.0)
     racc (1.6.2)
     rack (2.2.6.2)
-    rack-cors (1.1.1)
+    rack-cors (2.0.0)
       rack (>= 2.0.0)
     rack-protection (3.0.5)
       rack
@@ -505,7 +505,7 @@ DEPENDENCIES
   minitest-rg
   money
   money-uphold-bank
-  mongoid
+  mongoid (~> 7.0)
   mongoid_paranoia
   omniauth
   omniauth-ethereum!
