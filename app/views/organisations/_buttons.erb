@@ -38,7 +38,7 @@
       <div class="card-body p-3">
         <big class="d-block mb-1">
           <i class="fa fa-credit-card"></i>
-          Connected to <%= "#{organisationship.stripe_account_name}'s Stripe account" || 'Stripe' %>
+          Connected to <%= organisationship.stripe_account_name ? "#{organisationship.stripe_account_name}'s Stripe account" : 'Stripe' %>
         </big>
         <a class="btn btn-danger btn-sm" href="/organisationships/<%= organisationship.id %>/disconnect">Disconnect</a>
       </div>
