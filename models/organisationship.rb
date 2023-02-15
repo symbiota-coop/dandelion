@@ -258,7 +258,7 @@ class Organisationship
   def stripe_account_name
     if stripe_account_json
       j = JSON.parse(stripe_account_json)
-      j['display_name']
+      j['business_profile']['name']
     end
   end
 
