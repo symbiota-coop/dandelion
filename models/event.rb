@@ -543,7 +543,7 @@ class Event
   end
 
   def send_destroy_notification(destroyed_by)
-    mg_client = Mailgun::Client.new ENV.fetch('MAILGUN_API_KEY', nil), 'api.eu.mailgun.net'
+    mg_client = Mailgun::Client.new ENV['MAILGUN_API_KEY'], 'api.eu.mailgun.net'
     batch_message = Mailgun::BatchMessage.new(mg_client, 'notifications.dandelion.earth')
 
     event = self
@@ -562,7 +562,7 @@ class Event
   def send_reminders(account_id: nil)
     return unless organisation
 
-    mg_client = Mailgun::Client.new ENV.fetch('MAILGUN_API_KEY', nil), 'api.eu.mailgun.net'
+    mg_client = Mailgun::Client.new ENV['MAILGUN_API_KEY'], 'api.eu.mailgun.net'
     batch_message = Mailgun::BatchMessage.new(mg_client, 'notifications.dandelion.earth')
 
     event = self
@@ -583,7 +583,7 @@ class Event
   def send_star_reminders(account_id: nil)
     return unless organisation
 
-    mg_client = Mailgun::Client.new ENV.fetch('MAILGUN_API_KEY', nil), 'api.eu.mailgun.net'
+    mg_client = Mailgun::Client.new ENV['MAILGUN_API_KEY'], 'api.eu.mailgun.net'
     batch_message = Mailgun::BatchMessage.new(mg_client, 'notifications.dandelion.earth')
 
     event = self
@@ -605,7 +605,7 @@ class Event
     return if feedback_questions.nil?
     return unless organisation
 
-    mg_client = Mailgun::Client.new ENV.fetch('MAILGUN_API_KEY', nil), 'api.eu.mailgun.net'
+    mg_client = Mailgun::Client.new ENV['MAILGUN_API_KEY'], 'api.eu.mailgun.net'
     batch_message = Mailgun::BatchMessage.new(mg_client, 'notifications.dandelion.earth')
 
     event = self
@@ -733,7 +733,7 @@ class Event
   def when_details(zone)
     return unless start_time && end_time
 
-    zone ||= (time_zone || ENV.fetch('DEFAULT_TIME_ZONE', nil))
+    zone ||= (time_zone || ENV['DEFAULT_TIME_ZONE'])
     zone = zone.name unless zone.is_a?(String)
     start_time = self.start_time.in_time_zone(zone)
     end_time = self.end_time.in_time_zone(zone)
@@ -748,7 +748,7 @@ class Event
   def concise_when_details(zone)
     return unless start_time && end_time
 
-    zone ||= (time_zone || ENV.fetch('DEFAULT_TIME_ZONE', nil))
+    zone ||= (time_zone || ENV['DEFAULT_TIME_ZONE'])
     zone = zone.name unless zone.is_a?(String)
     start_time = self.start_time.in_time_zone(zone)
     end_time = self.end_time.in_time_zone(zone)
@@ -875,7 +875,7 @@ class Event
     orders.each { |order| r += order.discounted_ticket_revenue }
     r
   rescue Money::Bank::UnknownRate
-    Money.new(0, ENV.fetch('DEFAULT_CURRENCY', nil))
+    Money.new(0, ENV['DEFAULT_CURRENCY'])
   end
 
   def donation_revenue
@@ -883,7 +883,7 @@ class Event
     orders.each { |order| r += order.donation_revenue }
     r
   rescue Money::Bank::UnknownRate
-    Money.new(0, ENV.fetch('DEFAULT_CURRENCY', nil))
+    Money.new(0, ENV['DEFAULT_CURRENCY'])
   end
 
   def organisation_discounted_ticket_revenue
@@ -891,7 +891,7 @@ class Event
     orders.each { |order| r += order.organisation_discounted_ticket_revenue }
     r
   rescue Money::Bank::UnknownRate
-    Money.new(0, ENV.fetch('DEFAULT_CURRENCY', nil))
+    Money.new(0, ENV['DEFAULT_CURRENCY'])
   end
 
   def credit_payable_to_revenue_sharer
@@ -899,6 +899,6 @@ class Event
     orders.each { |order| r += Money.new((order.credit_payable_to_revenue_sharer || 0) * 100, order.currency) }
     r
   rescue Money::Bank::UnknownRate
-    Money.new(0, ENV.fetch('DEFAULT_CURRENCY', nil))
+    Money.new(0, ENV['DEFAULT_CURRENCY'])
   end
 end
