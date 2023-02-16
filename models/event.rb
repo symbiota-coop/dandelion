@@ -138,14 +138,15 @@ class Event
 
   def organisationship_for_discount(account)
     organisationship = nil
-    organisation_and_cohosts.order('created_at desc').each do |organisation|
-      o = organisation.organisationships.find_by(account: account)
-      if (o.monthly_donor? && o.monthly_donor_discount > 0)
-        organisationship = o if !organisationship || o.monthly_donor_discount > organisationship.monthly_donor_discount
+    if account
+      organisation_and_cohosts.order('created_at desc').each do |organisation|
+        next unless o = organisation.organisationships.find_by(account: account)
+
+        organisationship = o if o.monthly_donor? && o.monthly_donor_discount > 0 && (!organisationship || o.monthly_donor_discount > organisationship.monthly_donor_discount)
       end
     end
-    organisationship    
-  end  
+    organisationship
+  end
 
   has_many :pmails_as_mailable, class_name: 'Pmail', as: :mailable, dependent: :destroy
   has_many :pmails_as_exclusion, class_name: 'Pmail', inverse_of: :event, dependent: :nullify
@@ -542,7 +543,7 @@ class Event
   end
 
   def send_destroy_notification(destroyed_by)
-    mg_client = Mailgun::Client.new ENV['MAILGUN_API_KEY'], 'api.eu.mailgun.net'
+    mg_client = Mailgun::Client.new ENV.fetch('MAILGUN_API_KEY', nil), 'api.eu.mailgun.net'
     batch_message = Mailgun::BatchMessage.new(mg_client, 'notifications.dandelion.earth')
 
     event = self
@@ -561,7 +562,7 @@ class Event
   def send_reminders(account_id: nil)
     return unless organisation
 
-    mg_client = Mailgun::Client.new ENV['MAILGUN_API_KEY'], 'api.eu.mailgun.net'
+    mg_client = Mailgun::Client.new ENV.fetch('MAILGUN_API_KEY', nil), 'api.eu.mailgun.net'
     batch_message = Mailgun::BatchMessage.new(mg_client, 'notifications.dandelion.earth')
 
     event = self
@@ -582,7 +583,7 @@ class Event
   def send_star_reminders(account_id: nil)
     return unless organisation
 
-    mg_client = Mailgun::Client.new ENV['MAILGUN_API_KEY'], 'api.eu.mailgun.net'
+    mg_client = Mailgun::Client.new ENV.fetch('MAILGUN_API_KEY', nil), 'api.eu.mailgun.net'
     batch_message = Mailgun::BatchMessage.new(mg_client, 'notifications.dandelion.earth')
 
     event = self
@@ -604,7 +605,7 @@ class Event
     return if feedback_questions.nil?
     return unless organisation
 
-    mg_client = Mailgun::Client.new ENV['MAILGUN_API_KEY'], 'api.eu.mailgun.net'
+    mg_client = Mailgun::Client.new ENV.fetch('MAILGUN_API_KEY', nil), 'api.eu.mailgun.net'
     batch_message = Mailgun::BatchMessage.new(mg_client, 'notifications.dandelion.earth')
 
     event = self
@@ -630,7 +631,7 @@ class Event
   validates_presence_of :name, :start_time, :end_time, :location
   validates_uniqueness_of :ps_event_id, allow_nil: true
   validates_uniqueness_of :slug, allow_nil: true
-  validates_format_of :slug, with: /\A[a-z0-9\-]+\z/, if: :slug
+  validates_format_of :slug, with: /\A[a-z0-9-]+\z/, if: :slug
 
   def future?(from = Date.today)
     start_time >= from
@@ -730,31 +731,31 @@ class Event
   end
 
   def when_details(zone)
-    if start_time && end_time
-      zone ||= (time_zone || ENV['DEFAULT_TIME_ZONE'])
-      zone = zone.name unless zone.is_a?(String)
-      start_time = self.start_time.in_time_zone(zone)
-      end_time = self.end_time.in_time_zone(zone)
-      z = "#{zone.include?('London') ? 'UK time' : zone.gsub('_', ' ')} (UTC #{start_time.formatted_offset})"
-      if start_time.to_date == end_time.to_date
-        "#{start_time.to_date}, #{start_time.to_fs(:no_double_zeros)} – #{end_time.to_fs(:no_double_zeros)} #{z}"
-      else
-        "#{start_time.to_date}, #{start_time.to_fs(:no_double_zeros)} – #{end_time.to_date}, #{end_time.to_fs(:no_double_zeros)} #{z}"
-      end
+    return unless start_time && end_time
+
+    zone ||= (time_zone || ENV.fetch('DEFAULT_TIME_ZONE', nil))
+    zone = zone.name unless zone.is_a?(String)
+    start_time = self.start_time.in_time_zone(zone)
+    end_time = self.end_time.in_time_zone(zone)
+    z = "#{zone.include?('London') ? 'UK time' : zone.gsub('_', ' ')} (UTC #{start_time.formatted_offset})"
+    if start_time.to_date == end_time.to_date
+      "#{start_time.to_date}, #{start_time.to_fs(:no_double_zeros)} – #{end_time.to_fs(:no_double_zeros)} #{z}"
+    else
+      "#{start_time.to_date}, #{start_time.to_fs(:no_double_zeros)} – #{end_time.to_date}, #{end_time.to_fs(:no_double_zeros)} #{z}"
     end
   end
 
   def concise_when_details(zone)
-    if start_time && end_time
-      zone ||= (time_zone || ENV['DEFAULT_TIME_ZONE'])
-      zone = zone.name unless zone.is_a?(String)
-      start_time = self.start_time.in_time_zone(zone)
-      end_time = self.end_time.in_time_zone(zone)
-      if start_time.to_date == end_time.to_date
-        start_time.to_date
-      else
-        "#{start_time.to_date} – #{end_time.to_date}"
-      end
+    return unless start_time && end_time
+
+    zone ||= (time_zone || ENV.fetch('DEFAULT_TIME_ZONE', nil))
+    zone = zone.name unless zone.is_a?(String)
+    start_time = self.start_time.in_time_zone(zone)
+    end_time = self.end_time.in_time_zone(zone)
+    if start_time.to_date == end_time.to_date
+      start_time.to_date
+    else
+      "#{start_time.to_date} – #{end_time.to_date}"
     end
   end
 
@@ -874,7 +875,7 @@ class Event
     orders.each { |order| r += order.discounted_ticket_revenue }
     r
   rescue Money::Bank::UnknownRate
-    Money.new(0, ENV['DEFAULT_CURRENCY'])
+    Money.new(0, ENV.fetch('DEFAULT_CURRENCY', nil))
   end
 
   def donation_revenue
@@ -882,7 +883,7 @@ class Event
     orders.each { |order| r += order.donation_revenue }
     r
   rescue Money::Bank::UnknownRate
-    Money.new(0, ENV['DEFAULT_CURRENCY'])
+    Money.new(0, ENV.fetch('DEFAULT_CURRENCY', nil))
   end
 
   def organisation_discounted_ticket_revenue
@@ -890,7 +891,7 @@ class Event
     orders.each { |order| r += order.organisation_discounted_ticket_revenue }
     r
   rescue Money::Bank::UnknownRate
-    Money.new(0, ENV['DEFAULT_CURRENCY'])
+    Money.new(0, ENV.fetch('DEFAULT_CURRENCY', nil))
   end
 
   def credit_payable_to_revenue_sharer
@@ -898,6 +899,6 @@ class Event
     orders.each { |order| r += Money.new((order.credit_payable_to_revenue_sharer || 0) * 100, order.currency) }
     r
   rescue Money::Bank::UnknownRate
-    Money.new(0, ENV['DEFAULT_CURRENCY'])
+    Money.new(0, ENV.fetch('DEFAULT_CURRENCY', nil))
   end
 end
