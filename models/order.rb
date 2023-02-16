@@ -175,8 +175,8 @@ class Order
     end
     self.discount_code = nil if discount_code && !discount_code.applies_to?(event)
     self.percentage_discount = discount_code.percentage_discount if discount_code
-    if !event.no_discounts && (account && event && event.organisation && (organisationship = event.organisation.organisationships.find_by(account: account)) && (organisationship.monthly_donor? && organisationship.monthly_donor_discount > 0))
-      self.percentage_discount_monthly_donor = organisationship.monthly_donor_discount
+    if !event.no_discounts && (organisationship_for_discount = event.organisationship_for_discount(account))
+      self.percentage_discount_monthly_donor = organisationship_for_discount.monthly_donor_discount
     end
     if cohost && !affiliate_type && !affiliate_id
       self.affiliate_type = 'Organisation'

@@ -152,14 +152,14 @@
       </tr>
     <% end %>
     <% unless @event.no_discounts %>
-      <% if current_account && (organisationship = @event.organisation.organisationships.find_by(account: current_account)) && organisationship.monthly_donor? && organisationship.monthly_donor_discount > 0 %>
+      <% if current_account && (organisationship_for_discount = @event.organisationship_for_discount(current_account)) %>
         <tr>
           <td></td>
           <td></td>
           <td>
-            <strong><%= organisationship.organisation_tier.name %> discount</strong>
+            <strong><%= organisationship_for_discount.organisation_tier.name %> discount</strong>
             <div class="input-group" style="margin: 5px 0">
-              <%= number_field_tag :discount, id: 'discount', class: 'form-control', style: 'width: 5em', disabled: true, value: organisationship.monthly_donor_discount %>
+              <%= number_field_tag :discount, id: 'discount', class: 'form-control', style: 'width: 5em', disabled: true, value: organisationship_for_discount.monthly_donor_discount %>
               <div class="input-group-append">
                 <span class="py-0 input-group-text">%</span>
               </div>

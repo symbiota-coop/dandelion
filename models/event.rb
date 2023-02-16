@@ -136,6 +136,17 @@ class Event
     Organisation.and(:id.in => [organisation.id] + cohostships.pluck(:organisation_id))
   end
 
+  def organisationship_for_discount(account)
+    organisationship = nil
+    organisation_and_cohosts.order('created_at desc').each do |organisation|
+      o = organisation.organisationships.find_by(account: account)
+      if (o.monthly_donor? && o.monthly_donor_discount > 0)
+        organisationship = o if !organisationship || o.monthly_donor_discount > organisationship.monthly_donor_discount
+      end
+    end
+    organisationship    
+  end  
+
   has_many :pmails_as_mailable, class_name: 'Pmail', as: :mailable, dependent: :destroy
   has_many :pmails_as_exclusion, class_name: 'Pmail', inverse_of: :event, dependent: :nullify
 
