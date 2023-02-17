@@ -256,9 +256,13 @@ class Organisationship
   end
 
   def stripe_account_name
-    if stripe_account_json
-      j = JSON.parse(stripe_account_json)
+    return unless stripe_account_json
+
+    j = JSON.parse(stripe_account_json)
+    if j['business_profile'] && j['business_profile']['name']
       j['business_profile']['name']
+    else
+      j['display_name']
     end
   end
 
