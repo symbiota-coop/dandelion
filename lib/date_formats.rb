@@ -18,7 +18,7 @@ Date::DATE_FORMATS.merge!(
 module ActiveSupport
   class TimeWithZone
     def to_s(format = :default)
-      if formatter = Time::DATE_FORMATS[format]
+      if (formatter = Time::DATE_FORMATS[format])
         if formatter.respond_to?(:call)
           formatter.call(self).to_s
         else
@@ -33,7 +33,7 @@ end
 
 class Time
   def to_s(format = :default)
-    if formatter = Time::DATE_FORMATS[format]
+    if (formatter = Time::DATE_FORMATS[format])
       if formatter.respond_to?(:call)
         formatter.call(self).to_s
       else
@@ -47,7 +47,7 @@ end
 
 class Date
   def to_s(format = :default)
-    if formatter = Date::DATE_FORMATS[format]
+    if (formatter = Date::DATE_FORMATS[format])
       if formatter.respond_to?(:call)
         formatter.call(self).to_s
       else
@@ -58,4 +58,3 @@ class Date
     end
   end
 end
-

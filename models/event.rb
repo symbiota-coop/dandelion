@@ -140,7 +140,7 @@ class Event
     organisationship = nil
     if account
       organisation_and_cohosts.order('created_at desc').each do |organisation|
-        next unless o = organisation.organisationships.find_by(account: account)
+        next unless (o = organisation.organisationships.find_by(account: account))
 
         organisationship = o if o.monthly_donor? && o.monthly_donor_discount > 0 && (!organisationship || o.monthly_donor_discount > organisationship.monthly_donor_discount)
       end
