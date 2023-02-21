@@ -136,7 +136,7 @@ class Event
   end
 
   def organisation_and_cohosts
-    Organisation.and(:id.in => [organisation.id] + cohostships.pluck(:organisation_id))
+    Organisation.and(:id.in => ([organisation.try(:id)] + cohostships.pluck(:organisation_id)).compact)
   end
 
   def organisationship_for_discount(account)
@@ -278,7 +278,7 @@ Hosted by: #{organisation_and_cohosts.map(&:name).join(', ')}
 #{"Local Group: #{local_group.name}" if local_group}
 
 #{Sanitize.fragment(description).strip}"
-  end    
+  end
 
   def set_embedding!
     openai_response = OPENAI.post('embeddings') do |req|
@@ -286,6 +286,7 @@ Hosted by: #{organisation_and_cohosts.map(&:name).join(', ')}
     end
     set(embedding: JSON.parse(openai_response.body)['data'].first['embedding'])
   end
+  handle_asynchronously :set_embedding!
 
   after_save do
     event_facilitations.create account: revenue_sharer if revenue_sharer
