@@ -667,9 +667,9 @@ class Organisation
   def check_evm_account
     agent = Mechanize.new
     [
-      JSON.parse(agent.get("https://blockscout.com/poa/xdai/address/#{evm_address}/token-transfers?type=JSON").body),
-      JSON.parse(agent.get("https://explorer.celo.org/address/#{evm_address}/token-transfers?type=JSON").body)
-    ].each do |j|
+      begin; JSON.parse(agent.get("https://blockscout.com/poa/xdai/address/#{evm_address}/token-transfers?type=JSON").body); rescue Mechanize::ResponseCodeError; end,
+      begin; JSON.parse(agent.get("https://explorer.celo.org/address/#{evm_address}/token-transfers?type=JSON").body); rescue Mechanize::ResponseCodeError; end
+    ].compact.each do |j|
       items = j['items']
       items.each do |item|
         puts h = Nokogiri::HTML(item)
