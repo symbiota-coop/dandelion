@@ -227,7 +227,7 @@ class Organisation
 
   validates_presence_of :name, :slug, :currency
   validates_uniqueness_of :slug
-  validates_format_of :slug, with: /\A[a-z0-9\-]+\z/
+  validates_format_of :slug, with: /\A[a-z0-9-]+\z/
 
   has_many :events, dependent: :nullify
   def cohosted_events
@@ -376,15 +376,15 @@ class Organisation
       end
     end
 
-    unless webhooks.find { |w| w['url'] == "#{ENV['BASE_URI']}/o/#{slug}/stripe_webhook" && w['enabled_events'].include?('checkout.session.completed') }
-      w = Stripe::WebhookEndpoint.create({
-                                           url: "#{ENV['BASE_URI']}/o/#{slug}/stripe_webhook",
-                                           enabled_events: [
-                                             'checkout.session.completed'
-                                           ]
-                                         })
-      update_attribute(:stripe_endpoint_secret, w['secret'])
-    end
+    return if webhooks.find { |w| w['url'] == "#{ENV['BASE_URI']}/o/#{slug}/stripe_webhook" && w['enabled_events'].include?('checkout.session.completed') }
+
+    w = Stripe::WebhookEndpoint.create({
+                                         url: "#{ENV['BASE_URI']}/o/#{slug}/stripe_webhook",
+                                         enabled_events: [
+                                           'checkout.session.completed'
+                                         ]
+                                       })
+    update_attribute(:stripe_endpoint_secret, w['secret'])
   end
 
   def import_from_csv(csv)
@@ -611,12 +611,10 @@ class Organisation
       page_response = api_client.fetch_page_of_pledges(campaign_id, { count: 25, cursor: cursor })
       all_pledges += page_response.data
       next_page_link = page_response.links[page_response.data]['next']
-      if next_page_link
-        parsed_query = CGI.parse(next_page_link)
-        cursor = parsed_query['page[cursor]'][0]
-      else
-        break
-      end
+      break unless next_page_link
+
+      parsed_query = CGI.parse(next_page_link)
+      cursor = parsed_query['page[cursor]'][0]
     end
 
     all_pledges.each do |pledge|
