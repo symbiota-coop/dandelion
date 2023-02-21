@@ -45,7 +45,6 @@ class Event
   field :select_tickets_intro, type: String
   field :select_tickets_outro, type: String
   field :select_tickets_title, type: String
-  field :embedding_input, type: String
   field :embedding, type: Array
 
   def self.admin_fields
@@ -94,8 +93,7 @@ class Event
       account_id: :lookup,
       organisation_id: :lookup,
       activity_id: :lookup,
-      ticket_types: :collection,
-      embedding_input: :text_area
+      ticket_types: :collection
     }
   end
 
@@ -255,7 +253,6 @@ class Event
         end
       end
     end
-    set_embedding_input
   end
 
   after_create do
@@ -267,8 +264,8 @@ class Event
     organisation.try(:update_paid_up)
   end
 
-  def set_embedding_input
-    self.embedding_input = "#{name}
+  def set_embedding!
+    input = "#{name}
 When: #{when_details(time_zone)}
 Location: #{location}
 Hosted by: #{organisation_and_cohosts.map(&:name).join(', ')}
@@ -278,11 +275,9 @@ Hosted by: #{organisation_and_cohosts.map(&:name).join(', ')}
 #{"Local Group: #{local_group.name}" if local_group}
 
 #{Sanitize.fragment(description).strip}"
-  end
 
-  def set_embedding!
     openai_response = OPENAI.post('embeddings') do |req|
-      req.body = { model: 'text-embedding-ada-002', input: embedding_input }.to_json
+      req.body = { model: 'text-embedding-ada-002', input: input }.to_json
     end
     set(embedding: JSON.parse(openai_response.body)['data'].first['embedding'])
   end
