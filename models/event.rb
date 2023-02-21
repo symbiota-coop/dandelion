@@ -264,8 +264,8 @@ class Event
     organisation.try(:update_paid_up)
   end
 
-  def set_embedding!
-    input = "#{name}
+  def embedding_input
+    "#{name}
 When: #{when_details(time_zone)}
 Location: #{location}
 Hosted by: #{organisation_and_cohosts.map(&:name).join(', ')}
@@ -275,11 +275,26 @@ Hosted by: #{organisation_and_cohosts.map(&:name).join(', ')}
 #{"Local Group: #{local_group.name}" if local_group}
 
 #{Sanitize.fragment(description).strip}"
+  end
 
-    openai_response = OPENAI.post('embeddings') do |req|
-      req.body = { model: 'text-embedding-ada-002', input: input }.to_json
+  def set_embedding!
+    replicate_response = REPLICATE.post('predictions') do |req|
+      req.body = {
+        input: { input: embedding_input },
+        version: '9457e510eb8c4c03669d13e5c09cfd9716f3c7b249e8896e5bc86f707cd9aa94'
+      }.to_json
     end
-    set(embedding: JSON.parse(openai_response.body)['data'].first['embedding'])
+    r = JSON.parse(replicate_response.body)
+    until r['completed_at']
+      replicate_response = REPLICATE.get(r['urls']['get'])
+      r = JSON.parse(replicate_response.body)
+    end
+    set(embedding: r['output'])
+
+    # openai_response = OPENAI.post('embeddings') do |req|
+    #   req.body = { model: 'text-embedding-ada-002', input: embedding_input }.to_json
+    # end
+    # set(embedding: JSON.parse(openai_response.body)['data'].first['embedding'])
   end
   handle_asynchronously :set_embedding!
 

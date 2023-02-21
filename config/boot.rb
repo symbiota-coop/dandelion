@@ -35,6 +35,11 @@ OPENAI = Faraday.new(
   headers: { 'Content-Type': 'application/json', Authorization: "Bearer #{ENV['OPENAI_API_KEY']}" }
 )
 
+REPLICATE = Faraday.new(
+  url: 'https://api.replicate.com/v1',
+  headers: { 'Content-Type': 'application/json', Authorization: "Token #{ENV['REPLICATE_API_KEY']}" }
+)
+
 if ENV['GOOGLE_MAPS_API_KEY']
   Geocoder.configure(
     lookup: :google,
