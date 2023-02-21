@@ -158,7 +158,7 @@ class Event
   def all_discount_codes
     DiscountCode.and(:id.in =>
       discount_codes.pluck(:id) +
-      organisation.discount_codes.pluck(:id) +
+      (organisation ? organisation.discount_codes.pluck(:id) : []) +
       (activity ? activity.discount_codes.pluck(:id) : []) +
       (local_group ? local_group.discount_codes.pluck(:id) : []))
   end
@@ -217,7 +217,7 @@ class Event
       errors.add(:local_group, '- you are not an admin of this local group') if local_group && !LocalGroup.admin?(local_group, account)
     end
 
-    unless organisation.payment_method?
+    if organisation && !organisation.payment_method?
       errors.add(:organisation, 'does not have any payment methods set up, so you can currently only issue free tickets') if ticket_types.any? { |ticket_type| ticket_type.price && ticket_type.price > 0 }
       self.suggested_donation = nil
       self.minimum_donation = nil
@@ -260,11 +260,11 @@ class Event
 
   after_create do
     activity.update_attribute(:hidden, false) if activity
-    organisation.update_paid_up
+    organisation.try(:update_paid_up)
   end
 
   after_destroy do
-    organisation.update_paid_up
+    organisation.try(:update_paid_up)
   end
 
   def set_embedding_input
@@ -331,7 +331,7 @@ Hosted by: #{organisation_and_cohosts.map(&:name).join(', ')}
       end
     end
 
-    if zoom_party
+    if organisation && zoom_party
       organisation.local_groups.and(type: 'euro').each do |local_group|
         zoomships.create local_group: local_group
       end
@@ -345,7 +345,7 @@ Hosted by: #{organisation_and_cohosts.map(&:name).join(', ')}
 
   def carousel_coordinator
     account = nil
-    if organisation.carousels
+    if organisation && organisation.carousels
       organisation.carousels.split("\n").reject { |line| line.blank? }.each do |line|
         _title, tags = line.split(':')
         tags, coordinator = tags.split('@')
@@ -380,7 +380,7 @@ Hosted by: #{organisation_and_cohosts.map(&:name).join(', ')}
   def accounts_receiving_feedback
     a = [account, revenue_sharer, coordinator].compact
     a += event_facilitators
-    a += organisation.admins_receiving_feedback
+    a += organisation.admins_receiving_feedback if organisation
     a += activity.admins_receiving_feedback if activity
     a += local_group.admins_receiving_feedback if local_group
     a
@@ -595,7 +595,7 @@ Hosted by: #{organisation_and_cohosts.map(&:name).join(', ')}
     event = self
     content = ERB.new(File.read(Padrino.root('app/views/emails/reminder.erb'))).result(binding)
     batch_message.from 'Dandelion <reminders@dandelion.earth>'
-    batch_message.reply_to(event.email || event.organisation.reply_to)
+    batch_message.reply_to(event.email || event.organisation.try(:reply_to))
     batch_message.subject "#{event.name} is tomorrow"
     batch_message.body_html Premailer.new(ERB.new(File.read(Padrino.root('app/views/layouts/email.erb'))).result(binding), with_html_string: true, adapter: 'nokogiri', input_encoding: 'UTF-8').to_inline_css
 
@@ -616,7 +616,7 @@ Hosted by: #{organisation_and_cohosts.map(&:name).join(', ')}
     event = self
     content = ERB.new(File.read(Padrino.root('app/views/emails/reminder_starred.erb'))).result(binding)
     batch_message.from 'Dandelion <reminders@dandelion.earth>'
-    batch_message.reply_to(event.email || event.organisation.reply_to)
+    batch_message.reply_to(event.email || event.organisation.try(:reply_to))
     batch_message.subject "#{event.name} is next week"
     batch_message.body_html Premailer.new(ERB.new(File.read(Padrino.root('app/views/layouts/email.erb'))).result(binding), with_html_string: true, adapter: 'nokogiri', input_encoding: 'UTF-8').to_inline_css
 
@@ -638,7 +638,7 @@ Hosted by: #{organisation_and_cohosts.map(&:name).join(', ')}
     event = self
     content = ERB.new(File.read(Padrino.root('app/views/emails/feedback.erb'))).result(binding)
     batch_message.from 'Dandelion <feedback@dandelion.earth>'
-    batch_message.reply_to(event.email || event.organisation.reply_to)
+    batch_message.reply_to(event.email || event.organisation.try(:reply_to))
     batch_message.subject "Feedback on #{event.name}"
     batch_message.body_html Premailer.new(ERB.new(File.read(Padrino.root('app/views/layouts/email.erb'))).result(binding), with_html_string: true, adapter: 'nokogiri', input_encoding: 'UTF-8').to_inline_css
 
