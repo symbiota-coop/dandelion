@@ -302,7 +302,7 @@ Hosted by: #{organisation_and_cohosts.map(&:name).join(', ')}
     event_facilitations.create account: revenue_sharer if revenue_sharer
     event_facilitations.create account: account if quick_create
 
-    set_embedding!
+    # set_embedding!
 
     if changes['name'] && (post = posts.find_by(subject: "Chat for #{changes['name'][0]}"))
       post.update_attribute(:subject, "Chat for #{name}")
