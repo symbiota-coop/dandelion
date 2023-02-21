@@ -10,7 +10,7 @@ class Event
   belongs_to :local_group, optional: true, index: true
   belongs_to :coordinator, class_name: 'Account', inverse_of: :events_coordinating, index: true, optional: true
   belongs_to :revenue_sharer, class_name: 'Account', inverse_of: :events_revenue_sharing, index: true, optional: true
-  belongs_to :last_saved_by, class_name: 'Account', inverse_of: :events_last_saver, index: true
+  belongs_to :last_saved_by, class_name: 'Account', inverse_of: :events_last_saver, index: true, optional: true
   belongs_to :gathering, optional: true, index: true
 
   field :name, type: String
