@@ -10,7 +10,7 @@ require 'active_support/time'
 require 'money/bank/uphold'
 Bundler.require(:default, RACK_ENV)
 
-#  Dir['app/views/**/*.erb'].each { |p| puts p; `htmlbeautifier #{p} -b 2` } 
+#  Dir['app/views/**/*.erb'].each { |p| puts p; `htmlbeautifier #{p} -b 2` }
 
 Padrino.load!
 
@@ -24,11 +24,16 @@ Delayed::Worker.max_attempts = 1
 
 Money.default_bank = Money::Bank::Uphold.new
 Money.locale_backend = :currency
-Money.rounding_mode = BigDecimal::ROUND_HALF_EVEN 
+Money.rounding_mode = BigDecimal::ROUND_HALF_EVEN
 
 Time.zone = ENV['DEFAULT_TIME_ZONE']
 
 PUSHER = Pusher::Client.new(app_id: ENV['PUSHER_APP_ID'], key: ENV['PUSHER_KEY'], secret: ENV['PUSHER_SECRET'], cluster: ENV['PUSHER_CLUSTER'], encrypted: true) if ENV['PUSHER_APP_ID']
+
+OPENAI = Faraday.new(
+  url: 'https://api.openai.com/v1',
+  headers: { 'Content-Type': 'application/json', Authorization: "Bearer #{ENV['OPENAI_API_KEY']}" }
+)
 
 if ENV['GOOGLE_MAPS_API_KEY']
   Geocoder.configure(
