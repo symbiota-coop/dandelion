@@ -52,8 +52,8 @@ Dandelion::App.controller do
       aggregate = Account.collection.aggregate(pipeline)
       results += aggregate.first(5).map do |account_hash|
         account = Account.new(account_hash.select { |k, _v| Account.fields.keys.include?(k.to_s) })
-        { label: %(<i class="fa fa-fw fa-user"></i> #{account.name}), value: %(account:"#{account.name}") } }
-      end      
+        { label: %(<i class="fa fa-fw fa-user"></i> #{account.name}), value: %(account:"#{account.name}") }
+      end
 
       # @organisations = Organisation.and(name: /#{::Regexp.escape(@q)}/i)
       # @gatherings = Gathering.and(name: /#{::Regexp.escape(@q)}/i).and(listed: true).and(:privacy.ne => 'secret')
