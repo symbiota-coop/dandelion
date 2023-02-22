@@ -7,7 +7,6 @@ Dandelion::App.controller do
       results = []
 
       match_selector = Event.live.public.legit.future(1.month.ago).selector
-      # match_selector['start_time']['$gte'] = {'$date' => match_selector['start_time']['$gte']}
       pipeline = [{
         '$search': {
           index: 'events',
@@ -26,14 +25,6 @@ Dandelion::App.controller do
         event = Event.new(event_hash.select { |k, _v| Event.fields.keys.include?(k.to_s) })
         { label: %(<i class="fa fa-fw fa-calendar"></i> #{event.name} (#{concise_when_details(event)})), value: %(event:"#{event.name}") }
       end
-
-      # @accounts = Account.public
-      # @accounts = @accounts.and(:id.in => Account.all.or(
-      #   { name: /#{::Regexp.escape(@q)}/i },
-      #   { name_transliterated: /#{::Regexp.escape(@q)}/i },
-      #   { email: /#{::Regexp.escape(@q)}/i },
-      #   { username: /#{::Regexp.escape(@q)}/i }
-      # ).pluck(:id))
 
       match_selector = Account.public.selector
       pipeline = [{
@@ -55,13 +46,65 @@ Dandelion::App.controller do
         { label: %(<i class="fa fa-fw fa-user"></i> #{account.name}), value: %(account:"#{account.name}") }
       end
 
-      # @organisations = Organisation.and(name: /#{::Regexp.escape(@q)}/i)
-      # @gatherings = Gathering.and(name: /#{::Regexp.escape(@q)}/i).and(listed: true).and(:privacy.ne => 'secret')
-      # @places = Place.and(name: /#{::Regexp.escape(@q)}/i)
+      match_selector = Organisation.all.selector
+      pipeline = [{
+        '$search': {
+          index: 'organisations',
+          text: {
+            query: @q,
+            path: {
+              wildcard: '*'
+            }
+          }
+        }
+      }, {
+        '$match': match_selector
+      }]
+      aggregate = Organisation.collection.aggregate(pipeline)
+      results += aggregate.first(5).map do |organisation_hash|
+        organisation = Organisation.new(organisation_hash.select { |k, _v| Organisation.fields.keys.include?(k.to_s) })
+        { label: %(<i class="fa fa-fw fa-flag"></i> #{organisation.name}), value: %(organisation:"#{organisation.name}") }
+      end
 
-      # results += @organisations.limit(5).map { |organisation| { label: %(<i class="fa fa-fw fa-flag"></i> #{organisation.name}), value: %(organisation:"#{organisation.name}") } }
-      # results += @gatherings.limit(5).map { |gathering| { label: %(<i class="fa fa-fw fa-moon"></i> #{gathering.name}), value: %(gathering:"#{gathering.name}") } }
-      # results += @places.limit(5).map { |place| { label: %(<i class="fa fa-fw fa-map"></i> #{place.name}), value: %(place:"#{place.name}") } }
+      match_selector = Gathering.and(listed: true).and(:privacy.ne => 'secret').selector
+      pipeline = [{
+        '$search': {
+          index: 'gatherings',
+          text: {
+            query: @q,
+            path: {
+              wildcard: '*'
+            }
+          }
+        }
+      }, {
+        '$match': match_selector
+      }]
+      aggregate = Gathering.collection.aggregate(pipeline)
+      results += aggregate.first(5).map do |gathering_hash|
+        gathering = Gathering.new(gathering_hash.select { |k, _v| Gathering.fields.keys.include?(k.to_s) })
+        { label: %(<i class="fa fa-fw fa-moon"></i> #{gathering.name}), value: %(gathering:"#{gathering.name}") }
+      end
+
+      match_selector = Place.all.selector
+      pipeline = [{
+        '$search': {
+          index: 'places',
+          text: {
+            query: @q,
+            path: {
+              wildcard: '*'
+            }
+          }
+        }
+      }, {
+        '$match': match_selector
+      }]
+      aggregate = Place.collection.aggregate(pipeline)
+      results += aggregate.first(5).map do |place_hash|
+        place = Place.new(place_hash.select { |k, _v| Place.fields.keys.include?(k.to_s) })
+        { label: %(<i class="fa fa-fw fa-map"></i> #{place.name}), value: %(place:"#{place.name}") }
+      end
 
       results.to_json
     else
