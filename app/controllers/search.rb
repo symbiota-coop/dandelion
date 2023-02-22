@@ -6,6 +6,8 @@ Dandelion::App.controller do
 
       results = []
 
+      match_selector = Event.live.public.legit.future(1.month.ago).selector
+      # match_selector['start_time']['$gte'] = {'$date' => match_selector['start_time']['$gte']}
       pipeline = [{
         '$search': {
           index: 'events',
@@ -16,8 +18,15 @@ Dandelion::App.controller do
             }
           }
         }
-      }]
-      @events = Event.live.public.legit.future(1.month.ago).and(:id.in => Event.collection.aggregate(pipeline).pluck(:_id).map(&:to_s))
+      },
+                  {
+                    '$match': match_selector
+                  }]
+      aggregate = Event.collection.aggregate(pipeline)
+      results += aggregate.first(5).map do |event_hash|
+        event = Event.new(event_hash.select { |k, _v| Event.fields.keys.include?(k.to_s) })
+        { label: %(<i class="fa fa-fw fa-calendar"></i> #{event.name} (#{concise_when_details(event)})), value: %(event:"#{event.name}") }
+      end
 
       # @accounts = Account.public
       # @accounts = @accounts.and(:id.in => Account.all.or(
@@ -31,7 +40,6 @@ Dandelion::App.controller do
       # @gatherings = Gathering.and(name: /#{::Regexp.escape(@q)}/i).and(listed: true).and(:privacy.ne => 'secret')
       # @places = Place.and(name: /#{::Regexp.escape(@q)}/i)
 
-      results += @events.limit(5).map { |event| { label: %(<i class="fa fa-fw fa-calendar"></i> #{event.name} (#{concise_when_details(event)})), value: %(event:"#{event.name}") } }
       # results += @accounts.limit(5).map { |account| { label: %(<i class="fa fa-fw fa-user"></i> #{account.name}), value: %(account:"#{account.name}") } }
       # results += @organisations.limit(5).map { |organisation| { label: %(<i class="fa fa-fw fa-flag"></i> #{organisation.name}), value: %(organisation:"#{organisation.name}") } }
       # results += @gatherings.limit(5).map { |gathering| { label: %(<i class="fa fa-fw fa-moon"></i> #{gathering.name}), value: %(gathering:"#{gathering.name}") } }
