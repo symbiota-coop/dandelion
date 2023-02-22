@@ -7,19 +7,7 @@ Dandelion::App.controller do
       results = []
 
       match_selector = Event.live.public.legit.future(1.month.ago).selector
-      pipeline = [{
-        '$search': {
-          index: 'events',
-          text: {
-            query: @q,
-            path: {
-              wildcard: '*'
-            }
-          }
-        }
-      }, {
-        '$match': match_selector
-      }]
+      pipeline = [{ '$search': { index: 'events', text: { query: @q, path: { wildcard: '*' } } } }, { '$match': match_selector }]
       aggregate = Event.collection.aggregate(pipeline)
       results += aggregate.first(5).map do |event_hash|
         event = Event.new(event_hash.select { |k, _v| Event.fields.keys.include?(k.to_s) })
@@ -27,19 +15,7 @@ Dandelion::App.controller do
       end
 
       match_selector = Account.public.selector
-      pipeline = [{
-        '$search': {
-          index: 'accounts',
-          text: {
-            query: @q,
-            path: {
-              wildcard: '*'
-            }
-          }
-        }
-      }, {
-        '$match': match_selector
-      }]
+      pipeline = [{ '$search': { index: 'accounts', text: { query: @q, path: { wildcard: '*' } } } }, { '$match': match_selector }]
       aggregate = Account.collection.aggregate(pipeline)
       results += aggregate.first(5).map do |account_hash|
         account = Account.new(account_hash.select { |k, _v| Account.fields.keys.include?(k.to_s) })
@@ -47,19 +23,7 @@ Dandelion::App.controller do
       end
 
       match_selector = Organisation.all.selector
-      pipeline = [{
-        '$search': {
-          index: 'organisations',
-          text: {
-            query: @q,
-            path: {
-              wildcard: '*'
-            }
-          }
-        }
-      }, {
-        '$match': match_selector
-      }]
+      pipeline = [{ '$search': { index: 'organisations', text: { query: @q, path: { wildcard: '*' } } } }, { '$match': match_selector }]
       aggregate = Organisation.collection.aggregate(pipeline)
       results += aggregate.first(5).map do |organisation_hash|
         organisation = Organisation.new(organisation_hash.select { |k, _v| Organisation.fields.keys.include?(k.to_s) })
@@ -67,19 +31,7 @@ Dandelion::App.controller do
       end
 
       match_selector = Gathering.and(listed: true).and(:privacy.ne => 'secret').selector
-      pipeline = [{
-        '$search': {
-          index: 'gatherings',
-          text: {
-            query: @q,
-            path: {
-              wildcard: '*'
-            }
-          }
-        }
-      }, {
-        '$match': match_selector
-      }]
+      pipeline = [{ '$search': { index: 'gatherings', text: { query: @q, path: { wildcard: '*' } } } }, { '$match': match_selector }]
       aggregate = Gathering.collection.aggregate(pipeline)
       results += aggregate.first(5).map do |gathering_hash|
         gathering = Gathering.new(gathering_hash.select { |k, _v| Gathering.fields.keys.include?(k.to_s) })
@@ -87,19 +39,7 @@ Dandelion::App.controller do
       end
 
       match_selector = Place.all.selector
-      pipeline = [{
-        '$search': {
-          index: 'places',
-          text: {
-            query: @q,
-            path: {
-              wildcard: '*'
-            }
-          }
-        }
-      }, {
-        '$match': match_selector
-      }]
+      pipeline = [{ '$search': { index: 'places', text: { query: @q, path: { wildcard: '*' } } } }, { '$match': match_selector }]
       aggregate = Place.collection.aggregate(pipeline)
       results += aggregate.first(5).map do |place_hash|
         place = Place.new(place_hash.select { |k, _v| Place.fields.keys.include?(k.to_s) })
