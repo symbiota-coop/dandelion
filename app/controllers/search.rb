@@ -18,10 +18,9 @@ Dandelion::App.controller do
             }
           }
         }
-      },
-                  {
-                    '$match': match_selector
-                  }]
+      }, {
+        '$match': match_selector
+      }]
       aggregate = Event.collection.aggregate(pipeline)
       results += aggregate.first(5).map do |event_hash|
         event = Event.new(event_hash.select { |k, _v| Event.fields.keys.include?(k.to_s) })
@@ -36,11 +35,30 @@ Dandelion::App.controller do
       #   { username: /#{::Regexp.escape(@q)}/i }
       # ).pluck(:id))
 
+      match_selector = Account.public.selector
+      pipeline = [{
+        '$search': {
+          index: 'accounts',
+          text: {
+            query: @q,
+            path: {
+              wildcard: '*'
+            }
+          }
+        }
+      }, {
+        '$match': match_selector
+      }]
+      aggregate = Account.collection.aggregate(pipeline)
+      results += aggregate.first(5).map do |account_hash|
+        account = Account.new(account_hash.select { |k, _v| Account.fields.keys.include?(k.to_s) })
+        { label: %(<i class="fa fa-fw fa-user"></i> #{account.name}), value: %(account:"#{account.name}") } }
+      end      
+
       # @organisations = Organisation.and(name: /#{::Regexp.escape(@q)}/i)
       # @gatherings = Gathering.and(name: /#{::Regexp.escape(@q)}/i).and(listed: true).and(:privacy.ne => 'secret')
       # @places = Place.and(name: /#{::Regexp.escape(@q)}/i)
 
-      # results += @accounts.limit(5).map { |account| { label: %(<i class="fa fa-fw fa-user"></i> #{account.name}), value: %(account:"#{account.name}") } }
       # results += @organisations.limit(5).map { |organisation| { label: %(<i class="fa fa-fw fa-flag"></i> #{organisation.name}), value: %(organisation:"#{organisation.name}") } }
       # results += @gatherings.limit(5).map { |gathering| { label: %(<i class="fa fa-fw fa-moon"></i> #{gathering.name}), value: %(gathering:"#{gathering.name}") } }
       # results += @places.limit(5).map { |place| { label: %(<i class="fa fa-fw fa-map"></i> #{place.name}), value: %(place:"#{place.name}") } }
