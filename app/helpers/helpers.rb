@@ -11,6 +11,15 @@ Dandelion::App.helpers do
     whenable.send(:when_details, current_account ? current_account.time_zone : session[:time_zone])
   end
 
+  def search(klass, match, query, n = nil)
+    pipeline = [{ '$search': { index: klass.to_s.underscore.pluralize, text: { query: query, path: { wildcard: '*' } } } }, { '$match': match.selector }]
+    aggregate = klass.collection.aggregate(pipeline)
+    aggregate = aggregate.first(n) if n
+    aggregate.map do |hash|
+      klass.new(hash.select { |k, _v| klass.fields.keys.include?(k.to_s) })
+    end
+  end
+
   def pagination_details(collection, model: nil)
     if collection.total_pages < 2
       case collection.to_a.length

@@ -6,43 +6,23 @@ Dandelion::App.controller do
 
       results = []
 
-      match_selector = Event.live.public.legit.future(1.month.ago).selector
-      pipeline = [{ '$search': { index: 'events', text: { query: @q, path: { wildcard: '*' } } } }, { '$match': match_selector }]
-      aggregate = Event.collection.aggregate(pipeline)
-      results += aggregate.first(5).map do |event_hash|
-        event = Event.new(event_hash.select { |k, _v| Event.fields.keys.include?(k.to_s) })
+      results += search(Event, Event.live.public.legit.future(1.month.ago), @q, 5).map do |event|
         { label: %(<i class="fa fa-fw fa-calendar"></i> #{event.name} (#{concise_when_details(event)})), value: %(event:"#{event.name}") }
       end
 
-      match_selector = Account.public.selector
-      pipeline = [{ '$search': { index: 'accounts', text: { query: @q, path: { wildcard: '*' } } } }, { '$match': match_selector }]
-      aggregate = Account.collection.aggregate(pipeline)
-      results += aggregate.first(5).map do |account_hash|
-        account = Account.new(account_hash.select { |k, _v| Account.fields.keys.include?(k.to_s) })
+      results += search(Account, Account.public, @q, 5).map do |account|
         { label: %(<i class="fa fa-fw fa-user"></i> #{account.name}), value: %(account:"#{account.name}") }
       end
 
-      match_selector = Organisation.all.selector
-      pipeline = [{ '$search': { index: 'organisations', text: { query: @q, path: { wildcard: '*' } } } }, { '$match': match_selector }]
-      aggregate = Organisation.collection.aggregate(pipeline)
-      results += aggregate.first(5).map do |organisation_hash|
-        organisation = Organisation.new(organisation_hash.select { |k, _v| Organisation.fields.keys.include?(k.to_s) })
+      results += search(Organisation, Organisation.all, @q, 5).map do |organisation|
         { label: %(<i class="fa fa-fw fa-flag"></i> #{organisation.name}), value: %(organisation:"#{organisation.name}") }
       end
 
-      match_selector = Gathering.and(listed: true).and(:privacy.ne => 'secret').selector
-      pipeline = [{ '$search': { index: 'gatherings', text: { query: @q, path: { wildcard: '*' } } } }, { '$match': match_selector }]
-      aggregate = Gathering.collection.aggregate(pipeline)
-      results += aggregate.first(5).map do |gathering_hash|
-        gathering = Gathering.new(gathering_hash.select { |k, _v| Gathering.fields.keys.include?(k.to_s) })
+      results += search(Gathering, Gathering.and(listed: true).and(:privacy.ne => 'secret'), @q, 5).map do |gathering|
         { label: %(<i class="fa fa-fw fa-moon"></i> #{gathering.name}), value: %(gathering:"#{gathering.name}") }
       end
 
-      match_selector = Place.all.selector
-      pipeline = [{ '$search': { index: 'places', text: { query: @q, path: { wildcard: '*' } } } }, { '$match': match_selector }]
-      aggregate = Place.collection.aggregate(pipeline)
-      results += aggregate.first(5).map do |place_hash|
-        place = Place.new(place_hash.select { |k, _v| Place.fields.keys.include?(k.to_s) })
+      results += search(Place, Place.all, @q, 5).map do |place|
         { label: %(<i class="fa fa-fw fa-map"></i> #{place.name}), value: %(place:"#{place.name}") }
       end
 
@@ -57,30 +37,16 @@ Dandelion::App.controller do
           end
         end
         case @type
-        when 'gatherings'
-          @gatherings = Gathering.and(name: /#{Regexp.escape(@q)}/i).and(listed: true).and(:privacy.ne => 'secret')
-          @gatherings = @gatherings.paginate(page: params[:page], per_page: 10).order('name asc')
-        when 'places'
-          @places = Place.and(name: /#{Regexp.escape(@q)}/i)
-          @places = @places.paginate(page: params[:page], per_page: 10).order('name asc')
-        when 'organisations'
-          @organisations = Organisation.and(name: /#{Regexp.escape(@q)}/i)
-          @organisations = @organisations.paginate(page: params[:page], per_page: 10).order('name asc')
         when 'events'
-          @events = Event.live.public.legit.future(1.month.ago).and(:id.in => Event.all.or(
-            { name: /#{Regexp.escape(@q)}/i },
-            { description: /#{Regexp.escape(@q)}/i }
-          ).pluck(:id))
-          @events = @events.paginate(page: params[:page], per_page: 10).order('start_time asc')
+          @events = search(Event, Event.live.public.legit.future(1.month.ago), @q, 50)
         when 'accounts'
-          @accounts = Account.public
-          @accounts = @accounts.and(:id.in => Account.all.or(
-            { name: /#{Regexp.escape(@q)}/i },
-            { name_transliterated: /#{Regexp.escape(@q)}/i },
-            { email: /#{Regexp.escape(@q)}/i },
-            { username: /#{Regexp.escape(@q)}/i }
-          ).pluck(:id))
-          @accounts = @accounts.paginate(page: params[:page], per_page: 10).order('last_active desc')
+          @accounts = search(Account, Account.public, @q, 50)
+        when 'organisations'
+          @organisations = search(Organisation, Organisation.all, @q, 50)
+        when 'gatherings'
+          @gatherings = search(Gathering, Gathering.and(listed: true).and(:privacy.ne => 'secret'), @q, 50)
+        when 'places'
+          @places = search(Place, Place.all, @q, 50)
         end
       end
 
