@@ -38,15 +38,15 @@ Dandelion::App.controller do
         end
         case @type
         when 'events'
-          @events = search(Event, Event.live.public.legit.future(1.month.ago), @q, 50)
+          @events = search(Event, Event.live.public.legit.future(1.month.ago), @q, 25)
         when 'accounts'
-          @accounts = search(Account, Account.public, @q, 50)
+          @accounts = search(Account, Account.public, @q, 25)
         when 'organisations'
-          @organisations = search(Organisation, Organisation.all, @q, 50)
+          @organisations = search(Organisation, Organisation.all, @q, 25)
         when 'gatherings'
-          @gatherings = search(Gathering, Gathering.and(listed: true).and(:privacy.ne => 'secret'), @q, 50)
+          @gatherings = search(Gathering, Gathering.and(listed: true).and(:privacy.ne => 'secret'), @q, 25)
         when 'places'
-          @places = search(Place, Place.all, @q, 50)
+          @places = search(Place, Place.all, @q, 25)
         end
       end
 
