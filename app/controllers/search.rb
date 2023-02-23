@@ -38,27 +38,35 @@ Dandelion::App.controller do
         end
         case @type
         when 'events'
+          if params[:q] && params[:q].starts_with?("event:")
+            @events = Event.live.public.legit.future(1.month.ago).where(name: @q)
+            redirect "/events/#{@events.first.id}" if @events.count == 1
+          end
           @events = search(Event, Event.live.public.legit.future(1.month.ago), @q, 25)
         when 'accounts'
+          if params[:q] && params[:q].starts_with?("account:")
+          @accounts = Account.public.where(name: @q)
+          redirect "/u/#{@accounts.first.username}" if @accounts.count == 1
+          end
           @accounts = search(Account, Account.public, @q, 25)
         when 'organisations'
+          if params[:q] && params[:q].starts_with?("organisation:")
+          @organisations = Organisation.where(name: @q)
+          redirect "/o/#{@organisations.first.slug}" if @organisations.count == 1
+          end
           @organisations = search(Organisation, Organisation.all, @q, 25)
         when 'gatherings'
+          if params[:q] && params[:q].starts_with?("gathering:")
+          @gatherings = Gathering.all.and(listed: true).and(:privacy.ne => 'secret').where(name: @q)
+          redirect "/g/#{@gatherings.first.slug}" if @gatherings.count == 1
+          end
           @gatherings = search(Gathering, Gathering.and(listed: true).and(:privacy.ne => 'secret'), @q, 25)
         when 'places'
+          if params[:q] && params[:q].starts_with?("place:")
+          @places = Place.all.where(name: @q)
+          redirect "/places/#{@places.first.id}" if @places.count == 1
+          end
           @places = search(Place, Place.all, @q, 25)
-        end
-      end
-
-      %w[gathering place organisation event account].each do |t|
-        next unless params[:q] && params[:q].starts_with?("#{t}:")
-
-        case t
-        when 'gathering' then redirect "/g/#{@gatherings.first.slug}" if @gatherings.count == 1
-        when 'place' then redirect "/places/#{@places.first.id}" if @places.count == 1
-        when 'organisation' then redirect "/o/#{@organisations.first.slug}" if @organisations.count == 1
-        when 'event' then redirect "/events/#{@events.first.id}" if @events.count == 1
-        when 'account' then redirect "/u/#{@accounts.first.username}" if @accounts.count == 1
         end
       end
 
