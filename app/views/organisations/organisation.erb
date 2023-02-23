@@ -24,8 +24,7 @@
             </div>
           </div>
         </div>
-      <% elsif @organisation.allow_quick? %>
-        <a class="btn btn-primary mb-3" href="/o/<%= @organisation.slug %>/events/quick">List an event</a>
+      <% else %>
         <%= partial :'accounts/new_compact' %>
       <% end %>
     </div>
