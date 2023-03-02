@@ -63,7 +63,7 @@ class CoreTest < ActiveSupport::TestCase
     login_as(@account)
     visit "/events/#{@event.id}"
     select 1, from: "quantities[#{@event.ticket_types.first.id}]"
-    click_button 'Book your place'
+    click_button 'RSVP'
     assert page.has_content? 'Thanks for booking!'
   end
 end
