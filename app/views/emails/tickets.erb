@@ -49,3 +49,7 @@
   <% end %>
 </div>
 <div class="footer"></div>
+
+<% if defined?(pdf_link) %>
+  <a href="/orders/<%=order.id%>.pdf" class="attachment">📎 Download tickets PDF</a>
+<% end %>

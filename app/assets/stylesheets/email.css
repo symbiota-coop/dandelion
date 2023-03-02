@@ -1,22 +1,110 @@
+body,
+p,
+ul,
+ol,
+input,
+select,
+.form-control,
+blockquote {
+  font-family: 'Roboto', sans-serif;
+  font-size: 16px
+}
 
-body, p, ul, ol, input, select, .form-control, blockquote { font-family: 'Roboto', sans-serif; font-size: 16px }
-h1, h2, h3, h4, h5, h6, .h { font-family: 'Roboto', sans-serif; }
+h1,
+h2,
+h3,
+h4,
+h5,
+h6,
+.h {
+  font-family: 'Roboto', sans-serif;
+}
 
-img { max-width: 100% }
-blockquote { border-left: 8px solid #F8F9FA; padding-left: 1em }
+img {
+  max-width: 100%
+}
 
-.password { font-size: 200%; font-weight: bold; }
-.preview { padding: 16px; text-align: center; }
+blockquote {
+  border-left: 8px solid #F8F9FA;
+  padding-left: 1em
+}
 
-p.action { text-align: center }
-p.action a { background: #00B963; color: white; text-decoration: none; padding: 10px; border-radius: 5px }
-p.action a:hover { background: #2BA457 !important; }
+.password {
+  font-size: 200%;
+  font-weight: bold;
+}
 
-body { background-color: #f7f7f7 }
-.tagline { display:none; font-size: 1px; color: #f7f7f7; line-height:1px; max-height: 0px; max-width: 0px; opacity: 0; overflow:hidden; }
-.container {  max-width: 650px; margin: 0 auto; }
-.main { background: white; padding: 16px; margin: 0 16px; border: 1px solid #f2f2f2; border-radius: 4px }
-.footer { padding: 16px; text-align: center; font-size: 12px; color: #999; }
-.footer a { color: #333; text-decoration: none; }
+.preview {
+  padding: 16px;
+  text-align: center;
+}
 
-hr { border: 1px solid #ddd }
+p.action {
+  text-align: center
+}
+
+p.action a {
+  background: #00B963;
+  color: white;
+  text-decoration: none;
+  padding: 10px;
+  border-radius: 5px
+}
+
+p.action a:hover {
+  background: #2BA457 !important;
+}
+
+body {
+  background-color: #f2f2f2
+}
+
+.tagline {
+  display: none;
+  font-size: 1px;
+  color: #f2f2f2;
+  line-height: 1px;
+  max-height: 0px;
+  max-width: 0px;
+  opacity: 0;
+  overflow: hidden;
+}
+
+.container {
+  max-width: 650px;
+  margin: 0 auto;
+}
+
+.main {
+  background: white;
+  padding: 16px;
+  margin: 0 16px;
+  border: 1px solid #eaeaea;
+  border-radius: 4px
+}
+
+.footer {
+  padding: 16px;
+  text-align: center;
+  font-size: 12px;
+  color: #999;
+}
+
+.footer a {
+  color: #333;
+  text-decoration: none;
+}
+
+hr {
+  border: 1px solid #ddd
+}
+
+a.attachment {
+  background: white;
+  padding: 16px;
+  margin: 0 16px;
+  border: 1px solid #eaeaea;
+  border-radius: 4px;
+  text-decoration: none;
+  display: block;
+}

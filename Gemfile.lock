@@ -413,8 +413,6 @@ GEM
       unicode-display_width (>= 2.4.0, < 3.0)
     rubocop-ast (1.26.0)
       parser (>= 3.2.1.0)
-    rubocop-daemon (0.3.2)
-      rubocop
     ruby-progressbar (1.11.0)
     ruby2_keywords (0.0.5)
     rubyntlm (0.6.3)
@@ -526,7 +524,6 @@ DEPENDENCIES
   rinku
   rqrcode
   rubocop
-  rubocop-daemon
   sanitize
   sass
   sinatra
