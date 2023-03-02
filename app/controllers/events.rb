@@ -219,7 +219,7 @@ Dandelion::App.controller do
         end_date: @event.end_time.to_date.to_fs(:db),
         activity: ("#{@event.activity.name} (#{@event.activity_id})" if @event.activity),
         event_coordinator: ("#{@event.coordinator.name} (#{@event.coordinator_id})" if @event.coordinator),
-        carousel_coordinator: ("#{@event.carousel_coordinator.name} (#{@event.carousel_coordinator.id})" if @event.carousel_coordinator),
+        carousel: @event.carousel,
         order_count: @event.orders.count,
         discounted_ticket_revenue: @event.discounted_ticket_revenue.cents.to_f / 100,
         organisation_discounted_ticket_revenue: @event.organisation_discounted_ticket_revenue.cents.to_f / 100,

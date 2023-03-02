@@ -318,6 +318,21 @@ class Event
     Fragment.and(key: %r{/events/#{id}}).destroy_all
   end
 
+  def carousel
+    return unless organisation && organisation.carousels
+
+    carousel = nil
+    organisation.carousels.split("\n").reject { |line| line.blank? }.each do |line|
+      title, tags = line.split(':')
+      title, w = title.split('[')
+      tags, coordinator = tags.split('@')
+      tags = tags.split(',').map(&:strip)
+      intersection = event_tags.pluck(:name) & tags
+      carousel = title.strip if intersection.count > 0
+    end
+    carousel
+  end
+
   def carousel_coordinator
     account = nil
     if organisation && organisation.carousels
