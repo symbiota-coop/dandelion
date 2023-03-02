@@ -27,3 +27,5 @@ Lint/UriEscapeUnescape:
   Enabled: false
 Lint/DuplicateBranch:
   Enabled: false
+Lint/SuppressedException:
+  Enabled: false
