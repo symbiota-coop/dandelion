@@ -324,12 +324,12 @@ class Event
     carousel = nil
     organisation.carousels.split("\n").reject { |line| line.blank? }.each do |line|
       title, tags = line.split(':')
-      title, w = title.split('[')
-      tags, coordinator = tags.split('@')
+      title, _w = title.split('[')
+      tags, _coordinator = tags.split('@')
       tags = tags.split(',').map(&:strip)
       intersection = event_tags.pluck(:name) & tags
       if intersection.count > 0
-        carousel = title.strip 
+        carousel = title.strip
         break
       end
     end
