@@ -328,7 +328,10 @@ class Event
       tags, coordinator = tags.split('@')
       tags = tags.split(',').map(&:strip)
       intersection = event_tags.pluck(:name) & tags
-      carousel = title.strip if intersection.count > 0
+      if intersection.count > 0
+        carousel = title.strip 
+        break
+      end
     end
     carousel
   end
