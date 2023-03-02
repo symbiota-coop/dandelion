@@ -18,8 +18,8 @@ Dandelion::App.controller do
     @events = params[:order] == 'created_at' ? @events.order('created_at desc') : @events.order('start_time asc')
     @events = if params[:q]
                 @events.and(:id.in => Event.all.or(
-                  { name: /#{::Regexp.escape(params[:q])}/i },
-                  { description: /#{::Regexp.escape(params[:q])}/i }
+                  { name: /#{Regexp.escape(params[:q])}/i },
+                  { description: /#{Regexp.escape(params[:q])}/i }
                 ).pluck(:id))
               elsif params[:search]
                 @events
@@ -464,12 +464,12 @@ Dandelion::App.controller do
       @tickets = @tickets.and(:id.in =>
         Ticket.collection.aggregate([
                                       { '$addFields' => { 'id' => { '$toString' => '$_id' } } },
-                                      { '$match' => { 'id' => { '$regex' => /#{::Regexp.escape(params[:q])}/i } } }
+                                      { '$match' => { 'id' => { '$regex' => /#{Regexp.escape(params[:q])}/i } } }
                                     ]).pluck(:id) +
         Ticket.and(
           :account_id.in => Account.all.or(
-            { name: /#{::Regexp.escape(params[:q])}/i },
-            { email: /#{::Regexp.escape(params[:q])}/i }
+            { name: /#{Regexp.escape(params[:q])}/i },
+            { email: /#{Regexp.escape(params[:q])}/i }
           ).pluck(:id)
         ).pluck(:id))
     end
@@ -580,8 +580,8 @@ Dandelion::App.controller do
     @orders =  @orders.incomplete if params[:incomplete]
     if params[:q]
       @orders = @orders.and(:account_id.in => Account.all.or(
-        { name: /#{::Regexp.escape(params[:q])}/i },
-        { email: /#{::Regexp.escape(params[:q])}/i }
+        { name: /#{Regexp.escape(params[:q])}/i },
+        { email: /#{Regexp.escape(params[:q])}/i }
       ).pluck(:id))
     end
 
@@ -635,8 +635,8 @@ Dandelion::App.controller do
     @donations = @event.donations
     if params[:q]
       @donations = @donations.and(:account_id.in => Account.all.or(
-        { name: /#{::Regexp.escape(params[:q])}/i },
-        { email: /#{::Regexp.escape(params[:q])}/i }
+        { name: /#{Regexp.escape(params[:q])}/i },
+        { email: /#{Regexp.escape(params[:q])}/i }
       ).pluck(:id))
     end
     erb :'events/donations'
@@ -654,8 +654,8 @@ Dandelion::App.controller do
     @waitships = @event.waitships
     if params[:q]
       @waitships = @waitships.and(:account_id.in => Account.all.or(
-        { name: /#{::Regexp.escape(params[:q])}/i },
-        { email: /#{::Regexp.escape(params[:q])}/i }
+        { name: /#{Regexp.escape(params[:q])}/i },
+        { email: /#{Regexp.escape(params[:q])}/i }
       ).pluck(:id))
     end
     erb :'events/waitlist'
