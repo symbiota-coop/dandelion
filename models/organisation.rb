@@ -69,6 +69,7 @@ class Organisation
   field :recording_email_greeting, type: String
   field :feedback_email_body, type: String
   field :verified, type: Boolean
+  field :can_opt_out_of_contribution, type: Boolean
   field :contribution_not_required, type: Boolean
   field :contribution_requested_per_event_gbp, type: Integer
   field :ical_full, type: Boolean

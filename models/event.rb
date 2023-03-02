@@ -45,6 +45,7 @@ class Event
   field :select_tickets_intro, type: String
   field :select_tickets_outro, type: String
   field :select_tickets_title, type: String
+  field :opt_out_of_contribution, type: Boolean
 
   def self.admin_fields
     {
@@ -89,6 +90,7 @@ class Event
       hide_organisation_footer: :check_box,
       send_order_notifications: :check_box,
       raw_description: :check_box,
+      opt_out_of_contribution: :check_box,
       account_id: :lookup,
       organisation_id: :lookup,
       activity_id: :lookup,
@@ -834,7 +836,8 @@ class Event
       facebook_pixel_id: 'Your Facebook Pixel ID for tracking sales',
       purchase_url: "URL where people can buy tickets (if you're not selling tickets on Dandelion)",
       capacity: 'Caps the total number of tickets issued across all ticket types. Optional',
-      send_order_notifications: 'Send email notifications of orders to event facilitators'
+      send_order_notifications: 'Send email notifications of orders to event facilitators',
+      opt_out_of_contribution: 'Please use mindfully 😇'
     }
   end
 
