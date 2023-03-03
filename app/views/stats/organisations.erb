@@ -24,7 +24,7 @@ partial :chart, locals: {
   <%= pluralize(organisations.count, 'organisation') %> sold
   <%= pluralize(tickets.count, 'ticket') %>
   worth
-  <%= orders.sum { |o| Money.new(o.value*100, o.currency) }.exchange_to('GBP').format(no_cents: true) %>
+  <%= orders.sum { |o| Money.new(o.value*100, o.currency) }.exchange_to('GBP').format(no_cents: true) %>. Highlights:
 </p>
 
 <div class="mt-3">
