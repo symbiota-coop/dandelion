@@ -4,6 +4,13 @@
     $(function() {
 
       Chart.register(ChartDataLabels);
+      Chart.defaults.set('plugins.datalabels', {
+        color: 'white',
+        font: {
+          weight: 'bold'
+        }
+      })
+
 
       <%
         if !defined?(data)
@@ -36,10 +43,6 @@
           datalabels: {
             formatter: function(value, context) {
               return <%==(defined?(unit) ? unit : '').to_json %> + value.toLocaleString();
-            },
-            color: 'white',
-            font: {
-              weight: 'bold'
             }
           }
         },
