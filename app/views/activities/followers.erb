@@ -65,5 +65,3 @@
   <% } %>
 </table>
 <%= will_paginate @activityships, renderer: WillPaginate::ViewHelpers::BootstrapRenderer %>
-
-<%= partial :chart, locals: { countable: params[:subscribed_to_mailer] ? @activity.activityships.and(:account_id.in => @activity.subscribed_accounts.pluck(:id)) : @activity.activityships } %>

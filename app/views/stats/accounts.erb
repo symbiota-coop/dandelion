@@ -1,4 +1,5 @@
-<h2>Accounts</h2>
+<%= partial :chart, locals: { label: 'Accounts', countable: Account.all, months_ago: 24 } %>
+
 <table class="table">
   <thead>
     <tr>

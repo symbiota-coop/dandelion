@@ -1,6 +1,6 @@
 <%= partial :'organisations/nav', locals: { organisation: @organisation } %>
 
-<%= partial :stats, locals: { accounts: @organisation.members } %>
+<%= partial :stats, locals: { memberships: @organisation.organisationships, accounts: @organisation.members } %>
 
 <h2>Locations</h2>
 

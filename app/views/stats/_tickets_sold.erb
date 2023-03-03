@@ -1,7 +1,0 @@
-<p class="lead">
-  <%= pluralize(@organisations.count, 'organisation') %> sold
-  <%= pluralize(@tickets.count, 'ticket') %>
-  worth
-  <%= Order.and(:value.ne => nil, :currency.in => MAJOR_CURRENCIES, :created_at.gte => 3.months.ago).sum { |o| Money.new(o.value*100, o.currency) }.exchange_to('GBP').format(no_cents: true) %>
-  in the last 3 months
-</p>

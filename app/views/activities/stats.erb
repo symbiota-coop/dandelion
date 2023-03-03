@@ -1,6 +1,6 @@
 <%= partial :'activities/nav', locals: { activity: @activity } %>
 
-<%= partial :stats, locals: { accounts: @activity.members } %>
+<%= partial :stats, locals: { memberships: @activity.activityships, accounts: @activity.members } %>
 
 <h2>Locations</h2>
 <div data-pagelet-url="/map?activity_id=<%= @activity.id %>&admin=1">

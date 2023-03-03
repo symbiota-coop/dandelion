@@ -1,5 +1,9 @@
 <% base_paint = '#57B98C' %>
 
+<h2>Followers</h2>
+
+<%= partial :chart, locals: { label: 'Followers', countable: memberships } %>
+
 <% youngest = accounts.and(:date_of_birth.ne => nil, :date_of_birth.lte => Date.today).order('date_of_birth desc').first
 oldest = accounts.and(:date_of_birth.ne => nil, :date_of_birth.gte => 99.years.ago).order('date_of_birth asc').first
 if youngest && oldest %>

@@ -1,0 +1,21 @@
+<%= partial :chart, locals: { label: 'Events', countable: Event.all, months_ago: 24 } %>
+
+
+<%= 
+
+d = [Date.new(24.months.ago.year, 24.months.ago.month, 1)]
+d << (d.last + 1.month) while d.last < Date.new(Date.today.year, Date.today.month, 1)
+
+partial :chart, locals: {
+  label: 'Donations',
+  unit: '£',
+  data: d.map { |x|
+    account_contributions = AccountContribution.and(:created_at.gte => x, :created_at.lt => x + 1.month, :payment_completed => true)
+    account_contributions_sum = account_contributions.count > 0 ? account_contributions.sum { |ac| Money.new(ac.amount*100, ac.currency) }.exchange_to('GBP') : 0
+
+    organisation_contributions = OrganisationContribution.and(:created_at.gte => x, :created_at.lt => x + 1.month, :payment_completed => true)
+    organisation_contributions_sum = organisation_contributions.count > 0 ? organisation_contributions.sum { |oc| Money.new(oc.amount*100, oc.currency) }.exchange_to('GBP') : 0
+
+    ["#{Date::MONTHNAMES[x.month]} #{x.year}", (account_contributions_sum + organisation_contributions_sum).to_i]
+  }.to_h
+} %>
