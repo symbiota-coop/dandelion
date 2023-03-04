@@ -38,33 +38,33 @@ Dandelion::App.controller do
         end
         case @type
         when 'events'
-          if params[:q] && params[:q].starts_with?("event:")
-            @events = Event.live.public.legit.future(1.month.ago).where(name: @q)
+          if params[:q] && params[:q].starts_with?('event:')
+            @events = Event.live.public.legit.future(1.month.ago).and(name: @q)
             redirect "/events/#{@events.first.id}" if @events.count == 1
           end
           @events = search(Event, Event.live.public.legit.future(1.month.ago), @q, 25)
         when 'accounts'
-          if params[:q] && params[:q].starts_with?("account:")
-          @accounts = Account.public.where(name: @q)
-          redirect "/u/#{@accounts.first.username}" if @accounts.count == 1
+          if params[:q] && params[:q].starts_with?('account:')
+            @accounts = Account.public.and(name: @q)
+            redirect "/u/#{@accounts.first.username}" if @accounts.count == 1
           end
           @accounts = search(Account, Account.public, @q, 25)
         when 'organisations'
-          if params[:q] && params[:q].starts_with?("organisation:")
-          @organisations = Organisation.where(name: @q)
-          redirect "/o/#{@organisations.first.slug}" if @organisations.count == 1
+          if params[:q] && params[:q].starts_with?('organisation:')
+            @organisations = Organisation.and(name: @q)
+            redirect "/o/#{@organisations.first.slug}" if @organisations.count == 1
           end
           @organisations = search(Organisation, Organisation.all, @q, 25)
         when 'gatherings'
-          if params[:q] && params[:q].starts_with?("gathering:")
-          @gatherings = Gathering.all.and(listed: true).and(:privacy.ne => 'secret').where(name: @q)
-          redirect "/g/#{@gatherings.first.slug}" if @gatherings.count == 1
+          if params[:q] && params[:q].starts_with?('gathering:')
+            @gatherings = Gathering.all.and(listed: true).and(:privacy.ne => 'secret').and(name: @q)
+            redirect "/g/#{@gatherings.first.slug}" if @gatherings.count == 1
           end
           @gatherings = search(Gathering, Gathering.and(listed: true).and(:privacy.ne => 'secret'), @q, 25)
         when 'places'
-          if params[:q] && params[:q].starts_with?("place:")
-          @places = Place.all.where(name: @q)
-          redirect "/places/#{@places.first.id}" if @places.count == 1
+          if params[:q] && params[:q].starts_with?('place:')
+            @places = Place.all.and(name: @q)
+            redirect "/places/#{@places.first.id}" if @places.count == 1
           end
           @places = search(Place, Place.all, @q, 25)
         end
