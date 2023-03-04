@@ -28,7 +28,7 @@
     <div style="text-align: center">
       <% if pmail.organisation.image %>
         <a href="<%= pmail.organisation.website || "#{ENV['BASE_URI']}/o/#{pmail.organisation.slug}" %>">
-          <img src="<%= pmail.organisation.image.url %>" style="max-width: 100px; padding-top: 16px">
+          <img src="<%= pmail.organisation.image.thumb('200x200').url %>" style="max-width: 100px; padding-top: 16px">
         </a>
       <% else %>
         <h1 style="margin: 0; padding-top: 16px; padding-bottom: 0">

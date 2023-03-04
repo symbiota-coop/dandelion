@@ -34,7 +34,7 @@
 <div class="row justify-content-center">
   <div class="col-lg-10">
     <% if @event_image %>
-      <a href="/events/<%=@event.id%><% if params[:cohost] %>?cohost=<%=params[:cohost]%><% end %>"><img id="event-image" class="w-100 mb-3" src="<%= u @event_image.url %>"></a>
+      <a href="/events/<%=@event.id%><% if params[:cohost] %>?cohost=<%=params[:cohost]%><% end %>"><img id="event-image" class="w-100 mb-3" src="<%= u @event_image.thumb('1920x1920').url %>"></a>
     <% end %>
     <% if @order %>
       <%= partial :'events/success' %>
