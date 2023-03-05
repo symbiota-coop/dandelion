@@ -15,6 +15,11 @@
     @media(min-width: 992px) {
       #just-pay { font-size: 1rem; }
     }
+
+    #tickets-sold { font-size: 1.5rem; }
+    @media(min-width: 992px) {
+      #tickets-sold { font-size: 1.5rem; }
+    }
   </style>
 
   <div class="row">
@@ -86,25 +91,23 @@
           </p>
         </div>
       </div>
+      <h2 class="text-center my-5 my-lg-3" id="tickets-sold">
+        <%= cp :tickets_count %>
+      </h2>
     </div>
 
   </div>
 
 
-  <h2 class="text-center mt-4 mb-3">
-    <span class="d-none d-lg-inline">
-      <%= cp :tickets_count %>
-      &middot;      
-    </span>
-    <%= cp :events_count %>
-  </h2>
-  <%= partial :'events/search_form' %>
-  <%= partial :'events/view_options', locals: {path: '/events'} %>
+  <div class="mt-5">
+    <%= partial :'events/search_form' %>
+    <%= partial :'events/view_options', locals: {path: '/events'} %>
 
-  <div data-with-placeholder data-pagelet-url="/events">
-    <%= partial :'events/blocks_placeholder' %>
-  </div>
+    <div data-with-placeholder data-pagelet-url="/events">
+      <%= partial :'events/blocks_placeholder' %>
+    </div>
 
-  <div data-pagelet-url="/events?display=map">
-    <%= partial :'maps/map', locals: { stem: "/events", dynamic: true, trigger_bounds_changed: true } %>
+    <div data-pagelet-url="/events?display=map">
+      <%= partial :'maps/map', locals: { stem: "/events", dynamic: true, trigger_bounds_changed: true } %>
+    </div>
   </div>
