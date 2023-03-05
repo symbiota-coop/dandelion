@@ -1,7 +1,7 @@
 <%= partial :'event_feedbacks/average_rating', locals: { event_feedbacks: event_feedbacks } %>
 <% event_feedbacks = event_feedbacks.and(:rating.ne => nil).order('created_at desc').paginate(page: params[:page], per_page: 10) %>
 <table class="table table-condensed mt-3">
-  <% event_feedbacks.each { |event_feedback|  %>
+  <% event_feedbacks.each { |event_feedback| account = event_feedback.account %>
   <tr>
     <td class="feedback-name">
       <% if event_feedback.anonymise? %>
@@ -23,7 +23,6 @@
     <td style="white-space: nowrap;"><% event_feedback.rating.times do %><i class="fa fa-star"></i><% end %></td>
     <td><small><%= timeago event_feedback.created_at %></small></td>
   </tr>
-  <% account = event_feedback.account %>
   <% if event_feedback.public_answers %>
     <tr>
       <td colspan="3" style="border-top: 0">
