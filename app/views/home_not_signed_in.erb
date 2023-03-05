@@ -107,7 +107,7 @@
       <%= partial :'events/blocks_placeholder' %>
     </div>
 
-    <div data-pagelet-url="/events?display=map">
+    <div class="mt-3" data-pagelet-url="/events?display=map">
       <%= partial :'maps/map', locals: { stem: "/events", dynamic: true, trigger_bounds_changed: true } %>
     </div>
   </div>
