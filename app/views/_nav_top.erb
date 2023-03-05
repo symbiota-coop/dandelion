@@ -4,6 +4,13 @@
 </style>
 <ul class="nav navbar-nav navbar-right">
   <% if current_account %>
+    <% if current_account.admin? %>
+      <li class="d-none d-lg-inline">
+        <a href="/docs">
+          <img src="https://github.com/dandelion-collective/dandelion/workflows/Ruby/badge.svg">
+        </a>
+      </li>
+    <% end %>
     <li class="d-none d-lg-inline" id="docs-li">
       <a href="/docs">
         How to use Dandelion

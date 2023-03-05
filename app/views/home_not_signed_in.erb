@@ -1,100 +1,109 @@
-<style>
-  #banner { padding-left: 0.9375rem; padding-right: 0.9375rem; margin-top: -0.9375rem; margin-left: -0.9375rem; margin-right: -0.9375rem; }
-  @media(min-width: 768px) { #banner { padding-left: 1.5625rem; padding-right: 1.5625rem; margin-top: -1.5625rem; margin-left: -1.5625rem; margin-right: -1.5625rem; } }
-</style>
-<div id="banner" style="padding-top: 2.5vw; padding-bottom: 2.5vw; background: url('/images/dandelion.jpg'); background-position: 50% 62.5%; background-size: cover">
+<div>
 
   <style>
-    .strapline { font-size: 1.25rem; }
-    .strapline > span { padding: 0.05rem }
+    #strapline { font-size: 1.5rem; }
     @media(min-width: 992px) {
-      .strapline { font-size: 1.55rem; line-height: 130% }
-      .strapline > span { padding: 0.25rem }
+      #strapline { font-size: 2rem; line-height: 130% }
+    }
+
+    #unlike { font-size: 1.15em; }
+    @media(min-width: 992px) {
+      #unlike { font-size: 1.5rem; }
+    }
+
+    #just-pay { font-size: 0.85rem; }
+    @media(min-width: 992px) {
+      #just-pay { font-size: 1rem; }
     }
   </style>
 
-  <div class="row justify-content-center">
-    <div class="col-12 col-lg-10">
-      <p class="strapline mb-0" style="text-align: center;">
-        <span class="d-lg-inline-block" style="background: rgba(255,255,255,0.75)">
-          Use Dandelion to find and host
-          <span class="d-lg-none"><br />
-          </span>
-          <strong>regenerative events</strong> and
-          <span class="d-lg-none"><br />
-          </span>
-          <strong>co-created gatherings</strong>
+  <div class="row">
+
+    <div class="col-lg-6">
+      <p id="strapline" class="mb-3">
+        Find and host
+        <span class="d-sm-none">
+          <br />
         </span>
+        <strong>regenerative events</strong> and
+        <span class="d-sm-none">
+          <br />
+        </span>
+        <strong>co-created gatherings</strong>
+      </p>
+      <p class="mt-3 mb-3" id="unlike">
+        <mark class="pl-0">Unlike our competitors,          
+          we operate on a donation/gift economy basis.</mark>
+      </p>
+      <p class="mb-4" id="just-pay">
+        Hosts just pay processing fees via
+        <a target="_blank" href="https://stripe.com/gb/pricing">Stripe</a> or
+        <a target="_blank" href="https://help.coinbase.com/en/commerce/getting-started/fees">Coinbase</a>
+        <br />
+        (or choose fee-free crypto payments via <a href=https://www.optimism.io/">Optimism</a>, <a href="https://celo.org/">Celo</a> and <a href="https://www.gnosischain.com/evm">Gnosis</a>)
+      </p>
+      <p class="mb-1">
+        <a class="btn btn-primary btn-lg" href="/events/new">List an event</a>
+      </p>
+      <p>
+        <a href="/docs/events">Watch the 1-minute how-to video</a>
       </p>
     </div>
-  </div>
 
-  <div class="row justify-content-center">
-    <div class="col-4 col-lg-2">
-      <div class="m-3 p-2 rounded-circle" style="background: rgba(255,255,255,0.75);">
-        <a target="_blank" href="https://www.uk.coop/start-new-co-op/support/start-worker-co-op"><img src="/images/coop.png" class="w-100"></a>
+    <div class="col-lg-6">
+      <div class="row justify-content-center align-items-center">
+        <div class="col-4">
+          <div class="mb-3 p-4">
+            <img src="/images/gift.png" class="w-100">
+          </div>
+        </div>
+        <div class="col-4">
+          <div class="m-3 p-2 rounded-circle">
+            <img src="/images/coop.png" class="w-100">
+          </div>
+        </div>
+        <div class="col-4">
+          <div class="mb-3 p-4">
+            <img src="/images/copyleft.png" class="w-100">
+          </div>
+        </div>
+      </div>
+      <div class="row justify-content-center align-items-center">
+        <div class="col-4">
+          <p class="text-center">
+            <a target="_blank" href="https://www.youtube.com/watch?v=EaxjxICgahc">Gift economy</a>
+          </p>
+        </div>
+        <div class="col-4">
+          <p class="text-center">
+            <a href="https://dandelion.coop/">Not-for-profit<br />
+              worker co-operative</a>
+          </p>
+        </div>
+        <div class="col-4">
+          <p class="text-center">
+            <a target="_blank" href="https://github.com/dandelion-collective/dandelion">Open-source copyleft</a>
+          </p>
+        </div>
       </div>
     </div>
+
   </div>
 
-  <div class="row justify-content-center">
-    <div class="col-12 col-lg-10">
-      <p class="strapline mb-0" style="font-size: 0.85rem; text-align: center;">
-        <span class="d-lg-inline-block" style="background: rgba(255,255,255,0.75)">
-          Proudly made by a <a href="https://dandelion.coop/">not-for-profit worker co-operative</a>
-          <span class="d-none d-lg-inline">and <a target="_blank" href="https://github.com/dandelion-collective/dandelion">open-source</a>.</span>
-        </span>
-      </p>
+
+  <h2 class="text-center mt-4 mb-3">
+    <%= cp :tickets_count %>
+    <div class="d-none d-lg-block">
+      <%= cp :events_count %>
     </div>
+  </h2>
+  <%= partial :'events/search_form' %>
+  <%= partial :'events/view_options', locals: {path: '/events'} %>
+
+  <div data-with-placeholder data-pagelet-url="/events">
+    <%= partial :'events/blocks_placeholder' %>
   </div>
 
-</div>
-
-<style>
-  #just-pay { line-height: 1 }
-  #just-pay > span { font-size: 0.6em; }
-  @media(min-width: 992px) {
-    #just-pay { line-height: 1.2 }
-    #just-pay > span { font-size: 0.75em }
-  }
-</style>
-
-<p class="lead text-center mt-3 mb-1">
-  <mark>Unlike our competitors,
-    <span class="d-lg-none"><br />
-    </span>
-    we operate on a donation/gift economy basis.</mark><br />
-</p>
-<p class="lead text-center mb-4" id="just-pay">
-  <span>
-    Hosts just pay processing fees via
-    <a target="_blank" href="https://stripe.com/gb/pricing">Stripe</a> or
-    <a target="_blank" href="https://help.coinbase.com/en/commerce/getting-started/fees">Coinbase Commerce</a>
-    <br />
-    (or choose fee-free crypto payments via <a href="https://celo.org/">Celo</a> and <a href="https://www.gnosischain.com/evm">Gnosis Chain</a>).
-  </span>
-</p>
-
-<p class="text-center mb-1">
-  <a class="btn btn-primary btn-lg" href="/events/new">List an event</a>
-</p>
-<p class="text-center">
-  <a href="/docs/events">Watch the 1-minute how-to video</a>
-</p>
-
-<h2 class="text-center mt-4 mb-3">
-  <%= cp :tickets_count %>
-  <div class="d-none d-lg-block">
-    <%= cp :events_count %>
+  <div data-pagelet-url="/events?display=map">
+    <%= partial :'maps/map', locals: { stem: "/events", dynamic: true, trigger_bounds_changed: true } %>
   </div>
-</h2>
-<%= partial :'events/search_form' %>
-<%= partial :'events/view_options', locals: {path: '/events'} %>
-
-<div data-with-placeholder data-pagelet-url="/events">
-  <%= partial :'events/blocks_placeholder' %>
-</div>
-
-<div data-pagelet-url="/events?display=map">
-  <%= partial :'maps/map', locals: { stem: "/events", dynamic: true, trigger_bounds_changed: true } %>
-</div>
