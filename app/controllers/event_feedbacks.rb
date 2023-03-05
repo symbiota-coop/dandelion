@@ -31,7 +31,7 @@ Dandelion::App.controller do
     @event_feedback = EventFeedback.find(params[:id]) || not_found
     @event = @event_feedback.event
     event_admins_only!
-    erb :'event_feedbacks/feedback'
+    erb :'event_feedbacks/event_feedback'
   end
 
   get '/event_feedbacks/:id/destroy' do

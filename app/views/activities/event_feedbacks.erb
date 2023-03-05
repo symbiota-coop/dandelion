@@ -5,4 +5,4 @@
     <% average_rating.round.times do %><i class="fa fa-star"></i><% end %>
   </p>
 <% end %>
-<%= partial :'event_feedbacks/event_feedbacks', locals: { event_feedbacks: @event_feedbacks, event_name: true } %>
+<%= partial :'event_feedbacks/event_feedbacks_table', locals: { event_feedbacks: @event_feedbacks, event_name: true } %>

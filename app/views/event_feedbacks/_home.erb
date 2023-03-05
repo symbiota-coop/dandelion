@@ -1,0 +1,45 @@
+<style>
+  .grid-sizer, .grid-item {  width: 100% }
+  @media(min-width: 768px) {
+    .grid-sizer, .grid-item {  width: 50% }
+  }
+  .grid-item img { padding: 0.1rem }
+</style>
+<script>
+  $(window).on('load', function () {
+    $('.grid').masonry({
+      itemSelector: '.grid-item',
+      columnWidth: '.grid-sizer',
+      percentPosition: true
+    })
+  })
+</script>
+<div class="grid mt-5">
+  <% EventFeedback.and(:event_id.in => Event.pluck(:id), :account_id.in => Account.and(:sign_ins_count.gt => 0, :hidden.ne => true, :picture_uid.ne => nil).pluck(:id), :anonymise.ne => true, :public_answers.ne => nil, :rating => 5).order('created_at desc').limit(10).each { |event_feedback| account = event_feedback.account %>
+  <div class="grid-sizer"></div>
+  <div class="grid-item">
+
+    <div class="row">
+      <div class="col-auto"><i class="fa fa-quote-left"></i></div>
+      <div class="col">
+        <p class="lead mb-0">
+          <%= partial :'accounts/square', locals: { klass: 'float-left mr-3 mb-3', account: account, width: '150px' } %>
+          <a class="home-feedback" href="/events/<%= event_feedback.event.id %>">
+            <%== Sanitize.fragment(event_feedback.public_answers.map { |qa| qa[1] unless qa[1].blank? }.compact.join('<br /><br />'), Sanitize::Config::DANDELION) %>
+          </a>
+        </p>
+
+        <div class="my-2" style="font-size: 2em; white-space: nowrap;">
+          <% event_feedback.rating.times do %><i class="fa fa-star"></i><% end %>
+        </div>
+
+        <p class="mb-5">
+          <a href="/u/<%= account.username %>"><%= account.name %></a> on <a href="/events/<%= event_feedback.event.id %>"><%= event_feedback.event.name %></a>
+          <small><%= timeago event_feedback.created_at %></small>
+        </p>
+
+      </div>
+    </div>
+  </div>
+  <% } %>
+</div>

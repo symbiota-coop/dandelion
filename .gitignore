@@ -17,6 +17,7 @@ node_modules
 app/assets/javascripts/ckeditor5/build/translations
 .on-save.json
 *.code-workspace
+dump
 
 *.gem
 *.rbc
