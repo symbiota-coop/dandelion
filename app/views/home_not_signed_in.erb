@@ -92,10 +92,11 @@
 
 
   <h2 class="text-center mt-4 mb-3">
-    <%= cp :tickets_count %>
-    <div class="d-none d-lg-block">
-      <%= cp :events_count %>
-    </div>
+    <span class="d-none d-lg-inline">
+      <%= cp :tickets_count %>
+      &middot;      
+    </span>
+    <%= cp :events_count %>
   </h2>
   <%= partial :'events/search_form' %>
   <%= partial :'events/view_options', locals: {path: '/events'} %>
