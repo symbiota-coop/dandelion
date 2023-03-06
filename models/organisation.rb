@@ -141,6 +141,7 @@ class Organisation
       allow_purchase_url: :check_box,
       contribution_not_required: :check_box,
       contribution_requested_per_event_gbp: :number,
+      contribution_offset_gbp: :number,
       event_image_required_height: :number,
       event_image_required_width: :number,
       psychedelic: :check_box
