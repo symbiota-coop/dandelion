@@ -325,8 +325,10 @@ class Event
     organisation.carousels.split("\n").reject { |line| line.blank? }.each do |line|
       title, tags = line.split(':')
       title, _w = title.split('[')
-      tags, _coordinator = tags.split('@')
+      tags, coordinator = tags.split('@')
       tags = tags.split(',').map(&:strip)
+      next if coordinator
+
       intersection = event_tags.pluck(:name) & tags
       if intersection.count > 0
         carousel = title.strip
