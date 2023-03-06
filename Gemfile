@@ -25,7 +25,7 @@ gem 'mongoid_paranoia'
 gem 'bcrypt'
 gem 'bech32'
 gem 'omniauth'
-gem 'omniauth-ethereum', github: 'stephenreid321/omniauth-ethereum.rb'
+gem 'omniauth-ethereum', github: 'q9f/omniauth-ethereum.rb'
 gem 'strong_password'
 
 # Validation and testing
@@ -35,8 +35,8 @@ gem 'erb_lint', require: false
 gem 'factory_bot'
 gem 'rubocop'
 group :test do
-  gem 'apparition', github: 'twalpole/apparition', ref: 'ca86be4d54af835d531dbcd2b86e7b2c77f85f34'
   gem 'capybara'
+  gem 'cuprite'
   gem 'minitest-rg'
   gem 'rack_session_access'
 end
@@ -79,7 +79,7 @@ gem 'geocoder'
 
 # Formatting
 gem 'addressable'
-gem 'htmlbeautifier', github: 'trileuco/htmlbeautifier'
+gem 'htmlbeautifier'
 gem 'html_truncator'
 gem 'redcarpet'
 gem 'rinku'
