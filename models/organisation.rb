@@ -278,7 +278,7 @@ class Organisation
   end
 
   def contribution_requested
-    c = Money.new((-contribution_offset_gbp * 100) || 0, 'GBP')
+    c = Money.new((-1*contribution_offset_gbp * 100) || 0, 'GBP')
     contributable_events.each do |event|
       c += Money.new((event.contribution_gbp || contribution_requested_per_event_gbp || Organisation.contribution_requested_per_event_gbp) * 100, 'GBP')
     end
