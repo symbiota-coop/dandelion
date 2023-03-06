@@ -146,6 +146,19 @@ class Organisation
     }
   end
 
+  def self.spring_clean
+    fields = %i[image_uid]
+    ignore = [:organisationships, :notifications_as_notifiable]
+    Organisation.all.each do |organisation|
+      next unless Organisation.reflect_on_all_associations(:has_many).all? do |assoc|
+        organisation.send(assoc.name).count == 0 || ignore.include?(assoc.name)
+      end && fields.all? { |f| organisation.send(f).blank? } && organisation.created_at < 1.month.ago
+
+      puts organisation.name
+      organisation.destroy
+    end
+  end
+
   has_many :discount_codes, class_name: 'DiscountCode', as: :codeable, dependent: :destroy
 
   def self.currencies

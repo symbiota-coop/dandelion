@@ -94,6 +94,18 @@ class Gathering
             end.to_h)
   end
 
+  def self.spring_clean
+    ignore = [:memberships, :teams, :teamships, :notifications_as_notifiable, :notifications_as_circle]
+    Gathering.all.each do |gathering|
+      next unless Gathering.reflect_on_all_associations(:has_many).all? do |assoc|
+        gathering.send(assoc.name).count == 0 || ignore.include?(assoc.name)
+      end && gathering.created_at < 1.week.ago && gathering.memberships.count == 1
+
+      puts gathering.name
+      gathering.destroy
+    end
+  end  
+
   dragonfly_accessor :image
   before_validation do
     if image
