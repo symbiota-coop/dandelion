@@ -45,7 +45,7 @@ class Event
   field :select_tickets_intro, type: String
   field :select_tickets_outro, type: String
   field :select_tickets_title, type: String
-  field :opt_out_of_contribution, type: Boolean
+  field :contribution_gbp, type: Float
 
   def self.admin_fields
     {
@@ -90,7 +90,7 @@ class Event
       hide_organisation_footer: :check_box,
       send_order_notifications: :check_box,
       raw_description: :check_box,
-      opt_out_of_contribution: :check_box,
+      contribution_gbp: :number,
       account_id: :lookup,
       organisation_id: :lookup,
       activity_id: :lookup,
@@ -809,7 +809,8 @@ class Event
       ask_hear_about: 'Ask people how they heard about the event',
       capacity: 'Total capacity',
       gathering_id: 'Add people that buy tickets to this gathering',
-      send_order_notifications: 'Send email notifications of orders'
+      send_order_notifications: 'Send email notifications of orders',
+      contribution_gbp: 'Contribution'
     }[attr.to_sym] || super
   end
 
@@ -857,7 +858,7 @@ class Event
       purchase_url: "URL where people can buy tickets (if you're not selling tickets on Dandelion)",
       capacity: 'Caps the total number of tickets issued across all ticket types. Optional',
       send_order_notifications: 'Send email notifications of orders to event facilitators',
-      opt_out_of_contribution: 'Please use mindfully 😇'
+      contribution_gbp: 'Please use mindfully 😇'
     }
   end
 

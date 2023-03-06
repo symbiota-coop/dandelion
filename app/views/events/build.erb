@@ -306,8 +306,8 @@
             <% if Padrino.env == :development || @event.organisation.verified? %>
               <%= f.wysiwyg_block :extra_info_for_recording_email %>
               <%= f.number_block :affiliate_credit_percentage %>
-              <% if  Padrino.env == :development || @event.organisation.can_opt_out_of_contribution? %>
-                <%= f.check_box_block :opt_out_of_contribution %>
+              <% if  Padrino.env == :development || @event.organisation.can_set_contribution? %>
+                <%= f.number_block :contribution_gbp %>
               <% end %>
             <% end %>
             <% if @event.new_record? %>

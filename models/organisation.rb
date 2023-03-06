@@ -69,9 +69,9 @@ class Organisation
   field :recording_email_greeting, type: String
   field :feedback_email_body, type: String
   field :verified, type: Boolean
-  field :can_opt_out_of_contribution, type: Boolean
+  field :can_set_contribution, type: Boolean
   field :contribution_not_required, type: Boolean
-  field :contribution_requested_per_event_gbp, type: Integer
+  field :contribution_requested_per_event_gbp, type: Float
   field :ical_full, type: Boolean
   field :allow_purchase_url, type: Boolean
   field :change_select_tickets_title, type: Boolean
@@ -269,7 +269,7 @@ class Organisation
 
   has_many :organisation_contributions, dependent: :destroy
   def contributable_events
-    events.and(:opt_out_of_contribution.ne => true, :id.in => Order.and(:value.gt => 0, :event_id.in => events.pluck(:id)).pluck(:event_id))
+    events.and(:id.in => Order.and(:value.gt => 0, :event_id.in => events.pluck(:id)).pluck(:event_id))
   end
 
   def self.contribution_requested_per_event_gbp
@@ -277,8 +277,11 @@ class Organisation
   end
 
   def contribution_requested
-    c = contributable_events.count
-    Money.new(c * (contribution_requested_per_event_gbp || Organisation.contribution_requested_per_event_gbp) * 100, 'GBP').exchange_to(MAJOR_CURRENCIES.include?(currency) ? currency : ENV['DEFAULT_CURRENCY'])
+    c = Money.new(0, 'GBP')
+    contributable_events.each do |event|
+      c += Money.new((event.contribution_gbp || contribution_requested_per_event_gbp || Organisation.contribution_requested_per_event_gbp) * 100, 'GBP')
+    end
+    c.exchange_to(MAJOR_CURRENCIES.include?(currency) ? currency : ENV['DEFAULT_CURRENCY'])
   end
 
   def contribution_paid
