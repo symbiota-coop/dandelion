@@ -327,7 +327,7 @@ class Event
       title, _w = title.split('[')
       tags, coordinator = tags.split('@')
       tags = tags.split(',').map(&:strip)
-      next if coordinator
+      next unless coordinator
 
       intersection = event_tags.pluck(:name) & tags
       if intersection.count > 0
