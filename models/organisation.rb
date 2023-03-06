@@ -72,6 +72,7 @@ class Organisation
   field :can_set_contribution, type: Boolean
   field :contribution_not_required, type: Boolean
   field :contribution_requested_per_event_gbp, type: Float
+  field :contribution_offset_gbp, type: Float
   field :ical_full, type: Boolean
   field :allow_purchase_url, type: Boolean
   field :change_select_tickets_title, type: Boolean
@@ -277,7 +278,7 @@ class Organisation
   end
 
   def contribution_requested
-    c = Money.new(0, 'GBP')
+    c = Money.new(-contribution_offset_gbp*100 || 0, 'GBP')
     contributable_events.each do |event|
       c += Money.new((event.contribution_gbp || contribution_requested_per_event_gbp || Organisation.contribution_requested_per_event_gbp) * 100, 'GBP')
     end
