@@ -95,7 +95,7 @@ class Gathering
   end
 
   def self.spring_clean
-    ignore = [:memberships, :teams, :teamships, :notifications_as_notifiable, :notifications_as_circle]
+    ignore = %i[memberships teams teamships notifications_as_notifiable notifications_as_circle]
     Gathering.all.each do |gathering|
       next unless Gathering.reflect_on_all_associations(:has_many).all? do |assoc|
         gathering.send(assoc.name).count == 0 || ignore.include?(assoc.name)
@@ -104,7 +104,7 @@ class Gathering
       puts gathering.name
       gathering.destroy
     end
-  end  
+  end
 
   dragonfly_accessor :image
   before_validation do
@@ -183,7 +183,7 @@ class Gathering
 
   validates_presence_of :name, :slug, :currency
   validates_uniqueness_of :slug
-  validates_format_of :slug, with: /\A[a-z0-9\-]+\z/
+  validates_format_of :slug, with: /\A[a-z0-9-]+\z/
 
   has_many :notifications_as_notifiable, as: :notifiable, dependent: :destroy, class_name: 'Notification', inverse_of: :notifiable
   has_many :notifications_as_circle, as: :circle, dependent: :destroy, class_name: 'Notification', inverse_of: :circle
@@ -366,24 +366,24 @@ class Gathering
       end
     end
 
-    unless webhooks.find { |w| w['url'] == "#{ENV['BASE_URI']}/g/#{slug}/stripe_webhook" && w['enabled_events'].include?('checkout.session.completed') }
-      w = Stripe::WebhookEndpoint.create({
-                                           url: "#{ENV['BASE_URI']}/g/#{slug}/stripe_webhook",
-                                           enabled_events: [
-                                             'checkout.session.completed'
-                                           ]
-                                         })
-      update_attribute(:stripe_endpoint_secret, w['secret'])
-    end
+    return if webhooks.find { |w| w['url'] == "#{ENV['BASE_URI']}/g/#{slug}/stripe_webhook" && w['enabled_events'].include?('checkout.session.completed') }
+
+    w = Stripe::WebhookEndpoint.create({
+                                         url: "#{ENV['BASE_URI']}/g/#{slug}/stripe_webhook",
+                                         enabled_events: [
+                                           'checkout.session.completed'
+                                         ]
+                                       })
+    update_attribute(:stripe_endpoint_secret, w['secret'])
   end
 
   def median_threshold
     array = memberships.pluck(:desired_threshold).compact
-    if array.length > 0
-      sorted = array.sort
-      len = sorted.length
-      ((sorted[(len - 1) / 2] + sorted[len / 2]) / 2.0).round
-    end
+    return unless array.length > 0
+
+    sorted = array.sort
+    len = sorted.length
+    ((sorted[(len - 1) / 2] + sorted[len / 2]) / 2.0).round
   end
 
   def clear_up_optionships!

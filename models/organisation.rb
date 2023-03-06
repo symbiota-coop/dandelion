@@ -148,7 +148,7 @@ class Organisation
 
   def self.spring_clean
     fields = %i[image_uid]
-    ignore = [:organisationships, :notifications_as_notifiable]
+    ignore = %i[organisationships notifications_as_notifiable]
     Organisation.all.each do |organisation|
       next unless Organisation.reflect_on_all_associations(:has_many).all? do |assoc|
         organisation.send(assoc.name).count == 0 || ignore.include?(assoc.name)
