@@ -79,7 +79,6 @@ gem 'geocoder'
 
 # Formatting
 gem 'addressable'
-gem 'htmlbeautifier'
 gem 'html_truncator'
 gem 'redcarpet'
 gem 'rinku'

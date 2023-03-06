@@ -10,8 +10,6 @@ require 'active_support/time'
 require 'money/bank/uphold'
 Bundler.require(:default, RACK_ENV)
 
-#  Dir['app/views/**/*.erb'].each { |p| puts p; `htmlbeautifier #{p} -b 2` }
-
 Padrino.load!
 
 Mongoid.load!("#{PADRINO_ROOT}/config/mongoid.yml")

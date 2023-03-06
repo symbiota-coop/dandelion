@@ -18,6 +18,7 @@ FileUtils.rm_rf("#{Capybara.save_path}/.") unless ENV['CI']
 Capybara.register_driver :cuprite do |app|
   options = {}
   options[:js_errors] = false
+  options[:timeout] = 60
   Capybara::Cuprite::Driver.new(app, options)
 end
 Capybara.javascript_driver = :cuprite
