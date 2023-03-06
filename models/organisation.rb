@@ -779,9 +779,7 @@ class Organisation
     # worksheet.save
   end
 
-  def transfer_charges
-    from = Date.today - 2
-    to = Date.today - 1
+  def transfer_charges(from: Date.today - 2, to: Date.today - 1)
     Stripe.api_key = stripe_sk
     Stripe.api_version = '2020-08-27'
     charges = Stripe::Charge.list(created: { gte: Time.utc(from.year, from.month, from.day).to_i, lt: Time.utc(to.year, to.month, to.day).to_i })
@@ -824,9 +822,7 @@ class Organisation
     # worksheet.save
   end
 
-  def transfer_transactions
-    from = Date.today - 2
-    to = Date.today - 1
+  def transfer_transactions(from: Date.today - 2, to: Date.today - 1)
     Stripe.api_key = stripe_sk
     Stripe.api_version = '2020-08-27'
 
