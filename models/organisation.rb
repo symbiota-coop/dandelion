@@ -613,8 +613,7 @@ class Organisation
       monthly_donation_method: nil,
       monthly_donation_amount: nil,
       monthly_donation_currency: nil,
-      monthly_donation_start_date: nil,
-      monthly_donation_postcode: nil
+      monthly_donation_start_date: nil
     )
 
     api_client = Patreon::API.new(patreon_api_key)
