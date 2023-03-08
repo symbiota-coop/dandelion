@@ -1,5 +1,5 @@
 <td>
-  <a href="<%= "/events/#{event.id}#{if @organisation && @organisation != event.organisation; "?cohost=#{@organisation.slug}"; end }" %>"><%= event.name %></a>
+  <a href="<%= "/events/#{event.id}#{if organisation && organisation != event.organisation; "?cohost=#{organisation.slug}"; end }" %>"><%= event.name %></a>
   <% if event.draft? %>
     <span class="label label-default">Draft</span>
   <% end %>
@@ -9,13 +9,13 @@
   <% if event.monthly_donors_only? %>
     <span class="label label-default">Monthly donors only</span>
   <% end %>
-  <% if @organisation && @organisation != event.organisation %>
+  <% if organisation && organisation != event.organisation %>
     <span class="label label-yellow">Co-host</span>
   <% end %>
 </td>
 <td nowrap>
   <a data-toggle="tooltip" title="Edit event" class="btn btn-sm btn-primary" href="/events/<%= event.id %>/edit"><i class="fa fa-pencil"></i></a>
-  <% event_image = nil; if @organisation && (cohostship = event.cohostships.find_by(organisation: @organisation)) && cohostship.image
+  <% event_image = nil; if organisation && (cohostship = event.cohostships.find_by(organisation: organisation)) && cohostship.image
   event_image = cohostship.image
   elsif event.image
   event_image = event.image
@@ -23,7 +23,7 @@
   <% if event_image %>
     <a data-toggle="tooltip" title="Copy Markdown image code" class="btn btn-sm btn-primary" href="javascript:;" onclick="
   var el = document.createElement('textarea');
-  var str = '[![](<%= escape_javascript(u(event_image.url)) %>)](<%= ENV['BASE_URI'] %><%= "/events/#{event.id}#{if @organisation && @organisation != event.organisation; "?cohost=#{@organisation.slug}"; end }" %>)'
+  var str = '[![](<%= escape_javascript(u(event_image.url)) %>)](<%= ENV['BASE_URI'] %><%= "/events/#{event.id}#{if organisation && organisation != event.organisation; "?cohost=#{organisation.slug}"; end }" %>)'
   el.value = str;
   document.body.appendChild(el);
   el.select();

@@ -257,7 +257,7 @@ Dandelion::App.controller do
     @event = Event.find(params[:id]) || not_found
     @organisation = params[:organisation_id] ? Organisation.find(params[:organisation_id]) : nil
     event_admins_only!
-    cp(:'events/event_stats_row', locals: { event: @event }, key: "/events/#{@event.id}/stats_row?timezone=#{Time.zone.name}#{"&organisation_id=#{@organisation.id}" if @organisation}")
+    cp(:'events/event_stats_row', locals: { event: @event, organisation: @organisation }, key: "/events/#{@event.id}/stats_row?timezone=#{Time.zone.name}#{"&organisation_id=#{@organisation.id}" if @organisation}")
   end
 
   get '/events/:id/edit' do
