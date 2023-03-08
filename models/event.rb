@@ -266,6 +266,7 @@ class Event
   end
 
   after_save do
+    event_facilitations.create account: organisation.admins.first if organisation && organisation.admins.count == 1
     event_facilitations.create account: revenue_sharer if revenue_sharer
     event_facilitations.create account: account if quick_create
 
