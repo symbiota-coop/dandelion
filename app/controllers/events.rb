@@ -830,4 +830,35 @@ Dandelion::App.controller do
     @event_star.try(:destroy)
     200
   end
+
+  get '/tickets/:id/price' do
+    @ticket = Ticket.find(params[:id]) || not_found
+    @event = @ticket.event
+    event_admins_only!
+    partial :'events/ticket_price', locals: { ticket: @ticket }
+  end
+
+  post '/tickets/:id/price' do
+    @ticket = Ticket.find(params[:id]) || not_found
+    @event = @ticket.event
+    event_admins_only!
+    @ticket.update_attributes(price: params[:price])
+    200
+  end
+
+  get '/tickets/:id/ticket_type' do
+    @ticket = Ticket.find(params[:id]) || not_found
+    @event = @ticket.event
+    event_admins_only!
+    partial :'events/ticket_type', locals: { ticket: @ticket }
+  end
+
+  post '/tickets/:id/ticket_type' do
+    sign_in_required!
+    @ticket = Ticket.find(params[:id]) || not_found
+    @event = @ticket.event
+    event_admins_only!
+    @ticket.update_attributes(ticket_type_id: params[:ticket_type_id])
+    200
+  end  
 end
