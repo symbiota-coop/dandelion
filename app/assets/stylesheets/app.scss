@@ -355,6 +355,10 @@ h4.block-title {
   color: #f5b041
 }
 
+.editor-preview {
+  font-size: 18px
+}
+
 div.wysiwyg img,
 .editor-preview-side img,
 .editor-preview img {
@@ -391,7 +395,7 @@ img.private:hover {
 .CodeMirror,
 .CodeMirror-scroll {
   max-height: 25em;
-  font-size: 1.1em;
+  font-size: 18px;
 }
 
 .CodeMirror-fullscreen.CodeMirror {
