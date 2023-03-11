@@ -854,11 +854,24 @@ Dandelion::App.controller do
   end
 
   post '/tickets/:id/ticket_type' do
-    sign_in_required!
     @ticket = Ticket.find(params[:id]) || not_found
     @event = @ticket.event
     event_admins_only!
     @ticket.update_attributes(ticket_type_id: params[:ticket_type_id])
     200
-  end  
+  end
+
+  post '/events/:id/event_dates/new' do
+    @event = Event.find(params[:id]) || not_found
+    event_admins_only!
+    @event.event_dates.create(mass_assigning(params[:event_date], EventDate))
+    redirect back
+  end
+
+  post '/events/:id/event_dates/destroy' do
+    @event = Event.find(params[:id]) || not_found
+    event_admins_only!
+    @event.event_dates.find(params[:event_date_id]).try(:destroy)
+    redirect back
+  end
 end

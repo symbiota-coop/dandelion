@@ -3,12 +3,12 @@ Dandelion::App.helpers do
     request.env.select { |_k, v| v.is_a?(String) }.to_yaml
   end
 
-  def concise_when_details(whenable)
-    whenable.send(:concise_when_details, current_account ? current_account.time_zone : session[:time_zone])
+  def concise_when_details(whenable, with_zone: false)
+    whenable.send(:concise_when_details, current_account ? current_account.time_zone : session[:time_zone], with_zone: with_zone)
   end
 
-  def when_details(whenable)
-    whenable.send(:when_details, current_account ? current_account.time_zone : session[:time_zone])
+  def when_details(whenable, with_zone: true)
+    whenable.send(:when_details, current_account ? current_account.time_zone : session[:time_zone], with_zone: with_zone)
   end
 
   def search(klass, match, query, n = nil)

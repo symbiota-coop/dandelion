@@ -1,0 +1,42 @@
+<ul class="fa-ul" style="margin-left: 1.5em">
+  <% event_dates.each_with_index { |event_date,i| %>
+  <li>
+    <i data-toggle="tooltip" title="Session <%=i+1%>" class="fa fa-li fa-clock"></i> <%= when_details(event_date, with_zone: false) %>
+  </li>
+  <% } %>
+
+  <% if add_and_remove %>
+    <li>
+      <i class="fa fa-li fa-clock"></i>
+      <a id="add-event-date" href="javascript:;" onclick="$(this).hide().next().show();
+        $('#remove-event-date').hide()"><i class="fa fa-plus-square"></i></a>
+      <div style="display: none">
+        <script>
+          $(function() {
+            $('#event_date_start_time')[0]._flatpickr.set('minDate', <%==@event.start_time.to_fs(:db).to_json%>)
+            $('#event_date_start_time')[0]._flatpickr.set('maxDate', <%==@event.end_time.to_fs(:db).to_json%>)
+            $('#event_date_end_time')[0]._flatpickr.set('minDate', <%==@event.start_time.to_fs(:db).to_json%>)
+            $('#event_date_end_time')[0]._flatpickr.set('maxDate', <%==@event.end_time.to_fs(:db).to_json%>)
+            $('#event_date_start_time').change(function() {
+            $('#event_date_end_time')[0]._flatpickr.set('minDate', $('#event_date_start_time')[0]._flatpickr.selectedDates[0])
+              })
+          })
+        </script>
+        <% form_for new_object, new_url do |f| %>
+          <%= f.datetime_block :start_time %>
+          <%= f.datetime_block :end_time %>
+          <%= f.submit_block button_text: "Add date" %>
+        <% end %>
+      </div>
+      <a id="remove-event-date" href="javascript:;" onclick="$(this).hide().next().show();
+        $('#add-event-date').hide()"><i class="fa fa-minus-square"></i></a>
+      <div style="display: none">
+        <% form_tag destroy_url do |f| %>
+          <%= select_tag :event_date_id, options: event_dates.map { |event_date| [when_details(event_date, with_zone: false), event_date.id] }, class: 'form-control mb-1' %>
+          <%= submit_tag "Remove date", class: 'btn btn-danger' %>
+        <% end %>
+      </div>
+      <li>
+      <% end %>
+
+    </ul>

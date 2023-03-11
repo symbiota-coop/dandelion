@@ -129,6 +129,8 @@ class Event
   has_many :comments, as: :commentable, dependent: :destroy
   has_many :comment_reactions, as: :commentable, dependent: :destroy
 
+  has_many :event_dates, dependent: :destroy
+
   has_many :cohostships, dependent: :destroy
   def cohosts
     Organisation.and(:id.in => cohostships.pluck(:organisation_id))
@@ -754,7 +756,7 @@ class Event
     [''] + ActiveSupport::TimeZone::MAPPING.keys.sort
   end
 
-  def when_details(zone)
+  def when_details(zone, with_zone: true)
     return unless start_time && end_time
 
     zone ||= (time_zone || ENV['DEFAULT_TIME_ZONE'])
@@ -763,23 +765,24 @@ class Event
     end_time = self.end_time.in_time_zone(zone)
     z = "#{zone.include?('London') ? 'UK time' : zone.gsub('_', ' ')} (UTC #{start_time.formatted_offset})"
     if start_time.to_date == end_time.to_date
-      "#{start_time.to_date}, #{start_time.to_fs(:no_double_zeros)} – #{end_time.to_fs(:no_double_zeros)} #{z}"
+      "#{start_time.to_date}, #{start_time.to_fs(:no_double_zeros)} – #{end_time.to_fs(:no_double_zeros)} #{z if with_zone}"
     else
-      "#{start_time.to_date}, #{start_time.to_fs(:no_double_zeros)} – #{end_time.to_date}, #{end_time.to_fs(:no_double_zeros)} #{z}"
+      "#{start_time.to_date}, #{start_time.to_fs(:no_double_zeros)} – #{end_time.to_date}, #{end_time.to_fs(:no_double_zeros)} #{z if with_zone}"
     end
   end
 
-  def concise_when_details(zone)
+  def concise_when_details(zone, with_zone: false)
     return unless start_time && end_time
 
     zone ||= (time_zone || ENV['DEFAULT_TIME_ZONE'])
     zone = zone.name unless zone.is_a?(String)
     start_time = self.start_time.in_time_zone(zone)
     end_time = self.end_time.in_time_zone(zone)
+    z = "#{zone.include?('London') ? 'UK time' : zone.gsub('_', ' ')} (UTC #{start_time.formatted_offset})"
     if start_time.to_date == end_time.to_date
       start_time.to_date
     else
-      "#{start_time.to_date} – #{end_time.to_date}"
+      "#{start_time.to_date} – #{end_time.to_date} #{z if with_zone}"
     end
   end
 
