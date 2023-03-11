@@ -22,7 +22,7 @@
               })
           })
         </script>
-        <% form_for new_object, new_url do |f| %>
+        <% form_for new_object, new_url, class: 'mb-3' do |f| %>
           <%= f.datetime_block :start_time %>
           <%= f.datetime_block :end_time %>
           <%= f.submit_block button_text: 'Add session' %>
