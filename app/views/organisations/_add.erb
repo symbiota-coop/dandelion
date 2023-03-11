@@ -8,21 +8,23 @@
 <% } %>
 <% if add_and_remove %>
   <div>
-    <a id="add-role" href="javascript:;" onclick="$(this).hide().next().show();
-        $('#remove-role').hide()"><i class="fa fa-plus-square"></i></a>
+    <a id="add-organisation" href="javascript:;" onclick="$(this).hide().next().show();
+        $('#remove-organisation').hide()"><i class="fa fa-plus-square"></i></a>
     <div style="display: none">
       <% form_for new_object, new_url do |f| %>
         <%= f.lookup_block :organisation_id, lookup_url: '/organisations.json', placeholder: 'Search organisations' %>
         <%= f.submit_block button_text: "Add #{role}" %>
       <% end %>
     </div>
-    <a id="remove-role" href="javascript:;" onclick="$(this).hide().next().show();
-        $('#add-role').hide()"><i class="fa fa-minus-square"></i></a>
-    <div style="display: none">
-      <% form_tag destroy_url, class: 'form-inline' do |f| %>
-        <%= select_tag :organisation_id, options: organisations.map { |organisation| ["#{organisation.name} (#{organisation.id})", organisation.id] }, class: 'form-control mr-1' %>
-        <%= submit_tag "Remove #{role}", class: 'btn btn-danger' %>
-      <% end %>
-    </div>
+    <% if organisations.count > 0 %>
+      <a id="remove-organisation" href="javascript:;" onclick="$(this).hide().next().show();
+        $('#add-organisation').hide()"><i class="fa fa-minus-square"></i></a>
+      <div style="display: none">
+        <% form_tag destroy_url do |f| %>
+          <%= select_tag :organisation_id, options: organisations.map { |organisation| ["#{organisation.name} (#{organisation.id})", organisation.id] }, class: 'form-control mb-1' %>
+          <%= submit_tag "Remove #{role}", class: 'btn btn-danger' %>
+        <% end %>
+      </div>
+    <% end %>
   </div>
 <% end %>

@@ -94,23 +94,23 @@
       <li>
         <i <% if n > 1 %> style="top: 0.55em"<% end %> data-toggle="tooltip" title="Dates/times" class="fa fa-li fa-calendar"></i>
         <% if n > 1 %>
-          <%= select_tag :event_id, options: events.map { |event| [@event.event_dates.count > 0 ? concise_when_details(event, with_zone: true) : when_details(event), event.id] }, selected: @event.id, class: 'form-control mb-1', style: 'font-size: 1rem; padding: 0.375rem;', onchange: "window.location = '/events/'+$(this).val()" %>
-        <% elsif @event.event_dates.count > 0 %>
+          <%= select_tag :event_id, options: events.map { |event| [@event.event_sessions.count > 0 ? concise_when_details(event, with_zone: true) : when_details(event), event.id] }, selected: @event.id, class: 'form-control mb-1', style: 'font-size: 1rem; padding: 0.375rem;', onchange: "window.location = '/events/'+$(this).val()" %>
+        <% elsif @event.event_sessions.count > 0 %>
           <%= concise_when_details(@event, with_zone: true) %>
           <span style="font-size: 0.85em">
-            <span class="label label-primary"><%= pluralize @event.event_dates.count, 'date' %></span>
+            <span class="label label-primary"><%= pluralize @event.event_sessions.count, 'session' %></span>
           </span>
         <% else %>
           <%= when_details(@event) %>
         <% end %>
         <% if @event.start_time.to_date != @event.end_time.to_date %>
           <div style="font-size: 0.85em" class="my-1">
-            <%= partial :'events/add_event_date', locals: {
-          event_dates: @event.event_dates.order('start_time asc'),
+            <%= partial :'events/add_event_session', locals: {
+          event_sessions: @event.event_sessions.order('start_time asc'),
           add_and_remove: event_admin?,
-          new_object: EventDate.new,
-          new_url: "/events/#{@event.id}/event_dates/new",
-          destroy_url: "/events/#{@event.id}/event_dates/destroy"
+          new_object: EventSession.new,
+          new_url: "/events/#{@event.id}/event_sessions/new",
+          destroy_url: "/events/#{@event.id}/event_sessions/destroy"
         } %>
           </div>
         <% end %>

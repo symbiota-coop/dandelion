@@ -861,17 +861,17 @@ Dandelion::App.controller do
     200
   end
 
-  post '/events/:id/event_dates/new' do
+  post '/events/:id/event_sessions/new' do
     @event = Event.find(params[:id]) || not_found
     event_admins_only!
-    @event.event_dates.create(mass_assigning(params[:event_date], EventDate))
+    @event.event_sessions.create(mass_assigning(params[:event_session], EventSession))
     redirect back
   end
 
-  post '/events/:id/event_dates/destroy' do
+  post '/events/:id/event_sessions/destroy' do
     @event = Event.find(params[:id]) || not_found
     event_admins_only!
-    @event.event_dates.find(params[:event_date_id]).try(:destroy)
+    @event.event_sessions.find(params[:event_session_id]).try(:destroy)
     redirect back
   end
 end

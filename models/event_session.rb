@@ -1,4 +1,4 @@
-class EventDate
+class EventSession
   include Mongoid::Document
   include Mongoid::Timestamps
 

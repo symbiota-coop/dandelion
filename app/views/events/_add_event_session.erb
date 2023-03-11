@@ -1,0 +1,44 @@
+<ul class="fa-ul" style="margin-left: 1.5em">
+  <% event_sessions.each_with_index { |event_session,i| %>
+  <li>
+    <i data-toggle="tooltip" title="Session <%=i+1%>" class="fa fa-li fa-clock"></i> <%= when_details(event_session, with_zone: false) %>
+  </li>
+  <% } %>
+
+  <% if add_and_remove %>
+    <li>
+      <i class="fa fa-li fa-clock"></i>
+      <a data-toggle="tooltip" title="Add a session" id="add-event-session" href="javascript:;" onclick="$(this).hide().next().show();
+        $('#remove-event-session').hide()"><i class="fa fa-plus-square"></i></a>
+      <div style="display: none">
+        <script>
+          $(function() {
+            $('#event_session_start_time')[0]._flatpickr.set('minDate', <%==@event.start_time.to_fs(:db).to_json%>)
+            $('#event_session_start_time')[0]._flatpickr.set('maxDate', <%==@event.end_time.to_fs(:db).to_json%>)
+            $('#event_session_end_time')[0]._flatpickr.set('minDate', <%==@event.start_time.to_fs(:db).to_json%>)
+            $('#event_session_end_time')[0]._flatpickr.set('maxDate', <%==@event.end_time.to_fs(:db).to_json%>)
+            $('#event_session_start_time').change(function() {
+            $('#event_session_end_time')[0]._flatpickr.set('minDate', $('#event_session_start_time')[0]._flatpickr.selectedDates[0])
+              })
+          })
+        </script>
+        <% form_for new_object, new_url do |f| %>
+          <%= f.datetime_block :start_time %>
+          <%= f.datetime_block :end_time %>
+          <%= f.submit_block button_text: 'Add session' %>
+        <% end %>
+      </div>
+      <% if event_sessions.count > 0 %>
+        <a data-toggle="tooltip" title="Remove a session" id="remove-event-session" href="javascript:;" onclick="$(this).hide().next().show();
+        $('#add-event-session').hide()"><i class="fa fa-minus-square"></i></a>
+        <div style="display: none">
+          <% form_tag destroy_url do |f| %>
+            <%= select_tag :event_session_id, options: event_sessions.map { |event_session| [when_details(event_session, with_zone: false), event_session.id] }, class: 'form-control mb-1' %>
+            <%= submit_tag 'Remove session', class: 'btn btn-danger' %>
+          <% end %>
+        </div>
+      <% end %>
+    </li>
+  <% end %>
+
+</ul>

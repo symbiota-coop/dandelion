@@ -129,7 +129,7 @@ class Event
   has_many :comments, as: :commentable, dependent: :destroy
   has_many :comment_reactions, as: :commentable, dependent: :destroy
 
-  has_many :event_dates, dependent: :destroy
+  has_many :event_sessions, dependent: :destroy
 
   has_many :cohostships, dependent: :destroy
   def cohosts
