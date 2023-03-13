@@ -1,20 +1,22 @@
 <div style="position: relative;">
-  <a target="_parent" href="/events/<%= event.id %>" <% if event.carousel_text %> data-toggle="tooltip" title="<%=event.carousel_text%>" <% end %>>
-    <% if @organisation && (cohostship = event.cohostships.find_by(organisation: @organisation)) && cohostship.image %>
+  <% if @organisation && (cohostship = event.cohostships.find_by(organisation: @organisation)) && cohostship.image %>
+    <a target="_parent" href="/events/<%= event.id %>?cohost=<%=@organisation.slug%>" <% if event.carousel_text %> data-toggle="tooltip" title="<%=event.carousel_text%>" <% end %>>
       <img class="w-100" src="<%= u cohostship.image.thumb((crop if defined?(crop) && crop) || '992x992').url %>">
+    </a>
   <% else %>
-    <img class="w-100" src="<%= u event.image.thumb((crop if defined?(crop) && crop) || '992x992').url %>">
+    <a target="_parent" href="/events/<%= event.id %>" <% if event.carousel_text %> data-toggle="tooltip" title="<%=event.carousel_text%>" <% end %>>
+      <img class="w-100" src="<%= u event.image.thumb((crop if defined?(crop) && crop) || '992x992').url %>">
+    </a>
   <% end %>
-</a>
-<span data-toggle="tooltip" title="<%= when_details(event) %>" class="label label-primary" style="opacity: 0.85; border-radius: 0; position: absolute; top: 0; right: 0">
-  <% if event.start_time.to_date != event.end_time.to_date %>
-    Starts
-  <% end %>
-  <%= event.start_time.to_date.to_fs(:no_year) %>
-</span>
-<% if event.sold_out? %>
-  <span class="label label-danger" style="opacity: 0.85; border-radius: 0; position: absolute; bottom: 0; right: 0">
-    Sold out
+  <span data-toggle="tooltip" title="<%= when_details(event) %>" class="label label-primary" style="opacity: 0.85; border-radius: 0; position: absolute; top: 0; right: 0">
+    <% if event.start_time.to_date != event.end_time.to_date %>
+      Starts
+    <% end %>
+    <%= event.start_time.to_date.to_fs(:no_year) %>
   </span>
-<% end %>
+  <% if event.sold_out? %>
+    <span class="label label-danger" style="opacity: 0.85; border-radius: 0; position: absolute; bottom: 0; right: 0">
+      Sold out
+    </span>
+  <% end %>
 </div>

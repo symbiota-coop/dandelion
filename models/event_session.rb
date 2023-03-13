@@ -20,10 +20,14 @@ class EventSession
     event.time_zone
   end
 
+  def time_zone_or_default
+    time_zone || ENV['DEFAULT_TIME_ZONE']
+  end  
+
   def when_details(zone, with_zone: true)
     return unless start_time && end_time
 
-    zone ||= (time_zone || ENV['DEFAULT_TIME_ZONE'])
+    zone ||= time_zone_or_default
     zone = zone.name unless zone.is_a?(String)
     start_time = self.start_time.in_time_zone(zone)
     end_time = self.end_time.in_time_zone(zone)
@@ -38,7 +42,7 @@ class EventSession
   def concise_when_details(zone, with_zone: false)
     return unless start_time && end_time
 
-    zone ||= (time_zone || ENV['DEFAULT_TIME_ZONE'])
+    zone ||= time_zone_or_default
     zone = zone.name unless zone.is_a?(String)
     start_time = self.start_time.in_time_zone(zone)
     end_time = self.end_time.in_time_zone(zone)
