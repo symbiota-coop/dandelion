@@ -2,6 +2,7 @@ require 'active_support/core_ext/integer/inflections'
 
 Time::DATE_FORMATS.merge!(
   default: ->(time) { time.to_fs(:date) + ', ' + time.to_fs(:time) },
+  db_local: ->(time) { time.strftime("%Y-%m-%d %H:%M:%S") },
   date: ->(time) { time.to_date.to_s },
   no_year: ->(time) { time.to_date.to_fs(:no_year) + ', ' + time.to_fs(:time) },
   time: ->(time) { time.strftime("#{(t = time.hour % 12) == 0 ? 12 : t}:%M#{time.strftime('%p').downcase}") },
@@ -12,6 +13,7 @@ Time::DATE_FORMATS.merge!(
 
 Date::DATE_FORMATS.merge!(
   default: ->(date) { date.strftime("%a #{date.day.ordinalize} %b %Y") },
+  db_local: ->(date) { date.strftime("%Y-%m-%d") },
   no_year: ->(date) { date.strftime("%a #{date.day.ordinalize} %B") }
 )
 

@@ -13,10 +13,10 @@
       <div style="display: none">
         <script>
           $(function() {
-            $('#event_session_start_time')[0]._flatpickr.set('minDate', <%==@event.start_time.to_fs(:db).to_json%>)
-            $('#event_session_start_time')[0]._flatpickr.set('maxDate', <%==@event.end_time.to_fs(:db).to_json%>)
-            $('#event_session_end_time')[0]._flatpickr.set('minDate', <%==@event.start_time.to_fs(:db).to_json%>)
-            $('#event_session_end_time')[0]._flatpickr.set('maxDate', <%==@event.end_time.to_fs(:db).to_json%>)
+            $('#event_session_start_time')[0]._flatpickr.set('minDate', <%==@event.start_time.to_fs(:db_local).to_json%>)
+            $('#event_session_start_time')[0]._flatpickr.set('maxDate', <%==@event.end_time.to_fs(:db_local).to_json%>)
+            $('#event_session_end_time')[0]._flatpickr.set('minDate', <%==@event.start_time.to_fs(:db_local).to_json%>)
+            $('#event_session_end_time')[0]._flatpickr.set('maxDate', <%==@event.end_time.to_fs(:db_local).to_json%>)
             $('#event_session_start_time').change(function() {
             $('#event_session_end_time')[0]._flatpickr.set('minDate', $('#event_session_start_time')[0]._flatpickr.selectedDates[0])
               })

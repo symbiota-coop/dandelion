@@ -292,7 +292,7 @@ Dandelion::App.controller do
             order.opt_in_facilitator,
             order.hear_about,
             order.answers,
-            order.created_at.to_fs(:db)
+            order.created_at.to_fs(:db_local)
           ]
         end
       end

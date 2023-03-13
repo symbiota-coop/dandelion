@@ -31,8 +31,8 @@ class CoreTest < ActiveSupport::TestCase
     click_button 'Update organisation'
     click_link 'Create an event'
     fill_in 'Event title*', with: @event.name
-    execute_script %{$('#event_start_time').val('#{@event.start_time.to_fs(:db)}')}
-    execute_script %{$('#event_end_time').val('#{@event.end_time.to_fs(:db)}')}
+    execute_script %{$('#event_start_time').val('#{@event.start_time.to_fs(:db_local)}')}
+    execute_script %{$('#event_end_time').val('#{@event.end_time.to_fs(:db_local)}')}
     fill_in 'Location*', with: @event.location
     click_link 'Tickets'
     execute_script %{$("a:contains('Add ticket type')").click()}

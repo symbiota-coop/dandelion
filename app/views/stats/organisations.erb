@@ -64,7 +64,7 @@ partial :chart, locals: {
       <td>
         <%= orders_sum.format(no_cents: true) %>
       </td>
-      <td data-sort="<%=organisation.created_at.to_fs(:db)%>"><%=organisation.created_at%></td>
+      <td data-sort="<%=organisation.created_at.to_fs(:db_local)%>"><%=organisation.created_at%></td>
     </tr>
     <% } %>
   </table>
