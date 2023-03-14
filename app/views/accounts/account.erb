@@ -15,7 +15,7 @@
   <h2 class="mt-5">Upcoming events <% if @account.following_starred.count > 0 %>featuring <%=@account.firstname%> and <%=@account.pronoun%> stars<% end %></h2>
   <%= partial :'events/blocks', locals: { events: events } %>
 <% end %>
-<% if @account.event_feedbacks_as_facilitator.count > 0 %>
+<% if @account.event_feedbacks_as_facilitator.unscoped.count > 0 %>
   <h2 class="mt-5">Feedback</h2>
   <div class="mt-3" data-pagelet-url="/accounts/<%= @account.id %>/show_feedback"></div>
 <% end %>
