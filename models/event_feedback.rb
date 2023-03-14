@@ -1,6 +1,7 @@
 class EventFeedback
   include Mongoid::Document
   include Mongoid::Timestamps
+  include Mongoid::Paranoia
 
   belongs_to :event, index: true, optional: true
   belongs_to :activity, index: true, optional: true

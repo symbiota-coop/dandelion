@@ -18,18 +18,18 @@
   <%= partial :'events/tag_labels', locals: { event: event } %>
 </div>
 <ul style="margin-left: 1.66em; font-size: 1rem" class="fa-ul text-dark">
-  <% if (ef = event.event_facilitations.select { |event_facilitation| event_facilitation.account.lastname }).count > 0 || !@organisation %>
+  <% if (ef = event.event_facilitations.select { |event_facilitation| event_facilitation.account.lastname }).count > 0 || (!@organisation && event.organisation) %>
     <li>
       <i data-toggle="tooltip" title="Host/facilitators" class="fa fa-li fa-flag"></i>
       <% if ef.count > 0 %>
         <%== ef.map { |event_facilitation|
           %(<a target="_parent" class="text-dark" href="/u/#{event_facilitation.account.username}">#{Sanitize.fragment(event_facilitation.account.name)}</a>)
         }.to_sentence(last_word_connector: ' and ') %>
-        <% unless @organisation %>
+        <% if !@organisation && event.organisation %>
           in collaboration with
         <% end %>
       <% end %>
-      <% unless @organisation %>
+      <% if !@organisation && event.organisation %>
         <% organisations = []; organisations << %(<a target="_parent" class="text-dark" href="/o/#{Sanitize.fragment(event.organisation.slug)}">#{Sanitize.fragment(event.organisation.name)}</a>) %>
         <% event.cohosts.each { |organisation| organisations << %(<a target="_parent" class="text-dark" href="/o/#{Sanitize.fragment(organisation.slug)}">#{Sanitize.fragment(organisation.name)}</a>) } %>
         <%== organisations.to_sentence(last_word_connector: ' and ') %>
