@@ -324,6 +324,10 @@ class Organisation
   def event_feedbacks
     EventFeedback.and(:event_id.in => events.pluck(:id))
   end
+  
+  def unscoped_event_feedbacks
+    EventFeedback.unscoped.and(:event_id.in => events.pluck(:id))
+  end
 
   def event_tags
     EventTag.and(:id.in => EventTagship.and(:event_id.in => events.pluck(:id)).pluck(:event_tag_id))
