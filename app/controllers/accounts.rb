@@ -382,7 +382,7 @@ Dandelion::App.controller do
 
   get '/accounts/:id/show_feedback' do
     @account = Account.find(params[:id]) || not_found
-    partial :'event_feedbacks/event_feedbacks', locals: { event_feedbacks: @account.event_feedbacks_as_facilitator }
+    partial :'event_feedbacks/event_feedbacks', locals: { unscoped: true, event_feedbacks: @account.unscoped_event_feedbacks_as_facilitator }
   end
 
   # minimal

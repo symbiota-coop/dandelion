@@ -354,6 +354,9 @@ class Account
   def event_feedbacks_as_facilitator
     EventFeedback.and(:event_id.in => event_facilitations.pluck(:event_id))
   end
+  def unscoped_event_feedbacks_as_facilitator
+    EventFeedback.unscoped.and(:event_id.in => event_facilitations.pluck(:event_id))
+  end  
   has_many :activities, dependent: :nullify
   has_many :activityships, dependent: :destroy
   def activities_following
