@@ -287,11 +287,11 @@ class Organisation
   end
 
   def contribution_paid
-    s = Money.new(0, currency)
+    s = Money.new(0, 'GBP')
     organisation_contributions.and(payment_completed: true).each { |organisation_contribution|
       s+= Money.new(organisation_contribution.amount * 100, organisation_contribution.currency)
     }
-    s
+    s.exchange_to(MAJOR_CURRENCIES.include?(currency) ? currency : ENV['DEFAULT_CURRENCY'])
   end
 
   def update_paid_up
