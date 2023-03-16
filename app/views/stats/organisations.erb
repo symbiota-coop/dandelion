@@ -12,19 +12,42 @@ partial :chart, locals: {
   }.to_h   
 } %>
 
+<% form_tag '', method: 'get', class: 'searchForm form-inline' do %>
+  <div class="form-group">
+    <label>Events between</label>
+    <%= text_field_tag :from, class: 'form-control datepicker mx-1', value: @from.to_fs(:db_local) %>
+  </div>
+  <div class="form-group">
+    <label>and</label>
+    <%= text_field_tag :to, class: 'form-control datepicker mx-1', value: (@to.to_fs(:db_local) if @to) %>
+  </div>
+  <div class="form-group">
+    <label>Min. tickets</label>
+    <%= number_field_tag :min_tickets, class: 'form-control mx-1', value: @min_tickets %>
+  </div>
+  <div class="form-group">
+    <label>Min. order value</label>
+    <div class="input-group">
+      <div class="input-group-prepend">
+        <span class="input-group-text">£</span>
+      </div>
+      <%= number_field_tag :min_order_value, style: 'width: 8em', class: 'form-control', value: @min_order_value %>
+    </div>
+  </div>
+  <%= hidden_field_tag :search, value: 1 %>
+  <%= submit_tag 'Search', class: 'btn btn-primary' %>
+<% end %>
+
 <%
-  from = Date.new(3.months.ago.year, 3.months.ago.month, 1)
-  to = Date.new(Date.today.year, Date.today.month, 1)
-  orders = Order.and(:created_at.gte => from, :created_at.lt => to, :value.ne => nil, :currency.in => MAJOR_CURRENCIES)  
+  orders = Order.and(:created_at.gte => @from, :created_at.lt => @to, :value.ne => nil, :currency.in => MAJOR_CURRENCIES)  
   organisations = Organisation.and(:id.in => Event.and(:id.in => orders.pluck(:event_id)).pluck(:organisation_id))  
-  tickets = Ticket.and(:created_at.gte => from, :created_at.lt => to, :price.gt => 0)
+  tickets = Ticket.and(:created_at.gte => @from, :created_at.lt => @to, :price.gt => 0)
 %>
 <p class="lead mt-3">
-  In the last quarter,
   <%= pluralize(organisations.count, 'organisation') %> sold
   <%= pluralize(tickets.count, 'ticket') %>
   worth
-  <%= s = Money.new(0,'GBP'); orders.each { |o| s+= Money.new(o.value*100, o.currency) }; s.exchange_to('GBP').format(no_cents: true) %>. Highlights:
+  <%= s = Money.new(0,'GBP'); orders.each { |o| s+= Money.new(o.value*100, o.currency) }; s.exchange_to('GBP').format(no_cents: true) %>
 </p>
 
 <div class="mt-3">
@@ -45,14 +68,14 @@ partial :chart, locals: {
         <th data-col-name="contribution">Contribution</th>
       </tr>
     </thead>
-    <% organisations = Organisation.and(:id.in => Event.and(:id.in => Order.and(:created_at.gte => from, :created_at.lt => to, :value.ne => nil).pluck(:event_id)).pluck(:organisation_id)) %>
+    <% organisations = Organisation.and(:id.in => Event.and(:id.in => Order.and(:created_at.gte => @from, :created_at.lt => @to, :value.ne => nil).pluck(:event_id)).pluck(:organisation_id)) %>
     <% organisations.each { |organisation|
 
-    tickets = Ticket.and(:event_id.in => organisation.events.pluck(:id), :created_at.gte => from, :created_at.lt => to, :price.gt => 0)
-    orders = Order.and(:event_id.in => organisation.events.pluck(:id), :created_at.gte => from, :created_at.lt => to, :value.ne => nil, :currency.in => MAJOR_CURRENCIES)
+    tickets = Ticket.and(:event_id.in => organisation.events.pluck(:id), :created_at.gte => @from, :created_at.lt => @to, :price.gt => 0)
+    orders = Order.and(:event_id.in => organisation.events.pluck(:id), :created_at.gte => @from, :created_at.lt => @to, :value.ne => nil, :currency.in => MAJOR_CURRENCIES)
     orders_sum = orders.sum { |o| Money.new(o.value*100, o.currency) }.exchange_to('GBP')
 
-    next unless tickets.count >= 10 || orders_sum >= Money.new(1000*100, 'GBP')
+    next unless tickets.count >= @min_tickets || orders_sum >= Money.new(@min_order_value*100, 'GBP')
 
     %>
     <tr>
