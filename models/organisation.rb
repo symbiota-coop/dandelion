@@ -287,7 +287,11 @@ class Organisation
   end
 
   def contribution_paid
-    organisation_contributions.and(payment_completed: true).sum { |organisation_contribution| Money.new(organisation_contribution.amount * 100, organisation_contribution.currency) }
+    s = Money.new(0, currency)
+    organisation_contributions.and(payment_completed: true).each { |organisation_contribution|
+      s+= Money.new(organisation_contribution.amount * 100, organisation_contribution.currency)
+    }
+    s
   end
 
   def update_paid_up

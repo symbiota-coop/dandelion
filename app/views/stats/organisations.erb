@@ -24,7 +24,7 @@ partial :chart, locals: {
   <%= pluralize(organisations.count, 'organisation') %> sold
   <%= pluralize(tickets.count, 'ticket') %>
   worth
-  <%= orders.sum { |o| Money.new(o.value*100, o.currency) }.exchange_to('GBP').format(no_cents: true) %>. Highlights:
+  <%= s = Money.new(0,'GBP'); orders.each { |o| s+= Money.new(o.value*100, o.currency) }; s.exchange_to('GBP').format(no_cents: true) %>. Highlights:
 </p>
 
 <div class="mt-3">
@@ -42,6 +42,7 @@ partial :chart, locals: {
         <th data-col-name="tickets">Tickets</th>
         <th data-col-name="value">Value</th>
         <th data-col-name="created_at">Created at</th>
+        <th data-col-name="contribution">Contribution</th>
       </tr>
     </thead>
     <% organisations = Organisation.and(:id.in => Event.and(:id.in => Order.and(:created_at.gte => from, :created_at.lt => to, :value.ne => nil).pluck(:event_id)).pluck(:organisation_id)) %>
@@ -65,6 +66,15 @@ partial :chart, locals: {
         <%= orders_sum.format(no_cents: true) %>
       </td>
       <td data-sort="<%=organisation.created_at.to_fs(:db_local)%>"><%=organisation.created_at%></td>
+      <% r = organisation.contribution_requested %>
+      <% p = organisation.contribution_paid %>
+      <td data-sort="<%=p/r%>">
+        <div class="progress" style="height: 30px">
+          <div class="progress-bar" role="progressbar" style="width: <%= "#{w = 100*p.to_f/r.to_f}%" %>;">
+            <% if w > 0 %><%= w.to_f.round %>%<% end %>
+          </div>
+        </div>
+      </td>
     </tr>
     <% } %>
   </table>
