@@ -92,6 +92,7 @@ partial :chart, locals: {
       <% r = organisation.contribution_requested %>
       <% p = organisation.contribution_paid %>
       <td data-sort="<%=p/r%>">
+        <%=m p, organisation.currency%>/<%=m r, organisation.currency%>
         <div class="progress" style="height: 30px">
           <div class="progress-bar" role="progressbar" style="width: <%= "#{w = 100*p.to_f/r.to_f}%" %>;">
             <% if w > 0 %><%= w.to_f.round %>%<% end %>
