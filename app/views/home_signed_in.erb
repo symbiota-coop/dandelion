@@ -17,39 +17,27 @@
       </div>
     </div>
 
-    <% if params[:thanks] %>
-      <div class="px-4 mb-5 pt-3">
-        <p class="lead mb-1">
-          <mark class="px-0">Thank you so much for donating!</mark> 🎉
-        </p>
-        <p class="lead mb-0">
-          <small>
-            You're welcome to <a target="_blank" href="https://dandelion.nolt.io/">make suggestions of how we can improve Dandelion on our Nolt board</a>.</p>
-        </small>
-      </p>
-    </div>
-  <% else %>
     <%= partial :'accounts/pay', locals: {div_class: 'px-4 mb-5 pt-3', account: current_account } %>
-  <% end %>
-  <div data-with-placeholder id="newsfeed" data-pagelet-url="/" data-pagelet-refresh="60" class="mt-1 mb-3">
-    <% 15.times do %>
-      <div class="flicker" style="width: 75%; background: rgba(0,0,0,0.1)">&nbsp;</div>
-      <hr class="my-3" style="border-top-color: rgba(0,0,0,0.1)">
-    <% end %>
+
+    <div data-with-placeholder id="newsfeed" data-pagelet-url="/" data-pagelet-refresh="60" class="mt-1 mb-3">
+      <% 15.times do %>
+        <div class="flicker" style="width: 75%; background: rgba(0,0,0,0.1)">&nbsp;</div>
+        <hr class="my-3" style="border-top-color: rgba(0,0,0,0.1)">
+      <% end %>
+    </div>
   </div>
-</div>
-<div class="col-lg-4">
-  <div style="position: sticky; top: 3.75rem">
-    <%= partial :'events/awesome' %>
-    <% unless (provider_link = current_account.provider_links.find_by(provider: 'Ethereum')) %>
-      <div class="card mt-3">
-        <h3 class="card-header bg-primary text-white">Connect wallet</h3>
-        <div class="card-body">
-          <p>Connect your <a target="_blank" href="https://metamask.io/">wallet</a> to sign in with Ethereum</p>
-          <a class="btn btn-primary" href="/auth/ethereum">Connect <i class="fab fa-ethereum"></i></a>
+  <div class="col-lg-4">
+    <div style="position: sticky; top: 3.75rem">
+      <%= partial :'events/awesome' %>
+      <% unless (provider_link = current_account.provider_links.find_by(provider: 'Ethereum')) %>
+        <div class="card mt-3">
+          <h3 class="card-header bg-primary text-white">Connect wallet</h3>
+          <div class="card-body">
+            <p>Connect your <a target="_blank" href="https://metamask.io/">wallet</a> to sign in with Ethereum</p>
+            <a class="btn btn-primary" href="/auth/ethereum">Connect <i class="fab fa-ethereum"></i></a>
+          </div>
         </div>
-      </div>
-    <% end %>
+      <% end %>
+    </div>
   </div>
-</div>
 </div>

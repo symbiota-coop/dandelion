@@ -1,22 +1,44 @@
-<% if account = (current_account || (params[:account_id] && Account.find(params[:account_id]))) %>
+<% if params[:thanks] %>
   <div class="row justify-content-center">
     <div class="col-lg-8">
       <div class="card my-4">
         <div class="card-body p-4">
-          <%= partial :'accounts/pay', locals: { account: account, force: true } %>
+          <p class="lead mb-1">
+            <mark class="px-0">Thank you so much for donating!</mark> 🎉
+          </p>
+          <p class="lead mb-0">
+            <small>
+              You're welcome to <a target="_blank" href="https://dandelion.nolt.io/">make suggestions of how we can improve Dandelion on our Nolt board</a>.
+            </small>
+          </p>
         </div>
       </div>
-      <%= partial :badges %>
     </div>
   </div>
+
 <% else %>
-  <div class="row justify-content-center">
-    <div class="col-lg-10">
-      <p class="lead">
-        Dandelion operates on a donation/gift economy basis and
-        we rely on the generosity of our users. Please chip in so we can remain free.
-      </p>
-      <script src="https://donorbox.org/widget.js" paypalExpress="false"></script><iframe src="https://donorbox.org/embed/dandelion-1" name="donorbox" allowpaymentrequest="" seamless="seamless" frameborder="0" scrolling="no" height="900px" width="100%" style="max-width: 500px; min-width: 250px; max-height:none!important"></iframe>
+
+  <% if account = (current_account || (params[:account_id] && Account.find(params[:account_id]))) %>
+    <div class="row justify-content-center">
+      <div class="col-lg-8">
+        <div class="card my-4">
+          <div class="card-body p-4">
+            <%= partial :'accounts/pay', locals: { account: account, force: true } %>
+          </div>
+        </div>
+        <%= partial :badges %>
+      </div>
     </div>
-  </div>
+  <% else %>
+    <div class="row justify-content-center">
+      <div class="col-lg-10">
+        <p class="lead">
+          Dandelion operates on a donation/gift economy basis and
+          we rely on the generosity of our users. Please chip in so we can remain free.
+        </p>
+        <script src="https://donorbox.org/widget.js" paypalExpress="false"></script><iframe src="https://donorbox.org/embed/dandelion-1" name="donorbox" allowpaymentrequest="" seamless="seamless" frameborder="0" scrolling="no" height="900px" width="100%" style="max-width: 500px; min-width: 250px; max-height:none!important"></iframe>
+      </div>
+    </div>
+  <% end %>
+
 <% end %>

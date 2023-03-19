@@ -60,7 +60,7 @@ Dandelion::App.controller do
           quantity: 1
         }],
         customer_email: @account.email,
-        success_url: "#{ENV['BASE_URI']}?thanks=true",
+        success_url: "#{ENV['BASE_URI']}/donate?thanks=true",
         cancel_url: (ENV['BASE_URI']).to_s
       }
       session = Stripe::Checkout::Session.create(stripe_session_hash)
