@@ -297,7 +297,7 @@ class Organisation
   end
 
   def self.paid_up_fraction
-    0.6
+    0.8
   end
 
   def update_paid_up
