@@ -73,6 +73,7 @@ class Organisation
   field :contribution_not_required, type: Boolean
   field :contribution_requested_per_event_gbp, type: Float
   field :contribution_offset_gbp, type: Float
+  field :paid_up_fraction, type: Float
   field :ical_full, type: Boolean
   field :allow_purchase_url, type: Boolean
   field :change_select_tickets_title, type: Boolean
@@ -142,6 +143,7 @@ class Organisation
       contribution_not_required: :check_box,
       contribution_requested_per_event_gbp: :number,
       contribution_offset_gbp: :number,
+      paid_up_fraction: :number,
       event_image_required_height: :number,
       event_image_required_width: :number,
       psychedelic: :check_box
@@ -301,7 +303,7 @@ class Organisation
   def update_paid_up
     update_attribute(:paid_up, nil)
     begin
-      update_attribute(:paid_up, contribution_not_required? || contribution_requested.zero? || contributable_events.count == 1 || contribution_paid >= Organisation.paid_up_fraction * contribution_requested)
+      update_attribute(:paid_up, contribution_not_required? || contribution_requested.zero? || contributable_events.count == 1 || contribution_paid >= (organisation.paid_up_fraction || Organisation.paid_up_fraction) * contribution_requested)
     rescue Money::Bank::UnknownRate
       update_attribute(:paid_up, true)
     end
