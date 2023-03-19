@@ -56,41 +56,7 @@
     </div>
 
     <div class="col-lg-6">
-      <div class="row justify-content-center align-items-center">
-        <div class="col-4">
-          <div class="mb-3 p-4">
-            <img src="/images/gift.png" class="w-100">
-          </div>
-        </div>
-        <div class="col-4">
-          <div class="m-3 p-1 rounded-circle">
-            <img src="/images/coop.png" class="w-100">
-          </div>
-        </div>
-        <div class="col-4">
-          <div class="mb-3 p-4">
-            <img src="/images/copyleft.png" class="w-100">
-          </div>
-        </div>
-      </div>
-      <div class="row justify-content-center align-items-center">
-        <div class="col-4">
-          <p class="text-center">
-            No fees, we're a <a target="_blank" href="https://www.youtube.com/watch?v=EaxjxICgahc">gift economy</a>
-          </p>
-        </div>
-        <div class="col-4">
-          <p class="text-center">
-            Made by a <a href="https://dandelion.coop/">not-for-profit<br />
-              worker co-operative</a>
-          </p>
-        </div>
-        <div class="col-4">
-          <p class="text-center">
-            Code is <a target="_blank" href="https://github.com/dandelion-collective/dandelion/blob/master/GPLv3-LICENSE.md">open-source copyleft</a>
-          </p>
-        </div>
-      </div>
+      <%= partial :badges %>
       <h2 class="text-center my-5 my-lg-3" id="tickets-sold">
         <%= cp :tickets_count %>
       </h2>

@@ -21,7 +21,7 @@
     <% else %>
       <p class="lead mb-1">
         <small>
-          Please chip in so we can remain free<% if !current_account || (defined?(force) && force) %>.<% else %>
+          We rely on the generosity of our users. Please chip in so we can remain free<% if !current_account || (defined?(force) && force) %>.<% else %>
             <small>
               (and we won't ask again for a month).
             </small>
@@ -62,10 +62,11 @@
         </div>
       </div>
       <button data-payment-method="stripe" type="submit" class="btn btn-primary mb-1 ml-0 mr-1" style="height: 2.125rem">
-        Contribute via card
+        Contribute
         <i class="fa fa-spin fa-circle-o-notch" style="display: none"></i>
       </button>
       <%= hidden_field_tag :payment_method, value: 'stripe', disabled: true %>
+      <!--
       <div class="d-none d-lg-block">
         <button data-payment-method="coinbase" type="submit" class="btn btn-primary mb-1" style="height: 2.125rem">
           Contribute with crypto
@@ -73,7 +74,9 @@
         </button>
         <%= hidden_field_tag :payment_method, value: 'coinbase', disabled: true %>
       </div>
+      -->
     <% end %>
+    <!--
     <div class="d-none d-lg-block">
       <p class="lead mb-0">
         <small>
@@ -98,15 +101,17 @@
         </small>
       </p>
     </div>
+    -->
 
-    <% if !@event || @event.organisation.psychedelic? %>
-      <p class="mt-3 mb-0">
-        <a target="_blank" href="https://www.martianmushrooms.co.uk/?ref=9">
-          Receive 10% off supplies at Martian Mushrooms with the code DANDELION
-        </a> 🍄 🚀
-      </p>
+    <% if !(defined?(force) && force) %>
+      <% if !@event || @event.organisation.psychedelic? %>
+        <p class="mt-3 mb-0">
+          <a target="_blank" href="https://www.martianmushrooms.co.uk/?ref=9">
+            Receive 10% off supplies at Martian Mushrooms with the code DANDELION
+          </a> 🍄 🚀
+        </p>
+      <% end %>
     <% end %>
-
 
     <script>
       $(function () {
