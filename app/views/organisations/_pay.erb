@@ -55,9 +55,9 @@
         <p class="mt-3 mb-0">
           <mark class="px-0">Stay topped up and we'll continue to show your events in the main events section and on the Dandelion homepage.</mark>
         </p>
-      <% elsif ((r * 0.5) - p) > 0 %>
+      <% elsif ((r * Organisation.paid_up_fraction) - p) > 0 %>
         <p class="mt-3 mb-0">
-          <mark class="px-0">If you can't pay the full <%= m balance, currency %> right now, contribute <%= m ((r * 0.5) - p), currency %>+ and as a thank you we'll show your events in the main events section and on the Dandelion homepage.</mark>
+          <mark class="px-0">If you can't pay the full <%= m balance, currency %> right now, contribute <%= m ((r * Organisation.paid_up_fraction) - p), currency %>+ and as a thank you we'll show your events in the main events section and on the Dandelion homepage.</mark>
         </p>
       <% end %>
 
