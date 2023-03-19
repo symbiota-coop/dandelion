@@ -31,7 +31,7 @@
     </td>
     <% if defined?(organisation_name) %>
       <td class="text-center">
-        <% if event_feedback.event.organisation.image %>
+        <% if event_feedback.event && event_feedback.event.organisation && event_feedback.event.organisation.image %>
           <img src="<%=event_feedback.event.organisation.image.thumb('500x500#').url%>" style="max-width: 50px;">
           <br />
         <% end %>
@@ -47,7 +47,7 @@
     <% end %>
     <% if defined?(activity_name) %>
       <td>
-        <% if event_feedback.event.activity %>
+        <% if event_feedback.event && event_feedback.event.activity %>
           <a href="/activities/<%= event_feedback.event.activity_id %>"><%= event_feedback.event.activity.name %></a>
         <% end %>
       </td>
