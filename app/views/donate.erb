@@ -1,5 +1,5 @@
-<div class="row justify-content-center">
-  <% if account = (current_account || (params[:account_id] && Account.find(params[:account_id]))) %>
+<% if account = (current_account || (params[:account_id] && Account.find(params[:account_id]))) %>
+  <div class="row justify-content-center">
     <div class="col-lg-8">
       <div class="card my-4">
         <div class="card-body p-4">
@@ -8,9 +8,15 @@
       </div>
       <%= partial :badges %>
     </div>
-  <% else %>
-    <div class="col-lg-6">
+  </div>
+<% else %>
+  <div class="row justify-content-center">
+    <div class="col-lg-10">
+      <p class="lead">
+        Dandelion operates on a donation/gift economy basis and
+        we rely on the generosity of our users. Please chip in so we can remain free.
+      </p>
       <script src="https://donorbox.org/widget.js" paypalExpress="false"></script><iframe src="https://donorbox.org/embed/dandelion-1" name="donorbox" allowpaymentrequest="" seamless="seamless" frameborder="0" scrolling="no" height="900px" width="100%" style="max-width: 500px; min-width: 250px; max-height:none!important"></iframe>
     </div>
-  <% end %>
-</div>
+  </div>
+<% end %>
