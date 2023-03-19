@@ -21,7 +21,7 @@
       Attendee
     </th>
     <td>
-      <% if @event_feedback.anonymise %>
+      <% if !@event_feedback.account || @event_feedback.anonymise %>
         Anonymous
       <% else %>
         <a target="_blank" href="/u/<%= @event_feedback.account.username %>"><%= @event_feedback.account.name %> (<%= @event_feedback.account.email %>)</a>

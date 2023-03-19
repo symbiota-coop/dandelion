@@ -203,8 +203,8 @@ Dandelion::App.controller do
       @hide_right_nav = true
 
       if @event.posts.empty?
-        post = @event.posts.create!(subject: "Chat for #{@event.name}", account: @event.account)
-        post.comments.create!(account: @event.account)
+        post = @event.posts.create(subject: "Chat for #{@event.name}", account: @event.account)
+        post.comments.create(account: @event.account) if post.persisted?
       end
 
       if params[:ticket_form_only]

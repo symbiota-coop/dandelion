@@ -23,7 +23,7 @@
   event_feedbacks.each { |event_feedback| account = event_feedback.account %>
   <tr>
     <td>
-      <% if event_feedback.anonymise? %>
+      <% if !account || event_feedback.anonymise? %>
         Anonymous
       <% else %>
         <%= partial :'accounts/account', locals: { account: account, show_email: (v || (event_feedback.event ? event_email_viewer?(event_feedback.event) : false)) } %>

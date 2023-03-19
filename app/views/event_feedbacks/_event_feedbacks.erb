@@ -5,7 +5,7 @@
     <% event_feedbacks.each { |event_feedback| account = event_feedback.account %>
     <tr <% if event_feedback.deleted_at%>style="opacity: 0.5"<% end %>>
       <td class="feedback-name">
-        <% if event_feedback.anonymise? %>
+        <% if !account || event_feedback.anonymise? %>
           Anonymous
         <% else %>
           <% if account.public? %>
