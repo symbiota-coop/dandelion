@@ -281,16 +281,16 @@ class Organisation
   def contribution_requested
     c = Money.new((-1 * (contribution_offset_gbp || 0) * 100) || 0, 'GBP')
     contributable_events.each do |event|
-      c += Money.new((event.contribution_gbp || contribution_requested_per_event_gbp || Organisation.contribution_requested_per_event_gbp) * 100, 'GBP')
+      c += event.contribution_gbp
     end
     c.exchange_to(MAJOR_CURRENCIES.include?(currency) ? currency : ENV['DEFAULT_CURRENCY'])
   end
 
   def contribution_paid
     s = Money.new(0, 'GBP')
-    organisation_contributions.and(payment_completed: true).each { |organisation_contribution|
-      s+= Money.new(organisation_contribution.amount * 100, organisation_contribution.currency)
-    }
+    organisation_contributions.and(payment_completed: true).each do |organisation_contribution|
+      s += Money.new(organisation_contribution.amount * 100, organisation_contribution.currency)
+    end
     s.exchange_to(MAJOR_CURRENCIES.include?(currency) ? currency : ENV['DEFAULT_CURRENCY'])
   end
 
@@ -328,7 +328,7 @@ class Organisation
   def event_feedbacks
     EventFeedback.and(:event_id.in => events.pluck(:id))
   end
-  
+
   def unscoped_event_feedbacks
     EventFeedback.unscoped.and(:event_id.in => events.pluck(:id))
   end

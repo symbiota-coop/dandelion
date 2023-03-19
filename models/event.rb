@@ -45,7 +45,6 @@ class Event
   field :select_tickets_intro, type: String
   field :select_tickets_outro, type: String
   field :select_tickets_title, type: String
-  field :contribution_gbp, type: Float
 
   def self.admin_fields
     {
@@ -90,7 +89,6 @@ class Event
       hide_organisation_footer: :check_box,
       send_order_notifications: :check_box,
       raw_description: :check_box,
-      contribution_gbp: :number,
       account_id: :lookup,
       organisation_id: :lookup,
       activity_id: :lookup,
@@ -563,6 +561,12 @@ class Event
     end
   end
 
+  def contribution_gbp
+    standard = Money.new((organisation.try(:contribution_requested_per_event_gbp) || Organisation.contribution_requested_per_event_gbp) * 100, 'GBP')
+    one_percent_of_ticket_sales = Money.new(tickets.sum(:price) * 0.05 * 100, currency).exchange_to('GBP')
+    [standard, one_percent_of_ticket_sales].min
+  end
+
   def feedback_questions_a
     q = (feedback_questions || '').split("\n").map(&:strip).reject(&:blank?)
     q.empty? ? [] : q
@@ -818,8 +822,7 @@ class Event
       ask_hear_about: 'Ask people how they heard about the event',
       capacity: 'Total capacity',
       gathering_id: 'Add people that buy tickets to this gathering',
-      send_order_notifications: 'Send email notifications of orders',
-      contribution_gbp: 'Contribution'
+      send_order_notifications: 'Send email notifications of orders'
     }[attr.to_sym] || super
   end
 
@@ -866,8 +869,7 @@ class Event
       facebook_pixel_id: 'Your Facebook Pixel ID for tracking sales',
       purchase_url: "URL where people can buy tickets (if you're not selling tickets on Dandelion)",
       capacity: 'Caps the total number of tickets issued across all ticket types. Optional',
-      send_order_notifications: 'Send email notifications of orders to event facilitators',
-      contribution_gbp: 'Please use mindfully 😇'
+      send_order_notifications: 'Send email notifications of orders to event facilitators'
     }
   end
 
