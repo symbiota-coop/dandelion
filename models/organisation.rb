@@ -303,7 +303,7 @@ class Organisation
   def update_paid_up
     update_attribute(:paid_up, nil)
     begin
-      update_attribute(:paid_up, contribution_not_required? || contribution_requested.zero? || contributable_events.count == 1 || contribution_paid >= (organisation.paid_up_fraction || Organisation.paid_up_fraction) * contribution_requested)
+      update_attribute(:paid_up, contribution_not_required? || contribution_requested.zero? || contributable_events.count == 1 || contribution_paid >= (paid_up_fraction || Organisation.paid_up_fraction) * contribution_requested)
     rescue Money::Bank::UnknownRate
       update_attribute(:paid_up, true)
     end
