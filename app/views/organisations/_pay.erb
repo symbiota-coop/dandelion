@@ -17,7 +17,7 @@
         and contributed
         <%= m p, currency %>
         of a suggested
-        <%= m r, currency %>, leaving a balance of <%= m balance, currency %>.
+        <%= m r, currency %><% if balance <= 0%>.<% else %>, leaving a balance of <%= m balance, currency %>.<% end %>
       </p>
 
       <% if r > 0 && p > 0 %>
@@ -35,7 +35,7 @@
               <span class="input-group-text"><%= Money.new(0, currency).symbol %></span>
             </div>
             <%= hidden_field_tag :currency, value: currency %>
-            <%= text_field_tag :amount, style: 'width: 5em;', required: 'required', class: 'form-control', id: 'amount', value: balance %>
+            <%= text_field_tag :amount, style: 'width: 5em;', required: 'required', class: 'form-control', id: 'amount', value: (balance if balance > 0) %>
           </div>
         </div>
         <button data-payment-method="stripe" type="submit" class="btn btn-primary mb-1 ml-0 mr-1" style="height: 2.125rem">
