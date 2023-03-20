@@ -563,8 +563,12 @@ class Event
 
   def contribution_gbp
     standard = Money.new((organisation.try(:contribution_requested_per_event_gbp) || Organisation.contribution_requested_per_event_gbp) * 100, 'GBP')
-    one_percent_of_ticket_sales = Money.new(tickets.sum(:price) * 0.05 * 100, currency).exchange_to('GBP')
-    [standard, one_percent_of_ticket_sales].min
+    if organisation.fixed_fee
+      standard
+    else
+      one_percent_of_ticket_sales = Money.new(tickets.sum(:price) * 0.05 * 100, currency).exchange_to('GBP')
+      [standard, one_percent_of_ticket_sales].min
+    end
   end
 
   def feedback_questions_a

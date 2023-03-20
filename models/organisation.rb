@@ -88,6 +88,7 @@ class Organisation
   field :google_drive_refresh_token, type: String
   field :google_drive_scope, type: String
   field :google_sheets_key, type: String
+  field :fixed_fee, type: Boolean
 
   field :tokens, type: Float
   index({ tokens: 1 })

@@ -11,7 +11,7 @@
     <div class="card-body p-2">
       <p class="lead">
         <mark class="px-0">Dandelion operates on a donation/gift economy basis</mark>,
-        with a suggested donation of <%= m per_event, currency %> or 5% per event, whichever is less.
+        with a suggested donation of <%= m per_event, currency %><% if organisation.fixed_fee %>.<% else%> or 5% per event, whichever is less.<% end %>
         <br />
         <%= organisation.name %> has sold tickets to a total of <%= pluralize(c, 'event') %>
         and contributed
