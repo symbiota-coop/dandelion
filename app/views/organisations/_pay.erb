@@ -20,13 +20,13 @@
         <%= m r, currency %><% if balance <= 0%>.<% else %>, leaving a balance of <%= m balance, currency %>.<% end %>
       </p>
 
-      <% if r > 0 && p > 0 %>
+      <% if r > 0 && p > 0; w = 100*p.to_f/r.to_f; if w <= 100 %>
         <div class="progress my-3" style="height: 30px">
-          <div class="progress-bar" role="progressbar" style="width: <%= "#{w = 100*p.to_f/r.to_f}%" %>;">
+          <div class="progress-bar" role="progressbar" style="width: <%= "#{w}%" %>;">
             <% if w > 0 %><%= w.to_f.round %>%<% end %>
           </div>
         </div>
-      <% end %>
+      <% end; end %>
 
       <% form_tag '', class: 'form-inline', id: 'pay-form' do %>
         <div class="form-group mb-1 mr-1">
