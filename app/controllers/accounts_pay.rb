@@ -45,6 +45,7 @@ Dandelion::App.controller do
 
   post '/accounts/:id/pay', provides: :json do
     @account = Account.find(params[:id])
+    halt 400 unless params[:amount].to_f > 0
 
     case params[:payment_method]
     when 'stripe'
