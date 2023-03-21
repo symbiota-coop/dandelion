@@ -12,20 +12,21 @@
       <p class="lead">
         <small>
           Thanks for contributing <%= time_ago_in_words last_completed_contribution.created_at %> ago.
-          Will you chip in again so we can remain free? 
-          <small>
-            (and we won't ask again for a month)
-          </small>
+          Will you chip in again so we can remain free?
+          <% if last_completed_contribution.created_at < 1.month.ago %>
+            <small>
+              (and we won't ask again for a month)
+            </small>
+          <% end %>
         </small>
       </p>
     <% else %>
       <p class="lead mb-1">
         <small>
-          We rely on the generosity of our users. Please chip in so we can remain free<% if !account || (defined?(force) && force) %>.<% else %>
-            <small>
-              (and we won't ask again for a month).
-            </small>
-          <% end %>
+          We rely on the generosity of our users. Please chip in so we can remain free
+          <small>
+            (and we won't ask again for a month).
+          </small>
         </small>
       </p>
     <% end %>

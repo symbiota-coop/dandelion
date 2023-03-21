@@ -28,7 +28,7 @@ class EventFeedback
     }
   end
 
-  validates_uniqueness_of :event, scope: :account, allow_nil: true
+  validates_uniqueness_of :event, scope: :account, allow_nil: true, conditions: -> { where(deleted_at: nil) }
   validates_uniqueness_of :ps_event_feedback_id, allow_nil: true
 
   after_save do
@@ -44,10 +44,10 @@ class EventFeedback
 
   def self.average_rating
     ratings = self.and(:rating.ne => nil).pluck(:rating)
-    if ratings.length > 0
-      ratings = ratings.map(&:to_i)
-      (ratings.inject(:+).to_f / ratings.length).round(1)
-    end
+    return unless ratings.length > 0
+
+    ratings = ratings.map(&:to_i)
+    (ratings.inject(:+).to_f / ratings.length).round(1)
   end
 
   def self.ratings
@@ -58,23 +58,23 @@ class EventFeedback
 
   after_create :send_feedback
   def send_feedback
-    if event
-      mg_client = Mailgun::Client.new ENV['MAILGUN_API_KEY'], 'api.eu.mailgun.net'
-      batch_message = Mailgun::BatchMessage.new(mg_client, 'notifications.dandelion.earth')
+    return unless event
 
-      event_feedback = self
-      event = event_feedback.event
-      content = ERB.new(File.read(Padrino.root('app/views/emails/event_feedback.erb'))).result(binding)
-      batch_message.from 'Dandelion <notifications@dandelion.earth>'
-      batch_message.subject "#{event_feedback.rating.times.each.map { '★' }.join if event_feedback.rating} #{event.name}/#{event_feedback.anonymise? ? 'Anonymous' : event_feedback.account.name}"
-      batch_message.body_html Premailer.new(ERB.new(File.read(Padrino.root('app/views/layouts/email.erb'))).result(binding), with_html_string: true, adapter: 'nokogiri', input_encoding: 'UTF-8').to_inline_css
+    mg_client = Mailgun::Client.new ENV['MAILGUN_API_KEY'], 'api.eu.mailgun.net'
+    batch_message = Mailgun::BatchMessage.new(mg_client, 'notifications.dandelion.earth')
 
-      event.accounts_receiving_feedback.each do |account|
-        batch_message.add_recipient(:to, account.email, { 'firstname' => (account.firstname || 'there'), 'token' => account.sign_in_token, 'id' => account.id.to_s })
-      end
+    event_feedback = self
+    event = event_feedback.event
+    content = ERB.new(File.read(Padrino.root('app/views/emails/event_feedback.erb'))).result(binding)
+    batch_message.from 'Dandelion <notifications@dandelion.earth>'
+    batch_message.subject "#{event_feedback.rating.times.each.map { '★' }.join if event_feedback.rating} #{event.name}/#{event_feedback.anonymise? ? 'Anonymous' : event_feedback.account.name}"
+    batch_message.body_html Premailer.new(ERB.new(File.read(Padrino.root('app/views/layouts/email.erb'))).result(binding), with_html_string: true, adapter: 'nokogiri', input_encoding: 'UTF-8').to_inline_css
 
-      batch_message.finalize if ENV['MAILGUN_API_KEY']
+    event.accounts_receiving_feedback.each do |account|
+      batch_message.add_recipient(:to, account.email, { 'firstname' => (account.firstname || 'there'), 'token' => account.sign_in_token, 'id' => account.id.to_s })
     end
+
+    batch_message.finalize if ENV['MAILGUN_API_KEY']
   end
   handle_asynchronously :send_feedback
 

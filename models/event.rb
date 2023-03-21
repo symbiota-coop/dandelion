@@ -415,7 +415,7 @@ class Event
   has_many :donations, dependent: :nullify
   has_many :orders, dependent: :destroy
   has_many :waitships, dependent: :destroy
-  has_many :event_feedbacks, dependent: :nullify
+  has_many :event_feedbacks, dependent: :destroy
   has_many :event_facilitations, dependent: :destroy
   def event_facilitators
     Account.and(:id.in => event_facilitations.pluck(:account_id))

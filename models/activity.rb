@@ -46,7 +46,7 @@ class Activity
   has_many :discount_codes, class_name: 'DiscountCode', as: :codeable, dependent: :destroy
 
   has_many :events, dependent: :nullify
-  has_many :event_feedbacks, dependent: :nullify
+  has_many :event_feedbacks, dependent: :destroy
   has_many :activityships, dependent: :destroy
   has_many :activity_applications, dependent: :destroy
 
@@ -184,14 +184,14 @@ class Activity
   end
 
   def sync_activityships
-    if privacy == 'open'
-      events.each do |event|
-        event.tickets.each do |ticket|
-          activityships.create account: ticket.account
-        end
-        event.orders.each do |order|
-          activityships.create account: order.account
-        end
+    return unless privacy == 'open'
+
+    events.each do |event|
+      event.tickets.each do |ticket|
+        activityships.create account: ticket.account
+      end
+      event.orders.each do |order|
+        activityships.create account: order.account
       end
     end
   end
