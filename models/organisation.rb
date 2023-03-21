@@ -247,6 +247,8 @@ class Organisation
   validates_presence_of :name, :slug, :currency
   validates_uniqueness_of :slug
   validates_format_of :slug, with: /\A[a-z0-9-]+\z/
+  validates_format_of :stripe_sk, with: /\A[a-z0-9_]+\z/i, allow_nil: true
+  validates_format_of :stripe_pk, with: /\A[a-z0-9_]+\z/i, allow_nil: true
 
   has_many :events, dependent: :nullify
   def cohosted_events
