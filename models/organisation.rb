@@ -244,6 +244,16 @@ class Organisation
     end
   end
 
+  Mongoid.models.each { |m|
+    next if m == Order
+    if m.fields.keys.include?('currency')
+      m.where(currency: 'HAUS').each { |r|
+        puts m.name
+        puts r.id
+      }
+    end
+  } && 0
+
   validates_presence_of :name, :slug, :currency
   validates_uniqueness_of :slug
   validates_format_of :slug, with: /\A[a-z0-9-]+\z/
@@ -421,6 +431,10 @@ class Organisation
                                          ]
                                        })
     update_attribute(:stripe_endpoint_secret, w['secret'])
+
+    rescue Stripe::AuthenticationError
+      update_attribute(:stripe_sk, nil)
+      update_attribute(:stripe_pk, nil)
   end
 
   def import_from_csv(csv)
