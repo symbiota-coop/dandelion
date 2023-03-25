@@ -1,4 +1,4 @@
-<% currency = FIAT_CURRENCIES.include?(account.default_currency) ? account.default_currency : ENV['DEFAULT_CURRENCY'] %>
+<% currency = MAJOR_CURRENCIES.include?(account.default_currency) ? account.default_currency : ENV['DEFAULT_CURRENCY'] %>
 
 <% last_completed_contribution = account.account_contributions.and(payment_completed: true).order('created_at desc').first %>
 <% if (defined?(force) && force) || !last_completed_contribution || last_completed_contribution.created_at < 1.month.ago %>
@@ -62,20 +62,22 @@
           <%= number_field_tag :amount, value: 10, style: 'width: 5em;', required: 'required', class: 'form-control', id: 'amount' %>
         </div>
       </div>
-      <button data-payment-method="stripe" type="submit" class="btn btn-primary mb-1 ml-0 mr-1" style="height: 2.125rem">
-        Contribute
-        <i class="fa fa-spin fa-circle-o-notch" style="display: none"></i>
-      </button>
-      <%= hidden_field_tag :payment_method, value: 'stripe', disabled: true %>
-      <!--
-      <div class="d-none d-lg-block">
-        <button data-payment-method="coinbase" type="submit" class="btn btn-primary mb-1" style="height: 2.125rem">
-          Contribute with crypto
+      <% if FIAT_CURRENCIES.include?(currency) %>
+        <button data-payment-method="stripe" type="submit" class="btn btn-primary mb-1 ml-0 mr-1" style="height: 2.125rem">
+          Contribute via card
           <i class="fa fa-spin fa-circle-o-notch" style="display: none"></i>
         </button>
-        <%= hidden_field_tag :payment_method, value: 'coinbase', disabled: true %>
+        <%= hidden_field_tag :payment_method, value: 'stripe', disabled: true %>
+      <% end %>
+      <% if MAJOR_CURRENCIES.include?(currency) %>
+        <div class="d-none d-lg-block">
+          <button data-payment-method="coinbase" type="submit" class="btn mb-1 <% if FIAT_CURRENCIES.include?(currency) %> btn-outline-primary border-0  <% else %> btn-primary <% end %> " style="height: 2.125rem">
+            Contribute with crypto
+            <i class="fa fa-spin fa-circle-o-notch" style="display: none"></i>
+          </button>
+          <%= hidden_field_tag :payment_method, value: 'coinbase', disabled: true %>
+        <% end %>
       </div>
-      -->
     <% end %>
     <!--
     <div class="d-none d-lg-block">
