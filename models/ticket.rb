@@ -10,19 +10,13 @@ class Ticket
   belongs_to :zoomship, index: true, optional: true
 
   field :price, type: Float
+  field :currency, type: String
   field :show_attendance, type: Boolean
   field :subscribed_discussion, type: Boolean
   field :checked_in, type: Boolean
   field :checked_in_at, type: Time
   field :name, type: String
   field :email, type: String
-
-  before_validation do
-    if email
-      e = EmailAddress.error(email)
-      errors.add(:email, "- #{e}") if e
-    end
-  end
 
   def firstname
     unless name.blank?
@@ -40,6 +34,7 @@ class Ticket
     {
       summary: { type: :text, edit: false },
       price: :number,
+      currency: :text,
       show_attendance: :check_box,
       checked_in: :check_box,
       name: :text,
@@ -52,6 +47,10 @@ class Ticket
     }
   end
 
+  def self.currencies
+    [''] + CURRENCIES_HASH
+  end
+  
   after_save do
     event.clear_cache if event
   end
@@ -85,7 +84,13 @@ class Ticket
   end
 
   before_validation do
+    if email
+      e = EmailAddress.error(email)
+      errors.add(:email, "- #{e}") if e
+    end
+        
     self.price = ticket_type.price if !price && ticket_type && !complementary
+    self.currency = order.try(:currency) || event.try(:currency)
 
     if new_record?
       errors.add(:ticket_type, 'is full') if ticket_type && (ticket_type.number_of_tickets_available_in_single_purchase < 1)

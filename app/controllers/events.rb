@@ -486,7 +486,7 @@ Dandelion::App.controller do
             ticket.name,
             ticket_email_viewer?(ticket) ? ticket.email : '',
             ticket.ticket_type.try(:name),
-            m(ticket.discounted_price || 0, ticket.order ? ticket.order.currency : ticket.event.currency),
+            m(ticket.discounted_price || 0, ticket.currency),
             ticket.created_at.to_fs(:db_local)
           ]
         end
@@ -503,7 +503,7 @@ Dandelion::App.controller do
                 (I18n.transliterate(ticket.name) if ticket.name),
                 ticket_email_viewer?(ticket) ? ticket.email : '',
                 ticket.ticket_type.try(:name),
-                m(ticket.discounted_price || 0, ticket.order ? ticket.order.currency : ticket.event.currency),
+                m(ticket.discounted_price || 0, ticket.currency),
                 ticket.created_at.to_fs(:db_local)
               ]
             end)

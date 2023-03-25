@@ -195,13 +195,13 @@ class Order
 
   def ticket_revenue
     r = Money.new(0, currency)
-    tickets.each { |ticket| r += Money.new((ticket.price || 0) * 100, currency) }
+    tickets.each { |ticket| r += Money.new((ticket.price || 0) * 100, ticket.currency) }
     r
   end
 
   def discounted_ticket_revenue
     r = Money.new(0, currency)
-    tickets.each { |ticket| r += Money.new((ticket.discounted_price || 0) * 100, currency) }
+    tickets.each { |ticket| r += Money.new((ticket.discounted_price || 0) * 100, ticket.currency) }
     r
   end
 

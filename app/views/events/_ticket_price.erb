@@ -1,5 +1,5 @@
 <% if ticket.discounted_price %>
-  <a href="javascript:;" onclick="$(this).hide().next().show().find('input').focus()"><%= m ticket.discounted_price, (ticket.order ? ticket.order.currency : ticket.event.currency) %></a>
+  <a href="javascript:;" onclick="$(this).hide().next().show().find('input').focus()"><%= m ticket.discounted_price, ticket.currency) %></a>
   <% form_tag "/tickets/#{ticket.id}/price", style: 'display:none' do %>
     <div class="input-group">
       <div class="input-group-prepend">

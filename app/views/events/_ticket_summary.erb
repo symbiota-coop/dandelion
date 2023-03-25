@@ -4,7 +4,7 @@
     <a href="/events/<%= ticket.event_id %>/tickets">
       <%= ticket.event.summary %>
       <% if ticket.discounted_price %>
-        (<%= m ticket.discounted_price, ticket.order ? ticket.order.currency : ticket.event.currency %>)
+        (<%= m ticket.discounted_price, ticket.currency %>)
       <% end %>
     </a>
   </li>
