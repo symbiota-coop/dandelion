@@ -20,15 +20,15 @@ class Ticket
   field :email, type: String
 
   def firstname
-    unless name.blank?
-      parts = name.split(' ')
-      n = if parts.count > 1 && %w[mr mrs ms dr].include?(parts[0].downcase.gsub('.', ''))
-            parts[1]
-          else
-            parts[0]
-          end
-      n.capitalize
-    end
+    return if name.blank?
+
+    parts = name.split(' ')
+    n = if parts.count > 1 && %w[mr mrs ms dr].include?(parts[0].downcase.gsub('.', ''))
+          parts[1]
+        else
+          parts[0]
+        end
+    n.capitalize
   end
 
   def self.admin_fields
@@ -52,7 +52,7 @@ class Ticket
   def self.currencies
     [''] + CURRENCIES_HASH
   end
-  
+
   after_save do
     event.clear_cache if event
   end
@@ -61,12 +61,12 @@ class Ticket
   end
 
   def discounted_price
-    if price
-      p = price.to_f
-      p *= ((100 - (order.try(:percentage_discount) || 0)).to_f / 100)
-      p *= ((100 - (order.try(:percentage_discount_monthly_donor) || 0)).to_f / 100)
-      p.round(2)
-    end
+    return unless price
+
+    p = price.to_f
+    p *= ((100 - (order.try(:percentage_discount) || 0)).to_f / 100)
+    p *= ((100 - (order.try(:percentage_discount_monthly_donor) || 0)).to_f / 100)
+    p.round(2)
   end
 
   attr_accessor :complementary, :prevent_notifications
@@ -92,8 +92,8 @@ class Ticket
     end
 
     self.price = ticket_type.price if !price && ticket_type && !complementary
-    self.currency = (order.try(:currency) || event.try(:currency)) if !currency
-    self.organisation_revenue_share = order.try(:organisation_revenue_share) if !organisation_revenue_share
+    self.currency = (order.try(:currency) || event.try(:currency)) unless currency
+    self.organisation_revenue_share = order.try(:organisation_revenue_share) unless organisation_revenue_share
 
     if new_record?
       errors.add(:ticket_type, 'is full') if ticket_type && (ticket_type.number_of_tickets_available_in_single_purchase < 1)
