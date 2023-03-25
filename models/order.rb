@@ -207,13 +207,13 @@ class Order
 
   def organisation_discounted_ticket_revenue
     r = Money.new(0, currency)
-    tickets.each { |ticket| r += Money.new((ticket.discounted_price || 0) * 100 * (organisation_revenue_share || 1), currency) }
+    tickets.each { |ticket| r += Money.new((ticket.discounted_price || 0) * 100 * (ticket.organisation_revenue_share || 1), ticket.currency) }
     r
   end
 
   def donation_revenue
     r = Money.new(0, currency)
-    donations.each { |donation| r += Money.new((donation.amount || 0) * 100, currency) }
+    donations.each { |donation| r += Money.new((donation.amount || 0) * 100, donation.currency) }
     r
   end
 

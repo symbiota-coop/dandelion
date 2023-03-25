@@ -11,6 +11,7 @@ class Ticket
 
   field :price, type: Float
   field :currency, type: String
+  field :organisation_revenue_share, type: Float
   field :show_attendance, type: Boolean
   field :subscribed_discussion, type: Boolean
   field :checked_in, type: Boolean
@@ -35,6 +36,7 @@ class Ticket
       summary: { type: :text, edit: false },
       price: :number,
       currency: :text,
+      organisation_revenue_share: :number,
       show_attendance: :check_box,
       checked_in: :check_box,
       name: :text,
@@ -88,9 +90,10 @@ class Ticket
       e = EmailAddress.error(email)
       errors.add(:email, "- #{e}") if e
     end
-        
+
     self.price = ticket_type.price if !price && ticket_type && !complementary
     self.currency = order.try(:currency) || event.try(:currency)
+    self.organisation_revenue_share = order.try(:organisation_revenue_share)
 
     if new_record?
       errors.add(:ticket_type, 'is full') if ticket_type && (ticket_type.number_of_tickets_available_in_single_purchase < 1)
