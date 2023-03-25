@@ -92,8 +92,8 @@ class Ticket
     end
 
     self.price = ticket_type.price if !price && ticket_type && !complementary
-    self.currency = order.try(:currency) || event.try(:currency)
-    self.organisation_revenue_share = order.try(:organisation_revenue_share)
+    self.currency = (order.try(:currency) || event.try(:currency)) if !currency
+    self.organisation_revenue_share = order.try(:organisation_revenue_share) if !organisation_revenue_share
 
     if new_record?
       errors.add(:ticket_type, 'is full') if ticket_type && (ticket_type.number_of_tickets_available_in_single_purchase < 1)
