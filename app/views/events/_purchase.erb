@@ -39,7 +39,7 @@
           <% end %>
         <% end %>
         <tr>
-          <td <% if i == 0 %>style="border-top: 0"<% end %>>
+          <td style="<% if i == 0 %>border-top: 0;<% end %> <% if ticket_type.photos.count > 0 %>border-bottom: 0;<% end %>" >
             <%= ticket_type.name %>
             <% if ticket_type.hidden %>
               <i data-toggle="tooltip" title="Available to you as you used a secret link" class="fa fa-lock"></i>
@@ -48,12 +48,12 @@
               <i data-toggle="tooltip" title="Available to those donating <%=m ticket_type.minimum_monthly_donation, @event.currency%>+/month" class="fa fa-star-o"></i>
             <% end %>
           </td>
-          <td <% if i == 0 %>style="border-top: 0"<% end %>>
+          <td style="<% if i == 0 %>border-top: 0;<% end %> <% if ticket_type.photos.count > 0 %>border-bottom: 0;<% end %>">
             <% unless ticket_type.price == 0 %>
               <%= m ticket_type.price, @event.currency %>
             <% end %>
           </td>
-          <td style="width: 50%; <% if i == 0 %>border-top: 0<% end %>">
+          <td style="width: 50%; <% if i == 0 %>border-top: 0;<% end %> <% if ticket_type.photos.count > 0 %>border-bottom: 0;<% end %>">
             <% if ticket_type.number_of_tickets_available_in_single_purchase > 0 %>
               <% if ticket_type.minimum_monthly_donation && (
                   !current_account ||
@@ -81,6 +81,13 @@
           <% end %>
         </td>
       </tr>
+      <% if ticket_type.photos.count > 0 %>
+        <tr>
+          <td colspan="3" style="border: 0">
+            <%= partial :'photos/photos', locals: { photoable: ticket_type, dimensions: '100x100#' } %>
+          </td>
+        </tr>
+      <% end %>
       <% if ticket_type.description %>
         <tr>
           <td style="border: 0; padding-top: 0" class="text-muted" colspan="3">

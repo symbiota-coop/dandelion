@@ -14,6 +14,7 @@
           ['Edit event', "/events/#{event.id}/edit"],
           ['Duplicate event', "/events/#{event.id}/duplicate"],
           ['Discount codes', "/events/#{event.id}/discount_codes"],
+          (['Ticket type photos', "/events/#{event.id}/ticket_types"] if event.ticket_types.count > 0),
           (['Co-hosts', "/events/#{event.id}/cohosts"] if event.cohostships.count.positive?),
           ([%(Orders <span class="badge badge-primary">#{event.orders.count}</span>), "/events/#{event.id}/orders"] if event.orders.count.positive?),
           ([%(Tickets <span class="badge badge-primary">#{event.tickets.count}</span>), "/events/#{event.id}/tickets"] if event.ticket_types.count.positive? || event.tickets.count.positive?),

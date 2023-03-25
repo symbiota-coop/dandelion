@@ -744,6 +744,12 @@ Dandelion::App.controller do
     end
   end
 
+  get '/events/:id/ticket_types' do
+    @event = Event.find(params[:id]) || not_found
+    event_admins_only!
+    erb :'events/ticket_types'
+  end  
+
   get '/events/:id/notes' do
     @event = Event.find(params[:id]) || not_found
     event_admins_only!

@@ -17,7 +17,7 @@ class Photo
   end
 
   def self.photoables
-    %w[Gathering Comment]
+    %w[Gathering Comment TicketType]
   end
 
   dragonfly_accessor :image
@@ -39,6 +39,9 @@ class Photo
     elsif photoable.is_a?(Comment)
       comment = photoable
       comment.post.url
+    elsif photoable.is_a?(TicketType)
+      ticket_type = photoable
+      "#{ENV['BASE_URI']}/events/#{ticket_type.event_id}/ticket_types"
     end
   end
 

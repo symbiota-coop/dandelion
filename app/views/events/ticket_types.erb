@@ -1,0 +1,19 @@
+<%= partial :'events/nav', locals: { event: @event } %>
+<table class="table">
+  <thead>
+    <tr>
+      <th>Ticket type</th>
+      <th>Photos</th>
+    </tr>
+  </thead>
+  <% @event.ticket_types.order('order asc, price desc').each { |ticket_type| %>
+  <tr>
+    <td>
+      <%= ticket_type.name %>
+    </td>
+    <td>
+      <%= partial :'photos/photos', locals: { photoable: ticket_type, add_photo_if: event_admin?, dimensions: '100x100#' } %>
+    </td>
+  </tr>
+  <% } %>
+</table>
