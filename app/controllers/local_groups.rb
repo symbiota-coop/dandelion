@@ -36,8 +36,8 @@ Dandelion::App.controller do
     q_ids = []
     if params[:q]
       q_ids += Event.all.or(
-        { name: /#{::Regexp.escape(params[:q])}/i },
-        { description: /#{::Regexp.escape(params[:q])}/i }
+        { name: /#{Regexp.escape(params[:q])}/i },
+        { description: /#{Regexp.escape(params[:q])}/i }
       ).pluck(:id)
     end
     event_tag_ids = []
@@ -177,8 +177,8 @@ Dandelion::App.controller do
     @local_group = LocalGroup.find(params[:id]) || not_found
     local_group_admins_only!
     @local_groupships = @local_group.local_groupships.order('created_at desc')
-    @local_groupships = @local_groupships.and(:account_id.in => Account.and(name: /#{::Regexp.escape(params[:name])}/i).pluck(:id)) if params[:name]
-    @local_groupships = @local_groupships.and(:account_id.in => Account.and(email: /#{::Regexp.escape(params[:email])}/i).pluck(:id)) if params[:email]
+    @local_groupships = @local_groupships.and(:account_id.in => Account.and(name: /#{Regexp.escape(params[:name])}/i).pluck(:id)) if params[:name]
+    @local_groupships = @local_groupships.and(:account_id.in => Account.and(email: /#{Regexp.escape(params[:email])}/i).pluck(:id)) if params[:email]
     @local_groupships = @local_groupships.and(:account_id.in => @local_group.subscribed_accounts.pluck(:id)) if params[:subscribed_to_mailer]
     case content_type
     when :html

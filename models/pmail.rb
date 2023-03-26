@@ -172,7 +172,7 @@ class Pmail
     html = Premailer.new(ERB.new(File.read(Padrino.root('app/views/layouts/pmail.erb'))).result(binding), with_html_string: true, adapter: 'nokogiri', input_encoding: 'UTF-8').to_inline_css
     if link_params
       html.gsub(/href\s*=\s*"([^"]*)"/) do
-        url = ::Regexp.last_match[1]
+        url = Regexp.last_match[1]
         path, query_string = url.split('?')
         begin
           url = "#{path}?#{Rack::Utils.parse_nested_query(query_string).merge(Rack::Utils.parse_nested_query(link_params)).to_query}"

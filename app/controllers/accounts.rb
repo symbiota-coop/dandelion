@@ -3,9 +3,9 @@ Dandelion::App.controller do
     @accounts = Account.public
     if params[:q]
       @accounts = @accounts.and(:id.in => Account.all.or(
-        { name: /#{::Regexp.escape(params[:q])}/i },
-        { username: /#{::Regexp.escape(params[:q])}/i },
-        { email: /#{::Regexp.escape(params[:q])}/i }
+        { name: /#{Regexp.escape(params[:q])}/i },
+        { username: /#{Regexp.escape(params[:q])}/i },
+        { email: /#{Regexp.escape(params[:q])}/i }
       ).pluck(:id))
     end
     @accounts = @accounts.and(id: params[:id]) if params[:id]

@@ -1,6 +1,6 @@
 <table class="table table-borderless">
   <% attachments = @organisation.attachments %>
-  <% attachments = attachments.and(file_name: /#{::Regexp.escape(params[:file_q])}/i) if params[:file_q] %>
+  <% attachments = attachments.and(file_name: /#{Regexp.escape(params[:file_q])}/i) if params[:file_q] %>
   <% attachments = attachments.order('created_at desc').paginate(page: params[:page], per_page: 5) %>
   <% attachments.each { |attachment| %>
   <tr>

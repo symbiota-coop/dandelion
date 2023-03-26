@@ -7,7 +7,7 @@ Dandelion::App.controller do
     when :json
       sign_in_required!
       @gatherings = Gathering.and(:id.in => current_account.memberships.pluck(:gathering_id))
-      @gatherings = @gatherings.and(name: /#{::Regexp.escape(params[:q])}/i) if params[:q]
+      @gatherings = @gatherings.and(name: /#{Regexp.escape(params[:q])}/i) if params[:q]
       @gatherings = @gatherings.and(id: params[:id]) if params[:id]
       {
         results: @gatherings.map { |gathering| { id: gathering.id.to_s, text: "#{gathering.name} (id:#{gathering.id})" } }
