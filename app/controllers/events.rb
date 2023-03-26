@@ -478,7 +478,7 @@ Dandelion::App.controller do
       erb :'events/tickets'
     when :csv
       CSV.generate do |csv|
-        csv << %w[name email ordered_for_name ordered_for_email ticket_type price created_at]
+        csv << %w[name email ordered_for_name ordered_for_email ticket_type price created_at checked_in_at]
         @tickets.each do |ticket|
           csv << [
             ticket.account.name,
@@ -487,7 +487,8 @@ Dandelion::App.controller do
             ticket_email_viewer?(ticket) ? ticket.email : '',
             ticket.ticket_type.try(:name),
             m(ticket.discounted_price || 0, ticket.currency),
-            ticket.created_at.to_fs(:db_local)
+            ticket.created_at.to_fs(:db_local),
+            ticket.checked_in_at.to_fs(:db_local)
           ]
         end
       end
@@ -495,7 +496,7 @@ Dandelion::App.controller do
       @tickets = @tickets.sort_by { |ticket| ticket.account.name }
       Prawn::Document.new(page_layout: :landscape) do |pdf|
         pdf.font "#{Padrino.root}/app/assets/fonts/circular-ttf/CircularStd-Book.ttf"
-        pdf.table([%w[name email ordered_for_name ordered_for_email ticket_type price created_at]] +
+        pdf.table([%w[name email ordered_for_name ordered_for_email ticket_type price created_at checked_in_at]] +
             @tickets.map do |ticket|
               [
                 ticket.account.name_transliterated,
@@ -504,7 +505,8 @@ Dandelion::App.controller do
                 ticket_email_viewer?(ticket) ? ticket.email : '',
                 ticket.ticket_type.try(:name),
                 m(ticket.discounted_price || 0, ticket.currency),
-                ticket.created_at.to_fs(:db_local)
+                ticket.created_at.to_fs(:db_local),
+                ticket.checked_in_at.to_fs(:db_local)
               ]
             end)
       end.render
@@ -748,7 +750,7 @@ Dandelion::App.controller do
     @event = Event.find(params[:id]) || not_found
     event_admins_only!
     erb :'events/ticket_types'
-  end  
+  end
 
   get '/events/:id/notes' do
     @event = Event.find(params[:id]) || not_found
