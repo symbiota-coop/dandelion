@@ -40,27 +40,4 @@ Dandelion::App.controller do
       }
     end.to_json
   end
-
-  get '/z/organisation_event_tickets', provides: :json do
-    @organisation = Organisation.find_by(slug: params[:organisation_slug])
-    @event = @organisation.events.find(params[:event_id])
-    event_admins_only!
-    @event.orders.complete.order('created_at desc').map do |order|
-      {
-        id: order.id.to_s,
-        name: order.account ? order.account.name : '',
-        email: if order_email_viewer?(order)
-                 order.account ? order.account.email : ''
-               else
-                 ''
-               end,
-        value: m((order.value || 0), order.currency),
-        opt_in_organisation: order.opt_in_organisation,
-        opt_in_facilitator: order.opt_in_facilitator,
-        hear_about: order.hear_about,
-        answers: order.answers,
-        created_at: order.created_at.iso8601
-      }
-    end.to_json
-  end
 end
