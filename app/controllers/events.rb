@@ -475,8 +475,8 @@ Dandelion::App.controller do
     end
     case content_type
     when :html
-      if request.xhr? 
-        partial :'events/tickets_table', locals: { tickets: @tickets } 
+      if request.xhr?
+        partial :'events/tickets_table', locals: { tickets: @tickets }
       else
         erb :'events/tickets'
       end
@@ -595,7 +595,7 @@ Dandelion::App.controller do
 
     case content_type
     when :html
-      if request.xhr? 
+      if request.xhr?
         partial :'events/orders_table', locals: { orders: @orders, show_emails: event_email_viewer? }
       else
         erb :'events/orders'
