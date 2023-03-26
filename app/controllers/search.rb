@@ -31,10 +31,11 @@ Dandelion::App.controller do
       @type = params[:type] || 'events'
       if (@q = params[:q])
         %w[gathering place organisation event account].each do |t|
-          if params[:q].starts_with?("#{t}:")
-            @q = @q.match(/#{t}:"(.+)"/)[1]
-            @type = t.pluralize
-          end
+          next unless params[:q].starts_with?("#{t}:")
+
+          @q += '"' unless @q.ends_with?('"')
+          @q = @q.match(/#{t}:"(.+)"/)[1]
+          @type = t.pluralize
         end
         case @type
         when 'events'
