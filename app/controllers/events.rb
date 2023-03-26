@@ -478,7 +478,7 @@ Dandelion::App.controller do
       erb :'events/tickets'
     when :csv
       CSV.generate do |csv|
-        csv << %w[name email ordered_for_name ordered_for_email ticket_type price created_at checked_in_at]
+        csv << %w[name email ordered_for_name ordered_for_email ticket_type price currency created_at checked_in_at]
         @tickets.each do |ticket|
           csv << [
             ticket.account.name,
@@ -486,7 +486,8 @@ Dandelion::App.controller do
             ticket.name,
             ticket_email_viewer?(ticket) ? ticket.email : '',
             ticket.ticket_type.try(:name),
-            m(ticket.discounted_price || 0, ticket.currency),
+            ticket.discounted_price,
+            ticket.currency,
             ticket.created_at.to_fs(:db_local),
             ticket.checked_in_at.to_fs(:db_local)
           ]
@@ -496,7 +497,7 @@ Dandelion::App.controller do
       @tickets = @tickets.sort_by { |ticket| ticket.account.name }
       Prawn::Document.new(page_layout: :landscape) do |pdf|
         pdf.font "#{Padrino.root}/app/assets/fonts/circular-ttf/CircularStd-Book.ttf"
-        pdf.table([%w[name email ordered_for_name ordered_for_email ticket_type price created_at checked_in_at]] +
+        pdf.table([%w[name email ordered_for_name ordered_for_email ticket_type price currency created_at checked_in_at]] +
             @tickets.map do |ticket|
               [
                 ticket.account.name_transliterated,
@@ -504,7 +505,8 @@ Dandelion::App.controller do
                 (I18n.transliterate(ticket.name) if ticket.name),
                 ticket_email_viewer?(ticket) ? ticket.email : '',
                 ticket.ticket_type.try(:name),
-                m(ticket.discounted_price || 0, ticket.currency),
+                ticket.discounted_price,
+                ticket.currency,
                 ticket.created_at.to_fs(:db_local),
                 ticket.checked_in_at.to_fs(:db_local)
               ]
@@ -592,7 +594,7 @@ Dandelion::App.controller do
       erb :'events/orders'
     when :csv
       CSV.generate do |csv|
-        csv << %w[name email value opt_in_organisation opt_in_facilitator hear_about answers created_at]
+        csv << %w[name email value currency opt_in_organisation opt_in_facilitator hear_about answers created_at]
         @orders.each do |order|
           csv << [
             order.account ? order.account.name : '',
@@ -601,7 +603,8 @@ Dandelion::App.controller do
             else
               ''
             end,
-            m((order.value || 0), order.currency),
+            order.value,
+            order.currency,
             order.opt_in_organisation,
             order.opt_in_facilitator,
             order.hear_about,
@@ -614,7 +617,7 @@ Dandelion::App.controller do
       @orders = @orders.sort_by { |order| order.account.try(:name) || '' }
       Prawn::Document.new do |pdf|
         pdf.font "#{Padrino.root}/app/assets/fonts/circular-ttf/CircularStd-Book.ttf"
-        pdf.table([%w[name email value created_at]] +
+        pdf.table([%w[name email value currency created_at]] +
             @orders.map do |order|
               [
                 order.account.name_transliterated,
@@ -623,7 +626,8 @@ Dandelion::App.controller do
                 else
                   ''
                 end,
-                m((order.value || 0), order.currency),
+                order.value,
+                order.currency,
                 order.created_at.to_fs(:db_local)
               ]
             end)

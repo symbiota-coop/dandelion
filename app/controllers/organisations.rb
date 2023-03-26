@@ -6,7 +6,7 @@ Dandelion::App.controller do
       erb :'organisations/organisations'
     when :json
       @organisations = Organisation.all.order('created_at desc')
-      @organisations = @organisations.and(name: /#{::Regexp.escape(params[:q])}/i) if params[:q]
+      @organisations = @organisations.and(name: /#{Regexp.escape(params[:q])}/i) if params[:q]
       @organisations = @organisations.and(id: params[:id]) if params[:id]
       {
         results: @organisations.map { |organisation| { id: organisation.id.to_s, text: "#{organisation.name} (id:#{organisation.id})" } }
@@ -17,7 +17,7 @@ Dandelion::App.controller do
   get '/o/:slug/activities', provides: %i[html json] do
     @organisation = (Organisation.find_by(slug: params[:slug]) || Organisation.find(params[:slug]) || not_found)
     @activities = @organisation.activities.order('name asc')
-    @activities = @activities.and(name: /#{::Regexp.escape(params[:q])}/i) if params[:q]
+    @activities = @activities.and(name: /#{Regexp.escape(params[:q])}/i) if params[:q]
     @activities = @activities.and(id: params[:id]) if params[:id]
     case content_type
     when :html
@@ -37,7 +37,7 @@ Dandelion::App.controller do
   get '/o/:slug/local_groups', provides: %i[html json] do
     @organisation = (Organisation.find_by(slug: params[:slug]) || Organisation.find(params[:slug]) || not_found)
     @local_groups = @organisation.local_groups.order('name asc')
-    @local_groups = @local_groups.and(name: /#{::Regexp.escape(params[:q])}/i) if params[:q]
+    @local_groups = @local_groups.and(name: /#{Regexp.escape(params[:q])}/i) if params[:q]
     @local_groups = @local_groups.and(id: params[:id]) if params[:id]
     case content_type
     when :html
@@ -164,8 +164,8 @@ Dandelion::App.controller do
     q_ids = []
     if params[:q]
       q_ids += Event.all.or(
-        { name: /#{::Regexp.escape(params[:q])}/i },
-        { description: /#{::Regexp.escape(params[:q])}/i }
+        { name: /#{Regexp.escape(params[:q])}/i },
+        { description: /#{Regexp.escape(params[:q])}/i }
       ).pluck(:id)
     end
     event_tag_ids = []
@@ -266,8 +266,8 @@ Dandelion::App.controller do
     @orders = @organisation.orders
     if params[:q]
       @orders = @orders.and(:account_id.in => Account.all.or(
-        { name: /#{::Regexp.escape(params[:q])}/i },
-        { email: /#{::Regexp.escape(params[:q])}/i }
+        { name: /#{Regexp.escape(params[:q])}/i },
+        { email: /#{Regexp.escape(params[:q])}/i }
       ).pluck(:id))
     end
     @orders = @orders.and(:created_at.gte => @from) if @from
@@ -278,7 +278,7 @@ Dandelion::App.controller do
       erb :'organisations/orders'
     when :csv
       CSV.generate do |csv|
-        csv << %w[name email value opt_in_organisation opt_in_facilitator hear_about answers created_at]
+        csv << %w[name email value currency opt_in_organisation opt_in_facilitator hear_about answers created_at]
         @orders.each do |order|
           csv << [
             order.account ? order.account.name : '',
@@ -287,7 +287,8 @@ Dandelion::App.controller do
             else
               ''
             end,
-            m((order.value || 0), order.currency),
+            order.value,
+            order.currency,
             order.opt_in_organisation,
             order.opt_in_facilitator,
             order.hear_about,
@@ -309,8 +310,8 @@ Dandelion::App.controller do
     q_ids = []
     if params[:q]
       q_ids += Event.all.or(
-        { name: /#{::Regexp.escape(params[:q])}/i },
-        { description: /#{::Regexp.escape(params[:q])}/i }
+        { name: /#{Regexp.escape(params[:q])}/i },
+        { description: /#{Regexp.escape(params[:q])}/i }
       ).pluck(:id)
     end
     event_tag_ids = []
@@ -486,8 +487,8 @@ Dandelion::App.controller do
     @organisation = Organisation.find_by(slug: params[:slug]) || not_found
     organisation_admins_only!
     @organisationships = @organisation.organisationships.order('created_at desc')
-    @organisationships = @organisationships.and(:account_id.in => Account.and(name: /#{::Regexp.escape(params[:name])}/i).pluck(:id)) if params[:name]
-    @organisationships = @organisationships.and(:account_id.in => Account.and(email: /#{::Regexp.escape(params[:email])}/i).pluck(:id)) if params[:email]
+    @organisationships = @organisationships.and(:account_id.in => Account.and(name: /#{Regexp.escape(params[:name])}/i).pluck(:id)) if params[:name]
+    @organisationships = @organisationships.and(:account_id.in => Account.and(email: /#{Regexp.escape(params[:email])}/i).pluck(:id)) if params[:email]
     @organisationships = @organisationships.and(:monthly_donation_method.ne => nil) if params[:monthly_donor]
     @organisationships = @organisationships.and(monthly_donation_method: nil) if params[:not_a_monthly_donor]
     @organisationships = @organisationships.and(:stripe_connect_json.ne => nil) if params[:connected_to_stripe]
@@ -583,7 +584,7 @@ Dandelion::App.controller do
     @_organisation = @organisation
     organisation_admins_only!
     @pmails = @organisation.pmails
-    @pmails = @pmails.and(subject: /#{::Regexp.escape(params[:q])}/i) if params[:q]
+    @pmails = @pmails.and(subject: /#{Regexp.escape(params[:q])}/i) if params[:q]
     @scope = "organisation_id=#{@organisation.id}"
     case content_type
     when :html
