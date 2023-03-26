@@ -31,7 +31,8 @@ Dandelion::App.controller do
                else
                  ''
                end,
-        value: m((order.value || 0), order.currency),
+        value: order.value,
+        currency: order.currency,
         opt_in_organisation: order.opt_in_organisation,
         opt_in_facilitator: order.opt_in_facilitator,
         hear_about: order.hear_about,
