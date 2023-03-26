@@ -31,6 +31,11 @@ Dandelion::App.controller do
                else
                  ''
                end,
+        value: m((order.value || 0), order.currency),
+        opt_in_organisation: order.opt_in_organisation,
+        opt_in_facilitator: order.opt_in_facilitator,
+        hear_about: order.hear_about,
+        answers: order.answers,
         created_at: order.created_at.iso8601
       }
     end.to_json
