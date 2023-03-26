@@ -475,7 +475,11 @@ Dandelion::App.controller do
     end
     case content_type
     when :html
-      erb :'events/tickets'
+      if request.xhr? 
+        partial :'events/tickets_table', locals: { tickets: @tickets } 
+      else
+        erb :'events/tickets'
+      end
     when :csv
       CSV.generate do |csv|
         csv << %w[name email ordered_for_name ordered_for_email ticket_type price currency created_at checked_in_at]
@@ -591,7 +595,11 @@ Dandelion::App.controller do
 
     case content_type
     when :html
-      erb :'events/orders'
+      if request.xhr? 
+        partial :'events/orders_table', locals: { orders: @orders, show_emails: event_email_viewer? }
+      else
+        erb :'events/orders'
+      end
     when :csv
       CSV.generate do |csv|
         csv << %w[name email value currency opt_in_organisation opt_in_facilitator hear_about answers created_at]

@@ -1,6 +1,14 @@
 <% orders = orders.order('created_at desc')
    orders = orders.paginate(page: params[:page], per_page: 50) %>
 <% if @event %>
+  <% if event_email_viewer? %>
+    <pre>
+    <%== Account.and(:id.in => @orders.pluck(:account_id)).map { |account| "#{Sanitize.fragment(account.name)} &lt;#{Sanitize.fragment(account.email)}&gt;" }.join(', ') %>
+  </pre>
+  <% end %>
+  <% unless params[:search] %>
+    <%= partial :'events/ticket_types_progress' %>
+  <% end %>
   <div class="row justify-content-between">
     <div class="col">
       <p><%== pagination_details orders, model: 'Order' %></p>

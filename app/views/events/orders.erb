@@ -2,7 +2,11 @@
 
 <div class="row">
   <div class="col">
-    <% form_tag '', method: 'get', class: 'submitOnChange searchForm form-inline mb-3' do %>
+    <% form_tag '', method: 'get', class: 'submitOnChange searchForm form-inline mb-3', onsubmit: %{
+      $('#orders-table').attr('data-pagelet-url', $('#orders-table').attr('data-pagelet-url').split('?')[0] + '?' + $(this).serialize());
+      $('#orders-table').load($('#orders-table').attr('data-pagelet-url'))
+      return false
+    } do %>
       <div class="form-group">
         <label>Search orders</label>
         <%= text_field_tag :q, class: 'form-control', value: params[:q] %>
@@ -19,12 +23,6 @@
   </div>
 </div>
 
-<% if event_email_viewer? %>
-  <pre>
-    <%== Account.and(:id.in => @orders.pluck(:account_id)).map { |account| "#{Sanitize.fragment(account.name)} &lt;#{Sanitize.fragment(account.email)}&gt;" }.join(', ') %>
-  </pre>
-<% end %>
-<% unless params[:search] %>
-  <%= partial :'events/ticket_types_progress' %>
-<% end %>
-<%= partial :'events/orders', locals: { orders: @orders, show_emails: event_email_viewer? } %>
+<div id="orders-table" data-pagelet-url="/events/<%= @event.id %>/orders">
+  <%= partial :'events/orders_table', locals: { orders: @orders, show_emails: event_email_viewer? } %>
+</div>

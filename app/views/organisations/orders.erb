@@ -19,4 +19,4 @@
   <%= hidden_field_tag :search, value: 1 %>
   <%= submit_tag 'Search', class: 'btn btn-primary' %>
 <% end %>
-<%= partial :'events/orders', locals: { orders: @orders, event_name: true, show_emails: true } %>
+<%= partial :'events/orders_table', locals: { orders: @orders, event_name: true, show_emails: true } %>
