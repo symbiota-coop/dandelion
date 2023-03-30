@@ -294,8 +294,10 @@
     <div class="form-group">
       <% if m = q.match(/\[(.*)\]/)  %>
         <div class="checkbox-inline">
-          <%= check_box_tag "answers[#{i}]", id: "answers-#{i}" %>
-          <label class="font-weight-bold" for="answers-<%=i%>"><%== Sanitize.fragment(Rinku.auto_link(m[1]), Sanitize::Config::DANDELION) %></label>
+          <%= check_box_tag "answers[#{i}]", id: "answers-#{i}", 'data-required': q.ends_with?('*') %>
+          <label class="font-weight-bold" for="answers-<%=i%>">
+            <%== Sanitize.fragment(Rinku.auto_link(m[1]), Sanitize::Config::DANDELION) %><% if q.ends_with?('*') %>*<% end %>
+          </label>
         </div>
       <% else %>
         <label><%== Sanitize.fragment(Rinku.auto_link(q), Sanitize::Config::DANDELION) %>*</label>

@@ -1,9 +1,9 @@
-$(function() {
+$(function () {
 
   function price() {
     var p = 0
 
-    $('select[name^=quantities]').each(function() {
+    $('select[name^=quantities]').each(function () {
       p += (parseInt($(this).val()) * parseFloat($(this).attr('data-price')))
     })
 
@@ -73,18 +73,18 @@ $(function() {
     }
 
   }
-  $('select[name^=quantities], #donation_amount').change(function() {
+  $('select[name^=quantities], #donation_amount').change(function () {
     setTotal()
   })
   setTotal()
 
-  $('#details form button[data-payment-method]').click(function() {
+  $('#details form button[data-payment-method]').click(function () {
     $('input[type=hidden][name=payment_method]').attr('disabled', true)
     $('input[type=hidden][name=payment_method][value=' + $(this).attr('data-payment-method') + ']').removeAttr('disabled')
     $(this).attr('data-payment-method-clicked', true)
   })
 
-  $('#details form').on('keyup keypress', function(e) {
+  $('#details form').on('keyup keypress', function (e) {
     var keyCode = e.keyCode || e.which;
     if (keyCode === 13) {
       e.preventDefault();
@@ -92,17 +92,27 @@ $(function() {
     }
   });
 
-  $('#donation_amount').blur(function() {
+  $('#donation_amount').blur(function () {
     if ($('#donation_amount').val().length > 0) {
       var donationAmount = parseFloat($('#donation_amount').val())
       $('#donation_amount').val(donationAmount.toFixed(2).endsWith('00') ? donationAmount.toFixed(0) : donationAmount.toFixed(2))
     }
   }).blur()
 
-  $('#details form').submit(function() {
+  $('#details form').submit(function () {
+
+    var halt
+    $('input[type=checkbox][data-required]').each(function () {
+      if (!$(this).is(':checked')) {
+        alert($(this).next().text().trim() + ' must be checked')
+        halt = true
+      }
+    })
+    if (halt)
+      return false
 
     var numberOfTickets = 0
-    $('select[name^=quantities]').each(function() {
+    $('select[name^=quantities]').each(function () {
       numberOfTickets += parseInt($(this).val())
     })
     if (numberOfTickets == 0) {
@@ -133,7 +143,7 @@ $(function() {
     $.post('/events/' + eventId + '/purchase', {
       ticketForm: $('#ticket-types form').serializeObject(),
       detailsForm: $('#details form').serializeObject()
-    }, function(data) {
+    }, function (data) {
       if (balance() > 0) {
         if (data['session_id']) {
           // Stripe
@@ -152,9 +162,9 @@ $(function() {
           $('#pay-with-seeds').find('.card-body p.lead.memo').html(data['seeds_secret'])
           var offset = $('#pay-with-seeds').offset()
           window.scrollTo(0, offset['top'] - $('#header').height() - 10);
-          setInterval(function() {
+          setInterval(function () {
             if (Date.now() < data['order_expiry'])
-              $.getJSON('/events/' + eventId + '/orders/' + data['order_id'] + '/payment_completed', function(_data) {
+              $.getJSON('/events/' + eventId + '/orders/' + data['order_id'] + '/payment_completed', function (_data) {
                 if (_data['payment_completed'])
                   window.location = '?success=true&order_id=' + data['order_id']
               })
@@ -172,7 +182,7 @@ $(function() {
           web3.eth.net.getId().then(thisNetworkId => {
             if (thisNetworkId != networkId) {
               $('#pay-with-evm').find('.card-body p.web3wallet').html("<mark>Please switch your web3 wallet's network to " + networkName + '</mark>')
-              ethereum.on('chainChanged', function() {
+              ethereum.on('chainChanged', function () {
                 console.log('chainChanged')
                 web3.eth.net.getId().then(thisNetworkId => {
                   if (thisNetworkId == networkId)
@@ -188,7 +198,7 @@ $(function() {
             if (!ethereum.selectedAddress) {
               console.log('connecting')
               $('#pay-with-evm').find('.card-body p.web3wallet').html('<a href="javascript:;">Connect your web3 wallet</a>')
-              $('#pay-with-evm').find('.card-body p.web3wallet a').click(function() {
+              $('#pay-with-evm').find('.card-body p.web3wallet a').click(function () {
                 ethereum.request({
                   method: 'eth_requestAccounts'
                 }).then(pay)
@@ -205,13 +215,13 @@ $(function() {
             var abi = [{
               "constant": false,
               "inputs": [{
-                  "name": "_to",
-                  "type": "address"
-                },
-                {
-                  "name": "_value",
-                  "type": "uint256"
-                }
+                "name": "_to",
+                "type": "address"
+              },
+              {
+                "name": "_value",
+                "type": "uint256"
+              }
               ],
               "name": "transfer",
               "outputs": [{
@@ -231,9 +241,9 @@ $(function() {
             })
           }
 
-          setInterval(function() {
+          setInterval(function () {
             if (Date.now() < data['order_expiry'])
-              $.getJSON('/events/' + eventId + '/orders/' + data['order_id'] + '/payment_completed', function(_data) {
+              $.getJSON('/events/' + eventId + '/orders/' + data['order_id'] + '/payment_completed', function (_data) {
                 if (_data['payment_completed'])
                   window.location = '?success=true&order_id=' + data['order_id']
               })
@@ -243,7 +253,7 @@ $(function() {
         // RSVP
         window.location = '?success=true&order_id=' + data['order_id']
       }
-    }).fail(function() {
+    }).fail(function () {
       $('#select-tickets, #details').hide()
       $('#card-error').show()
     })
