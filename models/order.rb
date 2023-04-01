@@ -135,7 +135,7 @@ class Order
   def description_elements
     d = []
     TicketType.and(:id.in => tickets.pluck(:ticket_type_id)).each do |ticket_type|
-      d << "#{"#{ticket_type.name} ticket " if ticket_type}#{Money.new(ticket_type.price * 100, currency).format(no_cents_if_whole: true)}x#{tickets.and(ticket_type: ticket_type).count}"
+      d << "#{"#{ticket_type.name} " if ticket_type}#{Money.new(ticket_type.price * 100, currency).format(no_cents_if_whole: true)}x#{tickets.and(ticket_type: ticket_type).count}"
     end
 
     d << "#{percentage_discount}% discount" if percentage_discount
@@ -218,19 +218,19 @@ class Order
   end
 
   def apply_credit
-    if (organisationship = event.organisation.organisationships.find_by(account: account))
-      begin
-        credit_balance = organisationship.credit_balance.exchange_to(currency)
-      rescue Money::Bank::UnknownRate
-        return
-      end
-      if credit_balance > 0
-        if credit_balance >= (discounted_ticket_revenue + donation_revenue)
-          update_attribute(:credit_applied, (discounted_ticket_revenue + donation_revenue).cents.to_f / 100)
-        elsif credit_balance < (discounted_ticket_revenue + donation_revenue)
-          update_attribute(:credit_applied, credit_balance.cents.to_f / 100)
-        end
-      end
+    return unless (organisationship = event.organisation.organisationships.find_by(account: account))
+
+    begin
+      credit_balance = organisationship.credit_balance.exchange_to(currency)
+    rescue Money::Bank::UnknownRate
+      return
+    end
+    return unless credit_balance > 0
+
+    if credit_balance >= (discounted_ticket_revenue + donation_revenue)
+      update_attribute(:credit_applied, (discounted_ticket_revenue + donation_revenue).cents.to_f / 100)
+    elsif credit_balance < (discounted_ticket_revenue + donation_revenue)
+      update_attribute(:credit_applied, credit_balance.cents.to_f / 100)
     end
   end
 
@@ -269,23 +269,23 @@ class Order
 
   after_destroy :refund
   def refund
-    if event.refund_deleted_orders && !prevent_refund && event.organisation && value && value > 0 && payment_completed && payment_intent
-      begin
-        Stripe.api_key = event.organisation.stripe_sk
-        Stripe.api_version = '2020-08-27'
-        pi = Stripe::PaymentIntent.retrieve payment_intent
-        if event.revenue_sharer_organisationship
-          Stripe::Refund.create(
-            charge: pi.charges.first.id,
-            refund_application_fee: true,
-            reverse_transfer: true
-          )
-        else
-          Stripe::Refund.create(charge: pi.charges.first.id)
-        end
-      rescue Stripe::InvalidRequestError
-        true
+    return unless event.refund_deleted_orders && !prevent_refund && event.organisation && value && value > 0 && payment_completed && payment_intent
+
+    begin
+      Stripe.api_key = event.organisation.stripe_sk
+      Stripe.api_version = '2020-08-27'
+      pi = Stripe::PaymentIntent.retrieve payment_intent
+      if event.revenue_sharer_organisationship
+        Stripe::Refund.create(
+          charge: pi.charges.first.id,
+          refund_application_fee: true,
+          reverse_transfer: true
+        )
+      else
+        Stripe::Refund.create(charge: pi.charges.first.id)
       end
+    rescue Stripe::InvalidRequestError
+      true
     end
   end
 
@@ -321,19 +321,17 @@ class Order
   end
 
   def make_transfer
-    if event.revenue_sharer_organisationship && credit_payable_to_revenue_sharer && credit_payable_to_revenue_sharer > 0
+    return unless event.revenue_sharer_organisationship && credit_payable_to_revenue_sharer && credit_payable_to_revenue_sharer > 0
 
-      Stripe.api_key = event.organisation.stripe_sk
-      Stripe.api_version = '2020-08-27'
-      transfer = Stripe::Transfer.create({
-                                           amount: (credit_payable_to_revenue_sharer * 100).round,
-                                           currency: currency,
-                                           destination: event.revenue_sharer_organisationship.stripe_user_id,
-                                           metadata: metadata
-                                         })
-      set(transfer_id: transfer.id)
-
-    end
+    Stripe.api_key = event.organisation.stripe_sk
+    Stripe.api_version = '2020-08-27'
+    transfer = Stripe::Transfer.create({
+                                         amount: (credit_payable_to_revenue_sharer * 100).round,
+                                         currency: currency,
+                                         destination: event.revenue_sharer_organisationship.stripe_user_id,
+                                         metadata: metadata
+                                       })
+    set(transfer_id: transfer.id)
   end
 
   def tickets_pdf
