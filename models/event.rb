@@ -380,7 +380,7 @@ class Event
     a += organisation.admins_receiving_feedback if organisation
     a += activity.admins_receiving_feedback if activity
     a += local_group.admins_receiving_feedback if local_group
-    a
+    a.uniq
   end
 
   def discussers
