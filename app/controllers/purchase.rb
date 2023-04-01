@@ -162,8 +162,9 @@ Dandelion::App.controller do
         { order_id: @order.id.to_s }.to_json
       end
     rescue StandardError => e
+      Airbrake.notify(e, order: @order)
       @order.destroy
-      raise e
+      halt 400
     end
   end
 end

@@ -9,4 +9,5 @@ Airbrake.add_filter do |notice|
   notice.ignore! if notice[:errors].any? { |error| %w[Sinatra::NotFound SignalException].include?(error[:type]) }
   notice.ignore! if notice[:errors].any? { |error| error[:type] == 'ArgumentError' && error[:message] && error[:message].include?('invalid %-encoding') }
   notice.ignore! if notice[:errors].any? { |error| error[:type] == 'ThreadError' && error[:message] && error[:message].include?("can't be called from trap context") }
+  notice.ignore! if notice[:errors].any? { |error| error[:type] == 'Mongoid::Errors::Validations' && error[:message] && error[:message].include?('Ticket type is full') }
 end

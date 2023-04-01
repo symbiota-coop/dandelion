@@ -1,47 +1,42 @@
-$(function () {
+/* global timeAgo, eventId, placesRemaining, currency, currencySymbol, stripePk, coinbase, seedsUsername, evmAddress, contractAddress, networkId, networkName, signedIn */
 
-  function price() {
-    var p = 0
+$(function () {
+  function price () {
+    let p = 0
 
     $('select[name^=quantities]').each(function () {
       p += (parseInt($(this).val()) * parseFloat($(this).attr('data-price')))
     })
 
-    if ($('#percentage_discount').length > 0 && $('#percentage_discount').val() != '')
-      p = (p * (100 - parseInt($('#percentage_discount').val())) / 100)
+    if ($('#percentage_discount').length > 0 && $('#percentage_discount').val() != '') { p = (p * (100 - parseInt($('#percentage_discount').val())) / 100) }
 
-    if ($('#discount').length > 0 && $('#discount').val() != '')
-      p = (p * (100 - parseInt($('#discount').val())) / 100)
+    if ($('#discount').length > 0 && $('#discount').val() != '') { p = (p * (100 - parseInt($('#discount').val())) / 100) }
 
-    if ($('#donation_amount').length > 0 && $('#donation_amount').val() != '')
-      p += parseFloat($('#donation_amount').val())
+    if ($('#donation_amount').length > 0 && $('#donation_amount').val() != '') { p += parseFloat($('#donation_amount').val()) }
 
     return p
   }
 
-  function credit() {
-    var c = 0
+  function credit () {
+    let c = 0
 
-    if ($('#credit').length > 0 && $('#credit').val() != '')
-      c += parseFloat($('#credit').val())
+    if ($('#credit').length > 0 && $('#credit').val() != '') { c += parseFloat($('#credit').val()) }
 
-    if ($('#fixed_discount').length > 0 && $('#fixed_discount').val() != '')
-      c += parseFloat($('#fixed_discount').val())
+    if ($('#fixed_discount').length > 0 && $('#fixed_discount').val() != '') { c += parseFloat($('#fixed_discount').val()) }
 
     return c
   }
 
-  function balance() {
-    var b = price() - credit()
-    if (b < 0)
-      b = 0
+  function balance () {
+    let b = price() - credit()
+    if (b < 0) { b = 0 }
     return b
   }
 
-  function setTotal() {
-    var p = price()
-    var c = credit()
-    var b = balance()
+  function setTotal () {
+    const p = price()
+    // const c = credit()
+    const b = balance()
 
     $('#totalDisplay').val((+p).toFixed(2))
     $('#balance').val((+b).toFixed(2))
@@ -59,11 +54,8 @@ $(function () {
       $('#details form button[data-payment-method=evm]').hide()
     } else if (b > 0) {
       $('#balance').val((+b).toFixed(2))
-      var via_card
-      if (coinbase || seedsUsername || evmAddress)
-        via_card = ' via card'
-      else
-        via_card = ''
+      let via_card
+      if (coinbase || seedsUsername || evmAddress) { via_card = ' via card' } else { via_card = '' }
       $('#details form button[data-payment-method]:eq(1)').removeClass('btn-dotted')
       $('#details form button[data-payment-method=rsvp]').hide()
       $('#details form button[data-payment-method=stripe]').show().find('span').text('Pay ' + currencySymbol + (+b).toFixed(2) + via_card)
@@ -71,7 +63,6 @@ $(function () {
       $('#details form button[data-payment-method=seeds]').show()
       $('#details form button[data-payment-method=evm]').show()
     }
-
   }
   $('select[name^=quantities], #donation_amount').change(function () {
     setTotal()
@@ -85,33 +76,31 @@ $(function () {
   })
 
   $('#details form').on('keyup keypress', function (e) {
-    var keyCode = e.keyCode || e.which;
+    const keyCode = e.keyCode || e.which
     if (keyCode === 13) {
-      e.preventDefault();
-      return false;
+      e.preventDefault()
+      return false
     }
-  });
+  })
 
   $('#donation_amount').blur(function () {
     if ($('#donation_amount').val().length > 0) {
-      var donationAmount = parseFloat($('#donation_amount').val())
+      const donationAmount = parseFloat($('#donation_amount').val())
       $('#donation_amount').val(donationAmount.toFixed(2).endsWith('00') ? donationAmount.toFixed(0) : donationAmount.toFixed(2))
     }
   }).blur()
 
   $('#details form').submit(function () {
-
-    var halt
+    let halt
     $('input[type=checkbox][data-required]').each(function () {
       if (!$(this).is(':checked')) {
         alert($(this).next().text().trim() + ' must be checked')
         halt = true
       }
     })
-    if (halt)
-      return false
+    if (halt) { return false }
 
-    var numberOfTickets = 0
+    let numberOfTickets = 0
     $('select[name^=quantities]').each(function () {
       numberOfTickets += parseInt($(this).val())
     })
@@ -128,13 +117,11 @@ $(function () {
     }
 
     if (typeof timeAgo !== 'undefined') {
-      if (!confirm('This event started ' + timeAgo + ' ago. Press OK to continue, or Cancel to go back.'))
-        return false
+      if (!confirm('This event started ' + timeAgo + ' ago. Press OK to continue, or Cancel to go back.')) { return false }
     }
 
     if (!signedIn) {
-      if (!confirm('You entered your email address as ' + $('#account_email').val() + '. Press OK to continue, or Cancel to go back.'))
-        return false
+      if (!confirm('You entered your email address as ' + $('#account_email').val() + '. Press OK to continue, or Cancel to go back.')) { return false }
     }
 
     $('#total').val($('#totalDisplay').val())
@@ -145,39 +132,39 @@ $(function () {
       detailsForm: $('#details form').serializeObject()
     }, function (data) {
       if (balance() > 0) {
-        if (data['session_id']) {
+        if (data.session_id) {
           // Stripe
-          var stripe = Stripe(stripePk);
+          const stripe = Stripe(stripePk)
           stripe.redirectToCheckout({
-            sessionId: data['session_id']
+            sessionId: data.session_id
           })
-        } else if (data['checkout_id']) {
+        } else if (data.checkout_id) {
           // Coinbase
-          window.location = 'https://commerce.coinbase.com/checkout/' + data['checkout_id']
-        } else if (data['seeds_secret']) {
+          window.location = 'https://commerce.coinbase.com/checkout/' + data.checkout_id
+        } else if (data.seeds_secret) {
           // SEEDS
           $('#select-tickets').hide()
           $('#pay-with-seeds').show()
-          $('#pay-with-seeds').find('.card-body p.lead.please').html('Open the SEEDS app and send <strong>' + data['seeds_value'] + ' SEEDS</strong> to <strong>' + seedsUsername + '</strong> with the memo')
-          $('#pay-with-seeds').find('.card-body p.lead.memo').html(data['seeds_secret'])
-          var offset = $('#pay-with-seeds').offset()
-          window.scrollTo(0, offset['top'] - $('#header').height() - 10);
+          $('#pay-with-seeds').find('.card-body p.lead.please').html('Open the SEEDS app and send <strong>' + data.seeds_value + ' SEEDS</strong> to <strong>' + seedsUsername + '</strong> with the memo')
+          $('#pay-with-seeds').find('.card-body p.lead.memo').html(data.seeds_secret)
+          const offset = $('#pay-with-seeds').offset()
+          window.scrollTo(0, offset.top - $('#header').height() - 10)
           setInterval(function () {
-            if (Date.now() < data['order_expiry'])
-              $.getJSON('/events/' + eventId + '/orders/' + data['order_id'] + '/payment_completed', function (_data) {
-                if (_data['payment_completed'])
-                  window.location = '?success=true&order_id=' + data['order_id']
+            if (Date.now() < data.order_expiry) {
+              $.getJSON('/events/' + eventId + '/orders/' + data.order_id + '/payment_completed', function (_data) {
+                if (_data.payment_completed) { window.location = '?success=true&order_id=' + data.order_id }
               })
-          }, 30 * 1000);
-        } else if (data['evm_secret']) {
+            }
+          }, 30 * 1000)
+        } else if (data.evm_secret) {
           // EVM
           $('#select-tickets').hide()
           $('#pay-with-evm').show()
-          $('#pay-with-evm').find('.card-body p.lead.please').html('Send EXACTLY <strong>' + data['evm_value'] + ' ' + (currency == 'USD' ? 'CUSD' : currency) + '</strong> to <strong>' + evmAddress + '</strong>')
-          var offset = $('#pay-with-evm').offset()
-          window.scrollTo(0, offset['top'] - $('#header').height() - 10);
+          $('#pay-with-evm').find('.card-body p.lead.please').html('Send EXACTLY <strong>' + data.evm_value + ' ' + (currency == 'USD' ? 'CUSD' : currency) + '</strong> to <strong>' + evmAddress + '</strong>')
+          const offset = $('#pay-with-evm').offset()
+          window.scrollTo(0, offset.top - $('#header').height() - 10)
 
-          var web3 = new Web3(ethereum);
+          const web3 = new Web3(ethereum)
 
           web3.eth.net.getId().then(thisNetworkId => {
             if (thisNetworkId != networkId) {
@@ -185,16 +172,15 @@ $(function () {
               ethereum.on('chainChanged', function () {
                 console.log('chainChanged')
                 web3.eth.net.getId().then(thisNetworkId => {
-                  if (thisNetworkId == networkId)
-                    connectWeb3Wallet()
+                  if (thisNetworkId == networkId) { connectWeb3Wallet() }
                 })
-              });
+              })
             } else if (thisNetworkId == networkId) {
               connectWeb3Wallet()
             }
           })
 
-          function connectWeb3Wallet() {
+          function connectWeb3Wallet () {
             if (!ethereum.selectedAddress) {
               console.log('connecting')
               $('#pay-with-evm').find('.card-body p.web3wallet').html('<a href="javascript:;">Connect your web3 wallet</a>')
@@ -208,50 +194,50 @@ $(function () {
             }
           }
 
-          function pay() {
+          function pay () {
             console.log('paying')
             $('#pay-with-evm').find('.card-body p.web3wallet').remove()
 
-            var abi = [{
-              "constant": false,
-              "inputs": [{
-                "name": "_to",
-                "type": "address"
+            const abi = [{
+              constant: false,
+              inputs: [{
+                name: '_to',
+                type: 'address'
               },
               {
-                "name": "_value",
-                "type": "uint256"
+                name: '_value',
+                type: 'uint256'
               }
               ],
-              "name": "transfer",
-              "outputs": [{
-                "name": "",
-                "type": "bool"
+              name: 'transfer',
+              outputs: [{
+                name: '',
+                type: 'bool'
               }],
-              "type": "function"
-            }];
+              type: 'function'
+            }]
 
-            var toAddress = evmAddress
-            var fromAddress = ethereum.selectedAddress
-            var amount = parseInt(data['evm_wei']).toString()
+            const toAddress = evmAddress
+            const fromAddress = ethereum.selectedAddress
+            const amount = parseInt(data.evm_wei).toString()
 
-            var contractInstance = new web3.eth.Contract(abi, contractAddress);
+            const contractInstance = new web3.eth.Contract(abi, contractAddress)
             contractInstance.methods.transfer(toAddress, amount).send({
               from: fromAddress
             })
           }
 
           setInterval(function () {
-            if (Date.now() < data['order_expiry'])
-              $.getJSON('/events/' + eventId + '/orders/' + data['order_id'] + '/payment_completed', function (_data) {
-                if (_data['payment_completed'])
-                  window.location = '?success=true&order_id=' + data['order_id']
+            if (Date.now() < data.order_expiry) {
+              $.getJSON('/events/' + eventId + '/orders/' + data.order_id + '/payment_completed', function (_data) {
+                if (_data.payment_completed) { window.location = '?success=true&order_id=' + data.order_id }
               })
-          }, 10 * 1000);
+            }
+          }, 10 * 1000)
         }
       } else {
         // RSVP
-        window.location = '?success=true&order_id=' + data['order_id']
+        window.location = '?success=true&order_id=' + data.order_id
       }
     }).fail(function () {
       $('#select-tickets, #details').hide()
@@ -259,5 +245,5 @@ $(function () {
     })
 
     return false
-  });
-});
+  })
+})

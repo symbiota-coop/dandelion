@@ -493,7 +493,7 @@ Dandelion::App.controller do
             ticket.discounted_price,
             ticket.currency,
             ticket.created_at.to_fs(:db_local),
-            ticket.checked_in_at.to_fs(:db_local)
+            ticket.checked_in_at ? ticket.checked_in_at.to_fs(:db_local) : ''
           ]
         end
       end
