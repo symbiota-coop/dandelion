@@ -1,3 +1,5 @@
+/* global pusher */
+
 $(function () {
   $.ajaxPrefilter(function (options, originalOptions, jqXHR) {
     const t = '_t=' + Date.now()

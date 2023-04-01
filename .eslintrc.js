@@ -13,8 +13,7 @@ module.exports = {
     autosize: true,
     hljs: true,
     Pace: true,
-    ClassicEditor: true,
-    pusher: true
+    ClassicEditor: true
   },
   extends: 'standard',
   overrides: [
