@@ -24,7 +24,7 @@
       <td style="white-space: nowrap;"><% if event_feedback.deleted_at%><em>Removed</em><% else %><% event_feedback.rating.times do %><i class="fa fa-star"></i><% end %><% end %></td>
       <td><small><%= timeago event_feedback.created_at %></small></td>
     </tr>
-    <% if !event_feedback.deleted_at && event_feedback.public_answers %>
+    <% if !event_feedback.deleted_at && (event_feedback.public_answers || event_feedback.response) %>
       <tr>
         <td colspan="3" style="border-top: 0">
           <%= partial :'event_feedbacks/event_feedback', locals: { event_feedback: event_feedback } %>

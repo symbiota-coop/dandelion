@@ -1,15 +1,18 @@
-<div class="row mb-3">
-  <div class="col-auto"><i class="fa fa-quote-left"></i></div>
-  <div class="col">
-    <% if !(qas = event_feedback.public_answers.map { |qa| qa[1] unless qa[1].blank? }.compact).empty? %>
-      <p class="lead mb-0"><%== Sanitize.fragment(qas.join('<br /><br />'), Sanitize::Config::DANDELION) %></p>
-    <% end %>
+<% if event_feedback.public_answers %>
+  <% qas = event_feedback.public_answers.map { |qa| qa[1] unless qa[1].blank? }.compact %>
+  <div class="row mb-3">
+    <div class="col-auto"><i class="fa fa-quote-left"></i></div>
+    <div class="col">
+      <% if !qas.empty? %>
+        <p class="lead mb-0"><%== Sanitize.fragment(qas.join('<br /><br />'), Sanitize::Config::DANDELION) %></p>
+      <% end %>
+    </div>
   </div>
-</div>
+<% end %>
 
 <% if event_feedback.response %>
-  <div class="mt-3">
+  <div class="<% if event_feedback.public_answers && qas%>mt-3<% end %>">
     <em><%=@organisation.name%> replied</em>
-    <p class="lead">&mdash; <%== Sanitize.fragment(Rinku.auto_link(event_feedback.response), Sanitize::Config::DANDELION) %></p>
+    <p class="lead mb-0">&mdash; <%== Sanitize.fragment(Rinku.auto_link(event_feedback.response), Sanitize::Config::DANDELION) %></p>
   </div>
 <% end %>
