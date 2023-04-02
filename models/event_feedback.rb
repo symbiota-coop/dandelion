@@ -90,6 +90,7 @@ class EventFeedback
     event = event_feedback.event
     content = ERB.new(File.read(Padrino.root('app/views/emails/event_feedback_response.erb'))).result(binding)
     batch_message.from 'Dandelion <notifications@dandelion.earth>'
+    batch_message.reply_to(event.email || event.organisation.try(:reply_to))
     batch_message.subject "#{event.organisation.name} responded to your feedback on #{event.name}"
     batch_message.body_html Premailer.new(ERB.new(File.read(Padrino.root('app/views/layouts/email.erb'))).result(binding), with_html_string: true, adapter: 'nokogiri', input_encoding: 'UTF-8').to_inline_css
 
