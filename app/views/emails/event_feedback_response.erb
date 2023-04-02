@@ -1,0 +1,17 @@
+<div class="main">
+  <p><%= event.organisation.name %> responded to your feedback on <strong><a href="<%= ENV['BASE_URI'] %>/events/<%=event.id%>"><%= event.name %>, <%= event.when_details(nil) %></a></strong>:</p>
+  <p style="color: #F5B042">
+    <%= event_feedback.rating.times.each.map { '★' }.join if event_feedback.rating %>
+  </p>
+  <table>
+    <%= event_feedback.event.feedback_questions_a.each_with_index.map do |q, _i|
+          %(<tr><th>#{q}</th><td>#{qa = event_feedback.answers.detect { |k, _v| k == q }; qa[1] if qa}</td></tr>)
+        end.join %>
+  </table>
+  <blockquote>
+    <%= event_feedback.response %>
+  </blockquote>
+</div>
+<div class="footer">
+  <a href="<%= ENV['BASE_URI'] %>">Sent with Dandelion</a>
+</div>

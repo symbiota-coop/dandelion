@@ -100,6 +100,7 @@ Dandelion::App.controller do
     event_admins_only!
     @event_feedback.response = params[:response]
     @event_feedback.save
+    @event_feedback.send_response
     200
   end
 
