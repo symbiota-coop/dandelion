@@ -66,22 +66,22 @@
     <td>
       <% if event_feedback.event %>
         <% event_feedback.event.feedback_questions_a.each_with_index { |q,i| %>
-        <p>
-          <strong>
-            <%== Sanitize.fragment(Rinku.auto_link(q), Sanitize::Config::DANDELION) %>
-          </strong>
-          <br>
+        <div>
           <% qa = event_feedback.answers.detect { |k, _v| k == q }
              a = qa[1] if qa %>
           <% if a %>
+            <strong>
+              <%== Sanitize.fragment(Rinku.auto_link(q), Sanitize::Config::DANDELION) %>
+            </strong>
+            <br>
             <%== Sanitize.fragment(Rinku.auto_link(a), Sanitize::Config::DANDELION) %>
+            <% if event_feedback.public? %>
+              <div class="my-3">
+                <div data-pagelet-url="/event_feedbacks/<%= event_feedback.id %>/public/<%= i %>"></div>
+              </div>
+            <% end %>
           <% end %>
-        </p>
-        <% if event_feedback.public? %>
-          <div class="my-3">
-            <div data-pagelet-url="/event_feedbacks/<%= event_feedback.id %>/public/<%= i %>"></div>
-          </div>
-        <% end %>
+        </div>
         <% } %>
         <strong>Your response</strong>
         <div class="mt-1">

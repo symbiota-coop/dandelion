@@ -48,11 +48,11 @@
          a = qa[1] if qa %>
       <% if a %>
         <%== Sanitize.fragment(Rinku.auto_link(a), Sanitize::Config::DANDELION) %>
-      <% end %>
-      <% if @event_feedback.public? %>
-        <div class="mt-3">
-          <div data-pagelet-url="/event_feedbacks/<%= @event_feedback.id %>/public/<%= i %>"></div>
-        </div>
+        <% if @event_feedback.public? %>
+          <div class="mt-3">
+            <div data-pagelet-url="/event_feedbacks/<%= @event_feedback.id %>/public/<%= i %>"></div>
+          </div>
+        <% end %>
       <% end %>
     </td>
   </tr>
