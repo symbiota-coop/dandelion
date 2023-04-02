@@ -8,7 +8,7 @@
   </p>
   <table>
     <%= event_feedback.event.feedback_questions_a.each_with_index.map do |q, _i|
-          %(<tr><th>#{q}</th><td>#{event_feedback.answers.detect { |k, _v| k == q }[1]}</td></tr>)
+          %(<tr><th>#{q}</th><td>#{qa = event_feedback.answers.detect { |k, _v| k == q }; qa[1] if qa}</td></tr>)
         end.join %>
   </table>
 </div>

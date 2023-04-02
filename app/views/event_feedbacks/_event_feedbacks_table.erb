@@ -83,6 +83,10 @@
           </div>
         <% end %>
         <% } %>
+        <strong>Your response</strong>
+        <div class="mt-1">
+          <div data-pagelet-url="/event_feedbacks/<%= event_feedback.id %>/response"></div>
+        </div>
       <% else %>
         <% event_feedback.answers.each { |q,a| %>
         <p>

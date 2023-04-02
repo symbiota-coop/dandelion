@@ -13,6 +13,7 @@ class EventFeedback
   field :public_answers, type: Array
   field :rating, type: Integer
   field :ps_event_feedback_id, type: String
+  field :response, type: String
 
   def self.admin_fields
     {
@@ -21,6 +22,7 @@ class EventFeedback
       anonymise: :check_box,
       answers: { type: :text_area, disabled: true },
       public_answers: { type: :text_area, disabled: true },
+      response: :text_area,
       event_id: :lookup,
       activity_id: :lookup,
       ps_event_feedback_id: :text,

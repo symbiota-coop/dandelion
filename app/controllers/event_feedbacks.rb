@@ -87,6 +87,22 @@ Dandelion::App.controller do
     end
   end
 
+  get '/event_feedbacks/:id/response' do
+    @event_feedback = EventFeedback.find(params[:id]) || not_found
+    @event = @event_feedback.event
+    event_admins_only!
+    partial :'event_feedbacks/response'
+  end
+
+  post '/event_feedbacks/:id/response' do
+    @event_feedback = EventFeedback.find(params[:id]) || not_found
+    @event = @event_feedback.event
+    event_admins_only!
+    @event_feedback.response = params[:response]
+    @event_feedback.save
+    200
+  end
+
   get '/event_feedbacks/:id/public/:i' do
     @event_feedback = EventFeedback.find(params[:id]) || not_found
     @event = @event_feedback.event
