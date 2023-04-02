@@ -8,7 +8,7 @@
           %(<tr><th>#{q}</th><td>#{qa = event_feedback.answers.detect { |k, _v| k == q }; qa[1] if qa}</td></tr>)
         end.join %>
   </table>
-  <blockquote>
+  <blockquote style="margin-left: 0">
     <%= event_feedback.response %>
   </blockquote>
 </div>
