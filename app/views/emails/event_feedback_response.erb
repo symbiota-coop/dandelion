@@ -1,5 +1,5 @@
 <div class="main">
-  <p><%= event.organisation.name %> responded to your feedback on <strong><a href="<%= ENV['BASE_URI'] %>/events/<%=event.id%>"><%= event.name %>, <%= event.when_details(nil) %></a></strong>:</p>
+  <p><%= event.organisation.name %> responded to your feedback on <a href="<%= ENV['BASE_URI'] %>/events/<%=event.id%>"><%= event.name %>, <%= event.when_details(nil) %></a>:</p>
   <p style="color: #F5B042">
     <%= event_feedback.rating.times.each.map { '★' }.join if event_feedback.rating %>
   </p>
