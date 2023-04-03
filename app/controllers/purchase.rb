@@ -121,7 +121,7 @@ Dandelion::App.controller do
 
           checkout = client.checkout.create(
             name: @event.name,
-            description: @order.description,
+            description: @order.description.truncate(200),
             pricing_type: 'fixed_price',
             local_price: {
               amount: @order.total,
