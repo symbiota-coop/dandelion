@@ -158,7 +158,13 @@
         </td>
       </tr>
     <% end %>
-    <% unless @event.no_discounts %>
+    <% if @event.no_discounts %>
+      <tr>
+        <td colspan="3">
+          Membership discounts do not apply to this event.
+        </td>
+      </tr>
+    <% else %>
       <% if current_account && (organisationship_for_discount = @event.organisationship_for_discount(current_account)) %>
         <tr>
           <td></td>
