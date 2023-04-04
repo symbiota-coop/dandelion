@@ -222,7 +222,7 @@ class Order
 
     begin
       credit_balance = organisationship.credit_balance.exchange_to(currency)
-    rescue Money::Bank::UnknownRate
+    rescue Money::Bank::UnknownRate, Money::Currency::UnknownCurrency
       return
     end
     return unless credit_balance > 0

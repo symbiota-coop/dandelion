@@ -83,7 +83,7 @@
   <td>
     <%= partial :'events/checked_in', locals: { event: event } %>
   </td>
-  <td data-sort="<%=begin; event.discounted_ticket_revenue.exchange_to(event.organisation.currency); rescue Money::Bank::UnknownRate; 0; end%>">
+  <td data-sort="<%=begin; event.discounted_ticket_revenue.exchange_to(event.organisation.currency); rescue Money::Bank::UnknownRate, Money::Currency::UnknownCurrency; 0; end%>">
     <% if event.discounted_ticket_revenue > 0 %>
       <%= m event.discounted_ticket_revenue, event.currency %>
     <% end %>
@@ -103,7 +103,7 @@
         <%= m event.credit_payable_to_revenue_sharer, event.currency %>
       <% end %>
     </td>
-    <td data-sort="<%=begin; event.donation_revenue.exchange_to(event.organisation.currency); rescue Money::Bank::UnknownRate; 0; end%>">
+    <td data-sort="<%=begin; event.donation_revenue.exchange_to(event.organisation.currency); rescue Money::Bank::UnknownRate, Money::Currency::UnknownCurrency; 0; end%>">
       <% if event.donations.count > 0 && !event.purchase_url %>
         <%= m event.donation_revenue, event.currency %>
       <% end %>

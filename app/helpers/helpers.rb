@@ -80,6 +80,8 @@ Dandelion::App.helpers do
     else
       Money.new(amount * 100, currency).format(no_cents_if_whole: true)
     end
+  rescue Money::Bank::UnknownRate, Money::Currency::UnknownCurrency
+    "#{currency} #{amount}"
   end
 
   def u(url)

@@ -913,7 +913,7 @@ class Event
     r = Money.new(0, currency)
     tickets.each { |ticket| r += Money.new((ticket.discounted_price || 0) * 100, ticket.currency) }
     r
-  rescue Money::Bank::UnknownRate
+  rescue Money::Bank::UnknownRate, Money::Currency::UnknownCurrency
     Money.new(0, ENV['DEFAULT_CURRENCY'])
   end
 
@@ -921,7 +921,7 @@ class Event
     r = Money.new(0, currency)
     donations.each { |donation| r += Money.new((donation.amount || 0) * 100, donation.currency) }
     r
-  rescue Money::Bank::UnknownRate
+  rescue Money::Bank::UnknownRate, Money::Currency::UnknownCurrency
     Money.new(0, ENV['DEFAULT_CURRENCY'])
   end
 
@@ -929,7 +929,7 @@ class Event
     r = Money.new(0, currency)
     tickets.each { |ticket| r += Money.new((ticket.discounted_price || 0) * 100 * (ticket.organisation_revenue_share || 1), ticket.currency) }
     r
-  rescue Money::Bank::UnknownRate
+  rescue Money::Bank::UnknownRate, Money::Currency::UnknownCurrency
     Money.new(0, ENV['DEFAULT_CURRENCY'])
   end
 
@@ -937,7 +937,7 @@ class Event
     r = Money.new(0, currency)
     orders.each { |order| r += Money.new((order.credit_payable_to_revenue_sharer || 0) * 100, order.currency) }
     r
-  rescue Money::Bank::UnknownRate
+  rescue Money::Bank::UnknownRate, Money::Currency::UnknownCurrency
     Money.new(0, ENV['DEFAULT_CURRENCY'])
   end
 end
