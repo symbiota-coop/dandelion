@@ -63,6 +63,9 @@ $(function () {
       $('#details form button[data-payment-method=seeds]').show()
       $('#details form button[data-payment-method=evm]').show()
     }
+
+    $('input[type=hidden][name=payment_method]').prop('disabled', true)
+    $('input[type=hidden][name=payment_method][value=' + $('#details form button[data-payment-method]:visible').first().attr('data-payment-method') + ']').prop('disabled', false)
   }
   $('select[name^=quantities], #donation_amount').change(function () {
     setTotal()
@@ -70,8 +73,8 @@ $(function () {
   setTotal()
 
   $('#details form button[data-payment-method]').click(function () {
-    $('input[type=hidden][name=payment_method]').attr('disabled', true)
-    $('input[type=hidden][name=payment_method][value=' + $(this).attr('data-payment-method') + ']').removeAttr('disabled')
+    $('input[type=hidden][name=payment_method]').prop('disabled', true)
+    $('input[type=hidden][name=payment_method][value=' + $(this).attr('data-payment-method') + ']').prop('disabled', false)
     $(this).attr('data-payment-method-clicked', true)
   })
 
