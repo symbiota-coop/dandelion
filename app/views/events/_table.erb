@@ -1,7 +1,7 @@
 <script>
   $(function () {
     var colIndex = $("#events th").toArray().indexOf($("th[data-col-name='date']")[0])
-    $('#events').dataTable({bInfo: false, paging: false, searching: false, order: [[colIndex, "desc"]]});
+    $('#events').dataTable({bInfo: false, paging: false, searching: false, order: [[colIndex, "asc"]]});
   })
 </script>
 <table class="table" id="events">
