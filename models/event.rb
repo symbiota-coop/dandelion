@@ -308,7 +308,7 @@ class Event
     end
 
     if organisation && zoom_party
-      organisation.local_groups.and(type: 'euro').each do |local_group|
+      organisation.local_groups.each do |local_group|
         zoomships.create local_group: local_group
       end
     end
