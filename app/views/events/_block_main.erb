@@ -21,30 +21,16 @@
   <% if (ef = event.event_facilitations.select { |event_facilitation| event_facilitation.account.lastname }).count > 0 || (!@organisation && event.organisation) %>
     <li>
       <i data-toggle="tooltip" title="Host/facilitators" class="fa fa-li fa-flag"></i>
-      <% if ef.count > 0 %>
-        <%== ef.map { |event_facilitation|
-          %(<a target="_parent" class="text-dark" href="/u/#{event_facilitation.account.username}">#{Sanitize.fragment(event_facilitation.account.name)}</a>)
-        }.to_sentence(last_word_connector: ' and ') %>
-        <% if !@organisation && event.organisation %>
-          in collaboration with
-        <% end %>
-      <% end %>
-      <% if !@organisation && event.organisation %>
-        <% organisations = []; organisations << %(<a target="_parent" class="text-dark" href="/o/#{Sanitize.fragment(event.organisation.slug)}">#{Sanitize.fragment(event.organisation.name)}</a>) %>
-        <% event.cohosts.each { |organisation| organisations << %(<a target="_parent" class="text-dark" href="/o/#{Sanitize.fragment(organisation.slug)}">#{Sanitize.fragment(organisation.name)}</a>) } %>
-        <%== organisations.to_sentence(last_word_connector: ' and ') %>
-      <% end %>
+      <%= partial :'events/facilitators', locals: {event: event, event_facilitators: ef} %>
     </li>
   <% end %>
-  <li><i data-toggle="tooltip" title="Dates/times" class="fa fa-li fa-calendar"></i><%= when_details(event) %></li>
-  <li><i data-toggle="tooltip" title="Location" class="fa fa-li fa-map-marker"></i>
-    <% if event.location == 'Online' %>
-      Online
-    <% elsif event.location =~ URI::regexp %>
-      <span class="compact-urls"><a target="_blank" href="<%= event.location %>"><%= event.location %></a></span>
-    <% else %>
-      <a target="_blank" href="https://www.google.co.uk/maps?q=<%= event.location %>"><%= event.location %></a>
-    <% end %>
+  <li>
+    <i data-toggle="tooltip" title="Dates/times" class="fa fa-li fa-calendar"></i>
+    <%= when_details(event) %>
+  </li>
+  <li>
+    <i data-toggle="tooltip" title="Location" class="fa fa-li fa-map-marker"></i>
+    <%= partial :'events/location', locals: {event: event} %>
   </li>
   <% if defined?(skip_final_ul) && skip_final_ul %>
 

@@ -1,0 +1,7 @@
+    <% if event.location == 'Online' %>
+  Online
+<% elsif event.location =~ URI::regexp %>
+  <span class="compact-urls"><a target="_blank" href="<%= event.location %>"><%= event.location %></a></span>
+<% else %>
+  <a target="_blank" href="https://www.google.co.uk/maps?q=<%= event.location %>"><%= event.location %></a>
+<% end %>

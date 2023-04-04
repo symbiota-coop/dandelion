@@ -1,0 +1,57 @@
+<script>
+  $(function () {
+    var colIndex = $("#events th").toArray().indexOf($("th[data-col-name='date']")[0])
+    $('#events').dataTable({bInfo: false, paging: false, searching: false, order: [[colIndex, "desc"]]});
+  })
+</script>
+<table class="table" id="events">
+  <thead>
+    <tr>
+      <th>
+        Event name
+      </th>
+      <th>
+        Tags
+      </th>
+      <th>
+        Facilitators
+      </th>
+      <th data-col-name="date">
+        Dates/times
+      </th>
+      <th>
+        Location
+      </th>
+      <th>
+        Listed on
+      </th>
+    </tr>
+  </thead>
+  <% @events.each { |event| %>
+  <tr>
+    <td>
+      <%= event.name %>
+      <% if event.draft? %>
+        <span class="label label-default mb-1 d-inline-block">Draft</span>
+      <% end %>
+    </td>
+    <td>
+      <div class="mb-2">
+        <%= partial :'events/tag_labels', locals: { event: event } %>
+      </div>
+    </td>
+    <td>
+      <%= partial :'events/facilitators', locals: {event: event} %>
+    </td>
+    <td data-sort="<%= event.start_time.iso8601 %>">
+      <%= when_details(event) %>
+    </td>
+    <td>
+      <%= partial :'events/location', locals: {event: event} %>
+    </td>
+    <td data-sort="<%= event.created_at.iso8601 %>">
+      <%= event.created_at %>
+    </td>
+  </tr>
+  <% } %>
+</table>
