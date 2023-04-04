@@ -1,5 +1,11 @@
 <%= partial :'events/nav', locals: { event: @event } %>
 
+<% if @event.draft? %>
+  <div class="alert alert-secondary">
+    This event is currently marked as a draft and is not visible to the public.
+  </div>
+<% end %>
+
 <% if @event.new_record? %>
   <% begin %>
     <%= partial :'organisations/pay', locals: { organisation: @event.organisation } %>
@@ -216,6 +222,10 @@
             </div>
           <% end %>
         </div>
+        <%= f.check_box_block :draft %>
+        <%= f.check_box_block :secret %>
+        <%= f.check_box_block :featured %>
+        <%= f.check_box_block :send_order_notifications %>
       </div>
       <div role="tabpanel" class="tab-pane" id="tab2">
         <%= f.wysiwyg_block :description %>
@@ -289,16 +299,12 @@
             <% if current_account.memberships.and(admin: true).count > 0 %>
               <%= f.select_block :gathering_id, options: [''] + current_account.memberships.and(admin: true).map { |m| [m.gathering.name, m.gathering_id] }.sort_by { |a,b| a } %>
             <% end %>
-            <%= f.check_box_block :featured %>
-            <%= f.check_box_block :secret %>
-            <%= f.check_box_block :draft %>
             <%= f.check_box_block :hide_attendees %>
             <%= f.check_box_block :hide_discussion %>
             <%= f.check_box_block :monthly_donors_only %>
             <%= f.check_box_block :no_discounts %>
             <%= f.check_box_block :show_emails %>
             <%= f.check_box_block :opt_in_facilitator %>
-            <%= f.check_box_block :send_order_notifications %>
             <%= f.check_box_block :include_in_parent %>
             <%= f.check_box_block :refund_deleted_orders %>
             <%= f.check_box_block :ask_hear_about %>

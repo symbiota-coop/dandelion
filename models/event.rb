@@ -858,7 +858,7 @@ class Event
       feedback_questions: 'Questions to ask participants in the post-event feedback form. One question per line. Leave blank to disable feedback.',
       extra_info_for_ticket_email: 'This is the place to enter Zoom links, directions to the venue, etc.',
       extra_info_for_recording_email: 'This is the place to enter the link to the recording.',
-      featured: "Feature the event on the organisation's events page",
+      featured: "Feature the event in a carousel on the organisation's events page",
       secret: 'Hide the event from all public listings',
       draft: 'Make the event visible to admins only',
       hide_attendees: 'Hide the public list of attendees (in any case, individuals must opt in)',
