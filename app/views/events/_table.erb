@@ -30,7 +30,7 @@
   <% @events.each { |event| %>
   <tr>
     <td>
-      <%= event.name %>
+      <a href="/events/<%=event.id%>"><%= event.name %></a>
       <% if event.draft? %>
         <span class="label label-default mb-1 d-inline-block">Draft</span>
       <% end %>
