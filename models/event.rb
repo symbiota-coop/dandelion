@@ -428,7 +428,7 @@ class Event
   after_save :update_event_tags
   def update_event_tags
     @tag_names ||= ''
-    @tag_names_a = @tag_names.split(',')
+    @tag_names_a = @tag_names.split(',').map(&:strip)
     current_tag_names = event_tagships.map(&:event_tag_name)
     tags_to_remove = current_tag_names - @tag_names_a
     tags_to_add = @tag_names_a - current_tag_names

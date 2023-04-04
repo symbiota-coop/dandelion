@@ -66,10 +66,10 @@
     <td>
       <% if event_feedback.event %>
         <% event_feedback.event.feedback_questions_a.each_with_index { |q,i| %>
-        <div class="mb-3">
-          <% qa = event_feedback.answers.detect { |k, _v| k == q }
+        <% qa = event_feedback.answers.detect { |k, _v| k == q }
              a = qa[1] if qa %>
-          <% if a %>
+        <% if a %>
+          <div class="mb-3">
             <strong>
               <%== Sanitize.fragment(Rinku.auto_link(q), Sanitize::Config::DANDELION) %>
             </strong>
@@ -80,8 +80,8 @@
                 <div data-pagelet-url="/event_feedbacks/<%= event_feedback.id %>/public/<%= i %>"></div>
               </div>
             <% end %>
-          <% end %>
-        </div>
+          </div>
+        <% end %>
         <% } %>
         <strong>Your response</strong>
         <div class="mt-1">
