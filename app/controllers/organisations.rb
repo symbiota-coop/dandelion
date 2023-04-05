@@ -3,7 +3,7 @@ Dandelion::App.controller do
     case content_type
     when :html
       @organisations = Organisation.and(:hidden.ne => true)
-      @organisations = params[:order] == 'subscribed_accounts_count' ? @organisations.order('subscribed_accounts_count desc') : @organisations.order('created_at desc')
+      @organisations = params[:order] == 'created_at' ? @organisations.order('created_at desc') : @organisations.order('subscribed_accounts_count desc')
       if params[:q]
         @organisations = @organisations.and(:id.in => Organisation.all.or(
           { name: /#{Regexp.escape(params[:q])}/i },
