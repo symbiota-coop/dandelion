@@ -97,8 +97,10 @@ class Ticket
       errors.add(:email, "- #{e}") if e
     end
 
-    self.payment_completed = true if price.nil? || price == 0
+    
     self.price = ticket_type.price if !price && ticket_type && !complementary
+    self.payment_completed = true if price.nil? || price == 0
+    
     self.currency = (order.try(:currency) || event.try(:currency)) unless currency
     self.organisation_revenue_share = order.try(:organisation_revenue_share) unless organisation_revenue_share
 
