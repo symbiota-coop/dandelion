@@ -909,6 +909,10 @@ class Event
     Account.and(:id.in => tickets.and(:show_attendance.ne => true).pluck(:account_id))
   end
 
+  def complete_tickets
+    tickets.and(:order_id.in => [nil] + orders.complete.pluck(:id))
+  end
+
   def discounted_ticket_revenue
     r = Money.new(0, currency)
     tickets.each { |ticket| r += Money.new((ticket.discounted_price || 0) * 100, ticket.currency) }
