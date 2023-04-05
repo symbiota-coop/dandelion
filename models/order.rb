@@ -168,7 +168,6 @@ class Order
   end
 
   before_validation do
-    self.payment_completed = true if value.nil?
     self.evm_value = value.to_d + evm_offset if evm_secret && !evm_value
     if seeds_secret && !seeds_value
       self.seeds_value = value
