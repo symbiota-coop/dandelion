@@ -129,9 +129,7 @@ class Order
   end
 
   def self.complete
-    self.and(:id.in =>
-        Order.and(value: nil).pluck(:id) +
-        Order.and(payment_completed: true).pluck(:id))
+    self.or({ value: nil }, { payment_completed: true })
   end
 
   def complete?
