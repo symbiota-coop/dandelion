@@ -29,7 +29,7 @@ Dandelion::App.controller do
   get '/zoom_parties/unattend' do
     sign_in_required!
     @event = Event.find(params[:event_id]) || not_found
-    @event.tickets.find_by(account: current_account).destroy
+    @event.tickets.complete.find_by(account: current_account).destroy
     redirect back
   end
 end

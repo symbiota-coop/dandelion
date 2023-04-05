@@ -1,12 +1,12 @@
-<% if (checked_in = event.tickets.and(:checked_in => true).count) > 0; w = ((checked_in/event.tickets.count.to_f)*100).round %>
+<% if (checked_in = event.tickets.complete.and(:checked_in => true).count) > 0; w = ((checked_in/event.tickets.complete.count.to_f)*100).round %>
   <a href="/events/<%= event.id %>/tickets">
-    <%= checked_in %>/<%=event.tickets.count %>
+    <%= checked_in %>/<%=event.tickets.complete.count %>
   </a>
   <a class="d-block" style="text-decoration: none" href="/events/<%= event.id %>/tickets">
-    <div class="progress" data-toggle="tooltip" title="<%= checked_in %>/<%= event.tickets.count %> tickets sold">
+    <div class="progress" data-toggle="tooltip" title="<%= checked_in %>/<%= event.tickets.complete.count %> tickets sold">
       <div class="progress-bar" role="progressbar" style="width: <%= "#{w}%" %>;">
         <% if defined?(full_width) %>
-           <%= checked_in %>/<%=event.tickets.count %>
+          <%= checked_in %>/<%=event.tickets.complete.count %>
         <% end %>
       </div>
     </div>

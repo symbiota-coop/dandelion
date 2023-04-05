@@ -387,7 +387,7 @@ class Event
     Account.and(:id.in =>
         [account.try(:id), revenue_sharer.try(:id), coordinator.try(:id)].compact +
         event_facilitators.pluck(:id) +
-        complete_tickets.and(subscribed_discussion: true).pluck(:account_id))
+        tickets.complete.and(subscribed_discussion: true).pluck(:account_id))
   end
 
   def subscribed_members
@@ -398,7 +398,7 @@ class Event
   end
 
   def self.participant?(event, account)
-    (account && event.complete_tickets.find_by(account: account)) || Event.admin?(event, account)
+    (account && event.tickets.complete.find_by(account: account)) || Event.admin?(event, account)
   end
 
   def self.email_viewer?(event, account)
@@ -566,7 +566,7 @@ class Event
     if organisation && organisation.fixed_fee
       standard
     else
-      one_percent_of_ticket_sales = Money.new(complete_tickets.sum(:price) * 0.05 * 100, currency).exchange_to('GBP')
+      one_percent_of_ticket_sales = Money.new(tickets.complete.sum(:price) * 0.05 * 100, currency).exchange_to('GBP')
       [standard, one_percent_of_ticket_sales].min
     end
   end
@@ -894,7 +894,7 @@ class Event
   end
 
   def attendees
-    Account.and(:id.in => complete_tickets.pluck(:account_id))
+    Account.and(:id.in => tickets.complete.pluck(:account_id))
   end
 
   def starrers
@@ -902,20 +902,16 @@ class Event
   end
 
   def public_attendees
-    Account.and(:id.in => complete_tickets.and(show_attendance: true).pluck(:account_id)).and(:hidden.ne => true)
+    Account.and(:id.in => tickets.complete.and(show_attendance: true).pluck(:account_id)).and(:hidden.ne => true)
   end
 
   def private_attendees
-    Account.and(:id.in => complete_tickets.and(:show_attendance.ne => true).pluck(:account_id))
-  end
-
-  def complete_tickets
-    tickets.and(:order_id.in => [nil] + orders.complete.pluck(:id))
+    Account.and(:id.in => tickets.complete.and(:show_attendance.ne => true).pluck(:account_id))
   end
 
   def discounted_ticket_revenue
     r = Money.new(0, currency)
-    complete_tickets.each { |ticket| r += Money.new((ticket.discounted_price || 0) * 100, ticket.currency) }
+    tickets.complete.each { |ticket| r += Money.new((ticket.discounted_price || 0) * 100, ticket.currency) }
     r
   rescue Money::Bank::UnknownRate, Money::Currency::UnknownCurrency
     Money.new(0, ENV['DEFAULT_CURRENCY'])
@@ -931,7 +927,7 @@ class Event
 
   def organisation_discounted_ticket_revenue
     r = Money.new(0, currency)
-    complete_tickets.each { |ticket| r += Money.new((ticket.discounted_price || 0) * 100 * (ticket.organisation_revenue_share || 1), ticket.currency) }
+    tickets.complete.each { |ticket| r += Money.new((ticket.discounted_price || 0) * 100 * (ticket.organisation_revenue_share || 1), ticket.currency) }
     r
   rescue Money::Bank::UnknownRate, Money::Currency::UnknownCurrency
     Money.new(0, ENV['DEFAULT_CURRENCY'])

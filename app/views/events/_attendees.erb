@@ -1,4 +1,4 @@
-<% if (current_account && ticket = @event.tickets.find_by(account: current_account)) || (@event.organisation && @event.public_attendees.count > 0) %>
+<% if (current_account && ticket = @event.tickets.complete.find_by(account: current_account)) || (@event.organisation && @event.public_attendees.count > 0) %>
   <div class="my-3">
     <div class="row no-gutters">
       <div class="col">
@@ -6,7 +6,7 @@
       </div>
       <div class="col-auto">
         <% if ticket %>
-          <% if @event.tickets.and(account: current_account).all? { |ticket| ticket.show_attendance? } %>
+          <% if @event.tickets.complete.and(account: current_account).all? { |ticket| ticket.show_attendance? } %>
             <a class="pagelet-trigger btn btn-sm btn-primary mb-1" href="/events/<%= @event.id %>/hide_attendance">Attendance public</a>
           <% else %>
             <a class="pagelet-trigger btn btn-sm btn-outline-primary mb-1" href="/events/<%= @event.id %>/show_attendance">Attendance hidden</a>

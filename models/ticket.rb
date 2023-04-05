@@ -19,6 +19,10 @@ class Ticket
   field :name, type: String
   field :email, type: String
 
+  def self.complete
+    self.and(:order_id.in => [nil] + Order.complete.pluck(:id))
+  end
+
   def firstname
     return if name.blank?
 
@@ -107,7 +111,7 @@ class Ticket
           errors.add(:ticket_type, 'is not available to someone donating this amount')
         end
       end
-      errors.add(:account, 'already has a ticket to this event') if event && zoomship && event.tickets(true).find_by(account: account)
+      errors.add(:account, 'already has a ticket to this event') if event && zoomship && event.tickets.complete.find_by(account: account)
     end
   end
 

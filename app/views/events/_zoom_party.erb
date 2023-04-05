@@ -13,7 +13,7 @@
     </tr>
   </thead>
   <% my_local_group_ids_in_this_organisation = current_account.local_groupships.and(:local_group_id.in => @event.organisation.local_groups.pluck(:id)).pluck(:local_group_id) %>
-  <% my_ticket = @event.tickets.find_by(account: current_account) %>
+  <% my_ticket = @event.tickets.complete.find_by(account: current_account) %>
   <% @event.zoomships.each { |zoomship| %>
   <tr <% if my_local_group_ids_in_this_organisation.include?(zoomship.local_group.id) %> class="bg-primary-transparent-1"<% end %>>
     <td style="width: 1px" data-sort="<%= 1 if my_local_group_ids_in_this_organisation.include?(zoomship.local_group.id) %>">

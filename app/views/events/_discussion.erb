@@ -51,7 +51,7 @@
     <% end %>" id="chat-spacer" style="margin-bottom: 410px"></div>
     <% else %>
       <h2 class="mt-5">Private discussion for attendees and facilitators</h2>
-      <% if (ticket = @event.tickets.find_by(account: current_account)) %>
+      <% if (ticket = @event.tickets.complete.find_by(account: current_account)) %>
         <div data-pagelet-url="/events/<%= @event.id %>/subscribe_discussion">
           <%= partial :'events/subscribe_discussion' %>
         </div>

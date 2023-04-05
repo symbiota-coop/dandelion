@@ -220,7 +220,7 @@ Dandelion::App.controller do
         activity: ("#{@event.activity.name} (#{@event.activity_id})" if @event.activity),
         event_coordinator: ("#{@event.coordinator.name} (#{@event.coordinator_id})" if @event.coordinator),
         carousel: @event.carousel,
-        order_count: @event.orders.count,
+        order_count: @event.orders.complete.count,
         discounted_ticket_revenue: @event.discounted_ticket_revenue.cents.to_f / 100,
         organisation_discounted_ticket_revenue: @event.organisation_discounted_ticket_revenue.cents.to_f / 100,
         donation_revenue: @event.donation_revenue.cents.to_f / 100,
@@ -312,14 +312,14 @@ Dandelion::App.controller do
   get '/events/:id/check_in_toggle/:ticket_id' do
     @event = Event.find(params[:id]) || not_found
     event_admins_only!
-    ticket = @event.tickets.find(params[:ticket_id])
+    ticket = @event.tickets.complete.find(params[:ticket_id])
     partial :'events/check_in_toggle', locals: { ticket: ticket }
   end
 
   post '/events/:id/check_in/:ticket_id' do
     @event = Event.find(params[:id]) || not_found
     event_admins_only!
-    ticket = @event.tickets.find(params[:ticket_id])
+    ticket = @event.tickets.complete.find(params[:ticket_id])
     if !ticket
       403
     elsif params[:checked_in] && ticket.checked_in
@@ -703,14 +703,14 @@ Dandelion::App.controller do
   get '/events/:id/hide_attendance' do
     sign_in_required!
     @event = Event.find(params[:id]) || not_found
-    @event.tickets.and(account: current_account).update_all(show_attendance: nil)
+    @event.tickets.complete.and(account: current_account).update_all(show_attendance: nil)
     200
   end
 
   get '/events/:id/show_attendance' do
     sign_in_required!
     @event = Event.find(params[:id]) || not_found
-    @event.tickets.and(account: current_account).update_all(show_attendance: true)
+    @event.tickets.complete.and(account: current_account).update_all(show_attendance: true)
     200
   end
 
@@ -786,14 +786,14 @@ Dandelion::App.controller do
   get '/events/:id/set_subscribe_discussion' do
     sign_in_required!
     @event = Event.find(params[:id]) || not_found
-    @event.tickets.and(account: current_account).update_all(subscribed_discussion: true)
+    @event.tickets.complete.and(account: current_account).update_all(subscribed_discussion: true)
     request.xhr? ? 200 : redirect("/events/#{@event.id}")
   end
 
   get '/events/:id/unsubscribe_discussion' do
     sign_in_required!
     @event = Event.find(params[:id]) || not_found
-    @event.tickets.and(account: current_account).update_all(subscribed_discussion: false)
+    @event.tickets.complete.and(account: current_account).update_all(subscribed_discussion: false)
     request.xhr? ? 200 : redirect("/events/#{@event.id}")
   end
 
@@ -815,14 +815,14 @@ Dandelion::App.controller do
 
   get '/events/:id/orders/:order_id/ticketholders/:ticket_id/:f' do
     @event = Event.find(params[:id]) || not_found
-    @order = @event.orders.find(params[:order_id]) || not_found
+    @order = @event.orders.complete.find(params[:order_id]) || not_found
     @ticket = @order.tickets.find(params[:ticket_id])
     partial :"events/ticketholder_#{params[:f]}", locals: { ticket: @ticket }
   end
 
   post '/events/:id/orders/:order_id/ticketholders/:ticket_id/:f' do
     @event = Event.find(params[:id]) || not_found
-    @order = @event.orders.find(params[:order_id]) || not_found
+    @order = @event.orders.complete.find(params[:order_id]) || not_found
     @ticket = @order.tickets.find(params[:ticket_id]) || not_found
     @ticket.send(:"#{params[:f]}=", params[params[:f]])
     @ticket.save
