@@ -1,6 +1,8 @@
 <div class="row justify-content-between mb-3">
   <div class="col">
-    <h1>Events</h1>
+    <% if !current_account %>
+      <h1>Events</h1>
+    <% end %>
     <% if !current_account %>
       <p>
         <a class="btn btn-primary" href="/accounts/new?list_an_event=1">List an event</a>

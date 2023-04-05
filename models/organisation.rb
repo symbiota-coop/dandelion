@@ -218,6 +218,14 @@ class Organisation
     {}.merge(new_tips)
   end
 
+  def self.marker_color
+    '#FF5241'
+  end
+
+  def self.marker_icon
+    'fa fa-flag'
+  end
+
   has_many :notifications_as_notifiable, as: :notifiable, dependent: :destroy, class_name: 'Notification', inverse_of: :notifiable
   has_many :notifications_as_circle, as: :circle, dependent: :destroy, class_name: 'Notification', inverse_of: :circle
   after_create do

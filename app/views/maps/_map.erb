@@ -14,7 +14,7 @@
     var bounds = new google.maps.LatLngBounds();
 
     var models = []
-  <% [Place, Account, Gathering, ActivityApplication, Event, Organisationship].each { |model| %>
+  <% [Organisation, Place, Account, Gathering, ActivityApplication, Event, Organisationship].each { |model| %>
       models.push({
         name: '<%= model.to_s %>',
         color: '<%= model.marker_color %>',

@@ -2,8 +2,35 @@ Dandelion::App.controller do
   get '/organisations', provides: %i[html json] do
     case content_type
     when :html
-      @organisations = Organisation.and(:hidden.ne => true).order('created_at desc').paginate(page: params[:organisations_page], per_page: 50)
-      erb :'organisations/organisations'
+      @organisations = Organisation.and(:hidden.ne => true)
+      @organisations = params[:order] == 'subscribed_accounts_count' ? @organisations.order('subscribed_accounts_count desc') : @organisations.order('created_at desc')
+      if params[:q]
+        @organisations = @organisations.and(:id.in => Organisation.all.or(
+          { name: /#{Regexp.escape(params[:q])}/i },
+          { intro_text: /#{Regexp.escape(params[:q])}/i }
+        ).pluck(:id))
+      end
+      @organisations = @organisations.and(:id.in => current_account.organisations_following.pluck(:id)) if current_account && params[:following]
+      @organisations = @organisations.paginate(page: params[:organisations_page], per_page: 50)
+      if request.xhr?
+        if params[:display] == 'map'
+          @lat = params[:lat]
+          @lng = params[:lng]
+          @zoom = params[:zoom]
+          @south = params[:south]
+          @west = params[:west]
+          @north = params[:north]
+          @east = params[:east]
+          box = [[@west.to_f, @south.to_f], [@east.to_f, @north.to_f]]
+
+          @organisations = @organisations.and(coordinates: { '$geoWithin' => { '$box' => box } }) unless @organisations.empty?
+          @points_count = @organisations.count
+          @points = @organisations.to_a
+          partial :'maps/map', locals: { stem: '/organisations', dynamic: true, points: @points, points_count: @points_count, centre: (OpenStruct.new(lat: @lat, lng: @lng) if @lat && @lng), zoom: @zoom }
+        end
+      else
+        erb :'organisations/organisations'
+      end
     when :json
       @organisations = Organisation.all.order('created_at desc')
       @organisations = @organisations.and(name: /#{Regexp.escape(params[:q])}/i) if params[:q]
