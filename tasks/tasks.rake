@@ -11,6 +11,7 @@ namespace :organisations do
 
       organisation.update_paid_up
       organisation.set(subscribed_accounts_count: organisation.subscribed_accounts.count)
+      organisation.set(followers_count: organisation.organisationships.count)
       organisation.set(monthly_donors_count: organisation.monthly_donors.count)
       organisation.set(monthly_donations_count: monthly_donations_count)
     end

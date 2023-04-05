@@ -36,6 +36,7 @@ class Organisation
   field :extra_info_for_ticket_email, type: String
   field :event_footer, type: String
   field :minimal_head, type: String
+  field :followers_count, type: Integer
   field :subscribed_accounts_count, type: Integer
   field :monthly_donor_affiliate_reward, type: Integer
   field :monthly_donors_count, type: Integer
