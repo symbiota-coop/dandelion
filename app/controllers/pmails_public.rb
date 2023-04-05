@@ -4,6 +4,7 @@ Dandelion::App.controller do
     @pmail = Pmail.find(params[:pmail_id]) || not_found
     @pmail.html(share_buttons: true)
           .gsub('%recipient.firstname%', 'there')
+          .gsub('%recipient.view_or_activate%', 'View your profile')
           .gsub(/%recipient\.\w+%/, '_')
           .gsub('%share_buttons%', partial(:share, locals: {
                                              share_url: "#{ENV['BASE_URI']}/pmails/#{@pmail.id}",
