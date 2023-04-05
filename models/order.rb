@@ -129,7 +129,7 @@ class Order
   end
 
   def self.complete
-    self.or({ value: nil }, { payment_completed: true })
+    self.and(payment_completed: true)
   end
 
   def complete?

@@ -21,7 +21,7 @@ class Ticket
   field :payment_completed, type: Boolean
 
   def self.complete
-    self.or({ price: nil }, { price: 0 }, { payment_completed: true })
+    self.and(payment_completed: true)
   end
 
   def firstname
