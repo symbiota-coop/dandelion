@@ -18,9 +18,10 @@ class Ticket
   field :checked_in_at, type: Time
   field :name, type: String
   field :email, type: String
+  field :payment_completed, type: Boolean
 
   def self.complete
-    self.and(:order_id.in => [nil] + Order.complete.pluck(:id))
+    self.and(payment_completed: true)
   end
 
   def firstname
@@ -40,6 +41,7 @@ class Ticket
       summary: { type: :text, edit: false },
       price: :number,
       currency: :text,
+      payment_completed: :check_box,
       organisation_revenue_share: :number,
       show_attendance: :check_box,
       checked_in: :check_box,

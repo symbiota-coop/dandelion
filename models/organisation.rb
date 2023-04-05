@@ -686,7 +686,7 @@ class Organisation
 
       puts "#{data['amount']} SEEDS: #{seeds_secret}"
       if (@order = Order.find_by(:payment_completed.ne => true, :seeds_secret => seeds_secret.downcase, :seeds_value => data['amount']))
-        @order.set(payment_completed: true)
+        @order.payment_completed!
         @order.send_tickets
         @order.create_order_notification
       elsif (@order = Order.deleted.find_by(:payment_completed.ne => true, :seeds_secret => seeds_secret.downcase, :seeds_value => data['amount']))
@@ -716,7 +716,7 @@ class Organisation
         puts amount = h.search('[data-test=token_transfer] > span')[1].text.split(' ').first.gsub(',', '')
 
         if (@order = Order.find_by(:payment_completed.ne => true, :currency => token, :evm_value => amount))
-          @order.set(payment_completed: true)
+          @order.payment_completed!
           @order.send_tickets
           @order.create_order_notification
         elsif (@order = Order.deleted.find_by(:payment_completed.ne => true, :evm_value => amount))

@@ -16,7 +16,7 @@ Dandelion::App.controller do
     if event['type'] == 'checkout.session.completed'
       session = event['data']['object']
       if (@order = @organisation.orders.find_by(:session_id => session.id, :payment_completed.ne => true))
-        @order.set(payment_completed: true)
+        @order.payment_completed!
         @order.update_destination_payment
         @order.send_tickets
         @order.create_order_notification
@@ -60,7 +60,7 @@ Dandelion::App.controller do
 
     if event.type == 'charge:confirmed' && event.data.respond_to?(:checkout)
       if (@order = @organisation.orders.find_by(coinbase_checkout_id: event.data.checkout.id))
-        @order.set(payment_completed: true)
+        @order.payment_completed!
         @order.send_tickets
         @order.create_order_notification
         halt 200

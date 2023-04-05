@@ -9,11 +9,17 @@ class Donation
 
   field :amount, type: Float
   field :currency, type: String
+  field :payment_completed, type: Boolean
+
+  def self.complete
+    self.and(payment_completed: true)
+  end
 
   def self.admin_fields
     {
       amount: :number,
       currency: :text,
+      payment_completed: :check_box,
       account_id: :lookup,
       event_id: :lookup,
       order_id: :lookup

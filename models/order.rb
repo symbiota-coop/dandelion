@@ -100,11 +100,17 @@ class Order
     account && order && (Event.email_viewer?(order.event, account) || (order.opt_in_facilitator && Event.admin?(order.event, account)))
   end
 
+  def payment_completed!
+    set(payment_completed: true)
+    tickets.set(payment_completed: true)
+    donations.set(payment_completed: true)
+  end
+
   def restore_and_complete
     tickets.deleted.each { |ticket| ticket.restore }
     donations.deleted.each { |donation| donation.restore }
     restore
-    set(payment_completed: true)
+    payment_completed!
     update_destination_payment
     send_tickets
     create_order_notification
