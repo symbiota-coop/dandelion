@@ -69,7 +69,7 @@ $(function () {
       pagelet.css('opacity', '1')
       const offset = pagelet.offset()
       if (pagelet.attr('data-pagelet-scroll') != 'false') {
-        window.scrollTo(offset.left, offset.top - $('#header').height())
+        window.scrollTo(0, offset.top - $('#header').height())
       }
     })
     return false
