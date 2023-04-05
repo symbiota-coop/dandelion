@@ -24,7 +24,7 @@
     </a>
   <% end %>
   <% if event.orders.incomplete.count > 0 %>
-    <i class="fa fa-spin fa-circle-o-notch"></i>
+    <i data-toggle="tooltip" title="Someone is in the process of completing an order. If they don't complete it soon, the order will be removed." class="fa fa-spin fa-circle-o-notch"></i>
   <% end %>
   <% if event.sold_out? %>
     <div class="mt-1">
