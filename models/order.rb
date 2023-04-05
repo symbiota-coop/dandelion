@@ -116,24 +116,20 @@ class Order
     create_order_notification
   end
 
-  def self.incomplete
-    self.and(:id.in =>
-        Order.and(:payment_intent.ne => nil).and(:payment_completed.ne => true).pluck(:id) +
-        Order.and(:coinbase_checkout_id.ne => nil).and(:payment_completed.ne => true).pluck(:id) +
-        Order.and(:seeds_secret.ne => nil).and(:payment_completed.ne => true).pluck(:id) +
-        Order.and(:evm_secret.ne => nil).and(:payment_completed.ne => true).pluck(:id))
-  end
-
   def incomplete?
-    (payment_intent && !payment_completed) || (coinbase_checkout_id && !payment_completed) || (seeds_secret && !payment_completed) || (evm_secret && !payment_completed)
-  end
-
-  def self.complete
-    self.and(payment_completed: true)
+    !payment_completed
   end
 
   def complete?
     payment_completed
+  end
+
+  def self.incomplete
+    self.and(:payment_completed.ne => true)
+  end
+
+  def self.complete
+    self.and(payment_completed: true)
   end
 
   def description_elements

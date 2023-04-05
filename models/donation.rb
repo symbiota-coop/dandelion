@@ -11,6 +11,18 @@ class Donation
   field :currency, type: String
   field :payment_completed, type: Boolean
 
+  def incomplete?
+    !payment_completed
+  end
+
+  def complete?
+    payment_completed
+  end
+
+  def self.incomplete
+    self.and(:payment_completed.ne => true)
+  end
+
   def self.complete
     self.and(payment_completed: true)
   end
