@@ -9,7 +9,7 @@
   <%= hidden_field_tag :display, value: params[:display] %>
   <%= hidden_field_tag :order, value: params[:order] %>
   <div class="form-group">
-    <label>Show organisations containing the word</label>
+    <label>Search</label>
     <%= text_field_tag :q, class: 'form-control', value: params[:q], style: 'max-width: 12em' %>
   </div>
   <% if current_account %>
@@ -19,7 +19,7 @@
   <%= hidden_field_tag :search, value: 1 %>
 <% end %>
 
-<div class="row justify-content-between">
+<div class="row justify-content-between mb-3 mb-lg-0">
 
   <div class="col-12 col-sm">
 

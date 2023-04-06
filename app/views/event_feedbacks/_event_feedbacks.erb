@@ -12,13 +12,13 @@
             <% if account.picture && !params[:hide_pictures] %>
               <%= partial :'accounts/square', locals: { account: account, width: '50px' } %>
             <% end %>
-            <a href="/u/<%= account.username %>"><%= account.name %></a>
+            <a <% if params[:minimal] %>target="_blank"<% end %> href="/u/<%= account.username %>"><%= account.name %></a>
           <% else %>
             <%= account.abbrname %>
           <% end %>
         <% end %>
         <% if event_feedback.event %>
-          on <a href="/events/<%= event_feedback.event.id %>"><%= event_feedback.event.name %></a>
+          on <a <% if params[:minimal] %>target="_blank"<% end %>  href="/events/<%= event_feedback.event.id %>"><%= event_feedback.event.name %></a>
         <% end %>
       </td>
       <td style="white-space: nowrap;"><% if event_feedback.deleted_at%><em>Removed</em><% else %><% event_feedback.rating.times do %><i class="fa fa-star"></i><% end %><% end %></td>
