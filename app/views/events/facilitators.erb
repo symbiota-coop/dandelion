@@ -16,4 +16,6 @@ account_ids_freq = account_ids_freq.paginate(page: params[:page], per_page: 10)
   <% } %>
 </ul>
 
-<%= will_paginate account_ids_freq, renderer: WillPaginate::ViewHelpers::BootstrapRenderer %>
+<div class="mt-3">
+  <%= will_paginate account_ids_freq, renderer: WillPaginate::ViewHelpers::BootstrapRenderer %>
+</div>
