@@ -8,6 +8,7 @@ require 'bundler/setup'
 require 'open-uri'
 require 'active_support/time'
 require 'money/bank/uphold'
+require 'will_paginate/array'
 Bundler.require(:default, RACK_ENV)
 
 Padrino.load!

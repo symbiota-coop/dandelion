@@ -4,13 +4,16 @@ account_ids = EventFacilitation.and(:event_id.in => Event.past.pluck(:id)).pluck
 account_ids_freq = account_ids.inject(Hash.new(0)) { |h,v| h[v] += 1; h }
 # sort by frequency
 account_ids_freq = account_ids_freq.sort_by { |k,v| v }.reverse
+account_ids_freq = account_ids_freq.paginate(page: params[:page], per_page: 10)
 %>
 
-<% accounts = Account.and(:id.in => account_ids_freq.first(50).map { |id, freq| id }) %>
+<% accounts = Account.and(:id.in => account_ids_freq.map { |id, freq| id }) %>
 <ul class="search-result-list">
-  <% account_ids_freq.first(50).each { |id, freq|; account = accounts.find { |a| a.id == id } %>
+  <% account_ids_freq.each { |id, freq|; account = accounts.find { |a| a.id == id } %>
   <li>
     <%= partial 'accounts/search_result', locals: { account: account, facilitator_info: true } %>
   </li>
   <% } %>
 </ul>
+
+<%= will_paginate account_ids_freq, renderer: WillPaginate::ViewHelpers::BootstrapRenderer %>
