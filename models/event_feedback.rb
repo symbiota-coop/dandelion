@@ -45,7 +45,7 @@ class EventFeedback
   end
 
   def self.average_rating
-    ratings = self.and(:rating.ne => nil).pluck(:rating)
+    ratings = self.and(:deleted_at => nil, :rating.ne => nil).pluck(:rating)
     return unless ratings.length > 0
 
     ratings = ratings.map(&:to_i)
