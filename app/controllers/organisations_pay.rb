@@ -1,5 +1,6 @@
 Dandelion::App.controller do
   get '/o/:slug/contribute' do
+    sign_in_required!
     @organisation = Organisation.find_by(slug: params[:slug]) || not_found
     erb :'organisations/contribute'
   end
