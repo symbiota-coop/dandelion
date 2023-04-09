@@ -2,7 +2,11 @@ Dandelion::App.controller do
   get '/gatherings', provides: %i[html json] do
     case content_type
     when :html
-      @gatherings = Gathering.and(listed: true).and(:privacy.ne => 'secret')
+      @gatherings = if current_account && params[:my_gatherings]
+                      Gathering.and(:id.in => current_account.memberships.pluck(:gathering_id))
+                    else
+                      Gathering.and(listed: true).and(:privacy.ne => 'secret')
+                    end
       @gatherings = params[:order] == 'created_at' ? @gatherings.order('created_at desc') : @gatherings.order('membership_count desc')
       if params[:q]
         @gatherings = @gatherings.and(:id.in => Gathering.all.or(
@@ -10,7 +14,6 @@ Dandelion::App.controller do
           { intro_for_non_members: /#{Regexp.escape(params[:q])}/i }
         ).pluck(:id))
       end
-      @gatherings = @gatherings.and(:id.in => current_account.memberships.pluck(:gathering_id)) if current_account && params[:my_gatherings]
       @gatherings = @gatherings.paginate(page: params[:gatherings_page], per_page: 50)
       if request.xhr?
         if params[:display] == 'map'
