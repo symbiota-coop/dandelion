@@ -27,7 +27,11 @@
         <a href="/g/<%= @gathering.slug %>/teams/<%= inventory_item.team_id %>"><%= inventory_item.team.name %></a>
       <% end %>
     </td>
-    <td><a href="/accounts/<%= inventory_item.account_id %>"><%= inventory_item.account.name %></a></td>
+    <td>
+      <% if inventory_item.account %>
+        <a href="/accounts/<%= inventory_item.account_id %>"><%= inventory_item.account.name %></a>
+      <% end %>
+    </td>
     <td>
       <% if inventory_item.responsible %>
         <a href="javascript:;" onclick="$(this).hide().next().show()"><%= inventory_item.responsible.name %></a>
