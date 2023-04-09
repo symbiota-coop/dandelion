@@ -49,7 +49,7 @@
         <% } %>
         <%= hidden_field_tag :search, value: 1 %>
         <label class="mr-sm-2">Sort by</label>
-        <%= select_tag :order, options: { 'Most members' => 'membership_count', 'Most recently created' => 'created_at' }, selected: params[:order], class: 'form-control' %>
+        <%= select_tag :order, options: { 'Most recently created' => 'created_at', 'Most members' => 'membership_count' }, selected: params[:order], class: 'form-control' %>
       <% end %>
     </div>
   <% end %>

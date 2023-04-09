@@ -7,7 +7,7 @@ Dandelion::App.controller do
                     else
                       Gathering.and(listed: true).and(:privacy.ne => 'secret')
                     end
-      @gatherings = params[:order] == 'created_at' ? @gatherings.order('created_at desc') : @gatherings.order('membership_count desc')
+      @gatherings = params[:order] == 'membership_count' ? @gatherings.order('membership_count desc') : @gatherings.order('created_at desc')
       if params[:q]
         @gatherings = @gatherings.and(:id.in => Gathering.all.or(
           { name: /#{Regexp.escape(params[:q])}/i },
