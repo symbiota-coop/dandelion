@@ -1,18 +1,66 @@
 <% if !current_account %>
   <h1>Gatherings</h1>
 <% end %>
-<% if current_account %>
-  <a class="btn btn-primary mt-1 mt-lg-0 mb-3" href="/g/new"><i class="fa fa-plus-circle"></i> Create a gathering</a>
-<% end %>
+<a class="btn btn-primary mt-1 mt-lg-0 mb-3" href="/g/new"><i class="fa fa-plus-circle"></i> Create a gathering</a>
 
 <%= partial :'gatherings/explain' %>
 
-<% if current_account && current_account.memberships.count > 0 %>
-  <h2>Your gatherings</h2>
-  <% gatherings = current_account.memberships.sort_by { |membership| membership.gathering.notifications_as_circle.order('created_at desc').first.try(:created_at).try(:to_i) or 0 }.reverse.map(&:gathering) %>
-  <%= partial :'gatherings/blocks', locals: { gatherings: gatherings } %>
+<% form_tag '/gatherings', method: 'get', class: 'submitOnChange searchForm form-inline mb-3' do %>
+  <%= hidden_field_tag :display, value: params[:display] %>
+  <%= hidden_field_tag :order, value: params[:order] %>
+  <div class="form-group">
+    <label>Search</label>
+    <%= text_field_tag :q, class: 'form-control', value: params[:q], style: 'max-width: 12em' %>
+  </div>
+  <% if current_account %>
+    <%= checkbox 'My gatherings' %>
+  <% end %>
+  <%= submit_tag 'Search', class: 'btn btn-primary' %>
+  <%= hidden_field_tag :search, value: 1 %>
 <% end %>
-<% if current_account && current_account.memberships.count && @gatherings.count > 0 %>
-  <h2>All gatherings</h2>
+
+<div class="row justify-content-between mb-3 mb-lg-0">
+
+  <div class="col-12 col-sm">
+
+    <ul class="pl-0 mb-3 d-flex align-items-center">
+      <!-- align vertically -->
+      <li class="list-inline-item">
+        <label class="mb-0">View as</label>
+      </li>
+      <li class="list-inline-item">
+        <a class="btn <%='btn btn-outline-primary' if !params[:display].in?(['map']) %>" href="<%= path if defined?(path) %>?<%= q = Rack::Utils.parse_nested_query(request.query_string); q.delete('search'); q.delete('display'); q.merge({search: 1, display: 'blocks' }).to_query %>">
+          <i class="fa fa-th-large"></i> Blocks
+        </a>
+      </li>
+      <li class="list-inline-item">
+        <a class="btn <%='btn-outline-primary' if params[:display] == 'map' %>" href="<%= path if defined?(path) %>?<%= q = Rack::Utils.parse_nested_query(request.query_string); q.delete('search'); q.delete('display'); q.merge({search: 1, display: 'map' }).to_query %>">
+          <i class="fa fa-map-marker"></i> Map
+        </a>
+      </li>
+    </ul>
+  </div>
+
+  <% if params[:display] != 'map' %>
+    <div class="col-12 col-lg-auto">
+      <% form_tag (defined?(path) ? path : ''), method: 'get', class: 'form-inline submitOnChange' do %>
+        <% params.each { |k,v| next if %w[format search order slug].include?(k) %>
+        <%= hidden_field_tag k, value: v %>
+        <% } %>
+        <%= hidden_field_tag :search, value: 1 %>
+        <label class="mr-sm-2">Sort by</label>
+        <%= select_tag :order, options: { 'Most members' => 'membership_count', 'Most recently created' => 'created_at' }, selected: params[:order], class: 'form-control' %>
+      <% end %>
+    </div>
+  <% end %>
+
+</div>
+
+<% if params[:display] == 'map' %>
+  <div data-pagelet-url="/gatherings?<%= request.query_string %>">
+    <%= partial :'maps/map', locals: { stem: "/gatherings", dynamic: true, trigger_bounds_changed: true } %>
+  </div>
+<% else %>
+  <%= partial :'gatherings/blocks', locals: { gatherings: @gatherings } %>
+  <%= will_paginate @gatherings, param_name: 'gatherings_page', inner_window: 0, outer_window: 0, renderer: WillPaginate::ViewHelpers::BootstrapRenderer %>
 <% end %>
-<%= partial :'gatherings/blocks', locals: { gatherings: @gatherings } %>

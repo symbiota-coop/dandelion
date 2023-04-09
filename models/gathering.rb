@@ -34,6 +34,7 @@ class Gathering
   field :redirect_home, type: String
   field :choose_and_pay_label, type: String
   field :hide_paid, type: Boolean
+  field :membership_count, type: Integer
 
   def self.enablable
     %w[contributions teams timetables rotas shift_worth inventory budget partial_payments]

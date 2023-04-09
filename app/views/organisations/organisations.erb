@@ -1,9 +1,7 @@
 <% if !current_account %>
   <h1>Organisations</h1>
 <% end %>
-<% if current_account %>
-  <a class="btn btn-primary mt-1 mt-lg-0 mb-3" href="/o/new"><i class="fa fa-plus-circle"></i> Create an organisation</a>
-<% end %>
+<a class="btn btn-primary mt-1 mt-lg-0 mb-3" href="/o/new"><i class="fa fa-plus-circle"></i> Create an organisation</a>
 
 <% form_tag '/organisations', method: 'get', class: 'submitOnChange searchForm form-inline mb-3' do %>
   <%= hidden_field_tag :display, value: params[:display] %>

@@ -2,8 +2,35 @@ Dandelion::App.controller do
   get '/gatherings', provides: %i[html json] do
     case content_type
     when :html
-      @gatherings = Gathering.and(listed: true).and(:privacy.ne => 'secret').order('created_at desc')
-      erb :'gatherings/gatherings'
+      @gatherings = Gathering.and(listed: true).and(:privacy.ne => 'secret')
+      @gatherings = params[:order] == 'created_at' ? @gatherings.order('created_at desc') : @gatherings.order('membership_count desc')
+      if params[:q]
+        @gatherings = @gatherings.and(:id.in => Gathering.all.or(
+          { name: /#{Regexp.escape(params[:q])}/i },
+          { intro_for_non_members: /#{Regexp.escape(params[:q])}/i }
+        ).pluck(:id))
+      end
+      @gatherings = @gatherings.and(:id.in => current_account.memberships.pluck(:gathering_id)) if current_account && params[:my_gatherings]
+      @gatherings = @gatherings.paginate(page: params[:gatherings_page], per_page: 50)
+      if request.xhr?
+        if params[:display] == 'map'
+          @lat = params[:lat]
+          @lng = params[:lng]
+          @zoom = params[:zoom]
+          @south = params[:south]
+          @west = params[:west]
+          @north = params[:north]
+          @east = params[:east]
+          box = [[@west.to_f, @south.to_f], [@east.to_f, @north.to_f]]
+
+          @gatherings = @gatherings.and(coordinates: { '$geoWithin' => { '$box' => box } }) unless @gatherings.empty?
+          @points_count = @gatherings.count
+          @points = @gatherings.to_a
+          partial :'maps/map', locals: { stem: '/gatherings', dynamic: true, points: @points, points_count: @points_count, centre: (OpenStruct.new(lat: @lat, lng: @lng) if @lat && @lng), zoom: @zoom }
+        end
+      else
+        erb :'gatherings/gatherings'
+      end
     when :json
       sign_in_required!
       @gatherings = Gathering.and(:id.in => current_account.memberships.pluck(:gathering_id))

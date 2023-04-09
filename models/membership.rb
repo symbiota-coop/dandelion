@@ -48,6 +48,7 @@ class Membership
   has_many :notifications, as: :notifiable, dependent: :destroy
   after_create do
     notifications.create! circle: circle, type: 'joined_gathering' unless prevent_notifications
+    gathering.update_attribute(:membership_count, gathering.memberships.count)
     gathering.members.each do |follower|
       Follow.create follower: follower, followee: account, unsubscribed: true
     end
@@ -98,10 +99,11 @@ class Membership
 
   after_destroy do
     account.notifications_as_notifiable.create! circle: gathering, type: 'left_gathering'
+    gathering.update_attribute(:membership_count, gathering.memberships.count)
     if mapplication
       mapplication.prevent_notifications = true
       mapplication.destroy
-    end
+    end    
     gathering.subscriptions.and(account: account).destroy_all
     %w[teams tactivities mapplications].each do |items|
       gathering.send(items).each do |item|
