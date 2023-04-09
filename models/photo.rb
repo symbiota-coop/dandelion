@@ -24,7 +24,11 @@ class Photo
   before_validation do
     if image
       begin
-        errors.add(:image, 'must be an image') unless %w[jpeg png gif pam].include?(image.format)
+        if %w[jpeg png gif pam].include?(image.format)
+          image.name = "#{SecureRandom.uuid}.#{image.format}"
+        else
+          errors.add(:image, 'must be an image')
+        end
       rescue StandardError
         self.image = nil
         errors.add(:image, 'must be an image')
