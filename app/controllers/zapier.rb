@@ -9,7 +9,7 @@ Dandelion::App.controller do
   end
 
   get '/z/organisation_events', provides: :json do
-    @organisation = Organisation.find_by(slug: params[:organisation_slug])
+    @organisation = Organisation.find_by(slug: params[:organisation_slug]) || not_found
     @organisation.events_for_search.map do |event|
       {
         id: event.id.to_s,
@@ -19,7 +19,7 @@ Dandelion::App.controller do
   end
 
   get '/z/organisation_event_orders', provides: :json do
-    @organisation = Organisation.find_by(slug: params[:organisation_slug])
+    @organisation = Organisation.find_by(slug: params[:organisation_slug]) || not_found
     @event = @organisation.events.find(params[:event_id])
     event_admins_only!
     @event.orders.complete.order('created_at desc').map do |order|
