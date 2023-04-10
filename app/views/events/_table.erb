@@ -49,9 +49,7 @@
     <td>
       <%= partial :'events/location', locals: {event: event} %>
     </td>
-    <td data-sort="<%= event.created_at.iso8601 %>">
-      <%= event.created_at %>
-    </td>
+    <td data-sort="<%= event.created_at.iso8601 %>"><%= event.created_at %></td>
   </tr>
   <% } %>
 </table>
