@@ -34,7 +34,7 @@ Dandelion::App.controller do
           next unless params[:q].starts_with?("#{t}:")
 
           @q += '"' unless @q.ends_with?('"')
-          @q = @q.match(/#{t}:"(.+)"/)[1]
+          @q = @q.match(/#{t}\s*:"(.+)"/)[1]
           @type = t.pluralize
         end
         case @type
