@@ -462,7 +462,7 @@ class Account
   has_many :tickets, dependent: :destroy
   has_many :donations, dependent: :destroy
   def upcoming_events
-    Event.future_and_current_featured.and(:id.in =>
+    Event.and(:organisation_id.ne => nil).future_and_current_featured.and(:id.in =>
         tickets.pluck(:event_id) +
         event_facilitations.pluck(:event_id) +
         events_coordinating.pluck(:id) +
