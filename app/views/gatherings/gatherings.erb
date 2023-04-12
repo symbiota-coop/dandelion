@@ -3,7 +3,7 @@
 <% end %>
 <a class="btn btn-primary mt-1 mt-lg-0 mb-3" href="/g/new"><i class="fa fa-plus-circle"></i> Create a gathering</a>
 
-<%= partial :'gatherings/explain' %>
+<%= partial :'gatherings/explain', locals: {read_more: true} %>
 
 <% form_tag '/gatherings', method: 'get', class: 'submitOnChange searchForm form-inline mb-3' do %>
   <%= hidden_field_tag :display, value: params[:display] %>

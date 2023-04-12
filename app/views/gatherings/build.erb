@@ -3,7 +3,7 @@
 <% end %>
 
 <% if @gathering.new_record? %>
-  <%= partial :'gatherings/explain' %>
+  <%= partial :'gatherings/explain', locals: {read_more: true} %>
 <% end %>
 
 <p>
