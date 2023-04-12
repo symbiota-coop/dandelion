@@ -745,7 +745,7 @@ class Event
   end
 
   def self.live
-    self.and(:draft.ne => true)
+    self.and(:draft.ne => true).and(:organisation_id.ne => nil)
   end
 
   def self.secret
@@ -753,7 +753,7 @@ class Event
   end
 
   def self.public
-    self.and(:secret.ne => true)
+    self.and(:secret.ne => true).and(:organisation_id.ne => nil)
   end
 
   def live?
