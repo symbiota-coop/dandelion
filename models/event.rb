@@ -731,13 +731,7 @@ class Event
     self.and(:organisation_id.in =>
       Organisation.and(:hidden.ne => true).pluck(:id)).and(
         :organisation_id.in => Event.and(:id.in => TicketType.pluck(:event_id)).pluck(:organisation_id)
-      ).and(:organisation_id.in =>
-        Organisation.all.or(
-          { :stripe_pk.ne => nil },
-          { :coinbase_api_key.ne => nil },
-          { :evm_address.ne => nil },
-          { :seeds_username.ne => nil }
-        ).pluck(:id))
+      )
   end
 
   def self.draft

@@ -1,4 +1,4 @@
-<% ef = defined?(event_facilitators) ? event_facilitators : event.event_facilitations.select { |event_facilitation| event_facilitation.account.lastname } %>
+<% ef = defined?(event_facilitators) ? event_facilitators : event.event_facilitations.select { |event_facilitation| event_facilitation.account.lastname && event_facilitation.account.name != event.organisation.name } %>
 <% text_class = defined?(event_facilitators) ? 'text-dark' : '' %>
 <% if ef.count > 0 %>
   <%== ef.map { |event_facilitation|
