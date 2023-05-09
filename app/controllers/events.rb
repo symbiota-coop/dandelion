@@ -454,9 +454,11 @@ Dandelion::App.controller do
     @event = Event.find(params[:id]) || not_found
     event_admins_only!
     @tickets = if params[:ticket_type_id]
-                 @event.ticket_types.find(params[:ticket_type_id]).tickets
+                 tt = @event.ticket_types.find(params[:ticket_type_id]) || not_found
+                 tt.tickets
                elsif params[:ticket_group_id]
-                 @event.ticket_groups.find(params[:ticket_group_id]).tickets
+                 tg = @event.ticket_groups.find(params[:ticket_group_id]) || not_found
+                 tg.tickets
                else
                  @event.tickets
                end
@@ -725,7 +727,7 @@ Dandelion::App.controller do
 
   post '/events/:id/cohostships/new' do
     @event = Event.find(params[:id]) || not_found
-    if params[:cohostship]
+    if params[:cohostship] && params[:cohostship][:organisation_id]
       @organisation = Organisation.find(params[:cohostship][:organisation_id]) || not_found
       @organisation.restrict_cohosting? ? organisation_admins_only! : event_admins_only!
       @event.cohostships.create(organisation: @organisation)

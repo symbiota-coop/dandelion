@@ -22,7 +22,7 @@
           <div class="bg-primary text-white p-2 rounded mb-2">
             <p class="mb-1">
               <i class="fa fa-ticket"></i>
-              <%=ticket.ticket_type.name%>
+              <%=ticket.ticket_type.try(:name)%>
             </span>
           </p>
           <div class="row">

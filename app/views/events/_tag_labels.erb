@@ -1,3 +1,7 @@
 <% event.event_tags.each { |event_tag| %>
+<% if event.organisation %>
   <a href="/o/<%= event.organisation.slug %>/events?event_tag_id=<%= event_tag.id %>" class="text-white label label-primary d-inline-block mb-1"><%== Sanitize.fragment(event_tag.name) %></a>
+<% else %>
+  <span class="text-white label label-primary d-inline-block mb-1"><%== Sanitize.fragment(event_tag.name) %></span>
+<% end %>
 <% } %>
