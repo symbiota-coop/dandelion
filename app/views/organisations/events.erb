@@ -95,6 +95,8 @@
   </div>
 <% elsif params[:display] == 'table' %>
   <%= partial :'events/table' %>
+<% elsif params[:display] == 'concise' %>
+  <%= partial :'events/concise' %>
 <% else %>
   <div data-pagelet-url="/o/<%=@organisation.slug%>/events?<%= request.query_string %>">
     <%= partial :'organisations/events' %>
