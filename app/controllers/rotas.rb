@@ -90,6 +90,23 @@ Dandelion::App.controller do
     redirect "/g/#{@gathering.slug}/rotas"
   end
 
+  get '/g/:slug/rotas/:id/create_shift' do
+    @gathering = Gathering.find_by(slug: params[:slug]) || not_found
+    @membership = @gathering.memberships.find_by(account: current_account)
+    gathering_admins_only!
+    @rota = @gathering.rotas.find(params[:id]) || not_found
+    erb :'rotas/create_shift'
+  end
+
+  post '/g/:slug/rotas/:id/create_shift' do
+    @gathering = Gathering.find_by(slug: params[:slug]) || not_found
+    @membership = @gathering.memberships.find_by(account: current_account)
+    gathering_admins_only!
+    @rota = @gathering.rotas.find(params[:id]) || not_found
+    @rota.shifts.create(mass_assigning(params[:shift], Shift))
+    redirect "/g/#{params[:slug]}/rotas/#{params[:id]}"
+  end
+
   post '/roles/order' do
     @rota = Rota.find(params[:rota_id]) || not_found
     @gathering = @rota.gathering

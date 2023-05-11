@@ -1,0 +1,8 @@
+<a class="d-inline-block mb-3" href="/g/<%= @gathering.slug %>/rotas/<%= @rota.id %>"><i class="fa fa-arrow-left"></i> Return to rota</a>
+
+<% form_for @shift ||= Shift.new, "/g/#{@gathering.slug}/rotas/#{@rota.id}/create_shift" do |f| %>
+  <%= f.select_block :account_id, options: @gathering.members.order('name asc').map { |account| [account.name, account.id] } %>
+  <%= f.select_block :role_id, options: @rota.roles.compact.uniq.map { |role| [role.name, role.id] } %>
+  <%= f.select_block :rslot_id, options: @rota.rslots.compact.uniq.map { |rslot| [rslot.name, rslot.id] } %>
+  <%= f.submit_block button_text: 'Assign to shift' %>
+<% end %>
