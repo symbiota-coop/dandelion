@@ -109,10 +109,9 @@ class Ticket
       errors.add(:email, "- #{e}") if e
     end
 
-    
     self.price = ticket_type.price if !price && ticket_type && !complementary
     self.payment_completed = true if price.nil? || price == 0
-    
+
     self.currency = (order.try(:currency) || event.try(:currency)) unless currency
     self.organisation_revenue_share = order.try(:organisation_revenue_share) unless organisation_revenue_share
 
@@ -168,11 +167,27 @@ class Ticket
 
     batch_message.body_html Premailer.new(ERB.new(File.read(Padrino.root('app/views/layouts/email.erb'))).result(binding), with_html_string: true, adapter: 'nokogiri', input_encoding: 'UTF-8').to_inline_css
 
-    filename = "dandelion-#{event.name.parameterize}-#{order.id}.pdf"
-    tickets_pdf_file = File.new(filename, 'w+')
+    tickets_pdf_filename = "dandelion-#{event.name.parameterize}-#{order.id}.pdf"
+    tickets_pdf_file = File.new(tickets_pdf_filename, 'w+')
     tickets_pdf_file.write order.tickets_pdf.render
     tickets_pdf_file.rewind
-    batch_message.add_attachment tickets_pdf_file, filename
+    batch_message.add_attachment tickets_pdf_file, tickets_pdf_filename
+
+    cal = RiCal.Calendar do |rcal|
+      rcal.event do |revent|
+        revent.summary = event.name
+        revent.dtstart = event.start_time
+        revent.dtend = event.end_time
+        revent.location = event.location
+        revent.description = %(#{ENV['BASE_URI']}/events/#{event.id})
+        revent.uid = event.id.to_s
+      end
+    end
+    ics_filename = "dandelion-#{event.name.parameterize}-#{order.id}.ics"
+    ics_file = File.new(ics_filename, 'w+')
+    ics_file.write cal.export
+    ics_file.rewind
+    batch_message.add_attachment ics_file, ics_filename
 
     [account].each do |account|
       batch_message.add_recipient(:to, account.email, { 'firstname' => (account.firstname || 'there'), 'token' => account.sign_in_token, 'id' => account.id.to_s })
@@ -181,7 +196,9 @@ class Ticket
     batch_message.finalize if ENV['MAILGUN_API_KEY']
 
     tickets_pdf_file.close
-    File.delete(filename)
+    ics_file.close
+    File.delete(tickets_pdf_filename)
+    File.delete(ics_filename)
   end
   handle_asynchronously :send_ticket
 end
