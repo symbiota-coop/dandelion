@@ -180,6 +180,7 @@ class Ticket
         revent.dtend = event.end_time
         revent.location = event.location
         revent.description = %(#{ENV['BASE_URI']}/events/#{event.id})
+        revent.organizer = event.email
         revent.uid = event.id.to_s
       end
     end
