@@ -45,13 +45,13 @@ class TicketType
     return if EmailAddress.error(email)
     return if remaining <= 0
 
-    mg_client = Mailgun::Client.new ENV['MAILGUN_API_KEY'], 'api.eu.mailgun.net'
-    batch_message = Mailgun::BatchMessage.new(mg_client, 'notifications.dandelion.earth')
+    mg_client = Mailgun::Client.new ENV['MAILGUN_API_KEY'], ENV['MAILGUN_REGION']
+    batch_message = Mailgun::BatchMessage.new(mg_client, ENV['MAILGUN_NOTIFICATIONS_HOST'])
 
     ticket_type = self
     event = self.event
     content = ERB.new(File.read(Padrino.root('app/views/emails/payment_reminder.erb'))).result(binding)
-    batch_message.from 'Dandelion <reminders@dandelion.earth>'
+    batch_message.from ENV['REMINDERS_EMAIL_FULL']
     batch_message.reply_to(event.email || event.organisation.reply_to)
     batch_message.subject "Payment reminder for #{event.name}"
     batch_message.body_html Premailer.new(ERB.new(File.read(Padrino.root('app/views/layouts/email.erb'))).result(binding), with_html_string: true, adapter: 'nokogiri', input_encoding: 'UTF-8').to_inline_css

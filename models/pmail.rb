@@ -201,8 +201,8 @@ class Pmail
     mailgun_sto = nil
 
     if mailable.is_a?(Event)
-      mg_client = Mailgun::Client.new ENV['MAILGUN_API_KEY'], 'api.eu.mailgun.net'
-      batch_message = Mailgun::BatchMessage.new(mg_client, 'tickets.dandelion.earth')
+      mg_client = Mailgun::Client.new ENV['MAILGUN_API_KEY'], ENV['MAILGUN_REGION']
+      batch_message = Mailgun::BatchMessage.new(mg_client, ENV['MAILGUN_TICKETS_HOST'])
     else
       mg_client = Mailgun::Client.new organisation.mailgun_api_key, (organisation.mailgun_region == 'EU' ? 'api.eu.mailgun.net' : 'api.mailgun.net')
       batch_message = Mailgun::BatchMessage.new(mg_client, organisation.mailgun_domain)
@@ -279,7 +279,7 @@ class Pmail
 
   def self.new_hints
     {
-      from: 'In the form <em>Maria Sabina &lt;maria.sabina@dandelion.earth&gt;</em>',
+      from: "In the form <em>Maria Sabina &lt;maria.sabina@#{ENV['DOMAIN']}&gt;</em>",
       link_params: 'For example: utm_source=newsletter&utm_medium=email&utm_campaign=launch'
     }
   end

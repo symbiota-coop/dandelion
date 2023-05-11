@@ -144,8 +144,8 @@ class Ticket
   end
 
   def send_ticket
-    mg_client = Mailgun::Client.new ENV['MAILGUN_API_KEY'], 'api.eu.mailgun.net'
-    batch_message = Mailgun::BatchMessage.new(mg_client, 'tickets.dandelion.earth')
+    mg_client = Mailgun::Client.new ENV['MAILGUN_API_KEY'], ENV['MAILGUN_REGION']
+    batch_message = Mailgun::BatchMessage.new(mg_client, ENV['MAILGUN_TICKETS_HOST'])
 
     order = event.orders.new
     order.account = account
@@ -161,7 +161,7 @@ class Ticket
       batch_message.reply_to event.email
     else
       header_image_url = "#{ENV['BASE_URI']}/images/black-on-transparent-sq.png"
-      batch_message.from 'Dandelion <tickets@dandelion.earth>'
+      batch_message.from ENV['TICKETS_EMAIL_FULL']
       batch_message.reply_to(event.email || event.organisation.reply_to)
     end
 

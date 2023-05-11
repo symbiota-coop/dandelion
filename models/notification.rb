@@ -56,13 +56,13 @@ class Notification
   after_create :send_email
   def send_email
     if Notification.mailable_types.include?(type)
-      mg_client = Mailgun::Client.new ENV['MAILGUN_API_KEY'], 'api.eu.mailgun.net'
-      batch_message = Mailgun::BatchMessage.new(mg_client, 'notifications.dandelion.earth')
+      mg_client = Mailgun::Client.new ENV['MAILGUN_API_KEY'], ENV['MAILGUN_REGION']
+      batch_message = Mailgun::BatchMessage.new(mg_client, ENV['MAILGUN_NOTIFICATIONS_HOST'])
 
       notification = self
       circle = self.circle
       content = ERB.new(File.read(Padrino.root('app/views/emails/notification.erb'))).result(binding)
-      batch_message.from 'Dandelion <notifications@dandelion.earth>'
+      batch_message.from ENV['NOTIFICATIONS_EMAIL_FULL']
       batch_message.subject "[#{circle.name}] #{Nokogiri::HTML(notification.sentence).text}"
       batch_message.body_html Premailer.new(ERB.new(File.read(Padrino.root('app/views/layouts/email.erb'))).result(binding), with_html_string: true, adapter: 'nokogiri', input_encoding: 'UTF-8').to_inline_css
 

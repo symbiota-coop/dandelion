@@ -366,8 +366,8 @@ class Order
   end
 
   def send_tickets
-    mg_client = Mailgun::Client.new ENV['MAILGUN_API_KEY'], 'api.eu.mailgun.net'
-    batch_message = Mailgun::BatchMessage.new(mg_client, 'tickets.dandelion.earth')
+    mg_client = Mailgun::Client.new ENV['MAILGUN_API_KEY'], ENV['MAILGUN_REGION']
+    batch_message = Mailgun::BatchMessage.new(mg_client, ENV['MAILGUN_TICKETS_HOST'])
 
     order = self
     event = order.event
@@ -382,7 +382,7 @@ class Order
       batch_message.reply_to event.email
     else
       header_image_url = "#{ENV['BASE_URI']}/images/black-on-transparent-sq.png"
-      batch_message.from 'Dandelion <tickets@dandelion.earth>'
+      batch_message.from ENV['TICKETS_EMAIL_FULL']
       batch_message.reply_to(event.email || event.organisation.reply_to)
     end
 
@@ -434,14 +434,14 @@ class Order
   end
 
   def send_notification
-    mg_client = Mailgun::Client.new ENV['MAILGUN_API_KEY'], 'api.eu.mailgun.net'
-    batch_message = Mailgun::BatchMessage.new(mg_client, 'notifications.dandelion.earth')
+    mg_client = Mailgun::Client.new ENV['MAILGUN_API_KEY'], ENV['MAILGUN_REGION']
+    batch_message = Mailgun::BatchMessage.new(mg_client, ENV['MAILGUN_NOTIFICATIONS_HOST'])
 
     order = self
     event = order.event
     account = order.account
     content = ERB.new(File.read(Padrino.root('app/views/emails/order.erb'))).result(binding)
-    batch_message.from 'Dandelion <notifications@dandelion.earth>'
+    batch_message.from ENV['NOTIFICATIONS_EMAIL_FULL']
     batch_message.subject "New order for #{event.name}"
     batch_message.body_html Premailer.new(ERB.new(File.read(Padrino.root('app/views/layouts/email.erb'))).result(binding), with_html_string: true, adapter: 'nokogiri', input_encoding: 'UTF-8').to_inline_css
 

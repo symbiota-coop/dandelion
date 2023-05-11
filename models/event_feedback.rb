@@ -62,13 +62,13 @@ class EventFeedback
   def send_feedback
     return unless event
 
-    mg_client = Mailgun::Client.new ENV['MAILGUN_API_KEY'], 'api.eu.mailgun.net'
-    batch_message = Mailgun::BatchMessage.new(mg_client, 'notifications.dandelion.earth')
+    mg_client = Mailgun::Client.new ENV['MAILGUN_API_KEY'], ENV['MAILGUN_REGION']
+    batch_message = Mailgun::BatchMessage.new(mg_client, ENV['MAILGUN_NOTIFICATIONS_HOST'])
 
     event_feedback = self
     event = event_feedback.event
     content = ERB.new(File.read(Padrino.root('app/views/emails/event_feedback.erb'))).result(binding)
-    batch_message.from 'Dandelion <notifications@dandelion.earth>'
+    batch_message.from ENV['NOTIFICATIONS_EMAIL_FULL']
     batch_message.subject "#{event_feedback.rating.times.each.map { '★' }.join if event_feedback.rating} #{event.name}/#{event_feedback.anonymise? ? 'Anonymous' : event_feedback.account.name}"
     batch_message.body_html Premailer.new(ERB.new(File.read(Padrino.root('app/views/layouts/email.erb'))).result(binding), with_html_string: true, adapter: 'nokogiri', input_encoding: 'UTF-8').to_inline_css
 
@@ -83,13 +83,13 @@ class EventFeedback
   def send_response
     return if anonymise
 
-    mg_client = Mailgun::Client.new ENV['MAILGUN_API_KEY'], 'api.eu.mailgun.net'
-    batch_message = Mailgun::BatchMessage.new(mg_client, 'notifications.dandelion.earth')
+    mg_client = Mailgun::Client.new ENV['MAILGUN_API_KEY'], ENV['MAILGUN_REGION']
+    batch_message = Mailgun::BatchMessage.new(mg_client, ENV['MAILGUN_NOTIFICATIONS_HOST'])
 
     event_feedback = self
     event = event_feedback.event
     content = ERB.new(File.read(Padrino.root('app/views/emails/event_feedback_response.erb'))).result(binding)
-    batch_message.from 'Dandelion <notifications@dandelion.earth>'
+    batch_message.from ENV['NOTIFICATIONS_EMAIL_FULL']
     batch_message.reply_to(event.email || event.organisation.try(:reply_to))
     batch_message.subject "#{event.organisation.name} responded to your feedback on #{event.name}"
     batch_message.body_html Premailer.new(ERB.new(File.read(Padrino.root('app/views/layouts/email.erb'))).result(binding), with_html_string: true, adapter: 'nokogiri', input_encoding: 'UTF-8').to_inline_css
@@ -103,13 +103,13 @@ class EventFeedback
   handle_asynchronously :send_response
 
   def send_destroy_notification(destroyed_by)
-    mg_client = Mailgun::Client.new ENV['MAILGUN_API_KEY'], 'api.eu.mailgun.net'
-    batch_message = Mailgun::BatchMessage.new(mg_client, 'notifications.dandelion.earth')
+    mg_client = Mailgun::Client.new ENV['MAILGUN_API_KEY'], ENV['MAILGUN_REGION']
+    batch_message = Mailgun::BatchMessage.new(mg_client, ENV['MAILGUN_NOTIFICATIONS_HOST'])
 
     event_feedback = self
     event = event_feedback.event
     content = ERB.new(File.read(Padrino.root('app/views/emails/event_feedback_destroyed.erb'))).result(binding)
-    batch_message.from 'Dandelion <notifications@dandelion.earth>'
+    batch_message.from ENV['NOTIFICATIONS_EMAIL_FULL']
     batch_message.subject "#{destroyed_by.name} deleted feedback for #{event.name}"
     batch_message.body_html Premailer.new(ERB.new(File.read(Padrino.root('app/views/layouts/email.erb'))).result(binding), with_html_string: true, adapter: 'nokogiri', input_encoding: 'UTF-8').to_inline_css
 

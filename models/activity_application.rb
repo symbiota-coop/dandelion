@@ -56,14 +56,14 @@ class ActivityApplication
 
   after_create :send_notification
   def send_notification
-    mg_client = Mailgun::Client.new ENV['MAILGUN_API_KEY'], 'api.eu.mailgun.net'
-    batch_message = Mailgun::BatchMessage.new(mg_client, 'notifications.dandelion.earth')
+    mg_client = Mailgun::Client.new ENV['MAILGUN_API_KEY'], ENV['MAILGUN_REGION']
+    batch_message = Mailgun::BatchMessage.new(mg_client, ENV['MAILGUN_NOTIFICATIONS_HOST'])
 
     activity_application = self
     activity = activity_application.activity
     account = activity_application.account
     content = ERB.new(File.read(Padrino.root('app/views/emails/activity_application.erb'))).result(binding)
-    batch_message.from 'Dandelion <notifications@dandelion.earth>'
+    batch_message.from ENV['NOTIFICATIONS_EMAIL_FULL']
     batch_message.subject "Application to #{activity.name}"
     batch_message.body_html Premailer.new(ERB.new(File.read(Padrino.root('app/views/layouts/email.erb'))).result(binding), with_html_string: true, adapter: 'nokogiri', input_encoding: 'UTF-8').to_inline_css
 
@@ -78,14 +78,14 @@ class ActivityApplication
   def accept
     activity.activityships.create account: account
 
-    mg_client = Mailgun::Client.new ENV['MAILGUN_API_KEY'], 'api.eu.mailgun.net'
-    batch_message = Mailgun::BatchMessage.new(mg_client, 'notifications.dandelion.earth')
+    mg_client = Mailgun::Client.new ENV['MAILGUN_API_KEY'], ENV['MAILGUN_REGION']
+    batch_message = Mailgun::BatchMessage.new(mg_client, ENV['MAILGUN_NOTIFICATIONS_HOST'])
 
     activity_application = self
     activity = activity_application.activity
     account = activity_application.account
     content = ERB.new(File.read(Padrino.root('app/views/emails/accepted.erb'))).result(binding)
-    batch_message.from 'Dandelion <notifications@dandelion.earth>'
+    batch_message.from ENV['NOTIFICATIONS_EMAIL_FULL']
     batch_message.reply_to activity.email if activity.email
     batch_message.subject "You've been accepted to #{activity.name}"
     batch_message.body_html Premailer.new(ERB.new(File.read(Padrino.root('app/views/layouts/email.erb'))).result(binding), with_html_string: true, adapter: 'nokogiri', input_encoding: 'UTF-8').to_inline_css

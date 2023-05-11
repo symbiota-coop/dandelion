@@ -1,7 +1,7 @@
 FactoryBot.define do
   factory :account do
     sequence(:name) { |n| "Account #{n}" }
-    sequence(:email) { |n| "account#{n}@dandelion.earth" }
+    sequence(:email) { |n| "account#{n}@#{ENV['DOMAIN']}" }
     sequence(:password) { |_n| Account.generate_password }
     location { 'Totnes, UK' }
   end
@@ -98,7 +98,7 @@ FactoryBot.define do
 
   factory :pmail do
     sequence(:subject) { |n| "Subject #{n}" }
-    sequence(:from) { |n| "Account #{n} <account#{n}@dandelion.earth>" }
+    sequence(:from) { |n| "Account #{n} <account#{n}@#{ENV['DOMAIN']}>" }
     sequence(:body) { |n| "Body text #{n}" }
     organisation
     account

@@ -70,8 +70,8 @@ class Membership
 
   after_create :send_email
   def send_email
-    mg_client = Mailgun::Client.new ENV['MAILGUN_API_KEY'], 'api.eu.mailgun.net'
-    batch_message = Mailgun::BatchMessage.new(mg_client, 'notifications.dandelion.earth')
+    mg_client = Mailgun::Client.new ENV['MAILGUN_API_KEY'], ENV['MAILGUN_REGION']
+    batch_message = Mailgun::BatchMessage.new(mg_client, ENV['MAILGUN_NOTIFICATIONS_HOST'])
 
     account = self.account
     gathering = self.gathering
@@ -85,7 +85,7 @@ class Membership
     content = gathering.welcome_email || ''
     content = content.gsub('%gathering.name%', gathering.name)
     content = content.gsub('%sign_in_details%', sign_in_details)
-    batch_message.from 'Dandelion <notifications@dandelion.earth>'
+    batch_message.from ENV['NOTIFICATIONS_EMAIL_FULL']
     batch_message.subject "You're now a member of #{gathering.name}"
     batch_message.body_html Premailer.new(ERB.new(File.read(Padrino.root('app/views/layouts/email.erb'))).result(binding), with_html_string: true, adapter: 'nokogiri', input_encoding: 'UTF-8').to_inline_css
 

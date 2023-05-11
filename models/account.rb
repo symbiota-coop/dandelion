@@ -242,12 +242,12 @@ class Account
   after_create :send_confirmation_email
   def send_confirmation_email
     unless skip_confirmation_email
-      mg_client = Mailgun::Client.new ENV['MAILGUN_API_KEY'], 'api.eu.mailgun.net'
-      batch_message = Mailgun::BatchMessage.new(mg_client, 'notifications.dandelion.earth')
+      mg_client = Mailgun::Client.new ENV['MAILGUN_API_KEY'], ENV['MAILGUN_REGION']
+      batch_message = Mailgun::BatchMessage.new(mg_client, ENV['MAILGUN_NOTIFICATIONS_HOST'])
 
       account = self
       content = ERB.new(File.read(Padrino.root('app/views/emails/confirm_email.erb'))).result(binding)
-      batch_message.from 'Dandelion <notifications@dandelion.earth>'
+      batch_message.from ENV['NOTIFICATIONS_EMAIL_FULL']
       batch_message.subject 'Confirm your email address'
       batch_message.body_html Premailer.new(ERB.new(File.read(Padrino.root('app/views/layouts/email.erb'))).result(binding), with_html_string: true, adapter: 'nokogiri', input_encoding: 'UTF-8').to_inline_css
 
@@ -265,12 +265,12 @@ class Account
   end
 
   def send_activation_notification
-    mg_client = Mailgun::Client.new ENV['MAILGUN_API_KEY'], 'api.eu.mailgun.net'
-    batch_message = Mailgun::BatchMessage.new(mg_client, 'notifications.dandelion.earth')
+    mg_client = Mailgun::Client.new ENV['MAILGUN_API_KEY'], ENV['MAILGUN_REGION']
+    batch_message = Mailgun::BatchMessage.new(mg_client, ENV['MAILGUN_NOTIFICATIONS_HOST'])
 
     account = self
     content = ERB.new(File.read(Padrino.root('app/views/emails/activation_notification.erb'))).result(binding)
-    batch_message.from 'Dandelion <notifications@dandelion.earth>'
+    batch_message.from ENV['NOTIFICATIONS_EMAIL_FULL']
     batch_message.subject "You've activated your Dandelion account"
     batch_message.body_html Premailer.new(ERB.new(File.read(Padrino.root('app/views/layouts/email.erb'))).result(binding), with_html_string: true, adapter: 'nokogiri', input_encoding: 'UTF-8').to_inline_css
 
@@ -719,12 +719,12 @@ Two Spirit).split("\n")
   end
 
   def sign_in_link!
-    mg_client = Mailgun::Client.new ENV['MAILGUN_API_KEY'], 'api.eu.mailgun.net'
-    batch_message = Mailgun::BatchMessage.new(mg_client, 'notifications.dandelion.earth')
+    mg_client = Mailgun::Client.new ENV['MAILGUN_API_KEY'], ENV['MAILGUN_REGION']
+    batch_message = Mailgun::BatchMessage.new(mg_client, ENV['MAILGUN_NOTIFICATIONS_HOST'])
 
     account = self
     content = ERB.new(File.read(Padrino.root('app/views/emails/sign_in_link.erb'))).result(binding)
-    batch_message.from 'Dandelion <notifications@dandelion.earth>'
+    batch_message.from ENV['NOTIFICATIONS_EMAIL_FULL']
     batch_message.subject 'Sign in link for Dandelion'
     batch_message.body_html Premailer.new(ERB.new(File.read(Padrino.root('app/views/layouts/email.erb'))).result(binding), with_html_string: true, adapter: 'nokogiri', input_encoding: 'UTF-8').to_inline_css
 

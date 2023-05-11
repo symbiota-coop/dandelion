@@ -22,14 +22,14 @@ class HabitCompletionLike
   after_create :send_like
   def send_like
     if !habit_completion.account.unsubscribed? && !habit_completion.account.unsubscribed_habit_completion_likes?
-      mg_client = Mailgun::Client.new ENV['MAILGUN_API_KEY'], 'api.eu.mailgun.net'
-      batch_message = Mailgun::BatchMessage.new(mg_client, 'notifications.dandelion.earth')
+      mg_client = Mailgun::Client.new ENV['MAILGUN_API_KEY'], ENV['MAILGUN_REGION']
+      batch_message = Mailgun::BatchMessage.new(mg_client, ENV['MAILGUN_NOTIFICATIONS_HOST'])
 
       habit_completion_like = self
       habit_completion = habit_completion_like.habit_completion
       habit = habit_completion.habit
       content = ERB.new(File.read(Padrino.root('app/views/emails/habit_completion_like.erb'))).result(binding)
-      batch_message.from 'Dandelion <notifications@dandelion.earth>'
+      batch_message.from ENV['NOTIFICATIONS_EMAIL_FULL']
       batch_message.subject "#{habit_completion_like.account.name} liked your completion of #{habit.name} on #{habit_completion.date}"
       batch_message.body_html Premailer.new(ERB.new(File.read(Padrino.root('app/views/layouts/email.erb'))).result(binding), with_html_string: true, adapter: 'nokogiri', input_encoding: 'UTF-8').to_inline_css
 

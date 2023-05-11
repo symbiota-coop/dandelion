@@ -48,12 +48,11 @@ class Comment
   end
 
   def body_with_additions
-    if body
-      b = body
-      b = b.gsub("\n", '<br />')
-      b.gsub(/\[@([\w\s'-.]+)\]\(@(\w+)\)/, '<a href="' + ENV['BASE_URI'] + '/u/\2">\1</a>')
+    return unless body
 
-    end
+    b = body
+    b = b.gsub("\n", '<br />')
+    b.gsub(/\[@([\w\s'-.]+)\]\(@(\w+)\)/, '<a href="' + ENV['BASE_URI'] + '/u/\2">\1</a>')
   end
 
   has_many :notifications, as: :notifiable, dependent: :destroy
@@ -220,12 +219,12 @@ class Comment
     return if body.nil?
     return if sent_at
 
-    mg_client = Mailgun::Client.new ENV['MAILGUN_API_KEY'], 'api.eu.mailgun.net'
-    batch_message = Mailgun::BatchMessage.new(mg_client, 'posts.dandelion.earth')
+    mg_client = Mailgun::Client.new ENV['MAILGUN_API_KEY'], ENV['MAILGUN_REGION']
+    batch_message = Mailgun::BatchMessage.new(mg_client, ENV['MAILGUN_POSTS_HOST'])
 
     comment = self
     content = ERB.new(File.read(Padrino.root('app/views/emails/comment.erb'))).result(binding)
-    batch_message.from "Dandelion <#{comment.post_id}@posts.dandelion.earth>"
+    batch_message.from "Dandelion <#{comment.post_id}@#{ENV['MAILGUN_POSTS_HOST']}>"
     batch_message.subject comment.email_subject
     batch_message.body_html Premailer.new(ERB.new(File.read(Padrino.root('app/views/layouts/email.erb'))).result(binding), with_html_string: true, adapter: 'nokogiri', input_encoding: 'UTF-8').to_inline_css
 

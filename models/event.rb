@@ -543,7 +543,7 @@ class Event
         if %w[jpeg png gif pam].include?(image.format)
           image.name = "#{SecureRandom.uuid}.#{image.format}"
         else
-          errors.add(:image, 'must be an image') 
+          errors.add(:image, 'must be an image')
         end
       rescue StandardError
         self.image = nil
@@ -581,12 +581,12 @@ class Event
   end
 
   def send_destroy_notification(destroyed_by)
-    mg_client = Mailgun::Client.new ENV['MAILGUN_API_KEY'], 'api.eu.mailgun.net'
-    batch_message = Mailgun::BatchMessage.new(mg_client, 'notifications.dandelion.earth')
+    mg_client = Mailgun::Client.new ENV['MAILGUN_API_KEY'], ENV['MAILGUN_REGION']
+    batch_message = Mailgun::BatchMessage.new(mg_client, ENV['MAILGUN_NOTIFICATIONS_HOST'])
 
     event = self
     content = ERB.new(File.read(Padrino.root('app/views/emails/event_destroyed.erb'))).result(binding)
-    batch_message.from 'Dandelion <notifications@dandelion.earth>'
+    batch_message.from ENV['NOTIFICATIONS_EMAIL_FULL']
     batch_message.subject "#{destroyed_by.name} deleted the event #{event.name}"
     batch_message.body_html Premailer.new(ERB.new(File.read(Padrino.root('app/views/layouts/email.erb'))).result(binding), with_html_string: true, adapter: 'nokogiri', input_encoding: 'UTF-8').to_inline_css
 
@@ -600,12 +600,12 @@ class Event
   def send_reminders(account_id: nil)
     return unless organisation
 
-    mg_client = Mailgun::Client.new ENV['MAILGUN_API_KEY'], 'api.eu.mailgun.net'
-    batch_message = Mailgun::BatchMessage.new(mg_client, 'notifications.dandelion.earth')
+    mg_client = Mailgun::Client.new ENV['MAILGUN_API_KEY'], ENV['MAILGUN_REGION']
+    batch_message = Mailgun::BatchMessage.new(mg_client, ENV['MAILGUN_NOTIFICATIONS_HOST'])
 
     event = self
     content = ERB.new(File.read(Padrino.root('app/views/emails/reminder.erb'))).result(binding)
-    batch_message.from 'Dandelion <reminders@dandelion.earth>'
+    batch_message.from ENV['REMINDERS_EMAIL_FULL']
     batch_message.reply_to(event.email || event.organisation.try(:reply_to))
     batch_message.subject "#{event.name} is tomorrow"
     batch_message.body_html Premailer.new(ERB.new(File.read(Padrino.root('app/views/layouts/email.erb'))).result(binding), with_html_string: true, adapter: 'nokogiri', input_encoding: 'UTF-8').to_inline_css
@@ -621,12 +621,12 @@ class Event
   def send_star_reminders(account_id: nil)
     return unless organisation
 
-    mg_client = Mailgun::Client.new ENV['MAILGUN_API_KEY'], 'api.eu.mailgun.net'
-    batch_message = Mailgun::BatchMessage.new(mg_client, 'notifications.dandelion.earth')
+    mg_client = Mailgun::Client.new ENV['MAILGUN_API_KEY'], ENV['MAILGUN_REGION']
+    batch_message = Mailgun::BatchMessage.new(mg_client, ENV['MAILGUN_NOTIFICATIONS_HOST'])
 
     event = self
     content = ERB.new(File.read(Padrino.root('app/views/emails/reminder_starred.erb'))).result(binding)
-    batch_message.from 'Dandelion <reminders@dandelion.earth>'
+    batch_message.from ENV['REMINDERS_EMAIL_FULL']
     batch_message.reply_to(event.email || event.organisation.try(:reply_to))
     batch_message.subject "#{event.name} is next week"
     batch_message.body_html Premailer.new(ERB.new(File.read(Padrino.root('app/views/layouts/email.erb'))).result(binding), with_html_string: true, adapter: 'nokogiri', input_encoding: 'UTF-8').to_inline_css
@@ -643,12 +643,12 @@ class Event
     return if feedback_questions.nil?
     return unless organisation
 
-    mg_client = Mailgun::Client.new ENV['MAILGUN_API_KEY'], 'api.eu.mailgun.net'
-    batch_message = Mailgun::BatchMessage.new(mg_client, 'notifications.dandelion.earth')
+    mg_client = Mailgun::Client.new ENV['MAILGUN_API_KEY'], ENV['MAILGUN_REGION']
+    batch_message = Mailgun::BatchMessage.new(mg_client, ENV['MAILGUN_NOTIFICATIONS_HOST'])
 
     event = self
     content = ERB.new(File.read(Padrino.root('app/views/emails/feedback.erb'))).result(binding)
-    batch_message.from 'Dandelion <feedback@dandelion.earth>'
+    batch_message.from ENV['FEEDBACK_EMAIL_FULL']
     batch_message.reply_to(event.email || event.organisation.try(:reply_to))
     batch_message.subject "Feedback on #{event.name}"
     batch_message.body_html Premailer.new(ERB.new(File.read(Padrino.root('app/views/layouts/email.erb'))).result(binding), with_html_string: true, adapter: 'nokogiri', input_encoding: 'UTF-8').to_inline_css
