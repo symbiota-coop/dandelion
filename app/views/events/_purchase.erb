@@ -158,7 +158,7 @@
         </td>
       </tr>
     <% end %>
-    <% if current_account && (organisationship_for_discount = @event.organisationship_for_discount(current_account)) %>
+    <% if !params[:discount_code] && current_account && (organisationship_for_discount = @event.organisationship_for_discount(current_account)) %>
       <% if @event.no_discounts %>
         <tr>
           <td colspan="3" class="text-muted">
