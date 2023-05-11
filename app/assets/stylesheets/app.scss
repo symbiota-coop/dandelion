@@ -13,6 +13,10 @@ $body_text: #212529;
 
 @import "../infinite_admin/scss/style";
 
+a.btn-outline-danger:focus {
+  color: $color_danger;
+}
+
 form.form-inline input.datepicker {
   width: 10em !important
 }

@@ -280,9 +280,18 @@ Dandelion::App.controller do
     end
   end
 
+  get '/events/:id/delete' do
+    @event = Event.find(params[:id]) || not_found
+    event_admins_only!
+    erb :'events/delete'
+  end
+
   get '/events/:id/destroy' do
     @event = Event.find(params[:id]) || not_found
     event_admins_only!
+    if params[:no_refunds]
+      @event.update_attribute(:refund_deleted_orders, false)
+    end
     @event.send_destroy_notification(current_account)
     @event.destroy!
     flash[:notice] = 'The event was deleted.'
