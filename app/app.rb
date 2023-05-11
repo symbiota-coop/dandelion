@@ -37,7 +37,7 @@ module Dandelion
 
     before do
       @cachebuster = Padrino.env == :development ? SecureRandom.uuid : ENV['HEROKU_SLUG_COMMIT']
-      redirect "#{ENV['BASE_URI']}#{request.path}" if ENV['REDIRECT_BASE'] && ENV['BASE_URI'] && (ENV['BASE_URI'] != "#{request.scheme}://#{request.env['HTTP_HOST']}")
+      redirect "#{ENV['BASE_URI']}#{request.path}?#{request.query_string}" if ENV['REDIRECT_BASE'] && ENV['BASE_URI'] && (ENV['BASE_URI'] != "#{request.scheme}://#{request.env['HTTP_HOST']}")
       begin
         Time.zone = if current_account && current_account.time_zone
                       current_account.time_zone
