@@ -44,6 +44,7 @@ jobs:
         RACK_ENV: test
         PORT: 8020
         BASE_URI: http://127.0.0.1:8020
+        DOMAIN: dandelion.events
         DEFAULT_CURRENCY: USD
         DEFAULT_TIME_ZONE: London
         SESSION_SECRET: xxx
