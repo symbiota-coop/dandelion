@@ -83,10 +83,16 @@
           </div>
         <% end %>
         <% } %>
-        <div class="card">
-          <div class="card-body bg-grey-transparent-2 p-3">
-            <strong class="text-dark">Your response</strong>
-            <div class="mt-1">
+        <% if !event_feedback.response%>
+          <a href="javascript:;" onclick="$(this).hide().next().show().find('textarea').focus()">Respond</a>
+        <% end %>
+        <div <% if !event_feedback.response%>style="display: none"<% end %>>
+          <em><%=event_feedback.event.organisation.name%> replied</em>
+          <div class="row no-gutters align-items-center mt-2">
+            <div class="col-auto mr-2">
+              &mdash;
+            </div>
+            <div class="col">
               <div data-pagelet-url="/event_feedbacks/<%= event_feedback.id %>/response"></div>
             </div>
           </div>
