@@ -1,6 +1,6 @@
 <div class="main">
   <p>Hi there,</p>
-  <p>Just a reminder that you still have payments to make for <a href="<%= ENV['BASE_URI'] %>/events/<%= event.id %>?ticket_type_id=<%=ticket_type.id%>"><%= event.name %></a>.</p>
+  <p>Just a reminder that you still have payments to make for <a href="<%= ENV['BASE_URI'] %>/e/<%= event.slug %>?ticket_type_id=<%=ticket_type.id%>"><%= event.name %></a>.</p>
   <p>
     Best wishes,
     <br />

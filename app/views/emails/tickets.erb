@@ -43,7 +43,7 @@
       <% if account.sign_ins_count == 0 %>
         <a href="<%= ENV['BASE_URI'] %>/accounts/edit?sign_in_token=%recipient.token%&event_id=<%= event.id %>">Click here to create a profile on Dandelion and connect with others <%= event.recording? ? 'who attended' : 'attending' %> the event.</a>
       <% else %>
-        <a href="<%= ENV['BASE_URI'] %>/events/<%= event.id %>?sign_in_token=%recipient.token%">Sign in to Dandelion to show or hide your attendance and connect with others <%= event.recording? ? 'who attended' : 'attending' %> the event.</a>
+        <a href="<%= ENV['BASE_URI'] %>/e/<%= event.slug %>?sign_in_token=%recipient.token%">Sign in to Dandelion to show or hide your attendance and connect with others <%= event.recording? ? 'who attended' : 'attending' %> the event.</a>
       <% end %>
     </p>
   <% end %>
