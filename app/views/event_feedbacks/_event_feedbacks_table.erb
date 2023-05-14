@@ -84,7 +84,7 @@
         <% end %>
         <% } %>
         <% if !event_feedback.response%>
-          <a href="javascript:;" onclick="$(this).hide().next().show().find('textarea').focus()">Respond</a>
+          <a class="mb-2 d-inline-block" href="javascript:;" onclick="$(this).hide().next().show().find('textarea').focus()">Respond</a>
         <% end %>
         <div <% if !event_feedback.response%>style="display: none"<% end %>>
           <em><%=event_feedback.event.organisation.name%> replied</em>
