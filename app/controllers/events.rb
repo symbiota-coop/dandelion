@@ -168,14 +168,23 @@ Dandelion::App.controller do
     end
   end
 
-  get '/e/:slug' do
-    @event = Event.find_by(slug: params[:slug]) || not_found
-    redirect "/events/#{@event.id}"
+  get '/events/:id', provides: %i[html ics json] do
+    @event = Event.find(params[:id]) || not_found
+    if @event.slug
+      redirect request.url.gsub('/events/', '/e/').gsub(params[:id], @event.slug)
+    else
+      redirect request.url.gsub('/events/', '/e/')
+    end
   end
 
-  get '/events/:id', provides: %i[html ics json] do
+  get '/e/:slug', provides: %i[html ics json] do
     session[:return_to] = request.url
-    @event = Event.find(params[:id]) || not_found
+    @event = Event.find_by(slug: params[:slug])
+    unless @event
+      id = params[:slug]
+      @event = Event.find(id) || not_found
+      redirect request.url.gsub(id, @event.slug) if @event.slug
+    end
     @order = (Order.find(params[:order_id]) || not_found) if params[:order_id]
     @og_desc = when_details(@event)
     kick! unless @event.organisation
