@@ -668,7 +668,7 @@ class Event
     errors.add(:end_time, 'must be after the start time') if end_time && start_time && end_time <= start_time
   end
 
-  validates_presence_of :name, :start_time, :end_time, :location
+  validates_presence_of :name, :start_time, :end_time, :location, :slug
   validates_uniqueness_of :ps_event_id, allow_nil: true
   validates_uniqueness_of :slug, allow_nil: true
   validates_format_of :slug, with: /\A[a-z0-9-]+\z/, if: :slug

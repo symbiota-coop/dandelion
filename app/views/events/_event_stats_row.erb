@@ -23,7 +23,7 @@
   <% if event_image %>
     <a data-toggle="tooltip" title="Copy Markdown image code" class="btn btn-sm btn-primary" href="javascript:;" onclick="
   var el = document.createElement('textarea');
-  var str = '[![](<%= escape_javascript(u(event_image.url)) %>)](<%= ENV['BASE_URI'] %><%= "/events/#{event.id}#{if organisation && organisation != event.organisation; "?cohost=#{organisation.slug}"; end }" %>)'
+  var str = '[![](<%= escape_javascript(u(event_image.url)) %>)](<%= ENV['BASE_URI'] %><%= "/e/#{event.slug}#{if organisation && organisation != event.organisation; "?cohost=#{organisation.slug}"; end }" %>)'
   el.value = str;
   document.body.appendChild(el);
   el.select();
