@@ -127,7 +127,7 @@
       <% if @event.slug %>
         <li>
           <i data-toggle="tooltip" title="Event URL" class="fa fa-li fa-link"></i>
-          <a data-toggle="tooltip" title="Event URL" href="<%=ENV['BASE_URI']%>/e/<%=@event.slug%>"><%=ENV['BASE_URI']%>/e/<%=@event.slug%></a>
+          <a data-toggle="tooltip" href="<%=ENV['BASE_URI']%>/e/<%=@event.slug%>"><%=ENV['BASE_URI']%>/e/<%=@event.slug%></a>
         </li>
       <% end %>
     </ul>
