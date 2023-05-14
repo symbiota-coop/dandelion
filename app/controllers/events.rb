@@ -1,12 +1,4 @@
 Dandelion::App.controller do
-  get '/e/futurecraft-residency' do
-    redirect '/events/63876b53222f66000bbd3e19?cohost=stephen-reid'
-  end
-
-  get '/events/63cabd279ffaf000be555d5' do
-    redirect '/events/63cabd6279ffaf000be555d5'
-  end
-
   get '/facilitators' do
     @event_tags = EventTag.all
     erb :'events/facilitators'
