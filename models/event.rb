@@ -210,7 +210,7 @@ class Event
     self.minimum_donation = minimum_donation.round(2) if minimum_donation
     self.description = description.gsub('style="background-color:transparent;color:#1155cc;"', '') if description #  google docs link color
 
-    self.slug = ([*('a'..'z')].sample + [*('a'..'z'), *('0'..'9')].sample(4).join) until slug && !Event.find_by(slug: slug) unless slug
+    self.slug = ([*('a'..'z')].sample + [*('0'..'9')].sample + [*('a'..'z'), *('0'..'9')].sample(3).join) until slug && !Event.find_by(slug: slug) unless slug
 
     if new_record? && !duplicate
       errors.add(:organisation, '- you are not an admin of this organisation') if !local_group && !activity && !quick_create && !Organisation.admin?(organisation, account)
