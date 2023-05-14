@@ -3,7 +3,7 @@
     <% current_account.upcoming_events.each { |event| %>
     <tr class="block">
       <td style="width: 1px">
-        <a href="/events/<%= event.id %>" class="calendar-date" data-toggle="tooltip" title="in <%=distance_of_time_in_words event.start_time - Time.now %>">
+        <a href="/e/<%= event.slug %>" class="calendar-date" data-toggle="tooltip" title="in <%=distance_of_time_in_words event.start_time - Time.now %>">
           <span class="day"><%= event.start_time.day %></span>
           <br>
           <span class="month"><%= event.start_time.strftime('%b') %></span>
@@ -11,7 +11,7 @@
       </td>
       <td>
         <h4>
-          <a href="/events/<%= event.id %>"><%= event.name %></a>
+          <a href="/e/<%= event.slug %>"><%= event.name %></a>
           <div data-with-placeholder class="d-inline event-star" data-pagelet-url="/events/<%=event.id%>/star?block_edit=1"><i class="fa fa-star-o" style="opacity: 0.3"></i></div>
         </h4>
         <% if event_admin?(event) %>
