@@ -227,7 +227,7 @@ Dandelion::App.controller do
                elsif @local_group
                  "/local_groups/#{@local_group.id}"
                elsif @event
-                 "/events/#{@event.id}"
+                 "/e/#{@event.slug}"
                elsif @account.sign_ins_count == 1
                  '/'
                else

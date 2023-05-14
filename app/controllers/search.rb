@@ -41,7 +41,7 @@ Dandelion::App.controller do
         when 'events'
           if params[:q] && params[:q].starts_with?('event:')
             @events = Event.live.public.legit.future(1.month.ago).and(name: @q)
-            redirect "/events/#{@events.first.id}" if @events.count == 1
+            redirect "/e/#{@events.first.slug}" if @events.count == 1
           end
           @events = search(Event, Event.live.public.legit.future(1.month.ago), @q, 25)
         when 'accounts'

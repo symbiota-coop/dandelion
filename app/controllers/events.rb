@@ -120,7 +120,7 @@ Dandelion::App.controller do
     @event.account = current_account
     @event.last_saved_by = current_account
     if @event.save
-      redirect "/events/#{@event.id}?created=1"
+      redirect "/e/#{@event.slug}?created=1"
     else
       flash.now[:error] = 'There was an error saving the event'
       erb :'events/build'
@@ -157,7 +157,7 @@ Dandelion::App.controller do
       @event.last_saved_by = @account
       @event.quick_create = true
       if @event.save
-        redirect "/events/#{@event.id}"
+        redirect "/e/#{@event.slug}"
       else
         flash.now[:error] = 'There was an error saving the event'
         erb :'events/quick'
@@ -455,14 +455,14 @@ Dandelion::App.controller do
        end
       waitship = @event.waitships.create(account: @account)
       if waitship.persisted?
-        redirect "/events/#{@event.id}?added_to_waitlist=true"
+        redirect "/e/#{@event.slug}?added_to_waitlist=true"
       else
         flash[:error] = waitship.errors.full_messages.join('; ')
-        redirect "/events/#{@event.id}"
+        redirect "/e/#{@event.slug}"
       end
     else
       flash[:error] = @account.errors.full_messages.join('; ')
-      redirect "/events/#{@event.id}"
+      redirect "/e/#{@event.slug}"
     end
   end
 
@@ -805,14 +805,14 @@ Dandelion::App.controller do
     sign_in_required!
     @event = Event.find(params[:id]) || not_found
     @event.tickets.complete.and(account: current_account).update_all(subscribed_discussion: true)
-    request.xhr? ? 200 : redirect("/events/#{@event.id}")
+    request.xhr? ? 200 : redirect("/e/#{@event.slug}")
   end
 
   get '/events/:id/unsubscribe_discussion' do
     sign_in_required!
     @event = Event.find(params[:id]) || not_found
     @event.tickets.complete.and(account: current_account).update_all(subscribed_discussion: false)
-    request.xhr? ? 200 : redirect("/events/#{@event.id}")
+    request.xhr? ? 200 : redirect("/e/#{@event.slug}")
   end
 
   get '/events/:id/resend_feedback_email/:account_id' do

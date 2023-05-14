@@ -84,7 +84,7 @@ class NavTest < ActiveSupport::TestCase
     @organisation = FactoryBot.create(:organisation, account: @account)
     @event = FactoryBot.create(:event, organisation: @organisation, account: @account, last_saved_by: @account)
     login_as(@account)
-    visit "/events/#{@event.id}"
+    visit "/e/#{@event.slug}"
     hrefs = all('#content .dropdown-menu', visible: :all)[1].all('a', visible: :all).map { |a| a['href'] }.reject { |a| a == 'javascript:;' }
     hrefs.each do |href|
       puts URI(href).path

@@ -43,7 +43,7 @@
     <% end %>
 
     <% if @event.affiliate_credit_percentage %>
-      <% affiliate_link = "#{ENV['BASE_URI']}/events/#{@event.id}?affiliate_type=Account&affiliate_id=#{@order.account_id}" %>
+      <% affiliate_link = "#{ENV['BASE_URI']}/e/#{@event.slug}?affiliate_type=Account&affiliate_id=#{@order.account_id}" %>
       <p>
         <a href="<%= affiliate_link %>">Here's your affiliate link for this event.</a>
         For each person who buys a ticket via this link,

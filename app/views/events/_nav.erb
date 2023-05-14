@@ -10,7 +10,7 @@
       <%= partial :'local_groups/nav', locals: { local_group: event.local_group, hide_organisation_nav: true, inline: true } %>
     <% end %>
     <%= dropdown_nav [
-          ['View event', "/events/#{event.id}"],
+          ['View event', "/e/#{event.slug}"],
           ['Edit event', "/events/#{event.id}/edit"],
           ['Delete event', "/events/#{event.id}/delete"],
           ['Duplicate event', "/events/#{event.id}/duplicate"],

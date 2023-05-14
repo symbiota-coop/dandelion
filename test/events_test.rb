@@ -61,7 +61,7 @@ class CoreTest < ActiveSupport::TestCase
     @organisation = FactoryBot.create(:organisation, account: @account)
     @event = FactoryBot.create(:event, organisation: @organisation, account: @account, last_saved_by: @account)
     login_as(@account)
-    visit "/events/#{@event.id}"
+    visit "/e/#{@event.slug}"
     select 1, from: "quantities[#{@event.ticket_types.first.id}]"
     click_button 'RSVP'
     assert page.has_content? 'Thanks for booking!'

@@ -86,7 +86,7 @@ Dandelion::App.helpers do
   end
 
   def event_admins_only!
-    kick!(r: "/events/#{@event.id}") unless event_admin?
+    kick!(r: "/e/#{@event.slug}") unless event_admin?
   end
 
   def event_email_viewer?(event = nil, account = current_account)

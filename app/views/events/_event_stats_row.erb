@@ -1,5 +1,5 @@
 <td>
-  <a href="<%= "/events/#{event.id}#{if organisation && organisation != event.organisation; "?cohost=#{organisation.slug}"; end }" %>"><%= event.name %></a>
+  <a href="<%= "/e/#{event.slug}#{if organisation && organisation != event.organisation; "?cohost=#{organisation.slug}"; end }" %>"><%= event.name %></a>
   <% if event.draft? %>
     <span class="label label-default">Draft</span>
   <% end %>
