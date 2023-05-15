@@ -67,7 +67,7 @@
     </td>
     <% if defined?(event_name) %>
       <td>
-        <a href="/events/<%= order.event_id %>"><%= order.event.name %></a>
+        <a href="/e/<%= order.event.slug %>"><%= order.event.name %></a>
         <div>
           <span data-toggle="tooltip" title="<%= d = (order.event.start_time.to_date - Date.today).to_i; pluralize(d, 'day') %> to go" class="text-primary"><% d.times do %><i class="fa fa-square mr-1"></i><% end %></span>
         </div>
@@ -133,7 +133,7 @@
       <% elsif order.affiliate.is_a?(Organisation) %>
         <a href="/o/<%= order.affiliate.slug %>"><%= order.affiliate.name %></a><br />
       <% end; end %>
-      <% if order.http_referrer && "#{URI(order.http_referrer).host}#{URI(order.http_referrer).path}" != "#{URI(ENV['BASE_URI']).host}/events/#{order.event_id}"  %>
+      <% if order.http_referrer && !"#{URI(order.http_referrer).host}#{URI(order.http_referrer).path}".in?(["#{URI(ENV['BASE_URI']).host}/events/#{order.event_id}", "#{URI(ENV['BASE_URI']).host}/e/#{order.event.slug}"])  %>
         <a href="<%=order.http_referrer%>">
           <% if URI(order.http_referrer).host == URI(ENV['BASE_URI']).host %>
             <% if (match = URI(order.http_referrer).path.match(%r{\A/events/([a-z0-9]+)\Z})) && event = Event.find(match[1]) %>
@@ -196,7 +196,7 @@
   </td>
   <td nowrap>
     <% if order.deleted? %>
-      <a class="btn btn-primary" href="/events/<%= order.event.id %>/orders/<%= order.id %>/restore_and_complete" data-confirm="Are you sure you want to restore and complete this order?"><i class="fa fa-chevron-circle-up"></i></a>
+      <a class="btn btn-primary" href="/events/<%= order.event_id %>/orders/<%= order.id %>/restore_and_complete" data-confirm="Are you sure you want to restore and complete this order?"><i class="fa fa-chevron-circle-up"></i></a>
     <% else %>
       <a data-toggle="tooltip" title="Resend tickets" class="btn btn-primary" href="/orders/<%= order.id %>/send_tickets" data-confirm="Are you sure you want to resend the tickets for this order?"><i class="fa fa-ticket"></i></a>
       <a data-toggle="tooltip" title="Transfer to another event" class="btn btn-primary" href="/orders/<%= order.id %>/transfer" ><i class="fa fa-arrow-right"></i></a>
