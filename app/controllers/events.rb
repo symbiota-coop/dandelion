@@ -184,9 +184,9 @@ Dandelion::App.controller do
     @title = @event.name
     @organisation = @event.organisation
     if @order && params[:success]
-      @ga_transaction = { id: @order.id.to_s, affiliation: @event.organisation.name, revenue: (@order.value || 0), currency: @order.currency }
+      @ga_transaction = { transaction_id: @order.id.to_s, affiliation: @event.organisation.name, value: (@order.value || 0), currency: @order.currency }
       @ga_items = @order.tickets.map do |ticket|
-        { id: ticket.id.to_s, name: "#{ticket.event.name}: #{ticket.ticket_type.try(:name) || 'Complementary'}", price: (ticket.discounted_price || 0), quantity: 1 }
+        { item_id: ticket.id.to_s, item_name: "#{ticket.event.name}: #{ticket.ticket_type.try(:name) || 'Complementary'}", item_price: (ticket.discounted_price || 0), item_quantity: 1 }
       end
       @pixel_purchase = { value: (@order.value || 0), currency: @order.currency }
     end
