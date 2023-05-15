@@ -53,8 +53,16 @@
       <p>
         <a href="/docs/events">Watch the 1-minute how-to video</a>
       </p>
+    </div>
 
-      <div class="row align-items-center">
+    <div class="col-lg-6">
+      <%= partial :badges %>
+
+      <h2 class="text-center mt-5 mb-5 my-lg-3" id="tickets-sold">
+        <%= cp :tickets_count %>
+      </h2>
+
+      <div class="row align-items-center mb-5 px-3 mb-sm-0">
         <% {
         'stripe' => 'https://stripe.com/gb/pricing',
         'coinbase-commerce' => 'https://help.coinbase.com/en/commerce/getting-started/fees',
@@ -68,13 +76,6 @@
         <% end %>
       </div>
 
-    </div>
-
-    <div class="col-lg-6">
-      <%= partial :badges %>
-      <h2 class="text-center my-5 my-lg-3" id="tickets-sold">
-        <%= cp :tickets_count %>
-      </h2>
     </div>
 
   </div>
