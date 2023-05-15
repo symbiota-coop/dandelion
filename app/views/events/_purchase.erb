@@ -365,16 +365,16 @@
     <% end %>
     <% if @event.organisation.evm_address && (EVM_CURRENCIES.include?(@event.currency) || (@event.currency == 'USD')) %>
       <button class="btn btn-primary btn-block mb-1 btn-dotted" type="submit" data-payment-method="evm">
-        <span>Pay with <%= if XDAI_CURRENCIES.include?(@event.currency); 'Gnosis Chain'; elsif (CELO_CURRENCIES.include?(@event.currency) || @event.currency == 'USD'); 'Celo'; end %></span>
-          <i class="fa fa-spin fa-circle-o-notch" style="display: none"></i>
-        </button>
-        <%= hidden_field_tag :payment_method, value: 'evm', disabled: true %>
-      <% end %>
-      <%= hidden_field_tag :utm_source, value: params[:utm_source] %>
-      <%= hidden_field_tag :utm_medium, value: params[:utm_medium] %>
-      <%= hidden_field_tag :utm_campaign, value: params[:utm_campaign] %>
+        <span>Pay with <%= @event.chain %></span>
+        <i class="fa fa-spin fa-circle-o-notch" style="display: none"></i>
+      </button>
+      <%= hidden_field_tag :payment_method, value: 'evm', disabled: true %>
     <% end %>
-  </div>
+    <%= hidden_field_tag :utm_source, value: params[:utm_source] %>
+    <%= hidden_field_tag :utm_medium, value: params[:utm_medium] %>
+    <%= hidden_field_tag :utm_campaign, value: params[:utm_campaign] %>
+  <% end %>
+</div>
 </div>
 <div class="card" id="card-error" style="display: none">
   <h3 class="card-header bg-danger text-white">There was an error processing the transaction</h3>
@@ -394,45 +394,39 @@
 </div>
 <div class="card" id="pay-with-evm" style="display: none">
   <h3 class="card-header bg-primary text-white">
-    Pay with <%= if XDAI_CURRENCIES.include?(@event.currency); 'Gnosis Chain'; elsif (CELO_CURRENCIES.include?(@event.currency) || @event.currency == 'USD'); 'Celo'; end %>
-    </h3>
-    <div class="card-body">
-      <p class="lead please"></p>
-      <p class="web3wallet"></p>
-      <% if @event.organisation.evm_address && (CELO_CURRENCIES.include?(@event.currency) || @event.currency == 'USD') %>
-        <div class="qr mb-3">
-          <p class="mb-1">or use this QR code with Valora:</p>
-          <div id="qrcode"></div>
-          <script type="text/javascript">
-            new QRCode(document.getElementById("qrcode"), "celo://wallet/pay?address=<%=@event.organisation.evm_address%>");
-          </script>
-        </div>
-      <% end %>
-      <p>Making a manual transaction? You will find pasting these details easier if you 'Expand view' first.</p>
-      <p>Looking for your transaction... <i class="fa fa-spin fa-circle-o-notch"></i></p>
-    </div>
-  </div>
-  <script>
-    <% if @event.past? && !@event.recording? %>
-      timeAgo = '<%= time_ago_in_words @event.start_time %>'
+    Pay with <%= @event.chain %>
+  </h3>
+  <div class="card-body">
+    <p class="lead please"></p>
+    <p class="web3wallet"></p>
+    <% if @event.organisation.evm_address && (CELO_CURRENCIES.include?(@event.currency) || @event.currency == 'USD') %>
+      <div class="qr mb-3">
+        <p class="mb-1">or use this QR code with Valora:</p>
+        <div id="qrcode"></div>
+        <script type="text/javascript">
+          new QRCode(document.getElementById("qrcode"), "celo://wallet/pay?address=<%=@event.organisation.evm_address%>");
+        </script>
+      </div>
     <% end %>
-      eventId = <%== @event.id.to_s.to_json %>
-      placesRemaining = <%== @event.places_remaining.to_json %>
-      currency = <%== @event.currency.to_json %>
-      currencySymbol = <%== Money.new(0, @event.currency).symbol.to_json %>
-      stripePk = <%== @event.organisation.stripe_pk.to_json %>
-      coinbase = <%= @event.organisation.coinbase_api_key ? true : false %>
-      seedsUsername = <%== @event.organisation.seeds_username.to_json %>
-      evmAddress = <%== @event.organisation.evm_address.to_json %>
-      contractAddress = <%== EVM_CONTRACT_ADDRESSES[@event.currency == 'USD' ? 'CUSD' : @event.currency].to_json %>
-      networkId = <%= EVM_NETWORK_IDS[
-        if XDAI_CURRENCIES.include?(@event.currency)
-          'XDAI'
-        elsif (CELO_CURRENCIES.include?(@event.currency) || @event.currency == 'USD')
-          'CELO'
-        end
-      ] %>
-      networkName = '<%= if XDAI_CURRENCIES.include?(@event.currency); 'Gnosis Chain'; elsif (CELO_CURRENCIES.include?(@event.currency) || @event.currency == 'USD'); 'Celo'; end %>'
-      signedIn = <%= current_account ? true : false %>
-  </script>
-  <script src="/javascripts/purchase.js?<%= @cachebuster %>"></script>
+    <p>Making a manual transaction? You will find pasting these details easier if you 'Expand view' first.</p>
+    <p>Looking for your transaction... <i class="fa fa-spin fa-circle-o-notch"></i></p>
+  </div>
+</div>
+<script>
+  <% if @event.past? && !@event.recording? %>
+    timeAgo = '<%= time_ago_in_words @event.start_time %>'
+  <% end %>
+    eventId = <%== @event.id.to_s.to_json %>
+    placesRemaining = <%== @event.places_remaining.to_json %>
+    currency = <%== @event.currency.to_json %>
+    currencySymbol = <%== Money.new(0, @event.currency).symbol.to_json %>
+    stripePk = <%== @event.organisation.stripe_pk.to_json %>
+    coinbase = <%= @event.organisation.coinbase_api_key ? true : false %>
+    seedsUsername = <%== @event.organisation.seeds_username.to_json %>
+    evmAddress = <%== @event.organisation.evm_address.to_json %>
+    contractAddress = <%== EVM_CONTRACT_ADDRESSES[@event.currency == 'USD' ? 'CUSD' : @event.currency].to_json %>
+    networkId = <%= @event.network_id %>
+    networkName = '<%= @event.chain %>'
+    signedIn = <%= current_account ? true : false %>
+</script>
+<script src="/javascripts/purchase.js?<%= @cachebuster %>"></script>

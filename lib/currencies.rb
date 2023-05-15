@@ -8,9 +8,15 @@ CELO_CONTRACT_ADDRESSES = {
 }.freeze
 CELO_CURRENCIES = CELO_CONTRACT_ADDRESSES.keys.freeze
 
-EVM_CONTRACT_ADDRESSES = {}.merge(XDAI_CONTRACT_ADDRESSES).merge(CELO_CONTRACT_ADDRESSES).freeze
-EVM_CURRENCIES = (XDAI_CURRENCIES + CELO_CURRENCIES).freeze
-EVM_NETWORK_IDS = { 'XDAI' => 100, 'CELO' => 42_220 }.freeze
+OPTIMISM_CONTRACT_ADDRESSES = {
+  'DAI' => '0xda10009cbd5d07dd0cecc66161fc93d7c9000da1',
+  'WETH' => '0x4200000000000000000000000000000000000006'
+}.freeze
+OPTIMISM_CURRENCIES = OPTIMISM_CONTRACT_ADDRESSES.keys.freeze
+
+EVM_CONTRACT_ADDRESSES = {}.merge(XDAI_CONTRACT_ADDRESSES).merge(CELO_CONTRACT_ADDRESSES).merge(OPTIMISM_CONTRACT_ADDRESSES).freeze
+EVM_CURRENCIES = (XDAI_CURRENCIES + CELO_CURRENCIES + OPTIMISM_CURRENCIES).freeze
+EVM_NETWORK_IDS = { 'XDAI' => 100, 'CELO' => 42_220, 'OPTIMISM' => 10 }.freeze
 
 COINBASE_CURRENCIES = %w[BTC ETH].freeze
 CRYPTOCURRENCIES = (COINBASE_CURRENCIES + EVM_CURRENCIES + %w[SEEDS]).freeze
@@ -23,8 +29,9 @@ CURRENCIES_HASH = CURRENCIES.map do |currency|
   ["#{currency} (#{[
     ('Stripe' if FIAT_CURRENCIES.include?(currency)),
     ('Coinbase Commerce' if FIAT_CURRENCIES.include?(currency) || COINBASE_CURRENCIES.include?(currency)),
-    ('Gnosis Chain' if XDAI_CURRENCIES.include?(currency)),
+    ('Gnosis Chain' if XDAI_CURRENCIES.include?(currency)),    
     ('Celo' if CELO_CURRENCIES.include?(currency) || currency == 'USD'),
+    ('Optimism' if OPTIMISM_CURRENCIES.include?(currency)),
     ('SEEDS' if currency == 'SEEDS')
   ].compact.join('/')})", currency]
 end
@@ -35,6 +42,7 @@ CURRENCIES_HASH_WITHOUT_CELO_USD = CURRENCIES.map do |currency|
     ('Coinbase Commerce' if FIAT_CURRENCIES.include?(currency) || COINBASE_CURRENCIES.include?(currency)),
     ('Gnosis Chain' if XDAI_CURRENCIES.include?(currency)),
     ('Celo' if CELO_CURRENCIES.include?(currency)),
+    ('Optimism' if OPTIMISM_CURRENCIES.include?(currency)),    
     ('SEEDS' if currency == 'SEEDS')
   ].compact.join('/')})", currency]
 end

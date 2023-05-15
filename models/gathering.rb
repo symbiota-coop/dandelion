@@ -278,6 +278,28 @@ class Gathering
     CURRENCIES_HASH_WITHOUT_CELO_USD
   end
 
+  def chain
+    if XDAI_CURRENCIES.include?(currency)
+      'Gnosis Chain'
+    elsif CELO_CURRENCIES.include?(currency)
+      'Celo'
+    elsif OPTIMISM_CURRENCIES.include?(currency)
+      'Optimism'      
+    end
+  end
+
+  def network_id
+    EVM_NETWORK_IDS[
+      if XDAI_CURRENCIES.include?(currency)
+        'XDAI'
+      elsif CELO_CURRENCIES.include?(currency)
+        'CELO'
+      elsif OPTIMISM_CURRENCIES.include?(currency)
+        'OPTIMISM'            
+      end
+    ]
+  end    
+
   def admins
     Account.and(:id.in => memberships.and(admin: true).pluck(:account_id))
   end
@@ -476,8 +498,9 @@ class Gathering
   def check_evm_account
     agent = Mechanize.new
     [
-      JSON.parse(agent.get("https://blockscout.com/poa/xdai/address/#{evm_address}/token-transfers?type=JSON").body),
-      JSON.parse(agent.get("https://explorer.celo.org/address/#{evm_address}/token-transfers?type=JSON").body)
+      begin; JSON.parse(agent.get("https://blockscout.com/poa/xdai/address/#{evm_address}/token-transfers?type=JSON").body); rescue Mechanize::ResponseCodeError; end,
+      begin; JSON.parse(agent.get("https://explorer.celo.org/address/#{evm_address}/token-transfers?type=JSON").body); rescue Mechanize::ResponseCodeError; end,
+      begin; JSON.parse(agent.get("https://blockscout.com/optimism/mainnet/address/#{evm_address}/token-transfers?type=JSON").body); rescue Mechanize::ResponseCodeError; end
     ].each do |j|
       items = j['items']
       items.each do |item|

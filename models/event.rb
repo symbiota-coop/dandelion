@@ -104,6 +104,28 @@ class Event
     [''] + CURRENCIES_HASH
   end
 
+  def chain
+    if XDAI_CURRENCIES.include?(currency)
+      'Gnosis Chain'
+    elsif (CELO_CURRENCIES.include?(currency) || currency == 'USD')
+      'Celo'
+    elsif OPTIMISM_CURRENCIES.include?(currency)
+      'Optimism'      
+    end
+  end
+
+  def network_id
+    EVM_NETWORK_IDS[
+      if XDAI_CURRENCIES.include?(currency)
+        'XDAI'
+      elsif (CELO_CURRENCIES.include?(currency) || currency == 'USD')
+        'CELO'
+      elsif OPTIMISM_CURRENCIES.include?(currency)
+        'OPTIMISM'            
+      end
+    ]
+  end    
+
   def questions_a
     q = (questions || '').split("\n").map(&:strip).reject { |l| l.blank? }
     q.empty? ? [] : q

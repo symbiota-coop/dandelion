@@ -199,7 +199,7 @@ class Organisation
       banned_emails: 'One per line',
       event_image_required_width: 'Required width for event images in px',
       event_image_required_height: 'Required height for event images in px',
-      evm_address: 'Ethereum-compatible wallet address for receiving tokens via Gnosis Chain and Celo',
+      evm_address: 'Ethereum-compatible wallet address for receiving tokens via Celo, Optimism and Gnosis Chain',
       seeds_username: 'SEEDS/Telos username for receiving SEEDS via Telos',
       restrict_cohosting: 'When checked, only admins can add the organisation as a co-host of events'
     }
@@ -717,7 +717,8 @@ class Organisation
     agent = Mechanize.new
     [
       begin; JSON.parse(agent.get("https://blockscout.com/poa/xdai/address/#{evm_address}/token-transfers?type=JSON").body); rescue Mechanize::ResponseCodeError; end,
-      begin; JSON.parse(agent.get("https://explorer.celo.org/address/#{evm_address}/token-transfers?type=JSON").body); rescue Mechanize::ResponseCodeError; end
+      begin; JSON.parse(agent.get("https://explorer.celo.org/address/#{evm_address}/token-transfers?type=JSON").body); rescue Mechanize::ResponseCodeError; end,
+      begin; JSON.parse(agent.get("https://blockscout.com/optimism/mainnet/address/#{evm_address}/token-transfers?type=JSON").body); rescue Mechanize::ResponseCodeError; end
     ].compact.each do |j|
       items = j['items']
       items.each do |item|

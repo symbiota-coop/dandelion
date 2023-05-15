@@ -36,7 +36,7 @@
   <% if @gathering.evm_address && EVM_CURRENCIES.include?(@gathering.currency) %>
     <button data-payment-method="evm" type="submit" class="btn btn-default mb-1 ml-0 mr-1" style="height: 2.125rem">
       <span>
-        Pay with <%= if XDAI_CURRENCIES.include?(@gathering.currency); 'Gnosis Chain'; elsif CELO_CURRENCIES.include?(@gathering.currency); 'Celo'; end %>
+        Pay with <%= @gathering.chain %>
       </span>
       <i class="fa fa-spin fa-circle-o-notch" style="display: none"></i>
     </button>
@@ -88,14 +88,8 @@
           // EVM
           evmAddress = <%== @gathering.evm_address.to_json %>
           contractAddress = <%== EVM_CONTRACT_ADDRESSES[@gathering.currency].to_json %>
-          networkId = <%= EVM_NETWORK_IDS[
-            if XDAI_CURRENCIES.include?(@gathering.currency)
-              'XDAI'
-            elsif CELO_CURRENCIES.include?(@gathering.currency)
-              'CELO'
-            end
-          ] %>
-          networkName = '<%= if XDAI_CURRENCIES.include?(@gathering.currency); 'Gnosis Chain'; elsif CELO_CURRENCIES.include?(@gathering.currency); 'Celo'; end %>'
+          networkId = <%= @gathering.network_id %>
+          networkName = '<%=@gathering.chain%>'
           $('#owed').hide()
           $('#pay-with-evm').show()
           $('#pay-with-evm').find('.card-body p.lead.please').html('Send EXACTLY <strong>' + data['evm_amount'] + ' ' + currency + '</strong> to <strong>' + evmAddress + '</strong>')

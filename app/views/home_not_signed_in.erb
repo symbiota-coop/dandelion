@@ -45,7 +45,7 @@
         <a target="_blank" href="https://stripe.com/gb/pricing">Stripe</a> or
         <a target="_blank" href="https://help.coinbase.com/en/commerce/getting-started/fees">Coinbase</a>
         <br />
-        (or choose fee-free crypto payments via <a href="https://celo.org/">Celo</a> or <a href="https://www.gnosischain.com/evm">Gnosis Chain</a>)
+        (or choose fee-free crypto payments via <a href="https://celo.org/">Celo</a>, <a href="https://optimism.io/">Optimism</a> or <a href="https://www.gnosischain.com/">Gnosis Chain</a>)
       </p>
       <p class="mb-1">
         <a class="btn btn-primary btn-lg" href="/events/new">List an event</a>
@@ -53,6 +53,21 @@
       <p>
         <a href="/docs/events">Watch the 1-minute how-to video</a>
       </p>
+
+      <div class="row align-items-center">
+        <% {
+        'stripe' => 'https://stripe.com/gb/pricing',
+        'coinbase-commerce' => 'https://help.coinbase.com/en/commerce/getting-started/fees',
+        'celo' => 'https://celo.org/',
+        'optimism' => 'https://optimism.io/',
+        'gnosis-chain' => 'https://www.gnosischain.com/'
+      }.each do |k, v| %>
+          <div class="col">
+            <a href="<%=v%>"><img class="w-100" src="/images/payment_methods/<%=k%>.jpg" /></a>
+          </div>
+        <% end %>
+      </div>
+
     </div>
 
     <div class="col-lg-6">
