@@ -1,7 +1,7 @@
 <%= partial :'events/nav', locals: { event: @event } %>
 
 <div class="text-center">
-  <a href="/events/<%= @event.id %>/destroy" class="btn btn-danger">Delete event and attempt to refund all orders</a>
+  <a href="/events/<%= @event.id %>/destroy" class="btn btn-danger">Delete event and attempt to refund all Stripe orders</a>
   or
   <a href="/events/<%= @event.id %>/destroy?no_refunds=1" class="btn btn-outline-danger">Delete event without refunding orders</a>
 </div>
