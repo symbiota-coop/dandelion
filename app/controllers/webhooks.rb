@@ -73,13 +73,13 @@ Dandelion::App.controller do
           halt 200
         end
       else
-        # begin
-        #   raise Order::OrderNotFound
-        # rescue StandardError => e
-        #   Airbrake.notify(e, event: event)
-        #   halt 200
-        # end
-        halt 200
+        begin
+          raise Order::OrderNotFound
+        rescue StandardError => e
+          Airbrake.notify(e, event: event)
+          halt 200
+        end
+        # halt 200
       end
     else
       halt 200
