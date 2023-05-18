@@ -366,7 +366,7 @@ class Organisation
         if %w[jpeg png gif pam].include?(image.format)
           image.name = "#{SecureRandom.uuid}.#{image.format}"
         else
-          errors.add(:image, 'must be an image') 
+          errors.add(:image, 'must be an image')
         end
       rescue StandardError
         self.image = nil
@@ -398,6 +398,12 @@ class Organisation
     self.recording_email_greeting = recording_email_greeting_default unless recording_email_greeting
     self.feedback_email_body = feedback_email_body_default unless feedback_email_body
     errors.add(:affiliate_credit_percentage, 'must be between 1 and 100') if affiliate_credit_percentage && (affiliate_credit_percentage < 1 || affiliate_credit_percentage > 100)
+
+    errors.add(:mailgun_domain, 'must not be a sandbox domain') if mailgun_domain && mailgun_domain.starts_with?('sandbox') && mailgun_domain.ends_with?('mailgun.org')
+
+    errors.add(:mailgun_domain, 'must be provided if other Mailgun details have been provided') if (mailgun_api_key || mailgun_region) && !mailgun_domain
+    errors.add(:mailgun_api_key, 'must be provided if other Mailgun details have been provided') if (mailgun_domain || mailgun_region) && !mailgun_api_key
+    errors.add(:mailgun_region, 'must be provided if other Mailgun details have been provided') if (mailgun_domain || mailgun_api_key) && !mailgun_region
 
     if Padrino.env == :production && account && !account.admin?
       errors.add(:stripe_sk, 'must start with sk_live_') if stripe_sk && !stripe_sk.starts_with?('sk_live_')
