@@ -42,19 +42,21 @@
   <% @tickets.each { |ticket| %>
   <tr>
     <td>
-      <%= partial :'accounts/account', locals: { account: ticket.account, show_email: ticket_email_viewer?(ticket) } %>
-      <% if ticket.name || (ticket.email && ticket_email_viewer?(ticket)) %>
-        <div class="mt-1">
-          ordered for
-          <% if ticket.name %>
-            <br />
-            <strong><%= ticket.name %></strong>
-          <% end %>
-          <% if ticket.email && ticket_email_viewer?(ticket) %>
-            <br />
-            <small><%=ticket.email %></small>
-          <% end %>
-        </div>
+      <% if ticket.account %>
+        <%= partial :'accounts/account', locals: { account: ticket.account, show_email: ticket_email_viewer?(ticket) } %>
+        <% if ticket.name || (ticket.email && ticket_email_viewer?(ticket)) %>
+          <div class="mt-1">
+            ordered for
+            <% if ticket.name %>
+              <br />
+              <strong><%= ticket.name %></strong>
+            <% end %>
+            <% if ticket.email && ticket_email_viewer?(ticket) %>
+              <br />
+              <small><%=ticket.email %></small>
+            <% end %>
+          </div>
+        <% end %>
       <% end %>
     </td>
     <td data-pagelet-url="/tickets/<%= ticket.id %>/ticket_type">
@@ -85,7 +87,7 @@
             <%= event_feedback.id %>
           <% end %>
         </a>
-      <% elsif ticket.event.finished? && !ticket.account.unsubscribed_feedback %>
+      <% elsif ticket.event.finished? && (ticket.account && !ticket.account.unsubscribed_feedback) %>
         <a href="<%= ENV['BASE_URI'] %>/events/<%= ticket.event_id %>/resend_feedback_email/<%= ticket.account_id %>">Resend feedback email</a>
       <% end %>
     </td>

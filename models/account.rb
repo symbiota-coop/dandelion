@@ -459,8 +459,8 @@ class Account
   has_many :orders_as_revenue_sharer, class_name: 'Order', inverse_of: :revenue_sharer, dependent: :nullify
   has_many :orders_as_affiliate, class_name: 'Order', as: :affiliate, dependent: :nullify
 
-  has_many :tickets, dependent: :destroy
-  has_many :donations, dependent: :destroy
+  has_many :tickets, dependent: :nullify
+  has_many :donations, dependent: :nullify
   def upcoming_events
     Event.and(:organisation_id.ne => nil).future_and_current_featured.and(:id.in =>
         tickets.pluck(:event_id) +

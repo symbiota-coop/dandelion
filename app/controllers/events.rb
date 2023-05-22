@@ -341,7 +341,7 @@ Dandelion::App.controller do
       else
         ticket.update_attribute(:checked_in, nil)
       end
-      ticket.account.name
+      ticket.account ? ticket.account.name : ''
     end
   end
 
@@ -495,8 +495,8 @@ Dandelion::App.controller do
         csv << %w[name email ordered_for_name ordered_for_email ticket_type price currency created_at checked_in_at]
         @tickets.each do |ticket|
           csv << [
-            ticket.account.name,
-            ticket_email_viewer?(ticket) ? ticket.account.email : '',
+            ticket.account ? ticket.account.name : '',
+            ticket.account && ticket_email_viewer?(ticket) ? ticket.account.email : '',
             ticket.name,
             ticket_email_viewer?(ticket) ? ticket.email : '',
             ticket.ticket_type.try(:name),
@@ -508,14 +508,14 @@ Dandelion::App.controller do
         end
       end
     when :pdf
-      @tickets = @tickets.sort_by { |ticket| ticket.account.name }
+      @tickets = @tickets.sort_by { |ticket| ticket.account ? ticket.account.name : '' }
       Prawn::Document.new(page_layout: :landscape) do |pdf|
         pdf.font "#{Padrino.root}/app/assets/fonts/circular-ttf/CircularStd-Book.ttf"
         pdf.table([%w[name email ordered_for_name ordered_for_email ticket_type price currency created_at checked_in_at]] +
             @tickets.map do |ticket|
               [
-                ticket.account.name_transliterated,
-                ticket_email_viewer?(ticket) ? ticket.account.email : '',
+                ticket.account ? ticket.account.name_transliterated : '',
+                ticket.account && ticket_email_viewer?(ticket) ? ticket.account.email : '',
                 (I18n.transliterate(ticket.name) if ticket.name),
                 ticket_email_viewer?(ticket) ? ticket.email : '',
                 ticket.ticket_type.try(:name),

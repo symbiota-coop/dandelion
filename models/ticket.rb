@@ -4,7 +4,7 @@ class Ticket
   include Mongoid::Paranoia
 
   belongs_to :event, index: true
-  belongs_to :account, index: true
+  belongs_to :account, index: true, optional: true
   belongs_to :order, index: true, optional: true
   belongs_to :ticket_type, index: true, optional: true
   belongs_to :zoomship, index: true, optional: true
