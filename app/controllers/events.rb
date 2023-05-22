@@ -470,6 +470,9 @@ Dandelion::App.controller do
                else
                  @event.tickets
                end
+    @tickets =  @tickets.deleted if params[:deleted]
+    @tickets =  @tickets.complete if params[:complete]
+    @tickets =  @tickets.incomplete if params[:incomplete]
     if params[:q]
       @tickets = @tickets.and(:id.in =>
         Ticket.collection.aggregate([

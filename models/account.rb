@@ -241,27 +241,27 @@ class Account
 
   after_create :send_confirmation_email
   def send_confirmation_email
-    unless skip_confirmation_email
-      mg_client = Mailgun::Client.new ENV['MAILGUN_API_KEY'], ENV['MAILGUN_REGION']
-      batch_message = Mailgun::BatchMessage.new(mg_client, ENV['MAILGUN_NOTIFICATIONS_HOST'])
+    return if skip_confirmation_email
 
-      account = self
-      content = ERB.new(File.read(Padrino.root('app/views/emails/confirm_email.erb'))).result(binding)
-      batch_message.from ENV['NOTIFICATIONS_EMAIL_FULL']
-      batch_message.subject 'Confirm your email address'
-      batch_message.body_html Premailer.new(ERB.new(File.read(Padrino.root('app/views/layouts/email.erb'))).result(binding), with_html_string: true, adapter: 'nokogiri', input_encoding: 'UTF-8').to_inline_css
+    mg_client = Mailgun::Client.new ENV['MAILGUN_API_KEY'], ENV['MAILGUN_REGION']
+    batch_message = Mailgun::BatchMessage.new(mg_client, ENV['MAILGUN_NOTIFICATIONS_HOST'])
 
-      [account].each do |account|
-        batch_message.add_recipient(:to, account.email, {
-                                      'firstname' => (account.firstname || 'there'),
-                                      'token' => account.sign_in_token,
-                                      'id' => account.id.to_s,
-                                      'confirm_or_activate' => (account.sign_ins_count.zero? ? "If you'd like to activate your account, click the link below:" : 'Click here to confirm your email address:')
-                                    })
-      end
+    account = self
+    content = ERB.new(File.read(Padrino.root('app/views/emails/confirm_email.erb'))).result(binding)
+    batch_message.from ENV['NOTIFICATIONS_EMAIL_FULL']
+    batch_message.subject 'Confirm your email address'
+    batch_message.body_html Premailer.new(ERB.new(File.read(Padrino.root('app/views/layouts/email.erb'))).result(binding), with_html_string: true, adapter: 'nokogiri', input_encoding: 'UTF-8').to_inline_css
 
-      batch_message.finalize if ENV['MAILGUN_API_KEY']
+    [account].each do |account|
+      batch_message.add_recipient(:to, account.email, {
+                                    'firstname' => (account.firstname || 'there'),
+                                    'token' => account.sign_in_token,
+                                    'id' => account.id.to_s,
+                                    'confirm_or_activate' => (account.sign_ins_count.zero? ? "If you'd like to activate your account, click the link below:" : 'Click here to confirm your email address:')
+                                  })
     end
+
+    batch_message.finalize if ENV['MAILGUN_API_KEY']
   end
 
   def send_activation_notification
@@ -354,9 +354,10 @@ class Account
   def event_feedbacks_as_facilitator
     EventFeedback.and(:event_id.in => event_facilitations.pluck(:event_id))
   end
+
   def unscoped_event_feedbacks_as_facilitator
     EventFeedback.unscoped.and(:event_id.in => event_facilitations.pluck(:event_id))
-  end  
+  end
   has_many :activities, dependent: :nullify
   has_many :activityships, dependent: :destroy
   def activities_following
@@ -488,8 +489,8 @@ class Account
         if %w[jpeg png gif pam].include?(picture.format)
           picture.name = "#{SecureRandom.uuid}.#{picture.format}"
         else
-          errors.add(:picture, 'must be an image') 
-        end        
+          errors.add(:picture, 'must be an image')
+        end
       rescue StandardError
         self.picture = nil
         errors.add(:picture, 'must be an image')
@@ -619,10 +620,10 @@ Two Spirit).split("\n")
   end
 
   def age
-    if (dob = date_of_birth)
-      now = Time.now.utc.to_date
-      now.year - dob.year - (now.month > dob.month || (now.month == dob.month && now.day >= dob.day) ? 0 : 1)
-    end
+    return unless (dob = date_of_birth)
+
+    now = Time.now.utc.to_date
+    now.year - dob.year - (now.month > dob.month || (now.month == dob.month && now.day >= dob.day) ? 0 : 1)
   end
 
   def self.radio_scopes
@@ -657,28 +658,28 @@ Two Spirit).split("\n")
   end
 
   def firstname
-    unless name.blank?
-      parts = name.split(' ')
-      n = if parts.count > 1 && %w[mr mrs ms dr].include?(parts[0].downcase.gsub('.', ''))
-            parts[1]
-          else
-            parts[0]
-          end
-      n.capitalize
-    end
+    return if name.blank?
+
+    parts = name.split(' ')
+    n = if parts.count > 1 && %w[mr mrs ms dr].include?(parts[0].downcase.gsub('.', ''))
+          parts[1]
+        else
+          parts[0]
+        end
+    n.capitalize
   end
 
   def lastname
-    if name
-      nameparts = name.split(' ')
-      nameparts[1..-1].join(' ') if nameparts.length > 1
-    end
+    return unless name
+
+    nameparts = name.split(' ')
+    nameparts[1..-1].join(' ') if nameparts.length > 1
   end
 
   def abbrname
-    if firstname
-      firstname.capitalize + (lastname ? (' ' + lastname[0].upcase + '.') : '')
-    end
+    return unless firstname
+
+    firstname.capitalize + (lastname ? (' ' + lastname[0].upcase + '.') : '')
   end
 
   def self.time_zones
@@ -694,16 +695,16 @@ Two Spirit).split("\n")
   end
 
   def self.authenticate(email, password)
-    if email.present? && (account = find_by(email: email.downcase))
-      if account.failed_sign_in_attempts && account.failed_sign_in_attempts >= 5
-        nil
-      elsif account.has_password?(password)
-        account.update_attribute(:failed_sign_in_attempts, 0)
-        account
-      else
-        account.update_attribute(:failed_sign_in_attempts, (account.failed_sign_in_attempts || 0) + 1)
-        nil
-      end
+    return unless email.present? && (account = find_by(email: email.downcase))
+
+    if account.failed_sign_in_attempts && account.failed_sign_in_attempts >= 5
+      nil
+    elsif account.has_password?(password)
+      account.update_attribute(:failed_sign_in_attempts, 0)
+      account
+    else
+      account.update_attribute(:failed_sign_in_attempts, (account.failed_sign_in_attempts || 0) + 1)
+      nil
     end
   end
 

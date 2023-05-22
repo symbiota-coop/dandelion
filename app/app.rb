@@ -1,7 +1,6 @@
 module Dandelion
   class App < Padrino::Application
     register Padrino::Rendering
-
     register Padrino::Helpers
     register WillPaginate::Sinatra
     helpers Activate::ParamHelpers
