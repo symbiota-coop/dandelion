@@ -45,6 +45,7 @@ class Event
   field :select_tickets_intro, type: String
   field :select_tickets_outro, type: String
   field :select_tickets_title, type: String
+  field :contribution_gbp_custom, type: Float
 
   def self.admin_fields
     {
@@ -107,10 +108,10 @@ class Event
   def chain
     if XDAI_CURRENCIES.include?(currency)
       'Gnosis Chain'
-    elsif (CELO_CURRENCIES.include?(currency) || currency == 'USD')
+    elsif CELO_CURRENCIES.include?(currency) || currency == 'USD'
       'Celo'
     elsif OPTIMISM_CURRENCIES.include?(currency)
-      'Optimism'      
+      'Optimism'
     end
   end
 
@@ -118,13 +119,13 @@ class Event
     EVM_NETWORK_IDS[
       if XDAI_CURRENCIES.include?(currency)
         'XDAI'
-      elsif (CELO_CURRENCIES.include?(currency) || currency == 'USD')
+      elsif CELO_CURRENCIES.include?(currency) || currency == 'USD'
         'CELO'
       elsif OPTIMISM_CURRENCIES.include?(currency)
-        'OPTIMISM'            
+        'OPTIMISM'
       end
     ]
-  end    
+  end
 
   def questions_a
     q = (questions || '').split("\n").map(&:strip).reject { |l| l.blank? }
@@ -590,12 +591,16 @@ class Event
   end
 
   def contribution_gbp
-    standard = Money.new((organisation.try(:contribution_requested_per_event_gbp) || Organisation.contribution_requested_per_event_gbp) * 100, 'GBP')
-    if organisation && organisation.fixed_fee
-      standard
+    if contribution_gbp_custom
+      Money.new(contribution_gbp_custom * 100, 'GBP')
     else
-      one_percent_of_ticket_sales = Money.new(tickets.complete.sum(:price) * 0.05 * 100, currency).exchange_to('GBP')
-      [standard, one_percent_of_ticket_sales].min
+      standard = Money.new((organisation.try(:contribution_requested_per_event_gbp) || Organisation.contribution_requested_per_event_gbp) * 100, 'GBP')
+      if organisation && organisation.fixed_fee
+        standard
+      else
+        five_percent_of_ticket_sales = Money.new(tickets.complete.sum(:price) * 0.05 * 100, currency).exchange_to('GBP')
+        [standard, five_percent_of_ticket_sales].min
+      end
     end
   end
 
