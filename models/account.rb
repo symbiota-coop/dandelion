@@ -140,8 +140,12 @@ class Account
     !public?
   end
 
+  def live_player?
+    [account_contributions, tickets, event_facilitations, organisationships, activityships, local_groupships, memberships].any? { |x| x.count.positive? }
+  end
+
   def able_to_message
-    email_confirmed && (can_message || tickets.count > 0 || memberships.count > 0 || account_contributions.count > 0)
+    email_confirmed && (can_message || live_player?)
   end
 
   def self.public
@@ -206,6 +210,8 @@ class Account
     %w[email phone telegram_username].each do |p|
       send("#{p}_privacy=", 'People I follow') unless send("#{p}_privacy")
     end
+
+    errors.add(:bio, 'cannot contain links yet as an anti-spam measure, use Dandelion for a while first!') if !live_player? && (bio =~ %r{https?://})
 
     errors.add(:name, 'must not contain $') if name && name.include?('$')
     errors.add(:name, 'must not contain @') if name && name.include?('@')
