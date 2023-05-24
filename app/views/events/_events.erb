@@ -1,5 +1,7 @@
 <% if @events.count == 0 %>
-  <em>No events</em>
+  <div class="mt-3">
+    <em>No events</em>
+  </div>
 <% else %>
   <% @events = @events.paginate(page: params[:page], per_page: 20) %>
   <%= partial :'events/blocks', locals: { events: @events } %>

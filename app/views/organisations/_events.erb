@@ -1,5 +1,7 @@
 <% if @events.count == 0 %>
-  <em>No events</em>
+  <div class="mt-3">
+    <em>No events</em>
+  </div>
 <% else %>
   <% unless params[:no_listings] %>
     <% unless params[:minimal] %>
