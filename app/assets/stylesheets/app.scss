@@ -410,6 +410,11 @@ img.private:hover {
   max-height: none;
 }
 
+.ticket {
+  border-style: dashed !important;
+  background: $color_primary_transparent_3;
+}
+
 
 .calendar-date {
   color: #222222;

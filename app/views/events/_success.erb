@@ -19,7 +19,7 @@
         <p class="mb-3"><strong>You're welcome to let us know the names and email addresses of ticketholders so they hear about any important updates to the event (we won't use these details for anything else):</strong></p>
         <div class="mb-3">
           <% @order.tickets.each_with_index { |ticket,i| %>
-          <div class="bg-primary text-white p-2 rounded mb-2">
+          <div class="p-2 rounded mb-2 border border-primary ticket">
             <p class="mb-1">
               <i class="fa fa-ticket"></i>
               <%=ticket.ticket_type.try(:name)%>
