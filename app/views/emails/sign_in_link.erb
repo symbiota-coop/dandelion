@@ -2,7 +2,7 @@
   <p>Hi %recipient.firstname%,</p>
   <p>Someone (hopefully you) requested a sign in link for Dandelion. Visit this link to sign in:</p>
   <p>
-    <%= ENV['BASE_URI'] %>/?sign_in_token=%recipient.token%
+    <a href="<%= ENV['BASE_URI'] %>/?sign_in_token=%recipient.token%"><%= ENV['BASE_URI'] %>/?sign_in_token=%recipient.token%</a>
   </p>
   <p>Best wishes,<br>
     The Dandelion team</p>
