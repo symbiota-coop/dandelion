@@ -337,6 +337,12 @@
         <%= f.check_box_block :opt_in_facilitator %>
       </div>
     <% end %>
+    <% if @event.organisation.terms_and_conditions_url %>
+      <p><small>
+          By proceeding you agree to <%=@organisation.name%>'s <a href="<%=@event.organisation.terms_and_conditions_url%>" target="_blank">terms and conditions</a>
+        </small>
+      </p>
+    <% end %>
     <button class="btn btn-primary btn-block mb-1" type="submit" data-payment-method="rsvp">
       <span>RSVP</span>
       <i class="fa fa-spin fa-circle-o-notch" style="display: none"></i>

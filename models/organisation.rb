@@ -90,6 +90,7 @@ class Organisation
   field :google_drive_scope, type: String
   field :google_sheets_key, type: String
   field :fixed_fee, type: Boolean
+  field :terms_and_conditions_url, type: String
 
   field :tokens, type: Float
   index({ tokens: 1 })
@@ -148,7 +149,8 @@ class Organisation
       paid_up_fraction: :number,
       event_image_required_height: :number,
       event_image_required_width: :number,
-      psychedelic: :check_box
+      psychedelic: :check_box,
+      terms_and_conditions_url: :url
     }
   end
 
@@ -194,6 +196,7 @@ class Organisation
       gocardless_access_token: 'Registers people with active GoCardless subscriptions as monthly donors',
       patreon_api_key: 'Registers people with active Patreon subscriptions as monthly donors',
       become_a_member_url: 'Link to direct non-members to when they attempt to buy tickets to a members-only event',
+      terms_and_conditions_url: "Link to the organisation's terms and conditions of sale",
       event_footer: 'Included at the end of all public event descriptions',
       carousels: "To create a carousel on your organisation's events page with the title X showing event tags a and b, type X: a, b",
       banned_emails: 'One per line',
@@ -575,6 +578,7 @@ class Organisation
       enable_discussion: "Enable discussion feature in the Members' Area",
       auto_comment_sending: "Send comments in the Members' Area automatically",
       become_a_member_url: 'Become a Member URL',
+      terms_and_conditions_url: 'Terms and Conditions URL',
       add_a_donation_to: 'Text above donation field',
       donation_text: 'Text below donation field',
       show_ticketholder_link_in_ticket_emails: 'Show link for people to provide details of ticketholders in ticket emails',
