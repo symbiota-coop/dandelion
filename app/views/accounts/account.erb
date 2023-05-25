@@ -16,7 +16,7 @@
   <%= partial :'events/blocks', locals: { events: events } %>
 <% end %>
 <% if @account.unscoped_event_feedbacks_as_facilitator.count > 0 %>
-  <h2 class="mt-5">Feedback on <%=@account.name%>'s events</h2>
+  <h2 class="mt-5">Feedback on <%=@account.firstname%>'s events</h2>
   <div class="mt-3" data-pagelet-url="/accounts/<%= @account.id %>/show_feedback"></div>
 <% end %>
 <% if (habits = @account.habits.and(public: true).and(:archived.ne => true)).count > 0 %>
