@@ -147,6 +147,28 @@
         <%= f.url_block :facebook_event_url %>
         <%= partial :'events/tags', locals: { f: f } %>
         <%= f.lookup_block :coordinator_id, lookup_url: '/accounts.json', placeholder: 'Search accounts', selected_link: (%(<a class="d-inline-block mt-1" target="_blank" href="/u/#{@event.coordinator.username}">View account</a>) if @event.coordinator) %>
+        <% if @event.organisation.verified? %>
+          <%= f.lookup_block :organiser_id, lookup_url: '/accounts.json', placeholder: 'Search accounts', selected_link: (%(<a class="d-inline-block mt-1" target="_blank" href="/u/#{@event.organiser.username}">View account</a>) if @event.organiser_id) %>
+        <% end %>
+        <% if @event.organisation.stripe_client_id %>
+          <%= f.lookup_block :revenue_sharer_id, lookup_url: '/accounts.json', placeholder: 'Search accounts', selected_link: (%(<a class="d-inline-block mt-1" target="_blank" href="/u/#{@event.revenue_sharer.username}">View account</a>) if @event.revenue_sharer_id) %>
+          <script>
+            $(function () {
+              $('#event_revenue_sharer_id').change(function () {
+                if ($(this).val().length > 0) {
+                  $('#organisation-revenue-share').show()
+                } else {
+                  $('#organisation-revenue-share').hide()
+                }
+              })
+              $('#event_revenue_sharer_id').change()
+            })
+          </script>
+          <div id="organisation-revenue-share">
+            <%= f.number_block :organisation_revenue_share %>
+          </div>
+        <% end %>
+
         <div class="form-group">
           <label for="event_organisation" class="">
             Organisation
@@ -202,26 +224,6 @@
             <%= f.check_box_block :zoom_party %>
           </div>
         <% end %>
-        <div id="not-zoom-party">
-          <% if @event.organisation.stripe_client_id %>
-            <%= f.lookup_block :revenue_sharer_id, lookup_url: '/accounts.json', placeholder: 'Search accounts', selected_link: (%(<a class="d-inline-block mt-1" target="_blank" href="/u/#{@event.revenue_sharer.username}">View account</a>) if @event.revenue_sharer_id) %>
-            <script>
-              $(function () {
-                $('#event_revenue_sharer_id').change(function () {
-                  if ($(this).val().length > 0) {
-                    $('#organisation-revenue-share').show()
-                  } else {
-                    $('#organisation-revenue-share').hide()
-                  }
-                })
-                $('#event_revenue_sharer_id').change()
-              })
-            </script>
-            <div id="organisation-revenue-share">
-              <%= f.number_block :organisation_revenue_share %>
-            </div>
-          <% end %>
-        </div>
         <%= f.check_box_block :draft %>
         <%= f.check_box_block :secret %>
         <%= f.check_box_block :featured %>

@@ -43,6 +43,7 @@
       <th></th>
       <th style="min-width: 12.5em" data-col-name="date">Date</th>
       <th>Coordinator</th>
+      <th><% if @event.organisation.verified? %>Organiser/Revenue sharer<% else %>Revenue sharer<% end %></th>
       <th>Facilitators</th>
       <th>Tags</th>
       <th>Activity</th>
@@ -52,7 +53,6 @@
       <th data-col-name="tickets-sold">Tickets sold</th>
       <th>Checked in</th>
       <th data-col-name="ticket-revenue">Ticket revenue</th>
-      <th>Revenue sharer</th>
       <th>Credit due</th>
       <th data-col-name="donations">Donations</th>
       <th>Feedback</th>

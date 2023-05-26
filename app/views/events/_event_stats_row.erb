@@ -42,81 +42,86 @@
       <a href="/u/<%= event.coordinator.username %>"><%= event.coordinator.name %></a>
     <% end %>
   </td>
-  <td style="text-align: center">
-    <% if event.event_facilitations.count > 0 %>
-      <% event.event_facilitations.each { |event_facilitation| %>
-      <%= partial :'accounts/square', locals: { account: event_facilitation.account, width: '50px' } %>
-      <br />
-      <a href="/u/<%= event_facilitation.account.username %>"><%= event_facilitation.account.name %></a>
-      <br />
-      <% } %>
-    <% end %>
-  </td>
   <td>
-    <%= partial :'events/tag_labels', locals: { event: event } %>
-  </td>
-  <td style="text-align: center">
-    <% if event.activity %>
-      <% if event.activity.image %>
-        <a href="/activities/<%= event.activity.id %>">
-          <img src="<%= u event.activity.image.thumb('500x500#').url %>" style="width: 50px">
-        </a>
+    <% if event.organiser %>
+      <a href="/u/<%= event.organiser.username %>">
+        <%= partial :'accounts/square', locals: { account: event.organiser, width: '50px' } %>
         <br>
-      <% end %>
-      <a href="/activities/<%= event.activity.id %>"><%= event.activity.name %></a>
-    <% end %>
-  </td>
-  <td>
-    <% if event.local_group %>
-      <a href="/local_groups/<%= event.local_group.id %>"><%= event.local_group.name %></a>
-    <% end %>
-  </td>
-  <td>
-    <% if event.facebook_event_url %>
-      <a target="_blank" href="<%= event.facebook_event_url %>"><i class="fa fa-facebook-square"></i></a>
-    <% end %>
-  </td>
-  <td data-with-placeholder data-pagelet-url="/events/<%=event.id%>/page_views_count" data-sort="<%=event.page_views_count%>"></td>
-  <td data-sort="<%=event.tickets.count%>">
-    <%= partial :'events/progress', locals: { event: event } %>
-  </td>
-  <td>
-    <%= partial :'events/checked_in', locals: { event: event } %>
-  </td>
-  <td data-sort="<%=begin; event.discounted_ticket_revenue.exchange_to(event.organisation.currency); rescue Money::Bank::UnknownRate, Money::Currency::UnknownCurrency; 0; end%>">
-    <% if event.discounted_ticket_revenue > 0 %>
-      <%= m event.discounted_ticket_revenue, event.currency %>
-    <% end %>
-  </td>
-  <td>
-    <% if event.revenue_sharer && event.organisation_revenue_share %>
-      <a href="/u/<%= event.revenue_sharer.username %>">
-        <%= partial :'accounts/square', locals: { account: event.revenue_sharer, width: '50px' } %>
-        <br />
-        <a href="/u/<%= event.revenue_sharer.username %>"><%= event.revenue_sharer.name %></a>
-        <br>
-        <%= ((1 - event.organisation_revenue_share) * 100).round %>:<%= (event.organisation_revenue_share * 100).round %>
-      <% end %>
-    </td>
-    <td>
-      <% if event.credit_payable_to_revenue_sharer > 0 %>
-        <%= m event.credit_payable_to_revenue_sharer, event.currency %>
-      <% end %>
-    </td>
-    <td data-sort="<%=begin; event.donation_revenue.exchange_to(event.organisation.currency); rescue Money::Bank::UnknownRate, Money::Currency::UnknownCurrency; 0; end%>">
-      <% if event.donation_revenue > 0 && !event.purchase_url %>
-        <%= m event.donation_revenue, event.currency %>
-      <% end %>
-    </td>
-    <td>
-      <% if event.past? and event.attendees.count > 0 and event.event_feedbacks.count > 0 %>
-        <a href="/events/<%= event.id %>/feedback"><%= pluralize(event.event_feedbacks.count, 'response') %></a>
-        (<%= "#{(100 * (event.event_feedbacks.count.to_f / event.attendees.count)).round}%" %>)
-        <% if average_rating = event.event_feedbacks.average_rating %>
+        <a href="/u/<%= event.organiser.username %>"><%= event.organiser.name %></a>
+      <% elsif event.revenue_sharer && event.organisation_revenue_share %>
+        <a href="/u/<%= event.revenue_sharer.username %>">
+          <%= partial :'accounts/square', locals: { account: event.revenue_sharer, width: '50px' } %>
+          <br />
+          <a href="/u/<%= event.revenue_sharer.username %>"><%= event.revenue_sharer.name %></a>
           <br>
-          <span style="font-size: 20px" title="Average rating <%= average_rating %>">
-            <%= average_rating %>
-          </span>
+          <%= ((1 - event.organisation_revenue_share) * 100).round %>:<%= (event.organisation_revenue_share * 100).round %>
         <% end %>
-      <% end %>
-    </td>
+      </td>
+      <td style="text-align: center">
+        <% if event.event_facilitations.count > 0 %>
+          <% event.event_facilitations.each { |event_facilitation| %>
+          <%= partial :'accounts/square', locals: { account: event_facilitation.account, width: '50px' } %>
+          <br />
+          <a href="/u/<%= event_facilitation.account.username %>"><%= event_facilitation.account.name %></a>
+          <br />
+          <% } %>
+        <% end %>
+      </td>
+      <td>
+        <%= partial :'events/tag_labels', locals: { event: event } %>
+      </td>
+      <td style="text-align: center">
+        <% if event.activity %>
+          <% if event.activity.image %>
+            <a href="/activities/<%= event.activity.id %>">
+              <img src="<%= u event.activity.image.thumb('500x500#').url %>" style="width: 50px">
+            </a>
+            <br>
+          <% end %>
+          <a href="/activities/<%= event.activity.id %>"><%= event.activity.name %></a>
+        <% end %>
+      </td>
+      <td>
+        <% if event.local_group %>
+          <a href="/local_groups/<%= event.local_group.id %>"><%= event.local_group.name %></a>
+        <% end %>
+      </td>
+      <td>
+        <% if event.facebook_event_url %>
+          <a target="_blank" href="<%= event.facebook_event_url %>"><i class="fa fa-facebook-square"></i></a>
+        <% end %>
+      </td>
+      <td data-with-placeholder data-pagelet-url="/events/<%=event.id%>/page_views_count" data-sort="<%=event.page_views_count%>"></td>
+      <td data-sort="<%=event.tickets.count%>">
+        <%= partial :'events/progress', locals: { event: event } %>
+      </td>
+      <td>
+        <%= partial :'events/checked_in', locals: { event: event } %>
+      </td>
+      <td data-sort="<%=begin; event.discounted_ticket_revenue.exchange_to(event.organisation.currency); rescue Money::Bank::UnknownRate, Money::Currency::UnknownCurrency; 0; end%>">
+        <% if event.discounted_ticket_revenue > 0 %>
+          <%= m event.discounted_ticket_revenue, event.currency %>
+        <% end %>
+      </td>
+      <td>
+        <% if event.credit_payable_to_revenue_sharer > 0 %>
+          <%= m event.credit_payable_to_revenue_sharer, event.currency %>
+        <% end %>
+      </td>
+      <td data-sort="<%=begin; event.donation_revenue.exchange_to(event.organisation.currency); rescue Money::Bank::UnknownRate, Money::Currency::UnknownCurrency; 0; end%>">
+        <% if event.donation_revenue > 0 && !event.purchase_url %>
+          <%= m event.donation_revenue, event.currency %>
+        <% end %>
+      </td>
+      <td>
+        <% if event.past? and event.attendees.count > 0 and event.event_feedbacks.count > 0 %>
+          <a href="/events/<%= event.id %>/feedback"><%= pluralize(event.event_feedbacks.count, 'response') %></a>
+          (<%= "#{(100 * (event.event_feedbacks.count.to_f / event.attendees.count)).round}%" %>)
+          <% if average_rating = event.event_feedbacks.average_rating %>
+            <br>
+            <span style="font-size: 20px" title="Average rating <%= average_rating %>">
+              <%= average_rating %>
+            </span>
+          <% end %>
+        <% end %>
+      </td>

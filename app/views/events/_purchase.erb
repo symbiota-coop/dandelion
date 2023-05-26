@@ -339,7 +339,8 @@
     <% end %>
     <% if @event.organisation.terms_and_conditions_url %>
       <p><small>
-          By proceeding you agree to <%=@organisation.name%>'s <a href="<%=@event.organisation.terms_and_conditions_url%>" target="_blank">terms and conditions</a>
+          By proceeding you agree to <%=@organisation.name%>'s <a href="<%=@event.organisation.terms_and_conditions_url%>" target="_blank">terms and conditions</a><% if @event.organiser || @event.revenue_sharer %>
+            and understand this event is organised by <%= @event.organiser ? @event.organiser.name : @event.revenue_sharer.name %><% end %>.
         </small>
       </p>
     <% end %>

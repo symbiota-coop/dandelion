@@ -10,6 +10,7 @@ class Event
   belongs_to :local_group, optional: true, index: true
   belongs_to :coordinator, class_name: 'Account', inverse_of: :events_coordinating, index: true, optional: true
   belongs_to :revenue_sharer, class_name: 'Account', inverse_of: :events_revenue_sharing, index: true, optional: true
+  belongs_to :organiser, class_name: 'Account', inverse_of: :events_organising, index: true, optional: true
   belongs_to :last_saved_by, class_name: 'Account', inverse_of: :events_last_saver, index: true, optional: true
   belongs_to :gathering, optional: true, index: true
 
@@ -253,7 +254,8 @@ class Event
     end
     self.organisation_revenue_share = nil unless revenue_sharer
     errors.add(:organisation_revenue_share, 'must be present if a revenue sharer is set') if revenue_sharer && !organisation_revenue_share
-    errors.add(:revenue_sharer, 'is not connected to this organisation') if revenue_sharer && organisation_revenue_share && !revenue_sharer_organisationship
+    errors.add(:revenue_sharer, 'cannot be set if organiser is set') if revenue_sharer && organiser
+    errors.add(:revenue_sharer, 'is not connected to this organisation') if revenue_sharer && organisation_revenue_share && !revenue_sharer_organisationship    
     self.location = 'Online' if location.downcase == 'online'
     errors.add(:organisation_revenue_share, 'must be between 0 and 1') if organisation_revenue_share && (organisation_revenue_share < 0 || organisation_revenue_share > 1)
     errors.add(:affiliate_credit_percentage, 'must be between 1 and 100') if affiliate_credit_percentage && (affiliate_credit_percentage < 1 || affiliate_credit_percentage > 100)
