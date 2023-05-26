@@ -683,3 +683,20 @@ a.home-feedback {
   color: $body_text;
   text-decoration: none;
 }
+
+.image-style-align-center {
+  text-align: center;
+}
+
+.image-style-align-left {
+  text-align: left;
+}
+
+.image-style-align-right {
+  text-align: right;
+}
+
+.ck-content .image-style-align-center {
+  margin-left: auto !important;
+  margin-right: auto !important
+}

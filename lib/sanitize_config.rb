@@ -11,7 +11,8 @@ Sanitize::Config::DANDELION = Sanitize::Config.merge(Sanitize::Config::RELAXED,
                                                          'h3' => ['style'],
                                                          'h4' => ['style'],
                                                          'h5' => ['style'],
-                                                         'h6' => ['style']
+                                                         'h6' => ['style'],
+                                                         'p' => ['style']
                                                        }
                                                      ),
                                                      css: {

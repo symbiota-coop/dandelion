@@ -5,10 +5,15 @@
 
 /* eslint-env node */
 
-'use strict';
+'use strict'
 
 module.exports = {
 	rules: {
+		indent: 'off',
+		'no-tabs': 'off',
+		'space-in-parens': 'off',
+		'array-bracket-spacing': 'off',
+		semi: 'off',
 		'ckeditor5-rules/ckeditor-imports': 'off'
 	}
-};
+}
