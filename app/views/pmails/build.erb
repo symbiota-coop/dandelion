@@ -20,7 +20,7 @@
   $(function () {
 
   <% if params[:preview] %>
-      window.open('/pmails/<%= @pmail.id %>/preview?<%= @scope %>', null, 'scrollbars=yes,width=700,height=600,left=150,top=150').focus();
+      window.open('/pmails/<%= @pmail.id %>/preview?<%= @scope %>', null, 'scrollbars=yes,width=800,height=600,left=150,top=150').focus();
   <% end %>
 
     $('#pmail-form').submit(function() {
