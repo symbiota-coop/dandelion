@@ -15,31 +15,33 @@
   #pmail_body { height: 30rem; }
 </style>
 
-<script type="text/javascript">
-  var easyMDE
-  $(function () {
+<% unless @pmail.wysiwyg? %>
+  <script type="text/javascript">
+    var easyMDE
+    $(function () {
 
-  <% if params[:preview] %>
-      window.open('/pmails/<%= @pmail.id %>/preview?<%= @scope %>', null, 'scrollbars=yes,width=700,height=600,left=150,top=150').focus();
-  <% end %>
+    <% if params[:preview] %>
+        window.open('/pmails/<%= @pmail.id %>/preview?<%= @scope %>', null, 'scrollbars=yes,width=700,height=600,left=150,top=150').focus();
+    <% end %>
 
-    easyMDE = new EasyMDE({
-      element: $("#pmail_body")[0],
-      autoDownloadFontAwesome: false,
-      inputStyle: 'contenteditable',
-      spellChecker: false,
+      easyMDE = new EasyMDE({
+        element: $("#pmail_body")[0],
+        autoDownloadFontAwesome: false,
+        inputStyle: 'contenteditable',
+        spellChecker: false,
+      });
+
+      $('#pmail-form').submit(function() {
+        if($('#pmail_to_option').val().length == 0) {
+          alert('Please set the To field')
+          return false
+        }
+      })
+
     });
-
-    $('#pmail-form').submit(function() {
-      if($('#pmail_to_option').val().length == 0) {
-        alert('Please set the To field')
-        return false
-      }
-    })
-
-  });
-</script>
-<script src="/javascripts/clipboard2markdown.js?<%= @cachebuster %>"></script>
+  </script>
+  <script src="/javascripts/clipboard2markdown.js?<%= @cachebuster %>"></script>
+<% end %>
 
 <div class="container-fluid">
   <% form_for @pmail, @pmail.new_record? ? '/pmails/new' : "/pmails/#{@pmail.id}/edit", id: 'pmail-form', multipart: true do |f| %>
@@ -245,8 +247,14 @@
     <%= f.text_block :from %>
     <%= f.text_block :subject %>
     <%= f.text_block :preview_text %>
-    <div contenteditable="true" id="pastebin" style="opacity: 0.01; width: 100%; height: 1px; overflow: hidden;"></div>
-    <%= f.text_area_block :body %>
+
+    <% if @pmail.wysiwyg? %>
+      <%= f.wysiwyg_block :body %>
+    <% else %>
+      <div contenteditable="true" id="pastebin" style="opacity: 0.01; width: 100%; height: 1px; overflow: hidden;"></div>
+      <%= f.text_area_block :body %>
+    <% end %>
+
     <%= f.text_block :link_params %>
     <% if @pmail.sent_at %>
       <a data-confirm="Are you sure you want to delete this mail?" href="/pmails/<%= @pmail.id %>/destroy?<%= @scope %>" class="btn btn-danger">Delete</a>
@@ -267,6 +275,7 @@
 
           <div id="attachments" data-pagelet-url="/pmails/<%= organisation.id %>/attachments?<%= @scope %>&file_q=<%= params[:file_q] %>"></div>
           <%= f.file_block :file %>
+          <%= f.hidden_field :wysiwyg, value: @pmail.wysiwyg? ? true : false %>
           <%= f.submit_block button_text: 'Upload' %>
         </div>
       </div>

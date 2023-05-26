@@ -52,8 +52,12 @@
     </div>
     <div class="container">
       <div class="main">
-        <%= markdown = Redcarpet::Markdown.new(Redcarpet::Render::HTML.new(hard_wrap: true), autolink: true, tables: true)
+        <% if pmail.wysiwyg? %>
+          <%= pmail.body %>
+        <% else %>
+          <%= markdown = Redcarpet::Markdown.new(Redcarpet::Render::HTML.new(hard_wrap: true), autolink: true, tables: true)
             markdown.render(pmail.body) %>
+        <% end %>
       </div>
     </div>
     <div class="footer">

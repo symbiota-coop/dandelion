@@ -19,6 +19,7 @@ class Pmail
   field :requested_send_at, type: ActiveSupport::TimeWithZone
   field :sent_at, type: ActiveSupport::TimeWithZone
   field :link_params, type: String
+  field :wysiwyg, type: Boolean
 
   def self.admin_fields
     {
@@ -33,6 +34,7 @@ class Pmail
       requested_send_at: :datetime,
       sent_at: :datetime,
       message_ids: :text_area,
+      wysiwyg: :check_box,
       account_id: :lookup,
       organisation_id: :lookup
     }
