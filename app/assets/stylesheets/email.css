@@ -167,3 +167,9 @@ pre {
   margin-right: auto !important;
   text-align: center !important;
 }
+
+figcaption {
+  font-size: 0.75rem;
+  margin-top: 0.25rem;
+  text-align: center
+}

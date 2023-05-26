@@ -37,6 +37,7 @@ import SimpleUploadAdapter from '@ckeditor/ckeditor5-upload/src/adapters/simpleu
 import ImageResize from '@ckeditor/ckeditor5-image/src/imageresize'
 import HtmlEmbed from '@ckeditor/ckeditor5-html-embed/src/htmlembed'
 import CodeBlock from '@ckeditor/ckeditor5-code-block/src/codeblock'
+import HorizontalLine from '@ckeditor/ckeditor5-horizontal-line/src/horizontalline';
 
 export default class ClassicEditor extends ClassicEditorBase { }
 
@@ -72,7 +73,8 @@ ClassicEditor.builtinPlugins = [
 	SimpleUploadAdapter,
 	ImageResize,
 	HtmlEmbed,
-	CodeBlock
+	CodeBlock,
+	HorizontalLine
 ]
 
 // Editor configuration.
@@ -89,6 +91,7 @@ ClassicEditor.defaultConfig = {
 			'bulletedList',
 			'numberedList',
 			'blockQuote',
+			'horizontalLine',
 			'insertTable',
 			'alignment',
 			'codeBlock',
