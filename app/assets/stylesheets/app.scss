@@ -706,3 +706,20 @@ a.home-feedback {
   margin-right: auto !important;
   text-align: center !important;
 }
+
+
+p.action {
+  text-align: center
+}
+
+p.action a {
+  background: #00B963;
+  color: white;
+  text-decoration: none;
+  padding: 10px;
+  border-radius: 5px
+}
+
+p.action a:hover {
+  background: #2BA457 !important;
+}

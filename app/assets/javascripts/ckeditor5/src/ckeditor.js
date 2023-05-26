@@ -106,10 +106,11 @@ ClassicEditor.defaultConfig = {
 	heading: {
 		options: [
 			{ model: 'paragraph', title: 'Paragraph', class: 'ck-heading_paragraph' },
+			{ model: 'paragraphLead', view: { name: 'p', classes: 'lead' }, title: 'Paragraph (lead)', class: 'ck-heading_paragraph_lead' },
+			{ model: 'paragraphAction', view: { name: 'p', classes: 'action' }, title: 'Paragraph (action)', class: 'ck-heading_paragraph_action' },
 			{ model: 'heading1', view: 'h2', title: 'Heading 1', class: 'ck-heading_heading1' },
 			{ model: 'heading2', view: 'h3', title: 'Heading 2', class: 'ck-heading_heading2' },
-			{ model: 'heading3', view: 'h4', title: 'Heading 3', class: 'ck-heading_heading3' },
-			{ model: 'paragraphLead', view: { name: 'p', classes: 'lead' }, title: 'Paragraph (lead)', class: 'ck-heading_paragraph_lead', converterPriority: 'high' }
+			{ model: 'heading3', view: 'h4', title: 'Heading 3', class: 'ck-heading_heading3' }
 		]
 	},
 	image: {
