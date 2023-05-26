@@ -684,19 +684,25 @@ a.home-feedback {
   text-decoration: none;
 }
 
-.image-style-align-center {
-  text-align: center;
-}
 
+.ck-content .image-style-align-left,
 .image-style-align-left {
-  text-align: left;
+  float: none !important;
+  margin-right: auto !important;
+  text-align: left !important;
 }
 
+.ck-content .image-style-align-right,
 .image-style-align-right {
-  text-align: right;
+  float: none !important;
+  margin-left: auto !important;
+  text-align: right !important;
 }
 
-.ck-content .image-style-align-center {
+.ck-content .image-style-align-center,
+.image-style-align-center {
+  float: none !important;
   margin-left: auto !important;
-  margin-right: auto !important
+  margin-right: auto !important;
+  text-align: center !important;
 }
