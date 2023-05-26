@@ -1,3 +1,5 @@
+<% organisation = params[:cohost] ? Organisation.find_by(slug: params[:cohost]) : @organisation %>
+
 <% unless @event  %>
   <style>
     #event_stats_filter label { font-weight: bold }
@@ -27,7 +29,7 @@
               if (i == 0)
                 $('tfoot th').eq(index).html(sum);
               else
-                $('tfoot th').eq(index).html('<%= Money.new(0, @organisation.currency).symbol %>' + sum.toLocaleString());
+                $('tfoot th').eq(index).html('<%= Money.new(0, organisation.currency).symbol %>' + sum.toLocaleString());
             });
           })
           $('#event_stats').DataTable().draw();
@@ -43,7 +45,7 @@
       <th></th>
       <th style="min-width: 12.5em" data-col-name="date">Date</th>
       <th>Coordinator</th>
-      <th><% if @event.organisation.verified? %>Organiser/Revenue sharer<% else %>Revenue sharer<% end %></th>
+      <th><% if organisation.verified? %>Organiser/Revenue sharer<% else %>Revenue sharer<% end %></th>
       <th>Facilitators</th>
       <th>Tags</th>
       <th>Activity</th>
@@ -58,7 +60,6 @@
       <th>Feedback</th>
     </tr>
   </thead>
-  <% organisation = params[:cohost] ? Organisation.find_by(slug: params[:cohost]) : @organisation %>
   <% events.each { |event| %>
   <tr data-pagelet-url="/events/<%= event.id %>/stats_row<%= "?timezone=#{Time.zone.name}#{"&organisation_id=#{organisation.id}" if organisation}" %>"><% if @event %><%= cp(:'events/event_stats_row', locals: { event: @event, organisation: organisation }, key: "/events/#{@event.id}/stats_row?timezone=#{Time.zone.name}#{"&organisation_id=#{organisation.id}" if organisation}") %><% end %></tr>
   <% } %>
