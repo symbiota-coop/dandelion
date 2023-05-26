@@ -441,12 +441,17 @@ img.private:hover {
   background-color: $color_primary
 }
 
+.ck-content blockquote,
 blockquote {
   margin-bottom: 1rem;
   font-size: 1rem;
-  border-left: 0.25rem solid rgba(0, 185, 99, 0.33);
+  border-left: 0.25rem solid rgba(0, 185, 99, 0.33) !important;
   padding-left: 1rem;
   font-style: italic;
+}
+
+blockquote p {
+  margin: 0
 }
 
 small.form-text {

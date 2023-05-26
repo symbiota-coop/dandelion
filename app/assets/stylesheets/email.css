@@ -35,8 +35,16 @@ img {
 }
 
 blockquote {
-  border-left: 8px solid #ddd;
-  padding-left: 1em
+  margin-bottom: 1rem;
+  font-size: 1rem;
+  border-left: 0.25rem solid rgba(0, 185, 99, 0.33);
+  padding-left: 1rem;
+  font-style: italic;
+  margin-left: 0;
+}
+
+blockquote p {
+  margin: 0
 }
 
 .password {
@@ -121,4 +129,18 @@ a.attachment {
 
 figure {
   margin: 0
+}
+
+pre {
+  padding: 1em;
+  color: #353535;
+  background: #eee;
+  border: 1px solid #c4c4c4;
+  border-radius: 2px;
+  text-align: left;
+  direction: ltr;
+  tab-size: 4;
+  white-space: pre-wrap;
+  font-style: normal;
+  min-width: 200px;
 }
