@@ -144,3 +144,26 @@ pre {
   font-style: normal;
   min-width: 200px;
 }
+
+
+.ck-content .image-style-align-left,
+.image-style-align-left {
+  float: none !important;
+  margin-right: auto !important;
+  text-align: left !important;
+}
+
+.ck-content .image-style-align-right,
+.image-style-align-right {
+  float: none !important;
+  margin-left: auto !important;
+  text-align: right !important;
+}
+
+.ck-content .image-style-align-center,
+.image-style-align-center {
+  float: none !important;
+  margin-left: auto !important;
+  margin-right: auto !important;
+  text-align: center !important;
+}

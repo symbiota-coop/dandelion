@@ -88,7 +88,10 @@ ClassicEditor.defaultConfig = {
 			'link',
 			'bulletedList',
 			'numberedList',
+			'blockQuote',
+			'insertTable',
 			'alignment',
+			'codeBlock',
 			'|',
 			'outdent',
 			'indent',
@@ -96,9 +99,7 @@ ClassicEditor.defaultConfig = {
 			'uploadImage',
 			'mediaEmbed',
 			'htmlEmbed',
-			'blockQuote',
-			'codeBlock',
-			'insertTable',
+			'|',
 			'undo',
 			'redo'
 		]
