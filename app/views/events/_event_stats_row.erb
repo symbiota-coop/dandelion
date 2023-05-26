@@ -42,7 +42,7 @@
     alert('Copied ' + str)
     "><i class="fa fa-code"></i></a>
     <div class="d-none">
-      <a target="_parent" href="<%= ENV['BASE_URI'] %>/events/<%=event.id%><% if params[:cohost] %>?cohost=<%=params[:cohost]%><% end %>"><img src="<%= u event_image.thumb('1920x1920').url %>"></a>
+      <a target="_parent" href="<%= ENV['BASE_URI'] %>/e/<%=event.slug%><% if params[:cohost] %>?cohost=<%=params[:cohost]%><% end %>"><img src="<%= u event_image.thumb('1920x1920').url %>"></a>
     </div>
   <% end %>
 </td>
