@@ -15,29 +15,34 @@
   #pmail_body { height: 30rem; }
 </style>
 
+
+<script type="text/javascript">
+  $(function () {
+
+  <% if params[:preview] %>
+      window.open('/pmails/<%= @pmail.id %>/preview?<%= @scope %>', null, 'scrollbars=yes,width=700,height=600,left=150,top=150').focus();
+  <% end %>
+
+    $('#pmail-form').submit(function() {
+      if($('#pmail_to_option').val().length == 0) {
+        alert('Please set the To field')
+        return false
+      }
+    })
+
+  });
+</script>
+
 <% unless @pmail.wysiwyg? %>
   <script type="text/javascript">
     var easyMDE
     $(function () {
-
-    <% if params[:preview] %>
-        window.open('/pmails/<%= @pmail.id %>/preview?<%= @scope %>', null, 'scrollbars=yes,width=700,height=600,left=150,top=150').focus();
-    <% end %>
-
       easyMDE = new EasyMDE({
         element: $("#pmail_body")[0],
         autoDownloadFontAwesome: false,
         inputStyle: 'contenteditable',
         spellChecker: false,
       });
-
-      $('#pmail-form').submit(function() {
-        if($('#pmail_to_option').val().length == 0) {
-          alert('Please set the To field')
-          return false
-        }
-      })
-
     });
   </script>
   <script src="/javascripts/clipboard2markdown.js?<%= @cachebuster %>"></script>

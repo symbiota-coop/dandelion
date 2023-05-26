@@ -23,7 +23,7 @@
   <% if event_image %>
     <a data-toggle="tooltip" title="Copy Markdown image code" class="btn btn-sm btn-primary" href="javascript:;" onclick="
   var el = document.createElement('textarea');
-  var str = '[![](<%= escape_javascript(u(event_image.url)) %>)](<%= ENV['BASE_URI'] %><%= "/e/#{event.slug}#{if organisation && organisation != event.organisation; "?cohost=#{organisation.slug}"; end }" %>)'
+  var str = '[![](<%= escape_javascript(u(event_image.thumb('1920x1920').url)) %>)](<%= ENV['BASE_URI'] %><%= "/e/#{event.slug}#{if organisation && organisation != event.organisation; "?cohost=#{organisation.slug}"; end }" %>)'
   el.value = str;
   document.body.appendChild(el);
   el.select();
@@ -31,6 +31,19 @@
   document.body.removeChild(el);
   alert('Copied ' + str)
   "><i class="fa fa-image"></i></a>
+    <a data-toggle="tooltip" title="Copy HTML image code" class="btn btn-sm btn-primary" href="javascript:;" onclick="
+  var el = document.createElement('textarea');
+    str = $(this).next().html();
+    el.value = str.trim();
+    document.body.appendChild(el);
+    el.select();
+    document.execCommand('copy');
+    document.body.removeChild(el);
+    alert('Copied ' + str)
+    "><i class="fa fa-code"></i></a>
+    <div class="d-none">
+      <a target="_parent" href="<%= ENV['BASE_URI'] %>/events/<%=event.id%><% if params[:cohost] %>?cohost=<%=params[:cohost]%><% end %>"><img src="<%= u event_image.thumb('1920x1920').url %>"></a>
+    </div>
   <% end %>
 </td>
 <td data-sort="<%=event.start_time.to_fs(:db_local)%>"><%= when_details(event) %></td>

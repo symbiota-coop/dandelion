@@ -108,3 +108,7 @@ a.attachment {
   text-decoration: none;
   display: block;
 }
+
+figure {
+  margin: 0
+}
