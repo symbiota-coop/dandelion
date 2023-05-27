@@ -97,11 +97,16 @@ blockquote p {
   text-align: center;
 }
 
+p.lead {
+  font-size: 1.25rem;
+}
+
 p.action {
   text-align: center
 }
 
 p.action a {
+  display: inline-block;
   background: #00B963;
   color: white;
   text-decoration: none;
@@ -171,8 +176,4 @@ figcaption {
   font-size: 0.75rem;
   margin-top: 0.25rem;
   text-align: center
-}
-
-p.lead {
-  font-size: 1.25rem;
 }
