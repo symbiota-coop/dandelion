@@ -187,12 +187,23 @@ module Dandelion
     end
 
     get '/youtube_thumb/:id' do
-      background = Magick::Image.read("https://i.ytimg.com/vi/#{params[:id]}/sddefault.jpg").first
-      background = background.crop(0, 60, 640, 360)
-      overlay = Magick::Image.read('app/assets/images/youtube.png').first
-      overlay_x = (background.columns - overlay.columns) / 2
-      overlay_y = (background.rows - overlay.rows) / 2
-      result = background.composite(overlay, overlay_x, overlay_y, Magick::OverCompositeOp)
+      # load base image
+      base_image = MiniMagick::Image.open("https://i.ytimg.com/vi/#{params[:id]}/sddefault.jpg")
+      base_image = base_image.crop('640x360+0+60')
+
+      # load overlay image
+      overlay_image = MiniMagick::Image.open('app/assets/images/youtube.png')
+
+      # calculate coordinates to place the overlay image in the center
+      x_coordinate = (base_image.width - overlay_image.width) / 2
+      y_coordinate = (base_image.height - overlay_image.height) / 2
+
+      # create a new image which is the result of the composite operation
+      result = base_image.composite(overlay_image) do |c|
+        c.compose 'Over' # OverCompositeOp
+        c.geometry "+#{x_coordinate}+#{y_coordinate}" # place overlay image at calculated coordinates
+      end
+
       content_type 'image/jpeg'
       result.to_blob
     end
