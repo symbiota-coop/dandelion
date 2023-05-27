@@ -77,7 +77,7 @@ module Dandelion
         end
       end
       PageView.create(path: request.path, query_string: request.query_string) if File.extname(request.path).blank? && !request.xhr? && !request.is_crawler?
-      @og_desc = 'Dandelion is an open-source platform for regenerative events and co-created gatherings created by the not-for-profit worker co-operative Dandelion Collective'
+      @og_desc = 'Find and host regenerative events and co-created gatherings 🧘🏼‍♀️ 🌱 🕺'
       @og_image = "#{ENV['BASE_URI']}/images/black-on-white-link.png"
       # @no_discord = true if params[:minimal]
       @no_discord = true
