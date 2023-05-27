@@ -718,6 +718,7 @@ p.action {
 }
 
 p.action a {
+  display: inline-block;
   background: $color_primary !important;
   color: white;
   text-decoration: none;
