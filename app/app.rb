@@ -186,6 +186,17 @@ module Dandelion
       erb :'emails/notification', locals: { notification: @notification, circle: @notification.circle }, layout: false
     end
 
+    get '/youtube_thumb/:id' do
+      background = Magick::Image.read("https://i.ytimg.com/vi/#{params[:id]}/sddefault.jpg").first
+      background = background.crop(0, 60, 640, 360)
+      overlay = Magick::Image.read('app/assets/images/youtube.png').first
+      overlay_x = (background.columns - overlay.columns) / 2
+      overlay_y = (background.rows - overlay.rows) / 2
+      result = background.composite(overlay, overlay_x, overlay_y, Magick::OverCompositeOp)
+      content_type 'image/jpeg'
+      result.to_blob
+    end
+
     post '/upload' do
       sign_in_required!
       upload = current_account.uploads.create(file: params[:upload])
