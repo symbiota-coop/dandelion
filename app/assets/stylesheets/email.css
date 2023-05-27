@@ -173,3 +173,7 @@ figcaption {
   margin-top: 0.25rem;
   text-align: center
 }
+
+p.lead {
+  font-size: 1.25rem;
+}
