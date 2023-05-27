@@ -120,12 +120,7 @@
 <% } %>
 
 <%= favicon_tag 'black-on-transparent-sq.png' %>
-<title>
-  <% if @fulltitle %><%= @fulltitle %>
-  <% else %><%= "#{@title} · " if @title %>
-    <%= Padrino.env == :development ? 'DEV' : 'Dandelion' %>
-  <% end %>
-</title>
+<title><% if @fulltitle %><%= @fulltitle %><% else %><%= "#{@title} · " if @title %><%= Padrino.env == :development ? 'DEV' : 'Dandelion' %><% end %></title>
 <meta name="description" content="<%= @og_desc %>">
 <meta property="og:title" content="<%= @title %>">
 <meta property="og:image" content="<%= @og_image %>?<%= @cachebuster %>">
