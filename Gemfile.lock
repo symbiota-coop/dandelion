@@ -391,8 +391,7 @@ GEM
     retriable (3.1.2)
     rexml (3.2.5)
     rinku (2.0.6)
-    rmagick (5.2.0)
-      pkg-config (~> 1.4)
+    rmagick (4.3.0)
     rqrcode (2.1.2)
       chunky_png (~> 1.0)
       rqrcode_core (~> 1.0)
@@ -518,7 +517,7 @@ DEPENDENCIES
   redcarpet
   ri_cal!
   rinku
-  rmagick
+  rmagick (~> 4.0)
   rqrcode
   rubocop
   sanitize
