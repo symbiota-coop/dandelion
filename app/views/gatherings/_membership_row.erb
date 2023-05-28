@@ -21,7 +21,7 @@
   <%= membership.proposed_by.map(&:name).to_sentence(last_word_connector: ' and ') if membership.proposed_by %>
 </td>
 <td>
-  <% mapplication = membership.mapplication; if mapplication and mapplication.answers %>
+  <% mapplication = membership.mapplication; if @membership.admin? && mapplication && mapplication.answers %>
   <a href="javascript:;" onclick="$('#modal .modal-content').load('/g/<%= @gathering.slug %>/mapplications/<%= mapplication.id %>', function () {
           $('#modal').modal('show')
         });">
