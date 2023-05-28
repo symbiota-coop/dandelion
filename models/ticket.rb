@@ -10,8 +10,13 @@ class Ticket
   belongs_to :zoomship, index: true, optional: true
 
   field :price, type: Float
+  field :discounted_price, type: Float
+  ### from order
   field :currency, type: String
+  field :percentage_discount, type: Integer
+  field :percentage_discount_monthly_donor, type: Integer
   field :organisation_revenue_share, type: Float
+  #   
   field :show_attendance, type: Boolean
   field :subscribed_discussion, type: Boolean
   field :checked_in, type: Boolean
@@ -52,6 +57,9 @@ class Ticket
     {
       summary: { type: :text, edit: false },
       price: :number,
+      discounted_price: :number,
+      percentage_discount: :number,
+      percentage_discount_monthly_donor: :number,
       currency: :text,
       payment_completed: :check_box,
       organisation_revenue_share: :number,
@@ -78,12 +86,12 @@ class Ticket
     event.clear_cache if event
   end
 
-  def discounted_price
+  def calculate_discounted_price
     return unless price
 
     p = price.to_f
-    p *= ((100 - (order.try(:percentage_discount) || 0)).to_f / 100)
-    p *= ((100 - (order.try(:percentage_discount_monthly_donor) || 0)).to_f / 100)
+    p *= ((100 - (percentage_discount || 0)).to_f / 100)
+    p *= ((100 - (percentage_discount_monthly_donor || 0)).to_f / 100)
     p.round(2)
   end
 
@@ -114,6 +122,10 @@ class Ticket
 
     self.currency = (order.try(:currency) || event.try(:currency)) unless currency
     self.organisation_revenue_share = order.try(:organisation_revenue_share) unless organisation_revenue_share
+    self.percentage_discount = order.try(:percentage_discount) unless percentage_discount
+    self.percentage_discount_monthly_donor = order.try(:percentage_discount_monthly_donor) unless percentage_discount_monthly_donor
+
+    self.discounted_price = calculate_discounted_price
 
     if new_record?
       unless complementary

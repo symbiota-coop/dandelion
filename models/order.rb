@@ -104,6 +104,7 @@ class Order
     set(payment_completed: true)
     tickets.set(payment_completed: true)
     donations.set(payment_completed: true)
+    event.clear_cache if event
   end
 
   def restore_and_complete
