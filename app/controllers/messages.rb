@@ -12,7 +12,7 @@ Dandelion::App.controller do
       if message
         erb :'messages/messages'
       else
-        redirect '/search'
+        redirect '/search?type=accounts'
       end
     end
   end

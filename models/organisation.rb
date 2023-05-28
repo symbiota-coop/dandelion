@@ -91,6 +91,7 @@ class Organisation
   field :google_sheets_key, type: String
   field :fixed_fee, type: Boolean
   field :terms_and_conditions_url, type: String
+  field :require_organiser_or_revenue_sharer, type: Boolean
 
   field :tokens, type: Float
   index({ tokens: 1 })
@@ -407,6 +408,9 @@ class Organisation
     errors.add(:mailgun_domain, 'must be provided if other Mailgun details have been provided') if (mailgun_api_key || mailgun_region) && !mailgun_domain
     errors.add(:mailgun_api_key, 'must be provided if other Mailgun details have been provided') if (mailgun_domain || mailgun_region) && !mailgun_api_key
     errors.add(:mailgun_region, 'must be provided if other Mailgun details have been provided') if (mailgun_domain || mailgun_api_key) && !mailgun_region
+
+    errors.add(:event_image_required_width, 'must be greater than 0') if event_image_required_width && event_image_required_width <= 0
+    errors.add(:event_image_required_height, 'must be greater than 0') if event_image_required_height && event_image_required_height <= 0
 
     if Padrino.env == :production && account && !account.admin?
       errors.add(:stripe_sk, 'must start with sk_live_') if stripe_sk && !stripe_sk.starts_with?('sk_live_')
