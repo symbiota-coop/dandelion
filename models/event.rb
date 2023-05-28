@@ -601,7 +601,7 @@ class Event
       if organisation && organisation.fixed_fee
         standard
       else
-        five_percent_of_ticket_sales = Money.new(tickets.complete.sum(:price) * 0.05 * 100, currency).exchange_to('GBP')
+        five_percent_of_ticket_sales = Money.new(tickets.complete.sum(:discounted_price) * 0.05 * 100, currency).exchange_to('GBP')
         [standard, five_percent_of_ticket_sales].min
       end
     end
