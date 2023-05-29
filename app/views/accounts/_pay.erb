@@ -117,7 +117,6 @@
         Contribute and receive an <strong>uniquely-generated Dandelion Cityscape NFT</strong> to your email (no crypto wallet required).
       </p>
       <div id="nft-preview" class="text-center">
-        <img>
       </div>
       <style>
         #nft-preview img {
@@ -133,20 +132,24 @@
         $(function() {
           // rotate nft-preview img src every 3 seconds
           var i = 0
-            var srcs = [
-              'https://cdn.discordapp.com/attachments/1112548550614728744/1112694253286608957/Williamkanks_A_whimsical_watercolor_design_featuring_a_bioengin_3e95b027-5d8b-4079-ad24-4fd6e03bd0ce.png',
-              'https://cdn.discordapp.com/attachments/1112548550614728744/1112692708746739793/Williamkanks_A_whimsical_watercolor_design_featuring_a_bioengin_fc8b170f-226e-4afd-854b-267d7541afb2.png',
-              'https://cdn.discordapp.com/attachments/1112548550614728744/1112697839382962206/Williamkanks_A_whimsical_watercolor_design_featuring_a_bioengin_4e5d2771-cfd7-4c56-b2cb-2c03b91fbf6f.png',
-              'https://cdn.discordapp.com/attachments/1112548550614728744/1112694703142481990/Williamkanks_A_whimsical_watercolor_design_featuring_a_bioengin_d223a933-6fa0-48dd-9405-9a27caf261fd.png'
-            ]
-          $('#nft-preview img').attr('src', srcs[i])
-          setInterval(function() {
-            i = (i + 1) % srcs.length
-            $('#nft-preview img').fadeOut(function() {
-              $(this).attr('src', srcs[i])
-            }).fadeIn()
-          }, 4000)
-        })
+          var srcs = [
+            'https://cdn.discordapp.com/attachments/1112548550614728744/1112694253286608957/Williamkanks_A_whimsical_watercolor_design_featuring_a_bioengin_3e95b027-5d8b-4079-ad24-4fd6e03bd0ce.png',
+            'https://cdn.discordapp.com/attachments/1112548550614728744/1112692708746739793/Williamkanks_A_whimsical_watercolor_design_featuring_a_bioengin_fc8b170f-226e-4afd-854b-267d7541afb2.png',
+            'https://cdn.discordapp.com/attachments/1112548550614728744/1112697839382962206/Williamkanks_A_whimsical_watercolor_design_featuring_a_bioengin_4e5d2771-cfd7-4c56-b2cb-2c03b91fbf6f.png',
+            'https://cdn.discordapp.com/attachments/1112548550614728744/1112694703142481990/Williamkanks_A_whimsical_watercolor_design_featuring_a_bioengin_d223a933-6fa0-48dd-9405-9a27caf261fd.png'
+          ]
+          $(srcs).each(function(i, src) {
+            $('<img src="'+src+'" style="position: absolute; top: -9999px; opacity: 0">').appendTo('#nft-preview')
+          })
+          $('#nft-preview img').first().css('position', 'relative').css('top', '0px').css('opacity', 1)
+        setInterval(function() {
+          i = (i + 1) % srcs.length
+          $('#nft-preview img').eq(i-1).animate({opacity: 0}, 500, function() {
+            $(this).css('position', 'absolute').css('top', '-9999px')
+            $('#nft-preview img').eq(i).css('position', 'relative').css('top', '0px').animate({opacity: 1}, 500)
+          })
+        }, 4000)
+              })
       </script>
     <% end %>
 
