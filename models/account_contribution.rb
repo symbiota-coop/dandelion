@@ -40,4 +40,9 @@ class AccountContribution
     batch_message.finalize if ENV['MAILGUN_API_KEY']
   end
   handle_asynchronously :send_notification
+
+  def create_nft
+    NftCollection.order('created_at desc').first.nfts.create(account: account)
+  end
+  handle_asynchronously :create_nft
 end

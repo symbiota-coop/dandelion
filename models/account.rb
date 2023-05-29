@@ -323,6 +323,8 @@ class Account
     )
   end
 
+  has_many :nfts, dependent: :nullify
+
   has_many :account_contributions, dependent: :destroy
 
   has_many :sign_ins, dependent: :destroy
