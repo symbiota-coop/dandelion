@@ -62,7 +62,7 @@
       <%= partial :share %>
     <% end %>
     <% if @order.account %>
-      <%= partial :'accounts/pay', locals: {div_class: 'mt-5',  account: @order.account } %>
+      <%= partial :'accounts/pay', locals: {div_class: 'mt-5',  account: @order.account, nft: true } %>
     <% end %>
   <% end %>
 </div>

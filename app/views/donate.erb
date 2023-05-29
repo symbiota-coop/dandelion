@@ -3,13 +3,17 @@
     <div class="col-lg-8">
       <div class="card my-4">
         <div class="card-body p-4">
-          <p class="lead mb-1">
+          <p class="lead mb-3">
             <mark class="px-0">Thank you so much for donating!</mark> 🎉
           </p>
-          <p class="lead mb-0">
+          <p class="lead">
             <small>
-              You're welcome to <a target="_blank" href="https://dandelion.nolt.io/">make suggestions of how we can improve Dandelion on our Nolt board</a>.
+              Your <strong>uniquely-generated Dandelion Cityscape NFT</strong> has been delivered to a Crossmint account under your email address.
+              Sign in to view/transfer it at <a href="https://www.crossmint.com/signin">crossmint.com</a>.
             </small>
+          </p>
+          <p>
+            You're welcome to <a target="_blank" href="https://dandelion.nolt.io/">make suggestions of how we can improve Dandelion on our Nolt board</a>.
           </p>
         </div>
       </div>
@@ -23,7 +27,7 @@
       <div class="col-lg-8">
         <div class="card my-4">
           <div class="card-body p-4">
-            <%= partial :'accounts/pay', locals: { account: account, force: true } %>
+            <%= partial :'accounts/pay', locals: { account: account, nft: true, force: true } %>
           </div>
         </div>
         <%= partial :badges %>

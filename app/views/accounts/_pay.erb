@@ -106,14 +106,38 @@
     </div>
     -->
 
-    <% if !(defined?(force) && force) %>
-      <% if !@event || @event.organisation.psychedelic? %>
-        <p class="mt-3 mb-0">
-          <a target="_blank" href="https://www.martianmushrooms.co.uk/?ref=9">
-            Receive 10% off supplies at Martian Mushrooms with the code DANDELION
-          </a> 🍄 🚀
-        </p>
-      <% end %>
+    <% if defined?(short_nft) && short_nft %>
+      <p class="mt-2">
+        Contribute and receive an <a href="/donate">uniquely-generated Dandelion Cityscape NFT</a> to your email (no crypto wallet required).
+      </p>
+    <% end %>
+
+    <% if defined?(nft) && nft %>
+      <p class="mt-2">
+        Contribute and receive an <strong>uniquely-generated Dandelion Cityscape NFT</strong> to your email (no crypto wallet required).
+      </p>
+      <div id="nft-preview" class="text-center">
+        <img class="w-50">
+      </div>
+      <script>
+        $(function() {
+          // rotate nft-preview img src every 3 seconds
+          var i = 0
+            var srcs = [
+              'https://cdn.discordapp.com/attachments/1112548550614728744/1112692708746739793/Williamkanks_A_whimsical_watercolor_design_featuring_a_bioengin_fc8b170f-226e-4afd-854b-267d7541afb2.png',
+              'https://cdn.discordapp.com/attachments/1112548550614728744/1112697839382962206/Williamkanks_A_whimsical_watercolor_design_featuring_a_bioengin_4e5d2771-cfd7-4c56-b2cb-2c03b91fbf6f.png',
+              'https://cdn.discordapp.com/attachments/1112548550614728744/1112694703142481990/Williamkanks_A_whimsical_watercolor_design_featuring_a_bioengin_d223a933-6fa0-48dd-9405-9a27caf261fd.png',
+              'https://cdn.discordapp.com/attachments/1112548550614728744/1112694253286608957/Williamkanks_A_whimsical_watercolor_design_featuring_a_bioengin_3e95b027-5d8b-4079-ad24-4fd6e03bd0ce.png'
+            ]
+          $('#nft-preview img').attr('src', srcs[i])
+          setInterval(function() {
+            i = (i + 1) % srcs.length
+            $('#nft-preview img').fadeOut(function() {
+              $(this).attr('src', srcs[i]).fadeIn()
+            })
+          }, 4000)
+        })
+      </script>
     <% end %>
 
     <script>
