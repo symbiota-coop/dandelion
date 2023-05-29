@@ -143,8 +143,8 @@
           setInterval(function() {
             i = (i + 1) % srcs.length
             $('#nft-preview img').fadeOut(function() {
-              $(this).attr('src', srcs[i]).fadeIn()
-            })
+              $(this).attr('src', srcs[i])
+            }).fadeIn()
           }, 4000)
         })
       </script>
