@@ -205,6 +205,35 @@ $(function () {
       mediaEmbed: {
         removeProviders: ['facebook', 'twitter', 'instagram', 'googleMaps', 'flickr']
       }
+    }).then(editor => {
+      editor.editing.view.document.on('clipboardInput', (evt, data) => {
+        const content = data.dataTransfer.getData('text/html')
+
+        if (content) {
+          // We have HTML content from the clipboard.
+          const domParser = new DOMParser()
+          const documentFragment = domParser.parseFromString(content, 'text/html')
+
+          // Traverse the tree and remove color styles.
+          const walker = document.createTreeWalker(
+            documentFragment,
+            NodeFilter.SHOW_ELEMENT,
+            {
+              acceptNode: function (node) {
+                return (node.style.color || node.style.backgroundColor) ? NodeFilter.FILTER_ACCEPT : NodeFilter.FILTER_SKIP
+              }
+            }
+          )
+
+          while (walker.nextNode()) {
+            walker.currentNode.style.removeProperty('color')
+            walker.currentNode.style.removeProperty('background-color')
+          }
+
+          // Update the clipboard content.
+          data.content = editor.data.processor.toView(documentFragment.body.innerHTML)
+        }
+      })
     }).catch(error => {
       console.error(error)
     })

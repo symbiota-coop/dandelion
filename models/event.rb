@@ -232,7 +232,6 @@ class Event
     self.suggested_donation = suggested_donation.round(2) if suggested_donation
     self.minimum_donation = nil unless suggested_donation
     self.minimum_donation = minimum_donation.round(2) if minimum_donation
-    self.description = description.gsub('style="background-color:transparent;color:#1155cc;"', '') if description #  google docs link color
 
     self.slug = ([*('a'..'z')].sample + [*('0'..'9')].sample + [*('a'..'z'), *('0'..'9')].sample(3).join) until slug && !Event.find_by(slug: slug) unless slug
 
