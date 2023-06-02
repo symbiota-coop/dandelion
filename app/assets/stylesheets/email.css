@@ -2,6 +2,19 @@ body {
   background-color: #f2f2f2
 }
 
+table {
+  width: 100%;
+  border-collapse: collapse
+}
+
+th {
+  text-align: left
+}
+
+td {
+  vertical-align: top
+}
+
 .tagline {
   display: none;
   font-size: 1px;
@@ -81,6 +94,10 @@ blockquote {
   padding-left: 1rem;
   font-style: italic;
   margin-left: 0;
+}
+
+p {
+  margin-top: 0
 }
 
 blockquote p {
