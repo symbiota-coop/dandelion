@@ -6,13 +6,15 @@
           <p class="lead mb-3">
             <mark class="px-0">Thank you so much for donating!</mark> 🎉
           </p>
-          <p class="lead">
-            <small>
-              Your <strong>uniquely-generated Dandelion Cityscape NFT</strong> has been delivered to a Crossmint account under your email address.
-              Sign in to view/transfer it at <a href="https://www.crossmint.com/signin">crossmint.com</a>.
-            </small>
-          </p>
-          <p>
+          <% if ENV['OFFER_NFT'] %>
+            <p class="lead">
+              <small>
+                Your <strong>uniquely-generated Dandelion Cityscape NFT</strong> has been delivered to a Crossmint account under your email address.
+                Sign in to view/transfer it at <a href="https://www.crossmint.com/signin">crossmint.com</a>.
+              </small>
+            </p>
+          <% end %>
+          <p class="mb-0">
             You're welcome to <a target="_blank" href="https://dandelion.nolt.io/">make suggestions of how we can improve Dandelion on our Nolt board</a>.
           </p>
         </div>
