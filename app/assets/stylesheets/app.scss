@@ -729,3 +729,20 @@ p.action a {
 p.action a:hover {
   background: $color_primary_hover !important;
 }
+
+.ck-editor th,
+.ck-editor td {
+  width: 50%;
+  padding-right: 8px;
+  padding-bottom: 8px
+}
+
+@media(max-width: 700px) {
+
+  .ck-editor th,
+  .ck-editor td {
+    width: 100%;
+    padding-right: 0;
+    display: inline-block;
+  }
+}
