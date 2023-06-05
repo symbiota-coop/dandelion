@@ -39,9 +39,9 @@ partial :chart, locals: {
 <% end %>
 
 <%
-  orders = Order.and(:created_at.gte => @from, :created_at.lt => @to, :value.ne => nil, :currency.in => MAJOR_CURRENCIES)  
+  orders = Order.and(:created_at.gte => @from, :created_at.lt => @to + 1.day, :value.ne => nil, :currency.in => MAJOR_CURRENCIES)  
   organisations = Organisation.and(:id.in => Event.and(:id.in => orders.pluck(:event_id)).pluck(:organisation_id))  
-  tickets = Ticket.and(:created_at.gte => @from, :created_at.lt => @to, :price.gt => 0)
+  tickets = Ticket.and(:created_at.gte => @from, :created_at.lt => @to + 1.day, :price.gt => 0)
 %>
 <p class="lead mt-3">
   <%= pluralize(organisations.count, 'organisation') %> sold
@@ -69,11 +69,11 @@ partial :chart, locals: {
         <th data-col-name="contribution">Contribution</th>
       </tr>
     </thead>
-    <% organisations = Organisation.and(:id.in => Event.and(:id.in => Order.and(:created_at.gte => @from, :created_at.lt => @to, :value.ne => nil).pluck(:event_id)).pluck(:organisation_id)) %>
+    <% organisations = Organisation.and(:id.in => Event.and(:id.in => Order.and(:created_at.gte => @from, :created_at.lt => @to + 1.day, :value.ne => nil).pluck(:event_id)).pluck(:organisation_id)) %>
     <% organisations.each { |organisation|
     
-    tickets = Ticket.and(:event_id.in => organisation.events.pluck(:id), :created_at.gte => @from, :created_at.lt => @to, :price.gt => 0)
-    orders = Order.and(:event_id.in => organisation.events.pluck(:id), :created_at.gte => @from, :created_at.lt => @to, :value.ne => nil, :currency.in => MAJOR_CURRENCIES)
+    tickets = Ticket.and(:event_id.in => organisation.events.pluck(:id), :created_at.gte => @from, :created_at.lt => @to + 1.day, :price.gt => 0)
+    orders = Order.and(:event_id.in => organisation.events.pluck(:id), :created_at.gte => @from, :created_at.lt => @to + 1.day, :value.ne => nil, :currency.in => MAJOR_CURRENCIES)
     events = Event.and(:id.in => tickets.pluck(:event_id))
     orders_sum = orders.sum { |o| Money.new(o.value*100, o.currency) }.exchange_to('GBP')
 
