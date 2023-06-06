@@ -165,6 +165,21 @@ class Pmail
     end
   end
 
+  def body_with_additions
+    b = body
+    # replace youtu.be links with youtube.com links
+    b = b.gsub(%r{<oembed url="https://youtu\.be/(\w+)"></oembed>}) do |match|
+      video_id = match.match(%r{<oembed url="https://youtu\.be/(\w+)"></oembed>})[1]
+      %(<oembed url="https://www.youtube.com/watch?v=#{video_id}"></oembed>)
+    end
+    # replace youtube.com links with embeds
+    b.gsub(%r{<oembed url="https://www\.youtube\.com/watch\?v=(\w+)"></oembed>}) do |match|
+      video_id = match.match(%r{<oembed url="https://www\.youtube\.com/watch\?v=(\w+)"></oembed>})[1]
+      title = Faraday.get("https://www.youtube.com/watch?v=#{video_id}").body.match(%r{<title>(.*)</title>})[1]
+      "<figure><a href=\"https://www.youtube.com/watch?v=#{video_id}\"><img src=\"#{ENV['BASE_URI']}/youtube_thumb/#{video_id}\"></a><figcaption>#{title.gsub('- YouTube', '')}</figcaption></figure>"
+    end
+  end
+
   after_save do
     organisation.attachments.create(file: file) if file
   end

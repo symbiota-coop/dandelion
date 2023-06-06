@@ -46,11 +46,7 @@
     <div class="container">
       <div class="main">
         <% if pmail.wysiwyg? %>
-          <%= pmail.body.gsub(/<oembed url="https:\/\/www\.youtube\.com\/watch\?v=(\w+)"><\/oembed>/) do |match|
-            video_id = match.match(/<oembed url="https:\/\/www\.youtube\.com\/watch\?v=(\w+)"><\/oembed>/)[1]
-            title = Faraday.get("https://www.youtube.com/watch?v=#{video_id}").body.match(/<title>(.*)<\/title>/)[1]
-            "<figure><a href=\"https://www.youtube.com/watch?v=#{video_id}\"><img src=\"#{ENV['BASE_URI']}/youtube_thumb/#{video_id}\"></a><figcaption>#{title.gsub('- YouTube','')}</figcaption></figure>"
-          end %>
+          <%= pmail.body_with_additions %>
         <% else %>
           <%= markdown = Redcarpet::Markdown.new(Redcarpet::Render::HTML.new(hard_wrap: true), autolink: true, tables: true)
             markdown.render(pmail.body) %>
