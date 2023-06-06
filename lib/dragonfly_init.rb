@@ -16,7 +16,7 @@ Dragonfly.app.configure do
   secret ENV['DRAGONFLY_SECRET']
 
   define_url do |app, job, _opts|
-    if dj = DragonflyJob.find_by(signature: job.signature)
+    if (dj = DragonflyJob.find_by(signature: job.signature))
       "#{ENV['S3_CDN']}/#{dj.uid}"
     else
       dj = DragonflyJob.create(uid: job.store, signature: job.signature)
