@@ -100,6 +100,7 @@ FactoryBot.define do
     sequence(:subject) { |n| "Subject #{n}" }
     sequence(:from) { |n| "Account #{n} <account#{n}@#{ENV['DOMAIN']}>" }
     sequence(:body) { |n| "Body text #{n}" }
+    everyone { true }
     organisation
     account
   end

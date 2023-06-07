@@ -194,7 +194,7 @@ module Dandelion
         begin
           base_image = MiniMagick::Image.open("https://i.ytimg.com/vi/#{params[:id]}/hqdefault.jpg")
         rescue OpenURI::HTTPError
-          404
+          halt 404
         end
       end
       base_image = base_image.crop('640x360+0+60')

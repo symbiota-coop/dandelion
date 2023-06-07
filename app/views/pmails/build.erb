@@ -33,7 +33,7 @@
   });
 </script>
 
-<% unless @pmail.wysiwyg? %>
+<% if @pmail.markdown? %>
   <script type="text/javascript">
     var easyMDE
     $(function () {
@@ -253,11 +253,11 @@
     <%= f.text_block :subject %>
     <%= f.text_block :preview_text %>
 
-    <% if @pmail.wysiwyg? %>
-      <%= f.wysiwyg_block :body %>
-    <% else %>
+    <% if @pmail.markdown? %>
       <div contenteditable="true" id="pastebin" style="opacity: 0.01; width: 100%; height: 1px; overflow: hidden;"></div>
       <%= f.text_area_block :body %>
+    <% else %>
+      <%= f.wysiwyg_block :body %>
     <% end %>
 
     <%= f.text_block :link_params %>
@@ -280,7 +280,7 @@
 
           <div id="attachments" data-pagelet-url="/pmails/<%= organisation.id %>/attachments?<%= @scope %>&file_q=<%= params[:file_q] %>"></div>
           <%= f.file_block :file %>
-          <%= f.hidden_field :wysiwyg, value: @pmail.wysiwyg? ? true : false %>
+          <%= f.hidden_field :markdown, value: @pmail.markdown? ? true : false %>
           <%= f.submit_block button_text: 'Upload' %>
         </div>
       </div>

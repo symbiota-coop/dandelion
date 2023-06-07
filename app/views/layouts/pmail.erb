@@ -45,11 +45,11 @@
     </div>
     <div class="container">
       <div class="main">
-        <% if pmail.wysiwyg? %>
-          <%= pmail.body_with_additions %>
-        <% else %>
+        <% if pmail.markdown? %>
           <%= markdown = Redcarpet::Markdown.new(Redcarpet::Render::HTML.new(hard_wrap: true), autolink: true, tables: true)
             markdown.render(pmail.body) %>
+        <% else %>
+          <%= pmail.body_with_additions %>
         <% end %>
       </div>
     </div>
