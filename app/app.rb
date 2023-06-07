@@ -192,7 +192,7 @@ module Dandelion
         base_image = MiniMagick::Image.open("https://i.ytimg.com/vi/#{params[:id]}/sddefault.jpg")
       rescue OpenURI::HTTPError
         begin
-          base_image = MiniMagick::Image.open("https://i.ytimg.com/vi/#{params[:id]}/hqdefault.jpg")        
+          base_image = MiniMagick::Image.open("https://i.ytimg.com/vi/#{params[:id]}/hqdefault.jpg")
         rescue OpenURI::HTTPError
           404
         end
