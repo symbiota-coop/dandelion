@@ -1,4 +1,6 @@
-<% if pmail.monthly_donors %>
+<% if pmail.everyone %>
+  Everyone in <%= pmail.organisation.name %>
+<% elsif pmail.monthly_donors %>
   Monthly donors
 <% elsif pmail.not_monthly_donors %>
   People who aren't monthly donors
@@ -17,6 +19,4 @@
     <br>
     <small><%= concise_when_details(pmail.mailable) %></small>
   <% end %>
-<% else %>
-  Everyone in <%= pmail.organisation.name %>
 <% end %>

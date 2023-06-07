@@ -163,7 +163,7 @@
        if @organisation
          if organisation_admin?
            to_options << ['', '']
-           to_options << ["Everyone in #{@organisation.name}", 'all']
+           to_options << ["Everyone in #{@organisation.name}", 'everyone']
            to_options << ['Monthly donors', 'monthly_donors']
            to_options << ["People who aren't monthly donors", 'not_monthly_donors']
            to_options << %w[Facilitators facilitators]

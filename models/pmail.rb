@@ -11,6 +11,7 @@ class Pmail
   field :from, type: String
   field :subject, type: String
   field :preview_text, type: String
+  field :everyone, type: Boolean
   field :monthly_donors, type: Boolean
   field :not_monthly_donors, type: Boolean
   field :facilitators, type: Boolean
@@ -27,6 +28,7 @@ class Pmail
       from: :text,
       preview_text: :text,
       body: :text_area,
+      everyone: :check_box,
       monthly_donors: :check_box,
       not_monthly_donors: :check_box,
       facilitators: :check_box,
@@ -58,13 +60,15 @@ class Pmail
   before_validation do
     errors.add(:link_params, 'cannot contain spaces') if link_params && link_params.include?(' ')
 
-    self.monthly_donors = nil
-    self.not_monthly_donors = nil
-    self.facilitators = nil
-    self.mailable = nil
-
     if to_option
-      if to_option == 'monthly_donors'
+      self.everyone = nil
+      self.monthly_donors = nil
+      self.not_monthly_donors = nil
+      self.facilitators = nil
+      self.mailable = nil
+      if to_option == 'everyone'
+        self.everyone = true
+      elsif to_option == 'monthly_donors'
         self.monthly_donors = true
       elsif to_option == 'not_monthly_donors'
         self.not_monthly_donors = true
@@ -87,7 +91,9 @@ class Pmail
   end
 
   def to_selected
-    if monthly_donors
+    if everyone
+      'everyone'
+    elsif monthly_donors
       'monthly_donors'
     elsif not_monthly_donors
       'not_monthly_donors'
@@ -101,13 +107,13 @@ class Pmail
       "local_group:#{mailable_id}"
     elsif mailable.is_a?(Event)
       "event:#{mailable_id}"
-    else
-      'all'
     end
   end
 
   def reason
-    if monthly_donors
+    if everyone
+      "following #{organisation.name}"
+    elsif monthly_donors
       "a monthly donor of #{organisation.name}"
     elsif not_monthly_donors
       "not a monthly donor of #{organisation.name}"
@@ -121,13 +127,13 @@ class Pmail
       "following #{organisation.name}'s local group #{mailable.name}"
     elsif mailable.is_a?(Event)
       "attending #{organisation.name}'s event #{mailable.name}"
-    else
-      "following #{organisation.name}"
     end
   end
 
   def to
-    t = if monthly_donors
+    t = if everyone
+          organisation.subscribed_members
+        elsif monthly_donors
           organisation.subscribed_monthly_donors
         elsif not_monthly_donors
           organisation.subscribed_not_monthly_donors
@@ -135,8 +141,6 @@ class Pmail
           organisation.facilitators
         elsif mailable
           mailable.subscribed_members
-        else
-          organisation.subscribed_members
         end
     t = t.and(:id.nin => event.attendees.pluck(:id)) if event
     t = t.and(:id.nin => activity.future_attendees.pluck(:id)) if activity
