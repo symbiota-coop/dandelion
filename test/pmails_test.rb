@@ -20,7 +20,7 @@ class CoreTest < ActiveSupport::TestCase
     visit "/o/#{@organisation.slug}/pmails"
     click_link 'New message'
     fill_in 'Subject', with: @pmail.subject
-    execute_script %{$('#pmail_to_option').val('all')}
+    execute_script %{$('#pmail_to_option').val('everyone')}
     click_button 'Save'
     assert page.has_content? 'The mail was saved'
   end
