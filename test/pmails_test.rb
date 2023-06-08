@@ -28,15 +28,14 @@ class CoreTest < ActiveSupport::TestCase
   test 'editing a pmail' do
     @account = FactoryBot.create(:account)
     @organisation = FactoryBot.create(:organisation, account: @account)
-    @pmail = FactoryBot.create(:pmail, organisation: @organisation)
+    @pmail = FactoryBot.create(:pmail, organisation: @organisation, everyone: true)
     login_as(@account)
     visit "/o/#{@organisation.slug}/pmails"
     click_link 'Edit'
-    assert page.has_css? '.CodeMirror'
-    execute_script %{easyMDE.value('#{body = FactoryBot.build_stubbed(:pmail).body}')}
+    fill_in 'Subject', with: (subject = FactoryBot.build_stubbed(:pmail).subject)
     click_button 'Save'
     assert page.has_content? 'The mail was saved'
     visit "/pmails/#{@pmail.id}/preview?organisation_id=#{@organisation.id}"
-    assert page.has_content? body
+    assert page.has_title? subject
   end
 end
