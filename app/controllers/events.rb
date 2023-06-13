@@ -191,11 +191,11 @@ Dandelion::App.controller do
       @pixel_purchase = { value: (@order.value || 0), currency: @order.currency }
     end
     if params[:cohost] && (cohost = Organisation.find_by(slug: params[:cohost])) && (cohostship = @event.cohostships.find_by(organisation: cohost)) && cohostship.image
-      @event_image = cohostship.image
-      @og_image = cohostship.image.url
+      @event_image = cohostship.image.thumb('1920x1920')
+      @og_image = cohostship.image.thumb('1920x1920').url
     elsif @event.image
-      @event_image = @event.image
-      @og_image = @event.image.url
+      @event_image = @event.image.thumb('1920x1920')
+      @og_image = @event.image.thumb('1920x1920').url
     elsif @event.organisation && @event.organisation.image
       @og_image = @event.organisation.image.url
     end

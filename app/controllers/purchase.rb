@@ -71,9 +71,9 @@ Dandelion::App.controller do
           Stripe.api_version = '2020-08-27'
 
           if ticketForm[:cohost] && (cohost = Organisation.find_by(slug: ticketForm[:cohost])) && (cohostship = @event.cohostships.find_by(organisation: cohost)) && cohostship.image
-            @event_image = cohostship.image
+            @event_image = cohostship.image.thumb('1920x1920')
           elsif @event.image
-            @event_image = @event.image
+            @event_image = @event.image.thumb('1920x1920')
           end
 
           stripe_session_hash = {
