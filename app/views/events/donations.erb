@@ -32,6 +32,8 @@
     <td>
       <% if donation.account %>
         <%= partial :'accounts/account', locals: { account: donation.account, show_email: donation_email_viewer?(donation) } %>
+      <% else %>
+        (deleted account)
       <% end %>
     </td>
     <td>
