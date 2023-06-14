@@ -1,16 +1,15 @@
 Dandelion::App.helpers do
   def viewable?(account, p, viewer: current_account, viewer_in_network: nil)
-    (account.respond_to?(p) && account.send(p)) && (
-      account.send("#{p}_privacy").nil? ||
+    (
+      account.respond_to?(p) &&
+      account.send(p)) &&
+      (
+        (viewer && viewer.admin?) ||
+        account.send("#{p}_privacy").nil? ||
         (account.send("#{p}_privacy") == 'Public') ||
-        (account.send("#{p}_privacy") == 'People I follow' && (
-          viewer_in_network || (viewer && (viewer.id == account.id || account.network.find(viewer.id)))
-        )
-        ) ||
-        (
-        account.send("#{p}_privacy") == 'Only me' && (viewer && viewer.id == account.id)
+        (account.send("#{p}_privacy") == 'People I follow' && (viewer_in_network || (viewer && (viewer.id == account.id || account.network.find(viewer.id))))) ||
+        (account.send("#{p}_privacy") == 'Only me' && (viewer && viewer.id == account.id))
       )
-    )
   end
 
   def kick!(notice: "You don't have access to that page", r: nil, notice_type: :error)
@@ -158,21 +157,21 @@ Dandelion::App.helpers do
 
   def membership_required!(gathering = nil, account = current_account)
     gathering ||= @gathering
-    unless account && gathering && gathering.memberships.find_by(account: account)
-      kick!(
-        notice: 'You must be a member of that gathering to access that page',
-        r: ("/g/#{gathering.slug}" if %w[open closed].include?(gathering.privacy))
-      )
-    end
+    return if account && gathering && gathering.memberships.find_by(account: account)
+
+    kick!(
+      notice: 'You must be a member of that gathering to access that page',
+      r: ("/g/#{gathering.slug}" if %w[open closed].include?(gathering.privacy))
+    )
   end
 
   def confirmed_membership_required!(gathering = nil, account = current_account)
     gathering ||= @gathering
-    unless account && gathering && ((membership = gathering.memberships.find_by(account: account)) && membership.confirmed?)
-      kick!(
-        notice: (membership ? 'You must make a payment before accessing that page.' : 'You must be a member of the gathering to access that page.'),
-        r: ("/g/#{gathering.slug}" if %w[open closed].include?(gathering.privacy))
-      )
-    end
+    return if account && gathering && ((membership = gathering.memberships.find_by(account: account)) && membership.confirmed?)
+
+    kick!(
+      notice: (membership ? 'You must make a payment before accessing that page.' : 'You must be a member of the gathering to access that page.'),
+      r: ("/g/#{gathering.slug}" if %w[open closed].include?(gathering.privacy))
+    )
   end
 end

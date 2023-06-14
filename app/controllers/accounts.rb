@@ -265,6 +265,13 @@ Dandelion::App.controller do
     redirect "/u/#{@account.username}"
   end
 
+  post '/accounts/:id/reset_password', provides: :json do
+    admins_only!
+    @account = Account.find(params[:id]) || not_found
+    @account.update_attribute(:password, Account.generate_password)
+    { password: @account.password }.to_json
+  end
+
   get '/u/:username' do
     @account = Account.find_by(username: params[:username]) || not_found
     if request.xhr?
