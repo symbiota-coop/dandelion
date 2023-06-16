@@ -287,7 +287,7 @@ class Pmail
     Pmail.create!(
       to_option: to_option,
       from: from,
-      subject: "#{subject} (duplicated #{Time.now})",
+      subject: subject,
       preview_text: preview_text,
       body: body,
       link_params: link_params,

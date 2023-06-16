@@ -551,6 +551,21 @@ class Organisation
     ['', 'EU', 'US']
   end
 
+  def stripe_webhooks
+    Stripe.api_key = stripe_sk
+    Stripe.api_version = '2020-08-27'
+    webhooks = []
+    has_more = true
+    starting_after = nil
+    while has_more
+      w = Stripe::WebhookEndpoint.list({ limit: 100, starting_after: starting_after })
+      webhooks += w.data
+      has_more = w.has_more
+      starting_after = w.data.last.id
+    end
+    webhooks
+  end
+
   def self.human_attribute_name(attr, options = {})
     {
       intro_text: 'Intro text for organisation homepage',
