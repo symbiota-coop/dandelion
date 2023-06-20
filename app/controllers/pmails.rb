@@ -128,7 +128,7 @@ Dandelion::App.controller do
 
   get '/pmails/:oid/attachments/:attachment_id/destroy' do
     @organisation = Organisation.find(params[:oid]) || not_found
-    @organisation.attachments.find(params[:attachment_id]).destroy
+    @organisation.attachments.find(params[:attachment_id]).try(:destroy)
     200
   end
 
