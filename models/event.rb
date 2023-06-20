@@ -99,7 +99,7 @@ class Event
   end
 
   def page_views_count
-    PageView.and(path: "/e/#{slug}").count
+    PageView.or({path: "/e/#{slug}"}, {path: "/events/#{id}"}).count
   end
 
   def self.currencies
