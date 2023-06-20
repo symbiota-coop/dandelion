@@ -359,7 +359,7 @@ class Account
   has_many :zoomships, dependent: :destroy
   has_many :event_facilitations, dependent: :destroy
   has_many :waitships, dependent: :destroy
-  has_many :event_feedbacks, dependent: :destroy
+  has_many :event_feedbacks, dependent: :nullify
   def event_feedbacks_as_facilitator
     EventFeedback.and(:event_id.in => event_facilitations.pluck(:event_id))
   end
