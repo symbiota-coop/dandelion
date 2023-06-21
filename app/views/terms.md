@@ -5,7 +5,7 @@ Please read these terms and conditions carefully before using the Dandelion tick
 ## General Terms
 1.1. The Dandelion platform ("Dandelion") is run by Dandelion Collective Ltd, a not-for-profit worker co-operative registered as a company limited by guarantee, <a href="https://find-and-update.company-information.service.gov.uk/company/09603539">company no. 09603539</a>.
 
-1.2. Dandelion is a service provided solely for the purpose of facilitating the sale and purchase of tickets to various events organised by third-party event organisers ("Event Organisers"). **Dandelion does not organise the events listed on the platform.**
+1.2. Dandelion is a service provided solely for the purpose of facilitating the sale and purchase of tickets to various events organised by third-party event organisers ("Event Organisers"). **Dandelion does not organise the events listed on the platform**, unless specified.
 
 1.3. Dandelion reserves the right to modify or update these terms and conditions at any time without prior notice. The updated terms and conditions will be effective upon posting on the Dandelion website. Continued use of the platform after any such changes constitutes your acceptance of the modified terms and conditions.
 
