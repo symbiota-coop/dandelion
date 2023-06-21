@@ -339,8 +339,14 @@
     <% end %>
     <% if @event.organisation.terms_and_conditions_url %>
       <p><small>
-          By proceeding you agree to <%=@organisation.name%>'s <a href="<%=@event.organisation.terms_and_conditions_url%>" target="_blank">terms and conditions</a><% if @event.organiser || @event.revenue_sharer %>
+          By proceeding you agree to the terms and conditions of <a target="_blank" href="/terms">Dandelion</a> and <a href="<%=@event.organisation.terms_and_conditions_url%>" target="_blank"><%=@organisation.name%></a><% if @event.organiser || @event.revenue_sharer %>
             and understand this event is organised by <%= @event.organiser ? @event.organiser.name : @event.revenue_sharer.name %><% end %>.
+        </small>
+      </p>
+    <% else %>
+      <p><small>
+          By proceeding you agree to Dandelion's <a target="_blank" href="/terms">terms and conditions</a>
+          and understand this event is organised by <%= @event.organisation.name %>.
         </small>
       </p>
     <% end %>

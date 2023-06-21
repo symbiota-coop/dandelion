@@ -114,6 +114,10 @@ module Dandelion
       erb :cookies
     end
 
+    get '/terms' do
+      erb :terms
+    end    
+
     get '/contact' do
       erb :contact
     end
