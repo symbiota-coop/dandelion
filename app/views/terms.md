@@ -3,9 +3,11 @@
 Please read these terms and conditions carefully before using the Dandelion ticketing platform. By accessing or using the platform, you agree to be bound by these terms and conditions.
 
 ## General Terms
-1.1. The Dandelion platform ("Dandelion") run by Dandelion Collective Ltd, a not-for-profit worker co-operative registered as a company limited by guarantee (<a href="https://find-and-update.company-information.service.gov.uk/company/09603539">company no. 09603539</a>), is a service provided solely for the purpose of facilitating the sale and purchase of tickets to various events organised by third-party event organisers ("Event Organisers"). **Dandelion does not organise the events listed on the platform.**
+1.1. The Dandelion platform ("Dandelion") is run by Dandelion Collective Ltd, a not-for-profit worker co-operative registered as a company limited by guarantee, <a href="https://find-and-update.company-information.service.gov.uk/company/09603539">company no. 09603539</a>.
 
-1.2. Dandelion reserves the right to modify or update these terms and conditions at any time without prior notice. The updated terms and conditions will be effective upon posting on the Dandelion website. Continued use of the platform after any such changes constitutes your acceptance of the modified terms and conditions.
+1.2. Dandelion is a service provided solely for the purpose of facilitating the sale and purchase of tickets to various events organised by third-party event organisers ("Event Organisers"). **Dandelion does not organise the events listed on the platform.**
+
+1.3. Dandelion reserves the right to modify or update these terms and conditions at any time without prior notice. The updated terms and conditions will be effective upon posting on the Dandelion website. Continued use of the platform after any such changes constitutes your acceptance of the modified terms and conditions.
 
 ## Ticket Purchases
 2.1. Payments are taken by third-party payment processors including Stripe and Coinbase Commerce directly to accounts run by Event Organisers. **Dandelion does not handle or receive payments for tickets on the platform.**
@@ -36,4 +38,4 @@ Please read these terms and conditions carefully before using the Dandelion tick
 7.1. These terms and conditions shall be governed by and construed in accordance with the laws of the United Kingdom. Any disputes arising out of or in connection with these terms and conditions shall be subject to the exclusive jurisdiction.
 
 ## Contacting us
-8.1 If you have questions or comments about this policy, you may contact us at Dandelion Collective Ltd, 3rd Floor, 86-90 Paul Street, EC2A 4NE or email <a href="mailto:contact@dandelion.events">contact@dandelion.events</a>.
+8.1. If you have questions or comments about this policy, you may contact us at Dandelion Collective Ltd, 3rd Floor, 86-90 Paul Street, EC2A 4NE or email <a href="mailto:contact@dandelion.events">contact@dandelion.events</a>.
