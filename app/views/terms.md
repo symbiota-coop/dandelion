@@ -16,15 +16,15 @@ Please read these terms and conditions carefully before using the Dandelion tick
 
 2.3. Once you have completed a ticket purchase, you will receive an electronic ticket ("e-ticket") via email. It is your responsibility to ensure the accuracy of the provided email address. Dandelion is not responsible for any errors or delays in receiving the e-tickets due to inaccurate email addresses.
 
-## Ticket Resale and Transferability
-3.1. Dandelion allows ticket resale and transferability unless explicitly stated otherwise by the Event Organiser or local laws/regulations.
-
-3.2. Any resale or transfer of tickets is the sole responsibility of the parties involved. Dandelion does not guarantee or verify the authenticity or legitimacy of tickets being resold or transferred.
-
 ## Refunds and Exchanges
-4.1. All refund and exchange requests for tickets purchased through Dandelion must be directed to the respective Event Organiser. **Dandelion is not responsible for processing refunds or exchanges.**
+3.1. All refund and exchange requests for tickets purchased through Dandelion must be directed to the respective Event Organiser. **Dandelion is not responsible for processing refunds or exchanges.**
 
-4.2. The refund and exchange policies are determined by the Event Organisers and may vary for different events. It is your responsibility to review and understand the refund and exchange policies before making a purchase.
+3.2. The refund and exchange policies are determined by the Event Organisers and may vary for different events. It is your responsibility to review and understand the refund and exchange policies before making a purchase.
+
+## Ticket Resale and Transferability
+4.1. Dandelion allows ticket resale and transferability unless explicitly stated otherwise by the Event Organiser or local laws/regulations.
+
+4.2. Any resale or transfer of tickets is the sole responsibility of the parties involved. Dandelion does not guarantee or verify the authenticity or legitimacy of tickets being resold or transferred.
 
 ## Limitation of Liability
 5.1. Dandelion shall not be liable for any direct, indirect, incidental, special, or consequential damages arising out of or in connection with the use of the platform or the purchase of tickets, including but not limited to any loss of profits, revenue, or data.
