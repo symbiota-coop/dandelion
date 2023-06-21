@@ -109,8 +109,8 @@
   <a class="btn btn-primary mb-3" href="/events/new?activity_id=<%= @activity.id %>">Create an event</a>
 <% end %>
 
-<% upcoming_events = @activity.events.live.public.future_and_current_featured.paginate(page: params[:upcoming_events_page].to_i, per_page: 5) %>
-<% past_events = @activity.events.live.public.past.paginate(page: params[:past_events_page].to_i, per_page: 3) %>
+<% upcoming_events = @activity.events.live.public.future_and_current_featured.paginate(page: params[:upcoming_events_page], per_page: 5) %>
+<% past_events = @activity.events.live.public.past.paginate(page: params[:past_events_page], per_page: 3) %>
 
 <% if past_events.count > 0 %>
   <h3 class="mb-3">Upcoming events</h3>
