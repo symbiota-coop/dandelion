@@ -1,24 +1,8 @@
-<script>
-  $(function () {
-    $('#gathering-nav-show').click(function () {
-      $('#gathering-nav > ul').slideDown('fast');
-      $('#gathering-nav-hide').show()
-      $(this).hide()
-    })
-    $('#gathering-nav-hide').click(function () {
-      $('#gathering-nav > ul').slideUp('fast');
-      $('#gathering-nav-show').show()
-      $(this).hide()
-    })
-  })
-</script>
 <p class="mb-1" style="font-size: 1rem"><%= @gathering.name %></p>
 <style>
   #gathering-nav .label-danger { background: rgba(255,60,47,1) }
 </style>
 <div id="gathering-nav" class="mb-3 bg-dark p-1 rounded">
-  <a class="text-white bg-dark p-1 rounded float-right" style="display: none" href="javascript:;" id="gathering-nav-show"><i class="fa fa-navicon"></i></a>
-  <a class="text-white bg-dark p-1 rounded float-right" style="display: inline-block" href="javascript:;" id="gathering-nav-hide"><i class="fa fa-times"></i></a>
   <%= ul_nav [
         ['Home', "/g/#{gathering.slug}"],
         (['Settings', "/g/#{gathering.slug}/edit"] if membership.admin),
