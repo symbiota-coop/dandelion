@@ -14,6 +14,20 @@
       </div>
     <% end %>
     <%= partial :'accounts/buttons', locals: { account: account, modal: (true if defined?(modal)) } %>
+    <% if !defined?(modal) || (defined?(modal) && !modal) %>
+      <% if current_account && current_account.admin? %>
+        <a onclick="
+  $.post('/accounts/<%=account.id%>/reset_password', function(data) {
+var temp = $('<input>');
+          $('body').append(temp);
+          temp.val(data.password).select();
+          document.execCommand('copy');
+          temp.remove();
+          alert('Password copied to clipboard');
+          })
+          " href="javascript:;" class="d-block d-lg-inline-block mb-1 <%= btn_class if defined?(btn_class) %> btn btn-outline-primary">Reset password</a>
+      <% end %>
+    <% end %>
     <%= partial :'accounts/unhide', locals: { account: account } %>
     <% if defined?(modal) %>
       <div class="mt-1">
