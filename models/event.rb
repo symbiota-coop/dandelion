@@ -392,6 +392,7 @@ class Event
       account.admin? ||
         event.account_id == account.id ||
         event.revenue_sharer_id == account.id ||
+        event.organiser_id == account.id ||
         event.coordinator_id == account.id ||
         event.event_facilitations.find_by(account: account) ||
         (event.activity && Activity.admin?(event.activity, account)) ||
