@@ -144,9 +144,9 @@
 
 <% if @event && @event.persisted? %>
   <% if params[:cohost] %>
-    <link rel="canonical" href="<%=ENV['BASE_URI']%>/events/<%=@event.id%>?cohost=<%=params[:cohost]%>" />
+    <link rel="canonical" href="<%=ENV['BASE_URI']%>/e/<%=@event.slug%>?cohost=<%=params[:cohost]%>" />
   <% else %>
-    <link rel="canonical" href="<%=ENV['BASE_URI']%>/events/<%=@event.id%>" />
+    <link rel="canonical" href="<%=ENV['BASE_URI']%>/e/<%=@event.slug%>" />
   <% end %>
   <script type="application/ld+json">
     <%==

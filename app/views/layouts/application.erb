@@ -5,18 +5,6 @@
   <!--<![endif]-->
   <%= partial :'layouts/head' %>
   <body>
-    <div id="fb-root"></div>
-    <script>
-      (function (d, s, id) {
-              var js, fjs = d.getElementsByTagName(s)[0];
-              if (d.getElementById(id))
-                return;
-              js = d.createElement(s);
-              js.id = id;
-              js.src = 'https://connect.facebook.net/en_GB/sdk.js#xfbml=1&version=v3.2&appId=1498399346894704&autoLogAppEvents=1';
-              fjs.parentNode.insertBefore(js, fjs);
-            }(document, 'script', 'facebook-jssdk'));
-    </script>
     <!-- BEGIN #page-container -->
     <div id="page-container" class="page-header-fixed page-sidebar-fixed <% if session[:sidebar_minified] == 'minified' || (!session[:sidebar_minified] && !current_account) %> page-sidebar-minified <% end %>  ">
       <%= partial :alert %>
