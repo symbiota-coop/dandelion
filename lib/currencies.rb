@@ -14,9 +14,14 @@ OPTIMISM_CONTRACT_ADDRESSES = {
 }.freeze
 OPTIMISM_CURRENCIES = OPTIMISM_CONTRACT_ADDRESSES.keys.freeze
 
-EVM_CONTRACT_ADDRESSES = {}.merge(XDAI_CONTRACT_ADDRESSES).merge(CELO_CONTRACT_ADDRESSES).merge(OPTIMISM_CONTRACT_ADDRESSES).freeze
-EVM_CURRENCIES = (XDAI_CURRENCIES + CELO_CURRENCIES + OPTIMISM_CURRENCIES).freeze
-EVM_NETWORK_IDS = { 'XDAI' => 100, 'CELO' => 42_220, 'OPTIMISM' => 10 }.freeze
+POLYGON_CONTRACT_ADDRESSES = {
+  'BREAD' => '0x11d9efDf4Ab4A3bfabf5C7089F56AA4F059AA14C'
+}.freeze
+POLYGON_CURRENCIES = POLYGON_CONTRACT_ADDRESSES.keys.freeze
+
+EVM_CONTRACT_ADDRESSES = {}.merge(XDAI_CONTRACT_ADDRESSES).merge(CELO_CONTRACT_ADDRESSES).merge(OPTIMISM_CONTRACT_ADDRESSES).merge(POLYGON_CONTRACT_ADDRESSES).freeze
+EVM_CURRENCIES = (XDAI_CURRENCIES + CELO_CURRENCIES + OPTIMISM_CURRENCIES + POLYGON_CURRENCIES).freeze
+EVM_NETWORK_IDS = { 'XDAI' => 100, 'CELO' => 42_220, 'OPTIMISM' => 10, 'POLYGON' => 137 }.freeze
 
 COINBASE_CURRENCIES = %w[BTC ETH].freeze
 CRYPTOCURRENCIES = (COINBASE_CURRENCIES + EVM_CURRENCIES + %w[SEEDS]).freeze
@@ -29,9 +34,10 @@ CURRENCIES_HASH = CURRENCIES.map do |currency|
   ["#{currency} (#{[
     ('Stripe' if FIAT_CURRENCIES.include?(currency)),
     ('Coinbase Commerce' if FIAT_CURRENCIES.include?(currency) || COINBASE_CURRENCIES.include?(currency)),
-    ('Gnosis Chain' if XDAI_CURRENCIES.include?(currency)),    
+    ('Gnosis Chain' if XDAI_CURRENCIES.include?(currency)),
     ('Celo' if CELO_CURRENCIES.include?(currency) || currency == 'USD'),
     ('Optimism' if OPTIMISM_CURRENCIES.include?(currency)),
+    ('Polygon' if POLYGON_CURRENCIES.include?(currency)),
     ('SEEDS' if currency == 'SEEDS')
   ].compact.join('/')})", currency]
 end
@@ -42,7 +48,8 @@ CURRENCIES_HASH_WITHOUT_CELO_USD = CURRENCIES.map do |currency|
     ('Coinbase Commerce' if FIAT_CURRENCIES.include?(currency) || COINBASE_CURRENCIES.include?(currency)),
     ('Gnosis Chain' if XDAI_CURRENCIES.include?(currency)),
     ('Celo' if CELO_CURRENCIES.include?(currency)),
-    ('Optimism' if OPTIMISM_CURRENCIES.include?(currency)),    
+    ('Optimism' if OPTIMISM_CURRENCIES.include?(currency)),
+    ('Polygon' if POLYGON_CURRENCIES.include?(currency)),
     ('SEEDS' if currency == 'SEEDS')
   ].compact.join('/')})", currency]
 end

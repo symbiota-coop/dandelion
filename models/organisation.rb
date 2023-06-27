@@ -203,7 +203,7 @@ class Organisation
       banned_emails: 'One per line',
       event_image_required_width: 'Required width for event images in px',
       event_image_required_height: 'Required height for event images in px',
-      evm_address: 'Ethereum-compatible wallet address for receiving tokens via Celo, Optimism and Gnosis Chain',
+      evm_address: 'Ethereum-compatible wallet address for receiving tokens via EVM networks',
       seeds_username: 'SEEDS/Telos username for receiving SEEDS via Telos',
       restrict_cohosting: 'When checked, only admins can add the organisation as a co-host of events'
     }
@@ -741,33 +741,90 @@ class Organisation
     end
   end
 
-  def check_evm_account
+  def self.evm_transactions(evm_address)
+    transactions = []
     agent = Mechanize.new
+
+    # Etherscan
     [
-      begin; JSON.parse(agent.get("https://blockscout.com/poa/xdai/address/#{evm_address}/token-transfers?type=JSON").body); rescue Mechanize::ResponseCodeError; end,
-      begin; JSON.parse(agent.get("https://explorer.celo.org/address/#{evm_address}/token-transfers?type=JSON").body); rescue Mechanize::ResponseCodeError; end,
-      begin; JSON.parse(agent.get("https://blockscout.com/optimism/mainnet/address/#{evm_address}/token-transfers?type=JSON").body); rescue Mechanize::ResponseCodeError; end
-    ].compact.each do |j|
-      items = j['items']
-      items.each do |item|
-        puts h = Nokogiri::HTML(item)
-        puts to = h.search('[data-test=token_transfer] [data-address-hash]')[1].attr('data-address-hash').downcase
-        puts token = h.search('[data-test=token_link]').text.upcase
-        next unless to == evm_address.downcase
+      "https://polygonscan.com/address-tokenpage?m=normal&a=#{evm_address}",
+      "https://celoscan.io/address-tokenpage?m=normal&a=#{evm_address}",
+      "https://gnosisscan.io/address-tokenpage?m=normal&a=#{evm_address}"
+    ].each do |url|
+      puts url
+      page = begin; agent.get(url); rescue Mechanize::ResponseCodeError; end
+      next unless page
 
-        puts amount = h.search('[data-test=token_transfer] > span')[1].text.split(' ').first.gsub(',', '')
+      page.search('table tr')[1..-1].each do |tr|
+        to = tr.search('td')[6].text
+        next unless to.downcase == evm_address.downcase
 
-        if (@order = Order.find_by(:payment_completed.ne => true, :currency => token, :evm_value => amount))
-          @order.payment_completed!
-          @order.send_tickets
-          @order.create_order_notification
-        elsif (@order = Order.deleted.find_by(:payment_completed.ne => true, :evm_value => amount))
-          begin
-            @order.restore_and_complete
-            # raise Order::Restored
-          rescue StandardError => e
-            Airbrake.notify(e, order: @order)
-          end
+        token_address = tr.search('td')[8].search('a')[0]['href'].split('/')[2].split('?')[0]
+        next unless token_address
+
+        token_find = EVM_CONTRACT_ADDRESSES.invert.find { |k, _v| k.downcase == token_address.downcase }
+        next unless token_find
+
+        token = token_find[1]
+        next unless token
+
+        amount = tr.search('td')[7].text.gsub(',', '').to_f
+        next unless amount
+
+        puts [token, amount]
+        transactions << [token, amount]
+      end
+    end
+
+    # Blockscout
+    [
+      "https://optimism.blockscout.com/api/v2/addresses/#{evm_address}/token-transfers"
+    ].each do |url|
+      puts url
+      page = begin; agent.get(url); rescue Mechanize::ResponseCodeError; end
+      next unless page
+
+      j = JSON.parse(page.body)
+      j['items'].each do |item|
+        to = item['to']['hash']
+        next unless to.downcase == evm_address.downcase
+
+        token_address = item['token']['address']
+        next unless token_address
+
+        token_find = EVM_CONTRACT_ADDRESSES.invert.find { |k, _v| k.downcase == token_address.downcase }
+        next unless token_find
+
+        token = token_find[1]
+        next unless token
+
+        amount = item['total']['value'].to_f / (10**item['total']['decimals'].to_i)
+        next unless amount
+
+        puts [token, amount]
+        transactions << [token, amount]
+      end
+    end
+
+    transactions
+  end
+
+  def evm_transactions
+    Organisation.evm_transactions(evm_address)
+  end
+
+  def check_evm_account
+    evm_transactions.each do |token, amount|
+      if (@order = Order.find_by(:payment_completed.ne => true, :currency => token, :evm_value => amount))
+        @order.payment_completed!
+        @order.send_tickets
+        @order.create_order_notification
+      elsif (@order = Order.deleted.find_by(:payment_completed.ne => true, :evm_value => amount))
+        begin
+          @order.restore_and_complete
+          # raise Order::Restored
+        rescue StandardError => e
+          Airbrake.notify(e, order: @order)
         end
       end
     end

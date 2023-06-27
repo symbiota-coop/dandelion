@@ -113,6 +113,8 @@ class Event
       'Celo'
     elsif OPTIMISM_CURRENCIES.include?(currency)
       'Optimism'
+    elsif POLYGON_CURRENCIES.include?(currency)
+      'Polygon'
     end
   end
 
@@ -124,6 +126,8 @@ class Event
         'CELO'
       elsif OPTIMISM_CURRENCIES.include?(currency)
         'OPTIMISM'
+      elsif POLYGON_CURRENCIES.include?(currency)
+        'POLYGON'
       end
     ]
   end

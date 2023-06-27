@@ -284,7 +284,9 @@ class Gathering
     elsif CELO_CURRENCIES.include?(currency)
       'Celo'
     elsif OPTIMISM_CURRENCIES.include?(currency)
-      'Optimism'      
+      'Optimism'
+    elsif POLYGON_CURRENCIES.include?(currency)
+      'Polygon'
     end
   end
 
@@ -295,10 +297,12 @@ class Gathering
       elsif CELO_CURRENCIES.include?(currency)
         'CELO'
       elsif OPTIMISM_CURRENCIES.include?(currency)
-        'OPTIMISM'            
+        'OPTIMISM'
+      elsif POLYGON_CURRENCIES.include?(currency)
+        'POLYGON'
       end
     ]
-  end    
+  end
 
   def admins
     Account.and(:id.in => memberships.and(admin: true).pluck(:account_id))
@@ -495,24 +499,13 @@ class Gathering
     end
   end
 
+  def evm_transactions
+    Organisation.evm_transactions(evm_address)
+  end
+
   def check_evm_account
-    agent = Mechanize.new
-    [
-      begin; JSON.parse(agent.get("https://blockscout.com/poa/xdai/address/#{evm_address}/token-transfers?type=JSON").body); rescue Mechanize::ResponseCodeError; end,
-      begin; JSON.parse(agent.get("https://explorer.celo.org/address/#{evm_address}/token-transfers?type=JSON").body); rescue Mechanize::ResponseCodeError; end,
-      begin; JSON.parse(agent.get("https://blockscout.com/optimism/mainnet/address/#{evm_address}/token-transfers?type=JSON").body); rescue Mechanize::ResponseCodeError; end
-    ].each do |j|
-      items = j['items']
-      items.each do |item|
-        h = Nokogiri::HTML(item)
-        puts to = h.search('[data-test=token_transfer] [data-address-hash]')[1].attr('data-address-hash').downcase
-        puts token = h.search('[data-test=token_link]').text.upcase
-        next unless to == evm_address.downcase
-
-        puts amount = h.search('[data-test=token_transfer] > span')[1].text.split(' ').first.gsub(',', '')
-
-        Payment.create(payment_attempt: @payment_attempt) if (@payment_attempt = payment_attempts.find_by(currency: token, evm_amount: amount))
-      end
+    evm_transactions.each do |token, amount|
+      Payment.create(payment_attempt: @payment_attempt) if (@payment_attempt = payment_attempts.find_by(currency: token, evm_amount: amount))
     end
   end
 end
