@@ -35,14 +35,14 @@ CURRENCIES_HASH = CURRENCIES.map do |currency|
     ('Stripe' if FIAT_CURRENCIES.include?(currency)),
     ('Coinbase Commerce' if FIAT_CURRENCIES.include?(currency) || COINBASE_CURRENCIES.include?(currency)),
     ('Gnosis Chain' if XDAI_CURRENCIES.include?(currency)),
-    ('Celo' if CELO_CURRENCIES.include?(currency) || currency == 'USD'),
+    ('Celo' if CELO_CURRENCIES.include?(currency)),
     ('Optimism' if OPTIMISM_CURRENCIES.include?(currency)),
-    ('Polygon' if POLYGON_CURRENCIES.include?(currency)),
+    ('Polygon' if POLYGON_CURRENCIES.include?(currency) || currency == 'USD'),
     ('SEEDS' if currency == 'SEEDS')
   ].compact.join('/')})", currency]
 end
 
-CURRENCIES_HASH_WITHOUT_CELO_USD = CURRENCIES.map do |currency|
+CURRENCIES_HASH_UNBAKED = CURRENCIES.map do |currency|
   ["#{currency} (#{[
     ('Stripe' if FIAT_CURRENCIES.include?(currency)),
     ('Coinbase Commerce' if FIAT_CURRENCIES.include?(currency) || COINBASE_CURRENCIES.include?(currency)),

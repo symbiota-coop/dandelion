@@ -109,11 +109,11 @@ class Event
   def chain
     if XDAI_CURRENCIES.include?(currency)
       'Gnosis Chain'
-    elsif CELO_CURRENCIES.include?(currency) || currency == 'USD'
+    elsif CELO_CURRENCIES.include?(currency)
       'Celo'
     elsif OPTIMISM_CURRENCIES.include?(currency)
       'Optimism'
-    elsif POLYGON_CURRENCIES.include?(currency)
+    elsif POLYGON_CURRENCIES.include?(currency) || currency == 'USD'
       'Polygon'
     end
   end
@@ -122,11 +122,11 @@ class Event
     EVM_NETWORK_IDS[
       if XDAI_CURRENCIES.include?(currency)
         'XDAI'
-      elsif CELO_CURRENCIES.include?(currency) || currency == 'USD'
+      elsif CELO_CURRENCIES.include?(currency)
         'CELO'
       elsif OPTIMISM_CURRENCIES.include?(currency)
         'OPTIMISM'
-      elsif POLYGON_CURRENCIES.include?(currency)
+      elsif POLYGON_CURRENCIES.include?(currency) || currency == 'USD'
         'POLYGON'
       end
     ]

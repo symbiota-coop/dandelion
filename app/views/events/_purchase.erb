@@ -412,7 +412,7 @@
   <div class="card-body">
     <p class="lead please"></p>
     <p class="web3wallet"></p>
-    <% if @event.organisation.evm_address && (CELO_CURRENCIES.include?(@event.currency) || @event.currency == 'USD') %>
+    <% if @event.organisation.evm_address && CELO_CURRENCIES.include?(@event.currency) %>
       <div class="qr mb-3">
         <p class="mb-1">or use this QR code with Valora:</p>
         <div id="qrcode"></div>
@@ -437,7 +437,7 @@
     coinbase = <%= @event.organisation.coinbase_api_key ? true : false %>
     seedsUsername = <%== @event.organisation.seeds_username.to_json %>
     evmAddress = <%== @event.organisation.evm_address.to_json %>
-    contractAddress = <%== EVM_CONTRACT_ADDRESSES[@event.currency == 'USD' ? 'CUSD' : @event.currency].to_json %>
+    contractAddress = <%== EVM_CONTRACT_ADDRESSES[@event.currency == 'USD' ? 'BREAD' : @event.currency].to_json %>
     networkId = <%= @event.network_id %>
     networkName = '<%= @event.chain %>'
     signedIn = <%= current_account ? true : false %>

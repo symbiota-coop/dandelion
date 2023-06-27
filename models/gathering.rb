@@ -275,7 +275,7 @@ class Gathering
   end
 
   def self.currencies
-    CURRENCIES_HASH_WITHOUT_CELO_USD
+    CURRENCIES_HASH_UNBAKED
   end
 
   def chain
