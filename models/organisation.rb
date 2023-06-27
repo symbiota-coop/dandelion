@@ -756,8 +756,10 @@ class Organisation
       next unless page
 
       page.search('table tr')[1..-1].each do |tr|
-        to = tr.search('td')[6].text
-        next unless to.downcase == evm_address.downcase
+        to_cell = tr.search('td')[6]
+        next unless to_cell
+        to = to_cell.text
+        next unless to && to.downcase == evm_address.downcase
 
         token_address = tr.search('td')[8].search('a')[0]['href'].split('/')[2].split('?')[0]
         next unless token_address

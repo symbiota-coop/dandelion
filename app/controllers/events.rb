@@ -565,7 +565,7 @@ Dandelion::App.controller do
 
   get '/events/:id/orders/:order_id/payment_completed', provides: :json do
     @event = Event.find(params[:id]) || not_found
-    @order = @event.orders.find(params[:order_id])
+    @order = @event.orders.find(params[:order_id]) || not_found
     @event.organisation.check_seeds_account if @order.seeds_secret && @event.organisation.seeds_username
     @event.organisation.check_evm_account if @order.evm_secret && @event.organisation.evm_address
     { id: @order.id.to_s, payment_completed: @order.payment_completed }.to_json
