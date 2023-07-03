@@ -28,8 +28,8 @@
         points.push({
           model_name: '<%= point.class.to_s %>',
           id: '<%= point.id %>',
-          lat: <%= point.lat + ([Account, ActivityApplication, Event, Organisationship].include?(point.class) ? (rand - 0.5) * 0.0035 : 0) %>,
-          lng: <%= point.lng + ([Account, ActivityApplication, Event, Organisationship].include?(point.class) ? (rand - 0.5) * 0.0035 : 0) %>,
+          lat: <%= point.lat + ([Account, ActivityApplication, Event, Organisationship].include?(point.class) ? (rand - 0.5) * 0.01 : 0) %>,
+          lng: <%= point.lng + ([Account, ActivityApplication, Event, Organisationship].include?(point.class) ? (rand - 0.5) * 0.01 : 0) %>,
         })
   <% } %>
   <% end %>
