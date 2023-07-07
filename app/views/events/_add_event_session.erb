@@ -1,9 +1,15 @@
 <ul class="fa-ul" style="margin-left: 1.5em">
   <% event_sessions.each_with_index { |event_session,i| %>
-  <li>
+  <li <% if i > 2%> style="display:none" <% end %>>
     <i data-toggle="tooltip" title="Session <%=i+1%>" class="fa fa-li fa-clock"></i> <%= when_details(event_session, with_zone: false) %>
   </li>
+  <% if i == 2 && event_sessions.count > 3 %>
+    <li>
+      <i data-toggle="tooltip" class="fa fa-li fa-clock"></i>  <a href="javascript:;" onclick="$(this).hide().parent().nextAll().show()"><%= event_sessions.count - 3 %> more</a>
+    </li>
+  <% end %>
   <% } %>
+
 
   <% if add_and_remove %>
     <li>
