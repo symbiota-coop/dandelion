@@ -18,7 +18,7 @@ Dandelion::App.controller do
       if (account_contribution = AccountContribution.find_by(session_id: session.id))
         account_contribution.set(payment_completed: true)
         account_contribution.send_notification
-        account_contribution.create_nft
+        # account_contribution.create_nft
       end
     end
     halt 200
