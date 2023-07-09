@@ -137,7 +137,7 @@ class Event
     q.empty? ? [] : q
   end
 
-  %w[no_discounts hide_attendees hide_discussion refund_deleted_orders monthly_donors_only draft secret zoom_party show_emails include_in_parent featured opt_in_facilitator hide_few_left hide_organisation_footer ask_hear_about send_order_notifications raw_description].each do |b|
+  %w[no_discounts hide_attendees hide_discussion refund_deleted_orders monthly_donors_only draft secret zoom_party show_emails include_in_parent featured opt_in_facilitator hide_few_left hide_organisation_footer ask_hear_about send_order_notifications raw_description prevent_reminders].each do |b|
     field b.to_sym, type: Boolean
     index({ b.to_s => 1 })
   end
@@ -635,6 +635,7 @@ class Event
 
   def send_reminders(account_id: nil)
     return unless organisation
+    return if prevent_reminders
 
     mg_client = Mailgun::Client.new ENV['MAILGUN_API_KEY'], ENV['MAILGUN_REGION']
     batch_message = Mailgun::BatchMessage.new(mg_client, ENV['MAILGUN_NOTIFICATIONS_HOST'])
@@ -860,7 +861,8 @@ class Event
       ask_hear_about: 'Ask people how they heard about the event',
       capacity: 'Total capacity',
       gathering_id: 'Add people that buy tickets to this gathering',
-      send_order_notifications: 'Send email notifications of orders'
+      send_order_notifications: 'Send email notifications of orders',
+      prevent_reminders: 'Prevent reminder email',
     }[attr.to_sym] || super
   end
 
@@ -907,7 +909,8 @@ class Event
       facebook_pixel_id: 'Your Facebook Pixel ID for tracking sales',
       purchase_url: "URL where people can buy tickets (if you're not selling tickets on Dandelion)",
       capacity: 'Caps the total number of tickets issued across all ticket types. Optional',
-      send_order_notifications: 'Send email notifications of orders to event facilitators'
+      send_order_notifications: 'Send email notifications of orders to event facilitators',
+      prevent_reminders: 'Prevent reminder email from being sent before the event'
     }
   end
 
