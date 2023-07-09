@@ -862,7 +862,7 @@ class Event
       capacity: 'Total capacity',
       gathering_id: 'Add people that buy tickets to this gathering',
       send_order_notifications: 'Send email notifications of orders',
-      prevent_reminders: 'Prevent reminder email',
+      prevent_reminders: 'Prevent reminder email'
     }[attr.to_sym] || super
   end
 
