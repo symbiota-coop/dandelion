@@ -176,7 +176,7 @@ $(function () {
                 if (_data.payment_completed) { window.location = '?success=true&order_id=' + data.order_id }
               })
             }
-          }, 5 * 1000)
+          }, 30 * 1000)
         } else if (data.evm_secret) {
           // EVM
           $('#select-tickets').hide()

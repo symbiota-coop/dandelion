@@ -1001,7 +1001,7 @@ class Event
         transactions << [currency, amount, name]
       end
     end
-    
+
     transactions
   end
 
