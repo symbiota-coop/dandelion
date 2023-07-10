@@ -176,7 +176,6 @@ class Order
       # seeds_usd = seeds['symbolInfo']['askPrice'] * telos['telos']['usd']
       # self.seeds_value = (Money.new(value * 100, currency).exchange_to('USD').dollars.to_i / seeds_usd).round
     end
-    self.oc_name = account.name if account
     self.discount_code = nil if discount_code && !discount_code.applies_to?(event)
     self.percentage_discount = discount_code.percentage_discount if discount_code
     if !percentage_discount && !event.no_discounts && (organisationship_for_discount = event.organisationship_for_discount(account))
