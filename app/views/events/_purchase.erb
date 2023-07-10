@@ -376,6 +376,13 @@
       </button>
       <%= hidden_field_tag :payment_method, value: 'seeds', disabled: true %>
     <% end %>
+    <% if @event.oc_slug %>
+      <button class="btn btn-primary btn-block mb-1 btn-dotted" type="submit" data-payment-method="opencollective">
+        <span>Pay with Open Collective</span>
+        <i class="fa fa-spin fa-circle-o-notch" style="display: none"></i>
+      </button>
+      <%= hidden_field_tag :payment_method, value: 'opencollective', disabled: true %>
+    <% end %>
     <% if @event.organisation.evm_address && (EVM_CURRENCIES.include?(@event.currency) || (@event.currency == 'USD')) %>
       <button class="btn btn-primary btn-block mb-1 btn-dotted" type="submit" data-payment-method="evm">
         <span>Pay with <%= @event.chain %></span>
@@ -399,6 +406,14 @@
 </div>
 <div class="card" id="pay-with-seeds" style="display: none">
   <h3 class="card-header bg-primary text-white">Pay with SEEDS</h3>
+  <div class="card-body">
+    <p class="lead please"></p>
+    <p class="lead memo text-monospace font-weight-bold text-center"></p>
+    <p>Looking for your transaction... <i class="fa fa-spin fa-circle-o-notch"></i></p>
+  </div>
+</div>
+<div class="card" id="pay-with-opencollective" style="display: none">
+  <h3 class="card-header bg-primary text-white">Pay with Open Collective</h3>
   <div class="card-body">
     <p class="lead please"></p>
     <p class="lead memo text-monospace font-weight-bold text-center"></p>
@@ -436,6 +451,7 @@
     stripePk = <%== @event.organisation.stripe_pk.to_json %>
     coinbase = <%= @event.organisation.coinbase_api_key ? true : false %>
     seedsUsername = <%== @event.organisation.seeds_username.to_json %>
+    ocSlug = <%== @event.oc_slug.to_json %>
     evmAddress = <%== @event.organisation.evm_address.to_json %>
     contractAddress = <%== EVM_CONTRACT_ADDRESSES[@event.currency == 'USD' ? 'BREAD' : @event.currency].to_json %>
     networkId = <%= @event.network_id %>

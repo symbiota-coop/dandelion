@@ -144,6 +144,13 @@ Dandelion::App.controller do
           )
           { seeds_secret: @order.seeds_secret, seeds_value: @order.seeds_value, order_id: @order.id.to_s, order_expiry: (@order.created_at + 1.hour).to_datetime.strftime('%Q') }.to_json
 
+        when 'opencollective'
+
+          @order.update_attributes!(
+            value: @order.total.round(2)
+          )
+          { oc_name: @order.oc_name, currency: @order.currency, value: @order.value, order_id: @order.id.to_s, order_expiry: (@order.created_at + 1.hour).to_datetime.strftime('%Q') }.to_json
+
         when 'evm'
 
           evm_secret = Array.new(6) { [*'1'..'9'].sample }.join

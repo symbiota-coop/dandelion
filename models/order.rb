@@ -28,6 +28,7 @@ class Order
   field :seeds_value, type: Float
   field :evm_secret, type: String
   field :evm_value, type: BigDecimal
+  field :oc_name, type: String
   field :payment_completed, type: Boolean
   field :application_fee_amount, type: Float
   field :currency, type: String
@@ -58,6 +59,7 @@ class Order
       seeds_value: :number,
       evm_secret: :text,
       evm_value: :number,
+      oc_name: :text,
       payment_completed: :check_box,
       opt_in_organisation: :check_box,
       opt_in_facilitator: :check_box,
@@ -174,6 +176,7 @@ class Order
       # seeds_usd = seeds['symbolInfo']['askPrice'] * telos['telos']['usd']
       # self.seeds_value = (Money.new(value * 100, currency).exchange_to('USD').dollars.to_i / seeds_usd).round
     end
+    self.oc_name = account.name if account
     self.discount_code = nil if discount_code && !discount_code.applies_to?(event)
     self.percentage_discount = discount_code.percentage_discount if discount_code
     if !percentage_discount && !event.no_discounts && (organisationship_for_discount = event.organisationship_for_discount(account))

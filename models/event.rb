@@ -47,6 +47,7 @@ class Event
   field :select_tickets_outro, type: String
   field :select_tickets_title, type: String
   field :contribution_gbp_custom, type: Float
+  field :oc_slug, type: String
 
   def self.admin_fields
     {
@@ -862,7 +863,8 @@ class Event
       capacity: 'Total capacity',
       gathering_id: 'Add people that buy tickets to this gathering',
       send_order_notifications: 'Send email notifications of orders',
-      prevent_reminders: 'Prevent reminder email'
+      prevent_reminders: 'Prevent reminder email',
+      oc_slug: 'Open Collective event slug'
     }[attr.to_sym] || super
   end
 
@@ -976,5 +978,51 @@ class Event
     r
   rescue Money::Bank::UnknownRate, Money::Currency::UnknownCurrency
     Money.new(0, ENV['DEFAULT_CURRENCY'])
+  end
+
+  def self.oc_transactions(oc_slug)
+    transactions = []
+    agent = Mechanize.new
+
+    [
+      "https://api.opencollective.com/v1/collectives/#{oc_slug}/transactions?type=CREDIT"
+    ].each do |url|
+      puts url
+      page = begin; agent.get(url); rescue Mechanize::ResponseCodeError; end
+      next unless page
+
+      j = JSON.parse(page.body)
+      j['result'].each do |item|
+        currency = item['currency']
+        amount = item['amount'].to_f / 100
+        name = item['fromCollective']['name']
+
+        puts [currency, amount, name]
+        transactions << [currency, amount, name]
+      end
+    end
+    
+    transactions
+  end
+
+  def oc_transactions
+    Event.oc_transactions(oc_slug)
+  end
+
+  def check_oc_event
+    oc_transactions.each do |currency, amount, name|
+      if (@order = Order.find_by(:payment_completed.ne => true, :currency => currency, :value => amount, :oc_name => name))
+        @order.payment_completed!
+        @order.send_tickets
+        @order.create_order_notification
+      elsif (@order = Order.deleted.find_by(:payment_completed.ne => true, :currency => currency, :value => amount, :oc_name => name))
+        begin
+          @order.restore_and_complete
+          # raise Order::Restored
+        rescue StandardError => e
+          Airbrake.notify(e, order: @order)
+        end
+      end
+    end
   end
 end

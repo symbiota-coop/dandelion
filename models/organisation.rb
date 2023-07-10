@@ -758,6 +758,7 @@ class Organisation
       page.search('table tr')[1..-1].each do |tr|
         to_cell = tr.search('td')[6]
         next unless to_cell
+
         to = to_cell.text
         next unless to && to.downcase == evm_address.downcase
 
@@ -821,7 +822,7 @@ class Organisation
         @order.payment_completed!
         @order.send_tickets
         @order.create_order_notification
-      elsif (@order = Order.deleted.find_by(:payment_completed.ne => true, :evm_value => amount))
+      elsif (@order = Order.deleted.find_by(:payment_completed.ne => true, :currency => token, :evm_value => amount))
         begin
           @order.restore_and_complete
           # raise Order::Restored
