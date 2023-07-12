@@ -23,6 +23,8 @@ class PmailLink
   end
 
   def event
+    return unless url
+
     uri = URI.parse(url)
     result = "#{uri.scheme}://#{uri.host}#{uri.path}"
 
