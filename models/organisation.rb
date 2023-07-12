@@ -612,7 +612,7 @@ class Organisation
   end
 
   def payment_method?
-    stripe_pk || coinbase_api_key || evm_address || seeds_username
+    stripe_pk || coinbase_api_key || evm_address || seeds_username || oc_slug
   end
 
   def sync_with_gocardless
