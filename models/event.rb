@@ -998,9 +998,10 @@ class Event
         currency = item['currency']
         amount = item['amount'].to_f / 100
         name = item['fromCollective']['name']
+        tx_created_at = Time.parse(item['createdAt'])
 
-        puts [currency, amount, name]
-        transactions << [currency, amount, name]
+        puts [currency, amount, name, tx_created_at]
+        transactions << [currency, amount, name, tx_created_at]
       end
     end
 
@@ -1012,12 +1013,12 @@ class Event
   end
 
   def check_oc_event
-    oc_transactions.each do |currency, amount, name|
-      if (@order = Order.find_by(:payment_completed.ne => true, :currency => currency, :value => amount, :oc_name => name))
+    oc_transactions.each do |currency, amount, name, tx_created_at|
+      if (@order = Order.find_by(:payment_completed.ne => true, :currency => currency, :value => amount, :oc_name => name, :created_at.lt => tx_created_at))
         @order.payment_completed!
         @order.send_tickets
         @order.create_order_notification
-      elsif (@order = Order.deleted.find_by(:payment_completed.ne => true, :currency => currency, :value => amount, :oc_name => name))
+      elsif (@order = Order.deleted.find_by(:payment_completed.ne => true, :currency => currency, :value => amount, :oc_name => name, :created_at.lt => tx_created_at))
         begin
           @order.restore_and_complete
           # raise Order::Restored
