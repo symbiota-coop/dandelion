@@ -1,21 +1,21 @@
 <table class="table">
   <% @event.ticket_groups.each { |ticket_group| %>
-    <tr <% if params[:ticket_group_id] == ticket_group.id.to_s %> <% elsif params[:ticket_type_id] || params[:ticket_group_id] %>style="opacity: 0.4" <% end %>>
-      <td style="width: 1px; white-space: nowrap" class="pr-3">
-        <span class="label label-outline-primary"><%=ticket_group.name%></span>
-      </td>
-      <td>
-        <a href="/events/<%=@event.id%>/tickets?ticket_group_id=<%=ticket_group.id%>">
-          <%= ticket_group.tickets.count %>/<%= ticket_group.capacity %>
-          <% if ticket_group.capacity > 0 %>
-            <% w = ((ticket_group.tickets.count / ticket_group.capacity.to_f) * 100).round %>
-            <div class="progress">
-              <div class="progress-bar" role="progressbar" style="width: <%= "#{w}%" %>;"></div>
-            </div>
-          <% end %>
-        </a>
-      </td>
-    </tr>
+  <tr <% if params[:ticket_group_id] == ticket_group.id.to_s %> <% elsif params[:ticket_type_id] || params[:ticket_group_id] %>style="opacity: 0.4" <% end %>>
+    <td style="width: 1px; white-space: nowrap" class="pr-3">
+      <span class="label label-outline-primary"><%=ticket_group.name%></span>
+    </td>
+    <td>
+      <a href="/events/<%=@event.id%>/tickets?ticket_group_id=<%=ticket_group.id%>">
+        <%= ticket_group.tickets.count %>/<%= ticket_group.capacity %>
+        <% if ticket_group.capacity > 0 %>
+          <% w = ((ticket_group.tickets.count / ticket_group.capacity.to_f) * 100).round %>
+          <div class="progress">
+            <div class="progress-bar" role="progressbar" style="width: <%= "#{w}%" %>;"></div>
+          </div>
+        <% end %>
+      </a>
+    </td>
+  </tr>
   <% } %>
   <% @event.ticket_types.order('order asc, price desc').and(:quantity.gt => 0).each { |ticket_type| %>
   <tr <% if params[:ticket_type_id] == ticket_type.id.to_s %> <% elsif params[:ticket_type_id] || params[:ticket_group_id] %>style="opacity: 0.4" <% end %>>
@@ -25,7 +25,7 @@
         <% if ticket_type.ticket_group %>
           <span class="label label-outline-primary"><%=ticket_type.ticket_group.name%></span>
         <% end %>
-        <i data-toggle="tooltip" title="Secret ticket type" class="fa fa-lock"></i>
+        <i data-toggle="tooltip" title="Secret ticket type" class="fa fa-lock ml-1"></i>
       <% else %>
         <%= ticket_type.name %>
         <% if ticket_type.ticket_group %>
