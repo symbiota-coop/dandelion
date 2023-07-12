@@ -385,7 +385,7 @@
     <% end %>
     <% if @event.organisation.evm_address && (EVM_CURRENCIES.include?(@event.currency) || (@event.currency == 'USD')) %>
       <button class="btn btn-primary btn-block mb-1 btn-dotted" type="submit" data-payment-method="evm">
-        <span>Pay with <%= @event.chain %></span>
+        <span><% if @event.chain == 'Polygon'%>Pay with BREAD on Polygon<% else %>Pay with <%= @event.chain %><% end %></span>
         <i class="fa fa-spin fa-circle-o-notch" style="display: none"></i>
       </button>
       <%= hidden_field_tag :payment_method, value: 'evm', disabled: true %>

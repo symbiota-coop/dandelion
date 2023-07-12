@@ -258,6 +258,7 @@ class Event
     end
     self.organisation_revenue_share = nil unless revenue_sharer
     errors.add(:organisation_revenue_share, 'must be present if a revenue sharer is set') if revenue_sharer && !organisation_revenue_share
+    errors.add(:organiser, 'or revenue sharer must be set') if !revenue_sharer && !organiser && organisation && organisation.stripe_client_id
     errors.add(:revenue_sharer, 'cannot be set if organiser is set') if revenue_sharer && organiser
     errors.add(:revenue_sharer, 'or organiser must be set for this organisation') if organisation && organisation.require_organiser_or_revenue_sharer && !revenue_sharer && !organiser
     errors.add(:revenue_sharer, 'is not connected to this organisation') if revenue_sharer && organisation_revenue_share && !revenue_sharer_organisationship
