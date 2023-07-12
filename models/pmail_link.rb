@@ -23,8 +23,8 @@ class PmailLink
   end
 
   def event
-    if (match = URI(url).path.match(%r{\A/e/([a-z0-9]+)\Z}))
-      Event.find(match[1])
-    end
+    return unless (m = url.match(%r{\A#{ENV['BASE_URI']}/e/([a-z0-9]+)\Z}))
+
+    Event.find_by(slug: m[1])
   end
 end
