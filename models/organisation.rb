@@ -92,6 +92,7 @@ class Organisation
   field :fixed_fee, type: Boolean
   field :terms_and_conditions_url, type: String
   field :require_organiser_or_revenue_sharer, type: Boolean
+  field :oc_slug, type: String
 
   field :tokens, type: Float
   index({ tokens: 1 })
@@ -127,6 +128,7 @@ class Organisation
       mailgun_domain: :text,
       mailgun_region: :select,
       mailgun_sto: :check_box,
+      oc_slug: :text,
       minimal_head: :text,
       donation_text: :text,
       add_a_donation_to: :text,
@@ -205,7 +207,8 @@ class Organisation
       event_image_required_height: 'Required height for event images in px',
       evm_address: 'Ethereum-compatible wallet address for receiving tokens via EVM networks',
       seeds_username: 'SEEDS/Telos username for receiving SEEDS via Telos',
-      restrict_cohosting: 'When checked, only admins can add the organisation as a co-host of events'
+      restrict_cohosting: 'When checked, only admins can add the organisation as a co-host of events',
+      oc_slug: 'Open Collective organisation slug'
     }
   end
 
@@ -603,7 +606,8 @@ class Organisation
       show_ticketholder_link_in_ticket_emails: 'Show link for people to provide details of ticketholders in ticket emails',
       event_image_required_width: 'Event image width',
       event_image_required_height: 'Event image height',
-      restrict_cohosting: 'Restrict cohosting to admins'
+      restrict_cohosting: 'Restrict cohosting to admins',
+      oc_slug: 'Open Collective slug'
     }[attr.to_sym] || super
   end
 

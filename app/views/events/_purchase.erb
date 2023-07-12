@@ -451,6 +451,7 @@
     stripePk = <%== @event.organisation.stripe_pk.to_json %>
     coinbase = <%= @event.organisation.coinbase_api_key ? true : false %>
     seedsUsername = <%== @event.organisation.seeds_username.to_json %>
+    organisationOcSlug = <%== @event.organisation.oc_slug.to_json %>
     ocSlug = <%== @event.oc_slug.to_json %>
     evmAddress = <%== @event.organisation.evm_address.to_json %>
     contractAddress = <%== EVM_CONTRACT_ADDRESSES[@event.currency == 'USD' ? 'BREAD' : @event.currency].to_json %>

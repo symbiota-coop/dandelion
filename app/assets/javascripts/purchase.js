@@ -1,4 +1,4 @@
-/* global timeAgo, eventId, placesRemaining, currency, currencySymbol, stripePk, coinbase, seedsUsername, ocSlug, evmAddress, contractAddress, networkId, networkName, signedIn */
+/* global timeAgo, eventId, placesRemaining, currency, currencySymbol, stripePk, coinbase, seedsUsername, organisationOcSlug, ocSlug, evmAddress, contractAddress, networkId, networkName, signedIn */
 
 $(function () {
   function price () {
@@ -166,7 +166,7 @@ $(function () {
           // Open Collective
           $('#select-tickets').hide()
           $('#pay-with-opencollective').show()
-          $('#pay-with-opencollective').find('.card-body p.lead.please').html('Make a contribution of ' + currencySymbol + data.value + ' at <a target="_blank" href="https://opencollective.com/microsolidarity/events/microsolidarity-summer-camp-eu-74950d99">https://opencollective.com/microsolidarity/events/microsolidarity-summer-camp-eu-74950d99</a> then return to this page')
+          $('#pay-with-opencollective').find('.card-body p.lead.please').html('<a target="_blank" href="https://opencollective.com/' + organisationOcSlug + '/events/' + ocSlug + '/donate?interval=oneTime&amount=' + data.value + '&skipStepDetails=true&platformContribution=0">Make a contribution of ' + currencySymbol + data.value + ' on Open Collective</a> then return to this page')
           // $('#pay-with-opencollective').find('.card-body p.lead.memo').html(data.oc_name)
           const offset = $('#pay-with-opencollective').offset()
           window.scrollTo(0, offset.top - $('#header').height() - 10)
