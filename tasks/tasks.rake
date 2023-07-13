@@ -73,7 +73,7 @@ namespace :events do
       organisation.check_evm_account if Order.and(:payment_completed.ne => true, :evm_secret.ne => nil, :event_id.in => organisation.events.pluck(:id)).count > 0
     end
     Event.and(:oc_slug.ne => nil).each do |event|
-      event.check_oc_account if event.orders.and(:payment_completed.ne => true, :oc_name.ne => nil, :event_id => event.id).count > 0
+      event.check_oc_event if event.orders.and(:payment_completed.ne => true, :oc_name.ne => nil, :event_id => event.id).count > 0
     end
   end
 
