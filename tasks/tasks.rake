@@ -42,13 +42,10 @@ namespace :gatherings do
     end
   end
 
-  task check_seeds_accounts: :environment do
+  task check_for_payments: :environment do
     Gathering.and(:seeds_username.ne => nil).each do |gathering|
       gathering.check_seeds_account
     end
-  end
-
-  task check_evm_accounts: :environment do
     Gathering.and(:evm_address.ne => nil).each do |gathering|
       gathering.check_evm_account
     end
@@ -68,15 +65,15 @@ namespace :events do
     end
   end
 
-  task check_seeds_accounts: :environment do
+  task check_for_payments: :environment do
     Organisation.and(:seeds_username.ne => nil).each do |organisation|
       organisation.check_seeds_account if Order.and(:payment_completed.ne => true, :seeds_secret.ne => nil, :event_id.in => organisation.events.pluck(:id)).count > 0
     end
-  end
-
-  task check_evm_accounts: :environment do
     Organisation.and(:evm_address.ne => nil).each do |organisation|
       organisation.check_evm_account if Order.and(:payment_completed.ne => true, :evm_secret.ne => nil, :event_id.in => organisation.events.pluck(:id)).count > 0
+    end
+    Event.and(:oc_slug.ne => nil).each do |event|
+      event.check_oc_account if event.orders.and(:payment_completed.ne => true, :oc_name.ne => nil, :event_id => event.id).count > 0
     end
   end
 
