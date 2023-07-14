@@ -515,6 +515,7 @@ class Event
       local_group: local_group,
       coordinator: coordinator,
       revenue_sharer: revenue_sharer,
+      organiser: organiser,
       tag_names: event_tags.pluck(:name).join(','),
       add_a_donation_to: add_a_donation_to,
       donation_text: donation_text,
