@@ -75,7 +75,8 @@ partial :chart, locals: {
     tickets = Ticket.and(:event_id.in => organisation.events.pluck(:id), :created_at.gte => @from, :created_at.lt => @to + 1.day, :price.gt => 0)
     orders = Order.and(:event_id.in => organisation.events.pluck(:id), :created_at.gte => @from, :created_at.lt => @to + 1.day, :value.ne => nil, :currency.in => MAJOR_CURRENCIES)
     events = Event.and(:id.in => tickets.pluck(:event_id))
-    orders_sum = orders.sum { |o| Money.new(o.value*100, o.currency) }.exchange_to('GBP')
+    orders_sum = orders.sum { |o| Money.new(o.value*100, o.currency) }
+    orders_sum = orders_sum > 0 ? orders_sum.exchange_to('GBP') : Money.new(0, 'GBP')
 
     next unless tickets.count >= @min_tickets || orders_sum >= Money.new(@min_order_value*100, 'GBP')
 
