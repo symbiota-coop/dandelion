@@ -165,7 +165,7 @@ $(function () {
         } else if (data.oc_name) {
           // Open Collective
           alert('You will now be redirected to Open Collective. Use the same name at checkout as your name on Dandelion (' + data.oc_name + '). After payment, there may be a delay of up to 10 minutes before your ticket is delivered.')
-          window.location = 'https://opencollective.com/' + organisationOcSlug + '/events/' + ocSlug + '/donate?interval=oneTime&amount=' + data.value
+          window.location = 'https://opencollective.com/' + organisationOcSlug + '/events/' + ocSlug + '/donate?interval=oneTime&amount=' + data.value + '&name=' + data.oc_name
         } else if (data.evm_secret) {
           // EVM
           $('#select-tickets').hide()
