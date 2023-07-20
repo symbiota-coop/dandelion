@@ -784,6 +784,84 @@ Two Spirit).split("\n")
     update_attribute(:recommended_events_cache, events)
   end
 
+  def prediction_data
+    pd = {
+      has_phone: phone ? true : false,
+      has_telegram_username: telegram_username ? true : false,
+      has_website: website ? true : false,
+      has_picture: picture_uid ? true : false,
+      has_bio: bio ? true : false,
+      updated_profile: updated_profile ? true : false,
+      hide_location: hide_location ? true : false,
+      hidden: hidden ? true : false,
+      seen_intro_tour: seen_intro_tour ? true : false,
+      email_confirmed: email_confirmed ? true : false,
+      is_uk: false, # TODO
+      is_usa: false, # TODO
+      subscribed_ps: false, # TODO
+      # categorical
+      gender: gender || 'unknown',
+      sexuality: sexuality || 'unknown',
+      time_zone: time_zone || 'unknown',
+      default_currency: default_currency || 'unknown'
+
+    }
+    pd[:age] = if age
+                 if age <= 20
+                   '0-20'
+                 elsif age <= 30
+                   '20-30'
+                 elsif age <= 40
+                   '30-40'
+                 elsif age <= 50
+                   '40-50'
+                 elsif age <= 60
+                   '50-60'
+                 else
+                   '>60'
+                 end
+               else
+                 'unknown'
+               end
+    %w[last_active last_checked_notifications last_checked_messages].each do |key|
+      pd[:"#{key}"] = if send(key)
+                        t = Time.now - send(key)
+                        if t < 1.day
+                          'day'
+                        elsif t < 1.week
+                          'week'
+                        elsif t < 1.month
+                          'month'
+                        elsif t < 1.year
+                          'year'
+                        end
+                      else
+                        'never'
+                      end
+    end
+    %w[sign_ins orders tickets donations account_contributions gatherings memberships organisations organisationships events event_stars event_feedbacks].each do |association|
+      pd[:"#{association}_count"] = send(association).count
+      pd[:"#{association}_last"] = if send(association).empty?
+                                     'never'
+                                   else
+                                     t = Time.now - send(association).order('created_at desc').first.created_at
+                                     if t < 1.day
+                                       'day'
+                                     elsif t < 1.week
+                                       'week'
+                                     elsif t < 1.month
+                                       'month'
+                                     elsif t < 1.year
+                                       'year'
+                                     end
+                                   end
+    end
+    # "donations_via_email_count": 0,
+    # "donations_via_email_last": "never",
+    # "donated": false
+    pd
+  end
+
   private
 
   def encrypt_password
