@@ -17,7 +17,7 @@
       </div>
     </div>
 
-    <%= partial :'accounts/pay', locals: {div_class: 'px-4 mb-5 pt-3', account: current_account, short_nft: true } %>
+    <%= partial :'accounts/pay', locals: {div_class: 'px-4 mb-5 pt-3', source: 'home_signed_in', account: current_account, short_nft: true } %>
 
     <div data-with-placeholder id="newsfeed" data-pagelet-url="<%= params[:tour] ? '/?tour=1' : '/'%>" data-pagelet-refresh="60" class="mt-1 mb-3">
       <% 15.times do %>

@@ -29,7 +29,7 @@
       <div class="col-lg-8">
         <div class="card my-4">
           <div class="card-body p-4">
-            <%= partial :'accounts/pay', locals: { account: account, nft: true, force: true } %>
+            <%= partial :'accounts/pay', locals: { account: account, source: params[:event_feedback_id] ? "event_feedback:#{params[:event_feedback_id]}" : 'donate', nft: true, force: true } %>
           </div>
         </div>
         <%= partial :badges %>

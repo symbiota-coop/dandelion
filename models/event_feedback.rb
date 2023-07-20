@@ -7,6 +7,8 @@ class EventFeedback
   belongs_to :activity, index: true, optional: true
   belongs_to :account, index: true
 
+  has_many :account_contributions, dependent: :nullify
+
   field :answers, type: Array
   field :public, type: Boolean
   field :anonymise, type: Boolean

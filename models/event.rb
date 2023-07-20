@@ -158,6 +158,8 @@ class Event
 
   has_many :event_sessions, dependent: :destroy
 
+  has_many :account_contributions, dependent: :nullify
+
   has_many :cohostships, dependent: :destroy
   def cohosts
     Organisation.and(:id.in => cohostships.pluck(:organisation_id))
