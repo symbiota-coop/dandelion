@@ -804,7 +804,6 @@ Two Spirit).split("\n")
       sexuality: sexuality || 'unknown',
       time_zone: time_zone || 'unknown',
       default_currency: default_currency || 'unknown'
-
     }
     pd[:age] = if age
                  if age <= 20
