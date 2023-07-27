@@ -3,7 +3,7 @@
   <div class="row mb-3">
     <div class="col-12 col-lg-auto text-center">
       <% if @organisation.image %>
-        <a href="/o/<%= @organisation.slug %>"><img src="<%= u @organisation.image.thumb('200x200').url %>"></a>
+        <a href="/o/<%= @organisation.slug %>"><img src="<%= u @organisation.image.thumb('500x500#').url %>"></a>
       <% end %>
     </div>
     <div class="col-12 col-sm text-center text-lg-left">
