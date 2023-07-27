@@ -2,7 +2,7 @@
 <div class="row">
   <div class="col-12 col-lg-auto text-center">
     <% if @organisation.image %>
-      <img src="<%= u @organisation.image.thumb('400x400').url %>">
+      <img style="width: 200px" src="<%= u @organisation.image.thumb('400x400').url %>">
     <% end %>
   </div>
   <div class="col-12 col-sm">
