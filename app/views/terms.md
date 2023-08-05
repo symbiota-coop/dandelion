@@ -21,8 +21,8 @@ Please read these terms and conditions carefully before using the Dandelion tick
 
 3.2. The refund and exchange policies are determined by the Event Organisers and may vary for different events. It is your responsibility to review and understand the refund and exchange policies before making a purchase.
 
-## Ticket Resale and Transferability
-4.1. Dandelion allows ticket resale and transferability unless explicitly stated otherwise by the Event Organiser or local laws/regulations.
+## Ticket Resale
+4.1. Dandelion permits you to resell tickets you have bought unless explicitly stated otherwise by the Event Organiser or local laws/regulations.
 
 4.2. Any resale or transfer of tickets is the sole responsibility of the parties involved. Dandelion does not guarantee or verify the authenticity or legitimacy of tickets being resold or transferred.
 
