@@ -813,6 +813,7 @@ class Event
     return unless start_time && end_time
 
     zone ||= time_zone_or_default
+    zone = time_zone if time_zone && location != 'Online'
     zone = zone.name unless zone.is_a?(String)
     start_time = self.start_time.in_time_zone(zone)
     end_time = self.end_time.in_time_zone(zone)
@@ -828,6 +829,7 @@ class Event
     return unless start_time && end_time
 
     zone ||= time_zone_or_default
+    zone = time_zone if time_zone && location != 'Online'
     zone = zone.name unless zone.is_a?(String)
     start_time = self.start_time.in_time_zone(zone)
     end_time = self.end_time.in_time_zone(zone)
@@ -856,7 +858,7 @@ class Event
       zoom_party: 'Zoom party',
       add_a_donation_to: 'Text above donation field',
       donation_text: 'Text below donation field',
-      time_zone: 'Visitor time zone',
+      time_zone: 'Display time zone',
       start_time: 'Start date/time',
       end_time: 'End date/time',
       extra_info_for_ticket_email: 'Extra info for ticket confirmation email',
@@ -888,7 +890,7 @@ class Event
       image: 'At least 992px wide, and more wide than high',
       start_time: "in &hellip; (your profile's time zone)",
       end_time: "in &hellip; (your profile's time zone)",
-      time_zone: "Time zone to use for people that aren't signed in or haven't set a time zone",
+      time_zone: "Time zone to display the event in (ignored for online events)",
       add_a_donation_to: "Text to display above the 'Add a donation' field (leave blank to use organisation default)",
       donation_text: "Text to display below the 'Add a donation' field  (leave blank to use organisation default)",
       carousel_text: 'Text to show when hovering over the event in a carousel',

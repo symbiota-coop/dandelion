@@ -93,7 +93,6 @@ Dandelion::App.controller do
         redirect '/events'
       end
     end
-    @event.time_zone = current_account.time_zone
     @event.location = 'Online'
     @event.feedback_questions = 'Comments/suggestions'
     @event.affiliate_credit_percentage = @event.organisation.affiliate_credit_percentage
