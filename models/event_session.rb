@@ -28,7 +28,7 @@ class EventSession
     return unless start_time && end_time
 
     zone ||= time_zone_or_default
-    zone = time_zone if time_zone && location != 'Online'
+    zone = time_zone if time_zone && event.location != 'Online'
     zone = zone.name unless zone.is_a?(String)
     start_time = self.start_time.in_time_zone(zone)
     end_time = self.end_time.in_time_zone(zone)
@@ -44,7 +44,7 @@ class EventSession
     return unless start_time && end_time
 
     zone ||= time_zone_or_default
-    zone = time_zone if time_zone && location != 'Online'
+    zone = time_zone if time_zone && event.location != 'Online'
     zone = zone.name unless zone.is_a?(String)
     start_time = self.start_time.in_time_zone(zone)
     end_time = self.end_time.in_time_zone(zone)
