@@ -890,7 +890,7 @@ class Event
       image: 'At least 992px wide, and more wide than high',
       start_time: "in &hellip; (your profile's time zone)",
       end_time: "in &hellip; (your profile's time zone)",
-      time_zone: "Time zone to display the event in (ignored for online events)",
+      time_zone: 'Time zone to display the event in (ignored for online events)',
       add_a_donation_to: "Text to display above the 'Add a donation' field (leave blank to use organisation default)",
       donation_text: "Text to display below the 'Add a donation' field  (leave blank to use organisation default)",
       carousel_text: 'Text to show when hovering over the event in a carousel',
