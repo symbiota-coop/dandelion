@@ -80,7 +80,6 @@ class Organisation
   field :change_select_tickets_title, type: Boolean
   field :event_image_required_height, type: Integer
   field :event_image_required_width, type: Integer
-  field :allow_quick, type: Boolean
   field :restrict_cohosting, type: Boolean
   field :psychedelic, type: Boolean
   field :hide_few_left, type: Boolean

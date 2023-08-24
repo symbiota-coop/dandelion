@@ -195,7 +195,7 @@ class Event
       (local_group ? local_group.discount_codes.pluck(:id) : []))
   end
 
-  attr_accessor :prevent_notifications, :tag_names, :duplicate, :quick_create
+  attr_accessor :prevent_notifications, :tag_names, :duplicate
 
   has_many :notifications, as: :notifiable, dependent: :destroy
   after_create do
@@ -245,7 +245,7 @@ class Event
     self.slug = ([*('a'..'z')].sample + [*('0'..'9')].sample + [*('a'..'z'), *('0'..'9')].sample(3).join) until slug && !Event.find_by(slug: slug) unless slug
 
     if new_record? && !duplicate
-      errors.add(:organisation, '- you are not an admin of this organisation') if !local_group && !activity && !quick_create && !Organisation.admin?(organisation, account)
+      errors.add(:organisation, '- you are not an admin of this organisation') if !local_group && !activity && !Organisation.admin?(organisation, account)
       errors.add(:activity, '- you are not an admin of this activity') if activity && !Activity.admin?(activity, account)
       errors.add(:local_group, '- you are not an admin of this local group') if local_group && !LocalGroup.admin?(local_group, account)
     end
@@ -306,7 +306,6 @@ class Event
   after_save do
     event_facilitations.create account: organisation.admins.first if organisation && organisation.admins.count == 1
     event_facilitations.create account: revenue_sharer if revenue_sharer
-    event_facilitations.create account: account if quick_create
 
     if changes['name'] && (post = posts.find_by(subject: "Chat for #{changes['name'][0]}"))
       post.update_attribute(:subject, "Chat for #{name}")

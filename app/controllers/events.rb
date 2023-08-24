@@ -115,47 +115,6 @@ Dandelion::App.controller do
     end
   end
 
-  get '/o/:slug/events/quick' do
-    @organisation = Organisation.find_by(slug: params[:slug]) || not_found
-    kick! unless @organisation.allow_quick?
-    @event = @organisation.events.build
-    erb :'events/quick'
-  end
-
-  post '/o/:slug/events/quick' do
-    @organisation = Organisation.find_by(slug: params[:slug]) || not_found
-    kick! unless @organisation.allow_quick?
-    @event = @organisation.events.build(mass_assigning(params[:event], Event))
-
-    account_hash = { name: params[:event][:email], email: params[:event][:email] }
-    @account = if account_hash[:email] && (account = Account.find_by(email: account_hash[:email].downcase))
-                 account
-               else
-                 Account.new(mass_assigning(account_hash, Account))
-               end
-
-    successful_update_or_save = if @account.persisted?
-                                  @account.update_attributes(mass_assigning(account_hash.map { |k, v| [k, v] if v }.compact.to_h, Account))
-                                else
-                                  @account.save
-                                end
-
-    if successful_update_or_save
-      @event.account = @account
-      @event.last_saved_by = @account
-      @event.quick_create = true
-      if @event.save
-        redirect "/e/#{@event.slug}"
-      else
-        flash.now[:error] = 'There was an error saving the event'
-        erb :'events/quick'
-      end
-    else
-      flash.now[:error] = 'There was an error creating an account'
-      erb :'events/quick'
-    end
-  end
-
   get '/events/:id', provides: %i[html ics json] do
     @event = Event.find(params[:id]) || not_found
     if @event.slug
