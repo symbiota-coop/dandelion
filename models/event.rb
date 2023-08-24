@@ -15,6 +15,7 @@ class Event
   belongs_to :gathering, optional: true, index: true
 
   field :name, type: String
+  index({ name: 1 })
   field :slug, type: String
   field :start_time, type: Time
   field :end_time, type: Time
@@ -22,6 +23,7 @@ class Event
   field :coordinates, type: Array
   field :image_uid, type: String
   field :description, type: String
+  index({ description: 1 })
   field :email, type: String
   field :facebook_event_url, type: String
   field :feedback_questions, type: String
