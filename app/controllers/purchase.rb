@@ -171,7 +171,13 @@ Dandelion::App.controller do
         { order_id: @order.id.to_s }.to_json
       end
     rescue StandardError => e
-      Airbrake.notify(e, order: @order)
+      Airbrake.notify(e,
+                      url: "#{ENV['BASE_URI']}#{request.path}",
+                      current_account: (JSON.parse(current_account.to_json) if current_account),
+                      params: params,
+                      request: request.env.select { |_k, v| v.is_a?(String) },
+                      session: session,
+                      order: @order)
       @order.destroy
       halt 400
     end
