@@ -34,12 +34,7 @@ Dandelion::App.controller do
     @events = @local_group.events
     @events = params[:order] == 'created_at' ? @events.order('created_at desc') : @events.order('start_time asc')
     q_ids = []
-    if params[:q]
-      q_ids += Event.all.or(
-        { name: /#{Regexp.escape(params[:q])}/i },
-        { description: /#{Regexp.escape(params[:q])}/i }
-      ).pluck(:id)
-    end
+    q_ids += search_events(params[:q]).pluck(:id) if params[:q]
     event_tag_ids = []
     event_tag_ids = EventTagship.and(event_tag_id: params[:event_tag_id]).pluck(:event_id) if params[:event_tag_id]
     event_ids = (!q_ids.empty? && !event_tag_ids.empty? ? (q_ids & event_tag_ids) : (q_ids + event_tag_ids))

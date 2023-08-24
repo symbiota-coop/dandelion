@@ -116,7 +116,7 @@ module Dandelion
 
     get '/terms' do
       erb :terms
-    end    
+    end
 
     get '/contact' do
       erb :contact
@@ -173,12 +173,7 @@ module Dandelion
     get '/network', provides: :json do
       sign_in_required!
       if (@q = params[:q])
-        current_account.network.and(:id.in => Account.all.or(
-          { name: /#{Regexp.escape(@q)}/i },
-          { name_transliterated: /#{Regexp.escape(@q)}/i },
-          { email: /#{Regexp.escape(@q)}/i },
-          { username: /#{Regexp.escape(@q)}/i }
-        ).pluck(:id)).map do |account|
+        current_account.network.and(:id.in => search_accounts(@q).pluck(:id)).map do |account|
           { key: account.name, value: account.username }
         end.to_json
       end

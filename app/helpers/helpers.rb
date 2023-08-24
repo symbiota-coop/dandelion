@@ -20,6 +20,22 @@ Dandelion::App.helpers do
     end
   end
 
+  def search_accounts(q)
+    Account.all.or(
+      { name: /#{Regexp.escape(q)}/i },
+      { name_transliterated: /#{Regexp.escape(q)}/i },
+      { email: /#{Regexp.escape(q)}/i },
+      { username: /#{Regexp.escape(q)}/i }
+    )
+  end
+
+  def search_events(q)
+    Event.all.or(
+      { name: /#{Regexp.escape(q)}/i },
+      { description: /#{Regexp.escape(q)}/i }
+    )
+  end
+
   def pagination_details(collection, model: nil)
     if collection.total_pages < 2
       case collection.to_a.length

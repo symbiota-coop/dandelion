@@ -2,11 +2,7 @@ Dandelion::App.controller do
   get '/accounts', provides: [:json] do
     @accounts = Account.public
     if params[:q]
-      @accounts = @accounts.and(:id.in => Account.all.or(
-        { name: /#{Regexp.escape(params[:q])}/i },
-        { username: /#{Regexp.escape(params[:q])}/i },
-        { email: /#{Regexp.escape(params[:q])}/i }
-      ).pluck(:id))
+      @accounts = @accounts.and(:id.in => search_accounts(params[:q]).pluck(:id))
     end
     @accounts = @accounts.and(id: params[:id]) if params[:id]
     case content_type

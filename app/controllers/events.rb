@@ -9,10 +9,7 @@ Dandelion::App.controller do
     @from = params[:from] ? Date.parse(params[:from]) : Date.today
     @events = params[:order] == 'created_at' ? @events.order('created_at desc') : @events.order('start_time asc')
     @events = if params[:q]
-                @events.and(:id.in => Event.all.or(
-                  { name: /#{Regexp.escape(params[:q])}/i },
-                  { description: /#{Regexp.escape(params[:q])}/i }
-                ).pluck(:id))
+                @events.and(:id.in => search_events(params[:q]).pluck(:id))
               elsif params[:search]
                 @events
               else
@@ -479,10 +476,7 @@ Dandelion::App.controller do
                                       { '$match' => { 'id' => { '$regex' => /#{Regexp.escape(params[:q])}/i } } }
                                     ]).pluck(:id) +
         Ticket.and(
-          :account_id.in => Account.all.or(
-            { name: /#{Regexp.escape(params[:q])}/i },
-            { email: /#{Regexp.escape(params[:q])}/i }
-          ).pluck(:id)
+          :account_id.in => search_accounts(params[:q]).pluck(:id)
         ).pluck(:id))
     end
     case content_type
@@ -599,12 +593,7 @@ Dandelion::App.controller do
     @orders =  @orders.deleted if params[:deleted]
     @orders =  @orders.complete if params[:complete]
     @orders =  @orders.incomplete if params[:incomplete]
-    if params[:q]
-      @orders = @orders.and(:account_id.in => Account.all.or(
-        { name: /#{Regexp.escape(params[:q])}/i },
-        { email: /#{Regexp.escape(params[:q])}/i }
-      ).pluck(:id))
-    end
+    @orders = @orders.and(:account_id.in => search_accounts(params[:q]).pluck(:id)) if params[:q]
 
     case content_type
     when :html
@@ -660,12 +649,7 @@ Dandelion::App.controller do
     @event = Event.find(params[:id]) || not_found
     event_admins_only!
     @donations = @event.donations
-    if params[:q]
-      @donations = @donations.and(:account_id.in => Account.all.or(
-        { name: /#{Regexp.escape(params[:q])}/i },
-        { email: /#{Regexp.escape(params[:q])}/i }
-      ).pluck(:id))
-    end
+    @donations = @donations.and(:account_id.in => search_accounts(params[:q]).pluck(:id)) if params[:q]
     erb :'events/donations'
   end
 
@@ -680,10 +664,7 @@ Dandelion::App.controller do
     event_admins_only!
     @waitships = @event.waitships
     if params[:q]
-      @waitships = @waitships.and(:account_id.in => Account.all.or(
-        { name: /#{Regexp.escape(params[:q])}/i },
-        { email: /#{Regexp.escape(params[:q])}/i }
-      ).pluck(:id))
+      @waitships = @waitships.and(:account_id.in => search_accounts(params[:q]).pluck(:id))
     end
     erb :'events/waitlist'
   end

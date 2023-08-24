@@ -189,12 +189,7 @@ Dandelion::App.controller do
     @from = params[:from] ? Date.parse(params[:from]) : Date.today
     @events = params[:order] == 'created_at' ? @events.order('created_at desc') : @events.order('start_time asc')
     q_ids = []
-    if params[:q]
-      q_ids += Event.all.or(
-        { name: /#{Regexp.escape(params[:q])}/i },
-        { description: /#{Regexp.escape(params[:q])}/i }
-      ).pluck(:id)
-    end
+    q_ids += search_events(params[:q]).pluck(:id) if params[:q]
     event_tag_ids = []
     event_tag_ids = EventTagship.and(event_tag_id: params[:event_tag_id]).pluck(:event_id) if params[:event_tag_id]
     event_ids = (!q_ids.empty? && !event_tag_ids.empty? ? (q_ids & event_tag_ids) : (q_ids + event_tag_ids))
@@ -291,12 +286,7 @@ Dandelion::App.controller do
     @from = params[:from] ? Date.parse(params[:from]) : nil
     @to = params[:to] ? Date.parse(params[:to]) : nil
     @orders = @organisation.orders
-    if params[:q]
-      @orders = @orders.and(:account_id.in => Account.all.or(
-        { name: /#{Regexp.escape(params[:q])}/i },
-        { email: /#{Regexp.escape(params[:q])}/i }
-      ).pluck(:id))
-    end
+    @orders = @orders.and(:account_id.in => search_accounts(params[:q]).pluck(:id)) if params[:q]
     @orders = @orders.and(:created_at.gte => @from) if @from
     @orders = @orders.and(:created_at.lt => @to + 1) if @to
     @orders = @orders.and(affiliate_type: 'Organisation', affiliate_id: params[:affiliate_id]) if params[:affiliate_id]
@@ -336,10 +326,7 @@ Dandelion::App.controller do
     @events = params[:order] == 'created_at' ? @events.order('created_at desc') : @events.order('start_time asc')
     q_ids = []
     if params[:q]
-      q_ids += Event.all.or(
-        { name: /#{Regexp.escape(params[:q])}/i },
-        { description: /#{Regexp.escape(params[:q])}/i }
-      ).pluck(:id)
+      q_ids += search_events(params[:q]).pluck(:id)
     end
     event_tag_ids = []
     event_tag_ids = EventTagship.and(event_tag_id: params[:event_tag_id]).pluck(:event_id) if params[:event_tag_id]

@@ -5,7 +5,9 @@ class Account
   extend Dragonfly::Model
 
   field :name, type: String
+  index({ name: 1 })
   field :name_transliterated, type: String
+  index({ name_transliterated: 1 })
   field :ps_account_id, type: String
   index({ ps_account_id: 1 })
   field :email, type: String
