@@ -99,6 +99,8 @@ $(function () {
   })
 
   $('#details form').submit(function () {
+    setTotal()
+
     let halt
     $('input[type=checkbox][data-required]').each(function () {
       if (!$(this).is(':checked')) {
