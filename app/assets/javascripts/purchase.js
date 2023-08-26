@@ -99,7 +99,9 @@ $(function () {
   })
 
   $('#details form').submit(function () {
-    if ($('#totalDisplay').val() == '0.00') { setTotal() }
+    if (!$('input[type=hidden][name=payment_method][value=rsvp]').prop('disabled')) {
+      setTotal()
+    }
 
     let halt
     $('input[type=checkbox][data-required]').each(function () {
