@@ -99,7 +99,7 @@ $(function () {
   })
 
   $('#details form').submit(function () {
-    setTotal()
+    if ($('#totalDisplay').val() == '0.00') { setTotal() }
 
     let halt
     $('input[type=checkbox][data-required]').each(function () {
