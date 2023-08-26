@@ -123,15 +123,7 @@
             </div>
             <strong>Discount applied</strong>
             <div class="input-group" style="margin: 5px 0">
-              <% if discount_code.fixed_discount %>
-                <% show_balance = true %>
-                <div class="input-group-prepend">
-                  <span class="py-0 input-group-text">
-                    <%= Money.new(0, @event.currency).symbol %>
-                  </span>
-                </div>
-                <%= number_field_tag :fixed_discount, id: 'fixed_discount', class: 'form-control', style: 'width: 5em', disabled: true, value: discount_code.fixed_discount %>
-              <% elsif discount_code.percentage_discount %>
+              <% if if discount_code.percentage_discount %>
                 <%= number_field_tag :percentage_discount, id: 'percentage_discount', class: 'form-control', style: 'width: 5em', disabled: true, value: discount_code.percentage_discount %>
                 <div class="input-group-append">
                   <span class="py-0 input-group-text">%</span>

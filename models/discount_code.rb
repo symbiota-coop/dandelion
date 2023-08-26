@@ -7,7 +7,6 @@ class DiscountCode
 
   field :code, type: String
   field :description, type: String
-  field :fixed_discount, type: Integer
   field :percentage_discount, type: Integer
 
   validates_presence_of :code
@@ -23,7 +22,6 @@ class DiscountCode
     {
       code: :text,
       description: :text,
-      fixed_discount: :number,
       percentage_discount: :number,
       codeable_type: :select,
       codeable_id: :text,

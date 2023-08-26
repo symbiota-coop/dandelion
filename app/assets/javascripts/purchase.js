@@ -22,8 +22,6 @@ $(function () {
 
     if ($('#credit').length > 0 && $('#credit').val() != '') { c += parseFloat($('#credit').val()) }
 
-    if ($('#fixed_discount').length > 0 && $('#fixed_discount').val() != '') { c += parseFloat($('#fixed_discount').val()) }
-
     return c
   }
 
