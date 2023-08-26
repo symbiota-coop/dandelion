@@ -123,7 +123,7 @@
             </div>
             <strong>Discount applied</strong>
             <div class="input-group" style="margin: 5px 0">
-              <% if if discount_code.percentage_discount %>
+              <% if discount_code.percentage_discount %>
                 <%= number_field_tag :percentage_discount, id: 'percentage_discount', class: 'form-control', style: 'width: 5em', disabled: true, value: discount_code.percentage_discount %>
                 <div class="input-group-append">
                   <span class="py-0 input-group-text">%</span>
