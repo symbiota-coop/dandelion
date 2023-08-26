@@ -1,6 +1,25 @@
 /* global timeAgo, eventId, placesRemaining, currency, currencySymbol, stripePk, coinbase, seedsUsername, organisationOcSlug, ocSlug, evmAddress, contractAddress, networkId, networkName, signedIn */
 
 $(function () {
+  $('#details form').on('keyup keypress', function (e) {
+    const keyCode = e.keyCode || e.which
+    if (keyCode === 13) {
+      e.preventDefault()
+      return false
+    }
+  })
+
+  $('#donation_amount').change(function () {
+    if ($('#donation_amount').val().length > 0) {
+      const donationAmount = parseFloat($('#donation_amount').val())
+      if (donationAmount < 0) {
+        $('#donation_amount').val('')
+      } else {
+        $('#donation_amount').val(donationAmount.toFixed(2).endsWith('00') ? donationAmount.toFixed(0) : donationAmount.toFixed(2))
+      }
+    }
+  }).change()
+
   function price () {
     let p = 0
 
@@ -78,21 +97,6 @@ $(function () {
     $('input[type=hidden][name=payment_method][value=' + $(this).attr('data-payment-method') + ']').prop('disabled', false)
     $(this).attr('data-payment-method-clicked', true)
   })
-
-  $('#details form').on('keyup keypress', function (e) {
-    const keyCode = e.keyCode || e.which
-    if (keyCode === 13) {
-      e.preventDefault()
-      return false
-    }
-  })
-
-  $('#donation_amount').blur(function () {
-    if ($('#donation_amount').val().length > 0) {
-      const donationAmount = parseFloat($('#donation_amount').val())
-      $('#donation_amount').val(donationAmount.toFixed(2).endsWith('00') ? donationAmount.toFixed(0) : donationAmount.toFixed(2))
-    }
-  }).blur()
 
   $('#details form').submit(function () {
     let halt
