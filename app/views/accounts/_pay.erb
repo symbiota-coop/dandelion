@@ -3,35 +3,46 @@
 <% last_completed_contribution = account.account_contributions.and(payment_completed: true).order('created_at desc').first %>
 <% if (defined?(force) && force) || !last_completed_contribution || last_completed_contribution.created_at < 1.month.ago %>
   <div class="<%=div_class if defined?(div_class)%>">
-    <p class="lead mb-1">
-      <mark class="px-0">
-        Dandelion operates on a donation/gift economy basis.
-      </mark>
-    </p>
-    <% if last_completed_contribution %>
-      <p class="lead">
-        <small>
-          Thanks for contributing <%= time_ago_in_words last_completed_contribution.created_at %> ago.
-          Will you chip in again so we can remain free?
-          <% if last_completed_contribution.created_at < 1.month.ago %>
-            <small>
-              (and we won't ask again for a month)
-            </small>
-          <% end %>
-        </small>
-      </p>
-    <% else %>
-      <p class="lead mb-1">
-        <small>
-          We rely on the generosity of our users. Please chip in so we can remain free
-          <small>
-            (and we won't ask again for a month).
-          </small>
-        </small>
-      </p>
-    <% end %>
 
-    <%
+    <div class="row">
+      <div class="d-none d-sm-block col-sm-3">
+        <a target="_blank" href="https://stephenreid.net"><img class="w-100" src="/images/me-no-bg.png"></a>
+        <p style="font-size: 85%">Lead developer and project steward, <a href="https://stephenreid.net">Stephen Reid</a></p>
+      </div>
+      <div class="col-12 col-sm-9">
+        <p class="lead mb-1">
+          Hey there 👋
+        </p>
+        <% if last_completed_contribution %>
+          <p class="lead">
+            <small>
+              Thanks for contributing <%= time_ago_in_words last_completed_contribution.created_at %> ago.
+              <br />
+              Will you chip in again so we can remain free?
+              <% if last_completed_contribution.created_at < 1.month.ago %>
+                <br />
+                <small>
+                  (and we won't ask again for a month)
+                </small>
+              <% end %>
+            </small>
+          </p>
+        <% else %>
+          <p class="lead mb-1">
+            <small>
+              Dandelion is free to use, but it costs money to run.              
+              <br />
+              Will you chip in so we can remain free?
+              <br />
+              <small>
+                (and we won't ask again for a month)
+              </small>
+            </small>
+          </p>
+        <% end %>
+
+
+        <%
     monthly_contributions = Money.new(0,'GBP') +
       AccountContribution.and(:payment_completed => true, :created_at.gte => Date.new(Date.today.year, Date.today.month, 1)).sum { |ac| Money.new(ac.amount*100, ac.currency) } +
       OrganisationContribution.and(:payment_completed => true, :created_at.gte => Date.new(Date.today.year, Date.today.month, 1)).sum { |oc| Money.new(oc.amount*100, oc.currency) }    
@@ -43,44 +54,44 @@
     end    
     %>
 
-    <% if monthly_contributions > 0 %>
-      <div class="progress" style="height: 30px">
-        <div class="progress-bar" role="progressbar" style="width: <%= "#{w = 100*monthly_contributions/target}%" %>;">
-          <% if w > 0 %><%= w.to_f.round %>%<% end %>
-        </div>
-      </div>
-      <p class="mt-1 text-center"><%= monthly_contributions.format(no_cents: true) %> raised of <%=m target, currency%> monthly target</p>
-    <% end %>
-
-    <% form_tag '', class: "form-inline mt-2 #{'justify-content-center' if monthly_contributions > 0}", id: 'pay-form' do %>
-      <%= hidden_field_tag :source, value: source %>
-      <div class="form-group mb-1 mr-1">
-        <div class="input-group">
-          <div class="input-group-prepend">
-            <span class="input-group-text"><%= Money.new(0, currency).symbol %></span>
+        <% if monthly_contributions > 0 %>
+          <div class="progress" style="height: 30px">
+            <div class="progress-bar" role="progressbar" style="width: <%= "#{w = 100*monthly_contributions/target}%" %>;">
+              <% if w > 0 %><%= w.to_f.round %>%<% end %>
+            </div>
           </div>
-          <%= hidden_field_tag :currency, value: currency %>
-          <%= number_field_tag :amount, value: 10, style: 'width: 5em;', required: 'required', class: 'form-control', id: 'amount' %>
-        </div>
-      </div>
-      <% if FIAT_CURRENCIES.include?(currency) %>
-        <button data-payment-method="stripe" type="submit" class="btn btn-primary mb-1 ml-0 mr-1" style="height: 2.125rem">
-          Contribute via card
-          <i class="fa fa-spin fa-circle-o-notch" style="display: none"></i>
-        </button>
-        <%= hidden_field_tag :payment_method, value: 'stripe', disabled: true %>
-      <% end %>
-      <% if MAJOR_CURRENCIES.include?(currency) %>
-        <div class="d-none d-lg-block">
-          <button data-payment-method="coinbase" type="submit" class="btn mb-1 <% if FIAT_CURRENCIES.include?(currency) %> btn-outline-primary border-0  <% else %> btn-primary <% end %> " style="height: 2.125rem">
-            Contribute with crypto
-            <i class="fa fa-spin fa-circle-o-notch" style="display: none"></i>
-          </button>
-          <%= hidden_field_tag :payment_method, value: 'coinbase', disabled: true %>
+          <p class="mt-1 text-center"><%= monthly_contributions.format(no_cents: true) %> raised of <%=m target, currency%> monthly target</p>
         <% end %>
-      </div>
-    <% end %>
-    <!--
+
+        <% form_tag '', class: "form-inline mt-2 #{'justify-content-center' if monthly_contributions > 0}", id: 'pay-form' do %>
+          <%= hidden_field_tag :source, value: source %>
+          <div class="form-group mb-1 mr-1">
+            <div class="input-group">
+              <div class="input-group-prepend">
+                <span class="input-group-text"><%= Money.new(0, currency).symbol %></span>
+              </div>
+              <%= hidden_field_tag :currency, value: currency %>
+              <%= number_field_tag :amount, value: 10, style: 'width: 5em;', required: 'required', class: 'form-control', id: 'amount' %>
+            </div>
+          </div>
+          <% if FIAT_CURRENCIES.include?(currency) %>
+            <button data-payment-method="stripe" type="submit" class="btn btn-primary mb-1 ml-0 mr-1" style="height: 2.125rem">
+              Contribute via card
+              <i class="fa fa-spin fa-circle-o-notch" style="display: none"></i>
+            </button>
+            <%= hidden_field_tag :payment_method, value: 'stripe', disabled: true %>
+          <% end %>
+          <% if MAJOR_CURRENCIES.include?(currency) %>
+            <div class="d-none d-lg-block">
+              <button data-payment-method="coinbase" type="submit" class="btn mb-1 <% if FIAT_CURRENCIES.include?(currency) %> btn-outline-primary border-0  <% else %> btn-primary <% end %> " style="height: 2.125rem">
+                Contribute with crypto
+                <i class="fa fa-spin fa-circle-o-notch" style="display: none"></i>
+              </button>
+              <%= hidden_field_tag :payment_method, value: 'coinbase', disabled: true %>
+            <% end %>
+          </div>
+        <% end %>
+        <!--
     <div class="d-none d-lg-block">
       <p class="lead mb-0">
         <small>
@@ -107,82 +118,84 @@
     </div>
     -->
 
-    <% if ENV['OFFER_NFT'] && defined?(short_nft) && short_nft %>
-      <p class="mt-2">
-        As a thank you, you'll be able to claim a <a href="/donate">uniquely-generated Dandelion Cityscape NFT (digital collectible)</a>.
-      </p>
-    <% end %>
+        <% if ENV['OFFER_NFT'] && defined?(short_nft) && short_nft %>
+          <p class="mt-2">
+            As a thank you, you'll be able to claim a <a href="/donate">uniquely-generated Dandelion Cityscape NFT (digital collectible)</a>.
+          </p>
+        <% end %>
 
-    <% if ENV['OFFER_NFT'] && defined?(nft) && nft %>
-      <p class="mt-2">
-        As a thank you, you'll be able to claim a <strong>uniquely-generated Dandelion Cityscape NFT (digital collectible)</strong>.
-      </p>
-      <div id="nft-preview" class="text-center">
-      </div>
-      <style>
-        #nft-preview img {
-          width: 100%;
-        }
-        @media (min-width: 992px) {
-          #nft-preview img {
-            width: 50%;
-          }
-        }
-      </style>
-      <script>
-        $(function() {
-          // rotate nft-preview img src every 3 seconds
-          var i = 0
-          var srcs = [
-            'https://cdn.discordapp.com/attachments/1112548550614728744/1112694253286608957/Williamkanks_A_whimsical_watercolor_design_featuring_a_bioengin_3e95b027-5d8b-4079-ad24-4fd6e03bd0ce.png',
-            'https://cdn.discordapp.com/attachments/1112548550614728744/1112692708746739793/Williamkanks_A_whimsical_watercolor_design_featuring_a_bioengin_fc8b170f-226e-4afd-854b-267d7541afb2.png',
-            'https://cdn.discordapp.com/attachments/1112548550614728744/1112697839382962206/Williamkanks_A_whimsical_watercolor_design_featuring_a_bioengin_4e5d2771-cfd7-4c56-b2cb-2c03b91fbf6f.png',
-            'https://cdn.discordapp.com/attachments/1112548550614728744/1112694703142481990/Williamkanks_A_whimsical_watercolor_design_featuring_a_bioengin_d223a933-6fa0-48dd-9405-9a27caf261fd.png'
-          ]
-          $(srcs).each(function(i, src) {
-            $('<img src="'+src+'" style="position: absolute; top: -9999px; opacity: 0">').appendTo('#nft-preview')
-          })
-          $('#nft-preview img').first().css('position', 'relative').css('top', '0px').css('opacity', 1)
-        setInterval(function() {
-          i = (i + 1) % srcs.length
-          $('#nft-preview img').eq(i-1).animate({opacity: 0}, 500, function() {
-            $(this).css('position', 'absolute').css('top', '-9999px')
-            $('#nft-preview img').eq(i).css('position', 'relative').css('top', '0px').animate({opacity: 1}, 500)
-          })
-        }, 4000)
-              })
-      </script>
-    <% end %>
-
-    <script>
-      $(function () {
-
-        $('#pay-form button[data-payment-method]').click(function () {
-          $('input[type=hidden][name=payment_method]').attr('disabled', true)
-          $('input[type=hidden][name=payment_method][value=' + $(this).attr('data-payment-method') + ']').removeAttr('disabled')
-          $(this).attr('data-payment-method-clicked', true)
-        })
-
-        $('#pay-form').submit(function () {
-          $('#pay-form button[data-payment-method-clicked] i').show()
-          $.post('/accounts/<%= account.id %>/pay', $(this).serializeObject(), function (data) {
-            if (data['session_id']) {
-              var stripe = Stripe('<%= ENV['STRIPE_PK'] %>');
-              stripe.redirectToCheckout({sessionId: data['session_id']})
-            } else if (data['checkout_id']) {
-              window.location = 'https://commerce.coinbase.com/checkout/' + data['checkout_id']
+        <% if ENV['OFFER_NFT'] && defined?(nft) && nft %>
+          <p class="mt-2">
+            As a thank you, you'll be able to claim a <strong>uniquely-generated Dandelion Cityscape NFT (digital collectible)</strong>.
+          </p>
+          <div id="nft-preview" class="text-center">
+          </div>
+          <style>
+            #nft-preview img {
+              width: 100%;
             }
-          }).fail(function () {
-            $('#pay-form').hide()
-          }).always(function () {
-            $('#pay-form').css('opacity', 1)
+            @media (min-width: 992px) {
+              #nft-preview img {
+                width: 50%;
+              }
+            }
+          </style>
+          <script>
+            $(function() {
+              // rotate nft-preview img src every 3 seconds
+              var i = 0
+              var srcs = [
+                'https://cdn.discordapp.com/attachments/1112548550614728744/1112694253286608957/Williamkanks_A_whimsical_watercolor_design_featuring_a_bioengin_3e95b027-5d8b-4079-ad24-4fd6e03bd0ce.png',
+                'https://cdn.discordapp.com/attachments/1112548550614728744/1112692708746739793/Williamkanks_A_whimsical_watercolor_design_featuring_a_bioengin_fc8b170f-226e-4afd-854b-267d7541afb2.png',
+                'https://cdn.discordapp.com/attachments/1112548550614728744/1112697839382962206/Williamkanks_A_whimsical_watercolor_design_featuring_a_bioengin_4e5d2771-cfd7-4c56-b2cb-2c03b91fbf6f.png',
+                'https://cdn.discordapp.com/attachments/1112548550614728744/1112694703142481990/Williamkanks_A_whimsical_watercolor_design_featuring_a_bioengin_d223a933-6fa0-48dd-9405-9a27caf261fd.png'
+              ]
+              $(srcs).each(function(i, src) {
+                $('<img src="'+src+'" style="position: absolute; top: -9999px; opacity: 0">').appendTo('#nft-preview')
+              })
+              $('#nft-preview img').first().css('position', 'relative').css('top', '0px').css('opacity', 1)
+            setInterval(function() {
+              i = (i + 1) % srcs.length
+              $('#nft-preview img').eq(i-1).animate({opacity: 0}, 500, function() {
+                $(this).css('position', 'absolute').css('top', '-9999px')
+                $('#nft-preview img').eq(i).css('position', 'relative').css('top', '0px').animate({opacity: 1}, 500)
+              })
+            }, 4000)
+                  })
+          </script>
+        <% end %>
+
+        <script>
+          $(function () {
+
+            $('#pay-form button[data-payment-method]').click(function () {
+              $('input[type=hidden][name=payment_method]').attr('disabled', true)
+              $('input[type=hidden][name=payment_method][value=' + $(this).attr('data-payment-method') + ']').removeAttr('disabled')
+              $(this).attr('data-payment-method-clicked', true)
+            })
+
+            $('#pay-form').submit(function () {
+              $('#pay-form button[data-payment-method-clicked] i').show()
+              $.post('/accounts/<%= account.id %>/pay', $(this).serializeObject(), function (data) {
+                if (data['session_id']) {
+                  var stripe = Stripe('<%= ENV['STRIPE_PK'] %>');
+                  stripe.redirectToCheckout({sessionId: data['session_id']})
+                } else if (data['checkout_id']) {
+                  window.location = 'https://commerce.coinbase.com/checkout/' + data['checkout_id']
+                }
+              }).fail(function () {
+                $('#pay-form').hide()
+              }).always(function () {
+                $('#pay-form').css('opacity', 1)
+              })
+
+              return false
+
+            })
+            console.log('paying')
           })
-
-          return false
-
-        })
-        console.log('paying')
-      })
-    </script>
+        </script>
+      </div>
+    </div>
   </div>
 <% end %>
