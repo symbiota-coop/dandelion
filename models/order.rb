@@ -28,7 +28,7 @@ class Order
   field :seeds_value, type: Float
   field :evm_secret, type: String
   field :evm_value, type: BigDecimal
-  field :oc_name, type: String
+  field :oc_secret, type: String
   field :payment_completed, type: Boolean
   field :application_fee_amount, type: Float
   field :currency, type: String
@@ -59,7 +59,7 @@ class Order
       seeds_value: :number,
       evm_secret: :text,
       evm_value: :number,
-      oc_name: :text,
+      oc_secret: :text,
       payment_completed: :check_box,
       opt_in_organisation: :check_box,
       opt_in_facilitator: :check_box,

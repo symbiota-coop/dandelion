@@ -437,6 +437,7 @@
     timeAgo = '<%= time_ago_in_words @event.start_time %>'
   <% end %>
     eventId = <%== @event.id.to_s.to_json %>
+    eventUrl = <%== "#{ENV['BASE_URI']}/events/#{@event.id}".to_json %>
     placesRemaining = <%== @event.places_remaining.to_json %>
     currency = <%== @event.currency.to_json %>
     currencySymbol = <%== Money.new(0, @event.currency).symbol.to_json %>

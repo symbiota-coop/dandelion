@@ -992,23 +992,50 @@ class Event
     transactions = []
     agent = Mechanize.new
 
-    [
-      "https://api.opencollective.com/v1/collectives/#{oc_slug}/transactions?type=CREDIT"
-    ].each do |url|
-      puts url
-      page = begin; agent.get(url); rescue Mechanize::ResponseCodeError; end
-      next unless page
+    query = %Q{
+      query (
+        $account: AccountReferenceInput
+      ) {
+        orders(account: $account) {    
+          nodes {
+            legacyId    
+            createdAt
+            tags
+            amount {
+              value
+              currency
+              valueInCents
+            }      
+          }
+        }
+      }
+    }
 
-      j = JSON.parse(page.body)
-      j['result'].each do |item|
-        currency = item['currency']
-        amount = item['amount'].to_f / 100
-        name = item['fromCollective']['name']
-        tx_created_at = Time.parse(item['createdAt'])
+    variables = {"account": {"slug": oc_slug } }
 
-        puts [currency, amount, name, tx_created_at]
-        transactions << [currency, amount, name, tx_created_at]
-      end
+    conn = Faraday.new(url: 'https://api.opencollective.com/graphql/v2/') do |faraday|
+      faraday.request  :url_encoded
+      faraday.adapter  Faraday.default_adapter
+      faraday.headers['Content-Type'] = 'application/json'
+      faraday.headers['Api-Key'] = '6efa85f567f438af874a1a0faba917c935e0b252'
+    end
+    
+    response = conn.post do |req|
+      req.body = {
+        query: query,
+        variables: variables
+      }.to_json
+    end
+    
+    j = JSON.parse(response.body)
+    j['data']['orders']['nodes'].each do |item|
+      currency = item['amount']['currency']
+      amount = item['amount']['value']
+      secret = item['tags'].select { |tag| tag.starts_with?('dandelion:') }.first
+      tx_created_at = Time.parse(item['createdAt'])
+
+      puts [currency, amount, secret, tx_created_at]
+      transactions << [currency, amount, secret, tx_created_at]
     end
 
     transactions
@@ -1019,12 +1046,12 @@ class Event
   end
 
   def check_oc_event
-    oc_transactions.each do |currency, amount, name, tx_created_at|
-      if (@order = Order.find_by(:payment_completed.ne => true, :currency => currency, :value => amount, :oc_name => name, :created_at.lt => tx_created_at))
+    oc_transactions.each do |currency, amount, secret, tx_created_at|
+      if (@order = Order.find_by(:payment_completed.ne => true, :currency => currency, :value => amount, :oc_secret => secret, :created_at.lt => tx_created_at))
         @order.payment_completed!
         @order.send_tickets
         @order.create_order_notification
-      elsif (@order = Order.deleted.find_by(:payment_completed.ne => true, :currency => currency, :value => amount, :oc_name => name, :created_at.lt => tx_created_at))
+      elsif (@order = Order.deleted.find_by(:payment_completed.ne => true, :currency => currency, :value => amount, :oc_secret => secret, :created_at.lt => tx_created_at))
         begin
           @order.restore_and_complete
           # raise Order::Restored

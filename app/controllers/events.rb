@@ -139,6 +139,9 @@ Dandelion::App.controller do
     @title = @event.name
     @organisation = @event.organisation
     if @order && params[:success]
+      if !@order.payment_completed && @event.oc_slug
+        @event.check_oc_event
+      end      
       @ga_transaction = { transaction_id: @order.id.to_s, affiliation: @event.organisation.name, value: (@order.value || 0), currency: @order.currency }
       @ga_items = @order.tickets.map do |ticket|
         { item_id: ticket.id.to_s, item_name: "#{ticket.event.name}: #{ticket.ticket_type.try(:name) || 'Complementary'}", item_price: (ticket.discounted_price || 0), item_quantity: 1 }
@@ -521,7 +524,7 @@ Dandelion::App.controller do
     @order = @event.orders.find(params[:order_id]) || not_found
     @event.organisation.check_seeds_account if @order.seeds_secret && @event.organisation.seeds_username
     @event.organisation.check_evm_account if @order.evm_secret && @event.organisation.evm_address
-    @event.check_oc_event if @order.oc_name && @event.oc_slug
+    @event.check_oc_event if @order.oc_secret && @event.oc_slug
     { id: @order.id.to_s, payment_completed: @order.payment_completed }.to_json
   end
 

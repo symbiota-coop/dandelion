@@ -146,11 +146,12 @@ Dandelion::App.controller do
 
         when 'opencollective'
 
+          oc_secret = "dandelion:#{Array.new(5) { [*'a'..'z', *'0'..'9'].sample }.join}"
           @order.update_attributes!(
             value: @order.total.round(2),
-            oc_name: @order.account.name
+            oc_secret: oc_secret
           )
-          { oc_name: @order.oc_name, currency: @order.currency, value: @order.value, order_id: @order.id.to_s, order_expiry: (@order.created_at + 1.hour).to_datetime.strftime('%Q') }.to_json
+          { oc_secret: @order.oc_secret, currency: @order.currency, value: @order.value, order_id: @order.id.to_s, order_expiry: (@order.created_at + 1.hour).to_datetime.strftime('%Q') }.to_json
 
         when 'evm'
 

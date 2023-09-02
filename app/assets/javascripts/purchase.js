@@ -1,4 +1,4 @@
-/* global timeAgo, eventId, placesRemaining, currency, currencySymbol, stripePk, coinbase, seedsUsername, organisationOcSlug, ocSlug, evmAddress, contractAddress, networkId, networkName, signedIn */
+/* global timeAgo, eventId, eventUrl, placesRemaining, currency, currencySymbol, stripePk, coinbase, seedsUsername, organisationOcSlug, ocSlug, evmAddress, contractAddress, networkId, networkName, signedIn */
 
 $(function () {
   $('#details form').on('keyup keypress', function (e) {
@@ -168,10 +168,9 @@ $(function () {
               })
             }
           }, 30 * 1000)
-        } else if (data.oc_name) {
+        } else if (data.oc_secret) {
           // Open Collective
-          alert('You will now be redirected to Open Collective. Use the same name at checkout as your name on Dandelion (' + data.oc_name + '). After payment, there may be a delay of up to 10 minutes before your ticket is delivered.')
-          window.location = 'https://opencollective.com/' + organisationOcSlug + '/events/' + ocSlug + '/donate?interval=oneTime&amount=' + data.value + '&name=' + data.oc_name
+          window.location = 'https://opencollective.com/' + organisationOcSlug + '/events/' + ocSlug + '/donate?interval=oneTime&amount=' + data.value + '&tags=' + data.oc_secret + '&redirect=' + encodeURIComponent(eventUrl + '?success=true&order_id=' + data.order_id)
         } else if (data.evm_secret) {
           // EVM
           $('#select-tickets').hide()
