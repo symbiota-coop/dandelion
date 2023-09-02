@@ -990,7 +990,6 @@ class Event
 
   def self.oc_transactions(oc_slug)
     transactions = []
-    agent = Mechanize.new
 
     query = %Q{
       query (
@@ -1005,13 +1004,13 @@ class Event
               value
               currency
               valueInCents
-            }      
+            }
           }
         }
       }
     }
 
-    variables = {"account": {"slug": oc_slug } }
+    variables = { account: { slug: oc_slug } }
 
     conn = Faraday.new(url: 'https://api.opencollective.com/graphql/v2/') do |faraday|
       faraday.request  :url_encoded
