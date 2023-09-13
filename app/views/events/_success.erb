@@ -4,7 +4,8 @@
     <p class="lead mb-3"><strong>Check your inbox for the confirmation email with your tickets.</strong></p>
     <p>
       We are currently experiencing an issue with Hotmail and Outlook adddress. 
-      If you don't see anything in your inbox, you can also <a target="_blank" href="/orders/<%=@order.id%>">view the confirmation email in your browser</a>.
+      If you don't see anything in your inbox, you can also
+      <a target="_blank" href="/orders/<%=@order.id%>">view the confirmation email in your browser</a>.
     </p>
     <% if @event.redirect_url %>
       <p>Redirecting you to <a href="<%= @event.redirect_url %>"><%= @event.redirect_url %></a>&hellip; <i class="fa fa-spin fa-circle-o-notch"></i></p>
