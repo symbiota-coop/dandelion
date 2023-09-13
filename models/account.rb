@@ -62,7 +62,6 @@ class Account
      updated_profile
      admin
      unsubscribed
-     unsubscribed_habit_completion_likes
      unsubscribed_messages
      unsubscribed_feedback
      unsubscribed_reminders
@@ -112,7 +111,6 @@ class Account
       can_message: :check_box,
       admin: :check_box,
       unsubscribed: :check_box,
-      unsubscribed_habit_completion_likes: :check_box,
       unsubscribed_messages: :check_box,
       unsubscribed_feedback: :check_box,
       unsubscribed_reminders: :check_box,
@@ -418,10 +416,6 @@ class Account
   # Inventory
   has_many :inventory_items_listed, class_name: 'InventoryItem', inverse_of: :account, dependent: :nullify
   has_many :inventory_items_provided, class_name: 'InventoryItem', inverse_of: :responsible, dependent: :nullify
-  # Habits
-  has_many :habits, dependent: :destroy
-  has_many :habit_completions, dependent: :destroy
-  has_many :habit_completion_likes, dependent: :destroy
   # Follows
   has_many :follows_as_follower, class_name: 'Follow', inverse_of: :follower, dependent: :destroy
   has_many :follows_as_followee, class_name: 'Follow', inverse_of: :followee, dependent: :destroy
@@ -659,7 +653,6 @@ Two Spirit).split("\n")
     {
       picture: 'Photo',
       unsubscribed: 'Opt out of all emails from Dandelion',
-      unsubscribed_habit_completion_likes: 'Opt out of email notifications when people like my habit completions',
       unsubscribed_messages: 'Opt out of email notifications of direct messages',
       unsubscribed_feedback: 'Opt out of requests for feedback',
       unsubscribed_reminders: 'Opt out of event reminders',

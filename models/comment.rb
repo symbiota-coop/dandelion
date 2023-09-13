@@ -181,9 +181,6 @@ class Comment
     elsif commentable.is_a?(Gathering)
       gathering = commentable
       s << "[#{gathering.name}] "
-    elsif commentable.is_a?(Habit)
-      habit = commentable
-      s << "[#{habit.account.name}/#{habit.name}] "
     elsif commentable.is_a?(Account)
       account = commentable
       s << "[#{account.name}] "

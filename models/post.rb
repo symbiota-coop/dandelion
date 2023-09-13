@@ -47,9 +47,6 @@ class Post
     elsif commentable.is_a?(Mapplication)
       mapplication = commentable
       "#{ENV['BASE_URI']}/g/#{mapplication.gathering.slug}/mapplications/#{mapplication.id}#post-#{id}"
-    elsif commentable.is_a?(Habit)
-      habit = commentable
-      "#{ENV['BASE_URI']}/habits/#{habit.id}#post-#{id}"
     elsif commentable.is_a?(Account)
       account = commentable
       "#{ENV['BASE_URI']}/u/#{account.username}#post-#{id}"
