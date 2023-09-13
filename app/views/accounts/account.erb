@@ -19,10 +19,6 @@
   <h2 class="mt-5">Feedback on <%=@account.firstname%>'s events</h2>
   <div class="mt-3" data-pagelet-url="/accounts/<%= @account.id %>/show_feedback"></div>
 <% end %>
-<% if (habits = @account.habits.and(public: true).and(:archived.ne => true)).count > 0 %>
-  <h2 class="mt-5" id="habits">Habits</h2>
-  <div data-pagelet-url="/accounts/<%= @account.id %>/habits"></div>
-<% end %>
 
 <% if (organisations = Organisation.and(:id.in => @account.organisationships.and(:hide_membership.ne => true).pluck(:organisation_id))).count > 0 %>
   <% if viewable?(@account, :organisations, viewer_in_network: viewer_in_network) %>

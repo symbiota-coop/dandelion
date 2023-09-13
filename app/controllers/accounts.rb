@@ -1,9 +1,7 @@
 Dandelion::App.controller do
   get '/accounts', provides: [:json] do
     @accounts = Account.public
-    if params[:q]
-      @accounts = @accounts.and(:id.in => search_accounts(params[:q]).pluck(:id))
-    end
+    @accounts = @accounts.and(:id.in => search_accounts(params[:q]).pluck(:id)) if params[:q]
     @accounts = @accounts.and(id: params[:id]) if params[:id]
     case content_type
     when :json
@@ -288,12 +286,6 @@ Dandelion::App.controller do
     partial :'accounts/following', locals: { accounts: @account.following, starred: @account.following_starred }
   end
 
-  get '/accounts/:id/habits' do
-    @account = Account.find(params[:id]) || not_found
-    habits = @account.habits.and(public: true).and(:archived.ne => true)
-    partial :'habits/blocks', locals: { habits: habits }
-  end
-
   get '/accounts/:id/places' do
     @account = Account.find(params[:id]) || not_found
     partial :'accounts/places'
@@ -399,15 +391,5 @@ Dandelion::App.controller do
     @account = Account.find(params[:id]) || not_found
     events = Event.and(:id.in => EventFacilitation.and(:account_id.in => [@account.id] + @account.following_starred.pluck(:id)).pluck(:event_id)).live.public.future_and_current_featured
     partial :'events/blocks', locals: { events: events }, layout: 'minimal'
-  end
-
-  get '/u/:username/habits' do
-    @account = Account.find_by(username: params[:username]) || not_found
-    @habits = @account.habits.and(public: true).and(:archived.ne => true)
-    @date = params[:date] ? Date.parse(params[:date]) : Date.current
-    @hide_nav = true
-    @minimal_container = true
-    @no_discord = true
-    erb :'accounts/habits', layout: :minimal
   end
 end
