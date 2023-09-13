@@ -18,7 +18,7 @@
   <%= partial :'events/tag_labels', locals: { event: event } %>
 </div>
 <ul style="margin-left: 1.66em; font-size: 1rem" class="fa-ul text-dark">
-  <% if (!@organisation && event.organisation) || (ef = event.event_facilitations.select { |event_facilitation| event_facilitation.account.lastname && event_facilitation.account.name != event.organisation.name }).count > 0 %>
+  <% if (ef = event.event_facilitations.select { |event_facilitation| event_facilitation.account.lastname && event_facilitation.account.name != event.organisation.name }).count > 0 || (!@organisation && event.organisation) %>
     <li>
       <i data-toggle="tooltip" title="Host/facilitators" class="fa fa-li fa-flag"></i>
       <%= partial :'events/facilitators', locals: {event: event, event_facilitators: ef} %>
