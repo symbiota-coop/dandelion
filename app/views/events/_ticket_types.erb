@@ -28,7 +28,7 @@
                 </div>
               <% end %>
               <label>
-                Limit per order <%= o.number_field :max_quantity_per_transaction, class: 'form-control', :'data-toggle' => 'tooltip', :title => 'Maximum number of tickets of this type someone can purchase in a single order' %>
+                Limit per order <%= o.number_field :max_quantity_per_transaction, class: 'form-control', :'data-toggle' => 'tooltip', :title => 'Maximum number of tickets of this type someone can purchase in a single order', min: 0 %>
               </label><% if f.object.ticket_groups.select(&:persisted?).length > 0 %><label>
                   Group <%= o.select :ticket_group_id, options: [''] + f.object.ticket_groups.select(&:persisted?).map { |ticket_group| [ticket_group.name, ticket_group.id] }, class: 'form-control ml-1' %>
                 </label><% end %><label onclick="$(this).tooltip('hide')" data-toggle="tooltip" title="Allow only people with the link to this ticket type to purchase">
