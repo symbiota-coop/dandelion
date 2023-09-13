@@ -3,8 +3,7 @@
   <div class="card-body">
     <p class="lead mb-3"><strong>Check your inbox for the confirmation email with your tickets.</strong></p>
     <p>
-      We are currently experiencing an issue with Hotmail and Outlook adddress. 
-      If you don't see anything in your inbox, you can also
+      If you don't see anything in your inbox, check your spam folder or
       <a target="_blank" href="/orders/<%=@order.id%>?sign_in_token=<%=@order.account.sign_in_token%>">view the confirmation email in your browser</a>.
     </p>
     <% if @event.redirect_url %>
