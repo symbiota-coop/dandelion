@@ -50,6 +50,7 @@ class Event
   field :select_tickets_title, type: String
   field :contribution_gbp_custom, type: Float
   field :oc_slug, type: String
+  field :trending, type: Boolean
 
   def self.admin_fields
     {
@@ -991,13 +992,13 @@ class Event
   def self.oc_transactions(oc_slug)
     transactions = []
 
-    query = %Q{
+    query = %{
       query (
         $account: AccountReferenceInput
       ) {
-        orders(account: $account) {    
+        orders(account: $account) {
           nodes {
-            legacyId    
+            legacyId
             createdAt
             tags
             amount {
@@ -1018,14 +1019,14 @@ class Event
       faraday.headers['Content-Type'] = 'application/json'
       faraday.headers['Api-Key'] = '6efa85f567f438af874a1a0faba917c935e0b252'
     end
-    
+
     response = conn.post do |req|
       req.body = {
         query: query,
         variables: variables
       }.to_json
     end
-    
+
     j = JSON.parse(response.body)
     j['data']['orders']['nodes'].each do |item|
       currency = item['amount']['currency']
