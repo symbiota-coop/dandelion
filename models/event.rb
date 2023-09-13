@@ -76,6 +76,7 @@ class Event
       refund_deleted_orders: :check_box,
       monthly_donors_only: :check_box,
       no_discounts: :check_box,
+      trending: :check_box,
       extra_info_for_ticket_email: :wysiwyg,
       extra_info_for_recording_email: :wysiwyg,
       suggested_donation: :number,
@@ -768,7 +769,7 @@ class Event
     live.public.legit.future.and(:image_uid.ne => nil).and(
       :organisation_id.in => Organisation.and(paid_up: true).pluck(:id)
     ).sort_by do |event|
-      -event.orders.complete.and(:created_at.gt => 1.week.ago).count
+      [event.trending ? 0 : 1, -event.orders.complete.and(:created_at.gt => 1.week.ago).count]
     end
   end
 
