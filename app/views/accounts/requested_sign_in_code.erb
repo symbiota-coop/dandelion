@@ -1,0 +1,23 @@
+<div class="row justify-content-center">
+  <div class="col col-lg-4">
+    <div class="card" id="sign_in">
+      <div class="hw card-header text-white bg-primary">
+        <h2 class="text-center my-0">Sign in</h2>
+      </div>
+      <div class="card-body">
+        A sign in code was sent to <%=@account.email%>. Please check your email app and paste the code below ✨
+
+        <% form_tag '', class: 'my-3', onsubmit: %Q{window.location.href = '/?sign_in_token=' + $('#code').val(); return false;} do %>
+
+          <div class="input-group">
+            <%= text_field_tag :code, class: 'form-control', placeholder: 'Code', id: 'code' %>
+            <div class="input-group-append">
+              <button class="btn btn-primary" type="submit">Submit</button>
+            </div>
+          </div>
+
+        <% end %>
+      </div>
+    </div>
+  </div>
+</div>

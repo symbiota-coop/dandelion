@@ -67,7 +67,7 @@ module Dandelion
           session[:account_id] = account.id.to_s
           account.update_attribute(:sign_in_token, SecureRandom.uuid)
         elsif !current_account
-          kick! notice: 'Please sign in to continue.'
+          kick! notice: "That sign in code/link isn't valid any longer. Please request a new one."
         end
       elsif params[:api_key]
         if (account = Account.find_by(api_key: params[:api_key]))

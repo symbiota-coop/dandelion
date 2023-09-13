@@ -725,14 +725,14 @@ Two Spirit).split("\n")
     Array.new(16) { chars[rand(chars.size)] }.join
   end
 
-  def sign_in_link!
+  def sign_in_code!
     mg_client = Mailgun::Client.new ENV['MAILGUN_API_KEY'], ENV['MAILGUN_REGION']
     batch_message = Mailgun::BatchMessage.new(mg_client, ENV['MAILGUN_NOTIFICATIONS_HOST'])
 
     account = self
-    content = ERB.new(File.read(Padrino.root('app/views/emails/sign_in_link.erb'))).result(binding)
+    content = ERB.new(File.read(Padrino.root('app/views/emails/sign_in_code.erb'))).result(binding)
     batch_message.from ENV['NOTIFICATIONS_EMAIL_FULL']
-    batch_message.subject 'Sign in link for Dandelion'
+    batch_message.subject 'Sign in code for Dandelion'
     batch_message.body_html Premailer.new(ERB.new(File.read(Padrino.root('app/views/layouts/email.erb'))).result(binding), with_html_string: true, adapter: 'nokogiri', input_encoding: 'UTF-8').to_inline_css
 
     [account].each do |account|
