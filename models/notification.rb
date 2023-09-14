@@ -160,12 +160,6 @@ class Notification
       comment = notifiable
       if comment.commentable.is_a?(Mapplication)
         "<strong>#{comment.account.name}</strong> commented on <strong>#{comment.commentable.account.name}</strong>'s application"
-      elsif comment.commentable.is_a?(Habit)
-        if comment.first_in_post?
-          "<strong>#{comment.account.name}</strong> started a thread <strong>#{comment.commentable.account.name}/#{comment.commentable.name}/#{comment.post.subject}</strong>"
-        else
-          "<strong>#{comment.account.name}</strong> replied to <strong>#{comment.commentable.account.name}/#{comment.commentable.name}/#{comment.post.subject}</strong>"
-        end
       elsif comment.commentable.is_a?(Account)
         if comment.first_in_post?
           "<strong>#{comment.account.name}</strong> started a thread <strong>#{comment.post.subject}</strong> on #{comment.account_id == comment.commentable_id ? "#{comment.commentable.pronoun} own profile" : "<strong>#{comment.commentable.name}'s profile</strong>"}"

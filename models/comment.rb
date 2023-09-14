@@ -89,7 +89,7 @@ class Comment
         Gathering.admin?(comment.commentable.gathering, account)
       elsif %w[Account].include?(comment.commentable_type)
         comment.commentable_id == account.id
-      elsif %w[Place Habit].include?(comment.commentable_type)
+      elsif %w[Place].include?(comment.commentable_type)
         comment.commentable.account_id == account.id
       end
     )
@@ -100,8 +100,6 @@ class Comment
       commentable.gathering
     elsif %w[Account Gathering Activity LocalGroup Organisation Place].include?(commentable_type)
       commentable
-    elsif %w[Habit].include?(commentable_type)
-      commentable.account
     end
   end
 

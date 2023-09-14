@@ -28,7 +28,7 @@ class Post
   end
 
   def self.commentable_types
-    %w[DocPage Team Tactivity Mapplication Account Habit Place Gathering Activity Event LocalGroup Organisation ActivityApplication]
+    %w[DocPage Team Tactivity Mapplication Account Place Gathering Activity Event LocalGroup Organisation ActivityApplication]
   end
 
   def url
