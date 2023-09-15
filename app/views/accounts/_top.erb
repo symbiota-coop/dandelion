@@ -15,7 +15,7 @@
     <% end %>
     <%= partial :'accounts/buttons', locals: { account: account, modal: (true if defined?(modal)) } %>
     <% if !defined?(modal) || (defined?(modal) && !modal) %>
-      <% if current_account && current_account.admin? %>
+      <% if current_account && (current_account.admin? || current_account.can_reset_passwords?) %>
         <a onclick="
   $.post('/accounts/<%=account.id%>/reset_password', function(data) {
 var temp = $('<input>');

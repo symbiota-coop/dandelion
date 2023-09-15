@@ -32,7 +32,7 @@ Dandelion::App.controller do
 
   post '/accounts/sign_in_code' do
     if params[:email] && (@account = Account.find_by(email: params[:email].downcase))
-      @account.sign_in_code!      
+      @account.sign_in_code!
       erb :'accounts/requested_sign_in_code'
     else
       flash[:error] = "There's no account registered under that email address."
@@ -259,7 +259,7 @@ Dandelion::App.controller do
   end
 
   post '/accounts/:id/reset_password', provides: :json do
-    admins_only!
+    halt unless current_account && (current_account.admin? || current_account.can_reset_passwords?)
     @account = Account.find(params[:id]) || not_found
     @account.update_attribute(:password, Account.generate_password)
     { password: @account.password }.to_json

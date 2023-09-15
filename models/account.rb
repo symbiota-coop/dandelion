@@ -73,7 +73,8 @@ class Account
      hide_location
      block_reply_by_email
      hidden
-     seen_intro_tour].each do |b|
+     seen_intro_tour
+     can_reset_passwords].each do |b|
     field b.to_sym, type: Boolean
     index({ b.to_s => 1 })
   end
@@ -117,6 +118,7 @@ class Account
       hide_location: :check_box,
       hidden: :check_box,
       block_reply_by_email: :check_box,
+      can_reset_passwords: :check_box,
       time_zone: :select,
       password: :password,
       sign_ins_count: :number,
