@@ -10,6 +10,7 @@ class ActivityApplication
   field :status, type: String
   field :statused_at, type: Time
   field :word_count, type: Integer
+  field :via, type: String
 
   def self.admin_fields
     {
@@ -50,8 +51,7 @@ class ActivityApplication
   end
 
   def self.human_attribute_name(attr, options = {})
-    {
-    }[attr.to_sym] || super
+    {}[attr.to_sym] || super
   end
 
   after_create :send_notification

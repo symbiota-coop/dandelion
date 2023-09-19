@@ -28,7 +28,7 @@ Dandelion::App.controller do
       flash[:notice] = "You're already part of that activity"
       redirect back
     else
-      @activity_application = @activity.activity_applications.build(account: @account, status: 'Pending', answers: (params[:answers].map { |i, x| [@activity.application_questions_a[i.to_i], x] } if params[:answers]))
+      @activity_application = @activity.activity_applications.build(account: @account, via: params[:via], status: 'Pending', answers: (params[:answers].map { |i, x| [@activity.application_questions_a[i.to_i], x] } if params[:answers]))
       if @activity_application.save
         redirect "/activities/#{@activity.id}/apply?applied=true"
       else

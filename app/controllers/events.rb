@@ -125,6 +125,7 @@ Dandelion::App.controller do
   end
 
   get '/e/:slug', provides: %i[html ics json] do
+    session[:via] = params[:via] if params[:via]
     session[:return_to] = request.url
     @event = Event.find_by(slug: params[:slug])
     unless @event
@@ -139,9 +140,7 @@ Dandelion::App.controller do
     @title = @event.name
     @organisation = @event.organisation
     if @order && params[:success]
-      if !@order.payment_completed && @event.oc_slug
-        @event.check_oc_event
-      end      
+      @event.check_oc_event if !@order.payment_completed && @event.oc_slug
       @ga_transaction = { transaction_id: @order.id.to_s, affiliation: @event.organisation.name, value: (@order.value || 0), currency: @order.currency }
       @ga_items = @order.tickets.map do |ticket|
         { item_id: ticket.id.to_s, item_name: "#{ticket.event.name}: #{ticket.ticket_type.try(:name) || 'Complementary'}", item_price: (ticket.discounted_price || 0), item_quantity: 1 }

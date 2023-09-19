@@ -25,6 +25,7 @@
         <%== Sanitize.fragment(@activity.extra_info_for_application_form, Sanitize::Config::DANDELION) %>
       <% end %>
       <% form_for @account, "/activities/#{@activity.id}/apply", id: 'application-form', class: 'mt-3' do |f| %>
+        <%= hidden_field_tag :via, value: (session[:via] if session[:via]) %>
         <script>
           $(function () {
 
