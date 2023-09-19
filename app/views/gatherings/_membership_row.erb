@@ -27,6 +27,12 @@
         });">
     <%= membership.created_at %>
   </a>
+<% elsif membership.answers %>
+  <a href="javascript:;" onclick="$('#modal .modal-content').load('/g/<%= @gathering.slug %>/memberships/<%= membership.id %>', function () {
+          $('#modal').modal('show')
+        });">
+    <%= membership.created_at %>
+  </a>
 <% else %>
   <%= membership.created_at %>
 <% end %>

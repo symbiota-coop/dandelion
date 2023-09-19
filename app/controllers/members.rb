@@ -17,13 +17,14 @@ Dandelion::App.controller do
       erb :'gatherings/members'
     when :csv
       CSV.generate do |csv|
-        csv << %w[name email proposed_by accepted_at answers options requested_contribution paid]
+        csv << %w[name email proposed_by accepted_at joining_answers application_answers options requested_contribution paid]
         @memberships.each do |membership|
           csv << [
             membership.account.name,
             membership.account.email,
             (membership.proposed_by.map(&:name).to_sentence(last_word_connector: ' and ') if membership.proposed_by),
             membership.created_at.to_fs(:db_local),
+            membership.answers,
             (membership.mapplication.answers if membership.mapplication && membership.mapplication.answers),
             membership.optionships.map { |optionship| [optionship.option.name, optionship.option.cost_per_person] },
             membership.requested_contribution,
@@ -72,7 +73,7 @@ Dandelion::App.controller do
       flash[:notice] = "You're already part of that gathering"
       redirect back
     else
-      @gathering.memberships.create! account: @account
+      @gathering.memberships.create! account: @account, answers: (params[:answers].map { |i, x| [@gathering.joining_questions_a[i.to_i], x] } if params[:answers])
       redirect "/g/#{@gathering.slug}"
     end
   end
@@ -189,5 +190,17 @@ Dandelion::App.controller do
     @membership = @gathering.memberships.find_by(account: current_account)
     confirmed_membership_required!
     partial :'gatherings/membership_row', locals: { membership: membership }
+  end
+
+  get '/g/:slug/memberships/:id' do
+    @gathering = Gathering.find_by(slug: params[:slug]) || not_found
+    @membership = @gathering.memberships.find_by(account: current_account)
+    confirmed_membership_required!
+    @membership = @gathering.memberships.find(params[:id]) || not_found
+    if request.xhr?
+      partial :'gatherings/membership_modal', locals: { membership: @membership }
+    else
+      erb :'gatherings/membership'
+    end
   end
 end

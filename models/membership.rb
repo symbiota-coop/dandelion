@@ -13,6 +13,7 @@ class Membership
   field :requested_contribution, type: Integer
   field :invitations_granted, type: Integer
   field :shift_points_required, type: Float
+  field :answers, type: Array
 
   %w[admin unsubscribed hide_from_sidebar].each do |b|
     field b.to_sym, type: Boolean
@@ -30,7 +31,8 @@ class Membership
       requested_contribution: :number,
       invitations_granted: :number,
       unsubscribed: :check_box,
-      hide_from_sidebar: :check_box
+      hide_from_sidebar: :check_box,
+      answers: { type: :text_area, disabled: true }
     }
   end
 
@@ -103,7 +105,7 @@ class Membership
     if mapplication
       mapplication.prevent_notifications = true
       mapplication.destroy
-    end    
+    end
     gathering.subscriptions.and(account: account).destroy_all
     %w[teams tactivities mapplications].each do |items|
       gathering.send(items).each do |item|

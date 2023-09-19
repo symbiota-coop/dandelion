@@ -15,6 +15,7 @@ class Gathering
   field :privacy, type: String
   field :intro_for_non_members, type: String
   field :application_questions, type: String
+  field :joining_questions, type: String
   field :fixed_threshold, type: Integer
   field :member_limit, type: Integer
   field :proposing_delay, type: Integer
@@ -74,6 +75,7 @@ class Gathering
       privacy: :select,
       intro_for_non_members: :wysiwyg,
       application_questions: :text_area,
+      joining_questions: :text_area,
       enable_supporters: :check_box,
       anonymise_supporters: :check_box,
       clear_up_optionships: :check_box,
@@ -234,6 +236,11 @@ class Gathering
     q.empty? ? [] : q
   end
 
+  def joining_questions_a
+    q = (joining_questions || '').split("\n").map(&:strip).reject { |l| l.blank? }
+    q.empty? ? [] : q
+  end
+
   def members
     Account.and(:id.in => memberships.pluck(:account_id))
   end
@@ -317,6 +324,7 @@ class Gathering
   def self.new_hints
     {
       application_questions: 'Questions to ask applicants. One question per line.',
+      joining_questions: 'Questions to ask people joining the gathering. One question per line.',
       currency: 'This cannot be changed, choose wisely',
       fixed_threshold: 'Automatically accept applications with this number of proposers + supporters (with at least one proposer)',
       proposing_delay: 'Accept proposers on applications only once the application is this many hours old',

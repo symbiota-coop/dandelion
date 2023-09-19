@@ -66,19 +66,19 @@
         $('#application-options').show()
       else
         $('#application-options').hide()
-      if ($(this).val() == 'closed' || $(this).val() == 'open')
-        $('#closed-and-open-options').show()
+      if ($(this).val() == 'open')
+        $('#joining-options').show()
       else
-        $('#closed-and-open-options').hide()
+        $('#joining-options').hide()
     })
     if ($('#gathering_privacy').val() == 'closed')
       $('#application-options').show()
     else
       $('#application-options').hide()
-    if ($('#gathering_privacy').val() == 'closed' || $('#gathering_privacy').val() == 'open')
-      $('#closed-and-open-options').show()
+    if ($('#gathering_privacy').val() == 'open')
+      $('#joining-options').show()
     else
-      $('#closed-and-open-options').hide()
+      $('#joining-options').hide()
 
     $('#gathering_enable_supporters').click(function () {
       if ($(this).is(':checked'))
@@ -162,8 +162,11 @@
           <%= f.check_box_block :listed %>
         </div>
         <% # <div id="closed-and-open-options" style="display: none"></div> %>
+        <div id="joining-options" style="display: none">
+          <%= f.text_area_block :joining_questions, placeholder: "e.g. How did you hear about the gathering?\nWhen do you plan to arrive?" %>
+        </div>
         <div id="application-options" style="display: none">
-          <%= f.text_area_block :application_questions, placeholder: "e.g. How did you hear about this gathering?\nWhy do you want to participate?" %>
+          <%= f.text_area_block :application_questions, placeholder: "e.g. How did you hear about the gathering?\nWhy do you want to participate?" %>
           <%= f.check_box_block :require_reason_proposer %>
           <%= f.check_box_block :enable_supporters %>
           <div id="supporters-options" style="display: none">

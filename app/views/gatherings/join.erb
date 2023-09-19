@@ -34,6 +34,16 @@
           <%= f.email_block :email %>
           <%= f.image_block :picture %>
         <% end %>
+        <% @gathering.joining_questions_a.each_with_index { |q,i| %>
+        <div class="form-group">
+          <label>
+            <%== Sanitize.fragment(Rinku.auto_link(q), Sanitize::Config::DANDELION) %>
+          </label>
+          <div>
+            <%= text_area_tag "answers[#{i}]", class: 'autosize form-control', value: (params[:answers][i.to_s] if params[:answers]) %>
+          </div>
+        </div>
+        <% } %>
         <%= f.submit_block button_text: 'Join' %>
       <% end %>
     <% end %>
