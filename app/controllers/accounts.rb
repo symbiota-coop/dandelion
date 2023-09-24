@@ -262,6 +262,7 @@ Dandelion::App.controller do
     halt unless current_account && (current_account.admin? || current_account.can_reset_passwords?)
     @account = Account.find(params[:id]) || not_found
     @account.update_attribute(:password, Account.generate_password)
+    @account.update_attribute(:failed_sign_in_attempts, nil)
     { password: @account.password }.to_json
   end
 
