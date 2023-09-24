@@ -2,7 +2,7 @@ Sanitize::Config::DANDELION = Sanitize::Config.merge(Sanitize::Config::RELAXED,
                                                      elements: Sanitize::Config::RELAXED[:elements] + %w[oembed],
                                                      attributes: Sanitize::Config::RELAXED[:attributes].merge(
                                                        {
-                                                         :all => ['class'],
+                                                         :all => %w[class target],
                                                          'oembed' => ['url'],
                                                          'figure' => ['style'],
                                                          'span' => ['style'],

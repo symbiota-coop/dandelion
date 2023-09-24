@@ -134,6 +134,17 @@ ClassicEditor.defaultConfig = {
 	simpleUpload: {
 		uploadUrl: '/upload'
 	},
+	link: {
+		decorators: {
+			openInNewTab: {
+				mode: 'manual',
+				label: 'Open in a new tab',
+				attributes: {
+					target: '_blank',
+				}
+			}
+		}
+	},
 	// This value must be kept in sync with the language defined in webpack.config.js.
 	language: 'en'
 }
