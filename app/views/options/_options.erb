@@ -21,7 +21,7 @@
   <tr>
     <td>
       <strong>
-        <% if @membership.admin? %>
+        <% if @membership.admin? || option.cost == 0 %>
           <a href="/g/<%= @gathering.slug %>/options/<%= option.id %>/edit">
             <%= option.name %>
           </a>

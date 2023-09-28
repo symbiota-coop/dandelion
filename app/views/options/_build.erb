@@ -3,8 +3,8 @@
   <%= f.text_area_block :description %>
   <%= f.select_block :type %>
   <%= f.number_block :capacity %>
-  <%= f.number_block :cost %>
-  <%= f.check_box_block :split_cost %>
+  <%= f.number_block :cost, disabled: !@membership.admin?, hint: ('Only admins can add paid options' if !@membership.admin?) %>
+  <%= f.check_box_block :split_cost, disabled: !@membership.admin?  %>
   <%= f.check_box_block :by_invitation %>
   <%= f.check_box_block :hide_members %>
   <%= f.submit_block destroy_url: "/g/#{@gathering.slug}/options/#{@option.id}/destroy" %>

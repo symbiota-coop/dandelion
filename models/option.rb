@@ -29,13 +29,17 @@ class Option
     }
   end
 
-  validates_presence_of :name, :cost
+  validates_presence_of :name
 
   has_many :optionships, dependent: :destroy
 
   has_many :notifications, as: :notifiable, dependent: :destroy
   after_create do
     notifications.create! circle: circle, type: 'created_option'
+  end
+
+  before_validation do
+    self.cost = 0 unless cost
   end
 
   def circle
