@@ -4,11 +4,11 @@
     <p class="lead mb-3"><strong>Check your inbox for the confirmation email with your tickets.</strong></p>
     <p>
       If you don't see anything in your inbox, check your spam folder or
-      <a target="_blank" href="/orders/<%=@order.id%>?sign_in_token=<%=@order.account.sign_in_token%>">view the confirmation email in your browser</a>.
+      <a target="_blank" href="/orders/<%=@order.id%>">view the confirmation email in your browser</a>.
     </p>
 
     <div class="alert alert-warning my-3">
-      Hotmail, Outlook and Live addresses are sporadically blocking emails from Dandelion. Please <a class="text-warning" target="_blank" href="/orders/<%=@order.id%>?sign_in_token=<%=@order.account.sign_in_token%>">view the confirmation email in your browser</a>.
+      Hotmail, Outlook and Live addresses are sporadically blocking emails from Dandelion. Please <a class="text-warning" target="_blank" href="/orders/<%=@order.id%>">view the confirmation email in your browser</a>.
     </div>
 
     <% if @event.redirect_url %>
