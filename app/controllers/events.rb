@@ -327,7 +327,6 @@ Dandelion::App.controller do
   get '/orders/:id', provides: [:html, :pdf] do
     @order = Order.find(params[:id])
     @event = @order.event
-    halt unless admin? || (current_account && @order.account_id == current_account.id)
     event = @event
     order = @order
     account = current_account
