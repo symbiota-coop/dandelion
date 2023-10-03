@@ -332,8 +332,8 @@ Dandelion::App.controller do
     account = @order.account
     pdf_link = true
     content = ERB.new(File.read(Padrino.root('app/views/emails/tickets.erb'))).result(binding)
-                 .gsub('%recipient.firstname%', current_account.firstname)
-                 .gsub('%recipient.token%', current_account.sign_in_token)
+                 .gsub('%recipient.firstname%', @order.account.firstname)
+                 .gsub('%recipient.token%', @order.account.sign_in_token)
     case content_type
     when :html
       Premailer.new(ERB.new(File.read(Padrino.root('app/views/layouts/email.erb'))).result(binding), with_html_string: true, adapter: 'nokogiri', input_encoding: 'UTF-8').to_inline_css
