@@ -20,7 +20,11 @@
     </div>
     <% if @doc_page.body %>
       <div class="my-3" style="font-size: 120%">
-        <%== @doc_page.body %>
+        <% doc = Nokogiri::HTML.fragment(@doc_page.body)
+          doc.css('h2').each do |h2|
+            h2['id'] = h2.text.parameterize
+          end %>
+        <%== doc.to_html %>
       </div>
     <% end %>
     <% if current_account %>

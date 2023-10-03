@@ -1,5 +1,12 @@
-<p class="lead">
-<% DocPage.order('priority desc').each { |doc_page| %>
-  <a <% if @doc_page && @doc_page == doc_page %> class="font-weight-bold" <% end %> href="/docs/<%=doc_page.slug%>"><%=doc_page.name %></a><br />
-<% } %>
-</p>
+<ul class="list-unstyled" style="font-size: 1.5em">
+  <% DocPage.order('priority desc').each { |doc_page| %>
+  <li>
+    <a <% if @doc_page && @doc_page == doc_page %> class="font-weight-bold" <% end %> href="/docs/<%=doc_page.slug%>"><%=doc_page.name %></a>
+    <ul style="list-style-type: square">
+      <% doc_page.body.scan(/<h2>(.*?)<\/h2>/).each do |h2| %>
+        <li><a href="/docs/<%=doc_page.slug%>#<%=h2.first.parameterize%>"><%= h2.first %></a></li>
+      <% end %>
+    </ul>
+  </li>
+  <% } %>
+</ul>
