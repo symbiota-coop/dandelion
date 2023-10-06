@@ -334,6 +334,13 @@ Dandelion::App.controller do
     content = ERB.new(File.read(Padrino.root('app/views/emails/tickets.erb'))).result(binding)
                  .gsub('%recipient.firstname%', @order.account.firstname)
                  .gsub('%recipient.token%', @order.account.sign_in_token)
+
+    header_image_url = if event.organisation.send_ticket_emails_from_organisation && event.organisation.reply_to && event.organisation.image
+                         event.organisation.image.url
+                       else
+                         "#{ENV['BASE_URI']}/images/black-on-transparent-sq.png"
+                       end
+
     case content_type
     when :html
       Premailer.new(ERB.new(File.read(Padrino.root('app/views/layouts/email.erb'))).result(binding), with_html_string: true, adapter: 'nokogiri', input_encoding: 'UTF-8').to_inline_css
