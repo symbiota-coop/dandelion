@@ -4,7 +4,7 @@
     <% if @event.past? %>
       <% if @event.recording? %>
         <div class="alert alert-success">
-          <p class="mb-0">This event happened <%= time_ago_in_words @event.start_time %> ago, but you can purchase the recording 🍿</p>
+          <p class="mb-0">Select a ticket to access a recording of this event that happened on <%=@event.start_time%> 🍿</p>
         </div>
       <% else %>
         <div class="alert alert-danger">
