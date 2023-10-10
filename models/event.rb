@@ -1029,7 +1029,7 @@ class Event
       faraday.request  :url_encoded
       faraday.adapter  Faraday.default_adapter
       faraday.headers['Content-Type'] = 'application/json'
-      faraday.headers['Api-Key'] = '6efa85f567f438af874a1a0faba917c935e0b252'
+      faraday.headers['Api-Key'] = ENV['OC_API_KEY']
     end
 
     response = conn.post do |req|
