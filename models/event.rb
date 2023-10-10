@@ -50,7 +50,6 @@ class Event
   field :select_tickets_title, type: String
   field :contribution_gbp_custom, type: Float
   field :oc_slug, type: String
-  field :trending, type: Boolean
 
   def self.admin_fields
     {
@@ -142,7 +141,7 @@ class Event
     q.empty? ? [] : q
   end
 
-  %w[no_discounts hide_attendees hide_discussion refund_deleted_orders monthly_donors_only draft secret zoom_party show_emails include_in_parent featured opt_in_facilitator hide_few_left hide_organisation_footer ask_hear_about send_order_notifications raw_description prevent_reminders].each do |b|
+  %w[no_discounts hide_attendees hide_discussion refund_deleted_orders monthly_donors_only draft secret zoom_party show_emails include_in_parent featured opt_in_facilitator hide_few_left hide_organisation_footer ask_hear_about send_order_notifications raw_description prevent_reminders trending hide_from_carousels].each do |b|
     field b.to_sym, type: Boolean
     index({ b.to_s => 1 })
   end

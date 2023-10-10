@@ -463,6 +463,10 @@ small.form-text {
   background-color: #30B688
 }
 
+.bg-primary-transparent {
+  background: $color_primary_transparent_3
+}
+
 .form-control.datetimepicker[readonly] {
   background: white
 }

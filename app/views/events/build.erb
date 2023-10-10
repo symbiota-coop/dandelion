@@ -147,7 +147,7 @@
         <%= f.url_block :facebook_event_url %>
         <%= partial :'events/tags', locals: { f: f } %>
         <%= f.lookup_block :coordinator_id, lookup_url: '/accounts.json', placeholder: 'Search accounts', selected_link: (%(<a class="d-inline-block mt-1" target="_blank" href="/u/#{@event.coordinator.username}">View account</a>) if @event.coordinator) %>
-        <% if @event.organisation.verified? %>
+        <% if Padrino.env == :development || @event.organisation.verified? %>
           <%= f.lookup_block :organiser_id, lookup_url: '/accounts.json', placeholder: 'Search accounts', selected_link: (%(<a class="d-inline-block mt-1" target="_blank" href="/u/#{@event.organiser.username}">View account</a>) if @event.organiser_id) %>
         <% end %>
         <% if @event.organisation.stripe_client_id %>
@@ -216,7 +216,7 @@
         <div id="local-group-select" <% unless @event.organisation.verified? %> class="mb-3" <% end %>>
           <%= f.lookup_block :local_group_id, lookup_url: "/o/#{@event.organisation_id}/local_groups.json", placeholder: 'Search local groups', selected_link: (%(<a class="d-inline-block mt-1" target="_blank" href="/local_groups/#{@event.local_group_id}">View local group</a>) if @event.local_group_id) %>
         </div>
-        <% if @event.organisation.verified? %>
+        <% if Padrino.env == :development || @event.organisation.verified? %>
           <p id="do-zoom-party">or <a href="javascript:;">turn this event into a Zoom party (experimental)</a></p>
           <div id="zoom-party-checkbox">
             <%= f.check_box_block :zoom_party %>
@@ -285,12 +285,12 @@
           <div role="tabpanel" class="tab-pane" id="tab6">
             <%= f.shorturl_block :slug, stem: "#{ENV['BASE_URI']}/e/" %>
             <%= f.url_block :redirect_url %>
-            <% if @event.purchase_url || @event.organisation.allow_purchase_url? || (Padrino.env == :development || @event.organisation.verified?) %>
+            <% if Padrino.env == :development || @event.purchase_url || @event.organisation.allow_purchase_url? || @event.organisation.verified? %>
               <%= f.url_block :purchase_url %>
             <% end %>
             <%= f.number_block :facebook_pixel_id %>
             <%= f.select_block :time_zone %>
-            <% if @event.organisation.change_select_tickets_title || (Padrino.env == :development || @event.organisation.verified?) %>
+            <% if Padrino.env == :development || @event.organisation.change_select_tickets_title || @event.organisation.verified? %>
               <%= f.text_block :select_tickets_title %>
             <% end %>
             <%= f.text_block :select_tickets_intro %>
@@ -310,11 +310,16 @@
             <%= f.check_box_block :refund_deleted_orders %>
             <%= f.check_box_block :ask_hear_about %>
             <%= f.text_area_block :notes %>
+
             <% if Padrino.env == :development || @event.organisation.verified? %>
-              <%= f.wysiwyg_block :extra_info_for_recording_email %>
-              <%= f.number_block :affiliate_credit_percentage %>
-              <%= f.text_block :oc_slug %>
+              <div class="bg-primary-transparent rounded p-3">
+                <%= f.wysiwyg_block :extra_info_for_recording_email %>
+                <%= f.check_box_block :hide_from_carousels %>
+                <%= f.number_block :affiliate_credit_percentage %>
+                <%= f.text_block :oc_slug %>
+              </div>
             <% end %>
+
             <% if @event.new_record? %>
               <%= f.submit_block %>
             <% end %>
