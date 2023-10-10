@@ -4,7 +4,7 @@
     <% if @event.past? %>
       <% if @event.recording? %>
         <div class="alert alert-success">
-          <p class="mb-0">Select a ticket to access a recording of this event that happened on <%=@event.start_time.to_date%> 🍿</p>
+          <p class="mb-0">Access a recording of this event that happened on <%=@event.start_time.to_date%> 🍿</p>
         </div>
       <% else %>
         <div class="alert alert-danger">
