@@ -272,7 +272,9 @@ Dandelion::App.controller do
         tags, _coordinator = tags.split('@')
         w = w ? w.split(']').first.to_i : 8
         tags = tags.split(',').map(&:strip)
-        @events = @organisation.events_for_search.future_and_current_featured.and(:draft.ne => true).and(:start_time.lt => w.weeks.from_now).and(:image_uid.ne => nil).and(:id.in => EventTagship.and(:event_tag_id.in => EventTag.and(:name.in => tags).pluck(:id)).pluck(:event_id)).limit(20)
+        @events =
+          @organisation.events_for_search.future_and_current_featured.and(:draft.ne => true).and(:start_time.lt => w.weeks.from_now).and(:image_uid.ne => nil).and(:id.in => EventTagship.and(:event_tag_id.in => EventTag.and(:name.in => tags).pluck(:id)).pluck(:event_id)).limit(20) +
+          @organisation.events_for_search.past.and(:extra_info_for_recording_email.ne => true).and(:draft.ne => true).and(:image_uid.ne => nil).and(:id.in => EventTagship.and(:event_tag_id.in => EventTag.and(:name.in => tags).pluck(:id)).pluck(:event_id)).limit(20)
         partial :'events/carousel', locals: { title: title, events: @events }
       rescue StandardError
         500
@@ -325,9 +327,7 @@ Dandelion::App.controller do
     @events = @organisation.events_including_cohosted
     @events = params[:order] == 'created_at' ? @events.order('created_at desc') : @events.order('start_time asc')
     q_ids = []
-    if params[:q]
-      q_ids += search_events(params[:q]).pluck(:id)
-    end
+    q_ids += search_events(params[:q]).pluck(:id) if params[:q]
     event_tag_ids = []
     event_tag_ids = EventTagship.and(event_tag_id: params[:event_tag_id]).pluck(:event_id) if params[:event_tag_id]
     event_ids = (!q_ids.empty? && !event_tag_ids.empty? ? (q_ids & event_tag_ids) : (q_ids + event_tag_ids))

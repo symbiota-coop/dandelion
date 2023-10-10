@@ -9,10 +9,15 @@
     </a>
   <% end %>
   <span data-toggle="tooltip" title="<%= when_details(event) %>" class="label label-primary" style="opacity: 0.85; border-radius: 0; position: absolute; top: 0; right: 0">
-    <% if event.start_time.to_date != event.end_time.to_date %>
-      Starts
+    <% if event.recording? %>
+      Recording from
+      <%= event.start_time.to_date.to_fs(:no_year) %> 🍿
+    <% else %>
+      <% if event.start_time.to_date != event.end_time.to_date %>
+        Starts
+      <% end %>
+      <%= event.start_time.to_date.to_fs(:no_year) %>
     <% end %>
-    <%= event.start_time.to_date.to_fs(:no_year) %>
   </span>
   <% if event.sold_out? %>
     <span class="label label-danger" style="opacity: 0.85; border-radius: 0; position: absolute; bottom: 0; right: 0">
