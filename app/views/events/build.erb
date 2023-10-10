@@ -42,7 +42,7 @@
             $('#event-build-nav a[href="#' + $(tabPane).next().attr('id') + '"]').tab('show')
           })
         })
-        $('#tab6').find('a.next').remove()
+        $('#tab7').find('a.next').remove()
     <% end %>
 
     $('#event_start_time').siblings('small').text("<%==js_escape_html "#{Time.zone.name.include?('London') ? 'UK time' : "in #{Time.zone.name}"} (UTC #{Time.zone.now.formatted_offset})" %> (your profile's time zone)")
@@ -132,7 +132,8 @@
     <li role="presentation" class="nav-item"><a class="nav-link" href="#tab3" role="tab" data-toggle="tab">Tickets</a></li>
     <li role="presentation" class="nav-item"><a class="nav-link" href="#tab4" role="tab" data-toggle="tab">Questions</a></li>
     <li role="presentation" class="nav-item"><a class="nav-link" href="#tab5" role="tab" data-toggle="tab">Donations</a></li>
-    <li role="presentation" class="nav-item"><a class="nav-link" href="#tab6" role="tab" data-toggle="tab">Everything else</a></li>
+    <li role="presentation" class="nav-item"><a class="nav-link" href="#tab6" role="tab" data-toggle="tab">Labels</a></li>
+    <li role="presentation" class="nav-item"><a class="nav-link" href="#tab7" role="tab" data-toggle="tab">Everything else</a></li>
   </ul>
   <div class="container">
     <div class="tab-content mt-3">
@@ -283,24 +284,28 @@
             </div>
           </div>
           <div role="tabpanel" class="tab-pane" id="tab6">
-            <%= f.shorturl_block :slug, stem: "#{ENV['BASE_URI']}/e/" %>
-            <%= f.url_block :redirect_url %>
-            <% if Padrino.env == :development || @event.purchase_url || @event.organisation.allow_purchase_url? || @event.organisation.verified? %>
-              <%= f.url_block :purchase_url %>
-            <% end %>
-            <%= f.number_block :facebook_pixel_id %>
-            <%= f.select_block :time_zone %>
             <% if Padrino.env == :development || @event.organisation.change_select_tickets_title || @event.organisation.verified? %>
               <%= f.text_block :select_tickets_title %>
             <% end %>
             <%= f.text_block :select_tickets_intro %>
             <%= f.text_block :select_tickets_outro %>
             <%= f.text_block :carousel_text %>
+          </div>
+          <div role="tabpanel" class="tab-pane" id="tab7">
+            <%= f.shorturl_block :slug, stem: "#{ENV['BASE_URI']}/e/" %>
+            <%= f.select_block :time_zone %>
+            <%= f.url_block :redirect_url %>
+            <% if Padrino.env == :development || @event.purchase_url || @event.organisation.allow_purchase_url? || @event.organisation.verified? %>
+              <%= f.url_block :purchase_url %>
+            <% end %>
+            <%= f.number_block :facebook_pixel_id %>
+            <%= f.text_block :oc_slug %>
             <% if current_account.memberships.and(admin: true).count > 0 %>
               <%= f.select_block :gathering_id, options: [''] + current_account.memberships.and(admin: true).map { |m| [m.gathering.name, m.gathering_id] }.sort_by { |a,b| a } %>
             <% end %>
             <%= f.check_box_block :hide_attendees %>
             <%= f.check_box_block :hide_discussion %>
+            <%= f.check_box_block :hide_from_carousels %>
             <%= f.check_box_block :prevent_reminders %>
             <%= f.check_box_block :monthly_donors_only %>
             <%= f.check_box_block :no_discounts %>
@@ -312,11 +317,9 @@
             <%= f.text_area_block :notes %>
 
             <% if Padrino.env == :development || @event.organisation.verified? %>
-              <div class="bg-primary-transparent rounded p-3">
+              <div class="border border-primary rounded p-3" style="border-style: dashed !important">
                 <%= f.wysiwyg_block :extra_info_for_recording_email %>
-                <%= f.check_box_block :hide_from_carousels %>
                 <%= f.number_block :affiliate_credit_percentage %>
-                <%= f.text_block :oc_slug %>
               </div>
             <% end %>
 
