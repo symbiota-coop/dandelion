@@ -86,7 +86,11 @@ a:hover {
 
 img {
   max-width: 100%;
-  margin-bottom: 8px;
+  margin-bottom: 1rem;
+}
+
+figure+figure>img {
+  margin-bottom: 8px !important;
 }
 
 table img {
