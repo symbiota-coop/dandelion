@@ -531,6 +531,11 @@ class Event
       time_zone: time_zone,
       questions: questions
     )
+    event_tags.each do |event_tag|
+      event.event_tagships.create(
+        event_tag: event_tag
+      )
+    end
     event_facilitations.each do |event_facilitation|
       event.event_facilitations.create(
         account: event_facilitation.account
@@ -551,6 +556,7 @@ class Event
     ticket_types.each do |ticket_type|
       event.ticket_types.create(
         name: ticket_type.name,
+        description: ticket_type.description,
         price: ticket_type.price,
         quantity: ticket_type.quantity,
         hidden: ticket_type.hidden,
