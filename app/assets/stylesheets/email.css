@@ -89,7 +89,8 @@ img {
   margin-bottom: 1rem;
 }
 
-figure+figure>img {
+figure+figure>img,
+figure+figure>a>img {
   margin-bottom: 8px !important;
 }
 
