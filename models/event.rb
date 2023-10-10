@@ -732,6 +732,10 @@ class Event
     self.and(:id.in => future(from).pluck(:id) + current(from).and(featured: true).pluck(:id)).order('start_time asc')
   end
 
+  def self.future_and_current(from = Date.today)
+    self.and(:id.in => future(from).pluck(:id) + current(from).pluck(:id)).order('start_time asc')
+  end
+
   def past?(from = Date.today)
     start_time < from
   end
