@@ -85,7 +85,12 @@ a:hover {
 }
 
 img {
-  max-width: 100%
+  max-width: 100%;
+  margin-bottom: 1rem;
+}
+
+table img {
+  margin-bottom: 0 !important
 }
 
 blockquote {
