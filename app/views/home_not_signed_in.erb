@@ -42,8 +42,10 @@
       </p>
       <p class="mb-4" id="just-pay">
         Hosts just pay processing fees via
-        <a target="_blank" href="https://stripe.com/gb/pricing">Stripe</a> or
+        <a target="_blank" href="https://stripe.com/gb/pricing">Stripe</a>,
         <a target="_blank" href="https://help.coinbase.com/en/commerce/getting-started/fees">Coinbase</a>
+        or
+        <a target="_blank" href="https://opencollective.com/">Open Collective</a>
         <br />
         (or choose fee-free crypto payments via <a href="https://celo.org/">Celo</a>, <a href="https://optimism.io/">Optimism</a> or <a href="https://www.gnosischain.com/">Gnosis Chain</a>)
       </p>
@@ -75,9 +77,9 @@
         <% {
         'stripe' => 'https://stripe.com/gb/pricing',
         'coinbase-commerce' => 'https://help.coinbase.com/en/commerce/getting-started/fees',
+        'opencollective' => 'https://opencollective.com/',
         'celo' => 'https://celo.org/',
-        'optimism' => 'https://optimism.io/',
-        'opencollective' => 'https://opencollective.com/'
+        'optimism' => 'https://optimism.io/',        
       }.each do |k, v| %>
           <div class="col">
             <a href="<%=v%>"><img class="<%=k%> w-100" src="/images/payment_methods/<%=k%>.jpg" /></a>
