@@ -24,6 +24,20 @@
             <% } %>
           </ul>
         </div>
+        <% pmails = @event.pmails_as_mailable.and(:sent_at.ne => nil).order('sent_at desc') %>
+        <% if pmails.count > 0 %>
+          <h3 class="card-header bg-primary text-white">Messages from facilitators</h3>
+          <div class="card-body">
+            <ul class="list-unstyled">
+              <% pmails.each { |pmail| %>
+              <li>
+                <a target="_blank" href="<%= "/pmails/#{pmail.id}" %>"><%= pmail.subject %></a>
+                <%= timeago(pmail.sent_at) %>
+              </li>
+              <% } %>
+            </ul>
+          </div>
+        <% end %>
       </div>
     <% end %>
     <% if @event.purchase_url %>
