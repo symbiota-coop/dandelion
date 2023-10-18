@@ -485,7 +485,7 @@ class Event
   def duplicate!(account)
     event = Event.create!(
       duplicate: true,
-      name: "#{name} (duplicated #{Time.now})",
+      name: name,
       start_time: start_time,
       end_time: end_time,
       currency: currency,
