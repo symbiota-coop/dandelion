@@ -6,7 +6,7 @@
         <%== Sanitize.fragment(Rinku.auto_link(q), Sanitize::Config::DANDELION) %>
       </strong>
     </p>
-    <p style="font-size: 16px; font-weight: 300">
+    <p style="font-size: 16px;">
       <%== Sanitize.fragment(Rinku.auto_link(a.gsub("\n", '<br />')), Sanitize::Config::DANDELION) %>
     </p>
   <% end } if mapplication.answers %>

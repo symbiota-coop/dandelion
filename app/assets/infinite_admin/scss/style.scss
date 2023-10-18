@@ -17,20 +17,25 @@
 html {
 	font-size: 17px;
 }
+
 @media (min-width: 1680px) {
 	html {
 		font-size: 19px;
 	}
 }
+
 @media (min-width: 1920px) {
 	html {
 		font-size: 21px;
 	}
 }
 
-body, html, #page-container {
+body,
+html,
+#page-container {
 	/* height: 100%; */
 }
+
 body {
 	font-family: $body_font_family;
 	text-rendering: optimizeLegibility;
@@ -38,13 +43,15 @@ body {
 	-moz-osx-font-smoothing: grayscale;
 	background: $body_bg;
 	font-size: $body_font_size;
-	line-height: 1.42857143;
+	line-height: 1.45;
 	color: $body_text;
-  font-weight: 400;
+	font-weight: 500;
 }
+
 #page-container {
 	padding-top: 2.75rem;
 }
+
 @media (max-width: 767px) {
 	#page-container {
 		padding-top: 5.5625rem;
@@ -58,7 +65,9 @@ a {
 	color: $color_primary;
 	@include transition(color 0.2s cubic-bezier(0.3, 0.5, 0.6, 1));
 }
-a:focus, a:hover {
+
+a:focus,
+a:hover {
 	color: $color_primary_hover;
 	outline: none;
 }
@@ -66,37 +75,73 @@ a:focus, a:hover {
 
 /* Typography Setting */
 
-h1,h2,h3,h4,h5,h6,
-.h1,.h2,.h3,.h4,.h5,.h6,
-h1 small,h2 small,h3 small,h4 small,h5 small,h6 small,
-.h1 small,.h2 small,.h3 small,.h4 small,.h5 small,.h6 small {
-	font-weight: 300;
+h1,
+h2,
+h3,
+h4,
+h5,
+h6,
+.h1,
+.h2,
+.h3,
+.h4,
+.h5,
+.h6,
+h1 small,
+h2 small,
+h3 small,
+h4 small,
+h5 small,
+h6 small,
+.h1 small,
+.h2 small,
+.h3 small,
+.h4 small,
+.h5 small,
+.h6 small {
+	font-weight: 500;
 }
-h1, .h1 {
+
+h1,
+.h1 {
 	font-size: 2.25rem;
 }
-h2, .h2 {
+
+h2,
+.h2 {
 	font-size: 1.875rem;
 }
-h3, .h3 {
-	font-size: 1.5rem;
+
+h3,
+.h3 {
+	font-size: 1.45rem;
 }
-h4, .h4 {
+
+h4,
+.h4 {
 	font-size: 1.125rem;
 }
-h5, .h5 {
+
+h5,
+.h5 {
 	font-size: 0.875rem;
 }
-h6, .h6 {
+
+h6,
+.h6 {
 	font-size: $body_font_size;
 }
+
 .text-lg {
 	font-size: 0.875rem;
 }
+
 .desc {
 	color: #8c8c8c;
 }
-b, strong {
+
+b,
+strong {
 	font-weight: bold;
 }
 
@@ -106,74 +151,92 @@ b, strong {
 .inverse-mode {
 	color: $color_white;
 }
+
 .inverse-mode a {
 	color: #66afe9;
 }
+
 .inverse-mode a:hover,
 .inverse-mode a:focus {
 	color: #7bc5ff;
 }
+
 .inverse-mode .widget-title-link:hover,
 .inverse-mode .widget-title-link:focus {
-	background: rgba(255,255,255,0.5);
+	background: rgba(255, 255, 255, 0.5);
 	color: $color_white;
 }
+
 .inverse-mode .widget-title-link {
-	background: rgba(255,255,255,0.25);
+	background: rgba(255, 255, 255, 0.25);
 	color: $color_white;
 }
+
 .inverse-mode .widget .widget-header,
 .inverse-mode.widget .widget-header {
 	background: $color_inverse;
 }
+
 .inverse-mode .widget-header-title,
 .inverse-mode a.widget-header-title {
 	color: $color_white;
 }
+
 .inverse-mode .widget-header.with-border {
-	border-color: rgba(255,255,255,0.25);
+	border-color: rgba(255, 255, 255, 0.25);
 }
+
 .inverse-mode .widget-chat-message {
 	background: $color_grey;
 	color: $color_white;
 }
+
 .inverse-mode .widget-chat-message.last:before {
 	border-bottom-color: $color_grey;
 	border-right-color: $color_grey;
 }
+
 .inverse-mode .reply .widget-chat-message {
 	background: $color_primary;
 }
+
 .inverse-mode .reply .widget-chat-message.last:before {
 	border-color: transparent;
 	border-top-color: $color_primary;
 	border-left-color: $color_primary;
 }
-.inverse-mode .widget-content, 
+
+.inverse-mode .widget-content,
 .inverse-mode .widget-footer {
 	background: $color_inverse;
 }
+
 .inverse-mode .form-control {
 	background: $color_grey;
 	border-color: $color_grey;
 	color: $color_white;
 }
+
 .inverse-mode .form-control:focus {
 	border-color: #66afe9;
 	outline: none;
-	@include box-shadow(0 0 0 0.125rem rgba(102,175,233,.3));
+	@include box-shadow(0 0 0 0.125rem rgba(102, 175, 233, .3));
 }
+
 .inverse-mode .form-control::-webkit-input-placeholder {
-	color: rgba(255,255,255,0.5);
+	color: rgba(255, 255, 255, 0.5);
 }
+
 .inverse-mode .form-control::-moz-placeholder {
-	color: rgba(255,255,255,0.5);
+	color: rgba(255, 255, 255, 0.5);
 }
+
 .inverse-mode .form-control:-ms-input-placeholder {
-	color: rgba(255,255,255,0.5);
+	color: rgba(255, 255, 255, 0.5);
 }
+
 .inverse-mode .form-control:-moz-placeholder {
-	color: rgba(255,255,255,0.5);
+	color: rgba(255, 255, 255, 0.5);
 }
 
 
