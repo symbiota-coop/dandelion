@@ -347,7 +347,7 @@ class Order
     Prawn::Document.new(page_size: 'A4', margin: margin) do |pdf|
       order.tickets.each_with_index do |ticket, i|
         pdf.start_new_page unless i == 0
-        pdf.font "#{Padrino.root}/app/assets/fonts/circular-ttf/CircularStd-Book.ttf"
+        pdf.font "#{Padrino.root}/app/assets/fonts/PlusJakartaSans/ttf/PlusJakartaSans-Regular.ttf"
         pdf.image (event.organisation.send_ticket_emails_from_organisation && event.organisation.image ? open(Addressable::URI.escape(event.organisation.image.url)) : "#{Padrino.root}/app/assets/images/black-on-transparent-trim.png"), width: width / 4, position: :center
         pdf.move_down 0.5 * cm
         pdf.text order.event.name, align: :center, size: 32
