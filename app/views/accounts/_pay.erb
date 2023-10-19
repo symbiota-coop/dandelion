@@ -67,7 +67,7 @@
         <% } %>
 
         <p class="my-2">or make a one-off donation:</p>
-        <% form_tag '', class: "form-inline mt-2 #{'justify-content-center' if monthly_contributions > 0}", id: 'pay-form' do %>
+        <% form_tag '', class: "form-inline mt-2", id: 'pay-form' do %>
           <%= hidden_field_tag :source, value: source %>
           <div class="form-group mb-1 mr-1">
             <div class="input-group">
