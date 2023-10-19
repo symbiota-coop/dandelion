@@ -134,7 +134,7 @@
             <div class="input-group" style="margin: 5px 0">
               <%= text_field_tag :discount_code, id: 'discount_code', class: 'form-control', style: 'width: 5em' %>
               <div class="input-group-append">
-                <button class="btn btn-outline-secondary" type="button" onclick="
+                <button class="btn btn-outline-secondary" style="padding: 0 0.75rem" type="button" onclick="
                               var qs = $.deparam(window.location.search.substring(1))
                               qs['discount_code'] = $('#discount_code').val()
                               var quantities = {}
