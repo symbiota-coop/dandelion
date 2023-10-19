@@ -295,7 +295,7 @@ class Organisation
   end
 
   def self.contribution_requested_per_event_gbp
-    15
+    20
   end
 
   def contribution_requested
