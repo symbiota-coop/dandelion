@@ -19,24 +19,14 @@
               Thanks for contributing <%= time_ago_in_words last_completed_contribution.created_at %> ago.
               <br />
               Will you chip in again so we can remain free?
-              <% if last_completed_contribution.created_at < 1.month.ago %>
-                <br />
-                <small>
-                  (and we won't ask again for a month)
-                </small>
-              <% end %>
             </small>
           </p>
         <% else %>
           <p class="lead mb-1">
             <small>
-              Dandelion is free to use, but it costs money to run.              
+              Dandelion relies on the generosity of its users.
               <br />
               Will you chip in so we can remain free?
-              <br />
-              <small>
-                (and we won't ask again for a month)
-              </small>
             </small>
           </p>
         <% end %>
@@ -63,6 +53,20 @@
           <p class="mt-1 text-center"><%= monthly_contributions.format(no_cents: true) %> raised of <%=m target, currency%> monthly target</p>
         <% end %>
 
+        <p class="mb-2">Make a monthly contribution via Open Collective:</p>
+        <script>
+          $(function() {
+            $('.oc-tier').hover(function() { $(this).children().addClass('bg-primary-hover text-white border-white') }, function() { $(this).children().removeClass('bg-primary-hover text-white border-white') })
+          });
+        </script>
+        <% [['Seed 🌱', 5, 'seed-67104'], ['Butterfly 🦋', 10, 'butterfly-67105'], ['Bee 🐝', 20, 'bee-67106']].each { |name,amount,slug| %>
+        <div class="btn-group oc-tier" role="group">
+          <a target="_blank" class="btn btn-outline-primary" href="https://opencollective.com/dandelion-events/contribute/<%=slug%>/checkout"><%=name%></a>
+          <a target="_blank" class="btn btn-outline-primary" href="https://opencollective.com/dandelion-events/contribute/<%=slug%>/checkout">£<%=amount%></a>
+        </div>
+        <% } %>
+
+        <p class="my-2">or make a one-off donation:</p>
         <% form_tag '', class: "form-inline mt-2 #{'justify-content-center' if monthly_contributions > 0}", id: 'pay-form' do %>
           <%= hidden_field_tag :source, value: source %>
           <div class="form-group mb-1 mr-1">
@@ -84,7 +88,7 @@
           <% if MAJOR_CURRENCIES.include?(currency) %>
             <div class="d-none d-lg-block">
               <button data-payment-method="coinbase" type="submit" class="btn mb-1 <% if FIAT_CURRENCIES.include?(currency) %> btn-outline-primary border-0  <% else %> btn-primary <% end %> " style="height: 2.125rem">
-                Contribute with crypto
+                via crypto
                 <i class="fa fa-spin fa-circle-o-notch" style="display: none"></i>
               </button>
               <%= hidden_field_tag :payment_method, value: 'coinbase', disabled: true %>

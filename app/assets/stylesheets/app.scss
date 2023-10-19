@@ -111,7 +111,8 @@ mark,
 a.bg-primary:hover,
 a.bg-primary:focus,
 button.bg-primary:hover,
-button.bg-primary:focus {
+button.bg-primary:focus,
+.bg-primary-hover {
   background-color: $color_primary_hover !important
 }
 
