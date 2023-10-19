@@ -7,10 +7,6 @@
       <a target="_blank" href="/orders/<%=@order.id%>">view the confirmation email in your browser</a>.
     </p>
 
-    <div class="alert alert-warning my-3">
-      Hotmail, Outlook and Live addresses are sporadically blocking emails from Dandelion. Please <a class="text-warning" target="_blank" href="/orders/<%=@order.id%>">view the confirmation email in your browser</a>.
-    </div>
-
     <% if @event.redirect_url %>
       <p>Redirecting you to <a href="<%= @event.redirect_url %>"><%= @event.redirect_url %></a>&hellip; <i class="fa fa-spin fa-circle-o-notch"></i></p>
       <script>
