@@ -59,12 +59,14 @@
             $('.oc-tier').hover(function() { $(this).children().addClass('bg-primary-hover text-white border-white') }, function() { $(this).children().removeClass('bg-primary-hover text-white border-white') })
           });
         </script>
-        <% [['Seed 🌱', 5, 'seed-67104'], ['Butterfly 🦋', 10, 'butterfly-67105'], ['Bee 🐝', 20, 'bee-67106']].each { |name,amount,slug| %>
-        <div class="btn-group oc-tier mb-1" role="group">
-          <a target="_blank" class="btn btn-outline-primary" href="https://opencollective.com/dandelion-events/contribute/<%=slug%>/checkout"><%=name%></a>
-          <a target="_blank" class="btn btn-outline-primary" href="https://opencollective.com/dandelion-events/contribute/<%=slug%>/checkout">£<%=amount%></a>
+        <div class="text-sm-left text-center">
+          <% [['Seed 🌱', 5, 'seed-67104'], ['Butterfly 🦋', 10, 'butterfly-67105'], ['Bee 🐝', 20, 'bee-67106']].each { |name,amount,slug| %>
+          <div class="btn-group oc-tier mb-1" role="group">
+            <a target="_blank" class="btn btn-outline-primary" href="https://opencollective.com/dandelion-events/contribute/<%=slug%>/checkout"><%=name%></a>
+            <a target="_blank" class="btn btn-outline-primary" href="https://opencollective.com/dandelion-events/contribute/<%=slug%>/checkout">£<%=amount%></a>
+          </div>
+          <% } %>
         </div>
-        <% } %>
 
         <p class="mb-2 mt-1">or make a one-off donation:</p>
         <% form_tag '', class: "form-inline mt-2", id: 'pay-form' do %>
