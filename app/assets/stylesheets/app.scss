@@ -169,6 +169,10 @@ body[contenteditable] {
   border: 1px solid $color_primary;
 }
 
+label .form-text {
+  font-weight: 500
+}
+
 .map-icon-label .fa {
   color: white;
   font-size: 20px !important;
