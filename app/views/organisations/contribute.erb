@@ -1,2 +1,43 @@
 <%= partial :'organisations/nav', locals: { organisation: @organisation } %>
 <%= partial :'organisations/pay', locals: { organisation: @organisation, force: true } %>
+
+<% currency = MAJOR_CURRENCIES.include?(@organisation.currency) ? @organisation.currency : ENV['DEFAULT_CURRENCY'] %>
+
+<h2>Recent events</h2>
+
+<table class="table">
+  <thead>
+    <tr>
+      <th>Event</th>
+      <th style="width: 33%">Suggested donation</th>
+    </tr>
+  </thead>
+  <% @organisation.contributable_events.order('start_time asc').limit(20).each { |event| %>
+  <tr>
+    <td><a href="/e/<%=event.slug%>"><%=event.name%></a>, <%=concise_when_details(event)%></td>
+    <td>
+      <%=m event.contribution_gbp, currency%>
+      <% if event.contribution_gbp == event.cap %>
+        <span class="label label-primary">Capped</span>
+      <% end %>
+    </td>
+  </tr>
+  <% } %>
+</table>
+
+<h2>Contributions</h2>
+
+<table class="table">
+  <thead>
+    <tr>
+      <th>Date</th>
+      <th style="width: 33%">Amount</th>
+    </tr>
+  </thead>
+  <% @organisation.organisation_contributions.where(payment_completed: true).each { |organisation_contribution| %>
+  <tr>
+    <td><%=organisation_contribution.created_at%></td>
+    <td><%=m organisation_contribution.amount, organisation_contribution.currency%></td>
+  </tr>
+  <% } %>
+</table>

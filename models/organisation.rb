@@ -291,7 +291,7 @@ class Organisation
 
   has_many :organisation_contributions, dependent: :destroy
   def contributable_events
-    events.and(:id.in => Order.and(:value.gt => 0, :event_id.in => events.pluck(:id)).pluck(:event_id))
+    events.and(:id.in => Order.complete.and(:value.gt => 0, :event_id.in => events.pluck(:id)).pluck(:event_id))
   end
 
   def self.contribution_requested_per_event_gbp
