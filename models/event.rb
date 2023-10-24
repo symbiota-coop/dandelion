@@ -612,13 +612,17 @@ class Event
   end
 
   def cap
-    Money.new((organisation.try(:contribution_requested_per_event_gbp) || Organisation.contribution_requested_per_event_gbp) * 100, 'GBP')
+    if contribution_gbp_custom
+      Money.new(contribution_gbp_custom * 100, 'GBP')
+    elsif organisation && organisation.contribution_requested_per_event_gbp
+      Money.new(organisation.contribution_requested_per_event_gbp * 100, 'GBP')
+    else
+      Money.new(Organisation.contribution_requested_per_event_gbp * 100, 'GBP')
+    end
   end
 
   def contribution_gbp
-    if contribution_gbp_custom
-      Money.new(contribution_gbp_custom * 100, 'GBP')
-    elsif organisation && organisation.fixed_fee
+    if organisation && organisation.fixed_fee
       cap
     else
       five_percent_of_ticket_sales = Money.new(tickets.complete.sum(:discounted_price) * 0.05 * 100, currency).exchange_to('GBP')
