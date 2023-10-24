@@ -1,7 +1,6 @@
 <div class="main">
   <p>Hi %recipient.firstname%,</p>
-  <p>Welcome to Dandelion, created by the not-for-profit worker co-operative Dandelion Collective.</p>
-  <p>%recipient.confirm_or_activate%</p>
+  <p>Welcome to Dandelion! %recipient.confirm_or_activate%</p>
   <p>
     <a href="<%= ENV['BASE_URI'] %>/confirm_email/%recipient.token%"><%= ENV['BASE_URI'] %>/confirm_email/%recipient.token%</a>
   </p>

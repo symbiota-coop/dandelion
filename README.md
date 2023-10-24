@@ -4,5 +4,5 @@
 
 Check out the canonical install at https://dandelion.events \
 Created by Stephen Reid https://stephenreid.net \
-Questions? stephen@dandelion.coop \
+Questions? stephen@symbiota.coop \
 Audited by Molnar Consulting OÜ
