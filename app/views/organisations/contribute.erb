@@ -3,7 +3,7 @@
 
 <% currency = MAJOR_CURRENCIES.include?(@organisation.currency) ? @organisation.currency : ENV['DEFAULT_CURRENCY'] %>
 
-<% if (events = @organisation.contributable_events.order('start_time asc').limit(20)).count > 0 %>
+<% if (events = @organisation.contributable_events.order('start_time desc').limit(20)).count > 0 %>
 
   <h2>Recent events</h2>
 
