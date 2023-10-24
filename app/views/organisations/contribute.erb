@@ -29,7 +29,7 @@
 
 <% end %>
 
-<% if (organisation_contributions = @organisation.organisation_contributions.where(payment_completed: true)).count > 0 %>
+<% if (organisation_contributions = @organisation.organisation_contributions.where(payment_completed: true).order('created_at desc')).count > 0 %>
 
   <h2>Contributions</h2>
 
