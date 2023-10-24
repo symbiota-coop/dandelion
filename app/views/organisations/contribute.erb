@@ -3,9 +3,11 @@
 
 <% currency = MAJOR_CURRENCIES.include?(@organisation.currency) ? @organisation.currency : ENV['DEFAULT_CURRENCY'] %>
 
-<% if (events = @organisation.contributable_events.order('start_time desc').limit(20)).count > 0 %>
+<% if (events = @organisation.contributable_events.order('start_time desc')).count > 0 %>
 
-  <h2>Recent events</h2>
+  <% events = events.paginate(page: params[:events_page], per_page: 10) %>
+
+  <h2>Events</h2>
 
   <table class="table">
     <thead>
@@ -27,9 +29,13 @@
     <% } %>
   </table>
 
+  <%= will_paginate events, param_name: 'events_page', renderer: WillPaginate::ViewHelpers::BootstrapRenderer %>
+
 <% end %>
 
 <% if (organisation_contributions = @organisation.organisation_contributions.where(payment_completed: true).order('created_at desc')).count > 0 %>
+
+  <% organisation_contributions = organisation_contributions.paginate(page: params[:organisation_contributions_page], per_page: 10) %>
 
   <h2>Contributions</h2>
 
@@ -47,5 +53,7 @@
     </tr>
     <% } %>
   </table>
+
+  <%= will_paginate organisation_contributions, param_name: 'organisation_contributions_page', renderer: WillPaginate::ViewHelpers::BootstrapRenderer %>
 
 <% end %>
