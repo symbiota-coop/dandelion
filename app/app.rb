@@ -78,7 +78,7 @@ module Dandelion
       end
       PageView.create(path: request.path, query_string: request.query_string) if File.extname(request.path).blank? && !request.xhr? && !request.is_crawler?
       @og_desc = 'Find and host regenerative events and co-created gatherings 🧘🏼‍♀️ 🌱 🕺'
-      @og_image = "#{ENV['BASE_URI']}/images/black-on-white-link.png"
+      @og_image = "#{ENV['BASE_URI']}/images/cover2.jpg"
       # @no_discord = true if params[:minimal]
       @no_discord = true
       current_account.set(last_active: Time.now) if current_account
@@ -130,7 +130,6 @@ module Dandelion
           erb :home_signed_in
         end
       else
-        @og_image = "#{ENV['BASE_URI']}/images/cover2.jpg"
         @from = Date.today
         @events = Event.live.public.legit.future(@from)
         @accounts = []
