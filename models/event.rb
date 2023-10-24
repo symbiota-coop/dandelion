@@ -917,7 +917,7 @@ class Event
       select_tickets_outro: 'Text to show at the bottom of the Select Tickets panel',
       ask_hear_about: 'Ask people how they heard about the event on the order form',
       suggested_donation: 'If this is blank, the donation field will not be shown',
-      questions: 'Questions to ask participants upon booking. One question per line. Wrap in [square brackets] to turn into a checkbox, add a [star]* to make a checkbox required.',
+      questions: 'Questions to ask participants upon booking. One question per line. Wrap in [square brackets] to turn into a checkbox, add a [star]* to make a checkbox required. View answers on the Orders page.',
       feedback_questions: 'Questions to ask participants in the post-event feedback form. One question per line. Leave blank to disable feedback.',
       extra_info_for_ticket_email: 'This is the place to enter Zoom links, directions to the venue, etc.',
       extra_info_for_recording_email: 'This is the place to enter the link to the recording.',
