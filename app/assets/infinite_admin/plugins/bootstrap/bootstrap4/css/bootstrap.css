@@ -387,7 +387,7 @@ h6,
   margin-bottom: 0.5rem;
   font-family: inherit;
   font-weight: 500;
-  line-height: 1.2;
+  line-height: 1.33;
   color: inherit;
 }
 
@@ -423,26 +423,6 @@ h6,
 
 .lead {
   font-size: 1.25rem;
-}
-
-.display-1 {
-  font-size: 6rem;
-  line-height: 1.2;
-}
-
-.display-2 {
-  font-size: 5.5rem;
-  line-height: 1.2;
-}
-
-.display-3 {
-  font-size: 4.5rem;
-  line-height: 1.2;
-}
-
-.display-4 {
-  font-size: 3.5rem;
-  line-height: 1.2;
 }
 
 hr {
