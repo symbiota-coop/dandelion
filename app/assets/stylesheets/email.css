@@ -89,6 +89,13 @@ img {
   margin-bottom: 1rem;
 }
 
+figcaption {
+  font-size: 0.75rem;
+  margin-top: -0.75rem;
+  margin-bottom: 1rem;
+  text-align: center;
+}
+
 figure+figure>img,
 figure+figure>a>img {
   margin-bottom: 8px !important;
@@ -198,10 +205,4 @@ pre {
   margin-left: auto !important;
   margin-right: auto !important;
   text-align: center !important;
-}
-
-figcaption {
-  font-size: 0.75rem;
-  margin-top: 0.25rem;
-  text-align: center
 }
