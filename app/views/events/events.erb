@@ -29,17 +29,7 @@
 <%= partial :'events/search_form' %>
 
 <% if current_account && !params[:search] && !params[:event_tag_id] %>
-
-  <% if (organisations = Organisation.and(:id.in =>
-  current_account.organisationships.and(:hide_membership.ne => true).pluck(:organisation_id) +
-  current_account.organisationships.and(:admin => true).pluck(:organisation_id)
-  ).and(:id.in =>
-  Event.live.public.future.pluck(:organisation_id)
-  )
-  ).count > 0 %>
-  <%= partial :'events/carousel_organisations', locals: { organisations: organisations } %>
-<% end %>
-
+  <%= cp(:'events/carousel_organisations', key: "/events/carousel_organisations/#{current_account.id}") %>
 <% end %>
 
 <%= partial :'events/view_options' %>
