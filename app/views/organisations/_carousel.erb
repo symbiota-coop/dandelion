@@ -3,7 +3,7 @@
   current_account.organisationships.and(:admin => true).pluck(:organisation_id)
   )).count > 0 %>
 
-<% organisations = organisations.sort_by { |organisation| -organisation.events.count } %>
+<% organisations = organisations.sort_by { |organisation| created_at = organisation.events.live.public.order('created_at desc').first.try(:created_at); created_at ? created_at : 0 }.reverse %>
 <% carousel_id = "carousel-#{SecureRandom.uuid}" %>
 <script>
   $(function () {
