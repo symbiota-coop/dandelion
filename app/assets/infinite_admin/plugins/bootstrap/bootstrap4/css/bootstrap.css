@@ -387,8 +387,25 @@ h6,
   margin-bottom: 0.5rem;
   font-family: inherit;
   font-weight: 500;
-  line-height: 1.33;
   color: inherit;
+}
+
+h1,
+h2,
+h3,
+.h1,
+.h2,
+.h3 {
+  line-height: 1.2;
+}
+
+h4,
+h5,
+h6,
+.h4,
+.h5,
+.h6 {
+  line-height: 1.33;
 }
 
 h1,
