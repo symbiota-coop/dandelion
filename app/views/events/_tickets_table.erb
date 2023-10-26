@@ -89,8 +89,12 @@
             <%= event_feedback.id %>
           <% end %>
         </a>
-      <% elsif ticket.event.finished? && (ticket.account && !ticket.account.unsubscribed_feedback) %>
-        <a href="<%= ENV['BASE_URI'] %>/events/<%= ticket.event_id %>/resend_feedback_email/<%= ticket.account_id %>">Resend feedback email</a>
+      <% elsif ticket.event.finished? && ticket.account %>
+        <% if ticket.account.unsubscribed_feedback %>
+          <span class="text-muted">Unsubscribed from feedback emails</span>
+        <% else %>
+          <a href="<%= ENV['BASE_URI'] %>/events/<%= ticket.event_id %>/resend_feedback_email/<%= ticket.account_id %>">Resend feedback email</a>
+        <% end %>
       <% end %>
     </td>
     <td>
