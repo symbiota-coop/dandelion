@@ -53,50 +53,56 @@
           <p class="mt-1 text-center"><%= monthly_contributions.format(no_cents: true) %> raised of <%=m target, currency%> monthly target</p>
         <% end %>
 
-        <p class="mb-2">Make a monthly contribution via Open Collective:</p>
-        <script>
-          $(function() {
-            $('.oc-tier').hover(function() { $(this).children().addClass('bg-primary-hover text-white border-white') }, function() { $(this).children().removeClass('bg-primary-hover text-white border-white') })
-          });
-        </script>
         <div class="text-sm-left text-center">
+          <p class="mb-2">Make a monthly contribution via Open Collective:</p>
+          <script>
+            $(function() {
+              $('.oc-tier').hover(function() { $(this).children().addClass('bg-primary-hover text-white border-white') }, function() { $(this).children().removeClass('bg-primary-hover text-white border-white') })
+            });
+          </script>
+
           <% [['Seed 🌱', 5, 'seed-67104'], ['Butterfly 🦋', 10, 'butterfly-67105'], ['Bee 🐝', 20, 'bee-67106']].each { |name,amount,slug| %>
           <div class="btn-group oc-tier mb-1" role="group">
             <a target="_blank" class="btn btn-outline-primary" href="https://opencollective.com/dandelion-events/contribute/<%=slug%>/checkout"><%=name%></a>
             <a target="_blank" class="btn btn-outline-primary" href="https://opencollective.com/dandelion-events/contribute/<%=slug%>/checkout">£<%=amount%></a>
           </div>
           <% } %>
-        </div>
 
-        <p class="mb-2 mt-1">or make a one-off donation:</p>
-        <% form_tag '', class: "form-inline mt-2", id: 'pay-form' do %>
-          <%= hidden_field_tag :source, value: source %>
-          <div class="form-group mb-1 mr-1">
-            <div class="input-group">
-              <div class="input-group-prepend">
-                <span class="input-group-text"><%= Money.new(0, currency).symbol %></span>
+          <p class="mb-2 mt-1">or make a one-off donation:</p>
+          <style>
+            @media(max-width: 575px) {
+              #pay-form { justify-content: center }
+            }
+          </style>
+          <% form_tag '', class: "form-inline mt-2", id: 'pay-form' do %>
+            <%= hidden_field_tag :source, value: source %>
+            <div class="form-group mb-1 mr-1">
+              <div class="input-group">
+                <div class="input-group-prepend">
+                  <span class="input-group-text"><%= Money.new(0, currency).symbol %></span>
+                </div>
+                <%= hidden_field_tag :currency, value: currency %>
+                <%= number_field_tag :amount, value: 10, style: 'width: 5em;', required: 'required', class: 'form-control', id: 'amount' %>
               </div>
-              <%= hidden_field_tag :currency, value: currency %>
-              <%= number_field_tag :amount, value: 10, style: 'width: 5em;', required: 'required', class: 'form-control', id: 'amount' %>
             </div>
-          </div>
-          <% if FIAT_CURRENCIES.include?(currency) %>
-            <button data-payment-method="stripe" type="submit" class="btn btn-primary mb-1 ml-0 mr-1" style="height: 2.125rem">
-              Contribute via card
-              <i class="fa fa-spin fa-circle-o-notch" style="display: none"></i>
-            </button>
-            <%= hidden_field_tag :payment_method, value: 'stripe', disabled: true %>
-          <% end %>
-          <% if MAJOR_CURRENCIES.include?(currency) %>
-            <div class="d-none d-lg-block">
-              <button data-payment-method="coinbase" type="submit" class="btn mb-1 <% if FIAT_CURRENCIES.include?(currency) %> btn-outline-primary border-0  <% else %> btn-primary <% end %> " style="height: 2.125rem">
-                via crypto
+            <% if FIAT_CURRENCIES.include?(currency) %>
+              <button data-payment-method="stripe" type="submit" class="btn btn-primary mb-1 ml-0 mr-1" style="height: 2.125rem">
+                Contribute via card
                 <i class="fa fa-spin fa-circle-o-notch" style="display: none"></i>
               </button>
-              <%= hidden_field_tag :payment_method, value: 'coinbase', disabled: true %>
+              <%= hidden_field_tag :payment_method, value: 'stripe', disabled: true %>
             <% end %>
-          </div>
-        <% end %>
+            <% if MAJOR_CURRENCIES.include?(currency) %>
+              <div class="d-none d-lg-block">
+                <button data-payment-method="coinbase" type="submit" class="btn mb-1 <% if FIAT_CURRENCIES.include?(currency) %> btn-outline-primary border-0  <% else %> btn-primary <% end %> " style="height: 2.125rem">
+                  via crypto
+                  <i class="fa fa-spin fa-circle-o-notch" style="display: none"></i>
+                </button>
+                <%= hidden_field_tag :payment_method, value: 'coinbase', disabled: true %>
+              <% end %>
+            </div>
+          <% end %>
+        </div>
         <!--
     <div class="d-none d-lg-block">
       <p class="lead mb-0">
@@ -123,6 +129,7 @@
       </p>
     </div>
     -->
+
 
         <% if ENV['OFFER_NFT'] && defined?(short_nft) && short_nft %>
           <p class="mt-2">
