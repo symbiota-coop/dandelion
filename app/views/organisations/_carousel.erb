@@ -38,7 +38,7 @@
     <div class="slick-responsive row justify-content-center">
       <% organisations.each { |organisation| %>
       <div class="col-6 col-lg-4 slick-item">
-        <%= partial :'organisations/block', locals: { organisation: organisation } %>
+        <%= partial :'organisations/block', locals: { organisation: organisation, most_recent: true } %>
       </div>
       <% } %>
     </div>
