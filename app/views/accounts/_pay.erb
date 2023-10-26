@@ -54,17 +54,17 @@
         <% end %>
 
         <div class="text-sm-left text-center">
-          <p class="mb-2">Make a monthly contribution via Open Collective:</p>
+          <p class="mb-2">Make a monthly contribution:</p>
           <script>
             $(function() {
               $('.oc-tier').hover(function() { $(this).children().addClass('bg-primary-hover text-white border-white') }, function() { $(this).children().removeClass('bg-primary-hover text-white border-white') })
             });
           </script>
 
-          <% [['Seed 🌱', 5, 'seed-67104'], ['Butterfly 🦋', 10, 'butterfly-67105'], ['Bee 🐝', 20, 'bee-67106']].each { |name,amount,slug| %>
+          <% [['Seed 🌱', 5, 'https://buy.stripe.com/fZedUhdmW1jC3VCaEG'], ['Butterfly 🦋', 10, 'https://buy.stripe.com/3cs8zXaaKd2k63K147'], ['Bee 🐝', 20, 'https://buy.stripe.com/fZe17vdmWgew4ZGcMQ']].each { |name,amount,url| %>
           <div class="btn-group oc-tier mb-1" role="group">
-            <a target="_blank" class="btn btn-outline-primary" href="https://opencollective.com/dandelion-events/contribute/<%=slug%>/checkout"><%=name%></a>
-            <a target="_blank" class="btn btn-outline-primary" href="https://opencollective.com/dandelion-events/contribute/<%=slug%>/checkout">£<%=amount%></a>
+            <a target="_blank" class="btn btn-outline-primary" href="<%=url%>"><%=name%></a>
+            <a target="_blank" class="btn btn-outline-primary" href="<%=url%>">£<%=amount%></a>
           </div>
           <% } %>
 
