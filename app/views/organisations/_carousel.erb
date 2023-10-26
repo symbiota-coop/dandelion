@@ -3,7 +3,9 @@
   current_account.organisationships.and(:admin => true).pluck(:organisation_id)
   )).count > 0 %>
 
+
 <% organisations = organisations.sort_by { |organisation| created_at = organisation.events.live.public.order('created_at desc').first.try(:created_at); created_at ? created_at.to_i : 0 }.reverse %>
+
 <% carousel_id = "carousel-#{SecureRandom.uuid}" %>
 <script>
   $(function () {
@@ -38,7 +40,7 @@
     <div class="slick-responsive row justify-content-center">
       <% organisations.each { |organisation| %>
       <div class="col-6 col-lg-4 slick-item">
-        <%= partial :'organisations/block', locals: { organisation: organisation, most_recent: true } %>
+        <%= partial :'organisations/block', locals: { organisation: organisation, most_recent: (organisation.events.live.public.future.count > 0) } %>
       </div>
       <% } %>
     </div>
