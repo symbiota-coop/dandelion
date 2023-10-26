@@ -1,12 +1,13 @@
 <script>
   $(function() {
     $('#doc-body h2').css('padding-top', $('#header').height())
+    $('#sticky-index').css('top', $('#header').height() + parseInt($('.content').css('paddingTop')))
   })
 </script>
 
 <div class="row">
   <div class="col-lg-3">
-    <div class="mr-3">
+    <div class="mr-3" style="position: sticky;" id="sticky-index">
       <%= partial :'docs/index' %>
     </div>
   </div>
