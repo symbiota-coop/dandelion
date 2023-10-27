@@ -143,7 +143,7 @@ class Event
     q.empty? ? [] : q
   end
 
-  %w[no_discounts hide_attendees hide_discussion refund_deleted_orders monthly_donors_only draft secret zoom_party show_emails include_in_parent featured opt_in_facilitator hide_few_left hide_organisation_footer ask_hear_about send_order_notifications raw_description prevent_reminders trending hide_from_carousels].each do |b|
+  %w[no_discounts hide_attendees hide_discussion refund_deleted_orders monthly_donors_only draft secret zoom_party show_emails include_in_parent featured opt_in_facilitator hide_few_left hide_organisation_footer ask_hear_about send_order_notifications raw_description prevent_reminders trending hide_from_carousels no_tickets_pdf].each do |b|
     field b.to_sym, type: Boolean
     index({ b.to_s => 1 })
   end
@@ -890,7 +890,8 @@ class Event
       gathering_id: 'Add people that buy tickets to this gathering',
       send_order_notifications: 'Send email notifications of orders',
       prevent_reminders: 'Prevent reminder email',
-      oc_slug: 'Open Collective event slug'
+      oc_slug: 'Open Collective event slug',
+      no_tickets_pdf: "Don't attach tickets PDF to confirmation email"
     }[attr.to_sym] || super
   end
 

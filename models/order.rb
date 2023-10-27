@@ -392,11 +392,13 @@ class Order
 
     batch_message.body_html Premailer.new(ERB.new(File.read(Padrino.root('app/views/layouts/email.erb'))).result(binding), with_html_string: true, adapter: 'nokogiri', input_encoding: 'UTF-8').to_inline_css
 
-    tickets_pdf_filename = "dandelion-#{event.name.parameterize}-#{order.id}.pdf"
-    tickets_pdf_file = File.new(tickets_pdf_filename, 'w+')
-    tickets_pdf_file.write order.tickets_pdf.render
-    tickets_pdf_file.rewind
-    batch_message.add_attachment tickets_pdf_file, tickets_pdf_filename
+    unless event.no_tickets_pdf
+      tickets_pdf_filename = "dandelion-#{event.name.parameterize}-#{order.id}.pdf"
+      tickets_pdf_file = File.new(tickets_pdf_filename, 'w+')
+      tickets_pdf_file.write order.tickets_pdf.render
+      tickets_pdf_file.rewind
+      batch_message.add_attachment tickets_pdf_file, tickets_pdf_filename
+    end
 
     cal = RiCal.Calendar do |rcal|
       rcal.event do |revent|
