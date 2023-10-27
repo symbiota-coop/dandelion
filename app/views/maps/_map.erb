@@ -174,19 +174,7 @@
   <% end %>
 
   <% if defined?(points_count) && points_count > points_limit %>
-          if (params['triggered_bounds_changed']) {
-            navigator.geolocation.getCurrentPosition(function (position) {
-              if (position) {
-                map.setCenter(new google.maps.LatLng(position.coords.latitude, position.coords.longitude))
-                map.setZoom(10)
-                google.maps.event.trigger(map, 'bounds_changed');
-              }
-            }, function () {
-              $('#points-warning').show()
-            })
-          } else {
             $('#points-warning').show()
-          }
   <% end %>
 
       });
