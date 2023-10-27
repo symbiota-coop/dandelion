@@ -19,10 +19,6 @@
             <button class="btn btn-primary" type="submit">Sign in</button>
           <% end %>
 
-          <div class="alert alert-warning mt-3 mb-0">
-            Hotmail, Outlook and Live addresses are sporadically blocking emails from Dandelion. Please email <a class="text-warning text-underline" href="mailto:contact@dandelion.events">contact@dandelion.events</a> if you require assistance.
-          </div>
-
           <a href="javascript:;" onclick="$('#t1').hide();$('#t2').show().find('input').focus()" class="mt-3 mb-1 btn btn-primary">Get a sign in code via email <i class="fa fa-envelope"></i> </a>
           <% if !Provider.all.empty? %>
             <% Provider.all.each { |provider| %>
