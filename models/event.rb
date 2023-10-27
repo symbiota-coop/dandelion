@@ -51,6 +51,7 @@ class Event
   field :contribution_gbp_custom, type: Float
   field :oc_slug, type: String
   field :ticket_email_greeting, type: String
+  field :ticket_email_title, type: String
 
   def self.admin_fields
     {

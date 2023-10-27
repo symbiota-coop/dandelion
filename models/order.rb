@@ -378,7 +378,7 @@ class Order
 
     account = order.account
     content = ERB.new(File.read(Padrino.root('app/views/emails/tickets.erb'))).result(binding)
-    batch_message.subject "#{tickets.count == 1 ? 'Ticket' : 'Tickets'} to #{event.name}"
+    batch_message.subject(event.ticket_email_title || "#{tickets.count == 1 ? 'Ticket' : 'Tickets'} to #{event.name}")
 
     if event.organisation.send_ticket_emails_from_organisation && event.organisation.reply_to && event.organisation.image
       header_image_url = event.organisation.image.url
