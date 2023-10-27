@@ -154,7 +154,8 @@ p.action a:hover {
 }
 
 hr {
-  border: 1px solid #ddd
+  border: 1px solid #ddd;
+  margin-bottom: 1rem;
 }
 
 a.attachment {
