@@ -58,6 +58,9 @@ GEM
       airbrake-ruby (~> 6.0)
     airbrake-ruby (6.2.0)
       rbtree3 (~> 0.5)
+    airrecord (1.0.8)
+      faraday (>= 0.10, < 3.0)
+      net-http-persistent
     ast (2.4.2)
     bazaar (0.0.2)
     bcrypt (3.1.18)
@@ -468,6 +471,7 @@ DEPENDENCIES
   activemodel
   addressable
   airbrake
+  airrecord (= 1.0.8)
   bazaar
   bcrypt
   bech32

@@ -235,5 +235,10 @@ module Dandelion
     get '/token' do
       erb :token
     end
+
+    get '/films' do
+      @title = 'Films'
+      erb :'films/films'
+    end
   end
 end

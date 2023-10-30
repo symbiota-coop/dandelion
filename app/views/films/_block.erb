@@ -1,0 +1,13 @@
+<div class="card film">
+  <a href="<%= film['URL'] %>">
+    <img onerror="this.style.display='none'" class="card-img-top" src="<%= film['Images'].first['url'] if film['Images'] %>">
+  </a>
+  <div class="card-body">
+    <h4 class="card-title mb-0">
+      <span class="float-right text-muted">
+        <%= film['Year'] %>
+      </span>
+      <a href="<%= film['URL'] %>"><%= film['Name'] %></a>
+    </h5>
+  </div>
+</div>

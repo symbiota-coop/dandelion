@@ -27,6 +27,8 @@ Money.rounding_mode = BigDecimal::ROUND_HALF_EVEN
 
 Time.zone = ENV['DEFAULT_TIME_ZONE']
 
+Airrecord.api_key = ENV['AIRTABLE_API_KEY']
+
 PUSHER = Pusher::Client.new(app_id: ENV['PUSHER_APP_ID'], key: ENV['PUSHER_KEY'], secret: ENV['PUSHER_SECRET'], cluster: ENV['PUSHER_CLUSTER'], encrypted: true) if ENV['PUSHER_APP_ID']
 
 OPENAI = Faraday.new(

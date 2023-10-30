@@ -1,0 +1,7 @@
+<div class="row">
+  <% films.each { |film| %>
+  <div class="col-sm-6 col-lg-3 mb-3">
+    <%= partial :'films/block', locals: { film: film } %>
+  </div>
+  <% } %>
+</div>

@@ -1,0 +1,3 @@
+<p class="lead">Regenerative films recommended by the Dandelion team 🍿</p>
+
+<%= partial :'films/blocks', locals: { films: Film.all(sort: {'Year' => 'desc'}) } %>
