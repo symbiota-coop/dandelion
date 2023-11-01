@@ -1,8 +1,10 @@
 <%= partial :'organisations/nav', locals: { organisation: @organisation } %>
 <% form_for @organisation, "/o/#{@organisation.slug}/emails" do  |f| %>
+  <h2 class="mb-3">Welcome for followers</h2>
   <%= f.text_block :welcome_from %>
   <%= f.text_block :welcome_subject %>
   <%= f.wysiwyg_block :welcome_body %>
+  <h2 class="mt-5 mb-3">Welcome for monthly donors</h2>
   <%= f.text_block :monthly_donation_welcome_from %>
   <%= f.text_block :monthly_donation_welcome_subject %>
   <%= f.wysiwyg_block :monthly_donation_welcome_body %>
