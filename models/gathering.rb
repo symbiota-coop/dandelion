@@ -135,7 +135,7 @@ class Gathering
     coordinates[0] if coordinates
   end
   after_validation do
-    geocode || (self.coordinates = nil) if ENV['GOOGLE_MAPS_API_KEY']
+    geocode || (self.coordinates = nil)
   end
 
   def self.privacies
