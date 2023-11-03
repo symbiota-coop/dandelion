@@ -21,15 +21,14 @@
 <script>
   function drawNetwork() {
 
-  scale = chroma.scale(['#B16DC6', '#B16DC6']);
-  scale(0.5).hex(); // #FF7F7F
+  scale = chroma.scale(['#00B963', '#00B963']);
 
   node_min_width = 0
   node_min_color = 0
-  node_color_scale = 50
+  node_color_scale = 1
   edge_min_color = 0
-  edge_color_scale = 10
-  edge_min_opacity = 0.1
+  edge_color_scale = 1
+  edge_min_opacity = 0.25
   edge_opacity_scale = 10
 
           cy = cytoscape({
@@ -39,7 +38,7 @@
   <% models.each { |model| %>
                     {
                       data: {
-                      id: '<%= model.name.parameterize %>',
+                      id: '<%= model.name.underscore %>',
                       name: '<%= model.name %>',
                       weight: <%= w = model.fields.count + model.reflect_on_all_associations(:belongs_to).count %>,
                       width: (node_min_width +<%= w %>),
@@ -48,9 +47,9 @@
                     <% model.reflect_on_all_associations(:has_many).each_with_index { |assoc,i| %>
                     {
                       data: {
-                        id: '<%= assoc.class_name.parameterize %>-<%= model.name.parameterize %>-<%= i %>',
-                        source: '<%= assoc.class_name.parameterize %>',
-                        target: '<%= model.name.parameterize %>',
+                        id: '<%= assoc.class_name.underscore %>-<%= model.name.underscore %>-<%= i %>',
+                        source: '<%= assoc.class_name.underscore %>',
+                        target: '<%= model.name.underscore %>',
                         weight: <%= w = 1 %>,
                         color: scale(edge_min_color + <%= w %>/edge_color_scale).hex(),
                         opacity: (edge_min_opacity + <%= w %>/edge_opacity_scale)
@@ -63,9 +62,9 @@
                   {
                   selector: 'node',
                   style: {
-                      'color': 'white',
+                      'color': '#212529',
                       'background-color': 'data(color)',
-                      'opacity': 0.75,
+                      'opacity': 0.85,
                       'label': 'data(name)',
                       'width': 'data(width)',
                       'height': 'data(width)'
@@ -88,7 +87,10 @@
           });
   //cy.$('[weight < 2]').hide()
   cy.minZoom(0.5)
+  cy.on('tap', 'node', function(){
+   window.open('https://github.com/dandelion-collective/dandelion/blob/master/models/' + this.data('id') + '.rb')
 
+  });
   }
 
   $(function() {
@@ -96,4 +98,4 @@
           $(window).one('focus', function() { drawNetwork() })
   })
 </script>
-<div id="cy" class="card shadow-sm" style="background-color: #222; height: 700px"></div>
+<div id="cy" style="height: 600px"></div>
