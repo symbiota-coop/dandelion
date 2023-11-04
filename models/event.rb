@@ -360,6 +360,20 @@ class Event
     Fragment.and(key: %r{/events/#{id}}).destroy_all
   end
 
+  def self.events_for_carousel(organisation, carousel)
+    tags = nil
+    organisation.carousels.split("\n").reject { |line| line.blank? }.each do |line|
+      title, tags = line.split(':')
+      title, _w = title.split('[')
+      next unless title == carousel
+
+      tags, _coordinator = tags.split('@')
+      tags = tags.split(',').map(&:strip)
+      break
+    end
+    self.and(:id.in => EventTagship.and(:event_tag_id.in => EventTag.and(:name.in => tags).pluck(:id)).pluck(:event_id))
+  end
+
   def carousel
     return unless organisation && organisation.carousels
 

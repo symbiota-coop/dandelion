@@ -58,6 +58,16 @@
           <%= select_tag :activity_id, options: [''] + activities.map { |activity| [activity.name, activity.id] }, selected: params[:activity_id], class: 'form-control', style: 'max-width: 12em' %>
         </div>
       <% end %>
+      <% if @organisation.carousels %>
+        <div class="form-group">
+          <label>Carousel</label>
+          <%= select_tag :carousel, options: ([''] + @organisation.carousels.split("\n").reject { |line| line.blank? }.map do |line|
+            title, tags = line.split(':')
+            title, _w = title.split('[')
+            title
+          end), selected: params[:carousel], class: 'form-control', style: 'max-width: 12em' %>
+        </div>
+      <% end %>
       <%= checkbox 'Online' %>
       <%= checkbox 'In person' %>
       <% if @organisation.monthly_donors.count > 0 %>

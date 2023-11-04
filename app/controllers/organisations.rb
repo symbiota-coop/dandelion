@@ -196,6 +196,7 @@ Dandelion::App.controller do
     @events = @events.and(:id.in => event_ids) unless event_ids.empty?
     @events = @events.and(local_group_id: params[:local_group_id]) if params[:local_group_id]
     @events = @events.and(activity_id: params[:activity_id]) if params[:activity_id]
+    @events = @events.events_for_carousel(@organisation, params[:carousel]) if params[:carousel]
     @events = @events.online if params[:online]
     @events = @events.in_person if params[:in_person]
     @events = @events.and(monthly_donors_only: true) if params[:members_events]
