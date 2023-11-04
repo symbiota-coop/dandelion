@@ -125,7 +125,7 @@
 <% Account.privacyables.select { |p| %w[email location phone telegram_username website date_of_birth gender sexuality bio].include?(p) }.each { |p|
 next if p == 'sexuality' && @account.organisations.count == 1 && @account.organisations.first.slug == 'refi-spring'
    %>
-<div style="font-weight: normal" data-privacy="<%= p %>" data-pagelet-url="/accounts/privacyable/<%= p %>"></div>
+<div style="font-weight: 500" data-privacy="<%= p %>" data-pagelet-url="/accounts/privacyable/<%= p %>"></div>
 <% } %>
 <script>
   $(function () {

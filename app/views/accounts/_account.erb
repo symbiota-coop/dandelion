@@ -2,14 +2,11 @@
   <%= partial :'accounts/square', locals: { account: account, style: "display: block; width: #{defined?(width) ? width : '100px'}" } %>
 </a>
 <strong><%= account.name %></strong>
+<% if defined?(membership) && membership.admin? %>
+  <i data-toggle="tooltip" title="Admin" class="fa fa-key"></i>
+<% end %>
 <% if defined?(show_email) && show_email %>
   <div style="font-size: 12px">
     <%= account.email %>
   </div>
 <% end %>
-<div>
-  <%== [
-        ('<i data-toggle="tooltip" title="Admin" class="fa fa-key"></i>' if defined?(membership) && membership.admin?),
-        account.age ? %(<span data-toggle="tooltip" title="#{account.age} years old">#{account.age}</span>) : nil
-      ].compact.join(' &middot; ') %>
-</div>
