@@ -226,6 +226,7 @@ Dandelion::App.controller do
           start_time: event.start_time,
           end_time: event.end_time,
           location: event.location,
+          time_zone: event.time_zone,
           image: event.image.thumb('1920x1920').url,
           description: event.description
         }
