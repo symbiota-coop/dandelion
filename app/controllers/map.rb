@@ -68,10 +68,8 @@ Dandelion::App.controller do
       @polygonables = @local_groups
       @place = Place.new
       if params[:map_only]
-        @no_discord = true
         partial :'maps/map', locals: { points: @points, points_count: @points_count, polygonables: @polygonables, centre: (OpenStruct.new(lat: @lat, lng: @lng) if @lat && @lng), zoom: @zoom }, layout: :minimal
       elsif params[:blocks_only]
-        @no_discord = true
         if @account
           partial :'accounts/places', locals: { block_class: 'col-6' }, layout: :minimal
         else

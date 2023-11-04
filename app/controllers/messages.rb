@@ -1,7 +1,6 @@
 Dandelion::App.controller do
   before do
     sign_in_required!
-    @no_discord = true
   end
 
   get '/messages' do

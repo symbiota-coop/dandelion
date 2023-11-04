@@ -31,16 +31,6 @@ Airrecord.api_key = ENV['AIRTABLE_API_KEY']
 
 PUSHER = Pusher::Client.new(app_id: ENV['PUSHER_APP_ID'], key: ENV['PUSHER_KEY'], secret: ENV['PUSHER_SECRET'], cluster: ENV['PUSHER_CLUSTER'], encrypted: true) if ENV['PUSHER_APP_ID']
 
-OPENAI = Faraday.new(
-  url: 'https://api.openai.com/v1',
-  headers: { 'Content-Type': 'application/json', Authorization: "Bearer #{ENV['OPENAI_API_KEY']}" }
-)
-
-REPLICATE = Faraday.new(
-  url: 'https://api.replicate.com/v1',
-  headers: { 'Content-Type': 'application/json', Authorization: "Token #{ENV['REPLICATE_API_KEY']}" }
-)
-
 if ENV['GOOGLE_MAPS_API_KEY']
   Timezone::Lookup.config(:google) do |c|
     c.api_key = ENV['GOOGLE_MAPS_API_KEY']
