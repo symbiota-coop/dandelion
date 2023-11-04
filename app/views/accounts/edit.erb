@@ -65,8 +65,12 @@
     })
   </script>
   <%= f.image_block :picture, rotate: false %>
-  <%= f.select_block :time_zone %>
   <%= f.text_block :location %>
+  <% if @account.time_zone %>
+    <p class="text-muted">
+      Your time zone: <%= @account.time_zone %>
+    </p>
+  <% end %>
   <% if @account.coordinates %>
     <div id="account-map">
       <style>

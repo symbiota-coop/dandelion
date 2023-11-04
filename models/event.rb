@@ -229,6 +229,7 @@ class Event
   end
   after_validation do
     geocode || (self.coordinates = nil)
+    self.time_zone = Timezone.lookup(*coordinates.reverse) if coordinates
   end
 
   def recording?
@@ -820,10 +821,6 @@ class Event
     !secret?
   end
 
-  def self.time_zones
-    [''] + ActiveSupport::TimeZone::MAPPING.keys.sort
-  end
-
   def time_zone_or_default
     time_zone || ENV['DEFAULT_TIME_ZONE']
   end
@@ -836,7 +833,7 @@ class Event
     zone = zone.name unless zone.is_a?(String)
     start_time = self.start_time.in_time_zone(zone)
     end_time = self.end_time.in_time_zone(zone)
-    z = "#{zone.include?('London') ? 'UK time' : zone.gsub('_', ' ')} (UTC #{start_time.formatted_offset})"
+    z = "#{zone.split('/').last.gsub('_', ' ')} time (UTC #{start_time.formatted_offset})"
     if start_time.to_date == end_time.to_date
       "#{start_time.to_date}, #{start_time.to_fs(:no_double_zeros)} – #{end_time.to_fs(:no_double_zeros)} #{z if with_zone}"
     else
@@ -852,7 +849,7 @@ class Event
     zone = zone.name unless zone.is_a?(String)
     start_time = self.start_time.in_time_zone(zone)
     end_time = self.end_time.in_time_zone(zone)
-    z = "#{zone.include?('London') ? 'UK time' : zone.gsub('_', ' ')} (UTC #{start_time.formatted_offset})"
+    z = "#{zone.split('/').last.gsub('_', ' ')} time (UTC #{start_time.formatted_offset})"
     if start_time.to_date == end_time.to_date
       start_time.to_date
     else
@@ -877,7 +874,6 @@ class Event
       zoom_party: 'Zoom party',
       add_a_donation_to: 'Text above donation field',
       donation_text: 'Text below donation field',
-      time_zone: 'Display time zone',
       start_time: 'Start date/time',
       end_time: 'End date/time',
       extra_info_for_ticket_email: 'Extra info for ticket confirmation email',
@@ -910,7 +906,6 @@ class Event
       image: 'At least 992px wide, and more wide than high',
       start_time: "in &hellip; (your profile's time zone)",
       end_time: "in &hellip; (your profile's time zone)",
-      time_zone: "Time zone to display the event in (defaults to the user's time zone and ignored for online events)",
       add_a_donation_to: "Text to display above the 'Add a donation' field (leave blank to use organisation default)",
       oc_slug: 'Event slug for taking payments via Open Collective',
       donation_text: "Text to display below the 'Add a donation' field  (leave blank to use organisation default)",

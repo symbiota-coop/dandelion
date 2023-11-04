@@ -32,7 +32,7 @@ class EventSession
     zone = zone.name unless zone.is_a?(String)
     start_time = self.start_time.in_time_zone(zone)
     end_time = self.end_time.in_time_zone(zone)
-    z = "#{zone.include?('London') ? 'UK time' : zone.gsub('_', ' ')} (UTC #{start_time.formatted_offset})"
+    z = "#{zone.split('/').last.gsub('_', ' ')} time (UTC #{start_time.formatted_offset})"
     if start_time.to_date == end_time.to_date
       "#{start_time.to_date}, #{start_time.to_fs(:no_double_zeros)} – #{end_time.to_fs(:no_double_zeros)} #{z if with_zone}"
     else
@@ -48,7 +48,7 @@ class EventSession
     zone = zone.name unless zone.is_a?(String)
     start_time = self.start_time.in_time_zone(zone)
     end_time = self.end_time.in_time_zone(zone)
-    z = "#{zone.include?('London') ? 'UK time' : zone.gsub('_', ' ')} (UTC #{start_time.formatted_offset})"
+    z = "#{zone.split('/').last.gsub('_', ' ')} time (UTC #{start_time.formatted_offset})"
     if start_time.to_date == end_time.to_date
       start_time.to_date
     else
