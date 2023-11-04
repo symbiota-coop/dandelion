@@ -183,7 +183,7 @@ Dandelion::App.controller do
     partial :'organisations/events_block'
   end
 
-  get '/o/:slug/events', provides: %i[html ics] do
+  get '/o/:slug/events', provides: %i[html ics json] do
     @organisation = Organisation.find_by(slug: params[:slug]) || not_found
     @events = @organisation.events_for_search(include_all_local_group_events: (true if params[:local_group_id]))
     @from = params[:from] ? Date.parse(params[:from]) : Date.today
@@ -206,6 +206,25 @@ Dandelion::App.controller do
         @organisation.events.course.pluck(:id))
     end
     case content_type
+    when :json
+      @events = if params[:past]
+                  @events.past
+                else
+                  @events.future_and_current_featured(@from)
+                end
+      @events.map do |event|
+        {
+          id: event.id.to_s,
+          slug: event.slug,
+          name: event.name,
+          tags: event.event_tags.map(&:name),
+          start_date: event.start_time.to_date.to_fs(:db_local),
+          end_date: event.end_time.to_date.to_fs(:db_local),
+          location: event.location,
+          image: event.image.thumb('1920x1920').url,
+          description: event.description
+        }
+      end.to_json
     when :html
       @events = if params[:past]
                   @events.past
