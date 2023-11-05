@@ -26,8 +26,8 @@
     <% end %>
   <% end %>
 <% else %>
-  <a class="pagelet-trigger btn btn-primary btn-sm" href="/shifts/create?rota_id=<%= rota.id %>&rslot_id=<%= rslot.id %>&role_id=<%= role.id %>">Sign up</a>
+  <a class="pagelet-trigger btn btn-primary btn-sm mb-1" href="/shifts/create?rota_id=<%= rota.id %>&rslot_id=<%= rslot.id %>&role_id=<%= role.id %>">Sign up</a>
   <% if @membership.admin? %>
-    <a class="pagelet-trigger btn btn-primary btn-sm" href="/shifts/create?rota_id=<%= rota.id %>&rslot_id=<%= rslot.id %>&role_id=<%= role.id %>&na=true">n/a</a>
+    <a class="pagelet-trigger btn btn-primary btn-sm mb-1" href="/shifts/create?rota_id=<%= rota.id %>&rslot_id=<%= rslot.id %>&role_id=<%= role.id %>&na=true">n/a</a>
   <% end %>
 <% end %>
