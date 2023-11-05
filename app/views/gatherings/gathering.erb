@@ -44,6 +44,7 @@
       <% else %>
         <a class="btn btn-primary mb-1" href="/g/<%= @gathering.slug %>/hide_from_sidebar">Showing in sidebar</a>
       <% end %>
+      <a class="btn btn-primary mb-1" href="/g/<%= @gathering.slug %>/copy">Copy</a>
       <a class="btn btn-primary mb-1" data-confirm="Are you sure you want to leave the gathering?" href="/g/<%= @gathering.slug %>/leave">Leave gathering</a>
     </div>
     <% if @membership.admin? or @gathering.photos.count > 0 %>

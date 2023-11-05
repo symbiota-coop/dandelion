@@ -181,4 +181,46 @@ Dandelion::App.controller do
     @accounts = @gathering.members
     erb :'gatherings/map'
   end
+
+  get '/g/:slug/copy' do
+    @gathering = Gathering.find_by(slug: params[:slug]) || not_found
+    @membership = @gathering.memberships.find_by(account: current_account)
+    confirmed_membership_required!
+    erb :'gatherings/copy'
+  end
+
+  post '/g/:slug/copy' do
+    @gathering = Gathering.find_by(slug: params[:slug]) || not_found
+    @membership = @gathering.memberships.find_by(account: current_account)
+    confirmed_membership_required!
+
+    g1 = @gathering
+    g2 = current_account.gatherings.find(params[:gathering_id])
+
+    g1.timetables.each do |timetable1|
+      timetable2 = g2.timetables.create! name: timetable1.name, account: g2.account
+      timetable1.tslots.each do |tslot|
+        timetable2.tslots.create! name: tslot.name, o: tslot.o
+      end
+      timetable1.spaces.each do |space|
+        timetable2.spaces.create! name: space.name, o: space.o
+      end
+    end
+
+    g1.rotas.each do |rota1|
+      rota2 = g2.rotas.create! name: rota1.name, account: g2.account
+      rota1.rslots.each do |rslot|
+        rota2.rslots.create! name: rslot.name, o: rslot.o, worth: rslot.worth
+      end
+      rota1.roles.each do |role|
+        rota2.roles.create! name: role.name, o: role.o, worth: role.worth
+      end
+    end
+
+    g1.options.each do |option|
+      g2.options.create! account: option.account, name: option.name, description: option.description, capacity: option.capacity, cost: option.cost, split_cost: option.split_cost, type: option.type, by_invitation: option.by_invitation, hide_members: option.hide_members
+    end
+
+    redirect "/g/#{g2.slug}"
+  end
 end
