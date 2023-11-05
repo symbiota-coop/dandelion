@@ -45,8 +45,8 @@
         $('#tab7').find('a.next').remove()
     <% end %>
 
-    $('#event_start_time').siblings('small').text("<%==js_escape_html "#{Time.zone.name.include?('London') ? 'UK time' : "in #{Time.zone.name}"} (UTC #{Time.zone.now.formatted_offset})" %> (your profile's time zone)")
-    $('#event_end_time').siblings('small').text("<%==js_escape_html "#{Time.zone.name.include?('London') ? 'UK time' : "in #{Time.zone.name}"} (UTC #{Time.zone.now.formatted_offset})" %> (your profile's time zone)")
+    $('#event_start_time').siblings('small').text("<%==js_escape_html "in #{Time.zone.now.strftime('%Z')} (UTC #{Time.zone.now.formatted_offset})" %> (your profile's time zone)")
+    $('#event_end_time').siblings('small').text("<%==js_escape_html "in #{Time.zone.now.strftime('%Z')} (UTC #{Time.zone.now.formatted_offset})" %> (your profile's time zone)")
 
     var autocomplete = new google.maps.places.Autocomplete($('#event_location')[0]);
     $('#event_location').keydown(function (e) {
@@ -316,7 +316,7 @@
             <%= f.text_area_block :notes %>
 
             <% if Padrino.env == :development || @event.organisation.verified? %>
-              <div class="border border-primary rounded p-3" style="border-style: dashed !important">
+              <div class="border border-primary rounded p-3 mb-3" style="border-style: dashed !important">
                 <%= f.text_block :ticket_email_title %>
                 <%= f.wysiwyg_block :ticket_email_greeting %>
                 <%= f.check_box_block :no_tickets_pdf %>

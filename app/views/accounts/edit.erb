@@ -67,8 +67,10 @@
   <%= f.image_block :picture, rotate: false %>
   <%= f.text_block :location %>
   <% if @account.time_zone %>
-    <p class="text-muted">
-      Your time zone: <%= @account.time_zone %>
+    <p>
+      <small class="form-text text-muted">
+        Your time zone: <%= Time.zone.now.strftime('%Z') %> (UTC <%=Time.zone.now.formatted_offset%>)
+      </small>
     </p>
   <% end %>
   <% if @account.coordinates %>
