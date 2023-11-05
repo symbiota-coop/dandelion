@@ -196,11 +196,13 @@ Dandelion::App.controller do
     @events = @events.and(:id.in => event_ids) unless event_ids.empty?
     @events = @events.and(local_group_id: params[:local_group_id]) if params[:local_group_id]
     @events = @events.and(activity_id: params[:activity_id]) if params[:activity_id]
+    carousel = nil
     if params[:carousel_id]
       @events = if params[:carousel_id] == 'featured'
                   @events.and(featured: true)
                 else
-                  @events.and(:id.in => EventTagship.and(:event_tag_id.in => Carousel.find(params[:carousel_id]).event_tags.pluck(:id)).pluck(:event_id))
+                  carousel = Carousel.find(params[:carousel_id])
+                  @events.and(:id.in => EventTagship.and(:event_tag_id.in => carousel.event_tags.pluck(:id)).pluck(:event_id))
                 end
     end
     @events = @events.online if params[:online]
@@ -214,7 +216,7 @@ Dandelion::App.controller do
     end
     case content_type
     when :json
-      @events = if params[:past]
+      @events = if params[:past] || (carousel && carousel.name.downcase.include?('past events'))
                   @events.past
                 else
                   @events.future_and_current_featured(@from)
@@ -239,7 +241,7 @@ Dandelion::App.controller do
         }
       end.to_json
     when :html
-      @events = if params[:past]
+      @events = if params[:past] || (carousel && carousel.name.downcase.include?('past events'))
                   @events.past
                 else
                   @events.future_and_current_featured(@from)
