@@ -200,7 +200,7 @@ Dandelion::App.controller do
       @events = if params[:carousel_id] == 'featured'
                   @events.and(featured: true)
                 else
-                  @events.and(:id.in => EventTagship.and(:event_tag_id.in => Carousel.find(carousel_id).event_tags.pluck(:id)).pluck(:event_id))
+                  @events.and(:id.in => EventTagship.and(:event_tag_id.in => Carousel.find(params[:carousel_id]).event_tags.pluck(:id)).pluck(:event_id))
                 end
     end
     @events = @events.online if params[:online]
