@@ -361,7 +361,7 @@ class Event
   end
 
   def self.events_for_carousel(carousel_id)
-    self.and(:id.in => EventTagship.and(:event_tag_id.in => EventTag.and(:id.in => Carousel.find(carousel_id).event_tags.pluck(:id)).pluck(:id)).pluck(:event_id))
+    self.and(:id.in => EventTagship.and(:event_tag_id.in => Carousel.find(carousel_id).event_tags.pluck(:id)).pluck(:event_id))
   end
 
   def carousel_name

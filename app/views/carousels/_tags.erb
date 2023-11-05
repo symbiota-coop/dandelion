@@ -7,7 +7,7 @@
 <script>
   $(function () {
     $("#event_tag_names").select2({
-      tags: <%== EventTag.and(:id.in => Carouselship.pluck(:event_tag_id)).order('name asc').pluck(:name).map { |name| Sanitize.fragment(name).gsub("&amp;",'&') }.to_json %>,
+      tags: <%== EventTag.and(:id.in => EventTagship.pluck(:event_tag_id)).order('name asc').pluck(:name).map { |name| Sanitize.fragment(name).gsub("&amp;",'&') }.to_json %>,
       width: '100%'
     });
   })
