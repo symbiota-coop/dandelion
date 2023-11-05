@@ -1,0 +1,3 @@
+<% carousel.event_tags.each { |event_tag| %>
+<a href="/o/<%= carousel.organisation.slug %>/events?event_tag_id=<%= event_tag.id %>" class="text-white label label-primary d-inline-block mb-1"><%== Sanitize.fragment(event_tag.name) %></a>
+<% } %>

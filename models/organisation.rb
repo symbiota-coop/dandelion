@@ -289,6 +289,8 @@ class Organisation
     events_for_search.future_and_current_featured.and(:draft.ne => true).and(:image_uid.ne => nil).and(featured: true).limit(20).reject(&:sold_out?)
   end
 
+  has_many :carousels, dependent: :destroy
+
   has_many :organisation_contributions, dependent: :destroy
   def contributable_events
     events.and(:id.in => Order.complete.and(:value.gt => 0, :event_id.in => events.pluck(:id)).pluck(:event_id))

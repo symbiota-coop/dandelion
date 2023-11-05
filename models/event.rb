@@ -360,57 +360,22 @@ class Event
     Fragment.and(key: %r{/events/#{id}}).destroy_all
   end
 
-  def self.events_for_carousel(organisation, carousel)
-    tags = nil
-    organisation.carousels.split("\n").reject { |line| line.blank? }.each do |line|
-      title, tags = line.split(':')
-      title, _w = title.split('[')
-      next unless title == carousel
-
-      tags, _coordinator = tags.split('@')
-      tags = tags.split(',').map(&:strip)
-      break
-    end
-    self.and(:id.in => EventTagship.and(:event_tag_id.in => EventTag.and(:name.in => tags).pluck(:id)).pluck(:event_id))
+  def self.events_for_carousel(carousel)
+    self.and(:id.in => EventTagship.and(:event_tag_id.in => EventTag.and(:id.in => carousel.event_tags.pluck(:id)).pluck(:id)).pluck(:event_id))
   end
 
-  def carousel
+  def carousel_name
     return unless organisation && organisation.carousels
 
-    carousel = nil
-    organisation.carousels.split("\n").reject { |line| line.blank? }.each do |line|
-      title, tags = line.split(':')
-      title, _w = title.split('[')
-      tags, coordinator = tags.split('@')
-      tags = tags.split(',').map(&:strip)
-      next unless coordinator
-
-      intersection = event_tags.pluck(:name) & tags
+    c = nil
+    organisation.carousels.order('o asc').each do |carousel|
+      intersection = event_tags.pluck(:id) & carousel.event_tags.pluck(:id)
       if intersection.count > 0
-        carousel = title.strip
+        c = carousel.name
         break
       end
     end
-    carousel
-  end
-
-  def carousel_coordinator
-    account = nil
-    if organisation && organisation.carousels
-      organisation.carousels.split("\n").reject { |line| line.blank? }.each do |line|
-        _title, tags = line.split(':')
-        tags, coordinator = tags.split('@')
-        tags = tags.split(',').map(&:strip)
-        next unless coordinator
-
-        intersection = event_tags.pluck(:name) & tags
-        if intersection.count > 0
-          account = Account.find_by(username: coordinator.strip)
-          break
-        end
-      end
-    end
-    account
+    c
   end
 
   def self.admin?(event, account)

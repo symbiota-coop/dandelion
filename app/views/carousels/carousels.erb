@@ -1,0 +1,46 @@
+<%= partial :'organisations/nav', locals: { organisation: @organisation } %>
+
+<div style="margin: 10px 0">
+  <a class="btn btn-primary" href="/o/<%=@organisation.slug%>/carousels/new?<%=@scope%>"><i class="fa fa-plus-circle"></i> Create a carousel</a>
+</div>
+<table class="table">
+  <thead>
+    <tr>
+      <th>Name</th>
+      <th>Duration</th>
+      <th>Tags</th>
+    </tr>
+  </thead>
+  <tbody class="carousels">
+    <% @carousels.each { |carousel| %>
+    <tr id="<%=carousel.id%>">
+      <td>
+        <a href="/o/<%=@organisation.slug%>/carousels/<%= carousel.id %>/edit">
+          <%= carousel.name%>
+        </a>
+      </td>
+      <td>
+        <%= pluralize carousel.weeks, 'week' %>
+      </td>
+      <td>
+        <%= partial :'carousels/tag_labels', locals: {carousel: carousel}%>
+      </td>
+    </tr>
+    <% } %>
+  </tbody>
+</table>
+
+<style>
+  .carousels tr { cursor: move }
+</style>
+<script>
+  $(function () {
+
+    $(".carousels").sortable({
+      update: function (event, ui) {
+        $.post('/o/<%=@organisation.slug%>/carousels/order', {carousel_ids: $(event.target).sortable("toArray")})
+      }
+    });
+
+  })
+</script>

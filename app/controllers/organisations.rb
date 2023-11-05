@@ -196,7 +196,7 @@ Dandelion::App.controller do
     @events = @events.and(:id.in => event_ids) unless event_ids.empty?
     @events = @events.and(local_group_id: params[:local_group_id]) if params[:local_group_id]
     @events = @events.and(activity_id: params[:activity_id]) if params[:activity_id]
-    @events = @events.events_for_carousel(@organisation, params[:carousel]) if params[:carousel]
+    @events = @events.events_for_carousel(params[:carousel_id]) if params[:carousel_id]
     @events = @events.online if params[:online]
     @events = @events.in_person if params[:in_person]
     @events = @events.and(monthly_donors_only: true) if params[:members_events]
@@ -286,25 +286,13 @@ Dandelion::App.controller do
     end
   end
 
-  get '/o/:slug/carousels/:i' do
+  get '/o/:slug/carousels/:id' do
     @organisation = Organisation.find_by(slug: params[:slug]) || not_found
-    if params[:i] == 'featured'
+    if params[:id] == 'featured'
       partial :'events/carousel', locals: { title: 'Featured', events: @organisation.featured_events, hide_featured_title: params[:hide_featured_title], skip_margin: true }
     else
-      begin
-        line = @organisation.carousels.split("\n").reject { |line| line.blank? }[params[:i].to_i]
-        title, tags = line.split(':')
-        title, w = title.split('[')
-        tags, _coordinator = tags.split('@')
-        w = w ? w.split(']').first.to_i : 8
-        tags = tags.split(',').map(&:strip)
-        @events =
-          @organisation.events_for_search.future_and_current_featured.and(:start_time.lt => w.weeks.from_now).and(:hide_from_carousels.ne => true).and(:image_uid.ne => nil).and(:id.in => EventTagship.and(:event_tag_id.in => EventTag.and(:name.in => tags).pluck(:id)).pluck(:event_id)).limit(20) +
-          @organisation.events_for_search.past.and(:extra_info_for_recording_email.ne => nil).and(:hide_from_carousels.ne => true).and(:image_uid.ne => nil).and(:id.in => EventTagship.and(:event_tag_id.in => EventTag.and(:name.in => tags).pluck(:id)).pluck(:event_id)).limit(20)
-        partial :'events/carousel', locals: { title: title, events: @events }
-      rescue StandardError
-        500
-      end
+      carousel = @organisation.carousels.find(params[:id]) || not_found
+      partial :'events/carousel', locals: { title: carousel.name, events: carousel.events }
     end
   end
 
@@ -721,5 +709,12 @@ Dandelion::App.controller do
     @discount_codes = @organisation.discount_codes
     @scope = "organisation_id=#{@organisation.id}"
     erb :'discount_codes/discount_codes'
+  end
+
+  get '/o/:slug/carousels' do
+    @organisation = Organisation.find_by(slug: params[:slug]) || not_found
+    organisation_admins_only!
+    @carousels = @organisation.carousels.order('o asc')
+    erb :'carousels/carousels'
   end
 end

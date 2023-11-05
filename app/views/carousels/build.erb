@@ -1,0 +1,10 @@
+<%= partial :'organisations/nav', locals: { organisation: @organisation } %>
+
+<div class="container-fluid">
+  <% form_for @carousel, @carousel.new_record? ? "/o/#{@organisation.slug}/carousels/new" : "/o/#{@organisation.slug}/carousels/#{@carousel.id}/edit", multipart: true do |f| %>
+    <%= f.text_block :name %>
+    <%= f.number_block :weeks %>
+    <%= partial :'carousels/tags', locals: { f: f } %>
+    <%= f.submit_block destroy_url: "/o/#{@organisation.slug}/carousels/#{@carousel.id}/destroy" %>
+  <% end %>
+</div>

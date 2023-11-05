@@ -58,14 +58,10 @@
           <%= select_tag :activity_id, options: [''] + activities.map { |activity| [activity.name, activity.id] }, selected: params[:activity_id], class: 'form-control', style: 'max-width: 12em' %>
         </div>
       <% end %>
-      <% if @organisation.carousels %>
+      <% if (carousels = @organisation.carousels.order('o asc')).count > 0 %>
         <div class="form-group">
           <label>Carousel</label>
-          <%= select_tag :carousel, options: ([''] + @organisation.carousels.split("\n").reject { |line| line.blank? }.map do |line|
-            title, tags = line.split(':')
-            title, _w = title.split('[')
-            title
-          end), selected: params[:carousel], class: 'form-control', style: 'max-width: 12em' %>
+          <%= select_tag :carousel_id, options: [''] + carousels.map { |carousel| [carousel.name, carousel.id] }, selected: params[:carousel_id], class: 'form-control', style: 'max-width: 12em' %>
         </div>
       <% end %>
       <%= checkbox 'Online' %>
@@ -83,9 +79,9 @@
   <div data-with-placeholder data-pagelet-url="/o/<%= @organisation.slug %>/carousels/featured?hide_featured_title=<%=params[:hide_featured_title]%>">
     <%= partial :'events/carousel_placeholder' %>
   </div>
-  <% if @organisation.carousels %>
-    <% @organisation.carousels.split("\n").reject(&:blank?).each_with_index { |line,i| next if params[:first_carousel_only] && i > 0 %>
-    <div data-with-placeholder data-pagelet-url="/o/<%= @organisation.slug %>/carousels/<%= i %>">
+  <% if (carousels = @organisation.carousels.order('o asc')).count > 0 %>
+    <% carousels.each_with_index { |carousel,i| next if params[:first_carousel_only] && i > 0 %>
+    <div data-with-placeholder data-pagelet-url="/o/<%= @organisation.slug %>/carousels/<%= carousel.id %>">
       <%= partial :'events/carousel_placeholder' %>
     </div>
     <% } %>
