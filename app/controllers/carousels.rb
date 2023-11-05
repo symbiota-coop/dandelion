@@ -6,7 +6,7 @@ Dandelion::App.controller do
   end
 
   get '/o/:slug/carousels/new' do
-    @carousel = Carousel.new
+    @carousel = Carousel.new(weeks: 8)
     erb :'carousels/build'
   end
 

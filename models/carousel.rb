@@ -12,6 +12,10 @@ class Carousel
 
   attr_accessor :tag_names
 
+  before_validation do
+    self.weeks = 8 unless weeks
+  end
+
   def event_tags
     EventTag.and(:id.in => carouselships.pluck(:event_tag_id))
   end
