@@ -66,7 +66,7 @@ Dandelion::App.controller do
   post '/discount_codes/:discount_code_id/edit' do
     @discount_code = @discount_codes.find(params[:discount_code_id]) || not_found
     if @discount_code.update_attributes(mass_assigning(params[:discount_code], DiscountCode))
-      flash[:notice] = 'The mail was saved.'
+      flash[:notice] = 'The discount code was saved.'
       if @organisation
         redirect "/o/#{@organisation.slug}/discount_codes"
       elsif @activity
