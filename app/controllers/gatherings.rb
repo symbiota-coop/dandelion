@@ -195,7 +195,7 @@ Dandelion::App.controller do
     confirmed_membership_required!
 
     g1 = @gathering
-    g2 = current_account.gatherings.find(params[:gathering_id])
+    g2 = current_account.memberships.find_by(admin: true, gathering_id: params[:gathering_id]).gathering
 
     g1.timetables.each do |timetable1|
       timetable2 = g2.timetables.create! name: timetable1.name, account: g2.account
