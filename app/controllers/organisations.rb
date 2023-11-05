@@ -196,7 +196,13 @@ Dandelion::App.controller do
     @events = @events.and(:id.in => event_ids) unless event_ids.empty?
     @events = @events.and(local_group_id: params[:local_group_id]) if params[:local_group_id]
     @events = @events.and(activity_id: params[:activity_id]) if params[:activity_id]
-    @events = @events.events_for_carousel(params[:carousel_id]) if params[:carousel_id]
+    if params[:carousel_id]
+      @events = if params[:carousel_id] == 'featured'
+                  @events.and(featured: true)
+                else
+                  @events.and(:id.in => EventTagship.and(:event_tag_id.in => Carousel.find(carousel_id).event_tags.pluck(:id)).pluck(:event_id))
+                end
+    end
     @events = @events.online if params[:online]
     @events = @events.in_person if params[:in_person]
     @events = @events.and(monthly_donors_only: true) if params[:members_events]

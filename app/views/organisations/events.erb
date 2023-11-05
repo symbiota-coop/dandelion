@@ -61,7 +61,7 @@
       <% if (carousels = @organisation.carousels.order('o asc')).count > 0 %>
         <div class="form-group">
           <label>Carousel</label>
-          <%= select_tag :carousel_id, options: [''] + carousels.map { |carousel| [carousel.name, carousel.id] }, selected: params[:carousel_id], class: 'form-control', style: 'max-width: 12em' %>
+          <%= select_tag :carousel_id, options: ['', ['Featured', 'featured']] + carousels.map { |carousel| [carousel.name, carousel.id] }, selected: params[:carousel_id], class: 'form-control', style: 'max-width: 12em' %>
         </div>
       <% end %>
       <%= checkbox 'Online' %>
