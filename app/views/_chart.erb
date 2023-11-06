@@ -42,19 +42,24 @@
         plugins: {
           datalabels: {
             formatter: function(value, context) {
-              return <%==(defined?(unit) ? unit : '').to_json %> + value.toLocaleString();
+              return <%==(defined?(unit) ? unit : '').to_json %> + value.toLocaleString() + <%==(defined?(unit_after) ? unit_after : '').to_json %>;
             }
           }
         },
         responsive: true,
         scales: {
-          xAxes: [{
-              display: true,
-              scaleLabel: {
+          // x: {
+          //     title: {
+          //       display: true,
+          //       text: 'Month'
+          //     }
+          //   },
+          y: {
+              title: {
                 display: true,
-                labelString: 'Month'
+                text: <%== (defined?(unit) ? unit : (defined?(unit_after) ? unit_after : '')).to_json %>
               }
-            }]
+            }
         }
       }
     });
