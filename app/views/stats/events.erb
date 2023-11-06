@@ -13,7 +13,7 @@ partial :chart, locals: {
     lead_org_events_in_month = Event.and(organisation: Organisation.find_by(slug: ENV['LEAD_ORG_SLUG'])).and(:created_at.gte => x, :created_at.lt => x + 1.month).count
     other_events_in_month = Event.and(:organisation.ne => Organisation.find_by(slug: ENV['LEAD_ORG_SLUG'])).and(:created_at.gte => x, :created_at.lt => x + 1.month).count
 
-    ["#{Date::MONTHNAMES[x.month]} #{x.year}", lead_org_events_in_month == 0 ? 0 : (100*(other_events_in_month.to_f/lead_org_events_in_month)).round]
+    ["#{Date::MONTHNAMES[x.month]} #{x.year}", lead_org_events_in_month == 0 ? 0 : (100*(lead_org_events_in_month.to_f/other_events_in_month)).round]
   }.to_h
 }
 %>
