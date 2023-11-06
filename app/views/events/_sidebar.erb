@@ -104,4 +104,19 @@
       <% end %>
     <% end %>
   </div>
+  <div id="get-tickets-sidebar" style="position: sticky; top: 3.75rem" class="d-none d-md-none">
+    <a href="javascript:;" onclick="$(window).scrollTop($('#purchase').offset()['top'] - $('#header').height() - 17)" class="btn btn-primary btn-block">Get tickets</a>
+  </div>
+  <script>
+    $(function () {
+      $(window).scroll(function () {
+        if (window.scrollY > ($('#purchase').offset()['top'] + $('#purchase').height() - $('#header').height())) {
+          $('#get-tickets-sidebar').addClass('d-md-block').removeClass('d-md-none')
+        } else {
+          $('#get-tickets-sidebar').addClass('d-md-none').removeClass('d-md-block')
+        }
+      })
+      $(window).scroll()
+    })
+  </script>
 </div>
