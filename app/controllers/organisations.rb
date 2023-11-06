@@ -217,6 +217,7 @@ Dandelion::App.controller do
     case content_type
     when :json
       @events = if params[:past] || (carousel && carousel.name.downcase.include?('past events'))
+                  @past = true
                   @events.past
                 else
                   @events.future_and_current_featured(@from)
@@ -242,6 +243,7 @@ Dandelion::App.controller do
       end.to_json
     when :html
       @events = if params[:past] || (carousel && carousel.name.downcase.include?('past events'))
+                  @past = true
                   @events.past
                 else
                   @events.future_and_current_featured(@from)
