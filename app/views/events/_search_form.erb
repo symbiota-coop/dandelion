@@ -2,8 +2,12 @@
   <%= hidden_field_tag :display, value: params[:display] %>
   <%= hidden_field_tag :order, value: params[:order] %>
   <div class="form-group">
-    <label>Show events from</label>
+    <label>Events between</label>
     <%= text_field_tag :from, class: 'form-control datepicker', value: @from.to_fs(:db_local) %>
+  </div>
+  <div class="form-group">
+    <label>and</label>
+    <%= text_field_tag :to, class: 'form-control datepicker', value: (@to.to_fs(:db_local) if @to) %>
   </div>
   <div class="form-group">
     <label>containing the word</label>

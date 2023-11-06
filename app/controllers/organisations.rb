@@ -187,6 +187,7 @@ Dandelion::App.controller do
     @organisation = Organisation.find_by(slug: params[:slug]) || not_found
     @events = @organisation.events_for_search(include_all_local_group_events: (true if params[:local_group_id]))
     @from = params[:from] ? Date.parse(params[:from]) : Date.today
+    @to = params[:to] ? Date.parse(params[:to]) : nil
     @events = params[:order] == 'created_at' ? @events.order('created_at desc') : @events.order('start_time asc')
     q_ids = []
     q_ids += search_events(params[:q]).pluck(:id) if params[:q]
@@ -216,12 +217,13 @@ Dandelion::App.controller do
     end
     case content_type
     when :json
-      @events = if params[:past] || (carousel && carousel.name.downcase.include?('past events'))
-                  @past = true
-                  @events.past
-                else
-                  @events.future_and_current_featured(@from)
-                end
+      if params[:past] || (carousel && carousel.name.downcase.include?('past events'))
+        @past = true
+        @events = @events.past
+      else
+        @events = @events.future_and_current_featured(@from)
+        @events = @events.and(:start_time.lt => @to + 1) if @to
+      end
       @events.map do |event|
         {
           id: event.id.to_s,
@@ -242,12 +244,13 @@ Dandelion::App.controller do
         }
       end.to_json
     when :html
-      @events = if params[:past] || (carousel && carousel.name.downcase.include?('past events'))
-                  @past = true
-                  @events.past
-                else
-                  @events.future_and_current_featured(@from)
-                end
+      if params[:past] || (carousel && carousel.name.downcase.include?('past events'))
+        @past = true
+        @events = @events.past
+      else
+        @events = @events.future_and_current_featured(@from)
+        @events = @events.and(:start_time.lt => @to + 1) if @to
+      end
       if request.xhr?
         if params[:display] == 'map'
           @lat = params[:lat]

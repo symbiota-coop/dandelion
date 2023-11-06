@@ -7,6 +7,7 @@ Dandelion::App.controller do
   get '/events', provides: %i[html ics] do
     @events = Event.live.public.legit
     @from = params[:from] ? Date.parse(params[:from]) : Date.today
+    @to = params[:to] ? Date.parse(params[:to]) : nil
     @events = params[:order] == 'created_at' ? @events.order('created_at desc') : @events.order('start_time asc')
     @events = if params[:q]
                 @events.and(:id.in => search_events(params[:q]).pluck(:id))
@@ -26,6 +27,7 @@ Dandelion::App.controller do
     case content_type
     when :html
       @events = @events.future(@from)
+      @events = @events.and(:start_time.lt => @to + 1) if @to
       if request.xhr?
         if params[:display] == 'map'
           @lat = params[:lat]
