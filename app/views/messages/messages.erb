@@ -28,7 +28,8 @@
       <% if @account %>
         <div class="d-block d-lg-none">
           <ul id="message-breadcrumbs" class="breadcrumb">
-            <li class="breadcrumb-item"><a href="/messages">Messages</a></li>
+            <li class="breadcrumb-item"><a href="javascript:;" onclick="$('#thread-panel').hide();
+                $('#preview-panel').removeClass('d-none')">Messages</a></li>
             <li class="breadcrumb-item active"><%= @account.name %></li>
           </ul>
         </div>
