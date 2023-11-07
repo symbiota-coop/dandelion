@@ -210,9 +210,11 @@ class Ticket
 
     batch_message.finalize if ENV['MAILGUN_API_KEY']
 
-    tickets_pdf_file.close
+    unless event.no_tickets_pdf
+      tickets_pdf_file.close
+      File.delete(tickets_pdf_filename)
+    end
     ics_file.close
-    File.delete(tickets_pdf_filename)
     File.delete(ics_filename)
   end
   handle_asynchronously :send_ticket
