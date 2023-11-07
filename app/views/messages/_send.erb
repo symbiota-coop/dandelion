@@ -14,9 +14,15 @@
 <% end %>
 
 <script>
+  function slimHeight() {
+    return $(window).height() - $('#header').outerHeight(true) - ($(window).width() > 992 ? 2 : 3)*parseFloat($('#content').css('paddingTop')) - $('#message-breadcrumbs').outerHeight(true) - $('#messengee').outerHeight(true) - $('#message-send').outerHeight(true)
+  }
+
+  $('#thread-scroll').height(slimHeight())
+
   function doSlimscroll() {
     $('#thread-scroll').slimScroll({
-      height: $(window).height() - $('#header').outerHeight(true) - ($(window).width() > 992 ? 2 : 3)*parseFloat($('#content').css('paddingTop')) - $('#message-breadcrumbs').outerHeight(true) - $('#messengee').outerHeight(true) - $('#message-send').outerHeight(true),
+      height: slimHeight(),
       start: 'bottom',
       wheelStep: ($(window).width() > 992 ? 10 : 100)
     })

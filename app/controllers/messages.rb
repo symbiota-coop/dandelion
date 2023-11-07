@@ -7,12 +7,7 @@ Dandelion::App.controller do
     if request.xhr?
       cp(:'messages/dropdown', key: "/messages?account_id=#{current_account.id}", expires: 1.minute.from_now)
     else
-      message = current_account.messages.order('created_at desc').first
-      if message
-        erb :'messages/messages'
-      else
-        redirect '/search?type=accounts'
-      end
+      erb :'messages/messages'
     end
   end
 
@@ -41,6 +36,6 @@ Dandelion::App.controller do
 
   post '/messages/:id/send' do
     Message.create!(body: params[:body], messenger: current_account, messengee_id: params[:id]) if params[:body]
-    redirect back
+    200
   end
 end

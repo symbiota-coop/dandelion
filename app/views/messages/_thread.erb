@@ -4,8 +4,8 @@
     <h4 class="my-0"><a class="text-dark" href="/u/<%= @account.username %>"><%= @account.name %></a></h4>
   </div>
 </div>
-<div id="thread-scroll" class="p-1">
-  <ul class="widget-chat">
+<div id="thread-scroll">
+  <ul class="widget-chat p-1">
     <% messages = Message.all.or({ messenger: current_account, messengee_id: @account }, { messenger: @account, messengee_id: current_account }).order('created_at asc') %>
     <% messages.each_with_index { |message,i| %>
     <% if message.messenger_id == @account.id %>

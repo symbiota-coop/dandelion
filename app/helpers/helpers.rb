@@ -12,11 +12,15 @@ Dandelion::App.helpers do
   end
 
   def search(klass, match, query, n = nil)
-    pipeline = [{ '$search': { index: klass.to_s.underscore.pluralize, text: { query: query, path: { wildcard: '*' } } } }, { '$match': match.selector }]
-    aggregate = klass.collection.aggregate(pipeline)
-    aggregate = aggregate.first(n) if n
-    aggregate.map do |hash|
-      klass.new(hash.select { |k, _v| klass.fields.keys.include?(k.to_s) })
+    if Padrino.env == :development
+      klass.or(klass.admin_fields.map { |k, v| { k => /#{Regexp.escape(query)}/i } if v == :text || (v.is_a?(Hash) && v[:type] == :text) }.compact)
+    else
+      pipeline = [{ '$search': { index: klass.to_s.underscore.pluralize, text: { query: query, path: { wildcard: '*' } } } }, { '$match': match.selector }]
+      aggregate = klass.collection.aggregate(pipeline)
+      aggregate = aggregate.first(n) if n
+      aggregate.map do |hash|
+        klass.new(hash.select { |k, _v| klass.fields.keys.include?(k.to_s) })
+      end
     end
   end
 
