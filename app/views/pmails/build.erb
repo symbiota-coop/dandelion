@@ -77,6 +77,7 @@
           <% end %>
         </div>
         <div class="mb-3">
+          <a class="btn btn-primary" href="/pmails/<%=@pmail.id%>" target="_blank">View</button>
           <button type="submit" name="duplicate" value="1" class="btn btn-primary">Duplicate</button>
         </div>
       <% elsif @pmail.pmail_test && @pmail.pmail_test.winner %>
