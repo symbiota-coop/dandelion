@@ -19,11 +19,6 @@
       <%= text_field_tag :q, placeholder: 'Search for someone', id: 'messages-search', class: 'form-control' %>
     <% end %>
 
-    <div class="d-block d-lg-none">
-      <ul class="breadcrumb">
-        <li class="breadcrumb-item active">Messages</li>
-      </ul>
-    </div>
     <div data-pagelet-scroll="false" data-pagelet-url="/messages/index">
       <%= partial :'messages/index' %>
     </div>
@@ -33,8 +28,7 @@
       <% if @account %>
         <div class="d-block d-lg-none">
           <ul id="message-breadcrumbs" class="breadcrumb">
-            <li class="breadcrumb-item"><a href="javascript:;" onclick="$('#thread-panel').hide();
-                $('#preview-panel').removeClass('d-none')">Messages</a></li>
+            <li class="breadcrumb-item"><a href="/messages">Messages</a></li>
             <li class="breadcrumb-item active"><%= @account.name %></li>
           </ul>
         </div>
@@ -44,7 +38,7 @@
         <div id="message-send" data-pagelet-url="/messages/<%= @account.id %>/send" data-pusher-refresh="message.<%= @account.id %>.<%= current_account.id %>">
           <%= partial :'messages/send' %>
         </div>
-      <% else %>
+      <% elsif current_account.messages.count == 0 %>
         <p class="text-center"><em>Your messages will appear here.</em></p>
       <% end %>
     </div>
