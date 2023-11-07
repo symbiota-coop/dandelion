@@ -1,15 +1,9 @@
 <% if !current_account.able_to_message %>
   <p class="lead">You must <a href="/accounts/edit">confirm your email address</a>, and <a href="/donate">donate to Dandelion</a>, join a gathering or attend an event before messaging.</p>
 <% else %>
-  <% form_tag "/messages/#{@account.id}/send", id: 'compose', class: 'mt-3' do %>
-    <div class="row">
-      <div class="col">
-        <%= text_area_tag :body, id: 'message-body', placeholder: 'Type a message...', class: 'form-control' %>
-      </div>
-      <div class="col-auto align-self-end">
-        <button class="btn btn-primary" type="submit"><i class="fa fa-send"></i></button>
-      </div>
-    </div>
+  <% form_tag "/messages/#{@account.id}/send", id: 'compose', class: 'mt-3', style: 'position: relative' do %>
+    <%= text_area_tag :body, id: 'message-body', placeholder: 'Type a message...', class: 'form-control', style: 'padding-bottom: 40px' %>
+    <button class="btn btn-primary btn-sm" type="submit" style="position: absolute; bottom: 5px; right: 5px"><i class="fa fa-send"></i></button>
   <% end %>
 <% end %>
 
