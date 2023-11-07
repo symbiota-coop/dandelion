@@ -32,7 +32,7 @@
             <li class="breadcrumb-item active"><%= @account.name %></li>
           </ul>
         </div>
-        <div data-pagelet-url="/messages/<%= @account.id %>" data-pusher-channel="message.<%= @account.id %>.<%= current_account.id %>">
+        <div data-pagelet-url="/messages/<%= @account.id %>" data-pagelet-refresh-also="/messages/index" data-pusher-channel="message.<%= @account.id %>.<%= current_account.id %>">
           <%= partial :'messages/thread' %>
         </div>
         <div id="message-send" data-pagelet-url="/messages/<%= @account.id %>/send" data-pusher-refresh="message.<%= @account.id %>.<%= current_account.id %>">

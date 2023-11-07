@@ -38,10 +38,12 @@ $(function () {
             pagelet.css('opacity', '1')
           })
           if (pagelet.attr('data-pusher-refresh') && typeof (pusher) == 'undefined') {
-            pageletToRefresh = $('[data-pusher-channel="' + pagelet.attr('data-pusher-refresh') + '"]')
-            pageletToRefresh.css('opacity', '0.3')
-            pageletToRefresh.load(pageletToRefresh.attr('data-pagelet-url'), function () {
-              pageletToRefresh.css('opacity', '1')
+            pusherRefresh = $('[data-pusher-channel="' + pagelet.attr('data-pusher-refresh') + '"]')
+            pusherRefresh.load(pusherRefresh.attr('data-pagelet-url'), function () {
+              if (pusherRefresh.attr('data-pagelet-refresh-also')) {
+                alsoRefresh = $('[data-pagelet-url="' + pusherRefresh.attr('data-pagelet-refresh-also') + '"]')
+                alsoRefresh.load(alsoRefresh.attr('data-pagelet-url'))
+              }
             })
           }
         })
@@ -96,7 +98,12 @@ $(function () {
         const channel = pusher.subscribe(pagelet.attr('data-pusher-channel'))
         channel.bind('updated', function (data) {
           if ($(document).find(pagelet).length == 1) { // only proceed if this pagelet still exists in the DOM, to prevent unnecessary calls to .load()
-            $(pagelet).load($(pagelet).attr('data-pagelet-url'))
+            $(pagelet).load($(pagelet).attr('data-pagelet-url'), function () {
+              if (pagelet.attr('data-pagelet-refresh-also')) {
+                alsoRefresh = $('[data-pagelet-url="' + pagelet.attr('data-pagelet-refresh-also') + '"]')
+                alsoRefresh.load(alsoRefresh.attr('data-pagelet-url'))
+              }
+            })
           }
         })
       })
