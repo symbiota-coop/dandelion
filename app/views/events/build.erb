@@ -125,7 +125,7 @@
     </ul>
   </div>
 <% end %>
-<% form_for @event, @event.new_record ? '/events/new' : "/events/#{@event.id}/edit" do |f| %>
+<% form_for @event, @event.new_record ? '/events/new' : "/events/#{@event.id}/edit", id: 'build-event' do |f| %>
   <ul id="event-build-nav" class="nav nav-tabs" role="tablist">
     <li role="presentation" class="nav-item"><a class="nav-link active" href="#tab1" role="tab" data-toggle="tab">Basics</a></li>
     <li role="presentation" class="nav-item"><a class="nav-link" href="#tab2" role="tab" data-toggle="tab">Description and confirmation email</a></li>
@@ -326,6 +326,13 @@
             <% end %>
 
             <% if @event.new_record? %>
+              <script>
+                $(function() {
+                  $('#build-event').submit(function() {
+                    $(this).find('button[type=submit]').prop('disabled', true)
+                  })
+                })
+              </script>
               <%= f.submit_block %>
             <% end %>
           </div>
