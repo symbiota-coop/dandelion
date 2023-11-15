@@ -26,6 +26,14 @@ Capybara.default_driver = :cuprite
 
 module ActiveSupport
   class TestCase
+    def reset!
+      Capybara.reset_sessions!
+      Dir[Padrino.root('models', '*')].each do |f|
+        model = f.split('/').last.split('.').first.camelize.constantize
+        model.delete_all if model.respond_to?(:delete_all)
+      end
+    end
+
     def login_as(account)
       page.set_rack_session(account_id: account.id.to_s)
       visit '/'

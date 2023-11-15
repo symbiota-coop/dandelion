@@ -4,8 +4,7 @@ class NavTest < ActiveSupport::TestCase
   include Capybara::DSL
 
   setup do
-    Capybara.reset_sessions!
-    Dir[Padrino.root('models', '*')].each { |f| f.split('/').last.split('.').first.camelize.constantize.delete_all }
+    reset!
   end
 
   teardown do

@@ -1,6 +1,6 @@
 # Dandelion
 
-<img src="https://github.com/symbiota-coop/dandelion/workflows/Ruby/badge.svg">
+<img src="https://github.com/symbiota-coop/dandelion/actions/workflows/ruby.yml/badge.svg">
 
 Check out the canonical install at https://dandelion.events \
 Created by Stephen Reid https://stephenreid.net \
