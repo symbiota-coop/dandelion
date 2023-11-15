@@ -227,7 +227,13 @@ class Event
   end
   after_validation do
     geocode || (self.coordinates = nil)
-    self.time_zone = Timezone.lookup(*coordinates.reverse) if coordinates
+    if coordinates
+      self.time_zone = begin
+        Timezone.lookup(*coordinates.reverse)
+      rescue Timezone::Error::InvalidConfig
+        nil
+      end
+    end
   end
 
   def recording?
