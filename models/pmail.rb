@@ -255,7 +255,7 @@ class Pmail
     if test_to
       accounts = test_to
     elsif ab_test
-      accounts = accounts.and(:id.in => pmail_testship.account_ids)
+      accounts = to_with_unsubscribes.and(:id.in => pmail_testship.account_ids)
     else
       accounts = to_with_unsubscribes_less_ab_tests
       if mailable.is_a?(Event)
