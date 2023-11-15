@@ -11,12 +11,17 @@ class BookChapter
 
   def self.admin_fields
     {
+      name_with_embedding_status: { type: :text, edit: false },
       name: :text,
       number: :number,
       book_id: :lookup,
       summary: :text_area,
       embedding: { type: :text_area, disabled: true }
     }
+  end
+
+  def name_with_embedding_status
+    "#{name}#{' (no embedding)' unless embedding}"
   end
 
   validates_presence_of :name
