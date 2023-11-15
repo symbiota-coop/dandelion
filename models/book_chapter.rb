@@ -13,8 +13,8 @@ class BookChapter
     {
       name: :text,
       number: :number,
-      summary: :text_area,
       book_id: :lookup,
+      summary: :text_area,
       embedding: { type: :text_area, disabled: true }
     }
   end
