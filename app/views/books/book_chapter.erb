@@ -11,6 +11,25 @@
     <a href="/books/<%=@book.slug%>">&larr; <%= @book.title %> by <%=@book.book_author.name%></a>
 
     <h2>Chapter <%=@book_chapter.number %>: <%=@book_chapter.name%></h2>
-    <% markdown = Redcarpet::Markdown.new(Redcarpet::Render::HTML, autolink: true, tables: true, fenced_code_blocks: true) %>
-    <%== markdown.render(@book_chapter.summary.gsub(/^##/, '###')) %>
+    <big>
+      <% markdown = Redcarpet::Markdown.new(Redcarpet::Render::HTML, autolink: true, tables: true, fenced_code_blocks: true) %>
+      <%== markdown.render(@book_chapter.summary.gsub(/^##/, '###')) %>
+    </big>
+
+    <div class="row justify-content-between">
+      <div class="col-4">
+        <% if @book_chapter.previous %>
+          <a href="/books/<%=@book.slug%>/<%=@book_chapter.previous.number%>" class="btn btn-primary">&larr; Chapter <%=@book_chapter.previous.number%></a>
+        <% end %>
+      </div>
+      <div class="col-4 text-center">
+        <a class="btn" style="cursor: text">Chapter <%= @book_chapter.number %></a>
+      </div>
+      <div class="col-4 text-right">
+        <% if @book_chapter.next %>
+          <a href="/books/<%=@book.slug%>/<%=@book_chapter.next.number%>" class="btn btn-primary">Chapter <%=@book_chapter.next.number%> &rarr;</a>
+        <% end %>
+      </div>
+    </div>
+
   </div>

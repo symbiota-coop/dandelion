@@ -33,4 +33,12 @@ class BookChapter
     )
     set(embedding: response.dig('data', 0, 'embedding'))
   end
+
+  def previous
+    book.book_chapters.find_by(number: number - 1)
+  end
+
+  def next
+    book.book_chapters.find_by(number: number + 1)
+  end
 end
