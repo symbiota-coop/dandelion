@@ -34,7 +34,6 @@ class Event
   field :affiliate_credit_percentage, type: Integer
   field :extra_info_for_ticket_email, type: String
   field :extra_info_for_recording_email, type: String
-  field :ps_event_id, type: String
   field :notes, type: String
   field :redirect_url, type: String
   field :purchase_url, type: String
@@ -84,7 +83,6 @@ class Event
       minimum_donation: :number,
       capacity: :number,
       notes: :text_area,
-      ps_event_id: :text,
       redirect_url: :url,
       purchase_url: :url,
       draft: :check_box,
@@ -701,7 +699,6 @@ class Event
   end
 
   validates_presence_of :name, :start_time, :end_time, :location
-  validates_uniqueness_of :ps_event_id, allow_nil: true
   validates_uniqueness_of :slug, allow_nil: true
   validates_format_of :slug, with: /\A[a-z0-9-]+\z/, if: :slug
 

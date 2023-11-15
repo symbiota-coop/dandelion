@@ -17,7 +17,6 @@ class Activity
   field :privacy, type: String
   field :application_questions, type: String
   field :thank_you_message, type: String
-  field :ps_activity_id, type: String
   field :hidden, type: Boolean
   field :extra_info_for_application_form, type: String
   field :extra_info_for_acceptance_email, type: String
@@ -37,7 +36,6 @@ class Activity
       hide_discussion: :check_box,
       privacy: :select,
       application_questions: :text_area,
-      ps_activity_id: :text,
       thank_you_message: :wysiwyg,
       hidden: :check_box
     }
@@ -107,7 +105,6 @@ class Activity
   end
 
   validates_presence_of :name
-  validates_uniqueness_of :ps_activity_id, allow_nil: true
 
   def self.active
     self.and(:hidden.ne => true).and(:id.in => Event.future.pluck(:activity_id))

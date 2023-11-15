@@ -38,7 +38,7 @@ Dandelion::App.controller do
   end
 
   get '/stats/accounts' do
-    @accounts = Account.public.order('created_at desc').and(ps_account_id: nil).paginate(page: params[:page], per_page: 20)
+    @accounts = Account.public.order('created_at desc').paginate(page: params[:page], per_page: 20)
     erb :'stats/accounts'
   end
 

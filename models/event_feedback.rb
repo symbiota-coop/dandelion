@@ -14,7 +14,6 @@ class EventFeedback
   field :anonymise, type: Boolean
   field :public_answers, type: Array
   field :rating, type: Integer
-  field :ps_event_feedback_id, type: String
   field :response, type: String
 
   def self.admin_fields
@@ -27,13 +26,11 @@ class EventFeedback
       response: :text_area,
       event_id: :lookup,
       activity_id: :lookup,
-      ps_event_feedback_id: :text,
       account_id: :lookup
     }
   end
 
   validates_uniqueness_of :event, scope: :account, allow_nil: true, conditions: -> { where(deleted_at: nil) }
-  validates_uniqueness_of :ps_event_feedback_id, allow_nil: true
 
   after_save do
     event.clear_cache if event

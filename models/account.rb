@@ -8,8 +8,6 @@ class Account
   index({ name: 1 })
   field :name_transliterated, type: String
   index({ name_transliterated: 1 })
-  field :ps_account_id, type: String
-  index({ ps_account_id: 1 })
   field :email, type: String
   index({ email: 1 }, { unique: true })
   field :phone, type: String
@@ -96,7 +94,6 @@ class Account
       email: :email,
       name: :text,
       name_transliterated: { type: :text, disabled: true },
-      ps_account_id: :text,
       updated_profile: :check_box,
       default_currency: :select,
       phone: :text,
@@ -547,8 +544,6 @@ class Account
 
   validates_format_of :username, with: /\A[a-z0-9_.]+\z/
   validates_uniqueness_of :username
-
-  validates_uniqueness_of :ps_account_id, allow_nil: true
 
   def self.default_currencies
     [''] + CURRENCIES_HASH
