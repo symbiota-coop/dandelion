@@ -1,0 +1,16 @@
+<div class="row">
+  <div class="col-lg-3">
+
+    <a href="/books/<%=@book.slug%>">
+      <img src="<%= @book.image.url %>" class="w-100">
+    </a>
+
+  </div>
+  <div class="col-lg-9">
+
+    <a href="/books/<%=@book.slug%>">&larr; <%= @book.title %> by <%=@book.book_author.name%></a>
+
+    <h2>Chapter <%=@book_chapter.number %>: <%=@book_chapter.name%></h2>
+    <% markdown = Redcarpet::Markdown.new(Redcarpet::Render::HTML, autolink: true, tables: true, fenced_code_blocks: true) %>
+    <%== markdown.render(@book_chapter.summary.gsub(/^##/, '###')) %>
+  </div>

@@ -12,6 +12,7 @@ class BookChapter
   def self.admin_fields
     {
       name: :text,
+      number: :number,
       summary: :text_area,
       book_id: :lookup,
       embedding: { type: :text_area, disabled: true }
@@ -19,6 +20,7 @@ class BookChapter
   end
 
   validates_presence_of :name
+  validates_uniqueness_of :number, scope: :book_id
 
   after_save :set_embedding
   def set_embedding

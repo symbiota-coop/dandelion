@@ -1,0 +1,16 @@
+<div class="row">
+  <div class="col-lg-3">
+
+    <a href="/books/<%=@book.slug%>">
+      <img src="<%= @book.image.url %>" class="w-100">
+    </a>
+
+  </div>
+  <div class="col-lg-9">
+    <h2>Chapter summaries</h2>
+    <% @book.book_chapters.each { |book_chapter| %>
+    <ol>
+      <li><a href="/books/<%=@book.slug%>/<%=book_chapter.number%>"><%=book_chapter.name%></a></li>
+    </ol>
+    <% } %>
+  </div>
