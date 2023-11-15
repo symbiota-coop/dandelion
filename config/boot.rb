@@ -29,6 +29,10 @@ Time.zone = ENV['DEFAULT_TIME_ZONE']
 
 Airrecord.api_key = ENV['AIRTABLE_API_KEY']
 
+OpenAI.configure do |config|
+  config.access_token = ENV['OPENAI_API_KEY']
+end
+
 PUSHER = Pusher::Client.new(app_id: ENV['PUSHER_APP_ID'], key: ENV['PUSHER_KEY'], secret: ENV['PUSHER_SECRET'], cluster: ENV['PUSHER_CLUSTER'], encrypted: true) if ENV['PUSHER_APP_ID']
 
 if ENV['GOOGLE_MAPS_API_KEY']

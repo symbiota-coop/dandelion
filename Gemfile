@@ -48,6 +48,7 @@ gem 'google_drive'
 gem 'jwt'
 gem 'koala'
 gem 'mechanize'
+gem 'ruby-openai'
 
 # Payments
 gem 'coinbase_commerce'

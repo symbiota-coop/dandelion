@@ -199,6 +199,9 @@ GEM
     http-accept (1.7.0)
     http-cookie (1.0.5)
       domain_name (~> 0.5)
+    httparty (0.21.0)
+      mini_mime (>= 1.0.0)
+      multi_xml (>= 0.5.2)
     httpclient (2.8.3)
     i18n (1.14.1)
       concurrent-ruby (~> 1.0)
@@ -265,6 +268,7 @@ GEM
     mongoid_paranoia (0.5.0)
       mongoid (~> 7.3)
     multi_json (1.15.0)
+    multi_xml (0.6.0)
     multipart-post (2.3.0)
     mustermann (3.0.0)
       ruby2_keywords (~> 0.0.1)
@@ -411,6 +415,8 @@ GEM
       unicode-display_width (>= 2.4.0, < 3.0)
     rubocop-ast (1.26.0)
       parser (>= 3.2.1.0)
+    ruby-openai (3.7.0)
+      httparty (>= 0.18.1)
     ruby-progressbar (1.11.0)
     ruby2_keywords (0.0.5)
     rubyntlm (0.6.3)
@@ -524,6 +530,7 @@ DEPENDENCIES
   rinku
   rqrcode
   rubocop
+  ruby-openai
   sanitize
   sass
   sinatra
