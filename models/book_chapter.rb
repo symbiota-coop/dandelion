@@ -4,7 +4,7 @@ class BookChapter
 
   field :name, type: String
   field :summary, type: String
-  field :number, type: Float
+  field :number, type: String
   field :embedding, type: Array
 
   belongs_to :book, index: true
@@ -12,7 +12,7 @@ class BookChapter
   def self.admin_fields
     {
       name: :text,
-      number: :number,
+      number: :string,
       book_id: :lookup,
       summary: :text_area,
       embedding: { type: :text_area, disabled: true }
