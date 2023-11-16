@@ -12,7 +12,7 @@ class BookChapter
   def self.admin_fields
     {
       name: :text,
-      number: :string,
+      number: :text,
       book_id: :lookup,
       summary: :text_area,
       embedding: { type: :text_area, disabled: true }

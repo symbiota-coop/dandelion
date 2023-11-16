@@ -37,5 +37,9 @@ class Book
     end
   end
 
+  def parts
+    book_chapters.pluck(:number).map(&:to_i).uniq
+  end
+
   validates_presence_of :title
 end
