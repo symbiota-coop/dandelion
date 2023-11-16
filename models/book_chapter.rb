@@ -4,7 +4,7 @@ class BookChapter
 
   field :name, type: String
   field :summary, type: String
-  field :number, type: Integer
+  field :number, type: Float
   field :embedding, type: Array
 
   belongs_to :book, index: true
