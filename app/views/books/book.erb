@@ -10,19 +10,24 @@
 
     <h2>Chapter summaries</h2>
 
-    <% (parts = @book.parts).each { |part| %>
-
-    <% if parts.length > 1 %>
+    <% if (parts = @book.parts) %>
+      <% parts.each { |part| %>
       <h3>Part <%=part%></h3>
+      <big>
+        <ol>
+          <% @book.book_chapters.and(:number => /^#{part}\./).order('number asc').each { |book_chapter| %>
+          <li><a href="/books/<%=@book.slug%>/<%=book_chapter.number%>"><%=book_chapter.name%></a></li>
+          <% } %>
+        </ol>
+      </big>
+      <% } %>
+    <% else %>
+      <big>
+        <ol>
+          <% @book.book_chapters.order('number asc').each { |book_chapter| %>
+          <li><a href="/books/<%=@book.slug%>/<%=book_chapter.number%>"><%=book_chapter.name%></a></li>
+          <% } %>
+        </ol>
+      </big>
     <% end %>
-
-    <big>
-      <ol>
-        <% @book.book_chapters.and(:number => /^#{part}\./).order('number asc').each { |book_chapter| %>
-        <li><a href="/books/<%=@book.slug%>/<%=book_chapter.number%>"><%=book_chapter.name%></a></li>
-        <% } %>
-      </ol>
-    </big>
-
-    <% } %>
   </div>

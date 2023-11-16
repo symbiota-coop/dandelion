@@ -38,7 +38,8 @@ class Book
   end
 
   def parts
-    book_chapters.pluck(:number).map(&:to_i).uniq
+    chapters_in_parts = book_chapters.and(number: /\./)
+    chapters_in_parts.count > 0 ? chapters_in_parts.pluck(:number).map(&:to_i).uniq.sort : nil
   end
 
   validates_presence_of :title
