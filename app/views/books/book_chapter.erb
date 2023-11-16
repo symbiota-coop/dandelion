@@ -1,5 +1,5 @@
-<div class="row">
-  <div class="col-lg-3">
+<div class="row justify-content-center">
+  <div class="col-6 col-lg-3">
 
     <a href="/books/<%=@book.slug%>">
       <img src="<%= @book.image.url %>" class="w-100">
@@ -8,7 +8,9 @@
   </div>
   <div class="col-lg-9">
 
-    <a href="/books/<%=@book.slug%>">&larr; <%= @book.title %> by <%=@book.book_author.name%></a>
+    <div class="d-none d-lg-block">
+      <a href="/books/<%=@book.slug%>">&larr; <%= @book.title %> by <%=@book.book_author.name%></a>
+    </div>
 
     <h2 class="my-3">Chapter <%=@book_chapter.number %>: <%=@book_chapter.name%></h2>
     <big>
