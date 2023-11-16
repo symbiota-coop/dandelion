@@ -35,10 +35,14 @@ class BookChapter
   end
 
   def previous
-    book.book_chapters.find_by(number: number - 1)
+    chapters = book.book_chapters.order('number asc')
+    current_index = chapters.pluck(:id).index(id)
+    current_index > 0 ? chapters[current_index - 1] : nil
   end
 
   def next
-    book.book_chapters.find_by(number: number + 1)
+    chapters = book.book_chapters.order('number asc')
+    current_index = chapters.pluck(:id).index(id)
+    current_index < chapters.count - 1 ? chapters[current_index + 1] : nil
   end
 end
