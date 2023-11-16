@@ -35,13 +35,17 @@ class BookChapter
   end
 
   def previous
-    chapters = book.book_chapters.order('number asc')
+    chapters = book.book_chapters.sort_by do |chapter|
+      chapter.split('.').map(&:to_i)
+    end
     current_index = chapters.pluck(:id).index(id)
     current_index > 0 ? chapters[current_index - 1] : nil
   end
 
   def next
-    chapters = book.book_chapters.order('number asc')
+    chapters = book.book_chapters.sort_by do |chapter|
+      chapter.split('.').map(&:to_i)
+    end
     current_index = chapters.pluck(:id).index(id)
     current_index < chapters.count - 1 ? chapters[current_index + 1] : nil
   end
