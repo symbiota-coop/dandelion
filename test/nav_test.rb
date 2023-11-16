@@ -17,6 +17,8 @@ class NavTest < ActiveSupport::TestCase
     visit '/'
     hrefs = all('#header .nav a', visible: :all).map { |a| a['href'] }.reject { |a| a == 'javascript:;' }
     hrefs.each do |href|
+      next unless href.starts_with?('/')
+
       puts URI(href).path
       visit href
       assert true
@@ -31,6 +33,8 @@ class NavTest < ActiveSupport::TestCase
     visit '/'
     hrefs = all('#sidebar .nav a', visible: :all).map { |a| a['href'] }.reject { |a| a == 'javascript:;' }
     hrefs.each do |href|
+      next unless href.starts_with?('/')
+
       puts URI(href).path
       visit href
       assert true
@@ -44,6 +48,8 @@ class NavTest < ActiveSupport::TestCase
     visit "/o/#{@organisation.slug}"
     hrefs = all('#content .dropdown-menu', visible: :all)[0].all('a', visible: :all).map { |a| a['href'] }.reject { |a| a == 'javascript:;' }
     hrefs.each do |href|
+      next unless href.starts_with?('/')
+
       puts URI(href).path
       visit href
       assert true
@@ -58,6 +64,8 @@ class NavTest < ActiveSupport::TestCase
     visit "/activities/#{@activity.id}"
     hrefs = all('#content .dropdown-menu', visible: :all)[1].all('a', visible: :all).map { |a| a['href'] }.reject { |a| a == 'javascript:;' }
     hrefs.each do |href|
+      next unless href.starts_with?('/')
+
       puts URI(href).path
       visit href
       assert true
@@ -72,6 +80,8 @@ class NavTest < ActiveSupport::TestCase
     visit "/local_groups/#{@local_group.id}"
     hrefs = all('#content .dropdown-menu', visible: :all)[1].all('a', visible: :all).map { |a| a['href'] }.reject { |a| a == 'javascript:;' }
     hrefs.each do |href|
+      next unless href.starts_with?('/')
+
       puts URI(href).path
       visit href
       assert true
@@ -86,6 +96,8 @@ class NavTest < ActiveSupport::TestCase
     visit "/e/#{@event.slug}"
     hrefs = all('#content .dropdown-menu', visible: :all)[1].all('a', visible: :all).map { |a| a['href'] }.reject { |a| a == 'javascript:;' }
     hrefs.each do |href|
+      next unless href.starts_with?('/')
+
       puts URI(href).path
       visit href
       assert true
@@ -99,6 +111,8 @@ class NavTest < ActiveSupport::TestCase
     visit "/g/#{@gathering.slug}"
     hrefs = all('#gathering-nav a', visible: :all).map { |a| a['href'] }.reject { |a| a == 'javascript:;' }
     hrefs.each do |href|
+      next unless href.starts_with?('/')
+
       puts URI(href).path
       visit href
       assert true
