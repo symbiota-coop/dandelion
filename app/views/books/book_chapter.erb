@@ -12,7 +12,7 @@
   </div>
   <div class="col-lg-9">
 
-    <h2 class="my-3">Chapter <%=@book_chapter.number %>: <%=@book_chapter.name%></h2>
+    <h2 class="mb-3">Chapter <%=@book_chapter.number %>: <%=@book_chapter.name%></h2>
     <big>
       <% markdown = Redcarpet::Markdown.new(Redcarpet::Render::HTML, autolink: true, tables: true, fenced_code_blocks: true) %>
       <%== markdown.render(@book_chapter.summary.gsub(/^##/, '###')) %>
