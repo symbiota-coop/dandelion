@@ -34,19 +34,21 @@ class BookChapter
     set(embedding: response.dig('data', 0, 'embedding'))
   end
 
-  def previous
-    chapters = book.book_chapters.sort_by do |chapter|
-      chapter.split('.').map(&:to_i)
+  def self.sorted
+    all.sort_by do |book_chapter|
+      book_chapter.number.split('.').map(&:to_i)
     end
-    current_index = chapters.pluck(:id).index(id)
-    current_index > 0 ? chapters[current_index - 1] : nil
+  end
+
+  def previous
+    sorted_chapters = book.book_chapters.sorted
+    current_index = sorted_chapters.pluck(:id).index(id)
+    current_index > 0 ? sorted_chapters[current_index - 1] : nil
   end
 
   def next
-    chapters = book.book_chapters.sort_by do |chapter|
-      chapter.split('.').map(&:to_i)
-    end
-    current_index = chapters.pluck(:id).index(id)
-    current_index < chapters.count - 1 ? chapters[current_index + 1] : nil
+    sorted_chapters = book.book_chapters.sorted
+    current_index = sorted_chapters.pluck(:id).index(id)
+    current_index < sorted_chapters.count - 1 ? sorted_chapters[current_index + 1] : nil
   end
 end

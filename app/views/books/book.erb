@@ -21,7 +21,7 @@
       <h3>Part <%=part%></h3>
       <big>
         <ol>
-          <% @book.book_chapters.and(:number => /^#{part}\./).order('number asc').each { |book_chapter| %>
+          <% @book.book_chapters.and(:number => /^#{part}\./).sorted.each { |book_chapter| %>
           <li><a href="/books/<%=@book.slug%>/<%=book_chapter.number%>"><%=book_chapter.name%></a></li>
           <% } %>
         </ol>
@@ -30,7 +30,7 @@
     <% else %>
       <big>
         <ol>
-          <% @book.book_chapters.order('number asc').each { |book_chapter| %>
+          <% @book.book_chapters.sorted.each { |book_chapter| %>
           <li><a href="/books/<%=@book.slug%>/<%=book_chapter.number%>"><%=book_chapter.name%></a></li>
           <% } %>
         </ol>
