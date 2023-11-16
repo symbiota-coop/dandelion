@@ -9,8 +9,9 @@
   <div class="col-lg-9">
     <h2>Chapter summaries</h2>
     <big>
-      <ol>
-        <% @book.book_chapters.order('number asc').each { |book_chapter| %>
+      <% book_chapters = @book.book_chapters.order('number asc') %>
+      <ol start="<%=book_chapters.first.number%>">
+        <% book_chapters.each { |book_chapter| %>
         <li><a href="/books/<%=@book.slug%>/<%=book_chapter.number%>"><%=book_chapter.name%></a></li>
         <% } %>
       </ol>
