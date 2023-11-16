@@ -1,3 +1,7 @@
+<p class="lead text-center text-lg-left">
+  <a href="/books/<%=@book.slug%>"><%= @book.title %> by <%=@book.book_author.name%></a>
+</p>
+
 <div class="row justify-content-center">
   <div class="col-6 col-lg-3">
 
@@ -7,10 +11,6 @@
 
   </div>
   <div class="col-lg-9">
-
-    <div class="d-none d-lg-block">
-      <a href="/books/<%=@book.slug%>">&larr; <%= @book.title %> by <%=@book.book_author.name%></a>
-    </div>
 
     <h2 class="my-3">Chapter <%=@book_chapter.number %>: <%=@book_chapter.name%></h2>
     <big>
