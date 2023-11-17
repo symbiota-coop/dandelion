@@ -56,7 +56,6 @@ class Organisation
   field :monthly_donation_welcome_body, type: String
   field :seeds_username, type: String
   field :evm_address, type: String
-  field :carousels, type: String
   field :add_a_donation_to, type: String
   field :donation_text, type: String
   field :become_a_member_url, type: String
@@ -200,7 +199,6 @@ class Organisation
       become_a_member_url: 'Link to direct non-members to when they attempt to buy tickets to a members-only event',
       terms_and_conditions_url: "Link to the organisation's terms and conditions of sale",
       event_footer: 'Included at the end of all public event descriptions',
-      carousels: "To create a carousel on your organisation's events page with the title X showing event tags a and b, type X: a, b",
       banned_emails: 'One per line',
       event_image_required_width: 'Required width for event images in px',
       event_image_required_height: 'Required height for event images in px',
