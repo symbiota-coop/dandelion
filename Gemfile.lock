@@ -494,6 +494,7 @@ DEPENDENCIES
   email_address
   erb_lint
   factory_bot
+  ferrum
   geocoder
   gocardless_pro
   google_drive

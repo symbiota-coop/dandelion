@@ -5,6 +5,22 @@ namespace :page_views do
 end
 
 namespace :organisations do
+  task check_squarespace_signup: :environment do
+    raise "Squarespace: Account already exists with email #{ENV['SQUARESPACE_EMAIL']}" if Account.find_by(email: ENV['SQUARESPACE_EMAIL'])
+
+    f = Ferrum::Browser.new
+    f.go_to(ENV['SQUARESPACE_URL'])
+    name = f.css('form input')[0]
+    email = f.css('form input')[1]
+    name.focus.type(ENV['SQUARESPACE_NAME'])
+    email.focus.type(ENV['SQUARESPACE_EMAIL'])
+    f.at_css('form button').click
+    organisation = Organisation.find_by(slug: ENV['SQUARESPACE_ORGANISATION_SLUG'])
+    raise "Squarespace: Account not created for #{ENV['SQUARESPACE_EMAIL']}" unless (account = Account.find_by(email: ENV['SQUARESPACE_EMAIL'])) && account.organisationships.find_by(organisation: organisation)
+
+    account.destroy
+  end
+
   task set_counts: :environment do
     Organisation.all.each do |organisation|
       monthly_donations_count = organisation.organisationships.and(:monthly_donation_method.ne => nil).and(:monthly_donation_method.ne => 'Other').map do |organisationship|

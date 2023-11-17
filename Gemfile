@@ -44,6 +44,7 @@ end
 # Interacting with other websites
 gem 'airbrake'
 gem 'airrecord', '1.0.8'
+gem 'ferrum'
 gem 'google_drive'
 gem 'jwt'
 gem 'koala'
