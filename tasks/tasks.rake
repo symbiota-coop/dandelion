@@ -10,10 +10,8 @@ namespace :organisations do
 
     f = Ferrum::Browser.new
     f.go_to(ENV['SQUARESPACE_URL'])
-    name = f.css('form input')[0]
-    email = f.css('form input')[1]
-    name.focus.type(ENV['SQUARESPACE_NAME'])
-    email.focus.type(ENV['SQUARESPACE_EMAIL'])
+    f.css('form input')[0].focus.type(ENV['SQUARESPACE_NAME'])
+    f.css('form input')[1].focus.type(ENV['SQUARESPACE_EMAIL'])
     f.at_css('form button').click
     organisation = Organisation.find_by(slug: ENV['SQUARESPACE_ORGANISATION_SLUG'])
     raise "Squarespace: Account not created for #{ENV['SQUARESPACE_EMAIL']}" unless (account = Account.find_by(email: ENV['SQUARESPACE_EMAIL'])) && account.organisationships.find_by(organisation: organisation)
