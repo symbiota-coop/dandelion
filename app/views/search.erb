@@ -26,14 +26,25 @@
   <% when 'events' %>
   <%= partial 'events/blocks', locals: { events: @events } %>
   <% when 'organisations' %>
+  <style>
+    @media(min-width: 768px) {
+    .search-result-media div {
+      height: 10rem !important;
+    }
+    }
+  </style>
   <ul class="search-result-list">
     <% @organisations.each { |organisation| %>
     <li>
-      <% if organisation.image %>
-        <div class="search-result-media" style="height: auto">
+      <div class="search-result-media" style="height: auto">
+        <% if organisation.image %>
           <a href="/o/<%= organisation.slug %>"><img src="<%= u organisation.image.thumb('400x400').url %>"></a>
-        </div>
-      <% end %>
+        <% else %>
+          <a href="/o/<%= organisation.slug %>">
+            <div style="border: 2px solid #343a40; height: 5.625rem"></div>
+          </a>
+        <% end %>
+      </div>
       <div class="search-result-content">
         <h2>
           <a class="text-dark" href="/o/<%= organisation.slug %>"><%= organisation.name %></a>
