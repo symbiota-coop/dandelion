@@ -93,30 +93,30 @@
     node_color_scale = 1
     edge_min_color = 0
     edge_color_scale = 1
-    edge_min_opacity = 0.25
+    edge_min_opacity = 0.1
     edge_opacity_scale = 10
 
             cy = cytoscape({
 
             container: $('#cy'),
                     elements: [
-    <% (organisations = @organisations.limit(20)).each { |o1| %>
+    <% @organisations.each { |organisation| %>
                       {
                         data: {
-                          id: '<%= o1.slug %>',
-                          name: '<%= o1.name %>',
+                          id: '<%= organisation.id %>',
+                          name: '<%= organisation.name %>',
                           weight: <%= w = 50 %>,
                           width: (node_min_width + <%= w %>),
                           color: scale(node_min_color + <%= w %>/node_color_scale).hex()
                         }
                       },
-                      <% organisations.each_with_index { |o2,i| break if o1 == o2 %>
+                      <% organisation.organisation_edges_as_source.each_with_index { |edge,i| %>
                       {
                         data: {
-                          id: '<%= o1.slug %>-<%= o2.slug %>',
-                          source: '<%= o1.slug %>',
-                          target: '<%= o2.slug %>',
-                          weight: <%= w = o1.members.and(:id.in => o2.members.pluck(:id)).count %>,
+                          id: '<%= edge.id %>',
+                          source: '<%= edge.source.id %>',
+                          target: '<%= edge.sink.id %>',
+                          weight: <%= w = edge.mutual_followers %>,
                           color: scale(edge_min_color + <%= w %>/edge_color_scale).hex(),
                           opacity: (edge_min_opacity + <%= w %>/edge_opacity_scale)
                         }
@@ -147,7 +147,7 @@
                     layout: {
                     name: 'cola',
                             //infinite: true,
-                            // nodeSpacing: function(node){ return 40; },
+                            nodeSpacing: function(node){ return 40; },
                     }
 
             });

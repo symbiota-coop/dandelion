@@ -170,6 +170,9 @@ class Organisation
 
   has_many :discount_codes, class_name: 'DiscountCode', as: :codeable, dependent: :destroy
 
+  has_many :organisation_edges_as_source, class_name: 'OrganisationEdge', inverse_of: :source, dependent: :destroy
+  has_many :organisation_edges_as_sink, class_name: 'OrganisationEdge', inverse_of: :sink, dependent: :destroy
+
   def self.currencies
     CURRENCIES_HASH
   end
