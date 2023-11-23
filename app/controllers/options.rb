@@ -40,14 +40,14 @@ Dandelion::App.controller do
     @gathering = Gathering.find_by(slug: params[:slug]) || not_found
     @membership = @gathering.memberships.find_by(account: current_account)
     membership_required!
-    @option = @gathering.options.find(params[:id])
+    @option = @gathering.options.find(params[:id]) || not_found
     partial :'options/option_modal'
   end
 
   get '/g/:slug/options/:id/edit' do
     @gathering = Gathering.find_by(slug: params[:slug]) || not_found
     @membership = @gathering.memberships.find_by(account: current_account)
-    @option = @gathering.options.find(params[:id])
+    @option = @gathering.options.find(params[:id]) || not_found
     @option.cost > 0 ? gathering_admins_only! : membership_required!
     erb :'options/build'
   end
@@ -55,7 +55,7 @@ Dandelion::App.controller do
   post '/g/:slug/options/:id/edit' do
     @gathering = Gathering.find_by(slug: params[:slug]) || not_found
     @membership = @gathering.memberships.find_by(account: current_account)
-    @option = @gathering.options.find(params[:id])
+    @option = @gathering.options.find(params[:id]) || not_found
     @option.cost > 0 ? gathering_admins_only! : membership_required!
     if @option.update_attributes(mass_assigning(params[:option], Option))
       redirect "/g/#{@gathering.slug}/options"
@@ -69,7 +69,7 @@ Dandelion::App.controller do
     @gathering = Gathering.find_by(slug: params[:slug]) || not_found
     @membership = @gathering.memberships.find_by(account: current_account)
     gathering_admins_only!
-    @option = @gathering.options.find(params[:id])
+    @option = @gathering.options.find(params[:id]) || not_found
     @option.destroy
     redirect "/g/#{@gathering.slug}/options"
   end
