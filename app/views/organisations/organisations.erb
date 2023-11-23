@@ -110,7 +110,7 @@
                           color: scale(node_min_color + <%= w %>/node_color_scale).hex()
                         }
                       },
-                      <% organisation_edges.and(:source => organisation).each_with_index { |edge,i| %>
+                      <% organisation_edges.and(:source => organisation).each { |edge| %>
                       {
                         data: {
                           id: '<%= edge.id %>',
