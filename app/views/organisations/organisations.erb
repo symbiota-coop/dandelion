@@ -98,13 +98,13 @@
 
             container: $('#cy'),
                     elements: [
-    <% organisation_edges = OrganisationEdge.and(:mutual_followers.gte => 10) %>
+    <% organisation_edges = OrganisationEdge.and(:mutual_followers.gte => Padrino.env == :development ? 1 : 10) %>
     <% Organisation.and(:id.in => organisation_edges.pluck(:source_id) + organisation_edges.pluck(:sink_id)).each { |organisation| %>
                       {
                         data: {
                           id: '<%= organisation.id %>',
                           slug: '<%= organisation.slug %>',
-                          name: <%== Sanitize.fragment(organisation.name).to_json %>,
+                          name: <%== CGI.unescapeHTML(Sanitize.fragment(organisation.name)).to_json %>,
                           weight: <%= w = 50 %>,
                           width: (node_min_width + <%= w %>),
                           color: scale(node_min_color + <%= w %>/node_color_scale).hex()
