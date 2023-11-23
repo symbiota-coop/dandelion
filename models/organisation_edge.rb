@@ -17,9 +17,9 @@ class OrganisationEdge
     }
   end
 
-  def self.create_all
-    Organisation.all.each do |source|
-      Organisation.all.each do |sink|
+  def self.create_all(organisations)
+    organisations.each do |source|
+      organisations.each do |sink|
         next if source.id == sink.id
         next if OrganisationEdge.find_by(source: sink, sink: source)
 
