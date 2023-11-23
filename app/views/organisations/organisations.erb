@@ -100,7 +100,7 @@
 
             container: $('#cy'),
                     elements: [
-    <% @organisations.each { |o1| %>
+    <% (organisations = @organisations.limit(20)).each { |o1| %>
                       {
                         data: {
                           id: '<%= o1.slug %>',
@@ -110,7 +110,7 @@
                           color: scale(node_min_color + <%= w %>/node_color_scale).hex()
                         }
                       },
-                      <% @organisations.each_with_index { |o2,i| break if o1 == o2 %>
+                      <% organisations.each_with_index { |o2,i| break if o1 == o2 %>
                       {
                         data: {
                           id: '<%= o1.slug %>-<%= o2.slug %>',
