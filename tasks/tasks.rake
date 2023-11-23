@@ -6,7 +6,7 @@ end
 
 namespace :organisations do
   task check_squarespace_signup: :environment do
-    raise "Squarespace: Account already exists with email #{ENV['SQUARESPACE_EMAIL']}" if Account.find_by(email: ENV['SQUARESPACE_EMAIL'])
+    Account.find_by(email: ENV['SQUARESPACE_EMAIL']).try(:destroy)
 
     f = Ferrum::Browser.new
     f.go_to(ENV['SQUARESPACE_URL'])
@@ -16,8 +16,6 @@ namespace :organisations do
     organisation = Organisation.find_by(slug: ENV['SQUARESPACE_ORGANISATION_SLUG'])
     sleep 10
     raise "Squarespace: Account not created for #{ENV['SQUARESPACE_EMAIL']}" unless (account = Account.find_by(email: ENV['SQUARESPACE_EMAIL'])) && account.organisationships.find_by(organisation: organisation)
-
-    account.destroy
   end
 
   task set_counts: :environment do
