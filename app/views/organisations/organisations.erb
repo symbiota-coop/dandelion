@@ -27,8 +27,13 @@
         <label class="mb-0">View as</label>
       </li>
       <li class="list-inline-item">
-        <a class="btn <%='btn btn-outline-primary' if !params[:display].in?(['map']) %>" href="<%= path if defined?(path) %>?<%= q = Rack::Utils.parse_nested_query(request.query_string); q.delete('search'); q.delete('display'); q.merge({search: 1, display: 'blocks' }).to_query %>">
+        <a class="btn <%='btn btn-outline-primary' if !params[:display] || params[:display] == 'blocks' %>" href="<%= path if defined?(path) %>?<%= q = Rack::Utils.parse_nested_query(request.query_string); q.delete('search'); q.delete('display'); q.merge({search: 1, display: 'blocks' }).to_query %>">
           <i class="fa fa-th-large"></i> Blocks
+        </a>
+      </li>
+      <li class="list-inline-item">
+        <a class="btn <%='btn btn-outline-primary' if params[:display] == 'network' %>" href="<%= path if defined?(path) %>?<%= q = Rack::Utils.parse_nested_query(request.query_string); q.delete('search'); q.delete('display'); q.merge({search: 1, display: 'network' }).to_query %>">
+          <i class="fa fa-share-alt"></i> Network
         </a>
       </li>
       <li class="list-inline-item">
@@ -39,7 +44,7 @@
     </ul>
   </div>
 
-  <% if params[:display] != 'map' %>
+  <% if !params[:display] || params[:display] == 'blocks' %>
     <div class="col-12 col-lg-auto">
       <% form_tag (defined?(path) ? path : ''), method: 'get', class: 'form-inline submitOnChange' do %>
         <% params.each { |k,v| next if %w[format search order slug].include?(k) %>
@@ -58,6 +63,109 @@
   <div data-pagelet-url="/organisations?<%= request.query_string %>">
     <%= partial :'maps/map', locals: { stem: "/organisations", dynamic: true, trigger_bounds_changed: true } %>
   </div>
+<% elsif params[:display] == 'network' %>
+
+  <p class="lead">Dandelion is an open-source project. <a target="_blank" href="https://github.com/symbiota-coop/dandelion">View the code on Github</a></p>
+
+  <% {
+     'cytoscape/3.9.4' => 'cytoscape.min.js',
+     'chroma-js/2.0.6' => 'chroma.min.js'
+   }.each { |k,v| %>
+  <% v.split(' ').each { |f| u = "https://cdnjs.cloudflare.com/ajax/libs/#{k}/#{f}" %>
+  <script src="<%= u %>"></script>
+  <% } %>
+  <% } %>
+
+  <% [
+     '//rawcdn.githack.com/tgdwyer/WebCola/aab7e61cd9580c4c89180cc0a30594e12743a242/WebCola/cola.min.js',
+     '//rawcdn.githack.com/cytoscape/cytoscape.js-cola/8c78f9d5c11ff6162b7d902f0639e1f787277b9f/cytoscape-cola.js'
+   ].each { |f| %>
+  <script src="<%= f %>"></script>
+  <% } %>
+
+  <script>
+    function drawNetwork() {
+
+    scale = chroma.scale(['#00B963', '#00B963']);
+
+    node_min_width = 0
+    node_min_color = 0
+    node_color_scale = 1
+    edge_min_color = 0
+    edge_color_scale = 1
+    edge_min_opacity = 0.25
+    edge_opacity_scale = 10
+
+            cy = cytoscape({
+
+            container: $('#cy'),
+                    elements: [
+    <% @organisations.each { |o1| %>
+                      {
+                        data: {
+                          id: '<%= o1.slug %>',
+                          name: '<%= o1.name %>',
+                          weight: <%= w = 50 %>,
+                          width: (node_min_width + <%= w %>),
+                          color: scale(node_min_color + <%= w %>/node_color_scale).hex()
+                        }
+                      },
+                      <% @organisations.each_with_index { |o2,i| break if o1 == o2 %>
+                      {
+                        data: {
+                          id: '<%= o1.slug %>-<%= o2.slug %>',
+                          source: '<%= o1.slug %>',
+                          target: '<%= o2.slug %>',
+                          weight: <%= w = o1.members.and(:id.in => o2.members.pluck(:id)).count %>,
+                          color: scale(edge_min_color + <%= w %>/edge_color_scale).hex(),
+                          opacity: (edge_min_opacity + <%= w %>/edge_opacity_scale)
+                        }
+                      },
+                      <% } %>
+    <% } %>
+                    ],
+                    style: [
+                    {
+                    selector: 'node',
+                    style: {
+                        'color': '#212529',
+                        'background-color': 'data(color)',
+                        'opacity': 0.85,
+                        'label': 'data(name)',
+                        'width': 'data(width)',
+                        'height': 'data(width)'
+                      }
+                    },
+                    {
+                    selector: 'edge',
+                    style: {
+                        'opacity': 'data(opacity)',
+                        'line-color': 'data(color)',
+                      }
+                    }
+                    ],
+                    layout: {
+                    name: 'cola',
+                            //infinite: true,
+                            // nodeSpacing: function(node){ return 40; },
+                    }
+
+            });
+    //cy.$('[weight < 2]').hide()
+    cy.minZoom(0.5)
+    cy.on('tap', 'node', function(){
+     window.location.href = '/o/' + this.data('id');
+    });
+    }
+
+    $(function() {
+    drawNetwork()
+            $(window).one('focus', function() { drawNetwork() })
+    })
+  </script>
+  <div id="cy" style="height: 600px"></div>
+
+
 <% else %>
   <%= partial :'organisations/blocks', locals: { organisations: @organisations } %>
   <%= will_paginate @organisations, param_name: 'organisations_page', inner_window: 0, outer_window: 0, renderer: WillPaginate::ViewHelpers::BootstrapRenderer %>
