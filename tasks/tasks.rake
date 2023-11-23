@@ -18,6 +18,11 @@ namespace :organisations do
     raise "Squarespace: Account not created for #{ENV['SQUARESPACE_EMAIL']}" unless (account = Account.find_by(email: ENV['SQUARESPACE_EMAIL'])) && account.organisationships.find_by(organisation: organisation)
   end
 
+  task create_edges: :environment do
+    OrganisationEdge.delete_all
+    OrganisationEdge.create_all(Organisation.and(:followers_count.gte => 50))
+  end
+
   task set_counts: :environment do
     Organisation.all.each do |organisation|
       monthly_donations_count = organisation.organisationships.and(:monthly_donation_method.ne => nil).and(:monthly_donation_method.ne => 'Other').map do |organisationship|
