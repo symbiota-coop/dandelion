@@ -100,7 +100,7 @@
 
             container: $('#cy'),
                     elements: [
-    <% Organisation.and(:id.in => OrganisationEdge.pluck(:source_id) + OrganisationEdge.pluck(:sink_id)).each { |organisation| %>
+    <% Organisation.and(:id.in => OrganisationEdge.and(:mutual_followers.gte => 10).pluck(:source_id) + OrganisationEdge.and(:mutual_followers.gte => 10).pluck(:sink_id)).each { |organisation| %>
                       {
                         data: {
                           id: '<%= organisation.id %>',
