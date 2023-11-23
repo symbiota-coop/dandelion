@@ -104,6 +104,7 @@
                       {
                         data: {
                           id: '<%= organisation.id %>',
+                          slug: '<%= organisation.slug %>',
                           name: '<%= organisation.name %>',
                           weight: <%= w = 50 %>,
                           width: (node_min_width + <%= w %>),
@@ -154,7 +155,7 @@
     //cy.$('[weight < 2]').hide()
     cy.minZoom(0.5)
     cy.on('tap', 'node', function(){
-     window.location.href = '/o/' + this.data('id');
+     window.location.href = '/o/' + this.data('slug');
     });
     }
 
