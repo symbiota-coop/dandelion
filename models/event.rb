@@ -865,7 +865,8 @@ class Event
       send_order_notifications: 'Send email notifications of orders',
       prevent_reminders: 'Prevent reminder email',
       oc_slug: 'Open Collective event slug',
-      no_tickets_pdf: "Don't attach tickets PDF to confirmation email"
+      no_tickets_pdf: "Don't attach tickets PDF to confirmation email",
+      hide_few_left: "Hide 'few tickets left' labels"
     }[attr.to_sym] || super
   end
 
