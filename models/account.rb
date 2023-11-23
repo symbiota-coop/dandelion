@@ -502,11 +502,10 @@ class Account
         if %w[jpeg png gif pam].include?(picture.format)
           picture.name = "#{SecureRandom.uuid}.#{picture.format}"
         else
-          errors.add(:picture, 'must be an image')
+          self.picture = nil
         end
       rescue StandardError
         self.picture = nil
-        errors.add(:picture, 'must be an image')
       end
     end
   end
