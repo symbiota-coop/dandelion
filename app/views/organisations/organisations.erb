@@ -110,7 +110,7 @@
                           color: scale(node_min_color + <%= w %>/node_color_scale).hex()
                         }
                       },
-                      <% organisation.organisation_edges_as_source.each_with_index { |edge,i| %>
+                      <% organisation.organisation_edges_as_source.and(:mutual_followers.gte => 10).each_with_index { |edge,i| %>
                       {
                         data: {
                           id: '<%= edge.id %>',
