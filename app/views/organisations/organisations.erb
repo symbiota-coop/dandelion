@@ -105,7 +105,7 @@
                         data: {
                           id: '<%= organisation.id %>',
                           slug: '<%= organisation.slug %>',
-                          name: '<%= organisation.name %>',
+                          name: <%== Sanitize.fragment(organisation.name).to_json %>,
                           weight: <%= w = 50 %>,
                           width: (node_min_width + <%= w %>),
                           color: scale(node_min_color + <%= w %>/node_color_scale).hex()
