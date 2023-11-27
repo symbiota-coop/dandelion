@@ -241,7 +241,7 @@ class Account
     if coordinates
       self.time_zone = begin
         Timezone.lookup(*coordinates.reverse)
-      rescue Timezone::Error::InvalidZone
+      rescue Timezone::Error::InvalidZone, Timezone::Error::InvalidConfig
         nil
       end
     end
