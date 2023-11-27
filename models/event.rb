@@ -230,7 +230,7 @@ class Event
     if coordinates
       self.time_zone = begin
         Timezone.lookup(*coordinates.reverse)
-      rescue Timezone::Error::InvalidConfig
+      rescue Timezone::Error::InvalidZone
         nil
       end
     end
