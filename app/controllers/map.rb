@@ -24,7 +24,12 @@ Dandelion::App.controller do
       @places = Place.order('created_at desc').and(:id.in => placeship_category.placeships.pluck(:place_id))
     elsif params[:organisation_id]
       @organisation = Organisation.find(params[:organisation_id]) || not_found
-      @accounts = params[:admin] && organisation_admin? ? Account.all : Account.mappable
+      @accounts = if params[:admin] && organisation_admin?
+                    Account.all
+                  else
+                    @no_account_infowindow = true
+                    Account.mappable
+                  end
       @accounts = if params[:monthly_donors]
                     @accounts.and(:id.in => @organisation.organisationships.and(:hide_membership.ne => true, :monthly_donation_method.ne => nil).pluck(:account_id))
                   else
@@ -32,22 +37,34 @@ Dandelion::App.controller do
                   end
     elsif params[:activity_id]
       @activity = Activity.find(params[:activity_id]) || not_found
-      @accounts = params[:admin] && activity_admin? ? Account.all : Account.mappable
+      @accounts = if params[:admin] && activity_admin?
+                    Account.all
+                  else
+                    @no_account_infowindow = true
+                    Account.mappable
+                  end
       @accounts = @accounts.and(:id.in => @activity.activityships.and(:hide_membership.ne => true).pluck(:account_id))
     elsif params[:local_group_id]
       @local_group = LocalGroup.find(params[:local_group_id]) || not_found
-      @accounts = params[:admin] && local_group_admin? ? Account.all : Account.mappable
+      @accounts = if params[:admin] && local_group_admin?
+                    Account.all
+                  else
+                    @no_account_infowindow = true
+                    Account.mappable
+                  end
       @accounts = @accounts.and(:id.in => @local_group.local_groupships.and(:hide_membership.ne => true).pluck(:account_id))
       @local_groups = [@local_group]
     elsif params[:place_id]
       @place = Place.find(params[:place_id]) || not_found
       @places = Place.and(id: @place.id)
-      @accounts = Account.mappable.and(:id.in => @place.placeships.pluck(:account_id))
+      @accounts = (@no_account_infowindow = true
+                   Account.mappable.and(:id.in => @place.placeships.pluck(:account_id)))
     elsif params[:places]
       @places = Place.order('created_at desc')
     else
       @places = Place.order('created_at desc')
-      @accounts = Account.mappable
+      @accounts = (@no_account_infowindow = true
+                   Account.mappable)
     end
 
     if request.xhr?

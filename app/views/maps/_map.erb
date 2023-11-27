@@ -24,6 +24,11 @@
       })
   <% } %>
 
+  var noAccountInfoWindow
+  <% if @no_account_infowindow %>
+    noAccountInfoWindow = true
+  <% end %>
+
     var points = []
   <% if defined?(points) && (!defined?(dynamic) || (defined?(points_count) && points_count <= points_limit)) %>
   <% points.each { |point| %>
@@ -66,18 +71,22 @@
         },
         map_icon_label: '<span class="' + models.find(model => model.name == point.model_name)['icon'] + '"></span>'
       });
-      google.maps.event.addListener(marker, 'click', function (marker) {
-        return function () {
-          infowindow.setContent('<i class="fa fa-spin fa-circle-o-notch"></i>');
-          infowindow.open(map, marker);
-          setTimeout(function () {
-            clearTimeout(mapTimer)
-          }, 750)
-          $.get('/point/' + marker.model_name + '/' + marker.id, function (data) {
-            infowindow.setContent('<div class="infowindow">' + data + '</div>');
-          })
-        }
-      }(marker));
+        google.maps.event.addListener(marker, 'click', function (marker) {
+          return function () {
+            if(noAccountInfoWindow && marker.model_name == 'Account') {
+
+            } else {
+              infowindow.setContent('<i class="fa fa-spin fa-circle-o-notch"></i>');
+              infowindow.open(map, marker);
+              setTimeout(function () {
+                clearTimeout(mapTimer)
+              }, 750)
+              $.get('/point/' + marker.model_name + '/' + marker.id, function (data) {
+                infowindow.setContent('<div class="infowindow">' + data + '</div>');
+              })
+            }
+          }
+        }(marker));
   <% if (!defined?(polygonables) || polygonables.empty?) %>
         bounds.extend(marker.getPosition());
   <% end %>

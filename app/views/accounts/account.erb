@@ -1,11 +1,5 @@
 <% viewer_in_network = current_account && @account.network.find(current_account.id) %>
 <%= partial :'accounts/top', locals: { account: @account } %>
-<% if @account.coordinates && viewable?(@account, :location) && @account.mappable? %>
-  <style>
-    #map-canvas { height: 200px !important; margin-bottom: 1rem; margin-top: 1rem }
-  </style>
-  <%= partial :'maps/map', locals: { points: [@account] } %>
-<% end %>
 <% if current_account %>
   <div class="mt-3" data-pagelet-url="/commentable?commentable_type=Account&commentable_id=<%= @account.id %>">
     <%= partial :'comments/commentable', locals: { commentable: @account } %>
