@@ -369,6 +369,8 @@ class Event
 
     c = nil
     organisation.carousels.order('o desc').each do |carousel|
+      next if carousel.name.downcase.include?('past events')
+
       intersection = event_tags.pluck(:id) & carousel.event_tags.pluck(:id)
       if intersection.count > 0
         c = carousel.name
