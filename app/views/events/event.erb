@@ -77,7 +77,7 @@
 
       <% n = 1 
       if @event.organisation
-        events = ([@event] + @event.organisation.events_for_search.future.and(name: @event.name, location: @event.location)).uniq
+        events = ([@event] + @event.organisation.events_for_search.future.and(:name => @event.name, :location => @event.location, :start_time.ne => @event.start_time)).uniq
         n = events.count
      end %>
 
