@@ -29,7 +29,7 @@
   <div class="col-lg-4">
     <div style="position: sticky; top: 3.75rem">
       <%= partial :'events/awesome' %>
-      <% if current_account.following.and(:date_of_birth.ne => nil).count > 0 %>
+      <% if current_account.following.and(:hidden.ne => true, :date_of_birth.ne => nil).count > 0 %>
         <div class="card mt-3">
           <h3 class="card-header bg-primary text-white">Upcoming birthdays</h3>
           <div class="card-body">
