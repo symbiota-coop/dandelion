@@ -640,7 +640,7 @@ Two Spirit).split("\n")
 
   def self.ids_by_next_birthday
     today = Date.today
-    self.and(:date_of_birth.ne => nil).pluck(:id, :date_of_birth)
+    self.and(:hidden.ne => true, :date_of_birth.ne => nil).pluck(:id, :date_of_birth)
         .sort_by { |_, dob| (((dob.month * 100) + dob.day) - ((today.month * 100) + today.day)) % (12 * 100) }
         .map { |id, _| id }
   end
