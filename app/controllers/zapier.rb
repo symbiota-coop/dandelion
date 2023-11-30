@@ -26,6 +26,8 @@ Dandelion::App.controller do
       {
         id: order.id.to_s,
         name: order.account ? order.account.name : '',
+        firstname: order.account ? order.account.firstname : '',
+        lastname: order.account ? order.account.lastname : '',
         email: if order_email_viewer?(order)
                  order.account ? order.account.email : ''
                else
