@@ -16,7 +16,7 @@ Date::DATE_FORMATS.merge!(
   default: ->(date) { date.strftime("%a #{date.day.ordinalize} %b %Y") },
   db_local: ->(date) { date.strftime('%Y-%m-%d') },
   no_year: ->(date) { date.strftime("%a #{date.day.ordinalize} %B") },
-  no_year_concise: ->(date) { date.strftime("%a #{date.day.ordinalize} %b") },
+  birthday: ->(date) { date.strftime("#{date.day.ordinalize} %b") },
   month_year: ->(date) { date.strftime('%b %Y') }
 )
 

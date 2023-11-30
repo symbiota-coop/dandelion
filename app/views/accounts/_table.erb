@@ -84,6 +84,21 @@
         </div>
       </td>
     </tr>
+    <% if defined?(birthday) %>
+      <tr>
+        <td>Birthday</td>
+        <td>
+          <div class="row justify-content-between no-gutters">
+            <div class="col">
+              <% d = account.days_until_birthday %>
+              <span class="<%='highlight' if d == 0%>">
+                <%= account.next_birthday.to_fs(:birthday) %>, <%= d == 0 ? 'today!' : pluralize(d,'day') %>
+              </span>
+            </div>
+          </div>
+        </td>
+      </tr>
+    <% end %>
   <% end %>
   <% if viewable?(account, :gender, viewer_in_network: viewer_in_network) %>
     <tr>

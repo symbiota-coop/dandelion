@@ -10,7 +10,7 @@
     <% if defined?(facilitator_info) && facilitator_info %>
       <%= cp(:'accounts/facilitator_info', key: "/facilitator_info?account_id=#{account.id}", locals: { account: account }) %>
     <% else %>
-      <%= partial :'accounts/table', locals: { account: account } %>
+      <%= partial :'accounts/table', locals: { account: account, birthday: defined?(birthday) } %>
     <% end %>
   </div>
 </div>

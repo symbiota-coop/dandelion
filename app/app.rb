@@ -178,6 +178,8 @@ module Dandelion
 
     get '/birthdays' do
       sign_in_required!
+      @account_ids = current_account.following.ids_by_next_birthday
+      @account_ids = @account_ids.paginate(page: params[:page], per_page: 20)
       erb :birthdays
     end
 

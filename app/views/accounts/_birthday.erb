@@ -4,7 +4,11 @@
     <%= partial :'accounts/square', locals: { account: account, width: '32px', klass: 'media-object' } %>
   </span>
   <div class="media-body">
-    <span class="<%='highlight' if d == 0%>"><%= account.name %><br />
-      <%=account.next_birthday.to_fs(:no_year_concise)%>, <%= d == 0 ? 'today!' : pluralize(d,'day') %></span>
+    <a href="/u/<%=account.username%>"><%= account.name %></a>
+    <% viewer_in_network = current_account && account.network.find(current_account.id) %>
+    <% if viewable?(account, :date_of_birth, viewer_in_network: viewer_in_network) %>
+      <br />
+      <span class="<%='highlight' if d == 0%>"><%=account.next_birthday.to_fs(:birthday)%>, <%= d == 0 ? 'today!' : pluralize(d,'day') %></span>
+    <% end %>
   </div>
 </div>
