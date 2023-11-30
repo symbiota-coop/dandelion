@@ -29,17 +29,19 @@
   <div class="col-lg-4">
     <div style="position: sticky; top: 3.75rem">
       <%= partial :'events/awesome' %>
-      <div class="card mt-3">
-        <h3 class="card-header bg-primary text-white">Upcoming birthdays</h3>
-        <div class="card-body">
-          <div class="mb-3">
-            <% current_account.following.ids_by_next_birthday.first(5).each { |account_id| account = Account.find(account_id) %>
-            <%= partial :'accounts/birthday', locals: {account: account} %>
-            <% } %>
+      <% if current_account.following.and(:date_of_birth.ne => nil).count > 0 %>
+        <div class="card mt-3">
+          <h3 class="card-header bg-primary text-white">Upcoming birthdays</h3>
+          <div class="card-body">
+            <div class="mb-3">
+              <% current_account.following.ids_by_next_birthday.first(5).each { |account_id| account = Account.find(account_id) %>
+              <%= partial :'accounts/birthday', locals: {account: account} %>
+              <% } %>
+            </div>
+            <a href="/birthdays">All birthdays &rarr;</a>
           </div>
-          <a href="/birthdays">All birthdays &rarr;</a>
         </div>
-      </div>
+      <% end %>
     </div>
   </div>
 </div>
