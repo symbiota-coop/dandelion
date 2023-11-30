@@ -43,7 +43,7 @@ Dandelion::App.controller do
     elsif params[:place_id]
       @place = Place.find(params[:place_id]) || not_found
       @places = Place.and(id: @place.id)
-      @accounts = Account.all.and(:id.in => @place.placeships.pluck(:account_id))
+      @accounts = Account.and(:id.in => @place.placeships.pluck(:account_id))
     elsif params[:places]
       @places = Place.order('created_at desc')
     else
@@ -69,7 +69,7 @@ Dandelion::App.controller do
       @polygonables = @local_groups
       @place = Place.new
       if params[:map_only]
-        partial :'maps/map', locals: { points: @points, points_count: @points_count, polygonables: @polygonables, centre: (OpenStruct.new(lat: @lat, lng: @lng) if @lat && @lng), zoom: @zoom, account_info_window: @account_info_window }, layout: :minimal
+        partial :'maps/map', locals: { points: @points, points_count: @points_count, polygonables: @polygonables, centre: (OpenStruct.new(lat: @lat, lng: @lng) if @lat && @lng), zoom: @zoom, info_window: @info_window }, layout: :minimal
       elsif params[:blocks_only]
         if @account
           partial :'accounts/places', locals: { block_class: 'col-6' }, layout: :minimal
