@@ -110,7 +110,7 @@
   <em>No dietary requirements.</em>
 <% end %>
 <% when 'map' %>
-<%= partial :'maps/map', locals: { points: Account.and(:id.in => @memberships.pluck(:account_id)).and(:coordinates.ne => nil) } %>
+<%= partial :'maps/map', locals: { points: Account.and(:id.in => @memberships.pluck(:account_id)).and(:coordinates.ne => nil), info_window: true } %>
 <% when 'birthdays' %>
 <ul class="search-result-list mb-3">
   <% Account.and(:id.in => @memberships.pluck(:account_id)).ids_by_next_birthday.each { |account_id| account = Account.find(account_id) %>

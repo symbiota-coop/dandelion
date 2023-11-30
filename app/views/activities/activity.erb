@@ -142,7 +142,7 @@
 
 <% if @activityship || @activity.privacy == 'open' %>
   <% unless params[:e] or @activity.hide_members? %>
-    <% visible_members = Account.mappable.and(:id.in => @activity.activityships.and(:hide_membership.ne => true).pluck(:account_id)) %>
+    <% visible_members = Account.and(:id.in => @activity.activityships.and(:hide_membership.ne => true).pluck(:account_id)) %>
     <% if visible_members.count > 0 %>
       <h2 class="mt-5">People following <%= @activity.name %></h2>
       <div data-pagelet-url="/map?activity_id=<%= @activity.id %>">

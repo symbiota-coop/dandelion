@@ -24,12 +24,8 @@ Dandelion::App.controller do
       @places = Place.order('created_at desc').and(:id.in => placeship_category.placeships.pluck(:place_id))
     elsif params[:organisation_id]
       @organisation = Organisation.find(params[:organisation_id]) || not_found
-      @accounts = if params[:admin] && organisation_admin?
-                    Account.all
-                  else
-                    @no_account_infowindow = true
-                    Account.mappable
-                  end
+      @info_window = (params[:admin] && organisation_admin?)
+      @accounts = Account.all
       @accounts = if params[:monthly_donors]
                     @accounts.and(:id.in => @organisation.organisationships.and(:hide_membership.ne => true, :monthly_donation_method.ne => nil).pluck(:account_id))
                   else
@@ -37,34 +33,22 @@ Dandelion::App.controller do
                   end
     elsif params[:activity_id]
       @activity = Activity.find(params[:activity_id]) || not_found
-      @accounts = if params[:admin] && activity_admin?
-                    Account.all
-                  else
-                    @no_account_infowindow = true
-                    Account.mappable
-                  end
-      @accounts = @accounts.and(:id.in => @activity.activityships.and(:hide_membership.ne => true).pluck(:account_id))
+      @info_window = (params[:admin] && activity_admin?)
+      @accounts = Account.and(:id.in => @activity.activityships.and(:hide_membership.ne => true).pluck(:account_id))
     elsif params[:local_group_id]
       @local_group = LocalGroup.find(params[:local_group_id]) || not_found
-      @accounts = if params[:admin] && local_group_admin?
-                    Account.all
-                  else
-                    @no_account_infowindow = true
-                    Account.mappable
-                  end
-      @accounts = @accounts.and(:id.in => @local_group.local_groupships.and(:hide_membership.ne => true).pluck(:account_id))
+      @info_window = (params[:admin] && local_group_admin?)
+      @accounts = Account.and(:id.in => @local_group.local_groupships.and(:hide_membership.ne => true).pluck(:account_id))
       @local_groups = [@local_group]
     elsif params[:place_id]
       @place = Place.find(params[:place_id]) || not_found
       @places = Place.and(id: @place.id)
-      @accounts = (@no_account_infowindow = true
-                   Account.mappable.and(:id.in => @place.placeships.pluck(:account_id)))
+      @accounts = Account.all.and(:id.in => @place.placeships.pluck(:account_id))
     elsif params[:places]
       @places = Place.order('created_at desc')
     else
       @places = Place.order('created_at desc')
-      @accounts = (@no_account_infowindow = true
-                   Account.mappable)
+      @accounts = Account.all
     end
 
     if request.xhr?
@@ -76,7 +60,7 @@ Dandelion::App.controller do
       @points_count = @places.count + @accounts.count
       @points = @places + @accounts
       @polygonables = @local_groups
-      partial :'maps/map', locals: { dynamic: true, points: @points, points_count: @points_count, polygonables: @polygonables, places: params[:places], centre: (OpenStruct.new(lat: @lat, lng: @lng) if @lat && @lng), zoom: @zoom }
+      partial :'maps/map', locals: { dynamic: true, points: @points, points_count: @points_count, polygonables: @polygonables, places: params[:places], centre: (OpenStruct.new(lat: @lat, lng: @lng) if @lat && @lng), zoom: @zoom, info_window: @info_window }
     else
       @places = @places.and(:coordinates.ne => nil) unless @places.empty?
       @accounts = @accounts.and(:coordinates.ne => nil) unless @accounts.empty?
@@ -85,7 +69,7 @@ Dandelion::App.controller do
       @polygonables = @local_groups
       @place = Place.new
       if params[:map_only]
-        partial :'maps/map', locals: { points: @points, points_count: @points_count, polygonables: @polygonables, centre: (OpenStruct.new(lat: @lat, lng: @lng) if @lat && @lng), zoom: @zoom }, layout: :minimal
+        partial :'maps/map', locals: { points: @points, points_count: @points_count, polygonables: @polygonables, centre: (OpenStruct.new(lat: @lat, lng: @lng) if @lat && @lng), zoom: @zoom, account_info_window: @account_info_window }, layout: :minimal
       elsif params[:blocks_only]
         if @account
           partial :'accounts/places', locals: { block_class: 'col-6' }, layout: :minimal

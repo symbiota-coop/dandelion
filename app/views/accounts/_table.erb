@@ -134,7 +134,7 @@
       </td>
     </tr>
   <% end %>
-  <% if viewable?(account, :location, viewer_in_network: viewer_in_network) && account.mappable? && !account.location.match(/[0-9]/) %>
+  <% if viewable?(account, :location, viewer_in_network: viewer_in_network) && !account.location.match(/[0-9]/) %>
     <tr>
       <td>Location</td>
       <td>

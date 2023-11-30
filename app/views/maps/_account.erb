@@ -5,7 +5,7 @@
     </td>
     <td>
       <h4 class="mt-0"><a target="_parent" href="/u/<%= account.username %>"><%= account.name %></a></h4>
-      <% if viewable?(account, :location) && account.mappable? && !account.location.match(/[0-9]/) %>
+      <% if viewable?(account, :location) && !account.location.match(/[0-9]/) %>
         <p><%= account.location %></p>
       <% end %>
     </td>

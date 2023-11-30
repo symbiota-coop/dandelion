@@ -151,14 +151,6 @@ class Account
     self.and(:sign_ins_count.gt => 0, :hidden.ne => true)
   end
 
-  def self.mappable
-    public.and(:updated_profile => true, :hide_location.ne => true)
-  end
-
-  def mappable?
-    public? && updated_profile? && !hide_location?
-  end
-
   def self.open_to
     %w[new_friends hookups short_term_dating long_term_dating open_relating]
   end
@@ -682,7 +674,7 @@ Two Spirit).split("\n")
       unsubscribed_messages: 'Opt out of email notifications of direct messages',
       unsubscribed_feedback: 'Opt out of requests for feedback',
       unsubscribed_reminders: 'Opt out of event reminders',
-      hide_location: "Don't show me on maps",
+      hide_location: "Don't include me in anonymised maps",
       hidden: 'Make my profile private and visible only to me',
       hear_about: 'How did you hear about this event?',
       client_note: 'Add a note'

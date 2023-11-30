@@ -15,8 +15,8 @@
 
     var models = []
   <%
-  offsets = {Account: 0.0001, ActivityApplication: 0.0001, Organisationship: 0.0001, Event: 0.0001}
-  [Organisation, Place, Account, Gathering, ActivityApplication, Event, Organisationship].each { |model| %>
+  offsets = {Event: 0.0001, Account: 0.0001, ActivityApplication: 0.0001, Organisationship: 0.0001}
+  [Organisation, Place, Gathering, Event, Account, ActivityApplication, Organisationship].each { |model| %>
       models.push({
         name: '<%= model.to_s %>',
         color: '<%= model.marker_color %>',
@@ -24,9 +24,9 @@
       })
   <% } %>
 
-  var noAccountInfoWindow
-  <% if @no_account_infowindow %>
-    noAccountInfoWindow = true
+  var infoWindow
+  <% if defined?(info_window) && info_window %>
+    infoWindow = true
   <% end %>
 
     var points = []
@@ -73,9 +73,7 @@
       });
         google.maps.event.addListener(marker, 'click', function (marker) {
           return function () {
-            if(noAccountInfoWindow && marker.model_name == 'Account') {
-
-            } else {
+            if((marker.model_name == 'Organisation' || marker.model_name == 'Place' || marker.model_name == 'Gathering' || marker.model_name == 'Event') || infoWindow) {
               infowindow.setContent('<i class="fa fa-spin fa-circle-o-notch"></i>');
               infowindow.open(map, marker);
               setTimeout(function () {
@@ -198,9 +196,9 @@
   <div id="points-warning" style="position: absolute; top: 0; left: 20px; right: 20px; margin: auto; display: none" class="mt-3 alert alert-warning">There are too many points to display, please zoom in</div>
 </div>
 <% if defined?(places) && places %>
-  <% if @places.count <= 16 %>
+  <% if places.count <= 16 %>
     <div class="mt-3">
-      <%= partial :'places/blocks', locals: { places: @places } %>
+      <%= partial :'places/blocks', locals: { places: places } %>
     </div>
   <% end %>
 <% end %>
