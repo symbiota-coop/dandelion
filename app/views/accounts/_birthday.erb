@@ -1,9 +1,9 @@
 <% d = account.days_until_birthday %>
-<div class="media">
-  <span class="mr-2">
+<div class="row mb-2">
+  <div class="col-auto">
     <%= partial :'accounts/square', locals: { account: account, width: '32px', klass: 'media-object' } %>
-  </span>
-  <div class="media-body">
+  </div>
+  <div class="col">
     <a href="/u/<%=account.username%>"><%= account.name %></a>
     <% viewer_in_network = current_account && account.network.find(current_account.id) %>
     <% if viewable?(account, :date_of_birth, viewer_in_network: viewer_in_network) %>
