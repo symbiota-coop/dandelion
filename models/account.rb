@@ -557,7 +557,7 @@ class Account
   def self.new_hints
     {
       location: 'Locations are offset for privacy, and locations with numbers in (e.g. postcodes) are never displayed publicly.',
-      date_of_birth: 'We use this to calculate your age. Your full date of birth is never displayed.'
+      date_of_birth: 'We use this to calculate your age.'
     }
   end
 
