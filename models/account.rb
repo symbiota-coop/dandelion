@@ -645,7 +645,7 @@ Two Spirit).split("\n")
         .map { |id, _| id }
   end
 
-  def days_until_birthday
+  def days_until_next_birthday
     return unless date_of_birth
 
     now = Date.today

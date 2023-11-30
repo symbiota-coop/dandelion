@@ -90,7 +90,7 @@
         <td>
           <div class="row justify-content-between no-gutters">
             <div class="col">
-              <% d = account.days_until_birthday %>
+              <% d = account.days_until_next_birthday %>
               <span class="<%='highlight' if d == 0%>">
                 <%= account.next_birthday.to_fs(:birthday) %>, <%= d == 0 ? 'today!' : pluralize(d,'day') %>
               </span>

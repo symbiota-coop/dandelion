@@ -10,7 +10,7 @@
     </div>
     <div class="form-group">
       <label>View as</label>
-      <%= select_tag :view, class: 'form-control', options: %w[details pictures dietary_requirements map list].map { |view| [view.to_s.humanize.capitalize, view] }, selected: params[:view] %>
+      <%= select_tag :view, class: 'form-control', options: %w[details pictures dietary_requirements map birthdays].map { |view| [view.to_s.humanize.capitalize, view] }, selected: params[:view] %>
     </div>
     <%= submit_tag 'Search', class: 'btn btn-primary mr-2' %>
 
@@ -80,46 +80,42 @@
   <% } %>
 </div>
 <% when 'dietary_requirements' %>
-<table class="table table-striped">
-  <thead>
+<% if (memberships = @memberships.and(:account_id.in => Account.and(:dietary_requirements.ne => nil).pluck(:id))).count > 0 %>
+  <table class="table table-striped">
+    <thead>
+      <tr>
+        <th style="width: 1px">Name</th>
+        <th>Dietary requirements</th>
+      </tr>
+    </thead>
+    <% memberships.each { |membership| account = membership.account %>
     <tr>
-      <th style="width: 1px">Name</th>
-      <th>Dietary requirements</th>
+      <td>
+        <%= partial :'accounts/account', object: account, locals: { membership: membership, show_email: viewable?(account, :email) } %>
+        <div>
+          <% membership.teamships.each { |teamship| %>
+          <a href="/g/<%= @gathering.slug %>/teams">
+            <span class="label label-primary d-inline-block mb-1"><%= teamship.team.name %></span>
+          </a>
+          <% } %>
+        </div>
+      </td>
+      <td>
+        <%== Sanitize.fragment(account.dietary_requirements) %>
+      </td>
     </tr>
-  </thead>
-  <% @memberships.and(:account_id.in => Account.and(:dietary_requirements.ne => nil).pluck(:id)).each { |membership| account = membership.account %>
-  <tr>
-    <td>
-      <%= partial :'accounts/account', object: account, locals: { membership: membership, show_email: viewable?(account, :email) } %>
-      <div>
-        <% membership.teamships.each { |teamship| %>
-        <a href="/g/<%= @gathering.slug %>/teams">
-          <span class="label label-primary d-inline-block mb-1"><%= teamship.team.name %></span>
-        </a>
-        <% } %>
-      </div>
-    </td>
-    <td>
-      <%== Sanitize.fragment(account.dietary_requirements) %>
-    </td>
-  </tr>
-  <% } %>
-</table>
+    <% } %>
+  </table>
+<% else %>
+  <em>No dietary requirements.</em>
+<% end %>
 <% when 'map' %>
 <%= partial :'maps/map', locals: { points: Account.and(:id.in => @memberships.pluck(:account_id)).and(:coordinates.ne => nil) } %>
-<% when 'list' %>
-<ul class="search-result-list">
-  <% Account.and(:id.in => @memberships.pluck(:account_id)).order('name asc').each { |account| %>
+<% when 'birthdays' %>
+<ul class="search-result-list mb-3">
+  <% Account.and(:id.in => @memberships.pluck(:account_id)).ids_by_next_birthday.each { |account_id| account = Account.find(account_id) %>
   <li>
-    <div class="search-result-media" style="height: auto">
-      <%= partial :'accounts/square', locals: { account: account, style: 'display: block;' } %>
-    </div>
-    <div class="search-result-content">
-      <h2>
-        <a class="text-dark" href="/u/<%= account.username %>"><%= account.name %></a>
-      </h2>
-      <%= partial :'accounts/buttons', locals: { account: account } %>
-    </div>
+    <%= partial 'accounts/search_result', locals: { account: account, birthday: true } %>
   </li>
   <% } %>
 </ul>
