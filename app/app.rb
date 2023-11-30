@@ -176,6 +176,11 @@ module Dandelion
       end
     end
 
+    get '/birthdays' do
+      sign_in_required!
+      erb :birthdays
+    end
+
     get '/notifications/:id' do
       admins_only!
       @notification = Notification.find(params[:id]) || not_found

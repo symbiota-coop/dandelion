@@ -1,0 +1,10 @@
+<% d = account.days_until_birthday %>
+<div class="media">
+  <span class="mr-2">
+    <%= partial :'accounts/square', locals: { account: account, width: '32px', klass: 'media-object' } %>
+  </span>
+  <div class="media-body">
+    <span class="<%='highlight' if d == 0%>"><%= account.name %><br />
+      <%=account.next_birthday.to_fs(:no_year_concise)%>, <%= d == 0 ? 'today!' : pluralize(d,'day') %></span>
+  </div>
+</div>

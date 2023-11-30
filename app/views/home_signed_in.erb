@@ -29,15 +29,17 @@
   <div class="col-lg-4">
     <div style="position: sticky; top: 3.75rem">
       <%= partial :'events/awesome' %>
-      <% unless (provider_link = current_account.provider_links.find_by(provider: 'Ethereum')) %>
-        <div class="card mt-3">
-          <h3 class="card-header bg-primary text-white">Connect wallet</h3>
-          <div class="card-body">
-            <p>Connect your <a target="_blank" href="https://metamask.io/">wallet</a> to sign in with Ethereum</p>
-            <a class="btn btn-primary" href="/auth/ethereum">Connect <i class="fab fa-ethereum"></i></a>
+      <div class="card mt-3">
+        <h3 class="card-header bg-primary text-white">Upcoming birthdays</h3>
+        <div class="card-body">
+          <div class="mb-3">
+            <% current_account.following.ids_by_next_birthday.first(5).each { |account_id| account = Account.find(account_id) %>
+            <%= partial :'accounts/birthday', locals: {account: account} %>
+            <% } %>
           </div>
+          <a href="/birthdays">All birthdays &rarr;</a>
         </div>
-      <% end %>
+      </div>
     </div>
   </div>
 </div>

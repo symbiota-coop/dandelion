@@ -1,0 +1,4 @@
+<h2 class="mb-3">Birthdays <i class="fa fa-birthday-cake"></i></h1>
+<% current_account.following.ids_by_next_birthday.each { |account_id| account = Account.find(account_id) %>
+<%= partial :'accounts/birthday', locals: {account: account} %>
+<% } %>

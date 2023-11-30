@@ -628,6 +628,29 @@ Two Spirit).split("\n")
     end
   end
 
+  def next_birthday
+    return unless date_of_birth
+
+    now = Date.today
+    next_birthday = Date.new(now.year, date_of_birth.month, date_of_birth.day)
+    next_birthday = Date.new(now.year + 1, date_of_birth.month, date_of_birth.day) if now > next_birthday
+
+    next_birthday
+  end
+
+  def self.ids_by_next_birthday
+    self.and(:date_of_birth.ne => nil).pluck(:id, :date_of_birth)
+        .sort_by { |_, dob| -((dob.month * 100) + dob.day) }
+        .map { |id, _| id }
+  end
+
+  def days_until_birthday
+    return unless date_of_birth
+
+    now = Date.today
+    (next_birthday - now).to_i
+  end
+
   def age
     return unless (dob = date_of_birth)
 
