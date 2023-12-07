@@ -68,7 +68,6 @@ class Account
      open_to_short_term_dating
      open_to_long_term_dating
      open_to_open_relating
-     hide_location
      block_reply_by_email
      hidden
      seen_intro_tour
@@ -113,7 +112,6 @@ class Account
       unsubscribed_messages: :check_box,
       unsubscribed_feedback: :check_box,
       unsubscribed_reminders: :check_box,
-      hide_location: :check_box,
       hidden: :check_box,
       block_reply_by_email: :check_box,
       can_reset_passwords: :check_box,
@@ -674,7 +672,6 @@ Two Spirit).split("\n")
       unsubscribed_messages: 'Opt out of email notifications of direct messages',
       unsubscribed_feedback: 'Opt out of requests for feedback',
       unsubscribed_reminders: 'Opt out of event reminders',
-      hide_location: "Don't include me in anonymised maps",
       hidden: 'Make my profile private and visible only to me',
       hear_about: 'How did you hear about this event?',
       client_note: 'Add a note'
