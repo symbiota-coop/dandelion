@@ -17,6 +17,7 @@ class Event
   field :name, type: String
   index({ name: 1 })
   field :slug, type: String
+  index({ slug: 1 })
   field :start_time, type: Time
   field :end_time, type: Time
   field :location, type: String

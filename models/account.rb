@@ -26,6 +26,7 @@ class Account
   field :sign_in_token, type: String
   index({ sign_in_token: 1 })
   field :api_key, type: String
+  index({ api_key: 1 })
   field :last_active, type: Time
   field :last_checked_notifications, type: Time
   field :last_checked_messages, type: Time
