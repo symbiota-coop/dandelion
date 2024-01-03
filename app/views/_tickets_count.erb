@@ -7,7 +7,7 @@
     var c = new countUp.CountUp('worth-count',
       <%=
       m = Money.new(0,'GBP')
-      Order.and(:value.ne => nil, :currency.in => FIAT_CURRENCIES).each { |o| begin; m += Money.new(o.value*100, o.currency); rescue; end }
+      Order.and(:value.ne => nil, :currency.in => MAJOR_CURRENCIES).each { |o| begin; m += Money.new(o.value*100, o.currency); rescue; end }
       Float("%.3g" % m).to_i
       %>
     );
