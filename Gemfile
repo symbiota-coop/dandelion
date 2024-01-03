@@ -53,6 +53,7 @@ gem 'ruby-openai'
 
 # Payments
 gem 'coinbase_commerce'
+gem 'eu_central_bank'
 gem 'gocardless_pro'
 gem 'money'
 gem 'money-uphold-bank'

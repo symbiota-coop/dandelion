@@ -8,6 +8,7 @@ require 'bundler/setup'
 require 'open-uri'
 require 'active_support/time'
 # require 'money/bank/uphold'
+require 'eu_central_bank'
 require 'will_paginate/array'
 Bundler.require(:default, RACK_ENV)
 
@@ -22,6 +23,7 @@ OmniAuth.config.logger = Logger.new(IO::NULL)
 Delayed::Worker.max_attempts = 1
 
 # Money.default_bank = Money::Bank::Uphold.new
+Money.default_bank = EuCentralBank.new
 Money.locale_backend = :currency
 Money.rounding_mode = BigDecimal::ROUND_HALF_EVEN
 
