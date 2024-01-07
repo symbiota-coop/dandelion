@@ -610,8 +610,12 @@ class Event
     if organisation && organisation.fixed_fee
       cap
     else
-      five_percent_of_ticket_sales = Money.new(tickets.complete.sum(:discounted_price) * 0.05 * 100, currency).exchange_to('GBP')
-      [cap, five_percent_of_ticket_sales].min
+      begin
+        five_percent_of_ticket_sales = Money.new(tickets.complete.sum(:discounted_price) * 0.05 * 100, currency).exchange_to('GBP')
+        [cap, five_percent_of_ticket_sales].min
+      rescue StandardError
+        cap
+      end
     end
   end
 
