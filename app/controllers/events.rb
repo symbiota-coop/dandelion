@@ -327,7 +327,7 @@ Dandelion::App.controller do
   end
 
   get '/orders/:id', provides: [:html, :pdf] do
-    @order = Order.find(params[:id])
+    @order = Order.find(params[:id]) || not_found
     @event = @order.event
     event = @event
     order = @order

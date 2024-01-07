@@ -239,7 +239,7 @@ Dandelion::App.controller do
           end_time: event.end_time,
           location: event.location,
           time_zone: event.time_zone,
-          image: event.image.thumb('1920x1920').url,
+          image: event.image ? event.image.thumb('1920x1920').url : nil,
           description: event.description
         }
       end.to_json
