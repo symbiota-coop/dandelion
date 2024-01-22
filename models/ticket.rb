@@ -146,7 +146,7 @@ class Ticket
   after_create do
     # ticket might be destroyed again, so this should move
     event.waitships.find_by(account: account).try(:destroy)
-    event.gathering.memberships.create(account: account) if event.gathering
+    event.gathering.memberships.create(account: account, unsubscribed: true) if event.gathering
   end
 
   after_create :update_zoomship_tickets_count, if: :zoomship

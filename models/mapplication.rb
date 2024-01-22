@@ -71,7 +71,7 @@ class Mapplication
     account = mapplication.account
     gathering = mapplication.gathering
     update_attribute(:status, 'accepted')
-    gathering.memberships.create! account: account, mapplication: mapplication
+    gathering.memberships.create! account: account, unsubscribed: true, mapplication: mapplication
   end
 
   def name

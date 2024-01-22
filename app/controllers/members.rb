@@ -73,7 +73,7 @@ Dandelion::App.controller do
       flash[:notice] = "You're already part of that gathering"
       redirect back
     else
-      @gathering.memberships.create! account: @account, answers: (params[:answers].map { |i, x| [@gathering.joining_questions_a[i.to_i], x] } if params[:answers])
+      @gathering.memberships.create! account: @account, unsubscribed: true, answers: (params[:answers].map { |i, x| [@gathering.joining_questions_a[i.to_i], x] } if params[:answers])
       redirect "/g/#{@gathering.slug}"
     end
   end
@@ -114,7 +114,7 @@ Dandelion::App.controller do
       flash[:warning] = 'That person is already a member of the gathering'
       redirect back
     else
-      @gathering.memberships.create! account: @account, prevent_notifications: params[:prevent_notifications], added_by: current_account
+      @gathering.memberships.create! account: @account, unsubscribed: true, prevent_notifications: params[:prevent_notifications], added_by: current_account
       redirect back
     end
   end
