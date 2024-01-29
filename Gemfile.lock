@@ -22,10 +22,11 @@ GIT
 
 GIT
   remote: https://github.com/stephenreid321/activate-admin.git
-  revision: 7b8eebdf046346c37b2e12c04fd7ea1cf05a1a12
+  revision: c72100b0aadff0a024ccb30683b25ddd5093812e
   specs:
-    activate-admin (0.0.12)
+    activate-admin (0.0.14)
       activate-tools
+      erubi
       padrino
       will_paginate
 
