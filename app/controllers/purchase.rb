@@ -113,6 +113,13 @@ Dandelion::App.controller do
             payment_intent: session.payment_intent,
             application_fee_amount: (application_fee_amount if organisationship)
           )
+          @order.tickets.each do |ticket|
+            ticket.update_attributes!(
+              session_id: session.id,
+              payment_intent: session.payment_intent
+            )
+          end
+
           { session_id: session.id }.to_json
 
         when 'coinbase'

@@ -553,7 +553,9 @@ Dandelion::App.controller do
   get '/events/:id/tickets/:ticket_id/destroy' do
     @event = Event.find(params[:id]) || not_found
     event_admins_only!
-    @event.tickets.find(params[:ticket_id]).try(:destroy)
+    ticket = @event.tickets.find(params[:ticket_id]) || not_found
+    ticket.refund
+    ticket.destroy
     redirect back
   end
 
