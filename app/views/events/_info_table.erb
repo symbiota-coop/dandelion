@@ -3,9 +3,9 @@
     <td>
       <% if @event.purchase_url %>
         Promoted by
-        <% else %>
-          Hosted by
-        <% end %>
+      <% else %>
+        Hosted by
+      <% end %>
     </td>
     <td>
       <% if @event.organisation.image %>
@@ -85,6 +85,12 @@
       <tr>
         <td>Share</td>
         <td><%= partial :share %></td>
+      </tr>
+      <tr>
+        <td>QR code</td>
+        <td>
+          <a target="_blank" href="/qr?url=<%= "https://dandelion.events/#{@event.slug}" %>"><img src="/qr?url=<%= "https://dandelion.events/#{@event.slug}" %>" style="width: 50px"></a>
+        </td>
       </tr>
     <% end %>
   </table>
