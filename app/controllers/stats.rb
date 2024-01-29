@@ -20,8 +20,8 @@ Dandelion::App.controller do
   end
 
   get '/stats/organisations' do
-    @from = params[:from] ? Date.parse(params[:from]) : Date.new(3.months.ago.year, 3.months.ago.month, 1)
-    @to = params[:to] ? Date.parse(params[:to]) : Date.new(Date.today.year, Date.today.month, 1) - 1.day
+    @from = params[:from] ? parse_date(params[:from]) : Date.new(3.months.ago.year, 3.months.ago.month, 1)
+    @to = params[:to] ? parse_date(params[:to]) : Date.new(Date.today.year, Date.today.month, 1) - 1.day
     @min_tickets = params[:min_tickets] ? params[:min_tickets].to_i : 10
     @min_order_value = params[:min_order_value] || 1000
     erb :'stats/organisations'

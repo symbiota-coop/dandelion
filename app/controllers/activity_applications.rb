@@ -41,8 +41,8 @@ Dandelion::App.controller do
   get '/activities/:id/applications', provides: %i[html csv] do
     @activity = Activity.find(params[:id]) || not_found
     activity_admins_only!
-    @from = Date.parse(params[:from]) if params[:from]
-    @to = Date.parse(params[:to]) if params[:to]
+    @from = parse_date(params[:from]) if params[:from]
+    @to = parse_date(params[:to]) if params[:to]
     @activity_applications = @activity.activity_applications
     @activity_applications = @activity_applications.and(:account_id.in => Account.and(name: /#{Regexp.escape(params[:name])}/i).pluck(:id)) if params[:name]
     @activity_applications = @activity_applications.and(:account_id.in => Account.and(email: /#{Regexp.escape(params[:email])}/i).pluck(:id)) if params[:email]

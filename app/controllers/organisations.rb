@@ -186,8 +186,8 @@ Dandelion::App.controller do
   get '/o/:slug/events', provides: %i[html ics json] do
     @organisation = Organisation.find_by(slug: params[:slug]) || not_found
     @events = @organisation.events_for_search(include_all_local_group_events: (true if params[:local_group_id]))
-    @from = params[:from] ? Date.parse(params[:from]) : Date.today
-    @to = params[:to] ? Date.parse(params[:to]) : nil
+    @from = params[:from] ? parse_date(params[:from]) : Date.today
+    @to = params[:to] ? parse_date(params[:to]) : nil
     @events = params[:order] == 'created_at' ? @events.order('created_at desc') : @events.order('start_time asc')
     q_ids = []
     q_ids += search_events(params[:q]).pluck(:id) if params[:q]
@@ -312,8 +312,8 @@ Dandelion::App.controller do
   get '/o/:slug/orders', provides: %i[html csv] do
     @organisation = Organisation.find_by(slug: params[:slug]) || not_found
     organisation_admins_only!
-    @from = params[:from] ? Date.parse(params[:from]) : nil
-    @to = params[:to] ? Date.parse(params[:to]) : nil
+    @from = params[:from] ? parse_date(params[:from]) : nil
+    @to = params[:to] ? parse_date(params[:to]) : nil
     @orders = @organisation.orders
     @orders = @orders.and(:account_id.in => search_accounts(params[:q]).pluck(:id)) if params[:q]
     @orders = @orders.and(:created_at.gte => @from) if @from
@@ -349,8 +349,8 @@ Dandelion::App.controller do
   get '/o/:slug/events/stats' do
     @organisation = Organisation.find_by(slug: params[:slug]) || not_found
     organisation_admins_only!
-    @from = params[:from] ? Date.parse(params[:from]) : Date.today
-    @to = params[:to] ? Date.parse(params[:to]) : nil
+    @from = params[:from] ? parse_date(params[:from]) : Date.today
+    @to = params[:to] ? parse_date(params[:to]) : nil
     @events = @organisation.events_including_cohosted
     @events = params[:order] == 'created_at' ? @events.order('created_at desc') : @events.order('start_time asc')
     q_ids = []

@@ -140,4 +140,10 @@ Dandelion::App.helpers do
     }
     JWT.encode(payload, ENV['NOLT_SSO_SECRET'], 'HS256')
   end
+
+  def parse_date(d)
+    Date.parse(d)
+  rescue Date::Error
+    nil
+  end
 end

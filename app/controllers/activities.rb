@@ -34,8 +34,8 @@ Dandelion::App.controller do
     @activity = Activity.find(params[:id]) || not_found
     @organisation = @activity.organisation
     activity_admins_only!
-    @from = params[:from] ? Date.parse(params[:from]) : Date.today
-    @to = params[:to] ? Date.parse(params[:to]) : nil
+    @from = params[:from] ? parse_date(params[:from]) : Date.today
+    @to = params[:to] ? parse_date(params[:to]) : nil
     @events = @activity.events
     @events = params[:order] == 'created_at' ? @events.order('created_at desc') : @events.order('start_time asc')
     q_ids = []

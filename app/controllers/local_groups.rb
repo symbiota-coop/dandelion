@@ -29,8 +29,8 @@ Dandelion::App.controller do
     @local_group = LocalGroup.find(params[:id]) || not_found
     @organisation = @local_group.organisation
     local_group_admins_only!
-    @from = params[:from] ? Date.parse(params[:from]) : Date.today
-    @to = params[:to] ? Date.parse(params[:to]) : nil
+    @from = params[:from] ? parse_date(params[:from]) : Date.today
+    @to = params[:to] ? parse_date(params[:to]) : nil
     @events = @local_group.events
     @events = params[:order] == 'created_at' ? @events.order('created_at desc') : @events.order('start_time asc')
     q_ids = []

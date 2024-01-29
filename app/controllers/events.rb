@@ -6,8 +6,8 @@ Dandelion::App.controller do
 
   get '/events', provides: %i[html ics] do
     @events = Event.live.public.legit
-    @from = params[:from] ? Date.parse(params[:from]) : Date.today
-    @to = params[:to] ? Date.parse(params[:to]) : nil
+    @from = params[:from] ? parse_date(params[:from]) : Date.today
+    @to = params[:to] ? parse_date(params[:to]) : nil
     @events = params[:order] == 'created_at' ? @events.order('created_at desc') : @events.order('start_time asc')
     @events = if params[:q]
                 @events.and(:id.in => search_events(params[:q]).pluck(:id))
