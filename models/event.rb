@@ -433,7 +433,7 @@ class Event
   accepts_nested_attributes_for :ticket_types, allow_destroy: true, reject_if: ->(attributes) { %w[name description price quantity].all? { |f| attributes[f].nil? } }
 
   has_many :ticket_groups, dependent: :destroy
-  accepts_nested_attributes_for :ticket_groups, allow_destroy: true
+  accepts_nested_attributes_for :ticket_groups, allow_destroy: true, reject_if: ->(attributes) { %w[name capacity].all? { |f| attributes[f].nil? } }
 
   has_many :tickets, dependent: :destroy
   has_many :donations, dependent: :nullify
