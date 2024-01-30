@@ -78,8 +78,8 @@ Dandelion::App.controller do
 
           stripe_session_hash = {
             customer_email: @account.email,
-            success_url: "#{ENV['BASE_URI']}/e/#{@event.slug}?success=true&order_id=#{@order.id}&utm_source=#{params[:detailsForm][:utm_source]}&utm_medium=#{params[:detailsForm][:utm_medium]}&utm_campaign=#{params[:detailsForm][:utm_campaign]}",
-            cancel_url: "#{ENV['BASE_URI']}/e/#{@event.slug}?cancelled=true",
+            success_url: URI.encode("#{ENV['BASE_URI']}/e/#{@event.slug}?success=true&order_id=#{@order.id}&utm_source=#{params[:detailsForm][:utm_source]}&utm_medium=#{params[:detailsForm][:utm_medium]}&utm_campaign=#{params[:detailsForm][:utm_campaign]}"),
+            cancel_url: URI.encode("#{ENV['BASE_URI']}/e/#{@event.slug}?cancelled=true"),
             metadata: @order.metadata,
             line_items: [{
               name: @event.name,
