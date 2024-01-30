@@ -64,7 +64,7 @@
       <h5 class="mb-1">Share this event</h5>
       <%= partial :share %>
       <h5 class="my-1">QR code</h5>
-      <a target="_blank" href="/qr?url=<%= "https://dandelion.events/#{@event.slug}" %>"><img src="/qr?url=<%= "https://dandelion.events/#{@event.slug}" %>" style="width: 50px"></a>
+      <a target="_blank" href="/qr?url=<%= "https://dandelion.events/e/#{@event.slug}" %>"><img src="/qr?url=<%= "https://dandelion.events/e/#{@event.slug}" %>" style="width: 50px"></a>
     <% end %>
     <% if @order.account %>
       <%= partial :'accounts/pay', locals: {div_class: 'mt-5', source: "event:#{@event.id}", account: @order.account, nft: true } %>
