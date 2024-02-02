@@ -47,8 +47,8 @@ class Account
   field :minimal_head, type: String
   field :recommended_people_cache, type: Array
   field :recommended_events_cache, type: Array
-  field :sent_substack_invite, type: Boolean
-  field :substack_opt_in, type: Boolean
+  field :sent_substack_invite, type: Time
+  field :substack_opt_in, type: Time
 
   field :tokens, type: Float
   index({ tokens: 1 })
@@ -774,7 +774,7 @@ Two Spirit).split("\n")
     end
 
     batch_message.finalize if ENV['MAILGUN_API_KEY']
-    set(sent_substack_invite: true)
+    update_attribute(:sent_substack_invite, Time.now)
   end
 
   def self.recommendable

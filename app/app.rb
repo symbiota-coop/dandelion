@@ -214,7 +214,7 @@ module Dandelion
 
     get '/substack_opt_in' do
       sign_in_required!
-      current_account.set(substack_opt_in: true)
+      current_account.update_attribute(:substack_opt_in, Time.now)
       erb :substack_opt_in
     end
   end
