@@ -758,13 +758,13 @@ Two Spirit).split("\n")
     batch_message.finalize if ENV['MAILGUN_API_KEY']
   end
 
-  def substack_invite!
+  def send_substack_invite(n = 3)
     mg_client = Mailgun::Client.new ENV['MAILGUN_API_KEY'], ENV['MAILGUN_REGION']
     batch_message = Mailgun::BatchMessage.new(mg_client, ENV['MAILGUN_NOTIFICATIONS_HOST'])
 
     account = self
     events = Event.past.and(:id.in => account.tickets.and(:created_at.gt => 1.year.ago).order('created_at desc').limit(3).pluck(:event_id))
-    return unless events.count >= 3
+    return unless events.count >= n
 
     content = ERB.new(File.read(Padrino.root('app/views/emails/substack_invite.erb'))).result(binding)
     batch_message.from 'Dandelion <stephen@dandelion.coop>'
