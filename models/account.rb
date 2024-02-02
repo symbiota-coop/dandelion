@@ -768,7 +768,7 @@ Two Spirit).split("\n")
 
     content = ERB.new(File.read(Padrino.root('app/views/emails/substack_invite.erb'))).result(binding)
     batch_message.from 'Dandelion <stephen@dandelion.coop>'
-    batch_message.subject 'Subscribe to our new Substack newsletter!'
+    batch_message.subject 'Opt-in to our new Substack newsletter'
     batch_message.body_html Premailer.new(ERB.new(File.read(Padrino.root('app/views/layouts/email.erb'))).result(binding), with_html_string: true, adapter: 'nokogiri', input_encoding: 'UTF-8').to_inline_css
 
     [account].each do |account|
