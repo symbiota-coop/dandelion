@@ -127,6 +127,8 @@ class Account
       tickets: :collection,
       orders: :collection,
       last_active: :datetime,
+      sent_substack_invite: :datetime,
+      substack_opt_in: :datetime,
       stripe_connect_json: :text_area,
       minimal_head: :text_area
     }
