@@ -1,6 +1,7 @@
 <% currency = MAJOR_CURRENCIES.include?(account.default_currency) ? account.default_currency : ENV['DEFAULT_CURRENCY'] %>
 
 <% if !account.stripe_subscription_id %>
+
   <% last_completed_contribution = account.account_contributions.and(payment_completed: true).order('created_at desc').first %>
   <% if (defined?(force) && force) || !last_completed_contribution || last_completed_contribution.created_at < 1.month.ago %>
     <div class="<%=div_class if defined?(div_class)%>">
