@@ -1,5 +1,6 @@
 Dandelion::App.controller do
   get '/qr', provides: :png do
+    halt 400 unless params[:url]
     RQRCode::QRCode.new(params[:url]).as_png(border_modules: 0, size: 500).to_blob
   end
 
