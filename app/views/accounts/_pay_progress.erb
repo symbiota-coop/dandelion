@@ -1,4 +1,6 @@
-    <%
+<%
+
+  if ENV['STRIPE_SK']
 
     Stripe.api_key = ENV['STRIPE_SK']
     Stripe.api_version = '2020-08-27'    
@@ -37,4 +39,6 @@
     </div>
   </div>
   <p class="mt-1 text-center"><%= monthly_contributions.format(no_cents: true) %> raised of <%=m target, currency%> monthly target</p>
+<% end %>
+
 <% end %>
