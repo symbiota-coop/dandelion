@@ -24,6 +24,8 @@ Dandelion::App.controller do
       end
     when 'customer.subscription.created'
       subscription = event.data.object
+      Stripe.api_key = ENV['STRIPE_SK']
+      Stripe.api_version = '2020-08-27'
       customer = Stripe::Customer.retrieve(subscription.customer)
       email = customer.email
       account = Account.find_by(email: email)
