@@ -833,7 +833,6 @@ Two Spirit).split("\n")
 
     batch_message.finalize if ENV['MAILGUN_API_KEY']
   end
-  handle_asynchronously :send_stripe_subscription_created_notification
 
   def send_stripe_subscription_deleted_notification(subscription)
     mg_client = Mailgun::Client.new ENV['MAILGUN_API_KEY'], ENV['MAILGUN_REGION']
@@ -850,7 +849,6 @@ Two Spirit).split("\n")
 
     batch_message.finalize if ENV['MAILGUN_API_KEY']
   end
-  handle_asynchronously :send_stripe_subscription_deleted_notification
 
   private
 
