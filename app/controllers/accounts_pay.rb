@@ -13,7 +13,8 @@ Dandelion::App.controller do
       halt 200
     end
 
-    if event['type'] == 'checkout.session.completed'
+    case event['type']
+    when 'checkout.session.completed'
       session = event['data']['object']
       if (account_contribution = AccountContribution.find_by(session_id: session.id))
         account_contribution.set(payment_completed: true)
@@ -21,7 +22,18 @@ Dandelion::App.controller do
         # account_contribution.create_nft
         Fragment.and(key: %r{/accounts/pay_progress}).destroy_all
       end
+    when 'customer.subscription.created'
+      subscription = event.data.object
+      customer = Stripe::Customer.retrieve(subscription.customer)
+      email = customer.email
+      account = Account.find_by(email: email)
+      account.update_attribute(:stripe_subscription_id, subscription.id) if account
+    when 'customer.subscription.deleted'
+      subscription = event.data.object
+      account = Account.find_by(stripe_subscription_id: subscription.id)
+      account.update_attribute(:stripe_subscription_id, nil) if account
     end
+
     halt 200
   end
 

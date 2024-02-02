@@ -49,6 +49,7 @@ class Account
   field :recommended_events_cache, type: Array
   field :sent_substack_invite, type: Time
   field :substack_opt_in, type: Time
+  field :stripe_subscription_id, type: String
 
   field :tokens, type: Float
   index({ tokens: 1 })
@@ -129,6 +130,7 @@ class Account
       last_active: :datetime,
       sent_substack_invite: :datetime,
       substack_opt_in: :datetime,
+      stripe_subscription_id: :text,
       stripe_connect_json: :text_area,
       minimal_head: :text_area
     }
