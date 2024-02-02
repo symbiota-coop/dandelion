@@ -78,6 +78,7 @@ class Event
       monthly_donors_only: :check_box,
       no_discounts: :check_box,
       trending: :check_box,
+      hide_from_trending: :check_box,
       extra_info_for_ticket_email: :wysiwyg,
       extra_info_for_recording_email: :wysiwyg,
       suggested_donation: :number,
@@ -142,7 +143,7 @@ class Event
     q.empty? ? [] : q
   end
 
-  %w[no_discounts hide_attendees hide_discussion refund_deleted_orders monthly_donors_only draft secret zoom_party show_emails include_in_parent featured opt_in_facilitator hide_few_left hide_organisation_footer ask_hear_about send_order_notifications raw_description prevent_reminders trending hide_from_carousels no_tickets_pdf].each do |b|
+  %w[no_discounts hide_attendees hide_discussion refund_deleted_orders monthly_donors_only draft secret zoom_party show_emails include_in_parent featured opt_in_facilitator hide_few_left hide_organisation_footer ask_hear_about send_order_notifications raw_description prevent_reminders trending hide_from_trending hide_from_carousels no_tickets_pdf].each do |b|
     field b.to_sym, type: Boolean
     index({ b.to_s => 1 })
   end
@@ -768,7 +769,7 @@ class Event
   end
 
   def self.trending
-    live.public.legit.future.and(:image_uid.ne => nil).and(
+    live.public.legit.future.and(:image_uid.ne => nil, :hide_from_trending.ne => true).and(
       :organisation_id.in => Organisation.and(paid_up: true).pluck(:id)
     ).sort_by do |event|
       [event.trending ? 0 : 1, -event.orders.complete.and(:created_at.gt => 1.week.ago).count]
