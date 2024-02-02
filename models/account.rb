@@ -763,7 +763,7 @@ Two Spirit).split("\n")
     batch_message = Mailgun::BatchMessage.new(mg_client, ENV['MAILGUN_NOTIFICATIONS_HOST'])
 
     account = self
-    events = Event.past.and(:id.in => account.tickets.and(:created_at.gt => 1.year.ago).order('created_at desc').limit(3).pluck(:event_id))
+    events = Event.past.and(:id.in => account.orders.and(:created_at.gt => 1.year.ago).pluck(:event_id)).order('start_time desc').limit(3)
     return unless events.count >= n
 
     content = ERB.new(File.read(Padrino.root('app/views/emails/substack_invite.erb'))).result(binding)
