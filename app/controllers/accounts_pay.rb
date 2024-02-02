@@ -28,7 +28,7 @@ Dandelion::App.controller do
       Stripe.api_version = '2020-08-27'
       customer = Stripe::Customer.retrieve(subscription.customer)
       email = customer.email
-      account = Account.find_by(email: email)
+      account = Account.find_by(email: email.downcase)
       account.update_attribute(:stripe_subscription_id, subscription.id) if account
     when 'customer.subscription.deleted'
       subscription = event.data.object
