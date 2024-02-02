@@ -4,7 +4,6 @@
 <% if (defined?(force) && force) || !last_completed_contribution || last_completed_contribution.created_at < 1.month.ago %>
   <div class="<%=div_class if defined?(div_class)%>">
 
-
     <p class="lead mb-1">
       Dandelion operates on a donation/gift economy basis.
       <br />
@@ -26,27 +25,7 @@
       </p>
     <% end %>
 
-
-    <%
-    monthly_contributions = Money.new(0,'GBP') +
-      AccountContribution.and(:payment_completed => true, :created_at.gte => Date.new(Date.today.year, Date.today.month, 1)).sum { |ac| Money.new(ac.amount*100, ac.currency) } +
-      OrganisationContribution.and(:payment_completed => true, :created_at.gte => Date.new(Date.today.year, Date.today.month, 1)).sum { |oc| Money.new(oc.amount*100, oc.currency) }    
-    monthly_contributions = monthly_contributions.exchange_to(currency) 
-
-    target = Money.new(500*100,'GBP')
-    if monthly_contributions/target >= 0.5
-      target = Money.new(1000*100,'GBP') * (monthly_contributions/target).ceil
-    end    
-    %>
-
-    <% if monthly_contributions > 0 %>
-      <div class="progress" style="height: 30px">
-        <div class="progress-bar" role="progressbar" style="width: <%= "#{w = 100*monthly_contributions/target}%" %>;">
-          <% if w > 0 %><%= w.to_f.round %>%<% end %>
-        </div>
-      </div>
-      <p class="mt-1 text-center"><%= monthly_contributions.format(no_cents: true) %> raised of <%=m target, currency%> monthly target</p>
-    <% end %>
+    <%= cp(:'accounts/pay_progress', key: "/accounts/pay_progress/#{currency}", locals: {currency: currency}) %>
 
     <div class="text-sm-left text-center">
       <% if currency == 'GBP' %>

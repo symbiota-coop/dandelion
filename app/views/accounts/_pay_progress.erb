@@ -1,0 +1,40 @@
+    <%
+
+    Stripe.api_key = ENV['STRIPE_SK']
+    Stripe.api_version = '2020-08-27'    
+
+    start_of_month = Time.new(Date.today.year, Date.today.month, 1)
+    end_of_month = start_of_month + 1.month
+
+    charges_list = Stripe::Charge.list({
+      created: {
+        gte: start_of_month.to_i,
+        lt: end_of_month.to_i        
+      },
+      status: 'succeeded'
+    })
+
+    charges = []
+    charges_list.auto_paging_each do |charge|
+      charges << charge
+    end    
+
+    monthly_contributions = Money.new(0,'GBP')
+    charges.each { |c| monthly_contributions += Money.new(c['amount'], c['currency']) }
+    monthly_contributions = monthly_contributions.exchange_to(currency) 
+
+    target = Money.new(500*100,'GBP')
+    if monthly_contributions/target >= 0.5
+      target = Money.new(1000*100,'GBP') * (monthly_contributions/target).ceil
+    end   
+
+    %>
+
+<% if monthly_contributions > 0 %>
+  <div class="progress" style="height: 30px">
+    <div class="progress-bar" role="progressbar" style="width: <%= "#{w = 100*monthly_contributions/target}%" %>;">
+      <% if w > 0 %><%= w.to_f.round %>%<% end %>
+    </div>
+  </div>
+  <p class="mt-1 text-center"><%= monthly_contributions.format(no_cents: true) %> raised of <%=m target, currency%> monthly target</p>
+<% end %>
