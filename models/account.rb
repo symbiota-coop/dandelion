@@ -47,6 +47,8 @@ class Account
   field :minimal_head, type: String
   field :recommended_people_cache, type: Array
   field :recommended_events_cache, type: Array
+  field :sent_substack_invite, type: Boolean
+  field :substack_opt_in, type: Boolean
 
   field :tokens, type: Float
   index({ tokens: 1 })
@@ -752,6 +754,27 @@ Two Spirit).split("\n")
     end
 
     batch_message.finalize if ENV['MAILGUN_API_KEY']
+  end
+
+  def substack_invite!
+    mg_client = Mailgun::Client.new ENV['MAILGUN_API_KEY'], ENV['MAILGUN_REGION']
+    batch_message = Mailgun::BatchMessage.new(mg_client, ENV['MAILGUN_NOTIFICATIONS_HOST'])
+
+    account = self
+    events = Event.past.and(:id.in => account.tickets.and(:created_at.gt => 1.year.ago).order('created_at desc').limit(3).pluck(:event_id))
+    return unless events.count >= 3
+
+    content = ERB.new(File.read(Padrino.root('app/views/emails/substack_invite.erb'))).result(binding)
+    batch_message.from 'Dandelion <stephen@dandelion.coop>'
+    batch_message.subject 'Subscribe to our new Substack newsletter!'
+    batch_message.body_html Premailer.new(ERB.new(File.read(Padrino.root('app/views/layouts/email.erb'))).result(binding), with_html_string: true, adapter: 'nokogiri', input_encoding: 'UTF-8').to_inline_css
+
+    [account].each do |account|
+      batch_message.add_recipient(:to, account.email, { 'firstname' => (account.firstname || 'there'), 'token' => account.sign_in_token, 'id' => account.id.to_s })
+    end
+
+    batch_message.finalize if ENV['MAILGUN_API_KEY']
+    set(sent_substack_invite: true)
   end
 
   def self.recommendable

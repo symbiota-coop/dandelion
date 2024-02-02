@@ -211,5 +211,11 @@ module Dandelion
       @title = 'Films'
       erb :'films/films'
     end
+
+    get '/substack_opt_in' do
+      sign_in_required!
+      current_account.set(substack_opt_in: true)
+      erb :substack_opt_in
+    end
   end
 end
