@@ -22,7 +22,7 @@
     end    
 
     monthly_contributions = Money.new(0,'GBP')
-    charges.each { |c| next if c.refunded; monthly_contributions += Money.new(c['amount'], c['currency']) }
+    charges.each { |c| next unless c.status == 'succeeded'; next if c.refunded; monthly_contributions += Money.new(c['amount'], c['currency']) }
     monthly_contributions = monthly_contributions.exchange_to(currency) 
 
     target = Money.new(500*100,'GBP')
