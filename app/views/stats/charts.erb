@@ -40,7 +40,7 @@ partial :chart, locals: {
   <h2>Contributions</h2>
   <%= partial :chart, locals: {
   unit: '£',
-  data: JSON.parse(f.value)
+  data: JSON.parse(f.value).to_h
 } %>
 <% end %>
 
