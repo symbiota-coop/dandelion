@@ -43,7 +43,3 @@ partial :chart, locals: {
   data: JSON.parse(f.value)
 } %>
 <% end %>
-
-<h2>Accounts</h2>
-
-<%= partial :chart, locals: { countable: Account.all, months_ago: 24 } %>
