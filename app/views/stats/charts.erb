@@ -43,31 +43,33 @@ partial :chart, locals: {
 d = [Date.new(24.months.ago.year, 24.months.ago.month, 1)]
 d << (d.last + 1.month) while d.last < Date.new(Date.today.year, Date.today.month, 1)
 
+Stripe.api_key = ENV['STRIPE_SK']
+Stripe.api_version = '2020-08-27'    
+
+charges_list = Stripe::Charge.list({
+  created: {
+    gte: d.first.to_time.to_i,
+    lt: d.last.to_time.to_i        
+  },
+  status: 'succeeded'
+})  
+
+charges = []
+charges_list.auto_paging_each do |charge|
+  charges << charge
+end      
+
 partial :chart, locals: {
   unit: '£',
   data: d.map { |x|
 
-    Stripe.api_key = ENV['STRIPE_SK']
-    Stripe.api_version = '2020-08-27'    
-
     start_of_month = x
     end_of_month = x + 1.month
 
-    charges_list = Stripe::Charge.list({
-      created: {
-        gte: start_of_month.to_time.to_i,
-        lt: end_of_month.to_time.to_i        
-      },
-      status: 'succeeded'
-    })
-
-    charges = []
-    charges_list.auto_paging_each do |charge|
-      charges << charge
-    end    
-
     monthly_contributions = Money.new(0,'GBP')
-    charges.each { |c| next unless c.status == 'succeeded'; next if c.refunded; monthly_contributions += Money.new(c['amount'], c['currency']) }
+    charges
+      .select { |c| c.created >= start_of_month.to_time.to_i && c.created < end_of_month.to_time.to_i }
+      .each { |c| next unless c.status == 'succeeded'; next if c.refunded; monthly_contributions += Money.new(c['amount'], c['currency']) }
     monthly_contributions = monthly_contributions.exchange_to('GBP')       
 
     ["#{Date::MONTHNAMES[x.month]} #{x.year}", monthly_contributions.to_i]
