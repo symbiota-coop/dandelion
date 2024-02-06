@@ -131,3 +131,44 @@ namespace :events do
     end
   end
 end
+
+namespace :contributions do
+  task fetch_from_stripe :environment do
+    d = [Date.new(24.months.ago.year, 24.months.ago.month, 1)]
+    d << (d.last + 1.month) while d.last < Date.new(Date.today.year, Date.today.month, 1)
+
+    Stripe.api_key = ENV['STRIPE_SK']
+    Stripe.api_version = '2020-08-27'
+
+    charges_list = Stripe::Charge.list({
+                                         created: {
+                                           gte: d.first.to_time.to_i,
+                                           lt: (d.last + 1.month).to_time.to_i
+                                         },
+                                         limit: 100
+                                       })
+
+    charges = []
+    charges_list.auto_paging_each do |charge|
+      charges << charge
+    end
+
+    Fragment.create key: 'monthly_contributions', expires: 1.day.from_now, value: d.map { |x|
+                                                                                    start_of_month = x
+                                                                                    end_of_month = x + 1.month
+
+                                                                                    monthly_contributions = Money.new(0, 'GBP')
+                                                                                    charges
+                                                                                      .select { |c| c.created >= start_of_month.to_time.to_i && c.created < end_of_month.to_time.to_i }
+                                                                                      .each do |c|
+                                                                                      next unless c.status == 'succeeded'
+                                                                                      next if c.refunded
+
+                                                                                      monthly_contributions += Money.new(c['amount'], c['currency'])
+                                                                                    end
+                                                                                    monthly_contributions = monthly_contributions.exchange_to('GBP')
+
+                                                                                    ["#{Date::MONTHNAMES[x.month]} #{x.year}", monthly_contributions.to_i]
+                                                                                  }.to_json
+  end
+end
