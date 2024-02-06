@@ -116,7 +116,12 @@
                               $('#ticket-types form select[data-ticket-type-id]').each(function() {
                                 quantities[$(this).attr('data-ticket-type-id')] = $(this).val()
                               })
+                              var answers = []
+                              $('[name^=answers]').each(function() {
+                                answers.push($(this).is(':checkbox') ? $(this).is(':checked') : $(this).val())
+                              })
                               qs['quantities'] = quantities
+                              qs['answers'] = answers
                               window.location = window.location.pathname + '?' + $.param(qs) + '#select-tickets'
                               ">Remove</button>
               </div>
@@ -141,7 +146,12 @@
                               $('#ticket-types form select[data-ticket-type-id]').each(function() {
                                 quantities[$(this).attr('data-ticket-type-id')] = $(this).val()
                               })
+                              var answers = []
+                              $('[name^=answers]').each(function() {
+                                answers.push($(this).is(':checkbox') ? $(this).is(':checked') : $(this).val())
+                              })                              
                               qs['quantities'] = quantities
+                              qs['answers'] = answers
                               window.location = window.location.pathname + '?' + $.param(qs) + '#select-tickets'
                               ">Apply</button>
               </div>
@@ -292,7 +302,7 @@
     <div class="form-group">
       <% if m = q.match(/\[(.*)\]/)  %>
         <div class="checkbox-inline">
-          <%= check_box_tag "answers[#{i}]", id: "answers-#{i}", 'data-required': q.ends_with?('*') %>
+          <%= check_box_tag "answers[#{i}]", id: "answers-#{i}", checked: ((params[:answers][i] == 'true') if params[:answers]), 'data-required': q.ends_with?('*') %>
           <label class="font-weight-bold" for="answers-<%=i%>">
             <%== Sanitize.fragment(Rinku.auto_link(m[1]), Sanitize::Config::DANDELION) %><% if q.ends_with?('*') %>*<% end %>
           </label>
@@ -300,7 +310,7 @@
       <% else %>
         <label><%== Sanitize.fragment(Rinku.auto_link(q), Sanitize::Config::DANDELION) %>*</label>
         <div>
-          <%= text_area_tag "answers[#{i}]", required: true, class: 'autosize form-control' %>
+          <%= text_area_tag "answers[#{i}]", required: true, class: 'autosize form-control', value: (params[:answers][i] if params[:answers]) %>
         </div>
       <% end %>
     </div>
