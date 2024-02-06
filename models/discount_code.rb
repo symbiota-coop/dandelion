@@ -29,6 +29,10 @@ class DiscountCode
     }
   end
 
+  before_validation do
+    self.code = code.upcase if code
+  end
+
   has_many :orders, dependent: :nullify
 
   def self.codeable_types

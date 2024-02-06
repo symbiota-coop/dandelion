@@ -103,10 +103,10 @@
           <td>
             <strong>Apply a code</strong>
             <% if params[:discount_code] &&
-                            (discount_code = @event.all_discount_codes.find_by(code: params[:discount_code])) &&
+                            (discount_code = @event.all_discount_codes.find_by(code: params[:discount_code].upcase)) &&
                             (discount_code.applies_to?(@event)) %>
             <div class="input-group" style="margin: 5px 0">
-              <%= text_field_tag :discount_code_display, id: 'discount_code_display', class: 'form-control', style: 'width: 5em', disabled: true, value: params[:discount_code] %>
+              <%= text_field_tag :discount_code_display, id: 'discount_code_display', class: 'form-control', style: 'width: 5em', disabled: true, value: params[:discount_code].upcase %>
               <%= hidden_field_tag :discount_code_id, id: 'discount_code_id', value: discount_code.id %>
               <div class="input-group-append">
                 <button class="btn btn-outline-secondary" type="button" onclick="
@@ -136,6 +136,11 @@
               <% end %>
             </div>
           <% else %>
+            <% if params[:discount_code] %>
+              <div class="alert alert-danger my-1">
+                <p class="mb-0">The code you entered is not valid</p>
+              </div>
+            <% end %>
             <div class="input-group" style="margin: 5px 0">
               <%= text_field_tag :discount_code, id: 'discount_code', class: 'form-control', style: 'width: 5em' %>
               <div class="input-group-append">
