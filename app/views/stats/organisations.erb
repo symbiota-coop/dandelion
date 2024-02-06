@@ -1,17 +1,3 @@
-<%=
-
-d = [Date.new(24.months.ago.year, 24.months.ago.month, 1)]
-d << (d.last + 1.month) while d.last < Date.new(Date.today.year, Date.today.month, 1)
-
-partial :chart, locals: {
-  label: 'Active organisations',
-  data: d.map { |x|
-    orders = Order.and(:created_at.gte => x, :created_at.lt => x + 1.month, :value.ne => nil)
-    organisations = Organisation.and(:id.in => Event.and(:id.in => orders.pluck(:event_id)).pluck(:organisation_id))
-    ["#{Date::MONTHNAMES[x.month]} #{x.year}", organisations.count]
-  }.to_h   
-} %>
-
 <% form_tag '', method: 'get', class: 'searchForm form-inline' do %>
   <div class="form-group">
     <label>Events between</label>

@@ -31,7 +31,9 @@
         labels: <%== defined?(data) ? data.keys.to_json : d.map { |x| "#{Date::MONTHNAMES[x.month]} #{x.year}" }.to_json %>,
         datasets: [
           {
-            label: <%== label.to_json %>,
+            <% if defined?(label) %>
+              label: <%== label.to_json %>,
+            <% end %>
             backgroundColor: '#00B963',
             borderColor: '#00B963',
             data: <%== defined?(data) ? data.values.to_json : d.map { |x| countable.and(:created_at.gte => x, :created_at.lt => (x + 1.month)).count }.to_json %>
@@ -40,6 +42,11 @@
       },
       options: {
         plugins: {
+        <% if !defined?(label) %>
+          legend: {
+            display: false
+          },
+        <% end %>
           datalabels: {
             formatter: function(value, context) {
               return <%==(defined?(unit) ? unit : '').to_json %> + value.toLocaleString() + <%==(defined?(unit_after) ? unit_after : '').to_json %>;

@@ -3,8 +3,8 @@ Dandelion::App.controller do
     admins_only!
   end
 
-  get '/stats/events' do
-    erb :'stats/events'
+  get '/stats/charts' do
+    erb :'stats/charts'
   end
 
   get '/stats/feedback' do
