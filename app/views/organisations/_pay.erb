@@ -29,9 +29,16 @@
       <% end; end %>
 
       <% if p == 0 %>
-        <p class="mt-3">
-          Stay topped up and we'll continue to show your events in the main events section and on the Dandelion homepage.
-        </p>
+        <% if organisation.contributable_events.count == 1 %>
+          <p class="mt-3">
+            Stay topped up and we'll continue to show your events in the main events section and on the Dandelion homepage.
+          </p>
+        <% else %>
+          <p class="mt-3">
+            Stay topped up
+            and as a thank you we'll show your events in the main events section and on the Dandelion homepage.
+          </p>
+        <% end %>
       <% elsif p > 0 && r > 0 && ((r * (organisation.paid_up_fraction || Organisation.paid_up_fraction)) - p) > 0 %>
         <p class="mt-3">
           Stay above <%= number_to_percentage (organisation.paid_up_fraction || Organisation.paid_up_fraction)*100, precision: 0 %>
