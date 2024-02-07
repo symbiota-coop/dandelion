@@ -103,10 +103,6 @@
     <div data-with-placeholder data-pagelet-url="/events">
       <%= partial :'events/blocks_placeholder' %>
     </div>
-
-    <div class="mt-3" data-pagelet-url="/events?display=map">
-      <%= partial :'maps/map', locals: { stem: "/events", dynamic: true, trigger_bounds_changed: true } %>
-    </div>
   </div>
 
   <%= cp :'event_feedbacks/home' %>
