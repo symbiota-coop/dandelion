@@ -135,7 +135,7 @@ class Gathering
     coordinates[0] if coordinates
   end
   after_validation do
-    geocode || (self.coordinates = nil)
+    geocode || (self.coordinates = nil) if location && location_changed?
   end
 
   def self.privacies

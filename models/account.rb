@@ -232,12 +232,14 @@ class Account
     coordinates[0] if coordinates
   end
   after_validation do
-    geocode || (self.coordinates = nil)
-    if coordinates
-      self.time_zone = begin
-        Timezone.lookup(*coordinates.reverse)
-      rescue Timezone::Error::InvalidZone, Timezone::Error::InvalidConfig
-        nil
+    if location && location_changed?
+      geocode || (self.coordinates = nil)
+      if coordinates
+        self.time_zone = begin
+          Timezone.lookup(*coordinates.reverse)
+        rescue Timezone::Error::InvalidZone, Timezone::Error::InvalidConfig
+          nil
+        end
       end
     end
   end
