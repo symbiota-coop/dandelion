@@ -6,7 +6,7 @@
 <% per_event = Money.new((organisation.contribution_requested_per_event_gbp || Organisation.contribution_requested_per_event_gbp) * 100, 'GBP') %>
 <% balance = r - p %>
 
-<% if !contribution_not_required? && (defined?(force) || ((c > 0) && (balance > 0))) %>
+<% if !organisation.contribution_not_required? && (defined?(force) || ((c > 0) && (balance > 0))) %>
   <div class="card p-3 my-3">
     <div class="card-body p-2">
 
