@@ -84,8 +84,8 @@ namespace :events do
     c = Account.recommendable.count
     Account.recommendable.each_with_index do |account, i|
       puts "#{i + 1}/#{c}"
-      account.recommended_people
-      account.recommended_events(events_with_participant_ids)
+      account.recommend_people!
+      account.recommend_events!(events_with_participant_ids)
     end
   end
 

@@ -45,8 +45,6 @@ class Account
   field :can_message, type: Boolean
   field :failed_sign_in_attempts, type: Integer
   field :minimal_head, type: String
-  field :recommended_people_cache, type: Array
-  field :recommended_events_cache, type: Array
   field :sent_substack_invite, type: Time
   field :substack_opt_in, type: Time
   field :stripe_subscription_id, type: String
@@ -325,6 +323,8 @@ class Account
       }
     )
   end
+
+  has_one :account_cache, dependent: :destroy
 
   has_many :nfts, dependent: :nullify
 
@@ -785,37 +785,24 @@ Two Spirit).split("\n")
     Account.and(:id.in => Ticket.pluck(:account_id) + EventFacilitation.pluck(:account_id))
   end
 
-  def recommended_people
-    events = Event.and(:id.in => tickets.pluck(:event_id))
-    people = {}
-    events.each do |event|
-      event.attendees.pluck(:id).each do |attendee_id|
-        next if attendee_id == id
-
-        if people[attendee_id.to_s]
-          people[attendee_id.to_s] << event.id.to_s
-        else
-          people[attendee_id.to_s] = [event.id.to_s]
-        end
-      end
-    end
-    people = people.sort_by { |_k, v| -v.count }
-    update_attribute(:recommended_people_cache, people.first(100))
+  def recommend_people!
+    create_account_cache unless account_cache
+    account_cache.recommend_people!
   end
 
-  def recommended_events(events_with_participant_ids = Event.live.public.future.map do |event|
-    [event.id.to_s, event.attendees.pluck(:id).map(&:to_s)]
-  end, people = recommended_people_cache)
-    events = events_with_participant_ids.map do |event_id, participant_ids|
-      if participant_ids.include?(id.to_s)
-        nil
-      else
-        [event_id, people.select { |k, _v| participant_ids.include?(k) }]
-      end
-    end.compact
-    events = events.select { |_event_id, people| people.map { |_k, v| v }.flatten.count > 0 }
-    events = events.sort_by { |_event_id, people| -people.map { |_k, v| v }.flatten.count }
-    update_attribute(:recommended_events_cache, events.first(100))
+  def recommend_events!
+    create_account_cache unless account_cache
+    account_cache.recommend_events!
+  end
+
+  def recommended_people_cache
+    create_account_cache unless account_cache
+    account_cache.recommended_people_cache
+  end
+
+  def recommended_events_cache
+    create_account_cache unless account_cache
+    account_cache.recommended_people_cache
   end
 
   def send_stripe_subscription_created_notification(subscription)

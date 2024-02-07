@@ -5,13 +5,13 @@ Dandelion::App.controller do
   end
 
   get '/recommendations/accounts' do
-    @account.recommended_people if @account.recommended_people_cache.nil?
+    @account.recommend_people! if @account.recommended_people_cache.nil?
     erb :'recommendations/accounts'
   end
 
   get '/recommendations/events' do
-    @account.recommended_people if @account.recommended_people_cache.nil?
-    @account.recommended_events if @account.recommended_events_cache.nil?
+    @account.recommend_people! if @account.recommended_people_cache.nil?
+    @account.recommend_events! if @account.recommended_events_cache.nil?
     erb :'recommendations/events'
   end
 end
