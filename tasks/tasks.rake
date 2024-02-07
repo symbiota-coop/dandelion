@@ -132,8 +132,8 @@ namespace :events do
   end
 end
 
-namespace :contributions do
-  task fetch_from_stripe: :environment do
+namespace :stats do
+  task monthly_contributions: :environment do
     d = [Date.new(24.months.ago.year, 24.months.ago.month, 1)]
     d << (d.last + 1.month) while d.last < Date.new(Date.today.year, Date.today.month, 1)
 
