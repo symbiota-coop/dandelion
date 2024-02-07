@@ -795,14 +795,14 @@ Two Spirit).split("\n")
     account_cache.recommend_events!
   end
 
-  def recommended_people_cache
+  def recommended_people
     create_account_cache unless account_cache
     account_cache.recommended_people_cache
   end
 
-  def recommended_events_cache
+  def recommended_events
     create_account_cache unless account_cache
-    account_cache.recommended_people_cache
+    account_cache.recommended_events_cache
   end
 
   def send_stripe_subscription_created_notification(subscription)

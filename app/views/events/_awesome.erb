@@ -5,7 +5,7 @@
       <%= partial :'events/my_upcoming' %>
     </div>
   </div>
-  <% if current_account.recommended_events_cache && current_account.recommended_events_cache.count > 0 %>
+  <% if current_account.recommended_events && current_account.recommended_events.count > 0 %>
     <h3 class="card-header bg-primary text-white">Recommended for you</h3>
     <div class="card-body">
       <%= cp(:'events/recommended', key: "/events/recommended?account_id=#{current_account.id}", expires: 12.hours.from_now) %>
