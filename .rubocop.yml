@@ -17,6 +17,8 @@ Style/Documentation:
   Enabled: false
 Style/FetchEnvVar:
   Enabled: false
+Style/NumericPredicate:
+  Enabled: false  
 Layout/LineLength:
   Enabled: false
 Lint/ShadowingOuterLocalVariable:
