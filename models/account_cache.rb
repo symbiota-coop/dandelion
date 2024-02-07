@@ -20,7 +20,7 @@ class AccountCache
     people = {}
     events.each do |event|
       event.attendees.pluck(:id).each do |attendee_id|
-        next if attendee_id == id
+        next if attendee_id == account_id
 
         if people[attendee_id.to_s]
           people[attendee_id.to_s] << event.id.to_s
