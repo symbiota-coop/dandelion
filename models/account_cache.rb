@@ -33,9 +33,7 @@ class AccountCache
     update_attribute(:recommended_people_cache, people)
   end
 
-  def recommend_events!(events_with_participant_ids = Event.live.public.future.map do |event|
-    [event.id.to_s, event.attendees.pluck(:id).map(&:to_s)]
-  end, people = recommended_people_cache)
+  def recommend_events!(events_with_participant_ids, people)
     events = events_with_participant_ids.map do |event_id, participant_ids|
       if participant_ids.include?(id.to_s)
         nil

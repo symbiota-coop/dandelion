@@ -790,9 +790,11 @@ Two Spirit).split("\n")
     account_cache.recommend_people!
   end
 
-  def recommend_events!
+  def recommend_events!(events_with_participant_ids = Event.live.public.future.map do |event|
+    [event.id.to_s, event.attendees.pluck(:id).map(&:to_s)]
+  end, people = recommended_people)
     create_account_cache unless account_cache
-    account_cache.recommend_events!
+    account_cache.recommend_events!(events_with_participant_ids, people)
   end
 
   def recommended_people
