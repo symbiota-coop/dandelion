@@ -800,7 +800,7 @@ Two Spirit).split("\n")
       end
     end
     people = people.sort_by { |_k, v| -v.count }
-    update_attribute(:recommended_people_cache, people)
+    update_attribute(:recommended_people_cache, people.first(100))
   end
 
   def recommended_events(events_with_participant_ids = Event.live.public.future.map do |event|
@@ -815,7 +815,7 @@ Two Spirit).split("\n")
     end.compact
     events = events.select { |_event_id, people| people.map { |_k, v| v }.flatten.count > 0 }
     events = events.sort_by { |_event_id, people| -people.map { |_k, v| v }.flatten.count }
-    update_attribute(:recommended_events_cache, events)
+    update_attribute(:recommended_events_cache, events.first(100))
   end
 
   def send_stripe_subscription_created_notification(subscription)
