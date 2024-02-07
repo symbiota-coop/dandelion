@@ -55,13 +55,3 @@
 <% if organisation_admin? or @organisation.local_groups.count > 0 %>
   <div data-pagelet-url="/o/<%= @organisation.slug %>/local_groups"></div>
 <% end %>
-<% visible_members = Account.and(organisation_ids_public_cache: @organisation.id) %>
-<% if visible_members.count > 0 %>
-  <h2 class="mt-5">People following <%= @organisation.name %></h2>
-  <div data-pagelet-url="/map?organisation_id=<%= @organisation.id %>">
-    <%= partial :'maps/map', locals: { dynamic: true, trigger_bounds_changed: true } %>
-  </div>
-  <style>
-    #map-canvas { height: 50vh !important; margin-top: 1rem; margin-bottom: 1rem }
-  </style>
-<% end %>

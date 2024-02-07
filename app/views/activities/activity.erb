@@ -141,18 +141,6 @@
 <% end %>
 
 <% if @activityship || @activity.privacy == 'open' %>
-  <% unless params[:e] or @activity.hide_members? %>
-    <% visible_members = Account.and(:id.in => @activity.activityships.and(:hide_membership.ne => true).pluck(:account_id)) %>
-    <% if visible_members.count > 0 %>
-      <h2 class="mt-5">People following <%= @activity.name %></h2>
-      <div data-pagelet-url="/map?activity_id=<%= @activity.id %>">
-        <%= partial :'maps/map', locals: { dynamic: true, trigger_bounds_changed: true } %>
-      </div>
-      <style>
-        #map-canvas { height: 50vh !important; margin-top: 1rem; margin-bottom: 1rem }
-      </style>
-    <% end %>
-  <% end %>
   <% if !@activity.hide_discussion %>
     <% if current_account %>
       <h2 class="mt-5">Discussion</h2>
