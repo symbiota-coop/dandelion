@@ -153,22 +153,24 @@ namespace :contributions do
       charges << charge
     end
 
-    Fragment.create key: 'monthly_contributions', expires: 1.day.from_now, value: d.map { |x|
-                                                                                    start_of_month = x
-                                                                                    end_of_month = x + 1.month
+    fragment = Fragment.find_or_create_by(key: 'monthly_contributions')
+    fragment.update_attributes expires: 1.day.from_now, value: d.map { |x|
+                                                                 start_of_month = x
+                                                                 end_of_month = x + 1.month
 
-                                                                                    monthly_contributions = Money.new(0, 'GBP')
-                                                                                    charges
-                                                                                      .select { |c| c.created >= start_of_month.to_time.to_i && c.created < end_of_month.to_time.to_i }
-                                                                                      .each do |c|
-                                                                                      next unless c.status == 'succeeded'
-                                                                                      next if c.refunded
+                                                                 monthly_contributions = Money.new(0, 'GBP')
+                                                                 charges
+                                                                   .select { |c| c.created >= start_of_month.to_time.to_i && c.created < end_of_month.to_time.to_i }
+                                                                   .each do |c|
+                                                                   next unless c.status == 'succeeded'
+                                                                   next if c.refunded
+                                                                   next if ENV['STRIPE_PAYMENT_INTENTS_TO_IGNORE'] && c.payment_intent.in?(ENV['STRIPE_PAYMENT_INTENTS_TO_IGNORE'].split(','))
 
-                                                                                      monthly_contributions += Money.new(c['amount'], c['currency'])
-                                                                                    end
-                                                                                    monthly_contributions = monthly_contributions.exchange_to('GBP')
+                                                                   monthly_contributions += Money.new(c['amount'], c['currency'])
+                                                                 end
+                                                                 monthly_contributions = monthly_contributions.exchange_to('GBP')
 
-                                                                                    ["#{Date::MONTHNAMES[x.month]} #{x.year}", monthly_contributions.to_i]
-                                                                                  }.to_json
+                                                                 ["#{Date::MONTHNAMES[x.month]} #{x.year}", monthly_contributions.to_i]
+                                                               }.to_json
   end
 end
