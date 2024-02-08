@@ -1,6 +1,6 @@
 namespace :page_views do
   task delete_old: :environment do
-    PageView.where(:created_at.lt => 30.days.ago).delete_all
+    PageView.and(:created_at.lt => 30.days.ago).delete_all
   end
 end
 

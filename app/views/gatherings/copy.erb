@@ -7,6 +7,6 @@
   Select the gathering you would like to copy to:
 </p>
 <% form_tag '', class: 'form-inline' do %>
-  <%= select_tag :gathering_id, options: current_account.memberships.where(:admin => true).map { |membership| gathering = membership.gathering; next if @gathering == gathering; [gathering.name, gathering.id] }.compact, class: 'form-control mr-1' %>
+  <%= select_tag :gathering_id, options: current_account.memberships.and(admin: true).map { |membership| gathering = membership.gathering; next if @gathering == gathering; [gathering.name, gathering.id] }.compact, class: 'form-control mr-1' %>
   <%= submit_tag 'Copy', class: 'btn btn-primary' %>
 <% end %>

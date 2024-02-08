@@ -33,7 +33,7 @@
 
 <% end %>
 
-<% if (organisation_contributions = @organisation.organisation_contributions.where(payment_completed: true).order('created_at desc')).count > 0 %>
+<% if (organisation_contributions = @organisation.organisation_contributions.and(payment_completed: true).order('created_at desc')).count > 0 %>
 
   <% organisation_contributions = organisation_contributions.paginate(page: params[:organisation_contributions_page], per_page: 10) %>
 

@@ -9,8 +9,8 @@ Dandelion::App.controller do
 
   get '/stats/feedback' do
     @event_feedbacks = EventFeedback.order('created_at desc')
-    @event_feedbacks = @event_feedbacks.where(:id.in => search(EventFeedback, @event_feedbacks, params[:q], 25).map(&:id)) if params[:q]
-    @event_feedbacks = @event_feedbacks.where(:rating.ne => 5) if params[:hide_5_stars]
+    @event_feedbacks = @event_feedbacks.and(:id.in => search(EventFeedback, @event_feedbacks, params[:q], 25).map(&:id)) if params[:q]
+    @event_feedbacks = @event_feedbacks.and(:rating.ne => 5) if params[:hide_5_stars]
     erb :'stats/feedback'
   end
 
