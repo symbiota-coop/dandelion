@@ -228,14 +228,18 @@ class Event
     coordinates[0] if coordinates
   end
   after_validation do
-    if location && location_changed?
-      geocode || (self.coordinates = nil)
-      if coordinates
-        self.time_zone = begin
-          Timezone.lookup(*coordinates.reverse)
-        rescue Timezone::Error::InvalidZone, Timezone::Error::InvalidConfig
-          nil
+    if location_changed?
+      if location
+        geocode || (self.coordinates = nil)
+        if coordinates
+          self.time_zone = begin
+            Timezone.lookup(*coordinates.reverse)
+          rescue Timezone::Error::InvalidZone, Timezone::Error::InvalidConfig
+            nil
+          end
         end
+      else
+        self.coordinates = nil
       end
     end
   end

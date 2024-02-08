@@ -42,7 +42,13 @@ class Organisationship
     coordinates[0] if coordinates
   end
   after_validation do
-    geocode || (self.coordinates = nil) if monthly_donation_postcode && monthly_donation_postcode_changed?
+    if monthly_donation_postcode_changed?
+      if monthly_donation_postcode
+        geocode || (self.coordinates = nil)
+      else
+        self.coordinates = nil
+      end
+    end
   end
 
   def self.marker_color
