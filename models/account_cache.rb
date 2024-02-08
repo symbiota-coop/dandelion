@@ -16,7 +16,7 @@ class AccountCache
   end
 
   def recommend_people!
-    events = Event.and(:id.in => account.tickets.pluck(:event_id))
+    events = Event.past.and(:id.in => account.tickets.pluck(:event_id))
     people = {}
     events.each do |event|
       event.attendees.pluck(:id).each do |attendee_id|
