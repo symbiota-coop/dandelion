@@ -34,8 +34,7 @@ class AccountContribution
       if source.starts_with?('event:')
         self.event = Event.find(source.split(':')[1])
       elsif source.starts_with?('event_feedback:')
-        self.event_feedback = EventFeedback.find(source.split(':')[1])
-        self.event = event_feedback.event
+        self.event = event_feedback.event if (self.event_feedback = EventFeedback.find(source.split(':')[1]))
       end
     end
   end
