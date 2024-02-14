@@ -36,7 +36,7 @@
       <th>Created at</th>
       <th>Checked in</th>
       <th>Feedback</th>
-      <th></th>
+      <th>Actions</th>
     </tr>
   </thead>
   <% @tickets.each { |ticket| %>
@@ -98,10 +98,11 @@
       <% end %>
     </td>
     <td>
-      <% if ticket.order %>
-        <a target="_blank" data-toggle="tooltip" title="Link to order confirmation" class="btn btn-primary mb-1" href="/orders/<%= ticket.order_id %>"><i class="fa fa-link"></i></a>
-      <% end %>
-      <a data-toggle="tooltip" title="<% if @event.refund_deleted_orders && ticket.session_id %>Remove and refund ticket<% else %>Delete ticket<% end %>" class="btn btn-danger mb-1" href="/events/<%= @event.id %>/tickets/<%= ticket.id %>/destroy" data-confirm="<% if @event.refund_deleted_orders && ticket.session_id %>Are you sure you want to remove and refund this ticket?<% else %>Are you sure you want to delete this ticket?<% end %>"><i class="fa fa-times"></i></a>
+      <%= dropdown_nav [
+        (['Link to order confirmation', "/orders/#{ticket.order_id}"] if ticket.order),
+        (['Remove and refund ticket', "/events/#{@event.id}/tickets/#{ticket.id}/destroy"] if @event.refund_deleted_orders && ticket.session_id),
+        (['Delete ticket', "/events/#{@event.id}/tickets/#{ticket.id}/destroy"] if !(@event.refund_deleted_orders && ticket.session_id)),
+      ].compact, button_text: %(Actions <i class="fa fa-caret-down"></i>), container_class: 'btn-group mb-1' %>
     </td>
   </tr>
   <% } %>

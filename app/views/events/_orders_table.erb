@@ -55,7 +55,7 @@
       <% end %>
       <th data-col-name="created-at">Created at</th>
       <th>Feedback</th>
-      <th></th>
+      <th>Actions</th>
     </tr>
   </thead>
   <% orders.each { |order| %>
@@ -203,14 +203,14 @@
     <% end %>
   </td>
   <td nowrap>
-    <% if order.deleted? %>
-      <a class="btn btn-primary" href="/events/<%= order.event_id %>/orders/<%= order.id %>/restore_and_complete" data-confirm="Are you sure you want to restore and complete this order?"><i class="fa fa-chevron-circle-up"></i></a>
-    <% else %>
-      <a target="_blank" data-toggle="tooltip" title="Link to order confirmation" class="btn btn-primary mb-1" href="/orders/<%= order.id %>"><i class="fa fa-link"></i></a>
-      <a data-toggle="tooltip" title="Resend order confirmation" class="btn btn-primary mb-1" href="/orders/<%= order.id %>/send_tickets" data-confirm="Are you sure you want to resend the tickets for this order?"><i class="fa fa-ticket"></i></a>
-      <a data-toggle="tooltip" title="Transfer to another event" class="btn btn-primary mb-1" href="/orders/<%= order.id %>/transfer" ><i class="fa fa-arrow-right"></i></a>
-      <a data-toggle="tooltip" title="<% if order.event.refund_deleted_orders && order.session_id %>Remove and refund order<% else %>Delete order<% end %>" class="btn btn-danger mb-1" href="/events/<%= order.event.id %>/orders/<%= order.id %>/destroy" data-confirm="<% if order.event.refund_deleted_orders && order.session_id %>Are you sure you want to remove and refund this order?<% else %>Are you sure you want to delete this order?<% end %>"><i class="fa fa-times"></i></a>
-    <% end %>
+    <%= dropdown_nav [
+        (['Restore and complete', "/events/#{order.event_id}/orders/#{order.id}/restore_and_complete"] if order.deleted?),
+        ['Link to order confirmation', "/orders/#{order.id}"],
+        ['Resend order confirmation', "/orders/#{order.id}/send_tickets"],
+        ['Transfer to another event', "/orders/#{order.id}/transfer"],
+        (['Remove and refund order', "/events/#{order.event.id}/orders/#{order.id}/destroy"] if order.event.refund_deleted_orders && order.session_id),
+        (['Delete order', "/events/#{order.event.id}/orders/#{order.id}/destroy"] if !(order.event.refund_deleted_orders && order.session_id)),
+      ].compact, button_text: %(Actions <i class="fa fa-caret-down"></i>), container_class: 'btn-group mb-1' %>
   </td>
 </tr>
 <% } %>
