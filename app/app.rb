@@ -35,7 +35,7 @@ module Dandelion
     set :protection, except: :frame_options
 
     before do
-      @cachebuster = Padrino.env == :development ? SecureRandom.uuid : ENV['HEROKU_SLUG_COMMIT']
+      @cachebuster = Padrino.env == :development ? SecureRandom.uuid : (ENV['RENDER_GIT_COMMIT'] || ENV['HEROKU_SLUG_COMMIT'])
       redirect "#{ENV['BASE_URI']}#{request.path}#{"?#{request.query_string}" unless request.query_string.blank?}" if ENV['REDIRECT_BASE'] && ENV['BASE_URI'] && (ENV['BASE_URI'] != "#{request.scheme}://#{request.env['HTTP_HOST']}")
       begin
         Time.zone = if current_account && current_account.time_zone
