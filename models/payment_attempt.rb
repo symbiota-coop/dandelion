@@ -38,11 +38,7 @@ class PaymentAttempt
   validates_uniqueness_of :evm_secret, scope: :evm_amount, allow_nil: true
 
   def evm_offset
-    if CELO_CURRENCIES.include?(currency)
-      evm_secret.to_d / 1e8
-    else
-      evm_secret.to_d / 1e15
-    end
+    evm_secret.to_d / 1e8
   end
 
   before_validation do

@@ -102,6 +102,8 @@
         (['Link to order confirmation', "/orders/#{ticket.order_id}"] if ticket.order),
         (['Remove and refund ticket', "/events/#{@event.id}/tickets/#{ticket.id}/destroy"] if @event.refund_deleted_orders && ticket.session_id),
         (['Delete ticket', "/events/#{@event.id}/tickets/#{ticket.id}/destroy"] if !(@event.refund_deleted_orders && ticket.session_id)),
+        (['Remove and refund order', "/events/#{@event.id}/orders/#{ticket.order_id}/destroy"] if ticket.order && @event.refund_deleted_orders && ticket.order.session_id),
+        (['Delete order', "/events/#{@event.id}/orders/#{ticket.order_id}/destroy"] if ticket.order && !(@event.refund_deleted_orders && ticket.order.session_id)),        
       ].compact, button_text: %(Actions <i class="fa fa-caret-down"></i>), container_class: 'btn-group mb-1' %>
     </td>
   </tr>
