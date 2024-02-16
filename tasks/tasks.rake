@@ -121,13 +121,13 @@ namespace :events do
     Event.and(:start_time.gte => Date.tomorrow + 6, :start_time.lt => Date.tomorrow + 7).each do |event|
       event.send_star_reminders
     end
+  end
 
-    task send_payment_reminders: :environment do
-      return unless Date.today.day == 1
+  task send_payment_reminders: :environment do
+    return unless Date.today.day == 1
 
-      TicketType.and(name: /payment plan/i).each do |ticket_type|
-        ticket_type.send_payment_reminder
-      end
+    TicketType.and(name: /payment plan/i).each do |ticket_type|
+      ticket_type.send_payment_reminder
     end
   end
 end
