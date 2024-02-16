@@ -159,11 +159,7 @@ class Order
   end
 
   def evm_offset
-    if currency == 'BREAD'
-      evm_secret.to_d / 1e8
-    else
-      evm_secret.to_d / 1e15
-    end
+    evm_secret.to_d / 1e8
   end
 
   before_validation do
