@@ -894,13 +894,13 @@ class Organisation
 
     worksheet_name = 'Dandelion events'
     worksheet = session.spreadsheet_by_key(google_sheets_key).worksheets.find { |worksheet| worksheet.title == worksheet_name }
-    rows = []
 
     event_ids = worksheet.instance_variable_get(:@session).sheets_service.get_spreadsheet_values(
       worksheet.spreadsheet.id,
-      'Dandelion events!A2:A'
+      "#{worksheet_name}!A2:A"
     ).values.flatten
 
+    rows = []
     events.live.and(:id.nin => event_ids, :start_time.gte => '2020-06-01').each do |event|
       row = { id: event.id.to_s }
       rows << row
@@ -910,6 +910,39 @@ class Organisation
       worksheet.spreadsheet.id,
       worksheet_name,
       Google::Apis::SheetsV4::ValueRange.new(values: rows.reverse.map(&:values)),
+      value_input_option: 'USER_ENTERED'
+    )
+
+    event_ids = worksheet.instance_variable_get(:@session).sheets_service.get_spreadsheet_values(
+      worksheet.spreadsheet.id,
+      "#{worksheet_name}!A2:A"
+    ).values.flatten
+
+    rows = []
+    event_ids.each_with_index do |event_id, i|
+      event = Event.find(event_id)
+      puts i
+      row = {
+        id: event.id.to_s,
+        name: event.name,
+        start_date: event.start_time.to_date.to_fs(:db_local),
+        end_date: event.end_time.to_date.to_fs(:db_local),
+        activity: ("#{event.activity.name} (#{event.activity_id})" if event.activity),
+        event_coordinator: ("#{event.coordinator.name} (#{event.coordinator_id})" if event.coordinator),
+        carousel: event.carousel_name,
+        order_count: event.orders.complete.count,
+        discounted_ticket_revenue: event.discounted_ticket_revenue.cents.to_f / 100,
+        organisation_discounted_ticket_revenue: event.organisation_discounted_ticket_revenue.cents.to_f / 100,
+        donation_revenue: event.donation_revenue.cents.to_f / 100,
+        organisation_revenue_share: event.organisation_revenue_share
+      }
+      rows << row
+    end
+
+    worksheet.instance_variable_get(:@session).sheets_service.update_spreadsheet_value(
+      worksheet.spreadsheet.id,
+      "#{worksheet_name}!A2:L#{rows.count + 2}",
+      Google::Apis::SheetsV4::ValueRange.new(values: rows.map(&:values)),
       value_input_option: 'USER_ENTERED'
     )
 
