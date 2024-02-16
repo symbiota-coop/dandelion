@@ -159,7 +159,7 @@ class Order
   end
 
   def evm_offset
-    if CELO_CURRENCIES.include?(currency)
+    if currency == 'BREAD'
       evm_secret.to_d / 1e8
     else
       evm_secret.to_d / 1e15
