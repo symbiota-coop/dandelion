@@ -1,9 +1,10 @@
 source 'https://rubygems.org'
 
-ruby '2.7.7'
+ruby '3.2.3'
 gem 'irb'
 gem 'padrino'
 gem 'puma'
+gem 'rack', '~> 2.0'
 gem 'rake'
 gem 'sass'
 gem 'sinatra'
@@ -43,20 +44,20 @@ end
 
 # Interacting with other websites
 gem 'airbrake'
-gem 'airrecord', '1.0.8'
+gem 'airrecord'
+gem 'faraday'
 gem 'ferrum'
-gem 'google_drive'
+gem 'google_drive2'
 gem 'jwt'
-gem 'koala'
 gem 'mechanize'
 gem 'ruby-openai'
 
 # Payments
-gem 'coinbase_commerce'
+gem 'coinbase_commerce', github: 'quiknode-labs/coinbase-commerce-ruby'
 gem 'eu_central_bank'
 gem 'gocardless_pro'
 gem 'money'
-gem 'money-uphold-bank'
+gem 'money-uphold-bank', github: 'stephenreid321/money-uphold-bank'
 gem 'patreon'
 gem 'stripe'
 
@@ -96,4 +97,5 @@ gem 'rack-utf8_sanitizer'
 gem 'bazaar'
 gem 'chroma'
 gem 'crawler_detect'
+gem 'gems', github: 'rubygems/gems'
 gem 'mini_magick'
