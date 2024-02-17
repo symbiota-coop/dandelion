@@ -1,6 +1,7 @@
 source 'https://rubygems.org'
 
 ruby '3.2.3'
+gem 'activesupport', '~> 7.0.8'
 gem 'irb'
 gem 'padrino'
 gem 'puma'
@@ -19,7 +20,7 @@ gem 'activemodel'
 gem 'delayed_job_mongoid'
 gem 'dragonfly'
 gem 'dragonfly-s3_data_store'
-gem 'mongoid', '~> 7.0'
+gem 'mongoid'
 gem 'mongoid_paranoia'
 
 # Authentication

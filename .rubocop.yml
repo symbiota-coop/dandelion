@@ -4,7 +4,9 @@ Layout/EndAlignment:
   AutoCorrect: true
 Style/SymbolArray:
   MinSize: 3
-
+Style/HashSyntax:
+  EnforcedShorthandSyntax: never 
+  
 Metrics:
   Enabled: false
 Style/FrozenStringLiteralComment:

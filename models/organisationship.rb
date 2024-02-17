@@ -137,7 +137,7 @@ class Organisationship
   end
 
   def relevant_local_groups
-    organisation.local_groups.geo_spacial(:polygons.intersects_point => account.coordinates)
+    organisation.local_groups.geo_spatial(:polygons.intersects_point => account.coordinates)
   end
 
   after_create do
@@ -182,7 +182,7 @@ class Organisationship
     batch_message.body_html Premailer.new(ERB.new(File.read(Padrino.root('app/views/layouts/email.erb'))).result(binding), with_html_string: true, adapter: 'nokogiri', input_encoding: 'UTF-8').to_inline_css
 
     [account].each do |account|
-      batch_message.add_recipient(:to, account.email, { 'firstname' => (account.firstname || 'there'), 'token' => account.sign_in_token, 'id' => account.id.to_s })
+      batch_message.add_recipient(:to, account.email, { 'firstname' => account.firstname || 'there', 'token' => account.sign_in_token, 'id' => account.id.to_s })
     end
 
     batch_message.finalize if organisation.mailgun_api_key
@@ -237,7 +237,7 @@ class Organisationship
     batch_message.body_html Premailer.new(ERB.new(File.read(Padrino.root('app/views/layouts/email.erb'))).result(binding), with_html_string: true, adapter: 'nokogiri', input_encoding: 'UTF-8').to_inline_css
 
     [account].each do |account|
-      batch_message.add_recipient(:to, account.email, { 'firstname' => (account.firstname || 'there'), 'token' => account.sign_in_token, 'id' => account.id.to_s, 'username' => account.username })
+      batch_message.add_recipient(:to, account.email, { 'firstname' => account.firstname || 'there', 'token' => account.sign_in_token, 'id' => account.id.to_s, 'username' => account.username })
     end
 
     batch_message.finalize if organisation.mailgun_api_key

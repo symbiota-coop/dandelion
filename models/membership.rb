@@ -52,9 +52,13 @@ class Membership
     notifications.create! circle: circle, type: 'joined_gathering' unless prevent_notifications
     gathering.update_attribute(:membership_count, gathering.memberships.count)
     gathering.members.each do |follower|
+      next if follower.id == account.id
+
       Follow.create follower: follower, followee: account, unsubscribed: true
     end
     gathering.members.each do |followee|
+      next if followee.id == account.id
+
       Follow.create follower: account, followee: followee, unsubscribed: true
     end
     if (general = gathering.teams.find_by(name: 'General'))
@@ -92,7 +96,7 @@ class Membership
     batch_message.body_html Premailer.new(ERB.new(File.read(Padrino.root('app/views/layouts/email.erb'))).result(binding), with_html_string: true, adapter: 'nokogiri', input_encoding: 'UTF-8').to_inline_css
 
     [account].each do |account|
-      batch_message.add_recipient(:to, account.email, { 'firstname' => (account.firstname || 'there'), 'token' => account.sign_in_token, 'id' => account.id.to_s })
+      batch_message.add_recipient(:to, account.email, { 'firstname' => account.firstname || 'there', 'token' => account.sign_in_token, 'id' => account.id.to_s })
     end
 
     batch_message.finalize if ENV['MAILGUN_API_KEY']
