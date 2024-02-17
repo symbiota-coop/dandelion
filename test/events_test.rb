@@ -65,4 +65,20 @@ class CoreTest < ActiveSupport::TestCase
     click_button 'RSVP'
     assert page.has_content? 'Thanks for booking!'
   end
+
+  test 'booking onto a paid event' do
+    @account = FactoryBot.create(:account)
+    @organisation = FactoryBot.create(:organisation, account: @account)
+    @event = FactoryBot.create(:event, organisation: @organisation, account: @account, last_saved_by: @account, ticket_price: (ticket_price = 10))
+    login_as(@account)
+    visit "/e/#{@event.slug}"
+    select 1, from: "quantities[#{@event.ticket_types.first.id}]"
+    click_button "Pay £#{format('%.2f', ticket_price)}"
+    fill_in 'cardNumber', with: '4242 4242 4242 4242'
+    fill_in 'cardCvc', with: '242'
+    fill_in 'cardExpiry', with: '02/42'
+    fill_in 'billingName', with: @account.name
+    click_button 'Pay'
+    assert page.has_content? 'Thanks for booking!'
+  end
 end

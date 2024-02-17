@@ -9,8 +9,8 @@ FactoryBot.define do
   factory :organisation do
     sequence(:name) { |n| "Organisation #{n}" }
     sequence(:slug) { |n| "organisation-#{n}" }
-    sequence(:stripe_pk) { |n| "pk_test_#{n}" }
-    sequence(:stripe_sk) { |n| "sk_test_#{n}" }
+    stripe_pk { ENV['STRIPE_PK'] }
+    stripe_sk { ENV['STRIPE_SK'] }
     account
   end
 
@@ -72,7 +72,7 @@ FactoryBot.define do
 
   factory :ticket_type do
     sequence(:name) { |n| "Ticket Type #{n}" }
-    sequence(:price) { |_n| 0 }
+    price { 0 }
     sequence(:quantity) { |n| n }
     event
   end
@@ -89,9 +89,10 @@ FactoryBot.define do
 
     transient do
       ticket_types_count { 3 }
+      ticket_price { 0 }
     end
     after(:create) do |event, evaluator|
-      create_list(:ticket_type, evaluator.ticket_types_count, event: event)
+      create_list(:ticket_type, evaluator.ticket_types_count, event: event, price: evaluator.ticket_price)
       event.reload
     end
   end

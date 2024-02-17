@@ -36,8 +36,8 @@ Dandelion::App.controller do
         affiliate_type: ticketForm[:affiliate_type],
         affiliate_id: ticketForm[:affiliate_id],
         discount_code_id: ticketForm[:discount_code_id],
-        opt_in_organisation: (detailsForm[:account][:opt_in_organisation] == '1' || (detailsForm[:account][:opt_in_organisation].is_a?(Array) && detailsForm[:account][:opt_in_organisation].include?('1'))),
-        opt_in_facilitator: (detailsForm[:account][:opt_in_facilitator].is_a?(Array) && detailsForm[:account][:opt_in_facilitator].include?('1')),
+        opt_in_organisation: detailsForm[:account][:opt_in_organisation] == '1' || (detailsForm[:account][:opt_in_organisation].is_a?(Array) && detailsForm[:account][:opt_in_organisation].include?('1')),
+        opt_in_facilitator: detailsForm[:account][:opt_in_facilitator].is_a?(Array) && detailsForm[:account][:opt_in_facilitator].include?('1'),
         hear_about: detailsForm[:account][:hear_about],
         http_referrer: detailsForm[:account][:http_referrer],
         answers: (detailsForm[:answers].map { |i, x| [@event.questions_a[i.to_i], x] } if detailsForm[:answers])
@@ -78,8 +78,8 @@ Dandelion::App.controller do
 
           stripe_session_hash = {
             customer_email: @account.email,
-            success_url: URI.encode("#{ENV['BASE_URI']}/e/#{@event.slug}?success=true&order_id=#{@order.id}&utm_source=#{params[:detailsForm][:utm_source]}&utm_medium=#{params[:detailsForm][:utm_medium]}&utm_campaign=#{params[:detailsForm][:utm_campaign]}"),
-            cancel_url: URI.encode("#{ENV['BASE_URI']}/e/#{@event.slug}?cancelled=true"),
+            success_url: URI::DEFAULT_PARSER.escape("#{ENV['BASE_URI']}/e/#{@event.slug}?success=true&order_id=#{@order.id}&utm_source=#{params[:detailsForm][:utm_source]}&utm_medium=#{params[:detailsForm][:utm_medium]}&utm_campaign=#{params[:detailsForm][:utm_campaign]}"),
+            cancel_url: URI::DEFAULT_PARSER.escape("#{ENV['BASE_URI']}/e/#{@event.slug}?cancelled=true"),
             metadata: @order.metadata,
             line_items: [{
               name: @event.name,

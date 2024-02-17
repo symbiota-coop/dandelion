@@ -47,6 +47,8 @@ jobs:
         DOMAIN: dandelion.events
         DEFAULT_CURRENCY: USD
         DEFAULT_TIME_ZONE: London
-        SESSION_SECRET: xxx
+        SESSION_SECRET: 03f9674cbd548377
+        STRIPE_PK: pk_test_hBG6G5aSlQWzUuSesRvMMj3v
+        STRIPE_SK: sk_test_HCthlytw40KUFZ5nWNc0XI6A        
         CI: true
       run: bundle exec rake test
