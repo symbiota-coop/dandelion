@@ -6,7 +6,7 @@ module Delayed
         begin
           raise Delayed::Job::RunError, last_error.split("\n").first
         rescue StandardError => e
-          Airbrake.notify(e, id: YAML.load(handler)['attributes']['_id'].to_s, last_error: last_error.split("\n"))
+          Airbrake.notify(e, last_error: last_error.split("\n"))
         end
       end
     end
