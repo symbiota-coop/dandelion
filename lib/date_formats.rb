@@ -1,11 +1,11 @@
 require 'active_support/core_ext/integer/inflections'
 
 Time::DATE_FORMATS.merge!(
-  default: ->(time) { time.to_fs(:date) + ', ' + time.to_fs(:time) },
+  default: ->(time) { "#{time.to_fs(:date)}, #{time.to_fs(:time)}" },
   db_local: ->(time) { time.strftime('%Y-%m-%d %H:%M:%S') },
   date: ->(time) { time.to_date.to_s },
-  no_year: ->(time) { time.to_date.to_fs(:no_year) + ', ' + time.to_fs(:time) },
-  month_year: ->(time) { time.to_date.to_fs(:month_year) + ', ' + time.to_fs(:time) },
+  no_year: ->(time) { "#{time.to_date.to_fs(:no_year)}, #{time.to_fs(:time)}" },
+  month_year: ->(time) { "#{time.to_date.to_fs(:month_year)}, #{time.to_fs(:time)}" },
   time: ->(time) { time.strftime("#{(t = time.hour % 12) == 0 ? 12 : t}:%M#{time.strftime('%p').downcase}") },
   no_double_zeros: lambda { |time|
                      time.strftime("#{(t = time.hour % 12) == 0 ? 12 : t}#{time.strftime(':%M') unless time.strftime(':%M') == ':00'}#{time.strftime('%p').downcase}")

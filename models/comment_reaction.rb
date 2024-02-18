@@ -23,7 +23,7 @@ class CommentReaction
   before_validation do
     self.post = comment.post if comment
     self.commentable = post.commentable if post
-    self.body = body.split(' ').first if body
+    self.body = body.split.first if body
   end
 
   validates_uniqueness_of :account, scope: :comment

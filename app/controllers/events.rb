@@ -74,7 +74,7 @@ Dandelion::App.controller do
   end
 
   get '/events/new' do
-    sign_in_required!(r: '/accounts/new?list_an_event=1')
+    sign_in_required!(redirect_url: '/accounts/new?list_an_event=1')
     @event = Event.new
     if params[:organisation_id]
       @event.organisation = Organisation.find(params[:organisation_id]) || not_found
@@ -135,19 +135,19 @@ Dandelion::App.controller do
       @event = Event.find(id) || not_found
       redirect request.url.gsub(id, @event.slug) if @event.slug
     end
-    @order = (Order.find(params[:order_id]) || not_found) if params[:order_id]
+    @order = Order.find(params[:order_id]) || not_found if params[:order_id]
     @og_desc = when_details(@event)
     kick! unless @event.organisation
-    kick!(r: "/o/#{@event.organisation.slug}/events") if @event.draft? && !event_admin?
+    kick!(redirect_url: "/o/#{@event.organisation.slug}/events") if @event.draft? && !event_admin?
     @title = @event.name
     @organisation = @event.organisation
     if @order && params[:success]
       @event.check_oc_event if !@order.payment_completed && @event.oc_slug
-      @ga_transaction = { transaction_id: @order.id.to_s, affiliation: @event.organisation.name, value: (@order.value || 0), currency: @order.currency }
+      @ga_transaction = { transaction_id: @order.id.to_s, affiliation: @event.organisation.name, value: @order.value || 0, currency: @order.currency }
       @ga_items = @order.tickets.map do |ticket|
-        { item_id: ticket.id.to_s, item_name: "#{ticket.event.name}: #{ticket.ticket_type.try(:name) || 'Complementary'}", item_price: (ticket.discounted_price || 0), item_quantity: 1 }
+        { item_id: ticket.id.to_s, item_name: "#{ticket.event.name}: #{ticket.ticket_type.try(:name) || 'Complementary'}", item_price: ticket.discounted_price || 0, item_quantity: 1 }
       end
-      @pixel_purchase = { value: (@order.value || 0), currency: @order.currency }
+      @pixel_purchase = { value: @order.value || 0, currency: @order.currency }
     end
     if params[:cohost] && (cohost = Organisation.find_by(slug: params[:cohost])) && (cohostship = @event.cohostships.find_by(organisation: cohost)) && cohostship.image
       @event_image = cohostship.image.thumb('1920x1920')
@@ -516,15 +516,13 @@ Dandelion::App.controller do
       ticket = @account.tickets.create(event: @event, ticket_type: params[:ticket][:ticket_type_id], price: params[:ticket][:price], complementary: true)
       if ticket.persisted?
         ticket.send_ticket
-        redirect "/events/#{@event.id}/tickets"
       else
         flash[:error] = ticket.errors.full_messages.join('; ')
-        redirect "/events/#{@event.id}/tickets"
       end
     else
       flash[:error] = @account.errors.full_messages.join('; ')
-      redirect "/events/#{@event.id}/tickets"
     end
+    redirect "/events/#{@event.id}/tickets"
   end
 
   get '/events/:id/orders/:order_id/payment_completed', provides: :json do

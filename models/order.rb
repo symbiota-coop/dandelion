@@ -110,8 +110,8 @@ class Order
   end
 
   def restore_and_complete
-    tickets.deleted.each { |ticket| ticket.restore }
-    donations.deleted.each { |donation| donation.restore }
+    tickets.deleted.each(&:restore)
+    donations.deleted.each(&:restore)
     restore
     payment_completed!
     update_destination_payment
@@ -344,7 +344,7 @@ class Order
       order.tickets.each_with_index do |ticket, i|
         pdf.start_new_page unless i == 0
         pdf.font "#{Padrino.root}/app/assets/fonts/PlusJakartaSans/ttf/PlusJakartaSans-Regular.ttf"
-        pdf.image (event.organisation.send_ticket_emails_from_organisation && event.organisation.image ? open(Addressable::URI.escape(event.organisation.image.url)) : "#{Padrino.root}/app/assets/images/black-on-transparent-trim.png"), width: width / 4, position: :center
+        pdf.image (event.organisation.send_ticket_emails_from_organisation && event.organisation.image ? URI.parse(Addressable::URI.escape(event.organisation.image.url)).open : "#{Padrino.root}/app/assets/images/black-on-transparent-trim.png"), width: width / 4, position: :center
         pdf.move_down 0.5 * cm
         pdf.text order.event.name, align: :center, size: 32
         pdf.move_down 0.5 * cm
@@ -414,7 +414,7 @@ class Order
     batch_message.add_attachment ics_file, ics_filename
 
     [account].each do |account|
-      batch_message.add_recipient(:to, account.email, { 'firstname' => (account.firstname || 'there'), 'token' => account.sign_in_token, 'id' => account.id.to_s })
+      batch_message.add_recipient(:to, account.email, { 'firstname' => account.firstname || 'there', 'token' => account.sign_in_token, 'id' => account.id.to_s })
     end
 
     if ENV['MAILGUN_API_KEY']
@@ -450,7 +450,7 @@ class Order
     batch_message.body_html Premailer.new(ERB.new(File.read(Padrino.root('app/views/layouts/email.erb'))).result(binding), with_html_string: true, adapter: 'nokogiri', input_encoding: 'UTF-8').to_inline_css
 
     event.event_facilitators.each do |account|
-      batch_message.add_recipient(:to, account.email, { 'firstname' => (account.firstname || 'there'), 'token' => account.sign_in_token, 'id' => account.id.to_s })
+      batch_message.add_recipient(:to, account.email, { 'firstname' => account.firstname || 'there', 'token' => account.sign_in_token, 'id' => account.id.to_s })
     end
 
     batch_message.finalize if ENV['MAILGUN_API_KEY']

@@ -42,12 +42,8 @@ namespace :organisations do
   end
 
   task sync_monthly_donations: :environment do
-    Organisation.and(:gocardless_access_token.ne => nil).each do |organisation|
-      organisation.sync_with_gocardless
-    end
-    Organisation.and(:patreon_api_key.ne => nil).each do |organisation|
-      organisation.sync_with_patreon
-    end
+    Organisation.and(:gocardless_access_token.ne => nil).each(&:sync_with_gocardless)
+    Organisation.and(:patreon_api_key.ne => nil).each(&:sync_with_patreon)
   end
 
   task stripe_transfers: :environment do
@@ -61,18 +57,12 @@ end
 
 namespace :gatherings do
   task clear_up_optionships: :environment do
-    Gathering.and(clear_up_optionships: true).each do |gathering|
-      gathering.clear_up_optionships!
-    end
+    Gathering.and(clear_up_optionships: true).each(&:clear_up_optionships!)
   end
 
   task check_for_payments: :environment do
-    Gathering.and(:seeds_username.ne => nil).each do |gathering|
-      gathering.check_seeds_account
-    end
-    Gathering.and(:evm_address.ne => nil).each do |gathering|
-      gathering.check_evm_account
-    end
+    Gathering.and(:seeds_username.ne => nil).each(&:check_seeds_account)
+    Gathering.and(:evm_address.ne => nil).each(&:check_evm_account)
   end
 end
 
@@ -106,29 +96,21 @@ namespace :events do
   end
 
   task send_feedback_requests: :environment do
-    Event.and(:end_time.gte => Date.yesterday, :end_time.lt => Date.today).each do |event|
-      event.send_feedback_requests
-    end
+    Event.and(:end_time.gte => Date.yesterday, :end_time.lt => Date.today).each(&:send_feedback_requests)
   end
 
   task send_reminders: :environment do
-    Event.live.and(:start_time.gte => Date.tomorrow, :start_time.lt => Date.tomorrow + 1).each do |event|
-      event.send_reminders
-    end
+    Event.live.and(:start_time.gte => Date.tomorrow, :start_time.lt => Date.tomorrow + 1).each(&:send_reminders)
   end
 
   task send_star_reminders: :environment do
-    Event.and(:start_time.gte => Date.tomorrow + 6, :start_time.lt => Date.tomorrow + 7).each do |event|
-      event.send_star_reminders
-    end
+    Event.and(:start_time.gte => Date.tomorrow + 6, :start_time.lt => Date.tomorrow + 7).each(&:send_star_reminders)
   end
 
   task send_payment_reminders: :environment do
     return unless Date.today.day == 1
 
-    TicketType.and(name: /payment plan/i).each do |ticket_type|
-      ticket_type.send_payment_reminder
-    end
+    TicketType.and(name: /payment plan/i).each(&:send_payment_reminder)
   end
 end
 

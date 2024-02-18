@@ -1,5 +1,9 @@
 class Provider
-  @@all = []
+  @all = []
+
+  class << self
+    attr_accessor :all
+  end
 
   attr_accessor :display_name, :omniauth_name, :icon, :nickname, :profile_url, :image
 
@@ -10,11 +14,7 @@ class Provider
     @nickname = options[:nickname] || ->(hash) { hash['info']['nickname'] }
     @profile_url = options[:profile_url] || ->(hash) { "https://#{hash['provider']}.com/#{hash['info']['nickname']}" }
     @image = options[:image] || ->(hash) { hash['info']['image'] }
-    @@all << self
-  end
-
-  def self.all
-    @@all
+    self.class.all << self
   end
 
   def self.object(omniauth_name)

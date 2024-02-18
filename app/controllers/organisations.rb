@@ -42,7 +42,7 @@ Dandelion::App.controller do
   end
 
   get '/o/:slug/activities', provides: %i[html json] do
-    @organisation = (Organisation.find_by(slug: params[:slug]) || Organisation.find(params[:slug]) || not_found)
+    @organisation = Organisation.find_by(slug: params[:slug]) || Organisation.find(params[:slug]) || not_found
     @activities = @organisation.activities.order('name asc')
     @activities = @activities.and(name: /#{Regexp.escape(params[:q])}/i) if params[:q]
     @activities = @activities.and(id: params[:id]) if params[:id]
@@ -62,7 +62,7 @@ Dandelion::App.controller do
   end
 
   get '/o/:slug/local_groups', provides: %i[html json] do
-    @organisation = (Organisation.find_by(slug: params[:slug]) || Organisation.find(params[:slug]) || not_found)
+    @organisation = Organisation.find_by(slug: params[:slug]) || Organisation.find(params[:slug]) || not_found
     @local_groups = @organisation.local_groups.order('name asc')
     @local_groups = @local_groups.and(name: /#{Regexp.escape(params[:q])}/i) if params[:q]
     @local_groups = @local_groups.and(id: params[:id]) if params[:id]
@@ -81,7 +81,7 @@ Dandelion::App.controller do
   end
 
   get '/o/:slug/news' do
-    @organisation = (Organisation.find_by(slug: params[:slug]) || Organisation.find(params[:slug]) || not_found)
+    @organisation = Organisation.find_by(slug: params[:slug]) || Organisation.find(params[:slug]) || not_found
     @pmails = @organisation.news
     if request.xhr?
       partial :'organisations/news'
@@ -91,7 +91,7 @@ Dandelion::App.controller do
   end
 
   get '/o/:slug/news/latest' do
-    @organisation = (Organisation.find_by(slug: params[:slug]) || Organisation.find(params[:slug]) || not_found)
+    @organisation = Organisation.find_by(slug: params[:slug]) || Organisation.find(params[:slug]) || not_found
     @pmails = @organisation.news
     redirect "/pmails/#{@pmails.first.id}"
   end
@@ -562,7 +562,7 @@ Dandelion::App.controller do
   post '/o/:slug/followers' do
     @organisation = Organisation.find_by(slug: params[:slug]) || not_found
     organisation_admins_only!
-    @organisation.import_from_csv(open(params[:csv]).read)
+    @organisation.import_from_csv(File.read(params[:csv]))
     redirect "/o/#{@organisation.slug}/followers"
   end
 

@@ -11,32 +11,32 @@ Dandelion::App.helpers do
     whenable.send(:when_details, current_account ? current_account.time_zone : session[:time_zone], with_zone: with_zone)
   end
 
-  def search(klass, match, query, n = nil)
+  def search(klass, match, query, number = nil)
     if Padrino.env == :development
       klass.or(klass.admin_fields.map { |k, v| { k => /#{Regexp.escape(query)}/i } if v == :text || (v.is_a?(Hash) && v[:type] == :text) }.compact)
     else
       pipeline = [{ '$search': { index: klass.to_s.underscore.pluralize, text: { query: query, path: { wildcard: '*' } } } }, { '$match': match.selector }]
       aggregate = klass.collection.aggregate(pipeline)
-      aggregate = aggregate.first(n) if n
+      aggregate = aggregate.first(number) if number
       aggregate.map do |hash|
         klass.new(hash.select { |k, _v| klass.fields.keys.include?(k.to_s) })
       end
     end
   end
 
-  def search_accounts(q)
+  def search_accounts(query)
     Account.all.or(
-      { name: /#{Regexp.escape(q)}/i },
+      { name: /#{Regexp.escape(query)}/i },
       { name_transliterated: /#{Regexp.escape(q)}/i },
-      { email: /#{Regexp.escape(q)}/i },
-      { username: /#{Regexp.escape(q)}/i }
+      { email: /#{Regexp.escape(query)}/i },
+      { username: /#{Regexp.escape(query)}/i }
     )
   end
 
-  def search_events(q)
+  def search_events(query)
     Event.all.or(
-      { name: /#{Regexp.escape(q)}/i },
-      { description: /#{Regexp.escape(q)}/i }
+      { name: /#{Regexp.escape(query)}/i },
+      { description: /#{Regexp.escape(query)}/i }
     )
   end
 
@@ -112,20 +112,20 @@ Dandelion::App.helpers do
     URI::Parser.new.escape(url) if url
   end
 
-  def random(relation, n)
+  def random(relation, number)
     count = relation.count
-    (0..count - 1).sort_by { rand }.slice(0, n).collect! { |i| relation.skip(i).first }
+    (0..count - 1).sort_by { rand }.slice(0, number).collect! { |i| relation.skip(i).first }
   end
 
-  def timeago(x)
-    %(<abbr class="timeago" title="#{x.iso8601}">#{x}</abbr>).html_safe
+  def timeago(time)
+    %(<abbr class="timeago" title="#{time.iso8601}">#{time}</abbr>).html_safe
   end
 
   def checkbox(name, slug: nil, checked: false)
     slug ||= name.force_encoding('utf-8').parameterize.underscore
     %(<div class="form-group">
          <div class="checkbox-inline">
-            #{check_box_tag :"#{slug}", checked: (checked || params[:"#{slug}"]), id: "#{slug}_checkbox"}
+            #{check_box_tag :"#{slug}", checked: checked || params[:"#{slug}"], id: "#{slug}_checkbox"}
             <label for="#{slug}_checkbox">#{name}</label>
           </div>
       </div>).html_safe
@@ -141,8 +141,8 @@ Dandelion::App.helpers do
     JWT.encode(payload, ENV['NOLT_SSO_SECRET'], 'HS256')
   end
 
-  def parse_date(d)
-    Date.parse(d)
+  def parse_date(date)
+    Date.parse(date)
   rescue Date::Error
     nil
   end

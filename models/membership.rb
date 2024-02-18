@@ -55,8 +55,6 @@ class Membership
       next if follower.id == account.id
 
       Follow.create follower: follower, followee: account, unsubscribed: true
-    end
-    gathering.members.each do |followee|
       next if followee.id == account.id
 
       Follow.create follower: account, followee: followee, unsubscribed: true
@@ -71,7 +69,7 @@ class Membership
   end
 
   def proposed_by
-    mapplication ? mapplication.verdicts.proposers.map { |verdict| verdict.account } : ([added_by] if added_by)
+    mapplication ? mapplication.verdicts.proposers.map(&:account) : ([added_by] if added_by)
   end
 
   after_create :send_email

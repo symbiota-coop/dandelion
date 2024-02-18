@@ -1,24 +1,24 @@
 Dandelion::App.helpers do
-  def viewable?(account, p, viewer: current_account, viewer_in_network: nil)
+  def viewable?(account, privacyable, viewer: current_account, viewer_in_network: nil)
     (
-      account.respond_to?(p) &&
-      account.send(p)) &&
+      account.respond_to?(privacyable) &&
+      account.send(privacyable)) &&
       (
         (viewer && viewer.admin?) ||
-        account.send("#{p}_privacy").nil? ||
-        (account.send("#{p}_privacy") == 'Public') ||
-        (account.send("#{p}_privacy") == 'People I follow' && (viewer_in_network || (viewer && (viewer.id == account.id || account.network.find(viewer.id))))) ||
-        (account.send("#{p}_privacy") == 'Only me' && (viewer && viewer.id == account.id))
+        account.send("#{privacyable}_privacy").nil? ||
+        (account.send("#{privacyable}_privacy") == 'Public') ||
+        (account.send("#{privacyable}_privacy") == 'People I follow' && (viewer_in_network || (viewer && (viewer.id == account.id || account.network.find(viewer.id))))) ||
+        (account.send("#{privacyable}_privacy") == 'Only me' && (viewer && viewer.id == account.id))
       )
   end
 
-  def kick!(notice: "You don't have access to that page", r: nil, notice_type: :error)
+  def kick!(notice: "You don't have access to that page", redirect_url: nil, notice_type: :error)
     if request.xhr?
       halt 403
     else
       flash[notice_type] = notice
       session[:return_to] = request.url
-      redirect((r || (current_account ? '/' : '/accounts/sign_in')))
+      redirect((redirect_url || (current_account ? '/' : '/accounts/sign_in')))
     end
   end
 
@@ -40,7 +40,7 @@ Dandelion::App.helpers do
   end
 
   def organisation_admins_only!
-    kick!(r: "/o/#{@organisation.slug}") unless organisation_admin?
+    kick!(redirect_url: "/o/#{@organisation.slug}") unless organisation_admin?
   end
 
   def activity_admin?(activity = nil, account = current_account)
@@ -49,7 +49,7 @@ Dandelion::App.helpers do
   end
 
   def activity_admins_only!
-    kick!(r: "/activities/#{@activity.id}") unless activity_admin?
+    kick!(redirect_url: "/activities/#{@activity.id}") unless activity_admin?
   end
 
   def local_group_admin?(local_group = nil, account = current_account)
@@ -58,7 +58,7 @@ Dandelion::App.helpers do
   end
 
   def local_group_admins_only!
-    kick!(r: "/local_groups/#{@local_group.id}") unless local_group_admin?
+    kick!(redirect_url: "/local_groups/#{@local_group.id}") unless local_group_admin?
   end
 
   def organisation_assistant?(organisation = nil, account = current_account)
@@ -85,7 +85,7 @@ Dandelion::App.helpers do
   end
 
   def event_admins_only!
-    kick!(r: "/e/#{@event.slug}") unless event_admin?
+    kick!(redirect_url: "/e/#{@event.slug}") unless event_admin?
   end
 
   def event_email_viewer?(event = nil, account = current_account)
@@ -139,7 +139,7 @@ Dandelion::App.helpers do
   end
 
   def gathering_admins_only!
-    kick!(r: "/g/#{@gathering.slug}") unless gathering_admin?
+    kick!(redirect_url: "/g/#{@gathering.slug}") unless gathering_admin?
   end
 
   def comment_admin?(comment = nil, account = current_account)
@@ -151,8 +151,8 @@ Dandelion::App.helpers do
     kick! unless comment_admin?
   end
 
-  def sign_in_required!(notice: 'Please sign up or sign in to continue', r: '/accounts/new', notice_type: :notice)
-    kick!(notice: notice, r: r, notice_type: notice_type) unless current_account
+  def sign_in_required!(notice: 'Please sign up or sign in to continue', redirect_url: '/accounts/new', notice_type: :notice)
+    kick!(notice: notice, redirect_url: redirect_url, notice_type: notice_type) unless current_account
   end
 
   def membership_required!(gathering = nil, account = current_account)
@@ -161,7 +161,7 @@ Dandelion::App.helpers do
 
     kick!(
       notice: 'You must be a member of that gathering to access that page',
-      r: ("/g/#{gathering.slug}" if %w[open closed].include?(gathering.privacy))
+      redirect_url: ("/g/#{gathering.slug}" if %w[open closed].include?(gathering.privacy))
     )
   end
 

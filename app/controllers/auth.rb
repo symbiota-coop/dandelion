@@ -30,11 +30,7 @@ Dandelion::App.controller do
         account.sign_ins.create(env: env_yaml)
         session[:account_id] = account.id.to_s
         flash[:notice] = 'Signed in!'
-        if session[:return_to]
-          redirect session[:return_to]
-        else
-          redirect '/'
-        end
+        redirect session[:return_to] || '/'
       else
         flash.now[:notice] = "<i class=\"#{@provider.icon}\"></i> There's no account connected to that address. Let's create one for you!"
         session['omniauth.auth'] = env['omniauth.auth']

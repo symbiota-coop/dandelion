@@ -37,13 +37,14 @@ class Photo
   end
 
   def url
-    if photoable.is_a?(Gathering)
+    case photoable
+    when Gathering
       gathering = photoable
       "#{ENV['BASE_URI']}/g/#{gathering.slug}#photo-#{id}"
-    elsif photoable.is_a?(Comment)
+    when Comment
       comment = photoable
       comment.post.url
-    elsif photoable.is_a?(TicketType)
+    when TicketType
       ticket_type = photoable
       "#{ENV['BASE_URI']}/events/#{ticket_type.event_id}/ticket_types"
     end

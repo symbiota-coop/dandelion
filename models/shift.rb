@@ -57,6 +57,5 @@ class Shift
     {
       rslot_id: 'Slot'
     }[attr.to_sym] || super
-  end  
-
+  end
 end

@@ -32,40 +32,41 @@ class Post
   end
 
   def url
-    if commentable.is_a?(DocPage)
+    case commentable
+    when DocPage
       doc_page = commentable
       "#{ENV['BASE_URI']}/docs/#{doc_page.slug}#post-#{id}"
-    elsif commentable.is_a?(Team)
+    when Team
       team = commentable
       "#{ENV['BASE_URI']}/g/#{team.gathering.slug}/teams/#{team.id}#post-#{id}"
-    elsif commentable.is_a?(Gathering)
+    when Gathering
       gathering = commentable
       "#{ENV['BASE_URI']}/g/#{gathering.slug}"
-    elsif commentable.is_a?(Tactivity)
+    when Tactivity
       tactivity = commentable
       "#{ENV['BASE_URI']}/g/#{tactivity.gathering.slug}/tactivities/#{tactivity.id}#post-#{id}"
-    elsif commentable.is_a?(Mapplication)
+    when Mapplication
       mapplication = commentable
       "#{ENV['BASE_URI']}/g/#{mapplication.gathering.slug}/mapplications/#{mapplication.id}#post-#{id}"
-    elsif commentable.is_a?(Account)
+    when Account
       account = commentable
       "#{ENV['BASE_URI']}/u/#{account.username}#post-#{id}"
-    elsif commentable.is_a?(Place)
+    when Place
       place = commentable
       "#{ENV['BASE_URI']}/places/#{place.id}"
-    elsif commentable.is_a?(Organisation)
+    when Organisation
       organisation = commentable
       "#{ENV['BASE_URI']}/o/#{organisation.slug}/members"
-    elsif commentable.is_a?(Activity)
+    when Activity
       activity = commentable
       "#{ENV['BASE_URI']}/activities/#{activity.id}"
-    elsif commentable.is_a?(LocalGroup)
+    when LocalGroup
       local_group = commentable
       "#{ENV['BASE_URI']}/local_groups/#{local_group.id}"
-    elsif commentable.is_a?(Event)
+    when Event
       event = commentable
       "#{ENV['BASE_URI']}/events/#{event.id}"
-    elsif commentable.is_a?(ActivityApplication)
+    when ActivityApplication
       activity_application = commentable
       "#{ENV['BASE_URI']}/activities/#{activity_application.activity_id}/activity_applications/#{activity_application.id}"
     end

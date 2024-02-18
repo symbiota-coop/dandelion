@@ -24,17 +24,18 @@ class Notification
   end
 
   def circle_url
-    if circle.is_a?(Gathering)
+    case circle
+    when Gathering
       "#{ENV['BASE_URI']}/g/#{circle.slug}"
-    elsif circle.is_a?(Account)
+    when Account
       "#{ENV['BASE_URI']}/accounts/#{circle.id}"
-    elsif circle.is_a?(Activity)
+    when Activity
       "#{ENV['BASE_URI']}/activities/#{circle.id}"
-    elsif circle.is_a?(LocalGroup)
+    when LocalGroup
       "#{ENV['BASE_URI']}/local_groups/#{circle.id}"
-    elsif circle.is_a?(Place)
+    when Place
       "#{ENV['BASE_URI']}/places/#{circle.id}"
-    elsif circle.is_a?(Organisation)
+    when Organisation
       "#{ENV['BASE_URI']}/o/#{circle.slug}"
     end
   end
@@ -68,7 +69,7 @@ class Notification
     batch_message.body_html Premailer.new(ERB.new(File.read(Padrino.root('app/views/layouts/email.erb'))).result(binding), with_html_string: true, adapter: 'nokogiri', input_encoding: 'UTF-8').to_inline_css
 
     circle.discussers.each do |account|
-      batch_message.add_recipient(:to, account.email, { 'firstname' => (account.firstname || 'there'), 'token' => account.sign_in_token, 'id' => account.id.to_s })
+      batch_message.add_recipient(:to, account.email, { 'firstname' => account.firstname || 'there', 'token' => account.sign_in_token, 'id' => account.id.to_s })
     end
 
     batch_message.finalize if ENV['MAILGUN_API_KEY']

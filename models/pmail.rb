@@ -261,7 +261,7 @@ class Pmail
       if mailable.is_a?(Event)
         mailable.tickets.complete.and(:email.ne => nil).each do |ticket|
           batch_message.add_recipient(:to, ticket.email, {
-                                        'firstname' => (ticket.firstname || 'there'),
+                                        'firstname' => ticket.firstname || 'there',
                                         'footer_class' => 'd-none'
                                       })
         end
@@ -272,7 +272,7 @@ class Pmail
       next if check_already_sent && recipients.include?(account.email)
 
       batch_message.add_recipient(:to, account.email, {
-                                    'firstname' => (account.firstname || 'there'),
+                                    'firstname' => account.firstname || 'there',
                                     'token' => account.sign_in_token,
                                     'id' => account.id.to_s,
                                     'username' => account.username,

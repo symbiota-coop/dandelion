@@ -139,7 +139,7 @@ class Event
   end
 
   def questions_a
-    q = (questions || '').split("\n").map(&:strip).reject { |l| l.blank? }
+    q = (questions || '').split("\n").map(&:strip).reject(&:blank?)
     q.empty? ? [] : q
   end
 
@@ -258,7 +258,12 @@ class Event
     self.minimum_donation = nil unless suggested_donation
     self.minimum_donation = minimum_donation.round(2) if minimum_donation
 
-    self.slug = ([*('a'..'z')].sample + [*('0'..'9')].sample + [*('a'..'z'), *('0'..'9')].sample(3).join) until slug && !Event.find_by(slug: slug) unless slug
+    unless slug
+      loop do
+        self.slug = ([*('a'..'z')].sample + [*('0'..'9')].sample + [*('a'..'z'), *('0'..'9')].sample(3).join)
+        break if Event.find_by(slug: slug).nil?
+      end
+    end
 
     if new_record? && !duplicate
       errors.add(:organisation, '- you are not an admin of this organisation') if !local_group && !activity && !Organisation.admin?(organisation, account)
@@ -511,7 +516,7 @@ class Event
       local_group: local_group,
       coordinator: coordinator,
       revenue_sharer: revenue_sharer,
-      organiser: ((organiser || account) unless revenue_sharer),
+      organiser: (organiser || account unless revenue_sharer),
       tag_names: event_tags.pluck(:name).join(','),
       add_a_donation_to: add_a_donation_to,
       donation_text: donation_text,
@@ -642,7 +647,7 @@ class Event
     batch_message.body_html Premailer.new(ERB.new(File.read(Padrino.root('app/views/layouts/email.erb'))).result(binding), with_html_string: true, adapter: 'nokogiri', input_encoding: 'UTF-8').to_inline_css
 
     accounts_receiving_feedback.each do |account|
-      batch_message.add_recipient(:to, account.email, { 'firstname' => (account.firstname || 'there'), 'token' => account.sign_in_token, 'id' => account.id.to_s })
+      batch_message.add_recipient(:to, account.email, { 'firstname' => account.firstname || 'there', 'token' => account.sign_in_token, 'id' => account.id.to_s })
     end
 
     batch_message.finalize if ENV['MAILGUN_API_KEY']
@@ -663,7 +668,7 @@ class Event
     batch_message.body_html Premailer.new(ERB.new(File.read(Padrino.root('app/views/layouts/email.erb'))).result(binding), with_html_string: true, adapter: 'nokogiri', input_encoding: 'UTF-8').to_inline_css
 
     (account_id ? attendees.and(:unsubscribed.ne => true).and(:unsubscribed_reminders.ne => true).and(id: account_id) : attendees.and(:unsubscribed.ne => true).and(:unsubscribed_reminders.ne => true)).each do |account|
-      batch_message.add_recipient(:to, account.email, { 'firstname' => (account.firstname || 'there'), 'token' => account.sign_in_token, 'id' => account.id.to_s })
+      batch_message.add_recipient(:to, account.email, { 'firstname' => account.firstname || 'there', 'token' => account.sign_in_token, 'id' => account.id.to_s })
     end
 
     batch_message.finalize if ENV['MAILGUN_API_KEY']
@@ -684,7 +689,7 @@ class Event
     batch_message.body_html Premailer.new(ERB.new(File.read(Padrino.root('app/views/layouts/email.erb'))).result(binding), with_html_string: true, adapter: 'nokogiri', input_encoding: 'UTF-8').to_inline_css
 
     (account_id ? starrers.and(:unsubscribed.ne => true).and(:unsubscribed_reminders.ne => true).and(id: account_id) : starrers.and(:unsubscribed.ne => true).and(:unsubscribed_reminders.ne => true)).each do |account|
-      batch_message.add_recipient(:to, account.email, { 'firstname' => (account.firstname || 'there'), 'token' => account.sign_in_token, 'id' => account.id.to_s })
+      batch_message.add_recipient(:to, account.email, { 'firstname' => account.firstname || 'there', 'token' => account.sign_in_token, 'id' => account.id.to_s })
     end
 
     batch_message.finalize if ENV['MAILGUN_API_KEY']
@@ -706,7 +711,7 @@ class Event
     batch_message.body_html Premailer.new(ERB.new(File.read(Padrino.root('app/views/layouts/email.erb'))).result(binding), with_html_string: true, adapter: 'nokogiri', input_encoding: 'UTF-8').to_inline_css
 
     (account_id ? attendees.and(:unsubscribed.ne => true).and(:unsubscribed_feedback.ne => true).and(id: account_id) : attendees.and(:unsubscribed.ne => true).and(:unsubscribed_feedback.ne => true)).each do |account|
-      batch_message.add_recipient(:to, account.email, { 'firstname' => (account.firstname || 'there'), 'token' => account.sign_in_token, 'id' => account.id.to_s })
+      batch_message.add_recipient(:to, account.email, { 'firstname' => account.firstname || 'there', 'token' => account.sign_in_token, 'id' => account.id.to_s })
     end
 
     batch_message.finalize if ENV['MAILGUN_API_KEY']

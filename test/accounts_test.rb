@@ -1,4 +1,4 @@
-require File.expand_path(File.dirname(__FILE__) + '/test_config.rb')
+require File.expand_path("#{File.dirname(__FILE__)}/test_config.rb")
 
 class CoreTest < ActiveSupport::TestCase
   include Capybara::DSL

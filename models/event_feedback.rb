@@ -45,16 +45,16 @@ class EventFeedback
 
   def self.average_rating
     ratings = self.and(:deleted_at => nil, :rating.ne => nil).pluck(:rating)
-    return unless ratings.length > 0
+    return if ratings.empty?
 
     ratings = ratings.map(&:to_i)
     (ratings.inject(:+).to_f / ratings.length).round(1)
   end
 
   def self.ratings
-    1.upto(5).map do |i|
+    1.upto(5).to_h do |i|
       [i.times.map { '<i class="fa fa-star"></i>' }.join, i]
-    end.to_h
+    end
   end
 
   after_create :send_feedback
@@ -72,7 +72,7 @@ class EventFeedback
     batch_message.body_html Premailer.new(ERB.new(File.read(Padrino.root('app/views/layouts/email.erb'))).result(binding), with_html_string: true, adapter: 'nokogiri', input_encoding: 'UTF-8').to_inline_css
 
     event.accounts_receiving_feedback.each do |account|
-      batch_message.add_recipient(:to, account.email, { 'firstname' => (account.firstname || 'there'), 'token' => account.sign_in_token, 'id' => account.id.to_s })
+      batch_message.add_recipient(:to, account.email, { 'firstname' => account.firstname || 'there', 'token' => account.sign_in_token, 'id' => account.id.to_s })
     end
 
     batch_message.finalize if ENV['MAILGUN_API_KEY']
@@ -94,7 +94,7 @@ class EventFeedback
     batch_message.body_html Premailer.new(ERB.new(File.read(Padrino.root('app/views/layouts/email.erb'))).result(binding), with_html_string: true, adapter: 'nokogiri', input_encoding: 'UTF-8').to_inline_css
 
     [account].each do |account|
-      batch_message.add_recipient(:to, account.email, { 'firstname' => (account.firstname || 'there'), 'token' => account.sign_in_token, 'id' => account.id.to_s })
+      batch_message.add_recipient(:to, account.email, { 'firstname' => account.firstname || 'there', 'token' => account.sign_in_token, 'id' => account.id.to_s })
     end
 
     batch_message.finalize if ENV['MAILGUN_API_KEY']
@@ -113,7 +113,7 @@ class EventFeedback
     batch_message.body_html Premailer.new(ERB.new(File.read(Padrino.root('app/views/layouts/email.erb'))).result(binding), with_html_string: true, adapter: 'nokogiri', input_encoding: 'UTF-8').to_inline_css
 
     event.accounts_receiving_feedback.each do |account|
-      batch_message.add_recipient(:to, account.email, { 'firstname' => (account.firstname || 'there'), 'token' => account.sign_in_token, 'id' => account.id.to_s })
+      batch_message.add_recipient(:to, account.email, { 'firstname' => account.firstname || 'there', 'token' => account.sign_in_token, 'id' => account.id.to_s })
     end
 
     batch_message.finalize if ENV['MAILGUN_API_KEY']

@@ -467,11 +467,7 @@ class Organisation
     CSV.parse(csv, headers: true, header_converters: [:downcase, :symbol]).each do |row|
       email = row[:email]
       account_hash = { name: row[:name], email: row[:email], password: Account.generate_password }
-      account = if (account = Account.find_by(email: email.downcase))
-                  account
-                else
-                  Account.new(account_hash)
-                end
+      account = Account.new(account_hash) unless (account = Account.find_by(email: email.downcase))
       begin
         if account.persisted?
           account.update_attributes!(account_hash.map do |k, v|
@@ -767,7 +763,7 @@ class Organisation
       page = begin; agent.get(url); rescue Mechanize::ResponseCodeError; end
       next unless page
 
-      page.search('table tr')[1..-1].each do |tr|
+      page.search('table tr')[1..].each do |tr|
         to_cell = tr.search('td')[6]
         next unless to_cell
 
@@ -875,7 +871,7 @@ class Organisation
     batch_message.add_attachment(file.path, 'followers.csv')
 
     [account].each do |account|
-      batch_message.add_recipient(:to, account.email, { 'firstname' => (account.firstname || 'there'), 'token' => account.sign_in_token, 'id' => account.id.to_s })
+      batch_message.add_recipient(:to, account.email, { 'firstname' => account.firstname || 'there', 'token' => account.sign_in_token, 'id' => account.id.to_s })
     end
 
     batch_message.finalize if ENV['MAILGUN_API_KEY']
@@ -1035,7 +1031,7 @@ class Organisation
         row[f.to_sym] = "#{row[f.to_sym]} +0000"
       end
       %w[gross fee net].each do |f|
-        row["#{f}_gbp".to_sym] = Money.new(row[f.to_sym].to_f * 100, row[:currency]).exchange_to('GBP').cents.to_f / 100.to_f
+        row[:"#{f}_gbp"] = Money.new(row[f.to_sym].to_f * 100, row[:currency]).exchange_to('GBP').cents.to_f / 100
       end
       rows << row
     end

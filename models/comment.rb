@@ -52,7 +52,7 @@ class Comment
 
     b = body
     b = b.gsub("\n", '<br />')
-    b.gsub(/\[@([\w\s'-.]+)\]\(@(\w+)\)/, '<a href="' + ENV['BASE_URI'] + '/u/\2">\1</a>')
+    b.gsub(/\[@([\w\s'-.]+)\]\(@(\w+)\)/, "<a href=\"#{ENV['BASE_URI']}/u/\\2\">\\1</a>")
   end
 
   has_many :notifications, as: :notifiable, dependent: :destroy
@@ -185,17 +185,18 @@ class Comment
     elsif commentable.respond_to?(:gathering)
       s << '['
       s << commentable.gathering.name
-      if commentable.is_a?(Team)
+      case commentable
+      when Team
         team = commentable
         s << '/'
         s << team.name
-      elsif commentable.is_a?(Tactivity)
+      when Tactivity
         tactivity = commentable
         s << '/'
         s << tactivity.timetable.name
         s << '/'
         s << tactivity.name
-      elsif commentable.is_a?(Mapplication)
+      when Mapplication
         mapplication = commentable
         s << '/'
         s << "#{mapplication.account.name}'s application"
@@ -227,7 +228,7 @@ class Comment
     accounts = accounts.and(:unsubscribed.ne => true) unless force
     accounts = accounts.and(:id.in => post.subscriptions.pluck(:account_id))
     accounts.each do |account|
-      batch_message.add_recipient(:to, account.email, { 'firstname' => (account.firstname || 'there'), 'token' => account.sign_in_token, 'id' => account.id.to_s })
+      batch_message.add_recipient(:to, account.email, { 'firstname' => account.firstname || 'there', 'token' => account.sign_in_token, 'id' => account.id.to_s })
     end
 
     batch_message.finalize if ENV['MAILGUN_API_KEY']

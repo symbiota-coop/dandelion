@@ -46,7 +46,7 @@ class Ticket
   def firstname
     return if name.blank?
 
-    parts = name.split(' ')
+    parts = name.split
     n = if parts.count > 1 && %w[mr mrs ms dr].include?(parts[0].downcase.gsub('.', ''))
           parts[1]
         else
@@ -136,7 +136,7 @@ class Ticket
             !account ||
             !(organisationship = event.organisation.organisationships.find_by(account: account)) ||
             !organisationship.monthly_donation_amount ||
-            !(Money.new(organisationship.monthly_donation_amount * 100, organisationship.monthly_donation_currency) >= Money.new(ticket_type.minimum_monthly_donation * 100, event.currency))
+            Money.new(organisationship.monthly_donation_amount * 100, organisationship.monthly_donation_currency) < Money.new(ticket_type.minimum_monthly_donation * 100, event.currency)
           )
           errors.add(:ticket_type, 'is not available to someone donating this amount')
         end
@@ -207,7 +207,7 @@ class Ticket
     batch_message.add_attachment ics_file, ics_filename
 
     [account].each do |account|
-      batch_message.add_recipient(:to, account.email, { 'firstname' => (account.firstname || 'there'), 'token' => account.sign_in_token, 'id' => account.id.to_s })
+      batch_message.add_recipient(:to, account.email, { 'firstname' => account.firstname || 'there', 'token' => account.sign_in_token, 'id' => account.id.to_s })
     end
 
     batch_message.finalize if ENV['MAILGUN_API_KEY']

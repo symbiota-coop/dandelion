@@ -267,7 +267,7 @@ class Account
 
     [account].each do |account|
       batch_message.add_recipient(:to, account.email, {
-                                    'firstname' => (account.firstname || 'there'),
+                                    'firstname' => account.firstname || 'there',
                                     'token' => account.sign_in_token,
                                     'id' => account.id.to_s,
                                     'confirm_or_activate' => (account.sign_ins_count.zero? ? "If you'd like to activate your account, click the link below:" : 'Click here to confirm your email address:')
@@ -288,7 +288,7 @@ class Account
     batch_message.body_html Premailer.new(ERB.new(File.read(Padrino.root('app/views/layouts/email.erb'))).result(binding), with_html_string: true, adapter: 'nokogiri', input_encoding: 'UTF-8').to_inline_css
 
     [account].each do |account|
-      batch_message.add_recipient(:to, account.email, { 'firstname' => (account.firstname || 'there'), 'token' => account.sign_in_token, 'id' => account.id.to_s })
+      batch_message.add_recipient(:to, account.email, { 'firstname' => account.firstname || 'there', 'token' => account.sign_in_token, 'id' => account.id.to_s })
     end
 
     batch_message.finalize if ENV['MAILGUN_API_KEY']
@@ -694,7 +694,7 @@ Two Spirit).split("\n")
   def firstname
     return if name.blank?
 
-    parts = name.split(' ')
+    parts = name.split
     n = if parts.count > 1 && %w[mr mrs ms dr].include?(parts[0].downcase.gsub('.', ''))
           parts[1]
         else
@@ -706,14 +706,14 @@ Two Spirit).split("\n")
   def lastname
     return unless name
 
-    nameparts = name.split(' ')
-    nameparts[1..-1].join(' ') if nameparts.length > 1
+    nameparts = name.split
+    nameparts[1..].join(' ') if nameparts.length > 1
   end
 
   def abbrname
     return unless firstname
 
-    firstname.capitalize + (lastname ? (' ' + lastname[0].upcase + '.') : '')
+    firstname.capitalize + (lastname ? " #{lastname[0].upcase}." : '')
   end
 
   def uid
@@ -729,7 +729,7 @@ Two Spirit).split("\n")
 
     if account.failed_sign_in_attempts && account.failed_sign_in_attempts >= 5
       nil
-    elsif account.has_password?(password)
+    elsif account.password_matches?(password)
       account.update_attribute(:failed_sign_in_attempts, 0)
       account
     else
@@ -740,7 +740,7 @@ Two Spirit).split("\n")
 
   before_save :encrypt_password, if: :password_required
 
-  def has_password?(password)
+  def password_matches?(password)
     ::BCrypt::Password.new(crypted_password) == password
   end
 
@@ -760,19 +760,19 @@ Two Spirit).split("\n")
     batch_message.body_html Premailer.new(ERB.new(File.read(Padrino.root('app/views/layouts/email.erb'))).result(binding), with_html_string: true, adapter: 'nokogiri', input_encoding: 'UTF-8').to_inline_css
 
     [account].each do |account|
-      batch_message.add_recipient(:to, account.email, { 'firstname' => (account.firstname || 'there'), 'token' => account.sign_in_token, 'id' => account.id.to_s })
+      batch_message.add_recipient(:to, account.email, { 'firstname' => account.firstname || 'there', 'token' => account.sign_in_token, 'id' => account.id.to_s })
     end
 
     batch_message.finalize if ENV['MAILGUN_API_KEY']
   end
 
-  def send_substack_invite(n = 3)
+  def send_substack_invite(number = 3)
     mg_client = Mailgun::Client.new ENV['MAILGUN_API_KEY'], ENV['MAILGUN_REGION']
     batch_message = Mailgun::BatchMessage.new(mg_client, ENV['MAILGUN_NOTIFICATIONS_HOST'])
 
     account = self
     events = Event.past.and(:id.in => account.orders.and(:created_at.gt => 1.year.ago).pluck(:event_id)).order('start_time desc').limit(3)
-    return unless events.count >= n
+    return unless events.count >= number
 
     content = ERB.new(File.read(Padrino.root('app/views/emails/substack_invite.erb'))).result(binding)
     batch_message.from 'Dandelion <stephen@dandelion.coop>'
@@ -780,7 +780,7 @@ Two Spirit).split("\n")
     batch_message.body_html Premailer.new(ERB.new(File.read(Padrino.root('app/views/layouts/email.erb'))).result(binding), with_html_string: true, adapter: 'nokogiri', input_encoding: 'UTF-8').to_inline_css
 
     [account].each do |account|
-      batch_message.add_recipient(:to, account.email, { 'firstname' => (account.firstname || 'there'), 'token' => account.sign_in_token, 'id' => account.id.to_s })
+      batch_message.add_recipient(:to, account.email, { 'firstname' => account.firstname || 'there', 'token' => account.sign_in_token, 'id' => account.id.to_s })
     end
 
     batch_message.finalize if ENV['MAILGUN_API_KEY']
@@ -823,7 +823,7 @@ Two Spirit).split("\n")
     batch_message.body_text "Account: #{ENV['BASE_URI']}/u/#{account.username}"
 
     Account.and(admin: true).each do |account|
-      batch_message.add_recipient(:to, account.email, { 'firstname' => (account.firstname || 'there'), 'token' => account.sign_in_token, 'id' => account.id.to_s })
+      batch_message.add_recipient(:to, account.email, { 'firstname' => account.firstname || 'there', 'token' => account.sign_in_token, 'id' => account.id.to_s })
     end
 
     batch_message.finalize if ENV['MAILGUN_API_KEY']
@@ -839,7 +839,7 @@ Two Spirit).split("\n")
     batch_message.body_text "Account: #{ENV['BASE_URI']}/u/#{account.username}"
 
     Account.and(admin: true).each do |account|
-      batch_message.add_recipient(:to, account.email, { 'firstname' => (account.firstname || 'there'), 'token' => account.sign_in_token, 'id' => account.id.to_s })
+      batch_message.add_recipient(:to, account.email, { 'firstname' => account.firstname || 'there', 'token' => account.sign_in_token, 'id' => account.id.to_s })
     end
 
     batch_message.finalize if ENV['MAILGUN_API_KEY']

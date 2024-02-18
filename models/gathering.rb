@@ -92,9 +92,9 @@ class Gathering
       rotas: :collection,
       teams: :collection
     }
-    h.merge(enablable.map do |x|
-              ["enable_#{x}".to_sym, :check_box]
-            end.to_h)
+    h.merge(enablable.to_h do |x|
+              [:"enable_#{x}", :check_box]
+            end)
   end
 
   def self.spring_clean
@@ -238,12 +238,12 @@ class Gathering
   has_many :comment_reactions, as: :commentable, dependent: :destroy
 
   def application_questions_a
-    q = (application_questions || '').split("\n").map(&:strip).reject { |l| l.blank? }
+    q = (application_questions || '').split("\n").map(&:strip).reject(&:blank?)
     q.empty? ? [] : q
   end
 
   def joining_questions_a
-    q = (joining_questions || '').split("\n").map(&:strip).reject { |l| l.blank? }
+    q = (joining_questions || '').split("\n").map(&:strip).reject(&:blank?)
     q.empty? ? [] : q
   end
 
@@ -424,7 +424,7 @@ class Gathering
 
   def median_threshold
     array = memberships.pluck(:desired_threshold).compact
-    return unless array.length > 0
+    return if array.empty?
 
     sorted = array.sort
     len = sorted.length

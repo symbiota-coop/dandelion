@@ -189,7 +189,7 @@ Dandelion::App.controller do
   post '/local_groups/:id/followers' do
     @local_group = LocalGroup.find(params[:id]) || not_found
     local_group_admins_only!
-    @local_group.import_from_csv(open(params[:csv]).read)
+    @local_group.import_from_csv(File.read(params[:csv]))
     redirect "/local_groups/#{@local_group.id}/followers"
   end
 

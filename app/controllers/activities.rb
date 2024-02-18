@@ -196,7 +196,7 @@ Dandelion::App.controller do
   post '/activities/:id/followers' do
     @activity = Activity.find(params[:id]) || not_found
     activity_admins_only!
-    @activity.import_from_csv(open(params[:csv]).read)
+    @activity.import_from_csv(File.read(params[:csv]))
     redirect "/activities/#{@activity.id}/followers"
   end
 

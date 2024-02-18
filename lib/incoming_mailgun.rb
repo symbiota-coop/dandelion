@@ -16,7 +16,7 @@ class EmailReceiver < Incoming::Strategies::Mailgun
     end
     html = begin; body.decoded.force_encoding(charset).encode('UTF-8'); rescue StandardError; body.to_s; end
     html = html.gsub("\n", "<br>\n") if nl2br
-    html = html.gsub(/<o:p>/, '')
+    html = html.gsub('<o:p>', '')
     html = html.gsub(%r{</o:p>}, '')
     begin
       html = Premailer.new(html, with_html_string: true, adapter: 'nokogiri', input_encoding: 'UTF-8').to_inline_css

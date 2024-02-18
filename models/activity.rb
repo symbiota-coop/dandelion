@@ -115,7 +115,7 @@ class Activity
   end
 
   def application_questions_a
-    q = (application_questions || '').split("\n").map(&:strip).reject { |l| l.blank? }
+    q = (application_questions || '').split("\n").map(&:strip).reject(&:blank?)
     q.empty? ? [] : q
   end
 
@@ -132,11 +132,7 @@ class Activity
     CSV.parse(csv, headers: true, header_converters: [:downcase, :symbol]).each do |row|
       email = row[:email]
       account_hash = { name: row[:name], email: row[:email], password: Account.generate_password }
-      account = if (account = Account.find_by(email: email.downcase))
-                  account
-                else
-                  Account.new(account_hash)
-                end
+      account = Account.new(account_hash) unless (account = Account.find_by(email: email.downcase))
       begin
         if account.persisted?
           account.update_attributes!(account_hash.map do |k, v|
@@ -236,7 +232,7 @@ class Activity
     batch_message.add_attachment(file.path, 'followers.csv')
 
     [account].each do |account|
-      batch_message.add_recipient(:to, account.email, { 'firstname' => (account.firstname || 'there'), 'token' => account.sign_in_token, 'id' => account.id.to_s })
+      batch_message.add_recipient(:to, account.email, { 'firstname' => account.firstname || 'there', 'token' => account.sign_in_token, 'id' => account.id.to_s })
     end
 
     batch_message.finalize if ENV['MAILGUN_API_KEY']
@@ -278,7 +274,7 @@ class Activity
     batch_message.add_attachment(file.path, 'applications.csv')
 
     [account].each do |account|
-      batch_message.add_recipient(:to, account.email, { 'firstname' => (account.firstname || 'there'), 'token' => account.sign_in_token, 'id' => account.id.to_s })
+      batch_message.add_recipient(:to, account.email, { 'firstname' => account.firstname || 'there', 'token' => account.sign_in_token, 'id' => account.id.to_s })
     end
 
     batch_message.finalize if ENV['MAILGUN_API_KEY']

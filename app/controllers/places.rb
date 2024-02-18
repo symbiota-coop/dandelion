@@ -1,6 +1,6 @@
 Dandelion::App.controller do
   get '/point/:model/:id' do
-    partial "maps/#{params[:model].underscore}".to_sym, object: params[:model].constantize.find(params[:id])
+    partial :"maps/#{params[:model].underscore}", object: params[:model].constantize.find(params[:id])
   end
 
   get '/places' do

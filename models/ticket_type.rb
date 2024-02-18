@@ -41,7 +41,7 @@ class TicketType
   end
 
   def send_payment_reminder
-    email = name.split(' ').last
+    email = name.split.last
     return if EmailAddress.error(email)
     return if remaining <= 0
 

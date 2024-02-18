@@ -24,8 +24,8 @@ class Follow
     errors.add(:followee, 'cannot be the same as follower') if follower.id == followee.id
   end
 
-  def self.mutual(a, b)
-    Follow.find_by(follower: a, followee: b) && Follow.find_by(follower: b, followee: a)
+  def self.mutual(alice, bob)
+    Follow.find_by(follower: alice, followee: bob) && Follow.find_by(follower: bob, followee: alice)
   end
 
   has_many :notifications, as: :notifiable, dependent: :destroy

@@ -34,7 +34,7 @@ class OrganisationContribution
     batch_message.body_text "#{ENV['BASE_URI']}/o/#{organisation.slug}"
 
     Account.and(admin: true).each do |account|
-      batch_message.add_recipient(:to, account.email, { 'firstname' => (account.firstname || 'there'), 'token' => account.sign_in_token, 'id' => account.id.to_s })
+      batch_message.add_recipient(:to, account.email, { 'firstname' => account.firstname || 'there', 'token' => account.sign_in_token, 'id' => account.id.to_s })
     end
 
     batch_message.finalize if ENV['MAILGUN_API_KEY']

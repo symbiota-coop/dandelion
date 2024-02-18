@@ -112,11 +112,10 @@ Dandelion::App.controller do
 
     if @gathering.memberships.find_by(account: @account)
       flash[:warning] = 'That person is already a member of the gathering'
-      redirect back
     else
       @gathering.memberships.create! account: @account, unsubscribed: true, prevent_notifications: params[:prevent_notifications], added_by: current_account
-      redirect back
     end
+    redirect back
   end
 
   get '/memberships/:id/make_admin' do
