@@ -70,7 +70,7 @@ gem 'premailer'
 gem 'pusher'
 
 # Prawn (PDFs)
-gem 'prawn'
+gem 'prawn', github: 'prawnpdf/prawn'
 gem 'prawn-qrcode'
 gem 'prawn-table'
 gem 'rqrcode'

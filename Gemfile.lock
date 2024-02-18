@@ -13,6 +13,14 @@ GIT
       tzinfo (> 2.0)
 
 GIT
+  remote: https://github.com/prawnpdf/prawn.git
+  revision: bae682d829fd7130c8676da48be1875d09c84428
+  specs:
+    prawn (2.4.0)
+      pdf-core (~> 0.9.0)
+      ttfunk (~> 1.7)
+
+GIT
   remote: https://github.com/q9f/omniauth-ethereum.rb.git
   revision: db34570f4ec7b6ab8ca1358b762c3a1435eb6f04
   specs:
@@ -363,9 +371,6 @@ GEM
       rack
     pdf-core (0.9.0)
     pkg-config (1.5.6)
-    prawn (2.4.0)
-      pdf-core (~> 0.9.0)
-      ttfunk (~> 1.7)
     prawn-qrcode (0.5.2)
       prawn (>= 1)
       rqrcode (>= 1.0.0)
@@ -559,7 +564,7 @@ DEPENDENCIES
   omniauth-ethereum!
   padrino
   patreon
-  prawn
+  prawn!
   prawn-qrcode
   prawn-table
   premailer
