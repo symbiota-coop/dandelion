@@ -763,7 +763,7 @@ Dandelion::App.controller do
   get '/events/:id/resend_feedback_email/:account_id' do
     @event = Event.find(params[:id]) || not_found
     event_admins_only!
-    @event.send_feedback_requests(account_id: params[:account_id])
+    @event.send_feedback_requests(params[:account_id])
     flash[:notice] = 'The feedback email was resent.'
     redirect back
   end

@@ -96,15 +96,15 @@ namespace :events do
   end
 
   task send_feedback_requests: :environment do
-    Event.and(:end_time.gte => Date.yesterday, :end_time.lt => Date.today).each(&:send_feedback_requests)
+    Event.and(:end_time.gte => Date.yesterday, :end_time.lt => Date.today).each { |event| event.send_feedback_requests(:all) }
   end
 
   task send_reminders: :environment do
-    Event.live.and(:start_time.gte => Date.tomorrow, :start_time.lt => Date.tomorrow + 1).each(&:send_reminders)
+    Event.live.and(:start_time.gte => Date.tomorrow, :start_time.lt => Date.tomorrow + 1).each { |event| event.send_reminders(:all) }
   end
 
   task send_star_reminders: :environment do
-    Event.and(:start_time.gte => Date.tomorrow + 6, :start_time.lt => Date.tomorrow + 7).each(&:send_star_reminders)
+    Event.and(:start_time.gte => Date.tomorrow + 6, :start_time.lt => Date.tomorrow + 7).each { |event| event.send_star_reminders(:all) }
   end
 
   task send_payment_reminders: :environment do
