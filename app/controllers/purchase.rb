@@ -43,8 +43,6 @@ Dandelion::App.controller do
         answers: (detailsForm[:answers].map { |i, x| [@event.questions_a[i.to_i], x] } if detailsForm[:answers])
       )
 
-      @account.reload
-
       ticketForm[:quantities].each do |ticket_type_id, quantity|
         ticket_type = @event.ticket_types.find(ticket_type_id) || not_found
         quantity.to_i.times do

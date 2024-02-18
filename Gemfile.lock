@@ -291,10 +291,9 @@ GEM
       i18n (>= 0.6.4, <= 2)
     mongo (2.19.3)
       bson (>= 4.14.1, < 5.0.0)
-    mongoid (8.1.4)
-      activemodel (>= 5.1, < 7.2, != 7.0.0)
-      concurrent-ruby (>= 1.0.5, < 2.0)
-      mongo (>= 2.18.0, < 3.0.0)
+    mongoid (7.5.4)
+      activemodel (>= 5.1, < 7.1, != 7.0.0)
+      mongo (>= 2.10.5, < 3.0.0)
       ruby2_keywords (~> 0.0.5)
     mongoid_paranoia (0.6.0)
       mongoid (>= 7.3)
@@ -553,7 +552,7 @@ DEPENDENCIES
   minitest-rg
   money
   money-uphold-bank!
-  mongoid
+  mongoid (~> 7.0)
   mongoid_paranoia
   omniauth
   omniauth-ethereum!
