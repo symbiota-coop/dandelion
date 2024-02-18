@@ -128,9 +128,9 @@ GEM
       qonfig (~> 0.24)
     css_parser (1.16.0)
       addressable
-    cuprite (0.7.1)
-      capybara (>= 2.1, < 4)
-      ferrum (>= 0.2.1)
+    cuprite (0.15)
+      capybara (~> 3.0)
+      ferrum (~> 0.14.0)
     date (3.3.4)
     declarative (0.0.20)
     delayed_job (4.1.11)
@@ -180,11 +180,11 @@ GEM
     faraday-net_http_persistent (2.1.0)
       faraday (~> 2.5)
       net-http-persistent (~> 4.0)
-    ferrum (0.15)
+    ferrum (0.14)
       addressable (~> 2.5)
       concurrent-ruby (~> 1.1)
       webrick (~> 1.7)
-      websocket-driver (~> 0.7)
+      websocket-driver (>= 0.6, < 0.8)
     ffi (1.16.3)
     ffi-compiler (1.0.1)
       ffi (>= 1.0.0)
@@ -534,7 +534,7 @@ DEPENDENCIES
   coinbase_commerce!
   countries
   crawler_detect
-  cuprite
+  cuprite (~> 0.15)
   delayed_job_mongoid
   dragonfly
   dragonfly-s3_data_store

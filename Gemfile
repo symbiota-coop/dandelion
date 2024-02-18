@@ -38,7 +38,7 @@ gem 'factory_bot'
 gem 'rubocop'
 group :test do
   gem 'capybara'
-  gem 'cuprite'
+  gem 'cuprite', '~> 0.15'
   gem 'minitest-rg'
   gem 'rack_session_access'
 end
