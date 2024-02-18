@@ -42,19 +42,17 @@ class LocalGroup
   embeds_many :polygons
 
   before_validation do
-    begin
-      polygons.destroy_all
-      g = JSON.parse(geometry)
-      unless g['coordinates']
-        g = g['features'].first['geometry']
-        self.geometry = g.to_json
-      end
-      g['coordinates'].each do |polygon|
-        polygons.build coordinates: (g['type'] == 'Polygon' ? [polygon] : polygon)
-      end
-    rescue StandardError => e
-      errors.add(:geometry, e)
+    polygons.destroy_all
+    g = JSON.parse(geometry)
+    unless g['coordinates']
+      g = g['features'].first['geometry']
+      self.geometry = g.to_json
     end
+    g['coordinates'].each do |polygon|
+      polygons.build coordinates: (g['type'] == 'Polygon' ? [polygon] : polygon)
+    end
+  rescue StandardError => e
+    errors.add(:geometry, e)
   end
 
   def event_tags

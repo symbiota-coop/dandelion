@@ -12,31 +12,25 @@ Naming/VariableName:
 
 Metrics:
   Enabled: false
+
+Layout/LineLength:
+  Enabled: false  
+
 Style/FrozenStringLiteralComment:
   Enabled: false
 Style/SafeNavigation:
   Enabled: false
-Style/RedundantBegin:
+Style/FetchEnvVar:
   Enabled: false
+Style/HashLikeCase:
+  Enabled: false  
 Style/Documentation:
   Enabled: false
 Style/OpenStructUse:
   Enabled: false  
-Style/FetchEnvVar:
-  Enabled: false
 Style/NumericPredicate:
-  Enabled: false  
-Style/HashLikeCase:
-  Enabled: false  
-Layout/LineLength:
   Enabled: false
-Lint/ShadowingOuterLocalVariable:
-  Enabled: false
-Lint/Debugger:
-  Enabled: false
-Lint/UriEscapeUnescape:
-  Enabled: false
-Lint/DuplicateBranch:
-  Enabled: false
-Lint/SuppressedException:
-  Enabled: false
+
+  
+
+
