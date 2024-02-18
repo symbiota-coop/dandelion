@@ -1,6 +1,6 @@
 source 'https://rubygems.org'
 
-ruby '3.2.3'
+ruby File.read('.ruby-version').strip
 gem 'activesupport', '~> 7.0.8'
 gem 'irb'
 gem 'padrino'

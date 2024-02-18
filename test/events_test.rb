@@ -79,6 +79,6 @@ class CoreTest < ActiveSupport::TestCase
     fill_in 'cardExpiry', with: '02/42'
     fill_in 'billingName', with: @account.name
     click_button 'Pay'
-    #  assert page.has_content? 'Thanks for booking!'
+    # assert page.has_content? 'Thanks for booking!'
   end
 end
