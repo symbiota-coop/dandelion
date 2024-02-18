@@ -27,7 +27,7 @@ Dandelion::App.helpers do
   def search_accounts(query)
     Account.all.or(
       { name: /#{Regexp.escape(query)}/i },
-      { name_transliterated: /#{Regexp.escape(q)}/i },
+      { name_transliterated: /#{Regexp.escape(query)}/i },
       { email: /#{Regexp.escape(query)}/i },
       { username: /#{Regexp.escape(query)}/i }
     )
