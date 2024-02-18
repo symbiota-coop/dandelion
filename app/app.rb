@@ -42,8 +42,8 @@ module Dandelion
                       current_account.time_zone
                     elsif session[:time_zone]
                       session[:time_zone]
-                    elsif request.location && request.location.data['timezone']
-                      session[:time_zone] = request.location.data['timezone']
+                    # elsif request.location && request.location.data['timezone']
+                    #   session[:time_zone] = request.location.data['timezone']
                     else
                       ENV['DEFAULT_TIME_ZONE']
                     end
