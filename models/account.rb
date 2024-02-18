@@ -119,6 +119,7 @@ class Account
       can_reset_passwords: :check_box,
       password: :password,
       sign_ins_count: :number,
+      failed_sign_in_attempts: :number,
       provider_links: :collection,
       memberships: :collection,
       mapplications: :collection,

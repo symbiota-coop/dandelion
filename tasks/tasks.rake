@@ -108,9 +108,7 @@ namespace :events do
   end
 
   task send_payment_reminders: :environment do
-    return unless Date.today.day == 1
-
-    TicketType.and(name: /payment plan/i).each(&:send_payment_reminder)
+    TicketType.and(name: /payment plan/i).each(&:send_payment_reminder) if Date.today.day == 1
   end
 end
 
