@@ -51,13 +51,11 @@ class Membership
   after_create do
     notifications.create! circle: circle, type: 'joined_gathering' unless prevent_notifications
     gathering.update_attribute(:membership_count, gathering.memberships.count)
-    gathering.members.each do |follower|
-      next if follower.id == account.id
+    gathering.members.each do |member|
+      next if member.id == account.id
 
-      Follow.create follower: follower, followee: account, unsubscribed: true
-      next if followee.id == account.id
-
-      Follow.create follower: account, followee: followee, unsubscribed: true
+      Follow.create follower: member, followee: account, unsubscribed: true
+      Follow.create follower: account, followee: member, unsubscribed: true
     end
     if (general = gathering.teams.find_by(name: 'General'))
       general.teamships.create! account: account, prevent_notifications: true
