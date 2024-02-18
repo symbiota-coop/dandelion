@@ -38,12 +38,6 @@ GIT
       faraday-multipart (~> 1.0.4)
 
 GIT
-  remote: https://github.com/rubygems/gems.git
-  revision: c20c05888cb2b882bf3b99d3618cc37f69559f6a
-  specs:
-    gems (1.2.0)
-
-GIT
   remote: https://github.com/stephenreid321/activate-admin.git
   revision: 1404d9da7ddad58b8f183470fc3b24186f0434f6
   specs:
@@ -544,7 +538,6 @@ DEPENDENCIES
   factory_bot
   faraday
   ferrum
-  gems!
   geocoder
   gocardless_pro
   google_drive2

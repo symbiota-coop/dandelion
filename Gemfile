@@ -98,6 +98,5 @@ gem 'rack-utf8_sanitizer'
 gem 'bazaar'
 gem 'chroma'
 gem 'crawler_detect'
-gem 'gems', github: 'rubygems/gems'
-gem 'matrix'
+gem 'matrix' # necessary in connection with capybara/cuprite
 gem 'mini_magick'
