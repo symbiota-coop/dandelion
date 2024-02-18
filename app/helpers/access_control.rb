@@ -171,7 +171,7 @@ Dandelion::App.helpers do
 
     kick!(
       notice: (membership ? 'You must make a payment before accessing that page.' : 'You must be a member of the gathering to access that page.'),
-      r: ("/g/#{gathering.slug}" if %w[open closed].include?(gathering.privacy))
+      redirect_url: ("/g/#{gathering.slug}" if %w[open closed].include?(gathering.privacy))
     )
   end
 end

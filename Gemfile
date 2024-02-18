@@ -1,6 +1,6 @@
 source 'https://rubygems.org'
 
-ruby File.read('.ruby-version').strip
+ruby '3.2.3'
 gem 'activesupport', '~> 7.0.8'
 gem 'irb'
 gem 'padrino'
@@ -20,7 +20,7 @@ gem 'activemodel'
 gem 'delayed_job_mongoid'
 gem 'dragonfly'
 gem 'dragonfly-s3_data_store'
-gem 'mongoid', '~> 7.0'
+gem 'mongoid', '~> 7.0' #  due to belongs_to associations insisting on validating the parent in ~> 8.0
 gem 'mongoid_paranoia'
 
 # Authentication
