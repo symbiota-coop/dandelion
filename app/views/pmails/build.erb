@@ -175,7 +175,7 @@
                                        [
                                          ["Activity tag: #{activity_tag.name}", "activity_tag:#{activity_tag.id}"]
                                        ]
-                                     end.sum
+                                     end.sum([])
                                    else
                                      []
                                    end)
@@ -189,7 +189,7 @@
                                  [
                                    ["Activity: #{activity.name}", "activity:#{activity.id}"]
                                  ]
-                               end.sum
+                               end.sum([])
                              else
                                []
                              end)
@@ -201,7 +201,7 @@
                                     [
                                       ["Local group: #{local_group.name}", "local_group:#{local_group.id}"]
                                     ]
-                                  end.sum
+                                  end.sum([])
                                 else
                                   []
                                 end)
