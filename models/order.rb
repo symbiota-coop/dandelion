@@ -138,7 +138,7 @@ class Order
   def description_elements
     d = []
     TicketType.and(:id.in => tickets.pluck(:ticket_type_id)).each do |ticket_type|
-      d << "#{"#{ticket_type.name} " if ticket_type}#{Money.new(ticket_type.price * 100, currency).format(no_cents_if_whole: true)}x#{tickets.and(ticket_type: ticket_type).count}"
+      d << "#{"#{ticket_type.name} " if ticket_type}#{Money.new(ticket_type.price * 100, currency).format(no_cents_if_whole: true) if ticket_type.price}x#{tickets.and(ticket_type: ticket_type).count}"
     end
 
     d << "#{percentage_discount}% discount" if percentage_discount
@@ -224,7 +224,7 @@ class Order
     rescue Money::Bank::UnknownRate, Money::Currency::UnknownCurrency
       return
     end
-    return unless credit_balance > 0
+    return unless credit_balance.positive?
 
     if credit_balance >= (discounted_ticket_revenue + donation_revenue)
       update_attribute(:credit_applied, (discounted_ticket_revenue + donation_revenue).cents.to_f / 100)
@@ -268,7 +268,7 @@ class Order
 
   after_destroy :refund
   def refund
-    return unless event.refund_deleted_orders && !prevent_refund && event.organisation && value && value > 0 && payment_completed && payment_intent
+    return unless event.refund_deleted_orders && !prevent_refund && event.organisation && value && value.positive? && payment_completed && payment_intent
 
     begin
       Stripe.api_key = event.organisation.stripe_sk
@@ -312,15 +312,15 @@ class Order
   end
 
   def credit_payable_to_organisation
-    credit_applied - credit_payable_to_revenue_sharer if organisation_revenue_share && credit_applied && credit_applied > 0
+    credit_applied - credit_payable_to_revenue_sharer if organisation_revenue_share && credit_applied && credit_applied.positive?
   end
 
   def credit_payable_to_revenue_sharer
-    ((discounted_ticket_revenue / (discounted_ticket_revenue + donation_revenue)) * credit_applied * (1 - organisation_revenue_share)).to_f if organisation_revenue_share && credit_applied && credit_applied > 0 && ((discounted_ticket_revenue + donation_revenue) > 0)
+    ((discounted_ticket_revenue / (discounted_ticket_revenue + donation_revenue)) * credit_applied * (1 - organisation_revenue_share)).to_f if organisation_revenue_share && credit_applied && credit_applied.positive? && (discounted_ticket_revenue + donation_revenue).positive?
   end
 
   def make_transfer
-    return unless event.revenue_sharer_organisationship && credit_payable_to_revenue_sharer && credit_payable_to_revenue_sharer > 0
+    return unless event.revenue_sharer_organisationship && credit_payable_to_revenue_sharer && credit_payable_to_revenue_sharer.positive?
 
     Stripe.api_key = event.organisation.stripe_sk
     Stripe.api_version = '2020-08-27'
@@ -342,7 +342,7 @@ class Order
     qr_size = width / 1.5
     Prawn::Document.new(page_size: 'A4', margin: margin) do |pdf|
       order.tickets.each_with_index do |ticket, i|
-        pdf.start_new_page unless i == 0
+        pdf.start_new_page unless i.zero?
         pdf.font "#{Padrino.root}/app/assets/fonts/PlusJakartaSans/ttf/PlusJakartaSans-Regular.ttf"
         pdf.image (event.organisation.send_ticket_emails_from_organisation && event.organisation.image ? URI.parse(Addressable::URI.escape(event.organisation.image.url)).open : "#{Padrino.root}/app/assets/images/black-on-transparent-trim.png"), width: width / 4, position: :center
         pdf.move_down 0.5 * cm

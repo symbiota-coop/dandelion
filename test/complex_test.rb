@@ -36,7 +36,7 @@ class CoreTest < ActiveSupport::TestCase
     click_link 'Tickets'
     execute_script %{$("a:contains('Add ticket type')").click()}
     fill_in 'event_ticket_types_attributes_0_name', with: @ticket_type.name
-    fill_in 'event_ticket_types_attributes_0_price', with: @ticket_type.price
+    fill_in 'event_ticket_types_attributes_0_price_or_range', with: @ticket_type.price_or_range
     fill_in 'event_ticket_types_attributes_0_quantity', with: @ticket_type.quantity
     click_link 'Everything else'
     click_button 'Create event'

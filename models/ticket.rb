@@ -119,7 +119,9 @@ class Ticket
       errors.add(:email, "- #{e}") if e
     end
 
-    self.price = ticket_type.price if !price && ticket_type && !complementary
+    self.price = ticket_type.price if !price && !complementary && ticket_type && ticket_type.price
+    errors.add(:price, 'is too low') if price && ticket_type && ticket_type.range_min && price < ticket_type.range_min
+
     self.payment_completed = true if complementary || price.nil? || price == 0
 
     self.currency = (order.try(:currency) || event.try(:currency)) unless currency

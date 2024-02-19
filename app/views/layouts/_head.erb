@@ -68,23 +68,23 @@
      }.each { |k,v| %>
   <% v.split(' ').each { |f| u = "https://cdnjs.cloudflare.com/ajax/libs/#{k}/#{f}" %>
   <% case f.split('.').last.to_sym; when :js %>
-  <script src="<%= u %>"></script>
+    <script src="<%= u %>"></script>
   <% when :css %>
-  <link rel="stylesheet" href="<%= u %>">
-<% end %>
-<% } %>
-<% } %>
+    <link rel="stylesheet" href="<%= u %>">
+  <% end %>
+  <% } %>
+  <% } %>
 
-<% [
+  <% [
      '//rawcdn.githack.com/scottdejonge/map-icons/dbf6fd7caedd60d11b5bfb5f267a114a6847d012/dist/css/map-icons.min.css',
      '//cdn.jsdelivr.net/npm/easymde@2.10.1/dist/easymde.min.css',
      '/stylesheets/share.css',
      "/stylesheets/app.css?#{@cachebuster}"
    ].each { |f| %>
-<link rel="stylesheet" href="<%= f %>">
-<% } %>
+  <link rel="stylesheet" href="<%= f %>">
+  <% } %>
 
-<% [
+  <% [
      '//www.google.com/recaptcha/api.js',
      '//js.stripe.com/v3/',
      "//cdn.iframe.ly/embed.js?key=#{ENV['IFRAMELY_KEY']}",
@@ -106,92 +106,92 @@
      "/javascripts/ckeditor5/build/ckeditor.js?#{@cachebuster}",
      "/javascripts/app.js?#{@cachebuster}"
    ].each { |f| %>
-<script src="<%= f %>"></script>
-<% } %>
+  <script src="<%= f %>"></script>
+  <% } %>
 
-<script src="/infinite_admin/plugins/loader/pace/pace.min.js"></script>
-<script src="/infinite_admin/plugins/cookie/js/js.cookie.js"></script>
-<script src="/infinite_admin/plugins/tooltip/popper/popper.min.js"></script>
-<script src="/infinite_admin/plugins/bootstrap/bootstrap4/js/bootstrap.js"></script>
-<script src="/infinite_admin/plugins/scrollbar/slimscroll/jquery.slimscroll.min.js"></script>
-<script src="/infinite_admin/js/apps.js?<%= @cachebuster %>"></script>
+  <script src="/infinite_admin/plugins/loader/pace/pace.min.js"></script>
+  <script src="/infinite_admin/plugins/cookie/js/js.cookie.js"></script>
+  <script src="/infinite_admin/plugins/tooltip/popper/popper.min.js"></script>
+  <script src="/infinite_admin/plugins/bootstrap/bootstrap4/js/bootstrap.js"></script>
+  <script src="/infinite_admin/plugins/scrollbar/slimscroll/jquery.slimscroll.min.js"></script>
+  <script src="/infinite_admin/js/apps.js?<%= @cachebuster %>"></script>
 
-<script>
-  $(function () {
-    App.init();
-  });
-</script>
-
-<%= favicon_tag 'black-on-transparent-sq.png' %>
-<title><% if @fulltitle %><%= @fulltitle %><% else %><%= "#{@title} · " if @title %><%= Padrino.env == :development ? 'DEV' : 'Dandelion' %><% end %></title>
-<meta name="description" content="<%= @og_desc %>">
-<meta property="og:title" content="<%= @title %>">
-<meta property="og:image" content="<%= @og_image %>?<%= @cachebuster %>">
-<meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:title" content="<%= @title %>">
-<meta name="twitter:description" content="<%= @og_desc %>">
-<meta name="twitter:image" content="<%= @og_image %>?<%= @cachebuster %>">
-<%= partial :'layouts/a2hs' %>
-<% if !current_account && @hide_right_nav %>
-  <style>
-    @media (max-width: 991px) {
-      ul.nav.navbar-nav.navbar-right {
-        display: none;
-      }
-      #page-container {
-        padding-top: 2.75rem;
-      }
-    }
-  </style>
-<% end %>
-
-<% if @event && @event.persisted? %>
-  <% if params[:cohost] %>
-    <link rel="canonical" href="<%=ENV['BASE_URI']%>/e/<%=@event.slug%>?cohost=<%=params[:cohost]%>" />
-  <% else %>
-    <link rel="canonical" href="<%=ENV['BASE_URI']%>/e/<%=@event.slug%>" />
-  <% end %>
-  <script type="application/ld+json">
-    <%==
-    JSON.pretty_generate({
-      "@context": 'https://schema.org',
-      "@type": 'Event',
-      "eventStatus": "https://schema.org/EventScheduled",
-      "name": @event.name,
-      "startDate": @event.start_time.try(:iso8601),
-      "endDate": @event.end_time.try(:iso8601),
-      "eventAttendanceMode": @event.online? ? 'https://schema.org/OnlineEventAttendanceMode' : 'https://schema.org/OfflineEventAttendanceMode',
-      "location": (unless @event.online?
-                     {
-                       "@type": 'Place',
-                       "name": @event.location.split(', ').first,
-                       "address": {
-                           "@type": "PostalAddress",
-                           "name": @event.location.split(', ')[1..-1].join(', ')
-                          }
-                     }
-                   end),
-      "image": @event_image.try(:url),
-      "description": (if @event.description
-                        Nokogiri::HTML(@event.description).search('h1,h2,h3,h4,h5,h6,p').first.try(:text).try(:strip)
-                      end),
-      "organizer": {
-        "@type": 'Organization',
-        "name": @event.organisation.name,
-        "url": @event.organisation.website
-      },
-      "offers": (@event.ticket_types.map { |ticket_type|
-        {
-          "@type": "Offer",
-          "url": "#{ENV['BASE_URI']}/events/#{@event.id}",
-          "price": ticket_type.price,
-          "priceCurrency": @event.currency,
-          "availability": ticket_type.number_of_tickets_available_in_single_purchase > 0 ? "https://schema.org/InStock" : "https://schema.org/SoldOut",
-        }
-      })
-    })
-    %>
+  <script>
+    $(function () {
+      App.init();
+    });
   </script>
 
-<% end %>
+  <%= favicon_tag 'black-on-transparent-sq.png' %>
+  <title><% if @fulltitle %><%= @fulltitle %><% else %><%= "#{@title} · " if @title %><%= Padrino.env == :development ? 'DEV' : 'Dandelion' %><% end %></title>
+  <meta name="description" content="<%= @og_desc %>">
+  <meta property="og:title" content="<%= @title %>">
+  <meta property="og:image" content="<%= @og_image %>?<%= @cachebuster %>">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="<%= @title %>">
+  <meta name="twitter:description" content="<%= @og_desc %>">
+  <meta name="twitter:image" content="<%= @og_image %>?<%= @cachebuster %>">
+  <%= partial :'layouts/a2hs' %>
+  <% if !current_account && @hide_right_nav %>
+    <style>
+      @media (max-width: 991px) {
+        ul.nav.navbar-nav.navbar-right {
+          display: none;
+        }
+        #page-container {
+          padding-top: 2.75rem;
+        }
+      }
+    </style>
+  <% end %>
+
+  <% if @event && @event.persisted? %>
+    <% if params[:cohost] %>
+      <link rel="canonical" href="<%=ENV['BASE_URI']%>/e/<%=@event.slug%>?cohost=<%=params[:cohost]%>" />
+    <% else %>
+      <link rel="canonical" href="<%=ENV['BASE_URI']%>/e/<%=@event.slug%>" />
+    <% end %>
+    <script type="application/ld+json">
+      <%==
+      JSON.pretty_generate({
+        "@context": 'https://schema.org',
+        "@type": 'Event',
+        "eventStatus": "https://schema.org/EventScheduled",
+        "name": @event.name,
+        "startDate": @event.start_time.try(:iso8601),
+        "endDate": @event.end_time.try(:iso8601),
+        "eventAttendanceMode": @event.online? ? 'https://schema.org/OnlineEventAttendanceMode' : 'https://schema.org/OfflineEventAttendanceMode',
+        "location": (unless @event.online?
+                       {
+                         "@type": 'Place',
+                         "name": @event.location.split(', ').first,
+                         "address": {
+                             "@type": "PostalAddress",
+                             "name": @event.location.split(', ')[1..-1].join(', ')
+                            }
+                       }
+                     end),
+        "image": @event_image.try(:url),
+        "description": (if @event.description
+                          Nokogiri::HTML(@event.description).search('h1,h2,h3,h4,h5,h6,p').first.try(:text).try(:strip)
+                        end),
+        "organizer": {
+          "@type": 'Organization',
+          "name": @event.organisation.name,
+          "url": @event.organisation.website
+        },
+        "offers": (@event.ticket_types.map { |ticket_type|
+          {
+            "@type": "Offer",
+            "url": "#{ENV['BASE_URI']}/events/#{@event.id}",
+            "price": ticket_type.price ? ticket_type.price  : ticket_type.range_min,
+            "priceCurrency": @event.currency,
+            "availability": ticket_type.number_of_tickets_available_in_single_purchase > 0 ? "https://schema.org/InStock" : "https://schema.org/SoldOut",
+          }
+        })
+      })
+      %>
+    </script>
+
+  <% end %>
 </head>

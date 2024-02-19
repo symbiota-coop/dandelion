@@ -24,7 +24,7 @@ $(function () {
     let p = 0
 
     $('select[name^=quantities]').each(function () {
-      p += (parseInt($(this).val()) * parseFloat($(this).attr('data-price')))
+      p += (parseInt($(this).val()) * parseFloat($(this).attr('data-price') || 0))
     })
 
     if ($('#percentage_discount').length > 0 && $('#percentage_discount').val() != '') { p = (p * (100 - parseInt($('#percentage_discount').val())) / 100) }

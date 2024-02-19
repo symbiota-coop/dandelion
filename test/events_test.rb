@@ -26,11 +26,33 @@ class CoreTest < ActiveSupport::TestCase
     click_link 'Tickets'
     execute_script %{$("a:contains('Add ticket type')").click()}
     fill_in 'event_ticket_types_attributes_0_name', with: @ticket_type.name
-    fill_in 'event_ticket_types_attributes_0_price', with: @ticket_type.price
+    fill_in 'event_ticket_types_attributes_0_price_or_range', with: @ticket_type.price_or_range
     fill_in 'event_ticket_types_attributes_0_quantity', with: @ticket_type.quantity
     click_link 'Everything else'
     click_button 'Create event'
     assert page.has_content? 'Add to calendar'
+  end
+
+  test 'creating an event with a range' do
+    @account = FactoryBot.create(:account)
+    @organisation = FactoryBot.create(:organisation, account: @account)
+    @event = FactoryBot.build_stubbed(:event)
+    @ticket_type = FactoryBot.build_stubbed(:ticket_type, price_or_range: '10-100')
+    login_as(@account)
+    visit "/o/#{@organisation.slug}"
+    click_link 'Create an event'
+    fill_in 'Event title*', with: @event.name
+    execute_script %{$('#event_start_time').val('#{@event.start_time.to_fs(:db_local)}')}
+    execute_script %{$('#event_end_time').val('#{@event.end_time.to_fs(:db_local)}')}
+    fill_in 'Location*', with: @event.location
+    click_link 'Tickets'
+    execute_script %{$("a:contains('Add ticket type')").click()}
+    fill_in 'event_ticket_types_attributes_0_name', with: @ticket_type.name
+    fill_in 'event_ticket_types_attributes_0_price_or_range', with: @ticket_type.price_or_range
+    fill_in 'event_ticket_types_attributes_0_quantity', with: @ticket_type.quantity
+    click_link 'Everything else'
+    click_button 'Create event'
+    assert page.has_content? 'Select a price first'
   end
 
   test 'creating an event from /events' do
@@ -69,12 +91,32 @@ class CoreTest < ActiveSupport::TestCase
   test 'booking onto a paid event' do
     @account = FactoryBot.create(:account)
     @organisation = FactoryBot.create(:organisation, account: @account)
-    @event = FactoryBot.create(:event, organisation: @organisation, account: @account, last_saved_by: @account, ticket_price: (ticket_price = 10), suggested_donation: 0)
+    @event = FactoryBot.create(:event, organisation: @organisation, account: @account, last_saved_by: @account, price_or_range: (ticket_price = 10), suggested_donation: 0)
     login_as(@account)
     visit "/e/#{@event.slug}"
     select 1, from: "quantities[#{@event.ticket_types.first.id}]"
     fill_in 'donation_amount', with: (donation_amount = 5)
     click_button "Pay £#{format('%.2f', ticket_price + donation_amount)}"
+    assert page.has_content? "£#{format('%.2f', ticket_price + donation_amount)}"
+    fill_in 'cardNumber', with: '4242 4242 4242 4242'
+    fill_in 'cardCvc', with: '242'
+    fill_in 'cardExpiry', with: '02/42'
+    fill_in 'billingName', with: @account.name
+    click_button 'Pay'
+    # assert page.has_content? 'Thanks for booking!'
+  end
+
+  test 'booking onto a paid event with a range' do
+    @account = FactoryBot.create(:account)
+    @organisation = FactoryBot.create(:organisation, account: @account)
+    @event = FactoryBot.create(:event, organisation: @organisation, account: @account, last_saved_by: @account, price_or_range: '10-100', suggested_donation: 0)
+    login_as(@account)
+    visit "/e/#{@event.slug}"
+    execute_script %{$("[name='prices[#{@event.ticket_types.first.id}]']").val(#{selected_price = 50})[0].oninput()}
+    select 1, from: "quantities[#{@event.ticket_types.first.id}]"
+    fill_in 'donation_amount', with: (donation_amount = 5)
+    click_button "Pay £#{format('%.2f', selected_price + donation_amount)}"
+    assert page.has_content? "£#{format('%.2f', selected_price + donation_amount)}"
     fill_in 'cardNumber', with: '4242 4242 4242 4242'
     fill_in 'cardCvc', with: '242'
     fill_in 'cardExpiry', with: '02/42'

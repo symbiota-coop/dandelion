@@ -272,7 +272,7 @@ class Event
     end
 
     if organisation && !organisation.payment_method?
-      errors.add(:organisation, 'does not have any payment methods set up, so you can currently only issue free tickets') if ticket_types.any? { |ticket_type| ticket_type.price && ticket_type.price > 0 }
+      errors.add(:organisation, 'does not have any payment methods set up, so you can currently only issue free tickets') if ticket_types.any? { |ticket_type| (ticket_type.price && ticket_type.price > 0) || ticket_type.range }
       self.suggested_donation = nil
       self.minimum_donation = nil
     end
@@ -555,6 +555,8 @@ class Event
         name: ticket_type.name,
         description: ticket_type.description,
         price: ticket_type.price,
+        range_min: ticket_type.range_min,
+        range_max: ticket_type.range_max,
         quantity: ticket_type.quantity,
         hidden: ticket_type.hidden,
         order: ticket_type.order,
