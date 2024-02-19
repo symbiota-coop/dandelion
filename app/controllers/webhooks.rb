@@ -96,5 +96,6 @@ Dandelion::App.controller do
     events.each do |event|
       @organisation.gocardless_subscribe(subscription_id: event.links.subscription) if event.resource_type == 'subscriptions' && event.action == 'created'
     end
+    200
   end
 end
