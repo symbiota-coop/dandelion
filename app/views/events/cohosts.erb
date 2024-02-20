@@ -4,7 +4,7 @@
   <div class="alert alert-danger">
     <ul class="mb-0">
       <% @cohostship.errors.full_messages.each { |message| %>
-        <li><%= message %></li>
+      <li><%= message %></li>
       <% } %>
     </ul>
   </div>
@@ -25,21 +25,28 @@
   <thead>
     <th>Co-host</th>
     <th>Image</th>
+    <th>Video</th>
   </thead>
   <% @event.cohostships.each { |cohostship| organisation = cohostship.organisation %>
-    <tr>
-      <td>
-        <% if organisation.image %>
-          <a href="/o/<%= organisation.slug %>/events"><img src="<%= u organisation.image.thumb('500x500#').url %>" style="width: 50px"></a>
-        <% end %>
-        <a href="/o/<%= organisation.slug %>/events"><%= organisation.name %></a>
-      </td>
-      <td>
-        <% form_for cohostship, "/events/#{@event.id}/cohostships/#{cohostship.id}" do |f| %>
-          <%= f.image_block :image %>
-          <%= f.submit_block %>
-        <% end %>
-      </td>
-    </tr>
+  <tr>
+    <td>
+      <% if organisation.image %>
+        <a href="/o/<%= organisation.slug %>/events"><img src="<%= u organisation.image.thumb('500x500#').url %>" style="width: 50px"></a>
+      <% end %>
+      <a href="/o/<%= organisation.slug %>/events"><%= organisation.name %></a>
+    </td>
+    <td>
+      <% form_for cohostship, "/events/#{@event.id}/cohostships/#{cohostship.id}" do |f| %>
+        <%= f.image_block :image %>
+        <%= f.submit_block %>
+      <% end %>
+    </td>
+    <td>
+      <% form_for cohostship, "/events/#{@event.id}/cohostships/#{cohostship.id}" do |f| %>
+        <%= f.file_block :video %>
+        <%= f.submit_block %>
+      <% end %>
+    </td>
+  </tr>
   <% } %>
 </table>

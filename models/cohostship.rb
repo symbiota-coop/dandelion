@@ -7,14 +7,18 @@ class Cohostship
   belongs_to :organisation, index: true
 
   field :image_uid, type: String
+  field :video_uid, type: String
 
   def self.admin_fields
     {
       image: :image,
+      video: :file,
       event_id: :lookup,
       organisation_id: :lookup
     }
   end
+
+  dragonfly_accessor :video
 
   dragonfly_accessor :image
   before_validation do

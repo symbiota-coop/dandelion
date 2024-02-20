@@ -21,8 +21,8 @@ $.fn.serializeObject = function () {
 $(function () {
   function ajaxCompleted () {
     $('input[type=file]').change(function () {
-      if (this.files.length > 0 && this.files[0].size > 5e6) {
-        alert('That file is too large, the maximum file size is 5MB. Please resize it before uploading.')
+      if (this.files.length > 0 && this.files[0].size > 10e6) {
+        alert('That file is too large, the maximum file size is 10MB. Please resize it before uploading.')
         $(this).val('')
       }
     })

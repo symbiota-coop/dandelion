@@ -23,6 +23,7 @@ class Event
   field :location, type: String
   field :coordinates, type: Array
   field :image_uid, type: String
+  field :video_uid, type: String
   field :description, type: String
   index({ description: 1 })
   field :email, type: String
@@ -67,6 +68,7 @@ class Event
       select_tickets_intro: :text,
       select_tickets_outro: :text,
       image: :image,
+      video: :file,
       description: :wysiwyg,
       email: :email,
       facebook_event_url: :url,
@@ -488,6 +490,7 @@ class Event
       currency: currency,
       location: location,
       image: image,
+      video: video,
       description: description,
       email: email,
       feedback_questions: feedback_questions,
@@ -541,7 +544,8 @@ class Event
     cohostships.each do |cohostship|
       event.cohostships.create(
         organisation: cohostship.organisation,
-        image: cohostship.image
+        image: cohostship.image,
+        video: cohostship.video
       )
     end
     ticket_groups.each do |ticket_group|
@@ -580,6 +584,8 @@ class Event
       EventTagship.and(:event_tag_id.in =>
         EventTag.and(:name.in => %w[course courses]).pluck(:id)).pluck(:event_id))
   end
+
+  dragonfly_accessor :video
 
   dragonfly_accessor :image
   before_validation do

@@ -748,3 +748,7 @@ figure td {
 .ck-editor td {
   border: 1px solid #bfbfbf !important;
 }
+
+.embed-responsive-ps::before {
+  padding-top: 52.5%;
+}
