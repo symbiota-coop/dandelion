@@ -1,5 +1,5 @@
 <div style="position: relative;">
-  <% if @organisation && (cohostship = event.cohostships.find_by(organisation: @organisation)) %>
+  <% if @organisation && (cohostship = event.cohostships.find_by(organisation: @organisation)) && (cohostship.image || cohostship.video) %>
     <a target="_parent" href="/e/<%= event.slug %>?cohost=<%=@organisation.slug%>" <% if event.carousel_text %> data-toggle="tooltip" title="<%=event.carousel_text%>" <% end %>>  
       <% if cohostship.video %>    
       <div class="embed-responsive embed-responsive-16by9">
