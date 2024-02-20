@@ -17,9 +17,10 @@ class TicketType
   field :minimum_monthly_donation, type: Float
 
   attr_writer :price_or_range
+  attr_accessor :price_or_range_submitted
 
   def price_or_range
-    @price_or_range || (price || "#{range_min}-#{range_max}")
+    @price_or_range || ("#{range_min}-#{range_max}" if range_min && range_max) || price
   end
 
   def self.admin_fields
@@ -45,20 +46,24 @@ class TicketType
   validates_presence_of :name, :quantity
 
   before_validation do
-    if @price_or_range
+    if @price_or_range_submitted
       self.price = nil
       self.range_min = nil
       self.range_max = nil
-      if @price_or_range.to_s.include?('-')
-        r_min, r_max = @price_or_range.to_s.split('-')
-        self.range_min = r_min if floaty?(r_min)
-        self.range_max = r_max if floaty?(r_max)
-      elsif floaty?(@price_or_range)
-        self.price = @price_or_range
+      if @price_or_range
+        if @price_or_range.to_s.include?('-')
+          r_min, r_max = @price_or_range.to_s.split('-')
+          self.range_min = r_min if floaty?(r_min)
+          self.range_max = r_max if floaty?(r_max)
+        elsif floaty?(@price_or_range)
+          self.price = @price_or_range
+        end
       end
     end
 
-    errors.add(:price, 'or range must be set') if !price && !(range_min && range_max)
+    errors.add(:range_min, 'must not be not be < 0') if range_min && range_min < 0
+    errors.add(:range_max, 'must not be not be < 0') if range_max && range_max < 0
+    errors.add(:range_max, 'must be > range min') if range_min && range_max && range_max <= range_min
     errors.add(:price, 'must not be not be < 0') if price && price < 0
     errors.add(:quantity, 'must not be not be < 0') if quantity && quantity < 0
     errors.add(:max_quantity_per_transaction, 'must not be not be < 0') if max_quantity_per_transaction && max_quantity_per_transaction < 0

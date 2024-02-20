@@ -48,16 +48,24 @@
               <i data-toggle="tooltip" title="Available to those donating <%=m ticket_type.minimum_monthly_donation, @event.currency%>+/month" class="fa fa-star-o"></i>
             <% end %>
           </td>
-          <td style="<% if i == 0 %>border-top: 0;<% end %> <% if ticket_type.photos.count > 0 %>border-bottom: 0;<% end %>">
-            <% if ticket_type.price %>
-              <%= m ticket_type.price, @event.currency %>
-            <% elsif ticket_type.range %>
+          <td style="<% if i == 0 %>border-top: 0;<% end %> <% if ticket_type.photos.count > 0 %>border-bottom: 0;<% end %>;">
+            <% if ticket_type.range %>
               <span><%= m ticket_type.range_min, @event.currency %> - <%= m ticket_type.range_max, @event.currency %></span>
               <%= range_field_tag :"prices[#{ticket_type.id}]",
               class: 'form-control-range',
               min: ticket_type.range_min,
               max: ticket_type.range_max,
               oninput: "$(this).prev().html('#{Money.new(0, @event.currency).symbol}' + this.value); $(this).parent().next().find('.select-a-price-first').hide(); $(this).parent().next().find('[name^=quantities]').attr('data-price',this.value).prop('disabled',false).change();" %>
+            <% elsif ticket_type.price %>
+              <%= m ticket_type.price, @event.currency %>
+            <% else %>
+              <div class="input-group">
+                <div class="input-group-prepend">
+                  <span class="input-group-text"><%= Money.new(0, @event.currency).symbol %></span>
+                </div>
+                <%= text_field_tag :"prices[#{ticket_type.id}]", class: 'form-control',
+              oninput: "$(this).parent().parent().next().find('.select-a-price-first').hide(); $(this).parent().parent().next().find('[name^=quantities]').attr('data-price',this.value).prop('disabled',false).change();" %>
+              </div>
             <% end %>
           </td>
           <td style="width: 50%; <% if i == 0 %>border-top: 0;<% end %> <% if ticket_type.photos.count > 0 %>border-bottom: 0;<% end %>">
@@ -74,13 +82,16 @@
             <% else %>
               <div class="row justify-content-between align-items-center">
                 <div class="col">
-                  <%= select_tag :"quantities[#{ticket_type.id}]", 'data-ticket-type-id': ticket_type.id, 'data-price': ticket_type.price, style: 'width: auto; display: inline-block', class: 'form-control', options: (0..ticket_type.number_of_tickets_available_in_single_purchase).to_a, value: (params[:quantities][ticket_type.id.to_s] if params[:quantities]), disabled: ticket_type.range ? true : false %>
-                </div>
-                <% if ticket_type.range %>
-                  <div class="col-auto">
+                  <%= select_tag :"quantities[#{ticket_type.id}]", 'data-ticket-type-id': ticket_type.id, 'data-price': ticket_type.price, style: 'width: auto; display: inline-block', class: 'form-control', options: (0..ticket_type.number_of_tickets_available_in_single_purchase).to_a, value: (params[:quantities][ticket_type.id.to_s] if ticket_type.price && params[:quantities]), disabled: !ticket_type.price %>
+                  <% if ticket_type.range %>
+                    <br />
                     <em class="select-a-price-first">Select a price first</em>
-                  </div>
-                <% elsif !@event.organisation.hide_few_left && !@event.hide_few_left && ticket_type.wiser_remaining <= 3 %>
+                  <% elsif !ticket_type.price %>
+                    <br />
+                    <em class="select-a-price-first">Select a price first</em>
+                  <% end %>
+                </div>
+                <% if !@event.organisation.hide_few_left && !@event.hide_few_left && ticket_type.wiser_remaining <= 3 %>
                   <div class="col-auto">
                     <span class="badge badge-secondary"><%= ticket_type.wiser_remaining %> left</span>
                   </div>

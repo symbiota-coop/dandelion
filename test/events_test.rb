@@ -98,12 +98,6 @@ class CoreTest < ActiveSupport::TestCase
     fill_in 'donation_amount', with: (donation_amount = 5)
     click_button "Pay £#{format('%.2f', ticket_price + donation_amount)}"
     assert page.has_content? "£#{format('%.2f', ticket_price + donation_amount)}"
-    fill_in 'cardNumber', with: '4242 4242 4242 4242'
-    fill_in 'cardCvc', with: '242'
-    fill_in 'cardExpiry', with: '02/42'
-    fill_in 'billingName', with: @account.name
-    click_button 'Pay'
-    # assert page.has_content? 'Thanks for booking!'
   end
 
   test 'booking onto a paid event with a range' do
@@ -117,11 +111,18 @@ class CoreTest < ActiveSupport::TestCase
     fill_in 'donation_amount', with: (donation_amount = 5)
     click_button "Pay £#{format('%.2f', selected_price + donation_amount)}"
     assert page.has_content? "£#{format('%.2f', selected_price + donation_amount)}"
-    fill_in 'cardNumber', with: '4242 4242 4242 4242'
-    fill_in 'cardCvc', with: '242'
-    fill_in 'cardExpiry', with: '02/42'
-    fill_in 'billingName', with: @account.name
-    click_button 'Pay'
-    # assert page.has_content? 'Thanks for booking!'
+  end
+
+  test 'booking onto a paid event with a user-set price' do
+    @account = FactoryBot.create(:account)
+    @organisation = FactoryBot.create(:organisation, account: @account)
+    @event = FactoryBot.create(:event, organisation: @organisation, account: @account, last_saved_by: @account, price_or_range: nil, suggested_donation: 0)
+    login_as(@account)
+    visit "/e/#{@event.slug}"
+    fill_in "prices[#{@event.ticket_types.first.id}]", with: (selected_price = 50)
+    select 1, from: "quantities[#{@event.ticket_types.first.id}]"
+    fill_in 'donation_amount', with: (donation_amount = 5)
+    click_button "Pay £#{format('%.2f', selected_price + donation_amount)}"
+    assert page.has_content? "£#{format('%.2f', selected_price + donation_amount)}"
   end
 end

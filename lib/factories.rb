@@ -72,6 +72,7 @@ FactoryBot.define do
 
   factory :ticket_type do
     sequence(:name) { |n| "Ticket Type #{n}" }
+    price_or_range_submitted { true }
     price_or_range { 0 }
     sequence(:quantity) { |n| n }
     event
