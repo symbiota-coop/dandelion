@@ -56,3 +56,5 @@ jobs:
         STRIPE_SK: sk_test_HCthlytw40KUFZ5nWNc0XI6A        
         CI: true
       run: bundle exec rake test
+
+      
