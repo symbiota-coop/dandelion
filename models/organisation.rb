@@ -917,7 +917,7 @@ class Organisation
     rows = []
     event_ids.each_with_index do |event_id, _i|
       event = Event.find(event_id)
-      puts event.end_time.to_date.to_fs(:db_local)
+      puts event.end_time.to_date.to_fs(:db_local) if event.end_time
       row = {
         id: event.id.to_s,
         name: event.name,
