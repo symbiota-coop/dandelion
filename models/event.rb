@@ -115,7 +115,7 @@ class Event
   end
 
   def chain
-    if XDAI_CURRENCIES.include?(currency)
+    if GNOSIS_CURRENCIES.include?(currency)
       'Gnosis Chain'
     elsif CELO_CURRENCIES.include?(currency)
       'Celo'
@@ -128,8 +128,8 @@ class Event
 
   def network_id
     EVM_NETWORK_IDS[
-      if XDAI_CURRENCIES.include?(currency)
-        'XDAI'
+      if GNOSIS_CURRENCIES.include?(currency)
+        'GNOSIS'
       elsif CELO_CURRENCIES.include?(currency)
         'CELO'
       elsif OPTIMISM_CURRENCIES.include?(currency)

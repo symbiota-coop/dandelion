@@ -1,7 +1,7 @@
-XDAI_CONTRACT_ADDRESSES = {
+GNOSIS_CONTRACT_ADDRESSES = {
   'WXDAI' => '0xe91D153E0b41518A2Ce8Dd3D7944Fa863463a97d'
 }.freeze
-XDAI_CURRENCIES = XDAI_CONTRACT_ADDRESSES.keys.freeze
+GNOSIS_CURRENCIES = GNOSIS_CONTRACT_ADDRESSES.keys.freeze
 
 CELO_CONTRACT_ADDRESSES = {
   'CUSD' => '0x765DE816845861e75A25fCA122bb6898B8B1282a'
@@ -19,9 +19,9 @@ POLYGON_CONTRACT_ADDRESSES = {
 }.freeze
 POLYGON_CURRENCIES = POLYGON_CONTRACT_ADDRESSES.keys.freeze
 
-EVM_CONTRACT_ADDRESSES = {}.merge(XDAI_CONTRACT_ADDRESSES).merge(CELO_CONTRACT_ADDRESSES).merge(OPTIMISM_CONTRACT_ADDRESSES).merge(POLYGON_CONTRACT_ADDRESSES).freeze
-EVM_CURRENCIES = (XDAI_CURRENCIES + CELO_CURRENCIES + OPTIMISM_CURRENCIES + POLYGON_CURRENCIES).freeze
-EVM_NETWORK_IDS = { 'XDAI' => 100, 'CELO' => 42_220, 'OPTIMISM' => 10, 'POLYGON' => 137 }.freeze
+EVM_CONTRACT_ADDRESSES = {}.merge(GNOSIS_CONTRACT_ADDRESSES).merge(CELO_CONTRACT_ADDRESSES).merge(OPTIMISM_CONTRACT_ADDRESSES).merge(POLYGON_CONTRACT_ADDRESSES).freeze
+EVM_CURRENCIES = (GNOSIS_CURRENCIES + CELO_CURRENCIES + OPTIMISM_CURRENCIES + POLYGON_CURRENCIES).freeze
+EVM_NETWORK_IDS = { 'GNOSIS' => 100, 'CELO' => 42_220, 'OPTIMISM' => 10, 'POLYGON' => 137 }.freeze
 
 COINBASE_CURRENCIES = %w[BTC ETH].freeze
 CRYPTOCURRENCIES = (COINBASE_CURRENCIES + EVM_CURRENCIES + %w[SEEDS]).freeze
@@ -34,7 +34,7 @@ CURRENCIES_HASH = CURRENCIES.map do |currency|
   ["#{currency} (#{[
     ('Stripe' if FIAT_CURRENCIES.include?(currency)),
     ('Coinbase Commerce' if FIAT_CURRENCIES.include?(currency) || COINBASE_CURRENCIES.include?(currency)),
-    ('Gnosis Chain' if XDAI_CURRENCIES.include?(currency)),
+    ('Gnosis Chain' if GNOSIS_CURRENCIES.include?(currency)),
     ('Celo' if CELO_CURRENCIES.include?(currency)),
     ('Optimism' if OPTIMISM_CURRENCIES.include?(currency)),
     ('Polygon' if POLYGON_CURRENCIES.include?(currency) || currency == 'USD'),
@@ -46,7 +46,7 @@ CURRENCIES_HASH_UNBAKED = CURRENCIES.map do |currency|
   ["#{currency} (#{[
     ('Stripe' if FIAT_CURRENCIES.include?(currency)),
     ('Coinbase Commerce' if FIAT_CURRENCIES.include?(currency) || COINBASE_CURRENCIES.include?(currency)),
-    ('Gnosis Chain' if XDAI_CURRENCIES.include?(currency)),
+    ('Gnosis Chain' if GNOSIS_CURRENCIES.include?(currency)),
     ('Celo' if CELO_CURRENCIES.include?(currency)),
     ('Optimism' if OPTIMISM_CURRENCIES.include?(currency)),
     ('Polygon' if POLYGON_CURRENCIES.include?(currency)),

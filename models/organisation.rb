@@ -755,9 +755,8 @@ class Organisation
 
     # Etherscan
     [
-      "https://polygonscan.com/address-tokenpage?m=normal&a=#{evm_address}",
-      "https://celoscan.io/address-tokenpage?m=normal&a=#{evm_address}",
-      "https://gnosisscan.io/address-tokenpage?m=normal&a=#{evm_address}"
+      # "https://polygonscan.com/address-tokenpage?m=normal&a=#{evm_address}",
+      # "https://celoscan.io/address-tokenpage?m=normal&a=#{evm_address}",
     ].each do |url|
       puts url
       page = begin; agent.get(url); rescue Mechanize::ResponseCodeError; end
@@ -789,7 +788,8 @@ class Organisation
 
     # Blockscout
     [
-      "https://optimism.blockscout.com/api/v2/addresses/#{evm_address}/token-transfers"
+      "https://optimism.blockscout.com/api/v2/addresses/#{evm_address}/token-transfers",
+      "https://gnosis.blockscout.com/api/v2/addresses/#{evm_address}/token-transfers"
     ].each do |url|
       puts url
       page = begin; agent.get(url); rescue Mechanize::ResponseCodeError; end
