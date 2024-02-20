@@ -916,23 +916,24 @@ class Organisation
 
     rows = []
     event_ids.each_with_index do |event_id, _i|
-      event = Event.find(event_id)
-      puts event.end_time.to_date.to_fs(:db_local) if event.end_time
-      row = {
-        id: event.id.to_s,
-        name: event.name,
-        start_date: event.start_time.to_date.to_fs(:db_local),
-        end_date: event.end_time.to_date.to_fs(:db_local),
-        activity: ("#{event.activity.name} (#{event.activity_id})" if event.activity),
-        event_coordinator: ("#{event.coordinator.name} (#{event.coordinator_id})" if event.coordinator),
-        carousel: event.carousel_name,
-        order_count: event.orders.complete.count,
-        discounted_ticket_revenue: event.discounted_ticket_revenue.cents.to_f / 100,
-        organisation_discounted_ticket_revenue: event.organisation_discounted_ticket_revenue.cents.to_f / 100,
-        donation_revenue: event.donation_revenue.cents.to_f / 100,
-        organisation_revenue_share: event.organisation_revenue_share
-      }
-      rows << row
+      rows << if (event = Event.find(event_id)) && event.created_at > 6.months.ago
+                puts event.end_time.to_date.to_fs(:db_local) if event.end_time
+                {
+                  id: event.id.to_s,
+                  name: event.name,
+                  start_date: event.start_time.to_date.to_fs(:db_local),
+                  end_date: event.end_time.to_date.to_fs(:db_local),
+                  activity: ("#{event.activity.name} (#{event.activity_id})" if event.activity),
+                  event_coordinator: ("#{event.coordinator.name} (#{event.coordinator_id})" if event.coordinator),
+                  carousel: event.carousel_name,
+                  order_count: event.orders.complete.count,
+                  discounted_ticket_revenue: event.discounted_ticket_revenue.cents.to_f / 100,
+                  organisation_discounted_ticket_revenue: event.organisation_discounted_ticket_revenue.cents.to_f / 100,
+                  donation_revenue: event.donation_revenue.cents.to_f / 100,
+                  organisation_revenue_share: event.organisation_revenue_share
+                } else
+                    {}
+              end
     end
 
     worksheet.instance_variable_get(:@session).sheets_service.update_spreadsheet_value(
