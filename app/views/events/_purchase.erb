@@ -88,7 +88,7 @@
                     <em class="select-a-price-first">Select a price first</em>
                   <% elsif !ticket_type.price %>
                     <br />
-                    <em class="select-a-price-first">Select a price first</em>
+                    <em class="select-a-price-first">Set a price first</em>
                   <% end %>
                 </div>
                 <% if !@event.organisation.hide_few_left && !@event.hide_few_left && ticket_type.wiser_remaining <= 3 %>
