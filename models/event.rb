@@ -800,7 +800,7 @@ class Event
   end
 
   def self.legit
-    self.and(:id.in => TicketType.pluck(:event_id), :organisation_id.in => Organisation.and(:hidden.ne => true))
+    self.and(:id.in => TicketType.pluck(:event_id), :organisation_id.in => Organisation.and(:hidden.ne => true).pluck(:id))
   end
 
   def self.draft
