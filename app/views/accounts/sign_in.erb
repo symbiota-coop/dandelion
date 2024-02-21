@@ -12,7 +12,7 @@
             <div class="text-center mb-3">
               <% if !Provider.all.empty? %>
                 <% Provider.all.each { |provider| %>
-                <a class="btn btn-primary" href="/auth/<%= provider.omniauth_name %>"><i class="<%= provider.icon %>"></i> Sign in with <%= provider.display_name %></a>
+                <a class="btn btn-primary mb-1" href="/auth/<%= provider.omniauth_name %>"><i class="<%= provider.icon %>"></i> Sign in with <%= provider.display_name %></a>
                 <% } %>
               <% end %>
             </div>
