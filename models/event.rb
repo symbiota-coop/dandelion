@@ -124,7 +124,7 @@ class Event
     elsif POLYGON_CURRENCIES.include?(currency) || currency == 'USD'
       'Polygon'
     elsif ARBITRUM_CURRENCIES.include?(currency)
-      'Arbitrum One'      
+      'Arbitrum One'
     end
   end
 
@@ -139,7 +139,7 @@ class Event
       elsif POLYGON_CURRENCIES.include?(currency) || currency == 'USD'
         'POLYGON'
       elsif ARBITRUM_CURRENCIES.include?(currency)
-        'ARBITRUM'              
+        'ARBITRUM'
       end
     ]
   end
@@ -800,10 +800,7 @@ class Event
   end
 
   def self.legit
-    self.and(:organisation_id.in =>
-      Organisation.and(:hidden.ne => true).pluck(:id)).and(
-        :organisation_id.in => Event.and(:id.in => TicketType.pluck(:event_id)).pluck(:organisation_id)
-      )
+    self.and(:id.in => TicketType.pluck(:event_id), :organisation_id.in => Organisation.and(:hidden.ne => true))
   end
 
   def self.draft
