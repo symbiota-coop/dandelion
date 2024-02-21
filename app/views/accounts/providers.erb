@@ -1,22 +1,24 @@
 <%= partial :'accounts/nav' %>
 
-<% Provider.all.each { |provider| %>
-<div class="row align-items-center">
-  <div class="col-auto">
-    <%= provider.display_name %>
-  </div>
-  <div class="col">
-    <% if (provider_link = @account.provider_links.select { |provider_link| provider_link.provider == provider.display_name }[0]) %>
-      <% if provider.nickname.call(provider_link.omniauth_hash) %>
-        <a target="_blank" href="<%= provider.profile_url.call(provider_link.omniauth_hash) %>"><%= provider.nickname.call(provider_link.omniauth_hash) %></a>
-        <br>
+<table class="table table-borderless">
+  <% Provider.all.each { |provider| %>
+  <tr>
+    <td style="width: 1px">
+      <%= provider.display_name %>
+    </td>
+    <td>
+      <% if (provider_link = @account.provider_links.select { |provider_link| provider_link.provider == provider.display_name }[0]) %>
+        <% if provider.nickname.call(provider_link.omniauth_hash) %>
+          <a target="_blank" href="<%= provider.profile_url.call(provider_link.omniauth_hash) %>"><%= provider.nickname.call(provider_link.omniauth_hash) %></a>
+          <br>
+        <% end %>
+        <% if current_account %>
+          <a class="btn btn-danger mb-1" href="/accounts/disconnect/<%= provider.omniauth_name %>">Disconnect</a>
+        <% end %>
+      <% else %>
+        <a class="btn btn-primary mb-1" href="/auth/<%= provider.omniauth_name %>">Connect <i class="<%= provider.icon %>"></i></a>
       <% end %>
-      <% if current_account %>
-        <a class="btn btn-danger mb-1" href="/accounts/disconnect/<%= provider.omniauth_name %>">Disconnect</a>
-      <% end %>
-    <% else %>
-      <a class="btn btn-primary mb-1" href="/auth/<%= provider.omniauth_name %>">Connect <i class="<%= provider.icon %>"></i></a>
-    <% end %>
-  </div>
-</div>
-<% } %>
+    </td>
+  </tr>
+  <% } %>
+</table>

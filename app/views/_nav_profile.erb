@@ -1,8 +1,7 @@
 <%= ul_nav [
       ['View profile', "/u/#{current_account.username}"],
       ['Edit profile', '/accounts/edit'],
-      ['Subscriptions', '/accounts/subscriptions'],
+      ['Notifications', '/accounts/subscriptions'],
       (['Monthly contribution', 'https://billing.stripe.com/p/login/14kg1O9HD49fg2kcMM'] if current_account.stripe_subscription_id),
-      (['Connect <i class="fab fa-ethereum"></i>', '/accounts/providers'] unless current_account.provider_links.find_by(provider: 'Ethereum')),
       ['Sign out', '/accounts/sign_out']
     ].compact, ul_class: ul_class, li_class: '', a_class: '' %>

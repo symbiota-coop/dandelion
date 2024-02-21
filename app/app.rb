@@ -19,6 +19,7 @@ module Dandelion
     use OmniAuth::Builder do
       provider :account
       provider :ethereum, { custom_title: 'Sign in with Ethereum' }
+      provider :google_oauth2, ENV['GOOGLE_CLIENT_ID'], ENV['GOOGLE_CLIENT_SECRET'], { image_size: 400 }
     end
     use Rack::Cors do
       allow do

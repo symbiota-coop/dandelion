@@ -28,6 +28,7 @@ gem 'bcrypt'
 gem 'bech32'
 gem 'omniauth'
 gem 'omniauth-ethereum', github: 'q9f/omniauth-ethereum.rb'
+gem 'omniauth-google-oauth2'
 gem 'strong_password'
 
 # Validation and testing
