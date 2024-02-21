@@ -123,6 +123,8 @@ class Event
       'Optimism'
     elsif POLYGON_CURRENCIES.include?(currency) || currency == 'USD'
       'Polygon'
+    elsif ARBITRUM_CURRENCIES.include?(currency)
+      'Arbitrum One'      
     end
   end
 
@@ -136,6 +138,8 @@ class Event
         'OPTIMISM'
       elsif POLYGON_CURRENCIES.include?(currency) || currency == 'USD'
         'POLYGON'
+      elsif ARBITRUM_CURRENCIES.include?(currency)
+        'ARBITRUM'              
       end
     ]
   end

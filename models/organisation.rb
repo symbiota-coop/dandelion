@@ -757,6 +757,7 @@ class Organisation
     [
       # "https://polygonscan.com/address-tokenpage?m=normal&a=#{evm_address}",
       # "https://celoscan.io/address-tokenpage?m=normal&a=#{evm_address}",
+      # "https://arbiscan.io/address-tokenpage?m=normal&a=#{evm_address}",
     ].each do |url|
       puts url
       page = begin; agent.get(url); rescue Mechanize::ResponseCodeError; end

@@ -300,6 +300,8 @@ class Gathering
       'Optimism'
     elsif POLYGON_CURRENCIES.include?(currency)
       'Polygon'
+    elsif ARBITRUM_CURRENCIES.include?(currency)
+      'Arbitrum One'
     end
   end
 
@@ -313,6 +315,8 @@ class Gathering
         'OPTIMISM'
       elsif POLYGON_CURRENCIES.include?(currency)
         'POLYGON'
+      elsif ARBITRUM_CURRENCIES.include?(currency)
+        'ARBITRUM'
       end
     ]
   end
