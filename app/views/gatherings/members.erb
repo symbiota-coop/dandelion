@@ -58,7 +58,7 @@
     </div>
     <div class="col-auto">
       <% if @membership.admin? %>
-        <a class="btn btn-outline-primary" href="<%= request.path %>.csv?<%= request.query_string %>"><i class="fa fa-download"></i> Download results as CSV</a>
+        <a class="btn btn-outline-primary" href="<%= request.path %>.csv?<%= request.query_string %>"><i class="fa fa-download"></i> CSV</a>
       <% end %>
     </div>
   </div>
@@ -74,119 +74,119 @@
 <% end %>
 
 <% case (params[:view] || 'details'); when 'pictures' %>
-<div style="margin-top: 15px" class="row">
-  <% (Account.and(:id.in => @memberships.pluck(:account_id)).and(:picture_uid.ne => nil).shuffle + Account.and(:id.in => @memberships.pluck(:account_id)).and(picture_uid: nil).shuffle).each { |account| %>
-  <%= partial :'accounts/picture', locals: { account: account } %>
-  <% } %>
-</div>
+  <div style="margin-top: 15px" class="row">
+    <% (Account.and(:id.in => @memberships.pluck(:account_id)).and(:picture_uid.ne => nil).shuffle + Account.and(:id.in => @memberships.pluck(:account_id)).and(picture_uid: nil).shuffle).each { |account| %>
+    <%= partial :'accounts/picture', locals: { account: account } %>
+    <% } %>
+  </div>
 <% when 'dietary_requirements' %>
-<% if (memberships = @memberships.and(:account_id.in => Account.and(:dietary_requirements.ne => nil).pluck(:id))).count > 0 %>
+  <% if (memberships = @memberships.and(:account_id.in => Account.and(:dietary_requirements.ne => nil).pluck(:id))).count > 0 %>
+    <table class="table table-striped">
+      <thead>
+        <tr>
+          <th style="width: 1px">Name</th>
+          <th>Dietary requirements</th>
+        </tr>
+      </thead>
+      <% memberships.each { |membership| account = membership.account %>
+      <tr>
+        <td>
+          <%= partial :'accounts/account', object: account, locals: { membership: membership, show_email: viewable?(account, :email) } %>
+          <div>
+            <% membership.teamships.each { |teamship| %>
+            <a href="/g/<%= @gathering.slug %>/teams">
+              <span class="label label-primary d-inline-block mb-1"><%= teamship.team.name %></span>
+            </a>
+            <% } %>
+          </div>
+        </td>
+        <td>
+          <%== Sanitize.fragment(account.dietary_requirements) %>
+        </td>
+      </tr>
+      <% } %>
+    </table>
+  <% else %>
+    <em>No dietary requirements.</em>
+  <% end %>
+<% when 'map' %>
+  <%= partial :'maps/map', locals: { points: Account.and(:id.in => @memberships.pluck(:account_id)).and(:coordinates.ne => nil), info_window: true } %>
+<% when 'birthdays' %>
+  <ul class="search-result-list mb-3">
+    <% Account.and(:id.in => @memberships.pluck(:account_id)).ids_by_next_birthday.each { |account_id| account = Account.find(account_id) %>
+    <li>
+      <%= partial 'accounts/search_result', locals: { account: account, birthday: true } %>
+    </li>
+    <% } %>
+  </ul>
+<% when 'details'; @memberships = @memberships.per_page(50).page(params[:page]) %>
   <table class="table table-striped">
     <thead>
       <tr>
         <th style="width: 1px">Name</th>
-        <th>Dietary requirements</th>
+        <th>Following</th>
+        <th>Proposed by</th>
+        <th>Accepted at</th>
+        <% if @gathering.democratic_threshold %>
+          <th>Suggested magic number</th>
+        <% end %>
+        <% if @gathering.events.count > 0 %>
+          <th>Tickets</th>
+        <% end %>
+        <% if @gathering.enable_contributions %>
+          <th>Choices</th>
+          <% if @membership.admin? || !@gathering.hide_paid %>
+            <th>Requested contribution</th>
+            <th>Paid</th>
+          <% end %>
+        <% end %>
+        <% if @gathering.enable_rotas? && @gathering.rotas.count > 0 %>
+          <th>Shifts</th>
+        <% end %>
+        <% if (admin? || @membership.admin?) || !@gathering.hide_invitations %>
+          <th>Invitations</th>
+        <% end %>
+        <% if @membership.admin? %>
+          <th></th>
+        <% end %>
       </tr>
     </thead>
-    <% memberships.each { |membership| account = membership.account %>
-    <tr>
-      <td>
-        <%= partial :'accounts/account', object: account, locals: { membership: membership, show_email: viewable?(account, :email) } %>
-        <div>
-          <% membership.teamships.each { |teamship| %>
-          <a href="/g/<%= @gathering.slug %>/teams">
-            <span class="label label-primary d-inline-block mb-1"><%= teamship.team.name %></span>
-          </a>
-          <% } %>
-        </div>
-      </td>
-      <td>
-        <%== Sanitize.fragment(account.dietary_requirements) %>
-      </td>
-    </tr>
+    <% @memberships.each { |membership| account = membership.account %>
+    <tr data-pagelet-url="/membership_row/<%= membership.id %>"></tr>
     <% } %>
-  </table>
-<% else %>
-  <em>No dietary requirements.</em>
-<% end %>
-<% when 'map' %>
-<%= partial :'maps/map', locals: { points: Account.and(:id.in => @memberships.pluck(:account_id)).and(:coordinates.ne => nil), info_window: true } %>
-<% when 'birthdays' %>
-<ul class="search-result-list mb-3">
-  <% Account.and(:id.in => @memberships.pluck(:account_id)).ids_by_next_birthday.each { |account_id| account = Account.find(account_id) %>
-  <li>
-    <%= partial 'accounts/search_result', locals: { account: account, birthday: true } %>
-  </li>
-  <% } %>
-</ul>
-<% when 'details'; @memberships = @memberships.per_page(50).page(params[:page]) %>
-<table class="table table-striped">
-  <thead>
     <tr>
-      <th style="width: 1px">Name</th>
-      <th>Following</th>
-      <th>Proposed by</th>
-      <th>Accepted at</th>
+      <th style="width: 1px"></th>
+      <th></th>
+      <th></th>
+      <th></th>
       <% if @gathering.democratic_threshold %>
-        <th>Suggested magic number</th>
+        <th></th>
       <% end %>
       <% if @gathering.events.count > 0 %>
-        <th>Tickets</th>
+        <th></th>
       <% end %>
       <% if @gathering.enable_contributions %>
-        <th>Choices</th>
+        <th></th>
         <% if @membership.admin? || !@gathering.hide_paid %>
-          <th>Requested contribution</th>
-          <th>Paid</th>
+          <th></th>
+          <th>
+            <%= m @gathering.memberships.pluck(:paid).compact.sum, @gathering.currency %>
+            (<%= m @gathering.processed_via_dandelion, @gathering.currency %> processed via Dandelion)
+          </th>
         <% end %>
       <% end %>
       <% if @gathering.enable_rotas? && @gathering.rotas.count > 0 %>
-        <th>Shifts</th>
+        <th></th>
       <% end %>
       <% if (admin? || @membership.admin?) || !@gathering.hide_invitations %>
-        <th>Invitations</th>
+        <th></th>
       <% end %>
       <% if @membership.admin? %>
         <th></th>
       <% end %>
     </tr>
-  </thead>
-  <% @memberships.each { |membership| account = membership.account %>
-  <tr data-pagelet-url="/membership_row/<%= membership.id %>"></tr>
-  <% } %>
-  <tr>
-    <th style="width: 1px"></th>
-    <th></th>
-    <th></th>
-    <th></th>
-    <% if @gathering.democratic_threshold %>
-      <th></th>
-    <% end %>
-    <% if @gathering.events.count > 0 %>
-      <th></th>
-    <% end %>
-    <% if @gathering.enable_contributions %>
-      <th></th>
-      <% if @membership.admin? || !@gathering.hide_paid %>
-        <th></th>
-        <th>
-          <%= m @gathering.memberships.pluck(:paid).compact.sum, @gathering.currency %>
-          (<%= m @gathering.processed_via_dandelion, @gathering.currency %> processed via Dandelion)
-        </th>
-      <% end %>
-    <% end %>
-    <% if @gathering.enable_rotas? && @gathering.rotas.count > 0 %>
-      <th></th>
-    <% end %>
-    <% if (admin? || @membership.admin?) || !@gathering.hide_invitations %>
-      <th></th>
-    <% end %>
-    <% if @membership.admin? %>
-      <th></th>
-    <% end %>
-  </tr>
-</table>
-<div style="text-align: center">
-  <%= will_paginate @memberships, renderer: WillPaginate::ViewHelpers::BootstrapRenderer %>
-</div>
+  </table>
+  <div style="text-align: center">
+    <%= will_paginate @memberships, renderer: WillPaginate::ViewHelpers::BootstrapRenderer %>
+  </div>
 <% end %>
