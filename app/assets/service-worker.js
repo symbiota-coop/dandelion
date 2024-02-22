@@ -1,3 +1,3 @@
-self.addEventListener('fetch', function(event) {
- // console.log(event.request.url);
+self.addEventListener('fetch', function () {
+  // console.log(event.request.url);
 });

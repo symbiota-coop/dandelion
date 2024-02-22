@@ -1,12 +1,12 @@
 /* global pusher */
 
 $(function () {
-  $.ajaxPrefilter(function (options, originalOptions, jqXHR) {
+  $.ajaxPrefilter(function (options) {
     const t = '_t=' + Date.now()
     if (options.data) { options.data += '&' + t } else { options.data = t }
   })
 
-  $(document).on('submit', '[data-pagelet-url] form:not(.no-trigger)', function (event) {
+  $(document).on('submit', '[data-pagelet-url] form:not(.no-trigger)', function () {
     const form = this
     const pagelet = $(form).closest('[data-pagelet-url]')
     pagelet.css('opacity', '0.3')
@@ -38,10 +38,10 @@ $(function () {
             pagelet.css('opacity', '1')
           })
           if (pagelet.attr('data-pusher-refresh') && typeof (pusher) == 'undefined') {
-            pusherRefresh = $('[data-pusher-channel="' + pagelet.attr('data-pusher-refresh') + '"]')
+            let pusherRefresh = $('[data-pusher-channel="' + pagelet.attr('data-pusher-refresh') + '"]')
             pusherRefresh.load(pusherRefresh.attr('data-pagelet-url'), function () {
               if (pusherRefresh.attr('data-pagelet-refresh-also')) {
-                alsoRefresh = $('[data-pagelet-url="' + pusherRefresh.attr('data-pagelet-refresh-also') + '"]')
+                let alsoRefresh = $('[data-pagelet-url="' + pusherRefresh.attr('data-pagelet-refresh-also') + '"]')
                 alsoRefresh.load(alsoRefresh.attr('data-pagelet-url'))
               }
             })
@@ -52,7 +52,7 @@ $(function () {
     return false
   })
 
-  $(document).on('click', '[data-pagelet-url] a.pagelet-trigger', function (event) {
+  $(document).on('click', '[data-pagelet-url] a.pagelet-trigger', function () {
     const a = this
     if ($(a).hasClass('no-trigger')) {
       $(a).removeClass('no-trigger')
@@ -69,7 +69,7 @@ $(function () {
     return false
   })
 
-  $(document).on('click', '[data-pagelet-url] .pagination a', function (event) {
+  $(document).on('click', '[data-pagelet-url] .pagination a', function () {
     const a = this
     const pagelet = $(a).closest('[data-pagelet-url]')
     pagelet.css('opacity', '0.3')
@@ -96,11 +96,11 @@ $(function () {
       $('[data-pusher-channel]:not([data-pusher-channel-registered])').attr('data-pusher-channel-registered', 'true').each(function () {
         const pagelet = $(this)
         const channel = pusher.subscribe(pagelet.attr('data-pusher-channel'))
-        channel.bind('updated', function (data) {
+        channel.bind('updated', function () {
           if ($(document).find(pagelet).length == 1) { // only proceed if this pagelet still exists in the DOM, to prevent unnecessary calls to .load()
             $(pagelet).load($(pagelet).attr('data-pagelet-url'), function () {
               if (pagelet.attr('data-pagelet-refresh-also')) {
-                alsoRefresh = $('[data-pagelet-url="' + pagelet.attr('data-pagelet-refresh-also') + '"]')
+                let alsoRefresh = $('[data-pagelet-url="' + pagelet.attr('data-pagelet-refresh-also') + '"]')
                 alsoRefresh.load(alsoRefresh.attr('data-pagelet-url'))
               }
             })

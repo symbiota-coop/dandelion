@@ -33,21 +33,6 @@
   });
 </script>
 
-<% if @pmail.markdown? %>
-  <script type="text/javascript">
-    var easyMDE
-    $(function () {
-      easyMDE = new EasyMDE({
-        element: $("#pmail_body")[0],
-        autoDownloadFontAwesome: false,
-        inputStyle: 'contenteditable',
-        spellChecker: false,
-      });
-    });
-  </script>
-  <script src="/javascripts/clipboard2markdown.js?<%= @cachebuster %>"></script>
-<% end %>
-
 <div class="container-fluid">
   <% form_for @pmail, @pmail.new_record? ? '/pmails/new' : "/pmails/#{@pmail.id}/edit", id: 'pmail-form', multipart: true do |f| %>
     <% if @organisation %>

@@ -77,7 +77,6 @@
 
   <% [
      '//rawcdn.githack.com/scottdejonge/map-icons/dbf6fd7caedd60d11b5bfb5f267a114a6847d012/dist/css/map-icons.min.css',
-     '//cdn.jsdelivr.net/npm/easymde@2.10.1/dist/easymde.min.css',
      '/stylesheets/share.css',
      "/stylesheets/app.css?#{@cachebuster}"
    ].each { |f| %>
@@ -93,17 +92,15 @@
      '//rawcdn.githack.com/jackmoore/autosize/6ae70cd3d28888eb858eef1167e6ed75d25dff7f/dist/autosize.min.js',
      '//rawcdn.githack.com/mahnunchik/markerclustererplus/736b0e3a7d916fbeb2ee5007494f17a5329b11a8/src/markerclusterer.js',
      '//rawcdn.githack.com/scottdejonge/map-icons/dbf6fd7caedd60d11b5bfb5f267a114a6847d012/dist/js/map-icons.js',
-     '//rawcdn.githack.com/euangoddard/clipboard2markdown/2d46aadd373f8b5cdb5fa0763090135ac31def13/to-markdown.js',
      '//rawcdn.githack.com/scottgonzalez/jquery-ui-extensions/fb7fd7df3d70e0288394f07bfe78262b548c30d6/src/autocomplete/jquery.ui.autocomplete.html.js',
-     '//cdn.jsdelivr.net/npm/easymde@2.10.1/dist/easymde.min.js',
      '//cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.0.0',
-     '/javascripts/linkify.min.js',
-     '/javascripts/linkify-jquery.min.js',
-     '/javascripts/jquery-deparam.js',
-     '/javascripts/countUp.umd.js',
+     "/javascripts/ext/ckeditor.js?#{@cachebuster}",     
+     '/javascripts/ext/countUp.umd.js',     
+     '/javascripts/ext/jquery-deparam.js',     
+     '/javascripts/ext/linkify-jquery.min.js',
+     '/javascripts/ext/linkify.min.js',     
      "/javascripts/pagelets.js?#{@cachebuster}",
      "/javascripts/jquery.lookup.js?#{@cachebuster}",
-     "/javascripts/ckeditor.js?#{@cachebuster}",
      "/javascripts/app.js?#{@cachebuster}"
    ].each { |f| %>
   <script src="<%= f %>"></script>

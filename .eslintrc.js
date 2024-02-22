@@ -1,4 +1,10 @@
+/* eslint-env node */
+
 module.exports = {
+  ignorePatterns: [
+    'app/assets/javascripts/ext/**/*.js',
+    'app/assets/infinite_admin/**/*.js'
+  ],
   env: {
     browser: true,
     es2021: true,
@@ -15,7 +21,7 @@ module.exports = {
     Pace: true,
     ClassicEditor: true
   },
-  extends: 'standard',
+  extends: 'eslint:recommended',
   overrides: [
   ],
   parserOptions: {

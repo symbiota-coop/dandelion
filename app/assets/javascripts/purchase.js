@@ -195,7 +195,7 @@ $(function () {
             }
           })
 
-          function connectWeb3Wallet () {
+          const connectWeb3Wallet = function () {
             if (!ethereum.selectedAddress) {
               console.log('connecting')
               $('#pay-with-evm').find('.card-body p.web3wallet').html('<a href="javascript:;">Connect your web3 wallet</a>')
@@ -209,7 +209,7 @@ $(function () {
             }
           }
 
-          function pay () {
+          const pay = function () {
             console.log('paying')
             $('#pay-with-evm').find('.card-body p.web3wallet').remove()
 
