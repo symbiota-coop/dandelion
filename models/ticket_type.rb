@@ -74,7 +74,9 @@ class TicketType
   end
 
   def floaty?(obj)
-    obj.to_f.to_s == obj.to_s || obj.to_i.to_s == obj.to_s
+    !Float(obj).nil?
+  rescue StandardError
+    false
   end
 
   def send_payment_reminder
