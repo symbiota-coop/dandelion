@@ -7,7 +7,7 @@ module.exports = {
   ],
   env: {
     browser: true,
-    es2021: true,
+    // es2021: true,
     jquery: true
   },
   globals: {
@@ -24,11 +24,11 @@ module.exports = {
   extends: 'eslint:recommended',
   overrides: [
   ],
-  parserOptions: {
-    ecmaVersion: 'latest'
-  },
+  // parserOptions: {
+  //   ecmaVersion: 'latest'
+  // },
   rules: {
-    camelcase: 'off',
-    eqeqeq: 'off'
+    // camelcase: 'off',
+    // eqeqeq: 'off'
   }
 }
