@@ -1,15 +1,18 @@
 /* eslint-env node */
 
 module.exports = {
+  extends: 'eslint:recommended',
+  parserOptions: {
+    ecmaVersion: 'latest'
+  },
+  env: {
+    browser: true,
+    jquery: true
+  },
   ignorePatterns: [
     'app/assets/javascripts/ext/**/*.js',
     'app/assets/infinite_admin/**/*.js'
   ],
-  env: {
-    browser: true,
-    // es2021: true,
-    jquery: true
-  },
   globals: {
     Stripe: true,
     ethereum: true,
@@ -20,15 +23,5 @@ module.exports = {
     hljs: true,
     Pace: true,
     ClassicEditor: true
-  },
-  extends: 'eslint:recommended',
-  overrides: [
-  ],
-  // parserOptions: {
-  //   ecmaVersion: 'latest'
-  // },
-  rules: {
-    // camelcase: 'off',
-    // eqeqeq: 'off'
   }
 }
