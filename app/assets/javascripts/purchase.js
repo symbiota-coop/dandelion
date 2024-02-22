@@ -1,4 +1,5 @@
 /* global timeAgo, eventId, eventUrl, placesRemaining, currency, currencySymbol, stripePk, coinbase, seedsUsername, organisationOcSlug, ocSlug, evmAddress, contractAddress, networkId, networkName, signedIn */
+/* eslint no-inner-declarations: off */
 
 $(function () {
   $('#details form').on('keyup keypress', function (e) {
@@ -195,7 +196,7 @@ $(function () {
             }
           })
 
-          const connectWeb3Wallet = function () {
+          function connectWeb3Wallet () {
             if (!ethereum.selectedAddress) {
               console.log('connecting')
               $('#pay-with-evm').find('.card-body p.web3wallet').html('<a href="javascript:;">Connect your web3 wallet</a>')
@@ -209,7 +210,7 @@ $(function () {
             }
           }
 
-          const pay = function () {
+          function pay () {
             console.log('paying')
             $('#pay-with-evm').find('.card-body p.web3wallet').remove()
 
