@@ -11,7 +11,15 @@ module.exports = {
     jquery: true
   },
   globals: {
-
+    Stripe: true,
+    ethereum: true,
+    Web3: true,
+    Tribute: true,
+    iframely: true,
+    autosize: true,
+    hljs: true,
+    Pace: true,
+    ClassicEditor: true
   },
   extends: 'eslint:recommended',
   overrides: [
