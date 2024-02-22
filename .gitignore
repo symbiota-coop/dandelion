@@ -14,7 +14,6 @@ app/assets/stylesheets/app.css.map
 capybara
 node_modules
 *.js.map
-app/assets/javascripts/ckeditor5/build/translations
 .on-save.json
 *.code-workspace
 dump
