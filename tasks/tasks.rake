@@ -20,7 +20,7 @@ namespace :organisations do
 
   task create_edges: :environment do
     OrganisationEdge.delete_all
-    OrganisationEdge.create_all(Organisation.and(:followers_count.gte => 50))
+    OrganisationEdge.create_all(Organisation.and(:followers_count.gte => 50).and(:id.nin => Organisation.order('followers_count desc').limit(1).pluck(:id)))
   end
 
   task set_counts: :environment do
