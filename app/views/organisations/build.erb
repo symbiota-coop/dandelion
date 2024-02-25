@@ -229,8 +229,9 @@
           </script>
 
           <%= f.check_box_block :enable_discussion %>
-          <%= f.check_box_block :auto_comment_sending %>
+          <%= f.check_box_block :auto_comment_sending %>          
           <%= f.check_box_block :restrict_cohosting %>
+          <%= f.check_box_block :hide_ticket_revenue %>
         </div>
         <% if Padrino.env == :development || @organisation.verified? %>
           <div role="tabpanel" class="tab-pane <%= 'active' if params[:tab].to_i == 7%>" id="tab7">

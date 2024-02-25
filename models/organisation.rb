@@ -91,6 +91,7 @@ class Organisation
   field :terms_and_conditions_url, type: String
   field :require_organiser_or_revenue_sharer, type: Boolean
   field :oc_slug, type: String
+  field :hide_ticket_revenue, type: Boolean
 
   field :tokens, type: Float
   index({ tokens: 1 })
@@ -208,7 +209,8 @@ class Organisation
       evm_address: 'Ethereum-compatible wallet address for receiving tokens via EVM networks',
       seeds_username: 'SEEDS/Telos username for receiving SEEDS via Telos',
       restrict_cohosting: 'When checked, only admins can add the organisation as a co-host of events',
-      oc_slug: 'Open Collective organisation slug'
+      oc_slug: 'Open Collective organisation slug',
+      hide_ticket_revenue: 'Hide ticket revenue in event stats'
     }
   end
 

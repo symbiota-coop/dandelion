@@ -114,11 +114,15 @@
       <td>
         <%= partial :'events/checked_in', locals: { event: event } %>
       </td>
-      <td data-sort="<%=begin; event.discounted_ticket_revenue.exchange_to(event.organisation.currency); rescue Money::Bank::UnknownRate, Money::Currency::UnknownCurrency; 0; end%>">
-        <% if event.discounted_ticket_revenue > 0 %>
-          <%= m event.discounted_ticket_revenue, event.currency %>
-        <% end %>
-      </td>
+      <% if event.organisation.hide_ticket_revenue %>
+        <td></td>
+      <% else %>
+        <td data-sort="<%=begin; event.discounted_ticket_revenue.exchange_to(event.organisation.currency); rescue Money::Bank::UnknownRate, Money::Currency::UnknownCurrency; 0; end%>">
+          <% if event.discounted_ticket_revenue > 0 %>
+            <%= m event.discounted_ticket_revenue, event.currency %>
+          <% end %>
+        </td>
+      <% end %>
       <td>
         <% if event.credit_payable_to_revenue_sharer > 0 %>
           <%= m event.credit_payable_to_revenue_sharer, event.currency %>
