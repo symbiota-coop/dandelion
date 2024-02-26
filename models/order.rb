@@ -41,7 +41,16 @@ class Order
   field :message_ids, type: String
   field :answers, type: Array
 
-  attr_accessor :gc_plan_id, :gc_given_name, :gc_family_name, :gc_address_line1, :gc_city, :gc_postal_code, :gc_branch_code, :gc_account_number, :prevent_refund, :cohost
+  field :gc_plan_id, type: String
+  field :gc_given_name, type: String
+  field :gc_family_name, type: String
+  field :gc_address_line1, type: String
+  field :gc_city, type: String
+  field :gc_postal_code, type: String
+  field :gc_branch_code, type: String
+  field :gc_account_number, type: String
+
+  attr_accessor :prevent_refund, :cohost
 
   def self.admin_fields
     {
@@ -71,6 +80,14 @@ class Order
       account_id: :lookup,
       discount_code_id: :lookup,
       original_description: :text_area,
+      gc_plan_id: :text,
+      gc_given_name: :text,
+      gc_family_name: :text,
+      gc_address_line1: :text,
+      gc_city: :text,
+      gc_postal_code: :text,
+      gc_branch_code: :text,
+      gc_account_number: :text,
       tickets: :collection,
       donations: :collection
     }
