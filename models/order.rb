@@ -49,6 +49,7 @@ class Order
   field :gc_postal_code, type: String
   field :gc_branch_code, type: String
   field :gc_account_number, type: String
+  field :gc_success, type: Boolean
 
   attr_accessor :prevent_refund, :cohost
 
@@ -88,6 +89,7 @@ class Order
       gc_postal_code: :text,
       gc_branch_code: :text,
       gc_account_number: :text,
+      gc_success: :check_box,
       tickets: :collection,
       donations: :collection
     }
@@ -476,6 +478,8 @@ class Order
   handle_asynchronously :send_notification
 
   def sign_up_to_gocardless
+    return unless [gc_plan_id, gc_given_name, gc_family_name, gc_address_line1, gc_city, gc_postal_code, gc_branch_code, gc_account_number].all?(&:present?)
+
     f = Ferrum::Browser.new
     f.go_to("https://pay.gocardless.com/#{gc_plan_id}")
     sleep 5
@@ -500,6 +504,8 @@ class Order
     f.at_css('button[type=submit]').scroll_into_view.click
     # sleep 5
     # f.screenshot(path: 'screenshot5.png')
+    [gc_plan_id, gc_given_name, gc_family_name, gc_address_line1, gc_city, gc_postal_code, gc_branch_code, gc_account_number].each { |f| set(f => nil) }
+    set(gc_success: true)
   end
   handle_asynchronously :sign_up_to_gocardless
 end
