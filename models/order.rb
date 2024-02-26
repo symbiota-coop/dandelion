@@ -504,7 +504,7 @@ class Order
     f.at_css('button[type=submit]').scroll_into_view.click
     # sleep 5
     # f.screenshot(path: 'screenshot5.png')
-    [gc_plan_id, gc_given_name, gc_family_name, gc_address_line1, gc_city, gc_postal_code, gc_branch_code, gc_account_number].each { |f| set(f => nil) }
+    %i[gc_plan_id gc_given_name gc_family_name gc_address_line1 gc_city gc_postal_code gc_branch_code gc_account_number].each { |f| set(f => nil) }
     set(gc_success: true)
   end
   handle_asynchronously :sign_up_to_gocardless
