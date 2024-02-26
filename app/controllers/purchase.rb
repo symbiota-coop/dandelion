@@ -39,6 +39,14 @@ Dandelion::App.controller do
         opt_in_organisation: detailsForm[:account][:opt_in_organisation] == '1' || (detailsForm[:account][:opt_in_organisation].is_a?(Array) && detailsForm[:account][:opt_in_organisation].include?('1')),
         opt_in_facilitator: detailsForm[:account][:opt_in_facilitator].is_a?(Array) && detailsForm[:account][:opt_in_facilitator].include?('1'),
         hear_about: detailsForm[:account][:hear_about],
+        gc_plan_id: detailsForm[:account][:gc_plan_id],
+        gc_given_name: detailsForm[:account][:gc_given_name],
+        gc_family_name: detailsForm[:account][:gc_family_name],
+        gc_address_line1: detailsForm[:account][:gc_address_line1],
+        gc_city: detailsForm[:account][:gc_city],
+        gc_postal_code: detailsForm[:account][:gc_postal_code],
+        gc_branch_code: detailsForm[:account][:gc_branch_code],
+        gc_account_number: detailsForm[:account][:gc_account_number],
         http_referrer: detailsForm[:account][:http_referrer],
         answers: (detailsForm[:answers].map { |i, x| [@event.questions_a[i.to_i], x] } if detailsForm[:answers])
       )

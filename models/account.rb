@@ -544,7 +544,7 @@ class Account
   has_many :provider_links, dependent: :destroy
   accepts_nested_attributes_for :provider_links
 
-  attr_accessor :password, :postcode, :country, :skip_confirmation_email
+  attr_accessor :password, :postcode, :country, :skip_confirmation_email, :gc_plan_id
 
   validates_presence_of :name, :username, :email
   validates_uniqueness_of   :email,    case_sensitive: false
@@ -688,7 +688,14 @@ Two Spirit).split("\n")
       unsubscribed_reminders: 'Opt out of event reminders',
       hidden: 'Make my profile private and visible only to me',
       hear_about: 'How did you hear about this event?',
-      client_note: 'Add a note'
+      gc_plan_id: 'Your plan',
+      gc_given_name: 'First name on bank account',
+      gc_family_name: 'Last name on bank account',
+      gc_address_line1: 'Address line 1',
+      gc_city: 'City',
+      gc_postal_code: 'Post code',
+      gc_branch_code: 'Sort code',
+      gc_account_number: 'Account number'
     }[attr.to_sym] || super
   end
 

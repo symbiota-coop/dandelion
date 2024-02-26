@@ -41,6 +41,8 @@ class Order
   field :message_ids, type: String
   field :answers, type: Array
 
+  attr_accessor :gc_plan_id, :gc_given_name, :gc_family_name, :gc_address_line1, :gc_city, :gc_postal_code, :gc_branch_code, :gc_account_number, :prevent_refund, :cohost
+
   def self.admin_fields
     {
       value: :number,
@@ -241,6 +243,7 @@ class Order
       event.activity.activityships.create account: account if event.activity && event.activity.privacy == 'open'
       event.local_group.local_groupships.create account: account if event.local_group
     end
+    sign_up_to_gocardless if gc_plan_id
   end
 
   def update_destination_payment
@@ -263,8 +266,6 @@ class Order
       Airbrake.notify(e)
     end
   end
-
-  attr_accessor :prevent_refund, :cohost
 
   after_destroy :refund
   def refund
@@ -456,4 +457,32 @@ class Order
     batch_message.finalize if ENV['MAILGUN_API_KEY']
   end
   handle_asynchronously :send_notification
+
+  def sign_up_to_gocardless
+    f = Ferrum::Browser.new
+    f.go_to("https://pay.gocardless.com/#{gc_plan_id}")
+    sleep 5
+    f.at_css('#given_name').focus.type(gc_given_name)
+    f.at_css('#family_name').focus.type(gc_family_name)
+    f.at_css('#email').focus.type(account.email)
+    # f.screenshot(path: 'screenshot1.png')
+    f.css('form button[type=button]').last.scroll_into_view.click
+    sleep 5
+    f.at_css('#address_line1').focus.type(gc_address_line1)
+    f.at_css('#city').focus.type(gc_city)
+    f.at_css('#postal_code').focus.type(gc_postal_code)
+    # f.screenshot(path: 'screenshot2.png')
+    f.at_css('form button[type=submit]').scroll_into_view.click
+    sleep 5
+    f.at_css('#branch_code').focus.type(gc_branch_code)
+    f.at_css('#account_number').focus.type(gc_account_number)
+    # f.screenshot(path: 'screenshot3.png')
+    f.at_css('form button[type=submit]').scroll_into_view.click
+    sleep 5
+    # f.screenshot(path: 'screenshot4.png')
+    f.at_css('button[type=submit]').scroll_into_view.click
+    # sleep 5
+    # f.screenshot(path: 'screenshot5.png')
+  end
+  handle_asynchronously :sign_up_to_gocardless
 end

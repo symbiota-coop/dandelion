@@ -122,7 +122,7 @@ $(function () {
       $(this).html(nl2br($(this).html()))
     })
 
-    $('textarea[id=comment_body], #account_client_note, textarea.autosize').not('[data-autosized]').attr('data-autosized', true).each(function () {
+    $('textarea[id=comment_body], textarea.autosize').not('[data-autosized]').attr('data-autosized', true).each(function () {
       autosize(this)
     })
 

@@ -8,13 +8,13 @@ class OrganisationTier
   field :description, type: String
   field :threshold, type: Integer
   field :discount, type: Integer
-  field :gocardless_url, type: String
+  field :gc_plan_id, type: String
 
   def self.admin_fields
     {
       name: :text,
       description: :text_area,
-      gocardless_url: :url,
+      gc_plan_id: :text,
       threshold: :number,
       discount: :number,
       organisation_id: :lookup
@@ -25,7 +25,7 @@ class OrganisationTier
 
   def self.human_attribute_name(attr, options = {})
     {
-      gocardless_url: 'GoCardless URL'
+      gc_plan_id: 'GoCardless plan ID'
     }[attr.to_sym] || super
   end
 end
