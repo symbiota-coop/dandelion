@@ -327,7 +327,7 @@
     <% if @event.organisation.organisation_tiers.count > 0 %>
       <a class="mb-3" style="display: inline-block" href="javascript:;" onclick="$(this).hide().next().show()">Become a member of <%=@event.organisation.name%> now</a>
       <div id="gc-details" style="display: none">
-        <%= f.select_block :gc_plan_id, options: @event.organisation.organisation_tiers.map { |organisation_tier| ["#{organisation_tier.name} (#{m organisation_tier.threshold, @event.organisation.currency}/month)", organisation_tier.gc_plan_id] } %>
+        <%= f.select_block :gc_plan_id, options: [''] + @event.organisation.organisation_tiers.map { |organisation_tier| ["#{organisation_tier.name} (#{m organisation_tier.threshold, @event.organisation.currency}/month)", organisation_tier.gc_plan_id] } %>
         <%= f.text_block :gc_given_name %>
         <%= f.text_block :gc_family_name %>
         <%= f.text_block :gc_address_line1 %>
