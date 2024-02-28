@@ -16,6 +16,7 @@
       <th>Tier name</th>
       <th>Threshold</th>
       <th>Discount</th>
+      <th>GoCardless ID</th>
     </tr>
   </thead>
   <% @organisation.organisation_tiers(true).order('threshold asc').each { |organisation_tier| %>
@@ -32,6 +33,9 @@
     </td>
     <td>
       <%= organisation_tier.discount %>%
+    </td>
+    <td>
+      <%= organisation_tier.gc_plan_id %>%
     </td>
   </tr>
   <% } %>
