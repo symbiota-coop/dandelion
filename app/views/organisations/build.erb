@@ -204,6 +204,8 @@
           <%= f.number_block :event_image_required_height %>
           <%= f.url_block :become_a_member_url %>
           <%= f.url_block :terms_and_conditions_url %>
+          <%= f.text_area_block :terms_and_conditions %>
+          <%= f.check_box_block :terms_and_conditions_check_box %>
           <%= f.check_box_block :collect_location %>
 
           <script>
@@ -229,7 +231,7 @@
           </script>
 
           <%= f.check_box_block :enable_discussion %>
-          <%= f.check_box_block :auto_comment_sending %>          
+          <%= f.check_box_block :auto_comment_sending %>
           <%= f.check_box_block :restrict_cohosting %>
           <%= f.check_box_block :hide_ticket_revenue %>
         </div>

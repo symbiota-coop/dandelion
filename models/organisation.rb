@@ -89,6 +89,8 @@ class Organisation
   field :google_sheets_key, type: String
   field :fixed_fee, type: Boolean
   field :terms_and_conditions_url, type: String
+  field :terms_and_conditions, type: String
+  field :terms_and_conditions_check_box, type: Boolean
   field :require_organiser_or_revenue_sharer, type: Boolean
   field :oc_slug, type: String
   field :hide_ticket_revenue, type: Boolean
@@ -152,7 +154,9 @@ class Organisation
       event_image_required_height: :number,
       event_image_required_width: :number,
       psychedelic: :check_box,
-      terms_and_conditions_url: :url
+      terms_and_conditions_url: :url,
+      terms_and_conditions: :text_area,
+      terms_and_conditions_check_box: :check_box
     }
   end
 
@@ -202,6 +206,8 @@ class Organisation
       patreon_api_key: 'Registers people with active Patreon subscriptions as monthly donors',
       become_a_member_url: 'Link to direct non-members to when they attempt to buy tickets to a members-only event',
       terms_and_conditions_url: "Link to the organisation's terms and conditions of sale",
+      terms_and_conditions: 'Terms and conditions to be displayed on the ticket purchase page',
+      terms_and_conditions_check_box: 'Require attendees to check a box to confirm they have read and agree to the terms and conditions',
       event_footer: 'Included at the end of all public event descriptions',
       banned_emails: 'One per line',
       event_image_required_width: 'Required width for event images in px',

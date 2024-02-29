@@ -128,6 +128,11 @@ $(function () {
       }
     }
 
+    if ($('#accepted-terms').length > 0 && !$('#accepted-terms').is(':checked')) {
+      alert('You must agree to the terms and conditions to proceed')
+      return false
+    }
+
     if (typeof timeAgo !== 'undefined') {
       if (!confirm('This event started ' + timeAgo + ' ago. Press OK to continue, or Cancel to go back.')) { return false }
     }
