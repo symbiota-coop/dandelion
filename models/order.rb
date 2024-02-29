@@ -422,7 +422,7 @@ class Order
         revent.dtstart = event.start_time
         revent.dtend = event.end_time
         revent.location = event.location
-        revent.description = %(#{ENV['BASE_URI']}/events/#{event.id})
+        revent.description = %(#{ENV['BASE_URI']}/orders/#{order.id})
         revent.organizer = event.email
         revent.uid = event.id.to_s
       end
