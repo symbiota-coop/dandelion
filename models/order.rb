@@ -288,7 +288,7 @@ class Order
 
   after_destroy :refund
   def refund
-    return unless event.refund_deleted_orders && !prevent_refund && event.organisation && value && value.positive? && payment_completed && payment_intent
+    return unless event.refund_deleted_orders && !prevent_refund && event.organisation && event.organisation.stripe_sk && value && value.positive? && payment_completed && payment_intent
 
     begin
       Stripe.api_key = event.organisation.stripe_sk
