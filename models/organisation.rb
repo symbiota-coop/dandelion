@@ -942,7 +942,8 @@ class Organisation
                 }
               else
                 {
-                  id: event_id
+                  id: event_id,
+                  name: 'Event not found'
                 }
               end
     end
