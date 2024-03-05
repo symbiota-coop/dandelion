@@ -907,8 +907,7 @@ class Organisation
 
     rows = []
     events.live.and(:id.nin => event_ids, :start_time.gte => '2020-06-01').each do |event|
-      row = { id: event.id.to_s }
-      rows << row
+      rows << { id: event.id.to_s } if event.created_at > 6.months.ago
     end
 
     worksheet.instance_variable_get(:@session).sheets_service.append_spreadsheet_value(
@@ -924,11 +923,11 @@ class Organisation
     ).values.flatten
 
     rows = []
-    event_ids.each_with_index do |event_id, _i|
-      rows << if (event = Event.find(event_id)) && event.created_at > 6.months.ago
+    event_ids.each do |event_id|
+      rows << if (event = Event.find(event_id))
                 puts event.end_time.to_date.to_fs(:db_local) if event.end_time
                 {
-                  id: event.id.to_s,
+                  id: event_id,
                   name: event.name,
                   start_date: event.start_time.to_date.to_fs(:db_local),
                   end_date: event.end_time.to_date.to_fs(:db_local),
@@ -940,8 +939,11 @@ class Organisation
                   organisation_discounted_ticket_revenue: event.organisation_discounted_ticket_revenue.cents.to_f / 100,
                   donation_revenue: event.donation_revenue.cents.to_f / 100,
                   organisation_revenue_share: event.organisation_revenue_share
-                } else
-                    {}
+                }
+              else
+                {
+                  id: event_id
+                }
               end
     end
 
