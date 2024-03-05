@@ -906,8 +906,8 @@ class Organisation
     ).values.flatten
 
     rows = []
-    events.live.and(:id.nin => event_ids, :start_time.gte => '2020-06-01').each do |event|
-      rows << { id: event.id.to_s } if event.created_at > 6.months.ago
+    events.live.and(:id.nin => event_ids, :created_at.gt => 6.months.ago).each do |event|
+      rows << { id: event.id.to_s }
     end
 
     worksheet.instance_variable_get(:@session).sheets_service.append_spreadsheet_value(
