@@ -3,80 +3,31 @@
     <h1>Feedback on <%= @event.summary %></h1>
     <% form_for @event_feedback, "/events/#{@event.id}/give_feedback" do |f| %>
       <%= f.hidden_field :account_id %>
-      <style>
-        .rating {
-          display: inline-block;
-          position: relative;
-          height: 50px;
-          line-height: 50px;
-          font-size: 50px;
-        }
-
-        .rating label {
-          position: absolute;
-          top: 0;
-          left: 0;
-          height: 100%;
-          cursor: pointer;
-        }
-
-        .rating label:last-child {
-          position: static;
-        }
-
-        .rating label:nth-child(1) {
-          z-index: 5;
-        }
-
-        .rating label:nth-child(2) {
-          z-index: 4;
-        }
-
-        .rating label:nth-child(3) {
-          z-index: 3;
-        }
-
-        .rating label:nth-child(4) {
-          z-index: 2;
-        }
-
-        .rating label:nth-child(5) {
-          z-index: 1;
-        }
-
-        .rating label input {
-          position: absolute;
-          top: 0;
-          left: 0;
-          opacity: 0;
-        }
-
-        .rating label .fa.fa-star {
-          float: left;
-          color: transparent;
-        }
-
-        .rating label:last-child .fa.fa-star {
-          color: #bbb;
-        }
-
-        .rating:not(:hover) label input:checked ~ .fa.fa-star,
-        .rating:hover label:hover input ~ .fa.fa-star {
-          color: #f5b041;
-        }
-
-        .rating label input:focus:not(:checked) ~ .fa.fa-star:last-child {
-          color: #bbb;
-        }
-      </style>
-      <div class="rating">
+      <%= f.hidden_field :rating %>
+      <script>
+        $(function() {
+          $('.fa-star').hover(function() {
+            $(this).prevAll().addBack().css('color', '#f5b041');
+            $(this).nextAll().css('color', '#bbb');
+          }, function() {
+            if (!$('input[name="event_feedback[rating]"]').val()) {
+              $('.fa-star').css('color', '#bbb');
+            }
+          });
+          $('.fa-star').click(function() {
+            $('input[name="event_feedback[rating]"]').val($(this).index() + 1);
+          });
+          $($('input[name="event_feedback[rating]"]')[0].form).submit(function() {
+            if (!$('input[name="event_feedback[rating]"]').val()) {
+              alert('Please provide a star rating');
+              return false;
+            }
+          });
+        });
+      </script>
+      <div class="rate my-2">
         <% 1.upto(5) do |i| %>
-          <label>
-            <input type="radio" name="event_feedback[rating]" required="required" value="<%= i %>">
-            <% i.times do %>
-              <i class="fa fa-star"></i>
-            <% end %>
-          </label>
+          <i class="fa fa-star" style="cursor: pointer; font-size: 50px; color: #bbb"></i>
         <% end %>
       </div>
       <% @event.feedback_questions_a.each_with_index { |q,i| %>
