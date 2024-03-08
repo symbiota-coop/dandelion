@@ -561,7 +561,7 @@ class Account
   def self.new_hints
     {
       location: 'Used for connecting you with events near you. Never displayed publicly without your consent.',
-      date_of_birth: 'We use this to calculate your age.'
+      date_of_birth: 'Never displayed publicly, though you can choose to show your age.'
     }
   end
 
