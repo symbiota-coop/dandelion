@@ -90,7 +90,11 @@ module Dandelion
                       params: params,
                       request: request.env.select { |_k, v| v.is_a?(String) },
                       session: session)
-      erb :error, layout: :application
+      if content_type == :html
+        erb :error, layout: :application
+      else
+        500
+      end
     end
 
     get '/error' do
