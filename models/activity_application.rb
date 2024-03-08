@@ -47,7 +47,7 @@ class ActivityApplication
   end
 
   before_validation do
-    self.word_count = answers.map { |_q, a| a }.join(' ').split.count
+    self.word_count = answers.map { |_q, a| a }.join(' ').split.count if answers
   end
 
   def self.human_attribute_name(attr, options = {})
