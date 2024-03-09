@@ -6,15 +6,19 @@
       <%= f.hidden_field :rating %>
       <script>
         $(function() {
-          $('.fa-star').hover(function() {
+          $('.rate .fa-star').hover(function() {
             $(this).prevAll().addBack().css('color', '#f5b041');
             $(this).nextAll().css('color', '#bbb');
           }, function() {
-            if (!$('input[name="event_feedback[rating]"]').val()) {
-              $('.fa-star').css('color', '#bbb');
+            var rating  = $('input[name="event_feedback[rating]"]').val();
+            if (rating) {
+              $('.rate .fa-star').css('color', '#bbb');
+              $('.rate .fa-star').slice(0, rating).css('color', '#f5b041');
+            } else {
+              $('.rate .fa-star').css('color', '#bbb');
             }
           });
-          $('.fa-star').click(function() {
+          $('.rate .fa-star').click(function() {
             $('input[name="event_feedback[rating]"]').val($(this).index() + 1);
           });
           $($('input[name="event_feedback[rating]"]')[0].form).submit(function() {
