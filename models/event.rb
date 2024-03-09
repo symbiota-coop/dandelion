@@ -957,8 +957,8 @@ class Event
     cal.append_custom_property('METHOD', 'REQUEST') if order
     cal.event do |e|
       e.summary = (event.start_time.to_date == event.end_time.to_date ? event.name : "#{event.name} starts")
-      e.dtstart = (event.start_time.to_date == event.end_time.to_date ? event.start_time : Icalendar::Values::Date.new(event.start_time.to_date))
-      e.dtend = (event.start_time.to_date == event.end_time.to_date ? event.end_time : Icalendar::Values::Date.new(event.start_time.to_date + 1))
+      e.dtstart = (event.start_time.to_date == event.end_time.to_date ? event.start_time.utc : Icalendar::Values::Date.new(event.start_time.to_date))
+      e.dtend = (event.start_time.to_date == event.end_time.to_date ? event.end_time.utc : Icalendar::Values::Date.new(event.start_time.to_date + 1))
       e.location = event.location
       e.description = order ? %(#{ENV['BASE_URI']}/orders/#{order.id}) : %(#{ENV['BASE_URI']}/events/#{event.id})
       e.organizer = event.email

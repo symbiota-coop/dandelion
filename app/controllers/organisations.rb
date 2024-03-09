@@ -282,12 +282,12 @@ Dandelion::App.controller do
         cal.event do |e|
           if @organisation.ical_full
             e.summary = event.name
-            e.dtstart = event.start_time
-            e.dtend = event.end_time
+            e.dtstart = event.start_time.utc
+            e.dtend = event.end_time.utc
           else
             e.summary = (event.start_time.to_date == event.end_time.to_date ? event.name : "#{event.name} starts")
-            e.dtstart = (event.start_time.to_date == event.end_time.to_date ? event.start_time : Icalendar::Values::Date.new(event.start_time.to_date))
-            e.dtend = (event.start_time.to_date == event.end_time.to_date ? event.end_time : Icalendar::Values::Date.new(event.start_time.to_date + 1))
+            e.dtstart = (event.start_time.to_date == event.end_time.to_date ? event.start_time.utc : Icalendar::Values::Date.new(event.start_time.to_date))
+            e.dtend = (event.start_time.to_date == event.end_time.to_date ? event.end_time.utc : Icalendar::Values::Date.new(event.start_time.to_date + 1))
           end
           e.location = event.location
           e.description = %(#{ENV['BASE_URI']}/events/#{event.id})
