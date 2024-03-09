@@ -419,7 +419,7 @@ class Order
     cal = event.ical(description: %(#{ENV['BASE_URI']}/orders/#{order.id}))
     ics_filename = "dandelion-#{event.name.parameterize}-#{order.id}.ics"
     ics_file = File.new(ics_filename, 'w+')
-    ics_file.write cal.export
+    ics_file.write cal.to_ical
     ics_file.rewind
     batch_message.add_attachment ics_file, ics_filename
 
