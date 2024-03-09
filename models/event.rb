@@ -951,19 +951,28 @@ class Event
     {}.merge(new_hints)
   end
 
-  def ical(description: nil)
+  def ical(order: nil)
     event = self
     cal = Icalendar::Calendar.new
-    cal.append_custom_property('METHOD', 'REQUEST')
+    cal.append_custom_property('METHOD', 'REQUEST') if order
     cal.event do |e|
       e.summary = (event.start_time.to_date == event.end_time.to_date ? event.name : "#{event.name} starts")
       e.dtstart = (event.start_time.to_date == event.end_time.to_date ? event.start_time : Icalendar::Values::Date.new(event.start_time.to_date))
       e.dtend = (event.start_time.to_date == event.end_time.to_date ? event.end_time : Icalendar::Values::Date.new(event.start_time.to_date + 1))
       e.location = event.location
-      e.description = description || %(#{ENV['BASE_URI']}/events/#{event.id})
+      e.description = order ? %(#{ENV['BASE_URI']}/orders/#{order.id}) : %(#{ENV['BASE_URI']}/events/#{event.id})
       e.organizer = event.email
       e.uid = event.id.to_s
-      e.status = 'CONFIRMED'
+      if order
+        e.status = 'CONFIRMED'
+        e.attendee = Icalendar::Values::CalAddress.new(
+          "mailto:#{order.account.email}",
+          cn: order.account.email,
+          role: 'REQ-PARTICIPANT',
+          partstat: 'ACCEPTED',
+          cutype: 'INDIVIDUAL'
+        )
+      end
     end
     cal
   end

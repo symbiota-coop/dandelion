@@ -317,7 +317,7 @@ Dandelion::App.controller do
     Premailer.new(ERB.new(File.read(Padrino.root('app/views/layouts/email.erb'))).result(binding), with_html_string: true, adapter: 'nokogiri', input_encoding: 'UTF-8').to_inline_css
   end
 
-  get '/orders/:id', provides: [:html, :pdf] do
+  get '/orders/:id', provides: %i[html pdf ics] do
     @order = Order.find(params[:id]) || not_found
     @event = @order.event
     event = @event
@@ -337,6 +337,8 @@ Dandelion::App.controller do
     case content_type
     when :html
       Premailer.new(ERB.new(File.read(Padrino.root('app/views/layouts/email.erb'))).result(binding), with_html_string: true, adapter: 'nokogiri', input_encoding: 'UTF-8').to_inline_css
+    when :ics
+      @event.ical(order: @order).to_ical
     when :pdf
       order.tickets_pdf.render
     end
