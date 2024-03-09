@@ -416,17 +416,7 @@ class Order
       batch_message.add_attachment tickets_pdf_file, tickets_pdf_filename
     end
 
-    cal = RiCal.Calendar do |rcal|
-      rcal.event do |revent|
-        revent.summary = event.name
-        revent.dtstart = event.start_time
-        revent.dtend = event.end_time
-        revent.location = event.location
-        revent.description = %(#{ENV['BASE_URI']}/orders/#{order.id})
-        revent.organizer = event.email
-        revent.uid = event.id.to_s
-      end
-    end
+    cal = event.ical(description: %(#{ENV['BASE_URI']}/orders/#{order.id}))
     ics_filename = "dandelion-#{event.name.parameterize}-#{order.id}.ics"
     ics_file = File.new(ics_filename, 'w+')
     ics_file.write cal.export

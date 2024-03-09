@@ -274,28 +274,27 @@ Dandelion::App.controller do
       end
     when :ics
       @events = @events.current(3.months.ago)
-      cal = RiCal.Calendar do |rcal|
-        rcal.add_x_property('X-WR-CALNAME', 'Dandelion')
-        @events.each do |event|
-          next if event.draft?
+      cal = Icalendar::Calendar.new
+      cal.append_custom_property('X-WR-CALNAME', @organisation.name)
+      @events.each do |event|
+        next if event.draft?
 
-          rcal.event do |revent|
-            if @organisation.ical_full
-              revent.summary = event.name
-              revent.dtstart = event.start_time
-              revent.dtend = event.end_time
-            else
-              revent.summary = (event.start_time.to_date == event.end_time.to_date ? event.name : "#{event.name} starts")
-              revent.dtstart = (event.start_time.to_date == event.end_time.to_date ? event.start_time : event.start_time.to_date)
-              revent.dtend = (event.start_time.to_date == event.end_time.to_date ? event.end_time : event.start_time.to_date)
-            end
-            revent.location = event.location
-            revent.description = %(#{ENV['BASE_URI']}/events/#{event.id})
-            revent.uid = event.id.to_s
+        cal.event do |e|
+          if @organisation.ical_full
+            e.summary = event.name
+            e.dtstart = event.start_time
+            e.dtend = event.end_time
+          else
+            e.summary = (event.start_time.to_date == event.end_time.to_date ? event.name : "#{event.name} starts")
+            e.dtstart = (event.start_time.to_date == event.end_time.to_date ? event.start_time : event.start_time.to_date)
+            e.dtend = (event.start_time.to_date == event.end_time.to_date ? event.end_time : event.start_time.to_date)
           end
+          e.location = event.location
+          e.description = %(#{ENV['BASE_URI']}/events/#{event.id})
+          e.uid = event.id.to_s
         end
       end
-      cal.export
+      cal.to_ical
     end
   end
 

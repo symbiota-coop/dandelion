@@ -951,6 +951,23 @@ class Event
     {}.merge(new_hints)
   end
 
+  def ical(description: nil)
+    event = self
+    cal = Icalendar::Calendar.new
+    cal.append_custom_property('METHOD', 'REQUEST')
+    cal.event do |e|
+      e.summary = (event.start_time.to_date == event.end_time.to_date ? event.name : "#{event.name} starts")
+      e.dtstart = (event.start_time.to_date == event.end_time.to_date ? event.start_time : event.start_time.to_date)
+      e.dtend = (event.start_time.to_date == event.end_time.to_date ? event.end_time : event.start_time.to_date)
+      e.location = event.location
+      e.description = description || %(#{ENV['BASE_URI']}/events/#{event.id})
+      e.organizer = event.email
+      e.uid = event.id.to_s
+      e.status = 'CONFIRMED'
+    end
+    cal
+  end
+
   def sold_out?
     ticket_types.count > 0 && ticket_types.and(:hidden.ne => true).all? { |ticket_type| ticket_type.number_of_tickets_available_in_single_purchase <= 0 }
   end

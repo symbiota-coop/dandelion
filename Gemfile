@@ -77,7 +77,7 @@ gem 'prawn-table'
 gem 'rqrcode'
 
 # Time
-gem 'ri_cal', github: 'phoet/ri_cal'
+gem 'icalendar'
 gem 'timezone'
 
 # Geography

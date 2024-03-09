@@ -5,14 +5,6 @@ GIT
     will_paginate (4.0.0)
 
 GIT
-  remote: https://github.com/phoet/ri_cal.git
-  revision: 0c607408f931ebbbed1c5e4dd6e4eb22572f268f
-  specs:
-    ri_cal (0.8.8)
-      activesupport (> 2.2)
-      tzinfo (> 2.0)
-
-GIT
   remote: https://github.com/prawnpdf/prawn.git
   revision: bae682d829fd7130c8676da48be1875d09c84428
   specs:
@@ -239,6 +231,9 @@ GEM
     httpclient (2.8.3)
     i18n (1.14.1)
       concurrent-ruby (~> 1.0)
+    icalendar (2.10.1)
+      ice_cube (~> 0.16)
+    ice_cube (0.16.4)
     incoming (0.2.0)
       mail (~> 2.4)
       rack
@@ -561,6 +556,7 @@ DEPENDENCIES
   gocardless_pro
   google_drive2
   html_truncator
+  icalendar
   incoming
   irb
   jwt
@@ -591,7 +587,6 @@ DEPENDENCIES
   rack_session_access
   rake
   redcarpet
-  ri_cal!
   rinku
   rqrcode
   rubocop
