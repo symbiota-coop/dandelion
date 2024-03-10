@@ -63,7 +63,7 @@ Dandelion::App.controller do
 
       @order.apply_credit if current_account
       @order.update_attribute(:original_description, @order.description)
-    rescue StandardError => e
+    rescue StandardError
       airbrake_notify
       @order.try(:destroy)
       halt 400
