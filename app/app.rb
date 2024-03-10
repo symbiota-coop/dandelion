@@ -185,11 +185,27 @@ module Dandelion
       end
     end
 
-    get '/birthdays' do
+    get '/birthdays', provides: [:html, :ics] do
       sign_in_required!
-      @account_ids = current_account.following.ids_by_next_birthday
-      @account_ids = @account_ids.paginate(page: params[:page], per_page: 20)
-      erb :birthdays
+      case content_type
+      when :html
+        @account_ids = current_account.following.ids_by_next_birthday
+        @account_ids = @account_ids.paginate(page: params[:page], per_page: 20)
+        erb :birthdays
+      when :ics
+        cal = Icalendar::Calendar.new
+        cal.append_custom_property('X-WR-CALNAME', 'Birthdays')
+        current_account.following.each do |account|
+          cal.event do |e|
+            e.summary = "#{account.name}'s #{(account.age + 1).ordinalize} birthday"
+            e.dtstart = Icalendar::Values::Date.new(account.next_birthday.to_date)
+            e.dtend = Icalendar::Values::Date.new(account.next_birthday.to_date + 1)
+            e.description = %(#{ENV['BASE_URI']}/u/#{account.username})
+            e.uid = account.id.to_s
+          end
+        end
+        cal.to_ical
+      end
     end
 
     get '/notifications/:id' do
