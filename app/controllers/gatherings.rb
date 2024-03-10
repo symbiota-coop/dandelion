@@ -99,6 +99,26 @@ Dandelion::App.controller do
     end
   end
 
+  get '/g/:slug/birthdays', provides: :ics do
+    @gathering = Gathering.find_by(slug: params[:slug]) || not_found
+    @membership = @gathering.memberships.find_by(account: current_account)
+    membership_required!
+    cal = Icalendar::Calendar.new
+    cal.append_custom_property('X-WR-CALNAME', "#{@gathering.name} birthdays")
+    @memberships = @gathering.members.each do |account|
+      next unless account.date_of_birth
+
+      cal.event do |e|
+        e.summary = "#{account.name}'s #{(account.age + 1).ordinalize} birthday"
+        e.dtstart = Icalendar::Values::Date.new(account.next_birthday.to_date)
+        e.dtend = Icalendar::Values::Date.new(account.next_birthday.to_date + 1)
+        e.description = %(#{ENV['BASE_URI']}/u/#{account.username})
+        e.uid = account.id.to_s
+      end
+    end
+    cal.to_ical
+  end
+
   get '/g/:slug/todos' do
     @gathering = Gathering.find_by(slug: params[:slug]) || not_found
     @membership = @gathering.memberships.find_by(account: current_account)
