@@ -386,11 +386,23 @@ Dandelion::App.controller do
     redirect back
   end
 
-  get '/o/:slug/destroy' do
+  get '/o/:slug/delete' do
     @organisation = Organisation.find_by(slug: params[:slug]) || not_found
     organisation_admins_only!
-    @organisation.destroy
-    redirect '/o/new'
+    erb :'organisations/delete'
+  end
+
+  post '/o/:slug/destroy' do
+    @organisation = Organisation.find_by(slug: params[:slug]) || not_found
+    organisation_admins_only!
+    if params[:organisation_name] && (params[:organisation_name] == @organisation.name)
+      @organisation.destroy
+      flash[:notice] = 'The organisation was deleted'
+      redirect '/organisations'
+    else
+      flash[:error] = "The name you typed didn't match the organisation name"
+      redirect back
+    end
   end
 
   get '/organisationships/:id/disconnect' do

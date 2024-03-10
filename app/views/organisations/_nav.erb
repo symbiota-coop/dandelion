@@ -24,7 +24,9 @@
         ['Welcome emails', "/o/#{organisation.slug}/emails"],
         ['Bans', "/o/#{organisation.slug}/banned_emails"],
         ['Audience stats', "/o/#{organisation.slug}/stats"],
-        ['Contribute', "/o/#{organisation.slug}/contribute"]
+        ['Contribute', "/o/#{organisation.slug}/contribute"],
+        [],
+        ['Delete organisation', "/o/#{organisation.slug}/delete"]
       ].compact, button_text: %(#{organisation.name} <i class="fa fa-caret-down"></i>), container_class: 'btn-group mb-1' %>
   <% unless defined?(inline) %>
     <%== '</div>' %>
