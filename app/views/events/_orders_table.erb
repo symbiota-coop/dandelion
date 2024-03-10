@@ -81,11 +81,13 @@
     <% end %>
     <% if defined?(organisation_name) %>
       <td class="text-center">
-        <% if order.event.organisation.image %>
-          <img src="<%=order.event.organisation.image.thumb('500x500#').url%>" style="max-width: 50px;">
-          <br />
+        <% if order.event.organisation %>
+          <% if order.event.organisation.image %>
+            <img src="<%=order.event.organisation.image.thumb('500x500#').url%>" style="max-width: 50px;">
+            <br />
+          <% end %>
+          <a href="/o/<%=order.event.organisation.slug%>"><%= order.event.organisation.name%></a>
         <% end %>
-        <a href="/o/<%=order.event.organisation.slug%>"><%= order.event.organisation.name%></a>
       </td>
     <% end %>
     <td data-sort="<%= order.value %>">
