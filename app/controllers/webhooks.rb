@@ -26,14 +26,14 @@ Dandelion::App.controller do
           @order.restore_and_complete
           # raise Order::Restored
         rescue StandardError => e
-          Airbrake.notify(e, event: event)
+          airbrake_notify(e, { event: event })
           halt 200
         end
       else
         # begin
         #   raise Order::OrderNotFound
         # rescue StandardError => e
-        #   Airbrake.notify(e, event: event)
+        #   airbrake_notify(e, { event: event })
         #   halt 200
         # end
         halt 200
@@ -69,14 +69,14 @@ Dandelion::App.controller do
           @order.restore_and_complete
           # raise Order::Restored
         rescue StandardError => e
-          Airbrake.notify(e, event: event)
+          airbrake_notify(e, { event: event })
           halt 200
         end
       else
         # begin
         #   raise Order::OrderNotFound
         # rescue StandardError => e
-        #   Airbrake.notify(e, event: event)
+        #   airbrake_notify(e, { event: event })
         #   halt 200
         # end
         halt 200

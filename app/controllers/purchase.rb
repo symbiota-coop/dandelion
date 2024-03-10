@@ -63,8 +63,8 @@ Dandelion::App.controller do
 
       @order.apply_credit if current_account
       @order.update_attribute(:original_description, @order.description)
-    rescue StandardError
-      airbrake_notify
+    rescue StandardError => e
+      airbrake_notify(e)
       @order.try(:destroy)
       halt 400
     end
@@ -187,13 +187,7 @@ Dandelion::App.controller do
         { order_id: @order.id.to_s }.to_json
       end
     rescue StandardError => e
-      Airbrake.notify(e,
-                      url: "#{ENV['BASE_URI']}#{request.path}",
-                      current_account: (JSON.parse(current_account.to_json) if current_account),
-                      params: params,
-                      request: request.env.select { |_k, v| v.is_a?(String) },
-                      session: session,
-                      order: @order)
+      airbrake_notify(e, { order: @order })
       @order.destroy
       halt 400
     end

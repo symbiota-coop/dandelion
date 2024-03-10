@@ -84,7 +84,7 @@ module Dandelion
     end
 
     error do
-      airbrake_notify
+      airbrake_notify(env['sinatra.error'])
       if content_type == :html
         erb :error, layout: :application
       else
