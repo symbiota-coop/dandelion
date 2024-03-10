@@ -19,7 +19,7 @@ Dandelion::App.controller do
       if (payment_attempt = @gathering.payment_attempts.find_by(session_id: session.id))
         begin
           Payment.create!(payment_attempt: payment_attempt)
-        rescue StandardError => e
+        rescue StandardError
           airbrake_notify
           halt 200
         end

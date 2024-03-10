@@ -38,7 +38,16 @@
               <%= partial :'accounts/birthday', locals: {account: account} %>
               <% } %>
             </div>
-            <a href="/birthdays">All birthdays &rarr;</a>
+            <div class="row justify-content-between">
+              <div class="col">
+                <a href="/birthdays">All birthdays &rarr;</a>
+              </div>
+              <div class="col">
+                <a class="mt-2 mt-sm-0 ml-sm-3 badge badge-primary" style="font-weight: 500" id="ical" target="_blank" data-toggle="tooltip" href="/birthdays.ics?api_key=<%=current_account.api_key%>">
+                  iCal <i class="fa fa-external-link"></i>
+                </a>
+              </div>
+            </div>
           </div>
         </div>
       <% end %>
