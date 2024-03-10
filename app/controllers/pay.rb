@@ -20,7 +20,7 @@ Dandelion::App.controller do
         begin
           Payment.create!(payment_attempt: payment_attempt)
         rescue StandardError => e
-          Airbrake.notify(e)
+          airbrake_notify
           halt 200
         end
       end

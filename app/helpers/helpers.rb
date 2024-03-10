@@ -1,4 +1,13 @@
 Dandelion::App.helpers do
+  def airbrake_notify
+    Airbrake.notify(env['sinatra.error'],
+                    url: "#{ENV['BASE_URI']}#{request.path}",
+                    current_account: (JSON.parse(current_account.to_json) if current_account),
+                    params: params,
+                    request: request.env.select { |_k, v| v.is_a?(String) },
+                    session: session)
+  end
+
   def env_yaml
     request.env.select { |_k, v| v.is_a?(String) }.to_yaml
   end

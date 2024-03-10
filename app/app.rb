@@ -84,12 +84,7 @@ module Dandelion
     end
 
     error do
-      Airbrake.notify(env['sinatra.error'],
-                      url: "#{ENV['BASE_URI']}#{request.path}",
-                      current_account: (JSON.parse(current_account.to_json) if current_account),
-                      params: params,
-                      request: request.env.select { |_k, v| v.is_a?(String) },
-                      session: session)
+      airbrake_notify
       if content_type == :html
         erb :error, layout: :application
       else
