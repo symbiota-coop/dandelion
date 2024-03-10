@@ -111,7 +111,6 @@ Dandelion::App.controller do
       cal.event do |e|
         e.summary = "#{account.name}'s #{(account.age + 1).ordinalize} birthday"
         e.dtstart = Icalendar::Values::Date.new(account.next_birthday.to_date)
-        e.dtend = Icalendar::Values::Date.new(account.next_birthday.to_date + 1)
         e.description = %(#{ENV['BASE_URI']}/u/#{account.username})
         e.uid = account.id.to_s
       end
