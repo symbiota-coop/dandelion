@@ -141,4 +141,10 @@
   })
 </script>
 
-<p class="mt-3 text-lg-right">Your account ID: <%= @account.id %></p>
+<p class="mt-3 text-lg-right">
+  Your account ID: <%= @account.id %>
+  <% if @account.api_key %>
+    <br />
+    Your API key: <%= @account.api_key %>
+  <% end %>
+</p>
