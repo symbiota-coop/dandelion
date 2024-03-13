@@ -34,6 +34,15 @@ a.ui-menu-item-wrapper:hover {
   font-family: $body_font_family
 }
 
+.ui-state-active,
+.ui-widget-content .ui-state-active,
+.ui-widget-header .ui-state-active,
+a.ui-button:active,
+.ui-button:active,
+.ui-button.ui-state-active:hover {
+  font-weight: inherit
+}
+
 .introjs-tooltipReferenceLayer,
 .introjs-tooltipReferenceLayer * {
   font-family: $body_font_family
