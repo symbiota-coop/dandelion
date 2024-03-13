@@ -32,7 +32,7 @@ Dandelion::App.controller do
 
   get '/pmails/new' do
     @pmail = Pmail.new
-    @pmail.from = @organisation ? "#{@organisation.name} <#{@organisation.reply_to || current_account.email}>" : "#{current_account.name} <#{current_account.email}>"
+    @pmail.from = @organisation ? (@organisation.reply_to || "#{@organisation.name} <#{current_account.email}>") : "#{current_account.name} <#{current_account.email}>"
     @pmail.markdown = params[:markdown] ? true : false
     @pmail.body = %(Hi %recipient.firstname%,)
     erb :'pmails/build'
