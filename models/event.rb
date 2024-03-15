@@ -635,8 +635,12 @@ class Event
       cap
     else
       begin
-        five_percent_of_ticket_sales = Money.new(tickets.complete.sum(:discounted_price) * 0.05 * 100, currency).exchange_to('GBP')
-        [cap, five_percent_of_ticket_sales].min
+        if ticket_types.empty?
+          cap
+        else
+          five_percent_of_ticket_sales = Money.new(tickets.complete.sum(:discounted_price) * 0.05 * 100, currency).exchange_to('GBP')
+          [cap, five_percent_of_ticket_sales].min
+        end
       rescue StandardError
         cap
       end
