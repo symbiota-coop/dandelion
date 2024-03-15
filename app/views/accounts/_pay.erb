@@ -6,8 +6,14 @@
   <% if (defined?(force) && force) || !last_completed_contribution || last_completed_contribution.created_at < 1.month.ago %>
     <div class="<%=div_class if defined?(div_class)%>">
 
+      <div class="row justify-content-center">
+        <div class="d-sm-none col-9">
+          <img class="w-100" src="/images/dandelions/<%= Dir["#{Padrino.root}/app/assets/images/dandelions/*"].sample.split('/').last %>">
+        </div>
+      </div>
+
       <div class="row">
-        <div class="col-9">
+        <div class="col-12 col-sm-9">
           <p class="lead mb-1">
             Dandelion operates on a donation/gift economy basis.            
             <span class="highlight">We rely on your generosity.</span>
@@ -189,7 +195,7 @@
             })
           </script>
         </div>
-        <div class="col-3">
+        <div class="d-none d-sm-block col-sm-3">
           <img class="w-100" src="/images/dandelions/<%= Dir["#{Padrino.root}/app/assets/images/dandelions/*"].sample.split('/').last %>">
         </div>
       </div>
