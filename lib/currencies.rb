@@ -54,7 +54,8 @@ CURRENCIES_HASH_UNBAKED = CURRENCIES.map do |currency|
     ('Gnosis Chain' if GNOSIS_CURRENCIES.include?(currency)),
     ('Celo' if CELO_CURRENCIES.include?(currency)),
     ('Optimism' if OPTIMISM_CURRENCIES.include?(currency)),
-    ('Polygon' if POLYGON_CURRENCIES.include?(currency))
+    ('Polygon' if POLYGON_CURRENCIES.include?(currency)),
+    ('Arbitrum One' if ARBITRUM_CURRENCIES.include?(currency))
   ].compact.join('/')})", currency]
 end
 
