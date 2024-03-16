@@ -558,7 +558,7 @@ class Account
   validates_uniqueness_of :username
 
   def self.default_currencies
-    [''] + CURRENCIES_HASH
+    [''] + CURRENCY_OPTIONS
   end
 
   def self.new_hints

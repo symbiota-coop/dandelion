@@ -178,7 +178,7 @@ class Organisation
   has_many :organisation_edges_as_sink, class_name: 'OrganisationEdge', inverse_of: :sink, dependent: :destroy
 
   def self.currencies
-    CURRENCIES_HASH
+    CURRENCY_OPTIONS
   end
 
   def banned_emails_a

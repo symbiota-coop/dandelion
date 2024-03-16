@@ -102,7 +102,7 @@ class Order
   validates_uniqueness_of :evm_secret, scope: :evm_value, allow_nil: true
 
   def self.currencies
-    [''] + CURRENCIES_HASH
+    CURRENCY_OPTIONS
   end
 
   has_many :tickets, dependent: :destroy

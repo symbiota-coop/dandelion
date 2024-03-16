@@ -111,37 +111,15 @@ class Event
   end
 
   def self.currencies
-    [''] + CURRENCIES_HASH
+    CURRENCY_OPTIONS
   end
 
   def chain
-    if GNOSIS_CURRENCIES.include?(currency)
-      'Gnosis Chain'
-    elsif CELO_CURRENCIES.include?(currency)
-      'Celo'
-    elsif OPTIMISM_CURRENCIES.include?(currency)
-      'Optimism'
-    elsif POLYGON_CURRENCIES.include?(currency) || currency == 'USD'
-      'Polygon'
-    elsif ARBITRUM_CURRENCIES.include?(currency)
-      'Arbitrum One'
+    if currency == 'USD'
+      Chain.object('Polygon')
+    else
+      Token.all.find { |token| token.symbol == currency }.chain
     end
-  end
-
-  def network_id
-    EVM_NETWORK_IDS[
-      if GNOSIS_CURRENCIES.include?(currency)
-        'GNOSIS'
-      elsif CELO_CURRENCIES.include?(currency)
-        'CELO'
-      elsif OPTIMISM_CURRENCIES.include?(currency)
-        'OPTIMISM'
-      elsif POLYGON_CURRENCIES.include?(currency) || currency == 'USD'
-        'POLYGON'
-      elsif ARBITRUM_CURRENCIES.include?(currency)
-        'ARBITRUM'
-      end
-    ]
   end
 
   def questions_a

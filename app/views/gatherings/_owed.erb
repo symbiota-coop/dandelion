@@ -9,26 +9,29 @@
     </div>
   </div>
 
-  <div class="card" id="pay-with-evm" style="display: none">
-    <h3 class="card-header bg-primary text-white">
-      Pay with <%= @gathering.chain %>
-    </h3>
-    <div class="card-body">
-      <p class="lead please"></p>
-      <p class="web3wallet"></p>
-      <% if CELO_CURRENCIES.include?(@gathering.currency) %>
-        <div class="qr mb-3">
-          <p class="mb-1">or use this QR code with Valora:</p>
-          <div id="qrcode"></div>
-          <script type="text/javascript">
-            new QRCode(document.getElementById("qrcode"), "celo://wallet/pay?address=<%=@gathering.evm_address%>");
-          </script>
-        </div>
-      <% end %>
-      <p>Making a manual transaction? You will find pasting these details easier if you 'Expand view' first.</p>
-      <p>Looking for your transaction... <i class="fa fa-spin fa-circle-o-notch"></i></p>
+  <% if @gathering.chain %>
+    <div class="card" id="pay-with-evm" style="display: none">
+      <h3 class="card-header bg-primary text-white">
+        Pay with <%= @gathering.chain.name %>
+      </h3>
+      <div class="card-body">
+        <p class="lead please"></p>
+        <p class="web3wallet"></p>
+        <% if @gathering.chain.name == 'Celo' %>
+          <div class="qr mb-3">
+            <p class="mb-1">or use this QR code with Valora:</p>
+            <div id="qrcode"></div>
+            <script type="text/javascript">
+              new QRCode(document.getElementById("qrcode"), "celo://wallet/pay?address=<%=@gathering.evm_address%>");
+            </script>
+          </div>
+        <% end %>
+        <p>Making a manual transaction? You will find pasting these details easier if you 'Expand view' first.</p>
+        <p>Looking for your transaction... <i class="fa fa-spin fa-circle-o-notch"></i></p>
+      </div>
     </div>
-  </div>
+  <% end %>
+
 <% end %>
 
 <script>

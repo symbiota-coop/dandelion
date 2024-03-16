@@ -39,7 +39,7 @@ class Donation
   end
 
   def self.currencies
-    [''] + CURRENCIES_HASH
+    CURRENCY_OPTIONS
   end
 
   def self.email_viewer?(donation, account)

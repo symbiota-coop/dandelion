@@ -78,7 +78,7 @@ class Ticket
   end
 
   def self.currencies
-    [''] + CURRENCIES_HASH
+    CURRENCY_OPTIONS
   end
 
   after_save do
