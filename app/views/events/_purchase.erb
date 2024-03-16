@@ -430,13 +430,6 @@
       </button>
       <%= hidden_field_tag :payment_method, value: 'coinbase', disabled: true %>
     <% end %>
-    <% if @event.organisation.seeds_username && @event.currency == 'SEEDS' %>
-      <button class="btn btn-primary btn-block mb-1 btn-dotted" type="submit" data-payment-method="seeds">
-        <span>Pay with SEEDS</span>
-        <i class="fa fa-spin fa-circle-o-notch" style="display: none"></i>
-      </button>
-      <%= hidden_field_tag :payment_method, value: 'seeds', disabled: true %>
-    <% end %>
     <% if @event.oc_slug %>
       <button class="btn btn-primary btn-block mb-1 btn-dotted" type="submit" data-payment-method="opencollective">
         <span>Pay with Open Collective</span>
@@ -463,14 +456,6 @@
     <p>
       You have not be charged. Please refresh the page to try again.
     </p>
-  </div>
-</div>
-<div class="card" id="pay-with-seeds" style="display: none">
-  <h3 class="card-header bg-primary text-white">Pay with SEEDS</h3>
-  <div class="card-body">
-    <p class="lead please"></p>
-    <p class="lead memo text-monospace font-weight-bold text-center"></p>
-    <p>Looking for your transaction... <i class="fa fa-spin fa-circle-o-notch"></i></p>
   </div>
 </div>
 <div class="card" id="pay-with-opencollective" style="display: none">
@@ -512,7 +497,6 @@
     currencySymbol = <%== Money.new(0, @event.currency).symbol.to_json %>
     stripePk = <%== @event.organisation.stripe_pk.to_json %>
     coinbase = <%= @event.organisation.coinbase_api_key ? true : false %>
-    seedsUsername = <%== @event.organisation.seeds_username.to_json %>
     organisationOcSlug = <%== @event.organisation.oc_slug.to_json %>
     ocSlug = <%== @event.oc_slug.to_json %>
     evmAddress = <%== @event.organisation.evm_address.to_json %>

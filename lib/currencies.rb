@@ -29,7 +29,7 @@ EVM_CURRENCIES = (GNOSIS_CURRENCIES + CELO_CURRENCIES + OPTIMISM_CURRENCIES + PO
 EVM_NETWORK_IDS = { 'GNOSIS' => 100, 'CELO' => 42_220, 'OPTIMISM' => 10, 'POLYGON' => 137, 'ARBITRUM' => 42_161 }.freeze
 
 COINBASE_CURRENCIES = %w[BTC ETH].freeze
-CRYPTOCURRENCIES = (COINBASE_CURRENCIES + EVM_CURRENCIES + %w[SEEDS]).freeze
+CRYPTOCURRENCIES = COINBASE_CURRENCIES + EVM_CURRENCIES
 
 FIAT_CURRENCIES = %w[GBP EUR USD SEK DKK MXN CAD].freeze
 
@@ -43,8 +43,7 @@ CURRENCIES_HASH = CURRENCIES.map do |currency|
     ('Celo' if CELO_CURRENCIES.include?(currency)),
     ('Optimism' if OPTIMISM_CURRENCIES.include?(currency)),
     ('Polygon' if POLYGON_CURRENCIES.include?(currency) || currency == 'USD'),
-    ('Arbitrum One' if ARBITRUM_CURRENCIES.include?(currency)),
-    ('SEEDS' if currency == 'SEEDS')
+    ('Arbitrum One' if ARBITRUM_CURRENCIES.include?(currency))
   ].compact.join('/')})", currency]
 end
 
@@ -55,8 +54,7 @@ CURRENCIES_HASH_UNBAKED = CURRENCIES.map do |currency|
     ('Gnosis Chain' if GNOSIS_CURRENCIES.include?(currency)),
     ('Celo' if CELO_CURRENCIES.include?(currency)),
     ('Optimism' if OPTIMISM_CURRENCIES.include?(currency)),
-    ('Polygon' if POLYGON_CURRENCIES.include?(currency)),
-    ('SEEDS' if currency == 'SEEDS')
+    ('Polygon' if POLYGON_CURRENCIES.include?(currency))
   ].compact.join('/')})", currency]
 end
 
@@ -72,17 +70,6 @@ EVM_CURRENCIES.each do |c|
                              thousands_separator: ','
                            })
 end
-
-Money::Currency.register({
-                           priority: 1,
-                           iso_code: 'SEEDS',
-                           name: 'Seeds',
-                           symbol: 'Seeds',
-                           subunit: 'Cent',
-                           subunit_to_unit: 100,
-                           decimal_mark: '.',
-                           thousands_separator: ','
-                         })
 
 Money::Currency.register({
                            priority: 1,

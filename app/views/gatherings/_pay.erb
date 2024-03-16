@@ -26,13 +26,6 @@
     </button>
     <%= hidden_field_tag :payment_method, value: 'coinbase', disabled: true %>
   <% end %>
-  <% if @gathering.seeds_username && @gathering.currency == 'SEEDS' %>
-    <button data-payment-method="seeds" type="submit" class="btn btn-default mb-1 ml-0 mr-1" style="height: 2.125rem">
-      <span>Pay with SEEDS</span>
-      <i class="fa fa-spin fa-circle-o-notch" style="display: none"></i>
-    </button>
-    <%= hidden_field_tag :payment_method, value: 'seeds', disabled: true %>
-  <% end %>
   <% if @gathering.evm_address && EVM_CURRENCIES.include?(@gathering.currency) %>
     <button data-payment-method="evm" type="submit" class="btn btn-default mb-1 ml-0 mr-1" style="height: 2.125rem">
       <span>
@@ -68,22 +61,6 @@
         } else if (data['checkout_id']) {
           // Coinbase
           window.location = 'https://commerce.coinbase.com/checkout/' + data['checkout_id']
-        } else if (data['seeds_secret']) {
-          // SEEDS
-          seedsUsername = <%== @gathering.seeds_username.to_json %>
-          $('#owed').hide()
-          $('#pay-with-seeds').show()
-          $('#pay-with-seeds').find('.card-body p.lead.please').html('Open the SEEDS app and send <strong>' + data['seeds_amount'] + ' SEEDS</strong> to <strong>' + seedsUsername + '</strong> with the memo')
-          $('#pay-with-seeds').find('.card-body p.lead.memo').html(data['seeds_secret'])
-          var offset = $('#pay-with-seeds').offset()
-          window.scrollTo(0, offset['top'] - $('#header').height() - 10);
-          setInterval(function() {
-            if (Date.now() < data['payment_attempt_expiry'])
-              $.getJSON('/g/<%=@gathering.slug%>/payment_attempts/' + data['payment_attempt_id'] , function(_data) {
-                if (_data['payment_completed'])
-                  window.location = '/g/<%=@gathering.slug%>/options'
-              })
-          }, 30 * 1000);
         } else if (data['evm_secret']) {
           // EVM
           evmAddress = <%== @gathering.evm_address.to_json %>

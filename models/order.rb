@@ -24,8 +24,6 @@ class Order
   field :payment_intent, type: String
   field :transfer_id, type: String
   field :coinbase_checkout_id, type: String
-  field :seeds_secret, type: String
-  field :seeds_value, type: Float
   field :evm_secret, type: String
   field :evm_value, type: BigDecimal
   field :oc_secret, type: String
@@ -67,8 +65,6 @@ class Order
       payment_intent: :text,
       transfer_id: :text,
       coinbase_checkout_id: :text,
-      seeds_secret: :text,
-      seeds_value: :number,
       evm_secret: :text,
       evm_value: :number,
       oc_secret: :text,
@@ -103,7 +99,6 @@ class Order
   end
 
   validates_uniqueness_of :session_id, :payment_intent, :coinbase_checkout_id, allow_nil: true
-  validates_uniqueness_of :seeds_secret, scope: :seeds_value, allow_nil: true
   validates_uniqueness_of :evm_secret, scope: :evm_value, allow_nil: true
 
   def self.currencies
@@ -185,14 +180,6 @@ class Order
 
   before_validation do
     self.evm_value = value.to_d + evm_offset if evm_secret && !evm_value
-    if seeds_secret && !seeds_value
-      self.seeds_value = value
-      # agent = Mechanize.new
-      # seeds = JSON.parse(agent.get('https://newdex.io/api/symbol/getSymbolInfo', { symbol: 'token.seeds-seeds-tlos' }).body)
-      # telos = JSON.parse(agent.get('https://api.coingecko.com/api/v3/simple/price?ids=telos&vs_currencies=usd').body)
-      # seeds_usd = seeds['symbolInfo']['askPrice'] * telos['telos']['usd']
-      # self.seeds_value = (Money.new(value * 100, currency).exchange_to('USD').dollars.to_i / seeds_usd).round
-    end
     self.discount_code = nil if discount_code && !discount_code.applies_to?(event)
     self.percentage_discount = discount_code.percentage_discount if discount_code
     if !percentage_discount && !event.no_discounts && (organisationship_for_discount = event.organisationship_for_discount(account))

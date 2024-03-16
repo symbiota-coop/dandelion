@@ -30,7 +30,6 @@ class Gathering
   field :coinbase_api_key, type: String
   field :coinbase_webhook_secret, type: String
   field :evm_address, type: String
-  field :seeds_username, type: String
   field :redirect_on_acceptance, type: String
   field :redirect_home, type: String
   field :choose_and_pay_label, type: String
@@ -378,7 +377,6 @@ class Gathering
       coinbase_api_key: 'Coinbase Commerce API key',
       coinbase_webhook_secret: 'Coinbase Commerce webhook secret',
       evm_address: 'EVM address',
-      seeds_username: 'SEEDS username',
       privacy: 'Access',
       listed: 'List this gathering publicly',
       enable_rotas: 'Enable shifts',
@@ -502,19 +500,6 @@ class Gathering
     y << [:threshold, 'Suggesting magic number', memberships.and(:desired_threshold.ne => nil)] if democratic_threshold
 
     y
-  end
-
-  def check_seeds_account
-    agent = Mechanize.new
-    agent.agent.http.verify_mode = OpenSSL::SSL::VERIFY_NONE
-    j = JSON.parse(agent.get("https://telos.caleos.io/v2/history/get_actions?account=#{seeds_username}").body)
-    j['actions'].each do |action|
-      next unless action['act'] && (data = action['act']['data'])
-      next unless data['to'] == seeds_username && data['symbol'] == 'SEEDS' && data['amount'] && !data['memo'].blank? && (seeds_secret = data['memo'].split('SGP: ').last)
-
-      puts "#{data['amount']} SEEDS: #{seeds_secret}"
-      Payment.create!(payment_attempt: @payment_attempt) if (@payment_attempt = payment_attempts.find_by(seeds_secret: seeds_secret.downcase, seeds_amount: data['amount']))
-    end
   end
 
   def evm_transactions

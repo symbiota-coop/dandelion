@@ -13,8 +13,6 @@ class PaymentAttempt
   field :session_id, type: String
   field :payment_intent, type: String
   field :coinbase_checkout_id, type: String
-  field :seeds_secret, type: String
-  field :seeds_amount, type: Float
   field :evm_secret, type: String
   field :evm_amount, type: BigDecimal
 
@@ -34,7 +32,6 @@ class PaymentAttempt
   end
 
   validates_presence_of :gathering_name, :amount, :currency
-  validates_uniqueness_of :seeds_secret, scope: :seeds_amount, allow_nil: true
   validates_uniqueness_of :evm_secret, scope: :evm_amount, allow_nil: true
 
   def evm_offset
@@ -47,6 +44,5 @@ class PaymentAttempt
     self.gathering_name = gathering.name if gathering
 
     self.evm_amount = amount.to_d + evm_offset if evm_secret && !evm_amount
-    self.seeds_amount = amount if seeds_secret && !seeds_amount
   end
 end

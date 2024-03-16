@@ -54,7 +54,6 @@ class Organisation
   field :monthly_donation_welcome_from, type: String
   field :monthly_donation_welcome_subject, type: String
   field :monthly_donation_welcome_body, type: String
-  field :seeds_username, type: String
   field :evm_address, type: String
   field :add_a_donation_to, type: String
   field :donation_text, type: String
@@ -213,7 +212,6 @@ class Organisation
       event_image_required_width: 'Required width for event images in px',
       event_image_required_height: 'Required height for event images in px',
       evm_address: 'Ethereum-compatible wallet address for receiving tokens via EVM networks',
-      seeds_username: 'SEEDS/Telos username for receiving SEEDS via Telos',
       restrict_cohosting: 'When checked, only admins can add the organisation as a co-host of events',
       oc_slug: 'Open Collective organisation slug',
       hide_ticket_revenue: 'Hide ticket revenue in event stats'
@@ -600,7 +598,6 @@ class Organisation
       patreon_api_key: 'Patreon API key',
       mailgun_api_key: 'Mailgun API key',
       evm_address: 'EVM address',
-      seeds_username: 'SEEDS username',
       collect_location: 'Ask for location of ticket buyers',
       reply_to: 'Reply address for ticket emails',
       minimal_head: 'Extra content for &lt;head&gt; when embedding events page',
@@ -626,7 +623,7 @@ class Organisation
   end
 
   def payment_method?
-    stripe_pk || coinbase_api_key || evm_address || seeds_username || oc_slug
+    stripe_pk || coinbase_api_key || evm_address || oc_slug
   end
 
   def sync_with_gocardless
@@ -732,30 +729,6 @@ class Organisation
       organisationship.monthly_donation_currency = currency
       organisationship.monthly_donation_start_date = start_date
       organisationship.save
-    end
-  end
-
-  def check_seeds_account
-    agent = Mechanize.new
-    agent.agent.http.verify_mode = OpenSSL::SSL::VERIFY_NONE
-    j = JSON.parse(agent.get("https://telos.caleos.io/v2/history/get_actions?account=#{seeds_username}").body)
-    j['actions'].each do |action|
-      next unless action['act'] && (data = action['act']['data'])
-      next unless data['to'] == seeds_username && data['symbol'] == 'SEEDS' && data['amount'] && !data['memo'].blank? && (seeds_secret = data['memo'].split('SGP: ').last)
-
-      puts "#{data['amount']} SEEDS: #{seeds_secret}"
-      if (@order = Order.find_by(:payment_completed.ne => true, :seeds_secret => seeds_secret.downcase, :seeds_value => data['amount']))
-        @order.payment_completed!
-        @order.send_tickets
-        @order.create_order_notification
-      elsif (@order = Order.deleted.find_by(:payment_completed.ne => true, :seeds_secret => seeds_secret.downcase, :seeds_value => data['amount']))
-        begin
-          @order.restore_and_complete
-          # raise Order::Restored
-        rescue StandardError => e
-          Airbrake.notify(e, order: @order)
-        end
-      end
     end
   end
 

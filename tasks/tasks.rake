@@ -61,7 +61,6 @@ namespace :gatherings do
   end
 
   task check_for_payments: :environment do
-    Gathering.and(:seeds_username.ne => nil).each(&:check_seeds_account)
     Gathering.and(:evm_address.ne => nil).each(&:check_evm_account)
   end
 end
@@ -80,9 +79,6 @@ namespace :events do
   end
 
   task check_for_payments: :environment do
-    Organisation.and(:seeds_username.ne => nil).each do |organisation|
-      organisation.check_seeds_account if Order.and(:payment_completed.ne => true, :seeds_secret.ne => nil, :event_id.in => organisation.events.pluck(:id)).count > 0
-    end
     Organisation.and(:evm_address.ne => nil).each do |organisation|
       organisation.check_evm_account if Order.and(:payment_completed.ne => true, :evm_secret.ne => nil, :event_id.in => organisation.events.pluck(:id)).count > 0
     end

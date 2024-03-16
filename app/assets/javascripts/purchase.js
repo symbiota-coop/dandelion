@@ -1,4 +1,4 @@
-/* global timeAgo, eventId, eventUrl, placesRemaining, currency, currencySymbol, stripePk, coinbase, seedsUsername, organisationOcSlug, ocSlug, evmAddress, contractAddress, networkId, networkName, signedIn */
+/* global timeAgo, eventId, eventUrl, placesRemaining, currency, currencySymbol, stripePk, coinbase, organisationOcSlug, ocSlug, evmAddress, contractAddress, networkId, networkName, signedIn */
 
 $(function () {
   $('#details form').on('keyup keypress', function (e) {
@@ -61,25 +61,22 @@ $(function () {
       $('#details form button[data-payment-method=rsvp]').show()
       $('#details form button[data-payment-method=stripe]').hide()
       $('#details form button[data-payment-method=coinbase]').hide()
-      $('#details form button[data-payment-method=seeds]').hide()
       $('#details form button[data-payment-method=opencollective]').hide()
       $('#details form button[data-payment-method=evm]').hide()
     } else if (b == 0) {
       $('#details form button[data-payment-method=rsvp]').show().find('span').text('Use credit')
       $('#details form button[data-payment-method=stripe]').hide()
       $('#details form button[data-payment-method=coinbase]').hide()
-      $('#details form button[data-payment-method=seeds]').hide()
       $('#details form button[data-payment-method=opencollective]').hide()
       $('#details form button[data-payment-method=evm]').hide()
     } else if (b > 0) {
       $('#balance').val((+b).toFixed(2))
       let via_card
-      if (coinbase || seedsUsername || ocSlug || evmAddress) { via_card = ' via card' } else { via_card = '' }
+      if (coinbase || ocSlug || evmAddress) { via_card = ' via card' } else { via_card = '' }
       $('#details form button[data-payment-method]:eq(1)').removeClass('btn-dotted')
       $('#details form button[data-payment-method=rsvp]').hide()
       $('#details form button[data-payment-method=stripe]').show().find('span').text('Pay ' + currencySymbol + (+b).toFixed(2) + via_card)
       $('#details form button[data-payment-method=coinbase]').show()
-      $('#details form button[data-payment-method=seeds]').show()
       $('#details form button[data-payment-method=opencollective]').show()
       $('#details form button[data-payment-method=evm]').show()
     }
@@ -158,21 +155,6 @@ $(function () {
         } else if (data.checkout_id) {
           // Coinbase
           window.location = 'https://commerce.coinbase.com/checkout/' + data.checkout_id
-        } else if (data.seeds_secret) {
-          // SEEDS
-          $('#select-tickets').hide()
-          $('#pay-with-seeds').show()
-          $('#pay-with-seeds').find('.card-body p.lead.please').html('Open the SEEDS app and send <strong>' + data.seeds_value + ' SEEDS</strong> to <strong>' + seedsUsername + '</strong> with the memo')
-          $('#pay-with-seeds').find('.card-body p.lead.memo').html(data.seeds_secret)
-          const offset = $('#pay-with-seeds').offset()
-          window.scrollTo(0, offset.top - $('#header').height() - 10)
-          setInterval(function () {
-            if (Date.now() < data.order_expiry) {
-              $.getJSON('/events/' + eventId + '/orders/' + data.order_id + '/payment_completed', function (_data) {
-                if (_data.payment_completed) { window.location = '?success=true&order_id=' + data.order_id }
-              })
-            }
-          }, 30 * 1000)
         } else if (data.oc_secret) {
           // Open Collective
           window.location = 'https://opencollective.com/' + organisationOcSlug + '/events/' + ocSlug + '/donate?interval=oneTime&amount=' + data.value + '&tags=' + data.oc_secret + '&redirect=' + encodeURIComponent(eventUrl + '?success=true&order_id=' + data.order_id)
