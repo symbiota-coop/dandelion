@@ -97,11 +97,7 @@ module Dandelion
     end
 
     not_found do
-      if content_type == :html
-        erb :not_found, layout: :application
-      else
-        404
-      end
+      erb :not_found, layout: :application
     end
 
     get '/not_found' do
