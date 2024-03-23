@@ -1,3 +1,6 @@
+<div class="tagline">
+  <%= event_feedback.rating %> star feedback
+</div>
 <div class="main">
   <h1 style="margin-top: 0">
     <%= event.name %>
@@ -14,8 +17,4 @@
         end.join %>
   </table>
   <p><a href="<%= ENV['BASE_URI'] %>/events/<%= event.id %>/feedback">See all feedback for this event</a></p>
-</div>
-<div class="footer"></div>
-<div class="tagline">
-  <%= event_feedback.rating %> star feedback
 </div>

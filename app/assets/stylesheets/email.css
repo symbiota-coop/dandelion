@@ -26,9 +26,11 @@ td {
   overflow: hidden;
 }
 
-.container {
-  max-width: 650px;
-  margin: 0 auto;
+@media(min-width: 768px) {
+  .container {
+    max-width: 650px;
+    margin: 0 auto;
+  }
 }
 
 .main {
@@ -162,6 +164,7 @@ a.attachment {
   background: white;
   padding: 16px;
   margin: 0 16px;
+  margin-top: 16px;
   border: 1px solid #eaeaea;
   border-radius: 4px;
   text-decoration: none;
