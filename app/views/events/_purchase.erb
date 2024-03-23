@@ -439,7 +439,7 @@
     <% end %>
     <% if @event.organisation.evm_address && (EVM_CURRENCIES.include?(@event.currency) || (@event.currency == 'USD')) %>
       <button class="btn btn-primary btn-block mb-1 btn-dotted" type="submit" data-payment-method="evm">
-        <span><% if @event.chain.name == 'Polygon'%>Pay with BREAD on Polygon<% else %>Pay with <%= @event.chain.name %><% end %></span>
+        <span><% if @event.currency.in?(['BREAD', 'USD'])%>Pay with BREAD on Polygon<% else %>Pay with <%= @event.chain.name %><% end %></span>
         <i class="fa fa-spin fa-circle-o-notch" style="display: none"></i>
       </button>
       <%= hidden_field_tag :payment_method, value: 'evm', disabled: true %>
@@ -506,7 +506,7 @@
     organisationOcSlug = <%== @event.organisation.oc_slug.to_json %>
     ocSlug = <%== @event.oc_slug.to_json %>
     evmAddress = <%== @event.organisation.evm_address.to_json %>
-    contractAddress = <%== @event.token.try(:contract_address).to_json %>
+    contractAddress = <%== @event.currency == 'USD' ? Token.object('BREAD').contract_address.to_json : @event.token.try(:contract_address).to_json %>
     networkId = <%= @event.chain.try(:network_id) %>
     networkName = '<%= @event.chain.try(:name) %>'
     signedIn = <%= current_account ? true : false %>

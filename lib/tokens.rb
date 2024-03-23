@@ -41,6 +41,10 @@ class Token
   def self.object(symbol)
     all.find { |token| token.symbol == symbol }
   end
+
+  def self.by_contract_address
+    all.each_with_object({}) { |token, hash| hash[token.contract_address] = token.symbol }
+  end
 end
 
 Chain.new('Gnosis Chain', 100)

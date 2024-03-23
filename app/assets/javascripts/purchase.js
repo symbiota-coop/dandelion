@@ -173,7 +173,7 @@ $(function () {
               $('#pay-with-evm').find('.card-body p.web3wallet').html("<mark>Please switch your web3 wallet's network to " + networkName + '</mark>')
               ethereum.request({
                 method: 'wallet_switchEthereumChain',
-                params: [{ chainId: networkId.toString(16) }]
+                params: [{ chainId: '0x' + networkId.toString(16) }]
               })
               ethereum.on('chainChanged', function () {
                 console.log('chainChanged')
