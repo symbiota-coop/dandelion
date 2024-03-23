@@ -64,7 +64,7 @@
         } else if (data['evm_secret']) {
           // EVM
           evmAddress = <%== @gathering.evm_address.to_json %>
-          contractAddress = <%== EVM_CONTRACT_ADDRESSES[@gathering.currency].to_json %>
+          contractAddress = <%== @gathering.token.try(:contract_address).to_json %>
           networkId = <%= @gathering.chain.try(:network_id) %>
           networkName = '<%=@gathering.chain.try(:name) %>'
           $('#owed').hide()

@@ -114,11 +114,15 @@ class Event
     CURRENCY_OPTIONS
   end
 
+  def token
+    Token.all.find { |token| token.symbol == currency }
+  end
+
   def chain
     if currency == 'USD'
       Chain.object('Polygon')
     else
-      Token.all.find { |token| token.symbol == currency }.chain
+      token.try(:chain)
     end
   end
 

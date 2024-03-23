@@ -756,7 +756,7 @@ class Organisation
         token_address = tr.search('td')[8].search('a')[0]['href'].split('/')[2].split('?')[0]
         next unless token_address
 
-        token_find = EVM_CONTRACT_ADDRESSES.invert.find { |k, _v| k.downcase == token_address.downcase }
+        token_find = token.try(:symbol)
         next unless token_find
 
         token = token_find[1]
@@ -865,6 +865,8 @@ class Organisation
   handle_asynchronously :send_followers_csv
 
   def transfer_events
+    puts "transferring events for #{slug}"
+
     session = GoogleDrive::Session.from_config(OpenStruct.new(
                                                  client_id: google_drive_client_id,
                                                  client_secret: google_drive_client_secret,
@@ -935,6 +937,8 @@ class Organisation
   end
 
   def transfer_charges(from: Date.today - 2, to: Date.today - 1)
+    puts "transferring charges for #{slug} from #{from} to #{to}"
+
     Stripe.api_key = stripe_sk
     Stripe.api_version = '2020-08-27'
     charges = Stripe::Charge.list(created: { gte: Time.utc(from.year, from.month, from.day).to_i, lt: Time.utc(to.year, to.month, to.day).to_i })
@@ -978,6 +982,8 @@ class Organisation
   end
 
   def transfer_transactions(from: Date.today - 2, to: Date.today - 1)
+    puts "transferring transactions for #{slug} from #{from} to #{to}"
+
     Stripe.api_key = stripe_sk
     Stripe.api_version = '2020-08-27'
 
@@ -990,6 +996,7 @@ class Organisation
                                               })
 
     until run.result
+      puts 'sleeping...'
       sleep 5
       run = Stripe::Reporting::ReportRun.retrieve(run.id)
     end
