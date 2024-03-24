@@ -72,6 +72,33 @@ Dandelion::App.controller do
     erb :'local_groups/stats'
   end
 
+  post '/local_groups/:id/add_follower' do
+    @local_group = LocalGroup.find(params[:id]) || not_found
+    local_group_admins_only!
+
+    unless params[:email]
+      flash[:error] = 'Please provide an email address'
+      redirect back
+    end
+
+    unless (@account = Account.find_by(email: params[:email].downcase))
+      @account = Account.new(name: params[:email].split('@').first, email: params[:email], password: Account.generate_password)
+      unless @account.save
+        flash[:error] = '<strong>Oops.</strong> Some errors prevented the account from being saved.'
+        redirect back
+      end
+    end
+
+    if @local_group.local_groupships.find_by(account: @account)
+      flash[:warning] = 'That person is already following the local group'
+    else
+      @local_group.organisation.organisationships.create account: @account
+      @local_group.local_groupships.create! account: @account
+    end
+
+    redirect back
+  end
+
   get '/local_groups/:id/receive_feedback/:f' do
     @local_group = LocalGroup.find(params[:id]) || not_found
     local_group_admins_only!
@@ -244,7 +271,7 @@ Dandelion::App.controller do
     @local_group = LocalGroup.find(params[:id]) || not_found
     local_group_admins_only!
     @discount_codes = @local_group.discount_codes
-    @scope = "activity_id=#{@local_group.id}"
+    @scope = "local_group_id=#{@local_group.id}"
     erb :'discount_codes/discount_codes'
   end
 end

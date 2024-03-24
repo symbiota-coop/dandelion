@@ -31,6 +31,15 @@
     <%= file_field_tag :csv, onchange: '$(this.form).submit()' %>
   <% end %>
 </div>
+
+<a class="btn btn-primary mb-3" href="javascript:;" onclick="$(this).hide().next().show()"><i class="fa fa-plus-circle"></i> Add a follower</a>
+<div style="display: none" class="mb-3">
+  <% form_tag "/o/#{@organisation.slug}/add_follower", class: 'form-inline' do %>
+    <%= email_field_tag :email, class: 'form-control mr-1', placeholder: 'Email' %>
+    <%= submit_tag 'Add follower', class: 'btn btn-primary' %>
+  <% end %>
+</div>
+
 <% organisationships = @organisationships.paginate(page: params[:page], per_page: 25) %>
 <p><%== pagination_details organisationships, model: 'Person' %></p>
 <div class="table-responsive">

@@ -77,6 +77,33 @@ Dandelion::App.controller do
     erb :'activities/stats'
   end
 
+  post '/activities/:id/add_follower' do
+    @activity = Activity.find(params[:id]) || not_found
+    activity_admins_only!
+
+    unless params[:email]
+      flash[:error] = 'Please provide an email address'
+      redirect back
+    end
+
+    unless (@account = Account.find_by(email: params[:email].downcase))
+      @account = Account.new(name: params[:email].split('@').first, email: params[:email], password: Account.generate_password)
+      unless @account.save
+        flash[:error] = '<strong>Oops.</strong> Some errors prevented the account from being saved.'
+        redirect back
+      end
+    end
+
+    if @activity.activityships.find_by(account: @account)
+      flash[:warning] = 'That person is already following the activity'
+    else
+      @activity.organisation.organisationships.create account: @account
+      @activity.activityships.create! account: @account
+    end
+
+    redirect back
+  end
+
   get '/activities/:id/receive_feedback/:f' do
     @activity = Activity.find(params[:id]) || not_found
     activity_admins_only!

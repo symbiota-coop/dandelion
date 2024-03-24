@@ -370,6 +370,32 @@ Dandelion::App.controller do
     erb :'organisations/event_stats'
   end
 
+  post '/o/:slug/add_follower' do
+    @organisation = Organisation.find_by(slug: params[:slug]) || not_found
+    organisation_admins_only!
+
+    unless params[:email]
+      flash[:error] = 'Please provide an email address'
+      redirect back
+    end
+
+    unless (@account = Account.find_by(email: params[:email].downcase))
+      @account = Account.new(name: params[:email].split('@').first, email: params[:email], password: Account.generate_password)
+      unless @account.save
+        flash[:error] = '<strong>Oops.</strong> Some errors prevented the account from being saved.'
+        redirect back
+      end
+    end
+
+    if @organisation.organisationships.find_by(account: @account)
+      flash[:warning] = 'That person is already following the organisation'
+    else
+      @organisation.organisationships.create! account: @account
+    end
+
+    redirect back
+  end
+
   post '/o/:slug/organisationships/admin' do
     @organisation = Organisation.find_by(slug: params[:slug]) || not_found
     organisation_admins_only!
