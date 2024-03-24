@@ -15,8 +15,12 @@
   <% elsif pmail.mailable.is_a?(LocalGroup) %>
     Local group: <a href="/local_groups/<%= pmail.mailable_id %>"><%= pmail.mailable.name %></a>
   <% elsif pmail.mailable.is_a?(Event) %>
-    Event: <a href="/events/<%= pmail.mailable_id %>"><%= pmail.mailable.name %></a>
-    <br>
+    <% if pmail.waitlist %>
+      Waitlist: <a href="/events/<%= pmail.mailable_id %>"><%= pmail.mailable.name %></a>
+    <% else %>
+      Event: <a href="/events/<%= pmail.mailable_id %>"><%= pmail.mailable.name %></a>
+    <% end %>
+    <br />
     <small><%= concise_when_details(pmail.mailable) %></small>
   <% end %>
 <% end %>
