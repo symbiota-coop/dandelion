@@ -15,7 +15,6 @@
 
     var models = []
   <%
-  offsets = {Event: 0.0001, Account: 0.0001, ActivityApplication: 0.0001, Organisationship: 0.0001}
   [Organisation, Place, Gathering, Event, Account, ActivityApplication, Organisationship].each { |model| %>
       models.push({
         name: '<%= model.to_s %>',
@@ -35,8 +34,8 @@
         points.push({
           model_name: '<%= point.class.to_s %>',
           id: '<%= point.id %>',
-          lat: <%= point.lat + (offsets.keys.include?(:"#{point.class}") ? (((point.id.to_s.hash % 101) - 50) * offsets[:"#{point.class}"]) : 0) %>,
-          lng: <%= point.lng + (offsets.keys.include?(:"#{point.class}") ? (((point.id.to_s.reverse.hash % 101) - 50) * offsets[:"#{point.class}"]) : 0) %>,
+          lat: <%= point.lat %>,
+          lng: <%= point.lng %>,
         })
   <% } %>
   <% end %>
@@ -138,7 +137,34 @@
       }
     ];
 
-    var markerClusterer = new MarkerClusterer(map, markers, {styles: clusterStyles, maxZoom: 14});
+    var markerClusterer = new MarkerClusterer(map, markers, {styles: clusterStyles, zoomOnClick: false});
+    google.maps.event.addListener(markerClusterer, 'clusterclick', function(cluster) {
+      if (map.getZoom() === map.maxZoom) {
+        var markers = cluster.getMarkers();
+        infowindow.setContent('<i class="fa fa-spin fa-circle-o-notch"></i>');
+        infowindow.setPosition(cluster.getCenter());
+        infowindow.open(map);
+        setTimeout(function () {
+          clearTimeout(mapTimer)
+        }, 750)
+
+        var content = '';
+        var requests = markers.map(function(marker) {
+          return $.get('/point/' + marker.model_name + '/' + marker.id, function (data) {
+            if((marker.model_name == 'Organisation' || marker.model_name == 'Place' || marker.model_name == 'Gathering' || marker.model_name == 'Event') || infoWindow) {
+              content += '<div class="mb-3">' + data + '</div>';
+            }
+          });
+        });
+
+        $.when.apply($, requests).done(function() {
+          infowindow.setContent('<div class="infowindow">' + (content.length > 0 ? content : '<em>Nothing to show</em>') + '</div>');
+        });
+      } else {
+        map.setCenter(cluster.getCenter());
+        map.setZoom(map.getZoom() + 2);
+      }
+    });
   <% if defined?(centre) && centre %>
       map.setCenter(new google.maps.LatLng(<%= centre.lat %>, <%= centre.lng %>))
       map.setZoom(<%= zoom %>)

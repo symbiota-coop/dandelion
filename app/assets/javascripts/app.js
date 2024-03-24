@@ -85,7 +85,7 @@ $(function () {
       }
     })
 
-    $('.block').not('[data-block-hover]').attr('data-block-hover', true).hover(
+    $('.block').not('[data-block-hover], .infowindow .block').attr('data-block-hover', true).hover(
       function () {
         $('.block-edit', this).show()
       },
