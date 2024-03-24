@@ -201,6 +201,7 @@
        if @event || @pmail.mailable.is_a?(Event)
          event = @event || @pmail.mailable
          to_options << ["#{event.name} (#{when_details(event)})", "event:#{event.id}"]
+         to_options << ["Waitlist for #{event.name} (#{when_details(event)})", "waitlist:#{event.id}"]
        end %>
     <%= f.select_block :to_option, options: to_options, selected: (@pmail.to_selected if @pmail.persisted?) %>
     <% if organisation %>

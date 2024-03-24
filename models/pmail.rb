@@ -15,6 +15,7 @@ class Pmail
   field :monthly_donors, type: Boolean
   field :not_monthly_donors, type: Boolean
   field :facilitators, type: Boolean
+  field :waitlist, type: Boolean
   field :body, type: String
   field :message_ids, type: String
   field :requested_send_at, type: ActiveSupport::TimeWithZone
@@ -32,6 +33,7 @@ class Pmail
       monthly_donors: :check_box,
       not_monthly_donors: :check_box,
       facilitators: :check_box,
+      waitlist: :check_box,
       link_params: :text,
       requested_send_at: :datetime,
       sent_at: :datetime,
@@ -65,6 +67,7 @@ class Pmail
       self.monthly_donors = nil
       self.not_monthly_donors = nil
       self.facilitators = nil
+      self.waitlist = nil
       self.mailable = nil
       if to_option == 'everyone'
         self.everyone = true
@@ -86,6 +89,10 @@ class Pmail
       elsif to_option.starts_with?('event:')
         self.mailable_type = 'Event'
         self.mailable_id = to_option.split(':').last
+      elsif to_option.starts_with?('waitlist:')
+        self.mailable_type = 'Event'
+        self.mailable_id = to_option.split(':').last
+        self.waitlist = true
       end
     end
   end
@@ -106,7 +113,7 @@ class Pmail
     elsif mailable.is_a?(LocalGroup)
       "local_group:#{mailable_id}"
     elsif mailable.is_a?(Event)
-      "event:#{mailable_id}"
+      waitlist ? "waitlist:#{mailable_id}" : "event:#{mailable_id}"
     end
   end
 
@@ -126,7 +133,7 @@ class Pmail
     elsif mailable.is_a?(LocalGroup)
       "following #{organisation.name}'s local group #{mailable.name}"
     elsif mailable.is_a?(Event)
-      "attending #{organisation.name}'s event #{mailable.name}"
+      waitlist ? "on the waitlist for #{organisation.name}'s event #{mailable.name}" : "attending #{organisation.name}'s event #{mailable.name}"
     end
   end
 
@@ -140,7 +147,7 @@ class Pmail
         elsif facilitators
           organisation.facilitators
         elsif mailable
-          mailable.subscribed_members
+          mailable.is_a?(Event) && waitlist ? mailable.waiters : mailable.subscribed_members
         end
     t = t.and(:id.nin => event.attendees.pluck(:id)) if event
     t = t.and(:id.nin => activity.future_attendees.pluck(:id)) if activity
