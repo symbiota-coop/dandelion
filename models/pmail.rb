@@ -164,7 +164,7 @@ class Pmail
 
   def send_count
     c = to_with_unsubscribes_less_ab_tests.count
-    c += mailable.tickets.complete.and(:email.ne => nil).count if mailable.is_a?(Event)
+    c += mailable.tickets.complete.and(:email.ne => nil).count if mailable.is_a?(Event) && !waitlist
     c
   end
 
@@ -265,7 +265,7 @@ class Pmail
       accounts = to_with_unsubscribes.and(:id.in => pmail_testship.account_ids)
     else
       accounts = to_with_unsubscribes_less_ab_tests
-      if mailable.is_a?(Event)
+      if mailable.is_a?(Event) && !waitlist
         mailable.tickets.complete.and(:email.ne => nil).each do |ticket|
           batch_message.add_recipient(:to, ticket.email, {
                                         'firstname' => ticket.firstname || 'there',
