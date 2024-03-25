@@ -1,0 +1,3 @@
+<%= partial :'recommendations/nav' %>
+
+<%= cp(:'events/blocks', key: '/recommendations/trending', expires: 12.hours.from_now, locals: {events: Event.trending.first(20) }) %>

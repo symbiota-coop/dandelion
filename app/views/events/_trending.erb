@@ -1,5 +1,6 @@
-<% Event.trending[0..2].each { |event| %>
-  <div class="mb-1">
-    <%= partial :'events/block_carousel', locals: {event: event} %>
-  </div>
+<% Event.trending.first(3).each { |event| %>
+<div class="mb-1">
+  <%= partial :'events/block_carousel', locals: {event: event} %>
+</div>
+<p class="mt-3 mb-0"><a href="/recommendations/trending">More trending &rarr;</a></p>
 <% }  %>

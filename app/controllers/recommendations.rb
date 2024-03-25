@@ -14,4 +14,8 @@ Dandelion::App.controller do
     @account.recommend_events! if @account.recommended_events.nil?
     erb :'recommendations/events'
   end
+
+  get '/recommendations/trending' do
+    erb :'recommendations/trending'
+  end
 end
