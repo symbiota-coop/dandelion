@@ -55,13 +55,13 @@
               class: 'form-control-range',
               min: ticket_type.range_min,
               max: ticket_type.range_max,
-              oninput: "$(this).prev().html('#{Money.new(0, @event.currency).symbol}' + this.value); $(this).parent().next().find('.select-a-price-first').hide(); $(this).parent().next().find('[name^=quantities]').attr('data-price',this.value).prop('disabled',false).change();" %>
+              oninput: "$(this).prev().html('#{money_symbol(@event.currency)}' + this.value); $(this).parent().next().find('.select-a-price-first').hide(); $(this).parent().next().find('[name^=quantities]').attr('data-price',this.value).prop('disabled',false).change();" %>
             <% elsif ticket_type.price %>
               <%= m ticket_type.price, @event.currency %>
             <% else %>
               <div class="input-group">
                 <div class="input-group-prepend">
-                  <span class="input-group-text"><%= Money.new(0, @event.currency).symbol %></span>
+                  <span class="input-group-text"><%= money_symbol(@event.currency) %></span>
                 </div>
                 <%= text_field_tag :"prices[#{ticket_type.id}]", class: 'form-control',
               oninput: "$(this).parent().parent().next().find('.select-a-price-first').hide(); $(this).parent().parent().next().find('[name^=quantities]').attr('data-price',this.value).prop('disabled',false).change();" %>
@@ -221,7 +221,7 @@
           </strong>
           <div class="input-group" style="margin: 5px 0">
             <div class="input-group-prepend">
-              <span class="input-group-text"><%= Money.new(0, @event.currency).symbol %></span>
+              <span class="input-group-text"><%= money_symbol(@event.currency) %></span>
             </div>
             <% if @event.minimum_donation %>
               <script>
@@ -250,7 +250,7 @@
         <strong>Total</strong>
         <div class="input-group" style="margin: 5px 0">
           <div class="input-group-prepend">
-            <span class="input-group-text"><%= Money.new(0, @event.currency).symbol %></span>
+            <span class="input-group-text"><%= money_symbol(@event.currency) %></span>
           </div>
           <%= number_field_tag :totalDisplay, id: 'totalDisplay', class: 'form-control', style: 'width: 5em', disabled: true %>
           <%= hidden_field_tag :total, id: 'total' %>
@@ -266,7 +266,7 @@
           <strong>Credit</strong>
           <div class="input-group" style="margin: 5px 0">
             <div class="input-group-prepend">
-              <span class="input-group-text"><%= Money.new(0, @event.currency).symbol %></span>
+              <span class="input-group-text"><%= money_symbol(@event.currency) %></span>
             </div>
             <%= number_field_tag :credit, id: 'credit', class: 'form-control', style: 'width: 5em', disabled: true, value: format('%.2f', (organisationship.credit_balance.exchange_to(@event.currency).cents.to_f / 100)) %>
           </div>
@@ -281,7 +281,7 @@
           <strong>Balance</strong>
           <div class="input-group" style="margin: 5px 0">
             <div class="input-group-prepend">
-              <span class="input-group-text"><%= Money.new(0, @event.currency).symbol %></span>
+              <span class="input-group-text"><%= money_symbol(@event.currency) %></span>
             </div>
             <%= number_field_tag :balance, id: 'balance', class: 'form-control', style: 'width: 5em', disabled: true %>
           </div>
@@ -500,7 +500,7 @@
     eventUrl = <%== "#{ENV['BASE_URI']}/events/#{@event.id}".to_json %>
     placesRemaining = <%== @event.places_remaining.to_json %>
     currency = <%== @event.currency.to_json %>
-    currencySymbol = <%== Money.new(0, @event.currency).symbol.to_json %>
+    currencySymbol = <%== money_symbol(@event.currency).to_json %>
     stripePk = <%== @event.organisation.stripe_pk.to_json %>
     coinbase = <%= @event.organisation.coinbase_api_key ? true : false %>
     organisationOcSlug = <%== @event.organisation.oc_slug.to_json %>

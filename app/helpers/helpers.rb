@@ -118,6 +118,12 @@ Dandelion::App.helpers do
     "#{currency} #{amount}"
   end
 
+  def money_symbol(currency)
+    Money.new(0, currency).symbol
+  rescue Money::Currency::UnknownCurrency
+    currency
+  end
+
   def u(url)
     URI::Parser.new.escape(url) if url
   end

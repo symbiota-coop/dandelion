@@ -59,7 +59,7 @@
         <div class="form-group mb-1 mr-1">
           <div class="input-group">
             <div class="input-group-prepend">
-              <span class="input-group-text"><%= Money.new(0, currency).symbol %></span>
+              <span class="input-group-text"><%=money_symbol(currency) %></span>
             </div>
             <%= hidden_field_tag :currency, value: currency %>
             <%= text_field_tag :amount, style: 'width: 5em;', required: 'required', class: 'form-control', id: 'amount', value: (balance < per_event ? per_event : balance) %>

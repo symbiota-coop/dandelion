@@ -2,7 +2,7 @@
   <div class="form-group mb-1 mr-1">
     <div class="input-group">
       <div class="input-group-prepend">
-        <span class="input-group-text"><%= Money.new(0, @gathering.currency).symbol %></span>
+        <span class="input-group-text"><%= money_symbol(@gathering.currency) %></span>
       </div>
       <% if @gathering.enable_partial_payments %>
         <%= number_field_tag :amount, value: (amount if defined?(amount)), style: 'width: 5em;', required: 'required', class: 'form-control', id: 'amount' %>
@@ -43,7 +43,7 @@
   $(function () {
 
     currency = <%== @gathering.currency.to_json %>
-    currencySymbol = <%== Money.new(0, @gathering.currency).symbol.to_json %>
+    currencySymbol = <%== money_symbol(@gathering.currency) %>
 
     $('#pay-form button[data-payment-method]').click(function () {
       $('input[type=hidden][name=payment_method]').attr('disabled', true)

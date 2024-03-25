@@ -27,7 +27,7 @@
               if (i == 0)
                 $('tfoot th').eq(index).html(sum);
               else
-                $('tfoot th').eq(index).html('<%= Money.new(0, @organisation.currency).symbol %>' + sum.toLocaleString());
+                $('tfoot th').eq(index).html('<%= money_symbol(@organisation.currency) %>' + sum.toLocaleString());
             });
           })
           $('#event_stats').DataTable().draw();

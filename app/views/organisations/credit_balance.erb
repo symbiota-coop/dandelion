@@ -15,7 +15,7 @@
   <i style="margin-right: 5px" class="fa fa-plus-square"></i>
   <div class="input-group">
     <div class="input-group-prepend">
-      <span class="input-group-text"><%= Money.new(0, @organisation.currency).symbol %></span>
+      <span class="input-group-text"><%= money_symbol(@organisation.currency) %></span>
     </div>
     <%= number_field_tag :amount, class: 'form-control', style: 'width: 6em' %>
   </div>
@@ -24,7 +24,7 @@
   <i style="margin-right: 5px" class="fa fa-minus-square"></i>
   <div class="input-group">
     <div class="input-group-prepend">
-      <span class="input-group-text"><%= Money.new(0, @organisation.currency).symbol %></span>
+      <span class="input-group-text"><%= money_symbol(@organisation.currency) %></span>
     </div>
     <%= number_field_tag :amount, class: 'form-control', style: 'width: 6em' %>
   </div>
