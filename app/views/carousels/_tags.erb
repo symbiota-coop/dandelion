@@ -3,6 +3,7 @@
     Tags
   </label>
   <%= hidden_field_tag :'carousel[tag_names]', id: 'event_tag_names', value: @carousel.tag_names || @carousel.carouselships.map(&:event_tag_name).join(',') %>
+  <small class="form-text text-muted">Press comma to add a tag</small>
 </div>
 <script>
   $(function () {
