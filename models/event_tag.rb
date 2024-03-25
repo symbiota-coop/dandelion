@@ -10,7 +10,7 @@ class EventTag
     }
   end
 
-  validates_uniqueness_of :name
+  #  validates_uniqueness_of :name
 
   has_many :event_tagships, dependent: :destroy
 
