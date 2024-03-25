@@ -8,6 +8,7 @@
   $(function () {
     $("#activity_tag_names").select2({
       tags: <%== ActivityTag.and(:id.in => ActivityTagship.pluck(:activity_tag_id)).order('name asc').pluck(:name).map { |name| Sanitize.fragment(name).gsub("&amp;",'&') }.to_json %>,
+      tokenSeparators: [','],
       width: '100%'
     });
   })
