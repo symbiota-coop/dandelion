@@ -30,12 +30,13 @@
 
     var points = []
   <% if defined?(points) && (!defined?(dynamic) || (defined?(points_count) && points_count <= points_limit)) %>
-  <% points.each { |point| %>
+  <% points.each_with_index { |point,n| %>
         points.push({
           model_name: '<%= point.class.to_s %>',
           id: '<%= point.id %>',
           lat: <%= point.lat %>,
           lng: <%= point.lng %>,
+          n: <%= n %>
         })
   <% } %>
   <% end %>
@@ -60,6 +61,7 @@
       var marker = new mapIcons.Marker({
         model_name: point.model_name,
         id: point.id,
+        n: point.n,
         position: new google.maps.LatLng(point.lat, point.lng),
         icon: {
           path: mapIcons.shapes.MAP_PIN,
@@ -141,6 +143,10 @@
     google.maps.event.addListener(markerClusterer, 'clusterclick', function(cluster) {
       if (map.getZoom() === map.maxZoom) {
         var markers = cluster.getMarkers();
+        markers.sort(function(a, b) {
+          return a.n - b.n;
+        });
+        console.log(markers)
         infowindow.setContent('<i class="fa fa-spin fa-circle-o-notch"></i>');
         infowindow.setPosition(cluster.getCenter());
         infowindow.open(map);
