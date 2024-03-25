@@ -3,13 +3,13 @@
     Tags
   </label>
   <%= hidden_field_tag :'carousel[tag_names]', id: 'event_tag_names', value: @carousel.tag_names || @carousel.carouselships.map(&:event_tag_name).join(',') %>
-  <small class="form-text text-muted">Press comma to add a tag or enter to accept a suggestion</small>
+  <small class="form-text text-muted">Press comma to add a tag or enter to accept a suggestion. No need for #</small>
 </div>
 <script>
   $(function () {
     $("#event_tag_names").select2({
       tags: <%== EventTag.and(:id.in => EventTagship.pluck(:event_tag_id)).order('name asc').pluck(:name).map { |name| Sanitize.fragment(name).gsub("&amp;",'&') }.to_json %>,
-      tokenSeparators: [','],
+      tokenSeparators: [',','#'],
       width: '100%'
     });
   })
