@@ -35,7 +35,7 @@ class PaymentAttempt
   validates_uniqueness_of :evm_secret, scope: :evm_amount, allow_nil: true
 
   def evm_offset
-    evm_secret.to_d / 1e8
+    evm_secret.to_d / 1e3
   end
 
   before_validation do

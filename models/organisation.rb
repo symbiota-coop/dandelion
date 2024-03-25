@@ -773,7 +773,8 @@ class Organisation
     # Blockscout
     [
       "https://optimism.blockscout.com/api/v2/addresses/#{evm_address}/token-transfers",
-      "https://gnosis.blockscout.com/api/v2/addresses/#{evm_address}/token-transfers"
+      "https://gnosis.blockscout.com/api/v2/addresses/#{evm_address}/token-transfers",
+      "https://base.blockscout.com/api/v2/addresses/#{evm_address}/token-transfers"
     ].each do |url|
       puts url
       page = begin; agent.get(url); rescue Mechanize::ResponseCodeError; end

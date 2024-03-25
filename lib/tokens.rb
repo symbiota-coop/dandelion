@@ -47,15 +47,26 @@ class Token
   end
 end
 
-Chain.new('Gnosis Chain', 100)
-Chain.new('Celo', 42_220)
-Chain.new('Optimism', 10)
-Chain.new('Polygon', 137)
-Chain.new('Arbitrum One', 42_161)
+Chain.new('Gnosis Chain', 100).tap do |chain|
+  Token.new('WXDAI', '0xe91D153E0b41518A2Ce8Dd3D7944Fa863463a97d', chain)
+end
 
-Token.new('WXDAI', '0xe91D153E0b41518A2Ce8Dd3D7944Fa863463a97d', Chain.object('Gnosis Chain'))
-Token.new('CUSD', '0x765DE816845861e75A25fCA122bb6898B8B1282a', Chain.object('Celo'))
-Token.new('DAI', '0xda10009cbd5d07dd0cecc66161fc93d7c9000da1', Chain.object('Optimism'))
-Token.new('WETH', '0x4200000000000000000000000000000000000006', Chain.object('Optimism'))
-Token.new('BREAD', '0x11d9efDf4Ab4A3bfabf5C7089F56AA4F059AA14C', Chain.object('Polygon'))
-Token.new('USDGLO', '0x4f604735c1cf31399c6e711d5962b2b3e0225ad3', Chain.object('Arbitrum One'))
+Chain.new('Celo', 42_220).tap do |chain|
+  Token.new('CUSD', '0x765DE816845861e75A25fCA122bb6898B8B1282a', chain)
+end
+
+Chain.new('Optimism', 10).tap do |chain|
+  Token.new('DAI', '0xda10009cbd5d07dd0cecc66161fc93d7c9000da1', chain)
+end
+
+Chain.new('Polygon', 137).tap do |chain|
+  Token.new('BREAD', '0x11d9efDf4Ab4A3bfabf5C7089F56AA4F059AA14C', chain)
+end
+
+Chain.new('Arbitrum One', 42_161).tap do |chain|
+  Token.new('USDGLO', '0x4f604735c1cf31399c6e711d5962b2b3e0225ad3', chain)
+end
+
+Chain.new('Base', 8453).tap do |chain|
+  Token.new('USDC', '0x833589fcd6edb6e08f4c7c32d4f71b54bda02913', chain)
+end

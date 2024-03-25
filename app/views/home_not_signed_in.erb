@@ -52,7 +52,7 @@
         or
         <a target="_blank" href="https://opencollective.com/">Open Collective</a>
         <br />
-        (or choose fee-free crypto payments via <a href="https://optimism.io/">Optimism</a> or <a href="https://arbitrum.io/">Arbitrum</a>)
+        (or choose fee-free crypto payments via <a href="https://optimism.io/">Optimism</a> or <a href="https://www.base.org/">Base</a>)
       </p>
       <p class="mb-1">
         <a class="btn btn-primary btn-lg" href="/events/new">List an event</a>
@@ -78,6 +78,7 @@
         #payment-methods img.optimism { opacity: 0.5 }
         #payment-methods img.gnosis { opacity: 0.75 }
         #payment-methods img.arbitrum { opacity: 0.66 }
+        #payment-methods img.base { opacity: 0.66 }
       </style>
       <div id="payment-methods" class="row align-items-center mb-5 px-0 px-lg-3 mb-lg-3">
         <% {
@@ -85,7 +86,7 @@
         'coinbase-commerce' => 'https://help.coinbase.com/en/commerce/getting-started/fees',
         'opencollective' => 'https://opencollective.com/',
         'optimism' => 'https://optimism.io/',        
-        'arbitrum' => 'https://arbitrum.io/',        
+        'base' => 'https://base.org/',        
       }.each do |k, v| %>
           <div class="col">
             <a href="<%=v%>"><img class="<%=k%> w-100" src="/images/payment_methods/<%=k%>.jpg" /></a>

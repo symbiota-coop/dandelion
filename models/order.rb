@@ -175,7 +175,7 @@ class Order
   end
 
   def evm_offset
-    evm_secret.to_d / 1e8
+    evm_secret.to_d / 1e3
   end
 
   before_validation do
