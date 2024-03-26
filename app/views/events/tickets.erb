@@ -1,7 +1,6 @@
 <%= partial :'events/nav', locals: { event: @event } %>
 <div class="row">
   <div class="col">
-    <% # submit the form when the user stops typing %>
     <% form_tag '', method: 'get', class: 'submitOnChange searchForm form-inline mb-3', onsubmit: %{
       $('#tickets-table').attr('data-pagelet-url', $('#tickets-table').attr('data-pagelet-url').split('?')[0] + '?' + $(this).serialize());
       $('#tickets-table').load($('#tickets-table').attr('data-pagelet-url'))

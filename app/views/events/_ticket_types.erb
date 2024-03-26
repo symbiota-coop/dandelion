@@ -11,7 +11,7 @@
             <%= o.text_field :name, class: 'form-control', placeholder: 'Name' %>
           </div>
           <div>
-            <%= money_symbol(f.object.currency) %><%= o.text_field :price_or_range, class: 'form-control ml-1', placeholder: 'Price or range', step: 'any' %>
+            <%= money_symbol(f.object.currency) %><%= o.text_field :price_or_range, class: 'form-control ml-1', placeholder: 'Price', step: 'any', :'data-toggle' => 'tooltip', :title => 'Enter a price, a price range (two numbers separated by a dash) or leave blank to let the attendee pay as they feel' %>
             <%= o.hidden_field :price_or_range_submitted, value: true %>
           </div>
           <div>
@@ -64,7 +64,7 @@
           .ticket_type > div, .ticket_type > label { display: inline-block; margin-bottom: 5px; margin-right: 5px }
           .ticket_type > .ticket-type-description, .ticket_type > .ticket-type-minimum-monthly-donation { display: block; margin-right: 0 }
           .ticket_type input[name$='[name]'] { display: inline-block; width: auto }
-          .ticket_type input[name$='[price_or_range]'] { display: inline-block; width: 6em }
+          .ticket_type input[name$='[price_or_range]'] { display: inline-block; width: 7em }
           .ticket_type input[name$='[quantity]'] { display: inline-block; width: 7em }
           .ticket_type input[name$='[max_quantity_per_transaction]'] { display: inline-block; width: 5em }
           .ticket_type input[name$='[minimum_monthly_donation]'] { display: inline-block; width: 6em }
@@ -98,7 +98,7 @@
               nameDiv.appendTo(d);
 
               var priceOrRangeDiv = $('<div><%= money_symbol(f.object.currency) %></div>')
-              var priceOrRangeInput = $('<input type="text" step="any" class="form-control ml-1" placeholder="Price or range" />');
+              var priceOrRangeInput = $('<input type="text" step="any" class="form-control ml-1" placeholder="Price" data-toggle="tooltip" title="Enter a price, a price range (two numbers separated by a dash) or leave blank to let the attendee pay as they feel" />');
               priceOrRangeInput.attr('name', 'event[ticket_types_attributes][' + c + '][price_or_range]');
               priceOrRangeInput.attr('id', 'event_ticket_types_attributes_' + c + '_price_or_range');
               priceOrRangeInput.appendTo(priceOrRangeDiv);
@@ -106,6 +106,7 @@
               priceOrRangeSubmittedInput.attr('name', 'event[ticket_types_attributes][' + c + '][price_or_range_submitted]');
               priceOrRangeSubmittedInput.attr('id', 'event_ticket_types_attributes_' + c + '_price_or_range_submitted');
               priceOrRangeSubmittedInput.appendTo(priceOrRangeDiv);
+              priceOrRangeInput.tooltip();
               priceOrRangeDiv.appendTo(d);
 
               var quantityDiv = $('<div>&times;</div>')

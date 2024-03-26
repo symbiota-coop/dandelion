@@ -39,19 +39,19 @@ class Timetable
     gathering
   end
 
-  def self.new_tips
+  def self.new_hints
     {
       scheduling_by_all: 'By default, only admins can schedule activities'
     }
+  end
+
+  def self.edit_hints
+    {}.merge(new_hints)
   end
 
   def self.human_attribute_name(attr, options = {})
     {
       scheduling_by_all: 'Allow all members to schedule activities'
     }[attr.to_sym] || super
-  end
-
-  def self.edit_tips
-    new_tips
   end
 end

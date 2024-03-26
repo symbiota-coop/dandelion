@@ -187,6 +187,7 @@ class Organisation
 
   def self.new_hints
     {
+      slug: 'Lowercase letters, numbers and dashes only (no spaces)',
       image: 'Square images look best',
       stripe_pk: '<code>Developers</code> > <code>API keys</code> > <code>Publishable key</code>. Starts <code>pk_live_</code>',
       stripe_sk: '<code>Developers</code> > <code>API keys</code> > <code>Secret key</code>. Starts <code>sk_live_</code>',
@@ -220,16 +221,6 @@ class Organisation
 
   def self.edit_hints
     {}.merge(new_hints)
-  end
-
-  def self.new_tips
-    {
-      slug: 'Lowercase letters, numbers and dashes only (no spaces)'
-    }
-  end
-
-  def self.edit_tips
-    {}.merge(new_tips)
   end
 
   def self.marker_color

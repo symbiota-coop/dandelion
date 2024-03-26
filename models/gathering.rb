@@ -306,14 +306,9 @@ class Gathering
     Account.and(:id.in => memberships.and(admin: true).pluck(:account_id))
   end
 
-  def self.new_tips
-    {
-      slug: 'Lowercase letters, numbers and dashes only (no spaces)'
-    }
-  end
-
   def self.new_hints
     {
+      slug: 'Lowercase letters, numbers and dashes only (no spaces)',
       application_questions: 'Questions to ask applicants. One question per line.',
       joining_questions: 'Questions to ask people joining the gathering. One question per line.',
       currency: 'This cannot be changed, choose wisely',
@@ -366,12 +361,8 @@ class Gathering
     }[attr.to_sym] || super
   end
 
-  def self.edit_tips
-    new_tips
-  end
-
   def self.edit_hints
-    new_hints
+    {}.merge(new_hints)
   end
 
   def threshold

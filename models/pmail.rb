@@ -313,7 +313,7 @@ class Pmail
   end
 
   def self.edit_hints
-    new_hints
+    {}.merge(new_hints)
   end
 
   def self.human_attribute_name(attr, options = {})

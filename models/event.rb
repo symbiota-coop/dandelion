@@ -858,7 +858,7 @@ class Event
       name: 'Event title',
       slug: 'Short URL',
       email: 'Contact email',
-      questions: 'Booking questions',
+      questions: 'Further questions to ask on the order form',
       facebook_event_url: 'Facebook event URL',
       facebook_pixel_id: 'Facebook Pixel ID',
       show_emails: 'Allow all event admins to view email addresses of attendees',
@@ -887,18 +887,9 @@ class Event
     }[attr.to_sym] || super
   end
 
-  def self.new_tips
-    {
-      slug: 'Lowercase letters, numbers and dashes only (no spaces)'
-    }
-  end
-
-  def self.edit_tips
-    {}.merge(new_tips)
-  end
-
   def self.new_hints
     {
+      slug: 'Lowercase letters, numbers and dashes only (no spaces)',
       image: 'At least 992px wide, and more wide than high',
       start_time: "in &hellip; (your profile's time zone)",
       end_time: "in &hellip; (your profile's time zone)",

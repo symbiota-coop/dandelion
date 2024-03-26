@@ -258,6 +258,7 @@
                 autosize($('#event_feedback_questions')[0])
               })
             </script>
+            <%= f.check_box_block :ask_hear_about %>
             <%= f.text_area_block :questions, placeholder: "e.g. Any dietary requirements?\n[Check this box to agree to the terms and conditions]" %>
             <%= f.text_area_block :feedback_questions %>
           </div>
@@ -312,7 +313,6 @@
             <%= f.check_box_block :opt_in_facilitator %>
             <%= f.check_box_block :include_in_parent %>
             <%= f.check_box_block :refund_deleted_orders %>
-            <%= f.check_box_block :ask_hear_about %>
             <%= f.text_area_block :notes %>
 
             <% if Padrino.env == :development || @event.organisation.verified? %>

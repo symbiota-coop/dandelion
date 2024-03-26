@@ -564,7 +564,8 @@ class Account
   def self.new_hints
     {
       location: 'Used for connecting you with events near you. Never displayed publicly without your consent.',
-      date_of_birth: 'Never displayed publicly, though you can choose to show your age.'
+      date_of_birth: 'Never displayed publicly, though you can choose to show your age.',
+      username: 'Letters, numbers, underscores and periods'
     }
   end
 
@@ -572,16 +573,6 @@ class Account
     {
       password: 'Leave blank to keep existing password'
     }.merge(new_hints)
-  end
-
-  def self.new_tips
-    {
-      username: 'Letters, numbers, underscores and periods'
-    }
-  end
-
-  def self.edit_tips
-    {}.merge(new_tips)
   end
 
   def self.sexualities

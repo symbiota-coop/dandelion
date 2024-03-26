@@ -1,5 +1,5 @@
 <% if !current_account.able_to_message %>
-  <p class="lead">You must <a href="/accounts/edit">confirm your email address</a>, and <a href="/donate">donate to Dandelion</a>, join a gathering or attend an event before messaging.</p>
+  <p class="lead">You must <a href="/accounts/edit">confirm your email address</a> and <a href="/donate">donate to Dandelion</a>, join a gathering or attend an event before messaging.</p>
 <% else %>
   <% form_tag "/messages/#{@account.id}/send", id: 'compose', class: 'mt-3', style: 'position: relative' do %>
     <%= text_area_tag :body, id: 'message-body', placeholder: 'Type a message...', class: 'form-control', style: 'padding-bottom: 40px' %>

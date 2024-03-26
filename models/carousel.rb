@@ -25,7 +25,7 @@ class Carousel
   end
 
   def self.edit_hints
-    new_hints
+    {}.merge(new_hints)
   end
 
   has_many :carouselships, dependent: :destroy
