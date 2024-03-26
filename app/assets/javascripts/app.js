@@ -239,7 +239,7 @@ $(function () {
     })
   })
 
-  $('form.submitOnChange.searchForm input[name=q]').typeWatch({ wait: 500, callback: function () { $(this.form).submit() } })
+  $('input.typeWatch').typeWatch({ wait: 500, callback: function () { $(this.form).submit() } })
 
   $('form.submitOnChange').each(function () {
     $('select, .flatpickr-input, input[type=checkbox]', this).change(function () {
