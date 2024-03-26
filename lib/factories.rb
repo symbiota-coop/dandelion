@@ -66,7 +66,6 @@ FactoryBot.define do
     enable_contributions { true }
     enable_inventory { true }
     enable_budget { true }
-    enable_comments_on_gathering_homepage { false }
     account
   end
 

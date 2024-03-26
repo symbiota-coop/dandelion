@@ -139,21 +139,3 @@
   <h2 class="mt-5">Feedback</h2>
   <div class="mt-3" data-pagelet-url="/activities/<%= @activity.id %>/show_feedback"></div>
 <% end %>
-
-<% if @activityship || @activity.privacy == 'open' %>
-  <% if !@activity.hide_discussion %>
-    <% if current_account %>
-      <h2 class="mt-5">Discussion</h2>
-      <% if @activityship %>
-        <div data-pagelet-url="/activities/<%= @activity.id %>/subscribe_discussion">
-          <%= partial :'activities/subscribe_discussion', locals: { activityship: activityship } %>
-        </div>
-      <% end %>
-      <div class="mt-3" data-pagelet-url="/commentable?commentable_type=Activity&commentable_id=<%= @activity.id %>">
-        <%= partial :'comments/commentable', locals: { commentable: @activity } %>
-      </div>
-    <% else %>
-      <%= partial :'comments/sign_in', locals: { commentable: @activity } %>
-    <% end %>
-  <% end %>
-<% end %>

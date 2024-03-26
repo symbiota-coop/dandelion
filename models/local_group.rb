@@ -11,7 +11,6 @@ class LocalGroup
   field :intro_text, type: String
   field :geometry, type: String
   field :hide_members, type: Boolean
-  field :hide_discussion, type: Boolean
   field :type, type: String
 
   def self.admin_fields
@@ -21,8 +20,7 @@ class LocalGroup
       telegram_group: :url,
       intro_text: :wysiwyg,
       geometry: :text_area,
-      hide_members: :check_box,
-      hide_discussion: :check_box
+      hide_members: :check_box
     }
   end
 
@@ -90,11 +88,6 @@ class LocalGroup
     organisation.members.and(coordinates: { '$geoWithin' => { '$geometry' => JSON.parse(geometry) } })
   end
 
-  has_many :posts, as: :commentable, dependent: :destroy
-  has_many :subscriptions, as: :commentable, dependent: :destroy
-  has_many :comments, as: :commentable, dependent: :destroy
-  has_many :comment_reactions, as: :commentable, dependent: :destroy
-
   def self.human_attribute_name(attr, options = {})
     {
       telegram_group: 'Telegram group/channel URL'
@@ -108,10 +101,6 @@ class LocalGroup
         local_group.local_groupships.find_by(account: account, admin: true) ||
         Organisation.admin?(local_group.organisation, account)
       )
-  end
-
-  def discussers
-    Account.and(:id.in => local_groupships.and(subscribed_discussion: true).pluck(:account_id))
   end
 
   def subscribed_members

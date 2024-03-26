@@ -42,7 +42,6 @@ class Organisation
   field :monthly_donors_count, type: Integer
   field :monthly_donations_count, type: String
   field :currency, type: String
-  field :enable_discussion, type: Boolean
   field :auto_comment_sending, type: Boolean
   field :affiliate_credit_percentage, type: Integer
   field :affiliate_intro, type: String
@@ -347,11 +346,6 @@ class Organisation
   has_many :local_groups, dependent: :destroy
   has_many :organisation_tiers, dependent: :destroy
 
-  has_many :posts, as: :commentable, dependent: :destroy
-  has_many :subscriptions, as: :commentable, dependent: :destroy
-  has_many :comments, as: :commentable, dependent: :destroy
-  has_many :comment_reactions, as: :commentable, dependent: :destroy
-
   has_many :orders_as_affiliate, class_name: 'Order', as: :affiliate, dependent: :nullify
   def orders
     Order.and(:event_id.in => events.pluck(:id))
@@ -483,10 +477,6 @@ class Organisation
   end
   handle_asynchronously :import_from_csv
 
-  def discussers
-    Account.and(:id.in => organisationships.and(:monthly_donation_method.ne => nil, :subscribed_discussion => true).pluck(:account_id))
-  end
-
   def members
     Account.and(organisation_ids_cache: id)
   end
@@ -599,7 +589,6 @@ class Organisation
       monthly_donation_welcome_from: 'Welcome email for new monthly donors from',
       monthly_donation_welcome_subject: 'Welcome email for new monthly donors subject',
       monthly_donation_welcome_body: 'Welcome email for new monthly donors body',
-      enable_discussion: "Enable discussion feature in the Members' Area",
       auto_comment_sending: "Send comments in the Members' Area automatically",
       become_a_member_url: 'Become a Member URL',
       terms_and_conditions_url: 'Terms and Conditions URL',

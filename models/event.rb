@@ -329,7 +329,6 @@ class Event
           activity.activityships.create(
             account: account,
             unsubscribed: previous_activityship.unsubscribed,
-            subscribed_discussion: previous_activityship.subscribed_discussion,
             hide_membership: previous_activityship.hide_membership,
             receive_feedback: previous_activityship.receive_feedback
           )
@@ -346,7 +345,6 @@ class Event
         local_group.local_groupships.create(
           account: account,
           unsubscribed: previous_local_groupship.unsubscribed,
-          subscribed_discussion: previous_local_groupship.subscribed_discussion,
           hide_membership: previous_local_groupship.hide_membership,
           receive_feedback: previous_local_groupship.receive_feedback
         )

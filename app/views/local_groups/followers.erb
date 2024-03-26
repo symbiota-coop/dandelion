@@ -43,8 +43,7 @@
   <thead>
     <tr>
       <th>Name</th>
-      <th>Subscribed to mailer</th>
-      <th>Subscribed to discussion</th>
+      <th>Subscribed</th>
       <th>Following since</th>
       <th></th>
     </tr>
@@ -57,11 +56,6 @@
     <td>
       <div data-pagelet-url="/local_groups/<%= @local_group.id %>/subscribed/<%= local_groupship.id %>">
         <%= partial :'local_groups/subscribed', locals: { local_groupship: local_groupship } %>
-      </div>
-    </td>
-    <td>
-      <div data-pagelet-url="/local_groups/<%= @local_group.id %>/subscribed_discussion/<%= local_groupship.id %>">
-        <%= partial :'local_groups/subscribed_discussion', locals: { local_groupship: local_groupship } %>
       </div>
     </td>
     <td>

@@ -1,10 +1,5 @@
 <% viewer_in_network = current_account && @account.network.find(current_account.id) %>
 <%= partial :'accounts/top', locals: { account: @account } %>
-<% if current_account %>
-  <div class="mt-3" data-pagelet-url="/commentable?commentable_type=Account&commentable_id=<%= @account.id %>">
-    <%= partial :'comments/commentable', locals: { commentable: @account } %>
-  </div>
-<% end %>
 <% if (events = Event.and(:id.in => EventFacilitation.and(:account_id.in => [@account.id] + @account.following_starred.pluck(:id)).pluck(:event_id)).live.public.future_and_current_featured).count > 0 %>
   <h2 class="mt-5">Upcoming events <% if @account.following_starred.count > 0 %>featuring <%=@account.firstname%> and <%=@account.pronoun%> stars<% end %></h2>
   <%= partial :'events/blocks', locals: { events: events } %>

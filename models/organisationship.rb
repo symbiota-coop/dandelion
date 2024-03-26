@@ -19,7 +19,7 @@ class Organisationship
   field :why_i_joined_edited, type: String
   field :notes, type: String
 
-  %w[admin unsubscribed subscribed_discussion hide_membership receive_feedback why_i_joined_public sent_welcome sent_monthly_donation_welcome hide_referrer].each do |b|
+  %w[admin unsubscribed hide_membership receive_feedback why_i_joined_public sent_welcome sent_monthly_donation_welcome hide_referrer].each do |b|
     field b.to_sym, type: Boolean
     index({ b.to_s => 1 })
   end
@@ -66,7 +66,6 @@ class Organisationship
       referrer_id: :lookup,
       admin: :check_box,
       unsubscribed: :check_box,
-      subscribed_discussion: :check_box,
       receive_feedback: :check_box,
       hide_membership: :check_box,
       sent_monthly_donation_welcome: :check_box,

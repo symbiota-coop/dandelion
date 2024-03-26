@@ -310,10 +310,6 @@ class Account
     Account.and(:id.in => follows_as_follower.pluck(:followee_id))
   end
 
-  def discussers
-    Account.and(:id.in => [id] + follows_as_followee.and(:unsubscribed.ne => true).pluck(:follower_id))
-  end
-
   def network_notifications
     Notification.all.or(
       { :circle_type => 'Gathering', :circle_id.in => memberships.pluck(:gathering_id) },
@@ -468,11 +464,6 @@ class Account
   has_many :subscriptions_as_creator, class_name: 'Subscription', inverse_of: :account, dependent: :destroy
   has_many :comments_as_creator, class_name: 'Comment', inverse_of: :account, dependent: :destroy
   has_many :comment_reactions_as_creator, class_name: 'CommentReaction', inverse_of: :account, dependent: :destroy
-
-  has_many :posts, as: :commentable, dependent: :destroy
-  has_many :subscriptions, as: :commentable, dependent: :destroy
-  has_many :comments, as: :commentable, dependent: :destroy
-  has_many :comment_reactions, as: :commentable, dependent: :destroy
 
   has_many :orders, class_name: 'Order', inverse_of: :account, dependent: :nullify
   has_many :orders_as_revenue_sharer, class_name: 'Order', inverse_of: :revenue_sharer, dependent: :nullify

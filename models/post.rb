@@ -28,7 +28,8 @@ class Post
   end
 
   def self.commentable_types
-    %w[DocPage Team Tactivity Mapplication Account Place Gathering Activity Event LocalGroup Organisation ActivityApplication]
+    %w[DocPage Team Tactivity Mapplication Place Event ActivityApplication]
+    # Account Organisation LocalGroup Activity Gathering
   end
 
   def url
@@ -39,30 +40,15 @@ class Post
     when Team
       team = commentable
       "#{ENV['BASE_URI']}/g/#{team.gathering.slug}/teams/#{team.id}#post-#{id}"
-    when Gathering
-      gathering = commentable
-      "#{ENV['BASE_URI']}/g/#{gathering.slug}"
     when Tactivity
       tactivity = commentable
       "#{ENV['BASE_URI']}/g/#{tactivity.gathering.slug}/tactivities/#{tactivity.id}#post-#{id}"
     when Mapplication
       mapplication = commentable
       "#{ENV['BASE_URI']}/g/#{mapplication.gathering.slug}/mapplications/#{mapplication.id}#post-#{id}"
-    when Account
-      account = commentable
-      "#{ENV['BASE_URI']}/u/#{account.username}#post-#{id}"
     when Place
       place = commentable
       "#{ENV['BASE_URI']}/places/#{place.id}"
-    when Organisation
-      organisation = commentable
-      "#{ENV['BASE_URI']}/o/#{organisation.slug}/members"
-    when Activity
-      activity = commentable
-      "#{ENV['BASE_URI']}/activities/#{activity.id}"
-    when LocalGroup
-      local_group = commentable
-      "#{ENV['BASE_URI']}/local_groups/#{local_group.id}"
     when Event
       event = commentable
       "#{ENV['BASE_URI']}/events/#{event.id}"

@@ -13,7 +13,6 @@ class Activity
   field :intro_text, type: String
   field :image_uid, type: String
   field :hide_members, type: Boolean
-  field :hide_discussion, type: Boolean
   field :privacy, type: String
   field :application_questions, type: String
   field :thank_you_message, type: String
@@ -33,7 +32,6 @@ class Activity
       image: :image,
       events: :collection,
       hide_members: :check_box,
-      hide_discussion: :check_box,
       privacy: :select,
       application_questions: :text_area,
       thank_you_message: :wysiwyg,
@@ -47,11 +45,6 @@ class Activity
   has_many :event_feedbacks, dependent: :destroy
   has_many :activityships, dependent: :destroy
   has_many :activity_applications, dependent: :destroy
-
-  has_many :posts, as: :commentable, dependent: :destroy
-  has_many :subscriptions, as: :commentable, dependent: :destroy
-  has_many :comments, as: :commentable, dependent: :destroy
-  has_many :comment_reactions, as: :commentable, dependent: :destroy
 
   has_many :pmails_as_mailable, class_name: 'Pmail', as: :mailable, dependent: :destroy
   has_many :pmails_as_exclusion, class_name: 'Pmail', inverse_of: :activity, dependent: :nullify
@@ -154,10 +147,6 @@ class Activity
 
   def members
     Account.and(:id.in => activityships.pluck(:account_id))
-  end
-
-  def discussers
-    Account.and(:id.in => activityships.and(subscribed_discussion: true).pluck(:account_id))
   end
 
   def subscribed_members

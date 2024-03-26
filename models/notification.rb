@@ -161,18 +161,6 @@ class Notification
       comment = notifiable
       if comment.commentable.is_a?(Mapplication)
         "<strong>#{comment.account.name}</strong> commented on <strong>#{comment.commentable.account.name}</strong>'s application"
-      elsif comment.commentable.is_a?(Account)
-        if comment.first_in_post?
-          "<strong>#{comment.account.name}</strong> started a thread <strong>#{comment.post.subject}</strong> on #{comment.account_id == comment.commentable_id ? "#{comment.commentable.pronoun} own profile" : "<strong>#{comment.commentable.name}'s profile</strong>"}"
-        else
-          "<strong>#{comment.account.name}</strong> replied to <strong>#{comment.post.subject}</strong> on #{comment.account_id == comment.commentable_id ? "#{comment.commentable.pronoun} own profile" : "<strong>#{comment.commentable.name}'s profile</strong>"}"
-        end
-      elsif comment.commentable.is_a?(Activity) || comment.commentable.is_a?(LocalGroup)
-        if comment.first_in_post?
-          "<strong>#{comment.account.name}</strong> started a thread <strong>#{comment.commentable.organisation.name}/#{comment.commentable.name}/#{comment.post.subject}</strong>"
-        else
-          "<strong>#{comment.account.name}</strong> replied to <strong>#{comment.commentable.organisation.name}/#{comment.commentable.name}/#{comment.post.subject}</strong>"
-        end
       elsif comment.first_in_post?
         "<strong>#{comment.account.name}</strong> started a thread <strong>#{comment.commentable.name}/#{comment.post.subject}</strong>"
       else
@@ -180,13 +168,7 @@ class Notification
       end
     when :reacted_to_a_comment
       comment_reaction = notifiable
-      if comment_reaction.commentable.is_a?(Account)
-        "<strong>#{comment_reaction.account.name}</strong> reacted with #{comment_reaction.body == '💚' ? '<i class="text-primary fa fa-heart"></i>' : comment_reaction.body} to <strong>#{comment_reaction.comment.account.name}'s</strong> comment in <strong>#{comment_reaction.comment.post.subject}</strong>"
-      elsif comment_reaction.commentable.is_a?(Activity) || comment_reaction.commentable.is_a?(LocalGroup)
-        "<strong>#{comment_reaction.account.name}</strong> reacted with #{comment_reaction.body == '💚' ? '<i class="text-primary fa fa-heart"></i>' : comment_reaction.body} to <strong>#{comment_reaction.comment.account.name}'s</strong> comment in <strong>#{comment_reaction.commentable.organisation.name}/#{comment_reaction.commentable.name}/#{comment_reaction.comment.post.subject}</strong>"
-      else
-        "<strong>#{comment_reaction.account.name}</strong> reacted with #{comment_reaction.body == '💚' ? '<i class="text-primary fa fa-heart"></i>' : comment_reaction.body} to <strong>#{comment_reaction.comment.account.name}'s</strong> comment in <strong>#{comment_reaction.commentable.name}/#{comment_reaction.comment.post.subject}</strong>"
-      end
+      "<strong>#{comment_reaction.account.name}</strong> reacted with #{comment_reaction.body == '💚' ? '<i class="text-primary fa fa-heart"></i>' : comment_reaction.body} to <strong>#{comment_reaction.comment.account.name}'s</strong> comment in <strong>#{comment_reaction.commentable.name}/#{comment_reaction.comment.post.subject}</strong>"
     when :left_gathering
       account = notifiable
       "<strong>#{account.name}</strong> is no longer a member"

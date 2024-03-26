@@ -485,29 +485,6 @@ Dandelion::App.controller do
     redirect '/accounts/subscriptions'
   end
 
-  get '/o/:slug/subscribe_discussion' do
-    sign_in_required!
-    @organisation = Organisation.find_by(slug: params[:slug]) || not_found
-    @organisationship = current_account.organisationships.find_by(organisation: @organisation) || current_account.organisationships.create(organisation: @organisation)
-    partial :'organisations/subscribe_discussion', locals: { organisationship: @organisationship }
-  end
-
-  get '/o/:slug/set_subscribe_discussion' do
-    sign_in_required!
-    @organisation = Organisation.find_by(slug: params[:slug]) || not_found
-    @organisationship = current_account.organisationships.find_by(organisation: @organisation) || current_account.organisationships.create(organisation: @organisation)
-    @organisationship.update_attribute(:subscribed_discussion, true)
-    request.xhr? ? 200 : redirect('/accounts/subscriptions')
-  end
-
-  get '/o/:slug/unsubscribe_discussion' do
-    sign_in_required!
-    @organisation = Organisation.find_by(slug: params[:slug]) || not_found
-    @organisationship = current_account.organisationships.find_by(organisation: @organisation) || current_account.organisationships.create(organisation: @organisation)
-    @organisationship.update_attribute(:subscribed_discussion, false)
-    request.xhr? ? 200 : redirect('/accounts/subscriptions')
-  end
-
   get '/o/:slug/tiers' do
     @organisation = Organisation.find_by(slug: params[:slug]) || not_found
     organisation_admins_only!
@@ -720,21 +697,6 @@ Dandelion::App.controller do
     organisation_admins_only!
     @organisationship = @organisation.organisationships.find(params[:organisationship_id]) || not_found
     @organisationship.update_attribute(:unsubscribed, !params[:subscribed])
-    200
-  end
-
-  get '/o/:slug/subscribed_discussion/:organisationship_id' do
-    @organisation = Organisation.find_by(slug: params[:slug]) || not_found
-    organisation_admins_only!
-    @organisationship = @organisation.organisationships.find(params[:organisationship_id]) || not_found
-    partial :'organisations/subscribed_discussion', locals: { organisationship: @organisationship }
-  end
-
-  post '/o/:slug/subscribed_discussion/:organisationship_id' do
-    @organisation = Organisation.find_by(slug: params[:slug]) || not_found
-    organisation_admins_only!
-    @organisationship = @organisation.organisationships.find(params[:organisationship_id]) || not_found
-    @organisationship.update_attribute(:subscribed_discussion, params[:subscribed_discussion])
     200
   end
 

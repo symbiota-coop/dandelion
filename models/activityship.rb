@@ -5,7 +5,7 @@ class Activityship
   belongs_to :account, index: true
   belongs_to :activity, index: true
 
-  %w[admin unsubscribed subscribed_discussion hide_membership receive_feedback].each do |b|
+  %w[admin unsubscribed hide_membership receive_feedback].each do |b|
     field b.to_sym, type: Boolean
     index({ b.to_s => 1 })
   end
@@ -15,7 +15,6 @@ class Activityship
       account_id: :lookup,
       activity_id: :lookup,
       unsubscribed: :check_box,
-      subscribed_discussion: :check_box,
       hide_membership: :check_box,
       admin: :check_box
     }

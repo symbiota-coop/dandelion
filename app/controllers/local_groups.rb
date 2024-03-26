@@ -139,29 +139,6 @@ Dandelion::App.controller do
     redirect '/accounts/subscriptions'
   end
 
-  get '/local_groups/:id/subscribe_discussion' do
-    sign_in_required!
-    @local_group = LocalGroup.find(params[:id]) || not_found
-    @local_groupship = current_account.local_groupships.find_by(local_group: @local_group) || current_account.local_groupships.create(local_group: @local_group)
-    partial :'local_groups/subscribe_discussion', locals: { local_groupship: @local_groupship }
-  end
-
-  get '/local_groups/:id/set_subscribe_discussion' do
-    sign_in_required!
-    @local_group = LocalGroup.find(params[:id]) || not_found
-    @local_groupship = current_account.local_groupships.find_by(local_group: @local_group) || current_account.local_groupships.create(local_group: @local_group)
-    @local_groupship.update_attribute(:subscribed_discussion, true)
-    request.xhr? ? 200 : redirect('/accounts/subscriptions')
-  end
-
-  get '/local_groups/:id/unsubscribe_discussion' do
-    sign_in_required!
-    @local_group = LocalGroup.find(params[:id]) || not_found
-    @local_groupship = current_account.local_groupships.find_by(local_group: @local_group) || current_account.local_groupships.create(local_group: @local_group)
-    @local_groupship.update_attribute(:subscribed_discussion, false)
-    request.xhr? ? 200 : redirect('/accounts/subscriptions')
-  end
-
   get '/local_groups/:id/local_groupship' do
     sign_in_required!
     @local_group = LocalGroup.find(params[:id]) || not_found
@@ -249,21 +226,6 @@ Dandelion::App.controller do
     local_group_admins_only!
     @local_groupship = @local_group.local_groupships.find(params[:local_groupship_id]) || not_found
     @local_groupship.update_attribute(:unsubscribed, !params[:subscribed])
-    200
-  end
-
-  get '/local_groups/:id/subscribed_discussion/:local_groupship_id' do
-    @local_group = LocalGroup.find(params[:id]) || not_found
-    local_group_admins_only!
-    @local_groupship = @local_group.local_groupships.find(params[:local_groupship_id]) || not_found
-    partial :'local_groups/subscribed_discussion', locals: { local_groupship: @local_groupship }
-  end
-
-  post '/local_groups/:id/subscribed_discussion/:local_groupship_id' do
-    @local_group = LocalGroup.find(params[:id]) || not_found
-    local_group_admins_only!
-    @local_groupship = @local_group.local_groupships.find(params[:local_groupship_id]) || not_found
-    @local_groupship.update_attribute(:subscribed_discussion, params[:subscribed_discussion])
     200
   end
 

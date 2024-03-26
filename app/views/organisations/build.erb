@@ -206,31 +206,6 @@
           <%= f.text_area_block :terms_and_conditions %>
           <%= f.check_box_block :terms_and_conditions_check_box %>
           <%= f.check_box_block :collect_location %>
-
-          <script>
-            $(function() {
-
-              $('#organisation_enable_discussion').click(function () {
-                if ($(this).is(':checked')) {
-                  $('#organisation_auto_comment_sending').removeAttr('disabled')
-                }
-                else {
-                  $('#organisation_auto_comment_sending').prop('checked', false );
-                  $('#organisation_auto_comment_sending').attr('disabled',true)
-                }
-            })
-            if ($('#organisation_enable_discussion').is(':checked')) {
-              $('#organisation_auto_comment_sending').removeAttr('disabled')
-            }
-            else {
-              $('#organisation_auto_comment_sending').prop('checked', false );
-              $('#organisation_auto_comment_sending').attr('disabled',true)
-            }
-            })
-          </script>
-
-          <%= f.check_box_block :enable_discussion %>
-          <%= f.check_box_block :auto_comment_sending %>
           <%= f.check_box_block :restrict_cohosting %>
           <%= f.check_box_block :hide_ticket_revenue %>
         </div>

@@ -6,6 +6,5 @@
   <%= f.url_block :telegram_group %>
   <%= f.text_area_block :geometry %>
   <%= f.check_box_block :hide_members %>
-  <%= f.check_box_block :hide_discussion %>
   <%= f.submit_block destroy_url: "/local_groups/#{@local_group.id}/destroy" %>
 <% end %>

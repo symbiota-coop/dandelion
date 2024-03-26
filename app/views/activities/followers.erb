@@ -44,8 +44,7 @@
   <thead>
     <tr>
       <th>Name</th>
-      <th>Subscribed to mailer</th>
-      <th>Subscribed to discussion</th>
+      <th>Subscribed</th>
       <th>Following since</th>
       <th></th>
     </tr>
@@ -58,11 +57,6 @@
     <td>
       <div data-pagelet-url="/activities/<%= @activity.id %>/subscribed/<%= activityship.id %>">
         <%= partial :'activities/subscribed', locals: { activityship: activityship } %>
-      </div>
-    </td>
-    <td>
-      <div data-pagelet-url="/activities/<%= @activity.id %>/subscribed_discussion/<%= activityship.id %>">
-        <%= partial :'activities/subscribed_discussion', locals: { activityship: activityship } %>
       </div>
     </td>
     <td>

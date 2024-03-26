@@ -1,4 +1,4 @@
-<% if comment.commentable.is_a?(Gathering) or comment.commentable.respond_to?(:gathering) %>
+<% if comment.commentable.respond_to?(:gathering) %>
   <% comment.read_receipts.create account: current_account %>
 <% end %>
 <div class="media" style="padding: 10px 10px 0 10px; margin: 0">
@@ -26,7 +26,7 @@
     </div>
     <div class="row justify-content-between align-items-center">
       <div data-pagelet-url="/comments/<%= comment.id %>/reactions" class="col-auto"></div>
-      <% if comment.commentable.is_a?(Gathering) or comment.commentable.respond_to?(:gathering) %>
+      <% if comment.commentable.respond_to?(:gathering) %>
         <div data-pagelet-url="/comments/<%= comment.id %>/read_receipts" class="col-auto"></div>
       <% end %>
     </div>

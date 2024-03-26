@@ -95,18 +95,3 @@
   </div>
 <% end %>
 
-<% if !@local_group.hide_discussion %>
-  <% if current_account %>
-    <h2 class="mt-5">Discussion</h2>
-    <% if (local_groupship = @local_group.local_groupships.find_by(account: current_account)) %>
-      <div data-pagelet-url="/local_groups/<%= @local_group.id %>/subscribe_discussion">
-        <%= partial :'local_groups/subscribe_discussion', locals: { local_groupship: local_groupship } %>
-      </div>
-    <% end %>
-    <div class="mt-3" data-pagelet-url="/commentable?commentable_type=LocalGroup&commentable_id=<%= @local_group.id %>">
-      <%= partial :'comments/commentable', locals: { commentable: @local_group } %>
-    </div>
-  <% else %>
-    <%= partial :'comments/sign_in', locals: { commentable: @local_group } %>
-  <% end %>
-<% end %>

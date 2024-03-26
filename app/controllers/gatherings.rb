@@ -60,7 +60,6 @@ Dandelion::App.controller do
     end
     @gathering.listed = true
     @gathering.enable_partial_payments = true
-    @gathering.enable_comments_on_gathering_homepage = false
     erb :'gatherings/build'
   end
 

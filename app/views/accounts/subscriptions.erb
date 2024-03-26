@@ -19,25 +19,11 @@
       <li>
         <a href="/o/<%= organisation.slug %>"><%= organisation.name %></a>
         <div class="d-inline-block" data-pagelet-url="/o/<%= organisation.slug %>/organisationship"></div>
-        <% if organisationship.monthly_donor? %>
-          <ul>
-            <li>
-              <a href="/o/<%= organisation.slug %>/members"><%= organisation.name %> discussion</a>
-              <div class="d-inline-block" data-pagelet-url="/o/<%= organisation.slug %>/subscribe_discussion"></div>
-            </li>
-          </ul>
-        <% end %>
         <ul>
           <% @account.activityships.and(:activity_id.in => organisation.activities.pluck(:id)).each { |activityship| activity = activityship.activity %>
           <li>
             <a href="/activities/<%= activity.id %>"><%= activity.name %></a>
             <div class="d-inline-block" data-pagelet-url="/activities/<%= activity.id %>/activityship"></div>
-            <ul>
-              <li>
-                <a href="/activities/<%= activity.id %>"><%= activity.name %> discussion</a>
-                <div class="d-inline-block" data-pagelet-url="/activities/<%= activity.id %>/subscribe_discussion"></div>
-              </li>
-            </ul>
           </li>
           <% } %>
         </ul>
@@ -46,12 +32,6 @@
           <li>
             <a href="/local_groups/<%= local_group.id %>"><%= local_group.name %></a>
             <div class="d-inline-block" data-pagelet-url="/local_groups/<%= local_group.id %>/local_groupship"></div>
-            <ul>
-              <li>
-                <a href="/local_groups/<%= local_group.id %>"><%= local_group.name %> discussion</a>
-                <div class="d-inline-block" data-pagelet-url="/local_groups/<%= local_group.id %>/subscribe_discussion"></div>
-              </li>
-            </ul>
           </li>
           <% } %>
         </ul>

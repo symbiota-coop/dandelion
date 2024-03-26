@@ -44,7 +44,7 @@ class Gathering
     index({ "enable_#{x}" => 1 })
   end
 
-  %w[enable_comments_on_gathering_homepage enable_supporters clear_up_optionships anonymise_supporters democratic_threshold require_reason_proposer require_reason_supporter demand_payment hide_members_on_application_form hide_invitations listed].each do |b|
+  %w[enable_supporters clear_up_optionships anonymise_supporters democratic_threshold require_reason_proposer require_reason_supporter demand_payment hide_members_on_application_form hide_invitations listed].each do |b|
     field b.to_sym, type: Boolean
     index({ b.to_s => 1 })
   end
@@ -230,11 +230,6 @@ class Gathering
   has_many :inventory_items, dependent: :destroy
   #  Photos
   has_many :photos, as: :photoable, dependent: :destroy
-
-  has_many :posts, as: :commentable, dependent: :destroy
-  has_many :subscriptions, as: :commentable, dependent: :destroy
-  has_many :comments, as: :commentable, dependent: :destroy
-  has_many :comment_reactions, as: :commentable, dependent: :destroy
 
   def application_questions_a
     q = (application_questions || '').split("\n").map(&:strip).reject(&:blank?)

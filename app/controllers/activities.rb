@@ -144,29 +144,6 @@ Dandelion::App.controller do
     redirect '/accounts/subscriptions'
   end
 
-  get '/activities/:id/subscribe_discussion' do
-    sign_in_required!
-    @activity = Activity.find(params[:id]) || not_found
-    @activityship = current_account.activityships.find_by(activity: @activity) || current_account.activityships.create(activity: @activity)
-    partial :'activities/subscribe_discussion', locals: { activityship: @activityship }
-  end
-
-  get '/activities/:id/set_subscribe_discussion' do
-    sign_in_required!
-    @activity = Activity.find(params[:id]) || not_found
-    @activityship = current_account.activityships.find_by(activity: @activity) || current_account.activityships.create(activity: @activity)
-    @activityship.update_attribute(:subscribed_discussion, true)
-    request.xhr? ? 200 : redirect('/accounts/subscriptions')
-  end
-
-  get '/activities/:id/unsubscribe_discussion' do
-    sign_in_required!
-    @activity = Activity.find(params[:id]) || not_found
-    @activityship = current_account.activityships.find_by(activity: @activity) || current_account.activityships.create(activity: @activity)
-    @activityship.update_attribute(:subscribed_discussion, false)
-    request.xhr? ? 200 : redirect('/accounts/subscriptions')
-  end
-
   get '/activities/:id/activityship' do
     sign_in_required!
     @activity = Activity.find(params[:id]) || not_found
@@ -266,21 +243,6 @@ Dandelion::App.controller do
     activity_admins_only!
     @activityship = @activity.activityships.find(params[:activityship_id]) || not_found
     @activityship.update_attribute(:unsubscribed, !params[:subscribed])
-    200
-  end
-
-  get '/activities/:id/subscribed_discussion/:activityship_id' do
-    @activity = Activity.find(params[:id]) || not_found
-    activity_admins_only!
-    @activityship = @activity.activityships.find(params[:activityship_id]) || not_found
-    partial :'activities/subscribed_discussion', locals: { activityship: @activityship }
-  end
-
-  post '/activities/:id/subscribed_discussion/:activityship_id' do
-    @activity = Activity.find(params[:id]) || not_found
-    activity_admins_only!
-    @activityship = @activity.activityships.find(params[:activityship_id]) || not_found
-    @activityship.update_attribute(:subscribed_discussion, params[:subscribed_discussion])
     200
   end
 

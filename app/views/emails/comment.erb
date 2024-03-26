@@ -43,38 +43,11 @@
   <a href="<%= ENV['BASE_URI'] %>/posts/<%= comment.post_id %>/unsubscribe?sign_in_token=%recipient.token%">
     Unsubscribe from this post
   </a>
-  <% if comment.commentable.is_a?(Account) %>
-    &middot;
-    <a href="<%= ENV['BASE_URI'] %>/u/<%= commentable.username %>/unsubscribe?sign_in_token=%recipient.token%">
-      Unsubscribe from <%= commentable.name %>
-    </a>
-  <% end %>
   <% if comment.commentable.is_a?(Event) %>
     <% event = comment.commentable %>
     &middot;
     <a href="<%= ENV['BASE_URI'] %>/events/<%= event.id %>/unsubscribe_discussion?sign_in_token=%recipient.token%">
       Unsubscribe from this event
-    </a>
-  <% end %>
-  <% if comment.commentable.is_a?(Activity) %>
-    <% activity = comment.commentable %>
-    &middot;
-    <a href="<%= ENV['BASE_URI'] %>/activities/<%= activity.id %>/unsubscribe_discussion?sign_in_token=%recipient.token%">
-      Unsubscribe from this activity
-    </a>
-  <% end %>
-  <% if comment.commentable.is_a?(LocalGroup) %>
-    <% local_group = comment.commentable %>
-    &middot;
-    <a href="<%= ENV['BASE_URI'] %>/local_groups/<%= local_group.id %>/unsubscribe_discussion?sign_in_token=%recipient.token%">
-      Unsubscribe from this local group
-    </a>
-  <% end %>
-  <% if comment.commentable.is_a?(Organisation) %>
-    <% organisation = comment.commentable %>
-    &middot;
-    <a href="<%= ENV['BASE_URI'] %>/o/<%= organisation.slug %>/unsubscribe_discussion?sign_in_token=%recipient.token%">
-      Unsubscribe from <%= organisation.name %> members' area
     </a>
   <% end %>
   <% if comment.commentable.is_a?(Team) %>
@@ -84,8 +57,8 @@
       Unsubscribe from this team
     </a>
   <% end %>
-  <% if comment.commentable.is_a?(Gathering) || (comment.commentable.respond_to?(:gathering) && comment.commentable.gathering) %>
-    <% gathering = (comment.commentable.is_a?(Gathering) ? comment.commentable : comment.commentable.gathering) %>
+  <% if comment.commentable.respond_to?(:gathering) && comment.commentable.gathering %>
+    <% gathering = comment.commentable.gathering %>
     &middot;
     <a href="<%= ENV['BASE_URI'] %>/g/<%= gathering.slug %>/unsubscribe?sign_in_token=%recipient.token%">
       Unsubscribe from this gathering

@@ -49,8 +49,7 @@
         <th>Name</th>
         <th>Monthly donation</th>
         <th>Activities</th>
-        <th>Subscribed to mailer</th>
-        <th>Subscribed to discussion</th>
+        <th>Subscribed</th>
         <th>Credit balance</th>
         <th>Following since</th>
         <th>Notes</th>
@@ -79,11 +78,6 @@
       <td>
         <div data-pagelet-url="/o/<%= @organisation.slug %>/subscribed/<%= organisationship.id %>">
           <%= partial :'organisations/subscribed', locals: { organisationship: organisationship } %>
-        </div>
-      </td>
-      <td>
-        <div data-pagelet-url="/o/<%= @organisation.slug %>/subscribed_discussion/<%= organisationship.id %>">
-          <%= partial :'organisations/subscribed_discussion', locals: { organisationship: organisationship } %>
         </div>
       </td>
       <td>

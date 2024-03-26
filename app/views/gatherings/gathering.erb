@@ -27,12 +27,6 @@
       <%= partial :'accounts/square', locals: { account: account, content: ("#{time_ago_in_words account.last_active} ago" if account.last_active), width: '75px' } %>
       <% } %>
     </div>
-    <% if @gathering.enable_comments_on_gathering_homepage %>
-      <h2 class="mt-3 mb-3">Newsfeed</h2>
-      <div data-pagelet-url="/g/<%= @gathering.slug %>" data-pagelet-refresh="60">
-        <%= partial :newsfeed, locals: { notifications: @gathering.notifications_as_circle.order('created_at desc').page(params[:page]), include_circle_name: false } %>
-      </div>
-    <% end %>
   </div>
   <div class="col-lg-8 order-lg-1">
     <div class="mb-3">
@@ -52,14 +46,8 @@
         <%= partial :'photos/photos', locals: { photoable: @gathering, add_photo_if: @membership.admin?, dimensions: '100x100#' } %>
       </div>
     <% end %>
-    <% if @gathering.enable_comments_on_gathering_homepage %>
-      <div data-pagelet-url="/commentable?commentable_type=Gathering&commentable_id=<%= @gathering.id %>">
-        <%= partial :'comments/commentable', locals: { commentable: @gathering } %>
-      </div>
-    <% else %>
-      <div data-pagelet-url="/g/<%= @gathering.slug %>" data-pagelet-refresh="60">
-        <%= partial :newsfeed, locals: { notifications: @gathering.notifications_as_circle.order('created_at desc').page(params[:page]), include_circle_name: false } %>
-      </div>
-    <% end %>
+    <div data-pagelet-url="/g/<%= @gathering.slug %>" data-pagelet-refresh="60">
+      <%= partial :newsfeed, locals: { notifications: @gathering.notifications_as_circle.order('created_at desc').page(params[:page]), include_circle_name: false } %>
+    </div>
   </div>
 </div>
