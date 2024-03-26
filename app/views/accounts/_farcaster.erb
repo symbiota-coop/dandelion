@@ -1,0 +1,52 @@
+<% if (links = account.farcaster_links) && links.count > 0 %>
+
+  <h2 class="mb-3">
+    <a target="_blank" class="text-dark" href="https://warpcast.com/<%= u = account.farcaster_user_by_connected_address['username'] %>">
+      From Farcaster
+    </a>
+  </h2>
+
+  <div class="fake-container-fluid mb-3">
+    <div class="row bg-grey-transparent-2 pt-4 px-5" id="events">
+
+      <% links.each { |og| %>
+      <div class="col-12">
+        <div class="mb-4">
+          <div class="row block no-gutters align-items-lg-center bg-white">
+            <div class="col-3">
+              <a href="<%= og['url']%>" target="_blank">
+                <img class="w-100" onerror="this.style.display='none'" src="<%= og['image'] %>">
+              </a>
+            </div>
+            <div class="col-9">
+              <div class="pl-3">
+                <h4>
+                  <a class="text-dark" href="<%= og['url'] %>" target="_blank">
+                    <%= og['title']%>
+                  </a>
+                </h4>
+                <% if og['description'] %>
+                  <p class="mb-2">
+                    <a class="text-dark" href="<%= og['url']%>" target="_blank" style="text-decoration: none">
+                      <%= og['description'].truncate(150) %>
+                    </a>
+                  </p>
+                <% end %>
+                <p class="mb-0 text-muted">
+                  <a target="_blank" class="text-muted" href="<%= og['url'] %>">
+                    <%= URI(og['url']).host.gsub('www.', '') %>
+                  </a>
+                  &middot;
+                  <a target="_blank"  class="text-muted" href="https://warpcast.com/stephenreid.eth/<%= og['hash'] %>">
+                    <%= Time.at(og['timestamp']/1e3).to_date.to_s(:post) %>
+                  </a>
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <% } %>
+    </div>
+  </div>
+<% end %>
