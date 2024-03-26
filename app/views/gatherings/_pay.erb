@@ -43,7 +43,7 @@
   $(function () {
 
     currency = <%== @gathering.currency.to_json %>
-    currencySymbol = <%== money_symbol(@gathering.currency) %>
+    currencySymbol = <%== money_symbol(@gathering.currency).to_json %>
 
     $('#pay-form button[data-payment-method]').click(function () {
       $('input[type=hidden][name=payment_method]').attr('disabled', true)

@@ -39,6 +39,11 @@ end
 
 PUSHER = Pusher::Client.new(app_id: ENV['PUSHER_APP_ID'], key: ENV['PUSHER_KEY'], secret: ENV['PUSHER_SECRET'], cluster: ENV['PUSHER_CLUSTER'], encrypted: true) if ENV['PUSHER_APP_ID']
 
+FARQUEST = Faraday.new(
+  url: 'https://build.far.quest/farcaster/v2',
+  headers: { 'Content-Type': 'application/json', 'API-KEY': ENV['FARQUEST_API_KEY'] }
+)
+
 if ENV['GOOGLE_MAPS_API_KEY']
   Geocoder.configure(
     lookup: :google,

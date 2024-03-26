@@ -847,6 +847,15 @@ Two Spirit).split("\n")
     batch_message.finalize if ENV['MAILGUN_API_KEY']
   end
 
+  def x
+    r = FARQUEST.get('user-by-connected-address', { address: '0x72E1638bD8cD371Bfb04cF665b749A0E4ae38324' })
+    j = JSON.parse(r.body)
+    fid = j['result']['user']['fid']
+    r = FARQUEST.get('casts', { fid: fid })
+    j = JSON.parse(r.body)
+    casts = j['result']['casts'].select { |c| !c['parentUrl'] }
+  end
+
   private
 
   def encrypt_password
