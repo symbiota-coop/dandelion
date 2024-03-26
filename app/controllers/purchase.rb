@@ -161,7 +161,7 @@ Dandelion::App.controller do
 
         when 'evm'
 
-          evm_secret = Array.new(6) { [*'1'..'9'].sample }.join
+          evm_secret = Array.new(4) { [*'1'..'9'].sample }.join
           @order.update_attributes!(
             value: @order.total.round(2),
             evm_secret: evm_secret

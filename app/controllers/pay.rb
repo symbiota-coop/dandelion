@@ -95,7 +95,7 @@ Dandelion::App.controller do
 
     when 'evm'
 
-      evm_secret = Array.new(6) { [*'1'..'9'].sample }.join
+      evm_secret = Array.new(4) { [*'1'..'9'].sample }.join
       payment_attempt = @membership.payment_attempts.create!(
         amount: params[:amount].to_i,
         currency: @gathering.currency,
