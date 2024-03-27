@@ -16,8 +16,10 @@ a.btn-outline-danger:focus {
   color: $color_danger;
 }
 
-form.form-inline input.datepicker {
-  width: 10em !important
+@media(min-width: 576px) {
+  form.form-inline input.datepicker {
+    width: 10em !important
+  }
 }
 
 a.ui-menu-item-wrapper {
@@ -749,4 +751,18 @@ figure td {
 
 .embed-responsive-ps::before {
   padding-top: 52.5%;
+}
+
+@media screen and (max-width: 767px) {
+  div.dataTables_wrapper div.dataTables_filter {
+    text-align: left;
+  }
+}
+
+@media(min-width: 576px) {
+
+  form.searchForm input,
+  form.searchForm select {
+    max-width: 12em
+  }
 }

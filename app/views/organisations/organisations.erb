@@ -8,7 +8,7 @@
   <%= hidden_field_tag :order, value: params[:order] %>
   <div class="form-group">
     <label>Search</label>
-    <%= text_field_tag :q, class: 'form-control', value: params[:q], style: 'max-width: 12em' %>
+    <%= text_field_tag :q, class: 'form-control', value: params[:q] %>
   </div>
   <% if current_account %>
     <%= checkbox 'Following' %>
