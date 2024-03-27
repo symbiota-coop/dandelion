@@ -838,7 +838,7 @@ Two Spirit).split("\n")
     batch_message.finalize if ENV['MAILGUN_API_KEY']
   end
 
-  def farcaster_user_by_connected_address
+  def farcaster_user
     provider_link = provider_links.find_by(provider: 'Ethereum')
     return unless provider_link
 
@@ -847,7 +847,7 @@ Two Spirit).split("\n")
   end
 
   def farcaster_casts
-    f = farcaster_user_by_connected_address
+    f = farcaster_user
     return unless f
 
     fid = f['fid']
@@ -861,7 +861,7 @@ Two Spirit).split("\n")
 
     links = []
     casts.each do |c|
-      next unless !c['parentUrl'] && c['embeds']
+      next unless !c['parentUrl'] && c['embeds'] && c['embeds']['urls']
 
       c['embeds']['urls'].each do |url|
         og = url['openGraph']
