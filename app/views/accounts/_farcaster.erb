@@ -37,7 +37,7 @@
                     <%= URI(og['url']).host.gsub('www.', '') %>
                   </a>
                   &middot;
-                  <a target="_blank"  class="text-muted" href="https://warpcast.com/stephenreid.eth/<%= og['hash'] %>">
+                  <a target="_blank"  class="text-muted" href="https://warpcast.com/<%= u %>/<%= og['hash'] %>">
                     <%= Time.at(og['timestamp']/1e3).to_date.to_s(:post) %>
                   </a>
                 </p>
