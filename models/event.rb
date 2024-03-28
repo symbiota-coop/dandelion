@@ -245,6 +245,7 @@ class Event
     self.suggested_donation = suggested_donation.round(2) if suggested_donation
     self.minimum_donation = nil unless suggested_donation
     self.minimum_donation = minimum_donation.round(2) if minimum_donation
+    self.organiser = account if account && !revenue_sharer && !organiser && organisation && organisation.stripe_client_id
 
     unless slug
       loop do
