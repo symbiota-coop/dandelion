@@ -82,7 +82,7 @@ namespace :events do
     Organisation.and(:evm_address.ne => nil).each do |organisation|
       organisation.check_evm_account if Order.and(:payment_completed.ne => true, :evm_secret.ne => nil, :event_id.in => organisation.events.pluck(:id)).count > 0
     end
-    Event.and(:oc_slug.ne => nil).each do |event|
+    Event.live.and(:oc_slug.ne => nil).each do |event|
       event.check_oc_event if event.orders.and(:payment_completed.ne => true, :oc_secret.ne => nil, :event_id => event.id).count > 0
     end
   end
@@ -92,7 +92,7 @@ namespace :events do
   end
 
   task send_feedback_requests: :environment do
-    Event.and(:end_time.gte => Date.yesterday, :end_time.lt => Date.today).each { |event| event.send_feedback_requests(:all) }
+    Event.live.and(:end_time.gte => Date.yesterday, :end_time.lt => Date.today).each { |event| event.send_feedback_requests(:all) }
   end
 
   task send_reminders: :environment do
@@ -100,7 +100,7 @@ namespace :events do
   end
 
   task send_star_reminders: :environment do
-    Event.and(:start_time.gte => Date.tomorrow + 6, :start_time.lt => Date.tomorrow + 7).each { |event| event.send_star_reminders(:all) }
+    Event.live.and(:start_time.gte => Date.tomorrow + 6, :start_time.lt => Date.tomorrow + 7).each { |event| event.send_star_reminders(:all) }
   end
 
   task send_payment_reminders: :environment do
