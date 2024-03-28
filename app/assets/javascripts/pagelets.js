@@ -60,9 +60,9 @@ $(function () {
     const a = this
     const pagelet = $(a).closest('[data-pagelet-url]')
     pagelet.css('opacity', '0.3')
-    $('.tooltip').remove()
     pagelet.load($(a).attr('href'), function () {
       pagelet.css('opacity', '1')
+      $('.tooltip').remove()
       const offset = pagelet.offset()
       if (pagelet.attr('data-pagelet-scroll') != 'false') {
         window.scrollTo(0, offset.top - $('#header').height())
