@@ -22,18 +22,6 @@
   <link href="/infinite_admin/plugins/bootstrap/bootstrap4/css/bootstrap.css" rel="stylesheet">
   <link href="/infinite_admin/plugins/animate/animate.min.css" rel="stylesheet">
 
-  <% if Padrino.env == :production %>
-    <script src="https://js.pusher.com/4.0/pusher.min.js"></script>
-    <script>
-      if(typeof Pusher != 'undefined') {
-        <% if Padrino.env == :development %>
-          Pusher.logToConsole = true;
-        <% end %>
-        pusher = new Pusher('<%= ENV['PUSHER_KEY'] %>', { cluster: '<%= ENV['PUSHER_CLUSTER'] %>', encrypted: true });
-      }
-    </script>
-  <% end %>
-
   <% if current_account && ENV['NOLT_SSO_SECRET'] %>
     <script async src="https://cdn.nolt.io/widgets.js"></script>
     <script>

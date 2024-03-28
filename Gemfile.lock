@@ -390,11 +390,6 @@ GEM
     public_suffix (5.0.4)
     puma (6.4.2)
       nio4r (~> 2.0)
-    pusher (2.0.3)
-      httpclient (~> 2.8)
-      multi_json (~> 1.15)
-      pusher-signature (~> 0.1.8)
-    pusher-signature (0.1.8)
     qonfig (0.28.0)
     racc (1.7.3)
     rack (2.2.8)
@@ -580,7 +575,6 @@ DEPENDENCIES
   prawn-table
   premailer
   puma
-  pusher
   rack (~> 2.0)
   rack-cors
   rack-utf8_sanitizer

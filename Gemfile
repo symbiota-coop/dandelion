@@ -68,7 +68,6 @@ gem 'incoming'
 gem 'mail'
 gem 'mailgun-ruby', require: 'mailgun'
 gem 'premailer'
-gem 'pusher'
 
 # Prawn (PDFs)
 gem 'prawn', github: 'prawnpdf/prawn'

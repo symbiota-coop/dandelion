@@ -25,9 +25,13 @@
       <%= partial :'comments/body', locals: { comment: comment } %>
     </div>
     <div class="row justify-content-between align-items-center">
-      <div data-pagelet-url="/comments/<%= comment.id %>/reactions" class="col-auto"></div>
+      <div data-pagelet-url="/comments/<%= comment.id %>/reactions" class="col-auto">
+        <%= partial :'comments/comment_reactions', locals: { comment: comment } %>
+      </div>
       <% if comment.commentable.respond_to?(:gathering) %>
-        <div data-pagelet-url="/comments/<%= comment.id %>/read_receipts" class="col-auto"></div>
+        <div data-pagelet-url="/comments/<%= comment.id %>/read_receipts" class="col-auto">
+          <%= partial :'comments/read_receipts', locals: { comment: comment } %>
+        </div>
       <% end %>
     </div>
   </div>

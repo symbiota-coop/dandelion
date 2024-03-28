@@ -37,7 +37,7 @@
       <style>
         #messages .fa-spin { display: none }
       </style>
-      <div id="messages" data-pagelet-refresh="60" data-pagelet-url="/messages">
+      <div id="messages" data-pagelet-url="/messages" data-pagelet-refresh="60">
         <%= cp(:'messages/dropdown', key: "/messages?account_id=#{current_account.id}", expires: 1.minute.from_now) %>
       </div>
     </li>

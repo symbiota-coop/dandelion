@@ -1,20 +1,25 @@
-/* global pusher */
-
 $(function () {
   $.ajaxPrefilter(function (options) {
     const t = '_t=' + Date.now()
     if (options.data) { options.data += '&' + t } else { options.data = t }
   })
 
+  function postLoad (pagelet) {
+    pagelet.css('opacity', '1')
+    $('.tooltip').remove()
+    $('[data-pagelet-refresh-paused]').removeAttr('data-pagelet-refresh-paused')
+    if (pagelet.attr('data-pagelet-also')) {
+      let alsoRefresh = $('[data-pagelet-url="' + pagelet.attr('data-pagelet-also') + '"]')
+      alsoRefresh.load(alsoRefresh.attr('data-pagelet-url'))
+    }
+  }
+
   $(document).on('submit', '[data-pagelet-url] form:not(.no-trigger)', function () {
     const form = this
     const pagelet = $(form).closest('[data-pagelet-url]')
     pagelet.css('opacity', '0.3')
     if ($(this).hasClass('no-submit')) {
-      $('[data-toggle="tooltip"]', pagelet).tooltip('hide')
-      pagelet.load(pagelet.attr('data-pagelet-url'), function () {
-        pagelet.css('opacity', '1')
-      })
+      pagelet.load(pagelet.attr('data-pagelet-url'), function () { postLoad(pagelet) })
     } else {
       if ($(form).find('input[type=file]').length > 0 && $(form).find('input[type=file]').map(function () {
         return $(this).val()
@@ -25,27 +30,12 @@ $(function () {
           url: $(form).attr('action'),
           data: formData,
           success: function () {
-            $('[data-toggle="tooltip"]', pagelet).tooltip('hide')
-            pagelet.load(pagelet.attr('data-pagelet-url'), function () {
-              pagelet.css('opacity', '1')
-            })
+            pagelet.load(pagelet.attr('data-pagelet-url'), function () { postLoad(pagelet) })
           }
         })
       } else {
         $.post($(form).attr('action'), $(form).serialize(), function () {
-          $('[data-toggle="tooltip"]', pagelet).tooltip('hide')
-          pagelet.load(pagelet.attr('data-pagelet-url'), function () {
-            pagelet.css('opacity', '1')
-          })
-          if (pagelet.attr('data-pusher-refresh') && typeof (pusher) == 'undefined') {
-            let pusherRefresh = $('[data-pusher-channel="' + pagelet.attr('data-pusher-refresh') + '"]')
-            pusherRefresh.load(pusherRefresh.attr('data-pagelet-url'), function () {
-              if (pusherRefresh.attr('data-pagelet-refresh-also')) {
-                let alsoRefresh = $('[data-pagelet-url="' + pusherRefresh.attr('data-pagelet-refresh-also') + '"]')
-                alsoRefresh.load(alsoRefresh.attr('data-pagelet-url'))
-              }
-            })
-          }
+          pagelet.load(pagelet.attr('data-pagelet-url'), function () { postLoad(pagelet) })
         })
       }
     }
@@ -61,10 +51,7 @@ $(function () {
     const pagelet = $(a).closest('[data-pagelet-url]')
     pagelet.css('opacity', '0.3')
     $.get($(a).attr('href'), function () {
-      $('[data-toggle="tooltip"]', pagelet).tooltip('hide')
-      pagelet.load(pagelet.attr('data-pagelet-url'), function () {
-        pagelet.css('opacity', '1')
-      })
+      pagelet.load(pagelet.attr('data-pagelet-url'), function () { postLoad(pagelet) })
     })
     return false
   })
@@ -73,7 +60,7 @@ $(function () {
     const a = this
     const pagelet = $(a).closest('[data-pagelet-url]')
     pagelet.css('opacity', '0.3')
-    $('[data-toggle="tooltip"]', pagelet).tooltip('hide')
+    $('.tooltip').remove()
     pagelet.load($(a).attr('href'), function () {
       pagelet.css('opacity', '1')
       const offset = pagelet.offset()
@@ -84,47 +71,47 @@ $(function () {
     return false
   })
 
-  $('[data-pagelet-refresh]').each(function () {
-    const pagelet = $(this)
-    setInterval(function () {
-      pagelet.load($(pagelet).attr('data-pagelet-url'))
-    }, parseInt($(pagelet).attr('data-pagelet-refresh')) * 1000)
-  })
 
-  function pageletPusher () {
-    if (typeof (pusher) != 'undefined') {
-      $('[data-pusher-channel]:not([data-pusher-channel-registered])').attr('data-pusher-channel-registered', 'true').each(function () {
-        const pagelet = $(this)
-        const channel = pusher.subscribe(pagelet.attr('data-pusher-channel'))
-        channel.bind('updated', function () {
-          if ($(document).find(pagelet).length == 1) { // only proceed if this pagelet still exists in the DOM, to prevent unnecessary calls to .load()
-            $(pagelet).load($(pagelet).attr('data-pagelet-url'), function () {
-              if (pagelet.attr('data-pagelet-refresh-also')) {
-                let alsoRefresh = $('[data-pagelet-url="' + pagelet.attr('data-pagelet-refresh-also') + '"]')
-                alsoRefresh.load(alsoRefresh.attr('data-pagelet-url'))
-              }
-            })
-          }
-        })
-      })
-    }
+  function pageletRefresh () {
+    $('[data-pagelet-refresh]:not([data-pagelet-refresh-registered])').attr('data-pagelet-refresh-registered', 'true').each(function () {
+      const rawPagelet = this
+      const pagelet = $(this)
+      function applyRefreshPause () {
+        $("a[href='javascript:;']", pagelet).click(function () {
+          pagelet.attr('data-pagelet-refresh-paused', 'true')
+        });
+      }
+      function refreshProcess () {
+        if (!$(rawPagelet)[0].hasAttribute('data-pagelet-refresh-paused')) {
+          pagelet.load(pagelet.attr('data-pagelet-url'), function () {
+            applyRefreshPause()
+            if (pagelet.attr('data-pagelet-also')) {
+              let alsoRefresh = $('[data-pagelet-url="' + pagelet.attr('data-pagelet-also') + '"]')
+              alsoRefresh.load(alsoRefresh.attr('data-pagelet-url'))
+            }
+          })
+        }
+      }
+      applyRefreshPause()
+      setInterval(refreshProcess, parseInt(pagelet.attr('data-pagelet-refresh')) * 1000)
+    })
   }
 
   function loadEmptyPagelets () {
     $('[data-pagelet-url]').each(function () {
-      const pagelet = this
-      const placeholder = $(pagelet)[0].hasAttribute('data-with-placeholder')
-      if ($(pagelet).html().length == 0 || placeholder) {
-        if (placeholder) { $(pagelet).removeAttr('data-with-placeholder') } else { $(pagelet).html('<i class="fa fa-spin fa-circle-o-notch"></i>') }
-        $(pagelet).load($(pagelet).attr('data-pagelet-url'))
+      const rawPagelet = this
+      const placeholder = $(rawPagelet)[0].hasAttribute('data-with-placeholder')
+      if ($(rawPagelet).html().length == 0 || placeholder) {
+        if (placeholder) { $(rawPagelet).removeAttr('data-with-placeholder') } else { $(rawPagelet).html('<i class="fa fa-spin fa-circle-o-notch"></i>') }
+        $(rawPagelet).load($(rawPagelet).attr('data-pagelet-url'))
       }
     })
   }
 
   $(document).ajaxComplete(function () {
-    pageletPusher()
+    pageletRefresh()
     loadEmptyPagelets()
   })
-  pageletPusher()
+  pageletRefresh()
   loadEmptyPagelets()
 })

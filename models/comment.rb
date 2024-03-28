@@ -94,14 +94,6 @@ class Comment
     post.subject
   end
 
-  after_create do
-    PUSHER.trigger("post.#{post.id}", 'updated', {}) if defined?(PUSHER)
-  end
-
-  after_destroy do
-    PUSHER.trigger("post.#{post.id}", 'updated', {}) if defined?(PUSHER)
-  end
-
   before_validation do
     self.commentable = post.commentable if post
 

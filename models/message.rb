@@ -21,13 +21,6 @@ class Message
 
   validates_presence_of :body
 
-  after_create do
-    if defined?(PUSHER)
-      PUSHER.trigger("message.#{messenger.id}.#{messengee.id}", 'updated', {})
-      PUSHER.trigger("message.#{messengee.id}.#{messenger.id}", 'updated', {})
-    end
-  end
-
   def self.read?(messenger, messengee)
     messages = Message.and(messenger: messenger, messengee: messengee).order('created_at desc')
     message = messages.first

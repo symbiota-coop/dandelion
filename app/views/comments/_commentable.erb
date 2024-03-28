@@ -1,6 +1,6 @@
 <% if defined?(chat) && chat %>
 
-  <div data-pagelet-url="/posts/<%= (post = commentable.posts.first).id %>/replies" data-pusher-channel="post.<%= post.id %>">
+  <div data-pagelet-url="/posts/<%= (post = commentable.posts.first).id %>/replies" data-pagelet-refresh="30">
     <%= partial :'comments/replies', locals: { post: post } %>
   </div>
   <div class="media" style="padding: 10px 10px 0 10px; margin: 0">

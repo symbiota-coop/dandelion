@@ -1,5 +1,5 @@
 <% if !comment.comment_reactions.find_by(account: current_account) %>
-  <a data-toggle="tooltip" title="React" style="background: white; text-decoration: none" class="rounded p-1 border border-primary mr-1" href="javascript:;" onclick="$(this).hide().next().css('display', 'inline')">
+  <a data-toggle="tooltip" title="React" style="background: white; text-decoration: none" class="rounded p-1 border border-primary mr-1" href="javascript:;" onclick="$(this).tooltip('hide').hide().next().css('display', 'inline')">
     <i class="fa fa-heart-o"></i>
   </a>
   <% form_tag "/comments/#{comment.id}/react", class: 'form-inline', style: 'display: none;' do %>

@@ -26,7 +26,9 @@
               <%= partial :'accounts/square', locals: { account: notification.notifiable.account, style: 'display: block; width: 32px' } %>
               <div class="media-body ml-2">
                 <%= partial :'comments/body', locals: { comment: comment } %>
-                <div data-pagelet-url="/comments/<%= comment.id %>/reactions" class="mt-3"></div>
+                <div data-pagelet-url="/comments/<%= comment.id %>/reactions" class="mt-3">
+                  <%= partial :'comments/comment_reactions', locals: { comment: comment } %>
+                </div>
               </div>
             </div>
           <% end %>
