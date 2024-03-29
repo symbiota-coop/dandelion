@@ -1,53 +1,18 @@
-<% if defined?(chat) && chat %>
-
-  <div data-pagelet-url="/posts/<%= (post = commentable.posts.first).id %>/post_replies">
-    <%= partial :'comments/replies', locals: { post: post } %>
+<div class="media mt-0 mb-5">
+  <span class="mr-2">
+    <%= partial :'accounts/square', locals: { account: current_account, width: '32px', klass: 'media-object' } %>
+  </span>
+  <div class="media-body">
+    <%= partial :'comments/comment_form', locals: { comment: commentable.comments.build } %>
   </div>
-  <div class="media" style="padding: 10px 10px 0 10px; margin: 0">
-    <span class="mr-2">
-      <%= partial :'accounts/square', locals: { account: current_account, width: '32px', klass: 'media-object' } %>
-    </span>
-    <style>
-      .comment-form > .form-group { margin-bottom: 0.375rem }
-    </style>
-    <div class="media-body">
-      <%= partial :'comments/comment_form', locals: { comment: post.comments.build(commentable_type: post.commentable_type, commentable_id: post.commentable_id), chat: true } %>
-    </div>
+</div>
+<% (@posts = commentable.posts.order('updated_at desc').paginate(page: params[:page], per_page: 10)).each { |post| %>
+<% if post.comments.count > 0 %>
+  <div data-pagelet-url="/posts/<%= post.id %>" id="comments">
+    <%= partial :'comments/post', object: post %>
   </div>
-  <div style="padding-left: 1em; padding-bottom: 1em; font-size: 90%">
-    <% if (subscription = post.subscriptions.find_by(account: current_account)) %>
-      <a class="pagelet-trigger" href="/subscriptions/<%= subscription.id %>/unsubscribe">Email notifications on</a>
-    <% else %>
-      <a class="text-muted pagelet-trigger" href="/subscriptions/create?post_id=<%= post.id %>">Email notifications off</a>
-    <% end %>
-    <span class="text-muted">&middot; <%= pluralize(post.subscriptions.count, 'person') %> subscribed</span>
-  </div>
-  <script>
-    $(function() {
-      $('#comment_body').attr('autocomplete', 'off')
-      $("#chat").scrollTop($("#chat")[0].scrollHeight);
-    })
-  </script>
-
-<% else %>
-
-  <div class="media mt-0 mb-5">
-    <span class="mr-2">
-      <%= partial :'accounts/square', locals: { account: current_account, width: '32px', klass: 'media-object' } %>
-    </span>
-    <div class="media-body">
-      <%= partial :'comments/comment_form', locals: { comment: commentable.comments.build } %>
-    </div>
-  </div>
-  <% (@posts = commentable.posts.order('updated_at desc').paginate(page: params[:page], per_page: 10)).each { |post| %>
-  <% if post.comments.count > 0 %>
-    <div data-pagelet-url="/posts/<%= post.id %>" id="comments">
-      <%= partial :'comments/post', object: post %>
-    </div>
-  <% end %>
-  <% } %>
-  <div style="text-align: center">
-    <%= will_paginate @posts, renderer: WillPaginate::ViewHelpers::BootstrapRenderer %>
-  </div>
-
 <% end %>
+<% } %>
+<div style="text-align: center">
+  <%= will_paginate @posts, renderer: WillPaginate::ViewHelpers::BootstrapRenderer %>
+</div>

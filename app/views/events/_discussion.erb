@@ -35,8 +35,8 @@
           </a>
         </div>
         <div id="chat" <% if @event.posts.first.comments.count == 1 %>style="display:none"<% end %>>
-          <div data-pagelet-url="/commentable?commentable_type=Event&commentable_id=<%= @event.id %>&chat=true">
-            <%= partial :'comments/commentable', locals: { commentable: @event, chat: true } %>
+          <div data-pagelet-url="/chat?commentable_type=Event&commentable_id=<%= @event.id %>">
+            <%= partial :'comments/chat', locals: { commentable: @event } %>
           </div>
         </div>
       </div>
