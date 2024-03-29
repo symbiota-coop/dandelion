@@ -108,7 +108,7 @@ Dandelion::App.controller do
     redirect @post.url
   end
 
-  get '/posts/:id/replies' do
+  get '/posts/:id/post_replies' do
     @post = Post.find(params[:id]) || not_found
     @commentable = @post.commentable
     partial :'comments/replies', locals: { post: @post }
