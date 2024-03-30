@@ -736,7 +736,7 @@ class Organisation
         token_address = tr.search('td')[8].search('a')[0]['href'].split('/')[2].split('?')[0]
         next unless token_address
 
-        token_find = Token.by_contract_address.find { |_k, v| v.downcase == token_address.downcase }
+        token_find = Token.by_contract_address.find { |k, _v| k.downcase == token_address.downcase }
         next unless token_find
 
         token = token_find[1]
@@ -768,7 +768,7 @@ class Organisation
         token_address = item['token']['address']
         next unless token_address
 
-        token_find = Token.by_contract_address.find { |_k, v| v.downcase == token_address.downcase }
+        token_find = Token.by_contract_address.find { |k, _v| k.downcase == token_address.downcase }
         next unless token_find
 
         token = token_find[1]
