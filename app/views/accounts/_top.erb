@@ -8,8 +8,10 @@
       <div class="mb-2 text-center text-lg-left">
         <h1 class="my-0 d-inline">
           <a class="text-dark" href="/u/<%= account.username %>"><%= account.name %></a>
+          <br class="d-block d-lg-none" />
           <small class="text-muted">@<%= account.username %></small>
         </h1>
+        <br class="d-block d-lg-none" />
         <%= partial :'accounts/info_tags', locals: {account: account} %>
       </div>
     <% end %>

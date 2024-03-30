@@ -1,5 +1,5 @@
 <% if (e = (events = Event.past.and(:id.in => account.event_facilitations.pluck(:event_id))).count) > 0 %>
-  <small class="d-inline-block mt-1 mt-lg-0 label label-default">Facilitated <%= pluralize(e,'event') %></small>
+  <small class="d-inline-block mt-1 mt-lg-0 label label-primary">Facilitated <%= pluralize(e,'event') %></small>
 <% end %>
 
 <%
