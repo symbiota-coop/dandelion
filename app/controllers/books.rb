@@ -13,7 +13,7 @@ Dandelion::App.controller do
   get '/books/:slug/:number' do
     @book = Book.find_by(slug: params[:slug]) || not_found
     @title = "#{@book.title} by #{@book.book_author.name}"
-    @book_chapter = @book.book_chapters.find_by(number: params[:number])
+    @book_chapter = @book.book_chapters.find_by(number: params[:number]) || not_found
     erb :'books/book_chapter'
   end
 end
