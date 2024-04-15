@@ -625,6 +625,8 @@ Two Spirit).split("\n")
     next_birthday = Date.new(now.year + 1, date_of_birth.month, date_of_birth.day) if now > next_birthday
 
     next_birthday
+  rescue StandardError
+    nil
   end
 
   def self.ids_by_next_birthday
