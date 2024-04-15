@@ -48,7 +48,7 @@ class Token
 end
 
 Chain.new('Gnosis Chain', 100).tap do |chain|
-  Token.new('WXDAI', '0xe91D153E0b41518A2Ce8Dd3D7944Fa863463a97d', chain)
+  Token.new('BREAD', '0xa555d5344f6fb6c65da19e403cb4c1ec4a1a5ee3', chain)
 end
 
 Chain.new('Celo', 42_220).tap do |chain|
@@ -57,10 +57,6 @@ end
 
 Chain.new('Optimism', 10).tap do |chain|
   Token.new('DAI', '0xda10009cbd5d07dd0cecc66161fc93d7c9000da1', chain)
-end
-
-Chain.new('Polygon', 137).tap do |chain|
-  Token.new('BREAD', '0x11d9efDf4Ab4A3bfabf5C7089F56AA4F059AA14C', chain)
 end
 
 Chain.new('Arbitrum One', 42_161).tap do |chain|
