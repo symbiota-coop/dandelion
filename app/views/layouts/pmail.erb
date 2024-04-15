@@ -64,7 +64,7 @@
       You're receiving this email because you're <%= pmail.reason %>
       <span class="%recipient.footer_class%">
         <br>
-        <a href="<%= ENV['BASE_URI'] %>/accounts/subscriptions?sign_in_token=%recipient.token%">Manage your subscriptions</a>
+        <a href="<%= ENV['BASE_URI'] %>/accounts/subscriptions?sign_in_token=%recipient.token%">Manage your notifications</a>
         &middot;
         <a href="<%= ENV['BASE_URI'] %>/o/<%= pmail.organisation.slug %>/unsubscribe?sign_in_token=%recipient.token%">Unsubscribe from <%= pmail.organisation.name %></a>
       </span>

@@ -296,7 +296,7 @@ class Organisation
 
   has_many :organisation_contributions, dependent: :destroy
   def contributable_events
-    events.and(:id.in =>
+    events.and(:draft.ne => true, :id.in =>
       Order.complete.and(:value.gt => 0, :event_id.in => events.pluck(:id)).pluck(:event_id) +
       events.where(:id.nin => TicketType.pluck(:event_id)).pluck(:id))
   end
