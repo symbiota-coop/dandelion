@@ -78,6 +78,7 @@ gem 'rqrcode'
 # Time
 gem 'icalendar'
 gem 'timezone'
+gem 'tzinfo-data'
 
 # Geography
 gem 'countries'

@@ -502,6 +502,8 @@ GEM
     ttfunk (1.7.0)
     tzinfo (2.0.6)
       concurrent-ruby (~> 1.0)
+    tzinfo-data (1.2024.1)
+      tzinfo (>= 1.0.0)
     uber (0.1.0)
     unaccent (0.4.0)
     unf (0.1.4)
@@ -591,6 +593,7 @@ DEPENDENCIES
   stripe
   strong_password
   timezone
+  tzinfo-data
   will_paginate!
 
 RUBY VERSION
