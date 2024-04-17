@@ -305,6 +305,9 @@ class Event
   end
 
   after_create do
+    event_facilitations.create account: organisation.admins.first if organisation && organisation.admins.count == 1
+    event_facilitations.create account: revenue_sharer if revenue_sharer
+
     activity.update_attribute(:hidden, false) if activity
     organisation.try(:update_paid_up)
   end
@@ -314,9 +317,6 @@ class Event
   end
 
   after_save do
-    event_facilitations.create account: organisation.admins.first if organisation && organisation.admins.count == 1
-    event_facilitations.create account: revenue_sharer if revenue_sharer
-
     if changes['name'] && (post = posts.find_by(subject: "Chat for #{changes['name'][0]}"))
       post.update_attribute(:subject, "Chat for #{name}")
     end
