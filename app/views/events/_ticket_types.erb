@@ -8,14 +8,14 @@
         <div style="font-size: 0" class="ticket_type <%= 'has-error' if o.object.invalid? %>">
           <%= o.hidden_field :order %>
           <div>
-            <%= o.text_field :name, class: 'form-control', placeholder: 'Name' %>
+            <%= o.text_field :name, class: 'form-control', placeholder: 'Name', required: true %>
           </div>
           <div>
             <%= money_symbol(f.object.currency) %><%= o.text_field :price_or_range, class: 'form-control ml-1', placeholder: 'Price', step: 'any', :'data-toggle' => 'tooltip', :title => 'Enter a price, a price range (two numbers separated by a dash) or leave blank to let the attendee pay as they feel' %>
             <%= o.hidden_field :price_or_range_submitted, value: true %>
           </div>
           <div>
-            &times;<%= o.number_field :quantity, :class => 'form-control ml-1', :'data-toggle' => 'tooltip', :title => 'Total number of tickets of this type you want to issue', :placeholder => 'Quantity' %>
+            &times;<%= o.number_field :quantity, :class => 'form-control ml-1', :'data-toggle' => 'tooltip', :title => 'Total number of tickets of this type you want to issue', :placeholder => 'Quantity', :required => true %>
           </div>
           <div class="ticket-type-description">
             <%= o.text_field :description, class: 'form-control', placeholder: 'Description' %>
@@ -91,7 +91,7 @@
               orderInput.appendTo(d);
 
               var nameDiv = $('<div></div>')
-              var nameInput = $('<input type="text" class="form-control" placeholder="Name" />');
+              var nameInput = $('<input type="text" class="form-control" placeholder="Name" required="true" />');
               nameInput.attr('name', 'event[ticket_types_attributes][' + c + '][name]');
               nameInput.attr('id', 'event_ticket_types_attributes_' + c + '_name');
               nameInput.appendTo(nameDiv);
@@ -110,7 +110,7 @@
               priceOrRangeDiv.appendTo(d);
 
               var quantityDiv = $('<div>&times;</div>')
-              var quantityInput = $('<input type="number" step="any" class="form-control ml-1" placeholder="Quantity" data-toggle="tooltip" title="Total number of tickets of this type you want to issue" />');
+              var quantityInput = $('<input type="number" step="any" class="form-control ml-1" placeholder="Quantity" data-toggle="tooltip" title="Total number of tickets of this type you want to issue" required="true" />');
               quantityInput.attr('name', 'event[ticket_types_attributes][' + c + '][quantity]');
               quantityInput.attr('id', 'event_ticket_types_attributes_' + c + '_quantity');
               quantityInput.appendTo(quantityDiv);
