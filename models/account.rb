@@ -637,7 +637,7 @@ Two Spirit).split("\n")
   end
 
   def days_until_next_birthday
-    return unless date_of_birth
+    return unless next_birthday
 
     now = Date.today
     (next_birthday - now).to_i
