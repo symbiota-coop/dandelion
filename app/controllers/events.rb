@@ -431,6 +431,7 @@ Dandelion::App.controller do
                else
                  @event.tickets
                end
+    @tickets =  @tickets.discounted if params[:discounted]
     @tickets =  @tickets.deleted if params[:deleted]
     @tickets =  @tickets.complete if params[:complete]
     @tickets =  @tickets.incomplete if params[:incomplete]
@@ -554,6 +555,7 @@ Dandelion::App.controller do
     @event = Event.find(params[:id]) || not_found
     event_admins_only!
     @orders = @event.orders
+    @orders =  @orders.discounted if params[:discounted]
     @orders =  @orders.deleted if params[:deleted]
     @orders =  @orders.complete if params[:complete]
     @orders =  @orders.incomplete if params[:incomplete]

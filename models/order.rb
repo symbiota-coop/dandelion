@@ -151,6 +151,10 @@ class Order
     self.and(payment_completed: true)
   end
 
+  def self.discounted
+    self.and(:id.in => self.and(:percentage_discount.ne => nil).pluck(:id) + self.and(:percentage_discount_monthly_donor.ne => nil).pluck(:id))
+  end
+
   def description_elements
     d = []
     TicketType.and(:id.in => tickets.pluck(:ticket_type_id)).each do |ticket_type|

@@ -43,6 +43,10 @@ class Ticket
     self.and(payment_completed: true)
   end
 
+  def self.discounted
+    self.and(:id.in => self.and(:percentage_discount.ne => nil).pluck(:id) + self.and(:percentage_discount_monthly_donor.ne => nil).pluck(:id))
+  end
+
   def firstname
     return if name.blank?
 
