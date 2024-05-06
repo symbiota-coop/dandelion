@@ -10,7 +10,7 @@ CURRENCY_OPTIONS = CURRENCIES.map do |currency|
   means = []
   means << 'Stripe' if FIAT_CURRENCIES.include?(currency)
   means << 'Coinbase Commerce' if FIAT_CURRENCIES.include?(currency) || COINBASE_CURRENCIES.include?(currency)
-  means << 'Polygon' if currency == 'USD' # BREAD
+  means << 'Gnosis Chain' if currency == 'USD' # BREAD
   Chain.all.each do |chain|
     means << chain.name if chain.tokens.map(&:symbol).include?(currency)
   end

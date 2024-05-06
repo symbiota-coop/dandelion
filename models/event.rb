@@ -120,7 +120,7 @@ class Event
 
   def chain
     if currency == 'USD'
-      Chain.object('Polygon')
+      Chain.object('Gnosis Chain')
     else
       token.try(:chain)
     end

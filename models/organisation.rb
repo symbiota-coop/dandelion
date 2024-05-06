@@ -718,7 +718,6 @@ class Organisation
 
     # Etherscan
     [
-      # "https://polygonscan.com/address-tokenpage?m=normal&a=#{evm_address}",
       # "https://celoscan.io/address-tokenpage?m=normal&a=#{evm_address}",
       # "https://arbiscan.io/address-tokenpage?m=normal&a=#{evm_address}",
     ].each do |url|
