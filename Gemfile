@@ -53,6 +53,7 @@ gem 'google_drive2', require: 'google_drive'
 gem 'jwt'
 gem 'mechanize'
 gem 'ruby-openai'
+gem 'yt'
 
 # Payments
 gem 'coinbase_commerce', github: 'quiknode-labs/coinbase-commerce-ruby'

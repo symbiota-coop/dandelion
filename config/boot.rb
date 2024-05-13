@@ -54,3 +54,7 @@ if ENV['GOOGLE_MAPS_API_KEY']
     c.api_key = ENV['GOOGLE_MAPS_API_KEY']
   end
 end
+
+Yt.configure do |config|
+  config.api_key = ENV['YOUTUBE_API_KEY']
+end

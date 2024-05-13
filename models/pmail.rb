@@ -186,8 +186,8 @@ class Pmail
     # replace youtube.com links with embeds
     b.gsub(%r{<oembed url="https://www\.youtube\.com/watch\?v=(\w+)"></oembed>}) do |match|
       video_id = match.match(%r{<oembed url="https://www\.youtube\.com/watch\?v=(\w+)"></oembed>})[1]
-      title = Faraday.get("https://www.youtube.com/watch?v=#{video_id}").body.match(%r{<title>(.*)</title>})[1]
-      "<figure><a href=\"https://www.youtube.com/watch?v=#{video_id}\"><img src=\"#{ENV['BASE_URI']}/youtube_thumb/#{video_id}\"></a><figcaption>#{title.gsub('- YouTube', '')}</figcaption></figure>"
+      title = Yt::Video.new(id: video_id).title
+      "<figure><a href=\"https://www.youtube.com/watch?v=#{video_id}\"><img src=\"#{ENV['BASE_URI']}/youtube_thumb/#{video_id}\"></a><figcaption>#{title}</figcaption></figure>"
     end
   end
 
