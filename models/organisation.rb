@@ -730,7 +730,7 @@ class Organisation
 
         to = h.search('[data-test=token_transfer] [data-address-hash]')[1].attr('data-address-hash').downcase
         next unless to == evm_address.downcase
-                
+
         token_address = h.search('[data-test=token_link]')[0].attr('href').split('/').last
         next unless token_address
 
@@ -738,13 +738,13 @@ class Organisation
         next unless token_find
 
         token = token_find[1]
-        next unless token        
+        next unless token
 
         amount = h.search('[data-test=token_transfer] > span')[1].text.split(' ').first.gsub(',', '')
         next unless amount
 
         puts [token, amount]
-        transactions << [token, amount]        
+        transactions << [token, amount]
       end
     end
 
