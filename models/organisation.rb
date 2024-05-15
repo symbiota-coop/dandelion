@@ -171,6 +171,9 @@ class Organisation
     end
   end
 
+  has_many :stripe_charges, dependent: :destroy
+  has_many :stripe_transactions, dependent: :destroy
+
   has_many :discount_codes, class_name: 'DiscountCode', as: :codeable, dependent: :destroy
 
   has_many :organisation_edges_as_source, class_name: 'OrganisationEdge', inverse_of: :source, dependent: :destroy
