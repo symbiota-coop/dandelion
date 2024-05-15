@@ -144,6 +144,8 @@ class Event
     'fa fa-calendar-o'
   end
 
+  has_many :stripe_charges
+
   has_many :posts, as: :commentable, dependent: :destroy
   has_many :subscriptions, as: :commentable, dependent: :destroy
   has_many :comments, as: :commentable, dependent: :destroy

@@ -332,6 +332,8 @@ class Account
 
   has_one :account_cache, dependent: :destroy
 
+  has_many :stripe_charges
+
   has_many :nfts, dependent: :nullify
 
   has_many :account_contributions, dependent: :destroy

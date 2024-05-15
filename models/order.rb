@@ -105,6 +105,8 @@ class Order
     CURRENCY_OPTIONS
   end
 
+  has_many :stripe_charges
+
   has_many :tickets, dependent: :destroy
   has_many :donations, dependent: :destroy
 

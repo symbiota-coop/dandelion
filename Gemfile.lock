@@ -31,9 +31,9 @@ GIT
 
 GIT
   remote: https://github.com/stephenreid321/activate-admin.git
-  revision: 2e8cdcdccd496637ee71792cd3515b1990f9972d
+  revision: 87835375e7c57390838b0ce076cf1165f8ca55c8
   specs:
-    activate-admin (0.0.17)
+    activate-admin (0.0.18)
       activate-tools
       erubi
       padrino
