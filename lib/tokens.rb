@@ -59,9 +59,9 @@ Chain.new('Optimism', 10).tap do |chain|
   Token.new('DAI', '0xda10009cbd5d07dd0cecc66161fc93d7c9000da1', chain)
 end
 
-Chain.new('Arbitrum One', 42_161).tap do |chain|
-  Token.new('USDGLO', '0x4f604735c1cf31399c6e711d5962b2b3e0225ad3', chain)
-end
+# Chain.new('Arbitrum One', 42_161).tap do |chain|
+#   Token.new('USDGLO', '0x4f604735c1cf31399c6e711d5962b2b3e0225ad3', chain)
+# end
 
 Chain.new('Base', 8453).tap do |chain|
   Token.new('USDC', '0x833589fcd6edb6e08f4c7c32d4f71b54bda02913', chain)

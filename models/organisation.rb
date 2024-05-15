@@ -716,40 +716,39 @@ class Organisation
     transactions = []
     agent = Mechanize.new
 
-    # Etherscan
+    # Blockscout v1
     [
-      # "https://celoscan.io/address-tokenpage?m=normal&a=#{evm_address}",
-      # "https://arbiscan.io/address-tokenpage?m=normal&a=#{evm_address}",
-    ].each do |url|
+      "https://explorer.celo.org/address/#{evm_address}/token-transfers?type=JSON"
+    ].compact.each do |url|
       puts url
       page = begin; agent.get(url); rescue Mechanize::ResponseCodeError; end
       next unless page
 
-      page.search('table tr')[1..].each do |tr|
-        to_cell = tr.search('td')[6]
-        next unless to_cell
+      j = JSON.parse(page.body)
+      j['items'].each do |item|
+        h = Nokogiri::HTML(item)
 
-        to = to_cell.text
-        next unless to && to.downcase == evm_address.downcase
-
-        token_address = tr.search('td')[8].search('a')[0]['href'].split('/')[2].split('?')[0]
+        to = h.search('[data-test=token_transfer] [data-address-hash]')[1].attr('data-address-hash').downcase
+        next unless to == evm_address.downcase
+                
+        token_address = h.search('[data-test=token_link]')[0].attr('href').split('/').last
         next unless token_address
 
         token_find = Token.by_contract_address.find { |k, _v| k.downcase == token_address.downcase }
         next unless token_find
 
         token = token_find[1]
-        next unless token
+        next unless token        
 
-        amount = tr.search('td')[7].text.gsub(',', '').to_f
+        amount = h.search('[data-test=token_transfer] > span')[1].text.split(' ').first.gsub(',', '')
         next unless amount
 
         puts [token, amount]
-        transactions << [token, amount]
+        transactions << [token, amount]        
       end
     end
 
-    # Blockscout
+    # Blockscout v2
     [
       "https://optimism.blockscout.com/api/v2/addresses/#{evm_address}/token-transfers",
       "https://gnosis.blockscout.com/api/v2/addresses/#{evm_address}/token-transfers",
