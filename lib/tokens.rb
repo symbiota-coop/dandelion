@@ -53,16 +53,19 @@ end
 
 Chain.new('Celo', 42_220).tap do |chain|
   Token.new('CUSD', '0x765DE816845861e75A25fCA122bb6898B8B1282a', chain)
+  Token.new('CEUR', '0xd8763cba276a3738e6de85b4b3bf5fded6d6ca73', chain)
+  Token.new('CREAL', '0xe8537a3d056da446677b9e9d6c5db704eaab4787', chain)
 end
 
 Chain.new('Optimism', 10).tap do |chain|
   Token.new('DAI', '0xda10009cbd5d07dd0cecc66161fc93d7c9000da1', chain)
 end
 
-# Chain.new('Arbitrum One', 42_161).tap do |chain|
-#   Token.new('USDGLO', '0x4f604735c1cf31399c6e711d5962b2b3e0225ad3', chain)
-# end
-
 Chain.new('Base', 8453).tap do |chain|
   Token.new('USDC', '0x833589fcd6edb6e08f4c7c32d4f71b54bda02913', chain)
 end
+
+# not on blockscout =/
+# Chain.new('Arbitrum One', 42_161).tap do |chain|
+#   Token.new('USDGLO', '0x4f604735c1cf31399c6e711d5962b2b3e0225ad3', chain)
+# end
