@@ -152,7 +152,7 @@
       </td>
 
       <% if event.organisation.stripe_client_id %>
-        <!-- Total due to organisation = Organisation ticket revenue share + donations -->
+        <!-- Total collected by organisation = Organisation ticket revenue share + donations -->
         <td>
           <%= dandelion = "#{m(event.total_due_to_organisation, event.currency)} from #{pluralize(event.orders.and(:payment_intent.ne => nil).count, 'Stripe order')}" %>
         </td>

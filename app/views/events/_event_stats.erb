@@ -1,4 +1,4 @@
-  <script>
+<script>
   function hideCols() {
     $("#event_stats th.hide").each(function() {
       var index = $("#event_stats th").index(this);
@@ -83,7 +83,7 @@
       <% end %>
       <th data-col-name="donations">Donations</th>
       <% if organisation.stripe_client_id %>
-        <th>Total due to organisation</th>
+        <th>Total collected by organisation</th>
         <th>Revenue reported by Stripe</th>
         <th>Stripe fees</th>
       <% else %>
