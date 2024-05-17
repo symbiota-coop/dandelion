@@ -1,3 +1,15 @@
+  <script>
+  function hideCols() {
+    $("#event_stats th.hide").each(function() {
+      var index = $("#event_stats th").index(this);
+      $("#event_stats th").eq(index).hide(); // Hide header
+      $("#event_stats td:nth-child(" + (index + 1) + ")").hide(); // Hide all corresponding tds
+      $("#event_stats tfoot th").eq(index).hide(); // Hide footer
+    })
+  }
+  $(function() { hideCols() })
+</script>
+
 <% unless @event  %>
   <style>
     #event_stats_filter label { font-weight: bold }
@@ -9,6 +21,7 @@
       var ticketRevenue = $("#event_stats th").toArray().indexOf($("th[data-col-name='ticket-revenue']")[0])
       var organisationTicketRevenueShare = $("#event_stats th").toArray().indexOf($("th[data-col-name='organisation-ticket-revenue-share']")[0])
       var donations = $("#event_stats th").toArray().indexOf($("th[data-col-name='donations']")[0])
+
       $(document).ajaxStop(function() {
         if (!$('#event_stats').hasClass('dataTable')) {
           var table = $('#event_stats').dataTable({
@@ -33,15 +46,9 @@
           })
           $('#event_stats').DataTable().draw();
         }
-
-      $("#event_stats th.hide").each(function() {
-        var index = $("#event_stats th").index(this);
-        $("#event_stats th").eq(index).hide(); // Hide header
-        $("#event_stats td:nth-child(" + (index + 1) + ")").hide(); // Hide all corresponding tds
-        $("#event_stats tfoot th").eq(index).hide(); // Hide footer
+        hideCols()
       })
 
-      })
     })
   </script>
 <% end %>
