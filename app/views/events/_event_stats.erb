@@ -45,6 +45,9 @@
     })
   </script>
 <% end %>
+
+<% organisation = params[:cohost] ? Organisation.find_by(slug: params[:cohost]) : @organisation %>
+
 <table id="event_stats" class="table table-striped table-hover table-sm" style="font-size: 0.9em">
   <thead class="bg-white">
     <tr>
@@ -52,7 +55,7 @@
       <th></th>
       <th style="min-width: 12.5em" data-col-name="date">Date</th>
       <th>Coordinator</th>
-      <% if @organisation.stripe_client_id %>
+      <% if organisation.stripe_client_id %>
         <th>Organiser</th>
       <% else %>
         <th class="hide"></th>
@@ -66,13 +69,13 @@
       <th data-col-name="tickets-sold">Tickets sold</th>
       <th>Checked in</th>
       <th data-col-name="ticket-revenue">Ticket revenue</th>
-      <% if @organisation.stripe_client_id %>
+      <% if organisation.stripe_client_id %>
         <th data-col-name="organisation-ticket-revenue-share">Organisation ticket revenue share</th>
       <% else %>
         <th class="hide"></th>
       <% end %>
       <th data-col-name="donations">Donations</th>
-      <% if @organisation.stripe_client_id %>
+      <% if organisation.stripe_client_id %>
         <th>Total due to organisation</th>
         <th>Revenue reported by Stripe</th>
         <th>Stripe fees</th>
@@ -85,7 +88,6 @@
       <th>Feedback</th>
     </tr>
   </thead>
-  <% organisation = params[:cohost] ? Organisation.find_by(slug: params[:cohost]) : @organisation %>
   <% events.each { |event| %>
   <tr data-pagelet-url="/events/<%= event.id %>/stats_row<%= "?timezone=#{event.start_time.strftime('%Z')}#{"&organisation_id=#{organisation.id}" if organisation}" %>"><% if @event %><%= cp(:'events/event_stats_row', locals: { event: @event, organisation: organisation }, key: "/events/#{@event.id}/stats_row?timezone=#{@event.start_time.strftime('%Z')}#{"&organisation_id=#{organisation.id}" if organisation}") %><% end %></tr>
   <% } %>

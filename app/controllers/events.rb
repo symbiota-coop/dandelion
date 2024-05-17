@@ -215,12 +215,15 @@ Dandelion::App.controller do
     @event = Event.find(params[:id]) || not_found
     kick! unless @event.organisation
     event_admins_only!
+    @organisation = @event.organisation
     erb :'events/build'
   end
 
   post '/events/:id/edit' do
     @event = Event.find(params[:id]) || not_found
+    kick! unless @event.organisation
     event_admins_only!
+    @organisation = @event.organisation
     @event.last_saved_by = current_account
     if @event.update_attributes(mass_assigning(params[:event], Event))
       flash[:notice] = 'The event was saved.'
