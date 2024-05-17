@@ -1,6 +1,7 @@
 <% if event_admin? %>
   <% if event.organisation %>
     <%= partial :'organisations/nav', locals: { organisation: event.organisation, inline: true } %>
+    <% @organisation = event.organisation %>
   <% end %>
   <% if event.persisted? %>
     <% if event.activity %>
