@@ -7,6 +7,7 @@
       var date = $("#event_stats th").toArray().indexOf($("th[data-col-name='date']")[0])
       var ticketsSold = $("#event_stats th").toArray().indexOf($("th[data-col-name='tickets-sold']")[0])
       var ticketRevenue = $("#event_stats th").toArray().indexOf($("th[data-col-name='ticket-revenue']")[0])
+      var organisationTicketRevenueShare = $("#event_stats th").toArray().indexOf($("th[data-col-name='organisation-ticket-revenue-share']")[0])
       var donations = $("#event_stats th").toArray().indexOf($("th[data-col-name='donations']")[0])
       $(document).ajaxStop(function() {
         if (!$('#event_stats').hasClass('dataTable')) {
@@ -19,7 +20,7 @@
             }
           })
           table.on('draw.dt', function() {
-            $.each([ticketsSold, ticketRevenue, donations], function(i,index) {
+            $.each([ticketsSold, ticketRevenue, donations, organisationTicketRevenueShare], function(i,index) {
               var sum = 0
               $('#event_stats tbody tr').each(function() {
                 sum += parseFloat($('td:eq('+index+')', this).attr('data-sort'))
@@ -32,6 +33,14 @@
           })
           $('#event_stats').DataTable().draw();
         }
+
+      $("#event_stats th.hide").each(function() {
+        var index = $("#event_stats th").index(this);
+        $("#event_stats th").eq(index).hide(); // Hide header
+        $("#event_stats td:nth-child(" + (index + 1) + ")").hide(); // Hide all corresponding tds
+        $("#event_stats tfoot th").eq(index).hide(); // Hide footer
+      })
+
       })
     })
   </script>
@@ -43,7 +52,11 @@
       <th></th>
       <th style="min-width: 12.5em" data-col-name="date">Date</th>
       <th>Coordinator</th>
-      <th>Organiser</th>
+      <% if @organisation.stripe_client_id %>
+        <th>Organiser</th>
+      <% else %>
+        <th class="hide"></th>
+      <% end %>
       <th>Facilitators</th>
       <th>Tags</th>
       <th>Activity</th>
@@ -53,8 +66,22 @@
       <th data-col-name="tickets-sold">Tickets sold</th>
       <th>Checked in</th>
       <th data-col-name="ticket-revenue">Ticket revenue</th>
-      <th>Credit due</th>
+      <% if @organisation.stripe_client_id %>
+        <th data-col-name="organisation-ticket-revenue-share">Organisation ticket revenue share</th>
+      <% else %>
+        <th class="hide"></th>
+      <% end %>
       <th data-col-name="donations">Donations</th>
+      <% if @organisation.stripe_client_id %>
+        <th>Total due to organisation</th>
+        <th>Revenue reported by Stripe</th>
+        <th>Stripe fees</th>
+      <% else %>
+        <th class="hide"></th>
+        <th class="hide"></th>
+        <th class="hide"></th>
+      <% end %>
+      <th>Credit due</th>
       <th>Feedback</th>
     </tr>
   </thead>
@@ -69,6 +96,11 @@
         <th></th>
         <th></th>
         <th></th>
+        <% if @organisation.stripe_client_id %>
+          <th></th>
+        <% else %>
+          <th></th>
+        <% end %>
         <th></th>
         <th></th>
         <th></th>
@@ -78,8 +110,21 @@
         <th></th>
         <th></th>
         <th></th>
+        <% if @organisation.stripe_client_id %>
+          <th></th>
+        <% else %>
+          <th></th>
+        <% end %>
         <th></th>
-        <th></th>
+        <% if @organisation.stripe_client_id %>
+          <th></th>
+          <th></th>
+          <th></th>
+        <% else %>
+          <th></th>
+          <th></th>
+          <th></th>
+        <% end %>
         <th></th>
         <th></th>
       </tr>

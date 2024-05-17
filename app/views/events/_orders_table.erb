@@ -95,8 +95,10 @@
         <%= m (order.value || 0), order.currency %>
       </abbr>
       <% if order.application_fee_amount %>
-        (<%= m ((order.value || 0) - (order.application_fee_amount || 0)), order.currency %> paid to
-        <a href="/u/<%= order.revenue_sharer.username %>"><%= order.revenue_sharer.name %></a>)
+        (<%= m ((order.value || 0) - (order.application_fee_amount || 0)), order.currency %> paid <% if order.revenue_sharer %>
+          to
+          <a href="/u/<%= order.revenue_sharer.username %>"><%= order.revenue_sharer.name %></a>)
+        <% end %>
       <% end %>
       <% if order.credit_payable_to_revenue_sharer %>
         <span class="label label-default"><%= m order.credit_payable_to_revenue_sharer, order.currency %> credit due</span>

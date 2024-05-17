@@ -1011,6 +1011,18 @@ class Event
     Money.new(0, ENV['DEFAULT_CURRENCY'])
   end
 
+  def total_due_to_organisation
+    organisation_discounted_ticket_revenue + donation_revenue
+  end
+
+  def stripe_revenue
+    stripe_charges.sum(&:balance)
+  end
+
+  def stripe_fees
+    stripe_charges.sum(&:fees)
+  end
+
   def credit_payable_to_revenue_sharer
     r = Money.new(0, currency)
     orders.each { |order| r += Money.new((order.credit_payable_to_revenue_sharer || 0) * 100, order.currency) }

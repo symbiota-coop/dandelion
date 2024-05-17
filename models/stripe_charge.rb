@@ -80,7 +80,8 @@ class StripeCharge
       %w[de_donation_revenue de_ticket_revenue de_discounted_ticket_revenue de_percentage_discount de_percentage_discount_monthly_donor de_credit_applied].each do |f|
         c[f] = charge['metadata'][f]
       end
-      organisation.stripe_charges.create(c)
+      puts c
+      organisation.stripe_charges.create!(c)
     end
   end
 

@@ -19,8 +19,12 @@ Dragonfly.app.configure do
     if (dj = DragonflyJob.find_by(signature: job.signature))
       "#{ENV['S3_CDN']}/#{dj.uid}"
     else
-      dj = DragonflyJob.create(uid: job.store, signature: job.signature)
-      app.datastore.url_for(dj.uid)
+      begin
+        dj = DragonflyJob.create(uid: job.store, signature: job.signature)
+        app.datastore.url_for(dj.uid)
+      rescue Dragonfly::Job::Fetch::NotFound
+        raise if Padrino.env != :development
+      end
     end
   end
 end

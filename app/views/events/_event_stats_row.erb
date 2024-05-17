@@ -58,21 +58,27 @@
       <a href="/u/<%= event.coordinator.username %>"><%= event.coordinator.name %></a>
     <% end %>
   </td>
-  <td>
-    <% if event.organiser %>
-      <a href="/u/<%= event.organiser.username %>">
-        <%= partial :'accounts/square', locals: { account: event.organiser, width: '50px' } %>
-        <br>
-        <a href="/u/<%= event.organiser.username %>"><%= event.organiser.name %></a>
-      <% elsif event.revenue_sharer && event.organisation_revenue_share %>
-        <a href="/u/<%= event.revenue_sharer.username %>">
-          <%= partial :'accounts/square', locals: { account: event.revenue_sharer, width: '50px' } %>
-          <br />
-          <a href="/u/<%= event.revenue_sharer.username %>"><%= event.revenue_sharer.name %></a>
+
+  <% if event.organisation.stripe_client_id %>
+    <td>
+      <% if event.organiser %>
+        <a href="/u/<%= event.organiser.username %>">
+          <%= partial :'accounts/square', locals: { account: event.organiser, width: '50px' } %>
           <br>
-          <%= ((1 - event.organisation_revenue_share) * 100).round %>:<%= (event.organisation_revenue_share * 100).round %>
-        <% end %>
-      </td>
+          <a href="/u/<%= event.organiser.username %>"><%= event.organiser.name %></a>
+        <% elsif event.revenue_sharer && event.organisation_revenue_share %>
+          <a href="/u/<%= event.revenue_sharer.username %>">
+            <%= partial :'accounts/square', locals: { account: event.revenue_sharer, width: '50px' } %>
+            <br />
+            <a href="/u/<%= event.revenue_sharer.username %>"><%= event.revenue_sharer.name %></a>
+            <br>
+            <%= ((1 - event.organisation_revenue_share) * 100).round %>:<%= (event.organisation_revenue_share * 100).round %>
+          <% end %>
+        </td>
+      <% else %>
+        <td></td>
+      <% end %>
+
       <td style="text-align: center">
         <% if event.event_facilitations.count > 0 %>
           <% event.event_facilitations.each { |event_facilitation| %>
@@ -114,6 +120,9 @@
       <td>
         <%= partial :'events/checked_in', locals: { event: event } %>
       </td>
+
+
+      <!-- Ticket revenue -->
       <% if event.organisation.hide_ticket_revenue %>
         <td></td>
       <% else %>
@@ -123,14 +132,49 @@
           <% end %>
         </td>
       <% end %>
-      <td>
-        <% if event.credit_payable_to_revenue_sharer > 0 %>
-          <%= m event.credit_payable_to_revenue_sharer, event.currency %>
-        <% end %>
-      </td>
+
+      <% if event.organisation.stripe_client_id %>
+        <!-- Organisation ticket revenue share -->
+        <td data-sort="<%=begin; event.organisation_discounted_ticket_revenue.exchange_to(event.organisation.currency); rescue Money::Bank::UnknownRate, Money::Currency::UnknownCurrency; 0; end%>">
+          <% if event.organisation_discounted_ticket_revenue > 0 %>
+            <%= m event.organisation_discounted_ticket_revenue, event.currency %>
+          <% end %>
+        </td>
+      <% else %>
+        <td></td>
+      <% end %>
+
+      <!-- Donations -->
       <td data-sort="<%=begin; event.donation_revenue.exchange_to(event.organisation.currency); rescue Money::Bank::UnknownRate, Money::Currency::UnknownCurrency; 0; end%>">
         <% if event.donation_revenue > 0 && !event.purchase_url %>
           <%= m event.donation_revenue, event.currency %>
+        <% end %>
+      </td>
+
+      <% if event.organisation.stripe_client_id %>
+        <!-- Total due to organisation = Organisation ticket revenue share + donations -->
+        <td>
+          <%= dandelion = "#{m(event.total_due_to_organisation, event.currency)} from #{pluralize(event.orders.and(:payment_intent.ne => nil).count, 'Stripe order')}" %>
+        </td>
+        <!-- Revenue reported by Stripe -->
+        <% stripe = "#{m(event.stripe_revenue, event.currency)} from #{pluralize(event.stripe_charges.select { |stripe_charge| stripe_charge.balance > 0 }.count, 'Stripe charge')}" %>
+        <td class="<%= if dandelion.split(' ')[0..-3].join == stripe.split(' ')[0..-3].join; 'bg-success'; elsif event.end_time.to_date < Date.today; 'bg-warning'; end %>">
+          <%= stripe %>
+        </td>
+        <!-- Stripe fees -->
+        <td>
+          <%= m event.stripe_fees, event.currency %>
+        </td>
+      <% else %>
+        <td></td>
+        <td></td>
+        <td></td>
+      <% end %>
+
+
+      <td>
+        <% if event.credit_payable_to_revenue_sharer > 0 %>
+          <%= m event.credit_payable_to_revenue_sharer, event.currency %>
         <% end %>
       </td>
       <td>
