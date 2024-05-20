@@ -38,6 +38,7 @@ class Order
   field :http_referrer, type: String
   field :message_ids, type: String
   field :answers, type: Array
+  field :transferred, type: Boolean
 
   field :gc_plan_id, type: String
   field :gc_given_name, type: String

@@ -10,6 +10,9 @@
   <% end %>
 <% end %>
 <% if ticket.order %>
+  <% if ticket.order.transferred? %>
+    <span class="label label-default">Transferred</span>
+  <% end %>
   <% if ticket.order.percentage_discount %>
     <span data-toggle="tooltip" class="label label-default mr-1" title="<%= "#{ticket.order.percentage_discount}%" %> discount code applied<% if ticket.order.discount_code %>: <%=ticket.order.discount_code.code%><% end %>">
       <%= "#{ticket.order.percentage_discount}%" %>

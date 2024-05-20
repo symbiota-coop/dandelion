@@ -369,8 +369,10 @@ Dandelion::App.controller do
     event_admins_only!
     new_event = @event.organisation.events.find(params[:order][:event_id]) || not_found
     halt 400 unless event_admin?(new_event)
+    @order.update_attribute(:transferred, true)
     @order.update_attribute(:event, new_event)
     @order.tickets.each do |ticket|
+      ticket.update_attribute(:transferred, true)
       ticket.update_attribute(:event, new_event)
       ticket.update_attribute(:ticket_type, nil)
     end

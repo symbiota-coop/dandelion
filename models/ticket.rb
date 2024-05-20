@@ -26,6 +26,7 @@ class Ticket
   field :name, type: String
   field :email, type: String
   field :payment_completed, type: Boolean
+  field :transferred, type: Boolean
 
   def incomplete?
     !payment_completed

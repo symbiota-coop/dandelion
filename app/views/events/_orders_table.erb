@@ -100,6 +100,9 @@
           <a href="/u/<%= order.revenue_sharer.username %>"><%= order.revenue_sharer.name %></a>)
         <% end %>
       <% end %>
+      <% if order.transferred? %>
+        <span class="label label-default">Transferred</span>
+      <% end %>
       <% if order.credit_payable_to_revenue_sharer %>
         <span class="label label-default"><%= m order.credit_payable_to_revenue_sharer, order.currency %> credit due</span>
       <% end %>
