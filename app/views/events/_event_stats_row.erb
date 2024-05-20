@@ -182,13 +182,13 @@
         </td>
         <!-- Allocated to facilitator = Profit * profit_share_facilitator -->
         <td>
-          <% if !event.revenue_sharing? %>
+          <% if !event.revenue_sharer %>
             <%= m event.profit_to_facilitator, event.currency %>
           <% end %>
         </td>
         <!-- Allocated to coordinator = Profit * profit_share_coordinator -->
         <td>
-          <% if event.revenue_sharing? %>
+          <% if event.revenue_sharer %>
             <%= "#{event.profit_share_to_coordinator}/#{event.revenue_share_to_organisation}" %><br />
           <% else %>
             <%= "#{event.profit_share_to_coordinator}%" %><br />
@@ -197,7 +197,7 @@
         </td>
         <!-- Allocated to social media = Profit * profit_share_social_media -->
         <td>
-          <% if event.revenue_sharing? %>
+          <% if event.revenue_sharer %>
             <%= "#{event.profit_share_to_social_media}/#{event.revenue_share_to_organisation}" %><br />
           <% else %>
             <%= "#{event.profit_share_to_social_media}%" %><br />
@@ -206,7 +206,7 @@
         </td>
         <!-- Allocated to category steward = Profit * profit_share_category_steward -->
         <td>
-          <% if event.revenue_sharing? %>
+          <% if event.revenue_sharer %>
             <%= "#{event.profit_share_to_category_steward}/#{event.revenue_share_to_organisation}" %><br />
           <% else %>
             <%= "#{event.profit_share_to_category_steward}%" %><br />
