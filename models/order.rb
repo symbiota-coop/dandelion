@@ -206,6 +206,7 @@ class Order
       self.affiliate_id = nil
       self.affiliate_type = nil
     end
+    self.application_fee_amount = application_fee_amount.ceil(2) if application_fee_amount && application_fee_amount.to_s.split('.').last.length >= 3
   end
 
   def ticket_revenue
