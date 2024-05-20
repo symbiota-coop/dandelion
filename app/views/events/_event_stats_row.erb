@@ -66,13 +66,13 @@
           <%= partial :'accounts/square', locals: { account: event.organiser, width: '50px' } %>
           <br>
           <a href="/u/<%= event.organiser.username %>"><%= event.organiser.name %></a>
-        <% elsif event.revenue_sharer && event.organisation_revenue_share %>
+        <% elsif event.revenue_sharer %>
           <a href="/u/<%= event.revenue_sharer.username %>">
             <%= partial :'accounts/square', locals: { account: event.revenue_sharer, width: '50px' } %>
             <br />
             <a href="/u/<%= event.revenue_sharer.username %>"><%= event.revenue_sharer.name %></a>
             <br>
-            <%= ((1 - event.organisation_revenue_share) * 100).round %>:<%= (event.organisation_revenue_share * 100).round %>
+            <%= event.revenue_share_to_revenue_sharer %>:<%= event.revenue_share_to_organisation %>
           <% end %>
         </td>
       <% else %>
@@ -137,6 +137,7 @@
         <!-- Organisation ticket revenue share -->
         <td data-sort="<%=begin; event.organisation_discounted_ticket_revenue.exchange_to(event.organisation.currency); rescue Money::Bank::UnknownRate, Money::Currency::UnknownCurrency; 0; end%>">
           <% if event.organisation_discounted_ticket_revenue > 0 %>
+            <%= "#{event.revenue_share_to_organisation}%" %><br />
             <%= m event.organisation_discounted_ticket_revenue, event.currency %>
           <% end %>
         </td>
@@ -152,20 +153,84 @@
       </td>
 
       <% if event.organisation.stripe_client_id %>
-        <!-- Total collected by organisation = Organisation ticket revenue share + donations -->
+        <!-- Donations reported by Stripe -->
+        <td class="<%= if event.donation_revenue == event.stripe_donations; 'bg-success'; elsif event.end_time.to_date < Date.today; 'bg-warning'; end %>">
+          <%= m event.stripe_donations, event.currency %>
+        </td>
+        <!-- Revenue reported by Dandelion = Organisation ticket revenue share + donations -->
         <td>
-          <%= dandelion = "#{m(event.total_due_to_organisation, event.currency)} from #{pluralize(event.orders.and(:payment_intent.ne => nil).count, 'Stripe order')}" %>
+          <% dandelion = "#{m(event.dandelion_revenue, event.currency)} from #{pluralize(event.orders.and(:payment_intent.ne => nil).count, 'Stripe order')}" %>
+          <%= dandelion.split(' from ').first %> from <a href="/events/<%=event.id%>/orders"><%= dandelion.split(' from ').last %></a>
         </td>
         <!-- Revenue reported by Stripe -->
         <% stripe = "#{m(event.stripe_revenue, event.currency)} from #{pluralize(event.stripe_charges.select { |stripe_charge| stripe_charge.balance > 0 }.count, 'Stripe charge')}" %>
         <td class="<%= if dandelion.split(' ')[0..-3].join == stripe.split(' ')[0..-3].join; 'bg-success'; elsif event.end_time.to_date < Date.today; 'bg-warning'; end %>">
-          <%= stripe %>
+          <%= stripe.split(' from ').first %> from <a class="text-white font-weight-bold" href="/events/<%=event.id%>/stripe_charges"><%= stripe.split(' from ').last %></a>
         </td>
         <!-- Stripe fees -->
         <td>
           <%= m event.stripe_fees, event.currency %>
         </td>
+        <!-- Profit -->
+        <td>
+          <%= m event.profit, event.currency %>
+        </td>
+
+        <!-- Profit less donations, before allocations -->
+        <td>
+          <%= m event.profit_less_donations, event.currency %>
+        </td>
+        <!-- Allocated to facilitator = Profit * profit_share_facilitator -->
+        <td>
+          <% if !event.revenue_sharing? %>
+            <%= m event.profit_to_facilitator, event.currency %>
+          <% end %>
+        </td>
+        <!-- Allocated to coordinator = Profit * profit_share_coordinator -->
+        <td>
+          <% if event.revenue_sharing? %>
+            <%= "#{event.profit_share_to_coordinator}/#{event.revenue_share_to_organisation}" %><br />
+          <% else %>
+            <%= "#{event.profit_share_to_coordinator}%" %><br />
+          <% end %>
+          <%= m event.profit_to_coordinator, event.currency %>
+        </td>
+        <!-- Allocated to social media = Profit * profit_share_social_media -->
+        <td>
+          <% if event.revenue_sharing? %>
+            <%= "#{event.profit_share_to_social_media}/#{event.revenue_share_to_organisation}" %><br />
+          <% else %>
+            <%= "#{event.profit_share_to_social_media}%" %><br />
+          <% end %>
+          <%= m event.profit_to_social_media, event.currency %>
+        </td>
+        <!-- Allocated to category steward = Profit * profit_share_category_steward -->
+        <td>
+          <% if event.revenue_sharing? %>
+            <%= "#{event.profit_share_to_category_steward}/#{event.revenue_share_to_organisation}" %><br />
+          <% else %>
+            <%= "#{event.profit_share_to_category_steward}%" %><br />
+          <% end %>
+          <%= m event.profit_to_category_steward, event.currency %>
+        </td>
+        <!-- Profit less donations, after allocations -->
+        <td>
+          <%= m event.profit_less_donations_less_allocations, event.currency %>
+        </td>
+        <!-- Profit including donations, after allocations -->
+        <td>
+          <%= m event.profit_less_allocations, event.currency %>
+        </td>
+
+
       <% else %>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+
+        <td></td>
+        <td></td>
         <td></td>
         <td></td>
         <td></td>

@@ -325,11 +325,11 @@ class Order
   end
 
   def credit_payable_to_organisation
-    credit_applied - credit_payable_to_revenue_sharer if organisation_revenue_share && credit_applied && credit_applied.positive?
+    credit_applied - credit_payable_to_revenue_sharer if revenue_sharer && credit_applied && credit_applied.positive?
   end
 
   def credit_payable_to_revenue_sharer
-    ((discounted_ticket_revenue / (discounted_ticket_revenue + donation_revenue)) * credit_applied * (1 - organisation_revenue_share)).to_f if organisation_revenue_share && credit_applied && credit_applied.positive? && (discounted_ticket_revenue + donation_revenue).positive?
+    ((discounted_ticket_revenue / (discounted_ticket_revenue + donation_revenue)) * credit_applied * (1 - organisation_revenue_share)).to_f if revenue_sharer && credit_applied && credit_applied.positive? && (discounted_ticket_revenue + donation_revenue).positive?
   end
 
   def make_transfer

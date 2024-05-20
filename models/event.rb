@@ -32,7 +32,6 @@ class Event
   field :suggested_donation, type: Float
   field :minimum_donation, type: Float
   field :capacity, type: Integer
-  field :organisation_revenue_share, type: Float
   field :affiliate_credit_percentage, type: Integer
   field :extra_info_for_ticket_email, type: String
   field :extra_info_for_recording_email, type: String
@@ -54,6 +53,12 @@ class Event
   field :ticket_email_greeting, type: String
   field :ticket_email_title, type: String
 
+  field :revenue_share_to_revenue_sharer, type: Integer
+  field :profit_share_to_facilitator, type: Integer
+  field :profit_share_to_coordinator, type: Integer
+  field :profit_share_to_social_media, type: Integer
+  field :profit_share_to_category_steward, type: Integer
+
   def self.admin_fields
     {
       summary: { type: :text, index: false, edit: false },
@@ -72,7 +77,6 @@ class Event
       description: :wysiwyg,
       email: :email,
       facebook_event_url: :url,
-      organisation_revenue_share: :number,
       feedback_questions: :text_area,
       hide_attendees: :check_box,
       hide_discussion: :check_box,
@@ -239,7 +243,7 @@ class Event
   end
 
   def revenue_sharer_organisationship
-    organisation.organisationships.find_by(:account => revenue_sharer, :stripe_connect_json.ne => nil) if organisation && revenue_sharer && organisation_revenue_share
+    organisation.organisationships.find_by(:account => revenue_sharer, :stripe_connect_json.ne => nil) if organisation && revenue_sharer
   end
 
   before_validation do
@@ -272,14 +276,16 @@ class Event
       self.local_group = nil
       self.capacity = nil
     end
-    self.organisation_revenue_share = nil unless revenue_sharer
-    errors.add(:organisation_revenue_share, 'must be present if a revenue sharer is set') if revenue_sharer && !organisation_revenue_share
+    self.revenue_share_to_revenue_sharer = 0 unless revenue_share_to_revenue_sharer
+    self.revenue_share_to_revenue_sharer = 0 unless revenue_sharer
+    self.profit_share_to_facilitator = 0 if revenue_sharing?
+    errors.add(:revenue_share_to_revenue_sharer, 'must be present if a revenue sharer is set') if revenue_sharer && !revenue_share_to_revenue_sharer
     errors.add(:organiser, 'or revenue sharer must be set') if !revenue_sharer && !organiser && organisation && organisation.stripe_client_id
     errors.add(:revenue_sharer, 'cannot be set if organiser is set') if revenue_sharer && organiser
     errors.add(:revenue_sharer, 'or organiser must be set for this organisation') if organisation && organisation.require_organiser_or_revenue_sharer && !revenue_sharer && !organiser
-    errors.add(:revenue_sharer, 'is not connected to this organisation') if revenue_sharer && organisation_revenue_share && !revenue_sharer_organisationship
+    errors.add(:revenue_sharer, 'is not connected to this organisation') if revenue_sharer && !revenue_sharer_organisationship
     self.location = 'Online' if location && location.downcase == 'online'
-    errors.add(:organisation_revenue_share, 'must be between 0 and 1') if organisation_revenue_share && (organisation_revenue_share < 0 || organisation_revenue_share > 1)
+    errors.add(:revenue_share_to_revenue_sharer, 'must be between 0 and 100') if revenue_share_to_revenue_sharer && (revenue_share_to_revenue_sharer < 0 || revenue_share_to_revenue_sharer > 100)
     errors.add(:affiliate_credit_percentage, 'must be between 1 and 100') if affiliate_credit_percentage && (affiliate_credit_percentage < 1 || affiliate_credit_percentage > 100)
     errors.add(:capacity, 'must be greater than 0') if capacity && capacity.zero?
     errors.add(:suggested_donation, 'cannot be less than the minimum donation') if suggested_donation && minimum_donation && suggested_donation < minimum_donation
@@ -488,7 +494,7 @@ class Event
       minimum_donation: minimum_donation,
       affiliate_credit_percentage: affiliate_credit_percentage,
       capacity: capacity,
-      organisation_revenue_share: organisation_revenue_share,
+      revenue_share_to_revenue_sharer: revenue_share_to_revenue_sharer,
       hide_attendees: hide_attendees,
       hide_discussion: hide_discussion,
       refund_deleted_orders: refund_deleted_orders,
@@ -1011,7 +1017,19 @@ class Event
     Money.new(0, ENV['DEFAULT_CURRENCY'])
   end
 
-  def total_due_to_organisation
+  def revenue_share_to_organisation
+    100 - revenue_share_to_revenue_sharer
+  end
+
+  def organisation_revenue_share
+    revenue_share_to_organisation / 100.0
+  end
+
+  def revenue_sharing?
+    revenue_sharer || (revenue_share_to_revenue_sharer && revenue_share_to_revenue_sharer > 0)
+  end
+
+  def dandelion_revenue
     organisation_discounted_ticket_revenue + donation_revenue
   end
 
@@ -1021,6 +1039,58 @@ class Event
 
   def stripe_fees
     stripe_charges.sum(&:fees)
+  end
+
+  def stripe_donations
+    stripe_charges.sum(&:donations)
+  end
+
+  def stripe_profit
+    stripe_revenue - stripe_fees
+  end
+
+  def profit
+    stripe_profit
+  end
+
+  def profit_less_donations
+    stripe_profit - stripe_donations
+  end
+
+  def self.profit_share_roles
+    %w[facilitator coordinator social_media category_steward]
+  end
+
+  def allocations_to_roles
+    allocations = Money.new(0, currency)
+    Event.profit_share_roles.each do |role|
+      allocations += send("profit_to_#{role}")
+    end
+    allocations
+  end
+
+  def profit_less_donations_less_allocations
+    profit_less_donations - allocations_to_roles
+  end
+
+  def profit_less_allocations
+    profit_less_donations_less_allocations + stripe_donations
+  end
+
+  before_validation do
+    Event.profit_share_roles.each do |role|
+      send("profit_share_to_#{role}=", 0) if send("profit_share_to_#{role}").nil?
+    end
+    Event.profit_share_roles.each do |role|
+      errors.add(:"profit_share_to_#{role}", 'must be between 0% and 100%') if send("profit_share_to_#{role}") < 0 || send("profit_share_to_#{role}") > 100
+      errors.add(:"profit_share_to_#{role}", "along with other profit shares must not be greater than #{revenue_share_to_organisation}%") if Event.profit_share_roles.inject(0) { |sum, r| sum + send("profit_share_to_#{r}") } > revenue_share_to_organisation
+    end
+  end
+
+  (Event.profit_share_roles + ['organisation']).each do |role|
+    define_method "profit_to_#{role}" do
+      profit_less_donations * send("profit_share_to_#{role}") / revenue_share_to_organisation
+    end
   end
 
   def credit_payable_to_revenue_sharer

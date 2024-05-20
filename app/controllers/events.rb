@@ -552,6 +552,19 @@ Dandelion::App.controller do
     redirect back
   end
 
+  get '/events/:id/stripe_charges' do
+    @event = Event.find(params[:id]) || not_found
+    event_admins_only!
+    @stripe_charges = @event.stripe_charges.where(:balance_transaction.ne => nil)
+    @stripe_charges = @stripe_charges.and(:account_id.in => search_accounts(params[:q]).pluck(:id)) if params[:q]
+
+    if request.xhr?
+      partial :'events/stripe_charges_table', locals: { stripe_charges: @stripe_charges, show_emails: event_email_viewer? }
+    else
+      erb :'events/stripe_charges'
+    end
+  end
+
   get '/events/:id/orders', provides: %i[html csv pdf] do
     @event = Event.find(params[:id]) || not_found
     event_admins_only!

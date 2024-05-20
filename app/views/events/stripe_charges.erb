@@ -1,0 +1,18 @@
+<%= partial :'events/nav', locals: { event: @event } %>
+
+<% form_tag '', method: 'get', class: 'submitOnChange searchForm form-inline mb-3', onsubmit: %{
+  $('#stripe-charges-table').attr('data-pagelet-url', $('#stripe-charges-table').attr('data-pagelet-url').split('?')[0] + '?' + $(this).serialize());
+  $('#stripe-charges-table').load($('#stripe-charges-table').attr('data-pagelet-url'))
+  return false
+} do %>
+  <div class="form-group">
+    <label>Search charges</label>
+    <%= text_field_tag :q, class: 'form-control', value: params[:q] %>
+  </div>
+  <%= hidden_field_tag :search, value: 1 %>
+  <%= submit_tag 'Search', class: 'btn btn-primary' %>
+<% end %>
+
+<div id="stripe-charges-table" data-pagelet-url="/events/<%= @event.id %>/stripe_charges">
+  <%= partial :'events/stripe_charges_table', locals: { stripe_charges: @stripe_charges, show_emails: event_email_viewer? } %>
+</div>

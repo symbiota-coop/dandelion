@@ -83,10 +83,30 @@
       <% end %>
       <th data-col-name="donations">Donations</th>
       <% if organisation.stripe_client_id %>
-        <th>Total collected by organisation</th>
+        <th>Donations reported by Stripe</th>
+        <th>Revenue reported by Dandelion</th>
         <th>Revenue reported by Stripe</th>
         <th>Stripe fees</th>
+        <th>Profit</th>
+
+        <th>Profit less donations, before allocations</th>
+        <th>Allocated to facilitator</th>
+        <th>Allocated to coordinator</th>
+        <th>Allocated to social media</th>
+        <th>Allocated to category steward</th>
+        <th>Profit less donations, after allocations</th>
+        <th>Profit including donations, after allocations</th>
       <% else %>
+        <th class="hide"></th>
+        <th class="hide"></th>
+        <th class="hide"></th>
+        <th class="hide"></th>
+        <th class="hide"></th>
+
+        <th class="hide"></th>
+        <th class="hide"></th>
+        <th class="hide"></th>
+        <th class="hide"></th>
         <th class="hide"></th>
         <th class="hide"></th>
         <th class="hide"></th>
@@ -129,7 +149,27 @@
           <th></th>
           <th></th>
           <th></th>
+          <th></th>
+          <th></th>
+
+          <th></th>
+          <th></th>
+          <th></th>
+          <th></th>
+          <th></th>
+          <th></th>
+          <th></th>
         <% else %>
+          <th></th>
+          <th></th>
+          <th></th>
+          <th></th>
+          <th></th>
+
+          <th></th>
+          <th></th>
+          <th></th>
+          <th></th>
           <th></th>
           <th></th>
           <th></th>

@@ -19,9 +19,6 @@ class StripeTransaction
   field :customer_facing_currency, type: String
   field :automatic_payout_id, type: String
   field :automatic_payout_effective_at, type: Time
-  field :gross_gbp, type: Float
-  field :fee_gbp, type: Float
-  field :net_gbp, type: Float
 
   def self.admin_fields
     {
@@ -40,15 +37,29 @@ class StripeTransaction
       customer_facing_amount: :number,
       customer_facing_currency: :text,
       automatic_payout_id: :text,
-      automatic_payout_effective_at: :datetime,
-      gross_gbp: :number,
-      fee_gbp: :number,
-      net_gbp: :number
+      automatic_payout_effective_at: :datetime
     }
   end
 
-  def self.transfer_transactions(organisation, from: Date.today - 2, to: Date.today - 1)
-    puts "transferring transactions for #{organisation.slug} from #{from} to #{to}"
+  def gross_money
+    Money.new(gross * 100, currency)
+  end
+
+  def fee_money
+    Money.new(fee * 100, currency)
+  end
+
+  def net_money
+    Money.new(net * 100, currency)
+  end
+
+  def self.transfer(organisation, from: nil, to: Date.today - 1)
+    unless from
+      most_recent_stripe_transaction = organisation.stripe_transactions.order('created_utc desc').first
+      from = most_recent_stripe_transaction ? most_recent_stripe_transaction.created_utc.to_date + 1 : Date.today - 2
+    end
+
+    puts "transferring charges for #{organisation.slug} from #{from} to #{to}"
 
     Stripe.api_key = organisation.stripe_sk
     Stripe.api_version = '2020-08-27'
@@ -88,10 +99,7 @@ class StripeTransaction
                  transaction[f]
                end
       end
-      %w[gross fee net].each do |f|
-        t["#{f}_gbp"] = Money.new(transaction[f].to_f * 100, transaction['currency']).exchange_to('GBP').cents.to_f / 100
-      end
-      puts t
+      puts t.created_utc
       organisation.stripe_transactions.create!(t)
     end
   end

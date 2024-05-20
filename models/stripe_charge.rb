@@ -57,7 +57,12 @@ class StripeCharge
     }
   end
 
-  def self.transfer_charges(organisation, from: Date.today - 2, to: Date.today - 1)
+  def self.transfer(organisation, from: nil, to: Date.today - 1)
+    unless from
+      most_recent_stripe_charge = organisation.stripe_charges.order('created desc').first
+      from = most_recent_stripe_charge ? most_recent_stripe_charge.created.to_date + 1 : Date.today - 2
+    end
+
     puts "transferring charges for #{organisation.slug} from #{from} to #{to}"
 
     Stripe.api_key = organisation.stripe_sk
@@ -80,16 +85,32 @@ class StripeCharge
       %w[de_donation_revenue de_ticket_revenue de_discounted_ticket_revenue de_percentage_discount de_percentage_discount_monthly_donor de_credit_applied].each do |f|
         c[f] = charge['metadata'][f]
       end
-      puts c
+      puts c.created
       organisation.stripe_charges.create!(c)
     end
   end
 
   def balance
-    stripe_transactions.sum(:gross_gbp)
+    stripe_transactions.sum(&:gross_money)
   end
 
   def fees
-    stripe_transactions.sum(:fee_gbp)
+    stripe_transactions.sum(&:fee_money)
+  end
+
+  def de_donation_revenue_money
+    Money.new de_donation_revenue * 100, currency
+  end
+
+  def application_fee_amount_money
+    Money.new application_fee_amount, currency
+  end
+
+  def donations
+    if application_fee_amount
+      balance > 0 ? de_donation_revenue_money * (balance / application_fee_amount_money) : Money.new(0, currency)
+    else
+      [de_donation_revenue_money, balance].min
+    end
   end
 end

@@ -157,16 +157,16 @@
             $(function () {
               $('#event_revenue_sharer_id').change(function () {
                 if ($(this).val().length > 0) {
-                  $('#organisation-revenue-share').show()
+                  $('#revenue-share').show()
                 } else {
-                  $('#organisation-revenue-share').hide()
+                  $('#revenue-share').hide()
                 }
               })
               $('#event_revenue_sharer_id').change()
             })
           </script>
-          <div id="organisation-revenue-share">
-            <%= f.number_block :organisation_revenue_share %>
+          <div id="revenue-share">
+            <%= f.number_block :revenue_share_to_revenue_sharer %>
           </div>
         <% end %>
 

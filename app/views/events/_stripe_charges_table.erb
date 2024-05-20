@@ -1,0 +1,62 @@
+<% stripe_charges = stripe_charges.order('created_at desc')
+   stripe_charges = stripe_charges.paginate(page: params[:page], per_page: 50) %>
+
+<p><%== pagination_details stripe_charges, model: 'Charge' %></p>
+
+<script>
+  $(function () {
+    var colIndex = $("#stripe-charges th").toArray().indexOf($("th[data-col-name='created-at']")[0])
+    $('#stripe-charges').dataTable({bInfo: false, paging: false, searching: false, order: [[colIndex, "desc"]]});
+  })
+</script>
+<table class="table" id="stripe-charges">
+  <thead>
+    <tr>
+      <th>Name</th>
+      <th>Description</th>
+      <th>Original amount</th>
+      <th>Application fee</th>
+      <th>Balance</th>
+      <th>Order</th>
+      <th data-col-name="created-at">Created at</th>
+    </tr>
+  </thead>
+  <% stripe_charges.each { |stripe_charge| %>
+  <tr>
+    <td>
+      <% if stripe_charge.account %>
+        <%= partial :'accounts/account', locals: { account: stripe_charge.account, show_email: ((defined?(show_emails) && show_emails) || stripe_charge_email_viewer?(stripe_charge)) } %>
+      <% else %>
+        <em class="text-muted">(deleted account)</em>
+      <% end %>
+    </td>
+    <td>
+      <%= stripe_charge.description.split(':').last %>
+    </td>
+    <td>
+      <%= m stripe_charge.amount/100.0, stripe_charge.currency %>
+    </td>
+    <td>
+      <% if stripe_charge.application_fee_amount %>
+        <%= m stripe_charge.application_fee_amount/100.0, stripe_charge.currency %>
+      <% end %>
+    </td>
+    <td>
+      <%= m stripe_charge.balance, stripe_charge.currency %>
+      <% if stripe_charge.balance == 0 %>
+        <span class="label label-default">Refunded</span>
+      <% elsif stripe_charge.balance< Money.new(stripe_charge.application_fee_amount/100.0, stripe_charge.currency) %>
+        <span class="label label-default">Partial refund</span>
+      <% end %>
+    </td>
+    <td>
+      <a href="/events/<%= @event.id %>/orders"><%= stripe_charge.order.account ? stripe_charge.order.account.name : '(deleted account)' %> on <%= stripe_charge.order.created_at.to_date %></a>
+    </td>
+    <td data-sort="<%= stripe_charge.created.iso8601 %>">
+      <%= stripe_charge.created %>
+    </td>
+  </tr>
+  <% } %>
+</table>
+
+<%= will_paginate stripe_charges, renderer: WillPaginate::ViewHelpers::BootstrapRenderer %>
