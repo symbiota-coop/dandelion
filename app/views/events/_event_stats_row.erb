@@ -165,11 +165,16 @@
         <!-- Revenue reported by Stripe -->
         <% 
         stripe_charges = event.stripe_charges.and(:order_id.nin => Order.and(transferred: true).pluck(:id)).select { |stripe_charge| stripe_charge.balance > 0 }
-        stripe = "#{m(stripe_charges.sum(&:balance), event.currency)} from #{pluralize(stripe_charges.count, 'Stripe charge')}" %>
-        <%
+        stripe_charges_money = stripe_charges.sum(&:balance)
+        stripe = "#{m stripe_charges_money, event.currency} from #{pluralize(stripe_charges.count, 'Stripe charge')}"
+        
         stripe_charges_transferred = event.stripe_charges.and(:order_id.in => Order.and(transferred: true).pluck(:id)).select { |stripe_charge| stripe_charge.balance > 0 }
-        stripe_transferred = "#{m(stripe_charges_transferred.sum(&:balance), event.currency)} from #{pluralize(stripe_charges_transferred.count, 'transferred charge')}" %>
-        <td <% if stripe_charges.count > 0 %> class="<%= if dandelion.split(' ')[0..-3].join == stripe.split(' ')[0..-3].join; 'bg-success'; elsif event.end_time.to_date < Date.today; 'bg-warning'; end %>" <% end %>>
+        stripe_charges_transferred_money = stripe_charges_transferred.sum(&:balance)
+        stripe_transferred = "#{m stripe_charges_transferred_money, event.currency} from #{pluralize(stripe_charges_transferred.count, 'transferred charge')}"
+        
+        close_enough = (stripe_charges_money - event.dandelion_revenue).abs.cents < 100
+        %>
+        <td <% if stripe_charges.count > 0 %> class="<%= if close_enough; 'bg-success'; elsif event.end_time.to_date < Date.today; 'bg-warning'; end %>" <% end %>>
           <%= stripe.split(' from ').first %> from <a <% if stripe_charges.count > 0 %> class="text-white font-weight-bold" <% end %> href="/events/<%=event.id%>/stripe_charges"><%= stripe.split(' from ').last %></a>
           <% if stripe_charges_transferred.count > 0 %>
             +
