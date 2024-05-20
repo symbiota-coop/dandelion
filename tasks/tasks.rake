@@ -54,6 +54,7 @@ namespace :organisations do
       StripeCharge.transfer(organisation)
       StripeTransaction.transfer(organisation)
       StripeCharge.and(balance_float: nil).each { |stripe_charge| stripe_charge.set(balance_float: calculate_balance) }
+      StripeCharge.and(fees_float: nil).each { |stripe_charge| stripe_charge.set(fees_float: calculate_fees) }
     end
   end
 end

@@ -26,6 +26,7 @@ class StripeCharge
   field :de_percentage_discount_monthly_donor, type: Float
   field :de_credit_applied, type: Float
   field :balance_float, type: Float
+  field :fees_float, type: Float
 
   def summary
     Money.new(amount, currency).format(no_cents_if_whole: true)
@@ -92,19 +93,19 @@ class StripeCharge
   end
 
   def calculate_balance
-    stripe_transactions.sum(&:gross_money)
+    stripe_transactions.sum(&:gross_money).exchange_to(currency)
   end
 
-  def set_balance
-    set(balance_float: calculate_balance)
-  end
-
-  def fees
-    stripe_transactions.sum(&:fee_money)
+  def calculate_fees
+    stripe_transactions.sum(&:fee_money).exchange_to(currency)
   end
 
   def balance
     Money.new balance_float * 100, currency
+  end
+
+  def fees
+    Money.new fees_float * 100, currency
   end
 
   def de_donation_revenue_money
