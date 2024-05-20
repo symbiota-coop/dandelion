@@ -1028,7 +1028,7 @@ class Event
   end
 
   def dandelion_revenue
-    organisation_discounted_ticket_revenue(skip_transferred: true) + donation_revenue(skip_transferred: true) - credit_applied
+    organisation_discounted_ticket_revenue(skip_transferred: true) + donation_revenue(skip_transferred: true) - (credit_applied - credit_payable_to_revenue_sharer)
   end
 
   def stripe_revenue
