@@ -11,6 +11,7 @@ class Donation
   field :currency, type: String
   field :payment_completed, type: Boolean
   field :transferred, type: Boolean
+  index({ transferred: 1 })
 
   def incomplete?
     !payment_completed
