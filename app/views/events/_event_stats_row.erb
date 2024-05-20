@@ -173,7 +173,7 @@
           <%= stripe.split(' from ').first %> from <a <% if stripe_charges.count > 0 %> class="text-white font-weight-bold" <% end %> href="/events/<%=event.id%>/stripe_charges"><%= stripe.split(' from ').last %></a>
           <% if stripe_charges_transferred.count > 0 %>
             +
-            <%= stripe_transferred.split(' from ').first %> from <a class="text-white font-weight-bold" href="/events/<%=event.id%>/stripe_charges"><%= stripe_transferred.split(' from ').last %></a>
+            <%= stripe_transferred.split(' from ').first %> from <a <% if stripe_charges.count > 0 %> class="text-white font-weight-bold" <% end %> href="/events/<%=event.id%>/stripe_charges"><%= stripe_transferred.split(' from ').last %></a>
           <% end %>
         </td>
         <!-- Stripe fees -->
@@ -192,6 +192,7 @@
         <!-- Allocated to facilitator = Profit * profit_share_facilitator -->
         <td>
           <% if !event.revenue_sharer %>
+            <%= "#{event.profit_share_to_facilitator}%" %><br />
             <%= m event.profit_to_facilitator, event.currency %>
           <% end %>
         </td>
