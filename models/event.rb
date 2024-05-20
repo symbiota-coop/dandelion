@@ -1001,17 +1001,18 @@ class Event
     Money.new(0, ENV['DEFAULT_CURRENCY'])
   end
 
-  def donation_revenue
+  def donation_revenue(skip_transferred: false)
     r = Money.new(0, currency)
+    donations = skip_transferred ? self.donations.and(:transferred.ne => true) : self.donations
     donations.each { |donation| r += Money.new((donation.amount || 0) * 100, donation.currency) }
     r
   rescue Money::Bank::UnknownRate, Money::Currency::UnknownCurrency
     Money.new(0, ENV['DEFAULT_CURRENCY'])
   end
 
-  def organisation_discounted_ticket_revenue(skip_transfers: false)
+  def organisation_discounted_ticket_revenue(skip_transferred: false)
     r = Money.new(0, currency)
-    tickets = skip_transfers ? self.tickets.and(:transferred.ne => true) : self.tickets
+    tickets = skip_transferred ? self.tickets.and(:transferred.ne => true) : self.tickets
     tickets.complete.each { |ticket| r += Money.new((ticket.discounted_price || 0) * 100 * (ticket.organisation_revenue_share || 1), ticket.currency) }
     r
   rescue Money::Bank::UnknownRate, Money::Currency::UnknownCurrency
@@ -1027,7 +1028,7 @@ class Event
   end
 
   def dandelion_revenue
-    organisation_discounted_ticket_revenue(skip_transfers: true) + donation_revenue - credit_applied
+    organisation_discounted_ticket_revenue(skip_transferred: true) + donation_revenue(skip_transferred: true) - credit_applied
   end
 
   def stripe_revenue

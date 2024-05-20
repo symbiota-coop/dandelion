@@ -13,6 +13,7 @@
   <thead>
     <tr>
       <th>Name</th>
+      <th>Charge ID</th>
       <th>Description</th>
       <th>Original amount</th>
       <th>Application fee</th>
@@ -25,10 +26,13 @@
   <tr>
     <td>
       <% if stripe_charge.account %>
-        <%= partial :'accounts/account', locals: { account: stripe_charge.account, show_email: ((defined?(show_emails) && show_emails) || stripe_charge_email_viewer?(stripe_charge)) } %>
+        <%= partial :'accounts/account', locals: { account: stripe_charge.account, show_email: (defined?(show_emails) && show_emails) } %>
       <% else %>
         <em class="text-muted">(deleted account)</em>
       <% end %>
+    </td>
+    <td>
+      <%= stripe_charge.id %>
     </td>
     <td>
       <%= stripe_charge.description.split(':').last %>
@@ -51,7 +55,7 @@
     </td>
     <td>
       <% if stripe_charge.order %>
-        <a href="/events/<%= @event.id %>/orders"><%= stripe_charge.order.account ? stripe_charge.order.account.name : '(deleted account)' %> on <%= stripe_charge.order.created_at.to_date %></a>
+        <a href="/events/<%= stripe_charge.order.event_id %>/orders"><%= stripe_charge.order.account ? stripe_charge.order.account.name : '(deleted account)' %> on <%= stripe_charge.order.created_at.to_date %></a>
         <% if stripe_charge.order.transferred? %>
           <span class="label label-default">Transferred</span>
         <% end %>

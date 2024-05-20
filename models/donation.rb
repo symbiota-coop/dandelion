@@ -10,6 +10,7 @@ class Donation
   field :amount, type: Float
   field :currency, type: String
   field :payment_completed, type: Boolean
+  field :transferred, type: Boolean
 
   def incomplete?
     !payment_completed

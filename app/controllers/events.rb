@@ -377,6 +377,7 @@ Dandelion::App.controller do
       ticket.update_attribute(:ticket_type, nil)
     end
     @order.donations.each do |donation|
+      donation.update_attribute(:transferred, true)
       donation.update_attribute(:event, new_event)
     end
     @order.send_tickets
