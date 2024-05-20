@@ -164,11 +164,11 @@
         </td>
         <!-- Revenue reported by Stripe -->
         <% 
-        stripe_charges = event.stripe_charges.and(:order_id.nin => Order.and(transferred: true).pluck(:id)).select { |stripe_charge| stripe_charge.balance > 0 }
+        stripe_charges = event.stripe_charges.and(:balance_float.gt => 0, :order_id.nin => Order.and(transferred: true).pluck(:id))
         stripe_charges_money = stripe_charges.sum(&:balance)
         stripe = "#{m stripe_charges_money, event.currency} from #{pluralize(stripe_charges.count, 'Stripe charge')}"
         
-        stripe_charges_transferred = event.stripe_charges.and(:order_id.in => Order.and(transferred: true).pluck(:id)).select { |stripe_charge| stripe_charge.balance > 0 }
+        stripe_charges_transferred = event.stripe_charges.and(:balance_float.gt => 0, :order_id.in => Order.and(transferred: true).pluck(:id))
         stripe_charges_transferred_money = stripe_charges_transferred.sum(&:balance)
         stripe_transferred = "#{m stripe_charges_transferred_money, event.currency} from #{pluralize(stripe_charges_transferred.count, 'transferred charge')}"
         
