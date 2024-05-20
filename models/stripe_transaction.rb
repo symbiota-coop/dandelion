@@ -99,7 +99,7 @@ class StripeTransaction
                  transaction[f]
                end
       end
-      puts t.created_utc
+      puts t['created_utc']
       organisation.stripe_transactions.create!(t)
     end
   end
