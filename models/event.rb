@@ -1009,8 +1009,9 @@ class Event
     Money.new(0, ENV['DEFAULT_CURRENCY'])
   end
 
-  def organisation_discounted_ticket_revenue
+  def organisation_discounted_ticket_revenue(skip_transfers: false)
     r = Money.new(0, currency)
+    tickets = skip_transfers ? self.tickets.and(:transferred.ne => true) : self.tickets
     tickets.complete.each { |ticket| r += Money.new((ticket.discounted_price || 0) * 100 * (ticket.organisation_revenue_share || 1), ticket.currency) }
     r
   rescue Money::Bank::UnknownRate, Money::Currency::UnknownCurrency
@@ -1026,7 +1027,7 @@ class Event
   end
 
   def dandelion_revenue
-    organisation_discounted_ticket_revenue + donation_revenue
+    organisation_discounted_ticket_revenue(skip_transfers: true) + donation_revenue - credit_applied
   end
 
   def stripe_revenue
@@ -1055,6 +1056,10 @@ class Event
 
   def self.profit_share_roles
     %w[facilitator coordinator social_media category_steward]
+  end
+
+  Event.profit_share_roles.each do |role|
+    Event.all.set("profit_share_to_#{role}" => 0)
   end
 
   def allocations_to_roles
@@ -1087,6 +1092,14 @@ class Event
     define_method "profit_to_#{role}" do
       profit_less_donations * send("profit_share_to_#{role}") / revenue_share_to_organisation
     end
+  end
+
+  def credit_applied
+    r = Money.new(0, currency)
+    orders.each { |order| r += Money.new((order.credit_applied || 0) * 100, order.currency) }
+    r
+  rescue Money::Bank::UnknownRate, Money::Currency::UnknownCurrency
+    Money.new(0, ENV['DEFAULT_CURRENCY'])
   end
 
   def credit_payable_to_revenue_sharer

@@ -301,7 +301,7 @@ class Organisation
   def contributable_events
     events.and(:draft.ne => true, :id.in =>
       Order.complete.and(:value.gt => 0, :event_id.in => events.pluck(:id)).pluck(:event_id) +
-      events.where(:id.nin => TicketType.pluck(:event_id)).pluck(:id))
+      events.and(:id.nin => TicketType.pluck(:event_id)).pluck(:id))
   end
 
   def self.contribution_requested_per_event_gbp
