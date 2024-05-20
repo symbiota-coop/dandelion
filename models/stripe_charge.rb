@@ -93,11 +93,13 @@ class StripeCharge
   end
 
   def calculate_balance
-    stripe_transactions.sum(&:gross_money).exchange_to(currency)
+    m = stripe_transactions.sum(&:gross_money)
+    m > 0 ? m.exchange_to(currency) : Money.new(0, currency)
   end
 
   def calculate_fees
-    stripe_transactions.sum(&:fee_money).exchange_to(currency)
+    m = stripe_transactions.sum(&:fee_money)
+    m > 0 m.exchange_to(currency) : Money.new(0, currency)
   end
 
   def balance
