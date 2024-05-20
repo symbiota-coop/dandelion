@@ -164,10 +164,10 @@
         </td>
         <!-- Revenue reported by Stripe -->
         <% 
-        stripe_charges = event.stripe_charges.select { |stripe_charge| !stripe_charge.order.transferred && stripe_charge.balance > 0 }
+        stripe_charges = event.stripe_charges.and(:order_id.nin => Order.and(transferred: true).pluck(:id)).select { |stripe_charge| stripe_charge.balance > 0 }
         stripe = "#{m(stripe_charges.sum(&:balance), event.currency)} from #{pluralize(stripe_charges.count, 'Stripe charge')}" %>
         <%
-        stripe_charges_transferred = event.stripe_charges.select { |stripe_charge| stripe_charge.order.transferred && stripe_charge.balance > 0 }
+        stripe_charges_transferred = event.stripe_charges.and(:order_id.in => Order.and(transferred: true).pluck(:id)).select { |stripe_charge| stripe_charge.balance > 0 }
         stripe_transferred = "#{m(stripe_charges_transferred.sum(&:balance), event.currency)} from #{pluralize(stripe_charges_transferred.count, 'transferred charge')}" %>
         <td class="<%= if dandelion.split(' ')[0..-3].join == stripe.split(' ')[0..-3].join; 'bg-success'; elsif event.end_time.to_date < Date.today; 'bg-warning'; end %>">
           <%= stripe.split(' from ').first %> from <a class="text-white font-weight-bold" href="/events/<%=event.id%>/stripe_charges"><%= stripe.split(' from ').last %></a>
