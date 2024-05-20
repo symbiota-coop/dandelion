@@ -1,4 +1,4 @@
-<% stripe_charges = stripe_charges.order('created_at desc')
+<% stripe_charges = stripe_charges.order('created desc')
    stripe_charges = stripe_charges.paginate(page: params[:page], per_page: 50) %>
 
 <p><%== pagination_details stripe_charges, model: 'Charge' %></p>
