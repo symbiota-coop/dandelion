@@ -52,6 +52,9 @@
     <td>
       <% if stripe_charge.order %>
         <a href="/events/<%= @event.id %>/orders"><%= stripe_charge.order.account ? stripe_charge.order.account.name : '(deleted account)' %> on <%= stripe_charge.order.created_at.to_date %></a>
+        <% if stripe_charge.order.transferred? %>
+          <span class="label label-default">Transferred</span>
+        <% end %>
       <% end %>
     </td>
     <td data-sort="<%= stripe_charge.created.iso8601 %>">
