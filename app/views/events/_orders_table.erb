@@ -103,6 +103,9 @@
       <% if order.transferred? %>
         <span class="label label-default">Transferred</span>
       <% end %>
+      <% if order.credit_applied %>
+        <span class="label label-default"><%= m order.credit_applied, order.currency %> credit applied</span>
+      <% end %>
       <% if order.credit_payable_to_revenue_sharer %>
         <span class="label label-default"><%= m order.credit_payable_to_revenue_sharer, order.currency %> credit due</span>
       <% end %>
