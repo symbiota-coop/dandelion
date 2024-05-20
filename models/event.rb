@@ -1058,10 +1058,6 @@ class Event
     %w[facilitator coordinator social_media category_steward]
   end
 
-  Event.profit_share_roles.each do |role|
-    Event.all.set("profit_share_to_#{role}" => 0)
-  end
-
   def allocations_to_roles
     allocations = Money.new(0, currency)
     Event.profit_share_roles.each do |role|
