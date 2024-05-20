@@ -51,6 +51,8 @@ namespace :organisations do
       organisation.transfer_events
       organisation.transfer_charges
       organisation.transfer_transactions
+      StripeCharge.transfer(organisation)
+      StripeTransaction.transfer(organisation)
     end
   end
 end
