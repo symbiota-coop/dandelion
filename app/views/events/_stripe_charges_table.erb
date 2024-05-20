@@ -39,12 +39,12 @@
       <%= stripe_charge.description.split(':').last %>
     </td>
     <td>
+      <%= m stripe_charge.amount/100.0, stripe_charge.currency %>
+    </td>
+    <td>
       <% if stripe_charge.application_fee_amount %>
         <%= m (stripe_charge.amount - stripe_charge.application_fee_amount)/100.0, stripe_charge.currency %>
       <% end %>
-    </td>
-    <td>
-      <%= m stripe_charge.amount/100.0, stripe_charge.currency %>
     </td>
     <td>
       <% if stripe_charge.application_fee_amount %>
