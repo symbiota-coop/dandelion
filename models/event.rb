@@ -285,7 +285,7 @@ class Event
     errors.add(:revenue_sharer, 'or organiser must be set for this organisation') if organisation && organisation.require_organiser_or_revenue_sharer && !revenue_sharer && !organiser
     errors.add(:revenue_sharer, 'is not connected to this organisation') if revenue_sharer && !revenue_sharer_organisationship
     self.location = 'Online' if location && location.downcase == 'online'
-    errors.add(:revenue_share_to_revenue_sharer, 'must be between 1 and 100') if revenue_share_to_revenue_sharer && (revenue_share_to_revenue_sharer < 1 || revenue_share_to_revenue_sharer > 100)
+    # errors.add(:revenue_share_to_revenue_sharer, 'must be between 1 and 100') if revenue_share_to_revenue_sharer && (revenue_share_to_revenue_sharer < 1 || revenue_share_to_revenue_sharer > 100)
     errors.add(:affiliate_credit_percentage, 'must be between 1 and 100') if affiliate_credit_percentage && (affiliate_credit_percentage < 1 || affiliate_credit_percentage > 100)
     errors.add(:capacity, 'must be greater than 0') if capacity && capacity.zero?
     errors.add(:suggested_donation, 'cannot be less than the minimum donation') if suggested_donation && minimum_donation && suggested_donation < minimum_donation
