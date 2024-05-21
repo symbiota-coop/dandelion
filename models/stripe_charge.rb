@@ -119,7 +119,7 @@ class StripeCharge
   end
 
   def donations
-    if application_fee_amount
+    if application_fee_amount && application_fee_amount > 0
       balance > 0 ? de_donation_revenue_money * (balance / application_fee_amount_money) : Money.new(0, currency)
     else
       [de_donation_revenue_money, balance].min
