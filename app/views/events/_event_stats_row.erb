@@ -209,9 +209,12 @@
               <%= m event.send("profit_to_#{role}"), event.currency %>
               <br />
               <br />
-              <%= m event.send("paid_to_#{role}"), event.currency %> paid
-              <br />
-              <%= m event.send("remaining_to_#{role}"), event.currency %> remaining
+              <div class="p-1">
+                <%= m event.send("paid_to_#{role}"), event.currency %> paid
+              </div>
+              <div class="p-1<% overpaid = nil; if event.send("remaining_to_#{role}") > 0 %> bg-warning <% elsif event.send("remaining_to_#{role}") < 0; overpaid = true %> bg-danger <% end %>">
+                <%= m event.send("remaining_to_#{role}").abs, event.currency %> <%= overpaid ? 'overpaid' : 'remaining' %>
+              </div>
             </td>
           <% end %>
         <% end %>
