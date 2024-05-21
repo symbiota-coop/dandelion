@@ -1105,7 +1105,7 @@ class Event
   end
 
   def profit_share_to_organisation
-    100 - Event.profit_share_roles.inject(0) { |sum, r| sum + send("profit_share_to_#{r}") }
+    revenue_share_to_organisation - Event.profit_share_roles.inject(0) { |sum, r| sum + send("profit_share_to_#{r}") }
   end
 
   def credit_applied
