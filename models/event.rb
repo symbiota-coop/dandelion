@@ -58,6 +58,7 @@ class Event
   field :profit_share_to_coordinator, type: Integer
   field :profit_share_to_social_media, type: Integer
   field :profit_share_to_category_steward, type: Integer
+  field :stripe_revenue_adjustment, type: Float
 
   def self.admin_fields
     {
@@ -1046,7 +1047,7 @@ class Event
   end
 
   def stripe_profit
-    stripe_revenue - stripe_fees
+    stripe_revenue - stripe_fees + Money.new(stripe_revenue_adjustment * 100, currency)
   end
 
   def profit

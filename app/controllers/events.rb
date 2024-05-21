@@ -186,7 +186,7 @@ Dandelion::App.controller do
         discounted_ticket_revenue: @event.discounted_ticket_revenue.cents.to_f / 100,
         organisation_discounted_ticket_revenue: @event.organisation_discounted_ticket_revenue.cents.to_f / 100,
         donation_revenue: @event.donation_revenue.cents.to_f / 100,
-        organisation_revenue_share: @event.organisation_revenue_share
+        organisation_revenue_share: (@event.organisation_revenue_share if @event.organisation_revenue_share < 1)
       }.to_json
     when :ics
       @event.ical.to_ical
