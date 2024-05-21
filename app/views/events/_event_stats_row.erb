@@ -195,40 +195,22 @@
         <td>
           <%= m event.profit_less_donations, event.currency %>
         </td>
-        <!-- Allocated to facilitator = Profit * profit_share_facilitator -->
-        <td>
-          <% if !event.revenue_sharer %>
-            <%= "#{event.profit_share_to_facilitator}%" %><br />
-            <%= m event.profit_to_facilitator, event.currency %>
-          <% end %>
-        </td>
-        <!-- Allocated to coordinator = Profit * profit_share_coordinator -->
-        <td>
-          <% if event.revenue_sharer %>
-            <%= "#{event.profit_share_to_coordinator}/#{event.revenue_share_to_organisation}" %><br />
-          <% else %>
-            <%= "#{event.profit_share_to_coordinator}%" %><br />
-          <% end %>
-          <%= m event.profit_to_coordinator, event.currency %>
-        </td>
-        <!-- Allocated to social media = Profit * profit_share_social_media -->
-        <td>
-          <% if event.revenue_sharer %>
-            <%= "#{event.profit_share_to_social_media}/#{event.revenue_share_to_organisation}" %><br />
-          <% else %>
-            <%= "#{event.profit_share_to_social_media}%" %><br />
-          <% end %>
-          <%= m event.profit_to_social_media, event.currency %>
-        </td>
-        <!-- Allocated to category steward = Profit * profit_share_category_steward -->
-        <td>
-          <% if event.revenue_sharer %>
-            <%= "#{event.profit_share_to_category_steward}/#{event.revenue_share_to_organisation}" %><br />
-          <% else %>
-            <%= "#{event.profit_share_to_category_steward}%" %><br />
-          <% end %>
-          <%= m event.profit_to_category_steward, event.currency %>
-        </td>
+        <% Event.profit_share_roles.each do |role| %>
+          <!-- Allocated to <%= role %> = Profit * profit_share_<%= role %> -->
+          <td>
+            <% if event.revenue_sharer %>
+              <%= "#{event.send("profit_share_to_#{role}")}/#{event.revenue_share_to_organisation}" %><br />
+            <% else %>
+              <%= "#{event.send("profit_share_to_#{role}")}%" %><br />
+            <% end %>
+            <%= m event.send("profit_to_#{role}"), event.currency %>
+            <br />
+            <br />
+            <%= m event.send("paid_to_#{role}"), event.currency %> paid
+            <br />
+            <%= m event.send("remaining_to_#{role}"), event.currency %> remaining
+          </td>
+        <% end %>
         <!-- Profit less donations, after allocations -->
         <td>
           <%= m event.profit_less_donations_less_allocations, event.currency %>
@@ -238,18 +220,10 @@
           <%= m event.profit_less_allocations, event.currency %>
         </td>
 
-
       <% else %>
-        <td></td>
-        <td></td>
-        <td></td>
-        <td></td>
-
-        <td></td>
-        <td></td>
-        <td></td>
-        <td></td>
-        <td></td>
+        <% 12.times do %>
+          <td></td>
+        <% end %>
       <% end %>
 
 

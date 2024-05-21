@@ -1,0 +1,38 @@
+<%= partial :'events/nav', locals: { event: @event } %>
+
+<div class="mb-3">
+  <a class="btn btn-primary" href="javascript:;" onclick="$(this).hide().next().show()"><i class="fa fa-plus-circle"></i> Add payment</a>
+  <% form_for :rpayment, "/events/#{@event.id}/rpayments/new", style: 'display: none' do |f| %>
+    <%= f.lookup_block :receiver_id, lookup_url: '/accounts.json', placeholder: 'Search accounts' %>
+    <%= f.select_block :role, options: Rpayment.roles.map { |role| [role.gsub('_',' '), role] } %>
+    <%= f.number_block :amount %>
+    <%= f.select_block :currency %>
+    <%= f.submit_block button_text: 'Create payment' %>
+  <% end %>
+</div>
+
+<table class="table">
+  <thead>
+    <tr>
+      <th>Paid to</th>
+      <th>Role</th>
+      <th>Amount</th>
+      <th>Paid by</th>
+      <th>Paid on</th>
+      <th></th>
+    </thead>
+    <% @rpayments.each { |rpayment| %>
+    <tr>
+      <td>
+        <%= partial :'accounts/account', locals: { account: rpayment.receiver, show_email: true } %>
+      </td>
+      <td><%=rpayment.role.gsub('_',' ')%></td>
+      <td><%=m rpayment.amount, rpayment.currency %></td>
+      <td><%==rpayment.payer ? %{<a href="/u/#{rpayment.payer.username}">#{rpayment.payer.name}</a>} : '<em>(deleted account)</em>' %></td>
+      <td><%=rpayment.created_at%></td>
+      <td>
+        <a href="/events/<%=@event.id%>/rpayments/<%=rpayment.id%>/destroy" class="btn btn-danger"><i class="fa fa-times"></i></a>
+      </td>
+    </tr>
+    <% } %>
+  </table>

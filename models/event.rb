@@ -150,6 +150,8 @@ class Event
 
   has_many :stripe_charges
 
+  has_many :rpayments, dependent: :destroy
+
   has_many :posts, as: :commentable, dependent: :destroy
   has_many :subscriptions, as: :commentable, dependent: :destroy
   has_many :comments, as: :commentable, dependent: :destroy
@@ -285,7 +287,7 @@ class Event
     errors.add(:revenue_sharer, 'or organiser must be set for this organisation') if organisation && organisation.require_organiser_or_revenue_sharer && !revenue_sharer && !organiser
     errors.add(:revenue_sharer, 'is not connected to this organisation') if revenue_sharer && !revenue_sharer_organisationship
     self.location = 'Online' if location && location.downcase == 'online'
-    # errors.add(:revenue_share_to_revenue_sharer, 'must be between 1 and 100') if revenue_share_to_revenue_sharer && (revenue_share_to_revenue_sharer < 1 || revenue_share_to_revenue_sharer > 100)
+    errors.add(:revenue_share_to_revenue_sharer, 'must be between 1 and 100') if revenue_share_to_revenue_sharer && revenue_share_to_revenue_sharer != 0 && (revenue_share_to_revenue_sharer < 1 || revenue_share_to_revenue_sharer > 100)
     errors.add(:affiliate_credit_percentage, 'must be between 1 and 100') if affiliate_credit_percentage && (affiliate_credit_percentage < 1 || affiliate_credit_percentage > 100)
     errors.add(:capacity, 'must be greater than 0') if capacity && capacity.zero?
     errors.add(:suggested_donation, 'cannot be less than the minimum donation') if suggested_donation && minimum_donation && suggested_donation < minimum_donation
@@ -1082,6 +1084,15 @@ class Event
     Event.profit_share_roles.each do |role|
       errors.add(:"profit_share_to_#{role}", 'must be between 0% and 100%') if send("profit_share_to_#{role}") < 0 || send("profit_share_to_#{role}") > 100
       errors.add(:"profit_share_to_#{role}", "along with other profit shares must not be greater than #{revenue_share_to_organisation}%") if Event.profit_share_roles.inject(0) { |sum, r| sum + send("profit_share_to_#{r}") } > revenue_share_to_organisation
+    end
+  end
+
+  Event.profit_share_roles.each do |role|
+    define_method "paid_to_#{role}" do
+      rpayments.and(role: role).sum(&:amount_money)
+    end
+    define_method "remaining_to_#{role}" do
+      send("profit_to_#{role}") - send("paid_to_#{role}")
     end
   end
 

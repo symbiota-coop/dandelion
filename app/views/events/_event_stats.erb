@@ -90,26 +90,15 @@
         <th>Profit</th>
 
         <th>Profit less donations, before allocations</th>
-        <th>Allocated to facilitator</th>
-        <th>Allocated to coordinator</th>
-        <th>Allocated to social media</th>
-        <th>Allocated to category steward</th>
+        <% Event.profit_share_roles.each do |role| %>
+          <th>Allocated to <%= role.gsub('_',' ') %></th>
+        <% end %>
         <th>Profit less donations, after allocations</th>
         <th>Profit including donations, after allocations</th>
       <% else %>
-        <th class="hide"></th>
-        <th class="hide"></th>
-        <th class="hide"></th>
-        <th class="hide"></th>
-        <th class="hide"></th>
-
-        <th class="hide"></th>
-        <th class="hide"></th>
-        <th class="hide"></th>
-        <th class="hide"></th>
-        <th class="hide"></th>
-        <th class="hide"></th>
-        <th class="hide"></th>
+        <% 12.times do %>
+          <th class="hide"></th>
+        <% end %>
       <% end %>
       <th>Credit due</th>
       <th>Feedback</th>
@@ -146,33 +135,13 @@
         <% end %>
         <th></th>
         <% if organisation.stripe_client_id %>
-          <th></th>
-          <th></th>
-          <th></th>
-          <th></th>
-          <th></th>
-
-          <th></th>
-          <th></th>
-          <th></th>
-          <th></th>
-          <th></th>
-          <th></th>
-          <th></th>
+          <% 12.times do %>
+            <th></th>
+          <% end %>
         <% else %>
-          <th></th>
-          <th></th>
-          <th></th>
-          <th></th>
-          <th></th>
-
-          <th></th>
-          <th></th>
-          <th></th>
-          <th></th>
-          <th></th>
-          <th></th>
-          <th></th>
+          <% 12.times do %>
+            <th></th>
+          <% end %>
         <% end %>
         <th></th>
         <th></th>

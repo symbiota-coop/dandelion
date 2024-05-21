@@ -332,6 +332,9 @@ class Account
 
   has_one :account_cache, dependent: :destroy
 
+  has_many :rpayments_as_payer, class_name: 'Rpayment', inverse_of: :payer, dependent: :nullify
+  has_many :rpayments_as_receiver, class_name: 'Rpayment', inverse_of: :receiver, dependent: :nullify
+
   has_many :stripe_charges
 
   has_many :nfts, dependent: :nullify

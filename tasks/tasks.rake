@@ -53,10 +53,10 @@ namespace :organisations do
       organisation.transfer_transactions
       StripeCharge.transfer(organisation)
       StripeTransaction.transfer(organisation)
-      StripeCharge.and(:id.in => StripeTransaction.and(:created_at.gt => 1.day.ago).pluck(:stripe_charge_id)).each do |stripe_charge|
-        stripe_charge.set(balance_float: stripe_charge.calculate_balance)
-        stripe_charge.set(fees_float: stripe_charge.calculate_fees)
-      end
+    end
+    StripeCharge.and(:id.in => StripeTransaction.and(:created_at.gt => 1.day.ago).pluck(:stripe_charge_id)).each do |stripe_charge|
+      stripe_charge.set(balance_float: stripe_charge.calculate_balance)
+      stripe_charge.set(fees_float: stripe_charge.calculate_fees)
     end
   end
 end

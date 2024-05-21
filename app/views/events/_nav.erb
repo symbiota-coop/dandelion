@@ -21,6 +21,7 @@
           ([%(Orders <span class="badge badge-primary">#{event.orders.count}</span>), "/events/#{event.id}/orders"] if event.orders.count.positive?),
           ([%(Tickets <span class="badge badge-primary">#{event.tickets.count}</span>), "/events/#{event.id}/tickets"] if event.ticket_types.count.positive? || event.tickets.count.positive?),
           ([%(Donations <span class="badge badge-primary">#{event.donations.count}</span>), "/events/#{event.id}/donations"] if event.donations.count.positive?),
+          ([%(Payments <span class="badge badge-primary">#{event.rpayments.count}</span>), "/events/#{event.id}/rpayments"] if event.organisation.stripe_client_id),
           ([%(Waitlist <span class="badge badge-primary">#{event.waitships.count}</span>), "/events/#{event.id}/waitlist"] if event.waitships.count.positive?),
           ([%(Feedback <span class="badge badge-primary">#{event.event_feedbacks.count}</span>), "/events/#{event.id}/feedback"] if event.event_feedbacks.count.positive?),
           (['Preview confirmation email', "/events/#{event.id}/ticket_email"] if event.ticket_types.count.positive?),
