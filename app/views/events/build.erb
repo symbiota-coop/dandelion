@@ -42,7 +42,7 @@
             $('#event-build-nav a[href="#' + $(tabPane).next().attr('id') + '"]').tab('show')
           })
         })
-        $('#tab7').find('a.next').remove()
+        $('.tab-pane:last').find('a.next').remove()
     <% end %>
 
     $('#event_start_time').siblings('small').text("<%==js_escape_html "in #{Time.zone.now.strftime('%Z')} (UTC #{Time.zone.now.formatted_offset})" %> (your profile's time zone)")
@@ -134,6 +134,9 @@
     <li role="presentation" class="nav-item"><a class="nav-link" href="#tab5" role="tab" data-toggle="tab">Donations</a></li>
     <li role="presentation" class="nav-item"><a class="nav-link" href="#tab6" role="tab" data-toggle="tab">Labels</a></li>
     <li role="presentation" class="nav-item"><a class="nav-link" href="#tab7" role="tab" data-toggle="tab">Everything else</a></li>
+    <% if @event.organisation.stripe_client_id %>
+      <li role="presentation" class="nav-item"><a class="nav-link" href="#tab8" role="tab" data-toggle="tab">Revenue</a></li>
+    <% end %>
   </ul>
   <div class="container">
     <div class="tab-content mt-3">
@@ -150,24 +153,6 @@
         <%= f.lookup_block :coordinator_id, lookup_url: '/accounts.json', placeholder: 'Search accounts', selected_link: (%(<a class="d-inline-block mt-1" target="_blank" href="/u/#{@event.coordinator.username}">View account</a>) if @event.coordinator) %>
         <% if Padrino.env == :development || @event.organisation.verified? %>
           <%= f.lookup_block :organiser_id, lookup_url: '/accounts.json', placeholder: 'Search accounts', selected_link: (%(<a class="d-inline-block mt-1" target="_blank" href="/u/#{@event.organiser.username}">View account</a>) if @event.organiser_id) %>
-        <% end %>
-        <% if @event.organisation.stripe_client_id %>
-          <%= f.lookup_block :revenue_sharer_id, lookup_url: '/accounts.json', placeholder: 'Search accounts', selected_link: (%(<a class="d-inline-block mt-1" target="_blank" href="/u/#{@event.revenue_sharer.username}">View account</a>) if @event.revenue_sharer_id) %>
-          <script>
-            $(function () {
-              $('#event_revenue_sharer_id').change(function () {
-                if ($(this).val().length > 0) {
-                  $('#revenue-share').show()
-                } else {
-                  $('#revenue-share').hide()
-                }
-              })
-              $('#event_revenue_sharer_id').change()
-            })
-          </script>
-          <div id="revenue-share">
-            <%= f.number_block :revenue_share_to_revenue_sharer %>
-          </div>
         <% end %>
 
         <script>
@@ -337,7 +322,7 @@
               </div>
             <% end %>
 
-            <% if @event.new_record? %>
+            <% if !@event.organisation.stripe_client_id && @event.new_record? %>
               <script>
                 $(function() {
                   $('#build-event').submit(function() {
@@ -348,6 +333,46 @@
               <%= f.submit_block %>
             <% end %>
           </div>
+          <% if @event.organisation.stripe_client_id %>
+            <div role="tabpanel" class="tab-pane" id="tab8">
+              <%= f.lookup_block :revenue_sharer_id, lookup_url: '/accounts.json', placeholder: 'Search accounts', selected_link: (%(<a class="d-inline-block mt-1" target="_blank" href="/u/#{@event.revenue_sharer.username}">View account</a>) if @event.revenue_sharer_id) %>
+              <script>
+                $(function () {
+                  $('#event_revenue_sharer_id').change(function () {
+                    if ($(this).val().length > 0) {
+                      $('#revenue-share').show()
+                    } else {
+                      $('#revenue-share').hide()
+                    }
+                  })
+                  $('#event_revenue_sharer_id').change()
+
+                  $('#event_revenue_share_to_revenue_sharer, #event_profit_share_to_facilitator, #event_profit_share_to_coordinator, #event_profit_share_to_category_steward, #event_profit_share_to_social_media')
+                  .wrap('<div class="input-group w-25"></div>')
+                  .after('<div class="input-group-append"><span class="input-group-text">%</span></div>')
+                })
+              </script>
+              <div id="revenue-share">
+                <%= f.text_block :revenue_share_to_revenue_sharer %>
+              </div>
+              <%= f.number_block :profit_share_to_facilitator %>
+              <%= f.number_block :profit_share_to_coordinator %>
+              <%= f.number_block :profit_share_to_category_steward %>
+              <%= f.number_block :profit_share_to_social_media %>
+              <%= f.number_block :stripe_revenue_adjustment %>
+
+              <% if @event.new_record? %>
+                <script>
+                  $(function() {
+                    $('#build-event').submit(function() {
+                      $(this).find('button[type=submit]').prop('disabled', true)
+                    })
+                  })
+                </script>
+                <%= f.submit_block %>
+              <% end %>
+            </div>
+          <% end %>
         </div>
         <% if @event.persisted? %>
           <%= f.submit_block %>

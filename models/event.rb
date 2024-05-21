@@ -56,8 +56,8 @@ class Event
   field :revenue_share_to_revenue_sharer, type: Integer
   field :profit_share_to_facilitator, type: Integer
   field :profit_share_to_coordinator, type: Integer
-  field :profit_share_to_social_media, type: Integer
   field :profit_share_to_category_steward, type: Integer
+  field :profit_share_to_social_media, type: Integer
   field :stripe_revenue_adjustment, type: Float
 
   def self.admin_fields
@@ -1060,7 +1060,7 @@ class Event
   end
 
   def self.profit_share_roles
-    %w[facilitator coordinator social_media category_steward]
+    %w[facilitator coordinator category_steward social_media]
   end
 
   def allocations_to_roles
