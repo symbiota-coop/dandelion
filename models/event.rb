@@ -1104,6 +1104,10 @@ class Event
     end
   end
 
+  def profit_share_to_organisation
+    100 - Event.profit_share_roles.inject(0) { |sum, r| sum + send("profit_share_to_#{r}") }
+  end
+
   def credit_applied
     r = Money.new(0, currency)
     orders.each { |order| r += Money.new((order.credit_applied || 0) * 100, order.currency) }
