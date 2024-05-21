@@ -7,6 +7,7 @@
     <%= f.select_block :role, options: Rpayment.roles.map { |role| [role.gsub('_',' '), role] } %>
     <%= f.number_block :amount %>
     <%= f.select_block :currency %>
+    <%= f.text_area_block :notes %>
     <%= f.submit_block button_text: 'Create payment' %>
   <% end %>
 </div>
@@ -18,6 +19,7 @@
       <th>Role</th>
       <th>Amount</th>
       <th>Paid by</th>
+      <th>Notes</th>
       <th>Paid on</th>
       <th></th>
     </thead>
@@ -29,6 +31,11 @@
       <td><%=rpayment.role.gsub('_',' ')%></td>
       <td><%=m rpayment.amount, rpayment.currency %></td>
       <td><%==rpayment.payer ? %{<a href="/u/#{rpayment.payer.username}">#{rpayment.payer.name}</a>} : '<em>(deleted account)</em>' %></td>
+      <td>
+        <% if rpayment.notes %>
+          <%== Sanitize.fragment(rpayment.notes.gsub("\n",'<br />'), Sanitize::Config::DANDELION) %>
+        <% end %>
+      </td>
       <td><%=rpayment.created_at%></td>
       <td>
         <a href="/events/<%=@event.id%>/rpayments/<%=rpayment.id%>/destroy" class="btn btn-danger"><i class="fa fa-times"></i></a>

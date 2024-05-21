@@ -9,6 +9,7 @@ class Rpayment
   field :amount, type: Float
   field :currency, type: String
   field :role, type: String
+  field :notes, type: String
 
   def self.roles
     Event.profit_share_roles
@@ -21,7 +22,8 @@ class Rpayment
       receiver_id: :lookup,
       amount: :number,
       currency: :text,
-      role: :select
+      role: :select,
+      notes: :text_area
     }
   end
 
