@@ -279,6 +279,7 @@ class Event
       self.local_group = nil
       self.capacity = nil
     end
+    self.stripe_revenue_adjustment = 0 unless stripe_revenue_adjustment
     self.revenue_share_to_revenue_sharer = 0 unless revenue_share_to_revenue_sharer
     self.revenue_share_to_revenue_sharer = 0 unless revenue_sharer
     self.profit_share_to_facilitator = 0 if revenue_sharer
