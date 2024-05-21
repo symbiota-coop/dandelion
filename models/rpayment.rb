@@ -34,4 +34,11 @@ class Rpayment
   def amount_money
     Money.new amount * 100, currency
   end
+
+  after_save do
+    event.clear_cache if event
+  end
+  after_destroy do
+    event.clear_cache if event
+  end
 end
