@@ -181,7 +181,7 @@
             +
             <%= stripe_transferred.split(' from ').first %> from <a <% if bg_class %> class="text-white font-weight-bold" <% end %> href="/events/<%=event.id%>/stripe_charges"><%= stripe_transferred.split(' from ').last %></a>
           <% end %>
-          <% if event.stripe_revenue_adjustment %>
+          <% if event.stripe_revenue_adjustment && event.stripe_revenue_adjustment != 0 %>
             +
             <%= m event.stripe_revenue_adjustment, event.currency %> adjustment
           <% end %>
