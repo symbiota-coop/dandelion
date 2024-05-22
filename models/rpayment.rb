@@ -3,7 +3,7 @@ class Rpayment
   include Mongoid::Timestamps
 
   belongs_to :event, index: true
-  belongs_to :payer, class_name: 'Account', inverse_of: :rpayments_as_payer, index: true
+  belongs_to :account, index: true
 
   field :amount, type: Float
   field :currency, type: String
@@ -17,7 +17,7 @@ class Rpayment
   def self.admin_fields
     {
       event_id: :lookup,
-      payer_id: :lookup,
+      account_id: :lookup,
       amount: :number,
       currency: :text,
       role: :select,
