@@ -4,7 +4,6 @@ class Rpayment
 
   belongs_to :event, index: true
   belongs_to :payer, class_name: 'Account', inverse_of: :rpayments_as_payer, index: true
-  belongs_to :receiver, class_name: 'Account', inverse_of: :rpayments_as_receiver, index: true
 
   field :amount, type: Float
   field :currency, type: String
@@ -19,7 +18,6 @@ class Rpayment
     {
       event_id: :lookup,
       payer_id: :lookup,
-      receiver_id: :lookup,
       amount: :number,
       currency: :text,
       role: :select,

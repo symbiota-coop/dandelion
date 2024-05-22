@@ -96,9 +96,7 @@
       </abbr>
       <% if order.application_fee_amount %>
         (<%= m ((order.value || 0) - (order.application_fee_amount || 0)), order.currency %> paid<% if order.revenue_sharer %>
-          to
-          <a href="/u/<%= order.revenue_sharer.username %>"><%= order.revenue_sharer.name %></a>
-        <% else %> to revenue sharer)<% end %>
+          to <a href="/u/<%= order.revenue_sharer.username %>"><%= order.revenue_sharer.name %></a><% else %> to revenue sharer<% end %>)
       <% end %>
       <% if order.transferred? %>
         <span class="label label-default">Transferred</span>

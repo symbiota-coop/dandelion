@@ -10,7 +10,7 @@ Dandelion::App.controller do
     @event = Event.find(params[:event_id]) || not_found
     event_admins_only!
     @rpayment = @event.rpayments.new(mass_assigning(params[:rpayment], Rpayment))
-    @rpayment.payer = current_account
+    @rpayment.account = current_account
     if @rpayment.save
       redirect "/events/#{@event.id}/rpayments"
     else
