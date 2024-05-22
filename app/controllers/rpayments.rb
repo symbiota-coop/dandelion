@@ -3,7 +3,7 @@ Dandelion::App.controller do
     @event = Event.find(params[:id]) || not_found
     event_admins_only!
     @rpayments = @event.rpayments.order('created_at desc')
-    @rpayment = @event.rpayments.build
+    @rpayment = @event.rpayments.build(role: params[:role], amount: params[:amount], currency: params[:currency])
     erb :'rpayments/rpayments'
   end
 

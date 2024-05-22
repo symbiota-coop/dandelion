@@ -459,6 +459,13 @@ small.form-text {
   color: $color_muted;
 }
 
+a.bg-warning:hover,
+a.bg-warning:focus,
+button.bg-warning:hover,
+button.bg-warning:focus {
+  background-color: #FF9500 !important
+}
+
 .bg-coinbase {
   background-color: #2D53F1
 }

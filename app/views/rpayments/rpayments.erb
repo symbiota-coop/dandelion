@@ -1,8 +1,10 @@
 <%= partial :'events/nav', locals: { event: @event } %>
 
 <div class="mb-3">
-  <a class="btn btn-primary" href="javascript:;" onclick="$(this).hide().next().show()"><i class="fa fa-plus-circle"></i> Add payment</a>
-  <div style="display: none ">
+  <% unless params[:create] %> 
+    <a class="btn btn-primary" href="javascript:;" onclick="$(this).hide().next().show()"><i class="fa fa-plus-circle"></i> Add payment</a>
+  <% end %>
+  <div <% unless params[:create] %> style="display: none " <% end %>>
     <%= partial :'rpayments/build' %>
   </div>
 </div>
@@ -25,7 +27,7 @@
           <%== Sanitize.fragment(rpayment.notes.gsub("\n",'<br />'), Sanitize::Config::DANDELION) %>
         <% end %>
       </td>
-      <td><%=rpayment.created_at%> by <%==rpayment.account ? %{<a href="/u/#{rpayment.account.username}">#{rpayment.account.name}</a>} : '<em>(deleted account)</em>' %></td>
+      <td><%=rpayment.created_at%><% if rpayment.account%> by <a href="/u/<%=rpayment.account.username%>"><%=rpayment.account.name%></a><% end %></td>
       <td>
         <a href="/events/<%=@event.id%>/rpayments/<%=rpayment.id%>/edit" class="btn btn-primary"><i class="fa fa-pencil"></i></a>
         <a href="/events/<%=@event.id%>/rpayments/<%=rpayment.id%>/destroy" class="btn btn-danger"><i class="fa fa-times"></i></a>
