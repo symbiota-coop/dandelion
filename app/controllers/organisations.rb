@@ -367,6 +367,14 @@ Dandelion::App.controller do
     @events = @events.and(:start_time.lt => @to + 1) if @to
     @events = @events.online if params[:online]
     @events = @events.in_person if params[:in_person]
+    if params[:discrepancy]
+      events_with_discrepancy = @events.select do |event|
+        stripe_charges = event.stripe_charges.and(:balance_float.gt => 0, :order_id.nin => Order.and(transferred: true).pluck(:id))
+        stripe_charges_money = stripe_charges.sum(&:balance)
+        (stripe_charges_money - event.dandelion_revenue).abs.cents >= 100
+      end
+      @events = @events.and(:id.in => events_with_discrepancy.pluck(:id))
+    end
     erb :'organisations/event_stats'
   end
 
