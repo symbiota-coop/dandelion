@@ -2,13 +2,9 @@
 
 <div class="mb-3">
   <a class="btn btn-primary" href="javascript:;" onclick="$(this).hide().next().show()"><i class="fa fa-plus-circle"></i> Add payment</a>
-  <% form_for :rpayment, "/events/#{@event.id}/rpayments/new", style: 'display: none' do |f| %>
-    <%= f.select_block :role, options: Rpayment.roles.map { |role| [role.gsub('_',' '), role] } %>
-    <%= f.number_block :amount %>
-    <%= f.select_block :currency %>
-    <%= f.text_area_block :notes %>
-    <%= f.submit_block button_text: 'Create payment' %>
-  <% end %>
+  <div style="display: none ">
+    <%= partial :'rpayments/build' %>
+  </div>
 </div>
 
 <table class="table">
@@ -31,6 +27,7 @@
       </td>
       <td><%=rpayment.created_at%> by <%==rpayment.account ? %{<a href="/u/#{rpayment.account.username}">#{rpayment.account.name}</a>} : '<em>(deleted account)</em>' %></td>
       <td>
+        <a href="/events/<%=@event.id%>/rpayments/<%=rpayment.id%>/edit" class="btn btn-primary"><i class="fa fa-pencil"></i></a>
         <a href="/events/<%=@event.id%>/rpayments/<%=rpayment.id%>/destroy" class="btn btn-danger"><i class="fa fa-times"></i></a>
       </td>
     </tr>

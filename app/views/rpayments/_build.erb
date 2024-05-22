@@ -1,0 +1,7 @@
+<% form_for :rpayment, @rpayment.new_record? ? "/events/#{@event.id}/rpayments/new" : "/events/#{@event.id}/rpayments/#{@rpayment.id}/edit" do |f| %>
+  <%= f.select_block :role, options: Rpayment.roles.map { |role| [role.gsub('_',' '), role] } %>
+  <%= f.number_block :amount %>
+  <%= f.select_block :currency %>
+  <%= f.text_area_block :notes %>
+  <%= f.submit_block button_text: @rpayment.new_record? ? 'Create payment' : 'Save payment' %>
+<% end %>

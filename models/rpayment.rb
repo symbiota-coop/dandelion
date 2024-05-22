@@ -10,6 +10,8 @@ class Rpayment
   field :role, type: String
   field :notes, type: String
 
+  validates_presence_of :amount, :currency, :role
+
   def self.roles
     Event.profit_share_roles
   end
