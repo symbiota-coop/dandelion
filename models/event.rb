@@ -1100,7 +1100,7 @@ class Event
 
   (Event.profit_share_roles + ['organisation']).each do |role|
     define_method "profit_to_#{role}" do
-      profit_less_donations * send("profit_share_to_#{role}") / revenue_share_to_organisation
+      revenue_share_to_organisation > 0 ? profit_less_donations * send("profit_share_to_#{role}") / revenue_share_to_organisation : Money.new(0, currency)
     end
   end
 
