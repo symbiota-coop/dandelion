@@ -55,7 +55,7 @@
       <%= m stripe_charge.balance, stripe_charge.currency %>
       <% if stripe_charge.balance == 0 %>
         <span class="label label-default">Refunded</span>
-      <% elsif stripe_charge.balance < (stripe_charge.application_fee_amount ? Money.new(stripe_charge.application_fee_amount/100.0, stripe_charge.currency) : Money.new(stripe_charge.amount, stripe_charge.currency)) %>
+      <% elsif stripe_charge.balance < (stripe_charge.application_fee_amount ? Money.new(stripe_charge.application_fee_amount, stripe_charge.currency) : Money.new(stripe_charge.amount, stripe_charge.currency)) %>
         <span class="label label-default">Partial refund</span>
       <% end %>
     </td>
