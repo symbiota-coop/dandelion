@@ -93,7 +93,7 @@ class StripeCharge
         c[f] = charge['metadata'][f]
       end
       puts c['created']
-      organisation.stripe_charges.create!(c)
+      organisation.stripe_charges.create(c)
     end
   end
 
