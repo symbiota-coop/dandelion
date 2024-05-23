@@ -59,7 +59,7 @@ class StripeTransaction
       from = most_recent_stripe_transaction ? most_recent_stripe_transaction.created_utc.to_date + 1 : Date.today - 2
     end
 
-    puts "transferring charges for #{organisation.slug} from #{from} to #{to}"
+    puts "transferring transactions for #{organisation.slug} from #{from} to #{to}"
 
     Stripe.api_key = organisation.stripe_sk
     Stripe.api_version = '2020-08-27'

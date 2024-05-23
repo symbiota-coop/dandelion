@@ -28,6 +28,11 @@ class StripeCharge
   field :balance_float, type: Float
   field :fees_float, type: Float
 
+  before_validation do
+    self.balance_float = 0 unless balance_float
+    self.fees_float = 0 unless fees_float
+  end
+
   def summary
     Money.new(amount, currency).format(no_cents_if_whole: true)
   end
