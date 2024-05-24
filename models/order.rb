@@ -292,22 +292,22 @@ class Order
   def refund
     return unless event.refund_deleted_orders && !prevent_refund && event.organisation && event.organisation.stripe_sk && value && value.positive? && payment_completed && payment_intent
 
-    begin
-      Stripe.api_key = event.organisation.stripe_sk
-      Stripe.api_version = '2020-08-27'
-      pi = Stripe::PaymentIntent.retrieve payment_intent
-      if event.revenue_sharer_organisationship
-        Stripe::Refund.create(
-          charge: pi.charges.first.id,
-          refund_application_fee: true,
-          reverse_transfer: true
-        )
-      else
-        Stripe::Refund.create(charge: pi.charges.first.id)
-      end
-    rescue Stripe::InvalidRequestError
-      true
+    # begin
+    Stripe.api_key = event.organisation.stripe_sk
+    Stripe.api_version = '2020-08-27'
+    pi = Stripe::PaymentIntent.retrieve payment_intent
+    if event.revenue_sharer_organisationship
+      Stripe::Refund.create(
+        charge: pi.charges.first.id,
+        refund_application_fee: true,
+        reverse_transfer: true
+      )
+    else
+      Stripe::Refund.create(charge: pi.charges.first.id)
     end
+    # rescue Stripe::InvalidRequestError
+    #   true
+    # end
   end
 
   def metadata
