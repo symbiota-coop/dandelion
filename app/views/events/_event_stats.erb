@@ -72,21 +72,11 @@
       <th>30d views</th>
       <th data-sum>Tickets sold</th>
       <th>Checked in</th>
+      <th data-money>Ticket revenue</th>
+      <th data-money>Donations</th>
       <% if organisation.stripe_client_id %>
-        <th data-money>Ticket revenue reported by Dandelion</th>
-        <th data-money>Ticket revenue reported by Stripe</th>
-        <th data-money>Donations reported by Dandelion</th>
-      <% else %>
-        <th data-money>Ticket revenue</th>
-        <th data-money></th>
-        <th data-money>Donations</th>
-      <% end %>
-      <% if organisation.stripe_client_id %>
-        <th data-money>Donations reported by Stripe</th>
-        <th data-money>Ticket revenue to revenue sharer, reported by Dandelion</th>
-        <th data-money>Ticket revenue to revenue sharer, reported by Stripe</th>
-        <th data-money>Ticket revenue to organisation, reported by Dandelion</th>
-        <th data-money>Ticket revenue to organisation, reported by Stripe</th>
+        <th data-money>Ticket revenue to revenue sharer</th>
+        <th data-money>Ticket revenue to organisation</th>
         <th data-money>Revenue reported by Dandelion</th>
         <th data-money>Revenue reported by Stripe</th>
         <th data-money>Stripe fees</th>
@@ -99,7 +89,7 @@
         <th data-money>Profit less donations, after allocations</th>
         <th data-money>Profit including donations, after allocations</th>
       <% else %>
-        <% 16.times do %>
+        <% 13.times do %>
           <th class="hide"></th>
         <% end %>
       <% end %>
@@ -132,8 +122,7 @@
         <th></th>
         <th></th>
         <th></th>
-        <th></th>
-        <% 16.times do %>
+        <% 13.times do %>
           <th></th>
         <% end %>
         <th></th>
