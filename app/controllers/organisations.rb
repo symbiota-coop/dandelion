@@ -371,7 +371,7 @@ Dandelion::App.controller do
       events_with_discrepancy = @events.select do |event|
         stripe_charges = event.stripe_charges.and(:balance_float.gt => 0, :order_id.nin => Order.and(transferred: true).pluck(:id))
         stripe_charges_money = stripe_charges.sum(&:balance)
-        (stripe_charges_money - event.dandelion_revenue).abs.cents >= 100
+        (stripe_charges_money - event.revenue).abs.cents >= 100
       end
       @events = @events.and(:id.in => events_with_discrepancy.pluck(:id))
     end

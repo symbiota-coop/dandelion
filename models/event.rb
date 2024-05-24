@@ -1023,6 +1023,15 @@ class Event
     Money.new(0, ENV['DEFAULT_CURRENCY'])
   end
 
+  def revenue_sharer_discounted_ticket_revenue(skip_transferred: false)
+    r = Money.new(0, currency)
+    tickets = skip_transferred ? self.tickets.and(:transferred.ne => true) : self.tickets
+    tickets.complete.each { |ticket| r += Money.new((ticket.discounted_price || 0) * 100 * (1 - (ticket.organisation_revenue_share || 1)), ticket.currency) }
+    r
+  rescue Money::Bank::UnknownRate, Money::Currency::UnknownCurrency
+    Money.new(0, ENV['DEFAULT_CURRENCY'])
+  end
+
   def revenue_share_to_organisation
     100 - revenue_share_to_revenue_sharer
   end
@@ -1031,20 +1040,42 @@ class Event
     revenue_share_to_organisation / 100.0
   end
 
-  def dandelion_revenue
+  def revenue
     organisation_discounted_ticket_revenue(skip_transferred: true) + donation_revenue(skip_transferred: true) - (credit_applied - credit_payable_to_revenue_sharer)
   end
 
+  def ticket_revenue_to_revenue_sharer
+    revenue_sharer_discounted_ticket_revenue(skip_transferred: true)
+  end
+
   def stripe_revenue
-    stripe_charges.sum(&:balance)
+    s = stripe_charges.sum(&:balance)
+    s == 0 ? Money.new(0, currency) : s
   end
 
   def stripe_fees
-    stripe_charges.sum(&:fees)
+    s = stripe_charges.sum(&:fees)
+    s == 0 ? Money.new(0, currency) : s
   end
 
   def stripe_donations
-    stripe_charges.sum(&:donations)
+    s = stripe_charges.sum(&:donations)
+    s == 0 ? Money.new(0, currency) : s
+  end
+
+  def stripe_ticket_revenue
+    s = stripe_charges.sum(&:ticket_revenue)
+    s == 0 ? Money.new(0, currency) : s
+  end
+
+  def stripe_ticket_revenue_to_organisation
+    s = stripe_charges.sum(&:ticket_revenue_to_organisation)
+    s == 0 ? Money.new(0, currency) : s
+  end
+
+  def stripe_ticket_revenue_to_revenue_sharer
+    s = stripe_charges.sum(&:ticket_revenue_to_revenue_sharer)
+    s == 0 ? Money.new(0, currency) : s
   end
 
   def stripe_profit
@@ -1091,7 +1122,8 @@ class Event
 
   Event.profit_share_roles.each do |role|
     define_method "paid_to_#{role}" do
-      rpayments.and(role: role).sum(&:amount_money)
+      s = rpayments.and(role: role).sum(&:amount_money)
+      s == 0 ? Money.new(0, currency) : s
     end
     define_method "remaining_to_#{role}" do
       send("profit_to_#{role}") - send("paid_to_#{role}")

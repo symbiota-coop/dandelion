@@ -227,6 +227,12 @@ class Order
     r
   end
 
+  def revenue_sharer_discounted_ticket_revenue
+    r = Money.new(0, currency)
+    tickets.each { |ticket| r += Money.new((ticket.discounted_price || 0) * 100 * (1 - (ticket.organisation_revenue_share || 1)), ticket.currency) }
+    r
+  end
+
   def donation_revenue
     r = Money.new(0, currency)
     donations.each { |donation| r += Money.new((donation.amount || 0) * 100, donation.currency) }

@@ -17,10 +17,6 @@
   <script>
     $(function () {
       var date = $("#event_stats th").toArray().indexOf($("th[data-col-name='date']")[0])
-      var ticketsSold = $("#event_stats th").toArray().indexOf($("th[data-col-name='tickets-sold']")[0])
-      var ticketRevenue = $("#event_stats th").toArray().indexOf($("th[data-col-name='ticket-revenue']")[0])
-      var organisationTicketRevenueShare = $("#event_stats th").toArray().indexOf($("th[data-col-name='organisation-ticket-revenue-share']")[0])
-      var donations = $("#event_stats th").toArray().indexOf($("th[data-col-name='donations']")[0])
 
       $(document).ajaxStop(function() {
         if (!$('#event_stats').hasClass('dataTable')) {
@@ -33,15 +29,16 @@
             }
           })
           table.on('draw.dt', function() {
-            $.each([ticketsSold, ticketRevenue, donations, organisationTicketRevenueShare], function(i,index) {
+            $("#event_stats th[data-sum], #event_stats th[data-money]").each(function() {
+              var index = $("#event_stats th").index(this);
               var sum = 0
               $('#event_stats tbody tr').each(function() {
                 sum += parseFloat($('td:eq('+index+')', this).attr('data-sort'))
               })
-              if (i == 0)
-                $('tfoot th').eq(index).html(sum);
-              else
+              if ($(this).is('[data-money]'))
                 $('tfoot th').eq(index).html('<%= money_symbol(@organisation.currency) %>' + sum.toLocaleString());
+              else
+                $('tfoot th').eq(index).html(sum);
             });
           })
           $('#event_stats').DataTable().draw();
@@ -73,34 +70,40 @@
       <th>Local group</th>
       <th>Facebook event</th>
       <th>30d views</th>
-      <th data-col-name="tickets-sold">Tickets sold</th>
+      <th data-sum>Tickets sold</th>
       <th>Checked in</th>
-      <th data-col-name="ticket-revenue">Ticket revenue</th>
       <% if organisation.stripe_client_id %>
-        <th data-col-name="organisation-ticket-revenue-share">Organisation ticket revenue share</th>
+        <th data-money>Ticket revenue reported by Dandelion</th>
+        <th data-money>Ticket revenue reported by Stripe</th>
+        <th data-money>Donations reported by Dandelion</th>
       <% else %>
-        <th class="hide"></th>
+        <th data-money>Ticket revenue</th>
+        <th data-money></th>
+        <th data-money>Donations</th>
       <% end %>
-      <th data-col-name="donations">Donations</th>
       <% if organisation.stripe_client_id %>
-        <th>Donations reported by Stripe</th>
-        <th>Revenue reported by Dandelion</th>
-        <th>Revenue reported by Stripe</th>
-        <th>Stripe fees</th>
-        <th>Profit</th>
+        <th data-money>Donations reported by Stripe</th>
+        <th data-money>Ticket revenue to revenue sharer, reported by Dandelion</th>
+        <th data-money>Ticket revenue to revenue sharer, reported by Stripe</th>
+        <th data-money>Ticket revenue to organisation, reported by Dandelion</th>
+        <th data-money>Ticket revenue to organisation, reported by Stripe</th>
+        <th data-money>Revenue reported by Dandelion</th>
+        <th data-money>Revenue reported by Stripe</th>
+        <th data-money>Stripe fees</th>
+        <th data-money>Profit</th>
 
-        <th>Profit less donations, before allocations</th>
+        <th data-money>Profit less donations, before allocations</th>
         <% Event.profit_share_roles.each do |role| %>
-          <th>Allocated to <%= role.gsub('_',' ') %></th>
+          <th data-money>Allocated to <%= role.gsub('_',' ') %></th>
         <% end %>
-        <th>Profit less donations, after allocations</th>
-        <th>Profit including donations, after allocations</th>
+        <th data-money>Profit less donations, after allocations</th>
+        <th data-money>Profit including donations, after allocations</th>
       <% else %>
-        <% 12.times do %>
+        <% 16.times do %>
           <th class="hide"></th>
         <% end %>
       <% end %>
-      <th>Credit due</th>
+      <th data-money>Credit due</th>
       <th>Feedback</th>
     </tr>
   </thead>
@@ -128,20 +131,10 @@
         <th></th>
         <th></th>
         <th></th>
-        <% if organisation.stripe_client_id %>
-          <th></th>
-        <% else %>
-          <th></th>
-        <% end %>
         <th></th>
-        <% if organisation.stripe_client_id %>
-          <% 12.times do %>
-            <th></th>
-          <% end %>
-        <% else %>
-          <% 12.times do %>
-            <th></th>
-          <% end %>
+        <th></th>
+        <% 16.times do %>
+          <th></th>
         <% end %>
         <th></th>
         <th></th>

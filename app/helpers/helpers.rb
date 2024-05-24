@@ -162,4 +162,10 @@ Dandelion::App.helpers do
   rescue Date::Error
     nil
   end
+
+  def money_sort(event, method)
+    event.send(method).exchange_to(event.organisation.currency)
+  rescue Money::Bank::UnknownRate, Money::Currency::UnknownCurrency
+    0
+  end
 end
