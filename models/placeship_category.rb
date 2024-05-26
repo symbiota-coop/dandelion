@@ -5,10 +5,12 @@ class PlaceshipCategory
   belongs_to :account, index: true
 
   field :name, type: String
+  field :order, type: Integer
 
   def self.admin_fields
     {
       name: :text,
+      order: :number,
       account_id: :lookup
     }
   end

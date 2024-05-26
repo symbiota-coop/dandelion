@@ -2,7 +2,7 @@
 <% if c == 0 %>
   <%= partial :'places/blocks', locals: { places: Place.and(:id.in => @account.placeships.pluck(:place_id)).shuffle, block_class: (block_class if defined?(block_class)) } %>
 <% else %>
-  <% (@account.placeship_categories + ['uncategorised']).each_with_index { |placeship_category, i| %>
+  <% (@account.placeship_categories.order('order asc') + ['uncategorised']).each_with_index { |placeship_category, i| %>
   <% placeships = (i < c ? placeship_category.placeships : @account.placeships.and(placeship_category_id: nil)) %>
   <% if placeships.count > 0 %>
     <div class="placeship_category card" style="border-bottom-width: 0; border-radius: 0; <% if i == 0 %>border-top-left-radius: 5px; border-top-right-radius: 5px; <% end %>">
