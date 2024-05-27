@@ -123,6 +123,10 @@ class StripeCharge
     Money.new de_discounted_ticket_revenue * 100, currency
   end
 
+  def amount_money
+    Money.new amount, currency
+  end
+
   def application_fee_amount_money
     Money.new application_fee_amount, currency
   end
@@ -131,7 +135,7 @@ class StripeCharge
     if application_fee_amount && application_fee_amount > 0
       balance > 0 ? de_discounted_ticket_revenue_money * (balance / application_fee_amount_money) : Money.new(0, currency)
     else
-      Money.new(0, currency)
+      balance - de_donation_revenue_money
     end
   end
 
@@ -139,7 +143,7 @@ class StripeCharge
     if application_fee_amount && application_fee_amount > 0
       balance > 0 ? (application_fee_amount_money - de_donation_revenue_money) * (balance / application_fee_amount_money) : Money.new(0, currency)
     else
-      Money.new(0, currency)
+      ticket_revenue
     end
   end
 
