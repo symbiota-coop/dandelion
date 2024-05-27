@@ -896,8 +896,7 @@ Two Spirit).split("\n")
     loop do
       puts "attempt #{i}"
       prediction = version.predict(prompt: prompt, max_new_tokens: 128)
-      while (status = prediction.status).in?(%w[starting processing])
-        # puts status
+      while prediction.status.in?(%w[starting processing])
         sleep 1
         # puts prediction.inspect
         prediction = Replicate.client.retrieve_prediction(prediction.id)
