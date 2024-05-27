@@ -883,7 +883,7 @@ Two Spirit).split("\n")
   end
 
   def set_feedback_summary
-    summary = event_feedbacks_as_facilitator.and(:answers.ne => nil).map { |ef| "# Feedback on #{ef.event.start_time} (#{ef.rating}/5)\n\n#{ef.answers.join("\n")}" }.join("\n\n")
+    summary = event_feedbacks_as_facilitator.order('created_at desc').and(:answers.ne => nil).map { |ef| "# Feedback on #{ef.event.start_time} (#{ef.rating}/5)\n\n#{ef.answers.join("\n")}" }.join("\n\n")
 
     prompt = "Summarise the feedback on this facilitator, #{firstname}, across a number of different courses and events.\n\n#{summary}"
     prompt = prompt[0..88_888]
