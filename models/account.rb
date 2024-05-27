@@ -48,6 +48,7 @@ class Account
   field :sent_substack_invite, type: Time
   field :substack_opt_in, type: Time
   field :stripe_subscription_id, type: String
+  field :feedback_summary, type: String
 
   field :tokens, type: Float
   index({ tokens: 1 })

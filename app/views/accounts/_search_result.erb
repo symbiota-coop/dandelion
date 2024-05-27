@@ -13,4 +13,12 @@
       <%= partial :'accounts/table', locals: { account: account, birthday: defined?(birthday) } %>
     <% end %>
   </div>
+
+  <% if defined?(facilitator_info) && facilitator_info %>
+    <div class="mt-2">
+      <big>
+        <%= simple_format account.feedback_summary%>
+      </big>
+    </div>
+  <% end %>
 </div>
