@@ -175,6 +175,10 @@ body[contenteditable] {
   border-radius: 0;
 }
 
+.label-stripe {
+  background: #6158F7
+}
+
 .label-outline-primary {
   color: $color_primary;
   border: 1px solid $color_primary;
