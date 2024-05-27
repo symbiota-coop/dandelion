@@ -170,14 +170,14 @@
         </td>
         <!-- Revenue reported by Dandelion -->
         <td data-sort="<%=money_sort(event, :revenue)%>">
-          <% dandelion = "#{m(event.revenue, event.currency)} from #{pluralize(event.orders.and(:transferred.ne => true, :payment_intent.ne => nil).count, 'Stripe order')}" %>
+          <% dandelion = "#{m(event.revenue, event.currency)} from #{pluralize(event.orders.and(:transferred.ne => true, :payment_intent.ne => nil).count, 'order')}" %>
           <%= dandelion.split(' from ').first %> from <a href="/events/<%=event.id%>/orders"><%= dandelion.split(' from ').last %></a>
         </td>
         <!-- Revenue reported by Stripe -->
         <% 
         stripe_charges = event.stripe_charges.and(:balance_float.gt => 0, :order_id.nin => Order.and(transferred: true).pluck(:id))
         stripe_charges_money = stripe_charges.sum(&:balance)
-        stripe = "#{m stripe_charges_money, event.currency} from #{pluralize(stripe_charges.count, 'Stripe charge')}"
+        stripe = "#{m stripe_charges_money, event.currency} from #{pluralize(stripe_charges.count, 'charge')}"
         
         stripe_charges_transferred = event.stripe_charges.and(:balance_float.gt => 0, :order_id.in => Order.and(transferred: true).pluck(:id))
         stripe_charges_transferred_money = stripe_charges_transferred.sum(&:balance)

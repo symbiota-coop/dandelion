@@ -44,6 +44,10 @@ FARQUEST = Faraday.new(
   headers: { 'Content-Type': 'application/json', 'API-KEY': ENV['FARQUEST_API_KEY'] }
 )
 
+Replicate.configure do |config|
+  config.api_token = ENV['REPLICATE_API_KEY']
+end
+
 if ENV['GOOGLE_MAPS_API_KEY']
   Geocoder.configure(
     lookup: :google,

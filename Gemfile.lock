@@ -166,6 +166,8 @@ GEM
     faraday-net_http_persistent (2.1.0)
       faraday (~> 2.5)
       net-http-persistent (~> 4.0)
+    faraday-retry (2.2.1)
+      faraday (~> 2.0)
     ferrum (0.14)
       addressable (~> 2.5)
       concurrent-ruby (~> 1.1)
@@ -428,6 +430,11 @@ GEM
     regexp_parser (2.9.0)
     reline (0.4.2)
       io-console (~> 0.5)
+    replicate-ruby (0.2.3)
+      addressable
+      faraday (>= 1.0)
+      faraday-multipart
+      faraday-retry
     representable (3.2.0)
       declarative (< 0.1.0)
       trailblazer-option (>= 0.1.1, < 0.2.0)
@@ -585,6 +592,7 @@ DEPENDENCIES
   rack_session_access
   rake
   redcarpet
+  replicate-ruby
   rinku
   rqrcode
   rubocop

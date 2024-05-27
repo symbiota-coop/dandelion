@@ -52,6 +52,7 @@ gem 'ferrum'
 gem 'google_drive2', require: 'google_drive'
 gem 'jwt'
 gem 'mechanize'
+gem 'replicate-ruby', require: 'replicate'
 gem 'ruby-openai'
 gem 'yt'
 
