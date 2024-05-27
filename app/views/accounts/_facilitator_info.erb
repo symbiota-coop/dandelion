@@ -1,8 +1,6 @@
-<% if (e = (events = Event.past.and(:id.in => account.event_facilitations.pluck(:event_id))).count) > 0 %>
-  <small class="d-inline-block mt-1 mt-lg-0 label label-primary">Facilitated <%= pluralize(e,'event') %></small>
-<% end %>
-
 <%
+events = Event.past.and(:id.in => account.event_facilitations.pluck(:event_id))
+
 event_tagships = EventTagship.and(:event_id.in => events.pluck(:id))
 # get frequency of ids
 event_tags_freq = event_tagships.inject(Hash.new(0)) { |h,v| h[v.event_tag_id] += 1; h }

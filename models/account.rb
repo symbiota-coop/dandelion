@@ -882,6 +882,36 @@ Two Spirit).split("\n")
     links
   end
 
+  def set_feedback_summary
+    summary = event_feedbacks_as_facilitator.map { |ef| "# Feedback on #{ef.event.start_time} (#{ef.rating}/5)\n\n#{ef.answers.join("\n")}" }.join("\n\n")
+
+    prompt = "Summarise the feedback on this facilitator, #{firstname}, across a number of different courses and events.\n\n#{summary}"
+    prompt = prompt[0..88_888]
+
+    model = Replicate.client.retrieve_model('mistralai/mixtral-8x7b-instruct-v0.1')
+    version = model.latest_version
+
+    i = 1
+    prediction = nil
+    loop do
+      puts "attempt #{i}"
+      prediction = version.predict(prompt: prompt, max_new_tokens: 128)
+      while (status = prediction.status).in?(%w[starting processing])
+        # puts status
+        # puts 'sleeping...'
+        sleep 1
+        # puts prediction.inspect
+        prediction = Replicate.client.retrieve_prediction(prediction.id)
+      end
+      puts prediction.output.join
+      puts prediction.output.join[-1]
+      break if prediction.output.join[-1] == '.'
+
+      i += 1
+    end
+    set(feedback_summary: prediction.output.join)
+  end
+
   private
 
   def encrypt_password
