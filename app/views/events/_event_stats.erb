@@ -1,3 +1,12 @@
+<style>
+  #event_stats th:first-child, #event_stats td:first-child { position: sticky; left: 0; width: 15em; min-width: 15em; max-width: 15em; z-index: 999 }
+  #event_stats td:first-child { border-right: 1px solid black }
+
+  #event_stats th:first-child { background: white }
+  #event_stats tr:nth-child(even) td:first-child { background-color: white }
+  #event_stats tr:nth-child(odd) td:first-child { background-color: #eee }
+</style>
+
 <script>
   function hideCols() {
     $("#event_stats th.hide").each(function() {
@@ -52,82 +61,84 @@
 
 <% organisation = params[:cohost] ? Organisation.find_by(slug: params[:cohost]) : @organisation %>
 
-<table id="event_stats" class="table table-striped table-hover table-sm" style="font-size: 0.9em">
-  <thead class="bg-white">
-    <tr>
-      <th>Name</th>
-      <th></th>
-      <th style="min-width: 12.5em" data-col-name="date">Date</th>
-      <th>Coordinator</th>
-      <% if organisation.stripe_client_id %>
-        <th>Organiser</th>
-      <% else %>
-        <th class="hide"></th>
-      <% end %>
-      <th>Facilitators</th>
-      <th>Tags</th>
-      <th>Activity</th>
-      <th>Local group</th>
-      <th>Facebook event</th>
-      <th>30d views</th>
-      <th data-sum>Tickets sold</th>
-      <th>Checked in</th>
-      <th data-money>Ticket revenue</th>
-      <th data-money>Donations</th>
-      <% if organisation.stripe_client_id %>
-        <th data-money>Ticket revenue to revenue sharer</th>
-        <th data-money>Ticket revenue to organisation</th>
-        <th data-money>Revenue reported by Dandelion</th>
-        <th data-money>Revenue reported by Stripe</th>
-        <th data-money>Stripe fees</th>
-        <th data-money>Profit</th>
-
-        <th data-money>Profit less donations, before allocations</th>
-        <% Event.profit_share_roles.each do |role| %>
-          <th data-money>Allocated to <%= role.gsub('_',' ') %></th>
-        <% end %>
-        <th data-money>Profit less donations, after allocations</th>
-        <th data-money>Profit including donations, after allocations</th>
-      <% else %>
-        <% 13.times do %>
+<div style="position: relative; overflow: auto;">
+  <table id="event_stats" class="table table-striped table-hover table-sm" style="font-size: 0.9em">
+    <thead class="bg-white">
+      <tr>
+        <th>Name</th>
+        <th></th>
+        <th style="min-width: 12.5em" data-col-name="date">Date</th>
+        <th>Coordinator</th>
+        <% if organisation.stripe_client_id %>
+          <th>Organiser</th>
+        <% else %>
           <th class="hide"></th>
         <% end %>
-      <% end %>
-      <th data-money>Credit due</th>
-      <th>Feedback</th>
-    </tr>
-  </thead>
-  <% events.each { |event| %>
-  <tr data-pagelet-url="/events/<%= event.id %>/stats_row<%= "?timezone=#{event.start_time.strftime('%Z')}#{"&organisation_id=#{organisation.id}" if organisation}" %>"><% if @event %><%= cp(:'events/event_stats_row', locals: { event: @event, organisation: organisation }, key: "/events/#{@event.id}/stats_row?timezone=#{@event.start_time.strftime('%Z')}#{"&organisation_id=#{organisation.id}" if organisation}") %><% end %></tr>
-  <% } %>
-  <% unless @event %>
-    <tfoot>
-      <tr>
-        <th></th>
-        <th></th>
-        <th></th>
-        <th></th>
+        <th>Facilitators</th>
+        <th>Tags</th>
+        <th>Activity</th>
+        <th>Local group</th>
+        <th>Facebook event</th>
+        <th>30d views</th>
+        <th data-sum>Tickets sold</th>
+        <th>Checked in</th>
+        <th data-money>Ticket revenue</th>
+        <th data-money>Donations</th>
         <% if organisation.stripe_client_id %>
-          <th></th>
+          <th data-money>Ticket revenue to revenue sharer</th>
+          <th data-money>Ticket revenue to organisation</th>
+          <th data-money>Revenue reported by Dandelion</th>
+          <th data-money>Revenue reported by Stripe</th>
+          <th data-money>Stripe fees</th>
+          <th data-money>Profit</th>
+
+          <th data-money>Profit less donations, before allocations</th>
+          <% Event.profit_share_roles.each do |role| %>
+            <th data-money>Allocated to <%= role.gsub('_',' ') %></th>
+          <% end %>
+          <th data-money>Profit less donations, after allocations</th>
+          <th data-money>Profit including donations, after allocations</th>
         <% else %>
-          <th></th>
+          <% 13.times do %>
+            <th class="hide"></th>
+          <% end %>
         <% end %>
-        <th></th>
-        <th></th>
-        <th></th>
-        <th></th>
-        <th></th>
-        <th></th>
-        <th></th>
-        <th></th>
-        <th></th>
-        <th></th>
-        <% 13.times do %>
-          <th></th>
-        <% end %>
-        <th></th>
-        <th></th>
+        <th data-money>Credit due</th>
+        <th>Feedback</th>
       </tr>
-    </tfoot>
-  <% end %>
-</table>
+    </thead>
+    <% events.each { |event| %>
+    <tr data-pagelet-url="/events/<%= event.id %>/stats_row<%= "?timezone=#{event.start_time.strftime('%Z')}#{"&organisation_id=#{organisation.id}" if organisation}" %>"><% if @event %><%= cp(:'events/event_stats_row', locals: { event: @event, organisation: organisation }, key: "/events/#{@event.id}/stats_row?timezone=#{@event.start_time.strftime('%Z')}#{"&organisation_id=#{organisation.id}" if organisation}") %><% end %></tr>
+    <% } %>
+    <% unless @event %>
+      <tfoot>
+        <tr>
+          <th></th>
+          <th></th>
+          <th></th>
+          <th></th>
+          <% if organisation.stripe_client_id %>
+            <th></th>
+          <% else %>
+            <th></th>
+          <% end %>
+          <th></th>
+          <th></th>
+          <th></th>
+          <th></th>
+          <th></th>
+          <th></th>
+          <th></th>
+          <th></th>
+          <th></th>
+          <th></th>
+          <% 13.times do %>
+            <th></th>
+          <% end %>
+          <th></th>
+          <th></th>
+        </tr>
+      </tfoot>
+    <% end %>
+  </table>
+</div>
