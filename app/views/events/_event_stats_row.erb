@@ -126,12 +126,12 @@
         <!-- Ticket revenue -->
         <td data-sort="<%=money_sort(event, :discounted_ticket_revenue)%>">
           <span data-toggle="tooltip" title="Reported by Dandelion" class="label label-primary d-block mb-1"><%= m event.discounted_ticket_revenue, event.currency %></span>
-          <span data-toggle="tooltip" title="Reported by Stripe" class="label label-stripe d-block mb-1"><%= m event.stripe_ticket_revenue, event.currency %></span>
+          <span data-toggle="tooltip" title="Reported by Stripe (48h delay)" class="label label-stripe d-block mb-1"><%= m event.stripe_ticket_revenue, event.currency %></span>
         </td>
         <!-- Donations -->
         <td data-sort="<%=money_sort(event, :donation_revenue)%>">
           <span data-toggle="tooltip" title="Reported by Dandelion" class="label label-primary d-block mb-1"><%= m event.donation_revenue, event.currency %></span>
-          <span data-toggle="tooltip" title="Reported by Stripe" class="label label-stripe d-block mb-1"><%= m event.stripe_donations, event.currency %></span>
+          <span data-toggle="tooltip" title="Reported by Stripe (48h delay)" class="label label-stripe d-block mb-1"><%= m event.stripe_donations, event.currency %></span>
         </td>
       <% else %>
         <!-- Ticket revenue -->
@@ -158,7 +158,7 @@
         <% if event.revenue_sharer %>
           <td data-sort="<%=money_sort(event, :stripe_ticket_revenue_to_revenue_sharer)%>">
             <span data-toggle="tooltip" title="Reported by Dandelion" class="label label-primary d-block mb-1"><%= m event.ticket_revenue_to_revenue_sharer, event.currency %></span>
-            <span data-toggle="tooltip" title="Reported by Stripe" class="label label-stripe d-block mb-1"><%= m event.stripe_ticket_revenue_to_revenue_sharer, event.currency %></span>
+            <span data-toggle="tooltip" title="Reported by Stripe (48h delay)" class="label label-stripe d-block mb-1"><%= m event.stripe_ticket_revenue_to_revenue_sharer, event.currency %></span>
           </td>
         <% else %>
           <td></td>
@@ -166,7 +166,7 @@
         <!-- Ticket revenue to organisation -->
         <td data-sort="<%=money_sort(event, :stripe_ticket_revenue_to_organisation)%>">
           <span data-toggle="tooltip" title="Reported by Dandelion" class="label label-primary d-block mb-1"><%= m event.organisation_discounted_ticket_revenue, event.currency %></span>
-          <span data-toggle="tooltip" title="Reported by Stripe" class="label label-stripe d-block mb-1"><%= m event.stripe_ticket_revenue_to_organisation, event.currency %></span>
+          <span data-toggle="tooltip" title="Reported by Stripe (48h delay)" class="label label-stripe d-block mb-1"><%= m event.stripe_ticket_revenue_to_organisation, event.currency %></span>
         </td>
         <!-- Revenue reported by Dandelion -->
         <td data-sort="<%=money_sort(event, :revenue)%>">

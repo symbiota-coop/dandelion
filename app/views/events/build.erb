@@ -307,7 +307,9 @@
             <%= f.check_box_block :opt_in_facilitator %>
             <%= f.check_box_block :include_in_parent %>
             <%= f.check_box_block :refund_deleted_orders %>
-            <%= f.text_area_block :notes %>
+            <% if !@event.organisation.stripe_client_id %>
+              <%= f.text_area_block :notes %>
+            <% end %>
 
             <% if Padrino.env == :development || @event.organisation.verified? %>
               <div class="border border-primary rounded p-3 mb-3" style="border-style: dashed !important">
@@ -352,14 +354,18 @@
                   .after('<div class="input-group-append"><span class="input-group-text">%</span></div>')
                 })
               </script>
-              <div id="revenue-share">
-                <%= f.text_block :revenue_share_to_revenue_sharer %>
-              </div>
-              <%= f.number_block :profit_share_to_facilitator %>
-              <%= f.number_block :profit_share_to_coordinator %>
-              <%= f.number_block :profit_share_to_category_steward %>
-              <%= f.number_block :profit_share_to_social_media %>
-              <%= f.number_block :stripe_revenue_adjustment %>
+              <% if organisation_admin?(@event.organisation) %>
+                <div id="revenue-share">
+                  <%= f.text_block :revenue_share_to_revenue_sharer %>
+                </div>
+                <%= f.number_block :profit_share_to_facilitator %>
+                <%= f.number_block :profit_share_to_coordinator %>
+                <%= f.number_block :profit_share_to_category_steward %>
+                <%= f.number_block :profit_share_to_social_media %>
+                <%= f.number_block :stripe_revenue_adjustment %>
+              <% end %>
+              <%= f.text_area_block :notes %>
+
 
               <% if @event.new_record? %>
                 <script>

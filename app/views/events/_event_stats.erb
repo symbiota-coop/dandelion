@@ -42,7 +42,10 @@
               var index = $("#event_stats th").index(this);
               var sum = 0
               $('#event_stats tbody tr').each(function() {
-                sum += parseFloat($('td:eq('+index+')', this).attr('data-sort'))
+                var f = parseFloat($('td:eq('+index+')', this).attr('data-sort'))
+                if (isNaN(f))
+                  f = 0
+                sum += f
               })
               if ($(this).is('[data-money]'))
                 $('tfoot th').eq(index).html('<%= money_symbol(@organisation.currency) %>' + sum.toLocaleString());
@@ -88,7 +91,7 @@
           <th data-money>Ticket revenue to revenue sharer</th>
           <th data-money>Ticket revenue to organisation</th>
           <th data-money>Revenue reported by Dandelion</th>
-          <th data-money>Revenue reported by Stripe</th>
+          <th data-money>Revenue reported by Stripe (48h delay)</th>
           <th data-money>Stripe fees</th>
           <th data-money>Profit</th>
 

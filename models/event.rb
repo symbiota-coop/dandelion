@@ -928,7 +928,8 @@ class Event
       purchase_url: "URL where people can buy tickets (if you're not selling tickets on Dandelion)",
       capacity: 'Caps the total number of tickets issued across all ticket types. Optional',
       send_order_notifications: 'Send email notifications of orders to event facilitators',
-      prevent_reminders: 'Prevent reminder email from being sent before the event'
+      prevent_reminders: 'Prevent reminder email from being sent before the event',
+      stripe_revenue_adjustment: 'Positive or negative adjustment to the revenue reported by Stripe, e.g. +20 or -10'
     }
   end
 
