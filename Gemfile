@@ -47,6 +47,7 @@ end
 # Interacting with other websites
 gem 'airbrake'
 gem 'airrecord'
+gem 'anthropic'
 gem 'faraday'
 gem 'ferrum'
 gem 'google_drive2', require: 'google_drive'

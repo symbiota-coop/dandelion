@@ -48,6 +48,10 @@ Replicate.configure do |config|
   config.api_token = ENV['REPLICATE_API_KEY']
 end
 
+Anthropic.configure do |config|
+  config.access_token = ENV['ANTHROPIC_API_KEY']
+end
+
 if ENV['GOOGLE_MAPS_API_KEY']
   Geocoder.configure(
     lookup: :google,

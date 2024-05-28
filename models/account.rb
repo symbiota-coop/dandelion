@@ -883,31 +883,42 @@ Two Spirit).split("\n")
   end
 
   def set_feedback_summary
-    summary = event_feedbacks_as_facilitator.order('created_at desc').and(:answers.ne => nil).map { |ef| "# Feedback on #{ef.event.start_time} (#{ef.rating}/5)\n\n#{ef.answers.join("\n")}" }.join("\n\n")
+    summary = event_feedbacks_as_facilitator.order('created_at desc').and(:answers.ne => nil).map { |ef| "# Feedback on #{ef.event.name}, #{ef.event.start_time} (#{ef.rating}/5)\n\n#{ef.answers.join("\n")}" }.join("\n\n")
 
-    prompt = "Summarise the feedback on this facilitator, #{firstname}, across a number of different courses and events.\n\n#{summary}"
-    prompt = prompt[0..88_888]
+    prompt = "Summarise the feedback on this facilitator, #{firstname}.\n\n#{summary}"
+    prompt = prompt[0..(200_000 * 0.66 * 4)]
 
-    model = Replicate.client.retrieve_model('mistralai/mixtral-8x7b-instruct-v0.1')
-    version = model.latest_version
+    client = Anthropic::Client.new
+    response = client.messages(
+      parameters: {
+        model: 'claude-3-haiku-20240307',
+        messages: [
+          { role: 'user', content: prompt }
+        ],
+        max_tokens: 1000
+      }
+    )
+    set(feedback_summary: response['content'].first['text'])
 
-    i = 1
-    prediction = nil
-    loop do
-      puts "attempt #{i}"
-      prediction = version.predict(prompt: prompt, max_new_tokens: 128)
-      while prediction.status.in?(%w[starting processing])
-        sleep 1
-        # puts prediction.inspect
-        prediction = Replicate.client.retrieve_prediction(prediction.id)
-      end
-      puts prediction.output.join
-      puts prediction.output.join[-1]
-      break if prediction.output.join[-1] == '.'
+    # prompt = prompt[0..(32_000 * 0.66 * 4)]
+    # model = Replicate.client.retrieve_model('mistralai/mixtral-8x7b-instruct-v0.1')
+    # version = model.latest_version
+    # i = 1
+    # prediction = nil
+    # loop do
+    #   puts "attempt #{i}"
+    #   prediction = version.predict(prompt: prompt, max_new_tokens: 128)
+    #   while prediction.status.in?(%w[starting processing])
+    #     sleep 1
+    #     prediction = Replicate.client.retrieve_prediction(prediction.id)
+    #   end
+    #   puts prediction.output.join
+    #   puts prediction.output.join[-1]
+    #   break if prediction.output.join[-1] == '.'
 
-      i += 1
-    end
-    set(feedback_summary: prediction.output.join)
+    #   i += 1
+    # end
+    # set(feedback_summary: prediction.output.join)
   end
 
   private
