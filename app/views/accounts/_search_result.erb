@@ -3,16 +3,9 @@
 </div>
 <div class="search-result-content">
 
-  <div>
-    <h2 class="d-inline my-0">
-      <a class="text-dark" href="/u/<%= account.username %>"><%= account.name %></a>
-    </h2>
-    <% if defined?(facilitator_info) && facilitator_info %>
-      <% if (e = (events = Event.past.and(:id.in => account.event_facilitations.pluck(:event_id))).count) > 0 %>
-        <small style="position: relative; top: -3px" class="d-inline-block mt-1 mt-lg-0 label label-primary">Facilitated <%= pluralize(e,'event') %></small>
-      <% end %>
-    <% end %>
-  </div>
+  <h2>
+    <a class="text-dark" href="/u/<%= account.username %>"><%= account.name %></a>
+  </h2>
   <%= partial :'accounts/buttons', locals: { account: account } %>
   <div class="mt-2">
     <% if defined?(facilitator_info) && facilitator_info %>
@@ -24,7 +17,7 @@
 
   <% if defined?(facilitator_info) && facilitator_info && account.feedback_summary %>
     <div class="mt-2">
-      <div class="mb-1">
+      <div class="mb-1" data-toggle="tooltip" title="AI-generated summary ✨">
         <big>
           <%= account.feedback_summary %>
         </big>

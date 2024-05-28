@@ -13,4 +13,4 @@ event_tags_freq = event_tags_freq.sort_by { |k,v| v }.reverse
 <% } %>
 
 
-<%= partial :'event_feedbacks/average_rating', locals: { unscoped: true, event_feedbacks: account.unscoped_event_feedbacks_as_facilitator } %>
+<%= partial :'event_feedbacks/average_rating', locals: { unscoped: true, event_feedbacks: account.unscoped_event_feedbacks_as_facilitator, events: events } %>
