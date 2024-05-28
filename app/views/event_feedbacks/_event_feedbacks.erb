@@ -1,4 +1,16 @@
 <%= partial :'event_feedbacks/average_rating', locals: { event_feedbacks: event_feedbacks } %>
+
+<% if @account && @account.feedback_summary %>
+  <div class="my-3">
+    <div class="mb-1">
+      <big>
+        <%= @account.feedback_summary %>
+      </big>
+    </div>
+    <span class="label label-ai">AI-generated summary ✨</span>
+  </div>
+<% end %>
+
 <% unless defined?(unscoped); event_feedbacks = event_feedbacks.unscoped; end %>
   <% event_feedbacks = event_feedbacks.and(:rating.ne => nil).order('created_at desc').paginate(page: params[:page], per_page: 10) %>
   <table class="table table-condensed mt-3">

@@ -4,7 +4,7 @@
     <div class="col-auto"><i class="fa fa-quote-left"></i></div>
     <div class="col">
       <% if !qas.empty? %>
-        <p class="lead mb-0"><%== Sanitize.fragment(qas.join('<br /><br />'), Sanitize::Config::DANDELION) %></p>
+        <big><%== Sanitize.fragment(qas.join('<br /><br />'), Sanitize::Config::DANDELION) %></big>
       <% end %>
     </div>
   </div>
@@ -13,6 +13,6 @@
 <% if event_feedback.response %>
   <div class="mb-3 <% if event_feedback.public_answers && qas%>mt-3<% end %>">
     <em><%=event_feedback.event.organisation.name%> replied</em>
-    <p class="lead mb-0">&mdash; <%== Sanitize.fragment(Rinku.auto_link(event_feedback.response), Sanitize::Config::DANDELION) %></p>
+    <big>&mdash; <%== Sanitize.fragment(Rinku.auto_link(event_feedback.response), Sanitize::Config::DANDELION) %></big>
   </div>
 <% end %>

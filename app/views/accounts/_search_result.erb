@@ -17,9 +17,12 @@
 
   <% if defined?(facilitator_info) && facilitator_info %>
     <div class="mt-2">
-      <big>
-        <%= simple_format account.feedback_summary%>
-      </big>
+      <div class="mb-1">
+        <big>
+          <%= account.feedback_summary %>
+        </big>
+      </div>
+      <span class="label label-ai">AI-generated summary ✨</span>
     </div>
   <% end %>
 </div>

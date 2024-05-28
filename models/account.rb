@@ -882,23 +882,60 @@ Two Spirit).split("\n")
     links
   end
 
-  def set_feedback_summary
-    summary = event_feedbacks_as_facilitator.order('created_at desc').and(:answers.ne => nil).map { |ef| "# Feedback on #{ef.event.name}, #{ef.event.start_time} (#{ef.rating}/5)\n\n#{ef.answers.join("\n")}" }.join("\n\n")
+  def send_feedback_summary
+    mg_client = Mailgun::Client.new ENV['MAILGUN_API_KEY'], ENV['MAILGUN_REGION']
+    batch_message = Mailgun::BatchMessage.new(mg_client, ENV['MAILGUN_NOTIFICATIONS_HOST'])
 
-    prompt = "Summarise the feedback on this facilitator, #{firstname}.\n\n#{summary}"
-    prompt = prompt[0..(200_000 * 0.66 * 4)]
+    account = self
+    content = ERB.new(File.read(Padrino.root('app/views/emails/feedback_summary.erb'))).result(binding)
+    batch_message.from ENV['CONTACT_EMAIL_FULL']
+    batch_message.subject 'New feedback summary from Dandelion'
+    batch_message.body_html Premailer.new(ERB.new(File.read(Padrino.root('app/views/layouts/email.erb'))).result(binding), with_html_string: true, adapter: 'nokogiri', input_encoding: 'UTF-8').to_inline_css
 
-    client = Anthropic::Client.new
-    response = client.messages(
-      parameters: {
-        model: 'claude-3-haiku-20240307',
-        messages: [
-          { role: 'user', content: prompt }
-        ],
-        max_tokens: 1000
-      }
-    )
-    set(feedback_summary: response['content'].first['text'])
+    [account].each do |account|
+      batch_message.add_recipient(:to, account.email, { 'firstname' => account.firstname || 'there', 'token' => account.sign_in_token, 'id' => account.id.to_s })
+    end
+
+    batch_message.finalize if ENV['MAILGUN_API_KEY']
+  end
+
+  def self.set_feedback_summaries
+    # Account.and(:feedback_summary.ne => nil).set(feedback_summary: nil)
+    accounts = Account.and(:id.in => EventFacilitation.and(:event_id.in => Event.past.pluck(:id)).pluck(:account_id))
+    accounts = accounts.select { |account| account.feedback_summary.nil? && account.event_feedbacks_as_facilitator.count >= 10 }
+    accounts.each_with_index do |account, i|
+      puts "#{i + 1}/#{accounts.count} #{account.username}"
+
+      summary = account.event_feedbacks_as_facilitator.order('created_at desc').and(:answers.ne => nil).map { |ef| "# Feedback on #{ef.event.name}, #{ef.event.start_time}\n\n#{ef.answers.join("\n")}" }.join("\n\n")
+      prompt = "Provide a one-paragraph summary of the feedback on this facilitator, #{account.firstname}. Focus on their strengths and what they do well. \n\n#{summary}"
+
+      prompt = prompt[0..(200_000 * 0.66 * 4)]
+      client = Anthropic::Client.new
+      last_paragraph = nil
+      loop do
+        response = client.messages(
+          parameters: {
+            model: 'claude-3-haiku-20240307',
+            messages: [
+              { role: 'user', content: prompt }
+            ],
+            max_tokens: 256
+          }
+        )
+        if response['content']
+          paragraphs = response['content'].first['text'].split("\n\n")
+          if paragraphs.length <= 2
+            last_paragraph = paragraphs.last
+            break if last_paragraph.split.length >= 50 && last_paragraph[0] != '-' && last_paragraph[0] != '*' && last_paragraph[-1] == '.'
+          end
+        else
+          puts 'sleeping...'
+          sleep 5
+        end
+      end
+      puts "#{last_paragraph}\n\n"
+      account.set(feedback_summary: last_paragraph)
+    end
 
     # prompt = prompt[0..(32_000 * 0.66 * 4)]
     # model = Replicate.client.retrieve_model('mistralai/mixtral-8x7b-instruct-v0.1')
@@ -907,18 +944,16 @@ Two Spirit).split("\n")
     # prediction = nil
     # loop do
     #   puts "attempt #{i}"
+    #   i += 1
     #   prediction = version.predict(prompt: prompt, max_new_tokens: 128)
     #   while prediction.status.in?(%w[starting processing])
     #     sleep 1
     #     prediction = Replicate.client.retrieve_prediction(prediction.id)
     #   end
-    #   puts prediction.output.join
-    #   puts prediction.output.join[-1]
     #   break if prediction.output.join[-1] == '.'
-
-    #   i += 1
     # end
-    # set(feedback_summary: prediction.output.join)
+    # puts prediction.output.join
+    # account.set(feedback_summary: prediction.output.join)
   end
 
   private

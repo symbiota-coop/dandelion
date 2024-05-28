@@ -281,6 +281,12 @@ Dandelion::App.controller do
     end
   end
 
+  get '/accounts/:id/feedback_summary_email_preview' do
+    account = Account.find(params[:id]) || not_found
+    content = ERB.new(File.read(Padrino.root('app/views/emails/feedback_summary.erb'))).result(binding)
+    Premailer.new(ERB.new(File.read(Padrino.root('app/views/layouts/email.erb'))).result(binding), with_html_string: true, adapter: 'nokogiri', input_encoding: 'UTF-8').to_inline_css
+  end
+
   get '/accounts/:id/following' do
     @account = Account.find(params[:id]) || not_found
     partial :'accounts/following', locals: { accounts: @account.following, starred: @account.following_starred }

@@ -26,12 +26,12 @@
     <div class="row">
       <div class="col-auto"><i class="fa fa-quote-left"></i></div>
       <div class="col">
-        <p class="lead mb-0">
+        <big>
           <%= partial :'accounts/square', locals: { klass: 'float-left mr-3 mb-3', account: account, width: '150px' } %>
           <a class="home-feedback" href="/events/<%= event_feedback.event.id %>">
             <%== Sanitize.fragment(event_feedback.public_answers.map { |qa| qa[1] unless qa[1].blank? }.compact.join('<br /><br />'), Sanitize::Config::DANDELION) %>
           </a>
-        </p>
+        </big>
 
         <div class="my-2" style="font-size: 2em; white-space: nowrap;">
           <% event_feedback.rating.times do %><i class="fa fa-star"></i><% end %>
