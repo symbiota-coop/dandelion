@@ -7,6 +7,10 @@ account_ids_freq = account_ids_freq.sort_by { |k,v| v }.reverse
 account_ids_freq = account_ids_freq.paginate(page: params[:page], per_page: 10)
 %>
 
+<div class="mb-3 text-right">
+  <span class="label label-ai">AI-generated summaries ✨</span>
+</div>
+
 <% accounts = Account.and(:id.in => account_ids_freq.map { |id, freq| id }) %>
 <ul class="search-result-list">
   <% account_ids_freq.each { |id, freq|; account = accounts.find { |a| a.id == id } %>
