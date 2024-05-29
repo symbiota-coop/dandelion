@@ -1,22 +1,11 @@
-<% if !organisationship.monthly_donation_method || organisationship.monthly_donation_method == 'Other' %>
+<% if @organisation && @organisation.verified? && (!organisationship.monthly_donation_method || organisationship.monthly_donation_method == 'Other') %>
   <% form_tag "/organisationships/#{organisationship.id}/monthly_donation", class: 'form-inline' do %>
-
-    <div class="row no-gutters align-items-center">
-      <div class="col">
-        <div class="input-group">
-          <div class="input-group-prepend">
-            <span class="input-group-text"><%=money_symbol @organisation.currency%></span>
-          </div>
-          <%= text_field_tag :amount, class: 'form-control', value: organisationship.monthly_donation_amount, onchange: '$(this.form).submit()' %>
-        </div>
+    <div class="input-group">
+      <div class="input-group-prepend">
+        <span class="input-group-text"><%=money_symbol @organisation.currency%></span>
       </div>
-      <div class="col-auto">
-        <div class="pl-1">
-          /month
-        </div>
-      </div>
+      <%= text_field_tag :amount, class: 'form-control', value: organisationship.monthly_donation_amount, onchange: '$(this.form).submit()' %>
     </div>
-
   <% end %>
 <% else %>
   <%= m organisationship.monthly_donation_amount, organisationship.monthly_donation_currency %>/month
