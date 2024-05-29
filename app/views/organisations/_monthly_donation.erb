@@ -1,13 +1,19 @@
 <% if !organisationship.monthly_donation_method || organisationship.monthly_donation_method == 'Other' %>
-  <% form_tag "/organisationships/#{organisationship.id}/monthly_donation" do %>
+  <% form_tag "/organisationships/#{organisationship.id}/monthly_donation", class: 'form-inline' do %>
 
-    <div class="input-group">
-      <div class="input-group-prepend">
-        <span class="input-group-text"><%=money_symbol @organisation.currency%></span>
+    <div class="row no-gutters align-items-center">
+      <div class="col">
+        <div class="input-group">
+          <div class="input-group-prepend">
+            <span class="input-group-text"><%=money_symbol @organisation.currency%></span>
+          </div>
+          <%= text_field_tag :amount, class: 'form-control', value: organisationship.monthly_donation_amount, onchange: '$(this.form).submit()' %>
+        </div>
       </div>
-      <%= text_field_tag :amount, class: 'form-control', value: organisationship.monthly_donation_amount, onchange: '$(this.form).submit()' %>
-      <div class="input-group-append">
-        <span class="input-group-text">/month</span>
+      <div class="col-auto">
+        <div class="pl-1">
+          /month
+        </div>
       </div>
     </div>
 
