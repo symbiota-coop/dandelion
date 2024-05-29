@@ -7,7 +7,7 @@
       <%= text_field_tag :amount, class: 'form-control', value: organisationship.monthly_donation_amount, onchange: '$(this.form).submit()' %>
     </div>
   <% end %>
-<% else %>
+<% elsif organisationship.monthly_donation_method %>
   <%= m organisationship.monthly_donation_amount, organisationship.monthly_donation_currency %>/month
   via <%= organisationship.monthly_donation_method %>
   <% if organisationship.monthly_donation_start_date %>
