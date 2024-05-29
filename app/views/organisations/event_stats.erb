@@ -9,6 +9,9 @@
     <%= text_field_tag :to, class: 'form-control datepicker mx-1', value: (@to.to_fs(:db_local) if @to) %>
   </div>
   <div class="form-group">
+    <%= select_tag :start_or_end, options: {'start date' => 'start', 'end date' => 'end'}, value: @start_or_end, class: 'form-control mx-1' %>
+  </div>
+  <div class="form-group">
     <label>containing the word</label>
     <%= text_field_tag :q, class: 'form-control mx-1', value: params[:q] %>
   </div>
