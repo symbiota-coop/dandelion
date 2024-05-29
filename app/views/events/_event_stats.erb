@@ -1,26 +1,4 @@
-<style>
-  #content { z-index: 1021; }
-
-  #event_stats th:first-child, #event_stats td:first-child { position: sticky; left: 0; width: 15em; min-width: 15em; max-width: 15em; z-index: 999 }
-  #event_stats td:first-child { border-right: 1px solid black }
-
-  #event_stats th:first-child { background: white }
-  #event_stats tr:nth-child(even) td:first-child { background-color: white }
-  #event_stats tr:nth-child(odd) td:first-child { background-color: #eee }
-</style>
-
 <script>
-  // if scrolling right more than #sidebar width, hide sidebar
-  $(function() {
-    $(window).scroll(function() {
-      if ($(window).scrollLeft() > $('#sidebar').width()) {
-        $('#sidebar').hide()
-      } else {
-        $('#sidebar').show()
-      }
-    })
-  })
-
   function hideCols() {
     $("#event_stats th.hide").each(function() {
       var index = $("#event_stats th").index(this);
@@ -34,10 +12,29 @@
 
 <% unless @event  %>
   <style>
+    #content { z-index: 1021; }
+
+    #event_stats th:first-child, #event_stats td:first-child { position: sticky; left: 0; width: 15em; min-width: 15em; max-width: 15em; z-index: 999 }
+    #event_stats td:first-child { border-right: 1px solid black }
+
+    #event_stats th:first-child { background: white }
+    #event_stats tr:nth-child(even) td:first-child { background-color: white }
+    #event_stats tr:nth-child(odd) td:first-child { background-color: #eee }
+
     #event_stats_filter label { font-weight: bold }
   </style>
   <script>
     $(function () {
+
+    // if scrolling right more than #sidebar width, hide sidebar
+      $(window).scroll(function() {
+        if ($(window).scrollLeft() > $('#sidebar').width()) {
+          $('#sidebar').hide()
+        } else {
+          $('#sidebar').show()
+        }
+      })
+
       var date = $("#event_stats th").toArray().indexOf($("th[data-col-name='date']")[0])
 
       $(document).ajaxStop(function() {
