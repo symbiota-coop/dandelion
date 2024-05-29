@@ -58,6 +58,7 @@ class StripeTransaction
       most_recent_stripe_transaction = organisation.stripe_transactions.order('created_utc desc').first
       from = most_recent_stripe_transaction ? most_recent_stripe_transaction.created_utc.to_date + 1 : Date.today - 2
     end
+    return if from >= to
 
     puts "transferring transactions for #{organisation.slug} from #{from} to #{to}"
 
