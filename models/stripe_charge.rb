@@ -90,7 +90,8 @@ class StripeCharge
         c[f.gsub('de_', '')] = charge['metadata'][f]
       end
       %w[de_donation_revenue de_ticket_revenue de_discounted_ticket_revenue de_percentage_discount de_percentage_discount_monthly_donor de_credit_applied].each do |f|
-        c[f] = charge['metadata'][f]
+        x = charge['metadata'][f]
+        c[f] = x.gsub(',', '.') if x
       end
       puts c['created']
       organisation.stripe_charges.create(c)

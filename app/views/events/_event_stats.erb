@@ -7,7 +7,19 @@
       $("#event_stats tfoot th").eq(index).hide(); // Hide footer
     })
   }
-  $(function() { hideCols() })
+  $(function() {
+    hideCols()
+
+    // if scrolling right more than #sidebar width, hide sidebar
+    $(window).scroll(function() {
+      if ($(window).scrollLeft() > $('#sidebar').width()) {
+        $('#sidebar').hide()
+      } else {
+        $('#sidebar').show()
+      }
+    })
+
+  })
 </script>
 
 <% unless @event  %>
@@ -25,15 +37,6 @@
   </style>
   <script>
     $(function () {
-
-    // if scrolling right more than #sidebar width, hide sidebar
-      $(window).scroll(function() {
-        if ($(window).scrollLeft() > $('#sidebar').width()) {
-          $('#sidebar').hide()
-        } else {
-          $('#sidebar').show()
-        }
-      })
 
       var date = $("#event_stats th").toArray().indexOf($("th[data-col-name='date']")[0])
 
