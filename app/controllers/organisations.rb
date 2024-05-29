@@ -738,4 +738,23 @@ Dandelion::App.controller do
     @carousels = @organisation.carousels.order('o asc')
     erb :'carousels/carousels'
   end
+
+  get '/organisationships/:id/monthly_donation' do
+    organisationship = Organisationship.find(params[:id]) || not_found
+    @organisation = organisationship.organisation
+    organisation_admins_only!
+    partial :'organisations/monthly_donation', locals: { organisationship: organisationship }
+  end
+
+  post '/organisationships/:id/monthly_donation' do
+    organisationship = Organisationship.find(params[:id]) || not_found
+    @organisation = organisationship.organisation
+    organisation_admins_only!
+    organisationship.update_attributes(
+      monthly_donation_amount: params[:amount],
+      monthly_donation_method: 'Other',
+      monthly_donation_currency: @organisation.currency
+    )
+    200
+  end
 end

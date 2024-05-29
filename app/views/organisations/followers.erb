@@ -62,13 +62,9 @@
         <%= partial :'accounts/account', locals: { account: account, show_email: true } %>
       </td>
       <td>
-        <% if organisationship.monthly_donation_method %>
-          <%= m organisationship.monthly_donation_amount, organisationship.monthly_donation_currency %>/month
-          via <%= organisationship.monthly_donation_method %>
-          <% if organisationship.monthly_donation_start_date %>
-            since <%= organisationship.monthly_donation_start_date %>
-          <% end %>
-        <% end %>
+        <div data-pagelet-url="/organisationships/<%= organisationship.id %>/monthly_donation">
+          <%= partial :'organisations/monthly_donation', locals: { organisationship: organisationship } %>
+        </div>
       </td>
       <td>
         <% Activityship.and(:account => account, :activity_id.in => @organisation.activities.pluck(:id)).each { |activityship| %>
