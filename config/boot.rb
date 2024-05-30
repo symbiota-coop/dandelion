@@ -52,6 +52,14 @@ Anthropic.configure do |config|
   config.access_token = ENV['ANTHROPIC_API_KEY']
 end
 
+GEMINI = Gemini.new(
+  credentials: {
+    service: 'generative-language-api',
+    api_key: ENV['GEMINI_API_KEY']
+  },
+  options: { model: 'gemini-1.5-flash', server_sent_events: true }
+)
+
 if ENV['GOOGLE_MAPS_API_KEY']
   Geocoder.configure(
     lookup: :google,
