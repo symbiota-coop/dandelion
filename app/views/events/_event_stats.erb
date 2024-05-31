@@ -59,7 +59,7 @@
                 sum += f
               })
               if ($(this).is('[data-money]'))
-                $('tfoot th').eq(index).html('<%= money_symbol(@organisation.currency) %>' + sum.toLocaleString());
+                $('tfoot th').eq(index).html('<%= money_symbol(organisation.currency) %>' + sum.toLocaleString());
               else
                 $('tfoot th').eq(index).html(sum);
             });
@@ -72,8 +72,6 @@
     })
   </script>
 <% end %>
-
-<% organisation = params[:cohost] ? Organisation.find_by(slug: params[:cohost]) : @organisation %>
 
 <table id="event_stats" class="table table-striped table-hover table-sm" style="font-size: 0.9em">
   <thead class="bg-white">
