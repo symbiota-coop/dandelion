@@ -1,3 +1,4 @@
+<!-- Name -->
 <td>
   <a href="<%= "/e/#{event.slug}#{if organisation && organisation != event.organisation; "?cohost=#{organisation.slug}"; end }" %>"><%= event.name %></a>
   <% if event.draft? %>
@@ -13,6 +14,7 @@
     <span class="label label-yellow">Co-host</span>
   <% end %>
 </td>
+<!-- Buttons -->
 <td nowrap>
   <a data-toggle="tooltip" title="Edit event" class="btn btn-sm btn-primary" href="/events/<%= event.id %>/edit"><i class="fa fa-pencil"></i></a>
   <% event_image = nil; if organisation && (cohostship = event.cohostships.find_by(organisation: organisation)) && cohostship.image
@@ -49,7 +51,9 @@
     </div>
   <% end %>
 </td>
+<!-- Date -->
 <td data-sort="<%=event.start_time.to_fs(:db_local)%>"><%= when_details(event) %></td>
+<!-- Coordinator -->
 <td style="text-align: center">
   <% if event.coordinator %>
     <a href="/u/<%= event.coordinator.username %>">
@@ -59,6 +63,7 @@
     <% end %>
   </td>
 
+  <!-- Organiser -->
   <% if organisation.stripe_client_id %>
     <td>
       <% if event.organiser %>
@@ -79,6 +84,8 @@
         <td></td>
       <% end %>
 
+
+      <!-- Facilitators -->
       <td style="text-align: center">
         <% if event.event_facilitations.count > 0 %>
           <% event.event_facilitations.each { |event_facilitation| %>
@@ -89,9 +96,11 @@
           <% } %>
         <% end %>
       </td>
+      <!-- Tags -->
       <td>
         <%= partial :'events/tag_labels', locals: { event: event } %>
       </td>
+      <!-- Activity -->
       <td style="text-align: center">
         <% if event.activity %>
           <% if event.activity.image %>
@@ -103,20 +112,25 @@
           <a href="/activities/<%= event.activity.id %>"><%= event.activity.name %></a>
         <% end %>
       </td>
+      <!-- Local group -->
       <td>
         <% if event.local_group %>
           <a href="/local_groups/<%= event.local_group.id %>"><%= event.local_group.name %></a>
         <% end %>
       </td>
+      <!-- Facebook event -->
       <td>
         <% if event.facebook_event_url %>
           <a target="_blank" href="<%= event.facebook_event_url %>"><i class="fa fa-facebook-square"></i></a>
         <% end %>
       </td>
+      <!-- 30d views -->
       <td data-with-placeholder data-pagelet-url="/events/<%=event.id%>/page_views_count" data-sort="<%=event.page_views_count%>"></td>
+      <!-- Tickets sold-->
       <td data-sort="<%=event.tickets.count%>">
         <%= partial :'events/progress', locals: { event: event } %>
       </td>
+      <!-- Checked in -->
       <td>
         <%= partial :'events/checked_in', locals: { event: event } %>
       </td>
@@ -248,17 +262,19 @@
         </td>
 
       <% else %>
+        <!-- No stripe_client_id-->
         <% 13.times do %>
           <td></td>
         <% end %>
       <% end %>
 
-
+      <!-- Credit due -->
       <td data-sort="<%=money_sort(event, :credit_payable_to_revenue_sharer)%>">
         <% if event.credit_payable_to_revenue_sharer > 0 %>
           <%= m event.credit_payable_to_revenue_sharer, event.currency %>
         <% end %>
       </td>
+      <!-- Feedback -->
       <td>
         <% if event.past? and event.attendees.count > 0 and event.event_feedbacks.count > 0 %>
           <a href="/events/<%= event.id %>/feedback"><%= pluralize(event.event_feedbacks.count, 'response') %></a>

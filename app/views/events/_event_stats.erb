@@ -16,7 +16,7 @@
   });
 </script>
 
-<% unless @event  %>
+<% if !@event  %>
   <style>
     #event_stats th:first-child, #event_stats td:first-child { position: sticky; left: 0; width: 15em; min-width: 15em; max-width: 15em; z-index: 999 }
     #event_stats td:first-child { border-right: 1px solid black }
@@ -30,14 +30,14 @@
   <script>
     $(function () {
 
-      var date = $("#event_stats th").toArray().indexOf($("th[data-col-name='date']")[0])
+      var dateIndex = $("#event_stats th").toArray().indexOf($("th[data-col-name='date']")[0])
 
       $(document).ajaxStop(function() {
         if (!$('#event_stats').hasClass('dataTable')) {
           var table = $('#event_stats').dataTable({
             bInfo: false,
             paging: false,
-            order: [[date, "asc"]],
+            order: [[dateIndex, "asc"]],
             oLanguage: {
               sSearch: "Quick search"
             }
@@ -60,7 +60,6 @@
           })
           $('#event_stats').DataTable().draw();
         }
-        hideCols()
       })
 
     })
