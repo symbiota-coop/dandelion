@@ -1,25 +1,19 @@
 <script>
-  function hideCols() {
-    $("#event_stats th.hide").each(function() {
-      var index = $("#event_stats th").index(this);
-      $("#event_stats th").eq(index).hide(); // Hide header
-      $("#event_stats td:nth-child(" + (index + 1) + ")").hide(); // Hide all corresponding tds
-      $("#event_stats tfoot th").eq(index).hide(); // Hide footer
-    })
-  }
   $(function() {
-    hideCols()
+    var scrollTimeout;  // Timeout variable to detect end of scrolling
 
-    // if scrolling right more than #sidebar width, hide sidebar
     $(window).scroll(function() {
-      if ($(window).scrollLeft() > $('#sidebar').width()) {
-        $('#sidebar').hide()
-      } else {
-        $('#sidebar').show()
-      }
-    })
-
-  })
+      clearTimeout(scrollTimeout);  // Clear the previous timeout
+      scrollTimeout = setTimeout(function() {  // Set a new timeout
+        // This code will only run after scrolling has stopped
+        if ($(window).scrollLeft() > $('#sidebar').width()) {
+          $('#sidebar').hide();
+        } else {
+          $('#sidebar').show();
+        }
+      }, 250);  // Adjust timeout duration to suit your needs, 250ms is commonly used
+    });
+  });
 </script>
 
 <% unless @event  %>
@@ -83,7 +77,7 @@
       <% if organisation.stripe_client_id %>
         <th>Organiser</th>
       <% else %>
-        <th class="hide"></th>
+        <th></th>
       <% end %>
       <th>Facilitators</th>
       <th>Tags</th>
@@ -111,7 +105,7 @@
         <th data-money>Profit including donations, after allocations</th>
       <% else %>
         <% 13.times do %>
-          <th class="hide"></th>
+          <th></th>
         <% end %>
       <% end %>
       <th data-money>Credit due</th>
