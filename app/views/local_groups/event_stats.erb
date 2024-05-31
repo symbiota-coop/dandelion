@@ -41,4 +41,4 @@
       $('#event_stats').stickyTableHeaders({zIndex: 9999})
   })
 </script>
-<%= partial :'events/event_stats', locals: { events: @events } %>
+<%= partial :'events/event_stats', locals: { events: @events, organisation: @local_group.organisation } %>
