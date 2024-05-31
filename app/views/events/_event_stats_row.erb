@@ -268,7 +268,7 @@
       <% end %>
 
       <!-- Credit due -->
-      <td data-sort="<%=money_sort(event, :credit_payable_to_revenue_sharer)%>">
+      <td data-sort="<%=money_sort(event, organisation, :credit_payable_to_revenue_sharer)%>">
         <% if event.credit_payable_to_revenue_sharer > 0 %>
           <%= m event.credit_payable_to_revenue_sharer, event.currency %>
         <% end %>
