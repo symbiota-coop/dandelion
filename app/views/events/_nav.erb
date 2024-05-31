@@ -31,6 +31,7 @@
     <style>
       #event_stats thead th { border-top: none }
     </style>
-    <%= partial :'events/event_stats', locals: { events: Event.and(:id.in => [event.id]) } %>
+    <%= partial :'events/event_stats', locals: { events: Event.and(:id.in => [event.id]), organisation: event.organisation } %>
   <% end %>
 <% end %>
+
