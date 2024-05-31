@@ -1,17 +1,12 @@
 <style>
-  #feedback-li, #docs-li { display: none }
-  @media(min-width: 992px) { #feedback-li, #docs-li { display: list-item } }
+  #youtube-li { display: none }
+  @media(min-width: 992px) { #youtube-li { display: list-item } }
 </style>
 <ul class="nav navbar-nav navbar-right">
   <% if current_account %>
-    <li class="d-none d-lg-inline" id="docs-li">
-      <a href="/docs">
-        How to use Dandelion
-      </a>
-    </li>
-    <li id="feedback-li">
-      <a data-nolt="modal" href="https://dandelion.nolt.io">
-        Feedback?
+    <li class="d-none d-lg-inline" id="youtube-li">
+      <a target="_blank" href="https://www.youtube.com/@dandelion.events.321">
+        New YouTube channel! <i class="fa fa-youtube-play"></i>
       </a>
     </li>
     <li>
@@ -51,9 +46,9 @@
       <%= partial :nav_profile, locals: { ul_class: 'dropdown-menu' } %>
     </li>
   <% else %>
-    <li class="d-none d-lg-inline" id="docs-li">
-      <a href="/docs">
-        How to use Dandelion
+    <li class="d-none d-lg-inline" id="youtube-li">
+      <a target="_blank" href="https://www.youtube.com/@dandelion.events.321">
+        New YouTube channel! <i class="fa fa-youtube-play"></i>
       </a>
     </li>
     <li>
