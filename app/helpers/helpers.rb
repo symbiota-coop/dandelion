@@ -163,8 +163,8 @@ Dandelion::App.helpers do
     nil
   end
 
-  def money_sort(event, method)
-    event.send(method).exchange_to(event.organisation.currency)
+  def money_sort(event, organisation, method)
+    event.send(method).exchange_to(organisation.currency)
   rescue Money::Bank::UnknownRate, Money::Currency::UnknownCurrency
     0
   end

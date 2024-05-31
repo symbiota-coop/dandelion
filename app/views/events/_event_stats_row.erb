@@ -138,12 +138,12 @@
 
       <% if organisation.stripe_client_id %>
         <!-- Ticket revenue -->
-        <td data-sort="<%=money_sort(event, :discounted_ticket_revenue)%>">
+        <td data-sort="<%=money_sort(event, organisation, :discounted_ticket_revenue)%>">
           <span data-toggle="tooltip" title="Reported by Dandelion" class="label label-primary d-block mb-1"><%= m event.discounted_ticket_revenue, event.currency %></span>
           <span data-toggle="tooltip" title="Reported by Stripe (48h delay)" class="label label-stripe d-block mb-1"><%= m event.stripe_ticket_revenue, event.currency %></span>
         </td>
         <!-- Donations -->
-        <td data-sort="<%=money_sort(event, :donation_revenue)%>">
+        <td data-sort="<%=money_sort(event, organisation, :donation_revenue)%>">
           <span data-toggle="tooltip" title="Reported by Dandelion" class="label label-primary d-block mb-1"><%= m event.donation_revenue, event.currency %></span>
           <span data-toggle="tooltip" title="Reported by Stripe (48h delay)" class="label label-stripe d-block mb-1"><%= m event.stripe_donations, event.currency %></span>
         </td>
@@ -152,14 +152,14 @@
         <% if organisation.hide_ticket_revenue %>
           <td></td>
         <% else %>
-          <td data-sort="<%=money_sort(event, :discounted_ticket_revenue)%>">
+          <td data-sort="<%=money_sort(event, organisation, :discounted_ticket_revenue)%>">
             <% if event.discounted_ticket_revenue > 0 %>
               <%= m event.discounted_ticket_revenue, event.currency %>
             <% end %>
           </td>
         <% end %>
         <!-- Donations -->
-        <td data-sort="<%=money_sort(event, :donation_revenue)%>">
+        <td data-sort="<%=money_sort(event, organisation, :donation_revenue)%>">
           <% if event.donation_revenue > 0 && !event.purchase_url %>
             <%= m event.donation_revenue, event.currency %>
           <% end %>
@@ -169,7 +169,7 @@
       <% if organisation.stripe_client_id %>
         <!-- Ticket revenue to revenue sharer -->
         <% if event.revenue_sharer %>
-          <td data-sort="<%=money_sort(event, :stripe_ticket_revenue_to_revenue_sharer)%>">
+          <td data-sort="<%=money_sort(event, organisation, :stripe_ticket_revenue_to_revenue_sharer)%>">
             <span data-toggle="tooltip" title="Reported by Dandelion" class="label label-primary d-block mb-1"><%= m event.ticket_revenue_to_revenue_sharer, event.currency %></span>
             <span data-toggle="tooltip" title="Reported by Stripe (48h delay)" class="label label-stripe d-block mb-1"><%= m event.stripe_ticket_revenue_to_revenue_sharer, event.currency %></span>
           </td>
@@ -177,12 +177,12 @@
           <td></td>
         <% end %>
         <!-- Ticket revenue to organisation -->
-        <td data-sort="<%=money_sort(event, :stripe_ticket_revenue_to_organisation)%>">
+        <td data-sort="<%=money_sort(event, organisation, :stripe_ticket_revenue_to_organisation)%>">
           <span data-toggle="tooltip" title="Reported by Dandelion" class="label label-primary d-block mb-1"><%= m event.organisation_discounted_ticket_revenue, event.currency %></span>
           <span data-toggle="tooltip" title="Reported by Stripe (48h delay)" class="label label-stripe d-block mb-1"><%= m event.stripe_ticket_revenue_to_organisation, event.currency %></span>
         </td>
         <!-- Revenue reported by Dandelion -->
-        <td data-sort="<%=money_sort(event, :revenue)%>">
+        <td data-sort="<%=money_sort(event, organisation, :revenue)%>">
           <% dandelion = "#{m(event.revenue, event.currency)} from #{pluralize(event.orders.and(:transferred.ne => true, :payment_intent.ne => nil).count, 'order')}" %>
           <%= dandelion.split(' from ').first %> from <a href="/events/<%=event.id%>/orders"><%= dandelion.split(' from ').last %></a>
         </td>
@@ -199,7 +199,7 @@
         close_enough = (stripe_charges_money - event.revenue).abs.cents < 100
         bg_class = if event.end_time.to_date < Date.today - 1; (close_enough ? 'bg-success' : 'bg-warning'); end
         %>
-        <td data-sort="<%=money_sort(event, :stripe_revenue)%>" <% if bg_class %> class="<%= bg_class %>" <% end %>>
+        <td data-sort="<%=money_sort(event, organisation, :stripe_revenue)%>" <% if bg_class %> class="<%= bg_class %>" <% end %>>
           <%= stripe.split(' from ').first %> from <a <% if bg_class %> class="text-white font-weight-bold" <% end %> href="/events/<%=event.id%>/stripe_charges"><%= stripe.split(' from ').last %></a>
           <% if stripe_charges_transferred.count > 0 %>
             +
@@ -211,16 +211,16 @@
           <% end %>
         </td>
         <!-- Stripe fees -->
-        <td data-sort="<%=money_sort(event, :stripe_fees)%>">
+        <td data-sort="<%=money_sort(event, organisation, :stripe_fees)%>">
           <%= m event.stripe_fees, event.currency %>
         </td>
         <!-- Profit -->
-        <td data-sort="<%=money_sort(event, :profit)%>">
+        <td data-sort="<%=money_sort(event, organisation, :profit)%>">
           <%= m event.profit, event.currency %>
         </td>
 
         <!-- Profit less donations, before allocations -->
-        <td data-sort="<%=money_sort(event, :profit_less_donations)%>">
+        <td data-sort="<%=money_sort(event, organisation, :profit_less_donations)%>">
           <%= m event.profit_less_donations, event.currency %>
         </td>
         <% Event.profit_share_roles.each do |role| %>
@@ -228,7 +228,7 @@
           <% if role == 'facilitator' && event.revenue_sharer %>
             <td></td>
           <% else %>
-            <td data-sort="<%=money_sort(event, :"profit_to_#{role}")%>">
+            <td data-sort="<%=money_sort(event, organisation, :"profit_to_#{role}")%>">
               <% if event.revenue_sharer %>
                 <%= "#{event.send("profit_share_to_#{role}")}/#{event.revenue_share_to_organisation}" %><br />
               <% else %>
@@ -247,7 +247,7 @@
           <% end %>
         <% end %>
         <!-- Profit less donations, after allocations -->
-        <td data-sort="<%=money_sort(event, :profit_less_donations_less_allocations)%>">
+        <td data-sort="<%=money_sort(event, organisation, :profit_less_donations_less_allocations)%>">
           <% if event.revenue_sharer %>
             <%= "#{event.profit_share_to_organisation}/#{event.revenue_share_to_organisation}" %><br />
           <% else %>
@@ -256,7 +256,7 @@
           <%= m event.profit_less_donations_less_allocations, event.currency %>
         </td>
         <!-- Profit including donations, after allocations -->
-        <td data-sort="<%=money_sort(event, :profit_less_allocations)%>">
+        <td data-sort="<%=money_sort(event, organisation, :profit_less_allocations)%>">
           <%= m event.profit_less_allocations, event.currency %>
         </td>
 
