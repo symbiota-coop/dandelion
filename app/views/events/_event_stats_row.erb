@@ -59,7 +59,7 @@
     <% end %>
   </td>
 
-  <% if event.organisation.stripe_client_id %>
+  <% if organisation.stripe_client_id %>
     <td>
       <% if event.organiser %>
         <a href="/u/<%= event.organiser.username %>">
@@ -122,7 +122,7 @@
       </td>
 
 
-      <% if event.organisation.stripe_client_id %>
+      <% if organisation.stripe_client_id %>
         <!-- Ticket revenue -->
         <td data-sort="<%=money_sort(event, :discounted_ticket_revenue)%>">
           <span data-toggle="tooltip" title="Reported by Dandelion" class="label label-primary d-block mb-1"><%= m event.discounted_ticket_revenue, event.currency %></span>
@@ -135,7 +135,7 @@
         </td>
       <% else %>
         <!-- Ticket revenue -->
-        <% if event.organisation.hide_ticket_revenue %>
+        <% if organisation.hide_ticket_revenue %>
           <td></td>
         <% else %>
           <td data-sort="<%=money_sort(event, :discounted_ticket_revenue)%>">
@@ -153,7 +153,7 @@
         </td>
       <% end %>
 
-      <% if event.organisation.stripe_client_id %>
+      <% if organisation.stripe_client_id %>
         <!-- Ticket revenue to revenue sharer -->
         <% if event.revenue_sharer %>
           <td data-sort="<%=money_sort(event, :stripe_ticket_revenue_to_revenue_sharer)%>">
