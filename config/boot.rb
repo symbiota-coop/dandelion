@@ -52,13 +52,19 @@ Anthropic.configure do |config|
   config.access_token = ENV['ANTHROPIC_API_KEY']
 end
 
-GEMINI = Gemini.new(
-  credentials: {
-    service: 'generative-language-api',
-    api_key: ENV['GEMINI_API_KEY']
-  },
-  options: { model: 'gemini-1.5-flash', server_sent_events: true }
-)
+Yt.configure do |config|
+  config.api_key = ENV['YOUTUBE_API_KEY']
+end
+
+if ENV['GEMINI_API_KEY']
+  GEMINI = Gemini.new(
+    credentials: {
+      service: 'generative-language-api',
+      api_key: ENV['GEMINI_API_KEY']
+    },
+    options: { model: 'gemini-1.5-flash', server_sent_events: true }
+  )
+end
 
 if ENV['GOOGLE_MAPS_API_KEY']
   Geocoder.configure(
@@ -71,8 +77,4 @@ if ENV['GOOGLE_MAPS_API_KEY']
   Timezone::Lookup.config(:google) do |c|
     c.api_key = ENV['GOOGLE_MAPS_API_KEY']
   end
-end
-
-Yt.configure do |config|
-  config.api_key = ENV['YOUTUBE_API_KEY']
 end
