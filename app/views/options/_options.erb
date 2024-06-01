@@ -81,7 +81,7 @@
           <%= pluralize option.optionships.count, 'person' %>
         <% else %>
           <% y = [] %>
-          <% option.optionships.order('created_at desc').each { |optionship| account = optionship.account; %>
+          <% option.optionships.order('created_at asc').each { |optionship| account = optionship.account; %>
           <% if params[:view] == 'names' %>
             <% y << capture do %>
               <% if @membership.admin? %>
