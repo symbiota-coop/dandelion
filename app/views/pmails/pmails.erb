@@ -36,7 +36,9 @@
         <a href="<%= edit_url %>"><%= pmail.subject %></a>
       </td>
       <td>
-        <a href="/u/<%= pmail.account.username %>"><%= pmail.account.name %></a>
+        <% if pmail.account %>
+          <a href="/u/<%= pmail.account.username %>"><%= pmail.account.name %></a>
+        <% end %>
       </td>
       <td>
         <% if pmail.sent_at %>
