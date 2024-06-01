@@ -1,19 +1,23 @@
 <%= partial :'event_feedbacks/average_rating', locals: { event_feedbacks: event_feedbacks } %>
 
-<% if @account && @account.feedback_summary %>
-  <div class="well my-3" data-toggle="tooltip" title="AI-generated summary ✨">
-    <big>
-      <%= @account.feedback_summary %>
-    </big>
-  </div>
-<% end %>
+<% if !params[:minimal] %>
 
-<% if @activity && @activity.feedback_summary %>
-  <div class="well my-3" data-toggle="tooltip" title="AI-generated summary ✨">
-    <big>
-      <%= @activity.feedback_summary %>
-    </big>
-  </div>
+  <% if @account && @account.feedback_summary %>
+    <div class="well my-3" data-toggle="tooltip" title="AI-generated summary ✨">
+      <big>
+        <%= @account.feedback_summary %>
+      </big>
+    </div>
+  <% end %>
+
+  <% if @activity && @activity.feedback_summary %>
+    <div class="well my-3" data-toggle="tooltip" title="AI-generated summary ✨">
+      <big>
+        <%= @activity.feedback_summary %>
+      </big>
+    </div>
+  <% end %>
+
 <% end %>
 
 <% unless defined?(unscoped); event_feedbacks = event_feedbacks.unscoped; end %>
