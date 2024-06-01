@@ -1,19 +1,12 @@
 Dandelion::App.controller do
   get '/books' do
-    @books = Book.all
+    @books = Book.all(sort: { 'Year Published' => 'desc' }, filter: '{Dandelion} = 1')
     erb :'books/books'
   end
 
   get '/books/:slug' do
-    @book = Book.find_by(slug: params[:slug]) || not_found
-    @title = "#{@book.title} by #{@book.book_author.name}"
+    @book = Book.all(filter: "{Slug} = '#{params[:slug]}'").first || not_found
+    @title = "#{@book['Title']} by #{@book['Author']}"
     erb :'books/book'
-  end
-
-  get '/books/:slug/:number' do
-    @book = Book.find_by(slug: params[:slug]) || not_found
-    @title = "#{@book.title} by #{@book.book_author.name}"
-    @book_chapter = @book.book_chapters.find_by(number: params[:number]) || not_found
-    erb :'books/book_chapter'
   end
 end
