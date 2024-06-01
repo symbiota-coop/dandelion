@@ -101,10 +101,12 @@ class Gathering
     Gathering.all.each do |gathering|
       next unless Gathering.reflect_on_all_associations(:has_many).all? do |assoc|
         gathering.send(assoc.name).count == 0 || ignore.include?(assoc.name)
-      end && gathering.created_at < 1.month.ago && gathering.memberships.count == 1
+      end
 
-      puts gathering.name
-      gathering.destroy
+      if gathering.created_at < 1.month.ago && gathering.memberships.count == 1
+        puts gathering.name
+        gathering.destroy
+      end
     end
   end
 
