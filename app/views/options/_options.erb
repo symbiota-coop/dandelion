@@ -17,7 +17,7 @@
       <h3 class="mb-0"><i class="fa <%= Option.icon(type) %>"></i> <%= %w[Tier Extra].include?(type) ? type.pluralize : type %></h3>
     </td>
   </tr>
-  <% options.order('cost asc, name asc').each { |option| %>
+  <% options.order('cost asc, name asc, order asc').each { |option| %>
   <tr>
     <td>
       <strong>

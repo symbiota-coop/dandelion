@@ -285,7 +285,7 @@ class Activity
 
         "# Feedback on #{ef.event.name}, #{ef.event.start_time}\n\n#{ef.answers.join("\n")}"
       end.join("\n\n")
-      prompt = "Provide a one-paragraph summary of the feedback on this activity (family of events), #{activity.name}, hosted by #{activity.organisation.name}. Focus on the positives. Do not use the words 'overwhelming' or 'overwhelmingly'. The feedback:\n\n#{summary}"
+      prompt = "Provide a one-paragraph summary of the feedback on this activity (family of events), #{activity.name}, hosted by #{activity.organisation.name}. Write in the present tense and focus on the positives. The feedback:\n\n#{summary}"
 
       prompt = prompt[0..(200_000 * 0.66 * 4)]
       client = Anthropic::Client.new
@@ -311,6 +311,8 @@ class Activity
           sleep 5
         end
       end
+      sentences = last_paragraph.split('. ')
+      last_paragraph = sentences[1..-1].join('. ') if sentences[0] =~ /The feedback .* positive/ || sentences[0] =~ /positive feedback/
       puts "#{last_paragraph}\n\n"
       activity.set(feedback_summary: last_paragraph)
     end

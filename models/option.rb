@@ -13,6 +13,7 @@ class Option
   field :type, type: String
   field :by_invitation, type: Boolean
   field :hide_members, type: Boolean
+  field :order, type: Integer
 
   def self.admin_fields
     {
@@ -20,6 +21,7 @@ class Option
       description: :text_area,
       capacity: :number,
       cost: :number,
+      order: :number,
       split_cost: :check_box,
       type: :text,
       gathering_id: :lookup,
