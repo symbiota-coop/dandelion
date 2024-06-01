@@ -29,7 +29,7 @@
           <%== Sanitize.fragment(Rinku.auto_link(@gathering.intro_for_non_members), Sanitize::Config::DANDELION) %>
         </div>
       <% end %>
-      <% form_for @account, "/g/#{@gathering.slug}/apply", class: 'mt-3' do |f| %>
+      <% form_for @account, "/g/#{@gathering.slug}/apply", class: 'mt-3', id: 'apply' do |f| %>
         <script>
           $(function () {
             $('.form-group > div.col-lg-6').removeClass('col-lg-6').addClass('col-lg-8')
