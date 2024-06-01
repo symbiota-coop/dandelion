@@ -1,5 +1,5 @@
 <div class="card film">
-  <a href="<%= film['URL'] %>">
+  <a target="_blank" href="<%= film['URL'] %>">
     <img onerror="this.style.display='none'" class="card-img-top" src="<%= film['Images'].first['url'] if film['Images'] %>">
   </a>
   <div class="card-body">
@@ -7,7 +7,7 @@
       <span class="float-right text-muted">
         <%= film['Year'] %>
       </span>
-      <a href="<%= film['URL'] %>"><%= film['Name'] %></a>
+      <a target="_blank" href="<%= film['URL'] %>"><%= film['Name'] %></a>
     </h5>
   </div>
 </div>

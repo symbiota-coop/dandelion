@@ -1,3 +1,5 @@
-<p class="lead">Regenerative films recommended by the Dandelion team 🍿</p>
+<%= partial :nav_library %>
+
+<p class="lead">Films recommended by the Dandelion team 🍿</p>
 
 <%= cp(:'films/blocks', key: 'films/blocks', locals: { films: ENV['AIRTABLE_BASE_KEY'] ? Film.all(sort: {'Year' => 'desc'}) : [] }) %>

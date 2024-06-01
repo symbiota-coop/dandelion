@@ -1,0 +1,8 @@
+<ul class="nav nav-tabs mb-3">
+  <li class="nav-item">
+    <a class="nav-link <%= 'active' if request.path.start_with?('/books') %>" href="/books">Books</a>
+  </li>
+  <li class="nav-item">
+    <a class="nav-link <%= 'active' if request.path.start_with?('/films') %>" href="/films">Films</a>
+  </li>
+</ul>

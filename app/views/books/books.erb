@@ -1,3 +1,22 @@
-<p class="lead">Books recommended by the Dandelion team 📘</p>
+<%= partial :nav_library %>
 
-<%= partial(:'books/blocks', key: 'books/blocks', locals: { books: @books }) %>
+<p class="lead">Books recommended by the Dandelion team, with summaries 📘</p>
+
+<% grouped_books = @books.group_by do |book| 
+  year = book['Original Publication Year or Year Published']
+  if year < 1969
+    'Before 1969'     
+  elsif year < 1989    
+    'Before 1989' 
+  elsif year < 2000
+    'Before 2000'   
+  elsif year < 2010
+    '2000s'
+  else
+    year
+  end
+end %>
+<% grouped_books.each do |year_or_label, books| %>
+  <h2 class="mt-5"><%= year_or_label %></h2>
+  <%= partial(:'books/blocks', locals: { books: books }) %>
+<% end %>

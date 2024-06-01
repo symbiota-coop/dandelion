@@ -1,6 +1,6 @@
 Dandelion::App.controller do
   get '/books' do
-    @books = Book.all(sort: { 'Year Published' => 'desc' }, filter: '{Dandelion} = 1')
+    @books = Book.all(sort: { 'Original Publication Year or Year Published' => 'desc' }, filter: '{Dandelion} = 1')
     erb :'books/books'
   end
 
