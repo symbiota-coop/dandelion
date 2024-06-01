@@ -19,6 +19,7 @@ class Activity
   field :hidden, type: Boolean
   field :extra_info_for_application_form, type: String
   field :extra_info_for_acceptance_email, type: String
+  field :feedback_summary, type: String
 
   def self.admin_fields
     {
@@ -271,4 +272,47 @@ class Activity
     file.unlink
   end
   handle_asynchronously :send_applications_csv
+
+  def self.set_feedback_summaries
+    # Activity.and(:feedback_summary.ne => nil).set(feedback_summary: nil)
+    activities = Activity.and(:id.in => EventFeedback.pluck(:activity_id))
+    activities = activities.select { |activity| activity.feedback_summary.nil? && activity.event_feedbacks.count >= 10 }
+    activities.each_with_index do |activity, i|
+      puts "#{i + 1}/#{activities.count} #{activity.organisation.name}: #{activity.name}"
+
+      summary = activity.event_feedbacks.order('created_at desc').and(:answers.ne => nil).map do |ef|
+        next unless ef.event
+
+        "# Feedback on #{ef.event.name}, #{ef.event.start_time}\n\n#{ef.answers.join("\n")}"
+      end.join("\n\n")
+      prompt = "Provide a one-paragraph summary of the feedback on this activity (family of events), #{activity.name}, hosted by #{activity.organisation.name}. Focus on the positives. Do not use the words 'overwhelming' or 'overwhelmingly'. The feedback:\n\n#{summary}"
+
+      prompt = prompt[0..(200_000 * 0.66 * 4)]
+      client = Anthropic::Client.new
+      last_paragraph = nil
+      loop do
+        response = client.messages(
+          parameters: {
+            model: 'claude-3-haiku-20240307',
+            messages: [
+              { role: 'user', content: prompt }
+            ],
+            max_tokens: 256
+          }
+        )
+        if response['content']
+          paragraphs = response['content'].first['text'].split("\n\n")
+          if paragraphs.length <= 2
+            last_paragraph = paragraphs.last
+            break if last_paragraph.split.length >= 50 && last_paragraph[0] != '-' && last_paragraph[0] != '*' && last_paragraph[-1] == '.'
+          end
+        else
+          puts 'sleeping...'
+          sleep 5
+        end
+      end
+      puts "#{last_paragraph}\n\n"
+      activity.set(feedback_summary: last_paragraph)
+    end
+  end
 end
