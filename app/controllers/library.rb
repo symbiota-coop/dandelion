@@ -9,4 +9,9 @@ Dandelion::App.controller do
     @title = "#{@book['Title']} by #{@book['Author']}"
     erb :'books/book'
   end
+
+  get '/films' do
+    @title = 'Films'
+    erb :'films/films'
+  end
 end
