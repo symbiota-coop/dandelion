@@ -1,13 +1,3 @@
-<div class="card film">
-  <a target="_blank" href="<%= film['URL'] %>">
-    <img onerror="this.style.display='none'" class="card-img-top" src="<%= film['Images'].first['url'] if film['Images'] %>">
-  </a>
-  <div class="card-body">
-    <h4 class="card-title mb-0">
-      <span class="float-right text-muted">
-        <%= film['Year'] %>
-      </span>
-      <a target="_blank" href="<%= film['URL'] %>"><%= film['Name'] %></a>
-    </h5>
-  </div>
-</div>
+<a target="_blank" href="<%= film['URL'] %>">
+  <img class="w-100" src="<%= film['Images'].first['url']%>">
+</a>

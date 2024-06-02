@@ -1,0 +1,18 @@
+<% grouped_films = @films.group_by do |film| 
+  year = film['Year']
+  if year < 1969
+    'Before 1969'     
+  elsif year < 1989    
+    'Before 1989' 
+  elsif year < 2000
+    'Before 2000'   
+  elsif year < 2010
+    '2000s'
+  else
+    year
+  end
+end %>
+<% grouped_films.each do |year_or_label, films| %>
+  <h2 class="mt-5"><%= year_or_label %></h2>
+  <%= partial(:'films/blocks', locals: { films: films }) %>
+<% end %>

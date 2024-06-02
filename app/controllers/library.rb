@@ -1,5 +1,6 @@
 Dandelion::App.controller do
   get '/books' do
+    @title = 'Books'
     @books = Book.all(sort: { 'Original Publication Year or Year Published' => 'desc' }, filter: '{Dandelion} = 1')
     erb :'books/books'
   end
@@ -12,6 +13,7 @@ Dandelion::App.controller do
 
   get '/films' do
     @title = 'Films'
+    @films = Film.all(sort: { 'Year' => 'desc' })
     erb :'films/films'
   end
 end
