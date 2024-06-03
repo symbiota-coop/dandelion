@@ -121,7 +121,6 @@ GEM
       capybara (~> 3.0)
       ferrum (~> 0.14.0)
     date (3.3.4)
-    declarative (0.0.20)
     delayed_job (4.1.11)
       activesupport (>= 3.0, < 8.0)
     delayed_job_mongoid (3.0.0)
@@ -204,25 +203,8 @@ GEM
     geocoder (1.8.2)
     gocardless_pro (2.54.0)
       faraday (>= 2, < 3)
-    google-apis-core (0.13.0)
-      addressable (~> 2.5, >= 2.5.1)
-      googleauth (~> 1.9)
-      httpclient (>= 2.8.1, < 3.a)
-      mini_mime (~> 1.0)
-      representable (~> 3.0)
-      retriable (>= 2.0, < 4.a)
-      rexml
-    google-apis-drive_v3 (0.48.0)
-      google-apis-core (>= 0.12.0, < 2.a)
-    google-apis-sheets_v4 (0.27.0)
-      google-apis-core (>= 0.12.0, < 2.a)
     google-cloud-env (2.1.1)
       faraday (>= 1.0, < 3.a)
-    google_drive2 (3.0.9)
-      google-apis-drive_v3 (>= 0.5.0, < 2.0.0)
-      google-apis-sheets_v4 (>= 0.4.0, < 2.0.0)
-      googleauth (>= 0.5.0, < 2.0.0)
-      nokogiri (>= 1.5.3, < 2.0.0)
     googleauth (1.11.0)
       faraday (>= 1.0, < 3.a)
       google-cloud-env (~> 2.1)
@@ -237,7 +219,6 @@ GEM
     http-accept (1.7.0)
     http-cookie (1.0.5)
       domain_name (~> 0.5)
-    httpclient (2.8.3)
     i18n (1.14.1)
       concurrent-ruby (~> 1.0)
     icalendar (2.10.1)
@@ -442,16 +423,11 @@ GEM
       faraday (>= 1.0)
       faraday-multipart
       faraday-retry
-    representable (3.2.0)
-      declarative (< 0.1.0)
-      trailblazer-option (>= 0.1.1, < 0.2.0)
-      uber (< 0.2.0)
     rest-client (2.1.0)
       http-accept (>= 1.7.0, < 2.0)
       http-cookie (>= 1.0.2, < 2.0)
       mime-types (>= 1.16, < 4.0)
       netrc (~> 0.8)
-    retriable (3.1.2)
     rexml (3.2.6)
     rinku (2.0.6)
     rqrcode (2.2.0)
@@ -512,13 +488,11 @@ GEM
     tilt (2.3.0)
     timeout (0.4.1)
     timezone (1.3.25)
-    trailblazer-option (0.1.2)
     ttfunk (1.7.0)
     tzinfo (2.0.6)
       concurrent-ruby (~> 1.0)
     tzinfo-data (1.2024.1)
       tzinfo (>= 1.0.0)
-    uber (0.1.0)
     unaccent (0.4.0)
     unf (0.1.4)
       unf_ext
@@ -569,7 +543,6 @@ DEPENDENCIES
   gemini-ai
   geocoder
   gocardless_pro
-  google_drive2
   html_truncator
   icalendar
   incoming

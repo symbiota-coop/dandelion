@@ -64,7 +64,7 @@ class StripeCharge
     }
   end
 
-  def self.transfer(organisation, from: nil, to: Date.today - 1)
+  def self.transfer_1(organisation, from: nil, to: Date.today - 1)
     unless from
       most_recent_stripe_charge = organisation.stripe_charges.order('created desc').first
       from = most_recent_stripe_charge ? most_recent_stripe_charge.created.to_date + 1 : Date.today - 2
@@ -95,7 +95,11 @@ class StripeCharge
         c[f] = x.gsub(',', '.') if x
       end
       puts c['created']
-      organisation.stripe_charges.create(c)
+      begin
+        organisation.stripe_charges.create(c)
+      rescue StandardError
+        puts "error creating charge #{c['id']}"
+      end
     end
   end
 

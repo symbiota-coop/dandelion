@@ -47,10 +47,7 @@ namespace :organisations do
   end
 
   task stripe_transfers: :environment do
-    Organisation.and(:google_sheets_key.ne => nil).each do |organisation|
-      organisation.transfer_events
-      organisation.transfer_charges
-      organisation.transfer_transactions
+    Organisation.and(sync_stripe: true).each do |organisation|
       StripeCharge.transfer(organisation)
       StripeTransaction.transfer(organisation)
     end
