@@ -23,7 +23,6 @@ class StripeTransaction
     {
       organisation_id: :lookup,
       stripe_charge_id: :lookup,
-      balance_transaction_id: :text,
       created_utc: :datetime,
       available_on_utc: :datetime,
       currency: :text,
