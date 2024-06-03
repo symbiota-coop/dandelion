@@ -5,7 +5,6 @@ class StripeTransaction
   belongs_to :organisation, index: true
   belongs_to :stripe_charge, optional: true, index: true
 
-  field :balance_transaction_id, type: String
   field :created_utc, type: Time
   field :available_on_utc, type: Time
   field :currency, type: String
@@ -91,8 +90,9 @@ class StripeTransaction
     csv.each do |transaction|
       transaction = transaction.to_hash.transform_keys(&:to_s)
       t = {}
+      t['id'] = transaction['balance_transaction_id']
       t['stripe_charge_id'] = transaction['charge_id']
-      %w[balance_transaction_id created_utc available_on_utc currency gross fee net reporting_category source_id description customer_facing_amount customer_facing_currency automatic_payout_id automatic_payout_effective_at].each do |f|
+      %w[created_utc available_on_utc currency gross fee net reporting_category source_id description customer_facing_amount customer_facing_currency automatic_payout_id automatic_payout_effective_at].each do |f|
         t[f] = case f
                when 'created_utc', 'available_on_utc', 'automatic_payout_effective_at'
                  "#{transaction[f]} +0000" if transaction[f]
@@ -101,7 +101,11 @@ class StripeTransaction
                end
       end
       puts t['created_utc']
-      organisation.stripe_transactions.create(t)
+      begin
+        organisation.stripe_transactions.create(t)
+      rescue StandardError
+        puts "error creating transaction #{t['balance_transaction_id']}"
+      end
     end
   end
 end
