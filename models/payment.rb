@@ -51,4 +51,17 @@ class Payment
     gathering.update_attribute(:processed_via_dandelion, gathering.processed_via_dandelion + amount)
     gathering.update_attribute(:balance, gathering.balance + amount)
   end
+
+  def update_metadata
+    Stripe.api_key = gathering.stripe_sk
+    Stripe.api_version = '2020-08-27'
+    pi = Stripe::PaymentIntent.retrieve payment_attempt.payment_intent
+    charge = Stripe::Charge.retrieve pi.charges.first.id
+    Stripe::Charge.update(charge.id, { metadata: {
+                            de_gathering_id: gathering.id,
+                            de_account_id: account.id
+                          } })
+  rescue StandardError => e
+    Airbrake.notify(e)
+  end
 end

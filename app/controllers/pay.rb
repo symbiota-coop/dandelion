@@ -70,7 +70,11 @@ Dandelion::App.controller do
         }],
         customer_email: current_account.email,
         success_url: "#{ENV['BASE_URI']}/g/#{@gathering.slug}",
-        cancel_url: "#{ENV['BASE_URI']}/g/#{@gathering.slug}"
+        cancel_url: "#{ENV['BASE_URI']}/g/#{@gathering.slug}",
+        metadata: {
+          de_gathering_id: @gathering.id,
+          de_account_id: @membership.account.id
+        }
       }
       session = Stripe::Checkout::Session.create(stripe_session_hash)
       @membership.payment_attempts.create! amount: params[:amount].to_i, currency: @gathering.currency, session_id: session.id, payment_intent: session.payment_intent
