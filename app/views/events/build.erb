@@ -354,7 +354,7 @@
                   .after('<div class="input-group-append"><span class="input-group-text">%</span></div>')
                 })
               </script>
-              <% if organisation_admin?(@event.organisation) %>
+              <% if event_revenue_admin? %>
                 <div id="revenue-share">
                   <%= f.text_block :revenue_share_to_revenue_sharer %>
                 </div>
