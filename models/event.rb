@@ -386,6 +386,18 @@ class Event
     c
   end
 
+  def self.revenue_admin?(event, account)
+    account &&
+      event &&
+      (
+      account.admin? ||
+        (event.activity && Activity.admin?(event.activity, account)) ||
+        (event.local_group && LocalGroup.admin?(event.local_group, account)) ||
+        (event.organisation && Organisation.admin?(event.organisation, account)) ||
+        (event.cohosts.any? { |cohost| Organisation.admin?(cohost, account) })
+    )
+  end
+
   def self.admin?(event, account)
     account &&
       event &&

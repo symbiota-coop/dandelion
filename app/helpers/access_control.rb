@@ -88,6 +88,15 @@ Dandelion::App.helpers do
     kick!(redirect_url: "/e/#{@event.slug}") unless event_admin?
   end
 
+  def event_revenue_admin?(event = nil, account = current_account)
+    event ||= @event
+    Event.revenue_admin?(event, account)
+  end
+
+  def event_revenue_admins_only!
+    kick!(redirect_url: "/e/#{@event.slug}") unless event_revenue_admin?
+  end
+
   def event_email_viewer?(event = nil, account = current_account)
     event ||= @event
     Event.email_viewer?(event, account)

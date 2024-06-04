@@ -47,7 +47,7 @@
 
     "><i class="fa fa-image"></i></a>
     <div style="display: none">
-      <a target="_parent" href="<%= ENV['BASE_URI'] %>/e/<%=event.slug%><% if params[:cohost] %>?cohost=<%=params[:cohost]%><% end %>"><img src="<%= u event_image.thumb('1920x1920').url %>"></a>
+      <a target="_parent" href="<%= ENV['BASE_URI'] %>/e/<%=event.slug%>"><img src="<%= u event_image.thumb('1920x1920').url %>"></a>
     </div>
   <% end %>
 </td>
@@ -214,51 +214,58 @@
         <td data-sort="<%=money_sort(event, organisation, :stripe_fees)%>">
           <%= m event.stripe_fees, event.currency %>
         </td>
-        <!-- Profit -->
-        <td data-sort="<%=money_sort(event, organisation, :profit)%>">
-          <%= m event.profit, event.currency %>
-        </td>
 
-        <!-- Profit less donations, before allocations -->
-        <td data-sort="<%=money_sort(event, organisation, :profit_less_donations)%>">
-          <%= m event.profit_less_donations, event.currency %>
-        </td>
-        <% Event.profit_share_roles.each do |role| %>
-          <!-- Allocated to <%= role %> = Profit * profit_share_<%= role %> -->
-          <% if role == 'facilitator' && event.revenue_sharer %>
+        <% if event_revenue_admin %>
+          <!-- Profit -->
+          <td data-sort="<%=money_sort(event, organisation, :profit)%>">
+            <%= m event.profit, event.currency %>
+          </td>
+
+          <!-- Profit less donations, before allocations -->
+          <td data-sort="<%=money_sort(event, organisation, :profit_less_donations)%>">
+            <%= m event.profit_less_donations, event.currency %>
+          </td>
+          <% Event.profit_share_roles.each do |role| %>
+            <!-- Allocated to <%= role %> = Profit * profit_share_<%= role %> -->
+            <% if role == 'facilitator' && event.revenue_sharer %>
+              <td></td>
+            <% else %>
+              <td data-sort="<%=money_sort(event, organisation, :"profit_to_#{role}")%>">
+                <% if event.revenue_sharer %>
+                  <%= "#{event.send("profit_share_to_#{role}")}/#{event.revenue_share_to_organisation}" %><br />
+                <% else %>
+                  <%= "#{event.send("profit_share_to_#{role}")}%" %><br />
+                <% end %>
+                <%= m event.send("profit_to_#{role}"), event.currency %>
+                <br />
+                <br />
+                <div class="p-1">
+                  <%= m event.send("paid_to_#{role}"), event.currency %> paid
+                </div>
+                <a <% if event.send("remaining_to_#{role}") > 0 %> href="/events/<%=event.id%>/rpayments?create=1&role=<%=role%>&amount=<%=event.send("remaining_to_#{role}").abs%>&currency=<%=event.currency%>" <% else %> href="/events/<%=event.id%>/rpayments" <% end %> class="d-block p-1<% overpaid = nil; if event.send("remaining_to_#{role}") > 0 %> bg-warning <% elsif event.send("remaining_to_#{role}") < 0; overpaid = true %> bg-danger <% end %>">
+                  <%= m event.send("remaining_to_#{role}").abs, event.currency %> <%= overpaid ? 'overpaid' : 'remaining' %>
+                </a>
+              </td>
+            <% end %>
+          <% end %>
+          <!-- Profit less donations, after allocations -->
+          <td data-sort="<%=money_sort(event, organisation, :profit_less_donations_less_allocations)%>">
+            <% if event.revenue_sharer %>
+              <%= "#{event.profit_share_to_organisation}/#{event.revenue_share_to_organisation}" %><br />
+            <% else %>
+              <%= "#{event.profit_share_to_organisation}%" %><br />
+            <% end %>
+            <%= m event.profit_less_donations_less_allocations, event.currency %>
+          </td>
+          <!-- Profit including donations, after allocations -->
+          <td data-sort="<%=money_sort(event, organisation, :profit_less_allocations)%>">
+            <%= m event.profit_less_allocations, event.currency %>
+          </td>
+        <% else %>
+          <% 8.times do %>
             <td></td>
-          <% else %>
-            <td data-sort="<%=money_sort(event, organisation, :"profit_to_#{role}")%>">
-              <% if event.revenue_sharer %>
-                <%= "#{event.send("profit_share_to_#{role}")}/#{event.revenue_share_to_organisation}" %><br />
-              <% else %>
-                <%= "#{event.send("profit_share_to_#{role}")}%" %><br />
-              <% end %>
-              <%= m event.send("profit_to_#{role}"), event.currency %>
-              <br />
-              <br />
-              <div class="p-1">
-                <%= m event.send("paid_to_#{role}"), event.currency %> paid
-              </div>
-              <a <% if event.send("remaining_to_#{role}") > 0 %> href="/events/<%=event.id%>/rpayments?create=1&role=<%=role%>&amount=<%=event.send("remaining_to_#{role}").abs%>&currency=<%=event.currency%>" <% else %> href="/events/<%=event.id%>/rpayments" <% end %> class="d-block p-1<% overpaid = nil; if event.send("remaining_to_#{role}") > 0 %> bg-warning <% elsif event.send("remaining_to_#{role}") < 0; overpaid = true %> bg-danger <% end %>">
-                <%= m event.send("remaining_to_#{role}").abs, event.currency %> <%= overpaid ? 'overpaid' : 'remaining' %>
-              </a>
-            </td>
           <% end %>
         <% end %>
-        <!-- Profit less donations, after allocations -->
-        <td data-sort="<%=money_sort(event, organisation, :profit_less_donations_less_allocations)%>">
-          <% if event.revenue_sharer %>
-            <%= "#{event.profit_share_to_organisation}/#{event.revenue_share_to_organisation}" %><br />
-          <% else %>
-            <%= "#{event.profit_share_to_organisation}%" %><br />
-          <% end %>
-          <%= m event.profit_less_donations_less_allocations, event.currency %>
-        </td>
-        <!-- Profit including donations, after allocations -->
-        <td data-sort="<%=money_sort(event, organisation, :profit_less_allocations)%>">
-          <%= m event.profit_less_allocations, event.currency %>
-        </td>
 
       <% else %>
         <!-- No stripe_client_id-->
