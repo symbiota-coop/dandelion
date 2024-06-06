@@ -15,8 +15,6 @@ Padrino.load!
 Mongoid.load!("#{PADRINO_ROOT}/config/mongoid.yml")
 Mongoid.raise_not_found_error = false
 
-Fragment.and(key: /stats_row/).delete_all
-
 OmniAuth.config.allowed_request_methods = [:get]
 OmniAuth.config.logger = Logger.new(IO::NULL)
 
