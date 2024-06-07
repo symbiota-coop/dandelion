@@ -11,6 +11,7 @@ class DiscountCode
   field :fixed_discount_amount, type: Float
   field :fixed_discount_currency, type: String
   field :filter, type: String
+  field :maximum_uses, type: Integer
 
   validates_presence_of :code
   validates_uniqueness_of :code, scope: :codeable
@@ -29,6 +30,7 @@ class DiscountCode
       code: :text,
       description: :text,
       filter: :text,
+      maximum_uses: :number,
       percentage_discount: :number,
       fixed_discount_amount: :number,
       fixed_discount_currency: :select,

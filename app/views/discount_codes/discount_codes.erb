@@ -15,6 +15,7 @@
     <tr>
       <th>Code</th>
       <th>Discount</th>
+      <th>Uses</th>
       <th>Only applies to tickets containing the term</th>
       <th>Created by</th>
     </tr>
@@ -34,6 +35,9 @@
       <% elsif discount_code.fixed_discount %>
         <%= m discount_code.fixed_discount_amount, discount_code.fixed_discount_currency %>
       <% end %>
+    </td>
+    <td>
+      <%= discount_code.orders.count %><% if discount_code.maximum_uses %> / <%= discount_code.maximum_uses %><% end %>
     </td>
     <td>
       <%= discount_code.filter %>
