@@ -3,7 +3,7 @@
     <%== '<div class="mb-3">' %>
   <% end %>
   <%= dropdown_nav [
-        ['<i class="fa fa-flag"></i> View organisation', "/o/#{organisation.slug}"],
+        ['<i class="bi bi-flag-fill"></i> View organisation', "/o/#{organisation.slug}"],
         ['<i class="fa fa-cogs"></i>  Settings', "/o/#{organisation.slug}/edit"],
         [%(<i class="fa fa-users"></i> Followers <span class="badge badge-primary">#{organisation.organisationships.count}</span>), "/o/#{organisation.slug}/followers"],
         [],

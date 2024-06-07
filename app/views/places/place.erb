@@ -15,7 +15,7 @@
             <%= partial :'places/placeship', locals: { place: @place } %>
           </div>
           <% if (admin? || @place.account_id == current_account.id) %>
-            <a class="btn btn-primary" href="/places/<%= @place.id %>/edit"><i class="fa fa-pencil"></i> Edit place</a>
+            <a class="btn btn-primary" href="/places/<%= @place.id %>/edit"><i class="bi bi-pencil-fill"></i> Edit place</a>
           <% end %>
         <% end %>
       </div>

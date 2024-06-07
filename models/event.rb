@@ -493,6 +493,7 @@ class Event
 
   after_save :ai_tag
   def ai_tag
+    return unless ENV['ANTHROPIC_API_KEY']
     return unless event_tagships(true).empty?
 
     prompt = "Provide a list of 5 tags for this event as a comma-separated list: #{name}\n\n#{description}"

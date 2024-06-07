@@ -1,7 +1,7 @@
 <%= partial :'events/nav', locals: { event: @event } %>
 
 <div class="mb-3">
-  <% unless params[:create] %> 
+  <% unless params[:create] %>
     <a class="btn btn-primary" href="javascript:;" onclick="$(this).hide().next().show()"><i class="fa fa-plus-circle"></i> Add payment</a>
   <% end %>
   <div <% unless params[:create] %> style="display: none " <% end %>>
@@ -29,7 +29,7 @@
       </td>
       <td><%=rpayment.created_at%><% if rpayment.account%> by <a href="/u/<%=rpayment.account.username%>"><%=rpayment.account.name%></a><% end %></td>
       <td>
-        <a href="/events/<%=@event.id%>/rpayments/<%=rpayment.id%>/edit" class="btn btn-primary"><i class="fa fa-pencil"></i></a>
+        <a href="/events/<%=@event.id%>/rpayments/<%=rpayment.id%>/edit" class="btn btn-primary"><i class="bi bi-pencil-fill"></i></a>
         <a href="/events/<%=@event.id%>/rpayments/<%=rpayment.id%>/destroy" class="btn btn-danger"><i class="fa fa-times"></i></a>
       </td>
     </tr>
