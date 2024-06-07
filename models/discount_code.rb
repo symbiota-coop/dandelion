@@ -8,6 +8,7 @@ class DiscountCode
   field :code, type: String
   field :description, type: String
   field :percentage_discount, type: Integer
+  field :filter, type: String
 
   validates_presence_of :code
   validates_presence_of :percentage_discount # for the time being
@@ -22,6 +23,7 @@ class DiscountCode
     {
       code: :text,
       description: :text,
+      filter: :text,
       percentage_discount: :number,
       codeable_type: :select,
       codeable_id: :text,
@@ -41,5 +43,15 @@ class DiscountCode
 
   def applies_to?(event)
     event.all_discount_codes.include?(self)
+  end
+
+  def self.new_hints
+    {
+      filter: 'Only apply the discount to tickets containing this term'
+    }
+  end
+
+  def self.edit_hints
+    {}.merge(new_hints)
   end
 end

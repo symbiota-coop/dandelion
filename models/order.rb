@@ -186,6 +186,22 @@ class Order
     evm_secret.to_d / 1e6
   end
 
+  def filter_discounts
+    return unless discount_code && discount_code.filter
+
+    # return == leave existing discounts
+    return if tickets.all? { |ticket| ticket.ticket_type.name.downcase.include?(discount_code.filter.downcase) }
+
+    # otherwise, remove discounts
+    self.discount_code = nil
+    self.percentage_discount = nil
+    save
+    tickets.each do |ticket|
+      ticket.percentage_discount = nil
+      ticket.save
+    end
+  end
+
   before_validation do
     self.evm_value = value.to_d + evm_offset if evm_secret && !evm_value
     self.discount_code = nil if discount_code && !discount_code.applies_to?(event)

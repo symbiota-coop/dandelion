@@ -20,6 +20,7 @@
     <% end %>
     <%= f.text_block :code %>
     <%= f.text_block :description %>
+    <%= f.text_block :filter %>
     <%= f.text_block :percentage_discount %>
     <%= f.submit_block destroy_url: "/discount_codes/#{@discount_code.id}/destroy?#{@scope}" %>
   <% end %>

@@ -61,6 +61,7 @@ Dandelion::App.controller do
 
       @order.donations.create!(event: @event, account: @account, amount: ticketForm[:donation_amount]) if ticketForm[:donation_amount].to_f > 0
 
+      @order.filter_discounts if @order.discount_code && @order.discount_code.filter
       @order.apply_credit if current_account
       @order.update_attribute(:original_description, @order.description)
     rescue StandardError => e
