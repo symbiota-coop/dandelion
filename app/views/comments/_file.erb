@@ -3,7 +3,7 @@
     <% if %w{png jpg gif jpeg}.any? { |x| comment.file.url.split('/').last.downcase.ends_with? ".#{x}" } %>
       <img style="max-width: 100%;" src="<%= comment.file.url %>">
     <% else %>
-      <i class="fa fa-paperclip"></i> <a href="<%= comment.file.url %>"><%= comment.file.url.split('/').last %></a>
+      <i class="bi bi-paperclip"></i> <a href="<%= comment.file.url %>"><%= comment.file.url.split('/').last %></a>
     <% end %>
   </div>
 <% end %>

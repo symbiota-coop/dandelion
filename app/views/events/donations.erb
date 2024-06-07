@@ -38,7 +38,7 @@
     </td>
     <td>
       <%= m donation.amount, donation.order.currency %>
-      <% if donation.incomplete? %><i data-toggle="tooltip" title="This person is in the process of completing the order. If they don't complete it soon, the order will be removed." class="fa fa-spin fa-circle-o-notch"></i><% end %>
+      <% if donation.incomplete? %><i data-toggle="tooltip" title="This person is in the process of completing the order. If they don't complete it soon, the order will be removed." class="bi bi-spin bi-arrow-repeat"></i><% end %>
     </td>
     <td data-sort="<%= donation.created_at.iso8601 %>">
       <%= donation.created_at %>

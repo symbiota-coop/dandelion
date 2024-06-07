@@ -15,7 +15,7 @@
     </div>
     <% if accounts.count > 0 %>
       <a id="remove-role" href="javascript:;" onclick="$(this).hide().next().show();
-        $('#add-role').hide()"><i class="fa fa-minus-square"></i></a>
+        $('#add-role').hide()"><i class="bi bi-dash-square-fill"></i></a>
       <div style="display: none">
         <% form_tag destroy_url do |f| %>
           <%= select_tag :account_id, options: accounts.map { |account| ["#{account.name} (#{account.username})", account.id] }, class: 'form-control mb-1' %>

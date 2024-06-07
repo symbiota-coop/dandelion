@@ -20,7 +20,7 @@
 <% } %>
 <% if current_account && comment.account_id == current_account.id %>
   <a data-toggle="tooltip" title="Add a poll" class="btn btn-outline-primary btn-sm" id="poll-for-<%= comment.id %>" href="javascript:;" onclick="$(this).closest('[data-pagelet-url]').addClass('d-block').removeClass('d-inline-block');
-      $(this).hide().next().show().find('input').focus();"><i class="fa fa-bar-chart"></i></a>
+      $(this).hide().next().show().find('input').focus();"><i class="bi bi-bar-chart-line-fill"></i></a>
   <% form_tag '/voptions/create', style: 'display: none' do %>
     <%= hidden_field_tag :comment_id, value: comment.id %>
     <%= text_field_tag :text, class: 'form-control', placeholder: 'Add an option...' %>

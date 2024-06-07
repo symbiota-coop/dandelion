@@ -446,34 +446,34 @@ end
     <% end %>
     <button class="btn btn-primary btn-block mb-1" type="submit" data-payment-method="rsvp">
       <span>RSVP</span>
-      <i class="fa fa-spin fa-circle-o-notch" style="display: none"></i>
+      <i class="bi bi-spin bi-arrow-repeat" style="display: none"></i>
     </button>
     <%= hidden_field_tag :payment_method, value: 'rsvp', disabled: true %>
     <% if @event.organisation.stripe_sk && FIAT_CURRENCIES.include?(@event.currency) %>
       <button class="btn btn-primary btn-block mb-1" type="submit" data-payment-method="stripe">
         <span>Pay</span>
-        <i class="fa fa-spin fa-circle-o-notch" style="display: none"></i>
+        <i class="bi bi-spin bi-arrow-repeat" style="display: none"></i>
       </button>
       <%= hidden_field_tag :payment_method, value: 'stripe', disabled: true %>
     <% end %>
     <% if @event.organisation.coinbase_api_key && (FIAT_CURRENCIES.include?(@event.currency) || COINBASE_CURRENCIES.include?(@event.currency)) %>
       <button class="btn btn-primary btn-block mb-1 btn-dotted" type="submit" data-payment-method="coinbase">
         <span>Pay with Crypto</span>
-        <i class="fa fa-spin fa-circle-o-notch" style="display: none"></i>
+        <i class="bi bi-spin bi-arrow-repeat" style="display: none"></i>
       </button>
       <%= hidden_field_tag :payment_method, value: 'coinbase', disabled: true %>
     <% end %>
     <% if @event.oc_slug %>
       <button class="btn btn-primary btn-block mb-1 btn-dotted" type="submit" data-payment-method="opencollective">
         <span>Pay with Open Collective</span>
-        <i class="fa fa-spin fa-circle-o-notch" style="display: none"></i>
+        <i class="bi bi-spin bi-arrow-repeat" style="display: none"></i>
       </button>
       <%= hidden_field_tag :payment_method, value: 'opencollective', disabled: true %>
     <% end %>
     <% if @event.organisation.evm_address && (EVM_CURRENCIES.include?(@event.currency) || (@event.currency == 'USD')) %>
       <button class="btn btn-primary btn-block mb-1 btn-dotted" type="submit" data-payment-method="evm">
         <span><% if @event.currency.in?(['BREAD', 'USD'])%>Pay with BREAD on Gnosis Chain<% else %>Pay with <%= @event.chain.name %><% end %></span>
-        <i class="fa fa-spin fa-circle-o-notch" style="display: none"></i>
+        <i class="bi bi-spin bi-arrow-repeat" style="display: none"></i>
       </button>
       <%= hidden_field_tag :payment_method, value: 'evm', disabled: true %>
     <% end %>
@@ -498,7 +498,7 @@ end
   <div class="card-body">
     <p class="lead please"></p>
     <p class="lead memo text-monospace font-weight-bold text-center"></p>
-    <p>Looking for your transaction... <i class="fa fa-spin fa-circle-o-notch"></i></p>
+    <p>Looking for your transaction... <i class="bi bi-spin bi-arrow-repeat"></i></p>
   </div>
 </div>
 
@@ -520,7 +520,7 @@ end
         </div>
       <% end %>
       <p>Making a manual transaction? You will find pasting these details easier if you 'Expand view' first.</p>
-      <p>Looking for your transaction... <i class="fa fa-spin fa-circle-o-notch"></i></p>
+      <p>Looking for your transaction... <i class="bi bi-spin bi-arrow-repeat"></i></p>
     </div>
   </div>
 <% end %>

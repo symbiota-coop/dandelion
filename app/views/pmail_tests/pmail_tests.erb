@@ -1,6 +1,6 @@
 <%= partial :'organisations/nav', locals: { organisation: @organisation } %>
 
-<a href="/pmail_tests/new?<%= @scope %>" class="btn btn-primary"><i class="fa fa-bar-chart"></i> New A/B test</a>
+<a href="/pmail_tests/new?<%= @scope %>" class="btn btn-primary"><i class="bi bi-bar-chart-line-fill"></i> New A/B test</a>
 <table class="table table-hover table-striped mt-3">
   <thead>
     <tr>
@@ -39,7 +39,7 @@
         </div>
       <% elsif pmail_test.requested_send_at %>
         <a class="btn btn-secondary mr-1 mb-1" href="<%= edit_url %>">
-          <i class="fa fa-spin fa-circle-o-notch"></i> Sending
+          <i class="bi bi-spin bi-arrow-repeat"></i> Sending
         </a>
         <div class="mt-1">
           Queued for sending at <%= pmail_test.requested_send_at %> <br>

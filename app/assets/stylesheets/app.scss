@@ -782,3 +782,18 @@ figure td {
     max-width: 12em
   }
 }
+
+@keyframes spin {
+  0% {
+    transform: rotate(0deg);
+  }
+
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+.bi-spin {
+  display: inline-block;
+  animation: spin 2s linear infinite;
+}

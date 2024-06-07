@@ -55,7 +55,7 @@
           <% unless @pmail.mailable.is_a?(Event) %>
             <div class="col-auto">
               <a class="btn btn-primary" target="_blank" href="https://<%= organisation.mailgun_region == 'EU' ? 'app.eu.mailgun.com' : 'app.mailgun.com' %>/app/sending/domains/<%= organisation.mailgun_domain %>/analytics/<%= @pmail.id %>/overview">
-                <i class="fa fa-bar-chart"></i>
+                <i class="bi bi-bar-chart-line-fill"></i>
                 View analytics on Mailgun
               </a>
             </div>
@@ -76,7 +76,7 @@
           <% unless @pmail.mailable.is_a?(Event) %>
             <div class="col-auto">
               <a class="btn btn-primary" target="_blank" href="https://<%= organisation.mailgun_region == 'EU' ? 'app.eu.mailgun.com' : 'app.mailgun.com' %>/app/sending/domains/<%= organisation.mailgun_domain %>/analytics/<%= @pmail.id %>/overview">
-                <i class="fa fa-bar-chart"></i>
+                <i class="bi bi-bar-chart-line-fill"></i>
                 View analytics on Mailgun
               </a>
             </div>
@@ -95,7 +95,7 @@
             <% unless @pmail.mailable.is_a?(Event) %>
               <div class="col-auto">
                 <a class="btn btn-primary" target="_blank" href="https://<%= organisation.mailgun_region == 'EU' ? 'app.eu.mailgun.com' : 'app.mailgun.com' %>/app/sending/domains/<%= organisation.mailgun_domain %>/analytics/<%= @pmail.id %>/overview">
-                  <i class="fa fa-bar-chart"></i>
+                  <i class="bi bi-bar-chart-line-fill"></i>
                   View analytics on Mailgun
                 </a>
               </div>

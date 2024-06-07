@@ -128,7 +128,7 @@
         <% if order.deleted? %>
           <i data-toggle="tooltip" title="Timed out" class="bi bi-exclamation-triangle-fill"></i>
         <% else %>
-          <i data-toggle="tooltip" title="This person is in the process of completing the order. If they don't complete it soon, the order will be removed." class="fa fa-spin fa-circle-o-notch"></i>
+          <i data-toggle="tooltip" title="This person is in the process of completing the order. If they don't complete it soon, the order will be removed." class="bi bi-spin bi-arrow-repeat"></i>
         <% end %>
       <% elsif order.deleted? %>
         <i data-toggle="tooltip" title="Deleted" class="fa fa-trash"></i>

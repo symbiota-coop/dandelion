@@ -30,5 +30,5 @@
   <% elsif ticket.order.oc_secret %>
     <span class="label label-default bg-secondary mr-1">OC: <%= ticket.order.oc_secret.split('dandelion:').last %></span>
   <% end %>
-  <% if ticket.incomplete? %><i data-toggle="tooltip" title="This person is in the process of completing the order. If they don't complete it soon, the order will be removed." class="fa fa-spin fa-circle-o-notch"></i><% end %>
+  <% if ticket.incomplete? %><i data-toggle="tooltip" title="This person is in the process of completing the order. If they don't complete it soon, the order will be removed." class="bi bi-spin bi-arrow-repeat"></i><% end %>
 <% end %>

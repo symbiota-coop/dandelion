@@ -55,7 +55,7 @@
 
 <div class="my-3">
   <a class="btn btn-primary" href="/activities/<%= @activity.id %>/applications.csv?<%= request.query_string %>">Download CSV</a>
-  <a href="javascript:;" onclick="$(this).hide().next().show()" class="btn btn-primary"><i class="fa fa-map"></i> Show map</a>
+  <a href="javascript:;" onclick="$(this).hide().next().show()" class="btn btn-primary"><i class="bi bi-map-fill"></i> Show map</a>
   <div style="display:none" class="mt-3">
     <%= partial :'maps/map', locals: { points: @points } %>
   </div>

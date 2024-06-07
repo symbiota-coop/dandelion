@@ -36,7 +36,7 @@
       </div>
       <% if event_sessions.count > 0 %>
         <a data-toggle="tooltip" title="Remove a session" id="remove-event-session" href="javascript:;" onclick="$(this).hide().next().show();
-        $('#add-event-session').hide()"><i class="fa fa-minus-square"></i></a>
+        $('#add-event-session').hide()"><i class="bi bi-dash-square-fill"></i></a>
         <div style="display: none">
           <% form_tag destroy_url do |f| %>
             <%= select_tag :event_session_id, options: event_sessions.map { |event_session| [when_details(event_session, with_zone: false), event_session.id] }, class: 'form-control mb-1' %>

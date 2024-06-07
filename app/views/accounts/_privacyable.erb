@@ -1,22 +1,22 @@
 <div class="dropdown d-inline" style="display: none">
   <a class="dropdown-toggle text-dark" type="button" data-toggle="dropdown" href="javascript:;">
     <% case @account.send("#{p}_privacy"); when 'Only me' %>
-      <i class="fa fa-lock"></i> Only me
+      <i class="bi bi-lock"></i> Only me
     <% when 'People I follow' %>
       <i class="bi bi-people-fill"></i> People I follow
     <% else %>
-      <i class="fa fa-globe"></i> Public
+      <i class="bi bi-globe-europe-africa"></i> Public
     <% end %>
   </a>
   <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
     <a class="dropdown-item pagelet-trigger" href="/accounts/set_privacyable/<%= p %>" onclick="$(this).attr('href', $(this).attr('href') + '?level=Only me')">
-      <i class="fa fa-lock"></i> Only me
+      <i class="bi bi-lock"></i> Only me
     </a>
     <a class="dropdown-item pagelet-trigger" href="/accounts/set_privacyable/<%= p %>" onclick="$(this).attr('href', $(this).attr('href') + '?level=People I follow')">
       <i class="bi bi-people-fill"></i> People I follow
     </a>
     <a class="dropdown-item pagelet-trigger" href="/accounts/set_privacyable/<%= p %>" onclick="$(this).attr('href', $(this).attr('href') + '?level=Public')">
-      <i class="fa fa-globe"></i> Public
+      <i class="bi bi-globe-europe-africa"></i> Public
     </a>
   </div>
 </div>

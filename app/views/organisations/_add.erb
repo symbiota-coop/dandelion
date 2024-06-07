@@ -18,7 +18,7 @@
     </div>
     <% if organisations.count > 0 %>
       <a id="remove-organisation" href="javascript:;" onclick="$(this).hide().next().show();
-        $('#add-organisation').hide()"><i class="fa fa-minus-square"></i></a>
+        $('#add-organisation').hide()"><i class="bi bi-dash-square-fill"></i></a>
       <div style="display: none">
         <% form_tag destroy_url do |f| %>
           <%= select_tag :organisation_id, options: organisations.map { |organisation| ["#{organisation.name} (#{organisation.id})", organisation.id] }, class: 'form-control mb-1' %>

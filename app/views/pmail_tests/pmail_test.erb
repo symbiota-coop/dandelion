@@ -46,7 +46,7 @@
           <% end %>
         </div>
         <a id="remove-pmail" href="javascript:;" onclick="$(this).hide().next().show();
-        $('#add-pmail').hide()"><i class="fa fa-minus-square"></i></a>
+        $('#add-pmail').hide()"><i class="bi bi-dash-square-fill"></i></a>
         <div style="display: none">
           <% form_tag "/pmail_tests/#{@pmail_test.id}/remove", class: 'form-inline' do |f| %>
             <%= hidden_field_tag :organisation_id, value: @organisation.id %>

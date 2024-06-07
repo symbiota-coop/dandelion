@@ -75,7 +75,7 @@
         google.maps.event.addListener(marker, 'click', function (marker) {
           return function () {
             if((marker.model_name == 'Organisation' || marker.model_name == 'Place' || marker.model_name == 'Gathering' || marker.model_name == 'Event') || infoWindow) {
-              infowindow.setContent('<i class="fa fa-spin fa-circle-o-notch"></i>');
+              infowindow.setContent('<i class="bi bi-spin bi-arrow-repeat"></i>');
               infowindow.open(map, marker);
               setTimeout(function () {
                 clearTimeout(mapTimer)
@@ -146,7 +146,7 @@
         markers.sort(function(a, b) {
           return a.n - b.n;
         });
-        infowindow.setContent('<i class="fa fa-spin fa-circle-o-notch"></i>');
+        infowindow.setContent('<i class="bi bi-spin bi-arrow-repeat"></i>');
         infowindow.setPosition(cluster.getCenter());
         infowindow.open(map);
         setTimeout(function () {
