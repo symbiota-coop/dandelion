@@ -187,8 +187,6 @@ class Order
   end
 
   def filter_discounts
-    return unless discount_code && discount_code.filter
-
     # return == leave existing discounts
     return if tickets.all? { |ticket| ticket.ticket_type.name.downcase.include?(discount_code.filter.downcase) }
 
