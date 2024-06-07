@@ -33,35 +33,13 @@ Time.zone = ENV['DEFAULT_TIME_ZONE']
 
 Airrecord.api_key = ENV['AIRTABLE_API_KEY']
 
-OpenAI.configure do |config|
-  config.access_token = ENV['OPENAI_API_KEY']
-end
-
 FARQUEST = Faraday.new(
   url: 'https://build.far.quest/farcaster/v2',
   headers: { 'Content-Type': 'application/json', 'API-KEY': ENV['FARQUEST_API_KEY'] }
 )
 
-Replicate.configure do |config|
-  config.api_token = ENV['REPLICATE_API_KEY']
-end
-
-Anthropic.configure do |config|
-  config.access_token = ENV['ANTHROPIC_API_KEY']
-end
-
 Yt.configure do |config|
   config.api_key = ENV['YOUTUBE_API_KEY']
-end
-
-if ENV['GEMINI_API_KEY']
-  GEMINI = Gemini.new(
-    credentials: {
-      service: 'generative-language-api',
-      api_key: ENV['GEMINI_API_KEY']
-    },
-    options: { model: 'gemini-1.5-flash', server_sent_events: true }
-  )
 end
 
 if ENV['GOOGLE_MAPS_API_KEY']
@@ -75,4 +53,28 @@ if ENV['GOOGLE_MAPS_API_KEY']
   Timezone::Lookup.config(:google) do |c|
     c.api_key = ENV['GOOGLE_MAPS_API_KEY']
   end
+end
+
+# AI
+
+OpenAI.configure do |config|
+  config.access_token = ENV['OPENAI_API_KEY']
+end
+
+Replicate.configure do |config|
+  config.api_token = ENV['REPLICATE_API_KEY']
+end
+
+Anthropic.configure do |config|
+  config.access_token = ENV['ANTHROPIC_API_KEY']
+end
+
+if ENV['GEMINI_API_KEY']
+  GEMINI_FLASH = Gemini.new(
+    credentials: {
+      service: 'generative-language-api',
+      api_key: ENV['GEMINI_API_KEY']
+    },
+    options: { model: 'gemini-1.5-flash', server_sent_events: true }
+  )
 end

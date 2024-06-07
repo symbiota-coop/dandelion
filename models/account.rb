@@ -941,7 +941,7 @@ Two Spirit).split("\n")
     # last_paragraph = nil
     # attempts = 0
     # loop do
-    #   response = GEMINI.generate_content(
+    #   response = GEMINI_FLASH.generate_content(
     #     {
     #       contents: { role: 'user', parts: { text: prompt } },
     #       generationConfig: { maxOutputTokens: 256 }
