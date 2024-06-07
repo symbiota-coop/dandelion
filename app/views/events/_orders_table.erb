@@ -104,8 +104,8 @@
       <% if order.credit_applied %>
         <span class="label label-default"><%= m order.credit_applied, order.currency %> credit applied</span>
       <% end %>
-      <% if order.credit_payable_to_revenue_sharer %>
-        <span class="label label-default"><%= m order.credit_payable_to_revenue_sharer, order.currency %> credit due</span>
+      <% if order.fixed_discount_applied %>
+        <span data-toggle="tooltip" title="<%=order.discount_code.code %>" class="label label-default"><%= m order.fixed_discount_applied, order.currency %> discount applied</span>
       <% end %>
       <% if order.percentage_discount %>
         <span data-toggle="tooltip" class="label label-default mr-1" title="<%= "#{order.percentage_discount}%" %> discount code applied<% if order.discount_code %>: <%=order.discount_code.code%><% end %>">

@@ -8,17 +8,19 @@ class DiscountCode
   field :code, type: String
   field :description, type: String
   field :percentage_discount, type: Integer
-  field :fixed_discount_amount, type: Integer
+  field :fixed_discount_amount, type: Float
   field :fixed_discount_currency, type: String
   field :filter, type: String
 
   validates_presence_of :code
-  validates_presence_of :percentage_discount # for the time being
   validates_uniqueness_of :code, scope: :codeable
 
   before_validation do
-    errors.add(:percentage_discount, 'must be positive') if percentage_discount <= 0
-    errors.add(:percentage_discount, 'must be less or equal to 100%') if percentage_discount > 100
+    errors.add(:percentage_discount, 'or fixed discount must be present') if !percentage_discount && !fixed_discount_amount
+    errors.add(:percentage_discount, 'cannot be present if there is a fixed discount') if percentage_discount && fixed_discount_amount
+    errors.add(:fixed_discount_currency, 'must be present if there is a fixed discount amount') if fixed_discount_amount && !fixed_discount_currency
+    errors.add(:percentage_discount, 'must be positive') if percentage_discount && percentage_discount <= 0
+    errors.add(:percentage_discount, 'must be less or equal to 100%') if percentage_discount && percentage_discount > 100
   end
 
   def self.admin_fields
@@ -45,8 +47,16 @@ class DiscountCode
     %w[Organisation Activity LocalGroup Event]
   end
 
+  def fixed_discount
+    Money.new(fixed_discount_amount * 100, fixed_discount_currency) if fixed_discount_amount && fixed_discount_currency
+  end
+
   def applies_to?(event)
     event.all_discount_codes.include?(self)
+  end
+
+  def self.fixed_discount_currencies
+    CURRENCY_OPTIONS
   end
 
   def self.new_hints

@@ -14,8 +14,8 @@
   <thead>
     <tr>
       <th>Code</th>
+      <th>Discount</th>
       <th>Only applies to tickets containing the term</th>
-      <th>Percentage discount</th>
       <th>Created by</th>
     </tr>
   </thead>
@@ -29,10 +29,14 @@
       <%= discount_code.description %>
     </td>
     <td>
-      <%= discount_code.filter %>
+      <% if discount_code.percentage_discount %>
+        <%= discount_code.percentage_discount %>%
+      <% elsif discount_code.fixed_discount %>
+        <%= m discount_code.fixed_discount_amount, discount_code.fixed_discount_currency %>
+      <% end %>
     </td>
     <td>
-      <%= discount_code.percentage_discount %>%
+      <%= discount_code.filter %>
     </td>
     <td>
       <% if discount_code.account %>

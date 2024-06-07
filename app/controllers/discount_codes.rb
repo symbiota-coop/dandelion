@@ -27,6 +27,15 @@ Dandelion::App.controller do
 
   get '/discount_codes/new' do
     @discount_code = DiscountCode.new
+    if @organisation
+      @discount_code.fixed_discount_currency = @organisation.currency
+    elsif @activity
+      @discount_code.fixed_discount_currency = @activity.organisation.currency
+    elsif @local_group
+      @discount_code.fixed_discount_currency = @local_group.organisation.currency
+    elsif @event
+      @discount_code.fixed_discount_currency = @event.currency
+    end
     erb :'discount_codes/build'
   end
 

@@ -155,15 +155,17 @@ end
                               ">Remove</button>
                 </div>
               </div>
-              <strong>Discount applied</strong>
-              <div class="input-group" style="margin: 5px 0">
-                <% if discount_code.percentage_discount %>
-                  <%= number_field_tag :percentage_discount, id: 'percentage_discount', class: 'form-control', style: 'width: 5em', disabled: true, value: discount_code.percentage_discount %>
-                  <div class="input-group-append">
-                    <span class="py-0 input-group-text">%</span>
-                  </div>
-                <% end %>
-              </div>
+              <% if discount_code.percentage_discount %>
+                <strong>Discount applied</strong>
+                <div class="input-group" style="margin: 5px 0">
+                  <% if discount_code.percentage_discount %>
+                    <%= number_field_tag :percentage_discount, id: 'percentage_discount', class: 'form-control', style: 'width: 5em', disabled: true, value: discount_code.percentage_discount %>
+                    <div class="input-group-append">
+                      <span class="py-0 input-group-text">%</span>
+                    </div>
+                  <% end %>
+                </div>
+              <% end %>
             <% else %>
               <% if params[:discount_code] %>
                 <div class="alert alert-danger my-1">
@@ -276,6 +278,22 @@ end
                 <span class="input-group-text"><%= money_symbol(@event.currency) %></span>
               </div>
               <%= number_field_tag :credit, id: 'credit', class: 'form-control', style: 'width: 5em', disabled: true, value: format('%.2f', (organisationship.credit_balance.exchange_to(@event.currency).cents.to_f / 100)) %>
+            </div>
+          </td>
+        </tr>
+      <% end %>
+      <% if discount_code && discount_code.fixed_discount %>
+        <% show_balance = true %>
+        <tr>
+          <td></td>
+          <td></td>
+          <td>
+            <strong>Fixed discount</strong>
+            <div class="input-group" style="margin: 5px 0">
+              <div class="input-group-prepend">
+                <span class="input-group-text"><%= money_symbol(@event.currency) %></span>
+              </div>
+              <%= number_field_tag :fixed_discount, id: 'fixed-discount', class: 'form-control', style: 'width: 5em', disabled: true, value: format('%.2f', (discount_code.fixed_discount.exchange_to(@event.currency).cents.to_f / 100)) %>
             </div>
           </td>
         </tr>

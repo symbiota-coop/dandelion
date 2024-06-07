@@ -63,6 +63,7 @@ Dandelion::App.controller do
 
       @order.filter_discounts if @order.discount_code && @order.discount_code.filter
       @order.apply_credit if current_account
+      @order.apply_fixed_discount
       @order.update_attribute(:original_description, @order.description)
     rescue StandardError => e
       airbrake_notify(e)

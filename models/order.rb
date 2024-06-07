@@ -33,6 +33,7 @@ class Order
   field :opt_in_organisation, type: Boolean
   field :opt_in_facilitator, type: Boolean
   field :credit_applied, type: Float
+  field :fixed_discount_applied, type: Float
   field :organisation_revenue_share, type: Float
   field :hear_about, type: String
   field :http_referrer, type: String
@@ -174,6 +175,8 @@ class Order
 
     d << "#{Money.new(credit_applied * 100, currency).format(no_cents_if_whole: true)} credit applied" if credit_applied
 
+    d << "#{Money.new(fixed_discount_applied * 100, currency).format(no_cents_if_whole: true)} discount" if fixed_discount_applied
+
     d
   end
 
@@ -203,7 +206,7 @@ class Order
   before_validation do
     self.evm_value = value.to_d + evm_offset if evm_secret && !evm_value
     self.discount_code = nil if discount_code && !discount_code.applies_to?(event)
-    self.percentage_discount = discount_code.percentage_discount if discount_code
+    self.percentage_discount = discount_code.percentage_discount if discount_code && discount_code.percentage_discount
     if !percentage_discount && !event.no_discounts && (organisationship_for_discount = event.organisationship_for_discount(account))
       self.percentage_discount_monthly_donor = organisationship_for_discount.monthly_donor_discount
     end
@@ -263,10 +266,23 @@ class Order
     end
     return unless credit_balance.positive?
 
-    if credit_balance >= (discounted_ticket_revenue + donation_revenue)
-      update_attribute(:credit_applied, (discounted_ticket_revenue + donation_revenue).cents.to_f / 100)
-    elsif credit_balance < (discounted_ticket_revenue + donation_revenue)
+    current_total = discounted_ticket_revenue + donation_revenue
+    if credit_balance >= current_total
+      update_attribute(:credit_applied, current_total.cents.to_f / 100)
+    elsif credit_balance < current_total
       update_attribute(:credit_applied, credit_balance.cents.to_f / 100)
+    end
+  end
+
+  def apply_fixed_discount
+    return unless discount_code && discount_code.fixed_discount
+
+    fixed_discount = discount_code.fixed_discount.exchange_to(currency)
+    current_total = discounted_ticket_revenue + donation_revenue - Money.new((credit_applied || 0) * 100, currency)
+    if fixed_discount >= current_total
+      update_attribute(:fixed_discount_applied, current_total.cents.to_f / 100)
+    elsif fixed_discount < current_total
+      update_attribute(:fixed_discount_applied, fixed_discount.cents.to_f / 100)
     end
   end
 
@@ -335,38 +351,33 @@ class Order
       de_discounted_ticket_revenue: order.discounted_ticket_revenue,
       de_percentage_discount: order.percentage_discount,
       de_percentage_discount_monthly_donor: order.percentage_discount_monthly_donor,
-      de_credit_applied: order.credit_applied
+      de_credit_applied: order.credit_applied,
+      de_fixed_discount_applied: order.fixed_discount_applied
     }
   end
 
   def total
-    ((discounted_ticket_revenue + donation_revenue).cents.to_f / 100) - (credit_applied || 0)
+    ((discounted_ticket_revenue + donation_revenue).cents.to_f / 100) - (credit_applied || 0) - (fixed_discount_applied || 0)
   end
 
   def calculate_application_fee_amount
-    (((discounted_ticket_revenue.cents * organisation_revenue_share) + donation_revenue.cents).to_f / 100) - (credit_payable_to_organisation || 0)
+    (((discounted_ticket_revenue.cents * organisation_revenue_share) + donation_revenue.cents).to_f / 100) - (credit_on_behalf_of_organisation || 0) - (fixed_discount_on_behalf_of_organisation || 0)
   end
 
-  def credit_payable_to_organisation
-    credit_applied - credit_payable_to_revenue_sharer if revenue_sharer && credit_applied && credit_applied.positive?
+  def credit_on_behalf_of_organisation
+    credit_applied - credit_on_behalf_of_revenue_sharer if revenue_sharer && credit_applied && credit_applied.positive?
   end
 
-  def credit_payable_to_revenue_sharer
-    ((discounted_ticket_revenue / (discounted_ticket_revenue + donation_revenue)) * credit_applied * (1 - organisation_revenue_share)).to_f if revenue_sharer && credit_applied && credit_applied.positive? && (discounted_ticket_revenue + donation_revenue).positive?
+  def credit_on_behalf_of_revenue_sharer
+    credit_applied * ((discounted_ticket_revenue / (discounted_ticket_revenue + donation_revenue)) * (1 - organisation_revenue_share)).to_f if revenue_sharer && credit_applied && credit_applied.positive? && (discounted_ticket_revenue + donation_revenue).positive?
   end
 
-  def make_transfer
-    return unless event.revenue_sharer_organisationship && credit_payable_to_revenue_sharer && credit_payable_to_revenue_sharer.positive?
+  def fixed_discount_on_behalf_of_organisation
+    fixed_discount_applied - fixed_discount_on_behalf_of_revenue_sharer if revenue_sharer && fixed_discount_applied && fixed_discount_applied.positive?
+  end
 
-    Stripe.api_key = event.organisation.stripe_sk
-    Stripe.api_version = '2020-08-27'
-    transfer = Stripe::Transfer.create({
-                                         amount: (credit_payable_to_revenue_sharer * 100).round,
-                                         currency: currency,
-                                         destination: event.revenue_sharer_organisationship.stripe_user_id,
-                                         metadata: metadata
-                                       })
-    set(transfer_id: transfer.id)
+  def fixed_discount_on_behalf_of_revenue_sharer
+    fixed_discount_applied * ((discounted_ticket_revenue / (discounted_ticket_revenue + donation_revenue)) * (1 - organisation_revenue_share)).to_f if revenue_sharer && fixed_discount_applied && fixed_discount_applied.positive? && (discounted_ticket_revenue + donation_revenue).positive?
   end
 
   def tickets_pdf

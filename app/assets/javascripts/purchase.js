@@ -44,15 +44,22 @@ $(function () {
     return c
   }
 
+  function fixedDiscount () {
+    let d = 0
+
+    if ($('#fixed-discount').length > 0 && $('#fixed-discount').val() != '') { d += parseFloat($('#fixed-discount').val()) }
+
+    return d
+  }
+
   function balance () {
-    let b = price() - credit()
+    let b = price() - credit() - fixedDiscount()
     if (b < 0) { b = 0 }
     return b
   }
 
   function setTotal () {
     const p = price()
-    // const c = credit()
     const b = balance()
 
     $('#totalDisplay').val((+p).toFixed(2))

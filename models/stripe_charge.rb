@@ -25,6 +25,7 @@ class StripeCharge
   field :de_percentage_discount, type: Float
   field :de_percentage_discount_monthly_donor, type: Float
   field :de_credit_applied, type: Float
+  field :de_fixed_discount_applied, type: Float
   field :balance_float, type: Float
   field :fees_float, type: Float
 
@@ -60,6 +61,7 @@ class StripeCharge
       de_percentage_discount: :number,
       de_percentage_discount_monthly_donor: :number,
       de_credit_applied: :number,
+      de_fixed_discount_applied: :number,
       stripe_transactions: :collection
     }
   end
@@ -90,7 +92,7 @@ class StripeCharge
       %w[de_event_id de_order_id de_account_id].each do |f|
         c[f.gsub('de_', '')] = charge['metadata'][f]
       end
-      %w[de_donation_revenue de_ticket_revenue de_discounted_ticket_revenue de_percentage_discount de_percentage_discount_monthly_donor de_credit_applied].each do |f|
+      %w[de_donation_revenue de_ticket_revenue de_discounted_ticket_revenue de_percentage_discount de_percentage_discount_monthly_donor de_credit_applied de_fixed_discount_applied].each do |f|
         x = charge['metadata'][f]
         c[f] = x.gsub(',', '.') if x
       end
