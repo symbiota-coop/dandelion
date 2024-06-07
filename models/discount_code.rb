@@ -18,9 +18,10 @@ class DiscountCode
   before_validation do
     errors.add(:percentage_discount, 'or fixed discount must be present') if !percentage_discount && !fixed_discount_amount
     errors.add(:percentage_discount, 'cannot be present if there is a fixed discount') if percentage_discount && fixed_discount_amount
-    errors.add(:fixed_discount_currency, 'must be present if there is a fixed discount amount') if fixed_discount_amount && !fixed_discount_currency
     errors.add(:percentage_discount, 'must be positive') if percentage_discount && percentage_discount <= 0
     errors.add(:percentage_discount, 'must be less or equal to 100%') if percentage_discount && percentage_discount > 100
+    errors.add(:fixed_discount_currency, 'must be present if there is a fixed discount amount') if fixed_discount_amount && !fixed_discount_currency
+    errors.add(:fixed_discount_amount, 'must be positive') if fixed_discount_amount && fixed_discount_amount <= 0
   end
 
   def self.admin_fields

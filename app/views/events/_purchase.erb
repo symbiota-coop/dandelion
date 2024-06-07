@@ -2,7 +2,7 @@
 discount_code = nil
 if params[:discount_code]
   discount_code = @event.all_discount_codes.find_by(code: params[:discount_code].upcase)
-  discount_code = nil unless discount_code.applies_to?(@event)
+  discount_code = nil if discount_code && !discount_code.applies_to?(@event)
 end
 %>
 
