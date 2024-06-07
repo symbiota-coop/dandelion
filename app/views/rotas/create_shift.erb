@@ -1,4 +1,4 @@
-<a class="d-inline-block mb-3" href="/g/<%= @gathering.slug %>/rotas/<%= @rota.id %>"><i class="fa fa-arrow-left"></i> Return to rota</a>
+<a class="d-inline-block mb-3" href="/g/<%= @gathering.slug %>/rotas/<%= @rota.id %>"><i class="bi bi-arrow-left"></i> Return to rota</a>
 
 <% form_for @shift ||= Shift.new, "/g/#{@gathering.slug}/rotas/#{@rota.id}/create_shift" do |f| %>
   <%= f.select_block :account_id, options: @gathering.members.order('name asc').map { |account| [account.name, account.id] } %>

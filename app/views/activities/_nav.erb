@@ -15,7 +15,7 @@
         ['Audience stats', "/activities/#{activity.id}/stats"],
         ['Feedback', "/activities/#{activity.id}/feedback"],
         ['Mailer', "/activities/#{activity.id}/pmails"]
-      ].compact, button_text: %(#{activity.name} <i class="fa fa-caret-down"></i>), container_class: 'btn-group mb-1' %>
+      ].compact, button_text: %(#{activity.name} <i class="bi bi-caret-down-fill"></i>), container_class: 'btn-group mb-1' %>
   <% unless defined?(inline) %>
     <%== '</div>' %>
   <% end %>

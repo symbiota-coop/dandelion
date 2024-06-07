@@ -3,7 +3,7 @@
   <% if @event.organisation && !@event.organisation.payment_method? && @event.ticket_types.any? { |ticket_type| (ticket_type.price && ticket_type.price > 0) || ticket_type.range } %>
     <div class="alert alert-warning">
       <p class="mb-0">
-        <i class="fa fa-warning"></i> You must <a class="text-warning" href="/o/<%=@event.organisation.slug%>/edit">add either Stripe or Coinbase Commerce details in the Payments tab of your organisation</a> to take payments.
+        <i class="bi bi-exclamation-triangle-fill"></i> You must <a class="text-warning" href="/o/<%=@event.organisation.slug%>/edit">add either Stripe or Coinbase Commerce details in the Payments tab of your organisation</a> to take payments.
       </p>
     </div>
   <% end %>

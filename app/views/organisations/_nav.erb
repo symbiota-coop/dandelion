@@ -5,17 +5,17 @@
   <%= dropdown_nav [
         ['<i class="bi bi-flag-fill"></i> View organisation', "/o/#{organisation.slug}"],
         ['<i class="fa fa-cogs"></i>  Settings', "/o/#{organisation.slug}/edit"],
-        [%(<i class="fa fa-users"></i> Followers <span class="badge badge-primary">#{organisation.organisationships.count}</span>), "/o/#{organisation.slug}/followers"],
+        [%(<i class="bi bi-people-fill"></i> Followers <span class="badge badge-primary">#{organisation.organisationships.count}</span>), "/o/#{organisation.slug}/followers"],
         [],
-        ['<i class="fa fa-envelope"></i> Mailer', "/o/#{organisation.slug}/pmails"],
+        ['<i class="bi bi-envelope-fill"></i> Mailer', "/o/#{organisation.slug}/pmails"],
         (['A/B tests', "/o/#{organisation.slug}/pmail_tests"] if organisation.mailgun_api_key),
         [],
-        ['<i class="fa fa-calendar-o fa-fw"></i>  Events', "/o/#{organisation.slug}/events"],
-        ['<i class="fa fa-chart-bar fa-fw"></i> Event stats', "/o/#{organisation.slug}/events/stats"],
-        ['<i class="fa fa-plus-circle fa-fw"></i>  Create an event', "/events/new?organisation_id=#{organisation.id}"],
-        ['<i class="fa fa-shopping-cart fa-fw"></i> Orders', "/o/#{organisation.slug}/orders"],
-        ['<i class="fa fa-terminal fa-fw"></i> Discount codes', "/o/#{organisation.slug}/discount_codes"],
-        ['<i class="fa fa-comment-o fa-fw"></i> Feedback', "/o/#{organisation.slug}/feedback"],
+        ['<i class="fa fa-calendar-o"></i>  Events', "/o/#{organisation.slug}/events"],
+        ['<i class="fa fa-chart-bar"></i> Event stats', "/o/#{organisation.slug}/events/stats"],
+        ['<i class="bi bi-plus-square-fill"></i>  Create an event', "/events/new?organisation_id=#{organisation.id}"],
+        ['<i class="fa fa-shopping-cart"></i> Orders', "/o/#{organisation.slug}/orders"],
+        ['<i class="fa fa-terminal"></i> Discount codes', "/o/#{organisation.slug}/discount_codes"],
+        ['<i class="bi bi-chat"></i> Feedback', "/o/#{organisation.slug}/feedback"],
         [],
         ['Activities', "/o/#{organisation.slug}/activities"],
         ['Local groups', "/o/#{organisation.slug}/local_groups"],
@@ -27,7 +27,7 @@
         ['Contribute', "/o/#{organisation.slug}/contribute"],
         [],
         ['Delete organisation', "/o/#{organisation.slug}/delete"]
-      ].compact, button_text: %(#{organisation.name} <i class="fa fa-caret-down"></i>), container_class: 'btn-group mb-1' %>
+      ].compact, button_text: %(#{organisation.name} <i class="bi bi-caret-down-fill"></i>), container_class: 'btn-group mb-1' %>
   <% unless defined?(inline) %>
     <%== '</div>' %>
   <% end %>

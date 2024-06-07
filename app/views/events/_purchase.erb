@@ -57,7 +57,7 @@ end
               <i data-toggle="tooltip" title="Available to you as you used a secret link" class="fa fa-lock"></i>
             <% end %>
             <% if ticket_type.minimum_monthly_donation %>
-              <i data-toggle="tooltip" title="Available to those donating <%=m ticket_type.minimum_monthly_donation, @event.currency%>+/month" class="fa fa-star-o"></i>
+              <i data-toggle="tooltip" title="Available to those donating <%=m ticket_type.minimum_monthly_donation, @event.currency%>+/month" class="bi bi-star"></i>
             <% end %>
           </td>
           <td style="<% if i == 0 %>border-top: 0;<% end %> <% if ticket_type.photos.count > 0 %>border-bottom: 0;<% end %>;">

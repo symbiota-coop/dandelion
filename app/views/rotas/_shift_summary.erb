@@ -10,7 +10,7 @@
     </a><% if @gathering.enable_shift_worth %><%= partial :'rotas/shift_worth', locals: {shift: shift, style: 'border-top-left-radius: 0; border-bottom-left-radius: 0'} %>
     <% end %>
     <a data-confirm="<% if shift.account_id == current_account.id %>Resign from this shift?<% else %>Remove this person from this shift?<% end %>" class="pagelet-trigger label label-danger text-white d-inline-block mb-1" href="/shifts/<%= shift.id %>/destroy">
-      <i class="fa fa-times"></i>
+      <i class="bi bi-x"></i>
     </a>
   <% else %>
     <a <% if @gathering.enable_shift_worth %>style="border-top-right-radius: 0; border-bottom-right-radius: 0"<% end %> href="/g/<%= @gathering.slug %>/rotas/<%= shift.rota_id %>" class="label label-primary text-white d-inline-block mb-1">

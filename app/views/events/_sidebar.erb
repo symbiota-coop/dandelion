@@ -12,7 +12,7 @@
         <div class="card-body">
           <% if @event.past? %>
             <% if event_feedback = @event.event_feedbacks.find_by(account: current_account) %>
-              <p>Your rating: <% event_feedback.rating.times do %><i class="fa fa-star"></i><% end %></p>
+              <p>Your rating: <% event_feedback.rating.times do %><i class="bi bi-star-fill"></i><% end %></p>
             <% else %>
               <p><a href="/events/<%=@event.id%>/give_feedback">Give feedback</a></p>
             <% end %>

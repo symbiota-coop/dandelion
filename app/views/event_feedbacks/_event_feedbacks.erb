@@ -42,7 +42,7 @@
           on <a <% if params[:minimal] %>target="_blank"<% end %>  href="/events/<%= event_feedback.event.id %>"><%= event_feedback.event.name %></a>
         <% end %>
       </td>
-      <td style="white-space: nowrap;"><% if event_feedback.deleted_at%><em>Removed</em><% else %><% event_feedback.rating.times do %><i class="fa fa-star"></i><% end %><% end %></td>
+      <td style="white-space: nowrap;"><% if event_feedback.deleted_at%><em>Removed</em><% else %><% event_feedback.rating.times do %><i class="bi bi-star-fill"></i><% end %><% end %></td>
       <td><small><%= timeago event_feedback.created_at %></small></td>
     </tr>
     <% if !event_feedback.deleted_at && (event_feedback.public_answers || event_feedback.response) %>

@@ -83,7 +83,7 @@
         <h2>Places</h2>
         <% if current_account && current_account.id == @account.id %>
           <div class="mb-3">
-            <a class="btn btn-primary" href="javascript:;" onclick="$(this).hide().next().show().find('input').first().focus()"><i class="fa fa-plus-circle"></i> Add a category</a>
+            <a class="btn btn-primary" href="javascript:;" onclick="$(this).hide().next().show().find('input').first().focus()"><i class="bi bi-plus-square-fill"></i> Add a category</a>
             <div style="display: none" class="mt-3">
               <%= partial :'placeship_categories/build' %>
             </div>

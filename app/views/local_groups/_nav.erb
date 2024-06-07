@@ -14,7 +14,7 @@
         ['Audience stats', "/local_groups/#{local_group.id}/stats"],
         ['Feedback', "/local_groups/#{local_group.id}/feedback"],
         ['Mailer', "/local_groups/#{local_group.id}/pmails"]
-      ].compact, button_text: %(#{local_group.name} <i class="fa fa-caret-down"></i>), container_class: 'btn-group mb-1' %>
+      ].compact, button_text: %(#{local_group.name} <i class="bi bi-caret-down-fill"></i>), container_class: 'btn-group mb-1' %>
   <% unless defined?(inline) %>
     <%== '</div>' %>
   <% end %>

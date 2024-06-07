@@ -6,7 +6,7 @@
 <% if add_and_remove %>
   <div>
     <a id="add-role" href="javascript:;" onclick="$(this).hide().next().show();
-        $('#remove-role').hide()"><i class="fa fa-plus-square"></i></a>
+        $('#remove-role').hide()"><i class="bi bi-plus-square-fill"></i></a>
     <div style="display: none">
       <% form_for new_object, new_url do |f| %>
         <%= f.lookup_block :account_id, lookup_url: '/accounts.json', placeholder: 'Search accounts' %>

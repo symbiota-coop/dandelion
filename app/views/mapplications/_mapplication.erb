@@ -20,7 +20,7 @@
     <div class="media mb-3">
       <span class="mr-2">
         <% if @gathering.send("anonymise_#{noun.pluralize}") %>
-          <i class="fa fa-user-circle" style="font-size: 32px;" class="media-object"></i>
+          <i class="bi bi-person-bounding-box" style="font-size: 32px;" class="media-object"></i>
         <% else %>
           <%= partial :'accounts/square', locals: { account: account, width: '32px', klass: 'media-object' } %>
         <% end %>

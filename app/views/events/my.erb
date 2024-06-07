@@ -60,7 +60,7 @@
                                   <% if (event_feedback = event.event_feedbacks.find_by(account: current_account)) %>
                                     <div class="mt-1">
                                       <% if event_feedback.rating %>
-                                        <% event_feedback.rating.times do %><i class="fa fa-star"></i><% end %>
+                                        <% event_feedback.rating.times do %><i class="bi bi-star-fill"></i><% end %>
                                       <% end %>
 
                                       <% event_feedback.event.feedback_questions_a.each_with_index { |q,i|

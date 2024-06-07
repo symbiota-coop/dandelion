@@ -38,11 +38,11 @@
               </label>
               <% if o.object.new_record? %>
                 <a class="btn btn-sm btn-outline-danger" href="javascript:;" onclick="$(this).closest('.ticket_type').remove()">
-                  <i class="fa fa-times"></i>
+                  <i class="bi bi-x"></i>
                 </a>
               <% else %>
                 <a class="btn btn-sm btn-outline-danger" href="javascript:;" onclick="$(this).children().last().prop('checked', true).closest('.ticket_type').hide()">
-                  <i class="fa fa-times"></i>
+                  <i class="bi bi-x"></i>
                   <%= o.check_box '_destroy', style: 'display: none' %>
                 </a>
               <% end %>
@@ -55,7 +55,7 @@
           <% end %>
         </div>
         <a id="ticket_types_add" class="btn btn-sm btn-primary" href="javascript:;">
-          <i class="fa fa-plus-square"></i>
+          <i class="bi bi-plus-square-fill"></i>
           Add ticket type
         </a>
         <style>
@@ -166,7 +166,7 @@
               hiddenDiv.appendTo(d);
               hiddenDiv.tooltip();
 
-              $('<a class="btn btn-sm btn-outline-danger" href="javascript:;" onclick="$(this).closest(\'.ticket_type\').remove()"><i class="fa fa-times"></i></a>').appendTo(d);
+              $('<a class="btn btn-sm btn-outline-danger" href="javascript:;" onclick="$(this).closest(\'.ticket_type\').remove()"><i class="bi bi-x"></i></a>').appendTo(d);
 
               d.appendTo('#ticket_types');
             });

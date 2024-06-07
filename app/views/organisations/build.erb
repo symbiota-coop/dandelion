@@ -126,7 +126,7 @@
         <div role="tabpanel" class="tab-pane <%= 'active' if params[:tab].to_i == 2%>" id="tab2">
           <% if !@organisation.stripe_sk && !@organisation.coinbase_api_key %>
             <div class="alert alert-warning">
-              <p class="m-0"><i class="fa fa-warning"></i> To accept payments, you must add either Stripe or Coinbase Commerce details.</p>
+              <p class="m-0"><i class="bi bi-exclamation-triangle-fill"></i> To accept payments, you must add either Stripe or Coinbase Commerce details.</p>
             </div>
           <% end %>
           <%= f.select_block :currency %>
@@ -177,7 +177,7 @@
           <% if !@organisation.mailgun_api_key %>
             <div class="alert alert-warning">
               <p class="m-0">
-                <i class="fa fa-warning"></i>
+                <i class="bi bi-exclamation-triangle-fill"></i>
                 If you'd like to use Dandelion's mailer to email everyone following your organisation,
                 or people following your organisation's activities and local groups,
                 you'll need to link a <a class="text-warning text-underline" href="https://www.mailgun.com/pricing/">paid Mailgun account</a>.

@@ -1,12 +1,12 @@
 <% if current_account %>
   <% if !defined?(event_star); event_star = event.event_stars.find_by(account: current_account); end %>
-  <% if !event_star %>
-    <a data-toggle="tooltip" title="Star this event (shows in your upcoming events)" class="pagelet-trigger text-dark <% if defined?(block_edit) && block_edit %> block-edit <% end %>" style="<% if defined?(block_edit) && block_edit %> display: none; <% end %> text-decoration: none" href="/events/<%=event.id%>/do_star">
-      <i class="fa fa-star-o"></i>
-    </a>
-  <% else %>
-    <a data-toggle="tooltip" title="Unstar this event" class="pagelet-trigger text-dark" style="text-decoration: none" href="/events/<%=event.id%>/unstar">
-      <i class="fa fa-star"></i>
-    </a>
+    <% if !event_star %>
+      <a data-toggle="tooltip" title="Star this event (shows in your upcoming events)" class="pagelet-trigger text-dark <% if defined?(block_edit) && block_edit %> block-edit <% end %>" style="<% if defined?(block_edit) && block_edit %> display: none; <% end %> text-decoration: none" href="/events/<%=event.id%>/do_star">
+        <i class="bi bi-star"></i>
+      </a>
+    <% else %>
+      <a data-toggle="tooltip" title="Unstar this event" class="pagelet-trigger text-dark" style="text-decoration: none" href="/events/<%=event.id%>/unstar">
+        <i class="bi bi-star-fill"></i>
+      </a>
+    <% end %>
   <% end %>
-<% end %>

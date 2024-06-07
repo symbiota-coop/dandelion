@@ -30,7 +30,7 @@
   <% end %>
 </div>
 
-<a class="btn btn-primary mb-3" href="javascript:;" onclick="$(this).hide().next().show()"><i class="fa fa-plus-circle"></i> Add a follower</a>
+<a class="btn btn-primary mb-3" href="javascript:;" onclick="$(this).hide().next().show()"><i class="bi bi-plus-square-fill"></i> Add a follower</a>
 <div style="display: none" class="mb-3">
   <% form_tag "/local_groups/#{@local_group.id}/add_follower", class: 'form-inline' do %>
     <%= email_field_tag :email, class: 'form-control mr-1', placeholder: 'Email' %>
@@ -62,7 +62,7 @@
       <%= local_groupship.created_at %>
     </td>
     <td>
-      <a data-confirm="Are you sure you want to remove this person from this local group?" class="btn btn-danger btn-sm" href="/local_groupships/<%= local_groupship.id %>/destroy"><i class="fa fa-times"></i></a>
+      <a data-confirm="Are you sure you want to remove this person from this local group?" class="btn btn-danger btn-sm" href="/local_groupships/<%= local_groupship.id %>/destroy"><i class="bi bi-x"></i></a>
     </td>
   </tr>
   <% } %>

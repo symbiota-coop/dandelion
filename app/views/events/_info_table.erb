@@ -14,7 +14,7 @@
       <a href="/o/<%= @event.organisation.slug %>/events"><%= @event.organisation.name %></a>
       <% if event_admin? && @event.revenue_sharer && !(organisationship = @event.organisation.organisationships.find_by(:account => @event.revenue_sharer, :stripe_connect_json.ne => nil)) %>
         <span class="label label-danger">
-          <i class="fa fa-warning"></i> Revenue sharer not connect to this organisation
+          <i class="bi bi-exclamation-triangle-fill"></i> Revenue sharer not connect to this organisation
         </span>
       <% end %>
       <%= partial :'organisations/add', locals: {

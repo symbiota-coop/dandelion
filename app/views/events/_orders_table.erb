@@ -14,8 +14,8 @@
       <p><%== pagination_details orders, model: 'Order' %></p>
     </div>
     <div class="col-auto">
-      <a class="btn btn-primary" href="/events/<%= @event.id %>/orders.csv?<%= request.query_string %>"><i class="fa fa-download"></i> CSV</a>
-      <a class="btn btn-primary" href="/events/<%= @event.id %>/orders.pdf?<%= request.query_string %>"><i class="fa fa-download"></i> PDF</a>
+      <a class="btn btn-primary" href="/events/<%= @event.id %>/orders.csv?<%= request.query_string %>"><i class="bi bi-download"></i> CSV</a>
+      <a class="btn btn-primary" href="/events/<%= @event.id %>/orders.pdf?<%= request.query_string %>"><i class="bi bi-download"></i> PDF</a>
     </div>
   </div>
 <% elsif @organisation %>
@@ -24,7 +24,7 @@
       <p><%== pagination_details orders, model: 'Order' %></p>
     </div>
     <div class="col-auto">
-      <a class="btn btn-primary" href="/o/<%= @organisation.slug %>/orders.csv?<%= request.query_string %>"><i class="fa fa-download"></i> CSV</a>
+      <a class="btn btn-primary" href="/o/<%= @organisation.slug %>/orders.csv?<%= request.query_string %>"><i class="bi bi-download"></i> CSV</a>
     </div>
   </div>
 <% else %>
@@ -126,7 +126,7 @@
       <% end %>
       <% if order.incomplete? %>
         <% if order.deleted? %>
-          <i data-toggle="tooltip" title="Timed out" class="fa fa-warning"></i>
+          <i data-toggle="tooltip" title="Timed out" class="bi bi-exclamation-triangle-fill"></i>
         <% else %>
           <i data-toggle="tooltip" title="This person is in the process of completing the order. If they don't complete it soon, the order will be removed." class="fa fa-spin fa-circle-o-notch"></i>
         <% end %>
@@ -194,7 +194,7 @@
       <% if (event_feedback = order.event.event_feedbacks.find_by(account: order.account)) && !event_feedback.anonymise %>
         <a href="/event_feedbacks/<%= event_feedback.id %>">
           <% if event_feedback.rating %>
-            <% event_feedback.rating.times do %><i class="fa fa-star"></i><% end %>
+            <% event_feedback.rating.times do %><i class="bi bi-star-fill"></i><% end %>
           <% else %>
             <%= event_feedback.id %>
           <% end %>
@@ -216,7 +216,7 @@
         ['Transfer to another event', "/orders/#{order.id}/transfer"],
         (['Remove and refund order', "/events/#{order.event.id}/orders/#{order.id}/destroy"] if order.event.refund_deleted_orders && order.session_id),
         (['Delete order', "/events/#{order.event.id}/orders/#{order.id}/destroy"] if !(order.event.refund_deleted_orders && order.session_id)),
-      ].compact, button_text: %(Actions <i class="fa fa-caret-down"></i>), container_class: 'btn-group mb-1' %>
+      ].compact, button_text: %(Actions <i class="bi bi-caret-down-fill"></i>), container_class: 'btn-group mb-1' %>
   </td>
 </tr>
 <% } %>

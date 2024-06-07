@@ -14,8 +14,8 @@
       <p><%== pagination_details @tickets, model: 'Ticket' %></p>
     </div>
     <div class="col-auto">
-      <a class="btn btn-primary" href="/events/<%= @event.id %>/tickets.csv?<%= request.query_string %>"><i class="fa fa-download"></i> CSV</a>
-      <a class="btn btn-primary" href="/events/<%= @event.id %>/tickets.pdf?<%= request.query_string %>"><i class="fa fa-download"></i> PDF</a>
+      <a class="btn btn-primary" href="/events/<%= @event.id %>/tickets.csv?<%= request.query_string %>"><i class="bi bi-download"></i> CSV</a>
+      <a class="btn btn-primary" href="/events/<%= @event.id %>/tickets.pdf?<%= request.query_string %>"><i class="bi bi-download"></i> PDF</a>
     </div>
   </div>
 <% else %>
@@ -84,7 +84,7 @@
       <% if (event_feedback = @event.event_feedbacks.find_by(account: ticket.account)) && !event_feedback.anonymise %>
         <a href="/event_feedbacks/<%= event_feedback.id %>">
           <% if event_feedback.rating %>
-            <% event_feedback.rating.times do %><i class="fa fa-star"></i><% end %>
+            <% event_feedback.rating.times do %><i class="bi bi-star-fill"></i><% end %>
           <% else %>
             <%= event_feedback.id %>
           <% end %>
@@ -104,7 +104,7 @@
         (['Delete ticket', "/events/#{@event.id}/tickets/#{ticket.id}/destroy"] if !(@event.refund_deleted_orders && ticket.session_id)),
         (['Remove and refund order', "/events/#{@event.id}/orders/#{ticket.order_id}/destroy"] if ticket.order && @event.refund_deleted_orders && ticket.order.session_id),
         (['Delete order', "/events/#{@event.id}/orders/#{ticket.order_id}/destroy"] if ticket.order && !(@event.refund_deleted_orders && ticket.order.session_id)),        
-      ].compact, button_text: %(Actions <i class="fa fa-caret-down"></i>), container_class: 'btn-group mb-1' %>
+      ].compact, button_text: %(Actions <i class="bi bi-caret-down-fill"></i>), container_class: 'btn-group mb-1' %>
     </td>
   </tr>
   <% } %>

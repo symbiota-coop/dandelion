@@ -15,7 +15,7 @@
       <input type="text" class="form-control" value="<%= u attachment.file.url %>">
     </td>
     <td style="width: 1px">
-      <a data-confirm="Are you sure?" class="btn btn-danger pagelet-trigger" href="/pmails/<%= @organisation.id %>/attachments/<%= attachment.id %>/destroy?<%= @scope %>"><i class="fa fa-times"></i></a>
+      <a data-confirm="Are you sure?" class="btn btn-danger pagelet-trigger" href="/pmails/<%= @organisation.id %>/attachments/<%= attachment.id %>/destroy?<%= @scope %>"><i class="bi bi-x"></i></a>
     </td>
   </tr>
   <% } %>

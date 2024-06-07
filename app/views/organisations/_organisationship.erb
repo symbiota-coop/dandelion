@@ -3,7 +3,7 @@
      state_options = {
        'not_following' => 'Follow',
        'follow_without_subscribing' => 'Following',
-       'follow_and_subscribe' => 'Following with email updates <i class="fa fa-envelope"></i>'
+       'follow_and_subscribe' => 'Following with email updates <i class="bi bi-envelope-fill"></i>'
      }
      current_state = if organisationship
                        organisationship.unsubscribed ? 'follow_without_subscribing' : 'follow_and_subscribe'
@@ -14,7 +14,7 @@
      action_options = {
        'not_following' => 'Unfollow',
        'follow_without_subscribing' => 'Follow',
-       'follow_and_subscribe' => 'Follow with email updates <i class="fa fa-envelope"></i>'
+       'follow_and_subscribe' => 'Follow with email updates <i class="bi bi-envelope-fill"></i>'
      }
 
      action_options.delete('not_following') if organisationship && (organisationship.admin? || organisationship.monthly_donor?) %>

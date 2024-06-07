@@ -6,13 +6,13 @@
   <span class="label label-primary"><%= m @organisationship.credit_balance, @organisation.currency %></span>
   <a href="javascript:;" onclick="$(this).hide();
     $('#plus-credit').show().find('input').focus();
-    $(this).parent().find('a i').hide()"><i class="fa fa-plus-square"></i></a>
+    $(this).parent().find('a i').hide()"><i class="bi bi-plus-square-fill"></i></a>
   <a href="javascript:;" onclick="$(this).hide();
     $('#minus-credit').show().find('input').focus();
     $(this).parent().find('a i').hide()"><i class="fa fa-minus-square"></i></a>
 </p>
 <% form_tag "/organisationships/#{@organisationship.id}/credit/plus", class: 'form-inline mb-3', id: 'plus-credit', style: 'display: none' do %>
-  <i style="margin-right: 5px" class="fa fa-plus-square"></i>
+  <i style="margin-right: 5px" class="bi bi-plus-square-fill"></i>
   <div class="input-group">
     <div class="input-group-prepend">
       <span class="input-group-text"><%= money_symbol(@organisation.currency) %></span>

@@ -43,7 +43,7 @@
     <div class="col">
       <% if (@membership.invitations_remaining > 0 || @membership.admin?) && (!@gathering.member_limit || @gathering.memberships.count < @gathering.member_limit) %>
         <a class="btn btn-primary" href="javascript:;" onclick="$(this).hide().next().show().find('input[name=email]').focus()">
-          <i class="fa fa-plus-circle"></i> Add member
+          <i class="bi bi-plus-square-fill"></i> Add member
         </a>
         <% if !@membership.admin? && @membership.invitations_remaining > 0 %>
           <%= pluralize(@membership.invitations_remaining <= 0 ? 0 : @membership.invitations_remaining, 'invitation') %> remaining
@@ -58,7 +58,7 @@
     </div>
     <div class="col-auto">
       <% if @membership.admin? %>
-        <a class="btn btn-outline-primary" href="<%= request.path %>.csv?<%= request.query_string %>"><i class="fa fa-download"></i> CSV</a>
+        <a class="btn btn-outline-primary" href="<%= request.path %>.csv?<%= request.query_string %>"><i class="bi bi-download"></i> CSV</a>
       <% end %>
     </div>
   </div>
