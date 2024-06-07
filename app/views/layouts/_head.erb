@@ -53,7 +53,8 @@
       'intro.js/6.0.0' => 'intro.min.js introjs.min.css',
       'qrcodejs/1.0.0' => 'qrcode.min.js',
       'masonry/4.0.0' => 'masonry.pkgd.min.js',
-      'TypeWatch/3.0.2' => 'jquery.typewatch.min.js'
+      'TypeWatch/3.0.2' => 'jquery.typewatch.min.js',
+      'bootstrap-icons/1.11.3' => 'font/bootstrap-icons.min.css'
      }.each { |k,v| %>
   <% v.split(' ').each { |f| u = "https://cdnjs.cloudflare.com/ajax/libs/#{k}/#{f}" %>
   <% case f.split('.').last.to_sym; when :js %>

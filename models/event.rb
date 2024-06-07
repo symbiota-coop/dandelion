@@ -52,6 +52,7 @@ class Event
   field :oc_slug, type: String
   field :ticket_email_greeting, type: String
   field :ticket_email_title, type: String
+  field :ai_tagged, type: Boolean
 
   field :revenue_share_to_revenue_sharer, type: Integer
   field :profit_share_to_facilitator, type: Integer
@@ -195,7 +196,7 @@ class Event
       (local_group ? local_group.discount_codes.pluck(:id) : []))
   end
 
-  attr_accessor :prevent_notifications, :tag_names, :duplicate
+  attr_accessor :prevent_notifications, :update_tag_names, :tag_names, :duplicate
 
   has_many :notifications, as: :notifiable, dependent: :destroy
   after_create do
@@ -255,6 +256,7 @@ class Event
     self.minimum_donation = nil unless suggested_donation
     self.minimum_donation = minimum_donation.round(2) if minimum_donation
     self.organiser = account if account && !revenue_sharer && !organiser && organisation && organisation.stripe_client_id
+    self.ai_tagged = nil
 
     unless slug
       loop do
@@ -471,6 +473,8 @@ class Event
 
   after_save :update_event_tags
   def update_event_tags
+    return unless @update_tag_names
+
     @tag_names ||= ''
     @tag_names_a = @tag_names.split(',').map { |tag_name| tag_name.strip.gsub(' & ', ' and ') }
     current_tag_names = event_tagships.map(&:event_tag_name)
@@ -485,6 +489,44 @@ class Event
         event_tagships.create(event_tag: event_tag)
       end
     end
+  end
+
+  after_save :ai_tag
+  def ai_tag
+    return unless event_tagships(true).empty?
+
+    prompt = "Provide a list of 5 tags for this event as a comma-separated list: #{name}\n\n#{description}"
+
+    prompt = prompt[0..(200_000 * 0.66 * 4)]
+    client = Anthropic::Client.new
+    content = nil
+    loop do
+      response = client.messages(
+        parameters: {
+          model: 'claude-3-haiku-20240307',
+          messages: [
+            { role: 'user', content: prompt }
+          ],
+          max_tokens: 256
+        }
+      )
+      if response['content']
+        content = response['content'].first['text']
+        break unless content.include?('#')
+      else
+        puts 'sleeping...'
+        sleep 5
+      end
+    end
+    content.split(':').last.strip.split(',').map(&:strip).map do |name|
+      name.gsub('_', ' ').gsub('-', ' ').downcase
+    end.each do |name|
+      puts name
+      if (event_tag = EventTag.find_or_create_by(name: name)).persisted?
+        event_tagships.create(event_tag: event_tag)
+      end
+    end
+    set(ai_tagged: true)
   end
 
   def duplicate!(account)
