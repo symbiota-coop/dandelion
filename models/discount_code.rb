@@ -64,6 +64,8 @@ class DiscountCode
 
   def self.new_hints
     {
+      description: 'Private description, visible only to admins',
+      maximum_uses: 'The maximum number of times this code can be used',
       filter: 'Only apply the discount to tickets containing this term'
     }
   end
