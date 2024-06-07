@@ -97,7 +97,8 @@ ul.pagination {
   visibility: hidden;
 }
 
-.no-spinner .fa.fa-spin.fa-circle-o-notch {
+.no-spinner .fa.fa-spin.fa-circle-o-notch,
+.no-spinner .bi.bi-spin.bi-arrow-repeat {
   display: none
 }
 
@@ -363,7 +364,8 @@ h4.block-title {
   height: auto;
 }
 
-.fa.fa-star {
+.fa.fa-star,
+.bi.bi-star-fill {
   color: #f5b041
 }
 
@@ -796,4 +798,21 @@ figure td {
 .bi-spin {
   display: inline-block;
   animation: spin 2s linear infinite;
+}
+
+.icon-list {
+  list-style-type: none;
+  padding-left: 0;
+}
+
+.icon-list>li {
+  position: relative;
+  padding-left: 2em;
+}
+
+.icon-list>li>.bi {
+  position: absolute;
+  left: 0;
+  top: 50%;
+  transform: translateY(-50%);
 }
