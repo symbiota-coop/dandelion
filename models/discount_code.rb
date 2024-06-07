@@ -16,7 +16,7 @@ class DiscountCode
 
   before_validation do
     errors.add(:percentage_discount, 'must be positive') if percentage_discount <= 0
-    errors.add(:percentage_discount, 'must be less or equal to 99%') if percentage_discount > 99
+    errors.add(:percentage_discount, 'must be less or equal to 100%') if percentage_discount > 100
   end
 
   def self.admin_fields
