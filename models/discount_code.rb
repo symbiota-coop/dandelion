@@ -8,6 +8,8 @@ class DiscountCode
   field :code, type: String
   field :description, type: String
   field :percentage_discount, type: Integer
+  field :fixed_discount_amount, type: Integer
+  field :fixed_discount_currency, type: String
   field :filter, type: String
 
   validates_presence_of :code
@@ -25,6 +27,8 @@ class DiscountCode
       description: :text,
       filter: :text,
       percentage_discount: :number,
+      fixed_discount_amount: :number,
+      fixed_discount_currency: :select,
       codeable_type: :select,
       codeable_id: :text,
       account_id: :lookup
