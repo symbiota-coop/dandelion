@@ -4,7 +4,7 @@ if params[:discount_code]
   discount_code = @event.all_discount_codes.find_by(code: params[:discount_code].upcase)
   if discount_code
     discount_code = nil if !discount_code.applies_to?(@event)
-    discount_code = nil if discount_code.orders.count >= discount_code.maximum_uses
+    discount_code = nil if discount_code.orders.count >= (discount_code.maximum_uses || 0)
   end
 end
 %>
