@@ -17,19 +17,19 @@
 <div class="mb-2">
   <%= partial :'events/tag_labels', locals: { event: event } %>
 </div>
-<ul style="margin-left: 1.66em; font-size: 1rem" class="fa-ul text-dark">
+<ul style="margin-left: 1.66em; font-size: 1rem" class="icon-list text-dark">
   <% if (ef = event.event_facilitations.select { |event_facilitation| event.organisation && event_facilitation.account.lastname && event_facilitation.account.name != event.organisation.name }).count > 0 || (!@organisation && event.organisation) %>
     <li>
-      <i data-toggle="tooltip" title="Host/facilitators" class="fa fa-li fa-flag"></i>
+      <i data-toggle="tooltip" title="Host/facilitators" class="bi bi-flag-fill"></i>
       <%= partial :'events/facilitators', locals: {event: event, event_facilitators: ef} %>
     </li>
   <% end %>
   <li>
-    <i data-toggle="tooltip" title="Dates/times" class="fa fa-li fa-calendar"></i>
+    <i data-toggle="tooltip" title="Dates/times" class="bi bi-calendar-event"></i>
     <%= when_details(event) %>
   </li>
   <li>
-    <i data-toggle="tooltip" title="Location" class="fa fa-li fa-map-marker"></i>
+    <i data-toggle="tooltip" title="Location" class="bi bi-geo-alt-fill"></i>
     <%= partial :'events/location', locals: {event: event} %>
   </li>
   <% if defined?(skip_final_ul) && skip_final_ul %>

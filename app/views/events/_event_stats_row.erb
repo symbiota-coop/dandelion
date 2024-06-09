@@ -45,7 +45,7 @@
   // Alert the user that the node has been copied
   alert('Linked image copied');
 
-    "><i class="fa fa-image"></i></a>
+    "><i class="bi bi-image"></i></a>
     <div style="display: none">
       <a target="_parent" href="<%= ENV['BASE_URI'] %>/e/<%=event.slug%>"><img src="<%= u event_image.thumb('1920x1920').url %>"></a>
     </div>
@@ -121,7 +121,7 @@
       <!-- Facebook event -->
       <td>
         <% if event.facebook_event_url %>
-          <a target="_blank" href="<%= event.facebook_event_url %>"><i class="fa fa-facebook-square"></i></a>
+          <a target="_blank" href="<%= event.facebook_event_url %>"><i class="bi bi-facebook"></i></a>
         <% end %>
       </td>
       <!-- 30d views -->

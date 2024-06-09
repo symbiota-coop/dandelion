@@ -147,7 +147,7 @@ class Event
   end
 
   def self.marker_icon
-    'fa fa-calendar-o'
+    'bi bi-calendar-event'
   end
 
   has_many :stripe_charges

@@ -29,13 +29,13 @@
     <%= number_field_tag :amount, class: 'form-control', style: 'width: 6em' %>
   </div>
 <% end %>
-<ul class="fa-ul">
+<ul class="icon-list">
   <% @organisationship.credit_granted(description_hash: true).each { |c| %>
-  <li><i class="fa fa-li fa-plus-square"></i> <%= c[0] %> <%= c[1] %> </li>
+  <li><i class="bi bi-plus-square-fill"></i> <%= c[0] %> <%= c[1] %> </li>
   <% } %>
 </ul>
-<ul class="fa-ul">
+<ul class="icon-list">
   <% @organisationship.credit_used(description_hash: true).each { |c| %>
-  <li><i class="fa fa-li fa-minus-square"></i> <%= c[0] %> <%= c[1] %> </li>
+  <li><i class="bi bi-dash-square-fill"></i> <%= c[0] %> <%= c[1] %> </li>
   <% } %>
 </ul>

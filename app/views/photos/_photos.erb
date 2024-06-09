@@ -2,7 +2,7 @@
 <%= partial :'photos/photo', locals: { photo: photo, dimensions: defined?(dimensions) ? dimensions : '200x200#' } %>
 <% } %>
 <% if (defined?(add_photo_if) && add_photo_if) || (photoable.respond_to?(:account_id) && photoable.account_id == current_account.id) %>
-  <a data-toggle="tooltip" title="Add a photo" class="btn btn-outline-primary btn-sm" href="javascript:;" onclick="$(this).hide().next().show().find('input').click()"><i class="fa fa-camera"></i></a>
+  <a data-toggle="tooltip" title="Add a photo" class="btn btn-outline-primary btn-sm" href="javascript:;" onclick="$(this).hide().next().show().find('input').click()"><i class="bi bi-camera"></i></a>
   <% form_tag '/photos/new', multipart: true, class: 'mt-3', style: 'display: none' do %>
     <%= hidden_field_tag :photoable_id, value: photoable.id %>
     <%= hidden_field_tag :photoable_type, value: photoable.class.to_s %>

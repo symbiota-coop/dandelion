@@ -13,7 +13,7 @@
       </li>
       <li class="list-inline-item">
         <a class="btn <%='btn btn-outline-primary' if !params[:display].in?(['map','table']) %>" href="<%= path if defined?(path) %>?<%= q = Rack::Utils.parse_nested_query(request.query_string); q.delete('search'); q.delete('display'); q.merge({search: 1, display: 'list' }).to_query %>">
-          <i class="fa fa-list"></i> List
+          <i class="bi bi-list-task"></i> List
         </a>
       </li>
       <li class="list-inline-item">
@@ -23,7 +23,7 @@
       </li>
       <!-- <li class="list-inline-item">
         <a class="btn <%='btn-outline-primary' if params[:display] == 'table' %>" href="<%= path if defined?(path) %>?<%= q = Rack::Utils.parse_nested_query(request.query_string); q.delete('search'); q.delete('display'); q.merge({search: 1, display: 'table' }).to_query %>">
-          <i class="fa fa-table"></i> Table
+          <i class="bi bi-table"></i> Table
         </a>
       </li> -->
     </ul>

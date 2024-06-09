@@ -31,7 +31,7 @@
     <td>
       <% if pmail_test.sent_at %>
         <a class="btn btn-primary mr-1 mb-1" href="<%= edit_url %>">
-          <i class="fa fa-check"></i> Sent
+          <i class="bi bi-check"></i> Sent
         </a>
         <div class="mt-1">
           Queued for sending at <%= pmail_test.requested_send_at %> <br>
@@ -46,7 +46,7 @@
         </div>
       <% else %>
         <a class="btn btn-secondary" href="<%= edit_url %>">
-          <i class="fa fa-edit"></i> Edit
+          <i class="bi bi-pencil-fill"></i> Edit
         </a>
         <div class="mt-1">
           Created at <%= pmail_test.created_at %><br>

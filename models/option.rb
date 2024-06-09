@@ -59,15 +59,15 @@ class Option
   def self.icon(type)
     case type
     when 'Tier'
-      'fa-th-list'
+      'bi-grid-fill'
     when 'Accommodation'
-      'fa-home'
+      'bi-house-door'
     when 'Transport'
-      'fa-bus'
+      'bi-bus-front'
     when 'Food'
-      'fa-cutlery'
+      'bi-cup-hot'
     when 'Extra'
-      'fa-plus-circle'
+      'bi-plus-square-fill'
     end
   end
 

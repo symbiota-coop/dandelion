@@ -2,7 +2,7 @@
   <% current_account.network_notifications.order('created_at desc').limit(5).each_with_index { |notification,i| %>
   <li class="notification">
     <a href="<%= notification.link[1] %>">
-      <div class="notification-icon bg-dark text-white"><i class="fa <%= notification.icon %>"></i></div>
+      <div class="notification-icon bg-dark text-white"><i class="bi <%= notification.icon %>"></i></div>
       <div class="notification-info">
         <h4 class="notification-title"><%= notification.sentence %></h4>
         <p class="notification-desc">

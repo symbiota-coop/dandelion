@@ -168,7 +168,7 @@ class Notification
       end
     when :reacted_to_a_comment
       comment_reaction = notifiable
-      "<strong>#{comment_reaction.account.name}</strong> reacted with #{comment_reaction.body == '💚' ? '<i class="text-primary fa fa-heart"></i>' : comment_reaction.body} to <strong>#{comment_reaction.comment.account.name}'s</strong> comment in <strong>#{comment_reaction.commentable.name}/#{comment_reaction.comment.post.subject}</strong>"
+      "<strong>#{comment_reaction.account.name}</strong> reacted with #{comment_reaction.body == '💚' ? '<i class="text-primary bi bi-heart-fill"></i>' : comment_reaction.body} to <strong>#{comment_reaction.comment.account.name}'s</strong> comment in <strong>#{comment_reaction.commentable.name}/#{comment_reaction.comment.post.subject}</strong>"
     when :left_gathering
       account = notifiable
       "<strong>#{account.name}</strong> is no longer a member"
@@ -268,65 +268,65 @@ class Notification
   def icon
     case type.to_sym
     when :created_gathering
-      'fa-group'
+      'bi-people-fill'
     when :applied
-      'fa-file-text-o'
+      'bi-file-text'
     when :joined_gathering
-      'fa-user-plus'
+      'bi-person-fill-add'
     when :joined_team
-      'fa-group'
+      'bi-people-fill'
     when :created_spend
-      'fa-money'
+      'bi-cash-coin'
     when :created_place
-      'fa-map-marker'
+      'bi-geo-alt-fill'
     when :created_profile
-      'fa-user-circle-o'
+      'bi-person-fill'
     when :updated_profile
-      'fa-user-circle-o'
+      'bi-person-fill'
     when :updated_place
-      'fa-map-marker'
+      'bi-geo-alt-fill'
     when :created_tactivity
-      'fa-paper-plane'
+      'bi-easel'
     when :signed_up_to_a_shift
-      'fa-hand-paper-o'
+      'bi-hand-index'
     when :interested_in_tactivity
-      'fa-thumbs-up'
+      'bi-hand-thumbs-up'
     when :created_team
-      'fa-group'
+      'bi-people-fill'
     when :created_option
-      'fa-check'
+      'bi-check'
     when :created_rota
-      'fa-table'
+      'bi-table'
     when :scheduled_tactivity
-      'fa-calendar-plus-o'
+      'bi-calendar-plus'
     when :unscheduled_tactivity
-      'fa-calendar-minus-o'
+      'bi-calendar-minus'
     when :made_admin
-      'fa-key'
+      'bi-key'
     when :unadmined
-      'fa-key'
+      'bi-key'
     when :created_timetable
-      'fa-table'
+      'bi-table'
     when :commented
-      'fa-comment'
+      'bi-chat'
     when :reacted_to_a_comment
-      'fa-thumbs-up'
+      'bi-hand-thumbs-up'
     when :left_gathering
-      'fa fa-sign-out'
+      'bi-box-arrow-right'
     when :created_payment
-      'fa-money'
+      'bi-cash-coin'
     when :created_inventory_item
-      'fa-wrench'
+      'bi-wrench'
     when :mapplication_removed
-      'fa-file-text-o'
+      'bi-file-text'
     when :created_event
-      'fa-calendar-plus-o'
+      'bi-calendar-plus'
     when :updated_event
-      'fa-calendar-o'
+      'bi-calendar-event'
     when :created_organisation
-      'fa-flag'
+      'bi-flag-fill'
     when :created_order
-      'fa-ticket'
+      'bi-ticket-detailed-fill'
     end
   end
 end

@@ -11,26 +11,26 @@
     </li>
     <li>
       <a href="javascript:;" data-toggle="search-bar" class="navbar-icon">
-        <i class="ti-search"></i>
+        <i class="bi bi-search"></i>
       </a>
     </li>
     <li class="dropdown">
       <a id="notifications-a" href="javascript:;" data-toggle="dropdown" class="dropdown-toggle navbar-icon" onclick="$(this).removeClass('with-label');
           $.post('/checked_notifications')">
-        <i class="ti-bell"></i>
+        <i class="bi bi-bell"></i>
       </a>
       <style>
-        #notifications .fa-spin { display: none }
+        #notifications .bi-spin { display: none }
       </style>
       <div id="notifications" data-pagelet-url="/notifications" data-pagelet-refresh="60"></div>
     </li>
     <li class="dropdown">
       <a id="messages-a" href="javascript:;" data-toggle="dropdown" class="dropdown-toggle navbar-icon" onclick="$(this).removeClass('with-label');
           $.post('/checked_messages')">
-        <i class="ti-comment"></i>
+        <i class="bi bi-chat"></i>
       </a>
       <style>
-        #messages .fa-spin { display: none }
+        #messages .bi-spin { display: none }
       </style>
       <div id="messages" data-pagelet-url="/messages" data-pagelet-refresh="60">
         <%= cp(:'messages/dropdown', key: "/messages?account_id=#{current_account.id}", expires: 1.minute.from_now) %>
@@ -53,7 +53,7 @@
     </li>
     <li>
       <a href="javascript:;" data-toggle="search-bar" class="navbar-icon">
-        <i class="ti-search"></i>
+        <i class="bi bi-search"></i>
       </a>
     </li>
     <li>

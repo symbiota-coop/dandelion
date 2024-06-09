@@ -18,9 +18,9 @@ recommended_people = @account.recommended_people || []
           <a class="text-dark" href="/u/<%= account.username %>"><%= account.name %></a>
         </h2>
         <%= partial :'accounts/buttons', locals: { account: account } %>
-        <ul class="fa-ul mt-3">
+        <ul class="icon-list mt-3">
           <% Event.and(:id.in => v).order('start_time desc').each { |event| %>
-          <li><i class="fa fa-li fa-calendar"></i> <a href="/e/<%= event.slug %>"><%= event.name %></a>, <%=concise_when_details(event) %></li>
+          <li><i class="bi bi-calendar-event"></i> <a href="/e/<%= event.slug %>"><%= event.name %></a>, <%=concise_when_details(event) %></li>
           <% } %>
         </ul>
       </div>

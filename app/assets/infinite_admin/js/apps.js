@@ -211,19 +211,19 @@ var handleHeaderSearchBar = function () {
     html: true,
     source: '/search',
     minLength: 3,
-    open: function(event, ui) {
-  		$(this).autocomplete("widget").css({"width": ($(this).width() + "px")})
+    open: function (event, ui) {
+      $(this).autocomplete("widget").css({ "width": ($(this).width() + "px") })
     },
-    search: function() {
-      $('.header-search-bar .right-icon').html('<i class="fa fa-spin fa-circle-o-notch"></i>')
+    search: function () {
+      $('.header-search-bar .right-icon').html('<i class="bi bi-spin bi-arrow-repeat"></i>')
     },
-    response: function() {
-      $('.header-search-bar .right-icon').html('<i class="ti-close"></i>')
+    response: function () {
+      $('.header-search-bar .right-icon').html('<i class="bi bi-x"></i>')
     },
-    select: function(event, ui) {
-        $('#header-search').val(ui.item.value);
-        $('#header-search').closest('form').submit();
-      }
+    select: function (event, ui) {
+      $('#header-search').val(ui.item.value);
+      $('#header-search').closest('form').submit();
+    }
   }).on('focus', function () {
     $(this).autocomplete('search');
   });
@@ -304,7 +304,7 @@ var handleSidebarScrollMemory = function () {
 
     var defaultScroll = localStorage.getItem('sidebarScrollPosition');
     if (defaultScroll) {
-      $('.sidebar [data-scrollbar="true"]').slimScroll({scrollTo: defaultScroll});
+      $('.sidebar [data-scrollbar="true"]').slimScroll({ scrollTo: defaultScroll });
     }
   }
 };
@@ -804,7 +804,7 @@ var App = function () {
       this.initPage();
     },
     initPage: function () {
-//      handlePageLoadFadeIn();
+      //      handlePageLoadFadeIn();
     },
     initSidebar: function () {
       handleSidebarMinifyFloatMenu();

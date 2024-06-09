@@ -22,5 +22,5 @@ class Provider
   end
 end
 
-Provider.new('Ethereum', icon: 'fab fa-ethereum')
-Provider.new('Google', omniauth_name: 'google_oauth2', icon: 'fab fa-google')
+Provider.new('Ethereum', icon: 'bi bi-suit-diamond-fill')
+Provider.new('Google', omniauth_name: 'google_oauth2', icon: 'bi bi-google')

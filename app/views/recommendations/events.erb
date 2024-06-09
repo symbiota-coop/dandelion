@@ -39,7 +39,7 @@ show_image = (Padrino.env == :production)
                       <div class="col ml-1 p-lg-3">
                         <%= partial :'events/block_main', locals: { event: event, skip_final_ul: true } %>
 
-                        <li><i data-toggle="tooltip" title="People" class="fa fa-li fa-user"></i>
+                        <li><i data-toggle="tooltip" title="People" class="bi bi-person-fill"></i>
                           <% people.each { |k,v| account = Account.find(k) %>
                           <a href="/u/<%=account.username%>"><%=account.name%></a>,
                           <span data-toggle="tooltip">

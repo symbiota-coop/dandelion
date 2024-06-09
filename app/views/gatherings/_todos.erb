@@ -14,7 +14,7 @@
         <% if @membership && @membership.optionships.count > 0 %>
           <% @membership.optionships.each { |optionship| %>
           <a title="<%= optionship.option.type %>" href="/g/<%= @gathering.slug %>/options" class="label label-primary text-white d-inline-block mb-1">
-            <i class="fa <%= optionship.option.icon %>"></i> <%= optionship.option.name %> (<%= m optionship.option.cost_per_person, @gathering.currency %>)
+            <i class="bi <%= optionship.option.icon %>"></i> <%= optionship.option.name %> (<%= m optionship.option.cost_per_person, @gathering.currency %>)
           </a>
           <% } %>
         <% else %>

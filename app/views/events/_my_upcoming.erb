@@ -19,9 +19,9 @@
             <%= partial :'events/progress', locals: { event: event, full_width: true, link: true } %>
           </div>
         <% end %>
-        <ul class="fa-ul mb-0">
+        <ul class="icon-list mb-0">
           <% event.orders.complete.and(account: current_account).each { |order| %>
-          <li><i class="fa fa-li fa-ticket"></i><a target="_blank" href="/orders/<%= order.id %>"><%= d = order.description_elements; d.empty? ? order.created_at : d.join(', ') %></a></li>
+          <li><i class="bi bi-ticket-detailed-fill"></i><a target="_blank" href="/orders/<%= order.id %>"><%= d = order.description_elements; d.empty? ? order.created_at : d.join(', ') %></a></li>
           <% } %>
         </ul>
       </td>

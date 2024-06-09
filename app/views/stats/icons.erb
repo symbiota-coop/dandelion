@@ -1,0 +1,51 @@
+<%
+
+# Hash to store occurrences
+bi_counts = Hash.new(0)
+
+['app', 'models', 'lib'].each do |dir|
+  Find.find(dir) do |path|
+    if File.file?(path) && !path.split('/').last.starts_with?('.') && !path.include?('fonts') && !path.include?('infinite_admin') && !path.include?('images') && !path.include?('notification.ogg')
+      File.readlines(path).each do |line|
+        # Find all matches of 'bi-*' and count them
+        line.scan(/\bbi-[-\w]+/).each do |match|
+          bi_counts[match] += 1
+        end
+      end
+    end
+  end
+end
+
+# Sort the hash by occurrence count
+sorted_bi_counts = bi_counts.sort_by { |key, value| -value }
+
+%>
+
+<script>
+  $(function() {
+    $('#icons').DataTable({
+      paging: false,
+      searching: false,
+      bInfo: false,
+      order: [[0, 'asc']]
+    });
+  });
+</script>
+<table id="icons" class="table" style="width: auto">
+  <thead>
+    <tr>
+      <th>Pattern</th>
+      <th>Icon</th>
+      <th>Count</th>
+    </tr>
+  </thead>
+  <% sorted_bi_counts.each do |key, value| %>
+    <tr>
+      <td style="vertical-align: middle"><%= key %></td>
+      <td style="vertical-align: middle; font-size: 3em">
+        <i class="bi <%= key %>"></i>
+      </td>
+      <td style="vertical-align: middle"><%= value %></td>
+    </tr>
+  <% end %>
+</table>

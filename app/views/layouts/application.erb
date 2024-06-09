@@ -34,9 +34,9 @@
         <div class="header-search-bar">
           <form action="/search" name="search_bar_form">
             <div class="form-group">
-              <div class="left-icon"><i class="ti-search"></i></div>
+              <div class="left-icon"><i class="bi bi-search"></i></div>
               <input name="q" type="text" class="form-control" id="header-search">
-              <a href="javascript:;" data-dismiss="search-bar" class="right-icon"><i class="ti-close"></i></a>
+              <a href="javascript:;" data-dismiss="search-bar" class="right-icon"><i class="bi bi-x"></i></a>
             </div>
           </form>
         </div>
@@ -53,7 +53,7 @@
         <!-- BEGIN sidebar-minify-btn -->
         <a onclick="$.post('/sidebar', {minified: $('#page-container').hasClass('page-sidebar-minified') ? false : true});
             $('#sidebar ul.nav li a[data-toggle]').tooltip($('#page-container').hasClass('page-sidebar-minified') ? 'disable' : 'enable')
-           " href="#" class="sidebar-minify-btn" data-click="sidebar-minify"><i class="ti-arrow-left"></i></a>
+           " href="#" class="sidebar-minify-btn" data-click="sidebar-minify"><i class="bi bi-arrow-left"></i></a>
         <!-- END sidebar-minify-btn -->
       </div>
       <!-- END #sidebar -->

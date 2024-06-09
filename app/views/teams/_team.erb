@@ -7,7 +7,7 @@
 <% end %>
 <% if @team.budget %>
   <div style="margin-bottom: 20px">
-    <i class="fa fa-money"></i> This team has spent <%= m @team.spent, @gathering.currency %> of a budget of <%= m @team.budget, @gathering.currency %>
+    <i class="bi bi-cash-coin"></i> This team has spent <%= m @team.spent, @gathering.currency %> of a budget of <%= m @team.budget, @gathering.currency %>
   </div>
 <% end %>
 <div data-pagelet-url="/commentable?commentable_type=Team&commentable_id=<%= @team.id %>">

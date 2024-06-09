@@ -46,4 +46,8 @@ Dandelion::App.controller do
     @messages = Message.order('created_at desc').paginate(page: params[:page], per_page: 20)
     erb :'stats/messages'
   end
+
+  get '/stats/icons' do
+    erb :'stats/icons'
+  end
 end

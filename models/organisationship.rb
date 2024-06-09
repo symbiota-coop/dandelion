@@ -56,7 +56,7 @@ class Organisationship
   end
 
   def self.marker_icon
-    'fa fa-user'
+    'bi bi-person-fill'
   end
 
   def self.admin_fields

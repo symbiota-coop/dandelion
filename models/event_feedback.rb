@@ -53,7 +53,7 @@ class EventFeedback
 
   def self.ratings
     1.upto(5).to_h do |i|
-      [i.times.map { '<i class="fa fa-star"></i>' }.join, i]
+      [i.times.map { '<i class="bi bi-star-fill"></i>' }.join, i]
     end
   end
 

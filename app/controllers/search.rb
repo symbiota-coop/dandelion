@@ -9,31 +9,31 @@ Dandelion::App.controller do
 
       if !@type || @type == 'events'
         results += search(Event, Event.live.public.legit.future(1.month.ago), @q, 5).map do |event|
-          { label: %(<i class="fa fa-fw fa-calendar"></i> #{event.name} (#{concise_when_details(event)})), value: %(event:"#{event.name}") }
+          { label: %(<i class="bi bi-calendar-event"></i> #{event.name} (#{concise_when_details(event)})), value: %(event:"#{event.name}") }
         end
       end
 
       if !@type || @type == 'accounts'
         results += search(Account, Account.public, @q, 5).map do |account|
-          { label: %(<i class="fa fa-fw fa-user"></i> #{account.name}), value: %(account:"#{account.name}") }
+          { label: %(<i class="bi bi-person-fill"></i> #{account.name}), value: %(account:"#{account.name}") }
         end
       end
 
       if !@type || @type == 'organisations'
         results += search(Organisation, Organisation.all, @q, 5).map do |organisation|
-          { label: %(<i class="fa fa-fw fa-flag"></i> #{organisation.name}), value: %(organisation:"#{organisation.name}") }
+          { label: %(<i class="bi bi-flag-fill"></i> #{organisation.name}), value: %(organisation:"#{organisation.name}") }
         end
       end
 
       if !@type || @type == 'gatherings'
         results += search(Gathering, Gathering.and(listed: true).and(:privacy.ne => 'secret'), @q, 5).map do |gathering|
-          { label: %(<i class="fa fa-fw fa-moon"></i> #{gathering.name}), value: %(gathering:"#{gathering.name}") }
+          { label: %(<i class="bi bi-moon-fill"></i> #{gathering.name}), value: %(gathering:"#{gathering.name}") }
         end
       end
 
       if !@type || @type == 'places'
         results += search(Place, Place.all, @q, 5).map do |place|
-          { label: %(<i class="fa fa-fw fa-map"></i> #{place.name}), value: %(place:"#{place.name}") }
+          { label: %(<i class="bi bi-map-fill"></i> #{place.name}), value: %(place:"#{place.name}") }
         end
       end
 

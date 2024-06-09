@@ -14,7 +14,7 @@
   <% Option.types.each { |type| if (options = @gathering.options.and(type: type)).count > 0 %>
   <tr class="bg-white">
     <td colspan="5">
-      <h3 class="mb-0"><i class="fa <%= Option.icon(type) %>"></i> <%= %w[Tier Extra].include?(type) ? type.pluralize : type %></h3>
+      <h3 class="mb-0"><i class="bi <%= Option.icon(type) %>"></i> <%= %w[Tier Extra].include?(type) ? type.pluralize : type %></h3>
     </td>
   </tr>
   <% options.order('order asc, cost asc, name asc').each { |option| %>

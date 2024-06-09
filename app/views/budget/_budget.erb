@@ -127,7 +127,7 @@
       <td><a href="/accounts/<%= spend.account_id %>"><%= spend.account.name %></a></td>
       <td>
         <% if spend.reimbursed %>
-          <i style="cursor: pointer" class="fa fa-check" onclick="$(this).hide().next().show().find('input').click()"></i>
+          <i style="cursor: pointer" class="bi bi-check" onclick="$(this).hide().next().show().find('input').click()"></i>
         <% end %>
         <% form_tag "/spends/#{spend.id}/reimbursed", style: ('display:none' if spend.reimbursed) do %>
           <%= check_box_tag :reimbursed, value: true, checked: spend.reimbursed, onclick: '$(this.form).submit()' %>

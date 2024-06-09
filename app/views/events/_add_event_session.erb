@@ -1,11 +1,11 @@
-<ul class="fa-ul" style="margin-left: 1.5em">
+<ul class="icon-list" style="margin-left: 1.5em">
   <% event_sessions.each_with_index { |event_session,i| %>
   <li <% if i > 2%> style="display:none" <% end %>>
-    <i data-toggle="tooltip" title="Session <%=i+1%>" class="fa fa-li fa-clock"></i> <%= when_details(event_session, with_zone: false) %>
+    <i data-toggle="tooltip" title="Session <%=i+1%>" class="bi bi-clock"></i> <%= when_details(event_session, with_zone: false) %>
   </li>
   <% if i == 2 && event_sessions.count > 3 %>
     <li>
-      <i data-toggle="tooltip" class="fa fa-li fa-clock"></i>  <a href="javascript:;" onclick="$(this).hide().parent().nextAll().show()"><%= event_sessions.count - 3 %> more</a>
+      <i data-toggle="tooltip" class="bi bi-clock"></i>  <a href="javascript:;" onclick="$(this).hide().parent().nextAll().show()"><%= event_sessions.count - 3 %> more</a>
     </li>
   <% end %>
   <% } %>
@@ -13,7 +13,7 @@
 
   <% if add_and_remove %>
     <li>
-      <i class="fa fa-li fa-clock"></i>
+      <i class="bi bi-clock"></i>
       <a data-toggle="tooltip" title="Add a session" id="add-event-session" href="javascript:;" onclick="$(this).hide().next().show();
         $('#remove-event-session').hide()"><i class="bi bi-plus-square-fill"></i></a>
       <div style="display: none">

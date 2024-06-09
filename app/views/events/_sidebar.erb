@@ -18,9 +18,9 @@
             <% end %>
           <% end %>
           <p class="mb-1">Click an order to review the confirmation email:</p>
-          <ul class="fa-ul mb-0">
+          <ul class="icon-list mb-0">
             <% orders.each { |order| %>
-            <li><i class="fa fa-li fa-ticket"></i><a target="_blank" href="/orders/<%= order.id %>"><%= d = order.description_elements; d.empty? ? order.created_at : d.join(', ') %></a></li>
+            <li><i class="bi bi-ticket-detailed-fill"></i><a target="_blank" href="/orders/<%= order.id %>"><%= d = order.description_elements; d.empty? ? order.created_at : d.join(', ') %></a></li>
             <% } %>
           </ul>
         </div>

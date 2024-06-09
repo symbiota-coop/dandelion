@@ -226,7 +226,7 @@ class Organisation
   end
 
   def self.marker_icon
-    'fa fa-flag'
+    'bi bi-flag-fill'
   end
 
   has_many :notifications_as_notifiable, as: :notifiable, dependent: :destroy, class_name: 'Notification', inverse_of: :notifiable

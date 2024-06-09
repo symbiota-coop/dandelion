@@ -26,7 +26,7 @@
       &middot;
     <% end %>
     <% if tactivity.space_id and (@membership.admin? or tactivity.timetable.scheduling_by_all) %>
-      <a class="pagelet-trigger <% if image %>text-white<% else %>text-dark<% end %>" data-confirm="Are you sure you want to unschedule this activity?" title="Unschedule" href="/tactivities/<%= tactivity.id %>/unschedule"><i class="bi bi-calendar-minus-fill"></i></a>
+      <a class="pagelet-trigger <% if image %>text-white<% else %>text-dark<% end %>" data-confirm="Are you sure you want to unschedule this activity?" title="Unschedule" href="/tactivities/<%= tactivity.id %>/unschedule"><i class="bi bi-calendar-minus"></i></a>
       &middot;
     <% end %>
     <a class="<% if image %>text-white<% else %>text-dark<% end %>" title="Edit" href="/tactivities/<%= tactivity.id %>/edit"><i class="bi bi-pencil-fill"></i></a>

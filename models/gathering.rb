@@ -154,7 +154,7 @@ class Gathering
   end
 
   def self.marker_icon
-    'fa fa-users'
+    'bi bi-people-fill'
   end
 
   before_validation do
