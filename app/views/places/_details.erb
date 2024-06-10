@@ -7,6 +7,6 @@
     <li><i class="bi bi-person-fill"></i> Listed by <a class="<% if place.image %>text-white<% else %>text-dark<% end %>" href="/u/<%= place.account.username %>"><%= place.account.name %></a></li>
   <% end %>
   <% if (c = place.comments.count) > 0 %>
-    <li><i class="fa fa-comment-o"></i> <a class="<% if place.image %>text-white<% else %>text-dark<% end %>" href="/places/<%= place.id %>#comments"><%= pluralize(c, 'comment') %></a></li>
+    <li><i class="bi bi-chat"></i> <a class="<% if place.image %>text-white<% else %>text-dark<% end %>" href="/places/<%= place.id %>#comments"><%= pluralize(c, 'comment') %></a></li>
   <% end %>
 </ul>
