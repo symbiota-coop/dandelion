@@ -32,7 +32,7 @@
   <% end %>
 </div>
 
-<a class="btn btn-primary mb-3" href="javascript:;" onclick="$(this).hide().next().show()"><i class="bi bi-plus-square-fill"></i> Add a follower</a>
+<a class="btn btn-primary mb-3" href="javascript:;" onclick="$(this).hide().next().show()"><i class="bi bi-plus"></i> Add a follower</a>
 <div style="display: none" class="mb-3">
   <% form_tag "/o/#{@organisation.slug}/add_follower", class: 'form-inline' do %>
     <%= email_field_tag :email, class: 'form-control mr-1', placeholder: 'Email' %>

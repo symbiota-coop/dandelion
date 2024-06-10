@@ -1,6 +1,6 @@
 <%= partial :'gatherings/nav', locals: { gathering: @gathering, membership: @membership } %>
 <div style="margin: 10px 0">
-  <a class="btn btn-primary show mb-1" href="/g/<%= @gathering.slug %>/teams/new"><i class="bi bi-plus-square-fill"></i> Create a team</a>
+  <a class="btn btn-primary show mb-1" href="/g/<%= @gathering.slug %>/teams/new"><i class="bi bi-plus"></i> Create a team</a>
   <a class="btn btn-primary show mb-1" href="javascript:;" onclick="$(this).parent().find('a.show').hide(); $(this).next().show()"><i class="bi bi-person-fill-add"></i> Add someone to a team</a>
   <div style="display: none" class="option-form mt-3">
     <%= partial :'teams/teamship' %>

@@ -1,6 +1,6 @@
 <%= partial :'gatherings/nav', locals: { gathering: @gathering, membership: @membership } %>
 <div class="my-3">
-  <a class="btn btn-primary show mb-1" href="javascript:;" onclick="$(this).parent().find('a.show').hide(); $(this).next().show()"><i class="bi bi-plus-square-fill"></i> Add an option</a>
+  <a class="btn btn-primary show mb-1" href="javascript:;" onclick="$(this).parent().find('a.show').hide(); $(this).next().show()"><i class="bi bi-plus"></i> Add an option</a>
   <div style="display: none" class="option-form">
     <%= partial :'options/build' %>
   </div>

@@ -14,7 +14,7 @@
         </p>
       <% else %>
         <p>
-          <a class="btn btn-primary" href="javascript:;" onclick="$(this).parent().hide().next().show()"><i class="bi bi-plus-square-fill"></i> Create an event</a>
+          <a class="btn btn-primary" href="javascript:;" onclick="$(this).parent().hide().next().show()"><i class="bi bi-plus"></i> Create an event</a>
         </p>
         <% form_tag '/events/new', style: 'display: none', method: :get, class: 'my-3 form-inline' do %>
           <span class="mr-1">Create an event under</span>

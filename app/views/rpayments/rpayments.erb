@@ -2,7 +2,7 @@
 
 <div class="mb-3">
   <% unless params[:create] %>
-    <a class="btn btn-primary" href="javascript:;" onclick="$(this).hide().next().show()"><i class="bi bi-plus-square-fill"></i> Add payment</a>
+    <a class="btn btn-primary" href="javascript:;" onclick="$(this).hide().next().show()"><i class="bi bi-plus"></i> Add payment</a>
   <% end %>
   <div <% unless params[:create] %> style="display: none " <% end %>>
     <%= partial :'rpayments/build' %>
