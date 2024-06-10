@@ -108,6 +108,7 @@ Dandelion::App.controller do
   end
 
   post '/roles/order' do
+    halt 400 unless params[:rota_id]
     @rota = Rota.find(params[:rota_id]) || not_found
     @gathering = @rota.gathering
     @membership = @gathering.memberships.find_by(account: current_account)
@@ -119,6 +120,7 @@ Dandelion::App.controller do
   end
 
   post '/roles/create' do
+    halt 400 unless params[:rota_id]
     @rota = Rota.find(params[:rota_id]) || not_found
     @gathering = @rota.gathering
     @membership = @gathering.memberships.find_by(account: current_account)
@@ -158,6 +160,7 @@ Dandelion::App.controller do
   end
 
   post '/rslots/order' do
+    halt 400 unless params[:rota_id]
     @rota = Rota.find(params[:rota_id]) || not_found
     @gathering = @rota.gathering
     @membership = @gathering.memberships.find_by(account: current_account)
@@ -169,6 +172,7 @@ Dandelion::App.controller do
   end
 
   post '/rslots/create' do
+    halt 400 unless params[:rota_id]
     @rota = Rota.find(params[:rota_id]) || not_found
     @gathering = @rota.gathering
     @membership = @gathering.memberships.find_by(account: current_account)
@@ -218,6 +222,7 @@ Dandelion::App.controller do
   end
 
   get '/shifts/create' do
+    halt 400 unless params[:rota_id]
     @rota = Rota.find(params[:rota_id]) || not_found
     @gathering = @rota.gathering
     confirmed_membership_required!
