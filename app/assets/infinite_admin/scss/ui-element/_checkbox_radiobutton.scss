@@ -76,7 +76,7 @@
 
 .checkbox input:checked+label:after,
 .checkbox-inline input:checked+label:after {
-	content: "\e013";
+	content: "\f633";
 	position: absolute;
 	left: 0;
 	top: 0;
@@ -85,7 +85,7 @@
 	padding-right: 1px;
 	text-align: center;
 	line-height: 1.125rem;
-	font-family: 'Glyphicons Halflings';
+	font-family: 'bootstrap-icons';
 	font-style: normal;
 	-webkit-font-smoothing: antialiased;
 	-moz-osx-font-smoothing: grayscale;
