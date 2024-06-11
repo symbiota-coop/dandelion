@@ -1,4 +1,4 @@
-<ul class="icon-list" style="margin-left: 1.5em">
+<ul class="icon-list">
   <% event_sessions.each_with_index { |event_session,i| %>
   <li <% if i > 2%> style="display:none" <% end %>>
     <i data-toggle="tooltip" title="Session <%=i+1%>" class="bi bi-clock"></i> <%= when_details(event_session, with_zone: false) %>
