@@ -613,7 +613,7 @@ Dandelion::App.controller do
         pdf.table([%w[name email value currency created_at]] +
             @orders.map do |order|
               [
-                order.account.name_transliterated,
+                order.account ? order.account.name_transliterated : '',
                 if order_email_viewer?(order)
                   order.account ? order.account.email : ''
                 else
