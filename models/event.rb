@@ -476,7 +476,7 @@ class Event
     return unless @update_tag_names
 
     @tag_names ||= ''
-    @tag_names_a = @tag_names.split(',').map { |tag_name| tag_name.strip.gsub(' & ', ' and ') }
+    @tag_names_a = @tag_names.split(',').map { |tag_name| tag_name.strip }
     current_tag_names = event_tagships.map(&:event_tag_name)
     tags_to_remove = current_tag_names - @tag_names_a
     tags_to_add = @tag_names_a - current_tag_names
@@ -496,7 +496,7 @@ class Event
     return unless ENV['ANTHROPIC_API_KEY']
     return unless event_tagships(true).empty?
 
-    prompt = "Provide a list of 5 tags for this event as a comma-separated list: #{name}\n\n#{description}"
+    prompt = "Provide a list of 5 tags for this event as a comma-separated list:\n\n#{name}\n\n#{description}"
 
     prompt = prompt[0..(200_000 * 0.66 * 4)]
     client = Anthropic::Client.new
@@ -519,6 +519,8 @@ class Event
         sleep 5
       end
     end
+    return unless content
+
     content.split(':').last.strip.split(',').map(&:strip).map do |name|
       name.gsub('_', ' ').gsub('-', ' ').downcase
     end.each do |name|

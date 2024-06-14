@@ -43,7 +43,7 @@ class Carousel
   after_save :update_event_tags
   def update_event_tags
     @tag_names ||= ''
-    @tag_names_a = @tag_names.split(',').map { |tag_name| tag_name.strip.gsub(' & ', ' and ') }
+    @tag_names_a = @tag_names.split(',').map { |tag_name| tag_name.strip }
     current_tag_names = carouselships.map(&:event_tag_name)
     tags_to_remove = current_tag_names - @tag_names_a
     tags_to_add = @tag_names_a - current_tag_names
