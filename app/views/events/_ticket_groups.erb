@@ -10,11 +10,11 @@
           <div><%= o.number_field :capacity, class: 'form-control ml-1', placeholder: 'Capacity' %></div>
           <% if o.object.new_record? %>
             <span>
-              <i style="cursor: pointer" onclick="$(this).closest('.ticket_group').remove()" class="bi bi-x"></i>
+              <i style="cursor: pointer" onclick="$(this).closest('.ticket_group').remove()" class="bi bi-x-lg"></i>
             </span>
           <% else %>
             <span>
-              <i style="cursor: pointer" onclick="$(this).siblings().last().prop('checked', true).closest('.ticket_group').hide()" class="bi bi-x"></i>
+              <i style="cursor: pointer" onclick="$(this).siblings().last().prop('checked', true).closest('.ticket_group').hide()" class="bi bi-x-lg"></i>
               <%= o.check_box '_destroy', style: 'display: none' %>
             </span>
           <% end %>
@@ -58,7 +58,7 @@
           capacityInput.appendTo(capacityDiv);
           capacityDiv.appendTo(d);
 
-          $('<span><i style="cursor: pointer" onclick="$(this).closest(\'.ticket_group\').remove()" class="bi bi-x"></i></span>').appendTo(d);
+          $('<span><i style="cursor: pointer" onclick="$(this).closest(\'.ticket_group\').remove()" class="bi bi-x-lg"></i></span>').appendTo(d);
 
           d.appendTo('#ticket_groups');
         });

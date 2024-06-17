@@ -30,7 +30,7 @@
       <td><%=rpayment.created_at%><% if rpayment.account%> by <a href="/u/<%=rpayment.account.username%>"><%=rpayment.account.name%></a><% end %></td>
       <td>
         <a href="/events/<%=@event.id%>/rpayments/<%=rpayment.id%>/edit" class="btn btn-primary"><i class="bi bi-pencil-fill"></i></a>
-        <a href="/events/<%=@event.id%>/rpayments/<%=rpayment.id%>/destroy" class="btn btn-danger"><i class="bi bi-x"></i></a>
+        <a href="/events/<%=@event.id%>/rpayments/<%=rpayment.id%>/destroy" class="btn btn-danger"><i class="bi bi-x-lg"></i></a>
       </td>
     </tr>
     <% } %>

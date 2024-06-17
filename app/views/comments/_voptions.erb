@@ -6,7 +6,7 @@
       <%= voption.text %>
     </label>
     <% if admin? or (current_account && comment.account_id == current_account.id) %>
-      <a class="subtle pagelet-trigger" data-confirm="Are you sure?" href="/voptions/<%= voption.id %>/destroy"><i class="bi bi-x"></i></a>
+      <a class="subtle pagelet-trigger" data-confirm="Are you sure?" href="/voptions/<%= voption.id %>/destroy"><i class="bi bi-x-lg"></i></a>
     <% end %>
   <% end %>
   <% if voption.votes.count > 0 %>

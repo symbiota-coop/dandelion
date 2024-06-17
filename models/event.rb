@@ -501,7 +501,7 @@ class Event
     prompt = prompt[0..(200_000 * 0.66 * 4)]
     client = Anthropic::Client.new
     content = nil
-    loop do
+    5.times do
       response = client.messages(
         parameters: {
           model: 'claude-3-haiku-20240307',

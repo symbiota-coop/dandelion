@@ -218,7 +218,7 @@ var handleHeaderSearchBar = function () {
       $('.header-search-bar .right-icon').html('<i class="bi bi-spin bi-arrow-repeat"></i>')
     },
     response: function () {
-      $('.header-search-bar .right-icon').html('<i class="bi bi-x"></i>')
+      $('.header-search-bar .right-icon').html('<i class="bi bi-x-lg"></i>')
     },
     select: function (event, ui) {
       $('#header-search').val(ui.item.value);

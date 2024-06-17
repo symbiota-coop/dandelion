@@ -38,11 +38,11 @@
               </label>
               <% if o.object.new_record? %>
                 <a class="btn btn-sm btn-outline-danger" href="javascript:;" onclick="$(this).closest('.ticket_type').remove()">
-                  <i class="bi bi-x"></i>
+                  <i class="bi bi-x-lg"></i>
                 </a>
               <% else %>
                 <a class="btn btn-sm btn-outline-danger" href="javascript:;" onclick="$(this).children().last().prop('checked', true).closest('.ticket_type').hide()">
-                  <i class="bi bi-x"></i>
+                  <i class="bi bi-x-lg"></i>
                   <%= o.check_box '_destroy', style: 'display: none' %>
                 </a>
               <% end %>
@@ -163,7 +163,7 @@
               hiddenDiv.appendTo(d);
               hiddenDiv.tooltip();
 
-              $('<a class="btn btn-sm btn-outline-danger" href="javascript:;" onclick="$(this).closest(\'.ticket_type\').remove()"><i class="bi bi-x"></i></a>').appendTo(d);
+              $('<a class="btn btn-sm btn-outline-danger" href="javascript:;" onclick="$(this).closest(\'.ticket_type\').remove()"><i class="bi bi-x-lg"></i></a>').appendTo(d);
 
               d.appendTo('#ticket_types');
             });
