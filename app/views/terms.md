@@ -1,6 +1,6 @@
 # Dandelion Terms and Conditions
 
-Please read these terms and conditions carefully before using the Dandelion ticketing platform. By accessing or using the platform, you agree to be bound by these terms and conditions.
+Please read these terms and conditions carefully before using the Dandelion ticketing platform. By accessing or using the platform, you agree to these terms and conditions, along with our <a href="/privacy">privacy policy</a> and <a href="/cookies">cookies policy</a>.
 
 ## General Terms
 1.1. The Dandelion platform ("Dandelion") is run by Symbiota Ltd, a not-for-profit worker co-operative registered as a company limited by guarantee, <a href="https://find-and-update.company-information.service.gov.uk/company/09603539">company no. 09603539</a>.
