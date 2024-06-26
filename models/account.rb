@@ -83,6 +83,10 @@ class Account
     %w[email location phone telegram_username website date_of_birth gender sexuality bio open_to last_active organisations local_groups activities gatherings places following followers]
   end
 
+  def self.sensitive?(privacyable)
+    true if privacyable.in?(%i[organisations local_groups activities gatherings places])
+  end
+
   def self.privacy_levels
     ['Only me', 'People I follow', 'Public']
   end

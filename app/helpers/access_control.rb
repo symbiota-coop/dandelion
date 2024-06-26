@@ -3,6 +3,7 @@ Dandelion::App.helpers do
     (
       account.respond_to?(privacyable) &&
       account.send(privacyable)) &&
+      (viewer || !Account.sensitive?(privacyable)) &&
       (
         (viewer && viewer.admin?) ||
         account.send("#{privacyable}_privacy").nil? ||
