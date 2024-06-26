@@ -39,12 +39,14 @@
 
 <%= partial :'organisations/nav', locals: { organisation: @organisation } %>
 
-<p>
-  <a target="_blank" href="/docs/organisations">
-    <i class="bi bi-question-circle-fill"></i>
-    Need support? Check out the docs
-  </a>
-</p>
+<% if current_account.organisations.count > 0 %>
+  <p>
+    <a target="_blank" href="/docs/organisations">
+      <i class="bi bi-question-circle-fill"></i>
+      Need support? Check out the docs
+    </a>
+  </p>
+<% end %>
 
 <style>
   #organisation_minimal_head { height: 5em }
