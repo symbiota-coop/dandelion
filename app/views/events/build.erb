@@ -1,5 +1,16 @@
 <%= partial :'events/nav', locals: { event: @event } %>
 
+<% if params[:new_org] %>
+  <div class="alert alert-success">
+    <p class="lead">
+      Go ahead and create an event under your new organisation!
+    </p>
+    <p class="mb-0">
+      Step through the tabs then click 'Create event'.
+    </p>
+  </div>
+<% end %>
+
 <% if @event.draft? %>
   <div class="alert alert-secondary">
     This event is currently marked as a draft and is not visible to the public.

@@ -133,7 +133,15 @@ Dandelion::App.controller do
     if @organisation.update_attributes(mass_assigning(params[:organisation], Organisation))
       flash[:notice] = 'The organisation was saved.'
 
-      redirect(current_account.organisations.count == 1 ? "/o/#{@organisation.slug}" : "/o/#{@organisation.slug}/edit")
+      redirect(
+        if params[:created]
+          "/events/new?organisation_id=#{@organisation.id}&new_org=1"
+        elsif current_account.organisations.count == 1
+          "/o/#{@organisation.slug}"
+        else
+          "/o/#{@organisation.slug}/edit"
+        end
+      )
     else
       flash.now[:error] = 'There was an error saving the organisation.'
       erb :'organisations/build'

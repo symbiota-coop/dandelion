@@ -17,7 +17,7 @@
   </style>
 <% end %>
 
-<% if params[:tour] || (Padrino.env == :production && params[:created] && current_account && current_account.events.count == 1) %>
+<% if params[:tour] || (params[:created] && current_account && current_account.events.count == 1) %>
   <script>
     $(function() {
 

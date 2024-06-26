@@ -3,13 +3,16 @@
     <p class="lead">
       Let's create your first organisation!
     </p>
+    <p>
+      All events on Dandelion exist under an organisation.
+    </p>
     <p class="mb-0">
-      Once you're done, you'll be able to list events under this organisation.
+      Enter the organisation name and customise the URL.
     </p>
   </div>
 <% end %>
 
-<% if params[:tour] || (Padrino.env == :production && params[:created] && current_account.organisations.count == 1) %>
+<% if params[:tour] || (params[:created] && current_account.organisations.count == 1) %>
   <script>
     $(function() {
 
@@ -85,6 +88,7 @@
   </div>
 <% end %>
 <% form_for @organisation, @organisation.new_record? ? '/o/new' : "/o/#{@organisation.slug}/edit" do  |f| %>
+  <%= hidden_field_tag :created, value: params[:created] %>
   <% if @organisation.persisted? %>
     <ul id="organisation-build-nav" class="nav nav-tabs" role="tablist">
       <li role="presentation" class="nav-item"><a class="nav-link <%= 'active' if !params[:tab] || params[:tab].to_i == 1%>" href="#tab1" role="tab" data-toggle="tab">Basics</a></li>
@@ -114,20 +118,26 @@
             </p>
           <% end %>
         </div>
-        <%= f.wysiwyg_block :intro_text %>
-        <%= f.url_block :website %>
-        <% unless @organisation.new_record? %>
+        <% if @organisation.persisted? %>
+          <%= f.wysiwyg_block :intro_text %>
+          <%= f.url_block :website %>
           <%= f.url_block :telegram_group %>
+          <%= f.text_block :location %>
+          <%= f.image_block :image %>
         <% end %>
-        <%= f.text_block :location %>
-        <%= f.image_block :image %>
       </div>
       <% if @organisation.persisted? %>
         <div role="tabpanel" class="tab-pane <%= 'active' if params[:tab].to_i == 2%>" id="tab2">
-          <% if !@organisation.stripe_sk && !@organisation.coinbase_api_key %>
-            <div class="alert alert-warning">
-              <p class="m-0"><i class="bi bi-exclamation-triangle-fill"></i> To accept payments, you must add either Stripe or Coinbase Commerce details.</p>
+          <% if params[:created] %>
+            <div class="alert alert-success">
+              <p class="m-0">To accept payments, now add your Stripe and/or Coinbase Commerce details.</p>
             </div>
+          <% else %>
+            <% if !@organisation.stripe_sk && !@organisation.coinbase_api_key %>
+              <div class="alert alert-warning">
+                <p class="m-0"><i class="bi bi-exclamation-triangle-fill"></i> To accept payments, you must add either Stripe or Coinbase Commerce details.</p>
+              </div>
+            <% end %>
           <% end %>
           <%= f.select_block :currency %>
           <div class="card mb-3">
