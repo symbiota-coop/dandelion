@@ -1,7 +1,7 @@
 <%= partial :'events/nav', locals: { event: @event } %>
 
 
-<% if !ENV['SKIP_TOURS'] && (params[:tour] || params[:new_org]) %>
+<% if params[:tour] || (!ENV['SKIP_TOURS'] && params[:new_org]) %>
   <script>
     $(function() {
 

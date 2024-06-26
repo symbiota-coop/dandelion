@@ -12,7 +12,7 @@
   </div>
 <% end %>
 
-<% if !ENV['SKIP_TOURS'] && (params[:tour] || (params[:created] && current_account.organisations.count == 1)) %>
+<% if params[:tour] || (!ENV['SKIP_TOURS'] && params[:created] && current_account.organisations.count == 1) %>
   <script>
     $(function() {
 
