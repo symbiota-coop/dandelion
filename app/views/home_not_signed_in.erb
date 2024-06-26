@@ -22,89 +22,74 @@
     }
   </style>
 
-  <div class="row">
+  <div class="row justify-content-center">
 
-    <div class="col-lg-6">
-      <p id="strapline" class="mb-3">
+    <div class="col-12 col-lg-7">
+      <p id="strapline" class="mb-3 text-lg-center">
         Find and host
-        <span class="d-sm-none">
-          <br />
-        </span>
         <strong>regenerative events</strong> and
         <span class="d-sm-none">
           <br />
         </span>
         <strong>co-created gatherings</strong>
-        <span class="d-sm-none">
-          <br />
-        </span>
         🧘🏼‍♀️ 🌱 🕺 
       </p>
-      <p class="mt-3 mb-3" id="unlike">
-        <mark class="pl-0">
-          No platform fees: We seek to inspire a culture of giving through our donation-based model.
-        </mark>
-      </p>
-      <p class="mb-4" id="just-pay">
-        Hosts just pay processing fees via
-        <a target="_blank" href="https://stripe.com/gb/pricing">Stripe</a>,
-        <a target="_blank" href="https://help.coinbase.com/en/commerce/getting-started/fees">Coinbase</a>
-        or
-        <a target="_blank" href="https://opencollective.com/">Open Collective</a>
-        <br />
-        (or choose fee-free crypto payments via <a href="https://optimism.io/">Optimism</a> or <a href="https://www.base.org/">Base</a>)
-      </p>
-      <p class="mb-1">
+      <p class="mb-1 text-lg-center">
         <a class="btn btn-primary btn-lg" href="/events/new">List an event</a>
       </p>
-      <p>
+      <p class="text-lg-center">
         <a href="/docs/events">Watch the 1-minute how-to video</a> or <a href="/docs/gatherings">learn more about Gatherings</a>
       </p>
     </div>
 
-    <div class="col-lg-6">
-      <%= partial :badges %>
 
-      <h2 class="text-center mt-5 mb-5 my-lg-3" id="tickets-sold">
-        <%= cp :tickets_count %>
-      </h2>
+  </div>
 
-      <style>
-        #payment-methods img { filter: grayscale(100%); }
-        #payment-methods img:hover { filter: none; opacity: 1 !important }
-        #payment-methods img.stripe { opacity: 0.5 }
-        #payment-methods img.coinbase-commerce { opacity: 0.5 }
-        #payment-methods img.celo { opacity: 0.33 }
-        #payment-methods img.optimism { opacity: 0.5 }
-        #payment-methods img.gnosis { opacity: 0.75 }
-        #payment-methods img.base { opacity: 0.66 }
-      </style>
-      <div id="payment-methods" class="row align-items-center mb-5 px-0 px-lg-3 mb-lg-3">
-        <% {
+</div>
+
+<div class="row justify-content-center">
+  <div class="col-lg-7">
+
+    <h2 class="text-center mt-3 mb-5 my-lg-3 mb-lg-4" id="tickets-sold">
+      <%= cp :tickets_count %>
+    </h2>
+
+    <style>
+      #payment-methods img { filter: grayscale(100%); }
+      #payment-methods img:hover { filter: none; opacity: 1 !important }
+      #payment-methods img.stripe { opacity: 0.5 }
+      #payment-methods img.coinbase-commerce { opacity: 0.5 }
+      #payment-methods img.celo { opacity: 0.33 }
+      #payment-methods img.optimism { opacity: 0.5 }
+      #payment-methods img.gnosis { opacity: 0.75 }
+      #payment-methods img.base { opacity: 0.66 }
+    </style>
+    <div id="payment-methods" class="row align-items-center mb-5 px-0 px-lg-3 mb-lg-3">
+      <% {
         'stripe' => 'https://stripe.com/gb/pricing',
         'coinbase-commerce' => 'https://help.coinbase.com/en/commerce/getting-started/fees',
         'opencollective' => 'https://opencollective.com/',
         'optimism' => 'https://optimism.io/',        
         'base' => 'https://base.org/',        
       }.each do |k, v| %>
-          <div class="col">
-            <a href="<%=v%>"><img class="<%=k%> w-100" src="/images/payment_methods/<%=k%>.jpg" /></a>
-          </div>
-        <% end %>
-      </div>
-
+        <div class="col">
+          <a href="<%=v%>"><img class="<%=k%> w-100" src="/images/payment_methods/<%=k%>.jpg" /></a>
+        </div>
+      <% end %>
     </div>
 
+    <%= partial :badges %>
+
   </div>
+</div>
 
+<div class="mt-lg-5">
+  <%= partial :'events/search_form' %>
+  <%= partial :'events/view_options', locals: {path: '/events'} %>
 
-  <div class="mt-lg-5">
-    <%= partial :'events/search_form' %>
-    <%= partial :'events/view_options', locals: {path: '/events'} %>
-
-    <div data-with-placeholder data-pagelet-url="/events">
-      <%= partial :'events/blocks_placeholder' %>
-    </div>
+  <div data-with-placeholder data-pagelet-url="/events">
+    <%= partial :'events/blocks_placeholder' %>
   </div>
+</div>
 
-  <%= cp :'event_feedbacks/home' %>
+<%= cp :'event_feedbacks/home' %>
