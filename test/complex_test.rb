@@ -28,7 +28,6 @@ class CoreTest < ActiveSupport::TestCase
     fill_in 'Stripe public key', with: @organisation.stripe_pk
     fill_in 'Stripe secret key', with: @organisation.stripe_sk
     click_button 'Update organisation'
-    click_link 'Create an event'
     fill_in 'Event title*', with: @event.name
     execute_script %{$('#event_start_time').val('#{@event.start_time.to_fs(:db_local)}')}
     execute_script %{$('#event_end_time').val('#{@event.end_time.to_fs(:db_local)}')}
