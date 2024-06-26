@@ -1,9 +1,28 @@
 <%= partial :'events/nav', locals: { event: @event } %>
 
+
+<% if params[:tour] || params[:new_org] %>
+  <script>
+    $(function() {
+
+      if($(window).width() > 992) {
+
+        introJs().setOptions({
+          steps: [{
+            title: "Great job!",
+            intro: "Now it's time to create an event under your new organisation."
+          }]
+        }).start();
+
+      }
+    })
+  </script>
+<% end %>
+
 <% if params[:new_org] %>
   <div class="alert alert-success">
     <p class="lead">
-      Go ahead and create an event under your new organisation!
+      Now it's time to create an event under your new organisation!
     </p>
     <p class="mb-0">
       Step through the tabs then click 'Create event'.
