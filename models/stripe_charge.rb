@@ -66,11 +66,11 @@ class StripeCharge
     }
   end
 
-  def self.transfer(organisation, from: nil, to: Date.today - 1)
-    unless from
-      most_recent_stripe_charge = organisation.stripe_charges.order('created desc').first
-      from = most_recent_stripe_charge ? most_recent_stripe_charge.created.to_date + 1 : Date.today - 2
-    end
+  def self.transfer(organisation, from: 1.week.ago, to: Date.today - 1)
+    # unless from
+    #   most_recent_stripe_charge = organisation.stripe_charges.order('created desc').first
+    #   from = most_recent_stripe_charge ? most_recent_stripe_charge.created.to_date + 1 : Date.today - 2
+    # end
     return if from >= to
 
     puts "transferring charges for #{organisation.slug} from #{from} to #{to}"
