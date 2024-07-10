@@ -151,7 +151,9 @@
       <% if @event.description || @event.organisation.event_footer %>
         <% if @event.half_width_images %>
           <style>
-            div.wysiwyg img { width: 50% }
+            @media (min-width: 768px) {
+              div.wysiwyg img { width: 50% }
+            }
           </style>
         <% end %>
         <div class="wysiwyg">
