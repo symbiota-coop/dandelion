@@ -149,6 +149,11 @@
       </div>
       <%= partial :'events/info_table' %>
       <% if @event.description || @event.organisation.event_footer %>
+        <% if @event.half_width_images %>
+          <style>
+            div.wysiwyg img { width: 50% }
+          </style>
+        <% end %>
         <div class="wysiwyg">
           <big>
             <% if @event.description %>
