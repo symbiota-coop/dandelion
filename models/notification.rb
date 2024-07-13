@@ -294,7 +294,7 @@ class Notification
     when :created_team
       'bi-people-fill'
     when :created_option
-      'bi-check'
+      'bi-check-lg'
     when :created_rota
       'bi-table'
     when :scheduled_tactivity

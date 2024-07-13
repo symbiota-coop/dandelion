@@ -160,10 +160,10 @@
     </td>
     <% if @event %>
       <td>
-        <% if order.opt_in_organisation %><i class="bi bi-check"></i><% end %>
+        <% if order.opt_in_organisation %><i class="bi bi-check-lg"></i><% end %>
       </td>
       <td>
-        <% if order.opt_in_facilitator %><i class="bi bi-check"></i><% end %>
+        <% if order.opt_in_facilitator %><i class="bi bi-check-lg"></i><% end %>
       </td>
       <td>
         <% order.answers.each { |q,a| if q && a %>
@@ -178,7 +178,7 @@
         </p>
         <p style="width: 400px">
           <% if q =~ /\[.*\]/ %>
-            <i class="bi bi-check"></i>
+            <i class="bi bi-check-lg"></i>
           <% else %>
             <%== Sanitize.fragment(Rinku.auto_link(a.gsub("\n", '<br />')), Sanitize::Config::DANDELION) %>
           <% end %>
