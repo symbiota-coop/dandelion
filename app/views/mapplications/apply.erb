@@ -33,9 +33,19 @@
         <script>
           $(function () {
             $('.form-group > div.col-lg-6').removeClass('col-lg-6').addClass('col-lg-8')
+
+            <% if !current_account || @membership %>
+              $('#apply').submit(function () {
+                if (!grecaptcha || grecaptcha.getResponse().length == 0) {
+                  alert('Please confirm you are not a robot');
+                  return false
+                }
+              })
+            <% end %>
+
           })
         </script>
-        <% if !current_account or @membership %>
+        <% if !current_account || @membership %>
           <%= f.text_block :name %>
           <%= f.email_block :email %>
           <%= f.image_block :picture %>
@@ -50,6 +60,7 @@
           </div>
         </div>
         <% } %>
+        <div class="g-recaptcha mb-2" data-sitekey="<%= ENV['RECAPTCHA_SITE_KEY'] %>"></div>
         <%= f.submit_block button_text: 'Apply' %>
         <% if @gathering.threshold && @gathering.threshold > 0 %>
           <div class="row mt-2">
