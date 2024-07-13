@@ -14,12 +14,29 @@
 
   <div class="row justify-content-center">
 
+    <script>
+      $(function () {
+        var typed = new Typed('.typewriter', {
+          strings: [
+            'regenerative',
+            'metamodern',
+            'participatory',
+            'conscious',
+            'transformative',
+            'holistic',
+            'ethical'
+          ],
+          typeSpeed: 50,
+          loop: true
+        });
+      })
+    </script>
     <div class="col-12 col-lg-7">
-      <p id="strapline" class="mb-3 text-lg-center">
-        Find and host
-        <strong>regenerative events</strong> and
-        <strong>co-created gatherings</strong>
-        🧘🏼‍♀️ 🌱 🕺 
+      <p id="strapline" class="mb-3">
+        Find and host 
+        <strong class="typewriter"></strong>
+        <br />
+        events and co-created gatherings
       </p>
       <p class="mb-1 text-lg-center">
         <a class="btn btn-primary btn-lg" href="/events/new">List an event</a>
