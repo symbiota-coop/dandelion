@@ -111,11 +111,11 @@
   <title><% if @fulltitle %><%= @fulltitle %><% else %><%= "#{@title} · " if @title %><%= Padrino.env == :development ? 'DEV' : 'Dandelion' %><% end %></title>
   <meta name="description" content="<%= @og_desc %>">
   <meta property="og:title" content="<%= @title %>">
-  <meta property="og:image" content="<%= @og_image %>?<%= @cachebuster %>">
+  <meta property="og:image" content="<%= @og_image %>">
   <meta name="twitter:card" content="summary_large_image">
   <meta name="twitter:title" content="<%= @title %>">
   <meta name="twitter:description" content="<%= @og_desc %>">
-  <meta name="twitter:image" content="<%= @og_image %>?<%= @cachebuster %>">
+  <meta name="twitter:image" content="<%= @og_image %>">
   <%= partial :'layouts/a2hs' %>
   <% if !current_account && @hide_right_nav %>
     <style>
