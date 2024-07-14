@@ -137,7 +137,7 @@ Dandelion::App.controller do
     @order = Order.find(params[:order_id]) || not_found if params[:order_id]
     @og_desc = when_details(@event)
     kick! unless @event.organisation
-    kick!(redirect_url: "/o/#{@event.organisation.slug}/events") if @event.draft? && !event_admin?
+    kick!(redirect_url: "/o/#{@event.organisation.slug}/events") if @event.locked? && !event_admin?
     @title = @event.name
     @organisation = @event.organisation
     if @order && params[:success]
@@ -259,7 +259,7 @@ Dandelion::App.controller do
     @event = Event.find(params[:id]) || not_found
     event_admins_only!
     duplicated_event = @event.duplicate!(current_account)
-    flash[:notice] = 'Event duplicated as a draft'
+    flash[:notice] = 'Event duplicated and locked'
     redirect "/events/#{duplicated_event.id}/edit"
   end
 

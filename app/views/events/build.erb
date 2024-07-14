@@ -30,9 +30,9 @@
   </div>
 <% end %>
 
-<% if @event.draft? %>
+<% if @event.locked? %>
   <div class="alert alert-secondary">
-    This event is currently marked as a draft and is not visible to the public.
+    This event is currently locked and visible to event admins only.
   </div>
 <% end %>
 
@@ -247,7 +247,7 @@
             </div>
           <% end %>
         <% end %>
-        <%= f.check_box_block :draft %>
+        <%= f.check_box_block :locked %>
         <%= f.check_box_block :secret %>
         <%= f.check_box_block :featured %>
         <%= f.check_box_block :send_order_notifications %>

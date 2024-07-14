@@ -31,8 +31,8 @@
   <tr>
     <td>
       <a href="/events/<%=event.id%>"><%= event.name %></a>
-      <% if event.draft? %>
-        <span class="label label-default mb-1 d-inline-block">Draft</span>
+      <% if event.locked? %>
+        <span class="label label-default mb-1 d-inline-block">Locked</span>
       <% end %>
     </td>
     <td>

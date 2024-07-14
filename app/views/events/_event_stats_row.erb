@@ -1,8 +1,8 @@
 <!-- Name -->
 <td>
   <a href="<%= "/e/#{event.slug}#{if organisation && organisation != event.organisation; "?cohost=#{organisation.slug}"; end }" %>"><%= event.name %></a>
-  <% if event.draft? %>
-    <span class="label label-default">Draft</span>
+  <% if event.locked? %>
+    <span class="label label-default">Locked</span>
   <% end %>
   <% if event.secret? %>
     <span class="label label-default">Secret</span>

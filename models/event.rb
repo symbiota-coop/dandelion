@@ -95,7 +95,7 @@ class Event
       notes: :text_area,
       redirect_url: :url,
       purchase_url: :url,
-      draft: :check_box,
+      locked: :check_box,
       secret: :check_box,
       hide_few_left: :check_box,
       questions: :text_area,
@@ -137,7 +137,7 @@ class Event
     q.empty? ? [] : q
   end
 
-  %w[no_discounts hide_attendees hide_discussion refund_deleted_orders monthly_donors_only draft secret zoom_party show_emails include_in_parent featured opt_in_facilitator hide_few_left hide_organisation_footer ask_hear_about send_order_notifications raw_description prevent_reminders trending hide_from_trending hide_from_carousels no_tickets_pdf half_width_images].each do |b|
+  %w[no_discounts hide_attendees hide_discussion refund_deleted_orders monthly_donors_only locked secret zoom_party show_emails include_in_parent featured opt_in_facilitator hide_few_left hide_organisation_footer ask_hear_about send_order_notifications raw_description prevent_reminders trending hide_from_trending hide_from_carousels no_tickets_pdf half_width_images].each do |b|
     field b.to_sym, type: Boolean
     index({ b.to_s => 1 })
   end
@@ -561,7 +561,7 @@ class Event
       show_emails: show_emails,
       include_in_parent: include_in_parent,
       opt_in_facilitator: opt_in_facilitator,
-      draft: true,
+      locked: true,
       secret: secret,
       account: account,
       last_saved_by: account,
@@ -854,12 +854,12 @@ class Event
     self.and(:organisation_id.in => Organisation.and(:hidden.ne => true).pluck(:id))
   end
 
-  def self.draft
-    self.and(draft: true)
+  def self.locked
+    self.and(locked: true)
   end
 
   def self.live
-    self.and(:draft.ne => true).and(:organisation_id.ne => nil)
+    self.and(:locked.ne => true).and(:organisation_id.ne => nil)
   end
 
   def self.secret
@@ -871,7 +871,7 @@ class Event
   end
 
   def live?
-    !draft?
+    !locked?
   end
 
   def public?
@@ -970,7 +970,7 @@ class Event
       extra_info_for_recording_email: 'This is the place to enter the link to the recording.',
       featured: "Feature the event in a carousel on the organisation's events page",
       secret: 'Hide the event from all public listings',
-      draft: 'Make the event visible to admins only',
+      locked: 'Make the event visible to admins only',
       hide_attendees: 'Hide the public list of attendees (in any case, individuals must opt in)',
       hide_discussion: 'Hide the private discussion for attendees and facilitators',
       hide_from_carousels: 'Hide the event from carousels',

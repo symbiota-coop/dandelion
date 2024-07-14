@@ -2,7 +2,7 @@
   <div class="card mt-3">
     <h3 class="card-header bg-primary text-white">Upcoming <%= @event.activity.name %> events</h3>
     <div class="card-body">
-      <% events.each { |event| next if event.draft? && !event_admin?(event) %>
+      <% events.each { |event| next if event.locked? && !event_admin?(event) %>
       <%= partial :'events/block_main', locals: { event: event } %>
       <% } %>
     </div>

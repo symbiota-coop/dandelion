@@ -1,6 +1,6 @@
 <% i = 0; current_account.recommended_events.each { |event_id,people| event = Event.find(event_id);
   next unless event
-  next if event.draft? && !event_admin?(event)
+  next if event.locked? && !event_admin?(event)
   next if event.event_facilitations.find_by(account: current_account)
   next unless event.image_uid
 %>

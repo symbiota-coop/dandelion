@@ -11,13 +11,13 @@ show_image = (Padrino.env == :production)
   <div class="fake-container-fluid mb-3">
     <div class="row bg-grey-transparent-2 pt-4 px-5" id="events">
       <% recommended_events.first(10).each { |event_id,people|  event = Event.find(event_id);
-        next if event.draft? && !event_admin?(event)
+        next if event.locked? && !event_admin?(event)
         next if event.event_facilitations.find_by(account: current_account)
         %>
       <div class="col-12 <%= block_class if defined?(block_class) %>" id="<%= event.id %>">
         <div class="mb-4">
 
-          <div class="row block no-gutters align-items-center <% if event.draft? %>bg-grey-transparent-2<% else %>bg-white<% end %>">
+          <div class="row block no-gutters align-items-center <% if event.locked? %>bg-grey-transparent-2<% else %>bg-white<% end %>">
             <% if show_image %>
               <% if !event.image && (defined?(full_width) && full_width) %>
 

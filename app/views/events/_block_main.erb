@@ -11,8 +11,8 @@
     </a>
   <% end %>
 </h4>
-<% if event.draft? %>
-  <span class="label label-default mb-1 d-inline-block">Draft</span>
+<% if event.locked? %>
+  <span class="label label-default mb-1 d-inline-block">Locked</span>
 <% end %>
 <div class="mb-2">
   <%= partial :'events/tag_labels', locals: { event: event } %>

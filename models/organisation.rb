@@ -276,19 +276,19 @@ class Organisation
     Event.and(:id.in => events.pluck(:id) + cohostships.pluck(:event_id))
   end
 
-  def events_for_search(draft: false, secret: false, include_all_local_group_events: false)
+  def events_for_search(locked: false, secret: false, include_all_local_group_events: false)
     e = Event.and(:id.in =>
         events.and(local_group_id: nil).pluck(:id) +
-        events.and(:local_group_id.ne => nil, :draft => true).pluck(:id) +
+        events.and(:local_group_id.ne => nil, :locked => true).pluck(:id) +
         (include_all_local_group_events ? events.and(:local_group_id.ne => nil).pluck(:id) : events.and(:local_group_id.ne => nil, :include_in_parent => true).pluck(:id)) +
         cohostships.pluck(:event_id))
-    e = e.live unless draft
+    e = e.live unless locked
     e = e.public unless secret
     e
   end
 
   def featured_events
-    events_for_search.future_and_current_featured.and(:draft.ne => true).and(:image_uid.ne => nil).and(featured: true).limit(20).reject(&:sold_out?)
+    events_for_search.future_and_current_featured.and(:locked.ne => true).and(:image_uid.ne => nil).and(featured: true).limit(20).reject(&:sold_out?)
   end
 
   has_many :carousels, dependent: :destroy

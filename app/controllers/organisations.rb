@@ -285,7 +285,7 @@ Dandelion::App.controller do
       cal = Icalendar::Calendar.new
       cal.append_custom_property('X-WR-CALNAME', @organisation.name)
       @events.each do |event|
-        next if event.draft?
+        next if event.locked?
 
         cal.event do |e|
           if @organisation.ical_full
