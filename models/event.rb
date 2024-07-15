@@ -61,6 +61,9 @@ class Event
   field :profit_share_to_social_media, type: Integer
   field :stripe_revenue_adjustment, type: Float
 
+  # remove me
+  field :draft, type: Boolean
+
   def self.admin_fields
     {
       summary: { type: :text, index: false, edit: false },
