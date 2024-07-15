@@ -58,21 +58,21 @@
       $.getJSON('/events/draft.json?draft_id=' + qs.draft_id, function (data) {
         const form = $('#build-event')[0]
         $.each(data, function (key, value) {
-          $(form).find('[name="event[' + key + ']"]').val(value)
-          // set flatpickrs
-          if (['start_time', 'end_time'].includes(key)) {
-            $(form).find('[name="event[' + key + ']"]').flatpickr({
-              altInput: true,
-              altFormat: 'J F Y, H:i',
-              enableTime: true,
-              time_24hr: true
-            })
-          }
-          // set ckeditors
-          if (['description', 'extra_info_for_ticket_email', 'ticket_email_greeting', 'extra_info_for_recording_email'].includes(key)) {
-            const field = $(form).find('[name="event[' + key + ']"]')
-            const editorInstance = field.next().find('[contenteditable]')[0].ckeditorInstance;
-            if (value) {
+          if (value) {
+            $(form).find('[name="event[' + key + ']"]').val(value)
+            // set flatpickrs
+            if (['start_time', 'end_time'].includes(key)) {
+              $(form).find('[name="event[' + key + ']"]').flatpickr({
+                altInput: true,
+                altFormat: 'J F Y, H:i',
+                enableTime: true,
+                time_24hr: true
+              })
+            }
+            // set ckeditors
+            if (['description', 'extra_info_for_ticket_email', 'ticket_email_greeting', 'extra_info_for_recording_email'].includes(key)) {
+              const field = $(form).find('[name="event[' + key + ']"]')
+              const editorInstance = field.next().find('[contenteditable]')[0].ckeditorInstance;
               editorInstance.setData(value)
             }
           }
