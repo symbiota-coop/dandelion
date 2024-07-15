@@ -58,7 +58,6 @@
       $.getJSON('/events/draft.json?draft_id=' + qs.draft_id, function (data) {
         const form = $('#build-event')[0]
         $.each(data, function (key, value) {
-          console.log('setting ' + key + ' to ' + value)
           $(form).find('[name="event[' + key + ']"]').val(value)
           // set flatpickrs
           if (['start_time', 'end_time'].includes(key)) {
