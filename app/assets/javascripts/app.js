@@ -3,20 +3,31 @@ function nl2br (str) {
 }
 
 $.fn.serializeObject = function () {
-  const o = {}
-  const a = this.serializeArray()
+  const o = {};
+  const a = this.serializeArray();
+
+  // Handle regular form fields
   $.each(a, function () {
     if (o[this.name]) {
       if (!o[this.name].push) {
-        o[this.name] = [o[this.name]]
+        o[this.name] = [o[this.name]];
       }
-      o[this.name].push(this.value || '')
+      o[this.name].push(this.value || '');
     } else {
-      o[this.name] = this.value || ''
+      o[this.name] = this.value || '';
     }
-  })
-  return o
-}
+  });
+
+  // Handle CKEditor 5 fields
+  this.find('.ck[contenteditable]').each(function () {
+    const editorInstance = this.ckeditorInstance;
+    const fieldName = editorInstance.sourceElement.getAttribute('name');
+    const data = editorInstance.getData();
+    o[fieldName] = data;
+  });
+
+  return o;
+};
 
 $(function () {
   function ajaxCompleted () {

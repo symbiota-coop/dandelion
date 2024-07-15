@@ -53,6 +53,41 @@
 <script>
   $(function () {
 
+    const qs = $.deparam(window.location.search.substring(1))
+    if (qs.draft_id) {
+      $.getJSON('/events/draft.json?draft_id=' + qs.draft_id, function (data) {
+        const form = $('#build-event')[0]
+        $.each(data, function (key, value) {
+          console.log('setting ' + key + ' to ' + value)
+          $(form).find('[name="event[' + key + ']"]').val(value)
+          // set flatpickrs
+          if (['start_time', 'end_time'].includes(key)) {
+            $(form).find('[name="event[' + key + ']"]').flatpickr({
+              altInput: true,
+              altFormat: 'J F Y, H:i',
+              enableTime: true,
+              time_24hr: true
+            })
+          }
+          // set ckeditors
+          if (['description', 'extra_info_for_ticket_email', 'ticket_email_greeting', 'extra_info_for_recording_email'].includes(key)) {
+            const field = $(form).find('[name="event[' + key + ']"]')
+            const editorInstance = field.next().find('[contenteditable]')[0].ckeditorInstance;
+            if (value) {
+              editorInstance.setData(value)
+            }
+          }
+        })
+      })
+    }
+    <% if @event.new_record? %>
+      setInterval(function () {
+        if ($('#event_name').val().length > 0) {
+          $.post('/events/draft', $('#build-event').serializeObject())
+        }
+      }, 10*1000)
+    <% end %>
+
     $('#event-build-nav a[data-toggle="tab"]').on('show.bs.tab', function (e) {
       var form = $('#event-build-nav').closest('form')[0]
         if (form.reportValidity()) {
@@ -146,6 +181,43 @@
 
   })
 </script>
+
+<%
+drafts = current_account.drafts.and(model: 'Event')
+if params[:draft_id] && (d = current_account.drafts.find(params[:draft_id]))
+  drafts = drafts.and(:id.ne => d.id) 
+end
+%>
+<% if drafts.count > 0 %>
+  <div class="card mb-3" id="drafts">
+    <h4 class="card-header bg-light">
+      Drafts
+    </h4>
+    <div class="card-body bg-light">
+      <ul class="icon-list mb-0">
+        <% drafts.each do |draft| %>
+          <li>
+            <%
+        uri = URI(draft.url)
+        params = Rack::Utils.parse_query(uri.query || '')
+        params['draft_id'] = draft.id
+        uri.query = Rack::Utils.build_query(params)
+      %>
+            <i class="bi bi-pencil-square"></i>
+            <a href="<%=uri%>">
+              <%=draft.name%>
+            </a>
+            <span class="text-muted">
+              saved <%= time_ago_in_words draft.created_at %> ago
+            </span>
+            <a href="javascript:;" onclick="var a = this; $.get('/drafts/<%=draft.id%>/destroy', function() { $('[data-toggle=tooltip]').tooltip('hide'); $(a).parent().remove(); if ($('#drafts').find('li').length == 0) { $('#drafts').remove() } })"><i class="bi bi-x-lg" data-toggle="tooltip" title="Delete draft"></i></a>
+          </li>
+        <% end %>
+      </ul>
+    </div>
+  </div>
+<% end %>
+
 <% if @event.errors.count > 0 %>
   <div class="alert alert-danger">
     <ul class="mb-0">
@@ -155,6 +227,8 @@
     </ul>
   </div>
 <% end %>
+
+
 <% form_for @event, @event.new_record ? '/events/new' : "/events/#{@event.id}/edit", id: 'build-event' do |f| %>
   <ul id="event-build-nav" class="nav nav-tabs" role="tablist">
     <li role="presentation" class="nav-item"><a class="nav-link active" href="#tab1" role="tab" data-toggle="tab">Basics</a></li>

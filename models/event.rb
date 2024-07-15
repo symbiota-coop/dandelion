@@ -313,6 +313,8 @@ class Event
   end
 
   after_create do
+    account.drafts.and(model: 'Event', name: name).destroy_all
+
     event_facilitations.create account: organisation.admins.first if organisation && organisation.admins.count == 1
     event_facilitations.create account: revenue_sharer if revenue_sharer
 

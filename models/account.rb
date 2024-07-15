@@ -337,6 +337,8 @@ class Account
 
   has_one :account_cache, dependent: :destroy
 
+  has_many :drafts, dependent: :destroy
+
   has_many :rpayments, dependent: :nullify
 
   has_many :stripe_charges

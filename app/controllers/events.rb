@@ -103,6 +103,25 @@ Dandelion::App.controller do
     erb :'events/build'
   end
 
+  get '/events/draft', provides: :json do
+    sign_in_required!
+    draft = current_account.drafts.find(params[:draft_id])
+    draft.json if draft
+  end
+
+  post '/events/draft' do
+    sign_in_required!
+    current_account.drafts.create(model: 'Event', name: params[:event][:name], url: request.referer, json: params[:event].to_json)
+    200
+  end
+
+  get '/drafts/:id/destroy' do
+    sign_in_required!
+    draft = current_account.drafts.find(params[:id]) || not_found
+    draft.destroy
+    200
+  end
+
   post '/events/new' do
     sign_in_required!
     @event = Event.new(mass_assigning(params[:event], Event))
