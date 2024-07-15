@@ -74,6 +74,7 @@ Dandelion::App.controller do
 
   get '/events/new' do
     sign_in_required!(redirect_url: '/accounts/new?list_an_event=1')
+    @draft = current_account.drafts.find(params[:draft_id]) if params[:draft_id]
     @event = Event.new
     if params[:organisation_id]
       @event.organisation = Organisation.find(params[:organisation_id]) || not_found
@@ -101,12 +102,6 @@ Dandelion::App.controller do
     @event.ask_hear_about = true
     @event.include_in_parent = true if organisation_admin?(@event.organisation)
     erb :'events/build'
-  end
-
-  get '/events/draft', provides: :json do
-    sign_in_required!
-    draft = current_account.drafts.find(params[:draft_id])
-    draft.json if draft
   end
 
   post '/events/draft' do
