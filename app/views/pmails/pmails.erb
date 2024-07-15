@@ -12,66 +12,68 @@
 <% else %>
   <a href="/o/<%=@_organisation.slug%>/edit">Link a Mailgun account to get started</a>
 <% end %>
-<table class="table table-hover table-striped mt-3">
-  <thead>
-    <tr>
-      <th>To</th>
-      <th>From</th>
-      <th>Subject</th>
-      <th>Created by</th>
-      <th style="width: 33%">Status</th>
-    </tr>
-  </thead>
-  <tbody>
-    <% @pmails.each { |pmail| %>
-    <% edit_url = "/pmails/#{pmail.id}/edit?#{@scope}" %>
-    <tr>
-      <td>
-        <%= partial :'pmails/to', locals: { pmail: pmail } %>
-      </td>
-      <td>
-        <%= escape_html pmail.from %>
-      </td>
-      <td>
-        <a href="<%= edit_url %>"><%= pmail.subject %></a>
-      </td>
-      <td>
-        <% if pmail.account %>
-          <a href="/u/<%= pmail.account.username %>"><%= pmail.account.name %></a>
-        <% end %>
-      </td>
-      <td>
-        <% if pmail.sent_at %>
-          <a class="btn btn-primary mr-1 mb-1" href="<%= edit_url %>">
-            <i class="bi bi-check-lg"></i> Sent
-          </a>
-          <div class="mt-1">
-            Created at <%= pmail.created_at %><br>
-            Last saved at <%= pmail.updated_at %><br>
-            Queued for sending at <%= pmail.requested_send_at %> <br>
-            Sent at <%= pmail.sent_at %>
-          </div>
-        <% elsif pmail.requested_send_at %>
-          <a class="btn btn-secondary mr-1 mb-1" href="<%= edit_url %>">
-            <i class="bi bi-spin bi-arrow-repeat"></i> Sending
-          </a>
-          <div class="mt-1">
-            Created at <%= pmail.created_at %><br>
-            Last saved at <%= pmail.updated_at %><br>
-            Queued for sending at <%= pmail.requested_send_at %>
-          </div>
-        <% else %>
-          <a class="btn btn-secondary" href="<%= edit_url %>">
-            <i class="bi bi-pencil-fill"></i> Edit
-          </a>
-          <div class="mt-1">
-            Created at <%= pmail.created_at %><br>
-            Last saved at <%= pmail.updated_at %>
-          </div>
-        <% end %>
-      </td>
-    </tr>
-    <% } %>
-  </tbody>
-</table>
+<% if @pmails.count > 0 %>
+  <table class="table table-hover table-striped mt-3">
+    <thead>
+      <tr>
+        <th>To</th>
+        <th>From</th>
+        <th>Subject</th>
+        <th>Created by</th>
+        <th style="width: 33%">Status</th>
+      </tr>
+    </thead>
+    <tbody>
+      <% @pmails.each { |pmail| %>
+      <% edit_url = "/pmails/#{pmail.id}/edit?#{@scope}" %>
+      <tr>
+        <td>
+          <%= partial :'pmails/to', locals: { pmail: pmail } %>
+        </td>
+        <td>
+          <%= escape_html pmail.from %>
+        </td>
+        <td>
+          <a href="<%= edit_url %>"><%= pmail.subject %></a>
+        </td>
+        <td>
+          <% if pmail.account %>
+            <a href="/u/<%= pmail.account.username %>"><%= pmail.account.name %></a>
+          <% end %>
+        </td>
+        <td>
+          <% if pmail.sent_at %>
+            <a class="btn btn-primary mr-1 mb-1" href="<%= edit_url %>">
+              <i class="bi bi-check-lg"></i> Sent
+            </a>
+            <div class="mt-1">
+              Created at <%= pmail.created_at %><br>
+              Last saved at <%= pmail.updated_at %><br>
+              Queued for sending at <%= pmail.requested_send_at %> <br>
+              Sent at <%= pmail.sent_at %>
+            </div>
+          <% elsif pmail.requested_send_at %>
+            <a class="btn btn-secondary mr-1 mb-1" href="<%= edit_url %>">
+              <i class="bi bi-spin bi-arrow-repeat"></i> Sending
+            </a>
+            <div class="mt-1">
+              Created at <%= pmail.created_at %><br>
+              Last saved at <%= pmail.updated_at %><br>
+              Queued for sending at <%= pmail.requested_send_at %>
+            </div>
+          <% else %>
+            <a class="btn btn-secondary" href="<%= edit_url %>">
+              <i class="bi bi-pencil-fill"></i> Edit
+            </a>
+            <div class="mt-1">
+              Created at <%= pmail.created_at %><br>
+              Last saved at <%= pmail.updated_at %>
+            </div>
+          <% end %>
+        </td>
+      </tr>
+      <% } %>
+    </tbody>
+  </table>
+<% end %>
 <%= will_paginate @pmails, renderer: WillPaginate::ViewHelpers::BootstrapRenderer %>

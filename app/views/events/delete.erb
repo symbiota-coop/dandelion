@@ -1,10 +1,19 @@
 <%= partial :'events/nav', locals: { event: @event } %>
 
 <% if organisation_admin?(@event.organisation) %>
+
+  <% if @event.orders.count > 0 %>
+    <div class="alert alert-warning">
+      <p class="mb-0">
+        Make sure you <a class="text-warning text-underline" href="/events/<%= @event.id %>/pmails">contact ticketholders to let them know the event is cancelled</a> before your delete the event!
+      </p>
+    </div>
+  <% end %>
+
   <div class="text-center">
-    <a class="d-block d-lg-inline btn btn-danger" href="/events/<%= @event.id %>/destroy">Delete event and attempt to refund all Stripe orders</a>
-    or
-    <a class="d-block d-lg-inline btn btn-outline-danger" href="/events/<%= @event.id %>/destroy?no_refunds=1">Delete event without refunding Stripe orders</a>
+    <p><a class="d-block d-lg-inline btn btn-danger" href="/events/<%= @event.id %>/destroy">Delete event and attempt to refund all Stripe orders</a></p>
+    <p>or</p>
+    <p><a class="d-block d-lg-inline btn btn-outline-danger" href="/events/<%= @event.id %>/destroy?no_refunds=1">Delete event without refunding Stripe orders</a></p>
   </div>
 <% else %>
   <div class="alert alert-warning">
