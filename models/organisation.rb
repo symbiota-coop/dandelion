@@ -213,7 +213,8 @@ class Organisation
       evm_address: 'Ethereum-compatible wallet address for receiving tokens via EVM networks',
       restrict_cohosting: 'When checked, only admins can add the organisation as a co-host of events',
       oc_slug: 'Open Collective organisation slug',
-      hide_ticket_revenue: 'Hide ticket revenue in event stats'
+      hide_ticket_revenue: 'Hide ticket revenue in event stats',
+      collect_location: 'Request the location of ticket buyers at checkout'
     }
   end
 
