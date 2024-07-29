@@ -69,6 +69,8 @@ class Organisation
   field :verified, type: Boolean
   field :can_set_contribution, type: Boolean
   field :contribution_not_required, type: Boolean
+  field :contribution_requested_gbp_cache, type: Float
+  field :contribution_paid_gbp_cache, type: Float
   field :contribution_requested_per_event_gbp, type: Float
   field :contribution_offset_gbp, type: Float
   field :paid_up_fraction, type: Float
@@ -321,6 +323,14 @@ class Organisation
     s.exchange_to(MAJOR_CURRENCIES.include?(currency) ? currency : ENV['DEFAULT_CURRENCY'])
   end
 
+  def fraction_paid
+    cr = Money.new(contribution_requested_gbp_cache * 100, 'GBP') if contribution_requested_gbp_cache
+    cp = Money.new(contribution_paid_gbp_cache * 100, 'GBP') if contribution_paid_gbp_cache
+    return unless cr && cr > 0 && cp && cp > 0
+
+    cp / cr
+  end
+
   def self.paid_up_fraction
     0.8
   end
@@ -330,9 +340,13 @@ class Organisation
   end
 
   def update_paid_up
+    cr = contribution_requested
+    cp = contribution_paid
+    update_attribute(:contribution_requested_gbp_cache, cr.exchange_to('GBP').to_f)
+    update_attribute(:contribution_paid_gbp_cache, cp.exchange_to('GBP').to_f)
     update_attribute(:paid_up, nil)
     begin
-      update_attribute(:paid_up, contribution_not_required? || contribution_requested < contribution_threshold || contributable_events.count == 1 || contribution_paid >= (paid_up_fraction || Organisation.paid_up_fraction) * contribution_requested)
+      update_attribute(:paid_up, contribution_not_required? || cr < contribution_threshold || contributable_events.count == 1 || cp >= (paid_up_fraction || Organisation.paid_up_fraction) * cr)
     rescue Money::Bank::UnknownRate, Money::Currency::UnknownCurrency
       update_attribute(:paid_up, true)
     end

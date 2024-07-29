@@ -11,10 +11,8 @@ Dandelion::App.controller do
     @events = params[:order] == 'created_at' ? @events.order('created_at desc') : @events.order('start_time asc')
     @events = if params[:q]
                 @events.and(:id.in => search_events(params[:q]).pluck(:id))
-              elsif params[:search]
-                @events
               else
-                @events.and(:organisation_id.in => Organisation.and(paid_up: true).pluck(:id))
+                @events
               end
     @events = @events.and(:id.in => EventTagship.and(event_tag_id: params[:event_tag_id]).pluck(:event_id)) if params[:event_tag_id]
     %i[organisation activity local_group].each do |r|
