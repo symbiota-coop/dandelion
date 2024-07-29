@@ -25,7 +25,6 @@ Dandelion::App.controller do
         organisation_contribution.set(payment_completed: true)
         organisation_contribution.send_notification
         organisation_contribution.organisation.update_paid_up
-        Fragment.and(key: %r{/accounts/pay_progress}).destroy_all
       end
     end
     halt 200
@@ -48,7 +47,6 @@ Dandelion::App.controller do
     if event.type == 'charge:confirmed' && event.data.respond_to?(:checkout) && (organisation_contribution = OrganisationContribution.find_by(coinbase_checkout_id: event.data.checkout.id))
       organisation_contribution.set(payment_completed: true)
       organisation_contribution.organisation.update_paid_up
-      Fragment.and(key: %r{/accounts/pay_progress}).destroy_all
     end
     halt 200
   end
