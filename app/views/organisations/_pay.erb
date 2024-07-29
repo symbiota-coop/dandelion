@@ -46,7 +46,7 @@
         </div>
       <% end %>
 
-      <% if w <= 100 %>
+      <% if w && w <= 100 %>
         <div class="progress my-3" style="height: 30px">
           <div class="progress-bar" role="progressbar" style="width: <%= "#{w}%" %>;">
             <% if w > 0 %><%= w.to_f.round %>%<% end %>
