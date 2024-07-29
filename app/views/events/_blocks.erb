@@ -1,10 +1,7 @@
 <% if events.count > 0 %>
   <div class="fake-container-fluid mb-3">
     <div class="row bg-grey-transparent-2 pt-4 px-5" id="events">
-      <% events.each { |event|
-      next if event.locked? && !event_admin?(event)
-      next if rand > event.organisation.fraction_paid %>
-      %>
+      <% events.each { |event| next if event.locked? && !event_admin?(event) %>
       <div class="col-12 <%= block_class if defined?(block_class) %>" id="<%= event.id %>">
         <div class="mb-4">
           <%= cp(:'events/block', locals: { event: event }, key: "/events/#{event.id}?organisation_id=#{@organisation.try(:id)}&timezone=#{event.start_time.strftime('%Z')}&current_account=#{current_account ? 1 : 0}&event_admin=#{event_admin?(event) ? 1 : 0}") %>
