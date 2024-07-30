@@ -37,7 +37,7 @@
             </p>
           </div>
         <% end %>
-      <% elsif p > 0 && r > 0 %>
+      <% elsif p > 0 && r > 0 && !organisation.paid_up %>
         <div class="alert alert-warning">
           <p class="mb-0">
             Your events are only showing on the main events section and the Dandelion homepage <%=number_to_percentage w.to_f, precision: 0 %> of the time.            
