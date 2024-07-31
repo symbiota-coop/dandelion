@@ -73,7 +73,6 @@ class Organisation
   field :contribution_paid_gbp_cache, type: Float
   field :contribution_requested_per_event_gbp, type: Float
   field :contribution_offset_gbp, type: Float
-  field :paid_up_fraction, type: Float
   field :ical_full, type: Boolean
   field :allow_purchase_url, type: Boolean
   field :change_select_tickets_title, type: Boolean
@@ -146,7 +145,6 @@ class Organisation
       contribution_not_required: :check_box,
       contribution_requested_per_event_gbp: :number,
       contribution_offset_gbp: :number,
-      paid_up_fraction: :number,
       event_image_required_height: :number,
       event_image_required_width: :number,
       psychedelic: :check_box,
@@ -154,6 +152,10 @@ class Organisation
       terms_and_conditions: :text_area,
       terms_and_conditions_check_box: :check_box
     }
+  end
+
+  def self.fs(slug)
+    find_by(slug: slug)
   end
 
   def self.spring_clean
@@ -346,7 +348,7 @@ class Organisation
     update_attribute(:contribution_paid_gbp_cache, cp.exchange_to('GBP').to_f)
     update_attribute(:paid_up, nil)
     begin
-      update_attribute(:paid_up, contribution_not_required? || cr < contribution_threshold || contributable_events.count == 1 || cp >= (paid_up_fraction || Organisation.paid_up_fraction) * cr)
+      update_attribute(:paid_up, contribution_not_required? || cr < contribution_threshold || contributable_events.count == 1 || cp >= (Organisation.paid_up_fraction * cr))
     rescue Money::Bank::UnknownRate, Money::Currency::UnknownCurrency
       update_attribute(:paid_up, true)
     end

@@ -115,6 +115,10 @@ class Event
     }
   end
 
+  def self.fs(slug)
+    find_by(slug: slug)
+  end
+
   def page_views_count
     PageView.or({ path: "/e/#{slug}" }, { path: "/events/#{id}" }).count
   end
