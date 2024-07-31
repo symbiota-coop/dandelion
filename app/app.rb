@@ -78,7 +78,7 @@ module Dandelion
         end
       end
       PageView.create(path: request.path, query_string: request.query_string) if File.extname(request.path).blank? && !request.xhr? && !request.is_crawler?
-      @og_desc = 'regenerative - metamodern - participatory - conscious - transformative - holistic - ethical'
+      @og_desc = %w[regenerative metamodern participatory conscious transformative holistic ethical].join(' · ')
       @og_image = "#{ENV['BASE_URI']}/images/link.jpg"
       current_account.set(last_active: Time.now) if current_account
     end
