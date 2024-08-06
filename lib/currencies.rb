@@ -20,6 +20,17 @@ end
 
 Money::Currency.register({
                            priority: 1,
+                           iso_code: 'SEEDS',
+                           name: 'Seeds',
+                           symbol: 'SEEDS',
+                           subunit: 'Cent',
+                           subunit_to_unit: 100,
+                           decimal_mark: '.',
+                           thousands_separator: ','
+                         })
+
+Money::Currency.register({
+                           priority: 1,
                            iso_code: 'ETH',
                            name: 'Ethereum',
                            symbol: 'Ξ',
