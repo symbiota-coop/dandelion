@@ -36,7 +36,7 @@
   </div>
 <% end %>
 
-<% if @event.new_record? && @event.organisation %>
+<% if @event.new_record? %>
   <% begin %>
     <%= partial :'organisations/pay', locals: { organisation: @event.organisation } %>
     <% rescue Money::Bank::UnknownRate, Money::Currency::UnknownCurrency %>
@@ -150,14 +150,14 @@
             $(fileUpload).val('')
           }
 
-          <% if @event.organisation && @event.organisation.event_image_required_width %>
+          <% if @event.organisation.event_image_required_width %>
             if (width != <%=@event.organisation.event_image_required_width%>) {
               alert('Please use an image that is <%=@event.organisation.event_image_required_width%>px wide');
               $(fileUpload).val('')
             }
           <% end %>
 
-          <% if @event.organisation && @event.organisation.event_image_required_height %>
+          <% if @event.organisation.event_image_required_height %>
             if (height != <%=@event.organisation.event_image_required_height%>) {
               alert('Please use an image that is <%=@event.organisation.event_image_required_height%>px high');
               $(fileUpload).val('')

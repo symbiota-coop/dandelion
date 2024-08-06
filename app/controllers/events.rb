@@ -102,6 +102,27 @@ Dandelion::App.controller do
     erb :'events/build'
   end
 
+  post '/events/new' do
+    sign_in_required!
+    @event = Event.new(mass_assigning(params[:event], Event))
+    unless @event.organisation
+      flash[:error] = 'There was an error saving the event'
+      if current_account.organisations.count == 0
+        redirect '/o/new'
+      else
+        redirect '/events'
+      end
+    end
+    @event.account = current_account
+    @event.last_saved_by = current_account
+    if @event.save
+      redirect "/e/#{@event.slug}?created=1"
+    else
+      flash.now[:error] = 'There was an error saving the event'
+      erb :'events/build'
+    end
+  end
+
   post '/events/draft' do
     sign_in_required!
     current_account.drafts.create(model: 'Event', name: params[:event][:name], url: request.referer, json: params[:event].to_json)
@@ -113,19 +134,6 @@ Dandelion::App.controller do
     draft = current_account.drafts.find(params[:id]) || not_found
     draft.destroy
     200
-  end
-
-  post '/events/new' do
-    sign_in_required!
-    @event = Event.new(mass_assigning(params[:event], Event))
-    @event.account = current_account
-    @event.last_saved_by = current_account
-    if @event.save
-      redirect "/e/#{@event.slug}?created=1"
-    else
-      flash.now[:error] = 'There was an error saving the event'
-      erb :'events/build'
-    end
   end
 
   get '/events/:id', provides: %i[html ics json] do
