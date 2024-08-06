@@ -36,7 +36,7 @@
   </div>
 <% end %>
 
-<% if @event.new_record? %>
+<% if @event.new_record? && @event.organisation %>
   <% begin %>
     <%= partial :'organisations/pay', locals: { organisation: @event.organisation } %>
     <% rescue Money::Bank::UnknownRate, Money::Currency::UnknownCurrency %>
