@@ -89,6 +89,7 @@ class Organisation
   field :require_organiser_or_revenue_sharer, type: Boolean
   field :oc_slug, type: String
   field :hide_ticket_revenue, type: Boolean
+  field :allow_iframes, type: Boolean
 
   field :tokens, type: Float
   index({ tokens: 1 })
