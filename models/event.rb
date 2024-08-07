@@ -1105,8 +1105,12 @@ class Event
     organisation_discounted_ticket_revenue(skip_transferred: true) + donation_revenue(skip_transferred: true) - (credit_applied - credit_on_behalf_of_revenue_sharer) - (fixed_discounts_applied - fixed_discounts_on_behalf_of_revenue_sharer)
   end
 
+  def ticket_revenue_to_organisation(skip_transferred: false)
+    organisation_discounted_ticket_revenue(skip_transferred: skip_transferred) - credit_on_behalf_of_organisation - fixed_discounts_on_behalf_of_organisation
+  end
+
   def ticket_revenue_to_revenue_sharer
-    revenue_sharer_discounted_ticket_revenue(skip_transferred: true)
+    revenue_sharer_discounted_ticket_revenue(skip_transferred: true) - credit_on_behalf_of_revenue_sharer - fixed_discounts_on_behalf_of_revenue_sharer
   end
 
   def stripe_revenue
@@ -1209,6 +1213,14 @@ class Event
     Money.new(0, ENV['DEFAULT_CURRENCY'])
   end
 
+  def credit_on_behalf_of_organisation
+    r = Money.new(0, currency)
+    orders.each { |order| r += Money.new((order.credit_on_behalf_of_organisation || 0) * 100, order.currency) }
+    r
+  rescue Money::Bank::UnknownRate, Money::Currency::UnknownCurrency
+    Money.new(0, ENV['DEFAULT_CURRENCY'])
+  end
+
   def credit_on_behalf_of_revenue_sharer
     r = Money.new(0, currency)
     orders.each { |order| r += Money.new((order.credit_on_behalf_of_revenue_sharer || 0) * 100, order.currency) }
@@ -1220,6 +1232,14 @@ class Event
   def fixed_discounts_applied
     r = Money.new(0, currency)
     orders.each { |order| r += Money.new((order.fixed_discount_applied || 0) * 100, order.currency) }
+    r
+  rescue Money::Bank::UnknownRate, Money::Currency::UnknownCurrency
+    Money.new(0, ENV['DEFAULT_CURRENCY'])
+  end
+
+  def fixed_discounts_on_behalf_of_organisation
+    r = Money.new(0, currency)
+    orders.each { |order| r += Money.new((order.fixed_discount_on_behalf_of_organisation || 0) * 100, order.currency) }
     r
   rescue Money::Bank::UnknownRate, Money::Currency::UnknownCurrency
     Money.new(0, ENV['DEFAULT_CURRENCY'])
