@@ -1105,8 +1105,8 @@ class Event
     organisation_discounted_ticket_revenue(skip_transferred: true) + donation_revenue(skip_transferred: true) - (credit_applied - credit_on_behalf_of_revenue_sharer) - (fixed_discounts_applied - fixed_discounts_on_behalf_of_revenue_sharer)
   end
 
-  def ticket_revenue_to_organisation(skip_transferred: false)
-    organisation_discounted_ticket_revenue(skip_transferred: skip_transferred) - credit_on_behalf_of_organisation - fixed_discounts_on_behalf_of_organisation
+  def ticket_revenue_to_organisation
+    organisation_discounted_ticket_revenue(skip_transferred: true) - credit_on_behalf_of_organisation - fixed_discounts_on_behalf_of_organisation
   end
 
   def ticket_revenue_to_revenue_sharer

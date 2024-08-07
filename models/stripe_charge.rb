@@ -131,6 +131,14 @@ class StripeCharge
     Money.new de_discounted_ticket_revenue * 100, currency
   end
 
+  def de_credit_applied_money
+    Money.new de_credit_applied * 100, currency
+  end
+
+  def de_fixed_discount_applied_money
+    Money.new de_fixed_discount_applied * 100, currency
+  end
+
   def amount_money
     Money.new amount, currency
   end
@@ -156,7 +164,7 @@ class StripeCharge
   end
 
   def ticket_revenue_to_revenue_sharer
-    ticket_revenue - ticket_revenue_to_organisation
+    balance > 0 ? (amount_money - application_fee_amount_money) * (balance / application_fee_amount_money) : Money.new(0, currency)
   end
 
   def donations
