@@ -34,6 +34,8 @@ Dandelion::App.controller do
     if params[:email] && (@account = Account.find_by(email: params[:email].downcase))
       @account.sign_in_code!
       erb :'accounts/requested_sign_in_code'
+    elsif params[:code]
+      redirect "/?sign_in_token=#{params[:code]}"
     else
       flash[:error] = "There's no account registered under that email address."
       redirect '/accounts/sign_in'

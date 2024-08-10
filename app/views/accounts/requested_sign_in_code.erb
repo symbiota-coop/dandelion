@@ -7,7 +7,7 @@
       <div class="card-body">
         A sign in code was sent to <%=@account.email%>. Please check your email app and paste the code below ✨
 
-        <% form_tag '', class: 'my-3', onsubmit: %Q{window.location.href = '/?sign_in_token=' + $('#code').val(); return false;} do %>
+        <% form_tag '/accounts/sign_in_code', class: 'my-3' do %>
 
           <div class="input-group">
             <%= text_field_tag :code, class: 'form-control', placeholder: 'Code', id: 'code' %>
