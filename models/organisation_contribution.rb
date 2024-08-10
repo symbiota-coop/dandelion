@@ -25,6 +25,14 @@ class OrganisationContribution
 
   validates_presence_of :amount, :currency
 
+  after_save do
+    organisation.update_paid_up
+  end
+
+  after_destroy do
+    organisation.update_paid_up
+  end
+
   def send_notification
     mg_client = Mailgun::Client.new ENV['MAILGUN_API_KEY'], ENV['MAILGUN_REGION']
     batch_message = Mailgun::BatchMessage.new(mg_client, ENV['MAILGUN_NOTIFICATIONS_HOST'])

@@ -24,7 +24,6 @@ Dandelion::App.controller do
       if (organisation_contribution = OrganisationContribution.find_by(session_id: session.id))
         organisation_contribution.set(payment_completed: true)
         organisation_contribution.send_notification
-        organisation_contribution.organisation.update_paid_up
       end
     end
     halt 200

@@ -354,6 +354,7 @@ class Organisation
       update_attribute(:paid_up, true)
     end
   end
+  handle_asynchronously :update_paid_up
 
   has_many :cohostships, dependent: :destroy
   has_many :activities, dependent: :destroy
