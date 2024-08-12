@@ -375,6 +375,8 @@ end
             <%== Sanitize.fragment(Rinku.auto_link(m[1]), Sanitize::Config::DANDELION) %><% if q.ends_with?('*') %>*<% end %>
           </label>
         </div>
+      <% elsif q.starts_with?('> ') %>
+        <label><%== Sanitize.fragment(Rinku.auto_link(q.gsub(/^> /, '')), Sanitize::Config::DANDELION) %></label>
       <% else %>
         <label><%== Sanitize.fragment(Rinku.auto_link(q), Sanitize::Config::DANDELION) %>*</label>
         <div>
