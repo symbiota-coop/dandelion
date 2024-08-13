@@ -4,11 +4,6 @@
 </style>
 <ul class="nav navbar-nav navbar-right">
   <% if current_account %>
-    <li class="d-none d-lg-inline" id="youtube-li">
-      <a target="_blank" href="https://www.youtube.com/@dandelion.events.321">
-        New YouTube channel! <i class="bi bi-youtube"></i>
-      </a>
-    </li>
     <li>
       <a href="javascript:;" data-toggle="search-bar" class="navbar-icon">
         <i class="bi bi-search"></i>
@@ -46,11 +41,6 @@
       <%= partial :nav_profile, locals: { ul_class: 'dropdown-menu' } %>
     </li>
   <% else %>
-    <li class="d-none d-lg-inline" id="youtube-li">
-      <a target="_blank" href="https://www.youtube.com/@dandelion.events.321">
-        New YouTube channel! <i class="bi bi-youtube"></i>
-      </a>
-    </li>
     <li>
       <a href="javascript:;" data-toggle="search-bar" class="navbar-icon">
         <i class="bi bi-search"></i>
