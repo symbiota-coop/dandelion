@@ -378,9 +378,9 @@ end
       <% elsif q.starts_with?('# ') %>
         <label><%== Sanitize.fragment(Rinku.auto_link(q.gsub(/^# /, '')), Sanitize::Config::DANDELION) %></label>
       <% else %>
-        <label><%== Sanitize.fragment(Rinku.auto_link(q), Sanitize::Config::DANDELION) %>*</label>
+        <label><%== Sanitize.fragment(Rinku.auto_link(q), Sanitize::Config::DANDELION) %></label>
         <div>
-          <%= text_area_tag "answers[#{i}]", required: true, class: 'autosize form-control', value: (params[:answers][i] if params[:answers]) %>
+          <%= text_area_tag "answers[#{i}]", required: q.ends_with?('*'), class: 'autosize form-control', value: (params[:answers][i] if params[:answers]) %>
         </div>
       <% end %>
     </div>
@@ -462,7 +462,7 @@ end
     <% end %>
     <% if @event.organisation.coinbase_api_key && (FIAT_CURRENCIES.include?(@event.currency) || COINBASE_CURRENCIES.include?(@event.currency)) %>
       <button class="btn btn-primary btn-block mb-1 btn-dotted" type="submit" data-payment-method="coinbase">
-        <span>Pay with Crypto</span>
+        <span>Pay with crypto</span>
         <i class="bi bi-spin bi-arrow-repeat" style="display: none"></i>
       </button>
       <%= hidden_field_tag :payment_method, value: 'coinbase', disabled: true %>
