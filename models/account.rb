@@ -443,6 +443,10 @@ class Account
     Account.and(:id.in => follows_as_follower.pluck(:followee_id))
   end
 
+  def self.fu(username)
+    Account.find_by(username: username)
+  end
+
   def following_starred
     Account.and(:id.in => follows_as_follower.and(starred: true).pluck(:followee_id))
   end
