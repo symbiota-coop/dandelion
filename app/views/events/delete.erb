@@ -5,7 +5,7 @@
   <% if @event.orders.count > 0 %>
     <div class="alert alert-warning">
       <p class="mb-0">
-        Make sure you <a class="text-warning text-underline" href="/events/<%= @event.id %>/pmails">contact ticketholders to let them know the event is cancelled</a> before you delete the event!
+        Make sure you <a class="text-warning text-underline" href="/pmails/new?event_id=<%= @event.id %>">contact ticketholders to let them know the event is cancelled</a> before you delete the event!
       </p>
     </div>
   <% end %>
