@@ -183,7 +183,6 @@ $(function () {
                 params: [{ chainId: '0x' + networkId.toString(16) }]
               })
               ethereum.on('chainChanged', function () {
-                console.log('chainChanged')
                 web3.eth.net.getId().then(thisNetworkId => {
                   if (thisNetworkId == networkId) { connectWeb3Wallet() }
                 })
@@ -195,7 +194,6 @@ $(function () {
 
           const connectWeb3Wallet = function () {
             if (!ethereum.selectedAddress) {
-              console.log('connecting')
               $('#pay-with-evm').find('.card-body p.web3wallet').html('<a href="javascript:;">Connect your web3 wallet</a>')
               $('#pay-with-evm').find('.card-body p.web3wallet a').click(function () {
                 ethereum.request({
@@ -208,7 +206,6 @@ $(function () {
           }
 
           const pay = function () {
-            console.log('paying')
             $('#pay-with-evm').find('.card-body p.web3wallet').remove()
 
             const abi = [{

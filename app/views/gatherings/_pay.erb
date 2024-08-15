@@ -79,7 +79,6 @@
             if (thisNetworkId != networkId) {
               $('#pay-with-evm').find('.card-body p.web3wallet').html("<mark>Please switch your web3 wallet's network to " + networkName + '</mark>')
               ethereum.on('chainChanged', function() {
-                console.log('chainChanged')
                 web3.eth.net.getId().then(thisNetworkId => {
                   if (thisNetworkId == networkId)
                     connectWeb3Wallet()
@@ -92,7 +91,6 @@
 
           function connectWeb3Wallet() {
             if (!ethereum.selectedAddress) {
-              console.log('connecting')
               $('#pay-with-evm').find('.card-body p.web3wallet').html('<a href="javascript:;">Connect your web3 wallet</a>')
               $('#pay-with-evm').find('.card-body p.web3wallet a').click(function() {
                 ethereum.request({
@@ -105,7 +103,6 @@
           }
 
           function pay() {
-            console.log('paying')
             $('#pay-with-evm').find('.card-body p.web3wallet').remove()
 
             var abi = [{
@@ -154,6 +151,5 @@
       return false
 
     })
-    console.log('paying')
   })
 </script>

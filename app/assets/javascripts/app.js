@@ -266,11 +266,9 @@ $(function () {
       if ($('input[type=checkbox]:checked', div).length > 0) { $('span', button).removeClass('label-outline-primary').addClass('label-primary') }
       $(button).click(function () {
         if ($('input[type=checkbox]:checked', div).length > 0) {
-          console.log('unchecking')
           $('input[type=checkbox]', div).prop('checked', false)
           $('span', button).removeClass('label-primary').addClass('label-outline-primary')
         } else {
-          console.log('checking')
           $('input[type=checkbox]', div).prop('checked', true)
           $('span', button).removeClass('label-outline-primary').addClass('label-primary')
         }
