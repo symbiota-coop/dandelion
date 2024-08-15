@@ -32,12 +32,14 @@
   <%= cp(:'events/carousel_organisations', key: "/events/carousel_organisations/#{current_account.id}") %>
 <% end %>
 
-<%= partial :'events/view_options' %>
+<%= partial :'events/view_options', locals: { calendar_view: true } %>
 
 <% if params[:display] == 'map' %>
   <div data-pagelet-url="/events?<%= request.query_string %>">
     <%= partial :'maps/map', locals: { stem: "/events", dynamic: true, trigger_bounds_changed: true } %>
   </div>
+<% elsif params[:display] == 'calendar' %>
+  <iframe src="<%=ENV['TEAMUP_CALENDAR_URL']%>" style="width: 100%; height: 800px" loading="lazy" frameborder="0"></iframe>
 <% elsif params[:display] == 'table' %>
   <%= partial :'events/table' %>
 <% elsif params[:display] == 'concise' %>
