@@ -1,6 +1,11 @@
 <% points_limit = 500 %>
 <script>
   $(function () {
+    if (!navigator.cookieEnabled) {
+      $('#map-container').html('<div class="alert alert-warning"><p class="mb-0">Please enable cookies to view the map</p></div>');
+      return;
+    }
+
     mapTimer = null;
     map = new google.maps.Map(document.getElementById("map-canvas"), {
       mapTypeId: google.maps.MapTypeId.ROADMAP,
