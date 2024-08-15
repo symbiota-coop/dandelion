@@ -32,7 +32,7 @@
   <%= cp(:'events/carousel_organisations', key: "/events/carousel_organisations/#{current_account.id}") %>
 <% end %>
 
-<%= partial :'events/view_options', locals: { calendar_view: true } %>
+<%= partial :'events/view_options' %>
 
 <% if params[:display] == 'map' %>
   <div data-pagelet-url="/events?<%= request.query_string %>">
