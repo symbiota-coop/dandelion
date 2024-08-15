@@ -1,7 +1,7 @@
 <% points_limit = 500 %>
 <script>
   $(function () {
-    if (!navigator.cookieEnabled) {
+    if (typeof google === 'undefined') {
       $('#map-container').html('<div class="alert alert-warning"><p class="mb-0">Please enable cookies to view the map</p></div>');
       return;
     }
