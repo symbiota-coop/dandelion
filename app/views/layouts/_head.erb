@@ -6,9 +6,7 @@
   <% if !params[:minimal] && Padrino.env == :production %>
     <script
       type="text/javascript"
-      src="https://app.termly.io/embed.min.js"
-      data-auto-block="on"
-      data-website-uuid="e3781b47-56e6-4a03-987b-1ce448a36930"
+      src="https://app.termly.io/resource-blocker/<%=ENV["TERMLY_WEBSITE_UUID"]%>?autoBlock=on"
       ></script>
   <% end %>
 
