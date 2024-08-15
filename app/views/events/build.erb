@@ -79,11 +79,14 @@
     <% end %>
 
     <% if @event.new_record? %>
-      setInterval(function () {
+      var draftInterval = setInterval(function () {
         if ($('#event_name').val().length > 0) {
           $.post('/events/draft', $('#build-event').serializeObject())
         }
       }, 10*1000)
+      $('#build-event').submit(function() {
+        clearInterval(draftInterval);
+      });
     <% end %>
 
     $('#event-build-nav a[data-toggle="tab"]').on('show.bs.tab', function (e) {
