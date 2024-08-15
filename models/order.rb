@@ -404,7 +404,7 @@ class Order
         pdf.text ticket.account.name, align: :center, size: 14
         if ticket.ticket_type
           pdf.move_down 0.5 * cm
-          pdf.text ticket.ticket_type.name, align: :center, size: 14
+          pdf.text "#{ticket.ticket_type.name}, #{Money.new(ticket.discounted_price * 100, ticket.currency).format(no_cents_if_whole: true)}", align: :center, size: 14
         end
         pdf.move_down 0.5 * cm
         pdf.text ticket.id.to_s, align: :center, size: 10
