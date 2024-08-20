@@ -21,7 +21,7 @@
         $('#add-organisation').hide()"><i class="bi bi-dash-square-fill"></i></a>
       <div style="display: none">
         <% form_tag destroy_url do |f| %>
-          <%= select_tag :organisation_id, options: organisations.map { |organisation| ["#{organisation.name} (#{organisation.id})", organisation.id] }, class: 'form-control mb-1' %>
+          <%= select_tag :organisation_id, options: organisations.map { |organisation| ["#{organisation.name} (#{organisation.slug})", organisation.id] }, class: 'form-control mb-1' %>
           <%= submit_tag "Remove #{role}", class: 'btn btn-danger' %>
         <% end %>
       </div>

@@ -36,7 +36,7 @@ Dandelion::App.controller do
       @organisations = @organisations.and(name: /#{Regexp.escape(params[:q])}/i) if params[:q]
       @organisations = @organisations.and(id: params[:id]) if params[:id]
       {
-        results: @organisations.map { |organisation| { id: organisation.id.to_s, text: "#{organisation.name} (id:#{organisation.id})" } }
+        results: @organisations.map { |organisation| { id: organisation.id.to_s, text: "#{organisation.name} (#{organisation.slug})" } }
       }.to_json
     end
   end
