@@ -356,9 +356,8 @@ class Organisation
                                         off_session: true,
                                         confirm: true
                                       })
-    organisation_contribution = organisation_contributions.create amount: contribution_remaining.cents / 100, currency: contribution_remaining.currency, payment_intent: pi.id, payment_completed: true
+    organisation_contribution = organisation_contributions.create amount: contribution_remaining.cents.to_f / 100, currency: contribution_remaining.currency, payment_intent: pi.id, payment_completed: true
     organisation_contribution.send_notification
-    update_paid_up_without_delay
   end
 
   def self.paid_up_fraction

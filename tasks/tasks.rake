@@ -34,6 +34,8 @@ namespace :organisations do
       monthly_donations_count = monthly_donations_count.format(no_cents: true) if monthly_donations_count > 0
 
       organisation.update_paid_up_without_delay
+      organisation.stripe_topup if !organisation.paid_up && organisation.stripe_customer_id
+
       organisation.set(subscribed_accounts_count: organisation.subscribed_accounts.count)
       organisation.set(followers_count: organisation.organisationships.count)
       organisation.set(monthly_donors_count: organisation.monthly_donors.count)

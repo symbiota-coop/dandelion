@@ -86,6 +86,7 @@ Dandelion::App.controller do
     @organisation.set(card_last4: payment_method.card.last4)
 
     @organisation.stripe_topup
+    @organisation.update_paid_up_without_delay
     redirect "/o/#{@organisation.slug}/contribute"
   end
 
