@@ -54,7 +54,7 @@
         </div>
       <% end %>
 
-      <% form_tag '', class: 'form-inline', id: 'pay-form' do %>
+      <% form_tag '', class: 'form-inline mb-3', id: 'pay-form' do %>
         <div class="form-group mb-1 mr-1">
           <div class="input-group">
             <div class="input-group-prepend">
@@ -76,6 +76,18 @@
         <%= hidden_field_tag :payment_method, value: 'coinbase', disabled: true %>
       <% end %>
 
+      <p class="mb-0">
+        <% if organisation.stripe_customer_id %>
+          Auto top-up enabled using card ending in <%= organisation.card_last4 %>. <a href="/organisations/<%= organisation.id %>/clear_stripe_customer_id">Click to disable</a>
+        <% else %>
+          New: <a href="javascript:;" onclick="
+               $.post('/organisations/<%= organisation.id %>/stripe_setup', $(this).serializeObject(), function (data) {
+                  var stripe = Stripe('<%= ENV['STRIPE_PK'] %>');
+                  stripe.redirectToCheckout({sessionId: data['session_id']})                        
+                })
+        ">Enter your card details to remain automatically topped up</a>
+        <% end %>
+      </p>
 
       <script>
         $(function () {

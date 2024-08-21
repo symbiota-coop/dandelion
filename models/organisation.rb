@@ -19,6 +19,8 @@ class Organisation
   field :stripe_endpoint_secret, type: String
   field :stripe_pk, type: String
   field :stripe_sk, type: String
+  field :stripe_customer_id, type: String
+  field :card_last4, type: String
   field :coinbase_api_key, type: String
   field :coinbase_webhook_secret, type: String
   field :gocardless_access_token, type: String
@@ -332,6 +334,31 @@ class Organisation
     return unless cr && cr > 0 && cp && cp > 0
 
     cp / cr
+  end
+
+  def contribution_remaining
+    contribution_requested - contribution_paid
+  end
+
+  def stripe_topup
+    Stripe.api_key = ENV['STRIPE_SK']
+    Stripe.api_version = '2020-08-27'
+
+    return unless stripe_customer_id && contribution_remaining > 0
+
+    # charge customer
+    payment_method_id = Stripe::Customer.list_payment_methods(Organisation.first.stripe_customer_id).first.id
+    pi = Stripe::PaymentIntent.create({
+                                        amount: contribution_remaining.cents,
+                                        currency: contribution_remaining.currency,
+                                        customer: stripe_customer_id,
+                                        payment_method: payment_method_id,
+                                        off_session: true,
+                                        confirm: true
+                                      })
+    organisation_contribution = organisation_contributions.create amount: contribution_remaining.cents / 100, currency: contribution_remaining.currency, payment_intent: pi.id, payment_completed: true
+    organisation_contribution.send_notification
+    update_paid_up_without_delay
   end
 
   def self.paid_up_fraction

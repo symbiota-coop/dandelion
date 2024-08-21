@@ -22,7 +22,8 @@ Dandelion::App.controller do
     if event['type'] == 'checkout.session.completed'
       session = event['data']['object']
       if (organisation_contribution = OrganisationContribution.find_by(session_id: session.id))
-        organisation_contribution.set(payment_completed: true)
+        organisation_contribution.payment_completed = true
+        organisation_contribution.save
         organisation_contribution.send_notification
       end
     end
@@ -44,10 +45,58 @@ Dandelion::App.controller do
     end
 
     if event.type == 'charge:confirmed' && event.data.respond_to?(:checkout) && (organisation_contribution = OrganisationContribution.find_by(coinbase_checkout_id: event.data.checkout.id))
-      organisation_contribution.set(payment_completed: true)
-      organisation_contribution.organisation.update_paid_up
+      organisation_contribution.payment_completed = true
+      organisation_contribution.save
+      organisation_contribution.send_notification
     end
     halt 200
+  end
+
+  post '/organisations/:id/stripe_setup', provides: :json do
+    @organisation = Organisation.find(params[:id])
+
+    Stripe.api_key = ENV['STRIPE_SK']
+    Stripe.api_version = '2020-08-27'
+
+    session = Stripe::Checkout::Session.create({
+                                                 mode: 'setup',
+                                                 currency: @organisation.currency,
+                                                 customer_creation: 'always',
+                                                 success_url: "#{ENV['BASE_URI']}/organisations/#{@organisation.id}/stripe_setup_complete?session_id={CHECKOUT_SESSION_ID}",
+                                                 cancel_url: "#{ENV['BASE_URI']}/events/new?organisation_id=#{@organisation.id}"
+                                               })
+
+    { session_id: session.id }.to_json
+  end
+
+  get '/organisations/:id/stripe_setup_complete' do
+    @organisation = Organisation.find(params[:id])
+
+    Stripe.api_key = ENV['STRIPE_SK']
+    Stripe.api_version = '2020-08-27'
+
+    session = Stripe::Checkout::Session.retrieve(params[:session_id])
+    @organisation.set(stripe_customer_id: session.customer)
+
+    # Retrieve the setup intent to get the payment method
+    setup_intent = Stripe::SetupIntent.retrieve(session.setup_intent)
+    payment_method = Stripe::PaymentMethod.retrieve(setup_intent.payment_method)
+
+    # Save the last 4 digits of the card
+    @organisation.set(card_last4: payment_method.card.last4)
+
+    @organisation.stripe_topup
+    redirect "/o/#{@organisation.slug}/contribute"
+  end
+
+  get '/organisations/:id/clear_stripe_customer_id' do
+    @organisation = Organisation.find(params[:id])
+
+    Stripe.api_key = ENV['STRIPE_SK']
+    Stripe.api_version = '2020-08-27'
+
+    @organisation.set(stripe_customer_id: nil)
+    redirect "/o/#{@organisation.slug}/contribute"
   end
 
   post '/organisations/:id/pay', provides: :json do
