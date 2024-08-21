@@ -347,7 +347,7 @@ class Organisation
     return unless stripe_customer_id && contribution_remaining > 0
 
     # charge customer
-    payment_method_id = Stripe::Customer.list_payment_methods(Organisation.first.stripe_customer_id).first.id
+    payment_method_id = Stripe::Customer.list_payment_methods(stripe_customer_id).first.id
     pi = Stripe::PaymentIntent.create({
                                         amount: contribution_remaining.cents,
                                         currency: contribution_remaining.currency,
