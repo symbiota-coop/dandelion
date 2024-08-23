@@ -264,6 +264,7 @@ class Event
     self.minimum_donation = minimum_donation.round(2) if minimum_donation
     self.organiser = account if account && !revenue_sharer && !organiser && organisation && organisation.stripe_client_id
     self.ai_tagged = nil
+    self.description = description.gsub('href="www.', 'href="http://www.')
 
     unless slug
       loop do
