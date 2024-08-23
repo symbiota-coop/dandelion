@@ -1,9 +1,14 @@
 <style>
-  #youtube-li { display: none }
-  @media(min-width: 992px) { #youtube-li { display: list-item } }
+  #docs-li { display: none }
+  @media(min-width: 992px) { #docs-li { display: list-item } }
 </style>
 <ul class="nav navbar-nav navbar-right">
   <% if current_account %>
+    <li class="d-none d-lg-inline" id="docs-li">
+      <a href="/docs">
+        How to use Dandelion
+      </a>
+    </li>
     <li>
       <a href="javascript:;" data-toggle="search-bar" class="navbar-icon">
         <i class="bi bi-search"></i>
@@ -41,6 +46,11 @@
       <%= partial :nav_profile, locals: { ul_class: 'dropdown-menu' } %>
     </li>
   <% else %>
+    <li class="d-none d-lg-inline" id="docs-li">
+      <a href="/docs">
+        How to use Dandelion
+      </a>
+    </li>
     <li>
       <a href="javascript:;" data-toggle="search-bar" class="navbar-icon">
         <i class="bi bi-search"></i>
