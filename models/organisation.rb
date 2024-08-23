@@ -375,7 +375,7 @@ class Organisation
     update_attribute(:contribution_paid_gbp_cache, cp.exchange_to('GBP').to_f)
     update_attribute(:paid_up, nil)
     begin
-      update_attribute(:paid_up, contribution_not_required? || cr < contribution_threshold || contributable_events.count == 1 || cp >= (Organisation.paid_up_fraction * cr))
+      update_attribute(:paid_up, contribution_not_required? || stripe_customer_id || cr < contribution_threshold || contributable_events.count == 1 || cp >= (Organisation.paid_up_fraction * cr))
     rescue Money::Bank::UnknownRate, Money::Currency::UnknownCurrency
       update_attribute(:paid_up, true)
     end
