@@ -158,11 +158,11 @@
         "description": (if @event.description
                           Nokogiri::HTML(@event.description).search('h1,h2,h3,h4,h5,h6,p').first.try(:text).try(:strip)
                         end),
-        "organizer": {
+        "organizer": ({
           "@type": 'Organization',
           "name": @event.organisation.name,
           "url": @event.organisation.website
-        },
+        } if @event.organisation),
         "offers": (@event.ticket_types.map { |ticket_type|
           {
             "@type": "Offer",
