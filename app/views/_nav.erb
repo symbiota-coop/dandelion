@@ -81,6 +81,12 @@
                  a_active_class: '' %>
     </li>
   <% end %>
+  <li class="<%= 'active' if request.path == '/facilitators' %>">
+    <a href="/facilitators" data-toggle="tooltip" title="Facilitators" data-placement="right">
+      <i class="bi bi-mortarboard-fill"></i>
+      <span class="nav-link-text">Facilitators</span>
+    </a>
+  </li>
   <% if !current_account %>
     <li class="<%= 'active' if request.path == '/gatherings' %>">
       <a href="/gatherings" data-toggle="tooltip" title="Gatherings" data-placement="right">
@@ -107,12 +113,6 @@
                  a_active_class: '' %>
     </li>
   <% end %>
-  <li class="<%= 'active' if request.path == '/facilitators' %>">
-    <a href="/facilitators" data-toggle="tooltip" title="Facilitators" data-placement="right">
-      <i class="bi bi-mortarboard-fill"></i>
-      <span class="nav-link-text">Facilitators</span>
-    </a>
-  </li>
   <li>
     <a href="/docs" data-toggle="tooltip" title="How to use Dandelion" data-placement="right">
       <i class="bi bi-question-circle-fill"></i>
