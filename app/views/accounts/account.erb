@@ -76,30 +76,6 @@
   <% end %>
 <% end %>
 
-<% if @account.places_following.count > 0 %>
-  <% if viewable?(@account, :places, viewer_in_network: viewer_in_network) %>
-    <div class="mt-5 row justify-content-between no-gutters">
-      <div class="col">
-        <h2>Places</h2>
-        <% if current_account && current_account.id == @account.id %>
-          <div class="mb-3">
-            <a class="btn btn-primary" href="javascript:;" onclick="$(this).hide().next().show().find('input').first().focus()"><i class="bi bi-plus-lg"></i> Add a category</a>
-            <div style="display: none" class="mt-3">
-              <%= partial :'placeship_categories/build' %>
-            </div>
-          </div>
-        <% end %>
-      </div>
-      <% if current_account && current_account.id == @account.id %>
-        <div class="col-auto">
-          <div data-pagelet-url="/accounts/privacyable/places"></div>
-        </div>
-      <% end %>
-    </div>
-    <div data-pagelet-url="/accounts/<%= @account.id %>/places"></div>
-  <% end %>
-<% end %>
-
 <% if @account.follows_as_follower.count > 0 %>
   <% if viewable?(@account, :following, viewer_in_network: viewer_in_network) %>
     <div class="mt-5 row justify-content-between no-gutters">

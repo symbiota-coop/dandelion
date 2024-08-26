@@ -26,12 +26,6 @@ Dandelion::App.controller do
     erb :'stats/organisations'
   end
 
-  get '/stats/places' do
-    admins_only!
-    @places = Place.order('created_at desc').paginate(page: params[:page], per_page: 50)
-    erb :'stats/places'
-  end
-
   get '/stats/comments' do
     admins_only!
     @comments = Comment.and(:body.ne => nil).order('created_at desc').paginate(page: params[:page], per_page: 20)

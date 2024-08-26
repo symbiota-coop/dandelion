@@ -76,18 +76,14 @@ class Comment
         account.admin?
       elsif %w[Team Tactivity Mapplication].include?(comment.commentable_type)
         Gathering.admin?(comment.commentable.gathering, account)
-      elsif %w[Place].include?(comment.commentable_type)
-        comment.commentable.account_id == account.id
       end
     )
   end
 
   def circle
-    if %w[Team Tactivity Mapplication].include?(commentable_type)
-      commentable.gathering
-    elsif %w[Place].include?(commentable_type)
-      commentable
-    end
+    return unless %w[Team Tactivity Mapplication].include?(commentable_type)
+
+    commentable.gathering
   end
 
   def name
@@ -143,9 +139,6 @@ class Comment
     elsif commentable.is_a?(ActivityApplication)
       activity_application = commentable
       s << "[#{activity_application.activity.organisation.name}/#{activity_application.activity.name}/#{activity_application.account.name}] "
-    elsif commentable.is_a?(Place)
-      place = commentable
-      s << "[Places/#{place.name}] "
     elsif commentable.respond_to?(:gathering)
       s << '['
       s << commentable.gathering.name

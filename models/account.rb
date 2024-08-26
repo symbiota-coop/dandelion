@@ -80,11 +80,11 @@ class Account
   end
 
   def self.privacyables
-    %w[email location phone telegram_username website date_of_birth gender sexuality bio open_to last_active organisations local_groups activities gatherings places following followers]
+    %w[email location phone telegram_username website date_of_birth gender sexuality bio open_to last_active organisations local_groups activities gatherings following followers]
   end
 
   def self.sensitive?(privacyable)
-    true if privacyable.in?(%i[organisations local_groups activities gatherings places])
+    true if privacyable.in?(%i[organisations local_groups activities gatherings])
   end
 
   def self.privacy_levels
@@ -319,7 +319,6 @@ class Account
     Notification.all.or(
       { :circle_type => 'Gathering', :circle_id.in => memberships.pluck(:gathering_id) },
       { :circle_type => 'Account', :circle_id.in => [id] + network.pluck(:id) },
-      { :circle_type => 'Place', :circle_id.in => places_following.pluck(:id) },
       { :circle_type => 'Activity', :circle_id.in => activities_following.pluck(:id) },
       { :circle_type => 'LocalGroup', :circle_id.in => local_groups_following.pluck(:id) },
       {
@@ -398,8 +397,6 @@ class Account
     LocalGroup.and(:id.in => local_groupships.pluck(:local_group_id))
   end
 
-  has_many :places, dependent: :nullify
-
   has_many :gatherings, dependent: :nullify
 
   has_many :mapplications, class_name: 'Mapplication', inverse_of: :account, dependent: :destroy
@@ -463,12 +460,6 @@ class Account
   # MessageReceipts
   has_many :message_receipts_as_messenger, class_name: 'MessageReceipt', inverse_of: :messenger, dependent: :destroy
   has_many :message_receipts_as_messengee, class_name: 'MessageReceipt', inverse_of: :messengee, dependent: :destroy
-  # Placeships
-  has_many :placeships, dependent: :destroy
-  def places_following
-    Place.and(:id.in => placeships.pluck(:place_id))
-  end
-  has_many :placeship_categories, dependent: :destroy
 
   has_many :photos, dependent: :destroy
 

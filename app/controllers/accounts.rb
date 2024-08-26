@@ -294,11 +294,6 @@ Dandelion::App.controller do
     partial :'accounts/following', locals: { accounts: @account.following, starred: @account.following_starred }
   end
 
-  get '/accounts/:id/places' do
-    @account = Account.find(params[:id]) || not_found
-    partial :'accounts/places'
-  end
-
   get '/accounts/:id/organisations' do
     @account = Account.find(params[:id]) || not_found
     organisations = Organisation.and(:id.in => @account.organisationships.and(:hide_membership.ne => true).pluck(:organisation_id))

@@ -1,3 +1,0 @@
-<% form_tag "/placeship/categorise/#{placeship.id}", class: 'd-inline-block' do %>
-  <%= select_tag :placeship_category_id, options: [''] + current_account.placeship_categories.map { |placeship_category| [placeship_category.name, placeship_category.id] }, class: 'form-control', onchange: '$(this.form).submit()', selected: placeship.placeship_category_id %>
-<% end %>

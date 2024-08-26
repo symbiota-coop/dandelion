@@ -28,7 +28,7 @@ class Post
   end
 
   def self.commentable_types
-    %w[DocPage Team Tactivity Mapplication Place Event ActivityApplication]
+    %w[DocPage Team Tactivity Mapplication Event ActivityApplication]
     # Account Organisation LocalGroup Activity Gathering
   end
 
@@ -46,9 +46,6 @@ class Post
     when Mapplication
       mapplication = commentable
       "#{ENV['BASE_URI']}/g/#{mapplication.gathering.slug}/mapplications/#{mapplication.id}#post-#{id}"
-    when Place
-      place = commentable
-      "#{ENV['BASE_URI']}/places/#{place.id}"
     when Event
       event = commentable
       "#{ENV['BASE_URI']}/events/#{event.id}"

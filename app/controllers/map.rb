@@ -9,20 +9,10 @@ Dandelion::App.controller do
     @east = params[:east]
     box = [[@west.to_f, @south.to_f], [@east.to_f, @north.to_f]]
 
-    @places = []
     @accounts = []
     @local_groups = []
 
-    if params[:u]
-      @account = Account.find_by(username: params[:u]) || not_found
-      @places = @account.places_following.order('name_transliterated asc')
-    elsif params[:uncategorised_id]
-      account = Account.find(params[:uncategorised_id]) || not_found
-      @places = Place.order('created_at desc').and(:id.in => account.placeships.and(placeship_category_id: nil).pluck(:place_id))
-    elsif params[:placeship_category_id]
-      placeship_category = PlaceshipCategory.find(params[:placeship_category_id]) || not_found
-      @places = Place.order('created_at desc').and(:id.in => placeship_category.placeships.pluck(:place_id))
-    elsif params[:organisation_id]
+    if params[:organisation_id]
       @organisation = Organisation.find(params[:organisation_id]) || not_found
       @info_window = params[:admin] && organisation_admin?
       @accounts = Account.all
@@ -40,42 +30,26 @@ Dandelion::App.controller do
       @info_window = params[:admin] && local_group_admin?
       @accounts = Account.and(:id.in => @local_group.local_groupships.and(:hide_membership.ne => true).pluck(:account_id))
       @local_groups = [@local_group]
-    elsif params[:place_id]
-      @place = Place.find(params[:place_id]) || not_found
-      @places = Place.and(id: @place.id)
-      @accounts = Account.and(:id.in => @place.placeships.pluck(:account_id))
-    elsif params[:places]
-      @places = Place.order('created_at desc')
     else
-      @places = Place.order('created_at desc')
       @accounts = Account.all
     end
 
     if request.xhr?
-      @places = @places.and(coordinates: { '$geoWithin' => { '$box' => box } }) unless @places.empty?
       unless @accounts.empty?
         @accounts = @accounts.and(coordinates: { '$geoWithin' => { '$box' => box } })
         @accounts = @accounts.and(:number_at_this_location.lte => 50)
       end
-      @points_count = @places.count + @accounts.count
-      @points = @places + @accounts
+      @points_count = @accounts.count
+      @points = @accounts
       @polygonables = @local_groups
-      partial :'maps/map', locals: { dynamic: true, points: @points, points_count: @points_count, polygonables: @polygonables, places: params[:places], centre: (OpenStruct.new(lat: @lat, lng: @lng) if @lat && @lng), zoom: @zoom, info_window: @info_window }
+      partial :'maps/map', locals: { dynamic: true, points: @points, points_count: @points_count, polygonables: @polygonables, centre: (OpenStruct.new(lat: @lat, lng: @lng) if @lat && @lng), zoom: @zoom, info_window: @info_window }
     else
-      @places = @places.and(:coordinates.ne => nil) unless @places.empty?
       @accounts = @accounts.and(:coordinates.ne => nil) unless @accounts.empty?
-      @points_count = @places.count + @accounts.count
-      @points = @places + @accounts
+      @points_count = @accounts.count
+      @points = @accounts
       @polygonables = @local_groups
-      @place = Place.new
       if params[:map_only]
         partial :'maps/map', locals: { points: @points, points_count: @points_count, polygonables: @polygonables, centre: (OpenStruct.new(lat: @lat, lng: @lng) if @lat && @lng), zoom: @zoom, info_window: @info_window }, layout: :minimal
-      elsif params[:blocks_only]
-        if @account
-          partial :'accounts/places', locals: { block_class: 'col-6' }, layout: :minimal
-        else
-          partial :'places/blocks', locals: { places: @places, block_class: 'col-6' }, layout: :minimal
-        end
       else
         erb :'maps/map'
       end

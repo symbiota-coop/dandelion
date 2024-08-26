@@ -9,83 +9,66 @@
   <input type="hidden" name="type" id="type" value="<%= @type %>">
 </form>
 <ul class="search-tab">
-  <% { 'Events' => 'events', 'People' => 'accounts', 'Organisations' => 'organisations', 'Places' => 'places', 'Gatherings' => 'gatherings' }.each { |k,v| %>
+  <% { 'Events' => 'events', 'People' => 'accounts', 'Organisations' => 'organisations', 'Gatherings' => 'gatherings' }.each { |k,v| %>
   <li <% if @type == v %> class="active" <% end %>><a href="javascript:;" onclick="$('#type').val('<%= v %>');
           $('#search-form').submit()"><%= k %></a></li>
   <% } %>
 </ul>
 <% if @q %>
   <% case @type; when 'accounts' %>
-  <ul class="search-result-list">
-    <% @accounts.each { |account| %>
-    <li>
-      <%= partial 'accounts/search_result', locals: { account: account } %>
-    </li>
-    <% } %>
-  </ul>
+    <ul class="search-result-list">
+      <% @accounts.each { |account| %>
+      <li>
+        <%= partial 'accounts/search_result', locals: { account: account } %>
+      </li>
+      <% } %>
+    </ul>
   <% when 'events' %>
-  <%= partial 'events/blocks', locals: { events: @events } %>
+    <%= partial 'events/blocks', locals: { events: @events } %>
   <% when 'organisations' %>
-  <style>
-    @media(min-width: 768px) {
-    .search-result-media div {
-      height: 10rem !important;
-    }
-    }
-  </style>
-  <ul class="search-result-list">
-    <% @organisations.each { |organisation| %>
-    <li>
-      <div class="search-result-media" style="height: auto">
-        <% if organisation.image %>
-          <a href="/o/<%= organisation.slug %>"><img src="<%= u organisation.image.thumb('400x400').url %>"></a>
-        <% else %>
-          <a href="/o/<%= organisation.slug %>">
-            <div style="border: 2px solid #343a40; height: 5.625rem"></div>
-          </a>
-        <% end %>
-      </div>
-      <div class="search-result-content">
-        <h2>
-          <a class="text-dark" href="/o/<%= organisation.slug %>"><%= organisation.name %></a>
-        </h2>
-      </div>
-    </li>
-    <% } %>
-  </ul>
-  <% when 'places' %>
-  <ul class="search-result-list">
-    <% @places.each { |place| %>
-    <li>
-      <% if place.image %>
+    <style>
+      @media(min-width: 768px) {
+      .search-result-media div {
+        height: 10rem !important;
+      }
+      }
+    </style>
+    <ul class="search-result-list">
+      <% @organisations.each { |organisation| %>
+      <li>
         <div class="search-result-media" style="height: auto">
-          <a href="/places/<%= place.id %>"><img src="<%= u place.image.thumb('400x400').url %>"></a>
+          <% if organisation.image %>
+            <a href="/o/<%= organisation.slug %>"><img src="<%= u organisation.image.thumb('400x400').url %>"></a>
+          <% else %>
+            <a href="/o/<%= organisation.slug %>">
+              <div style="border: 2px solid #343a40; height: 5.625rem"></div>
+            </a>
+          <% end %>
         </div>
-      <% end %>
-      <div class="search-result-content">
-        <h2>
-          <a class="text-dark" href="/places/<%= place.id %>"><%= place.name %></a>
-        </h2>
-      </div>
-    </li>
-    <% } %>
-  </ul>
+        <div class="search-result-content">
+          <h2>
+            <a class="text-dark" href="/o/<%= organisation.slug %>"><%= organisation.name %></a>
+          </h2>
+        </div>
+      </li>
+      <% } %>
+    </ul>
   <% when 'gatherings' %>
-  <ul class="search-result-list">
-    <% @gatherings.each { |gathering| %>
-    <li>
-      <% if gathering.image %>
-        <div class="search-result-media" style="height: auto">
-          <a href="/g/<%= gathering.slug %>"><img src="<%= u gathering.image.thumb('400x400').url %>"></a>
+    <ul class="search-result-list">
+      <% @gatherings.each { |gathering| %>
+      <li>
+        <% if gathering.image %>
+          <div class="search-result-media" style="height: auto">
+            <a href="/g/<%= gathering.slug %>"><img src="<%= u gathering.image.thumb('400x400').url %>"></a>
+          </div>
+        <% end %>
+        <div class="search-result-content">
+          <h2>
+            <a class="text-dark" href="/g/<%= gathering.slug %>"><%= gathering.name %></a>
+          </h2>
         </div>
-      <% end %>
-      <div class="search-result-content">
-        <h2>
-          <a class="text-dark" href="/g/<%= gathering.slug %>"><%= gathering.name %></a>
-        </h2>
-      </div>
-    </li>
-    <% } %>
-  </ul>
-<% end %>
+      </li>
+      <% } %>
+    </ul>
+  <% end %>
 <% end %>

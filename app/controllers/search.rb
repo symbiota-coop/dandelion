@@ -31,17 +31,11 @@ Dandelion::App.controller do
         end
       end
 
-      if !@type || @type == 'places'
-        results += search(Place, Place.all, @q, 5).map do |place|
-          { label: %(<i class="bi bi-map-fill"></i> #{place.name}), value: %(place:"#{place.name}") }
-        end
-      end
-
       results.to_json
     else
       @type = params[:type] || 'events'
       if (@q = params[:q])
-        %w[gathering place organisation event account].each do |t|
+        %w[gathering organisation event account].each do |t|
           next unless params[:q].starts_with?("#{t}:")
 
           @q += '"' unless @q.ends_with?('"')
@@ -79,12 +73,6 @@ Dandelion::App.controller do
             redirect "/g/#{@gatherings.first.slug}" if @gatherings.count == 1
           end
           @gatherings = search(Gathering, Gathering.and(listed: true).and(:privacy.ne => 'secret'), @q, 25)
-        when 'places'
-          if params[:q] && params[:q].starts_with?('place:')
-            @places = Place.all.and(name: @q)
-            redirect "/places/#{@places.first.id}" if @places.count == 1
-          end
-          @places = search(Place, Place.all, @q, 25)
         end
       end
 

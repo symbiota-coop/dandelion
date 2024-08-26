@@ -1,6 +1,0 @@
-<% form_for (@placeship_category ||= PlaceshipCategory.new), @placeship_category.new_record? ? '/placeship_categories/new' : "/placeship_categories/#{@placeship_category.id}/edit" do  |f| %>
-  <%= f.text_block :name %>
-  <div class="my-3">
-    <%= f.submit_block button_text: 'Save category', destroy_url: "/placeship_categories/#{@placeship_category.id}/destroy" %>
-  </div>
-<% end %>

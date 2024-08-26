@@ -1,8 +1,0 @@
-<%= partial :block, locals: {
-      title: place.name,
-      image: place.image,
-      view_url: "/places/#{place.id}",
-      edit_url: "/places/#{place.id}/edit",
-      admin: current_account && current_account.id == place.account_id,
-      content: partial(:'places/details', locals: { place: place })
-    } %>

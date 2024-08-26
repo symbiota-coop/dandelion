@@ -127,7 +127,6 @@ module Dandelion
         @from = Date.today
         @events = Event.live.public.legit.future(@from)
         @accounts = []
-        @places = Place.all.order('created_at desc')
         if request.xhr?
           400
         else

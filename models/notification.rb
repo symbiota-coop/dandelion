@@ -20,7 +20,7 @@ class Notification
   index({ circle_type: 1, created_at: -1 })
 
   def self.circle_types
-    %w[Account Gathering Activity LocalGroup Place Organisation]
+    %w[Account Gathering Activity LocalGroup Organisation]
   end
 
   def circle_url
@@ -33,8 +33,6 @@ class Notification
       "#{ENV['BASE_URI']}/activities/#{circle.id}"
     when LocalGroup
       "#{ENV['BASE_URI']}/local_groups/#{circle.id}"
-    when Place
-      "#{ENV['BASE_URI']}/places/#{circle.id}"
     when Organisation
       "#{ENV['BASE_URI']}/o/#{circle.slug}"
     end
@@ -47,7 +45,7 @@ class Notification
   end
 
   def self.types
-    %w[created_gathering applied joined_gathering created_team created_timetable created_tactivity created_rota created_option created_spend created_place created_profile updated_profile updated_place joined_team signed_up_to_a_shift interested_in_tactivity scheduled_tactivity unscheduled_tactivity made_admin unadmined commented reacted_to_a_comment left_gathering created_payment created_inventory_item mapplication_removed created_event updated_event created_organisation created_order]
+    %w[created_gathering applied joined_gathering created_team created_timetable created_tactivity created_rota created_option created_spend created_profile updated_profile joined_team signed_up_to_a_shift interested_in_tactivity scheduled_tactivity unscheduled_tactivity made_admin unadmined commented reacted_to_a_comment left_gathering created_payment created_inventory_item mapplication_removed created_event updated_event created_organisation created_order]
   end
 
   def self.mailable_types
@@ -104,18 +102,12 @@ class Notification
     when :created_spend
       spend = notifiable
       "<strong>#{spend.account.name}</strong> spent #{Money.new(spend.amount * 100, spend.gathering.currency).format(no_cents_if_whole: true)} on <strong>#{spend.item}</strong>"
-    when :created_place
-      place = notifiable
-      "<strong>#{place.account.name}</strong> listed the place <strong>#{place.name}</strong>"
     when :created_profile
       account = notifiable
       "<strong>#{account.name}</strong> joined Dandelion!"
     when :updated_profile
       account = notifiable
       "<strong>#{account.name}</strong> updated #{account.pronoun} profile"
-    when :updated_place
-      place = notifiable
-      "<strong>#{place.name}</strong> was updated"
     when :created_tactivity
       tactivity = notifiable
       "<strong>#{tactivity.account.name}</strong> proposed the activity <strong>#{tactivity.name}</strong> under <strong>#{tactivity.timetable.name}</strong>"
@@ -212,14 +204,10 @@ class Notification
       ['View team', "#{ENV['BASE_URI']}/g/#{circle.slug}/teams/#{notifiable.team_id}"]
     when :created_spend
       ['View budget', "#{ENV['BASE_URI']}/g/#{circle.slug}/budget"]
-    when :created_place
-      ['View place', "#{ENV['BASE_URI']}/places/#{notifiable.id}"]
     when :created_profile
       ['View profile', "#{ENV['BASE_URI']}/u/#{notifiable.username}"]
     when :updated_profile
       ['View profile', "#{ENV['BASE_URI']}/u/#{notifiable.username}"]
-    when :updated_place
-      ['View place', "#{ENV['BASE_URI']}/places/#{notifiable.id}"]
     when :created_tactivity
       ['View activity', "#{ENV['BASE_URI']}/g/#{circle.slug}/tactivities/#{notifiable.id}"]
     when :signed_up_to_a_shift
@@ -277,14 +265,10 @@ class Notification
       'bi-people-fill'
     when :created_spend
       'bi-cash-coin'
-    when :created_place
-      'bi-geo-alt-fill'
     when :created_profile
       'bi-person-fill'
     when :updated_profile
       'bi-person-fill'
-    when :updated_place
-      'bi-geo-alt-fill'
     when :created_tactivity
       'bi-easel'
     when :signed_up_to_a_shift
