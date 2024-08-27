@@ -358,19 +358,6 @@ end
     <% if @event.ask_hear_about %>
       <%= f.text_block :hear_about %>
     <% end %>
-    <% if @event.organisation.organisation_tiers.and(:gc_plan_id.ne => nil).count > 0 %>
-      <a class="mb-3" style="display: inline-block" href="javascript:;" onclick="$(this).hide().next().show(); $('#account_gc_plan_id option:not(:empty):first').prop('selected', true);">Add Direct Debit info to become a member of <%=@event.organisation.name%> (UK only)</a>
-      <div id="gc-details" style="display: none">
-        <%= f.select_block :gc_plan_id, options: [''] + @event.organisation.organisation_tiers.map { |organisation_tier| ["#{organisation_tier.name} (#{m organisation_tier.threshold, @event.organisation.currency}/month, #{organisation_tier.discount}% off future events)", organisation_tier.gc_plan_id] } %>
-        <%= f.text_block :gc_given_name %>
-        <%= f.text_block :gc_family_name %>
-        <%= f.text_block :gc_address_line1 %>
-        <%= f.text_block :gc_city %>
-        <%= f.text_block :gc_postal_code %>
-        <%= f.text_block :gc_branch_code %>
-        <%= f.text_block :gc_account_number %>
-      </div>
-    <% end %>
     <%= f.hidden_field :http_referrer, value: request.referrer %>
     <% @event.questions_a.each_with_index { |q,i| %>
     <div class="form-group links-blank">
@@ -454,6 +441,21 @@ end
         </small>
       </p>
     <% end %>
+
+    <% if @event.organisation.organisation_tiers.and(:gc_plan_id.ne => nil).count > 0 %>
+      <a class="mb-3" style="display: inline-block" href="javascript:;" onclick="$(this).hide().next().show(); $('#account_gc_plan_id option:not(:empty):first').prop('selected', true);">Add Direct Debit info to become a member of <%=@event.organisation.name%> (UK only)</a>
+      <div id="gc-details" style="display: none">
+        <%= f.select_block :gc_plan_id, options: [''] + @event.organisation.organisation_tiers.map { |organisation_tier| ["#{organisation_tier.name} (#{m organisation_tier.threshold, @event.organisation.currency}/month, #{organisation_tier.discount}% off future events)", organisation_tier.gc_plan_id] } %>
+        <%= f.text_block :gc_given_name %>
+        <%= f.text_block :gc_family_name %>
+        <%= f.text_block :gc_address_line1 %>
+        <%= f.text_block :gc_city %>
+        <%= f.text_block :gc_postal_code %>
+        <%= f.text_block :gc_branch_code %>
+        <%= f.text_block :gc_account_number %>
+      </div>
+    <% end %>
+
     <button class="btn btn-primary btn-block mb-1" type="submit" data-payment-method="rsvp">
       <span>RSVP</span>
       <i class="bi bi-spin bi-arrow-repeat" style="display: none"></i>
