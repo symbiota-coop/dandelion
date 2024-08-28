@@ -53,6 +53,7 @@
         <th data-col-name="value">Value</th>
         <th data-col-name="created_at">Created at</th>
         <th data-col-name="contribution">Contribution</th>
+        <th data-col-name="remaining">Remaining</th>
       </tr>
     </thead>
     <% organisations = Organisation.and(:id.in => Event.and(:id.in => Order.and(:created_at.gte => @from, :created_at.lt => @to + 1.day, :value.ne => nil).pluck(:event_id)).pluck(:organisation_id)) %>
@@ -90,6 +91,9 @@
             <% if w > 0 %><%= w.to_f.round %>%<% end %>
           </div>
         </div>
+      </td>
+      <td data-sort="<%=organisation.contribution_remaining.exchange_to('GBP')%>">
+        <%=m organisation.contribution_remaining, organisation.currency%>
       </td>
     </tr>
     <% } %>
