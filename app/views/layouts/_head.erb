@@ -3,17 +3,18 @@
   <meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" name="viewport">
   <link rel="manifest" href="/manifest.json">
 
-  <% if !params[:minimal] %>
-    <script
+  <% if Padrino.env == :production %>
+    <% if !params[:minimal] %>
+      <script
       type="text/javascript"
       src="https://app.termly.io/resource-blocker/<%=ENV["TERMLY_WEBSITE_UUID"]%>?autoBlock=on"
       ></script>
+    <% end %>
+    <%= partial :'layouts/ga' %>
+    <%= partial :'layouts/pixel' %>
+    <%= partial :'layouts/simple_analytics' %>
+    <%= partial :'layouts/hotjar' %>
   <% end %>
-
-  <%= partial :'layouts/ga' %>
-  <%= partial :'layouts/pixel' %>
-  <%= partial :'layouts/simple_analytics' %>
-  <%= partial :'layouts/hotjar' %>
 
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
