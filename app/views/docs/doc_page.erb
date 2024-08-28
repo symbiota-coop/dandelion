@@ -1,6 +1,6 @@
 <script>
   $(function() {
-    $('#doc-body h2').css('padding-top', $('#header').height())
+    $('#doc-body h2:not(:first)').addClass('mt-5')
     $('#sticky-index').css('top', $('#header').height() + parseInt($('.content').css('paddingTop')))
   })
 </script>

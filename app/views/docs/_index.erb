@@ -1,3 +1,17 @@
+<script>
+  $(function() {
+    $('.doc-link').on('click', function(e) {
+      e.preventDefault();
+      var targetId = $(this).attr('href').split('#')[1];
+      var $target = $('#' + targetId);
+      var headerHeight = $('#header').outerHeight();
+      $('html, body').animate({
+        scrollTop: $target.offset().top - headerHeight
+      }, 500);
+    });
+  });
+</script>
+
 <ul class="list-unstyled" style="font-size: 1.5em">
   <% DocPage.order('priority desc').each { |doc_page| active = false %>
   <li>
@@ -5,7 +19,7 @@
     <% if active %>
       <ul style="list-style-type: square; font-size: 75%">
         <% doc_page.body.scan(/<h2>(.*?)<\/h2>/).each do |h2| %>
-          <li><a href="/docs/<%=doc_page.slug%>#<%=h2.first.parameterize%>"><%= h2.first %></a></li>
+          <li><a href="/docs/<%=doc_page.slug%>#<%=h2.first.parameterize%>" class="doc-link"><%= h2.first %></a></li>
         <% end %>
       </ul>
     <% end %>
