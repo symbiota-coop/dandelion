@@ -10,10 +10,21 @@
       src="https://app.termly.io/resource-blocker/<%=ENV["TERMLY_WEBSITE_UUID"]%>?autoBlock=on"
       ></script>
     <% end %>
+
     <%= partial :'layouts/ga' %>
     <%= partial :'layouts/pixel' %>
     <%= partial :'layouts/simple_analytics' %>
     <%= partial :'layouts/hotjar' %>
+
+    <% if current_account && ENV['NOLT_SSO_SECRET'] %>
+      <script async src="https://cdn.nolt.io/widgets.js"></script>
+      <script>
+        window.noltQueue=window.noltQueue||[];function nolt(){noltQueue.push(arguments)}
+      </script>
+      <script>
+        nolt('identify', { jwt: '<%= generate_nolt_token %>' });
+      </script>
+    <% end %>
   <% end %>
 
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -23,16 +34,6 @@
   <link href="/infinite_admin/plugins/icon/themify-icons/themify-icons.css" rel="stylesheet">
   <link href="/infinite_admin/plugins/bootstrap/bootstrap4/css/bootstrap.css" rel="stylesheet">
   <link href="/infinite_admin/plugins/animate/animate.min.css" rel="stylesheet">
-
-  <% if current_account && ENV['NOLT_SSO_SECRET'] %>
-    <script async src="https://cdn.nolt.io/widgets.js"></script>
-    <script>
-      window.noltQueue=window.noltQueue||[];function nolt(){noltQueue.push(arguments)}
-    </script>
-    <script>
-      nolt('identify', { jwt: '<%= generate_nolt_token %>' });
-    </script>
-  <% end %>
 
   <link rel="preconnect" href="https://cdnjs.cloudflare.com">
   <% {
@@ -109,7 +110,6 @@
   <script src="/infinite_admin/plugins/bootstrap/bootstrap4/js/bootstrap.js"></script>
   <script src="/infinite_admin/plugins/scrollbar/slimscroll/jquery.slimscroll.min.js"></script>
   <script src="/infinite_admin/js/apps.js?<%= @cachebuster %>"></script>
-
   <script>
     $(function () {
       App.init();
