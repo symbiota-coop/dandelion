@@ -12,115 +12,120 @@
     <div class="card-body p-2">
 
       <p class="lead">
-        <mark>Dandelion relies on your generosity.</mark>
-        The suggested donation is <% if organisation.fixed_fee %><%= m per_event, currency %> per event<% else%>5% of ticket sales per event, <u>capped at <%= m per_event, currency %></u><% end %>.
-      </p>
+        <mark>
+          Help us remain donation-based and ad-free.
+          <%= %w[🦄 🌈 🌸 🌻 🌼 ☘️ 🌱].sample %>
+        </mark>
 
-      <p class="lead">
-        <%= organisation.name %> has sold tickets to a total of <%= pluralize(c, 'event') %>
-        and contributed
-        <%= m p, currency %>
-        of a
-        <% if request.path.split('/').last == 'contribute' %>suggested <%= m r, currency %><% else %><a href="/o/<%=organisation.slug%>/contribute">suggested <%= m r, currency %></a><% end %><% if balance <= 0%>.<% else %><% if balance > per_event %>, leaving a balance of <%= m balance, currency %><% end %>.<% end %>
-      </p>
+        <p class="lead">
+          The suggested donation is <% if organisation.fixed_fee %><%= m per_event, currency %> per event<% else%>5% of ticket sales per event, <u>capped at <%= m per_event, currency %></u><% end %>.
+        </p>
 
-      <% if p == 0 %>
-        <% if r < organisation.contribution_threshold || organisation.contributable_events.count == 1 %>
-          <p class="mt-3">
-            Stay topped up and we'll continue to show your events in the main events section and on the Dandelion homepage.
-          </p>
-        <% elsif r > 0 %>
+        <p class="lead">
+          <%= organisation.name %> has sold tickets to a total of <%= pluralize(c, 'event') %>
+          and contributed
+          <%= m p, currency %>
+          of a
+          <% if request.path.split('/').last == 'contribute' %>suggested <%= m r, currency %><% else %><a href="/o/<%=organisation.slug%>/contribute">suggested <%= m r, currency %></a><% end %><% if balance <= 0%>.<% else %><% if balance > per_event %>, leaving a balance of <%= m balance, currency %><% end %>.<% end %>
+        </p>
+
+        <% if p == 0 %>
+          <% if r < organisation.contribution_threshold || organisation.contributable_events.count == 1 %>
+            <p class="mt-3">
+              Stay topped up and we'll continue to show your events in the main events section and on the Dandelion homepage.
+            </p>
+          <% elsif r > 0 %>
+            <div class="alert alert-warning">
+              <p class="mb-0">
+                Since you haven't been donating, your events are currently hidden from the main events section and the Dandelion homepage.            
+                Make a contribution and we'll show them again!
+              </p>
+            </div>
+          <% end %>
+        <% elsif p > 0 && r > 0 && !organisation.paid_up %>
           <div class="alert alert-warning">
             <p class="mb-0">
-              Since you haven't been donating, your events are currently hidden from the main events section and the Dandelion homepage.            
-              Make a contribution and we'll show them again!
+              Your events are only showing on the main events section and the Dandelion homepage <%=number_to_percentage w.to_f, precision: 0 %> of the time.            
+              Top up for more visibility!
             </p>
           </div>
         <% end %>
-      <% elsif p > 0 && r > 0 && !organisation.paid_up %>
-        <div class="alert alert-warning">
-          <p class="mb-0">
-            Your events are only showing on the main events section and the Dandelion homepage <%=number_to_percentage w.to_f, precision: 0 %> of the time.            
-            Top up for more visibility!
-          </p>
-        </div>
-      <% end %>
 
-      <% if w && w <= 100 %>
-        <div class="progress my-3" style="height: 30px">
-          <div class="progress-bar" role="progressbar" style="width: <%= "#{w}%" %>;">
-            <% if w > 0 %><%= w.to_f.round %>%<% end %>
-          </div>
-        </div>
-      <% end %>
-
-      <% form_tag '', class: 'form-inline mb-3', id: 'pay-form' do %>
-        <div class="form-group mb-1 mr-1">
-          <div class="input-group">
-            <div class="input-group-prepend">
-              <span class="input-group-text"><%=money_symbol(currency) %></span>
+        <% if w && w <= 100 %>
+          <div class="progress my-3" style="height: 30px">
+            <div class="progress-bar" role="progressbar" style="width: <%= "#{w}%" %>;">
+              <% if w > 0 %><%= w.to_f.round %>%<% end %>
             </div>
-            <%= hidden_field_tag :currency, value: currency %>
-            <%= text_field_tag :amount, style: 'width: 5em;', required: 'required', class: 'form-control', id: 'amount', value: (balance < per_event ? per_event : balance) %>
           </div>
-        </div>
-        <button data-payment-method="stripe" type="submit" class="btn btn-primary mb-1 ml-0 mr-1" style="height: 2.125rem">
-          Contribute via card
-          <i class="bi bi-spin bi-arrow-repeat" style="display: none"></i>
-        </button>
-        <%= hidden_field_tag :payment_method, value: 'stripe', disabled: true %>
-        <button data-payment-method="coinbase" type="submit" class="btn btn-outline-primary border-0 mb-1" style="height: 2.125rem">
-          via crypto
-          <i class="bi bi-spin bi-arrow-repeat" style="display: none"></i>
-        </button>
-        <%= hidden_field_tag :payment_method, value: 'coinbase', disabled: true %>
-      <% end %>
+        <% end %>
 
-      <p class="mb-0">
-        <% if organisation.stripe_customer_id %>
-          Auto top-up enabled using card ending in <%= organisation.card_last4 %>. <a href="/organisations/<%= organisation.id %>/clear_stripe_customer_id">Click to disable</a>
-        <% else %>
-          New: <a href="javascript:;" onclick="
+        <% form_tag '', class: 'form-inline mb-3', id: 'pay-form' do %>
+          <div class="form-group mb-1 mr-1">
+            <div class="input-group">
+              <div class="input-group-prepend">
+                <span class="input-group-text"><%=money_symbol(currency) %></span>
+              </div>
+              <%= hidden_field_tag :currency, value: currency %>
+              <%= text_field_tag :amount, style: 'width: 5em;', required: 'required', class: 'form-control', id: 'amount', value: (balance < per_event ? per_event : balance) %>
+            </div>
+          </div>
+          <button data-payment-method="stripe" type="submit" class="btn btn-primary mb-1 ml-0 mr-1" style="height: 2.125rem">
+            Contribute via card
+            <i class="bi bi-spin bi-arrow-repeat" style="display: none"></i>
+          </button>
+          <%= hidden_field_tag :payment_method, value: 'stripe', disabled: true %>
+          <button data-payment-method="coinbase" type="submit" class="btn btn-outline-primary border-0 mb-1" style="height: 2.125rem">
+            via crypto
+            <i class="bi bi-spin bi-arrow-repeat" style="display: none"></i>
+          </button>
+          <%= hidden_field_tag :payment_method, value: 'coinbase', disabled: true %>
+        <% end %>
+
+        <p class="mb-0">
+          <% if organisation.stripe_customer_id %>
+            Auto top-up enabled using card ending in <%= organisation.card_last4 %>. <a href="/organisations/<%= organisation.id %>/clear_stripe_customer_id">Click to disable</a>
+          <% else %>
+            New: <a href="javascript:;" onclick="
                $.post('/organisations/<%= organisation.id %>/stripe_setup', $(this).serializeObject(), function (data) {
                   var stripe = Stripe('<%= ENV['STRIPE_PK'] %>');
                   stripe.redirectToCheckout({sessionId: data['session_id']})                        
                 })
         ">Enter your card details to remain automatically topped up</a>
-          <br />
-          When you fall below 80% of the suggested amount, we'll top you up to 100%. Your events will always be visible in the main events section and on the Dandelion homepage.
-        <% end %>
-      </p>
+            <br />
+            When you fall below 80% of the suggested amount, we'll top you up to 100%. Your events will always be visible in the main events section and on the Dandelion homepage.
+          <% end %>
+        </p>
 
-      <script>
-        $(function () {
+        <script>
+          $(function () {
 
-          $('#pay-form button[data-payment-method]').click(function () {
-            $('input[type=hidden][name=payment_method]').attr('disabled', true)
-            $('input[type=hidden][name=payment_method][value=' + $(this).attr('data-payment-method') + ']').removeAttr('disabled')
-            $(this).attr('data-payment-method-clicked', true)
-          })
-
-          $('#pay-form').submit(function () {
-            $('#pay-form button[data-payment-method-clicked] i').show()
-            $.post('/organisations/<%= organisation.id %>/pay', $(this).serializeObject(), function (data) {
-              if (data['session_id']) {
-                var stripe = Stripe('<%= ENV['STRIPE_PK'] %>');
-                stripe.redirectToCheckout({sessionId: data['session_id']})
-              } else if (data['checkout_id']) {
-                window.location = 'https://commerce.coinbase.com/checkout/' + data['checkout_id']
-              }
-            }).fail(function () {
-              $('#pay-form').hide()
-            }).always(function () {
-              $('#pay-form').css('opacity', 1)
+            $('#pay-form button[data-payment-method]').click(function () {
+              $('input[type=hidden][name=payment_method]').attr('disabled', true)
+              $('input[type=hidden][name=payment_method][value=' + $(this).attr('data-payment-method') + ']').removeAttr('disabled')
+              $(this).attr('data-payment-method-clicked', true)
             })
 
-            return false
+            $('#pay-form').submit(function () {
+              $('#pay-form button[data-payment-method-clicked] i').show()
+              $.post('/organisations/<%= organisation.id %>/pay', $(this).serializeObject(), function (data) {
+                if (data['session_id']) {
+                  var stripe = Stripe('<%= ENV['STRIPE_PK'] %>');
+                  stripe.redirectToCheckout({sessionId: data['session_id']})
+                } else if (data['checkout_id']) {
+                  window.location = 'https://commerce.coinbase.com/checkout/' + data['checkout_id']
+                }
+              }).fail(function () {
+                $('#pay-form').hide()
+              }).always(function () {
+                $('#pay-form').css('opacity', 1)
+              })
 
+              return false
+
+            })
           })
-        })
-      </script>
+        </script>
 
+      </div>
     </div>
-  </div>
-<% end %>
+  <% end %>
