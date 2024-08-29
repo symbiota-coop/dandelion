@@ -1,6 +1,7 @@
-namespace :page_views do
-  task delete_old: :environment do
+namespace :tidy_up do
+  task delete_all: :environment do
     PageView.and(:created_at.lt => 30.days.ago).delete_all
+    SignIn.and(:created_at.lt => 1.year.ago).delete_all
   end
 end
 
