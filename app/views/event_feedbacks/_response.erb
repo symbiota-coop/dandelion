@@ -1,4 +1,4 @@
 <% form_tag "/event_feedbacks/#{@event_feedback.id}/response" do %>
-  <%= text_area_tag :response, onblur: '$(this).next().click()', class: 'form-control autosize', value: @event_feedback.response, placeholder: 'Your public response to this feedback' %>
+  <%= text_area_tag :response, onblur: '$(this).next().click()', class: 'form-control autosize', value: @event_feedback.response, placeholder: "#{@event_feedback.event.organisation.name}'s public response to this feedback" %>
   <%= submit_tag 'Save', class: 'd-none' %>
 <% end %>
