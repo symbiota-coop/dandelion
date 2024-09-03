@@ -22,7 +22,7 @@ class CoreTest < ActiveSupport::TestCase
     fill_in 'Email', with: @account.email
     fill_in 'Location', with: @account.location
     click_button 'Sign up'
-    fill_in 'Name', with: @organisation.name
+    fill_in 'Organisation name', with: @organisation.name
     fill_in 'Slug', with: @organisation.slug
     click_button 'Save and continue'
     fill_in 'Stripe public key', with: @organisation.stripe_pk
