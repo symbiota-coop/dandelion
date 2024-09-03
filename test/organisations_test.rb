@@ -18,7 +18,7 @@ class CoreTest < ActiveSupport::TestCase
     click_link 'Organisations'
     click_link 'All organisations'
     click_link 'Create an organisation'
-    fill_in 'Name', with: @organisation.name
+    fill_in 'Organsiation name', with: @organisation.name
     fill_in 'Slug', with: @organisation.slug
     click_button 'Save and continue'
     assert page.has_content? 'Update organisation'
