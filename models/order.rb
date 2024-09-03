@@ -335,9 +335,10 @@ class Order
     else
       Stripe::Refund.create(charge: pi.charges.first.id)
     end
-    # rescue Stripe::InvalidRequestError
-    #   true
-    # end
+  rescue Stripe::InvalidRequestError => e
+    raise e unless e.message.include?('already been refunded')
+
+    true
   end
 
   def metadata
