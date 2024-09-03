@@ -29,7 +29,7 @@ class CoreTest < ActiveSupport::TestCase
     @organisation = FactoryBot.create(:organisation, account: @account)
     login_as(@account)
     visit "/o/#{@organisation.slug}/edit"
-    fill_in 'Name', with: (name = FactoryBot.build_stubbed(:organisation).name)
+    fill_in 'Organisation name', with: (name = FactoryBot.build_stubbed(:organisation).name)
     click_button 'Update organisation'
     assert page.has_content? 'The organisation was saved'
     assert page.has_content? name
