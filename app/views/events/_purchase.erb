@@ -60,7 +60,7 @@ end
               <i data-toggle="tooltip" title="Available to those donating <%=m ticket_type.minimum_monthly_donation, @event.currency%>+/month" class="bi bi-lock"></i>
             <% end %>
           </td>
-          <td style="<% if i == 0 %>border-top: 0;<% end %> <% if ticket_type.photos.count > 0 %>border-bottom: 0;<% end %>;">
+          <td style="min-width: 8em; <% if i == 0 %>border-top: 0;<% end %> <% if ticket_type.photos.count > 0 %>border-bottom: 0;<% end %>">
             <% if ticket_type.range %>
               <span><%= m ticket_type.range_min, @event.currency %> - <%= m ticket_type.range_max, @event.currency %></span>
               <%= range_field_tag :"prices[#{ticket_type.id}]",
