@@ -75,7 +75,7 @@ end
                 <div class="input-group-prepend">
                   <span class="input-group-text"><%= money_symbol(@event.currency) %></span>
                 </div>
-                <%= text_field_tag :"prices[#{ticket_type.id}]", class: 'form-control',
+                <%= number_field_tag :"prices[#{ticket_type.id}]", min: 1, class: 'form-control',
               oninput: "$(this).parent().parent().next().find('.select-a-price-first').hide(); $(this).parent().parent().next().find('[name^=quantities]').attr('data-price',this.value).prop('disabled',false).change();" %>
               </div>
             <% end %>
