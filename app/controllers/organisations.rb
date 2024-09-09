@@ -331,9 +331,10 @@ Dandelion::App.controller do
       erb :'organisations/orders'
     when :csv
       CSV.generate do |csv|
-        csv << %w[name email value currency opt_in_organisation opt_in_facilitator hear_about answers created_at]
+        row = %w[name email value currency opt_in_organisation opt_in_facilitator hear_about created_at]
+        csv << row
         @orders.each do |order|
-          csv << [
+          row = [
             order.account ? order.account.name : '',
             if order_email_viewer?(order)
               order.account ? order.account.email : ''
@@ -345,9 +346,9 @@ Dandelion::App.controller do
             order.opt_in_organisation,
             order.opt_in_facilitator,
             order.hear_about,
-            order.answers,
             order.created_at.to_fs(:db_local)
           ]
+          csv << row
         end
       end
     end
