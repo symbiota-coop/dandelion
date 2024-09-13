@@ -59,9 +59,6 @@
       <td>
         <%=tickets.count%>
       </td>
-      <td>
-
-      </td>
       <td data-sort="<%=organisation.created_at.to_fs(:db_local)%>"><%=organisation.created_at%></td>
       <% r = organisation.contribution_requested %>
       <% p = organisation.contribution_paid %>
