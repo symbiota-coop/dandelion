@@ -19,8 +19,6 @@
 <p class="lead mt-3">
   <%= pluralize(organisations.count, 'organisation') %> sold
   <%= pluralize(tickets.count, 'ticket') %>
-  worth
-  <%= s = Money.new(0,'GBP'); orders.each { |o| s+= Money.new(o.value*100, o.currency) }; s.exchange_to('GBP').format(no_cents: true) %>
 </p>
 
 <div class="mt-3">
