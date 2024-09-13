@@ -2,13 +2,30 @@
   $(function() {
     $('.doc-link').on('click', function(e) {
       e.preventDefault();
-      var targetId = $(this).attr('href').split('#')[1];
+      var href = $(this).attr('href');
+      history.pushState(null, null, href);
+      scrollToTarget(href);
+    });
+
+    function scrollToTarget(href) {
+      var targetId = href.split('#')[1];
       var $target = $('#' + targetId);
       var headerHeight = $('#header').outerHeight();
       $('html, body').animate({
         scrollTop: $target.offset().top - headerHeight
       }, 500);
+    }
+
+    $(window).on('popstate', function() {
+      if (window.location.hash) {
+        scrollToTarget(window.location.hash);
+      }
     });
+
+    if (window.location.hash) {
+      window.scrollTo(0, 0);
+      scrollToTarget(window.location.hash);
+    }
   });
 </script>
 
