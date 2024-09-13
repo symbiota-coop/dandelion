@@ -4,7 +4,7 @@
   <link rel="manifest" href="/manifest.json">
 
   <% if Padrino.env == :production %>
-    <% if !params[:minimal] %>
+    <% if !params[:minimal] && !params[:ticket_form_only] %>
       <script
       type="text/javascript"
       src="https://app.termly.io/resource-blocker/<%=ENV["TERMLY_WEBSITE_UUID"]%>?autoBlock=on"
