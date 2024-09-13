@@ -38,7 +38,7 @@
                         id: '<%= organisation.id %>',
                         slug: '<%= organisation.slug %>',
                         name: <%== CGI.unescapeHTML(Sanitize.fragment(organisation.name)).to_json %>,
-                        weight: <%= organisation.followers_count %>,
+                        weight: <%= w = organisation.followers_count %>,
                         width: (node_min_width + <%= w %>),
                         color: scale(node_min_color + <%= w %>/node_color_scale).hex()
                       }
