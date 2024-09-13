@@ -19,9 +19,11 @@
 
   scale = chroma.scale(['#00B963', '#00B963']);
 
-  node_min_width = 0
   node_min_color = 0
   node_color_scale = 1
+  node_min_width = 0
+  node_width_scale = 20
+
   edge_min_color = 0
   edge_color_scale = 1
   edge_min_opacity = 0.25
@@ -39,7 +41,7 @@
                         slug: '<%= organisation.slug %>',
                         name: <%== CGI.unescapeHTML(Sanitize.fragment(organisation.name)).to_json %>,
                         weight: <%= w = organisation.followers_count %>,
-                        width: (node_min_width + <%= w %>),
+                        width: (node_min_width + <%= w %>/node_width_scale),
                         color: scale(node_min_color + <%= w %>/node_color_scale).hex()
                       }
                     },
