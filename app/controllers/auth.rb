@@ -13,7 +13,7 @@ Dandelion::App.controller do
                   @provider = Provider.object(env['omniauth.auth']['provider'])
                   ProviderLink.find_by(provider: @provider.display_name, provider_uid: env['omniauth.auth']['uid']).try(:account)
                 end
-      if current_account # already signed in; attempt to connect
+      if current_account && env['omniauth.auth']['provider'] != 'account' # already signed in; attempt to connect
         if account # someone's already connected
           flash[:error] = "Someone's already connected to that account!"
         else # connect; Account never reaches here
