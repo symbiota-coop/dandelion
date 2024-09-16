@@ -198,10 +198,12 @@ class Activity
 
   def send_followers_csv(account)
     csv = CSV.generate do |csv|
-      csv << %w[name email unsubscribed]
+      csv << %w[name firstname lastname email unsubscribed]
       activityships.each do |activityship|
         csv << [
           activityship.account.name,
+          activityship.account.firstname,
+          activityship.account.lastname,
           Organisation.admin?(organisation, account) ? activityship.account.email : '',
           (1 if activityship.unsubscribed)
         ]
@@ -233,10 +235,12 @@ class Activity
 
   def send_applications_csv(account)
     csv = CSV.generate do |csv|
-      csv << %w[name email location gender application_date word_count status statused_by statused_at answers]
+      csv << %w[name firstname lastname email location gender application_date word_count status statused_by statused_at answers]
       activity_applications.each do |activity_application|
         csv << [
           activity_application.account.name,
+          activity_application.account.firstname,
+          activity_application.account.lastname,
           activity_application.account.email,
           activity_application.account.location,
           activity_application.account.gender,

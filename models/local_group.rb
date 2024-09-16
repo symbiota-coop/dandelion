@@ -125,10 +125,12 @@ class LocalGroup
 
   def send_followers_csv(account)
     csv = CSV.generate do |csv|
-      csv << %w[name email unsubscribed]
+      csv << %w[name firstname lastname email unsubscribed]
       local_groupships.each do |local_groupship|
         csv << [
           local_groupship.account.name,
+          local_groupship.account.firstname,
+          local_groupship.account.lastname,
           Organisation.admin?(organisation, account) ? local_groupship.account.email : '',
           (1 if local_groupship.unsubscribed)
         ]

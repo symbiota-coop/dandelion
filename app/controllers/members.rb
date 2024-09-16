@@ -17,13 +17,15 @@ Dandelion::App.controller do
       erb :'gatherings/members'
     when :csv
       CSV.generate do |csv|
-        row = %w[name email proposed_by accepted_at options requested_contribution paid]
+        row = %w[name firstname lastname email proposed_by accepted_at options requested_contribution paid]
         @gathering.joining_questions_a.each { |q| row << q }
         @gathering.application_questions_a.each { |q| row << q }
         csv << row
         @memberships.each do |membership|
           row = [
             membership.account.name,
+            membership.account.firstname,
+            membership.account.lastname,
             membership.account.email,
             (membership.proposed_by.map(&:name).to_sentence(last_word_connector: ' and ') if membership.proposed_by),
             membership.created_at.to_fs(:db_local),

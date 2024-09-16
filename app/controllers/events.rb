@@ -478,10 +478,12 @@ Dandelion::App.controller do
       end
     when :csv
       CSV.generate do |csv|
-        csv << %w[name email ordered_for_name ordered_for_email ticket_type price currency created_at checked_in_at]
+        csv << %w[name firstname lastname email ordered_for_name ordered_for_email ticket_type price currency created_at checked_in_at]
         @tickets.each do |ticket|
           csv << [
             ticket.account ? ticket.account.name : '',
+            ticket.account ? ticket.account.firstname : '',
+            ticket.account ? ticket.account.lastname : '',
             ticket.account && ticket_email_viewer?(ticket) ? ticket.account.email : '',
             ticket.name,
             ticket_email_viewer?(ticket) ? ticket.email : '',
@@ -607,12 +609,14 @@ Dandelion::App.controller do
       end
     when :csv
       CSV.generate do |csv|
-        row = %w[name email value currency opt_in_organisation opt_in_facilitator hear_about created_at]
+        row = %w[name firstname lastname email value currency opt_in_organisation opt_in_facilitator hear_about created_at]
         @event.questions_a.each { |q| row << q }
         csv << row
         @orders.each do |order|
           row = [
             order.account ? order.account.name : '',
+            order.account ? order.account.firstname : '',
+            order.account ? order.account.lastname : '',
             if order_email_viewer?(order)
               order.account ? order.account.email : ''
             else

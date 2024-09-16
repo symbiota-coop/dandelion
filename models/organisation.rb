@@ -855,10 +855,12 @@ class Organisation
 
   def send_followers_csv(account)
     csv = CSV.generate do |csv|
-      csv << %w[name email unsubscribed monthly_donation_method monthly_donation_amount monthly_donation_currency monthly_donation_start_date]
+      csv << %w[name firstname lastname email unsubscribed monthly_donation_method monthly_donation_amount monthly_donation_currency monthly_donation_start_date]
       organisationships.each do |organisationship|
         csv << [
           organisationship.account.name,
+          organisationship.account.firstname,
+          organisationship.account.lastname,
           Organisation.admin?(self, account) ? organisationship.account.email : '',
           (1 if organisationship.unsubscribed),
           organisationship.monthly_donation_method,

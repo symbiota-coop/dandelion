@@ -331,11 +331,13 @@ Dandelion::App.controller do
       erb :'organisations/orders'
     when :csv
       CSV.generate do |csv|
-        row = %w[name email value currency opt_in_organisation opt_in_facilitator hear_about created_at]
+        row = %w[name firstname lastname email value currency opt_in_organisation opt_in_facilitator hear_about created_at]
         csv << row
         @orders.each do |order|
           row = [
             order.account ? order.account.name : '',
+            order.account ? order.account.firstname : '',
+            order.account ? order.account.lastname : '',
             if order_email_viewer?(order)
               order.account ? order.account.email : ''
             else
