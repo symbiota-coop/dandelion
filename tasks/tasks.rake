@@ -1,3 +1,22 @@
+namespace :dump do
+  task code: :environment do
+    content = ''
+    allowed_file_extensions = %w[css js erb rake rb]
+    Dir.glob('**/*').each do |file|
+      next if File.directory?(file)
+      next if file.starts_with?('app/assets/infinite_admin')
+      next if file.starts_with?('app/assets/javascripts/ext')
+      next unless allowed_file_extensions.include?(File.extname(file).delete('.'))
+
+      puts file
+      content += "# #{file}\n\n"
+      content += File.read(file)
+      content += "\n\n"
+    end
+    File.write('code.md', content)
+  end
+end
+
 namespace :tidy_up do
   task delete_all: :environment do
     PageView.and(:created_at.lt => 30.days.ago).delete_all
