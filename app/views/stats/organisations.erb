@@ -73,15 +73,13 @@
       <% w = organisation.fraction_paid*100 if organisation.fraction_paid %>
       <% balance = r - p %>
       <td data-sort="<%=organisation.fraction_paid%>">
-        <%=m p, organisation.currency%>/<%=m r, organisation.currency%>
+        <%=m p, 'GBP'%>/<%=m r, 'GBP'%>
 
-        <% if w && w <= 100 %>
-          <div class="progress my-3" style="height: 30px">
-            <div class="progress-bar" role="progressbar" style="width: <%= "#{w}%" %>;">
-              <% if w > 0 %><%= w.to_f.round %>%<% end %>
-            </div>
+        <div class="progress my-3" style="height: 30px">
+          <div class="progress-bar" role="progressbar" style="width: <%= "#{w}%" %>;">
+            <% if w > 0 %><%= w.to_f.round %>%<% end %>
           </div>
-        <% end %>
+        </div>
 
       </td>
       <td data-sort="<%=balance%>">

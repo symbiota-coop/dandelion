@@ -67,13 +67,14 @@
       #payment-methods img.optimism { opacity: 0.5 }
       #payment-methods img.gnosis { opacity: 0.75 }
       #payment-methods img.base { opacity: 0.66 }
+      #payment-methods img.bread { opacity: 0.66 }
     </style>
     <div id="payment-methods" class="row align-items-center mb-5 px-0 px-lg-3 mb-lg-3">
       <% {
         'stripe' => 'https://stripe.com/gb/pricing',
         'coinbase-commerce' => 'https://help.coinbase.com/en/commerce/getting-started/fees',
         'opencollective' => 'https://opencollective.com/',
-        'optimism' => 'https://optimism.io/',        
+        'bread' => 'https://breadchain.xyz/',
         'celo' => 'https://celo.org/',        
       }.each do |k, v| %>
         <div class="col">
