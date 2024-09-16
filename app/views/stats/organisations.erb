@@ -39,6 +39,8 @@
         <th data-col-name="tickets">Tickets</th>
         <th data-col-name="value">Value</th>
         <th data-col-name="created_at">Created at</th>
+        <th data-col-name="contribution">Contribution</th>
+        <th data-col-name="remaining">Remaining</th>
       </tr>
     </thead>
     <% organisations = Organisation.and(:id.in => Event.and(:id.in => Order.and(:created_at.gte => @from, :created_at.lt => @to + 1.day, :value.ne => nil).pluck(:event_id)).pluck(:organisation_id)) %>
@@ -65,6 +67,26 @@
         <%= orders_sum.format(no_cents: true) %>
       </td>
       <td data-sort="<%=organisation.created_at.to_fs(:db_local)%>"><%=organisation.created_at%></td>
+
+      <% r = organisation.contribution_requested_gbp_cache %>
+      <% p = organisation.contribution_paid_gbp_cache %>
+      <% w = organisation.fraction_paid*100 if organisation.fraction_paid %>
+      <td data-sort="<%=organisation.fraction_paid%>">
+        <%=m p, organisation.currency%>/<%=m r, organisation.currency%>
+
+        <% if w && w <= 100 %>
+          <div class="progress my-3" style="height: 30px">
+            <div class="progress-bar" role="progressbar" style="width: <%= "#{w}%" %>;">
+              <% if w > 0 %><%= w.to_f.round %>%<% end %>
+            </div>
+          </div>
+        <% end %>
+
+      </td>
+      <td data-sort="<%=organisation.contribution_remaining.exchange_to('GBP')%>">
+        <%=m organisation.contribution_remaining, organisation.currency%>
+      </td>
+
     </tr>
     <% } %>
   </table>
