@@ -71,6 +71,7 @@
       <% r = organisation.contribution_requested_gbp_cache %>
       <% p = organisation.contribution_paid_gbp_cache %>
       <% w = organisation.fraction_paid*100 if organisation.fraction_paid %>
+      <% balance = r - p %>
       <td data-sort="<%=organisation.fraction_paid%>">
         <%=m p, organisation.currency%>/<%=m r, organisation.currency%>
 
@@ -83,8 +84,8 @@
         <% end %>
 
       </td>
-      <td data-sort="<%=organisation.contribution_remaining.exchange_to('GBP')%>">
-        <%=m organisation.contribution_remaining, organisation.currency%>
+      <td data-sort="<%=balance.exchange_to('GBP')%>">
+        <%=m balance, organisation.currency%>
       </td>
 
     </tr>
