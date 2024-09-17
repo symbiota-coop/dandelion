@@ -10,36 +10,38 @@
       <h1>
         <a href="/o/<%= @organisation.slug %>"><%= @organisation.name %></a> members' area
       </h1>
-      <% if !@organisationship.hide_membership? %>
+      <% if @organisationship &&!@organisationship.hide_membership? %>
         <a class="btn btn-primary mb-1" href="/o/<%= @organisation.slug %>/show_membership/0">Membership public</a>
       <% else %>
         <a class="btn btn-outline-primary mb-1" href="/o/<%= @organisation.slug %>/show_membership/1">Membership hidden</a>
       <% end %>
       <div class="d-block d-lg-inline-block">
-        <% if @organisationship.referrer %>
+        <% if @organisationship && @organisationship.referrer %>
           <a href="javascript:;" onclick="$(this).hide();
               $('#set_referrer').show()">Referred by <%= @organisationship.referrer.name %></a>
         <% end %>
-        <% if @organisationship.hide_referrer %>
+        <% if @organisationship && @organisationship.hide_referrer %>
           <a class="btn btn-primary mb-1" href="javascript:;" onclick="$(this).hide();
               $('#set_referrer').show()">Credit referrer</a>
         <% end %>
       </div>
-      <% if @organisationship.credit_balance > 0 %>
+      <% if @organisationship && @organisationship.credit_balance > 0 %>
         <div class="mt-1 mb-2">
           <a class="label label-primary text-white" href="/organisationships/<%= @organisationship.id %>/credit_balance"><big><%= m @organisationship.credit_balance, @organisation.currency %> credit</big></a>
         </div>
       <% end %>
-      <div class="card" id="set_referrer" <% if @organisationship.referrer || @organisationship.hide_referrer %> style="display: none"<% end %>>
-        <div class="card-body">
-          <h4 class="card-title">Credit someone for suggesting you join <%= @organisation.name %></h4>
-          <% form_for @organisationship, "/organisationships/#{@organisationship.id}/referrer" do |f| %>
-            <%= f.lookup_block :referrer_id, lookup_url: '/accounts.json', placeholder: 'Search accounts' %>
-            <button class="btn btn-primary" type="submit">Submit</button>
-            <a href="/organisationships/<%= @organisationship.id %>/hide_referrer" class="btn btn-danger">Hide</a>
-          <% end %>
+      <% if @organisationship %>
+        <div class="card" id="set_referrer" <% if @organisationship.referrer || @organisationship.hide_referrer %> style="display: none"<% end %>>
+          <div class="card-body">
+            <h4 class="card-title">Credit someone for suggesting you join <%= @organisation.name %></h4>
+            <% form_for @organisationship, "/organisationships/#{@organisationship.id}/referrer" do |f| %>
+              <%= f.lookup_block :referrer_id, lookup_url: '/accounts.json', placeholder: 'Search accounts' %>
+              <button class="btn btn-primary" type="submit">Submit</button>
+              <a href="/organisationships/<%= @organisationship.id %>/hide_referrer" class="btn btn-danger">Hide</a>
+            <% end %>
+          </div>
         </div>
-      </div>
+      <% end %>
     </div>
   </div>
 </div>
