@@ -30,11 +30,7 @@
   </div>
 <% end %>
 
-<% if @event.locked? %>
-  <div class="alert alert-warning">
-    This event is currently locked and visible to event admins only.
-  </div>
-<% end %>
+<%= partial :'events/locked' %>
 
 <% if @event.new_record? %>
   <% begin %>

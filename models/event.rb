@@ -852,6 +852,10 @@ class Event
     location != 'Online'
   end
 
+  def paid_tickets?
+    ticket_types.any? { |ticket_type| (ticket_type.price && ticket_type.price > 0) || ticket_type.range }
+  end
+
   def self.trending
     live.public.legit.future.and(:image_uid.ne => nil, :hide_from_trending.ne => true).and(
       :organisation_id.in => Organisation.and(paid_up: true).pluck(:id)

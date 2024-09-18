@@ -135,7 +135,7 @@
               <p class="m-0">To accept payments, now add your Stripe and/or Coinbase Commerce details.</p>
             </div>
           <% else %>
-            <% if !@organisation.stripe_sk && !@organisation.coinbase_api_key %>
+            <% if !@organisation.payment_method? %>
               <div class="alert alert-warning">
                 <p class="m-0"><i class="bi bi-exclamation-triangle-fill"></i> To accept payments, you must add either Stripe or Coinbase Commerce details.</p>
               </div>

@@ -1,0 +1,13 @@
+<% if @event.locked? || (@event.organisation && !@event.organisation.payment_method? && @event.paid_tickets?) %>
+  <div class="alert alert-warning">
+    <p class="mb-0">
+      <i class="bi bi-exclamation-triangle-fill"></i>
+      <% if @event.locked? %>
+        This event is currently locked and visible to event admins only.
+      <% end %>
+      <% if @event.organisation && !@event.organisation.payment_method? && @event.paid_tickets? %>
+        You must <a class="text-warning text-underline" href="/o/<%=@event.organisation.slug%>/edit">add either Stripe or Coinbase Commerce details in the Payments tab of your organisation</a> to take payments.
+      <% end %>
+    </p>
+  </div>
+<% end %>
