@@ -156,7 +156,7 @@ end
                               })
                               var answers = []
                               $('[name^=answers]').each(function() {
-                                answers.push($(this).is(':checkbox') ? $(this).is(':checked') : $(this).val())
+                                answers.push($(this).is(':checkbox') ? $(this).is(':checked') : ($(this).val() || '__EMPTY__'))
                               })
                               qs['quantities'] = quantities
                               qs['answers'] = answers
@@ -193,7 +193,7 @@ end
                               })
                               var answers = []
                               $('[name^=answers]').each(function() {
-                                answers.push($(this).is(':checkbox') ? $(this).is(':checked') : $(this).val())
+                                answers.push($(this).is(':checkbox') ? $(this).is(':checked') : ($(this).val() || '__EMPTY__'))
                               })                              
                               qs['quantities'] = quantities
                               qs['answers'] = answers
@@ -373,7 +373,7 @@ end
       <% else %>
         <label><%== Sanitize.fragment(Rinku.auto_link(q), Sanitize::Config::DANDELION) %></label>
         <div>
-          <%= text_area_tag "answers[#{i}]", required: q.ends_with?('*'), class: 'autosize form-control', value: (params[:answers][i] if params[:answers]) %>
+          <%= text_area_tag "answers[#{i}]", required: q.ends_with?('*'), class: 'autosize form-control', value: (params[:answers][i] if params[:answers] && params[:answers][i] != '__EMPTY__') %>
         </div>
       <% end %>
     </div>
