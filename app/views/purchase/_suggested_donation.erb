@@ -1,0 +1,33 @@
+<% if @event.suggested_donation %>
+  <tr>
+    <td></td>
+    <td></td>
+    <td>
+      <strong>
+        <%== Sanitize.fragment(@event.add_a_donation_to || @event.organisation.add_a_donation_to || "Add a donation to #{@event.organisation.name}", Sanitize::Config::DANDELION) %>
+        <%= "(minimum #{m @event.minimum_donation, @event.currency})" if @event.minimum_donation && @event.minimum_donation > 0 %>
+      </strong>
+      <div class="input-group" style="margin: 5px 0">
+        <div class="input-group-prepend">
+          <span class="input-group-text"><%= money_symbol(@event.currency) %></span>
+        </div>
+        <% if @event.minimum_donation %>
+          <script>
+            $(function() {
+              $('#donation_amount').change(function() {
+                if ($(this).val() < <%=@event.minimum_donation%>)
+                  $(this).val('<%=@event.minimum_donation%>')
+              })
+            })
+          </script>
+        <% end %>
+        <%= number_field_tag :donation_amount, id: 'donation_amount', class: 'form-control', style: 'width: 5em', value: @event.suggested_donation, min: (@event.minimum_donation || 0) %>
+      </div>
+      <% if (Padrino.env == :development || @organisation.verified?) && (@event.donation_text || @event.organisation.donation_text) %>
+        <%== @event.donation_text || @event.organisation.donation_text %>
+      <% else %>
+        <%== Sanitize.fragment(@event.donation_text || @event.organisation.donation_text, Sanitize::Config::DANDELION) %>
+      <% end %>
+    </td>
+  </tr>
+<% end %>

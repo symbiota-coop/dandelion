@@ -1,0 +1,93 @@
+<% if @event.all_discount_codes.count > 0 %>
+  <tr>
+    <td></td>
+    <td></td>
+    <td>
+      <strong>Apply a code</strong>
+      <% if discount_code %>
+        <div class="input-group" style="margin: 5px 0">
+          <%= text_field_tag :discount_code_display, id: 'discount_code_display', class: 'form-control', style: 'width: 5em', disabled: true, value: params[:discount_code].upcase %>
+          <%= hidden_field_tag :discount_code_id, id: 'discount_code_id', value: discount_code.id %>
+          <div class="input-group-append">
+            <button class="btn btn-outline-secondary" type="button" onclick="
+                              var qs = $.deparam(window.location.search.substring(1))
+                              delete qs['discount_code']
+                              var quantities = {}
+                              $('#ticket-types form select[data-ticket-type-id]').each(function() {
+                                quantities[$(this).attr('data-ticket-type-id')] = $(this).val()
+                              })
+                              var answers = []
+                              $('[name^=answers]').each(function() {
+                                answers.push($(this).is(':checkbox') ? $(this).is(':checked') : ($(this).val() || '__EMPTY__'))
+                              })
+                              qs['quantities'] = quantities
+                              qs['answers'] = answers
+                              window.location = window.location.pathname + '?' + $.param(qs) + '#select-tickets'
+                              ">Remove</button>
+          </div>
+        </div>
+        <% if discount_code.percentage_discount %>
+          <strong>Discount applied</strong>
+          <div class="input-group" style="margin: 5px 0">
+            <% if discount_code.percentage_discount %>
+              <%= number_field_tag :percentage_discount, id: 'percentage_discount', class: 'form-control', style: 'width: 5em', disabled: true, value: discount_code.percentage_discount %>
+              <div class="input-group-append">
+                <span class="py-0 input-group-text">%</span>
+              </div>
+            <% end %>
+          </div>
+        <% end %>
+      <% else %>
+        <% if params[:discount_code] %>
+          <div class="alert alert-danger my-1">
+            <p class="mb-0">The code you entered is not valid</p>
+          </div>
+        <% end %>
+        <div class="input-group" style="margin: 5px 0">
+          <%= text_field_tag :discount_code, id: 'discount_code', class: 'form-control', style: 'width: 5em' %>
+          <div class="input-group-append">
+            <button class="btn btn-outline-secondary" style="padding: 0 0.75rem" type="button" onclick="
+                              var qs = $.deparam(window.location.search.substring(1))
+                              qs['discount_code'] = $('#discount_code').val()
+                              var quantities = {}
+                              $('#ticket-types form select[data-ticket-type-id]').each(function() {
+                                quantities[$(this).attr('data-ticket-type-id')] = $(this).val()
+                              })
+                              var answers = []
+                              $('[name^=answers]').each(function() {
+                                answers.push($(this).is(':checkbox') ? $(this).is(':checked') : ($(this).val() || '__EMPTY__'))
+                              })                              
+                              qs['quantities'] = quantities
+                              qs['answers'] = answers
+                              window.location = window.location.pathname + '?' + $.param(qs) + '#select-tickets'
+                              ">Apply</button>
+          </div>
+        <% end %>
+      </div>
+    </td>
+  </tr>
+<% end %>
+
+<% if !params[:discount_code] && current_account && (organisationship_for_discount = @event.organisationship_for_discount(current_account)) %>
+  <% if @event.no_discounts %>
+    <tr>
+      <td colspan="3" class="text-muted">
+        Membership discounts do not apply to this event.
+      </td>
+    </tr>
+  <% else %>
+    <tr>
+      <td></td>
+      <td></td>
+      <td>
+        <strong><%= organisationship_for_discount.organisation_tier.name %> discount</strong>
+        <div class="input-group" style="margin: 5px 0">
+          <%= number_field_tag :discount, id: 'discount', class: 'form-control', style: 'width: 5em', disabled: true, value: organisationship_for_discount.monthly_donor_discount %>
+          <div class="input-group-append">
+            <span class="py-0 input-group-text">%</span>
+          </div>
+        </div>
+      </td>
+    </tr>
+  <% end %>
+<% end %>

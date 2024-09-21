@@ -1,0 +1,314 @@
+<%
+discount_code = nil
+if params[:discount_code]
+  discount_code = @event.all_discount_codes.find_by(code: params[:discount_code].upcase)
+  if discount_code
+    discount_code = nil if !discount_code.applies_to?(@event)
+    discount_code = nil if discount_code.maximum_uses && discount_code.orders.count >= discount_code.maximum_uses
+  end
+end
+%>
+
+<div class="card mb-3 <% if @event.no_discounts %>no-discounts<% end %>" id="select-tickets">
+  <h3 class="card-header bg-primary text-white"><%= @event.select_tickets_title || 'Select tickets' %></h3>
+  <div class="card-body">
+    <% if @event.past? %>
+      <% if @event.recording? %>
+        <div class="alert alert-success">
+          <p class="mb-0">Access a recording of this event that started on <%=@event.start_time.to_date%> 🍿</p>
+        </div>
+      <% else %>
+        <div class="alert alert-danger">
+          <p class="mb-0">This event started <%= time_ago_in_words @event.start_time %> ago</p>
+        </div>
+      <% end %>
+    <% end %>
+    <% if @event.select_tickets_intro %>
+      <table class="table table-borderless mb-0">
+        <tr>
+          <td>
+            <%== Sanitize.fragment(Rinku.auto_link(@event.select_tickets_intro), Sanitize::Config::DANDELION) %>
+          </td>
+        </tr>
+      </table>
+    <% end %>
+
+    <div id="ticket-types">
+      <% form_tag '' do %>
+        <%= hidden_field_tag :cohost, value: params[:cohost] %>
+        <%= hidden_field_tag :affiliate_type, value: params[:affiliate_type] %>
+        <%= hidden_field_tag :affiliate_id, value: params[:affiliate_id] %>
+
+        <table class="table">
+
+          <% @no_ticket_groups = @event.ticket_types.all? { |ticket_type| !ticket_type.ticket_group } %>
+          <% @previous_ticket_group = 'Other tickets' %>
+
+          <% @event.ticket_types.order('order asc, price desc').each_with_index { |ticket_type,i| %>
+          <% next if ticket_type.hidden && params[:ticket_type_id] != ticket_type.id.to_s; %>
+          <% next if discount_code && discount_code.filter && !ticket_type.name.downcase.include?(discount_code.filter.downcase) %>
+          <%= partial :'purchase/ticket_type', locals: { ticket_type: ticket_type, no_border_top: (i == 0) } %>
+          <% } %>
+
+          <%= partial :'purchase/discounts', locals: { discount_code: discount_code } %>
+
+          <%= partial :'purchase/suggested_donation' %>
+
+          <tr>
+            <td></td>
+            <td></td>
+            <td>
+              <strong>Total</strong>
+              <div class="input-group" style="margin: 5px 0">
+                <div class="input-group-prepend">
+                  <span class="input-group-text"><%= money_symbol(@event.currency) %></span>
+                </div>
+                <%= number_field_tag :totalDisplay, id: 'totalDisplay', class: 'form-control', style: 'width: 5em', disabled: true %>
+                <%= hidden_field_tag :total, id: 'total' %>
+              </div>
+            </td>
+          </tr>
+
+          <% if current_account && (organisationship = @event.organisation.organisationships.find_by(account: current_account)) && organisationship.credit_balance > 0 && FIAT_CURRENCIES.include?(@event.currency) %>
+            <% show_balance = true %>
+            <tr>
+              <td></td>
+              <td></td>
+              <td>
+                <strong>Credit</strong>
+                <div class="input-group" style="margin: 5px 0">
+                  <div class="input-group-prepend">
+                    <span class="input-group-text"><%= money_symbol(@event.currency) %></span>
+                  </div>
+                  <%= number_field_tag :credit, id: 'credit', class: 'form-control', style: 'width: 5em', disabled: true, value: format('%.2f', (organisationship.credit_balance.exchange_to(@event.currency).cents.to_f / 100)) %>
+                </div>
+              </td>
+            </tr>
+          <% end %>
+
+          <% if discount_code && discount_code.fixed_discount %>
+            <% show_balance = true %>
+            <tr>
+              <td></td>
+              <td></td>
+              <td>
+                <strong>Fixed discount</strong>
+                <div class="input-group" style="margin: 5px 0">
+                  <div class="input-group-prepend">
+                    <span class="input-group-text"><%= money_symbol(@event.currency) %></span>
+                  </div>
+                  <%= number_field_tag :fixed_discount, id: 'fixed-discount', class: 'form-control', style: 'width: 5em', disabled: true, value: format('%.2f', (discount_code.fixed_discount.exchange_to(@event.currency).cents.to_f / 100)) %>
+                </div>
+              </td>
+            </tr>
+          <% end %>
+
+          <% if show_balance %>
+            <tr>
+              <td></td>
+              <td></td>
+              <td>
+                <strong>Balance</strong>
+                <div class="input-group" style="margin: 5px 0">
+                  <div class="input-group-prepend">
+                    <span class="input-group-text"><%= money_symbol(@event.currency) %></span>
+                  </div>
+                  <%= number_field_tag :balance, id: 'balance', class: 'form-control', style: 'width: 5em', disabled: true %>
+                </div>
+              </td>
+            </tr>
+          <% end %>
+
+        </table>
+      <% end %>
+    </div>
+    <% if @event.select_tickets_outro %>
+      <table class="table table-borderless mb-0">
+        <tr>
+          <td>
+            <%== Sanitize.fragment(Rinku.auto_link(@event.select_tickets_outro), Sanitize::Config::DANDELION) %>
+          </td>
+        </tr>
+      </table>
+    <% end %>
+  </div>
+
+  <h3 class="card-header bg-primary text-white">Your details</h3>
+  <div class="card-body" id="details">
+    <script>
+      $(function () {
+        $('#account_name').attr('required', 'required')
+      })
+    </script>
+    <% form_for (@account = current_account || Account.new(country: 'United Kingdom of Great Britain and Northern Ireland')), '' do |f| %>
+      <% if current_account %>
+        <p class="lead">Signed in as <%= current_account.name %> (<%= current_account.email %>)</p>
+        <%= f.hidden_field :name %>
+        <%= f.hidden_field :email %>
+      <% else %>
+        <%= f.text_block :name %>
+        <%= f.email_block :email %>
+        <% if @event.organisation.collect_location %>
+          <%= f.text_block :postcode %>
+          <%= f.select_block :country %>
+        <% end %>
+      <% end %>
+      <% if @event.ask_hear_about %>
+        <%= f.text_block :hear_about %>
+      <% end %>
+      <%= f.hidden_field :http_referrer, value: request.referrer %>
+      <% @event.questions_a.each_with_index { |q,i| %>
+      <div class="form-group links-blank">
+        <% if m = q.match(/\[(.*)\]/)  %>
+          <div class="checkbox-inline">
+            <%= check_box_tag "answers[#{i}]", id: "answers-#{i}", checked: ((params[:answers][i] == 'true') if params[:answers]), 'data-required': q.ends_with?('*') %>
+            <label class="font-weight-bold" for="answers-<%=i%>">
+              <%== Sanitize.fragment(Rinku.auto_link(m[1]), Sanitize::Config::DANDELION) %><% if q.ends_with?('*') %>*<% end %>
+            </label>
+          </div>
+        <% elsif q.starts_with?('# ') %>
+          <label><%== Sanitize.fragment(Rinku.auto_link(q.gsub(/^# /, '')), Sanitize::Config::DANDELION) %></label>
+        <% else %>
+          <label><%== Sanitize.fragment(Rinku.auto_link(q), Sanitize::Config::DANDELION) %></label>
+          <div>
+            <%= text_area_tag "answers[#{i}]", required: q.ends_with?('*'), class: 'autosize form-control', value: (params[:answers][i] if params[:answers] && params[:answers][i] != '__EMPTY__') %>
+          </div>
+        <% end %>
+      </div>
+      <% } %>
+      <% if current_account && @event.organisation_and_cohosts.all? { |organisation| current_account.organisationships.find_by(organisation: organisation) } %>
+        <%= f.hidden_field :opt_in_organisation, value: 1 %>
+      <% else %>
+        <script>
+          $(function () {
+            $('#opt-in-organisation label').html('Get email updates from <%== @event.organisation_and_cohosts.map { |organisation| Sanitize.fragment(organisation.name) }.to_sentence(last_word_connector: ' and ') %>')
+            $('#opt-in-organisation').show()
+          })
+        </script>
+        <div id="opt-in-organisation" style="display: none">
+          <%= f.check_box_block :opt_in_organisation %>
+        </div>
+      <% end %>
+      <% if @event.opt_in_facilitator && @event.event_facilitators.count > 0 %>
+        <script>
+          $(function () {
+            $('#opt-in-facilitator label').text('Get email updates from <%= @event.event_facilitators.map(&:firstname).to_sentence(last_word_connector: ' and ') %>')
+            $('#opt-in-facilitator').show()
+          })
+        </script>
+        <div id="opt-in-facilitator" style="display: none">
+          <%= f.check_box_block :opt_in_facilitator %>
+        </div>
+      <% end %>
+
+      <%= partial :'purchase/terms_and_conditions' %>
+
+      <%= partial :'purchase/gocardless_details' %>
+
+      <button class="btn btn-primary btn-block mb-1" type="submit" data-payment-method="rsvp">
+        <span>RSVP</span>
+        <i class="bi bi-spin bi-arrow-repeat" style="display: none"></i>
+      </button>
+      <%= hidden_field_tag :payment_method, value: 'rsvp', disabled: true %>
+
+      <% if @event.organisation.stripe_sk && FIAT_CURRENCIES.include?(@event.currency) %>
+        <button class="btn btn-primary btn-block mb-1" type="submit" data-payment-method="stripe">
+          <span>Pay</span>
+          <i class="bi bi-spin bi-arrow-repeat" style="display: none"></i>
+        </button>
+        <%= hidden_field_tag :payment_method, value: 'stripe', disabled: true %>
+      <% end %>
+
+      <% if @event.organisation.coinbase_api_key && (FIAT_CURRENCIES.include?(@event.currency) || COINBASE_CURRENCIES.include?(@event.currency)) %>
+        <button class="btn btn-primary btn-block mb-1 btn-dotted" type="submit" data-payment-method="coinbase">
+          <span>Pay with crypto</span>
+          <i class="bi bi-spin bi-arrow-repeat" style="display: none"></i>
+        </button>
+        <%= hidden_field_tag :payment_method, value: 'coinbase', disabled: true %>
+      <% end %>
+
+      <% if @event.oc_slug %>
+        <button class="btn btn-primary btn-block mb-1 btn-dotted" type="submit" data-payment-method="opencollective">
+          <span>Pay with Open Collective</span>
+          <i class="bi bi-spin bi-arrow-repeat" style="display: none"></i>
+        </button>
+        <%= hidden_field_tag :payment_method, value: 'opencollective', disabled: true %>
+      <% end %>
+
+      <% if @event.organisation.evm_address && (EVM_CURRENCIES.include?(@event.currency) || (@event.currency == 'USD')) %>
+        <button class="btn btn-primary btn-block mb-1 btn-dotted" type="submit" data-payment-method="evm">
+          <span><% if @event.currency.in?(['BREAD', 'USD'])%>Pay with BREAD on Gnosis Chain<% else %>Pay with <%= @event.chain.name %><% end %></span>
+          <i class="bi bi-spin bi-arrow-repeat" style="display: none"></i>
+        </button>
+        <%= hidden_field_tag :payment_method, value: 'evm', disabled: true %>
+      <% end %>
+
+
+      <%= hidden_field_tag :utm_source, value: params[:utm_source] %>
+      <%= hidden_field_tag :utm_medium, value: params[:utm_medium] %>
+      <%= hidden_field_tag :utm_campaign, value: params[:utm_campaign] %>
+    <% end %>
+  </div>
+</div>
+
+<div class="card" id="card-error" style="display: none">
+  <h3 class="card-header bg-danger text-white">There was an error processing the transaction</h3>
+  <div class="card-body">
+    <p>
+      You have not be charged. Please refresh the page to try again.
+    </p>
+  </div>
+</div>
+
+<div class="card" id="pay-with-opencollective" style="display: none">
+  <h3 class="card-header bg-primary text-white">Pay with Open Collective</h3>
+  <div class="card-body">
+    <p class="lead please"></p>
+    <p class="lead memo text-monospace font-weight-bold text-center"></p>
+    <p>Looking for your transaction... <i class="bi bi-spin bi-arrow-repeat"></i></p>
+  </div>
+</div>
+
+<% if @event.chain %>
+  <div class="card" id="pay-with-evm" style="display: none">
+    <h3 class="card-header bg-primary text-white">
+      Pay with <%= @event.chain.name %>
+    </h3>
+    <div class="card-body">
+      <p class="lead please"></p>
+      <p class="web3wallet"></p>
+      <% if @event.organisation.evm_address && @event.chain.name == 'Celo' %>
+        <div class="qr mb-3">
+          <p class="mb-1">or use this QR code with Valora:</p>
+          <div id="qrcode"></div>
+          <script type="text/javascript">
+            new QRCode(document.getElementById("qrcode"), "celo://wallet/pay?address=<%=@event.organisation.evm_address%>");
+          </script>
+        </div>
+      <% end %>
+      <p>Making a manual transaction? You will find pasting these details easier if you 'Expand view' first.</p>
+      <p>Looking for your transaction... <i class="bi bi-spin bi-arrow-repeat"></i></p>
+    </div>
+  </div>
+<% end %>
+
+<script>
+  <% if @event.past? && !@event.recording? %>
+    timeAgo = '<%= time_ago_in_words @event.start_time %>'
+  <% end %>
+    eventId = <%== @event.id.to_s.to_json %>
+    eventUrl = <%== "#{ENV['BASE_URI']}/events/#{@event.id}".to_json %>
+    placesRemaining = <%== @event.places_remaining.to_json %>
+    currency = <%== @event.currency.to_json %>
+    currencySymbol = <%== money_symbol(@event.currency).to_json %>
+    stripePk = <%== @event.organisation.stripe_pk.to_json %>
+    coinbase = <%= @event.organisation.coinbase_api_key ? true : false %>
+    organisationOcSlug = <%== @event.organisation.oc_slug.to_json %>
+    ocSlug = <%== @event.oc_slug.to_json %>
+    evmAddress = <%== @event.organisation.evm_address.to_json %>
+    contractAddress = <%== @event.currency == 'USD' ? Token.object('BREAD').contract_address.to_json : @event.token.try(:contract_address).to_json %>
+    networkId = <%= @event.chain.try(:network_id) %>
+    networkName = '<%= @event.chain.try(:name) %>'
+    signedIn = <%= current_account ? true : false %>
+</script>
+<script src="/javascripts/purchase.js?<%= @cachebuster %>"></script>

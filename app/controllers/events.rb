@@ -191,7 +191,7 @@ Dandelion::App.controller do
       end
 
       if params[:ticket_form_only]
-        partial :'events/purchase', layout: :minimal
+        partial :'purchase/purchase', layout: :minimal
       else
         erb :'events/event'
       end

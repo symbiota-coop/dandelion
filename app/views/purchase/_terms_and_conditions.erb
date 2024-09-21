@@ -1,0 +1,39 @@
+ <% if @event.organisation.terms_and_conditions %>
+  <p class="mb-1 font-weight-bold">Terms and conditions</p>
+  <textarea class="form-control mb-2" style="height: 8em" readonly><%=@event.organisation.terms_and_conditions%></textarea>
+  <% if @event.organisation.terms_and_conditions_check_box %>
+    <div class="checkbox-inline mb-1">
+      <%= check_box_tag :accepted_terms, id: 'accepted-terms' %>
+      <label for="accepted-terms">
+        I agree to the terms and conditions
+      </label>
+    </div>
+  <% end %>
+  <p><small>
+      By proceeding you also agree to Dandelion's <a target="_blank" href="/terms">terms and conditions</a>
+      and understand this event is organised by <%= (@event.organiser || @event.revenue_sharer || @event.organisation).name %>,
+      who takes financial and legal responsibility for the event.
+    </small>
+  </p>
+<% elsif @event.organisation.terms_and_conditions_url %>
+  <p><small>
+      By proceeding you agree to the terms and conditions of <a target="_blank" href="/terms">Dandelion</a> and <a href="<%=@event.organisation.terms_and_conditions_url%>" target="_blank"><%=@event.organisation.name%></a><% if @event.organiser || @event.revenue_sharer %>
+        and understand this event is organised by <%= (@event.organiser || @event.revenue_sharer || @event.organisation).name %>, who takes financial and legal responsibility for the event<% end %>.
+    </small>
+  </p>
+  <% if @event.organisation.terms_and_conditions_check_box %>
+    <div class="checkbox-inline mb-1">
+      <%= check_box_tag :accepted_terms, id: 'accepted-terms' %>
+      <label for="accepted-terms">
+        I agree to the terms and conditions
+      </label>
+    </div>
+  <% end %>
+<% else %>
+  <p><small>
+      By proceeding you agree to Dandelion's <a target="_blank" href="/terms">terms and conditions</a>
+      and understand this event is organised by <%= (@event.organiser || @event.revenue_sharer || @event.organisation).name %>,
+      who takes financial and legal responsibility for the event.
+    </small>
+  </p>
+<% end %>
