@@ -32,7 +32,7 @@
     monthly_contributions = monthly_contributions.exchange_to(currency) 
 
     target = Money.new(500*100,'GBP')
-    if monthly_contributions/target >= 0.5
+    if monthly_contributions/target >= 0.8
       target = Money.new(1000*100,'GBP') * (monthly_contributions/target).ceil
     end   
 
