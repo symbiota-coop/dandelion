@@ -33,12 +33,9 @@
 
     base_target = Money.new(500*100, 'GBP')
     target = base_target
-    if monthly_contributions >= base_target
-      multiplier = (monthly_contributions / base_target).ceil
-      target = base_target * multiplier
-    elsif monthly_contributions >= (base_target * 0.8)
-      target = base_target * 1.5
-    end   
+    while monthly_contributions >= (target * 0.8)
+      target += base_target
+    end
 
     %>
 
