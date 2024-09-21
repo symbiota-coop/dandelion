@@ -1,5 +1,7 @@
 Dandelion::App.helpers do
   def airbrake_notify(error, extra = {})
+    raise(error) if Padrino.env == :development
+
     Airbrake.notify(error,
                     url: "#{ENV['BASE_URI']}#{request.path}",
                     current_account: (JSON.parse(current_account.to_json) if current_account),

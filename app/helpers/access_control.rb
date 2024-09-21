@@ -44,24 +44,6 @@ Dandelion::App.helpers do
     kick!(redirect_url: "/o/#{@organisation.slug}") unless organisation_admin?
   end
 
-  def activity_admin?(activity = nil, account = current_account)
-    activity ||= @activity
-    Activity.admin?(activity, account)
-  end
-
-  def activity_admins_only!
-    kick!(redirect_url: "/activities/#{@activity.id}") unless activity_admin?
-  end
-
-  def local_group_admin?(local_group = nil, account = current_account)
-    local_group ||= @local_group
-    LocalGroup.admin?(local_group, account)
-  end
-
-  def local_group_admins_only!
-    kick!(redirect_url: "/local_groups/#{@local_group.id}") unless local_group_admin?
-  end
-
   def organisation_assistant?(organisation = nil, account = current_account)
     organisation ||= @organisation
     Organisation.assistant?(organisation, account)
@@ -78,6 +60,24 @@ Dandelion::App.helpers do
 
   def organisation_monthly_donors_plus_only!
     kick! unless organisation_monthly_donor_plus?
+  end
+
+  def activity_admin?(activity = nil, account = current_account)
+    activity ||= @activity
+    Activity.admin?(activity, account)
+  end
+
+  def activity_admins_only!
+    kick!(redirect_url: "/activities/#{@activity.id}") unless activity_admin?
+  end
+
+  def local_group_admin?(local_group = nil, account = current_account)
+    local_group ||= @local_group
+    LocalGroup.admin?(local_group, account)
+  end
+
+  def local_group_admins_only!
+    kick!(redirect_url: "/local_groups/#{@local_group.id}") unless local_group_admin?
   end
 
   def event_admin?(event = nil, account = current_account)
@@ -107,6 +107,15 @@ Dandelion::App.helpers do
     kick! unless event_email_viewer?
   end
 
+  def event_participant?(event = nil, account = current_account)
+    event ||= @event
+    Event.participant?(event, account)
+  end
+
+  def event_participants_only!
+    kick! unless event_participant?
+  end
+
   def order_email_viewer?(order = nil, account = current_account)
     order ||= @order
     Order.email_viewer?(order, account)
@@ -132,15 +141,6 @@ Dandelion::App.helpers do
 
   def donation_email_viewers_only!
     kick! unless donation_email_viewer?
-  end
-
-  def event_participant?(event = nil, account = current_account)
-    event ||= @event
-    Event.participant?(event, account)
-  end
-
-  def event_participants_only!
-    kick! unless event_participant?
   end
 
   def gathering_admin?(gathering = nil, account = current_account)

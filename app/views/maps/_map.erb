@@ -1,4 +1,36 @@
-<% points_limit = 500 %>
+<%
+
+points_limit = 500
+
+markers = {
+  account: {
+    color: '#00B963',
+    icon: 'bi bi-person-fill'
+  },
+  activity_application: {
+    color: '#00B963',
+    icon: 'bi bi-person-fill'
+  },
+  event: {
+    color: '#FF5241',
+    icon: 'bi bi-calendar-event'
+  },
+  gathering: {
+    color: '#00B963',
+    icon: 'bi bi-people-fill'
+  },
+  organisation: {
+    color: '#FF5241',
+    icon: 'bi bi-flag-fill'
+  },
+  organisationship: {
+    color: '#00B963',
+    icon: 'bi bi-person-fill'
+  }
+}
+
+%>
+
 <script>
   $(function () {
     if (typeof google === 'undefined') {
@@ -23,8 +55,8 @@
   [Organisation, Gathering, Event, Account, ActivityApplication, Organisationship].each { |model| %>
       models.push({
         name: '<%= model.to_s %>',
-        color: '<%= model.marker_color %>',
-        icon: '<%= model.marker_icon %>',
+        color: '<%= markers[model.to_s.underscore.to_sym][:color] %>',
+        icon: '<%= markers[model.to_s.underscore.to_sym][:icon] %>',
       })
   <% } %>
 

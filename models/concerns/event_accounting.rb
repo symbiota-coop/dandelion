@@ -1,6 +1,12 @@
 module EventAccounting
   extend ActiveSupport::Concern
 
+  class_methods do
+    def profit_share_roles
+      %w[facilitator coordinator category_steward social_media]
+    end
+  end
+
   included do
     Event.profit_share_roles.each do |role|
       define_method "paid_to_#{role}" do
@@ -16,12 +22,6 @@ module EventAccounting
       define_method "profit_to_#{role}" do
         revenue_share_to_organisation > 0 ? profit_less_donations * send("profit_share_to_#{role}") / revenue_share_to_organisation : Money.new(0, currency)
       end
-    end
-  end
-
-  class_methods do
-    def profit_share_roles
-      %w[facilitator coordinator category_steward social_media]
     end
   end
 

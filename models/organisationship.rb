@@ -51,14 +51,6 @@ class Organisationship
     end
   end
 
-  def self.marker_color
-    '#00B963'
-  end
-
-  def self.marker_icon
-    'bi bi-person-fill'
-  end
-
   def self.admin_fields
     {
       account_id: :lookup,

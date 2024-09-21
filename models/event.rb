@@ -1,136 +1,34 @@
 class Event
   include Mongoid::Document
   include Mongoid::Timestamps
-  include Geocoder::Model::Mongoid
   extend Dragonfly::Model
 
+  include EventFields
+  include EventAssociations
+  include EventCallbacks
+  include EventScopes
   include EventAccounting
   include EventDuplication
   include EventNotifications
   include EventOpenCollective
   include EventValidation
-
-  belongs_to :account, inverse_of: :events, index: true
-  belongs_to :organisation, index: true
-  belongs_to :activity, optional: true, index: true
-  belongs_to :local_group, optional: true, index: true
-  belongs_to :coordinator, class_name: 'Account', inverse_of: :events_coordinating, index: true, optional: true
-  belongs_to :revenue_sharer, class_name: 'Account', inverse_of: :events_revenue_sharing, index: true, optional: true
-  belongs_to :organiser, class_name: 'Account', inverse_of: :events_organising, index: true, optional: true
-  belongs_to :last_saved_by, class_name: 'Account', inverse_of: :events_last_saver, index: true, optional: true
-  belongs_to :gathering, optional: true, index: true
-
-  field :name, type: String
-  index({ name: 1 })
-  field :slug, type: String
-  index({ slug: 1 })
-  field :start_time, type: Time
-  field :end_time, type: Time
-  field :location, type: String
-  field :coordinates, type: Array
-  field :image_uid, type: String
-  field :video_uid, type: String
-  field :description, type: String
-  index({ description: 1 })
-  field :email, type: String
-  field :facebook_event_url, type: String
-  field :feedback_questions, type: String
-  field :suggested_donation, type: Float
-  field :minimum_donation, type: Float
-  field :capacity, type: Integer
-  field :affiliate_credit_percentage, type: Integer
-  field :extra_info_for_ticket_email, type: String
-  field :extra_info_for_recording_email, type: String
-  field :notes, type: String
-  field :redirect_url, type: String
-  field :purchase_url, type: String
-  field :currency, type: String
-  field :facebook_pixel_id, type: String
-  field :time_zone, type: String
-  field :questions, type: String
-  field :add_a_donation_to, type: String
-  field :donation_text, type: String
-  field :carousel_text, type: String
-  field :select_tickets_intro, type: String
-  field :select_tickets_outro, type: String
-  field :select_tickets_title, type: String
-  field :contribution_gbp_custom, type: Float
-  field :oc_slug, type: String
-  field :ticket_email_greeting, type: String
-  field :ticket_email_title, type: String
-  field :ai_tagged, type: Boolean
-
-  field :revenue_share_to_revenue_sharer, type: Integer
-  field :profit_share_to_facilitator, type: Integer
-  field :profit_share_to_coordinator, type: Integer
-  field :profit_share_to_category_steward, type: Integer
-  field :profit_share_to_social_media, type: Integer
-  field :stripe_revenue_adjustment, type: Float
-
-  dragonfly_accessor :video
-  dragonfly_accessor :image
-
-  def self.admin_fields
-    {
-      summary: { type: :text, index: false, edit: false },
-      name: { type: :text, full: true },
-      slug: :slug,
-      start_time: :datetime,
-      end_time: :datetime,
-      location: :text,
-      add_a_donation_to: :text,
-      donation_text: :text,
-      carousel_text: :text,
-      select_tickets_intro: :text,
-      select_tickets_outro: :text,
-      image: :image,
-      video: :file,
-      description: :wysiwyg,
-      email: :email,
-      facebook_event_url: :url,
-      feedback_questions: :text_area,
-      hide_attendees: :check_box,
-      hide_discussion: :check_box,
-      refund_deleted_orders: :check_box,
-      monthly_donors_only: :check_box,
-      no_discounts: :check_box,
-      trending: :check_box,
-      hide_from_trending: :check_box,
-      extra_info_for_ticket_email: :wysiwyg,
-      extra_info_for_recording_email: :wysiwyg,
-      suggested_donation: :number,
-      minimum_donation: :number,
-      capacity: :number,
-      notes: :text_area,
-      redirect_url: :url,
-      purchase_url: :url,
-      locked: :check_box,
-      secret: :check_box,
-      hide_few_left: :check_box,
-      questions: :text_area,
-      zoom_party: :check_box,
-      show_emails: :check_box,
-      opt_in_facilitator: :check_box,
-      hide_organisation_footer: :check_box,
-      send_order_notifications: :check_box,
-      raw_description: :check_box,
-      account_id: :lookup,
-      organisation_id: :lookup,
-      activity_id: :lookup,
-      ticket_types: :collection
-    }
-  end
+  include EventAccessControl
+  include Geocoded
 
   def self.fs(slug)
     find_by(slug: slug)
   end
 
-  def page_views_count
-    PageView.or({ path: "/e/#{slug}" }, { path: "/events/#{id}" }).count
-  end
-
   def self.currencies
     CURRENCY_OPTIONS
+  end
+
+  def self.public
+    self.and(:secret.ne => true).and(:organisation_id.ne => nil)
+  end
+
+  def page_views_count
+    PageView.or({ path: "/e/#{slug}" }, { path: "/events/#{id}" }).count
   end
 
   def token
@@ -150,158 +48,65 @@ class Event
     q.empty? ? [] : q
   end
 
-  %w[no_discounts hide_attendees hide_discussion refund_deleted_orders monthly_donors_only locked secret zoom_party show_emails include_in_parent featured opt_in_facilitator hide_few_left hide_organisation_footer ask_hear_about send_order_notifications raw_description prevent_reminders trending hide_from_trending hide_from_carousels no_tickets_pdf half_width_images].each do |b|
-    field b.to_sym, type: Boolean
-    index({ b.to_s => 1 })
-  end
-
-  def self.marker_color
-    '#FF5241'
-  end
-
-  def self.marker_icon
-    'bi bi-calendar-event'
-  end
-
-  has_many :stripe_charges
-
-  has_many :rpayments, dependent: :destroy
-
-  has_many :posts, as: :commentable, dependent: :destroy
-  has_many :subscriptions, as: :commentable, dependent: :destroy
-  has_many :comments, as: :commentable, dependent: :destroy
-  has_many :comment_reactions, as: :commentable, dependent: :destroy
-
-  has_many :event_sessions, dependent: :destroy
-
-  has_many :account_contributions, dependent: :nullify
-
-  has_many :cohostships, dependent: :destroy
-  def cohosts
-    Organisation.and(:id.in => cohostships.pluck(:organisation_id))
-  end
-
-  def organisation_and_cohosts
-    Organisation.and(:id.in => ([organisation.try(:id)] + cohostships.pluck(:organisation_id)).compact)
-  end
-
-  def organisationship_for_discount(account)
-    organisationship = nil
-    if account
-      organisation_and_cohosts.order('created_at desc').each do |organisation|
-        next unless (o = organisation.organisationships.find_by(account: account))
-
-        organisationship = o if o.monthly_donor? && o.monthly_donor_discount > 0 && (!organisationship || o.monthly_donor_discount > organisationship.monthly_donor_discount)
-      end
-    end
-    organisationship
-  end
-
-  has_many :pmails_as_mailable, class_name: 'Pmail', as: :mailable, dependent: :destroy
-  has_many :pmails_as_exclusion, class_name: 'Pmail', inverse_of: :event, dependent: :nullify
-
-  has_many :discount_codes, class_name: 'DiscountCode', as: :codeable, dependent: :destroy
-  def all_discount_codes
-    DiscountCode.and(:id.in =>
-      discount_codes.pluck(:id) +
-      (organisation ? organisation.discount_codes.pluck(:id) : []) +
-      (activity ? activity.discount_codes.pluck(:id) : []) +
-      (local_group ? local_group.discount_codes.pluck(:id) : []))
-  end
-
-  attr_accessor :prevent_notifications, :update_tag_names, :tag_names, :duplicate
-
-  has_many :notifications, as: :notifiable, dependent: :destroy
-  after_create do
-    if circle && !prevent_notifications && live? && public?
-      notifications.and(:type.in => %w[created_event updated_event]).destroy_all
-      notifications.create! circle: circle, type: 'created_event'
-    end
-  end
-  after_update do
-    if circle && !prevent_notifications && live? && public?
-      notifications.and(:type.in => %w[created_event updated_event]).destroy_all
-      notifications.create! circle: circle, type: 'updated_event'
-    end
-  end
-
-  def circle
-    organisation
-  end
-
-  # Geocoder
-  geocoded_by :location
-  def lat
-    coordinates[1] if coordinates
-  end
-
-  def lng
-    coordinates[0] if coordinates
-  end
-
   def recording?
     past? && extra_info_for_recording_email
   end
 
-  def revenue_sharer_organisationship
-    organisation.organisationships.find_by(:account => revenue_sharer, :stripe_connect_json.ne => nil) if organisation && revenue_sharer
+  def summary
+    start_time ? "#{name} (#{start_time.to_date})" : name
   end
 
-  after_create do
-    account.drafts.and(model: 'Event', name: name).destroy_all
-
-    event_facilitations.create account: organisation.admins.first if organisation && organisation.admins.count == 1
-    event_facilitations.create account: revenue_sharer if revenue_sharer
-
-    activity.update_attribute(:hidden, false) if activity
-    organisation.try(:update_paid_up)
+  def feedback_questions_a
+    q = (feedback_questions || '').split("\n").map(&:strip).reject(&:blank?)
+    q.empty? ? [] : q
   end
 
-  after_destroy do
-    organisation.try(:update_paid_up)
+  def future?(from = Date.today)
+    start_time >= from
   end
 
-  after_save do
-    if changes['name'] && (post = posts.find_by(subject: "Chat for #{changes['name'][0]}"))
-      post.update_attribute(:subject, "Chat for #{name}")
-    end
+  def past?(from = Date.today)
+    start_time < from
+  end
 
-    if changes['activity_id']
-      if activity && activity.privacy == 'open' && changes['activity_id'][0]
-        previous_activity = Activity.find(changes['activity_id'][0])
-        attendees.each do |account|
-          next unless (previous_activityship = previous_activity.activityships.find_by(account: account))
+  def finished?(from = Date.today)
+    end_time < from
+  end
 
-          activity.activityships.create(
-            account: account,
-            unsubscribed: previous_activityship.unsubscribed,
-            hide_membership: previous_activityship.hide_membership,
-            receive_feedback: previous_activityship.receive_feedback
-          )
-        end
-      end
-      event_feedbacks.update_all(activity_id: activity_id)
-    end
+  def online?
+    location == 'Online'
+  end
 
-    if changes['local_group_id'] && local_group && changes['local_group_id'][0]
-      previous_local_group = LocalGroup.find(changes['local_group_id'][0])
-      attendees.each do |account|
-        next unless (previous_local_groupship = previous_local_group.local_groupships.find_by(account: account))
+  def in_person?
+    location != 'Online'
+  end
 
-        local_group.local_groupships.create(
-          account: account,
-          unsubscribed: previous_local_groupship.unsubscribed,
-          hide_membership: previous_local_groupship.hide_membership,
-          receive_feedback: previous_local_groupship.receive_feedback
-        )
-      end
-    end
+  def paid_tickets?
+    ticket_types.any? { |ticket_type| (ticket_type.price && ticket_type.price > 0) || ticket_type.range }
+  end
 
-    if organisation && zoom_party
-      organisation.local_groups.each do |local_group|
-        zoomships.create local_group: local_group
-      end
-    end
+  def live?
+    !locked?
+  end
+
+  def public?
+    !secret?
+  end
+
+  def sold_out?
+    ticket_types.count > 0 && ticket_types.and(:hidden.ne => true).all? { |ticket_type| ticket_type.number_of_tickets_available_in_single_purchase <= 0 }
+  end
+
+  def tickets_available?
+    ticket_types.count > 0 && ticket_types.and(:hidden.ne => true).any? { |ticket_type| ticket_type.number_of_tickets_available_in_single_purchase >= 1 }
+  end
+
+  def places_remaining
+    capacity - tickets.count if capacity
+  end
+
+  def time_zone_or_default
+    time_zone || ENV['DEFAULT_TIME_ZONE']
   end
 
   after_save :clear_cache
@@ -325,88 +130,64 @@ class Event
     c
   end
 
-  def self.revenue_admin?(event, account)
-    account &&
-      event &&
-      (
-      account.admin? ||
-        (event.activity && Activity.admin?(event.activity, account)) ||
-        (event.local_group && LocalGroup.admin?(event.local_group, account)) ||
-        (event.organisation && Organisation.admin?(event.organisation, account)) ||
-        (event.cohosts.any? { |cohost| Organisation.admin?(cohost, account) })
-    )
+  def when_details(zone, with_zone: true)
+    return unless start_time && end_time
+
+    zone ||= time_zone_or_default
+    zone = time_zone if time_zone && location != 'Online'
+    zone = zone.name unless zone.is_a?(String)
+    start_time = self.start_time.in_time_zone(zone)
+    end_time = self.end_time.in_time_zone(zone)
+    z = "#{start_time.strftime('%Z')} (UTC #{start_time.formatted_offset})"
+    if start_time.to_date == end_time.to_date
+      "#{start_time.to_date}, #{start_time.to_fs(:no_double_zeros)} – #{end_time.to_fs(:no_double_zeros)} #{z if with_zone}"
+    else
+      "#{start_time.to_date}, #{start_time.to_fs(:no_double_zeros)} – #{end_time.to_date}, #{end_time.to_fs(:no_double_zeros)} #{z if with_zone}"
+    end
   end
 
-  def self.admin?(event, account)
-    account &&
-      event &&
-      (
-      account.admin? ||
-        event.account_id == account.id ||
-        event.revenue_sharer_id == account.id ||
-        event.organiser_id == account.id ||
-        event.coordinator_id == account.id ||
-        event.event_facilitations.find_by(account: account) ||
-        (event.activity && Activity.admin?(event.activity, account)) ||
-        (event.local_group && LocalGroup.admin?(event.local_group, account)) ||
-        (event.organisation && Organisation.admin?(event.organisation, account)) ||
-        (event.cohosts.any? { |cohost| Organisation.admin?(cohost, account) })
-    )
+  def concise_when_details(zone, with_zone: false)
+    return unless start_time && end_time
+
+    zone ||= time_zone_or_default
+    zone = time_zone if time_zone && location != 'Online'
+    zone = zone.name unless zone.is_a?(String)
+    start_time = self.start_time.in_time_zone(zone)
+    end_time = self.end_time.in_time_zone(zone)
+    z = "#{start_time.strftime('%Z')} (UTC #{start_time.formatted_offset})"
+    if start_time.to_date == end_time.to_date
+      start_time.to_date
+    else
+      "#{start_time.to_date} – #{end_time.to_date} #{z if with_zone}"
+    end
   end
 
-  def accounts_receiving_feedback
-    a = [account, revenue_sharer, coordinator].compact
-    a += event_facilitators
-    a += organisation.admins_receiving_feedback if organisation
-    a += activity.admins_receiving_feedback if activity
-    a += local_group.admins_receiving_feedback if local_group
-    a.uniq
+  def ical(order: nil)
+    event = self
+    cal = Icalendar::Calendar.new
+    cal.append_custom_property('METHOD', 'REQUEST') if order
+    cal.event do |e|
+      e.summary = (event.start_time.to_date == event.end_time.to_date ? event.name : "#{event.name} starts")
+      e.dtstart = (event.start_time.to_date == event.end_time.to_date ? event.start_time.utc.strftime('%Y%m%dT%H%M%SZ') : Icalendar::Values::Date.new(event.start_time.to_date))
+      e.dtend = (event.start_time.to_date == event.end_time.to_date ? event.end_time.utc.strftime('%Y%m%dT%H%M%SZ') : nil)
+      e.transp = (event.start_time.to_date == event.end_time.to_date ? 'OPAQUE' : 'TRANSPARENT')
+      e.location = event.location
+      e.description = order ? %(#{ENV['BASE_URI']}/orders/#{order.id}) : %(#{ENV['BASE_URI']}/events/#{event.id})
+      e.organizer = event.email
+      e.uid = event.id.to_s
+      if order
+        e.status = 'CONFIRMED'
+        e.attendee = Icalendar::Values::CalAddress.new(
+          "mailto:#{order.account.email}",
+          cn: order.account.email,
+          role: 'REQ-PARTICIPANT',
+          partstat: 'ACCEPTED',
+          cutype: 'INDIVIDUAL'
+        )
+      end
+    end
+    cal
   end
-
-  def discussers
-    Account.and(:id.in =>
-        [account.try(:id), revenue_sharer.try(:id), coordinator.try(:id)].compact +
-        event_facilitators.pluck(:id) +
-        tickets.complete.and(subscribed_discussion: true).pluck(:account_id))
-  end
-
-  def subscribed_members
-    Account.and(:id.in =>
-        [account.try(:id), revenue_sharer.try(:id), coordinator.try(:id)].compact +
-        event_facilitators.pluck(:id) +
-        attendees.pluck(:id))
-  end
-
-  def self.participant?(event, account)
-    (account && event.tickets.complete.find_by(account: account)) || Event.admin?(event, account)
-  end
-
-  def self.email_viewer?(event, account)
-    account && event && ((event.show_emails && Event.admin?(event, account)) || Organisation.admin?(event.organisation, account))
-  end
-
-  has_many :ticket_types, dependent: :destroy
-  accepts_nested_attributes_for :ticket_types, allow_destroy: true, reject_if: ->(attributes) { %w[name description price quantity].all? { |f| attributes[f].nil? } }
-
-  has_many :ticket_groups, dependent: :destroy
-  accepts_nested_attributes_for :ticket_groups, allow_destroy: true, reject_if: ->(attributes) { %w[name capacity].all? { |f| attributes[f].nil? } }
-
-  has_many :tickets, dependent: :destroy
-  has_many :donations, dependent: :nullify
-  has_many :orders, dependent: :destroy
-  has_many :waitships, dependent: :destroy
-  def waiters
-    Account.and(:id.in => waitships.pluck(:account_id))
-  end
-  has_many :event_feedbacks, dependent: :destroy
-  has_many :event_facilitations, dependent: :destroy
-  def event_facilitators
-    Account.and(:id.in => event_facilitations.pluck(:account_id))
-  end
-  has_many :zoomships, dependent: :destroy
-
-  has_many :event_tagships, dependent: :destroy
-  has_many :event_stars, dependent: :destroy
 
   after_save :update_event_tags
   def update_event_tags
@@ -467,287 +248,5 @@ class Event
       end
     end
     set(ai_tagged: true)
-  end
-
-  def event_tags
-    EventTag.and(:id.in => event_tagships.pluck(:event_tag_id))
-  end
-
-  def summary
-    start_time ? "#{name} (#{start_time.to_date})" : name
-  end
-
-  def self.course
-    self.and(:id.in =>
-      EventTagship.and(:event_tag_id.in =>
-        EventTag.and(:name.in => %w[course courses]).pluck(:id)).pluck(:event_id))
-  end
-
-  def feedback_questions_a
-    q = (feedback_questions || '').split("\n").map(&:strip).reject(&:blank?)
-    q.empty? ? [] : q
-  end
-
-  def future?(from = Date.today)
-    start_time >= from
-  end
-
-  def self.future(from = Date.today)
-    self.and(:start_time.gte => from).order('start_time asc')
-  end
-
-  def self.current(from = Date.today)
-    self.and(:end_time.gte => from).order('start_time asc')
-  end
-
-  def self.future_and_current_featured(from = Date.today)
-    self.and(:id.in => future(from).pluck(:id) + current(from).and(featured: true).pluck(:id)).order('start_time asc')
-  end
-
-  def self.future_and_current(from = Date.today)
-    self.and(:id.in => future(from).pluck(:id) + current(from).pluck(:id)).order('start_time asc')
-  end
-
-  def past?(from = Date.today)
-    start_time < from
-  end
-
-  def self.past(from = Date.today)
-    self.and(:start_time.lt => from).order('start_time desc')
-  end
-
-  def finished?(from = Date.today)
-    end_time < from
-  end
-
-  def self.finished(from = Date.today)
-    self.and(:end_time.lt => from).order('start_time desc')
-  end
-
-  def self.online
-    self.and(location: 'Online')
-  end
-
-  def online?
-    location == 'Online'
-  end
-
-  def self.in_person
-    self.and(:location.ne => 'Online')
-  end
-
-  def in_person?
-    location != 'Online'
-  end
-
-  def paid_tickets?
-    ticket_types.any? { |ticket_type| (ticket_type.price && ticket_type.price > 0) || ticket_type.range }
-  end
-
-  def self.trending
-    live.public.legit.future.and(:image_uid.ne => nil, :hide_from_trending.ne => true).and(
-      :organisation_id.in => Organisation.and(paid_up: true).pluck(:id)
-    ).sort_by do |event|
-      [event.trending ? 0 : 1, -event.orders.complete.and(:created_at.gt => 1.week.ago).count]
-    end
-  end
-
-  def self.legit
-    self.and(:organisation_id.in => Organisation.and(:hidden.ne => true).pluck(:id))
-  end
-
-  def self.locked
-    self.and(locked: true)
-  end
-
-  def self.live
-    self.and(:locked.ne => true).and(:organisation_id.ne => nil)
-  end
-
-  def self.secret
-    self.and(secret: true)
-  end
-
-  def self.public
-    self.and(:secret.ne => true).and(:organisation_id.ne => nil)
-  end
-
-  def live?
-    !locked?
-  end
-
-  def public?
-    !secret?
-  end
-
-  def sold_out?
-    ticket_types.count > 0 && ticket_types.and(:hidden.ne => true).all? { |ticket_type| ticket_type.number_of_tickets_available_in_single_purchase <= 0 }
-  end
-
-  def tickets_available?
-    ticket_types.count > 0 && ticket_types.and(:hidden.ne => true).any? { |ticket_type| ticket_type.number_of_tickets_available_in_single_purchase >= 1 }
-  end
-
-  def places_remaining
-    capacity - tickets.count if capacity
-  end
-
-  def attendees
-    Account.and(:id.in => tickets.complete.pluck(:account_id))
-  end
-
-  def starrers
-    Account.and(:id.in => event_stars.pluck(:account_id))
-  end
-
-  def public_attendees
-    Account.and(:id.in => tickets.complete.and(show_attendance: true).pluck(:account_id)).and(:hidden.ne => true)
-  end
-
-  def private_attendees
-    Account.and(:id.in => tickets.complete.and(:show_attendance.ne => true).pluck(:account_id))
-  end
-
-  def time_zone_or_default
-    time_zone || ENV['DEFAULT_TIME_ZONE']
-  end
-
-  def when_details(zone, with_zone: true)
-    return unless start_time && end_time
-
-    zone ||= time_zone_or_default
-    zone = time_zone if time_zone && location != 'Online'
-    zone = zone.name unless zone.is_a?(String)
-    start_time = self.start_time.in_time_zone(zone)
-    end_time = self.end_time.in_time_zone(zone)
-    z = "#{start_time.strftime('%Z')} (UTC #{start_time.formatted_offset})"
-    if start_time.to_date == end_time.to_date
-      "#{start_time.to_date}, #{start_time.to_fs(:no_double_zeros)} – #{end_time.to_fs(:no_double_zeros)} #{z if with_zone}"
-    else
-      "#{start_time.to_date}, #{start_time.to_fs(:no_double_zeros)} – #{end_time.to_date}, #{end_time.to_fs(:no_double_zeros)} #{z if with_zone}"
-    end
-  end
-
-  def concise_when_details(zone, with_zone: false)
-    return unless start_time && end_time
-
-    zone ||= time_zone_or_default
-    zone = time_zone if time_zone && location != 'Online'
-    zone = zone.name unless zone.is_a?(String)
-    start_time = self.start_time.in_time_zone(zone)
-    end_time = self.end_time.in_time_zone(zone)
-    z = "#{start_time.strftime('%Z')} (UTC #{start_time.formatted_offset})"
-    if start_time.to_date == end_time.to_date
-      start_time.to_date
-    else
-      "#{start_time.to_date} – #{end_time.to_date} #{z if with_zone}"
-    end
-  end
-
-  def self.human_attribute_name(attr, options = {})
-    {
-      description: 'Public event description',
-      name: 'Event title',
-      slug: 'Short URL',
-      email: 'Contact email',
-      questions: 'Further questions to ask on the order form',
-      facebook_event_url: 'Facebook event URL',
-      facebook_pixel_id: 'Facebook Pixel ID',
-      show_emails: 'Allow all event admins to view email addresses of attendees',
-      opt_in_facilitator: 'Allow people to opt in to emails from facilitators',
-      refund_deleted_orders: 'Refund deleted orders/tickets on Stripe',
-      redirect_url: 'Redirect URL after successful payment',
-      include_in_parent: 'Include in parent organisation event listings',
-      zoom_party: 'Zoom party',
-      add_a_donation_to: 'Text above donation field',
-      donation_text: 'Text below donation field',
-      start_time: 'Start date/time',
-      end_time: 'End date/time',
-      extra_info_for_ticket_email: 'Extra info for ticket confirmation email',
-      extra_info_for_recording_email: 'Extra info for recording confirmation email',
-      purchase_url: 'Ticket purchase URL',
-      no_discounts: 'No discounts for monthly donors',
-      notes: 'Private notes',
-      ask_hear_about: 'Ask people how they heard about the event',
-      capacity: 'Total capacity',
-      gathering_id: 'Add people that buy tickets to this gathering',
-      send_order_notifications: 'Send email notifications of orders',
-      prevent_reminders: 'Prevent reminder email',
-      oc_slug: 'Open Collective event slug',
-      no_tickets_pdf: "Don't attach tickets PDF to confirmation email",
-      hide_few_left: "Hide 'few tickets left' labels"
-    }[attr.to_sym] || super
-  end
-
-  def self.new_hints
-    {
-      slug: 'Lowercase letters, numbers and dashes only (no spaces)',
-      image: 'At least 992px wide, and more wide than high',
-      start_time: "in &hellip; (your profile's time zone)",
-      end_time: "in &hellip; (your profile's time zone)",
-      add_a_donation_to: "Text to display above the 'Add a donation' field (leave blank to use organisation default)",
-      oc_slug: 'Event slug for taking payments via Open Collective',
-      donation_text: "Text to display below the 'Add a donation' field  (leave blank to use organisation default)",
-      carousel_text: 'Text to show when hovering over the event in a carousel',
-      select_tickets_title: 'Title of the Select Tickets panel',
-      select_tickets_intro: 'Text to show at the top of the Select Tickets panel',
-      select_tickets_outro: 'Text to show at the bottom of the Select Tickets panel',
-      ask_hear_about: 'Ask people how they heard about the event on the order form',
-      suggested_donation: 'If this is blank, the donation field will not be shown',
-      questions: 'Questions to ask participants upon booking. One question per line. Add headers by starting a line with #. Wrap in [square brackets] to turn into a checkbox. End a line with a star * to make the question required. View answers on the Orders page.',
-      feedback_questions: 'Questions to ask participants in the post-event feedback form. One question per line. Leave blank to disable feedback.',
-      extra_info_for_ticket_email: 'This is the place to enter Zoom links, directions to the venue, etc.',
-      extra_info_for_recording_email: 'This is the place to enter the link to the recording.',
-      featured: "Feature the event in a carousel on the organisation's events page",
-      secret: 'Hide the event from all public listings',
-      locked: 'Make the event visible to admins only',
-      hide_attendees: 'Hide the public list of attendees (in any case, individuals must opt in)',
-      hide_discussion: 'Hide the private discussion for attendees and facilitators',
-      hide_from_carousels: 'Hide the event from carousels',
-      show_emails: 'Allow all event admins to view attendee emails (by default, only organisation admins see them)',
-      opt_in_facilitator: "Allow people to opt in to receive emails from any facilitators' personal lists",
-      monthly_donors_only: 'Only allow people making a monthly donation to the organisation to purchase tickets',
-      no_discounts: "Don't apply usual discounts for monthly donors to the organisation",
-      include_in_parent: 'If the event has a local group, show it in the event listings of the parent organisation',
-      refund_deleted_orders: 'Refund deleted orders/tickets via Stripe, and all orders if the event is deleted',
-      redirect_url: 'Optional. By default people will be shown a thank you page on Dandelion.',
-      facebook_pixel_id: 'Your Facebook Pixel ID for tracking sales',
-      purchase_url: "URL where people can buy tickets (if you're not selling tickets on Dandelion)",
-      capacity: 'Caps the total number of tickets issued across all ticket types. Optional',
-      send_order_notifications: 'Send email notifications of orders to event facilitators',
-      prevent_reminders: 'Prevent reminder email from being sent before the event',
-      stripe_revenue_adjustment: 'Positive or negative adjustment to the revenue reported by Stripe, e.g. +20 or -10'
-    }
-  end
-
-  def self.edit_hints
-    {}.merge(new_hints)
-  end
-
-  def ical(order: nil)
-    event = self
-    cal = Icalendar::Calendar.new
-    cal.append_custom_property('METHOD', 'REQUEST') if order
-    cal.event do |e|
-      e.summary = (event.start_time.to_date == event.end_time.to_date ? event.name : "#{event.name} starts")
-      e.dtstart = (event.start_time.to_date == event.end_time.to_date ? event.start_time.utc.strftime('%Y%m%dT%H%M%SZ') : Icalendar::Values::Date.new(event.start_time.to_date))
-      e.dtend = (event.start_time.to_date == event.end_time.to_date ? event.end_time.utc.strftime('%Y%m%dT%H%M%SZ') : nil)
-      e.transp = (event.start_time.to_date == event.end_time.to_date ? 'OPAQUE' : 'TRANSPARENT')
-      e.location = event.location
-      e.description = order ? %(#{ENV['BASE_URI']}/orders/#{order.id}) : %(#{ENV['BASE_URI']}/events/#{event.id})
-      e.organizer = event.email
-      e.uid = event.id.to_s
-      if order
-        e.status = 'CONFIRMED'
-        e.attendee = Icalendar::Values::CalAddress.new(
-          "mailto:#{order.account.email}",
-          cn: order.account.email,
-          role: 'REQ-PARTICIPANT',
-          partstat: 'ACCEPTED',
-          cutype: 'INDIVIDUAL'
-        )
-      end
-    end
-    cal
   end
 end

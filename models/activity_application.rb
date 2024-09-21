@@ -26,14 +26,6 @@ class ActivityApplication
   has_many :comments, as: :commentable, dependent: :destroy
   has_many :comment_reactions, as: :commentable, dependent: :destroy
 
-  def self.marker_color
-    '#00B963'
-  end
-
-  def self.marker_icon
-    'bi bi-person-fill'
-  end
-
   def coordinates
     account.coordinates
   end
