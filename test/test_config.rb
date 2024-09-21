@@ -28,7 +28,7 @@ module ActiveSupport
   class TestCase
     def reset!
       Capybara.reset_sessions!
-      Dir[Padrino.root('models', '*')].each do |f|
+      Dir.glob(Padrino.root('models', '*.rb')).each do |f|
         model = f.split('/').last.split('.').first.camelize.constantize
         model.delete_all if model.respond_to?(:delete_all)
       end

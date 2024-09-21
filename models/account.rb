@@ -242,7 +242,7 @@ class Account
   end
   after_validation do
     if location_changed?
-      if location
+      if location && ENV['GOOGLE_MAPS_API_KEY']
         geocode || (self.coordinates = nil)
         if coordinates
           self.time_zone = begin

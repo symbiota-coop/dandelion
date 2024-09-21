@@ -4,6 +4,12 @@ class Event
   include Geocoder::Model::Mongoid
   extend Dragonfly::Model
 
+  include EventAccounting
+  include EventDuplication
+  include EventNotifications
+  include EventOpenCollective
+  include EventValidation
+
   belongs_to :account, inverse_of: :events, index: true
   belongs_to :organisation, index: true
   belongs_to :activity, optional: true, index: true
@@ -61,8 +67,8 @@ class Event
   field :profit_share_to_social_media, type: Integer
   field :stripe_revenue_adjustment, type: Float
 
-  # remove me
-  field :draft, type: Boolean
+  dragonfly_accessor :video
+  dragonfly_accessor :image
 
   def self.admin_fields
     {
@@ -232,22 +238,6 @@ class Event
   def lng
     coordinates[0] if coordinates
   end
-  after_validation do
-    if location_changed?
-      if location
-        geocode || (self.coordinates = nil)
-        if coordinates
-          self.time_zone = begin
-            Timezone.lookup(*coordinates.reverse)
-          rescue Timezone::Error::InvalidZone, Timezone::Error::InvalidConfig
-            nil
-          end
-        end
-      else
-        self.coordinates = nil
-      end
-    end
-  end
 
   def recording?
     past? && extra_info_for_recording_email
@@ -255,69 +245,6 @@ class Event
 
   def revenue_sharer_organisationship
     organisation.organisationships.find_by(:account => revenue_sharer, :stripe_connect_json.ne => nil) if organisation && revenue_sharer
-  end
-
-  before_validation do
-    self.name = name.strip if name
-    self.suggested_donation = suggested_donation.round(2) if suggested_donation
-    self.minimum_donation = nil unless suggested_donation
-    self.minimum_donation = minimum_donation.round(2) if minimum_donation
-    self.organiser = account if account && !revenue_sharer && !organiser && organisation && organisation.stripe_client_id
-    self.ai_tagged = nil
-    self.description = description.gsub('href="www.', 'href="http://www.') if description
-
-    unless slug
-      loop do
-        self.slug = ([*('a'..'z')].sample + [*('0'..'9')].sample + [*('a'..'z'), *('0'..'9')].sample(3).join)
-        break if Event.find_by(slug: slug).nil?
-      end
-    end
-
-    if new_record? && !duplicate
-      errors.add(:organisation, '- you are not an admin of this organisation') if !local_group && !activity && !Organisation.admin?(organisation, account)
-      errors.add(:activity, '- you are not an admin of this activity') if activity && !Activity.admin?(activity, account)
-      errors.add(:local_group, '- you are not an admin of this local group') if local_group && !LocalGroup.admin?(local_group, account)
-    end
-
-    if zoom_party?
-      self.local_group = nil
-      self.capacity = nil
-    end
-    self.stripe_revenue_adjustment = 0 unless stripe_revenue_adjustment
-    self.revenue_share_to_revenue_sharer = 0 unless revenue_share_to_revenue_sharer
-    self.revenue_share_to_revenue_sharer = 0 unless revenue_sharer
-    self.profit_share_to_facilitator = 0 if revenue_sharer
-    errors.add(:revenue_share_to_revenue_sharer, 'must be present if a revenue sharer is set') if revenue_sharer && !revenue_share_to_revenue_sharer
-    errors.add(:organiser, 'or revenue sharer must be set') if !revenue_sharer && !organiser && organisation && organisation.stripe_client_id
-    errors.add(:revenue_sharer, 'cannot be set if organiser is set') if revenue_sharer && organiser
-    errors.add(:revenue_sharer, 'or organiser must be set for this organisation') if organisation && organisation.require_organiser_or_revenue_sharer && !revenue_sharer && !organiser
-    errors.add(:revenue_sharer, 'is not connected to this organisation') if revenue_sharer && !revenue_sharer_organisationship
-    self.location = 'Online' if location && location.downcase == 'online'
-    errors.add(:revenue_share_to_revenue_sharer, 'must be between 1 and 100') if revenue_share_to_revenue_sharer && revenue_share_to_revenue_sharer != 0 && (revenue_share_to_revenue_sharer < 1 || revenue_share_to_revenue_sharer > 100)
-    errors.add(:affiliate_credit_percentage, 'must be between 1 and 100') if affiliate_credit_percentage && (affiliate_credit_percentage < 1 || affiliate_credit_percentage > 100)
-    errors.add(:capacity, 'must be greater than 0') if capacity && capacity.zero?
-    errors.add(:suggested_donation, 'cannot be less than the minimum donation') if suggested_donation && minimum_donation && suggested_donation < minimum_donation
-    errors.add(:oc_slug, "cannot be set until the organisation's Open Collective slug is set") if oc_slug && organisation && !organisation.oc_slug
-
-    {
-      zoom_party: false,
-      monthly_donors_only: false,
-      no_discounts: false,
-      include_in_parent: false,
-      affiliate_credit_percentage: organisation.try(:affiliate_credit_percentage),
-      featured: false,
-      show_emails: false,
-      opt_in_facilitator: false,
-      refund_deleted_orders: true
-    }.each do |k, v|
-      if !duplicate && !Organisation.admin?(organisation, last_saved_by)
-        if new_record?
-          send("#{k}=", v)
-        elsif send("#{k}_changed?")
-          errors.add(:"#{k}", '- you cannot change this setting')
-        end
-      end
-    end
   end
 
   after_create do
@@ -542,96 +469,6 @@ class Event
     set(ai_tagged: true)
   end
 
-  def duplicate!(account)
-    event = Event.create!(
-      duplicate: true,
-      name: name,
-      start_time: start_time,
-      end_time: end_time,
-      currency: currency,
-      location: location,
-      image: image,
-      video: video,
-      description: description,
-      email: email,
-      feedback_questions: feedback_questions,
-      suggested_donation: suggested_donation,
-      minimum_donation: minimum_donation,
-      affiliate_credit_percentage: affiliate_credit_percentage,
-      capacity: capacity,
-      revenue_share_to_revenue_sharer: revenue_share_to_revenue_sharer,
-      hide_attendees: hide_attendees,
-      hide_discussion: hide_discussion,
-      refund_deleted_orders: refund_deleted_orders,
-      monthly_donors_only: monthly_donors_only,
-      no_discounts: no_discounts,
-      extra_info_for_ticket_email: extra_info_for_ticket_email,
-      extra_info_for_recording_email: extra_info_for_recording_email,
-      zoom_party: zoom_party,
-      show_emails: show_emails,
-      include_in_parent: include_in_parent,
-      opt_in_facilitator: opt_in_facilitator,
-      locked: true,
-      secret: secret,
-      account: account,
-      last_saved_by: account,
-      organisation: organisation,
-      activity: activity,
-      local_group: local_group,
-      coordinator: coordinator,
-      revenue_sharer: revenue_sharer,
-      organiser: (organiser || account unless revenue_sharer),
-      tag_names: event_tags.pluck(:name).join(','),
-      add_a_donation_to: add_a_donation_to,
-      donation_text: donation_text,
-      carousel_text: carousel_text,
-      select_tickets_intro: select_tickets_intro,
-      select_tickets_outro: select_tickets_outro,
-      select_tickets_title: select_tickets_title,
-      ask_hear_about: ask_hear_about,
-      time_zone: time_zone,
-      questions: questions
-    )
-    event_tags.each do |event_tag|
-      event.event_tagships.create(
-        event_tag: event_tag
-      )
-    end
-    event_facilitations.each do |event_facilitation|
-      event.event_facilitations.create(
-        account: event_facilitation.account
-      )
-    end
-    cohostships.each do |cohostship|
-      event.cohostships.create(
-        organisation: cohostship.organisation,
-        image: cohostship.image,
-        video: cohostship.video
-      )
-    end
-    ticket_groups.each do |ticket_group|
-      event.ticket_groups.create(
-        name: ticket_group.name,
-        capacity: ticket_group.capacity
-      )
-    end
-    ticket_types.each do |ticket_type|
-      event.ticket_types.create(
-        name: ticket_type.name,
-        description: ticket_type.description,
-        price: ticket_type.price,
-        range_min: ticket_type.range_min,
-        range_max: ticket_type.range_max,
-        quantity: ticket_type.quantity,
-        hidden: ticket_type.hidden,
-        order: ticket_type.order,
-        max_quantity_per_transaction: ticket_type.max_quantity_per_transaction,
-        ticket_group: (event.ticket_groups.find_by(name: ticket_type.ticket_group.name) if ticket_type.ticket_group)
-      )
-    end
-    event
-  end
-
   def event_tags
     EventTag.and(:id.in => event_tagships.pluck(:event_tag_id))
   end
@@ -646,159 +483,10 @@ class Event
         EventTag.and(:name.in => %w[course courses]).pluck(:id)).pluck(:event_id))
   end
 
-  dragonfly_accessor :video
-
-  dragonfly_accessor :image
-  before_validation do
-    if image
-      begin
-        if %w[jpeg png gif pam].include?(image.format)
-          image.name = "#{SecureRandom.uuid}.#{image.format}"
-        else
-          errors.add(:image, 'must be an image')
-        end
-      rescue StandardError
-        self.image = nil
-        errors.add(:image, 'must be an image')
-      end
-
-      begin
-        self.image = image.encode('jpg') if image && !%w[jpg jpeg].include?(image.format)
-      rescue StandardError
-        self.image = nil
-      end
-
-      errors.add(:image, 'must be at least 992px wide') if image && image.width < 800 # legacy images are 800px
-      errors.add(:image, 'must be more wide than high') if image && image.height > image.width
-
-      errors.add(:image, "must be #{organisation.event_image_required_width}px wide") if organisation && organisation.event_image_required_width && !(image && image.width == organisation.event_image_required_width)
-      errors.add(:image, "must be #{organisation.event_image_required_height}px high") if organisation && organisation.event_image_required_height && !(image && image.height == organisation.event_image_required_height)
-
-    end
-  end
-
-  def cap
-    if contribution_gbp_custom
-      Money.new(contribution_gbp_custom * 100, 'GBP')
-    elsif organisation && organisation.contribution_requested_per_event_gbp
-      Money.new(organisation.contribution_requested_per_event_gbp * 100, 'GBP')
-    else
-      Money.new(Organisation.contribution_requested_per_event_gbp * 100, 'GBP')
-    end
-  end
-
-  def contribution_gbp
-    if organisation && organisation.fixed_fee
-      cap
-    else
-      begin
-        if ticket_types.empty?
-          cap
-        else
-          five_percent_of_ticket_sales = Money.new(tickets.complete.sum(:discounted_price) * 0.05 * 100, currency).exchange_to('GBP')
-          [cap, five_percent_of_ticket_sales].min
-        end
-      rescue StandardError
-        cap
-      end
-    end
-  end
-
   def feedback_questions_a
     q = (feedback_questions || '').split("\n").map(&:strip).reject(&:blank?)
     q.empty? ? [] : q
   end
-
-  def send_destroy_notification(destroyed_by)
-    mg_client = Mailgun::Client.new ENV['MAILGUN_API_KEY'], ENV['MAILGUN_REGION']
-    batch_message = Mailgun::BatchMessage.new(mg_client, ENV['MAILGUN_NOTIFICATIONS_HOST'])
-
-    event = self
-    content = ERB.new(File.read(Padrino.root('app/views/emails/event_destroyed.erb'))).result(binding)
-    batch_message.from ENV['NOTIFICATIONS_EMAIL_FULL']
-    batch_message.subject "#{destroyed_by.name} deleted the event #{event.name}"
-    batch_message.body_html Premailer.new(ERB.new(File.read(Padrino.root('app/views/layouts/email.erb'))).result(binding), with_html_string: true, adapter: 'nokogiri', input_encoding: 'UTF-8').to_inline_css
-
-    accounts_receiving_feedback.each do |account|
-      batch_message.add_recipient(:to, account.email, { 'firstname' => account.firstname || 'there', 'token' => account.sign_in_token, 'id' => account.id.to_s })
-    end
-
-    batch_message.finalize if ENV['MAILGUN_API_KEY']
-  end
-
-  def send_reminders(account_id)
-    return unless organisation
-    return if prevent_reminders
-
-    mg_client = Mailgun::Client.new ENV['MAILGUN_API_KEY'], ENV['MAILGUN_REGION']
-    batch_message = Mailgun::BatchMessage.new(mg_client, ENV['MAILGUN_NOTIFICATIONS_HOST'])
-
-    event = self
-    content = ERB.new(File.read(Padrino.root('app/views/emails/reminder.erb'))).result(binding)
-    batch_message.from ENV['REMINDERS_EMAIL_FULL']
-    batch_message.reply_to(event.email || event.organisation.try(:reply_to))
-    batch_message.subject "#{event.name} is tomorrow"
-    batch_message.body_html Premailer.new(ERB.new(File.read(Padrino.root('app/views/layouts/email.erb'))).result(binding), with_html_string: true, adapter: 'nokogiri', input_encoding: 'UTF-8').to_inline_css
-
-    (account_id == :all ? attendees.and(:unsubscribed.ne => true).and(:unsubscribed_reminders.ne => true) : attendees.and(:unsubscribed.ne => true).and(:unsubscribed_reminders.ne => true).and(id: account_id)).each do |account|
-      batch_message.add_recipient(:to, account.email, { 'firstname' => account.firstname || 'there', 'token' => account.sign_in_token, 'id' => account.id.to_s })
-    end
-
-    batch_message.finalize if ENV['MAILGUN_API_KEY']
-  end
-  handle_asynchronously :send_reminders
-
-  def send_star_reminders(account_id)
-    return unless organisation
-
-    mg_client = Mailgun::Client.new ENV['MAILGUN_API_KEY'], ENV['MAILGUN_REGION']
-    batch_message = Mailgun::BatchMessage.new(mg_client, ENV['MAILGUN_NOTIFICATIONS_HOST'])
-
-    event = self
-    content = ERB.new(File.read(Padrino.root('app/views/emails/reminder_starred.erb'))).result(binding)
-    batch_message.from ENV['REMINDERS_EMAIL_FULL']
-    batch_message.reply_to(event.email || event.organisation.try(:reply_to))
-    batch_message.subject "#{event.name} is next week"
-    batch_message.body_html Premailer.new(ERB.new(File.read(Padrino.root('app/views/layouts/email.erb'))).result(binding), with_html_string: true, adapter: 'nokogiri', input_encoding: 'UTF-8').to_inline_css
-
-    (account_id == :all ? starrers.and(:unsubscribed.ne => true).and(:unsubscribed_reminders.ne => true) : starrers.and(:unsubscribed.ne => true).and(:unsubscribed_reminders.ne => true).and(id: account_id)).each do |account|
-      batch_message.add_recipient(:to, account.email, { 'firstname' => account.firstname || 'there', 'token' => account.sign_in_token, 'id' => account.id.to_s })
-    end
-
-    batch_message.finalize if ENV['MAILGUN_API_KEY']
-  end
-  handle_asynchronously :send_star_reminders
-
-  def send_feedback_requests(account_id)
-    return if feedback_questions.nil?
-    return unless organisation
-
-    mg_client = Mailgun::Client.new ENV['MAILGUN_API_KEY'], ENV['MAILGUN_REGION']
-    batch_message = Mailgun::BatchMessage.new(mg_client, ENV['MAILGUN_NOTIFICATIONS_HOST'])
-
-    event = self
-    content = ERB.new(File.read(Padrino.root('app/views/emails/feedback.erb'))).result(binding)
-    batch_message.from ENV['FEEDBACK_EMAIL_FULL']
-    batch_message.reply_to(event.email || event.organisation.try(:reply_to))
-    batch_message.subject "Feedback on #{event.name}"
-    batch_message.body_html Premailer.new(ERB.new(File.read(Padrino.root('app/views/layouts/email.erb'))).result(binding), with_html_string: true, adapter: 'nokogiri', input_encoding: 'UTF-8').to_inline_css
-
-    (account_id == :all ? attendees.and(:unsubscribed.ne => true).and(:unsubscribed_feedback.ne => true) : attendees.and(:unsubscribed.ne => true).and(:unsubscribed_feedback.ne => true).and(id: account_id)).each do |account|
-      batch_message.add_recipient(:to, account.email, { 'firstname' => account.firstname || 'there', 'token' => account.sign_in_token, 'id' => account.id.to_s })
-    end
-
-    batch_message.finalize if ENV['MAILGUN_API_KEY']
-  end
-  handle_asynchronously :send_feedback_requests
-
-  before_validation :ensure_end_after_start
-  def ensure_end_after_start
-    errors.add(:end_time, 'must be after the start time') if end_time && start_time && end_time <= start_time
-  end
-
-  validates_presence_of :name, :start_time, :end_time, :location, :currency
-  validates_uniqueness_of :slug, allow_nil: true
-  validates_format_of :slug, with: /\A[a-z0-9-]+\z/, if: :slug
 
   def future?(from = Date.today)
     start_time >= from
@@ -890,6 +578,34 @@ class Event
 
   def public?
     !secret?
+  end
+
+  def sold_out?
+    ticket_types.count > 0 && ticket_types.and(:hidden.ne => true).all? { |ticket_type| ticket_type.number_of_tickets_available_in_single_purchase <= 0 }
+  end
+
+  def tickets_available?
+    ticket_types.count > 0 && ticket_types.and(:hidden.ne => true).any? { |ticket_type| ticket_type.number_of_tickets_available_in_single_purchase >= 1 }
+  end
+
+  def places_remaining
+    capacity - tickets.count if capacity
+  end
+
+  def attendees
+    Account.and(:id.in => tickets.complete.pluck(:account_id))
+  end
+
+  def starrers
+    Account.and(:id.in => event_stars.pluck(:account_id))
+  end
+
+  def public_attendees
+    Account.and(:id.in => tickets.complete.and(show_attendance: true).pluck(:account_id)).and(:hidden.ne => true)
+  end
+
+  def private_attendees
+    Account.and(:id.in => tickets.complete.and(:show_attendance.ne => true).pluck(:account_id))
   end
 
   def time_zone_or_default
@@ -1033,301 +749,5 @@ class Event
       end
     end
     cal
-  end
-
-  def sold_out?
-    ticket_types.count > 0 && ticket_types.and(:hidden.ne => true).all? { |ticket_type| ticket_type.number_of_tickets_available_in_single_purchase <= 0 }
-  end
-
-  def tickets_available?
-    ticket_types.count > 0 && ticket_types.and(:hidden.ne => true).any? { |ticket_type| ticket_type.number_of_tickets_available_in_single_purchase >= 1 }
-  end
-
-  def places_remaining
-    capacity - tickets.count if capacity
-  end
-
-  def attendees
-    Account.and(:id.in => tickets.complete.pluck(:account_id))
-  end
-
-  def starrers
-    Account.and(:id.in => event_stars.pluck(:account_id))
-  end
-
-  def public_attendees
-    Account.and(:id.in => tickets.complete.and(show_attendance: true).pluck(:account_id)).and(:hidden.ne => true)
-  end
-
-  def private_attendees
-    Account.and(:id.in => tickets.complete.and(:show_attendance.ne => true).pluck(:account_id))
-  end
-
-  def discounted_ticket_revenue
-    r = Money.new(0, currency)
-    tickets.complete.each { |ticket| r += Money.new((ticket.discounted_price || 0) * 100, ticket.currency) }
-    r
-  rescue Money::Bank::UnknownRate, Money::Currency::UnknownCurrency
-    Money.new(0, ENV['DEFAULT_CURRENCY'])
-  end
-
-  def donation_revenue(skip_transferred: false)
-    r = Money.new(0, currency)
-    donations = skip_transferred ? self.donations.and(:transferred.ne => true) : self.donations
-    donations.each { |donation| r += Money.new((donation.amount || 0) * 100, donation.currency) }
-    r
-  rescue Money::Bank::UnknownRate, Money::Currency::UnknownCurrency
-    Money.new(0, ENV['DEFAULT_CURRENCY'])
-  end
-
-  def organisation_discounted_ticket_revenue(skip_transferred: false)
-    r = Money.new(0, currency)
-    tickets = skip_transferred ? self.tickets.and(:transferred.ne => true) : self.tickets
-    tickets.complete.each { |ticket| r += Money.new((ticket.discounted_price || 0) * 100 * (ticket.organisation_revenue_share || 1), ticket.currency) }
-    r
-  rescue Money::Bank::UnknownRate, Money::Currency::UnknownCurrency
-    Money.new(0, ENV['DEFAULT_CURRENCY'])
-  end
-
-  def revenue_sharer_discounted_ticket_revenue(skip_transferred: false)
-    r = Money.new(0, currency)
-    tickets = skip_transferred ? self.tickets.and(:transferred.ne => true) : self.tickets
-    tickets.complete.each { |ticket| r += Money.new((ticket.discounted_price || 0) * 100 * (1 - (ticket.organisation_revenue_share || 1)), ticket.currency) }
-    r
-  rescue Money::Bank::UnknownRate, Money::Currency::UnknownCurrency
-    Money.new(0, ENV['DEFAULT_CURRENCY'])
-  end
-
-  def revenue_share_to_organisation
-    100 - (revenue_share_to_revenue_sharer || 0)
-  end
-
-  def organisation_revenue_share
-    revenue_share_to_organisation / 100.0
-  end
-
-  def revenue
-    organisation_discounted_ticket_revenue(skip_transferred: true) + donation_revenue(skip_transferred: true) - (credit_applied - credit_on_behalf_of_revenue_sharer) - (fixed_discounts_applied - fixed_discounts_on_behalf_of_revenue_sharer)
-  end
-
-  def ticket_revenue_to_organisation
-    organisation_discounted_ticket_revenue(skip_transferred: true) - credit_on_behalf_of_organisation - fixed_discounts_on_behalf_of_organisation
-  end
-
-  def ticket_revenue_to_revenue_sharer
-    revenue_sharer_discounted_ticket_revenue(skip_transferred: true) - credit_on_behalf_of_revenue_sharer - fixed_discounts_on_behalf_of_revenue_sharer
-  end
-
-  def stripe_revenue
-    s = stripe_charges.sum(&:balance)
-    s == 0 ? Money.new(0, currency) : s
-  end
-
-  def stripe_fees
-    s = stripe_charges.sum(&:fees)
-    s == 0 ? Money.new(0, currency) : s
-  end
-
-  def stripe_donations
-    s = stripe_charges.sum(&:donations)
-    s == 0 ? Money.new(0, currency) : s
-  end
-
-  def stripe_ticket_revenue
-    s = stripe_charges.sum(&:ticket_revenue)
-    s == 0 ? Money.new(0, currency) : s
-  end
-
-  def stripe_ticket_revenue_to_organisation
-    s = stripe_charges.sum(&:ticket_revenue_to_organisation)
-    s == 0 ? Money.new(0, currency) : s
-  end
-
-  def stripe_ticket_revenue_to_revenue_sharer
-    s = stripe_charges.sum(&:ticket_revenue_to_revenue_sharer)
-    s == 0 ? Money.new(0, currency) : s
-  end
-
-  def stripe_profit
-    stripe_revenue - stripe_fees + Money.new(stripe_revenue_adjustment * 100, currency)
-  end
-
-  def profit
-    stripe_profit
-  end
-
-  def profit_less_donations
-    stripe_profit - stripe_donations
-  end
-
-  def self.profit_share_roles
-    %w[facilitator coordinator category_steward social_media]
-  end
-
-  def allocations_to_roles
-    allocations = Money.new(0, currency)
-    Event.profit_share_roles.each do |role|
-      allocations += send("profit_to_#{role}")
-    end
-    allocations
-  end
-
-  def profit_less_donations_less_allocations
-    profit_less_donations - allocations_to_roles
-  end
-
-  def profit_less_allocations
-    profit_less_donations_less_allocations + stripe_donations
-  end
-
-  before_validation do
-    Event.profit_share_roles.each do |role|
-      send("profit_share_to_#{role}=", 0) if send("profit_share_to_#{role}").nil?
-    end
-    Event.profit_share_roles.each do |role|
-      errors.add(:"profit_share_to_#{role}", 'must be between 0% and 100%') if send("profit_share_to_#{role}") < 0 || send("profit_share_to_#{role}") > 100
-      errors.add(:"profit_share_to_#{role}", "along with other profit shares must not be greater than #{revenue_share_to_organisation}%") if Event.profit_share_roles.inject(0) { |sum, r| sum + send("profit_share_to_#{r}") } > revenue_share_to_organisation
-    end
-  end
-
-  Event.profit_share_roles.each do |role|
-    define_method "paid_to_#{role}" do
-      s = rpayments.and(role: role).sum(&:amount_money)
-      s == 0 ? Money.new(0, currency) : s
-    end
-    define_method "remaining_to_#{role}" do
-      send("profit_to_#{role}") - send("paid_to_#{role}")
-    end
-  end
-
-  (Event.profit_share_roles + ['organisation']).each do |role|
-    define_method "profit_to_#{role}" do
-      revenue_share_to_organisation > 0 ? profit_less_donations * send("profit_share_to_#{role}") / revenue_share_to_organisation : Money.new(0, currency)
-    end
-  end
-
-  def profit_share_to_organisation
-    revenue_share_to_organisation - Event.profit_share_roles.inject(0) { |sum, r| sum + (send("profit_share_to_#{r}") || 0) }
-  end
-
-  def credit_applied
-    r = Money.new(0, currency)
-    orders.each { |order| r += Money.new((order.credit_applied || 0) * 100, order.currency) }
-    r
-  rescue Money::Bank::UnknownRate, Money::Currency::UnknownCurrency
-    Money.new(0, ENV['DEFAULT_CURRENCY'])
-  end
-
-  def credit_on_behalf_of_organisation
-    r = Money.new(0, currency)
-    orders.each { |order| r += Money.new((order.credit_on_behalf_of_organisation || 0) * 100, order.currency) }
-    r
-  rescue Money::Bank::UnknownRate, Money::Currency::UnknownCurrency
-    Money.new(0, ENV['DEFAULT_CURRENCY'])
-  end
-
-  def credit_on_behalf_of_revenue_sharer
-    r = Money.new(0, currency)
-    orders.each { |order| r += Money.new((order.credit_on_behalf_of_revenue_sharer || 0) * 100, order.currency) }
-    r
-  rescue Money::Bank::UnknownRate, Money::Currency::UnknownCurrency
-    Money.new(0, ENV['DEFAULT_CURRENCY'])
-  end
-
-  def fixed_discounts_applied
-    r = Money.new(0, currency)
-    orders.each { |order| r += Money.new((order.fixed_discount_applied || 0) * 100, order.currency) }
-    r
-  rescue Money::Bank::UnknownRate, Money::Currency::UnknownCurrency
-    Money.new(0, ENV['DEFAULT_CURRENCY'])
-  end
-
-  def fixed_discounts_on_behalf_of_organisation
-    r = Money.new(0, currency)
-    orders.each { |order| r += Money.new((order.fixed_discount_on_behalf_of_organisation || 0) * 100, order.currency) }
-    r
-  rescue Money::Bank::UnknownRate, Money::Currency::UnknownCurrency
-    Money.new(0, ENV['DEFAULT_CURRENCY'])
-  end
-
-  def fixed_discounts_on_behalf_of_revenue_sharer
-    r = Money.new(0, currency)
-    orders.each { |order| r += Money.new((order.fixed_discount_on_behalf_of_revenue_sharer || 0) * 100, order.currency) }
-    r
-  rescue Money::Bank::UnknownRate, Money::Currency::UnknownCurrency
-    Money.new(0, ENV['DEFAULT_CURRENCY'])
-  end
-
-  def self.oc_transactions(oc_slug)
-    transactions = []
-
-    query = %{
-      query (
-        $account: AccountReferenceInput
-      ) {
-        orders(account: $account) {
-          nodes {
-            legacyId
-            createdAt
-            tags
-            amount {
-              value
-              currency
-              valueInCents
-            }
-          }
-        }
-      }
-    }
-
-    variables = { account: { slug: oc_slug } }
-
-    conn = Faraday.new(url: 'https://api.opencollective.com/graphql/v2/') do |faraday|
-      faraday.request  :url_encoded
-      faraday.adapter  Faraday.default_adapter
-      faraday.headers['Content-Type'] = 'application/json'
-      faraday.headers['Api-Key'] = ENV['OC_API_KEY']
-    end
-
-    response = conn.post do |req|
-      req.body = {
-        query: query,
-        variables: variables
-      }.to_json
-    end
-
-    j = JSON.parse(response.body)
-    j['data']['orders']['nodes'].each do |item|
-      currency = item['amount']['currency']
-      amount = item['amount']['value']
-      secret = item['tags'].select { |tag| tag.starts_with?('dandelion:') }.first
-      tx_created_at = Time.parse(item['createdAt'])
-
-      puts [currency, amount, secret, tx_created_at]
-      transactions << [currency, amount, secret, tx_created_at]
-    end
-
-    transactions
-  end
-
-  def oc_transactions
-    Event.oc_transactions(oc_slug)
-  end
-
-  def check_oc_event
-    oc_transactions.each do |currency, amount, secret, tx_created_at|
-      if (@order = Order.find_by(:payment_completed.ne => true, :currency => currency, :value => amount, :oc_secret => secret, :created_at.lt => tx_created_at))
-        @order.payment_completed!
-        @order.send_tickets
-        @order.create_order_notification
-      elsif (@order = Order.deleted.find_by(:payment_completed.ne => true, :currency => currency, :value => amount, :oc_secret => secret, :created_at.lt => tx_created_at))
-        begin
-          @order.restore_and_complete
-          # raise Order::Restored
-        rescue StandardError => e
-          Airbrake.notify(e, order: @order)
-        end
-      end
-    end
   end
 end

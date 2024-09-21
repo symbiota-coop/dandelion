@@ -38,3 +38,5 @@ _yardoc
 doc/
 
 .idea/
+.aider.*
+code.md
