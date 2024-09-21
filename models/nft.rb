@@ -15,9 +15,8 @@ class Nft
     }
   end
 
-  after_create :generate_nft
-
-  def generate_nft
+  after_create :generate_image
+  def generate_image
     headers = {
       Authorization: "Bearer #{ENV['NEXTLEG_API_KEY']}",
       'Content-Type': 'application/json'
@@ -58,10 +57,10 @@ class Nft
 
     update_attribute(:image_url, j['response']['imageUrl'])
 
-    send_nft
+    mint_nft
   end
 
-  def send_nft
+  def mint_nft
     headers = {
       'x-client-secret' => ENV['CROSSMINT_CLIENT_SECRET'],
       'x-project-id' => ENV['CROSSMINT_PROJECT_ID'],
