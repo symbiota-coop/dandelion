@@ -214,27 +214,24 @@ class Event
     return unless ENV['ANTHROPIC_API_KEY']
     return unless event_tagships(true).empty?
 
-    prompt = "Provide a list of 5 tags for this event as a comma-separated list:\n\n#{name}\n\n#{description}"
+    prompt = "Provide a list of 5 tags for this event as a comma-separated list. Use spaces. No hashtags. Event details: \n\n#{name}\n\n#{description}"
 
-    prompt = prompt[0..(200_000 * 0.66 * 4)]
-    client = Anthropic::Client.new
+    prompt = prompt[0..(128_000 * 0.66 * 4)]
+    client = OpenAI::Client.new
     content = nil
     5.times do
-      response = client.messages(
+      response = client.chat(
         parameters: {
-          model: 'claude-3-haiku-20240307',
-          messages: [
-            { role: 'user', content: prompt }
-          ],
+          model: 'gpt-4o-mini',
+          messages: [{ role: 'user', content: prompt }],
           max_tokens: 256
         }
       )
-      if response['content']
-        content = response['content'].first['text']
+      if (content = response.dig('choices', 0, 'message', 'content'))
         break unless content.include?('#')
       else
         puts 'sleeping...'
-        sleep 5
+        sleep 1
       end
     end
     return unless content
@@ -248,5 +245,46 @@ class Event
       end
     end
     set(ai_tagged: true)
+
+    # prompt = prompt[0..(200_000 * 0.66 * 4)]
+    # client = Anthropic::Client.new
+    # content = nil
+    # 5.times do
+    #   response = client.messages(
+    #     parameters: {
+    #       model: 'claude-3-haiku-20240307',
+    #       messages: [
+    #         { role: 'user', content: prompt }
+    #       ],
+    #       max_tokens: 256
+    #     }
+    #   )
+    #   if response['content']
+    #     content = response['content'].first['text']
+    #     break unless content.include?('#')
+    #   else
+    #     puts 'sleeping...'
+    #     sleep 5
+    #   end
+    # end
+    # return unless content
+
+    # prompt = prompt[0..(1_000_000 * 0.66 * 4)]
+    # content = nil
+    # 5.times do
+    #   response = GEMINI_FLASH.generate_content(
+    #     {
+    #       contents: { role: 'user', parts: { text: prompt } },
+    #       generationConfig: { maxOutputTokens: 256 }
+    #     }
+    #   )
+    #   if (content = response.dig('candidates', 0, 'content', 'parts', 0, 'text'))
+    #     break unless content.include?('#')
+    #   else
+    #     puts 'sleeping...'
+    #     sleep 1
+    #   end
+    # end
+    # return unless content
   end
 end

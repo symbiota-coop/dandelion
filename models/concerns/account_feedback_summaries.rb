@@ -63,24 +63,6 @@ module AccountFeedbackSummaries
       #   end
       # end
       # puts "#{last_paragraph}\n\n" if last_paragraph
-
-      # prompt = prompt[0..(32_000 * 0.66 * 4)]
-      # model = Replicate.client.retrieve_model('mistralai/mixtral-8x7b-instruct-v0.1')
-      # version = model.latest_version
-      # i = 1
-      # prediction = nil
-      # loop do
-      #   puts "attempt #{i}"
-      #   i += 1
-      #   prediction = version.predict(prompt: prompt, max_new_tokens: 128)
-      #   while prediction.status.in?(%w[starting processing])
-      #     sleep 1
-      #     prediction = Replicate.client.retrieve_prediction(prediction.id)
-      #   end
-      #   break if prediction.output.join[-1] == '.'
-      # end
-      # puts prediction.output.join
-      # account.set(feedback_summary: prediction.output.join)
     end
   end
 end
