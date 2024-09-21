@@ -167,10 +167,7 @@
       else
         $('#donation-options').hide()
     })
-    if ($('#event_suggested_donation').val().length > 0)
-      $('#donation-options').show()
-    else
-      $('#donation-options').hide()
+    $('#event_suggested_donation').keyup();
 
     <% if !organisation_admin?(@event.organisation) %>
       $('#do-zoom-party').hide()
@@ -188,40 +185,40 @@
 
     <% if @event.organisation.stripe_client_id %>
       $('#event_revenue_sharer_id').change(function () {
-          if ($(this).val().length > 0) {
-            $('#revenue-share').show()
-            $('#event_profit_share_to_facilitator').val(0).closest('.form-group').hide()
-            $('#event_profit_share_to_coordinator, #event_profit_share_to_category_steward, #event_profit_share_to_social_media, #event_profit_share_to_organisation').parent().find('.input-group-text').text('/' + (100 - $('#event_revenue_share_to_revenue_sharer').val()))
-          } else {
-            $('#revenue-share').hide()
-            $('#event_profit_share_to_facilitator').closest('.form-group').show()
-            $('#event_profit_share_to_coordinator, #event_profit_share_to_category_steward, #event_profit_share_to_social_media, #event_profit_share_to_organisation').parent().find('.input-group-text').text('%')
-          }
-        })
-        $('#event_revenue_sharer_id').change()
-
-        $('#event_revenue_share_to_revenue_sharer').change(function() {
-          if ($('#event_revenue_sharer_id').val().length > 0)
-            $('#event_profit_share_to_coordinator, #event_profit_share_to_category_steward, #event_profit_share_to_social_media, #event_profit_share_to_organisation').parent().find('.input-group-text').text('/' + (100 - $('#event_revenue_share_to_revenue_sharer').val()))
-        }).change()
-
-        $('#event_revenue_share_to_revenue_sharer, #event_profit_share_to_facilitator, #event_profit_share_to_coordinator, #event_profit_share_to_category_steward, #event_profit_share_to_social_media, #event_profit_share_to_organisation')
-        .wrap('<div class="input-group w-25"></div>')
-        .after('<div class="input-group-append"><span class="input-group-text">%</span></div>')
-        .change(function () {
-          var sum = $.map($('#event_revenue_share_to_revenue_sharer, #event_profit_share_to_facilitator, #event_profit_share_to_coordinator, #event_profit_share_to_category_steward, #event_profit_share_to_social_media'), function (el) {
-            return parseInt($(el).val()) || 0
-          }).reduce(function (a, b) {
-            return a + b
-          })
-          var remaining = 100 - sum
-          $('#event_profit_share_to_organisation').val(remaining)
-        }).change()
-      <% end %>
-
-      $('#build-event').submit(function() {
-        $(this).find('button[type=submit]').prop('disabled', true)
+        if ($(this).val().length > 0) {
+          $('#revenue-share').show()
+          $('#event_profit_share_to_facilitator').val(0).closest('.form-group').hide()
+          $('#event_profit_share_to_coordinator, #event_profit_share_to_category_steward, #event_profit_share_to_social_media, #event_profit_share_to_organisation').parent().find('.input-group-text').text('/' + (100 - $('#event_revenue_share_to_revenue_sharer').val()))
+        } else {
+          $('#revenue-share').hide()
+          $('#event_profit_share_to_facilitator').closest('.form-group').show()
+          $('#event_profit_share_to_coordinator, #event_profit_share_to_category_steward, #event_profit_share_to_social_media, #event_profit_share_to_organisation').parent().find('.input-group-text').text('%')
+        }
       })
+      $('#event_revenue_sharer_id').change()
+
+      $('#event_revenue_share_to_revenue_sharer').change(function() {
+        if ($('#event_revenue_sharer_id').val().length > 0)
+          $('#event_profit_share_to_coordinator, #event_profit_share_to_category_steward, #event_profit_share_to_social_media, #event_profit_share_to_organisation').parent().find('.input-group-text').text('/' + (100 - $('#event_revenue_share_to_revenue_sharer').val()))
+      }).change()
+
+      $('#event_revenue_share_to_revenue_sharer, #event_profit_share_to_facilitator, #event_profit_share_to_coordinator, #event_profit_share_to_category_steward, #event_profit_share_to_social_media, #event_profit_share_to_organisation')
+      .wrap('<div class="input-group w-25"></div>')
+      .after('<div class="input-group-append"><span class="input-group-text">%</span></div>')
+      .change(function () {
+        var sum = $.map($('#event_revenue_share_to_revenue_sharer, #event_profit_share_to_facilitator, #event_profit_share_to_coordinator, #event_profit_share_to_category_steward, #event_profit_share_to_social_media'), function (el) {
+          return parseInt($(el).val()) || 0
+        }).reduce(function (a, b) {
+          return a + b
+        })
+        var remaining = 100 - sum
+        $('#event_profit_share_to_organisation').val(remaining)
+      }).change()
+    <% end %>
+
+    $('#build-event').submit(function() {
+      $(this).find('button[type=submit]').prop('disabled', true)
+    })
 
   })
 </script>
