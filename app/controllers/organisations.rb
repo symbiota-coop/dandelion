@@ -194,46 +194,6 @@ Dandelion::App.controller do
     end
   end
 
-  get '/o/:slug/orders', provides: %i[html csv] do
-    @organisation = Organisation.find_by(slug: params[:slug]) || not_found
-    organisation_admins_only!
-    @from = params[:from] ? parse_date(params[:from]) : nil
-    @to = params[:to] ? parse_date(params[:to]) : nil
-    @orders = @organisation.orders
-    @orders = @orders.and(:account_id.in => search_accounts(params[:q]).pluck(:id)) if params[:q]
-    @orders = @orders.and(:created_at.gte => @from) if @from
-    @orders = @orders.and(:created_at.lt => @to + 1) if @to
-    @orders = @orders.and(affiliate_type: 'Organisation', affiliate_id: params[:affiliate_id]) if params[:affiliate_id]
-    case content_type
-    when :html
-      erb :'organisations/orders'
-    when :csv
-      CSV.generate do |csv|
-        row = %w[name firstname lastname email value currency opt_in_organisation opt_in_facilitator hear_about created_at]
-        csv << row
-        @orders.each do |order|
-          row = [
-            order.account ? order.account.name : '',
-            order.account ? order.account.firstname : '',
-            order.account ? order.account.lastname : '',
-            if order_email_viewer?(order)
-              order.account ? order.account.email : ''
-            else
-              ''
-            end,
-            order.value,
-            order.currency,
-            order.opt_in_organisation,
-            order.opt_in_facilitator,
-            order.hear_about,
-            order.created_at.to_fs(:db_local)
-          ]
-          csv << row
-        end
-      end
-    end
-  end
-
   post '/o/:slug/add_follower' do
     @organisation = Organisation.find_by(slug: params[:slug]) || not_found
     organisation_admins_only!
