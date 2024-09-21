@@ -9,6 +9,10 @@ class Ticket
   belongs_to :ticket_type, index: true, optional: true
   belongs_to :zoomship, index: true, optional: true
 
+  has_many :notifications, as: :notifiable, dependent: :destroy
+
+  attr_accessor :complementary, :prevent_notifications
+
   field :price, type: Float
   field :discounted_price, type: Float
   ### from order
@@ -28,38 +32,6 @@ class Ticket
   field :payment_completed, type: Boolean
   field :transferred, type: Boolean
   index({ transferred: 1 })
-
-  def incomplete?
-    !payment_completed
-  end
-
-  def complete?
-    payment_completed
-  end
-
-  def self.incomplete
-    self.and(:payment_completed.ne => true)
-  end
-
-  def self.complete
-    self.and(payment_completed: true)
-  end
-
-  def self.discounted
-    self.and(:id.in => self.and(:percentage_discount.ne => nil).pluck(:id) + self.and(:percentage_discount_monthly_donor.ne => nil).pluck(:id))
-  end
-
-  def firstname
-    return if name.blank?
-
-    parts = name.split
-    n = if parts.count > 1 && %w[mr mrs ms dr].include?(parts[0].downcase.gsub('.', ''))
-          parts[1]
-        else
-          parts[0]
-        end
-    n.capitalize
-  end
 
   def self.admin_fields
     {
@@ -81,42 +53,6 @@ class Ticket
       ticket_type_id: :lookup,
       zoomship_id: :lookup
     }
-  end
-
-  def self.currencies
-    CURRENCY_OPTIONS
-  end
-
-  after_save do
-    event.clear_cache if event
-  end
-  after_destroy do
-    event.clear_cache if event
-  end
-
-  def calculate_discounted_price
-    return unless price
-
-    p = price.to_f
-    p *= ((100 - (percentage_discount || 0)).to_f / 100)
-    p *= ((100 - (percentage_discount_monthly_donor || 0)).to_f / 100)
-    p.round(2)
-  end
-
-  attr_accessor :complementary, :prevent_notifications
-
-  def summary
-    "#{event.try(:name)} : #{account.email} : #{ticket_type.try(:name)}"
-  end
-
-  has_many :notifications, as: :notifiable, dependent: :destroy
-
-  def circle
-    account
-  end
-
-  def self.email_viewer?(ticket, account)
-    account && (!ticket.order || Order.email_viewer?(ticket.order, account))
   end
 
   before_validation do
@@ -157,6 +93,70 @@ class Ticket
     # ticket might be destroyed again, so this should move
     event.waitships.find_by(account: account).try(:destroy)
     event.gathering.memberships.create(account: account, unsubscribed: true) if event.gathering
+  end
+
+  after_save do
+    event.clear_cache if event
+  end
+  after_destroy do
+    event.clear_cache if event
+  end
+
+  def self.email_viewer?(ticket, account)
+    account && (!ticket.order || Order.email_viewer?(ticket.order, account))
+  end
+
+  def self.currencies
+    CURRENCY_OPTIONS
+  end
+
+  def self.incomplete
+    self.and(:payment_completed.ne => true)
+  end
+
+  def self.complete
+    self.and(payment_completed: true)
+  end
+
+  def self.discounted
+    self.and(:id.in => self.and(:percentage_discount.ne => nil).pluck(:id) + self.and(:percentage_discount_monthly_donor.ne => nil).pluck(:id))
+  end
+
+  def incomplete?
+    !payment_completed
+  end
+
+  def complete?
+    payment_completed
+  end
+
+  def firstname
+    return if name.blank?
+
+    parts = name.split
+    n = if parts.count > 1 && %w[mr mrs ms dr].include?(parts[0].downcase.gsub('.', ''))
+          parts[1]
+        else
+          parts[0]
+        end
+    n.capitalize
+  end
+
+  def calculate_discounted_price
+    return unless price
+
+    p = price.to_f
+    p *= ((100 - (percentage_discount || 0)).to_f / 100)
+    p *= ((100 - (percentage_discount_monthly_donor || 0)).to_f / 100)
+    p.round(2)
+  end
+
+  def summary
+    "#{event.try(:name)} : #{account.email} : #{ticket_type.try(:name)}"
+  end
+
+  def circle
+    account
   end
 
   after_create :update_zoomship_tickets_count, if: :zoomship
