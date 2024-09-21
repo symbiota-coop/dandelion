@@ -1,0 +1,214 @@
+<%= partial :'events/nav', locals: { event: @event } %>
+
+<% if params[:new_org] %>
+  <div class="alert alert-success">
+    <p class="lead">
+      Now it's time to create an event under your new organisation!
+    </p>
+    <p class="mb-0">
+      Step through the tabs then click 'Create event'.
+    </p>
+  </div>
+<% end %>
+
+<%= partial :'events/locked' %>
+
+<% if @event.new_record? %>
+  <% begin %>
+    <%= partial :'organisations/pay', locals: { organisation: @event.organisation } %>
+    <% rescue Money::Bank::UnknownRate, Money::Currency::UnknownCurrency %>
+  <% end %>
+<% end %>
+
+<p class="mt-3">
+  <a target="_blank" href="/docs/events">
+    <i class="bi bi-question-circle-fill"></i>
+    Need support? Check out the docs
+  </a>
+</p>
+
+<%= partial :'events_build/build_js' %>
+
+<%= partial :'events_build/drafts' %>
+
+<% if @event.errors.count > 0 %>
+  <div class="alert alert-danger">
+    <ul class="mb-0">
+      <% @event.errors.full_messages.each { |message| %>
+      <li><%= message %></li>
+      <% } %>
+    </ul>
+  </div>
+<% end %>
+
+<% form_for @event, @event.new_record ? '/events/new' : "/events/#{@event.id}/edit", id: 'build-event' do |f| %>
+  <ul id="event-build-nav" class="nav nav-tabs" role="tablist">
+    <li role="presentation" class="nav-item"><a class="nav-link active" href="#tab1" role="tab" data-toggle="tab">Basics</a></li>
+    <li role="presentation" class="nav-item"><a class="nav-link" href="#tab2" role="tab" data-toggle="tab">Description and confirmation email</a></li>
+    <li role="presentation" class="nav-item"><a class="nav-link" href="#tab3" role="tab" data-toggle="tab">Tickets</a></li>
+    <li role="presentation" class="nav-item"><a class="nav-link" href="#tab4" role="tab" data-toggle="tab">Questions</a></li>
+    <li role="presentation" class="nav-item"><a class="nav-link" href="#tab5" role="tab" data-toggle="tab">Donations</a></li>
+    <li role="presentation" class="nav-item"><a class="nav-link" href="#tab6" role="tab" data-toggle="tab">Labels</a></li>
+    <li role="presentation" class="nav-item"><a class="nav-link" href="#tab7" role="tab" data-toggle="tab">Everything else</a></li>
+    <% if @event.organisation.stripe_client_id %>
+      <li role="presentation" class="nav-item"><a class="nav-link" href="#tab8" role="tab" data-toggle="tab">Revenue</a></li>
+    <% end %>
+  </ul>
+  <div class="container">
+    <div class="tab-content mt-3">
+      <div role="tabpanel" class="tab-pane active" id="tab1">
+        <%= f.hidden_field :organisation_id, value: @event.organisation_id %>
+        <%= f.text_block :name %>
+        <%= f.datetime_block :start_time %>
+        <%= f.datetime_block :end_time %>
+        <%= f.text_block :location %>
+        <%= f.email_block :email %>
+        <%= f.image_block :image %>
+        <%= f.url_block :facebook_event_url %>
+        <%= partial :'events_build/tags', locals: { f: f } %>
+        <%= f.lookup_block :coordinator_id, lookup_url: '/accounts.json', placeholder: 'Search accounts', selected_link: (%(<a class="d-inline-block mt-1" target="_blank" href="/u/#{@event.coordinator.username}">View account</a>) if @event.coordinator) %>
+        <% if Padrino.env == :development || @event.organisation.verified? %>
+          <%= f.lookup_block :organiser_id, lookup_url: '/accounts.json', placeholder: 'Search accounts', selected_link: (%(<a class="d-inline-block mt-1" target="_blank" href="/u/#{@event.organiser.username}">View account</a>) if @event.organiser_id) %>
+        <% end %>
+
+        <% if @event.organisation.activities.count > 0 || @event.organisation.local_groups.count > 0 %>
+          <div class="form-group">
+            <label for="event_organisation" class="">
+              Organisation
+            </label>
+            <div>
+              <input type="text" value="<%=@event.organisation.name%>" class="form-control " disabled="disabled">
+            </div>
+          </div>
+        <% end %>
+
+        <% if @event.organisation.activities.count > 0 %>
+          <%= f.lookup_block :activity_id, lookup_url: "/o/#{@event.organisation_id}/activities.json", placeholder: 'Search activities', selected_link: (%(<a class="d-inline-block mt-1" target="_blank" href="/activities/#{@event.activity_id}">View activity</a>) if @event.activity_id) %>
+        <% end %>
+
+        <% if @event.organisation.local_groups.count > 0 %>
+          <div id="local-group-select" <% unless @event.organisation.verified? %> class="mb-3" <% end %>>
+            <%= f.lookup_block :local_group_id, lookup_url: "/o/#{@event.organisation_id}/local_groups.json", placeholder: 'Search local groups', selected_link: (%(<a class="d-inline-block mt-1" target="_blank" href="/local_groups/#{@event.local_group_id}">View local group</a>) if @event.local_group_id) %>
+          </div>
+          <% if Padrino.env == :development || @event.organisation.verified? %>
+            <p id="do-zoom-party">or <a href="javascript:;">turn this event into a Zoom party (experimental)</a></p>
+            <div id="zoom-party-checkbox">
+              <%= f.check_box_block :zoom_party %>
+            </div>
+          <% end %>
+        <% end %>
+        <%= f.check_box_block :locked %>
+        <%= f.check_box_block :secret %>
+        <%= f.check_box_block :featured %>
+        <%= f.check_box_block :send_order_notifications %>
+      </div>
+      <div role="tabpanel" class="tab-pane" id="tab2">
+        <%= f.wysiwyg_block :description %>
+        <%= f.wysiwyg_block :extra_info_for_ticket_email %>
+        <% if @event.persisted? %>
+          <p style="margin-top: -1rem"><a target="_blank" href="/events/<%=@event.id%>/ticket_email">Preview ticket confirmation email &rarr;</a></p>
+        <% end %>
+      </div>
+      <div role="tabpanel" class="tab-pane" id="tab3">
+        <%= f.select_block :currency %>
+        <p id="event-currency-changed" style="margin-top: -0.75rem; display: none">
+          <em>Save the event to update the currency symbol.</em>
+          <p>
+            <%= partial :'events_build/ticket_types', locals: { f: f } %>
+            <%= partial :'events_build/ticket_groups', locals: { f: f } %>
+            <%= f.number_block :capacity %>
+          </div>
+          <div role="tabpanel" class="tab-pane" id="tab4">
+            <%= f.check_box_block :ask_hear_about %>
+            <%= f.text_area_block :questions, placeholder: "e.g. Any dietary requirements?\n[Check this box to agree to the terms and conditions]" %>
+            <%= f.text_area_block :feedback_questions %>
+          </div>
+          <div role="tabpanel" class="tab-pane" id="tab5">
+            <%= f.number_block :suggested_donation %>
+            <div id="donation-options">
+              <%= f.number_block :minimum_donation %>
+              <%= f.text_block :add_a_donation_to %>
+              <%= f.text_block :donation_text %>
+            </div>
+          </div>
+          <div role="tabpanel" class="tab-pane" id="tab6">
+            <% if Padrino.env == :development || @event.organisation.change_select_tickets_title || @event.organisation.verified? %>
+              <%= f.text_block :select_tickets_title %>
+            <% end %>
+            <%= f.text_block :select_tickets_intro %>
+            <%= f.text_block :select_tickets_outro %>
+            <%= f.text_block :carousel_text %>
+          </div>
+          <div role="tabpanel" class="tab-pane" id="tab7">
+            <%= f.shorturl_block :slug, stem: "#{ENV['BASE_URI']}/e/" %>
+            <%= f.url_block :redirect_url %>
+            <% if Padrino.env == :development || @event.purchase_url || @event.organisation.allow_purchase_url? || @event.organisation.verified? %>
+              <%= f.url_block :purchase_url %>
+            <% end %>
+            <%= f.number_block :facebook_pixel_id %>
+            <%= f.text_block :oc_slug %>
+            <% if current_account.memberships.and(admin: true).count > 0 %>
+              <%= f.select_block :gathering_id, options: [''] + current_account.memberships.and(admin: true).map { |m| [m.gathering.name, m.gathering_id] }.sort_by { |a,b| a } %>
+            <% end %>
+            <%= f.check_box_block :hide_attendees %>
+            <%= f.check_box_block :hide_discussion %>
+            <%= f.check_box_block :hide_from_carousels %>
+            <%= f.check_box_block :prevent_reminders %>
+            <%= f.check_box_block :monthly_donors_only %>
+            <%= f.check_box_block :no_discounts %>
+            <%= f.check_box_block :show_emails %>
+            <%= f.check_box_block :opt_in_facilitator %>
+            <%= f.check_box_block :include_in_parent %>
+            <%= f.check_box_block :refund_deleted_orders %>
+            <% if !@event.organisation.stripe_client_id %>
+              <%= f.text_area_block :notes %>
+            <% end %>
+
+            <% if Padrino.env == :development || @event.organisation.verified? %>
+              <div class="border border-primary rounded p-3 mb-3" style="border-style: dashed !important">
+                <%= f.text_block :ticket_email_title %>
+                <%= f.wysiwyg_block :ticket_email_greeting %>
+                <%= f.check_box_block :no_tickets_pdf %>
+                <%= f.check_box_block :hide_organisation_footer %>
+                <%= f.check_box_block :hide_few_left %>
+                <%= f.wysiwyg_block :extra_info_for_recording_email %>
+                <%= f.file_block :video %>
+                <%= f.number_block :affiliate_credit_percentage %>
+              </div>
+            <% end %>
+
+            <% if !@event.organisation.stripe_client_id && @event.new_record? %>
+              <%= f.submit_block %>
+            <% end %>
+          </div>
+          <% if @event.organisation.stripe_client_id %>
+            <div role="tabpanel" class="tab-pane" id="tab8">
+              <%= f.lookup_block :revenue_sharer_id, lookup_url: '/accounts.json', placeholder: 'Search accounts', selected_link: (%(<a class="d-inline-block mt-1" target="_blank" href="/u/#{@event.revenue_sharer.username}">View account</a>) if @event.revenue_sharer_id) %>
+
+              <% if event_revenue_admin? %>
+                <div id="revenue-share">
+                  <%= f.text_block :revenue_share_to_revenue_sharer %>
+                </div>
+                <%= f.number_block :profit_share_to_facilitator %>
+                <%= f.number_block :profit_share_to_coordinator %>
+                <%= f.number_block :profit_share_to_category_steward %>
+                <%= f.number_block :profit_share_to_social_media %>
+
+                <%= f.number_block :profit_share_to_organisation, disabled: true %>
+
+                <%= f.number_block :stripe_revenue_adjustment %>
+              <% end %>
+              <%= f.text_area_block :notes %>
+
+
+              <% if @event.new_record? %>
+                <%= f.submit_block %>
+              <% end %>
+            </div>
+          <% end %>
+        </div>
+        <% if @event.persisted? %>
+          <%= f.submit_block %>
+        <% end %>
+      </div>
+    <% end %>

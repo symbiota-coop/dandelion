@@ -1,0 +1,35 @@
+<%
+drafts = current_account.drafts.and(model: 'Event')
+if @draft
+  drafts = drafts.and(:id.ne => @draft.id) 
+end
+%>
+<% if drafts.count > 0 %>
+  <div class="card mb-3" id="drafts">
+    <h4 class="card-header bg-light">
+      Drafts
+    </h4>
+    <div class="card-body bg-light">
+      <ul class="icon-list mb-0">
+        <% drafts.each do |draft| %>
+          <li>
+            <%
+        uri = URI(draft.url)
+        params = Rack::Utils.parse_query(uri.query || '')
+        params['draft_id'] = draft.id
+        uri.query = Rack::Utils.build_query(params)
+      %>
+            <i class="bi bi-pencil-square"></i>
+            <a href="<%=uri%>">
+              <%=draft.name%>
+            </a>
+            <span class="text-muted">
+              saved <%= time_ago_in_words draft.created_at %> ago
+            </span>
+            <a href="javascript:;" onclick="var a = this; $.get('/drafts/<%=draft.id%>/destroy', function() { $('[data-toggle=tooltip]').tooltip('hide'); $(a).parent().remove(); if ($('#drafts').find('li').length == 0) { $('#drafts').remove() } })"><i class="bi bi-x-lg" data-toggle="tooltip" title="Delete draft"></i></a>
+          </li>
+        <% end %>
+      </ul>
+    </div>
+  </div>
+<% end %>

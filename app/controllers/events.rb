@@ -99,7 +99,7 @@ Dandelion::App.controller do
     @event.refund_deleted_orders = true
     @event.ask_hear_about = true
     @event.include_in_parent = true if organisation_admin?(@event.organisation)
-    erb :'events/build'
+    erb :'events_build/build'
   end
 
   post '/events/new' do
@@ -120,7 +120,7 @@ Dandelion::App.controller do
       redirect "/e/#{@event.slug}?created=1"
     else
       flash.now[:error] = 'There was an error saving the event'
-      erb :'events/build'
+      erb :'events_build/build'
     end
   end
 
@@ -236,7 +236,7 @@ Dandelion::App.controller do
     @event = Event.find(params[:id]) || not_found
     kick! unless @event.organisation
     event_admins_only!
-    erb :'events/build'
+    erb :'events_build/build'
   end
 
   post '/events/:id/edit' do
@@ -250,7 +250,7 @@ Dandelion::App.controller do
       redirect "/events/#{@event.id}/edit"
     else
       flash.now[:error] = 'There was an error saving the event.'
-      erb :'events/build'
+      erb :'events_build/build'
     end
   end
 
