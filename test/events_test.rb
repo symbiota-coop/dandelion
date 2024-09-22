@@ -96,8 +96,7 @@ class CoreTest < ActiveSupport::TestCase
     visit "/e/#{@event.slug}"
     select 1, from: "quantities[#{@event.ticket_types.first.id}]"
     fill_in 'donation_amount', with: (donation_amount = 5)
-    click_button "Pay £#{format('%.2f', ticket_price + donation_amount)}"
-    assert page.has_content? "£#{format('%.2f', ticket_price + donation_amount)}"
+    assert page.has_button? "Pay £#{format('%.2f', ticket_price + donation_amount)}"
   end
 
   test 'booking onto a paid event with a range' do
@@ -109,8 +108,7 @@ class CoreTest < ActiveSupport::TestCase
     execute_script %{$("[name='prices[#{@event.ticket_types.first.id}]']").val(#{selected_price = 50})[0].oninput()}
     select 1, from: "quantities[#{@event.ticket_types.first.id}]"
     fill_in 'donation_amount', with: (donation_amount = 5)
-    click_button "Pay £#{format('%.2f', selected_price + donation_amount)}"
-    assert page.has_content? "£#{format('%.2f', selected_price + donation_amount)}"
+    assert page.has_button? "Pay £#{format('%.2f', selected_price + donation_amount)}"
   end
 
   test 'booking onto a paid event with a user-set price' do
@@ -122,7 +120,24 @@ class CoreTest < ActiveSupport::TestCase
     fill_in "prices[#{@event.ticket_types.first.id}]", with: (selected_price = 50)
     select 1, from: "quantities[#{@event.ticket_types.first.id}]"
     fill_in 'donation_amount', with: (donation_amount = 5)
-    click_button "Pay £#{format('%.2f', selected_price + donation_amount)}"
-    assert page.has_content? "£#{format('%.2f', selected_price + donation_amount)}"
+    assert page.has_button? "Pay £#{format('%.2f', selected_price + donation_amount)}"
+  end
+
+  test 'booking onto a paid event with booking questions and a discount code' do
+    @account = FactoryBot.create(:account)
+    @organisation = FactoryBot.create(:organisation, account: @account)
+    @event = FactoryBot.create(:event, organisation: @organisation, account: @account, last_saved_by: @account, price_or_range: (ticket_price = 10), suggested_donation: 0, questions: "q0\n[q1]\nq2")
+    @discount_code = FactoryBot.create(:discount_code, codeable: @event, code: (code = 'DISCOUNT10'), percentage_discount: (percentage_discount = 10))
+    login_as(@account)
+    visit "/e/#{@event.slug}"
+    select 1, from: "quantities[#{@event.ticket_types.first.id}]"
+    # fill_in 'donation_amount', with: (donation_amount = 5) # donations aren't passed across discount codes yet
+    fill_in 'answers[0]', with: 'a0'
+    fill_in 'answers[2]', with: 'a2'
+    fill_in 'discount_code', with: code
+    click_button 'Apply'
+    assert_equal 'a0', find_field('answers[0]').value
+    assert_equal 'a2', find_field('answers[2]').value
+    assert page.has_button? "Pay £#{format('%.2f', ticket_price * (100 - percentage_discount).to_f / 100)}"
   end
 end

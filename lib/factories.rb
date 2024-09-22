@@ -97,6 +97,12 @@ FactoryBot.define do
     end
   end
 
+  factory :discount_code do
+    trait :for_event do
+      association :codable, factory: :event
+    end
+  end
+
   factory :pmail do
     sequence(:subject) { |n| "Subject #{n}" }
     sequence(:from) { |n| "Account #{n} <account#{n}@#{ENV['DOMAIN']}>" }
