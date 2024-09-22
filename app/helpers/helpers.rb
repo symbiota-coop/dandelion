@@ -48,7 +48,8 @@ Dandelion::App.helpers do
   def search_events(query)
     Event.all.or(
       { name: /#{Regexp.escape(query)}/i },
-      { description: /#{Regexp.escape(query)}/i }
+      { description: /#{Regexp.escape(query)}/i },
+      { location: /#{Regexp.escape(query)}/i }
     )
   end
 
