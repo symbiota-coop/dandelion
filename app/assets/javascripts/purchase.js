@@ -3,7 +3,7 @@
 $(function () {
   $('#details form').on('keyup keypress', function (e) {
     const keyCode = e.keyCode || e.which
-    if (keyCode === 13) {
+    if (keyCode === 13 && e.target.tagName !== 'TEXTAREA') {
       e.preventDefault()
       return false
     }
