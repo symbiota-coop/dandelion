@@ -120,8 +120,51 @@
           </div>
           <div role="tabpanel" class="tab-pane" id="tab4">
             <%= f.check_box_block :ask_hear_about %>
-            <%= f.text_area_block :questions, placeholder: "e.g. Any dietary requirements?\n[Check this box to agree to the terms and conditions]" %>
-            <%= f.text_area_block :feedback_questions %>
+
+
+            <style>
+              .q-help p { margin-top: -1em }
+                @media (min-width: 992px) {
+                  .q-help p {
+                    margin-top: 1.5em;
+                  }
+                  .q-help ul {
+                    padding-left: 2em;
+                  }
+                }
+            </style>
+            <div class="row">
+              <div class="col-lg-8">
+                <%= f.text_area_block :questions, placeholder: "e.g. Any dietary requirements?\n[Check this box to agree to the terms and conditions]" %>
+              </div>
+              <div class="col-lg-4">
+                <div class="q-help">
+                  <p class="text-muted">Questions to ask participants upon booking.</p>
+                  <ul class="text-muted">
+                    <li>One question per line</li>
+                    <li>Add headers by starting a line with # </li>
+                    <li>Wrap in [square brackets] to turn into a checkbox</li>
+                    <li>End a line with a star * to make the question required</li>
+                    <li>View answers on the Orders page</li>
+                  </ul>
+                </div>
+              </div>
+            </div>
+            <div class="row">
+              <div class="col-lg-8">
+                <%= f.text_area_block :feedback_questions %>
+              </div>
+              <div class="col-lg-4">
+                <div class="q-help">
+                  <p class="text-muted">Questions to ask participants in the post-event feedback form.</p>
+                  <ul class="text-muted">
+                    <li>One question per line</li>
+                    <li>Leave blank to disable feedback</li>
+                    <li>View answers on the Feedback page</li>
+                  </ul>
+                </div>
+              </div>
+            </div>
           </div>
           <div role="tabpanel" class="tab-pane" id="tab5">
             <%= f.number_block :suggested_donation %>
