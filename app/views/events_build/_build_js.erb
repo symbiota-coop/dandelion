@@ -57,7 +57,18 @@
       $('.tab-pane:last').find('a.next').remove()
     <% end %>
 
+    $('#event_questions').attr('rows', '8')
+    $('#event_feedback_questions').attr('rows', '8')
+    autosize($('#event_questions')[0])
+    autosize($('#event_feedback_questions')[0])
+
     $('#event-build-nav a[data-toggle="tab"]').on('show.bs.tab', function (e) {
+
+      setTimeout(function() {
+        autosize.update($('#event_questions')[0])
+        autosize.update($('#event_feedback_questions')[0])
+      }, 0)
+
       var form = $('#event-build-nav').closest('form')[0]
       if (form.reportValidity()) {
         // continue
@@ -155,11 +166,6 @@
     $('#event_zoom_party').change()
 
     $('#event_currency').change(function() { $('#event-currency-changed').show() })
-
-    $('#event_questions').attr('rows', '8')
-    $('#event_feedback_questions').attr('rows', '8')
-    autosize($('#event_questions')[0])
-    autosize($('#event_feedback_questions')[0])
 
     $('#event_suggested_donation').keyup(function () {
       if ($(this).val().length > 0)
