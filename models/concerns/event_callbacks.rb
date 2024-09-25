@@ -53,6 +53,8 @@ module EventCallbacks
           zoomships.create local_group: local_group
         end
       end
+
+      notifications.destroy_all if locked? || secret?
     end
 
     after_destroy do
