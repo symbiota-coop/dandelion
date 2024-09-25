@@ -71,118 +71,131 @@ Dandelion::App.controller do
       halt 400
     end
 
-    begin
-      if @order.total > 0
+    # begin
+    if @order.total > 0
 
-        case params[:detailsForm][:payment_method]
-        when 'stripe'
+      case params[:detailsForm][:payment_method]
+      when 'stripe'
 
-          Stripe.api_key = @event.organisation.stripe_sk
-          Stripe.api_version = '2020-08-27'
+        Stripe.api_key = if @event.organisation.stripe_connect_json
+                           ENV['STRIPE_SK']
+                         else
+                           @event.organisation.stripe_sk
+                         end
+        Stripe.api_version = '2020-08-27'
 
-          if ticketForm[:cohost] && (cohost = Organisation.find_by(slug: ticketForm[:cohost])) && (cohostship = @event.cohostships.find_by(organisation: cohost)) && cohostship.image
-            @event_image = cohostship.image.thumb('1920x1920')
-          elsif @event.image
-            @event_image = @event.image.thumb('1920x1920')
-          end
-
-          stripe_session_hash = {
-            customer_email: @account.email,
-            success_url: URI::DEFAULT_PARSER.escape("#{ENV['BASE_URI']}/e/#{@event.slug}?success=true&order_id=#{@order.id}&utm_source=#{params[:detailsForm][:utm_source]}&utm_medium=#{params[:detailsForm][:utm_medium]}&utm_campaign=#{params[:detailsForm][:utm_campaign]}"),
-            cancel_url: URI::DEFAULT_PARSER.escape("#{ENV['BASE_URI']}/e/#{@event.slug}?cancelled=true"),
-            metadata: @order.metadata,
-            line_items: [{
-              name: @event.name,
-              description: @order.description,
-              images: [@event_image.try(:url)].compact,
-              amount: (@order.total * 100).round,
-              currency: @order.currency,
-              quantity: 1
-            }]
-          }
-          payment_intent_data = {
-            description: @order.description,
-            metadata: @order.metadata
-          }
-          if (organisationship = @event.revenue_sharer_organisationship)
-            application_fee_amount = @order.calculate_application_fee_amount
-            payment_intent_data.merge!({
-                                         application_fee_amount: (application_fee_amount * 100).round,
-                                         transfer_data: {
-                                           destination: organisationship.stripe_user_id
-                                         }
-                                       })
-          end
-          stripe_session_hash.merge!({
-                                       payment_intent_data: payment_intent_data
-                                     })
-          session = Stripe::Checkout::Session.create(stripe_session_hash)
-          @order.update_attributes!(
-            value: @order.total.round(2),
-            session_id: session.id,
-            payment_intent: session.payment_intent,
-            application_fee_amount: (application_fee_amount if organisationship)
-          )
-          @order.tickets.each do |ticket|
-            ticket.update_attributes!(
-              session_id: session.id,
-              payment_intent: session.payment_intent
-            )
-          end
-
-          { session_id: session.id }.to_json
-
-        when 'coinbase'
-
-          client = CoinbaseCommerce::Client.new(api_key: @event.organisation.coinbase_api_key)
-
-          checkout = client.checkout.create(
-            name: @event.name,
-            description: @order.description.truncate(200),
-            pricing_type: 'fixed_price',
-            local_price: {
-              amount: @order.total,
-              currency: @order.currency
-            },
-            requested_info: %w[email]
-          )
-          @order.update_attributes!(
-            value: @order.total.round(2),
-            coinbase_checkout_id: checkout.id
-          )
-          { checkout_id: checkout.id }.to_json
-
-        when 'opencollective'
-
-          oc_secret = "dandelion:#{Array.new(5) { [*'a'..'z', *'0'..'9'].sample }.join}"
-          @order.update_attributes!(
-            value: @order.total.round(2),
-            oc_secret: oc_secret
-          )
-          { oc_secret: @order.oc_secret, currency: @order.currency, value: @order.value, order_id: @order.id.to_s, order_expiry: (@order.created_at + 1.hour).to_datetime.strftime('%Q') }.to_json
-
-        when 'evm'
-
-          evm_secret = Array.new(4) { [*'1'..'9'].sample }.join
-          @order.update_attributes!(
-            value: @order.total.round(2),
-            evm_secret: evm_secret
-          )
-          { evm_secret: @order.evm_secret, evm_value: @order.evm_value, evm_wei: (@order.evm_value * 1e18.to_d).to_i, order_id: @order.id.to_s, order_expiry: (@order.created_at + 1.hour).to_datetime.strftime('%Q') }.to_json
-
-        else
-          raise Order::PaymentMethodNotFound
+        if ticketForm[:cohost] && (cohost = Organisation.find_by(slug: ticketForm[:cohost])) && (cohostship = @event.cohostships.find_by(organisation: cohost)) && cohostship.image
+          @event_image = cohostship.image.thumb('1920x1920')
+        elsif @event.image
+          @event_image = @event.image.thumb('1920x1920')
         end
+
+        stripe_session_hash = {
+          customer_email: @account.email,
+          success_url: URI::DEFAULT_PARSER.escape("#{ENV['BASE_URI']}/e/#{@event.slug}?success=true&order_id=#{@order.id}&utm_source=#{params[:detailsForm][:utm_source]}&utm_medium=#{params[:detailsForm][:utm_medium]}&utm_campaign=#{params[:detailsForm][:utm_campaign]}"),
+          cancel_url: URI::DEFAULT_PARSER.escape("#{ENV['BASE_URI']}/e/#{@event.slug}?cancelled=true"),
+          metadata: @order.metadata,
+          line_items: [{
+            name: @event.name,
+            description: @order.description,
+            images: [@event_image.try(:url)].compact,
+            amount: (@order.total * 100).round,
+            currency: @order.currency,
+            quantity: 1
+          }]
+        }
+        payment_intent_data = {
+          description: @order.description,
+          metadata: @order.metadata
+        }
+
+        application_fee_amount = nil
+        if (organisationship = @event.revenue_sharer_organisationship)
+          application_fee_amount = @order.calculate_application_fee_amount
+          payment_intent_data.merge!({
+                                       application_fee_amount: (application_fee_amount * 100).round,
+                                       transfer_data: {
+                                         destination: organisationship.stripe_user_id
+                                       }
+                                     })
+        elsif @event.organisation.donations_to_dandelion?
+          application_fee_amount = @order.donation_revenue.cents / 100
+          payment_intent_data.merge!({
+                                       application_fee_amount: (application_fee_amount * 100).round
+                                     })
+        end
+
+        stripe_session_hash.merge!({
+                                     payment_intent_data: payment_intent_data
+                                   })
+        session = Stripe::Checkout::Session.create(stripe_session_hash, @event.organisation.donations_to_dandelion? ? { 'Stripe-Account': @event.organisation.stripe_user_id } : {})
+        @order.update_attributes!(
+          value: @order.total.round(2),
+          session_id: session.id,
+          payment_intent: session.payment_intent,
+          application_fee_amount: application_fee_amount,
+          application_fee_paid_to_dandelion: @event.organisation.donations_to_dandelion? ? true : false
+        )
+        @order.tickets.each do |ticket|
+          ticket.update_attributes!(
+            session_id: session.id,
+            payment_intent: session.payment_intent
+          )
+        end
+
+        { session_id: session.id }.to_json
+
+      when 'coinbase'
+
+        client = CoinbaseCommerce::Client.new(api_key: @event.organisation.coinbase_api_key)
+
+        checkout = client.checkout.create(
+          name: @event.name,
+          description: @order.description.truncate(200),
+          pricing_type: 'fixed_price',
+          local_price: {
+            amount: @order.total,
+            currency: @order.currency
+          },
+          requested_info: %w[email]
+        )
+        @order.update_attributes!(
+          value: @order.total.round(2),
+          coinbase_checkout_id: checkout.id
+        )
+        { checkout_id: checkout.id }.to_json
+
+      when 'opencollective'
+
+        oc_secret = "dandelion:#{Array.new(5) { [*'a'..'z', *'0'..'9'].sample }.join}"
+        @order.update_attributes!(
+          value: @order.total.round(2),
+          oc_secret: oc_secret
+        )
+        { oc_secret: @order.oc_secret, currency: @order.currency, value: @order.value, order_id: @order.id.to_s, order_expiry: (@order.created_at + 1.hour).to_datetime.strftime('%Q') }.to_json
+
+      when 'evm'
+
+        evm_secret = Array.new(4) { [*'1'..'9'].sample }.join
+        @order.update_attributes!(
+          value: @order.total.round(2),
+          evm_secret: evm_secret
+        )
+        { evm_secret: @order.evm_secret, evm_value: @order.evm_value, evm_wei: (@order.evm_value * 1e18.to_d).to_i, order_id: @order.id.to_s, order_expiry: (@order.created_at + 1.hour).to_datetime.strftime('%Q') }.to_json
+
       else
-        @order.payment_completed!
-        @order.send_tickets
-        @order.create_order_notification
-        { order_id: @order.id.to_s }.to_json
+        raise Order::PaymentMethodNotFound
       end
-    rescue StandardError => e
-      airbrake_notify(e, { order: @order })
-      @order.destroy
-      halt 400
+    else
+      @order.payment_completed!
+      @order.send_tickets
+      @order.create_order_notification
+      { order_id: @order.id.to_s }.to_json
     end
+    # rescue StandardError => e
+    #   airbrake_notify(e, { order: @order })
+    #   @order.destroy
+    #   halt 400
+    # end
   end
 end

@@ -17,6 +17,7 @@ module OrderFields
     field :oc_secret, type: String
     field :payment_completed, type: Mongoid::Boolean
     field :application_fee_amount, type: Float
+    field :application_fee_paid_to_dandelion, type: Mongoid::Boolean
     field :currency, type: String
     field :opt_in_organisation, type: Mongoid::Boolean
     field :opt_in_facilitator, type: Mongoid::Boolean
@@ -50,6 +51,7 @@ module OrderFields
         percentage_discount: :number,
         percentage_discount_monthly_donor: :number,
         application_fee_amount: :number,
+        application_fee_paid_to_dandelion: :check_box,
         organisation_revenue_share: :number,
         http_referrer: :text,
         session_id: :text,

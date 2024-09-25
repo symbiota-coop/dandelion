@@ -1,4 +1,4 @@
-/* global timeAgo, eventId, eventUrl, placesRemaining, currency, currencySymbol, stripePk, coinbase, organisationOcSlug, ocSlug, evmAddress, contractAddress, networkId, networkName, signedIn */
+/* global timeAgo, eventId, eventUrl, placesRemaining, currency, currencySymbol, stripePk, stripeAccount, coinbase, organisationOcSlug, ocSlug, evmAddress, contractAddress, networkId, networkName, signedIn */
 
 $(function () {
   $('#details form').on('keyup keypress', function (e) {
@@ -155,7 +155,7 @@ $(function () {
       if (balance() > 0) {
         if (data.session_id) {
           // Stripe
-          const stripe = Stripe(stripePk)
+          const stripe = stripeAccount ? Stripe(stripePk, { stripeAccount: stripeAccount }) : Stripe(stripePk)
           stripe.redirectToCheckout({
             sessionId: data.session_id
           })

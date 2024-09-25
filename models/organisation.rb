@@ -42,7 +42,7 @@ class Organisation
   end
 
   def payment_method?
-    stripe_pk || coinbase_api_key || evm_address || oc_slug
+    stripe_connect_json || stripe_pk || coinbase_api_key || evm_address || oc_slug
   end
 
   after_create do
@@ -73,6 +73,10 @@ class Organisation
 
   def stripe_user_id
     JSON.parse(stripe_connect_json)['stripe_user_id']
+  end
+
+  def donations_to_dandelion?
+    stripe_connect_json && !paid_up
   end
 
   def stripe_account_name
