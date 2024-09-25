@@ -71,12 +71,14 @@ class Organisation
 <p>With thanks,<br>[organisation_name]</p>'
   end
 
-  def stripe_user_id
-    JSON.parse(stripe_connect_json)['stripe_user_id'] if stripe_connect_json
-  end
-
   def donations_to_dandelion?
     stripe_connect_json && !paid_up
+  end
+
+  def stripe_user_id
+    return unless stripe_connect_json
+
+    JSON.parse(stripe_connect_json)['stripe_user_id']
   end
 
   def stripe_account_name

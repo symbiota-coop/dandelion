@@ -255,6 +255,8 @@ class Organisationship
   end
 
   def stripe_user_id
+    return unless stripe_connect_json
+
     JSON.parse(stripe_connect_json)['stripe_user_id']
   end
 

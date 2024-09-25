@@ -46,4 +46,47 @@ Dandelion::App.controller do
     @organisationship.update_attribute(:stripe_connect_json, nil)
     redirect "/o/#{@organisation.slug}"
   end
+
+  post '/organisations/stripe_connect_webhook' do
+    payload = request.body.read
+    sig_header = request.env['HTTP_STRIPE_SIGNATURE']
+    begin
+      event = Stripe::Webhook.construct_event(
+        payload, sig_header, ENV['STRIPE_CONNECT_ENDPOINT_SECRET']
+      )
+    rescue JSON::ParserError
+      halt 400
+    rescue Stripe::SignatureVerificationError
+      halt 400
+    end
+
+    if event['type'] == 'checkout.session.completed'
+      session = event['data']['object']
+      if (@order = Order.find_by(:session_id => session.id, :payment_completed.ne => true))
+        @order.payment_completed!
+        @order.update_destination_payment
+        @order.send_tickets
+        @order.create_order_notification
+        halt 200
+      elsif (@order = Order.deleted.find_by(:session_id => session.id, :payment_completed.ne => true))
+        begin
+          @order.restore_and_complete
+          # raise Order::Restored
+        rescue StandardError => e
+          airbrake_notify(e, { event: event })
+          halt 200
+        end
+      else
+        # begin
+        #   raise Order::OrderNotFound
+        # rescue StandardError => e
+        #   airbrake_notify(e, { event: event })
+        #   halt 200
+        # end
+        halt 200
+      end
+    else
+      halt 200
+    end
+  end
 end
