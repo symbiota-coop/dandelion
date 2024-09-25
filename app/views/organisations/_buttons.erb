@@ -37,7 +37,7 @@
           <i class="bi bi-credit-card"></i>
           Connected to <%= organisationship.stripe_account_name ? "#{organisationship.stripe_account_name}'s Stripe account" : 'Stripe' %>
         </big>
-        <a class="btn btn-danger btn-sm" href="/organisationships/<%= organisationship.id %>/disconnect">Disconnect</a>
+        <a class="btn btn-danger btn-sm" href="/o/<%= @organisation.slug %>/stripe_disconnect">Disconnect</a>
       </div>
     </div>
   <% elsif current_account %>

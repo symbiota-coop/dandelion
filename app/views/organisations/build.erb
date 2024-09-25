@@ -231,6 +231,21 @@
             <%= f.number_block :monthly_donor_affiliate_reward %>
             <%= f.wysiwyg_block :affiliate_intro %>
             <%= f.url_block :affiliate_share_image_url %>
+
+            <% if @organisation.stripe_connect_json %>
+              <div class="card my-1">
+                <div class="card-body p-3">
+                  <big class="d-block mb-1">
+                    <i class="bi bi-credit-card"></i>
+                    Connected to <%= @organisation.stripe_account_name ? "#{@organisation.stripe_account_name}'s Stripe account" : 'Stripe' %>
+                  </big>
+                  <a class="btn btn-danger btn-sm" href="/organisations/stripe_disconnect?organisation_id=<%= @organisation.id %>">Disconnect</a>
+                </div>
+              </div>
+            <% else %>
+              <a class="btn btn-outline-primary mb-1" href="https://connect.stripe.com/oauth/authorize?response_type=code&client_id=<%= ENV['STRIPE_CLIENT_ID'] %>&scope=read_write&state=<%= @organisation.id %>">Connect Stripe</a>
+            <% end %>
+
           </div>
         <% end %>
       <% end %>

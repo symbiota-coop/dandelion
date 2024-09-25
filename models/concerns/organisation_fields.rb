@@ -13,6 +13,8 @@ module OrganisationFields
     field :image_uid, type: String
     field :google_analytics_id, type: String
     field :facebook_pixel_id, type: String
+    field :stripe_connect_json, type: String
+    field :stripe_account_json, type: String
     field :stripe_client_id, type: String
     field :stripe_endpoint_secret, type: String
     field :stripe_pk, type: String
@@ -109,6 +111,8 @@ module OrganisationFields
         paid_up: :check_box,
         google_analytics_id: :text,
         facebook_pixel_id: :text,
+        stripe_connect_json: :text,
+        stripe_account_json: :text,
         stripe_client_id: :text,
         stripe_endpoint_secret: :text,
         coinbase_api_key: :text,

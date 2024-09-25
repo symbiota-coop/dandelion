@@ -71,6 +71,19 @@ class Organisation
 <p>With thanks,<br>[organisation_name]</p>'
   end
 
+  def stripe_user_id
+    JSON.parse(stripe_connect_json)['stripe_user_id']
+  end
+
+  def stripe_account_name
+    return unless stripe_account_json
+
+    j = JSON.parse(stripe_account_json)
+    j.dig('business_profile', 'name') ||
+      j.dig('settings', 'dashboard', 'display_name') ||
+      j['display_name']
+  end
+
   def stripe_webhooks
     Stripe.api_key = stripe_sk
     Stripe.api_version = '2020-08-27'

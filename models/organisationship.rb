@@ -262,11 +262,9 @@ class Organisationship
     return unless stripe_account_json
 
     j = JSON.parse(stripe_account_json)
-    if j['business_profile'] && j['business_profile']['name']
-      j['business_profile']['name']
-    else
+    j.dig('business_profile', 'name') ||
+      j.dig('settings', 'dashboard', 'display_name') ||
       j['display_name']
-    end
   end
 
   def monthly_donor?

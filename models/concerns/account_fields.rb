@@ -38,7 +38,6 @@ module AccountFields
     index({ number_at_this_location: 1 })
     field :coordinates, type: Array
     field :default_currency, type: String
-    field :stripe_connect_json, type: String
     field :organisation_ids_cache, type: Array
     index({ organisation_ids_cache: 1 })
     field :organisation_ids_public_cache, type: Array
@@ -123,7 +122,6 @@ module AccountFields
         sent_substack_invite: :datetime,
         substack_opt_in: :datetime,
         stripe_subscription_id: :text,
-        stripe_connect_json: :text_area,
         minimal_head: :text_area
       }
     end
