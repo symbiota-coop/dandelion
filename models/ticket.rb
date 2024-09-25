@@ -223,7 +223,7 @@ class Ticket
     return unless event.refund_deleted_orders && event.organisation && discounted_price && discounted_price > 0 && payment_completed && payment_intent
 
     # begin
-    Stripe.api_key = event.organisation.stripe_sk
+    Stripe.api_key = event.organisation.stripe_connect_json ? ENV['STRIPE_SK'] : event.organisation.stripe_sk
     Stripe.api_version = '2020-08-27'
     pi = Stripe::PaymentIntent.retrieve payment_intent
     if event.revenue_sharer_organisationship

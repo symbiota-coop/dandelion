@@ -192,6 +192,7 @@ class Order
 
   def update_destination_payment
     return unless application_fee_amount
+    return if application_fee_paid_to_dandelion?
 
     begin
       Stripe.api_key = event.organisation.stripe_sk
@@ -213,10 +214,10 @@ class Order
 
   after_destroy :refund
   def refund
-    return unless event.refund_deleted_orders && !prevent_refund && event.organisation && event.organisation.stripe_sk && value && value.positive? && payment_completed && payment_intent
+    return unless event.refund_deleted_orders && !prevent_refund && event.organisation && value && value.positive? && payment_completed && payment_intent
 
     # begin
-    Stripe.api_key = event.organisation.stripe_sk
+    Stripe.api_key = event.organisation.stripe_connect_json ? ENV['STRIPE_SK'] : event.organisation.stripe_sk
     Stripe.api_version = '2020-08-27'
     pi = Stripe::PaymentIntent.retrieve payment_intent
     if event.revenue_sharer_organisationship
