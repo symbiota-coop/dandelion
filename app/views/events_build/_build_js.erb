@@ -209,7 +209,7 @@
       }).change()
 
       $('#event_revenue_share_to_revenue_sharer, #event_profit_share_to_facilitator, #event_profit_share_to_coordinator, #event_profit_share_to_category_steward, #event_profit_share_to_social_media, #event_profit_share_to_organisation')
-      .wrap('<div class="input-group w-25"></div>')
+      .wrap('<div class="input-group" style="width: 10em"></div>')
       .after('<div class="input-group-append"><span class="input-group-text">%</span></div>')
       .change(function () {
         var sum = $.map($('#event_revenue_share_to_revenue_sharer, #event_profit_share_to_facilitator, #event_profit_share_to_coordinator, #event_profit_share_to_category_steward, #event_profit_share_to_social_media'), function (el) {
