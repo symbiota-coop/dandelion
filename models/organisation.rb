@@ -72,7 +72,7 @@ class Organisation
   end
 
   def stripe_user_id
-    JSON.parse(stripe_connect_json)['stripe_user_id']
+    JSON.parse(stripe_connect_json)['stripe_user_id'] if stripe_connect_json
   end
 
   def donations_to_dandelion?
