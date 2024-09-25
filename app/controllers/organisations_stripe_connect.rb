@@ -52,7 +52,7 @@ Dandelion::App.controller do
     sig_header = request.env['HTTP_STRIPE_SIGNATURE']
     begin
       event = Stripe::Webhook.construct_event(
-        payload, sig_header, ENV['STRIPE_CONNECT_ENDPOINT_SECRET']
+        payload, sig_header, ENV['STRIPE_ENDPOINT_SECRET_CONNECT']
       )
     rescue JSON::ParserError
       halt 400
