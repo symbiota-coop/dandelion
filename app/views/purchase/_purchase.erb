@@ -304,7 +304,7 @@ end
     currency = <%== @event.currency.to_json %>
     currencySymbol = <%== money_symbol(@event.currency).to_json %>
     stripePk = <%== (@event.organisation.stripe_connect_json ? ENV['STRIPE_PK'] : @event.organisation.stripe_pk).to_json %>
-    stripeAccount = <%== @event.organisation.stripe_user_id ? @event.organisation.stripe_user_id.to_json : 'null'%>
+    stripeAccount = <%== @event.organisation.stripe_user_id ? @event.organisation.stripe_user_id.to_json : 'null' %>
     coinbase = <%= @event.organisation.coinbase_api_key ? true : false %>
     organisationOcSlug = <%== @event.organisation.oc_slug.to_json %>
     ocSlug = <%== @event.oc_slug.to_json %>
