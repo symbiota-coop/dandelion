@@ -128,13 +128,13 @@ Dandelion::App.controller do
         stripe_session_hash.merge!({
                                      payment_intent_data: payment_intent_data
                                    })
-        session = Stripe::Checkout::Session.create(stripe_session_hash, @event.organisation.donations_to_dandelion? ? { 'Stripe-Account': @event.organisation.stripe_user_id } : {})
+        session = Stripe::Checkout::Session.create(stripe_session_hash, @event.organisation.stripe_connect_json ? { stripe_account: @event.organisation.stripe_user_id } : {})
         @order.update_attributes!(
           value: @order.total.round(2),
           session_id: session.id,
           payment_intent: session.payment_intent,
           application_fee_amount: application_fee_amount,
-          application_fee_paid_to_dandelion: @event.organisation.donations_to_dandelion? ? true : false
+          application_fee_paid_to_dandelion: @event.organisation.donations_to_dandelion?
         )
         @order.tickets.each do |ticket|
           ticket.update_attributes!(

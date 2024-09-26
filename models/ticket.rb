@@ -225,7 +225,7 @@ class Ticket
     # begin
     Stripe.api_key = event.organisation.stripe_connect_json ? ENV['STRIPE_SK'] : event.organisation.stripe_sk
     Stripe.api_version = '2020-08-27'
-    pi = Stripe::PaymentIntent.retrieve payment_intent
+    pi = Stripe::PaymentIntent.retrieve payment_intent, { stripe_account: event.organisation.stripe_user_id }.compact
     if event.revenue_sharer_organisationship
       Stripe::Refund.create(
         amount: (discounted_price * 100).to_i,
@@ -234,10 +234,10 @@ class Ticket
         reverse_transfer: true
       )
     else
-      Stripe::Refund.create(
-        amount: (discounted_price * 100).to_i,
-        charge: pi.charges.first.id
-      )
+      Stripe::Refund.create({
+                              amount: (discounted_price * 100).to_i,
+                              charge: pi.charges.first.id
+                            }, { stripe_account: event.organisation.stripe_user_id }.compact)
     end
     # rescue Stripe::InvalidRequestError
     #   true
