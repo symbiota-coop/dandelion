@@ -40,6 +40,8 @@ module AccountFeedbackSummaries
         account.set(feedback_summary: last_paragraph)
       end
 
+      # accounts.each(&:send_feedback_summary)
+
       # prompt = prompt[0..(1_000_000 * 0.66 * 4)]
       # last_paragraph = nil
       # attempts = 0
