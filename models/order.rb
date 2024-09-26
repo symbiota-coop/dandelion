@@ -226,8 +226,14 @@ class Order
         refund_application_fee: true,
         reverse_transfer: true
       )
+    elsif event.organisation.stripe_user_id
+      Stripe::Refund.create({
+                              charge: pi.charges.first.id,
+                              refund_application_fee: true
+                            },
+                            { stripe_account: event.organisation.stripe_user_id })
     else
-      Stripe::Refund.create({ charge: pi.charges.first.id }, { stripe_account: event.organisation.stripe_user_id }.compact)
+      Stripe::Refund.create({ charge: pi.charges.first.id })
     end
   rescue Stripe::InvalidRequestError => e
     raise e unless e.message.include?('already been refunded')
