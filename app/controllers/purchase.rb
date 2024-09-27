@@ -48,7 +48,8 @@ Dandelion::App.controller do
         gc_branch_code: detailsForm[:account][:gc_branch_code],
         gc_account_number: detailsForm[:account][:gc_account_number],
         http_referrer: detailsForm[:account][:http_referrer],
-        answers: (detailsForm[:answers].map { |i, x| [@event.questions_a[i.to_i], x] } if detailsForm[:answers])
+        answers: (detailsForm[:answers].map { |i, x| [@event.questions_a[i.to_i], x] } if detailsForm[:answers]),
+        application_fee_paid_to_dandelion: @event.organisation.donations_to_dandelion?
       )
 
       ticketForm[:quantities].each do |ticket_type_id, quantity|
@@ -133,8 +134,7 @@ Dandelion::App.controller do
           value: @order.total.round(2),
           session_id: session.id,
           payment_intent: session.payment_intent,
-          application_fee_amount: application_fee_amount,
-          application_fee_paid_to_dandelion: @event.organisation.donations_to_dandelion?
+          application_fee_amount: application_fee_amount
         )
         @order.tickets.each do |ticket|
           ticket.update_attributes!(

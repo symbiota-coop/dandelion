@@ -12,14 +12,14 @@ Dandelion::App.controller do
     rescue StandardError
       flash[:error] = 'There was an error connecting your organisation'
     end
-    redirect "/o/#{@organisation.slug}/edit"
+    redirect "/o/#{@organisation.slug}/edit?tab=payments"
   end
 
   get '/organisations/stripe_disconnect' do
     @organisation = Organisation.find(params[:organisation_id]) || not_found
     organisation_admins_only!
     @organisation.update_attribute(:stripe_connect_json, nil)
-    redirect "/o/#{@organisation.slug}/edit"
+    redirect "/o/#{@organisation.slug}/edit?tab=payments"
   end
 
   get '/o/:slug/stripe_connect' do

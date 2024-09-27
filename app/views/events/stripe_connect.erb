@@ -1,0 +1,11 @@
+<%= partial :'events/nav', locals: { event: @event } %>
+
+<h1 class="mt-3">We're changing how Dandelion connects to Stripe</h1>
+
+<p>
+  To continue, please click the button below to connect <%=@organisation.name%>'s Stripe account to Dandelion.
+</p>
+
+<p>
+  <a class="btn btn-outline-primary mb-1" href="https://connect.stripe.com/oauth/authorize?response_type=code&client_id=<%= ENV['STRIPE_CLIENT_ID'] %>&scope=read_write&state=<%= @organisation.id %>">Connect Stripe</a>
+</p>

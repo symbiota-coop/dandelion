@@ -90,16 +90,22 @@ Dandelion::App.controller do
         redirect '/events'
       end
     end
-    @event.location = 'Online'
-    @event.feedback_questions = 'Comments/suggestions'
-    @event.affiliate_credit_percentage = @event.organisation.affiliate_credit_percentage
-    @event.currency = @event.organisation.currency
-    @event.suggested_donation = 0
-    @event.coordinator = current_account
-    @event.refund_deleted_orders = true
-    @event.ask_hear_about = true
-    @event.include_in_parent = true if organisation_admin?(@event.organisation)
-    erb :'events_build/build'
+
+    if Padrino.env != :test && !@event.organisation.verified? && @event.organisation.stripe_sk && !@event.organisation.stripe_connect_json
+      @organisation = @event.organisation
+      erb :'events/stripe_connect'
+    else
+      @event.location = 'Online'
+      @event.feedback_questions = 'Comments/suggestions'
+      @event.affiliate_credit_percentage = @event.organisation.affiliate_credit_percentage
+      @event.currency = @event.organisation.currency
+      @event.suggested_donation = 0
+      @event.coordinator = current_account
+      @event.refund_deleted_orders = true
+      @event.ask_hear_about = true
+      @event.include_in_parent = true if organisation_admin?(@event.organisation)
+      erb :'events_build/build'
+    end
   end
 
   post '/events/new' do

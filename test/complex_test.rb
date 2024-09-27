@@ -25,8 +25,6 @@ class CoreTest < ActiveSupport::TestCase
     fill_in 'Organisation name', with: @organisation.name
     fill_in 'Slug', with: @organisation.slug
     click_button 'Save and continue'
-    fill_in 'Stripe public key', with: @organisation.stripe_pk
-    fill_in 'Stripe secret key', with: @organisation.stripe_sk
     click_button 'Update organisation'
     fill_in 'Event title*', with: @event.name
     execute_script %{$('#event_start_time').val('#{@event.start_time.to_fs(:db_local)}')}

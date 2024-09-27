@@ -6,11 +6,18 @@
       <strong>
         Add a donation to Dandelion
       </strong>
+
+      <div class="btn-group mt-1" id="donation-percent-buttons">
+        <button type="button" class="btn btn-outline-secondary" data-percent="0">0%</button>
+        <button type="button" class="btn btn-secondary" data-percent="5">5%</button>
+        <button type="button" class="btn btn-outline-secondary" data-percent="10">10%</button>
+      </div>
+
       <div class="input-group" style="margin: 5px 0">
         <div class="input-group-prepend">
           <span class="input-group-text"><%= money_symbol(@event.currency) %></span>
         </div>
-        <%= number_field_tag :donation_amount, id: 'donation_amount', class: 'form-control', style: 'width: 5em', value: 5 %>
+        <%= number_field_tag :donation_amount, id: 'donation_amount', class: 'form-control', style: 'width: 5em' %>
       </div>
     </td>
   </tr>

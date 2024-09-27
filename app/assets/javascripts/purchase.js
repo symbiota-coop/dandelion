@@ -20,7 +20,7 @@ $(function () {
     }
   }).change()
 
-  function price () {
+  function priceWithoutDonation () {
     let p = 0
 
     $('select[name^=quantities]').each(function () {
@@ -30,6 +30,14 @@ $(function () {
     if ($('#percentage_discount').length > 0 && $('#percentage_discount').val() != '') { p = (p * (100 - parseInt($('#percentage_discount').val())) / 100) }
 
     if ($('#discount').length > 0 && $('#discount').val() != '') { p = (p * (100 - parseInt($('#discount').val())) / 100) }
+
+    return p
+  }
+
+  function price () {
+    let p = 0
+
+    p += priceWithoutDonation()
 
     if ($('#donation_amount').length > 0 && $('#donation_amount').val() != '') { p += parseFloat($('#donation_amount').val()) }
 
@@ -58,7 +66,28 @@ $(function () {
     return b
   }
 
+  $('#donation_amount').focus(function () {
+    $('#donation-percent-buttons button').addClass('btn-outline-secondary').removeClass('btn-secondary')
+  })
+
+  $('#donation-percent-buttons button').click(function () {
+    $('#donation-percent-buttons button').addClass('btn-outline-secondary').removeClass('btn-secondary')
+    $(this).removeClass('btn-outline-secondary').addClass('btn-secondary')
+    setTotal()
+  })
+
+  function setDonationAmount () {
+    let p = priceWithoutDonation()
+
+    let dp = $('#donation-percent-buttons button.btn-secondary').data('percent')
+
+    if (typeof dp !== 'undefined') {
+      $('#donation_amount').val(p * (dp / 100))
+    }
+  }
+
   function setTotal () {
+    setDonationAmount()
     const p = price()
     const b = balance()
 

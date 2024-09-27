@@ -36,6 +36,14 @@
   </script>
 <% end %>
 
+<% if params[:tab] == 'payments' %>
+  <script>
+    $(function() {
+      $('#organisation-build-nav a[href="#tab2"]').tab('show')
+    })
+  </script>
+<% end %>
+
 
 <%= partial :'organisations/nav', locals: { organisation: @organisation } %>
 
@@ -54,16 +62,17 @@
 <script>
   $(function () {
 
-    var autocomplete = new google.maps.places.Autocomplete($('#organisation_location')[0]);
+    if (typeof google !== 'undefined') {
+      var autocomplete = new google.maps.places.Autocomplete($('#organisation_location')[0]);
+      $('#organisation_location').keydown(function (e) {
+        if (e.which == 13 && $('.pac-container:visible').length)
+          return false;
+      })
+    }
 
     $('#organisation_slug, #organisation_name').keyup(function () {
       $('#slug-replace-organisation-url').text('<%= ENV['BASE_URI'] %>/o/' + $('#organisation_slug').val());
     }).keyup();
-
-    $('#organisation_location').keydown(function (e) {
-      if (e.which == 13 && $('.pac-container:visible').length)
-        return false;
-    })
 
     autosize($('#organisation_minimal_head')[0])
 
@@ -147,11 +156,15 @@
               <h4 class="my-0">Card payments via Stripe</h4>
             </div>
             <div class="card-body pb-0">
-              <p>
-                Don't know where to find your Stripe API keys? <a target="_blank" href="https://support.stripe.com/questions/locate-api-keys-in-the-dashboard">Check this help page on Stripe's site</a>
-              </p>
-              <%= f.text_block :stripe_pk %>
-              <%= f.text_block :stripe_sk %>
+              <% if @organisation.stripe_connect_json %>
+                <big class="d-block mb-1">
+                  <i class="bi bi-credit-card"></i>
+                  Connected to <%= @organisation.stripe_account_name ? "#{@organisation.stripe_account_name}'s Stripe account" : 'Stripe' %>
+                </big>
+                <a class="btn btn-danger btn-sm" href="/organisations/stripe_disconnect?organisation_id=<%= @organisation.id %>">Disconnect</a>
+              <% else %>
+                <a class="btn btn-outline-primary mb-1" href="https://connect.stripe.com/oauth/authorize?response_type=code&client_id=<%= ENV['STRIPE_CLIENT_ID'] %>&scope=read_write&state=<%= @organisation.id %>">Connect Stripe</a>
+              <% end %>
             </div>
           </div>
           <div class="card mb-3">
@@ -223,6 +236,8 @@
         </div>
         <% if Padrino.env == :development || @organisation.verified? %>
           <div role="tabpanel" class="tab-pane <%= 'active' if params[:tab].to_i == 7%>" id="tab7">
+            <%= f.text_block :stripe_pk %>
+            <%= f.text_block :stripe_sk %>
             <%= f.text_block :stripe_client_id %>
             <%= f.wysiwyg_block :recording_email_greeting %>
             <%= f.text_area_block :minimal_head %>
@@ -231,21 +246,6 @@
             <%= f.number_block :monthly_donor_affiliate_reward %>
             <%= f.wysiwyg_block :affiliate_intro %>
             <%= f.url_block :affiliate_share_image_url %>
-
-            <% if @organisation.stripe_connect_json %>
-              <div class="card my-1">
-                <div class="card-body p-3">
-                  <big class="d-block mb-1">
-                    <i class="bi bi-credit-card"></i>
-                    Connected to <%= @organisation.stripe_account_name ? "#{@organisation.stripe_account_name}'s Stripe account" : 'Stripe' %>
-                  </big>
-                  <a class="btn btn-danger btn-sm" href="/organisations/stripe_disconnect?organisation_id=<%= @organisation.id %>">Disconnect</a>
-                </div>
-              </div>
-            <% else %>
-              <a class="btn btn-outline-primary mb-1" href="https://connect.stripe.com/oauth/authorize?response_type=code&client_id=<%= ENV['STRIPE_CLIENT_ID'] %>&scope=read_write&state=<%= @organisation.id %>">Connect Stripe</a>
-            <% end %>
-
           </div>
         <% end %>
       <% end %>

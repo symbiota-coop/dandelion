@@ -131,7 +131,7 @@ class Order
     d << "#{percentage_discount_monthly_donor}% discount" if percentage_discount_monthly_donor
 
     donations.each do |donation|
-      d << "#{Money.new(donation.amount * 100, currency).format(no_cents_if_whole: true)} donation"
+      d << "#{Money.new(donation.amount * 100, currency).format(no_cents_if_whole: true)} donation #{'to Dandelion' if application_fee_paid_to_dandelion}"
     end
 
     d << "#{Money.new(credit_applied * 100, currency).format(no_cents_if_whole: true)} credit applied" if credit_applied
