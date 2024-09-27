@@ -227,11 +227,18 @@ class Order
         reverse_transfer: true
       )
     elsif event.organisation.stripe_user_id
-      Stripe::Refund.create({
-                              charge: pi.charges.first.id,
-                              refund_application_fee: true
-                            },
-                            { stripe_account: event.organisation.stripe_user_id })
+      if application_fee_amount && application_fee_amount > 0
+        Stripe::Refund.create({
+                                charge: pi.charges.first.id,
+                                refund_application_fee: true
+                              },
+                              { stripe_account: event.organisation.stripe_user_id })
+      else
+        Stripe::Refund.create({
+                                charge: pi.charges.first.id
+                              },
+                              { stripe_account: event.organisation.stripe_user_id })
+      end
     else
       Stripe::Refund.create({ charge: pi.charges.first.id })
     end
