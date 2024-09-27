@@ -49,7 +49,7 @@ Dandelion::App.controller do
         gc_account_number: detailsForm[:account][:gc_account_number],
         http_referrer: detailsForm[:account][:http_referrer],
         answers: (detailsForm[:answers].map { |i, x| [@event.questions_a[i.to_i], x] } if detailsForm[:answers]),
-        application_fee_paid_to_dandelion: @event.organisation.donations_to_dandelion?
+        application_fee_paid_to_dandelion: !@event.revenue_sharer_organisationship && @event.organisation.donations_to_dandelion?
       )
 
       ticketForm[:quantities].each do |ticket_type_id, quantity|
