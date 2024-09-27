@@ -82,7 +82,8 @@ $(function () {
     let dp = $('#donation-percent-buttons button.btn-secondary').data('percent')
 
     if (typeof dp !== 'undefined') {
-      $('#donation_amount').val(p * (dp / 100))
+      let donationAmount = parseFloat(p * (dp / 100))
+      $('#donation_amount').val(donationAmount.toFixed(2).endsWith('00') ? donationAmount.toFixed(0) : donationAmount.toFixed(2))
     }
   }
 
