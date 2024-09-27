@@ -56,12 +56,14 @@
   <%= f.password_block :password %>
   <script>
     $(function () {
-      var autocomplete = new google.maps.places.Autocomplete($('#account_location')[0]);
-      $('#account_location').keydown(function (e) {
-        $('#account-map').hide()
-        if (e.which == 13 && $('.pac-container:visible').length)
-          return false;
-      });
+      if (typeof google !== 'undefined') {
+        var autocomplete = new google.maps.places.Autocomplete($('#account_location')[0]);
+        $('#account_location').keydown(function (e) {
+          $('#account-map').hide()
+          if (e.which == 13 && $('.pac-container:visible').length)
+            return false;
+        });
+      }
     })
   </script>
   <%= f.image_block :picture, rotate: false %>
