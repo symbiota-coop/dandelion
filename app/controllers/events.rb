@@ -94,8 +94,8 @@ Dandelion::App.controller do
     if Padrino.env != :test && !@event.organisation.stripe_client_id && @event.organisation.stripe_sk && !@event.organisation.stripe_connect_json
       @organisation = @event.organisation
       erb :'events/stripe_connect'
-    elsif @organisation.stripe_client_id && !@organisation.paid_up
-      redirect "/o/#{@organisation.slug}/contribute"
+    elsif @event.organisation.stripe_client_id && !@event.organisation.paid_up
+      redirect "/o/#{@event.organisation.slug}/contribute"
     else
       @event.location = 'Online'
       @event.feedback_questions = 'Comments/suggestions'
