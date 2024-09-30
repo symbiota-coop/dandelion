@@ -14,8 +14,10 @@
       <p class="lead">
 
         <% if organisation.stripe_client_id && !organisation.paid_up %>
-          Since you're using our advanced revenue sharing feature,
-          we ask that you meet the suggested donation before creating more events. 
+          <mark>
+            Since you're using our advanced revenue sharing feature,
+            we ask that you meet the suggested donation before creating more events. 
+          </mark>
         <% else %>
           <mark>
             Help us remain donation-based and ad-free.
