@@ -1,4 +1,4 @@
-<% if @organisation && @organisation.verified? && (!organisationship.monthly_donation_method || organisationship.monthly_donation_method == 'Other') %>
+<% if @organisation && @organisation.experimental? && (!organisationship.monthly_donation_method || organisationship.monthly_donation_method == 'Other') %>
   <% form_tag "/organisationships/#{organisationship.id}/monthly_donation", class: 'form-inline' do %>
     <div class="input-group">
       <div class="input-group-prepend">

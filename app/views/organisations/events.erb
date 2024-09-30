@@ -23,7 +23,7 @@
     </div>
   </div>
 <% end %>
-<% if !params[:no_events_banner] && @organisation.verified? && @organisation.events_banner && (!current_account || ((organisationship = @organisation.organisationships.find_by(account: current_account)) && !organisationship.monthly_donor?)) %>
+<% if !params[:no_events_banner] && @organisation.unsanitized_ok? && @organisation.events_banner && (!current_account || ((organisationship = @organisation.organisationships.find_by(account: current_account)) && !organisationship.monthly_donor?)) %>
   <%== @organisation.events_banner %>
 <% end %>
 <% unless params[:no_search] %>

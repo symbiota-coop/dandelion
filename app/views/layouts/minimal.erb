@@ -2,7 +2,7 @@
 <html lang="en">
   <%= partial :'layouts/head' %>
   <body>
-    <% if @organisation && @organisation.verified? && @organisation.minimal_head %>
+    <% if @organisation && @organisation.unsanitized_ok? && @organisation.minimal_head %>
       <%== @organisation.minimal_head %>
     <% end %>
     <% if @account && @account.admin? && @account.minimal_head %>

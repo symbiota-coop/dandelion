@@ -91,7 +91,7 @@ Dandelion::App.controller do
       end
     end
 
-    if Padrino.env != :test && !@event.organisation.verified? && @event.organisation.stripe_sk && !@event.organisation.stripe_connect_json
+    if Padrino.env != :test && !@event.organisation.stripe_client_id && @event.organisation.stripe_sk && !@event.organisation.stripe_connect_json
       @organisation = @event.organisation
       erb :'events/stripe_connect'
     else

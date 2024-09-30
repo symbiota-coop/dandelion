@@ -67,7 +67,7 @@
         <%= f.url_block :facebook_event_url %>
         <%= partial :'events_build/tags', locals: { f: f } %>
         <%= f.lookup_block :coordinator_id, lookup_url: '/accounts.json', placeholder: 'Search accounts', selected_link: (%(<a class="d-inline-block mt-1" target="_blank" href="/u/#{@event.coordinator.username}">View account</a>) if @event.coordinator) %>
-        <% if Padrino.env == :development || @event.organisation.verified? %>
+        <% if Padrino.env == :development || @event.organisation.experimental? %>
           <%= f.lookup_block :organiser_id, lookup_url: '/accounts.json', placeholder: 'Search accounts', selected_link: (%(<a class="d-inline-block mt-1" target="_blank" href="/u/#{@event.organiser.username}">View account</a>) if @event.organiser_id) %>
         <% end %>
 
@@ -87,10 +87,10 @@
         <% end %>
 
         <% if @event.organisation.local_groups.count > 0 %>
-          <div id="local-group-select" <% unless @event.organisation.verified? %> class="mb-3" <% end %>>
+          <div id="local-group-select" <% unless @event.organisation.experimental? %> class="mb-3" <% end %>>
             <%= f.lookup_block :local_group_id, lookup_url: "/o/#{@event.organisation_id}/local_groups.json", placeholder: 'Search local groups', selected_link: (%(<a class="d-inline-block mt-1" target="_blank" href="/local_groups/#{@event.local_group_id}">View local group</a>) if @event.local_group_id) %>
           </div>
-          <% if Padrino.env == :development || @event.organisation.verified? %>
+          <% if Padrino.env == :development || @event.organisation.experimental? %>
             <p id="do-zoom-party">or <a href="javascript:;">turn this event into a Zoom party (experimental)</a></p>
             <div id="zoom-party-checkbox">
               <%= f.check_box_block :zoom_party %>
@@ -183,7 +183,7 @@
             </div>
           </div>
           <div role="tabpanel" class="tab-pane" id="tab6">
-            <% if Padrino.env == :development || @event.organisation.change_select_tickets_title || @event.organisation.verified? %>
+            <% if Padrino.env == :development || @event.organisation.change_select_tickets_title || @event.organisation.experimental? %>
               <%= f.text_block :select_tickets_title %>
             <% end %>
             <%= f.text_block :select_tickets_intro %>
@@ -193,7 +193,7 @@
           <div role="tabpanel" class="tab-pane" id="tab7">
             <%= f.shorturl_block :slug, stem: "#{ENV['BASE_URI']}/e/" %>
             <%= f.url_block :redirect_url %>
-            <% if Padrino.env == :development || @event.purchase_url || @event.organisation.allow_purchase_url? || @event.organisation.verified? %>
+            <% if Padrino.env == :development || @event.purchase_url || @event.organisation.allow_purchase_url? || @event.organisation.experimental? %>
               <%= f.url_block :purchase_url %>
             <% end %>
             <%= f.number_block :facebook_pixel_id %>
@@ -215,7 +215,7 @@
               <%= f.text_area_block :notes %>
             <% end %>
 
-            <% if Padrino.env == :development || @event.organisation.verified? %>
+            <% if Padrino.env == :development || @event.organisation.experimental? %>
               <div class="border border-primary rounded p-3 mb-3" style="border-style: dashed !important">
                 <%= f.text_block :ticket_email_title %>
                 <%= f.wysiwyg_block :ticket_email_greeting %>

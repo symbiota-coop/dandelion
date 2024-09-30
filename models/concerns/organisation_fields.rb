@@ -68,7 +68,8 @@ module OrganisationFields
     field :ticket_email_greeting, type: String
     field :recording_email_greeting, type: String
     field :feedback_email_body, type: String
-    field :verified, type: Mongoid::Boolean
+    field :experimental, type: Mongoid::Boolean
+    field :unsanitized_ok, type: Mongoid::Boolean
     field :can_set_contribution, type: Mongoid::Boolean
     field :contribution_not_required, type: Mongoid::Boolean
     field :contribution_requested_gbp_cache, type: Float
@@ -143,7 +144,8 @@ module OrganisationFields
         post_url: :url,
         event_footer: :wysiwyg,
         banned_emails: :text_area,
-        verified: :check_box,
+        experimental: :check_box,
+        unsanitized_ok: :check_box,
         allow_purchase_url: :check_box,
         contribution_not_required: :check_box,
         contribution_requested_per_event_gbp: :number,

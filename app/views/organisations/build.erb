@@ -107,7 +107,7 @@
       <li role="presentation" class="nav-item"><a class="nav-link <%= 'active' if params[:tab].to_i == 4%>" href="#tab4" role="tab" data-toggle="tab">Mailgun</a></li>
       <li role="presentation" class="nav-item"><a class="nav-link <%= 'active' if params[:tab].to_i == 5%>" href="#tab5" role="tab" data-toggle="tab">Other services</a></li>
       <li role="presentation" class="nav-item"><a class="nav-link <%= 'active' if params[:tab].to_i == 6%>" href="#tab6" role="tab" data-toggle="tab">Everything else</a></li>
-      <% if Padrino.env == :development || @organisation.verified? %>
+      <% if Padrino.env == :development || @organisation.experimental? %>
         <li role="presentation" class="nav-item"><a class="nav-link <%= 'active' if params[:tab].to_i == 7%>" href="#tab7" role="tab" data-toggle="tab">Experimental</a></li>
       <% end %>
     </ul>
@@ -233,7 +233,7 @@
           <%= f.check_box_block :restrict_cohosting %>
           <%= f.check_box_block :hide_ticket_revenue %>
         </div>
-        <% if Padrino.env == :development || @organisation.verified? %>
+        <% if Padrino.env == :development || @organisation.experimental? %>
           <div role="tabpanel" class="tab-pane <%= 'active' if params[:tab].to_i == 7%>" id="tab7">
             <%= f.text_block :stripe_pk %>
             <%= f.text_block :stripe_sk %>
