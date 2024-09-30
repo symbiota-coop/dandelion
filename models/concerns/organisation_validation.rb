@@ -9,6 +9,7 @@ module OrganisationValidation
     validates_format_of :stripe_pk, with: /\A[a-z0-9_]+\z/i, allow_nil: true
 
     before_validation do
+      self.paid_up = true if new_record?
       self.currency = 'GBP' unless currency
       self.ticket_email_greeting = ticket_email_greeting_default unless ticket_email_greeting
       self.recording_email_greeting = recording_email_greeting_default unless recording_email_greeting
