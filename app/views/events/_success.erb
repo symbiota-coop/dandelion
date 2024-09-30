@@ -66,7 +66,7 @@
       <h5 class="my-1">QR code</h5>
       <a target="_blank" href="/qr?url=<%= "#{ENV['BASE_URI']}/e/#{@event.slug}" %>"><img src="/qr?url=<%= "#{ENV['BASE_URI']}/e/#{@event.slug}" %>" style="width: 50px"></a>
     <% end %>
-    <% if @order.account %>
+    <% if @order.account && !@event.organisation.donations_to_dandelion? %>
       <%= partial :'accounts/pay', locals: {div_class: 'mt-5', source: "event:#{@event.id}", account: @order.account, nft: true } %>
     <% end %>
   <% end %>
