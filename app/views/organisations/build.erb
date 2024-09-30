@@ -99,7 +99,6 @@
   </div>
 <% end %>
 <% form_for @organisation, @organisation.new_record? ? '/o/new' : "/o/#{@organisation.slug}/edit" do  |f| %>
-  <%= hidden_field_tag :created, value: params[:created] %>
   <% if @organisation.persisted? %>
     <ul id="organisation-build-nav" class="nav nav-tabs" role="tablist">
       <li role="presentation" class="nav-item"><a class="nav-link <%= 'active' if !params[:tab] || params[:tab].to_i == 1%>" href="#tab1" role="tab" data-toggle="tab">Basics</a></li>
