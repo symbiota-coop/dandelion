@@ -12,10 +12,16 @@
     <div class="card-body p-2">
 
       <p class="lead">
-        <mark>
-          Help us remain donation-based and ad-free.
-          <%= %w[🦄 🌈 🌸 🌻 🌼 ☘️ 🌱].sample %>
-        </mark>
+
+        <% if organisation.stripe_client_id && !organisation.paid_up %>
+          Since you're using our advanced revenue sharing feature,
+          we ask that you meet the suggested donation before creating more events. 
+        <% else %>
+          <mark>
+            Help us remain donation-based and ad-free.
+            <%= %w[🦄 🌈 🌸 🌻 🌼 ☘️ 🌱].sample %>
+          </mark>
+        <% end %>
 
         <p class="lead">
           The suggested donation is <% if organisation.fixed_fee %><%= m per_event, currency %> per event<% else%>5% of ticket sales per event, <u>capped at <%= m per_event, currency %></u><% end %>.
