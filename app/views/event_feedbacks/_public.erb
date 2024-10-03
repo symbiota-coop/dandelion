@@ -5,7 +5,10 @@
      public_qa = @event_feedback.public_answers.detect { |k, _v| k == q }
      public_a = public_qa[1] if public_qa
    end %>
-<% form_tag "/event_feedbacks/#{@event_feedback.id}/public/#{params[:i]}" do %>
+<% if !public_a %>
+  <a href="javascript:;" onclick="$(this).hide().next().show()">Show an extract</a>
+<% end %>
+<% form_tag "/event_feedbacks/#{@event_feedback.id}/public/#{params[:i]}", style: ('display: none' if !public_a) do %>
   <%= text_area_tag :public, onblur: '$(this).next().click()', class: 'form-control autosize', value: public_a, placeholder: 'Paste an extract here to show it publicly' %>
   <%= submit_tag 'Save', class: 'd-none' %>
 <% end %>
