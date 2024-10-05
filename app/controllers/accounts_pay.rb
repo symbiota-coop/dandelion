@@ -1,7 +1,6 @@
 Dandelion::App.controller do
   post '/accounts/stripe_webhook' do
     payload = request.body.read
-    event = nil
     sig_header = request.env['HTTP_STRIPE_SIGNATURE']
     event = Stripe::Webhook.construct_event(
       payload, sig_header, ENV['STRIPE_ENDPOINT_SECRET_ACCOUNTS']

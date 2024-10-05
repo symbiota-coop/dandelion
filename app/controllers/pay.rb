@@ -2,7 +2,6 @@ Dandelion::App.controller do
   post '/g/:slug/stripe_webhook' do
     @gathering = Gathering.find_by(slug: params[:slug]) || not_found
     payload = request.body.read
-    event = nil
     sig_header = request.env['HTTP_STRIPE_SIGNATURE']
     event = Stripe::Webhook.construct_event(
       payload, sig_header, @gathering.stripe_endpoint_secret
