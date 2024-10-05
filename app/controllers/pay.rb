@@ -4,15 +4,9 @@ Dandelion::App.controller do
     payload = request.body.read
     event = nil
     sig_header = request.env['HTTP_STRIPE_SIGNATURE']
-    begin
-      event = Stripe::Webhook.construct_event(
-        payload, sig_header, @gathering.stripe_endpoint_secret
-      )
-    rescue JSON::ParserError
-      halt 400
-    rescue Stripe::SignatureVerificationError
-      halt 400
-    end
+    event = Stripe::Webhook.construct_event(
+      payload, sig_header, @gathering.stripe_endpoint_secret
+    )
 
     if event['type'] == 'checkout.session.completed'
       session = event['data']['object']
