@@ -13,7 +13,7 @@ data = d.map { |x|
     ["#{Date::MONTHNAMES[x.month]} #{x.year}", organisations.count]
   }.to_h
 
-partial :chart, locals: { data: data, make_projection: true } %>
+partial :chart, locals: { data: data } %>
 
 <h2>Dominance of leading organisation</h2>
 
