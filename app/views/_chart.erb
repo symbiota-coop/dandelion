@@ -15,13 +15,20 @@
       <%
         if !defined?(data)
           if !defined?(months_ago); months_ago = 12; end
-        earliest = countable.min(:created_at).to_date
-        d = [Date.new(earliest.year, earliest.month, 1) - 1.month]
-        if earliest < months_ago.months.ago
-          earliest = months_ago.months.ago
-          d = [Date.new(earliest.year, earliest.month, 1)]
-        end
-        d << (d.last + 1.month) while d.last < Date.new(Date.today.year, Date.today.month, 1)
+          earliest = countable.min(:created_at).to_date
+          d = [Date.new(earliest.year, earliest.month, 1) - 1.month]
+          if earliest < months_ago.months.ago
+            earliest = months_ago.months.ago
+            d = [Date.new(earliest.year, earliest.month, 1)]
+          end
+          d << (d.last + 1.month) while d.last < Date.new(Date.today.year, Date.today.month, 1)
+
+          # Calculate projection for the current month
+          current_month_data = countable.and(:created_at.gte => d.last, :created_at.lt => Date.today).count
+          days_in_month = Date.new(Date.today.year, Date.today.month, -1).day
+          days_passed = Date.today.day
+          projected_data = (current_month_data.to_f / days_passed * days_in_month).round
+          projection = [projected_data - current_month_data, 0].max
         end
       %>
 
@@ -34,9 +41,15 @@
             <% if defined?(label) %>
               label: <%== label.to_json %>,
             <% end %>
-            backgroundColor: '#00B963',
-            borderColor: '#00B963',
+            backgroundColor: 'rgba(0, 185, 99, 1)',
+            borderColor: 'rgba(0, 185, 99, 1)',
             data: <%== defined?(data) ? data.values.to_json : d.map { |x| countable.and(:created_at.gte => x, :created_at.lt => (x + 1.month)).count }.to_json %>
+          },
+          {
+            label: 'Projection',
+            backgroundColor: 'rgba(0, 185, 99, 0.5)',
+            borderColor: 'rgba(0, 185, 99, 0.5)',
+            data: <%== defined?(data) ? '[]' : d.map { |x| x == d.last ? projection : 'null' }.to_json %>
           }
         ],
       },
@@ -55,18 +68,16 @@
         },
         responsive: true,
         scales: {
-          // x: {
-          //     title: {
-          //       display: true,
-          //       text: 'Month'
-          //     }
-          //   },
+          x: {
+            stacked: true
+          },
           y: {
-              title: {
-                display: true,
-                text: <%== (defined?(unit) ? unit : (defined?(unit_after) ? unit_after : '')).to_json %>
-              }
+            stacked: true,
+            title: {
+              display: true,
+              text: <%== (defined?(unit) ? unit : (defined?(unit_after) ? unit_after : '')).to_json %>
             }
+          }
         }
       }
     });
