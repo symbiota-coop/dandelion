@@ -3,9 +3,14 @@ Dandelion::App.controller do
     @gathering = Gathering.find_by(slug: params[:slug]) || not_found
     payload = request.body.read
     sig_header = request.env['HTTP_STRIPE_SIGNATURE']
-    event = Stripe::Webhook.construct_event(
-      payload, sig_header, @gathering.stripe_endpoint_secret
-    )
+    begin
+      event = Stripe::Webhook.construct_event(
+        payload, sig_header, @gathering.stripe_endpoint_secret
+      )
+    rescue Stripe::SignatureVerificationError => e
+      airbrake_notify(e)
+      halt 200
+    end
 
     if event['type'] == 'checkout.session.completed'
       session = event['data']['object']
