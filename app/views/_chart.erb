@@ -42,15 +42,11 @@
         labels: <%== data.keys.to_json %>,
         datasets: [
           {
-            <% if defined?(label) %>
-              label: <%== label.to_json %>,
-            <% end %>
             backgroundColor: 'rgba(0, 185, 99, 1)',
             borderColor: 'rgba(0, 185, 99, 1)',
             data: <%== data.values.to_json %>
           },
           {
-            label: 'Projection',
             backgroundColor: 'rgba(0, 185, 99, 0.5)',
             borderColor: 'rgba(0, 185, 99, 0.5)',
             data: <%== data.size.times.map { |i| i == data.size - 1 ? (defined?(projection) ? projection : nil) : nil }.to_json %>
@@ -59,11 +55,9 @@
       },
       options: {
         plugins: {
-        <% if !defined?(label) %>
           legend: {
             display: false
           },
-        <% end %>
           datalabels: {
             formatter: function(value, context) {
               if (context.datasetIndex === 1 && value !== null) {
