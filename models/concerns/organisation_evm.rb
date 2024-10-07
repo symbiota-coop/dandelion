@@ -1,10 +1,6 @@
 module OrganisationEvm
   extend ActiveSupport::Concern
 
-  def evm_transactions
-    Organisation.evm_transactions(evm_address)
-  end
-
   def check_evm_account
     evm_transactions.each do |token, amount|
       if (@order = Order.find_by(:payment_completed.ne => true, :currency => token, :evm_value => amount))

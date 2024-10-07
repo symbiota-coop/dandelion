@@ -7,6 +7,7 @@ class Gathering
   include GatheringAssociations
   include Geocoded
   include EvmTransactions
+  include StripeWebhooks
 
   def self.spring_clean
     ignore = %i[memberships teams teamships notifications_as_notifiable notifications_as_circle]
@@ -162,42 +163,10 @@ class Gathering
     end
   end
 
-  def evm_transactions
-    Gathering.evm_transactions(evm_address)
-  end
-
   def check_evm_account
     evm_transactions.each do |token, amount|
       Payment.create(payment_attempt: @payment_attempt) if (@payment_attempt = payment_attempts.find_by(currency: token, evm_amount: amount))
     end
-  end
-
-  after_save :create_stripe_webhook_if_necessary, if: :stripe_sk
-  def create_stripe_webhook_if_necessary
-    Stripe.api_key = stripe_sk
-    Stripe.api_version = '2020-08-27'
-
-    webhooks = []
-    has_more = true
-    starting_after = nil
-    while has_more
-      w = Stripe::WebhookEndpoint.list({ limit: 100, starting_after: starting_after })
-      has_more = w['has_more']
-      unless w['data'].empty?
-        webhooks += w['data']
-        starting_after = w['data'].last['id']
-      end
-    end
-
-    return if webhooks.find { |w| w['url'] == "#{ENV['BASE_URI']}/g/#{slug}/stripe_webhook" && w['enabled_events'].include?('checkout.session.completed') }
-
-    w = Stripe::WebhookEndpoint.create({
-                                         url: "#{ENV['BASE_URI']}/g/#{slug}/stripe_webhook",
-                                         enabled_events: [
-                                           'checkout.session.completed'
-                                         ]
-                                       })
-    update_attribute(:stripe_endpoint_secret, w['secret'])
   end
 
   def radio_scopes

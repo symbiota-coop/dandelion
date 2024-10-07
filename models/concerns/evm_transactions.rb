@@ -73,4 +73,8 @@ module EvmTransactions
       transactions
     end
   end
+
+  def evm_transactions
+    self.class.evm_transactions(evm_address)
+  end
 end
