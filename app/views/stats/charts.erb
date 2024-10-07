@@ -1,49 +1,43 @@
 <h2>Events</h2>
 
-<%= partial :chart, locals: { countable: Event.all, months_ago: 24 } %>
+<%= partial :chart, locals: { countable: Event.all, months_ago: 24, make_projection: true } %>
 
 <h2>Active organisations</h2>
 
 <%=
-
 d = [Date.new(24.months.ago.year, 24.months.ago.month, 1)]
 d << (d.last + 1.month) while d.last < Date.new(Date.today.year, Date.today.month, 1)
-
-partial :chart, locals: {
-  data: d.map { |x|
+data = d.map { |x|
     orders = Order.and(:created_at.gte => x, :created_at.lt => x + 1.month, :value.ne => nil)
     organisations = Organisation.and(:id.in => Event.and(:id.in => orders.pluck(:event_id)).pluck(:organisation_id))
     ["#{Date::MONTHNAMES[x.month]} #{x.year}", organisations.count]
-  }.to_h   
-} %>
+  }.to_h
+
+partial :chart, locals: { data: data, make_projection: true } %>
 
 <h2>Dominance of leading organisation</h2>
 
 <%=
-
 d = [Date.new(24.months.ago.year, 24.months.ago.month, 1)]
 d << (d.last + 1.month) while d.last < Date.new(Date.today.year, Date.today.month, 1)
+data = d.map { |x|
+  lead_org_events_in_month = Event.and(organisation: Organisation.find_by(slug: ENV['LEAD_ORG_SLUG'])).and(:created_at.gte => x, :created_at.lt => x + 1.month).count
+  other_events_in_month = Event.and(:organisation.ne => Organisation.find_by(slug: ENV['LEAD_ORG_SLUG'])).and(:created_at.gte => x, :created_at.lt => x + 1.month).count
 
-partial :chart, locals: {
-  unit_after: '%',
-  data: d.map { |x|
+  ["#{Date::MONTHNAMES[x.month]} #{x.year}", (lead_org_events_in_month == 0 || other_events_in_month == 0) ? 0 : (100*(lead_org_events_in_month.to_f/other_events_in_month)).round]
+}.to_h 
 
-    lead_org_events_in_month = Event.and(organisation: Organisation.find_by(slug: ENV['LEAD_ORG_SLUG'])).and(:created_at.gte => x, :created_at.lt => x + 1.month).count
-    other_events_in_month = Event.and(:organisation.ne => Organisation.find_by(slug: ENV['LEAD_ORG_SLUG'])).and(:created_at.gte => x, :created_at.lt => x + 1.month).count
-
-    ["#{Date::MONTHNAMES[x.month]} #{x.year}", (lead_org_events_in_month == 0 || other_events_in_month == 0) ? 0 : (100*(lead_org_events_in_month.to_f/other_events_in_month)).round]
-  }.to_h
-}
+partial :chart, locals: { unit_after: '%', data: data }
 %>
 
 <% if (f = Fragment.find_by(key: 'monthly_contributions')) %>
   <h2>Contributions</h2>
-  <%= partial :chart, locals: {
-  unit: '£',
-  data: JSON.parse(f.value).to_h
-} %>
+  <%=
+    data = JSON.parse(f.value).to_h
+    partial :chart, locals: { unit: '£', data: data, make_projection: true}
+  %>
 <% end %>
 
 <h2>Accounts</h2>
 
-<%= partial :chart, locals: { countable: Account.all, months_ago: 24 } %>
+<%= partial :chart, locals: { countable: Account.all, months_ago: 24, make_projection: true } %>
