@@ -7,6 +7,7 @@ class Organisation
   include OrganisationAssociations
   include OrganisationAccounting
   include OrganisationAccessControl
+  include EvmTransactions
   include OrganisationEvm
   include OrganisationValidation
   include Geocoded

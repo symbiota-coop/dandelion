@@ -6,6 +6,7 @@ class Gathering
   include GatheringFields
   include GatheringAssociations
   include Geocoded
+  include EvmTransactions
 
   def self.spring_clean
     ignore = %i[memberships teams teamships notifications_as_notifiable notifications_as_circle]
@@ -162,7 +163,7 @@ class Gathering
   end
 
   def evm_transactions
-    Organisation.evm_transactions(evm_address)
+    Gathering.evm_transactions(evm_address)
   end
 
   def check_evm_account
