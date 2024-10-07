@@ -2,7 +2,7 @@
 
 <% if defined?(memberships) %>
   <h2>Followers</h2>
-  <%= partial :chart, locals: { label: 'Followers', countable: memberships } %>
+  <%= partial :chart, locals: { countable: memberships } %>
 <% end %>
 
 <% youngest = accounts.and(:date_of_birth.ne => nil, :date_of_birth.lte => Date.today).order('date_of_birth desc').first
