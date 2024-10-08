@@ -308,7 +308,8 @@ class Pmail
   def self.new_hints
     {
       from: "In the form <em>Maria Sabina &lt;maria.sabina@#{ENV['DOMAIN']}&gt;</em>",
-      link_params: 'For example: utm_source=newsletter&utm_medium=email&utm_campaign=launch'
+      link_params: 'For example: utm_source=newsletter&utm_medium=email&utm_campaign=launch',
+      preview_text: 'Appears alongside the subject line in some email clients'
     }
   end
 
