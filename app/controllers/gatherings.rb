@@ -56,7 +56,7 @@ Dandelion::App.controller do
   %sign_in_details%
 </p>)
     Gathering.enablable.each do |x|
-      @gathering.send("enable_#{x}=", true)
+      @gathering.send("enable_#{x}=", true) unless x == 'shift_worth'
     end
     @gathering.listed = true
     @gathering.enable_partial_payments = true

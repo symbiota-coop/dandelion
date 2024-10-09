@@ -102,5 +102,6 @@ gem 'rack-utf8_sanitizer'
 gem 'bazaar'
 gem 'chroma'
 gem 'crawler_detect'
+gem 'digest'
 gem 'matrix' # necessary in connection with capybara/cuprite
 gem 'mini_magick'

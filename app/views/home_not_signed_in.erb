@@ -14,21 +14,26 @@
 
   <div class="row justify-content-center">
 
+
     <script>
       $(function () {
-        var typed = new Typed('.typewriter', {
-          strings: [
-            'regenerative',
-            'metamodern',
-            'participatory',
-            'conscious',
-            'transformative',
-            'holistic',
-            'ethical'
-          ],
-          typeSpeed: 50,
-          loop: true
-        });
+        <% if ENV['CREATE_VIDEO'] %>
+          $('.typewriter').text('regenerative')
+        <% else %>
+          var typed = new Typed('.typewriter', {
+            strings: [
+              'regenerative',
+              'metamodern',
+              'participatory',
+              'conscious',
+              'transformative',
+              'holistic',
+              'ethical'
+            ],
+            typeSpeed: 50,
+            loop: true
+          });
+        <% end %>
       })
     </script>
     <div class="col-12 col-lg-7">

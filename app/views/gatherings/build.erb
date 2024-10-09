@@ -2,10 +2,6 @@
   <%= partial :'gatherings/nav', locals: { gathering: @gathering, membership: @membership } %>
 <% end %>
 
-<% if @gathering.new_record? %>
-  <%= partial :'gatherings/explain', locals: {read_more: true} %>
-<% end %>
-
 <p>
   <a target="_blank" href="/docs/gatherings">
     <i class="bi bi-question-circle-fill"></i>

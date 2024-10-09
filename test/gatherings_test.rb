@@ -1,15 +1,7 @@
 require File.expand_path("#{File.dirname(__FILE__)}/test_config.rb")
 
-class CoreTest < ActiveSupport::TestCase
+class DandelionTest < ActiveSupport::TestCase
   include Capybara::DSL
-
-  setup do
-    reset!
-  end
-
-  teardown do
-    save_screenshot unless ENV['CI']
-  end
 
   test 'creating a gathering' do
     @account = FactoryBot.create(:account)

@@ -97,6 +97,14 @@
   <script src="<%= f %>"></script>
   <% } %>
 
+
+  <% if ENV['CREATE_VIDEO'] %>
+    <style>
+      .pace-activity {
+        display: none !important;
+      }
+    </style>
+  <% end %>
   <script>
     paceOptions = {
         ajax: {

@@ -1,3 +1,14 @@
+<style>
+  #tactivity_description {
+    height: 5em
+  }
+</style>
+<script>
+  $(function() {
+    autosize($('#tactivity_description')[0]);
+  });
+</script>
+
 <% form_for @tactivity ||= Tactivity.new, @tactivity.new_record? ? "/tactivities/create?timetable_id=#{timetable.id}" : "/tactivities/#{@tactivity.id}/edit" do |f| %>
 
   <% if @tactivity.errors.count > 0 %>

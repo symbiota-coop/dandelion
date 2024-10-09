@@ -1,6 +1,6 @@
 <% form_for @organisation_tier, @organisation_tier.new_record? ? "/o/#{@organisation.slug}/organisation_tiers/new" : "/o/#{@organisation.slug}/organisation_tiers/#{@organisation_tier.id}/edit" do  |f| %>
   <%= f.text_block :name %>
-  <%= f.text_area_block :description %>  
+  <%= f.text_area_block :description %>
   <%= f.number_block :threshold %>
   <%= f.number_block :discount %>
   <%= f.text_block :gc_plan_id %>

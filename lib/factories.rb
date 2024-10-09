@@ -3,7 +3,7 @@ FactoryBot.define do
     sequence(:name) { |n| "Account #{n}" }
     sequence(:email) { |n| "account#{n}@#{ENV['DOMAIN']}" }
     sequence(:password) { |_n| Account.generate_password }
-    location { 'Totnes, UK' }
+    location { 'Stockholm, Sweden' }
   end
 
   factory :organisation do
@@ -58,6 +58,8 @@ FactoryBot.define do
   factory :gathering do
     sequence(:name) { |n| "Gathering #{n}" }
     sequence(:slug) { |n| "gathering-#{n}" }
+    stripe_pk { ENV['STRIPE_PK'] }
+    stripe_sk { ENV['STRIPE_SK'] }
     currency { 'GBP' }
     listed { true }
     enable_teams { true }
@@ -81,7 +83,7 @@ FactoryBot.define do
     sequence(:name) { |n| "Event #{n}" }
     sequence(:start_time) { |n| Time.now + 1.month + n.days }
     sequence(:end_time) { |n| Time.now + 1.month + (n + 1).days }
-    location { 'Totnes, UK' }
+    location { 'Stockholm, Sweden' }
     currency { 'GBP' }
     organisation
     account

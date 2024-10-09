@@ -1,3 +1,13 @@
+<style>
+  #option_description {
+    height: 5em
+  }
+</style>
+<script>
+  $(function() {
+    autosize($('#option_description')[0]);
+  });
+</script>
 <% form_for @option ||= Option.new, @option.new_record? ? "/g/#{@gathering.slug}/options/new" : "/g/#{@gathering.slug}/options/#{@option.id}/edit" do |f| %>
   <%= f.text_block :name %>
   <%= f.text_area_block :description %>
