@@ -15,13 +15,27 @@
     <% end %>
   </div>
 
-  <% if defined?(facilitator_info) && facilitator_info && account.feedback_summary %>
-    <div class="mt-2">
-      <div class="mb-1" data-toggle="tooltip" title="AI-generated summary ✨">
-        <big>
-          <%= account.feedback_summary %>
-        </big>
+  <% if defined?(facilitator_info) && facilitator_info %>
+
+    <% if account.feedback_summary %>
+      <div class="mt-2">
+        <div class="mb-1" data-toggle="tooltip" title="AI-generated summary ✨">
+          <big>
+            <%= account.feedback_summary %>
+          </big>
+        </div>
+      </div>
+    <% end %>
+
+    <% if account.youtube_video_url %>
+      <div class="row mt-3">
+        <div class="col-12 col-xl-6">
+          <div class="embed-responsive embed-responsive-16by9">
+            <iframe class="embed-responsive-item" src="<%= youtube_embed_url(account.youtube_video_url) %>" allowfullscreen></iframe>
+          </div>
+        </div>
       </div>
     </div>
   <% end %>
-</div>
+
+<% end %>

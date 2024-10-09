@@ -171,4 +171,12 @@ Dandelion::App.helpers do
   rescue Money::Bank::UnknownRate, Money::Currency::UnknownCurrency
     0
   end
+
+  def youtube_embed_url(url)
+    if url =~ %r{(?:youtube\.com/(?:[^/]+/.+/|(?:v|e(?:mbed)?)/|.*[?&]v=)|youtu\.be/)([^"&?/\s]{11})}
+      "https://www.youtube.com/embed/#{Regexp.last_match(1)}"
+    else
+      url # Return original URL if it doesn't match YouTube format
+    end
+  end
 end

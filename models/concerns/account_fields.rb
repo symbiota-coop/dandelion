@@ -50,6 +50,7 @@ module AccountFields
     field :substack_opt_in, type: Time
     field :stripe_subscription_id, type: String
     field :feedback_summary, type: String
+    field :youtube_video_url, type: String
 
     field :tokens, type: Float
     index({ tokens: 1 })
@@ -122,7 +123,8 @@ module AccountFields
         sent_substack_invite: :datetime,
         substack_opt_in: :datetime,
         stripe_subscription_id: :text,
-        minimal_head: :text_area
+        minimal_head: :text_area,
+        youtube_video_url: :url
       }
     end
 
