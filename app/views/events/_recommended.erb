@@ -2,9 +2,9 @@
   next unless event
   next if event.locked? && !event_admin?(event)
   next if event.sold_out?
+  next if event.created_at < 1.year.ago
   next if event.event_facilitations.find_by(account: current_account)    
-  next unless event.image_uid
-  next unless event.created_at > 1.year.ago
+  next unless event.image_uid  
 %>
 <div class="mb-1">
   <%= partial :'events/block_carousel', locals: {event: event} %>

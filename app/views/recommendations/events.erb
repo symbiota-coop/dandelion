@@ -13,8 +13,8 @@ show_image = (Padrino.env == :production)
       <% recommended_events.first(10).each { |event_id,people|  event = Event.find(event_id);
         next if event.locked? && !event_admin?(event)
         next if event.sold_out?
+        next if event.created_at < 1.year.ago
         next if event.event_facilitations.find_by(account: current_account)
-        next unless event.created_at > 1.year.ago
         %>
       <div class="col-12 <%= block_class if defined?(block_class) %>" id="<%= event.id %>">
         <div class="mb-4">
