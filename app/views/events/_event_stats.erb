@@ -7,9 +7,9 @@
       scrollTimeout = setTimeout(function() {  // Set a new timeout
         // This code will only run after scrolling has stopped
         if ($(window).scrollLeft() > $('#sidebar').width()) {
-          $('#sidebar').hide();
+          $('#sidebar').fadeOut();
         } else {
-          $('#sidebar').show();
+          $('#sidebar').fadeIn();
         }
       }, 100);  // Adjust timeout duration to suit your needs, 250ms is commonly used
     });
