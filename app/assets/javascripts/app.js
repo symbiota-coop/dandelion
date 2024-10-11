@@ -276,6 +276,10 @@ $(function () {
     })
   })
 
+  $('.search.well .checkbox-inline input[type="checkbox"]').on('change', function () {
+    $(this).closest('.checkbox-inline').toggleClass('checked', this.checked);
+  });
+
   $(window).on('beforeunload', function () {
     if ($('#page-container').hasClass('page-sidebar-toggled') && $(window).width() < 768) {
       $('.pace-activity').css('border-top-color', 'white').css('border-left-color', 'white')

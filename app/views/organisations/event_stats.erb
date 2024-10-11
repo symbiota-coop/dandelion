@@ -1,54 +1,73 @@
 <%= partial :'organisations/nav', locals: { organisation: @organisation } %>
-<% form_tag '', method: 'get', class: 'searchForm form-inline' do %>
-  <div class="form-group">
-    <label>Events between</label>
-    <%= text_field_tag :from, class: 'form-control datepicker mx-1', value: @from.to_fs(:db_local) %>
-  </div>
-  <div class="form-group">
-    <label>and</label>
-    <%= text_field_tag :to, class: 'form-control datepicker mx-1', value: (@to.to_fs(:db_local) if @to) %>
-  </div>
-  <div class="form-group">
-    <%= select_tag :start_or_end, options: {'start date' => 'start', 'end date' => 'end'}, value: @start_or_end, class: 'form-control mx-1' %>
-  </div>
-  <div class="form-group">
-    <label>containing the word</label>
-    <%= text_field_tag :q, class: 'form-control mx-1', value: params[:q] %>
-  </div>
-  <% if @organisation.event_tags.count > 0 %>
-    <div class="form-group">
-      <label>tagged</label>
-      <%= select_tag :event_tag_id, options: [''] + @organisation.event_tags.order('name asc').map { |event_tag| [event_tag.name, event_tag.id] }, selected: params[:event_tag_id], class: 'form-control' %>
+
+<div class="search well">
+
+  <% form_tag '', method: 'get', class: 'searchForm mb-3' do %>
+    <div class="form-row align-items-end">
+      <div class="form-group col-12 col-sm-auto">
+        <label>Events between</label>
+        <%= text_field_tag :from, class: 'form-control datepicker mx-1', value: @from.to_fs(:db_local) %>
+      </div>
+      <div class="form-group col-12 col-sm-auto">
+        <label>and</label>
+        <%= text_field_tag :to, class: 'form-control datepicker mx-1', value: (@to.to_fs(:db_local) if @to) %>
+      </div>
+      <div class="form-group col-12 col-sm-auto">
+        <label>start/end date</label>
+        <%= select_tag :start_or_end, options: {'start date' => 'start', 'end date' => 'end'}, value: @start_or_end, class: 'form-control mx-1' %>
+      </div>
+      <div class="form-group col-12 col-sm-auto">
+        <label>containing the word</label>
+        <%= text_field_tag :q, class: 'form-control mx-1', value: params[:q] %>
+      </div>
+      <% if @organisation.event_tags.count > 0 %>
+        <div class="form-group col-12 col-sm-auto">
+          <label>tagged</label>
+          <%= select_tag :event_tag_id, options: [''] + @organisation.event_tags.order('name asc').map { |event_tag| [event_tag.name, event_tag.id] }, selected: params[:event_tag_id], class: 'form-control' %>
+        </div>
+      <% end %>
+      <% if @organisation.local_groups.count > 0 %>
+        <div class="form-group col-12 col-sm-auto">
+          <label>Local group</label>
+          <%= select_tag :local_group_id, options: [''] + @organisation.local_groups.order('name asc').map { |local_group| [local_group.name, local_group.id] }, selected: params[:local_group_id], class: 'form-control mx-1' %>
+        </div>
+      <% end %>
+      <% if @organisation.activities.count > 0 %>
+        <div class="form-group col-12 col-sm-auto">
+          <label>Activity</label>
+          <%= select_tag :activity_id, options: [''] + @organisation.activities.order('name asc').map { |activity| [activity.name, activity.id] }, selected: params[:activity_id], class: 'form-control mx-1' %>
+        </div>
+      <% end %>
+      <div class="form-group col-12 col-sm-auto">
+        <label>Coordinator</label>
+        <%= select_tag :coordinator_id, options: [''] + Account.and(:id.in => @organisation.events_including_cohosted.pluck(:coordinator_id)).order('name asc').map { |account| [account.name, account.id] }, selected: params[:coordinator_id], class: 'form-control mx-1' %>
+      </div>
     </div>
-  <% end %>
-  <% if @organisation.local_groups.count > 0 %>
-    <div class="form-group">
-      <label>Local group</label>
-      <%= select_tag :local_group_id, options: [''] + @organisation.local_groups.order('name asc').map { |local_group| [local_group.name, local_group.id] }, selected: params[:local_group_id], class: 'form-control mx-1' %>
+
+    <div class="form-row align-items-end mt-1">
+      <%= checkbox 'Online', form_group_class: 'col-12 col-sm-auto' %>
+      <%= checkbox 'In person', form_group_class: 'col-12 col-sm-auto' %>
+      <%= checkbox 'No coordinator', form_group_class: 'col-12 col-sm-auto' %>
+      <%= checkbox 'No facilitators', form_group_class: 'col-12 col-sm-auto' %>
+      <%= checkbox 'Discrepancy', form_group_class: 'col-12 col-sm-auto' %>
+      <div class="form-group col-12 col-sm-auto">
+        <%= submit_tag 'Search', class: 'btn btn-primary' %>
+      </div>
     </div>
+    <%= hidden_field_tag :search, value: 1 %>
   <% end %>
-  <% if @organisation.activities.count > 0 %>
-    <div class="form-group">
-      <label>Activity</label>
-      <%= select_tag :activity_id, options: [''] + @organisation.activities.order('name asc').map { |activity| [activity.name, activity.id] }, selected: params[:activity_id], class: 'form-control mx-1' %>
-    </div>
+
+  <% form_tag (defined?(path) && path ? path : ''), method: 'get', class: 'form-inline submitOnChange mb-3' do %>
+    <% params.each { |k,v| next if %w[format search order slug].include?(k) %>
+    <%= hidden_field_tag k, value: v %>
+    <% } %>
+    <%= hidden_field_tag :search, value: 1 %>
+    <label class="mr-sm-2">Sort by</label>
+    <%= select_tag :order, options: { 'Event date' => 'date', 'Most recently created' => 'created_at' }, selected: params[:order], class: 'form-control' %>
   <% end %>
-  <div class="form-group">
-    <label>Coordinator</label>
-    <%= select_tag :coordinator_id, options: [''] + Account.and(:id.in => @organisation.events_including_cohosted.pluck(:coordinator_id)).order('name asc').map { |account| [account.name, account.id] }, selected: params[:coordinator_id], class: 'form-control mx-1' %>
-  </div>
-  <div class="form-group">
-    <label>Sort by</label>
-    <%= select_tag :order, options: { 'Event date' => 'date', 'Most recently created' => 'created_at' }, selected: params[:order], class: 'form-control mx-1' %>
-  </div>
-  <%= checkbox 'Online' %>
-  <%= checkbox 'In person' %>
-  <%= checkbox 'No coordinator' %>
-  <%= checkbox 'No facilitators' %>
-  <%= checkbox 'Discrepancy' %>
-  <%= hidden_field_tag :search, value: 1 %>
-  <%= submit_tag 'Search', class: 'btn btn-primary' %>
-<% end %>
+
+</div>
+
 <h2 class="my-3">
   <span class="badge badge-primary"><%= pluralize @events.count, 'event' %></span>
 </h2>
