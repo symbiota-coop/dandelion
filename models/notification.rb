@@ -185,7 +185,11 @@ class Notification
       "<strong>#{event.organisation.name}</strong> updated the event <strong>#{event.name}</strong>, #{event.concise_when_details(nil)}"
     when :created_organisation
       organisation = notifiable
-      "<strong>#{organisation.account.name}</strong> created the organisation <strong>#{organisation.name}</strong>"
+      if organisation.account
+        "<strong>#{organisation.account.name}</strong> created the organisation <strong>#{organisation.name}</strong>"
+      else
+        "A new organisation <strong>#{organisation.name}</strong> was created"
+      end
     when :created_order
       order = notifiable
       "<strong>#{order.account.name}</strong> is going to <strong>#{order.event.name}</strong>"
