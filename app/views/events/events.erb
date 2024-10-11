@@ -28,12 +28,6 @@
 
 <%= partial :'events/search_form' %>
 
-<% if current_account && !params[:search] && !params[:event_tag_id] %>
-  <%= cp(:'events/carousel_organisations', key: "/events/carousel_organisations/#{current_account.id}") %>
-<% end %>
-
-<%= partial :'events/view_options' %>
-
 <% if params[:display] == 'map' %>
   <div data-pagelet-url="/events?<%= request.query_string %>">
     <%= partial :'maps/map', locals: { stem: "/events", dynamic: true, trigger_bounds_changed: true } %>

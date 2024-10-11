@@ -1,26 +1,47 @@
-<% form_tag '/events', method: 'get', class: 'submitOnChange searchForm form-inline mb-3' do %>
-  <%= hidden_field_tag :display, value: params[:display] %>
-  <%= hidden_field_tag :order, value: params[:order] %>
-  <div class="form-group">
-    <label>Events between</label>
-    <%= text_field_tag :from, class: 'form-control datepicker', value: @from.to_fs(:db_local) %>
-  </div>
-  <div class="form-group">
-    <label>and</label>
-    <%= text_field_tag :to, class: 'form-control datepicker', value: (@to.to_fs(:db_local) if @to) %>
-  </div>
-  <div class="form-group">
-    <label>containing the word</label>
-    <%= text_field_tag :q, class: 'form-control', value: params[:q] %>
-  </div>
-  <% if (event_tags = EventTag.and(:id.in => EventTagship.and(:event_id.in => Event.live.public.legit.future.pluck(:id)).pluck(:event_tag_id)).order('name asc')).count > 0 %>
-    <div class="form-group">
-      <label>tagged</label>
-      <%= select_tag :event_tag_id, options: [''] + event_tags.map { |event_tag| [event_tag.name, event_tag.id] }, selected: params[:event_tag_id], class: 'form-control'%>
+<style>
+  .checkbox-inline { cursor: auto; background-color: white; padding: 0.3rem; padding-bottom: 0.2rem; border-radius: 0.25rem }
+  .checkbox-inline label { cursor: pointer }
+  .checkbox-inline.checked { border: 1px solid #00B963; }
+    @media(min-width: 992px) {
+      #search-form { padding-top: 1.0875rem; padding-bottom: 0 }
+    }
+    .searchForm input[type=submit] { margin: 0 !important }
+</style>
+<div class="well" id="search-form">
+
+  <% form_tag '/events', method: 'get', class: 'submitOnChange searchForm mb-3' do %>
+    <%= hidden_field_tag :display, value: params[:display] %>
+    <%= hidden_field_tag :order, value: params[:order] %>
+    <div class="form-row align-items-end">
+      <div class="form-group col-12 col-sm-auto">
+        <label>Events between</label>
+        <%= text_field_tag :from, class: 'form-control datepicker', value: @from.to_fs(:db_local) %>
+      </div>
+      <div class="form-group col-12 col-sm-auto">
+        <label>and</label>
+        <%= text_field_tag :to, class: 'form-control datepicker', value: (@to.to_fs(:db_local) if @to) %>
+      </div>
+      <div class="form-group col-12 col-sm-auto">
+        <label>containing the word</label>
+        <%= text_field_tag :q, class: 'form-control', value: params[:q] %>
+      </div>
+      <% if (event_tags = EventTag.and(:id.in => EventTagship.and(:event_id.in => Event.live.public.legit.future.pluck(:id)).pluck(:event_tag_id)).order('name asc')).count > 0 %>
+        <div class="form-group col-12 col-sm-auto">
+          <label>tagged</label>
+          <%= select_tag :event_tag_id, options: [''] + event_tags.map { |event_tag| [event_tag.name, event_tag.id] }, selected: params[:event_tag_id], class: 'form-control'%>
+        </div>
+      <% end %>
     </div>
+    <div class="form-row align-items-end mt-1">
+      <%= checkbox 'Online', form_group_class: 'col-12 col-sm-auto' %>
+      <%= checkbox 'In person', form_group_class: 'col-12 col-sm-auto' %>
+      <div class="form-group col-12 col-sm-auto">
+        <%= submit_tag 'Search', class: 'btn btn-primary' %>
+      </div>
+    </div>
+    <%= hidden_field_tag :search, value: 1 %>
   <% end %>
-  <%= checkbox 'Online' %>
-  <%= checkbox 'In person' %>
-  <%= submit_tag 'Search', class: 'btn btn-primary' %>
-  <%= hidden_field_tag :search, value: 1 %>
-<% end %>
+
+  <%= partial :'events/view_options', locals: { path: (path if defined?(path)) } %>
+
+</div>

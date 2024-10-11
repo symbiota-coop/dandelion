@@ -9,6 +9,7 @@ $color_theme_transparent: rgba(251, 174, 59, 0.5);
 $body_font_family: 'Plus Jakarta Sans', sans-serif;
 $body_font_size: 0.825rem;
 $body_text: #212529;
+$bg_well: #F5F5F5;
 
 @import "../infinite_admin/scss/style";
 
@@ -665,20 +666,23 @@ figure.image,
   }
 }
 
-@media(max-width: 991px) {
-  .fake-container-fluid>.px-5 {
-    padding-left: 1rem !important;
-    padding-right: 1rem !important
-  }
-
-  .fake-container-fluid>.bg-grey-transparent-2 {
-    background: white !important
-  }
+.fake-container-fluid {
+  padding-top: 1rem;
+  padding-left: 0.5rem;
+  padding-right: 0.5rem;
 }
 
 @media(min-width: 992px) {
   .fake-container-fluid {
-    margin: 0 -1.2rem
+    margin: 0 -1.2rem;
+    padding-top: 1.5625rem;
+    padding-left: 1.5625rem;
+    padding-right: 1.5625rem;
+  }
+
+  .fake-container-fluid .row.align-items-stretch {
+    background: $bg_well;
+    border-radius: 0.25rem;
   }
 }
 

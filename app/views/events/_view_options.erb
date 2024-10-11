@@ -2,9 +2,17 @@
   <%== '<div class="container-fluid">' %>
 <% end %>
 
-<div class="row justify-content-between">
+<style>
+  #view-options .btn {
+    background-color: white;
+  }
+  #view-options .btn:hover {
+    color: inherit;
+  }
+</style>
+<div class="row" id="view-options">
 
-  <div class="col-12 col-sm">
+  <div class="col-12 col-lg-auto">
 
     <ul class="pl-0 mb-3 d-flex align-items-center">
       <!-- align vertically -->
@@ -12,24 +20,24 @@
         <label class="mb-0">View as</label>
       </li>
       <li class="list-inline-item">
-        <a class="btn <%='btn btn-outline-primary' if !params[:display].in?(['map','calendar']) %>" href="<%= path if defined?(path) %>?<%= q = Rack::Utils.parse_nested_query(request.query_string); q.delete('search'); q.delete('display'); q.merge({search: 1, display: 'list' }).to_query %>">
+        <a class="btn <%='btn btn-outline-primary' if !params[:display].in?(['map','calendar']) %>" href="<%= path if defined?(path) && path %>?<%= q = Rack::Utils.parse_nested_query(request.query_string); q.delete('search'); q.delete('display'); q.merge({search: 1, display: 'list' }).to_query %>">
           <i class="bi bi-list-task"></i> List
         </a>
       </li>
       <li class="list-inline-item">
-        <a class="btn <%='btn-outline-primary' if params[:display] == 'map' %>" href="<%= path if defined?(path) %>?<%= q = Rack::Utils.parse_nested_query(request.query_string); q.delete('search'); q.delete('display'); q.merge({search: 1, display: 'map' }).to_query %>">
+        <a class="btn <%='btn-outline-primary' if params[:display] == 'map' %>" href="<%= path if defined?(path) && path %>?<%= q = Rack::Utils.parse_nested_query(request.query_string); q.delete('search'); q.delete('display'); q.merge({search: 1, display: 'map' }).to_query %>">
           <i class="bi bi-geo-alt-fill"></i> Map
         </a>
       </li>
       <% if defined?(calendar_view) %>
         <li class="list-inline-item">
-          <a class="btn <%='btn-outline-primary' if params[:display] == 'calendar' %>" href="<%= path if defined?(path) %>?<%= q = Rack::Utils.parse_nested_query(request.query_string); q.delete('search'); q.delete('display'); q.merge({search: 1, display: 'calendar' }).to_query %>">
+          <a class="btn <%='btn-outline-primary' if params[:display] == 'calendar' %>" href="<%= path if defined?(path) && path %>?<%= q = Rack::Utils.parse_nested_query(request.query_string); q.delete('search'); q.delete('display'); q.merge({search: 1, display: 'calendar' }).to_query %>">
             <i class="bi bi-calendar-event"></i> Calendar
           </a>
         </li>
       <% end %>
       <!-- <li class="list-inline-item">
-        <a class="btn <%='btn-outline-primary' if params[:display] == 'table' %>" href="<%= path if defined?(path) %>?<%= q = Rack::Utils.parse_nested_query(request.query_string); q.delete('search'); q.delete('display'); q.merge({search: 1, display: 'table' }).to_query %>">
+        <a class="btn <%='btn-outline-primary' if params[:display] == 'table' %>" href="<%= path if defined?(path) && path %>?<%= q = Rack::Utils.parse_nested_query(request.query_string); q.delete('search'); q.delete('display'); q.merge({search: 1, display: 'table' }).to_query %>">
           <i class="bi bi-table"></i> Table
         </a>
       </li> -->
@@ -38,14 +46,14 @@
 
   <% if params[:display] != 'map' %>
     <div class="col-12 col-lg-auto">
-      <% form_tag (defined?(path) ? path : ''), method: 'get', class: 'form-inline submitOnChange' do %>
+      <% form_tag (defined?(path) && path ? path : ''), method: 'get', class: 'form-inline submitOnChange' do %>
         <% params.each { |k,v| next if %w[format search order slug].include?(k) %>
         <%= hidden_field_tag k, value: v %>
         <% } %>
         <%= hidden_field_tag :search, value: 1 %>
         <label class="mr-sm-2">Sort by</label>
         <%= select_tag :order, options: { 'Event date' => 'date', 'Most recently created' => 'created_at' }, selected: params[:order], class: 'form-control' %>
-        <a class="mt-2 mt-sm-0 ml-sm-3 badge badge-primary" style="font-weight: 500" id="ical" target="_blank" data-toggle="tooltip" href="<%= defined?(path) ? path : request.path %>.ics?<%= request.query_string %>">
+        <a class="mt-2 mt-sm-0 ml-sm-3 badge badge-primary" style="font-weight: 500" id="ical" target="_blank" data-toggle="tooltip" href="<%= defined?(path) && path ? path : request.path %>.ics?<%= request.query_string %>">
           iCal <i class="bi bi-box-arrow-up-right"></i>
         </a>
       <% end %>
