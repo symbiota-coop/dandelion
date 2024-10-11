@@ -1,4 +1,6 @@
-<div class="row block no-gutters align-items-center <% if event.locked? %>bg-grey-transparent-2<% else %>bg-white<% end %>">
+<% full_width = true %>
+
+<div class="row block no-gutters align-items-stretch <% if event.locked? %>event-locked<% end %>">
   <% if !event.image && (defined?(full_width) && full_width) %>
 
   <% else %>
