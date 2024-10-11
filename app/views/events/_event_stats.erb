@@ -38,9 +38,7 @@
             bInfo: false,
             paging: false,
             order: [[dateIndex, "asc"]],
-            oLanguage: {
-              sSearch: "Quick search"
-            }
+            searching: false
           })
           table.on('draw.dt', function() {
             $("#event_stats th[data-sum], #event_stats th[data-money]").each(function() {
