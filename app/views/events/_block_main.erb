@@ -15,7 +15,7 @@
   <span class="label label-default mb-1 d-inline-block">Locked</span>
 <% end %>
 <div class="mb-2">
-  <%= partial :'events/tag_labels', locals: { event: event } %>
+  <%= partial :'events/tag_labels', locals: { event: event, limit: 5 } %>
 </div>
 <ul style="font-size: 1rem" class="icon-list text-dark">
   <% if (ef = event.event_facilitations.select { |event_facilitation| event.organisation && event_facilitation.account.lastname && event_facilitation.account.name != event.organisation.name }).count > 0 || (!@organisation && event.organisation) %>
