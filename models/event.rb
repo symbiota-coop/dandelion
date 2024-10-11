@@ -106,7 +106,7 @@ class Event
   end
 
   def time_zone_or_default
-    time_zone || ENV['DEFAULT_TIME_ZONE']
+    time_zone || organisation.try(:time_zone) || ENV['DEFAULT_TIME_ZONE']
   end
 
   after_save :clear_cache

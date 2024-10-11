@@ -21,7 +21,7 @@ class EventSession
   end
 
   def time_zone_or_default
-    time_zone || ENV['DEFAULT_TIME_ZONE']
+    event.time_zone_or_default
   end
 
   def when_details(zone, with_zone: true)

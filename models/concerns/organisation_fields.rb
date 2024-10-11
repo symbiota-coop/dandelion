@@ -93,6 +93,7 @@ module OrganisationFields
     field :oc_slug, type: String
     field :hide_ticket_revenue, type: Mongoid::Boolean
     field :allow_iframes, type: Mongoid::Boolean
+    field :time_zone, type: String
 
     field :tokens, type: Float
     index({ tokens: 1 })

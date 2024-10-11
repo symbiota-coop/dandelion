@@ -49,6 +49,13 @@ module OrganisationValidation
       if location_changed?
         if location && ENV['GOOGLE_MAPS_API_KEY']
           geocode || (self.coordinates = nil)
+          if coordinates
+            self.time_zone = begin
+              Timezone.lookup(*coordinates.reverse)
+            rescue Timezone::Error::InvalidZone, Timezone::Error::InvalidConfig
+              nil
+            end
+          end
         else
           self.coordinates = nil
         end
