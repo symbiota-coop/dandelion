@@ -57,15 +57,6 @@
     <%= hidden_field_tag :search, value: 1 %>
   <% end %>
 
-  <% form_tag (defined?(path) && path ? path : ''), method: 'get', class: 'form-inline submitOnChange mb-3' do %>
-    <% params.each { |k,v| next if %w[format search order slug].include?(k) %>
-    <%= hidden_field_tag k, value: v %>
-    <% } %>
-    <%= hidden_field_tag :search, value: 1 %>
-    <label class="mr-sm-2">Sort by</label>
-    <%= select_tag :order, options: { 'Event date' => 'date', 'Most recently created' => 'created_at' }, selected: params[:order], class: 'form-control' %>
-  <% end %>
-
 </div>
 
 <h2 class="my-3">
