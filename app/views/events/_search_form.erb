@@ -1,15 +1,4 @@
-<style>
-  .checkbox-inline { cursor: auto; background-color: white; padding: 0.3rem; padding-bottom: 0.2rem; border-radius: 0.25rem }
-  .checkbox-inline label { cursor: pointer }
-  .checkbox-inline.checked { border: 1px solid #00B963; }
-  @media(min-width: 992px) {
-    #search-form { padding-top: 1.0875rem; padding-bottom: 0 }
-  }
-  @media(min-width: 576px) {
-    .searchForm input[type=submit] { margin: 0 !important }
-  }
-</style>
-<div class="well" id="search-form">
+<div class="search well">
 
   <% form_tag '/events', method: 'get', class: 'submitOnChange searchForm mb-3' do %>
     <%= hidden_field_tag :display, value: params[:display] %>

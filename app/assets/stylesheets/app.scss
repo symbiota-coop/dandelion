@@ -686,6 +686,35 @@ figure.image,
   }
 }
 
+@media(min-width: 992px) {
+  .search.well {
+    padding-top: 1.0875rem;
+    padding-bottom: 0
+  }
+}
+
+.search.well .checkbox-inline {
+  cursor: auto;
+  background-color: white;
+  padding: 0.3rem;
+  padding-bottom: 0.2rem;
+  border-radius: 0.25rem
+}
+
+.search.well .checkbox-inline label {
+  cursor: pointer
+}
+
+.search.well .checkbox-inline.checked {
+  border: 1px solid $color_primary;
+}
+
+@media(min-width: 576px) {
+  .search.well input[type=submit] {
+    margin: 0 !important
+  }
+}
+
 @keyframes flickerAnimation {
   0% {
     opacity: 1;

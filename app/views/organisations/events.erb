@@ -26,56 +26,13 @@
 <% if !params[:no_events_banner] && @organisation.unsanitized_ok? && @organisation.events_banner && (!current_account || ((organisationship = @organisation.organisationships.find_by(account: current_account)) && !organisationship.monthly_donor?)) %>
   <%== @organisation.events_banner %>
 <% end %>
-<% unless params[:no_search] %>
+<% if params[:no_search] %>
+  <% unless params[:no_listings] || params[:no_view_options]  %>
+    <%= partial :'events/view_options' %>
+  <% end %>
+<% else %>
   <div class="<%= params[:minimal] ? 'pb-3 pt-1' : 'py-3' %>">
-    <% form_tag '', method: 'get', class: 'submitOnChange searchForm form-inline' do %>
-      <%= hidden_field_tag :display, value: params[:display] %>
-      <%= hidden_field_tag :order, value: params[:order] %>
-      <%= hidden_field_tag :minimal, value: params[:minimal] %>
-      <div class="form-group">
-        <label>Events between</label>
-        <%= text_field_tag :from, class: 'form-control datepicker', value: (@from.to_fs(:db_local) unless @past) %>
-      </div>
-      <div class="form-group">
-        <label>and</label>
-        <%= text_field_tag :to, class: 'form-control datepicker', value: (@to.to_fs(:db_local) if @to) %>
-      </div>
-      <div class="form-group">
-        <label>containing the word</label>
-        <%= text_field_tag :q, class: 'form-control', value: params[:q] %>
-      </div>
-      <% if @organisation.event_tags.count > 1 %>
-        <div class="form-group">
-          <label>tagged</label>
-          <%= select_tag :event_tag_id, options: [''] + @organisation.event_tags.and(:id.in => EventTagship.and(:event_id.in => @organisation.events_for_search.future_and_current_featured.pluck(:id)).pluck(:event_tag_id)).order('name asc').map { |event_tag| [event_tag.name, event_tag.id] }, selected: params[:event_tag_id], class: 'form-control' %>
-        </div>
-      <% end %>
-      <% if (local_groups = @organisation.local_groups.order('name asc').and(:id.in => [params[:local_group_id]].compact + @organisation.events_for_search.future_and_current_featured.pluck(:local_group_id))).count > 0 %>
-        <div class="form-group">
-          <label>Local group</label>
-          <%= select_tag :local_group_id, options: [''] + local_groups.order('name asc').map { |local_group| [local_group.name, local_group.id] }, selected: params[:local_group_id], class: 'form-control' %>
-        </div>
-      <% end %>
-      <% if (activities = @organisation.activities.order('name asc').and(:id.in => [params[:activity_id]].compact + @organisation.events_for_search.future_and_current_featured.pluck(:activity_id))).count > 0 %>
-        <div class="form-group">
-          <label>Activity</label>
-          <%= select_tag :activity_id, options: [''] + activities.map { |activity| [activity.name, activity.id] }, selected: params[:activity_id], class: 'form-control' %>
-        </div>
-      <% end %>
-      <% if (carousels = @organisation.carousels.order('o asc')).count > 0 %>
-        <div class="form-group">
-          <label>Carousel</label>
-          <%= select_tag :carousel_id, options: ['', ['Featured', 'featured']] + carousels.map { |carousel| [carousel.name, carousel.id] }, selected: params[:carousel_id], class: 'form-control' %>
-        </div>
-      <% end %>
-      <%= checkbox 'Online' %>
-      <%= checkbox 'In person' %>
-      <% if @organisation.monthly_donors.count > 0 %>
-        <%= checkbox "Members' events" %>
-      <% end %>
-      <%= submit_tag 'Search', class: 'btn btn-primary' %>
-      <%= hidden_field_tag :search, value: 1 %>
-    <% end %>
+    <%= partial :'organisations/events_search_form' %>
   </div>
 <% end %>
 
@@ -90,10 +47,6 @@
     </div>
     <% } %>
   <% end %>
-<% end %>
-
-<% unless params[:no_listings] || params[:no_view_options]  %>
-  <%= partial :'events/view_options' %>
 <% end %>
 
 <% if params[:minimal] %>
