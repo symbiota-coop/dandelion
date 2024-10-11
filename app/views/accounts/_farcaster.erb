@@ -12,14 +12,14 @@
       <% links.first(5).each { |og| %>
       <div class="col-12">
         <div class="mb-4">
-          <div class="row block no-gutters align-items-stretch bg-white">
-            <div class="col-3">
+          <div class="row block no-gutters align-items-stretch">
+            <div class="col-3 bg-white">
               <a href="<%= og['url']%>" target="_blank">
                 <img class="w-100" onerror="this.style.display='none'" src="<%= og['image'] %>">
               </a>
             </div>
             <div class="col-9">
-              <div class="pl-3">
+              <div class="pl-3 py-lg-3">
                 <h4>
                   <a class="text-dark" href="<%= og['url'] %>" target="_blank">
                     <%= og['title']%>
