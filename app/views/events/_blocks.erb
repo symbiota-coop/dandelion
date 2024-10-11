@@ -1,6 +1,6 @@
 <% if events.count > 0 %>
   <div class="fake-container-fluid mb-3">
-    <div class="row bg-grey-transparent-2 pt-4 px-5" id="events">
+    <div class="row" id="events">
       <% events.each { |event| next if event.locked? && !event_admin?(event) %>
       <div class="col-12 <%= block_class if defined?(block_class) %>" id="<%= event.id %>">
         <div class="mb-4">
