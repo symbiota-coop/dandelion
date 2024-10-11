@@ -249,6 +249,8 @@
         <% end %>
       <% end %>
     </div>
-    <%= f.submit_block button_text: (@organisation.persisted? ? 'Update organisation' : 'Save and continue') %>
+    <div class="ml-3">
+      <%= f.submit_block button_text: (@organisation.persisted? ? 'Update organisation' : 'Save and continue') %>
+    </div>
   </div>
 <% end %>

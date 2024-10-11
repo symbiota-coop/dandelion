@@ -269,7 +269,9 @@
       </div>
     </div>
     <% if @gathering.persisted? %>
-      <%= f.submit_block destroy_url: "/g/#{@gathering.slug}/destroy" %>
+      <div class="ml-3">
+        <%= f.submit_block destroy_url: "/g/#{@gathering.slug}/destroy" %>
+      </div>
     <% end %>
   <% end %>
 </div>
