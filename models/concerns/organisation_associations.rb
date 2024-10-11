@@ -2,7 +2,7 @@ module OrganisationAssociations
   extend ActiveSupport::Concern
 
   included do
-    belongs_to :account, index: true
+    belongs_to :account, index: true, optional: true
 
     has_many :stripe_charges, dependent: :destroy
     has_many :stripe_transactions, dependent: :destroy
