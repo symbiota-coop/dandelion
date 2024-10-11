@@ -69,7 +69,7 @@
   </style>
 <% end %>
 <h2 class="mt-5">Events</h2>
-<a class="btn btn-primary mb-3" href="/o/<%= @local_group.organisation.slug %>/events?local_group_id=<%= @local_group.id %>">All events</a>
+<a class="btn btn-primary mb-3" href="/o/<%= @local_group.organisation.slug %>/events?search=1&local_group_id=<%= @local_group.id %>">All events</a>
 <% if local_group_admin? %>
   <a class="btn btn-primary mb-3" href="/events/new?local_group_id=<%= @local_group.id %>">Create an event</a>
 <% end %>
@@ -94,4 +94,3 @@
     <%= will_paginate events, param_name: 'past_events_page', inner_window: 0, outer_window: 0, renderer: WillPaginate::ViewHelpers::BootstrapRenderer %>
   </div>
 <% end %>
-

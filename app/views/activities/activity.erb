@@ -104,7 +104,7 @@
 <% end %>
 
 <h2 class="mt-5">Events</h2>
-<a class="btn btn-primary mb-3" href="/o/<%= @activity.organisation.slug %>/events?activity_id=<%= @activity.id %>">All events</a>
+<a class="btn btn-primary mb-3" href="/o/<%= @activity.organisation.slug %>/events?search=1&activity_id=<%= @activity.id %>">All events</a>
 <% if activity_admin? %>
   <a class="btn btn-primary mb-3" href="/events/new?activity_id=<%= @activity.id %>">Create an event</a>
 <% end %>
