@@ -666,21 +666,12 @@ figure.image,
   }
 }
 
-.fake-container-fluid {
-  padding-top: 1rem;
-  padding-left: 0.5rem;
-  padding-right: 0.5rem;
+.row.block.no-gutters.align-items-stretch {
+  margin: 0
 }
 
 @media(min-width: 992px) {
-  .fake-container-fluid {
-    margin: 0 -1.2rem;
-    padding-top: 1.5625rem;
-    padding-left: 1.5625rem;
-    padding-right: 1.5625rem;
-  }
-
-  .fake-container-fluid .row.align-items-stretch {
+  .row.block.no-gutters.align-items-stretch {
     background: $bg_well;
     border-radius: 0.25rem;
   }

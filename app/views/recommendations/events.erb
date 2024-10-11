@@ -8,7 +8,7 @@ show_image = (Padrino.env == :production)
 <% if recommended_events.count == 0 %>
   <em>No recommended events</em>
 <% else %>
-  <div class="fake-container-fluid mb-3">
+  <div class="mb-3">
     <div class="row" id="events">
       <% recommended_events.first(10).each { |event_id,people|  event = Event.find(event_id);
         next if event.locked? && !event_admin?(event)
