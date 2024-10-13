@@ -1,13 +1,15 @@
+<% if @membership.admin? %>
+  <pre style="margin-top: 15px;">
+  <%== Account.and(:id.in => @mapplications.pluck(:account_id)).map { |account| "#{Sanitize.fragment(account.name)} &lt;#{Sanitize.fragment(account.email)}&gt;" }.join(', ') %>
+</pre>
+<% end %>
+
 <% if params[:view] == 'pictures' %>
   <div style="margin-top: 15px" class="row">
     <% (Account.and(:id.in => @mapplications.pluck(:account_id)).and(:picture_uid.ne => nil).shuffle + Account.and(:id.in => @mapplications.pluck(:account_id)).and(picture_uid: nil).shuffle).each { |account| %>
     <%= partial :'accounts/picture', locals: { account: account } %>
     <% } %>
   </div>
-<% elsif params[:view] == 'emails' %>
-  <pre style="margin-top: 15px;">
-    <%== Account.and(:id.in => @mapplications.pluck(:account_id)).map { |account| "#{Sanitize.fragment(account.name)} &lt;#{Sanitize.fragment(account.email)}&gt;" }.join(', ') %>
-  </pre>
 <% else @mapplications = @mapplications.per_page(10).page(params[:page]) %>
   <table class="table table-striped">
     <thead>

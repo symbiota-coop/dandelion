@@ -46,7 +46,7 @@
 
   <% if !params[:display] || params[:display] == 'blocks' %>
     <div class="col-12 col-lg-auto">
-      <% form_tag (defined?(path) ? path : ''), method: 'get', class: 'form-inline submitOnChange' do %>
+      <% form_tag (defined?(path) && path ? path : ''), method: 'get', class: 'form-inline submitOnChange' do %>
         <% params.each { |k,v| next if %w[format search order slug].include?(k) %>
         <%= hidden_field_tag k, value: v %>
         <% } %>
