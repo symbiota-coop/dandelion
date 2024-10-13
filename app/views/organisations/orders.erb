@@ -12,10 +12,12 @@
     <label>containing the word</label>
     <%= text_field_tag :q, class: 'form-control typeWatch mx-1', value: params[:q] %>
   </div>
-  <div class="form-group">
-    <label>via affiliate</label>
-    <%= select_tag :affiliate_id, selected: params[:affiliate_id], options: [''] + @organisation.orders.and(:affiliate_type => 'Organisation').pluck(:affiliate_id).uniq.map { |organisation_id| if organisation = Organisation.find(organisation_id); [organisation.name, organisation.id]; end }.compact, class: 'form-control mx-1' %>
-  </div>
+  <% if (affiliates = Organisation.and(:id.in => @organisation.orders.and(:affiliate_type => 'Organisation').pluck(:affiliate_id))).count > 0 %>
+    <div class="form-group">
+      <label>via affiliate</label>
+      <%= select_tag :affiliate_id, selected: params[:affiliate_id], options: [''] + affiliates.map { |organisation| [organisation.name, organisation.id] }, class: 'form-control mx-1' %>
+    </div>
+  <% end %>
   <%= hidden_field_tag :search, value: 1 %>
   <%= submit_tag 'Search', class: 'btn btn-primary' %>
 <% end %>

@@ -13,8 +13,7 @@
   </pre>
 <% end %>
 <p>
-  <strong>Donations from this event:</strong>
-  <%= m @event.donation_revenue, @event.currency %>
+  <%=@event.organisation.name%> has received <strong><%= m @event.donation_revenue, @event.currency %></strong> in donations from this event.
 </p>
 <% @donations = @donations.order('created_at desc')
    @donations = @donations.paginate(page: params[:page], per_page: 50) %>
