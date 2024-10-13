@@ -24,7 +24,9 @@
       <% } %>
     </ul>
   <% when 'events' %>
-    <%= partial 'events/blocks', locals: { events: @events } %>
+    <div class="mt-4">
+      <%= partial 'events/blocks', locals: { events: @events } %>
+    </div>
   <% when 'organisations' %>
     <style>
       @media(min-width: 768px) {
