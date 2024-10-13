@@ -32,26 +32,26 @@ Dandelion::App.controller do
 
   get '/activities/:id/events/stats' do
     @activity = Activity.find(params[:id]) || not_found
-    @organisation = @activity.organisation
     activity_admins_only!
     @from = params[:from] ? parse_date(params[:from]) : Date.today
     @to = params[:to] ? parse_date(params[:to]) : nil
+    @start_or_end = (params[:start_or_end] == 'end' ? 'end' : 'start')
     @events = @activity.events
-    @events = params[:order] == 'created_at' ? @events.order('created_at desc') : @events.order('start_time asc')
+    @events = params[:order] == 'created_at' ? @events.order('created_at desc') : @events.order("#{@start_or_end}_time asc")
     q_ids = []
     q_ids += search_events(params[:q]).pluck(:id) if params[:q]
     event_tag_ids = []
     event_tag_ids = EventTagship.and(event_tag_id: params[:event_tag_id]).pluck(:event_id) if params[:event_tag_id]
     event_ids = (!q_ids.empty? && !event_tag_ids.empty? ? (q_ids & event_tag_ids) : (q_ids + event_tag_ids))
     @events = @events.and(:id.in => event_ids) unless event_ids.empty?
+    @events = @events.and(:"#{@start_or_end}_time".gte => @from)
+    @events = @events.and(:"#{@start_or_end}_time".lt => @to + 1) if @to
     @events = @events.and(coordinator_id: params[:coordinator_id]) if params[:coordinator_id]
     @events = @events.and(coordinator_id: nil) if params[:no_coordinator]
     @events = @events.and(:id.nin => EventFacilitation.pluck(:event_id)) if params[:no_facilitators]
-    @events = @events.and(:start_time.gte => @from)
-    @events = @events.and(:start_time.lt => @to + 1) if @to
     @events = @events.online if params[:online]
     @events = @events.in_person if params[:in_person]
-    erb :'activities/event_stats'
+    erb :'events/event_stats'
   end
 
   get '/activities/:id/edit' do
