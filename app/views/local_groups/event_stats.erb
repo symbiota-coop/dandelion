@@ -2,7 +2,7 @@
 
 <div class="search well">
 
-  <% form_tag '', method: 'get', class: 'searchForm mb-3' do %>
+  <% form_tag '', method: 'get', class: 'searchForm mb-0 mb-lg-3' do %>
     <div class="form-row align-items-end">
       <div class="form-group col-12 col-sm-auto">
         <label>Events between</label>
@@ -31,8 +31,9 @@
       <%= checkbox 'Online', form_group_class: 'col-12 col-sm-auto' %>
       <%= checkbox 'In person', form_group_class: 'col-12 col-sm-auto' %>
       <%= checkbox 'No coordinator', form_group_class: 'col-12 col-sm-auto' %>
+      <%= checkbox 'No facilitators', form_group_class: 'col-12 col-sm-auto' %>
       <div class="form-group col-12 col-sm-auto">
-        <%= submit_tag 'Search', class: 'btn btn-primary' %>
+        <%= submit_tag 'Search', class: 'btn btn-primary mb-0' %>
       </div>
     </div>
     <%= hidden_field_tag :search, value: 1 %>

@@ -41,6 +41,7 @@ Dandelion::App.controller do
     @events = @events.and(:id.in => event_ids) unless event_ids.empty?
     @events = @events.and(coordinator_id: params[:coordinator_id]) if params[:coordinator_id]
     @events = @events.and(coordinator_id: nil) if params[:no_coordinator]
+    @events = @events.and(:id.nin => EventFacilitation.pluck(:event_id)) if params[:no_facilitators]
     @events = @events.and(:start_time.gte => @from)
     @events = @events.and(:start_time.lt => @to + 1) if @to
     @events = @events.online if params[:online]
