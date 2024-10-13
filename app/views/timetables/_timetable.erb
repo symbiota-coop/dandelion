@@ -1,5 +1,5 @@
 <% if timetable.hide_schedule? %>
-  <div class="row" style="margin-top: 15px">
+  <div class="row mt-3">
     <% timetable.tactivities.sort_by { |tactivity| -tactivity.attendances.count }.each { |tactivity| %>
     <div class="col-lg-3">
       <%= partial :'timetables/tactivity', object: tactivity %>

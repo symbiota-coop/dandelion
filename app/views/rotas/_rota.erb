@@ -4,7 +4,7 @@
   <%= partial :'rotas/shift_summary', locals: {membership: @membership, rota: @rota, show_title: true} %>
 </div>
 
-<table class="table table-striped" style="margin-top: 15px">
+<table class="table table-striped mt-3">
   <tr>
     <td></td>
     <% rota.roles.order('o asc').each { |role| %>

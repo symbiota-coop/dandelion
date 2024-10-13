@@ -1,11 +1,11 @@
 <% if @membership.admin? %>
-  <pre style="margin-top: 15px;">
+  <pre class="mt-3">
   <%== Account.and(:id.in => @mapplications.pluck(:account_id)).map { |account| "#{Sanitize.fragment(account.name)} &lt;#{Sanitize.fragment(account.email)}&gt;" }.join(', ') %>
 </pre>
 <% end %>
 
 <% if params[:view] == 'pictures' %>
-  <div style="margin-top: 15px" class="row">
+  <div class="row mt-3">
     <% (Account.and(:id.in => @mapplications.pluck(:account_id)).and(:picture_uid.ne => nil).shuffle + Account.and(:id.in => @mapplications.pluck(:account_id)).and(picture_uid: nil).shuffle).each { |account| %>
     <%= partial :'accounts/picture', locals: { account: account } %>
     <% } %>
