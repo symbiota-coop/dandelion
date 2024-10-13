@@ -2,6 +2,7 @@
 <div class="search well">
 
   <% form_tag '', method: 'get', class: 'submitOnChange searchForm mb-3' do %>
+    <%= hidden_field_tag :order, value: params[:order] %>
     <div class="form-row align-items-end">
       <div class="form-group col-12 col-sm-auto">
         <label>Applications between</label>
