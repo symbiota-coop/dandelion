@@ -28,7 +28,7 @@ module AccountValidation
       self.name = name.split('@').first if name && name.include?('@')
 
       self.location = "#{postcode}, #{country}" if postcode && country
-      self.sign_in_token = SecureRandom.uuid unless sign_in_token
+      self.sign_in_token = Account.generate_sign_in_token unless sign_in_token
       self.name = name.strip if name
       self.name_transliterated = I18n.transliterate(name) if name
       self.username = username.downcase if username

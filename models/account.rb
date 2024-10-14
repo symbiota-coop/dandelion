@@ -39,24 +39,12 @@ class Account
         .map { |id, _| id }
   end
 
-  def self.radio_scopes
-    []
-  end
-
-  def self.check_box_scopes
-    y = []
-
-    y << [:open_to_new_friends, 'Open to new friends', self.and(open_to_new_friends: true)]
-    y << [:open_to_hookups, 'Open to hookups', self.and(open_to_hookups: true)]
-    y << [:open_to_short_term_dating, 'Open to short-term dating', self.and(open_to_short_term_dating: true)]
-    y << [:open_to_long_term_dating, 'Open to long-term dating', self.and(open_to_long_term_dating: true)]
-    y << [:open_to_open_relating, 'Open to open relating', self.and(open_to_open_relating: true)]
-
-    y
-  end
-
   def self.recommendable
     Account.and(:id.in => Ticket.pluck(:account_id) + EventFacilitation.pluck(:account_id))
+  end
+
+  def self.generate_sign_in_token
+    SecureRandom.uuid.delete('-')
   end
 
   def calculate_tokens
