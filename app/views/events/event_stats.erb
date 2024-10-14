@@ -75,8 +75,11 @@
       <%= checkbox 'In person', form_group_class: 'col-12 col-sm-auto' %>
       <%= checkbox 'No coordinator', form_group_class: 'col-12 col-sm-auto' %>
       <%= checkbox 'No facilitators', form_group_class: 'col-12 col-sm-auto' %>
-      <% if @organisation && @organisation.sync_stripe %>
-        <%= checkbox 'Discrepancy', form_group_class: 'col-12 col-sm-auto' %>
+      <% if @organisation %>
+        <%= checkbox 'Exclude co-hosted', form_group_class: 'col-12 col-sm-auto' %>
+        <% if @organisation.sync_stripe %>
+          <%= checkbox 'Discrepancy', form_group_class: 'col-12 col-sm-auto' %>
+        <% end %>
       <% end %>
       <div class="form-group col-12 col-sm-auto">
         <%= submit_tag 'Search', class: 'btn btn-primary mb-0' %>

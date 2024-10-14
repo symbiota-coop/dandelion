@@ -127,7 +127,7 @@ Dandelion::App.controller do
     @from = params[:from] ? parse_date(params[:from]) : Date.today
     @to = params[:to] ? parse_date(params[:to]) : nil
     @start_or_end = (params[:start_or_end] == 'end' ? 'end' : 'start')
-    @events = @organisation.events_including_cohosted
+    @events = params[:exclude_co_hosted] ? @organisation.events : @organisation.events_including_cohosted
     @events = params[:order] == 'created_at' ? @events.order('created_at desc') : @events.order("#{@start_or_end}_time asc")
     q_ids = []
     q_ids += search_events(params[:q]).pluck(:id) if params[:q]
