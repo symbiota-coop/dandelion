@@ -3,6 +3,8 @@ class LocalGroup
   include Mongoid::Timestamps
   extend Dragonfly::Model
 
+  include ImportFromCsv
+
   belongs_to :organisation, index: true
   belongs_to :account, index: true
 
@@ -55,25 +57,6 @@ class LocalGroup
 
   def event_tags
     EventTag.and(:id.in => EventTagship.and(:event_id.in => events.pluck(:id)).pluck(:event_tag_id))
-  end
-
-  def import_from_csv(csv)
-    CSV.parse(csv, headers: true, header_converters: [:downcase, :symbol]).each do |row|
-      email = row[:email]
-      account_hash = { name: row[:name], email: row[:email], password: Account.generate_password }
-      account = Account.find_by(email: email.downcase)
-      account ||= Account.new(account_hash)
-      begin
-        if account.persisted?
-          account.update_attributes!(account_hash.map { |k, v| [k, v] if v }.compact.to_h)
-        else
-          account.save!
-        end
-        local_groupships.create account: account
-      rescue StandardError
-        next
-      end
-    end
   end
 
   def event_feedbacks

@@ -3,6 +3,8 @@ class Activity
   include Mongoid::Timestamps
   extend Dragonfly::Model
 
+  include ImportFromCsv
+
   belongs_to :organisation, index: true
   belongs_to :account, index: true, optional: true
 
@@ -120,26 +122,6 @@ class Activity
         activity.activityships.find_by(account: account, admin: true) ||
         Organisation.admin?(activity.organisation, account)
       )
-  end
-
-  def import_from_csv(csv)
-    CSV.parse(csv, headers: true, header_converters: [:downcase, :symbol]).each do |row|
-      email = row[:email]
-      account_hash = { name: row[:name], email: row[:email], password: Account.generate_password }
-      account = Account.new(account_hash) unless (account = Account.find_by(email: email.downcase))
-      begin
-        if account.persisted?
-          account.update_attributes!(account_hash.map do |k, v|
-                                       [k, v] if v
-                                     end.compact.to_h)
-        else
-          account.save!
-        end
-        activityships.create account: account
-      rescue StandardError
-        next
-      end
-    end
   end
 
   def future_attendees

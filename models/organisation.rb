@@ -13,6 +13,7 @@ class Organisation
   include Geocoded
   include EvmTransactions
   include StripeWebhooks
+  include ImportFromCsv
 
   def self.fs(slug)
     find_by(slug: slug)
@@ -92,27 +93,6 @@ class Organisation
       j.dig('settings', 'dashboard', 'display_name') ||
       j['display_name']
   end
-
-  def import_from_csv(csv)
-    CSV.parse(csv, headers: true, header_converters: [:downcase, :symbol]).each do |row|
-      email = row[:email]
-      account_hash = { name: row[:name], email: row[:email], password: Account.generate_password }
-      account = Account.new(account_hash) unless (account = Account.find_by(email: email.downcase))
-      begin
-        if account.persisted?
-          account.update_attributes!(account_hash.map do |k, v|
-                                       [k, v] if v
-                                     end.compact.to_h)
-        else
-          account.save!
-        end
-        organisationships.create account: account, skip_welcome: row[:skip_welcome]
-      rescue StandardError
-        next
-      end
-    end
-  end
-  handle_asynchronously :import_from_csv
 
   def send_followers_csv(account)
     csv = CSV.generate do |csv|

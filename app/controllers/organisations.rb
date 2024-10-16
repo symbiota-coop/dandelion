@@ -376,7 +376,8 @@ Dandelion::App.controller do
   post '/o/:slug/followers' do
     @organisation = Organisation.find_by(slug: params[:slug]) || not_found
     organisation_admins_only!
-    @organisation.import_from_csv(File.read(params[:csv]))
+    @organisation.import_from_csv(File.read(params[:csv]), :organisationships)
+    flash[:notice] = 'The followers will be added shortly. Refresh the page to check progress.'
     redirect "/o/#{@organisation.slug}/followers"
   end
 

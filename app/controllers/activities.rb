@@ -201,7 +201,8 @@ Dandelion::App.controller do
   post '/activities/:id/followers' do
     @activity = Activity.find(params[:id]) || not_found
     activity_admins_only!
-    @activity.import_from_csv(File.read(params[:csv]))
+    @activity.import_from_csv(File.read(params[:csv]), :activityships)
+    flash[:notice] = 'The followers will be added shortly. Refresh the page to check progress.'
     redirect "/activities/#{@activity.id}/followers"
   end
 
