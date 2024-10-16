@@ -2,7 +2,7 @@ module MaxMindDownloader
   def self.download
     uri = URI.parse('https://download.maxmind.com/geoip/databases/GeoLite2-City/download?suffix=tar.gz')
     request = Net::HTTP::Get.new(uri)
-    request.basic_auth(ENV['MAXMIND_USER_ID'], ENV['MAXMIND_LICENSE_KEY'])
+    request.basic_auth(ENV['MAX_MIND_USER_ID'], ENV['MAX_MIND_LICENSE_KEY'])
 
     response = Net::HTTP.start(uri.hostname, uri.port, use_ssl: true) do |http|
       http.request(request)
