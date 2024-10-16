@@ -263,6 +263,10 @@
           <td data-sort="<%=money_sort(event, organisation, :profit_less_allocations)%>">
             <%= m event.profit_less_allocations, event.currency %>
           </td>
+          <!-- Remaining to be paid -->
+          <td data-sort="<%=money_sort(event, organisation, :remaining_sum)%>">
+            <%= m event.remaining_sum, event.currency %>
+          </td>
         <% else %>
           <% 8.times do %>
             <td></td>
@@ -271,7 +275,7 @@
 
       <% else %>
         <!-- No stripe_client_id-->
-        <% 13.times do %>
+        <% 14.times do %>
           <td></td>
         <% end %>
       <% end %>

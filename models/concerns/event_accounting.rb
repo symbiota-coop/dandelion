@@ -25,6 +25,14 @@ module EventAccounting
     end
   end
 
+  def remaining_sum
+    s = Money.new(0, currency)
+    Event.profit_share_roles.each do |role|
+      s += send("remaining_to_#{role}")
+    end
+    s
+  end
+
   def cap
     if contribution_gbp_custom
       Money.new(contribution_gbp_custom * 100, 'GBP')
