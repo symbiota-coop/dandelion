@@ -1,12 +1,12 @@
 <% if current_account %>
-  <% activityship = current_account.activityships.find_by(activity: activity)
+  <% resourceship = current_account.send(:"#{resourceship_name.pluralize}").find_by(:"#{resource.class.name.underscore}" => resource)
      state_options = {
        'not_following' => 'Follow',
        'follow_without_subscribing' => 'Following',
        'follow_and_subscribe' => 'Following with email updates <i class="bi bi-envelope-fill"></i>'
      }
-     current_state = if activityship
-                       activityship.unsubscribed ? 'follow_without_subscribing' : 'follow_and_subscribe'
+     current_state = if resourceship
+                       resourceship.unsubscribed ? 'follow_without_subscribing' : 'follow_and_subscribe'
                      else
                        'not_following'
                      end
@@ -17,28 +17,28 @@
        'follow_and_subscribe' => 'Follow with email updates <i class="bi bi-envelope-fill"></i>'
      }
 
-     action_options.delete('not_following') if activityship && activityship.admin? %>
-  <% if activityship || activity.privacy == 'open' %>
+     action_options.delete('not_following') if resourceship && resourceship.admin? %>
+  <% if resourceship || (resource.respond_to?(:privacy) && resource.privacy == 'open') %>
     <% if current_state == 'not_following' %>
-      <a class="pagelet-trigger btn btn-outline-primary <%= btn_class if defined?(btn_class) %>" href="/activities/<%= activity.id %>/activityship?f=follow_and_subscribe">Follow</a>
+      <a class="pagelet-trigger btn btn-outline-primary <%= btn_class if defined?(btn_class) %>" href="<%=resource_path%>/<%=resourceship_name%>?f=follow_and_subscribe">Follow</a>
     <% else %>
       <div class="dropdown d-inline-block">
-        <button class="btn <%= btn_class if defined?(btn_class) %> <%= current_state == 'not_following' ? 'btn-outline-primary' : 'btn-primary' %> dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+        <button class="btn <%= btn_class if defined?(btn_class) %> <%= current_state == 'not_following' ? 'btn-outline-primary' : 'btn-primary' %> dropdown-toggle" type="button" data-toggle="dropdown">
           <%== text %>
         </button>
         <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
           <% action_options.invert.each { |text,value| %>
-          <a class="pagelet-trigger dropdown-item" href="/activities/<%= activity.id %>/activityship?f=<%= value %>"><%== text %></a>
+          <a class="pagelet-trigger dropdown-item" href="<%=resource_path%>/<%=resourceship_name%>?f=<%= value %>"><%== text %></a>
           <% } %>
         </div>
       </div>
     <% end %>
-  <% elsif activity.privacy == 'closed' %>
+  <% elsif resource.respond_to?(:privacy) && resource.privacy == 'closed'; activity = resource %>
     <% if existing_application = activity.activity_applications.and(account: current_account).first %>
       <a class="btn btn-outline-primary" href="/activities/<%= activity.id %>/activity_applications/latest">View latest application</a>
     <% end %>
     <a class="btn btn-primary" href="/activities/<%= activity.id %>/apply"><%= existing_application ? 'Apply again' : 'Apply' %></a>
-  <% elsif activity.privacy == 'secret' %>
+  <% elsif resource.respond_to?(:privacy) && resource.privacy == 'secret' %>
     <span class="btn btn-outline-primary">Invitation-only</span>
   <% end %>
 <% end %>

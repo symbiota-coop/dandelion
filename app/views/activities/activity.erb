@@ -18,7 +18,7 @@
       <% if current_account %>
         <div class="mb-2">
           <div class="d-inline-block mb-1" data-pagelet-url="/activities/<%= @activity.id %>/activityship">
-            <%= partial :'activities/activityship', locals: { activity: @activity } %>
+            <%= partial :'activities_and_local_groups/resourceship', locals: { resource: @activity, resourceship_name: 'activityship', resource_path: "/activities/#{@activity.id}" } %>
           </div>
           <% if current_account && activityship = @activity.activityships.find_by(account: current_account) %>
             <% if !activityship.hide_membership? %>
