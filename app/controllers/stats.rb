@@ -1,4 +1,19 @@
 Dandelion::App.controller do
+  get '/notifications/:id' do
+    admins_only!
+    @notification = Notification.find(params[:id]) || not_found
+    erb :'emails/notification', locals: { notification: @notification, circle: @notification.circle }, layout: false
+  end
+
+  get '/fragments/:q' do
+    admins_only!
+    if params[:q]
+      count = Fragment.where(key: /#{Regexp.escape(params[:q])}/i).delete_all
+      flash[:notice] = "Deleted #{pluralize(count, 'fragment')}"
+    end
+    redirect '/'
+  end
+
   get '/stats/charts' do
     erb :'stats/charts'
   end

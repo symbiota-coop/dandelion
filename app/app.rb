@@ -173,12 +173,6 @@ module Dandelion
       end
     end
 
-    get '/notifications/:id' do
-      admins_only!
-      @notification = Notification.find(params[:id]) || not_found
-      erb :'emails/notification', locals: { notification: @notification, circle: @notification.circle }, layout: false
-    end
-
     post '/upload' do
       sign_in_required!
       upload = current_account.uploads.create(file: params[:upload])
