@@ -73,7 +73,11 @@ module Dandelion
     end
 
     get '/geolocate' do
-      MaxMind::GeoIP2::Reader.new(database: 'GeoLite2-City.mmdb').city(request.ip).to_json
+      {
+        ip: request.ip,
+        remote_ip: request.remote_ip,
+        max_mind: MaxMind::GeoIP2::Reader.new(database: 'GeoLite2-City.mmdb').city(request.remote_ip)
+      }.to_json
     rescue StandardError => e
       e.to_s
     end

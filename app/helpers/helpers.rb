@@ -5,7 +5,7 @@ Dandelion::App.helpers do
                 elsif session[:time_zone]
                   session[:time_zone]
                 elsif File.exist?('GeoLite2-City.mmdb')
-                  session[:time_zone] = MaxMind::GeoIP2::Reader.new(database: 'GeoLite2-City.mmdb').city(request.ip).location.time_zone
+                  session[:time_zone] = MaxMind::GeoIP2::Reader.new(database: 'GeoLite2-City.mmdb').city(request.remote_ip).location.time_zone
                 else
                   ENV['DEFAULT_TIME_ZONE']
                 end
