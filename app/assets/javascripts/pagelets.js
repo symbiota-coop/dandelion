@@ -102,7 +102,7 @@ $(function () {
       const rawPagelet = this
       const placeholder = $(rawPagelet)[0].hasAttribute('data-with-placeholder')
       if ($(rawPagelet).html().length == 0 || placeholder) {
-        if (placeholder) { $(rawPagelet).removeAttr('data-with-placeholder') } else { $(rawPagelet).html('<i class="bi bi-spin bi-arrow-repeat"></i>') }
+        if (placeholder) { $(rawPagelet).removeAttr('data-with-placeholder') } else { $(rawPagelet).html('<i class="pagelet-loading bi bi-spin bi-arrow-repeat"></i>') }
         $(rawPagelet).load($(rawPagelet).attr('data-pagelet-url'))
       }
     })

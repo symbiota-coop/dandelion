@@ -72,6 +72,15 @@ module Dandelion
       erb :not_found, layout: :application
     end
 
+    get '/fragments/delete/:q' do
+      admins_only!
+      if params[:q]
+        count = Fragment.where(key: /#{Regexp.escape(params[:q])}/i).delete_all
+        flash[:notice] = "Deleted #{pluralize(count, 'fragment')}"
+      end
+      redirect '/'
+    end
+
     get '/geolocate' do
       MaxMind::GeoIP2::Reader.new(database: 'GeoLite2-City.mmdb').city(ip_from_cloudflare).to_json
     rescue StandardError => e
