@@ -9,16 +9,6 @@ Dandelion::App.helpers do
                 elsif session[:time_zone]
                   session[:time_zone]
                 elsif File.exist?('GeoLite2-City.mmdb') && ip_from_cloudflare
-
-                  if Padrino.env == :production && File.ctime('GeoLite2-City.mmdb') > 1.day.ago
-                    begin
-                      MaxMinder.download
-                      puts 'MaxMind update succeeded'
-                    rescue StandardError
-                      puts 'MaxMind update failed'
-                    end
-                  end
-
                   session[:time_zone] = MaxMind::GeoIP2::Reader.new(database: 'GeoLite2-City.mmdb').city(ip_from_cloudflare).location.time_zone
                 else
                   ENV['DEFAULT_TIME_ZONE']
