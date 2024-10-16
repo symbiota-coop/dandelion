@@ -1,11 +1,15 @@
 Dandelion::App.helpers do
+  def ip_from_cloudflare
+    request.env['HTTP_CF_CONNECTING_IP'] || request.env['HTTP_X_FORWARDED_FOR']
+  end
+
   def set_time_zone
     Time.zone = if current_account && current_account.time_zone
                   current_account.time_zone
                 elsif session[:time_zone]
                   session[:time_zone]
-                elsif File.exist?('GeoLite2-City.mmdb')
-                  session[:time_zone] = MaxMind::GeoIP2::Reader.new(database: 'GeoLite2-City.mmdb').city(request.remote_ip).location.time_zone
+                elsif File.exist?('GeoLite2-City.mmdb') && ip_from_cloudflare
+                  session[:time_zone] = MaxMind::GeoIP2::Reader.new(database: 'GeoLite2-City.mmdb').city(ip_from_cloudflare).location.time_zone
                 else
                   ENV['DEFAULT_TIME_ZONE']
                 end
