@@ -29,15 +29,6 @@ Money.default_bank = Money::Bank::Uphold.new
 Money.locale_backend = :currency
 Money.rounding_mode = BigDecimal::ROUND_HALF_EVEN
 
-if Padrino.env == :production
-  begin
-    MaxMinder.download
-    puts 'MaxMind download succeeded'
-  rescue StandardError
-    puts 'MaxMind download failed'
-  end
-end
-
 Time.zone = ENV['DEFAULT_TIME_ZONE']
 
 Airrecord.api_key = ENV['AIRTABLE_API_KEY']
