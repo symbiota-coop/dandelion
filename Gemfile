@@ -104,4 +104,5 @@ gem 'chroma'
 gem 'crawler_detect'
 gem 'digest'
 gem 'matrix' # necessary in connection with capybara/cuprite
+gem 'maxmind-geoip2'
 gem 'mini_magick'

@@ -40,3 +40,4 @@ doc/
 .idea/
 .aider.*
 code.md
+GeoLite2-City.mmdb

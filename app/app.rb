@@ -38,44 +38,16 @@ module Dandelion
     before do
       @cachebuster = Padrino.env == :development ? SecureRandom.uuid : (ENV['RENDER_GIT_COMMIT'] || ENV['HEROKU_SLUG_COMMIT'])
       redirect "#{ENV['BASE_URI']}#{request.path}#{"?#{request.query_string}" unless request.query_string.blank?}" if ENV['REDIRECT_BASE'] && ENV['BASE_URI'] && (ENV['BASE_URI'] != "#{request.scheme}://#{request.env['HTTP_HOST']}")
-      begin
-        Time.zone = if current_account && current_account.time_zone
-                      current_account.time_zone
-                    elsif session[:time_zone]
-                      session[:time_zone]
-                    # elsif request.location && request.location.data['timezone']
-                    #   session[:time_zone] = request.location.data['timezone']
-                    else
-                      ENV['DEFAULT_TIME_ZONE']
-                    end
-      rescue StandardError
-        Time.zone = ENV['DEFAULT_TIME_ZONE']
-      end
+      set_time_zone
       fix_params!
       @_params = params; # force controllers to inherit the fixed params
       def params
         @_params
       end
       if params[:sign_in_token]
-        if (account = Account.find_by(sign_in_token: params[:sign_in_token]))
-          flash.now[:notice] = 'Signed in via a code/link'
-          account.update_attribute(:failed_sign_in_attempts, 0)
-          account.sign_ins.create(env: env_yaml, skip_increment: %w[unsubscribe give_feedback subscriptions].any? { |p| request.path.include?(p) })
-          if account.sign_ins_count == 1
-            account.set(email_confirmed: true)
-            account.send_activation_notification
-          end
-          session[:account_id] = account.id.to_s
-          account.update_attribute(:sign_in_token, Account.generate_sign_in_token)
-        elsif !current_account
-          kick! notice: "That sign in code/link isn't valid any longer. Please request a new one."
-        end
+        sign_in_via_token
       elsif params[:api_key]
-        if (account = Account.find_by(api_key: params[:api_key]))
-          session[:account_id] = account.id.to_s
-        elsif !current_account
-          403
-        end
+        sign_in_via_api_key
       end
       PageView.create(path: request.path, query_string: request.query_string) if File.extname(request.path).blank? && !request.xhr? && !request.is_crawler?
       @og_desc = "Find #{%w[regenerative metamodern participatory conscious transformative holistic ethical].join(' · ')} events and co-created gatherings"
@@ -98,6 +70,12 @@ module Dandelion
 
     get '/not_found' do
       erb :not_found, layout: :application
+    end
+
+    get '/geolocate' do
+      MaxMind::GeoIP2::Reader.new(database: 'GeoLite2-City.mmdb').city(request.ip).to_json
+    rescue StandardError => e
+      e.to_s
     end
 
     get '/privacy' do
