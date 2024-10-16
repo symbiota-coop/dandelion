@@ -31,7 +31,8 @@ Money.rounding_mode = BigDecimal::ROUND_HALF_EVEN
 
 if Padrino.env == :production
   begin
-    MaxMindDownloader.download
+    MaxMinder.download
+    puts 'MaxMind download succeeded'
   rescue StandardError
     puts 'MaxMind download failed'
   end

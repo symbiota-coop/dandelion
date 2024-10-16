@@ -17,6 +17,12 @@ namespace :dump do
   end
 end
 
+namespace :max_minder do
+  task upload: :environment do
+    MaxMinder.upload
+  end
+end
+
 namespace :tidy_up do
   task delete_all: :environment do
     PageView.and(:created_at.lt => 30.days.ago).delete_all
