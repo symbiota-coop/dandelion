@@ -18,7 +18,7 @@
      }
 
      action_options.delete('not_following') if resourceship && resourceship.admin? %>
-  <% if resourceship || (resource.respond_to?(:privacy) && resource.privacy == 'open') %>
+  <% if resourceship || !resource.respond_to?(:privacy) || resource.privacy == 'open' %>
     <% if current_state == 'not_following' %>
       <a class="pagelet-trigger btn btn-outline-primary <%= btn_class if defined?(btn_class) %>" href="<%=resource_path%>/<%=resourceship_name%>?f=follow_and_subscribe">Follow</a>
     <% else %>
