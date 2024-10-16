@@ -8,14 +8,14 @@ Dandelion::App.helpers do
                   current_account.time_zone
                 elsif session[:time_zone]
                   session[:time_zone]
-                elsif ip_from_cloudflare
+                elsif File.exist?('GeoLite2-City.mmdb') && ip_from_cloudflare
 
-                  if Padrino.env == :production && (!File.exist?('GeoLite2-City.mmdb') || File.ctime('GeoLite2-City.mmdb') > 1.day.ago)
+                  if Padrino.env == :production && File.ctime('GeoLite2-City.mmdb') > 1.day.ago
                     begin
                       MaxMinder.download
-                      puts 'MaxMind download succeeded'
+                      puts 'MaxMind update succeeded'
                     rescue StandardError
-                      puts 'MaxMind download failed'
+                      puts 'MaxMind update failed'
                     end
                   end
 
