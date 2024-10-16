@@ -17,7 +17,7 @@ module ImportFromCsv
         else
           account.save!
         end
-        send(association).create account: account, skip_welcome: row[:skip_welcome]
+        send(association).create account: account
       rescue StandardError
         next
       end
