@@ -118,6 +118,11 @@
             $(fileUpload).val('')
           }
 
+          if (width > 7680) {
+            alert('Please use an image that is less than 7680px wide');
+            $(fileUpload).val('')
+          }
+
           if (height > width) {
             alert('Please use an image that is more wide than high');
             $(fileUpload).val('')
