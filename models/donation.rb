@@ -54,7 +54,7 @@ class Donation
     self.amount = amount.round(2)
     self.currency = order.try(:currency) || event.try(:currency)
     errors.add(:amount, 'minimum is 0.01') if amount < 0.01
-    errors.add(:amount, 'is insufficient') if event.minimum_donation && amount < event.minimum_donation
+    errors.add(:amount, 'is insufficient') if !event.organisation.donations_to_dandelion? && event.minimum_donation && amount < event.minimum_donation
   end
 
   def summary
