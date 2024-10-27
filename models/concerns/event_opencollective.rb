@@ -61,6 +61,8 @@ module EventOpenCollective
 
   def check_oc_event
     oc_transactions.each do |currency, amount, secret, tx_created_at|
+      next unless secret
+
       if (@order = Order.find_by(:payment_completed.ne => true, :currency => currency, :value => amount, :oc_secret => secret, :created_at.lt => tx_created_at))
         @order.payment_completed!
         @order.send_tickets
