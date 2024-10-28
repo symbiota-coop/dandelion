@@ -115,6 +115,7 @@ class Order
     tickets.deleted.each(&:restore)
     donations.deleted.each(&:restore)
     restore
+    set(restored: true)
     payment_completed!
     update_destination_payment
     send_tickets
