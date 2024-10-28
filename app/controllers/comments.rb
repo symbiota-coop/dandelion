@@ -153,7 +153,7 @@ Dandelion::App.controller do
   get '/subscriptions/create' do
     sign_in_required!
     @post = Post.find(params[:post_id]) || not_found
-    @post.subscriptions.create!(account: current_account)
+    @post.subscriptions.create(account: current_account)
     200
   end
 
