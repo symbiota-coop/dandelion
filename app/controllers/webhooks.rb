@@ -1,6 +1,8 @@
 Dandelion::App.controller do
   post '/o/:slug/stripe_webhook' do
     @organisation = Organisation.find_by(slug: params[:slug]) || not_found
+    halt 200 if @organisation.stripe_connect_json
+
     payload = request.body.read
     sig_header = request.env['HTTP_STRIPE_SIGNATURE']
     begin
