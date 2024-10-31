@@ -60,7 +60,7 @@ Dandelion::App.controller do
       end
     when :csv
       CSV.generate do |csv|
-        row = %w[name firstname lastname email value currency opt_in_organisation opt_in_facilitator hear_about created_at]
+        row = %w[name firstname lastname email value discounted_ticket_revenue donation_revenue currency opt_in_organisation opt_in_facilitator hear_about created_at]
         @event.questions_a.each { |q| row << q }
         csv << row
         @orders.each do |order|
@@ -74,6 +74,8 @@ Dandelion::App.controller do
               ''
             end,
             order.value,
+            order.discounted_ticket_revenue,
+            order.donation_revenue,
             order.currency,
             order.opt_in_organisation,
             order.opt_in_facilitator,
