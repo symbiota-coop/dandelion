@@ -104,6 +104,17 @@ class Order
     evm_secret.to_d / 1e6
   end
 
+  def stripe_payment_status
+    Stripe.api_key = event.organisation.stripe_connect_json ? ENV['STRIPE_SK'] : event.organisation.stripe_sk
+    Stripe.api_version = '2020-08-27'
+    session = Stripe::Checkout::Session.retrieve(session_id)
+    session.payment_status
+  end
+
+  def coinbase_payment_status
+    event.organisation.coinbase_confirmed_checkout_ids.include?(coinbase_checkout_id)
+  end
+
   def payment_completed!
     set(payment_completed: true)
     tickets.set(payment_completed: true)

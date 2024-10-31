@@ -79,4 +79,13 @@ module OrganisationAccounting
     organisation_contribution = organisation_contributions.create amount: contribution_remaining.cents.to_f / 100, currency: contribution_remaining.currency, payment_intent: pi.id, payment_completed: true
     organisation_contribution.send_notification
   end
+
+  def coinbase_confirmed_checkout_ids
+    confirmed_checkout_ids = []
+    client = CoinbaseCommerce::Client.new(api_key: coinbase_api_key)
+    client.charge.auto_paging do |charge|
+      confirmed_checkout_ids << charge['checkout']['id'] if charge['confirmed_at'] && charge['checkout'] && charge['checkout']['id']
+    end
+    confirmed_checkout_ids
+  end
 end
