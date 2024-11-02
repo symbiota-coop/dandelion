@@ -56,7 +56,7 @@ class Tactivity
   before_validation do
     if image
       begin
-        if %w[jpeg png gif pam].include?(image.format)
+        if %w[jpeg png gif pam webp].include?(image.format)
           image.name = "#{SecureRandom.uuid}.#{image.format}"
         else
           errors.add(:image, 'must be an image')
