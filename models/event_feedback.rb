@@ -81,6 +81,7 @@ class EventFeedback
 
   def send_response
     return if anonymise
+    return unless response
 
     mg_client = Mailgun::Client.new ENV['MAILGUN_API_KEY'], ENV['MAILGUN_REGION']
     batch_message = Mailgun::BatchMessage.new(mg_client, ENV['MAILGUN_NOTIFICATIONS_HOST'])

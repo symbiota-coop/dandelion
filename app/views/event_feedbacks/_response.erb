@@ -1,4 +1,7 @@
-<% form_tag "/event_feedbacks/#{@event_feedback.id}/response" do %>
-  <%= text_area_tag :response, onblur: '$(this).next().click()', class: 'form-control autosize', value: @event_feedback.response, placeholder: "#{@event_feedback.event.organisation.name}'s public response to this feedback" %>
-  <%= submit_tag 'Save', class: 'd-none' %>
+<% if !@event_feedback.response%>
+  <a class="mb-2" href="javascript:;" style="display: inline-block" onclick="$(this).hide().next().show().find('textarea').focus()">Respond</a>
+<% end %>
+<% form_tag "/event_feedbacks/#{@event_feedback.id}/response", style: ('display: none' if !@event_feedback.response) do %>
+  <%= text_area_tag :response, onclick: '$(this).next().show()', class: 'form-control autosize mb-1', value: @event_feedback.response, placeholder: "#{@event_feedback.event.organisation.name}'s public response to this feedback" %>
+  <%= submit_tag 'Send', class: 'btn btn-primary', style: ('display: none' if @event_feedback.response) %>
 <% end %>

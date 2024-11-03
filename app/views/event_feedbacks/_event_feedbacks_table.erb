@@ -111,12 +111,7 @@
     </td>
     <td>
       <% if event_feedback.event %>
-        <% if !event_feedback.response%>
-          <a class="mb-2" href="javascript:;" style="display: inline-block" onclick="$(this).hide().next().show().find('textarea').focus()">Respond</a>
-        <% end %>
-        <div <% if !event_feedback.response%>style="display: none"<% end %>>
-          <div data-pagelet-url="/event_feedbacks/<%= event_feedback.id %>/response"></div>
-        </div>
+        <div data-pagelet-url="/event_feedbacks/<%= event_feedback.id %>/response"></div>
       <% end %>
     </td>
     <td>
