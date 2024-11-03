@@ -11,11 +11,6 @@
         <a href="/o/<%= @organisation.slug %>"><%= @organisation.name %></a> members' area
       </h1>
       <% if @organisationship %>
-        <% if !@organisationship.hide_membership? %>
-          <a class="btn btn-primary mb-1" href="/o/<%= @organisation.slug %>/show_membership/0">Membership public</a>
-        <% else %>
-          <a class="btn btn-outline-primary mb-1" href="/o/<%= @organisation.slug %>/show_membership/1">Membership hidden</a>
-        <% end %>
         <div class="d-block d-lg-inline-block">
           <% if @organisationship.referrer %>
             <a href="javascript:;" onclick="$(this).hide();
