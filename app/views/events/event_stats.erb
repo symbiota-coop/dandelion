@@ -80,6 +80,7 @@
         <% if @organisation.sync_stripe %>
           <%= checkbox 'Discrepancy', form_group_class: 'col-12 col-sm-auto' %>
         <% end %>
+        <%= checkbox 'Deleted', form_group_class: 'col-12 col-sm-auto' %>
       <% end %>
       <div class="form-group col-12 col-sm-auto">
         <%= submit_tag 'Search', class: 'btn btn-primary mb-0' %>

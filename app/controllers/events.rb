@@ -229,14 +229,14 @@ Dandelion::App.controller do
   end
 
   get '/events/:id/stats_row' do
-    @event = Event.find(params[:id]) || not_found
+    @event = Event.unscoped.find(params[:id]) || not_found
     @organisation = Organisation.find(params[:organisation_id]) || not_found
     event_admins_only!
     cp(:'events/event_stats_row', locals: { event: @event, organisation: @organisation, event_revenue_admin: event_revenue_admin? }, key: "/events/#{@event.id}/stats_row?timezone=#{@event.start_time.strftime('%Z')}&organisation_id=#{@organisation.id}&event_revenue_admin=#{event_revenue_admin? ? 1 : 0}")
   end
 
   get '/events/:id/edit' do
-    @event = Event.find(params[:id]) || not_found
+    @event = Event.unscoped.find(params[:id]) || not_found
     kick! unless @event.organisation
     event_admins_only!
     erb :'events_build/build'
@@ -269,7 +269,7 @@ Dandelion::App.controller do
     organisation_admins_only!
     @event.update_attribute(:refund_deleted_orders, false) if params[:no_refunds]
     @event.send_destroy_notification(current_account)
-    @event.destroy!
+    @event.destroy
     flash[:notice] = 'The event was deleted.'
     redirect "/o/#{@event.organisation.slug}/events"
   end

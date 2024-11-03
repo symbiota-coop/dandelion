@@ -1,6 +1,10 @@
 <!-- Name -->
 <td>
-  <a href="<%= "/e/#{event.slug}#{if organisation && organisation != event.organisation; "?cohost=#{organisation.slug}"; end }" %>"><%= event.name %></a>
+  <% if event.deleted? %>
+    <a href="/events/<%=event.id%>/edit"><%= event.name %></a>
+  <% else %>
+    <a href="<%= "/e/#{event.slug}#{if organisation && organisation != event.organisation; "?cohost=#{organisation.slug}"; end }" %>"><%= event.name %></a>
+  <% end %>
   <% if event.locked? %>
     <span class="label label-default">Locked</span>
   <% end %>

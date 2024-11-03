@@ -11,6 +11,15 @@
   </div>
 <% end %>
 
+<% if @event.deleted? %>
+  <div class="alert alert-warning">
+    <p class="mb-0">
+      <i class="bi bi-trash"></i>
+      This event has been deleted and cannot be saved.
+    </p>
+  </div>
+<% end %>
+
 <%= partial :'events/locked' %>
 
 <% if @event.new_record? %>
@@ -258,7 +267,7 @@
             </div>
           <% end %>
         </div>
-        <% if @event.persisted? %>
+        <% if @event.persisted? && !@event.deleted? %>
           <div class="ml-3">
             <%= f.submit_block %>
           </div>

@@ -1,6 +1,7 @@
 class Event
   include Mongoid::Document
   include Mongoid::Timestamps
+  include Mongoid::Paranoia
   extend Dragonfly::Model
 
   include EventFields
