@@ -5,7 +5,7 @@
 </div>
 <% if current_account && organisationship %>
   <% if organisationship.credit_balance > 0 %>
-    <div class="mt-1 mb-2">
+    <div class="mb-2">
       <a class="label label-primary text-white" href="/organisationships/<%= organisationship.id %>/credit_balance"><big><%= m organisationship.credit_balance, @organisation.currency %> credit</big></a>
     </div>
   <% end %>

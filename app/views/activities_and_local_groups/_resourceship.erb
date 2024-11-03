@@ -23,7 +23,7 @@
       <a class="pagelet-trigger btn btn-outline-primary <%= btn_class if defined?(btn_class) %>" href="<%=resource_path%>/<%=resourceship_name%>?f=follow_and_subscribe">Follow</a>
     <% else %>
       <div class="dropdown d-inline-block">
-        <button class="btn <%= btn_class if defined?(btn_class) %> <%= current_state == 'not_following' ? 'btn-outline-primary' : 'btn-primary' %> dropdown-toggle" type="button" data-toggle="dropdown">
+        <button class="btn mb-1 <%= btn_class if defined?(btn_class) %> <%= current_state == 'not_following' ? 'btn-outline-primary' : 'btn-primary' %> dropdown-toggle" type="button" data-toggle="dropdown">
           <%== text %>
         </button>
         <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
@@ -35,16 +35,16 @@
 
       <% if resourceship.admin? %>
         <% if resourceship.receive_feedback? %>
-          <a class="btn btn-primary" href="<%=resource_path %>/receive_feedback/0">Receiving feedback</a>
+          <a class="btn mb-1 btn-primary" href="<%=resource_path %>/receive_feedback/0">Receiving feedback</a>
         <% else %>
-          <a class="btn btn-outline-primary" href="<%=resource_path %>/receive_feedback/1">Not receiving feedback</a>
+          <a class="btn mb-1 btn-outline-primary" href="<%=resource_path %>/receive_feedback/1">Not receiving feedback</a>
         <% end %>
       <% end %>
 
       <% if !resourceship.hide_membership? %>
-        <a class="btn btn-primary" href="<%=resource_path %>/hide_membership">Membership public</a>
+        <a class="btn mb-1 btn-primary" href="<%=resource_path %>/hide_membership">Membership public</a>
       <% else %>
-        <a class="btn btn-outline-primary" href="<%=resource_path %>/show_membership">Membership hidden</a>
+        <a class="btn mb-1 btn-outline-primary" href="<%=resource_path %>/show_membership">Membership hidden</a>
       <% end %>
 
     <% end %>
