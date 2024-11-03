@@ -75,7 +75,7 @@ module Dandelion
     get '/fragments/delete/:q' do
       admins_only!
       if params[:q]
-        count = Fragment.where(key: /#{Regexp.escape(params[:q])}/i).delete_all
+        count = Fragment.and(key: /#{Regexp.escape(params[:q])}/i).delete_all
         flash[:notice] = "Deleted #{pluralize(count, 'fragment')}"
       end
       redirect '/'
