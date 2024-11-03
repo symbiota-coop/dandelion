@@ -5,6 +5,7 @@ Dandelion::App.controller do
     @from = params[:from] ? parse_date(params[:from]) : nil
     @to = params[:to] ? parse_date(params[:to]) : nil
     @orders = @organisation.orders
+    @orders = @orders.deleted if params[:deleted]
     @orders = @orders.and(:account_id.in => search_accounts(params[:q]).pluck(:id)) if params[:q]
     @orders = @orders.and(:created_at.gte => @from) if @from
     @orders = @orders.and(:created_at.lt => @to + 1) if @to

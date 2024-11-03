@@ -18,6 +18,7 @@
       <%= select_tag :affiliate_id, selected: params[:affiliate_id], options: [''] + affiliates.map { |organisation| [organisation.name, organisation.id] }, class: 'form-control mx-1' %>
     </div>
   <% end %>
+  <%= checkbox 'Deleted' %>
   <%= hidden_field_tag :search, value: 1 %>
   <%= submit_tag 'Search', class: 'btn btn-primary' %>
 <% end %>
