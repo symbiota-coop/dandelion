@@ -215,14 +215,19 @@
     <% end %>
   </td>
   <td nowrap>
-    <%= dropdown_nav [
-        (['Restore and complete', "/events/#{order.event_id}/orders/#{order.id}/restore_and_complete"] if order.deleted?),
+    <% if order.deleted? %>
+      <%= dropdown_nav [
+        ['Restore and complete', "/events/#{order.event_id}/orders/#{order.id}/restore_and_complete"],
+      ].compact, button_text: %(Actions <i class="bi bi-caret-down-fill"></i>), container_class: 'btn-group mb-1' %>
+    <% else %>
+      <%= dropdown_nav [
         ['Link to order confirmation', "/orders/#{order.id}"],
         ['Resend order confirmation', "/orders/#{order.id}/send_tickets"],
         ['Transfer to another event', "/orders/#{order.id}/transfer"],
         (['Remove and refund order', "/events/#{order.event.id}/orders/#{order.id}/destroy"] if order.event.refund_deleted_orders && order.session_id),
         (['Delete order', "/events/#{order.event.id}/orders/#{order.id}/destroy"] if !(order.event.refund_deleted_orders && order.session_id)),
       ].compact, button_text: %(Actions <i class="bi bi-caret-down-fill"></i>), container_class: 'btn-group mb-1' %>
+    <% end %>
   </td>
 </tr>
 <% } %>

@@ -272,6 +272,13 @@ Dandelion::App.controller do
     redirect back
   end
 
+  get '/events/:id/tickets/:ticket_id/restore' do
+    @event = Event.find(params[:id]) || not_found
+    event_admins_only!
+    @event.tickets.deleted.find(params[:ticket_id]).restore
+    redirect back
+  end
+
   get '/events/:id/orders/:order_id/ticketholders/:ticket_id/:f' do
     @event = Event.find(params[:id]) || not_found
     @order = @event.orders.complete.find(params[:order_id]) || not_found
