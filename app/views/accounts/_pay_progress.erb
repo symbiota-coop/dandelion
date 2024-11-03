@@ -16,10 +16,23 @@
       limit: 100
     })
 
+    application_fees_list = Stripe::ApplicationFee.list({
+      created: {
+        gte: start_of_month.to_i,
+        lt: end_of_month.to_i
+      },
+      limit: 100
+    })
+
     charges = []
     charges_list.auto_paging_each do |charge|
       charges << charge
     end    
+
+    application_fees = []
+    application_fees_list.auto_paging_each do |fee|
+      application_fees << fee
+    end
 
     monthly_contributions = Money.new(0,'GBP')
     charges.each { |c|
@@ -29,6 +42,12 @@
 
     monthly_contributions += Money.new(c['amount'], c['currency'])
     }
+
+    application_fees.each { |f|
+      next if f.refunded
+      monthly_contributions += Money.new(f['amount'], f['currency'])
+    }
+
     monthly_contributions = monthly_contributions.exchange_to(currency) 
 
     base_target = Money.new(500*100, 'GBP')

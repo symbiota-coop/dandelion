@@ -162,24 +162,48 @@ namespace :stats do
       charges << charge
     end
 
+    application_fees_list = Stripe::ApplicationFee.list({
+                                                          created: {
+                                                            gte: d.first.to_time.to_i,
+                                                            lt: (d.last + 1.month).to_time.to_i
+                                                          },
+                                                          limit: 100
+                                                        })
+
+    application_fees = []
+    application_fees_list.auto_paging_each do |fee|
+      application_fees << fee
+    end
+
     fragment = Fragment.find_or_create_by(key: 'monthly_contributions')
     fragment.update_attributes expires: 1.day.from_now, value: d.map { |x|
-                                                                 start_of_month = x
-                                                                 end_of_month = x + 1.month
+      start_of_month = x
+      end_of_month = x + 1.month
 
-                                                                 monthly_contributions = Money.new(0, 'GBP')
-                                                                 charges
-                                                                   .select { |c| c.created >= start_of_month.to_time.to_i && c.created < end_of_month.to_time.to_i }
-                                                                   .each do |c|
-                                                                   next unless c.status == 'succeeded'
-                                                                   next if c.refunded
-                                                                   next if ENV['STRIPE_PAYMENT_INTENTS_TO_IGNORE'] && c.payment_intent.in?(ENV['STRIPE_PAYMENT_INTENTS_TO_IGNORE'].split(','))
+      monthly_contributions = Money.new(0, 'GBP')
 
-                                                                   monthly_contributions += Money.new(c['amount'], c['currency'])
-                                                                 end
-                                                                 monthly_contributions = monthly_contributions.exchange_to('GBP')
+      # Process charges
+      charges
+        .select { |c| c.created >= start_of_month.to_time.to_i && c.created < end_of_month.to_time.to_i }
+        .each do |c|
+          next unless c.status == 'succeeded'
+          next if c.refunded
+          next if ENV['STRIPE_PAYMENT_INTENTS_TO_IGNORE'] && c.payment_intent.in?(ENV['STRIPE_PAYMENT_INTENTS_TO_IGNORE'].split(','))
 
-                                                                 ["#{Date::MONTHNAMES[x.month]} #{x.year}", monthly_contributions.to_i]
-                                                               }.to_json
+          monthly_contributions += Money.new(c['amount'], c['currency'])
+        end
+
+      # Process application fees
+      application_fees
+        .select { |f| f.created >= start_of_month.to_time.to_i && f.created < end_of_month.to_time.to_i }
+        .each do |f|
+          next if f.refunded
+
+          monthly_contributions += Money.new(f['amount'], f['currency'])
+        end
+
+      monthly_contributions = monthly_contributions.exchange_to('GBP')
+      ["#{Date::MONTHNAMES[x.month]} #{x.year}", monthly_contributions.to_i]
+    }.to_json
   end
 end
