@@ -14,6 +14,8 @@ $(function () {
       const donationAmount = parseFloat($('#donation_amount').val())
       if (donationAmount < 0) {
         $('#donation_amount').val('')
+      } else if (donationAmount > 0 && minimumApplicationFee && donationAmount < minimumApplicationFee) {
+        $('#donation_amount').val(minimumApplicationFee)
       } else {
         $('#donation_amount').val(donationAmount.toFixed(2).endsWith('00') ? donationAmount.toFixed(0) : donationAmount.toFixed(2))
       }
