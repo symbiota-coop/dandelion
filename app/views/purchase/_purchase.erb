@@ -303,6 +303,13 @@ end
     placesRemaining = <%== @event.places_remaining.to_json %>
     currency = <%== @event.currency.to_json %>
     currencySymbol = <%== money_symbol(@event.currency).to_json %>
+    minimumApplicationFee = <%=
+      if FIAT_CURRENCIES.include?(@event.currency)
+        amount = Money.new(100, 'GBP').exchange_to(@event.currency).cents.to_f / 100
+        power = Math.log10(amount).floor
+        10 ** power
+      end
+    %>
     stripePk = <%== (@event.organisation.stripe_connect_json ? ENV['STRIPE_PK'] : @event.organisation.stripe_pk).to_json %>
     stripeAccount = <%== @event.organisation.stripe_user_id ? @event.organisation.stripe_user_id.to_json : 'null' %>
     coinbase = <%= @event.organisation.coinbase_api_key ? true : false %>

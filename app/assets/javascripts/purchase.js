@@ -1,4 +1,4 @@
-/* global timeAgo, eventId, eventUrl, placesRemaining, currency, currencySymbol, stripePk, stripeAccount, coinbase, organisationOcSlug, ocSlug, evmAddress, contractAddress, networkId, networkName, signedIn */
+/* global timeAgo, eventId, eventUrl, placesRemaining, currency, currencySymbol, minimumApplicationFee, stripePk, stripeAccount, coinbase, organisationOcSlug, ocSlug, evmAddress, contractAddress, networkId, networkName, signedIn */
 
 $(function () {
   $('#details form').on('keyup keypress', function (e) {
@@ -67,23 +67,29 @@ $(function () {
   }
 
   $('#donation_amount').focus(function () {
-    $('#donation-percent-buttons button').addClass('btn-outline-secondary').removeClass('btn-secondary')
+    $('#donation-percent-buttons button').addClass('btn-outline-secondary').removeClass('btn-secondary selected-percent')
   })
 
   $('#donation-percent-buttons button').click(function () {
-    $('#donation-percent-buttons button').addClass('btn-outline-secondary').removeClass('btn-secondary')
-    $(this).removeClass('btn-outline-secondary').addClass('btn-secondary')
+    $('#donation-percent-buttons button').addClass('btn-outline-secondary').removeClass('btn-secondary selected-percent')
+    $(this).removeClass('btn-outline-secondary').addClass('btn-secondary selected-percent')
     setTotal()
   })
 
   function setDonationAmount () {
     let p = priceWithoutDonation()
 
-    let dp = $('#donation-percent-buttons button.btn-secondary').data('percent')
+    let dp = $('#donation-percent-buttons button.selected-percent').data('percent')
 
     if (typeof dp !== 'undefined') {
       let donationAmount = parseFloat(p * (dp / 100))
-      $('#donation_amount').val(donationAmount.toFixed(2).endsWith('00') ? donationAmount.toFixed(0) : donationAmount.toFixed(2))
+      if (minimumApplicationFee && donationAmount < minimumApplicationFee) {
+        $('#donation-percent-buttons button').addClass('btn-outline-secondary').removeClass('btn-secondary')
+        $('#donation_amount').val(minimumApplicationFee)
+      } else {
+        $('#donation-percent-buttons button.selected-percent').removeClass('btn-outline-secondary').addClass('btn-secondary')
+        $('#donation_amount').val(donationAmount.toFixed(2).endsWith('00') ? donationAmount.toFixed(0) : donationAmount.toFixed(2))
+      }
     }
   }
 
