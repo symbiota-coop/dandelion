@@ -50,11 +50,8 @@ gem 'airrecord'
 gem 'anthropic'
 gem 'faraday'
 gem 'ferrum'
-gem 'gemini-ai'
 gem 'jwt'
 gem 'mechanize'
-gem 'replicate-ruby', require: 'replicate'
-gem 'ruby-openai'
 gem 'yt'
 
 # Payments
