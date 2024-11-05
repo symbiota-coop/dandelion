@@ -41,30 +41,6 @@ module AccountFeedbackSummaries
       end
 
       # accounts.each(&:send_feedback_summary)
-
-      # prompt = prompt[0..(1_000_000 * 0.66 * 4)]
-      # last_paragraph = nil
-      # attempts = 0
-      # loop do
-      #   response = GEMINI_FLASH.generate_content(
-      #     {
-      #       contents: { role: 'user', parts: { text: prompt } },
-      #       generationConfig: { maxOutputTokens: 256 }
-      #     }
-      #   )
-      #   attempts += 1
-      #   if (content = response.dig('candidates', 0, 'content', 'parts', 0, 'text'))
-      #     paragraphs = content.split("\n\n")
-      #     if paragraphs.length <= 2
-      #       last_paragraph = paragraphs.last.strip
-      #       break if last_paragraph.split.length >= 50 && last_paragraph[0] != '-' && last_paragraph[0] != '*' && last_paragraph[-1] == '.'
-      #     end
-      #   else
-      #     puts response
-      #     break if attempts == 3
-      #   end
-      # end
-      # puts "#{last_paragraph}\n\n" if last_paragraph
     end
   end
 end

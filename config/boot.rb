@@ -56,26 +56,6 @@ if ENV['GOOGLE_MAPS_API_KEY']
   end
 end
 
-# AI
-
-OpenAI.configure do |config|
-  config.access_token = ENV['OPENAI_API_KEY']
-end
-
-Replicate.configure do |config|
-  config.api_token = ENV['REPLICATE_API_KEY']
-end
-
 Anthropic.configure do |config|
   config.access_token = ENV['ANTHROPIC_API_KEY']
-end
-
-if ENV['GEMINI_API_KEY']
-  GEMINI_FLASH = Gemini.new(
-    credentials: {
-      service: 'generative-language-api',
-      api_key: ENV['GEMINI_API_KEY']
-    },
-    options: { model: 'gemini-1.5-flash', server_sent_events: true }
-  )
 end

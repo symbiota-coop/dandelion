@@ -251,43 +251,5 @@ class Event
       end
     end
     set(ai_tagged: true)
-
-    # prompt = prompt[0..(128_000 * 0.66 * 4)]
-    # client = OpenAI::Client.new
-    # content = nil
-    # 5.times do
-    #   response = client.chat(
-    #     parameters: {
-    #       model: 'gpt-4o-mini',
-    #       messages: [{ role: 'user', content: prompt }],
-    #       max_tokens: 256
-    #     }
-    #   )
-    #   if (content = response.dig('choices', 0, 'message', 'content'))
-    #     break unless content.include?('#')
-    #   else
-    #     puts 'sleeping...'
-    #     sleep 1
-    #   end
-    # end
-    # return unless content
-
-    # prompt = prompt[0..(1_000_000 * 0.66 * 4)]
-    # content = nil
-    # 5.times do
-    #   response = GEMINI_FLASH.generate_content(
-    #     {
-    #       contents: { role: 'user', parts: { text: prompt } },
-    #       generationConfig: { maxOutputTokens: 256 }
-    #     }
-    #   )
-    #   if (content = response.dig('candidates', 0, 'content', 'parts', 0, 'text'))
-    #     break unless content.include?('#')
-    #   else
-    #     puts 'sleeping...'
-    #     sleep 1
-    #   end
-    # end
-    # return unless content
   end
 end
