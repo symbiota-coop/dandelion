@@ -99,6 +99,7 @@ Dandelion::App.controller do
       @account.provider_links.build(provider: @provider.display_name, provider_uid: session['omniauth.auth']['uid'], omniauth_hash: session['omniauth.auth'])
       # @account.picture_url = @provider.image.call(session['omniauth.auth']) unless @account.picture
     end
+
     if @account.save
       flash[:notice] = '<strong>Awesome!</strong> Your account was created successfully.'
       unless params[:recaptcha_skip_secret]
@@ -135,10 +136,30 @@ Dandelion::App.controller do
         redirect '/accounts/edit'
       end
     elsif @account.email && (account = Account.find_by(email: @account.email.downcase))
-      if params[:recaptcha_skip_secret] && params[:organisation_id]
-        @organisation = Organisation.find(params[:organisation_id])
-        @organisation.organisationships.create account: account, skip_welcome: params[:skip_welcome], referrer_id: params[:referrer_id]
-        200
+      if params[:organisation_id] || params[:activity_id] || params[:local_group_id] || params[:event_id]
+        if params[:organisation_id]
+          @organisation = Organisation.find(params[:organisation_id])
+          @organisation.organisationships.create account: account, skip_welcome: params[:skip_welcome], referrer_id: params[:referrer_id]
+        elsif params[:activity_id]
+          @activity = Activity.find(params[:activity_id])
+          @activity.organisation.organisationships.create account: @account
+          @activity.activityships.create account: @account
+        elsif params[:local_group_id]
+          @local_group = LocalGroup.find(params[:local_group_id])
+          @local_group.organisation.organisationships.create account: @account
+          @local_group.local_groupships.create account: @account
+        elsif params[:event_id]
+          @event = Event.find(params[:event_id])
+          @event.organisation.organisationships.create(account: @account)
+          @event.activity.activityships.create(account: @account) if @event.activity
+          @event.local_group.local_groupships.create(account: @account) if @event.local_group
+        end
+        if params[:recaptcha_skip_secret]
+          200
+        else
+          flash[:notice] = "OK, you're on the list!"
+          redirect(back)
+        end
       else
         flash[:error] = "There's already an account registered under that email address. You can request a sign in code below."
         redirect '/accounts/sign_in'
