@@ -75,10 +75,11 @@ Dandelion::App.helpers do
 
   def search_events(query)
     # Mongoid::Paranoia seems to break .or
-    Event.and(:id.in =>
-      Event.and(name: /#{Regexp.escape(query)}/i).pluck(:id) +
-      Event.and(description: /#{Regexp.escape(query)}/i).pluck(:id) +
-      Event.and(location: /#{Regexp.escape(query)}/i).pluck(:id))
+    Event.where('$or' => [
+                  { name: /#{Regexp.escape(query)}/i },
+                  { description: /#{Regexp.escape(query)}/i },
+                  { location: /#{Regexp.escape(query)}/i }
+                ])
   end
 
   def pagination_details(collection, model: nil)
