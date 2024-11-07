@@ -9,6 +9,10 @@ class Gathering
   include EvmTransactions
   include StripeWebhooks
 
+  def self.fs(slug)
+    find_by(slug: slug)
+  end
+
   def self.spring_clean
     ignore = %i[memberships teams teamships notifications_as_notifiable notifications_as_circle]
     Gathering.all.each do |gathering|

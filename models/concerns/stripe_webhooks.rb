@@ -24,7 +24,7 @@ module StripeWebhooks
       w = Stripe::WebhookEndpoint.list({ limit: 100, starting_after: starting_after })
       webhooks += w.data
       has_more = w.has_more
-      starting_after = w.data.last.id
+      starting_after = w.data.last.try(:id)
     end
     webhooks
   end
