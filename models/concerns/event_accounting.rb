@@ -10,8 +10,11 @@ module EventAccounting
   included do
     Event.profit_share_roles.each do |role|
       define_method "paid_to_#{role}" do
-        s = rpayments.and(role: role).sum(&:amount_money)
-        s == 0 ? Money.new(0, currency) : s
+        instance_variable = "@paid_to_#{role}"
+        instance_variable_get(instance_variable) || instance_variable_set(instance_variable, begin
+          s = rpayments.and(role: role).sum(&:amount_money)
+          s == 0 ? Money.new(0, currency) : s
+        end)
       end
       define_method "remaining_to_#{role}" do
         send("profit_to_#{role}") - send("paid_to_#{role}")
@@ -61,33 +64,45 @@ module EventAccounting
   end
 
   def stripe_revenue
-    s = stripe_charges.sum(&:balance)
-    s == 0 ? Money.new(0, currency) : s
+    @stripe_revenue ||= begin
+      s = stripe_charges.sum(&:balance)
+      s == 0 ? Money.new(0, currency) : s
+    end
   end
 
   def stripe_fees
-    s = stripe_charges.sum(&:fees)
-    s == 0 ? Money.new(0, currency) : s
+    @stripe_fees ||= begin
+      s = stripe_charges.sum(&:fees)
+      s == 0 ? Money.new(0, currency) : s
+    end
   end
 
   def stripe_donations
-    s = stripe_charges.sum(&:donations)
-    s == 0 ? Money.new(0, currency) : s
+    @stripe_donations ||= begin
+      s = stripe_charges.sum(&:donations)
+      s == 0 ? Money.new(0, currency) : s
+    end
   end
 
   def stripe_ticket_revenue
-    s = stripe_charges.sum(&:ticket_revenue)
-    s == 0 ? Money.new(0, currency) : s
+    @stripe_ticket_revenue ||= begin
+      s = stripe_charges.sum(&:ticket_revenue)
+      s == 0 ? Money.new(0, currency) : s
+    end
   end
 
   def stripe_ticket_revenue_to_organisation
-    s = stripe_charges.sum(&:ticket_revenue_to_organisation)
-    s == 0 ? Money.new(0, currency) : s
+    @stripe_ticket_revenue_to_organisation ||= begin
+      s = stripe_charges.sum(&:ticket_revenue_to_organisation)
+      s == 0 ? Money.new(0, currency) : s
+    end
   end
 
   def stripe_ticket_revenue_to_revenue_sharer
-    s = stripe_charges.sum(&:ticket_revenue_to_revenue_sharer)
-    s == 0 ? Money.new(0, currency) : s
+    @stripe_ticket_revenue_to_revenue_sharer ||= begin
+      s = stripe_charges.sum(&:ticket_revenue_to_revenue_sharer)
+      s == 0 ? Money.new(0, currency) : s
+    end
   end
 
   def stripe_profit
