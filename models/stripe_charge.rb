@@ -105,15 +105,15 @@ class StripeCharge
     end
   end
 
-  def calculate_balance
-    @calculated_balance ||= begin
+  def balance_from_transactions
+    @balance_from_transactions ||= begin
       m = stripe_transactions.sum(&:gross_money)
       m > 0 ? m.exchange_to(currency) : Money.new(0, currency)
     end
   end
 
-  def calculate_fees
-    @calculated_fees ||= begin
+  def fees_from_transactions
+    @fees_from_transactions ||= begin
       m = stripe_transactions.sum(&:fee_money)
       m > 0 ? m.exchange_to(currency) : Money.new(0, currency)
     end
