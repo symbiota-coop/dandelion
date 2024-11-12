@@ -23,7 +23,8 @@ Dandelion::App.helpers do
                 else
                   ENV['DEFAULT_TIME_ZONE']
                 end
-  rescue StandardError
+  rescue StandardError => e
+    airbrake_notify(e)
     Time.zone = ENV['DEFAULT_TIME_ZONE']
   end
 
