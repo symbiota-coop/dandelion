@@ -10,8 +10,8 @@ module EventAccounting
   included do
     Event.profit_share_roles.each do |role|
       define_method "paid_to_#{role}" do
-        instance_variable = "@paid_to_#{role}"
-        instance_variable_get(instance_variable) || instance_variable_set(instance_variable, begin
+        instance_var = :"@paid_to_#{role}"
+        instance_variable_get(instance_var) || instance_variable_set(instance_var, begin
           s = rpayments.and(role: role).sum(&:amount_money)
           s == 0 ? Money.new(0, currency) : s
         end)
@@ -138,86 +138,109 @@ module EventAccounting
   end
 
   def credit_applied
-    r = Money.new(0, currency)
-    orders.each { |order| r += Money.new((order.credit_applied || 0) * 100, order.currency) }
-    r
-  rescue Money::Bank::UnknownRate, Money::Currency::UnknownCurrency
-    Money.new(0, ENV['DEFAULT_CURRENCY'])
+    @credit_applied ||= begin
+      r = Money.new(0, currency)
+      orders.each { |order| r += Money.new((order.credit_applied || 0) * 100, order.currency) }
+      r
+    rescue Money::Bank::UnknownRate, Money::Currency::UnknownCurrency
+      Money.new(0, ENV['DEFAULT_CURRENCY'])
+    end
   end
 
   def credit_on_behalf_of_organisation
-    r = Money.new(0, currency)
-    orders.each { |order| r += Money.new((order.credit_on_behalf_of_organisation || 0) * 100, order.currency) }
-    r
-  rescue Money::Bank::UnknownRate, Money::Currency::UnknownCurrency
-    Money.new(0, ENV['DEFAULT_CURRENCY'])
+    @credit_on_behalf_of_organisation ||= begin
+      r = Money.new(0, currency)
+      orders.each { |order| r += Money.new((order.credit_on_behalf_of_organisation || 0) * 100, order.currency) }
+      r
+    rescue Money::Bank::UnknownRate, Money::Currency::UnknownCurrency
+      Money.new(0, ENV['DEFAULT_CURRENCY'])
+    end
   end
 
   def credit_on_behalf_of_revenue_sharer
-    r = Money.new(0, currency)
-    orders.each { |order| r += Money.new((order.credit_on_behalf_of_revenue_sharer || 0) * 100, order.currency) }
-    r
-  rescue Money::Bank::UnknownRate, Money::Currency::UnknownCurrency
-    Money.new(0, ENV['DEFAULT_CURRENCY'])
+    @credit_on_behalf_of_revenue_sharer ||= begin
+      r = Money.new(0, currency)
+      orders.each { |order| r += Money.new((order.credit_on_behalf_of_revenue_sharer || 0) * 100, order.currency) }
+      r
+    rescue Money::Bank::UnknownRate, Money::Currency::UnknownCurrency
+      Money.new(0, ENV['DEFAULT_CURRENCY'])
+    end
   end
 
   def fixed_discounts_applied
-    r = Money.new(0, currency)
-    orders.each { |order| r += Money.new((order.fixed_discount_applied || 0) * 100, order.currency) }
-    r
-  rescue Money::Bank::UnknownRate, Money::Currency::UnknownCurrency
-    Money.new(0, ENV['DEFAULT_CURRENCY'])
+    @fixed_discounts_applied ||= begin
+      r = Money.new(0, currency)
+      orders.each { |order| r += Money.new((order.fixed_discount_applied || 0) * 100, order.currency) }
+      r
+    rescue Money::Bank::UnknownRate, Money::Currency::UnknownCurrency
+      Money.new(0, ENV['DEFAULT_CURRENCY'])
+    end
   end
 
   def fixed_discounts_on_behalf_of_organisation
-    r = Money.new(0, currency)
-    orders.each { |order| r += Money.new((order.fixed_discount_on_behalf_of_organisation || 0) * 100, order.currency) }
-    r
-  rescue Money::Bank::UnknownRate, Money::Currency::UnknownCurrency
-    Money.new(0, ENV['DEFAULT_CURRENCY'])
+    @fixed_discounts_on_behalf_of_organisation ||= begin
+      r = Money.new(0, currency)
+      orders.each { |order| r += Money.new((order.fixed_discount_on_behalf_of_organisation || 0) * 100, order.currency) }
+      r
+    rescue Money::Bank::UnknownRate, Money::Currency::UnknownCurrency
+      Money.new(0, ENV['DEFAULT_CURRENCY'])
+    end
   end
 
   def fixed_discounts_on_behalf_of_revenue_sharer
-    r = Money.new(0, currency)
-    orders.each { |order| r += Money.new((order.fixed_discount_on_behalf_of_revenue_sharer || 0) * 100, order.currency) }
-    r
-  rescue Money::Bank::UnknownRate, Money::Currency::UnknownCurrency
-    Money.new(0, ENV['DEFAULT_CURRENCY'])
+    @fixed_discounts_on_behalf_of_revenue_sharer ||= begin
+      r = Money.new(0, currency)
+      orders.each { |order| r += Money.new((order.fixed_discount_on_behalf_of_revenue_sharer || 0) * 100, order.currency) }
+      r
+    rescue Money::Bank::UnknownRate, Money::Currency::UnknownCurrency
+      Money.new(0, ENV['DEFAULT_CURRENCY'])
+    end
   end
 
   def discounted_ticket_revenue
-    r = Money.new(0, currency)
-    tickets.complete.each { |ticket| r += Money.new((ticket.discounted_price || 0) * 100, ticket.currency) }
-    r
-  rescue Money::Bank::UnknownRate, Money::Currency::UnknownCurrency
-    Money.new(0, ENV['DEFAULT_CURRENCY'])
+    @discounted_ticket_revenue ||= begin
+      r = Money.new(0, currency)
+      tickets.complete.each { |ticket| r += Money.new((ticket.discounted_price || 0) * 100, ticket.currency) }
+      r
+    rescue Money::Bank::UnknownRate, Money::Currency::UnknownCurrency
+      Money.new(0, ENV['DEFAULT_CURRENCY'])
+    end
   end
 
   def donation_revenue(skip_transferred: false)
-    r = Money.new(0, currency)
-    donations = skip_transferred ? self.donations.and(:transferred.ne => true) : self.donations
-    donations.each { |donation| r += Money.new((donation.amount || 0) * 100, donation.currency) }
-    r
-  rescue Money::Bank::UnknownRate, Money::Currency::UnknownCurrency
-    Money.new(0, ENV['DEFAULT_CURRENCY'])
+    instance_var = skip_transferred ? :@donation_revenue_without_transferred : :@donation_revenue
+    instance_variable_get(instance_var) || instance_variable_set(instance_var, begin
+      r = Money.new(0, currency)
+      donations = skip_transferred ? self.donations.and(:transferred.ne => true) : self.donations
+      donations.each { |donation| r += Money.new((donation.amount || 0) * 100, donation.currency) }
+      r
+    rescue Money::Bank::UnknownRate, Money::Currency::UnknownCurrency
+      Money.new(0, ENV['DEFAULT_CURRENCY'])
+    end)
   end
 
   def organisation_discounted_ticket_revenue(skip_transferred: false)
-    r = Money.new(0, currency)
-    tickets = skip_transferred ? self.tickets.and(:transferred.ne => true) : self.tickets
-    tickets.complete.each { |ticket| r += Money.new((ticket.discounted_price || 0) * 100 * (ticket.organisation_revenue_share || 1), ticket.currency) }
-    r
-  rescue Money::Bank::UnknownRate, Money::Currency::UnknownCurrency
-    Money.new(0, ENV['DEFAULT_CURRENCY'])
+    instance_var = skip_transferred ? :@org_discounted_ticket_revenue_without_transferred : :@org_discounted_ticket_revenue
+    instance_variable_get(instance_var) || instance_variable_set(instance_var, begin
+      r = Money.new(0, currency)
+      tickets = skip_transferred ? self.tickets.and(:transferred.ne => true) : self.tickets
+      tickets.complete.each { |ticket| r += Money.new((ticket.discounted_price || 0) * 100 * (ticket.organisation_revenue_share || 1), ticket.currency) }
+      r
+    rescue Money::Bank::UnknownRate, Money::Currency::UnknownCurrency
+      Money.new(0, ENV['DEFAULT_CURRENCY'])
+    end)
   end
 
   def revenue_sharer_discounted_ticket_revenue(skip_transferred: false)
-    r = Money.new(0, currency)
-    tickets = skip_transferred ? self.tickets.and(:transferred.ne => true) : self.tickets
-    tickets.complete.each { |ticket| r += Money.new((ticket.discounted_price || 0) * 100 * (1 - (ticket.organisation_revenue_share || 1)), ticket.currency) }
-    r
-  rescue Money::Bank::UnknownRate, Money::Currency::UnknownCurrency
-    Money.new(0, ENV['DEFAULT_CURRENCY'])
+    instance_var = skip_transferred ? :@revenue_sharer_discounted_ticket_revenue_without_transferred : :@revenue_sharer_discounted_ticket_revenue
+    instance_variable_get(instance_var) || instance_variable_set(instance_var, begin
+      r = Money.new(0, currency)
+      tickets = skip_transferred ? self.tickets.and(:transferred.ne => true) : self.tickets
+      tickets.complete.each { |ticket| r += Money.new((ticket.discounted_price || 0) * 100 * (1 - (ticket.organisation_revenue_share || 1)), ticket.currency) }
+      r
+    rescue Money::Bank::UnknownRate, Money::Currency::UnknownCurrency
+      Money.new(0, ENV['DEFAULT_CURRENCY'])
+    end)
   end
 
   def revenue_share_to_organisation
