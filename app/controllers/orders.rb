@@ -43,7 +43,7 @@ Dandelion::App.controller do
   end
 
   get '/events/:id/orders', provides: %i[html csv pdf] do
-    @event = Event.find(params[:id]) || not_found
+    @event = Event.unscoped.find(params[:id]) || not_found
     event_admins_only!
     @orders = @event.orders
     @orders =  @orders.discounted if params[:discounted]
@@ -110,7 +110,7 @@ Dandelion::App.controller do
   end
 
   get '/events/:id/tickets', provides: %i[html csv pdf] do
-    @event = Event.find(params[:id]) || not_found
+    @event = Event.unscoped.find(params[:id]) || not_found
     event_admins_only!
     @tickets = if params[:ticket_type_id]
                  tt = @event.ticket_types.find(params[:ticket_type_id]) || not_found

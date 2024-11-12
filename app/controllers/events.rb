@@ -424,7 +424,7 @@ Dandelion::App.controller do
   end
 
   get '/events/:id/donations' do
-    @event = Event.find(params[:id]) || not_found
+    @event = Event.unscoped.find(params[:id]) || not_found
     event_admins_only!
     @donations = @event.donations
     @donations = @donations.and(:account_id.in => search_accounts(params[:q]).pluck(:id)) if params[:q]
