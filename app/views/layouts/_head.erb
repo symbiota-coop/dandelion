@@ -9,12 +9,10 @@
       type="text/javascript"
       src="https://app.termly.io/resource-blocker/<%=ENV["TERMLY_WEBSITE_UUID"]%>?autoBlock=on"
       ></script>
-      <%= partial :'layouts/hotjar' %>
     <% end %>
 
     <%= partial :'layouts/ga' %>
     <%= partial :'layouts/pixel' %>
-    <%= partial :'layouts/simple_analytics' %>
 
     <% if current_account && ENV['NOLT_SSO_SECRET'] %>
       <script async src="https://cdn.nolt.io/widgets.js"></script>
