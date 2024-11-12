@@ -92,7 +92,7 @@ module OrderNotifications
     batch_message.subject "Refund failed: #{account.name} in #{event.name}"
     batch_message.body_html Premailer.new(ERB.new(File.read(Padrino.root('app/views/layouts/email.erb'))).result(binding), with_html_string: true, adapter: 'nokogiri', input_encoding: 'UTF-8').to_inline_css
 
-    (event.event_facilitators + Account.and(admin: true)).each do |account|
+    event.event_facilitators.each do |account|
       batch_message.add_recipient(:to, account.email, { 'firstname' => account.firstname || 'there', 'token' => account.sign_in_token, 'id' => account.id.to_s })
     end
 
