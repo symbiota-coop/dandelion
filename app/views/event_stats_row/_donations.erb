@@ -1,0 +1,12 @@
+<% if organisation.stripe_client_id %>
+  <td data-sort="<%=money_sort(event, organisation, :donation_revenue)%>">
+    <span data-toggle="tooltip" title="Reported by Dandelion" class="label label-primary d-block mb-1"><%= m event.donation_revenue, event.currency %></span>
+    <span data-toggle="tooltip" title="Reported by Stripe (48h delay)" class="label label-stripe d-block mb-1"><%= m event.stripe_donations, event.currency %></span>
+  </td>
+<% else %>
+  <td data-sort="<%=money_sort(event, organisation, :donation_revenue)%>">
+    <% if event.donation_revenue > 0 && !event.purchase_url %>
+      <%= m event.donation_revenue, event.currency %>
+    <% end %>
+  </td>
+<% end %>

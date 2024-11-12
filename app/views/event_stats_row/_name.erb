@@ -1,0 +1,19 @@
+<td>
+  <% if event.deleted? %>
+    <a href="/events/<%=event.id%>/edit"><%= event.name %></a>
+  <% else %>
+    <a href="<%= "/e/#{event.slug}#{if organisation && organisation != event.organisation; "?cohost=#{organisation.slug}"; end }" %>"><%= event.name %></a>
+  <% end %>
+  <% if event.locked? %>
+    <span class="label label-default">Locked</span>
+  <% end %>
+  <% if event.secret? %>
+    <span class="label label-default">Secret</span>
+  <% end %>
+  <% if event.monthly_donors_only? %>
+    <span class="label label-default">Monthly donors only</span>
+  <% end %>
+  <% if organisation && organisation != event.organisation %>
+    <span class="label label-yellow">Co-host</span>
+  <% end %>
+</td>

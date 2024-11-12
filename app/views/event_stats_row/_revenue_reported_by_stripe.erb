@@ -1,0 +1,23 @@
+<% 
+  stripe_charges = event.stripe_charges.and(:balance_float.gt => 0, :order_id.nin => Order.and(transferred: true).pluck(:id))
+  stripe_charges_money = stripe_charges.sum(&:balance)
+  stripe = "#{m stripe_charges_money, event.currency} from #{pluralize(stripe_charges.count, 'charge')}"
+
+  stripe_charges_transferred = event.stripe_charges.and(:balance_float.gt => 0, :order_id.in => Order.and(transferred: true).pluck(:id))
+  stripe_charges_transferred_money = stripe_charges_transferred.sum(&:balance)
+  stripe_transferred = "#{m stripe_charges_transferred_money, event.currency} from #{pluralize(stripe_charges_transferred.count, 'transferred charge')}"
+
+  close_enough = (stripe_charges_money - event.revenue).abs.cents < 100
+  bg_class = if event.end_time.to_date < Date.today - 1; (close_enough ? 'bg-success' : 'bg-warning'); end
+%>
+<td data-sort="<%=money_sort(event, organisation, :stripe_revenue)%>" <% if bg_class %> class="<%= bg_class %>" <% end %>>
+  <%= stripe.split(' from ').first %> from <a <% if bg_class %> class="text-white font-weight-bold" <% end %> href="/events/<%=event.id%>/stripe_charges"><%= stripe.split(' from ').last %></a>
+  <% if stripe_charges_transferred.count > 0 %>
+    +
+    <%= stripe_transferred.split(' from ').first %> from <a <% if bg_class %> class="text-white font-weight-bold" <% end %> href="/events/<%=event.id%>/stripe_charges"><%= stripe_transferred.split(' from ').last %></a>
+  <% end %>
+  <% if event.stripe_revenue_adjustment && event.stripe_revenue_adjustment != 0 %>
+    +
+    <%= m event.stripe_revenue_adjustment, event.currency %> adjustment
+  <% end %>
+</td>

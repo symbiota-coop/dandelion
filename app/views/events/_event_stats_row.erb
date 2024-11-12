@@ -1,299 +1,73 @@
 <!-- Name -->
-<td>
-  <% if event.deleted? %>
-    <a href="/events/<%=event.id%>/edit"><%= event.name %></a>
-  <% else %>
-    <a href="<%= "/e/#{event.slug}#{if organisation && organisation != event.organisation; "?cohost=#{organisation.slug}"; end }" %>"><%= event.name %></a>
-  <% end %>
-  <% if event.locked? %>
-    <span class="label label-default">Locked</span>
-  <% end %>
-  <% if event.secret? %>
-    <span class="label label-default">Secret</span>
-  <% end %>
-  <% if event.monthly_donors_only? %>
-    <span class="label label-default">Monthly donors only</span>
-  <% end %>
-  <% if organisation && organisation != event.organisation %>
-    <span class="label label-yellow">Co-host</span>
-  <% end %>
-</td>
+<%= partial :'event_stats_row/name', locals: { event: event, organisation: organisation } %>
 <!-- Buttons -->
-<td nowrap>
-  <a data-toggle="tooltip" title="Edit event" class="btn btn-sm btn-primary" href="/events/<%= event.id %>/edit"><i class="bi bi-pencil-fill"></i></a>
-  <% event_image = nil; if organisation && (cohostship = event.cohostships.find_by(organisation: organisation)) && cohostship.image
-  event_image = cohostship.image
-  elsif event.image
-  event_image = event.image
-  end %>
-  <% if event_image %>
-    <a data-toggle="tooltip" title="Copy linked image" class="btn btn-sm btn-primary" href="javascript:;" onclick="
-
-  var div = $(this).next().show();
-  var node = $(div).find('a')[0];
-
-  // Create a range and select the node's content
-  var range = document.createRange();
-  range.selectNode(node);
-
-  // Add the selected content to the clipboard
-  var selection = window.getSelection();
-  selection.removeAllRanges();
-  selection.addRange(range);
-  document.execCommand('copy');
-
-  // Deselect the content
-  selection.removeAllRanges();
-
-  $(div).hide();
-  // Alert the user that the node has been copied
-  alert('Linked image copied');
-
-    "><i class="bi bi-image"></i></a>
-    <div style="display: none">
-      <a target="_parent" href="<%= ENV['BASE_URI'] %>/e/<%=event.slug%>"><img src="<%= u event_image.thumb('1920x1920').url %>"></a>
-    </div>
-  <% end %>
-</td>
+<%= partial :'event_stats_row/buttons', locals: { event: event, organisation: organisation } %>
 <!-- Date -->
-<td data-sort="<%=event.start_time.to_fs(:db_local)%>"><%= when_details(event) %></td>
+<%= partial :'event_stats_row/date', locals: { event: event, organisation: organisation } %>
 <!-- Coordinator -->
-<td style="text-align: center">
-  <% if event.coordinator %>
-    <a href="/u/<%= event.coordinator.username %>">
-      <%= partial :'accounts/square', locals: { account: event.coordinator, width: '50px' } %>
-      <br>
-      <a href="/u/<%= event.coordinator.username %>"><%= event.coordinator.name %></a>
+<%= partial :'event_stats_row/coordinator', locals: { event: event, organisation: organisation } %>
+<!-- Organiser -->
+<%= partial :'event_stats_row/organiser', locals: { event: event, organisation: organisation } %>
+<!-- Facilitators -->
+<%= partial :'event_stats_row/facilitators', locals: { event: event, organisation: organisation } %>
+<!-- Tags -->
+<%= partial :'event_stats_row/tags', locals: { event: event, organisation: organisation } %>
+<!-- Activity -->
+<%= partial :'event_stats_row/activity', locals: { event: event, organisation: organisation } %>
+<!-- Local group -->
+<%= partial :'event_stats_row/local_group', locals: { event: event, organisation: organisation } %>
+<!-- Facebook event -->
+<%= partial :'event_stats_row/facebook_event', locals: { event: event, organisation: organisation } %>
+<!-- 30d views -->
+<%= partial :'event_stats_row/30d_views', locals: { event: event, organisation: organisation } %>
+<!-- Tickets sold-->
+<%= partial :'event_stats_row/tickets_sold', locals: { event: event, organisation: organisation } %>
+<!-- Checked in -->
+<%= partial :'event_stats_row/checked_in', locals: { event: event, organisation: organisation } %>
+<!-- Ticket revenue -->
+<%= partial :'event_stats_row/ticket_revenue', locals: { event: event, organisation: organisation } %>
+<!-- Donations -->
+<%= partial :'event_stats_row/donations', locals: { event: event, organisation: organisation } %>
+
+<% if organisation.stripe_client_id %>
+  <!-- Ticket revenue to revenue sharer -->
+  <%= partial :'event_stats_row/ticket_revenue_to_revenue_sharer', locals: { event: event, organisation: organisation } %>
+  <!-- Ticket revenue to organisation -->
+  <%= partial :'event_stats_row/ticket_revenue_to_organisation', locals: { event: event, organisation: organisation } %>
+  <!-- Revenue reported by Dandelion -->
+  <%= partial :'event_stats_row/revenue_reported_by_dandelion', locals: { event: event, organisation: organisation } %>
+  <!-- Revenue reported by Stripe -->
+  <%= partial :'event_stats_row/revenue_reported_by_stripe', locals: { event: event, organisation: organisation } %>
+  <!-- Stripe fees -->
+  <%= partial :'event_stats_row/stripe_fees', locals: { event: event, organisation: organisation } %>
+
+  <% if event_revenue_admin %>
+    <!-- Profit -->
+    <%= partial :'event_stats_row/profit', locals: { event: event, organisation: organisation } %>
+    <!-- Profit less donations, before allocations -->
+    <%= partial :'event_stats_row/profit_less_donations_before_allocations', locals: { event: event, organisation: organisation } %>
+    <% Event.profit_share_roles.each do |role| %>
+      <!-- Allocated to <%= role %> = Profit * profit_share_<%= role %> -->
+      <%= partial :'event_stats_row/allocated_to_role', locals: { event: event, organisation: organisation, role: role } %>
     <% end %>
-  </td>
+    <!-- Profit less donations, after allocations -->
+    <%= partial :'event_stats_row/profit_less_donations_after_allocations', locals: { event: event, organisation: organisation } %>
+    <!-- Profit including donations, after allocations -->
+    <%= partial :'event_stats_row/profit_including_donations_after_allocations', locals: { event: event, organisation: organisation } %>
+    <!-- Remaining to be paid -->
+    <%= partial :'event_stats_row/remaining_to_be_paid', locals: { event: event, organisation: organisation } %>
+  <% else %>
+    <% 9.times do %>
+      <td></td>
+    <% end %>
+  <% end %>
 
-  <!-- Organiser -->
-  <% if organisation.stripe_client_id %>
-    <td>
-      <% if event.organiser %>
-        <a href="/u/<%= event.organiser.username %>">
-          <%= partial :'accounts/square', locals: { account: event.organiser, width: '50px' } %>
-          <br>
-          <a href="/u/<%= event.organiser.username %>"><%= event.organiser.name %></a>
-        <% elsif event.revenue_sharer %>
-          <a href="/u/<%= event.revenue_sharer.username %>">
-            <%= partial :'accounts/square', locals: { account: event.revenue_sharer, width: '50px' } %>
-            <br />
-            <a href="/u/<%= event.revenue_sharer.username %>"><%= event.revenue_sharer.name %></a>
-            <br>
-            <%= event.revenue_share_to_revenue_sharer %>:<%= event.revenue_share_to_organisation %>
-          <% end %>
-        </td>
-      <% else %>
-        <td></td>
-      <% end %>
+<% else %>
+  <!-- No stripe_client_id-->
+  <% 14.times do %>
+    <td></td>
+  <% end %>
+<% end %>
 
-
-      <!-- Facilitators -->
-      <td style="text-align: center">
-        <% if event.event_facilitations.count > 0 %>
-          <% event.event_facilitations.each { |event_facilitation| %>
-          <%= partial :'accounts/square', locals: { account: event_facilitation.account, width: '50px' } %>
-          <br />
-          <a href="/u/<%= event_facilitation.account.username %>"><%= event_facilitation.account.name %></a>
-          <br />
-          <% } %>
-        <% end %>
-      </td>
-      <!-- Tags -->
-      <td>
-        <%= partial :'events/tag_labels', locals: { event: event } %>
-      </td>
-      <!-- Activity -->
-      <td style="text-align: center">
-        <% if event.activity %>
-          <% if event.activity.image %>
-            <a href="/activities/<%= event.activity.id %>">
-              <img src="<%= u event.activity.image.thumb('500x500#').url %>" style="width: 50px">
-            </a>
-            <br>
-          <% end %>
-          <a href="/activities/<%= event.activity.id %>"><%= event.activity.name %></a>
-        <% end %>
-      </td>
-      <!-- Local group -->
-      <td>
-        <% if event.local_group %>
-          <a href="/local_groups/<%= event.local_group.id %>"><%= event.local_group.name %></a>
-        <% end %>
-      </td>
-      <!-- Facebook event -->
-      <td>
-        <% if event.facebook_event_url %>
-          <a target="_blank" href="<%= event.facebook_event_url %>"><i class="bi bi-facebook"></i></a>
-        <% end %>
-      </td>
-      <!-- 30d views -->
-      <td data-sort="<%=event.page_views_count%>">
-        <%= event.page_views_count %>
-      </td>
-      <!-- Tickets sold-->
-      <td data-sort="<%=event.tickets.count%>">
-        <%= partial :'events/progress', locals: { event: event } %>
-      </td>
-      <!-- Checked in -->
-      <td>
-        <%= partial :'events/checked_in', locals: { event: event } %>
-      </td>
-
-
-      <% if organisation.stripe_client_id %>
-        <!-- Ticket revenue -->
-        <td data-sort="<%=money_sort(event, organisation, :discounted_ticket_revenue)%>">
-          <span data-toggle="tooltip" title="Reported by Dandelion" class="label label-primary d-block mb-1"><%= m event.discounted_ticket_revenue, event.currency %></span>
-          <span data-toggle="tooltip" title="Reported by Stripe (48h delay)" class="label label-stripe d-block mb-1"><%= m event.stripe_ticket_revenue, event.currency %></span>
-        </td>
-        <!-- Donations -->
-        <td data-sort="<%=money_sort(event, organisation, :donation_revenue)%>">
-          <span data-toggle="tooltip" title="Reported by Dandelion" class="label label-primary d-block mb-1"><%= m event.donation_revenue, event.currency %></span>
-          <span data-toggle="tooltip" title="Reported by Stripe (48h delay)" class="label label-stripe d-block mb-1"><%= m event.stripe_donations, event.currency %></span>
-        </td>
-      <% else %>
-        <!-- Ticket revenue -->
-        <% if organisation.hide_ticket_revenue %>
-          <td></td>
-        <% else %>
-          <td data-sort="<%=money_sort(event, organisation, :discounted_ticket_revenue)%>">
-            <% if event.discounted_ticket_revenue > 0 %>
-              <%= m event.discounted_ticket_revenue, event.currency %>
-            <% end %>
-          </td>
-        <% end %>
-        <!-- Donations -->
-        <td data-sort="<%=money_sort(event, organisation, :donation_revenue)%>">
-          <% if event.donation_revenue > 0 && !event.purchase_url %>
-            <%= m event.donation_revenue, event.currency %>
-          <% end %>
-        </td>
-      <% end %>
-
-      <% if organisation.stripe_client_id %>
-        <!-- Ticket revenue to revenue sharer -->
-        <% if event.revenue_sharer %>
-          <td data-sort="<%=money_sort(event, organisation, :stripe_ticket_revenue_to_revenue_sharer)%>">
-            <span data-toggle="tooltip" title="Reported by Dandelion" class="label label-primary d-block mb-1"><%= m event.ticket_revenue_to_revenue_sharer, event.currency %></span>
-            <span data-toggle="tooltip" title="Reported by Stripe (48h delay)" class="label label-stripe d-block mb-1"><%= m event.stripe_ticket_revenue_to_revenue_sharer, event.currency %></span>
-          </td>
-        <% else %>
-          <td></td>
-        <% end %>
-        <!-- Ticket revenue to organisation -->
-        <td data-sort="<%=money_sort(event, organisation, :stripe_ticket_revenue_to_organisation)%>">
-          <span data-toggle="tooltip" title="Reported by Dandelion" class="label label-primary d-block mb-1"><%= m event.ticket_revenue_to_organisation, event.currency %></span>
-          <span data-toggle="tooltip" title="Reported by Stripe (48h delay)" class="label label-stripe d-block mb-1"><%= m event.stripe_ticket_revenue_to_organisation, event.currency %></span>
-        </td>
-        <!-- Revenue reported by Dandelion -->
-        <td data-sort="<%=money_sort(event, organisation, :revenue)%>">
-          <% dandelion = "#{m(event.revenue, event.currency)} from #{pluralize(event.orders.and(:transferred.ne => true, :payment_intent.ne => nil).count, 'order')}" %>
-          <%= dandelion.split(' from ').first %> from <a href="/events/<%=event.id%>/orders"><%= dandelion.split(' from ').last %></a>
-        </td>
-        <!-- Revenue reported by Stripe -->
-        <% 
-        stripe_charges = event.stripe_charges.and(:balance_float.gt => 0, :order_id.nin => Order.and(transferred: true).pluck(:id))
-        stripe_charges_money = stripe_charges.sum(&:balance)
-        stripe = "#{m stripe_charges_money, event.currency} from #{pluralize(stripe_charges.count, 'charge')}"
-        
-        stripe_charges_transferred = event.stripe_charges.and(:balance_float.gt => 0, :order_id.in => Order.and(transferred: true).pluck(:id))
-        stripe_charges_transferred_money = stripe_charges_transferred.sum(&:balance)
-        stripe_transferred = "#{m stripe_charges_transferred_money, event.currency} from #{pluralize(stripe_charges_transferred.count, 'transferred charge')}"
-        
-        close_enough = (stripe_charges_money - event.revenue).abs.cents < 100
-        bg_class = if event.end_time.to_date < Date.today - 1; (close_enough ? 'bg-success' : 'bg-warning'); end
-        %>
-        <td data-sort="<%=money_sort(event, organisation, :stripe_revenue)%>" <% if bg_class %> class="<%= bg_class %>" <% end %>>
-          <%= stripe.split(' from ').first %> from <a <% if bg_class %> class="text-white font-weight-bold" <% end %> href="/events/<%=event.id%>/stripe_charges"><%= stripe.split(' from ').last %></a>
-          <% if stripe_charges_transferred.count > 0 %>
-            +
-            <%= stripe_transferred.split(' from ').first %> from <a <% if bg_class %> class="text-white font-weight-bold" <% end %> href="/events/<%=event.id%>/stripe_charges"><%= stripe_transferred.split(' from ').last %></a>
-          <% end %>
-          <% if event.stripe_revenue_adjustment && event.stripe_revenue_adjustment != 0 %>
-            +
-            <%= m event.stripe_revenue_adjustment, event.currency %> adjustment
-          <% end %>
-        </td>
-        <!-- Stripe fees -->
-        <td data-sort="<%=money_sort(event, organisation, :stripe_fees)%>">
-          <%= m event.stripe_fees, event.currency %>
-        </td>
-
-        <% if event_revenue_admin %>
-          <!-- Profit -->
-          <td data-sort="<%=money_sort(event, organisation, :profit)%>">
-            <%= m event.profit, event.currency %>
-          </td>
-
-          <!-- Profit less donations, before allocations -->
-          <td data-sort="<%=money_sort(event, organisation, :profit_less_donations)%>">
-            <%= m event.profit_less_donations, event.currency %>
-          </td>
-          <% Event.profit_share_roles.each do |role| %>
-            <!-- Allocated to <%= role %> = Profit * profit_share_<%= role %> -->
-            <% if role == 'facilitator' && event.revenue_sharer %>
-              <td></td>
-            <% else %>
-              <td data-sort="<%=money_sort(event, organisation, :"profit_to_#{role}")%>">
-                <% if event.revenue_sharer %>
-                  <%= "#{event.send("profit_share_to_#{role}")}/#{event.revenue_share_to_organisation}" %><br />
-                <% else %>
-                  <%= "#{event.send("profit_share_to_#{role}")}%" %><br />
-                <% end %>
-                <%= m event.send("profit_to_#{role}"), event.currency %>
-                <br />
-                <br />
-                <div class="p-1">
-                  <%= m event.send("paid_to_#{role}"), event.currency %> paid
-                </div>
-                <a <% if event.send("remaining_to_#{role}") > 0 %> href="/events/<%=event.id%>/rpayments?create=1&role=<%=role%>&amount=<%=event.send("remaining_to_#{role}").abs%>&currency=<%=event.currency%>" <% else %> href="/events/<%=event.id%>/rpayments" <% end %> class="d-block p-1<% overpaid = nil; if event.send("remaining_to_#{role}") > 0 %> bg-warning <% elsif event.send("remaining_to_#{role}") < 0; overpaid = true %> bg-danger <% end %>">
-                  <%= m event.send("remaining_to_#{role}").abs, event.currency %> <%= overpaid ? 'overpaid' : 'remaining' %>
-                </a>
-              </td>
-            <% end %>
-          <% end %>
-          <!-- Profit less donations, after allocations -->
-          <td data-sort="<%=money_sort(event, organisation, :profit_less_donations_less_allocations)%>">
-            <% if event.revenue_sharer %>
-              <%= "#{event.profit_share_to_organisation}/#{event.revenue_share_to_organisation}" %><br />
-            <% else %>
-              <%= "#{event.profit_share_to_organisation}%" %><br />
-            <% end %>
-            <%= m event.profit_less_donations_less_allocations, event.currency %>
-          </td>
-          <!-- Profit including donations, after allocations -->
-          <td data-sort="<%=money_sort(event, organisation, :profit_less_allocations)%>">
-            <%= m event.profit_less_allocations, event.currency %>
-          </td>
-          <!-- Remaining to be paid -->
-          <td data-sort="<%=money_sort(event, organisation, :remaining_sum)%>">
-            <%= m event.remaining_sum, event.currency %>
-          </td>
-        <% else %>
-          <% 8.times do %>
-            <td></td>
-          <% end %>
-        <% end %>
-
-      <% else %>
-        <!-- No stripe_client_id-->
-        <% 14.times do %>
-          <td></td>
-        <% end %>
-      <% end %>
-
-      <!-- Feedback -->
-      <td>
-        <% if event.past? and event.attendees.count > 0 and event.event_feedbacks.count > 0 %>
-          <a href="/events/<%= event.id %>/feedback"><%= pluralize(event.event_feedbacks.count, 'response') %></a>
-          (<%= "#{(100 * (event.event_feedbacks.count.to_f / event.attendees.count)).round}%" %>)
-          <% if average_rating = event.event_feedbacks.average_rating %>
-            <br>
-            <span style="font-size: 20px" title="Average rating <%= average_rating %>">
-              <%= average_rating %>
-            </span>
-          <% end %>
-        <% end %>
-      </td>
+<!-- Feedback -->
+<%= partial :'event_stats_row/feedback', locals: { event: event, organisation: organisation } %>

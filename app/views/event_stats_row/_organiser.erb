@@ -1,0 +1,19 @@
+<% if organisation.stripe_client_id %>
+  <td>
+    <% if event.organiser %>
+      <a href="/u/<%= event.organiser.username %>">
+        <%= partial :'accounts/square', locals: { account: event.organiser, width: '50px' } %>
+        <br>
+        <a href="/u/<%= event.organiser.username %>"><%= event.organiser.name %></a>
+      <% elsif event.revenue_sharer %>
+        <a href="/u/<%= event.revenue_sharer.username %>">
+          <%= partial :'accounts/square', locals: { account: event.revenue_sharer, width: '50px' } %>
+          <br />
+          <a href="/u/<%= event.revenue_sharer.username %>"><%= event.revenue_sharer.name %></a>
+          <br>
+          <%= event.revenue_share_to_revenue_sharer %>:<%= event.revenue_share_to_organisation %>
+        <% end %>
+      </td>
+    <% else %>
+      <td></td>
+    <% end %>
