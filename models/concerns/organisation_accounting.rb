@@ -7,7 +7,7 @@ module OrganisationAccounting
 
   class_methods do
     def contribution_requested_per_event_gbp
-      20
+      25
     end
 
     def paid_up_fraction
