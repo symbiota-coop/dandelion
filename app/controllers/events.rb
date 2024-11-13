@@ -369,7 +369,7 @@ Dandelion::App.controller do
                                 end
     if successful_update_or_save
       waitship = @event.waitships.create(account: @account)
-      if waitship.persisted?
+      if @event.waitships.find_by(account: @account)
         redirect "/e/#{@event.slug}?added_to_waitlist=true"
       else
         flash[:error] = waitship.errors.full_messages.join('; ')
