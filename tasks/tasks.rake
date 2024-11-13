@@ -40,7 +40,7 @@ namespace :organisations do
     f.css('form input')[1].focus.type(ENV['SQUARESPACE_EMAIL'])
     f.at_css('form button').click
     organisation = Organisation.find_by(slug: ENV['SQUARESPACE_ORGANISATION_SLUG'])
-    sleep 10
+    sleep 30
     raise "Squarespace: Account not created for #{ENV['SQUARESPACE_EMAIL']}" unless (account = Account.find_by(email: ENV['SQUARESPACE_EMAIL'])) && account.organisationships.find_by(organisation: organisation)
   end
 
