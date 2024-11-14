@@ -19,6 +19,7 @@ Capybara.register_driver :cuprite do |app|
   options = {}
   options[:js_errors] = false
   options[:timeout] = 60
+  options[:process_timeout] = 30
   options[:window_size] = [1280, 720]
   Capybara::Cuprite::Driver.new(app, options)
 end
