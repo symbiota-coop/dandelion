@@ -14,8 +14,9 @@ Dandelion::App.helpers do
                     begin
                       MaxMinder.download
                       puts 'MaxMind download succeeded'
-                    rescue StandardError
+                    rescue StandardError => e
                       puts 'MaxMind download failed'
+                      airbrake_notify(e)
                     end
                   end
 
