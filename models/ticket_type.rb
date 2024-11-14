@@ -102,6 +102,10 @@ class TicketType
   handle_asynchronously :send_payment_reminder
 
   def remaining
+    (quantity || 0) - tickets.and(made_available_at: nil).count
+  end
+
+  def remaining_including_made_available
     (quantity || 0) - tickets.count
   end
 

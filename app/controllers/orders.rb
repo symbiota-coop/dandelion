@@ -296,6 +296,14 @@ Dandelion::App.controller do
     200
   end
 
+  get '/tickets/:id/toggle_resale' do
+    @ticket = Ticket.find(params[:id]) || not_found
+    halt 400 unless @ticket.account == current_account
+    @event = @ticket.event
+    @ticket.update_attribute(:made_available_at, @ticket.made_available_at ? nil : Time.now)
+    redirect back
+  end
+
   get '/tickets/:id/price' do
     @ticket = Ticket.find(params[:id]) || not_found
     @event = @ticket.event

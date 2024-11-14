@@ -17,12 +17,12 @@
               <p><a href="/events/<%=@event.id%>/give_feedback">Give feedback</a></p>
             <% end %>
           <% end %>
-          <p class="mb-1">Click an order to review the confirmation email:</p>
-          <ul class="icon-list mb-0">
-            <% orders.each { |order| %>
-            <li><i class="bi bi-ticket-detailed-fill"></i><a target="_blank" href="/orders/<%= order.id %>"><%= d = order.description_elements; d.empty? ? order.created_at : d.join(', ') %></a></li>
-            <% } %>
-          </ul>
+          <% if @event.enable_resales? %>
+            <p>
+              Click a ticket to mark it for resale.
+            </p>
+          <% end %>
+          <%= partial :'events/orders', locals: { event: @event, orders: orders } %>
         </div>
         <% pmails = @event.pmails_as_mailable.and(:sent_at.ne => nil).order('sent_at desc') %>
         <% if pmails.count > 0 %>

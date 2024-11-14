@@ -1,0 +1,18 @@
+<% orders.each { |order| %>
+<a target="_blank" href="/orders/<%= order.id %>">View order confirmation <% if orders.count > 1 %>sent <%= order.created_at %><% end %></a>
+<ul class="icon-list mb-0">
+  <% order.tickets.each { |ticket| %>
+  <li>
+    <i class="bi bi-ticket-detailed-fill"></i>
+    <% if event.enable_resales? %>
+      <a class="text-dark" href="/tickets/<%= ticket.id %>/toggle_resale"><%= ticket.ticket_type.name %></a>
+      <% if ticket.made_available_at %>
+        <span class="label label-default" style="padding: .1em .5em">On resale</span>
+      <% end %>
+    <% else %>
+      <%= ticket.ticket_type.name %>
+    <% end %>
+  </li>
+  <% } %>
+</ul>
+<% } %>
