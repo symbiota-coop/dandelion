@@ -52,6 +52,7 @@ gem 'faraday'
 gem 'ferrum'
 gem 'jwt'
 gem 'mechanize'
+gem 'ruby-openai'
 gem 'yt'
 
 # Payments

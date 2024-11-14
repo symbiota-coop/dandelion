@@ -288,5 +288,7 @@ $(function () {
     $('.pace-inactive').show()
   })
 
-  Pace.stop()
+  if (typeof Pace !== 'undefined') {
+    Pace.stop()
+  }
 })

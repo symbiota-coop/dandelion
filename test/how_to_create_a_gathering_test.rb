@@ -68,7 +68,7 @@ class DandelionTest < ActiveSupport::TestCase
       fill_in 'Cost', with: 50
     }
     click_button 'Create option'
-    narrate %(This is what it looks like after adding Standard and Higher income tiers too.), lambda {
+    narrate %(After adding Standard and Higher income tiers also, it will look like this.), lambda {
       click_link 'Add an option'
       fill_in 'Name', with: 'Standard'
       fill_in 'Capacity', with: 100

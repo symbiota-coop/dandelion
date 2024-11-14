@@ -83,11 +83,9 @@ module ActiveSupport
 
       image_files = Dir.glob("#{Capybara.save_path}/*_before_*.png").sort_by { |file| file[/\d+/].to_i }
 
-      # Generate silent AAC audio files
+      # Generate silent AAC audio file
       system("ffmpeg -f lavfi -i anullsrc=r=44100:cl=stereo -t 2 -q:a 9 -acodec aac #{Capybara.save_path}/silent_2.aac") unless File.exist?("#{Capybara.save_path}/silent_2.aac")
       system("ffmpeg -i #{Capybara.save_path}/silent_2.aac -ar 44100 -ac 2 -c:a aac -b:a 192k #{Capybara.save_path}/silent_normalized_2.aac") unless File.exist?("#{Capybara.save_path}/silent_normalized_2.aac")
-      system("ffmpeg -f lavfi -i anullsrc=r=44100:cl=stereo -t 3 -q:a 9 -acodec aac #{Capybara.save_path}/silent_3.aac") unless File.exist?("#{Capybara.save_path}/silent_3.aac")
-      system("ffmpeg -i #{Capybara.save_path}/silent_3.aac -ar 44100 -ac 2 -c:a aac -b:a 192k #{Capybara.save_path}/silent_normalized_3.aac") unless File.exist?("#{Capybara.save_path}/silent_normalized_3.aac")
 
       # Open file list for concatenation
       File.open("#{Capybara.save_path}/file_list.txt", 'w') do |file|
@@ -110,7 +108,7 @@ module ActiveSupport
           # Generate individual video for each image/audio pair with normalized audio
           system("ffmpeg -loop 1 -i #{before_image} -i #{Capybara.save_path}/silent_normalized_2.aac -c:v libx264 -pix_fmt yuv420p -c:a aac -b:a 192k -shortest #{Capybara.save_path}/#{label}_before.mp4") if File.exist?(after_image)
           system("ffmpeg -loop 1 -i #{before_image} -i #{Capybara.save_path}/#{label}_audio_normalized_#{hash}.aac -c:v libx264 -pix_fmt yuv420p -c:a aac -b:a 192k -shortest #{Capybara.save_path}/#{label}_during.mp4")
-          system("ffmpeg -loop 1 -i #{after_image} -i #{Capybara.save_path}/silent_normalized_3.aac -c:v libx264 -pix_fmt yuv420p -c:a aac -b:a 192k -shortest #{Capybara.save_path}/#{label}_after.mp4") if File.exist?(after_image)
+          system("ffmpeg -loop 1 -i #{after_image} -i #{Capybara.save_path}/silent_normalized_2.aac -c:v libx264 -pix_fmt yuv420p -c:a aac -b:a 192k -shortest #{Capybara.save_path}/#{label}_after.mp4") if File.exist?(after_image)
 
           # Add entries to file list for concatenation
           file.puts("file '#{label}_before.mp4'") if File.exist?(after_image)
