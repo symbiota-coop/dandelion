@@ -135,24 +135,24 @@ Dandelion::App.controller do
       else
         redirect '/accounts/edit'
       end
-    elsif @account.email && (account = Account.find_by(email: @account.email.downcase))
+    elsif @account.email && (existing_account = Account.find_by(email: @account.email.downcase))
       if params[:organisation_id] || params[:activity_id] || params[:local_group_id] || params[:event_id]
         if params[:organisation_id]
           @organisation = Organisation.find(params[:organisation_id])
-          @organisation.organisationships.create account: account, skip_welcome: params[:skip_welcome], referrer_id: params[:referrer_id]
+          @organisation.organisationships.create account: existing_account, skip_welcome: params[:skip_welcome], referrer_id: params[:referrer_id]
         elsif params[:activity_id]
           @activity = Activity.find(params[:activity_id])
-          @activity.organisation.organisationships.create account: @account
-          @activity.activityships.create account: @account
+          @activity.organisation.organisationships.create account: existing_account
+          @activity.activityships.create account: existing_account
         elsif params[:local_group_id]
           @local_group = LocalGroup.find(params[:local_group_id])
-          @local_group.organisation.organisationships.create account: @account
-          @local_group.local_groupships.create account: @account
+          @local_group.organisation.organisationships.create account: existing_account
+          @local_group.local_groupships.create account: existing_account
         elsif params[:event_id]
           @event = Event.find(params[:event_id])
-          @event.organisation.organisationships.create(account: @account)
-          @event.activity.activityships.create(account: @account) if @event.activity
-          @event.local_group.local_groupships.create(account: @account) if @event.local_group
+          @event.organisation.organisationships.create(account: existing_account)
+          @event.activity.activityships.create(account: existing_account) if @event.activity
+          @event.local_group.local_groupships.create(account: existing_account) if @event.local_group
         end
         if params[:recaptcha_skip_secret]
           200

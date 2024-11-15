@@ -123,14 +123,8 @@ class Organisationship
   attr_accessor :skip_welcome
 
   after_create do
-    if account.coordinates
-      relevant_local_groups.each do |local_group|
-        local_group.local_groupships.find_or_create_by(account: account)
-      end
-    end
+    relevant_local_groups.each { |local_group| local_group.local_groupships.create account: account } if account.coordinates
     account.update_attribute(:organisation_ids_cache, ((account.organisation_ids_cache || []) + [organisation.id]).uniq)
-  rescue Mongo::Error::OperationFailure => e
-    Airbrake.notify(e)
   end
 
   def relevant_local_groups
