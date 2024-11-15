@@ -8,7 +8,7 @@ Dandelion::App.helpers do
                   current_account.time_zone
                 elsif session[:time_zone]
                   session[:time_zone]
-                elsif File.exist?('GeoLite2-City.mmdb') && ip_from_cloudflare
+                elsif ip_from_cloudflare
 
                   if Padrino.env == :production && (!File.exist?('GeoLite2-City.mmdb') || File.ctime('GeoLite2-City.mmdb') < 1.day.ago)
                     begin
