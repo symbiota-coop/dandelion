@@ -142,6 +142,14 @@ namespace :events do
 end
 
 namespace :stats do
+  task facilitator_feedback_counts: :environment do
+    fragment = Fragment.find_or_create_by(key: 'facilitator_feedback_counts')
+    feedback_counts = Account.and(:id.in => EventFacilitation.pluck(:account_id)).map do |account|
+      [account.id.to_s, account.unscoped_event_feedbacks_as_facilitator.count]
+    end
+    fragment.update_attributes expires: 1.day.from_now, value: feedback_counts.sort_by { |_, freq| -freq }.to_json
+  end
+
   task monthly_contributions: :environment do
     d = [Date.new(24.months.ago.year, 24.months.ago.month, 1)]
     d << (d.last + 1.month) while d.last < Date.new(Date.today.year, Date.today.month, 1)
