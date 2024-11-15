@@ -159,6 +159,7 @@
                 <big class="d-block mb-1">
                   <i class="bi bi-credit-card"></i>
                   Connected to <%= @organisation.stripe_account_name ? "#{@organisation.stripe_account_name}'s Stripe account" : 'Stripe' %>
+                  (id: <%= @organisation.stripe_user_id %>)
                 </big>
                 <a class="btn btn-danger btn-sm" href="/organisations/stripe_disconnect?organisation_id=<%= @organisation.id %>">Disconnect</a>
               <% else %>
