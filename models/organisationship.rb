@@ -126,11 +126,11 @@ class Organisationship
     if account.coordinates
       relevant_local_groups.each do |local_group|
         local_group.local_groupships.find_or_create_by(account: account)
-      rescue Mongo::Error::OperationFailure => e
-        Airbrake.notify(e)
       end
     end
     account.update_attribute(:organisation_ids_cache, ((account.organisation_ids_cache || []) + [organisation.id]).uniq)
+  rescue Mongo::Error::OperationFailure => e
+    Airbrake.notify(e)
   end
 
   def relevant_local_groups
