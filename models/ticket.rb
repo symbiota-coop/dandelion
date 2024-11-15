@@ -91,8 +91,7 @@ class Ticket
   end
 
   def payment_completed!
-    # && order so refunds are only triggered by user-made purchases
-    if event.enable_resales? && order && ticket_type.remaining_including_made_available < 0 && (ticket = ticket_type.tickets.and(:made_available_at.ne => nil).order('made_available_at asc').first)
+    if event.enable_resales? && ticket_type.remaining_including_made_available < 0 && (ticket = ticket_type.tickets.and(:made_available_at.ne => nil).order('made_available_at asc').first)
       ticket.refund
       ticket.destroy
     end
