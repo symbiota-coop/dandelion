@@ -6,7 +6,7 @@ account_ids_freq = account_ids_freq.paginate(page: params[:page], per_page: 10)
 
 <% accounts = Account.and(:id.in => account_ids_freq.map { |id, freq| id }) %>
 <ul class="search-result-list">
-  <% account_ids_freq.each { |id, freq|; account = accounts.find { |a| a.id == id } %>
+  <% account_ids_freq.each { |id, freq|; account = accounts.find { |a| a.id.to_s == id } %>
   <li>
     <%= partial 'accounts/search_result', locals: { account: account, facilitator_info: true } %>
   </li>
