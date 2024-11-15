@@ -90,13 +90,12 @@ class Ticket
     end
   end
 
-  after_create do
+  def payment_completed!
     # && order so refunds are only triggered by user-made purchases
     if event.enable_resales? && order && ticket_type.remaining_including_made_available < 0 && (ticket = ticket_type.tickets.and(:made_available_at.ne => nil).order('made_available_at asc').first)
       ticket.refund
       ticket.destroy
     end
-    # ticket might be destroyed again, so this should move
     event.waitships.find_by(account: account).try(:destroy)
     event.gathering.memberships.create(account: account, unsubscribed: true) if event.gathering
   end

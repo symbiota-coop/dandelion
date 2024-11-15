@@ -119,6 +119,7 @@ class Order
     set(payment_completed: true)
     tickets.set(payment_completed: true)
     donations.set(payment_completed: true)
+    tickets.each(&:payment_completed!)
     event.clear_cache if event
   end
 
