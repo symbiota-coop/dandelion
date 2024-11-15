@@ -42,7 +42,7 @@ Dandelion::App.helpers do
   end
 
   def env_yaml
-    request.env.select { |_k, v| v.is_a?(String) }.to_yaml
+    request.env.select { |k, v| v.is_a?(String) && k != 'rack.request.form_vars' }.to_yaml
   end
 
   def concise_when_details(whenable, with_zone: false)
