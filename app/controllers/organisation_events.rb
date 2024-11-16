@@ -166,8 +166,10 @@ Dandelion::App.controller do
       erb :'events/event_stats'
     when :csv
       CSV.generate do |csv|
+        headers = []
+        headers << 'name'
+
         headers_basic = %w[
-          name
           date
           coordinator
           organiser
@@ -182,7 +184,7 @@ Dandelion::App.controller do
           ticket_revenue
           donations
         ]
-        headers = headers_basic
+        headers += headers_basic
 
         if @organisation.stripe_client_id
           headers_stripe_client_id = %w[
@@ -216,7 +218,10 @@ Dandelion::App.controller do
         csv << headers
 
         @events.each do |event|
-          row = headers_basic.map do |header|
+          row = []
+          row << event.name
+
+          row += headers_basic.map do |header|
             partial(:"event_stats_row/#{header}", locals: { event: event, organisation: @organisation })
           end
 
