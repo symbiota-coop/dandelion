@@ -169,31 +169,11 @@ Dandelion::App.controller do
         headers = []
         headers << 'name'
 
-        headers_basic = %w[
-          date
-          coordinator
-          organiser
-          facilitators
-          tags
-          activity
-          local_group
-          facebook_event
-          30d_views
-          tickets_sold
-          checked_in
-          ticket_revenue
-          donations
-        ]
+        headers_basic = %w[date coordinator organiser facilitators tags activity local_group facebook_event 30d_views tickets_sold checked_in ticket_revenue donations]
         headers += headers_basic
 
         if @organisation.stripe_client_id
-          headers_stripe_client_id = %w[
-            ticket_revenue_to_revenue_sharer
-            ticket_revenue_to_organisation
-            revenue_reported_by_dandelion
-            revenue_reported_by_stripe
-            stripe_fees
-          ]
+          headers_stripe_client_id = %w[ticket_revenue_to_revenue_sharer ticket_revenue_to_organisation revenue_reported_by_dandelion revenue_reported_by_stripe stripe_fees]
           headers += headers_stripe_client_id
 
           headers += %w[
