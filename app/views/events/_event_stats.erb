@@ -77,8 +77,6 @@
       <th>Coordinator</th>
       <% if organisation.stripe_client_id %>
         <th>Organiser</th>
-      <% else %>
-        <th></th>
       <% end %>
       <th>Facilitators</th>
       <th>Tags</th>
@@ -104,10 +102,6 @@
         <th data-money>Profit less donations, after allocations</th>
         <th data-money>Profit including donations, after allocations</th>
         <th data-money>Remaining to be paid</th>
-      <% else %>
-        <% 14.times do %>
-          <th></th>
-        <% end %>
       <% end %>
       <th>Feedback</th>
     </tr>
@@ -124,8 +118,6 @@
         <th></th>
         <% if organisation.stripe_client_id %>
           <th></th>
-        <% else %>
-          <th></th>
         <% end %>
         <th></th>
         <th></th>
@@ -137,8 +129,10 @@
         <th></th>
         <th></th>
         <th></th>
-        <% 14.times do %>
-          <th></th>
+        <% if organisation.stripe_client_id %>
+          <% 14.times do %>
+            <th></th>
+          <% end %>
         <% end %>
         <th></th>
       </tr>

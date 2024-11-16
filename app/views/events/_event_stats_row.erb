@@ -7,7 +7,9 @@
 <!-- Coordinator -->
 <%= partial :'event_stats_row/coordinator', locals: { event: event, organisation: organisation } %>
 <!-- Organiser -->
-<%= partial :'event_stats_row/organiser', locals: { event: event, organisation: organisation } %>
+<% if organisation.stripe_client_id %>
+  <%= partial :'event_stats_row/organiser', locals: { event: event, organisation: organisation } %>
+<% end %>
 <!-- Facilitators -->
 <%= partial :'event_stats_row/facilitators', locals: { event: event, organisation: organisation } %>
 <!-- Tags -->
@@ -60,12 +62,6 @@
     <% 9.times do %>
       <td></td>
     <% end %>
-  <% end %>
-
-<% else %>
-  <!-- No stripe_client_id-->
-  <% 14.times do %>
-    <td></td>
   <% end %>
 <% end %>
 
