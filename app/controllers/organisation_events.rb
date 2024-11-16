@@ -121,7 +121,7 @@ Dandelion::App.controller do
     end
   end
 
-  get '/o/:slug/events/stats' do
+  get '/o/:slug/events/stats', provides: %i[html csv] do
     @organisation = Organisation.find_by(slug: params[:slug]) || not_found
     organisation_admins_only!
     @from = params[:from] ? parse_date(params[:from]) : Date.today
@@ -161,6 +161,101 @@ Dandelion::App.controller do
       @events = @events.and(:id.in => events_with_discrepancy.pluck(:id))
     end
     @events = @events.deleted if params[:deleted]
-    erb :'events/event_stats'
+    case content_type
+    when :html
+      erb :'events/event_stats'
+    when :csv
+      CSV.generate do |csv|
+        headers_basic = %w[
+          name
+          date
+          coordinator
+          organiser
+          facilitators
+          tags
+          activity
+          local_group
+          facebook_event
+          30d_views
+          tickets_sold
+          checked_in
+          ticket_revenue
+          donations
+        ]
+        headers = headers_basic
+
+        if @organisation.stripe_client_id
+          headers_stripe_client_id = %w[
+            ticket_revenue_to_revenue_sharer
+            ticket_revenue_to_organisation
+            revenue_reported_by_dandelion
+            revenue_reported_by_stripe
+            stripe_fees
+          ]
+          headers += headers_stripe_client_id
+
+          headers += %w[
+            profit
+            profit_less_donations_before_allocations
+          ]
+          Event.profit_share_roles.each do |role|
+            headers << "allocated_to_#{role}"
+          end
+          headers += %w[
+            profit_less_donations_after_allocations
+            profit_including_donations_after_allocations
+            remaining_to_be_paid
+          ]
+        end
+
+        headers += ['feedback']
+
+        csv << headers
+
+        @events.each do |event|
+          row = headers_basic.map do |header|
+            partial(:"event_stats_row/#{header}", locals: { event: event, organisation: @organisation })
+          end
+
+          if @organisation.stripe_client_id
+            row += headers_stripe_client_id.map do |header|
+              partial(:"event_stats_row/#{header}", locals: { event: event, organisation: @organisation })
+            end
+
+            if event_revenue_admin?(event)
+              row += [
+                partial(:'event_stats_row/profit', locals: { event: event, organisation: @organisation }),
+                partial(:'event_stats_row/profit_less_donations_before_allocations', locals: { event: event, organisation: @organisation })
+              ]
+
+              Event.profit_share_roles.each do |role|
+                row << m(event.send("remaining_to_#{role}").abs, event.currency)
+              end
+
+              row += [
+                partial(:'event_stats_row/profit_less_donations_after_allocations', locals: { event: event, organisation: @organisation }),
+                partial(:'event_stats_row/profit_including_donations_after_allocations', locals: { event: event, organisation: @organisation }),
+                partial(:'event_stats_row/remaining_to_be_paid', locals: { event: event, organisation: @organisation })
+              ]
+            else
+              row += 9.times.map { '' }
+            end
+          end
+
+          row << partial(:'event_stats_row/feedback', locals: { event: event, organisation: @organisation })
+
+          row.each_with_index do |cell, i|
+            html = Nokogiri::HTML(cell)
+            if html.search('td').empty?
+              row[i] = cell
+            else
+              html.search('script').remove
+              row[i] = html.search('td').children.text.strip.gsub("\n", ',').gsub(/\s+/, ' ')
+            end
+          end
+          csv << row
+        end
+      end
+    end
   end
 end

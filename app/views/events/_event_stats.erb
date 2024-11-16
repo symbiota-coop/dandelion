@@ -97,7 +97,6 @@
         <th data-money>Revenue reported by Stripe (48h delay)</th>
         <th data-money>Stripe fees</th>
         <th data-money>Profit</th>
-
         <th data-money>Profit less donations, before allocations</th>
         <% Event.profit_share_roles.each do |role| %>
           <th data-money>Allocated to <%= role.gsub('_',' ') %></th>
