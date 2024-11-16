@@ -116,6 +116,11 @@ module ActiveSupport
           file.puts("file '#{label}_during.mp4'")
           file.puts("file '#{label}_after.mp4'") if File.exist?(after_image)
         end
+
+        # Add 2 extra seconds of silence at the end using the last image
+        last_image = image_files.last
+        system("ffmpeg -loop 1 -i #{last_image} -i #{Capybara.save_path}/silent_normalized_2.aac -c:v libx264 -pix_fmt yuv420p -c:a aac -b:a 192k -shortest #{Capybara.save_path}/finale.mp4")
+        file.puts("file 'finale.mp4'")
       end
 
       # Concatenate all the individual video segments into a final video
