@@ -199,7 +199,7 @@ Dandelion::App.controller do
             profit_less_donations_before_allocations
           ]
           Event.profit_share_roles.each do |role|
-            headers << "allocated_to_#{role}"
+            headers << "remaining_to_#{role}"
           end
           headers += %w[
             profit_less_donations_after_allocations
@@ -250,7 +250,7 @@ Dandelion::App.controller do
               row[i] = cell
             else
               html.search('script').remove
-              row[i] = html.search('td').children.text.strip.gsub("\n", ',').gsub(/\s+/, ' ')
+              row[i] = html.search('td').children.text.split("\n").reject(&:blank?).map(&:strip).join(', ')
             end
           end
           csv << row
