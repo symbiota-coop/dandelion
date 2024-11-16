@@ -10,11 +10,11 @@
     </div>
   <% end %>
 <% end %>
-<span class="d-inline-block d-lg-none">
+<div class="d-inline-block mb-1 d-lg-none">
   <% if organisation_monthly_donor_plus? %>
-    <a class="btn btn-outline-primary mb-1" href="/o/<%= @organisation.slug %>/members">Members' area</a>
+    <a class="btn btn-outline-primary" href="/o/<%= @organisation.slug %>/members">Members' area</a>
   <% end %>
-</span>
+</div>
 <% if @organisation.stripe_client_id %>
   <% if (organisationship = @organisation.organisationships.find_by(:account => current_account, :stripe_connect_json.ne => nil)) %>
     <div class="card my-1">
