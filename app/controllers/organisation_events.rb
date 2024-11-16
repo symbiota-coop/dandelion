@@ -199,16 +199,19 @@ Dandelion::App.controller do
             profit_less_donations_before_allocations
           ]
           Event.profit_share_roles.each do |role|
-            headers << "remaining_to_#{role}"
+            headers << "allocated_to_#{role}"
           end
           headers += %w[
             profit_less_donations_after_allocations
             profit_including_donations_after_allocations
-            remaining_to_be_paid
           ]
+          Event.profit_share_roles.each do |role|
+            headers << "remaining_to_#{role}"
+          end
+          headers << 'remaining_to_be_paid'
         end
 
-        headers += ['feedback']
+        headers << 'feedback'
 
         csv << headers
 
@@ -229,16 +232,20 @@ Dandelion::App.controller do
               ]
 
               Event.profit_share_roles.each do |role|
-                row << m(event.send("remaining_to_#{role}").abs, event.currency)
+                row << partial(:'event_stats_row/allocated_to_role', locals: { event: event, organisation: @organisation, role: role })
               end
 
               row += [
                 partial(:'event_stats_row/profit_less_donations_after_allocations', locals: { event: event, organisation: @organisation }),
-                partial(:'event_stats_row/profit_including_donations_after_allocations', locals: { event: event, organisation: @organisation }),
-                partial(:'event_stats_row/remaining_to_be_paid', locals: { event: event, organisation: @organisation })
+                partial(:'event_stats_row/profit_including_donations_after_allocations', locals: { event: event, organisation: @organisation })
               ]
+
+              Event.profit_share_roles.each do |role|
+                row << m(event.send("remaining_to_#{role}").abs, event.currency)
+              end
+              row << partial(:'event_stats_row/remaining_to_be_paid', locals: { event: event, organisation: @organisation })
             else
-              row += 9.times.map { '' }
+              row += 13.times.map { '' }
             end
           end
 
