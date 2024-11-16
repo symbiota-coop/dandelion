@@ -40,10 +40,12 @@
       <% end %>
     <% end %>
 
-    <% if !organisationship.hide_membership? %>
-      <a class="btn mb-1 btn-primary" href="/o/<%= @organisation.slug %>/show_membership/0">Membership public</a>
-    <% else %>
-      <a class="btn mb-1 btn-outline-primary" href="/o/<%= @organisation.slug %>/show_membership/1">Membership hidden</a>
+    <% if defined?(membership_toggle) && membership_toggle %>
+      <% if !organisationship.hide_membership? %>
+        <a class="btn mb-1 btn-primary" href="/o/<%= @organisation.slug %>/show_membership/0">Membership public</a>
+      <% else %>
+        <a class="btn mb-1 btn-outline-primary" href="/o/<%= @organisation.slug %>/show_membership/1">Membership hidden</a>
+      <% end %>
     <% end %>
 
   <% end %>

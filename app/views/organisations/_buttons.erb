@@ -1,7 +1,7 @@
 <% organisationship = @organisation.organisationships.find_by(account: current_account) %>
 
-<div class="d-inline-block mb-1" data-pagelet-url="/o/<%= @organisation.slug %>/organisationship">
-  <%= partial :'organisations/organisationship', locals: { organisation: @organisation } %>
+<div class="d-inline-block mb-1" data-pagelet-url="/o/<%= @organisation.slug %>/organisationship?membership_toggle=1">
+  <%= partial :'organisations/organisationship', locals: { organisation: @organisation, membership_toggle: true } %>
 </div>
 <% if current_account && organisationship %>
   <% if organisationship.credit_balance > 0 %>

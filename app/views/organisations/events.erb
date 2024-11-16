@@ -11,8 +11,8 @@
         <a href="/o/<%= @organisation.slug %>"><%= @organisation.name %></a>'s events
       </h1>
       <% if current_account %>
-        <div class="d-inline-block" data-pagelet-url="/o/<%= @organisation.slug %>/organisationship">
-          <%= partial :'organisations/organisationship', locals: { organisation: @organisation } %>
+        <div class="d-inline-block" data-pagelet-url="/o/<%= @organisation.slug %>/organisationship?membership_toggle=1">
+          <%= partial :'organisations/organisationship', locals: { organisation: @organisation, membership_toggle: true } %>
         </div>
         <% if organisation_assistant? %>
           <a class="btn mb-1 btn-primary" href="/events/new?organisation_id=<%= @organisation.id %>">Create an event</a>

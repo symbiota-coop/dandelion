@@ -17,8 +17,8 @@
       <% end %>
       <% if current_account %>
         <div class="mb-2">
-          <div class="d-inline-block mb-1" data-pagelet-url="/activities/<%= @activity.id %>/activityship">
-            <%= partial :'activities_and_local_groups/resourceship', locals: { resource: @activity, resourceship_name: 'activityship', resource_path: "/activities/#{@activity.id}" } %>
+          <div class="d-inline-block mb-1" data-pagelet-url="/activities/<%= @activity.id %>/activityship?membership_toggle=1">
+            <%= partial :'activities_and_local_groups/resourceship', locals: { resource: @activity, resourceship_name: 'activityship', resource_path: "/activities/#{@activity.id}", membership_toggle: true } %>
           </div>
         </div>
       <% else %>

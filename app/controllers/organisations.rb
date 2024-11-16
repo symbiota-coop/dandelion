@@ -270,7 +270,7 @@ Dandelion::App.controller do
       organisationship.update_attribute(:unsubscribed, false)
     end
     if request.xhr?
-      partial :'organisations/organisationship', locals: { organisation: @organisation, btn_class: params[:btn_class] }
+      partial :'organisations/organisationship', locals: { organisation: @organisation, membership_toggle: params[:membership_toggle], btn_class: params[:btn_class] }
     else
       redirect "/o/#{@organisation.slug}"
     end

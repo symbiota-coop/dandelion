@@ -7,8 +7,8 @@
       </h1>
       <% if current_account %>
         <div class="mb-2">
-          <div class="d-inline-block mb-1" data-pagelet-url="/local_groups/<%= @local_group.id %>/local_groupship">
-            <%= partial :'activities_and_local_groups/resourceship', locals: { resource: @local_group, resourceship_name: 'local_groupship', resource_path: "/local_groups/#{@local_group.id}" } %>
+          <div class="d-inline-block mb-1" data-pagelet-url="/local_groups/<%= @local_group.id %>/local_groupship?membership_toggle=1">
+            <%= partial :'activities_and_local_groups/resourceship', locals: { resource: @local_group, resourceship_name: 'local_groupship', resource_path: "/local_groups/#{@local_group.id}", membership_toggle: true } %>
           </div>
         </div>
       <% else %>

@@ -161,7 +161,7 @@ Dandelion::App.controller do
         activityship.update_attribute(:unsubscribed, false)
       end
     end
-    request.xhr? ? (partial :'activities_and_local_groups/resourceship', locals: { resource: @activity, resourceship_name: 'activityship', resource_path: "/activities/#{@activity.id}", btn_class: params[:btn_class] }) : redirect("/activities/#{@activity.id}")
+    request.xhr? ? (partial :'activities_and_local_groups/resourceship', locals: { resource: @activity, resourceship_name: 'activityship', resource_path: "/activities/#{@activity.id}", membership_toggle: params[:membership_toggle], btn_class: params[:btn_class] }) : redirect("/activities/#{@activity.id}")
   end
 
   get '/activities/:id/hide_membership' do
