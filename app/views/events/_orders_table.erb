@@ -205,7 +205,7 @@
             <%= event_feedback.id %>
           <% end %>
         </a>
-      <% elsif order.event.finished? %>
+      <% elsif order.event.started? %>
         <% if order.account.unsubscribed || order.account.unsubscribed_feedback %>
           <span class="text-muted">Unsubscribed from feedback emails</span>
         <% else %>
