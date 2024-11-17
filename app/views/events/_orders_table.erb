@@ -209,7 +209,13 @@
         <% if order.account.unsubscribed || order.account.unsubscribed_feedback %>
           <span class="text-muted">Unsubscribed from feedback emails</span>
         <% else %>
-          <a href="<%= ENV['BASE_URI'] %>/events/<%= order.event_id %>/resend_feedback_email/<%= order.account_id %>">Resend feedback email</a>
+          <a href="<%= ENV['BASE_URI'] %>/events/<%= order.event_id %>/resend_feedback_email/<%= order.account_id %>">
+            <% if order.event.finished? %>
+              Resend feedback email
+            <% else %>
+              Send feedback email
+            <% end %>
+          </a>
         <% end %>
       <% end %>
     <% end %>
