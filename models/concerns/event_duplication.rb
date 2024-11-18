@@ -49,7 +49,9 @@ module EventDuplication
       select_tickets_title: select_tickets_title,
       ask_hear_about: ask_hear_about,
       time_zone: time_zone,
-      questions: questions
+      questions: questions,
+      redirect_url: redirect_url,
+      purchase_url: purchase_url
     )
     event_tags.each do |event_tag|
       event.event_tagships.create(
