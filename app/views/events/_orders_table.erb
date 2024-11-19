@@ -212,7 +212,7 @@
           <a href="<%= ENV['BASE_URI'] %>/events/<%= order.event_id %>/resend_feedback_email/<%= order.account_id %>">
             <% if order.event.finished? %>
               Resend feedback email
-            <% else %>
+            <% elsif order.event.started? %>
               Send feedback email
             <% end %>
           </a>
