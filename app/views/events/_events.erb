@@ -1,3 +1,4 @@
 <% @events = @events.paginate(page: params[:page], per_page: 20) %>
-<%= partial :'events/blocks', locals: { events: @events } %>
+<% events = @events.reject { |event| event.ticket_types.empty? && !event.organisation.paid_up }
+<%= partial :'events/blocks', locals: { events: events } %>
 <%= will_paginate @events, inner_window: 0, outer_window: 0, renderer: WillPaginate::ViewHelpers::BootstrapRenderer %>
