@@ -1,31 +1,33 @@
-<% if (current_account && ticket = @event.tickets.complete.find_by(account: current_account)) || (@event.organisation && @event.public_attendees.count > 0) %>
-  <div class="my-3">
-    <div class="row no-gutters">
-      <div class="col">
-        <h2>Attending</h2>
-      </div>
-      <div class="col-auto">
-        <% if ticket %>
-          <% if @event.tickets.complete.and(account: current_account).all? { |ticket| ticket.show_attendance? } %>
-            <a class="pagelet-trigger btn btn-sm btn-primary mb-1" href="/events/<%= @event.id %>/hide_attendance">Attendance public</a>
-          <% else %>
-            <a class="pagelet-trigger btn btn-sm btn-outline-primary mb-1" href="/events/<%= @event.id %>/show_attendance">Attendance hidden</a>
-          <% end %>
+<% 
+public_count = @event.public_attendees.count
+private_count = @event.private_attendees.count
+%>
+<% if (current_account && ticket = @event.tickets.complete.find_by(account: current_account)) || (@event.organisation && (public_count + private_count) > 0) %>
+  <div class="image-wall">
+    <% @event.public_attendees.each { |account| %>
+    <%= partial :'accounts/square', locals: { account: account, width: '50px' } %>
+    <% };  %>
+    <% if private_count > 0 %>
+      <% if public_count == 0 %>
+        <% if private_count < 10 %>
+          &lt; 10 people
+        <% else %>
+          <%= pluralize(private_count, 'person') %>
         <% end %>
-      </div>
-    </div>
-    <div class="image-wall">
-      <% @event.public_attendees.each { |account| %>
-      <%= partial :'accounts/square', locals: { account: account, width: '50px' } %>
-      <% }; x = @event.public_attendees.count %>
-      <% if (y = @event.private_attendees.count) > 0 %>
-        <big>
-          <% if x > 0 %>
-            +
-          <% end %>
-          <%= pluralize(y, 'person') %>
+      <% elsif public_count > 0 %>
+        <% if private_count < 10 %>
+          + others
+        <% else %>
+          + <%= pluralize(private_count, 'person') %>
         <% end %>
-      </big>
-    </div>
+      <% end %>
+    <% end %>
   </div>
+  <% if ticket %>
+    <% if @event.tickets.complete.and(account: current_account).all? { |ticket| ticket.show_attendance? } %>
+      <a class="pagelet-trigger mb-1" href="/events/<%= @event.id %>/hide_attendance">Hide attendance</a>
+    <% else %>
+      <a class="pagelet-trigger mb-1" href="/events/<%= @event.id %>/show_attendance">Show attendance</a>
+    <% end %>
+  <% end %>
 <% end %>

@@ -170,11 +170,6 @@
           </big>
         </div>
       <% end %>
-      <% unless @event.hide_attendees? %>
-        <div data-pagelet-url="/events/<%= @event.id %>/attendees">
-          <%= partial :'events/attendees' %>
-        </div>
-      <% end %>
       <% if @event.zoom_party? %>
         <% if current_account %>
           <div data-pagelet-url="/zoom_parties?event_id=<%= @event.id %>"></div>

@@ -74,6 +74,16 @@
       </td>
     </tr>
   <% end %>
+  <% if !@event.hide_attendees? && @event.attendees.count > 0 %>
+    <tr>
+      <td>Attending</td>
+      <td>
+        <div data-pagelet-url="/events/<%= @event.id %>/attendees">
+          <%= partial :'events/attendees' %>
+        </div>
+      </td>
+    </tr>
+  <% end %>
   <tr>
     <td>
       Add to calendar
