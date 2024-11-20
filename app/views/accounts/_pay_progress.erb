@@ -64,7 +64,19 @@
       <% if w > 0 %><%= w.to_f.round %>%<% end %>
     </div>
   </div>
-  <p class="mt-1 text-center"><%= monthly_contributions.format(no_cents: true) %> raised of <%=m target, currency%> monthly target</p>
+  <p class="mt-1 text-center">
+    <%= monthly_contributions.format(no_cents: true) %> raised of <%=m target, currency%> monthly target
+    <% if admin? %>
+      <% 
+    current_month_value = monthly_contributions.to_i
+    days_in_month = Date.new(Date.today.year, Date.today.month, -1).day
+    days_passed = Date.today.day
+    projected_value = (current_month_value.to_f / days_passed * days_in_month).round
+    projection = [projected_value - current_month_value, 0].max    
+    %>
+      (projected <%= m (projection + current_month_value), currency %>)
+    <% end %>
+  </p>
 <% end %>
 
 <% end %>

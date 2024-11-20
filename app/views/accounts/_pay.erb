@@ -35,7 +35,7 @@
             </p>
           <% end %>
 
-          <%= cp(:'accounts/pay_progress', key: "/accounts/pay_progress/#{currency}", locals: {currency: currency}) %>
+          <%= cp(:'accounts/pay_progress', key: "/accounts/pay_progress/#{currency}?admin=#{admin? ? 1 : 0}", locals: {currency: currency}) %>
 
           <div class="text-sm-left text-center">
             <% if currency == 'GBP' %>
