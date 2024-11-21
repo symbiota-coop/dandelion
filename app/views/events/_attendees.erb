@@ -12,13 +12,13 @@ private_count = @event.private_attendees.count
         <% if private_count < 10 %>
           &lt; 10 people
         <% else %>
-          <%= pluralize(private_count, 'person') %>
+          <%=private_count %>+ people
         <% end %>
       <% elsif public_count > 0 %>
         <% if private_count < 10 %>
           + others
         <% else %>
-          + <%= pluralize(private_count, 'person') %>
+          + <%=private_count %>+ people
         <% end %>
       <% end %>
     <% end %>
