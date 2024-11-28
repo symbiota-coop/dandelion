@@ -96,6 +96,7 @@ Dandelion::App.controller do
             success_url: URI::DEFAULT_PARSER.escape("#{ENV['BASE_URI']}/e/#{@event.slug}?success=true&order_id=#{@order.id}&utm_source=#{params[:detailsForm][:utm_source]}&utm_medium=#{params[:detailsForm][:utm_medium]}&utm_campaign=#{params[:detailsForm][:utm_campaign]}"),
             cancel_url: URI::DEFAULT_PARSER.escape("#{ENV['BASE_URI']}/e/#{@event.slug}?cancelled=true"),
             metadata: @order.metadata,
+            billing_address_collection: @event.organisation.billing_address_collection? ? 'required' : nil,
             line_items: [{
               name: @event.name,
               description: @order.description,

@@ -94,6 +94,7 @@ module OrganisationFields
     field :hide_ticket_revenue, type: Mongoid::Boolean
     field :allow_iframes, type: Mongoid::Boolean
     field :time_zone, type: String
+    field :billing_address_collection, type: Mongoid::Boolean
 
     field :tokens, type: Float
     index({ tokens: 1 })
@@ -156,7 +157,8 @@ module OrganisationFields
         psychedelic: :check_box,
         terms_and_conditions_url: :url,
         terms_and_conditions: :text_area,
-        terms_and_conditions_check_box: :check_box
+        terms_and_conditions_check_box: :check_box,
+        billing_address_collection: :check_box
       }
     end
 
