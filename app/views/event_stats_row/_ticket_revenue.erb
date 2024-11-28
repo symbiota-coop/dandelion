@@ -10,6 +10,12 @@
     <td data-sort="<%=money_sort(event, organisation, :discounted_ticket_revenue)%>">
       <% if event.discounted_ticket_revenue > 0 %>
         <%= m event.discounted_ticket_revenue, event.currency %>
+        <% if event.credit_applied > 0 %>
+          - <%= m event.credit_applied, event.currency %> credit applied
+        <% end %>
+        <% if event.fixed_discounts_applied > 0 %>
+          - <%= m event.fixed_discounts_applied, event.currency %> discounts
+        <% end %>
       <% end %>
     </td>
   <% end %>
