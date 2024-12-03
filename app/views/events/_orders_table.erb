@@ -3,8 +3,8 @@
 <% if @event %>
   <% if event_email_viewer? %>
     <pre>
-    <%== Account.and(:id.in => @orders.pluck(:account_id)).map { |account| "#{Sanitize.fragment(account.name)} &lt;#{Sanitize.fragment(account.email)}&gt;" }.join(', ') %>
-  </pre>
+      <%== Account.and(:id.in => @orders.pluck(:account_id)).map { |account| "#{Sanitize.fragment(account.name)} &lt;#{Sanitize.fragment(account.email)}&gt;" }.join(', ') %>
+    </pre>
   <% end %>
   <% unless params[:search] %>
     <%= partial :'events/ticket_types_progress' %>
@@ -32,8 +32,14 @@
 <% end %>
 <script>
   $(function () {
-    var colIndex = $("#orders th").toArray().indexOf($("th[data-col-name='created-at']")[0])
-    $('#orders').dataTable({bInfo: false, paging: false, searching: false, order: [[colIndex, "desc"]]});
+
+      var colIndex = $("#orders th").toArray().indexOf($("th[data-col-name='created-at']")[0])
+
+      $(document).ajaxStop(function() {
+        if (!$('#orders').hasClass('dataTable')) {
+          $('#orders').dataTable({bInfo: false, paging: false, searching: false, order: [[colIndex, "desc"]]});
+        }
+      })
   })
 </script>
 <table class="table" id="orders">

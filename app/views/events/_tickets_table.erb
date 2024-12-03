@@ -1,3 +1,5 @@
+<% @tickets = @tickets.order('created_at desc')
+   @tickets = @tickets.paginate(page: params[:page], per_page: 50) %>
 <% if event_email_viewer? %>
   <pre>
     <%== Account.and(:id.in => @tickets.pluck(:account_id)).map { |account| "#{Sanitize.fragment(account.name)} &lt;#{Sanitize.fragment(account.email)}&gt;" }.join(', ') %>
@@ -6,8 +8,6 @@
 <% unless params[:search] %>
   <%= partial :'events/ticket_types_progress' %>
 <% end %>
-<% @tickets = @tickets.order('created_at desc')
-   @tickets = @tickets.paginate(page: params[:page], per_page: 50) %>
 <% if @event %>
   <div class="row justify-content-between">
     <div class="col">
@@ -23,7 +23,14 @@
 <% end %>
 <script>
   $(function () {
-    $('#tickets').dataTable({bInfo: false, paging: false, searching: false, order: [[4, "desc"]]});
+
+    var colIndex = $("#tickets th").toArray().indexOf($("th[data-col-name='created-at']")[0])
+
+    $(document).ajaxStop(function() {
+      if (!$('#tickets').hasClass('dataTable')) {
+        $('#tickets').dataTable({bInfo: false, paging: false, searching: false, order: [[colIndex, "desc"]]});
+      }
+    })
   })
 </script>
 <table class="table" id="tickets">
@@ -33,7 +40,7 @@
       <th>Ticket type</th>
       <th>Ticket ID</th>
       <th>Price</th>
-      <th>Created at</th>
+      <th data-col-name="created-at">Created at</th>
       <th>Checked in</th>
       <th>Feedback</th>
       <th>Actions</th>
