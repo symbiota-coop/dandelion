@@ -12,7 +12,7 @@ class DandelionTest < ActiveSupport::TestCase
     narrate %(Hi, I'm going to show you how easy it is to set up an event on Dandelion. Start by clicking 'List an event'.)
     click_link 'List an event'
     narrate %(First you'll need to create an account. Fill in some personal details and click 'Sign up'.), lambda {
-      fill_in 'Name', with: @account.name
+      fill_in 'Full name', with: @account.name
       fill_in 'Email', with: @account.email
       fill_in 'Location', with: @account.location
     }
