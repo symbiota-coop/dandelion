@@ -9,7 +9,7 @@ class Donation
 
   field :amount, type: Float
   field :currency, type: String
-  field :application_fee_paid_to_organisation, type: Boolean
+  field :application_fee_paid_to_dandelion, type: Boolean
   field :payment_completed, type: Boolean
   field :transferred, type: Boolean
   index({ transferred: 1 })
@@ -35,7 +35,7 @@ class Donation
       amount: :number,
       currency: :text,
       payment_completed: :check_box,
-      application_fee_paid_to_organisation: :check_box,
+      application_fee_paid_to_dandelion: :check_box,
       account_id: :lookup,
       event_id: :lookup,
       order_id: :lookup

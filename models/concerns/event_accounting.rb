@@ -212,7 +212,7 @@ module EventAccounting
     instance_variable_get(instance_var) || instance_variable_set(instance_var, begin
       r = Money.new(0, currency)
       donations = skip_transferred ? self.donations.and(:transferred.ne => true) : self.donations
-      donations.and(:application_fee_paid_to_organisation.ne => true).each { |donation| r += Money.new((donation.amount || 0) * 100, donation.currency) }
+      donations.and(:application_fee_paid_to_dandelion.ne => true).each { |donation| r += Money.new((donation.amount || 0) * 100, donation.currency) }
       r
     rescue Money::Bank::UnknownRate, Money::Currency::UnknownCurrency
       Money.new(0, ENV['DEFAULT_CURRENCY'])
