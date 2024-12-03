@@ -1,1 +1,5 @@
-<%= partial :'events/block_main', locals: { event: event } %>
+<style>
+  h4.map-event { font-size: 1.2rem }
+  ul.map-event { font-size: 0.85rem !important }
+</style>
+<%= partial :'events/block_main', locals: { event: event, custom_class: 'map-event' } %>
