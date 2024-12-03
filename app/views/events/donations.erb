@@ -2,7 +2,7 @@
 <% form_tag '', method: 'get', class: 'submitOnChange searchForm form-inline mb-3' do %>
   <div class="form-group">
     <label>Search donations</label>
-    <%= text_field_tag :q, class: 'form-control', value: params[:q] %>
+    <%= text_field_tag :q, class: 'form-control', value: params[:q], autocomplete: 'off' %>
   </div>
   <%= hidden_field_tag :search, value: 1 %>
   <%= submit_tag 'Search', class: 'btn btn-primary' %>

@@ -9,7 +9,7 @@
     } do %>
       <div class="form-group">
         <label>Search orders</label>
-        <%= text_field_tag :q, class: 'form-control', value: params[:q] %>
+        <%= text_field_tag :q, class: 'form-control', value: params[:q], autocomplete: 'off' %>
       </div>
       <%= checkbox 'Complete' %>
       <%= checkbox 'Incomplete' %>
