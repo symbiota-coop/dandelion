@@ -104,3 +104,4 @@ gem 'digest'
 gem 'matrix' # necessary in connection with capybara/cuprite
 gem 'maxmind-geoip2'
 gem 'mini_magick'
+gem 'rexml'
