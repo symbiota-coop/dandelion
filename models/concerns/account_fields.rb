@@ -130,6 +130,7 @@ module AccountFields
 
     def human_attribute_name(attr, options = {})
       {
+        name: 'Full name',
         picture: 'Photo',
         unsubscribed: 'Opt out of all emails from Dandelion',
         unsubscribed_messages: 'Opt out of email notifications of direct messages',
