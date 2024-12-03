@@ -565,7 +565,6 @@ DEPENDENCIES
   rack_session_access
   rake
   redcarpet
-  rexml
   rinku
   rqrcode
   rubocop
