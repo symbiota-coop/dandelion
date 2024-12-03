@@ -43,7 +43,7 @@
           return
         checkingIn = true
         $.post('/events/<%=@event.id%>/check_in/' + code, {checked_in: true}, function(accountName, textStatus, jqXHR) {
-          alert('Checked in ' + accountName + ' ' + code + ' ' + ✅)
+          alert('Checked in ' + accountName + ' ' + code + ' ✅')
         }).fail(function(data, textStatus, jqXHR) {
           switch (data.status) {
           case 403:
