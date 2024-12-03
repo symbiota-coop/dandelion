@@ -1,33 +1,39 @@
 <% 
-public_count = @event.public_attendees.count
-private_count = @event.private_attendees.count
+picture_accounts = @event.public_attendees.and(:picture_uid.ne => nil)
+picture_accounts_count = picture_accounts.count
+no_picture_accounts = @event.public_attendees.and(:picture_uid => nil) + @event.private_attendees
+no_picture_accounts_count = no_picture_accounts.count
 %>
-<% if (current_account && ticket = @event.tickets.complete.find_by(account: current_account)) || (@event.organisation && (public_count + private_count) > 0) %>
+<% if (@event.organisation && (picture_accounts_count + no_picture_accounts_count) > 0) %>
   <div class="image-wall">
-    <% @event.public_attendees.each { |account| %>
+    <% picture_accounts.each { |account| %>
     <%= partial :'accounts/square', locals: { account: account, width: '50px' } %>
     <% };  %>
-    <% if private_count > 0 %>
-      <% if public_count == 0 %>
-        <% if private_count < 10 %>
+    <% if no_picture_accounts_count > 0 %>
+      <% if picture_accounts_count == 0 %>
+        <% if no_picture_accounts_count < 10 %>
           &lt; 10 people
         <% else %>
-          <%=private_count %>+ people
+          <%=no_picture_accounts_count %>+ people
         <% end %>
-      <% elsif public_count > 0 %>
-        <% if private_count < 10 %>
+      <% elsif picture_accounts_count > 0 %>
+        <% if no_picture_accounts_count < 10 %>
           + others
         <% else %>
-          + <%=private_count %> people
+          + <%=no_picture_accounts_count %> people
         <% end %>
       <% end %>
     <% end %>
   </div>
-  <% if ticket %>
+  <% if (current_account && ticket = @event.tickets.complete.find_by(account: current_account)) %>
     <% if @event.tickets.complete.and(account: current_account).all? { |ticket| ticket.show_attendance? } %>
       <a class="pagelet-trigger mb-1" href="/events/<%= @event.id %>/hide_attendance">Hide attendance</a>
     <% else %>
-      <a class="pagelet-trigger mb-1" href="/events/<%= @event.id %>/show_attendance">Show attendance</a>
+      <% if current_account.picture %>
+        <a class="pagelet-trigger mb-1" href="/events/<%= @event.id %>/show_attendance">Show your attendance</a>
+      <% else %>
+        <a href="/accounts/edit" onclick="alert('Please first upload a profile photo');">Show your attendance</a>
+      <% end %>
     <% end %>
   <% end %>
 <% end %>
