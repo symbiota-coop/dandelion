@@ -1,26 +1,26 @@
 <% 
 picture_accounts = @event.public_attendees.and(:picture_uid.ne => nil)
 picture_accounts_count = picture_accounts.count
-no_picture_accounts = @event.public_attendees.and(:picture_uid => nil) + @event.private_attendees
-no_picture_accounts_count = no_picture_accounts.count
+no_picture_accounts = @event.attendees.and(:id.nin => picture_accounts.pluck(:id))
+others_count = no_picture_accounts.count + (@event.tickets.complete.and(:email.ne => nil).pluck(:email).map(&:downcase) - @event.attendees.pluck(:email).map(&:downcase)).length
 %>
-<% if (@event.organisation && (picture_accounts_count + no_picture_accounts_count) > 0) %>
+<% if (@event.organisation && (picture_accounts_count + others_count) > 0) %>
   <div class="image-wall">
     <% picture_accounts.each { |account| %>
     <%= partial :'accounts/square', locals: { account: account, width: '50px' } %>
     <% };  %>
-    <% if no_picture_accounts_count > 0 %>
+    <% if others_count > 0 %>
       <% if picture_accounts_count == 0 %>
-        <% if no_picture_accounts_count < 10 %>
+        <% if others_count < 10 %>
           &lt; 10 people
         <% else %>
-          <%=no_picture_accounts_count %>+ people
+          <%=others_count %>+ people
         <% end %>
       <% elsif picture_accounts_count > 0 %>
-        <% if no_picture_accounts_count < 10 %>
+        <% if others_count < 10 %>
           + others
         <% else %>
-          + <%=no_picture_accounts_count %> people
+          + <%=others_count %> people
         <% end %>
       <% end %>
     <% end %>
