@@ -63,9 +63,10 @@ $(function () {
     pagelet.load($(a).attr('href'), function () {
       pagelet.css('opacity', '1')
       $('.tooltip').remove()
-      const offset = pagelet.offset()
+      const searchWell = pagelet.prevAll('.search.well').first()
+      const offset = searchWell.length ? searchWell.offset() : pagelet.offset()
       if (pagelet.attr('data-pagelet-scroll') != 'false') {
-        window.scrollTo(0, offset.top - $('#header').height())
+        window.scrollTo(0, offset.top - $('#header').height() - 20)
       }
     })
     return false
