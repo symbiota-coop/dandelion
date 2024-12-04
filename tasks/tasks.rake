@@ -81,7 +81,7 @@ namespace :organisations do
   end
 
   task stripe_transfers: :environment do
-    Organisation.and(sync_stripe: true).each do |organisation|
+    Organisation.and(:stripe_client_id.ne => nil).each do |organisation|
       StripeCharge.transfer(organisation)
       StripeTransaction.transfer(organisation)
     end

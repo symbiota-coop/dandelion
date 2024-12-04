@@ -84,7 +84,6 @@ module OrganisationFields
     field :restrict_cohosting, type: Mongoid::Boolean
     field :psychedelic, type: Mongoid::Boolean
     field :hide_few_left, type: Mongoid::Boolean
-    field :sync_stripe, type: Mongoid::Boolean
     field :fixed_fee, type: Mongoid::Boolean
     field :terms_and_conditions_url, type: String
     field :terms_and_conditions, type: String
