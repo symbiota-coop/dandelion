@@ -77,7 +77,7 @@
       <%= checkbox 'No facilitators', form_group_class: 'col-12 col-sm-auto' %>
       <% if @organisation %>
         <%= checkbox 'Exclude co-hosted', form_group_class: 'col-12 col-sm-auto' %>
-        <% if @organisation.sync_stripe %>
+        <% if @organisation.stripe_client_id %>
           <%= checkbox 'Discrepancy', form_group_class: 'col-12 col-sm-auto' %>
         <% end %>
         <%= checkbox 'Deleted', form_group_class: 'col-12 col-sm-auto' %>
