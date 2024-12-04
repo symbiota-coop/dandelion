@@ -5,7 +5,7 @@ Dandelion::App.controller do
       @gatherings = if current_account && params[:my_gatherings]
                       Gathering.and(:id.in => current_account.memberships.pluck(:gathering_id))
                     else
-                      Gathering.and(listed: true).and(:privacy.ne => 'secret')
+                      Gathering.and(:listed => true, :privacy.ne => 'secret', :image_uid.ne => nil)
                     end
       @gatherings = params[:order] == 'membership_count' ? @gatherings.order('membership_count desc') : @gatherings.order('created_at desc')
       if params[:q]

@@ -15,14 +15,14 @@ class Gathering
 
   def self.spring_clean
     ignore = %i[memberships teams teamships notifications_as_notifiable notifications_as_circle]
-    Gathering.all.each do |gathering|
+    Gathering.and(listed: true).each do |gathering|
       next unless Gathering.reflect_on_all_associations(:has_many).all? do |assoc|
         gathering.send(assoc.name).count == 0 || ignore.include?(assoc.name)
       end
 
       if gathering.created_at < 1.month.ago && gathering.memberships.count == 1
-        puts gathering.name
-        gathering.destroy
+        puts gathering.slug
+        # gathering.destroy
       end
     end
   end
