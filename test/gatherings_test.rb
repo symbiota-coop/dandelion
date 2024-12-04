@@ -11,7 +11,7 @@ class DandelionTest < ActiveSupport::TestCase
     click_link 'All gatherings'
     click_link 'Create a gathering'
     fill_in 'Name', with: @gathering.name
-    fill_in 'Slug', with: @gathering.slug
+    fill_in 'URL', with: @gathering.slug
     click_link 'Next'
     click_link 'Next'
     click_link 'Next'
