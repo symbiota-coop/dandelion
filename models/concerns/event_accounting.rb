@@ -219,6 +219,18 @@ module EventAccounting
     end)
   end
 
+  def donation_revenue_less_application_fees_paid_to_dandelion(skip_transferred: false)
+    instance_var = skip_transferred ? :@donation_revenue_without_transferred : :@donation_revenue
+    instance_variable_get(instance_var) || instance_variable_set(instance_var, begin
+      r = Money.new(0, currency)
+      donations = skip_transferred ? self.donations.and(:transferred.ne => true) : self.donations
+      donations.and(:application_fee_paid_to_dandelion.ne => true).each { |donation| r += Money.new((donation.amount || 0) * 100, donation.currency) }
+      r
+    rescue Money::Bank::UnknownRate, Money::Currency::UnknownCurrency
+      Money.new(0, ENV['DEFAULT_CURRENCY'])
+    end)
+  end
+
   def organisation_discounted_ticket_revenue(skip_transferred: false)
     instance_var = skip_transferred ? :@org_discounted_ticket_revenue_without_transferred : :@org_discounted_ticket_revenue
     instance_variable_get(instance_var) || instance_variable_set(instance_var, begin

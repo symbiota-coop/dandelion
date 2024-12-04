@@ -31,6 +31,12 @@ module OrderAccounting
     r
   end
 
+  def donation_revenue_less_application_fees_paid_to_dandelion
+    r = Money.new(0, currency)
+    donations.and(:application_fee_paid_to_dandelion.ne => true).each { |donation| r += Money.new((donation.amount || 0) * 100, donation.currency) }
+    r
+  end
+
   def total
     ((discounted_ticket_revenue + donation_revenue).cents.to_f / 100) - (credit_applied || 0) - (fixed_discount_applied || 0)
   end

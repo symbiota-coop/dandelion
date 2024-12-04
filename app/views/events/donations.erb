@@ -13,7 +13,7 @@
   </pre>
 <% end %>
 <p>
-  Received <strong><%= m @event.donation_revenue, @event.currency %></strong> in donations from this event.
+  Received <strong><%= m @event.donation_revenue_less_application_fees_paid_to_dandelion, @event.currency %></strong> in donations from this event.
 </p>
 <% @donations = @donations.order('created_at desc')
    @donations = @donations.paginate(page: params[:page], per_page: 50) %>
