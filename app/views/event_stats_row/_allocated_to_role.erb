@@ -1,4 +1,4 @@
-<% if role == 'facilitator' && event.revenue_sharer %>
+<% if role == 'organiser' && event.revenue_sharer %>
   <td></td>
 <% else %>
   <td data-sort="<%=money_sort(event, organisation, :"profit_to_#{role}")%>">

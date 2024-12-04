@@ -48,7 +48,7 @@ module EventFields
     field :ai_tagged, type: Mongoid::Boolean
 
     field :revenue_share_to_revenue_sharer, type: Integer
-    field :profit_share_to_facilitator, type: Integer
+    field :profit_share_to_organiser, type: Integer
     field :profit_share_to_coordinator, type: Integer
     field :profit_share_to_category_steward, type: Integer
     field :profit_share_to_social_media, type: Integer

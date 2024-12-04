@@ -35,7 +35,7 @@ module EventValidation
       self.stripe_revenue_adjustment = 0 unless stripe_revenue_adjustment
       self.revenue_share_to_revenue_sharer = 0 unless revenue_share_to_revenue_sharer
       self.revenue_share_to_revenue_sharer = 0 unless revenue_sharer
-      self.profit_share_to_facilitator = 0 if revenue_sharer
+      self.profit_share_to_organiser = 0 if revenue_sharer
       errors.add(:revenue_share_to_revenue_sharer, 'must be present if a revenue sharer is set') if revenue_sharer && !revenue_share_to_revenue_sharer
       errors.add(:organiser, 'or revenue sharer must be set') if !revenue_sharer && !organiser && organisation && organisation.stripe_client_id
       errors.add(:revenue_sharer, 'cannot be set if organiser is set') if revenue_sharer && organiser

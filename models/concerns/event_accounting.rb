@@ -3,7 +3,7 @@ module EventAccounting
 
   class_methods do
     def profit_share_roles
-      %w[facilitator coordinator category_steward social_media]
+      %w[organiser coordinator category_steward social_media]
     end
   end
 
