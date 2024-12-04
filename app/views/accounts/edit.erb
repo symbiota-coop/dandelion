@@ -54,6 +54,9 @@
     <p style="margin-top: -0.75rem"><a href="/confirm_email">Resend confirmation email</a></p>
   <% end %>
   <%= f.password_block :password %>
+  <div class="my-3">
+    <%= f.check_box_block :hidden %>
+  </div>
   <script>
     $(function () {
       if (typeof google !== 'undefined') {
@@ -90,9 +93,6 @@
   <%= f.select_block :gender %>
   <%= f.wysiwyg_block :bio %>
   <%= f.select_block :default_currency %>
-  <div class="my-3">
-    <%= f.check_box_block :hidden %>
-  </div>
 
   <% if @account.memberships.count > 0 %>
     <script>
