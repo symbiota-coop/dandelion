@@ -27,7 +27,7 @@ module OrderAccounting
 
   def donation_revenue
     r = Money.new(0, currency)
-    donations.and(:application_fee_paid_to_dandelion.ne => true).each { |donation| r += Money.new((donation.amount || 0) * 100, donation.currency) }
+    donations.each { |donation| r += Money.new((donation.amount || 0) * 100, donation.currency) }
     r
   end
 
