@@ -165,6 +165,7 @@ module OrganisationFields
     def human_attribute_name(attr, options = {})
       {
         name: 'Organisation name',
+        slug: 'URL',
         intro_text: 'Intro text for organisation homepage',
         telegram_group: 'Telegram group/channel URL',
         extra_info_for_ticket_email: 'Extra info for ticket confirmation email',

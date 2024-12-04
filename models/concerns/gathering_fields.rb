@@ -104,6 +104,7 @@ module GatheringFields
 
     def human_attribute_name(attr, options = {})
       {
+        slug: 'URL',
         intro_for_non_members: 'Intro for non-members',
         paypal_email: 'PayPal email',
         fixed_threshold: 'Magic number',

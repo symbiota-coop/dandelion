@@ -13,7 +13,6 @@
   $(function () {
 
     $('#gathering_slug, #gathering_name').keyup(function () {
-      $('#slug-replace-gathering-url').text('<%= ENV['BASE_URI'] %>/g/' + $('#gathering_slug').val());
       $('#slug-replace-stripe-webhook').text('<%= ENV['BASE_URI'] %>/g/' + $('#gathering_slug').val() + '/stripe_webhook');
       $('#slug-replace-coinbase-webhook').text('<%= ENV['BASE_URI'] %>/g/' + $('#gathering_slug').val() + '/coinbase_webhook');
     }).keyup();
@@ -121,10 +120,9 @@
     <div class="tab-content mt-3">
       <div role="tabpanel" class="tab-pane active" id="tab1">
         <%= f.text_block :name %>
-        <%= f.slug_block :slug %>
-        <p class="text-muted" style="margin-top: -0.75rem">Gathering URL:
-          <span id="slug-replace-gathering-url"></span>
-        </p>
+        <div class="slugify">
+          <%= f.shorturl_block :slug, stem: "#{ENV['BASE_URI']}/g/" %>
+        </div>
         <script>
           $(function () {
             if (typeof google !== 'undefined') {

@@ -70,10 +70,6 @@
       })
     }
 
-    $('#organisation_slug, #organisation_name').keyup(function () {
-      $('#slug-replace-organisation-url').text('<%= ENV['BASE_URI'] %>/o/' + $('#organisation_slug').val());
-    }).keyup();
-
     autosize($('#organisation_minimal_head')[0])
 
     $('#organisation-build-nav a[data-toggle="tab"]').on('show.bs.tab', function (e) {
@@ -116,17 +112,8 @@
     <div class="tab-content <%= 'mt-3' if @organisation.persisted? %>">
       <div role="tabpanel" class="tab-pane <%= 'active' if !params[:tab] || params[:tab].to_i == 1%>" id="tab1">
         <%= f.text_block :name %>
-        <%= f.slug_block :slug %>
-        <div class="mb-3">
-          <p class="text-muted mb-0" style="margin-top: -0.75rem">
-            Organisation URL: 
-            <span id="slug-replace-organisation-url"></span>
-          </p>
-          <% if @organisation.persisted? %>
-            <p class="text-muted mt-1" >
-              Organisation ID: <%= @organisation.id %>
-            </p>
-          <% end %>
+        <div class="slugify">
+          <%= f.shorturl_block :slug, stem: "#{ENV['BASE_URI']}/o/" %>
         </div>
         <% if @organisation.persisted? %>
           <%= f.wysiwyg_block :intro_text %>
