@@ -68,14 +68,14 @@
 </ul>
 <div class="tab-content">
   <% if organisation_admin? or @organisation.events_for_search.future_and_current_featured.and(:monthly_donors_only => true).count > 0 %>
-    <div class="tab-pane fade show active" id="panel-events" role="tabpanel">
+    <div class="tab-pane show active" id="panel-events" role="tabpanel">
       <div data-with-placeholder data-pagelet-url="/o/<%= @organisation.slug %>/events_block?members_events=1">
         <%= partial :'organisations/events_block_placeholder' %>
       </div>
     </div>
   <% end %>
   <% if visible_members.count > 0 %>
-    <div class="tab-pane fade" id="panel-map" role="tabpanel">
+    <div class="tab-pane" id="panel-map" role="tabpanel">
       <%= partial :'maps/map', locals: { points: @organisation.organisationships.and(:monthly_donation_method.ne => nil).and(:coordinates.ne => nil) } %>
       <style>
         #map-canvas { height: 50vh !important; margin-top: 1rem; margin-bottom: 1rem }
@@ -83,7 +83,7 @@
     </div>
   <% end %>
   <% if @organisation.monthly_donor_affiliate_reward %>
-    <div class="tab-pane fade" id="panel-referral" role="tabpanel">
+    <div class="tab-pane" id="panel-referral" role="tabpanel">
       <h2>Your referral link</h2>
       <p class="lead">
         <a href="<%= ENV['BASE_URI'] %>/o/<%= @organisation.slug %>/via/<%= current_account.username %>"><%= ENV['BASE_URI'] %>/o/<%= @organisation.slug %>/via/<%= current_account.username %></a>

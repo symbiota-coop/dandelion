@@ -1,13 +1,33 @@
 <%= partial :'organisations/nav', locals: { organisation: @organisation } %>
-<% form_for @organisation, "/o/#{@organisation.slug}/emails" do  |f| %>
-  <h2 class="mb-3">Welcome for followers</h2>
-  <%= f.text_block :welcome_from %>
-  <%= f.text_block :welcome_subject %>
-  <%= f.wysiwyg_block :welcome_body %>
-  <h2 class="mt-5 mb-3">Welcome for monthly donors</h2>
-  <%= f.text_block :monthly_donation_welcome_from %>
-  <%= f.text_block :monthly_donation_welcome_subject %>
-  <%= f.wysiwyg_block :monthly_donation_welcome_body %>
+
+<% form_for @organisation, "/o/#{@organisation.slug}/emails" do |f| %>
+  <ul class="nav nav-tabs" role="tablist">
+    <li class="nav-item">
+      <a class="nav-link active" id="follower-tab" data-toggle="tab" href="#follower" role="tab">
+        Welcome for followers
+      </a>
+    </li>
+    <li class="nav-item">
+      <a class="nav-link" id="monthly-tab" data-toggle="tab" href="#monthly" role="tab">
+        Welcome for monthly donors
+      </a>
+    </li>
+  </ul>
+
+  <div class="tab-content">
+    <div class="tab-pane show active" id="follower" role="tabpanel">
+      <%= f.text_block :welcome_from %>
+      <%= f.text_block :welcome_subject %>
+      <%= f.wysiwyg_block :welcome_body %>
+    </div>
+
+    <div class="tab-pane" id="monthly" role="tabpanel">
+      <%= f.text_block :monthly_donation_welcome_from %>
+      <%= f.text_block :monthly_donation_welcome_subject %>
+      <%= f.wysiwyg_block :monthly_donation_welcome_body %>
+    </div>
+  </div>
+
   <div class="my-3">
     <%= f.submit_block %>
   </div>
