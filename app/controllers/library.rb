@@ -16,4 +16,9 @@ Dandelion::App.controller do
     @films = Film.all(sort: { 'Year' => 'desc' })
     erb :'films/films'
   end
+
+  get '/treasure-map' do
+    @title = 'Treasure Map'
+    erb :treasure_map
+  end
 end
