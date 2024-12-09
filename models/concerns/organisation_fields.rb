@@ -94,6 +94,7 @@ module OrganisationFields
     field :allow_iframes, type: Mongoid::Boolean
     field :time_zone, type: String
     field :billing_address_collection, type: Mongoid::Boolean
+    field :enable_resales, type: Mongoid::Boolean
 
     field :tokens, type: Float
     index({ tokens: 1 })

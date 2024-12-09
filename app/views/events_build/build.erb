@@ -220,6 +220,9 @@
             <%= f.check_box_block :opt_in_facilitator %>
             <%= f.check_box_block :include_in_parent %>
             <%= f.check_box_block :refund_deleted_orders %>
+            <% if Padrino.env == :development || @event.organisation.experimental? || @event.organisation.enable_resales?   %>
+              <%= f.check_box_block :enable_resales %>
+            <% end %>
             <% if !@event.organisation.stripe_client_id %>
               <%= f.text_area_block :notes %>
             <% end %>
@@ -231,7 +234,6 @@
                 <%= f.check_box_block :no_tickets_pdf %>
                 <%= f.check_box_block :hide_organisation_footer %>
                 <%= f.check_box_block :hide_few_left %>
-                <%= f.check_box_block :enable_resales %>
                 <%= f.wysiwyg_block :extra_info_for_recording_email %>
                 <%= f.file_block :video %>
                 <%= f.number_block :affiliate_credit_percentage %>
