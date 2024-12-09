@@ -2,20 +2,30 @@
 
 <% if !params[:minimal] %>
 
-  <% if @account && @account.feedback_summary %>
-    <div class="well my-3" data-toggle="tooltip" title="AI-generated summary ✨">
-      <big>
-        <%= @account.feedback_summary %>
-      </big>
-    </div>
+  <% if @account %>
+    <% if @account.feedback_summary %>
+      <div class="well my-3" data-toggle="tooltip" title="AI-generated summary ✨">
+        <big>
+          <%= @account.feedback_summary %>
+        </big>
+      </div>
+    <% end %>
+    <% if admin? %>
+      <a href="/accounts/<%= @account.id %>/feedback_summary">Refresh feedback summary</a>
+    <% end %>
   <% end %>
 
-  <% if @activity && @activity.feedback_summary %>
-    <div class="well my-3" data-toggle="tooltip" title="AI-generated summary ✨">
-      <big>
-        <%= @activity.feedback_summary %>
-      </big>
-    </div>
+  <% if @activity %>
+    <% if @activity.feedback_summary %>
+      <div class="well my-3" data-toggle="tooltip" title="AI-generated summary ✨">
+        <big>
+          <%= @activity.feedback_summary %>
+        </big>
+      </div>
+    <% end %>
+    <% if admin? %>
+      <a href="/activities/<%= @activity.id %>/feedback_summary">Refresh feedback summary</a>
+    <% end %>
   <% end %>
 
 <% end %>

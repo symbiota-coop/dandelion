@@ -221,28 +221,10 @@ class Event
 
     prompt = "Provide a list of 5 tags for this event as a comma-separated list. Use spaces. No hashtags. Event details: \n\n#{name}\n\n#{description}"
 
-    return unless ENV['ANTHROPIC_API_KEY']
-
-    prompt = prompt[0..(200_000 * 0.66 * 4)]
-    client = Anthropic::Client.new
     content = nil
     5.times do
-      response = client.messages(
-        parameters: {
-          model: 'claude-3-haiku-20240307',
-          messages: [
-            { role: 'user', content: prompt }
-          ],
-          max_tokens: 256
-        }
-      )
-      if response['content']
-        content = response['content'].first['text']
-        break unless content.include?('#')
-      else
-        puts 'sleeping...'
-        sleep 5
-      end
+      content = OpenRouter.chat(prompt, max_tokens: 256)
+      break unless content.include?('#')
     end
     return unless content
 

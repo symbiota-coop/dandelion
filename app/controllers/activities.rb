@@ -30,6 +30,13 @@ Dandelion::App.controller do
     erb :'activities/activity'
   end
 
+  get '/activities/:id/feedback_summary' do
+    @activity = Activity.find(params[:id]) || not_found
+    admins_only!
+    @activity.feedback_summary!
+    redirect back
+  end
+
   get '/activities/:id/events/stats' do
     @activity = Activity.find(params[:id]) || not_found
     activity_admins_only!

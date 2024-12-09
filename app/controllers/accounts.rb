@@ -281,6 +281,13 @@ Dandelion::App.controller do
     redirect "/u/#{@account.username}"
   end
 
+  get '/accounts/:id/feedback_summary' do
+    @account = Account.find(params[:id]) || not_found
+    admins_only!
+    @account.feedback_summary!
+    redirect back
+  end
+
   post '/accounts/:id/reset_password', provides: :json do
     halt unless current_account && (current_account.admin? || current_account.can_reset_passwords?)
     @account = Account.find(params[:id]) || not_found

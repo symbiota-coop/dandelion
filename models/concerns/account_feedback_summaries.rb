@@ -8,39 +8,34 @@ module AccountFeedbackSummaries
       accounts = accounts.select { |account| account.feedback_summary.nil? && account.event_feedbacks_as_facilitator.count >= 10 }
       accounts.each_with_index do |account, i|
         puts "#{i + 1}/#{accounts.count} #{account.username}"
-
-        summary = account.event_feedbacks_as_facilitator.order('created_at desc').and(:answers.ne => nil).map { |ef| "# Feedback on #{ef.event.name}, #{ef.event.start_time}\n\n#{ef.answers.join("\n")}" }.join("\n\n")
-        prompt = "Provide a one-paragraph summary of the feedback on this facilitator, #{account.firstname}. Focus on their strengths and what they do well. \n\n#{summary}"
-
-        prompt = prompt[0..(200_000 * 0.66 * 4)]
-        client = Anthropic::Client.new
-        last_paragraph = nil
-        loop do
-          response = client.messages(
-            parameters: {
-              model: 'claude-3-haiku-20240307',
-              messages: [
-                { role: 'user', content: prompt }
-              ],
-              max_tokens: 256
-            }
-          )
-          if response['content']
-            paragraphs = response['content'].first['text'].split("\n\n")
-            if paragraphs.length <= 2
-              last_paragraph = paragraphs.last
-              break if last_paragraph.split.length >= 50 && last_paragraph[0] != '-' && last_paragraph[0] != '*' && last_paragraph[-1] == '.'
-            end
-          else
-            puts 'sleeping...'
-            sleep 5
-          end
-        end
-        puts "#{last_paragraph}\n\n"
-        account.set(feedback_summary: last_paragraph)
+        account.feedback_summary!
       end
 
       # accounts.each(&:send_feedback_summary)
     end
+  end
+
+  def feedback_summary!
+    account = self
+    summary = account.event_feedbacks_as_facilitator.order('created_at desc').and(:answers.ne => nil).map do |ef|
+      next unless ef.event
+
+      "# Feedback on #{ef.event.name}, #{ef.event.start_time}\n\n#{ef.answers.join("\n")}"
+    end.compact.join("\n\n")
+    prompt = "Provide a one-paragraph summary of the feedback on this facilitator, #{account.firstname}. Focus on their strengths and what they do well. \n\n#{summary}"
+
+    last_paragraph = nil
+    loop do
+      response = OpenRouter.chat(prompt, max_tokens: 256)
+      paragraphs = response.split("\n\n")
+      if paragraphs.length <= 2
+        last_paragraph = paragraphs.last
+        break if last_paragraph.split.length >= 50 && last_paragraph[0] != '-' && last_paragraph[0] != '*' && last_paragraph[-1] == '.'
+      end
+    end
+    # sentences = last_paragraph.split('. ')
+    # last_paragraph = sentences[1..-1].join('. ') if sentences[0] =~ /The feedback .* positive/ || sentences[0] =~ /positive feedback/
+    puts "#{last_paragraph}\n\n"
+    account.set(feedback_summary: last_paragraph)
   end
 end

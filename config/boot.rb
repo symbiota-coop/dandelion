@@ -64,10 +64,6 @@ if ENV['GOOGLE_MAPS_API_KEY']
   end
 end
 
-Anthropic.configure do |config|
-  config.access_token = ENV['ANTHROPIC_API_KEY']
-end
-
 OpenAI.configure do |config|
   config.access_token = ENV['OPENAI_API_KEY']
 end
