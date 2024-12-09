@@ -158,7 +158,8 @@ module OrganisationFields
         terms_and_conditions_url: :url,
         terms_and_conditions: :text_area,
         terms_and_conditions_check_box: :check_box,
-        billing_address_collection: :check_box
+        billing_address_collection: :check_box,
+        enable_resales: :check_box
       }
     end
 
