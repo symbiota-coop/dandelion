@@ -33,7 +33,7 @@
           ([%(Feedback <span class="badge badge-primary">#{event.event_feedbacks.count}</span>), "/events/#{event.id}/feedback"] if event.event_feedbacks.count.positive?),
           (['Preview confirmation email', "/events/#{event.id}/ticket_email"] if event.ticket_types.count.positive?),
           ['Audience stats', "/events/#{event.id}/stats"],
-          ([%(Check-in), "/events/#{event.id}/check_in"] if event.ticket_types.count.positive? || event.tickets.count.positive?),
+          ([%(Check-in scanner), "/events/#{event.id}/check_in"] if event.ticket_types.count.positive? || event.tickets.count.positive?),
           ['Mailer', "/events/#{event.id}/pmails"]
         ].compact, button_text: %(#{event.name} <i class="bi bi-caret-down-fill"></i>), container_class: 'btn-group mb-1' %>
     <% end %>
