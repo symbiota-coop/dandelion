@@ -216,10 +216,11 @@ class Event
 
   after_save :ai_tag
   def ai_tag
+    return unless ENV['OPENROUTER_API_KEY']
     return if duplicate
     return unless event_tagships(true).empty?
 
-    prompt = "Provide a list of 5 tags for this event as a comma-separated list. Use spaces. No hashtags. Event details: \n\n#{name}\n\n#{description}"
+    prompt = "Provide a list of 5 tags for this event as a comma-separated list. Use spaces. No hashtags. Event details: \n\n# #{name}\n\n#{description}"
 
     content = nil
     5.times do
