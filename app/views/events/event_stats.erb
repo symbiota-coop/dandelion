@@ -67,6 +67,12 @@
             <%= select_tag :carousel_id, options: ['', ['Featured', 'featured']] + @organisation.carousels.order('o asc').map { |carousel| [carousel.name, carousel.id] }, selected: params[:carousel_id], class: 'form-control mx-1' %>
           </div>
         <% end %>
+        <% if @organisation.cohosts.count > 0 %>
+          <div class="form-group col-12 col-sm-auto">
+            <label>Co-host</label>
+            <%= select_tag :cohost_id, options: [''] + @organisation.cohosts.order('name asc').map { |organisation| [organisation.name, organisation.id] }, selected: params[:cohost_id], class: 'form-control mx-1' %>
+          </div>
+        <% end %>
       </div>
     <% end %>
 

@@ -144,6 +144,10 @@ Dandelion::App.controller do
     @events = @events.in_person if params[:in_person]
     @events = @events.and(local_group_id: params[:local_group_id]) if params[:local_group_id]
     @events = @events.and(activity_id: params[:activity_id]) if params[:activity_id]
+    if params[:cohost_id]
+      @cohost = Organisation.find(params[:cohost_id])
+      @events = @events.and(:id.in => @cohost.cohosted_events.pluck(:id))
+    end
     if params[:carousel_id]
       @events = if params[:carousel_id] == 'featured'
                   @events.and(featured: true)

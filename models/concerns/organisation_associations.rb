@@ -38,6 +38,10 @@ module OrganisationAssociations
     pmails.and(mailable: nil, monthly_donors: nil, facilitators: nil).and(:sent_at.ne => nil).order('sent_at desc')
   end
 
+  def cohosts
+    Organisation.and(:id.in => Cohostship.and(:event_id.in => events.pluck(:id)).pluck(:organisation_id))
+  end
+
   def cohosted_events
     Event.and(:id.in => cohostships.pluck(:event_id))
   end
