@@ -1,7 +1,7 @@
 class OpenRouter
   BASE_URL = 'https://openrouter.ai'.freeze
   DEFAULT_MODEL = 'meta-llama/llama-3.3-70b-instruct'.freeze
-  DEFAULT_PROVIDERS = %w[Fireworks Together Avian].freeze
+  DEFAULT_PROVIDERS = %w[Fireworks Together Avian Lepton].freeze
   DEFAULT_CONTEXT_WINDOW = 128_000
 
   class << self
