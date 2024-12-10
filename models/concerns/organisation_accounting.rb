@@ -40,15 +40,20 @@ module OrganisationAccounting
   end
 
   def update_paid_up
-    cr = contribution_requested
-    cp = contribution_paid
-    update_attribute(:contribution_requested_gbp_cache, cr.exchange_to('GBP').to_f)
-    update_attribute(:contribution_paid_gbp_cache, cp.exchange_to('GBP').to_f)
-    update_attribute(:paid_up, nil)
-    begin
-      update_attribute(:paid_up, contribution_not_required? || !stripe_customer_id.nil? || cp >= (Organisation.paid_up_fraction * cr))
-    rescue Money::Bank::UnknownRate, Money::Currency::UnknownCurrency
-      update_attribute(:paid_up, true)
+    if contribution_not_required? || !stripe_customer_id.nil?
+      update_attributes(
+        contribution_requested_gbp_cache: nil,
+        contribution_paid_gbp_cache: nil,
+        paid_up: true
+      )
+    else
+      cr = contribution_requested
+      cp = contribution_paid
+      update_attributes(
+        contribution_requested_gbp_cache: cr.exchange_to('GBP').to_f,
+        contribution_paid_gbp_cache: cp.exchange_to('GBP').to_f,
+        paid_up: cp >= (Organisation.paid_up_fraction * cr)
+      )
     end
   end
 
