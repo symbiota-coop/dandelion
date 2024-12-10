@@ -5,6 +5,10 @@ module EventAccounting
     def profit_share_roles
       %w[organiser coordinator category_steward social_media]
     end
+
+    def contribution_gbp_fallback
+      25
+    end
   end
 
   included do
@@ -44,7 +48,7 @@ module EventAccounting
 
   def contribution_gbp
     if ticket_types.empty?
-      Money.new(25 * 100, 'GBP')
+      Money.new(contribution_gbp_fallback * 100, 'GBP')
     else
       one_percent_of_ticket_sales = Money.new(tickets.complete.sum(:discounted_price) * 0.01 * 100, currency).exchange_to('GBP')
       if cap
@@ -53,6 +57,8 @@ module EventAccounting
         one_percent_of_ticket_sales
       end
     end
+  rescue Money::Bank::UnknownRate, Money::Currency::UnknownCurrency
+    Money.new(contribution_gbp_fallback * 100, 'GBP')
   end
 
   def stripe_revenue
