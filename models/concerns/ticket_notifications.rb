@@ -97,4 +97,24 @@ module TicketNotifications
 
     batch_message.finalize if ENV['MAILGUN_API_KEY']
   end
+
+  def send_email_update_notification
+    mg_client = Mailgun::Client.new ENV['MAILGUN_API_KEY'], ENV['MAILGUN_REGION']
+    batch_message = Mailgun::BatchMessage.new(mg_client, ENV['MAILGUN_NOTIFICATIONS_HOST'])
+
+    ticket = self
+    order = ticket.order
+    event = order.event
+    account = order.account
+    content = ERB.new(File.read(Padrino.root('app/views/emails/ticket_email_update.erb'))).result(binding)
+    batch_message.from ENV['NOTIFICATIONS_EMAIL_FULL']
+    batch_message.subject "Ticket email update: #{account.name} in #{event.name}"
+    batch_message.body_html Premailer.new(ERB.new(File.read(Padrino.root('app/views/layouts/email.erb'))).result(binding), with_html_string: true, adapter: 'nokogiri', input_encoding: 'UTF-8').to_inline_css
+
+    event.event_facilitators.each do |account|
+      batch_message.add_recipient(:to, account.email, { 'firstname' => account.firstname || 'there', 'token' => account.sign_in_token, 'id' => account.id.to_s })
+    end
+
+    batch_message.finalize if ENV['MAILGUN_API_KEY']
+  end
 end

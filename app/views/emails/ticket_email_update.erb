@@ -1,0 +1,8 @@
+<div class="main">
+  <p>Hi %recipient.firstname%,</p>
+  <p>
+    FYI, <%= account.name %> (<%=account.email%>) updated the email address for a ticket to the event <a href="<%= ENV['BASE_URI'] %>/e/<%=event.slug%>"><%= event.name %></a>.
+    The new email address is <%= ticket.email %>.
+  </p>
+</p>
+</div>

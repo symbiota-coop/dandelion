@@ -35,8 +35,8 @@
               </div>
             </div>
             <div class="col-6">
-              <div data-pagelet-url="/events/<%=@event.id%>/orders/<%=@order.id%>/ticketholders/<%=ticket.id%>/email">
-                <%= partial :"events/ticketholder_email", locals: { ticket: ticket } %>
+              <div data-pagelet-url="/events/<%=@event.id%>/orders/<%=@order.id%>/ticketholders/<%=ticket.id%>/email?success=<%=params[:success] ? 1 : 0 %>">
+                <%= partial :"events/ticketholder_email", locals: { ticket: ticket, success: (params[:success] ? 1 : 0) } %>
               </div>
             </div>
           </div>

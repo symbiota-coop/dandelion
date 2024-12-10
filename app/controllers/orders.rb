@@ -280,19 +280,34 @@ Dandelion::App.controller do
     redirect back
   end
 
-  get '/events/:id/orders/:order_id/ticketholders/:ticket_id/:f' do
+  get '/events/:id/orders/:order_id/ticketholders/:ticket_id/name' do
     @event = Event.find(params[:id]) || not_found
     @order = @event.orders.complete.find(params[:order_id]) || not_found
     @ticket = @order.tickets.find(params[:ticket_id])
-    partial :"events/ticketholder_#{params[:f]}", locals: { ticket: @ticket }
+    partial :'events/ticketholder_name', locals: { ticket: @ticket }
   end
 
-  post '/events/:id/orders/:order_id/ticketholders/:ticket_id/:f' do
+  post '/events/:id/orders/:order_id/ticketholders/:ticket_id/name' do
     @event = Event.find(params[:id]) || not_found
     @order = @event.orders.complete.find(params[:order_id]) || not_found
     @ticket = @order.tickets.find(params[:ticket_id]) || not_found
-    @ticket.send(:"#{params[:f]}=", params[params[:f]])
-    @ticket.save
+    @ticket.update_attribute(:name, params[:name])
+    200
+  end
+
+  get '/events/:id/orders/:order_id/ticketholders/:ticket_id/email' do
+    @event = Event.find(params[:id]) || not_found
+    @order = @event.orders.complete.find(params[:order_id]) || not_found
+    @ticket = @order.tickets.find(params[:ticket_id])
+    partial :'events/ticketholder_email', locals: { ticket: @ticket, success: params[:success] }
+  end
+
+  post '/events/:id/orders/:order_id/ticketholders/:ticket_id/email' do
+    @event = Event.find(params[:id]) || not_found
+    @order = @event.orders.complete.find(params[:order_id]) || not_found
+    @ticket = @order.tickets.find(params[:ticket_id]) || not_found
+    @ticket.update_attribute(:email, params[:email])
+    @ticket.send_email_update_notification unless params[:success].to_i == 1
     200
   end
 
