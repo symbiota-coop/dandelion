@@ -62,6 +62,8 @@ namespace :organisations do
         )
       end.sum
       monthly_donations_count = monthly_donations_count.format(no_cents: true) if monthly_donations_count > 0
+      organisation.set(monthly_donations_count: monthly_donations_count)
+      organisation.set(monthly_donors_count: organisation.monthly_donors.count)
 
       organisation.update_paid_up_without_delay
       if organisation.stripe_customer_id
@@ -72,8 +74,6 @@ namespace :organisations do
 
       organisation.set(subscribed_accounts_count: organisation.subscribed_accounts.count)
       organisation.set(followers_count: organisation.organisationships.count)
-      organisation.set(monthly_donors_count: organisation.monthly_donors.count)
-      organisation.set(monthly_donations_count: monthly_donations_count)
     end
   end
 
