@@ -70,20 +70,25 @@
 
       <% r = organisation.contribution_requested_gbp_cache %>
       <% p = organisation.contribution_paid_gbp_cache %>
-      <% w = organisation.fraction_paid*100 if organisation.fraction_paid %>
-      <% balance = r - p %>
-      <td data-sort="<%=organisation.fraction_paid%>">
-        <%=m p, 'GBP'%>/<%=m r, 'GBP'%>
+      <% if r && p %>
+        <% w = organisation.fraction_paid*100 if organisation.fraction_paid %>
+        <% balance = r - p %>
+        <td data-sort="<%=organisation.fraction_paid%>">
+          <%=m p, 'GBP'%>/<%=m r, 'GBP'%>
 
-        <% if w %>
-          <div class="progress my-3" style="height: 30px">
-            <div class="progress-bar" role="progressbar" style="width: <%= "#{w > 100 ? 100 : w}%" %>;">
-              <% if w > 0 %><%= w.to_f.round %>%<% end %>
+          <% if w %>
+            <div class="progress my-3" style="height: 30px">
+              <div class="progress-bar" role="progressbar" style="width: <%= "#{w > 100 ? 100 : w}%" %>;">
+                <% if w > 0 %><%= w.to_f.round %>%<% end %>
+              </div>
             </div>
-          </div>
-        <% end %>
+          <% end %>
+        </td>
+      <% else %>
+        <td data-sort="0">
+        </td>
+      <% end %>
 
-      </td>
       <td data-sort="<%=balance%>">
         <%=m balance, 'GBP'%>
       </td>
