@@ -84,14 +84,13 @@
             </div>
           <% end %>
         </td>
-      <% else %>
-        <td data-sort="0">
+        <td data-sort="<%=balance%>">
+          <%=m balance, 'GBP'%>
         </td>
+      <% else %>
+        <td data-sort="0"></td>
+        <td data-sort="0"></td>
       <% end %>
-
-      <td data-sort="<%=balance%>">
-        <%=m balance, 'GBP'%>
-      </td>
 
     </tr>
     <% } %>
