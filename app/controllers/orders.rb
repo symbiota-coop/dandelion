@@ -296,6 +296,26 @@ Dandelion::App.controller do
     200
   end
 
+  get '/tickets/:id/edit' do
+    @ticket = Ticket.find(params[:id]) || not_found
+    @event = @ticket.event
+    event_admins_only!
+    erb :'events/ticket'
+  end
+
+  post '/tickets/:id/edit' do
+    @ticket = Ticket.find(params[:id]) || not_found
+    @event = @ticket.event
+    event_admins_only!
+    if @ticket.update_attributes(name: params[:ticket][:name], email: params[:ticket][:email])
+      flash[:notice] = 'The ticket was updated.'
+      redirect "/events/#{@event.id}/tickets"
+    else
+      flash.now[:error] = 'There was an error updating the ticket.'
+      erb :'events/ticket'
+    end
+  end
+
   get '/tickets/:id/toggle_resale' do
     @ticket = Ticket.find(params[:id]) || not_found
     halt 400 unless @ticket.account == current_account
@@ -315,7 +335,7 @@ Dandelion::App.controller do
     @ticket = Ticket.find(params[:id]) || not_found
     @event = @ticket.event
     event_admins_only!
-    @ticket.update_attributes(price: params[:price])
+    @ticket.update_attribute(:price, params[:price])
     200
   end
 
@@ -330,7 +350,7 @@ Dandelion::App.controller do
     @ticket = Ticket.find(params[:id]) || not_found
     @event = @ticket.event
     event_admins_only!
-    @ticket.update_attributes(ticket_type_id: params[:ticket_type_id])
+    @ticket.update_attribute(:ticket_type_id, params[:ticket_type_id])
     200
   end
 

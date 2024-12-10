@@ -1,0 +1,7 @@
+<%= partial :'events/nav', locals: { event: @event } %>
+
+<% form_for @ticket, "/tickets/#{@ticket.id}/edit" do |f| %>
+  <%= f.text_block :name %>
+  <%= f.email_block :email %>
+  <%= f.submit_block %>
+<% end %>
