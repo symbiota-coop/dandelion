@@ -37,28 +37,20 @@ module EventAccounting
   end
 
   def cap
-    if contribution_gbp_custom
-      Money.new(contribution_gbp_custom * 100, 'GBP')
-    elsif organisation && organisation.contribution_requested_per_event_gbp
-      Money.new(organisation.contribution_requested_per_event_gbp * 100, 'GBP')
-    else
-      Money.new(Organisation.contribution_requested_per_event_gbp * 100, 'GBP')
-    end
+    return unless contribution_gbp_custom
+
+    Money.new(contribution_gbp_custom * 100, 'GBP')
   end
 
   def contribution_gbp
-    if organisation && organisation.fixed_fee
-      cap
+    if ticket_types.empty?
+      Money.new(25 * 100, 'GBP')
     else
-      begin
-        if ticket_types.empty?
-          cap
-        else
-          five_percent_of_ticket_sales = Money.new(tickets.complete.sum(:discounted_price) * 0.05 * 100, currency).exchange_to('GBP')
-          [cap, five_percent_of_ticket_sales].min
-        end
-      rescue StandardError
-        cap
+      one_percent_of_ticket_sales = Money.new(tickets.complete.sum(:discounted_price) * 0.01 * 100, currency).exchange_to('GBP')
+      if cap
+        [cap, one_percent_of_ticket_sales].min
+      else
+        one_percent_of_ticket_sales
       end
     end
   end

@@ -6,10 +6,6 @@ module OrganisationAccounting
   end
 
   class_methods do
-    def contribution_requested_per_event_gbp
-      25
-    end
-
     def paid_up_fraction
       0.8
     end
@@ -43,10 +39,6 @@ module OrganisationAccounting
     contribution_requested - contribution_paid
   end
 
-  def contribution_threshold
-    Money.new((contribution_requested_per_event_gbp || Organisation.contribution_requested_per_event_gbp) * 100, 'GBP')
-  end
-
   def update_paid_up
     cr = contribution_requested
     cp = contribution_paid
@@ -54,7 +46,7 @@ module OrganisationAccounting
     update_attribute(:contribution_paid_gbp_cache, cp.exchange_to('GBP').to_f)
     update_attribute(:paid_up, nil)
     begin
-      update_attribute(:paid_up, contribution_not_required? || !stripe_customer_id.nil? || cr < contribution_threshold || cp >= (Organisation.paid_up_fraction * cr))
+      update_attribute(:paid_up, contribution_not_required? || !stripe_customer_id.nil? || cp >= (Organisation.paid_up_fraction * cr))
     rescue Money::Bank::UnknownRate, Money::Currency::UnknownCurrency
       update_attribute(:paid_up, true)
     end

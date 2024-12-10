@@ -4,7 +4,6 @@
 <% r = organisation.contribution_requested %>
 <% p = organisation.contribution_paid %>
 <% w = organisation.fraction_paid*100 if organisation.fraction_paid %>
-<% per_event = Money.new((organisation.contribution_requested_per_event_gbp || Organisation.contribution_requested_per_event_gbp) * 100, 'GBP') %>
 <% balance = r - p %>
 
 <% if !organisation.contribution_not_required? && (defined?(force) || ((c > 0) && (balance > 0))) %>
@@ -26,7 +25,7 @@
         <% end %>
 
         <p class="lead">
-          The suggested donation is <% if organisation.fixed_fee %><%= m per_event, currency %> per event<% else%>5% of ticket sales per event, <u>capped at <%= m per_event, currency %></u><% end %>.
+          The suggested donation is 1% of ticket sales per event.
         </p>
 
         <p class="lead">
@@ -34,7 +33,7 @@
           and contributed
           <%= m p, currency %>
           of a
-          <% if request.path.split('/').last == 'contribute' %>suggested <%= m r, currency %><% else %><a href="/o/<%=organisation.slug%>/contribute">suggested <%= m r, currency %></a><% end %><% if balance <= 0%>.<% else %><% if balance > per_event %>, leaving a balance of <%= m balance, currency %><% end %>.<% end %>
+          <% if request.path.split('/').last == 'contribute' %>suggested <%= m r, currency %><% else %><a href="/o/<%=organisation.slug%>/contribute">suggested <%= m r, currency %></a><% end %><% if balance <= 0%>.<% else %>, leaving a balance of <%= m balance, currency %>.<% end %>
         </p>
 
         <% if w && w <= 100 %>
@@ -52,7 +51,7 @@
                 <span class="input-group-text"><%=money_symbol(currency) %></span>
               </div>
               <%= hidden_field_tag :currency, value: currency %>
-              <%= text_field_tag :amount, style: 'width: 5em;', required: 'required', class: 'form-control', id: 'amount', value: (balance < per_event ? per_event : balance) %>
+              <%= text_field_tag :amount, style: 'width: 5em;', required: 'required', class: 'form-control', id: 'amount', value: balance %>
             </div>
           </div>
           <button data-payment-method="stripe" type="submit" class="btn btn-primary mb-1 ml-0 mr-1" style="height: 2.125rem">
