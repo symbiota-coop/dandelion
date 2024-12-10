@@ -50,11 +50,12 @@ module EventAccounting
     if ticket_types.empty?
       Money.new(Event.contribution_gbp_fallback * 100, 'GBP')
     else
-      one_percent_of_ticket_sales = Money.new(tickets.complete.sum(:discounted_price) * 0.01 * 100, currency).exchange_to('GBP')
+      percent_requested = start_time < Date.new(2025, 1, 1) ? 5 : 1
+      percentage_of_ticket_sales = Money.new(tickets.complete.sum(:discounted_price) * (percent_requested.to_f / 100) * 100, currency).exchange_to('GBP')
       if cap
-        [cap, one_percent_of_ticket_sales].min
+        [cap, percentage_of_ticket_sales].min
       else
-        one_percent_of_ticket_sales
+        percentage_of_ticket_sales
       end
     end
   rescue Money::Bank::UnknownRate, Money::Currency::UnknownCurrency
