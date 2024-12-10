@@ -51,7 +51,7 @@
                 <span class="input-group-text"><%=money_symbol(currency) %></span>
               </div>
               <%= hidden_field_tag :currency, value: currency %>
-              <%= text_field_tag :amount, style: 'width: 5em;', required: 'required', class: 'form-control', id: 'amount', value: (balance if balance > 0) %>
+              <%= text_field_tag :amount, style: 'width: 5em;', required: 'required', class: 'form-control', id: 'amount', value: (balance if balance > Money.new(1 * 100, 'GBP')) %>
             </div>
           </div>
           <button data-payment-method="stripe" type="submit" class="btn btn-primary mb-1 ml-0 mr-1" style="height: 2.125rem">
