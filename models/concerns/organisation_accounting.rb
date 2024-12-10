@@ -12,7 +12,7 @@ module OrganisationAccounting
   end
 
   def contribution_requested
-    c = Money.new((-1 * (contribution_offset_gbp || 0) * 100) || 0, 'GBP')
+    c = Money.new(0, 'GBP')
     contributable_events.each do |event|
       c += event.contribution_gbp
     end

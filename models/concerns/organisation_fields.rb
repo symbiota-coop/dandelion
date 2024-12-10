@@ -74,7 +74,6 @@ module OrganisationFields
     field :contribution_not_required, type: Mongoid::Boolean
     field :contribution_requested_gbp_cache, type: Float
     field :contribution_paid_gbp_cache, type: Float
-    field :contribution_offset_gbp, type: Float
     field :ical_full, type: Mongoid::Boolean
     field :allow_purchase_url, type: Mongoid::Boolean
     field :change_select_tickets_title, type: Mongoid::Boolean
@@ -148,7 +147,6 @@ module OrganisationFields
         unsanitized_ok: :check_box,
         allow_purchase_url: :check_box,
         contribution_not_required: :check_box,
-        contribution_offset_gbp: :number,
         event_image_required_height: :number,
         event_image_required_width: :number,
         psychedelic: :check_box,

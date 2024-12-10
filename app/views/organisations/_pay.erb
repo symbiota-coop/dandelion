@@ -44,28 +44,26 @@
           </div>
         <% end %>
 
-        <% if balance > 0 %>
-          <% form_tag '', class: 'form-inline mb-3', id: 'pay-form' do %>
-            <div class="form-group mb-1 mr-1">
-              <div class="input-group">
-                <div class="input-group-prepend">
-                  <span class="input-group-text"><%=money_symbol(currency) %></span>
-                </div>
-                <%= hidden_field_tag :currency, value: currency %>
-                <%= text_field_tag :amount, style: 'width: 5em;', required: 'required', class: 'form-control', id: 'amount', value: balance %>
+        <% form_tag '', class: 'form-inline mb-3', id: 'pay-form' do %>
+          <div class="form-group mb-1 mr-1">
+            <div class="input-group">
+              <div class="input-group-prepend">
+                <span class="input-group-text"><%=money_symbol(currency) %></span>
               </div>
+              <%= hidden_field_tag :currency, value: currency %>
+              <%= text_field_tag :amount, style: 'width: 5em;', required: 'required', class: 'form-control', id: 'amount', value: (balance if balance > 0) %>
             </div>
-            <button data-payment-method="stripe" type="submit" class="btn btn-primary mb-1 ml-0 mr-1" style="height: 2.125rem">
-              Contribute via card
-              <i class="bi bi-spin bi-arrow-repeat" style="display: none"></i>
-            </button>
-            <%= hidden_field_tag :payment_method, value: 'stripe', disabled: true %>
-            <button data-payment-method="coinbase" type="submit" class="btn btn-outline-primary border-0 mb-1" style="height: 2.125rem">
-              via crypto
-              <i class="bi bi-spin bi-arrow-repeat" style="display: none"></i>
-            </button>
-            <%= hidden_field_tag :payment_method, value: 'coinbase', disabled: true %>
-          <% end %>
+          </div>
+          <button data-payment-method="stripe" type="submit" class="btn btn-primary mb-1 ml-0 mr-1" style="height: 2.125rem">
+            Contribute via card
+            <i class="bi bi-spin bi-arrow-repeat" style="display: none"></i>
+          </button>
+          <%= hidden_field_tag :payment_method, value: 'stripe', disabled: true %>
+          <button data-payment-method="coinbase" type="submit" class="btn btn-outline-primary border-0 mb-1" style="height: 2.125rem">
+            via crypto
+            <i class="bi bi-spin bi-arrow-repeat" style="display: none"></i>
+          </button>
+          <%= hidden_field_tag :payment_method, value: 'coinbase', disabled: true %>
         <% end %>
 
         <p class="mb-0">
