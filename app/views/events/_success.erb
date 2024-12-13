@@ -18,32 +18,30 @@
       </script>
     <% else %>
 
-      <% if @order.tickets.count > 1 %>
-        <p class="mb-3"><strong>You're welcome to let us know the names and email addresses of ticketholders so they hear about any important updates to the event (we won't use these details for anything else):</strong></p>
-        <div class="mb-3">
-          <% @order.tickets.each_with_index { |ticket,i| %>
-          <div class="p-2 rounded mb-2 border border-primary ticket">
-            <p class="mb-1">
-              <i class="bi bi-ticket-detailed-fill"></i>
-              <%=ticket.ticket_type.try(:name)%>
-            </span>
-          </p>
-          <div class="row">
-            <div class="col-6">
-              <div data-pagelet-url="/events/<%=@event.id%>/orders/<%=@order.id%>/ticketholders/<%=ticket.id%>/name">
-                <%= partial :"events/ticketholder_name", locals: { ticket: ticket } %>
-              </div>
+      <p class="mb-3"><strong>You're welcome to let us know the names and email addresses of ticketholders so they hear about any important updates to the event (we won't use these details for anything else):</strong></p>
+      <div class="mb-3">
+        <% @order.tickets.each_with_index { |ticket,i| %>
+        <div class="p-2 rounded mb-2 border border-primary ticket">
+          <p class="mb-1">
+            <i class="bi bi-ticket-detailed-fill"></i>
+            <%=ticket.ticket_type.try(:name)%>
+          </span>
+        </p>
+        <div class="row">
+          <div class="col-6">
+            <div data-pagelet-url="/events/<%=@event.id%>/orders/<%=@order.id%>/ticketholders/<%=ticket.id%>/name">
+              <%= partial :"events/ticketholder_name", locals: { ticket: ticket } %>
             </div>
-            <div class="col-6">
-              <div data-pagelet-url="/events/<%=@event.id%>/orders/<%=@order.id%>/ticketholders/<%=ticket.id%>/email?success=<%=params[:success] ? 1 : 0 %>">
-                <%= partial :"events/ticketholder_email", locals: { ticket: ticket, success: (params[:success] ? 1 : 0) } %>
-              </div>
+          </div>
+          <div class="col-6">
+            <div data-pagelet-url="/events/<%=@event.id%>/orders/<%=@order.id%>/ticketholders/<%=ticket.id%>/email?success=<%=params[:success] ? 1 : 0 %>">
+              <%= partial :"events/ticketholder_email", locals: { ticket: ticket, success: (params[:success] ? 1 : 0) } %>
             </div>
           </div>
         </div>
-        <% } %>
       </div>
-    <% end %>
+      <% } %>
+    </div>
 
     <% if @event.affiliate_credit_percentage %>
       <% affiliate_link = "#{ENV['BASE_URI']}/e/#{@event.slug}?affiliate_type=Account&affiliate_id=#{@order.account_id}" %>

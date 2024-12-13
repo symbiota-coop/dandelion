@@ -24,7 +24,7 @@
       <hr>
       <%= event.organisation.extra_info_for_ticket_email %>
     <% end %>
-    <% if !event.recording? && event.organisation.show_ticketholder_link_in_ticket_emails && order.tickets.length > 1 %>
+    <% if !event.recording? && event.organisation.show_ticketholder_link_in_ticket_emails %>
       <p>
         <a href="<%=ENV['BASE_URI']%>/e/<%=event.slug%>?order_id=<%=order.id%>">Visit this page to add details of ticketholders.</a>
       </p>
