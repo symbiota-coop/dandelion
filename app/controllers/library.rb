@@ -8,7 +8,11 @@ Dandelion::App.controller do
   get '/books/:slug' do
     @book = Book.all(filter: "{Slug} = '#{params[:slug]}'").first || not_found
     @title = "#{@book['Title']} by #{@book['Author']}"
-    erb :'books/book'
+    if @book['Full text'].empty?
+      redirect "https://goodreads.com/book/show/#{@book['Book Id']}"
+    else
+      erb :'books/book'
+    end
   end
 
   get '/films' do
