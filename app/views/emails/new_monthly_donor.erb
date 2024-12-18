@@ -4,7 +4,7 @@
     is now donating
     <%= organisationship.monthly_donation_amount %> <%= organisationship.monthly_donation_currency %> per month      
     to <%= organisation.name %>
-    via <%= organisationship.monthly_donation_method %>.
+    via <%= organisationship.monthly_donation_method %><% if organisationship.monthly_donation_annual %>, paid annually<% end %>.
   </p>
 </div>
 <div class="footer">
