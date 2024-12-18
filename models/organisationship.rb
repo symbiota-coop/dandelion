@@ -14,6 +14,7 @@ class Organisationship
   field :monthly_donation_currency, type: String
   field :monthly_donation_start_date, type: Date
   field :monthly_donation_postcode, type: String
+  field :monthly_donation_annual, type: Boolean
   field :coordinates, type: Array
   field :why_i_joined, type: String
   field :why_i_joined_edited, type: String

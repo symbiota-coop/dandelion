@@ -61,6 +61,9 @@ module OrganisationMonthlyDonations
     organisationship.monthly_donation_currency = currency
     organisationship.monthly_donation_start_date = start_date
     organisationship.monthly_donation_postcode = postcode
+    organisationship.monthly_donation_annual = true if subscription.name =~ /\bannual\b/i
+    organisationship.monthly_donation_amount = (organisationship.monthly_donation_amount.to_f / 12).round(2) if organisationship.monthly_donation_annual
+
     organisationship.save
 
     send_new_monthly_donor_notification(organisationship) if send_notification
