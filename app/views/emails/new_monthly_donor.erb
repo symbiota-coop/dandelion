@@ -1,0 +1,12 @@
+<div class="main">
+  <p>
+    <%= organisationship.account.name %> (<%= organisationship.account.email %>)
+    is now donating
+    <%= organisationship.monthly_donation_amount %> <%= organisationship.monthly_donation_currency %> per month      
+    to <%= organisation.name %>
+    via <%= organisationship.monthly_donation_method %>.
+  </p>
+</div>
+<div class="footer">
+  <a href="<%= ENV['BASE_URI'] %>">Sent with Dandelion</a>
+</div>

@@ -3,7 +3,6 @@ module OrganisationMonthlyDonations
 
   def sync_with_gocardless
     organisationships.and(monthly_donation_method: 'GoCardless').set(
-      monthly_donation_method: nil,
       monthly_donation_amount: nil,
       monthly_donation_currency: nil,
       monthly_donation_start_date: nil
@@ -23,6 +22,10 @@ module OrganisationMonthlyDonations
     subscriptions.each do |subscription|
       gocardless_subscribe(subscription: subscription)
     end
+
+    organisationships.and(monthly_donation_method: 'GoCardless', monthly_donation_amount: nil).set(
+      monthly_donation_method: nil
+    )
   end
 
   def gocardless_subscribe(subscription: nil, subscription_id: nil)
@@ -51,17 +54,20 @@ module OrganisationMonthlyDonations
     account = Account.find_by(email: email.downcase) || Account.create(name: name, email: email)
     organisationship = organisationships.find_by(account: account) || organisationships.create(account: account)
 
+    send_notification = organisationship.monthly_donation_method.nil?
+
     organisationship.monthly_donation_method = 'GoCardless'
     organisationship.monthly_donation_amount = amount.to_f / 100
     organisationship.monthly_donation_currency = currency
     organisationship.monthly_donation_start_date = start_date
     organisationship.monthly_donation_postcode = postcode
     organisationship.save
+
+    send_new_monthly_donor_notification(organisationship) if send_notification
   end
 
   def sync_with_patreon
     organisationships.and(monthly_donation_method: 'Patreon').set(
-      monthly_donation_method: nil,
       monthly_donation_amount: nil,
       monthly_donation_currency: nil,
       monthly_donation_start_date: nil
@@ -87,23 +93,52 @@ module OrganisationMonthlyDonations
     end
 
     all_pledges.each do |pledge|
-      next unless pledge.declined_since.nil?
-
-      name = pledge.patron.full_name
-      email = pledge.patron.email
-      amount = pledge.amount_cents
-      currency = pledge.currency
-      start_date = pledge.created_at
-
-      puts "#{name} #{email} #{amount} #{currency} #{start_date}"
-      account = Account.find_by(email: email.downcase) || Account.create(name: name, email: email)
-      organisationship = organisationships.find_by(account: account) || organisationships.create(account: account)
-
-      organisationship.monthly_donation_method = 'Patreon'
-      organisationship.monthly_donation_amount = amount.to_f / 100
-      organisationship.monthly_donation_currency = currency
-      organisationship.monthly_donation_start_date = start_date
-      organisationship.save
+      patreon_subscribe(pledge)
     end
+
+    organisationships.and(monthly_donation_method: 'Patreon', monthly_donation_amount: nil).set(
+      monthly_donation_method: nil
+    )
+  end
+
+  def patreon_subscribe(pledge)
+    return unless pledge.declined_since.nil?
+
+    name = pledge.patron.full_name
+    email = pledge.patron.email
+    amount = pledge.amount_cents
+    currency = pledge.currency
+    start_date = pledge.created_at
+
+    puts "#{name} #{email} #{amount} #{currency} #{start_date}"
+    account = Account.find_by(email: email.downcase) || Account.create(name: name, email: email)
+    organisationship = organisationships.find_by(account: account) || organisationships.create(account: account)
+
+    send_notification = organisationship.monthly_donation_method.nil?
+
+    organisationship.monthly_donation_method = 'Patreon'
+    organisationship.monthly_donation_amount = amount.to_f / 100
+    organisationship.monthly_donation_currency = currency
+    organisationship.monthly_donation_start_date = start_date
+    organisationship.save
+
+    send_new_monthly_donor_notification(organisationship) if send_notification
+  end
+
+  def send_new_monthly_donor_notification(organisationship)
+    mg_client = Mailgun::Client.new ENV['MAILGUN_API_KEY'], ENV['MAILGUN_REGION']
+    batch_message = Mailgun::BatchMessage.new(mg_client, ENV['MAILGUN_NOTIFICATIONS_HOST'])
+
+    organisation = self
+    content = ERB.new(File.read(Padrino.root('app/views/emails/new_monthly_donor.erb'))).result(binding)
+    batch_message.from ENV['NOTIFICATIONS_EMAIL_FULL']
+    batch_message.subject "New monthly donor for #{organisation.name}: #{organisationship.account.name}"
+    batch_message.body_html Premailer.new(ERB.new(File.read(Padrino.root('app/views/layouts/email.erb'))).result(binding), with_html_string: true, adapter: 'nokogiri', input_encoding: 'UTF-8').to_inline_css
+
+    admins_receiving_feedback.each do |account|
+      batch_message.add_recipient(:to, account.email, { 'firstname' => account.firstname || 'there', 'token' => account.sign_in_token, 'id' => account.id.to_s })
+    end
+
+    batch_message.finalize if ENV['MAILGUN_API_KEY']
   end
 end
