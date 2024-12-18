@@ -5,7 +5,8 @@ module OrganisationMonthlyDonations
     organisationships.and(monthly_donation_method: 'GoCardless').set(
       monthly_donation_amount: nil,
       monthly_donation_currency: nil,
-      monthly_donation_start_date: nil
+      monthly_donation_start_date: nil,
+      monthly_donation_annual: nil
     )
 
     client = GoCardlessPro::Client.new(access_token: gocardless_access_token)
@@ -61,7 +62,7 @@ module OrganisationMonthlyDonations
     organisationship.monthly_donation_currency = currency
     organisationship.monthly_donation_start_date = start_date
     organisationship.monthly_donation_postcode = postcode
-    organisationship.monthly_donation_annual = true if subscription.name =~ /\bannual\b/i
+    organisationship.monthly_donation_annual = subscription.name =~ /\bannual\b/i ? true : false
     organisationship.monthly_donation_amount = (organisationship.monthly_donation_amount.to_f / 12).round(2) if organisationship.monthly_donation_annual
 
     organisationship.save
@@ -73,7 +74,8 @@ module OrganisationMonthlyDonations
     organisationships.and(monthly_donation_method: 'Patreon').set(
       monthly_donation_amount: nil,
       monthly_donation_currency: nil,
-      monthly_donation_start_date: nil
+      monthly_donation_start_date: nil,
+      monthly_donation_annual: nil
     )
 
     api_client = Patreon::API.new(patreon_api_key)
