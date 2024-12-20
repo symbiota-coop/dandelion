@@ -10,7 +10,7 @@
   </div>
 <% end %>
 
-<% if event_feedback.response %>
+<% if event_feedback.public_answers && !qas.empty? && event_feedback.response %>
   <div class="mb-3 <% if event_feedback.public_answers && qas%>mt-3<% end %>">
     <em><%=event_feedback.event.organisation.name%> replied</em>
     <p class="mt-1 mb-0"><big>&mdash; <%== Sanitize.fragment(Rinku.auto_link(event_feedback.response), Sanitize::Config::DANDELION) %></big></p>
