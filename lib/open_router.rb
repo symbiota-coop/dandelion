@@ -18,7 +18,7 @@ class OpenRouter
     end
   end
 
-  def chat(prompt, full_response: false, max_tokens: nil, model: DEFAULT_MODEL, providers: DEFAULT_PROVIDERS, context_window_size: DEFAULT_CONTEXT_WINDOW_SIZE)
+  def chat(prompt, full_response: false, max_tokens: nil, schema: nil, model: DEFAULT_MODEL, providers: DEFAULT_PROVIDERS, context_window_size: DEFAULT_CONTEXT_WINDOW_SIZE)
     prompt = prompt[0..(context_window_size * 4 * 0.66)]
 
     payload = {
@@ -36,12 +36,28 @@ class OpenRouter
       allow_fallbacks: 'false'
     }
 
+    if schema
+      payload[:response_format] = {
+        type: 'json_schema',
+        json_schema: {
+          name: 'response',
+          strict: true,
+          schema: schema
+        }
+      }
+    end
+
     response = @client.post('/api/v1/chat/completions') do |req|
       req.headers['Content-Type'] = 'application/json'
       req.headers['Authorization'] = "Bearer #{ENV['OPENROUTER_API_KEY']}"
       req.body = payload
     end
 
-    full_response ? response.body : response.body.dig('choices', 0, 'message', 'content')
+    if full_response
+      response.body
+    else
+      r = response.body.dig('choices', 0, 'message', 'content')
+      schema ? JSON.parse(r) : r
+    end
   end
 end

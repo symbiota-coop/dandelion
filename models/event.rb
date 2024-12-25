@@ -220,6 +220,29 @@ class Event
     return if duplicate
     return unless event_tagships(true).empty?
 
+    # prompt = "Provide a list of 5 tags for this event. No hashtags. Event details: \n\n# #{name}\n\n#{description}"
+
+    # tags = nil
+    # 5.times do
+    #   tags = OpenRouter.chat(prompt, max_tokens: 256, schema: {
+    #                            type: 'object',
+    #                            properties: {
+    #                              tags: {
+    #                                type: 'array',
+    #                                description: 'List of tags'
+    #                              }
+    #                            },
+    #                            required: ['tags'],
+    #                            additionalProperties: false
+    #                          })['tags']
+    #   break if tags.all? { |tag| !tag.starts_with?('#') }
+    # end
+    # return unless tags
+
+    # tags.map do |name|
+    #   name.gsub('_', ' ').gsub('-', ' ').downcase
+    # end.each do |name|
+
     prompt = "Provide a list of 5 tags for this event as a comma-separated list. Use spaces. No hashtags. Event details: \n\n# #{name}\n\n#{description}"
 
     content = nil
