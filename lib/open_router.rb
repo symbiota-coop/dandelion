@@ -1,8 +1,8 @@
 class OpenRouter
   BASE_URL = 'https://openrouter.ai'.freeze
   DEFAULT_MODEL = 'meta-llama/llama-3.3-70b-instruct'.freeze
-  DEFAULT_PROVIDERS = %w[Fireworks Together Avian Lepton].freeze
-  DEFAULT_CONTEXT_WINDOW = 128_000
+  DEFAULT_PROVIDERS = %w[Lepton Fireworks Together Avian].freeze
+  DEFAULT_CONTEXT_WINDOW_SIZE = 128_000
 
   class << self
     def chat(prompt, **)
@@ -18,8 +18,8 @@ class OpenRouter
     end
   end
 
-  def chat(prompt, full_response: false, max_tokens: nil, model: DEFAULT_MODEL, providers: DEFAULT_PROVIDERS)
-    prompt = prompt[0..(DEFAULT_CONTEXT_WINDOW * 4 * 0.66)]
+  def chat(prompt, full_response: false, max_tokens: nil, model: DEFAULT_MODEL, providers: DEFAULT_PROVIDERS, context_window_size: DEFAULT_CONTEXT_WINDOW_SIZE)
+    prompt = prompt[0..(context_window_size * 4 * 0.66)]
 
     payload = {
       model: model,
