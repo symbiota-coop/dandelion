@@ -14,7 +14,7 @@ Dandelion::App.controller do
               else
                 @events
               end
-    @events = @events.and(coordinates: { '$geoWithin' => { '$center' => [Geocoder.coordinates(params[:near]).reverse, 100 / 111.319] } }) if params[:near]
+    @events = @events.and(coordinates: { '$geoWithin' => { '$center' => [Geocoder.coordinates(params[:near]).reverse, 50 / 111.319] } }) if params[:near]
     @events = @events.and(:id.in => EventTagship.and(event_tag_id: params[:event_tag_id]).pluck(:event_id)) if params[:event_tag_id]
     %i[organisation activity local_group].each do |r|
       @events = @events.and("#{r}_id": params[:"#{r}_id"]) if params[:"#{r}_id"]

@@ -18,7 +18,7 @@ Dandelion::App.controller do
     event_tag_ids = EventTagship.and(event_tag_id: params[:event_tag_id]).pluck(:event_id) if params[:event_tag_id]
     event_ids = (!q_ids.empty? && !event_tag_ids.empty? ? (q_ids & event_tag_ids) : (q_ids + event_tag_ids))
     @events = @events.and(:id.in => event_ids) unless event_ids.empty?
-    @events = @events.and(coordinates: { '$geoWithin' => { '$center' => [Geocoder.coordinates(params[:near]).reverse, 100 / 111.319] } }) if params[:near]
+    @events = @events.and(coordinates: { '$geoWithin' => { '$center' => [Geocoder.coordinates(params[:near]).reverse, 50 / 111.319] } }) if params[:near]
     @events = @events.and(local_group_id: params[:local_group_id]) if params[:local_group_id]
     @events = @events.and(activity_id: params[:activity_id]) if params[:activity_id]
     carousel = nil
