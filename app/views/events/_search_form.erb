@@ -3,10 +3,6 @@
 
     if (typeof google !== 'undefined') {
       var autocomplete = new google.maps.places.Autocomplete($('#events-search-near')[0]);
-      $('#events-search-near').keydown(function (e) {
-        if (e.which == 13 && $('.pac-container:visible').length)
-          return false;
-      })
     }
 
   })
