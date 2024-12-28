@@ -16,6 +16,10 @@
         <label>containing the word</label>
         <%= text_field_tag :q, class: 'form-control', value: params[:q] %>
       </div>
+      <div class="form-group col-12 col-sm-auto">
+        <label>near</label>
+        <%= text_field_tag :near, class: 'form-control', value: params[:near] %>
+      </div>
       <% if (event_tags = EventTag.and(:id.in => EventTagship.and(:event_id.in => Event.live.public.legit.future.pluck(:id)).pluck(:event_tag_id)).order('name asc')).count > 0 %>
         <div class="form-group col-12 col-sm-auto">
           <label>tagged</label>
