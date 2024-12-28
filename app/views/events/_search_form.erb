@@ -1,3 +1,17 @@
+<script>
+  $(function () {
+
+    if (typeof google !== 'undefined') {
+      var autocomplete = new google.maps.places.Autocomplete($('#events-search-near')[0]);
+      $('#events-search-near').keydown(function (e) {
+        if (e.which == 13 && $('.pac-container:visible').length)
+          return false;
+      })
+    }
+
+  })
+</script>
+
 <div class="search well">
 
   <% form_tag '/events', method: 'get', class: 'submitOnChange searchForm mb-3' do %>
@@ -18,7 +32,7 @@
       </div>
       <div class="form-group col-12 col-sm-auto">
         <label>near</label>
-        <%= text_field_tag :near, class: 'form-control', value: params[:near] %>
+        <%= text_field_tag :near, class: 'form-control', value: params[:near], id: 'events-search-near' %>
       </div>
       <% if (event_tags = EventTag.and(:id.in => EventTagship.and(:event_id.in => Event.live.public.legit.future.pluck(:id)).pluck(:event_tag_id)).order('name asc')).count > 0 %>
         <div class="form-group col-12 col-sm-auto">
