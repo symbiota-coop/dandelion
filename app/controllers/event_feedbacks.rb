@@ -29,7 +29,7 @@ Dandelion::App.controller do
 
   get '/event_feedbacks/report' do
     if request.xhr?
-      prompt = "Suggest up to 5 areas for improvement for this facilitator, presented as a numbered list. Use an encouraging and positive tone. Address them in the second person ('you'). \n\n#{current_account.feedbacks_joined}"
+      prompt = "Suggest up to 5 areas for improvement for this facilitator based on this feedback, presented as a numbered list. Use an encouraging and positive tone. Address them in the second person ('you'). The feedback:\n\n#{current_account.feedbacks_joined}"
       markdown = Redcarpet::Markdown.new(Redcarpet::Render::HTML, autolink: true, tables: true, fenced_code_blocks: true)
       markdown.render(%(1. #{OpenRouter.chat(prompt).split('1.').last}))
     else
