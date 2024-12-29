@@ -15,8 +15,10 @@ module AccountFeedbackSummaries
     end
   end
 
-  def feedbacks_joined
-    event_feedbacks_as_facilitator.order('created_at desc').and(:answers.ne => nil).map do |ef|
+  def feedbacks_joined(since: nil)
+    event_feedbacks = event_feedbacks_as_facilitator.and(:answers.ne => nil).order('created_at desc')
+    event_feedbacks = event_feedbacks.and(:created_at.gte => since) if since
+    event_feedbacks.map do |ef|
       next unless ef.event
       next if ef.answers.all? { |_q, a| a.blank? }
 
