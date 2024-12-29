@@ -28,6 +28,7 @@ Dandelion::App.controller do
   end
 
   get '/event_feedbacks/report' do
+    sign_in_required!
     if request.xhr?
       cp(:'event_feedbacks/report', key: "/event_feedbacks/#{current_account.id}/report", expires: 7.days.from_now)
     else
