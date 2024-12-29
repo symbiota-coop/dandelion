@@ -29,7 +29,7 @@
       </div>
       <div class="form-group col-12 col-sm-auto">
         <label>near</label>
-        <%= text_field_tag :near, class: 'form-control', value: params[:near], id: 'events-search-near' %>
+        <%= text_field_tag :near, class: 'form-control', value: params[:near], id: 'events-search-near', placeholder: '' %>
       </div>
       <% if @organisation.event_tags.count > 1 %>
         <div class="form-group col-12 col-sm-auto">
