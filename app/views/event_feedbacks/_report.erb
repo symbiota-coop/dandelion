@@ -7,5 +7,6 @@ Further instructions (don't mention in your response):
 
 The feedback:\n\n#{current_account.feedbacks_joined(since: 1.year.ago)}}
   markdown = Redcarpet::Markdown.new(Redcarpet::Render::HTML, autolink: true, tables: true, fenced_code_blocks: true)
+  content = OpenRouter.chat(prompt, model: 'anthropic/claude-3.5-sonnet:beta').split('1.').last
 %>
-<%== markdown.render(%(1. #{OpenRouter.chat(prompt, model: 'anthropic/claude-3.5-sonnet:beta').split('1.').last})) %>
+<%== markdown.render(%(Based on feedback from the past year, here are 5 possible areas for improvement:\n\n1. #{content})) %>
