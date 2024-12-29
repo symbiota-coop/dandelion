@@ -29,9 +29,7 @@ Dandelion::App.controller do
 
   get '/event_feedbacks/report' do
     if request.xhr?
-      prompt = "Suggest up to 5 areas for improvement for this facilitator based on this feedback, presented as a numbered list. Use an encouraging and positive tone. Address them in the second person ('you'). The feedback:\n\n#{current_account.feedbacks_joined}"
-      markdown = Redcarpet::Markdown.new(Redcarpet::Render::HTML, autolink: true, tables: true, fenced_code_blocks: true)
-      markdown.render(%(1. #{OpenRouter.chat(prompt).split('1.').last}))
+      cp(:'event_feedbacks/report', key: "/event_feedbacks/#{current_account.id}/report", expires: 7.days.from_now)
     else
       erb :'event_feedbacks/report'
     end
