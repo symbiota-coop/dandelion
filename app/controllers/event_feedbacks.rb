@@ -27,6 +27,20 @@ Dandelion::App.controller do
     erb :'events/event_feedbacks'
   end
 
+  get '/event_feedbacks/report' do
+    if request.xhr?
+      prompt = "Suggest up to 5 areas for improvement for this facilitator, presented as a numbered list. Use an encouraging and positive tone. Address them in the second person ('you'). \n\n#{current_account.feedbacks_joined}"
+      markdown = Redcarpet::Markdown.new(Redcarpet::Render::HTML, autolink: true, tables: true, fenced_code_blocks: true)
+      markdown.render(%(1. #{OpenRouter.chat(prompt).split('1.').last}))
+    else
+      erb :'event_feedbacks/report'
+    end
+  end
+
+  get '/event_feedbacks/feedback', provides: :txt do
+    current_account.feedbacks_joined
+  end
+
   get '/event_feedbacks/:id' do
     @event_feedback = EventFeedback.find(params[:id]) || not_found
     @event = @event_feedback.event

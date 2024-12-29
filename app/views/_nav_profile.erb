@@ -1,6 +1,7 @@
 <%= ul_nav [
       ['View profile', "/u/#{current_account.username}"],
       ['Edit profile', '/accounts/edit'],
+      (['Facilitator feedback', '/event_feedbacks/report'] if current_account.event_feedbacks_as_facilitator.and(:answers.ne => nil).exists?),
       ['Notifications', '/accounts/subscriptions'],
       (['Monthly contribution', 'https://billing.stripe.com/p/login/14kg1O9HD49fg2kcMM'] if current_account.stripe_subscription_id),
       ['Sign out', '/accounts/sign_out']
