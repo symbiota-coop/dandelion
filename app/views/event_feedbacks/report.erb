@@ -1,10 +1,12 @@
 <a target="_blank" href="/event_feedbacks/feedback.txt">Download your event feedback as a Markdown file</a> (for pasting into your favourite AI)
 
-<h2 class="mt-3">Feedback summary</h2>
+<% if current_account.feedback_summary %>
+  <h2 class="mt-3">Feedback summary</h2>
 
-<div style="font-size: 0.9rem" data-toggle="tooltip" title="AI-generated ✨">
-  <%== current_account.feedback_summary ? current_account.feedback_summary : (current_account.feedback_summary!; current_account.feedback_summary) %>
-</div>
+  <div style="font-size: 0.9rem" data-toggle="tooltip" title="AI-generated ✨">
+    <%== current_account.feedback_summary %>
+  </div>
+<% end %>
 
 <h2 class="mt-3" >Possible areas for improvement</h2>
 
