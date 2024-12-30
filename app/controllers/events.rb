@@ -159,6 +159,10 @@ Dandelion::App.controller do
     session[:via] = params[:via] if params[:via]
     session[:return_to] = request.url
     @event = Event.find_by(slug: params[:slug])
+    if !@event && params[:slug] =~ /[A-Z]/
+      @event = Event.find_by(slug: params[:slug].downcase)
+      redirect "/e/#{@event.slug}" if @event
+    end
     unless @event
       id = params[:slug]
       @event = Event.find(id) || not_found
