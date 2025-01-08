@@ -277,7 +277,7 @@ class Organisationship
   def organisation_tier
     organisation_tier = nil
     organisation.organisation_tiers.order('threshold asc').each do |ot|
-      organisation_tier = ot if Money.new(monthly_donation_amount * 100, monthly_donation_currency) >= Money.new(ot.threshold * 100, organisation.currency)
+      organisation_tier = ot if monthly_donation_amount && monthly_donation_currency && Money.new(monthly_donation_amount * 100, monthly_donation_currency) >= Money.new(ot.threshold * 100, organisation.currency)
     end
     organisation_tier
   end
