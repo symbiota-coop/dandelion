@@ -32,7 +32,7 @@
           <span class="input-group-text"><%= money_symbol(@event.currency) %></span>
         </div>
         <%= number_field_tag :"prices[#{ticket_type.id}]", min: 1, class: 'form-control',
-              oninput: "$(this).parent().parent().next().find('.select-a-price-first').hide(); $(this).parent().parent().next().find('[name^=quantities]').attr('data-price',this.value).prop('disabled',false).change();" %>
+              oninput: "$(this).parent().parent().next().find('.select-a-price-first').hide(); var qty = $(this).parent().parent().next().find('[name^=quantities]'); qty.attr('data-price',this.value); if (qty.prop('disabled')) { qty.val(1); }; qty.prop('disabled',false).change();" %>
       </div>
     <% end %>
   </td>
@@ -56,7 +56,7 @@
     <% else %>
       <div class="row justify-content-between align-items-center">
         <div class="col">
-          <%= select_tag :"quantities[#{ticket_type.id}]", 'data-ticket-type-id': ticket_type.id, 'data-price': ticket_type.price, style: 'width: auto; display: inline-block', class: 'form-control', options: (0..ticket_type.number_of_tickets_available_in_single_purchase).to_a, value: (if params[:quantities]; params[:quantities][ticket_type.id.to_s]; elsif !ticket_type.price; 1; end), disabled: !ticket_type.price %>
+          <%= select_tag :"quantities[#{ticket_type.id}]", 'data-ticket-type-id': ticket_type.id, 'data-price': ticket_type.price, style: 'width: auto; display: inline-block', class: 'form-control', options: (0..ticket_type.number_of_tickets_available_in_single_purchase).to_a, value: (params[:quantities][ticket_type.id.to_s] if params[:quantities]), disabled: !ticket_type.price %>
           <% if ticket_type.range %>
             <br />
             <em class="select-a-price-first">Drag the slider to set a price</em>
