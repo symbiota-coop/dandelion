@@ -284,12 +284,6 @@ Dandelion::App.controller do
   get '/events/:id/duplicate' do
     @event = Event.find(params[:id]) || not_found
     event_admins_only!
-    erb :'events/duplicate'
-  end
-
-  post '/events/:id/duplicate' do
-    @event = Event.find(params[:id]) || not_found
-    event_admins_only!
     duplicated_event = @event.duplicate!(current_account)
     flash[:notice] = 'Event duplicated and locked'
     redirect "/events/#{duplicated_event.id}/edit"
