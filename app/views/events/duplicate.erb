@@ -1,11 +1,5 @@
 <%= partial :'events/nav', locals: { event: @event } %>
 
-<% begin %>
-  <%= partial :'organisations/pay', locals: { organisation: @event.organisation } %>
-  <% rescue Money::Bank::UnknownRate, Money::Currency::UnknownCurrency %>
-<% end %>
-
-
 <% form_tag "/events/#{@event.id}/duplicate" do %>
   <%= submit_tag 'Duplicate', class: 'btn btn-primary' %>
 <% end %>
