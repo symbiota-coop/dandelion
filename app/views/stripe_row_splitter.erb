@@ -1,0 +1,3 @@
+<% form_tag '', multipart: true do %>
+  <%= file_field_tag :csv, onchange: '$(this.form).submit()' %>
+<% end %>

@@ -205,5 +205,13 @@ module Dandelion
       current_account.update_attribute(:substack_opt_in, Time.now)
       erb :substack_opt_in
     end
+
+    get '/stripe_row_splitter' do
+      erb :stripe_row_splitter
+    end
+
+    post '/stripe_row_splitter', provides: :csv do
+      StripeRowSplitter.split(File.read(params[:csv]))
+    end
   end
 end
