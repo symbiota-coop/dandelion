@@ -11,18 +11,20 @@ class StripeRowSplitter
       ticket_parts = ticket_info.split(',').map(&:strip)
 
       # Initialize variables
-      ticket_amount = 0
       donation_amount = 0
+      discount_percentage = 0
 
-      # Process each part (ticket, donation)
+      # Process each part (ticket, donation, discount)
+      # Does not yet handle multiple % discounts, credit or fixed discounts
       ticket_types = []
       ticket_parts.each do |part|
-        if part.match?(/£\d+\s+donation(?!\s+to\s+Dandelion)/)
+        case part
+        when /£\d+\s+donation(?!\s+to\s+Dandelion)/
           donation_amount = part.match(/£(\d+)\s+donation/)[1].to_f
-        elsif part.match?(/.*£\d+x\d+/)
+        when /(\d+)%\s*discount/
+          discount_percentage = part.match(/(\d+)%\s*discount/)[1].to_f
+        when /.*£\d+x\d+/
           ticket_types << part
-          price, quantity = part.match(/£(\d+)x(\d+)/)[1, 2].map(&:to_f)
-          ticket_amount += price * quantity
         end
       end
 
@@ -32,8 +34,11 @@ class StripeRowSplitter
       ticket_types.each do |ticket_type|
         price, quantity = ticket_type.match(/£(\d+)x(\d+)/)[1, 2].map(&:to_f)
         ticket_row = row.to_h
-        ticket_row['Description'] = "#{base_desc}: #{ticket_type}"
-        ticket_row['Amount'] = (price * quantity).round(2).to_s
+        formatted_discount = discount_percentage.to_i == discount_percentage ? discount_percentage.to_i : discount_percentage
+        discount_text = discount_percentage > 0 ? ", #{formatted_discount}% discount" : ''
+        ticket_row['Description'] = "#{base_desc}: #{ticket_type}#{discount_text}"
+        individual_amount = price * quantity * (1 - (discount_percentage / 100))
+        ticket_row['Amount'] = individual_amount.round(2).to_s
         results << ticket_row
       end
 
