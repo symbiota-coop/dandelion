@@ -17,7 +17,7 @@ class StripeRowSplitter
       # Process each part (ticket, donation)
       ticket_types = []
       ticket_parts.each do |part|
-        if part.match?(/£\d+\s+donation/)
+        if part.match?(/£\d+\s+donation(?!\s+to\s+Dandelion)/)
           donation_amount = part.match(/£(\d+)\s+donation/)[1].to_f
         elsif part.match?(/.*£\d+x\d+/)
           ticket_types << part
@@ -37,7 +37,7 @@ class StripeRowSplitter
         results << ticket_row
       end
 
-      # Only create donation row if there's a donation
+      # Only create donation row if there's a donation to the organisation
       if donation_amount > 0
         donation_row = row.to_h
         # Format donation amount without trailing zeros if it's a whole number
