@@ -6,7 +6,6 @@ class StripeRowSplitter
     processed_rows = csv.flat_map do |row|
       description = row['Description']
       base_desc, ticket_info = description.rpartition(':').values_at(0, 2).map(&:strip)
-      return [row] unless ticket_info # Skip if no ticket info
 
       # Parse ticket information
       ticket_parts = ticket_info.split(',').map(&:strip)
@@ -34,8 +33,7 @@ class StripeRowSplitter
         price, quantity = ticket_type.match(/£(\d+)x(\d+)/)[1, 2].map(&:to_f)
         ticket_row = row.to_h
         ticket_row['Description'] = "#{base_desc}: #{ticket_type}"
-        individual_amount = price * quantity
-        ticket_row['Amount'] = individual_amount.round(2).to_s
+        ticket_row['Amount'] = (price * quantity).round(2).to_s
         results << ticket_row
       end
 
@@ -49,14 +47,13 @@ class StripeRowSplitter
         results << donation_row
       end
 
-      results.empty? ? [row] : results
+      results
     end
 
     CSV.generate do |output_csv|
       output_csv << csv.headers
       processed_rows.each do |row|
-        r = (row.is_a?(CSV::Row) ? row.fields : row.values)
-        output_csv << r
+        output_csv << row.values
       end
     end
   end
