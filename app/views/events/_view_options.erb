@@ -52,7 +52,7 @@
         <% } %>
         <%= hidden_field_tag :search, value: 1 %>
         <label class="mr-sm-2">Sort by</label>
-        <%= select_tag :order, options: { 'Event date' => 'date', 'Most recently created' => 'created_at' }, selected: params[:order], class: 'form-control' %>
+        <%= select_tag :order, options: { 'Event date' => 'date', 'Most recently created' => 'created_at', 'Random' => 'random' }, selected: params[:order], class: 'form-control' %>
         <a class="mt-2 mt-sm-0 ml-sm-3 badge badge-primary" style="font-weight: 500" id="ical" target="_blank" data-toggle="tooltip" href="<%= (defined?(path) && path ? path : request.path.chomp('/')) %>.ics?<%= request.query_string %>">
           iCal <i class="bi bi-box-arrow-up-right"></i>
         </a>

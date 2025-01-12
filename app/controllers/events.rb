@@ -29,6 +29,11 @@ Dandelion::App.controller do
     when :html
       @events = @events.future(@from)
       @events = @events.and(:start_time.lt => @to + 1) if @to
+      if params[:order] == 'random'
+        @events = @events.collection.aggregate([{ '$sample' => { size: @events.count } }]).map do |hash|
+          Event.new(hash.select { |k, _v| Event.fields.keys.include?(k.to_s) })
+        end
+      end
       if request.xhr?
         if params[:display] == 'map'
           @lat = params[:lat]
