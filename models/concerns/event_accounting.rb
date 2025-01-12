@@ -41,18 +41,28 @@ module EventAccounting
   end
 
   def cap
-    return unless contribution_gbp_custom
+    return unless cap_gbp
 
-    Money.new(contribution_gbp_custom * 100, 'GBP')
+    Money.new(cap_gbp * 100, 'GBP')
+  end
+
+  def fixed_contribution
+    return unless fixed_contribution_gbp
+
+    Money.new(fixed_contribution_gbp * 100, 'GBP')
   end
 
   def contribution_gbp
     if ticket_types.empty?
       Money.new(Event.contribution_gbp_fallback * 100, 'GBP')
+    elsif fixed_contribution
+      fixed_contribution
     elsif cap
       percent_requested = 5
       percentage_of_ticket_sales = Money.new(tickets.complete.sum(:discounted_price) * (percent_requested.to_f / 100) * 100, currency).exchange_to('GBP')
       [cap, percentage_of_ticket_sales].min
+    elsif organisation.try(:fixed_contribution_gbp)
+      Money.new(organisation.fixed_contribution_gbp * 100, 'GBP')
     else
       percent_requested = 1
       Money.new(tickets.complete.sum(:discounted_price) * (percent_requested.to_f / 100) * 100, currency).exchange_to('GBP')

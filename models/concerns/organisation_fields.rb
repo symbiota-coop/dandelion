@@ -92,6 +92,7 @@ module OrganisationFields
     field :time_zone, type: String
     field :billing_address_collection, type: Mongoid::Boolean
     field :enable_resales, type: Mongoid::Boolean
+    field :fixed_contribution_gbp, type: Float
 
     field :tokens, type: Float
     index({ tokens: 1 })

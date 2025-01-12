@@ -41,7 +41,8 @@ module EventFields
     field :select_tickets_intro, type: String
     field :select_tickets_outro, type: String
     field :select_tickets_title, type: String
-    field :contribution_gbp_custom, type: Float
+    field :fixed_contribution_gbp, type: Float
+    field :cap_gbp, type: Float
     field :oc_slug, type: String
     field :ticket_email_greeting, type: String
     field :ticket_email_title, type: String
