@@ -340,6 +340,7 @@ Dandelion::App.controller do
 
   get '/events/:id/ticket_email_preview' do
     @event = Event.find(params[:id]) || not_found
+    event_admins_only!
     event = @event
     account = current_account
     order = @event.orders.new
