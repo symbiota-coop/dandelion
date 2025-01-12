@@ -16,10 +16,26 @@ class EventBoostBid
   end
 
   def self.boost
+    # Reset all boosted events
     Event.and(boosted: true).set(boosted: nil)
-    EventBoostBid.where(date: Date.today).sort_by(&:amount_money).reverse.first(5).each do |event_boost_bid|
-      # event_boost_bid.charge
-      event_boost_bid.event.update_attribute(:boosted, true)
+
+    # Get today's bids sorted by amount (highest first)
+    bids_today = EventBoostBid.and(date: Date.today).sort_by(&:amount_money).reverse
+
+    # "We auction off 5 boosts each day. The price of a boost is the price of the 5th highest bid
+    # - so winners tend to pay less than what they bid."
+
+    # Take top 5 bids (or all if less than 5)
+    winning_bids = bids_today.first(5)
+    return if winning_bids.empty?
+
+    # Use the last winning bid as the second price
+    second_price = winning_bids.last.amount_money
+
+    winning_bids.each do |event_boost_bid|
+      # Charge second price
+      # event_boost_bid.charge(second_price.amount)
+      event_boost_bid.event.set(boosted: true)
     end
   end
 end
