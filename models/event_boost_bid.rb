@@ -30,7 +30,7 @@ class EventBoostBid
     return if winning_bids.empty?
 
     # Use the last winning bid as the second price
-    second_price = winning_bids.last.amount_money
+    # second_price = winning_bids.last.amount_money
 
     winning_bids.each do |event_boost_bid|
       # Charge second price
