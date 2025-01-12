@@ -58,8 +58,6 @@ class Organisation
     end
   end
 
-  def summary; end
-
   def ticket_email_greeting_default
     '<p>Hi [firstname],</p>
 <p>Thanks for booking onto [event_name], [event_when] [at_event_location_if_not_online]. Your [tickets_are] attached.</p>'

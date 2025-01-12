@@ -16,7 +16,9 @@ class EventBoostBid
   end
 
   def self.boost
+    Event.and(boosted: true).set(boosted: nil)
     EventBoostBid.where(date: Date.today).sort_by(&:amount_money).reverse.first(5).each do |event_boost_bid|
+      # event_boost_bid.charge
       event_boost_bid.event.update_attribute(:boosted, true)
     end
   end
