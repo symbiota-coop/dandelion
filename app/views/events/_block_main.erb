@@ -17,6 +17,15 @@
 <% if event.locked? %>
   <span class="label label-default mb-1 d-inline-block">Locked</span>
 <% end %>
+<% if @organisation %>
+  <% if event.featured? %>
+    <span class="label label-yellow mb-1 d-inline-block">Featured</span>
+  <% end %>
+<% else %>
+  <% if event.boosted? %>
+    <span class="label label-yellow mb-1 d-inline-block">Featured</span>
+  <% end %>
+<% end %>
 <div class="mb-2">
   <%= partial :'events/tag_labels', locals: { event: event, limit: 5 } %>
 </div>

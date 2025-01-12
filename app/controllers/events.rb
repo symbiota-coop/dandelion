@@ -8,7 +8,14 @@ Dandelion::App.controller do
     @events = Event.live.public.legit
     @from = params[:from] ? parse_date(params[:from]) : Date.today
     @to = params[:to] ? parse_date(params[:to]) : nil
-    @events = params[:order] == 'created_at' ? @events.order('created_at desc') : @events.order('start_time asc')
+    @events = case params[:order]
+              when 'created_at'
+                @events.order('created_at desc')
+              when 'featured'
+                @events.order('boosted desc, start_time asc')
+              else
+                @events.order('start_time asc')
+              end
     @events = if params[:q]
                 @events.and(:id.in => search_events(params[:q]).pluck(:id))
               else

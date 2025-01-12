@@ -47,6 +47,7 @@ module EventFields
     field :ticket_email_greeting, type: String
     field :ticket_email_title, type: String
     field :ai_tagged, type: Mongoid::Boolean
+    field :boosted, type: Mongoid::Boolean
 
     field :revenue_share_to_revenue_sharer, type: Integer
     field :profit_share_to_organiser, type: Integer
