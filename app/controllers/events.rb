@@ -30,7 +30,11 @@ Dandelion::App.controller do
       @events = @events.future(@from)
       @events = @events.and(:start_time.lt => @to + 1) if @to
       if params[:order] == 'random'
-        @events = @events.collection.aggregate([{ '$sample' => { size: @events.count } }]).map do |hash|
+        event_ids = @events.pluck(:id)
+        @events = @events.collection.aggregate([
+                                                 { '$match' => { '_id' => { '$in' => event_ids } } },
+                                                 { '$sample' => { size: event_ids.length } }
+                                               ]).map do |hash|
           Event.new(hash.select { |k, _v| Event.fields.keys.include?(k.to_s) })
         end
       end
@@ -336,7 +340,6 @@ Dandelion::App.controller do
 
   get '/events/:id/ticket_email_preview' do
     @event = Event.find(params[:id]) || not_found
-    event_admins_only!
     event = @event
     account = current_account
     order = @event.orders.new

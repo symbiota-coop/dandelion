@@ -79,7 +79,11 @@ Dandelion::App.controller do
         @events = @events.and(:start_time.lt => @to + 1) if @to
       end
       if params[:order] == 'random'
-        @events = @events.collection.aggregate([{ '$sample' => { size: @events.count } }]).map do |hash|
+        event_ids = @events.pluck(:id)
+        @events = @events.collection.aggregate([
+                                                 { '$match' => { '_id' => { '$in' => event_ids } } },
+                                                 { '$sample' => { size: event_ids.length } }
+                                               ]).map do |hash|
           Event.new(hash.select { |k, _v| Event.fields.keys.include?(k.to_s) })
         end
       end
