@@ -24,9 +24,10 @@ module OrganisationMonthlyDonations
       gocardless_subscribe(subscription: subscription)
     end
 
-    organisationships.and(monthly_donation_method: 'GoCardless', monthly_donation_amount: nil).set(
-      monthly_donation_method: nil
-    )
+    organisationships.and(monthly_donation_method: 'GoCardless', monthly_donation_amount: nil).each do |organisationship|
+      send_finished_monthly_donor_notification(organisationship)
+      organisationship.set(monthly_donation_method: nil)
+    end
   end
 
   def gocardless_subscribe(subscription: nil, subscription_id: nil)
@@ -101,9 +102,10 @@ module OrganisationMonthlyDonations
       patreon_subscribe(pledge)
     end
 
-    organisationships.and(monthly_donation_method: 'Patreon', monthly_donation_amount: nil).set(
-      monthly_donation_method: nil
-    )
+    organisationships.and(monthly_donation_method: 'Patreon', monthly_donation_amount: nil).each do |organisationship|
+      send_finished_monthly_donor_notification(organisationship)
+      organisationship.set(monthly_donation_method: nil)
+    end
   end
 
   def patreon_subscribe(pledge)
@@ -138,6 +140,23 @@ module OrganisationMonthlyDonations
     content = ERB.new(File.read(Padrino.root('app/views/emails/new_monthly_donor.erb'))).result(binding)
     batch_message.from ENV['NOTIFICATIONS_EMAIL_FULL']
     batch_message.subject "New monthly donor for #{organisation.name}: #{organisationship.account.name}"
+    batch_message.body_html Premailer.new(ERB.new(File.read(Padrino.root('app/views/layouts/email.erb'))).result(binding), with_html_string: true, adapter: 'nokogiri', input_encoding: 'UTF-8').to_inline_css
+
+    admins_receiving_feedback.each do |account|
+      batch_message.add_recipient(:to, account.email, { 'firstname' => account.firstname || 'there', 'token' => account.sign_in_token, 'id' => account.id.to_s })
+    end
+
+    batch_message.finalize if ENV['MAILGUN_API_KEY']
+  end
+
+  def send_finished_monthly_donor_notification(organisationship)
+    mg_client = Mailgun::Client.new ENV['MAILGUN_API_KEY'], ENV['MAILGUN_REGION']
+    batch_message = Mailgun::BatchMessage.new(mg_client, ENV['MAILGUN_NOTIFICATIONS_HOST'])
+
+    organisation = self
+    content = ERB.new(File.read(Padrino.root('app/views/emails/finished_monthly_donor.erb'))).result(binding)
+    batch_message.from ENV['NOTIFICATIONS_EMAIL_FULL']
+    batch_message.subject "Monthly donation ended for #{organisation.name}: #{organisationship.account.name}"
     batch_message.body_html Premailer.new(ERB.new(File.read(Padrino.root('app/views/layouts/email.erb'))).result(binding), with_html_string: true, adapter: 'nokogiri', input_encoding: 'UTF-8').to_inline_css
 
     admins_receiving_feedback.each do |account|
