@@ -170,7 +170,7 @@
           </div>
           <div role="tabpanel" class="tab-pane" id="tab5">
 
-            <% if @event.organisation.donations_to_dandelion? %>
+            <% if @event.donations_to_dandelion? %>
               <div class="alert alert-warning">
                 <p class="mb-0">
                   The settings below won't take effect until you've met the <a class="text-warning text-underline" href="/o/<%=@event.organisation.slug%>/contribute">suggested contribution</a>.

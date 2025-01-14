@@ -32,6 +32,10 @@ class Event
     PageView.or({ path: "/e/#{slug}" }, { path: "/events/#{id}" }).count
   end
 
+  def donations_to_dandelion?
+    !donations_to_organisation? && organisation.donations_to_dandelion?
+  end
+
   def token
     Token.all.find { |token| token.symbol == currency }
   end
