@@ -48,7 +48,6 @@ module EventFields
     field :ticket_email_title, type: String
     field :ai_tagged, type: Mongoid::Boolean
     field :boosted, type: Mongoid::Boolean
-    field :donations_to_organisation, type: Mongoid::Boolean
 
     field :revenue_share_to_revenue_sharer, type: Integer
     field :profit_share_to_organiser, type: Integer
@@ -108,6 +107,7 @@ module EventFields
         hide_organisation_footer: :check_box,
         send_order_notifications: :check_box,
         raw_description: :check_box,
+        donations_to_organisation: :check_box,
         account_id: :lookup,
         organisation_id: :lookup,
         activity_id: :lookup,
