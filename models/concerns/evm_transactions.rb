@@ -11,7 +11,7 @@ module EvmTransactions
         "https://explorer.celo.org/address/#{evm_address}/token-transfers?type=JSON"
       ].compact.each do |url|
         puts url
-        page = begin; agent.get(url); rescue Mechanize::ResponseCodeError; end
+        page = agent.get(url)
         next unless page
 
         j = JSON.parse(page.body)
@@ -36,6 +36,8 @@ module EvmTransactions
           puts [token, amount]
           transactions << [token, amount]
         end
+      rescue StandardError => e
+        Airbrake.notify(e)
       end
 
       # Blockscout v2
@@ -45,7 +47,7 @@ module EvmTransactions
         "https://base.blockscout.com/api/v2/addresses/#{evm_address}/token-transfers"
       ].each do |url|
         puts url
-        page = begin; agent.get(url); rescue Mechanize::ResponseCodeError; end
+        page = agent.get(url)
         next unless page
 
         j = JSON.parse(page.body)
@@ -68,6 +70,8 @@ module EvmTransactions
           puts [token, amount]
           transactions << [token, amount]
         end
+      rescue StandardError => e
+        Airbrake.notify(e)
       end
 
       transactions

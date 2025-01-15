@@ -65,16 +65,20 @@ module OrganisationAccounting
 
     # charge customer
     payment_method_id = Stripe::Customer.list_payment_methods(stripe_customer_id).first.id
-    pi = Stripe::PaymentIntent.create({
-                                        amount: contribution_remaining.cents,
-                                        currency: contribution_remaining.currency,
-                                        customer: stripe_customer_id,
-                                        payment_method: payment_method_id,
-                                        off_session: true,
-                                        confirm: true
-                                      })
-    organisation_contribution = organisation_contributions.create amount: contribution_remaining.cents.to_f / 100, currency: contribution_remaining.currency, payment_intent: pi.id, payment_completed: true
-    organisation_contribution.send_notification
+    begin
+      pi = Stripe::PaymentIntent.create({
+                                          amount: contribution_remaining.cents,
+                                          currency: contribution_remaining.currency,
+                                          customer: stripe_customer_id,
+                                          payment_method: payment_method_id,
+                                          off_session: true,
+                                          confirm: true
+                                        })
+      organisation_contribution = organisation_contributions.create amount: contribution_remaining.cents.to_f / 100, currency: contribution_remaining.currency, payment_intent: pi.id, payment_completed: true
+      organisation_contribution.send_notification
+    rescue StandardError => e
+      Airbrake.notify(e)
+    end
   end
 
   def coinbase_confirmed_checkout_ids
