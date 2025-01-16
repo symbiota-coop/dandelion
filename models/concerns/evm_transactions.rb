@@ -11,7 +11,7 @@ module EvmTransactions
         "https://explorer.celo.org/address/#{evm_address}/token-transfers?type=JSON"
       ].compact.each do |url|
         puts url
-        page = agent.get(url)
+        page = begin; agent.get(url); rescue Mechanize::ResponseCodeError; end
         next unless page
 
         j = JSON.parse(page.body)
@@ -47,7 +47,7 @@ module EvmTransactions
         "https://base.blockscout.com/api/v2/addresses/#{evm_address}/token-transfers"
       ].each do |url|
         puts url
-        page = agent.get(url)
+        page = begin; agent.get(url); rescue Mechanize::ResponseCodeError; end
         next unless page
 
         j = JSON.parse(page.body)
