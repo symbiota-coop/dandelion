@@ -11,7 +11,7 @@ class StripeRowSplitter
       ticket_parts = []
       current_part = ''
       ticket_info.each_char do |char|
-        if char == ',' && !current_part.match?(/£[\d,]+$/)
+        if char == ',' && !current_part.match?(/£[\d.,]+$/)
           # Only split on commas that aren't part of a number
           ticket_parts << current_part.strip
           current_part = ''
