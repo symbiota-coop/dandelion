@@ -8,7 +8,18 @@ class StripeRowSplitter
       base_desc, ticket_info = description.rpartition(':').values_at(0, 2).map(&:strip)
 
       # Parse ticket information
-      ticket_parts = ticket_info.split(',').map(&:strip)
+      ticket_parts = []
+      current_part = ''
+      ticket_info.each_char do |char|
+        if char == ',' && !current_part.match?(/£[\d,]+$/)
+          # Only split on commas that aren't part of a number
+          ticket_parts << current_part.strip
+          current_part = ''
+        else
+          current_part += char
+        end
+      end
+      ticket_parts << current_part.strip if current_part.strip.length > 0
 
       # Initialize variables
       donation_amount = 0
