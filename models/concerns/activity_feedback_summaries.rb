@@ -26,7 +26,7 @@ module ActivityFeedbackSummaries
 
   def feedback_summary!
     activity = self
-    prompt = "Provide a one-paragraph summary of the feedback on this activity (family of events), #{activity.name}, hosted by #{activity.organisation.name}. Focus on the positives. The feedback:\n\n#{feedbacks_joined}"
+    prompt = "Provide a one-paragraph summary of the feedback on this activity (family of events), #{activity.name}, hosted by #{activity.organisation.name}. Focus on the positives. The feedback:\n\n#{activity.feedbacks_joined}"
 
     last_paragraph = nil
     loop do

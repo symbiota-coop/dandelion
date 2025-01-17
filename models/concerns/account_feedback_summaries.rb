@@ -28,7 +28,7 @@ module AccountFeedbackSummaries
 
   def feedback_summary!
     account = self
-    prompt = "Provide a one-paragraph summary of the feedback on this facilitator, #{account.firstname}. Focus on their strengths and what they do well. The feedback:\n\n#{feedbacks_joined}"
+    prompt = "Provide a one-paragraph summary of the feedback on this facilitator, #{account.firstname}. Focus on their strengths and what they do well. The feedback:\n\n#{account.feedbacks_joined}"
 
     last_paragraph = nil
     loop do
