@@ -35,7 +35,7 @@ module AccountFeedbackSummaries
       response = OpenRouter.chat(prompt, max_tokens: 256)
       paragraphs = response.split("\n\n")
       if paragraphs.length <= 2
-        last_paragraph = paragraphs.last
+        last_paragraph = paragraphs.last.strip
         break if last_paragraph.split.length >= 50 && last_paragraph[0] != '-' && last_paragraph[0] != '*' && last_paragraph[-1] == '.'
       end
     end
