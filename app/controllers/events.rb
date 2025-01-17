@@ -300,7 +300,10 @@ Dandelion::App.controller do
   get '/events/:id/duplicate' do
     @event = Event.find(params[:id]) || not_found
     event_admins_only!
-    if @event.organisation.stripe_client_id && !@event.organisation.paid_up
+    if Padrino.env != :test && !@event.organisation.stripe_client_id && @event.organisation.stripe_sk && !@event.organisation.stripe_connect_json
+      @organisation = @event.organisation
+      erb :'events/stripe_connect'
+    elsif @event.organisation.stripe_client_id && !@event.organisation.paid_up
       redirect "/o/#{@event.organisation.slug}/contribute"
     else
       duplicated_event = @event.duplicate!(current_account)
