@@ -1,0 +1,232 @@
+<canvas id="dandelion-canvas"></canvas>
+<script>
+  const canvas = document.getElementById('dandelion-canvas');
+  const ctx = canvas.getContext('2d');
+  function calculateBaseUnit() {
+      const screenWidth = window.innerWidth;
+      const screenHeight = window.innerHeight;
+      // Base divisor for responsive scaling
+      const baseDivisor = 70;
+      // Adjust divisor based on Bootstrap breakpoints
+      let divisor;
+      if (screenWidth >= 1200) {  // lg and up
+          divisor = baseDivisor;
+      } else if (screenWidth >= 992) {  // md
+          divisor = baseDivisor * 1.2;
+      } else if (screenWidth >= 768) {  // sm
+          divisor = baseDivisor;
+      } else {  // xs
+          divisor = baseDivisor;
+      }
+      return Math.min(screenWidth, screenHeight) / divisor;
+  }
+  let baseUnit = calculateBaseUnit();
+  let isScattering = false;
+  let mouseIsOver = false;
+  let requiresMouseOutIn = true;
+  let centerX, centerY;
+  let lastScrollY = 0;  // Track last scroll position
+
+  function calculateSizes(baseUnit) {
+      return {
+          stalkLength: 1.2 * baseUnit,
+          seedSizes: [0.3, 0.4, 0.5].map(s => s * baseUnit),
+          layerRadii: [1.5, 3.0, 4.5].map(r => r * baseUnit),
+          radialLines: {
+              regular: 1.2 * baseUnit,
+              bottom: 1.8 * baseUnit
+          },
+          centerDot: 0.8 * baseUnit,
+          hoverRadius: 6 * baseUnit,
+          offScreenBuffer: 0
+      };
+  }
+
+  let sizes = calculateSizes(baseUnit);
+
+  function resizeCanvas() {
+      // Update baseUnit on resize
+      baseUnit = calculateBaseUnit();
+
+      // Snap to base unit grid
+      canvas.width = 50 * baseUnit;
+      canvas.height = 17 * baseUnit;
+
+      // Update sizes with new baseUnit
+      sizes = calculateSizes(baseUnit);
+
+      // Update center coordinates
+      centerX = canvas.width / 2;
+      centerY = canvas.height / 2;
+
+      // Reset all elements to new positions
+      resetAllSeeds();
+  }
+
+  class Seed {
+      constructor(x, y, baseRotation, size) {
+          this.hasStalk = false;
+          this.size = size;
+          this.reset(x, y, baseRotation);
+      }
+
+      reset(x, y, baseRotation) {
+          this.baseX = x;
+          this.baseY = y;
+          Object.assign(this, { x, y, baseRotation });
+          this.velocity = 0;
+          this.rotation = baseRotation;
+          this.rotationSpeed = (Math.random() - 0.5) * 0.2;
+          this.t = Math.random() * 100;
+          this.blown = false;
+      }
+
+      isOffScreen() {
+          return this.x > canvas.width + sizes.offScreenBuffer;
+      }
+
+      update() {
+          if (isScattering) {
+              this.blown = true;
+              this.t += 0.5;
+              this.velocity = Math.min(this.velocity + 0.1, 5);
+              const wind = Math.sin(this.t * 0.03) * 2.1 + 3.6;
+              this.x += wind;
+              this.y += Math.sin(this.t * 0.05) * 0.1 - this.velocity * 0.1;
+              this.rotation += this.rotationSpeed;
+          }
+      }
+
+      draw() {
+          if (this.isOffScreen()) return;
+
+          const edge = canvas.width;
+          const opacity = Math.max(0, 1 - (this.x - centerX) / (edge - centerX));
+
+          ctx.save();
+          ctx.translate(this.x, this.y);
+          ctx.rotate(this.rotation);
+
+          if (this.hasStalk) {
+              ctx.beginPath();
+              ctx.moveTo(0, 0);
+              ctx.lineTo(-sizes.stalkLength, 0);
+              ctx.strokeStyle = `rgba(0, 0, 0, ${opacity})`;
+              ctx.lineWidth = 1;
+              ctx.stroke();
+          }
+
+          ctx.beginPath();
+          ctx.arc(-sizes.stalkLength, 0, this.size, 0, Math.PI * 2);
+          ctx.fillStyle = `rgba(0, 0, 0, ${opacity})`;
+          ctx.fill();
+
+          ctx.restore();
+      }
+  }
+
+  let seeds = [];
+  let layers = [];
+  let stalkSeed = null;
+
+  function initializeSeeds() {
+      seeds = [];
+      layers = sizes.layerRadii.map((radius, i) => ({
+          radius,
+          count: 18,
+          size: sizes.seedSizes[i]
+      }));
+
+      layers.forEach((layer, layerIdx) => {
+          for (let i = 0; i < layer.count; i++) {
+              let angle = (-Math.PI/2) + (i / layer.count) * Math.PI * 2;
+              if (layerIdx === 1) angle += Math.PI / layer.count;
+
+              const x = centerX + Math.cos(angle) * layer.radius;
+              const y = centerY + Math.sin(angle) * layer.radius;
+              const baseRotation = Math.atan2(centerY - y, centerX - x);
+              const seed = new Seed(x, y, baseRotation, layer.size);
+
+              if (layerIdx === 0 && Math.round((i / layer.count) * 12) === 1) {
+                  stalkSeed = seed;
+                  stalkSeed.hasStalk = true;
+              }
+              seeds.push(seed);
+          }
+      });
+  }
+
+  function drawRadialLines() {
+      ctx.strokeStyle = '#000';
+      ctx.lineWidth = 1;
+      for (let h = 0; h < 12; h++) {
+          if (h === 1) continue;
+          const angle = (-Math.PI/2) + (h * Math.PI/6);
+          const length = h === 6 ? sizes.radialLines.bottom : sizes.radialLines.regular;
+          ctx.beginPath();
+          ctx.moveTo(centerX, centerY);
+          ctx.lineTo(centerX + Math.cos(angle) * length, centerY + Math.sin(angle) * length);
+          ctx.stroke();
+      }
+  }
+
+  function resetAllSeeds() {
+      initializeSeeds(); // Recreate seeds with new positions
+      isScattering = false;
+      requiresMouseOutIn = true;
+  }
+
+  canvas.addEventListener('mousemove', (e) => {
+      const rect = canvas.getBoundingClientRect();
+      const mouseX = e.clientX - rect.left;
+      const mouseY = e.clientY - rect.top;
+      const distance = Math.hypot(mouseX - centerX, mouseY - centerY);
+      const newMouseIsOver = distance < sizes.hoverRadius;
+
+      if (newMouseIsOver !== mouseIsOver) {
+          if (newMouseIsOver && !isScattering && requiresMouseOutIn) {
+              isScattering = true;
+              requiresMouseOutIn = false;
+          } else if (!newMouseIsOver) {
+              requiresMouseOutIn = true;
+          }
+          mouseIsOver = newMouseIsOver;
+      }
+  });
+
+  function animate() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      drawRadialLines();
+      ctx.beginPath();
+      ctx.arc(centerX, centerY, sizes.centerDot, 0, Math.PI * 2);
+      ctx.fillStyle = '#000';
+      ctx.fill();
+
+      if (isScattering) {
+          seeds.forEach(seed => seed.update());
+          if (seeds.every(s => s.isOffScreen())) {
+              resetAllSeeds();
+          }
+      }
+      seeds.forEach(seed => seed.draw());
+
+      requestAnimationFrame(animate);
+  }
+
+  // Update scroll event listener
+  window.addEventListener('scroll', () => {
+    // Check if we're scrolling down from the very top
+    if (lastScrollY === 0 && window.scrollY > 0 && window.pageYOffset === window.scrollY) {
+      isScattering = true;
+      requiresMouseOutIn = false;
+    }
+    lastScrollY = window.scrollY;
+  });
+
+  // Initial setup
+  resizeCanvas();
+  window.addEventListener('resize', resizeCanvas);
+  // Set initial scroll position
+  lastScrollY = window.scrollY;
+  animate();
+</script>
