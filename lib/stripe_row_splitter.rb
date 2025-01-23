@@ -29,6 +29,7 @@ class StripeRowSplitter
       fixed_discount = 0
 
       # Process each part (ticket, donation, discount)
+      # Does not yet handle multiple % discounts (OK if no monthly donors) or credit
       ticket_types = []
       ticket_parts.each do |part|
         case part
