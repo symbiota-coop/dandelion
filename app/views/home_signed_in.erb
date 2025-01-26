@@ -17,7 +17,11 @@
       </div>
     </div>
 
-    <div data-with-placeholder id="newsfeed" data-pagelet-url="<%= params[:tour] ? '/?tour=1' : '/'%>" data-pagelet-refresh="60" class="mt-1 mb-3">
+    <% if admin? %>
+      <%= cp(:'accounts/pay_progress', key: "/accounts/pay_progress/GBP?admin=1", locals: {currency: 'GBP'}) %>
+    <% end %>
+
+    <div data-with-placeholder id="newsfeed" data-pagelet-url="<%= params[:tour] ? '/?tour=1' : '/'%>" data-pagelet-refresh="60" class="mt-4 mb-3">
       <% 15.times do %>
         <div class="flicker" style="width: 75%; background: rgba(0,0,0,0.1)">&nbsp;</div>
         <hr class="my-3" style="border-top-color: rgba(0,0,0,0.1)">
