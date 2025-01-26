@@ -59,7 +59,7 @@ module EventAssociations
   def organisationship_for_discount(account)
     organisationship = nil
     if account
-      organisation_and_cohosts.order('created_at desc').each do |organisation|
+      organisation_and_cohosts.each do |organisation|
         next unless (o = organisation.organisationships.find_by(account: account))
 
         organisationship = o if o.monthly_donor? && o.monthly_donor_discount > 0 && (!organisationship || o.monthly_donor_discount > organisationship.monthly_donor_discount)
@@ -89,7 +89,7 @@ module EventAssociations
   end
 
   def organisation_and_cohosts
-    Organisation.and(:id.in => ([organisation.try(:id)] + cohostships.pluck(:organisation_id)).compact)
+    [organisation] + cohosts
   end
 
   def event_tags
