@@ -42,6 +42,10 @@ partial :chart, locals: { unit_after: '%', data: data }
 
 <%= partial :chart, locals: { countable: Order.all, months_ago: 24, make_projection: true } %>
 
+<h2>Tickets</h2>
+
+<%= partial :chart, locals: { countable: Ticket.all, months_ago: 24, make_projection: true } %>
+
 <h2>Accounts</h2>
 
 <%= partial :chart, locals: { countable: Account.all, months_ago: 24, make_projection: true } %>
