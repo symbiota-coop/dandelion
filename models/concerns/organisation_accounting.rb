@@ -62,6 +62,7 @@ module OrganisationAccounting
     Stripe.api_version = '2020-08-27'
 
     return unless stripe_customer_id && contribution_remaining > 0
+    return if contribution_remaining < Money.new(1 * 100, 'GBP')
 
     # charge customer
     payment_method_id = Stripe::Customer.list_payment_methods(stripe_customer_id).first.id
