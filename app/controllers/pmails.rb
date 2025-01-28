@@ -51,7 +51,7 @@ Dandelion::App.controller do
       @pmail.organisation = @event.organisation
     end
     if @pmail.save
-      flash[:notice] = %(The mail was saved.)
+      flash[:notice] = 'The mail was saved. Preview and send using the buttons below.'
       redirect "/pmails/#{@pmail.id}/edit?#{@scope}"
     else
       erb :'pmails/build'
@@ -66,17 +66,17 @@ Dandelion::App.controller do
   post '/pmails/:pmail_id/edit' do
     @pmail = @pmails.find(params[:pmail_id]) || not_found
     if @pmail.update_attributes(mass_assigning(params[:pmail], Pmail))
-      flash[:notice] = 'The mail was saved.'
+      flash[:notice] = 'The mail was saved. Preview and send using the buttons below.'
       if params[:send_test]
         @pmail.send_batch_message(test_to: Account.and(id: current_account.id))
-        flash[:notice] = %(Test sent)
+        flash[:notice] = 'Test sent.'
         redirect "/pmails/#{@pmail.id}/edit?#{@scope}"
       elsif params[:send]
         unless @pmail.requested_send_at
           @pmail.update_attribute(:requested_send_at, Time.now)
           @pmail.send_pmail
         end
-        flash[:notice] = %(Sent!)
+        flash[:notice] = 'Sent!'
         if @organisation
           redirect "/o/#{@organisation.slug}/pmails"
         elsif @activity
@@ -90,7 +90,7 @@ Dandelion::App.controller do
         redirect "/pmails/#{@pmail.id}/edit?#{@scope}&preview=1"
       elsif params[:duplicate]
         duplicated_pmail = @pmail.duplicate!(current_account)
-        flash[:notice] = 'The mail was duplicated'
+        flash[:notice] = 'The mail was duplicated.'
         redirect "/pmails/#{duplicated_pmail.id}/edit?#{@scope}"
       elsif params[:file_q]
         redirect "/pmails/#{@pmail.id}/edit?#{@scope}&file_q=#{params[:file_q]}#attachments"
@@ -142,7 +142,7 @@ Dandelion::App.controller do
     @pmail_test.account = current_account
     @pmail_test.organisation = @organisation
     if @pmail_test.save
-      flash[:notice] = %(The test was saved.)
+      flash[:notice] = 'The test was saved.'
       redirect "/pmail_tests/#{@pmail_test.id}?#{@scope}"
     else
       erb :'pmail_tests/build'
