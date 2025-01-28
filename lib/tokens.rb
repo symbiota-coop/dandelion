@@ -65,7 +65,6 @@ Chain.new('Base', 8453).tap do |chain|
   Token.new('USDC', '0x833589fcd6edb6e08f4c7c32d4f71b54bda02913', chain)
 end
 
-# not on blockscout =/
-# Chain.new('Arbitrum One', 42_161).tap do |chain|
-#   Token.new('USDGLO', '0x4f604735c1cf31399c6e711d5962b2b3e0225ad3', chain)
-# end
+Chain.new('Arbitrum One', 42_161).tap do |chain|
+  Token.new('USDGLO', '0x4f604735c1cf31399c6e711d5962b2b3e0225ad3', chain)
+end
