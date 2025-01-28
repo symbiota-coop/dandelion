@@ -1,7 +1,26 @@
-<ul class="icon-list">
+<script>
+  $(function() {
+    $('#event-sessions').hover(
+      function() {
+        $(this).find('.add-to-calendar').show();
+      },
+      function() {
+        $(this).find('.add-to-calendar').hide();
+      }
+    );
+  });
+</script>
+
+<ul class="icon-list" id="event-sessions">
   <% event_sessions.each_with_index { |event_session,i| %>
   <li <% if i > 2%> style="display:none" <% end %>>
-    <i data-toggle="tooltip" title="Session <%=i+1%>" class="bi bi-clock"></i> <%= when_details(event_session, with_zone: false) %>
+    <i data-toggle="tooltip" title="Session <%=i+1%>" class="bi bi-clock"></i>
+    <%= when_details(event_session, with_zone: false) %>
+    <span class="add-to-calendar" style="display: none">
+      <small>
+        <%= partial :'events/add_to_calendar', locals: { event_session: event_session } %>
+      </small>
+    </span>
   </li>
   <% if i == 2 && event_sessions.count > 3 %>
     <li>

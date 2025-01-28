@@ -110,7 +110,7 @@ Dandelion::App.controller do
       end
     end
 
-    if Padrino.env != :test && !@event.organisation.stripe_client_id && @event.organisation.stripe_sk && !@event.organisation.stripe_connect_json
+    if Padrino.env == :production && !@event.organisation.stripe_client_id && @event.organisation.stripe_sk && !@event.organisation.stripe_connect_json
       @organisation = @event.organisation
       erb :'events/stripe_connect'
     elsif @event.organisation.stripe_client_id && !@event.organisation.paid_up
@@ -245,6 +245,11 @@ Dandelion::App.controller do
     end
   end
 
+  get '/event_sessions/:id', provides: %i[ics] do
+    @event_session = EventSession.find(params[:id]) || not_found
+    @event_session.ical.to_ical
+  end
+
   get '/events/:id/progress' do
     @event = Event.find(params[:id]) || not_found
     event_admins_only!
@@ -300,7 +305,7 @@ Dandelion::App.controller do
   get '/events/:id/duplicate' do
     @event = Event.find(params[:id]) || not_found
     event_admins_only!
-    if Padrino.env != :test && !@event.organisation.stripe_client_id && @event.organisation.stripe_sk && !@event.organisation.stripe_connect_json
+    if Padrino.env == :production && !@event.organisation.stripe_client_id && @event.organisation.stripe_sk && !@event.organisation.stripe_connect_json
       @organisation = @event.organisation
       erb :'events/stripe_connect'
     elsif @event.organisation.stripe_client_id && !@event.organisation.paid_up

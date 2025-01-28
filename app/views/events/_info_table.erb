@@ -88,7 +88,7 @@
     <td>
       Add to calendar
       <td>
-        <%= partial :'events/add_to_calendar' %>
+        <%= partial :'events/add_to_calendar', locals: { event: @event } %>
       </td>
     </tr>
     <% unless @event.secret? %>

@@ -57,7 +57,10 @@
     <% end %>
 
     <h5 class="mb-1">Add to calendar</h5>
-    <p class="mb-1"><%= partial :'events/add_to_calendar' %></p>
+    <p class="mb-1"><% if @event.event_sessions.count > 0 %>Full event: <% end %><%= partial :'events/add_to_calendar', locals: { event: @event } %></p>
+    <% @event.event_sessions.each do |event_session| %>
+      <p class="mb-1">Session <%= event_session.session_number %>: <%= partial :'events/add_to_calendar', locals: { event_session: event_session } %></p>
+    <% end %>
     <% if !@event.secret? && !(@order && @event.affiliate_credit_percentage) %>
       <h5 class="mb-1">Share this event</h5>
       <%= partial :share %>

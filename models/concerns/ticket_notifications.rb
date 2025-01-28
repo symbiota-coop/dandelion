@@ -37,12 +37,23 @@ module TicketNotifications
       batch_message.add_attachment tickets_pdf_file, tickets_pdf_filename
     end
 
-    cal = event.ical
-    ics_filename = "dandelion-#{event.name.parameterize}-#{order.id}.ics"
-    ics_file = File.new(ics_filename, 'w+')
-    ics_file.write cal.to_ical
-    ics_file.rewind
-    batch_message.add_attachment ics_file, ics_filename
+    if event.event_sessions.empty?
+      cal = event.ical(order: order)
+      ics_filename = "dandelion-#{event.name.parameterize}-#{order.id}.ics"
+      ics_file = File.new(ics_filename, 'w+')
+      ics_file.write cal.to_ical
+      ics_file.rewind
+      batch_message.add_attachment ics_file, ics_filename
+    else
+      event.event_sessions.each do |event_session|
+        cal = event_session.ical(order: order)
+        ics_filename = "dandelion-#{event_session.name.parameterize}-#{order.id}.ics"
+        ics_file = File.new(ics_filename, 'w+')
+        ics_file.write cal.to_ical
+        ics_file.rewind
+        batch_message.add_attachment ics_file, ics_filename
+      end
+    end
 
     [account].each do |account|
       batch_message.add_recipient(:to, account.email, { 'firstname' => account.firstname || 'there', 'token' => account.sign_in_token, 'id' => account.id.to_s })
