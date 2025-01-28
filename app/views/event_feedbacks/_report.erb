@@ -5,7 +5,7 @@ Further instructions (don't mention in your response):
 - Present as a numbered list
 - Address your answer in the second person ('you')
 
-The feedback:\n\n#{current_account.feedbacks_joined(since: 1.year.ago)}}
+The feedback:\n\n#{current_account.event_feedbacks.joined(since: 1.year.ago)}}
   markdown = Redcarpet::Markdown.new(Redcarpet::Render::HTML, autolink: true, tables: true, fenced_code_blocks: true)
   content = OpenRouter.chat(prompt, model: 'anthropic/claude-3.5-sonnet:beta').split('1.').last
 %>

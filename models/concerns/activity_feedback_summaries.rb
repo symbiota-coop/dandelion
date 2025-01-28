@@ -15,18 +15,9 @@ module ActivityFeedbackSummaries
     end
   end
 
-  def feedbacks_joined
-    event_feedbacks.order('created_at desc').and(:answers.ne => nil).map do |ef|
-      next unless ef.event
-      next if ef.answers.all? { |_q, a| a.blank? }
-
-      "# Feedback on #{ef.event.name}, #{ef.event.start_time}\n\n#{ef.answers.map { |q, a| "## #{q}\n#{a}" }.join("\n\n")}"
-    end.compact.join("\n\n")
-  end
-
   def feedback_summary!
     activity = self
-    prompt = "Provide a one-paragraph summary of the feedback on this activity (family of events), #{activity.name}, hosted by #{activity.organisation.name}. Focus on the positives. The feedback:\n\n#{activity.feedbacks_joined}"
+    prompt = "Provide a one-paragraph summary of the feedback on this activity (family of events), #{activity.name}, hosted by #{activity.organisation.name}. Focus on the positives. The feedback:\n\n#{activity.event_feedbacks.joined}"
 
     last_paragraph = nil
     loop do

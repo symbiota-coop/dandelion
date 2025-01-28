@@ -120,4 +120,16 @@ class EventFeedback
     batch_message.finalize if ENV['MAILGUN_API_KEY']
   end
   handle_asynchronously :send_destroy_notification
+
+  def self.joined(since: nil)
+    event_feedbacks = order('created_at desc').and(:answers.ne => nil)
+    event_feedbacks = event_feedbacks.and(:created_at.gte => since) if since
+
+    event_feedbacks.map do |ef|
+      next unless ef.event
+      next if ef.answers.all? { |_q, a| a.blank? }
+
+      "# Feedback on #{ef.event.name}, #{ef.event.start_time}\n\n#{ef.answers.map { |q, a| "## #{q}\n#{a}" }.join("\n\n")}"
+    end.compact.join("\n\n")
+  end
 end

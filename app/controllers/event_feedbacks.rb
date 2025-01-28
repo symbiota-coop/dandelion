@@ -37,7 +37,7 @@ Dandelion::App.controller do
   end
 
   get '/event_feedbacks/feedback', provides: :txt do
-    current_account.feedbacks_joined
+    current_account.event_feedbacks.joined
   end
 
   get '/event_feedbacks/:id' do

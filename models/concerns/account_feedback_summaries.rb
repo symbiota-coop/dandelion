@@ -15,20 +15,9 @@ module AccountFeedbackSummaries
     end
   end
 
-  def feedbacks_joined(since: nil)
-    event_feedbacks = event_feedbacks_as_facilitator.and(:answers.ne => nil).order('created_at desc')
-    event_feedbacks = event_feedbacks.and(:created_at.gte => since) if since
-    event_feedbacks.map do |ef|
-      next unless ef.event
-      next if ef.answers.all? { |_q, a| a.blank? }
-
-      "# Feedback on #{ef.event.name}, #{ef.event.start_time}\n\n#{ef.answers.map { |q, a| "## #{q}\n#{a}" }.join("\n\n")}"
-    end.compact.join("\n\n")
-  end
-
   def feedback_summary!
     account = self
-    prompt = "Provide a one-paragraph summary of the feedback on this facilitator, #{account.firstname}. Focus on their strengths and what they do well. The feedback:\n\n#{account.feedbacks_joined}"
+    prompt = "Provide a one-paragraph summary of the feedback on this facilitator, #{account.firstname}. Focus on their strengths and what they do well. The feedback:\n\n#{account.event_feedbacks.joined}"
 
     last_paragraph = nil
     loop do
