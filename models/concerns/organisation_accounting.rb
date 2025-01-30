@@ -49,10 +49,11 @@ module OrganisationAccounting
     else
       cr = contribution_requested
       cp = contribution_paid
+      contribution_remaining = cr - cp
       update_attributes(
         contribution_requested_gbp_cache: cr.exchange_to('GBP').to_f,
         contribution_paid_gbp_cache: cp.exchange_to('GBP').to_f,
-        paid_up: cp >= (Organisation.paid_up_fraction * cr)
+        paid_up: (contribution_remaining < Money.new(1 * 100, 'GBP')) || cp >= (Organisation.paid_up_fraction * cr)
       )
     end
   end
