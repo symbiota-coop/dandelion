@@ -51,7 +51,15 @@
         var tabPane = this
         $('<a href="javascript:;" class="next btn btn-primary">Next</a>').appendTo(tabPane)
         $(this).find('a.next').click(function () {
-          $('#event-build-nav a[href="#' + $(tabPane).next().attr('id') + '"]').tab('show')
+          var nextTab = $(tabPane).next().attr('id')
+          $('#event-build-nav a[href="#' + nextTab + '"]').tab('show')
+
+          // Scroll the tab into view
+          var navWrapper = $('.nav-wrapper')[0]
+          var activeTab = $('#event-build-nav a[href="#' + nextTab + '"]')[0]
+          if (navWrapper && activeTab) {
+            navWrapper.scrollLeft = activeTab.offsetLeft - (navWrapper.clientWidth / 2) + (activeTab.clientWidth / 2)
+          }
         })
       })
       $('.tab-pane:last').find('a.next').remove()
