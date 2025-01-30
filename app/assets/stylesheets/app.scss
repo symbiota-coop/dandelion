@@ -846,3 +846,34 @@ figure td {
   left: 0;
   top: 0;
 }
+
+@media(max-width: 767px) {
+  .nav-wrapper .nav-tabs {
+    border-bottom: 0;
+    flex-wrap: nowrap;
+  }
+
+  .nav-wrapper .nav-link {
+    white-space: nowrap;
+  }
+
+  .nav-wrapper {
+    -webkit-overflow-scrolling: touch;
+    overflow-x: scroll;
+    overflow-y: hidden;
+  }
+
+  .nav-wrapper::-webkit-scrollbar {
+    height: 8px;
+    display: block;
+  }
+
+  .nav-wrapper::-webkit-scrollbar-track {
+    background: #f1f1f1;
+  }
+
+  .nav-wrapper::-webkit-scrollbar-thumb {
+    background: #999;
+    border-radius: 4px;
+  }
+}

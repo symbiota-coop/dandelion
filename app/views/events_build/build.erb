@@ -44,18 +44,20 @@
 <% end %>
 
 <% form_for @event, @event.new_record ? '/events/new' : "/events/#{@event.id}/edit", id: 'build-event' do |f| %>
-  <ul id="event-build-nav" class="nav nav-tabs" role="tablist">
-    <li role="presentation" class="nav-item"><a class="nav-link active" href="#tab1" role="tab" data-toggle="tab">Basics</a></li>
-    <li role="presentation" class="nav-item"><a class="nav-link" href="#tab2" role="tab" data-toggle="tab">Description and confirmation email</a></li>
-    <li role="presentation" class="nav-item"><a class="nav-link" href="#tab3" role="tab" data-toggle="tab">Tickets</a></li>
-    <li role="presentation" class="nav-item"><a class="nav-link" href="#tab4" role="tab" data-toggle="tab">Questions</a></li>
-    <li role="presentation" class="nav-item"><a class="nav-link" href="#tab5" role="tab" data-toggle="tab">Donations</a></li>
-    <li role="presentation" class="nav-item"><a class="nav-link" href="#tab6" role="tab" data-toggle="tab">Labels</a></li>
-    <li role="presentation" class="nav-item"><a class="nav-link" href="#tab7" role="tab" data-toggle="tab">Everything else</a></li>
-    <% if @event.organisation.stripe_client_id %>
-      <li role="presentation" class="nav-item"><a class="nav-link" href="#tab8" role="tab" data-toggle="tab">Revenue</a></li>
-    <% end %>
-  </ul>
+  <div class="nav-wrapper">
+    <ul id="event-build-nav" class="nav nav-tabs" role="tablist">
+      <li role="presentation" class="nav-item"><a class="nav-link active" href="#tab1" role="tab" data-toggle="tab">Basics</a></li>
+      <li role="presentation" class="nav-item"><a class="nav-link" href="#tab2" role="tab" data-toggle="tab">Description and confirmation email</a></li>
+      <li role="presentation" class="nav-item"><a class="nav-link" href="#tab3" role="tab" data-toggle="tab">Tickets</a></li>
+      <li role="presentation" class="nav-item"><a class="nav-link" href="#tab4" role="tab" data-toggle="tab">Questions</a></li>
+      <li role="presentation" class="nav-item"><a class="nav-link" href="#tab5" role="tab" data-toggle="tab">Donations</a></li>
+      <li role="presentation" class="nav-item"><a class="nav-link" href="#tab6" role="tab" data-toggle="tab">Labels</a></li>
+      <li role="presentation" class="nav-item"><a class="nav-link" href="#tab7" role="tab" data-toggle="tab">Everything else</a></li>
+      <% if @event.organisation.stripe_client_id %>
+        <li role="presentation" class="nav-item"><a class="nav-link" href="#tab8" role="tab" data-toggle="tab">Revenue</a></li>
+      <% end %>
+    </ul>
+  </div>
   <div class="container">
     <div class="tab-content mt-3">
       <div role="tabpanel" class="tab-pane active" id="tab1">
