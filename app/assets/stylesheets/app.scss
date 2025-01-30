@@ -846,3 +846,67 @@ figure td {
   left: 0;
   top: 0;
 }
+
+
+
+
+.nav-tabs.responsive {
+  display: none;
+}
+
+@media(min-width:768px) {
+  .nav-tabs.responsive {
+    display: flex;
+  }
+
+  .tab-content>.card {
+    border: none;
+  }
+
+  .tab-content>.card .card-header {
+    display: none;
+  }
+
+  .tab-content>.card .collapse {
+    display: block;
+  }
+}
+
+@media(max-width:767px) {
+  .tab-content>.tab-pane {
+    display: block !important;
+    opacity: 1;
+  }
+}
+
+.accordion {
+  .card:not(:first-of-type):not(:last-of-type) {
+    border-bottom: 0;
+    border-radius: 0;
+  }
+
+  .card:not(:first-of-type) {
+    .card-header:first-child {
+      border-radius: 0;
+    }
+  }
+
+  .card:first-of-type {
+    border-bottom: 0;
+    border-bottom-right-radius: 0;
+    border-bottom-left-radius: 0;
+  }
+
+  .card:last-of-type {
+    border-top-left-radius: 0;
+    border-top-right-radius: 0;
+  }
+}
+
+.tab-content.accordion {
+  padding: 0.9375rem 0
+}
+
+.accordion>.card>.card-header {
+  cursor: pointer
+}
