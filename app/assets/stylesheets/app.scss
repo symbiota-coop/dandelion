@@ -855,6 +855,8 @@ figure td {
 
   .nav-wrapper .nav-link {
     white-space: nowrap;
+    padding-top: 0.75rem;
+    padding-bottom: 0.75rem;
   }
 
   .nav-wrapper {
@@ -873,7 +875,7 @@ figure td {
   }
 
   .nav-wrapper::-webkit-scrollbar-thumb {
-    background: #999;
+    background: #aaa;
     border-radius: 4px;
   }
 }
