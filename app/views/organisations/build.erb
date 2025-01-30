@@ -94,10 +94,9 @@
     </ul>
   </div>
 <% end %>
-
 <% form_for @organisation, @organisation.new_record? ? '/o/new' : "/o/#{@organisation.slug}/edit" do  |f| %>
   <% if @organisation.persisted? %>
-    <ul id="organisation-build-nav" class="nav nav-tabs responsive" role="tablist">
+    <ul id="organisation-build-nav" class="nav nav-tabs" role="tablist">
       <li role="presentation" class="nav-item"><a class="nav-link <%= 'active' if !params[:tab] || params[:tab].to_i == 1%>" href="#tab1" role="tab" data-toggle="tab">Basics</a></li>
       <li role="presentation" class="nav-item"><a class="nav-link <%= 'active' if params[:tab].to_i == 2%>" href="#tab2" role="tab" data-toggle="tab">Payments</a></li>
       <li role="presentation" class="nav-item"><a class="nav-link <%= 'active' if params[:tab].to_i == 3%>" href="#tab3" role="tab" data-toggle="tab">Emails</a></li>
@@ -110,198 +109,135 @@
     </ul>
   <% end %>
   <div class="container">
-    <div class="tab-content accordion" id="accordion">
-      <div role="tabpanel" class="card tab-pane <%= 'active' if !params[:tab] || params[:tab].to_i == 1%>" id="tab1">
-        <div class="card-header" id="accordion-header-1">
-          <h5 class="mb-0" data-toggle="collapse" data-target="#accordion-pane-1">
-            Basics
-          </h5>
+    <div class="tab-content <%= 'mt-3' if @organisation.persisted? %>">
+      <div role="tabpanel" class="tab-pane <%= 'active' if !params[:tab] || params[:tab].to_i == 1%>" id="tab1">
+        <%= f.text_block :name %>
+        <div class="slugify">
+          <%= f.shorturl_block :slug, stem: "#{ENV['BASE_URI']}/o/" %>
         </div>
-        <div id="accordion-pane-1" class="collapse <%= 'show' if !params[:tab] || params[:tab].to_i == 1%>" data-parent="#accordion">
-          <div class="card-body">
-            <%= f.text_block :name %>
-            <div class="slugify">
-              <%= f.shorturl_block :slug, stem: "#{ENV['BASE_URI']}/o/" %>
-            </div>
-            <% if @organisation.persisted? %>
-              <%= f.wysiwyg_block :intro_text %>
-              <%= f.url_block :website %>
-              <%= f.url_block :telegram_group %>
-              <%= f.text_block :location %>
-              <%= f.image_block :image %>
-            <% end %>
-          </div>
-        </div>
+        <% if @organisation.persisted? %>
+          <%= f.wysiwyg_block :intro_text %>
+          <%= f.url_block :website %>
+          <%= f.url_block :telegram_group %>
+          <%= f.text_block :location %>
+          <%= f.image_block :image %>
+        <% end %>
       </div>
       <% if @organisation.persisted? %>
-        <div role="tabpanel" class="card tab-pane <%= 'active' if params[:tab].to_i == 2%>" id="tab2">
-          <div class="card-header" id="accordion-header-2">
-            <h5 class="mb-0" data-toggle="collapse" data-target="#accordion-pane-2">
-              Payments
-            </h5>
-          </div>
-          <div id="accordion-pane-2" class="collapse <%= 'show' if params[:tab].to_i == 2%>" data-parent="#accordion">
+        <div role="tabpanel" class="tab-pane <%= 'active' if params[:tab].to_i == 2%>" id="tab2">
+          <% if params[:created] %>
+            <div class="alert alert-success">
+              <p class="m-0">To accept payments, now add your Stripe and/or Coinbase Commerce details.</p>
+            </div>
+          <% else %>
+            <% if !@organisation.payment_method? %>
+              <div class="alert alert-warning">
+                <p class="m-0"><i class="bi bi-exclamation-triangle-fill"></i> To accept payments, you must add either Stripe or Coinbase Commerce details.</p>
+              </div>
+            <% end %>
+          <% end %>
+          <%= f.select_block :currency %>
+          <div class="card mb-3">
+            <div class="card-header text-white bg-primary">
+              <h4 class="my-0">Card payments via Stripe</h4>
+            </div>
             <div class="card-body">
-              <% if params[:created] %>
-                <div class="alert alert-success">
-                  <p class="m-0">To accept payments, now add your Stripe and/or Coinbase Commerce details.</p>
-                </div>
+              <% if @organisation.stripe_connect_json %>
+                <big class="d-block mb-1">
+                  <i class="bi bi-credit-card"></i>
+                  Connected to <%= @organisation.stripe_account_name ? "#{@organisation.stripe_account_name}'s Stripe account" : 'Stripe' %>
+                  (id: <%= @organisation.stripe_user_id %>)
+                </big>
+                <a class="btn btn-danger btn-sm" href="/organisations/stripe_disconnect?organisation_id=<%= @organisation.id %>">Disconnect</a>
               <% else %>
-                <% if !@organisation.payment_method? %>
-                  <div class="alert alert-warning">
-                    <p class="m-0"><i class="bi bi-exclamation-triangle-fill"></i> To accept payments, you must add either Stripe or Coinbase Commerce details.</p>
-                  </div>
-                <% end %>
+                <a class="btn btn-outline-primary mb-1" href="https://connect.stripe.com/oauth/authorize?response_type=code&client_id=<%= ENV['STRIPE_CLIENT_ID'] %>&scope=read_write&state=<%= @organisation.id %>">Connect Stripe</a>
               <% end %>
-              <%= f.select_block :currency %>
-              <div class="card mb-3">
-                <div class="card-header text-white bg-primary">
-                  <h4 class="my-0">Card payments via Stripe</h4>
-                </div>
-                <div class="card-body">
-                  <% if @organisation.stripe_connect_json %>
-                    <big class="d-block mb-1">
-                      <i class="bi bi-credit-card"></i>
-                      Connected to <%= @organisation.stripe_account_name ? "#{@organisation.stripe_account_name}'s Stripe account" : 'Stripe' %>
-                      (id: <%= @organisation.stripe_user_id %>)
-                    </big>
-                    <a class="btn btn-danger btn-sm" href="/organisations/stripe_disconnect?organisation_id=<%= @organisation.id %>">Disconnect</a>
-                  <% else %>
-                    <a class="btn btn-outline-primary mb-1" href="https://connect.stripe.com/oauth/authorize?response_type=code&client_id=<%= ENV['STRIPE_CLIENT_ID'] %>&scope=read_write&state=<%= @organisation.id %>">Connect Stripe</a>
-                  <% end %>
-                </div>
-              </div>
-              <div class="card mb-3">
-                <div class="card-header text-white bg-primary">
-                  <h4 class="my-0">Crypto payments via Coinbase Commerce</h4>
-                </div>
-                <div class="card-body pb-0">
-                  <p>First go to <code>Settings</code> > <code>Webhook subscriptions</code> > <code>Add an endpoint</code> and add
-                    <span style="text-decoration: underline dotted"><%=ENV['BASE_URI']%>/o/<%= @organisation.slug %>/coinbase_webhook</span>
-                  </p>
-                  <%= f.text_block :coinbase_api_key %>
-                  <%= f.text_block :coinbase_webhook_secret %>
-                </div>
-              </div>
-              <div class="card mb-3">
-                <div class="card-header text-white bg-primary">
-                  <h4 class="my-0">Experimental</h4>
-                </div>
-                <div class="card-body pb-0">
-                  <%= f.text_block :evm_address %>
-                  <%= f.text_block :oc_slug %>
-                </div>
-              </div>
+            </div>
+          </div>
+          <div class="card mb-3">
+            <div class="card-header text-white bg-primary">
+              <h4 class="my-0">Crypto payments via Coinbase Commerce</h4>
+            </div>
+            <div class="card-body pb-0">
+              <p>First go to <code>Settings</code> > <code>Webhook subscriptions</code> > <code>Add an endpoint</code> and add
+                <span style="text-decoration: underline dotted"><%=ENV['BASE_URI']%>/o/<%= @organisation.slug %>/coinbase_webhook</span>
+              </p>
+              <%= f.text_block :coinbase_api_key %>
+              <%= f.text_block :coinbase_webhook_secret %>
+            </div>
+          </div>
+          <div class="card mb-3">
+            <div class="card-header text-white bg-primary">
+              <h4 class="my-0">Experimental</h4>
+            </div>
+            <div class="card-body pb-0">
+              <%= f.text_block :evm_address %>
+              <%= f.text_block :oc_slug %>
             </div>
           </div>
         </div>
-        <div role="tabpanel" class="card tab-pane <%= 'active' if params[:tab].to_i == 3%>" id="tab3">
-          <div class="card-header" id="accordion-header-3">
-            <h5 class="mb-0" data-toggle="collapse" data-target="#accordion-pane-3">
-              Emails
-            </h5>
-          </div>
-          <div id="accordion-pane-3" class="collapse <%= 'show' if params[:tab].to_i == 3%>" data-parent="#accordion">
-            <div class="card-body">
-              <%= f.wysiwyg_block :ticket_email_greeting %>
-              <%= f.wysiwyg_block :extra_info_for_ticket_email %>
-              <%= f.wysiwyg_block :feedback_email_body %>
-              <%= f.text_block :reply_to %>
-              <%= f.check_box_block :send_ticket_emails_from_organisation %>
-              <%= f.check_box_block :show_ticketholder_link_in_ticket_emails %>
-              <%= f.check_box_block :show_sign_in_link_in_ticket_emails %>
-            </div>
-          </div>
+        <div role="tabpanel" class="tab-pane <%= 'active' if params[:tab].to_i == 3%>" id="tab3">
+          <%= f.wysiwyg_block :ticket_email_greeting %>
+          <%= f.wysiwyg_block :extra_info_for_ticket_email %>
+          <%= f.wysiwyg_block :feedback_email_body %>
+          <%= f.text_block :reply_to %>
+          <%= f.check_box_block :send_ticket_emails_from_organisation %>
+          <%= f.check_box_block :show_ticketholder_link_in_ticket_emails %>
+          <%= f.check_box_block :show_sign_in_link_in_ticket_emails %>
         </div>
-        <div role="tabpanel" class="card tab-pane <%= 'active' if params[:tab].to_i == 4%>" id="tab4">
-          <div class="card-header" id="accordion-header-4">
-            <h5 class="mb-0" data-toggle="collapse" data-target="#accordion-pane-4">
-              Mailgun
-            </h5>
-          </div>
-          <div id="accordion-pane-4" class="collapse <%= 'show' if params[:tab].to_i == 4%>" data-parent="#accordion">
-            <div class="card-body">
-              <% if !@organisation.mailgun_api_key %>
-                <div class="alert alert-warning">
-                  <p class="m-0">
-                    <i class="bi bi-exclamation-triangle-fill"></i>
-                    If you'd like to use Dandelion's mailer to email everyone following your organisation,
-                    or people following your organisation's activities and local groups,
-                    you'll need to link a <a class="text-warning text-underline" href="https://www.mailgun.com/pricing/">paid Mailgun account</a>.
-                    (You can email event attendees without providing these details.)
-                  </p>
-                </div>
-              <% end %>
-              <%= f.text_block :mailgun_api_key %>
-              <%= f.text_block :mailgun_domain %>
-              <%= f.select_block :mailgun_region %>
+        <div role="tabpanel" class="tab-pane <%= 'active' if params[:tab].to_i == 4%>" id="tab4">
+          <% if !@organisation.mailgun_api_key %>
+            <div class="alert alert-warning">
+              <p class="m-0">
+                <i class="bi bi-exclamation-triangle-fill"></i>
+                If you'd like to use Dandelion's mailer to email everyone following your organisation,
+                or people following your organisation's activities and local groups,
+                you'll need to link a <a class="text-warning text-underline" href="https://www.mailgun.com/pricing/">paid Mailgun account</a>.
+                (You can email event attendees without providing these details.)
+              </p>
             </div>
-          </div>
+          <% end %>
+          <%= f.text_block :mailgun_api_key %>
+          <%= f.text_block :mailgun_domain %>
+          <%= f.select_block :mailgun_region %>
         </div>
-        <div role="tabpanel" class="card tab-pane <%= 'active' if params[:tab].to_i == 5%>" id="tab5">
-          <div class="card-header" id="accordion-header-5">
-            <h5 class="mb-0" data-toggle="collapse" data-target="#accordion-pane-5">
-              Other services
-            </h5>
-          </div>
-          <div id="accordion-pane-5" class="collapse <%= 'show' if params[:tab].to_i == 5%>" data-parent="#accordion">
-            <div class="card-body">
-              <%= f.text_block :google_analytics_id %>
-              <%= f.text_block :facebook_pixel_id %>
-              <%= f.text_block :gocardless_access_token %>
-              <%= f.text_block :patreon_api_key %>
-            </div>
-          </div>
+        <div role="tabpanel" class="tab-pane <%= 'active' if params[:tab].to_i == 5%>" id="tab5">
+          <%= f.text_block :google_analytics_id %>
+          <%= f.text_block :facebook_pixel_id %>
+          <%= f.text_block :gocardless_access_token %>
+          <%= f.text_block :patreon_api_key %>
         </div>
-        <div role="tabpanel" class="card tab-pane <%= 'active' if params[:tab].to_i == 6%>" id="tab6">
-          <div class="card-header" id="accordion-header-6">
-            <h5 class="mb-0" data-toggle="collapse" data-target="#accordion-pane-6">
-              Everything else
-            </h5>
-          </div>
-          <div id="accordion-pane-6" class="collapse <%= 'show' if params[:tab].to_i == 6%>" data-parent="#accordion">
-            <div class="card-body">
-              <%= f.wysiwyg_block :event_footer %>
-              <%= f.text_block :add_a_donation_to %>
-              <%= f.text_block :donation_text %>
-              <%= f.number_block :event_image_required_width %>
-              <%= f.number_block :event_image_required_height %>
-              <%= f.url_block :become_a_member_url %>
-              <%= f.url_block :terms_and_conditions_url %>
-              <%= f.text_area_block :terms_and_conditions %>
-              <%= f.check_box_block :terms_and_conditions_check_box %>
-              <%= f.check_box_block :collect_location %>
-              <%= f.check_box_block :restrict_cohosting %>
-              <%= f.check_box_block :hide_ticket_revenue %>
-            </div>
-          </div>
+        <div role="tabpanel" class="tab-pane <%= 'active' if params[:tab].to_i == 6%>" id="tab6">
+          <%= f.wysiwyg_block :event_footer %>
+          <%= f.text_block :add_a_donation_to %>
+          <%= f.text_block :donation_text %>
+          <%= f.number_block :event_image_required_width %>
+          <%= f.number_block :event_image_required_height %>
+          <%= f.url_block :become_a_member_url %>
+          <%= f.url_block :terms_and_conditions_url %>
+          <%= f.text_area_block :terms_and_conditions %>
+          <%= f.check_box_block :terms_and_conditions_check_box %>
+          <%= f.check_box_block :collect_location %>
+          <%= f.check_box_block :restrict_cohosting %>
+          <%= f.check_box_block :hide_ticket_revenue %>
         </div>
         <% if Padrino.env == :development || @organisation.experimental? %>
-          <div role="tabpanel" class="card tab-pane <%= 'active' if params[:tab].to_i == 7%>" id="tab7">
-            <div class="card-header" id="accordion-header-7">
-              <h5 class="mb-0" data-toggle="collapse" data-target="#accordion-pane-7">
-                Experimental
-              </h5>
-            </div>
-            <div id="accordion-pane-7" class="collapse <%= 'show' if params[:tab].to_i == 7%>" data-parent="#accordion">
-              <div class="card-body">
-                <%= f.text_block :stripe_pk %>
-                <%= f.text_block :stripe_sk %>
-                <%= f.text_block :stripe_client_id %>
-                <%= f.wysiwyg_block :recording_email_greeting %>
-                <%= f.text_area_block :minimal_head %>
-                <%= f.text_area_block :events_banner %>
-                <%= f.number_block :affiliate_credit_percentage %>
-                <%= f.number_block :monthly_donor_affiliate_reward %>
-                <%= f.wysiwyg_block :affiliate_intro %>
-                <%= f.url_block :affiliate_share_image_url %>
-              </div>
-            </div>
+          <div role="tabpanel" class="tab-pane <%= 'active' if params[:tab].to_i == 7%>" id="tab7">
+            <%= f.text_block :stripe_pk %>
+            <%= f.text_block :stripe_sk %>
+            <%= f.text_block :stripe_client_id %>
+            <%= f.wysiwyg_block :recording_email_greeting %>
+            <%= f.text_area_block :minimal_head %>
+            <%= f.text_area_block :events_banner %>
+            <%= f.number_block :affiliate_credit_percentage %>
+            <%= f.number_block :monthly_donor_affiliate_reward %>
+            <%= f.wysiwyg_block :affiliate_intro %>
+            <%= f.url_block :affiliate_share_image_url %>
           </div>
         <% end %>
       <% end %>
     </div>
-    <div class="ml-md-3">
+    <div class="ml-3">
       <%= f.submit_block button_text: (@organisation.persisted? ? 'Update organisation' : 'Save and continue') %>
     </div>
   </div>
