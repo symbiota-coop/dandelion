@@ -33,7 +33,15 @@
         var tabPane = this
         $('<a href="javascript:;" class="next btn btn-primary">Next</a>').appendTo(tabPane)
         $(this).find('a.next').click(function () {
-          $('#gathering-build-nav a[href="#' + $(tabPane).next().attr('id') + '"]').tab('show')
+          var nextTab = $(tabPane).next().attr('id')
+          $('#gathering-build-nav a[href="#' + nextTab + '"]').tab('show')
+
+          // Scroll the tab into view
+          var navWrapper = $('.nav-wrapper')[0]
+          var activeTab = $('#gathering-build-nav a[href="#' + nextTab + '"]')[0]
+          if (navWrapper && activeTab) {
+            navWrapper.scrollLeft = activeTab.offsetLeft - (navWrapper.clientWidth / 2) + (activeTab.clientWidth / 2)
+          }
         })
       })
       $('#tab5').find('a.next').remove()
@@ -109,13 +117,15 @@
   </div>
 <% end %>
 <% form_for @gathering, @gathering.new_record? ? '/g/new' : "/g/#{@gathering.slug}/edit", multipart: true do |f| %>
-  <ul id="gathering-build-nav" class="nav nav-tabs" role="tablist">
-    <li role="presentation" class="nav-item"><a class="nav-link active" href="#tab1" role="tab" data-toggle="tab">Basics</a></li>
-    <li role="presentation" class="nav-item"><a class="nav-link" href="#tab2" role="tab" data-toggle="tab">Joining</a></li>
-    <li role="presentation" class="nav-item"><a class="nav-link" href="#tab3" role="tab" data-toggle="tab">Welcome</a></li>
-    <li role="presentation" class="nav-item"><a class="nav-link" href="#tab4" role="tab" data-toggle="tab">Payments</a></li>
-    <li role="presentation" class="nav-item"><a class="nav-link" href="#tab5" role="tab" data-toggle="tab">Features</a></li>
-  </ul>
+  <div class="nav-wrapper">
+    <ul id="gathering-build-nav" class="nav nav-tabs" role="tablist">
+      <li role="presentation" class="nav-item"><a class="nav-link active" href="#tab1" role="tab" data-toggle="tab">Basics</a></li>
+      <li role="presentation" class="nav-item"><a class="nav-link" href="#tab2" role="tab" data-toggle="tab">Joining</a></li>
+      <li role="presentation" class="nav-item"><a class="nav-link" href="#tab3" role="tab" data-toggle="tab">Welcome</a></li>
+      <li role="presentation" class="nav-item"><a class="nav-link" href="#tab4" role="tab" data-toggle="tab">Payments</a></li>
+      <li role="presentation" class="nav-item"><a class="nav-link" href="#tab5" role="tab" data-toggle="tab">Features</a></li>
+    </ul>
+  </div>
   <div class="container">
     <div class="tab-content mt-3">
       <div role="tabpanel" class="tab-pane active" id="tab1">
