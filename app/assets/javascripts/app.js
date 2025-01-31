@@ -287,6 +287,10 @@ $(function () {
     $('#page-container').removeClass('page-sidebar-toggled');
     $('[data-click="sidebar-toggled"]').removeClass('active');
     $('.pace-progress').hide()
+    $('.pace-inactive').show()
+  })
+
+  $(window).on('unload', function () {
     $('.pace-inactive').hide()
   })
 
