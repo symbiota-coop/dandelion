@@ -1,5 +1,7 @@
-<ul class="nav nav-tabs mb-3" role="tablist">
-  <% {'Recommended  events' => 'events',  'Recommended people' => 'accounts',  'Trending' => 'trending' }.each { |k,v| %>
-  <li class="nav-item"><a class="nav-link  <% if request.path.split('/').last == v %>active<% end %>" href="/recommendations/<%=v%>"><%= k %></a></li>
-  <% } %>
-</ul>
+<div class="nav-wrapper mb-3">
+  <ul class="nav nav-tabs" role="tablist">
+    <% {'Recommended  events' => 'events',  'Recommended people' => 'accounts',  'Trending' => 'trending' }.each { |k,v| %>
+    <li class="nav-item"><a class="nav-link  <% if request.path.split('/').last == v %>active<% end %>" href="/recommendations/<%=v%>"><%= k %></a></li>
+    <% } %>
+  </ul>
+</div>

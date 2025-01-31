@@ -40,32 +40,36 @@
     </div>
   </div>
 </div>
-<ul class="nav nav-tabs mt-3" role="tablist">
-  <% events_active = nil %>
-  <% if organisation_admin? or @organisation.events_for_search.future_and_current_featured.and(:monthly_donors_only => true).count > 0 %>
-    <% events_active = true %>
-    <li class="nav-item">
-      <a class="nav-link active" id="tab-events" data-toggle="tab" href="#panel-events" role="tab">
-        Events
-      </a>
-    </li>
-  <% end %>
-  <% visible_members = @organisation.monthly_donors %>
-  <% if visible_members.count > 0 %>
-    <li class="nav-item">
-      <a class="nav-link" id="tab-map" data-toggle="tab" href="#panel-map" role="tab">
-        Member map
-      </a>
-    </li>
-  <% end %>
-  <% if @organisation.monthly_donor_affiliate_reward %>
-    <li class="nav-item">
-      <a class="nav-link" id="tab-referral" data-toggle="tab" href="#panel-referral" role="tab">
-        Referral link
-      </a>
-    </li>
-  <% end %>
-</ul>
+
+<div class="nav-wrapper mt-3">
+  <ul class="nav nav-tabs" role="tablist">
+    <% events_active = nil %>
+    <% if organisation_admin? or @organisation.events_for_search.future_and_current_featured.and(:monthly_donors_only => true).count > 0 %>
+      <% events_active = true %>
+      <li class="nav-item">
+        <a class="nav-link active" id="tab-events" data-toggle="tab" href="#panel-events" role="tab">
+          Events
+        </a>
+      </li>
+    <% end %>
+    <% visible_members = @organisation.monthly_donors %>
+    <% if visible_members.count > 0 %>
+      <li class="nav-item">
+        <a class="nav-link" id="tab-map" data-toggle="tab" href="#panel-map" role="tab">
+          Member map
+        </a>
+      </li>
+    <% end %>
+    <% if @organisation.monthly_donor_affiliate_reward %>
+      <li class="nav-item">
+        <a class="nav-link" id="tab-referral" data-toggle="tab" href="#panel-referral" role="tab">
+          Referral link
+        </a>
+      </li>
+    <% end %>
+  </ul>
+</div>
+
 <div class="tab-content">
   <% if organisation_admin? or @organisation.events_for_search.future_and_current_featured.and(:monthly_donors_only => true).count > 0 %>
     <div class="tab-pane show active" id="panel-events" role="tabpanel">
