@@ -880,7 +880,13 @@ figure td {
   }
 }
 
-.sidebar .nav li>a {
-  padding-top: 0.5rem;
-  padding-bottom: 0.5rem;
+.sidebar .nav li.has-sub .sub-menu>li>a {
+  padding-bottom: 0.3125rem;
+}
+
+@media(max-width: 767px) {
+  .sidebar .nav li>a {
+    padding-top: 0.5rem;
+    padding-bottom: 0.5rem;
+  }
 }
