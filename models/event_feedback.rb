@@ -121,7 +121,7 @@ class EventFeedback
   end
   handle_asynchronously :send_destroy_notification
 
-  def self.joined(since: nil)
+  def self.joined(since: nil, base_header: '')
     event_feedbacks = order('created_at desc').and(:answers.ne => nil)
     event_feedbacks = event_feedbacks.and(:created_at.gte => since) if since
 
@@ -129,7 +129,7 @@ class EventFeedback
       next unless ef.event
       next if ef.answers.all? { |_q, a| a.blank? }
 
-      "# Feedback on #{ef.event.name}, #{ef.event.when_details(ENV['DEFAULT_TIME_ZONE'])} at #{ef.event.location}\n\n#{ef.answers.map { |q, a| "## #{q}\n#{a}" }.join("\n\n")}"
+      "#{base_header}# Feedback on #{ef.event.name}, #{ef.event.when_details(ENV['DEFAULT_TIME_ZONE'])} at #{ef.event.location}\n\n#{ef.answers.map { |q, a| "#{base_header}## #{q}\n#{a}" }.join("\n\n")}"
     end.compact.join("\n\n")
   end
 end

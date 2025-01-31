@@ -1,0 +1,66 @@
+<%
+@events = Event.live.public.legit
+@from = Date.today
+@to = Date.today
+@events = @events.future(@from)
+@events = @events.and(:start_time.lt => @to + 1)
+@events = @events.reject { |event| event.ticket_types.empty? && !event.organisation.paid_up }
+
+output = ''
+@events.each do |event|
+  output << "# #{event.name}, #{event.when_details(ENV['DEFAULT_TIME_ZONE'])} at #{event.location}\n"
+  output << "#{ENV['BASE_URI']}/e/#{event.slug}\n\n"
+  output << event.description
+  output << "\n\n"
+end
+puts output
+
+prompt = %(Create a two-paragraph summary of these event(s), happening today.
+
+Do not mention specific times. Return well-formatted markdown. Do not use italics. Link the event name.
+
+#{output})
+
+@events_summary = OpenRouter.chat(prompt)
+
+@events = Event.live.public.legit
+@from = Date.yesterday
+@to = Date.yesterday
+@events = @events.future(@from)
+@events = @events.and(:start_time.lt => @to + 1)
+@events = @events.reject { |event| event.event_feedbacks.empty? }
+
+output = ''
+@events.each do |event|
+  output << "# #{event.name}, #{event.when_details(ENV['DEFAULT_TIME_ZONE'])} at #{event.location}\n"
+  output << "#{ENV['BASE_URI']}/e/#{event.slug}\n\n"
+  output << event.event_feedbacks(base_header: '#').joined
+  output << "\n\n"
+end
+puts output
+
+prompt = %(Create a two-paragraph summary of the feedback on these event(s).
+
+Do not mention specific times. Return well-formatted markdown. Do not use italics. Link the event name.
+
+#{output})
+
+@feedback_summary = OpenRouter.chat(prompt)
+
+%>
+
+<% markdown = Redcarpet::Markdown.new(Redcarpet::Render::HTML, autolink: true, tables: true, fenced_code_blocks: true) %>
+
+<div class="article">
+  <h2 class="article-title">Today's Events</h2>
+  <div class="article-content">
+    <%== markdown.render(@events_summary) %>
+  </div>
+</div>
+
+<div class="article">
+  <h2 class="article-title">Yesterday's Feedback</h2>
+  <div class="article-content">
+    <%== markdown.render(@feedback_summary) %>
+  </div>
+</div>

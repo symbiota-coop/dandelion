@@ -1,0 +1,71 @@
+<div class="newspaper">
+  <h1 class="newspaper-title">The Dandelion Daily</h1>
+  <p class="newspaper-date"><%= Date.today.strftime("%A, %B %d, %Y") %></p>
+
+  <div data-with-placeholder data-pagelet-url="/daily">
+
+    <div class="article">
+      <h2 class="article-title">Today's Events</h2>
+      <div class="article-content">
+        <% 10.times do %>
+          <div class="flicker mb-3" style="width: <%= rand(10..90) %>%; background: rgba(0,0,0,0.1)">&nbsp;</div>
+        <% end %>
+      </div>
+    </div>
+
+    <div class="article">
+      <h2 class="article-title">Yesterday's Feedback</h2>
+      <div class="article-content">
+        <% 10.times do %>
+          <div class="flicker mb-3" style="width: <%= rand(10..90) %>%; background: rgba(0,0,0,0.1)">&nbsp;</div>
+        <% end %>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<style>
+  .newspaper {
+    font-family: "Lora", "Times New Roman", Times, serif;
+  }
+
+  .newspaper-title {
+    font-family: "UnifrakturMaguntia", "Lora", "Times New Roman", Times, serif;
+    text-align: center;
+    font-size: 3rem;
+    border-bottom: double 4px #000;
+    padding-bottom: 10px;
+    margin-bottom: 20px;
+    letter-spacing: 2px;
+  }
+
+  .newspaper-date {
+    text-align: center;
+  }
+
+  .article {
+    column-count: 2;
+    column-gap: 40px;
+    margin-bottom: 30px;
+  }
+
+  @media (max-width: 767px) {
+    .article {
+      column-count: 1;
+    }
+  }
+
+  .article-title {
+    column-span: all;
+    font-size: 1.8rem;
+    margin-bottom: 15px;
+    border-bottom: 1px solid #000;
+  }
+
+  .article-content {
+    font-size: 1rem;
+    line-height: 1.6;
+    text-align: justify;
+  }
+</style>
