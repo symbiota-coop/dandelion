@@ -183,6 +183,8 @@
           <strong>
             <% if m = q.match(/\[(.*)\]/) %>
               <%== Sanitize.fragment(Rinku.auto_link(m[1]), Sanitize::Config::DANDELION) %>
+            <% elsif m = q.match(/\{(.*)\}/) %>
+              <%== Sanitize.fragment(Rinku.auto_link(m[1]), Sanitize::Config::DANDELION) %>
             <% else %>
               <%== Sanitize.fragment(Rinku.auto_link(q), Sanitize::Config::DANDELION) %>
             <% end %>

@@ -160,15 +160,20 @@ end
 
       <% @event.questions_a.each_with_index { |q,i| %>
       <div class="form-group links-blank">
-        <% if m = q.match(/\[(.*)\]/)  %>
+        <% if q.starts_with?('# ') %>
+          <label><%== Sanitize.fragment(Rinku.auto_link(q.gsub(/^# /, '')), Sanitize::Config::DANDELION) %></label>
+        <% elsif m = q.match(/\[(.*)\]/)  %>
           <div class="checkbox-inline">
             <%= check_box_tag "answers[#{i}]", id: "answers-#{i}", checked: ((params[:answers][i] == 'true') if params[:answers]), 'data-required': q.ends_with?('*') %>
             <label class="font-weight-bold" for="answers-<%=i%>">
               <%== Sanitize.fragment(Rinku.auto_link(m[1]), Sanitize::Config::DANDELION) %><% if q.ends_with?('*') %>*<% end %>
             </label>
           </div>
-        <% elsif q.starts_with?('# ') %>
-          <label><%== Sanitize.fragment(Rinku.auto_link(q.gsub(/^# /, '')), Sanitize::Config::DANDELION) %></label>
+        <% elsif m = q.match(/\{(.*)\}/)  %>
+          <div class="form-group">
+            <label><%== Sanitize.fragment(Rinku.auto_link(m[1]), Sanitize::Config::DANDELION) %><% if q.ends_with?('*') %>*<% end %></label>
+            <%= date_field_tag "answers[#{i}]", required: q.ends_with?('*'), class: 'form-control', value: (params[:answers][i] if params[:answers] && params[:answers][i] != '__EMPTY__') %>
+          </div>
         <% else %>
           <label><%== Sanitize.fragment(Rinku.auto_link(q), Sanitize::Config::DANDELION) %></label>
           <div>
