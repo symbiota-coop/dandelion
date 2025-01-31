@@ -3,14 +3,10 @@ class OpenRouter
   DEFAULT_MODEL = 'google/gemini-flash-1.5'.freeze
   DEFAULT_PROVIDERS = {
     'google/gemini-flash-1.5' => %w[Google],
-    'meta-llama/llama-3.3-70b-instruct' => %w[Lepton Fireworks Together Avian],
-    'deepseek/deepseek-chat' => %w[DeepSeek],
     'anthropic/claude-3.5-sonnet:beta' => %w[Anthropic]
   }.freeze
   DEFAULT_CONTEXT_WINDOW_SIZES = {
     'google/gemini-flash-1.5' => 1_000_000,
-    'meta-llama/llama-3.3-70b-instruct' => 128_000,
-    'deepseek/deepseek-chat' => 64_000,
     'anthropic/claude-3.5-sonnet:beta' => 200_000
   }.freeze
 
