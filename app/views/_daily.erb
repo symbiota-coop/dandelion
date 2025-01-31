@@ -1,3 +1,6 @@
+<% markdown = Redcarpet::Markdown.new(Redcarpet::Render::HTML, autolink: true, tables: true, fenced_code_blocks: true) %>
+
+
 <%
 @events = Event.live.public.legit
 @from = Date.today
@@ -23,6 +26,17 @@ Do not mention specific times. Return well-formatted markdown. Do not use italic
 
 @events_summary = OpenRouter.chat(prompt)
 
+%>
+
+<div class="article">
+  <h2 class="article-title">Today's Events</h2>
+  <div class="article-content">
+    <%== markdown.render(@events_summary) %>
+  </div>
+</div>
+
+
+<%
 @events = Event.live.public.legit
 @from = Date.yesterday
 @to = Date.yesterday
@@ -48,15 +62,6 @@ Do not mention specific times. Return well-formatted markdown. Do not use italic
 @feedback_summary = OpenRouter.chat(prompt)
 
 %>
-
-<% markdown = Redcarpet::Markdown.new(Redcarpet::Render::HTML, autolink: true, tables: true, fenced_code_blocks: true) %>
-
-<div class="article">
-  <h2 class="article-title">Today's Events</h2>
-  <div class="article-content">
-    <%== markdown.render(@events_summary) %>
-  </div>
-</div>
 
 <div class="article">
   <h2 class="article-title">Feedback on Yesterday's Events</h2>
