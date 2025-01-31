@@ -16,8 +16,25 @@
         <div class="container-fluid">
           <!-- BEGIN mobile sidebar expand / collapse button -->
           <div class="navbar-header">
-            <a href="/" class="navbar-brand">
-              <img style="max-height: 1.75rem; position: relative; top: -0.25rem" src="/images/white-on-black.png">
+            <a href="/" class="navbar-brand" onclick="
+              if (shouldShowMobileBackArrow()) {
+                event.preventDefault(); 
+                history.back();
+              }">
+              <script>
+                function shouldShowMobileBackArrow() {
+                  const referrer = document.referrer;
+                  if (window.innerWidth >= 768) return false;
+                  if (window.location.pathname === '/') return false;
+                  return referrer && new URL(referrer).hostname === window.location.hostname;
+                }
+
+                document.write(
+                  shouldShowMobileBackArrow()
+                    ? '<i class="bi bi-arrow-left" style="font-size: 1.75rem; position: relative; top: -0.25rem"></i>'
+                    : '<img style="max-height: 1.75rem; position: relative; top: -0.25rem" src="/images/white-on-black.png">'
+                );
+              </script>
             </a>
             <button type="button" class="navbar-toggle" data-click="sidebar-toggled">
               <span class="icon-bar"></span>
