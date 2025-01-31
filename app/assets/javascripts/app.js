@@ -284,14 +284,14 @@ $(function () {
     if ($('#page-container').hasClass('page-sidebar-toggled') && $(window).width() < 768) {
       $('.pace-activity').css('border-top-color', 'white').css('border-left-color', 'white')
     }
-    $('#page-container').removeClass('page-sidebar-toggled');
-    $('[data-click="sidebar-toggled"]').removeClass('active');
-    $('.pace-progress').hide()
-    $('.pace-inactive').show()
+    $('.pace-inactive').show() // start spinner as user starts navigating away from page
   })
 
   $(window).on('unload', function () {
-    $('.pace-inactive').hide()
+    $('#page-container').removeClass('page-sidebar-toggled');
+    $('[data-click="sidebar-toggled"]').removeClass('active');
+    $('.pace-progress').hide()
+    $('.pace-inactive').hide() // hide spinner as user leaves page so it doesn't show when pressing back button
   })
 
   if (typeof Pace !== 'undefined') {
