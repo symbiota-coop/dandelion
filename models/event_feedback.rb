@@ -129,7 +129,7 @@ class EventFeedback
       next unless ef.event
       next if ef.answers.all? { |_q, a| a.blank? }
 
-      "# Feedback on #{ef.event.name}, #{ef.event.start_time}\n\n#{ef.answers.map { |q, a| "## #{q}\n#{a}" }.join("\n\n")}"
+      "# Feedback on #{ef.event.name}, #{ef.event.when_details(ENV['DEFAULT_TIME_ZONE'])} at #{ef.event.location}\n\n#{ef.answers.map { |q, a| "## #{q}\n#{a}" }.join("\n\n")}"
     end.compact.join("\n\n")
   end
 end
