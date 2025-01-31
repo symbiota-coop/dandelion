@@ -287,7 +287,7 @@ $(function () {
     $('.pace-inactive').show() // start spinner as user starts navigating away from page
   })
 
-  $(window).on('unload', function () {
+  $(window).on('pagehide', function () {
     $('#page-container').removeClass('page-sidebar-toggled');
     $('[data-click="sidebar-toggled"]').removeClass('active');
     $('.pace-progress').hide()
