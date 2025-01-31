@@ -280,16 +280,13 @@ $(function () {
     $(this).closest('.checkbox-inline').toggleClass('checked', this.checked);
   });
 
-  $(window).on('unload', function () {
-    $('#page-container').removeClass('page-sidebar-toggled');
-  });
-
   $(window).on('beforeunload', function () {
     if ($('#page-container').hasClass('page-sidebar-toggled') && $(window).width() < 768) {
       $('.pace-activity').css('border-top-color', 'white').css('border-left-color', 'white')
     }
+    $('#page-container').removeClass('page-sidebar-toggled');
     $('.pace-progress').hide()
-    $('.pace-inactive').show()
+    $('.pace-inactive').hide()
   })
 
   if (typeof Pace !== 'undefined') {
