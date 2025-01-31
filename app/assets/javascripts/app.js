@@ -285,6 +285,7 @@ $(function () {
       $('.pace-activity').css('border-top-color', 'white').css('border-left-color', 'white')
     }
     $('#page-container').removeClass('page-sidebar-toggled');
+    $('[data-click="sidebar-toggled"]').removeClass('active');
     $('.pace-progress').hide()
     $('.pace-inactive').hide()
   })
