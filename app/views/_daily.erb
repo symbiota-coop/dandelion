@@ -1,5 +1,4 @@
 <%=
-# Today's events
 events = Event.live.public.legit
   .and(:start_time.gte => Date.today, :start_time.lt => Date.today + 1)
   .reject { |event| event.ticket_types.empty? && !event.organisation.paid_up }
@@ -7,15 +6,13 @@ render_article("Today's Events", "Create a two-paragraph summary of these event(
 %>
 
 <%=
-# Yesterday's feedback
 events = Event.live.public.legit
-  .and(:start_time.gte => Date.yesterday, :start_time.lt => Date.yesterday + 1)
+  .and(:end_time.gte => Date.yesterday - 1, :end_time.lt => Date.yesterday)
   .reject { |event| event.event_feedbacks.empty? }
-render_article("Feedback on Yesterday's Events", "Create a two-paragraph summary of the feedback on these event(s).", events, use_feedback: true)
+render_article("Feedback Report", "Create a two-paragraph summary of the feedback on these event(s).", events, use_feedback: true)
 %>
 
 <%=
-# Events listed yesterday
 events = Event.live.public.legit
   .and(:created_at.gte => Date.yesterday, :created_at.lt => Date.yesterday + 1)
   .reject { |event| event.ticket_types.empty? && !event.organisation.paid_up }
@@ -24,7 +21,6 @@ render_article("Events Listed Yesterday", "Create a two-paragraph summary of the
 
 
 <%=
-# Trending events
 events = Event.trending.first(3)
 render_article("Trending Events", "Create a two-paragraph summary of these event(s).", events)
 %>
