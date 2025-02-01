@@ -3,25 +3,21 @@
   <p class="newspaper-date"><%= Date.today.strftime("%A, %B %d, %Y") %></p>
 
   <div data-with-placeholder data-pagelet-url="/daily">
+    <% 
+      headers = File.read(Padrino.root('app', 'views', '_daily.erb'))
+                   .scan(/render_article\("([^"]+)"/).flatten
+    %>
 
-    <div class="article">
-      <h2 class="article-title">Today's Events</h2>
-      <div class="article-content">
-        <% 10.times do %>
-          <div class="flicker mb-3" style="width: <%= rand(10..90) %>%; background: rgba(0,0,0,0.1)">&nbsp;</div>
-        <% end %>
+    <% headers.each do |header| %>
+      <div class="article">
+        <h2 class="article-title"><%= header %></h2>
+        <div class="article-content">
+          <% 10.times do %>
+            <div class="flicker mb-3" style="width: <%= rand(10..90) %>%; background: rgba(0,0,0,0.1)">&nbsp;</div>
+          <% end %>
+        </div>
       </div>
-    </div>
-
-    <div class="article">
-      <h2 class="article-title">Feedback on Yesterday's Events</h2>
-      <div class="article-content">
-        <% 10.times do %>
-          <div class="flicker mb-3" style="width: <%= rand(10..90) %>%; background: rgba(0,0,0,0.1)">&nbsp;</div>
-        <% end %>
-      </div>
-    </div>
-
+    <% end %>
   </div>
 </div>
 
