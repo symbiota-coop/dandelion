@@ -1,5 +1,7 @@
 Dandelion::App.helpers do
   def render_article(title, prompt_prefix, events, use_feedback: false)
+    return if use_feedback ? events.event_feedbacks.empty? : events.empty?
+
     markdown = Redcarpet::Markdown.new(Redcarpet::Render::HTML, autolink: true, tables: true, fenced_code_blocks: true)
     content = <<-HTML
       <div class="article">

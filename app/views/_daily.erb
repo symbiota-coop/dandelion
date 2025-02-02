@@ -19,8 +19,7 @@ events = Event.live.public.legit
 render_article("Events Listed Yesterday", "Create a two-paragraph summary of these newly-listed event(s).", events)
 %>
 
-
 <%=
 events = Event.trending.first(3)
-render_article("Trending Events", "Create a two-paragraph summary of these event(s).", events)
+render_article("Trending Events", "Create a two-paragraph summary of these upcoming event(s).", events)
 %>
