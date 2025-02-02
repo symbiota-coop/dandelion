@@ -1,6 +1,7 @@
 Dandelion::App.helpers do
   def render_article(title, prompt_prefix, events, use_feedback: false)
-    return if use_feedback ? events.event_feedbacks.empty? : events.empty?
+    return if events.empty?
+    return if use_feedback? && events.event_feedbacks.empty?
 
     markdown = Redcarpet::Markdown.new(Redcarpet::Render::HTML, autolink: true, tables: true, fenced_code_blocks: true)
     content = <<-HTML
@@ -20,7 +21,7 @@ Dandelion::App.helpers do
     events.each do |event|
       output << "# #{event.name}, #{event.when_details(ENV['DEFAULT_TIME_ZONE'])} at #{event.location}\n"
       output << "URL: #{ENV['BASE_URI']}/e/#{event.slug}\n\n"
-      output << (use_feedback ? event.event_feedbacks(base_header: '#').joined : event.description)
+      output << (use_feedback ? event.event_feedbacks.joined(base_header: '#') : event.description)
       output << "\n\n"
     end
 
