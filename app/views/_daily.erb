@@ -23,3 +23,45 @@ render_article("Events Listed Yesterday", "Create a two-paragraph summary of the
 events = Event.trending.first(3)
 render_article("Trending Events", "Create a two-paragraph summary of these upcoming event(s).", events)
 %>
+
+<div class="row">
+  <div class="col-lg-4 pr-lg-5">
+    <div class="article single-column">
+      <h2 class="article-title">Book of the Day</h2>
+      <div class="article-content">
+        <% book = Book.all(filter: '{Dandelion} = 1').shuffle.first %>
+        <a href="/books/<%= book['Slug'] %>">
+          <img style="max-width: 100%" src="<%= book['Cover image'][0]['url'] %>">
+        </a>
+      </div>
+    </div>
+  </div>
+  <div class="col-lg-4 pr-lg-5">
+    <div class="article single-column">
+      <h2 class="article-title">Film of the Day</h2>
+      <div class="article-content">
+        <% film = Film.all.shuffle.first %>
+        <a href="<%= film['URL'] %>">
+          <img style="max-width: 100%" src="<%= film['Images'].first['url'] %>">
+        </a>
+      </div>
+    </div>
+  </div>
+  <div class="col-lg-4 pr-lg-5">
+    <div class="article single-column">
+      <h2 class="article-title">Facilitator of the Day</h2>
+      <div class="article-content">
+        <%
+        if Padrino.env == :development
+          account = Account.first
+        else
+          f = Fragment.find_by(key: 'facilitator_feedback_counts')
+          account_ids_freq = JSON.parse(f.value)
+          account = Account.and(:id.in => account_ids_freq.select { |id, freq| freq >= 20 }.map { |id, freq| id }).sample
+        end
+        %>
+        <%= partial :'accounts/square', locals: { account: account, style: 'display: block;' } %>
+      </div>
+    </div>
+  </div>
+</div>
