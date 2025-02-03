@@ -16,7 +16,7 @@ render_article("Feedback Report", "Create a two-paragraph summary of the feedbac
 events = Event.live.public.legit
   .and(:created_at.gte => Date.yesterday, :created_at.lt => Date.yesterday + 1)
   .reject { |event| event.ticket_types.empty? && !event.organisation.paid_up }
-render_article("Events Listed Yesterday", "Create a two-paragraph summary of these newly-listed event(s).", events)
+render_article("Recently Listed", "Create a two-paragraph summary of these newly-listed event(s).", events)
 %>
 
 <%=
