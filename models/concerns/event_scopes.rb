@@ -37,7 +37,12 @@ module EventScopes
     end
 
     def legit
-      self.and(:organisation_id.in => Organisation.and(:hidden.ne => true).pluck(:id))
+      events_with_tickets = TicketType.pluck(:event_id)
+      events_by_paid_up_orgs = Event.and(:organisation_id.in => Organisation.and(paid_up: true).pluck(:id)).pluck(:id)
+
+      self
+        .and(:organisation_id.in => Organisation.and(:hidden.ne => true).pluck(:id))
+        .and(:id.in => (events_with_tickets + events_by_paid_up_orgs))
     end
 
     def locked

@@ -1,7 +1,6 @@
 <%=
 events = Event.live.public.legit
   .and(:start_time.gte => @date, :start_time.lt => @date + 1)
-  .reject { |event| event.ticket_types.empty? && !event.organisation.paid_up }
 render_article("Today's events", "Create a two-paragraph summary of these event(s), happening today.", events)
 %>
 
@@ -15,7 +14,6 @@ render_article("Feedback report", "Create a two-paragraph summary of the feedbac
 <%=
 events = Event.live.public.legit
   .and(:created_at.gte => @date - 1, :created_at.lt => @date)
-  .reject { |event| event.ticket_types.empty? && !event.organisation.paid_up }
 render_article("Recently listed", "Create a two-paragraph summary of these newly-listed event(s).", events)
 %>
 
@@ -57,7 +55,10 @@ render_article("Trending events", "Create a two-paragraph summary of these upcom
         else
           f = Fragment.find_by(key: 'facilitator_feedback_counts')
           account_ids_freq = JSON.parse(f.value)
-          account = Account.and(:picture_uid.ne => nil, :id.in => account_ids_freq.select { |id, freq| freq >= 20 }.map { |id, freq| id }).sample
+          account = Account.and(
+            :picture_uid.ne => nil,
+            :id.in => account_ids_freq.select { |id, freq| freq >= 20 }.map { |id, freq| id } & EventFacilitation.and(:created_at.gt => 1.year.ago).pluck(:account_id).uniq
+          ).sample
         end
         %>
         <a style="text-decoration: none" href="javascript:;" data-account-username="<%= account.username %>">
