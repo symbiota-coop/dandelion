@@ -1,33 +1,33 @@
 <%=
 events = Event.live.public.legit
-  .and(:start_time.gte => Date.today, :start_time.lt => Date.today + 1)
+  .and(:start_time.gte => @date, :start_time.lt => @date + 1)
   .reject { |event| event.ticket_types.empty? && !event.organisation.paid_up }
-render_article("Today's Events", "Create a two-paragraph summary of these event(s), happening today.", events)
+render_article("Today's events", "Create a two-paragraph summary of these event(s), happening today.", events)
 %>
 
 <%=
 events = Event.live.public.legit
-  .and(:end_time.gte => Date.yesterday - 1, :end_time.lt => Date.yesterday)
+  .and(:end_time.gte => @date - 2, :end_time.lt => @date - 1)
   .reject { |event| event.event_feedbacks.empty? }
-render_article("Feedback Report", "Create a two-paragraph summary of the feedback on these event(s).", events, use_feedback: true)
+render_article("Feedback report", "Create a two-paragraph summary of the feedback on these event(s).", events, use_feedback: true)
 %>
 
 <%=
 events = Event.live.public.legit
-  .and(:created_at.gte => Date.yesterday, :created_at.lt => Date.yesterday + 1)
+  .and(:created_at.gte => @date - 1, :created_at.lt => @date)
   .reject { |event| event.ticket_types.empty? && !event.organisation.paid_up }
-render_article("Recently Listed", "Create a two-paragraph summary of these newly-listed event(s).", events)
+render_article("Recently listed", "Create a two-paragraph summary of these newly-listed event(s).", events)
 %>
 
 <%=
 events = Event.trending.first(3)
-render_article("Trending Events", "Create a two-paragraph summary of these upcoming event(s).", events)
+render_article("Trending events", "Create a two-paragraph summary of these upcoming event(s).", events)
 %>
 
 <div class="row">
   <div class="col-lg-4 pr-lg-5">
     <div class="article single-column">
-      <h2 class="article-title">Book of the Day</h2>
+      <h2 class="article-title">Book of the day</h2>
       <div class="article-content">
         <% book = Book.all(filter: '{Dandelion} = 1').shuffle.first %>
         <a href="/books/<%= book['Slug'] %>">
@@ -38,7 +38,7 @@ render_article("Trending Events", "Create a two-paragraph summary of these upcom
   </div>
   <div class="col-lg-4 pr-lg-5">
     <div class="article single-column">
-      <h2 class="article-title">Film of the Day</h2>
+      <h2 class="article-title">Film of the day</h2>
       <div class="article-content">
         <% film = Film.all.shuffle.first %>
         <a href="<%= film['URL'] %>">
@@ -49,7 +49,7 @@ render_article("Trending Events", "Create a two-paragraph summary of these upcom
   </div>
   <div class="col-lg-4 pr-lg-5">
     <div class="article single-column">
-      <h2 class="article-title">Facilitator of the Day</h2>
+      <h2 class="article-title">Facilitator of the day</h2>
       <div class="article-content">
         <%
         if Padrino.env == :development
@@ -60,7 +60,13 @@ render_article("Trending Events", "Create a two-paragraph summary of these upcom
           account = Account.and(:id.in => account_ids_freq.select { |id, freq| freq >= 20 }.map { |id, freq| id }).sample
         end
         %>
-        <%= partial :'accounts/square', locals: { account: account, style: 'display: block;' } %>
+        <a style="text-decoration: none" href="javascript:;" data-account-username="<%= account.username %>">
+          <img class="w-100 <%= 'private' if account.private? %>" src="<%= u account.picture_thumb_or_gravatar_url %>">
+          <h3>
+            <a class="text-dark" href="/u/<%= account.username %>"><%= account.name %></a>
+          </h3>
+          <%= cp(:'accounts/facilitator_info', key: "/facilitator_info?account_id=#{account.id}", locals: { account: account }) %>
+        </a>
       </div>
     </div>
   </div>

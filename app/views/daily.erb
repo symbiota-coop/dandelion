@@ -1,8 +1,16 @@
 <div class="newspaper">
   <h1 class="newspaper-title">The Dandelion Daily</h1>
-  <p class="newspaper-date"><%= Date.today.strftime("%A, %B %-d, %Y") %></p>
+  <div class="date-navigation">
+    <a href="/daily?date=<%= (@date - 1).strftime('%Y-%m-%d') %>" class="nav-arrow">←</a>
+    <p class="newspaper-date"><%= @date.strftime("%A, %B %-d, %Y") %></p>
+    <% if @date < Date.today %>
+      <a href="/daily?date=<%= (@date + 1).strftime('%Y-%m-%d') %>" class="nav-arrow">→</a>
+    <% else %>
+      <span class="nav-arrow disabled">→</span>
+    <% end %>
+  </div>
 
-  <div data-with-placeholder data-pagelet-url="/daily">
+  <div data-with-placeholder data-pagelet-url="/daily?date=<%= @date.strftime('%Y-%m-%d') %>">
     <% 
       headers = File.read(Padrino.root('app', 'views', '_daily.erb'))
                    .scan(/render_article\("([^"]+)"/).flatten
@@ -23,7 +31,7 @@
 
 <style>
   .newspaper {
-    font-family: "Lora", "Times New Roman", Times, serif;
+    /* font-family: "Lora", "Times New Roman", Times, serif; */
     max-width: 1140px;
     margin: 0 auto;
   }
@@ -36,13 +44,32 @@
     letter-spacing: 2px;
   }
 
-  .newspaper-date {
-    text-align: center;
+  .date-navigation {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 20px;
     border-top: double 4px #000;
     border-bottom: 1px solid #000;
-    padding-top: 10px;
-    padding-bottom: 10px;
     margin-bottom: 20px;
+  }
+
+  .nav-arrow {
+    font-size: 1.5rem;
+    text-decoration: none;
+    color: #000;
+    padding: 0 10px;
+  }
+
+  .nav-arrow:hover {
+    color: #666;
+    text-decoration: none;
+  }
+
+  .newspaper-date {
+    margin: 0;
+    min-width: 200px;
+    text-align: center;
   }
 
   .article {
@@ -72,5 +99,10 @@
 
   .single-column {
     column-count: 1 !important;
+  }
+
+  .nav-arrow.disabled {
+    color: #ccc;
+    cursor: not-allowed;
   }
 </style>

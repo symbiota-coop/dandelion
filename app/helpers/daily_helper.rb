@@ -18,8 +18,13 @@ Dandelion::App.helpers do
 
   def generate_events_summary(prompt_prefix, events, use_feedback: false)
     output = ''
+    seen_event_names = Set.new
+
     events.each do |event|
       next if use_feedback && event.event_feedbacks.empty?
+      next if seen_event_names.include?(event.name)
+
+      seen_event_names.add(event.name)
 
       output << "# #{event.name}, #{event.when_details(ENV['DEFAULT_TIME_ZONE'])} at #{event.location}\n"
       output << "URL: #{ENV['BASE_URI']}/e/#{event.slug}\n\n"
@@ -27,7 +32,7 @@ Dandelion::App.helpers do
       output << "\n\n"
     end
 
-    general_instructions = 'Do not mention specific times. Return well-formatted markdown. Do not use italics. Do not use headers. Link all event names using proper markdown syntax like [Event Name](URL).'
+    general_instructions = 'Do not mention specific dates or times. Return well-formatted markdown. Do not use italics. Do not use headers. Link all event names using proper markdown syntax like [Event Name](URL).'
     prompt = %(#{prompt_prefix}\n\n#{general_instructions}\n\n#{output})
 
     OpenRouter.chat(prompt, model: 'google/gemini-flash-1.5').split("\n\n").last(2).join("\n\n")
