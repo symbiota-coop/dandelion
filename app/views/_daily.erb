@@ -57,7 +57,7 @@ render_article("Trending events", "Create a two-paragraph summary of these upcom
           account_ids_freq = JSON.parse(f.value)
           account = Account.and(
             :picture_uid.ne => nil,
-            :id.in => account_ids_freq.select { |id, freq| freq >= 20 }.map { |id, freq| id } & EventFacilitation.and(:created_at.gt => 1.year.ago).pluck(:account_id).uniq
+            :id.in => account_ids_freq.select { |id, freq| freq >= 20 }.map { |id, freq| id } & EventFacilitation.and(:created_at.gt => 1.year.ago).pluck(:account_id).map(&:to_s).uniq
           ).sample
         end
         %>
