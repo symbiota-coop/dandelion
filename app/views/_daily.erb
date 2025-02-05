@@ -1,25 +1,25 @@
 <%=
 events = Event.live.public.legit
   .and(:start_time.gte => @date, :start_time.lt => @date + 1)
-render_article("Today's events", "Create a two-paragraph summary of these event(s), happening today.", events)
+render_article("Today's events", "Create a two-paragraph summary of these event(s), happening today. IMPORTANT: Two paragraphs only.", events)
 %>
 
 <%=
 events = Event.live.public.legit
   .and(:end_time.gte => @date - 2, :end_time.lt => @date - 1)
   .reject { |event| event.event_feedbacks.empty? }
-render_article("Feedback report", "Create a two-paragraph summary of the feedback on these event(s).", events, use_feedback: true)
+render_article("Feedback report", "Create a two-paragraph summary of the feedback on these event(s). IMPORTANT: Two paragraphs only.", events, use_feedback: true)
 %>
 
 <%=
 events = Event.live.public.legit
   .and(:created_at.gte => @date - 1, :created_at.lt => @date)
-render_article("Recently listed", "Create a two-paragraph summary of these newly-listed event(s).", events)
+render_article("Recently listed", "Create a two-paragraph summary of these newly-listed event(s). IMPORTANT: Two paragraphs only.", events)
 %>
 
 <%=
 events = Event.trending(@date).first(3)
-render_article("Trending events", "Create a two-paragraph summary of these upcoming event(s).", events)
+render_article("Trending events", "Create a two-paragraph summary of these upcoming event(s). IMPORTANT: Two paragraphs only.", events)
 %>
 
 <div class="row">
