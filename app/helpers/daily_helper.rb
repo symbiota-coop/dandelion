@@ -35,6 +35,15 @@ Dandelion::App.helpers do
     general_instructions = 'Do not mention specific dates or times. Return well-formatted markdown. Do not use italics. Do not use headers. Link all event names using proper markdown syntax like [Event Name](URL).'
     prompt = %(#{prompt_prefix}\n\n#{general_instructions}\n\n#{output})
 
-    OpenRouter.chat(prompt)
+    result = OpenRouter.chat(prompt)
+
+    # Remove first paragraph if it ends with a colon
+    paragraphs = result.split("\n\n")
+    if paragraphs.first&.strip&.end_with?(':')
+      paragraphs.shift
+      result = paragraphs.join("\n\n")
+    end
+
+    result
   end
 end
