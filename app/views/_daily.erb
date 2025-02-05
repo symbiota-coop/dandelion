@@ -28,7 +28,7 @@ render_article("Trending events", "Create a two-paragraph summary of these upcom
   <div class="col-lg-4 pr-lg-5">
     <div class="article single-column">
       <h2 class="article-title">Book of the day</h2>
-      <div class="article-content">
+      <div>
         <% book = Book.all(filter: '{Dandelion} = 1').shuffle.first %>
         <a href="/books/<%= book['Slug'] %>">
           <img style="max-width: 100%" src="<%= book['Cover image'][0]['url'] %>">
@@ -39,7 +39,7 @@ render_article("Trending events", "Create a two-paragraph summary of these upcom
   <div class="col-lg-4 pr-lg-5">
     <div class="article single-column">
       <h2 class="article-title">Film of the day</h2>
-      <div class="article-content">
+      <div>
         <% film = Film.all.shuffle.first %>
         <a href="<%= film['URL'] %>">
           <img style="max-width: 100%" src="<%= film['Images'].first['url'] %>">
@@ -50,22 +50,24 @@ render_article("Trending events", "Create a two-paragraph summary of these upcom
   <div class="col-lg-4 pr-lg-5">
     <div class="article single-column">
       <h2 class="article-title">Facilitator of the day</h2>
-      <div class="article-content">
+      <div>
         <%
         if Padrino.env == :development
           account = Account.first
         else
           f = Fragment.find_by(key: 'facilitator_feedback_counts')
           account_ids_freq = JSON.parse(f.value)
-          account = Account.and(:id.in => account_ids_freq.select { |id, freq| freq >= 20 }.map { |id, freq| id }).sample
+          account = Account.and(:picture_uid.ne => nil, :id.in => account_ids_freq.select { |id, freq| freq >= 20 }.map { |id, freq| id }).sample
         end
         %>
         <a style="text-decoration: none" href="javascript:;" data-account-username="<%= account.username %>">
           <img class="w-100 <%= 'private' if account.private? %>" src="<%= u account.picture_thumb_or_gravatar_url %>">
-          <h3>
+          <h3 class="mt-2">
             <a class="text-dark" href="/u/<%= account.username %>"><%= account.name %></a>
           </h3>
-          <%= cp(:'accounts/facilitator_info', key: "/facilitator_info?account_id=#{account.id}", locals: { account: account }) %>
+          <div class="facilitator-info">
+            <%= cp(:'accounts/facilitator_info', key: "/facilitator_info?account_id=#{account.id}", locals: { account: account }) %>
+          </div>
         </a>
       </div>
     </div>
