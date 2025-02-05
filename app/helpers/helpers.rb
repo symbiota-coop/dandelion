@@ -118,6 +118,22 @@ Dandelion::App.helpers do
     end
   end
 
+  def stash_partial(slug, locals: {}, key: slug)
+    # if Padrino.env == :development
+    #   partial(slug, locals: locals)
+    # else
+    if (stash = Stash.find_by(key: key))
+      stash.value
+    else
+      begin
+        Stash.create(key: key, value: partial(slug, locals: locals)).value
+      rescue Mongo::Error::OperationFailure # protect against race condition
+        Stash.find_by(key: key).value
+      end
+    end.html_safe
+    # end
+  end
+
   def mass_assigning(params, model)
     params ||= {}
     if model.respond_to?(:protected_attributes)

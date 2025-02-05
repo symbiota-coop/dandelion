@@ -56,11 +56,11 @@ module EventScopes
       self.and(:location.ne => 'Online')
     end
 
-    def trending
-      live.public.legit.future.and(:image_uid.ne => nil, :hide_from_trending.ne => true).and(
+    def trending(from = Date.today)
+      live.public.legit.future(from).and(:image_uid.ne => nil, :hide_from_trending.ne => true).and(
         :organisation_id.in => Organisation.and(paid_up: true).pluck(:id)
       ).sort_by do |event|
-        [event.trending ? 0 : 1, -event.orders.complete.and(:created_at.gt => 1.week.ago).count]
+        [event.trending ? 0 : 1, -event.orders.complete.and(:created_at.gt => from - 1.week).count]
       end
     end
   end
