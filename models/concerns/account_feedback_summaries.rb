@@ -22,6 +22,8 @@ module AccountFeedbackSummaries
     last_paragraph = nil
     loop do
       response = OpenRouter.chat(prompt, max_tokens: 256)
+      next if response.nil?
+
       paragraphs = response.split("\n\n")
       if paragraphs.length <= 2
         last_paragraph = paragraphs.last.strip

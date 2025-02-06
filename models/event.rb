@@ -252,7 +252,7 @@ class Event
     content = nil
     5.times do
       content = OpenRouter.chat(prompt, max_tokens: 256)
-      break unless content.include?('#')
+      break if content && !content.include?('#')
     end
     return unless content
 
