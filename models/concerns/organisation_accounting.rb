@@ -40,7 +40,7 @@ module OrganisationAccounting
   end
 
   def update_paid_up
-    if contribution_not_required? || !stripe_customer_id.nil?
+    if contribution_not_required? || stripe_customer_id
       update_attributes(
         contribution_requested_gbp_cache: nil,
         contribution_paid_gbp_cache: nil,
