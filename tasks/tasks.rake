@@ -17,6 +17,12 @@ namespace :dump do
   end
 end
 
+namespace :daily do
+  task get: :environment do
+    Faraday.get("#{ENV['BASE_URL']}/daily?date=#{Date.today.to_fs(:db_local)}", {}, { 'X-Requested-With' => 'XMLHttpRequest' })
+  end
+end
+
 namespace :max_minder do
   task upload: :environment do
     MaxMinder.upload
