@@ -59,7 +59,7 @@ class Organisation
   end
 
   after_save do
-    events.each(&:update_browsable) if hidden_changed? || paid_up_changed?
+    events.each(&:set_browsable) if hidden_changed? || paid_up_changed?
   end
 
   def ticket_email_greeting_default
