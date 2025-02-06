@@ -7,7 +7,7 @@ render_article("Today's events", "Create a two-paragraph summary of these event(
 <%=
 events = Event.live.public.browsable
   .and(:end_time.gte => @date - 2, :end_time.lt => @date - 1)
-  .reject { |event| event.event_feedbacks.empty? }
+  .reject { |event| event.event_feedbacks.empty? || event.event_feedbacks.all? { |ef| ef.answers.map { |q,a| a.blank? }.all? } }
 render_article("Feedback report", "Create a two-paragraph summary of the feedback on these event(s). IMPORTANT: Two paragraphs only.", events, use_feedback: true)
 %>
 
@@ -25,29 +25,29 @@ render_article("Trending events", "Create a two-paragraph summary of these trend
 <div class="row">
   <div class="col-lg-4 pr-lg-5">
     <div class="article single-column">
-      <h2 class="article-title">Book of the day</h2>
+      <h3>Book of the day</h3>
       <div>
         <% book = Book.all(filter: '{Dandelion} = 1').shuffle.first %>
         <a href="/books/<%= book['Slug'] %>">
-          <img style="max-width: 100%" src="<%= book['Cover image'][0]['url'] %>">
+          <img style="max-width: 100%" src="/books/<%= book['Slug'] %>.jpg">
         </a>
       </div>
     </div>
   </div>
   <div class="col-lg-4 pr-lg-5">
     <div class="article single-column">
-      <h2 class="article-title">Film of the day</h2>
+      <h3>Film of the day</h3>
       <div>
         <% film = Film.all.shuffle.first %>
         <a href="<%= film['URL'] %>">
-          <img style="max-width: 100%" src="<%= film['Images'].first['url'] %>">
+          <img style="max-width: 100%" src="/films/<%= film['Slug'] %>.jpg">
         </a>
       </div>
     </div>
   </div>
   <div class="col-lg-4 pr-lg-5">
     <div class="article single-column">
-      <h2 class="article-title">Facilitator of the day</h2>
+      <h3>Facilitator of the day</h3>
       <div>
         <%
         if Padrino.env == :development
@@ -63,9 +63,9 @@ render_article("Trending events", "Create a two-paragraph summary of these trend
         %>
         <a style="text-decoration: none" href="javascript:;" data-account-username="<%= account.username %>">
           <img class="w-100 <%= 'private' if account.private? %>" src="<%= u account.picture_thumb_or_gravatar_url %>">
-          <h3 class="mt-2">
+          <h4 class="mt-2">
             <a class="text-dark" href="/u/<%= account.username %>"><%= account.name %></a>
-          </h3>
+          </h4>
           <div class="facilitator-info">
             <%= cp(:'accounts/facilitator_info', key: "/facilitator_info?account_id=#{account.id}", locals: { account: account }) %>
           </div>

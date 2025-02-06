@@ -1,5 +1,5 @@
 <% if event_feedback.public_answers %>
-  <% qas = event_feedback.public_answers.map { |qa| qa[1] unless qa[1].blank? }.compact %>
+  <% qas = event_feedback.public_answers.map { |q,a| a unless a.blank? }.compact %>
   <div class="row mb-3">
     <div class="col-auto"><i class="bi bi-quote"></i></div>
     <div class="col">

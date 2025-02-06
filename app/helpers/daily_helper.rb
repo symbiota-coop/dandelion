@@ -22,9 +22,9 @@ Dandelion::App.helpers do
 
     events.each do |event|
       next if use_feedback && event.event_feedbacks.empty?
-      next if seen_event_names.include?(event.name)
+      next if seen_event_names.include?(event.name.split(':').first)
 
-      seen_event_names.add(event.name)
+      seen_event_names.add(event.name.split(':').first)
 
       output << "# #{event.name}, #{event.when_details(ENV['DEFAULT_TIME_ZONE'])} at #{event.location}\n"
       output << "URL: #{ENV['BASE_URI']}/e/#{event.slug}\n\n"
