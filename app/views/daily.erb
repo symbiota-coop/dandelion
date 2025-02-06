@@ -1,12 +1,18 @@
 <div class="newspaper">
   <h1 class="newspaper-title">The Dandelion Daily</h1>
   <div class="date-navigation">
-    <a href="/daily?date=<%= (@date - 1).strftime('%Y-%m-%d') %>" class="nav-arrow">←</a>
-    <p class="newspaper-date"><%= @date.strftime("%A, %B %-d, %Y") %></p>
+    <a href="/daily?date=<%= (@date - 1).strftime('%Y-%m-%d') %>" class="nav-arrow">
+      <i class="bi bi-arrow-left"></i>
+    </a>
+    <span><%= @date.strftime("%A, %B %-d, %Y") %></span>
     <% if @date < Date.today %>
-      <a href="/daily?date=<%= (@date + 1).strftime('%Y-%m-%d') %>" class="nav-arrow">→</a>
+      <a href="/daily?date=<%= (@date + 1).strftime('%Y-%m-%d') %>" class="nav-arrow">
+        <i class="bi bi-arrow-right"></i>
+      </a>
     <% else %>
-      <span class="nav-arrow disabled">→</span>
+      <span class="nav-arrow disabled">
+        <i class="bi bi-arrow-right"></i>
+      </span>
     <% end %>
   </div>
 
@@ -45,20 +51,17 @@
   }
 
   .date-navigation {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 20px;
+    text-align: center;
     border-top: double 4px #000;
     border-bottom: 1px solid #000;
     margin-bottom: 20px;
+    padding: 10px 0;
   }
 
   .nav-arrow {
-    font-size: 1.5rem;
-    text-decoration: none;
     color: #000;
     padding: 0 10px;
+    text-decoration: none;
   }
 
   .nav-arrow:hover {
@@ -66,16 +69,19 @@
     text-decoration: none;
   }
 
-  .newspaper-date {
-    margin: 0;
-    min-width: 200px;
-    text-align: center;
+  .nav-arrow.disabled {
+    color: #ccc;
+    cursor: not-allowed;
   }
 
   .article {
     column-count: 2;
     column-gap: 40px;
     margin-bottom: 30px;
+  }
+
+  .article.single-column {
+    column-count: 1 !important;
   }
 
   @media (max-width: 767px) {
@@ -99,15 +105,6 @@
 
   .facilitator-info .bi.bi-star-fill {
     display: none;
-  }
-
-  .single-column {
-    column-count: 1 !important;
-  }
-
-  .nav-arrow.disabled {
-    color: #ccc;
-    cursor: not-allowed;
   }
 
   .average-rating {
