@@ -124,7 +124,7 @@ class Event
   end
 
   def set_browsable
-    set(browsable: !organisation.hidden && (ticket_types.exists? || organisation.paid_up))
+    set(browsable: !organisation.hidden && (organisation.paid_up || ticket_types.exists?))
   end
 
   def carousel_name
