@@ -24,14 +24,15 @@
     </li>
   <% end %>
   <li class="<%= 'active' if request.path == '/' %>">
-    <a href="/" data-toggle="tooltip" title="<%= current_account ? 'Newsfeed' : 'Home' %>" data-placement="right">
-      <% if current_account %>
-        <i class="bi bi-newspaper"></i>
-        <span class="nav-link-text">Newsfeed</span>
-      <% else %>
-        <i class="bi bi-house"></i>
-        <span class="nav-link-text">Home</span>
-      <% end %>
+    <a href="/" data-toggle="tooltip" title="Home" data-placement="right">
+      <i class="bi bi-house"></i>
+      <span class="nav-link-text">Home</span>
+    </a>
+  </li>
+  <li class="<%= 'active' if request.path == '/daily' %>">
+    <a href="/daily" data-toggle="tooltip" title="Dandelion Daily" data-placement="right">
+      <i class="bi bi-newspaper"></i>
+      <span class="nav-link-text">Dandelion Daily</span>
     </a>
   </li>
   <% if !current_account %>
