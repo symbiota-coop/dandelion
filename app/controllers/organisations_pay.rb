@@ -69,17 +69,16 @@ Dandelion::App.controller do
     Stripe.api_version = '2020-08-27'
 
     session = Stripe::Checkout::Session.retrieve(params[:session_id])
-    @organisation.set(stripe_customer_id: session.customer)
-
-    # Retrieve the setup intent to get the payment method
     setup_intent = Stripe::SetupIntent.retrieve(session.setup_intent)
     payment_method = Stripe::PaymentMethod.retrieve(setup_intent.payment_method)
 
-    # Save the last 4 digits of the card
-    @organisation.set(card_last4: payment_method.card.last4) if payment_method.respond_to?(:card)
+    if payment_method.respond_to?(:card)
+      @organisation.set(stripe_customer_id: session.customer)
+      @organisation.set(card_last4: payment_method.card.last4)
+      @organisation.stripe_topup
+      @organisation.update_paid_up_without_delay
+    end
 
-    @organisation.stripe_topup
-    @organisation.update_paid_up_without_delay
     redirect "/o/#{@organisation.slug}/contribute"
   end
 
