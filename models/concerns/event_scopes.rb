@@ -36,17 +36,12 @@ module EventScopes
       self.and(location: 'Online')
     end
 
-    def legit
-      events_with_tickets = TicketType.pluck(:event_id)
-      events_by_paid_up_orgs = Event.and(:organisation_id.in => Organisation.and(paid_up: true).pluck(:id)).pluck(:id)
-
-      self
-        .and(:organisation_id.in => Organisation.and(:hidden.ne => true).pluck(:id))
-        .and(:id.in => (events_with_tickets + events_by_paid_up_orgs))
-    end
-
     def locked
       self.and(locked: true)
+    end
+
+    def browsable
+      self.and(browsable: true)
     end
 
     def live
@@ -62,7 +57,7 @@ module EventScopes
     end
 
     def trending(from = Date.today)
-      live.public.legit.future(from).and(:image_uid.ne => nil, :hide_from_trending.ne => true).and(
+      live.public.browsable.future(from).and(:image_uid.ne => nil, :hide_from_trending.ne => true).and(
         :organisation_id.in => Organisation.and(paid_up: true).pluck(:id)
       ).sort_by do |event|
         [event.trending ? 0 : 1, -event.orders.complete.and(:created_at.gt => from - 1.week).count]

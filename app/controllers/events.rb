@@ -5,7 +5,7 @@ Dandelion::App.controller do
   end
 
   get '/events', provides: %i[html ics] do
-    @events = Event.live.public.legit
+    @events = Event.live.public.browsable
     @from = params[:from] ? parse_date(params[:from]) : Date.today
     @to = params[:to] ? parse_date(params[:to]) : nil
     @events = case params[:order]

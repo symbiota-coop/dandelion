@@ -123,6 +123,11 @@ class Event
     Fragment.and(key: %r{/events/#{id}}).destroy_all
   end
 
+  def update_browsable
+    update_attribute(:browsable, !organisation.hidden &&
+      (ticket_types.exists? || organisation.paid_up))
+  end
+
   def carousel_name
     return unless organisation && organisation.carousels
 

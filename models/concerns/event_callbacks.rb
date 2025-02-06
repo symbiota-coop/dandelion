@@ -13,6 +13,8 @@ module EventCallbacks
     end
 
     after_save do
+      update_browsable
+
       if changes['name'] && (post = posts.find_by(subject: "Chat for #{changes['name'][0]}"))
         post.update_attribute(:subject, "Chat for #{name}")
       end

@@ -112,7 +112,7 @@ module Dandelion
         end
       else
         @from = Date.today
-        @events = Event.live.public.legit.future(@from)
+        @events = Event.live.public.browsable.future(@from)
         @accounts = []
         if request.xhr?
           400

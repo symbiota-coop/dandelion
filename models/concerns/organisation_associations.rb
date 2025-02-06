@@ -50,15 +50,15 @@ module OrganisationAssociations
     Event.and(:id.in => events.pluck(:id) + cohostships.pluck(:event_id))
   end
 
-  def events_for_search(locked: false, secret: false, include_all_local_group_events: false)
-    e = Event.and(:id.in =>
+  def events_for_search(include_locked: false, include_secret: false, include_all_local_group_events: false)
+    events_for_search = Event.and(:id.in =>
         events.and(local_group_id: nil).pluck(:id) +
         events.and(:local_group_id.ne => nil, :locked => true).pluck(:id) +
         (include_all_local_group_events ? events.and(:local_group_id.ne => nil).pluck(:id) : events.and(:local_group_id.ne => nil, :include_in_parent => true).pluck(:id)) +
         cohostships.pluck(:event_id))
-    e = e.live unless locked
-    e = e.public unless secret
-    e
+    events_for_search = events_for_search.live unless include_locked
+    events_for_search = events_for_search.public unless include_secret
+    events_for_search
   end
 
   def featured_events

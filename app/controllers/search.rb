@@ -8,7 +8,7 @@ Dandelion::App.controller do
       results = []
 
       if !@type || @type == 'events'
-        results += search(Event, Event.live.public.legit.future(1.month.ago), @q, 5).map do |event|
+        results += search(Event, Event.live.public.browsable.future(1.month.ago), @q, 5).map do |event|
           { label: %(<i class="bi bi-calendar-event"></i> #{event.name} (#{concise_when_details(event)})), value: %(event:"#{event.name}") }
         end
       end
@@ -45,10 +45,10 @@ Dandelion::App.controller do
         case @type
         when 'events'
           if params[:q] && params[:q].starts_with?('event:')
-            @events = Event.live.public.legit.future(1.month.ago).and(name: @q)
+            @events = Event.live.public.browsable.future(1.month.ago).and(name: @q)
             redirect "/e/#{@events.first.slug}" if @events.count == 1
           end
-          @events = search(Event, Event.live.public.legit.future(1.month.ago), @q, 25)
+          @events = search(Event, Event.live.public.browsable.future(1.month.ago), @q, 25)
         when 'accounts'
           if params[:q] && params[:q].starts_with?('account:')
             @accounts = Account.public.and(name: @q)
