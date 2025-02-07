@@ -1,5 +1,6 @@
 <%=
 events = Event.live.public.browsable
+  .and(:description.ne => nil)
   .and(:start_time.gte => @date, :start_time.lt => @date + 1)
 render_article("Today's events", "Create a two-paragraph summary of these event(s), happening today. IMPORTANT: Two paragraphs only.", events)
 %>
@@ -13,6 +14,7 @@ render_article("Feedback report", "Create a two-paragraph summary of the feedbac
 
 <%=
 events = Event.live.public.browsable
+  .and(:description.ne => nil)
   .and(:created_at.gte => @date - 1, :created_at.lt => @date)
 render_article("Recently listed", "Create a two-paragraph summary of these newly-listed event(s). IMPORTANT: Two paragraphs only.", events)
 %>
