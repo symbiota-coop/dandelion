@@ -19,7 +19,7 @@ end
 
 namespace :daily do
   task get: :environment do
-    Faraday.get("#{ENV['BASE_URL']}/daily?date=#{Date.today.to_fs(:db_local)}", {}, { 'X-Requested-With' => 'XMLHttpRequest' })
+    Faraday.get("#{ENV['BASE_URI']}/daily?date=#{Date.today.to_fs(:db_local)}", {}, { 'X-Requested-With' => 'XMLHttpRequest' })
   end
 end
 
