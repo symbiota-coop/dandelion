@@ -123,6 +123,8 @@ Dandelion::App.controller do
       @event.suggested_donation = 0
       @event.coordinator = current_account
       @event.refund_deleted_orders = true
+      @event.opt_in_organisation = true
+      @event.opt_in_facilitator = true
       @event.ask_hear_about = true
       @event.include_in_parent = true if organisation_admin?(@event.organisation)
       erb :'events_build/build'

@@ -72,7 +72,6 @@ module EventValidation
         affiliate_credit_percentage: organisation.try(:affiliate_credit_percentage),
         featured: false,
         show_emails: false,
-        opt_in_facilitator: false,
         refund_deleted_orders: true
       }.each do |k, v|
         if !duplicate && !Organisation.admin?(organisation, last_saved_by)

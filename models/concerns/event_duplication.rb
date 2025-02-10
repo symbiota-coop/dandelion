@@ -29,6 +29,7 @@ module EventDuplication
       zoom_party: zoom_party,
       show_emails: show_emails,
       include_in_parent: include_in_parent,
+      opt_in_organisation: opt_in_organisation,
       opt_in_facilitator: opt_in_facilitator,
       locked: true,
       secret: secret,

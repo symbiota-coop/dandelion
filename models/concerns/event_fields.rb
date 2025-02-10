@@ -56,7 +56,7 @@ module EventFields
     field :profit_share_to_social_media, type: Integer
     field :stripe_revenue_adjustment, type: Float
 
-    %w[no_discounts hide_attendees hide_discussion refund_deleted_orders monthly_donors_only locked secret zoom_party show_emails include_in_parent featured opt_in_facilitator hide_few_left hide_organisation_footer ask_hear_about send_order_notifications raw_description prevent_reminders trending hide_from_trending hide_from_carousels no_tickets_pdf half_width_images enable_resales donations_to_organisation browsable].each do |b|
+    %w[no_discounts hide_attendees hide_discussion refund_deleted_orders monthly_donors_only locked secret zoom_party show_emails include_in_parent featured opt_in_organisation opt_in_facilitator hide_few_left hide_organisation_footer ask_hear_about send_order_notifications raw_description prevent_reminders trending hide_from_trending hide_from_carousels no_tickets_pdf half_width_images enable_resales donations_to_organisation browsable].each do |b|
       field b.to_sym, type: Mongoid::Boolean
       index({ b.to_s => 1 })
     end
@@ -103,6 +103,7 @@ module EventFields
         questions: :text_area,
         zoom_party: :check_box,
         show_emails: :check_box,
+        opt_in_organisation: :check_box,
         opt_in_facilitator: :check_box,
         hide_organisation_footer: :check_box,
         send_order_notifications: :check_box,
@@ -125,6 +126,7 @@ module EventFields
         facebook_event_url: 'Facebook event URL',
         facebook_pixel_id: 'Facebook Pixel ID',
         show_emails: 'Allow all event admins to view email addresses of attendees',
+        opt_in_organisation: 'Allow people to opt in to emails from the host organisation(s)',
         opt_in_facilitator: 'Allow people to opt in to emails from facilitators',
         refund_deleted_orders: 'Refund deleted orders/tickets on Stripe',
         redirect_url: 'Redirect URL after successful payment',
@@ -174,6 +176,7 @@ module EventFields
         hide_discussion: 'Hide the private discussion for attendees and facilitators',
         hide_from_carousels: 'Hide the event from carousels',
         show_emails: 'Allow all event admins to view attendee emails (by default, only organisation admins see them)',
+        opt_in_organisation: 'Allow people to opt in to receive emails from host organisation(s)',
         opt_in_facilitator: "Allow people to opt in to receive emails from any facilitators' personal lists",
         monthly_donors_only: 'Only allow people making a monthly donation to the organisation to purchase tickets',
         no_discounts: "Don't apply usual discounts for monthly donors to the organisation",
