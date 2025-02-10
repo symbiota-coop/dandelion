@@ -37,9 +37,9 @@ Dandelion::App.helpers do
 
     result = OpenRouter.chat(prompt)
 
-    # Remove first paragraph if it ends with a colon
+    # Remove first paragraph if starts with 'Here' or ends with a colon
     paragraphs = result.split("\n\n")
-    if paragraphs.first&.strip&.end_with?(':')
+    if paragraphs.first&.strip&.start_with?('Here') || paragraphs.first&.strip&.end_with?(':')
       paragraphs.shift
       result = paragraphs.join("\n\n")
     end
