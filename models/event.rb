@@ -256,9 +256,9 @@ class Event
     content = nil
     5.times do
       content = OpenRouter.chat(prompt, max_tokens: 256)
-      break if content && !content.include?('#')
+      break if content && content.include?(', ') && !content.include?('#')
     end
-    return unless content
+    return unless content && content.include?(', ') && !content.include?('#')
 
     content.split(':').last.strip.split(',').map(&:strip).map do |name|
       name.gsub('_', ' ').gsub('-', ' ').downcase
