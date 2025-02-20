@@ -38,7 +38,7 @@ class Order
       self.affiliate_type = 'Organisation'
       self.affiliate_id = Organisation.find_by(slug: cohost).try(:id)
     end
-    if affiliate_type && %w[Account Organisation].include?(affiliate_type)
+    if affiliate_type && %w[Account Organisation].include?(affiliate_type) && affiliate_id
       unless affiliate_type.constantize.find(affiliate_id)
         self.affiliate_id = nil
         self.affiliate_type = nil
