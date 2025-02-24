@@ -217,8 +217,8 @@ class Pmail
   def send_pmail
     return if sent_at
     return if pmail_test && pmail_test.winner
+    return unless (message_ids = send_batch_message)
 
-    message_ids = send_batch_message
     update_attribute(:sent_at, Time.now)
     update_attribute(:message_ids, message_ids)
   end
