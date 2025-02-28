@@ -1,6 +1,6 @@
 <%= partial :'events/nav', locals: { event: @event } %>
 
-<% if params[:new_org] %>
+<% if params[:new_org] && !params[:draft_id] %>
   <div class="alert alert-success mt-3">
     <p class="lead">
       Now it's time to create an event under your new organisation!

@@ -1,7 +1,7 @@
 <script>
   $(function () {
 
-    <% if params[:tour] || (!ENV['SKIP_TOURS'] && params[:new_org]) %>
+    <% if params[:tour] || (!ENV['SKIP_TOURS'] && params[:new_org] && !params[:draft_id]) %>
       if($(window).width() > 992) {
         introJs().setOptions({
           steps: [{
