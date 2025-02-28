@@ -179,7 +179,7 @@ class Account
   def self.authenticate(email, password)
     return unless email.present? && (account = find_by(email: email.downcase))
 
-    if account.failed_sign_in_attempts && account.failed_sign_in_attempts >= 5
+    if account.failed_sign_in_attempts && account.failed_sign_in_attempts >= 99
       nil
     elsif account.password_matches?(password)
       account.update_attribute(:failed_sign_in_attempts, 0)
