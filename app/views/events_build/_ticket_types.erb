@@ -41,11 +41,11 @@
                 <%= o.check_box :hidden %>
               </label>
               <% if o.object.new_record? %>
-                <a class="btn btn-sm btn-outline-danger" href="javascript:;" onclick="$(this).closest('.ticket_type').remove()">
+                <a class="btn btn-sm text-dark remove-ticket-type" href="javascript:;" onclick="$(this).closest('.ticket_type').remove()">
                   <i class="bi bi-x-lg"></i>
                 </a>
               <% else %>
-                <a class="btn btn-sm btn-outline-danger" href="javascript:;" onclick="$(this).children().last().prop('checked', true).closest('.ticket_type').hide()">
+                <a class="btn btn-sm text-dark remove-ticket-type" href="javascript:;" onclick="$(this).children().last().prop('checked', true).closest('.ticket_type').hide()">
                   <i class="bi bi-x-lg"></i>
                   <%= o.check_box '_destroy', style: 'display: none' %>
                 </a>
@@ -60,7 +60,7 @@
         </div>
         <a id="ticket_types_add" class="btn btn-sm btn-primary" href="javascript:;"><i class="bi bi-plus-lg"></i> Add ticket type</a>
         <style>
-          .ticket_type { margin-bottom: 10px; padding: 15px; padding-bottom: 10px; border: 1px solid #DADADE; border-radius: 5px }
+          .ticket_type { position: relative; margin-bottom: 10px; padding: 15px; padding-bottom: 10px; border: 1px solid #DADADE; border-radius: 5px }
           .ticket_type > * { font-size: 14.45px }
           .ticket_type > div, .ticket_type > label { display: inline-block; margin-bottom: 5px; margin-right: 5px }
           .ticket_type > .ticket-type-description, .ticket_type > .ticket-type-minimum-monthly-donation, .ticket_type > .ticket-type-sales-end { display: block; margin-right: 0 }
@@ -72,6 +72,7 @@
           .ticket_type input[name$='[minimum_monthly_donation]'] { display: inline-block; width: 6em }
           .ticket_type select[name$='[ticket_group_id]'] { display: inline-block; width: auto }
           .ticket_type a.btn { margin-bottom: 5px }
+          .ticket_type .remove-ticket-type { position: absolute; right: 0; top: 0; }
         </style>
         <script>
           $(function () {
@@ -205,7 +206,7 @@
               hiddenDiv.appendTo(d);
               hiddenDiv.tooltip();
 
-              $('<a class="btn btn-sm btn-outline-danger" href="javascript:;" onclick="$(this).closest(\'.ticket_type\').remove()"><i class="bi bi-x-lg"></i></a>').appendTo(d);
+              $('<a class="btn btn-sm text-dark remove-ticket-type" href="javascript:;" onclick="$(this).closest(\'.ticket_type\').remove()"><i class="bi bi-x-lg"></i></a>').appendTo(d);
 
               d.appendTo('#ticket_types');
             });
