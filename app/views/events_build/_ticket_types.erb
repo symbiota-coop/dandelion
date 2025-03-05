@@ -7,7 +7,7 @@
       <% f.fields_for :ticket_types, f.object.ticket_types.sort_by(&:order) do |o| %>
         <div style="font-size: 0" class="ticket_type bg-light shadow-sm <%= 'has-error' if o.object.invalid? %>">
           <%= o.hidden_field :order %>
-          <div>
+          <div class="ticket-type-name">
             <%= o.text_field :name, class: 'form-control', placeholder: 'Name', required: true %>
           </div>
           <div>
@@ -51,8 +51,8 @@
                 </a>
               <% end %>
               <% if o.object.hidden? %>
-                <a target="_blank" data-toggle="tooltip" title="Link to secret ticket type" class="ml-1 btn btn-sm btn-outline-primary" href="/events/<%= @event.id %>?ticket_type_id=<%= o.object.id %>">
-                  <i class="bi bi-link"></i>
+                <a target="_blank" data-toggle="tooltip" title="Link to secret ticket type" class="ml-1 text-dark" href="/events/<%= @event.id %>?ticket_type_id=<%= o.object.id %>">
+                  <i style="font-size: 1.5em; position: relative; top: 2px" class="bi bi-box-arrow-up-right"></i>
                 </a>
               <% end %>
             </div>
@@ -71,8 +71,17 @@
           .ticket_type input[name$='[sales_end]'] { display: inline-block; width: 14em }
           .ticket_type input[name$='[minimum_monthly_donation]'] { display: inline-block; width: 6em }
           .ticket_type select[name$='[ticket_group_id]'] { display: inline-block; width: auto }
+          .ticket_type input[name$='[hidden]'] { margin-left: 5px; transform: scale(1.5); position: relative; top: 1px }
           .ticket_type a.btn { margin-bottom: 5px }
           .ticket_type .remove-ticket-type { position: absolute; right: 0; top: 0; }
+          @media(max-width: 767px) {
+            .ticket_type input[name$='[name]'], .ticket_type input[name$='[description]'] { width: 18.25em }
+            .ticket_type input[name$='[max_quantity_per_transaction]'] { width: 10.75em }
+            .ticket_type input[name$='[sales_end]'] { display: inline-block; width: 13.5em }
+            .ticket_type input { border: 0; border-bottom: 1px solid #C7C6CB; border-radius: 0 }
+            .ticket_type label { display: block }
+            .ticket_type .ticket-type-name { display: block }
+          }
         </style>
         <script>
           $(function () {
@@ -122,7 +131,7 @@
               orderInput.attr('id', 'event_ticket_types_attributes_' + c + '_order');
               orderInput.appendTo(d);
 
-              var nameDiv = $('<div></div>')
+              var nameDiv = $('<div class="ticket-type-name"></div>')
               var nameInput = $('<input type="text" class="form-control" placeholder="Name" required="true" />');
               nameInput.attr('name', 'event[ticket_types_attributes][' + c + '][name]');
               nameInput.attr('id', 'event_ticket_types_attributes_' + c + '_name');
