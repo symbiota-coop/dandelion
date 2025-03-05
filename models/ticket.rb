@@ -79,6 +79,7 @@ class Ticket
     if new_record?
       unless complementary
         errors.add(:ticket_type, 'is full') if ticket_type && (ticket_type.number_of_tickets_available_in_single_purchase < 1)
+        errors.add(:ticket_type, 'is not available as sales have ended') if ticket_type && ticket_type.sales_end && Time.now > ticket_type.sales_end
         if ticket_type && ticket_type.minimum_monthly_donation && (
             !account ||
             !(organisationship = event.organisation.organisationships.find_by(account: account)) ||

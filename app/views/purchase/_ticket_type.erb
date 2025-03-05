@@ -37,7 +37,9 @@
     <% end %>
   </td>
   <td style="width: 50%; <% if no_border_top %>border-top: 0;<% end %> <% if ticket_type.photos.count > 0 %>border-bottom: 0;<% end %>">
-    <% if ticket_type.number_of_tickets_available_in_single_purchase > 0 %>
+    <% if ticket_type.sales_end && Time.now > ticket_type.sales_end %>
+      <span class="badge badge-default">Sales closed</span>
+    <% elsif ticket_type.number_of_tickets_available_in_single_purchase > 0 %>
       <% if ticket_type.minimum_monthly_donation && (
                   !current_account ||
                   !(organisationship = @event.organisation.organisationships.find_by(account: current_account)) ||

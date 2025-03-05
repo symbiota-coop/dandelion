@@ -32,7 +32,11 @@
                 Limit per order <%= o.number_field :max_quantity_per_transaction, class: 'form-control', :'data-toggle' => 'tooltip', :title => 'Maximum number of tickets of this type someone can purchase in a single order', min: 0 %>
               </label><% if f.object.ticket_groups.select(&:persisted?).length > 0 %><label>
                   Group <%= o.select :ticket_group_id, options: [''] + f.object.ticket_groups.select(&:persisted?).map { |ticket_group| [ticket_group.name, ticket_group.id] }, class: 'form-control ml-1' %>
-                </label><% end %><label onclick="$(this).tooltip('hide')" data-toggle="tooltip" title="Allow only people with the link to this ticket type to purchase">
+                </label><% end %><label>
+                Sales end
+                <%= o.datetime_local_field :sales_end, class: 'form-control' %>
+              </label>
+              <label onclick="$(this).tooltip('hide')" data-toggle="tooltip" title="Allow only people with the link to this ticket type to purchase">
                 Secret?
                 <%= o.check_box :hidden %>
               </label>
@@ -59,17 +63,47 @@
           .ticket_type { margin-bottom: 10px; padding: 15px; padding-bottom: 10px; border: 1px solid #DADADE; border-radius: 5px }
           .ticket_type > * { font-size: 14.45px }
           .ticket_type > div, .ticket_type > label { display: inline-block; margin-bottom: 5px; margin-right: 5px }
-          .ticket_type > .ticket-type-description, .ticket_type > .ticket-type-minimum-monthly-donation { display: block; margin-right: 0 }
+          .ticket_type > .ticket-type-description, .ticket_type > .ticket-type-minimum-monthly-donation, .ticket_type > .ticket-type-sales-end { display: block; margin-right: 0 }
           .ticket_type input[name$='[name]'] { display: inline-block; width: auto }
-          .ticket_type input[name$='[price_or_range]'] { display: inline-block; width: 7em }
-          .ticket_type input[name$='[quantity]'] { display: inline-block; width: 7em }
+          .ticket_type input[name$='[price_or_range]'] { display: inline-block; width: 8em }
+          .ticket_type input[name$='[quantity]'] { display: inline-block; width: 8em }
           .ticket_type input[name$='[max_quantity_per_transaction]'] { display: inline-block; width: 5em }
+          .ticket_type input[name$='[sales_end]'] { display: inline-block; width: 14em }
           .ticket_type input[name$='[minimum_monthly_donation]'] { display: inline-block; width: 6em }
           .ticket_type select[name$='[ticket_group_id]'] { display: inline-block; width: auto }
           .ticket_type a.btn { margin-bottom: 5px }
         </style>
         <script>
           $(function () {
+
+            // Apply styling to existing sales_end datetime inputs
+            $('input[name$="[sales_end]"]').each(function() {
+              setupDatetimeInput(this);
+            });
+
+            function setupDatetimeInput(element) {
+              if (!element.value) {
+                $(element).css('color', 'transparent');
+              }
+
+              $(element).on('input', function() {
+                if (this.value) {
+                  $(this).css('color', 'black');
+                } else {
+                  $(this).css('color', 'transparent');
+                }
+              });
+
+              $(element).on('focus', function() {
+                $(this).css('color', 'black');
+              });
+
+              $(element).on('blur', function() {
+                if (!this.value) {
+                  $(this).css('color', 'transparent');
+                }
+              });
+            }
 
             $("#ticket_types").sortable().closest('form').submit(function () {
               $('.ticket_type').each(function (i) {
@@ -151,6 +185,14 @@
                 ticketGroupInput.appendTo(ticketGroupDiv);
                 ticketGroupDiv.appendTo(d);
           <% end %>
+
+              var salesEndDiv = $('<label>Sales end </label>')
+              var salesEndInput = $('<input type="datetime-local" class="form-control" />');
+              salesEndInput.attr('name', 'event[ticket_types_attributes][' + c + '][sales_end]');
+              salesEndInput.attr('id', 'event_ticket_types_attributes_' + c + '_sales_end');
+              salesEndInput.appendTo(salesEndDiv);
+              salesEndDiv.appendTo(d);
+              setupDatetimeInput(salesEndInput[0]); // Apply styling to new sales_end inputs
 
               var hiddenDiv = $('<label onclick="$(this).tooltip(\'hide\')" data-toggle="tooltip" title="Allow only people with the link to this ticket type to purchase">Secret? </label>')
               var hiddenInput0 = $('<input type="hidden" value="0">')

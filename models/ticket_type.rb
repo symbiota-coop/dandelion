@@ -15,6 +15,7 @@ class TicketType
   field :range_max, type: Float
   field :max_quantity_per_transaction, type: Integer
   field :minimum_monthly_donation, type: Float
+  field :sales_end, type: Time
 
   attr_writer :price_or_range
   attr_accessor :price_or_range_submitted
@@ -35,6 +36,7 @@ class TicketType
       minimum_monthly_donation: :number,
       hidden: :check_box,
       max_quantity_per_transaction: :number,
+      sales_end: :datetime,
       event_id: :lookup,
       tickets: :collection
     }
