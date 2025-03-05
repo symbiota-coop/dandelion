@@ -1,6 +1,5 @@
 <div class="row justify-content-center">
   <div class="col-lg-8">
-    <% markdown = Redcarpet::Markdown.new(Redcarpet::Render::HTML, autolink: true, tables: true, fenced_code_blocks: true) %>
-    <%== markdown.render(open('app/views/terms.md').read) %>
+    <%== md(open('app/views/terms.md').read) %>
   </div>
 </div>

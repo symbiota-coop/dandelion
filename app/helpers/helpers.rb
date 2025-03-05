@@ -3,6 +3,11 @@ Dandelion::App.helpers do
     request.env['HTTP_CF_CONNECTING_IP'] || request.env['HTTP_X_FORWARDED_FOR']
   end
 
+  def md(text, hard_wrap: false)
+    markdown = Redcarpet::Markdown.new(hard_wrap ? Redcarpet::Render::HTML.new(hard_wrap: true) : Redcarpet::Render::HTML, autolink: true, tables: true, fenced_code_blocks: true)
+    markdown.render(text)
+  end
+
   def set_time_zone
     Time.zone = if current_account && current_account.time_zone
                   current_account.time_zone

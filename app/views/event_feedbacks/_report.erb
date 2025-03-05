@@ -6,7 +6,6 @@ Further instructions (don't mention in your response):
 - Address your answer in the second person ('you')
 
 The feedback:\n\n#{current_account.event_feedbacks_as_facilitator.joined(since: 1.year.ago)}}
-  markdown = Redcarpet::Markdown.new(Redcarpet::Render::HTML, autolink: true, tables: true, fenced_code_blocks: true)
   content = OpenRouter.chat(prompt).split('1.').last
 %>
-<%== markdown.render(%(Based on feedback from the past year, here are 5 possible areas for improvement:\n\n1. #{content})) %>
+<%== md(%(Based on feedback from the past year, here are 5 possible areas for improvement:\n\n1. #{content})) %>

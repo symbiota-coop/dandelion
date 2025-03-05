@@ -47,8 +47,7 @@
     <div class="container">
       <div class="main">
         <% if pmail.markdown? %>
-          <%= markdown = Redcarpet::Markdown.new(Redcarpet::Render::HTML.new(hard_wrap: true), autolink: true, tables: true)
-            markdown.render(pmail.body) %>
+          <%= md(pmail.body, hard_wrap: true) %>
         <% else %>
           <%= pmail.body_with_additions %>
         <% end %>

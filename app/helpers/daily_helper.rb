@@ -3,12 +3,11 @@ Dandelion::App.helpers do
     return if events.empty?
     return if use_feedback && events.all? { |event| event.event_feedbacks.empty? }
 
-    markdown = Redcarpet::Markdown.new(Redcarpet::Render::HTML, autolink: true, tables: true, fenced_code_blocks: true)
     content = <<-HTML
       <div class="article">
         <h2 class="article-title">#{title}</h2>
         <div class="article-content">
-          #{markdown.render(generate_events_summary(prompt_prefix, events, use_feedback: use_feedback))}
+          #{md(generate_events_summary(prompt_prefix, events, use_feedback: use_feedback))}
         </div>
       </div>
     HTML

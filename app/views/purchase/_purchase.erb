@@ -27,7 +27,7 @@ end
       <table class="table table-borderless mb-0">
         <tr>
           <td>
-            <%== Sanitize.fragment(Rinku.auto_link(@event.select_tickets_intro), Sanitize::Config::DANDELION) %>
+            <%== Sanitize.fragment(Rinku.auto_link(md(@event.select_tickets_intro)), Sanitize::Config::DANDELION) %>
           </td>
         </tr>
       </table>
@@ -126,7 +126,7 @@ end
       <table class="table table-borderless mb-0">
         <tr>
           <td>
-            <%== Sanitize.fragment(Rinku.auto_link(@event.select_tickets_outro), Sanitize::Config::DANDELION) %>
+            <%== Sanitize.fragment(Rinku.auto_link(md(@event.select_tickets_outro)), Sanitize::Config::DANDELION) %>
           </td>
         </tr>
       </table>

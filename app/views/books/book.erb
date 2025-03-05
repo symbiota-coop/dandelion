@@ -32,8 +32,7 @@
         </a>
       </p>
 
-      <% markdown = Redcarpet::Markdown.new(Redcarpet::Render::HTML.new(hard_wrap: true), autolink: true, tables: true) %>
-      <%== markdown.render(@book['Summary'].split("\n\n")[1..-1].join("\n\n")) %>
+      <%== md(@book['Summary'].split("\n\n")[1..-1].join("\n\n"), hard_wrap: true) %>
     </div>
 
   </div>
