@@ -42,7 +42,7 @@
             <%= o.check_box :hidden, :onclick => "$(this).tooltip('hide')", :'data-toggle' => "tooltip", :title => "Allow only people with the link to this ticket type to purchase" %>
             <% if o.object.hidden? %>
               <a target="_blank" data-toggle="tooltip" title="Link to secret ticket type" class="ml-1 text-dark" href="/events/<%= @event.id %>?ticket_type_id=<%= o.object.id %>">
-                <i style="font-size: 1.5em; position: relative; top: 1px" class="bi bi-box-arrow-up-right"></i>
+                <i style="position: relative; top: -1px" class="bi bi-box-arrow-up-right"></i>
               </a>
             <% end %>
           </label>
@@ -72,7 +72,7 @@
       .ticket_type input[name$='[sales_end]'] { display: inline-block; width: 14em }
       .ticket_type input[name$='[minimum_monthly_donation]'] { display: inline-block; width: 6em }
       .ticket_type select[name$='[ticket_group_id]'] { display: inline-block; width: auto }
-      .ticket_type input[name$='[hidden]'] { margin-left: 5px; transform: scale(1.5); position: relative; top: 1px }
+      .ticket_type input[name$='[hidden]'] { margin-left: 2.5px; position: relative; top: 1px }
       .ticket_type a.btn { margin-bottom: 5px }
       .ticket_type .remove-ticket-type { position: absolute; right: 0; top: 0; }
       @media(max-width: 767px) {
