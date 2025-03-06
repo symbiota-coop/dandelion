@@ -89,7 +89,7 @@
 <% if ticket_type.description %>
   <tr>
     <td style="border: 0; padding-top: 0" class="text-muted" colspan="3">
-      <%= ticket_type.description %>
+      <%== Sanitize.fragment(Rinku.auto_link(md(ticket_type.description)), Sanitize::Config::DANDELION) %>
     </td>
   </tr>
 <% end %>
