@@ -15,7 +15,7 @@
   <li style="height: 0.5rem"></li>
   <% if current_account %>
     <li class="d-md-none has-sub">
-      <a>
+      <a href="javascript:;">
         <b class="caret caret-right pull-right"></b>
         <i class="bi bi-person-fill"></i>
         <span><%= current_account.name %></span>
@@ -64,7 +64,7 @@
     </li>
   <% else %>
     <li class="has-sub <%= 'active' if @organisation %>">
-      <a>
+      <a href="javascript:;">
         <b class="caret caret-right pull-right"></b>
         <i class="bi bi-flag-fill"></i>
         <span>Organisations</span>
@@ -97,7 +97,7 @@
     </li>
   <% else %>
     <li class="has-sub <%= 'active' if @gathering %>">
-      <a>
+      <a href="javascript:;">
         <b class="caret caret-right pull-right"></b>
         <i class="bi bi-moon-fill"></i>
         <span>Gatherings</span>
