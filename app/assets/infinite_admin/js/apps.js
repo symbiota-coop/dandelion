@@ -235,9 +235,7 @@ var handleHeaderSearchBar = function () {
  ------------------------------------------------ */
 var handleSidebarMenu = function () {
   "use strict";
-  $('.sidebar .nav > .has-sub > a').click(function (e) {
-    e.preventDefault();
-
+  $('.sidebar .nav > .has-sub > a').click(function () {
     var target = $(this).next('.sub-menu');
     var otherMenu = '.sidebar .nav > li.has-sub > .sub-menu';
 
@@ -255,16 +253,12 @@ var handleSidebarMenu = function () {
       });
     }
   });
-
-  $('.sidebar .nav > .has-sub .sub-menu li.has-sub > a').click(function (e) {
-    e.preventDefault();
-
+  $('.sidebar .nav > .has-sub .sub-menu li.has-sub > a').click(function () {
     if ($('.page-sidebar-minified').length === 0) {
       var target = $(this).next('.sub-menu');
       $(target).slideToggle(250);
     }
   });
-
   $(document).on('click', '[data-click="sidebar-toggled"]', function (e) {
     e.preventDefault();
 
