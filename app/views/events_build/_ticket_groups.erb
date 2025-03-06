@@ -5,18 +5,18 @@
   <div>
     <div id="ticket_groups">
       <% f.fields_for :ticket_groups do |o| %>
-        <div class="ticket_group <%= 'has-error' if o.object.invalid? %>">
+        <div class="ticket_group bg-light shadow-sm <%= 'has-error' if o.object.invalid? %>">
           <div><%= o.text_field :name, class: 'form-control', placeholder: 'Name' %></div>
           <div><%= o.number_field :capacity, class: 'form-control ml-1', placeholder: 'Capacity' %></div>
           <% if o.object.new_record? %>
-            <span>
-              <i style="cursor: pointer" onclick="$(this).closest('.ticket_group').remove()" class="bi bi-x-lg"></i>
-            </span>
+            <a class="btn btn-sm text-dark remove-ticket-group" href="javascript:;" onclick="$(this).closest('.ticket_group').remove()">
+              <i class="bi bi-x-lg"></i>
+            </a>
           <% else %>
-            <span>
-              <i style="cursor: pointer" onclick="$(this).siblings().last().prop('checked', true).closest('.ticket_group').hide()" class="bi bi-x-lg"></i>
+            <a class="btn btn-sm text-dark remove-ticket-group" href="javascript:;" onclick="$(this).siblings().last().prop('checked', true).closest('.ticket_group').hide()">
+              <i class="bi bi-x-lg"></i>
               <%= o.check_box '_destroy', style: 'display: none' %>
-            </span>
+            </a>
           <% end %>
         </div>
       <% end %>
@@ -26,10 +26,14 @@
       <em>Save the event to add tickets to these ticket groups.</em>
     </p>
     <style>
-      .ticket_group { margin-bottom: 10px; padding-left: 10px; border-left: 4px solid #ddd; }
+      .ticket_group { position: relative; margin-bottom: 10px; padding: 15px; padding-bottom: 10px; border: 1px solid #DADADE; border-radius: 5px }
       .ticket_group > div, .ticket_group > label { display: inline-block; margin-bottom: 5px; margin-right: 5px }
       .ticket_group input[name$='[name]'] { display: inline-block; width: auto }
-      .ticket_group input[name$='[capacity]'] { display: inline-block; width: 7em }
+      .ticket_group input[name$='[capacity]'] { display: inline-block; width: 8em }
+      .ticket_group .remove-ticket-group { position: absolute; right: 0; top: 0; }
+      @media(max-width: 767px) {
+        .ticket_group input[name$='[name]'] { width: 12em }
+      }
     </style>
     <script>
       $(function () {
@@ -38,7 +42,7 @@
           $('#ticket_groups_save').show()
           var c = $('.ticket_group').length
 
-          var d = $('<div class="ticket_group"/>');
+          var d = $('<div class="ticket_group bg-light shadow-sm"/>');
 
           var nameDiv = $('<div></div>')
           var nameInput = $('<input type="text" />');
@@ -58,7 +62,7 @@
           capacityInput.appendTo(capacityDiv);
           capacityDiv.appendTo(d);
 
-          $('<span><i style="cursor: pointer" onclick="$(this).closest(\'.ticket_group\').remove()" class="bi bi-x-lg"></i></span>').appendTo(d);
+          $('<a class="btn btn-sm text-dark remove-ticket-group" href="javascript:;" onclick="$(this).closest(\'.ticket_group\').remove()"><i class="bi bi-x-lg"></i></a>').appendTo(d);
 
           d.appendTo('#ticket_groups');
         });
