@@ -46,24 +46,30 @@ namespace :morning do
   end
 end
 
-# late
-
-namespace :daily do
-  task get: :environment do
+namespace :late do
+  task errands: :environment do
+    # get Dandelion Daily
     Faraday.get("#{ENV['BASE_URI']}/daily?date=#{Date.today.to_fs(:db_local)}", {}, { 'X-Requested-With' => 'XMLHttpRequest' })
+    # delete old page views and sign ins
+    PageView.and(:created_at.lt => 30.days.ago).delete_all
+    SignIn.and(:created_at.lt => 1.year.ago).delete_all
+    # create organisation edges
+    OrganisationEdge.delete_all
+    OrganisationEdge.create_all(Organisation.and(:followers_count.gte => 50).and(:id.nin => Organisation.order('followers_count desc').limit(1).pluck(:id)))
+    # clear up optionships
+    Gathering.and(clear_up_optionships: true).each(&:clear_up_optionships!)
+    # update feedback counts
+    fragment = Fragment.find_or_create_by(key: 'facilitator_feedback_counts')
+    feedback_counts = Account.and(:id.in => EventFacilitation.pluck(:account_id)).map do |account|
+      [account.id.to_s, account.unscoped_event_feedbacks_as_facilitator.count]
+    end
+    fragment.update_attributes expires: 1.day.from_now, value: feedback_counts.sort_by { |_, freq| -freq }.to_json
   end
 end
 
 namespace :max_minder do
   task upload: :environment do
     MaxMinder.upload
-  end
-end
-
-namespace :tidy_up do
-  task delete_all: :environment do
-    PageView.and(:created_at.lt => 30.days.ago).delete_all
-    SignIn.and(:created_at.lt => 1.year.ago).delete_all
   end
 end
 
@@ -83,11 +89,6 @@ namespace :organisations do
     organisation = Organisation.find_by(slug: ENV['SQUARESPACE_ORGANISATION_SLUG'])
     sleep 10
     raise "Squarespace: Account not created for #{ENV['SQUARESPACE_EMAIL']}" unless (account = Account.find_by(email: ENV['SQUARESPACE_EMAIL'])) && account.organisationships.find_by(organisation: organisation)
-  end
-
-  task create_edges: :environment do
-    OrganisationEdge.delete_all
-    OrganisationEdge.create_all(Organisation.and(:followers_count.gte => 50).and(:id.nin => Organisation.order('followers_count desc').limit(1).pluck(:id)))
   end
 
   task set_counts: :environment do
@@ -131,12 +132,6 @@ namespace :organisations do
   end
 end
 
-namespace :gatherings do
-  task clear_up_optionships: :environment do
-    Gathering.and(clear_up_optionships: true).each(&:clear_up_optionships!)
-  end
-end
-
 namespace :events do
   task recommend: :environment do
     events_with_participant_ids = Event.live.public.future.map do |event|
@@ -152,14 +147,6 @@ namespace :events do
 end
 
 namespace :stats do
-  task facilitator_feedback_counts: :environment do
-    fragment = Fragment.find_or_create_by(key: 'facilitator_feedback_counts')
-    feedback_counts = Account.and(:id.in => EventFacilitation.pluck(:account_id)).map do |account|
-      [account.id.to_s, account.unscoped_event_feedbacks_as_facilitator.count]
-    end
-    fragment.update_attributes expires: 1.day.from_now, value: feedback_counts.sort_by { |_, freq| -freq }.to_json
-  end
-
   task monthly_contributions: :environment do
     d = [Date.new(24.months.ago.year, 24.months.ago.month, 1)]
     d << (d.last + 1.month) while d.last < Date.new(Date.today.year, Date.today.month, 1)
