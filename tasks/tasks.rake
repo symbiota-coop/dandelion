@@ -19,7 +19,7 @@ end
 
 namespace :hourly do
   task errands: :environment do
-    puts 'check for payments'
+    logger.info 'check for payments'
     Organisation.and(:evm_address.ne => nil).each do |organisation|
       organisation.check_evm_account if Order.and(:payment_completed.ne => true, :evm_secret.ne => nil, :event_id.in => organisation.events.pluck(:id)).count > 0
     end
@@ -27,50 +27,50 @@ namespace :hourly do
       event.check_oc_event if event.orders.and(:payment_completed.ne => true, :oc_secret.ne => nil, :event_id => event.id).count > 0
     end
     Gathering.and(:evm_address.ne => nil).each(&:check_evm_account)
-    puts 'delete stale uncompleted orders'
+    logger.info 'delete stale uncompleted orders'
     Order.incomplete.and(:created_at.lt => 1.hour.ago).destroy_all
   end
 end
 
 namespace :morning do
   task errands: :environment do
-    puts 'feedback requests'
+    logger.info 'feedback requests'
     Event.live.and(:end_time.gte => Date.yesterday, :end_time.lt => Date.today).each { |event| event.send_feedback_requests(:all) }
-    puts 'event reminders'
+    logger.info 'event reminders'
     Event.live.and(:start_time.gte => Date.tomorrow, :start_time.lt => Date.tomorrow + 1).each { |event| event.send_reminders(:all) }
-    puts 'star reminders'
+    logger.info 'star reminders'
     Event.live.and(:start_time.gte => Date.tomorrow + 6, :start_time.lt => Date.tomorrow + 7).each { |event| event.send_star_reminders(:all) }
-    puts 'payment reminders'
+    logger.info 'payment reminders'
     TicketType.and(name: /payment plan/i).each(&:send_payment_reminder) if Date.today.day == 1
   end
 end
 
 namespace :late do
   task errands: :environment do
-    puts 'get Dandelion Daily'
+    logger.info 'get Dandelion Daily'
     Faraday.get("#{ENV['BASE_URI']}/daily?date=#{Date.today.to_fs(:db_local)}", {}, { 'X-Requested-With' => 'XMLHttpRequest' })
-    puts 'delete old page views and sign ins'
+    logger.info 'delete old page views and sign ins'
     PageView.and(:created_at.lt => 30.days.ago).delete_all
     SignIn.and(:created_at.lt => 1.year.ago).delete_all
-    puts 'create organisation edges'
+    logger.info 'create organisation edges'
     OrganisationEdge.delete_all
     OrganisationEdge.create_all(Organisation.and(:followers_count.gte => 50).and(:id.nin => Organisation.order('followers_count desc').limit(1).pluck(:id)))
-    puts 'clear up optionships'
+    logger.info 'clear up optionships'
     Gathering.and(clear_up_optionships: true).each(&:clear_up_optionships!)
-    puts 'update feedback counts'
+    logger.info 'update feedback counts'
     EventFeedback.update_facilitator_feedback_counts
-    puts 'monthly contributions'
+    logger.info 'monthly contributions'
     MonthlyContributionsCalculator.calculate
-    puts 'MaxMinder upload'
+    logger.info 'MaxMinder upload'
     MaxMinder.upload
-    puts 'check squarespace signup'
-    CheckSquarespaceSignup.check
-    puts 'set counts'
+    logger.info 'check squarespace signup'
+    # CheckSquarespaceSignup.check
+    logger.info 'set counts'
     Organisation.set_counts
-    puts 'sync monthly donations'
+    logger.info 'sync monthly donations'
     Organisation.and(:gocardless_access_token.ne => nil).each(&:sync_with_gocardless)
     Organisation.and(:patreon_api_key.ne => nil).each(&:sync_with_patreon)
-    puts 'stripe transfers'
+    logger.info 'stripe transfers'
     Organisation.and(:stripe_client_id.ne => nil).each do |organisation|
       StripeCharge.transfer(organisation)
       StripeTransaction.transfer(organisation)
@@ -79,7 +79,7 @@ namespace :late do
       stripe_charge.set(balance_float: stripe_charge.balance_from_transactions)
       stripe_charge.set(fees_float: stripe_charge.fees_from_transactions)
     end
-    puts 'event recommendations'
+    logger.info 'event recommendations'
     Event.recommend
   end
 end
