@@ -17,6 +17,37 @@ namespace :dump do
   end
 end
 
+namespace :hourly do
+  task errands: :environment do
+    # check for payments
+    Organisation.and(:evm_address.ne => nil).each do |organisation|
+      organisation.check_evm_account if Order.and(:payment_completed.ne => true, :evm_secret.ne => nil, :event_id.in => organisation.events.pluck(:id)).count > 0
+    end
+    Event.live.and(:oc_slug.ne => nil).each do |event|
+      event.check_oc_event if event.orders.and(:payment_completed.ne => true, :oc_secret.ne => nil, :event_id => event.id).count > 0
+    end
+    Gathering.and(:evm_address.ne => nil).each(&:check_evm_account)
+
+    # delete stale uncompleted orders
+    Order.incomplete.and(:created_at.lt => 1.hour.ago).destroy_all
+  end
+end
+
+namespace :morning do
+  task errands: :environment do
+    # feedback requests
+    Event.live.and(:end_time.gte => Date.yesterday, :end_time.lt => Date.today).each { |event| event.send_feedback_requests(:all) }
+    # event reminders
+    Event.live.and(:start_time.gte => Date.tomorrow, :start_time.lt => Date.tomorrow + 1).each { |event| event.send_reminders(:all) }
+    # star reminders
+    Event.live.and(:start_time.gte => Date.tomorrow + 6, :start_time.lt => Date.tomorrow + 7).each { |event| event.send_star_reminders(:all) }
+    # payment reminders
+    TicketType.and(name: /payment plan/i).each(&:send_payment_reminder) if Date.today.day == 1
+  end
+end
+
+# late
+
 namespace :daily do
   task get: :environment do
     Faraday.get("#{ENV['BASE_URI']}/daily?date=#{Date.today.to_fs(:db_local)}", {}, { 'X-Requested-With' => 'XMLHttpRequest' })
@@ -104,10 +135,6 @@ namespace :gatherings do
   task clear_up_optionships: :environment do
     Gathering.and(clear_up_optionships: true).each(&:clear_up_optionships!)
   end
-
-  task check_for_payments: :environment do
-    Gathering.and(:evm_address.ne => nil).each(&:check_evm_account)
-  end
 end
 
 namespace :events do
@@ -121,35 +148,6 @@ namespace :events do
       account.recommend_people!
       account.recommend_events!(events_with_participant_ids)
     end
-  end
-
-  task check_for_payments: :environment do
-    Organisation.and(:evm_address.ne => nil).each do |organisation|
-      organisation.check_evm_account if Order.and(:payment_completed.ne => true, :evm_secret.ne => nil, :event_id.in => organisation.events.pluck(:id)).count > 0
-    end
-    Event.live.and(:oc_slug.ne => nil).each do |event|
-      event.check_oc_event if event.orders.and(:payment_completed.ne => true, :oc_secret.ne => nil, :event_id => event.id).count > 0
-    end
-  end
-
-  task delete_stale_uncompleted_orders: :environment do
-    Order.incomplete.and(:created_at.lt => 1.hour.ago).destroy_all
-  end
-
-  task send_feedback_requests: :environment do
-    Event.live.and(:end_time.gte => Date.yesterday, :end_time.lt => Date.today).each { |event| event.send_feedback_requests(:all) }
-  end
-
-  task send_reminders: :environment do
-    Event.live.and(:start_time.gte => Date.tomorrow, :start_time.lt => Date.tomorrow + 1).each { |event| event.send_reminders(:all) }
-  end
-
-  task send_star_reminders: :environment do
-    Event.live.and(:start_time.gte => Date.tomorrow + 6, :start_time.lt => Date.tomorrow + 7).each { |event| event.send_star_reminders(:all) }
-  end
-
-  task send_payment_reminders: :environment do
-    TicketType.and(name: /payment plan/i).each(&:send_payment_reminder) if Date.today.day == 1
   end
 end
 
