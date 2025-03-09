@@ -211,7 +211,7 @@ Dandelion::App.controller do
   end
 
   get '/orders/:id/send_tickets' do
-    @order = Order.find(params[:id])
+    @order = Order.find(params[:id]) || not_found
     @event = @order.event
     event_admins_only!
     @order.send_tickets
@@ -220,14 +220,14 @@ Dandelion::App.controller do
   end
 
   get '/orders/:id/transfer' do
-    @order = Order.find(params[:id])
+    @order = Order.find(params[:id]) || not_found
     @event = @order.event
     event_admins_only!
     erb :'events/transfer_order'
   end
 
   post '/orders/:id/transfer' do
-    @order = Order.find(params[:id])
+    @order = Order.find(params[:id]) || not_found
     @event = @order.event
     @organisation = @event.organisation
     original_event_id = @order.event_id
