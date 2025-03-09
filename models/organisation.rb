@@ -19,6 +19,30 @@ class Organisation
     find_by(slug: slug)
   end
 
+  def self.set_counts
+    Organisation.all.each do |organisation|
+      monthly_donations_count = organisation.organisationships.and(:monthly_donation_method.ne => nil).and(:monthly_donation_method.ne => 'Other').map do |organisationship|
+        Money.new(
+          organisationship.monthly_donation_amount * 100,
+          organisationship.monthly_donation_currency
+        )
+      end.sum
+      monthly_donations_count = monthly_donations_count.format(no_cents: true) if monthly_donations_count > 0
+      organisation.set(monthly_donations_count: monthly_donations_count)
+      organisation.set(monthly_donors_count: organisation.monthly_donors.count)
+
+      organisation.update_paid_up_without_delay
+      if organisation.stripe_customer_id
+        cr = organisation.contribution_requested
+        cp = organisation.contribution_paid
+        organisation.stripe_topup if cp < (Organisation.paid_up_fraction * cr)
+      end
+
+      organisation.set(subscribed_accounts_count: organisation.subscribed_accounts.count)
+      organisation.set(followers_count: organisation.organisationships.count)
+    end
+  end
+
   def self.spring_clean
     fields = %i[image_uid]
     ignore = %i[organisationships notifications_as_notifiable]
