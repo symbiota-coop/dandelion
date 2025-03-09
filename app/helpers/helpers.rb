@@ -74,7 +74,8 @@ Dandelion::App.helpers do
     Event.where('$or' => [
                   { name: /#{Regexp.escape(query)}/i },
                   { description: /#{Regexp.escape(query)}/i },
-                  { location: /#{Regexp.escape(query)}/i }
+                  { location: /#{Regexp.escape(query)}/i },
+                  { event_tags_joined: /#{Regexp.escape(query)}/i }
                 ])
   end
 
