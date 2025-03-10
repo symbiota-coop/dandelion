@@ -74,65 +74,8 @@
     <%= f.submit_block destroy_url: "/pmails/#{@pmail.id}/destroy?#{@scope}", button_text: @pmail.new_record? ? 'Save and continue' : 'Save' %>
   <% end %>
 
-
-  <style>
-    @media(max-width: 991px) {
-        #chat { display: block !important }
-    }
-    @media(min-width: 992px) {
-      #chat-card { border: 0; margin: 0 !important }
-      #chat-card-body { padding: 0 !important }
-      #chat-container { z-index: 99; border-radius: 0.25rem; box-shadow: #666 0 0 5px; background: white; position: fixed; width: 411px; bottom: 0.475rem; right: 0.475rem;  }
-      #chat { height: 400px; overflow: auto; padding: 20px }
-    }
-  </style>
-  <div class="card mt-5" id="chat-card">
-    <h5 class="card-header bg-primary text-white d-lg-none"><%= organisation.name %>'s files</h5>
-    <div class="card-body" id="chat-card-body">
-      <div id="chat-container">
-        <div class="d-none d-lg-block p-2 bg-primary" style="border-radius: 0.25rem 0.25rem 0 0;">
-          <a id="chat-hide" style="<%= 'display:none' if !params[:file_q] %>"        
-            class="text-white" href="javascript:;"
-            onclick="$('#chat').hide();$(this).hide().next().show();$('#chat-spacer').removeClass('d-lg-block');$('#select-tickets').addClass('mb-4')">
-
-            <span class="float-right"><i class="bi bi-chevron-double-down"></i></span>
-            <span class="text-white font-weight-bold">
-              <%= organisation.name %>'s files
-            </span>
-
-          </a>
-          <a id="chat-show" style="<%= 'display:none' if params[:file_q] %>"
-             class="text-white" href="javascript:;"         
-             onclick="$('#chat').show();$(this).hide().prev().show();$('#chat-spacer').addClass('d-lg-block');$('#select-tickets').removeClass('mb-4')">
-
-            <span class="float-right"><i class="bi bi-chevron-double-up"></i></span>
-            <span class="text-white font-weight-bold">
-              <%= organisation.name %>'s files
-            </span>
-          </a>
-        </div>
-        <div id="chat" <% if !params[:file_q] %>style="display:none"<% end %>>
-
-          <% if organisation %>
-            <div class="input-group mb-3">
-              <div class="input-group-prepend">
-                <span class="input-group-text"><i class="bi bi-search"></i></span>
-              </div>
-              <%= text_field_tag :file_q, class: 'form-control', placeholder: 'Search files', value: params[:file_q] %>
-            </div>
-
-            <div id="attachments" data-pagelet-url="/pmails/<%= organisation.id %>/attachments?<%= @scope %>&file_q=<%= params[:file_q] %>"></div>
-            <style>
-              #pmail_file { width: 100% }
-            </style>
-            <%= f.file_block :file %>
-            <%= f.hidden_field :markdown, value: @pmail.markdown? ? true : false %>
-            <%= f.submit_block button_text: 'Upload' %>
-          <% end %>
-
-        </div>
-      </div>
-    </div>
-    <div class="d-none <%= 'd-lg-block' if params[:file_q] %>" id="chat-spacer" style="margin-bottom: 410px"></div>
-
+  <% if organisation %>
+    <%= partial :'pmails/files', locals: { f: f, organisation: organisation } %>
   <% end %>
+
+<% end %>

@@ -1,0 +1,25 @@
+<div class="card mt-5" id="chat-card">
+  <span class="card-header bg-primary text-white font-weight-bold d-lg-none"><%= title %></span>
+  <div class="card-body" id="chat-card-body">
+    <div id="chat-container">
+      <div class="d-none d-lg-block p-2 bg-primary" style="border-radius: 0.25rem 0.25rem 0 0;">
+        <a id="chat-hide" style="<%= 'display:none' if !show_chat %>"        
+            class="text-white" href="javascript:;"
+            onclick="$('#chat').hide();$(this).hide().next().show();$('#chat-spacer').removeClass('d-lg-block');">
+          <span class="float-right"><i class="bi bi-chevron-double-down"></i></span>
+          <span class="text-white font-weight-bold"><%= title %></span>
+        </a>
+        <a id="chat-show" style="<%= 'display:none' if show_chat %>"
+             class="text-white" href="javascript:;"         
+             onclick="$('#chat').show();$(this).hide().prev().show();$('#chat-spacer').addClass('d-lg-block');">
+          <span class="float-right"><i class="bi bi-chevron-double-up"></i></span>
+          <span class="text-white font-weight-bold"><%= title %></span>
+        </a>
+      </div>
+      <div id="chat" <% if !show_chat %>style="display:none"<% end %>>
+        <%= content %>
+      </div>
+    </div>
+  </div>
+</div>
+<div class="d-none <%= 'd-lg-block' if show_chat %>" id="chat-spacer" style="margin-bottom: 410px"></div>

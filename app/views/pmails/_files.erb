@@ -1,0 +1,26 @@
+<style>
+  @media(min-width: 992px) {
+    #chat { padding: 20px }
+  }
+</style>
+
+<% content = capture do %>
+
+  <div class="input-group mb-3">
+    <div class="input-group-prepend">
+      <span class="input-group-text"><i class="bi bi-search"></i></span>
+    </div>
+    <%= text_field_tag :file_q, class: 'form-control', placeholder: 'Search files', value: params[:file_q] %>
+  </div>
+
+  <div id="attachments" data-pagelet-url="/pmails/<%= organisation.id %>/attachments?<%= @scope %>&file_q=<%= params[:file_q] %>"></div>
+  <style>
+    #pmail_file { width: 100% }
+  </style>
+  <%= f.file_block :file %>
+  <%= f.hidden_field :markdown, value: @pmail.markdown? ? true : false %>
+  <%= f.submit_block button_text: 'Upload' %>
+
+<% end %>
+
+<%= partial :chat_card, locals: { title: "#{organisation.name}'s files", show_chat: params[:file_q].present?, content: content } %>

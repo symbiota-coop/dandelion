@@ -184,6 +184,13 @@
       <%= partial :'events/sidebar' %>
     <% end %>
   </div>
+
   <%= partial :'events/feedback' %>
-  <%= partial :'events/discussion' %>
+
+  <% if !@event.hide_discussion %>
+    <% if event_participant? %>
+      <%= partial :'events/discussion' %>
+    <% end %>
+  <% end %>
+
 <% end %>
