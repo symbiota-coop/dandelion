@@ -1,23 +1,42 @@
-<table class="table table-borderless">
-  <% attachments = @organisation.attachments %>
-  <% attachments = attachments.and(file_name: /#{Regexp.escape(params[:file_q])}/i) if params[:file_q] %>
-  <% attachments = attachments.order('created_at desc').paginate(page: params[:page], per_page: 5) %>
+<% attachments = @organisation.attachments %>
+<% attachments = attachments.and(file_name: /#{Regexp.escape(params[:file_q])}/i) if params[:file_q] %>
+<% attachments = attachments.order('created_at desc').paginate(page: params[:page], per_page: 5) %>
+<table class="table">
   <% attachments.each { |attachment| %>
   <tr>
-    <td style="width: 1px">
+    <td>
       <% if %w{png jpg gif jpeg}.any? { |x| attachment.file.name.downcase.ends_with? ".#{x}" } %>
-        <img style="max-width: 100px" src="<%= attachment.file.url %>">
+        <img class="w-100" src="<%= attachment.file.url %>">
       <% else %>
         <a href="<%= attachment.file.url %>"><%= attachment.file.name %></a>
       <% end %>
     </td>
-    <td>
-      <input type="text" class="form-control" value="<%= u attachment.file.url %>">
-    </td>
-    <td style="width: 1px">
-      <a data-confirm="Are you sure?" class="btn btn-danger pagelet-trigger" href="/pmails/<%= @organisation.id %>/attachments/<%= attachment.id %>/destroy?<%= @scope %>"><i class="bi bi-x-lg"></i></a>
+    <td style="white-space: nowrap;">
+      <a href="javascript:;" class="text-dark copy-url-btn" data-url="<%= u attachment.file.url %>">
+        <i class="bi bi-clipboard"></i> Copy URL
+      </a>
+      <br />
+      <a data-confirm="Are you sure?" class="text-dark pagelet-trigger" href="/pmails/<%= @organisation.id %>/attachments/<%= attachment.id %>/destroy?<%= @scope %>">
+        <i class="bi bi-x-lg"></i>
+        Delete
+      </a>
     </td>
   </tr>
   <% } %>
 </table>
 <%= will_paginate attachments, inner_window: 0, outer_window: 0, renderer: WillPaginate::ViewHelpers::BootstrapRenderer %>
+
+<script>
+  $(document).on('click', '.copy-url-btn', function() {
+    const url = $(this).data('url');
+    navigator.clipboard.writeText(url).then(() => {
+      const originalText = $(this).html();
+      $(this).html('<i class="bi bi-clipboard-check"></i> Copied!');
+      setTimeout(() => {
+        $(this).html(originalText);
+      }, 2000);
+    }).catch(err => {
+      console.error('Failed to copy: ', err);
+    });
+  });
+</script>
