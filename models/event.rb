@@ -32,7 +32,7 @@ class Event
     events_with_participant_ids = Event.live.public.future.map do |event|
       [event.id.to_s, event.attendees.pluck(:id).map(&:to_s)]
     end
-    c = Account.recommendable.count
+    # c = Account.recommendable.count
     Account.recommendable.each_with_index do |account, _i|
       # puts "#{i + 1}/#{c}"
       account.recommend_people!
