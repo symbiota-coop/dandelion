@@ -902,37 +902,3 @@ figure td {
 input[type="checkbox"] {
   accent-color: #29A95B;
 }
-
-
-@media(max-width: 991px) {
-  #chat {
-    display: block !important
-  }
-}
-
-@media(min-width: 992px) {
-  #chat-card {
-    border: 0;
-    margin: 0 !important
-  }
-
-  #chat-card-body {
-    padding: 0 !important
-  }
-
-  #chat-container {
-    z-index: 99;
-    border-radius: 0.25rem;
-    box-shadow: #666 0 0 5px;
-    background: white;
-    position: fixed;
-    width: 411px;
-    bottom: 0.475rem;
-    right: 0.475rem;
-  }
-
-  #chat {
-    height: 400px;
-    overflow: auto;
-  }
-}
