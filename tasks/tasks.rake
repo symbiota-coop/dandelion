@@ -61,27 +61,27 @@ namespace :late do
     logger.info 'event recommendations'
     Event.recommend
   end
+end
 
-  namespace :other do
-    task check_squarespace_signup: :environment do
-      CheckSquarespaceSignup.check
+namespace :other do
+  task check_squarespace_signup: :environment do
+    CheckSquarespaceSignup.check
+  end
+
+  task code_to_markdown: :environment do
+    content = ''
+    allowed_file_extensions = %w[css js erb rake rb]
+    Dir.glob('**/*').each do |file|
+      next if File.directory?(file)
+      next if file.starts_with?('app/assets/infinite_admin')
+      next if file.starts_with?('app/assets/javascripts/ext')
+      next unless allowed_file_extensions.include?(File.extname(file).delete('.'))
+
+      puts file
+      content += "# #{file}\n\n"
+      content += File.read(file)
+      content += "\n\n"
     end
-
-    task code_to_markdown: :environment do
-      content = ''
-      allowed_file_extensions = %w[css js erb rake rb]
-      Dir.glob('**/*').each do |file|
-        next if File.directory?(file)
-        next if file.starts_with?('app/assets/infinite_admin')
-        next if file.starts_with?('app/assets/javascripts/ext')
-        next unless allowed_file_extensions.include?(File.extname(file).delete('.'))
-
-        puts file
-        content += "# #{file}\n\n"
-        content += File.read(file)
-        content += "\n\n"
-      end
-      File.write('code.md', content)
-    end
+    File.write('code.md', content)
   end
 end
