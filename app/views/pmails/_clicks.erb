@@ -1,0 +1,22 @@
+  <% if @pmail.pmail_links.count > 0 %>
+  <table class="table">
+    <thead>
+      <tr>
+        <th style="width: 1px">Link</th>
+        <th>Clicks</th>
+      </tr>
+    </thead>
+    <tbody>
+      <% max_clicks = 0; @pmail.pmail_links.order('clicks desc').limit(20).each_with_index { |link,i| max_clicks = link.clicks if i == 0; w = (link.clicks.to_f/max_clicks)*100; event = link.event %>
+      <tr>
+        <td><a class="<%= 'text-dark' unless event %>" target="_blank" href="<%= link.url %>"><%= event ? link.event.name : link.url %></a></td>
+        <td>
+          <div class="progress">
+            <div class="progress-bar" role="progressbar" style="width: <%= "#{w}%" %>;"><%= link.clicks %></div>
+          </div>
+        </td>
+      </tr>
+      <% } %>
+    </tbody>
+  </table>
+<% end %>

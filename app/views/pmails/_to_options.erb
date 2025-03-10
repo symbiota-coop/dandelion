@@ -1,0 +1,74 @@
+<%
+
+to_options = []
+
+if @organisation
+  if organisation_admin?
+    to_options << ['', '']
+    to_options << ["Everyone in #{@organisation.name}", 'everyone']
+    to_options << ['Monthly donors', 'monthly_donors']
+    to_options << ["People who aren't monthly donors", 'not_monthly_donors']
+    to_options << %w[Facilitators facilitators]
+
+    activity_tags = @organisation.activity_tags
+    activity_tag_options = (if activity_tags.count.positive?
+                              activity_tags.order('name asc').map do |activity_tag|
+                                [
+                                  ["Activity tag: #{activity_tag.name}", "activity_tag:#{activity_tag.id}"]
+                                ]
+                              end.sum([])
+                            else
+                              []
+                            end)
+    to_options += activity_tag_options
+
+  end
+
+  activities = organisation_admin? ? @organisation.activities : @organisation.activities.and(:id.in => current_account.activityships.and(admin: true).pluck(:activity_id))
+  activity_options = (if activities.count.positive?
+                        activities.order('name asc').map do |activity|
+                          [
+                            ["Activity: #{activity.name}", "activity:#{activity.id}"]
+                          ]
+                        end.sum([])
+                      else
+                        []
+                      end)
+  to_options += activity_options
+
+  local_groups = organisation_admin? ? @organisation.local_groups : @organisation.local_groups.and(:id.in => current_account.local_groupships.and(admin: true).pluck(:local_group_id))
+  local_group_options = (if local_groups.count.positive?
+                          local_groups.order('name asc').map do |local_group|
+                            [
+                              ["Local group: #{local_group.name}", "local_group:#{local_group.id}"]
+                            ]
+                          end.sum([])
+                        else
+                          []
+                        end)
+  to_options += local_group_options
+
+elsif @activity
+  to_options << [@activity.name, "activity:#{@activity.id}"]
+elsif @local_group
+  to_options << [@local_group.name, "local_group:#{@local_group.id}"]
+end
+
+if @event || @pmail.mailable.is_a?(Event)
+  event = @event || @pmail.mailable
+  to_options << ["#{event.name} (#{when_details(event)})", "event:#{event.id}"]
+  to_options << ["Waitlist for #{event.name} (#{when_details(event)})", "waitlist:#{event.id}"]
+end
+
+%>
+
+<script>
+  $(function () {
+    if ($('#pmail_to_option option').length == 1)
+      $('#pmail_to_option').hide().after('<input class="form-control" type="text" disabled value="' + $('#pmail_to_option option:selected').text() + '">')
+    else
+      $("#pmail_to_option").removeClass('form-control').css('width', '100%').select2();
+  })
+</script>
+
+<%= f.select_block :to_option, options: to_options, selected: (@pmail.to_selected if @pmail.persisted?) %>
