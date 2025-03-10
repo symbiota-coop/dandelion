@@ -33,121 +33,121 @@
   });
 </script>
 
-<div class="container-fluid">
-  <% form_for @pmail, @pmail.new_record? ? '/pmails/new' : "/pmails/#{@pmail.id}/edit", id: 'pmail-form', multipart: true do |f| %>
-    <% if @organisation %>
-      <%= hidden_field_tag :organisation_id, value: @organisation.id %>
-    <% elsif @activity %>
-      <%= hidden_field_tag :activity_id, value: @activity.id %>
-    <% elsif @local_group %>
-      <%= hidden_field_tag :local_group_id, value: @local_group.id %>
-    <% elsif @event %>
-      <%= hidden_field_tag :event_id, value: @event.id %>
-    <% end %>
-    <% if @pmail.persisted? %>
-      <% if @pmail.sent_at %>
-        <div class="row no-gutters justify-content-between">
-          <div class="col">
-            <p class="lead">
-              Sending completed at <%= @pmail.sent_at %>
-            </p>
-          </div>
-          <% unless @pmail.mailable.is_a?(Event) %>
-            <div class="col-auto">
-              <a class="btn btn-primary" target="_blank" href="https://<%= organisation.mailgun_region == 'EU' ? 'app.eu.mailgun.com' : 'app.mailgun.com' %>/mg/sending/<%= organisation.mailgun_domain %>/analytics">
-                <i class="bi bi-bar-chart-line-fill"></i>
-                View analytics on Mailgun
-              </a>
-            </div>
-          <% end %>
-        </div>
-        <div class="mb-3">
-          <a class="btn btn-primary" href="/pmails/<%=@pmail.id%>" target="_blank">View</a>
-          <button type="submit" name="duplicate" value="1" class="btn btn-primary">Duplicate</button>
-        </div>
-      <% elsif @pmail.pmail_test && @pmail.pmail_test.winner %>
-        <div class="row no-gutters justify-content-between">
-          <div class="col">
-            <p class="lead">
-              Part of the A/B test <a href="/pmail_tests/<%= @pmail.pmail_test.id %>?<%= @scope %>"><%= @pmail.pmail_test.name %></a>.
-              The email <a href="/pmails/<%= @pmail.pmail_test.winner.id %>/edit?<%= @scope %>"><%= @pmail.pmail_test.winner.subject %></a> was sent instead.
-            </p>
-          </div>
-          <% unless @pmail.mailable.is_a?(Event) %>
-            <div class="col-auto">
-              <a class="btn btn-primary" target="_blank" href="https://<%= organisation.mailgun_region == 'EU' ? 'app.eu.mailgun.com' : 'app.mailgun.com' %>/mg/sending/<%= organisation.mailgun_domain %>/analytics">
-                <i class="bi bi-bar-chart-line-fill"></i>
-                View analytics on Mailgun
-              </a>
-            </div>
-          <% end %>
-        </div>
-      <% elsif @pmail.requested_send_at %>
-        <p class="lead">Queued for sending at <%= @pmail.requested_send_at %></p>
-      <% else %>
-        <% if @pmail.pmail_test %>
-          <div class="row no-gutters justify-content-between">
-            <div class="col">
-              <p class="lead">
-                Part of the A/B test <a href="/pmail_tests/<%= @pmail.pmail_test.id %>?<%= @scope %>"><%= @pmail.pmail_test.name %></a>
-              </p>
-            </div>
-            <% unless @pmail.mailable.is_a?(Event) %>
-              <div class="col-auto">
-                <a class="btn btn-primary" target="_blank" href="https://<%= organisation.mailgun_region == 'EU' ? 'app.eu.mailgun.com' : 'app.mailgun.com' %>/mg/sending/<%= organisation.mailgun_domain %>/analytics">
-                  <i class="bi bi-bar-chart-line-fill"></i>
-                  View analytics on Mailgun
-                </a>
-              </div>
-            <% end %>
-          </div>
-        <% else %>
-          <%= @hide_alert = true; partial :flash %>
-        <% end %>
-        <div class="mb-3">
-          <button type="submit" name="default" style="overflow: visible !important; height: 0 !important; width: 0 !important; margin: 0 !important; border: 0 !important; padding: 0 !important; display: block !important;" value="1"></button>
-          <button type="submit" name="preview" value="1" class="btn btn-primary">Preview</button>
-          <button type="submit" name="send_test" value="1" class="btn btn-primary">Send test to <%= current_account.email %></button>
-          <button type="submit" name="send" value="1" class="btn btn-primary" data-confirm="Are you sure you want to send this mail to <%= pluralize(@pmail.send_count, 'person') %>?">Send</button>
-          <button type="submit" name="duplicate" value="1" class="btn btn-outline-primary">Duplicate</button>
-        </div>
-      <% end %>
-    <% end %>
-    <% if @pmail.pmail_links.count > 0 %>
-      <table class="table">
-        <thead>
-          <tr>
-            <th style="width: 1px">Link</th>
-            <th>Clicks</th>
-          </tr>
-        </thead>
-        <tbody>
-          <% max_clicks = 0; @pmail.pmail_links.order('clicks desc').limit(20).each_with_index { |link,i| max_clicks = link.clicks if i == 0; w = (link.clicks.to_f/max_clicks)*100; event = link.event %>
-          <tr>
-            <td><a class="<%= 'text-dark' unless event %>" target="_blank" href="<%= link.url %>"><%= event ? link.event.name : link.url %></a></td>
-            <td>
-              <div class="progress">
-                <div class="progress-bar" role="progressbar" style="width: <%= "#{w}%" %>;"><%= link.clicks %></div>
-              </div>
-            </td>
-          </tr>
-          <% } %>
-        </tbody>
-      </table>
-    <% end %>
-    <script>
-      $(function () {
-        if ($('#pmail_to_option option').length == 1)
-          $('#pmail_to_option').hide().after('<input class="form-control" type="text" disabled value="' + $('#pmail_to_option option:selected').text() + '">')
-        else
-          $("#pmail_to_option").removeClass('form-control').css('width', '100%').select2();
 
-        $("#pmail_event_id").removeClass('form-control').css('width', '100%').select2({allowClear: true});
-        $("#pmail_activity_id").removeClass('form-control').css('width', '100%').select2({allowClear: true});
-        $("#pmail_local_group_id").removeClass('form-control').css('width', '100%').select2({allowClear: true});
-      })
-    </script>
-    <% to_options = []
+<% form_for @pmail, @pmail.new_record? ? '/pmails/new' : "/pmails/#{@pmail.id}/edit", id: 'pmail-form', multipart: true do |f| %>
+  <% if @organisation %>
+    <%= hidden_field_tag :organisation_id, value: @organisation.id %>
+  <% elsif @activity %>
+    <%= hidden_field_tag :activity_id, value: @activity.id %>
+  <% elsif @local_group %>
+    <%= hidden_field_tag :local_group_id, value: @local_group.id %>
+  <% elsif @event %>
+    <%= hidden_field_tag :event_id, value: @event.id %>
+  <% end %>
+  <% if @pmail.persisted? %>
+    <% if @pmail.sent_at %>
+      <div class="row no-gutters justify-content-between">
+        <div class="col">
+          <p class="lead">
+            Sending completed at <%= @pmail.sent_at %>
+          </p>
+        </div>
+        <% unless @pmail.mailable.is_a?(Event) %>
+          <div class="col-auto">
+            <a class="btn btn-primary" target="_blank" href="https://<%= organisation.mailgun_region == 'EU' ? 'app.eu.mailgun.com' : 'app.mailgun.com' %>/mg/sending/<%= organisation.mailgun_domain %>/analytics">
+              <i class="bi bi-bar-chart-line-fill"></i>
+              View analytics on Mailgun
+            </a>
+          </div>
+        <% end %>
+      </div>
+      <div class="mb-3">
+        <a class="btn btn-primary" href="/pmails/<%=@pmail.id%>" target="_blank">View</a>
+        <button type="submit" name="duplicate" value="1" class="btn btn-primary">Duplicate</button>
+      </div>
+    <% elsif @pmail.pmail_test && @pmail.pmail_test.winner %>
+      <div class="row no-gutters justify-content-between">
+        <div class="col">
+          <p class="lead">
+            Part of the A/B test <a href="/pmail_tests/<%= @pmail.pmail_test.id %>?<%= @scope %>"><%= @pmail.pmail_test.name %></a>.
+            The email <a href="/pmails/<%= @pmail.pmail_test.winner.id %>/edit?<%= @scope %>"><%= @pmail.pmail_test.winner.subject %></a> was sent instead.
+          </p>
+        </div>
+        <% unless @pmail.mailable.is_a?(Event) %>
+          <div class="col-auto">
+            <a class="btn btn-primary" target="_blank" href="https://<%= organisation.mailgun_region == 'EU' ? 'app.eu.mailgun.com' : 'app.mailgun.com' %>/mg/sending/<%= organisation.mailgun_domain %>/analytics">
+              <i class="bi bi-bar-chart-line-fill"></i>
+              View analytics on Mailgun
+            </a>
+          </div>
+        <% end %>
+      </div>
+    <% elsif @pmail.requested_send_at %>
+      <p class="lead">Queued for sending at <%= @pmail.requested_send_at %></p>
+    <% else %>
+      <% if @pmail.pmail_test %>
+        <div class="row no-gutters justify-content-between">
+          <div class="col">
+            <p class="lead">
+              Part of the A/B test <a href="/pmail_tests/<%= @pmail.pmail_test.id %>?<%= @scope %>"><%= @pmail.pmail_test.name %></a>
+            </p>
+          </div>
+          <% unless @pmail.mailable.is_a?(Event) %>
+            <div class="col-auto">
+              <a class="btn btn-primary" target="_blank" href="https://<%= organisation.mailgun_region == 'EU' ? 'app.eu.mailgun.com' : 'app.mailgun.com' %>/mg/sending/<%= organisation.mailgun_domain %>/analytics">
+                <i class="bi bi-bar-chart-line-fill"></i>
+                View analytics on Mailgun
+              </a>
+            </div>
+          <% end %>
+        </div>
+      <% else %>
+        <%= @hide_alert = true; partial :flash %>
+      <% end %>
+      <div class="mb-3">
+        <button type="submit" name="default" style="overflow: visible !important; height: 0 !important; width: 0 !important; margin: 0 !important; border: 0 !important; padding: 0 !important; display: block !important;" value="1"></button>
+        <button type="submit" name="preview" value="1" class="btn btn-primary">Preview</button>
+        <button type="submit" name="send_test" value="1" class="btn btn-primary">Send test to <%= current_account.email %></button>
+        <button type="submit" name="send" value="1" class="btn btn-primary" data-confirm="Are you sure you want to send this mail to <%= pluralize(@pmail.send_count, 'person') %>?">Send</button>
+        <button type="submit" name="duplicate" value="1" class="btn btn-outline-primary">Duplicate</button>
+      </div>
+    <% end %>
+  <% end %>
+  <% if @pmail.pmail_links.count > 0 %>
+    <table class="table">
+      <thead>
+        <tr>
+          <th style="width: 1px">Link</th>
+          <th>Clicks</th>
+        </tr>
+      </thead>
+      <tbody>
+        <% max_clicks = 0; @pmail.pmail_links.order('clicks desc').limit(20).each_with_index { |link,i| max_clicks = link.clicks if i == 0; w = (link.clicks.to_f/max_clicks)*100; event = link.event %>
+        <tr>
+          <td><a class="<%= 'text-dark' unless event %>" target="_blank" href="<%= link.url %>"><%= event ? link.event.name : link.url %></a></td>
+          <td>
+            <div class="progress">
+              <div class="progress-bar" role="progressbar" style="width: <%= "#{w}%" %>;"><%= link.clicks %></div>
+            </div>
+          </td>
+        </tr>
+        <% } %>
+      </tbody>
+    </table>
+  <% end %>
+  <script>
+    $(function () {
+      if ($('#pmail_to_option option').length == 1)
+        $('#pmail_to_option').hide().after('<input class="form-control" type="text" disabled value="' + $('#pmail_to_option option:selected').text() + '">')
+      else
+        $("#pmail_to_option").removeClass('form-control').css('width', '100%').select2();
+
+      $("#pmail_event_id").removeClass('form-control').css('width', '100%').select2({allowClear: true});
+      $("#pmail_activity_id").removeClass('form-control').css('width', '100%').select2({allowClear: true});
+      $("#pmail_local_group_id").removeClass('form-control').css('width', '100%').select2({allowClear: true});
+    })
+  </script>
+  <% to_options = []
 
        if @organisation
          if organisation_admin?
@@ -206,85 +206,94 @@
          to_options << ["#{event.name} (#{when_details(event)})", "event:#{event.id}"]
          to_options << ["Waitlist for #{event.name} (#{when_details(event)})", "waitlist:#{event.id}"]
        end %>
-    <%= f.select_block :to_option, options: to_options, selected: (@pmail.to_selected if @pmail.persisted?) %>
-    <% if organisation %>
-      <script>
-        $(function () {
-            <% if @pmail.event %>
-            $('#exclude-event-btn').click()
-            <% end %>
-            <% if @pmail.activity %>
-            $('#exclude-activity-btn').click()
-            <% end %>
-            <% if @pmail.local_group %>
-            $('#exclude-local-group-btn').click()
-            <% end %>
-        })
-      </script>
-      <div>
-        <a id="exclude-event-btn" class="mb-3" href="javascript:;" style="display: inline-block" onclick="$(this).hide().next().show();
+
+  <div class="row">
+    <div class="col-md-8">
+      <%= f.select_block :to_option, options: to_options, selected: (@pmail.to_selected if @pmail.persisted?) %>
+      <% if organisation %>
+        <script>
+          $(function () {
+              <% if @pmail.event %>
+              $('#exclude-event-btn').click()
+              <% end %>
+              <% if @pmail.activity %>
+              $('#exclude-activity-btn').click()
+              <% end %>
+              <% if @pmail.local_group %>
+              $('#exclude-local-group-btn').click()
+              <% end %>
+          })
+        </script>
+        <div>
+          <a id="exclude-event-btn" class="mb-3" href="javascript:;" style="display: inline-block" onclick="$(this).hide().next().show();
                     $(this).next().next().hide()">
-          <small>Exclude people attending an event</small>
-        </a>
-        <div id="exclude-event" style="display: none">
-          <%= f.select_block :event_id, options: ([''] + organisation.events_for_search.map { |event| [event.summary, event.id] }), selected: @pmail.event_id %>
-        </div>
-        <span class="exclude-separator">&middot;</span>
-        <a id="exclude-activity-btn" class="mb-3" href="javascript:;" style="display: inline-block" onclick="$(this).hide().next().show();
-            $(this).next().next().hide();$(this).prev().hide()">
-          <small>Exclude people attending upcoming events in an activity</small>
-        </a>
-        <div id="exclude-activity" style="display: none">
-          <%= f.select_block :activity_id, options: ([''] + organisation.activities.order('name asc').map { |activity| [activity.name, activity.id] }), selected: @pmail.activity_id %>
-        </div>
-        <span class="exclude-separator">&middot;</span>
-        <a id="exclude-local-group-btn" class="mb-3" href="javascript:;" style="display: inline-block" onclick="$(this).hide().next().show();
-        $(this).prev().hide()">
-          <small>Exclude people in a local group</small>
-        </a>
-        <div id="exclude-local-group" style="display: none">
-          <%= f.select_block :local_group_id, options: ([''] + organisation.local_groups.order('name asc').map { |local_group| [local_group.name, local_group.id] }), selected: @pmail.local_group_id %>
-        </div>
-      </div>
-    <% end %>
-    <% if @pmail.persisted? %>
-      <span class="mb-3 badge badge-primary"><%= pluralize(@pmail.send_count, 'person') %></span>
-    <% end %>
-    <%= f.text_block :from %>
-    <%= f.text_block :subject %>
-    <%= f.text_block :preview_text %>
-
-    <% if @pmail.markdown? %>
-      <div contenteditable="true" id="pastebin" style="opacity: 0.01; width: 100%; height: 1px; overflow: hidden;"></div>
-      <%= f.text_area_block :body %>
-    <% else %>
-      <%= f.wysiwyg_block :body %>
-    <% end %>
-
-    <%= f.text_block :link_params %>
-    <% if @pmail.sent_at %>
-      <a data-confirm="Are you sure you want to delete this mail?" href="/pmails/<%= @pmail.id %>/destroy?<%= @scope %>" class="btn btn-danger">Delete</a>
-    <% else %>
-      <%= f.submit_block destroy_url: "/pmails/#{@pmail.id}/destroy?#{@scope}", button_text: @pmail.new_record? ? 'Save and continue' : 'Save' %>
-    <% end %>
-    <% if organisation %>
-      <div class="card mt-3">
-        <h5 class="card-header bg-primary text-white"><%= organisation.name %>'s files</h5>
-        <div class="card-body">
-
-          <div class="input-group mb-3">
-            <div class="input-group-prepend">
-              <span class="input-group-text"><i class="bi bi-search"></i></span>
-            </div>
-            <%= text_field_tag :file_q, class: 'form-control', placeholder: 'Search files', value: params[:file_q] %>
+            <small>Exclude people attending an event</small>
+          </a>
+          <div id="exclude-event" style="display: none">
+            <%= f.select_block :event_id, options: ([''] + organisation.events_for_search.map { |event| [event.summary, event.id] }), selected: @pmail.event_id %>
           </div>
-
-          <div id="attachments" data-pagelet-url="/pmails/<%= organisation.id %>/attachments?<%= @scope %>&file_q=<%= params[:file_q] %>"></div>
-          <%= f.file_block :file %>
-          <%= f.hidden_field :markdown, value: @pmail.markdown? ? true : false %>
-          <%= f.submit_block button_text: 'Upload' %>
+          <span class="exclude-separator">&middot;</span>
+          <a id="exclude-activity-btn" class="mb-3" href="javascript:;" style="display: inline-block" onclick="$(this).hide().next().show();
+            $(this).next().next().hide();$(this).prev().hide()">
+            <small>Exclude people attending upcoming events in an activity</small>
+          </a>
+          <div id="exclude-activity" style="display: none">
+            <%= f.select_block :activity_id, options: ([''] + organisation.activities.order('name asc').map { |activity| [activity.name, activity.id] }), selected: @pmail.activity_id %>
+          </div>
+          <span class="exclude-separator">&middot;</span>
+          <a id="exclude-local-group-btn" class="mb-3" href="javascript:;" style="display: inline-block" onclick="$(this).hide().next().show();
+        $(this).prev().hide()">
+            <small>Exclude people in a local group</small>
+          </a>
+          <div id="exclude-local-group" style="display: none">
+            <%= f.select_block :local_group_id, options: ([''] + organisation.local_groups.order('name asc').map { |local_group| [local_group.name, local_group.id] }), selected: @pmail.local_group_id %>
+          </div>
         </div>
-      </div>
-    <% end %>
-  <% end %>
-</div>
+      <% end %>
+      <% if @pmail.persisted? %>
+        <span class="mb-3 badge badge-primary"><%= pluralize(@pmail.send_count, 'person') %></span>
+      <% end %>
+      <%= f.text_block :from %>
+      <%= f.text_block :subject %>
+      <%= f.text_block :preview_text %>
+
+      <% if @pmail.markdown? %>
+        <div contenteditable="true" id="pastebin" style="opacity: 0.01; width: 100%; height: 1px; overflow: hidden;"></div>
+        <%= f.text_area_block :body %>
+      <% else %>
+        <%= f.wysiwyg_block :body %>
+      <% end %>
+
+      <%= f.text_block :link_params %>
+      <% if @pmail.sent_at %>
+        <a data-confirm="Are you sure you want to delete this mail?" href="/pmails/<%= @pmail.id %>/destroy?<%= @scope %>" class="btn btn-danger">Delete</a>
+      <% else %>
+        <%= f.submit_block destroy_url: "/pmails/#{@pmail.id}/destroy?#{@scope}", button_text: @pmail.new_record? ? 'Save and continue' : 'Save' %>
+      <% end %>
+    </div>
+    <div class="col-md-4 mt-3 mt-md-0">
+      <% if organisation %>
+        <div class="card">
+          <h5 class="card-header"><%= organisation.name %>'s files <i class="bi bi-paperclip"></i></h5>
+          <div class="card-body">
+
+            <div class="input-group mb-3">
+              <div class="input-group-prepend">
+                <span class="input-group-text"><i class="bi bi-search"></i></span>
+              </div>
+              <%= text_field_tag :file_q, class: 'form-control', placeholder: 'Search files', value: params[:file_q] %>
+            </div>
+
+            <div id="attachments" data-pagelet-url="/pmails/<%= organisation.id %>/attachments?<%= @scope %>&file_q=<%= params[:file_q] %>"></div>
+            <style>
+              #pmail_file { width: 100% }
+            </style>
+            <%= f.file_block :file %>
+            <%= f.hidden_field :markdown, value: @pmail.markdown? ? true : false %>
+            <%= f.submit_block button_text: 'Upload' %>
+          </div>
+        </div>
+      <% end %>
+    </div>
+  </div>
+<% end %>
