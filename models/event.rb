@@ -33,8 +33,8 @@ class Event
       [event.id.to_s, event.attendees.pluck(:id).map(&:to_s)]
     end
     c = Account.recommendable.count
-    Account.recommendable.each_with_index do |account, i|
-      puts "#{i + 1}/#{c}"
+    Account.recommendable.each_with_index do |account, _i|
+      # puts "#{i + 1}/#{c}"
       account.recommend_people!
       account.recommend_events!(events_with_participant_ids)
     end
