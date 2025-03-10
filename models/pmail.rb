@@ -7,6 +7,7 @@ class Pmail
   belongs_to :mailable, polymorphic: true, index: true, optional: true
   belongs_to :event, index: true, optional: true, inverse_of: :pmails_as_exclusion # Exclude people attending an event
   belongs_to :activity, index: true, optional: true, inverse_of: :pmails_as_exclusion # Exclude people attending upcoming events in an activity
+  belongs_to :local_group, index: true, optional: true, inverse_of: :pmails_as_exclusion # Exclude people in a local group
 
   field :from, type: String
   field :subject, type: String
@@ -151,6 +152,7 @@ class Pmail
         end
     t = t.and(:id.nin => event.attendees.pluck(:id)) if event
     t = t.and(:id.nin => activity.future_attendees.pluck(:id)) if activity
+    t = t.and(:id.nin => local_group.members.pluck(:id)) if local_group
     t
   end
 
@@ -303,6 +305,7 @@ class Pmail
       organisation: organisation,
       event: event,
       activity: activity,
+      local_group: local_group,
       account: account
     )
   end
@@ -324,6 +327,7 @@ class Pmail
       to_option: 'To',
       event_id: 'Exclude people attending this event',
       activity_id: 'Exclude people attending upcoming events in this activity',
+      local_group_id: 'Exclude people in this local group',
       link_params: 'Parameters to add to links'
     }[attr.to_sym] || super
   end

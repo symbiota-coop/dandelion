@@ -144,6 +144,7 @@
 
         $("#pmail_event_id").removeClass('form-control').css('width', '100%').select2({allowClear: true});
         $("#pmail_activity_id").removeClass('form-control').css('width', '100%').select2({allowClear: true});
+        $("#pmail_local_group_id").removeClass('form-control').css('width', '100%').select2({allowClear: true});
       })
     </script>
     <% to_options = []
@@ -215,23 +216,34 @@
             <% if @pmail.activity %>
             $('#exclude-activity-btn').click()
             <% end %>
+            <% if @pmail.local_group %>
+            $('#exclude-local-group-btn').click()
+            <% end %>
         })
       </script>
       <div>
         <a id="exclude-event-btn" class="mb-3" href="javascript:;" style="display: inline-block" onclick="$(this).hide().next().show();
-                    $('#exclude-separator').hide()">
+                    $(this).next().next().hide()">
           <small>Exclude people attending an event</small>
         </a>
         <div id="exclude-event" style="display: none">
           <%= f.select_block :event_id, options: ([''] + organisation.events_for_search.map { |event| [event.summary, event.id] }), selected: @pmail.event_id %>
         </div>
-        <span id="exclude-separator">&middot;</span>
+        <span class="exclude-separator">&middot;</span>
         <a id="exclude-activity-btn" class="mb-3" href="javascript:;" style="display: inline-block" onclick="$(this).hide().next().show();
-            $('#exclude-separator').hide()">
+            $(this).next().next().hide();$(this).prev().hide()">
           <small>Exclude people attending upcoming events in an activity</small>
         </a>
         <div id="exclude-activity" style="display: none">
           <%= f.select_block :activity_id, options: ([''] + organisation.activities.order('name asc').map { |activity| [activity.name, activity.id] }), selected: @pmail.activity_id %>
+        </div>
+        <span class="exclude-separator">&middot;</span>
+        <a id="exclude-local-group-btn" class="mb-3" href="javascript:;" style="display: inline-block" onclick="$(this).hide().next().show();
+        $(this).prev().hide()">
+          <small>Exclude people in a local group</small>
+        </a>
+        <div id="exclude-local-group" style="display: none">
+          <%= f.select_block :local_group_id, options: ([''] + organisation.local_groups.order('name asc').map { |local_group| [local_group.name, local_group.id] }), selected: @pmail.local_group_id %>
         </div>
       </div>
     <% end %>
