@@ -80,13 +80,15 @@
         #chat { display: block !important }
     }
     @media(min-width: 992px) {
-      #chat-container { border-radius: 0.25rem; box-shadow: #666 0 0 5px; background: white; position: fixed; width: 411px; bottom: 0.475rem; right: 0.475rem;  }
+      #chat-card { border: 0; margin: 0 !important }
+      #chat-card-body { padding: 0 !important }
+      #chat-container { z-index: 99; border-radius: 0.25rem; box-shadow: #666 0 0 5px; background: white; position: fixed; width: 411px; bottom: 0.475rem; right: 0.475rem;  }
       #chat { height: 400px; overflow: auto; padding: 20px }
     }
   </style>
-  <div class="card mt-5">
+  <div class="card mt-5" id="chat-card">
     <h5 class="card-header bg-primary text-white d-lg-none"><%= organisation.name %>'s files</h5>
-    <div class="card-body">
+    <div class="card-body" id="chat-card-body">
       <div id="chat-container">
         <div class="d-none d-lg-block p-2 bg-primary" style="border-radius: 0.25rem 0.25rem 0 0;">
           <a id="chat-hide" style="<%= 'display:none' if !params[:file_q] %>"        
