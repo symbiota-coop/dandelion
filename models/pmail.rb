@@ -19,8 +19,8 @@ class Pmail
   field :waitlist, type: Boolean
   field :body, type: String
   field :message_ids, type: String
-  field :requested_send_at, type: ActiveSupport::TimeWithZone
-  field :sent_at, type: ActiveSupport::TimeWithZone
+  field :requested_send_at, type: Time
+  field :sent_at, type: Time
   field :link_params, type: String
   field :markdown, type: Boolean
 

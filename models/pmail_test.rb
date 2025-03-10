@@ -8,8 +8,8 @@ class PmailTest
 
   field :name, type: String
   field :fraction, type: Float
-  field :requested_send_at, type: ActiveSupport::TimeWithZone
-  field :sent_at, type: ActiveSupport::TimeWithZone
+  field :requested_send_at, type: Time
+  field :sent_at, type: Time
 
   def self.admin_fields
     {
