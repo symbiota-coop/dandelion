@@ -254,8 +254,12 @@ class Pmail
 
     end
 
-    from_name = from.match(/\A\s*([\p{L}\d\s]+?)\s*</).try(:[], 1)
-    from_email = from.split('<').last.split('>').first
+    from_name = (from.split('<').first.strip if from.include?('<'))
+    from_email = if from.include?('<')
+                   from.split('<').last.split('>').first
+                 else
+                   from
+                 end
 
     if from_email && organisation.mailgun_domain == from_email.split('@').last
       batch_message.from from
