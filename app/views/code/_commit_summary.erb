@@ -1,18 +1,16 @@
 <% 
-  # Use the commit data we already have instead of making new API calls
   commit_info = commits.map do |commit|
     date = commit.commit.author.date
     "# #{date}\n\n#{commit.commit.message}"
   end.join("\n\n")
-
-  puts commit_info
   
-  prompt = "Summarise the key changes to the platform based on the commit messages below, writing for users of the platform.
+  prompt = "Summarise the key changes to the platform based on the commit messages below, writing for end users of the platform.
 
 - Write 3 short paragraphs with ### headers.
 - Each paragraph should be at least 3 sentences.
 - Only write about user-facing changes and improvements.
-- Ignore minor changes (e.g. font size changes) and technical details (e.g. z-index changes).
+- Ignore minor changes (e.g. font size changes).
+- Ignore technical details (e.g. file, variable, and parameter names).
 - 'Pmails' are emails sent by organisation and event hosts to users. 'Pmail' is an internal term, so if mentioned, refer to 'mails', not 'Pmails'.
 - Write in the past tense.
 
@@ -21,7 +19,7 @@ Commit messages:
 #{commit_info}"
 
   begin
-    response = OpenRouter.chat(prompt)
+    response = OpenRouter.chat(prompt, model: 'anthropic/claude-3.7-sonnet:beta')
     summary = if response
       lines = response.split("\n")
       if lines.first && (lines.first.start_with?("Here") || lines.first.end_with?(":"))
