@@ -51,7 +51,8 @@ commits = client.commits(repo, since: start_date.iso8601, until: end_date.iso860
               <td data-toggle="tooltip" title="AI-generated summary ✨">
                 <%== md(
                 commit.commit.message
-                .gsub('_', '\_').gsub(/\p{Emoji_Presentation}|\p{Extended_Pictographic}/u, '<br />\0')
+                .gsub('_', '\_')
+                .gsub(/\p{Emoji_Presentation}|\p{Extended_Pictographic}/u, '<br />\0')
                 .sub(/^<br \/>/, '')
                 ) %>
               </td>
