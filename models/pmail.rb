@@ -255,8 +255,15 @@ class Pmail
     end
 
     from_name = from.match(/\A\s*([\p{L}\d\s]+?)\s*</).try(:[], 1)
-    batch_message.from from_name ? "#{from_name} <#{ENV['MAILER_EMAIL']}>" : ENV['MAILER_EMAIL_FULL']
-    batch_message.reply_to from
+    from_email = from.split('<').last.split('>').first
+
+    if from_email && organisation.mailgun_domain == from_email.split('@').last
+      batch_message.from from
+    else
+      batch_message.from from_name ? "#{from_name} <#{ENV['MAILER_EMAIL']}>" : ENV['MAILER_EMAIL_FULL']
+      batch_message.reply_to from
+    end
+
     batch_message.subject(test_to ? "#{subject} [test sent #{Time.now}]" : subject)
     batch_message.body_html html
     batch_message.add_tag id
