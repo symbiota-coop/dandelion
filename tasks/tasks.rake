@@ -61,6 +61,7 @@ namespace :late do
     end
     puts 'event recommendations'
     Event.recommend
+    puts 'done!'
   end
 end
 

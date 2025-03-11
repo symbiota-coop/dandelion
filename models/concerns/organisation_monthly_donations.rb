@@ -51,7 +51,7 @@ module OrganisationMonthlyDonations
     amount = subscription.amount
     currency = subscription.currency
     start_date = subscription.start_date
-    puts "#{name} #{email} #{amount} #{currency} #{start_date}"
+    # puts "#{name} #{email} #{amount} #{currency} #{start_date}"
 
     account = Account.find_by(email: email.downcase) || Account.create(name: name, email: email)
     organisationship = organisationships.find_by(account: account) || organisationships.create(account: account)
@@ -117,7 +117,7 @@ module OrganisationMonthlyDonations
     currency = pledge.currency
     start_date = pledge.created_at
 
-    puts "#{name} #{email} #{amount} #{currency} #{start_date}"
+    # puts "#{name} #{email} #{amount} #{currency} #{start_date}"
     account = Account.find_by(email: email.downcase) || Account.create(name: name, email: email)
     organisationship = organisationships.find_by(account: account) || organisationships.create(account: account)
 

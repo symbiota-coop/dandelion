@@ -99,11 +99,11 @@ class StripeTransaction
                  transaction[f]
                end
       end
-      puts t['created_utc']
+      # puts t['created_utc']
       begin
         organisation.stripe_transactions.create(t)
       rescue StandardError
-        puts "error creating transaction #{t['balance_transaction_id']}"
+        # puts "error creating transaction #{t['balance_transaction_id']}"
       end
     end
   end

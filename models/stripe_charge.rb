@@ -96,11 +96,11 @@ class StripeCharge
         x = charge['metadata'][f]
         c[f] = x.gsub(',', '.') if x
       end
-      puts c['created']
+      # puts c['created']
       begin
         organisation.stripe_charges.create(c)
       rescue StandardError
-        puts "error creating charge #{c['id']}"
+        # puts "error creating charge #{c['id']}"
       end
     end
   end
