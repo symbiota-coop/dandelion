@@ -193,7 +193,7 @@ module Dandelion
     end
 
     get '/code' do
-      erb :code
+      erb :'code/code'
     end
 
     get '/token' do

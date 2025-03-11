@@ -133,6 +133,13 @@
       <span class="nav-link-text">Contact us</span>
     </a>
   </li>
+  <li class="<%= 'active' if request.path == '/code' %>">
+    <a
+      href="/code" data-toggle="tooltip" title="Code" data-placement="right">
+      <i class="bi bi-code"></i>
+      <span class="nav-link-text">Code</span>
+    </a>
+  </li>
   <li class="<%= 'active' if request.path == '/donate' %>">
     <a href="/donate" data-toggle="tooltip" title="Donate" data-placement="right">
       <i class="bi bi-cash-coin"></i>

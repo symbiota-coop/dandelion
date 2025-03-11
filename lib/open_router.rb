@@ -3,11 +3,11 @@ class OpenRouter
   DEFAULT_MODEL = 'google/gemini-2.0-flash-001'.freeze
   DEFAULT_PROVIDERS = {
     'google/gemini-2.0-flash-001' => %w[Google],
-    'anthropic/claude-3.5-sonnet:beta' => %w[Anthropic]
+    'anthropic/claude-3.7-sonnet:beta' => %w[Anthropic]
   }.freeze
   DEFAULT_CONTEXT_WINDOW_SIZES = {
     'google/gemini-2.0-flash-001' => 1_000_000,
-    'anthropic/claude-3.5-sonnet:beta' => 200_000
+    'anthropic/claude-3.7-sonnet:beta' => 200_000
   }.freeze
 
   class << self

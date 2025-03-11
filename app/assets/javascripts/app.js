@@ -253,7 +253,7 @@ $(function () {
   $('input.typeWatch').typeWatch({ wait: 500, callback: function () { $(this.form).submit() } })
 
   $('form.submitOnChange').each(function () {
-    $('select, .flatpickr-input, input[type=checkbox]', this).change(function () {
+    $('select, .flatpickr-input, input[type=checkbox], input[type=month]', this).change(function () {
       $(this.form).submit()
     })
   })

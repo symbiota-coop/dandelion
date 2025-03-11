@@ -1,0 +1,41 @@
+<% 
+  # Use the commit data we already have instead of making new API calls
+  commit_info = commits.map do |commit|
+    date = commit.commit.author.date
+    "# #{date}\n\n#{commit.commit.message}"
+  end.join("\n\n")
+
+  puts commit_info
+  
+  prompt = "Summarise the key changes to the platform based on the commit messages below.
+
+- Write 3 short paragraphs with ### headers.
+- Write for users of the platform.
+- Only write about user-facing changes and improvements.
+- Ignore minor changes like font size alterations.
+- Avoid technical details.
+- 'Pmails' are emails sent by organisation and event hosts to users. 'Pmail' is an internal term, so if mentioned, refer to 'mails', not 'Pmails'.
+- Write in the past tense.
+
+Commit messages:
+
+#{commit_info}"
+
+  begin
+    response = OpenRouter.chat(prompt)
+    summary = if response
+      lines = response.split("\n")
+      if lines.first && (lines.first.start_with?("Here") || lines.first.end_with?(":"))
+        lines[1..-1].join("\n")
+      else
+        response
+      end
+    end
+  rescue => e
+    summary = "Unable to generate summary: #{e.message}"
+  end
+%>
+
+<div class="mb-4" data-toggle="tooltip" title="AI-generated summary ✨">
+  <%== md(summary) %>
+</div>
