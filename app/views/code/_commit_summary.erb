@@ -18,19 +18,15 @@ Commit messages:
 
 #{commit_info}"
 
-  begin
-    response = OpenRouter.chat(prompt, model: 'anthropic/claude-3.7-sonnet:beta')
-    summary = if response
-      lines = response.split("\n")
-      if lines.first && (lines.first.start_with?("# ") || lines.first.start_with?("Here") || lines.first.end_with?(":"))
-        lines[1..-1].join("\n")
-      else
-        response
-      end
-    end
-  rescue => e
-    summary = "Unable to generate summary: #{e.message}"
+response = OpenRouter.chat(prompt, model: 'anthropic/claude-3.7-sonnet:beta')
+summary = if response
+  lines = response.split("\n")
+  if lines.first && (lines.first.start_with?("# ") || lines.first.start_with?("Here") || lines.first.end_with?(":"))
+    lines[1..-1].join("\n")
+  else
+    response
   end
+end
 %>
 
 <div class="mb-4" data-toggle="tooltip" title="AI-generated summary ✨">
