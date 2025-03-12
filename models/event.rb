@@ -261,7 +261,7 @@ class Event
     #   name.gsub('_', ' ').gsub('-', ' ').downcase
     # end.each do |name|
 
-    prompt = "Provide a list of 5 tags for this event as a comma-separated list. No hashtags. Separate multiple words in a tag with spaces. Event details: \n\n# #{e.name}\n\n#{e.description}"
+    prompt = "Provide a list of 5 tags for this event as a comma-separated list. No hashtags. Separate multiple words in a tag with spaces. Event details: \n\n# #{name}\n\n#{description}"
 
     content = nil
     5.times do
