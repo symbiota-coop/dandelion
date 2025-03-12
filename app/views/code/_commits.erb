@@ -19,7 +19,7 @@ commits = client.commits(repo, since: start_date.iso8601, until: end_date.iso860
   <% if start_date < Date.today.beginning_of_month %>
     <%= stash_partial(:'code/commit_summary', key: "/commit_summary?month=#{selected_month}", locals: { commits: commits, client: client, repo: repo }) %>
   <% else %>
-    <%= cp(:'code/commit_summary', key: "/commit_summary?month=#{selected_month}", locals: { commits: commits, client: client, repo: repo }, expires: 1.day.from_now) %>
+    <%= partial :'code/commit_summary', locals: { commits: commits, client: client, repo: repo } %>
   <% end %>
 
   <% commits.group_by { |c| c.commit.author.date.to_date }.each do |date, day_commits| %>
