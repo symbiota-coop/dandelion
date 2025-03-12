@@ -6,3 +6,8 @@
     <span <% if event.ai_tagged? %> data-toggle="tooltip" title="AI generated"<% end %> class="text-white label <%= event.ai_tagged? ? 'label-primary' : 'label-primary' %> d-inline-block mb-1"><% if event.ai_tagged? %><i class="bi bi-stars"></i> <% end %><%== Sanitize.fragment(event_tag.name) %></span>
   <% end %>
 <% end %>
+<% if defined?(plus_more) && event.event_tags.count > limit %>
+  <span style="white-space: nowrap">
+    + <%= event.event_tags.count - limit %>
+  </span>
+<% end %>
