@@ -1,0 +1,53 @@
+<% 
+client = Octokit::Client.new(access_token: ENV['GITHUB_ACCESS_TOKEN'])
+client.auto_paginate = true  # Enable auto-pagination
+
+# Get selected month or default to current month
+selected_month = params[:month] || Date.today.strftime('%Y-%m')
+year, month = selected_month.split('-').map(&:to_i)
+
+# Calculate date range for the selected month
+start_date = Date.new(year, month, 1)
+end_date = Date.new(year, month, -1)
+
+repo = "symbiota-coop/dandelion"
+
+commits = client.commits(repo, since: start_date.iso8601, until: end_date.iso8601)
+%>
+
+<% if commits.any? %>
+  <% if start_date < Date.today.beginning_of_month %>
+    <%= stash_partial(:'code/commit_summary', key: "/commit_summary?month=#{selected_month}", locals: { commits: commits, client: client, repo: repo }) %>
+  <% else %>
+    <%= cp(:'code/commit_summary', key: "/commit_summary?month=#{selected_month}", locals: { commits: commits, client: client, repo: repo }, expires: 1.day.from_now) %>
+  <% end %>
+
+  <% commits.group_by { |c| c.commit.author.date.to_date }.each do |date, day_commits| %>
+    <h6 class="mt-4">Commits on <%= date.strftime('%b %d, %Y') %></h6>
+    <div class="table-responsive">
+      <table class="table table-sm">
+        <tbody>
+          <% day_commits.each do |commit| %>
+            <tr>
+              <td style="width: 70px">
+                <a href="<%= commit.html_url %>" target="_blank">
+                  <%= commit.sha[0..6] %>
+                </a>
+              </td>
+              <td data-toggle="tooltip" title="AI-generated summary ✨">
+                <%== md(
+                commit.commit.message
+                .gsub('_', '\_')
+                .gsub(/\p{Emoji_Presentation}|\p{Extended_Pictographic}/u, '<br />\0')
+                .sub(/^<br \/>/, '')
+                ).gsub('\\_', '_') %>
+              </td>
+            </tr>
+          <% end %>
+        </tbody>
+      </table>
+    </div>
+  <% end %>
+<% else %>
+  <p class="text-center mb-0">No commits found.</p>
+<% end %>
