@@ -25,7 +25,7 @@ class Payment
 
   has_many :notifications, as: :notifiable, dependent: :destroy
   after_create do
-    notifications.create! circle: circle, type: 'created_payment' unless gathering.options.any?(&:hide_members)
+    notifications.create! circle: circle, type: 'created_payment' unless gathering.hide_paid || gathering.options.any?(&:hide_members)
   end
 
   def circle
