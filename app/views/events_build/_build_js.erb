@@ -180,7 +180,9 @@
     })
     $('#event_zoom_party').change()
 
-    $('#event_currency').change(function() { $('#event-currency-changed').show() })
+    $('#event_currency').change(function() {
+      $('.money-symbol').text(getCurrencySymbol($(this).val()))
+    })
 
     $('#event_suggested_donation').keyup(function () {
       if ($(this).val().length > 0)

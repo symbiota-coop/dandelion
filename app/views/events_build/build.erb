@@ -115,162 +115,159 @@
       </div>
       <div role="tabpanel" class="tab-pane" id="tab3">
         <%= f.select_block :currency %>
-        <p id="event-currency-changed" style="margin-top: -0.75rem; display: none">
-          <em>Save the event to update the currency symbol.</em>
-          <p>
-            <%= partial :'events_build/ticket_types', locals: { f: f } %>
-            <%= partial :'events_build/ticket_groups', locals: { f: f } %>
-            <%= f.number_block :capacity %>
+        <%= partial :'events_build/ticket_types', locals: { f: f } %>
+        <%= partial :'events_build/ticket_groups', locals: { f: f } %>
+        <%= f.number_block :capacity %>
+      </div>
+      <div role="tabpanel" class="tab-pane" id="tab4">
+        <%= f.check_box_block :ask_hear_about %>
+
+
+        <style>
+          .q-help p { margin-top: -1em }
+            @media (min-width: 992px) {
+              .q-help p {
+                margin-top: 1.5em;
+              }
+              .q-help ul {
+                padding-left: 2em;
+              }
+            }
+        </style>
+        <div class="row">
+          <div class="col-lg-8">
+            <%= f.text_area_block :questions, placeholder: "e.g. Any dietary requirements?\n[Check this box to agree to the terms and conditions]" %>
           </div>
-          <div role="tabpanel" class="tab-pane" id="tab4">
-            <%= f.check_box_block :ask_hear_about %>
-
-
-            <style>
-              .q-help p { margin-top: -1em }
-                @media (min-width: 992px) {
-                  .q-help p {
-                    margin-top: 1.5em;
-                  }
-                  .q-help ul {
-                    padding-left: 2em;
-                  }
-                }
-            </style>
-            <div class="row">
-              <div class="col-lg-8">
-                <%= f.text_area_block :questions, placeholder: "e.g. Any dietary requirements?\n[Check this box to agree to the terms and conditions]" %>
-              </div>
-              <div class="col-lg-4">
-                <div class="q-help">
-                  <p class="text-muted">Questions to ask participants upon booking.</p>
-                  <ul class="text-muted">
-                    <li>One question per line</li>
-                    <li>Add headers by starting a line with # </li>
-                    <li>Wrap in [square brackets] to turn into a checkbox</li>
-                    <li>Wrap in {curly brackets} to turn into a date field</li>
-                    <li>End a line with a star * to make the question required</li>
-                    <li>View answers on the Orders page</li>
-                  </ul>
-                </div>
-              </div>
-            </div>
-            <div class="row">
-              <div class="col-lg-8">
-                <%= f.text_area_block :feedback_questions %>
-              </div>
-              <div class="col-lg-4">
-                <div class="q-help">
-                  <p class="text-muted">Questions to ask participants in the post-event feedback form.</p>
-                  <ul class="text-muted">
-                    <li>One question per line</li>
-                    <li>Leave blank to disable feedback</li>
-                    <li>View answers on the Feedback page</li>
-                  </ul>
-                </div>
-              </div>
+          <div class="col-lg-4">
+            <div class="q-help">
+              <p class="text-muted">Questions to ask participants upon booking.</p>
+              <ul class="text-muted">
+                <li>One question per line</li>
+                <li>Add headers by starting a line with # </li>
+                <li>Wrap in [square brackets] to turn into a checkbox</li>
+                <li>Wrap in {curly brackets} to turn into a date field</li>
+                <li>End a line with a star * to make the question required</li>
+                <li>View answers on the Orders page</li>
+              </ul>
             </div>
           </div>
-          <div role="tabpanel" class="tab-pane" id="tab5">
-
-            <% if @event.donations_to_dandelion? %>
-              <div class="alert alert-warning">
-                <p class="mb-0">
-                  The settings below won't take effect until you've met the <a class="text-warning text-underline" href="/o/<%=@event.organisation.slug%>/contribute">suggested contribution</a>.
-                </p>
-              </div>
-            <% end %>
-            <%= f.number_block :suggested_donation %>
-            <div id="donation-options">
-              <%= f.number_block :minimum_donation %>
-              <%= f.text_block :add_a_donation_to %>
-              <%= f.text_block :donation_text %>
-            </div>
-          </div>
-          <div role="tabpanel" class="tab-pane" id="tab6">
-            <% if Padrino.env == :development || @event.organisation.change_select_tickets_title || @event.organisation.experimental? %>
-              <%= f.text_block :select_tickets_title %>
-            <% end %>
-            <%= f.text_block :select_tickets_intro %>
-            <%= f.text_block :select_tickets_outro %>
-            <%= f.text_block :carousel_text %>
-          </div>
-          <div role="tabpanel" class="tab-pane" id="tab7">
-            <%= f.shorturl_block :slug, stem: "#{ENV['BASE_URI']}/e/" %>
-            <%= f.url_block :redirect_url %>
-            <% if Padrino.env == :development || @event.purchase_url || @event.organisation.allow_purchase_url? || @event.organisation.experimental? %>
-              <%= f.url_block :purchase_url %>
-            <% end %>
-            <%= f.number_block :facebook_pixel_id %>
-            <%= f.text_block :oc_slug %>
-            <% if current_account.memberships.and(admin: true).count > 0 %>
-              <%= f.select_block :gathering_id, options: [''] + current_account.memberships.and(admin: true).map { |m| [m.gathering.name, m.gathering_id] }.sort_by { |a,b| a } %>
-            <% end %>
-            <%= f.check_box_block :hide_attendees %>
-            <%= f.check_box_block :hide_discussion %>
-            <%= f.check_box_block :hide_from_carousels %>
-            <%= f.check_box_block :prevent_reminders %>
-            <%= f.check_box_block :monthly_donors_only %>
-            <%= f.check_box_block :no_discounts %>
-            <%= f.check_box_block :show_emails %>
-            <%= f.check_box_block :opt_in_organisation %>
-            <%= f.check_box_block :opt_in_facilitator %>
-            <%= f.check_box_block :include_in_parent %>
-            <%= f.check_box_block :refund_deleted_orders %>
-            <% if Padrino.env == :development || @event.organisation.experimental? || @event.organisation.enable_resales?   %>
-              <%= f.check_box_block :enable_resales %>
-            <% end %>
-            <% if !@event.organisation.stripe_client_id %>
-              <%= f.text_area_block :notes %>
-            <% end %>
-
-            <% if Padrino.env == :development || @event.organisation.experimental? %>
-              <div class="border border-primary rounded p-3 mb-3" style="border-style: dashed !important">
-                <%= f.text_block :ticket_email_title %>
-                <%= f.wysiwyg_block :ticket_email_greeting %>
-                <%= f.check_box_block :no_tickets_pdf %>
-                <%= f.check_box_block :hide_organisation_footer %>
-                <%= f.check_box_block :hide_few_left %>
-                <%= f.wysiwyg_block :extra_info_for_recording_email %>
-                <%= f.file_block :video %>
-                <%= f.number_block :affiliate_credit_percentage %>
-              </div>
-            <% end %>
-
-            <% if !@event.organisation.stripe_client_id && @event.new_record? %>
-              <%= f.submit_block %>
-            <% end %>
-          </div>
-          <% if @event.organisation.stripe_client_id %>
-            <div role="tabpanel" class="tab-pane" id="tab8">
-              <%= f.lookup_block :revenue_sharer_id, lookup_url: '/accounts.json', placeholder: 'Search accounts', selected_link: (%(<a class="d-inline-block mt-1" target="_blank" href="/u/#{@event.revenue_sharer.username}">View account</a>) if @event.revenue_sharer_id) %>
-
-              <% if event_revenue_admin? %>
-                <div id="revenue-share">
-                  <%= f.text_block :revenue_share_to_revenue_sharer %>
-                </div>
-                <%= f.number_block :profit_share_to_organiser %>
-                <%= f.number_block :profit_share_to_coordinator %>
-                <%= f.number_block :profit_share_to_category_steward %>
-                <%= f.number_block :profit_share_to_social_media %>
-
-                <%= f.number_block :profit_share_to_organisation, disabled: true %>
-
-                <%= f.number_block :stripe_revenue_adjustment %>
-              <% end %>
-              <%= f.text_area_block :notes %>
-
-
-              <% if @event.new_record? %>
-                <%= f.submit_block %>
-              <% end %>
-            </div>
-          <% end %>
         </div>
-        <% if @event.persisted? && !@event.deleted? %>
-          <div class="ml-3">
-            <%= f.submit_block %>
+        <div class="row">
+          <div class="col-lg-8">
+            <%= f.text_area_block :feedback_questions %>
+          </div>
+          <div class="col-lg-4">
+            <div class="q-help">
+              <p class="text-muted">Questions to ask participants in the post-event feedback form.</p>
+              <ul class="text-muted">
+                <li>One question per line</li>
+                <li>Leave blank to disable feedback</li>
+                <li>View answers on the Feedback page</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div role="tabpanel" class="tab-pane" id="tab5">
+
+        <% if @event.donations_to_dandelion? %>
+          <div class="alert alert-warning">
+            <p class="mb-0">
+              The settings below won't take effect until you've met the <a class="text-warning text-underline" href="/o/<%=@event.organisation.slug%>/contribute">suggested contribution</a>.
+            </p>
           </div>
         <% end %>
+        <%= f.currency_block :suggested_donation, money_symbol: money_symbol(@event.currency) %>
+        <div id="donation-options">
+          <%= f.currency_block :minimum_donation, money_symbol: money_symbol(@event.currency) %>
+          <%= f.text_block :add_a_donation_to %>
+          <%= f.text_block :donation_text %>
+        </div>
+      </div>
+      <div role="tabpanel" class="tab-pane" id="tab6">
+        <% if Padrino.env == :development || @event.organisation.change_select_tickets_title || @event.organisation.experimental? %>
+          <%= f.text_block :select_tickets_title %>
+        <% end %>
+        <%= f.text_block :select_tickets_intro %>
+        <%= f.text_block :select_tickets_outro %>
+        <%= f.text_block :carousel_text %>
+      </div>
+      <div role="tabpanel" class="tab-pane" id="tab7">
+        <%= f.shorturl_block :slug, stem: "#{ENV['BASE_URI']}/e/" %>
+        <%= f.url_block :redirect_url %>
+        <% if Padrino.env == :development || @event.purchase_url || @event.organisation.allow_purchase_url? || @event.organisation.experimental? %>
+          <%= f.url_block :purchase_url %>
+        <% end %>
+        <%= f.number_block :facebook_pixel_id %>
+        <%= f.text_block :oc_slug %>
+        <% if current_account.memberships.and(admin: true).count > 0 %>
+          <%= f.select_block :gathering_id, options: [''] + current_account.memberships.and(admin: true).map { |m| [m.gathering.name, m.gathering_id] }.sort_by { |a,b| a } %>
+        <% end %>
+        <%= f.check_box_block :hide_attendees %>
+        <%= f.check_box_block :hide_discussion %>
+        <%= f.check_box_block :hide_from_carousels %>
+        <%= f.check_box_block :prevent_reminders %>
+        <%= f.check_box_block :monthly_donors_only %>
+        <%= f.check_box_block :no_discounts %>
+        <%= f.check_box_block :show_emails %>
+        <%= f.check_box_block :opt_in_organisation %>
+        <%= f.check_box_block :opt_in_facilitator %>
+        <%= f.check_box_block :include_in_parent %>
+        <%= f.check_box_block :refund_deleted_orders %>
+        <% if Padrino.env == :development || @event.organisation.experimental? || @event.organisation.enable_resales?   %>
+          <%= f.check_box_block :enable_resales %>
+        <% end %>
+        <% if !@event.organisation.stripe_client_id %>
+          <%= f.text_area_block :notes %>
+        <% end %>
+
+        <% if Padrino.env == :development || @event.organisation.experimental? %>
+          <div class="border border-primary rounded p-3 mb-3" style="border-style: dashed !important">
+            <%= f.text_block :ticket_email_title %>
+            <%= f.wysiwyg_block :ticket_email_greeting %>
+            <%= f.check_box_block :no_tickets_pdf %>
+            <%= f.check_box_block :hide_organisation_footer %>
+            <%= f.check_box_block :hide_few_left %>
+            <%= f.wysiwyg_block :extra_info_for_recording_email %>
+            <%= f.file_block :video %>
+            <%= f.number_block :affiliate_credit_percentage %>
+          </div>
+        <% end %>
+
+        <% if !@event.organisation.stripe_client_id && @event.new_record? %>
+          <%= f.submit_block %>
+        <% end %>
+      </div>
+      <% if @event.organisation.stripe_client_id %>
+        <div role="tabpanel" class="tab-pane" id="tab8">
+          <%= f.lookup_block :revenue_sharer_id, lookup_url: '/accounts.json', placeholder: 'Search accounts', selected_link: (%(<a class="d-inline-block mt-1" target="_blank" href="/u/#{@event.revenue_sharer.username}">View account</a>) if @event.revenue_sharer_id) %>
+
+          <% if event_revenue_admin? %>
+            <div id="revenue-share">
+              <%= f.text_block :revenue_share_to_revenue_sharer %>
+            </div>
+            <%= f.number_block :profit_share_to_organiser %>
+            <%= f.number_block :profit_share_to_coordinator %>
+            <%= f.number_block :profit_share_to_category_steward %>
+            <%= f.number_block :profit_share_to_social_media %>
+
+            <%= f.number_block :profit_share_to_organisation, disabled: true %>
+
+            <%= f.number_block :stripe_revenue_adjustment %>
+          <% end %>
+          <%= f.text_area_block :notes %>
+
+
+          <% if @event.new_record? %>
+            <%= f.submit_block %>
+          <% end %>
+        </div>
+      <% end %>
+    </div>
+    <% if @event.persisted? && !@event.deleted? %>
+      <div class="ml-3">
+        <%= f.submit_block %>
       </div>
     <% end %>
+  </div>
+<% end %>

@@ -11,7 +11,7 @@
             <%= o.text_field :name, class: 'form-control', placeholder: 'Name', required: true %>
           </div>
           <div>
-            <%= money_symbol(f.object.currency) %><%= o.text_field :price_or_range, class: 'form-control ml-1', placeholder: 'Price', step: 'any', :'data-toggle' => 'tooltip', :title => 'Enter a price, a price range (two numbers separated by a dash) or leave blank to let the attendee pay as they feel' %>
+            <span class="money-symbol"><%= money_symbol(f.object.currency) %></span><%= o.text_field :price_or_range, class: 'form-control ml-1', placeholder: 'Price', step: 'any', :'data-toggle' => 'tooltip', :title => 'Enter a price, a price range (two numbers separated by a dash) or leave blank to let the attendee pay as they feel' %>
             <%= o.hidden_field :price_or_range_submitted, value: true %>
           </div>
           <div>
@@ -23,7 +23,7 @@
           <% if @event.organisation && (@event.organisation.gocardless_access_token || @event.organisation.patreon_api_key) %>
             <div class="ticket-type-minimum-monthly-donation">
               <strong>Min. monthly donation</strong>
-              <span><%= money_symbol(f.object.currency) %></span>
+              <span class="money-symbol"><%= money_symbol(f.object.currency) %></span>
               <%= o.number_field :minimum_monthly_donation, class: 'form-control ml-1', step: 'any' %>
             </div>
           <% end %>
@@ -145,7 +145,7 @@
           nameInput.appendTo(nameDiv);
           nameDiv.appendTo(d);
 
-          var priceOrRangeDiv = $('<div><%= money_symbol(f.object.currency) %></div>')
+          var priceOrRangeDiv = $('<div><span class="money-symbol"><%= money_symbol(f.object.currency) %></span></div>')
           var priceOrRangeInput = $('<input type="text" step="any" class="form-control ml-1" placeholder="Price" data-toggle="tooltip" title="Enter a price, a price range (two numbers separated by a dash) or leave blank to let the attendee pay as they feel" />');
           priceOrRangeInput.attr('name', 'event[ticket_types_attributes][' + c + '][price_or_range]');
           priceOrRangeInput.attr('id', 'event_ticket_types_attributes_' + c + '_price_or_range');
@@ -174,7 +174,7 @@
 
           <% if @event.organisation && (@event.organisation.gocardless_access_token || @event.organisation.patreon_api_key) %>
             var minimumMonthlyDonationDiv = $('<div class="ticket-type-minimum-monthly-donation"></div>')
-            minimumMonthlyDonationStrong = $('<strong>Min. monthly donation</strong> <span><%= money_symbol(f.object.currency) %></span>')
+            minimumMonthlyDonationStrong = $('<strong>Min. monthly donation</strong> <span class="money-symbol"><%= money_symbol(f.object.currency) %></span>')
             minimumMonthlyDonationStrong.appendTo(minimumMonthlyDonationDiv);
             var minimumMonthlyDonationInput = $('<input type="number" step="any" class="form-control ml-1" />');
             minimumMonthlyDonationInput.attr('name', 'event[ticket_types_attributes][' + c + '][minimum_monthly_donation]');
