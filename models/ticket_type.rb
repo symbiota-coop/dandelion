@@ -21,7 +21,11 @@ class TicketType
   attr_accessor :price_or_range_submitted
 
   def price_or_range
-    @price_or_range || ("#{range_min}-#{range_max}" if range_min && range_max) || price
+    @price_or_range || (
+      if range_min && range_max
+        "#{range_min.to_i == range_min ? range_min.to_i : range_min}-#{range_max.to_i == range_max ? range_max.to_i : range_max}"
+      end
+    ) || (price.to_i == price ? price.to_i : price)
   end
 
   def self.admin_fields
