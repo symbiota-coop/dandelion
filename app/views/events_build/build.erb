@@ -1,5 +1,9 @@
 <%= partial :'events/nav', locals: { event: @event } %>
 
+<style>
+  #build-event .input-group-text { font-size: 1em; }
+</style>
+
 <% if params[:new_org] && !params[:draft_id] %>
   <div class="alert alert-success mt-3">
     <p class="lead">
