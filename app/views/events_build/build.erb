@@ -57,8 +57,11 @@
       <li role="presentation" class="nav-item"><a class="nav-link" href="#tab5" role="tab" data-toggle="tab">Donations</a></li>
       <li role="presentation" class="nav-item"><a class="nav-link" href="#tab6" role="tab" data-toggle="tab">Labels</a></li>
       <li role="presentation" class="nav-item"><a class="nav-link" href="#tab7" role="tab" data-toggle="tab">Everything else</a></li>
+      <% if @event.past? %>
+        <li role="presentation" class="nav-item"><a class="nav-link" href="#tab8" role="tab" data-toggle="tab">Recording</a></li>
+      <% end %>
       <% if @event.organisation.stripe_client_id %>
-        <li role="presentation" class="nav-item"><a class="nav-link" href="#tab8" role="tab" data-toggle="tab">Revenue</a></li>
+        <li role="presentation" class="nav-item"><a class="nav-link" href="#tab9" role="tab" data-toggle="tab">Revenue</a></li>
       <% end %>
     </ul>
   </div>
@@ -114,7 +117,7 @@
         <%= f.wysiwyg_block :description %>
         <%= f.wysiwyg_block :extra_info_for_ticket_email %>
         <% if @event.persisted? %>
-          <p style="margin-top: -1rem"><a target="_blank" href="/events/<%=@event.id%>/ticket_email">Preview ticket confirmation email &rarr;</a></p>
+          <p style="margin-top: -1rem"><a target="_blank" href="/events/<%=@event.id%>/ticket_email">Preview order confirmation email &rarr;</a></p>
         <% end %>
       </div>
       <div role="tabpanel" class="tab-pane" id="tab3">
@@ -195,6 +198,11 @@
         <%= f.text_block :select_tickets_intro %>
         <%= f.text_block :select_tickets_outro %>
         <%= f.text_block :carousel_text %>
+        <%= f.text_block :ticket_email_title %>
+        <%= f.wysiwyg_block :ticket_email_greeting %>
+        <% if @event.persisted? %>
+          <p style="margin-top: -1rem"><a target="_blank" href="/events/<%=@event.id%>/ticket_email">Preview order confirmation email &rarr;</a></p>
+        <% end %>
       </div>
       <div role="tabpanel" class="tab-pane" id="tab7">
         <%= f.shorturl_block :slug, stem: "#{ENV['BASE_URI']}/e/" %>
@@ -210,6 +218,9 @@
         <%= f.check_box_block :hide_attendees %>
         <%= f.check_box_block :hide_discussion %>
         <%= f.check_box_block :hide_from_carousels %>
+        <%= f.check_box_block :hide_few_left %>
+        <%= f.check_box_block :hide_organisation_footer %>
+        <%= f.check_box_block :no_tickets_pdf %>
         <%= f.check_box_block :prevent_reminders %>
         <%= f.check_box_block :monthly_donors_only %>
         <%= f.check_box_block :no_discounts %>
@@ -227,12 +238,6 @@
 
         <% if Padrino.env == :development || @event.organisation.experimental? %>
           <div class="border border-primary rounded p-3 mb-3" style="border-style: dashed !important">
-            <%= f.text_block :ticket_email_title %>
-            <%= f.wysiwyg_block :ticket_email_greeting %>
-            <%= f.check_box_block :no_tickets_pdf %>
-            <%= f.check_box_block :hide_organisation_footer %>
-            <%= f.check_box_block :hide_few_left %>
-            <%= f.wysiwyg_block :extra_info_for_recording_email %>
             <%= f.file_block :video %>
             <%= f.number_block :affiliate_credit_percentage %>
           </div>
@@ -242,8 +247,16 @@
           <%= f.submit_block %>
         <% end %>
       </div>
-      <% if @event.organisation.stripe_client_id %>
+      <% if @event.past? %>
         <div role="tabpanel" class="tab-pane" id="tab8">
+          <%= f.wysiwyg_block :extra_info_for_recording_email %>
+          <% if @event.persisted? %>
+            <p style="margin-top: -1rem"><a target="_blank" href="/events/<%=@event.id%>/ticket_email">Preview order confirmation email &rarr;</a></p>
+          <% end %>
+        </div>
+      <% end %>
+      <% if @event.organisation.stripe_client_id %>
+        <div role="tabpanel" class="tab-pane" id="tab9">
           <%= f.lookup_block :revenue_sharer_id, lookup_url: '/accounts.json', placeholder: 'Search accounts', selected_link: (%(<a class="d-inline-block mt-1" target="_blank" href="/u/#{@event.revenue_sharer.username}">View account</a>) if @event.revenue_sharer_id) %>
 
           <% if event_revenue_admin? %>

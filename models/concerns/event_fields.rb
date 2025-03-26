@@ -137,8 +137,8 @@ module EventFields
         donation_text: 'Text below donation field',
         start_time: 'Start date/time',
         end_time: 'End date/time',
-        extra_info_for_ticket_email: 'Extra info for ticket confirmation email',
-        extra_info_for_recording_email: 'Extra info for recording confirmation email',
+        extra_info_for_ticket_email: 'Extra info for order confirmation email',
+        extra_info_for_recording_email: 'Extra info for order confirmation email',
         purchase_url: 'Ticket purchase URL',
         no_discounts: 'No discounts for monthly donors',
         notes: 'Private notes',
@@ -148,8 +148,10 @@ module EventFields
         send_order_notifications: 'Send email notifications of orders',
         prevent_reminders: 'Prevent reminder email',
         oc_slug: 'Open Collective event slug',
-        no_tickets_pdf: "Don't attach tickets PDF to confirmation email",
-        hide_few_left: "Hide 'few tickets left' labels"
+        no_tickets_pdf: "Don't include tickets PDF in confirmation email",
+        hide_few_left: "Hide 'few tickets left' labels",
+        ticket_email_title: 'Order confirmation email subject',
+        ticket_email_greeting: 'Order confirmation greeting'
       }[attr.to_sym] || super
     end
 
@@ -163,7 +165,7 @@ module EventFields
         oc_slug: 'Event slug for taking payments via Open Collective',
         donation_text: "Text to display below the 'Add a donation' field  (leave blank to use organisation default)",
         carousel_text: 'Text to show when hovering over the event in a carousel',
-        select_tickets_title: 'Title of the Select Tickets panel',
+        select_tickets_title: 'Title of the Select Tickets panel (default: Select tickets)',
         select_tickets_intro: 'Text to show at the top of the Select Tickets panel',
         select_tickets_outro: 'Text to show at the bottom of the Select Tickets panel',
         ask_hear_about: 'Ask people how they heard about the event on the order form',
@@ -190,7 +192,12 @@ module EventFields
         send_order_notifications: 'Send email notifications of orders to event facilitators',
         prevent_reminders: 'Prevent reminder email from being sent before the event',
         stripe_revenue_adjustment: 'Positive or negative adjustment to the revenue reported by Stripe, e.g. +20 or -10',
-        enable_resales: 'Allow ticketholders to resell tickets via the event once a ticket type sells out (experimental)'
+        enable_resales: 'Allow ticketholders to resell tickets via the event once a ticket type sells out (experimental)',
+        hide_few_left: "Hide the 'few tickets left' labels at checkout when tickets are running low",
+        hide_organisation_footer: 'Hide the organisation footer in the event confirmation email',
+        no_tickets_pdf: 'Skip the PDF attachment in the confirmation email',
+        ticket_email_title: 'Custom subject line for the order confirmation email',
+        ticket_email_greeting: 'Custom greeting for the order confirmation email'
       }
     end
 

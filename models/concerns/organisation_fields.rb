@@ -165,7 +165,7 @@ module OrganisationFields
         slug: 'URL',
         intro_text: 'Intro text for organisation homepage',
         telegram_group: 'Telegram group/channel URL',
-        extra_info_for_ticket_email: 'Extra info for ticket confirmation email',
+        extra_info_for_ticket_email: 'Extra info for order confirmation email',
         google_analytics_id: 'Google Analytics ID',
         facebook_pixel_id: 'Facebook Pixel ID',
         stripe_client_id: 'Stripe client ID',
@@ -197,7 +197,9 @@ module OrganisationFields
         event_image_required_width: 'Event image width',
         event_image_required_height: 'Event image height',
         restrict_cohosting: 'Restrict cohosting to admins',
-        oc_slug: 'Open Collective slug'
+        oc_slug: 'Open Collective slug',
+        ticket_email_greeting: 'Order confirmation email greeting',
+        recording_email_greeting: 'Order confirmation email greeting for recordings of past events'
       }[attr.to_sym] || super
     end
 
