@@ -193,6 +193,10 @@ Dandelion::App.controller do
         @order.create_order_notification
         { order_id: @order.id.to_s }.to_json
       end
+    rescue Stripe::InvalidRequestError => e
+      @order.notify_of_failed_purchase(e)
+      @order.destroy
+      halt 400
     rescue StandardError => e
       airbrake_notify(e, { order: @order })
       @order.destroy
