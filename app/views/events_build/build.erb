@@ -57,7 +57,7 @@
       <li role="presentation" class="nav-item"><a class="nav-link" href="#tab5" role="tab" data-toggle="tab">Donations</a></li>
       <li role="presentation" class="nav-item"><a class="nav-link" href="#tab6" role="tab" data-toggle="tab">Labels</a></li>
       <li role="presentation" class="nav-item"><a class="nav-link" href="#tab7" role="tab" data-toggle="tab">Everything else</a></li>
-      <% if @event.past? %>
+      <% if @event.persisted? && @event.past? %>
         <li role="presentation" class="nav-item"><a class="nav-link" href="#tab8" role="tab" data-toggle="tab">Recording</a></li>
       <% end %>
       <% if @event.organisation.stripe_client_id %>
@@ -247,7 +247,7 @@
           <%= f.submit_block %>
         <% end %>
       </div>
-      <% if @event.past? %>
+      <% if @event.persisted? && @event.past? %>
         <div role="tabpanel" class="tab-pane" id="tab8">
           <%= f.wysiwyg_block :extra_info_for_recording_email %>
           <% if @event.persisted? %>
