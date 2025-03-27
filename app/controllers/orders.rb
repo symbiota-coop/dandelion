@@ -350,7 +350,7 @@ Dandelion::App.controller do
     @ticket = Ticket.find(params[:id]) || not_found
     @event = @ticket.event
     event_admins_only!
-    @ticket.update_attribute(:price, params[:price])
+    @ticket.update_attribute(:discounted_price, params[:price])
     200
   end
 

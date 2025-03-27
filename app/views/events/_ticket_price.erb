@@ -5,7 +5,7 @@
       <div class="input-group-prepend">
         <span class="input-group-text"><%= money_symbol(ticket.currency) %></span>
       </div>
-      <%= number_field_tag :price, class: 'form-control', style: 'width: 6em', value: ticket.price, onblur: '$(this.form).submit()' %>
+      <%= number_field_tag :price, class: 'form-control', style: 'width: 6em', value: ticket.discounted_price, onblur: '$(this.form).submit()' %>
     </div>
   <% end %>
 <% end %>
