@@ -164,10 +164,18 @@ class Pmail
     end
   end
 
+  def event_emails
+    emails = to_with_unsubscribes_less_ab_tests.pluck(:email)
+    emails += mailable.tickets.complete.and(:email.ne => nil).reject { |ticket| emails.include?(ticket.email) }
+    emails
+  end
+
   def send_count
-    c = to_with_unsubscribes_less_ab_tests.count
-    c += mailable.tickets.complete.and(:email.ne => nil).count if mailable.is_a?(Event) && !waitlist
-    c
+    if mailable.is_a?(Event) && !waitlist
+      event_emails.count
+    else
+      to_with_unsubscribes_less_ab_tests.count
+    end
   end
 
   def to_with_unsubscribes_less_ab_tests
@@ -281,7 +289,8 @@ class Pmail
     else
       accounts = to_with_unsubscribes_less_ab_tests
       if mailable.is_a?(Event) && !waitlist
-        mailable.tickets.complete.and(:email.ne => nil).each do |ticket|
+        emails = to_with_unsubscribes_less_ab_tests.pluck(:email)
+        mailable.tickets.complete.and(:email.ne => nil).reject { |ticket| emails.include?(ticket.email) }.each do |ticket|
           batch_message.add_recipient(:to, ticket.email, {
                                         'firstname' => ticket.firstname || 'there',
                                         'footer_class' => 'd-none'
