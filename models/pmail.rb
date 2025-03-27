@@ -166,7 +166,7 @@ class Pmail
 
   def event_emails
     emails = to_with_unsubscribes_less_ab_tests.pluck(:email)
-    emails += mailable.tickets.complete.and(:email.ne => nil).reject { |ticket| emails.include?(ticket.email) }
+    emails += mailable.tickets.complete.and(:email.ne => nil).reject { |ticket| emails.include?(ticket.email) }.map(&:email)
     emails
   end
 

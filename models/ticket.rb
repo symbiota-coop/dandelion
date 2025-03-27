@@ -60,6 +60,7 @@ class Ticket
 
   before_validation do
     if email
+      self.email = email.downcase.strip
       e = EmailAddress.error(email)
       errors.add(:email, "- #{e}") if e
     end
