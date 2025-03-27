@@ -220,6 +220,8 @@ class Order
                               description: "#{account.name}: #{description}",
                               metadata: metadata
                             })
+    rescue Stripe::InvalidRequestError => e
+      Airbrake.notify(e) unless e.message.include?('No such transfer')
     rescue StandardError => e
       Airbrake.notify(e)
     end
