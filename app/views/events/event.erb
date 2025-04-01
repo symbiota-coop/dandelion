@@ -139,7 +139,7 @@
         <% end %>
       </ul>
       <div>
-        <%= partial :'events/tag_labels', locals: { event: @event } %>
+        <%= partial :'events/tag_labels', locals: { event: @event, show_more: true, show_more_limit: 5 } %>
       </div>
       <%= partial :'events/info_table' %>
       <% if @event.description || @event.organisation.event_footer %>
