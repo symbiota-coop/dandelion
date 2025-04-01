@@ -19,7 +19,7 @@
 
     <% if admin? %>
       <div class="mb-4">
-        <%= cp(:'accounts/pay_progress', locals: {currency: 'GBP'}, key: "/accounts/pay_progress/GBP?admin=1", expires: 3.hours.from_now) %>
+        <%= partial :'accounts/pay_progress', locals: {currency: 'GBP'} %>
       </div>
     <% end %>
 
