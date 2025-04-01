@@ -188,9 +188,7 @@
         <div id="donation-options">
           <%= f.currency_block :minimum_donation, money_symbol: money_symbol(@event.currency) %>
           <%= f.text_block :add_a_donation_to %>
-          <% if @event.donation_text %>
-            <%= f.text_block :donation_text %>
-          <% end %>
+          <%= f.text_block :donation_text %>
         </div>
       </div>
       <div role="tabpanel" class="tab-pane" id="tab6">
