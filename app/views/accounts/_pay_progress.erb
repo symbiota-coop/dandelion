@@ -1,62 +1,21 @@
 <%
-
   if ENV['STRIPE_SK']
+    fragment = Fragment.find_by(key: 'monthly_contributions')
+    if fragment && fragment.value
+      monthly_data = JSON.parse(fragment.value)
+      current_month = "#{Date::MONTHNAMES[Date.today.month]} #{Date.today.year}"
+      current_month_data = monthly_data.find { |d| d[0] == current_month }
+      
+      if current_month_data
+        monthly_contributions = Money.new(current_month_data[1], 'GBP')
+        monthly_contributions = monthly_contributions.exchange_to(currency)
 
-    Stripe.api_key = ENV['STRIPE_SK']
-    Stripe.api_version = '2020-08-27'    
-
-    start_of_month = Time.new(Date.today.year, Date.today.month, 1)
-    end_of_month = start_of_month + 1.month
-
-    charges_list = Stripe::Charge.list({
-      created: {
-        gte: start_of_month.to_i,
-        lt: end_of_month.to_i        
-      },
-      limit: 100
-    })
-
-    application_fees_list = Stripe::ApplicationFee.list({
-      created: {
-        gte: start_of_month.to_i,
-        lt: end_of_month.to_i
-      },
-      limit: 100
-    })
-
-    charges = []
-    charges_list.auto_paging_each do |charge|
-      charges << charge
-    end    
-
-    application_fees = []
-    application_fees_list.auto_paging_each do |fee|
-      application_fees << fee
-    end
-
-    monthly_contributions = Money.new(0,'GBP')
-    charges.each { |c|
-    next unless c.status == 'succeeded'
-    next if c.refunded
-    next if ENV['STRIPE_PAYMENT_INTENTS_TO_IGNORE'] && c.payment_intent.in?(ENV['STRIPE_PAYMENT_INTENTS_TO_IGNORE'].split(','))
-
-    monthly_contributions += Money.new(c['amount'], c['currency'])
-    }
-
-    application_fees.each { |f|
-      next if f.refunded
-      monthly_contributions += Money.new(f['amount'], f['currency'])
-    }
-
-    monthly_contributions = monthly_contributions.exchange_to(currency) 
-
-    base_target = Money.new(500*100, 'GBP')
-    target = base_target
-    while monthly_contributions >= (target * 0.8)
-      target += base_target
-    end
-
-    %>
+        base_target = Money.new(500*100, 'GBP')
+        target = base_target
+        while monthly_contributions >= (target * 0.8)
+          target += base_target
+        end
+%>
 
 <% if monthly_contributions > 0 %>
   <div class="progress" style="height: 30px">
@@ -68,12 +27,12 @@
     <%= monthly_contributions.format(no_cents: true) %> raised of <%=m target, currency%> monthly target
     <% if admin? %>
       <% 
-    current_month_value = monthly_contributions.to_i
-    days_in_month = Date.new(Date.today.year, Date.today.month, -1).day
-    days_passed = Date.today.day
-    projected_value = (current_month_value.to_f / days_passed * days_in_month).round
-    projection = [projected_value - current_month_value, 0].max    
-    %>
+        current_month_value = monthly_contributions.to_i
+        days_in_month = Date.new(Date.today.year, Date.today.month, -1).day
+        days_passed = Date.today.day
+        projected_value = (current_month_value.to_f / days_passed * days_in_month).round
+        projection = [projected_value - current_month_value, 0].max    
+      %>
       (projected <%= m (projection + current_month_value), currency %>)
     <% end %>
   </p>
