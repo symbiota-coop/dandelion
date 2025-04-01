@@ -1,5 +1,15 @@
 <script src="//rawcdn.githack.com/cozmo/jsQR/49a9633931fb8030ac2fc9cecc121d6e5a19f9a3/dist/jsQR.js"></script>
-<%= partial :'events/nav', locals: { event: @event } %>
+
+<% if event_admin? %>
+  <%= partial :'events/nav', locals: { event: @event } %>
+<% else %>
+  <%= partial :'events/check_in_nav', locals: { event: @event } %>
+<% end %>
+
+<p class="text-center">
+  Assistants can check-in attendees at <a href="<%= @check_in_url %>"><%= @check_in_url %></a>
+</p>
+
 <div class="row justify-content-center">
   <div class="col-12 col-lg-8">
     <div id="loadingMessage">🎥 Unable to access video stream (please make sure you have a webcam enabled)</div>

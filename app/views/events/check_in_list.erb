@@ -1,0 +1,26 @@
+<% if event_admin? %>
+  <%= partial :'events/nav', locals: { event: @event } %>
+<% else %>
+  <%= partial :'events/check_in_nav', locals: { event: @event } %>
+<% end %>
+
+<% form_tag '', method: 'get', class: 'submitOnChange searchForm form-inline mb-3', onsubmit: %{
+      $('#tickets-table').attr('data-pagelet-url', $('#tickets-table').attr('data-pagelet-url').split('?')[0] + '?' + $(this).serialize());
+      $('#tickets-table').load($('#tickets-table').attr('data-pagelet-url'))
+      return false
+    } do %>
+  <div class="form-group">
+    <label>Search tickets</label>
+    <%= text_field_tag :q, class: 'form-control', value: params[:q], autocomplete: 'off' %>
+  </div>
+  <%= checkbox 'Complete' %>
+  <%= checkbox 'Incomplete' %>
+  <%= checkbox 'Discounted' %>
+  <%= checkbox 'Deleted' %>
+  <%= hidden_field_tag :search, value: 1 %>
+  <%= submit_tag 'Search', class: 'btn btn-primary' %>
+<% end %>
+
+<div id="tickets-table" data-pagelet-url="/e/<%= @event.slug %>/check_in_list">
+  <%= partial :'events/check_in_list_table', locals: { tickets: @tickets } %>
+</div>

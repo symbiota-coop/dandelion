@@ -1,0 +1,68 @@
+<% @tickets = @tickets.order('created_at desc')
+   @tickets = @tickets.paginate(page: params[:page], per_page: 50) %>
+
+<p><%== pagination_details @tickets, model: 'Ticket' %></p>
+<script>
+  $(function () {
+
+    var colIndex = $("#tickets th").toArray().indexOf($("th[data-col-name='created-at']")[0])
+
+    $(document).ajaxStop(function() {
+      if (!$('#tickets').hasClass('dataTable')) {
+        $('#tickets').dataTable({bInfo: false, paging: false, searching: false, order: [[colIndex, "desc"]]});
+      }
+    })
+  })
+</script>
+<table class="table" id="tickets">
+  <thead>
+    <tr>
+      <th>Name</th>
+      <th>Ticket type</th>
+      <th>Ticket ID</th>
+      <th data-col-name="created-at">Created at</th>
+      <th>Checked in</th>
+    </tr>
+  </thead>
+  <% @tickets.each { |ticket| %>
+  <tr>
+    <td>
+      <% if ticket.account %>
+        <%= partial :'accounts/account', locals: { account: ticket.account, show_email: ticket_email_viewer?(ticket) } %>
+        <% if ticket.name || (ticket.email && ticket_email_viewer?(ticket)) %>
+          <div class="mt-1">
+            ordered for
+            <% if ticket.name %>
+              <br />
+              <strong><%= ticket.name %></strong>
+            <% end %>
+            <% if ticket.email && ticket_email_viewer?(ticket) %>
+              <br />
+              <small><%=ticket.email %></small>
+            <% end %>
+          </div>
+        <% end %>
+      <% else %>
+        <em class="text-muted">(deleted account)</em>
+      <% end %>
+    </td>
+    <td>
+      <%= ticket.ticket_type.try(:name) %>
+    </td>
+    <td nowrap>
+      <abbr title="<%= ticket.id %>" data-toggle="tooltip">
+        <%= ticket.id.to_s[0..3] %>&hellip;<%= ticket.id.to_s[-4..-1] %>
+      </abbr>
+    </td>
+    <td data-sort="<%= ticket.created_at.iso8601 %>">
+      <%= ticket.created_at %>
+    </td>
+    <td>
+      <div data-pagelet-url="/events/<%= @event.id %>/check_in_toggle/<%= ticket.id %>">
+        <%= partial :'events/check_in_toggle', locals: { ticket: ticket } %>
+      </div>
+    </td>
+  </tr>
+  <% } %>
+</table>
+<%= will_paginate @tickets, renderer: WillPaginate::ViewHelpers::BootstrapRenderer %>

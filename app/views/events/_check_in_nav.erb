@@ -1,0 +1,6 @@
+<div class="nav-wrapper mb-3">
+  <ul class="nav nav-tabs" role="tablist">
+    <li role="presentation" class="nav-item"><a class="nav-link <%= 'active' if request.path == "/e/#{@event.slug}/check_in" %>" href="/e/<%=@event.slug%>/check_in">Check-in scanner</a></li>
+    <li role="presentation" class="nav-item"><a class="nav-link <%= 'active' if request.path == "/e/#{@event.slug}/check_in_list" %>" href="/e/<%=@event.slug%>/check_in_list">Check-in list</a></li>
+  </ul>
+</div>

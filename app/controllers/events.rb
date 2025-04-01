@@ -319,40 +319,6 @@ Dandelion::App.controller do
     end
   end
 
-  get '/events/:id/check_in' do
-    @event = Event.find(params[:id]) || not_found
-    event_admins_only!
-    erb :'events/check_in'
-  end
-
-  get '/events/:id/check_in_toggle/:ticket_id' do
-    @event = Event.find(params[:id]) || not_found
-    event_admins_only!
-    ticket = @event.tickets.complete.find(params[:ticket_id])
-    partial :'events/check_in_toggle', locals: { ticket: ticket }
-  end
-
-  post '/events/:id/check_in/:ticket_id' do
-    @event = Event.find(params[:id]) || not_found
-    event_admins_only!
-    ticket = @event.tickets.complete.find(params[:ticket_id])
-    if !ticket
-      403
-    elsif params[:checked_in] && ticket.checked_in
-      409
-    elsif !params[:checked_in] && !ticket.checked_in
-      409
-    else
-      if params[:checked_in]
-        ticket.update_attribute(:checked_in, true)
-        ticket.update_attribute(:checked_in_at, Time.now)
-      else
-        ticket.update_attribute(:checked_in, nil)
-      end
-      ticket.account ? ticket.account.name : ''
-    end
-  end
-
   get '/events/:id/ticket_email' do
     @event = Event.find(params[:id]) || not_found
     event_admins_only!
