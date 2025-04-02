@@ -95,7 +95,7 @@
           <% else %>
             <% y << capture do %>
               <% if @membership.admin? %>
-                <a class="mr-1" href="/g/<%= @gathering.slug %>/optionships/<%= optionship.id %>/edit"><img data-toggle="tooltip" title="<%== Sanitize.fragment(account.name) %>" style="width: 50px;" src="<%= u account.picture_thumb_or_gravatar_url %>"></a>
+                <a class="mr-1" href="/g/<%= @gathering.slug %>/optionships/<%= optionship.id %>/edit"><img data-toggle="tooltip" title="<%== Sanitize.fragment(account.name) %>" style="width: 50px;" src="<%= u account.image_thumb_or_gravatar_url %>"></a>
               <% else %>
                 <%= partial :'accounts/square', locals: { account: account, width: '50px' } %>
               <% end %>

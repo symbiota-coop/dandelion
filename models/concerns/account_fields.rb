@@ -21,7 +21,7 @@ module AccountFields
     field :dietary_requirements, type: String
     field :time_zone, type: String
     field :crypted_password, type: String
-    field :picture_uid, type: String
+    field :image_uid, type: String
     field :sign_ins_count, type: Integer
     field :sign_in_token, type: String
     index({ sign_in_token: 1 })
@@ -97,7 +97,7 @@ module AccountFields
         sexuality: :select,
         date_of_birth: :date,
         dietary_requirements: :text,
-        picture: :image,
+        image: :image,
         can_message: :check_box,
         email_confirmed: :check_box,
         admin: :check_box,
@@ -129,7 +129,7 @@ module AccountFields
     def human_attribute_name(attr, options = {})
       {
         name: 'Full name',
-        picture: 'Photo',
+        image: 'Photo',
         unsubscribed: 'Opt out of all emails from Dandelion',
         unsubscribed_messages: 'Opt out of email notifications of direct messages',
         unsubscribed_feedback: 'Opt out of requests for feedback',

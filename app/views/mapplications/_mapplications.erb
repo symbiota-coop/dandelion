@@ -6,8 +6,8 @@
 
 <% if params[:view] == 'pictures' %>
   <div class="row mt-3">
-    <% (Account.and(:id.in => @mapplications.pluck(:account_id)).and(:picture_uid.ne => nil).shuffle + Account.and(:id.in => @mapplications.pluck(:account_id)).and(picture_uid: nil).shuffle).each { |account| %>
-    <%= partial :'accounts/picture', locals: { account: account } %>
+    <% (Account.and(:id.in => @mapplications.pluck(:account_id)).and(:image_uid.ne => nil).shuffle + Account.and(:id.in => @mapplications.pluck(:account_id)).and(image_uid: nil).shuffle).each { |account| %>
+    <%= partial :'accounts/image', locals: { account: account } %>
     <% } %>
   </div>
 <% else @mapplications = @mapplications.per_page(10).page(params[:page]) %>

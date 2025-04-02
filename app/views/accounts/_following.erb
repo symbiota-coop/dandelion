@@ -9,7 +9,7 @@
 <% end %>
 
 <div class="image-wall">
-  <% accounts = accounts.order('picture_uid desc').paginate(page: params[:page], per_page: 50); accounts.each { |account| %>
+  <% accounts = accounts.order('image_uid desc').paginate(page: params[:page], per_page: 50); accounts.each { |account| %>
   <%= partial :'accounts/square', locals: { account: account, width: '50px' } %>
   <% } %>
 </div>

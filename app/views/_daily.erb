@@ -58,13 +58,13 @@ render_article("Trending events", "Create a two-paragraph summary of these trend
           f = Fragment.find_by(key: 'facilitator_feedback_counts')
           account_ids_freq = JSON.parse(f.value)
           account = Account.and(
-            :picture_uid.ne => nil,
+            :image_uid.ne => nil,
             :id.in => account_ids_freq.select { |id, freq| freq >= 20 }.map { |id, freq| id } & EventFacilitation.and(:created_at.gt => 1.year.ago).pluck(:account_id).map(&:to_s).uniq
           ).sample
         end
         %>
         <a style="text-decoration: none" href="javascript:;" data-account-username="<%= account.username %>">
-          <img class="w-100 <%= 'private' if account.private? %>" src="<%= u account.picture_thumb_or_gravatar_url %>">
+          <img class="w-100 <%= 'private' if account.private? %>" src="<%= u account.image_thumb_or_gravatar_url %>">
           <h4 class="mt-2">
             <a class="text-dark" href="/u/<%= account.username %>"><%= account.name %></a>
           </h4>

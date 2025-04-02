@@ -1,3 +1,3 @@
 <a style="text-decoration: none" href="javascript:;" data-account-username="<%= account.username %>">
-  <img class="<%= klass if defined?(klass) %>  <%= 'private' if account.private? %>" data-toggle="tooltip" title="<%== Sanitize.fragment(account.name) %><% if defined?(content) && content %>: <%= CGI.escapeHTML(content) if content %><% end %>" <% if defined?(style) %> style="<%= style %>" <% else %> style="width: <%= width %>;" <% end %> src="<%= u account.picture_thumb_or_gravatar_url %>">
+  <img class="<%= klass if defined?(klass) %>  <%= 'private' if account.private? %>" data-toggle="tooltip" title="<%== Sanitize.fragment(account.name) %><% if defined?(content) && content %>: <%= CGI.escapeHTML(content) if content %><% end %>" <% if defined?(style) %> style="<%= style %>" <% else %> style="width: <%= width %>;" <% end %> src="<%= u account.image_thumb_or_gravatar_url %>">
 </a>

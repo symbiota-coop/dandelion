@@ -73,8 +73,8 @@
 
 <% case (params[:view] || 'details'); when 'pictures' %>
   <div class="row mt-3">
-    <% (Account.and(:id.in => @memberships.pluck(:account_id)).and(:picture_uid.ne => nil).shuffle + Account.and(:id.in => @memberships.pluck(:account_id)).and(picture_uid: nil).shuffle).each { |account| %>
-    <%= partial :'accounts/picture', locals: { account: account } %>
+    <% (Account.and(:id.in => @memberships.pluck(:account_id)).and(:image_uid.ne => nil).shuffle + Account.and(:id.in => @memberships.pluck(:account_id)).and(image_uid: nil).shuffle).each { |account| %>
+    <%= partial :'accounts/image', locals: { account: account } %>
     <% } %>
   </div>
 <% when 'dietary_requirements' %>

@@ -18,7 +18,7 @@ module TicketNotifications
     batch_message.subject(event.ticket_email_title || "Ticket to #{event.name}")
 
     if event.organisation.send_ticket_emails_from_organisation && event.organisation.reply_to && event.organisation.image
-      header_image_url = event.organisation.image.url
+      header_image_url = event.organisation.image.thumb('1920x1920').url
       batch_message.from event.organisation.reply_to
       batch_message.reply_to event.email
     else

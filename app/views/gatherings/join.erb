@@ -32,7 +32,7 @@
         <% if !current_account or @membership %>
           <%= f.text_block :name %>
           <%= f.email_block :email %>
-          <%= f.image_block :picture %>
+          <%= f.image_block :image %>
         <% end %>
         <% @gathering.joining_questions_a.each_with_index { |q,i| %>
         <div class="form-group">

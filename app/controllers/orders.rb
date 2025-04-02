@@ -195,7 +195,7 @@ Dandelion::App.controller do
                  .gsub('%recipient.token%', @order.account.sign_in_token)
 
     header_image_url = if event.organisation.send_ticket_emails_from_organisation && event.organisation.reply_to && event.organisation.image
-                         event.organisation.image.url
+                         event.organisation.image.thumb('1920x1920').url
                        else
                          "#{ENV['BASE_URI']}/images/black-on-transparent-sq.png"
                        end

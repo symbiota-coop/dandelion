@@ -36,15 +36,15 @@ module AccountValidation
       self.sign_ins_count = 0 unless sign_ins_count
       self.number_at_this_location = 0 unless number_at_this_location
 
-      if picture
+      if image
         begin
-          if picture.image?
-            picture.name = "#{SecureRandom.uuid}.#{picture.format}"
+          if image.image?
+            image.name = "#{SecureRandom.uuid}.#{image.format}"
           else
-            self.picture = nil
+            self.image = nil
           end
         rescue StandardError
-          self.picture = nil
+          self.image = nil
         end
       end
 

@@ -4,7 +4,7 @@ module ImageWithValidation
   included do
     dragonfly_accessor :image do
       after_assign do |attachment|
-        attachment.process!(:thumb, '2048x2048>') if attachment.image?
+        attachment.process!(:thumb, '1920x1920>') if attachment.image?
       end
     end
 

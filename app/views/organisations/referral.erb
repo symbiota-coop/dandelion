@@ -6,7 +6,7 @@
     <br>
     <strong><%= @organisation.name %></strong>
   </h2>
-  <img title="<%= @account.name %>" class="rounded-circle my-3" style="width: 200px; background: white; border: 3px solid white" src="<%= u @account.picture_thumb_or_gravatar_url %>">
+  <img title="<%= @account.name %>" class="rounded-circle my-3" style="width: 200px; background: white; border: 3px solid white" src="<%= u @account.image_thumb_or_gravatar_url %>">
 </div>
 <% if params[:registered] %>
   <div class="row justify-content-center">

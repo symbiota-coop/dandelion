@@ -1,9 +1,9 @@
 <% account = membership.account %>
 <td>
   <%= partial :'accounts/account', object: account, locals: { membership: membership, show_email: viewable?(account, :email) } %>
-  <% if admin? && !account.picture %>
-    <% form_tag "/accounts/#{account.id}/picture", multipart: true do %>
-      <%= file_field_tag :picture, onchange: 'this.form.submit()' %>
+  <% if admin? && !account.image %>
+    <% form_tag "/accounts/#{account.id}/image", multipart: true do %>
+      <%= file_field_tag :image, onchange: 'this.form.submit()' %>
     <% end %>
   <% end %>
   <div>

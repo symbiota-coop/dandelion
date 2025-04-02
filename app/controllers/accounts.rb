@@ -97,7 +97,7 @@ Dandelion::App.controller do
     if session['omniauth.auth']
       @provider = Provider.object(session['omniauth.auth']['provider'])
       @account.provider_links.build(provider: @provider.display_name, provider_uid: session['omniauth.auth']['uid'], omniauth_hash: session['omniauth.auth'])
-      # @account.picture_url = @provider.image.call(session['omniauth.auth']) unless @account.picture
+      # @account.image_url = @provider.image.call(session['omniauth.auth']) unless @account.image
     end
 
     if @account.save
@@ -367,11 +367,11 @@ Dandelion::App.controller do
     partial :'accounts/following', locals: { accounts: @account.followers }
   end
 
-  get '/accounts/use_picture/:provider' do
+  get '/accounts/use_image/:provider' do
     sign_in_required!
     @provider = Provider.object(params[:provider])
     @account = current_account
-    @account.picture_url = @provider.image.call(@account.provider_links.find_by(provider: @provider.display_name).omniauth_hash)
+    @account.image_url = @provider.image.call(@account.provider_links.find_by(provider: @provider.display_name).omniauth_hash)
     if @account.save
       flash[:notice] = "<i class=\"#{@provider.icon}\"></i> Grabbed your picture!"
       redirect '/accounts/edit'
@@ -415,10 +415,10 @@ Dandelion::App.controller do
     end
   end
 
-  post '/accounts/:id/picture' do
+  post '/accounts/:id/image' do
     admins_only!
     @account = Account.find(params[:id]) || not_found
-    @account.update_attribute(:picture, params[:picture])
+    @account.update_attribute(:image, params[:image])
     redirect back
   end
 

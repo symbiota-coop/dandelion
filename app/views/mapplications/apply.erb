@@ -48,7 +48,7 @@
         <% if !current_account || @membership %>
           <%= f.text_block :name %>
           <%= f.email_block :email %>
-          <%= f.image_block :picture %>
+          <%= f.image_block :image %>
         <% end %>
         <% @gathering.application_questions_a.each_with_index { |q,i| %>
         <div class="form-group">

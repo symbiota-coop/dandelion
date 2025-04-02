@@ -3,7 +3,7 @@ class Account
   include Mongoid::Timestamps
   extend Dragonfly::Model
 
-  dragonfly_accessor :picture
+  dragonfly_accessor :image
 
   include AccountFields
   include AccountAssociations
@@ -77,9 +77,9 @@ class Account
     o.empty? ? nil : o
   end
 
-  def picture_thumb_or_gravatar_url
-    if picture
-      picture.thumb('400x400#').url
+  def image_thumb_or_gravatar_url
+    if image
+      image.thumb('400x400#').url
     else
       (Padrino.env == :development ? '/images/silhouette.png' : "https://www.gravatar.com/avatar/#{Digest::MD5.hexdigest(email.downcase)}?s=400&d=#{Addressable::URI.escape("#{ENV['BASE_URI']}/images/silhouette.png")}")
     end

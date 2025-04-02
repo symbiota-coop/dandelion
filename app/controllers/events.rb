@@ -210,7 +210,7 @@ Dandelion::App.controller do
       @event_image = @event.image.thumb('1920x1920')
       @og_image = @event.image.thumb('1920x1920').url
     elsif @event.organisation && @event.organisation.image
-      @og_image = @event.organisation.image.url
+      @og_image = @event.organisation.image.thumb('1920x1920').url
     end
     @event_video = @event.video if @event.video
     @event_video = cohostship.video if cohostship && cohostship.video

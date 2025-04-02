@@ -1,22 +1,22 @@
 <% 
-picture_accounts = @event.public_attendees.and(:picture_uid.ne => nil)
-picture_accounts_count = picture_accounts.count
-no_picture_accounts = @event.attendees.and(:id.nin => picture_accounts.pluck(:id))
-others_count = no_picture_accounts.count + (@event.tickets.complete.and(:email.ne => nil).pluck(:email).map(&:downcase) - @event.attendees.pluck(:email).map(&:downcase)).length
+image_accounts = @event.public_attendees.and(:image_uid.ne => nil)
+image_accounts_count = image_accounts.count
+no_image_accounts = @event.attendees.and(:id.nin => image_accounts.pluck(:id))
+others_count = no_image_accounts.count + (@event.tickets.complete.and(:email.ne => nil).pluck(:email).map(&:downcase) - @event.attendees.pluck(:email).map(&:downcase)).length
 %>
-<% if (@event.organisation && (picture_accounts_count + others_count) > 0) %>
+<% if (@event.organisation && (image_accounts_count + others_count) > 0) %>
   <div class="image-wall">
-    <% picture_accounts.each { |account| %>
+    <% image_accounts.each { |account| %>
     <%= partial :'accounts/square', locals: { account: account, width: '50px' } %>
     <% };  %>
     <% if others_count > 0 %>
-      <% if picture_accounts_count == 0 %>
+      <% if image_accounts_count == 0 %>
         <% if others_count < 10 %>
           &lt; 10 people
         <% else %>
           <%=others_count %>+ people
         <% end %>
-      <% elsif picture_accounts_count > 0 %>
+      <% elsif image_accounts_count > 0 %>
         <% if others_count < 10 %>
           + others
         <% else %>
@@ -29,7 +29,7 @@ others_count = no_picture_accounts.count + (@event.tickets.complete.and(:email.n
     <% if @event.tickets.complete.and(account: current_account).all? { |ticket| ticket.show_attendance? } %>
       <a class="pagelet-trigger mb-1" href="/events/<%= @event.id %>/hide_attendance">Hide attendance</a>
     <% else %>
-      <% if current_account.picture %>
+      <% if current_account.image %>
         <a class="pagelet-trigger mb-1" href="/events/<%= @event.id %>/show_attendance">Show your attendance</a>
       <% else %>
         <a href="/accounts/edit" onclick="alert('Please first upload a profile photo');">Show your attendance</a>

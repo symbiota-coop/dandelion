@@ -47,7 +47,7 @@ Dandelion::App.controller do
     redirect "/g/#{@gathering.slug}/apply" unless @gathering.privacy == 'open'
     @title = @gathering.name
     @og_desc = "#{@gathering.name} is being co-created on Dandelion"
-    @og_image = @gathering.image.url if @gathering.image
+    @og_image = @gathering.image.thumb('1920x1920').url if @gathering.image
     @account = Account.new
     erb :'gatherings/join'
   end
