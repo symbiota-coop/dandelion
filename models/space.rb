@@ -3,6 +3,8 @@ class Space
   include Mongoid::Timestamps
   extend Dragonfly::Model
 
+  include ImageWithValidation
+
   belongs_to :timetable, index: true
   belongs_to :gathering, index: true
 
@@ -18,22 +20,6 @@ class Space
       timetable_id: :lookup,
       gathering_id: :lookup
     }
-  end
-
-  dragonfly_accessor :image
-  before_validation do
-    if image
-      begin
-        if %w[jpeg png gif pam webp].include?(image.format)
-          image.name = "#{SecureRandom.uuid}.#{image.format}"
-        else
-          errors.add(:image, 'must be an image')
-        end
-      rescue StandardError
-        self.image = nil
-        errors.add(:image, 'must be an image')
-      end
-    end
   end
 
   has_many :tactivities, dependent: :nullify

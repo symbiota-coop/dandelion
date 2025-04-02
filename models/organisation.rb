@@ -14,6 +14,7 @@ class Organisation
   include EvmTransactions
   include StripeWebhooks
   include ImportFromCsv
+  include ImageWithValidation
 
   def self.fs(slug)
     find_by(slug: slug)

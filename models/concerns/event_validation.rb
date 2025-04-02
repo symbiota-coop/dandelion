@@ -85,17 +85,6 @@ module EventValidation
 
       if image
         begin
-          if %w[jpeg png gif pam webp].include?(image.format)
-            image.name = "#{SecureRandom.uuid}.#{image.format}"
-          else
-            errors.add(:image, 'must be an image')
-          end
-        rescue StandardError
-          self.image = nil
-          errors.add(:image, 'must be an image')
-        end
-
-        begin
           self.image = image.encode('jpg') if image && !%w[jpg jpeg].include?(image.format)
         rescue StandardError
           self.image = nil

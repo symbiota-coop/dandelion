@@ -16,6 +16,9 @@ class Upload
     }
   end
 
-  # Dragonfly
-  dragonfly_accessor :file
+  dragonfly_accessor :file do
+    after_assign do |attachment|
+      attachment.process!(:thumb, '2048x2048>') if attachment.image?
+    end
+  end
 end

@@ -3,6 +3,8 @@ class Tactivity
   include Mongoid::Timestamps
   extend Dragonfly::Model
 
+  include ImageWithValidation
+
   belongs_to :timetable, index: true
   belongs_to :account, class_name: 'Account', inverse_of: :tactivities, index: true
   belongs_to :gathering, index: true
@@ -50,22 +52,6 @@ class Tactivity
 
     self.space = nil if tslot.nil?
     self.tslot = nil if space.nil?
-  end
-
-  dragonfly_accessor :image
-  before_validation do
-    if image
-      begin
-        if %w[jpeg png gif pam webp].include?(image.format)
-          image.name = "#{SecureRandom.uuid}.#{image.format}"
-        else
-          errors.add(:image, 'must be an image')
-        end
-      rescue StandardError
-        self.image = nil
-        errors.add(:image, 'must be an image')
-      end
-    end
   end
 
   validates_presence_of :name

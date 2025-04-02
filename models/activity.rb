@@ -6,6 +6,7 @@ class Activity
   include ActivityFeedbackSummaries
   include ImportFromCsv
   include SendFollowersCsv
+  include ImageWithValidation
 
   belongs_to :organisation, index: true
   belongs_to :account, index: true, optional: true
@@ -59,22 +60,6 @@ class Activity
 
   def event_tags
     EventTag.and(:id.in => EventTagship.and(:event_id.in => events.pluck(:id)).pluck(:event_tag_id))
-  end
-
-  dragonfly_accessor :image
-  before_validation do
-    if image
-      begin
-        if %w[jpeg png gif pam webp].include?(image.format)
-          image.name = "#{SecureRandom.uuid}.#{image.format}"
-        else
-          errors.add(:image, 'must be an image')
-        end
-      rescue StandardError
-        self.image = nil
-        errors.add(:image, 'must be an image')
-      end
-    end
   end
 
   has_many :activity_tagships, dependent: :destroy

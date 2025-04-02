@@ -8,6 +8,7 @@ class Gathering
   include Geocoded
   include EvmTransactions
   include StripeWebhooks
+  include ImageWithValidation
 
   def self.fs(slug)
     find_by(slug: slug)
@@ -46,19 +47,6 @@ class Gathering
     errors.add(:stripe_sk, 'must start with sk_') if stripe_sk && !stripe_sk.starts_with?('sk_')
     errors.add(:stripe_pk, 'must start with pk_') if stripe_pk && !stripe_pk.starts_with?('pk_')
     errors.add(:stripe_sk, 'must be present if Stripe public key is present') if stripe_pk && !stripe_sk
-
-    if image
-      begin
-        if %w[jpeg png gif pam webp].include?(image.format)
-          image.name = "#{SecureRandom.uuid}.#{image.format}"
-        else
-          errors.add(:image, 'must be an image')
-        end
-      rescue StandardError
-        self.image = nil
-        errors.add(:image, 'must be an image')
-      end
-    end
 
     self.listed = nil if privacy == 'secret'
     self.balance = 0 if balance.nil?

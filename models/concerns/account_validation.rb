@@ -38,7 +38,7 @@ module AccountValidation
 
       if picture
         begin
-          if %w[jpeg png gif pam webp].include?(picture.format)
+          if picture.image?
             picture.name = "#{SecureRandom.uuid}.#{picture.format}"
           else
             self.picture = nil

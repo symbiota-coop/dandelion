@@ -2,8 +2,6 @@ module GatheringFields
   extend ActiveSupport::Concern
 
   included do
-    dragonfly_accessor :image
-
     field :name, type: String
     field :slug, type: String
     field :location, type: String

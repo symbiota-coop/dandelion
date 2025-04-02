@@ -3,6 +3,8 @@ class Cohostship
   include Mongoid::Timestamps
   extend Dragonfly::Model
 
+  include ImageWithValidation
+
   belongs_to :event, index: true
   belongs_to :organisation, index: true
 
@@ -20,19 +22,8 @@ class Cohostship
 
   dragonfly_accessor :video
 
-  dragonfly_accessor :image
   before_validation do
     if image
-      begin
-        if %w[jpeg png gif pam webp].include?(image.format)
-          image.name = "#{SecureRandom.uuid}.#{image.format}"
-        else
-          errors.add(:image, 'must be an image')
-        end
-      rescue StandardError
-        self.image = nil
-        errors.add(:image, 'must be an image')
-      end
 
       begin
         self.image = image.encode('jpg') if image && !%w[jpg jpeg].include?(image.format)

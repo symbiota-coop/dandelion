@@ -2,9 +2,6 @@ module EventFields
   extend ActiveSupport::Concern
 
   included do
-    dragonfly_accessor :video
-    dragonfly_accessor :image
-
     attr_accessor :prevent_notifications, :update_tag_names, :tag_names, :duplicate
 
     field :name, type: String

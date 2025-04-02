@@ -4,6 +4,8 @@ class Event
   include Mongoid::Paranoia
   extend Dragonfly::Model
 
+  dragonfly_accessor :video
+
   include EventFields
   include EventAssociations
   include EventCallbacks
@@ -15,6 +17,7 @@ class Event
   include EventValidation
   include EventAccessControl
   include Geocoded
+  include ImageWithValidation
 
   def self.fs(slug)
     find_by(slug: slug)

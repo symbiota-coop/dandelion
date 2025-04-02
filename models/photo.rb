@@ -3,6 +3,8 @@ class Photo
   include Mongoid::Timestamps
   extend Dragonfly::Model
 
+  include ImageWithValidation
+
   belongs_to :photoable, polymorphic: true, index: true
   belongs_to :account, index: true
 
@@ -18,22 +20,6 @@ class Photo
 
   def self.photoables
     %w[Gathering Comment TicketType]
-  end
-
-  dragonfly_accessor :image
-  before_validation do
-    if image
-      begin
-        if %w[jpeg png gif pam webp].include?(image.format)
-          image.name = "#{SecureRandom.uuid}.#{image.format}"
-        else
-          errors.add(:image, 'must be an image')
-        end
-      rescue StandardError
-        self.image = nil
-        errors.add(:image, 'must be an image')
-      end
-    end
   end
 
   def url

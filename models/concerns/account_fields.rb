@@ -2,8 +2,6 @@ module AccountFields
   extend ActiveSupport::Concern
 
   included do
-    dragonfly_accessor :picture
-
     attr_accessor :password, :postcode, :country, :skip_confirmation_email, :gc_plan_id
 
     field :name, type: String
