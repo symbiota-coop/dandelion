@@ -213,8 +213,13 @@ markers = {
   <% elsif defined?(bounds) && bounds %>
       map.fitBounds({south: <%= bounds[:south] %>, west: <%= bounds[:west] %>, north: <%= bounds[:north] %>, east: <%= bounds[:east] %>});
   <% elsif (!defined?(points) || points.empty? || (defined?(points_count) && points_count > points_limit)) && (!defined?(polygonables) || polygonables.empty?) %>
-      map.setCenter(new google.maps.LatLng(35, 0));
-      map.setZoom(2)
+      <% if current_account && current_account.coordinates %>
+        map.setCenter(new google.maps.LatLng(<%= current_account.lat %>, <%= current_account.lng %>));
+        map.setZoom(7);
+      <% else %>
+        map.setCenter(new google.maps.LatLng(35, 0));
+        map.setZoom(2);
+      <% end %>
   <% else %>
       map.fitBounds(bounds);
   <% end %>
