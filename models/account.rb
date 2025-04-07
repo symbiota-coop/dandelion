@@ -49,6 +49,44 @@ class Account
     SecureRandom.uuid.delete('-')
   end
 
+  def merge(account_to_destroy)
+    # Don't allow merging with self
+    return if id == account_to_destroy.id
+
+    # Transfer all has_many associations using reflection
+    self.class.reflect_on_all_associations(:has_many).each do |association|
+      foreign_key = association.foreign_key
+
+      # Handle associations with different naming patterns
+      if association.options[:inverse_of]
+        # For associations with explicit inverse_of
+        foreign_key = "#{association.options[:inverse_of]}_id"
+      elsif association.options[:as]
+        # For polymorphic associations
+        type_key = "#{association.options[:as]}_type"
+        id_key = "#{association.options[:as]}_id"
+
+        # Update the polymorphic association
+        klass = association.klass
+        if klass.respond_to?(:unscoped)
+          klass.unscoped.where(type_key => account_to_destroy.class.name, id_key => account_to_destroy.id)
+               .update_all(id_key => id)
+        end
+        next
+      end
+
+      # Get the target collection and update foreign keys
+      target_collection = account_to_destroy.send(association.name)
+      target_collection.update_all(foreign_key => id) if target_collection.respond_to?(:update_all)
+    end
+
+    # Delete the other account
+    account_to_destroy.destroy
+
+    # Return self for method chaining
+    self
+  end
+
   def calculate_tokens
     orders.and(:value.ne => nil, :currency.in => MAJOR_CURRENCIES).sum { |o| Math.sqrt(Money.new(o.value * 100, o.currency).exchange_to('GBP').cents) } +
       Order.and(:event_id.in => events_revenue_sharing.pluck(:id), :value.ne => nil, :currency.in => MAJOR_CURRENCIES).sum { |o| 0.25 * Math.sqrt(Money.new(o.value * 100, o.currency).exchange_to('GBP').cents) } +
