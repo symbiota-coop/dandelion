@@ -1,15 +1,15 @@
 namespace :hourly do
   task errands: :environment do
+    puts 'delete stale uncompleted orders'
+    Order.incomplete.and(:created_at.lt => 1.hour.ago).destroy_all
     puts 'check for payments'
     Organisation.and(:evm_address.ne => nil).each do |organisation|
       organisation.check_evm_account if Order.and(:payment_completed.ne => true, :evm_secret.ne => nil, :event_id.in => organisation.events.pluck(:id)).count > 0
     end
-    Event.live.and(:oc_slug.ne => nil).each do |event|
-      event.check_oc_event if event.orders.and(:payment_completed.ne => true, :oc_secret.ne => nil, :event_id => event.id).count > 0
-    end
+    # Event.live.and(:oc_slug.ne => nil).each do |event|
+    #   event.check_oc_event if event.orders.and(:payment_completed.ne => true, :oc_secret.ne => nil, :event_id => event.id).count > 0
+    # end
     Gathering.and(:evm_address.ne => nil).each(&:check_evm_account)
-    puts 'delete stale uncompleted orders'
-    Order.incomplete.and(:created_at.lt => 1.hour.ago).destroy_all
   end
 end
 
