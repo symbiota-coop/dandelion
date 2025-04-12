@@ -85,17 +85,14 @@ module EventValidation
 
       if image
         begin
-          self.image = image.encode('jpg') if image && !%w[jpg jpeg].include?(image.format)
+          errors.add(:image, 'must be at least 992px wide') if image && image.width < 800 # legacy images are 800px
+          errors.add(:image, 'must be more wide than high') if image && image.height > image.width
+
+          errors.add(:image, "must be #{organisation.event_image_required_width}px wide") if organisation && organisation.event_image_required_width && !(image && image.width == organisation.event_image_required_width)
+          errors.add(:image, "must be #{organisation.event_image_required_height}px high") if organisation && organisation.event_image_required_height && !(image && image.height == organisation.event_image_required_height)
         rescue StandardError
           self.image = nil
         end
-
-        errors.add(:image, 'must be at least 992px wide') if image && image.width < 800 # legacy images are 800px
-        errors.add(:image, 'must be more wide than high') if image && image.height > image.width
-
-        errors.add(:image, "must be #{organisation.event_image_required_width}px wide") if organisation && organisation.event_image_required_width && !(image && image.width == organisation.event_image_required_width)
-        errors.add(:image, "must be #{organisation.event_image_required_height}px high") if organisation && organisation.event_image_required_height && !(image && image.height == organisation.event_image_required_height)
-
       end
     end
 

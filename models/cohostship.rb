@@ -24,16 +24,12 @@ class Cohostship
 
   before_validation do
     if image
-
       begin
-        self.image = image.encode('jpg') if image && !%w[jpg jpeg].include?(image.format)
+        errors.add(:image, 'must be at least 992px wide') if image && image.width < 800 # legacy images are 800px
+        errors.add(:image, 'must be more wide than high') if image && image.height > image.width
       rescue StandardError
         self.image = nil
       end
-
-      errors.add(:image, 'must be at least 992px wide') if image && image.width < 800 # legacy images are 800px
-      errors.add(:image, 'must be more wide than high') if image && image.height > image.width
-
     end
   end
 
