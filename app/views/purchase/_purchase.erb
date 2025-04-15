@@ -157,6 +157,7 @@ end
         <%= f.text_block :hear_about %>
       <% end %>
       <%= f.hidden_field :http_referrer, value: request.referrer %>
+      <%= f.hidden_field :via, value: params[:via] %>
 
       <% @event.questions_a.each_with_index { |q,i| %>
       <div class="form-group links-blank">

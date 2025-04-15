@@ -38,6 +38,7 @@ Dandelion::App.controller do
         opt_in_organisation: order.opt_in_organisation,
         opt_in_facilitator: order.opt_in_facilitator,
         hear_about: order.hear_about,
+        via: order.via,
         answers: order.answers,
         created_at: order.created_at.iso8601
       }

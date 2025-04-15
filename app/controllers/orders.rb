@@ -15,7 +15,7 @@ Dandelion::App.controller do
       erb :'organisations/orders'
     when :csv
       CSV.generate do |csv|
-        row = %w[name firstname lastname email value discounted_ticket_revenue donation_revenue currency opt_in_organisation opt_in_facilitator hear_about created_at]
+        row = %w[name firstname lastname email value discounted_ticket_revenue donation_revenue currency opt_in_organisation opt_in_facilitator hear_about via created_at]
         csv << row
         @orders.each do |order|
           row = [
@@ -34,6 +34,7 @@ Dandelion::App.controller do
             order.opt_in_organisation,
             order.opt_in_facilitator,
             order.hear_about,
+            order.via,
             order.created_at.to_fs(:db_local)
           ]
           csv << row
@@ -61,7 +62,7 @@ Dandelion::App.controller do
       end
     when :csv
       CSV.generate do |csv|
-        row = %w[name firstname lastname email value discounted_ticket_revenue donation_revenue currency opt_in_organisation opt_in_facilitator hear_about created_at]
+        row = %w[name firstname lastname email value discounted_ticket_revenue donation_revenue currency opt_in_organisation opt_in_facilitator hear_about via created_at]
         @event.questions_a.each { |q| row << q }
         csv << row
         @orders.each do |order|
@@ -81,6 +82,7 @@ Dandelion::App.controller do
             order.opt_in_organisation,
             order.opt_in_facilitator,
             order.hear_about,
+            order.via,
             order.created_at.to_fs(:db_local)
           ]
           @event.questions_a.each { |q| row << order.answers.to_h[q] } if order.answers

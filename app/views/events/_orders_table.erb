@@ -150,6 +150,9 @@
       <% if order.hear_about %>
         <%= order.hear_about %><br />
       <% end %>
+      <% if order.via %>
+        <%= order.via %><br />
+      <% end %>
       <% if order.affiliate; if order.affiliate.is_a?(Account) %>
         <a href="/u/<%= order.affiliate.username %>"><%= order.affiliate.name %></a><br />
       <% elsif order.affiliate.is_a?(Organisation) %>

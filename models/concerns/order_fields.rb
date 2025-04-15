@@ -25,6 +25,7 @@ module OrderFields
     field :fixed_discount_applied, type: Float
     field :organisation_revenue_share, type: Float
     field :hear_about, type: String
+    field :via, type: String
     field :http_referrer, type: String
     field :message_ids, type: String
     field :answers, type: Array

@@ -39,6 +39,7 @@ Dandelion::App.controller do
         opt_in_organisation: detailsForm[:account][:opt_in_organisation] == '1' || (detailsForm[:account][:opt_in_organisation].is_a?(Array) && detailsForm[:account][:opt_in_organisation].include?('1')),
         opt_in_facilitator: detailsForm[:account][:opt_in_facilitator].is_a?(Array) && detailsForm[:account][:opt_in_facilitator].include?('1'),
         hear_about: detailsForm[:account][:hear_about],
+        via: detailsForm[:account][:via],
         gc_plan_id: detailsForm[:account][:gc_plan_id],
         gc_given_name: detailsForm[:account][:gc_given_name],
         gc_family_name: detailsForm[:account][:gc_family_name],
