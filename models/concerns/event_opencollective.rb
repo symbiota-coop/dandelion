@@ -41,7 +41,7 @@ module EventOpenCollective
       end
 
       j = JSON.parse(response.body)
-      j['data']['orders']['nodes'].each do |item|
+      (j.dig('data', 'orders', 'nodes') || []).each do |item|
         currency = item['amount']['currency']
         amount = item['amount']['value']
         secret = item['tags'].select { |tag| tag.starts_with?('dandelion:') }.first

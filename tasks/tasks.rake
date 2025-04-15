@@ -6,9 +6,9 @@ namespace :hourly do
     Organisation.and(:evm_address.ne => nil).each do |organisation|
       organisation.check_evm_account if Order.and(:payment_completed.ne => true, :evm_secret.ne => nil, :event_id.in => organisation.events.pluck(:id)).count > 0
     end
-    # Event.live.and(:oc_slug.ne => nil).each do |event|
-    #   event.check_oc_event if event.orders.and(:payment_completed.ne => true, :oc_secret.ne => nil, :event_id => event.id).count > 0
-    # end
+    Event.live.and(:oc_slug.ne => nil).each do |event|
+      event.check_oc_event if event.orders.and(:payment_completed.ne => true, :oc_secret.ne => nil, :event_id => event.id).count > 0
+    end
     Gathering.and(:evm_address.ne => nil).each(&:check_evm_account)
   end
 end
