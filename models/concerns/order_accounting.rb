@@ -50,7 +50,7 @@ module OrderAccounting
   end
 
   def credit_on_behalf_of_revenue_sharer
-    o.credit_applied * ((o.discounted_ticket_revenue / (o.discounted_ticket_revenue + o.donation_revenue)) * (1 - o.organisation_revenue_share)).to_f if revenue_sharer && credit_applied && credit_applied.positive? && (discounted_ticket_revenue + donation_revenue).positive?
+    credit_applied * ((discounted_ticket_revenue / (discounted_ticket_revenue + donation_revenue)) * (1 - organisation_revenue_share)).to_f if revenue_sharer && credit_applied && credit_applied.positive? && (discounted_ticket_revenue + donation_revenue).positive?
   end
 
   def fixed_discount_on_behalf_of_organisation
