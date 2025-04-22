@@ -59,7 +59,7 @@ Dandelion::App.controller do
                                       { '$addFields' => { 'id' => { '$toString' => '$_id' } } },
                                       { '$match' => { 'id' => { '$regex' => /#{Regexp.escape(params[:q])}/i } } }
                                     ]).pluck(:id) +
-        Ticket.and(
+        Ticket.unscoped.and(
           :account_id.in => search_accounts(params[:q]).pluck(:id)
         ).pluck(:id))
     end
