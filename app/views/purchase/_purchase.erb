@@ -161,8 +161,8 @@ end
 
       <% @event.questions_a.each_with_index { |q,i| %>
       <div class="form-group links-blank">
-        <% if q.starts_with?('# ') %>
-          <label><%== Sanitize.fragment(Rinku.auto_link(q.gsub(/^# /, '')), Sanitize::Config::DANDELION) %></label>
+        <% if q =~ /^#\s*(.+)/ %>
+          <label><%== Sanitize.fragment(Rinku.auto_link($1), Sanitize::Config::DANDELION) %></label>
         <% elsif m = q.match(/\[(.*)\]/)  %>
           <div class="checkbox-inline">
             <%= check_box_tag "answers[#{i}]", id: "answers-#{i}", checked: ((params[:answers][i] == 'true') if params[:answers]), 'data-required': q.ends_with?('*') %>
