@@ -48,6 +48,7 @@ module EventDuplication
       select_tickets_intro: select_tickets_intro,
       select_tickets_outro: select_tickets_outro,
       select_tickets_title: select_tickets_title,
+      rsvp_button_text: rsvp_button_text,
       ask_hear_about: ask_hear_about,
       time_zone: time_zone,
       questions: questions,

@@ -216,7 +216,7 @@ end
       <%= partial :'purchase/gocardless_details', locals: { f: f } %>
 
       <button class="btn btn-primary btn-block mb-1" type="submit" data-payment-method="rsvp">
-        <span>RSVP</span>
+        <span><%= @event.rsvp_button_text || 'RSVP' %></span>
         <i class="bi bi-spin bi-arrow-repeat" style="display: none"></i>
       </button>
       <%= hidden_field_tag :payment_method, value: 'rsvp', disabled: true %>

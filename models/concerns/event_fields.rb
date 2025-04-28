@@ -38,6 +38,7 @@ module EventFields
     field :select_tickets_intro, type: String
     field :select_tickets_outro, type: String
     field :select_tickets_title, type: String
+    field :rsvp_button_text, type: String
     field :fixed_contribution_gbp, type: Float
     field :cap_gbp, type: Float
     field :oc_slug, type: String
@@ -74,6 +75,8 @@ module EventFields
         carousel_text: :text,
         select_tickets_intro: :text,
         select_tickets_outro: :text,
+        select_tickets_title: :text,
+        rsvp_button_text: :text,
         image: :image,
         video: :file,
         description: :wysiwyg,
@@ -148,7 +151,8 @@ module EventFields
         no_tickets_pdf: "Don't include tickets PDF in confirmation email",
         hide_few_left: "Hide 'few tickets left' labels",
         ticket_email_title: 'Order confirmation email subject',
-        ticket_email_greeting: 'Order confirmation greeting'
+        ticket_email_greeting: 'Order confirmation greeting',
+        rsvp_button_text: 'RSVP button'
       }[attr.to_sym] || super
     end
 
@@ -165,6 +169,7 @@ module EventFields
         select_tickets_title: 'Title of the Select Tickets panel (default: Select tickets)',
         select_tickets_intro: 'Text to show at the top of the Select Tickets panel',
         select_tickets_outro: 'Text to show at the bottom of the Select Tickets panel',
+        rsvp_button_text: 'Title of the RSVP button for free tickets',
         ask_hear_about: 'Ask people how they heard about the event on the order form',
         suggested_donation: 'If this is blank, the donation field will not be shown',
         extra_info_for_ticket_email: 'This is the place to enter Zoom links, directions to the venue, etc.',
