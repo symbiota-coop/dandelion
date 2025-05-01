@@ -53,6 +53,9 @@ class LocalGroup
     g['coordinates'].each do |polygon|
       polygons.build coordinates: (g['type'] == 'Polygon' ? [polygon] : polygon)
     end
+
+    # Ensure polygons were created
+    errors.add(:geometry, 'is invalid - unable to create polygons') if geometry.present? && polygons.empty?
   rescue StandardError => e
     errors.add(:geometry, e)
   end
