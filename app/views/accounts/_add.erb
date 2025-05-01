@@ -13,7 +13,7 @@
         <%= f.submit_block button_text: "Add #{role}" %>
       <% end %>
     </div>
-    <% if accounts.count > 0 %>
+    <% if accounts.count > (defined?(min_accounts) ? min_accounts : 0) %>
       <a id="remove-role" href="javascript:;" onclick="$(this).hide().next().show();
         $('#add-role').hide()"><i class="bi bi-dash-square-fill"></i></a>
       <div style="display: none">

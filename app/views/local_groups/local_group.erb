@@ -32,6 +32,7 @@
                   role: 'admin',
                   accounts: @local_group.admins.order('name asc'),
                   add_and_remove: local_group_admin?,
+                  min_accounts: 1,  
                   new_object: LocalGroupship.new,
                   new_url: "/local_groups/#{@local_group.id}/local_groupships/admin",
                   destroy_url: "/local_groups/#{@local_group.id}/local_groupships/unadmin"

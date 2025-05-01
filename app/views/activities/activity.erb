@@ -45,6 +45,7 @@
                   role: 'admin',
                   accounts: @activity.admins.order('name asc'),
                   add_and_remove: activity_admin?,
+                  min_accounts: 1,  
                   new_object: Activityship.new,
                   new_url: "/activities/#{@activity.id}/activityships/admin",
                   destroy_url: "/activities/#{@activity.id}/activityships/unadmin"

@@ -31,6 +31,7 @@
               role: 'admin',
               accounts: @organisation.admins.order('name asc'),
               add_and_remove: organisation_admin?,
+              min_accounts: 1,              
               new_object: Organisationship.new,
               new_url: "/o/#{@organisation.slug}/organisationships/admin",
               destroy_url: "/o/#{@organisation.slug}/organisationships/unadmin"
