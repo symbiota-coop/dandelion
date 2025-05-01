@@ -55,9 +55,9 @@
       <th>Value</th>
       <th>Via</th>
       <% if @event %>
+        <th>Answers</th>
         <th>Updates from organisation?</th>
         <th>Updates from facilitator?</th>
-        <th>Answers</th>
       <% end %>
       <th data-col-name="created-at">Created at</th>
       <th>Feedback</th>
@@ -175,12 +175,6 @@
     </td>
     <% if @event %>
       <td>
-        <% if order.opt_in_organisation %><i class="bi bi-check-lg"></i><% end %>
-      </td>
-      <td>
-        <% if order.opt_in_facilitator %><i class="bi bi-check-lg"></i><% end %>
-      </td>
-      <td>
         <% order.answers.each { |q,a| if q && a %>
         <p style="width: 400px">
           <strong>
@@ -201,6 +195,12 @@
           <% end %>
         </p>
       <% end } if order.answers %>
+    </td>
+    <td>
+      <% if order.opt_in_organisation %><i class="bi bi-check-lg"></i><% end %>
+    </td>
+    <td>
+      <% if order.opt_in_facilitator %><i class="bi bi-check-lg"></i><% end %>
     </td>
   <% end %>
   <td data-sort="<%= order.created_at.iso8601 %>">
