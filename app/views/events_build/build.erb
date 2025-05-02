@@ -213,6 +213,7 @@
         <% end %>
         <%= f.number_block :facebook_pixel_id %>
         <%= f.text_block :oc_slug %>
+        <%= f.text_block :tax_rate_id %>
         <% if current_account.memberships.and(admin: true).count > 0 %>
           <%= f.select_block :gathering_id, options: [''] + current_account.memberships.and(admin: true).map { |m| [m.gathering.name, m.gathering_id] }.sort_by { |a,b| a } %>
         <% end %>

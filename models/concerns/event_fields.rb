@@ -47,6 +47,7 @@ module EventFields
     field :ai_tagged, type: Mongoid::Boolean
     field :boosted, type: Mongoid::Boolean
     field :event_tags_joined, type: String
+    field :tax_rate_id, type: String
 
     field :revenue_share_to_revenue_sharer, type: Integer
     field :profit_share_to_organiser, type: Integer
@@ -152,7 +153,8 @@ module EventFields
         hide_few_left: "Hide 'few tickets left' labels",
         ticket_email_title: 'Order confirmation email subject',
         ticket_email_greeting: 'Order confirmation greeting',
-        rsvp_button_text: 'RSVP button'
+        rsvp_button_text: 'RSVP button',
+        tax_rate_id: 'Stripe tax rate ID'
       }[attr.to_sym] || super
     end
 
@@ -199,7 +201,8 @@ module EventFields
         hide_organisation_footer: 'Hide the organisation footer in the event confirmation email',
         no_tickets_pdf: 'Skip the PDF attachment in the confirmation email',
         ticket_email_title: 'Custom subject line for the order confirmation email',
-        ticket_email_greeting: 'Custom greeting for the order confirmation email'
+        ticket_email_greeting: 'Custom greeting for the order confirmation email',
+        tax_rate_id: 'Stripe tax rate ID to apply to ticket purchases'
       }
     end
 

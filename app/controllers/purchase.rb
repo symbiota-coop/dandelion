@@ -104,7 +104,8 @@ Dandelion::App.controller do
               images: [@event_image.try(:url)].compact,
               amount: (@order.total * 100).round,
               currency: @order.currency,
-              quantity: 1
+              quantity: 1,
+              tax_rates: @event.tax_rate_id || @event.organisation.tax_rate_id ? [@event.tax_rate_id || @event.organisation.tax_rate_id] : nil
             }]
           }
           payment_intent_data = {

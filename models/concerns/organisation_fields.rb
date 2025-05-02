@@ -91,6 +91,7 @@ module OrganisationFields
     field :billing_address_collection, type: Mongoid::Boolean
     field :enable_resales, type: Mongoid::Boolean
     field :fixed_contribution_gbp, type: Float
+    field :tax_rate_id, type: String
 
     field :tokens, type: Float
     index({ tokens: 1 })
@@ -197,7 +198,8 @@ module OrganisationFields
         restrict_cohosting: 'Restrict cohosting to admins',
         oc_slug: 'Open Collective slug',
         ticket_email_greeting: 'Order confirmation email greeting',
-        recording_email_greeting: 'Order confirmation email greeting for recordings of past events'
+        recording_email_greeting: 'Order confirmation email greeting for recordings of past events',
+        tax_rate_id: 'Stripe tax rate ID'
       }[attr.to_sym] || super
     end
 
@@ -232,7 +234,8 @@ module OrganisationFields
         restrict_cohosting: 'When checked, only admins can add the organisation as a co-host of events',
         oc_slug: 'Open Collective organisation slug',
         hide_ticket_revenue: 'Hide ticket revenue in event stats',
-        collect_location: 'Request the location of ticket buyers at checkout'
+        collect_location: 'Request the location of ticket buyers at checkout',
+        tax_rate_id: 'Stripe tax rate ID to apply to ticket purchases'
       }
     end
 
