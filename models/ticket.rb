@@ -184,6 +184,7 @@ class Ticket
 
     # to handle cases where there was an order-wide discount applied
     refund_amount = order ? [discounted_price, order.total].min : discounted_price
+    return if refund_amount <= 0
 
     if event.revenue_sharer_organisationship
       Stripe::Refund.create(
