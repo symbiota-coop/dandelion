@@ -70,14 +70,15 @@
           <% if organisation.stripe_customer_id %>
             Auto top-up enabled<% if organisation.card_last4 %> using card ending in <%= organisation.card_last4 %><% end %>. <a href="/organisations/<%= organisation.id %>/clear_stripe_customer_id">Click to disable</a>
           <% else %>
-            New: <a href="javascript:;" onclick="
+            <a href="javascript:;" onclick="
                $.post('/organisations/<%= organisation.id %>/stripe_setup', $(this).serializeObject(), function (data) {
                   var stripe = Stripe('<%= ENV['STRIPE_PK'] %>');
                   stripe.redirectToCheckout({sessionId: data['session_id']})                        
                 })
-        ">Enter your card details to remain automatically topped up</a>
+        ">Save time by enabling auto top-ups</a>
             <br />
-            When you fall below 80% of the suggested amount, we'll top you up to 100%.
+            When you fall below 80% of the suggested amount, we'll top you up to 100%,
+            and donations will always go to your organisation.
           <% end %>
         </p>
 
