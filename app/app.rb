@@ -40,10 +40,6 @@ module Dandelion
       redirect "#{ENV['BASE_URI']}#{request.path}#{"?#{request.query_string}" unless request.query_string.blank?}" if ENV['REDIRECT_BASE'] && ENV['BASE_URI'] && (ENV['BASE_URI'] != "#{request.scheme}://#{request.env['HTTP_HOST']}")
       set_time_zone
       fix_params!
-      @_params = params; # force controllers to inherit the fixed params
-      def params
-        @_params
-      end
       if params[:sign_in_token]
         sign_in_via_token
       elsif params[:api_key]
