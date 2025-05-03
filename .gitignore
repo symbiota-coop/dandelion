@@ -41,3 +41,4 @@ doc/
 .aider.*
 code.md
 GeoLite2-City.mmdb
+repomix-output.xml
