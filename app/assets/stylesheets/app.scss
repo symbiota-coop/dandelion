@@ -902,3 +902,16 @@ figure td {
 input[type="checkbox"] {
   accent-color: #29A95B;
 }
+
+label.remove-file,
+label.remove-image {
+  margin-top: 0.3125rem;
+  font-weight: normal
+}
+
+label.remove-file input,
+label.remove-image input {
+  position: relative;
+  top: 2px;
+  margin-left: 5px;
+}
