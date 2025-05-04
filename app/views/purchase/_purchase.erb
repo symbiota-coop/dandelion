@@ -167,12 +167,12 @@ end
           <div class="checkbox-inline">
             <%= check_box_tag "answers[#{i}]", id: "answers-#{i}", checked: ((params[:answers][i] == 'true') if params[:answers]), 'data-required': q.ends_with?('*') %>
             <label class="font-weight-bold" for="answers-<%=i%>">
-              <%== Sanitize.fragment(Rinku.auto_link(m[1]), Sanitize::Config::DANDELION) %><% if q.ends_with?('*') %>*<% end %>
+              <%== Sanitize.fragment(Rinku.auto_link(m[1]), Sanitize::Config::DANDELION) %>
             </label>
           </div>
         <% elsif m = q.match(/\{(.*)\}/)  %>
           <div class="form-group">
-            <label><%== Sanitize.fragment(Rinku.auto_link(m[1]), Sanitize::Config::DANDELION) %><% if q.ends_with?('*') %>*<% end %></label>
+            <label><%== Sanitize.fragment(Rinku.auto_link(m[1]), Sanitize::Config::DANDELION) %></label>
             <%= date_field_tag "answers[#{i}]", required: q.ends_with?('*'), class: 'form-control', value: (params[:answers][i] if params[:answers] && params[:answers][i] != '__EMPTY__') %>
           </div>
         <% else %>
