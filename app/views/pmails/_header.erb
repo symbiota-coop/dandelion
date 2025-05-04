@@ -8,7 +8,7 @@
       </div>
       <% unless @pmail.mailable.is_a?(Event) %>
         <div class="col-auto">
-          <a class="btn btn-primary" target="_blank" href="https://<%= organisation.mailgun_region == 'EU' ? 'app.eu.mailgun.com' : 'app.mailgun.com' %>/mg/sending/<%= organisation.mailgun_domain %>/analytics">
+          <a class="btn btn-primary mb-1" target="_blank" href="https://<%= organisation.mailgun_region == 'EU' ? 'app.eu.mailgun.com' : 'app.mailgun.com' %>/mg/sending/<%= organisation.mailgun_domain %>/analytics">
             <i class="bi bi-bar-chart-line-fill"></i>
             View analytics on Mailgun
           </a>
@@ -16,8 +16,8 @@
       <% end %>
     </div>
     <div class="mb-3">
-      <a class="btn btn-primary" href="/pmails/<%=@pmail.id%>" target="_blank">View</a>
-      <button type="submit" name="duplicate" value="1" class="btn btn-primary">Duplicate</button>
+      <a class="btn btn-primary mb-1" href="/pmails/<%=@pmail.id%>" target="_blank">View</a>
+      <button type="submit" name="duplicate" value="1" class="btn btn-primary mb-1">Duplicate</button>
     </div>
   <% elsif @pmail.pmail_test && @pmail.pmail_test.winner %>
     <div class="row no-gutters justify-content-between">
@@ -29,7 +29,7 @@
       </div>
       <% unless @pmail.mailable.is_a?(Event) %>
         <div class="col-auto">
-          <a class="btn btn-primary" target="_blank" href="https://<%= organisation.mailgun_region == 'EU' ? 'app.eu.mailgun.com' : 'app.mailgun.com' %>/mg/sending/<%= organisation.mailgun_domain %>/analytics">
+          <a class="btn btn-primary mb-1" target="_blank" href="https://<%= organisation.mailgun_region == 'EU' ? 'app.eu.mailgun.com' : 'app.mailgun.com' %>/mg/sending/<%= organisation.mailgun_domain %>/analytics">
             <i class="bi bi-bar-chart-line-fill"></i>
             View analytics on Mailgun
           </a>
@@ -42,13 +42,13 @@
     <% if @pmail.pmail_test %>
       <div class="row no-gutters justify-content-between">
         <div class="col">
-          <p class="lead">
+          <p class="lead mb-1">
             Part of the A/B test <a href="/pmail_tests/<%= @pmail.pmail_test.id %>?<%= @scope %>"><%= @pmail.pmail_test.name %></a>
           </p>
         </div>
         <% unless @pmail.mailable.is_a?(Event) %>
           <div class="col-auto">
-            <a class="btn btn-primary" target="_blank" href="https://<%= organisation.mailgun_region == 'EU' ? 'app.eu.mailgun.com' : 'app.mailgun.com' %>/mg/sending/<%= organisation.mailgun_domain %>/analytics">
+            <a class="btn btn-primary mb-1" target="_blank" href="https://<%= organisation.mailgun_region == 'EU' ? 'app.eu.mailgun.com' : 'app.mailgun.com' %>/mg/sending/<%= organisation.mailgun_domain %>/analytics">
               <i class="bi bi-bar-chart-line-fill"></i>
               View analytics on Mailgun
             </a>
@@ -60,10 +60,10 @@
     <% end %>
     <div class="mb-3">
       <button type="submit" name="default" style="overflow: visible !important; height: 0 !important; width: 0 !important; margin: 0 !important; border: 0 !important; padding: 0 !important; display: block !important;" value="1"></button>
-      <button type="submit" name="preview" value="1" class="btn btn-primary">Preview</button>
-      <button type="submit" name="send_test" value="1" class="btn btn-primary">Send test to <%= current_account.email %></button>
-      <button type="submit" name="send" value="1" class="btn btn-primary" data-confirm="Are you sure you want to send this mail to <%= pluralize(@pmail.send_count, 'person') %>?">Send</button>
-      <button type="submit" name="duplicate" value="1" class="btn btn-outline-primary">Duplicate</button>
+      <button type="submit" name="preview" value="1" class="btn btn-primary mb-1">Preview</button>
+      <button type="submit" name="send_test" value="1" class="btn btn-primary mb-1">Send test to <%= current_account.email %></button>
+      <button type="submit" name="send" value="1" class="btn btn-primary mb-1" data-confirm="Are you sure you want to send this mail to <%= pluralize(@pmail.send_count, 'person') %>?">Send</button>
+      <button type="submit" name="duplicate" value="1" class="btn btn-outline-primary mb-1">Duplicate</button>
     </div>
   <% end %>
 <% end %>
