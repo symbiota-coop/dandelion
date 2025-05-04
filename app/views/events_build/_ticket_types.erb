@@ -44,7 +44,7 @@
                     <%= money_symbol(f.object.currency) %>
                   </span>
                 </div>
-                <%= o.text_field :price_or_range, class: 'form-control', step: 'any', :'data-toggle' => 'tooltip', :title => 'Enter a price, a price range (two numbers separated by a dash) or leave blank to let the attendee pay as they feel' %>
+                <%= o.text_field :price_or_range, class: 'form-control', :'data-toggle' => 'tooltip', :title => 'Enter a price, a price range (two numbers separated by a dash) or leave blank to let the attendee pay as they feel' %>
                 <%= o.hidden_field :price_or_range_submitted, value: true %>
                 <div class="input-group-append">
                   <span class="input-group-text border-right-0">&times;</span>
@@ -188,7 +188,7 @@
           // Name row
           var nameRow = $('<div class="row mb-2"><div class="col-12 col-lg"><div class="input-group"></div></div></div>');
           nameRow.find('.input-group').append('<div class="input-group-prepend"><span class="input-group-text">Name</span></div>');
-          var nameInput = $('<input type="text" class="form-control" required="true" />');
+          var nameInput = $('<input type="text" class="form-control" required="required" />');
           nameInput.attr('name', 'event[ticket_types_attributes][' + c + '][name]');
           nameInput.attr('id', 'event_ticket_types_attributes_' + c + '_name');
           nameRow.find('.input-group').append(nameInput);
@@ -208,7 +208,7 @@
           priceRow.find('.input-group')
             .append('<div class="input-group-prepend"><span class="input-group-text money-symbol"><%= money_symbol(f.object.currency) %></span></div>');
 
-          var priceInput = $('<input type="text" class="form-control" step="any" data-toggle="tooltip" title="Enter a price, a price range (two numbers separated by a dash) or leave blank to let the attendee pay as they feel" />');
+          var priceInput = $('<input type="text" class="form-control" data-toggle="tooltip" title="Enter a price, a price range (two numbers separated by a dash) or leave blank to let the attendee pay as they feel" />');
           priceInput.attr('name', 'event[ticket_types_attributes][' + c + '][price_or_range]');
           priceInput.attr('id', 'event_ticket_types_attributes_' + c + '_price_or_range');
           priceRow.find('.input-group').append(priceInput);
@@ -220,7 +220,7 @@
 
           priceRow.find('.input-group').append('<div class="input-group-append"><span class="input-group-text border-right-0">&times;</span></div>');
 
-          var quantityInput = $('<input type="number" class="form-control" data-toggle="tooltip" title="Total number of tickets of this type you want to issue" required="true" />');
+          var quantityInput = $('<input type="number" class="form-control" data-toggle="tooltip" title="Total number of tickets of this type you want to issue" required="required" />');
           quantityInput.attr('name', 'event[ticket_types_attributes][' + c + '][quantity]');
           quantityInput.attr('id', 'event_ticket_types_attributes_' + c + '_quantity');
           priceRow.find('.input-group').append(quantityInput);

@@ -1,3 +1,8 @@
+<style>
+  .ticket_group { position: relative; border: 1px solid #DADADE; border-radius: 5px; }
+  .ticket_group .remove-ticket-group { position: absolute; right: 0; top: 0; }
+</style>
+
 <div class="form-group">
   <label>
     Ticket groups
@@ -5,15 +10,32 @@
   <div>
     <div id="ticket_groups">
       <% f.fields_for :ticket_groups do |o| %>
-        <div class="ticket_group bg-light shadow-sm <%= 'has-error' if o.object.invalid? %>">
-          <div><%= o.text_field :name, class: 'form-control', placeholder: 'Name' %></div>
-          <div><%= o.number_field :capacity, class: 'form-control ml-1', placeholder: 'Capacity' %></div>
+        <div class="ticket_group bg-light shadow-sm pt-3 pb-0 pl-3 pr-5 mb-3 <%= 'has-error' if o.object.invalid? %>">
+          <div class="row mb-2">
+            <div class="col-12 col-lg mb-2 mb-lg-0">
+              <div class="input-group">
+                <div class="input-group-prepend">
+                  <span class="input-group-text">Name</span>
+                </div>
+                <%= o.text_field :name, class: 'form-control', required: true %>
+              </div>
+            </div>
+            <div class="col-12 col-lg">
+              <div class="input-group">
+                <div class="input-group-prepend">
+                  <span class="input-group-text">Capacity</span>
+                </div>
+                <%= o.number_field :capacity, class: 'form-control', required: true %>
+              </div>
+            </div>
+          </div>
+
           <% if o.object.new_record? %>
             <a class="btn btn-sm text-dark remove-ticket-group" href="javascript:;" onclick="$(this).closest('.ticket_group').remove()">
               <i class="bi bi-x-lg"></i>
             </a>
           <% else %>
-            <a class="btn btn-sm text-dark remove-ticket-group" href="javascript:;" onclick="$(this).siblings().last().prop('checked', true).closest('.ticket_group').hide()">
+            <a class="btn btn-sm text-dark remove-ticket-group" href="javascript:;" onclick="$(this).find('input[type=checkbox]').prop('checked', true).closest('.ticket_group').hide()">
               <i class="bi bi-x-lg"></i>
               <%= o.check_box '_destroy', style: 'display: none' %>
             </a>
@@ -25,44 +47,39 @@
     <p style="display: none" id="ticket_groups_save" class="my-1">
       <em>Save the event to add tickets to these ticket groups.</em>
     </p>
-    <style>
-      .ticket_group { position: relative; margin-bottom: 10px; padding: 15px; padding-bottom: 10px; border: 1px solid #DADADE; border-radius: 5px }
-      .ticket_group > div, .ticket_group > label { display: inline-block; margin-bottom: 5px; margin-right: 5px }
-      .ticket_group input[name$='[name]'] { display: inline-block; width: auto }
-      .ticket_group input[name$='[capacity]'] { display: inline-block; width: 8em }
-      .ticket_group .remove-ticket-group { position: absolute; right: 0; top: 0; }
-      @media(max-width: 767px) {
-        .ticket_group input, .ticket_group select { border: 0; border-bottom: 1px solid #C7C6CB; border-radius: 0;  }
-        .ticket_group input[name$='[name]'] { width: 9.75em }
-      }
-    </style>
+
     <script>
       $(function () {
-
         $('#ticket_groups_add').click(function () {
           $('#ticket_groups_save').show()
           var c = $('.ticket_group').length
 
-          var d = $('<div class="ticket_group bg-light shadow-sm"/>');
+          var d = $('<div class="ticket_group bg-light shadow-sm pt-3 pb-0 pl-3 pr-5 mb-3"/>');
 
-          var nameDiv = $('<div></div>')
-          var nameInput = $('<input type="text" />');
+          // Combined row for Name and Capacity
+          var row = $('<div class="row mb-2"></div>');
+
+          // Name column
+          var nameCol = $('<div class="col-12 col-lg mb-2 mb-lg-0"><div class="input-group"></div></div>');
+          nameCol.find('.input-group').append('<div class="input-group-prepend"><span class="input-group-text">Name</span></div>');
+          var nameInput = $('<input type="text" class="form-control" required="required" />');
           nameInput.attr('name', 'event[ticket_groups_attributes][' + c + '][name]');
           nameInput.attr('id', 'event_ticket_groups_attributes_' + c + '_name');
-          nameInput.attr('placeholder', 'Name');
-          nameInput.addClass('form-control');
-          nameInput.appendTo(nameDiv);
-          nameDiv.appendTo(d);
+          nameCol.find('.input-group').append(nameInput);
+          row.append(nameCol);
 
-          var capacityDiv = $('<div></div>')
-          var capacityInput = $('<input type="number" step="any" />');
+          // Capacity column
+          var capacityCol = $('<div class="col-12 col-lg"><div class="input-group"></div></div>');
+          capacityCol.find('.input-group').append('<div class="input-group-prepend"><span class="input-group-text">Capacity</span></div>');
+          var capacityInput = $('<input type="number" class="form-control" required="required" />');
           capacityInput.attr('name', 'event[ticket_groups_attributes][' + c + '][capacity]');
           capacityInput.attr('id', 'event_ticket_groups_attributes_' + c + '_capacity');
-          capacityInput.attr('placeholder', 'Capacity');
-          capacityInput.addClass('form-control ml-1');
-          capacityInput.appendTo(capacityDiv);
-          capacityDiv.appendTo(d);
+          capacityCol.find('.input-group').append(capacityInput);
+          row.append(capacityCol);
 
+          row.appendTo(d);
+
+          // Remove button
           $('<a class="btn btn-sm text-dark remove-ticket-group" href="javascript:;" onclick="$(this).closest(\'.ticket_group\').remove()"><i class="bi bi-x-lg"></i></a>').appendTo(d);
 
           d.appendTo('#ticket_groups');
