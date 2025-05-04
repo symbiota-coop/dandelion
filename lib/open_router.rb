@@ -3,10 +3,16 @@ class OpenRouter
   DEFAULT_MODEL = 'google/gemini-2.0-flash-001'.freeze
   DEFAULT_PROVIDERS = {
     'google/gemini-2.0-flash-001' => %w[Google],
+    'google/gemini-2.5-flash-preview' => %w[Google],
+    'google/gemini-2.5-flash-preview:thinking' => %w[Google],
+    'google/gemini-2.5-pro-preview-03-25' => %w[Google],
     'anthropic/claude-3.7-sonnet:beta' => %w[Anthropic]
   }.freeze
   DEFAULT_CONTEXT_WINDOW_SIZES = {
     'google/gemini-2.0-flash-001' => 1_000_000,
+    'google/gemini-2.5-flash-preview' => 1_000_000,
+    'google/gemini-2.5-flash-preview:thinking' => 1_000_000,
+    'google/gemini-2.5-pro-preview-03-25' => 1_000_000,
     'anthropic/claude-3.7-sonnet:beta' => 200_000
   }.freeze
 
