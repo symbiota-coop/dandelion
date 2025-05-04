@@ -1,5 +1,6 @@
 <style>
-  .ticket_type { position: relative; border: 1px solid #DADADE; border-radius: 5px }
+  .ticket_type { position: relative; border: 1px solid #DADADE; border-radius: 5px; cursor: grab; }
+  .ticket_type.ui-sortable-helper { cursor: grabbing; }
   .ticket_type .remove-ticket-type { position: absolute; right: 0; top: 0; }
 </style>
 
@@ -166,7 +167,9 @@
           });
         }
 
-        $("#ticket_types").sortable().closest('form').submit(function () {
+        $("#ticket_types").sortable({
+          cursor: 'grabbing'
+        }).closest('form').submit(function () {
           $('.ticket_type').each(function (i) {
             $("input[name$='[order]']", this).val(i)
           })
