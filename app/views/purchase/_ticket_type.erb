@@ -36,7 +36,7 @@
       </div>
     <% end %>
   </td>
-  <td style="<% if no_border_top %>border-top: 0;<% end %> <% if ticket_type.photos.count > 0 %>border-bottom: 0;<% end %> <% if ticket_type.range || !ticket_type.price %>width: 50%;<% end %>">
+  <td style="<% if no_border_top %>border-top: 0;<% end %> <% if ticket_type.photos.count > 0 %>border-bottom: 0;<% end %>">
     <% if ticket_type.sales_end && Time.now > ticket_type.sales_end %>
       <span class="badge badge-default">Sales closed</span>
     <% elsif ticket_type.number_of_tickets_available_in_single_purchase > 0 %>
@@ -61,10 +61,10 @@
           <%= select_tag :"quantities[#{ticket_type.id}]", 'data-ticket-type-id': ticket_type.id, 'data-price': ticket_type.price, style: 'width: auto; display: inline-block', class: 'form-control', options: (0..ticket_type.number_of_tickets_available_in_single_purchase).to_a, value: (params[:quantities][ticket_type.id.to_s] if params[:quantities]), disabled: !ticket_type.price %>
           <% if ticket_type.range %>
             <br />
-            <em class="select-a-price-first">Drag the slider to set a price</em>
+            <em class="select-a-price-first" style="white-space: nowrap;">Drag the slider to set a price</em>
           <% elsif !ticket_type.price %>
             <br />
-            <em class="select-a-price-first">Set a price first</em>
+            <em class="select-a-price-first" style="white-space: nowrap;">Set a price first</em>
           <% end %>
         </div>
         <% if !@event.organisation.hide_few_left && !@event.hide_few_left && ticket_type.wiser_remaining <= 3 %>
