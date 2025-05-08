@@ -48,6 +48,7 @@ class Activity
   has_many :discount_codes, class_name: 'DiscountCode', as: :codeable, dependent: :destroy
 
   has_many :events, dependent: :nullify
+  has_many :events_as_feedback_activity, class_name: 'Event', dependent: :nullify
   has_many :event_feedbacks, dependent: :destroy
   has_many :activityships, dependent: :destroy
   has_many :activity_applications, dependent: :destroy

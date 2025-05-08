@@ -4,7 +4,8 @@ module EventAssociations
   included do
     belongs_to :account, inverse_of: :events, index: true
     belongs_to :organisation, index: true
-    belongs_to :activity, optional: true, index: true
+    belongs_to :activity, class_name: 'Activity', inverse_of: :events, optional: true, index: true
+    belongs_to :feedback_activity, class_name: 'Activity', inverse_of: :events_as_feedback_activity, optional: true, index: true
     belongs_to :local_group, optional: true, index: true
     belongs_to :coordinator, class_name: 'Account', inverse_of: :events_coordinating, index: true, optional: true
     belongs_to :revenue_sharer, class_name: 'Account', inverse_of: :events_revenue_sharing, index: true, optional: true
