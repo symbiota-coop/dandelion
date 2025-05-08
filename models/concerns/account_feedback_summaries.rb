@@ -11,7 +11,7 @@ module AccountFeedbackSummaries
         account.feedback_summary!
       end
 
-      # accounts.each(&:send_feedback_summary)
+      # accounts.each { |account| account.send_feedback_summary if account.feedback_summary }
     end
   end
 
