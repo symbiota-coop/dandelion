@@ -46,6 +46,7 @@
     <% end %>
   </div>
 </div>
+
 <% unless @order %>
   <% sidebar = false %>
   <% sidebar = true if @event.sold_out? || @event.purchase_url %>

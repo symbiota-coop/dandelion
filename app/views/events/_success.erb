@@ -25,51 +25,50 @@
           <p class="mb-1">
             <i class="bi bi-ticket-detailed-fill"></i>
             <%=ticket.ticket_type.try(:name)%>
-          </span>
-        </p>
-        <div class="row">
-          <div class="col-6">
-            <div data-pagelet-url="/events/<%=@event.id%>/orders/<%=@order.id%>/ticketholders/<%=ticket.id%>/name">
-              <%= partial :"events/ticketholder_name", locals: { ticket: ticket } %>
+          </p>
+          <div class="row">
+            <div class="col-6">
+              <div data-pagelet-url="/events/<%=@event.id%>/orders/<%=@order.id%>/ticketholders/<%=ticket.id%>/name">
+                <%= partial :"events/ticketholder_name", locals: { ticket: ticket } %>
+              </div>
             </div>
-          </div>
-          <div class="col-6">
-            <div data-pagelet-url="/events/<%=@event.id%>/orders/<%=@order.id%>/ticketholders/<%=ticket.id%>/email?success=<%=params[:success] ? 1 : 0 %>">
-              <%= partial :"events/ticketholder_email", locals: { ticket: ticket, success: (params[:success] ? 1 : 0) } %>
+            <div class="col-6">
+              <div data-pagelet-url="/events/<%=@event.id%>/orders/<%=@order.id%>/ticketholders/<%=ticket.id%>/email?success=<%=params[:success] ? 1 : 0 %>">
+                <%= partial :"events/ticketholder_email", locals: { ticket: ticket, success: (params[:success] ? 1 : 0) } %>
+              </div>
             </div>
           </div>
         </div>
+        <% } %>
       </div>
-      <% } %>
-    </div>
 
-    <% if @event.affiliate_credit_percentage %>
-      <% affiliate_link = "#{ENV['BASE_URI']}/e/#{@event.slug}?affiliate_type=Account&affiliate_id=#{@order.account_id}" %>
-      <p>
-        <a href="<%= affiliate_link %>">Here's your affiliate link for this event.</a>
-        For each person who buys a ticket via this link,
-        you receive credit that can used to attend future events equal to <%= @event.affiliate_credit_percentage %>% of the order value.
-      </p>
-      <div class="mb-3">
-        <h5>Share your link</h5>
-        <%= partial :share, locals: { share_url: affiliate_link } %>
-      </div>
-    <% end %>
+      <% if @event.affiliate_credit_percentage %>
+        <% affiliate_link = "#{ENV['BASE_URI']}/e/#{@event.slug}?affiliate_type=Account&affiliate_id=#{@order.account_id}" %>
+        <p>
+          <a href="<%= affiliate_link %>">Here's your affiliate link for this event.</a>
+          For each person who buys a ticket via this link,
+          you receive credit that can used to attend future events equal to <%= @event.affiliate_credit_percentage %>% of the order value.
+        </p>
+        <div class="mb-3">
+          <h5>Share your link</h5>
+          <%= partial :share, locals: { share_url: affiliate_link } %>
+        </div>
+      <% end %>
 
-    <h5 class="mb-1">Add to calendar</h5>
-    <p class="mb-1"><% if @event.event_sessions.count > 0 %>Full event: <% end %><%= partial :'events/add_to_calendar', locals: { event: @event } %></p>
-    <% @event.event_sessions.each do |event_session| %>
-      <p class="mb-1">Session <%= event_session.session_number %>: <%= partial :'events/add_to_calendar', locals: { event_session: event_session } %></p>
+      <h5 class="mb-1">Add to calendar</h5>
+      <p class="mb-1"><% if @event.event_sessions.count > 0 %>Full event: <% end %><%= partial :'events/add_to_calendar', locals: { event: @event } %></p>
+      <% @event.event_sessions.each do |event_session| %>
+        <p class="mb-1">Session <%= event_session.session_number %>: <%= partial :'events/add_to_calendar', locals: { event_session: event_session } %></p>
+      <% end %>
+      <% if !@event.secret? && !(@order && @event.affiliate_credit_percentage) %>
+        <h5 class="mb-1">Share this event</h5>
+        <%= partial :share %>
+        <h5 class="my-1">QR code</h5>
+        <a target="_blank" href="/qr?url=<%= "#{ENV['BASE_URI']}/e/#{@event.slug}" %>"><img src="/qr?url=<%= "#{ENV['BASE_URI']}/e/#{@event.slug}" %>" style="width: 50px"></a>
+      <% end %>
+      <% if @order.account && !@event.donations_to_dandelion? %>
+        <%= partial :'accounts/pay', locals: {div_class: 'mt-5', source: "event:#{@event.id}", account: @order.account, nft: true } %>
+      <% end %>
     <% end %>
-    <% if !@event.secret? && !(@order && @event.affiliate_credit_percentage) %>
-      <h5 class="mb-1">Share this event</h5>
-      <%= partial :share %>
-      <h5 class="my-1">QR code</h5>
-      <a target="_blank" href="/qr?url=<%= "#{ENV['BASE_URI']}/e/#{@event.slug}" %>"><img src="/qr?url=<%= "#{ENV['BASE_URI']}/e/#{@event.slug}" %>" style="width: 50px"></a>
-    <% end %>
-    <% if @order.account && !@event.donations_to_dandelion? %>
-      <%= partial :'accounts/pay', locals: {div_class: 'mt-5', source: "event:#{@event.id}", account: @order.account, nft: true } %>
-    <% end %>
-  <% end %>
-</div>
+  </div>
 </div>
