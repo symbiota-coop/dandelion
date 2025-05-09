@@ -80,7 +80,7 @@
   <div class="row">
     <div class="<%= sidebar ? 'col-lg-7' : 'col-lg-12' %>">
 
-      <% n = 1 
+      <% n = 1; events = [];
       if @event.organisation
         events = ([@event] + @event.organisation.events_for_search.future.and(:name => @event.name, :location => @event.location, :start_time.ne => @event.start_time)).uniq
         n = events.count
@@ -98,7 +98,7 @@
         </small>
       </h1>
 
-      <%= partial :'events/details', locals: { n: n } %>
+      <%= partial :'events/details', locals: { n: n, events: events } %>
 
       <div style="font-size: 1.1em" class="mb-3">
         <%= partial :'events/tag_labels', locals: { event: @event, show_more: true, show_more_limit: 5 } %>

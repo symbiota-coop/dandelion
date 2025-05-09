@@ -64,9 +64,9 @@
       <% if @event.location == 'Online' %>
         Online
       <% elsif @event.location =~ URI::regexp %>
-        <span class="compact-urls"><a href="<%= @event.location %>"><%= @event.location %></a></span>
+        <span class="compact-urls"><a class="text-dark" target="_blank" href="<%= @event.location %>"><%= @event.location %></a></span>
       <% else %>
-        <a target="_blank" href="https://www.google.co.uk/maps?q=<%= @event.location %>"><%= @event.location %></a>
+        <a class="text-dark" target="_blank" href="https://www.google.co.uk/maps?q=<%= @event.location %>"><%= @event.location %></a>
       <% end %>
 
     </td>
@@ -78,14 +78,14 @@
   <tr>
     <td>
 
-      <a href="javascript:;" class="event-detail link copy-link-icon" data-toggle="tooltip" title="Event URL; Click to copy">
+      <a href="javascript:;" class="event-detail link copy-link-icon" data-toggle="tooltip" title="Event URL (click to copy)">
         <i class="bi bi-link"></i>
       </a>
 
     </td>
     <td>
 
-      <a href="javascript:;" class="copy-link" data-toggle="tooltip" title="Click to copy"><%=ENV['BASE_URI']%>/e/<%=@event.slug%></a>
+      <a href="javascript:;" class="copy-link text-dark" data-toggle="tooltip" title="Click to copy"><%=ENV['BASE_URI']%>/e/<%=@event.slug%></a>
       <script>
         $(function() {
           $('.copy-link, .copy-link-icon').on('click', function(e) {
