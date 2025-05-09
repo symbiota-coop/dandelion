@@ -43,22 +43,6 @@
       </td>
     </tr>
   <% end %>
-  <% if @event.facebook_event_url %>
-    <tr>
-      <td>Facebook event</td>
-      <td>
-        <a target="_blank" href="<%= @event.facebook_event_url %>"><i class="bi bi-facebook"></i></a>
-      </td>
-    </tr>
-  <% end %>
-  <% if @event.email %>
-    <tr>
-      <td>Enquiries to</td>
-      <td>
-        <a target="_blank" href="mailto:<%= @event.email %>"><%= @event.email %></a>
-      </td>
-    </tr>
-  <% end %>
   <% if event_admin? || (@event.event_facilitations.count > 0 && @event.event_facilitations.any? { |event_facilitation| event_facilitation.account.public? }) %>
     <tr>
       <td>Facilitators</td>
@@ -84,19 +68,34 @@
       </td>
     </tr>
   <% end %>
+  <% if @event.facebook_event_url %>
+    <tr>
+      <td>Facebook event</td>
+      <td>
+        <a target="_blank" href="<%= @event.facebook_event_url %>"><i class="bi bi-facebook"></i></a>
+      </td>
+    </tr>
+  <% end %>
+  <% if @event.email %>
+    <tr>
+      <td>Enquiries to</td>
+      <td>
+        <a target="_blank" href="mailto:<%= @event.email %>"><%= @event.email %></a>
+      </td>
+    </tr>
+  <% end %>
   <tr>
     <td>
       Add to calendar
+      <%= partial :'events/add_to_calendar', locals: { event: @event } %>
+    </td>
+  </tr>
+  <% unless @event.secret? %>
+    <tr>
+      <td>QR code</td>
       <td>
-        <%= partial :'events/add_to_calendar', locals: { event: @event } %>
+        <a target="_blank" href="/qr?url=<%= "#{ENV['BASE_URI']}/e/#{@event.slug}" %>"><img src="/qr?url=<%= "#{ENV['BASE_URI']}/e/#{@event.slug}" %>" style="width: 50px"></a>
       </td>
     </tr>
-    <% unless @event.secret? %>
-      <tr>
-        <td>QR code</td>
-        <td>
-          <a target="_blank" href="/qr?url=<%= "#{ENV['BASE_URI']}/e/#{@event.slug}" %>"><img src="/qr?url=<%= "#{ENV['BASE_URI']}/e/#{@event.slug}" %>" style="width: 50px"></a>
-        </td>
-      </tr>
-    <% end %>
-  </table>
+  <% end %>
+</table>
