@@ -1,13 +1,14 @@
  <% if current_account.upcoming_events.count > 0 %>
   <table class="table">
     <% current_account.upcoming_events.each { |event| %>
-    <tr class="block">
-      <td style="width: 1px">
-        <a href="/e/<%= event.slug %>" class="calendar-date" data-toggle="tooltip" title="in <%=distance_of_time_in_words event.start_time - Time.now %>">
-          <span class="day"><%= event.start_time.day %></span>
-          <br>
+    <tr>
+      <td class="pr-2" style="width: 1px">
+
+        <a href="/e/<%= event.slug %>" style="margin-top: 3px;" class="event-detail calendar-date" data-toggle="tooltip" title="in <%=distance_of_time_in_words event.start_time - Time.now %>">
           <span class="month"><%= event.start_time.strftime('%b') %></span>
+          <span class="day"><%= event.start_time.day %></span>
         </a>
+
       </td>
       <td>
         <h4>

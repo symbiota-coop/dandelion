@@ -97,51 +97,15 @@
           </div>
         </small>
       </h1>
-      <ul style="font-size: 1rem" class="icon-list text-dark mb-1">
-        <li>
-          <i <% if n > 1 %> style="top: 0.55em"<% end %> data-toggle="tooltip" title="Dates/times" class="bi bi-calendar-event"></i>
-          <% if n > 1 %>
-            <%= select_tag :event_id, options: events.map { |event| [@event.event_sessions.count > 0 ? concise_when_details(event, with_zone: true) : when_details(event), event.id] }, selected: @event.id, class: 'form-control mb-1', style: 'font-size: 1rem; padding: 0.375rem;', onchange: "window.location = '/events/'+$(this).val()" %>
-          <% elsif @event.event_sessions.count > 0 %>
-            <%= concise_when_details(@event, with_zone: true) %>
-            <span style="font-size: 0.85em">
-              <span class="label label-primary"><%= pluralize @event.event_sessions.count, 'session' %></span>
-            </span>
-          <% else %>
-            <%= when_details(@event) %>
-          <% end %>
-          <% if @event.start_time.to_date != @event.end_time.to_date %>
-            <div style="font-size: 0.85em" class="my-1">
-              <%= partial :'events/add_event_session', locals: {
-          event_sessions: @event.event_sessions.order('start_time asc'),
-          add_and_remove: event_admin?,
-          new_object: EventSession.new,
-          new_url: "/events/#{@event.id}/event_sessions/new",
-          destroy_url: "/events/#{@event.id}/event_sessions/destroy"
-        } %>
-            </div>
-          <% end %>
-        </li>
-        <li><i data-toggle="tooltip" title="Location" class="bi bi-geo-alt-fill"></i>
-          <% if @event.location == 'Online' %>
-            Online
-          <% elsif @event.location =~ URI::regexp %>
-            <span class="compact-urls"><a href="<%= @event.location %>"><%= @event.location %></a></span>
-          <% else %>
-            <a target="_blank" href="https://www.google.co.uk/maps?q=<%= @event.location %>"><%= @event.location %></a>
-          <% end %>
-        </li>
-        <% if @event.slug %>
-          <li>
-            <i data-toggle="tooltip" title="Event URL" class="bi bi-link"></i>
-            <a data-toggle="tooltip" href="<%=ENV['BASE_URI']%>/e/<%=@event.slug%>"><%=ENV['BASE_URI']%>/e/<%=@event.slug%></a>
-          </li>
-        <% end %>
-      </ul>
-      <div>
+
+      <%= partial :'events/details', locals: { n: n } %>
+
+      <div style="font-size: 1.1em" class="mb-3">
         <%= partial :'events/tag_labels', locals: { event: @event, show_more: true, show_more_limit: 5 } %>
       </div>
+
       <%= partial :'events/info_table' %>
+
       <% if @event.description || @event.organisation.event_footer %>
         <% if @event.half_width_images %>
           <style>
@@ -168,6 +132,7 @@
           </big>
         </div>
       <% end %>
+
       <% if @event.zoom_party? %>
         <% if current_account %>
           <div data-pagelet-url="/zoom_parties?event_id=<%= @event.id %>"></div>
@@ -177,6 +142,7 @@
           </p>
         <% end %>
       <% end %>
+
     </div>
     <% if sidebar %>
       <%= partial :'events/sidebar' %>

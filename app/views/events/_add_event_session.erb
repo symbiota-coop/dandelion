@@ -11,7 +11,7 @@
   });
 </script>
 
-<ul class="icon-list" id="event-sessions">
+<ul class="icon-list mb-0" id="event-sessions">
   <% event_sessions.each_with_index { |event_session,i| %>
   <li <% if i > 2%> style="display:none" <% end %>>
     <i data-toggle="tooltip" title="Session <%=i+1%>" class="bi bi-clock"></i>
