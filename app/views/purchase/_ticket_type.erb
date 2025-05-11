@@ -61,7 +61,7 @@
           <%= select_tag :"quantities[#{ticket_type.id}]", 'data-ticket-type-id': ticket_type.id, 'data-price': ticket_type.price, style: 'width: auto; display: inline-block', class: 'form-control', options: (0..ticket_type.number_of_tickets_available_in_single_purchase).to_a, value: (params[:quantities][ticket_type.id.to_s] if params[:quantities]), disabled: !ticket_type.price %>
           <% if ticket_type.range %>
             <br />
-            <em class="select-a-price-first" style="white-space: nowrap;">Drag the slider to set a price</em>
+            <em class="select-a-price-first" style="white-space: nowrap;">Drag the slider</em>
           <% elsif !ticket_type.price %>
             <br />
             <em class="select-a-price-first" style="white-space: nowrap;">Set a price first</em>
