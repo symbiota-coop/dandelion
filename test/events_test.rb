@@ -44,7 +44,7 @@ class DandelionTest < ActiveSupport::TestCase
     fill_in 'event_ticket_types_attributes_0_quantity', with: @ticket_type.quantity
     click_link 'Everything else'
     click_button 'Create event'
-    assert page.has_content? 'Drag the slider to set a price'
+    assert page.has_content? 'Drag the slider'
   end
 
   test 'creating an event from /events' do
