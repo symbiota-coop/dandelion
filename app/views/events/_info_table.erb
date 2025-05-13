@@ -27,7 +27,7 @@
         } %>
     </td>
   </tr>
-  <% if @event.activity %>
+  <% if @event.activity && @event.activity.name != @event.organisation.name %>
     <tr>
       <td>Activity</td>
       <td>
