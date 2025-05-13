@@ -4,7 +4,7 @@
   )).count > 0 %>
 
 
-<% organisations = organisations.sort_by { |organisation| created_at = organisation.events.live.public.order('created_at desc').first.try(:created_at); created_at ? created_at.to_i : 0 }.reverse %>
+<% organisations = organisations.sort_by { |organisation| created_at = organisation.events.live.public.order('created_at desc').first.try(:created_at); created_at ? created_at.to_i : 0 }.reverse.first(12) %>
 
 <% carousel_id = "carousel-#{SecureRandom.uuid}" %>
 <script>
