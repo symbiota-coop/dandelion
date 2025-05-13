@@ -36,7 +36,7 @@
   <div class="col-lg-10">
     <% if @event_video %>
       <div class="embed-responsive embed-responsive-16by9 mb-3">
-        <video src="<%=@event_video.url%>" type="video/mp4" controls></video>
+        <video src="<%=@event_video.url%>" type="video/mp4" controls muted playsinline onmouseover="this.play();" onmouseout="this.pause();"></video>
       </div>
     <% elsif @event_image %>
       <a href="/e/<%=@event.slug%><% if params[:cohost] %>?cohost=<%=params[:cohost]%><% end %>"><img id="event-image" class="w-100 mb-3" src="<%= u @event_image.thumb('1920x1920').url %>"></a>

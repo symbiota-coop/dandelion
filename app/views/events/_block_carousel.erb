@@ -3,7 +3,7 @@
     <a target="_parent" href="/e/<%= event.slug %>?cohost=<%=@organisation.slug%>" <% if event.carousel_text %> data-toggle="tooltip" title="<%=event.carousel_text%>" <% end %>>  
       <% if cohostship.video %>    
       <div class="embed-responsive embed-responsive-16by9">
-      <video src="<%=cohostship.video.url%>" type="video/mp4" autoplay loop muted></video>
+      <video src="<%=cohostship.video.url%>" type="video/mp4" controls muted playsinline onmouseover="this.play();" onmouseout="this.pause();"></video>
     </div>
   <% elsif cohostship.image %>
     <img class="w-100" src="<%= u cohostship.image.thumb((crop if defined?(crop) && crop) || '992x992').url %>">
@@ -12,8 +12,8 @@
 <% else %>
   <a target="_parent" href="/e/<%= event.slug %>" <% if event.carousel_text %> data-toggle="tooltip" title="<%=event.carousel_text%>" <% end %>>
   <% if event.video %>  
-      <div class="embed-responsive embed-responsive-16by9">
-    <video src="<%=event.video.url%>" type="video/mp4" autoplay loop muted></video>
+    <div class="embed-responsive embed-responsive-16by9">
+    <video src="<%=event.video.url%>" type="video/mp4" controls muted playsinline onmouseover="this.play();" onmouseout="this.pause();"></video>
   </div>
 <% else %>
   <img class="w-100" src="<%= u event.image.thumb((crop if defined?(crop) && crop) || '992x992').url %>">
