@@ -442,12 +442,6 @@ Dandelion::App.controller do
     erb :'events/waitlist'
   end
 
-  get '/events/:id/facilitators' do
-    @event = Event.find(params[:id]) || not_found
-    event_admins_only!
-    erb :'events/facilitators'
-  end
-
   post '/events/:id/event_facilitations/new' do
     @event = Event.find(params[:id]) || not_found
     event_admins_only!
