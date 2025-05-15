@@ -18,7 +18,14 @@ class Upload
 
   dragonfly_accessor :file do
     after_assign do |attachment|
-      attachment.process!(:thumb, '1920x1920>') if attachment.image?
+      if attachment.image?
+        if attachment.format == 'heic'
+          attachment.convert('-format jpeg')
+          attachment.name = "#{SecureRandom.uuid}.jpg"
+        end
+
+        attachment.process!(:thumb, '1920x1920>')
+      end
     end
   end
 end

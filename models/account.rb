@@ -3,8 +3,6 @@ class Account
   include Mongoid::Timestamps
   extend Dragonfly::Model
 
-  dragonfly_accessor :image
-
   include AccountFields
   include AccountAssociations
   include AccountValidation
