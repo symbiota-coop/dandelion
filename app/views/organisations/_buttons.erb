@@ -12,7 +12,7 @@
 <% end %>
 <div class="d-inline-block mb-1 d-lg-none">
   <% if organisation_monthly_donor_plus? %>
-    <a class="btn btn-outline-primary" href="/o/<%= @organisation.slug %>/members">Members' area</a>
+    <a class="btn mb-1 btn-outline-primary" href="/o/<%= @organisation.slug %>/members">Members' area</a>
   <% end %>
 </div>
 <% if @organisation.stripe_client_id %>
