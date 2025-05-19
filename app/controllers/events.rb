@@ -340,6 +340,22 @@ Dandelion::App.controller do
     Premailer.new(ERB.new(File.read(Padrino.root('app/views/layouts/email.erb'))).result(binding), with_html_string: true, adapter: 'nokogiri', input_encoding: 'UTF-8').to_inline_css
   end
 
+  get '/events/:id/reminder_email' do
+    @event = Event.find(params[:id]) || not_found
+    event_admins_only!
+    erb :'events/reminder_email'
+  end
+
+  get '/events/:id/reminder_email_preview' do
+    @event = Event.find(params[:id]) || not_found
+    event_admins_only!
+    event = @event
+    content = ERB.new(File.read(Padrino.root('app/views/emails/reminder.erb'))).result(binding)
+                 .gsub('%recipient.firstname%', current_account.firstname)
+                 .gsub('%recipient.token%', current_account.sign_in_token)
+    Premailer.new(ERB.new(File.read(Padrino.root('app/views/layouts/email.erb'))).result(binding), with_html_string: true, adapter: 'nokogiri', input_encoding: 'UTF-8').to_inline_css
+  end
+
   post '/events/:id/waitship/new' do
     @event = Event.find(params[:id]) || not_found
 
