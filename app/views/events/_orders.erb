@@ -1,5 +1,5 @@
 <% orders.each { |order| %>
-<a target="_blank" href="/orders/<%= order.id %>">View order confirmation <% if orders.count > 1 %>sent <%= order.created_at %><% end %></a>
+<a target="_blank" href="/orders/<%= order.id %>">View order confirmation <% if orders.count > 1 %>(sent <%= order.created_at %>)<% end %></a>
 <ul class="icon-list mb-0">
   <% order.tickets.each { |ticket| ticket_description = [ticket.ticket_type.try(:name), m(ticket.discounted_price || 0, ticket.currency)].compact.join(', ') %>
   <li>
