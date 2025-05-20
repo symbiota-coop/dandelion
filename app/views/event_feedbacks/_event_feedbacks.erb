@@ -4,7 +4,7 @@
 
   <% if @account %>
     <% if @account.feedback_summary %>
-      <div class="well border-0 my-3" data-toggle="tooltip" title="AI-generated summary ✨">
+      <div class="ai-well my-3" data-toggle="tooltip" title="AI-generated summary ✨">
         <big>
           <%= @account.feedback_summary %>
         </big>
@@ -17,7 +17,7 @@
 
   <% if @activity %>
     <% if @activity.feedback_summary %>
-      <div class="well border-0 my-3" data-toggle="tooltip" title="AI-generated summary ✨">
+      <div class="ai-well my-3" data-toggle="tooltip" title="AI-generated summary ✨">
         <big>
           <%= @activity.feedback_summary %>
         </big>

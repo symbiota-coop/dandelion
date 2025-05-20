@@ -22,6 +22,13 @@ $color_highlight_2: #B900A1;
   background: linear-gradient(45deg, #222 0%, #222 66%, $color_highlight_1 100%) !important;
 }
 
+.ai-well {
+  background: lighten($color_highlight_1, 57.5%);
+  padding: 1rem;
+  border-radius: 0.5rem;
+}
+
+
 .bg-primary.text-white,
 .progress-bar {
   background: linear-gradient(135deg, $color_primary 0%, $color_primary 50%, $color_primary_light 100%) !important;
