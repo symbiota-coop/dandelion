@@ -14,6 +14,15 @@ $bg_well: #F5F5F5;
 
 @import "../infinite_admin/scss/style";
 
+.newsfeed-icon {
+  font-size: 16px;
+}
+
+.newsfeed-icon .bi-ticket-detailed-fill {
+  position: relative;
+  top: -1px;
+}
+
 a.btn-outline-danger:focus {
   color: $color_danger;
 }

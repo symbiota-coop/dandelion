@@ -5,7 +5,7 @@
     <% notifications.each_with_index { |notification,i| %>
     <li>
       <div class="media">
-        <span style="border-radius: 6px; height: 18px; width: 18px; font-size: 12px" class="text-center bg-dark text-white"><i class="bi <%= notification.icon %>"></i></span>
+        <span class="newsfeed-icon text-center"><i class="bi <%= notification.icon %>"></i></span>
         <div class="media-body ml-2">
           <p class="my-0 mb-1">
             <a class="text-dark" href="<%= notification.link[1] %>">
