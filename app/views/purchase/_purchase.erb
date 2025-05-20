@@ -9,7 +9,7 @@ if params[:discount_code]
 end
 %>
 
-<div class="card shadow-sm mb-3 <% if @event.no_discounts %>no-discounts<% end %>" id="select-tickets">
+<div class="card shadow-sm <% if @event.no_discounts %>no-discounts<% end %>" id="select-tickets">
   <h3 class="card-header bg-primary text-white"><%= @event.select_tickets_title || 'Select tickets' %></h3>
   <div class="card-body">
     <% if @event.past? %>

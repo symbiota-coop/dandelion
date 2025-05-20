@@ -1,7 +1,7 @@
 <div class="col-lg-5">
   <div id="purchase">
     <% if current_account && (orders =  @event.orders.complete.and(account: current_account)).count > 0 %>
-      <div class="card shadow-sm mb-3">
+      <div class="card shadow-sm">
         <h3 class="card-header bg-primary text-white">
           <% if @event.past? %>
             Thanks for attending!
