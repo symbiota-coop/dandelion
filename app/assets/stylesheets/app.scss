@@ -14,6 +14,8 @@ $badge_font_size: 0.75rem;
 $body_text: #212529;
 $bg_well: #F5F5F5;
 $color_highlight_1: #4400B9;
+$color_highlight_1_light_1: lighten($color_highlight_1, 57.5%);
+$color_highlight_1_light_2: lighten($color_highlight_1, 37.5%);
 $color_highlight_2: #B900A1;
 
 @import "../infinite_admin/scss/style";
@@ -23,11 +25,10 @@ $color_highlight_2: #B900A1;
 }
 
 .ai-well {
-  background: lighten($color_highlight_1, 57.5%);
+  background: linear-gradient(135deg, $color_highlight_1_light_1 0%, $color_highlight_1_light_1 50%, $color_highlight_1_light_2 100%) !important;
   padding: 1rem;
   border-radius: 0.5rem;
 }
-
 
 .bg-primary.text-white,
 .progress-bar {
