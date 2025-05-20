@@ -30,6 +30,19 @@ $color_highlight_2: #B900A1;
   border-radius: 0.5rem;
 }
 
+.select2-choices {
+  box-shadow: none !important;
+}
+
+.select2-container-multi .select2-choices .select2-search-choice {
+  margin-top: 5px
+}
+
+.lookup .select2-choice {
+  height: 32px !important;
+  line-height: 32px !important;
+}
+
 .bg-primary.text-white,
 .progress-bar,
 .label-primary,
