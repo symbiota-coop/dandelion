@@ -22,10 +22,10 @@
       <div class="mb-3">
         <% @order.tickets.each_with_index { |ticket,i| %>
         <div class="p-2 rounded mb-2 border border-primary ticket">
-          <p class="mb-1">
-            <i class="bi bi-ticket-detailed-fill"></i>
+          <h4 class="mb-2">
+            <i class="bi bi-ticket-detailed-fill" style="position: relative; top: 2px;"></i>
             <%=ticket.ticket_type.try(:name)%>
-          </p>
+          </h4>
           <div class="row">
             <div class="col-6">
               <div data-pagelet-url="/events/<%=@event.id%>/orders/<%=@order.id%>/ticketholders/<%=ticket.id%>/name">
