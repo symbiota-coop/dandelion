@@ -38,6 +38,8 @@ namespace :late do
     OrganisationEdge.create_all(Organisation.and(:followers_count.gte => 50).and(:id.nin => Organisation.order('followers_count desc').limit(1).pluck(:id)))
     puts 'clear up optionships'
     Gathering.and(clear_up_optionships: true).each(&:clear_up_optionships!)
+    puts 'update event tags for select'
+    EventTag.update_tags_for_select
     puts 'update feedback counts'
     EventFeedback.update_facilitator_feedback_counts
     puts 'monthly contributions'
