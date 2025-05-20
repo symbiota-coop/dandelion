@@ -1,3 +1,7 @@
+<style>
+  #content { background-color: #FCFBFD; }
+</style>
+
 <% if event_admin? %>
   <%= partial :'events/nav', locals: { event: @event } %>
   <%= partial :'events/locked' %>

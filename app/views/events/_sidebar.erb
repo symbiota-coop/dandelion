@@ -1,7 +1,7 @@
 <div class="col-lg-5">
   <div id="purchase">
     <% if current_account && (orders =  @event.orders.complete.and(account: current_account)).count > 0 %>
-      <div class="card mb-3">
+      <div class="card shadow-sm mb-3">
         <h3 class="card-header bg-primary text-white">
           <% if @event.past? %>
             Thanks for attending!
@@ -41,7 +41,7 @@
       </div>
     <% end %>
     <% if @event.purchase_url %>
-      <div class="card d-none d-lg-block">
+      <div class="card shadow-sm d-none d-lg-block">
         <h3 class="card-header bg-primary text-white"><%= @event.select_tickets_title || 'Select tickets' %></h3>
         <div class="card-body">
           <a target="_blank" href="<%= @event.purchase_url %>" class="btn btn-outline-primary btn-block mb-3">Book via <%=URI(@event.purchase_url).host.gsub('www.','')%></a>
@@ -49,7 +49,7 @@
       </div>
     <% elsif @event.sold_out? && !params[:ticket_type_id] %>
       <% if params[:added_to_waitlist] %>
-        <div class="card">
+        <div class="card shadow-sm">
           <h3 class="card-header bg-primary text-white">Thanks!</h3>
           <div class="card-body">
             <p class="lead mb-0">
@@ -63,7 +63,7 @@
       <% end %>
     <% elsif @event.ticket_types.count > 0 %>
       <% if @event.monthly_donors_only && !(current_account && @event.organisation.organisationships.find_by(:account => current_account, :monthly_donation_method.ne => nil)) %>
-        <div class="card">
+        <div class="card shadow-sm">
           <h3 class="card-header bg-primary text-white"><%= @event.select_tickets_title || 'Select tickets' %></h3>
           <div class="card-body">
             <p class="lead mb-0">
@@ -81,7 +81,7 @@
           </div>
         </div>
       <% elsif @event.activity && @event.activity.privacy != 'open' && !(current_account && @event.activity.activityships.find_by(account: current_account)) %>
-        <div class="card">
+        <div class="card shadow-sm">
           <h3 class="card-header bg-primary text-white"><%= @event.select_tickets_title || 'Select tickets' %></h3>
           <div class="card-body">
             <p class="lead mb-0">

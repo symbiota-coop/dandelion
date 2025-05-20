@@ -9,7 +9,7 @@ if params[:discount_code]
 end
 %>
 
-<div class="card mb-3 <% if @event.no_discounts %>no-discounts<% end %>" id="select-tickets">
+<div class="card shadow-sm mb-3 <% if @event.no_discounts %>no-discounts<% end %>" id="select-tickets">
   <h3 class="card-header bg-primary text-white"><%= @event.select_tickets_title || 'Select tickets' %></h3>
   <div class="card-body">
     <% if @event.past? %>
@@ -261,7 +261,7 @@ end
   </div>
 </div>
 
-<div class="card" id="card-error" style="display: none">
+<div class="card shadow-sm" id="card-error" style="display: none">
   <h3 class="card-header bg-danger text-white">There was an error processing the transaction</h3>
   <div class="card-body">
     <p>
@@ -270,7 +270,7 @@ end
   </div>
 </div>
 
-<div class="card" id="pay-with-opencollective" style="display: none">
+<div class="card shadow-sm" id="pay-with-opencollective" style="display: none">
   <h3 class="card-header bg-primary text-white">Pay with Open Collective</h3>
   <div class="card-body">
     <p class="lead please"></p>
@@ -280,7 +280,7 @@ end
 </div>
 
 <% if @event.chain %>
-  <div class="card" id="pay-with-evm" style="display: none">
+  <div class="card shadow-sm" id="pay-with-evm" style="display: none">
     <h3 class="card-header bg-primary text-white">
       Pay with <%= @event.chain.name %>
     </h3>
