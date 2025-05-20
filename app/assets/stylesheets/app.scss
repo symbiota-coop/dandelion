@@ -31,7 +31,9 @@ $color_highlight_2: #B900A1;
 }
 
 .bg-primary.text-white,
-.progress-bar {
+.progress-bar,
+.label-primary,
+.badge-primary {
   background: linear-gradient(135deg, $color_primary 0%, $color_primary 50%, $color_primary_light 100%) !important;
   border: none !important;
 }
