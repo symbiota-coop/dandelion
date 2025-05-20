@@ -82,7 +82,7 @@ a {
 }
 
 a:hover {
-  color: #2BA457;
+  color: #00A558;
   text-decoration: underline
 }
 
@@ -152,7 +152,7 @@ p.action a {
 }
 
 p.action a:hover {
-  background: #2BA457 !important;
+  background: #00A558 !important;
 }
 
 hr {
