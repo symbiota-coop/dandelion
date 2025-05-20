@@ -1,6 +1,6 @@
 <div class="main">
   <p>Hi %recipient.firstname%,</p>
   <p>
-    FYI, <%= account.name %> (<%=account.email%>) purchased a resale ticket for the event <a href="<%= ENV['BASE_URI'] %>/e/<%=event.slug%>"><%= event.name %></a>.
+    FYI, <%= account.name %> (<a href="mailto:<%=account.email%>"><%=account.email%></a>) purchased a resale ticket for the event <a href="<%= ENV['BASE_URI'] %>/e/<%=event.slug%>"><%= event.name %></a>.
   </p>
 </div>

@@ -1,6 +1,6 @@
 <div class="main">
   <p>
-    <%= organisationship.account.name %> (<%= organisationship.account.email %>)
+    <%= organisationship.account.name %> (<a href="mailto:<%=organisationship.account.email%>"><%=organisationship.account.email%></a>)
     is no longer donating
     to <%= organisation.name %>.
   </p>

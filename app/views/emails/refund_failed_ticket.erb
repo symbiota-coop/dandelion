@@ -1,7 +1,7 @@
 <div class="main">
   <p>Hi %recipient.firstname%,</p>
   <p>
-    We tried to refund the ticket of <%= account.name %> (<%=account.email%>) for the event <a href="<%= ENV['BASE_URI'] %>/e/<%=event.slug%>"><%= event.name %></a>, but we received an error from Stripe:
+    We tried to refund the ticket of <%= account.name %> (<a href="mailto:<%=account.email%>"><%=account.email%></a>) for the event <a href="<%= ENV['BASE_URI'] %>/e/<%=event.slug%>"><%= event.name %></a>, but we received an error from Stripe:
   </p>
   <blockquote>
     <%= error.message %>
