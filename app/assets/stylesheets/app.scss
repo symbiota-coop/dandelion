@@ -1,5 +1,5 @@
 $color_primary: rgb(0, 185, 99); // #00B963
-$color_primary_light: lighten($color_primary, 7.5%);
+$color_primary_light: lighten($color_primary, 6.66%);
 $color_primary_transparent_7: rgba(0, 185, 99, 0.7);
 $color_primary_transparent_5: rgba(0, 185, 99, 0.5);
 $color_primary_transparent_3: rgba(0, 185, 99, 0.3);
@@ -24,7 +24,8 @@ $color_highlight_2: #B900A1;
 }
 
 .card-header.bg-primary.text-white,
-#chat-container .bg-primary {
+#chat-container .bg-primary,
+.progress-bar {
   background: linear-gradient(135deg, $color_primary 0%, $color_primary 50%, $color_primary_light 100%) !important;
   border: none !important;
 }
