@@ -68,8 +68,8 @@
   #event_stats .pagelet-loading { font-size: 2em }
 </style>
 
-<table id="event_stats" class="table table-striped table-hover table-sm" style="font-size: 0.9em">
-  <thead class="bg-white">
+<table id="event_stats" class="table <% unless @event %> table-striped table-hover <% end %> table-sm" style="font-size: 0.9em">
+  <thead>
     <tr>
       <th>Name</th>
       <th data-orderable="false"></th>
