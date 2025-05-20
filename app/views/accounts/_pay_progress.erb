@@ -31,6 +31,7 @@
               projected_value = (current_month_value.to_f / days_passed * days_in_month).round
               projection = [projected_value - current_month_value, 0].max    
             %>
+          <br class="d-lg-none" />
           (projected <%= m (projection + current_month_value), currency %>)
         <% end %>
       </p>
