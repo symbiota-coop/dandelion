@@ -1,13 +1,17 @@
-<% if @event.feedback_activity && @event.feedback_activity.event_feedbacks.unscoped.count > 0 %>
-  <h2 class="mt-5">Feedback on <%= @event.feedback_activity.name %> events</h2>
-  <div class="mt-3" data-pagelet-url="/activities/<%= @event.feedback_activity_id %>/show_feedback"></div>
-<% elsif @event.activity && @event.activity.event_feedbacks.unscoped.count > 0 %>
-  <h2 class="mt-5">Feedback on <%= @event.activity.name %> events</h2>
-  <div class="mt-3" data-pagelet-url="/activities/<%= @event.activity_id %>/show_feedback"></div>
-<% elsif @event.event_facilitations.count == 1 && (account = @event.event_facilitators.first).unscoped_event_feedbacks_as_facilitator.count > 0 %>
-  <h2 class="mt-5">Feedback on <%= account.name %>'s events</h2>
-  <div class="mt-3" data-pagelet-url="/accounts/<%= account.id %>/show_feedback"></div>
-<% elsif @event.organisation.unscoped_event_feedbacks.count > 0 %>
-  <h2 class="mt-5">Feedback on <%= @event.organisation.name %> events</h2>
-  <div class="mt-3" data-pagelet-url="/o/<%= @event.organisation.slug %>/show_feedback"></div>
-<% end %>
+<div class="card shadow-sm">
+
+  <% if @event.feedback_activity && @event.feedback_activity.event_feedbacks.unscoped.count > 0 %>
+    <h3 class="card-header chill">Feedback on <%= @event.feedback_activity.name %> events</h2>
+    <div class="card-body pt-2" data-pagelet-url="/activities/<%= @event.feedback_activity_id %>/show_feedback"></div>
+  <% elsif @event.activity && @event.activity.event_feedbacks.unscoped.count > 0 %>
+    <h3 class="card-header chill">Feedback on <%= @event.activity.name %> events</h2>
+    <div class="card-body pt-2" data-pagelet-url="/activities/<%= @event.activity_id %>/show_feedback"></div>
+  <% elsif @event.event_facilitations.count == 1 && (account = @event.event_facilitators.first).unscoped_event_feedbacks_as_facilitator.count > 0 %>
+    <h3 class="card-header chill">Feedback on <%= account.name %>'s events</h2>
+    <div class="card-body pt-2" data-pagelet-url="/accounts/<%= account.id %>/show_feedback"></div>
+  <% elsif @event.organisation.unscoped_event_feedbacks.count > 0 %>
+    <h3 class="card-header chill">Feedback on <%= @event.organisation.name %> events</h2>
+    <div class="card-body pt-2" data-pagelet-url="/o/<%= @event.organisation.slug %>/show_feedback"></div>
+  <% end %>
+
+</div>

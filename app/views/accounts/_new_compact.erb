@@ -1,5 +1,5 @@
-<div class="card mb-3">
-  <div class="hw card-header text-white bg-primary">
+<div class="card shadow-sm mb-3">
+  <div class="card-header text-white bg-primary">
     <h4 class="my-0">
       <% %w{organisation activity local_group event}.each { |r| if instance_variable_get("@#{r}") %>
       Get email updates from <%= instance_variable_get("@#{r}").name %>

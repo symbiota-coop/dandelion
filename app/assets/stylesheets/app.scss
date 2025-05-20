@@ -30,6 +30,23 @@ $color_highlight_2: #B900A1;
   border: none !important;
 }
 
+.card-header.chill {
+  background: white !important;
+  color: #212529 !important;
+  border: none !important;
+  position: relative;
+}
+
+.card-header.chill::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 15px;
+  right: 15px;
+  height: 1px;
+  background-color: rgba(0, 0, 0, 0.1);
+}
+
 .newsfeed-icon {
   font-size: 16px;
 }
@@ -228,12 +245,6 @@ label .form-text {
   font-size: 22px !important;
   position: relative;
   top: -4px
-}
-
-.navbar-brand .hw {
-  font-size: 1.6rem;
-  line-height: 1rem;
-  position: relative;
 }
 
 .note-group-select-from-files {
@@ -729,10 +740,14 @@ figure.image,
   }
 }
 
+.search.well {
+  box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075) !important;
+}
+
 @media(min-width: 992px) {
   .search.well {
     padding-top: 1.0875rem;
-    padding-bottom: 0
+    padding-bottom: 0;
   }
 }
 

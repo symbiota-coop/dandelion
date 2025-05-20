@@ -36,7 +36,7 @@
 
 <% unless defined?(unscoped); event_feedbacks = event_feedbacks.unscoped; end %>
   <% event_feedbacks = event_feedbacks.and(:rating.ne => nil).order('created_at desc').paginate(page: params[:page], per_page: 10) %>
-  <table class="table table-condensed mt-3">
+  <table class="table table-borderless mt-3">
     <% event_feedbacks.each { |event_feedback| account = event_feedback.account %>
     <tr <% if event_feedback.deleted_at%>style="opacity: 0.5"<% end %>>
       <td class="feedback-name">
