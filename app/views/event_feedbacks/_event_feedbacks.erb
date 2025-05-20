@@ -4,12 +4,10 @@
 
   <% if @account %>
     <% if @account.feedback_summary %>
-      <div class="card shadow-sm my-3" data-toggle="tooltip" title="AI-generated summary ✨">
-        <div class="card-body">
-          <big>
-            <%= @account.feedback_summary %>
-          </big>
-        </div>
+      <div class="well border-0 my-3" data-toggle="tooltip" title="AI-generated summary ✨">
+        <big>
+          <%= @account.feedback_summary %>
+        </big>
       </div>
     <% end %>
     <% if admin? %>
@@ -19,12 +17,10 @@
 
   <% if @activity %>
     <% if @activity.feedback_summary %>
-      <div class="card shadow-sm my-3" data-toggle="tooltip" title="AI-generated summary ✨">
-        <div class="card-body">
-          <big>
-            <%= @activity.feedback_summary %>
-          </big>
-        </div>
+      <div class="well border-0 my-3" data-toggle="tooltip" title="AI-generated summary ✨">
+        <big>
+          <%= @activity.feedback_summary %>
+        </big>
       </div>
     <% end %>
     <% if admin? %>

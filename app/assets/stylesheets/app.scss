@@ -18,13 +18,11 @@ $color_highlight_2: #B900A1;
 
 @import "../infinite_admin/scss/style";
 
-#header,
-.card-header.bg-primary.text-white {
+#header {
   background: linear-gradient(45deg, #222 0%, #222 66%, $color_highlight_1 100%) !important;
 }
 
-.card-header.bg-primary.text-white,
-#chat-container .bg-primary,
+.bg-primary.text-white,
 .progress-bar {
   background: linear-gradient(135deg, $color_primary 0%, $color_primary 50%, $color_primary_light 100%) !important;
   border: none !important;
