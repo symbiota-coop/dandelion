@@ -38,8 +38,8 @@
       </div>
     </div>
 
-    <% if admin? %>
-      <div class="mb-4">
+    <% if admin? && Fragment.find_by(key: 'monthly_contributions') %>
+      <div class="mb-4 p-3 bg-white shadow-sm border rounded">
         <%= partial :'accounts/pay_progress', locals: {currency: 'GBP'} %>
       </div>
     <% end %>

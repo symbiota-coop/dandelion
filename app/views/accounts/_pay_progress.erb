@@ -21,7 +21,7 @@
           <% if w > 0 %><%= w.to_f.round %>%<% end %>
         </div>
       </div>
-      <p class="mt-1 text-center">
+      <p class="mt-1 mb-0 text-center">
         <%= monthly_contributions.format(no_cents: true) %> raised of <%= m target, currency %> monthly target
         <% if admin? %>
           <% 
