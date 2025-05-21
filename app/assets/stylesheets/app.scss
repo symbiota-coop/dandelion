@@ -30,6 +30,10 @@ $color_highlight_2: #B900A1;
   border-radius: 0.5rem;
 }
 
+table.dataTable.table-sm>thead>tr>th {
+  background: white
+}
+
 .select2-choices {
   box-shadow: none !important;
 }
