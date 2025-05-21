@@ -1,7 +1,7 @@
 <% if event_feedback.public_answers %>
   <% qas = event_feedback.public_answers.map { |q,a| a unless a.blank? }.compact %>
-  <div class="row mb-3">
-    <div class="col-auto"><i class="bi bi-quote"></i></div>
+  <div class="row no-gutters mb-3">
+    <div class="col-auto mr-2"><i class="bi bi-quote"></i></div>
     <div class="col">
       <% if !qas.empty? %>
         <big><%== Sanitize.fragment(qas.join('<br /><br />'), Sanitize::Config::DANDELION) %></big>
