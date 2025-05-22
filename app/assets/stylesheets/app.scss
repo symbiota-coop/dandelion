@@ -50,9 +50,15 @@ table.dataTable.table-sm>thead>tr>th {
 .bg-primary.text-white,
 .progress-bar,
 .label-primary,
-.badge-primary {
+.badge-primary,
+.btn-primary {
   background: linear-gradient(135deg, $color_primary 0%, $color_primary 50%, $color_primary_light 100%) !important;
   border: none !important;
+}
+
+.btn-primary:hover,
+.btn-primary:focus {
+  background: linear-gradient(135deg, $color_primary_hover 0%, $color_primary_hover 50%, $color_primary_light 100%) !important;
 }
 
 .card-header.chill {
