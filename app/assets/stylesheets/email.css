@@ -76,16 +76,6 @@ h6,
   margin-top: 0;
 }
 
-a {
-  color: #00B963;
-  text-decoration: none
-}
-
-a:hover {
-  color: #00A558;
-  text-decoration: underline
-}
-
 img {
   max-width: 100%;
   margin-bottom: 1rem;
