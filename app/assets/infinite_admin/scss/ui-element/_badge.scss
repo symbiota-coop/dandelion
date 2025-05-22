@@ -24,7 +24,7 @@
 }
 
 .badge-default {
-    background: #8A8A8F;
+    background: linear-gradient(135deg, #8A8A8F 0%, #8A8A8F 50%, lighten(#8A8A8F, 6.66%) 100%) !important;
 }
 
 .badge-default[href]:focus,
@@ -34,7 +34,7 @@
 
 .badge-light {
     color: #000;
-    background-color: #f8f9fa;
+    background: linear-gradient(135deg, #f8f9fa 0%, #f8f9fa 50%, lighten(#f8f9fa, 6.66%) 100%) !important;
 }
 
 .badge-light[href]:focus,
@@ -44,7 +44,7 @@
 }
 
 .badge-primary {
-    background: $color_primary;
+    background: linear-gradient(135deg, $color_primary 0%, $color_primary 50%, lighten($color_primary, 6.66%) 100%) !important;
 }
 
 .badge-primary[href]:focus,
@@ -53,7 +53,7 @@
 }
 
 .badge-success {
-    background: #4CD964;
+    background: linear-gradient(135deg, #4CD964 0%, #4CD964 50%, lighten(#4CD964, 6.66%) 100%) !important;
 }
 
 .badge-success[href]:focus,
@@ -62,7 +62,7 @@
 }
 
 .badge-info {
-    background: #5AC8FA;
+    background: linear-gradient(135deg, #5AC8FA 0%, #5AC8FA 50%, lighten(#5AC8FA, 6.66%) 100%) !important;
 }
 
 .badge-info[href]:focus,
@@ -71,7 +71,7 @@
 }
 
 .badge-warning {
-    background: #FF9500;
+    background: linear-gradient(135deg, #FF9500 0%, #FF9500 50%, lighten(#FF9500, 6.66%) 100%) !important;
 }
 
 .badge-warning[href]:focus,
@@ -80,7 +80,7 @@
 }
 
 .badge-danger {
-    background: #FF3B30;
+    background: linear-gradient(135deg, #FF3B30 0%, #FF3B30 50%, lighten(#FF3B30, 6.66%) 100%) !important;
 }
 
 .badge-danger[href]:focus,
@@ -89,7 +89,7 @@
 }
 
 .badge-purple {
-    background: #5856D6;
+    background: linear-gradient(135deg, #5856D6 0%, #5856D6 50%, lighten(#5856D6, 6.66%) 100%) !important;
 }
 
 .badge-purple[href]:focus,
@@ -98,7 +98,7 @@
 }
 
 .badge-pink {
-    background: #FF2D55;
+    background: linear-gradient(135deg, #FF2D55 0%, #FF2D55 50%, lighten(#FF2D55, 6.66%) 100%) !important;
 }
 
 .badge-pink[href]:focus,
@@ -107,7 +107,7 @@
 }
 
 .badge-yellow {
-    background: #FFCC00;
+    background: linear-gradient(135deg, #FFCC00 0%, #FFCC00 50%, lighten(#FFCC00, 6.66%) 100%) !important;
 }
 
 .badge-yellow[href]:focus,
@@ -117,7 +117,7 @@
 
 .badge-inverse,
 .badge-dark {
-    background: #000;
+    background: linear-gradient(135deg, #000 0%, #000 50%, lighten(#000, 6.66%) 100%) !important;
 }
 
 .badge-inverse[href]:focus,

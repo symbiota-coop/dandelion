@@ -12,23 +12,93 @@
     vertical-align: baseline;
     @include border-radius(0.25em);
 }
-.label-default { background: $color_grey; }
-.label-default[href]:focus, .label-default[href]:hover { background: #737377; }
-.label-primary { background: $color_primary; }
-.label-primary[href]:focus, .label-primary[href]:hover { background: $color_primary_hover; }
-.label-success { background: $color_success; }
-.label-success[href]:focus, .label-success[href]:hover { background: #45c35a; }
-.label-info { background: $color_info; }
-.label-info[href]:focus, .label-info[href]:hover { background: #50b3e0; }
-.label-warning { background: $color_warning; }
-.label-warning[href]:focus, .label-warning[href]:hover { background: #e68701; }
-.label-danger { background: $color_danger; }
-.label-danger[href]:focus, .label-danger[href]:hover { background: #e4352b; }
-.label-purple { background: $color_purple; }
-.label-purple[href]:focus, .label-purple[href]:hover { background: #4c4bb7; }
-.label-pink { background: $color_pink; }
-.label-pink[href]:focus, .label-pink[href]:hover { background: #de2649; }
-.label-yellow { background: $color_yellow; }
-.label-yellow[href]:focus, .label-yellow[href]:hover { background: #e6b801; }
-.label-inverse { background: $color_inverse; }
-.label-inverse[href]:focus, .label-inverse[href]:hover { background: #333; }
+
+.label-default {
+    background: linear-gradient(135deg, $color_grey 0%, $color_grey 50%, lighten($color_grey, 6.66%) 100%) !important;
+}
+
+.label-default[href]:focus,
+.label-default[href]:hover {
+    background: #737377;
+}
+
+.label-primary {
+    background: linear-gradient(135deg, $color_primary 0%, $color_primary 50%, lighten($color_primary, 6.66%) 100%) !important;
+}
+
+.label-primary[href]:focus,
+.label-primary[href]:hover {
+    background: $color_primary_hover;
+}
+
+.label-success {
+    background: linear-gradient(135deg, $color_success 0%, $color_success 50%, lighten($color_success, 6.66%) 100%) !important;
+}
+
+.label-success[href]:focus,
+.label-success[href]:hover {
+    background: #45c35a;
+}
+
+.label-info {
+    background: linear-gradient(135deg, $color_info 0%, $color_info 50%, lighten($color_info, 6.66%) 100%) !important;
+}
+
+.label-info[href]:focus,
+.label-info[href]:hover {
+    background: #50b3e0;
+}
+
+.label-warning {
+    background: linear-gradient(135deg, $color_warning 0%, $color_warning 50%, lighten($color_warning, 6.66%) 100%) !important;
+}
+
+.label-warning[href]:focus,
+.label-warning[href]:hover {
+    background: #e68701;
+}
+
+.label-danger {
+    background: linear-gradient(135deg, $color_danger 0%, $color_danger 50%, lighten($color_danger, 6.66%) 100%) !important;
+}
+
+.label-danger[href]:focus,
+.label-danger[href]:hover {
+    background: #e4352b;
+}
+
+.label-purple {
+    background: linear-gradient(135deg, $color_purple 0%, $color_purple 50%, lighten($color_purple, 6.66%) 100%) !important;
+}
+
+.label-purple[href]:focus,
+.label-purple[href]:hover {
+    background: #4c4bb7;
+}
+
+.label-pink {
+    background: linear-gradient(135deg, $color_pink 0%, $color_pink 50%, lighten($color_pink, 6.66%) 100%) !important;
+}
+
+.label-pink[href]:focus,
+.label-pink[href]:hover {
+    background: #de2649;
+}
+
+.label-yellow {
+    background: linear-gradient(135deg, $color_yellow 0%, $color_yellow 50%, lighten($color_yellow, 6.66%) 100%) !important;
+}
+
+.label-yellow[href]:focus,
+.label-yellow[href]:hover {
+    background: #e6b801;
+}
+
+.label-inverse {
+    background: linear-gradient(135deg, $color_inverse 0%, $color_inverse 50%, lighten($color_inverse, 6.66%) 100%) !important;
+}
+
+.label-inverse[href]:focus,
+.label-inverse[href]:hover {
+    background: #333;
+}
