@@ -73,7 +73,7 @@
 	.open>.dropdown-toggle.#{$buttonClassName} {
 		border-color: $borderColor;
 		color: $textColor;
-		background: linear-gradient(135deg, $bgColor 0%, $bgColor 50%, lighten($bgColor, 10%) 100%);
+		background: linear-gradient(135deg, $bgColor 0%, $bgColor 50%, lighten($bgColor, 6.66%) 100%);
 		border: none;
 	}
 
@@ -101,7 +101,7 @@
 	.open>.dropdown-toggle.#{$buttonClassName}:focus,
 	.open>.dropdown-toggle.#{$buttonClassName}:hover {
 		border-color: $hoverBorderColor;
-		background: linear-gradient(135deg, $hoverBgColor 0%, $hoverBgColor 50%, lighten($hoverBgColor, 10%) 100%);
+		background: linear-gradient(135deg, $hoverBgColor 0%, $hoverBgColor 50%, lighten($hoverBgColor, 6.66%) 100%);
 		color: $hoverTextColor;
 		border: none;
 	}
@@ -109,7 +109,7 @@
 	.#{$buttonClassName}:not([disabled]):not(.disabled).active,
 	.#{$buttonClassName}:not([disabled]):not(.disabled):active,
 	.show>.#{$buttonClassName}.dropdown-toggle {
-		background: linear-gradient(135deg, $hoverBgColor 0%, $hoverBgColor 50%, lighten($hoverBgColor, 10%) 100%);
+		background: linear-gradient(135deg, $hoverBgColor 0%, $hoverBgColor 50%, lighten($hoverBgColor, 6.66%) 100%);
 		border-color: $hoverBorderColor;
 		box-shadow: 0 0 0 0.2rem fade($bgColor, 50%);
 		border: none;
