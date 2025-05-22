@@ -3,30 +3,37 @@
 .btn {
 	font-size: 0.875rem;
 }
+
 .btn:hover,
 .btn:active,
 .btn:focus {
 	outline: none;
 }
+
 .btn.btn-sm {
 	padding: 0.3125rem 0.625rem;
 	font-size: $body_font_size;
 }
-.btn-group-xs > .btn, .btn-xs {
-    padding: 1px 0.3125rem;
-    font-size: $body_font_size;
-    line-height: 1.5;
-    border-radius: 0.1875rem;
+
+.btn-group-xs>.btn,
+.btn-xs {
+	padding: 1px 0.3125rem;
+	font-size: $body_font_size;
+	line-height: 1.5;
+	border-radius: 0.1875rem;
 }
+
 .btn.btn-lg {
 	font-size: 1.125rem;
 	padding: 0.625rem 1rem;
-    line-height: 1.3333333;
+	line-height: 1.3333333;
 	@include border-radius(0.25rem);
 }
+
 .btn.btn-rounded {
 	@include border-radius(6.25rem);
 }
+
 .btn.btn-outline,
 .btn.btn-default.btn-outline,
 .btn.btn-primary.btn-outline,
@@ -37,40 +44,46 @@
 .btn.btn-purple.btn-outline,
 .btn.btn-yellow.btn-outline,
 .btn.btn-grey.btn-outline,
-.btn.btn-pink.btn-outline   {
+.btn.btn-pink.btn-outline {
 	background: none;
 }
+
 .btn.no-border {
 	border: none;
 }
+
 .btn.btn-icon {
 	@include border-radius(2.5rem);
 }
 
 @mixin generate-button-styling($buttonClassName, $borderColor, $textColor, $bgColor, $outlineColor, $hoverBorderColor, $hoverBgColor, $hoverTextColor) {
+
 	.#{$buttonClassName},
-	.#{$buttonClassName}.disabled.focus, 
-	.#{$buttonClassName}.disabled:focus, 
-	.#{$buttonClassName}.disabled:hover, 
-	.#{$buttonClassName}[disabled].focus, 
-	.#{$buttonClassName}[disabled]:focus, 
-	.#{$buttonClassName}[disabled]:hover, 
-	fieldset[disabled] .#{$buttonClassName}.focus, 
-	fieldset[disabled] .#{$buttonClassName}:focus, 
+	.#{$buttonClassName}.disabled.focus,
+	.#{$buttonClassName}.disabled:focus,
+	.#{$buttonClassName}.disabled:hover,
+	.#{$buttonClassName}[disabled].focus,
+	.#{$buttonClassName}[disabled]:focus,
+	.#{$buttonClassName}[disabled]:hover,
+	fieldset[disabled] .#{$buttonClassName}.focus,
+	fieldset[disabled] .#{$buttonClassName}:focus,
 	fieldset[disabled] .#{$buttonClassName}:hover,
-	.#{$buttonClassName}.active, 
-	.#{$buttonClassName}:active, 
-	.open > .dropdown-toggle.#{$buttonClassName} {
+	.#{$buttonClassName}.active,
+	.#{$buttonClassName}:active,
+	.open>.dropdown-toggle.#{$buttonClassName} {
 		border-color: $borderColor;
 		color: $textColor;
-		background: $bgColor;
+		background: linear-gradient(135deg, $bgColor 0%, $bgColor 50%, lighten($bgColor, 10%) 100%);
+		border: none;
 	}
+
 	.#{$buttonClassName}.btn-outline,
 	.#{$buttonClassName}.btn-outline:hover,
 	.#{$buttonClassName}.btn-outline:focus,
 	.#{$buttonClassName}.btn-outline:active {
 		color: $outlineColor;
 	}
+
 	.#{$buttonClassName}:hover,
 	.#{$buttonClassName}:focus,
 	.#{$buttonClassName}:active,
@@ -78,192 +91,173 @@
 	.#{$buttonClassName}.btn-outline:focus,
 	.#{$buttonClassName}.btn-outline:active,
 	.#{$buttonClassName}.btn-outline.active,
-	.#{$buttonClassName}.active.focus, 
-	.#{$buttonClassName}.active:focus, 
-	.#{$buttonClassName}.active:hover, 
-	.#{$buttonClassName}:active.focus, 
-	.#{$buttonClassName}:active:focus, 
-	.#{$buttonClassName}:active:hover, 
-	.open > .dropdown-toggle.#{$buttonClassName}.focus, 
-	.open > .dropdown-toggle.#{$buttonClassName}:focus, 
-	.open > .dropdown-toggle.#{$buttonClassName}:hover {
+	.#{$buttonClassName}.active.focus,
+	.#{$buttonClassName}.active:focus,
+	.#{$buttonClassName}.active:hover,
+	.#{$buttonClassName}:active.focus,
+	.#{$buttonClassName}:active:focus,
+	.#{$buttonClassName}:active:hover,
+	.open>.dropdown-toggle.#{$buttonClassName}.focus,
+	.open>.dropdown-toggle.#{$buttonClassName}:focus,
+	.open>.dropdown-toggle.#{$buttonClassName}:hover {
 		border-color: $hoverBorderColor;
-		background: $hoverBgColor;
+		background: linear-gradient(135deg, $hoverBgColor 0%, $hoverBgColor 50%, lighten($hoverBgColor, 10%) 100%);
 		color: $hoverTextColor;
+		border: none;
 	}
-	.#{$buttonClassName}:not([disabled]):not(.disabled).active, 
-	.#{$buttonClassName}:not([disabled]):not(.disabled):active, 
-	.show > .#{$buttonClassName}.dropdown-toggle {
-		background: $hoverBgColor;
+
+	.#{$buttonClassName}:not([disabled]):not(.disabled).active,
+	.#{$buttonClassName}:not([disabled]):not(.disabled):active,
+	.show>.#{$buttonClassName}.dropdown-toggle {
+		background: linear-gradient(135deg, $hoverBgColor 0%, $hoverBgColor 50%, lighten($hoverBgColor, 10%) 100%);
 		border-color: $hoverBorderColor;
 		box-shadow: 0 0 0 0.2rem fade($bgColor, 50%);
+		border: none;
 	}
 }
 
 
 /* Button - Default Setting */
-@include generate-button-styling(
-	btn-default, 			
-	$color_default_border,			
-	$color_default_text,			
-	$color_white,			
-	$color_inverse,			
-	$color_default_border_hover,	
-	$color_default_hover,	
-	$color_inverse
-);
+@include generate-button-styling(btn-default,
+	$color_default_border,
+	$color_default_text,
+	$color_white,
+	$color_inverse,
+	$color_default_border_hover,
+	$color_default_hover,
+	$color_inverse);
+
 .btn-default.active {
 	background: $color_white;
 }
 
 
 /* Button - White Setting */
-@include generate-button-styling(
-	btn-white, 			
-	$color_white,			
-	$color_inverse,			
-	$color_white,			
-	$color_white,			
-	$color_white_transparent_8,	
-	$color_white_transparent_8,	
-	$color_inverse		
-);
+@include generate-button-styling(btn-white,
+	$color_white,
+	$color_inverse,
+	$color_white,
+	$color_white,
+	$color_white_transparent_8,
+	$color_white_transparent_8,
+	$color_inverse);
 
 
 /* Button - Primary Setting */
-@include generate-button-styling(
-	btn-primary, 			
-	$color_primary,			
-	$color_white,			
-	$color_primary,			
-	$color_primary,			
-	$color_primary_hover,	
-	$color_primary_hover,	
-	$color_white
-);
+@include generate-button-styling(btn-primary,
+	$color_primary,
+	$color_white,
+	$color_primary,
+	$color_primary,
+	$color_primary_hover,
+	$color_primary_hover,
+	$color_white);
 
 
 /* Button - Success Setting */
-@include generate-button-styling(
-	btn-success, 			
-	$color_success,			
-	$color_white,			
-	$color_success,			
-	$color_success,			
-	$color_success_hover,	
-	$color_success_hover,	
-	$color_white
-);
+@include generate-button-styling(btn-success,
+	$color_success,
+	$color_white,
+	$color_success,
+	$color_success,
+	$color_success_hover,
+	$color_success_hover,
+	$color_white);
 
 
 /* Button - Info Setting */
-@include generate-button-styling(
-	btn-info, 			
-	$color_info,			
-	$color_white,			
-	$color_info,			
-	$color_info,			
-	$color_info_hover,	
-	$color_info_hover,	
-	$color_white	
-);
+@include generate-button-styling(btn-info,
+	$color_info,
+	$color_white,
+	$color_info,
+	$color_info,
+	$color_info_hover,
+	$color_info_hover,
+	$color_white);
 
 
 /* Button - Warning Setting */
-@include generate-button-styling(
-	btn-warning, 			
-	$color_warning,			
-	$color_white,			
-	$color_warning,			
-	$color_warning,			
-	$color_warning_hover,	
-	$color_warning_hover,	
-	$color_white
-);
+@include generate-button-styling(btn-warning,
+	$color_warning,
+	$color_white,
+	$color_warning,
+	$color_warning,
+	$color_warning_hover,
+	$color_warning_hover,
+	$color_white);
 
 
 /* Button - Danger Setting */
-@include generate-button-styling(
-	btn-danger, 			
-	$color_danger,			
-	$color_white,			
-	$color_danger,			
-	$color_danger,			
-	$color_danger_hover,	
-	$color_danger_hover,	
-	$color_white
-);
+@include generate-button-styling(btn-danger,
+	$color_danger,
+	$color_white,
+	$color_danger,
+	$color_danger,
+	$color_danger_hover,
+	$color_danger_hover,
+	$color_white);
 
 
 /* Button - Purple Setting */
-@include generate-button-styling(
-	btn-purple, 			
-	$color_purple,			
-	$color_white,			
-	$color_purple,			
-	$color_purple,			
-	$color_purple_hover,	
-	$color_purple_hover,	
-	$color_white
-);
+@include generate-button-styling(btn-purple,
+	$color_purple,
+	$color_white,
+	$color_purple,
+	$color_purple,
+	$color_purple_hover,
+	$color_purple_hover,
+	$color_white);
 
 
 /* Button - Pink Setting */
-@include generate-button-styling(
-	btn-pink, 			
-	$color_pink,			
-	$color_white,			
-	$color_pink,			
-	$color_pink,			
-	$color_pink_hover,	
-	$color_pink_hover,	
-	$color_white
-);
+@include generate-button-styling(btn-pink,
+	$color_pink,
+	$color_white,
+	$color_pink,
+	$color_pink,
+	$color_pink_hover,
+	$color_pink_hover,
+	$color_white);
 
 
 /* Button - Yellow Setting */
-@include generate-button-styling(
-	btn-yellow, 			
-	$color_yellow,			
-	$color_white,			
-	$color_yellow,			
-	$color_yellow,			
-	$color_yellow_hover,	
-	$color_yellow_hover,	
-	$color_white
-);
+@include generate-button-styling(btn-yellow,
+	$color_yellow,
+	$color_white,
+	$color_yellow,
+	$color_yellow,
+	$color_yellow_hover,
+	$color_yellow_hover,
+	$color_white);
 
 
 /* Button - Grey Setting */
-@include generate-button-styling(
-	btn-grey, 			
-	$color_grey,			
-	$color_white,			
-	$color_grey,			
-	$color_grey,			
-	$color_grey_hover,	
-	$color_grey_hover,	
-	$color_white
-);
+@include generate-button-styling(btn-grey,
+	$color_grey,
+	$color_white,
+	$color_grey,
+	$color_grey,
+	$color_grey_hover,
+	$color_grey_hover,
+	$color_white);
 
 
 /* Button - Inverse Setting */
-@include generate-button-styling(
-	btn-inverse, 			
-	$color_inverse,			
-	$color_white,			
-	$color_inverse,			
-	$color_inverse,			
-	$color_inverse_hover,	
-	$color_inverse_hover,	
-	$color_white
-);
+@include generate-button-styling(btn-inverse,
+	$color_inverse,
+	$color_white,
+	$color_inverse,
+	$color_inverse,
+	$color_inverse_hover,
+	$color_inverse_hover,
+	$color_white);
 
 
 /* Button - Link Setting */
 .btn-link {
 	color: $color_primary;
 }
+
 .btn-link:hover,
 .btn-link:focus,
 .btn-link:active {
