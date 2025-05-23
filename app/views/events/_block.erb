@@ -29,11 +29,13 @@
           <div class="row justify-content-between">
             <div class="col ml-1 p-lg-3">
               <%= partial :'events/block_main', locals: { event: event } %>
+              <% if event.carousel_text
               <div class="alert alert-success" style="font-size: 1rem" class="mb-0"><%= event.carousel_text %></div>
-            </div>
-          </div>
-        </td>
-      </tr>
-    </table>
-  </div>
+          <% end %>
+        </div>
+      </div>
+    </td>
+  </tr>
+</table>
+</div>
 </div>
