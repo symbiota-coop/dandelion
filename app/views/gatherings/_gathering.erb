@@ -1,7 +1,5 @@
 <a class="d-block p-2 <% if gathering.image %>text-white<% else %>text-dark<% end %>" href="/g/<%= gathering.slug %>" style="<% if !gathering.image %>border: 2px solid #212529;<% end %> <% if gathering.image %>background: linear-gradient( rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0.4) ), url('<%= u gathering.image.thumb('400x400').url %>'); background-size: cover; background-position: center center;<% end %>" class="gathering">
   <div style="height: 160px;">
-    <h4 class="block-title">
-      <%= gathering.name %>
-    </h4>
+    <h4 class="block-title"><%= gathering.name %></h4>
   </div>
 </a>

@@ -391,8 +391,16 @@ li.reply .widget-chat-message a {
   -webkit-text-fill-color: transparent;
 }
 
-h4.block-title {
+h4.block-title,
+div.block-title,
+div.block-title h4 {
   font-size: 1.66rem
+}
+
+div.block-title .label {
+  font-size: 0.75rem;
+  position: relative;
+  top: -0.25rem;
 }
 
 #gathering-nav ul li a {

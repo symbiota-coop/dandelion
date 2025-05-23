@@ -105,7 +105,13 @@
     <% end %>
   </div>
   <div id="get-tickets-sidebar" style="position: sticky; top: 3.75rem" class="d-none d-md-none">
-    <a href="javascript:;" onclick="$(window).scrollTop($('#purchase').offset()['top'] - $('#header').height() - 17)" class="btn btn-primary btn-block">Get tickets</a>
+    <a href="javascript:;" onclick="$(window).scrollTop($('#purchase').offset()['top'] - $('#header').height() - 17)" class="btn btn-primary btn-block">
+      <% if @event.purchase_url %>
+        <%= @event.rsvp_button_text %>
+      <% else %>
+        Get tickets
+      <% end %>
+    </a>
   </div>
   <script>
     $(function () {

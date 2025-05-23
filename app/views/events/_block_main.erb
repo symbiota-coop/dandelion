@@ -1,21 +1,23 @@
-<h4 class="block-title <% if defined?(custom_class) %><%=custom_class%><% end %>">
-  <a class="text-dark" target="_parent" href="<%= "/e/#{event.slug}#{if @organisation && @organisation != event.organisation; "?cohost=#{@organisation.slug}"; end }"%>">
-    <%= event.name %>
-  </a>
+<div class="block-title">
+  <h4 class="d-inline-block mr-1 <% if defined?(custom_class) %><%=custom_class%><% end %>">
+    <a class="text-dark" target="_parent" href="<%= "/e/#{event.slug}#{if @organisation && @organisation != event.organisation; "?cohost=#{@organisation.slug}"; end }"%>">
+      <%= event.name %>
+    </a>
+  </h4>
   <% if @organisation %>
     <% if event.featured? %>
-      <span style="font-size: 0.75rem; position: relative; top: -0.25rem" class="label label-yellow">Featured</span>
+      <span class="label label-yellow">Featured</span>
     <% end %>
   <% else %>
     <% if event.boosted? %>
-      <span style="font-size: 0.75rem; position: relative; top: -0.25rem" class="label label-yellow">Featured</span>
+      <span class="label label-yellow">Featured</span>
     <% end %>
   <% end %>
   <% if event.sold_out? %>
-    <span style="font-size: 0.75rem; position: relative; top: -0.25rem" class="label label-danger">Sold out</span>
+    <span class="label label-danger">Sold out</span>
   <% end %>
   <% if event.locked? %>
-    <span style="font-size: 0.75rem; position: relative; top: -0.25rem"  class="label label-default">Locked</span>
+    <span class="label label-default">Locked</span>
   <% end %>
   <% if current_account %>
     <div data-with-placeholder class="d-inline event-star" data-pagelet-url="/events/<%=event.id%>/star?block_edit=1"><i class="bi bi-star" style="opacity: 0.3"></i></div>
@@ -25,7 +27,7 @@
       <i class="bi bi-pencil-fill"></i>
     </a>
   <% end %>
-</h4>
+</div>
 <div class="mb-2">
   <%= partial :'events/tag_labels', locals: { event: event, limit: 5 } %>
 </div>
