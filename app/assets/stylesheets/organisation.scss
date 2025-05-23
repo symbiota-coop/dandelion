@@ -1,9 +1,4 @@
-// =============================================================================
-// COMMON THEME BASE
-// Only the patterns that are identical across ALL themes
-// =============================================================================
-
-// Primary color variable - the only required variable
+// Theme color variable
 $theme-color: #00B963 !default;
 
 // =============================================================================
@@ -33,7 +28,7 @@ a:active {
 a:hover,
 a:focus,
 a:active {
-  opacity: 0.7;
+  background: darken($theme-color, 6.66%)
 }
 
 // =============================================================================
@@ -75,29 +70,39 @@ a:active {
 .btn-primary:hover,
 .btn-primary:focus,
 .btn-primary:active {
-  opacity: 0.7;
+  background: darken($theme-color, 6.66%);
 }
 
 // =============================================================================
 // LABELS AND BADGES
 // =============================================================================
 
+.badge-primary {
+  background: $theme-color !important;
+}
+
+.badge-primary[href] {
+  background: $theme-color !important;
+}
+
+.badge-primary[href]:hover,
+.badge-primary[href]:focus,
+.badge-primary[href]:active {
+  background: darken($theme-color, 6.66%) !important;
+}
+
 .label-primary {
   background: $theme-color !important;
 }
 
-.badge-primary[href],
-.badge-primary[href]:hover,
-.badge-primary[href]:focus,
-.badge-primary[href]:active {
+.label-primary[href] {
   background: $theme-color !important;
 }
 
-.label-primary[href],
 .label-primary[href]:hover,
 .label-primary[href]:focus,
 .label-primary[href]:active {
-  background: $theme-color !important;
+  background: darken($theme-color, 6.66%) !important;
 }
 
 // =============================================================================
@@ -156,8 +161,8 @@ a:active {
 .alert.alert-success {
   background: linear-gradient(135deg,
       rgba($theme-color, 0.1) 0%,
-      rgba($theme-color, 0.15) 50%,
-      rgba($theme-color, 0.2) 100%) !important;
+      rgba($theme-color, 0.1) 50%,
+      rgba($theme-color, 0.25) 100%) !important;
   color: darken($theme-color, 10%);
 }
 
