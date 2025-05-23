@@ -154,7 +154,8 @@ module EventFields
         ticket_email_title: 'Order confirmation email subject',
         ticket_email_greeting: 'Order confirmation greeting',
         rsvp_button_text: 'RSVP button',
-        tax_rate_id: 'Stripe tax rate ID'
+        tax_rate_id: 'Stripe tax rate ID',
+        carousel_text: 'Preview text'
       }[attr.to_sym] || super
     end
 
@@ -167,7 +168,7 @@ module EventFields
         add_a_donation_to: "Text to display beside the 'Add a donation' field (leave blank to use organisation default)",
         oc_slug: 'Event slug for taking payments via Open Collective',
         donation_text: "Text to display below the 'Add a donation' field  (leave blank to use organisation default)",
-        carousel_text: 'Text to show when hovering over the event in a carousel',
+        carousel_text: 'Text to show on event listings or when hovering over the event in a carousel',
         select_tickets_title: 'Title of the Select Tickets panel (default: Select tickets)',
         select_tickets_intro: 'Text to show at the top of the Select Tickets panel',
         select_tickets_outro: 'Text to show at the bottom of the Select Tickets panel',

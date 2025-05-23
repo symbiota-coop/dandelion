@@ -1,0 +1,171 @@
+// =============================================================================
+// COMMON THEME BASE
+// Only the patterns that are identical across ALL themes
+// =============================================================================
+
+// Primary color variable - the only required variable
+$theme-color: #00B963 !default;
+
+// =============================================================================
+// SEARCH COMPONENTS
+// =============================================================================
+
+.search.well .checkbox-inline.checked {
+  border-color: $theme-color;
+}
+
+// =============================================================================
+// LINKS AND NAVIGATION
+// =============================================================================
+
+a,
+a:hover,
+a:focus,
+a:active {
+  color: $theme-color;
+}
+
+.nav-pills .nav-link.active,
+.nav-pills .show>.nav-link {
+  background-color: $theme-color;
+}
+
+a:hover,
+a:focus,
+a:active {
+  opacity: 0.7;
+}
+
+// =============================================================================
+// BUTTONS
+// =============================================================================
+
+.btn:focus {
+  box-shadow: none;
+}
+
+.btn-outline-primary,
+.btn-outline-primary:hover,
+.btn-outline-primary:focus,
+.btn-outline-primary:active {
+  color: $theme-color;
+  border-color: $theme-color;
+}
+
+.btn-outline-primary:not(:disabled):not(.disabled):active,
+.btn-outline-primary:not(:disabled):not(.disabled).active,
+.show>.btn-outline-primary.dropdown-toggle {
+  background: white;
+  border-color: $theme-color;
+  color: $theme-color;
+}
+
+.btn-outline-primary:hover {
+  background: white;
+}
+
+.btn-primary,
+.btn-primary:hover,
+.btn-primary:focus,
+.btn-primary:active {
+  background: $theme-color;
+  border-color: $theme-color;
+}
+
+.btn-primary:hover,
+.btn-primary:focus,
+.btn-primary:active {
+  opacity: 0.7;
+}
+
+// =============================================================================
+// LABELS AND BADGES
+// =============================================================================
+
+.label-primary {
+  background: $theme-color !important;
+}
+
+.badge-primary[href],
+.badge-primary[href]:hover,
+.badge-primary[href]:focus,
+.badge-primary[href]:active {
+  background: $theme-color !important;
+}
+
+.label-primary[href],
+.label-primary[href]:hover,
+.label-primary[href]:focus,
+.label-primary[href]:active {
+  background: $theme-color !important;
+}
+
+// =============================================================================
+// PAGINATION
+// =============================================================================
+
+.page-item.active .page-link {
+  background: $theme-color;
+  border-color: $theme-color;
+}
+
+.page-link:focus {
+  box-shadow: none;
+}
+
+// =============================================================================
+// FORM CONTROLS
+// =============================================================================
+
+.checkbox input:checked+label:before,
+.checkbox-inline input:checked+label:before {
+  background: $theme-color;
+  border-color: $theme-color;
+}
+
+// =============================================================================
+// DATE PICKER
+// =============================================================================
+
+.flatpickr-day.selected,
+.flatpickr-day.startRange,
+.flatpickr-day.endRange,
+.flatpickr-day.selected.inRange,
+.flatpickr-day.startRange.inRange,
+.flatpickr-day.endRange.inRange,
+.flatpickr-day.selected:focus,
+.flatpickr-day.startRange:focus,
+.flatpickr-day.endRange:focus,
+.flatpickr-day.selected:hover,
+.flatpickr-day.startRange:hover,
+.flatpickr-day.endRange:hover,
+.flatpickr-day.selected.prevMonthDay,
+.flatpickr-day.startRange.prevMonthDay,
+.flatpickr-day.endRange.prevMonthDay,
+.flatpickr-day.selected.nextMonthDay,
+.flatpickr-day.startRange.nextMonthDay,
+.flatpickr-day.endRange.nextMonthDay {
+  background: $theme-color;
+  border-color: $theme-color;
+}
+
+// =============================================================================
+// ALERTS
+// =============================================================================
+
+.alert.alert-success {
+  background: linear-gradient(135deg,
+      rgba($theme-color, 0.1) 0%,
+      rgba($theme-color, 0.15) 50%,
+      rgba($theme-color, 0.2) 100%) !important;
+  color: darken($theme-color, 10%);
+}
+
+// =============================================================================
+// MAP CONTAINER
+// =============================================================================
+
+#map-container,
+#map-canvas {
+  min-height: 500px;
+}

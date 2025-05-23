@@ -549,4 +549,25 @@ Dandelion::App.controller do
     )
     200
   end
+
+  get '/organisations/stylesheet.css' do
+    content_type 'text/css'
+    theme_color = params[:theme_color] || '00B963'
+
+    # Sanitize the input (only allow valid hex colors)
+    theme_color = theme_color.gsub(/[^0-9A-Fa-f]/, '')
+    theme_color = '00B963' unless theme_color.match?(/^([0-9A-Fa-f]{3}){1,2}$/)
+
+    # Add the # prefix if it's missing
+    theme_color = "##{theme_color}" unless theme_color.start_with?('#')
+
+    # Read the base SCSS file
+    scss_content = File.read(Padrino.root('app/assets/stylesheets/organisation.scss'))
+
+    # Replace the default variable with our parameter
+    scss_content.sub!(/\$theme-color:.*?;/, "$theme-color: #{theme_color};")
+
+    # Compile the SCSS to CSS
+    Sass::Engine.new(scss_content, syntax: :scss).render
+  end
 end

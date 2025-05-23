@@ -2,8 +2,11 @@
 <html lang="en">
   <%= partial :'layouts/head' %>
   <body>
-    <% if @organisation && @organisation.unsanitized_ok? && @organisation.minimal_head %>
-      <%== @organisation.minimal_head %>
+    <% if @organisation %>
+      <link href="/organisations/stylesheet.css?theme_color=<%=@organisation.theme_color%>" rel="stylesheet">
+      <% if @organisation.unsanitized_ok? && @organisation.minimal_head %>
+        <%== @organisation.minimal_head %>
+      <% end %>
     <% end %>
     <% if @account && @account.admin? && @account.minimal_head %>
       <%== @account.minimal_head %>
