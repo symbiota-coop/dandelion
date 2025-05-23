@@ -5,7 +5,7 @@
 
   <% else %>
     <div class="col-lg-6 order-lg-2 mb-2 mb-lg-0 bg-white">
-      <% if @organisation && (cohostship = event.cohostships.find_by(organisation: @organisation)) %>
+      <% if @organisation && (cohostship = event.cohostships.find_by(organisation: @organisation)) && (cohostship.image || cohostship.video) %>
         <% if cohostship.image %>
           <a target="_parent" href="/e/<%= event.slug %>?cohost=<%=@organisation.slug%>"><img class="w-100" src="<%= u cohostship.image.thumb('992x992').url %>"></a>
         <% elsif cohostship.video %>
