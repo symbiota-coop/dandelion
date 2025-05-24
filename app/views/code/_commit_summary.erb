@@ -17,7 +17,7 @@ Commit messages:
 
 #{commit_info}"
 
-response = OpenRouter.chat(prompt, model: 'anthropic/claude-3.7-sonnet:beta')
+response = OpenRouter.chat(prompt, intelligence: 'smarter')
 summary = if response
   lines = response.split("\n")
   if lines.first && (lines.first.start_with?("# ") || lines.first.start_with?("Here") || lines.first.end_with?(":"))

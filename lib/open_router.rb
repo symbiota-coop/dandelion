@@ -1,19 +1,17 @@
 class OpenRouter
   BASE_URL = 'https://openrouter.ai'.freeze
-  DEFAULT_MODEL = 'google/gemini-2.0-flash-001'.freeze
+  DEFAULT_MODEL = 'google/gemini-2.5-flash-preview-05-20'.freeze
   DEFAULT_PROVIDERS = {
-    'google/gemini-2.0-flash-001' => %w[Google],
-    'google/gemini-2.5-flash-preview' => %w[Google],
-    'google/gemini-2.5-flash-preview:thinking' => %w[Google],
-    'google/gemini-2.5-pro-preview-03-25' => %w[Google],
-    'anthropic/claude-3.7-sonnet:beta' => %w[Anthropic]
+    'google/gemini-2.5-flash-preview-05-20' => %w[Google],
+    'google/gemini-2.5-flash-preview-05-20:thinking' => %w[Google]
   }.freeze
   DEFAULT_CONTEXT_WINDOW_SIZES = {
-    'google/gemini-2.0-flash-001' => 1_000_000,
-    'google/gemini-2.5-flash-preview' => 1_000_000,
-    'google/gemini-2.5-flash-preview:thinking' => 1_000_000,
-    'google/gemini-2.5-pro-preview-03-25' => 1_000_000,
-    'anthropic/claude-3.7-sonnet:beta' => 200_000
+    'google/gemini-2.5-flash-preview-05-20' => 1_000_000,
+    'google/gemini-2.5-flash-preview-05-20:thinking' => 1_000_000
+  }.freeze
+  INTELLIGENCE_LEVELS = {
+    'standard' => 'google/gemini-2.5-flash-preview-05-20',
+    'smarter' => 'google/gemini-2.5-flash-preview-05-20:thinking'
   }.freeze
 
   class << self
@@ -30,7 +28,8 @@ class OpenRouter
     end
   end
 
-  def chat(prompt, full_response: false, max_tokens: nil, schema: nil, model: DEFAULT_MODEL, providers: nil, context_window_size: nil)
+  def chat(prompt, full_response: false, max_tokens: nil, schema: nil, model: DEFAULT_MODEL, providers: nil, context_window_size: nil, intelligence: nil)
+    model = INTELLIGENCE_LEVELS[intelligence] if intelligence
     providers ||= DEFAULT_PROVIDERS[model]
     context_window_size ||= DEFAULT_CONTEXT_WINDOW_SIZES[model]
     prompt = prompt[0..(context_window_size * 4 * 0.66)]
