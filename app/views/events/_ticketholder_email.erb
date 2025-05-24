@@ -1,4 +1,4 @@
 <% form_tag "/events/#{@event.id}/orders/#{@order.id}/ticketholders/#{ticket.id}/email", id: 'ticketholders', class: 'mb-0' do %>
   <%= hidden_field_tag :success, value: success %>
-  <%= email_field_tag :email, value: ticket.email, onchange: '$(this.form).submit()', class: 'form-control', placeholder: "Email" %>
+  <%= email_field_tag :email, value: ticket.email, onchange: "showSavedTooltipAndSubmit(this);", class: 'form-control', placeholder: "Email" %>
 <% end %>

@@ -5,7 +5,9 @@ $(function () {
   })
 
   function postLoad (pagelet) {
-    pagelet.css('opacity', '1')
+    if (!pagelet.is('[data-pagelet-no-opacity-change]')) {
+      pagelet.css('opacity', '1')
+    }
     $('.tooltip').remove()
     $('[data-pagelet-refresh-paused]').removeAttr('data-pagelet-refresh-paused')
     if (pagelet.attr('data-pagelet-also')) {
@@ -17,7 +19,9 @@ $(function () {
   $(document).on('submit', '[data-pagelet-url] form:not(.no-trigger)', function () {
     const form = this
     const pagelet = $(form).closest('[data-pagelet-url]')
-    pagelet.css('opacity', '0.3')
+    if (!pagelet.is('[data-pagelet-no-opacity-change]')) {
+      pagelet.css('opacity', '0.3')
+    }
     if ($(this).hasClass('no-submit')) {
       pagelet.load(pagelet.attr('data-pagelet-url'), function () { postLoad(pagelet) })
     } else {
@@ -49,7 +53,9 @@ $(function () {
       return false
     }
     const pagelet = $(a).closest('[data-pagelet-url]')
-    pagelet.css('opacity', '0.3')
+    if (!pagelet.is('[data-pagelet-no-opacity-change]')) {
+      pagelet.css('opacity', '0.3')
+    }
     $.get($(a).attr('href'), function () {
       pagelet.load(pagelet.attr('data-pagelet-url'), function () { postLoad(pagelet) })
     })
@@ -59,9 +65,13 @@ $(function () {
   $(document).on('click', '[data-pagelet-url] .pagination a', function () {
     const a = this
     const pagelet = $(a).closest('[data-pagelet-url]')
-    pagelet.css('opacity', '0.3')
+    if (!pagelet.is('[data-pagelet-no-opacity-change]')) {
+      pagelet.css('opacity', '0.3')
+    }
     pagelet.load($(a).attr('href'), function () {
-      pagelet.css('opacity', '1')
+      if (!pagelet.is('[data-pagelet-no-opacity-change]')) {
+        pagelet.css('opacity', '1')
+      }
       $('.tooltip').remove()
       const offset = pagelet.offset()
       if (pagelet.attr('data-pagelet-scroll') != 'false') {
