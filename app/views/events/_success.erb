@@ -40,7 +40,13 @@
           }, 500);
         }
       </script>
-      <p class="mb-3"><strong>If you purchased tickets for someone else, you're welcome to let us know the names and email addresses of ticketholders so they hear about any important updates to the event (we won't use these details for anything else):</strong></p>
+      <p class="mb-3">
+        <strong>
+          If you booked
+          <%= @order.tickets.count == 1 ? 'the ticket' : 'tickets' %>
+          for someone else, you're welcome to let us know the
+          <%= @order.tickets.count == 1 ? 'name and email address of the ticketholder' : 'names and email addresses of ticketholders' %>
+          so they hear about any important updates to the event (we won't use these details for anything else):</strong></p>
       <div class="mb-3">
         <% @order.tickets.each_with_index { |ticket,i| %>
         <div class="alert alert-success ticket">
