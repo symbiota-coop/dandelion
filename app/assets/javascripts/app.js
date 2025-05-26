@@ -151,10 +151,12 @@ $(function () {
       autosize(this)
     })
 
-    $('oembed[url]').not('[data-embedded]').attr('data-embedded', true).each(function () {
-      iframely.load(this, $(this).attr('url'))
-      if ($(this).parent().is('figure.media')) { $(this).parent().removeClass('media') }
-    })
+    if (typeof iframely !== 'undefined') {
+      $('oembed[url]').not('[data-embedded]').attr('data-embedded', true).each(function () {
+        iframely.load(this, $(this).attr('url'))
+        if ($(this).parent().is('figure.media')) { $(this).parent().removeClass('media') }
+      })
+    }
 
     $('.links-blank').not('[data-links-blank-done]').attr('data-links-blank-done', true).each(function () {
       $('a[href^=http]', this).attr('target', '_blank')
