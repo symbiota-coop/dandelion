@@ -7,6 +7,8 @@ module AccountFarcaster
 
     r = FARQUEST.get('user-by-connected-address', { address: provider_link.provider_uid })
     JSON.parse(r.body)['result']['user']
+  rescue JSON::ParserError
+    nil
   end
 
   def farcaster_casts
@@ -16,6 +18,8 @@ module AccountFarcaster
     fid = f['fid']
     r = FARQUEST.get('casts', { fid: fid })
     JSON.parse(r.body)['result']['casts']
+  rescue JSON::ParserError
+    nil
   end
 
   def farcaster_links
