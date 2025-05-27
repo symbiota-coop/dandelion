@@ -17,7 +17,7 @@
     <div class="form-row align-items-end">
       <div class="form-group col-12 col-sm-auto">
         <label>Events between</label>
-        <%= text_field_tag :from, class: 'form-control datepicker', value: (@from.to_fs(:db_local) unless @past) %>
+        <%= text_field_tag :from, class: 'form-control datepicker', value: (@from.to_fs(:db_local) if @from && !@past) %>
       </div>
       <div class="form-group col-12 col-sm-auto">
         <label>and</label>
