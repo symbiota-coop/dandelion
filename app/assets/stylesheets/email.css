@@ -2,6 +2,16 @@ body {
   background-color: #f2f2f2
 }
 
+a {
+  color: #00B963;
+  text-decoration: none
+}
+
+a:hover {
+  color: #00A558;
+  text-decoration: underline
+}
+
 table {
   width: 100%;
   border-collapse: collapse
