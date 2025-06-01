@@ -4,8 +4,7 @@ module EventValidation
   included do
     validates_presence_of :name, :start_time, :end_time, :location, :currency
     validates_uniqueness_of :slug, allow_nil: true
-    # needs rethinking as this prevents duplicating events!
-    # validates_uniqueness_of :name, scope: [:start_time, :organisation_id], message: 'is invalid: an event with this title and start time already exists for this organisation'
+    validates_uniqueness_of :name, scope: [:start_time, :organisation_id], message: 'is invalid: an event with this title and start time already exists for this organisation', unless: :duplicate
     validates_format_of :slug, with: /\A[a-z0-9-]+\z/, if: :slug
 
     before_validation do
