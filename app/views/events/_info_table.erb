@@ -1,7 +1,7 @@
 <table class="table table-hr">
   <tr>
     <td>
-      <% if @event.purchase_url %>
+      <% if @event.purchase_url || @event.organiser ||@event.revenue_sharer %>
         Promoted by
       <% else %>
         Hosted by
