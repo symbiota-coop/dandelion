@@ -121,22 +121,21 @@ class Pmail
       pagination: {
         limit: 10,
         skip: 0,
-        sort: 'time:desc'
+        sort: 'clicked_rate:desc'
       },
       metrics: %w[
-        clicked_count
-        complained_count
-        opened_count
-        unique_clicked_count
-        unique_opened_count
-        unsubscribed_count
+        clicked_rate
+        opened_rate
+        delivered_rate
+        unique_clicked_rate
+        unique_opened_rate
       ],
-      resolution: 'day'
+      resolution: 'month'
     }
 
-    # Build the date range (last 30 days)
+    # Build the date range
     end_date = Time.now
-    start_date = end_date - 30.days
+    start_date = end_date - 1.year
 
     date_range = {
       endDate: end_date.iso8601(3),
