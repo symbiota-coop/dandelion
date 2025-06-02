@@ -8,7 +8,7 @@
       </div>
       <% unless @pmail.mailable.is_a?(Event) %>
         <div class="col-auto">
-          <a class="btn btn-primary mb-1" target="_blank" href="https://<%= organisation.mailgun_region == 'EU' ? 'app.eu.mailgun.com' : 'app.mailgun.com' %>/mg/sending/<%= organisation.mailgun_domain %>/analytics">
+          <a class="btn btn-primary mb-1" target="_blank" href="<%=@pmail.mailgun_url%>">
             <i class="bi bi-bar-chart-line-fill"></i>
             View analytics on Mailgun
           </a>
@@ -29,7 +29,7 @@
       </div>
       <% unless @pmail.mailable.is_a?(Event) %>
         <div class="col-auto">
-          <a class="btn btn-primary mb-1" target="_blank" href="https://<%= organisation.mailgun_region == 'EU' ? 'app.eu.mailgun.com' : 'app.mailgun.com' %>/mg/sending/<%= organisation.mailgun_domain %>/analytics">
+          <a class="btn btn-primary mb-1" target="_blank" href="<%=@pmail.mailgun_url%>">
             <i class="bi bi-bar-chart-line-fill"></i>
             View analytics on Mailgun
           </a>
@@ -48,7 +48,7 @@
         </div>
         <% unless @pmail.mailable.is_a?(Event) %>
           <div class="col-auto">
-            <a class="btn btn-primary mb-1" target="_blank" href="https://<%= organisation.mailgun_region == 'EU' ? 'app.eu.mailgun.com' : 'app.mailgun.com' %>/mg/sending/<%= organisation.mailgun_domain %>/analytics">
+            <a class="btn btn-primary mb-1" target="_blank" href="<%=@pmail.mailgun_url%>">
               <i class="bi bi-bar-chart-line-fill"></i>
               View analytics on Mailgun
             </a>

@@ -98,6 +98,64 @@ class Pmail
     end
   end
 
+  def self.mailgun_url(region, tag)
+    base_url = "https://#{region == 'EU' ? 'app.eu.mailgun.com' : 'app.mailgun.com'}/mg/reporting/metrics"
+
+    search_metrics = {
+      dimensions: [],
+      filter: {
+        'AND' => [
+          {
+            attribute: 'tag',
+            comparator: '=',
+            values: [
+              {
+                label: tag,
+                value: tag
+              }
+            ]
+          }
+        ]
+      },
+      includeSubaccounts: true,
+      pagination: {
+        limit: 10,
+        skip: 0,
+        sort: 'time:desc'
+      },
+      metrics: %w[
+        clicked_count
+        complained_count
+        opened_count
+        unique_clicked_count
+        unique_opened_count
+        unsubscribed_count
+      ],
+      resolution: 'day'
+    }
+
+    # Build the date range (last 30 days)
+    end_date = Time.now
+    start_date = end_date - 30.days
+
+    date_range = {
+      endDate: end_date.iso8601(3),
+      startDate: start_date.iso8601(3)
+    }
+
+    # Build query parameters
+    params = {
+      'reporting-search-metrics' => search_metrics.to_json,
+      'reporting-search-metrics-date-range' => date_range.to_json
+    }
+
+    "#{base_url}?#{params.to_query}"
+  end
+
+  def mailgun_url
+    Pmail.mailgun_url(organisation.mailgun_region, id.to_s)
+  end
+
   def to_selected
     if everyone
       'everyone'
