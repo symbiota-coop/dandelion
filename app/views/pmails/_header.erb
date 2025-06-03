@@ -32,7 +32,7 @@
               <%= name.humanize %>
               <i class="bi bi-info-circle"></i>
             </td>
-            <td><%= value %>%</td>
+            <td><%= sprintf("%.2f", value) %>%</td>
           </tr>
         <% end %>
       </table>
