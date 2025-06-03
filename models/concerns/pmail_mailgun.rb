@@ -13,8 +13,8 @@ module PmailMailgun
             comparator: '=',
             values: [
               {
-                label: id,
-                value: id
+                label: id.to_s,
+                value: id.to_s
               }
             ]
           }
@@ -59,7 +59,7 @@ module PmailMailgun
 
     stats_data = tags.get_tag_stats(organisation.mailgun_domain, id, {
                                       event: %w[accepted delivered failed opened clicked unsubscribed complained stored],
-                                      start: sent_at.iso8601(3),
+                                      start: sent_at.to_i,
                                       resolution: 'month'
                                     })
 
