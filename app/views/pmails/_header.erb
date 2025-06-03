@@ -3,10 +3,11 @@
     <div class="row no-gutters justify-content-between">
       <div class="col">
         <p class="lead">
-          Sending completed at <%= @pmail.sent_at %>
+          Sending completed at <%= @pmail.sent_at %>.
         </p>
       </div>
       <% unless @pmail.mailable.is_a?(Event) %>
+        <% analytics = true %>
         <div class="col-auto">
           <a class="btn btn-primary mb-1" target="_blank" href="<%=@pmail.mailgun_url%>">
             <i class="bi bi-bar-chart-line-fill"></i>
@@ -15,46 +16,42 @@
         </div>
       <% end %>
     </div>
+    <table class="table">
+      <% 
+        tooltip_descriptions = {
+          'delivered_rate' => 'Percentage of sent emails that were delivered.',
+          'opened_rate' => 'Raw open events over delivered events.',
+          'unique_opened_rate' => 'Percentage of delivered emails that received a unique open event.',
+          'clicked_rate' => 'Raw click events over delivered events.',
+          'unique_clicked_rate' => 'Percentage of delivered emails that received a unique click event.'
+        }
+      %>
+      <% @pmail.metrics['rates'].each do |name, value| %>
+        <tr>
+          <td style="width: 1px; white-space: nowrap;" data-toggle="tooltip" title="<%= tooltip_descriptions[name.downcase] || name.humanize %>">
+            <%= name.humanize %>
+            <i class="bi bi-info-circle"></i>
+          </td>
+          <td><%= value %>%</td>
+        </tr>
+      <% end %>
+    </table>
     <div class="mb-3">
       <a class="btn btn-primary mb-1" href="/pmails/<%=@pmail.id%>" target="_blank">View</a>
       <button type="submit" name="duplicate" value="1" class="btn btn-primary mb-1">Duplicate</button>
     </div>
   <% elsif @pmail.pmail_test && @pmail.pmail_test.winner %>
-    <div class="row no-gutters justify-content-between">
-      <div class="col">
-        <p class="lead">
-          Part of the A/B test <a href="/pmail_tests/<%= @pmail.pmail_test.id %>?<%= @scope %>"><%= @pmail.pmail_test.name %></a>.
-          The email <a href="/pmails/<%= @pmail.pmail_test.winner.id %>/edit?<%= @scope %>"><%= @pmail.pmail_test.winner.subject %></a> was sent instead.
-        </p>
-      </div>
-      <% unless @pmail.mailable.is_a?(Event) %>
-        <div class="col-auto">
-          <a class="btn btn-primary mb-1" target="_blank" href="<%=@pmail.mailgun_url%>">
-            <i class="bi bi-bar-chart-line-fill"></i>
-            View analytics on Mailgun
-          </a>
-        </div>
-      <% end %>
-    </div>
+    <p class="lead">
+      Part of the A/B test <a href="/pmail_tests/<%= @pmail.pmail_test.id %>?<%= @scope %>"><%= @pmail.pmail_test.name %></a>.
+      The email <a href="/pmails/<%= @pmail.pmail_test.winner.id %>/edit?<%= @scope %>"><%= @pmail.pmail_test.winner.subject %></a> was sent instead.
+    </p>
   <% elsif @pmail.requested_send_at %>
     <p class="lead">Queued for sending at <%= @pmail.requested_send_at %></p>
   <% else %>
     <% if @pmail.pmail_test %>
-      <div class="row no-gutters justify-content-between">
-        <div class="col">
-          <p class="lead mb-1">
-            Part of the A/B test <a href="/pmail_tests/<%= @pmail.pmail_test.id %>?<%= @scope %>"><%= @pmail.pmail_test.name %></a>
-          </p>
-        </div>
-        <% unless @pmail.mailable.is_a?(Event) %>
-          <div class="col-auto">
-            <a class="btn btn-primary mb-1" target="_blank" href="<%=@pmail.mailgun_url%>">
-              <i class="bi bi-bar-chart-line-fill"></i>
-              View analytics on Mailgun
-            </a>
-          </div>
-        <% end %>
-      </div>
+      <p class="lead mb-1">
+        Part of the A/B test <a href="/pmail_tests/<%= @pmail.pmail_test.id %>?<%= @scope %>"><%= @pmail.pmail_test.name %></a>
+      </p>
     <% else %>
       <%= @hide_alert = true; partial :flash %>
     <% end %>
