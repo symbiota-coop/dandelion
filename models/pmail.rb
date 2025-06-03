@@ -2,6 +2,8 @@ class Pmail
   include Mongoid::Document
   include Mongoid::Timestamps
 
+  include PmailMailgun
+
   belongs_to :organisation, index: true
   belongs_to :account, index: true
   belongs_to :mailable, polymorphic: true, index: true, optional: true
@@ -98,63 +100,6 @@ class Pmail
     end
   end
 
-  def self.mailgun_url(region, tag)
-    base_url = "https://#{region == 'EU' ? 'app.eu.mailgun.com' : 'app.mailgun.com'}/mg/reporting/metrics"
-
-    search_metrics = {
-      dimensions: [],
-      filter: {
-        'AND' => [
-          {
-            attribute: 'tag',
-            comparator: '=',
-            values: [
-              {
-                label: tag,
-                value: tag
-              }
-            ]
-          }
-        ]
-      },
-      includeSubaccounts: true,
-      pagination: {
-        limit: 10,
-        skip: 0,
-        sort: 'clicked_rate:desc'
-      },
-      metrics: %w[
-        clicked_rate
-        opened_rate
-        delivered_rate
-        unique_clicked_rate
-        unique_opened_rate
-      ],
-      resolution: 'month'
-    }
-
-    # Build the date range
-    end_date = Time.now
-    start_date = end_date - 1.year
-
-    date_range = {
-      endDate: end_date.iso8601(3),
-      startDate: start_date.iso8601(3)
-    }
-
-    # Build query parameters
-    params = {
-      'reporting-search-metrics' => search_metrics.to_json,
-      'reporting-search-metrics-date-range' => date_range.to_json
-    }
-
-    "#{base_url}?#{params.to_query}"
-  end
-
-  def mailgun_url
-    Pmail.mailgun_url(organisation.mailgun_region, id.to_s)
-  end
-
   def to_selected
     if everyone
       'everyone'
@@ -179,7 +124,7 @@ class Pmail
     if everyone
       "following #{organisation.name}"
     elsif monthly_donors
-      "a monthly donor of #{organisation.name}"
+      "a monthly donor of #{organisation.name}"
     elsif not_monthly_donors
       "not a monthly donor of #{organisation.name}"
     elsif facilitators
@@ -327,7 +272,7 @@ class Pmail
                  end
     from_domain = from_email.split('@').last
 
-    if from_email && (organisation.mailgun_domain == from_domain ||
+    if from_email && organisation.mailgun_domain && (organisation.mailgun_domain == from_domain ||
                       organisation.mailgun_domain.ends_with?(".#{from_domain}"))
       batch_message.from from
     else
