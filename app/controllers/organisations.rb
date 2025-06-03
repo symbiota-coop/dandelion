@@ -115,6 +115,11 @@ Dandelion::App.controller do
     end
   end
 
+  get '/organisations/:id' do
+    @organisation = Organisation.find(params[:id]) || not_found
+    redirect "/o/#{@organisation.slug}"
+  end
+
   get '/o/:slug' do
     @organisation = Organisation.find_by(slug: params[:slug]) || not_found
     @title = @organisation.name

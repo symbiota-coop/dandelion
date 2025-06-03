@@ -57,11 +57,15 @@ module PmailMailgun
     mg_client = Mailgun::Client.new organisation.mailgun_api_key, (organisation.mailgun_region == 'EU' ? 'api.eu.mailgun.net' : 'api.mailgun.net')
     tags = Mailgun::Tags.new(mg_client)
 
-    stats_data = tags.get_tag_stats(organisation.mailgun_domain, id, {
-                                      event: %w[accepted delivered failed opened clicked unsubscribed complained stored],
-                                      start: sent_at.to_i,
-                                      resolution: 'month'
-                                    })
+    begin
+      stats_data = tags.get_tag_stats(organisation.mailgun_domain, id, {
+                                        event: %w[accepted delivered failed opened clicked unsubscribed complained stored],
+                                        start: sent_at.to_i,
+                                        resolution: 'month'
+                                      })
+    rescue Mailgun::CommunicationError
+      return nil
+    end
 
     totals = {
       'accepted' => { 'incoming' => 0, 'outgoing' => 0, 'total' => 0 },

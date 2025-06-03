@@ -16,8 +16,9 @@
       <% end %>
     </div>
     <% unless @pmail.mailable.is_a?(Event) %>
-      <table class="table">
-        <% 
+      <% if @pmail.metrics %>
+        <table class="table">
+          <% 
         tooltip_descriptions = {
           'delivered_rate' => 'Percentage of sent emails that were delivered.',
           'opened_rate' => 'Raw open events over delivered events.',
@@ -26,16 +27,17 @@
           'unique_clicked_rate' => 'Percentage of delivered emails that received a unique click event.'
         }
       %>
-        <% @pmail.metrics['rates'].each do |name, value| %>
-          <tr>
-            <td style="width: 1px; white-space: nowrap;" data-toggle="tooltip" title="<%= tooltip_descriptions[name.downcase] || name.humanize %>">
-              <%= name.humanize %>
-              <i class="bi bi-info-circle"></i>
-            </td>
-            <td><%= sprintf("%.2f", value) %>%</td>
-          </tr>
-        <% end %>
-      </table>
+          <% @pmail.metrics['rates'].each do |name, value| %>
+            <tr>
+              <td style="width: 1px; white-space: nowrap;" data-toggle="tooltip" title="<%= tooltip_descriptions[name.downcase] || name.humanize %>">
+                <%= name.humanize %>
+                <i class="bi bi-info-circle"></i>
+              </td>
+              <td><%= sprintf("%.2f", value) %>%</td>
+            </tr>
+          <% end %>
+        </table>
+      <% end %>
     <% end %>
     <div class="mb-3">
       <a class="btn btn-primary mb-1" href="/pmails/<%=@pmail.id%>" target="_blank">View</a>
