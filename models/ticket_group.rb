@@ -23,7 +23,7 @@ class TicketGroup
   validates_presence_of :name, :capacity
 
   before_validation do
-    errors.add(:capacity, 'must not be not be < 0') if capacity && capacity < 0
+    errors.add(:capacity, 'must not be < 0') if capacity && capacity < 0
   end
 
   def places_remaining

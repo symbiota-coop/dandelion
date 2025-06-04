@@ -67,12 +67,12 @@ class TicketType
       end
     end
 
-    errors.add(:range_min, 'must not be not be < 0') if range_min && range_min < 0
-    errors.add(:range_max, 'must not be not be < 0') if range_max && range_max < 0
+    errors.add(:range_min, 'must not be < 0') if range_min && range_min < 0
+    errors.add(:range_max, 'must not be < 0') if range_max && range_max < 0
     errors.add(:range_max, 'must be > range min') if range_min && range_max && range_max <= range_min
-    errors.add(:price, 'must not be not be < 0') if price && price < 0
-    errors.add(:quantity, 'must not be not be < 0') if quantity && quantity < 0
-    errors.add(:max_quantity_per_transaction, 'must not be not be < 0') if max_quantity_per_transaction && max_quantity_per_transaction < 0
+    errors.add(:price, 'must not be < 0') if price && price < 0
+    errors.add(:quantity, 'must not be < 0') if quantity && quantity < 0
+    errors.add(:max_quantity_per_transaction, 'must not be < 0') if max_quantity_per_transaction && max_quantity_per_transaction < 0
   end
 
   def range
