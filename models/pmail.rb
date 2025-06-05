@@ -252,7 +252,7 @@ class Pmail
       mg_client = Mailgun::Client.new ENV['MAILGUN_API_KEY'], ENV['MAILGUN_REGION']
       batch_message = Mailgun::BatchMessage.new(mg_client, ENV['MAILGUN_TICKETS_HOST'])
 
-      batch_message.from from_name ? "#{from_name} <#{ENV['MAILER_EMAIL']}>" : ENV['MAILER_EMAIL_FULL']
+      batch_message.from from_name ? "#{from_name} <mailer@#{ENV['MAILGUN_TICKETS_HOST']}>" : "mailer@#{ENV['MAILGUN_TICKETS_HOST']}"
       batch_message.reply_to from
     else
       mg_client = Mailgun::Client.new organisation.mailgun_api_key, (organisation.mailgun_region == 'EU' ? 'api.eu.mailgun.net' : 'api.mailgun.net')
