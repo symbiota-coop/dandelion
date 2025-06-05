@@ -240,13 +240,31 @@ class Pmail
     pmail_links.destroy_all
     mailgun_sto = nil
 
+    from_name = (from.split('<').first.strip if from.include?('<'))
+    from_email = if from.include?('<')
+                   from.split('<').last.split('>').first
+                 else
+                   from
+                 end
+    from_domain = from_email.split('@').last
+
     if mailable.is_a?(Event)
       mg_client = Mailgun::Client.new ENV['MAILGUN_API_KEY'], ENV['MAILGUN_REGION']
       batch_message = Mailgun::BatchMessage.new(mg_client, ENV['MAILGUN_TICKETS_HOST'])
+
+      batch_message.from from_name ? "#{from_name} <#{ENV['MAILER_EMAIL']}>" : ENV['MAILER_EMAIL_FULL']
+      batch_message.reply_to from
     else
       mg_client = Mailgun::Client.new organisation.mailgun_api_key, (organisation.mailgun_region == 'EU' ? 'api.eu.mailgun.net' : 'api.mailgun.net')
       batch_message = Mailgun::BatchMessage.new(mg_client, organisation.mailgun_domain)
       mailgun_sto = organisation.mailgun_sto
+
+      if from_domain == organisation.mailgun_domain
+        batch_message.from from
+      else
+        batch_message.from from_name ? "#{from_name} <mailer@#{organisation.mailgun_domain}>" : "mailer@#{organisation.mailgun_domain}"
+        batch_message.reply_to from
+      end
 
       if check_already_sent
         mg_events = Mailgun::Events.new(mg_client, organisation.mailgun_domain)
@@ -262,22 +280,6 @@ class Pmail
         end
       end
 
-    end
-
-    from_name = (from.split('<').first.strip if from.include?('<'))
-    from_email = if from.include?('<')
-                   from.split('<').last.split('>').first
-                 else
-                   from
-                 end
-    from_domain = from_email.split('@').last
-
-    if from_email && organisation.mailgun_domain && (organisation.mailgun_domain == from_domain ||
-                      organisation.mailgun_domain.ends_with?(".#{from_domain}"))
-      batch_message.from from
-    else
-      batch_message.from from_name ? "#{from_name} <#{ENV['MAILER_EMAIL']}>" : ENV['MAILER_EMAIL_FULL']
-      batch_message.reply_to from
     end
 
     batch_message.subject(test_to ? "#{subject} [test sent #{Time.now}]" : subject)
