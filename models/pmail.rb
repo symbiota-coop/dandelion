@@ -259,7 +259,7 @@ class Pmail
       batch_message = Mailgun::BatchMessage.new(mg_client, organisation.mailgun_domain)
       mailgun_sto = organisation.mailgun_sto
 
-      if from_domain == organisation.mailgun_domain
+      if organisation.mailgun_domain == from_domain || organisation.mailgun_domain.ends_with?(".#{from_domain}")
         batch_message.from from
       else
         batch_message.from from_name ? "#{from_name} <mailer@#{organisation.mailgun_domain}>" : "mailer@#{organisation.mailgun_domain}"
