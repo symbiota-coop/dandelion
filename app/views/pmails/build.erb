@@ -35,47 +35,50 @@
 </script>
 
 
-<% form_for @pmail, @pmail.new_record? ? '/pmails/new' : "/pmails/#{@pmail.id}/edit", id: 'pmail-form', multipart: true do |f| %>
+<div class="container">
+  <% form_for @pmail, @pmail.new_record? ? '/pmails/new' : "/pmails/#{@pmail.id}/edit", id: 'pmail-form', multipart: true do |f| %>
 
-  <%= partial :'pmails/header', locals: { f: f, organisation: organisation } %>
-  <%= partial :'pmails/clicks', locals: { f: f, organisation: organisation } %>
+    <%= partial :'pmails/header', locals: { f: f, organisation: organisation } %>
+    <%= partial :'pmails/clicks', locals: { f: f, organisation: organisation } %>
 
-  <% if @organisation %>
-    <%= hidden_field_tag :organisation_id, value: @organisation.id %>
-  <% elsif @activity %>
-    <%= hidden_field_tag :activity_id, value: @activity.id %>
-  <% elsif @local_group %>
-    <%= hidden_field_tag :local_group_id, value: @local_group.id %>
-  <% elsif @event %>
-    <%= hidden_field_tag :event_id, value: @event.id %>
+    <% if @organisation %>
+      <%= hidden_field_tag :organisation_id, value: @organisation.id %>
+    <% elsif @activity %>
+      <%= hidden_field_tag :activity_id, value: @activity.id %>
+    <% elsif @local_group %>
+      <%= hidden_field_tag :local_group_id, value: @local_group.id %>
+    <% elsif @event %>
+      <%= hidden_field_tag :event_id, value: @event.id %>
+    <% end %>
+
+    <%= partial :'pmails/to_options', locals: { f: f, organisation: organisation } %>
+    <%= partial :'pmails/exclude', locals: { f: f, organisation: organisation } %>
+
+    <% if @pmail.persisted? %>
+      <span class="mb-3 badge badge-primary"><%= pluralize(@pmail.send_count, 'person') %></span>
+    <% end %>
+
+    <%= f.text_block :from %>
+    <%= f.text_block :subject %>
+    <%= f.text_block :preview_text %>
+
+    <% if @pmail.markdown? %>
+      <div contenteditable="true" id="pastebin" style="opacity: 0.01; width: 100%; height: 1px; overflow: hidden;"></div>
+      <%= f.text_area_block :body %>
+    <% else %>
+      <%= f.wysiwyg_block :body %>
+    <% end %>
+
+    <%= f.text_block :link_params %>
+    <% if @pmail.sent_at %>
+      <a data-confirm="Are you sure you want to delete this mail?" href="/pmails/<%= @pmail.id %>/destroy?<%= @scope %>" class="btn btn-danger">Delete</a>
+    <% else %>
+      <%= f.submit_block destroy_url: "/pmails/#{@pmail.id}/destroy?#{@scope}", button_text: @pmail.new_record? ? 'Save and continue' : 'Save' %>
+    <% end %>
+
+    <% if organisation %>
+      <%= partial :'pmails/files', locals: { f: f, organisation: organisation } %>
+    <% end %>
+
   <% end %>
-
-  <%= partial :'pmails/to_options', locals: { f: f, organisation: organisation } %>
-  <%= partial :'pmails/exclude', locals: { f: f, organisation: organisation } %>
-
-  <% if @pmail.persisted? %>
-    <span class="mb-3 badge badge-primary"><%= pluralize(@pmail.send_count, 'person') %></span>
-  <% end %>
-  <%= f.text_block :from %>
-  <%= f.text_block :subject %>
-  <%= f.text_block :preview_text %>
-
-  <% if @pmail.markdown? %>
-    <div contenteditable="true" id="pastebin" style="opacity: 0.01; width: 100%; height: 1px; overflow: hidden;"></div>
-    <%= f.text_area_block :body %>
-  <% else %>
-    <%= f.wysiwyg_block :body %>
-  <% end %>
-
-  <%= f.text_block :link_params %>
-  <% if @pmail.sent_at %>
-    <a data-confirm="Are you sure you want to delete this mail?" href="/pmails/<%= @pmail.id %>/destroy?<%= @scope %>" class="btn btn-danger">Delete</a>
-  <% else %>
-    <%= f.submit_block destroy_url: "/pmails/#{@pmail.id}/destroy?#{@scope}", button_text: @pmail.new_record? ? 'Save and continue' : 'Save' %>
-  <% end %>
-
-  <% if organisation %>
-    <%= partial :'pmails/files', locals: { f: f, organisation: organisation } %>
-  <% end %>
-
-<% end %>
+</div>
