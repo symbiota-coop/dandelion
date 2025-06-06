@@ -12,13 +12,46 @@
 <% else %>
   <a href="/o/<%=@_organisation.slug%>/edit">Link a Mailgun account to get started</a>
 <% end %>
+
+<% if @organisation %>
+  <div class="search well mt-3">
+    <% form_tag '', method: 'get', class: 'submitOnChange searchForm mb-3' do %>
+      <%= hidden_field_tag :order, value: params[:order] %>
+      <div class="form-row align-items-end">
+        <div class="form-group col-12 col-sm-auto">
+          <label>To</label>
+          <%= select_tag :to, class: 'form-control', selected: params[:to], options: [
+            [],
+            ['Everyone', 'everyone'],
+            ['Monthly donors', 'monthly_donors'],
+            ["People who aren't monthly donors", 'not_monthly_donors'],
+            ['Facilitators', 'facilitators'],
+            ['Activities', 'activity'],
+            ['Activity tags', 'activity_tag'],
+            ['Local groups', 'local_group'],
+            ['Events', 'event'],
+            ['Waitlists', 'waitlist']            
+          ] %>
+        </div>
+        <div class="form-group col-12 col-sm-auto">
+          <label>Subject</label>
+          <%= text_field_tag :q, class: 'form-control', value: params[:q] %>
+        </div>
+        <div class="form-group col-12 col-sm-auto">
+          <%= submit_tag 'Search', class: 'btn btn-primary mb-0' %>
+        </div>
+      </div>
+    <% end %>
+  </div>
+<% end %>
+
 <% if @pmails.count > 0 %>
   <table class="table table-hover table-striped mt-3">
     <thead>
       <tr>
         <th>To</th>
-        <th>From</th>
         <th>Subject</th>
+        <th>From</th>
         <th>Created by</th>
         <th style="width: 33%">Status</th>
       </tr>
@@ -31,10 +64,12 @@
           <%= partial :'pmails/to', locals: { pmail: pmail } %>
         </td>
         <td>
-          <%= escape_html pmail.from %>
+          <a href="<%= edit_url %>"><%= pmail.subject %></a>
+          <br />
+          <%= pmail.preview_text %>
         </td>
         <td>
-          <a href="<%= edit_url %>"><%= pmail.subject %></a>
+          <%= pmail.from %>
         </td>
         <td>
           <% if pmail.account %>

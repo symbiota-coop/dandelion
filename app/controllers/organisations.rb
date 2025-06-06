@@ -441,6 +441,26 @@ Dandelion::App.controller do
     organisation_admins_only!
     @pmails = @organisation.pmails
     @pmails = @pmails.and(subject: /#{Regexp.escape(params[:q])}/i) if params[:q]
+    case params[:to]
+    when 'everyone'
+      @pmails = @pmails.and(everyone: true)
+    when 'monthly_donors'
+      @pmails = @pmails.and(monthly_donors: true)
+    when 'not_monthly_donors'
+      @pmails = @pmails.and(not_monthly_donors: true)
+    when 'facilitators'
+      @pmails = @pmails.and(facilitators: true)
+    when 'waitlist'
+      @pmails = @pmails.and(waitlist: true)
+    when 'activity'
+      @pmails = @pmails.and(mailable_type: 'Activity')
+    when 'activity_tag'
+      @pmails = @pmails.and(mailable_type: 'ActivityTag')
+    when 'local_group'
+      @pmails = @pmails.and(mailable_type: 'LocalGroup')
+    when 'event'
+      @pmails = @pmails.and(mailable_type: 'Event')
+    end
     @scope = "organisation_id=#{@organisation.id}"
     case content_type
     when :html
