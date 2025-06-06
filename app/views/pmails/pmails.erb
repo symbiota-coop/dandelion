@@ -22,7 +22,7 @@
           <label>To</label>
           <%= select_tag :to, class: 'form-control', selected: params[:to], options: [
             [],
-            ['Everyone', 'everyone'],
+            ["Everyone in #{@organisation.name}", 'everyone'],
             ['Monthly donors', 'monthly_donors'],
             ["People who aren't monthly donors", 'not_monthly_donors'],
             ['Facilitators', 'facilitators'],
