@@ -35,10 +35,12 @@
 </script>
 
 
-<div style="max-width: 720px; margin: 0 auto;">
-  <% form_for @pmail, @pmail.new_record? ? '/pmails/new' : "/pmails/#{@pmail.id}/edit", id: 'pmail-form', multipart: true do |f| %>
+<% form_for @pmail, @pmail.new_record? ? '/pmails/new' : "/pmails/#{@pmail.id}/edit", id: 'pmail-form', multipart: true do |f| %>
 
-    <%= partial :'pmails/header', locals: { f: f, organisation: organisation } %>
+  <%= partial :'pmails/header', locals: { f: f, organisation: organisation } %>
+
+  <div style="max-width: 720px; margin: 0 auto;">
+
     <%= partial :'pmails/clicks', locals: { f: f, organisation: organisation } %>
 
     <% if @organisation %>
@@ -80,5 +82,6 @@
       <%= partial :'pmails/files', locals: { f: f, organisation: organisation } %>
     <% end %>
 
-  <% end %>
-</div>
+  </div>
+
+<% end %>
