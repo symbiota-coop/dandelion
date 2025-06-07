@@ -6,7 +6,7 @@
   <% if current_account %>
     <% if admin? && (contribution_data = monthly_contribution_data) %>
       <li class="d-none d-lg-inline">
-        <a href="#" class="navbar-text" style="color: #6c757d; font-size: 0.875rem;">
+        <a href="javascript:;" class="navbar-text text-muted" style="cursor: default">
           <%= contribution_data[:current].format(no_cents: true) %> (<%= m contribution_data[:projected], contribution_data[:currency] %>)
         </a>
       </li>
