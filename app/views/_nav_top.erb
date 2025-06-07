@@ -4,6 +4,13 @@
 </style>
 <ul class="nav navbar-nav navbar-right">
   <% if current_account %>
+    <% if admin? && (contribution_data = monthly_contribution_data) %>
+      <li class="d-none d-lg-inline">
+        <a href="#" class="navbar-text" style="color: #6c757d; font-size: 0.875rem;">
+          <%= contribution_data[:current].format(no_cents: true) %> (<%= m contribution_data[:projected], contribution_data[:currency] %>)
+        </a>
+      </li>
+    <% end %>
     <li>
       <a href="javascript:;" data-toggle="search-bar" class="navbar-icon">
         <i class="bi bi-search"></i>

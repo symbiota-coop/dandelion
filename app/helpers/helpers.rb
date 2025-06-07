@@ -222,4 +222,33 @@ Dandelion::App.helpers do
       url # Return original URL if it doesn't match YouTube format
     end
   end
+
+  def monthly_contribution_data(currency = nil)
+    currency ||= ENV['DEFAULT_CURRENCY'] || 'GBP'
+    fragment = Fragment.find_by(key: 'monthly_contributions')
+
+    return nil unless fragment&.value
+
+    monthly_data = JSON.parse(fragment.value)
+    current_month = "#{Date::MONTHNAMES[Date.today.month]} #{Date.today.year}"
+    current_month_data = monthly_data.find { |d| d[0] == current_month }
+
+    return nil unless current_month_data
+
+    monthly_contributions = Money.new(current_month_data[1] * 100, 'GBP')
+    monthly_contributions = monthly_contributions.exchange_to(currency)
+
+    return nil unless monthly_contributions > 0
+
+    current_month_value = monthly_contributions.to_i
+    days_in_month = Date.new(Date.today.year, Date.today.month, -1).day
+    days_passed = Date.today.day
+    projected_value = (current_month_value.to_f / days_passed * days_in_month).round
+
+    {
+      current: monthly_contributions,
+      projected: projected_value,
+      currency: currency
+    }
+  end
 end
