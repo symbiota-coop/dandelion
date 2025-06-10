@@ -2,6 +2,8 @@
 RACK_ENV = ENV['RACK_ENV'] ||= 'development' unless defined?(RACK_ENV)
 PADRINO_ROOT = File.expand_path('..', __dir__) unless defined?(PADRINO_ROOT)
 
+ENV['RAILS_DISABLE_DEPRECATED_TO_S_CONVERSION'] = 'true'
+
 # Load our dependencies
 require 'rubygems' unless defined?(Gem)
 require 'bundler/setup'
