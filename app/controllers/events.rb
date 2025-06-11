@@ -67,7 +67,7 @@ Dandelion::App.controller do
         erb :'events/events'
       end
     when :ics
-      @events = @events.current(1.month.ago).limit(400)
+      @events = @events.current.limit(500)
       cal = Icalendar::Calendar.new
       cal.append_custom_property('X-WR-CALNAME', 'Dandelion')
       @events.each do |event|

@@ -117,7 +117,7 @@ Dandelion::App.controller do
       end
     when :ics
       @events = @events.live
-      @events = @events.current(1.month.ago).limit(400)
+      @events = @events.current(1.month.ago).limit(500)
       cal = Icalendar::Calendar.new
       cal.append_custom_property('X-WR-CALNAME', @organisation.name)
       @events.each do |event|
