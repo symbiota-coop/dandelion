@@ -1,0 +1,46 @@
+ <% if params[:cohost] %>
+  <link rel="canonical" href="<%=ENV['BASE_URI']%>/e/<%=@event.slug%>?cohost=<%=params[:cohost]%>" />
+<% else %>
+  <link rel="canonical" href="<%=ENV['BASE_URI']%>/e/<%=@event.slug%>" />
+<% end %>
+<script type="application/ld+json">
+  <%==
+  JSON.pretty_generate({
+    "@context": 'https://schema.org',
+    "@type": 'Event',
+    "eventStatus": "https://schema.org/EventScheduled",
+    "name": @event.name,
+    "startDate": @event.start_time.try(:iso8601),
+    "endDate": @event.end_time.try(:iso8601),
+    "eventAttendanceMode": @event.online? ? 'https://schema.org/OnlineEventAttendanceMode' : 'https://schema.org/OfflineEventAttendanceMode',
+    "location": (unless @event.online?
+                   {
+                     "@type": 'Place',
+                     "name": @event.location.split(', ').first,
+                     "address": {
+                         "@type": "PostalAddress",
+                         "name": @event.location.split(', ')[1..-1].join(', ')
+                        }
+                   }
+                 end),
+    "image": @event_image.try(:url),
+    "description": (if @event.description
+                      Nokogiri::HTML(@event.description).search('h1,h2,h3,h4,h5,h6,p').first.try(:text).try(:strip)
+                    end),
+    "organizer": ({
+      "@type": 'Organization',
+      "name": @event.organisation.name,
+      "url": @event.organisation.website
+    } if @event.organisation),
+    "offers": (@event.ticket_types.map { |ticket_type|
+      {
+        "@type": "Offer",
+        "url": "#{ENV['BASE_URI']}/events/#{@event.id}",
+        "price": (ticket_type.price || ticket_type.range_min),
+        "priceCurrency": @event.currency,
+        "availability": ticket_type.number_of_tickets_available_in_single_purchase > 0 ? "https://schema.org/InStock" : "https://schema.org/SoldOut",
+      }
+    })
+  })
+  %>
+</script>

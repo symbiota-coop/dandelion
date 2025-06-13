@@ -192,9 +192,9 @@ module Dandelion
       erb :'code/code'
     end
 
-    get '/token' do
-      erb :token
-    end
+    # get '/token' do
+    #   erb :token
+    # end
 
     get '/substack_opt_in' do
       sign_in_required!
