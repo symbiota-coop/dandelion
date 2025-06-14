@@ -16,6 +16,7 @@
     </script>
     <% form_tag '/search', method: :get, class: 'mb-3' do %>
       <%= hidden_field_tag :message, value: true %>
+      <%= hidden_field_tag :type, value: 'accounts' %>
       <%= text_field_tag :q, placeholder: 'Search for someone', id: 'messages-search', class: 'form-control' %>
     <% end %>
 
