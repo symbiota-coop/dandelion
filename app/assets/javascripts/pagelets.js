@@ -68,6 +68,9 @@ $(function () {
     if (!pagelet.is('[data-pagelet-no-opacity-change]')) {
       pagelet.css('opacity', '0.3')
     }
+    if (pagelet.attr('data-pagelet-refresh')) {
+      pagelet.attr('data-pagelet-refresh-paused', 'true')
+    }
     pagelet.load($(a).attr('href'), function () {
       if (!pagelet.is('[data-pagelet-no-opacity-change]')) {
         pagelet.css('opacity', '1')
