@@ -242,20 +242,28 @@
       $(this).find('button[type=submit]').prop('disabled', true)
     })
 
+    let questionsTimer;
     function loadQuestions() {
       $('#questions-preview').load('/events/<%=@event.id%>/questions?questions=' + encodeURIComponent($('#event_questions').val()))
     }
-    $('#event_questions').keyup(function() {
-      loadQuestions()
-      });
+    $('#event_questions').on('input', function() {
+      clearTimeout(questionsTimer);
+      questionsTimer = setTimeout(function() {
+        loadQuestions();
+      }, 500);
+    });
     loadQuestions()
 
+    let feedbackQuestionsTimer;
     function loadFeedbackQuestions() {
       $('#feedback-questions-preview').load('/events/<%=@event.id%>/feedback_questions?questions=' + encodeURIComponent($('#event_feedback_questions').val()))
     }
-    $('#event_feedback_questions').keyup(function() {
-      loadFeedbackQuestions()
-      });
+    $('#event_feedback_questions').on('input', function() {
+      clearTimeout(feedbackQuestionsTimer);
+      feedbackQuestionsTimer = setTimeout(function() {
+        loadFeedbackQuestions();
+      }, 500);
+    });
     loadFeedbackQuestions()
 
   })
