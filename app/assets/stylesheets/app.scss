@@ -1013,3 +1013,19 @@ label.remove-image input {
 .input-group {
   flex-wrap: nowrap;
 }
+
+.email-preview-iframe-container {
+  overflow: hidden;
+  padding-top: 56.25%;
+  position: relative;
+  height: 80vh;
+}
+
+.email-preview-iframe-container iframe {
+  border: 0;
+  height: 100%;
+  left: 0;
+  position: absolute;
+  top: 0;
+  width: 100%;
+}

@@ -1,21 +1,4 @@
 <%= partial :'events/nav', locals: { event: @event } %>
-<style>
-  .iframe-container {
-    overflow: hidden;
-    padding-top: 56.25%;
-    position: relative;
-    height: 80vh;
-  }
-
-  .iframe-container iframe {
-    border: 0;
-    height: 100%;
-    left: 0;
-    position: absolute;
-    top: 0;
-    width: 100%;
-  }
-</style>
-<div class="iframe-container">
+<div class="email-preview-iframe-container">
   <iframe src="/events/<%= @event.id %>/feedback_request_email_preview"></iframe>
 </div>
