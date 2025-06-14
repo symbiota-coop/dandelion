@@ -96,9 +96,10 @@ class Ticket
 
   def payment_completed!
     if event.enable_resales? && ticket_type.remaining_including_made_available < 0 && (ticket = ticket_type.tickets.and(:made_available_at.ne => nil).order('made_available_at asc').first)
+      account = ticket.account
       ticket.refund
       ticket.destroy
-      send_resale_notification
+      send_resale_notification(account)
     end
     event.waitships.find_by(account: account).try(:destroy)
     event.gathering.memberships.create(account: account, unsubscribed: true) if event.gathering

@@ -88,7 +88,7 @@ module TicketNotifications
     batch_message.finalize if ENV['MAILGUN_API_KEY']
   end
 
-  def send_resale_notification
+  def send_resale_notification(previous_account)
     mg_client = Mailgun::Client.new ENV['MAILGUN_API_KEY'], ENV['MAILGUN_REGION']
     batch_message = Mailgun::BatchMessage.new(mg_client, ENV['MAILGUN_NOTIFICATIONS_HOST'])
 
