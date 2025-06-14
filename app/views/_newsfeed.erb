@@ -39,9 +39,7 @@
               </div>
             </div>
           <% elsif notification.type == 'left_feedback'; event_feedback = notification.notifiable %>
-            <div class="mt-3">
-              <%= partial :'event_feedbacks/event_feedback', locals: { event_feedback: event_feedback, mb_class: 'mb-0' } %>
-            </div>
+            <%= partial :'event_feedbacks/event_feedback', locals: { event_feedback: event_feedback, mt_class: 'mt-3', mb_class: 'mb-0' } %>
           <% end %>
         </div>
       </div>

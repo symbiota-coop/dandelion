@@ -1,6 +1,6 @@
 <% if event_feedback.public_answers %>
   <% qas = event_feedback.public_answers.map { |q,a| a unless a.blank? }.compact %>
-  <div class="row no-gutters <% if defined?(mb_class) %><%= mb_class %><% else %>mb-3<% end %>">
+  <div class="row no-gutters <% if defined?(mt_class) %><%= mt_class %><% end %> <% if defined?(mb_class) %><%= mb_class %><% else %>mb-3<% end %>">
     <div class="col-auto mr-2"><i class="bi bi-quote"></i></div>
     <div class="col">
       <% if !qas.empty? %>
