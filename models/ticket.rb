@@ -34,6 +34,7 @@ class Ticket
   field :payment_completed, type: Boolean
   field :transferred, type: Boolean
   field :made_available_at, type: Time
+  field :original_ticket_type_name, type: String
   index({ transferred: 1 })
 
   def self.admin_fields
@@ -70,6 +71,7 @@ class Ticket
 
     self.payment_completed = true if complementary || price.nil? || price == 0
 
+    self.original_ticket_type_name = ticket_type.name if ticket_type && !original_ticket_type_name
     self.currency = (order.try(:currency) || event.try(:currency)) unless currency
     self.organisation_revenue_share = order.try(:organisation_revenue_share) unless organisation_revenue_share
     self.percentage_discount = order.try(:percentage_discount) unless percentage_discount
