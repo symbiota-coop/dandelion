@@ -28,8 +28,10 @@ Dandelion::App.controller do
     %i[organisation activity local_group].each do |r|
       @events = @events.and("#{r}_id": params[:"#{r}_id"]) if params[:"#{r}_id"]
     end
-    @events = @events.online if params[:online]
-    @events = @events.in_person if params[:in_person]
+    unless params[:online] && params[:in_person]
+      @events = @events.online if params[:online]
+      @events = @events.in_person if params[:in_person]
+    end
     content_type = (parts = URI(request.url).path.split('.')
                     parts.length == 2 ? parts.last.to_sym : :html)
     case content_type

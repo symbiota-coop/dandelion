@@ -39,8 +39,10 @@ Dandelion::App.controller do
                   @events.and(:id.in => EventTagship.and(:event_tag_id.in => carousel.event_tags.pluck(:id)).pluck(:event_id))
                 end
     end
-    @events = @events.online if params[:online]
-    @events = @events.in_person if params[:in_person]
+    unless params[:online] && params[:in_person]
+      @events = @events.online if params[:online]
+      @events = @events.in_person if params[:in_person]
+    end
     @events = @events.and(monthly_donors_only: true) if params[:members_events]
     @events = @events.and(featured: true) if params[:featured]
     if params[:featured_or_course]
@@ -159,8 +161,10 @@ Dandelion::App.controller do
     @events = @events.and(coordinator_id: params[:coordinator_id]) if params[:coordinator_id]
     @events = @events.and(coordinator_id: nil) if params[:no_coordinator]
     @events = @events.and(:id.nin => EventFacilitation.pluck(:event_id)) if params[:no_facilitators]
-    @events = @events.online if params[:online]
-    @events = @events.in_person if params[:in_person]
+    unless params[:online] && params[:in_person]
+      @events = @events.online if params[:online]
+      @events = @events.in_person if params[:in_person]
+    end
     @events = @events.and(local_group_id: params[:local_group_id]) if params[:local_group_id]
     @events = @events.and(activity_id: params[:activity_id]) if params[:activity_id]
     if params[:cohost_id]

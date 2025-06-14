@@ -44,8 +44,10 @@ Dandelion::App.controller do
     @events = @events.and(coordinator_id: params[:coordinator_id]) if params[:coordinator_id]
     @events = @events.and(coordinator_id: nil) if params[:no_coordinator]
     @events = @events.and(:id.nin => EventFacilitation.pluck(:event_id)) if params[:no_facilitators]
-    @events = @events.online if params[:online]
-    @events = @events.in_person if params[:in_person]
+    unless params[:online] && params[:in_person]
+      @events = @events.online if params[:online]
+      @events = @events.in_person if params[:in_person]
+    end
     erb :'events/event_stats'
   end
 
