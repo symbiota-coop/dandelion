@@ -10,4 +10,8 @@
   <% form_tag "/tickets/#{ticket.id}/ticket_type", style: 'display:none' do %>
     <%= select_tag :ticket_type_id, class: 'form-control', value: ticket.ticket_type_id, options: ticket.event.ticket_types.map { |t| [t.name, t.id] }, onchange: '$(this.form).submit()', onblur: '$(this.form).submit()' %>
   <% end %>
+<% elsif ticket.original_ticket_type_name %>
+  <span data-toggle="tooltip" title="Ticket type has been deleted" >
+    <%= ticket.original_ticket_type_name %> <i class="bi bi-trash"></i>
+  </span>
 <% end %>
