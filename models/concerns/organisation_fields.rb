@@ -221,7 +221,6 @@ module OrganisationFields
         monthly_donor_affiliate_reward: 'When an existing monthly donor gets a friend to sign up via their affiliate link, credit of this amount is issued to both the existing monthly donor and the friend/new member.',
         add_a_donation_to: "Text to display beside the 'Add a donation' field",
         donation_text: "Text to display below the 'Add a donation' field",
-        send_ticket_emails_from_organisation: 'Requires image and reply address',
         gocardless_access_token: 'Registers people with active GoCardless subscriptions as monthly donors',
         patreon_api_key: 'Registers people with active Patreon subscriptions as monthly donors',
         become_a_member_url: 'Link to direct non-members to when they attempt to buy tickets to a members-only event',
