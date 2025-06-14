@@ -261,10 +261,20 @@ Dandelion::App.controller do
     { id: @order.id.to_s, payment_completed: @order.payment_completed }.to_json
   end
 
+  get '/events/:id/orders/:order_id/refund_and_destroy' do
+    @event = Event.find(params[:id]) || not_found
+    event_admins_only!
+    order = @event.orders.find(params[:order_id]) || not_found
+    order.destroy # calls order.refund
+    redirect back
+  end
+
   get '/events/:id/orders/:order_id/destroy' do
     @event = Event.find(params[:id]) || not_found
     event_admins_only!
-    @event.orders.find(params[:order_id]).try(:destroy)
+    order = @event.orders.find(params[:order_id]) || not_found
+    order.prevent_refund = true
+    order.destroy
     redirect back
   end
 
@@ -371,11 +381,19 @@ Dandelion::App.controller do
     200
   end
 
-  get '/events/:id/tickets/:ticket_id/destroy' do
+  get '/events/:id/tickets/:ticket_id/refund_and_destroy' do
     @event = Event.find(params[:id]) || not_found
     event_admins_only!
     ticket = @event.tickets.find(params[:ticket_id]) || not_found
     ticket.refund
+    ticket.destroy
+    redirect back
+  end
+
+  get '/events/:id/tickets/:ticket_id/destroy' do
+    @event = Event.find(params[:id]) || not_found
+    event_admins_only!
+    ticket = @event.tickets.find(params[:ticket_id]) || not_found
     ticket.destroy
     redirect back
   end

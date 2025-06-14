@@ -114,10 +114,10 @@
         (['Link to order confirmation', "/orders/#{ticket.order_id}"] if ticket.order),
         (['Resend order confirmation', "/orders/#{ticket.order_id}/send_tickets"] if ticket.order),
         ['Change name or email', "/tickets/#{ticket.id}/edit"],
-        (['Remove and refund ticket', "/events/#{@event.id}/tickets/#{ticket.id}/destroy"] if @event.refund_deleted_orders && ticket.session_id),
-        (['Delete ticket', "/events/#{@event.id}/tickets/#{ticket.id}/destroy"] if !(@event.refund_deleted_orders && ticket.session_id)),
-        (['Remove and refund order', "/events/#{@event.id}/orders/#{ticket.order_id}/destroy"] if ticket.order && @event.refund_deleted_orders && ticket.order.session_id),
-        (['Delete order', "/events/#{@event.id}/orders/#{ticket.order_id}/destroy"] if ticket.order && !(@event.refund_deleted_orders && ticket.order.session_id)),        
+        (['Remove and refund ticket', "/events/#{@event.id}/tickets/#{ticket.id}/refund_and_destroy"] if @event.refund_deleted_orders && ticket.session_id),
+        ['Remove ticket', "/events/#{@event.id}/tickets/#{ticket.id}/destroy"],
+        (['Remove and refund order', "/events/#{@event.id}/orders/#{ticket.order_id}/refund_and_destroy"] if ticket.order && @event.refund_deleted_orders && ticket.order.session_id),
+        (['Remove order', "/events/#{@event.id}/orders/#{ticket.order_id}/destroy"] if ticket.order),        
       ].compact, button_text: %(Actions <i class="bi bi-caret-down-fill"></i>), container_class: 'btn-group mb-1' %>
       <% end %>
     </td>
