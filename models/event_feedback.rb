@@ -9,6 +9,8 @@ class EventFeedback
 
   has_many :account_contributions, dependent: :nullify
 
+  has_many :notifications, as: :notifiable, dependent: :destroy
+
   field :answers, type: Array
   field :public, type: Boolean
   field :anonymise, type: Boolean
@@ -37,6 +39,14 @@ class EventFeedback
   end
   after_destroy do
     event.clear_cache if event
+  end
+
+  def circle
+    account
+  end
+
+  after_create do
+    notifications.create! circle: circle, type: 'left_feedback' unless anonymise
   end
 
   before_validation do

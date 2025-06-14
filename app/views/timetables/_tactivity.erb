@@ -22,7 +22,7 @@
   </div>
   <div style="position: absolute; right: 10px; bottom: 10px;" class="text-white">
     <% if tactivity.comments.count > 0 %>
-      <a class="<% if image %>text-white<% else %>text-dark<% end %>" data-toggle="tooltip" title="<%= pluralize(tactivity.comments.count, 'comment') %>" href="/g/<%= @gathering.slug %>/tactivities/<%= tactivity.id %>"><i class="bi bi-chat"></i> <%= tactivity.comments.count %></a>
+      <a class="<% if image %>text-white<% else %>text-dark<% end %>" data-toggle="tooltip" title="<%= pluralize(tactivity.comments.count, 'comment') %>" href="/g/<%= @gathering.slug %>/tactivities/<%= tactivity.id %>"><i class="bi bi-chat-left-text"></i> <%= tactivity.comments.count %></a>
       &middot;
     <% end %>
     <% if tactivity.space_id and (@membership.admin? or tactivity.timetable.scheduling_by_all) %>

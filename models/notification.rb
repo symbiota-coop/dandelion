@@ -45,7 +45,7 @@ class Notification
   end
 
   def self.types
-    %w[created_gathering applied joined_gathering created_team created_timetable created_tactivity created_rota created_option created_spend created_profile updated_profile joined_team signed_up_to_a_shift interested_in_tactivity scheduled_tactivity unscheduled_tactivity made_admin unadmined commented reacted_to_a_comment left_gathering created_payment created_inventory_item mapplication_removed created_event updated_event created_organisation created_order]
+    %w[created_gathering applied joined_gathering created_team created_timetable created_tactivity created_rota created_option created_spend created_profile updated_profile joined_team signed_up_to_a_shift interested_in_tactivity scheduled_tactivity unscheduled_tactivity made_admin unadmined commented reacted_to_a_comment left_gathering created_payment created_inventory_item mapplication_removed created_event updated_event created_organisation created_order left_feedback]
   end
 
   def self.mailable_types
@@ -193,6 +193,9 @@ class Notification
     when :created_order
       order = notifiable
       "<strong>#{order.account.name}</strong> is going to <strong>#{order.event.name}</strong>"
+    when :left_feedback
+      event_feedback = notifiable
+      "<strong>#{event_feedback.account.name}</strong> left feedback on <strong>#{event_feedback.event.name}</strong>"
     end.html_safe
   end
 
@@ -254,6 +257,8 @@ class Notification
       ['View organisation', "#{ENV['BASE_URI']}/o/#{notifiable.slug}"]
     when :created_order
       ['View event', "#{ENV['BASE_URI']}/events/#{notifiable.event_id}"]
+    when :left_feedback
+      ['View event', "#{ENV['BASE_URI']}/events/#{notifiable.event_id}"]
     end
   end
 
@@ -296,7 +301,7 @@ class Notification
     when :created_timetable
       'bi-table'
     when :commented
-      'bi-chat'
+      'bi-chat-left-text'
     when :reacted_to_a_comment
       'bi-hand-thumbs-up'
     when :left_gathering
@@ -315,6 +320,8 @@ class Notification
       'bi-flag-fill'
     when :created_order
       'bi-ticket-detailed-fill'
+    when :left_feedback
+      'bi-chat-left-quote'
     end
   end
 end
