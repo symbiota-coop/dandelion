@@ -34,16 +34,10 @@
           <i class="bi bi-star-fill" style="cursor: pointer; font-size: 50px; color: #bbb"></i>
         <% end %>
       </div>
-      <% @event.feedback_questions_a.each_with_index { |q,i| %>
-      <div class="form-group">
-        <label style="font-size: 1.1rem">
-          <%== Sanitize.fragment(Rinku.auto_link(q), Sanitize::Config::DANDELION) %>
-        </label>
-        <div>
-          <%= text_area_tag "answers[#{i}]", class: 'autosize form-control', style: 'font-size: 1.1rem' %>
-        </div>
-      </div>
-      <% } %>
+      <style>
+        .feedback-question-label, .feedback-question-answer { font-size: 1.1rem }
+      </style>
+      <%= partial :'events/feedback_questions' %>
       <%= checkbox 'Allow this feedback to be quoted publicly', slug: :public, checked: true %>
       <%= checkbox 'Anonymise this feedback', slug: :anonymise %>
       <%= f.submit_block button_text: 'Submit' %>

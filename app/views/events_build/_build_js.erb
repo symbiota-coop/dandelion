@@ -242,5 +242,21 @@
       $(this).find('button[type=submit]').prop('disabled', true)
     })
 
+    function loadQuestions() {
+      $('#questions-preview').load('/events/<%=@event.id%>/questions?questions=' + encodeURIComponent($('#event_questions').val()))
+    }
+    $('#event_questions').keyup(function() {
+      loadQuestions()
+      });
+    loadQuestions()
+
+    function loadFeedbackQuestions() {
+      $('#feedback-questions-preview').load('/events/<%=@event.id%>/feedback_questions?questions=' + encodeURIComponent($('#event_feedback_questions').val()))
+    }
+    $('#event_feedback_questions').keyup(function() {
+      loadFeedbackQuestions()
+      });
+    loadFeedbackQuestions()
+
   })
 </script>

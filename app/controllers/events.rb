@@ -644,4 +644,12 @@ Dandelion::App.controller do
     @event.event_sessions.find(params[:event_session_id]).try(:destroy)
     redirect back
   end
+
+  get '/events/:id/questions' do
+    partial :'events/questions', locals: { questions: params[:questions] }
+  end
+
+  get '/events/:id/feedback_questions' do
+    partial :'events/feedback_questions', locals: { questions: params[:questions] }
+  end
 end

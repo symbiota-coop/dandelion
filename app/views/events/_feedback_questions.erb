@@ -1,0 +1,18 @@
+<% if defined?(questions) 
+    q = (questions || '').split("\n").map(&:strip).reject(&:blank?)
+    questions_a = q.empty? ? [] : q
+else
+questions_a = @event.feedback_questions_a
+end
+%>
+
+<% questions_a.each_with_index { |q,i| %>
+<div class="form-group">
+  <label class="feedback-question-label">
+    <%== Sanitize.fragment(Rinku.auto_link(q), Sanitize::Config::DANDELION) %>
+  </label>
+  <div>
+    <%= text_area_tag "answers[#{i}]", class: 'autosize form-control feedback-question-answer', disabled: defined?(questions) %>
+  </div>
+</div>
+<% } %>

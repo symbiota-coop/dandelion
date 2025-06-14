@@ -159,30 +159,7 @@ end
       <%= f.hidden_field :http_referrer, value: request.referrer %>
       <%= f.hidden_field :via, value: params[:via] %>
 
-      <% @event.questions_a.each_with_index { |q,i| %>
-      <div class="form-group links-blank">
-        <% if q =~ /^#\s*(.+)/ %>
-          <label><%== Sanitize.fragment(Rinku.auto_link($1), Sanitize::Config::DANDELION) %></label>
-        <% elsif m = q.match(/\[(.*)\]/)  %>
-          <div class="checkbox-inline">
-            <%= check_box_tag "answers[#{i}]", id: "answers-#{i}", checked: ((params[:answers][i] == 'true') if params[:answers]), 'data-required': q.ends_with?('*') %>
-            <label class="font-weight-bold" for="answers-<%=i%>">
-              <%== Sanitize.fragment(Rinku.auto_link(m[1]), Sanitize::Config::DANDELION) %>
-            </label>
-          </div>
-        <% elsif m = q.match(/\{(.*)\}/)  %>
-          <div class="form-group">
-            <label><%== Sanitize.fragment(Rinku.auto_link(m[1]), Sanitize::Config::DANDELION) %></label>
-            <%= date_field_tag "answers[#{i}]", required: q.ends_with?('*'), class: 'form-control', value: (params[:answers][i] if params[:answers] && params[:answers][i] != '__EMPTY__') %>
-          </div>
-        <% else %>
-          <label><%== Sanitize.fragment(Rinku.auto_link(q), Sanitize::Config::DANDELION) %></label>
-          <div>
-            <%= text_area_tag "answers[#{i}]", required: q.ends_with?('*'), class: 'autosize form-control', value: (params[:answers][i] if params[:answers] && params[:answers][i] != '__EMPTY__') %>
-          </div>
-        <% end %>
-      </div>
-      <% } %>
+      <%= partial :'events/questions' %>
 
       <% if @event.opt_in_organisation %>
         <% if current_account && @event.organisation_and_cohosts.all? { |organisation| current_account.organisationships.find_by(organisation: organisation) } %>

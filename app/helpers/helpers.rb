@@ -182,12 +182,12 @@ Dandelion::App.helpers do
     %(<abbr class="timeago" title="#{time.iso8601}">#{time}</abbr>).html_safe
   end
 
-  def checkbox(name, slug: nil, checked: false, form_group_class: nil)
+  def checkbox(name, slug: nil, checked: false, form_group_class: nil, disabled: false)
     slug ||= name.force_encoding('utf-8').parameterize.underscore
     checked_or_param = checked || params[:"#{slug}"]
     %(<div class="form-group #{form_group_class}">
          <div class="checkbox-inline #{'checked' if checked_or_param}">
-            #{check_box_tag :"#{slug}", checked: checked_or_param, id: "#{slug}_checkbox"}
+            #{check_box_tag :"#{slug}", checked: checked_or_param, id: "#{slug}_checkbox", disabled: disabled}
             <label for="#{slug}_checkbox">#{name}</label>
           </div>
       </div>).html_safe

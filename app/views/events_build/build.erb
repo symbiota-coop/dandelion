@@ -142,10 +142,8 @@
             }
         </style>
         <div class="row">
-          <div class="col-lg-8">
+          <div class="col-lg-6">
             <%= f.text_area_block :questions, placeholder: "e.g. Any dietary requirements?\n[Check this box to agree to the terms and conditions]" %>
-          </div>
-          <div class="col-lg-4">
             <div class="q-help">
               <p class="text-muted">Questions to ask participants upon booking.</p>
               <ul class="text-muted">
@@ -158,12 +156,16 @@
               </ul>
             </div>
           </div>
+          <div class="col-lg-6">
+            <fieldset class="ml-lg-5 border p-3 rounded mb-3">
+              <legend class="w-auto px-2" style="font-size: 1rem">Preview</legend>
+              <div id="questions-preview"></div>
+            </fieldset>
+          </div>
         </div>
         <div class="row">
-          <div class="col-lg-8">
+          <div class="col-lg-6">
             <%= f.text_area_block :feedback_questions %>
-          </div>
-          <div class="col-lg-4">
             <div class="q-help">
               <p class="text-muted">Questions to ask participants in the post-event feedback form.</p>
               <ul class="text-muted">
@@ -172,6 +174,12 @@
                 <li>View answers on the Feedback page</li>
               </ul>
             </div>
+          </div>
+          <div class="col-lg-6">
+            <fieldset class="ml-lg-5 border p-3 rounded mb-3">
+              <legend class="w-auto px-2" style="font-size: 1rem">Preview</legend>
+              <div id="feedback-questions-preview"></div>
+            </fieldset>
           </div>
         </div>
       </div>

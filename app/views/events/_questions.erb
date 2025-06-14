@@ -1,0 +1,32 @@
+<% if defined?(questions) 
+    q = (questions || '').split("\n").map(&:strip).reject(&:blank?)
+    questions_a = q.empty? ? [] : q
+else
+questions_a = @event.questions_a
+end
+%>
+
+<% questions_a.each_with_index { |q,i| %>
+<div class="form-group links-blank">
+  <% if q =~ /^#\s*(.+)/ %>
+    <label><%== Sanitize.fragment(Rinku.auto_link($1), Sanitize::Config::DANDELION) %></label>
+  <% elsif m = q.match(/\[(.*)\]/)  %>
+    <div class="checkbox-inline">
+      <%= check_box_tag "answers[#{i}]", id: "answers-#{i}", checked: ((params[:answers][i] == 'true') if params[:answers]), 'data-required': q.ends_with?('*'), disabled: defined?(questions) %>
+      <label class="font-weight-bold" for="answers-<%=i%>">
+        <%== Sanitize.fragment(Rinku.auto_link(m[1]), Sanitize::Config::DANDELION) %>
+      </label>
+    </div>
+  <% elsif m = q.match(/\{(.*)\}/)  %>
+    <div class="form-group">
+      <label><%== Sanitize.fragment(Rinku.auto_link(m[1]), Sanitize::Config::DANDELION) %></label>
+      <%= date_field_tag "answers[#{i}]", required: q.ends_with?('*'), class: 'form-control', value: (params[:answers][i] if params[:answers] && params[:answers][i] != '__EMPTY__'), disabled: defined?(questions) %>
+    </div>
+  <% else %>
+    <label><%== Sanitize.fragment(Rinku.auto_link(q), Sanitize::Config::DANDELION) %></label>
+    <div>
+      <%= text_area_tag "answers[#{i}]", required: q.ends_with?('*'), class: 'autosize form-control', value: (params[:answers][i] if params[:answers] && params[:answers][i] != '__EMPTY__'), disabled: defined?(questions) %>
+    </div>
+  <% end %>
+</div>
+<% } %>
