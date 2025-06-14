@@ -23,7 +23,7 @@ end
       <%= date_field_tag "answers[#{i}]", required: q.ends_with?('*'), class: 'form-control', value: (params[:answers][i] if params[:answers] && params[:answers][i] != '__EMPTY__'), disabled: defined?(questions) %>
     </div>
   <% else %>
-    <label><%== Sanitize.fragment(Rinku.auto_link(q), Sanitize::Config::DANDELION) %></label>
+    <label><%== Sanitize.fragment(Rinku.auto_link(q.chomp('*')), Sanitize::Config::DANDELION) %></label>
     <div>
       <%= text_area_tag "answers[#{i}]", required: q.ends_with?('*'), class: 'autosize form-control', value: (params[:answers][i] if params[:answers] && params[:answers][i] != '__EMPTY__'), disabled: defined?(questions) %>
     </div>
