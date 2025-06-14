@@ -20,11 +20,11 @@
               <span class="float-right label label-<%= mapplication.label %>"><%= mapplication.status.capitalize %></span>
             <% end %>
             <% if notification.type.to_sym == :left_feedback; event_feedback = notification.notifiable %>
-              <span class="float-right">
+              <a href="/events/<%= event_feedback.event_id %>" class="float-right">
                 <% if event_feedback.rating %>
                   <% event_feedback.rating.times do %><i class="bi bi-star-fill"></i><% end %>
                 <% end %>
-              </span>
+              </a>
             <% end %>
             <span style="font-size: 11px" class="text-muted"><%= timeago(notification.created_at) %></span>
           </p>

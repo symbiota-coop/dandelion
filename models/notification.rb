@@ -250,9 +250,9 @@ class Notification
     when :mapplication_removed
       ['View applications', "#{ENV['BASE_URI']}/g/#{circle.slug}/applications"]
     when :created_event
-      ['View event', "#{ENV['BASE_URI']}/events/#{notifiable.id}"]
+      ['View event', "#{ENV['BASE_URI']}/e/#{notifiable.slug}"]
     when :updated_event
-      ['View event', "#{ENV['BASE_URI']}/events/#{notifiable.id}"]
+      ['View event', "#{ENV['BASE_URI']}/e/#{notifiable.slug}"]
     when :created_organisation
       ['View organisation', "#{ENV['BASE_URI']}/o/#{notifiable.slug}"]
     when :created_order
