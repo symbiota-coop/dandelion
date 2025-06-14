@@ -36,7 +36,7 @@ module OrderNotifications
     content = ERB.new(File.read(Padrino.root('app/views/emails/tickets.erb'))).result(binding)
     batch_message.subject(event.ticket_email_title || "#{tickets.count == 1 ? 'Ticket' : 'Tickets'} to #{event.name}")
 
-    if event.organisation.send_ticket_emails_from_organisation && event.organisation.reply_to && event.organisation.image
+    if event.organisation.send_ticket_emails_from_organisation && event.organisation.image
       header_image_url = event.organisation.image.thumb('1920x1920').url
       batch_message.from "#{event.organisation.name} <#{ENV['TICKETS_EMAIL']}>"
     else
