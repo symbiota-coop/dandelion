@@ -12,9 +12,12 @@
     <%= event_feedback.rating.times.each.map { '★' }.join if event_feedback.rating %>
   </p>
   <table>
-    <%= event_feedback.event.feedback_questions_a.each_with_index.map do |q, _i|
-          %(<tr><th>#{q}</th><td>#{event_feedback.answers.detect { |k, _v| k == q }[1]}</td></tr>)
-        end.join %>
+    <% event_feedback.answers.each { |q,a| %>
+    <tr>
+      <th><%= q %></th>
+      <td><%= a %></td>
+    </tr>
+    <% } %>
   </table>
   <p><a href="<%= ENV['BASE_URI'] %>/events/<%= event.id %>/feedback">See all feedback for this event</a></p>
 </div>

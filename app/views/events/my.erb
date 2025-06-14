@@ -1,5 +1,6 @@
 <% upcoming_events = current_account.upcoming_events.paginate(page: params[:upcoming_events_page], per_page: 10) %>
 <% past_events = current_account.previous_events.paginate(page: params[:past_events_page], per_page: 10) %>
+<% full_width = true %>
 
 <% if params[:past_events_page] || params[:upcoming_events_page] %>
   <p><a href="/events/my">&larr; All your events</a></p>
@@ -63,57 +64,54 @@
                                         <% event_feedback.rating.times do %><i class="bi bi-star-fill"></i><% end %>
                                       <% end %>
 
-                                      <% event_feedback.event.feedback_questions_a.each_with_index { |q,i|
-                                qa = event_feedback.answers.detect { |k, _v| k == q }
-                                   a = qa[1] if qa
-                                   if a
-                                   %>
-                                      <p class="mt-1">
-                                        <strong>
-                                          <%== Sanitize.fragment(Rinku.auto_link(q), Sanitize::Config::DANDELION) %>
-                                        </strong>
-                                        <br>
-                                        <%  %>
-                                        <% if a %>
-                                          <%== Sanitize.fragment(Rinku.auto_link(a), Sanitize::Config::DANDELION) %>
-                                        <% end %>
-                                      </p>
+                                      <% event_feedback.answers.each_with_index { |qa,i| q = qa[0]; a = qa[1] %>
+                                      <% if a %>
+                                        <p class="mt-1">
+                                          <strong>
+                                            <%== Sanitize.fragment(Rinku.auto_link(q), Sanitize::Config::DANDELION) %>
+                                          </strong>
+                                          <br>
+                                          <%  %>
+                                          <% if a %>
+                                            <%== Sanitize.fragment(Rinku.auto_link(a), Sanitize::Config::DANDELION) %>
+                                          <% end %>
+                                        </p>
+                                      <% end %>
+                                      <% } %>
+                                    </div>
+                                  <% else %>
+                                    <i data-toggle="tooltip" title="Give feedback" class="bi bi-star"></i>
+                                    <a href="/events/<%=event.id%>/give_feedback">Give feedback</a>
+                                  <% end %>
+                                </li>
 
-                                    <% end } %>
-                                  </div>
-                                <% else %>
-                                  <i data-toggle="tooltip" title="Give feedback" class="bi bi-star"></i>
-                                  <a href="/events/<%=event.id%>/give_feedback">Give feedback</a>
-                                <% end %>
-                              </li>
+                              <% end %>
 
                             <% end %>
 
-                          <% end %>
-
-                        </ul>
+                          </ul>
 
 
+                        </div>
                       </div>
-                    </div>
-                  </td>
-                </tr>
-              </table>
+                    </td>
+                  </tr>
+                </table>
+              </div>
             </div>
+
+
           </div>
-
-
         </div>
+        <% } %>
       </div>
-      <% } %>
     </div>
+  <% end %>
+
+
+  <div class="mt-3">
+    <%= will_paginate past_events, param_name: 'past_events_page', inner_window: 0, outer_window: 0, renderer: WillPaginate::ViewHelpers::BootstrapRenderer %>
   </div>
-<% end %>
-
-
-<div class="mt-3">
-  <%= will_paginate past_events, param_name: 'past_events_page', inner_window: 0, outer_window: 0, renderer: WillPaginate::ViewHelpers::BootstrapRenderer %>
-</div>
 <% end %>
 
 <% end %>

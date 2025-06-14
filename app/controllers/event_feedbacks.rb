@@ -128,23 +128,8 @@ Dandelion::App.controller do
     @event_feedback = EventFeedback.find(params[:id]) || not_found
     @event = @event_feedback.event
     event_admins_only!
-
-    public_answers = @event_feedback.event.feedback_questions_a.map { |q| [q, ''] }
-
-    # keep existing answers
-    if @event_feedback.public_answers
-      public_answers.each_with_index do |qa, i|
-        q = qa[0]
-        if (existing_qa = @event_feedback.public_answers.detect { |k, _v| k == q })
-          public_answers[i][1] = existing_qa[1]
-        end
-      end
-    end
-
-    # set new answer
-    public_answers[params[:i].to_i][1] = params[:public]
-
-    @event_feedback.public_answers = public_answers.all? { |_k, v| v.blank? } ? nil : public_answers
+    @event_feedback.public_answers ||= @event_feedback.answers.map { |q, _a| [q, ''] }
+    @event_feedback.public_answers[params[:i].to_i][1] = params[:public]
     @event_feedback.save
     200
   end

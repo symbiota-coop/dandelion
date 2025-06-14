@@ -65,49 +65,22 @@
       </a>
     </td>
     <td>
-      <% if event_feedback.event %>
-        <% event_feedback.event.feedback_questions_a.each_with_index { |q,i| %>
-        <% qa = event_feedback.answers.detect { |k, _v| k == q }
-             a = qa[1] if qa %>
-        <% if a %>
-          <div class="mb-3">
-            <strong>
-              <%== Sanitize.fragment(Rinku.auto_link(q), Sanitize::Config::DANDELION) %>
-            </strong>
-            <br>
-            <%== Sanitize.fragment(Rinku.auto_link(a), Sanitize::Config::DANDELION) %>
-            <% if event_feedback.public? %>
-              <div class="my-3">
-                <div data-pagelet-url="/event_feedbacks/<%= event_feedback.id %>/public/<%= i %>"></div>
-              </div>
-            <% end %>
-          </div>
-        <% end %>
-        <% } %>
-      <% else %>
-        <% event_feedback.answers.each { |q,a| %>
-        <p>
+      <% event_feedback.answers.each_with_index { |qa,i| q = qa[0]; a = qa[1] %>
+      <% if a %>
+        <div class="mb-3">
           <strong>
             <%== Sanitize.fragment(Rinku.auto_link(q), Sanitize::Config::DANDELION) %>
           </strong>
           <br>
-          <% if a %>
-            <%== Sanitize.fragment(Rinku.auto_link(a), Sanitize::Config::DANDELION) %>
+          <%== Sanitize.fragment(Rinku.auto_link(a), Sanitize::Config::DANDELION) %>
+          <% if event_feedback.public? %>
+            <div class="my-3">
+              <div data-pagelet-url="/event_feedbacks/<%= event_feedback.id %>/public/<%= i %>"></div>
+            </div>
           <% end %>
-        </p>
-        <% if event_feedback.public_answers %>
-          <% qa = event_feedback.public_answers.detect { |k, _v| k == q }
-             a = qa[1] if qa %>
-          <div class="my-3">
-            <textarea class="form-control" disabled>
-              <% if a %>
-               <%== Sanitize.fragment(Rinku.auto_link(a), Sanitize::Config::DANDELION) %>
-             <% end %>
-            </textarea>
-          </div>
-        <% end %>
-        <% } %>
+        </div>
       <% end %>
+      <% } %>
     </td>
     <td>
       <% if event_feedback.event %>

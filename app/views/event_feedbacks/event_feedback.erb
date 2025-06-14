@@ -38,21 +38,17 @@
       </td>
     </tr>
   <% end %>
-  <% @event_feedback.event.feedback_questions_a.each_with_index { |q,i| %>
+  <% @event_feedback.answers.each_with_index { |qa,i| q = qa[0]; a = qa[1] %>
   <tr>
     <th>
       <%== Sanitize.fragment(Rinku.auto_link(q), Sanitize::Config::DANDELION) %>
     </th>
     <td>
-      <% qa = @event_feedback.answers.detect { |k, _v| k == q }
-         a = qa[1] if qa %>
-      <% if a %>
-        <%== Sanitize.fragment(Rinku.auto_link(a), Sanitize::Config::DANDELION) %>
-        <% if @event_feedback.public? %>
-          <div class="mt-3">
-            <div data-pagelet-url="/event_feedbacks/<%= @event_feedback.id %>/public/<%= i %>"></div>
-          </div>
-        <% end %>
+      <%== Sanitize.fragment(Rinku.auto_link(a), Sanitize::Config::DANDELION) %>
+      <% if @event_feedback.public? %>
+        <div class="mt-3">
+          <div data-pagelet-url="/event_feedbacks/<%= @event_feedback.id %>/public/<%= i %>"></div>
+        </div>
       <% end %>
     </td>
   </tr>
