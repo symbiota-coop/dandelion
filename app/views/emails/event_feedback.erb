@@ -11,7 +11,7 @@
   <p style="color: #F5B042">
     <%= event_feedback.rating.times.each.map { '★' }.join if event_feedback.rating %>
   </p>
-  <table style="margin-bottom: 1rem">
+  <table style="margin-bottom: 1em">
     <% event_feedback.answers.each { |q,a| %>
     <tr>
       <th><%= q %></th>
