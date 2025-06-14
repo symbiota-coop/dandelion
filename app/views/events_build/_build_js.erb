@@ -244,9 +244,12 @@
 
     let questionsTimer;
     function loadQuestions() {
-      $('#questions-preview').load('/events/<%=@event.id%>/questions?questions=' + encodeURIComponent($('#event_questions').val()))
+      $('#questions-preview').load('/events/<%=@event.id%>/questions?questions=' + encodeURIComponent($('#event_questions').val()), function() {
+        $('#questions-spinner').hide();
+      });
     }
     $('#event_questions').on('input', function() {
+      $('#questions-spinner').show();
       clearTimeout(questionsTimer);
       questionsTimer = setTimeout(function() {
         loadQuestions();
@@ -256,9 +259,12 @@
 
     let feedbackQuestionsTimer;
     function loadFeedbackQuestions() {
-      $('#feedback-questions-preview').load('/events/<%=@event.id%>/feedback_questions?questions=' + encodeURIComponent($('#event_feedback_questions').val()))
+      $('#feedback-questions-preview').load('/events/<%=@event.id%>/feedback_questions?questions=' + encodeURIComponent($('#event_feedback_questions').val()), function() {
+        $('#feedback-questions-spinner').hide();
+      });
     }
     $('#event_feedback_questions').on('input', function() {
+      $('#feedback-questions-spinner').show();
       clearTimeout(feedbackQuestionsTimer);
       feedbackQuestionsTimer = setTimeout(function() {
         loadFeedbackQuestions();
