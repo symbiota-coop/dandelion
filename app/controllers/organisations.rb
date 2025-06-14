@@ -473,14 +473,6 @@ Dandelion::App.controller do
     end
   end
 
-  get '/o/:slug/pmail_tests' do
-    @organisation = Organisation.find_by(slug: params[:slug]) || not_found
-    organisation_admins_only!
-    @pmail_tests = @organisation.pmail_tests.order('created_at desc').page(params[:page])
-    @scope = "organisation_id=#{@organisation.id}"
-    erb :'pmail_tests/pmail_tests'
-  end
-
   get '/o/:slug/show_membership/:f' do
     sign_in_required!
     @organisation = Organisation.find_by(slug: params[:slug]) || not_found

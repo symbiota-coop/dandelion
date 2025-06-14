@@ -1,9 +1,0 @@
-<%= partial :'organisations/nav', locals: { organisation: @organisation } %>
-<% organisation = @organisation %>
-
-<% form_for @pmail_test, @pmail_test.new_record? ? '/pmail_tests/new' : "/pmail_tests/#{@pmail_test.id}/edit", multipart: true do |f| %>
-  <%= hidden_field_tag :organisation_id, value: @organisation.id %>
-  <%= f.text_block :name %>
-  <%= f.number_block :fraction %>
-  <%= f.submit_block button_text: (@pmail_test.persisted? ? 'Save A/B test' : 'Create A/B test'), destroy_url: "/pmail_tests/#{@pmail_test.id}/destroy?organisation_id=#{@organisation.id}" %>
-<% end %>

@@ -43,21 +43,10 @@
       <a class="btn btn-primary mb-1" href="/pmails/<%=@pmail.id%>" target="_blank">View</a>
       <button type="submit" name="duplicate" value="1" class="btn btn-primary mb-1">Duplicate</button>
     </div>
-  <% elsif @pmail.pmail_test && @pmail.pmail_test.winner %>
-    <p class="lead">
-      Part of the A/B test <a href="/pmail_tests/<%= @pmail.pmail_test.id %>?<%= @scope %>"><%= @pmail.pmail_test.name %></a>.
-      The email <a href="/pmails/<%= @pmail.pmail_test.winner.id %>/edit?<%= @scope %>"><%= @pmail.pmail_test.winner.subject %></a> was sent instead.
-    </p>
   <% elsif @pmail.requested_send_at %>
     <p class="lead">Queued for sending at <%= @pmail.requested_send_at %></p>
   <% else %>
-    <% if @pmail.pmail_test %>
-      <p class="lead mb-1">
-        Part of the A/B test <a href="/pmail_tests/<%= @pmail.pmail_test.id %>?<%= @scope %>"><%= @pmail.pmail_test.name %></a>
-      </p>
-    <% else %>
-      <%= @hide_alert = true; partial :flash %>
-    <% end %>
+    <%= @hide_alert = true; partial :flash %>
     <div class="mb-3">
       <button type="submit" name="default" style="overflow: visible !important; height: 0 !important; width: 0 !important; margin: 0 !important; border: 0 !important; padding: 0 !important; display: block !important;" value="1"></button>
       <button type="submit" name="preview" value="1" class="btn btn-primary mb-1">Preview</button>

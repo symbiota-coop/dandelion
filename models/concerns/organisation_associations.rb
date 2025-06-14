@@ -25,7 +25,6 @@ module OrganisationAssociations
     has_many :activities, dependent: :destroy
     has_many :organisationships, dependent: :destroy
     has_many :pmails, dependent: :destroy
-    has_many :pmail_tests, dependent: :destroy
 
     has_many :attachments, dependent: :destroy
     has_many :local_groups, dependent: :destroy

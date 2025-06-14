@@ -6,7 +6,6 @@ Dandelion::App.controller do
       @scope = "organisation_id=#{@organisation.id}"
       organisation_admins_only!
       @pmails = @organisation.pmails
-      @pmail_tests = @organisation.pmail_tests
     elsif params[:activity_id]
       @activity = Activity.find(params[:activity_id]) || not_found
       @_organisation = @activity.organisation
@@ -130,68 +129,5 @@ Dandelion::App.controller do
     @organisation = Organisation.find(params[:oid]) || not_found
     @organisation.attachments.find(params[:attachment_id]).try(:destroy)
     200
-  end
-
-  get '/pmail_tests/new' do
-    @pmail_test = PmailTest.new
-    erb :'pmail_tests/build'
-  end
-
-  post '/pmail_tests/new' do
-    @pmail_test = PmailTest.new(mass_assigning(params[:pmail_test], PmailTest))
-    @pmail_test.account = current_account
-    @pmail_test.organisation = @organisation
-    if @pmail_test.save
-      flash[:notice] = 'The test was saved.'
-      redirect "/pmail_tests/#{@pmail_test.id}?#{@scope}"
-    else
-      erb :'pmail_tests/build'
-    end
-  end
-
-  get '/pmail_tests/:pmail_test_id' do
-    @pmail_test = @pmail_tests.find(params[:pmail_test_id]) || not_found
-    erb :'pmail_tests/pmail_test'
-  end
-
-  get '/pmail_tests/:pmail_test_id/edit' do
-    @pmail_test = @pmail_tests.find(params[:pmail_test_id]) || not_found
-    erb :'pmail_tests/build'
-  end
-
-  post '/pmail_tests/:pmail_test_id/edit' do
-    @pmail_test = @pmail_tests.find(params[:pmail_test_id]) || not_found
-    if @pmail_test.update_attributes(mass_assigning(params[:pmail_test], PmailTest))
-      redirect "/pmail_tests/#{@pmail_test.id}?#{@scope}"
-    else
-      erb :'pmail_tests/build'
-    end
-  end
-
-  get '/pmail_tests/:pmail_test_id/destroy' do
-    @pmail_test = @pmail_tests.find(params[:pmail_test_id]) || not_found
-    @pmail_test.destroy
-    redirect "/o/#{@pmail_test.organisation.slug}/pmail_tests"
-  end
-
-  post '/pmail_tests/:pmail_test_id/add' do
-    @pmail_test = @pmail_tests.find(params[:pmail_test_id]) || not_found
-    @pmail_test.pmail_testships.create(pmail_id: params[:pmail_testship][:pmail_id])
-    redirect back
-  end
-
-  post '/pmail_tests/:pmail_test_id/remove' do
-    @pmail_test = @pmail_tests.find(params[:pmail_test_id]) || not_found
-    @pmail_test.pmail_testships.find_by(pmail_id: params[:pmail_id]).try(:destroy)
-    redirect back
-  end
-
-  get '/pmail_tests/:pmail_test_id/assign_and_send' do
-    @pmail_test = @pmail_tests.find(params[:pmail_test_id]) || not_found
-    unless @pmail_test.requested_send_at
-      @pmail_test.update_attribute(:requested_send_at, Time.now)
-      @pmail_test.assign_and_send
-    end
-    redirect back
   end
 end

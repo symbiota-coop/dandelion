@@ -48,10 +48,6 @@ class Pmail
   end
 
   has_many :pmail_links, dependent: :destroy
-  has_one :pmail_testship, dependent: :destroy
-  def pmail_test
-    pmail_testship.try(:pmail_test)
-  end
 
   def self.mailable_types
     %w[Activity ActivityTag LocalGroup Event]
@@ -167,7 +163,7 @@ class Pmail
   end
 
   def event_emails
-    emails = to_with_unsubscribes_less_ab_tests.pluck(:email)
+    emails = to_with_unsubscribes.pluck(:email)
     emails += mailable.tickets.complete.and(:email.ne => nil).reject { |ticket| emails.include?(ticket.email) }.map(&:email)
     emails
   end
@@ -176,15 +172,7 @@ class Pmail
     if mailable.is_a?(Event) && !waitlist
       event_emails.count
     else
-      to_with_unsubscribes_less_ab_tests.count
-    end
-  end
-
-  def to_with_unsubscribes_less_ab_tests
-    if pmail_test && pmail_test.sent_at
-      to_with_unsubscribes.and(:id.nin => pmail_test.pmail_testships.map(&:account_ids).flatten)
-    else
-      to_with_unsubscribes
+      to_with_unsubscribes.count
     end
   end
 
@@ -228,7 +216,6 @@ class Pmail
 
   def send_pmail
     return if sent_at
-    return if pmail_test && pmail_test.winner
     return unless (message_ids = send_batch_message)
 
     update_attribute(:sent_at, Time.now)
@@ -236,7 +223,7 @@ class Pmail
   end
   handle_asynchronously :send_pmail
 
-  def send_batch_message(test_to: nil, ab_test: nil, check_already_sent: false)
+  def send_batch_message(test_to: nil, check_already_sent: false)
     pmail_links.destroy_all
     mailgun_sto = nil
 
@@ -290,12 +277,10 @@ class Pmail
 
     if test_to
       accounts = test_to
-    elsif ab_test
-      accounts = to_with_unsubscribes.and(:id.in => pmail_testship.account_ids)
     else
-      accounts = to_with_unsubscribes_less_ab_tests
+      accounts = to_with_unsubscribes
       if mailable.is_a?(Event) && !waitlist
-        emails = to_with_unsubscribes_less_ab_tests.pluck(:email)
+        emails = to_with_unsubscribes.pluck(:email)
         mailable.tickets.complete.and(:email.ne => nil).reject { |ticket| emails.include?(ticket.email) }.each do |ticket|
           batch_message.add_recipient(:to, ticket.email, {
                                         'firstname' => ticket.firstname || 'there',

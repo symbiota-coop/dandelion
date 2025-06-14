@@ -17,7 +17,6 @@ module AccountAssociations
     has_many :sign_ins, dependent: :destroy
 
     has_many :pmails, dependent: :nullify
-    has_many :pmail_tests, dependent: :nullify
 
     has_many :uploads, dependent: :destroy
 
