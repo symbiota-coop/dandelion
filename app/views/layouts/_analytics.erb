@@ -1,0 +1,57 @@
+<% if @organisation && @organisation.plausible_analytics_domain %>
+  <script defer data-domain="<%= @organisation.plausible_analytics_domain %>" src="https://plausible.io/js/script.pageview-props.revenue.tagged-events.js"></script>
+  <script>
+    window.plausible = window.plausible || function() { (window.plausible.q = window.plausible.q || []).push(arguments) }
+  </script>
+  <% if @order && params[:success] %>
+    <script>
+      plausible('purchase', {
+        props: {
+          order_id: <%== @order.id.to_s.to_json %>
+        },
+        revenue: {
+          currency: <%== @order.currency.to_json %>,
+          amount: <%== @order.value.to_json %>
+        }
+      });
+    </script>
+  <% end %>
+<% end %>
+
+<% if (@organisation && @organisation.facebook_pixel_id) || (@event && @event.facebook_pixel_id) %>
+  <script>
+    !function (f, b, e, v, n, t, s)
+    {
+      if (f.fbq)
+        return;
+      n = f.fbq = function () {
+        n.callMethod ?
+                n.callMethod.apply(n, arguments) : n.queue.push(arguments)
+      };
+      if (!f._fbq)
+        f._fbq = n;
+      n.push = n;
+      n.loaded = !0;
+      n.version = '2.0';
+      n.queue = [];
+      t = b.createElement(e);
+      t.async = !0;
+      t.src = v;
+      s = b.getElementsByTagName(e)[0];
+      s.parentNode.insertBefore(t, s)
+    }(window, document, 'script',
+            'https://connect.facebook.net/en_US/fbevents.js');
+    <% if @organisation && @organisation.facebook_pixel_id %>
+      fbq('init', '<%= @organisation.facebook_pixel_id %>');
+    <% end %>
+    <% if @event && @event.facebook_pixel_id %>
+      fbq('init', '<%= @event.facebook_pixel_id %>');
+    <% end %>
+
+    fbq('track', 'PageView');
+
+    <% if @order && params[:success] %>
+      fbq('track', 'Purchase', <%== { value: @order.value || 0, currency: @order.currency }.to_json %>, {eventID: <%= @order.id.to_s.to_json%>});
+    <% end %>
+  </script>
+<% end %>

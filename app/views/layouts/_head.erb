@@ -8,8 +8,7 @@
       <script type="text/javascript" src="https://app.termly.io/resource-blocker/<%=ENV["TERMLY_WEBSITE_UUID"]%>?autoBlock=on"></script>
     <% end %>
 
-    <%= partial :'layouts/ga' %>
-    <%= partial :'layouts/pixel' %>
+    <%= partial :'layouts/analytics' %>
 
     <% if current_account && ENV['NOLT_SSO_SECRET'] %>
       <%= partial :'layouts/nolt' %>

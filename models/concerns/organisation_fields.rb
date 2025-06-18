@@ -9,7 +9,7 @@ module OrganisationFields
     field :intro_text, type: String
     field :telegram_group, type: String
     field :image_uid, type: String
-    field :google_analytics_id, type: String
+    field :plausible_analytics_domain, type: String
     field :facebook_pixel_id, type: String
     field :stripe_connect_json, type: String
     field :stripe_account_json, type: String
@@ -110,7 +110,7 @@ module OrganisationFields
         image: :image,
         hidden: :check_box,
         paid_up: :check_box,
-        google_analytics_id: :text,
+        plausible_analytics_domain: :text,
         facebook_pixel_id: :text,
         stripe_connect_json: :text,
         stripe_account_json: :text,
@@ -166,7 +166,7 @@ module OrganisationFields
         intro_text: 'Intro text for organisation homepage',
         telegram_group: 'Telegram group/channel URL',
         extra_info_for_ticket_email: 'Extra info for order confirmation email',
-        google_analytics_id: 'Google Analytics ID',
+        plausible_analytics_domain: 'Plausible Analytics domain',
         facebook_pixel_id: 'Facebook Pixel ID',
         stripe_client_id: 'Stripe client ID',
         stripe_endpoint_secret: 'Stripe endpoint secret',

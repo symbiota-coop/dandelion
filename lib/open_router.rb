@@ -34,7 +34,7 @@ class OpenRouter
     prompt = prompt[0..(context_window_size * 4 * 0.66)]
 
     payload = {
-      model: model.split(':').first,
+      model: model.split(':thinking').first,
       max_tokens: max_tokens,
       messages: [
         {

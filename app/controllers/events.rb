@@ -197,12 +197,7 @@ Dandelion::App.controller do
     @title = @event.name
     @organisation = @event.organisation
     if @order && params[:success]
-      @event.check_oc_event if !@order.payment_completed && @event.oc_slug
-      @ga_transaction = { transaction_id: @order.id.to_s, affiliation: @event.organisation.name, value: @order.value || 0, currency: @order.currency }
-      @ga_items = @order.tickets.map do |ticket|
-        { item_id: ticket.id.to_s, item_name: "#{ticket.event.name}: #{ticket.ticket_type.try(:name) || 'Complementary'}", item_price: ticket.discounted_price || 0, item_quantity: 1 }
-      end
-      @pixel_purchase = { value: @order.value || 0, currency: @order.currency }
+      @event.check_oc_event if !@order.payment_completed && @event.oc_slug      
     end
     cohostship = nil
     if params[:cohost] && (cohost = Organisation.find_by(slug: params[:cohost])) && (cohostship = @event.cohostships.find_by(organisation: cohost)) && cohostship.image
