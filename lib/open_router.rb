@@ -34,7 +34,7 @@ class OpenRouter
     prompt = prompt[0..(context_window_size * 4 * 0.66)]
 
     payload = {
-      model: model,
+      model: model.split(':').first,
       max_tokens: max_tokens,
       messages: [
         {
@@ -47,6 +47,12 @@ class OpenRouter
       },
       allow_fallbacks: 'false'
     }
+
+    if model.include?(':thinking')
+      payload[:reasoning] = {
+        enabled: true
+      }
+    end
 
     if schema
       payload[:response_format] = {
