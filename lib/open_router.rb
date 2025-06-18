@@ -1,16 +1,16 @@
 class OpenRouter
   BASE_URL = 'https://openrouter.ai'.freeze
   INTELLIGENCE_LEVELS = {
-    'standard' => 'google/gemini-2.5-flash-preview-05-20',
-    'smarter' => 'google/gemini-2.5-flash-preview-05-20:thinking'
+    'standard' => 'google/gemini-2.5-flash',
+    'smarter' => 'google/gemini-2.5-flash:thinking'
   }.freeze
   DEFAULT_PROVIDERS = {
-    'google/gemini-2.5-flash-preview-05-20' => %w[Google],
-    'google/gemini-2.5-flash-preview-05-20:thinking' => %w[Google]
+    'google/gemini-2.5-flash' => %w[Google],
+    'google/gemini-2.5-flash:thinking' => %w[Google]
   }.freeze
   DEFAULT_CONTEXT_WINDOW_SIZES = {
-    'google/gemini-2.5-flash-preview-05-20' => 1_000_000,
-    'google/gemini-2.5-flash-preview-05-20:thinking' => 1_000_000
+    'google/gemini-2.5-flash' => 1_000_000,
+    'google/gemini-2.5-flash:thinking' => 1_000_000
   }.freeze
 
   class << self
