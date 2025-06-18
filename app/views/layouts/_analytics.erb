@@ -5,7 +5,7 @@
   </script>
   <% if @order && params[:success] %>
     <script>
-      plausible('purchase', {
+      plausible('Purchase', {
         props: {
           order_id: <%== @order.id.to_s.to_json %>
         },
