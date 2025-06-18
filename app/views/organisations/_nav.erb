@@ -11,7 +11,7 @@
         ['<i class="bi bi-bar-chart-line-fill"></i> Event stats', "/o/#{organisation.slug}/events/stats"],
         ['<i class="bi bi-plus-square-fill"></i>  Create an event', "/events/new?organisation_id=#{organisation.id}"],
         ['<i class="bi bi-cart-fill"></i> Orders', "/o/#{organisation.slug}/orders"],
-        ['<i class="bi bi-terminal"></i> Discount codes', "/o/#{organisation.slug}/discount_codes"],
+        ['<i class="bi bi-terminal"></i> Discount codes' + (organisation.discount_codes.count.positive? ? " <span class='badge badge-primary'>#{organisation.discount_codes.count}</span>" : ''), "/o/#{organisation.slug}/discount_codes"],
         ['<i class="bi bi-chat-left-quote"></i> Feedback', "/o/#{organisation.slug}/feedback"],
         ['<i class="bi bi-envelope-fill"></i> Mailer', "/o/#{organisation.slug}/pmails"],
         [],        

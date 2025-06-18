@@ -10,7 +10,7 @@
         ['Settings', "/activities/#{activity.id}/edit"],
         ([%(Applications <span class="badge badge-primary">#{activity.activity_applications.outstanding.count}</span>), "/activities/#{activity.id}/applications"] if activity.privacy == 'closed'),
         [%(Followers <span class="badge badge-primary">#{activity.activityships.count}</span>), "/activities/#{activity.id}/followers"],
-        ['Discount codes', "/activities/#{activity.id}/discount_codes"],
+        ['Discount codes' + (activity.discount_codes.count.positive? ? " <span class='badge badge-primary'>#{activity.discount_codes.count}</span>" : ''), "/activities/#{activity.id}/discount_codes"],
         ['Event stats', "/activities/#{activity.id}/events/stats"],
         ['Audience stats', "/activities/#{activity.id}/stats"],
         ['Feedback', "/activities/#{activity.id}/feedback"],

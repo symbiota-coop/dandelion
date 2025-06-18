@@ -22,7 +22,7 @@
           ['Edit event', "/events/#{event.id}/edit"],
           ['Delete event', "/events/#{event.id}/delete"],
           ['Duplicate event', "/events/#{event.id}/duplicate"],
-          ['Discount codes', "/events/#{event.id}/discount_codes"],
+          ['Discount codes' + (event.discount_codes.count.positive? ? " <span class='badge badge-primary'>#{event.discount_codes.count}</span>" : ''), "/events/#{event.id}/discount_codes"],
           (['Ticket type photos', "/events/#{event.id}/ticket_types"] if event.ticket_types.count > 0),
           (['Co-host images', "/events/#{event.id}/cohosts"] if event.cohostships.count.positive?),
           ([%(Orders <span class="badge badge-primary">#{event.orders.count}</span>), "/events/#{event.id}/orders"] if event.orders.count.positive?),

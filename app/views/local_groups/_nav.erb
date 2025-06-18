@@ -9,7 +9,7 @@
         ['View local group', "/local_groups/#{local_group.id}"],
         ['Settings', "/local_groups/#{local_group.id}/edit"],
         [%(Followers <span class="badge badge-primary">#{local_group.local_groupships.count}</span>), "/local_groups/#{local_group.id}/followers"],
-        ['Discount codes', "/local_groups/#{local_group.id}/discount_codes"],
+        ['Discount codes' + (local_group.discount_codes.count.positive? ? " <span class='badge badge-primary'>#{local_group.discount_codes.count}</span>" : ''), "/local_groups/#{local_group.id}/discount_codes"],
         ['Event stats', "/local_groups/#{local_group.id}/events/stats"],
         ['Audience stats', "/local_groups/#{local_group.id}/stats"],
         ['Feedback', "/local_groups/#{local_group.id}/feedback"],
