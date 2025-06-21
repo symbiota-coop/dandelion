@@ -69,7 +69,7 @@
     fbq('track', 'PageView');
 
     <% if @order && params[:success] %>
-      fbq('track', 'Purchase', <%== { currency: @order.currency, value: @order.value || 0 }.to_json %>, {eventID: <%= @order.id.to_s.to_json%>});
+      fbq('track', 'Purchase', <%== { currency: @order.currency, value: @order.value || 0 }.to_json %>, {eventID: <%== @order.id.to_s.to_json%>});
     <% end %>
   </script>
 <% end %>
