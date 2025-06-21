@@ -44,7 +44,7 @@
           }
         })
       })
-      $('#tab5').find('a.next').remove()
+      $('#tab-features').find('a.next').remove()
       $('#gathering_name').focus().attr('autocomplete', 'off')
   <% end %>
 
@@ -119,16 +119,16 @@
 <% form_for @gathering, @gathering.new_record? ? '/g/new' : "/g/#{@gathering.slug}/edit", multipart: true do |f| %>
   <div class="nav-wrapper">
     <ul id="gathering-build-nav" class="nav nav-tabs" role="tablist">
-      <li role="presentation" class="nav-item"><a class="nav-link active" href="#tab1" role="tab" data-toggle="tab">Basics</a></li>
-      <li role="presentation" class="nav-item"><a class="nav-link" href="#tab2" role="tab" data-toggle="tab">Joining</a></li>
-      <li role="presentation" class="nav-item"><a class="nav-link" href="#tab3" role="tab" data-toggle="tab">Welcome</a></li>
-      <li role="presentation" class="nav-item"><a class="nav-link" href="#tab4" role="tab" data-toggle="tab">Payments</a></li>
-      <li role="presentation" class="nav-item"><a class="nav-link" href="#tab5" role="tab" data-toggle="tab">Features</a></li>
+      <li role="presentation" class="nav-item"><a class="nav-link active" href="#tab-basics" role="tab" data-toggle="tab">Basics</a></li>
+      <li role="presentation" class="nav-item"><a class="nav-link" href="#tab-joining" role="tab" data-toggle="tab">Joining</a></li>
+      <li role="presentation" class="nav-item"><a class="nav-link" href="#tab-welcome" role="tab" data-toggle="tab">Welcome</a></li>
+      <li role="presentation" class="nav-item"><a class="nav-link" href="#tab-payments" role="tab" data-toggle="tab">Payments</a></li>
+      <li role="presentation" class="nav-item"><a class="nav-link" href="#tab-features" role="tab" data-toggle="tab">Features</a></li>
     </ul>
   </div>
   <div class="container">
     <div class="tab-content mt-3">
-      <div role="tabpanel" class="tab-pane active" id="tab1">
+      <div role="tabpanel" class="tab-pane active" id="tab-basics">
         <%= f.text_block :name %>
         <div class="slugify">
           <%= f.shorturl_block :slug, stem: "#{ENV['BASE_URI']}/g/" %>
@@ -150,7 +150,7 @@
           <%= f.select_block :currency %>
         <% end %>
       </div>
-      <div role="tabpanel" class="tab-pane" id="tab2">
+      <div role="tabpanel" class="tab-pane" id="tab-joining">
         <%= f.wysiwyg_block :intro_for_non_members %>
         <%= f.number_block :member_limit %>
         <div class="mb-2">
@@ -193,11 +193,11 @@
           <%= f.check_box_block :hide_invitations %>
         </div>
       </div>
-      <div role="tabpanel" class="tab-pane" id="tab3">
+      <div role="tabpanel" class="tab-pane" id="tab-welcome">
         <%= f.wysiwyg_block :welcome_email %>
         <%= f.wysiwyg_block :intro_for_members %>
       </div>
-      <div role="tabpanel" class="tab-pane" id="tab4">
+      <div role="tabpanel" class="tab-pane" id="tab-payments">
         <% if !@gathering.stripe_sk && !@gathering.coinbase_api_key %>
           <div class="alert alert-warning">
             <p class="m-0"><i class="bi bi-exclamation-triangle-fill"></i> To accept payments, you must add either Stripe or Coinbase Commerce details.</p>
@@ -239,7 +239,7 @@
           </div>
         </div>
       </div>
-      <div role="tabpanel" class="tab-pane" id="tab5">
+      <div role="tabpanel" class="tab-pane" id="tab-features">
         <script>
           $(function() {
 

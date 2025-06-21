@@ -108,7 +108,7 @@ Dandelion::App.controller do
     @organisation.show_sign_in_link_in_ticket_emails = true
     @organisation.show_ticketholder_link_in_ticket_emails = true
     if @organisation.save
-      redirect "/o/#{@organisation.slug}/edit?created=1&tab=2"
+      redirect "/o/#{@organisation.slug}/edit?created=1&tab=payments"
     else
       flash.now[:error] = 'There was an error saving the organisation.'
       erb :'organisations/build'

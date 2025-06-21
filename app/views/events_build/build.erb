@@ -50,24 +50,24 @@
 <% form_for @event, @event.new_record ? '/events/new' : "/events/#{@event.id}/edit", id: 'build-event' do |f| %>
   <div class="nav-wrapper">
     <ul id="event-build-nav" class="nav nav-tabs" role="tablist">
-      <li role="presentation" class="nav-item"><a class="nav-link active" href="#tab1" role="tab" data-toggle="tab">Basics</a></li>
-      <li role="presentation" class="nav-item"><a class="nav-link" href="#tab2" role="tab" data-toggle="tab">Description and confirmation email</a></li>
-      <li role="presentation" class="nav-item"><a class="nav-link" href="#tab3" role="tab" data-toggle="tab">Tickets</a></li>
-      <li role="presentation" class="nav-item"><a class="nav-link" href="#tab4" role="tab" data-toggle="tab">Questions</a></li>
-      <li role="presentation" class="nav-item"><a class="nav-link" href="#tab5" role="tab" data-toggle="tab">Donations</a></li>
-      <li role="presentation" class="nav-item"><a class="nav-link" href="#tab6" role="tab" data-toggle="tab">Labels</a></li>
-      <li role="presentation" class="nav-item"><a class="nav-link" href="#tab7" role="tab" data-toggle="tab">Everything else</a></li>
+      <li role="presentation" class="nav-item"><a class="nav-link active" href="#tab-basics" role="tab" data-toggle="tab">Basics</a></li>
+      <li role="presentation" class="nav-item"><a class="nav-link" href="#tab-description" role="tab" data-toggle="tab">Description and confirmation email</a></li>
+      <li role="presentation" class="nav-item"><a class="nav-link" href="#tab-tickets" role="tab" data-toggle="tab">Tickets</a></li>
+      <li role="presentation" class="nav-item"><a class="nav-link" href="#tab-questions" role="tab" data-toggle="tab">Questions</a></li>
+      <li role="presentation" class="nav-item"><a class="nav-link" href="#tab-donations" role="tab" data-toggle="tab">Donations</a></li>
+      <li role="presentation" class="nav-item"><a class="nav-link" href="#tab-labels" role="tab" data-toggle="tab">Labels</a></li>
+      <li role="presentation" class="nav-item"><a class="nav-link" href="#tab-everything-else" role="tab" data-toggle="tab">Everything else</a></li>
       <% if @event.persisted? && @event.past? %>
-        <li role="presentation" class="nav-item"><a class="nav-link" href="#tab8" role="tab" data-toggle="tab">Recording</a></li>
+        <li role="presentation" class="nav-item"><a class="nav-link" href="#tab-recording" role="tab" data-toggle="tab">Recording</a></li>
       <% end %>
       <% if @event.organisation.stripe_client_id %>
-        <li role="presentation" class="nav-item"><a class="nav-link" href="#tab9" role="tab" data-toggle="tab">Revenue</a></li>
+        <li role="presentation" class="nav-item"><a class="nav-link" href="#tab-revenue" role="tab" data-toggle="tab">Revenue</a></li>
       <% end %>
     </ul>
   </div>
   <div class="container">
     <div class="tab-content mt-3">
-      <div role="tabpanel" class="tab-pane active" id="tab1">
+      <div role="tabpanel" class="tab-pane active" id="tab-basics">
         <%= f.hidden_field :organisation_id, value: @event.organisation_id %>
         <%= f.text_block :name %>
         <%= f.datetime_block :start_time %>
@@ -113,20 +113,20 @@
         <%= f.check_box_block :featured %>
         <%= f.check_box_block :send_order_notifications %>
       </div>
-      <div role="tabpanel" class="tab-pane" id="tab2">
+      <div role="tabpanel" class="tab-pane" id="tab-description">
         <%= f.wysiwyg_block :description %>
         <%= f.wysiwyg_block :extra_info_for_ticket_email %>
         <% if @event.persisted? %>
           <p style="margin-top: -1rem"><a target="_blank" href="/events/<%=@event.id%>/ticket_email">Preview order confirmation email &rarr;</a></p>
         <% end %>
       </div>
-      <div role="tabpanel" class="tab-pane" id="tab3">
+      <div role="tabpanel" class="tab-pane" id="tab-tickets">
         <%= f.select_block :currency %>
         <%= partial :'events_build/ticket_types', locals: { f: f } %>
         <%= partial :'events_build/ticket_groups', locals: { f: f } %>
         <%= f.number_block :capacity %>
       </div>
-      <div role="tabpanel" class="tab-pane" id="tab4">
+      <div role="tabpanel" class="tab-pane" id="tab-questions">
         <%= f.check_box_block :ask_hear_about %>
 
 
@@ -196,7 +196,7 @@
           </div>
         </div>
       </div>
-      <div role="tabpanel" class="tab-pane" id="tab5">
+      <div role="tabpanel" class="tab-pane" id="tab-donations">
 
         <% if @event.donations_to_dandelion? %>
           <div class="alert alert-warning">
@@ -212,7 +212,7 @@
           <%= f.text_block :donation_text %>
         </div>
       </div>
-      <div role="tabpanel" class="tab-pane" id="tab6">
+      <div role="tabpanel" class="tab-pane" id="tab-labels">
         <% if Padrino.env == :development || @event.organisation.change_select_tickets_title || @event.organisation.experimental? %>
           <%= f.text_block :select_tickets_title %>
         <% end %>
@@ -226,7 +226,7 @@
           <p style="margin-top: -1rem"><a target="_blank" href="/events/<%=@event.id%>/ticket_email">Preview order confirmation email &rarr;</a></p>
         <% end %>
       </div>
-      <div role="tabpanel" class="tab-pane" id="tab7">
+      <div role="tabpanel" class="tab-pane" id="tab-everything-else">
         <%= f.shorturl_block :slug, stem: "#{ENV['BASE_URI']}/e/" %>
         <%= f.url_block :redirect_url %>
         <% if Padrino.env == :development || @event.purchase_url || @event.organisation.allow_purchase_url? || @event.organisation.experimental? %>
@@ -269,7 +269,7 @@
         <% end %>
       </div>
       <% if @event.persisted? && @event.past? %>
-        <div role="tabpanel" class="tab-pane" id="tab8">
+        <div role="tabpanel" class="tab-pane" id="tab-recording">
           <%= f.wysiwyg_block :extra_info_for_recording_email %>
           <% if @event.persisted? %>
             <p style="margin-top: -1rem"><a target="_blank" href="/events/<%=@event.id%>/ticket_email">Preview order confirmation email &rarr;</a></p>
@@ -277,7 +277,7 @@
         </div>
       <% end %>
       <% if @event.organisation.stripe_client_id %>
-        <div role="tabpanel" class="tab-pane" id="tab9">
+        <div role="tabpanel" class="tab-pane" id="tab-revenue">
           <%= f.lookup_block :revenue_sharer_id, lookup_url: '/accounts.json', placeholder: 'Search accounts', selected_link: (%(<a class="d-inline-block mt-1" target="_blank" href="/u/#{@event.revenue_sharer.username}">View account</a>) if @event.revenue_sharer_id) %>
 
           <% if event_revenue_admin? %>

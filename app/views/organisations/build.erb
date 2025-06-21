@@ -36,14 +36,6 @@
   </script>
 <% end %>
 
-<% if params[:tab] == 'payments' %>
-  <script>
-    $(function() {
-      $('#organisation-build-nav a[href="#tab2"]').tab('show')
-    })
-  </script>
-<% end %>
-
 
 <%= partial :'organisations/nav', locals: { organisation: @organisation } %>
 
@@ -98,21 +90,21 @@
   <% if @organisation.persisted? %>
     <div class="nav-wrapper">
       <ul id="organisation-build-nav" class="nav nav-tabs" role="tablist">
-        <li role="presentation" class="nav-item"><a class="nav-link <%= 'active' if !params[:tab] || params[:tab].to_i == 1%>" href="#tab1" role="tab" data-toggle="tab">Basics</a></li>
-        <li role="presentation" class="nav-item"><a class="nav-link <%= 'active' if params[:tab].to_i == 2%>" href="#tab2" role="tab" data-toggle="tab">Payments</a></li>
-        <li role="presentation" class="nav-item"><a class="nav-link <%= 'active' if params[:tab].to_i == 3%>" href="#tab3" role="tab" data-toggle="tab">Emails</a></li>
-        <li role="presentation" class="nav-item"><a class="nav-link <%= 'active' if params[:tab].to_i == 4%>" href="#tab4" role="tab" data-toggle="tab">Mailgun</a></li>
-        <li role="presentation" class="nav-item"><a class="nav-link <%= 'active' if params[:tab].to_i == 5%>" href="#tab5" role="tab" data-toggle="tab">Other services</a></li>
-        <li role="presentation" class="nav-item"><a class="nav-link <%= 'active' if params[:tab].to_i == 6%>" href="#tab6" role="tab" data-toggle="tab">Everything else</a></li>
+        <li role="presentation" class="nav-item"><a class="nav-link <%= 'active' if !params[:tab] || params[:tab] == 'basics'%>" href="#tab-basics" role="tab" data-toggle="tab">Basics</a></li>
+        <li role="presentation" class="nav-item"><a class="nav-link <%= 'active' if params[:tab] == 'payments'%>" href="#tab-payments" role="tab" data-toggle="tab">Payments</a></li>
+        <li role="presentation" class="nav-item"><a class="nav-link <%= 'active' if params[:tab] == 'emails'%>" href="#tab-emails" role="tab" data-toggle="tab">Emails</a></li>
+        <li role="presentation" class="nav-item"><a class="nav-link <%= 'active' if params[:tab] == 'mailgun'%>" href="#tab-mailgun" role="tab" data-toggle="tab">Mailgun</a></li>
+        <li role="presentation" class="nav-item"><a class="nav-link <%= 'active' if params[:tab] == 'other-services'%>" href="#tab-other-services" role="tab" data-toggle="tab">Other services</a></li>
+        <li role="presentation" class="nav-item"><a class="nav-link <%= 'active' if params[:tab] == 'everything-else'%>" href="#tab-everything-else" role="tab" data-toggle="tab">Everything else</a></li>
         <% if Padrino.env == :development || @organisation.experimental? %>
-          <li role="presentation" class="nav-item"><a class="nav-link <%= 'active' if params[:tab].to_i == 7%>" href="#tab7" role="tab" data-toggle="tab">Experimental</a></li>
+          <li role="presentation" class="nav-item"><a class="nav-link <%= 'active' if params[:tab] == 'experimental'%>" href="#tab-experimental" role="tab" data-toggle="tab">Experimental</a></li>
         <% end %>
       </ul>
     </div>
   <% end %>
   <div class="container">
     <div class="tab-content <%= 'mt-3' if @organisation.persisted? %>">
-      <div role="tabpanel" class="tab-pane <%= 'active' if !params[:tab] || params[:tab].to_i == 1%>" id="tab1">
+      <div role="tabpanel" class="tab-pane <%= 'active' if !params[:tab] || params[:tab] == 'basics'%>" id="tab-basics">
         <%= f.text_block :name %>
         <div class="slugify">
           <%= f.shorturl_block :slug, stem: "#{ENV['BASE_URI']}/o/" %>
@@ -126,7 +118,7 @@
         <% end %>
       </div>
       <% if @organisation.persisted? %>
-        <div role="tabpanel" class="tab-pane <%= 'active' if params[:tab].to_i == 2%>" id="tab2">
+        <div role="tabpanel" class="tab-pane <%= 'active' if params[:tab] == 'payments'%>" id="tab-payments">
           <% if params[:created] %>
             <div class="alert alert-success">
               <p class="m-0">To accept payments, now add your Stripe and/or Coinbase Commerce details.</p>
@@ -179,7 +171,7 @@
             </div>
           </div>
         </div>
-        <div role="tabpanel" class="tab-pane <%= 'active' if params[:tab].to_i == 3%>" id="tab3">
+        <div role="tabpanel" class="tab-pane <%= 'active' if params[:tab] == 'emails'%>" id="tab-emails">
           <%= f.wysiwyg_block :ticket_email_greeting %>
           <%= f.wysiwyg_block :recording_email_greeting %>
           <%= f.wysiwyg_block :extra_info_for_ticket_email %>
@@ -189,7 +181,7 @@
           <%= f.check_box_block :show_ticketholder_link_in_ticket_emails %>
           <%= f.check_box_block :show_sign_in_link_in_ticket_emails %>
         </div>
-        <div role="tabpanel" class="tab-pane <%= 'active' if params[:tab].to_i == 4%>" id="tab4">
+        <div role="tabpanel" class="tab-pane <%= 'active' if params[:tab] == 'mailgun'%>" id="tab-mailgun">
           <% if !@organisation.mailgun_api_key %>
             <div class="alert alert-warning">
               <p class="m-0">
@@ -205,14 +197,14 @@
           <%= f.text_block :mailgun_domain %>
           <%= f.select_block :mailgun_region %>
         </div>
-        <div role="tabpanel" class="tab-pane <%= 'active' if params[:tab].to_i == 5%>" id="tab5">
+        <div role="tabpanel" class="tab-pane <%= 'active' if params[:tab] == 'other-services'%>" id="tab-other-services">
           <%= f.text_block :plausible_analytics_domain %>
           <%= f.text_block :simple_analytics_domain %>
           <%= f.text_block :facebook_pixel_id %>
           <%= f.text_block :gocardless_access_token %>
           <%= f.text_block :patreon_api_key %>
         </div>
-        <div role="tabpanel" class="tab-pane <%= 'active' if params[:tab].to_i == 6%>" id="tab6">
+        <div role="tabpanel" class="tab-pane <%= 'active' if params[:tab] == 'everything-else'%>" id="tab-everything-else">
           <%= f.wysiwyg_block :event_footer %>
           <%= f.text_block :add_a_donation_to %>
           <%= f.text_block :donation_text %>
@@ -227,7 +219,7 @@
           <%= f.check_box_block :hide_ticket_revenue %>
         </div>
         <% if Padrino.env == :development || @organisation.experimental? %>
-          <div role="tabpanel" class="tab-pane <%= 'active' if params[:tab].to_i == 7%>" id="tab7">
+          <div role="tabpanel" class="tab-pane <%= 'active' if params[:tab] == 'experimental'%>" id="tab-experimental">
             <%= f.text_block :stripe_pk %>
             <%= f.text_block :stripe_sk %>
             <%= f.text_block :stripe_client_id %>
