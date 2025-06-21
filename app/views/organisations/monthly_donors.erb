@@ -47,7 +47,7 @@
     <% if organisation_admin? or @organisation.events_for_search.future_and_current_featured.and(:monthly_donors_only => true).count > 0 %>
       <% events_active = true %>
       <li class="nav-item">
-        <a class="nav-link active" id="tab-events" data-toggle="tab" href="#panel-events" role="tab">
+        <a class="nav-link active" data-toggle="tab" href="#tab-events" role="tab">
           Events
         </a>
       </li>
@@ -55,14 +55,14 @@
     <% visible_members = @organisation.monthly_donors %>
     <% if visible_members.count > 0 %>
       <li class="nav-item">
-        <a class="nav-link" id="tab-map" data-toggle="tab" href="#panel-map" role="tab">
+        <a class="nav-link" data-toggle="tab" href="#tab-map" role="tab">
           Member map
         </a>
       </li>
     <% end %>
     <% if @organisation.monthly_donor_affiliate_reward %>
       <li class="nav-item">
-        <a class="nav-link" id="tab-referral" data-toggle="tab" href="#panel-referral" role="tab">
+        <a class="nav-link" data-toggle="tab" href="#tab-referral" role="tab">
           Referral link
         </a>
       </li>
@@ -72,14 +72,14 @@
 
 <div class="tab-content">
   <% if organisation_admin? or @organisation.events_for_search.future_and_current_featured.and(:monthly_donors_only => true).count > 0 %>
-    <div class="tab-pane show active" id="panel-events" role="tabpanel">
+    <div class="tab-pane show active" id="tab-events" role="tabpanel">
       <div data-with-placeholder data-pagelet-url="/o/<%= @organisation.slug %>/events_block?members_events=1">
         <%= partial :'organisations/events_block_placeholder' %>
       </div>
     </div>
   <% end %>
   <% if visible_members.count > 0 %>
-    <div class="tab-pane" id="panel-map" role="tabpanel">
+    <div class="tab-pane" id="tab-map" role="tabpanel">
       <%= partial :'maps/map', locals: { points: @organisation.organisationships.and(:monthly_donation_method.ne => nil).and(:coordinates.ne => nil) } %>
       <style>
         #map-canvas { height: 50vh !important; margin-top: 1rem; margin-bottom: 1rem }
@@ -87,7 +87,7 @@
     </div>
   <% end %>
   <% if @organisation.monthly_donor_affiliate_reward %>
-    <div class="tab-pane" id="panel-referral" role="tabpanel">
+    <div class="tab-pane" id="tab-referral" role="tabpanel">
       <h2>Your referral link</h2>
       <p class="lead">
         <a href="<%= ENV['BASE_URI'] %>/o/<%= @organisation.slug %>/via/<%= current_account.username %>"><%= ENV['BASE_URI'] %>/o/<%= @organisation.slug %>/via/<%= current_account.username %></a>
