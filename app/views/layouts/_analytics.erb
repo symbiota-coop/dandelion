@@ -18,6 +18,24 @@
   <% end %>
 <% end %>
 
+
+<% if @organisation && @organisation.simple_analytics_domain %>
+  <script>
+    window.sa_event=window.sa_event||function(){var a=[].slice.call(arguments);window.sa_event.q?window.sa_event.q.push(a):window.sa_event.q=[a]};
+  </script>
+  <script async data-hostname="<%= @organisation.simple_analytics_domain %>" src="https://scripts.simpleanalyticscdn.com/latest.js"></script>
+  <% if @order && params[:success] %>
+    <script>
+      sa_event('purchase', {
+          order_id: <%== @order.id.to_s.to_json %>,
+          currency: <%== @order.currency.to_json %>,
+          amount: <%== @order.value.to_json %>
+      });
+    </script>
+  <% end %>
+<% end %>
+
+
 <% if (@organisation && @organisation.facebook_pixel_id) || (@event && @event.facebook_pixel_id) %>
   <script>
     !function (f, b, e, v, n, t, s)

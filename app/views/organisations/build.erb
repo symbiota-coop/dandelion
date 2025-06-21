@@ -207,6 +207,7 @@
         </div>
         <div role="tabpanel" class="tab-pane <%= 'active' if params[:tab].to_i == 5%>" id="tab5">
           <%= f.text_block :plausible_analytics_domain %>
+          <%= f.text_block :simple_analytics_domain %>
           <%= f.text_block :facebook_pixel_id %>
           <%= f.text_block :gocardless_access_token %>
           <%= f.text_block :patreon_api_key %>
