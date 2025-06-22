@@ -61,7 +61,7 @@ module OrganisationAssociations
   end
 
   def featured_events
-    events_for_search.future_and_current_featured.and(:locked.ne => true).and(:image_uid.ne => nil).and(featured: true).limit(20).reject(&:sold_out?)
+    events_for_search.future_and_current_featured.and(:locked.ne => true).and(:image_uid.ne => nil).and(featured: true).and(organisation_id: id).limit(20).reject(&:sold_out?)
   end
 
   def contributable_events
