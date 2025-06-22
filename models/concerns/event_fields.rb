@@ -2,6 +2,8 @@ module EventFields
   extend ActiveSupport::Concern
 
   included do
+    include EmailFields
+
     attr_accessor :prevent_notifications, :update_tag_names, :tag_names, :duplicate
 
     field :name, type: String
@@ -46,15 +48,6 @@ module EventFields
     field :boosted, type: Mongoid::Boolean
     field :event_tags_joined, type: String
     field :tax_rate_id, type: String
-
-    field :ticket_email_title, type: String
-    field :ticket_email_greeting, type: String
-    field :recording_email_title, type: String
-    field :recording_email_greeting, type: String
-    field :reminder_email_title, type: String
-    field :reminder_email_body, type: String
-    field :feedback_email_title, type: String
-    field :feedback_email_body, type: String
 
     field :revenue_share_to_revenue_sharer, type: Integer
     field :profit_share_to_organiser, type: Integer
@@ -122,7 +115,7 @@ module EventFields
         organisation_id: :lookup,
         activity_id: :lookup,
         ticket_types: :collection
-      }
+      }.merge(email_admin_fields)
     end
 
     def human_attribute_name(attr, options = {})
@@ -158,18 +151,10 @@ module EventFields
         oc_slug: 'Open Collective event slug',
         no_tickets_pdf: "Don't include tickets PDF in confirmation email",
         hide_few_left: "Hide 'few tickets left' labels",
-        ticket_email_title: 'Order confirmation email subject',
-        ticket_email_greeting: 'Order confirmation email greeting',
-        recording_email_title: 'Order confirmation email subject for recordings of past events',
-        recording_email_greeting: 'Order confirmation email greeting for recordings of past events',
-        reminder_email_title: 'Reminder email subject',
-        reminder_email_body: 'Reminder email body',
-        feedback_email_title: 'Feedback request email subject',
-        feedback_email_body: 'Feedback request email body',
         rsvp_button_text: 'RSVP button',
         tax_rate_id: 'Stripe tax rate ID',
         carousel_text: 'Preview text'
-      }[attr.to_sym] || super
+      }.merge(email_human_attribute_names)[attr.to_sym] || super
     end
 
     def new_hints
@@ -214,16 +199,8 @@ module EventFields
         hide_few_left: "Hide the 'few tickets left' labels at checkout when tickets are running low",
         hide_organisation_footer: 'Hide the organisation footer in the event confirmation email',
         no_tickets_pdf: 'Skip the PDF attachment in the confirmation email',
-        ticket_email_title: 'Custom subject line for the order confirmation email',
-        ticket_email_greeting: 'Custom greeting for the order confirmation email',
-        recording_email_title: 'Custom subject line for the order confirmation email for recordings of past events',
-        recording_email_greeting: 'Custom greeting for the order confirmation email for recordings of past events',
-        reminder_email_title: 'Custom subject line for the reminder email',
-        reminder_email_body: 'Custom body for the reminder email',
-        feedback_email_title: 'Custom subject line for the feedback request email',
-        feedback_email_body: 'Custom body for the feedback request email',
         tax_rate_id: 'Stripe tax rate ID to apply to ticket purchases'
-      }
+      }.merge(email_hints)
     end
 
     def edit_hints

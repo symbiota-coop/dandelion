@@ -2,6 +2,8 @@ module OrganisationFields
   extend ActiveSupport::Concern
 
   included do
+    include EmailFields
+
     field :name, type: String
     field :slug, type: String
     field :website, type: String
@@ -92,15 +94,6 @@ module OrganisationFields
     field :fixed_contribution_gbp, type: Float
     field :tax_rate_id, type: String
 
-    field :ticket_email_title, type: String
-    field :ticket_email_greeting, type: String
-    field :recording_email_title, type: String
-    field :recording_email_greeting, type: String
-    field :reminder_email_title, type: String
-    field :reminder_email_body, type: String
-    field :feedback_email_title, type: String
-    field :feedback_email_body, type: String
-
     field :tokens, type: Float
     index({ tokens: 1 })
   end
@@ -164,7 +157,7 @@ module OrganisationFields
         terms_and_conditions_check_box: :check_box,
         billing_address_collection: :check_box,
         enable_resales: :check_box
-      }
+      }.merge(email_admin_fields)
     end
 
     def human_attribute_name(attr, options = {})
@@ -208,16 +201,8 @@ module OrganisationFields
         event_image_required_height: 'Event image height',
         restrict_cohosting: 'Restrict cohosting to admins',
         oc_slug: 'Open Collective slug',
-        ticket_email_title: 'Order confirmation email subject',
-        ticket_email_greeting: 'Order confirmation email greeting',
-        recording_email_title: 'Order confirmation email subject for recordings of past events',
-        recording_email_greeting: 'Order confirmation email greeting for recordings of past events',
-        reminder_email_title: 'Reminder email subject',
-        reminder_email_body: 'Reminder email body',
-        feedback_email_title: 'Feedback request email subject',
-        feedback_email_body: 'Feedback request email body',
         tax_rate_id: 'Stripe tax rate ID'
-      }[attr.to_sym] || super
+      }.merge(email_human_attribute_names)[attr.to_sym] || super
     end
 
     def new_hints
@@ -251,16 +236,8 @@ module OrganisationFields
         oc_slug: 'Open Collective organisation slug',
         hide_ticket_revenue: 'Hide ticket revenue in event stats',
         collect_location: 'Request the location of ticket buyers at checkout',
-        tax_rate_id: 'Stripe tax rate ID to apply to ticket purchases',
-        ticket_email_title: 'Custom subject line for the order confirmation email',
-        ticket_email_greeting: 'Custom greeting for the order confirmation email',
-        recording_email_title: 'Custom subject line for the order confirmation email for recordings of past events',
-        recording_email_greeting: 'Custom greeting for the order confirmation email for recordings of past events',
-        reminder_email_title: 'Custom subject line for the reminder email',
-        reminder_email_body: 'Custom body for the reminder email',
-        feedback_email_title: 'Custom subject line for the feedback request email',
-        feedback_email_body: 'Custom body for the feedback request email'
-      }
+        tax_rate_id: 'Stripe tax rate ID to apply to ticket purchases'
+      }.merge(email_hints)
     end
 
     def edit_hints
