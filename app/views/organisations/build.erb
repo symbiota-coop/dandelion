@@ -172,10 +172,23 @@
           </div>
         </div>
         <div role="tabpanel" class="tab-pane <%= 'active' if params[:tab] == 'emails'%>" id="tab-emails">
+          <script>
+            $(function() {
+              $('label[for$="_email_greeting"], label[for$="_email_body"]').hide()
+              $('label[for$="_email_title"]').each(function() {
+                $(this).text($(this).text().replace('email subject', 'email'))
+              })
+            })
+          </script>
+          <%= f.text_block :ticket_email_title %>
           <%= f.wysiwyg_block :ticket_email_greeting %>
+          <%= f.text_block :recording_email_title %>
           <%= f.wysiwyg_block :recording_email_greeting %>
-          <%= f.wysiwyg_block :extra_info_for_ticket_email %>
+          <%= f.text_block :reminder_email_title %>
+          <%= f.wysiwyg_block :reminder_email_body %>
+          <%= f.text_block :feedback_email_title %>
           <%= f.wysiwyg_block :feedback_email_body %>
+          <%= f.wysiwyg_block :extra_info_for_ticket_email %>
           <%= f.text_block :reply_to %>
           <%= f.check_box_block :send_ticket_emails_from_organisation %>
           <%= f.check_box_block :show_ticketholder_link_in_ticket_emails %>

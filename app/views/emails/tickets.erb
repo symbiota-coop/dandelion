@@ -1,5 +1,5 @@
 <div class="main">
-  <%= (event.ticket_email_greeting || (event.recording? ? event.organisation.recording_email_greeting : event.organisation.ticket_email_greeting))
+  <%= ((event.recording? ? event.recording_email_greeting : event.ticket_email_greeting) || (event.recording? ? event.organisation.recording_email_greeting : event.organisation.ticket_email_greeting))
         .gsub('[firstname]', order.account.firstname)
         .gsub('[lastname]', order.account.lastname || '')
         .gsub('[fullname]', order.account.name)

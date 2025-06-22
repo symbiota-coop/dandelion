@@ -87,14 +87,39 @@ class Organisation
     events.each(&:set_browsable) if hidden_changed? || paid_up_changed?
   end
 
+  def ticket_email_title_default
+    '[ticket_or_tickets] to [event_name]'
+  end
+
   def ticket_email_greeting_default
     '<p>Hi [firstname],</p>
 <p>Thanks for booking onto [event_name], [event_when] [at_event_location_if_not_online]. Your [tickets_are] attached.</p>'
   end
 
+  def recording_email_title_default
+    'Recording of [event_name]'
+  end
+
   def recording_email_greeting_default
     '<p>Hi [firstname],</p>
 <p>Thanks for purchasing the recording of [event_name], [event_when] [at_event_location_if_not_online].</p>'
+  end
+
+  def reminder_email_title_default
+    '[event_name] is tomorrow'
+  end
+
+  def reminder_email_body_default
+    %{<p>Hi [firstname],</p>
+  <p>Just a reminder that [event_link] is tomorrow.</p>
+  <p>
+    You should have received a confirmation email with your ticket(s) shortly after purchase. (If you don't see anything in your inbox, please look in your spam folder.)
+  </p>
+  [key_information_again]}
+  end
+
+  def feedback_email_title_default
+    'Feedback on [event_name]'
   end
 
   def feedback_email_body_default

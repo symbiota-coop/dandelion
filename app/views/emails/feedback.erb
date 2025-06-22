@@ -1,5 +1,5 @@
 <div class="main">
-  <%= event.organisation.feedback_email_body
+  <%= (event.feedback_email_body || event.organisation.feedback_email_body)
         .gsub('[firstname]', '%recipient.firstname%')
         .gsub('[event_name]', event.name)
         .gsub('[feedback_url]', "#{ENV['BASE_URI']}/events/#{event.id}/give_feedback?t=%recipient.id%")

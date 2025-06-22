@@ -11,9 +11,9 @@ module OrganisationValidation
     before_validation do
       self.paid_up = true if new_record?
       self.currency = 'GBP' unless currency
-      self.ticket_email_greeting = ticket_email_greeting_default unless ticket_email_greeting
-      self.recording_email_greeting = recording_email_greeting_default unless recording_email_greeting
-      self.feedback_email_body = feedback_email_body_default unless feedback_email_body
+      %w[ticket_email_title ticket_email_greeting recording_email_title recording_email_greeting reminder_email_title reminder_email_body feedback_email_title feedback_email_body].each do |f|
+        send("#{f}=", send("#{f}_default")) unless send(f)
+      end
       errors.add(:affiliate_credit_percentage, 'must be between 1 and 100') if affiliate_credit_percentage && (affiliate_credit_percentage < 1 || affiliate_credit_percentage > 100)
 
       errors.add(:mailgun_domain, 'must not be a sandbox domain') if mailgun_domain && mailgun_domain.starts_with?('sandbox') && mailgun_domain.ends_with?('mailgun.org')

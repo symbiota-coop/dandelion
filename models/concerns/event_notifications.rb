@@ -35,7 +35,10 @@ module EventNotifications
     content = ERB.new(File.read(Padrino.root('app/views/emails/reminder.erb'))).result(binding)
     batch_message.from ENV['REMINDERS_EMAIL_FULL']
     batch_message.reply_to(event.email || event.organisation.try(:reply_to))
-    batch_message.subject "#{event.name} is tomorrow"
+    batch_message.subject(
+      (event.reminder_email_title || event.organisation.reminder_email_title)
+      .gsub('[event_name]', event.name)
+    )
     batch_message.body_html Premailer.new(ERB.new(File.read(Padrino.root('app/views/layouts/email.erb'))).result(binding), with_html_string: true, adapter: 'nokogiri', input_encoding: 'UTF-8').to_inline_css
 
     (account_id == :all ? attendees.and(:unsubscribed.ne => true).and(:unsubscribed_reminders.ne => true) : attendees.and(:unsubscribed.ne => true).and(:unsubscribed_reminders.ne => true).and(id: account_id)).each do |account|
@@ -76,7 +79,10 @@ module EventNotifications
     content = ERB.new(File.read(Padrino.root('app/views/emails/feedback.erb'))).result(binding)
     batch_message.from ENV['FEEDBACK_EMAIL_FULL']
     batch_message.reply_to(event.email || event.organisation.try(:reply_to))
-    batch_message.subject "Feedback on #{event.name}"
+    batch_message.subject(
+      (event.feedback_email_title || event.organisation.feedback_email_title)
+      .gsub('[event_name]', event.name)
+    )
     batch_message.body_html Premailer.new(ERB.new(File.read(Padrino.root('app/views/layouts/email.erb'))).result(binding), with_html_string: true, adapter: 'nokogiri', input_encoding: 'UTF-8').to_inline_css
 
     (account_id == :all ? attendees.and(:unsubscribed.ne => true).and(:unsubscribed_feedback.ne => true) : attendees.and(:unsubscribed.ne => true).and(:unsubscribed_feedback.ne => true).and(id: account_id)).each do |account|

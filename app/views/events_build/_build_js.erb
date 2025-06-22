@@ -65,6 +65,11 @@
       $('.tab-pane:last').find('a.next').remove()
     <% end %>
 
+    $('label[for$="_email_greeting"], label[for$="_email_body"]').hide()
+    $('label[for$="_email_title"]').each(function() {
+      $(this).text($(this).text().replace('email subject', 'email'))
+    })
+
     $('#event_questions').attr('rows', '8')
     $('#event_feedback_questions').attr('rows', '8')
     autosize($('#event_questions')[0])
