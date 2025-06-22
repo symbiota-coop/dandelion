@@ -32,8 +32,8 @@ class DandelionTest < ActiveSupport::TestCase
       execute_script %{$('#event_end_time').val('#{@event.end_time.to_fs(:db_local)}')}
       execute_script %{$('#event_end_time').flatpickr({ altInput: true, altFormat: 'J F Y, H:i', enableTime: true, time_24hr: true })}
     }
-    click_link 'Description and confirmation email'
-    narrate %(Click 'Description and confirmation email', and provide an event description and any extra info for the order confirmation email.), lambda {
+    click_link 'Description and confirmation'
+    narrate %(Click 'Description and confirmation', and provide an event description and any extra info for the order confirmation email.), lambda {
       execute_script %{const field = $('#event_description'); const editorInstance = field.next().find('[contenteditable]')[0].ckeditorInstance; editorInstance.setData('#{@event.description}')}
       execute_script %{const field = $('#event_extra_info_for_ticket_email'); const editorInstance = field.next().find('[contenteditable]')[0].ckeditorInstance; editorInstance.setData('#{@event.extra_info_for_ticket_email}')}
     }
