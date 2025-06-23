@@ -84,7 +84,16 @@ module Dandelion
     end
 
     not_found do
-      erb :not_found, layout: :application
+      case request.path_info.split('.').last
+      when 'ics'
+        content_type 'text/calendar'
+        'Calendar not found'
+      when 'json'
+        content_type 'application/json'
+        { error: 'Not found' }.to_json
+      else
+        erb :not_found, layout: :application
+      end
     end
 
     get '/not_found' do
