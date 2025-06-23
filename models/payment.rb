@@ -62,6 +62,6 @@ class Payment
                             de_account_id: account.id
                           } })
   rescue StandardError => e
-    Airbrake.notify(e)
+    Honeybadger.notify(e)
   end
 end

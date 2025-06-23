@@ -221,9 +221,9 @@ class Order
                               metadata: metadata
                             })
     rescue Stripe::InvalidRequestError => e
-      Airbrake.notify(e) unless e.message.include?('No such transfer')
+      Honeybadger.notify(e) unless e.message.include?('No such transfer')
     rescue StandardError => e
-      Airbrake.notify(e)
+      Honeybadger.notify(e)
     end
   end
 

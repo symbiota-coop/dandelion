@@ -45,10 +45,10 @@ group :test do
 end
 
 # Interacting with other websites
-gem 'airbrake'
 gem 'airrecord'
 gem 'faraday'
 gem 'ferrum'
+gem 'honeybadger'
 gem 'jwt'
 gem 'mechanize'
 gem 'octokit'

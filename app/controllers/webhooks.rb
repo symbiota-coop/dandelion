@@ -10,7 +10,7 @@ Dandelion::App.controller do
         payload, sig_header, @organisation.stripe_endpoint_secret
       )
     rescue Stripe::SignatureVerificationError => e
-      airbrake_notify(e)
+      honeybadger_notify(e)
       halt 200
     end
 
@@ -27,14 +27,14 @@ Dandelion::App.controller do
           @order.restore_and_complete
           # raise Order::Restored
         rescue StandardError => e
-          airbrake_notify(e, { event: event })
+          honeybadger_notify(e, { event: event })
           halt 200
         end
       else
         # begin
         #   raise Order::OrderNotFound
         # rescue StandardError => e
-        #   airbrake_notify(e, { event: event })
+        #   honeybadger_notify(e, { event: event })
         #   halt 200
         # end
         halt 200
@@ -70,14 +70,14 @@ Dandelion::App.controller do
           @order.restore_and_complete
           # raise Order::Restored
         rescue StandardError => e
-          airbrake_notify(e, { event: event })
+          honeybadger_notify(e, { event: event })
           halt 200
         end
       else
         # begin
         #   raise Order::OrderNotFound
         # rescue StandardError => e
-        #   airbrake_notify(e, { event: event })
+        #   honeybadger_notify(e, { event: event })
         #   halt 200
         # end
         halt 200

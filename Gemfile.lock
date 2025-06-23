@@ -71,10 +71,6 @@ GEM
       tzinfo (~> 2.0)
     addressable (2.8.6)
       public_suffix (>= 2.0.2, < 6.0)
-    airbrake (13.0.4)
-      airbrake-ruby (~> 6.0)
-    airbrake-ruby (6.2.2)
-      rbtree3 (~> 0.6)
     airrecord (1.0.12)
       faraday (>= 1.0, < 3.0)
       faraday-net_http_persistent
@@ -196,6 +192,9 @@ GEM
     gocardless_pro (2.54.0)
       faraday (>= 2, < 3)
     hashie (5.0.0)
+    honeybadger (5.28.0)
+      logger
+      ostruct
     html_truncator (0.4.2)
       nokogiri (~> 1.5)
     htmlentities (4.3.4)
@@ -328,6 +327,7 @@ GEM
       oauth2 (>= 1.4, < 3)
       omniauth (~> 2.0)
     openssl (3.2.0)
+    ostruct (0.6.2)
     padrino (0.15.3)
       padrino-admin (= 0.15.3)
       padrino-cache (= 0.15.3)
@@ -413,7 +413,6 @@ GEM
       mini_portile2 (~> 2.8)
       pkg-config (~> 1.5)
       rubyzip (~> 2.3)
-    rbtree3 (0.7.1)
     rdoc (6.6.2)
       psych (>= 4.0.0)
     redcarpet (3.6.0)
@@ -513,7 +512,6 @@ DEPENDENCIES
   activemodel
   activesupport (~> 7.0.8)
   addressable
-  airbrake
   airrecord
   bazaar
   bcrypt
@@ -537,6 +535,7 @@ DEPENDENCIES
   ferrum
   geocoder
   gocardless_pro
+  honeybadger
   html_truncator
   icalendar
   incoming

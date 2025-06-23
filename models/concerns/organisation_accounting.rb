@@ -79,7 +79,7 @@ module OrganisationAccounting
       organisation_contribution = organisation_contributions.create amount: contribution_remaining.cents.to_f / 100, currency: contribution_remaining.currency, payment_intent: pi.id, payment_completed: true
       organisation_contribution.send_notification
     rescue StandardError => e
-      Airbrake.notify(e)
+      Honeybadger.notify(e)
     end
   end
 

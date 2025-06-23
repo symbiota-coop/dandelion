@@ -39,7 +39,7 @@ module EvmTransactions
           transactions << [token, amount]
         end
       rescue StandardError => e
-        Airbrake.notify(e)
+        Honeybadger.notify(e)
       end
 
       transactions

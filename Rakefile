@@ -1,7 +1,7 @@
 require 'bundler/setup'
 require 'padrino-core/cli/rake'
 require 'dragonfly'
-require 'airbrake'
+require 'honeybadger'
 
 PadrinoTasks.use(:database)
 PadrinoTasks.use(:mongoid)

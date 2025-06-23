@@ -72,7 +72,7 @@ module EventOpenCollective
           @order.restore_and_complete
           # raise Order::Restored
         rescue StandardError => e
-          Airbrake.notify(e, order: @order)
+          Honeybadger.notify(e, order: @order)
         end
       end
     end

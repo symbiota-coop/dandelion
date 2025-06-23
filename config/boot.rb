@@ -34,7 +34,7 @@ if Padrino.env == :production
   begin
     MaxMinder.download
   rescue StandardError => e
-    Airbrake.notify(e)
+    Honeybadger.notify(e)
   end
 end
 

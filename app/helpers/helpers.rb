@@ -19,14 +19,14 @@ Dandelion::App.helpers do
                   ENV['DEFAULT_TIME_ZONE']
                 end
   rescue StandardError => e
-    airbrake_notify(e)
+    honeybadger_notify(e)
     Time.zone = ENV['DEFAULT_TIME_ZONE']
   end
 
-  def airbrake_notify(error, extra = {})
+  def honeybadger_notify(error, extra = {})
     raise(error) if Padrino.env == :development
 
-    Airbrake.notify(error,
+    Honeybadger.notify(error,
                     url: "#{ENV['BASE_URI']}#{request.path}",
                     current_account: (JSON.parse(current_account.to_json) if current_account),
                     params: params,

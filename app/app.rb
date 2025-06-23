@@ -11,6 +11,10 @@ module Dandelion
     Sass::Plugin.options[:css_location] = Padrino.root('app', 'assets', 'stylesheets')
     use Sass::Plugin::Rack
 
+    use Honeybadger::Rack::UserFeedback
+    use Honeybadger::Rack::UserInformer
+    use Honeybadger::Rack::ErrorNotifier
+
     use Rack::Session::Cookie, expire_after: 1.year.to_i, secret: ENV['SESSION_SECRET']
     use Rack::UTF8Sanitizer
     use Rack::CrawlerDetect
@@ -52,7 +56,7 @@ module Dandelion
     end
 
     error do
-      airbrake_notify(env['sinatra.error'])
+      honeybadger_notify(env['sinatra.error'])
       erb :error, layout: :application
     end
 
