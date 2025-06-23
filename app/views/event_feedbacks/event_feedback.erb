@@ -44,11 +44,13 @@
       <%== Sanitize.fragment(Rinku.auto_link(q), Sanitize::Config::DANDELION) %>
     </th>
     <td>
-      <%== Sanitize.fragment(Rinku.auto_link(a), Sanitize::Config::DANDELION) %>
-      <% if @event_feedback.public? %>
-        <div class="mt-3">
-          <div data-pagelet-url="/event_feedbacks/<%= @event_feedback.id %>/public/<%= i %>"></div>
-        </div>
+      <% if a %>
+        <%== Sanitize.fragment(Rinku.auto_link(a), Sanitize::Config::DANDELION) %>
+        <% if @event_feedback.public? %>
+          <div class="mt-3">
+            <div data-pagelet-url="/event_feedbacks/<%= @event_feedback.id %>/public/<%= i %>"></div>
+          </div>
+        <% end %>
       <% end %>
     </td>
   </tr>
