@@ -72,7 +72,10 @@ module Dandelion
 
     get '/raise' do
       admins_only!
-      raise params[:message] || 'test error'
+      msg = params[:message] || 'test error'
+      raise msg unless params[:detail]
+
+      honeybadger_notify(msg, { detail: params[:detail] })
     end
 
     not_found do

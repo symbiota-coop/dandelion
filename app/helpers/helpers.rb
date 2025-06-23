@@ -23,9 +23,10 @@ Dandelion::App.helpers do
     Time.zone = ENV['DEFAULT_TIME_ZONE']
   end
 
-  def honeybadger_notify(error, _extra = {})
+  def honeybadger_notify(error, context = {})
     raise(error) if Padrino.env == :development
 
+    Honeybadger.context(context)
     Honeybadger.notify(error)
   end
 

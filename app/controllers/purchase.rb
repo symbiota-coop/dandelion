@@ -200,7 +200,7 @@ Dandelion::App.controller do
       @order.destroy
       halt 400
     rescue StandardError => e
-      honeybadger_notify(e, { order: @order })
+      honeybadger_notify(e, { order_id: @order.id })
       @order.destroy
       halt 400
     end
