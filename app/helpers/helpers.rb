@@ -23,18 +23,10 @@ Dandelion::App.helpers do
     Time.zone = ENV['DEFAULT_TIME_ZONE']
   end
 
-  def honeybadger_notify(error, extra = {})
+  def honeybadger_notify(error, _extra = {})
     raise(error) if Padrino.env == :development
 
-    Honeybadger.notify(error,
-                       context: {
-                         url: "#{ENV['BASE_URI']}#{request.path}",
-                         current_account: (JSON.parse(current_account.to_json) if current_account),
-                         params: params,
-                         request: request.env.select { |_k, v| v.is_a?(String) },
-                         session: session,
-                         extra: extra
-                       })
+    Honeybadger.notify(error)
   end
 
   def env_yaml
