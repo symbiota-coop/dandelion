@@ -193,16 +193,6 @@ Dandelion::App.helpers do
       </div>).html_safe
   end
 
-  def generate_nolt_token
-    payload = {
-      id: current_account.id.to_s,
-      email: current_account.email,
-      name: current_account.name,
-      imageUrl: (current_account.image.thumb('400x400#').url if current_account.image)
-    }
-    JWT.encode(payload, ENV['NOLT_SSO_SECRET'], 'HS256')
-  end
-
   def parse_date(date)
     Date.parse(date)
   rescue Date::Error

@@ -9,10 +9,6 @@
     <% end %>
 
     <%= partial :'layouts/analytics' %>
-
-    <% if current_account && ENV['NOLT_SSO_SECRET'] %>
-      <%= partial :'layouts/nolt' %>
-    <% end %>
   <% end %>
 
   <link rel="preconnect" href="https://fonts.googleapis.com">
