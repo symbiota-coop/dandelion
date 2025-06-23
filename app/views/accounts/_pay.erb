@@ -89,86 +89,7 @@
                 </div>
               <% end %>
             <% end %>
-            <!--
-            <div class="d-lg-none mt-3">
-              or <a target="_blank" href="https://zora.co/collect/base:0x237d1e23458b39d0e720c3a1ec382d2f9e80bd7d">mint one of 100 limited edition Dandelion NFTs on Base via Zora</a>
-            </div>
-            -->
           </div>
-          <!--
-    <div class="d-none d-lg-block">
-      <p class="lead mb-0">
-        <small>
-          <small>
-            Other crypto options:
-            <a target="_blank" href="https://gitcoin.co/grants/564/dandelion">Gitcoin</a>
-            &middot;
-            <a target="_blank" href="https://giveth.io/project/dandelion">Giveth</a>
-          </small>
-        </small>
-      </p>
-    </div>
-    <div class="d-lg-none">
-      <p class="lead mb-0">
-        <small>
-          <small>
-            Crypto options:
-            <a target="_blank" href="https://gitcoin.co/grants/564/dandelion">Gitcoin</a>
-            &middot;
-            <a target="_blank" href="https://giveth.io/project/dandelion">Giveth</a>
-          </small>
-        </small>
-      </p>
-    </div>
-    -->
-
-
-          <% if ENV['OFFER_NFT'] && defined?(short_nft) && short_nft %>
-            <p class="mt-2">
-              As a thank you, you'll be able to claim a <a href="/donate">uniquely-generated Dandelion Cityscape NFT (digital collectible)</a>.
-            </p>
-          <% end %>
-
-          <% if ENV['OFFER_NFT'] && defined?(nft) && nft %>
-            <p class="mt-2">
-              As a thank you, you'll be able to claim a <strong>uniquely-generated Dandelion Cityscape NFT (digital collectible)</strong>.
-            </p>
-            <div id="nft-preview" class="text-center">
-            </div>
-            <style>
-              #nft-preview img {
-                width: 100%;
-              }
-              @media (min-width: 992px) {
-                #nft-preview img {
-                  width: 50%;
-                }
-              }
-            </style>
-            <script>
-              $(function() {
-                // rotate nft-preview img src every 3 seconds
-                var i = 0
-                var srcs = [
-                  'https://cdn.discordapp.com/attachments/1112548550614728744/1112694253286608957/Williamkanks_A_whimsical_watercolor_design_featuring_a_bioengin_3e95b027-5d8b-4079-ad24-4fd6e03bd0ce.png',
-                  'https://cdn.discordapp.com/attachments/1112548550614728744/1112692708746739793/Williamkanks_A_whimsical_watercolor_design_featuring_a_bioengin_fc8b170f-226e-4afd-854b-267d7541afb2.png',
-                  'https://cdn.discordapp.com/attachments/1112548550614728744/1112697839382962206/Williamkanks_A_whimsical_watercolor_design_featuring_a_bioengin_4e5d2771-cfd7-4c56-b2cb-2c03b91fbf6f.png',
-                  'https://cdn.discordapp.com/attachments/1112548550614728744/1112694703142481990/Williamkanks_A_whimsical_watercolor_design_featuring_a_bioengin_d223a933-6fa0-48dd-9405-9a27caf261fd.png'
-                ]
-                $(srcs).each(function(i, src) {
-                  $('<img src="'+src+'" style="position: absolute; top: -9999px; opacity: 0">').appendTo('#nft-preview')
-                })
-                $('#nft-preview img').first().css('position', 'relative').css('top', '0px').css('opacity', 1)
-              setInterval(function() {
-                i = (i + 1) % srcs.length
-                $('#nft-preview img').eq(i-1).animate({opacity: 0}, 500, function() {
-                  $(this).css('position', 'absolute').css('top', '-9999px')
-                  $('#nft-preview img').eq(i).css('position', 'relative').css('top', '0px').animate({opacity: 1}, 500)
-                })
-              }, 4000)
-                    })
-            </script>
-          <% end %>
 
           <script>
             $(function () {
@@ -202,16 +123,6 @@
         </div>
         <div class="d-none d-sm-block col-sm-3">
           <img class="w-100" src="/images/dandelions/<%= Dir["#{Padrino.root}/app/assets/images/dandelions/*"].sample.split('/').last %>">
-          <!--
-          <a target="_blank" href="https://zora.co/collect/base:0x237d1e23458b39d0e720c3a1ec382d2f9e80bd7d">            
-            <img class="w-100" src="/images/dandelions/<%= Dir["#{Padrino.root}/app/assets/images/dandelions/*"].sample.split('/').last %>">
-          </a>
-          -->
-          <!--
-          <small>
-            <a target="_blank" class="text-dark" href="https://zora.co/collect/base:0x237d1e23458b39d0e720c3a1ec382d2f9e80bd7d">Mint one of 100 limited edition Dandelion NFTs on Base via Zora</a>
-          </small>
-          -->
         </div>
       </div>
     </div>

@@ -10,8 +10,6 @@ module AccountAssociations
 
     has_many :stripe_charges
 
-    has_many :nfts, dependent: :nullify
-
     has_many :account_contributions, dependent: :destroy
 
     has_many :sign_ins, dependent: :destroy

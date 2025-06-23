@@ -6,14 +6,6 @@
           <p class="lead mb-3">
             <mark>Thank you so much for donating!</mark> 🎉
           </p>
-          <% if ENV['OFFER_NFT'] %>
-            <p class="lead">
-              <small>
-                Your <strong>uniquely-generated Dandelion Cityscape NFT</strong> has been delivered to a Crossmint account under your email address.
-                Sign in to view/transfer it at <a href="https://www.crossmint.com/signin">crossmint.com</a>.
-              </small>
-            </p>
-          <% end %>
           <p class="mb-0">
             Every contribution, no matter the size, helps us grow this co-op run, open source, not-for-profit platform. Thank you for believing in Dandelion!
           </p>
@@ -32,7 +24,7 @@
             <% if account.stripe_subscription_id %>
               <p class="mb-0">Thanks for making a <a href="https://billing.stripe.com/p/login/14kg1O9HD49fg2kcMM">monthly contribution</a> to Dandelion!</p>
             <% else %>
-              <%= partial :'accounts/pay', locals: { account: account, source: params[:event_feedback_id] ? "event_feedback:#{params[:event_feedback_id]}" : 'donate', nft: true, force: true } %>
+              <%= partial :'accounts/pay', locals: { account: account, source: params[:event_feedback_id] ? "event_feedback:#{params[:event_feedback_id]}" : 'donate', force: true } %>
             <% end %>
           </div>
         </div>
