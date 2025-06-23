@@ -72,7 +72,7 @@ module Dandelion
 
     get '/raise' do
       admins_only!
-      raise 'test error'
+      raise params[:message] || 'test error'
     end
 
     not_found do
