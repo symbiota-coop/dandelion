@@ -27,12 +27,14 @@ Dandelion::App.helpers do
     raise(error) if Padrino.env == :development
 
     Honeybadger.notify(error,
-                    url: "#{ENV['BASE_URI']}#{request.path}",
-                    current_account: (JSON.parse(current_account.to_json) if current_account),
-                    params: params,
-                    request: request.env.select { |_k, v| v.is_a?(String) },
-                    session: session,
-                    extra: extra)
+                       context: {
+                         url: "#{ENV['BASE_URI']}#{request.path}",
+                         current_account: (JSON.parse(current_account.to_json) if current_account),
+                         params: params,
+                         request: request.env.select { |_k, v| v.is_a?(String) },
+                         session: session,
+                         extra: extra
+                       })
   end
 
   def env_yaml

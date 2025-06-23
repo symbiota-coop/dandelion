@@ -52,7 +52,13 @@ module Dandelion
       PageView.create(path: request.path, query_string: request.query_string) if File.extname(request.path).blank? && !request.xhr? && !request.is_crawler? && !request.path.start_with?('/z/')
       @og_desc = "Find #{%w[soulful regenerative metamodern participatory conscious transformative holistic ethical].join(' · ')} events and co-created gatherings"
       @og_image = "#{ENV['BASE_URI']}/images/link.jpg"
-      current_account.set(last_active: Time.now) if current_account
+      if current_account
+        current_account.set(last_active: Time.now)
+        Honeybadger.context({
+                              user_id: current_account.id,
+                              user_email: current_account.email
+                            })
+      end
     end
 
     error do
