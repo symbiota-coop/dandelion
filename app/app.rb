@@ -62,7 +62,7 @@ module Dandelion
     end
 
     error do
-      honeybadger_notify(env['sinatra.error'])
+      Honeybadger.notify(env['sinatra.error'])
       erb :error, layout: :application
     end
 
@@ -75,7 +75,12 @@ module Dandelion
       msg = params[:message] || 'test error'
       raise msg unless params[:detail]
 
-      honeybadger_notify(msg, { detail: params[:detail] })
+      begin
+        raise msg
+      rescue StandardError => e
+        Honeybadger.context({ detail: params[:detail] })
+        Honeybadger.notify(e)
+      end
     end
 
     not_found do

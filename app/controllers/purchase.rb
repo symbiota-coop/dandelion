@@ -68,7 +68,7 @@ Dandelion::App.controller do
       @order.apply_fixed_discount
       @order.update_attribute(:original_description, @order.description)
     rescue StandardError => e
-      honeybadger_notify(e)
+      Honeybadger.notify(e)
       @order.try(:destroy)
       halt 400
     end
@@ -200,7 +200,8 @@ Dandelion::App.controller do
       @order.destroy
       halt 400
     rescue StandardError => e
-      honeybadger_notify(e, { order_id: @order.id })
+      Honeybadger.context({ order_id: @order.id })
+      Honeybadger.notify(e)
       @order.destroy
       halt 400
     end

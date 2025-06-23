@@ -12,7 +12,8 @@ module OrganisationEvm
           @order.restore_and_complete
           # raise Order::Restored
         rescue StandardError => e
-          Honeybadger.notify(e, context: { order: @order })
+          Honeybadger.context({ order_id: @order.id })
+          Honeybadger.notify(e)
         end
       end
     end

@@ -10,7 +10,7 @@ Dandelion::App.controller do
         payload, sig_header, @organisation.stripe_endpoint_secret
       )
     rescue Stripe::SignatureVerificationError => e
-      honeybadger_notify(e)
+      Honeybadger.notify(e)
       halt 200
     end
 
@@ -27,16 +27,11 @@ Dandelion::App.controller do
           @order.restore_and_complete
           # raise Order::Restored
         rescue StandardError => e
-          honeybadger_notify(e, { event_id: event.id })
+          Honeybadger.context({ event_id: event.id })
+          Honeybadger.notify(e)
           halt 200
         end
       else
-        # begin
-        #   raise Order::OrderNotFound
-        # rescue StandardError => e
-        #   honeybadger_notify(e, { event_id: event.id })
-        #   halt 200
-        # end
         halt 200
       end
     else
@@ -70,16 +65,11 @@ Dandelion::App.controller do
           @order.restore_and_complete
           # raise Order::Restored
         rescue StandardError => e
-          honeybadger_notify(e, { event_id: event.id })
+          Honeybadger.context({ event_id: event.id })
+          Honeybadger.notify(e)
           halt 200
         end
       else
-        # begin
-        #   raise Order::OrderNotFound
-        # rescue StandardError => e
-        #   honeybadger_notify(e, { event_id: event.id })
-        #   halt 200
-        # end
         halt 200
       end
     else

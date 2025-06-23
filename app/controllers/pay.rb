@@ -8,7 +8,7 @@ Dandelion::App.controller do
         payload, sig_header, @gathering.stripe_endpoint_secret
       )
     rescue Stripe::SignatureVerificationError => e
-      honeybadger_notify(e)
+      Honeybadger.notify(e)
       halt 200
     end
 
@@ -18,7 +18,7 @@ Dandelion::App.controller do
         begin
           Payment.create!(payment_attempt: payment_attempt)
         rescue StandardError => e
-          honeybadger_notify(e)
+          Honeybadger.notify(e)
           halt 200
         end
       end

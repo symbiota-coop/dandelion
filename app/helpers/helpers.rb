@@ -19,15 +19,8 @@ Dandelion::App.helpers do
                   ENV['DEFAULT_TIME_ZONE']
                 end
   rescue StandardError => e
-    honeybadger_notify(e)
+    Honeybadger.notify(e)
     Time.zone = ENV['DEFAULT_TIME_ZONE']
-  end
-
-  def honeybadger_notify(error, context = {})
-    raise(error) if Padrino.env == :development
-
-    Honeybadger.context(context)
-    Honeybadger.notify(error)
   end
 
   def env_yaml
