@@ -5,7 +5,9 @@
     </a>
   </h4>
   <% if @organisation %>
-    <% if event.featured? %>
+    <% if @organisation == event.organisation && event.featured? %>
+      <span class="label label-yellow">Featured</span>
+    <% elsif event.cohostships.any? { |cohostship| cohostship.organisation == @organisation && cohostship.featured? } %>
       <span class="label label-yellow">Featured</span>
     <% end %>
   <% else %>

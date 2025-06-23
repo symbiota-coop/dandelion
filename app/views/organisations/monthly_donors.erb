@@ -44,7 +44,7 @@
 <div class="nav-wrapper mt-3">
   <ul class="nav nav-tabs" role="tablist">
     <% events_active = nil %>
-    <% if organisation_admin? or @organisation.events_for_search.future_and_current_featured.and(:monthly_donors_only => true).count > 0 %>
+    <% if organisation_admin? or @organisation.events_for_search.future_and_current.and(:monthly_donors_only => true).count > 0 %>
       <% events_active = true %>
       <li class="nav-item">
         <a class="nav-link active" data-toggle="tab" href="#tab-events" role="tab">
@@ -71,7 +71,7 @@
 </div>
 
 <div class="tab-content">
-  <% if organisation_admin? or @organisation.events_for_search.future_and_current_featured.and(:monthly_donors_only => true).count > 0 %>
+  <% if organisation_admin? or @organisation.events_for_search.future_and_current.and(:monthly_donors_only => true).count > 0 %>
     <div class="tab-pane show active" id="tab-events" role="tabpanel">
       <div data-with-placeholder data-pagelet-url="/o/<%= @organisation.slug %>/events_block?members_events=1">
         <%= partial :'organisations/events_block_placeholder' %>

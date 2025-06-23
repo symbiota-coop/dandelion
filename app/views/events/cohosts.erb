@@ -11,14 +11,16 @@
 <% end %>
 
 <style>
-  #cohosts label { display: none }
-  #cohosts button { display: none }
+  td.no-labels label { display: none }
+  td.no-buttons button { display: none }
+  label[for="cohostship_featured"] { display: none }
 </style>
 <script>
   $(function() {
     $('#cohosts input').change(function() {
       this.form.submit()
     })
+    $('label[for="cohostship_featured"]').text('').show()
   })
 </script>
 <table id="cohosts" class="table">
@@ -26,6 +28,7 @@
     <th>Co-host</th>
     <th>Image</th>
     <th>Video</th>
+    <th>Featured</th>
   </thead>
   <% @event.cohostships.each { |cohostship| organisation = cohostship.organisation %>
   <tr>
@@ -35,15 +38,21 @@
       <% end %>
       <a href="/o/<%= organisation.slug %>/events"><%= organisation.name %></a>
     </td>
-    <td>
+    <td class="no-labels no-buttons">
       <% form_for cohostship, "/events/#{@event.id}/cohostships/#{cohostship.id}" do |f| %>
         <%= f.image_block :image %>
         <%= f.submit_block %>
       <% end %>
     </td>
-    <td>
+    <td class="no-labels no-buttons">
       <% form_for cohostship, "/events/#{@event.id}/cohostships/#{cohostship.id}" do |f| %>
         <%= f.file_block :video %>
+        <%= f.submit_block %>
+      <% end %>
+    </td>
+    <td class="no-buttons">
+      <% form_for cohostship, "/events/#{@event.id}/cohostships/#{cohostship.id}" do |f| %>
+        <%= f.check_box_block :featured %>
         <%= f.submit_block %>
       <% end %>
     </td>

@@ -53,7 +53,7 @@
     <%= partial :'pmails/blocks_placeholder' %>
   </div>
 <% end %>
-<% if organisation_admin? or @organisation.events_for_search.future_and_current_featured.count > 0 %>
+<% if organisation_admin? or @organisation.events_for_search.future_and_current.count > 0 %>
   <h2 class="mt-5">Events</h2>
   <div data-with-placeholder data-pagelet-url="/o/<%= @organisation.slug %>/events_block">
     <%= partial :'organisations/events_block_placeholder' %>
