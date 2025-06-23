@@ -64,6 +64,11 @@ module Dandelion
       erb :error, layout: :application
     end
 
+    get '/raise' do
+      admins_only!
+      raise 'test error'
+    end
+
     not_found do
       erb :not_found, layout: :application
     end
