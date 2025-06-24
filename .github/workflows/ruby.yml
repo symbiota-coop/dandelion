@@ -57,5 +57,4 @@ jobs:
         CI: true
         SKIP_TOURS: true
       run: bundle exec rake test
-
       
