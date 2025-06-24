@@ -15,23 +15,40 @@
     <% if @draft %>
       const draft = <%==@draft.json %>
       const form = $('#build-event')[0]
+
+      // Set regular form values
       $.each(draft, function (key, value) {
         if (value) {
           $(form).find('[name="event[' + key + ']"]').val(value)
-          // set flatpickrs
-          if (['start_time', 'end_time'].includes(key)) {
-            $(form).find('[name="event[' + key + ']"]').flatpickr({
+        }
+      })
+
+      // Set flatpickrs for datetime fields
+      $(form).find('input.datetimepicker').each(function() {
+        const field = $(this)
+        const fieldName = field.attr('name')
+        if (fieldName) {
+          const match = fieldName.match(/event\[(.+)\]/)
+          if (match && draft[match[1]]) {
+            field.flatpickr({
               altInput: true,
               altFormat: 'J F Y, H:i',
               enableTime: true,
               time_24hr: true
             })
           }
-          // set ckeditors
-          if (['description', 'extra_info_for_ticket_email', 'ticket_email_greeting', 'extra_info_for_recording_email'].includes(key)) {
-            const field = $(form).find('[name="event[' + key + ']"]')
+        }
+      })
+
+      // Set CKEditor content
+      $(form).find('textarea.wysiwyg').each(function() {
+        const field = $(this)
+        const fieldName = field.attr('name')
+        if (fieldName) {
+          const match = fieldName.match(/event\[(.+)\]/)
+          if (match && draft[match[1]]) {
             const editorInstance = field.next().find('[contenteditable]')[0].ckeditorInstance;
-            editorInstance.setData(value)
+            editorInstance.setData(draft[match[1]])
           }
         }
       })
