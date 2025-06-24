@@ -47,6 +47,7 @@ end
           <% @event.ticket_types.order('order asc, price desc').each_with_index { |ticket_type,i| %>
           <% next if ticket_type.hidden && params[:ticket_type_id] != ticket_type.id.to_s; %>
           <% next if discount_code && discount_code.filter && !ticket_type.name.downcase.include?(discount_code.filter.downcase) %>
+          <% next if @event.hide_unavailable_tickets? && (ticket_type.number_of_tickets_available_in_single_purchase == 0  || (ticket_type.sales_end && Time.now > ticket_type.sales_end)) %>
           <%= partial :'purchase/ticket_type', locals: { ticket_type: ticket_type, no_border_top: (i == 0) } %>
           <% } %>
 

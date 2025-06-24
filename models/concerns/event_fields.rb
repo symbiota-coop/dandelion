@@ -56,7 +56,7 @@ module EventFields
     field :profit_share_to_social_media, type: Integer
     field :stripe_revenue_adjustment, type: Float
 
-    %w[no_discounts hide_attendees hide_discussion refund_deleted_orders monthly_donors_only locked secret zoom_party show_emails include_in_parent featured opt_in_organisation opt_in_facilitator hide_few_left hide_organisation_footer ask_hear_about send_order_notifications raw_description prevent_reminders trending hide_from_trending hide_from_carousels no_tickets_pdf half_width_images enable_resales donations_to_organisation browsable].each do |b|
+    %w[no_discounts hide_attendees hide_discussion refund_deleted_orders monthly_donors_only locked secret zoom_party show_emails include_in_parent featured opt_in_organisation opt_in_facilitator hide_few_left hide_organisation_footer ask_hear_about send_order_notifications raw_description prevent_reminders trending hide_from_trending hide_from_carousels no_tickets_pdf half_width_images enable_resales donations_to_organisation browsable hide_unavailable_tickets].each do |b|
       field b.to_sym, type: Mongoid::Boolean
       index({ b.to_s => 1 })
     end
@@ -199,7 +199,8 @@ module EventFields
         hide_few_left: "Hide the 'few tickets left' labels at checkout when tickets are running low",
         hide_organisation_footer: 'Hide the organisation footer in the event confirmation email',
         no_tickets_pdf: 'Skip the PDF attachment in the confirmation email',
-        tax_rate_id: 'Stripe tax rate ID to apply to ticket purchases'
+        tax_rate_id: 'Stripe tax rate ID to apply to ticket purchases',
+        hide_unavailable_tickets: 'Hide tickets that have sold out or where sales have ended'
       }.merge(email_hints)
     end
 
