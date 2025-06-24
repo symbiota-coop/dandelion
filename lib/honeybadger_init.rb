@@ -1,7 +1,5 @@
 MESSAGES_TO_IGNORE = [
-  'Ticket type is full',
-  'No such charge',
-  'No such transfer'
+  'Ticket type is full'
 ].freeze
 
 Honeybadger.configure do |config|

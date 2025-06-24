@@ -220,6 +220,8 @@ class Order
                               description: "#{account.name}: #{description}",
                               metadata: metadata
                             })
+    rescue Stripe::InvalidRequestError => e
+      Honeybadger.notify(e) unless e.message.include?('No such charge') || e.message.include?('No such transfer')
     rescue StandardError => e
       Honeybadger.notify(e)
     end
