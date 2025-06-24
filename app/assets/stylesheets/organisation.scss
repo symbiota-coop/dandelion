@@ -73,6 +73,13 @@ a:active {
   background: darken($theme-color, 6.66%);
 }
 
+.btn-primary:not([disabled]):not(.disabled).active,
+.btn-primary:not([disabled]):not(.disabled):active,
+.show>.btn-primary.dropdown-toggle {
+  background: $theme-color;
+  border-color: $theme-color;
+}
+
 // =============================================================================
 // LABELS AND BADGES
 // =============================================================================
