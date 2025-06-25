@@ -1,3 +1,4 @@
+# rubocop:disable Lint/Debugger
 $VERBOSE = false
 require File.expand_path('../config/boot', __dir__)
 
@@ -128,3 +129,4 @@ module ActiveSupport
     end
   end
 end
+# rubocop:enable Lint/Debugger
