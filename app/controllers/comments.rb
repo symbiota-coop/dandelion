@@ -10,17 +10,20 @@ Dandelion::App.controller do
   end
 
   get '/commentable' do
+    halt 403 unless Post.commentable_types.include?(params[:commentable_type])
     @commentable = params[:commentable_type].constantize.find(params[:commentable_id])
     partial :'comments/commentable', locals: { commentable: @commentable }
   end
 
   get '/chat' do
+    halt 403 unless Post.commentable_types.include?(params[:commentable_type])
     @commentable = params[:commentable_type].constantize.find(params[:commentable_id])
     partial :'comments/chat', locals: { commentable: @commentable }
   end
 
   post '/comment' do
     sign_in_required!
+    halt 403 unless Post.commentable_types.include?(params[:comment][:commentable_type])
     @commentable = params[:comment][:commentable_type].constantize.find(params[:comment][:commentable_id])
     subject = params[:comment].delete(:subject)
     @comment = @commentable.comments.build(params[:comment])
