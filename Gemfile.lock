@@ -528,7 +528,7 @@ GEM
       activesupport
 
 PLATFORMS
-  arm64-darwin-23
+  ruby
 
 DEPENDENCIES
   activate-admin!
