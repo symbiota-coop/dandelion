@@ -1,11 +1,11 @@
 source 'https://rubygems.org'
 
-ruby '3.2.3'
-gem 'activesupport', '~> 7.0.8'
+ruby '3.2.8'
+gem 'activesupport'
 gem 'irb'
 gem 'padrino'
 gem 'puma'
-gem 'rack', '~> 2.0'
+gem 'rack', '~> 2.0' # until padrino 0.16
 gem 'rake'
 gem 'sass'
 gem 'sinatra'
@@ -39,7 +39,7 @@ gem 'factory_bot'
 gem 'rubocop'
 group :test do
   gem 'capybara'
-  gem 'cuprite', '~> 0.15'
+  gem 'cuprite'
   gem 'minitest-rg'
   gem 'rack_session_access'
 end
