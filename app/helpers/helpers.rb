@@ -85,13 +85,13 @@ Dandelion::App.helpers do
   def partial(*args)
     if admin?
       t1 = Time.now
-      output = super(*args)
+      output = super
       t2 = Time.now
       ms = ((t2 - t1) * 1000).round
       t = "<script>console.log('PARTIAL #{ms.times.map { '=' }.join} #{args.first} #{ms}ms')</script>".html_safe
       output + t
     else
-      super(*args)
+      super
     end
   end
 
@@ -163,7 +163,7 @@ Dandelion::App.helpers do
 
   def random(relation, number)
     count = relation.count
-    (0..count - 1).sort_by { rand }.slice(0, number).collect! { |i| relation.skip(i).first }
+    (0..(count - 1)).sort_by { rand }.slice(0, number).collect! { |i| relation.skip(i).first }
   end
 
   def timeago(time)
