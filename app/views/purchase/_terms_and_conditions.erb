@@ -11,14 +11,16 @@
   <% end %>
   <p><small>
       By proceeding you also agree to Dandelion's <a target="_blank" href="/terms">terms and conditions</a>
-      and understand this event is organised by <%= (@event.organiser || @event.revenue_sharer || @event.organisation).name %>,
+      and understand this event is organised by <%= @event.responsible_name %>,
       who takes financial and legal responsibility for the event.
     </small>
   </p>
 <% elsif @event.organisation.terms_and_conditions_url %>
   <p><small>
-      By proceeding you agree to the terms and conditions of <a target="_blank" href="/terms">Dandelion</a> and <a href="<%=@event.organisation.terms_and_conditions_url%>" target="_blank"><%=@event.organisation.name%></a><% if @event.organiser || @event.revenue_sharer %>
-        and understand this event is organised by <%= (@event.organiser || @event.revenue_sharer || @event.organisation).name %>, who takes financial and legal responsibility for the event<% end %>.
+      By proceeding you agree to the terms and conditions of <a target="_blank" href="/terms">Dandelion</a>
+      and <a href="<%=@event.organisation.terms_and_conditions_url%>" target="_blank"><%=@event.organisation.name%></a>
+      and understand this event is organised by <%= @event.responsible_name %>,
+      who takes financial and legal responsibility for the event.
     </small>
   </p>
   <% if @event.organisation.terms_and_conditions_check_box %>
@@ -32,7 +34,7 @@
 <% else %>
   <p><small>
       By proceeding you agree to Dandelion's <a target="_blank" href="/terms">terms and conditions</a>
-      and understand this event is organised by <%= (@event.organiser || @event.revenue_sharer || @event.organisation).name %>,
+      and understand this event is organised by <%= @event.responsible_name %>,
       who takes financial and legal responsibility for the event.
     </small>
   </p>

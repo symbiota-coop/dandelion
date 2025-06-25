@@ -43,6 +43,16 @@ class Event
     end
   end
 
+  def responsible_name
+    if organiser && organisation && organisation.experimental?
+      organiser
+    elsif revenue_sharer
+      revenue_sharer
+    else
+      organisation
+    end.name
+  end
+
   def page_views_count
     PageView.or({ path: "/e/#{slug}" }, { path: "/events/#{id}" }).count
   end
