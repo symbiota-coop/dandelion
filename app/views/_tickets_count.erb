@@ -1,13 +1,13 @@
 <script>
   $(function() {
     var c = new countUp.CountUp('ticket-count',
-      <%= ENV['CREATE_VIDEO'] ? 100_000 : Ticket.count%>
+      <%= ENV['CREATE_VIDEO'] ? 200_000 : Ticket.count%>
     );
     c.start();
     var c = new countUp.CountUp('worth-count',
       <%=
       if ENV['CREATE_VIDEO']
-       m = Money.new(3_000_000_00,'GBP')
+       m = Money.new(5_000_000_00,'GBP')
       else
        m = Money.new(0,'GBP')
        Order.and(:value.ne => nil, :currency.in => MAJOR_CURRENCIES).each { |o| begin; m += Money.new(o.value*100, o.currency); rescue; end }
