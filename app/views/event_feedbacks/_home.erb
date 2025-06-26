@@ -17,6 +17,8 @@
 <div class="grid mt-5">
   <% account_ids = []; EventFeedback.and(:event_id.in => Event.pluck(:id), :account_id.in => Account.and(:image_uid.ne => nil).pluck(:id), :anonymise.ne => true, :public_answers.ne => nil, :rating => 5).order('created_at desc').limit(10).each { |event_feedback|
   account = event_feedback.account
+  quote = event_feedback.public_answers.map { |q,a| a unless a.blank? }.compact.join('<br /><br />')
+  next if quote.length > 800
   next unless account.public?
   next if account.name.include?('_')
   next if account_ids.include?(account.id) %>
@@ -29,7 +31,7 @@
         <big>
           <%= partial :'accounts/square', locals: { klass: 'float-left mr-3 mb-3', account: account, width: '150px' } %>
           <a class="home-feedback" href="/events/<%= event_feedback.event.id %>">
-            <%== Sanitize.fragment(event_feedback.public_answers.map { |q,a| a unless a.blank? }.compact.join('<br /><br />'), Sanitize::Config::DANDELION) %>
+            <%== Sanitize.fragment(quote, Sanitize::Config::DANDELION) %>
           </a>
         </big>
 
