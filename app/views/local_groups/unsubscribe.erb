@@ -1,0 +1,6 @@
+<%= partial :'local_groups/nav', locals: { local_group: @local_group } %>
+
+<% form_tag "/local_groups/#{@local_group.id}/unsubscribe" do %>
+  <p class="lead">Are you sure you want to unsubscribe <%= current_account.email %> from <%= @local_group.organisation.name %>'s local group <%= @local_group.name %>?</p>
+  <%= submit_tag "Yes, unsubscribe", class: 'btn btn-primary' %>
+<% end %>

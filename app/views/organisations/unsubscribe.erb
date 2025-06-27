@@ -1,0 +1,6 @@
+<%= partial :'organisations/nav', locals: { organisation: @organisation } %>
+
+<% form_tag "/o/#{@organisation.slug}/unsubscribe" do %>
+  <p class="lead">Are you sure you want to unsubscribe <%= current_account.email %> from <%= @organisation.name %>?</p>
+  <%= submit_tag "Yes, unsubscribe", class: 'btn btn-primary' %>
+<% end %>

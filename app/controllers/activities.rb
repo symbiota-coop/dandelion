@@ -154,6 +154,12 @@ Dandelion::App.controller do
   get '/activities/:id/unsubscribe' do
     sign_in_required!
     @activity = Activity.find(params[:id]) || not_found
+    erb :'activities/unsubscribe'
+  end
+
+  post '/activities/:id/unsubscribe' do
+    sign_in_required!
+    @activity = Activity.find(params[:id]) || not_found
     @activityship = current_account.activityships.find_by(activity: @activity) || current_account.activityships.create(activity: @activity)
     @activityship.update_attribute(:unsubscribed, true)
     flash[:notice] = "You were unsubscribed from #{@activity.name}."

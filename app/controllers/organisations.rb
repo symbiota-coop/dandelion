@@ -279,6 +279,12 @@ Dandelion::App.controller do
   get '/o/:slug/unsubscribe' do
     sign_in_required!
     @organisation = Organisation.find_by(slug: params[:slug]) || not_found
+    erb :'organisations/unsubscribe'
+  end
+
+  post '/o/:slug/unsubscribe' do
+    sign_in_required!
+    @organisation = Organisation.find_by(slug: params[:slug]) || not_found
     @organisationship = current_account.organisationships.find_by(organisation: @organisation) || current_account.organisationships.create(organisation: @organisation)
     @organisationship.update_attribute(:unsubscribed, true)
     flash[:notice] = "You were unsubscribed from #{@organisation.name}."

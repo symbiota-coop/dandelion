@@ -142,6 +142,12 @@ Dandelion::App.controller do
   get '/local_groups/:id/unsubscribe' do
     sign_in_required!
     @local_group = LocalGroup.find(params[:id]) || not_found
+    erb :'local_groups/unsubscribe'
+  end
+
+  post '/local_groups/:id/unsubscribe' do
+    sign_in_required!
+    @local_group = LocalGroup.find(params[:id]) || not_found
     @local_groupship = current_account.local_groupships.find_by(local_group: @local_group) || current_account.local_groupships.create(local_group: @local_group)
     @local_groupship.update_attribute(:unsubscribed, true)
     flash[:notice] = "You were unsubscribed from #{@local_group.name}."
