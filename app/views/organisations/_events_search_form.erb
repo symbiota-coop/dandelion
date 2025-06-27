@@ -37,8 +37,6 @@
           <%= select_tag :event_tag_id, options: [''] + event_tags.order('name asc').map { |event_tag| [event_tag.name, event_tag.id] }, selected: params[:event_tag_id], class: 'form-control' %>
         </div>
       <% end %>
-    </div>
-    <div class="form-row align-items-end">
       <% if (local_groups = @organisation.local_groups.order('name asc').and(:id.in => [params[:local_group_id]].compact + @organisation.events_for_search.future_and_current.pluck(:local_group_id))).count > 0 %>
         <div class="form-group col-12 col-sm-auto">
           <label>Local group</label>
