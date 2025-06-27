@@ -17,11 +17,10 @@ class Activity
   field :telegram_group, type: String
   field :intro_text, type: String
   field :image_uid, type: String
-  field :hide_members, type: Boolean
   field :privacy, type: String
   field :application_questions, type: String
   field :thank_you_message, type: String
-  field :hidden, type: Boolean
+  field :locked, type: Boolean
   field :extra_info_for_application_form, type: String
   field :extra_info_for_acceptance_email, type: String
   field :feedback_summary, type: String
@@ -38,11 +37,10 @@ class Activity
       intro_text: :wysiwyg,
       image: :image,
       events: :collection,
-      hide_members: :check_box,
       privacy: :select,
       application_questions: :text_area,
       thank_you_message: :wysiwyg,
-      hidden: :check_box
+      locked: :check_box
     }
   end
 
@@ -94,11 +92,11 @@ class Activity
   validates_format_of :slug, with: /\A[a-z0-9-]+\z/
 
   def self.active
-    self.and(:hidden.ne => true).and(:id.in => Event.future.pluck(:activity_id))
+    self.and(:locked.ne => true).and(:id.in => Event.future.pluck(:activity_id))
   end
 
   def self.inactive
-    self.and(:id.in => Activity.and(hidden: true).pluck(:id) + Activity.and(:id.nin => Event.future.pluck(:activity_id)).pluck(:id))
+    self.and(:id.in => Activity.and(locked: true).pluck(:id) + Activity.and(:id.nin => Event.future.pluck(:activity_id)).pluck(:id))
   end
 
   def application_questions_a

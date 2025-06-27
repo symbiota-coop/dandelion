@@ -28,10 +28,7 @@ Dandelion::App.controller do
     organisation = Organisation.find_by(slug: params[:organisation_slug]) || not_found
     @activity = organisation.activities.find_by(slug: params[:slug]) || not_found
     @title = @activity.name
-    if @activity.hidden? && !activity_admin?
-      flash[:warning] = 'That activity is hidden.'
-      redirect "/o/#{@activity.organisation.slug}"
-    end
+    kick!(redirect_url: "/o/#{@activity.organisation.slug}") if @activity.locked? && !activity_admin?
     @activityship = @activity.activityships.find_by(account: current_account) if current_account
     erb :'activities/activity'
   end
