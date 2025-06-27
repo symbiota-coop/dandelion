@@ -21,6 +21,12 @@ Dandelion::App.controller do
 
   get '/activities/:id' do
     @activity = Activity.find(params[:id]) || not_found
+    redirect "/o/#{@activity.organisation.slug}/a/#{@activity.slug}"
+  end
+
+  get '/o/:organisation_slug/a/:slug' do
+    organisation = Organisation.find_by(slug: params[:organisation_slug]) || not_found
+    @activity = organisation.activities.find_by(slug: params[:slug]) || not_found
     @title = @activity.name
     if @activity.hidden? && !activity_admin?
       flash[:warning] = 'That activity is hidden.'

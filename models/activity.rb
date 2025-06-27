@@ -25,6 +25,7 @@ class Activity
   field :extra_info_for_application_form, type: String
   field :extra_info_for_acceptance_email, type: String
   field :feedback_summary, type: String
+  field :slug, type: String
 
   def self.admin_fields
     {
@@ -88,7 +89,9 @@ class Activity
     ActivityTag.and(:id.in => activity_tagships.pluck(:activity_tag_id))
   end
 
-  validates_presence_of :name
+  validates_presence_of :name, :slug
+  validates_uniqueness_of :slug, scope: :organisation_id
+  validates_format_of :slug, with: /\A[a-z0-9-]+\z/
 
   def self.active
     self.and(:hidden.ne => true).and(:id.in => Event.future.pluck(:activity_id))
@@ -162,7 +165,8 @@ class Activity
     {
       privacy: 'Access',
       telegram_group: 'Telegram group/channel URL',
-      email: 'Contact email'
+      email: 'Contact email',
+      slug: 'URL'
     }[attr.to_sym] || super
   end
 

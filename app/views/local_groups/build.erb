@@ -2,6 +2,9 @@
 <% form_for @local_group, @local_group.new_record ? '/local_groups/new' : "/local_groups/#{@local_group.id}/edit" do |f| %>
   <%= hidden_field_tag :'local_group[organisation_id]', value: @local_group.organisation_id %>
   <%= f.text_block :name %>
+  <div class="slugify">
+    <%= f.shorturl_block :slug, stem: "#{ENV['BASE_URI']}/o/#{@local_group.organisation.slug}/lg/" %>
+  </div>
   <%= f.wysiwyg_block :intro_text %>
   <%= f.url_block :telegram_group %>
   <%= f.text_area_block :geometry %>

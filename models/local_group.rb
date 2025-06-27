@@ -15,6 +15,7 @@ class LocalGroup
   field :geometry, type: String
   field :hide_members, type: Boolean
   field :type, type: String
+  field :slug, type: String
 
   def self.admin_fields
     {
@@ -27,7 +28,9 @@ class LocalGroup
     }
   end
 
-  validates_presence_of :name, :geometry
+  validates_presence_of :name, :geometry, :slug
+  validates_uniqueness_of :slug, scope: :organisation_id
+  validates_format_of :slug, with: /\A[a-z0-9-]+\z/
 
   has_many :discount_codes, class_name: 'DiscountCode', as: :codeable, dependent: :destroy
 
@@ -78,7 +81,8 @@ class LocalGroup
 
   def self.human_attribute_name(attr, options = {})
     {
-      telegram_group: 'Telegram group/channel URL'
+      telegram_group: 'Telegram group/channel URL',
+      slug: 'URL'
     }[attr.to_sym] || super
   end
 

@@ -21,6 +21,12 @@ Dandelion::App.controller do
 
   get '/local_groups/:id' do
     @local_group = LocalGroup.find(params[:id]) || not_found
+    redirect "/o/#{@local_group.organisation.slug}/lg/#{@local_group.slug}"
+  end
+
+  get '/o/:organisation_slug/lg/:slug' do
+    organisation = Organisation.find_by(slug: params[:organisation_slug]) || not_found
+    @local_group = organisation.local_groups.find_by(slug: params[:slug]) || not_found
     @title = @local_group.name
     erb :'local_groups/local_group'
   end
