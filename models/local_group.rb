@@ -82,7 +82,8 @@ class LocalGroup
   def self.human_attribute_name(attr, options = {})
     {
       telegram_group: 'Telegram group/channel URL',
-      slug: 'URL'
+      slug: 'URL',
+      hide_members: 'Hide member map'
     }[attr.to_sym] || super
   end
 
@@ -93,6 +94,16 @@ class LocalGroup
         local_group.local_groupships.find_by(account: account, admin: true) ||
         Organisation.admin?(local_group.organisation, account)
       )
+  end
+
+  def self.new_hints
+    {
+      geometry: 'Accepts a GeoJSON polygon created via https://geojson.io/ (copy and paste the contents of the box on the right)'
+    }
+  end
+
+  def self.edit_hints
+    {}.merge(new_hints)
   end
 
   def subscribed_members

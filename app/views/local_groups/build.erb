@@ -7,6 +7,11 @@
   </div>
   <%= f.wysiwyg_block :intro_text %>
   <%= f.url_block :telegram_group %>
+  <script>
+    $(document).ready(function() {
+      $('#local_group_geometry').attr('rows', '8');
+    });
+  </script>
   <%= f.text_area_block :geometry %>
   <%= f.check_box_block :hide_members %>
   <%= f.submit_block destroy_url: "/local_groups/#{@local_group.id}/destroy" %>
