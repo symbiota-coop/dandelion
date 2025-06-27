@@ -196,9 +196,7 @@ Dandelion::App.controller do
     kick!(redirect_url: "/o/#{@event.organisation.slug}/events") if @event.locked? && !event_admin?
     @title = @event.name
     @organisation = @event.organisation
-    if @order && params[:success]
-      @event.check_oc_event if !@order.payment_completed && @event.oc_slug      
-    end
+    @event.check_oc_event if @order && params[:success] && !@order.payment_completed && @event.oc_slug
     cohostship = nil
     if params[:cohost] && (cohost = Organisation.find_by(slug: params[:cohost])) && (cohostship = @event.cohostships.find_by(organisation: cohost)) && cohostship.image
       @event_image = cohostship.image.thumb('1920x1920')
@@ -264,20 +262,25 @@ Dandelion::App.controller do
 
   get '/events/:id/edit' do
     @event = Event.unscoped.find(params[:id]) || not_found
+    redirect "/e/#{@event.slug}/edit"
+  end
+
+  get '/e/:slug/edit' do
+    @event = Event.unscoped.find_by(slug: params[:slug]) || not_found
     kick! unless @event.organisation
     event_admins_only!
     erb :'events_build/build'
   end
 
-  post '/events/:id/edit' do
-    @event = Event.find(params[:id]) || not_found
+  post '/e/:slug/edit' do
+    @event = Event.find_by(slug: params[:slug]) || not_found
     kick! unless @event.organisation
     event_admins_only!
     @event.last_saved_by = current_account
     if @event.update_attributes(mass_assigning(params[:event], Event))
       @event.set(locked: true) if !@event.organisation.payment_method? && @event.paid_tickets?
       flash[:notice] = 'The event was saved.'
-      redirect "/events/#{@event.id}/edit"
+      redirect "/e/#{@event.slug}/edit"
     else
       flash.now[:error] = 'There was an error saving the event.'
       erb :'events_build/build'
@@ -312,7 +315,7 @@ Dandelion::App.controller do
     else
       duplicated_event = @event.duplicate!(current_account)
       flash[:notice] = 'Event duplicated and locked'
-      redirect "/events/#{duplicated_event.id}/edit"
+      redirect "/e/#{duplicated_event.slug}/edit"
     end
   end
 

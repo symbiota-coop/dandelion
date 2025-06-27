@@ -62,7 +62,7 @@ class DandelionTest < ActiveSupport::TestCase
     @organisation = FactoryBot.create(:organisation, account: @account)
     @event = FactoryBot.create(:event, organisation: @organisation, account: @account, last_saved_by: @account)
     login_as(@account)
-    visit "/events/#{@event.id}/edit"
+    visit "/e/#{@event.slug}/edit"
     fill_in 'Event title*', with: (name = FactoryBot.build_stubbed(:event).name)
     click_button 'Update event'
     assert page.has_content? 'The event was saved'

@@ -47,7 +47,7 @@
   </div>
 <% end %>
 
-<% form_for @event, @event.new_record ? '/events/new' : "/events/#{@event.id}/edit", id: 'build-event' do |f| %>
+<% form_for @event, @event.new_record ? '/events/new' : "/e/#{@event.slug}/edit", id: 'build-event' do |f| %>
   <div class="nav-wrapper">
     <ul id="event-build-nav" class="nav nav-tabs" role="tablist">
       <li role="presentation" class="nav-item"><a class="nav-link active" href="#tab-basics" role="tab" data-toggle="tab">Basics</a></li>

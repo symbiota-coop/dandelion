@@ -1,6 +1,6 @@
 <td>
   <% if event.deleted? %>
-    <a href="/events/<%=event.id%>/edit"><%= event.name %></a>
+    <a href="/e/<%=event.slug%>/edit"><%= event.name %></a>
   <% else %>
     <a href="<%= "/e/#{event.slug}#{if organisation && organisation != event.organisation; "?cohost=#{organisation.slug}"; end }" %>"><%= event.name %></a>
   <% end %>

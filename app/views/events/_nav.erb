@@ -11,7 +11,7 @@
     <% end %>
     <% if event.deleted? %>
       <%= dropdown_nav [
-          ['View deleted event', "/events/#{event.id}/edit"],
+          ['View deleted event', "/e/#{event.slug}/edit"],
           ([%(Orders <span class="badge badge-primary">#{event.orders.deleted.complete.count}</span>), "/events/#{event.id}/orders"] if event.orders.deleted.complete.count.positive?),          
           ([%(Tickets <span class="badge badge-primary">#{event.tickets.deleted.complete.count}</span>), "/events/#{event.id}/tickets"] if event.ticket_types.count.positive? || event.tickets.deleted.complete.count.positive?),
           ([%(Donations <span class="badge badge-primary">#{event.donations.deleted.complete.count}</span>), "/events/#{event.id}/donations"] if event.donations.deleted.complete.count.positive?),          
@@ -19,7 +19,7 @@
     <% else %>
       <%= dropdown_nav [
           ['View event', "/e/#{event.slug}"],
-          ['Edit event', "/events/#{event.id}/edit"],
+          ['Edit event', "/e/#{event.slug}/edit"],
           ['Delete event', "/events/#{event.id}/delete"],
           ['Duplicate event', "/events/#{event.id}/duplicate"],
           ['Discount codes' + (event.discount_codes.count.positive? ? " <span class='badge badge-primary'>#{event.discount_codes.count}</span>" : ''), "/events/#{event.id}/discount_codes"],
