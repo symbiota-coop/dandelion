@@ -1,8 +1,10 @@
 Dandelion::App.controller do
   get '/local_groups/new' do
     sign_in_required!
+    halt 400 unless params[:organisation_id]
+    organisation = Organisation.find(params[:organisation_id]) || not_found
     @local_group = LocalGroup.new
-    @local_group.organisation_id = params[:organisation_id]
+    @local_group.organisation = organisation
     erb :'local_groups/build'
   end
 

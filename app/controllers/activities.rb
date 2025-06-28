@@ -1,8 +1,10 @@
 Dandelion::App.controller do
   get '/activities/new' do
     sign_in_required!
+    halt 400 unless params[:organisation_id]
+    organisation = Organisation.find(params[:organisation_id]) || not_found
     @activity = Activity.new
-    @activity.organisation_id = params[:organisation_id]
+    @activity.organisation = organisation
     erb :'activities/build'
   end
 
