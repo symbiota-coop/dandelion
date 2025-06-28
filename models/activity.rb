@@ -211,4 +211,12 @@ class Activity
     file.unlink
   end
   handle_asynchronously :send_applications_csv
+
+  def organisation_slug
+    if organisation
+      organisation.slug
+    elsif organisation_id
+      Organisation.find(organisation_id).slug
+    end
+  end
 end
