@@ -17,7 +17,7 @@
   <%= hidden_field_tag :'activity[organisation_id]', value: @activity.organisation_id %>
   <%= f.text_block :name %>
   <div class="slugify">
-    <%= f.shorturl_block :slug, stem: "#{ENV['BASE_URI']}/o/#{@activity.organisation_slug}/a/" %>
+    <%= f.shorturl_block :slug, stem: "#{ENV['BASE_URI']}/o/#{@activity.organisation.slug}/a/" %>
   </div>
   <%= f.wysiwyg_block :intro_text %>
   <%= f.url_block :website %>

@@ -145,7 +145,7 @@ Dandelion::App.controller do
     @activity = Activity.find(params[:id]) || not_found
     activity_admins_only!
     @activity.destroy
-    redirect '/activities/new'
+    redirect "/o/#{@activity.organisation.slug}/activities"
   end
 
   get '/activities/:id/unsubscribe' do
