@@ -2,19 +2,6 @@
 
 <% if !params[:minimal] %>
 
-  <% if @account %>
-    <% if @account.feedback_summary %>
-      <div class="ai-well my-3" data-toggle="tooltip" title="AI-generated summary ✨">
-        <big>
-          <%= @account.feedback_summary %>
-        </big>
-      </div>
-    <% end %>
-    <% if admin? %>
-      <a href="/accounts/<%= @account.id %>/feedback_summary">Refresh feedback summary</a>
-    <% end %>
-  <% end %>
-
   <% if @activity %>
     <% if @activity.feedback_summary %>
       <div class="ai-well my-3" data-toggle="tooltip" title="AI-generated summary ✨">
@@ -25,6 +12,28 @@
     <% end %>
     <% if admin? %>
       <a href="/activities/<%= @activity.id %>/feedback_summary">Refresh feedback summary</a>
+    <% end %>
+  <% elsif  @account %>
+    <% if @account.feedback_summary %>
+      <div class="ai-well my-3" data-toggle="tooltip" title="AI-generated summary ✨">
+        <big>
+          <%= @account.feedback_summary %>
+        </big>
+      </div>
+    <% end %>
+    <% if admin? %>
+      <a href="/accounts/<%= @account.id %>/feedback_summary">Refresh feedback summary</a>
+    <% end %> %>
+  <% elsif @organisation %>
+    <% if @organisation.feedback_summary %>
+      <div class="ai-well my-3" data-toggle="tooltip" title="AI-generated summary ✨">
+        <big>
+          <%= @organisation.feedback_summary %>
+        </big>
+      </div>
+    <% end %>
+    <% if admin? %>
+      <a href="/organisations/<%= @organisation.id %>/feedback_summary">Refresh feedback summary</a>
     <% end %>
   <% end %>
 

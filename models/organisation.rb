@@ -10,6 +10,7 @@ class Organisation
   include OrganisationMonthlyDonations
   include OrganisationEvm
   include OrganisationValidation
+  include OrganisationFeedbackSummaries
   include Geocoded
   include EvmTransactions
   include StripeWebhooks

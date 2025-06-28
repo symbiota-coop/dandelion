@@ -93,6 +93,7 @@ module OrganisationFields
     field :enable_resales, type: Mongoid::Boolean
     field :fixed_contribution_gbp, type: Float
     field :tax_rate_id, type: String
+    field :feedback_summary, type: String
 
     field :tokens, type: Float
     index({ tokens: 1 })
@@ -156,7 +157,8 @@ module OrganisationFields
         terms_and_conditions: :text_area,
         terms_and_conditions_check_box: :check_box,
         billing_address_collection: :check_box,
-        enable_resales: :check_box
+        enable_resales: :check_box,
+        feedback_summary: :text_area
       }.merge(email_admin_fields)
     end
 
