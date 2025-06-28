@@ -44,6 +44,16 @@ class Activity
     }
   end
 
+  def self.new_hints
+    {
+      locked: 'Make the activity visible to admins only'
+    }
+  end
+
+  def self.edit_hints
+    {}.merge(new_hints)
+  end
+
   has_many :discount_codes, class_name: 'DiscountCode', as: :codeable, dependent: :destroy
 
   has_many :events, dependent: :nullify
