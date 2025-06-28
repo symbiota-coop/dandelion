@@ -9,6 +9,7 @@ Honeybadger.configure do |config|
       error_type == 'Sinatra::BadRequest' && error_message && error_message.include?('Invalid multipart/form-data: EOFError'),
       error_type == 'ThreadError' && error_message && error_message.include?("can't be called from trap context"),
       error_type == 'Mongoid::Errors::Validations' && error_message && error_message.include?('Ticket type is full'),
+      error_type == 'Mongoid::Errors::Validations' && error_message && error_message.include?('Ticket type is not available as sales have ended'),
       error_type == 'Errno::EIO' && error_message && error_message.include?('Input/output error'),
       error_type == 'Encoding::CompatibilityError' && error_message && error_message.include?('invalid byte sequence in UTF-8')
     ].any?
