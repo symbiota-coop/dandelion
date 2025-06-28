@@ -39,6 +39,7 @@
     <% end %>
   </div>
 </div>
+
 <% if @organisation.intro_text && @organisation.intro_text.match(/<h[1-6]\b/) %>
   <div class="wysiwyg links-blank">
     <big>
@@ -47,21 +48,32 @@
     </big>
   </div>
 <% end %>
+
 <% if @organisation.news.count > 0 %>
   <h2 class="mt-5 mb-3">News</h2>
   <div data-with-placeholder data-pagelet-url="/o/<%= @organisation.slug %>/news">
     <%= partial :'pmails/blocks_placeholder' %>
   </div>
 <% end %>
+
 <% if organisation_admin? or @organisation.events_for_search.future_and_current.count > 0 %>
   <h2 class="mt-5">Events</h2>
   <div data-with-placeholder data-pagelet-url="/o/<%= @organisation.slug %>/events_block">
     <%= partial :'organisations/events_block_placeholder' %>
   </div>
 <% end %>
+
 <% if organisation_admin? or @organisation.activities.active.count > 0 %>
   <div data-pagelet-url="/o/<%= @organisation.slug %>/activities"></div>
 <% end %>
+
 <% if organisation_admin? or @organisation.local_groups.count > 0 %>
   <div data-pagelet-url="/o/<%= @organisation.slug %>/local_groups"></div>
+<% end %>
+
+<% if @organisation.unscoped_event_feedbacks.count > 0 %>
+  <div class="card shadow-sm mt-5">
+    <h3 class="card-header chill">Feedback on <%= @organisation.name %> events</h3>
+    <div class="card-body pt-2" data-pagelet-url="/o/<%= @organisation.slug %>/show_feedback"></div>
+  </div>
 <% end %>

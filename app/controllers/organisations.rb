@@ -588,4 +588,11 @@ Dandelion::App.controller do
     # Compile the SCSS to CSS
     Sass::Engine.new(scss_content, syntax: :scss).render
   end
+
+  get '/organisations/:id/feedback_summary' do
+    @organisation = Organisation.find(params[:id]) || not_found
+    admins_only!
+    @organisation.feedback_summary!
+    redirect back
+  end
 end

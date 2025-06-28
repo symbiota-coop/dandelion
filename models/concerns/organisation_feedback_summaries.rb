@@ -4,14 +4,12 @@ module OrganisationFeedbackSummaries
   class_methods do
     def set_feedback_summaries
       # Organisation.and(:feedback_summary.ne => nil).set(feedback_summary: nil)
-      organisations = Organisation.all
-      organisations = organisations.select { |organisation| organisation.feedback_summary.nil? && organisation.event_feedbacks.count >= 10 }
+      organisations = Organisation.and(feedback_summary: nil)
+      organisations = organisations.select { |organisation| organisation.event_feedbacks.count >= 10 }
       organisations.each_with_index do |organisation, i|
-        puts "#{i + 1}/#{organisation.count} #{organisation.name}"
+        puts "#{i + 1}/#{organisations.count} #{organisation.name}"
         organisation.feedback_summary!
       end
-
-      ###
     end
   end
 

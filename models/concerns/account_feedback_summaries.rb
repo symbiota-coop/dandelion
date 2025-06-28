@@ -4,8 +4,8 @@ module AccountFeedbackSummaries
   class_methods do
     def set_feedback_summaries
       # Account.and(:feedback_summary.ne => nil).set(feedback_summary: nil)
-      accounts = Account.and(:id.in => EventFacilitation.and(:event_id.in => Event.past.pluck(:id)).pluck(:account_id))
-      accounts = accounts.select { |account| account.feedback_summary.nil? && account.event_feedbacks_as_facilitator.count >= 10 }
+      accounts = Account.and(:id.in => EventFacilitation.and(:event_id.in => Event.past.pluck(:id)).pluck(:account_id), :feedback_summary => nil)
+      accounts = accounts.select { |account| account.event_feedbacks_as_facilitator.count >= 10 }
       accounts.each_with_index do |account, i|
         puts "#{i + 1}/#{accounts.count} #{account.username}"
         account.feedback_summary!
@@ -17,7 +17,7 @@ module AccountFeedbackSummaries
 
   def feedback_summary!
     account = self
-    prompt = "Provide a one-paragraph summary of the feedback on this facilitator, #{account.firstname}. Focus on their strengths and what they do well. The feedback:\n\n#{account.event_feedbacks_as_facilitator.joined}"
+    prompt = "Provide a one-paragraph summary of the feedback on this facilitator, #{account.name}. Focus on their strengths and what they do well. The feedback:\n\n#{account.event_feedbacks_as_facilitator.joined}"
 
     last_paragraph = nil
     loop do
