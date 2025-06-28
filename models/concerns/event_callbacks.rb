@@ -8,7 +8,7 @@ module EventCallbacks
       event_facilitations.create account: organisation.admins.first if organisation && organisation.admins.count == 1
       event_facilitations.create account: revenue_sharer if revenue_sharer
 
-      activity.update_attribute(:hidden, false) if activity
+      activity.update_attribute(:locked, false) if activity
       organisation.try(:update_paid_up)
     end
 
