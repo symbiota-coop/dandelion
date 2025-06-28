@@ -1,17 +1,18 @@
 Dandelion::App.controller do
   get '/local_groups/new' do
-    sign_in_required!
     halt 400 unless params[:organisation_id]
-    organisation = Organisation.find(params[:organisation_id]) || not_found
+    @organisation = Organisation.find(params[:organisation_id]) || not_found
+    organisation_admins_only!
     @local_group = LocalGroup.new
-    @local_group.organisation = organisation
+    @local_group.organisation = @organisation
     erb :'local_groups/build'
   end
 
   post '/local_groups/new' do
-    sign_in_required!
     @local_group = LocalGroup.new(mass_assigning(params[:local_group], LocalGroup))
     @local_group.account = current_account
+    @organisation = @local_group.organisation
+    organisation_admins_only!
     if @local_group.save
       flash[:notice] = 'The local group was created.'
       redirect "/local_groups/#{@local_group.id}"

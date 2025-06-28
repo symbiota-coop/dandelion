@@ -1,17 +1,18 @@
 Dandelion::App.controller do
   get '/activities/new' do
-    sign_in_required!
     halt 400 unless params[:organisation_id]
-    organisation = Organisation.find(params[:organisation_id]) || not_found
+    @organisation = Organisation.find(params[:organisation_id]) || not_found
+    organisation_admins_only!
     @activity = Activity.new
-    @activity.organisation = organisation
+    @activity.organisation = @organisation
     erb :'activities/build'
   end
 
   post '/activities/new' do
-    sign_in_required!
     @activity = Activity.new(mass_assigning(params[:activity], Activity))
     @activity.account = current_account
+    @organisation = @activity.organisation
+    organisation_admins_only!
     if @activity.save
       flash[:notice] = 'The activity was created.'
       redirect "/activities/#{@activity.id}"
