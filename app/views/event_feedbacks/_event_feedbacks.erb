@@ -23,7 +23,7 @@
     <% end %>
     <% if admin? %>
       <a href="/accounts/<%= @account.id %>/feedback_summary">Refresh feedback summary</a>
-    <% end %> %>
+    <% end %>
   <% elsif @organisation %>
     <% if @organisation.feedback_summary %>
       <div class="ai-well my-3" data-toggle="tooltip" title="AI-generated summary ✨">
