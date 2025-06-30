@@ -72,8 +72,6 @@
 <% end %>
 
 <% if @organisation.unscoped_event_feedbacks.count > 0 %>
-  <div class="card shadow-sm mt-5">
-    <h3 class="card-header chill">Feedback on <%= @organisation.name %> events</h3>
-    <div class="card-body pt-2" data-pagelet-url="/o/<%= @organisation.slug %>/show_feedback"></div>
-  </div>
+  <h2 class="mt-5">Feedback on <%= @organisation.name %> events</h2>
+  <div class="mt-3" data-pagelet-url="/o/<%= @organisation.slug %>/show_feedback"></div>
 <% end %>
