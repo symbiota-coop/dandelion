@@ -9,7 +9,7 @@ end
 <% questions_a.each_with_index { |q,i| %>
 <div class="form-group links-blank">
   <% if q =~ /^#\s*(.+)/ %>
-    <label><%== Sanitize.fragment(Rinku.auto_link($1), Sanitize::Config::DANDELION) %></label>
+    <h4><%== Sanitize.fragment(Rinku.auto_link($1), Sanitize::Config::DANDELION) %></h4>
   <% elsif m = q.match(/\[(.*)\]/)  %>
     <div class="checkbox-inline">
       <%= check_box_tag "answers[#{i}]", id: "answers-#{i}", checked: ((params[:answers][i] == 'true') if params[:answers]), 'data-required': q.ends_with?('*'), disabled: defined?(questions) %>
