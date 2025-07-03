@@ -39,39 +39,38 @@
 
 <% end %>
 
-<% unless defined?(unscoped); event_feedbacks = event_feedbacks.unscoped; end %>
-  <% event_feedbacks = event_feedbacks.and(:rating.ne => nil).order('created_at desc').paginate(page: params[:page], per_page: 10) %>
-  <table class="table table-borderless mt-3">
-    <% event_feedbacks.each { |event_feedback| account = event_feedback.account %>
-    <tr <% if event_feedback.deleted_at%>style="opacity: 0.5"<% end %>>
-      <td class="feedback-name">
-        <% if !account || event_feedback.anonymise? %>
-          Anonymous
-        <% else %>
-          <% if account.public? %>
-            <% if account.image && !params[:hide_pictures] %>
-              <%= partial :'accounts/square', locals: { account: account, width: '50px' } %>
-              <br class="d-lg-none" />
-            <% end %>
-            <a <% if params[:minimal] %>target="_blank"<% end %> href="/u/<%= account.username %>"><%= account.name %></a>
-          <% else %>
-            <%= account.abbrname %>
+<% event_feedbacks = event_feedbacks.and(:rating.ne => nil).order('created_at desc').paginate(page: params[:page], per_page: 10) %>
+<table class="table table-borderless mt-3">
+  <% event_feedbacks.each { |event_feedback| account = event_feedback.account %>
+  <tr <% if event_feedback.deleted_at%>style="opacity: 0.5"<% end %>>
+    <td class="feedback-name">
+      <% if !account || event_feedback.anonymise? %>
+        Anonymous
+      <% else %>
+        <% if account.public? %>
+          <% if account.image && !params[:hide_pictures] %>
+            <%= partial :'accounts/square', locals: { account: account, width: '50px' } %>
+            <br class="d-lg-none" />
           <% end %>
+          <a <% if params[:minimal] %>target="_blank"<% end %> href="/u/<%= account.username %>"><%= account.name %></a>
+        <% else %>
+          <%= account.abbrname %>
         <% end %>
-        <% if event_feedback.event %>
-          on <a <% if params[:minimal] %>target="_blank"<% end %>  href="/events/<%= event_feedback.event.id %>"><%= event_feedback.event.name %></a>
-        <% end %>
+      <% end %>
+      <% if event_feedback.event %>
+        on <a <% if params[:minimal] %>target="_blank"<% end %>  href="/events/<%= event_feedback.event.id %>"><%= event_feedback.event.name %></a>
+      <% end %>
+    </td>
+    <td style="white-space: nowrap;"><% if event_feedback.deleted_at%><em>Removed</em><% else %><% event_feedback.rating.times do %><i class="bi bi-star-fill"></i><% end %><% end %></td>
+    <td><small><%= timeago event_feedback.created_at %></small></td>
+  </tr>
+  <% if !event_feedback.deleted_at && (event_feedback.public_answers || event_feedback.response) %>
+    <tr>
+      <td colspan="3" style="border-top: 0">
+        <%= partial :'event_feedbacks/event_feedback', locals: { event_feedback: event_feedback } %>
       </td>
-      <td style="white-space: nowrap;"><% if event_feedback.deleted_at%><em>Removed</em><% else %><% event_feedback.rating.times do %><i class="bi bi-star-fill"></i><% end %><% end %></td>
-      <td><small><%= timeago event_feedback.created_at %></small></td>
     </tr>
-    <% if !event_feedback.deleted_at && (event_feedback.public_answers || event_feedback.response) %>
-      <tr>
-        <td colspan="3" style="border-top: 0">
-          <%= partial :'event_feedbacks/event_feedback', locals: { event_feedback: event_feedback } %>
-        </td>
-      </tr>
-    <% end %>
-    <% } %>
-  </table>
-  <%= will_paginate event_feedbacks, inner_window: 0, outer_window: 0, renderer: WillPaginate::ViewHelpers::BootstrapRenderer %>
+  <% end %>
+  <% } %>
+</table>
+<%= will_paginate event_feedbacks, inner_window: 0, outer_window: 0, renderer: WillPaginate::ViewHelpers::BootstrapRenderer %>

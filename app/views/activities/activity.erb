@@ -122,7 +122,7 @@
   </div>
 <% end %>
 
-<% if @activity.event_feedbacks.unscoped.count > 0 %>
+<% if @activity.unscoped_event_feedbacks.count > 0 %>
   <h2 class="mt-5">Feedback on <%= @activity.name %> events</h2>
   <div class="mt-3" data-pagelet-url="/activities/<%= @activity.id %>/show_feedback"></div>
 <% end %>

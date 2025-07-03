@@ -12,4 +12,4 @@ event_tags_freq = event_tags_freq.sort_by { |k,v| v }.reverse
 <a href="/events?event_tag_id=<%= event_tag.id %>" class="text-white label label-primary d-inline-block mb-1"><%== Sanitize.fragment(event_tag.name) %></a>
 <% } %>
 
-<%= partial :'event_feedbacks/average_rating', locals: { unscoped: true, event_feedbacks: account.unscoped_event_feedbacks_as_facilitator, events: events } %>
+<%= partial :'event_feedbacks/average_rating', locals: { event_feedbacks: account.unscoped_event_feedbacks_as_facilitator, events: events } %>

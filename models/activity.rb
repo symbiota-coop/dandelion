@@ -58,7 +58,6 @@ class Activity
 
   has_many :events, dependent: :nullify
   has_many :events_as_feedback_activity, class_name: 'Event', dependent: :nullify
-  has_many :event_feedbacks, dependent: :destroy
   has_many :activityships, dependent: :destroy
   has_many :activity_applications, dependent: :destroy
 
@@ -66,6 +65,14 @@ class Activity
   has_many :pmails_as_exclusion, class_name: 'Pmail', inverse_of: :activity, dependent: :nullify
   def pmails_including_events
     Pmail.and(:id.in => pmails_as_mailable.pluck(:id) + Pmail.and(:mailable_type => 'Event', :mailable_id.in => events.pluck(:id)).pluck(:id))
+  end
+
+  def event_feedbacks
+    EventFeedback.and(:event_id.in => events.pluck(:id))
+  end
+
+  def unscoped_event_feedbacks
+    EventFeedback.unscoped.and(:event_id.in => events.pluck(:id))
   end
 
   def event_tags

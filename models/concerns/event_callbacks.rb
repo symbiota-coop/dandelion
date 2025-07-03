@@ -20,21 +20,18 @@ module EventCallbacks
         post.update_attribute(:subject, "Chat for #{name}")
       end
 
-      if changes['activity_id']
-        if activity && activity.privacy == 'open' && changes['activity_id'][0]
-          previous_activity = Activity.find(changes['activity_id'][0])
-          attendees.each do |account|
-            next unless (previous_activityship = previous_activity.activityships.find_by(account: account))
+      if changes['activity_id'] && activity && activity.privacy == 'open' && changes['activity_id'][0]
+        previous_activity = Activity.find(changes['activity_id'][0])
+        attendees.each do |account|
+          next unless (previous_activityship = previous_activity.activityships.find_by(account: account))
 
-            activity.activityships.create(
-              account: account,
-              unsubscribed: previous_activityship.unsubscribed,
-              hide_membership: previous_activityship.hide_membership,
-              receive_feedback: previous_activityship.receive_feedback
-            )
-          end
+          activity.activityships.create(
+            account: account,
+            unsubscribed: previous_activityship.unsubscribed,
+            hide_membership: previous_activityship.hide_membership,
+            receive_feedback: previous_activityship.receive_feedback
+          )
         end
-        event_feedbacks.update_all(activity_id: activity_id)
       end
 
       if changes['local_group_id'] && local_group && changes['local_group_id'][0]

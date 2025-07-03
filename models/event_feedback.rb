@@ -4,7 +4,6 @@ class EventFeedback
   include Mongoid::Paranoia
 
   belongs_to :event, index: true, optional: true
-  belongs_to :activity, index: true, optional: true
   belongs_to :account, index: true
 
   has_many :account_contributions, dependent: :nullify
@@ -27,7 +26,6 @@ class EventFeedback
       public_answers: { type: :text_area, disabled: true },
       response: :text_area,
       event_id: :lookup,
-      activity_id: :lookup,
       account_id: :lookup
     }
   end
@@ -47,10 +45,6 @@ class EventFeedback
 
   after_create do
     notifications.create! circle: circle, type: 'left_feedback' unless anonymise
-  end
-
-  before_validation do
-    self.activity = event.activity if new_record? && !activity && event
   end
 
   def self.average_rating
