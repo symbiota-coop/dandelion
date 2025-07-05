@@ -5,7 +5,7 @@
 <% else %>
   <% unless params[:no_listings] %>
     <% if !params[:minimal] || params[:past] %>
-      <% @events = @events.paginate(page: params[:page], per_page: 20) %>
+      <% @events = @events.paginate(page: params[:page], per_page: (params[:per_page] || 20)) %>
     <% end %>
     <%= partial :'events/blocks', locals: { events: @events } %>
     <% if !params[:minimal] || params[:past] %>
