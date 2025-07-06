@@ -3,7 +3,7 @@ class EventBoostBid
   include Mongoid::Timestamps
   include Mongoid::Paranoia
 
-  belongs_to :event
+  belongs_to :event, index: true
 
   field :amount, type: Float
   field :currency, type: String
