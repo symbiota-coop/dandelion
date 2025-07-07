@@ -81,6 +81,10 @@ class Gathering
     end
   end
 
+  def stripe_webhook_url
+    "#{ENV['BASE_URI']}/g/#{slug}/stripe_webhook"
+  end
+
   def circle
     self
   end

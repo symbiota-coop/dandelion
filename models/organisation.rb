@@ -89,6 +89,10 @@ class Organisation
     events.each(&:set_browsable) if hidden_changed? || paid_up_changed?
   end
 
+  def stripe_webhook_url
+    "#{ENV['BASE_URI']}/o/#{slug}/stripe_webhook"
+  end
+
   def ticket_email_title_default
     '[ticket_or_tickets] to [event_name]'
   end

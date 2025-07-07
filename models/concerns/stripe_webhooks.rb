@@ -5,15 +5,6 @@ module StripeWebhooks
     after_save :create_stripe_webhook_if_necessary, if: :stripe_sk
   end
 
-  def stripe_webhook_url
-    case self.class
-    when Organisation
-      "#{ENV['BASE_URI']}/o/#{slug}/stripe_webhook"
-    when Gathering
-      "#{ENV['BASE_URI']}/g/#{slug}/stripe_webhook"
-    end
-  end
-
   def stripe_webhooks
     Stripe.api_key = stripe_sk
     Stripe.api_version = '2020-08-27'
