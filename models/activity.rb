@@ -1,4 +1,8 @@
-class Activity < DandelionModel
+class Activity
+  include Mongoid::Document
+  include Mongoid::Timestamps
+  include BelongsToWithoutParentValidation
+
   extend Dragonfly::Model
   include ActivityFeedbackSummaries
   include ImportFromCsv

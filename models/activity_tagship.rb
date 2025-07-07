@@ -1,4 +1,8 @@
-class ActivityTagship < DandelionModel
+class ActivityTagship
+  include Mongoid::Document
+  include Mongoid::Timestamps
+  include BelongsToWithoutParentValidation
+
   belongs_to_without_parent_validation :activity, index: true
   belongs_to_without_parent_validation :activity_tag, index: true
 

@@ -1,4 +1,8 @@
-class Rpayment < DandelionModel
+class Rpayment
+  include Mongoid::Document
+  include Mongoid::Timestamps
+  include BelongsToWithoutParentValidation
+
   belongs_to_without_parent_validation :event, index: true
   belongs_to_without_parent_validation :account, index: true
 

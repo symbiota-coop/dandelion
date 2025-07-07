@@ -1,4 +1,8 @@
-class Vote < DandelionModel
+class Vote
+  include Mongoid::Document
+  include Mongoid::Timestamps
+  include BelongsToWithoutParentValidation
+
   belongs_to_without_parent_validation :voption, index: true
   belongs_to_without_parent_validation :account, index: true
 

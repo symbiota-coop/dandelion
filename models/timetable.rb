@@ -1,4 +1,8 @@
-class Timetable < DandelionModel
+class Timetable
+  include Mongoid::Document
+  include Mongoid::Timestamps
+  include BelongsToWithoutParentValidation
+
   belongs_to_without_parent_validation :gathering, index: true
   belongs_to_without_parent_validation :account, index: true
 

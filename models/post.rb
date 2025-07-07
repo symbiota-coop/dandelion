@@ -1,4 +1,8 @@
-class Post < DandelionModel
+class Post
+  include Mongoid::Document
+  include Mongoid::Timestamps
+  include BelongsToWithoutParentValidation
+
   belongs_to_without_parent_validation :account, index: true, inverse_of: :posts_as_creator
   belongs_to_without_parent_validation :commentable, polymorphic: true, index: true
 

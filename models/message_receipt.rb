@@ -1,4 +1,8 @@
-class MessageReceipt < DandelionModel
+class MessageReceipt
+  include Mongoid::Document
+  include Mongoid::Timestamps
+  include BelongsToWithoutParentValidation
+
   belongs_to_without_parent_validation :messenger, class_name: 'Account', inverse_of: :message_receipts_as_messenger, index: true
   belongs_to_without_parent_validation :messengee, class_name: 'Account', inverse_of: :message_receipts_as_massangee, index: true
 

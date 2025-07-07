@@ -1,4 +1,8 @@
-class Shift < DandelionModel
+class Shift
+  include Mongoid::Document
+  include Mongoid::Timestamps
+  include BelongsToWithoutParentValidation
+
   belongs_to_without_parent_validation :role, index: true
   belongs_to_without_parent_validation :rslot, index: true
   belongs_to_without_parent_validation :rota, index: true

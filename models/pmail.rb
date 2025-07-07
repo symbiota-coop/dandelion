@@ -1,4 +1,8 @@
-class Pmail < DandelionModel
+class Pmail
+  include Mongoid::Document
+  include Mongoid::Timestamps
+  include BelongsToWithoutParentValidation
+
   include PmailMailgun
   belongs_to_without_parent_validation :organisation, index: true
   belongs_to_without_parent_validation :account, index: true

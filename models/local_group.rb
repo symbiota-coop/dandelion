@@ -1,4 +1,8 @@
-class LocalGroup < DandelionModel
+class LocalGroup
+  include Mongoid::Document
+  include Mongoid::Timestamps
+  include BelongsToWithoutParentValidation
+
   extend Dragonfly::Model
   include ImportFromCsv
   include SendFollowersCsv

@@ -1,4 +1,8 @@
-class Cohostship < DandelionModel
+class Cohostship
+  include Mongoid::Document
+  include Mongoid::Timestamps
+  include BelongsToWithoutParentValidation
+
   extend Dragonfly::Model
   include ImageWithValidation
 

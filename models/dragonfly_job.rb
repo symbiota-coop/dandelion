@@ -1,4 +1,8 @@
-class DragonflyJob < DandelionModel
+class DragonflyJob
+  include Mongoid::Document
+  include Mongoid::Timestamps
+  include BelongsToWithoutParentValidation
+
   extend Dragonfly::Model
 
   field :signature, type: String

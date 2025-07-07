@@ -1,4 +1,8 @@
-class Organisationship < DandelionModel
+class Organisationship
+  include Mongoid::Document
+  include Mongoid::Timestamps
+  include BelongsToWithoutParentValidation
+
   include Geocoder::Model::Mongoid
   belongs_to_without_parent_validation :organisation, index: true
   belongs_to_without_parent_validation :account, inverse_of: :organisationships, index: true

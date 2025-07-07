@@ -1,4 +1,8 @@
-class Stash < DandelionModel
+class Stash
+  include Mongoid::Document
+  include Mongoid::Timestamps
+  include BelongsToWithoutParentValidation
+
   field :key, type: String
   index({ key: 1 }, { unique: true })
   field :value, type: String

@@ -1,4 +1,8 @@
-class AccountCache < DandelionModel
+class AccountCache
+  include Mongoid::Document
+  include Mongoid::Timestamps
+  include BelongsToWithoutParentValidation
+
   field :recommended_people_cache, type: Array
   field :recommended_events_cache, type: Array
 

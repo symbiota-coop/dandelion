@@ -1,4 +1,8 @@
-class StripeCharge < DandelionModel
+class StripeCharge
+  include Mongoid::Document
+  include Mongoid::Timestamps
+  include BelongsToWithoutParentValidation
+
   belongs_to_without_parent_validation :organisation, index: true
   belongs_to_without_parent_validation :event, optional: true, index: true
   belongs_to_without_parent_validation :order, optional: true, index: true

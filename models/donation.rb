@@ -1,4 +1,8 @@
-class Donation < DandelionModel
+class Donation
+  include Mongoid::Document
+  include Mongoid::Timestamps
+  include BelongsToWithoutParentValidation
+
   include Mongoid::Paranoia
 
   belongs_to_without_parent_validation :account, index: true

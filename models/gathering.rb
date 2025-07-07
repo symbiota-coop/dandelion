@@ -1,4 +1,8 @@
-class Gathering < DandelionModel
+class Gathering
+  include Mongoid::Document
+  include Mongoid::Timestamps
+  include BelongsToWithoutParentValidation
+
   extend Dragonfly::Model
   include GatheringFields
   include GatheringAssociations

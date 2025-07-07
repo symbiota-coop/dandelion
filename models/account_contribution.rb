@@ -1,4 +1,8 @@
-class AccountContribution < DandelionModel
+class AccountContribution
+  include Mongoid::Document
+  include Mongoid::Timestamps
+  include BelongsToWithoutParentValidation
+
   belongs_to_without_parent_validation :account, index: true
   belongs_to_without_parent_validation :event, index: true, optional: true
   belongs_to_without_parent_validation :event_feedback, index: true, optional: true

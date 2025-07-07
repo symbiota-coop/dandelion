@@ -1,4 +1,8 @@
-class Organisation < DandelionModel
+class Organisation
+  include Mongoid::Document
+  include Mongoid::Timestamps
+  include BelongsToWithoutParentValidation
+
   extend Dragonfly::Model
   include OrganisationFields
   include OrganisationAssociations

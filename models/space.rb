@@ -1,4 +1,8 @@
-class Space < DandelionModel
+class Space
+  include Mongoid::Document
+  include Mongoid::Timestamps
+  include BelongsToWithoutParentValidation
+
   extend Dragonfly::Model
   include ImageWithValidation
 

@@ -1,4 +1,8 @@
-class Photo < DandelionModel
+class Photo
+  include Mongoid::Document
+  include Mongoid::Timestamps
+  include BelongsToWithoutParentValidation
+
   extend Dragonfly::Model
   include ImageWithValidation
 

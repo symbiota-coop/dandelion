@@ -1,4 +1,8 @@
-class SignIn < DandelionModel
+class SignIn
+  include Mongoid::Document
+  include Mongoid::Timestamps
+  include BelongsToWithoutParentValidation
+
   belongs_to_without_parent_validation :account, index: true
 
   field :env, type: String

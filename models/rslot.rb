@@ -1,4 +1,8 @@
-class Rslot < DandelionModel
+class Rslot
+  include Mongoid::Document
+  include Mongoid::Timestamps
+  include BelongsToWithoutParentValidation
+
   belongs_to_without_parent_validation :rota, index: true
   belongs_to_without_parent_validation :gathering, index: true
 

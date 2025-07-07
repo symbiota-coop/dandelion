@@ -1,4 +1,8 @@
-class ActivityApplication < DandelionModel
+class ActivityApplication
+  include Mongoid::Document
+  include Mongoid::Timestamps
+  include BelongsToWithoutParentValidation
+
   belongs_to_without_parent_validation :activity, index: true
   belongs_to_without_parent_validation :account, class_name: 'Account', inverse_of: :activity_applications, index: true
   belongs_to_without_parent_validation :statused_by, class_name: 'Account', inverse_of: :statused_activity_applications, index: true, optional: true

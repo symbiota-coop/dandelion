@@ -1,4 +1,8 @@
-class OrganisationEdge < DandelionModel
+class OrganisationEdge
+  include Mongoid::Document
+  include Mongoid::Timestamps
+  include BelongsToWithoutParentValidation
+
   belongs_to_without_parent_validation :source, class_name: 'Organisation', inverse_of: :organisation_edges_as_source, index: true
   belongs_to_without_parent_validation :sink, class_name: 'Organisation', inverse_of: :organisation_edges_as_sink, index: true
 

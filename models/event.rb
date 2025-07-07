@@ -1,4 +1,8 @@
-class Event < DandelionModel
+class Event
+  include Mongoid::Document
+  include Mongoid::Timestamps
+  include BelongsToWithoutParentValidation
+
   extend Dragonfly::Model
   include Mongoid::Paranoia
   include EventFields

@@ -1,4 +1,8 @@
-class Attendance < DandelionModel
+class Attendance
+  include Mongoid::Document
+  include Mongoid::Timestamps
+  include BelongsToWithoutParentValidation
+
   extend Dragonfly::Model
 
   belongs_to_without_parent_validation :tactivity, index: true

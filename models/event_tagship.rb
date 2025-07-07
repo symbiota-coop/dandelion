@@ -1,4 +1,8 @@
-class EventTagship < DandelionModel
+class EventTagship
+  include Mongoid::Document
+  include Mongoid::Timestamps
+  include BelongsToWithoutParentValidation
+
   belongs_to_without_parent_validation :event, index: true
   belongs_to_without_parent_validation :event_tag, index: true
 

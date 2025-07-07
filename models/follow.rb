@@ -1,4 +1,8 @@
-class Follow < DandelionModel
+class Follow
+  include Mongoid::Document
+  include Mongoid::Timestamps
+  include BelongsToWithoutParentValidation
+
   belongs_to_without_parent_validation :follower, class_name: 'Account', inverse_of: :follows_as_follower, index: true
   belongs_to_without_parent_validation :followee, class_name: 'Account', inverse_of: :follows_as_followee, index: true
 

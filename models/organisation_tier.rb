@@ -1,4 +1,8 @@
-class OrganisationTier < DandelionModel
+class OrganisationTier
+  include Mongoid::Document
+  include Mongoid::Timestamps
+  include BelongsToWithoutParentValidation
+
   belongs_to_without_parent_validation :organisation, index: true
 
   field :name, type: String

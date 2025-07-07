@@ -1,4 +1,8 @@
-class Account < DandelionModel
+class Account
+  include Mongoid::Document
+  include Mongoid::Timestamps
+  include BelongsToWithoutParentValidation
+
   extend Dragonfly::Model
   include AccountFields
   include AccountAssociations

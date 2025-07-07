@@ -1,4 +1,8 @@
-class Upload < DandelionModel
+class Upload
+  include Mongoid::Document
+  include Mongoid::Timestamps
+  include BelongsToWithoutParentValidation
+
   extend Dragonfly::Model
 
   belongs_to_without_parent_validation :account, index: true

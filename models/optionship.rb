@@ -1,4 +1,8 @@
-class Optionship < DandelionModel
+class Optionship
+  include Mongoid::Document
+  include Mongoid::Timestamps
+  include BelongsToWithoutParentValidation
+
   belongs_to_without_parent_validation :account, index: true
   belongs_to_without_parent_validation :option, index: true
   belongs_to_without_parent_validation :gathering, index: true

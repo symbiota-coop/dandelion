@@ -1,4 +1,8 @@
-class Membership < DandelionModel
+class Membership
+  include Mongoid::Document
+  include Mongoid::Timestamps
+  include BelongsToWithoutParentValidation
+
   belongs_to_without_parent_validation :gathering, index: true
   belongs_to_without_parent_validation :account, class_name: 'Account', inverse_of: :memberships, index: true
   belongs_to_without_parent_validation :added_by, class_name: 'Account', inverse_of: :memberships_added, index: true, optional: true

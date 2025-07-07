@@ -1,4 +1,8 @@
-class CommentReaction < DandelionModel
+class CommentReaction
+  include Mongoid::Document
+  include Mongoid::Timestamps
+  include BelongsToWithoutParentValidation
+
   belongs_to_without_parent_validation :account, index: true, inverse_of: :comment_reactions_as_creator
   belongs_to_without_parent_validation :comment, index: true
   belongs_to_without_parent_validation :post, index: true

@@ -1,4 +1,8 @@
-class Carouselship < DandelionModel
+class Carouselship
+  include Mongoid::Document
+  include Mongoid::Timestamps
+  include BelongsToWithoutParentValidation
+
   belongs_to_without_parent_validation :carousel, index: true
   belongs_to_without_parent_validation :event_tag, index: true
 

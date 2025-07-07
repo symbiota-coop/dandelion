@@ -1,4 +1,8 @@
-class EventTag < DandelionModel
+class EventTag
+  include Mongoid::Document
+  include Mongoid::Timestamps
+  include BelongsToWithoutParentValidation
+
   field :name, type: String
 
   def self.admin_fields

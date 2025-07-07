@@ -1,4 +1,8 @@
-class Order < DandelionModel
+class Order
+  include Mongoid::Document
+  include Mongoid::Timestamps
+  include BelongsToWithoutParentValidation
+
   include Mongoid::Paranoia
   %w[OrderNotFound Restored PaymentMethodNotFound NoTickets].each do |error_class|
     const_set(error_class, Class.new(StandardError))

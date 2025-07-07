@@ -1,4 +1,8 @@
-class Ticket < DandelionModel
+class Ticket
+  include Mongoid::Document
+  include Mongoid::Timestamps
+  include BelongsToWithoutParentValidation
+
   include Mongoid::Paranoia
   include TicketNotifications
 
