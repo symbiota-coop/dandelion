@@ -1,11 +1,8 @@
-class Verdict
-  include Mongoid::Document
-  include Mongoid::Timestamps
-
-  belongs_to :account, index: true
-  belongs_to :gathering, index: true
-  belongs_to :membership, index: true
-  belongs_to :mapplication, index: true
+class Verdict < DandelionModel
+  belongs_to_without_parent_validation :account, index: true
+  belongs_to_without_parent_validation :gathering, index: true
+  belongs_to_without_parent_validation :membership, index: true
+  belongs_to_without_parent_validation :mapplication, index: true
 
   field :type, type: String
   field :reason, type: String

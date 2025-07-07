@@ -1,11 +1,8 @@
-class AccountCache
-  include Mongoid::Document
-  include Mongoid::Timestamps
-
+class AccountCache < DandelionModel
   field :recommended_people_cache, type: Array
   field :recommended_events_cache, type: Array
 
-  belongs_to :account, index: true
+  belongs_to_without_parent_validation :account, index: true
 
   def self.admin_fields
     {

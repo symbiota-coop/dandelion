@@ -1,9 +1,6 @@
-class ReadReceipt
-  include Mongoid::Document
-  include Mongoid::Timestamps
-
-  belongs_to :comment, index: true
-  belongs_to :account, index: true
+class ReadReceipt < DandelionModel
+  belongs_to_without_parent_validation :comment, index: true
+  belongs_to_without_parent_validation :account, index: true
 
   def self.admin_fields
     {

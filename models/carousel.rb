@@ -1,8 +1,5 @@
-class Carousel
-  include Mongoid::Document
-  include Mongoid::Timestamps
-
-  belongs_to :organisation, index: true
+class Carousel < DandelionModel
+  belongs_to_without_parent_validation :organisation, index: true
 
   field :name, type: String
   field :weeks, type: Integer

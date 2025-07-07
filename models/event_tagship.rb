@@ -1,9 +1,6 @@
-class EventTagship
-  include Mongoid::Document
-  include Mongoid::Timestamps
-
-  belongs_to :event, index: true
-  belongs_to :event_tag, index: true
+class EventTagship < DandelionModel
+  belongs_to_without_parent_validation :event, index: true
+  belongs_to_without_parent_validation :event_tag, index: true
 
   def self.admin_fields
     {

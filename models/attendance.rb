@@ -1,12 +1,10 @@
-class Attendance
-  include Mongoid::Document
-  include Mongoid::Timestamps
+class Attendance < DandelionModel
   extend Dragonfly::Model
 
-  belongs_to :tactivity, index: true
-  belongs_to :account, index: true
-  belongs_to :gathering, index: true
-  belongs_to :membership, index: true
+  belongs_to_without_parent_validation :tactivity, index: true
+  belongs_to_without_parent_validation :account, index: true
+  belongs_to_without_parent_validation :gathering, index: true
+  belongs_to_without_parent_validation :membership, index: true
 
   def self.admin_fields
     {

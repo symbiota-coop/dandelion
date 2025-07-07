@@ -1,9 +1,7 @@
-class Attachment
-  include Mongoid::Document
-  include Mongoid::Timestamps
+class Attachment < DandelionModel
   extend Dragonfly::Model
 
-  belongs_to :organisation, index: true
+  belongs_to_without_parent_validation :organisation, index: true
 
   field :file_uid, type: String
   field :file_name, type: String

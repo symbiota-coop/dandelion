@@ -1,8 +1,5 @@
-class Order
-  include Mongoid::Document
-  include Mongoid::Timestamps
+class Order < DandelionModel
   include Mongoid::Paranoia
-
   %w[OrderNotFound Restored PaymentMethodNotFound NoTickets].each do |error_class|
     const_set(error_class, Class.new(StandardError))
   end
@@ -11,11 +8,11 @@ class Order
   include OrderNotifications
   include OrderAccounting
 
-  belongs_to :event, index: true, optional: true
-  belongs_to :account, class_name: 'Account', inverse_of: :orders, index: true, optional: true
-  belongs_to :revenue_sharer, class_name: 'Account', inverse_of: :orders_as_revenue_sharer, index: true, optional: true
-  belongs_to :affiliate, polymorphic: true, index: true, optional: true
-  belongs_to :discount_code, optional: true # removed index
+  belongs_to_without_parent_validation :event, index: true, optional: true
+  belongs_to_without_parent_validation :account, class_name: 'Account', inverse_of: :orders, index: true, optional: true
+  belongs_to_without_parent_validation :revenue_sharer, class_name: 'Account', inverse_of: :orders_as_revenue_sharer, index: true, optional: true
+  belongs_to_without_parent_validation :affiliate, polymorphic: true, index: true, optional: true
+  belongs_to_without_parent_validation :discount_code, optional: true # removed index
 
   has_many :stripe_charges
 

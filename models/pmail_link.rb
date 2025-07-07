@@ -1,8 +1,5 @@
-class PmailLink
-  include Mongoid::Document
-  include Mongoid::Timestamps
-
-  belongs_to :pmail, index: true
+class PmailLink < DandelionModel
+  belongs_to_without_parent_validation :pmail, index: true
 
   field :url, type: String
   field :clicks, type: Integer

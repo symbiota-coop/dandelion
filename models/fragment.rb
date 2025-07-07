@@ -1,7 +1,4 @@
-class Fragment
-  include Mongoid::Document
-  include Mongoid::Timestamps
-
+class Fragment < DandelionModel
   field :key, type: String
   index({ key: 1 }, { unique: true })
   field :value, type: String

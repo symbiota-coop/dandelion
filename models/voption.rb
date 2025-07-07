@@ -1,9 +1,6 @@
-class Voption
-  include Mongoid::Document
-  include Mongoid::Timestamps
-
-  belongs_to :comment, index: true
-  belongs_to :account, index: true
+class Voption < DandelionModel
+  belongs_to_without_parent_validation :comment, index: true
+  belongs_to_without_parent_validation :account, index: true
 
   field :text, type: String
 

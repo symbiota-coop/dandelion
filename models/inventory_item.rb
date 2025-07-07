@@ -1,12 +1,9 @@
-class InventoryItem
-  include Mongoid::Document
-  include Mongoid::Timestamps
-
-  belongs_to :gathering, index: true
-  belongs_to :account, index: true, optional: true, class_name: 'Account', inverse_of: :inventory_items_listed
-  belongs_to :responsible, index: true, optional: true, class_name: 'Account', inverse_of: :inventory_items_provided
-  belongs_to :membership, index: true, optional: true
-  belongs_to :team, index: true
+class InventoryItem < DandelionModel
+  belongs_to_without_parent_validation :gathering, index: true
+  belongs_to_without_parent_validation :account, index: true, optional: true, class_name: 'Account', inverse_of: :inventory_items_listed
+  belongs_to_without_parent_validation :responsible, index: true, optional: true, class_name: 'Account', inverse_of: :inventory_items_provided
+  belongs_to_without_parent_validation :membership, index: true, optional: true
+  belongs_to_without_parent_validation :team, index: true
 
   field :name, type: String
   field :description, type: String

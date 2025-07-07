@@ -1,8 +1,5 @@
-class Draft
-  include Mongoid::Document
-  include Mongoid::Timestamps
-
-  belongs_to :account, index: true
+class Draft < DandelionModel
+  belongs_to_without_parent_validation :account, index: true
 
   field :model, type: String
   field :name, type: String

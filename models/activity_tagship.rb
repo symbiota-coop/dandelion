@@ -1,9 +1,6 @@
-class ActivityTagship
-  include Mongoid::Document
-  include Mongoid::Timestamps
-
-  belongs_to :activity, index: true
-  belongs_to :activity_tag, index: true
+class ActivityTagship < DandelionModel
+  belongs_to_without_parent_validation :activity, index: true
+  belongs_to_without_parent_validation :activity_tag, index: true
 
   def self.admin_fields
     {

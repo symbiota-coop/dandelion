@@ -1,10 +1,7 @@
-class Mapplication
-  include Mongoid::Document
-  include Mongoid::Timestamps
-
-  belongs_to :gathering, index: true
-  belongs_to :account, class_name: 'Account', inverse_of: :mapplications, index: true
-  belongs_to :processed_by, class_name: 'Account', inverse_of: :mapplications_processed, index: true, optional: true
+class Mapplication < DandelionModel
+  belongs_to_without_parent_validation :gathering, index: true
+  belongs_to_without_parent_validation :account, class_name: 'Account', inverse_of: :mapplications, index: true
+  belongs_to_without_parent_validation :processed_by, class_name: 'Account', inverse_of: :mapplications_processed, index: true, optional: true
 
   field :status, type: String
   field :answers, type: Array

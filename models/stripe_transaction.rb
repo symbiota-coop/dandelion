@@ -1,9 +1,6 @@
-class StripeTransaction
-  include Mongoid::Document
-  include Mongoid::Timestamps
-
-  belongs_to :organisation, index: true
-  belongs_to :stripe_charge, optional: true, index: true
+class StripeTransaction < DandelionModel
+  belongs_to_without_parent_validation :organisation, index: true
+  belongs_to_without_parent_validation :stripe_charge, optional: true, index: true
 
   field :created_utc, type: Time
   field :available_on_utc, type: Time

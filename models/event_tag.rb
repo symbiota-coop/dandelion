@@ -1,7 +1,4 @@
-class EventTag
-  include Mongoid::Document
-  include Mongoid::Timestamps
-
+class EventTag < DandelionModel
   field :name, type: String
 
   def self.admin_fields

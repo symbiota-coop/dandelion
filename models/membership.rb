@@ -1,12 +1,9 @@
-class Membership
-  include Mongoid::Document
-  include Mongoid::Timestamps
-
-  belongs_to :gathering, index: true
-  belongs_to :account, class_name: 'Account', inverse_of: :memberships, index: true
-  belongs_to :added_by, class_name: 'Account', inverse_of: :memberships_added, index: true, optional: true
-  belongs_to :admin_status_changed_by, class_name: 'Account', inverse_of: :memberships_admin_status_changed, index: true, optional: true
-  belongs_to :mapplication, index: true, optional: true
+class Membership < DandelionModel
+  belongs_to_without_parent_validation :gathering, index: true
+  belongs_to_without_parent_validation :account, class_name: 'Account', inverse_of: :memberships, index: true
+  belongs_to_without_parent_validation :added_by, class_name: 'Account', inverse_of: :memberships_added, index: true, optional: true
+  belongs_to_without_parent_validation :admin_status_changed_by, class_name: 'Account', inverse_of: :memberships_admin_status_changed, index: true, optional: true
+  belongs_to_without_parent_validation :mapplication, index: true, optional: true
 
   field :paid, type: Integer
   field :desired_threshold, type: Integer

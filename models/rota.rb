@@ -1,9 +1,6 @@
-class Rota
-  include Mongoid::Document
-  include Mongoid::Timestamps
-
-  belongs_to :gathering, index: true
-  belongs_to :account, index: true
+class Rota < DandelionModel
+  belongs_to_without_parent_validation :gathering, index: true
+  belongs_to_without_parent_validation :account, index: true
 
   field :name, type: String
   field :description, type: String

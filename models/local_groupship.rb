@@ -1,9 +1,6 @@
-class LocalGroupship
-  include Mongoid::Document
-  include Mongoid::Timestamps
-
-  belongs_to :account, index: true
-  belongs_to :local_group, index: true
+class LocalGroupship < DandelionModel
+  belongs_to_without_parent_validation :account, index: true
+  belongs_to_without_parent_validation :local_group, index: true
 
   %w[admin unsubscribed hide_membership receive_feedback].each do |b|
     field b.to_sym, type: Boolean

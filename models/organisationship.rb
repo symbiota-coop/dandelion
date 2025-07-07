@@ -1,11 +1,8 @@
-class Organisationship
-  include Mongoid::Document
-  include Mongoid::Timestamps
+class Organisationship < DandelionModel
   include Geocoder::Model::Mongoid
-
-  belongs_to :organisation, index: true
-  belongs_to :account, inverse_of: :organisationships, index: true
-  belongs_to :referrer, class_name: 'Account', inverse_of: :organisationships_as_referrer, index: true, optional: true
+  belongs_to_without_parent_validation :organisation, index: true
+  belongs_to_without_parent_validation :account, inverse_of: :organisationships, index: true
+  belongs_to_without_parent_validation :referrer, class_name: 'Account', inverse_of: :organisationships_as_referrer, index: true, optional: true
 
   field :stripe_connect_json, type: String
   field :stripe_account_json, type: String

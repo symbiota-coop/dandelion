@@ -1,9 +1,6 @@
-class Notification
-  include Mongoid::Document
-  include Mongoid::Timestamps
-
-  belongs_to :circle, polymorphic: true, index: true
-  belongs_to :notifiable, polymorphic: true, index: true
+class Notification < DandelionModel
+  belongs_to_without_parent_validation :circle, polymorphic: true, index: true
+  belongs_to_without_parent_validation :notifiable, polymorphic: true, index: true
 
   field :type, type: String
 

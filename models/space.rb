@@ -1,12 +1,9 @@
-class Space
-  include Mongoid::Document
-  include Mongoid::Timestamps
+class Space < DandelionModel
   extend Dragonfly::Model
-
   include ImageWithValidation
 
-  belongs_to :timetable, index: true
-  belongs_to :gathering, index: true
+  belongs_to_without_parent_validation :timetable, index: true
+  belongs_to_without_parent_validation :gathering, index: true
 
   field :name, type: String
   field :o, type: Integer

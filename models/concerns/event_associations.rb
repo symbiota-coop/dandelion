@@ -2,16 +2,16 @@ module EventAssociations
   extend ActiveSupport::Concern
 
   included do
-    belongs_to :account, inverse_of: :events, index: true
-    belongs_to :organisation, index: true
-    belongs_to :activity, class_name: 'Activity', inverse_of: :events, optional: true, index: true
-    belongs_to :feedback_activity, class_name: 'Activity', inverse_of: :events_as_feedback_activity, optional: true, index: true
-    belongs_to :local_group, optional: true, index: true
-    belongs_to :coordinator, class_name: 'Account', inverse_of: :events_coordinating, index: true, optional: true
-    belongs_to :revenue_sharer, class_name: 'Account', inverse_of: :events_revenue_sharing, index: true, optional: true
-    belongs_to :organiser, class_name: 'Account', inverse_of: :events_organising, index: true, optional: true
-    belongs_to :last_saved_by, class_name: 'Account', inverse_of: :events_last_saver, index: true, optional: true
-    belongs_to :gathering, optional: true, index: true
+    belongs_to_without_parent_validation :account, inverse_of: :events, index: true
+    belongs_to_without_parent_validation :organisation, index: true
+    belongs_to_without_parent_validation :activity, class_name: 'Activity', inverse_of: :events, optional: true, index: true
+    belongs_to_without_parent_validation :feedback_activity, class_name: 'Activity', inverse_of: :events_as_feedback_activity, optional: true, index: true
+    belongs_to_without_parent_validation :local_group, optional: true, index: true
+    belongs_to_without_parent_validation :coordinator, class_name: 'Account', inverse_of: :events_coordinating, index: true, optional: true
+    belongs_to_without_parent_validation :revenue_sharer, class_name: 'Account', inverse_of: :events_revenue_sharing, index: true, optional: true
+    belongs_to_without_parent_validation :organiser, class_name: 'Account', inverse_of: :events_organising, index: true, optional: true
+    belongs_to_without_parent_validation :last_saved_by, class_name: 'Account', inverse_of: :events_last_saver, index: true, optional: true
+    belongs_to_without_parent_validation :gathering, optional: true, index: true
 
     has_many :stripe_charges
 

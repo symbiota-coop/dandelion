@@ -1,13 +1,10 @@
-class Shift
-  include Mongoid::Document
-  include Mongoid::Timestamps
-
-  belongs_to :role, index: true
-  belongs_to :rslot, index: true
-  belongs_to :rota, index: true
-  belongs_to :gathering, index: true
-  belongs_to :account, index: true, optional: true
-  belongs_to :membership, index: true, optional: true
+class Shift < DandelionModel
+  belongs_to_without_parent_validation :role, index: true
+  belongs_to_without_parent_validation :rslot, index: true
+  belongs_to_without_parent_validation :rota, index: true
+  belongs_to_without_parent_validation :gathering, index: true
+  belongs_to_without_parent_validation :account, index: true, optional: true
+  belongs_to_without_parent_validation :membership, index: true, optional: true
 
   def self.admin_fields
     {

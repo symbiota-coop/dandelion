@@ -1,18 +1,15 @@
-class Tactivity
-  include Mongoid::Document
-  include Mongoid::Timestamps
+class Tactivity < DandelionModel
   extend Dragonfly::Model
-
   include ImageWithValidation
 
-  belongs_to :timetable, index: true
-  belongs_to :account, class_name: 'Account', inverse_of: :tactivities, index: true
-  belongs_to :gathering, index: true
-  belongs_to :membership, index: true
+  belongs_to_without_parent_validation :timetable, index: true
+  belongs_to_without_parent_validation :account, class_name: 'Account', inverse_of: :tactivities, index: true
+  belongs_to_without_parent_validation :gathering, index: true
+  belongs_to_without_parent_validation :membership, index: true
 
-  belongs_to :space, index: true, optional: true
-  belongs_to :tslot, index: true, optional: true
-  belongs_to :scheduled_by, class_name: 'Account', inverse_of: :tactivities_scheduled, index: true, optional: true
+  belongs_to_without_parent_validation :space, index: true, optional: true
+  belongs_to_without_parent_validation :tslot, index: true, optional: true
+  belongs_to_without_parent_validation :scheduled_by, class_name: 'Account', inverse_of: :tactivities_scheduled, index: true, optional: true
 
   field :name, type: String
   field :description, type: String

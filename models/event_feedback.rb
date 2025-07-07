@@ -1,10 +1,8 @@
-class EventFeedback
-  include Mongoid::Document
-  include Mongoid::Timestamps
+class EventFeedback < DandelionModel
   include Mongoid::Paranoia
 
-  belongs_to :event, index: true, optional: true
-  belongs_to :account, index: true
+  belongs_to_without_parent_validation :event, index: true, optional: true
+  belongs_to_without_parent_validation :account, index: true
 
   has_many :account_contributions, dependent: :nullify
 

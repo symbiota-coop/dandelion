@@ -1,9 +1,6 @@
-class Carouselship
-  include Mongoid::Document
-  include Mongoid::Timestamps
-
-  belongs_to :carousel, index: true
-  belongs_to :event_tag, index: true
+class Carouselship < DandelionModel
+  belongs_to_without_parent_validation :carousel, index: true
+  belongs_to_without_parent_validation :event_tag, index: true
 
   def self.admin_fields
     {

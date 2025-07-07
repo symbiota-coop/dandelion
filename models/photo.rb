@@ -1,12 +1,9 @@
-class Photo
-  include Mongoid::Document
-  include Mongoid::Timestamps
+class Photo < DandelionModel
   extend Dragonfly::Model
-
   include ImageWithValidation
 
-  belongs_to :photoable, polymorphic: true, index: true
-  belongs_to :account, index: true
+  belongs_to_without_parent_validation :photoable, polymorphic: true, index: true
+  belongs_to_without_parent_validation :account, index: true
 
   field :image_uid, type: String
 

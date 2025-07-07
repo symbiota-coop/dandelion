@@ -1,15 +1,12 @@
-class Activity
-  include Mongoid::Document
-  include Mongoid::Timestamps
+class Activity < DandelionModel
   extend Dragonfly::Model
-
   include ActivityFeedbackSummaries
   include ImportFromCsv
   include SendFollowersCsv
   include ImageWithValidation
 
-  belongs_to :organisation, index: true
-  belongs_to :account, index: true, optional: true
+  belongs_to_without_parent_validation :organisation, index: true
+  belongs_to_without_parent_validation :account, index: true, optional: true
 
   field :name, type: String
   field :email, type: String

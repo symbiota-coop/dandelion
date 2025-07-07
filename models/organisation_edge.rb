@@ -1,9 +1,6 @@
-class OrganisationEdge
-  include Mongoid::Document
-  include Mongoid::Timestamps
-
-  belongs_to :source, class_name: 'Organisation', inverse_of: :organisation_edges_as_source, index: true
-  belongs_to :sink, class_name: 'Organisation', inverse_of: :organisation_edges_as_sink, index: true
+class OrganisationEdge < DandelionModel
+  belongs_to_without_parent_validation :source, class_name: 'Organisation', inverse_of: :organisation_edges_as_source, index: true
+  belongs_to_without_parent_validation :sink, class_name: 'Organisation', inverse_of: :organisation_edges_as_sink, index: true
 
   field :mutual_followers, type: Integer
 

@@ -1,7 +1,4 @@
-class DocPage
-  include Mongoid::Document
-  include Mongoid::Timestamps
-
+class DocPage < DandelionModel
   field :name, type: String
   field :slug, type: String
   field :body, type: String

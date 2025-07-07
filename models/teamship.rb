@@ -1,11 +1,8 @@
-class Teamship
-  include Mongoid::Document
-  include Mongoid::Timestamps
-
-  belongs_to :account, index: true
-  belongs_to :team, index: true
-  belongs_to :gathering, index: true
-  belongs_to :membership, index: true
+class Teamship < DandelionModel
+  belongs_to_without_parent_validation :account, index: true
+  belongs_to_without_parent_validation :team, index: true
+  belongs_to_without_parent_validation :gathering, index: true
+  belongs_to_without_parent_validation :membership, index: true
 
   field :unsubscribed, type: Boolean
 

@@ -1,10 +1,7 @@
-class Zoomship
-  include Mongoid::Document
-  include Mongoid::Timestamps
-
-  belongs_to :event, index: true
-  belongs_to :local_group, index: true
-  belongs_to :account, index: true, optional: true
+class Zoomship < DandelionModel
+  belongs_to_without_parent_validation :event, index: true
+  belongs_to_without_parent_validation :local_group, index: true
+  belongs_to_without_parent_validation :account, index: true, optional: true
 
   field :link, type: String
   field :tickets_count, type: Integer

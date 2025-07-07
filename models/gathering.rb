@@ -1,8 +1,5 @@
-class Gathering
-  include Mongoid::Document
-  include Mongoid::Timestamps
+class Gathering < DandelionModel
   extend Dragonfly::Model
-
   include GatheringFields
   include GatheringAssociations
   include Geocoded

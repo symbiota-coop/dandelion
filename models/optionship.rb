@@ -1,11 +1,8 @@
-class Optionship
-  include Mongoid::Document
-  include Mongoid::Timestamps
-
-  belongs_to :account, index: true
-  belongs_to :option, index: true
-  belongs_to :gathering, index: true
-  belongs_to :membership, index: true
+class Optionship < DandelionModel
+  belongs_to_without_parent_validation :account, index: true
+  belongs_to_without_parent_validation :option, index: true
+  belongs_to_without_parent_validation :gathering, index: true
+  belongs_to_without_parent_validation :membership, index: true
 
   def self.admin_fields
     {

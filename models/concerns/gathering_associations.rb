@@ -2,7 +2,7 @@ module GatheringAssociations
   extend ActiveSupport::Concern
 
   included do
-    belongs_to :account, index: true
+    belongs_to_without_parent_validation :account, index: true
 
     has_many :notifications_as_notifiable, as: :notifiable, dependent: :destroy, class_name: 'Notification', inverse_of: :notifiable
     has_many :notifications_as_circle, as: :circle, dependent: :destroy, class_name: 'Notification', inverse_of: :circle

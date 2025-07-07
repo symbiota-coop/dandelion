@@ -1,11 +1,8 @@
-class CommentReaction
-  include Mongoid::Document
-  include Mongoid::Timestamps
-
-  belongs_to :account, index: true, inverse_of: :comment_reactions_as_creator
-  belongs_to :comment, index: true
-  belongs_to :post, index: true
-  belongs_to :commentable, polymorphic: true, index: true
+class CommentReaction < DandelionModel
+  belongs_to_without_parent_validation :account, index: true, inverse_of: :comment_reactions_as_creator
+  belongs_to_without_parent_validation :comment, index: true
+  belongs_to_without_parent_validation :post, index: true
+  belongs_to_without_parent_validation :commentable, polymorphic: true, index: true
 
   field :body, type: String
 

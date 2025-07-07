@@ -1,11 +1,6 @@
-class Event
-  include Mongoid::Document
-  include Mongoid::Timestamps
-  include Mongoid::Paranoia
+class Event < DandelionModel
   extend Dragonfly::Model
-
-  dragonfly_accessor :video
-
+  include Mongoid::Paranoia
   include EventFields
   include EventAssociations
   include EventCallbacks
@@ -18,6 +13,8 @@ class Event
   include EventAccessControl
   include Geocoded
   include ImageWithValidation
+
+  dragonfly_accessor :video
 
   def self.fs(slug)
     find_by(slug: slug)

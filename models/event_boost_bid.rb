@@ -1,9 +1,7 @@
-class EventBoostBid
-  include Mongoid::Document
-  include Mongoid::Timestamps
+class EventBoostBid < DandelionModel
   include Mongoid::Paranoia
 
-  belongs_to :event, index: true
+  belongs_to_without_parent_validation :event, index: true
 
   field :amount, type: Float
   field :currency, type: String

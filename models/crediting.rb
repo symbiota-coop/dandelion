@@ -1,10 +1,8 @@
-class Crediting
-  include Mongoid::Document
-  include Mongoid::Timestamps
+class Crediting < DandelionModel
   extend Dragonfly::Model
 
-  belongs_to :account, index: true
-  belongs_to :organisationship, index: true
+  belongs_to_without_parent_validation :account, index: true
+  belongs_to_without_parent_validation :organisationship, index: true
 
   field :amount, type: Integer
   field :currency, type: String

@@ -1,7 +1,4 @@
-class ActivityTag
-  include Mongoid::Document
-  include Mongoid::Timestamps
-
+class ActivityTag < DandelionModel
   field :name, type: String
 
   def self.admin_fields

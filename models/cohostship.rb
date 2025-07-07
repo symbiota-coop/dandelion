@@ -1,12 +1,9 @@
-class Cohostship
-  include Mongoid::Document
-  include Mongoid::Timestamps
+class Cohostship < DandelionModel
   extend Dragonfly::Model
-
   include ImageWithValidation
 
-  belongs_to :event, index: true
-  belongs_to :organisation, index: true
+  belongs_to_without_parent_validation :event, index: true
+  belongs_to_without_parent_validation :organisation, index: true
 
   field :image_uid, type: String
   field :video_uid, type: String

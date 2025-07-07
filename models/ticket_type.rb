@@ -1,9 +1,6 @@
-class TicketType
-  include Mongoid::Document
-  include Mongoid::Timestamps
-
-  belongs_to :event, index: true
-  belongs_to :ticket_group, optional: true, index: true
+class TicketType < DandelionModel
+  belongs_to_without_parent_validation :event, index: true
+  belongs_to_without_parent_validation :ticket_group, optional: true, index: true
 
   field :name, type: String
   field :description, type: String

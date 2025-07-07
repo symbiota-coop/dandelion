@@ -1,9 +1,6 @@
-class Rslot
-  include Mongoid::Document
-  include Mongoid::Timestamps
-
-  belongs_to :rota, index: true
-  belongs_to :gathering, index: true
+class Rslot < DandelionModel
+  belongs_to_without_parent_validation :rota, index: true
+  belongs_to_without_parent_validation :gathering, index: true
 
   field :name, type: String
   field :o, type: Integer

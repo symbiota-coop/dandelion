@@ -1,10 +1,7 @@
-class Subscription
-  include Mongoid::Document
-  include Mongoid::Timestamps
-
-  belongs_to :account, index: true, inverse_of: :subscriptions_as_creator
-  belongs_to :post, index: true
-  belongs_to :commentable, polymorphic: true, index: true
+class Subscription < DandelionModel
+  belongs_to_without_parent_validation :account, index: true, inverse_of: :subscriptions_as_creator
+  belongs_to_without_parent_validation :post, index: true
+  belongs_to_without_parent_validation :commentable, polymorphic: true, index: true
 
   def self.admin_fields
     {

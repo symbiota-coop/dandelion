@@ -1,9 +1,6 @@
-class EventStar
-  include Mongoid::Document
-  include Mongoid::Timestamps
-
-  belongs_to :event, index: true
-  belongs_to :account, index: true
+class EventStar < DandelionModel
+  belongs_to_without_parent_validation :event, index: true
+  belongs_to_without_parent_validation :account, index: true
 
   validates_uniqueness_of :event, scope: :account
 

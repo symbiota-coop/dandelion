@@ -1,9 +1,6 @@
-class Follow
-  include Mongoid::Document
-  include Mongoid::Timestamps
-
-  belongs_to :follower, class_name: 'Account', inverse_of: :follows_as_follower, index: true
-  belongs_to :followee, class_name: 'Account', inverse_of: :follows_as_followee, index: true
+class Follow < DandelionModel
+  belongs_to_without_parent_validation :follower, class_name: 'Account', inverse_of: :follows_as_follower, index: true
+  belongs_to_without_parent_validation :followee, class_name: 'Account', inverse_of: :follows_as_followee, index: true
 
   %w[unsubscribed starred].each do |b|
     field b.to_sym, type: Boolean

@@ -1,10 +1,7 @@
-class AccountContribution
-  include Mongoid::Document
-  include Mongoid::Timestamps
-
-  belongs_to :account, index: true
-  belongs_to :event, index: true, optional: true
-  belongs_to :event_feedback, index: true, optional: true
+class AccountContribution < DandelionModel
+  belongs_to_without_parent_validation :account, index: true
+  belongs_to_without_parent_validation :event, index: true, optional: true
+  belongs_to_without_parent_validation :event_feedback, index: true, optional: true
 
   field :amount, type: Float
   field :currency, type: String

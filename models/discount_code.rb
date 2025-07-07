@@ -1,9 +1,6 @@
-class DiscountCode
-  include Mongoid::Document
-  include Mongoid::Timestamps
-
-  belongs_to :codeable, polymorphic: true, index: true
-  belongs_to :account, optional: true, index: true
+class DiscountCode < DandelionModel
+  belongs_to_without_parent_validation :codeable, polymorphic: true, index: true
+  belongs_to_without_parent_validation :account, optional: true, index: true
 
   field :code, type: String
   field :description, type: String

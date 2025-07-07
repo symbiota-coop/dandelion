@@ -1,11 +1,9 @@
-class Comment
-  include Mongoid::Document
-  include Mongoid::Timestamps
+class Comment < DandelionModel
   extend Dragonfly::Model
 
-  belongs_to :account, index: true, inverse_of: :comments_as_creator
-  belongs_to :post, index: true
-  belongs_to :commentable, polymorphic: true, index: true
+  belongs_to_without_parent_validation :account, index: true, inverse_of: :comments_as_creator
+  belongs_to_without_parent_validation :post, index: true
+  belongs_to_without_parent_validation :commentable, polymorphic: true, index: true
 
   field :body, type: String
   field :file_uid, type: String

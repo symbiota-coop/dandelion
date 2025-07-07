@@ -1,9 +1,6 @@
-class Waitship
-  include Mongoid::Document
-  include Mongoid::Timestamps
-
-  belongs_to :account, index: true
-  belongs_to :event, index: true
+class Waitship < DandelionModel
+  belongs_to_without_parent_validation :account, index: true
+  belongs_to_without_parent_validation :event, index: true
 
   def self.admin_fields
     {

@@ -1,15 +1,11 @@
-class Pmail
-  include Mongoid::Document
-  include Mongoid::Timestamps
-
+class Pmail < DandelionModel
   include PmailMailgun
-
-  belongs_to :organisation, index: true
-  belongs_to :account, index: true
-  belongs_to :mailable, polymorphic: true, index: true, optional: true
-  belongs_to :event, index: true, optional: true, inverse_of: :pmails_as_exclusion # Exclude people attending an event
-  belongs_to :activity, index: true, optional: true, inverse_of: :pmails_as_exclusion # Exclude people attending upcoming events in an activity
-  belongs_to :local_group, index: true, optional: true, inverse_of: :pmails_as_exclusion # Exclude people in a local group
+  belongs_to_without_parent_validation :organisation, index: true
+  belongs_to_without_parent_validation :account, index: true
+  belongs_to_without_parent_validation :mailable, polymorphic: true, index: true, optional: true
+  belongs_to_without_parent_validation :event, index: true, optional: true, inverse_of: :pmails_as_exclusion # Exclude people attending an event
+  belongs_to_without_parent_validation :activity, index: true, optional: true, inverse_of: :pmails_as_exclusion # Exclude people attending upcoming events in an activity
+  belongs_to_without_parent_validation :local_group, index: true, optional: true, inverse_of: :pmails_as_exclusion # Exclude people in a local group
 
   field :from, type: String
   field :subject, type: String

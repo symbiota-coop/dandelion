@@ -1,11 +1,8 @@
-class Payment
-  include Mongoid::Document
-  include Mongoid::Timestamps
-
-  belongs_to :account, index: true
-  belongs_to :gathering, index: true
-  belongs_to :membership, index: true
-  belongs_to :payment_attempt, index: true, optional: true
+class Payment < DandelionModel
+  belongs_to_without_parent_validation :account, index: true
+  belongs_to_without_parent_validation :gathering, index: true
+  belongs_to_without_parent_validation :membership, index: true
+  belongs_to_without_parent_validation :payment_attempt, index: true, optional: true
 
   field :gathering_name, type: String
   field :amount, type: Integer

@@ -1,15 +1,12 @@
-class Ticket
-  include Mongoid::Document
-  include Mongoid::Timestamps
+class Ticket < DandelionModel
   include Mongoid::Paranoia
-
   include TicketNotifications
 
-  belongs_to :event, index: true
-  belongs_to :account, index: true, optional: true
-  belongs_to :order, index: true, optional: true
-  belongs_to :ticket_type, index: true, optional: true
-  belongs_to :zoomship, index: true, optional: true
+  belongs_to_without_parent_validation :event, index: true
+  belongs_to_without_parent_validation :account, index: true, optional: true
+  belongs_to_without_parent_validation :order, index: true, optional: true
+  belongs_to_without_parent_validation :ticket_type, index: true, optional: true
+  belongs_to_without_parent_validation :zoomship, index: true, optional: true
 
   has_many :notifications, as: :notifiable, dependent: :destroy
 
@@ -24,7 +21,6 @@ class Ticket
   field :organisation_revenue_share, type: Float
   field :session_id, type: String
   field :payment_intent, type: String
-  #   
   field :show_attendance, type: Boolean
   field :subscribed_discussion, type: Boolean
   field :checked_in, type: Boolean

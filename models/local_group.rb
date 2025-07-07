@@ -1,13 +1,10 @@
-class LocalGroup
-  include Mongoid::Document
-  include Mongoid::Timestamps
+class LocalGroup < DandelionModel
   extend Dragonfly::Model
-
   include ImportFromCsv
   include SendFollowersCsv
 
-  belongs_to :organisation, index: true
-  belongs_to :account, index: true
+  belongs_to_without_parent_validation :organisation, index: true
+  belongs_to_without_parent_validation :account, index: true
 
   field :name, type: String
   field :telegram_group, type: String
