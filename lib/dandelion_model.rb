@@ -3,5 +3,8 @@ class DandelionModel
   include Mongoid::Timestamps
   include BelongsToWithoutParentValidation
 
-  self.abstract_class = true
+  def self.inherited(subclass)
+    super
+    subclass.store_in(collection: subclass.name.tableize)
+  end
 end
