@@ -6,7 +6,7 @@ module Delayed
         begin
           raise Delayed::Job::RunError, last_error.split("\n").first
         rescue StandardError => e
-          Honeybadger.context({ last_error: last_error.split("\n") })
+          Honeybadger.context({ last_error: last_error })
           Honeybadger.notify(e)
         end
       end
