@@ -31,6 +31,9 @@ module BelongsToWithoutParentValidation
           end
           return errors.add(:"#{name}_type", 'is not a valid class') unless klass
 
+          # Check if the parent exists in memory first (for nested attributes)
+          return if send(name).present?
+
           return if klass.where(id: send("#{name}_id")).exists?
 
           errors.add(:"#{name}", 'does not exist')
@@ -40,6 +43,9 @@ module BelongsToWithoutParentValidation
 
         define_method "validate_#{name}_exists" do
           return unless send("#{name}_id").present?
+
+          # Check if the parent exists in memory first (for nested attributes)
+          return if send(name).present?
 
           association_class = self.class.reflect_on_association(name.to_sym).klass
           return if association_class.where(id: send("#{name}_id")).exists?
