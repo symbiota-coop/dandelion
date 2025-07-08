@@ -94,12 +94,12 @@ gem 'rinku'
 gem 'sanitize'
 
 # Rack
+gem 'crawler_detect'
 gem 'rack-cors'
 gem 'rack-utf8_sanitizer'
 
 #  Everything else
 gem 'bazaar' # for generating random names
 gem 'chroma' # for manipulating colours
-gem 'crawler_detect' # for detecting crawler bots
 gem 'digest' # for generating hashes
 gem 'mini_magick' # for image processing
