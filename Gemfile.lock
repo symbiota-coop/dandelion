@@ -582,7 +582,6 @@ DEPENDENCIES
   jwt
   mail
   mailgun-ruby
-  matrix
   maxmind-geoip2
   mechanize
   mini_magick

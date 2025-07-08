@@ -50,6 +50,7 @@ gem 'faraday'
 gem 'ferrum', '~> 0.14.0' # scroll behaviour changed in 0.15
 gem 'honeybadger'
 gem 'jwt'
+gem 'maxmind-geoip2'
 gem 'mechanize'
 gem 'octokit'
 gem 'ruby-openai'
@@ -97,10 +98,8 @@ gem 'rack-cors'
 gem 'rack-utf8_sanitizer'
 
 #  Everything else
-gem 'bazaar'
-gem 'chroma'
-gem 'crawler_detect'
-gem 'digest'
-gem 'matrix' # necessary in connection with capybara/cuprite
-gem 'maxmind-geoip2'
-gem 'mini_magick'
+gem 'bazaar' # for generating random names
+gem 'chroma' # for manipulating colours
+gem 'crawler_detect' # for detecting crawler bots
+gem 'digest' # for generating hashes
+gem 'mini_magick' # for image processing
