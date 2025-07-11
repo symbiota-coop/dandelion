@@ -190,7 +190,7 @@ Dandelion::App.controller do
     @event = @order.event
     event = @event
     order = @order
-    account = @order.account
+    account = @order.account || not_found
     pdf_link = true
     content = ERB.new(File.read(Padrino.root('app/views/emails/tickets.erb'))).result(binding)
                  .gsub('%recipient.firstname%', @order.account.firstname)
