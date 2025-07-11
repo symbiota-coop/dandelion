@@ -181,6 +181,8 @@ class StripeCharge
   end
 
   def ticket_revenue_to_revenue_sharer
+    return Money.new(0, currency) unless application_fee_amount
+
     if application_fee_amount == 0 && balance == 0
       (amount_money - application_fee_amount_money)
     elsif application_fee_amount > 0
