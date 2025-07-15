@@ -101,7 +101,7 @@ class Event
   end
 
   def started?(from = Date.today)
-    start_time >= from
+    from >= start_time
   end
 
   def finished?(from = Date.today)
