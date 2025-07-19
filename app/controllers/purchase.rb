@@ -170,10 +170,7 @@ Dandelion::App.controller do
 
         when 'gocardless'
 
-          client = GoCardlessPro::Client.new(
-            access_token: @event.organisation.gocardless_access_token,
-            environment: :sandbox
-          )
+          client = GoCardlessPro::Client.new(access_token: @event.organisation.gocardless_access_token)
 
           billing_request = client.billing_requests.create(
             params: {
