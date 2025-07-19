@@ -27,6 +27,7 @@ module OrganisationFields
     field :gocardless_access_token, type: String
     field :gocardless_endpoint_secret, type: String
     field :gocardless_filter, type: String
+    field :gocardless_instant_bank_pay, type: Mongoid::Boolean
     field :patreon_api_key, type: String
     field :mailgun_api_key, type: String
     field :mailgun_domain, type: String
@@ -177,6 +178,7 @@ module OrganisationFields
         stripe_pk: 'Stripe public key',
         stripe_sk: 'Stripe secret key',
         gocardless_access_token: 'GoCardless access token',
+        gocardless_instant_bank_pay: 'Enable GoCardless Instant Bank Pay',
         coinbase_api_key: 'Coinbase Commerce API key',
         coinbase_webhook_secret: 'Coinbase Commerce webhook secret',
         patreon_api_key: 'Patreon API key',

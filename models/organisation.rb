@@ -73,7 +73,7 @@ class Organisation
   end
 
   def payment_method?
-    stripe_connect_json || stripe_pk || coinbase_api_key || evm_address || oc_slug
+    stripe_connect_json || stripe_pk || coinbase_api_key || (gocardless_instant_bank_pay && gocardless_access_token) || evm_address || oc_slug
   end
 
   after_create do

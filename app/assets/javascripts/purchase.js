@@ -106,22 +106,25 @@ $(function () {
       $('#details form button[data-payment-method=rsvp]').show()
       $('#details form button[data-payment-method=stripe]').hide()
       $('#details form button[data-payment-method=coinbase]').hide()
+      $('#details form button[data-payment-method=gocardless]').hide()
       $('#details form button[data-payment-method=opencollective]').hide()
       $('#details form button[data-payment-method=evm]').hide()
     } else if (b == 0) {
       $('#details form button[data-payment-method=rsvp]').show().find('span').text('Use credit')
       $('#details form button[data-payment-method=stripe]').hide()
       $('#details form button[data-payment-method=coinbase]').hide()
+      $('#details form button[data-payment-method=gocardless]').hide()
       $('#details form button[data-payment-method=opencollective]').hide()
       $('#details form button[data-payment-method=evm]').hide()
     } else if (b > 0) {
       $('#balance').val((+b).toFixed(2))
       let via_card
-      if (coinbase || ocSlug || evmAddress) { via_card = ' via card' } else { via_card = '' }
+      if (coinbase || gocardless || ocSlug || evmAddress) { via_card = ' via card' } else { via_card = '' }
       $('#details form button[data-payment-method]:eq(1)').removeClass('btn-dotted')
       $('#details form button[data-payment-method=rsvp]').hide()
       $('#details form button[data-payment-method=stripe]').show().find('span').text('Pay ' + currencySymbol + (+b).toFixed(2) + via_card)
       $('#details form button[data-payment-method=coinbase]').show()
+      $('#details form button[data-payment-method=gocardless]').show()
       $('#details form button[data-payment-method=opencollective]').show()
       $('#details form button[data-payment-method=evm]').show()
     }
@@ -200,6 +203,9 @@ $(function () {
         } else if (data.checkout_id) {
           // Coinbase
           window.location = 'https://commerce.coinbase.com/checkout/' + data.checkout_id
+        } else if (data.gocardless_billing_request_flow) {
+          // GoCardless
+          window.location = data.gocardless_billing_request_flow['authorisation_url']
         } else if (data.oc_secret) {
           // Open Collective
           window.location = 'https://opencollective.com/' + organisationOcSlug + '/events/' + ocSlug + '/donate?interval=oneTime&amount=' + data.value + '&tags=' + data.oc_secret + '&redirect=' + encodeURIComponent(eventUrl + '?success=true&order_id=' + data.order_id)

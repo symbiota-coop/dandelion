@@ -168,6 +168,40 @@ Dandelion::App.controller do
           )
           { checkout_id: checkout.id }.to_json
 
+        when 'gocardless'
+
+          client = GoCardlessPro::Client.new(
+            access_token: @event.organisation.gocardless_access_token,
+            environment: :sandbox
+          )
+
+          billing_request = client.billing_requests.create(
+            params: {
+              payment_request: {
+                description: @order.description.truncate(200),
+                amount: (@order.total * 100).round,
+                currency: @order.currency
+              }
+            }
+          )
+
+          @order.update_attributes!(
+            value: @order.total.round(2),
+            gocardless_billing_request_id: billing_request.id
+          )
+
+          billing_request_flow = client.billing_request_flows.create(
+            params: {
+              redirect_uri: URI::DEFAULT_PARSER.escape("#{ENV['BASE_URI']}/e/#{@event.slug}?success=true&order_id=#{@order.id}&utm_source=#{params[:detailsForm][:utm_source]}&utm_medium=#{params[:detailsForm][:utm_medium]}&utm_campaign=#{params[:detailsForm][:utm_campaign]}"),
+              exit_uri: URI::DEFAULT_PARSER.escape("#{ENV['BASE_URI']}/e/#{@event.slug}?cancelled=true"),
+              links: {
+                billing_request: billing_request.id
+              }
+            }
+          )
+
+          { gocardless_billing_request_flow: billing_request_flow }.to_json
+
         when 'opencollective'
 
           oc_secret = "dandelion:#{Array.new(5) { [*'a'..'z', *'0'..'9'].sample }.join}"

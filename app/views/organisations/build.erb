@@ -215,6 +215,7 @@
           <%= f.text_block :simple_analytics_domain %>
           <%= f.text_block :facebook_pixel_id %>
           <%= f.text_block :gocardless_access_token %>
+          <%= f.check_box_block :gocardless_instant_bank_pay %>
           <%= f.text_block :patreon_api_key %>
         </div>
         <div role="tabpanel" class="tab-pane <%= 'active' if params[:tab] == 'everything-else'%>" id="tab-everything-else">

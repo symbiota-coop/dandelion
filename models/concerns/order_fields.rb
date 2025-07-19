@@ -12,6 +12,7 @@ module OrderFields
     field :payment_intent, type: String
     field :transfer_id, type: String
     field :coinbase_checkout_id, type: String
+    field :gocardless_billing_request_id, type: String
     field :evm_secret, type: String
     field :evm_value, type: BigDecimal
     field :oc_secret, type: String

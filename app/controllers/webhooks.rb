@@ -85,7 +85,30 @@ Dandelion::App.controller do
     events = GoCardlessPro::Webhook.parse(request_body: request_body, signature_header: signature_header, webhook_endpoint_secret: webhook_endpoint_secret)
 
     events.each do |event|
-      @organisation.gocardless_subscribe(subscription_id: event.links.subscription) if event.resource_type == 'subscriptions' && event.action == 'created'
+      if event.resource_type == 'subscriptions' && event.action == 'created'
+        @organisation.gocardless_subscribe(subscription_id: event.links.subscription)
+      elsif event.resource_type == 'billing_requests' && event.action == 'fulfilled'
+        billing_request_id = event.links.billing_request
+
+        if (@order = @organisation.orders.find_by(gocardless_billing_request_id: billing_request_id))
+          @order.payment_completed!
+          @order.send_tickets
+          @order.create_order_notification
+          halt 200
+        elsif (@order = Order.deleted.find_by(gocardless_billing_request_id: billing_request_id))
+          begin
+            @order.restore_and_complete
+            # raise Order::Restored
+          rescue StandardError => e
+            Honeybadger.context({ event_id: event.id })
+            Honeybadger.notify(e)
+            halt 200
+          end
+        else
+          halt 200
+        end
+
+      end
     end
     200
   end
