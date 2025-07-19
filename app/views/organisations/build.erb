@@ -94,7 +94,7 @@
         <li role="presentation" class="nav-item"><a class="nav-link <%= 'active' if params[:tab] == 'payments'%>" href="#tab-payments" role="tab" data-toggle="tab">Payments</a></li>
         <li role="presentation" class="nav-item"><a class="nav-link <%= 'active' if params[:tab] == 'emails'%>" href="#tab-emails" role="tab" data-toggle="tab">Emails</a></li>
         <li role="presentation" class="nav-item"><a class="nav-link <%= 'active' if params[:tab] == 'mailgun'%>" href="#tab-mailgun" role="tab" data-toggle="tab">Mailgun</a></li>
-        <li role="presentation" class="nav-item"><a class="nav-link <%= 'active' if params[:tab] == 'other-services'%>" href="#tab-other-services" role="tab" data-toggle="tab">Other services</a></li>
+        <li role="presentation" class="nav-item"><a class="nav-link <%= 'active' if params[:tab] == 'analytics'%>" href="#tab-analytics" role="tab" data-toggle="tab">Analytics</a></li>
         <li role="presentation" class="nav-item"><a class="nav-link <%= 'active' if params[:tab] == 'everything-else'%>" href="#tab-everything-else" role="tab" data-toggle="tab">Everything else</a></li>
         <% if Padrino.env == :development || @organisation.experimental? %>
           <li role="presentation" class="nav-item"><a class="nav-link <%= 'active' if params[:tab] == 'experimental'%>" href="#tab-experimental" role="tab" data-toggle="tab">Experimental</a></li>
@@ -165,6 +165,9 @@
               <h4 class="my-0">Experimental</h4>
             </div>
             <div class="card-body pb-0">
+              <%= f.text_block :gocardless_access_token %>
+              <%= f.check_box_block :gocardless_instant_bank_pay %>
+              <%= f.text_block :patreon_api_key %>
               <%= f.text_block :tax_rate_id %>
               <%= f.text_block :evm_address %>
               <%= f.text_block :oc_slug %>
@@ -210,13 +213,10 @@
           <%= f.text_block :mailgun_domain %>
           <%= f.select_block :mailgun_region %>
         </div>
-        <div role="tabpanel" class="tab-pane <%= 'active' if params[:tab] == 'other-services'%>" id="tab-other-services">
+        <div role="tabpanel" class="tab-pane <%= 'active' if params[:tab] == 'analytics'%>" id="tab-analytics">
           <%= f.text_block :plausible_analytics_domain %>
           <%= f.text_block :simple_analytics_domain %>
           <%= f.text_block :facebook_pixel_id %>
-          <%= f.text_block :gocardless_access_token %>
-          <%= f.check_box_block :gocardless_instant_bank_pay %>
-          <%= f.text_block :patreon_api_key %>
         </div>
         <div role="tabpanel" class="tab-pane <%= 'active' if params[:tab] == 'everything-else'%>" id="tab-everything-else">
           <%= f.wysiwyg_block :event_footer %>
