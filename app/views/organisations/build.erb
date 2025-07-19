@@ -162,11 +162,22 @@
           </div>
           <div class="card mb-3">
             <div class="card-header text-white bg-primary">
+              <h4 class="my-0">GoCardless</h4>
+            </div>
+            <div class="card-body pb-0">
+              <p>First go to <code>Developers</code> > <code>Create</code> > <code>Webhook endpoint</code> and add
+                <span style="text-decoration: underline dotted"><%=ENV['BASE_URI']%>/o/<%= @organisation.slug %>/gocardless_webhook</span>
+              </p>
+              <%= f.text_block :gocardless_access_token %>
+              <%= f.text_block :gocardless_endpoint_secret %>
+              <%= f.check_box_block :gocardless_instant_bank_pay %>
+            </div>
+          </div>
+          <div class="card mb-3">
+            <div class="card-header text-white bg-primary">
               <h4 class="my-0">Experimental</h4>
             </div>
             <div class="card-body pb-0">
-              <%= f.text_block :gocardless_access_token %>
-              <%= f.check_box_block :gocardless_instant_bank_pay %>
               <%= f.text_block :patreon_api_key %>
               <%= f.text_block :tax_rate_id %>
               <%= f.text_block :evm_address %>
