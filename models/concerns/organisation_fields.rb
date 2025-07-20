@@ -28,6 +28,7 @@ module OrganisationFields
     field :gocardless_endpoint_secret, type: String
     field :gocardless_filter, type: String
     field :gocardless_instant_bank_pay, type: Mongoid::Boolean
+    field :gocardless_subscriptions, type: Mongoid::Boolean
     field :patreon_api_key, type: String
     field :mailgun_api_key, type: String
     field :mailgun_domain, type: String
@@ -126,6 +127,8 @@ module OrganisationFields
         gocardless_access_token: :text,
         gocardless_endpoint_secret: :text,
         gocardless_filter: :text,
+        gocardless_subscriptions: :check_box,
+        gocardless_instant_bank_pay: :check_box,
         patreon_api_key: :text,
         mailgun_api_key: :text,
         mailgun_domain: :text,
@@ -180,6 +183,7 @@ module OrganisationFields
         gocardless_access_token: 'GoCardless access token',
         gocardless_endpoint_secret: 'GoCardless webhook secret',
         gocardless_instant_bank_pay: 'Enable GoCardless Instant Bank Pay',
+        gocardless_subscriptions: 'Register people with active GoCardless subscriptions as monthly donors',
         coinbase_api_key: 'Coinbase Commerce API key',
         coinbase_webhook_secret: 'Coinbase Commerce webhook secret',
         patreon_api_key: 'Patreon API key',
@@ -226,7 +230,6 @@ module OrganisationFields
         monthly_donor_affiliate_reward: 'When an existing monthly donor gets a friend to sign up via their affiliate link, credit of this amount is issued to both the existing monthly donor and the friend/new member.',
         add_a_donation_to: "Text to display beside the 'Add a donation' field",
         donation_text: "Text to display below the 'Add a donation' field",
-        gocardless_access_token: 'Also registers people with active GoCardless subscriptions as monthly donors',
         patreon_api_key: 'Registers people with active Patreon subscriptions as monthly donors',
         become_a_member_url: 'Link to direct non-members to when they attempt to buy tickets to a members-only event',
         terms_and_conditions_url: "Link to the organisation's terms and conditions of sale",

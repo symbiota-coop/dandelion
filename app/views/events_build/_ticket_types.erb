@@ -54,7 +54,7 @@
             </div>
           </div>
 
-          <% if @event.organisation && (@event.organisation.gocardless_access_token || @event.organisation.patreon_api_key) %>
+          <% if @event.organisation && ((@event.organisation.gocardless_subscriptions && @event.organisation.gocardless_access_token) || @event.organisation.patreon_api_key) %>
             <div class="row mb-2">
               <div class="col-12 col-lg">
                 <div class="input-group">
@@ -226,7 +226,7 @@
           priceRow.find('.input-group').append(quantityInput);
           priceRow.appendTo(d);
 
-          <% if @event.organisation && (@event.organisation.gocardless_access_token || @event.organisation.patreon_api_key) %>
+          <% if @event.organisation && ((@event.organisation.gocardless_subscriptions && @event.organisation.gocardless_access_token) || @event.organisation.patreon_api_key) %>
             // Minimum monthly donation row
             var donationRow = $('<div class="row mb-2"><div class="col-12 col-lg"><div class="input-group"></div></div></div>');
             donationRow.find('.input-group').append('<div class="input-group-prepend"><span class="input-group-text"><span class="mr-1">Min. monthly donation</span><span class="money-symbol"><%= money_symbol(f.object.currency) %></span></span></div>');

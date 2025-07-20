@@ -49,7 +49,7 @@ namespace :late do
     puts 'set counts'
     Organisation.set_counts
     puts 'sync monthly donations'
-    Organisation.and(:gocardless_access_token.ne => nil).each(&:sync_with_gocardless)
+    Organisation.and(:gocardless_subscriptions => true, :gocardless_access_token.ne => nil).each(&:sync_with_gocardless)
     Organisation.and(:patreon_api_key.ne => nil).each(&:sync_with_patreon)
     puts 'stripe transfers'
     Organisation.and(:stripe_client_id.ne => nil).each do |organisation|
