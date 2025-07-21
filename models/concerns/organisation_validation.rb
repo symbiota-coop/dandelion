@@ -25,6 +25,8 @@ module OrganisationValidation
       errors.add(:event_image_required_width, 'must be greater than 0') if event_image_required_width && event_image_required_width <= 0
       errors.add(:event_image_required_height, 'must be greater than 0') if event_image_required_height && event_image_required_height <= 0
 
+      errors.add(:tax_rate_id, 'must start with txr_') if tax_rate_id && !tax_rate_id.starts_with?('txr_')
+
       if Padrino.env == :production && account && !account.admin?
         errors.add(:stripe_sk, 'must start with sk_live_') if stripe_sk && !stripe_sk.starts_with?('sk_live_')
         errors.add(:stripe_pk, 'must start with pk_live_') if stripe_pk && !stripe_pk.starts_with?('pk_live_')

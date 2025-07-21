@@ -43,6 +43,8 @@ module EventValidation
       errors.add(:revenue_sharer, 'cannot be changed as the event has orders') if persisted? && revenue_sharer_id_changed? && orders.any?
       errors.add(:revenue_share_to_revenue_sharer, 'cannot be changed as the event has orders') if persisted? && revenue_share_to_revenue_sharer_changed? && orders.any?
 
+      errors.add(:tax_rate_id, 'must start with txr_') if tax_rate_id && !tax_rate_id.starts_with?('txr_')
+
       errors.add(:revenue_sharer, 'cannot be set if organiser is set') if revenue_sharer && organiser
       errors.add(:revenue_sharer, 'or organiser must be set for this organisation') if organisation && organisation.require_organiser_or_revenue_sharer && !revenue_sharer && !organiser
       errors.add(:revenue_sharer, 'is not connected to this organisation') if revenue_sharer && !revenue_sharer_organisationship
