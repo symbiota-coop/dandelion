@@ -89,7 +89,7 @@ module EventDuplication
         hidden: ticket_type.hidden,
         order: ticket_type.order,
         max_quantity_per_transaction: ticket_type.max_quantity_per_transaction,
-        sales_end: ticket_type.sales_end,
+        # sales_end: ticket_type.sales_end,
         ticket_group: (event.ticket_groups.find_by(name: ticket_type.ticket_group.name) if ticket_type.ticket_group)
       )
     end
