@@ -563,7 +563,15 @@ button.bg-warning:focus {
 }
 
 .bg-coinbase {
-  background-color: #2D53F1
+  background: #2D53F1 !important
+}
+
+.bg-gocardless {
+  background: #1C1B18 !important
+}
+
+.label.bg-gocardless {
+  color: #F1F252 !important
 }
 
 .bg-primary-transparent {
