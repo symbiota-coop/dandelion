@@ -60,8 +60,8 @@ class Carousel
   end
 
   def events
-    Event.and(:id.in =>
-      organisation.events_for_search.future_and_current.and(:start_time.lt => weeks.weeks.from_now).and(:hide_from_carousels.ne => true).and(:image_uid.ne => nil).and(:id.in => EventTagship.and(:event_tag_id.in => event_tags.pluck(:id)).pluck(:event_id)).limit(20).pluck(:id) +
-      organisation.events_for_search.past.and(:extra_info_for_recording_email.ne => nil).and(:hide_from_carousels.ne => true).and(:image_uid.ne => nil).and(:id.in => EventTagship.and(:event_tag_id.in => event_tags.pluck(:id)).pluck(:event_id)).limit(20).pluck(:id))
+    future_events = organisation.events_for_search.future_and_current.and(:start_time.lt => weeks.weeks.from_now).and(:hide_from_carousels.ne => true).and(:image_uid.ne => nil).and(:id.in => EventTagship.and(:event_tag_id.in => event_tags.pluck(:id)).pluck(:event_id)).limit(20)
+    past_events = organisation.events_for_search.past.and(:extra_info_for_recording_email.ne => nil).and(:hide_from_carousels.ne => true).and(:image_uid.ne => nil).and(:id.in => EventTagship.and(:event_tag_id.in => event_tags.pluck(:id)).pluck(:event_id)).limit(20)
+    (future_events + past_events).uniq
   end
 end
