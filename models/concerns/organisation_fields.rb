@@ -96,7 +96,7 @@ module OrganisationFields
     field :fixed_contribution_gbp, type: Float
     field :tax_rate_id, type: String
     field :feedback_summary, type: String
-    field :hide_event_names_from_order_descriptions, type: Mongoid::Boolean
+    field :use_event_slugs_in_order_descriptions, type: Mongoid::Boolean
 
     field :tokens, type: Float
     index({ tokens: 1 })

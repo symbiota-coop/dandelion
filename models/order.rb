@@ -157,7 +157,7 @@ class Order
 
   def description
     d = description_elements
-    text = event.organisation.hide_event_names_from_order_descriptions ? '' : "#{event.name}, "
+    text = event.organisation.use_event_slugs_in_order_descriptions ? "#{event.slug}, " : "#{event.name}, "
     text + "#{event.when_details(account.try(:time_zone))}#{" at #{event.location}" if event.location != 'Online'}#{": #{d.join(', ')}" unless d.empty?}"
   end
 
