@@ -72,10 +72,6 @@ class Organisation
     banned_emails ? banned_emails.split("\n").map(&:strip) : []
   end
 
-  def payment_method?
-    stripe_connect_json || stripe_pk || coinbase_api_key || (gocardless_instant_bank_pay && gocardless_access_token) || evm_address || oc_slug
-  end
-
   after_create do
     notifications_as_notifiable.create! circle: account, type: 'created_organisation'
 
@@ -135,8 +131,16 @@ class Organisation
 <p>With thanks,<br>[organisation_name]</p>'
   end
 
+  def payment_method?
+    stripe_connect_json || stripe_pk || coinbase_api_key || (gocardless_instant_bank_pay && gocardless_access_token) || evm_address || oc_slug
+  end
+
+  def stripe_connect_only?
+    stripe_connect_json && !stripe_pk && !coinbase_api_key && !(gocardless_instant_bank_pay && gocardless_access_token) && !evm_address && !oc_slug
+  end
+
   def donations_to_dandelion?
-    stripe_connect_json && !paid_up
+    stripe_connect_only? && !paid_up
   end
 
   def stripe_user_id
