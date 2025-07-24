@@ -68,7 +68,7 @@ gem 'stripe'
 # Mail
 gem 'incoming'
 gem 'mail'
-gem 'mailgun-ruby', require: 'mailgun'
+gem 'mailgun-ruby', '~> 1.2.0', require: 'mailgun'
 gem 'premailer'
 
 # Prawn (PDFs)
