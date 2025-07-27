@@ -1,6 +1,7 @@
 <%
 recommended_events = @account.recommended_events || []
 show_image = (Padrino.env == :production)
+full_width = true
 %>
 
 <%= partial :'recommendations/nav' %>
