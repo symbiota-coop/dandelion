@@ -284,13 +284,13 @@ class Order
         pdf.move_down 0.5 * cm
         pdf.text order.event.name, align: :center, size: 32
         pdf.move_down 0.5 * cm
-        pdf.text order.event.when_details(order.account.time_zone), align: :center, size: 14
+        pdf.text order.event.when_details(order.account.try(:time_zone)), align: :center, size: 14
         pdf.move_down 0.5 * cm
         pdf.indent((width / 2) - (qr_size / 2) - margin) do
           pdf.print_qr_code ticket.id.to_s, extent: qr_size
         end
         pdf.move_down 0.5 * cm
-        pdf.text ticket.account.name, align: :center, size: 14
+        pdf.text order.account.name, align: :center, size: 14
         if ticket.ticket_type
           pdf.move_down 0.5 * cm
           pdf.text "#{ticket.ticket_type.name}, #{Money.new((ticket.discounted_price || 0) * 100, ticket.currency).format(no_cents_if_whole: true)}", align: :center, size: 14
