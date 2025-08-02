@@ -1,10 +1,10 @@
 <div class="main">
   <%= ((event.recording? ? event.recording_email_greeting : event.ticket_email_greeting) || (event.recording? ? event.organisation.recording_email_greeting : event.organisation.ticket_email_greeting))
-        .gsub('[firstname]', order.account.firstname)
-        .gsub('[lastname]', order.account.lastname || '')
-        .gsub('[fullname]', order.account.name)
+        .gsub('[firstname]', account.firstname)
+        .gsub('[lastname]', account.lastname || '')
+        .gsub('[fullname]', account.name)
         .gsub('[event_name]', event.name)
-        .gsub('[event_when]', event.when_details(order.account.time_zone))
+        .gsub('[event_when]', event.when_details(account.time_zone))
         .gsub('[event_location]', event.location)
         .gsub(' [at_event_location_if_not_online]', event.online? ? '' : " at #{event.location}")
         .gsub('[tickets_are]', order.tickets.length == 1 ? 'ticket is' : 'tickets are') %>
@@ -29,8 +29,8 @@
         <a href="<%=ENV['BASE_URI']%>/e/<%=event.slug%>?order_id=<%=order.id%>">Visit this page to add details of ticketholders.</a>
       </p>
     <% end %>
-    <% if event.affiliate_credit_percentage %>
-      <% affiliate_link = "#{ENV['BASE_URI']}/e/#{event.slug}?affiliate_type=Account&affiliate_id=#{order.account_id}" %>
+    <% if event.affiliate_credit_percentage && account.persisted? %>
+      <% affiliate_link = "#{ENV['BASE_URI']}/e/#{event.slug}?affiliate_type=Account&affiliate_id=#{account.id}" %>
       <p>
         <a href="<%= affiliate_link %>">Here's your affiliate link for this event.</a>
         For each person who buys a ticket via this link,
@@ -40,7 +40,7 @@
   <% end %>
   <% if event.organisation.show_sign_in_link_in_ticket_emails && !event.hide_attendees %>
     <p>
-      <% if account.sign_ins_count == 0 %>
+      <% if account.sign_ins_count == 0 && account.persisted? %>
         <a href="<%= ENV['BASE_URI'] %>/accounts/edit?sign_in_token=%recipient.token%&event_id=<%= event.id %>">Click here to create a profile on Dandelion and connect with others <%= event.recording? ? 'who attended' : 'attending' %> the event.</a>
       <% else %>
         <a href="<%= ENV['BASE_URI'] %>/e/<%= event.slug %>?sign_in_token=%recipient.token%">Sign in to Dandelion to show or hide your attendance and connect with others <%= event.recording? ? 'who attended' : 'attending' %> the event.</a>

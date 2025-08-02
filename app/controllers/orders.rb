@@ -193,8 +193,7 @@ Dandelion::App.controller do
     account = @order.account || not_found
     pdf_link = true
     content = ERB.new(File.read(Padrino.root('app/views/emails/tickets.erb'))).result(binding)
-                 .gsub('%recipient.firstname%', @order.account.firstname)
-                 .gsub('%recipient.token%', @order.account.sign_in_token)
+                 .gsub('%recipient.token%', account.sign_in_token)
 
     header_image_url = if event.organisation.send_ticket_emails_from_organisation && event.organisation.image
                          event.organisation.image.thumb('1920x1920').url

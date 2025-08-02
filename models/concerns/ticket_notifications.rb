@@ -9,10 +9,14 @@ module TicketNotifications
     mg_client = Mailgun::Client.new ENV['MAILGUN_API_KEY'], ENV['MAILGUN_REGION']
     batch_message = Mailgun::BatchMessage.new(mg_client, ENV['MAILGUN_TICKETS_HOST'])
 
+    ticket = self
     order = event.orders.new
-    order.account = account
-    account = self.account
-    order.tickets = [self]
+    account = if email
+                Account.new(name: ticket.name)
+              else
+                ticket.account
+              end
+    order.tickets = [ticket]
 
     content = ERB.new(File.read(Padrino.root('app/views/emails/tickets.erb'))).result(binding)
     batch_message.subject(event.ticket_email_title || "Ticket to #{event.name}")
@@ -55,10 +59,10 @@ module TicketNotifications
     end
 
     if email
-      batch_message.add_recipient(:to, email, { 'firstname' => firstname || 'there' })
+      batch_message.add_recipient(:to, email)
     else
       [account].each do |account|
-        batch_message.add_recipient(:to, account.email, { 'firstname' => account.firstname || 'there', 'token' => account.sign_in_token, 'id' => account.id.to_s })
+        batch_message.add_recipient(:to, account.email, { 'token' => account.sign_in_token, 'id' => account.id.to_s })
       end
     end
 
