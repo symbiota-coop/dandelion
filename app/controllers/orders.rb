@@ -323,6 +323,15 @@ Dandelion::App.controller do
     200
   end
 
+  get '/tickets/:id/send_ticket' do
+    @ticket = Ticket.find(params[:id]) || not_found
+    @event = @ticket.event
+    event_admins_only!
+    @ticket.send_ticket
+    flash[:notice] = 'The ticket was resent.'
+    redirect back
+  end
+
   get '/tickets/:id/edit' do
     @ticket = Ticket.find(params[:id]) || not_found
     @event = @ticket.event

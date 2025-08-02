@@ -119,6 +119,7 @@
         <%= dropdown_nav [
         (['Link to order confirmation', "/orders/#{ticket.order_id}"] if ticket.order),
         (['Resend order confirmation', "/orders/#{ticket.order_id}/send_tickets"] if ticket.order),
+        ['Resend single ticket', "/tickets/#{ticket.id}/send_ticket"],
         ['Change name or email', "/tickets/#{ticket.id}/edit"],
         (['Remove and refund ticket', "/events/#{@event.id}/tickets/#{ticket.id}/refund_and_destroy"] if @event.refund_deleted_orders && ticket.session_id),
         ['Remove ticket', "/events/#{@event.id}/tickets/#{ticket.id}/destroy"],

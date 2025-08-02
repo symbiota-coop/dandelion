@@ -54,8 +54,12 @@ module TicketNotifications
       end
     end
 
-    [account].each do |account|
-      batch_message.add_recipient(:to, account.email, { 'firstname' => account.firstname || 'there', 'token' => account.sign_in_token, 'id' => account.id.to_s })
+    if email
+      batch_message.add_recipient(:to, email, { 'firstname' => firstname || 'there' })
+    else
+      [account].each do |account|
+        batch_message.add_recipient(:to, account.email, { 'firstname' => account.firstname || 'there', 'token' => account.sign_in_token, 'id' => account.id.to_s })
+      end
     end
 
     batch_message.finalize if ENV['MAILGUN_API_KEY']
