@@ -47,6 +47,7 @@ module EventFields
     field :ai_tagged, type: Mongoid::Boolean
     field :event_tags_joined, type: String
     field :tax_rate_id, type: String
+    field :match_phrase, type: String
 
     field :revenue_share_to_revenue_sharer, type: Integer
     field :profit_share_to_organiser, type: Integer
@@ -152,7 +153,8 @@ module EventFields
         hide_few_left: "Hide 'few tickets left' labels",
         rsvp_button_text: 'RSVP button',
         tax_rate_id: 'Stripe tax rate ID',
-        carousel_text: 'Preview text'
+        carousel_text: 'Preview text',
+        match_phrase: 'Dropdown match phrase'
       }.merge(email_human_attribute_names)[attr.to_sym] || super
     end
 
@@ -199,7 +201,8 @@ module EventFields
         hide_organisation_footer: 'Hide the organisation footer in the event confirmation email',
         no_tickets_pdf: 'Skip the PDF attachment in the confirmation email',
         tax_rate_id: 'Stripe tax rate ID to apply to ticket purchases',
-        hide_unavailable_tickets: 'Hide tickets that have sold out or where sales have ended'
+        hide_unavailable_tickets: 'Hide tickets that have sold out or where sales have ended',
+        match_phrase: 'Create a dropdown on the event page with future events containing this term'
       }.merge(email_hints)
     end
 

@@ -250,6 +250,7 @@
         <% if Padrino.env == :development || @event.purchase_url || @event.organisation.allow_purchase_url? || @event.organisation.experimental? %>
           <%= f.url_block :purchase_url %>
         <% end %>
+        <%= f.text_block :match_phrase %>
         <%= f.number_block :facebook_pixel_id %>
         <%= f.text_block :oc_slug %>
         <%= f.text_block :tax_rate_id %>
