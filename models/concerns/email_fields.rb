@@ -10,6 +10,10 @@ module EmailFields
     field :reminder_email_body, type: String
     field :feedback_email_title, type: String
     field :feedback_email_body, type: String
+
+    before_validation do
+      errors.add(:feedback_email_body, 'must contain [feedback_url]') if feedback_email_body && !feedback_email_body.include?('[feedback_url]')
+    end
   end
 
   class_methods do
