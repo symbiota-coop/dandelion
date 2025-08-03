@@ -113,7 +113,7 @@ Dandelion::App.controller do
     if Padrino.env == :production && !@event.organisation.stripe_client_id && @event.organisation.stripe_sk && !@event.organisation.stripe_connect_json
       @organisation = @event.organisation
       erb :'events/stripe_connect'
-    elsif @event.organisation.stripe_client_id && !@event.organisation.paid_up
+    elsif @event.organisation.contribution_required
       redirect "/o/#{@event.organisation.slug}/contribute"
     else
       @event.location = 'Online'
@@ -308,7 +308,7 @@ Dandelion::App.controller do
     if Padrino.env == :production && !@event.organisation.stripe_client_id && @event.organisation.stripe_sk && !@event.organisation.stripe_connect_json
       @organisation = @event.organisation
       erb :'events/stripe_connect'
-    elsif @event.organisation.stripe_client_id && !@event.organisation.paid_up
+    elsif @event.organisation.contribution_required
       redirect "/o/#{@event.organisation.slug}/contribute"
     else
       duplicated_event = @event.duplicate!(current_account)

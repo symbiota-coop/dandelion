@@ -11,6 +11,10 @@ module OrganisationAccounting
     end
   end
 
+  def contribution_required
+    !paid_up && (stripe_client_id || gocardless_instant_bank_pay)
+  end
+
   def contribution_requested
     c = Money.new(0, 'GBP')
     contributable_events.each do |event|
