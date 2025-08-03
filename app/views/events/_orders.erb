@@ -5,7 +5,7 @@
   <% end %>
   <a target="_blank" href="/orders/<%= order.id %>">View confirmation email</a>
   &middot;
-  <a target="_blank" href="/e/<%= event.slug %>?order_id=<%= order.id %>" style="white-space: nowrap">Edit ticketholders</a>
+  <a href="/e/<%= event.slug %>?order_id=<%= order.id %>" style="white-space: nowrap">Edit ticketholders</a>
   <ul class="icon-list mt-1 mb-0">
     <% order.tickets.each { |ticket| ticket_description = [ticket.ticket_type.try(:name), m(ticket.discounted_price || 0, ticket.currency)].compact.join(', ') %>
     <li>
