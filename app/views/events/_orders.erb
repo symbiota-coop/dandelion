@@ -1,18 +1,29 @@
-<% orders.each { |order| %>
-<a target="_blank" href="/orders/<%= order.id %>">View order confirmation <% if orders.count > 1 %>(sent <%= order.created_at %>)<% end %></a>
-<ul class="icon-list mb-0">
-  <% order.tickets.each { |ticket| ticket_description = [ticket.ticket_type.try(:name), m(ticket.discounted_price || 0, ticket.currency)].compact.join(', ') %>
-  <li>
-    <i class="bi bi-ticket-detailed-fill"></i>
-    <% if event.enable_resales? %>
-      <a class="text-dark" href="/tickets/<%= ticket.id %>/toggle_resale"><%= ticket_description %></a>
+<% orders.each_with_index { |order, index| %>
+<div class="<%= 'mb-4' unless index == orders.count - 1 %>">
+  <% if orders.count > 1 %>
+    <h5 class="mb-1">Order #<%= index + 1 %></h5>
+  <% end %>
+  <a target="_blank" href="/orders/<%= order.id %>">View confirmation email</a>
+  &middot;
+  <a target="_blank" href="/e/<%= event.slug %>?order_id=<%= order.id %>" style="white-space: nowrap">Edit ticketholders</a>
+  <ul class="icon-list mt-1 mb-0">
+    <% order.tickets.each { |ticket| ticket_description = [ticket.ticket_type.try(:name), m(ticket.discounted_price || 0, ticket.currency)].compact.join(', ') %>
+    <li>
+      <i class="bi bi-ticket-detailed-fill"></i>
+      <%= ticket_description %>
       <% if ticket.made_available_at %>
         <span class="label label-default" style="padding: .1em .5em">On resale</span>
       <% end %>
-    <% else %>
-      <%= ticket_description %>
-    <% end %>
-  </li>
-  <% } %>
-</ul>
+      <% if event.enable_resales? %>
+        &middot;
+        <% if ticket.made_available_at %>
+          <a href="/tickets/<%= ticket.id %>/toggle_resale">Remove from resale</a>
+        <% else %>
+          <a href="/tickets/<%= ticket.id %>/toggle_resale">Mark for resale</a>
+        <% end %>
+      <% end %>
+    </li>
+    <% } %>
+  </ul>
+</div>
 <% } %>

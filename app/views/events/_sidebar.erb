@@ -17,11 +17,6 @@
               <p><a href="/events/<%=@event.id%>/give_feedback">Give feedback</a></p>
             <% end %>
           <% end %>
-          <% if @event.enable_resales? %>
-            <p>
-              Click a ticket to mark it for resale.
-            </p>
-          <% end %>
           <%= partial :'events/orders', locals: { event: @event, orders: orders } %>
         </div>
         <% pmails = @event.pmails_as_mailable.and(:sent_at.ne => nil).order('sent_at desc') %>
