@@ -25,20 +25,6 @@ jobs:
       id-token: write
       actions: read # Required for Claude to read CI results on PRs
     steps:
-      - name: Debug event info
-        run: |
-          echo "Event name: ${{ github.event_name }}"
-          echo "Event action: ${{ github.event.action }}"
-          if [[ "${{ github.event_name }}" == "issue_comment" ]]; then
-            echo "Comment body: ${{ github.event.comment.body }}"
-            echo "Comment user: ${{ github.event.comment.user.login }}"
-          fi
-          if [[ "${{ github.event_name }}" == "issues" ]]; then
-            echo "Issue title: ${{ github.event.issue.title }}"
-            echo "Issue body: ${{ github.event.issue.body }}"
-            echo "Issue user: ${{ github.event.issue.user.login }}"
-          fi
-
       - name: Checkout repository
         uses: actions/checkout@v4
         with:
