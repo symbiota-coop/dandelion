@@ -15,6 +15,7 @@ module EventValidation
       self.organiser = account if account && !revenue_sharer && !organiser && organisation && organisation.stripe_client_id
       self.ai_tagged = nil
       self.description = description.gsub('href="www.', 'href="http://www.') if description
+      self.suggested_donation = nil if organisation && !organisation.payment_method?
 
       unless slug
         loop do

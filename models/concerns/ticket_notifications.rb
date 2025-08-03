@@ -126,7 +126,7 @@ module TicketNotifications
     event = order.event
     account = order.account
 
-    return unless account
+    return unless account && ticket.email
 
     content = ERB.new(File.read(Padrino.root('app/views/emails/ticket_email_update.erb'))).result(binding)
     batch_message.from ENV['NOTIFICATIONS_EMAIL_FULL']
