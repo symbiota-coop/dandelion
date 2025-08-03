@@ -35,7 +35,7 @@ Dandelion::App.controller do
       @events = if params[:carousel_id] == 'featured'
                   @events.and(featured: true)
                 else
-                  carousel = Carousel.find(params[:carousel_id])
+                  carousel = Carousel.find(params[:carousel_id]) || not_found
                   @events.and(:id.in => EventTagship.and(:event_tag_id.in => carousel.event_tags.pluck(:id)).pluck(:event_id))
                 end
     end
@@ -175,7 +175,7 @@ Dandelion::App.controller do
       @events = if params[:carousel_id] == 'featured'
                   @events.and(featured: true)
                 else
-                  carousel = Carousel.find(params[:carousel_id])
+                  carousel = Carousel.find(params[:carousel_id]) || not_found
                   @events.and(:id.in => EventTagship.and(:event_tag_id.in => carousel.event_tags.pluck(:id)).pluck(:event_id))
                 end
     end
