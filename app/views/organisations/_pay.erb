@@ -25,7 +25,7 @@
         <% end %>
 
         <p class="lead">
-          The suggested donation is 1% of ticket sales per event.
+          The suggested donation is <%= organisation.percent_requested || 1 %>% of ticket sales per event.
         </p>
 
         <p class="lead">

@@ -64,7 +64,7 @@ module EventAccounting
     elsif organisation.try(:fixed_contribution_gbp)
       Money.new(organisation.fixed_contribution_gbp * 100, 'GBP')
     else
-      percent_requested = 1
+      percent_requested = organisation.try(:percent_requested) || 1
       Money.new(tickets.complete.sum(:discounted_price) * (percent_requested.to_f / 100) * 100, currency).exchange_to('GBP')
     end
   rescue Money::Bank::UnknownRate, Money::Currency::UnknownCurrency

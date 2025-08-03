@@ -97,6 +97,7 @@ module OrganisationFields
     field :tax_rate_id, type: String
     field :feedback_summary, type: String
     field :use_event_slugs_in_order_descriptions, type: Mongoid::Boolean
+    field :percent_requested, type: Float
 
     field :tokens, type: Float
     index({ tokens: 1 })
