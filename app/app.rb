@@ -71,6 +71,7 @@ module Dandelion
     end
 
     get '/raise' do
+      halt 404 if Padrino.env == :production
       admins_only!
       msg = params[:message] || 'test error'
       raise msg unless params[:detail]
