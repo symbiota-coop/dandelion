@@ -1,0 +1,37 @@
+#!/bin/bash
+
+# Configuration
+GEMFILE_PATH="Gemfile"
+FRONTEND_DEPENDENCIES_PATH="app/views/layouts/_dependencies.erb"
+OUTPUT_PATH=".cursorrules"
+CLAUDE_PATH="CLAUDE.md"
+
+# Function to add a dependency section to the output file
+add_dependency_section() {
+  local title="$1"
+  local file_path="$2"
+  
+  {
+    echo ""
+    echo "## $title"
+    echo ""
+    echo "\`\`\`"
+    cat "$file_path"
+    echo "\`\`\`"
+  } >> "$OUTPUT_PATH"
+}
+
+# Create the output file, overwriting if it exists
+echo "# Dependencies" > "$OUTPUT_PATH"
+
+# Add content
+add_dependency_section "Gemfile" "$GEMFILE_PATH"
+add_dependency_section "Frontend dependencies" "$FRONTEND_DEPENDENCIES_PATH"
+
+# Also save to CLAUDE.md
+cp "$OUTPUT_PATH" "$CLAUDE_PATH"
+
+# Add the generated files to the commit
+git add "$OUTPUT_PATH" "$CLAUDE_PATH"
+
+echo "✅ Generated and staged $OUTPUT_PATH and $CLAUDE_PATH"
