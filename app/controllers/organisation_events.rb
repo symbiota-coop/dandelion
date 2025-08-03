@@ -36,7 +36,11 @@ Dandelion::App.controller do
                   @events.and(featured: true)
                 else
                   carousel = Carousel.find(params[:carousel_id])
-                  @events.and(:id.in => EventTagship.and(:event_tag_id.in => carousel.event_tags.pluck(:id)).pluck(:event_id))
+                  if carousel
+                    @events.and(:id.in => EventTagship.and(:event_tag_id.in => carousel.event_tags.pluck(:id)).pluck(:event_id))
+                  else
+                    @events.none
+                  end
                 end
     end
     unless params[:online] && params[:in_person]
@@ -176,7 +180,11 @@ Dandelion::App.controller do
                   @events.and(featured: true)
                 else
                   carousel = Carousel.find(params[:carousel_id])
-                  @events.and(:id.in => EventTagship.and(:event_tag_id.in => carousel.event_tags.pluck(:id)).pluck(:event_id))
+                  if carousel
+                    @events.and(:id.in => EventTagship.and(:event_tag_id.in => carousel.event_tags.pluck(:id)).pluck(:event_id))
+                  else
+                    @events.none
+                  end
                 end
     end
     if params[:discrepancy]
