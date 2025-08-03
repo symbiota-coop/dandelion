@@ -45,7 +45,6 @@ module EventFields
     field :cap_gbp, type: Float
     field :oc_slug, type: String
     field :ai_tagged, type: Mongoid::Boolean
-    field :boosted, type: Mongoid::Boolean
     field :event_tags_joined, type: String
     field :tax_rate_id, type: String
 

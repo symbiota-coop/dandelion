@@ -11,8 +11,6 @@ Dandelion::App.controller do
     @events = case params[:order]
               when 'created_at'
                 @events.order('created_at desc')
-              when 'featured'
-                @events.order('boosted desc, start_time asc')
               else
                 @events.order('start_time asc')
               end

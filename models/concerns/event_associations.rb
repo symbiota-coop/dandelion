@@ -53,8 +53,6 @@ module EventAssociations
 
     has_many :event_tagships, dependent: :destroy
     has_many :event_stars, dependent: :destroy
-
-    has_many :event_boost_bids, dependent: :destroy
   end
 
   def organisationship_for_discount(account)
