@@ -150,9 +150,9 @@ Dandelion::App.controller do
 
         when 'coinbase'
 
-          client = CoinbaseCommerce::Client.new(api_key: @event.organisation.coinbase_api_key)
+          client = Coinbase::Client.new(@event.organisation.coinbase_api_key)
 
-          checkout = client.checkout.create(
+          charge = client.create_charge(
             name: @event.name,
             description: @order.description.truncate(200),
             pricing_type: 'fixed_price',
@@ -164,9 +164,9 @@ Dandelion::App.controller do
           )
           @order.update_attributes!(
             value: @order.total.round(2),
-            coinbase_checkout_id: checkout.id
+            coinbase_checkout_id: charge['data']['checkout']['id']
           )
-          { checkout_id: checkout.id }.to_json
+          { checkout_id: charge['data']['checkout']['id'] }.to_json
 
         when 'gocardless'
 

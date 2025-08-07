@@ -88,11 +88,10 @@ module OrganisationAccounting
   end
 
   def coinbase_confirmed_checkout_ids
-    confirmed_checkout_ids = []
-    client = CoinbaseCommerce::Client.new(api_key: coinbase_api_key)
-    client.charge.auto_paging do |charge|
-      confirmed_checkout_ids << charge['checkout']['id'] if charge['confirmed_at'] && charge['checkout'] && charge['checkout']['id']
-    end
-    confirmed_checkout_ids
+    client = Coinbase::Client.new(coinbase_api_key)
+    charges = client.list_charges
+    charges.map do |charge|
+      charge['checkout']['id'] if charge['confirmed_at'] && charge['checkout'] && charge['checkout']['id']
+    end.compact
   end
 end
