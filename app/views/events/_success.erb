@@ -1,10 +1,16 @@
 <div class="card shadow-sm">
   <h3 class="card-header bg-primary text-white">Thanks for booking!</h3>
   <div class="card-body">
-    <p class="lead mb-3"><strong>Check your inbox for the confirmation email with your tickets.</strong></p>
+
     <p>
-      If you don't see anything in your inbox, check your spam folder or
-      <a target="_blank" href="/orders/<%=@order.id%>">view the confirmation email in your browser</a>.
+      <a target="_blank" href="/orders/<%=@order.id%>" class="btn btn-outline-primary">
+        View confirmation <% unless @event.no_tickets_pdf? %>and <%= @order.tickets.count == 1 ? 'ticket' : 'tickets' %><% end %>
+        <i class="bi bi-qr-code"></i>
+      </a>
+    </p>
+
+    <p>
+      We've also sent the confirmation via email. If you don't see anything in your inbox, please check your spam folder.
     </p>
 
     <% if @event.redirect_url %>
