@@ -40,12 +40,10 @@ Dandelion::App.controller do
     sig_header = request.env['HTTP_X_CC_WEBHOOK_SIGNATURE']
 
     begin
-      event = CoinbaseCommerce::Webhook.construct_event(payload, sig_header, ENV['COINBASE_WEBHOOK_SECRET'])
+      event = Coinbase::Webhook.construct_event(payload, sig_header, ENV['COINBASE_WEBHOOK_SECRET'])
     rescue JSON::ParserError
       halt 400
-    rescue CoinbaseCommerce::Errors::SignatureVerificationError
-      halt 400
-    rescue CoinbaseCommerce::Errors::WebhookInvalidPayload
+    rescue Coinbase::Webhook::SignatureVerificationError
       halt 400
     end
 
@@ -83,9 +81,9 @@ Dandelion::App.controller do
 
     when 'coinbase'
 
-      client = CoinbaseCommerce::Client.new(api_key: ENV['COINBASE_API_KEY'])
+      client = Coinbase::Client.new(ENV['COINBASE_API_KEY'])
 
-      checkout = client.checkout.create(
+      charge = client.create_charge(
         name: 'Dandelion',
         description: 'Contribution to Dandelion',
         pricing_type: 'fixed_price',
@@ -95,8 +93,8 @@ Dandelion::App.controller do
         },
         requested_info: %w[email]
       )
-      @account.account_contributions.create! source: params[:source], amount: params[:amount].to_f, currency: params[:currency], coinbase_checkout_id: checkout.id
-      { checkout_id: checkout.id }.to_json
+      @account.account_contributions.create! source: params[:source], amount: params[:amount].to_f, currency: params[:currency], coinbase_checkout_id: charge['data']['checkout']['id']
+      { checkout_id: charge['data']['checkout']['id'] }.to_json
 
     end
   end
