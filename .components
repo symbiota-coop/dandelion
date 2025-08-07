@@ -1,7 +1,0 @@
----
-:orm: mongoid
-:test: minitest
-:mock: none
-:script: jquery
-:renderer: erb
-:stylesheet: none

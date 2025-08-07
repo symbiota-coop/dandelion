@@ -31,7 +31,4 @@ add_dependency_section "Frontend dependencies" "$FRONTEND_DEPENDENCIES_PATH"
 # Also save to CLAUDE.md
 cp "$OUTPUT_PATH" "$CLAUDE_PATH"
 
-# Add the generated files to the commit
-git add "$OUTPUT_PATH" "$CLAUDE_PATH"
-
-echo "✅ Generated and staged $OUTPUT_PATH and $CLAUDE_PATH"
+echo "✅ Generated $OUTPUT_PATH and $CLAUDE_PATH"
