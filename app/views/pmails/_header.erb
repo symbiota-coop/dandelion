@@ -47,12 +47,23 @@
     <p class="lead">Queued for sending at <%= @pmail.requested_send_at %></p>
   <% else %>
     <%= @hide_alert = true; partial :flash %>
+    <% if @pmail.will_send_at %>
+      <p class="lead">Will be sent at <%= @pmail.delayed_job.run_at %></p>
+    <% end %>
     <div class="mb-3">
-      <button type="submit" name="default" style="overflow: visible !important; height: 0 !important; width: 0 !important; margin: 0 !important; border: 0 !important; padding: 0 !important; display: block !important;" value="1"></button>
-      <button type="submit" name="preview" value="1" class="btn btn-primary mb-1">Preview</button>
-      <button type="submit" name="send_test" value="1" class="btn btn-primary mb-1">Send test to <%= current_account.email %></button>
-      <button type="submit" name="send" value="1" class="btn btn-primary mb-1" data-confirm="Are you sure you want to send this mail to <%= pluralize(@pmail.send_count, 'person') %>?">Send</button>
-      <button type="submit" name="duplicate" value="1" class="btn btn-outline-primary mb-1">Duplicate</button>
+      <div>
+        <button type="submit" name="default" style="overflow: visible !important; height: 0 !important; width: 0 !important; margin: 0 !important; border: 0 !important; padding: 0 !important; display: block !important;" value="1"></button>
+        <button type="submit" name="preview" value="1" class="btn btn-primary mb-1">Preview</button>
+        <button type="submit" name="send_test" value="1" class="btn btn-primary mb-1">Send test to <%= current_account.email %></button>
+        <button type="submit" name="send" value="1" class="btn btn-primary mb-1" data-confirm="Are you sure you want to send this mail to <%= pluralize(@pmail.send_count, 'person') %>?">Send</button>
+        <a href="javascript:;" onclick="$(this).parent().hide(); $('#send_later').show().find('input').attr('required', true); " class="btn btn-primary mb-1">Send later</a>
+        <button type="submit" name="duplicate" value="1" class="btn btn-outline-primary mb-1">Duplicate</button>
+      </div>
+
+      <div id="send_later" style="display: none">
+        <%= datetime_local_field_tag :'pmail[will_send_at]', value: @pmail.will_send_at, class: 'form-control d-inline-block', style: 'width: auto' %>
+        <button type="submit" name="send_later" value="1" class="btn btn-primary mb-1" data-confirm="Are you sure you want to send this mail to <%= pluralize(@pmail.send_count, 'person') %>?">Send</button>
+      </div>
     </div>
   <% end %>
 <% end %>

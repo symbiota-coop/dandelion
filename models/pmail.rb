@@ -21,6 +21,7 @@ class Pmail
   field :waitlist, type: Boolean
   field :body, type: String
   field :message_ids, type: String
+  field :will_send_at, type: Time
   field :requested_send_at, type: Time
   field :sent_at, type: Time
   field :link_params, type: String
@@ -38,6 +39,7 @@ class Pmail
       facilitators: :check_box,
       waitlist: :check_box,
       link_params: :text,
+      will_send_at: :datetime,
       requested_send_at: :datetime,
       sent_at: :datetime,
       message_ids: :text_area,
@@ -214,14 +216,27 @@ class Pmail
     end
   end
 
+  def delayed_jobs
+    Delayed::Job.and(handler: %r{object: !ruby/Mongoid:Pmail}).and(handler: /#{Regexp.escape(Base64.encode64(id.to_bson.to_s))}/)
+  end
+
+  def delayed_job
+    raise 'Multiple delayed jobs!' if delayed_jobs.count > 1
+
+    delayed_jobs.first
+  end
+
   def send_pmail
-    return if sent_at
+    return if sent_at # if already sent
+
+    update_attribute(:requested_send_at, Time.now) unless requested_send_at
+
+    # send_batch_message
     return unless (message_ids = send_batch_message)
 
     update_attribute(:sent_at, Time.now)
     update_attribute(:message_ids, message_ids)
   end
-  handle_asynchronously :send_pmail
 
   def send_batch_message(test_to: nil, check_already_sent: false)
     pmail_links.destroy_all

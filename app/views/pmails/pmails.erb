@@ -94,6 +94,10 @@
               Last saved at <%= pmail.updated_at %><br>
               Queued for sending at <%= pmail.requested_send_at %>
             </div>
+          <% elsif pmail.will_send_at %>
+            Created at <%= pmail.created_at %><br>
+            Last saved at <%= pmail.updated_at %><br>
+            Will be sent at <%= pmail.delayed_job.run_at %>
           <% else %>
             <a class="btn btn-secondary" href="<%= edit_url %>">
               <i class="bi bi-pencil-fill"></i> Edit
