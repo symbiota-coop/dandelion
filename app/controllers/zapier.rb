@@ -27,7 +27,8 @@ Dandelion::App.controller do
         name: organisationship.account.name,
         firstname: organisationship.account.firstname,
         lastname: organisationship.account.lastname,
-        email: organisationship.account.email
+        email: organisationship.account.email,
+        created_at: organisationship.created_at.iso8601
       }
     end.to_json
   end
