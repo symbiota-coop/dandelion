@@ -4,7 +4,7 @@ module ImageWithValidation
   included do
     dragonfly_accessor :image do
       after_assign do |attachment|
-        if attachment.image?
+        if attachment.image? && valid_image_format?(attachment.format)
           if attachment.format == 'heic'
             attachment.convert('-format jpeg')
             attachment.name = "#{SecureRandom.uuid}.jpg"
@@ -19,6 +19,13 @@ module ImageWithValidation
   end
 
   private
+
+  def valid_image_format?(format)
+    return false unless format
+    
+    valid_formats = %w[jpg jpeg png gif bmp webp heic heif tiff tif]
+    valid_formats.include?(format.to_s.downcase)
+  end
 
   def validate_image_format
     return unless image
