@@ -18,6 +18,20 @@ Dandelion::App.controller do
     end.to_json
   end
 
+  get '/z/organisation_followers', provides: :json do
+    @organisation = Organisation.find_by(slug: params[:organisation_slug]) || not_found
+    organisation_admins_only!
+    @organisation.organisationships.and(:created_at.gte => 1.day.ago).order('created_at desc').map do |organisationship|
+      {
+        id: organisationship.id.to_s,
+        name: organisationship.account.name,
+        firstname: organisationship.account.firstname,
+        lastname: organisationship.account.lastname,
+        email: organisationship.account.email
+      }
+    end.to_json
+  end
+
   get '/z/organisation_event_orders', provides: :json do
     @organisation = Organisation.find_by(slug: params[:organisation_slug]) || not_found
     @event = Event.find(params[:event_id])
