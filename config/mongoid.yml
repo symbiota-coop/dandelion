@@ -15,4 +15,22 @@ test:
 production:
   clients:
     default:
-      uri: <%= ENV['MONGODB_URI'] || ENV['MONGO_URL'] %>
+      <% mongodb_uri = ENV['MONGODB_URI'] || ENV['MONGO_URL'] %>
+      <% if mongodb_uri && !mongodb_uri.empty? %>
+      uri: <%= mongodb_uri %>
+      <% else %>
+      <% raise "MONGODB_URI or MONGO_URL environment variable must be set for production" %>
+      <% end %>
+  options:
+    # Connection pool configuration
+    max_pool_size: 10
+    min_pool_size: 1
+    wait_queue_timeout: 5
+    # Connection timeout settings
+    connect_timeout: 10
+    socket_timeout: 5
+    server_selection_timeout: 30
+    # Retry configuration
+    max_retries: 3
+    # Logging
+    log_level: :info
