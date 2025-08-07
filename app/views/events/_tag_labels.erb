@@ -2,8 +2,8 @@
 <span class="tag-container">
   <% tags_to_display.each_with_index do |event_tag, index| %>
     <span class="tag-item <%= 'd-none' if defined?(show_more) && index >= show_more_limit %>">
-      <% if event.organisation %>
-        <a <% if event.ai_tagged? %> data-toggle="tooltip" title="AI generated"<% end %> href="/events?event_tag_id=<%= event_tag.id %>" class="text-white label <%= event.ai_tagged? ? 'label-primary' : 'label-primary' %> d-inline-block mb-1"><% if event.ai_tagged? %><i class="bi bi-stars"></i> <% end %><%== Sanitize.fragment(event_tag.name) %></a>
+      <% if @organisation %>
+        <a <% if event.ai_tagged? %> data-toggle="tooltip" title="AI generated"<% end %> href="/o/<%= @organisation.slug %>/events?event_tag_id=<%= event_tag.id %><%= '&minimal=1' if params[:minimal] %>" class="text-white label <%= event.ai_tagged? ? 'label-primary' : 'label-primary' %> d-inline-block mb-1"><% if event.ai_tagged? %><i class="bi bi-stars"></i> <% end %><%== Sanitize.fragment(event_tag.name) %></a>
       <% else %>
         <span <% if event.ai_tagged? %> data-toggle="tooltip" title="AI generated"<% end %> class="text-white label <%= event.ai_tagged? ? 'label-primary' : 'label-primary' %> d-inline-block mb-1"><% if event.ai_tagged? %><i class="bi bi-stars"></i> <% end %><%== Sanitize.fragment(event_tag.name) %></span>
       <% end %>
