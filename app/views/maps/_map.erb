@@ -219,15 +219,9 @@ markers = {
       console.log('using polygonables')
       map.fitBounds(bounds);
   <% elsif (!defined?(points) || points.empty? || (defined?(points_count) && points_count > points_limit)) %>
-      <% if current_account && current_account.coordinates %>
-        console.log('using current_account')
-        map.setCenter(new google.maps.LatLng(<%= current_account.lat %>, <%= current_account.lng %>));
-        map.setZoom(7);
-      <% else %>
-        console.log('using world')
-        map.setCenter(new google.maps.LatLng(35, 0));
-        map.setZoom(0);
-      <% end %>
+      console.log('using world')
+      map.setCenter(new google.maps.LatLng(35, 0));
+      map.setZoom(0);
   <% else %>
       console.log('using bounds')
       map.fitBounds(bounds);
