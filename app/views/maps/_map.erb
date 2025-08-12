@@ -212,6 +212,9 @@ markers = {
       console.log('using centre')
       map.setCenter(new google.maps.LatLng(<%= centre.lat %>, <%= centre.lng %>))
       map.setZoom(<%= zoom %>)
+  <% elsif defined?(bounding_box) && bounding_box %>
+      console.log('using bounding box')
+      map.fitBounds({west: <%= bounding_box[0] %>, south: <%= bounding_box[1] %>, east: <%= bounding_box[2] %>, north: <%= bounding_box[3] %>});
   <% elsif defined?(bounds) && bounds %>
       console.log('using explicit bounds')
       map.fitBounds({south: <%= bounds[:south] %>, west: <%= bounds[:west] %>, north: <%= bounds[:north] %>, east: <%= bounds[:east] %>});

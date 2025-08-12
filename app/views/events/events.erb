@@ -30,7 +30,7 @@
 
 <% if params[:display] == 'map' %>
   <div data-pagelet-url="/events?<%= Rack::Utils.parse_nested_query(request.query_string).merge(bounding_box: @bounding_box&.flatten).to_query %>">
-    <%= partial :'maps/map', locals: { stem: "/events", dynamic: true, trigger_bounds_changed: true } %>
+    <%= partial :'maps/map', locals: { stem: "/events", dynamic: true, trigger_bounds_changed: true, bounding_box: @bounding_box&.flatten } %>
   </div>
 <% elsif params[:display] == 'calendar' %>
   <iframe src="<%=ENV['TEAMUP_CALENDAR_URL']%>" style="width: 100%; height: 800px" loading="lazy" frameborder="0"></iframe>
