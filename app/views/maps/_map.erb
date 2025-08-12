@@ -38,9 +38,12 @@ markers = {
       return;
     }
 
+    var params = {}
     var pagelet = $('#map-container').closest('[data-pagelet-url]')
-    var query = pagelet.attr('data-pagelet-url').split('?')[1]
-    var params = $.deparam(query)
+    if (pagelet.length > 0) {
+      query = pagelet.attr('data-pagelet-url').split('?')[1]
+      params = $.deparam(query)
+    }
 
     mapTimer = null;
     map = new google.maps.Map(document.getElementById("map-canvas"), {
