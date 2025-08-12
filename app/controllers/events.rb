@@ -390,7 +390,7 @@ Dandelion::App.controller do
       agent = Mechanize.new
       captcha_response = JSON.parse(agent.post(ENV['RECAPTCHA_VERIFY_URL'], { secret: ENV['RECAPTCHA_SECRET_KEY'], response: params['g-recaptcha-response'] }).body)
       unless captcha_response['success'] == true
-        flash[:error] = "Our systems think you're a bot. Please email #{ENV['CONTACT_EMAIL']} if you keep having trouble."
+        flash[:error] = "Our systems think you're a bot. Please try a different device or browser, or email #{ENV['CONTACT_EMAIL']} if you keep having trouble."
         redirect(back)
       end
     end
