@@ -29,7 +29,14 @@ Dandelion::App.controller do
       if result.respond_to?(:boundingbox)
         south, north, west, east = result.boundingbox.map(&:to_f)
       elsif result.respond_to?(:bounds)
-        south, west, north, east = result.bounds.map(&:to_f)
+        if ['UK', 'United Kingdom'].include?(params[:near])
+          south = 49.6740000
+          west = -14.0155170
+          north = 61.0610000
+          east = 2.0919117
+        else
+          south, west, north, east = result.bounds.map(&:to_f)
+        end
       end
       @bounding_box = [[west, south], [east, north]]
       @events = @events.and(coordinates: { '$geoWithin' => { '$box' => @bounding_box } })
