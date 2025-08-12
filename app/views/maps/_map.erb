@@ -42,6 +42,18 @@ markers = {
     var query = pagelet.attr('data-pagelet-url').split('?')[1]
     var params = $.deparam(query)
 
+    mapTimer = null;
+    map = new google.maps.Map(document.getElementById("map-canvas"), {
+      mapTypeId: google.maps.MapTypeId.ROADMAP,
+      mapTypeControl: false,
+      scaleControl: true,
+      streetViewControl: false,
+      fullscreenControl: false,
+      maxZoom: 16,
+      minZoom: <%= defined?(minZoom) && minZoom ? minZoom : 1 %>
+    });
+    var bounds = new google.maps.LatLngBounds();
+
     if (params['bounding_box']) {
 
       var west = parseFloat(params['bounding_box'][0]);
@@ -58,19 +70,17 @@ markers = {
         {lat: north, lng: east}, // Northeast
         {lat: south, lng: east}  // Southeast
       ];
-    }
 
-    mapTimer = null;
-    map = new google.maps.Map(document.getElementById("map-canvas"), {
-      mapTypeId: google.maps.MapTypeId.ROADMAP,
-      mapTypeControl: false,
-      scaleControl: true,
-      streetViewControl: false,
-      fullscreenControl: false,
-      maxZoom: 16,
-      minZoom: <%= defined?(minZoom) && minZoom ? minZoom : 1 %>
-    });
-    var bounds = new google.maps.LatLngBounds();
+      var polygon = new google.maps.Polygon({
+        paths: boundingBoxPaths,
+        strokeColor: '#000000',
+        strokeOpacity: 0.1,
+        strokeWeight: 2,
+        fillColor: '#000000',
+        fillOpacity: 0.05,
+        map: map
+      });
+    }
 
     var models = []
   <%
@@ -253,18 +263,6 @@ markers = {
   <% end %>
 
   <% if defined?(dynamic) && dynamic %>
-      if (params['bounding_box']) {
-        var polygon = new google.maps.Polygon({
-          paths: boundingBoxPaths,
-          strokeColor: '#000000',
-          strokeOpacity: 0.1,
-          strokeWeight: 2,
-          fillColor: '#000000',
-          fillOpacity: 0.05,
-          map: map
-        });
-      }
-
        google.maps.event.addListenerOnce(map, 'idle', function () {
         map.addListener('bounds_changed', function () {
   <% if defined?(trigger_bounds_changed) %>
