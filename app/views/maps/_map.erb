@@ -38,6 +38,28 @@ markers = {
       return;
     }
 
+    var pagelet = $('#map-container').closest('[data-pagelet-url]')
+    var query = pagelet.attr('data-pagelet-url').split('?')[1]
+    var params = $.deparam(query)
+
+    if (params['bounding_box']) {
+
+      var west = parseFloat(params['bounding_box'][0]);
+      var south = parseFloat(params['bounding_box'][1]);
+      var east = parseFloat(params['bounding_box'][2]);
+      var north = parseFloat(params['bounding_box'][3]);
+
+      var boundingBox = [west, south, east, north]
+
+      // Create rectangle path (clockwise from southwest)
+      var boundingBoxPaths = [
+        {lat: south, lng: west}, // Southwest
+        {lat: north, lng: west}, // Northwest
+        {lat: north, lng: east}, // Northeast
+        {lat: south, lng: east}  // Southeast
+      ];
+    }
+
     mapTimer = null;
     map = new google.maps.Map(document.getElementById("map-canvas"), {
       mapTypeId: google.maps.MapTypeId.ROADMAP,
@@ -212,9 +234,6 @@ markers = {
       console.log('using centre')
       map.setCenter(new google.maps.LatLng(<%= centre.lat %>, <%= centre.lng %>))
       map.setZoom(<%= zoom %>)
-  <% elsif defined?(bounding_box) && bounding_box %>
-      console.log('using bounding box')
-      map.fitBounds({west: <%= bounding_box[0] %>, south: <%= bounding_box[1] %>, east: <%= bounding_box[2] %>, north: <%= bounding_box[3] %>});
   <% elsif defined?(bounds) && bounds %>
       console.log('using explicit bounds')
       map.fitBounds({south: <%= bounds[:south] %>, west: <%= bounds[:west] %>, north: <%= bounds[:north] %>, east: <%= bounds[:east] %>});
@@ -222,36 +241,19 @@ markers = {
       console.log('using polygonables')
       map.fitBounds(bounds);
   <% elsif (!defined?(points) || points.empty? || (defined?(points_count) && points_count > points_limit)) %>
-      console.log('using world')
-      map.setCenter(new google.maps.LatLng(35, 0));
-      map.setZoom(0);
+      if(params['bounding_box']) {
+        map.fitBounds({west: boundingBox[0], south: boundingBox[1], east: boundingBox[2], north: boundingBox[3]});
+      } else {
+          map.setCenter(new google.maps.LatLng(35, 0));
+          map.setZoom(0);
+      }
   <% else %>
       console.log('using bounds')
       map.fitBounds(bounds);
   <% end %>
 
   <% if defined?(dynamic) && dynamic %>
-      var pagelet = $('#map-container').closest('[data-pagelet-url]')
-      var query = pagelet.attr('data-pagelet-url').split('?')[1]
-      var params = $.deparam(query)
-
       if (params['bounding_box']) {
-        // draw a polygon on the map
-        var boundingBoxPaths = [];
-
-        var west = parseFloat(params['bounding_box'][0]);
-        var south = parseFloat(params['bounding_box'][1]);
-        var east = parseFloat(params['bounding_box'][2]);
-        var north = parseFloat(params['bounding_box'][3]);
-
-        // Create rectangle path (clockwise from southwest)
-        boundingBoxPaths = [
-          {lat: south, lng: west}, // Southwest
-          {lat: north, lng: west}, // Northwest
-          {lat: north, lng: east}, // Northeast
-          {lat: south, lng: east}  // Southeast
-        ];
-
         var polygon = new google.maps.Polygon({
           paths: boundingBoxPaths,
           strokeColor: '#000000',
