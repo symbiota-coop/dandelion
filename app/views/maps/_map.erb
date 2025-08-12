@@ -124,6 +124,7 @@ markers = {
           }
         }(marker));
   <% if (!defined?(polygonables) || polygonables.empty?) %>
+        console.log('pushed ' + marker.getPosition().toJSON() + ' to bounds')
         bounds.extend(marker.getPosition());
   <% end %>
       markers.push(marker);
@@ -208,21 +209,27 @@ markers = {
       }
     });
   <% if defined?(centre) && centre %>
+      console.log('using centre')
       map.setCenter(new google.maps.LatLng(<%= centre.lat %>, <%= centre.lng %>))
       map.setZoom(<%= zoom %>)
   <% elsif defined?(bounds) && bounds %>
+      console.log('using explicit bounds')
       map.fitBounds({south: <%= bounds[:south] %>, west: <%= bounds[:west] %>, north: <%= bounds[:north] %>, east: <%= bounds[:east] %>});
   <% elsif defined?(polygonables) %>
+      console.log('using polygonables')
       map.fitBounds(bounds);
   <% elsif (!defined?(points) || points.empty? || (defined?(points_count) && points_count > points_limit)) %>
       <% if current_account && current_account.coordinates %>
+        console.log('using current_account')
         map.setCenter(new google.maps.LatLng(<%= current_account.lat %>, <%= current_account.lng %>));
         map.setZoom(7);
       <% else %>
+        console.log('using world')
         map.setCenter(new google.maps.LatLng(35, 0));
-        map.setZoom(2);
+        map.setZoom(0);
       <% end %>
   <% else %>
+      console.log('using bounds')
       map.fitBounds(bounds);
   <% end %>
 
@@ -231,15 +238,43 @@ markers = {
       var query = pagelet.attr('data-pagelet-url').split('?')[1]
       var params = $.deparam(query)
 
-      google.maps.event.addListenerOnce(map, 'idle', function () {
+      if (params['bounding_box']) {
+        // draw a polygon on the map
+        var boundingBoxPaths = [];
+
+        var west = parseFloat(params['bounding_box'][0]);
+        var south = parseFloat(params['bounding_box'][1]);
+        var east = parseFloat(params['bounding_box'][2]);
+        var north = parseFloat(params['bounding_box'][3]);
+
+        // Create rectangle path (clockwise from southwest)
+        boundingBoxPaths = [
+          {lat: south, lng: west}, // Southwest
+          {lat: north, lng: west}, // Northwest
+          {lat: north, lng: east}, // Northeast
+          {lat: south, lng: east}  // Southeast
+        ];
+
+        var polygon = new google.maps.Polygon({
+          paths: boundingBoxPaths,
+          strokeColor: '#000000',
+          strokeOpacity: 0.1,
+          strokeWeight: 2,
+          fillColor: '#000000',
+          fillOpacity: 0.05,
+          map: map
+        });
+      }
+
+       google.maps.event.addListenerOnce(map, 'idle', function () {
         map.addListener('bounds_changed', function () {
-          var center = map.getCenter().toJSON()
-          var zoom = map.getZoom()
-          var bounds = map.getBounds().toJSON()
-          delete params['triggered_bounds_changed']
-          var q = {lat: center['lat'], lng: center['lng'], zoom: zoom, south: bounds['south'], west: bounds['west'], north: bounds['north'], east: bounds['east']}
   <% if defined?(trigger_bounds_changed) %>
-            q['triggered_bounds_changed'] = true
+            var bounds = map.getBounds().toJSON()
+            var q = {south: bounds['south'], west: bounds['west'], north: bounds['north'], east: bounds['east']}
+  <% else %>
+            var center = map.getCenter().toJSON()
+            var zoom = map.getZoom()
+            var q = {lat: center['lat'], lng: center['lng'], zoom: zoom}
   <% end %>
           jQuery.extend(params, q);
           pagelet.attr('data-pagelet-url', '<%=defined?(stem) && stem ? stem : '/map' %>/?' + $.param(params))

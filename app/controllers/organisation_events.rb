@@ -25,8 +25,14 @@ Dandelion::App.controller do
     event_tag_ids = EventTagship.and(event_tag_id: params[:event_tag_id]).pluck(:event_id) if params[:event_tag_id]
     event_ids = (!q_ids.empty? && !event_tag_ids.empty? ? (q_ids & event_tag_ids) : (q_ids + event_tag_ids))
     @events = @events.and(:id.in => event_ids) unless event_ids.empty?
-    if params[:near] && (center = Geocoder.coordinates(params[:near]))
-      @events = @events.and(coordinates: { '$geoWithin' => { '$center' => [center.reverse, 50 / 111.319] } })
+    if params[:near] && (result = Geocoder.search(params[:near]).first)
+      if result.respond_to?(:boundingbox)
+        south, north, west, east = result.boundingbox.map(&:to_f)
+      elsif result.respond_to?(:bounds)
+        south, west, north, east = result.bounds.map(&:to_f)
+      end
+      @bounding_box = [[west, south], [east, north]]
+      @events = @events.and(coordinates: { '$geoWithin' => { '$box' => @bounding_box } })
     end
     @events = @events.and(local_group_id: params[:local_group_id]) if params[:local_group_id]
     @events = @events.and(activity_id: params[:activity_id]) if params[:activity_id]
