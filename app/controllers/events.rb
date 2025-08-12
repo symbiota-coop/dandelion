@@ -23,7 +23,7 @@ Dandelion::App.controller do
       if result.respond_to?(:boundingbox)
         south, north, west, east = result.boundingbox.map(&:to_f)
       elsif result.respond_to?(:bounds)
-        if params[:near] == 'UK' || params[:near] == 'United Kingdom'
+        if ['UK', 'United Kingdom'].include?(params[:near])
           south = 49.6740000
           west = -14.0155170
           north = 61.0610000
