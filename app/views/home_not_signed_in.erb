@@ -90,12 +90,15 @@
       </div>
     </div>
 
-    <div class="mt-lg-5">
-      <%= partial :'events/search_form', locals: { path: '/events' } %>
+  </div>
+</div>
 
-      <div data-with-placeholder data-pagelet-url="/events">
-        <%= partial :'events/blocks_placeholder' %>
-      </div>
-    </div>
+<div class="mt-lg-5">
+  <%= partial :'events/search_form', locals: { path: '/events' } %>
 
-    <%= cp :'event_feedbacks/home' %>
+  <div data-with-placeholder data-pagelet-url="/events">
+    <%= partial :'events/blocks_placeholder' %>
+  </div>
+</div>
+
+<%= cp :'event_feedbacks/home' %>
