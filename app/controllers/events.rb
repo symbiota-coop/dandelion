@@ -211,12 +211,12 @@ Dandelion::App.controller do
     cohostship = nil
     if params[:cohost] && (cohost = Organisation.find_by(slug: params[:cohost])) && (cohostship = @event.cohostships.find_by(organisation: cohost)) && cohostship.image
       @event_image = cohostship.image.thumb('1920x1920')
-      @og_image = cohostship.image.thumb('1200x630').url
+      @og_image = cohostship.image.encode('jpg', '-quality 90').thumb('1200x630').url
     elsif @event.image
       @event_image = @event.image.thumb('1920x1920')
-      @og_image = @event.image.thumb('1200x630').url
+      @og_image = @event.image.encode('jpg', '-quality 90').thumb('1200x630').url
     elsif @event.organisation && @event.organisation.image
-      @og_image = @event.organisation.image.thumb('1200x630').url
+      @og_image = @event.organisation.image.encode('jpg', '-quality 90').thumb('1200x630').url
     end
     @event_video = @event.video if @event.video
     @event_video = cohostship.video if cohostship && cohostship.video
