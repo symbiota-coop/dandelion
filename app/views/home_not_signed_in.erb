@@ -66,32 +66,36 @@
       #payment-methods img.gnosis { opacity: 0.75 }
       #payment-methods img.base { opacity: 0.66 }
       #payment-methods img.bread { opacity: 0.5 }
+      #payment-methods img.gocardless { opacity: 0.5; filter: grayscale(100%) brightness(0.4); }
+      #payment-methods img.gocardless:hover { filter: none; }
     </style>
     <div id="payment-methods" class="row align-items-center mb-5 px-0 px-lg-3 mb-lg-3">
       <% {
-        'stripe' => 'https://stripe.com/gb/pricing',
-        'coinbase-commerce' => 'https://help.coinbase.com/en/commerce/getting-started/fees',
-        'opencollective' => 'https://opencollective.com/',
-        'bread' => 'https://breadchain.xyz/',
-        'celo' => 'https://celo.org/',        
+        'stripe.jpg' => 'https://stripe.com/',
+        'gocardless.png' => 'https://gocardless.com/',     
+        'coinbase-commerce.jpg' => 'https://www.coinbase.com/en-gb/commerce',
+        'opencollective.jpg' => 'https://opencollective.com/',
+        'bread.jpg' => 'https://breadchain.xyz/',
+        'celo.jpg' => 'https://celo.org/',     
       }.each do |k, v| %>
         <div class="col">
-          <a href="<%=v%>"><img class="<%=k%> w-100" src="/images/payment_methods/<%=k%>.jpg" /></a>
+          <a href="<%=v%>"><img class="<%=k.split('.').first%> w-100" src="/images/payment_methods/<%=k%>" /></a>
         </div>
       <% end %>
     </div>
 
-    <%= partial :badges %>
+    <div class="row justify-content-center">
+      <div class="col-lg-10">
+        <%= partial :badges %>
+      </div>
+    </div>
 
-  </div>
-</div>
+    <div class="mt-lg-5">
+      <%= partial :'events/search_form', locals: { path: '/events' } %>
 
-<div class="mt-lg-5">
-  <%= partial :'events/search_form', locals: { path: '/events' } %>
+      <div data-with-placeholder data-pagelet-url="/events">
+        <%= partial :'events/blocks_placeholder' %>
+      </div>
+    </div>
 
-  <div data-with-placeholder data-pagelet-url="/events">
-    <%= partial :'events/blocks_placeholder' %>
-  </div>
-</div>
-
-<%= cp :'event_feedbacks/home' %>
+    <%= cp :'event_feedbacks/home' %>
