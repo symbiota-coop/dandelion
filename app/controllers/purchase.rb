@@ -79,11 +79,25 @@ Dandelion::App.controller do
         case params[:detailsForm][:payment_method]
         when 'stripe'
 
-          Stripe.api_key = if @event.organisation.stripe_connect_json
-                             ENV['STRIPE_SK']
-                           else
-                             @event.organisation.stripe_sk
-                           end
+          # Set up Stripe API configuration
+          if @event.organisation.stripe_connect_json
+            # Using Stripe Connect - validate that we have proper platform credentials
+            unless ENV['STRIPE_SK']
+              raise Order::PaymentConfigurationError, 'Platform Stripe key not configured'
+            end
+            Stripe.api_key = ENV['STRIPE_SK']
+            
+            # Validate connected account access
+            unless @event.organisation.stripe_user_id
+              raise Order::PaymentConfigurationError, 'Connected Stripe account ID not found'
+            end
+          else
+            # Using direct Stripe integration
+            unless @event.organisation.stripe_sk
+              raise Order::PaymentConfigurationError, 'Organisation Stripe key not configured'
+            end
+            Stripe.api_key = @event.organisation.stripe_sk
+          end
           Stripe.api_version = '2020-08-27'
 
           if ticketForm[:cohost] && (cohost = Organisation.find_by(slug: ticketForm[:cohost])) && (cohostship = @event.cohostships.find_by(organisation: cohost)) && cohostship.image
@@ -132,7 +146,35 @@ Dandelion::App.controller do
           stripe_session_hash.merge!({
                                        payment_intent_data: payment_intent_data
                                      })
-          session = Stripe::Checkout::Session.create(stripe_session_hash, @event.organisation.stripe_connect_json ? { stripe_account: @event.organisation.stripe_user_id } : {})
+          
+          # Create Stripe session with proper account context
+          begin
+            session_options = @event.organisation.stripe_connect_json ? 
+                               { stripe_account: @event.organisation.stripe_user_id } : 
+                               {}
+            session = Stripe::Checkout::Session.create(stripe_session_hash, session_options)
+          rescue Stripe::PermissionError => e
+            # Handle permission errors for Stripe Connect accounts
+            if @event.organisation.stripe_connect_json
+              # Log the error and clear the problematic connection
+              Honeybadger.context({ 
+                organisation_id: @event.organisation.id.to_s,
+                stripe_user_id: @event.organisation.stripe_user_id,
+                error_message: e.message
+              })
+              Honeybadger.notify(e, context: { error_type: 'stripe_connect_permission_error' })
+              
+              # Clear the invalid connection data
+              @event.organisation.update_attributes!(
+                stripe_connect_json: nil,
+                stripe_account_json: nil
+              )
+              
+              raise Order::PaymentError, 'Stripe connection has been revoked. Please reconnect your Stripe account in organisation settings.'
+            else
+              raise e
+            end
+          end
           @order.update_attributes!(
             value: @order.total.round(2),
             session_id: session.id,
@@ -226,6 +268,19 @@ Dandelion::App.controller do
         @order.create_order_notification
         { order_id: @order.id.to_s }.to_json
       end
+    rescue Order::PaymentConfigurationError => e
+      # Configuration error - don't destroy order, notify with specific error
+      Honeybadger.context({ 
+        order_id: @order.id,
+        organisation_id: @event.organisation.id.to_s,
+        error_type: 'payment_configuration_error'
+      })
+      Honeybadger.notify(e)
+      halt 400, { error: e.message }.to_json
+    rescue Order::PaymentError => e
+      # Payment error - don't destroy order, notify user
+      @order.notify_of_failed_purchase(e)
+      halt 400, { error: e.message }.to_json
     rescue Stripe::InvalidRequestError => e
       @order.notify_of_failed_purchase(e)
       @order.destroy
