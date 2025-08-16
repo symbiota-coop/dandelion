@@ -2,7 +2,16 @@
    @tickets = @tickets.paginate(page: params[:page], per_page: 50) %>
 <% if event_email_viewer? %>
   <pre>
-    <%== Account.and(:id.in => @tickets.pluck(:account_id)).map { |account| "#{Sanitize.fragment(account.name)} &lt;#{Sanitize.fragment(account.email)}&gt;" }.join(', ') %>
+    <% 
+    tickets_with_accounts = @tickets.includes(:account).to_a
+    email_list = tickets_with_accounts.filter_map do |ticket|
+      name = ticket.name.present? ? ticket.name : (ticket.account&.name)
+      email = ticket.email.present? ? ticket.email : (ticket.account&.email)
+      next unless name && email
+      "#{Sanitize.fragment(name)} &lt;#{Sanitize.fragment(email)}&gt;"
+    end.uniq
+    %>
+    <%== email_list.join(', ') %>
   </pre>
 <% end %>
 <% unless params[:search] %>
