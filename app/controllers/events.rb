@@ -29,11 +29,13 @@ Dandelion::App.controller do
           north = 61.0610000
           east = 2.0919117
         else
-          south, west, north, east = result.bounds.map(&:to_f)
+          south, west, north, east = result.bounds&.map(&:to_f)
         end
       end
-      @bounding_box = [[west, south], [east, north]]
-      @events = @events.and(coordinates: { '$geoWithin' => { '$box' => @bounding_box } })
+      if south && west && north && east
+        @bounding_box = [[west, south], [east, north]]
+        @events = @events.and(coordinates: { '$geoWithin' => { '$box' => @bounding_box } })
+      end
     end
     @events = @events.and(:id.in => EventTagship.and(event_tag_id: params[:event_tag_id]).pluck(:event_id)) if params[:event_tag_id]
     %i[organisation activity local_group].each do |r|
