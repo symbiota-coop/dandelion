@@ -35,19 +35,33 @@ Dandelion::App.controller do
           south, west, north, east = result.bounds.map(&:to_f)
         end
       end
-      unless bounds
-        # Create a 10km x 10km bounding box around the geocoded location
-        km = 10
-        lat, lng = result.coordinates
-        # Approximate degrees per kilometer (varies by latitude, but good enough for a 10km box)
-        lat_offset = (km / 2) * 0.009 # ~1km = 0.009 degrees latitude
-        lng_offset = (km / 2) * 0.009 / Math.cos(lat * Math::PI / 180) # Adjust for longitude compression at this latitude
 
-        south = lat - lat_offset
-        north = lat + lat_offset
-        west = lng - lng_offset
-        east = lng + lng_offset
+      # Always ensure minimum 25km bounding box
+      lat, lng = result.coordinates
+      min_km = 25
+      # Approximate degrees per kilometer (varies by latitude, but good enough for a 25km box)
+      lat_offset = (min_km / 2) * 0.009 # ~1km = 0.009 degrees latitude
+      lng_offset = (min_km / 2) * 0.009 / Math.cos(lat * Math::PI / 180) # Adjust for longitude compression at this latitude
+
+      min_south = lat - lat_offset
+      min_north = lat + lat_offset
+      min_west = lng - lng_offset
+      min_east = lng + lng_offset
+
+      if bounds
+        # Expand bounds if they're smaller than 25km
+        south = [south, min_south].min
+        north = [north, min_north].max
+        west = [west, min_west].min
+        east = [east, min_east].max
+      else
+        # Use the 25km box as fallback
+        south = min_south
+        north = min_north
+        west = min_west
+        east = min_east
       end
+
       @bounding_box = [[west, south], [east, north]]
       @events = @events.and(coordinates: { '$geoWithin' => { '$box' => @bounding_box } })
     end
