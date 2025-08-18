@@ -1,6 +1,14 @@
 Dandelion::App.controller do
   get '/daily' do
-    @date = params[:date] ? Date.parse(params[:date]) : Date.today
+    @date = if params[:date]
+              begin
+                Date.parse(params[:date])
+              rescue Date::Error
+                Date.today
+              end
+            else
+              Date.today
+            end
     if request.xhr?
       @event_tags = EventTag.all
       stash_partial(:daily, key: "/daily?date=#{@date.to_fs(:db_local)}")
