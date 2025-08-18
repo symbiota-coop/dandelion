@@ -19,52 +19,7 @@ Dandelion::App.controller do
               else
                 @events
               end
-    if params[:near] && (result = Geocoder.search(params[:near]).first)
-      bounds = nil
-      if result.respond_to?(:boundingbox) && result.boundingbox
-        bounds = true
-        south, north, west, east = result.boundingbox.map(&:to_f)
-      elsif result.respond_to?(:bounds) && result.bounds
-        bounds = true
-        if ['uk', 'united kingdom'].include?(params[:near].downcase)
-          south = 49.6740000
-          west = -14.0155170
-          north = 61.0610000
-          east = 2.0919117
-        else
-          south, west, north, east = result.bounds.map(&:to_f)
-        end
-      end
-
-      # Always ensure minimum 25km bounding box
-      lat, lng = result.coordinates
-      min_km = 25
-      # Approximate degrees per kilometer (varies by latitude, but good enough for a 25km box)
-      lat_offset = (min_km / 2) * 0.009 # ~1km = 0.009 degrees latitude
-      lng_offset = (min_km / 2) * 0.009 / Math.cos(lat * Math::PI / 180) # Adjust for longitude compression at this latitude
-
-      min_south = lat - lat_offset
-      min_north = lat + lat_offset
-      min_west = lng - lng_offset
-      min_east = lng + lng_offset
-
-      if bounds
-        # Expand bounds if they're smaller than 25km
-        south = [south, min_south].min
-        north = [north, min_north].max
-        west = [west, min_west].min
-        east = [east, min_east].max
-      else
-        # Use the 25km box as fallback
-        south = min_south
-        north = min_north
-        west = min_west
-        east = min_east
-      end
-
-      @bounding_box = [[west, south], [east, north]]
-      @events = @events.and(coordinates: { '$geoWithin' => { '$box' => @bounding_box } })
-    end
+    @events = @events.and(coordinates: { '$geoWithin' => { '$box' => @bounding_box } }) if params[:near] && (@bounding_box = calculate_geographic_bounding_box(params[:near]))
     @events = @events.and(:id.in => EventTagship.and(event_tag_id: params[:event_tag_id]).pluck(:event_id)) if params[:event_tag_id]
     %i[organisation activity local_group].each do |r|
       @events = @events.and("#{r}_id": params[:"#{r}_id"]) if params[:"#{r}_id"]
