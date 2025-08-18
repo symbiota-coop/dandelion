@@ -385,7 +385,7 @@ Dandelion::App.controller do
     sign_in_required!
     @provider = Provider.object(params[:provider])
     @account = current_account
-    if @account.provider_links.find_by(provider: @provider.display_name).destroy
+    if @account.provider_links.find_by(provider: @provider.display_name).try(:destroy)
       flash[:notice] = "<i class=\"#{@provider.icon}\"></i> Disconnected!"
       redirect '/accounts/providers'
     else
