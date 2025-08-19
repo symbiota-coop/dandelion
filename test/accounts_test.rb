@@ -10,7 +10,7 @@ class DandelionTest < ActiveSupport::TestCase
     fill_in 'Email', with: @account.email
     fill_in 'Location', with: @account.location
     click_button 'Sign up'
-    assert page.has_content? 'Your account was created successfully'
+    assert page.has_content? 'Welcome to Dandelion!'
   end
 
   test 'signing in' do

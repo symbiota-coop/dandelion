@@ -186,11 +186,17 @@ class Pmail
       %(<oembed url="https://www.youtube.com/watch?v=#{video_id}"></oembed>)
     end
     # replace youtube.com links with embeds
-    b.gsub(%r{<oembed url="https://www\.youtube\.com/watch\?v=(\w+)"></oembed>}) do |match|
+    b = b.gsub(%r{<oembed url="https://www\.youtube\.com/watch\?v=(\w+)"></oembed>}) do |match|
       video_id = match.match(%r{<oembed url="https://www\.youtube\.com/watch\?v=(\w+)"></oembed>})[1]
       title = Yt::Video.new(id: video_id).title
       "<figure><a href=\"https://www.youtube.com/watch?v=#{video_id}\"><img src=\"#{ENV['BASE_URI']}/youtube_thumb/#{video_id}\"></a><figcaption>#{title}</figcaption></figure>"
     end
+    # replace all figures with divs
+    b = b.gsub(/<figure([^>]*)>/, '<div\1>')
+    b = b.gsub('</figure>', '</div>')
+    # replace all figcaptions with divs
+    b = b.gsub(/<figcaption([^>]*)>/, '<span\1>')
+    b.gsub('</figcaption>', '</span>')
   end
 
   after_save do
