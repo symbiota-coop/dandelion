@@ -272,6 +272,7 @@ Dandelion::App.controller do
     @event = Event.find_by(slug: params[:slug]) || not_found
     kick! unless @event.organisation
     event_admins_only!
+    return not_found unless @event
     @event.last_saved_by = current_account
     if @event.update_attributes(mass_assigning(params[:event], Event))
       @event.set(locked: true) if !@event.organisation.payment_method? && @event.paid_tickets?
