@@ -36,7 +36,7 @@
   </div>
 <% end %>
 
-<% if !params[:search] && !params[:event_tag_id] && !params[:page] && !params[:carousel_ids] %>
+<% if !params[:search] && !params[:event_tag_id] && !params[:page] && !params[:carousel_ids] && !params[:local_group_id] %>
   <% if @organisation.featured_events.count > 0 %>
     <div data-with-placeholder data-pagelet-url="/o/<%= @organisation.slug %>/carousels/featured?hide_featured_title=<%=params[:hide_featured_title]%>">
       <%= partial :'events/carousel_placeholder' %>
