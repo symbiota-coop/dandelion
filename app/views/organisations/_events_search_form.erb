@@ -36,11 +36,15 @@
         <label>near</label>
         <%= text_field_tag :near, class: 'form-control', value: params[:near], id: 'events-search-near', placeholder: '' %>
       </div>
-      <% if !@carousel_buttons %>
+      <% if @carousel_buttons %>
+        <% if params[:carousel_ids] %>
+          <% params[:carousel_ids].each do |carousel_id| %>
+            <%= hidden_field_tag :'carousel_ids[]', value: carousel_id %>
+          <% end %>
+        <% end %>
+      <% else %>
         <%= partial :'organisations/search_event_tags' %>
-      <% end %>
-      <%= partial :'organisations/search_local_groups' %>
-      <% if !@carousel_buttons %>
+        <%= partial :'organisations/search_local_groups' %>
         <%= partial :'organisations/search_activities' %>
       <% end %>
       <%= partial :'organisations/search_carousels' %>
