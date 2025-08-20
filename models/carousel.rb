@@ -8,6 +8,10 @@ class Carousel
   field :name, type: String
   field :weeks, type: Integer
   field :o, type: Integer
+  field :button, type: Boolean
+  field :o, type: Integer
+
+  validates_presence_of :name
 
   def self.admin_fields
     {
@@ -27,6 +31,12 @@ class Carousel
 
   def self.edit_hints
     {}.merge(new_hints)
+  end
+
+  def self.human_attribute_name(attr, options = {})
+    {
+      button: 'Show button'
+    }[attr] || super
   end
 
   has_many :carouselships, dependent: :destroy

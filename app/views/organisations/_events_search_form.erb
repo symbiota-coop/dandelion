@@ -8,7 +8,10 @@
   })
 </script>
 
-<div class="search well">
+<% @carousel_buttons = @organisation.carousels.and(button: true).count > 0 %>
+<%= partial :'organisations/carousel_buttons' %>
+
+<div class="search well <%='mt-3' if @carousel_buttons %>" id="search-well" style="<%= 'display: none;' if @carousel_buttons && !params[:search] %>">
 
   <% form_tag '', method: 'get', class: 'submitOnChange searchForm mb-3' do %>
     <%= hidden_field_tag :display, value: params[:display] %>
@@ -49,10 +52,10 @@
           <%= select_tag :activity_id, options: [''] + activities.map { |activity| [activity.name, activity.id] }, selected: params[:activity_id], class: 'form-control' %>
         </div>
       <% end %>
-      <% if (carousels = @organisation.carousels.order('o asc')).count > 0 %>
+      <% if !@carousel_buttons && ((carousels = @organisation.carousels.order('o asc')).count > 0) %>
         <div class="form-group col-12 col-sm-auto">
           <label>Carousel</label>
-          <%= select_tag :carousel_id, options: ['', ['Featured', 'featured']] + carousels.map { |carousel| [carousel.name, carousel.id] }, selected: params[:carousel_id], class: 'form-control' %>
+          <%= select_tag :'carousel_ids[]', options: ['', ['Featured', 'featured']] + carousels.map { |carousel| [carousel.name, carousel.id] }, selected: (params[:carousel_ids].first if params[:carousel_ids] && params[:carousel_ids].count == 1), class: 'form-control' %>
         </div>
       <% end %>
     </div>

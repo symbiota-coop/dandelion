@@ -1,0 +1,82 @@
+<script>
+  function toggleAdvancedSearch() {
+    var searchWell = $('#search-well');
+    var toggleLink = $('#toggle-search');
+    var searchArrow = $('#search-arrow');
+
+    if (searchWell.is(':visible')) {
+      searchWell.hide();
+      toggleLink.html('<i class="bi bi-chevron-right" id="search-arrow"></i> Show advanced search');
+    } else {
+      searchWell.show();
+      toggleLink.html('<i class="bi bi-chevron-down" id="search-arrow"></i> Hide advanced search');
+    }
+  }
+
+  function updateCarouselHref(element) {
+    var searchWell = $('#search-well');
+    var isSearchWellVisible = searchWell.is(':visible');
+
+    if (isSearchWellVisible) {
+      // Use full href with all existing parameters
+      element.href = element.getAttribute('data-full-href');
+    } else {
+      // Use carousel-only href without search parameters
+      element.href = element.getAttribute('data-carousel-only-href');
+    }
+
+    return true; // Allow the link to proceed
+  }
+</script>
+
+<% if @carousel_buttons %>
+  <div class="m-3">
+    <% @organisation.carousels.and(button: true).each do |carousel| %>
+      <%
+      current_carousel_ids = params[:carousel_ids] || []
+      if current_carousel_ids.include?(carousel.id.to_s)
+        # Remove this carousel from the list
+        new_carousel_ids = current_carousel_ids - [carousel.id.to_s]
+      else
+        # Add this carousel to the list
+        new_carousel_ids = current_carousel_ids + [carousel.id.to_s]
+      end
+      
+      # Build query string preserving other query params (not route params)
+      # Parse query string manually for Sinatra
+      query_params = {}
+      if request.query_string
+        Rack::Utils.parse_nested_query(request.query_string).each do |key, value|
+          query_params[key] = value unless key == 'carousel_ids'
+        end
+      end
+      
+      # Build the href manually to handle multiple carousel_ids[] properly
+      param_strings = []
+      query_params.each do |key, value|
+        param_strings << "#{key}=#{CGI.escape(value.to_s)}" if value.present?
+      end
+      new_carousel_ids.each { |id| param_strings << "carousel_ids[]=#{CGI.escape(id)}" }
+      
+      base_href = param_strings.any? ? "?#{param_strings.join('&')}" : "?"
+      carousel_only_href = new_carousel_ids.any? ? "?#{new_carousel_ids.map { |id| "carousel_ids[]=#{CGI.escape(id)}" }.join('&')}" : "?"
+    %>
+      <a href="<%= base_href %>" 
+         data-full-href="<%= base_href %>" 
+         data-carousel-only-href="<%= carousel_only_href %>"
+         onclick="updateCarouselHref(this)"
+         class="btn <%= params[:carousel_ids] && params[:carousel_ids].include?(carousel.id.to_s) ? 'btn-primary' : 'btn-outline-primary' %>">
+        <%= carousel.name %>
+      </a>
+    <% end %>
+  </div>
+<% end %>
+
+<% if @carousel_buttons %>
+  <div class="text-right">
+    <a href="javascript:;" id="toggle-search" onclick="toggleAdvancedSearch()">
+      <i class="bi <%= params[:search] ? 'bi-chevron-down' : 'bi-chevron-right' %>" id="search-arrow"></i>
+      <%= params[:search] ? 'Hide advanced search' : 'Show advanced search' %>
+    </a>
+  </div>
+<% end %>

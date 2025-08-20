@@ -29,12 +29,12 @@ Dandelion::App.controller do
     @events = @events.and(local_group_id: params[:local_group_id]) if params[:local_group_id]
     @events = @events.and(activity_id: params[:activity_id]) if params[:activity_id]
     carousel = nil
-    if params[:carousel_id]
-      @events = if params[:carousel_id] == 'featured'
+    if params[:carousel_ids]
+      @events = if params[:carousel_ids].include?('featured')
                   @events.and(featured: true)
                 else
-                  carousel = Carousel.find(params[:carousel_id]) || not_found
-                  @events.and(:id.in => EventTagship.and(:event_tag_id.in => carousel.event_tags.pluck(:id)).pluck(:event_id))
+                  event_tags = EventTag.and(:id.in => Carouselship.and(:carousel_id.in => params[:carousel_ids]).pluck(:event_tag_id))
+                  @events.and(:id.in => EventTagship.and(:event_tag_id.in => event_tags.pluck(:id)).pluck(:event_id))
                 end
     end
     unless params[:online] && params[:in_person]
