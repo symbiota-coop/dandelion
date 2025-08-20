@@ -1,4 +1,4 @@
-      <% if (event_tags = @organisation.event_tags.and(:id.in => EventTagship.and(:event_id.in => @future_and_current_event_ids).pluck(:event_tag_id))).count > 1 %>
+<% if !@carousel_buttons && (event_tags = @organisation.event_tags.and(:id.in => EventTagship.and(:event_id.in => @future_and_current_event_ids).pluck(:event_tag_id))).count > 1 %>
   <div class="form-group col-12 col-sm-auto">
     <label>tagged</label>
     <%= select_tag :event_tag_id, options: [''] + event_tags.order('name asc').map { |event_tag| [event_tag.name, event_tag.id] }, selected: params[:event_tag_id], class: 'form-control' %>
