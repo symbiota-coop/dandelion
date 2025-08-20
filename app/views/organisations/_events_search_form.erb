@@ -47,16 +47,14 @@
         <% if params[:local_group_id] %>
           <%= hidden_field_tag :local_group_id, value: params[:local_group_id] %>
         <% end %>
+        <div class="form-group col-12 col-sm-auto">
+          <%= submit_tag 'Search', class: 'btn btn-primary' %>
+        </div>
       <% else %>
         <%= partial :'organisations/search_event_tags' %>
         <%= partial :'organisations/search_local_groups' %>
         <%= partial :'organisations/search_activities' %>
         <%= partial :'organisations/search_carousels' %>
-      <% end %>
-      <% if @carousel_buttons %>
-        <div class="form-group col-12 col-sm-auto">
-          <%= submit_tag 'Search', class: 'btn btn-primary' %>
-        </div>
       <% end %>
     </div>
     <% if !@carousel_buttons %>
