@@ -56,7 +56,8 @@ a:active {
 }
 
 .btn-outline-primary:hover {
-  background: white;
+  background: $theme-color;
+  color: white;
 }
 
 .btn-primary,
