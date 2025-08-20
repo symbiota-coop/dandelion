@@ -30,7 +30,7 @@
 </script>
 
 <% if @carousel_buttons %>
-  <div class="m-3">
+  <div class="m-3 text-center">
     <% @organisation.carousels.and(button: true).each do |carousel| %>
       <%
       current_carousel_ids = params[:carousel_ids] || []
@@ -65,7 +65,7 @@
          data-full-href="<%= base_href %>" 
          data-carousel-only-href="<%= carousel_only_href %>"
          onclick="updateCarouselHref(this)"
-         class="btn <%= params[:carousel_ids] && params[:carousel_ids].include?(carousel.id.to_s) ? 'btn-primary' : 'btn-outline-primary' %>">
+         class="mb-1 btn <%= params[:carousel_ids] && params[:carousel_ids].include?(carousel.id.to_s) ? 'btn-primary' : 'btn-outline-primary' %>">
         <%= carousel.name %>
       </a>
     <% end %>
