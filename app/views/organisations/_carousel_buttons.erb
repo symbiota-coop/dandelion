@@ -37,7 +37,7 @@
       var urlParams = new URLSearchParams(window.location.search);
       urlParams.forEach(function(value, key) {
         // Skip parameters that are already handled by the form
-        if (key !== 'minimal' && key !== 'carousel_ids[]' && key !== 'local_group_id') {
+        if (key !== 'minimal' && key !== 'carousel_ids[]' && key !== 'near') {
           form.append('<input type="hidden" name="' + key + '" value="' + value + '">');
         }
       });
@@ -75,9 +75,9 @@
       
       base_href = param_strings.any? ? "?#{param_strings.join('&')}" : "?"
       
-      # Build carousel-only href but preserve minimal and local_group_id params
+      # Build carousel-only href but preserve minimal and near params
       carousel_only_params = []
-      %w[minimal local_group_id].each do |param|
+      %w[minimal near].each do |param|
         carousel_only_params << "#{param}=#{CGI.escape(query_params[param].to_s)}" if query_params[param].present?
       end
       new_carousel_ids.each { |id| carousel_only_params << "carousel_ids[]=#{CGI.escape(id)}" }
@@ -102,7 +102,7 @@
           <%= hidden_field_tag :'carousel_ids[]', value: carousel_id %>
         <% end %>
       <% end %>
-      <%= select_tag :local_group_id, options: [['Location', '', {disabled: true, selected: params[:local_group_id].blank?}], ['Anywhere',''], ['Online', 'online']] + local_groups.order('name asc').map { |local_group| [local_group.name, local_group.id] }, selected: params[:local_group_id], class: 'form-control d-inline-block', style: 'width: auto' %>
+      <%= select_tag :near, options: [['Location', '', {disabled: true, selected: params[:near].blank?}], ['Anywhere',''], ['Online', 'online']] + local_groups.order('name asc').map { |local_group| [local_group.name, local_group.name] }, selected: params[:near], class: 'form-control d-inline-block', style: 'width: auto' %>
     <% end %>
   </div>
 <% end %>

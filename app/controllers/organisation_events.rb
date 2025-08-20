@@ -25,14 +25,14 @@ Dandelion::App.controller do
     event_tag_ids = EventTagship.and(event_tag_id: params[:event_tag_id]).pluck(:event_id) if params[:event_tag_id]
     event_ids = (!q_ids.empty? && !event_tag_ids.empty? ? (q_ids & event_tag_ids) : (q_ids + event_tag_ids))
     @events = @events.and(:id.in => event_ids) unless event_ids.empty?
-    @events = @events.and(coordinates: { '$geoWithin' => { '$box' => @bounding_box } }) if params[:near] && (@bounding_box = calculate_geographic_bounding_box(params[:near]))
-    if params[:local_group_id]
-      @events = if params[:local_group_id] == 'online'
-                  @events.online
-                else
-                  @events.and(local_group_id: params[:local_group_id])
-                end
+    if params[:near]
+      if params[:near] == 'online'
+        @events = @events.online
+      elsif (@bounding_box = calculate_geographic_bounding_box(params[:near]))
+        @events = @events.and(coordinates: { '$geoWithin' => { '$box' => @bounding_box } })
+      end
     end
+    @events = @events.and(local_group_id: params[:local_group_id]) if params[:local_group_id]
     @events = @events.and(activity_id: params[:activity_id]) if params[:activity_id]
     carousel = nil
     if params[:carousel_ids] && params[:carousel_ids].any?
