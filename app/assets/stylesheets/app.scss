@@ -20,6 +20,14 @@ $color_highlight_2: #B900A1;
 
 @import "../infinite_admin/scss/style";
 
+.slick-placeholder h2 {
+  color: #E8E8E8;
+}
+
+.slick-placeholder img {
+  background: #E8E8E8;
+}
+
 #header {
   background: linear-gradient(45deg, #222 0%, #222 66%, $color_highlight_1 100%) !important;
 }
