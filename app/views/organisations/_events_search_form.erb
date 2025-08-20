@@ -72,7 +72,7 @@
     <div class="form-row align-items-end mt-1">
       <%= checkbox 'Online', form_group_class: 'col-12 col-sm-auto' %>
       <%= checkbox 'In person', form_group_class: 'col-12 col-sm-auto' %>
-      <% if @organisation.monthly_donors.exists? %>
+      <% if @organisation.organisation_tiers.exists? %>
         <%= checkbox "Members' events", form_group_class: 'col-12 col-sm-auto' %>
       <% end %>
       <div class="form-group col-12 col-sm-auto">
