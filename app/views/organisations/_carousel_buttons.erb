@@ -102,7 +102,7 @@
           <%= hidden_field_tag :'carousel_ids[]', value: carousel_id %>
         <% end %>
       <% end %>
-      <%= select_tag :near, options: [['Location', '', {disabled: true, selected: params[:near].blank?}], ['Anywhere',''], ['Online', 'online']] + local_groups.order('name asc').map { |local_group| [local_group.name, local_group.name] }, selected: params[:near], class: 'form-control d-inline-block', style: 'width: auto' %>
+      <%= select_tag :near, options: [['Location', '', {disabled: true, selected: params[:near].blank?}], ['Anywhere',''], ['Online', 'online']] + local_groups.order('name asc').map { |local_group| [local_group.name, "#{local_group.name}#{@organisation.near_select_suffix}"] }, selected: params[:near], class: 'form-control d-inline-block', style: 'width: auto' %>
     <% end %>
   </div>
 <% end %>
