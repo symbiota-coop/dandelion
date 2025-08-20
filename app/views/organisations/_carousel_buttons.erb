@@ -27,6 +27,22 @@
 
     return true; // Allow the link to proceed
   }
+
+  // Preserve all query parameters if search well is visible
+  $(function() {
+    var searchWell = $('#search-well');
+    var form = $('#local-group-form').last();
+
+    if (searchWell.length && searchWell.is(':visible')) {
+      var urlParams = new URLSearchParams(window.location.search);
+      urlParams.forEach(function(value, key) {
+        // Skip parameters that are already handled by the form
+        if (key !== 'minimal' && key !== 'carousel_ids[]' && key !== 'local_group_id') {
+          form.append('<input type="hidden" name="' + key + '" value="' + value + '">');
+        }
+      });
+    }
+  });
 </script>
 
 <div class="m-3 text-center">
@@ -79,7 +95,7 @@
 
 <% if (local_groups = @organisation.local_groups.order('name asc').and(:id.in => [params[:local_group_id]].compact + Event.and(:id.in => @future_and_current_event_ids).pluck(:local_group_id))).exists? %>
   <div class="text-center">
-    <% form_tag '', method: 'get', class: 'submitOnChange searchForm mb-3' do %>
+    <% form_tag '', method: 'get', class: 'submitOnChange mb-3', id: 'local-group-form' do %>
       <%= hidden_field_tag :minimal, value: params[:minimal] %>
       <% if params[:carousel_ids] %>
         <% params[:carousel_ids].each do |carousel_id| %>
