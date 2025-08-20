@@ -11,7 +11,9 @@
 <% @future_and_current_event_ids = @organisation.events_for_search.future_and_current.pluck(:id) %>
 
 <% @carousel_buttons = @organisation.carousels.and(button: true).exists? %>
-<%= partial :'organisations/carousel_buttons' %>
+<% if @carousel_buttons %>
+  <%= partial :'organisations/carousel_buttons' %>
+<% end %>
 
 <div class="search well <%='mt-3' if @carousel_buttons %>" id="search-well" style="<%= 'display: none;' if @carousel_buttons && !params[:search] %>">
 
@@ -41,6 +43,9 @@
           <% params[:carousel_ids].each do |carousel_id| %>
             <%= hidden_field_tag :'carousel_ids[]', value: carousel_id %>
           <% end %>
+        <% end %>
+        <% if params[:local_group_id] %>
+          <%= hidden_field_tag :local_group_id, value: params[:local_group_id] %>
         <% end %>
       <% else %>
         <%= partial :'organisations/search_event_tags' %>

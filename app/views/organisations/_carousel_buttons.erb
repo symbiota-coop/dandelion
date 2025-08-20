@@ -29,10 +29,9 @@
   }
 </script>
 
-<% if @carousel_buttons %>
-  <div class="m-3 text-center">
-    <% @organisation.carousels.and(button: true).order('o asc').each do |carousel| %>
-      <%
+<div class="m-3 text-center">
+  <% @organisation.carousels.and(button: true).order('o asc').each do |carousel| %>
+    <%
       current_carousel_ids = params[:carousel_ids] || []
       if current_carousel_ids.include?(carousel.id.to_s)
         # Remove this carousel from the list
@@ -60,28 +59,40 @@
       
       base_href = param_strings.any? ? "?#{param_strings.join('&')}" : "?"
       
-      # Build carousel-only href but preserve minimal param
+      # Build carousel-only href but preserve minimal and local_group_id params
       carousel_only_params = []
-      carousel_only_params << "minimal=#{CGI.escape(query_params['minimal'].to_s)}" if query_params['minimal'].present?
+      %w[minimal local_group_id].each do |param|
+        carousel_only_params << "#{param}=#{CGI.escape(query_params[param].to_s)}" if query_params[param].present?
+      end
       new_carousel_ids.each { |id| carousel_only_params << "carousel_ids[]=#{CGI.escape(id)}" }
       carousel_only_href = carousel_only_params.any? ? "?#{carousel_only_params.join('&')}" : "?"
     %>
-      <a href="<%= base_href %>" 
+    <a href="<%= base_href %>" 
          data-full-href="<%= base_href %>" 
          data-carousel-only-href="<%= carousel_only_href %>"
          onclick="updateCarouselHref(this)"
          class="mb-1 btn <%= params[:carousel_ids] && params[:carousel_ids].include?(carousel.id.to_s) ? 'btn-primary' : 'btn-outline-primary' %>">
-        <%= carousel.name %>
-      </a>
+      <%= carousel.name %>
+    </a>
+  <% end %>
+</div>
+
+<% if (local_groups = @organisation.local_groups.order('name asc').and(:id.in => [params[:local_group_id]].compact + Event.and(:id.in => @future_and_current_event_ids).pluck(:local_group_id))).exists? %>
+  <div class="text-center">
+    <% form_tag '', method: 'get', class: 'submitOnChange searchForm mb-3' do %>
+      <% if params[:carousel_ids] %>
+        <% params[:carousel_ids].each do |carousel_id| %>
+          <%= hidden_field_tag :'carousel_ids[]', value: carousel_id %>
+        <% end %>
+      <% end %>
+      <%= select_tag :local_group_id, options: [['Location', '', {disabled: true, selected: params[:local_group_id].blank?}], ['',''], ['Online', 'online']] + local_groups.order('name asc').map { |local_group| [local_group.name, local_group.id] }, selected: params[:local_group_id], class: 'form-control d-inline-block', style: 'width: auto' %>
     <% end %>
   </div>
 <% end %>
 
-<% if @carousel_buttons %>
-  <div class="text-right">
-    <a href="javascript:;" id="toggle-search" onclick="toggleAdvancedSearch()">
-      <i class="bi <%= params[:search] ? 'bi-chevron-down' : 'bi-chevron-right' %>" id="search-arrow"></i>
-      <%= params[:search] ? 'Hide advanced search' : 'Show advanced search' %>
-    </a>
-  </div>
-<% end %>
+<div class="text-right">
+  <a href="javascript:;" id="toggle-search" onclick="toggleAdvancedSearch()">
+    <i class="bi <%= params[:search] ? 'bi-chevron-down' : 'bi-chevron-right' %>" id="search-arrow"></i>
+    <%= params[:search] ? 'Hide advanced search' : 'Show advanced search' %>
+  </a>
+</div>
