@@ -1,0 +1,14 @@
+      <% if @carousel_buttons %>
+  <% if params[:carousel_ids] %>
+    <% params[:carousel_ids].each do |carousel_id| %>
+      <%= hidden_field_tag :'carousel_ids[]', value: carousel_id %>
+    <% end %>
+  <% end %>
+<% else %>
+  <% if (carousels = @organisation.carousels.order('o asc')).exists? %>
+    <div class="form-group col-12 col-sm-auto">
+      <label>Carousel</label>
+      <%= select_tag :'carousel_ids[]', options: ['', ['Featured', 'featured']] + carousels.map { |carousel| [carousel.name, carousel.id] }, selected: (params[:carousel_ids].first if params[:carousel_ids] && params[:carousel_ids].count == 1), class: 'form-control' %>
+    </div>
+  <% end %>
+<% end %>

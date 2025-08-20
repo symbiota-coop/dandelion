@@ -1,0 +1,6 @@
+ <% if (activities = @organisation.activities.order('name asc').and(:id.in => [params[:activity_id]].compact + Event.and(:id.in => @future_and_current_event_ids).pluck(:activity_id))).exists? %>
+  <div class="form-group col-12 col-sm-auto">
+    <label>Activity</label>
+    <%= select_tag :activity_id, options: [''] + activities.map { |activity| [activity.name, activity.id] }, selected: params[:activity_id], class: 'form-control' %>
+  </div>
+<% end %>
