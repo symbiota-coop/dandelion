@@ -31,7 +31,7 @@
 
 <% if @carousel_buttons %>
   <div class="m-3 text-center">
-    <% @organisation.carousels.and(button: true).each do |carousel| %>
+    <% @organisation.carousels.and(button: true).order('o asc').each do |carousel| %>
       <%
       current_carousel_ids = params[:carousel_ids] || []
       if current_carousel_ids.include?(carousel.id.to_s)
