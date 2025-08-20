@@ -44,17 +44,24 @@
         <%= partial :'organisations/search_activities' %>
       <% end %>
       <%= partial :'organisations/search_carousels' %>
-    </div>
-    <div class="form-row align-items-end mt-1">
-      <%= checkbox 'Online', form_group_class: 'col-12 col-sm-auto' %>
-      <%= checkbox 'In person', form_group_class: 'col-12 col-sm-auto' %>
-      <% if @organisation.organisation_tiers.exists? %>
-        <%= checkbox "Members' events", form_group_class: 'col-12 col-sm-auto' %>
+      <% if @carousel_buttons %>
+        <div class="form-group col-12 col-sm-auto">
+          <%= submit_tag 'Search', class: 'btn btn-primary' %>
+        </div>
       <% end %>
-      <div class="form-group col-12 col-sm-auto">
-        <%= submit_tag 'Search', class: 'btn btn-primary' %>
-      </div>
     </div>
+    <% if !@carousel_buttons %>
+      <div class="form-row align-items-end mt-1">
+        <%= checkbox 'Online', form_group_class: 'col-12 col-sm-auto' %>
+        <%= checkbox 'In person', form_group_class: 'col-12 col-sm-auto' %>
+        <% if @organisation.organisation_tiers.exists? %>
+          <%= checkbox "Members' events", form_group_class: 'col-12 col-sm-auto' %>
+        <% end %>
+        <div class="form-group col-12 col-sm-auto">
+          <%= submit_tag 'Search', class: 'btn btn-primary' %>
+        </div>
+      </div>
+    <% end %>
     <%= hidden_field_tag :search, value: 1 %>
   <% end %>
 
