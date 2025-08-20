@@ -1,34 +1,34 @@
 <!doctype html>
 <html lang="en">
   <%= partial :'layouts/head' %>
-  <body>
+  <body <% if @organisation && @organisation.theme_background_color %>style="background-color: <%= @organisation.theme_background_color %>"<% end %>>
     <% if @organisation %>
       <link href="/organisations/stylesheet.css?theme_color=<%=@organisation.theme_color%>" rel="stylesheet">
-      <% if @organisation.unsanitized_ok? && @organisation.minimal_head %>
-        <%== @organisation.minimal_head %>
-      <% end %>
+    <% if @organisation.unsanitized_ok? && @organisation.minimal_head %>
+      <%== @organisation.minimal_head %>
     <% end %>
-    <% if @account && @account.admin? && @account.minimal_head %>
-      <%== @account.minimal_head %>
-    <% end %>
-    <style>
-      html, body, #map-container, #map-canvas { height: 100% !important }
-    </style>
-    <script>
-      $(function () {
-        $(document).on('click', 'a[target]', function(event) {
-          var a = this
-          $(a).attr('target', '_blank')
-        });
-      })
-    </script>
-    <% if @minimal_container %>
-      <%== '<div class="container-fluid">' %>
-    <% end %>
-    <%= yield %>
-    <% if @minimal_container %>
-      <%== '</div>' %>
-    <% end %>
-    <a data-iframe-height></a>
-  </body>
+  <% end %>
+  <% if @account && @account.admin? && @account.minimal_head %>
+    <%== @account.minimal_head %>
+  <% end %>
+  <style>
+    html, body, #map-container, #map-canvas { height: 100% !important }
+  </style>
+  <script>
+    $(function () {
+      $(document).on('click', 'a[target]', function(event) {
+        var a = this
+        $(a).attr('target', '_blank')
+      });
+    })
+  </script>
+  <% if @minimal_container %>
+    <%== '<div class="container-fluid">' %>
+  <% end %>
+  <%= yield %>
+  <% if @minimal_container %>
+    <%== '</div>' %>
+  <% end %>
+  <a data-iframe-height></a>
+</body>
 </html>

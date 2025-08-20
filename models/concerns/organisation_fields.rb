@@ -42,6 +42,7 @@ module OrganisationFields
     field :event_footer, type: String
     field :minimal_head, type: String
     field :theme_color, type: String
+    field :theme_background_color, type: String
     field :followers_count, type: Integer
     field :subscribed_accounts_count, type: Integer
     field :monthly_donor_affiliate_reward, type: Integer
