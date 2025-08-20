@@ -59,7 +59,12 @@
       new_carousel_ids.each { |id| param_strings << "carousel_ids[]=#{CGI.escape(id)}" }
       
       base_href = param_strings.any? ? "?#{param_strings.join('&')}" : "?"
-      carousel_only_href = new_carousel_ids.any? ? "?#{new_carousel_ids.map { |id| "carousel_ids[]=#{CGI.escape(id)}" }.join('&')}" : "?"
+      
+      # Build carousel-only href but preserve minimal param
+      carousel_only_params = []
+      carousel_only_params << "minimal=#{CGI.escape(query_params['minimal'].to_s)}" if query_params['minimal'].present?
+      new_carousel_ids.each { |id| carousel_only_params << "carousel_ids[]=#{CGI.escape(id)}" }
+      carousel_only_href = carousel_only_params.any? ? "?#{carousel_only_params.join('&')}" : "?"
     %>
       <a href="<%= base_href %>" 
          data-full-href="<%= base_href %>" 
