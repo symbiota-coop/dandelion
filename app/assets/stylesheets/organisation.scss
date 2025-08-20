@@ -51,6 +51,7 @@ a:active {
 .btn-outline-primary:not(:disabled):not(.disabled).active,
 .show>.btn-outline-primary.dropdown-toggle {
   background: $theme-color;
+  border-color: $theme-color;
   color: white;
 }
 
