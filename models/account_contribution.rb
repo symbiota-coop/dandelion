@@ -43,6 +43,7 @@ class AccountContribution
   def body_text
     b = "Account: #{ENV['BASE_URI']}/u/#{account.username}"
     if event
+      b << "\nEvent name: #{event.name}" if event
       b << "\nEvent URL: #{ENV['BASE_URI']}/e/#{event.slug}" if event
       b << "\nEvent Feedback URL: #{ENV['BASE_URI']}/event_feedbacks/#{event_feedback.id}" if event_feedback
     else
