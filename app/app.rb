@@ -92,6 +92,8 @@ module Dandelion
       erb :not_found, layout: :application
     end
 
+    ###
+
     get '/fragments/delete/:q' do
       admins_only!
       if params[:q]
@@ -102,26 +104,13 @@ module Dandelion
     end
 
     get '/geolocate' do
+      admins_only!
       MaxMind::GeoIP2::Reader.new(database: 'GeoLite2-City.mmdb').city(ip_from_cloudflare).to_json
     rescue StandardError => e
       e.to_s
     end
 
-    get '/privacy' do
-      erb :privacy
-    end
-
-    get '/cookies' do
-      erb :cookies
-    end
-
-    get '/terms' do
-      erb :terms
-    end
-
-    get '/contact' do
-      erb :contact
-    end
+    ###
 
     get '/' do
       if current_account
@@ -208,6 +197,14 @@ module Dandelion
       { default: upload.file.url }.to_json
     end
 
+    get '/stripe_row_splitter' do
+      erb :stripe_row_splitter
+    end
+
+    post '/stripe_row_splitter', provides: :csv do
+      StripeRowSplitter.split(File.read(params[:csv]))
+    end
+
     get '/donate' do
       erb :donate
     end
@@ -216,22 +213,20 @@ module Dandelion
       erb :'code/code'
     end
 
-    # get '/token' do
-    #   erb :token
-    # end
-
-    get '/substack_opt_in' do
-      sign_in_required!
-      current_account.update_attribute(:substack_opt_in, Time.now)
-      erb :substack_opt_in
+    get '/privacy' do
+      erb :privacy
     end
 
-    get '/stripe_row_splitter' do
-      erb :stripe_row_splitter
+    get '/cookies' do
+      erb :cookies
     end
 
-    post '/stripe_row_splitter', provides: :csv do
-      StripeRowSplitter.split(File.read(params[:csv]))
+    get '/terms' do
+      erb :terms
+    end
+
+    get '/contact' do
+      erb :contact
     end
   end
 end
