@@ -572,6 +572,19 @@ Dandelion::App.controller do
     content_type 'text/css'
     theme_color = params[:theme_color]
 
+    # Sanitize theme_color to ensure it's a valid hex color
+    if theme_color
+      # Remove quotes and ensure it starts with #
+      theme_color = theme_color.to_s.gsub(/["']/, '')
+      theme_color = "##{theme_color}" unless theme_color.start_with?('#')
+      # Validate it's a proper hex color (3 or 6 digits)
+      unless theme_color.match?(/^#[0-9A-Fa-f]{3}$|^#[0-9A-Fa-f]{6}$/)
+        theme_color = '#00B963' # fallback to default
+      end
+    else
+      theme_color = '#00B963' # default color
+    end
+
     # Read the base SCSS file
     scss_content = File.read(Padrino.root('app/assets/stylesheets/organisation.scss'))
 
