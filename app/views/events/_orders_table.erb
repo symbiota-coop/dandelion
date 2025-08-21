@@ -53,6 +53,9 @@
         <th>Organisation</th>
       <% end %>
       <th>Value</th>
+      <% if defined?(donation_to_dandelion) %>
+        <th>Donation to Dandelion</th>
+      <% end %>
       <th>Via</th>
       <% if @event %>
         <th>Answers</th>
@@ -148,6 +151,13 @@
         <i data-toggle="tooltip" title="Deleted" class="bi bi-trash"></i>
       <% end %>
     </td>
+    <% if defined?(donation_to_dandelion) %>
+      <td>
+        <% if order.application_fee_paid_to_dandelion? %>
+          <%= m order.donation_revenue, order.currency %>
+        <% end %>
+      </td>
+    <% end %>
     <td>
       <% if order.hear_about %>
         <%= order.hear_about %><br />
