@@ -42,7 +42,15 @@ Dandelion::App.helpers do
       klass.or(klass.admin_fields.map { |k, v| { k => /#{Regexp.escape(query)}/i } if v == :text || (v.is_a?(Hash) && v[:type] == :text) }.compact)
     else
       pipeline = [
-        { '$search': { index: klass.to_s.underscore.pluralize, text: { query: query, path: { wildcard: '*' } } } },
+        { '$search': {
+          index: klass.to_s.underscore.pluralize,
+          compound: {
+            should: [
+              { phrase: { query: query, path: { wildcard: '*' }, score: { boost: { value: 1.5 } } } },
+              { text: { query: query, path: { wildcard: '*' } } }
+            ]
+          }
+        } },
         { '$addFields': { score: { '$meta': 'searchScore' } } },
         { '$match': match.selector }
       ]
