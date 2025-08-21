@@ -9,7 +9,7 @@
       email = ticket.email.present? ? ticket.email : (ticket.account&.email)
       next unless name && email
       "#{Sanitize.fragment(name)} &lt;#{Sanitize.fragment(email)}&gt;"
-    end.uniq
+    end.compact.uniq
     %>
     <%== email_list.join(', ') %>
   </pre>

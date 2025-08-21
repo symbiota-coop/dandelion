@@ -570,7 +570,7 @@ Dandelion::App.controller do
 
   get '/organisations/stylesheet.css' do
     content_type 'text/css'
-    theme_color = params[:theme_color] || '#00B963'
+    theme_color = params[:theme_color]
 
     # Read the base SCSS file
     scss_content = File.read(Padrino.root('app/assets/stylesheets/organisation.scss'))
