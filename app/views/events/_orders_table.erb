@@ -153,7 +153,7 @@
     </td>
     <% if defined?(donation_to_dandelion) %>
       <td>
-        <% if order.application_fee_paid_to_dandelion? %>
+        <% if order.application_fee_paid_to_dandelion? && order.donation_revenue > 0 %>
           <%= m order.donation_revenue, order.currency %>
         <% end %>
       </td>
