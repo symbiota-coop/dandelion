@@ -4,10 +4,29 @@
     <meta charset="utf-8">
     <meta content="width=device-width, initial-scale=1.0" name="viewport">
     <style>
-      <%= File.read(Padrino.root('app/assets/stylesheets/email.css')) %>
       <% if !defined?(header_image_url) %>
         body { padding-top: 16px }
       <% end %>
+      <%= File.read(Padrino.root('app/assets/stylesheets/email.css')) %>
+        a {
+          color: #00B963;
+        }
+
+        a:hover {
+          color: #00A558;
+        }
+
+        p.action a {
+          background: #00B963;
+        }
+
+        p.action a:hover {
+          background: #00A558 !important;
+        }
+
+        blockquote {
+          border-left: 0.25rem solid rgba(0, 185, 99, 0.33);
+        }
     </style>
   </head>
   <body>

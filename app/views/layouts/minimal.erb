@@ -3,7 +3,7 @@
   <%= partial :'layouts/head' %>
   <body <% if @organisation && @organisation.theme_background_color %>style="background-color: <%= @organisation.theme_background_color %>"<% end %>>
     <% if @organisation %>
-      <link href="/organisations/stylesheet.css?theme_color=<%=@organisation.theme_color%>" rel="stylesheet">
+      <link href="/organisations/stylesheet.css?theme_color=<%=CGI.escape(@organisation.theme_color)%>" rel="stylesheet">
     <% if @organisation.unsanitized_ok? && @organisation.minimal_head %>
       <%== @organisation.minimal_head %>
     <% end %>

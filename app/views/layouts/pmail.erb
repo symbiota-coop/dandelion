@@ -13,6 +13,26 @@
     </style>
     <style>
       <%= File.read(Padrino.root('app/assets/stylesheets/email.css')) %>
+      a {
+        color: <%= pmail.organisation.theme_color || '#00B963' %>;
+      }
+
+      a:hover {
+        color: <%= pmail.organisation.theme_color ? pmail.organisation.theme_color.paint.darken : '#00A558' %> !important;
+      }
+
+      p.action a {
+        background: <%= pmail.organisation.theme_color || '#00B963' %>;
+      }
+
+      p.action a:hover {
+        color: white !important;
+        background: <%= pmail.organisation.theme_color ? pmail.organisation.theme_color.paint.darken : '#00A558' %> !important;
+      }
+
+      blockquote {
+        border-left: 0.25rem solid <%= pmail.organisation.theme_color ? pmail.organisation.theme_color.paint.opacity(0.33) : '#00B963'.paint.opacity(0.33) %> !important;
+      }
     </style>
   </head>
   <body>

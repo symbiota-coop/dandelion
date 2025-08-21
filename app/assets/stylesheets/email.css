@@ -1,15 +1,21 @@
-body {
-  background-color: #f2f2f2
-}
-
 a {
-  color: #00B963;
   text-decoration: none
 }
 
 a:hover {
-  color: #00A558;
   text-decoration: underline
+}
+
+p.action a {
+  display: inline-block;
+  color: white;
+  text-decoration: none;
+  padding: 10px;
+  border-radius: 5px
+}
+
+body {
+  background-color: #f2f2f2
 }
 
 table {
@@ -104,7 +110,6 @@ table img {
 blockquote {
   margin-bottom: 1rem;
   font-size: 1rem;
-  border-left: 0.25rem solid rgba(0, 185, 99, 0.33);
   padding-left: 1rem;
   font-style: italic;
   margin-left: 0;
@@ -134,19 +139,6 @@ p.lead {
 
 p.action {
   text-align: center
-}
-
-p.action a {
-  display: inline-block;
-  background: #00B963;
-  color: white;
-  text-decoration: none;
-  padding: 10px;
-  border-radius: 5px
-}
-
-p.action a:hover {
-  background: #00A558 !important;
 }
 
 hr {
