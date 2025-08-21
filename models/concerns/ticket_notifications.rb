@@ -97,7 +97,27 @@ module TicketNotifications
     batch_message.finalize if ENV['MAILGUN_API_KEY']
   end
 
-  def send_resale_notification(previous_account)
+  def send_resale_notification_to_previous_ticketholder(previous_account)
+    mg_client = Mailgun::Client.new ENV['MAILGUN_API_KEY'], ENV['MAILGUN_REGION']
+    batch_message = Mailgun::BatchMessage.new(mg_client, ENV['MAILGUN_NOTIFICATIONS_HOST'])
+
+    ticket = self
+    order = ticket.order
+    event = order.event
+    account = order.account
+    content = ERB.new(File.read(Padrino.root('app/views/emails/ticket_resale_previous_ticketholder.erb'))).result(binding)
+    batch_message.from ENV['NOTIFICATIONS_EMAIL_FULL']
+    batch_message.subject "Your ticket to #{event.name} was resold"
+    batch_message.body_html Premailer.new(ERB.new(File.read(Padrino.root('app/views/layouts/email.erb'))).result(binding), with_html_string: true, adapter: 'nokogiri', input_encoding: 'UTF-8').to_inline_css
+
+    [previous_account].each do |account|
+      batch_message.add_recipient(:to, account.email, { 'firstname' => account.firstname || 'there', 'token' => account.sign_in_token, 'id' => account.id.to_s })
+    end
+
+    batch_message.finalize if ENV['MAILGUN_API_KEY']
+  end
+
+  def send_resale_notification_to_organiser(previous_account)
     mg_client = Mailgun::Client.new ENV['MAILGUN_API_KEY'], ENV['MAILGUN_REGION']
     batch_message = Mailgun::BatchMessage.new(mg_client, ENV['MAILGUN_NOTIFICATIONS_HOST'])
 

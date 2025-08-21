@@ -101,7 +101,8 @@ class Ticket
       account = ticket.account
       ticket.refund
       ticket.destroy
-      send_resale_notification(account)
+      send_resale_notification_to_previous_ticketholder(account)
+      send_resale_notification_to_organiser(account)
     end
     event.waitships.find_by(account: account).try(:destroy)
     event.gathering.memberships.create(account: account, unsubscribed: true) if event.gathering

@@ -1,0 +1,7 @@
+<div class="main">
+  <p>Hi %recipient.firstname%,</p>
+  <p>
+    Your ticket to <a href="<%= ENV['BASE_URI'] %>/e/<%=event.slug%>"><%= event.name %></a> was resold.
+    You should receive a refund from Stripe shortly.
+  </p>
+</div>
