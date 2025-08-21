@@ -63,11 +63,11 @@ module Dandelion
 
     error do
       Honeybadger.notify(env['sinatra.error'])
-      erb :error, layout: :application
+      erb :error, layout: 'layouts/application'
     end
 
     get '/error' do
-      erb :error, layout: :application
+      erb :error, layout: 'layouts/application'
     end
 
     get '/raise' do
@@ -85,11 +85,11 @@ module Dandelion
 
     not_found do
       content_type 'text/html'
-      erb :not_found, layout: :application
+      erb :not_found, layout: 'layouts/application'
     end
 
     get '/not_found' do
-      erb :not_found, layout: :application
+      erb :not_found, layout: 'layouts/application'
     end
 
     get '/fragments/delete/:q' do
