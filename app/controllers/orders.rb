@@ -319,7 +319,8 @@ Dandelion::App.controller do
     @event = Event.find(params[:id]) || not_found
     @order = @event.orders.complete.find(params[:order_id]) || not_found
     @ticket = @order.tickets.find(params[:ticket_id]) || not_found
-    @ticket.update_attribute(:email, params[:email])
+    @ticket.email = params[:email]
+    @ticket.save
     @ticket.send_email_update_notification unless params[:success].to_i == 1
     200
   end
