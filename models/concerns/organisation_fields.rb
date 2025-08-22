@@ -99,6 +99,7 @@ module OrganisationFields
     field :feedback_summary, type: String
     field :use_event_slugs_in_order_descriptions, type: Mongoid::Boolean
     field :percent_requested, type: Float
+    field :event_types, type: String
 
     field :tokens, type: Float
     index({ tokens: 1 })
