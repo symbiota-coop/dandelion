@@ -570,7 +570,7 @@ Dandelion::App.controller do
 
   get '/organisations/stylesheet.css' do
     content_type 'text/css'
-    theme_color = params[:theme_color]
+    theme_color = params[:theme_color] || '#007bff'
     theme_color = "##{theme_color}" unless theme_color.start_with?('#')
 
     # Read the base SCSS file
