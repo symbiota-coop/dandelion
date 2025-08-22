@@ -2,7 +2,7 @@ Dandelion::App.controller do
   before do
     @organisation = Organisation.find_by(slug: params[:slug]) || not_found
     organisation_admins_only!
-    @carousels = @organisation.carousels.order('o asc')
+    @carousels = @organisation.carousels.and(:hidden.ne => true).order('o asc')
   end
 
   get '/o/:slug/carousels/new' do

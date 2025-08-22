@@ -8,6 +8,7 @@ class Carousel
   field :name, type: String
   field :weeks, type: Integer
   field :o, type: Integer
+  field :hidden, type: Boolean
   field :button, type: Boolean
   field :o, type: Integer
 
@@ -17,6 +18,8 @@ class Carousel
     {
       organisation_id: :lookup,
       name: :text,
+      hidden: :check_box,
+      button: :check_box,
       weeks: :number,
       o: :number,
       carouselships: :collection
@@ -35,7 +38,8 @@ class Carousel
 
   def self.human_attribute_name(attr, options = {})
     {
-      button: 'Show button'
+      button: 'Show button',
+      hidden: 'Hide carousel'
     }[attr] || super
   end
 

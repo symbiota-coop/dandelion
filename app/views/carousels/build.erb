@@ -6,6 +6,7 @@
     <%= f.number_block :weeks %>
     <%= partial :'carousels/tags', locals: { f: f } %>
     <%= f.check_box_block :button %>
+    <%= f.check_box_block :hidden %>
     <%= f.submit_block destroy_url: "/o/#{@organisation.slug}/carousels/#{@carousel.id}/destroy" %>
   <% end %>
 </div>

@@ -42,7 +42,7 @@
       <%= partial :'events/carousel_placeholder' %>
     </div>
   <% end %>
-  <% if (carousels = @organisation.carousels.order('o asc')).count > 0 %>
+  <% if (carousels = @organisation.carousels.and(:hidden.ne => true).order('o asc')).count > 0 %>
     <% carousels.each_with_index { |carousel,i| next if params[:first_carousel_only] && i > 0 %>
     <div data-with-placeholder data-pagelet-url="/o/<%= @organisation.slug %>/carousels/<%= carousel.id %>">
       <%= partial :'events/carousel_placeholder' %>
