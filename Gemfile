@@ -68,7 +68,7 @@ gem 'stripe'
 # Mail
 gem 'incoming'
 gem 'mail'
-gem 'mailgun-ruby', '~> 1.2.0', require: 'mailgun' # attachments not working with 1.3.2, which is the latest version allowed by coinbase_commerce
+gem 'mailgun-ruby', require: 'mailgun'
 gem 'premailer'
 
 # Prawn (PDFs)
