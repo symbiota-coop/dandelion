@@ -150,7 +150,7 @@ Dandelion::App.controller do
 
         when 'coinbase'
 
-          client = CoinbaseCommerce::Client.new(api_key: @event.organisation.coinbase_api_key)
+          client = CoinbaseCommerceClient::Client.new(api_key: @event.organisation.coinbase_api_key)
 
           checkout = client.checkout.create(
             name: @event.name,

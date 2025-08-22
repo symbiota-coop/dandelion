@@ -45,12 +45,12 @@ Dandelion::App.controller do
     sig_header = request.env['HTTP_X_CC_WEBHOOK_SIGNATURE']
 
     begin
-      event = CoinbaseCommerce::Webhook.construct_event(payload, sig_header, @organisation.coinbase_webhook_secret)
+      event = CoinbaseCommerceClient::Webhook.construct_event(payload, sig_header, @organisation.coinbase_webhook_secret)
     rescue JSON::ParserError
       halt 400
-    rescue CoinbaseCommerce::Errors::SignatureVerificationError
+    rescue CoinbaseCommerceClient::Errors::SignatureVerificationError
       halt 400
-    rescue CoinbaseCommerce::Errors::WebhookInvalidPayload
+    rescue CoinbaseCommerceClient::Errors::WebhookInvalidPayload
       halt 400
     end
 

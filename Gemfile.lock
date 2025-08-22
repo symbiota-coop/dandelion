@@ -22,14 +22,6 @@ GIT
       omniauth (~> 2.1)
 
 GIT
-  remote: https://github.com/quiknode-labs/coinbase-commerce-ruby.git
-  revision: 500704ed9f01e5b391aab3575c997830bdde8fb6
-  specs:
-    coinbase_commerce (0.8.7)
-      faraday (~> 2.7.0)
-      faraday-multipart (~> 1.0.4)
-
-GIT
   remote: https://github.com/stephenreid321/activate-admin.git
   revision: 87835375e7c57390838b0ce076cf1165f8ca55c8
   specs:
@@ -111,6 +103,9 @@ GEM
       xpath (~> 3.2)
     chroma (0.2.0)
     chunky_png (1.4.0)
+    coinbase_commerce_client (0.4.2)
+      faraday (~> 2.6)
+      multipart-post (~> 2.0)
     concurrent-ruby (1.3.5)
     connection_pool (2.5.3)
     countries (8.0.2)
@@ -564,7 +559,7 @@ DEPENDENCIES
   better_html
   capybara
   chroma
-  coinbase_commerce!
+  coinbase_commerce_client
   countries
   crawler_detect
   cuprite

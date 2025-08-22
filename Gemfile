@@ -57,7 +57,7 @@ gem 'ruby-openai'
 gem 'yt'
 
 # Payments
-gem 'coinbase_commerce', github: 'quiknode-labs/coinbase-commerce-ruby' # TODO: remove, as unmaintained and blocking update of mailgun-ruby beyond 1.3.2
+gem 'coinbase_commerce_client'
 gem 'eu_central_bank'
 gem 'gocardless_pro'
 gem 'money'
