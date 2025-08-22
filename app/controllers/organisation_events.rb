@@ -32,7 +32,7 @@ Dandelion::App.controller do
       event_tag_ids = EventTagship.and(event_tag_id: params[:event_tag_id]).pluck(:event_id)
     end
     event_ids = (q_ids.empty? ? event_tag_ids : (q_ids & event_tag_ids))
-    @events = @events.and(:id.in => event_ids) unless params[:event_type] || event_ids.empty?
+    @events = @events.and(:id.in => event_ids) if params[:event_type] || !event_ids.empty?
     if params[:near]
       if params[:near] == 'online'
         @events = @events.online
