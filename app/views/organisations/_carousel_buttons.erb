@@ -45,7 +45,7 @@
   });
 </script>
 
-<div class="m-3 text-center">
+<div class="mb-3 text-center <%= 'mt-3' if params[:minimal] %>">
   <% @organisation.carousels.and(button: true).order('o asc').each do |carousel| %>
     <%
       current_carousel_ids = params[:carousel_ids] || []
