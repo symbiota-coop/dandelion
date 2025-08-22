@@ -54,6 +54,9 @@ module PmailMailgun
   end
 
   def metrics
+    # Return nil if organisation doesn't have valid Mailgun credentials
+    return nil unless organisation.mailgun_api_key.present? && organisation.mailgun_domain.present? && organisation.mailgun_region.present?
+
     mg_client = Mailgun::Client.new organisation.mailgun_api_key, (organisation.mailgun_region == 'EU' ? 'api.eu.mailgun.net' : 'api.mailgun.net')
     tags = Mailgun::Tags.new(mg_client)
 
@@ -63,7 +66,7 @@ module PmailMailgun
                                         start: sent_at.to_i,
                                         resolution: 'month'
                                       })
-    rescue Mailgun::CommunicationError
+    rescue Mailgun::CommunicationError, StandardError
       return nil
     end
 

@@ -237,6 +237,11 @@ class Pmail
 
     update_attribute(:requested_send_at, Time.now) unless requested_send_at
 
+    # Validate credentials before attempting to send
+    if !mailable.is_a?(Event) && (!organisation.mailgun_api_key.present? || !organisation.mailgun_domain.present? || !organisation.mailgun_region.present?)
+      raise "Cannot send pmail: Organisation #{organisation.name} (ID: #{organisation.id}) has missing or invalid Mailgun credentials. Please configure mailgun_api_key, mailgun_domain, and mailgun_region."
+    end
+
     # send_batch_message
     return unless (message_ids = send_batch_message)
 
@@ -257,12 +262,22 @@ class Pmail
     from_domain = from_email.split('@').last
 
     if mailable.is_a?(Event)
+      # Validate event Mailgun credentials
+      unless ENV['MAILGUN_API_KEY'].present? && ENV['MAILGUN_REGION'].present? && ENV['MAILGUN_TICKETS_HOST'].present?
+        raise "Missing or invalid Mailgun credentials for event mailing. Please check MAILGUN_API_KEY, MAILGUN_REGION, and MAILGUN_TICKETS_HOST environment variables."
+      end
+
       mg_client = Mailgun::Client.new ENV['MAILGUN_API_KEY'], ENV['MAILGUN_REGION']
       batch_message = Mailgun::BatchMessage.new(mg_client, ENV['MAILGUN_TICKETS_HOST'])
 
       batch_message.from from_name ? "#{from_name} <#{ENV['MAILER_EMAIL']}>" : ENV['MAILER_EMAIL_FULL']
       batch_message.reply_to from
     else
+      # Validate organisation Mailgun credentials
+      unless organisation.mailgun_api_key.present? && organisation.mailgun_domain.present? && organisation.mailgun_region.present?
+        raise "Organisation #{organisation.name} (ID: #{organisation.id}) has missing or invalid Mailgun credentials. Please configure mailgun_api_key, mailgun_domain, and mailgun_region."
+      end
+
       mg_client = Mailgun::Client.new organisation.mailgun_api_key, (organisation.mailgun_region == 'EU' ? 'api.eu.mailgun.net' : 'api.mailgun.net')
       batch_message = Mailgun::BatchMessage.new(mg_client, organisation.mailgun_domain)
       mailgun_sto = organisation.mailgun_sto
