@@ -10,7 +10,6 @@ class Carousel
   field :o, type: Integer
   field :hidden, type: Boolean
   field :button, type: Boolean
-  field :o, type: Integer
 
   validates_presence_of :name
 
