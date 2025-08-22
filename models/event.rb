@@ -163,7 +163,7 @@ class Event
     return unless organisation && organisation.carousels
 
     c = nil
-    organisation.carousels.and(:hidden.ne => true).order('o desc').each do |carousel|
+    organisation.carousels.order('o desc').each do |carousel|
       next if carousel.name.downcase.include?('past events')
 
       intersection = event_tags.pluck(:id) & carousel.event_tags.pluck(:id)

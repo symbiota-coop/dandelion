@@ -64,7 +64,7 @@
         <% if @organisation.carousels.count > 0 %>
           <div class="form-group col-12 col-sm-auto">
             <label>Carousel</label>
-            <%= select_tag :carousel_id, options: ['', ['Featured', 'featured']] + @organisation.carousels.and(:hidden.ne => true).order('o asc').map { |carousel| [carousel.name, carousel.id] }, selected: params[:carousel_id], class: 'form-control mx-1' %>
+            <%= select_tag :carousel_id, options: ['', ['Featured', 'featured']] + @organisation.carousels.order('o asc').map { |carousel| [carousel.name, carousel.id] }, selected: params[:carousel_id], class: 'form-control mx-1' %>
           </div>
         <% end %>
         <% if @organisation.cohosts.count > 0 %>
