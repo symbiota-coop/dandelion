@@ -9,11 +9,12 @@
       <th>Name</th>
       <th>Duration</th>
       <th>Tags</th>
+      <th>Button</th>
     </tr>
   </thead>
   <tbody class="carousels">
     <% @carousels.each { |carousel| %>
-    <tr id="<%=carousel.id%>">
+    <tr id="<%=carousel.id%>" style="opacity: <%= carousel.hidden ? 0.5 : 1 %>">
       <td>
         <a href="/o/<%=@organisation.slug%>/carousels/<%= carousel.id %>/edit">
           <%= carousel.name%>
@@ -24,6 +25,11 @@
       </td>
       <td>
         <%= partial :'carousels/tag_labels', locals: {carousel: carousel}%>
+      </td>
+      <td>
+        <% if carousel.button %>
+          <i class="bi bi-check-lg"></i>
+        <% end %>
       </td>
     </tr>
     <% } %>
