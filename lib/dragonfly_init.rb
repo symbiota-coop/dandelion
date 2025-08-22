@@ -17,7 +17,13 @@ Dragonfly.app.configure do
 
   define_url do |app, job, _opts|
     if (dj = DragonflyJob.find_by(signature: job.signature))
-      "#{ENV['S3_CDN']}/#{dj.uid}"
+      s3_cdn = ENV['S3_CDN']
+      uid = dj.uid
+      if s3_cdn && uid
+        "#{s3_cdn}/#{uid}"
+      else
+        app.datastore.url_for(dj.uid)
+      end
     else
       begin
         dj = DragonflyJob.create(uid: job.store, signature: job.signature)
