@@ -125,6 +125,7 @@ Dandelion::App.controller do
           @east = params[:east]
           box = [[@west.to_f, @south.to_f], [@east.to_f, @north.to_f]]
 
+          @events = @event.and(:locked.ne => true)
           @events = @events.and(coordinates: { '$geoWithin' => { '$box' => box } }) unless @events.empty?
           @points_count = @events.count
           @points = @events.to_a
