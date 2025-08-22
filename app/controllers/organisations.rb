@@ -570,16 +570,11 @@ Dandelion::App.controller do
 
   get '/organisations/stylesheet.css' do
     content_type 'text/css'
-    theme_color = params[:theme_color]
-    theme_color = "##{theme_color}" unless theme_color.start_with?('#')
-
-    # Read the base SCSS file
-    scss_content = File.read(Padrino.root('app/assets/stylesheets/organisation.scss'))
-
-    # Replace the default variable with our parameter
-    scss_content.sub!(/\$theme-color:.*?;/, "$theme-color: #{theme_color};")
-
-    # Compile the SCSS to CSS
+    if (theme_color = params[:theme_color])
+      theme_color = "##{theme_color}" unless theme_color.start_with?('#')
+      scss_content = File.read(Padrino.root('app/assets/stylesheets/organisation.scss'))
+      scss_content.sub!(/\$theme-color:.*?;/, "$theme-color: #{theme_color};")
+    end
     Sass::Engine.new(scss_content, syntax: :scss).render
   end
 

@@ -46,7 +46,7 @@ Dandelion::App.controller do
     q_ids += search_events(params[:q]).pluck(:id) if params[:q]
     event_tag_ids = []
     event_tag_ids = EventTagship.and(event_tag_id: params[:event_tag_id]).pluck(:event_id) if params[:event_tag_id]
-    event_ids = (!q_ids.empty? && !event_tag_ids.empty? ? (q_ids & event_tag_ids) : (q_ids + event_tag_ids))
+    event_ids = (q_ids.empty? ? event_tag_ids : (q_ids & event_tag_ids))
     @events = @events.and(:id.in => event_ids) unless event_ids.empty?
     @events = @events.and(:"#{@start_or_end}_time".gte => @from)
     @events = @events.and(:"#{@start_or_end}_time".lt => @to + 1) if @to
