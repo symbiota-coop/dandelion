@@ -30,7 +30,7 @@
             <div class="col ml-1 p-lg-3">
               <%= partial :'events/block_main', locals: { event: event } %>
               <% if @organisation && event.carousel_text %>
-                <div class="alert alert-success" style="font-size: 1rem" class="mb-0"><%= event.carousel_text %></div>
+                <div class="p-1" style="font-size: 0.9rem" class="mb-0"><%= event.carousel_text %></div>
               <% end %>
             </div>
           </div>
