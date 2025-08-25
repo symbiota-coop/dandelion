@@ -22,6 +22,10 @@ class Organisation
     find_by(slug: slug)
   end
 
+  def to_param
+    slug
+  end
+
   def self.set_counts
     Organisation.all.each do |organisation|
       monthly_donations_count = organisation.organisationships.and(:monthly_donation_method.ne => nil).and(:monthly_donation_method.ne => 'Other').map do |organisationship|

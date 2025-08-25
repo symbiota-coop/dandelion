@@ -24,6 +24,10 @@ class Event
     find_by(slug: slug)
   end
 
+  def to_param
+    slug
+  end
+
   def self.currencies
     CURRENCY_OPTIONS
   end
@@ -55,7 +59,7 @@ class Event
   end
 
   def page_views_count
-    PageView.or({ path: "/e/#{slug}" }, { path: "/events/#{id}" }).count
+    PageView.all.or({ path: "/e/#{slug}" }, { path: "/events/#{id}" }).count
   end
 
   def donations_to_dandelion?
