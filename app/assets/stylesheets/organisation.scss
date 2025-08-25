@@ -1,6 +1,10 @@
 // Theme color variable
 $theme-color: #00B963 !default;
 
+.bg-primary {
+  background-color: $theme-color !important;
+}
+
 // =============================================================================
 // SEARCH COMPONENTS
 // =============================================================================
