@@ -315,24 +315,26 @@ window.MapUtils = {
 
   setMapBounds: function (bounds, config) {
     if (config.centre) {
-      console.log('using centre');
+      console.log('using config.centre');
       window.map.setCenter(new google.maps.LatLng(config.centre.lat, config.centre.lng));
       window.map.setZoom(config.zoom);
-    } else if (config.explicitBounds) {
-      console.log('using explicit bounds');
-      this.fitValidBounds(config.explicitBounds, 'Invalid explicit bounds values:');
+    } else if (config.bounds) {
+      console.log('using config.bounds');
+      this.fitValidBounds(config.bounds, 'Invalid bounds');
     } else if (config.polygonables) {
-      console.log('using polygonables');
+      console.log('using config.polygonables');
       window.map.fitBounds(bounds);
     } else if (!config.points || config.points.length === 0 || config.pointsExceedLimit) {
       var params = this.getPageletParams();
       if (params['bounding_box']) {
-        this.fitValidBounds(params['bounding_box'], 'Invalid bounding box values:');
+        console.log("using params['bounding_box']");
+        this.fitValidBounds(params['bounding_box'], 'Invalid bounding box');
       } else {
+        console.log('using default view');
         this.setDefaultView();
       }
     } else {
-      console.log('using bounds');
+      console.log('using map bounds');
       window.map.fitBounds(bounds);
     }
   },

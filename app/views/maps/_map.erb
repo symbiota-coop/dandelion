@@ -47,7 +47,7 @@ points_limit = 500
         , centre: { lat: <%= centre.lat %>, lng: <%= centre.lng %> },
         zoom: <%= zoom %>
       <% elsif defined?(bounds) && bounds %>
-        , explicitBounds: {
+        , bounds: {
           south: <%= bounds[:south] %>,
           west: <%= bounds[:west] %>,
           north: <%= bounds[:north] %>,
