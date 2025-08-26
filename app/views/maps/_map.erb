@@ -1,304 +1,63 @@
 <%
-
 points_limit = 500
-
-markers = {
-  account: {
-    color: '#00B963',
-    icon: 'bi bi-person-fill'
-  },
-  activity_application: {
-    color: '#00B963',
-    icon: 'bi bi-person-fill'
-  },
-  event: {
-    color: '#FF5241',
-    icon: 'bi bi-calendar-event'
-  },
-  gathering: {
-    color: '#00B963',
-    icon: 'bi bi-people-fill'
-  },
-  organisation: {
-    color: '#FF5241',
-    icon: 'bi bi-flag-fill'
-  },
-  organisationship: {
-    color: '#00B963',
-    icon: 'bi bi-person-fill'
-  }
-}
-
 %>
 
 <script>
   $(function () {
-    if (typeof google === 'undefined') {
-      $('#map-container').html('<div class="alert alert-warning"><p class="mb-0">Please enable cookies and refresh the page to view the map</p></div>');
-      return;
-    }
+    // Prepare configuration data
 
-    var params = {}
-    var pagelet = $('#map-container').closest('[data-pagelet-url]')
-    if (pagelet.length > 0) {
-      query = pagelet.attr('data-pagelet-url').split('?')[1]
-      params = $.deparam(query)
-    }
-
-    mapTimer = null;
-    map = new google.maps.Map(document.getElementById("map-canvas"), {
-      mapTypeId: google.maps.MapTypeId.ROADMAP,
-      mapTypeControl: false,
-      scaleControl: true,
-      streetViewControl: false,
-      fullscreenControl: false,
-      maxZoom: 16,
-      minZoom: <%= defined?(minZoom) && minZoom ? minZoom : 1 %>
-    });
-    var bounds = new google.maps.LatLngBounds();
-
-    if (params['bounding_box']) {
-
-      var west = parseFloat(params['bounding_box'][0]);
-      var south = parseFloat(params['bounding_box'][1]);
-      var east = parseFloat(params['bounding_box'][2]);
-      var north = parseFloat(params['bounding_box'][3]);
-
-      var boundingBox = [west, south, east, north]
-
-      // Create rectangle path (clockwise from southwest)
-      var boundingBoxPaths = [
-        {lat: south, lng: west}, // Southwest
-        {lat: north, lng: west}, // Northwest
-        {lat: north, lng: east}, // Northeast
-        {lat: south, lng: east}  // Southeast
-      ];
-
-      var polygon = new google.maps.Polygon({
-        paths: boundingBoxPaths,
-        strokeColor: '#000000',
-        strokeOpacity: 0.1,
-        strokeWeight: 2,
-        fillColor: '#000000',
-        fillOpacity: 0.05,
-        map: map
-      });
-    }
-
-    var models = []
-  <%
-  [Organisation, Gathering, Event, Account, ActivityApplication, Organisationship].each { |model| %>
-      models.push({
-        name: '<%= model.to_s %>',
-        color: '<%= markers[model.to_s.underscore.to_sym][:color] %>',
-        icon: '<%= markers[model.to_s.underscore.to_sym][:icon] %>',
-      })
-  <% } %>
-
-  var infoWindow
-  <% if defined?(info_window) && info_window %>
-    infoWindow = true
-  <% end %>
-
-    var points = []
-  <% if defined?(points) && (!defined?(dynamic) || (defined?(points_count) && points_count <= points_limit)) %>
-  <% points.each_with_index { |point,n| %>
+    var points = [];
+    <% if defined?(points) && (!defined?(dynamic) || (defined?(points_count) && points_count <= points_limit)) %>
+      <% points.each_with_index { |point, n| %>
         points.push({
           model_name: '<%= point.class.to_s %>',
           id: '<%= point.id %>',
           lat: <%= point.lat %>,
           lng: <%= point.lng %>,
           n: <%= n %>
-        })
-  <% } %>
-  <% end %>
-
-    var polygonPaths = []
-  <% if defined?(polygonables) %>
-  <% polygonables.each { |polygonable| %>
-    <% polygonable.polygons.each { |polygon| %>
-          polygonPaths.push([
-      <% polygon.coordinates[0].each { |coordinate| %>
-              {lat: <%= coordinate[1] %>, lng: <%= coordinate[0] %>},
+        });
       <% } %>
-          ])
-    <% } %>
-  <% } %>
-  <% end %>
+    <% end %>
 
-    var infowindow = new google.maps.InfoWindow();
-    var markers = []
-    for (i = 0; i < points.length; i++) {
-      var point = points[i];
-      var marker = new mapIcons.Marker({
-        model_name: point.model_name,
-        id: point.id,
-        n: point.n,
-        position: new google.maps.LatLng(point.lat, point.lng),
-        icon: {
-          path: mapIcons.shapes.MAP_PIN,
-          fillColor: models.find(model => model.name == point.model_name)['color'],
-          fillOpacity: 1,
-          strokeColor: '',
-          strokeWeight: 0
-        },
-        map_icon_label: '<span class="' + models.find(model => model.name == point.model_name)['icon'] + '"></span>'
-      });
-        google.maps.event.addListener(marker, 'click', function (marker) {
-          return function () {
-            if((marker.model_name == 'Organisation' || marker.model_name == 'Gathering' || marker.model_name == 'Event') || infoWindow) {
-              infowindow.setContent('<i class="bi bi-spin bi-arrow-repeat"></i>');
-              infowindow.open(map, marker);
-              setTimeout(function () {
-                clearTimeout(mapTimer)
-              }, 750)
-              $.get('/point/' + marker.model_name + '/' + marker.id, function (data) {
-                infowindow.setContent('<div class="infowindow">' + data + '</div>');
-              })
-            }
-          }
-        }(marker));
-  <% if (!defined?(polygonables) || polygonables.empty?) %>
-        console.log('pushed ' + marker.getPosition().toJSON() + ' to bounds')
-        bounds.extend(marker.getPosition());
-  <% end %>
-      markers.push(marker);
-    }
-    var polygons = []
-    for (i = 0; i < polygonPaths.length; i++) {
-      var polygon = new google.maps.Polygon({
-        map: map,
-        paths: polygonPaths[i],
-        strokeColor: '#FBAE3B',
-        strokeOpacity: 0.8,
-        strokeWeight: 2,
-        fillColor: '#FBAE3B',
-        fillOpacity: 0.35
-      });
-      var paths = polygon.getPaths();
-      for (var ii = 0; ii < paths.getLength(); ii++) {
-        var path = paths.getAt(ii);
-        for (var iii = 0; iii < path.getLength(); iii++) {
-          bounds.extend(path.getAt(iii));
+    var polygonPaths = [];
+    <% if defined?(polygonables) %>
+      <% polygonables.each { |polygonable| %>
+        <% polygonable.polygons.each { |polygon| %>
+          polygonPaths.push([
+            <% polygon.coordinates[0].each { |coordinate| %>
+              {lat: <%= coordinate[1] %>, lng: <%= coordinate[0] %>},
+            <% } %>
+          ]);
+        <% } %>
+      <% } %>
+    <% end %>
+
+    // Map configuration
+    var config = {
+      minZoom: <%= defined?(minZoom) && minZoom ? minZoom : 1 %>,
+      points: points,
+      polygonPaths: polygonPaths,
+      infoWindow: <%= defined?(info_window) && info_window ? 'true' : 'false' %>,
+      polygonables: <%= defined?(polygonables) ? 'polygonables' : '[]' %>,
+      pointsExceedLimit: <%= defined?(points_count) && points_count > points_limit ? 'true' : 'false' %>,
+      dynamic: <%= defined?(dynamic) && dynamic ? 'true' : 'false' %>,
+      triggerBoundsChanged: <%= defined?(trigger_bounds_changed) && trigger_bounds_changed ? 'true' : 'false' %>,
+      stem: '<%= defined?(stem) && stem ? stem : '/map' %>'
+      <% if defined?(centre) && centre %>
+        , centre: { lat: <%= centre.lat %>, lng: <%= centre.lng %> },
+        zoom: <%= zoom %>
+      <% elsif defined?(bounds) && bounds %>
+        , explicitBounds: {
+          south: <%= bounds[:south] %>,
+          west: <%= bounds[:west] %>,
+          north: <%= bounds[:north] %>,
+          east: <%= bounds[:east] %>
         }
-      }
-      polygons.push(polygon);
-    }
+      <% end %>
+    };
 
-    var clusterStyles = [
-      {
-        textColor: 'white',
-        textSize: 16,
-        fontFamily: 'Plus Jakarta Sans',
-        url: '/images/cluster-green.png',
-        height: 50,
-        width: 50
-      },
-      {
-        textColor: 'white',
-        textSize: 16,
-        fontFamily: 'Plus Jakarta Sans',
-        url: '/images/cluster-yellow.png',
-        height: 50,
-        width: 50
-      },
-      {
-        textColor: 'white',
-        textSize: 14,
-        fontFamily: 'Plus Jakarta Sans',
-        url: '/images/cluster-red.png',
-        height: 50,
-        width: 50
-      }
-    ];
-
-    var markerClusterer = new MarkerClusterer(map, markers, {styles: clusterStyles, zoomOnClick: false});
-    google.maps.event.addListener(markerClusterer, 'clusterclick', function(cluster) {
-      if (map.getZoom() === map.maxZoom) {
-        var markers = cluster.getMarkers();
-        markers.sort(function(a, b) {
-          return a.n - b.n;
-        });
-        infowindow.setContent('<i class="bi bi-spin bi-arrow-repeat"></i>');
-        infowindow.setPosition(cluster.getCenter());
-        infowindow.open(map);
-        setTimeout(function () {
-          clearTimeout(mapTimer)
-        }, 750)
-
-        var content = '';
-        var requests = markers.map(function(marker) {
-          return $.get('/point/' + marker.model_name + '/' + marker.id, function (data) {
-            if((marker.model_name == 'Organisation' || marker.model_name == 'Gathering' || marker.model_name == 'Event') || infoWindow) {
-              content += '<div class="mb-3">' + data + '</div>';
-            }
-          });
-        });
-
-        $.when.apply($, requests).done(function() {
-          infowindow.setContent('<div class="infowindow">' + (content.length > 0 ? content : '<em>Nothing to show</em>') + '</div>');
-        });
-      } else {
-        map.setCenter(cluster.getCenter());
-        map.setZoom(map.getZoom() + 2);
-      }
-    });
-  <% if defined?(centre) && centre %>
-      console.log('using centre')
-      map.setCenter(new google.maps.LatLng(<%= centre.lat %>, <%= centre.lng %>))
-      map.setZoom(<%= zoom %>)
-  <% elsif defined?(bounds) && bounds %>
-      console.log('using explicit bounds')
-      map.fitBounds({south: <%= bounds[:south] %>, west: <%= bounds[:west] %>, north: <%= bounds[:north] %>, east: <%= bounds[:east] %>});
-  <% elsif defined?(polygonables) %>
-      console.log('using polygonables')
-      map.fitBounds(bounds);
-  <% elsif (!defined?(points) || points.empty? || (defined?(points_count) && points_count > points_limit)) %>
-      if(params['bounding_box']) {
-        map.fitBounds({west: boundingBox[0], south: boundingBox[1], east: boundingBox[2], north: boundingBox[3]});
-      } else {
-          map.setCenter(new google.maps.LatLng(35, 0));
-          map.setZoom(0);
-      }
-  <% else %>
-      console.log('using bounds')
-      map.fitBounds(bounds);
-  <% end %>
-
-  <% if defined?(dynamic) && dynamic %>
-       google.maps.event.addListenerOnce(map, 'idle', function () {
-        map.addListener('bounds_changed', function () {
-  <% if defined?(trigger_bounds_changed) %>
-            var bounds = map.getBounds().toJSON()
-            var q = {south: bounds['south'], west: bounds['west'], north: bounds['north'], east: bounds['east']}
-  <% else %>
-            var center = map.getCenter().toJSON()
-            var zoom = map.getZoom()
-            var q = {lat: center['lat'], lng: center['lng'], zoom: zoom}
-  <% end %>
-          jQuery.extend(params, q);
-          pagelet.attr('data-pagelet-url', '<%=defined?(stem) && stem ? stem : '/map' %>/?' + $.param(params))
-
-          clearTimeout(mapTimer);
-          mapTimer = setTimeout(function () {
-            map.setOptions({draggable: false, zoomControl: false, scrollwheel: false, disableDoubleClickZoom: true})
-            pagelet.css('opacity', '0.3')
-            pagelet.load(pagelet.attr('data-pagelet-url'), function () {
-              pagelet.css('opacity', '1')
-            })
-          }, 750)
-        })
-  <% if defined?(trigger_bounds_changed) %>
-          google.maps.event.trigger(map, 'bounds_changed');
-  <% end %>
-
-  <% if defined?(points_count) && points_count > points_limit %>
-            $('#points-warning').show()
-  <% end %>
-
-      });
-  <% end %>
-
+    // Initialize the map
+    MapUtils.initializeMap(config);
   });
 </script>
 <div id="map-container" style="position: relative">
