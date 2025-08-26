@@ -19,6 +19,7 @@ node_modules
 .on-save.json
 *.code-workspace
 dump
+_map_old.erb
 
 *.gem
 *.rbc
