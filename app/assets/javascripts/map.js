@@ -81,6 +81,51 @@ window.MapUtils = {
     scrollwheel: false,
     disableDoubleClickZoom: true
   },
+
+  // Helper functions for bounds validation and fallback
+  validateBounds: function (bounds) {
+    if (!bounds) return null;
+
+    var west = parseFloat(bounds.west || bounds[0]);
+    var south = parseFloat(bounds.south || bounds[1]);
+    var east = parseFloat(bounds.east || bounds[2]);
+    var north = parseFloat(bounds.north || bounds[3]);
+
+    if (!isNaN(west) && !isNaN(south) && !isNaN(east) && !isNaN(north)) {
+      return { west: west, south: south, east: east, north: north };
+    }
+
+    return null;
+  },
+
+  setDefaultView: function () {
+    window.map.setCenter(new google.maps.LatLng(this.defaultCenter.lat, this.defaultCenter.lng));
+    window.map.setZoom(this.defaultZoom);
+  },
+
+  fitValidBounds: function (bounds, errorMessage) {
+    var validBounds = this.validateBounds(bounds);
+    if (validBounds) {
+      window.map.fitBounds(validBounds);
+      return true;
+    } else {
+      if (errorMessage) {
+        console.warn(errorMessage, bounds);
+      }
+      this.setDefaultView();
+      return false;
+    }
+  },
+
+  getCenterZoomParams: function () {
+    var center = window.map.getCenter().toJSON();
+    var zoom = window.map.getZoom();
+    return {
+      lat: center['lat'],
+      lng: center['lng'],
+      zoom: zoom
+    };
+  },
   // Initialize map with given configuration
   initializeMap: function (config) {
     if (typeof google === 'undefined') {
@@ -290,28 +335,16 @@ window.MapUtils = {
       window.map.setZoom(config.zoom);
     } else if (config.explicitBounds) {
       console.log('using explicit bounds');
-      window.map.fitBounds({
-        south: config.explicitBounds.south,
-        west: config.explicitBounds.west,
-        north: config.explicitBounds.north,
-        east: config.explicitBounds.east
-      });
+      this.fitValidBounds(config.explicitBounds, 'Invalid explicit bounds values:');
     } else if (config.polygonables && config.polygonables.length > 0) {
       console.log('using polygonables');
       window.map.fitBounds(bounds);
     } else if (!config.points || config.points.length === 0 || config.pointsExceedLimit) {
       var params = this.getPageletParams();
       if (params['bounding_box']) {
-        var boundingBox = params['bounding_box'];
-        window.map.fitBounds({
-          west: boundingBox[0],
-          south: boundingBox[1],
-          east: boundingBox[2],
-          north: boundingBox[3]
-        });
+        this.fitValidBounds(params['bounding_box'], 'Invalid bounding box values:');
       } else {
-        window.map.setCenter(new google.maps.LatLng(this.defaultCenter.lat, this.defaultCenter.lng));
-        window.map.setZoom(this.defaultZoom);
+        this.setDefaultView();
       }
     } else {
       console.log('using bounds');
@@ -325,21 +358,21 @@ window.MapUtils = {
       window.map.addListener('bounds_changed', function () {
         var q;
         if (config.triggerBoundsChanged) {
-          var bounds = window.map.getBounds().toJSON();
-          q = {
-            south: bounds['south'],
-            west: bounds['west'],
-            north: bounds['north'],
-            east: bounds['east']
-          };
+          var bounds = window.map.getBounds();
+          if (bounds) {
+            var boundsJSON = bounds.toJSON();
+            q = {
+              south: boundsJSON['south'],
+              west: boundsJSON['west'],
+              north: boundsJSON['north'],
+              east: boundsJSON['east']
+            };
+          } else {
+            // Fallback if bounds are not available
+            q = self.getCenterZoomParams();
+          }
         } else {
-          var center = window.map.getCenter().toJSON();
-          var zoom = window.map.getZoom();
-          q = {
-            lat: center['lat'],
-            lng: center['lng'],
-            zoom: zoom
-          };
+          q = self.getCenterZoomParams();
         }
 
         jQuery.extend(params, q);
