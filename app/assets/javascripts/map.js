@@ -11,32 +11,26 @@ window.MapUtils = {
     minZoom: 1
   },
 
-  clusterStyles: [
-    {
+  // Helper function to generate cluster styles
+  generateClusterStyle: function (color, textSize = 16) {
+    return {
       textColor: 'white',
-      textSize: 16,
+      textSize: textSize,
       fontFamily: 'Plus Jakarta Sans',
-      url: '/images/cluster-green.png',
+      url: `/images/cluster-${color}.png`,
       height: 50,
       width: 50
-    },
-    {
-      textColor: 'white',
-      textSize: 16,
-      fontFamily: 'Plus Jakarta Sans',
-      url: '/images/cluster-yellow.png',
-      height: 50,
-      width: 50
-    },
-    {
-      textColor: 'white',
-      textSize: 14,
-      fontFamily: 'Plus Jakarta Sans',
-      url: '/images/cluster-red.png',
-      height: 50,
-      width: 50
-    }
-  ],
+    };
+  },
+
+  // Generate cluster styles using the helper function
+  get clusterStyles () {
+    return [
+      this.generateClusterStyle('green'),
+      this.generateClusterStyle('yellow'),
+      this.generateClusterStyle('red', 14)
+    ];
+  },
 
   polygonStyle: {
     strokeColor: '#FBAE3B',
@@ -117,15 +111,6 @@ window.MapUtils = {
     }
   },
 
-  getCenterZoomParams: function () {
-    var center = window.map.getCenter().toJSON();
-    var zoom = window.map.getZoom();
-    return {
-      lat: center['lat'],
-      lng: center['lng'],
-      zoom: zoom
-    };
-  },
   // Initialize map with given configuration
   initializeMap: function (config) {
     if (typeof google === 'undefined') {
@@ -357,22 +342,26 @@ window.MapUtils = {
     google.maps.event.addListenerOnce(window.map, 'idle', function () {
       window.map.addListener('bounds_changed', function () {
         var q;
+        var bounds = window.map.getBounds().toJSON();
+        var center = window.map.getCenter().toJSON();
+        var zoom = window.map.getZoom();
         if (config.triggerBoundsChanged) {
-          var bounds = window.map.getBounds();
-          if (bounds) {
-            var boundsJSON = bounds.toJSON();
-            q = {
-              south: boundsJSON['south'],
-              west: boundsJSON['west'],
-              north: boundsJSON['north'],
-              east: boundsJSON['east']
-            };
-          } else {
-            // Fallback if bounds are not available
-            q = self.getCenterZoomParams();
-          }
+          q = {
+            south: bounds['south'],
+            west: bounds['west'],
+            north: bounds['north'],
+            east: bounds['east'],
+          };
         } else {
-          q = self.getCenterZoomParams();
+          q = {
+            south: bounds['south'],
+            west: bounds['west'],
+            north: bounds['north'],
+            east: bounds['east'],
+            lat: center['lat'],
+            lng: center['lng'],
+            zoom: zoom
+          };
         }
 
         jQuery.extend(params, q);
