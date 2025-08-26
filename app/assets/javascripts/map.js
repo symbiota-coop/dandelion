@@ -226,7 +226,7 @@ window.MapUtils = {
       this.addMarkerClickListener(marker, infowindow, infoWindowEnabled);
 
       // Extend bounds if not using polygonables
-      if (!polygonables || polygonables === 'false') {
+      if (!polygonables) {
         console.log('pushed ' + marker.getPosition().toJSON() + ' to bounds');
         bounds.extend(marker.getPosition());
       }
@@ -336,7 +336,7 @@ window.MapUtils = {
     } else if (config.explicitBounds) {
       console.log('using explicit bounds');
       this.fitValidBounds(config.explicitBounds, 'Invalid explicit bounds values:');
-    } else if (config.polygonables && config.polygonables === 'true') {
+    } else if (config.polygonables) {
       console.log('using polygonables');
       window.map.fitBounds(bounds);
     } else if (!config.points || config.points.length === 0 || config.pointsExceedLimit) {

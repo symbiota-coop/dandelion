@@ -174,6 +174,7 @@ gem 'mini_magick' # for image processing
      '/javascripts/ext/linkify-jquery.min.js',     
      "/javascripts/pagelets.js?#{@cachebuster}",
      "/javascripts/jquery.lookup.js?#{@cachebuster}",
+     "/javascripts/map.js?#{@cachebuster}",
      "/javascripts/app.js?#{@cachebuster}"
    ].each { |f| %>
 <script src="<%= f %>"></script>
