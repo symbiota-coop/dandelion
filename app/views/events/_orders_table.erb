@@ -85,7 +85,7 @@
       <td>
         <a href="/e/<%= order.event.slug %>"><%= order.event.name %></a>
         <div style="white-space: nowrap">
-          <span data-toggle="tooltip" title="<%= d = (order.event.start_time.to_date - Date.today).to_i; distance_of_time_in_words(order.event.start_time, Date.today) %> to go" class="text-primary">
+          <span data-toggle="tooltip" title="<%= d = (order.event.start_time.to_date - Date.today).to_i; distance_of_time_in_words(order.event.start_time.to_date, Date.today) %> to go" class="text-primary">
             <% [d, 28].min.times do |i| %>
               <% if i == 27 && d > 28 %>
                 <i class="bi bi-plus-square-fill mr-1"></i>
