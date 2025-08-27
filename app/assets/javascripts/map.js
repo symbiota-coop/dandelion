@@ -9,7 +9,8 @@ window.MapUtils = {
     fullscreenControl: false,
     maxZoom: 16,
     minZoom: 1,
-    gestureHandling: 'greedy'
+    gestureHandling: 'greedy',
+    clickableIcons: false
   },
 
   // Helper function to generate cluster styles
