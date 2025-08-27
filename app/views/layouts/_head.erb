@@ -42,6 +42,13 @@
       }
     </style>
   <% end %>
+  <% if params[:display] == 'map' %>
+    <style>
+      #content {
+        padding-bottom: 0px;
+      }
+    </style>
+  <% end %>
 
   <% if @event && @event.persisted? %>
     <%= partial :'layouts/event' %>

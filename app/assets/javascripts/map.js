@@ -112,6 +112,21 @@ window.MapUtils = {
     }
   },
 
+  fillScreen: function () {
+    const mapContainer = document.getElementById('map-container');
+    const mapContainerTop = mapContainer.getBoundingClientRect().top;
+    const headerHeight = mapContainerTop;
+    const remainingHeight = window.innerHeight - headerHeight;
+    const minHeight = window.innerHeight * 0.5;
+    const finalHeight = Math.max(remainingHeight, minHeight);
+    document.getElementById('map-canvas').style.height = finalHeight + 'px';
+
+    // Trigger map resize if map exists
+    if (window.map) {
+      google.maps.event.trigger(window.map, 'resize');
+    }
+  },
+
   // Initialize map with given configuration
   initializeMap: function (config) {
     if (typeof google === 'undefined') {
@@ -121,6 +136,13 @@ window.MapUtils = {
 
     var params = this.getContainerParams();
     window.mapTimer = null;
+
+    if (config.fillScreen) {
+      var self = this;
+      // Set height on load and resize
+      self.fillScreen();
+      $(window).on('resize', function () { self.fillScreen(); });
+    }
 
     var mapOptions = Object.assign({}, this.mapOptions, {
       minZoom: config.minZoom || this.mapOptions.minZoom
@@ -152,6 +174,11 @@ window.MapUtils = {
     // Setup dynamic loading if enabled
     if (config.dynamic) {
       this.setupDynamicLoading(params, config);
+    }
+
+    // Set map height after initialization if dynamic height is enabled
+    if (config.fillScreen) {
+      this.fillScreen();
     }
 
     return { map: window.map, markers: markers, polygons: polygons };
