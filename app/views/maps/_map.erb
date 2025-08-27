@@ -61,6 +61,9 @@ points_limit = 500
     MapUtils.initializeMap(config);
   });
 </script>
+<style>
+  #map-canvas > div { background-color: white !important; }
+</style>
 <div id="map-container" style="position: relative">
   <div id="map-canvas" style="height: 50vh"></div>
   <div id="points-warning" style="position: absolute; top: 0; left: 20px; right: 20px; margin: auto; display: none" class="mt-3 alert alert-warning">There are too many points to display, please zoom in</div>
