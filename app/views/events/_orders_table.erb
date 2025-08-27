@@ -86,8 +86,15 @@
         <a href="/e/<%= order.event.slug %>"><%= order.event.name %></a>
         <div style="white-space: nowrap">
           <span data-toggle="tooltip" title="<%= d = (order.event.start_time.to_date - Date.today).to_i; distance_of_time_in_words(order.event.start_time, Date.today) %> to go" class="text-primary">
-            <% [d, 28].min.times do |i| %><i class="bi bi-square-fill mr-1"></i><% if (i + 1) % 7 == 0 %><br>
-              <% end %><% end %>
+            <% [d, 28].min.times do |i| %>
+              <% if i == 27 && d > 28 %>
+                <i class="bi bi-plus-square-fill mr-1"></i>
+              <% else %>
+                <i class="bi bi-square-fill mr-1"></i>
+              <% end %>
+              <% if (i + 1) % 7 == 0 %><br>
+              <% end %>
+            <% end %>
           </span>
         </div>
         <div data-pagelet-url="/events/<%=order.event.id%>/progress?full_width=true" class="my-1"></div>
