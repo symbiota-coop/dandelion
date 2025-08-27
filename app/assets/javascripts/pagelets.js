@@ -115,7 +115,7 @@ $(function () {
       const rawPagelet = this
       const placeholder = $(rawPagelet)[0].hasAttribute('data-with-placeholder')
       if ($(rawPagelet).html().length == 0 || placeholder) {
-        if (placeholder) { $(rawPagelet).removeAttr('data-with-placeholder') } else { $(rawPagelet).html('<i class="pagelet-loading p-3 bi bi-spin bi-slash-lg"></i>') }
+        if (placeholder) { $(rawPagelet).removeAttr('data-with-placeholder') } else { $(rawPagelet).html('<i class="pagelet-loading bi bi-spin bi-slash-lg"></i>') }
         $(rawPagelet).load($(rawPagelet).attr('data-pagelet-url'))
       }
     })
