@@ -215,7 +215,7 @@ var handleHeaderSearchBar = function () {
       $(this).autocomplete("widget").css({ "width": ($(this).width() + "px") })
     },
     search: function () {
-      $('.header-search-bar .right-icon').html('<i class="bi bi-spin bi-arrow-repeat"></i>')
+      $('.header-search-bar .right-icon').html('<i class="bi bi-spin bi-slash-lg"></i>')
     },
     response: function () {
       $('.header-search-bar .right-icon').html('<i class="bi bi-x-lg"></i>')

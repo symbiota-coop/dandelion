@@ -7,6 +7,6 @@
     <%= hidden_field_tag :photoable_id, value: photoable.id %>
     <%= hidden_field_tag :photoable_type, value: photoable.class.to_s %>
     <%= file_field_tag :image, onchange: '$(this).next().show();this.form.submit()' %>
-    <i style="display: none" class="bi bi-spin bi-arrow-repeat"></i>
+    <i style="display: none" class="bi bi-spin bi-slash-lg"></i>
   <% end %>
 <% end %>

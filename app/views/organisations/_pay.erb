@@ -61,12 +61,12 @@
           </div>
           <button data-payment-method="stripe" type="submit" class="btn btn-primary mb-1 ml-0 mr-1" style="height: 2.125rem">
             Contribute via card
-            <i class="bi bi-spin bi-arrow-repeat" style="display: none"></i>
+            <i class="bi bi-spin bi-slash-lg" style="display: none"></i>
           </button>
           <%= hidden_field_tag :payment_method, value: 'stripe', disabled: true %>
           <button data-payment-method="coinbase" type="submit" class="btn btn-outline-primary border-0 mb-1" style="height: 2.125rem">
             via crypto
-            <i class="bi bi-spin bi-arrow-repeat" style="display: none"></i>
+            <i class="bi bi-spin bi-slash-lg" style="display: none"></i>
           </button>
           <%= hidden_field_tag :payment_method, value: 'coinbase', disabled: true %>
         <% end %>

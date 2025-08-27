@@ -270,7 +270,7 @@ window.DandelionMap = {
     var self = this;
     google.maps.event.addListener(marker, 'click', function () {
       if (self.shouldShowInfoWindow(marker.model_name, infoWindowEnabled)) {
-        infowindow.setContent('<i class="bi bi-spin bi-arrow-repeat"></i>');
+        infowindow.setContent('<i class="bi bi-spin bi-slash-lg"></i>');
         infowindow.open(window.map, marker);
         var timeout = self.dynamicLoadingTimeout;
         setTimeout(function () {
@@ -334,7 +334,7 @@ window.DandelionMap = {
       return a.n - b.n;
     });
 
-    infowindow.setContent('<i class="bi bi-spin bi-arrow-repeat"></i>');
+    infowindow.setContent('<i class="bi bi-spin bi-slash-lg"></i>');
     infowindow.setPosition(cluster.getCenter());
     infowindow.open(window.map);
 

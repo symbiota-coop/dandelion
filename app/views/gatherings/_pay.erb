@@ -15,14 +15,14 @@
   <% if @gathering.stripe_sk && FIAT_CURRENCIES.include?(@gathering.currency) %>
     <button data-payment-method="stripe" type="submit" class="btn btn-default mb-1 ml-0 mr-1" style="height: 2.125rem">
       Pay with card
-      <i class="bi bi-spin bi-arrow-repeat" style="display: none"></i>
+      <i class="bi bi-spin bi-slash-lg" style="display: none"></i>
     </button>
     <%= hidden_field_tag :payment_method, value: 'stripe', disabled: true %>
   <% end %>
   <% if @gathering.coinbase_api_key && (FIAT_CURRENCIES.include?(@gathering.currency) || COINBASE_CURRENCIES.include?(@gathering.currency)) %>
     <button data-payment-method="coinbase" type="submit" class="btn btn-default mb-1 ml-0 mr-1" style="height: 2.125rem">
       Pay with crypto
-      <i class="bi bi-spin bi-arrow-repeat" style="display: none"></i>
+      <i class="bi bi-spin bi-slash-lg" style="display: none"></i>
     </button>
     <%= hidden_field_tag :payment_method, value: 'coinbase', disabled: true %>
   <% end %>
@@ -31,7 +31,7 @@
       <span>
         Pay with <%= @gathering.chain.name %>
       </span>
-      <i class="bi bi-spin bi-arrow-repeat" style="display: none"></i>
+      <i class="bi bi-spin bi-slash-lg" style="display: none"></i>
     </button>
     <%= hidden_field_tag :payment_method, value: 'evm', disabled: true %>
   <% end %>
