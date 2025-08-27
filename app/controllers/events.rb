@@ -28,6 +28,7 @@ Dandelion::App.controller do
       @events = @events.online if params[:online]
       @events = @events.in_person if params[:in_person]
     end
+    @events = @events.and(:hidden_from_homepage.ne => true) if params[:home]
     content_type = (parts = URI(request.url).path.split('.')
                     parts.length == 2 ? parts.last.to_sym : :html)
     case content_type
@@ -645,5 +646,19 @@ Dandelion::App.controller do
 
   get '/events/:id/feedback_questions' do
     partial :'events/feedback_questions', locals: { questions: params[:questions] }
+  end
+
+  get '/events/:id/hide_from_homepage' do
+    @event = Event.find(params[:id]) || not_found
+    event_admins_only!
+    @event.set(hidden_from_homepage: true)
+    redirect back
+  end
+
+  get '/events/:id/unhide_from_homepage' do
+    @event = Event.find(params[:id]) || not_found
+    event_admins_only!
+    @event.set(hidden_from_homepage: false)
+    redirect back
   end
 end
