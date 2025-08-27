@@ -265,10 +265,7 @@ label .form-text {
 }
 
 #map-canvas button[title=Close] {
-  position: absolute !important;
-  top: 0;
-  right: 0;
-  z-index: 999;
+  height: 32px !important;
 }
 
 .map-icon-label .bi {
