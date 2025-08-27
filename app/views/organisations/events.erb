@@ -56,7 +56,7 @@
 <% end %>
 <% if params[:display] == 'map' %>
   <div data-pagelet-url="/o/<%=@organisation.slug%>/events?<%= Rack::Utils.parse_nested_query(request.query_string).merge(bounding_box: @bounding_box&.flatten).to_query %>">
-    <%= partial :'maps/map', locals: { stem: "/o/#{@organisation.slug}/events", dynamic: true, trigger_bounds_changed: true, bounding_box: @bounding_box&.flatten } %>
+    <%= partial :'maps/map', locals: { stem: "/o/#{@organisation.slug}/events", dynamic: true, trigger_bounds_changed: true, bounding_box: @bounding_box&.flatten, fill_screen: true } %>
   </div>
 <% elsif params[:display] == 'table' %>
   <%= partial :'events/table' %>

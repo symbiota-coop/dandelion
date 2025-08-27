@@ -63,9 +63,6 @@ window.MapUtils = {
 
   dynamicLoadingTimeout: 750,
 
-  defaultCenter: { lat: 35, lng: 0 },
-  defaultZoom: 0,
-
   clusterConfig: {
     zoomOnClick: false
   },
@@ -94,8 +91,8 @@ window.MapUtils = {
   },
 
   setDefaultView: function () {
-    window.map.setCenter(new google.maps.LatLng(this.defaultCenter.lat, this.defaultCenter.lng));
-    window.map.setZoom(this.defaultZoom);
+    window.map.setCenter(new google.maps.LatLng(0, 0));
+    window.map.setZoom(0);
   },
 
   fitValidBounds: function (bounds, errorMessage) {

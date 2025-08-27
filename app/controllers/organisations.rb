@@ -26,7 +26,7 @@ Dandelion::App.controller do
           @organisations = @organisations.and(coordinates: { '$geoWithin' => { '$box' => box } }) unless @organisations.empty?
           @points_count = @organisations.count
           @points = @organisations.to_a
-          partial :'maps/map', locals: { stem: '/organisations', dynamic: true, points: @points, points_count: @points_count, centre: (OpenStruct.new(lat: @lat, lng: @lng) if @lat && @lng), zoom: @zoom }
+          partial :'maps/map', locals: { stem: '/organisations', dynamic: true, points: @points, points_count: @points_count, centre: (OpenStruct.new(lat: @lat, lng: @lng) if @lat && @lng), zoom: @zoom, fill_screen: true }
         end
       else
         erb :'organisations/organisations'

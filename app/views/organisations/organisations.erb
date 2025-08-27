@@ -60,7 +60,7 @@
 
 <% if params[:display] == 'map' %>
   <div data-pagelet-url="/organisations?<%= request.query_string %>">
-    <%= partial :'maps/map', locals: { stem: "/organisations", dynamic: true, trigger_bounds_changed: true } %>
+    <%= partial :'maps/map', locals: { stem: "/organisations", dynamic: true, trigger_bounds_changed: true, fill_screen: true } %>
   </div>
 <% elsif params[:display] == 'network' %>
   <%= partial :'organisations/network', locals: { organisations: @organisations } %>
