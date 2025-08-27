@@ -37,7 +37,17 @@
 
       $(document).ajaxStop(function() {
         if (!$('#orders').hasClass('dataTable')) {
-          $('#orders').dataTable({bInfo: false, paging: false, searching: false, order: [[colIndex, "desc"]]});
+          $('#orders').dataTable({
+            bInfo: false,
+            paging: false,
+            searching: false,
+            order: [[colIndex, "desc"]],
+            columnDefs: [
+              <% if defined?(event_name) %>
+              { width: "116px", targets: 1 }, // Event column
+              <% end %>
+            ]
+          });
         }
       })
   })
@@ -80,8 +90,8 @@
       <td>
         <a href="/e/<%= order.event.slug %>"><%= order.event.name %></a>
         <div>
-          <span data-toggle="tooltip" title="<%= d = (order.event.start_time.to_date - Date.today).to_i; d >= 30 ? '30+ days' : pluralize(d, 'day') %> to go" class="text-primary">
-            <% [d, 30].min.times do %><i class="bi bi-square-fill mr-1"></i><% end %>
+          <span data-toggle="tooltip" title="<%= d = (order.event.start_time.to_date - Date.today).to_i; distance_of_time_in_words(order.event.start_time, Date.today) %> to go" class="text-primary">
+            <% [d, 28].min.times do %><i class="bi bi-square-fill mr-1"></i><% end %>
           </span>
         </div>
         <div data-pagelet-url="/events/<%=order.event.id%>/progress?full_width=true" class="my-1"></div>
