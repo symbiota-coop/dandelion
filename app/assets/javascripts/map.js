@@ -61,7 +61,7 @@ window.MapUtils = {
     { name: 'Organisationship', color: '#00B963', icon: 'bi bi-person-fill' }
   ],
 
-  dynamicLoadingTimeout: 750,
+  dynamicLoadingTimeout: 500,
 
   clusterConfig: {
     zoomOnClick: false
