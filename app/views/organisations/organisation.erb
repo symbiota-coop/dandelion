@@ -79,5 +79,7 @@
 
 <% if @organisation.unscoped_event_feedbacks.count > 0 %>
   <h2 class="mt-5">Feedback on <%= @organisation.name %> events</h2>
-  <div class="mt-3" data-pagelet-url="/o/<%= @organisation.slug %>/show_feedback"></div>
+  <div data-with-placeholder class="mt-3" data-pagelet-url="/o/<%= @organisation.slug %>/show_feedback">
+    <%= partial :placeholder %>
+  </div>
 <% end %>
