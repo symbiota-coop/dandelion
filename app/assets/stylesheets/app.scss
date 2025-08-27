@@ -264,6 +264,13 @@ label .form-text {
   font-weight: 500
 }
 
+#map-canvas button[title=Close] {
+  position: absolute !important;
+  top: 0;
+  right: 0;
+  z-index: 999;
+}
+
 .map-icon-label .bi {
   color: white;
   font-size: 20px !important;

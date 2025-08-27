@@ -14,7 +14,6 @@ Dandelion::App.controller do
           { intro_for_non_members: /#{Regexp.escape(params[:q])}/i }
         ).pluck(:id))
       end
-      @gatherings = @gatherings.paginate(page: params[:gatherings_page], per_page: 50)
       if request.xhr?
         if params[:display] == 'map'
           @lat = params[:lat]
@@ -32,6 +31,7 @@ Dandelion::App.controller do
           partial :'maps/map', locals: { stem: '/gatherings', dynamic: true, points: @points, points_count: @points_count, centre: (OpenStruct.new(lat: @lat, lng: @lng) if @lat && @lng), zoom: @zoom, fill_screen: true }
         end
       else
+        @gatherings = @gatherings.paginate(page: params[:gatherings_page], per_page: 50)
         erb :'gatherings/gatherings'
       end
     when :json

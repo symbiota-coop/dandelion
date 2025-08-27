@@ -11,7 +11,6 @@ Dandelion::App.controller do
         ).pluck(:id))
       end
       @organisations = @organisations.and(:id.in => current_account.organisations_following.pluck(:id)) if current_account && params[:following]
-      @organisations = @organisations.paginate(page: params[:organisations_page], per_page: 50)
       if request.xhr?
         if params[:display] == 'map'
           @lat = params[:lat]
@@ -29,6 +28,7 @@ Dandelion::App.controller do
           partial :'maps/map', locals: { stem: '/organisations', dynamic: true, points: @points, points_count: @points_count, centre: (OpenStruct.new(lat: @lat, lng: @lng) if @lat && @lng), zoom: @zoom, fill_screen: true }
         end
       else
+        @organisations = @organisations.paginate(page: params[:organisations_page], per_page: 50)
         erb :'organisations/organisations'
       end
     when :json
