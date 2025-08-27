@@ -49,6 +49,7 @@ Dandelion::App.controller do
     @events = @events.and(local_group_id: params[:local_group_id]) if params[:local_group_id]
     @events = @events.and(activity_id: params[:activity_id]) if params[:activity_id]
     carousel = nil
+    params[:carousel_ids] = [params[:carousel_id]] if params[:carousel_id]
     if params[:carousel_ids] && params[:carousel_ids].any?
       @events = if params[:carousel_ids].include?('featured')
                   @events.and(featured: true)
