@@ -42,7 +42,7 @@
       }
     </style>
   <% end %>
-  <% if params[:display] == 'map' %>
+  <% if @no_content_padding_bottom || params[:display] == 'map' %>
     <style>
       #content {
         padding-bottom: 0px;

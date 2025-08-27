@@ -122,6 +122,7 @@ module Dandelion
       else
         @from = Date.today
         @events = Event.live.public.browsable.future(@from)
+        @no_content_padding_bottom = true
         @accounts = []
         if request.xhr?
           400
