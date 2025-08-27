@@ -1,5 +1,5 @@
 // Map functionality
-window.MapUtils = {
+window.DandelionMap = {
   // Configuration settings
   mapOptions: {
     mapTypeId: google.maps.MapTypeId.ROADMAP,
