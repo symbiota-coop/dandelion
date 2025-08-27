@@ -118,7 +118,7 @@ window.MapUtils = {
       return;
     }
 
-    var params = this.getPageletParams();
+    var params = this.getContainerParams();
     window.mapTimer = null;
 
     var mapOptions = Object.assign({}, this.mapOptions, {
@@ -156,14 +156,32 @@ window.MapUtils = {
     return { map: window.map, markers: markers, polygons: polygons };
   },
 
-  getPageletParams: function () {
-    var params = {};
+  getContainerParams: function () {
+    var query;
     var pagelet = $('#map-container').closest('[data-pagelet-url]');
+    var turboFrame = $('#map-container').closest('turbo-frame');
+
     if (pagelet.length > 0) {
-      var query = pagelet.attr('data-pagelet-url').split('?')[1];
-      params = $.deparam(query);
+      query = pagelet.attr('data-pagelet-url').split('?')[1];
+    } else if (turboFrame.length > 0 && turboFrame.attr('src')) {
+      query = turboFrame.attr('src').split('?')[1];
+    } else {
+      query = window.location.search;
     }
-    return params;
+    return Object.fromEntries(new URLSearchParams(query || ''));
+  },
+
+  getContainer: function () {
+    var pagelet = $('#map-container').closest('[data-pagelet-url]');
+    var turboFrame = $('#map-container').closest('turbo-frame');
+
+    if (pagelet.length > 0) {
+      return { type: 'pagelet', element: pagelet };
+    } else if (turboFrame.length > 0) {
+      return { type: 'turbo-frame', element: turboFrame };
+    } else {
+      return { type: 'none', element: null };
+    }
   },
 
   drawBoundingBox: function (boundingBox) {
@@ -325,7 +343,7 @@ window.MapUtils = {
       console.log('using config.polygonables');
       window.map.fitBounds(bounds);
     } else if (!config.points || config.points.length === 0 || config.pointsExceedLimit) {
-      var params = this.getPageletParams();
+      var params = this.getContainerParams();
       if (params['bounding_box']) {
         console.log("using params['bounding_box']");
         this.fitValidBounds(params['bounding_box'], 'Invalid bounding box');
@@ -367,18 +385,27 @@ window.MapUtils = {
         }
 
         jQuery.extend(params, q);
-        var pagelet = $('#map-container').closest('[data-pagelet-url]');
+        var container = self.getContainer();
         var stem = config.stem || '/map';
-        pagelet.attr('data-pagelet-url', stem + '/?' + $.param(params));
+        var newUrl = stem + '/?' + $.param(params);
+
+        if (container.type === 'pagelet') {
+          container.element.attr('data-pagelet-url', newUrl);
+        }
 
         clearTimeout(window.mapTimer);
         var timeout = self.dynamicLoadingTimeout;
         window.mapTimer = setTimeout(function () {
           window.map.setOptions(self.disabledMapOptions);
-          pagelet.css('opacity', '0.3');
-          pagelet.load(pagelet.attr('data-pagelet-url'), function () {
-            pagelet.css('opacity', '1');
-          });
+
+          if (container.type === 'pagelet') {
+            container.element.css('opacity', '0.3');
+            container.element.load(newUrl, function () {
+              container.element.css('opacity', '1');
+            });
+          } else if (container.type === 'turbo-frame') {
+            container.element.attr('src', newUrl);
+          }
         }, timeout);
       });
 
