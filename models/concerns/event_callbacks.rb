@@ -16,12 +16,12 @@ module EventCallbacks
       set_browsable
       set(event_tags_joined: event_tags.map(&:name).join(', '))
 
-      if changes['name'] && (post = posts.find_by(subject: "Chat for #{changes['name'][0]}"))
+      if previous_changes['name'] && (post = posts.find_by(subject: "Chat for #{previous_changes['name'][0]}"))
         post.update_attribute(:subject, "Chat for #{name}")
       end
 
-      if changes['activity_id'] && activity && activity.privacy == 'open' && changes['activity_id'][0]
-        previous_activity = Activity.find(changes['activity_id'][0])
+      if previous_changes['activity_id'] && activity && activity.privacy == 'open' && previous_changes['activity_id'][0]
+        previous_activity = Activity.find(previous_changes['activity_id'][0])
         attendees.each do |account|
           next unless (previous_activityship = previous_activity.activityships.find_by(account: account))
 
@@ -34,8 +34,8 @@ module EventCallbacks
         end
       end
 
-      if changes['local_group_id'] && local_group && changes['local_group_id'][0]
-        previous_local_group = LocalGroup.find(changes['local_group_id'][0])
+      if previous_changes['local_group_id'] && local_group && previous_changes['local_group_id'][0]
+        previous_local_group = LocalGroup.find(previous_changes['local_group_id'][0])
         attendees.each do |account|
           next unless (previous_local_groupship = previous_local_group.local_groupships.find_by(account: account))
 
