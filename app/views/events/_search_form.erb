@@ -34,12 +34,7 @@
         <label>near</label>
         <%= text_field_tag :near, class: 'form-control', value: params[:near], id: 'events-search-near', placeholder: '' %>
       </div>
-      <% if (event_tags = EventTag.and(:id.in => EventTagship.and(:event_id.in => Event.live.public.browsable.future.pluck(:id)).pluck(:event_tag_id)).order('name asc')).count > 0 %>
-        <div class="form-group col-12 col-sm-auto">
-          <label>tagged</label>
-          <%= select_tag :event_tag_id, options: [''] + event_tags.map { |event_tag| [event_tag.name, event_tag.id] }, selected: params[:event_tag_id], class: 'form-control'%>
-        </div>
-      <% end %>
+      <%= partial :'events/search_event_tags' %>
     </div>
     <div class="form-row align-items-end mt-1">
       <%= checkbox 'Online', form_group_class: 'col-12 col-sm-auto' %>
