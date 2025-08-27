@@ -1,2 +1,5 @@
 <%= partial :'organisations/nav', locals: { organisation: @organisation } %>
-<div data-pagelet-url="/o/<%= @organisation.slug %>/activities"></div>
+<h2>Activities</h2>
+<div data-with-placeholder data-pagelet-url="/o/<%= @organisation.slug %>/activities">
+  <%= partial :placeholder %>
+</div>

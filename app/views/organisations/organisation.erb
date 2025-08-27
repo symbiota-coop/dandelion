@@ -64,11 +64,17 @@
 <% end %>
 
 <% if organisation_admin? or @organisation.activities.active.count > 0 %>
-  <div data-pagelet-url="/o/<%= @organisation.slug %>/activities"></div>
+  <h2 class="mt-5">Activities</h2>
+  <div data-with-placeholder data-pagelet-url="/o/<%= @organisation.slug %>/activities">
+    <%= partial :placeholder %>
+  </div>
 <% end %>
 
 <% if organisation_admin? or @organisation.local_groups.count > 0 %>
-  <div data-pagelet-url="/o/<%= @organisation.slug %>/local_groups"></div>
+  <h2 class="mt-5">Local groups</h2>
+  <div data-with-placeholder data-pagelet-url="/o/<%= @organisation.slug %>/local_groups">
+    <%= partial :placeholder %>
+  </div>
 <% end %>
 
 <% if @organisation.unscoped_event_feedbacks.count > 0 %>
