@@ -192,9 +192,9 @@ window.MapUtils = {
     } else if (turboFrame.length > 0 && turboFrame.attr('src')) {
       query = turboFrame.attr('src').split('?')[1];
     } else {
-      query = window.location.search;
+      query = window.location.search.substring(1);
     }
-    return Object.fromEntries(new URLSearchParams(query || ''));
+    return $.deparam(query);
   },
 
   getContainer: function () {
