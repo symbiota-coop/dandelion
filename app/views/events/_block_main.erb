@@ -28,13 +28,9 @@
     <% end %>
     <% if admin? %>
       <% if event.hidden_from_homepage? %>
-        <a class="text-dark block-edit" style="display: none" target="_parent" href="<%= "/events/#{event.id}/unhide_from_homepage" %>">
-          <i class="bi bi-eye-slash-fill"></i>
-        </a>
+        <a class="text-dark block-edit" style="display: none" target="_parent" href="<%= "/events/#{event.id}/unhide_from_homepage" %>"><i class="bi bi-eye-slash-fill"></i></a>
       <% else %>
-        <a class="text-dark block-edit" style="display: none" target="_parent" href="<%= "/events/#{event.id}/hide_from_homepage" %>">
-          <i class="bi bi-eye-fill"></i>
-        </a>
+        <a class="text-dark block-edit" style="display: none" target="_parent" href="<%= "/events/#{event.id}/hide_from_homepage" %>"><i class="bi bi-eye-fill"></i></a>
       <% end %>
     <% end %>
   </div>

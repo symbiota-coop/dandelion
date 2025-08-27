@@ -265,7 +265,8 @@ label .form-text {
 }
 
 #map-canvas button[title=Close] {
-  height: 32px !important;
+  height: 36px !important;
+  margin-top: -8px !important;
 }
 
 .map-icon-label .bi {
