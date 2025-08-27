@@ -15,7 +15,11 @@
   <%= partial :'organisations/carousel_buttons' %>
 <% end %>
 
-<div class="search well <%='mt-3' if params[:minimal] || @carousel_buttons %>" id="search-well" style="<%= 'display: none;' if @carousel_buttons && !params[:search] %>">
+<% if params[:display] == 'map' || @carousel_buttons %>
+  <%= partial :'events/toggle_search_well' %>
+<% end %>
+
+<div class="search well <%='mt-3' if params[:minimal] || @carousel_buttons %>" style="<%= 'display: none;' if (params[:display] == 'map') || (@carousel_buttons && !params[:search]) %>">
 
   <% form_tag '', method: 'get', class: 'submitOnChange searchForm mb-3' do %>
     <%= hidden_field_tag :display, value: params[:display] %>

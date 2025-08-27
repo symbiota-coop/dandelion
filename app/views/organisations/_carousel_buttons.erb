@@ -1,20 +1,6 @@
 <script>
-  function toggleAdvancedSearch() {
-    var searchWell = $('#search-well');
-    var toggleLink = $('#toggle-search');
-    var searchArrow = $('#search-arrow');
-
-    if (searchWell.is(':visible')) {
-      searchWell.hide();
-      toggleLink.html('<i class="bi bi-chevron-right" id="search-arrow"></i> Show advanced search');
-    } else {
-      searchWell.show();
-      toggleLink.html('<i class="bi bi-chevron-down" id="search-arrow"></i> Hide advanced search');
-    }
-  }
-
   function updateCarouselHref(element) {
-    var searchWell = $('#search-well');
+    var searchWell = $('.search.well');
     var isSearchWellVisible = searchWell.is(':visible');
 
     if (isSearchWellVisible) {
@@ -30,7 +16,7 @@
 
   // Preserve all query parameters if search well is visible
   $(function() {
-    var searchWell = $('#search-well');
+    var searchWell = $('.search.well');
     var form = $('#local-group-form').last();
 
     if (searchWell.length && searchWell.is(':visible')) {
@@ -113,10 +99,3 @@
     <% end %>
   </div>
 <% end %>
-
-<div class="text-right">
-  <a href="javascript:;" id="toggle-search" onclick="toggleAdvancedSearch()">
-    <i class="bi <%= params[:search] ? 'bi-chevron-down' : 'bi-chevron-right' %>" id="search-arrow"></i>
-    <%= params[:search] ? 'Hide advanced search' : 'Show advanced search' %>
-  </a>
-</div>
