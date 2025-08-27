@@ -91,7 +91,7 @@ window.MapUtils = {
   },
 
   setDefaultView: function () {
-    window.map.setCenter(new google.maps.LatLng(0, 0));
+    window.map.setCenter(new google.maps.LatLng(0, 35));
     window.map.setZoom(0);
   },
 
