@@ -7,6 +7,10 @@
     <%= error.message %>
   </blockquote>
   <p>
-    We recommend you log into your Stripe account and resolve any warnings or notifications you see there.
+    We've locked the event on Dandelion to prevent further errors.
+  </p>
+  <p>
+    Please log into your Stripe account and resolve any warnings or notifications you see there.
+    Once you've done that, you can <a href="<%= ENV['BASE_URI'] %>/e/<%=event.slug%>/edit">edit the event</a> to uncheck the Locked checkbox and save to allow purchases again.
   </p>
 </div>
