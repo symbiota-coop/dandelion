@@ -1,4 +1,4 @@
-<div class="row justify-content-between mb-3">
+<div class="row justify-content-between">
   <div class="col">
     <% if !current_account %>
       <h1>Events</h1>
@@ -21,7 +21,7 @@
           <%= select_tag :organisation_id, onchange: "window.location = '/events/new?organisation_id=' + $(this).val()", class: 'form-control', options: ['']+current_account.organisations.order('name asc').map { |organisation| [organisation.name, organisation.id] } %>
         <% end %>
       <% end %>
-      <p class="mb-0"><a href="/events/my">View your upcoming and past events</a></p>
+      <p><a href="/events/my">View your upcoming and past events</a></p>
     <% end %>
   </div>
 </div>
