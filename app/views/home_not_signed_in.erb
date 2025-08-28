@@ -103,6 +103,13 @@
 
 <%= cp :'event_feedbacks/home' %>
 
-<div data-pagelet-url="/events?<%= Rack::Utils.parse_nested_query(request.query_string).merge(display: 'map').to_query %>">
+<script>
+  $(function () {
+    if (typeof google === 'undefined') {
+      $('#homepage-map').hide();
+    }
+  });
+</script>
+<div id="homepage-map" data-pagelet-url="/events?<%= Rack::Utils.parse_nested_query(request.query_string).merge(display: 'map').to_query %>">
   <%= partial :'maps/map', locals: { stem: "/events", dynamic: true, trigger_bounds_changed: true, fill_screen: true } %>
 </div>
