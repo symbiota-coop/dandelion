@@ -115,7 +115,17 @@ $(function () {
       const rawPagelet = this
       const placeholder = $(rawPagelet)[0].hasAttribute('data-with-placeholder')
       if ($(rawPagelet).html().length == 0 || placeholder) {
-        if (placeholder) { $(rawPagelet).removeAttr('data-with-placeholder') } else { $(rawPagelet).html('<i class="pagelet-loading bi bi-spin bi-slash-lg"></i>') }
+        if (placeholder) {
+          $(rawPagelet).removeAttr('data-with-placeholder')
+        } else {
+          if ($(rawPagelet).is('tr')) {
+            const table = $(rawPagelet).closest('table')
+            const colCount = table.find('thead th').length || table.find('tr:first th').length || 1
+            $(rawPagelet).html('<td colspan="' + colCount + '"><i class="pagelet-loading bi bi-spin bi-slash-lg"></i></td>')
+          } else {
+            $(rawPagelet).html('<i class="pagelet-loading bi bi-spin bi-slash-lg"></i>')
+          }
+        }
         $(rawPagelet).load($(rawPagelet).attr('data-pagelet-url'))
       }
     })
