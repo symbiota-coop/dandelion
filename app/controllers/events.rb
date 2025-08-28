@@ -651,14 +651,20 @@ Dandelion::App.controller do
   get '/events/:id/hide_from_homepage' do
     @event = Event.find(params[:id]) || not_found
     event_admins_only!
+    partial :'events/hide_from_homepage', locals: { event: @event, block_edit: params[:block_edit] }
+  end
+
+  get '/events/:id/do_hide_from_homepage' do
+    @event = Event.find(params[:id]) || not_found
+    event_admins_only!
     @event.set(hidden_from_homepage: true)
-    redirect back
+    200
   end
 
   get '/events/:id/unhide_from_homepage' do
     @event = Event.find(params[:id]) || not_found
     event_admins_only!
     @event.set(hidden_from_homepage: false)
-    redirect back
+    200
   end
 end

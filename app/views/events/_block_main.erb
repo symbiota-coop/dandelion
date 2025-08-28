@@ -19,7 +19,7 @@
       <span class="label label-default">Locked</span>
     <% end %>
     <% if current_account %>
-      <div data-with-placeholder class="d-inline event-star" data-pagelet-url="/events/<%=event.id%>/star?block_edit=1"><i class="bi bi-star" style="opacity: 0.3"></i></div>
+      <div data-with-placeholder class="d-inline" data-pagelet-url="/events/<%=event.id%>/star?block_edit=1"><i class="bi bi-star" style="opacity: 0"></i></div>
     <% end %>
     <% if event_admin?(event) %>
       <a class="text-dark block-edit" style="display: none" target="_parent" href="<%= "/e/#{event.slug}/edit" %>">
@@ -27,11 +27,7 @@
       </a>
     <% end %>
     <% if admin? %>
-      <% if event.hidden_from_homepage? %>
-        <a class="text-dark block-edit" style="display: none" target="_parent" href="<%= "/events/#{event.id}/unhide_from_homepage" %>"><i class="bi bi-eye-slash-fill"></i></a>
-      <% else %>
-        <a class="text-dark block-edit" style="display: none" target="_parent" href="<%= "/events/#{event.id}/hide_from_homepage" %>"><i class="bi bi-eye-fill"></i></a>
-      <% end %>
+      <div data-with-placeholder class="d-inline" data-pagelet-url="/events/<%=event.id%>/hide_from_homepage?block_edit=1"><i class="bi bi-eye-slash-fill" style="opacity: 0"></i></div>
     <% end %>
   </div>
   <div class="mb-2">

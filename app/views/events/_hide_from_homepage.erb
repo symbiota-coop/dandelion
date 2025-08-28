@@ -1,0 +1,9 @@
+<% if event.hidden_from_homepage? %>
+  <a class="pagelet-trigger text-dark <% if defined?(block_edit) && block_edit %> block-edit <% end %>" style="<% if defined?(block_edit) && block_edit %> display: none; <% end %> text-decoration: none" href="/events/<%=event.id%>/unhide_from_homepage">
+    <i class="bi bi-eye-slash-fill"></i>
+  </a>
+<% else %>
+  <a class="pagelet-trigger text-dark <% if defined?(block_edit) && block_edit %> block-edit <% end %>" style="<% if defined?(block_edit) && block_edit %> display: none; <% end %> text-decoration: none" href="/events/<%=event.id%>/do_hide_from_homepage">
+    <i class="bi bi-eye-fill"></i>
+  </a>
+<% end %>
