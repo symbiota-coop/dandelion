@@ -57,6 +57,8 @@ jobs:
         DEFAULT_CURRENCY: USD
         DEFAULT_TIME_ZONE: London
         SESSION_SECRET: ${{ github.run_id }}
+        STRIPE_PK: pk_test_hBG6G5aSlQWzUuSesRvMMj3v
+        STRIPE_SK: sk_test_HCthlytw40KUFZ5nWNc0XI6A        
         CI: true
         SKIP_TOURS: true
       run: bundle exec rake test:${{ matrix.test_file }}
