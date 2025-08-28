@@ -57,8 +57,6 @@ module AccountFields
     field :can_message, type: Mongoid::Boolean
     field :failed_sign_in_attempts, type: Integer
     field :minimal_head, type: String
-    field :sent_substack_invite, type: Time
-    field :substack_opt_in, type: Time
     field :stripe_subscription_id, type: String
     field :feedback_summary, type: String
     field :youtube_video_url, type: String
@@ -132,8 +130,6 @@ module AccountFields
         tickets: :collection,
         orders: :collection,
         last_active: :datetime,
-        sent_substack_invite: :datetime,
-        substack_opt_in: :datetime,
         stripe_subscription_id: :text,
         minimal_head: :text_area,
         youtube_video_url: :url

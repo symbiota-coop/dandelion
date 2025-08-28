@@ -83,27 +83,6 @@ module AccountNotifications
     batch_message.finalize if ENV['MAILGUN_API_KEY']
   end
 
-  def send_substack_invite(number = 3)
-    mg_client = Mailgun::Client.new ENV['MAILGUN_API_KEY'], ENV['MAILGUN_REGION']
-    batch_message = Mailgun::BatchMessage.new(mg_client, ENV['MAILGUN_NOTIFICATIONS_HOST'])
-
-    account = self
-    events = Event.past.and(:id.in => account.orders.and(:created_at.gt => 1.year.ago).pluck(:event_id)).order('start_time desc').limit(3)
-    return unless events.count >= number
-
-    content = ERB.new(File.read(Padrino.root('app/views/emails/substack_invite.erb'))).result(binding)
-    batch_message.from 'Dandelion <stephen@dandelion.coop>'
-    batch_message.subject 'Opt-in to our new Substack newsletter'
-    batch_message.body_html Premailer.new(ERB.new(File.read(Padrino.root('app/views/layouts/email.erb'))).result(binding), with_html_string: true, adapter: 'nokogiri', input_encoding: 'UTF-8').to_inline_css
-
-    [account].each do |account|
-      batch_message.add_recipient(:to, account.email, { 'firstname' => account.firstname || 'there', 'token' => account.sign_in_token, 'id' => account.id.to_s })
-    end
-
-    batch_message.finalize if ENV['MAILGUN_API_KEY']
-    update_attribute(:sent_substack_invite, Time.now)
-  end
-
   def send_stripe_subscription_created_notification(subscription)
     mg_client = Mailgun::Client.new ENV['MAILGUN_API_KEY'], ENV['MAILGUN_REGION']
     batch_message = Mailgun::BatchMessage.new(mg_client, ENV['MAILGUN_NOTIFICATIONS_HOST'])

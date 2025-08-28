@@ -45,10 +45,8 @@
         <label>Coordinator</label>
         <%= select_tag :coordinator_id, options: [''] + coordinators.order('name asc').map { |account| [account.name, account.id] }, selected: params[:coordinator_id], class: 'form-control mx-1' %>
       </div>
-    </div>
 
-    <% if @organisation %>
-      <div class="form-row align-items-end">
+      <% if @organisation %>
         <% if @organisation.local_groups.count > 0 %>
           <div class="form-group col-12 col-sm-auto">
             <label>Local group</label>
@@ -73,8 +71,9 @@
             <%= select_tag :cohost_id, options: [''] + @organisation.cohosts.order('name asc').map { |organisation| [organisation.name, organisation.id] }, selected: params[:cohost_id], class: 'form-control mx-1' %>
           </div>
         <% end %>
-      </div>
-    <% end %>
+      <% end %>
+
+    </div>
 
     <div class="form-row align-items-end mt-1">
       <%= checkbox 'Online', form_group_class: 'col-12 col-sm-auto' %>
