@@ -1,16 +1,18 @@
 // Map functionality
 window.DandelionMap = {
-  // Configuration settings
-  mapOptions: {
-    mapTypeId: google.maps.MapTypeId.ROADMAP,
-    mapTypeControl: false,
-    scaleControl: true,
-    streetViewControl: false,
-    fullscreenControl: false,
-    maxZoom: 16,
-    minZoom: 1,
-    gestureHandling: 'greedy',
-    clickableIcons: false
+  // Configuration settings - lazy loaded to avoid referencing google before it's available
+  get mapOptions () {
+    return {
+      mapTypeId: google.maps.MapTypeId.ROADMAP,
+      mapTypeControl: false,
+      scaleControl: true,
+      streetViewControl: false,
+      fullscreenControl: false,
+      maxZoom: 16,
+      minZoom: 1,
+      gestureHandling: 'greedy',
+      clickableIcons: false
+    };
   },
 
   // Helper function to generate cluster styles
