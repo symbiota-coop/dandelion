@@ -5,26 +5,6 @@ module EventNotifications
     handle_asynchronously :send_reminders
     handle_asynchronously :send_star_reminders
     handle_asynchronously :send_feedback_requests
-    handle_asynchronously :send_first_event_email
-  end
-
-  def send_first_event_email
-    mg_client = Mailgun::Client.new ENV['MAILGUN_API_KEY'], ENV['MAILGUN_REGION']
-    batch_message = Mailgun::BatchMessage.new(mg_client, ENV['MAILGUN_NOTIFICATIONS_HOST'])
-
-    event = self
-    content = ERB.new(File.read(Padrino.root('app/views/emails/first_event.erb'))).result(binding)
-    batch_message.from ENV['FOUNDER_EMAIL_FULL']
-    batch_message.reply_to ENV['FOUNDER_EMAIL']
-    batch_message.subject 'Congratulations on listing your first event on Dandelion!'
-    batch_message.body_text content
-
-    [account].each do |account|
-      batch_message.add_recipient(:to, account.email, { 'firstname' => account.firstname || 'there' })
-    end
-
-    batch_message.finalize if ENV['MAILGUN_API_KEY']
-    account.update_attribute(:sent_first_event_email, Time.now)
   end
 
   def send_destroy_notification(destroyed_by)
