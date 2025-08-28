@@ -13,9 +13,13 @@ concurrency:
 jobs:
   test:
     runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        test_file: [accounts, activities, events, gatherings, how_to_create_a_gathering, how_to_create_an_event, local_groups, nav, organisations, pmails, tour]
     steps:
     - name: Git checkout
-      uses: actions/checkout@v2
+      uses: actions/checkout@v4
 
     - name: Install Ruby
       uses: ruby/setup-ruby@v1
@@ -23,7 +27,7 @@ jobs:
         ruby-version: 3.2.8
 
     - name: Install MongoDB
-      uses: supercharge/mongodb-github-action@1.3.0
+      uses: supercharge/mongodb-github-action@1.12.0
       with:
         mongodb-version: 7.0
 
@@ -31,8 +35,9 @@ jobs:
       uses: actions/cache@v4
       with:
         path: vendor/bundle
-        key: ${{ runner.os }}-gems-${{ hashFiles('**/Gemfile.lock') }}
+        key: ${{ runner.os }}-gems-${{ hashFiles('**/Gemfile.lock') }}-${{ matrix.test_file }}
         restore-keys: |
+          ${{ runner.os }}-gems-${{ hashFiles('**/Gemfile.lock') }}-
           ${{ runner.os }}-gems-
 
     - name: Install gems
@@ -43,7 +48,7 @@ jobs:
     - name: Run RuboCop
       run: bundle exec rubocop --fail-level warning --display-only-fail-level-offenses
 
-    - name: Run tests
+    - name: Run test (${{ matrix.test_file }})
       env:
         RACK_ENV: test
         PORT: 8020
@@ -56,5 +61,5 @@ jobs:
         STRIPE_SK: sk_test_HCthlytw40KUFZ5nWNc0XI6A        
         CI: true
         SKIP_TOURS: true
-      run: bundle exec rake test
+      run: bundle exec rake test:${{ matrix.test_file }}
       
