@@ -4,7 +4,11 @@
       <% events.each { |event| next if event.locked? && !event_admin?(event) %>
       <div class="col-12 <%= block_class if defined?(block_class) %>" id="<%= event.id %>">
         <div class="mb-4">
-          <%= cp(:'events/block', locals: { event: event }, key: "/events/#{event.id}?organisation_id=#{@organisation.try(:id)}&timezone=#{event.start_time.strftime('%Z')}&current_account=#{current_account ? 1 : 0}&event_admin=#{event_admin?(event) ? 1 : 0}&admin=#{admin? ? 1 : 0}") %>
+          <% if admin? %>
+            <%= partial :'events/block', locals: { event: event } %>
+          <% else %>
+            <%= cp(:'events/block', locals: { event: event }, key: "/events/#{event.id}?organisation_id=#{@organisation.try(:id)}&timezone=#{event.start_time.strftime('%Z')}&current_account=#{current_account ? 1 : 0}&event_admin=#{event_admin?(event) ? 1 : 0}") %>
+          <% end %>
         </div>
       </div>
       <% } %>

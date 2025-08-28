@@ -1,6 +1,6 @@
 <% full_width = true %>
 
-<div class="row block no-gutters align-items-stretch <% if event.locked? %>event-locked<% end %>">
+<div class="row block no-gutters align-items-stretch <% if event.locked? %>event-locked<% end %>" style="<% if admin? && event.hidden_from_homepage? %>opacity: 0.3<% end %>">
   <% if !event.image && (defined?(full_width) && full_width) %>
 
   <% else %>
