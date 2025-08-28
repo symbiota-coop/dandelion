@@ -7,6 +7,8 @@
       <% end %>
       <% if @event.organisation && !@event.organisation.payment_method? && @event.paid_tickets? %>
         You must <a class="text-warning text-underline" href="/o/<%=@event.organisation.slug%>/edit">add either Stripe or Coinbase Commerce details in the Payments tab of your organisation</a> to take payments.
+      <% elsif @event.locked? %>
+        <a href="/events/<%= @event.id %>/edit">Edit the event</a>, unchecked the Locked checkbox and save to unlock it.
       <% end %>
     </p>
   </div>
