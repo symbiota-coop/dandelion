@@ -62,6 +62,7 @@ module AccountFields
     field :stripe_subscription_id, type: String
     field :feedback_summary, type: String
     field :youtube_video_url, type: String
+    field :sent_first_event_email, type: Time
 
     field :tokens, type: Float
     index({ tokens: 1 })
