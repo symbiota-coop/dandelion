@@ -29,6 +29,7 @@ Dandelion::App.controller do
       @events = @events.in_person if params[:in_person]
     end
     @events = @events.and(:hidden_from_homepage.ne => true) if params[:home]
+    @events = @events.and(:image_uid.ne => nil) if params[:images]
     content_type = (parts = URI(request.url).path.split('.')
                     parts.length == 2 ? parts.last.to_sym : :html)
     case content_type
