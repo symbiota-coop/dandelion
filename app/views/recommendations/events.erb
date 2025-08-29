@@ -46,7 +46,7 @@ full_width = true
                           <% people.each { |k,v| account = Account.find(k) %>
                           <a href="/u/<%=account.username%>"><%=account.name%></a>,
                           <span data-toggle="tooltip">
-                            <%=pluralize v.count, 'connection'%> in common
+                            <%=pluralize v.count, 'event'%> in common
                           </span>
                           <span class="d-none">
                             <% v.each { |connection| 
