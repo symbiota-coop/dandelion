@@ -42,6 +42,7 @@ recommended_people = @account.recommended_people || []
         </ul>
       </div>
     </li>
+    <% break if p == 20 %>
     <% } %>
   </ul>
-  <% break if p == 20; end %>
+<% end %>
