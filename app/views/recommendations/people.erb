@@ -19,23 +19,24 @@ recommended_people = @account.recommended_people || []
         </h2>
         <%= partial :'accounts/buttons', locals: { account: account } %>
         <ul class="icon-list mt-3">
-          <% v.each { |connection| 
-            case connection['type']
-            when 'Event'
-              event = Event.find(connection['id']) rescue nil
-              next unless event
-              %>
+          <%
+            # Collect IDs by type
+            event_ids = v.select { |connection| connection['type'] == 'Event' }.map { |connection| connection['id'] }
+            gathering_ids = v.select { |connection| connection['type'] == 'Gathering' }.map { |connection| connection['id'] }
+            
+            # Bulk query events and gatherings
+            events = event_ids.any? ? Event.and(:id.in => event_ids).order('start_time desc') : []
+            gatherings = gathering_ids.any? ? Gathering.and(:id.in => gathering_ids) : []
+          %>
+          <% events.each { |event| %>
           <li><i class="bi bi-calendar-event"></i> <a href="/e/<%= event.slug %>"><%= event.name %></a>, <%=concise_when_details(event) %></li>
-        <% when 'Gathering'
-              gathering = Gathering.find(connection['id']) rescue nil
-              next unless gathering
-              %>
-        <li><i class="bi bi-moon-fill"></i> <a href="/g/<%= gathering.slug %>"><%= gathering.name %></a></li>
-      <% end
-          } %>
-    </ul>
-  </div>
-</li>
-<% } %>
-</ul>
+          <% } %>
+          <% gatherings.each { |gathering| %>
+          <li><i class="bi bi-moon-fill"></i> <a href="/g/<%= gathering.slug %>"><%= gathering.name %></a></li>
+          <% } %>
+        </ul>
+      </div>
+    </li>
+    <% } %>
+  </ul>
 <% end %>

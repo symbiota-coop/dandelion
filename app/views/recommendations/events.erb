@@ -49,34 +49,38 @@ full_width = true
                             <%=pluralize v.count, 'event'%> in common
                           </span>
                           <span class="d-none">
-                            <% v.each { |connection| 
-                              case connection['type']
-                              when 'Event'
-                                event = Event.find(connection['id']) rescue nil
-                                next unless event %>
+                            <%
+                              # Collect IDs by type
+                              event_ids = v.select { |connection| connection['type'] == 'Event' }.map { |connection| connection['id'] }
+                              gathering_ids = v.select { |connection| connection['type'] == 'Gathering' }.map { |connection| connection['id'] }
+                              
+                              # Bulk query events and gatherings
+                              events = event_ids.any? ? Event.and(:id.in => event_ids).order('start_time desc') : []
+                              gatherings = gathering_ids.any? ? Gathering.and(:id.in => gathering_ids) : []
+                            %>
+                            <% events.each { |event| %>
                             <%= event.name %><br />
-                          <% when 'Gathering'
-                                gathering = Gathering.find(connection['id']) rescue nil
-                                next unless gathering %>
-                          <%= gathering.name %><br />
-                        <% end } %>
-                      </span>
-                      <br />
-                      <% } %>
-                    </li>
-                  </ul>
+                            <% } %>
+                            <% gatherings.each { |gathering| %>
+                            <%= gathering.name %><br />
+                            <% } %>
+                          </span>
+                          <br />
+                          <% } %>
+                        </li>
+                      </ul>
 
-                </div>
-              </div>
-            </td>
-          </tr>
-        </table>
+                    </div>
+                  </div>
+                </td>
+              </tr>
+            </table>
+          </div>
+        </div>
+
       </div>
     </div>
-
+    <% } %>
   </div>
-</div>
-<% } %>
-</div>
 </div>
 <% end %>
