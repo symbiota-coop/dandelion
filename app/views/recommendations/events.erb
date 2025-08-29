@@ -5,17 +5,19 @@ full_width = true
 %>
 
 <%= partial :'recommendations/nav' %>
+<% r = 0 %>
 
 <% if recommended_events.count == 0 %>
   <em>No recommended events</em>
 <% else %>
   <div class="mb-3">
     <div class="row" id="events">
-      <% recommended_events.first(10).each { |event_id,people|  event = Event.find(event_id);
+      <% recommended_events.each { |event_id,people|  event = Event.find(event_id);
         next if event.locked? && !event_admin?(event)
         next if event.sold_out?
         next if event.created_at < 1.year.ago
-        next if event.event_facilitations.find_by(account: current_account)
+        next if event.event_facilitations.find_by(account: current_account);
+        r = r + 1;
         %>
       <div class="col-12 <%= block_class if defined?(block_class) %>" id="<%= event.id %>">
         <div class="mb-4">
@@ -80,7 +82,7 @@ full_width = true
 
       </div>
     </div>
-    <% } %>
+    <% break if r == 20; end %>
   </div>
 </div>
 <% end %>
