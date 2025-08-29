@@ -30,7 +30,7 @@ recommended_people = @account.recommended_people || []
               gathering = Gathering.find(connection['id']) rescue nil
               next unless gathering
               %>
-        <li><i class="bi bi-people-fill"></i> <a href="/g/<%= gathering.slug %>"><%= gathering.name %></a></li>
+        <li><i class="bi bi-moon-fill"></i> <a href="/g/<%= gathering.slug %>"><%= gathering.name %></a></li>
       <% end
           } %>
     </ul>
