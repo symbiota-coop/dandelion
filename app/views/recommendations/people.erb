@@ -19,12 +19,23 @@ recommended_people = @account.recommended_people || []
         </h2>
         <%= partial :'accounts/buttons', locals: { account: account } %>
         <ul class="icon-list mt-3">
-          <% Event.and(:id.in => v).order('start_time desc').each { |event| %>
+          <% v.each { |connection| 
+            case connection['type']
+            when 'Event'
+              event = Event.find(connection['id']) rescue nil
+              next unless event
+              %>
           <li><i class="bi bi-calendar-event"></i> <a href="/e/<%= event.slug %>"><%= event.name %></a>, <%=concise_when_details(event) %></li>
-          <% } %>
-        </ul>
-      </div>
-    </li>
-    <% } %>
-  </ul>
+        <% when 'Gathering'
+              gathering = Gathering.find(connection['id']) rescue nil
+              next unless gathering
+              %>
+        <li><i class="bi bi-people-fill"></i> <a href="/g/<%= gathering.slug %>"><%= gathering.name %></a></li>
+      <% end
+          } %>
+    </ul>
+  </div>
+</li>
+<% } %>
+</ul>
 <% end %>

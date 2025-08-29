@@ -46,27 +46,37 @@ full_width = true
                           <% people.each { |k,v| account = Account.find(k) %>
                           <a href="/u/<%=account.username%>"><%=account.name%></a>,
                           <span data-toggle="tooltip">
-                            <%=pluralize v.count, 'past event'%> in common
+                            <%=pluralize v.count, 'connection'%> in common
                           </span>
                           <span class="d-none">
-                            <%== Event.and(:id.in => v).map { |event| "#{event.name}" }.join('<br />')%>
-                          </span>
-                          <br />
-                          <% } %>
-                        </li>
-                      </ul>
+                            <% v.each { |connection| 
+                              case connection['type']
+                              when 'Event'
+                                event = Event.find(connection['id']) rescue nil
+                                next unless event %>
+                            <%= event.name %><br />
+                          <% when 'Gathering'
+                                gathering = Gathering.find(connection['id']) rescue nil
+                                next unless gathering %>
+                          <%= gathering.name %><br />
+                        <% end } %>
+                      </span>
+                      <br />
+                      <% } %>
+                    </li>
+                  </ul>
 
-                    </div>
-                  </div>
-                </td>
-              </tr>
-            </table>
-          </div>
-        </div>
-
+                </div>
+              </div>
+            </td>
+          </tr>
+        </table>
       </div>
     </div>
-    <% } %>
+
   </div>
+</div>
+<% } %>
+</div>
 </div>
 <% end %>

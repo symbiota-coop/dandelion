@@ -4,9 +4,9 @@ Dandelion::App.controller do
     @account = current_account
   end
 
-  get '/recommendations/accounts' do
+  get '/recommendations/people' do
     @account.recommend_people! if @account.recommended_people.nil?
-    erb :'recommendations/accounts'
+    erb :'recommendations/people'
   end
 
   get '/recommendations/events' do

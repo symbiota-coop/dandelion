@@ -41,7 +41,7 @@ class Account
   end
 
   def self.recommendable
-    Account.and(:id.in => Ticket.pluck(:account_id) + EventFacilitation.pluck(:account_id))
+    Account.and(:id.in => Ticket.pluck(:account_id) + EventFacilitation.pluck(:account_id) + Membership.pluck(:account_id))
   end
 
   def self.generate_sign_in_token
