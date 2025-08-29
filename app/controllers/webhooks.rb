@@ -82,7 +82,13 @@ Dandelion::App.controller do
     webhook_endpoint_secret = @organisation.gocardless_endpoint_secret
     request_body = request.body.tap(&:rewind).read
     signature_header = request.env['HTTP_WEBHOOK_SIGNATURE']
-    events = GoCardlessPro::Webhook.parse(request_body: request_body, signature_header: signature_header, webhook_endpoint_secret: webhook_endpoint_secret)
+    
+    begin
+      events = GoCardlessPro::Webhook.parse(request_body: request_body, signature_header: signature_header, webhook_endpoint_secret: webhook_endpoint_secret)
+    rescue GoCardlessPro::Webhook::InvalidSignatureError => e
+      Honeybadger.notify(e)
+      halt 400
+    end
 
     events.each do |event|
       if event.resource_type == 'subscriptions' && event.action == 'created'
