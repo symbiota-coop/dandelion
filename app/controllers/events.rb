@@ -198,13 +198,16 @@ Dandelion::App.controller do
     @event.check_oc_event if @order && params[:success] && !@order.payment_completed && @event.oc_slug
     cohostship = nil
     if params[:cohost] && (cohost = Organisation.find_by(slug: params[:cohost])) && (cohostship = @event.cohostships.find_by(organisation: cohost)) && cohostship.image
-      @event_image = cohostship.image.thumb('1920x1920')
-      @og_image = cohostship.image.encode('jpg', '-quality 90').thumb('1200x630').url
+      @event_image = cohostship.image
+      og_transform = safe_image_transform(cohostship.image, [:encode, 'jpg', '-quality 90'], [:thumb, '1200x630'])
+      @og_image = safe_image_url(og_transform) if og_transform
     elsif @event.image
-      @event_image = @event.image.thumb('1920x1920')
-      @og_image = @event.image.encode('jpg', '-quality 90').thumb('1200x630').url
+      @event_image = @event.image
+      og_transform = safe_image_transform(@event.image, [:encode, 'jpg', '-quality 90'], [:thumb, '1200x630'])
+      @og_image = safe_image_url(og_transform) if og_transform
     elsif @event.organisation && @event.organisation.image
-      @og_image = @event.organisation.image.encode('jpg', '-quality 90').thumb('1200x630').url
+      og_transform = safe_image_transform(@event.organisation.image, [:encode, 'jpg', '-quality 90'], [:thumb, '1200x630'])
+      @og_image = safe_image_url(og_transform) if og_transform
     end
     @event_video = @event.video if @event.video
     @event_video = cohostship.video if cohostship && cohostship.video

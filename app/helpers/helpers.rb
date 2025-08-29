@@ -299,4 +299,37 @@ Dandelion::App.helpers do
       currency: currency
     }
   end
+
+  def safe_image_url(dragonfly_object, transformation = nil, fallback = nil)
+    return fallback unless dragonfly_object
+
+    begin
+      processed_object = if transformation
+                           dragonfly_object.send(*transformation)
+                         else
+                           dragonfly_object
+                         end
+      processed_object.url
+    rescue Dragonfly::Job::Fetch::NotFound
+      fallback
+    end
+  end
+
+  def safe_image_transform(dragonfly_object, *transformations)
+    return nil unless dragonfly_object
+
+    begin
+      result = dragonfly_object
+      transformations.each do |transform|
+        result = if transform.is_a?(Array)
+                   result.send(*transform)
+                 else
+                   result.send(transform)
+                 end
+      end
+      result
+    rescue Dragonfly::Job::Fetch::NotFound
+      nil
+    end
+  end
 end

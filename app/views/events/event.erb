@@ -49,7 +49,10 @@
         <video src="<%=@event_video.url%>" type="video/mp4" controls muted playsinline onmouseover="this.play();" onmouseout="this.pause();"></video>
       </div>
     <% elsif @event_image %>
-      <a href="/e/<%=@event.slug%><% if params[:cohost] %>?cohost=<%=params[:cohost]%><% end %>"><img id="event-image" class="w-100 mb-3" src="<%= u @event_image.thumb('1920x1920').url %>"></a>
+      <% image_url = safe_image_url(@event_image, [:thumb, '1920x1920']) %>
+      <% if image_url %>
+        <a href="/e/<%=@event.slug%><% if params[:cohost] %>?cohost=<%=params[:cohost]%><% end %>"><img id="event-image" class="w-100 mb-3" src="<%= u image_url %>"></a>
+      <% end %>
     <% end %>
     <% if @order %>
       <%= partial :'events/success' %>
