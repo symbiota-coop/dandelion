@@ -20,6 +20,10 @@ $color_highlight_2: #B900A1;
 
 @import "../infinite_admin/scss/style";
 
+.invalid-feedback {
+  display: block;
+}
+
 .slick-placeholder h2 {
   color: #E8E8E8;
 }

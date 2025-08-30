@@ -67,7 +67,9 @@ class DiscountCode
     {
       description: 'Private description, visible only to admins',
       maximum_uses: 'The maximum number of times this code can be used',
-      filter: 'Only apply the discount to tickets containing this term'
+      percentage_discount: 'The percentage discount to apply to the order e.g. 50 for 50%',
+      fixed_discount_amount: 'The fixed discount to apply to the order e.g. 10 for £10',
+      filter: 'Only apply the discount to ticket types where the name contains this term/these terms. Use commas to separate multiple terms'
     }
   end
 

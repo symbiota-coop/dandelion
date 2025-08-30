@@ -22,11 +22,21 @@
     <%= f.text_block :description %>
     <%= f.number_block :maximum_uses %>
     <%= f.text_block :filter %>
-    <%= f.text_block :percentage_discount %>
+    <%= f.percentage_block :percentage_discount %>
+
     <p>
       &mdash; or &mdash;
     </p>
-    <%= f.text_block :fixed_discount_amount %>
+    <%= f.currency_block :fixed_discount_amount, money_symbol: money_symbol(@discount_code.fixed_discount_currency) %>
+
+    <script>
+      $(function () {
+        $('#discount_code_fixed_discount_currency').change(function() {
+          $('.money-symbol').text(getCurrencySymbol($(this).val()))
+        })
+        $('#discount_code_fixed_discount_currency').change()
+      })
+    </script>
     <%= f.select_block :fixed_discount_currency %>
     <%= f.submit_block destroy_url: "/discount_codes/#{@discount_code.id}/destroy?#{@scope}" %>
   <% end %>

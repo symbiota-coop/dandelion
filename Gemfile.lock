@@ -33,9 +33,9 @@ GIT
 
 GIT
   remote: https://github.com/stephenreid321/activate-tools.git
-  revision: 7a8a197c06f2dc3f40b7d7e89d619da23111912d
+  revision: 39dda9d57eebe75d9a1ec017e6d6f560ce0ce732
   specs:
-    activate-tools (0.0.24)
+    activate-tools (0.0.25)
       padrino
 
 GIT
@@ -286,7 +286,7 @@ GEM
     mime-types (3.7.0)
       logger
       mime-types-data (~> 3.2025, >= 3.2025.0507)
-    mime-types-data (3.2025.0819)
+    mime-types-data (3.2025.0826)
     mini_magick (5.3.1)
       logger
     mini_mime (1.1.5)
@@ -317,7 +317,7 @@ GEM
     net-http-digest_auth (1.4.1)
     net-http-persistent (4.0.6)
       connection_pool (~> 2.2, >= 2.2.4)
-    net-imap (0.5.9)
+    net-imap (0.5.10)
       date
       net-protocol
     net-pop (0.1.2)
