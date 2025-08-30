@@ -9,6 +9,10 @@ module OrganisationValidation
     validates_format_of :stripe_pk, with: /\A[a-z0-9_]+\z/i, allow_nil: true
 
     before_validation do
+      %w[name facebook_pixel_id gocardless_access_token gocardless_endpoint_secret coinbase_api_key coinbase_webhook_secret patreon_api_key mailgun_api_key evm_address oc_slug].each do |f|
+        send("#{f}=", send(f).strip) if send(f)
+      end
+
       self.paid_up = true if new_record?
       self.currency = 'GBP' unless currency
       %w[ticket_email_title ticket_email_greeting recording_email_title recording_email_greeting reminder_email_title reminder_email_body feedback_email_title feedback_email_body].each do |f|
