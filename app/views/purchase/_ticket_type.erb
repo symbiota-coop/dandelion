@@ -25,7 +25,9 @@
               max: ticket_type.range_max,
               oninput: "$(this).prev().html('#{money_symbol(@event.currency)}' + this.value); $(this).parent().next().find('.select-a-price-first').hide(); $(this).parent().next().find('[name^=quantities]').attr('data-price',this.value).prop('disabled',false).change();" %>
     <% elsif ticket_type.price %>
-      <%= m ticket_type.price, @event.currency %>
+      <% unless ticket_type.price == 0 && @event.blank_price_for_free_tickets %>
+        <%= m ticket_type.price, @event.currency %>
+      <% end %>
     <% else %>
       <div class="input-group">
         <div class="input-group-prepend">
