@@ -215,7 +215,8 @@ class Order
     return if application_fee_paid_to_dandelion?
 
     begin
-      Stripe.api_key = event.organisation.stripe_sk
+      Stripe.api_key = event.organisation.stripe_connect_json ? ENV['STRIPE_SK'] : event.organisation.stripe_sk
+      return unless Stripe.api_key.present?
       Stripe.api_version = '2020-08-27'
       pi = Stripe::PaymentIntent.retrieve payment_intent
       transfer = Stripe::Transfer.retrieve pi.charges.first.transfer
