@@ -63,7 +63,7 @@ class Event
   end
 
   def donations_to_dandelion?
-    !donations_to_organisation? && organisation.donations_to_dandelion? && ticket_types.any? { |ticket_type| (ticket_type.price && ticket_type.price > 0) || ticket_type.range }
+    !donations_to_organisation? && organisation.donations_to_dandelion? && (suggested_donation || ticket_types.any? { |ticket_type| (ticket_type.price && ticket_type.price > 0) || ticket_type.range })
   end
 
   def token
