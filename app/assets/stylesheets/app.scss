@@ -18,14 +18,46 @@ $color_highlight_1_light_1: lighten($color_highlight_1, 57.5%);
 $color_highlight_1_light_2: lighten($color_highlight_1, 42.5%);
 $color_highlight_1_light_3: lighten($color_highlight_1, 60%);
 $color_highlight_2: #B900A1;
-$color_paper: #FFFBF5;
+$color_paper: #FFFCF9;
 $color_superlight: #F9F8FA;
 
 @import "../infinite_admin/scss/style";
 
+.navbar-xs-justified {
+  border: 0 !important
+}
+
 body.gradient,
 body.gradient #content {
-  background: linear-gradient(135deg, $color_highlight_1_light_3 0%, $color_superlight 50%);
+  background:
+    linear-gradient(135deg, $color_highlight_1_light_3 0%, $color_paper 50%),
+}
+
+.gradient {
+  background:
+    linear-gradient(135deg, $color_highlight_1_light_3 0%, $color_paper 50%),
+    linear-gradient(to bottom, transparent 80%, white 100%);
+  background-blend-mode: lighten;
+}
+
+.content-padding-x {
+  padding-left: 0.9375rem;
+  padding-right: 0.9375rem;
+}
+
+.content-padding-top {
+  padding-top: 0.9375rem;
+}
+
+@media(min-width: 768px) {
+  .content-padding-x {
+    padding-left: 1.5625rem;
+    padding-right: 1.5625rem;
+  }
+
+  .content-padding-top {
+    padding-top: 1.5625rem;
+  }
 }
 
 body.greyed,

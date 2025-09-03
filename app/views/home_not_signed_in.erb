@@ -1,4 +1,5 @@
 <style>
+  #content { padding-left: 0; padding-right: 0; padding-top: 0; }
   #strapline { font-size: 1.3rem; }
   @media(min-width: 992px) {
     #strapline { font-size: 3.1vw; line-height: 130% }
@@ -10,71 +11,72 @@
   }
 </style>
 
-<div class="row justify-content-center">
-  <script>
-    $(function () {
-      <% if ENV['CREATE_VIDEO'] %>
-        $('.typewriter').text('regenerative')
-      <% else %>
-        var typed = new Typed('.typewriter', {
-          strings: [
-            'soulful',
-            'regenerative',
-            'metamodern',
-            'participatory',
-            'conscious',
-            'transformative',
-            'holistic',
-            'ethical'
-          ],
-          typeSpeed: 50,
-          loop: true
-        });
-      <% end %>
-    })
-  </script>
-  <div class="col-12 col-lg-7">
-    <p id="strapline" class="mb-3">
-      Find and host 
-      <strong class="typewriter"></strong>
-      <br />
-      events and co-created gatherings
-    </p>
-    <p class="mb-1 text-lg-center">
-      <a class="btn btn-primary btn-lg" href="/events/new">List an event</a>
-    </p>
-    <p class="text-lg-center">
-      <a href="/docs/events">Watch the 1-minute how-to video</a> or <a href="/docs/gatherings">learn more about Gatherings</a>
-    </p>
+<div class="gradient content-padding-x content-padding-top">
+  <div class="row justify-content-center mx-0">
+    <script>
+      $(function () {
+        <% if ENV['CREATE_VIDEO'] %>
+          $('.typewriter').text('regenerative')
+        <% else %>
+          var typed = new Typed('.typewriter', {
+            strings: [
+              'soulful',
+              'regenerative',
+              'metamodern',
+              'participatory',
+              'conscious',
+              'transformative',
+              'holistic',
+              'ethical'
+            ],
+            typeSpeed: 50,
+            loop: true
+          });
+        <% end %>
+      })
+    </script>
+    <div class="col-12 col-lg-7">
+      <p id="strapline" class="mb-3">
+        Find and host 
+        <strong class="typewriter"></strong>
+        <br />
+        events and co-created gatherings
+      </p>
+      <p class="mb-1 text-lg-center">
+        <a class="btn btn-primary btn-lg" href="/events/new">List an event</a>
+      </p>
+      <p class="text-lg-center">
+        <a href="/docs/events">Watch the 1-minute how-to video</a> or <a href="/docs/gatherings">learn more about Gatherings</a>
+      </p>
+    </div>
   </div>
-</div>
 
-<div class="row justify-content-center mb-5">
-  <div class="col-lg-7">
+  <div class="row justify-content-center mb-5 mx-0">
+    <div class="col-lg-7">
 
-    <h2 class="text-center mt-3 mb-5 my-lg-3 mb-lg-4" id="tickets-sold">
-      <%= cp :tickets_count %>
-    </h2>
+      <h2 class="text-center mt-3 mb-5 my-lg-3 mb-lg-4" id="tickets-sold">
+        <%= cp :tickets_count %>
+      </h2>
 
-    <style>
-      #payment-methods img { filter: grayscale(100%); }
-      #payment-methods img:hover { filter: none; opacity: 1 !important }
+      <style>
+        #payment-methods img { filter: grayscale(100%); }
+        #payment-methods img:hover { filter: none; opacity: 1 !important }
 
-      #payment-methods img.stripe { opacity: 0.5 }
-      #payment-methods img.coinbase { opacity: 0.5 }
-      #payment-methods img.celo { opacity: 0.33 }
-      #payment-methods img.opencollective { opacity: 0.5 }
-      #payment-methods img.gocardless { opacity: 0.33; }
+        #payment-methods img.stripe { opacity: 0.5 }
+        #payment-methods img.coinbase { opacity: 0.5 }
+        #payment-methods img.celo { opacity: 0.33 }
+        #payment-methods img.opencollective { opacity: 0.5 }
+        #payment-methods img.gocardless { opacity: 0.33; }
 
-      /*
-      #payment-methods img.bread { opacity: 0.5 }
-      #payment-methods img.optimism { opacity: 0.5 }
-      #payment-methods img.gnosis { opacity: 0.75 }
-      #payment-methods img.base { opacity: 0.66 }
-      */
-    </style>
-    <div id="payment-methods" class="row align-items-center mb-5 px-0 px-lg-3 mb-lg-3">
-      <% {
+        /*
+        #payment-methods img.bread { opacity: 0.5 }
+        #payment-methods img.optimism { opacity: 0.5 }
+        #payment-methods img.gnosis { opacity: 0.75 }
+        #payment-methods img.base { opacity: 0.66 }
+        */
+      </style>
+      <div id="payment-methods" class="row align-items-center mb-5 px-0 px-lg-3 mb-lg-3">
+        <% {
         'stripe.png' => 'https://stripe.com/',
         'gocardless.png' => 'https://gocardless.com/',     
         'coinbase.png' => 'https://www.coinbase.com/en-gb/commerce',
@@ -82,38 +84,41 @@
         # 'bread.jpg' => 'https://breadchain.xyz/',
         'celo.png' => 'https://celo.org/',     
       }.each do |k, v| %>
-        <div class="col">
-          <a href="<%=v%>"><img class="<%=k.split('.').first%> w-100" src="/images/payment_methods/<%=k%>" /></a>
-        </div>
-      <% end %>
-    </div>
-
-    <div class="row justify-content-center">
-      <div class="col-lg-10">
-        <%= partial :badges %>
+          <div class="col">
+            <a href="<%=v%>"><img class="<%=k.split('.').first%> w-100" src="/images/payment_methods/<%=k%>" /></a>
+          </div>
+        <% end %>
       </div>
+
+      <div class="row justify-content-center">
+        <div class="col-lg-10">
+          <%= partial :badges %>
+        </div>
+      </div>
+
     </div>
-
   </div>
 </div>
 
-<div class="mt-lg-5">
-  <%= partial :'events/search_form', locals: { path: '/events' } %>
+<div style="padding-left: 1.5625rem; padding-right: 1.5625rem;">
+  <div class="mt-lg-5">
+    <%= partial :'events/search_form', locals: { path: '/events' } %>
 
-  <div data-with-placeholder data-pagelet-url="/events?home=1&images=1">
-    <%= partial :'events/blocks_placeholder' %>
+    <div data-with-placeholder data-pagelet-url="/events?home=1&images=1">
+      <%= partial :'events/blocks_placeholder' %>
+    </div>
   </div>
-</div>
 
-<%= cp :'event_feedbacks/home' %>
+  <%= cp :'event_feedbacks/home' %>
 
-<script>
-  $(function () {
-    if (typeof google === 'undefined') {
-      $('#homepage-map').hide();
-    }
-  });
-</script>
-<div id="homepage-map" data-pagelet-url="/events?<%= Rack::Utils.parse_nested_query(request.query_string).merge(display: 'map').to_query %>">
-  <%= partial :'maps/map', locals: { stem: "/events", dynamic: true, trigger_bounds_changed: true, fill_screen: true } %>
+  <script>
+    $(function () {
+      if (typeof google === 'undefined') {
+        $('#homepage-map').hide();
+      }
+    });
+  </script>
+  <div id="homepage-map" data-pagelet-url="/events?<%= Rack::Utils.parse_nested_query(request.query_string).merge(display: 'map').to_query %>">
+    <%= partial :'maps/map', locals: { stem: "/events", dynamic: true, trigger_bounds_changed: true, fill_screen: true } %>
+  </div>
 </div>
