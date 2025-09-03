@@ -26,6 +26,7 @@ Dandelion::App.controller do
   end
 
   get '/accounts/sign_in' do
+    @body_class = 'gradient'
     @hide_right_nav = true
     erb :'accounts/sign_in'
   end
@@ -55,6 +56,7 @@ Dandelion::App.controller do
   end
 
   get '/accounts/new' do
+    @body_class = 'gradient'
     @account = Account.new
     if params[:organisation_id]
       @organisation = Organisation.find(params[:organisation_id])

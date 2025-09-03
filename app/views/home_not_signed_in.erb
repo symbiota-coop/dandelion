@@ -59,24 +59,28 @@
     <style>
       #payment-methods img { filter: grayscale(100%); }
       #payment-methods img:hover { filter: none; opacity: 1 !important }
+
       #payment-methods img.stripe { opacity: 0.5 }
-      #payment-methods img.coinbase-commerce { opacity: 0.5 }
+      #payment-methods img.coinbase { opacity: 0.5 }
       #payment-methods img.celo { opacity: 0.33 }
+      #payment-methods img.opencollective { opacity: 0.5 }
+      #payment-methods img.gocardless { opacity: 0.33; }
+
+      /*
+      #payment-methods img.bread { opacity: 0.5 }
       #payment-methods img.optimism { opacity: 0.5 }
       #payment-methods img.gnosis { opacity: 0.75 }
       #payment-methods img.base { opacity: 0.66 }
-      #payment-methods img.bread { opacity: 0.5 }
-      #payment-methods img.gocardless { opacity: 0.5; filter: grayscale(100%) brightness(0.4); }
-      #payment-methods img.gocardless:hover { filter: none; }
+      */
     </style>
     <div id="payment-methods" class="row align-items-center mb-5 px-0 px-lg-3 mb-lg-3">
       <% {
-        'stripe.jpg' => 'https://stripe.com/',
+        'stripe.png' => 'https://stripe.com/',
         'gocardless.png' => 'https://gocardless.com/',     
-        'coinbase-commerce.jpg' => 'https://www.coinbase.com/en-gb/commerce',
-        'opencollective.jpg' => 'https://opencollective.com/',
-        'bread.jpg' => 'https://breadchain.xyz/',
-        'celo.jpg' => 'https://celo.org/',     
+        'coinbase.png' => 'https://www.coinbase.com/en-gb/commerce',
+        'opencollective.png' => 'https://opencollective.com/',
+        # 'bread.jpg' => 'https://breadchain.xyz/',
+        'celo.png' => 'https://celo.org/',     
       }.each do |k, v| %>
         <div class="col">
           <a href="<%=v%>"><img class="<%=k.split('.').first%> w-100" src="/images/payment_methods/<%=k%>" /></a>

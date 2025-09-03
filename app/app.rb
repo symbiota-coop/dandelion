@@ -117,6 +117,7 @@ module Dandelion
         if request.xhr?
           partial :newsfeed, locals: { notifications: current_account.network_notifications.order('created_at desc').page(params[:page]), include_circle_name: true }
         else
+          @body_class = 'greyed'
           erb :home_signed_in
         end
       else
@@ -126,6 +127,7 @@ module Dandelion
         if request.xhr?
           400
         else
+          @body_class = 'gradient'
           erb :home_not_signed_in
         end
       end
