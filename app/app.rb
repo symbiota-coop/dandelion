@@ -127,7 +127,7 @@ module Dandelion
         if request.xhr?
           400
         else
-          @body_class = 'gradient'
+          # @body_class = 'gradient'
           erb :home_not_signed_in
         end
       end
