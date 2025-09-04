@@ -63,6 +63,8 @@ Dandelion::App.controller do
           @points_count = @events.count
           @points = @events.to_a
           partial :'maps/map', locals: { stem: '/events', dynamic: true, points: @points, points_count: @points_count, centre: (OpenStruct.new(lat: @lat, lng: @lng) if @lat && @lng), zoom: @zoom, fill_screen: true }
+        elsif params[:home]
+          cp(:'events/events', key: '/events/home', expires: 6.hours.from_now)
         else
           partial :'events/events'
         end
