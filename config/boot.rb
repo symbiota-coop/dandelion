@@ -41,6 +41,8 @@ end
 Time.zone = ENV['DEFAULT_TIME_ZONE']
 
 Airrecord.api_key = ENV['AIRTABLE_API_KEY']
+Airrecord.timeout = 30  # Set timeout to 30 seconds
+Airrecord.http_timeout = 30
 
 FARQUEST = Faraday.new(
   url: 'https://build.far.quest/farcaster/v2',

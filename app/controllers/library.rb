@@ -1,12 +1,23 @@
 Dandelion::App.controller do
   get '/books' do
     @title = 'Books'
-    @books = Book.all(sort: { 'Original Publication Year or Year Published' => 'desc' }, filter: '{Dandelion} = 1')
+    begin
+      @books = Book.all(sort: { 'Original Publication Year or Year Published' => 'desc' }, filter: '{Dandelion} = 1')
+    rescue Faraday::TimeoutError, Faraday::ConnectionFailed, StandardError => e
+      Honeybadger.notify(e)
+      halt 503, 'Service temporarily unavailable. Please try again later.'
+    end
     erb :'books/books'
   end
 
   get '/books/:slug', provides: [:html, :jpg] do
-    @book = Book.all(filter: "{Slug} = '#{params[:slug]}'").first || not_found
+    begin
+      @book = Book.all(filter: "{Slug} = '#{params[:slug]}'").first || not_found
+    rescue Faraday::TimeoutError, Faraday::ConnectionFailed, StandardError => e
+      Honeybadger.notify(e)
+      halt 503, 'Service temporarily unavailable. Please try again later.'
+    end
+    
     @title = "#{@book['Title']} by #{@book['Author']}"
 
     case content_type
@@ -23,12 +34,22 @@ Dandelion::App.controller do
 
   get '/films' do
     @title = 'Films'
-    @films = Film.all(sort: { 'Year' => 'desc' })
+    begin
+      @films = Film.all(sort: { 'Year' => 'desc' })
+    rescue Faraday::TimeoutError, Faraday::ConnectionFailed, StandardError => e
+      Honeybadger.notify(e)
+      halt 503, 'Service temporarily unavailable. Please try again later.'
+    end
     erb :'films/films'
   end
 
   get '/films/:slug', provides: :jpg do
-    @film = Film.all(filter: "{Slug} = '#{params[:slug]}'").first || not_found
+    begin
+      @film = Film.all(filter: "{Slug} = '#{params[:slug]}'").first || not_found
+    rescue Faraday::TimeoutError, Faraday::ConnectionFailed, StandardError => e
+      Honeybadger.notify(e)
+      halt 503, 'Service temporarily unavailable. Please try again later.'
+    end
     redirect @film['Images'].first['url']
   end
 
