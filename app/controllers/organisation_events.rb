@@ -114,6 +114,8 @@ Dandelion::App.controller do
                                                ]).map do |hash|
           Event.new(hash.select { |k, _v| Event.fields.keys.include?(k.to_s) })
         end
+      elsif params[:order] == 'trending'
+        @events = @events.trending(@from)
       end
       if request.xhr?
         if params[:display] == 'map'
