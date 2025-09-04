@@ -101,7 +101,7 @@ module EventScopes
                              },
                              { '$sort' => { 'trending_priority' => 1, 'recent_order_count' => -1 } },
                              { '$unset' => %w[recent_orders trending_priority recent_order_count] }
-                           ]).map { |doc| Event.new(doc) }
+                           ]).map { |hash| Event.new(hash.select { |k, _v| Event.fields.keys.include?(k.to_s) }) }
     end
   end
 end
