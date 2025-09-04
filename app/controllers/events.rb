@@ -54,6 +54,9 @@ Dandelion::App.controller do
       end
     when :json
       # JSON response for map display
+      @events = @events.future(@from)
+      @events = @events.and(:start_time.lt => @to + 1) if @to
+
       @lat = params[:lat]
       @lng = params[:lng]
       @zoom = params[:zoom]
