@@ -45,9 +45,7 @@ Dandelion::App.controller do
           Event.new(hash.select { |k, _v| Event.fields.keys.include?(k.to_s) })
         end
       elsif params[:order] == 'trending'
-        unless params[:home] && (fragment = Fragment.find_by(key: '/events/home')) && fragment.expires > Time.now
-          @events = @events.trending(@from)
-        end
+        @events = @events.trending(@from)
       end
       if request.xhr?
         if params[:display] == 'map'
@@ -65,8 +63,6 @@ Dandelion::App.controller do
           @points_count = @events.count
           @points = @events.to_a
           partial :'maps/map', locals: { stem: '/events', dynamic: true, points: @points, points_count: @points_count, centre: (OpenStruct.new(lat: @lat, lng: @lng) if @lat && @lng), zoom: @zoom, fill_screen: true }
-        elsif params[:home]
-          cp(:'events/events', key: '/events/home', expires: 6.hours.from_now)
         else
           partial :'events/events'
         end
