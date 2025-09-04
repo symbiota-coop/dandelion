@@ -129,8 +129,7 @@ Dandelion::App.controller do
           polygonPaths: [],
           polygonables: nil,
           centre: (@lat && @lng ? { lat: @lat.to_f, lng: @lng.to_f } : nil),
-          zoom: @zoom&.to_i,
-          infoWindow: false
+          zoom: @zoom&.to_i
         }.to_json
       else
         # Regular JSON response for events

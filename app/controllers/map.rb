@@ -18,7 +18,7 @@ Dandelion::App.controller do
 
     if params[:organisation_id]
       @organisation = Organisation.find(params[:organisation_id]) || not_found
-      @info_window = params[:admin] && organisation_admin?
+      @enable_info_window = params[:admin] && organisation_admin?
       @accounts = Account.all
       @accounts = if params[:monthly_donors]
                     @accounts.and(:id.in => @organisation.organisationships.and(:hide_membership.ne => true, :monthly_donation_method.ne => nil).pluck(:account_id))
@@ -27,11 +27,11 @@ Dandelion::App.controller do
                   end
     elsif params[:activity_id]
       @activity = Activity.find(params[:activity_id]) || not_found
-      @info_window = params[:admin] && activity_admin?
+      @enable_info_window = params[:admin] && activity_admin?
       @accounts = Account.and(:id.in => @activity.activityships.and(:hide_membership.ne => true).pluck(:account_id))
     elsif params[:local_group_id]
       @local_group = LocalGroup.find(params[:local_group_id]) || not_found
-      @info_window = params[:admin] && local_group_admin?
+      @enable_info_window = params[:admin] && local_group_admin?
       @accounts = Account.and(:id.in => @local_group.local_groupships.and(:hide_membership.ne => true).pluck(:account_id))
       @local_groups = [@local_group]
     else
@@ -86,7 +86,7 @@ Dandelion::App.controller do
         polygonables: @polygonables,
         centre: (@lat && @lng ? { lat: @lat.to_f, lng: @lng.to_f } : nil),
         zoom: @zoom&.to_i,
-        infoWindow: @info_window
+        enableInfoWindow: @enable_info_window
       }.to_json
     end
   end

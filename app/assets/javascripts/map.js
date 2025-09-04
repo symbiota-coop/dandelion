@@ -158,13 +158,13 @@ window.DandelionMap = {
     var infowindow = new google.maps.InfoWindow();
 
     // Create markers
-    var markers = this.createMarkers(config.points, infowindow, bounds, config.infoWindow, config.polygonables);
+    var markers = this.createMarkers(config.points, infowindow, bounds, config.enableInfoWindow, config.polygonables);
 
     // Create polygons
     var polygons = this.createPolygons(config.polygonPaths, bounds);
 
     // Setup clustering
-    this.setupClustering(markers, infowindow, config.infoWindow);
+    this.setupClustering(markers, infowindow, config.enableInfoWindow);
 
     // Store references globally for dynamic updates
     window.mapInfoWindow = infowindow;
@@ -208,7 +208,7 @@ window.DandelionMap = {
     return boundingBoxPolygon;
   },
 
-  createMarkers: function (points, infowindow, bounds, infoWindowEnabled, polygonables) {
+  createMarkers: function (points, infowindow, bounds, enableInfoWindow, polygonables) {
     var markers = [];
 
     for (var i = 0; i < points.length; i++) {
@@ -231,7 +231,7 @@ window.DandelionMap = {
       });
 
       // Add click listener
-      this.addMarkerClickListener(marker, infowindow, infoWindowEnabled);
+      this.addMarkerClickListener(marker, infowindow, enableInfoWindow);
 
       // Extend bounds if not using polygonables
       if (!polygonables) {
@@ -245,10 +245,10 @@ window.DandelionMap = {
     return markers;
   },
 
-  addMarkerClickListener: function (marker, infowindow, infoWindowEnabled) {
+  addMarkerClickListener: function (marker, infowindow, enableInfoWindow) {
     var self = this;
     google.maps.event.addListener(marker, 'click', function () {
-      if (self.shouldShowInfoWindow(marker.model_name, infoWindowEnabled)) {
+      if (self.shouldShowInfoWindow(marker.model_name, enableInfoWindow)) {
         infowindow.setContent('<i class="bi bi-spin bi-slash-lg"></i>');
         infowindow.open(window.map, marker);
         var timeout = self.dynamicLoadingTimeout;
@@ -263,8 +263,8 @@ window.DandelionMap = {
     });
   },
 
-  shouldShowInfoWindow: function (modelName, infoWindowEnabled) {
-    return this.infoWindowModels.includes(modelName) || infoWindowEnabled;
+  shouldShowInfoWindow: function (modelName, enableInfoWindow) {
+    return this.infoWindowModels.includes(modelName) || enableInfoWindow;
   },
 
   createPolygons: function (polygonPaths, bounds) {
@@ -291,7 +291,7 @@ window.DandelionMap = {
     return polygons;
   },
 
-  setupClustering: function (markers, infowindow, infoWindowEnabled) {
+  setupClustering: function (markers, infowindow, enableInfoWindow) {
     var markerClusterer = new MarkerClusterer(window.map, markers, Object.assign({}, this.clusterConfig, {
       styles: this.clusterStyles
     }));
@@ -302,7 +302,7 @@ window.DandelionMap = {
     var self = this;
     google.maps.event.addListener(markerClusterer, 'clusterclick', function (cluster) {
       if (window.map.getZoom() === window.map.maxZoom) {
-        self.handleClusterClick(cluster, infowindow, infoWindowEnabled);
+        self.handleClusterClick(cluster, infowindow, enableInfoWindow);
       } else {
         window.map.setCenter(cluster.getCenter());
         window.map.setZoom(window.map.getZoom() + 2);
@@ -310,7 +310,7 @@ window.DandelionMap = {
     });
   },
 
-  handleClusterClick: function (cluster, infowindow, infoWindowEnabled) {
+  handleClusterClick: function (cluster, infowindow, enableInfoWindow) {
     var markers = cluster.getMarkers();
     markers.sort(function (a, b) {
       return a.n - b.n;
@@ -328,7 +328,7 @@ window.DandelionMap = {
     var self = this;
     var requests = markers.map(function (marker) {
       return $.get('/point/' + marker.model_name + '/' + marker.id, function (data) {
-        if (self.shouldShowInfoWindow(marker.model_name, infoWindowEnabled)) {
+        if (self.shouldShowInfoWindow(marker.model_name, enableInfoWindow)) {
           content += '<div class="mb-3">' + data + '</div>';
         }
       });
@@ -468,7 +468,7 @@ window.DandelionMap = {
     // Create new markers from JSON data
     var markers = [];
     if (data.points && data.points.length > 0) {
-      markers = this.createMarkers(data.points, window.mapInfoWindow, bounds, config.infoWindow, data.polygonables);
+      markers = this.createMarkers(data.points, window.mapInfoWindow, bounds, data.enableInfoWindow, data.polygonables);
     }
 
     // Create new polygons if provided
@@ -485,7 +485,7 @@ window.DandelionMap = {
 
     // Setup new clustering
     if (markers.length > 0) {
-      this.setupClustering(markers, window.mapInfoWindow, config.infoWindow);
+      this.setupClustering(markers, window.mapInfoWindow, data.enableInfoWindow);
     }
 
     // Update points warning

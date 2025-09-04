@@ -33,7 +33,7 @@
       minZoom: <%= defined?(minZoom) && minZoom ? minZoom : 1 %>,
       points: points,
       polygonPaths: polygonPaths,
-      infoWindow: <%= defined?(info_window) && info_window ? 'true' : 'false' %>,
+      enableInfoWindow: <%= defined?(enable_info_window) && enable_info_window ? 'true' : 'false' %>,
       polygonables: <%= defined?(polygonables) && !polygonables.empty? ? 'true' : 'false' %>,
       fillScreen: <%= defined?(fill_screen) && fill_screen ? 'true' : 'false' %>,
       url: <%== (binding.local_variable_defined?(:url) ? url : nil).to_json %>
