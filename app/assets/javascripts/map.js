@@ -489,7 +489,5 @@ window.DandelionMap = {
       $('#points-warning').hide();
     }
 
-    // Store reference to marker clusterer
-    window.markerClusterer = window.markerClusterer;
   }
 };
