@@ -56,7 +56,7 @@
 </div>
 
 <% if params[:display] == 'map' %>
-  <%= partial :'maps/map', locals: { url: "/gatherings", dynamic: true, trigger_bounds_changed: true, fill_screen: true } %>
+  <%= partial :'maps/map', locals: { url: "/gatherings", fill_screen: true } %>
 <% else %>
   <%= partial :'gatherings/blocks', locals: { gatherings: @gatherings } %>
   <%= will_paginate @gatherings, param_name: 'gatherings_page', inner_window: 0, outer_window: 0, renderer: WillPaginate::ViewHelpers::BootstrapRenderer %>

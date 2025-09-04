@@ -48,7 +48,7 @@
 </div>
 
 <% unless @local_group.hide_members? %>
-  <%= partial :'maps/map', locals: { url: "/map?local_group_id=#{@local_group.id}", dynamic: true, trigger_bounds_changed: true, polygonables: [@local_group] } %>
+  <%= partial :'maps/map', locals: { url: "/map?local_group_id=#{@local_group.id}", polygonables: [@local_group] } %>
   <style>
     #map-canvas { height: 50vh !important; margin-top: 1rem; margin-bottom: 1rem }
   </style>

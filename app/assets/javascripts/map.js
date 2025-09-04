@@ -75,13 +75,6 @@ window.DandelionMap = {
     zoomOnClick: false
   },
 
-  disabledMapOptions: {
-    draggable: false,
-    zoomControl: false,
-    scrollwheel: false,
-    disableDoubleClickZoom: true
-  },
-
   // Helper functions for bounds validation and fallback
   validateBounds: function (bounds) {
     if (!bounds) return null;
@@ -182,7 +175,7 @@ window.DandelionMap = {
     this.setMapBounds(bounds, config);
 
     // Setup dynamic loading if enabled
-    if (config.dynamic) {
+    if (config.url) {
       this.setupDynamicLoading(config);
     }
 
@@ -379,7 +372,7 @@ window.DandelionMap = {
         var bounds = window.map.getBounds().toJSON();
         var center = window.map.getCenter().toJSON();
         var zoom = window.map.getZoom();
-        if (config.triggerBoundsChanged) {
+        if (config.url) {
           q = {
             south: bounds['south'],
             west: bounds['west'],
@@ -416,7 +409,6 @@ window.DandelionMap = {
         clearTimeout(window.mapTimer);
         var timeout = self.dynamicLoadingTimeout;
         window.mapTimer = setTimeout(function () {
-          window.map.setOptions(self.disabledMapOptions);
 
           // Make JSON request to get new points
           $.ajax({
@@ -435,7 +427,7 @@ window.DandelionMap = {
         }, timeout);
       });
 
-      if (config.triggerBoundsChanged) {
+      if (config.url) {
         google.maps.event.trigger(window.map, 'bounds_changed');
       }
 

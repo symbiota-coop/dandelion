@@ -39,6 +39,12 @@ Dandelion::App.controller do
     end
 
     case content_type
+    when :html
+      @accounts = @accounts.and(:coordinates.ne => nil) unless @accounts.empty?
+      @points_count = @accounts.count
+      @points = @accounts
+      @polygonables = @local_groups
+      erb :'maps/map'
     when :json
       # For JSON requests, apply bounding box filtering
       unless @accounts.empty?
@@ -82,28 +88,6 @@ Dandelion::App.controller do
         zoom: @zoom&.to_i,
         infoWindow: @info_window
       }.to_json
-    else
-      # HTML responses
-      if request.xhr?
-        unless @accounts.empty?
-          @accounts = @accounts.and(coordinates: { '$geoWithin' => { '$box' => box } })
-          @accounts = @accounts.and(:number_at_this_location.lte => 50)
-        end
-        @points_count = @accounts.count
-        @points = @accounts
-        @polygonables = @local_groups
-        partial :'maps/map', locals: { dynamic: true, points: @points, points_count: @points_count, polygonables: @polygonables, centre: (OpenStruct.new(lat: @lat, lng: @lng) if @lat && @lng), zoom: @zoom, info_window: @info_window }
-      else
-        @accounts = @accounts.and(:coordinates.ne => nil) unless @accounts.empty?
-        @points_count = @accounts.count
-        @points = @accounts
-        @polygonables = @local_groups
-        if params[:map_only]
-          partial :'maps/map', locals: { points: @points, points_count: @points_count, polygonables: @polygonables, centre: (OpenStruct.new(lat: @lat, lng: @lng) if @lat && @lng), zoom: @zoom, info_window: @info_window }, layout: :minimal
-        else
-          erb :'maps/map'
-        end
-      end
     end
   end
 

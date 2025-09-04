@@ -35,10 +35,8 @@
       polygonPaths: polygonPaths,
       infoWindow: <%= defined?(info_window) && info_window ? 'true' : 'false' %>,
       polygonables: <%= defined?(polygonables) && !polygonables.empty? ? 'true' : 'false' %>,
-      dynamic: <%= defined?(dynamic) && dynamic ? 'true' : 'false' %>,
-      triggerBoundsChanged: <%= defined?(trigger_bounds_changed) && trigger_bounds_changed ? 'true' : 'false' %>,
       fillScreen: <%= defined?(fill_screen) && fill_screen ? 'true' : 'false' %>,
-      url: <%== (defined?(url) && url ? url : nil).to_json %>
+      url: <%== (binding.local_variable_defined?(:url) ? url : nil).to_json %>
       <% if defined?(bounding_box) && bounding_box %>
         , boundingBox: <%= bounding_box.to_json %>
       <% end %>
