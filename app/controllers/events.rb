@@ -5,10 +5,6 @@ Dandelion::App.controller do
   end
 
   get '/events', provides: %i[html ics] do
-    if params[:home] && (fragment = Fragment.find_by(key: '/events/home')) && fragment.expires > Time.now
-      halt fragment.value
-    end
-
     @events = Event.live.public.browsable
     @from = params[:from] ? parse_date(params[:from]) : Date.today
     @to = params[:to] ? parse_date(params[:to]) : nil
@@ -49,7 +45,9 @@ Dandelion::App.controller do
           Event.new(hash.select { |k, _v| Event.fields.keys.include?(k.to_s) })
         end
       elsif params[:order] == 'trending'
-        @events = @events.trending(@from)
+        unless params[:home] && (fragment = Fragment.find_by(key: '/events/home')) && fragment.expires > Time.now
+          @events = @events.trending(@from)
+        end
       end
       if request.xhr?
         if params[:display] == 'map'
