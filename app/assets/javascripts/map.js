@@ -139,7 +139,6 @@ window.DandelionMap = {
       return;
     }
 
-    var params = this.getParams();
     window.mapTimer = null;
 
     if (config.fillScreen) {
@@ -184,7 +183,7 @@ window.DandelionMap = {
 
     // Setup dynamic loading if enabled
     if (config.dynamic) {
-      this.setupDynamicLoading(params, config);
+      this.setupDynamicLoading(config);
     }
 
     // Set map height after initialization if dynamic height is enabled
@@ -193,11 +192,6 @@ window.DandelionMap = {
     }
 
     return { map: window.map, markers: markers, polygons: polygons };
-  },
-
-  getParams: function () {
-    var query = window.location.search.substring(1);
-    return $.deparam(query);
   },
 
   drawBoundingBox: function (boundingBox) {
@@ -377,7 +371,7 @@ window.DandelionMap = {
     }
   },
 
-  setupDynamicLoading: function (params, config) {
+  setupDynamicLoading: function (config) {
     var self = this;
     google.maps.event.addListenerOnce(window.map, 'idle', function () {
       window.map.addListener('bounds_changed', function () {
@@ -404,10 +398,8 @@ window.DandelionMap = {
           };
         }
 
-        jQuery.extend(params, q);
-        var url = config.url;
-
         // Parse URL to extract base path and existing parameters
+        var url = config.url;
         var urlParts = url.split('?');
         var basePath = urlParts[0];
         var urlParams = {};
@@ -418,7 +410,7 @@ window.DandelionMap = {
         }
 
         // Merge url parameters with dynamic request parameters
-        var requestParams = jQuery.extend({}, urlParams, params, q, { display: 'map' });
+        var requestParams = jQuery.extend({}, urlParams, q, { display: 'map' });
         var jsonUrl = basePath + '.json?' + $.param(requestParams);
 
         clearTimeout(window.mapTimer);
