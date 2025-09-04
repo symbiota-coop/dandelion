@@ -337,6 +337,6 @@ Dandelion::App.helpers do
       centre: (lat && lng ? { lat: lat.to_f, lng: lng.to_f } : nil),
       zoom: zoom&.to_i,
       enableInfoWindow: enable_info_window
-    }.compact.to_json
+    }.to_json
   end
 end

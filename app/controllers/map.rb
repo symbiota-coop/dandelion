@@ -31,10 +31,6 @@ Dandelion::App.controller do
 
     case content_type
     when :html
-      @accounts = @accounts.and(:coordinates.ne => nil) unless @accounts.empty?
-      @points_count = @accounts.count
-      @points = @accounts
-      @polygonables = @local_groups
       erb :'maps/map'
     when :json
       map_data_json(@accounts,
