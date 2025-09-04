@@ -55,7 +55,7 @@
   <%== '<div id="events-container" class="container-fluid">' %>
 <% end %>
 <% if params[:display] == 'map' %>
-  <%= partial :'maps/map', locals: { stem: "/o/#{@organisation.slug}/events", dynamic: true, trigger_bounds_changed: true, bounding_box: @bounding_box&.flatten, fill_screen: true } %>
+  <%= partial :'maps/map', locals: { url: "/o/#{@organisation.slug}/events", dynamic: true, trigger_bounds_changed: true, bounding_box: @bounding_box&.flatten, fill_screen: true } %>
 <% elsif params[:display] == 'table' %>
   <%= partial :'events/table' %>
 <% elsif params[:display] == 'concise' %>

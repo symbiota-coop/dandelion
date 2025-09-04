@@ -1,13 +1,9 @@
-<%
-points_limit = 500
-%>
-
 <script>
   $(function () {
     // Prepare configuration data
 
     var points = [];
-    <% if defined?(points) && (!defined?(dynamic) || (defined?(points_count) && points_count <= points_limit)) %>
+    <% if defined?(points) %>
       <% points.each_with_index { |point, n| %>
         points.push({
           model_name: '<%= point.class.to_s %>',
@@ -39,11 +35,10 @@ points_limit = 500
       polygonPaths: polygonPaths,
       infoWindow: <%= defined?(info_window) && info_window ? 'true' : 'false' %>,
       polygonables: <%= defined?(polygonables) && !polygonables.empty? ? 'true' : 'false' %>,
-      pointsExceedLimit: <%= defined?(points_count) && points_count > points_limit ? 'true' : 'false' %>,
       dynamic: <%= defined?(dynamic) && dynamic ? 'true' : 'false' %>,
       triggerBoundsChanged: <%= defined?(trigger_bounds_changed) && trigger_bounds_changed ? 'true' : 'false' %>,
       fillScreen: <%= defined?(fill_screen) && fill_screen ? 'true' : 'false' %>,
-      stem: <%== (defined?(stem) && stem ? stem : nil).to_json %>
+      url: <%== (defined?(url) && url ? url : nil).to_json %>
       <% if defined?(bounding_box) && bounding_box %>
         , boundingBox: <%= bounding_box.to_json %>
       <% end %>

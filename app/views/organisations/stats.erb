@@ -3,4 +3,4 @@
 <%= partial :stats, locals: { memberships: @organisation.organisationships, accounts: @organisation.members } %>
 
 <h2>Locations</h2>
-<%= partial :'maps/map', locals: { stem: "/map?organisation_id=#{@organisation.id}&admin=1", dynamic: true, trigger_bounds_changed: true } %>
+<%= partial :'maps/map', locals: { url: "/map?organisation_id=#{@organisation.id}&admin=1", dynamic: true, trigger_bounds_changed: true } %>

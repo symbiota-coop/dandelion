@@ -1,5 +1,7 @@
 // Map functionality
 window.DandelionMap = {
+  // Constants
+  POINTS_LIMIT: 500,
   // Configuration settings - lazy loaded to avoid referencing google before it's available
   get mapOptions () {
     return {
@@ -361,7 +363,7 @@ window.DandelionMap = {
     } else if (config.polygonables) {
       console.log('using config.polygonables');
       window.map.fitBounds(bounds);
-    } else if (!config.points || config.points.length === 0 || config.pointsExceedLimit) {
+    } else if (!config.points || config.points.length === 0 || (config.points && config.points.length > this.POINTS_LIMIT)) {
       if (config.boundingBox) {
         console.log("using config.boundingBox");
         this.fitValidBounds(config.boundingBox, 'Invalid bounding box');
@@ -403,20 +405,20 @@ window.DandelionMap = {
         }
 
         jQuery.extend(params, q);
-        var stem = config.stem;
+        var url = config.url;
 
-        // Parse stem URL to extract base path and existing parameters
-        var stemParts = stem.split('?');
-        var basePath = stemParts[0];
-        var stemParams = {};
+        // Parse URL to extract base path and existing parameters
+        var urlParts = url.split('?');
+        var basePath = urlParts[0];
+        var urlParams = {};
 
-        if (stemParts.length > 1) {
-          // Parse existing parameters from stem
-          stemParams = $.deparam(stemParts[1]);
+        if (urlParts.length > 1) {
+          // Parse existing parameters from url
+          urlParams = $.deparam(urlParts[1]);
         }
 
-        // Merge stem parameters with dynamic request parameters
-        var requestParams = jQuery.extend({}, stemParams, params, q, { display: 'map' });
+        // Merge url parameters with dynamic request parameters
+        var requestParams = jQuery.extend({}, urlParams, params, q, { display: 'map' });
         var jsonUrl = basePath + '.json?' + $.param(requestParams);
 
         clearTimeout(window.mapTimer);
@@ -445,7 +447,7 @@ window.DandelionMap = {
         google.maps.event.trigger(window.map, 'bounds_changed');
       }
 
-      if (config.pointsExceedLimit) {
+      if (config.points && config.points.length > this.POINTS_LIMIT) {
         $('#points-warning').show();
       }
     });
@@ -503,7 +505,7 @@ window.DandelionMap = {
     }
 
     // Update points warning
-    if (data.pointsExceedLimit) {
+    if (data.pointsCount > this.POINTS_LIMIT) {
       $('#points-warning').show();
     } else {
       $('#points-warning').hide();

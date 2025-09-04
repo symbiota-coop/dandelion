@@ -29,7 +29,7 @@
 <%= partial :'events/search_form' %>
 
 <% if params[:display] == 'map' %>
-  <%= partial :'maps/map', locals: { stem: "/events", dynamic: true, trigger_bounds_changed: true, bounding_box: @bounding_box&.flatten, fill_screen: true } %>
+  <%= partial :'maps/map', locals: { url: "/events", dynamic: true, trigger_bounds_changed: true, bounding_box: @bounding_box&.flatten, fill_screen: true } %>
 <% elsif params[:display] == 'calendar' %>
   <iframe src="<%=ENV['TEAMUP_CALENDAR_URL']%>" style="width: 100%; height: 800px" loading="lazy" frameborder="0"></iframe>
 <% elsif params[:display] == 'table' %>

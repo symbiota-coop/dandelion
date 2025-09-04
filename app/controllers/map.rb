@@ -49,18 +49,6 @@ Dandelion::App.controller do
       @points = @accounts
       @polygonables = @local_groups
 
-      # Format points for JSON response
-      points_data = @points.map.with_index do |point, n|
-        {
-          model_name: point.class.to_s,
-          id: point.id.to_s,
-          lat: point.lat,
-          lng: point.lng,
-          n: n
-        }
-      end
-
-      # Format polygon paths for JSON response
       polygon_paths_data = []
       if @polygonables
         @polygonables.each do |polygonable|
@@ -74,9 +62,20 @@ Dandelion::App.controller do
       end
 
       {
-        points: points_data,
+        points: if @points.count > MAP_POINTS_LIMIT
+                  []
+                else
+                  @points.map.with_index do |point, n|
+                    {
+                      model_name: point.class.to_s,
+                      id: point.id.to_s,
+                      lat: point.lat,
+                      lng: point.lng,
+                      n: n
+                    }
+                  end
+                end,
         pointsCount: @points_count,
-        pointsExceedLimit: @points_count > 500,
         polygonPaths: polygon_paths_data,
         polygonables: @polygonables,
         centre: (@lat && @lng ? { lat: @lat.to_f, lng: @lng.to_f } : nil),

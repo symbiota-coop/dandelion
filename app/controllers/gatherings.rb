@@ -33,20 +33,21 @@ Dandelion::App.controller do
       @points_count = @gatherings.count
       @points = @gatherings.to_a
 
-      points_data = @points.map.with_index do |point, n|
-        {
-          model_name: point.class.to_s,
-          id: point.id.to_s,
-          lat: point.lat,
-          lng: point.lng,
-          n: n
-        }
-      end
-
       {
-        points: points_data,
+        points: if @points.count > MAP_POINTS_LIMIT
+                  []
+                else
+                  @points.map.with_index do |point, n|
+                    {
+                      model_name: point.class.to_s,
+                      id: point.id.to_s,
+                      lat: point.lat,
+                      lng: point.lng,
+                      n: n
+                    }
+                  end
+                end,
         pointsCount: @points_count,
-        pointsExceedLimit: @points_count > 500,
         polygonPaths: [],
         polygonables: nil,
         centre: (@lat && @lng ? { lat: @lat.to_f, lng: @lng.to_f } : nil),
