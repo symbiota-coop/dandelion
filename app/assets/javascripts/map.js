@@ -11,7 +11,10 @@ window.DandelionMap = {
       maxZoom: 16,
       minZoom: 1,
       gestureHandling: 'greedy',
-      clickableIcons: false
+      clickableIcons: false,
+      scrollwheel: true,
+      draggable: true,
+      disableDoubleClickZoom: false
     };
   },
 
@@ -134,7 +137,7 @@ window.DandelionMap = {
       return;
     }
 
-    var params = this.getContainerParams();
+    var params = this.getParams();
     window.mapTimer = null;
 
     if (config.fillScreen) {
@@ -152,8 +155,9 @@ window.DandelionMap = {
     var bounds = new google.maps.LatLngBounds();
 
     // Handle bounding box if provided
-    if (params['bounding_box']) {
-      this.drawBoundingBox(params['bounding_box']);
+    var boundingBoxPolygon = null;
+    if (config.boundingBox) {
+      boundingBoxPolygon = this.drawBoundingBox(config.boundingBox);
     }
 
     // Initialize info window
@@ -167,6 +171,11 @@ window.DandelionMap = {
 
     // Setup clustering
     this.setupClustering(markers, infowindow, config.infoWindow);
+
+    // Store references globally for dynamic updates
+    window.mapInfoWindow = infowindow;
+    window.mapPolygons = polygons;
+    window.mapBoundingBoxPolygon = boundingBoxPolygon;
 
     // Set map bounds/center
     this.setMapBounds(bounds, config);
@@ -184,32 +193,9 @@ window.DandelionMap = {
     return { map: window.map, markers: markers, polygons: polygons };
   },
 
-  getContainerParams: function () {
-    var query;
-    var pagelet = $('#map-container').closest('[data-pagelet-url]');
-    var turboFrame = $('#map-container').closest('turbo-frame');
-
-    if (pagelet.length > 0) {
-      query = pagelet.attr('data-pagelet-url').split('?')[1];
-    } else if (turboFrame.length > 0 && turboFrame.attr('src')) {
-      query = turboFrame.attr('src').split('?')[1];
-    } else {
-      query = window.location.search.substring(1);
-    }
+  getParams: function () {
+    var query = window.location.search.substring(1);
     return $.deparam(query);
-  },
-
-  getContainer: function () {
-    var pagelet = $('#map-container').closest('[data-pagelet-url]');
-    var turboFrame = $('#map-container').closest('turbo-frame');
-
-    if (pagelet.length > 0) {
-      return { type: 'pagelet', element: pagelet };
-    } else if (turboFrame.length > 0) {
-      return { type: 'turbo-frame', element: turboFrame };
-    } else {
-      return { type: 'none', element: null };
-    }
   },
 
   drawBoundingBox: function (boundingBox) {
@@ -225,10 +211,12 @@ window.DandelionMap = {
       { lat: south, lng: east }
     ];
 
-    new google.maps.Polygon(Object.assign({}, this.boundingBoxStyle, {
+    var boundingBoxPolygon = new google.maps.Polygon(Object.assign({}, this.boundingBoxStyle, {
       paths: boundingBoxPaths,
       map: window.map
     }));
+
+    return boundingBoxPolygon;
   },
 
   createMarkers: function (points, infowindow, bounds, infoWindowEnabled, polygonables) {
@@ -319,6 +307,9 @@ window.DandelionMap = {
       styles: this.clusterStyles
     }));
 
+    // Store reference globally for dynamic updates
+    window.markerClusterer = markerClusterer;
+
     var self = this;
     google.maps.event.addListener(markerClusterer, 'clusterclick', function (cluster) {
       if (window.map.getZoom() === window.map.maxZoom) {
@@ -371,10 +362,9 @@ window.DandelionMap = {
       console.log('using config.polygonables');
       window.map.fitBounds(bounds);
     } else if (!config.points || config.points.length === 0 || config.pointsExceedLimit) {
-      var params = this.getContainerParams();
-      if (params['bounding_box']) {
-        console.log("using params['bounding_box']");
-        this.fitValidBounds(params['bounding_box'], 'Invalid bounding box');
+      if (config.boundingBox) {
+        console.log("using config.boundingBox");
+        this.fitValidBounds(config.boundingBox, 'Invalid bounding box');
       } else {
         console.log('using default view');
         this.setDefaultView();
@@ -413,27 +403,41 @@ window.DandelionMap = {
         }
 
         jQuery.extend(params, q);
-        var container = self.getContainer();
-        var stem = config.stem || '/map';
-        var newUrl = stem + '/?' + $.param(params);
+        var stem = config.stem;
 
-        if (container.type === 'pagelet') {
-          container.element.attr('data-pagelet-url', newUrl);
+        // Parse stem URL to extract base path and existing parameters
+        var stemParts = stem.split('?');
+        var basePath = stemParts[0];
+        var stemParams = {};
+
+        if (stemParts.length > 1) {
+          // Parse existing parameters from stem
+          stemParams = $.deparam(stemParts[1]);
         }
+
+        // Merge stem parameters with dynamic request parameters
+        var requestParams = jQuery.extend({}, stemParams, params, q, { display: 'map' });
+        var jsonUrl = basePath + '.json?' + $.param(requestParams);
 
         clearTimeout(window.mapTimer);
         var timeout = self.dynamicLoadingTimeout;
         window.mapTimer = setTimeout(function () {
           window.map.setOptions(self.disabledMapOptions);
 
-          if (container.type === 'pagelet') {
-            container.element.css('opacity', '0.3');
-            container.element.load(newUrl, function () {
-              container.element.css('opacity', '1');
-            });
-          } else if (container.type === 'turbo-frame') {
-            container.element.attr('src', newUrl);
-          }
+          // Make JSON request to get new points
+          $.ajax({
+            url: jsonUrl,
+            method: 'GET',
+            dataType: 'json',
+            success: function (data) {
+              self.updateMapWithNewData(data, config);
+              window.map.setOptions(self.mapOptions);
+            },
+            error: function (xhr, status, error) {
+              console.error('Failed to load map data:', error);
+              window.map.setOptions(self.mapOptions);
+            }
+          });
         }, timeout);
       });
 
@@ -445,5 +449,67 @@ window.DandelionMap = {
         $('#points-warning').show();
       }
     });
+  },
+
+  updateMapWithNewData: function (data, config) {
+    var self = this;
+
+    // Clear existing markers and clusters
+    if (window.markerClusterer) {
+      window.markerClusterer.clearMarkers();
+    }
+
+    // Clear existing polygons
+    if (window.mapPolygons) {
+      window.mapPolygons.forEach(function (polygon) {
+        polygon.setMap(null);
+      });
+    }
+
+    // Clear existing bounding box
+    if (window.mapBoundingBoxPolygon) {
+      window.mapBoundingBoxPolygon.setMap(null);
+    }
+
+    // Create new bounds
+    var bounds = new google.maps.LatLngBounds();
+
+    // Initialize info window if it doesn't exist
+    if (!window.mapInfoWindow) {
+      window.mapInfoWindow = new google.maps.InfoWindow();
+    }
+
+    // Create new markers from JSON data
+    var markers = [];
+    if (data.points && data.points.length > 0) {
+      markers = this.createMarkers(data.points, window.mapInfoWindow, bounds, config.infoWindow, data.polygonables);
+    }
+
+    // Create new polygons if provided
+    var polygons = [];
+    if (data.polygonPaths && data.polygonPaths.length > 0) {
+      polygons = this.createPolygons(data.polygonPaths, bounds);
+    }
+    window.mapPolygons = polygons;
+
+    // Redraw bounding box if it exists in config
+    if (config.boundingBox) {
+      window.mapBoundingBoxPolygon = this.drawBoundingBox(config.boundingBox);
+    }
+
+    // Setup new clustering
+    if (markers.length > 0) {
+      this.setupClustering(markers, window.mapInfoWindow, config.infoWindow);
+    }
+
+    // Update points warning
+    if (data.pointsExceedLimit) {
+      $('#points-warning').show();
+    } else {
+      $('#points-warning').hide();
+    }
+
+    // Store reference to marker clusterer
+    window.markerClusterer = window.markerClusterer;
   }
 };

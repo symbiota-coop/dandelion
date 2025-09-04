@@ -4,7 +4,7 @@ Dandelion::App.controller do
     erb :'events/facilitators'
   end
 
-  get '/events', provides: %i[html ics] do
+  get '/events', provides: %i[html ics json] do
     @events = Event.live.public.browsable
     @from = params[:from] ? parse_date(params[:from]) : Date.today
     @to = params[:to] ? parse_date(params[:to]) : nil
@@ -48,27 +48,46 @@ Dandelion::App.controller do
         @events = @events.trending(@from)
       end
       if request.xhr?
-        if params[:display] == 'map'
-          @lat = params[:lat]
-          @lng = params[:lng]
-          @zoom = params[:zoom]
-          @south = params[:south]
-          @west = params[:west]
-          @north = params[:north]
-          @east = params[:east]
-          box = [[@west.to_f, @south.to_f], [@east.to_f, @north.to_f]]
-
-          @events = @events.and(:locked.ne => true)
-          @events = @events.and(coordinates: { '$geoWithin' => { '$box' => box } }) unless @events.empty?
-          @points_count = @events.count
-          @points = @events.to_a
-          partial :'maps/map', locals: { stem: '/events', dynamic: true, points: @points, points_count: @points_count, centre: (OpenStruct.new(lat: @lat, lng: @lng) if @lat && @lng), zoom: @zoom, fill_screen: true }
-        else
-          partial :'events/events'
-        end
+        partial :'events/events'
       else
         erb :'events/events'
       end
+    when :json
+      # JSON response for map display
+      @lat = params[:lat]
+      @lng = params[:lng]
+      @zoom = params[:zoom]
+      @south = params[:south]
+      @west = params[:west]
+      @north = params[:north]
+      @east = params[:east]
+      box = [[@west.to_f, @south.to_f], [@east.to_f, @north.to_f]]
+
+      @events = @events.and(:locked.ne => true)
+      @events = @events.and(coordinates: { '$geoWithin' => { '$box' => box } }) unless @events.empty?
+      @points_count = @events.count
+      @points = @events.to_a
+
+      points_data = @points.map.with_index do |point, n|
+        {
+          model_name: point.class.to_s,
+          id: point.id.to_s,
+          lat: point.lat,
+          lng: point.lng,
+          n: n
+        }
+      end
+
+      {
+        points: points_data,
+        pointsCount: @points_count,
+        pointsExceedLimit: @points_count > 500,
+        polygonPaths: [],
+        polygonables: nil,
+        centre: (@lat && @lng ? { lat: @lat.to_f, lng: @lng.to_f } : nil),
+        zoom: @zoom&.to_i,
+        infoWindow: false
+      }.to_json
     when :ics
       @events = @events.current.limit(500)
       cal = Icalendar::Calendar.new

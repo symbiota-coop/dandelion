@@ -43,7 +43,10 @@ points_limit = 500
       dynamic: <%= defined?(dynamic) && dynamic ? 'true' : 'false' %>,
       triggerBoundsChanged: <%= defined?(trigger_bounds_changed) && trigger_bounds_changed ? 'true' : 'false' %>,
       fillScreen: <%= defined?(fill_screen) && fill_screen ? 'true' : 'false' %>,
-      stem: '<%= defined?(stem) && stem ? stem : '/map' %>'
+      stem: <%== (defined?(stem) && stem ? stem : nil).to_json %>
+      <% if defined?(bounding_box) && bounding_box %>
+        , boundingBox: <%= bounding_box.to_json %>
+      <% end %>
       <% if defined?(centre) && centre %>
         , centre: { lat: <%= centre.lat %>, lng: <%= centre.lng %> },
         zoom: <%= zoom %>

@@ -12,7 +12,7 @@
         $('#remove-organisation').hide()"><i class="bi bi-plus-square-fill"></i></a>
     <div style="display: none">
       <% form_for new_object, new_url do |f| %>
-        <%= f.lookup_block :organisation_id, lookup_url: '/organisations.json', placeholder: 'Search organisations' %>
+        <%= f.lookup_block :organisation_id, lookup_url: '/organisations/autocomplete.json', placeholder: 'Search organisations' %>
         <%= f.submit_block button_text: "Add #{role}" %>
       <% end %>
     </div>

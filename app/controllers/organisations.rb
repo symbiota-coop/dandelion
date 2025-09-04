@@ -1,44 +1,64 @@
 Dandelion::App.controller do
   get '/organisations', provides: %i[html json] do
+    @organisations = Organisation.and(:hidden.ne => true)
+    @organisations = params[:order] == 'created_at' ? @organisations.order('created_at desc') : @organisations.order('followers_count desc')
+    if params[:q]
+      @organisations = @organisations.and(:id.in => Organisation.all.or(
+        { name: /#{Regexp.escape(params[:q])}/i },
+        { intro_text: /#{Regexp.escape(params[:q])}/i }
+      ).pluck(:id))
+    end
+    @organisations = @organisations.and(:id.in => current_account.organisations_following.pluck(:id)) if current_account && params[:following]
+
     case content_type
     when :html
-      @organisations = Organisation.and(:hidden.ne => true)
-      @organisations = params[:order] == 'created_at' ? @organisations.order('created_at desc') : @organisations.order('followers_count desc')
-      if params[:q]
-        @organisations = @organisations.and(:id.in => Organisation.all.or(
-          { name: /#{Regexp.escape(params[:q])}/i },
-          { intro_text: /#{Regexp.escape(params[:q])}/i }
-        ).pluck(:id))
-      end
-      @organisations = @organisations.and(:id.in => current_account.organisations_following.pluck(:id)) if current_account && params[:following]
-      if request.xhr?
-        if params[:display] == 'map'
-          @lat = params[:lat]
-          @lng = params[:lng]
-          @zoom = params[:zoom]
-          @south = params[:south]
-          @west = params[:west]
-          @north = params[:north]
-          @east = params[:east]
-          box = [[@west.to_f, @south.to_f], [@east.to_f, @north.to_f]]
-
-          @organisations = @organisations.and(coordinates: { '$geoWithin' => { '$box' => box } }) unless @organisations.empty?
-          @points_count = @organisations.count
-          @points = @organisations.to_a
-          partial :'maps/map', locals: { stem: '/organisations', dynamic: true, points: @points, points_count: @points_count, centre: (OpenStruct.new(lat: @lat, lng: @lng) if @lat && @lng), zoom: @zoom, fill_screen: true }
-        end
-      else
-        @organisations = @organisations.paginate(page: params[:organisations_page], per_page: 50)
-        erb :'organisations/organisations'
-      end
+      @organisations = @organisations.paginate(page: params[:organisations_page], per_page: 50)
+      erb :'organisations/organisations'
     when :json
-      @organisations = Organisation.all.order('created_at desc')
-      @organisations = @organisations.and(name: /#{Regexp.escape(params[:q])}/i) if params[:q]
-      @organisations = @organisations.and(id: params[:id]) if params[:id]
+      # JSON response for map display
+      @lat = params[:lat]
+      @lng = params[:lng]
+      @zoom = params[:zoom]
+      @south = params[:south]
+      @west = params[:west]
+      @north = params[:north]
+      @east = params[:east]
+      box = [[@west.to_f, @south.to_f], [@east.to_f, @north.to_f]]
+
+      @organisations = @organisations.and(coordinates: { '$geoWithin' => { '$box' => box } }) unless @organisations.empty?
+      @points_count = @organisations.count
+      @points = @organisations.to_a
+
+      points_data = @points.map.with_index do |point, n|
+        {
+          model_name: point.class.to_s,
+          id: point.id.to_s,
+          lat: point.lat,
+          lng: point.lng,
+          n: n
+        }
+      end
+
       {
-        results: @organisations.map { |organisation| { id: organisation.id.to_s, text: "#{organisation.name} (#{organisation.slug})" } }
+        points: points_data,
+        pointsCount: @points_count,
+        pointsExceedLimit: @points_count > 500,
+        polygonPaths: [],
+        polygonables: nil,
+        centre: (@lat && @lng ? { lat: @lat.to_f, lng: @lng.to_f } : nil),
+        zoom: @zoom&.to_i,
+        infoWindow: false
       }.to_json
     end
+  end
+
+  get '/organisations/autocomplete', provides: :json do
+    @organisations = Organisation.all.order('created_at desc')
+    @organisations = @organisations.and(name: /#{Regexp.escape(params[:q])}/i) if params[:q]
+    @organisations = @organisations.and(id: params[:id]) if params[:id]
+    {
+      results: @organisations.map { |organisation| { id: organisation.id.to_s, text: "#{organisation.name} (#{organisation.slug})" } }
+    }.to_json
   end
 
   get '/o/:slug/activities', provides: %i[html json] do

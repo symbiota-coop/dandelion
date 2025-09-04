@@ -1,48 +1,69 @@
 Dandelion::App.controller do
   get '/gatherings', provides: %i[html json] do
+    @gatherings = if current_account && params[:my_gatherings]
+                    Gathering.and(:id.in => current_account.memberships.pluck(:gathering_id))
+                  else
+                    Gathering.and(:listed => true, :privacy.ne => 'secret')
+                  end
+    @gatherings = params[:order] == 'membership_count' ? @gatherings.order('membership_count desc') : @gatherings.order('created_at desc')
+    if params[:q]
+      @gatherings = @gatherings.and(:id.in => Gathering.all.or(
+        { name: /#{Regexp.escape(params[:q])}/i },
+        { intro_for_non_members: /#{Regexp.escape(params[:q])}/i }
+      ).pluck(:id))
+    end
+
     case content_type
     when :html
-      @gatherings = if current_account && params[:my_gatherings]
-                      Gathering.and(:id.in => current_account.memberships.pluck(:gathering_id))
-                    else
-                      Gathering.and(:listed => true, :privacy.ne => 'secret', :image_uid.ne => nil)
-                    end
-      @gatherings = params[:order] == 'membership_count' ? @gatherings.order('membership_count desc') : @gatherings.order('created_at desc')
-      if params[:q]
-        @gatherings = @gatherings.and(:id.in => Gathering.all.or(
-          { name: /#{Regexp.escape(params[:q])}/i },
-          { intro_for_non_members: /#{Regexp.escape(params[:q])}/i }
-        ).pluck(:id))
-      end
-      if request.xhr?
-        if params[:display] == 'map'
-          @lat = params[:lat]
-          @lng = params[:lng]
-          @zoom = params[:zoom]
-          @south = params[:south]
-          @west = params[:west]
-          @north = params[:north]
-          @east = params[:east]
-          box = [[@west.to_f, @south.to_f], [@east.to_f, @north.to_f]]
-
-          @gatherings = @gatherings.and(coordinates: { '$geoWithin' => { '$box' => box } }) unless @gatherings.empty?
-          @points_count = @gatherings.count
-          @points = @gatherings.to_a
-          partial :'maps/map', locals: { stem: '/gatherings', dynamic: true, points: @points, points_count: @points_count, centre: (OpenStruct.new(lat: @lat, lng: @lng) if @lat && @lng), zoom: @zoom, fill_screen: true }
-        end
-      else
-        @gatherings = @gatherings.paginate(page: params[:gatherings_page], per_page: 50)
-        erb :'gatherings/gatherings'
-      end
+      @gatherings = @gatherings.and(:image_uid.ne => nil)
+      @gatherings = @gatherings.paginate(page: params[:gatherings_page], per_page: 50)
+      erb :'gatherings/gatherings'
     when :json
-      sign_in_required!
-      @gatherings = Gathering.and(:id.in => current_account.memberships.pluck(:gathering_id))
-      @gatherings = @gatherings.and(name: /#{Regexp.escape(params[:q])}/i) if params[:q]
-      @gatherings = @gatherings.and(id: params[:id]) if params[:id]
+      # JSON response for map display
+      @lat = params[:lat]
+      @lng = params[:lng]
+      @zoom = params[:zoom]
+      @south = params[:south]
+      @west = params[:west]
+      @north = params[:north]
+      @east = params[:east]
+      box = [[@west.to_f, @south.to_f], [@east.to_f, @north.to_f]]
+
+      @gatherings = @gatherings.and(coordinates: { '$geoWithin' => { '$box' => box } }) unless @gatherings.empty?
+      @points_count = @gatherings.count
+      @points = @gatherings.to_a
+
+      points_data = @points.map.with_index do |point, n|
+        {
+          model_name: point.class.to_s,
+          id: point.id.to_s,
+          lat: point.lat,
+          lng: point.lng,
+          n: n
+        }
+      end
+
       {
-        results: @gatherings.map { |gathering| { id: gathering.id.to_s, text: "#{gathering.name} (id:#{gathering.id})" } }
+        points: points_data,
+        pointsCount: @points_count,
+        pointsExceedLimit: @points_count > 500,
+        polygonPaths: [],
+        polygonables: nil,
+        centre: (@lat && @lng ? { lat: @lat.to_f, lng: @lng.to_f } : nil),
+        zoom: @zoom&.to_i,
+        infoWindow: false
       }.to_json
     end
+  end
+
+  get '/gatherings/autocomplete', provides: :json do
+    sign_in_required!
+    @gatherings = Gathering.and(:id.in => current_account.memberships.pluck(:gathering_id))
+    @gatherings = @gatherings.and(name: /#{Regexp.escape(params[:q])}/i) if params[:q]
+    @gatherings = @gatherings.and(id: params[:id]) if params[:id]
+    {
+      results: @gatherings.map { |gathering| { id: gathering.id.to_s, text: "#{gathering.name} (id:#{gathering.id})" } }
+    }.to_json
   end
 
   get '/g/new' do

@@ -3,7 +3,4 @@
 <%= partial :stats, locals: { memberships: @local_group.local_groupships, accounts: @local_group.members } %>
 
 <h2>Locations</h2>
-
-<div data-pagelet-url="/map?local_group_id=<%= @local_group.id %>&admin=1">
-  <%= partial :'maps/map', locals: { dynamic: true, trigger_bounds_changed: true } %>
-</div>
+<%= partial :'maps/map', locals: { stem: "/map?local_group_id=#{@local_group.id}&admin=1", dynamic: true, trigger_bounds_changed: true } %>

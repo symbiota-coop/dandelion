@@ -26,6 +26,4 @@
     </div>
   </div>
 <% end %>
-<div data-pagelet-url="/map?<%= Rack::Utils.parse_nested_query(request.query_string).merge({}).to_query %>">
-  <%= partial :'maps/map', locals: { dynamic: true, trigger_bounds_changed: true } %>
-</div>
+<%= partial :'maps/map', locals: { stem: '/map', dynamic: true, trigger_bounds_changed: true } %>

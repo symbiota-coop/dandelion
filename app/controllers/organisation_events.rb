@@ -70,34 +70,6 @@ Dandelion::App.controller do
         @organisation.events.course.pluck(:id))
     end
     case content_type
-    when :json
-      @events = @events.live
-      if params[:past] || (carousel && carousel.name.downcase.include?('past events'))
-        @past = true
-        @events = @events.past
-      else
-        @events = @events.future_and_current(@from)
-        @events = @events.and(:start_time.lt => @to + 1) if @to
-      end
-      @events.map do |event|
-        {
-          id: event.id.to_s,
-          slug: event.slug,
-          name: event.name,
-          cohosts: event.cohosts.map { |organisation| { name: organisation.name, slug: organisation.slug } },
-          facilitators: event.event_facilitators.map { |account| { name: account.name, username: account.username } },
-          activity: event.activity ? { name: event.activity.name, id: event.activity_id.to_s } : nil,
-          local_group: event.local_group ? { name: event.local_group.name, id: event.local_group_id.to_s } : nil,
-          email: event.email,
-          tags: event.event_tags.map(&:name),
-          start_time: event.start_time,
-          end_time: event.end_time,
-          location: event.location,
-          time_zone: event.time_zone,
-          image: event.image ? event.image.thumb('1920x1920').url : nil,
-          description: event.description
-        }
-      end.to_json
     when :html
       if params[:past] || (carousel && carousel.name.downcase.include?('past events'))
         @past = true
@@ -118,26 +90,76 @@ Dandelion::App.controller do
         @events = @events.trending(@from)
       end
       if request.xhr?
-        if params[:display] == 'map'
-          @lat = params[:lat]
-          @lng = params[:lng]
-          @zoom = params[:zoom]
-          @south = params[:south]
-          @west = params[:west]
-          @north = params[:north]
-          @east = params[:east]
-          box = [[@west.to_f, @south.to_f], [@east.to_f, @north.to_f]]
-
-          @events = @events.and(:locked.ne => true)
-          @events = @events.and(coordinates: { '$geoWithin' => { '$box' => box } }) unless @events.empty?
-          @points_count = @events.count
-          @points = @events.to_a
-          partial :'maps/map', locals: { stem: "/o/#{@organisation.slug}/events", dynamic: true, points: @points, points_count: @points_count, centre: (OpenStruct.new(lat: @lat, lng: @lng) if @lat && @lng), zoom: @zoom, fill_screen: true }
-        else
-          partial :'organisations/events'
-        end
+        partial :'organisations/events'
       else
         erb :'organisations/events', layout: (params[:minimal] ? 'minimal' : nil)
+      end
+    when :json
+      if params[:display] == 'map'
+        # JSON response for map display
+        @lat = params[:lat]
+        @lng = params[:lng]
+        @zoom = params[:zoom]
+        @south = params[:south]
+        @west = params[:west]
+        @north = params[:north]
+        @east = params[:east]
+        box = [[@west.to_f, @south.to_f], [@east.to_f, @north.to_f]]
+
+        @events = @events.and(:locked.ne => true)
+        @events = @events.and(coordinates: { '$geoWithin' => { '$box' => box } }) unless @events.empty?
+        @points_count = @events.count
+        @points = @events.to_a
+
+        points_data = @points.map.with_index do |point, n|
+          {
+            model_name: point.class.to_s,
+            id: point.id.to_s,
+            lat: point.lat,
+            lng: point.lng,
+            n: n
+          }
+        end
+
+        {
+          points: points_data,
+          pointsCount: @points_count,
+          pointsExceedLimit: @points_count > 500,
+          polygonPaths: [],
+          polygonables: nil,
+          centre: (@lat && @lng ? { lat: @lat.to_f, lng: @lng.to_f } : nil),
+          zoom: @zoom&.to_i,
+          infoWindow: false
+        }.to_json
+      else
+        # Regular JSON response for events
+        @events = @events.live
+        if params[:past] || (carousel && carousel.name.downcase.include?('past events'))
+          @past = true
+          @events = @events.past
+        else
+          @events = @events.future_and_current(@from)
+          @events = @events.and(:start_time.lt => @to + 1) if @to
+        end
+        @events.map do |event|
+          {
+            id: event.id.to_s,
+            slug: event.slug,
+            name: event.name,
+            cohosts: event.cohosts.map { |organisation| { name: organisation.name, slug: organisation.slug } },
+            facilitators: event.event_facilitators.map { |account| { name: account.name, username: account.username } },
+            activity: event.activity ? { name: event.activity.name, id: event.activity_id.to_s } : nil,
+            local_group: event.local_group ? { name: event.local_group.name, id: event.local_group_id.to_s } : nil,
+            email: event.email,
+            tags: event.event_tags.map(&:name),
+            start_time: event.start_time,
+            end_time: event.end_time,
+            location: event.location,
+            time_zone: event.time_zone,
+            image: event.image ? event.image.thumb('1920x1920').url : nil,
+            description: event.description
+          }
+        end.to_json
       end
     when :ics
       @events = @events.live

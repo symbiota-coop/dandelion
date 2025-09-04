@@ -56,9 +56,7 @@
 </div>
 
 <% if params[:display] == 'map' %>
-  <div data-pagelet-url="/gatherings?<%= request.query_string %>">
-    <%= partial :'maps/map', locals: { stem: "/gatherings", dynamic: true, trigger_bounds_changed: true, fill_screen: true } %>
-  </div>
+  <%= partial :'maps/map', locals: { stem: "/gatherings", dynamic: true, trigger_bounds_changed: true, fill_screen: true } %>
 <% else %>
   <%= partial :'gatherings/blocks', locals: { gatherings: @gatherings } %>
   <%= will_paginate @gatherings, param_name: 'gatherings_page', inner_window: 0, outer_window: 0, renderer: WillPaginate::ViewHelpers::BootstrapRenderer %>

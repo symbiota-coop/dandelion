@@ -3,7 +3,7 @@ Dandelion::App.controller do
     partial :"maps/#{params[:model].underscore}", object: params[:model].constantize.find(params[:id])
   end
 
-  get '/map' do
+  get '/map', provides: %i[html json] do
     @lat = params[:lat]
     @lng = params[:lng]
     @zoom = params[:zoom]
@@ -38,7 +38,9 @@ Dandelion::App.controller do
       @accounts = Account.all
     end
 
-    if request.xhr?
+    case content_type
+    when :json
+      # For JSON requests, apply bounding box filtering
       unless @accounts.empty?
         @accounts = @accounts.and(coordinates: { '$geoWithin' => { '$box' => box } })
         @accounts = @accounts.and(:number_at_this_location.lte => 50)
@@ -46,16 +48,62 @@ Dandelion::App.controller do
       @points_count = @accounts.count
       @points = @accounts
       @polygonables = @local_groups
-      partial :'maps/map', locals: { dynamic: true, points: @points, points_count: @points_count, polygonables: @polygonables, centre: (OpenStruct.new(lat: @lat, lng: @lng) if @lat && @lng), zoom: @zoom, info_window: @info_window }
+
+      # Format points for JSON response
+      points_data = @points.map.with_index do |point, n|
+        {
+          model_name: point.class.to_s,
+          id: point.id.to_s,
+          lat: point.lat,
+          lng: point.lng,
+          n: n
+        }
+      end
+
+      # Format polygon paths for JSON response
+      polygon_paths_data = []
+      if @polygonables
+        @polygonables.each do |polygonable|
+          polygonable.polygons.each do |polygon|
+            polygon_path = polygon.coordinates[0].map do |coordinate|
+              { lat: coordinate[1], lng: coordinate[0] }
+            end
+            polygon_paths_data << polygon_path
+          end
+        end
+      end
+
+      {
+        points: points_data,
+        pointsCount: @points_count,
+        pointsExceedLimit: @points_count > 500,
+        polygonPaths: polygon_paths_data,
+        polygonables: @polygonables,
+        centre: (@lat && @lng ? { lat: @lat.to_f, lng: @lng.to_f } : nil),
+        zoom: @zoom&.to_i,
+        infoWindow: @info_window
+      }.to_json
     else
-      @accounts = @accounts.and(:coordinates.ne => nil) unless @accounts.empty?
-      @points_count = @accounts.count
-      @points = @accounts
-      @polygonables = @local_groups
-      if params[:map_only]
-        partial :'maps/map', locals: { points: @points, points_count: @points_count, polygonables: @polygonables, centre: (OpenStruct.new(lat: @lat, lng: @lng) if @lat && @lng), zoom: @zoom, info_window: @info_window }, layout: :minimal
+      # HTML responses
+      if request.xhr?
+        unless @accounts.empty?
+          @accounts = @accounts.and(coordinates: { '$geoWithin' => { '$box' => box } })
+          @accounts = @accounts.and(:number_at_this_location.lte => 50)
+        end
+        @points_count = @accounts.count
+        @points = @accounts
+        @polygonables = @local_groups
+        partial :'maps/map', locals: { dynamic: true, points: @points, points_count: @points_count, polygonables: @polygonables, centre: (OpenStruct.new(lat: @lat, lng: @lng) if @lat && @lng), zoom: @zoom, info_window: @info_window }
       else
-        erb :'maps/map'
+        @accounts = @accounts.and(:coordinates.ne => nil) unless @accounts.empty?
+        @points_count = @accounts.count
+        @points = @accounts
+        @polygonables = @local_groups
+        if params[:map_only]
+          partial :'maps/map', locals: { points: @points, points_count: @points_count, polygonables: @polygonables, centre: (OpenStruct.new(lat: @lat, lng: @lng) if @lat && @lng), zoom: @zoom, info_window: @info_window }, layout: :minimal
+        else
+          erb :'maps/map'
+        end
       end
     end
   end
