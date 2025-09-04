@@ -427,13 +427,7 @@ window.DandelionMap = {
         }, timeout);
       });
 
-      if (config.url) {
-        google.maps.event.trigger(window.map, 'bounds_changed');
-      }
-
-      if (config.points && config.points.length > this.POINTS_LIMIT) {
-        $('#points-warning').show();
-      }
+      google.maps.event.trigger(window.map, 'bounds_changed');
     });
   },
 
