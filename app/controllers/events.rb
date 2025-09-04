@@ -56,41 +56,8 @@ Dandelion::App.controller do
       # JSON response for map display
       @events = @events.future(@from)
       @events = @events.and(:start_time.lt => @to + 1) if @to
-
-      @lat = params[:lat]
-      @lng = params[:lng]
-      @zoom = params[:zoom]
-      @south = params[:south]
-      @west = params[:west]
-      @north = params[:north]
-      @east = params[:east]
-      box = [[@west.to_f, @south.to_f], [@east.to_f, @north.to_f]]
-
       @events = @events.and(:locked.ne => true)
-      @events = @events.and(coordinates: { '$geoWithin' => { '$box' => box } }) unless @events.empty?
-      @points_count = @events.count
-      @points = @events.to_a
-
-      {
-        points: if @points.count > MAP_POINTS_LIMIT
-                  []
-                else
-                  @points.map.with_index do |point, n|
-                    {
-                      model_name: point.class.to_s,
-                      id: point.id.to_s,
-                      lat: point.lat,
-                      lng: point.lng,
-                      n: n
-                    }
-                  end
-                end,
-        pointsCount: @points_count,
-        polygonPaths: [],
-        polygonables: nil,
-        centre: (@lat && @lng ? { lat: @lat.to_f, lng: @lng.to_f } : nil),
-        zoom: @zoom&.to_i
-      }.to_json
+      map_data_json(@events)
     when :ics
       @events = @events.current.limit(500)
       cal = Icalendar::Calendar.new

@@ -4,15 +4,6 @@ Dandelion::App.controller do
   end
 
   get '/map', provides: %i[html json] do
-    @lat = params[:lat]
-    @lng = params[:lng]
-    @zoom = params[:zoom]
-    @south = params[:south]
-    @west = params[:west]
-    @north = params[:north]
-    @east = params[:east]
-    box = [[@west.to_f, @south.to_f], [@east.to_f, @north.to_f]]
-
     @accounts = []
     @local_groups = []
 
@@ -46,48 +37,9 @@ Dandelion::App.controller do
       @polygonables = @local_groups
       erb :'maps/map'
     when :json
-      # For JSON requests, apply bounding box filtering
-      unless @accounts.empty?
-        @accounts = @accounts.and(coordinates: { '$geoWithin' => { '$box' => box } })
-        @accounts = @accounts.and(:number_at_this_location.lte => 50)
-      end
-      @points_count = @accounts.count
-      @points = @accounts
-      @polygonables = @local_groups
-
-      polygon_paths_data = []
-      if @polygonables
-        @polygonables.each do |polygonable|
-          polygonable.polygons.each do |polygon|
-            polygon_path = polygon.coordinates[0].map do |coordinate|
-              { lat: coordinate[1], lng: coordinate[0] }
-            end
-            polygon_paths_data << polygon_path
-          end
-        end
-      end
-
-      {
-        points: if @points.count > MAP_POINTS_LIMIT
-                  []
-                else
-                  @points.map.with_index do |point, n|
-                    {
-                      model_name: point.class.to_s,
-                      id: point.id.to_s,
-                      lat: point.lat,
-                      lng: point.lng,
-                      n: n
-                    }
-                  end
-                end,
-        pointsCount: @points_count,
-        polygonPaths: polygon_paths_data,
-        polygonables: @polygonables,
-        centre: (@lat && @lng ? { lat: @lat.to_f, lng: @lng.to_f } : nil),
-        zoom: @zoom&.to_i,
-        enableInfoWindow: @enable_info_window
-      }.to_json
+      map_data_json(@accounts,
+                    polygonables: @local_groups,
+                    enable_info_window: @enable_info_window)
     end
   end
 

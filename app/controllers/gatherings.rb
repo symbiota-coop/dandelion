@@ -19,40 +19,7 @@ Dandelion::App.controller do
       @gatherings = @gatherings.paginate(page: params[:gatherings_page], per_page: 50)
       erb :'gatherings/gatherings'
     when :json
-      # JSON response for map display
-      @lat = params[:lat]
-      @lng = params[:lng]
-      @zoom = params[:zoom]
-      @south = params[:south]
-      @west = params[:west]
-      @north = params[:north]
-      @east = params[:east]
-      box = [[@west.to_f, @south.to_f], [@east.to_f, @north.to_f]]
-
-      @gatherings = @gatherings.and(coordinates: { '$geoWithin' => { '$box' => box } }) unless @gatherings.empty?
-      @points_count = @gatherings.count
-      @points = @gatherings.to_a
-
-      {
-        points: if @points.count > MAP_POINTS_LIMIT
-                  []
-                else
-                  @points.map.with_index do |point, n|
-                    {
-                      model_name: point.class.to_s,
-                      id: point.id.to_s,
-                      lat: point.lat,
-                      lng: point.lng,
-                      n: n
-                    }
-                  end
-                end,
-        pointsCount: @points_count,
-        polygonPaths: [],
-        polygonables: nil,
-        centre: (@lat && @lng ? { lat: @lat.to_f, lng: @lng.to_f } : nil),
-        zoom: @zoom&.to_i
-      }.to_json
+      map_data_json(@gatherings)
     end
   end
 

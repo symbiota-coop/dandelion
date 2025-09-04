@@ -158,7 +158,7 @@ window.DandelionMap = {
     var infowindow = new google.maps.InfoWindow();
 
     // Create markers
-    var markers = this.createMarkers(config.points, infowindow, bounds, config.enableInfoWindow, config.polygonables);
+    var markers = this.createMarkers(config.points, infowindow, bounds, config.enableInfoWindow, config.polygonPaths);
 
     // Create polygons
     var polygons = this.createPolygons(config.polygonPaths, bounds);
@@ -208,7 +208,7 @@ window.DandelionMap = {
     return boundingBoxPolygon;
   },
 
-  createMarkers: function (points, infowindow, bounds, enableInfoWindow, polygonables) {
+  createMarkers: function (points, infowindow, bounds, enableInfoWindow, polygonPaths) {
     var markers = [];
 
     for (var i = 0; i < points.length; i++) {
@@ -233,8 +233,8 @@ window.DandelionMap = {
       // Add click listener
       this.addMarkerClickListener(marker, infowindow, enableInfoWindow);
 
-      // Extend bounds if not using polygonables
-      if (!polygonables) {
+      // Extend bounds if not using polygonPaths
+      if (!polygonPaths || polygonPaths.length === 0) {
         console.log('pushed ' + marker.getPosition().toJSON() + ' to bounds');
         bounds.extend(marker.getPosition());
       }
@@ -347,8 +347,8 @@ window.DandelionMap = {
     } else if (config.bounds) {
       console.log('using config.bounds');
       this.fitValidBounds(config.bounds, 'Invalid bounds');
-    } else if (config.polygonables) {
-      console.log('using config.polygonables');
+    } else if (config.polygonPaths && config.polygonPaths.length > 0) {
+      console.log('using config.polygonPaths');
       window.map.fitBounds(bounds);
     } else if (!config.points || config.points.length === 0 || (config.points && config.points.length > this.POINTS_LIMIT)) {
       if (config.boundingBox) {
@@ -468,7 +468,7 @@ window.DandelionMap = {
     // Create new markers from JSON data
     var markers = [];
     if (data.points && data.points.length > 0) {
-      markers = this.createMarkers(data.points, window.mapInfoWindow, bounds, data.enableInfoWindow, data.polygonables);
+      markers = this.createMarkers(data.points, window.mapInfoWindow, bounds, data.enableInfoWindow, data.polygonPaths);
     }
 
     // Create new polygons if provided

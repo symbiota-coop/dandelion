@@ -299,4 +299,44 @@ Dandelion::App.helpers do
       currency: currency
     }
   end
+
+  def map_data_json(points, polygonables: nil, enable_info_window: nil)
+    lat = params[:lat]
+    lng = params[:lng]
+    zoom = params[:zoom]
+    box = [[params[:west].to_f, params[:south].to_f], [params[:east].to_f, params[:north].to_f]]
+
+    points = points.and(coordinates: { '$geoWithin' => { '$box' => box } })
+
+    {
+      points: if points.count > 500
+                []
+              else
+                points.map.with_index do |point, n|
+                  {
+                    model_name: point.class.to_s,
+                    id: point.id.to_s,
+                    lat: point.lat,
+                    lng: point.lng,
+                    n: n
+                  }
+                end
+              end,
+      pointsCount: points.count,
+      polygonPaths: if polygonables
+                      polygonables.flat_map do |polygonable|
+                        polygonable.polygons.map do |polygon|
+                          polygon.coordinates[0].map do |coordinate|
+                            { lat: coordinate[1], lng: coordinate[0] }
+                          end
+                        end
+                      end
+                    else
+                      []
+                    end,
+      centre: (lat && lng ? { lat: lat.to_f, lng: lng.to_f } : nil),
+      zoom: zoom&.to_i,
+      enableInfoWindow: enable_info_window
+    }.compact.to_json
+  end
 end
