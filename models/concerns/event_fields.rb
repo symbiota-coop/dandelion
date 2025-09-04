@@ -155,7 +155,10 @@ module EventFields
         tax_rate_id: 'Stripe tax rate ID',
         carousel_text: 'Preview text',
         match_phrase: 'Dropdown match phrase'
-      }.merge(email_human_attribute_names)[attr.to_sym] || super
+      }.merge(email_human_attribute_names).merge({
+                                                   recording_email_title: 'Order confirmation email subject for the recording of the event',
+                                                   recording_email_greeting: 'Order confirmation email greeting for the recording of the event'
+                                                 })[attr.to_sym] || super
     end
 
     def new_hints
@@ -204,7 +207,10 @@ module EventFields
         hide_unavailable_tickets: 'Hide tickets that have sold out or where sales have ended',
         match_phrase: 'Create a dropdown on the event page with future events containing this term',
         blank_price_for_free_tickets: 'Show a blank price for free tickets instead of zero'
-      }.merge(email_hints)
+      }.merge(email_hints).merge({
+                                   recording_email_title: 'Custom subject line for the order confirmation email for the recording of the event',
+                                   recording_email_greeting: 'Custom greeting for the order confirmation email for the recording of the event'
+                                 })
     end
 
     def edit_hints
