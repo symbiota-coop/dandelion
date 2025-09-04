@@ -2,6 +2,8 @@ namespace :hourly do
   task errands: :environment do
     puts 'delete stale uncompleted orders'
     Order.incomplete.and(:created_at.lt => 1.hour.ago).destroy_all
+    puts 'update monthly contributions current month'
+    MonthlyContributionsCalculator.update_current_month
     puts 'check for payments'
     Organisation.and(:evm_address.ne => nil).each do |organisation|
       organisation.check_evm_account if Order.and(:payment_completed.ne => true, :evm_secret.ne => nil, :event_id.in => organisation.events.pluck(:id)).count > 0
