@@ -39,17 +39,6 @@
       <% if defined?(bounding_box) && bounding_box %>
         , boundingBox: <%= bounding_box.to_json %>
       <% end %>
-      <% if defined?(centre) && centre %>
-        , centre: { lat: <%= centre.lat %>, lng: <%= centre.lng %> },
-        zoom: <%= zoom %>
-      <% elsif defined?(bounds) && bounds %>
-        , bounds: {
-          south: <%= bounds[:south] %>,
-          west: <%= bounds[:west] %>,
-          north: <%= bounds[:north] %>,
-          east: <%= bounds[:east] %>
-        }
-      <% end %>
     };
 
     // Initialize the map
