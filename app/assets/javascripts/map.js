@@ -141,9 +141,7 @@ window.DandelionMap = {
       $(window).on('resize', function () { self.fillScreen(); });
     }
 
-    var mapOptions = Object.assign({}, this.mapOptions, {
-      minZoom: config.minZoom || this.mapOptions.minZoom
-    });
+    var mapOptions = Object.assign({}, this.mapOptions);
 
     window.map = new google.maps.Map(document.getElementById("map-canvas"), mapOptions);
     var bounds = new google.maps.LatLngBounds();
