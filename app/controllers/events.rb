@@ -5,6 +5,10 @@ Dandelion::App.controller do
   end
 
   get '/events', provides: %i[html ics] do
+    if params[:home] && (fragment = Fragment.find_by(key: '/events/home')) && fragment.expires > Time.now
+      halt fragment.value
+    end
+
     @events = Event.live.public.browsable
     @from = params[:from] ? parse_date(params[:from]) : Date.today
     @to = params[:to] ? parse_date(params[:to]) : nil
