@@ -101,7 +101,11 @@ module EventScopes
                              },
                              { '$sort' => { 'trending_priority' => 1, 'recent_order_count' => -1 } },
                              { '$unset' => %w[recent_orders trending_priority recent_order_count] }
-                           ]).map { |doc| Event.new(doc) }
+                           ]).map { |doc| 
+        # Filter out any fields that aren't defined in the Event model
+        filtered_doc = doc.select { |key, _value| Event.fields.keys.include?(key.to_s) }
+        Event.new(filtered_doc) 
+      }
     end
   end
 end
