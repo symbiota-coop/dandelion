@@ -114,21 +114,22 @@ module Dandelion
 
     get '/' do
       if current_account
+        # signed in
         if request.xhr?
           partial :newsfeed, locals: { notifications: current_account.network_notifications.order('created_at desc').page(params[:page]), include_circle_name: true }
         else
           @body_class = 'greyed'
           erb :home_signed_in
         end
+      elsif request.xhr?
+        # not signed in
+        400
       else
         @from = Date.today
+        @events_search_order = 'trending'
         @no_content_padding_bottom = true
         @accounts = []
-        if request.xhr?
-          400
-        else
-          erb :home_not_signed_in
-        end
+        erb :home_not_signed_in
       end
     end
 
