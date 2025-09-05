@@ -138,7 +138,7 @@ window.DandelionMap = {
     window.mapInfoWindow = infowindow;
 
     // Create markers
-    var markers = this.createMarkers(config.points, window.mapInfoWindow, bounds);
+    var markers = this.createMarkers(config.points, infowindow, bounds);
 
     // Create polygons
     var polygons = this.createPolygons(config.polygonPaths, bounds);
