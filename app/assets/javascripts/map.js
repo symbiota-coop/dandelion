@@ -51,11 +51,11 @@ window.DandelionMap = {
 
   // Model configurations for map markers
   models: [
-    { name: 'Organisation', color: '#FF5241', icon: 'bi bi-flag-fill' },
-    { name: 'Gathering', color: '#00B963', icon: 'bi bi-people-fill' },
-    { name: 'Event', color: '#FF5241', icon: 'bi bi-calendar-event' },
     { name: 'Account', color: '#00B963', icon: 'bi bi-person-fill' },
     { name: 'ActivityApplication', color: '#00B963', icon: 'bi bi-person-fill' },
+    { name: 'Event', color: '#FF5241', icon: 'bi bi-calendar-event' },
+    { name: 'Gathering', color: '#00B963', icon: 'bi bi-people-fill' },
+    { name: 'Organisation', color: '#FF5241', icon: 'bi bi-flag-fill' },
     { name: 'Organisationship', color: '#00B963', icon: 'bi bi-person-fill' }
   ],
 
