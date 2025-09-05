@@ -57,8 +57,6 @@ window.DandelionMap = {
     fillOpacity: 0.05
   },
 
-  infoWindowModels: ['Organisation', 'Gathering', 'Event'],
-
   // Model configurations for map markers
   models: [
     { name: 'Organisation', color: '#FF5241', icon: 'bi bi-flag-fill' },
@@ -156,13 +154,13 @@ window.DandelionMap = {
     var infowindow = new google.maps.InfoWindow();
 
     // Create markers
-    var markers = this.createMarkers(config.points, infowindow, bounds, config.enableInfoWindow, config.polygonPaths);
+    var markers = this.createMarkers(config.points, infowindow, bounds, config.polygonPaths);
 
     // Create polygons
     var polygons = this.createPolygons(config.polygonPaths, bounds);
 
     // Setup clustering
-    this.setupClustering(markers, infowindow, config.enableInfoWindow);
+    this.setupClustering(markers, infowindow);
 
     // Store references globally for dynamic updates
     window.mapInfoWindow = infowindow;
@@ -206,7 +204,7 @@ window.DandelionMap = {
     return boundingBoxPolygon;
   },
 
-  createMarkers: function (points, infowindow, bounds, enableInfoWindow, polygonPaths) {
+  createMarkers: function (points, infowindow, bounds, polygonPaths) {
     var markers = [];
 
     for (var i = 0; i < points.length; i++) {
@@ -229,7 +227,7 @@ window.DandelionMap = {
       });
 
       // Add click listener
-      this.addMarkerClickListener(marker, infowindow, enableInfoWindow);
+      this.addMarkerClickListener(marker, infowindow);
 
       // Extend bounds if not using polygonPaths
       if (!polygonPaths || polygonPaths.length === 0) {
@@ -243,26 +241,23 @@ window.DandelionMap = {
     return markers;
   },
 
-  addMarkerClickListener: function (marker, infowindow, enableInfoWindow) {
+  addMarkerClickListener: function (marker, infowindow) {
     var self = this;
     google.maps.event.addListener(marker, 'click', function () {
-      if (self.shouldShowInfoWindow(marker.model_name, enableInfoWindow)) {
-        infowindow.setContent('<i class="bi bi-spin bi-slash-lg"></i>');
-        infowindow.open(window.map, marker);
-        var timeout = self.dynamicLoadingTimeout;
-        setTimeout(function () {
-          clearTimeout(window.mapTimer);
-        }, timeout);
+      var timeout = self.dynamicLoadingTimeout;
+      setTimeout(function () {
+        clearTimeout(window.mapTimer);
+      }, timeout);
 
-        $.get('/point/' + marker.model_name + '/' + marker.id, function (data) {
+      $.get('/points/' + marker.model_name + '/' + marker.id)
+        .done(function (data) {
           infowindow.setContent('<div class="infowindow">' + data + '</div>');
+          infowindow.open(window.map, marker);
+        })
+        .fail(function (xhr, status, error) {
+          console.error('Error loading marker data:', error);
         });
-      }
     });
-  },
-
-  shouldShowInfoWindow: function (modelName, enableInfoWindow) {
-    return this.infoWindowModels.includes(modelName) || enableInfoWindow;
   },
 
   createPolygons: function (polygonPaths, bounds) {
@@ -289,7 +284,7 @@ window.DandelionMap = {
     return polygons;
   },
 
-  setupClustering: function (markers, infowindow, enableInfoWindow) {
+  setupClustering: function (markers, infowindow) {
     var markerClusterer = new MarkerClusterer(window.map, markers, Object.assign({}, this.clusterConfig, {
       styles: this.clusterStyles
     }));
@@ -300,7 +295,7 @@ window.DandelionMap = {
     var self = this;
     google.maps.event.addListener(markerClusterer, 'clusterclick', function (cluster) {
       if (window.map.getZoom() === window.map.maxZoom) {
-        self.handleClusterClick(cluster, infowindow, enableInfoWindow);
+        self.handleClusterClick(cluster, infowindow);
       } else {
         window.map.setCenter(cluster.getCenter());
         window.map.setZoom(window.map.getZoom() + 2);
@@ -308,15 +303,13 @@ window.DandelionMap = {
     });
   },
 
-  handleClusterClick: function (cluster, infowindow, enableInfoWindow) {
+  handleClusterClick: function (cluster, infowindow) {
     var markers = cluster.getMarkers();
     markers.sort(function (a, b) {
       return a.n - b.n;
     });
 
-    infowindow.setContent('<i class="bi bi-spin bi-slash-lg"></i>');
     infowindow.setPosition(cluster.getCenter());
-    infowindow.open(window.map);
 
     setTimeout(function () {
       clearTimeout(window.mapTimer);
@@ -325,15 +318,20 @@ window.DandelionMap = {
     var content = '';
     var self = this;
     var requests = markers.map(function (marker) {
-      return $.get('/point/' + marker.model_name + '/' + marker.id, function (data) {
-        if (self.shouldShowInfoWindow(marker.model_name, enableInfoWindow)) {
+      return $.get('/points/' + marker.model_name + '/' + marker.id)
+        .done(function (data) {
           content += '<div class="mb-3">' + data + '</div>';
-        }
-      });
+        })
+        .fail(function (xhr, status, error) {
+          console.error('Error loading marker data for ' + marker.model_name + '/' + marker.id + ':', error);
+        });
     });
 
     $.when.apply($, requests).done(function () {
       infowindow.setContent('<div class="infowindow">' + (content.length > 0 ? content : '<em>Nothing to show</em>') + '</div>');
+      infowindow.open(window.map);
+    }).fail(function () {
+      console.error('Error loading cluster marker data');
     });
   },
 
@@ -460,7 +458,7 @@ window.DandelionMap = {
     // Create new markers from JSON data
     var markers = [];
     if (data.points && data.points.length > 0) {
-      markers = this.createMarkers(data.points, window.mapInfoWindow, bounds, data.enableInfoWindow, data.polygonPaths);
+      markers = this.createMarkers(data.points, window.mapInfoWindow, bounds, data.polygonPaths);
     }
 
     // Create new polygons if provided
@@ -477,7 +475,7 @@ window.DandelionMap = {
 
     // Setup new clustering
     if (markers.length > 0) {
-      this.setupClustering(markers, window.mapInfoWindow, data.enableInfoWindow);
+      this.setupClustering(markers, window.mapInfoWindow);
     }
 
     // Update points warning

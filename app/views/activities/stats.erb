@@ -3,4 +3,4 @@
 <%= partial :stats, locals: { memberships: @activity.activityships, accounts: @activity.members } %>
 
 <h2>Locations</h2>
-<%= partial :'maps/map', locals: { url: "/map?activity_id=#{@activity.id}&admin=1" } %>
+<%= partial :'maps/map', locals: { url: "/map?activity_id=#{@activity.id}" } %>

@@ -3,4 +3,4 @@
 <%= partial :stats, locals: { memberships: @local_group.local_groupships, accounts: @local_group.members } %>
 
 <h2>Locations</h2>
-<%= partial :'maps/map', locals: { url: "/map?local_group_id=#{@local_group.id}&admin=1" } %>
+<%= partial :'maps/map', locals: { url: "/map?local_group_id=#{@local_group.id}" } %>

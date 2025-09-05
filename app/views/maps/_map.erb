@@ -32,7 +32,6 @@
     var config = {
       points: points,
       polygonPaths: polygonPaths,
-      enableInfoWindow: <%= defined?(enable_info_window) && enable_info_window ? 'true' : 'false' %>,
       fillScreen: <%= defined?(fill_screen) && fill_screen ? 'true' : 'false' %>,
       url: <%== (binding.local_variable_defined?(:url) ? url : nil).to_json %>
       <% if defined?(bounding_box) && bounding_box %>

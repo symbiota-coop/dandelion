@@ -108,7 +108,7 @@
     <em>No dietary requirements.</em>
   <% end %>
 <% when 'map' %>
-  <%= partial :'maps/map', locals: { points: Account.and(:id.in => @memberships.pluck(:account_id)).and(:coordinates.ne => nil), enable_info_window: true } %>
+  <%= partial :'maps/map', locals: { points: Account.and(:id.in => @memberships.pluck(:account_id)).and(:coordinates.ne => nil) } %>
 <% when 'birthdays' %>
   <a class="badge badge-primary" style="font-weight: 500" id="ical" target="_blank" href="/g/<%=@gathering.slug%>/birthdays.ics?api_key=<%=current_account.api_key%>">
     iCal <i class="bi bi-box-arrow-up-right"></i>
