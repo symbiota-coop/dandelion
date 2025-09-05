@@ -86,15 +86,12 @@ window.DandelionMap = {
     window.map.setZoom(0);
   },
 
-  fitValidBounds: function (bounds, errorMessage) {
+  fitValidBounds: function (bounds) {
     var validBounds = this.validateBounds(bounds);
     if (validBounds) {
       window.map.fitBounds(validBounds);
       return true;
     } else {
-      if (errorMessage) {
-        console.warn(errorMessage, bounds);
-      }
       this.setDefaultView();
       return false;
     }
@@ -300,27 +297,18 @@ window.DandelionMap = {
   },
 
   setMapBounds: function (bounds, config) {
-    if (config.centre) {
-      console.log('using config.centre');
-      window.map.setCenter(new google.maps.LatLng(config.centre.lat, config.centre.lng));
-      window.map.setZoom(config.zoom);
-    } else if (config.bounds) {
-      console.log('using config.bounds');
-      this.fitValidBounds(config.bounds, 'Invalid bounds');
+    if (config.boundingBox) {
+      console.log('using config.boundingBox');
+      this.fitValidBounds(config.boundingBox);
     } else if (config.polygonPaths && config.polygonPaths.length > 0) {
       console.log('using config.polygonPaths');
       window.map.fitBounds(bounds);
-    } else if (!config.points || config.points.length === 0 || (config.points && config.points.length > this.POINTS_LIMIT)) {
-      if (config.boundingBox) {
-        console.log("using config.boundingBox");
-        this.fitValidBounds(config.boundingBox, 'Invalid bounding box');
-      } else {
-        console.log('using default view');
-        this.setDefaultView();
-      }
-    } else {
+    } else if (config.points && config.points.length > 0) {
       console.log('using map bounds');
       window.map.fitBounds(bounds);
+    } else {
+      console.log('using default view');
+      this.setDefaultView();
     }
   },
 
