@@ -1,5 +1,5 @@
 <div class="block-title <%= defined?(custom_class) ? custom_class : '' %>">
-  <h4 class="d-inline mr-1">
+  <h4 class="d-inline mr-1" <% if defined?(h4_style) %>style="<%=h4_style%>"<% end %>>
     <a class="text-dark" target="_parent" href="<%= "/e/#{event.slug}#{if @organisation && @organisation != event.organisation; "?cohost=#{@organisation.slug}"; end }"%>">
       <%= event.name %>
     </a>
