@@ -357,8 +357,10 @@ window.DandelionMap = {
           urlParams = $.deparam(urlParts[1]);
         }
 
+        queryParams = $.deparam(window.location.search.substring(1));
+
         // Merge url parameters with dynamic request parameters
-        var requestParams = jQuery.extend({}, urlParams, q, { display: 'map' });
+        var requestParams = jQuery.extend({}, urlParams, queryParams, q, { display: 'map' });
         var jsonUrl = basePath + '.json?' + $.param(requestParams);
 
         clearTimeout(window.mapTimer);
