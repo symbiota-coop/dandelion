@@ -93,7 +93,7 @@
           ['Location', '', {disabled: true, selected: params[:near].blank?}],
           ['Anywhere',''],
           ['Online', 'online'],
-          ([params[:near].split(',').first, params[:near]] if params[:near] && params[:near] != 'online' &&!local_group_options.map(&:last).include?(params[:near]))
+          ([params[:near], params[:near]] if params[:near] && params[:near] != 'online' &&!local_group_options.map(&:last).include?(params[:near]))
         ].compact + local_group_options).uniq,
         selected: params[:near], class: 'form-control d-inline-block', style: 'width: auto' %>
     <% end %>
