@@ -44,7 +44,7 @@ module OrderNotifications
       header_image_url = event.organisation.image.thumb('1920x1920').url
       batch_message.from "#{event.organisation.name} <#{ENV['TICKETS_EMAIL']}>"
     else
-      header_image_url = "#{ENV['BASE_URI']}/images/black-on-transparent-sq.png"
+      header_image_url = "#{ENV['BASE_URI']}/images/logos/black-on-transparent-sq.png"
       batch_message.from ENV['TICKETS_EMAIL_FULL']
     end
     batch_message.reply_to(event.email || event.organisation.reply_to)

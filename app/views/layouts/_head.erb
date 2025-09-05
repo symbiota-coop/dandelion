@@ -20,7 +20,7 @@
 
   <%= partial :'layouts/dependencies' %>
 
-  <%= favicon_tag 'black-on-transparent-sq.png' %>
+  <%= favicon_tag 'logos/black-on-transparent-sq.png' %>
   <title><% if @fulltitle %><%= @fulltitle %><% else %><%= "#{@title} · " if @title %><%= Padrino.env == :development ? 'DEV' : 'Dandelion' %><% end %></title>
   <meta name="description" content="<%= @og_desc %>">
   <meta property="og:title" content="<%= @title %>">

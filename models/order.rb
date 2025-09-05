@@ -4,6 +4,7 @@ class Order
   include BelongsToWithoutParentValidation
 
   include Mongoid::Paranoia
+
   %w[OrderNotFound Restored PaymentMethodNotFound NoTickets].each do |error_class|
     const_set(error_class, Class.new(StandardError))
   end
@@ -280,7 +281,7 @@ class Order
       order.tickets.each_with_index do |ticket, i|
         pdf.start_new_page unless i.zero?
         pdf.font "#{Padrino.root}/app/assets/fonts/PlusJakartaSans/ttf/PlusJakartaSans-Regular.ttf"
-        pdf.image (event.organisation.send_ticket_emails_from_organisation && event.organisation.image ? URI.parse(Addressable::URI.escape(event.organisation.image.thumb('1920x1920').url)).open : "#{Padrino.root}/app/assets/images/black-on-transparent-trim.png"), width: width / 4, position: :center
+        pdf.image (event.organisation.send_ticket_emails_from_organisation && event.organisation.image ? URI.parse(Addressable::URI.escape(event.organisation.image.thumb('1920x1920').url)).open : "#{Padrino.root}/app/assets/images/logos/black-on-transparent-trim.png"), width: width / 4, position: :center
         pdf.move_down 0.5 * cm
         pdf.text order.event.name, align: :center, size: 32
         pdf.move_down 0.5 * cm

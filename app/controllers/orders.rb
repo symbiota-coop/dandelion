@@ -200,7 +200,7 @@ Dandelion::App.controller do
     header_image_url = if event.organisation.send_ticket_emails_from_organisation && event.organisation.image
                          event.organisation.image.thumb('1920x1920').url
                        else
-                         "#{ENV['BASE_URI']}/images/black-on-transparent-sq.png"
+                         "#{ENV['BASE_URI']}/images/logos/black-on-transparent-sq.png"
                        end
 
     case content_type
