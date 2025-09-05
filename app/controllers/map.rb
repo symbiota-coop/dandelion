@@ -7,7 +7,6 @@ Dandelion::App.controller do
 
   get '/map', provides: %i[html json] do
     @accounts = []
-    @local_groups = []
 
     if params[:organisation_id]
       @organisation = Organisation.find(params[:organisation_id]) || not_found
@@ -19,7 +18,6 @@ Dandelion::App.controller do
     elsif params[:local_group_id]
       @local_group = LocalGroup.find(params[:local_group_id]) || not_found
       @accounts = Account.and(:id.in => @local_group.local_groupships.and(:hide_membership.ne => true).pluck(:account_id))
-      @local_groups = [@local_group]
     else
       @accounts = Account.all
     end
