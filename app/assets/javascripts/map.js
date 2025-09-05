@@ -277,7 +277,6 @@ window.DandelionMap = {
     }, this.dynamicLoadingTimeout);
 
     var content = '';
-    var self = this;
     var requests = markers.map(function (marker) {
       return $.get('/points/' + marker.model_name + '/' + marker.id)
         .done(function (data) {
@@ -380,8 +379,6 @@ window.DandelionMap = {
   },
 
   updateMapWithNewData: function (data, config) {
-    var self = this;
-
     // Clear existing markers and clusters
     if (window.markerClusterer) {
       window.markerClusterer.clearMarkers();
