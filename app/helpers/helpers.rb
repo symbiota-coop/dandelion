@@ -300,7 +300,7 @@ Dandelion::App.helpers do
     }
   end
 
-  def map_data_json(points, polygonables: nil)
+  def map_json(points, polygonables: nil)
     lat = params[:lat]
     lng = params[:lng]
     zoom = params[:zoom]

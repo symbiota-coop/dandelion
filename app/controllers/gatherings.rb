@@ -19,7 +19,7 @@ Dandelion::App.controller do
       @gatherings = @gatherings.paginate(page: params[:gatherings_page], per_page: 50)
       erb :'gatherings/gatherings'
     when :json
-      map_data_json(@gatherings)
+      map_json(@gatherings)
     end
   end
 

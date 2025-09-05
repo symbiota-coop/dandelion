@@ -99,7 +99,7 @@ Dandelion::App.controller do
         @events = @events.future(@from)
         @events = @events.and(:start_time.lt => @to + 1) if @to
         @events = @events.and(:locked.ne => true)
-        map_data_json(@events)
+        map_json(@events)
       else
         # Regular JSON response for events
         @events = @events.live

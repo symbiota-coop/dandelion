@@ -15,7 +15,7 @@ Dandelion::App.controller do
       @organisations = @organisations.paginate(page: params[:organisations_page], per_page: 50)
       erb :'organisations/organisations'
     when :json
-      map_data_json(@organisations)
+      map_json(@organisations)
     end
   end
 

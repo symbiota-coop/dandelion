@@ -12,11 +12,7 @@ Dandelion::App.controller do
     if params[:organisation_id]
       @organisation = Organisation.find(params[:organisation_id]) || not_found
       @accounts = Account.all
-      @accounts = if params[:monthly_donors]
-                    @accounts.and(:id.in => @organisation.organisationships.and(:hide_membership.ne => true, :monthly_donation_method.ne => nil).pluck(:account_id))
-                  else
-                    @accounts.and(organisation_ids_public_cache: @organisation.id)
-                  end
+      @accounts = @accounts.and(organisation_ids_public_cache: @organisation.id)
     elsif params[:activity_id]
       @activity = Activity.find(params[:activity_id]) || not_found
       @accounts = Account.and(:id.in => @activity.activityships.and(:hide_membership.ne => true).pluck(:account_id))
@@ -32,7 +28,7 @@ Dandelion::App.controller do
     when :html
       erb :'maps/map'
     when :json
-      map_data_json(@accounts, polygonables: @local_groups)
+      map_json(@accounts, polygonables: @local_groups)
     end
   end
 
