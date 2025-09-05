@@ -135,19 +135,16 @@ window.DandelionMap = {
 
     // Initialize info window
     var infowindow = new google.maps.InfoWindow();
+    window.mapInfoWindow = infowindow;
 
     // Create markers
-    var markers = this.createMarkers(config.points, infowindow, bounds, config.polygonPaths);
+    var markers = this.createMarkers(config.points, window.mapInfoWindow, bounds);
 
     // Create polygons
     var polygons = this.createPolygons(config.polygonPaths, bounds);
 
     // Setup clustering
     this.setupClustering(markers, infowindow);
-
-    // Store references globally for dynamic updates
-    window.mapInfoWindow = infowindow;
-    window.mapPolygons = polygons;
 
     // Set map bounds/center
     this.setMapBounds(bounds, config);
@@ -165,7 +162,7 @@ window.DandelionMap = {
     return { map: window.map, markers: markers, polygons: polygons };
   },
 
-  createMarkers: function (points, infowindow, bounds, polygonPaths) {
+  createMarkers: function (points, infowindow, bounds) {
     var markers = [];
 
     for (var i = 0; i < points.length; i++) {
@@ -190,11 +187,7 @@ window.DandelionMap = {
       // Add click listener
       this.addMarkerClickListener(marker, infowindow);
 
-      // Extend bounds if not using polygonPaths
-      if (!polygonPaths || polygonPaths.length === 0) {
-        console.log('pushed ' + marker.getPosition().toJSON() + ' to bounds');
-        bounds.extend(marker.getPosition());
-      }
+      bounds.extend(marker.getPosition());
 
       markers.push(marker);
     }
@@ -315,28 +308,13 @@ window.DandelionMap = {
     var self = this;
     google.maps.event.addListenerOnce(window.map, 'idle', function () {
       window.map.addListener('bounds_changed', function () {
-        var q;
         var bounds = window.map.getBounds().toJSON();
-        var center = window.map.getCenter().toJSON();
-        var zoom = window.map.getZoom();
-        if (config.url) {
-          q = {
-            south: bounds['south'],
-            west: bounds['west'],
-            north: bounds['north'],
-            east: bounds['east'],
-          };
-        } else {
-          q = {
-            south: bounds['south'],
-            west: bounds['west'],
-            north: bounds['north'],
-            east: bounds['east'],
-            lat: center['lat'],
-            lng: center['lng'],
-            zoom: zoom
-          };
-        }
+        var q = {
+          south: bounds['south'],
+          west: bounds['west'],
+          north: bounds['north'],
+          east: bounds['east'],
+        };
 
         // Parse URL to extract base path and existing parameters
         var url = config.url;
@@ -384,33 +362,12 @@ window.DandelionMap = {
       window.markerClusterer.clearMarkers();
     }
 
-    // Clear existing polygons
-    if (window.mapPolygons) {
-      window.mapPolygons.forEach(function (polygon) {
-        polygon.setMap(null);
-      });
-    }
-
-    // Create new bounds
-    var bounds = new google.maps.LatLngBounds();
-
-    // Initialize info window if it doesn't exist
-    if (!window.mapInfoWindow) {
-      window.mapInfoWindow = new google.maps.InfoWindow();
-    }
-
     // Create new markers from JSON data
+    var bounds = new google.maps.LatLngBounds();
     var markers = [];
     if (data.points && data.points.length > 0) {
-      markers = this.createMarkers(data.points, window.mapInfoWindow, bounds, data.polygonPaths);
+      markers = this.createMarkers(data.points, window.mapInfoWindow, bounds);
     }
-
-    // Create new polygons if provided
-    var polygons = [];
-    if (data.polygonPaths && data.polygonPaths.length > 0) {
-      polygons = this.createPolygons(data.polygonPaths, bounds);
-    }
-    window.mapPolygons = polygons;
 
     // Setup new clustering
     if (markers.length > 0) {

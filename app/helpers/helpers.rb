@@ -301,11 +301,7 @@ Dandelion::App.helpers do
   end
 
   def map_json(points, polygonables: nil)
-    lat = params[:lat]
-    lng = params[:lng]
-    zoom = params[:zoom]
     box = [[params[:west].to_f, params[:south].to_f], [params[:east].to_f, params[:north].to_f]]
-
     points = points.and(coordinates: { '$geoWithin' => { '$box' => box } })
 
     {
@@ -322,20 +318,7 @@ Dandelion::App.helpers do
                   }
                 end
               end,
-      pointsCount: points.count,
-      polygonPaths: if polygonables
-                      polygonables.flat_map do |polygonable|
-                        polygonable.polygons.map do |polygon|
-                          polygon.coordinates[0].map do |coordinate|
-                            { lat: coordinate[1], lng: coordinate[0] }
-                          end
-                        end
-                      end
-                    else
-                      []
-                    end,
-      centre: (lat && lng ? { lat: lat.to_f, lng: lng.to_f } : nil),
-      zoom: zoom&.to_i
+      pointsCount: points.count
     }.to_json
   end
 end
