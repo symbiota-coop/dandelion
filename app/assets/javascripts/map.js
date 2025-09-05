@@ -215,6 +215,8 @@ window.DandelionMap = {
         strokeWeight: 0
       });
 
+      infowindow.setContent('<div class="infowindow"></div>');
+
       $.get('/points/' + marker.model_name + '/' + marker.id)
         .done(function (data) {
           infowindow.setContent('<div class="infowindow">' + data + '</div>');
@@ -279,6 +281,7 @@ window.DandelionMap = {
       return a.n - b.n;
     });
 
+    infowindow.setContent('<div class="infowindow"></div>');
     infowindow.setPosition(cluster.getCenter());
 
     setTimeout(function () {
