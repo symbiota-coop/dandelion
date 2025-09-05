@@ -28,7 +28,7 @@ Dandelion::App.controller do
     when :html
       erb :'maps/map'
     when :json
-      map_json(@accounts, polygonables: @local_groups)
+      map_json(@accounts)
     end
   end
 
