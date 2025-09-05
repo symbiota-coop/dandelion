@@ -203,6 +203,18 @@ window.DandelionMap = {
         clearTimeout(window.mapTimer);
       }, timeout);
 
+      // Store original icon and label for restoration
+      var originalIcon = marker.getIcon();
+
+      // Change to loading icon
+      marker.setIcon({
+        path: mapIcons.shapes.MAP_PIN,
+        fillColor: originalIcon.fillColor,
+        fillOpacity: 0.5,
+        strokeColor: '',
+        strokeWeight: 0
+      });
+
       $.get('/points/' + marker.model_name + '/' + marker.id)
         .done(function (data) {
           infowindow.setContent('<div class="infowindow">' + data + '</div>');
@@ -210,6 +222,10 @@ window.DandelionMap = {
         })
         .fail(function (xhr, status, error) {
           console.error('Error loading marker data:', error);
+        })
+        .always(function () {
+          // Restore original icon and label
+          marker.setIcon(originalIcon);
         });
     });
   },
@@ -269,6 +285,12 @@ window.DandelionMap = {
       clearTimeout(window.mapTimer);
     }, this.dynamicLoadingTimeout);
 
+    // Change cluster opacity to indicate loading
+    var clusterIcon = cluster.clusterIcon_;
+    if (clusterIcon && clusterIcon.div_) {
+      clusterIcon.div_.style.opacity = '0.5';
+    }
+
     var content = '';
     var requests = markers.map(function (marker) {
       return $.get('/points/' + marker.model_name + '/' + marker.id)
@@ -285,6 +307,11 @@ window.DandelionMap = {
       infowindow.open(window.map);
     }).fail(function () {
       console.error('Error loading cluster marker data');
+    }).always(function () {
+      // Restore cluster opacity
+      if (clusterIcon && clusterIcon.div_) {
+        clusterIcon.div_.style.opacity = '1';
+      }
     });
   },
 
