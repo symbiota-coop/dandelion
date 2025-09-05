@@ -27,6 +27,20 @@ $color_superlight: #F9F8FA;
   border: 0 !important
 }
 
+div.block-title.map-event {
+  margin-bottom: 0.5rem !important;
+}
+
+div.block-title.map-event h4 {
+  font-size: 1.1rem !important;
+  display: inline-block !important;
+  margin-bottom: 0 !important;
+}
+
+ul.map-event li {
+  font-size: 0.85rem !important
+}
+
 body.gradient,
 body.gradient #content {
   background:
