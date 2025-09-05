@@ -304,7 +304,7 @@ window.DandelionMap = {
       console.log('using config.polygonPaths');
       window.map.fitBounds(bounds);
     } else if (config.points && config.points.length > 0) {
-      console.log('using map bounds');
+      console.log('using config.points');
       window.map.fitBounds(bounds);
     } else {
       console.log('using default view');
