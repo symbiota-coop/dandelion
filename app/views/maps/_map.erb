@@ -32,10 +32,8 @@
       points: points,
       polygonPaths: polygonPaths,
       fillScreen: <%= defined?(fill_screen) && fill_screen ? 'true' : 'false' %>,
-      url: <%== (binding.local_variable_defined?(:url) ? url : nil).to_json %>
-      <% if defined?(bounding_box) && bounding_box %>
-        , boundingBox: <%= bounding_box.to_json %>
-      <% end %>
+      url: <%== (binding.local_variable_defined?(:url) ? url : nil).to_json %>,
+      boundingBox: <%== (defined?(bounding_box) ? bounding_box : nil).to_json  %>
     };
 
     // Initialize the map

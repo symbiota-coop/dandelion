@@ -336,6 +336,7 @@ window.DandelionMap = {
 
   setupDynamicLoading: function (config) {
     var self = this;
+    var isFirstLoad = true;
     google.maps.event.addListenerOnce(window.map, 'idle', function () {
       window.map.addListener('bounds_changed', function () {
         var bounds = window.map.getBounds().toJSON();
@@ -373,7 +374,8 @@ window.DandelionMap = {
             method: 'GET',
             dataType: 'json',
             success: function (data) {
-              self.updateMapWithNewData(data, config);
+              self.updateMapWithNewData(data, config, isFirstLoad);
+              isFirstLoad = false;
               window.map.setOptions(self.mapOptions);
             },
             error: function (xhr, status, error) {
@@ -388,7 +390,7 @@ window.DandelionMap = {
     });
   },
 
-  updateMapWithNewData: function (data, config) {
+  updateMapWithNewData: function (data, config, isFirstLoad) {
     // Clear existing markers and clusters
     if (window.markerClusterer) {
       window.markerClusterer.clearMarkers();
@@ -413,5 +415,9 @@ window.DandelionMap = {
       $('#points-warning').hide();
     }
 
+    // Fit map to new points only on first load and if no specific bounds are configured
+    if (isFirstLoad && markers.length > 0 && !config.boundingBox && (!config.polygonPaths || config.polygonPaths.length === 0)) {
+      window.map.fitBounds(bounds);
+    }
   }
 };
