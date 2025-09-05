@@ -49,14 +49,6 @@ window.DandelionMap = {
     fillOpacity: 0.35
   },
 
-  boundingBoxStyle: {
-    strokeColor: '#000000',
-    strokeOpacity: 0.1,
-    strokeWeight: 2,
-    fillColor: '#000000',
-    fillOpacity: 0.05
-  },
-
   // Model configurations for map markers
   models: [
     { name: 'Organisation', color: '#FF5241', icon: 'bi bi-flag-fill' },
@@ -144,12 +136,6 @@ window.DandelionMap = {
     window.map = new google.maps.Map(document.getElementById("map-canvas"), mapOptions);
     var bounds = new google.maps.LatLngBounds();
 
-    // Handle bounding box if provided
-    var boundingBoxPolygon = null;
-    if (config.boundingBox) {
-      boundingBoxPolygon = this.drawBoundingBox(config.boundingBox);
-    }
-
     // Initialize info window
     var infowindow = new google.maps.InfoWindow();
 
@@ -165,7 +151,6 @@ window.DandelionMap = {
     // Store references globally for dynamic updates
     window.mapInfoWindow = infowindow;
     window.mapPolygons = polygons;
-    window.mapBoundingBoxPolygon = boundingBoxPolygon;
 
     // Set map bounds/center
     this.setMapBounds(bounds, config);
@@ -181,27 +166,6 @@ window.DandelionMap = {
     }
 
     return { map: window.map, markers: markers, polygons: polygons };
-  },
-
-  drawBoundingBox: function (boundingBox) {
-    var west = parseFloat(boundingBox[0]);
-    var south = parseFloat(boundingBox[1]);
-    var east = parseFloat(boundingBox[2]);
-    var north = parseFloat(boundingBox[3]);
-
-    var boundingBoxPaths = [
-      { lat: south, lng: west },
-      { lat: north, lng: west },
-      { lat: north, lng: east },
-      { lat: south, lng: east }
-    ];
-
-    var boundingBoxPolygon = new google.maps.Polygon(Object.assign({}, this.boundingBoxStyle, {
-      paths: boundingBoxPaths,
-      map: window.map
-    }));
-
-    return boundingBoxPolygon;
   },
 
   createMarkers: function (points, infowindow, bounds, polygonPaths) {
@@ -442,11 +406,6 @@ window.DandelionMap = {
       });
     }
 
-    // Clear existing bounding box
-    if (window.mapBoundingBoxPolygon) {
-      window.mapBoundingBoxPolygon.setMap(null);
-    }
-
     // Create new bounds
     var bounds = new google.maps.LatLngBounds();
 
@@ -467,11 +426,6 @@ window.DandelionMap = {
       polygons = this.createPolygons(data.polygonPaths, bounds);
     }
     window.mapPolygons = polygons;
-
-    // Redraw bounding box if it exists in config
-    if (config.boundingBox) {
-      window.mapBoundingBoxPolygon = this.drawBoundingBox(config.boundingBox);
-    }
 
     // Setup new clustering
     if (markers.length > 0) {
