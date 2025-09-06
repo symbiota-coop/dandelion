@@ -29,10 +29,24 @@ render_article("Trending events", "Create a two-paragraph summary of these trend
     <div class="article single-column">
       <h3>Book of the day</h3>
       <div>
-        <% book = Book.all(filter: '{Dandelion} = 1').shuffle.first %>
-        <a href="/books/<%= book['Slug'] %>">
-          <img style="max-width: 100%" src="/books/<%= book['Slug'] %>.jpg">
-        </a>
+        <%
+        begin
+          book = Book.all(filter: '{Dandelion} = 1').shuffle.first
+        rescue Airrecord::Error => e
+          if e.message.include?('503') || e.message.include?('Service Unavailable')
+            book = nil
+          else
+            raise e
+          end
+        end
+        %>
+        <% if book %>
+          <a href="/books/<%= book['Slug'] %>">
+            <img style="max-width: 100%" src="/books/<%= book['Slug'] %>.jpg">
+          </a>
+        <% else %>
+          <p class="text-muted">Book of the day temporarily unavailable</p>
+        <% end %>
       </div>
     </div>
   </div>
@@ -40,10 +54,24 @@ render_article("Trending events", "Create a two-paragraph summary of these trend
     <div class="article single-column">
       <h3>Film of the day</h3>
       <div>
-        <% film = Film.all.shuffle.first %>
-        <a href="<%= film['URL'] %>">
-          <img style="max-width: 100%" src="/films/<%= film['Slug'] %>.jpg">
-        </a>
+        <%
+        begin
+          film = Film.all.shuffle.first
+        rescue Airrecord::Error => e
+          if e.message.include?('503') || e.message.include?('Service Unavailable')
+            film = nil
+          else
+            raise e
+          end
+        end
+        %>
+        <% if film %>
+          <a href="<%= film['URL'] %>">
+            <img style="max-width: 100%" src="/films/<%= film['Slug'] %>.jpg">
+          </a>
+        <% else %>
+          <p class="text-muted">Film of the day temporarily unavailable</p>
+        <% end %>
       </div>
     </div>
   </div>
