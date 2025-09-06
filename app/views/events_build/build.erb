@@ -33,7 +33,18 @@
   </a>
 </p>
 
-<%= partial :'events_build/build_js' %>
+<script>
+  buildShowIntro = <%= params[:tour] || (!ENV['SKIP_TOURS'] && params[:new_org] && !params[:draft_id]) ? true : false %>
+  buildDraft = <%== @draft ? @draft.json : nil.to_json %>
+  buildNewRecord = <%= @event.new_record? %>
+  buildTimeZoneSuffix = <%== "in #{Time.zone.now.strftime('%Z')} (UTC #{Time.zone.now.formatted_offset}) (your profile\'s time zone)".to_json %>
+  buildImageRequiredWidth = <%= @event.organisation.try(:event_image_required_width).to_json %>
+  buildImageRequiredHeight = <%= @event.organisation.try(:event_image_required_height).to_json %>
+  buildIsOrgAdmin = <%= organisation_admin?(@event.organisation) %>
+  buildRevenueSharingEnabled = <%= @event.organisation.try(:stripe_client_id) ? true : false %>
+  eventId = <%== @event.id.to_json %>
+</script>
+<script src="/javascripts/events_build.js?<%= @cachebuster %>"></script>
 
 <%= partial :'events_build/drafts' %>
 
