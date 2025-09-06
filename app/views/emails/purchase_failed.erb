@@ -4,7 +4,7 @@
     We received an error from Stripe when <%= account.name %> (<a href="mailto:<%=account.email%>"><%=account.email%></a>) attempted to purchase ticket(s) for the event <a href="<%= ENV['BASE_URI'] %>/e/<%=event.slug%>"><%= event.name %></a>:
   </p>
   <blockquote>
-    <%= error.message %>
+    <%= Rinku.auto_link(error.message) %>
   </blockquote>
   <p>
     We've locked the event on Dandelion to prevent further errors.
