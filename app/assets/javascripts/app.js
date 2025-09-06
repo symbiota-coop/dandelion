@@ -52,8 +52,6 @@ $(function () {
   $('.either-or input[type="checkbox"]').change(function () {
     if (this.checked) {
       $('.either-or input[type="checkbox"]').not(this).prop('checked', false);
-    } else {
-      $('.either-or input[type="checkbox"]').not(this).prop('checked', true);
     }
   });
 
