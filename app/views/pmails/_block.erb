@@ -1,5 +1,5 @@
 <div class="block">
-  <h4 class="block-title" style="font-size: 1.35rem">
+  <h4 class="block-title" style="font-size: 1.35rem; font-weight: 600">
     <a class="text-dark" target="_blank" href="<%= "/pmails/#{pmail.id}" %>" onclick="event.stopPropagation();"><%= pmail.subject %></a>
     <small>
       <%= time_ago_in_words(pmail.sent_at) %> ago
