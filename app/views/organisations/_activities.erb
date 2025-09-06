@@ -23,7 +23,7 @@
     <% end %>
   </div>
 </div>
-<% activities = @activities.paginate(page: params[:page], per_page: 16) %>
+<% activities = @activities.paginate(page: params[:page], per_page: 12) %>
 <%= partial :'activities/blocks', locals: { activities: activities } %>
 <div class="mt-3">
   <%= will_paginate activities, inner_window: 0, outer_window: 0, renderer: WillPaginate::ViewHelpers::BootstrapRenderer %>

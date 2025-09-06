@@ -23,7 +23,7 @@
     <% end %>
   </div>
 </div>
-<% local_groups = @local_groups.paginate(page: params[:page], per_page: 10) %>
+<% local_groups = @local_groups.paginate(page: params[:page], per_page: 5) %>
 <%= partial :'local_groups/blocks', locals: { local_groups: local_groups } %>
 <div class="mt-3">
   <%= will_paginate local_groups, inner_window: 0, outer_window: 0, renderer: WillPaginate::ViewHelpers::BootstrapRenderer %>
