@@ -2,7 +2,7 @@
   <h4 class="block-title" style="font-size: 1.35rem">
     <a class="text-dark" target="_blank" href="<%= "/pmails/#{pmail.id}" %>" onclick="event.stopPropagation();"><%= pmail.subject %></a>
     <small>
-      <%= pmail.sent_at.to_date %>
+      <%= time_ago_in_words(pmail.sent_at) %> ago
     </small>
   </h4>
 </div>
