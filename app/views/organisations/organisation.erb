@@ -50,7 +50,7 @@
 <% end %>
 
 <% if @organisation.news.count > 0 %>
-  <h2 class="mt-5 mb-3">Latest news</h2>
+  <h2 class="mt-5 mb-3">Latest newsletters</h2>
   <div data-with-placeholder data-pagelet-url="/o/<%= @organisation.slug %>/news">
     <%= partial :'pmails/blocks_placeholder' %>
   </div>
