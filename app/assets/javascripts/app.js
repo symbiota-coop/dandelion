@@ -44,6 +44,15 @@ $.fn.serializeObject = function () {
 };
 
 $(function () {
+
+  $('.either-or input[type="checkbox"]').on('change', function () {
+    if (this.checked) {
+      $('.either-or input[type="checkbox"]').not(this).prop('checked', false);
+    } else {
+      $('.either-or input[type="checkbox"]').not(this).prop('checked', true);
+    }
+  });
+
   function ajaxCompleted () {
     $('input[type=file]').change(function () {
       if (this.files.length > 0 && this.files[0].size > 10e6) {

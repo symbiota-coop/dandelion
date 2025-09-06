@@ -24,9 +24,13 @@ Dandelion::App.controller do
     %i[organisation activity local_group].each do |r|
       @events = @events.and("#{r}_id": params[:"#{r}_id"]) if params[:"#{r}_id"]
     end
-    unless params[:online] && params[:in_person]
-      @events = @events.online if params[:online]
-      @events = @events.in_person if params[:in_person]
+    if params[:online]
+      @events = @events.online
+      params[:in_person] = false
+    end
+    if params[:in_person]
+      @events = @events.in_person
+      params[:online] = false
     end
     @events = @events.and(:hidden_from_homepage.ne => true) if params[:home]
     @events = @events.and(:image_uid.ne => nil) if params[:images]

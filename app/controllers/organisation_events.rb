@@ -180,9 +180,13 @@ Dandelion::App.controller do
     @events = @events.and(coordinator_id: params[:coordinator_id]) if params[:coordinator_id]
     @events = @events.and(coordinator_id: nil) if params[:no_coordinator]
     @events = @events.and(:id.nin => EventFacilitation.pluck(:event_id)) if params[:no_facilitators]
-    unless params[:online] && params[:in_person]
-      @events = @events.online if params[:online]
-      @events = @events.in_person if params[:in_person]
+    if params[:online]
+      @events = @events.online
+      params[:in_person] = false
+    end
+    if params[:in_person]
+      @events = @events.in_person
+      params[:online] = false
     end
     @events = @events.and(local_group_id: params[:local_group_id]) if params[:local_group_id]
     @events = @events.and(activity_id: params[:activity_id]) if params[:activity_id]
