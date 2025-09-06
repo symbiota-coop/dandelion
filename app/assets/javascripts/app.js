@@ -45,7 +45,11 @@ $.fn.serializeObject = function () {
 
 $(function () {
 
-  $('.either-or input[type="checkbox"]').on('change', function () {
+  $(document).on('click', 'input[type=datetime-local]', function () {
+    this.showPicker()
+  });
+
+  $('.either-or input[type="checkbox"]').change(function () {
     if (this.checked) {
       $('.either-or input[type="checkbox"]').not(this).prop('checked', false);
     } else {
