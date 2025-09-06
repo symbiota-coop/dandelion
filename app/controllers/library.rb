@@ -1,12 +1,34 @@
 Dandelion::App.controller do
+  # Helper method to handle Airrecord API calls with retry logic for 503 errors
+  def airtable_with_retry(max_retries: 3, delay: 1, &block)
+    retries = 0
+    begin
+      yield
+    rescue Airrecord::Error => e
+      # Check if it's a 503 Service Unavailable error
+      if e.message.include?('503') && retries < max_retries
+        retries += 1
+        sleep(delay * retries) # Exponential backoff
+        retry
+      else
+        # Re-raise the error if it's not a 503 or we've exceeded retries
+        raise e
+      end
+    end
+  end
+
   get '/books' do
     @title = 'Books'
-    @books = Book.all(sort: { 'Original Publication Year or Year Published' => 'desc' }, filter: '{Dandelion} = 1')
+    @books = airtable_with_retry do
+      Book.all(sort: { 'Original Publication Year or Year Published' => 'desc' }, filter: '{Dandelion} = 1')
+    end
     erb :'books/books'
   end
 
   get '/books/:slug', provides: [:html, :jpg] do
-    @book = Book.all(filter: "{Slug} = '#{params[:slug]}'").first || not_found
+    @book = airtable_with_retry do
+      Book.all(filter: "{Slug} = '#{params[:slug]}'").first
+    end || not_found
     @title = "#{@book['Title']} by #{@book['Author']}"
 
     case content_type
@@ -23,12 +45,16 @@ Dandelion::App.controller do
 
   get '/films' do
     @title = 'Films'
-    @films = Film.all(sort: { 'Year' => 'desc' })
+    @films = airtable_with_retry do
+      Film.all(sort: { 'Year' => 'desc' })
+    end
     erb :'films/films'
   end
 
   get '/films/:slug', provides: :jpg do
-    @film = Film.all(filter: "{Slug} = '#{params[:slug]}'").first || not_found
+    @film = airtable_with_retry do
+      Film.all(filter: "{Slug} = '#{params[:slug]}'").first
+    end || not_found
     redirect @film['Images'].first['url']
   end
 
