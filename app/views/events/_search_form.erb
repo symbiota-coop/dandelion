@@ -8,11 +8,11 @@
   })
 </script>
 
-<% if params[:display] == 'map' %>
+<% if params[:display].in?(['map', 'calendar']) %>
   <%= partial :'events/toggle_search_well' %>
 <% end %>
 
-<div class="search well" style="<%= 'display: none;' if params[:display] == 'map' %>">
+<div class="search well" style="<%= 'display: none;' if params[:display].in?(['map', 'calendar']) %>">
 
   <% form_tag '/events', method: 'get', class: 'submitOnChange searchForm mb-3' do %>
     <%= hidden_field_tag :display, value: params[:display] %>
