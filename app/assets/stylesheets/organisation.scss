@@ -10,6 +10,10 @@ $theme-color: #00B963 !default;
   color: $theme-color !important;
 }
 
+#calendar a.fc-event {
+  color: $theme-color !important;
+}
+
 // =============================================================================
 // SEARCH COMPONENTS
 // =============================================================================
