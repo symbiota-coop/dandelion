@@ -28,11 +28,11 @@
     <div class="form-row align-items-end">
       <div class="form-group col-12 col-sm-auto">
         <label>Events between</label>
-        <%= text_field_tag :from, class: 'form-control datepicker', placeholder: @organisation.start_date_placeholder, value: (@from.to_fs(:db_local) if @from && !@past) %>
+        <%= text_field_tag :from, class: 'form-control datepicker', placeholder: (@organisation.start_date_placeholder if params[:minimal]), value: (@from.to_fs(:db_local) if @from && !@past) %>
       </div>
       <div class="form-group col-12 col-sm-auto">
         <label>and</label>
-        <%= text_field_tag :to, class: 'form-control datepicker', placeholder: @organisation.end_date_placeholder, value: (@to.to_fs(:db_local) if @to) %>
+        <%= text_field_tag :to, class: 'form-control datepicker', placeholder: (@organisation.end_date_placeholder if params[:minimal]), value: (@to.to_fs(:db_local) if @to) %>
       </div>
       <div class="form-group col-12 col-sm-auto">
         <label>containing the word</label>
@@ -54,7 +54,7 @@
         <% if @organisation.event_types %>
           <div class="form-group col-12 col-sm-auto">
             <label>Event type</label>
-            <%= select_tag :event_type, options: [[@organisation.event_types_placeholder, '', {disabled: true, selected: params[:event_type].blank?}]] + @organisation.event_types.split(',').map { |type| [type, type.parameterize] }, selected: params[:event_type], class: 'form-control select-placeholder' %>
+            <%= select_tag :event_type, options: [[(@organisation.event_types_placeholder if params[:minimal]), '', {disabled: true, selected: params[:event_type].blank?}]] + @organisation.event_types.split(',').map { |type| [type, type.parameterize] }, selected: params[:event_type], class: 'form-control select-placeholder' %>
           </div>
         <% end %>
         <div class="form-group col-12 col-sm-auto">
