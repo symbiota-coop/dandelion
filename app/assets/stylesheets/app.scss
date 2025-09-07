@@ -13,7 +13,8 @@ $body_font_size: 0.825rem;
 $badge_font_size: 0.75rem;
 $body_text: #212529;
 $bg_well: #F5F5F5;
-$calendar_grey: #555;
+$placeholder_grey: #6c757d;
+$calendar_grey: $placeholder_grey;
 $color_highlight_1: #4400B9;
 $color_highlight_1_light_1: lighten($color_highlight_1, 57.5%);
 $color_highlight_1_light_2: lighten($color_highlight_1, 42.5%);
@@ -25,7 +26,7 @@ $color_superlight: #F9F8FA;
 @import "../infinite_admin/scss/style";
 
 .select-placeholder {
-  color: #6c757d !important;
+  color: $placeholder_grey !important;
 }
 
 .navbar-xs-justified {
