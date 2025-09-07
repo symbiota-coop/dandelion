@@ -16,17 +16,24 @@
           .then(response => response.json())
           .then(data => {
             var events = data.map(function(event) {
+              // For multi-day events, only show the start day
+              var startDate = new Date(event.start_time);
+              var endDate = new Date(event.end_time);
+              var isMultiDay = startDate.toDateString() !== endDate.toDateString();
+
               return {
                 id: event.id,
-                title: event.name,
+                title: isMultiDay ? event.name + ' starts' : event.name,
                 start: event.start_time,
-                end: event.end_time,
+                end: isMultiDay ? null : event.end_time, // Don't set end for multi-day events
+                allDay: isMultiDay, // Make multi-day events appear as all-day on start date
                 url: '/e/' + event.slug,
                 color: <%== (params[:minimal] && @organisation.theme_color ? @organisation.theme_color : '#4400B9').to_json %>,
                 extendedProps: {
                   location: event.location,
                   organisation: event.organisation,
-                  time_zone: event.time_zone
+                  isMultiDay: isMultiDay,
+                  when_details: event.when_details
                 }
               };
             });
@@ -49,22 +56,10 @@
       },
       eventDidMount: function(info) {
         // Initialize Bootstrap tooltip for each event
-        var eventTime = moment(info.event.start);
-        var eventTimeZone = info.event.extendedProps.time_zone;
-
-        // Format time in the event's timezone
-        var formattedTime;
-        try {
-          formattedTime = eventTime.tz(eventTimeZone).format('ddd Do MMM YYYY h:mm A z');
-        } catch (e) {
-          // Fallback if timezone data is not available
-          formattedTime = eventTime.format('ddd Do MMM YYYY h:mm A');
-        }
-
         var tooltipContent = '<strong>' + info.event.title + '</strong><br>' +
           (info.event.extendedProps.organisation ? info.event.extendedProps.organisation + '<br>' : '') +
           (info.event.extendedProps.location ? info.event.extendedProps.location + '<br>' : '') +
-          '<small>' + formattedTime + '</small>';
+          '<small>' + info.event.extendedProps.when_details + '</small>';
 
         // Target the specific element for tooltip based on view type
         var tooltipTarget = info.el;
