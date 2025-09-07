@@ -332,7 +332,6 @@ Dandelion::App.helpers do
         slug: event.slug,
         location: event.location,
         organisation: event.organisation&.name,
-        description: event.description,
         time_zone: event.time_zone_or_default
       }
     end.to_json
