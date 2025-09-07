@@ -46,6 +46,6 @@
     <%= hidden_field_tag :search, value: 1 %>
   <% end %>
 
-  <%= partial :'events/view_options', locals: { calendar_view: true, path: (path if defined?(path)) } %>
+  <%= partial :'events/view_options', locals: { path: (path if defined?(path)) } %>
 
 </div>
