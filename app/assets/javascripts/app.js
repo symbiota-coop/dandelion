@@ -45,7 +45,6 @@ $.fn.serializeObject = function () {
 
 $(function () {
 
-
   function styleSelectElement (select) {
     if ($(select).find('option:selected').is(':disabled')) {
       $(select).css('color', '#6c757d');
