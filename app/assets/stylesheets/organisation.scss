@@ -40,6 +40,11 @@ a:active {
   color: darken($theme-color, 6.66%);
 }
 
+a.text-primary:hover,
+a.text-primary:focus {
+  color: darken($theme-color, 6.66%) !important;
+}
+
 // =============================================================================
 // BUTTONS
 // =============================================================================
