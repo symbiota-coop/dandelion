@@ -42,20 +42,31 @@
             failureCallback(error);
           });
       },
-      eventClick: function(info) {
-        // Check for modifier keys (cmd on Mac, ctrl on Windows/Linux)
-        if (info.jsEvent.metaKey || info.jsEvent.ctrlKey) {
-          // Allow default behavior for cmd/ctrl+click to open in new tab
-          return;
-        }
-        // For regular clicks, open in same window
-        window.open(info.event.url, '_parent');
-        info.jsEvent.preventDefault();
-      },
+      <% if params[:minimal] %>
+        eventClick: function(info) {
+          // Check for modifier keys (cmd on Mac, ctrl on Windows/Linux)
+          if (info.jsEvent.metaKey || info.jsEvent.ctrlKey) {
+            // Allow default behavior for cmd/ctrl+click to open in new tab
+            return;
+          }
+          // For regular clicks, open in same window
+          window.open(info.event.url, '_parent');
+          info.jsEvent.preventDefault();
+        },
+      <% end %>
       eventDidMount: function(info) {
         // Initialize Bootstrap tooltip for each event
+        var locationIcon = '';
+        if (info.event.extendedProps.location) {
+          if (info.event.extendedProps.location === 'Online') {
+            locationIcon = '<i class="bi bi-camera-video-fill"></i> ';
+          } else {
+            locationIcon = '<i class="bi bi-geo-alt-fill"></i> ';
+          }
+        }
+
         var tooltipContent = '<strong>' + info.event.title + '</strong><br>' +
-          (info.event.extendedProps.location ? info.event.extendedProps.location + '<br>' : '') +
+          (info.event.extendedProps.location ? locationIcon + info.event.extendedProps.location + '<br>' : '') +
           '<small>' + info.event.extendedProps.when_details + '</small>';
 
         // Target the specific element for tooltip based on view type
