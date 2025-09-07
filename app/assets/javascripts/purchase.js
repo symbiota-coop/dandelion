@@ -1,6 +1,16 @@
-/* global timeAgo, eventId, eventUrl, placesRemaining, currency, currencySymbol, minimumApplicationFee, stripePk, stripeAccount, coinbase, organisationOcSlug, ocSlug, evmAddress, contractAddress, networkId, networkName, signedIn */
+/* global Stripe, Web3, ethereum */
 
 $(function () {
+  // Centralized configuration: prefer JSON from #purchase-config, then window.purchaseConfig, else {}
+  const config = (function () {
+    try {
+      const el = document.getElementById('purchase-config')
+      if (el) { return JSON.parse(el.textContent || '{}') }
+    } catch (e) {
+      // fall through to window.purchaseConfig
+    }
+    return (window.purchaseConfig || {})
+  })()
   $('#details form').on('keyup keypress', function (e) {
     const keyCode = e.keyCode || e.which
     if (keyCode === 13 && e.target.tagName !== 'TEXTAREA') {
@@ -14,8 +24,8 @@ $(function () {
       const donationAmount = parseFloat($('#donation_amount').val())
       if (donationAmount < 0) {
         $('#donation_amount').val('')
-      } else if (donationAmount > 0 && minimumApplicationFee && donationAmount < minimumApplicationFee) {
-        $('#donation_amount').val(minimumApplicationFee)
+      } else if (donationAmount > 0 && config.minimumApplicationFee && donationAmount < config.minimumApplicationFee) {
+        $('#donation_amount').val(config.minimumApplicationFee)
       } else {
         $('#donation_amount').val(donationAmount.toFixed(2).endsWith('00') ? donationAmount.toFixed(0) : donationAmount.toFixed(2))
       }
@@ -85,9 +95,9 @@ $(function () {
 
     if (typeof dp !== 'undefined') {
       let donationAmount = parseFloat(p * (dp / 100))
-      if (minimumApplicationFee && donationAmount < minimumApplicationFee) {
+      if (config.minimumApplicationFee && donationAmount < config.minimumApplicationFee) {
         $('#donation-percent-buttons button').addClass('btn-outline-secondary').removeClass('btn-secondary')
-        $('#donation_amount').val(minimumApplicationFee)
+        $('#donation_amount').val(config.minimumApplicationFee)
       } else {
         $('#donation-percent-buttons button.selected-percent').removeClass('btn-outline-secondary').addClass('btn-secondary')
         $('#donation_amount').val(donationAmount.toFixed(2).endsWith('00') ? donationAmount.toFixed(0) : donationAmount.toFixed(2))
@@ -119,10 +129,10 @@ $(function () {
     } else if (b > 0) {
       $('#balance').val((+b).toFixed(2))
       let via_card
-      if (coinbase || gocardless || ocSlug || evmAddress) { via_card = ' via card' } else { via_card = '' }
+      if (config.coinbase || config.gocardless || config.ocSlug || config.evmAddress) { via_card = ' via card' } else { via_card = '' }
       $('#details form button[data-payment-method]:eq(1)').removeClass('btn-dotted')
       $('#details form button[data-payment-method=rsvp]').hide()
-      $('#details form button[data-payment-method=stripe]').show().find('span').text('Pay ' + currencySymbol + (+b).toFixed(2) + via_card)
+      $('#details form button[data-payment-method=stripe]').show().find('span').text('Pay ' + config.currencySymbol + (+b).toFixed(2) + via_card)
       $('#details form button[data-payment-method=coinbase]').show()
       $('#details form button[data-payment-method=gocardless]').show()
       $('#details form button[data-payment-method=opencollective]').show()
@@ -166,9 +176,9 @@ $(function () {
       return false
     }
 
-    if (placesRemaining) {
-      if (numberOfTickets > placesRemaining) {
-        alert('Please select a maximum of ' + placesRemaining + (placesRemaining == 1 ? ' ticket' : ' tickets'))
+    if (config.placesRemaining) {
+      if (numberOfTickets > config.placesRemaining) {
+        alert('Please select a maximum of ' + config.placesRemaining + (config.placesRemaining == 1 ? ' ticket' : ' tickets'))
         return false
       }
     }
@@ -178,25 +188,25 @@ $(function () {
       return false
     }
 
-    if (typeof timeAgo !== 'undefined') {
-      if (!confirm('This event started ' + timeAgo + ' ago. Press OK to continue, or Cancel to go back.')) { return false }
+    if (config.timeAgo) {
+      if (!confirm('This event started ' + config.timeAgo + ' ago. Press OK to continue, or Cancel to go back.')) { return false }
     }
 
-    if (!signedIn) {
+    if (!config.signedIn) {
       if (!confirm('You entered your email address as ' + $('#account_email').val() + '. Press OK to continue, or Cancel to go back.')) { return false }
     }
 
     $('#total').val($('#totalDisplay').val())
     $('#details form button[data-payment-method-clicked] i').show()
 
-    $.post('/events/' + eventId + '/purchase', {
+    $.post('/events/' + config.eventId + '/purchase', {
       ticketForm: $('#ticket-types form').serializeObject(),
       detailsForm: $('#details form').serializeObject()
     }, function (data) {
       if (balance() > 0) {
         if (data.session_id) {
           // Stripe
-          const stripe = stripeAccount ? Stripe(stripePk, { stripeAccount: stripeAccount }) : Stripe(stripePk)
+          const stripe = config.stripeAccount ? Stripe(config.stripePk, { stripeAccount: config.stripeAccount }) : Stripe(config.stripePk)
           stripe.redirectToCheckout({
             sessionId: data.session_id
           })
@@ -208,30 +218,30 @@ $(function () {
           window.location = data.gocardless_billing_request_flow['authorisation_url']
         } else if (data.oc_secret) {
           // Open Collective
-          window.location = 'https://opencollective.com/' + organisationOcSlug + '/events/' + ocSlug + '/donate?interval=oneTime&amount=' + data.value + '&tags=' + data.oc_secret + '&redirect=' + encodeURIComponent(eventUrl + '?success=true&order_id=' + data.order_id)
+          window.location = 'https://opencollective.com/' + config.organisationOcSlug + '/events/' + config.ocSlug + '/donate?interval=oneTime&amount=' + data.value + '&tags=' + data.oc_secret + '&redirect=' + encodeURIComponent(config.eventUrl + '?success=true&order_id=' + data.order_id)
         } else if (data.evm_secret) {
           // EVM
           $('#select-tickets').hide()
           $('#pay-with-evm').show()
-          $('#pay-with-evm').find('.card-body p.lead.please').html('Send EXACTLY <strong>' + data.evm_value + ' ' + (currency == 'USD' ? 'BREAD' : currency) + '</strong> to <strong>' + evmAddress + '</strong>')
+          $('#pay-with-evm').find('.card-body p.lead.please').html('Send EXACTLY <strong>' + data.evm_value + ' ' + (config.currency == 'USD' ? 'BREAD' : config.currency) + '</strong> to <strong>' + config.evmAddress + '</strong>')
           const offset = $('#pay-with-evm').offset()
           window.scrollTo(0, offset.top - $('#header').height() - 10)
 
           const web3 = new Web3(ethereum)
 
           web3.eth.net.getId().then(thisNetworkId => {
-            if (thisNetworkId != networkId) {
-              $('#pay-with-evm').find('.card-body p.web3wallet').html("<mark>Please switch your web3 wallet's network to " + networkName + '</mark>')
+            if (thisNetworkId != config.networkId) {
+              $('#pay-with-evm').find('.card-body p.web3wallet').html("<mark>Please switch your web3 wallet's network to " + config.networkName + '</mark>')
               ethereum.request({
                 method: 'wallet_switchEthereumChain',
-                params: [{ chainId: '0x' + networkId.toString(16) }]
+                params: [{ chainId: '0x' + config.networkId.toString(16) }]
               })
               ethereum.on('chainChanged', function () {
                 web3.eth.net.getId().then(thisNetworkId => {
-                  if (thisNetworkId == networkId) { connectWeb3Wallet() }
+                  if (thisNetworkId == config.networkId) { connectWeb3Wallet() }
                 })
               })
-            } else if (thisNetworkId == networkId) {
+            } else if (thisNetworkId == config.networkId) {
               connectWeb3Wallet()
             }
           })
@@ -271,11 +281,11 @@ $(function () {
               type: 'function'
             }]
 
-            const toAddress = evmAddress
+            const toAddress = config.evmAddress
             const fromAddress = ethereum.selectedAddress
             const amount = parseInt(data.evm_wei).toString()
 
-            const contractInstance = new web3.eth.Contract(abi, contractAddress)
+            const contractInstance = new web3.eth.Contract(abi, config.contractAddress)
             contractInstance.methods.transfer(toAddress, amount).send({
               from: fromAddress
             })
@@ -283,7 +293,7 @@ $(function () {
 
           setInterval(function () {
             if (Date.now() < data.order_expiry) {
-              $.getJSON('/events/' + eventId + '/orders/' + data.order_id + '/payment_completed', function (_data) {
+              $.getJSON('/events/' + config.eventId + '/orders/' + data.order_id + '/payment_completed', function (_data) {
                 if (_data.payment_completed) { window.location = '?success=true&order_id=' + data.order_id }
               })
             }

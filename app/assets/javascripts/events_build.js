@@ -1,8 +1,16 @@
-/* global buildShowIntro, buildDraft, buildNewRecord, buildTimeZoneSuffix, buildImageRequiredWidth, buildImageRequiredHeight, buildIsOrgAdmin, buildRevenueSharingEnabled, eventId */
+/* global introJs, ClassicEditor, Tribute, autosize, google */
 
 $(function () {
+  // Load config from JSON script tag or window fallback
+  const config = (function () {
+    try {
+      const el = document.getElementById('events-build-config')
+      if (el) { return JSON.parse(el.textContent || '{}') }
+    } catch (e) { }
+    return (window.eventsBuildConfig || {})
+  })()
   // Intro tour on new org creation
-  if (buildShowIntro && $(window).width() > 992) {
+  if (config.showIntro && $(window).width() > 992) {
     if (typeof introJs !== 'undefined') {
       introJs().setOptions({
         steps: [{
@@ -14,8 +22,8 @@ $(function () {
   }
 
   // Load draft into form fields (including datetime and wysiwyg)
-  if (buildDraft) {
-    const draft = buildDraft
+  if (config.draft) {
+    const draft = config.draft
     const form = $('#build-event')[0]
 
     // Set regular form values
@@ -57,7 +65,7 @@ $(function () {
   }
 
   // Autosave draft + Next buttons on new record
-  if (buildNewRecord) {
+  if (config.newRecord) {
     const draftInterval = setInterval(function () {
       if ($('#event_name').val().length > 0) {
         $.post('/events/draft', $('#build-event').serializeObject())
@@ -119,9 +127,9 @@ $(function () {
   })
 
   // Timezone hint
-  if (buildTimeZoneSuffix) {
-    $('#event_start_time').siblings('small').text(buildTimeZoneSuffix)
-    $('#event_end_time').siblings('small').text(buildTimeZoneSuffix)
+  if (config.timeZoneSuffix) {
+    $('#event_start_time').siblings('small').text(config.timeZoneSuffix)
+    $('#event_end_time').siblings('small').text(config.timeZoneSuffix)
   }
 
   // Google Places Autocomplete for location
@@ -167,15 +175,15 @@ $(function () {
           $(fileUpload).val('')
         }
 
-        if (buildImageRequiredWidth) {
-          if (width !== buildImageRequiredWidth) {
-            alert('Please use an image that is ' + buildImageRequiredWidth + 'px wide')
+        if (config.imageRequiredWidth) {
+          if (width !== config.imageRequiredWidth) {
+            alert('Please use an image that is ' + config.imageRequiredWidth + 'px wide')
             $(fileUpload).val('')
           }
         }
-        if (buildImageRequiredHeight) {
-          if (height !== buildImageRequiredHeight) {
-            alert('Please use an image that is ' + buildImageRequiredHeight + 'px high')
+        if (config.imageRequiredHeight) {
+          if (height !== config.imageRequiredHeight) {
+            alert('Please use an image that is ' + config.imageRequiredHeight + 'px high')
             $(fileUpload).val('')
           }
         }
@@ -183,14 +191,14 @@ $(function () {
     }
   })
 
-  if (buildImageRequiredWidth || buildImageRequiredHeight) {
+  if (config.imageRequiredWidth || config.imageRequiredHeight) {
     const $small = $('#event_image').closest('.form-group').find('small')
-    if (buildImageRequiredWidth && buildImageRequiredHeight) {
-      $small.text('Required image dimensions: ' + buildImageRequiredWidth + 'px x ' + buildImageRequiredHeight + 'px')
-    } else if (buildImageRequiredWidth) {
-      $small.text('Image must be ' + buildImageRequiredWidth + 'px wide')
-    } else if (buildImageRequiredHeight) {
-      $small.text('Image must be ' + buildImageRequiredHeight + 'px high')
+    if (config.imageRequiredWidth && config.imageRequiredHeight) {
+      $small.text('Required image dimensions: ' + config.imageRequiredWidth + 'px x ' + config.imageRequiredHeight + 'px')
+    } else if (config.imageRequiredWidth) {
+      $small.text('Image must be ' + config.imageRequiredWidth + 'px wide')
+    } else if (config.imageRequiredHeight) {
+      $small.text('Image must be ' + config.imageRequiredHeight + 'px high')
     }
   }
 
@@ -225,7 +233,7 @@ $(function () {
   }).keyup()
 
   // Disable controls for non-admin org members
-  if (!buildIsOrgAdmin) {
+  if (!config.isOrgAdmin) {
     $('#do-zoom-party').hide()
     $('input[name="event[zoom_party]"]').prop('disabled', true)
     $('input[name="event[monthly_donors_only]"]').prop('disabled', true)
@@ -238,7 +246,7 @@ $(function () {
   }
 
   // Revenue share UI if Stripe connected
-  if (buildRevenueSharingEnabled) {
+  if (config.revenueSharingEnabled) {
     $('#event_revenue_sharer_id').change(function () {
       if ($(this).val().length > 0) {
         $('#revenue-share').show()
@@ -276,8 +284,8 @@ $(function () {
 
   // Live preview for questions
   function loadQuestions () {
-    if (!eventId) return
-    $('#questions-preview').load('/events/' + eventId + '/questions?questions=' + encodeURIComponent($('#event_questions').val()), function () {
+    if (!config.eventId) return
+    $('#questions-preview').load('/events/' + config.eventId + '/questions?questions=' + encodeURIComponent($('#event_questions').val()), function () {
       $('#questions-spinner').hide()
     })
   }
@@ -291,8 +299,8 @@ $(function () {
 
   // Live preview for feedback questions
   function loadFeedbackQuestions () {
-    if (!eventId) return
-    $('#feedback-questions-preview').load('/events/' + eventId + '/feedback_questions?questions=' + encodeURIComponent($('#event_feedback_questions').val()), function () {
+    if (!config.eventId) return
+    $('#feedback-questions-preview').load('/events/' + config.eventId + '/feedback_questions?questions=' + encodeURIComponent($('#event_feedback_questions').val()), function () {
       $('#feedback-questions-spinner').hide()
     })
   }
@@ -304,4 +312,3 @@ $(function () {
   })
   loadFeedbackQuestions()
 })
-
