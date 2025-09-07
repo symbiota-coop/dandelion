@@ -110,8 +110,8 @@
 <% when 'map' %>
   <%= partial :'maps/map', locals: { points: Account.and(:id.in => @memberships.pluck(:account_id)).and(:coordinates.ne => nil) } %>
 <% when 'birthdays' %>
-  <a class="badge badge-primary" style="font-weight: 500" id="ical" target="_blank" href="/g/<%=@gathering.slug%>/birthdays.ics?api_key=<%=current_account.api_key%>">
-    iCal <i class="bi bi-box-arrow-up-right"></i>
+  <a data-toggle="tooltip" title="iCal feed" style="font-size: 1rem" class="text-primary" id="ical" target="_blank" href="/g/<%=@gathering.slug%>/birthdays.ics?api_key=<%=current_account.api_key%>">
+    <i class="bi bi-rss-fill"></i>
   </a>
   <ul class="search-result-list my-3">
     <% Account.and(:id.in => @memberships.pluck(:account_id)).ids_by_next_birthday.each { |account_id| account = Account.find(account_id) %>
