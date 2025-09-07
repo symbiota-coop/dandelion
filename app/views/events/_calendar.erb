@@ -60,7 +60,7 @@
         var tooltipTarget = info.el;
 
         // In list view, target the td.fc-list-event-title a element instead of the tr
-        if (info.view.type === 'listWeek') {
+        if (info.view.type === 'listMonth') {
           var titleElement = $(info.el).find('td.fc-list-event-title a');
           if (titleElement.length > 0) {
             tooltipTarget = titleElement[0];
@@ -78,7 +78,7 @@
       headerToolbar: {
         left: 'today prev,next title',
         center: '',
-        right: 'dayGridMonth,listWeek'
+        right: 'dayGridMonth,listMonth'
       },
       buttonText: {
         today: 'Today',
