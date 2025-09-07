@@ -45,15 +45,6 @@ $.fn.serializeObject = function () {
 
 $(function () {
 
-  $('select').change(function () {
-    if ($(this).find('option:selected').is(':disabled')) {
-      $(this).css('color', '#6c757d');
-    } else {
-      $(this).css('color', '');
-    }
-    $(this).removeClass('select-placeholder');
-  }).change();
-
   $(document).on('click', 'input[type=datetime-local]', function () {
     this.showPicker()
   });
