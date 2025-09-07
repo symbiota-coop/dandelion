@@ -48,6 +48,9 @@
             <%= hidden_field_tag :'carousel_ids[]', value: carousel_id %>
           <% end %>
         <% end %>
+        <% if params[:event_tag_id] %>
+          <%= partial :'organisations/search_event_tags' %>
+        <% end %>
         <% if @organisation.event_types %>
           <div class="form-group col-12 col-sm-auto">
             <label>Event type</label>
