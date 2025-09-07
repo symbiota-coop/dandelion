@@ -51,6 +51,7 @@ $(function () {
     } else {
       $(this).css('color', '');
     }
+    $(this).removeClass('select-placeholder');
   }).change();
 
   $(document).on('click', 'input[type=datetime-local]', function () {

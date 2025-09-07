@@ -23,6 +23,10 @@ $color_superlight: #F9F8FA;
 
 @import "../infinite_admin/scss/style";
 
+.select-placeholder {
+  color: #6c757d !important;
+}
+
 .navbar-xs-justified {
   border: 0 !important
 }
