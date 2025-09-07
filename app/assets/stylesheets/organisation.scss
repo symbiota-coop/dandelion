@@ -6,6 +6,10 @@ $theme-color: #00B963 !default;
   background-color: $theme-color !important;
 }
 
+.text-primary {
+  color: $theme-color !important;
+}
+
 // =============================================================================
 // SEARCH COMPONENTS
 // =============================================================================
