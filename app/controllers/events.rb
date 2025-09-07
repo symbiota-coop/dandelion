@@ -60,12 +60,7 @@ Dandelion::App.controller do
       @events = @events.future(@from)
       @events = @events.and(:start_time.lt => @to + 1) if @to
       @events = @events.and(:locked.ne => true)
-
-      if params[:display] == 'calendar'
-        calendar_json(@events)
-      else
-        map_json(@events)
-      end
+      map_json(@events)
     when :ics
       @events = @events.current.limit(500)
       cal = Icalendar::Calendar.new

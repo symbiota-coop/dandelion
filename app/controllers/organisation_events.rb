@@ -38,7 +38,7 @@ Dandelion::App.controller do
                 else
                   q_ids & event_tag_ids
                 end
-    @events = @events.and(:id.in => event_ids) if params[:event_type] || !event_ids.empty?
+    @events = @events.and(:id.in => event_ids) if params[:q] || params[:event_tag_id] || params[:event_type]
     if params[:near]
       if params[:near] == 'online'
         @events = @events.online
@@ -96,6 +96,9 @@ Dandelion::App.controller do
       end
     when :json
       if params[:display] == 'calendar'
+        @events = @events.and(:start_time.gte => @from)
+        @events = @events.and(:start_time.lt => @to + 1) if @to
+        @events = @events.and(:locked.ne => true)
         calendar_json(@events)
       elsif params[:display] == 'map'
         @events = @events.future(@from)
@@ -176,7 +179,7 @@ Dandelion::App.controller do
                 else
                   q_ids & event_tag_ids
                 end
-    @events = @events.and(:id.in => event_ids) unless event_ids.empty?
+    @events = @events.and(:id.in => event_ids) if params[:q] || params[:event_tag_id]
     @events = @events.and(:"#{@start_or_end}_time".gte => @from)
     @events = @events.and(:"#{@start_or_end}_time".lt => @to + 1) if @to
     @events = @events.and(coordinator_id: params[:coordinator_id]) if params[:coordinator_id]

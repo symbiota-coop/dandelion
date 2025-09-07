@@ -53,7 +53,7 @@ Dandelion::App.controller do
                 else
                   q_ids & event_tag_ids
                 end
-    @events = @events.and(:id.in => event_ids) unless event_ids.empty?
+    @events = @events.and(:id.in => event_ids) if params[:q] || params[:event_tag_id]
     @events = @events.and(:"#{@start_or_end}_time".gte => @from)
     @events = @events.and(:"#{@start_or_end}_time".lt => @to + 1) if @to
     @events = @events.and(coordinator_id: params[:coordinator_id]) if params[:coordinator_id]

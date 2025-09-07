@@ -5,7 +5,14 @@
       initialView: 'dayGridMonth',
       events: function(fetchInfo, successCallback, failureCallback) {
         // Fetch events from the server
-        fetch('/<%= @organisation ? "o/#{@organisation.slug}/events" : "events" %>.json?display=calendar&from=' + fetchInfo.start.toISOString().split('T')[0] + '&to=' + fetchInfo.end.toISOString().split('T')[0])
+        var currentQuery = window.location.search;
+        var params = $.deparam(currentQuery.substring(1));
+        delete params.from;
+        delete params.to;
+        var queryString = $.param(params);
+        var baseUrl = '/<%= @organisation ? "o/#{@organisation.slug}/events" : "events" %>.json?from=' + fetchInfo.start.toISOString().split('T')[0] + '&to=' + fetchInfo.end.toISOString().split('T')[0];
+        var url = baseUrl + (queryString ? '&' + queryString : '');
+        fetch(url)
           .then(response => response.json())
           .then(data => {
             var events = data.map(function(event) {
