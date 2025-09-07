@@ -100,6 +100,8 @@ module OrganisationFields
     field :use_event_slugs_in_order_descriptions, type: Mongoid::Boolean
     field :percent_requested, type: Float
     field :event_types, type: String
+    field :start_date_placeholder, type: String
+    field :end_date_placeholder, type: String
 
     field :tokens, type: Float
     index({ tokens: 1 })
