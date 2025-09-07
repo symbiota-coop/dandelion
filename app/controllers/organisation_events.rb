@@ -95,7 +95,9 @@ Dandelion::App.controller do
         erb :'organisations/events', layout: (params[:minimal] ? 'minimal' : nil)
       end
     when :json
-      if params[:display] == 'map'
+      if params[:display] == 'calendar'
+        calendar_json(@events)
+      elsif params[:display] == 'map'
         @events = @events.future(@from)
         @events = @events.and(:start_time.lt => @to + 1) if @to
         @events = @events.and(:locked.ne => true)

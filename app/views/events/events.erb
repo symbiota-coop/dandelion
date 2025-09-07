@@ -31,7 +31,7 @@
 <% if params[:display] == 'map' %>
   <%= partial :'maps/map', locals: { url: "/events", bounding_box: @bounding_box&.flatten, fill_screen: true } %>
 <% elsif params[:display] == 'calendar' %>
-  <iframe src="<%=ENV['TEAMUP_CALENDAR_URL']%>" style="width: 100%; height: 800px" loading="lazy" frameborder="0"></iframe>
+  <%= partial :'events/calendar' %>
 <% elsif params[:display] == 'table' %>
   <%= partial :'events/table' %>
 <% elsif params[:display] == 'concise' %>

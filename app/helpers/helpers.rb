@@ -321,4 +321,20 @@ Dandelion::App.helpers do
       pointsCount: points.count
     }.to_json
   end
+
+  def calendar_json(events)
+    events.map do |event|
+      {
+        id: event.id.to_s,
+        name: event.name,
+        start_time: event.start_time.iso8601,
+        end_time: event.end_time.iso8601,
+        slug: event.slug,
+        location: event.location,
+        organisation: event.organisation&.name,
+        description: event.description,
+        time_zone: event.time_zone_or_default
+      }
+    end.to_json
+  end
 end

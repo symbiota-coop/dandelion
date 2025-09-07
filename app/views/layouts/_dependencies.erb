@@ -8,6 +8,7 @@
       'jqueryui/1.13.2' => 'jquery-ui.min.js themes/base/jquery-ui.min.css',
       'jquery-timeago/1.4.3' => 'jquery.timeago.min.js',
       'moment.js/2.17.1' => 'moment.min.js locale/en-gb.js',
+      'moment-timezone/0.5.43' => 'moment-timezone.min.js moment-timezone-with-data.min.js',
       'flatpickr/4.6.13' => 'flatpickr.min.js flatpickr.min.css',
       'datatables/1.10.16' => 'js/jquery.dataTables.min.js js/dataTables.bootstrap4.min.js css/dataTables.bootstrap4.min.css',       
       'tributejs/3.5.3' => 'tribute.min.js tribute.min.css',
@@ -23,7 +24,8 @@
       'masonry/4.0.0' => 'masonry.pkgd.min.js',
       'TypeWatch/3.0.2' => 'jquery.typewatch.min.js',
       'bootstrap-icons/1.11.3' => 'font/bootstrap-icons.min.css',
-      'typed.js/2.0.10' => 'typed.min.js'
+      'typed.js/2.0.10' => 'typed.min.js',
+      'fullcalendar/6.1.19' => 'index.global.min.js'    
      }.each { |k,v| %>
 <% v.split(' ').each { |f| u = "https://cdnjs.cloudflare.com/ajax/libs/#{k}/#{f}" %>
 <% case f.split('.').last.to_sym; when :js %>

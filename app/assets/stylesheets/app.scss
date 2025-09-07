@@ -13,6 +13,7 @@ $body_font_size: 0.825rem;
 $badge_font_size: 0.75rem;
 $body_text: #212529;
 $bg_well: #F5F5F5;
+$calendar_grey: #555;
 $color_highlight_1: #4400B9;
 $color_highlight_1_light_1: lighten($color_highlight_1, 57.5%);
 $color_highlight_1_light_2: lighten($color_highlight_1, 42.5%);
@@ -43,6 +44,24 @@ div.block-title.map-event h4 {
 
 ul.map-event li {
   font-size: 0.85rem !important
+}
+
+.fc-button {
+  background-color: white !important;
+  border-color: $calendar_grey !important;
+  color: $calendar_grey !important;
+}
+
+.fc-button:hover {
+  background-color: $calendar_grey !important;
+  border-color: $calendar_grey !important;
+  color: white !important;
+}
+
+.fc-button-active {
+  background-color: $calendar_grey !important;
+  border-color: $calendar_grey !important;
+  color: white !important;
 }
 
 body.gradient,

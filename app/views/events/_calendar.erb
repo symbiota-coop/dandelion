@@ -1,0 +1,142 @@
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    var calendarEl = document.getElementById('calendar');
+    var calendar = new FullCalendar.Calendar(calendarEl, {
+      initialView: 'dayGridMonth',
+      events: function(fetchInfo, successCallback, failureCallback) {
+        // Fetch events from the server
+        fetch('/events.json?display=calendar&from=' + fetchInfo.start.toISOString().split('T')[0] + '&to=' + fetchInfo.end.toISOString().split('T')[0])
+          .then(response => response.json())
+          .then(data => {
+            var events = data.map(function(event) {
+              return {
+                id: event.id,
+                title: event.name,
+                start: event.start_time,
+                end: event.end_time,
+                url: '/e/' + event.slug,
+                color: <%== (params[:minimal] && @organisation.theme_color ? @organisation.theme_color : '#00B963').to_json %>,
+                extendedProps: {
+                  location: event.location,
+                  organisation: event.organisation,
+                  description: event.description,
+                  time_zone: event.time_zone
+                }
+              };
+            });
+            successCallback(events);
+          })
+          .catch(error => {
+            console.error('Error fetching events:', error);
+            failureCallback(error);
+          });
+      },
+      eventDidMount: function(info) {
+        // Initialize Bootstrap tooltip for each event
+        var eventTime = moment(info.event.start);
+        var eventTimeZone = info.event.extendedProps.time_zone;
+
+        // Format time in the event's timezone
+        var formattedTime;
+        try {
+          formattedTime = eventTime.tz(eventTimeZone).format('ddd Do MMM YYYY h:mm A z');
+        } catch (e) {
+          // Fallback if timezone data is not available
+          formattedTime = eventTime.format('ddd Do MMM YYYY h:mm A');
+        }
+
+        var tooltipContent = '<strong>' + info.event.title + '</strong><br>' +
+          (info.event.extendedProps.organisation ? info.event.extendedProps.organisation + '<br>' : '') +
+          (info.event.extendedProps.location ? info.event.extendedProps.location + '<br>' : '') +
+          '<small>' + formattedTime + '</small>';
+
+        $(info.el).tooltip({
+          title: tooltipContent,
+          html: true,
+          placement: 'top',
+          trigger: 'hover',
+          container: 'body'
+        });
+      },
+      headerToolbar: {
+        left: 'today prev,next title',
+        center: '',
+        right: 'dayGridMonth,listWeek'
+      },
+      buttonText: {
+        today: 'Today',
+        month: 'Month',
+        week: 'Week',
+        list: 'List'
+      },
+      height: 'auto',
+      aspectRatio: 1.8
+    });
+
+    calendar.render();
+  });
+</script>
+<div id="calendar"></div>
+
+<style>
+  .fc-prev-button, .fc-next-button {
+    border: none !important;
+  }
+
+  .fc-toolbar-title {
+    white-space: nowrap !important;
+  }
+
+  .fc-toolbar-chunk {
+    display: flex !important;
+    align-items: center !important;
+    gap: 8px !important;
+  }
+
+  .fc-toolbar-chunk .fc-toolbar-title {
+    margin: 0 !important;
+  }
+
+  /* Ensure all toolbar buttons have consistent height */
+  .fc-toolbar .fc-button {
+    height: 38px !important;
+    min-height: 38px !important;
+    line-height: 1.2 !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    padding: 8px 12px !important;
+  }
+
+  /* Specific styling for arrow buttons to match other buttons */
+  .fc-toolbar .fc-button-group .fc-button {
+    height: 38px !important;
+    min-height: 38px !important;
+  }
+
+  /* Ensure button groups maintain consistent height */
+  .fc-toolbar .fc-button-group {
+    height: 38px !important;
+  }
+
+  /* Add margin between events to prevent squashing */
+  .fc-event {
+    margin-bottom: 2px !important;
+  }
+
+  /* Add some padding to event content */
+  .fc-event-main {
+    padding: 1px 2px !important;
+  }
+
+  /* Shorten month names and hide Today button on small screens */
+  @media (max-width: 768px) {
+    .fc-toolbar-title {
+      font-size: 1.1em !important;
+    }
+
+    .fc-toolbar .fc-today-button {
+      display: none !important;
+    }
+  }
+</style>
