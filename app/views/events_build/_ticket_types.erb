@@ -88,7 +88,7 @@
                 <div class="input-group-prepend">
                   <span class="input-group-text">Sales end</span>
                 </div>
-                <%= o.datetime_local_field :sales_end, class: 'form-control' %>
+                <%= o.text_field :sales_end, class: 'form-control datetimepicker', value: (if v = o.object.sales_end; v.strftime('%Y-%m-%d %H:%M'); end) %>
               </div>
             </div>
 
@@ -137,35 +137,6 @@
 
     <script>
       $(function () {
-
-        // Apply styling to existing sales_end datetime inputs
-        $('input[name$="[sales_end]"]').each(function() {
-          setupDatetimeInput(this);
-        });
-
-        function setupDatetimeInput(element) {
-          if (!element.value) {
-            $(element).css('color', 'transparent');
-          }
-
-          $(element).on('input', function() {
-            if (this.value) {
-              $(this).css('color', 'black');
-            } else {
-              $(this).css('color', 'transparent');
-            }
-          });
-
-          $(element).on('focus', function() {
-            $(this).css('color', 'black');
-          });
-
-          $(element).on('blur', function() {
-            if (!this.value) {
-              $(this).css('color', 'transparent');
-            }
-          });
-        }
 
         $("#ticket_types").sortable({
           cursor: 'grabbing'
@@ -257,7 +228,7 @@
           // Sales end column
           var salesEndCol = $('<div class="col-12 col-lg mb-2"><div class="input-group"></div></div>');
           salesEndCol.find('.input-group').append('<div class="input-group-prepend"><span class="input-group-text">Sales end</span></div>');
-          var salesEndInput = $('<input type="datetime-local" class="form-control" />');
+          var salesEndInput = $('<input type="text" class="form-control datetimepicker" />');
           salesEndInput.attr('name', 'event[ticket_types_attributes][' + c + '][sales_end]');
           salesEndInput.attr('id', 'event_ticket_types_attributes_' + c + '_sales_end');
           salesEndCol.find('.input-group').append(salesEndInput);
@@ -290,7 +261,14 @@
 
           // Initialize tooltips and setup datetime input
           d.find('[data-toggle="tooltip"]').tooltip();
-          setupDatetimeInput(salesEndInput[0]);
+
+          // Initialize flatpickr for the datetime input
+          salesEndInput.flatpickr({
+            altInput: true,
+            altFormat: 'J F Y, H:i',
+            enableTime: true,
+            time_24hr: true
+          });
         });
       });
     </script>
