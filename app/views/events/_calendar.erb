@@ -30,9 +30,8 @@
                 url: '/e/' + event.slug,
                 color: <%== (params[:minimal] && @organisation.theme_color ? @organisation.theme_color : '#4400B9').to_json %>,
                 extendedProps: {
-                  location: event.location,
                   organisation: event.organisation,
-                  isMultiDay: isMultiDay,
+                  location: event.location,
                   when_details: event.when_details
                 }
               };

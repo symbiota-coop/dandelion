@@ -331,8 +331,8 @@ Dandelion::App.helpers do
         start_time: event.start_time.iso8601,
         end_time: event.end_time.iso8601,
         slug: event.slug,
-        location: event.location,
         organisation: event.organisation&.name,
+        location: event.location,
         when_details: event.when_details(user_time_zone)
       }
     end.to_json
