@@ -15,7 +15,7 @@
     }
   }
 </script>
-<div class="<% if @carousel_buttons %> text-right <% end %> mb-3">
+<div class="text-center <% if @carousel_buttons %> text-lg-right <% end %> mb-3">
   <a href="javascript:;" id="toggle-search" onclick="toggleAdvancedSearch()">
     <i class="bi <%= (params[:search] && params[:display] != 'map') ? 'bi-chevron-down' : 'bi-chevron-right' %>" id="search-arrow"></i>
     <%= (params[:search] && params[:display] != 'map') ? 'Hide search options' : 'Show search options' %>
