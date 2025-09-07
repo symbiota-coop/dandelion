@@ -38,7 +38,12 @@
           });
       },
       eventClick: function(info) {
-        // Open event in a new window
+        // Check for modifier keys (cmd on Mac, ctrl on Windows/Linux)
+        if (info.jsEvent.metaKey || info.jsEvent.ctrlKey) {
+          // Allow default behavior for cmd/ctrl+click to open in new tab
+          return;
+        }
+        // For regular clicks, open in same window
         window.open(info.event.url, '_parent');
         info.jsEvent.preventDefault();
       },
