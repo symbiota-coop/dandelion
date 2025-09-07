@@ -37,6 +37,11 @@
             failureCallback(error);
           });
       },
+      eventClick: function(info) {
+        // Open event in a new window
+        window.open(info.event.url, '_parent');
+        info.jsEvent.preventDefault();
+      },
       eventDidMount: function(info) {
         // Initialize Bootstrap tooltip for each event
         var eventTime = moment(info.event.start);
