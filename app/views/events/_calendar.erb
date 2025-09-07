@@ -5,7 +5,7 @@
       initialView: 'dayGridMonth',
       events: function(fetchInfo, successCallback, failureCallback) {
         // Fetch events from the server
-        fetch('/events.json?display=calendar&from=' + fetchInfo.start.toISOString().split('T')[0] + '&to=' + fetchInfo.end.toISOString().split('T')[0])
+        fetch('/<%= @organisation ? "o/#{@organisation.slug}/events" : "events" %>.json?display=calendar&from=' + fetchInfo.start.toISOString().split('T')[0] + '&to=' + fetchInfo.end.toISOString().split('T')[0])
           .then(response => response.json())
           .then(data => {
             var events = data.map(function(event) {
