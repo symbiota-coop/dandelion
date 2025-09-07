@@ -28,7 +28,7 @@
 <% end %>
 <% if params[:no_search] %>
   <% unless params[:no_listings] || params[:no_view_options]  %>
-    <%= partial :'events/view_options' %>
+    <%= partial :'events/view_options', locals: { calendar_view: true } %>
   <% end %>
 <% else %>
   <div class="<%= params[:minimal] ? 'mb-3 mt-1' : 'my-3' %>">
