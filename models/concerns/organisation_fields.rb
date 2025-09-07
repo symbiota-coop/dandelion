@@ -102,6 +102,7 @@ module OrganisationFields
     field :event_types, type: String
     field :start_date_placeholder, type: String
     field :end_date_placeholder, type: String
+    field :event_types_placeholder, type: String
 
     field :tokens, type: Float
     index({ tokens: 1 })
