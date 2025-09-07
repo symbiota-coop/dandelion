@@ -96,7 +96,7 @@ Dandelion::App.controller do
       end
     when :json
       if params[:display] == 'calendar'
-        @events = @events.future_and_current(@from)
+        @events = @events.future(@from)
         @events = @events.and(:start_time.lt => @to + 1) if @to
         @events = @events.and(:locked.ne => true)
         calendar_json(@events)
