@@ -46,6 +46,10 @@ ul.map-event li {
   font-size: 0.85rem !important
 }
 
+#calendar a.fc-event {
+  color: $color_highlight_1 !important;
+}
+
 .fc-button {
   background-color: white !important;
   border-color: $calendar_grey !important;

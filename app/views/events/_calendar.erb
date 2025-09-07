@@ -22,7 +22,7 @@
                 start: event.start_time,
                 end: event.end_time,
                 url: '/e/' + event.slug,
-                color: <%== (params[:minimal] && @organisation.theme_color ? @organisation.theme_color : '#00B963').to_json %>,
+                color: <%== (params[:minimal] && @organisation.theme_color ? @organisation.theme_color : '#4400B9').to_json %>,
                 extendedProps: {
                   location: event.location,
                   organisation: event.organisation,
@@ -57,7 +57,18 @@
           (info.event.extendedProps.location ? info.event.extendedProps.location + '<br>' : '') +
           '<small>' + formattedTime + '</small>';
 
-        $(info.el).tooltip({
+        // Target the specific element for tooltip based on view type
+        var tooltipTarget = info.el;
+
+        // In list view, target the td.fc-list-event-title a element instead of the tr
+        if (info.view.type === 'listWeek') {
+          var titleElement = $(info.el).find('td.fc-list-event-title a');
+          if (titleElement.length > 0) {
+            tooltipTarget = titleElement[0];
+          }
+        }
+
+        $(tooltipTarget).tooltip({
           title: tooltipContent,
           html: true,
           placement: 'top',
