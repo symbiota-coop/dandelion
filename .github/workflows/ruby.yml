@@ -55,7 +55,7 @@ jobs:
         BASE_URI: http://127.0.0.1:8020
         DOMAIN: dandelion.events
         DEFAULT_CURRENCY: USD
-        DEFAULT_TIME_ZONE: London
+        DEFAULT_TIME_ZONE: Europe/London
         SESSION_SECRET: ${{ github.run_id }}
         STRIPE_PK: pk_test_hBG6G5aSlQWzUuSesRvMMj3v
         STRIPE_SK: sk_test_HCthlytw40KUFZ5nWNc0XI6A        

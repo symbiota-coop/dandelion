@@ -323,7 +323,15 @@ Dandelion::App.helpers do
   end
 
   def calendar_json(events)
+    user_time_zone = current_account ? current_account.time_zone : session[:time_zone]
     events.map do |event|
+      # For online events, use user's time zone if available, otherwise fall back to event's time zone
+      event_time_zone = if event.online? && user_time_zone
+                          user_time_zone
+                        else
+                          event.time_zone_or_default
+                        end
+
       {
         id: event.id.to_s,
         name: event.name,
@@ -332,7 +340,7 @@ Dandelion::App.helpers do
         slug: event.slug,
         location: event.location,
         organisation: event.organisation&.name,
-        time_zone: event.time_zone_or_default
+        time_zone: event_time_zone
       }
     end.to_json
   end
