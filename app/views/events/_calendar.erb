@@ -10,7 +10,7 @@
         delete params.from;
         delete params.to;
         var queryString = $.param(params);
-        var baseUrl = '/<%= @organisation ? "o/#{@organisation.slug}/events" : "events" %>.json?from=' + fetchInfo.start.toISOString().split('T')[0] + '&to=' + fetchInfo.end.toISOString().split('T')[0];
+        var baseUrl = '/o/<%=@organisation.slug%>/events.json?from=' + fetchInfo.start.toISOString().split('T')[0] + '&to=' + fetchInfo.end.toISOString().split('T')[0];
         var url = baseUrl + (queryString ? '&' + queryString : '');
         fetch(url)
           .then(response => response.json())
@@ -30,7 +30,6 @@
                 url: '/e/' + event.slug,
                 color: <%== (params[:minimal] && @organisation.theme_color ? @organisation.theme_color : '#4400B9').to_json %>,
                 extendedProps: {
-                  organisation: event.organisation,
                   location: event.location,
                   when_details: event.when_details
                 }
@@ -56,7 +55,6 @@
       eventDidMount: function(info) {
         // Initialize Bootstrap tooltip for each event
         var tooltipContent = '<strong>' + info.event.title + '</strong><br>' +
-          (info.event.extendedProps.organisation ? info.event.extendedProps.organisation + '<br>' : '') +
           (info.event.extendedProps.location ? info.event.extendedProps.location + '<br>' : '') +
           '<small>' + info.event.extendedProps.when_details + '</small>';
 
