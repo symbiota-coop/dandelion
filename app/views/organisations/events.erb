@@ -1,11 +1,11 @@
 <% unless params[:minimal] %>
   <%= partial :'organisations/nav', locals: { organisation: @organisation } %>
   <div class="row mb-3">
-    <div class="col-12 col-lg-auto text-center">
-      <% if @organisation.image %>
+    <% if @organisation.image %>
+      <div class="col-12 col-lg-auto text-center">
         <a href="/o/<%= @organisation.slug %>"><img src="<%= u @organisation.image.thumb('200x200').url %>"></a>
-      <% end %>
-    </div>
+      </div>
+    <% end %>
     <div class="col-12 col-sm text-center text-lg-left">
       <h1>
         <a href="/o/<%= @organisation.slug %>"><%= @organisation.name %></a>'s events
