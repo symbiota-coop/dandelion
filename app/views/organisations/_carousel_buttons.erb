@@ -23,7 +23,7 @@
       var urlParams = new URLSearchParams(window.location.search);
       urlParams.forEach(function(value, key) {
         // Skip parameters that are already handled by the form
-        if (key !== 'minimal' && key !== 'carousel_ids[]' && key !== 'near') {
+        if (key !== 'minimal' && key !== 'carousel_ids[]' && key !== 'near' && key !== 'display') {
           form.append('<input type="hidden" name="' + key + '" value="' + value + '">');
         }
       });
@@ -63,7 +63,7 @@
       
       # Build carousel-only href but preserve minimal and near params
       carousel_only_params = []
-      %w[minimal near].each do |param|
+      %w[minimal near display].each do |param|
         carousel_only_params << "#{param}=#{CGI.escape(query_params[param].to_s)}" if query_params[param].present?
       end
       new_carousel_ids.each { |id| carousel_only_params << "carousel_ids[]=#{CGI.escape(id)}" }
@@ -83,6 +83,7 @@
   <div class="text-center">
     <% form_tag '', method: 'get', class: 'submitOnChange mb-3', id: 'local-group-form' do %>
       <%= hidden_field_tag :minimal, value: params[:minimal] %>
+      <%= hidden_field_tag :display, value: params[:display] %>
       <% if params[:carousel_ids] %>
         <% params[:carousel_ids].each do |carousel_id| %>
           <%= hidden_field_tag :'carousel_ids[]', value: carousel_id %>
