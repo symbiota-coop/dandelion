@@ -1,7 +1,7 @@
-<% carousel_id = "carousel-#{SecureRandom.uuid}" %>
+<% slick_id = "slick-#{SecureRandom.uuid}" %>
 <script>
   $(function () {
-    $('#<%= carousel_id %> .slick-responsive').slick({
+    $('#<%= slick_id %> .slick-responsive').slick({
       speed: 300,
       dots: true,
       prevArrow:"<button type='button' class='rounded-circle slick-prev pull-left'><i class='bi bi-chevron-compact-left' aria-hidden='true'></i></button>",
@@ -28,7 +28,7 @@
   })
 </script>
 
-<div class="slick-container slick-placeholder mt-5 mb-lg-5" id="<%= carousel_id %>">
+<div class="slick-container slick-placeholder mt-5 mb-lg-5" id="<%= slick_id %>">
   <h2 class="text-center">█████████</h2>
   <div class="slick-responsive row">
     <% 3.times do |i| %>
