@@ -2,7 +2,7 @@
 
   <h2>
     <span class="text-muted font-weight-normal">
-      Order confirmation for
+      Your <%= order.tickets.length == 1 ? 'ticket' : 'tickets' %> to
     </span>
     <br />
     <%= event.name %>
@@ -35,9 +35,9 @@
           <a target="_blank" <% if event.location != 'Online' %>href="https://www.google.com/maps?q=<%=event.location%>"<% end %> class="event-detail location">
 
             <% if event.location == 'Online' %>
-              <img src="<%=ENV['BASE_URI']%>/images/icons/camera-video.svg">
+              <img src="<%=ENV['BASE_URI']%>/images/icons/camera-video.png">
             <% else %>
-              <img src="<%=ENV['BASE_URI']%>/images/icons/geo-alt.svg">
+              <img src="<%=ENV['BASE_URI']%>/images/icons/geo-alt.png">
             <% end %>
 
           </a>
@@ -52,7 +52,7 @@
       <tr>
         <td>
           <a href="<%=ENV['BASE_URI']%>/e/<%=event.slug%>" class="event-detail link copy-link-icon">
-            <img src="<%=ENV['BASE_URI']%>/images/icons/link.svg">
+            <img src="<%=ENV['BASE_URI']%>/images/icons/link.png">
           </a>
         </td>
         <td>
@@ -126,7 +126,7 @@
 
 <% if !event.no_tickets_pdf && defined?(pdf_link) %>
   <a href="/orders/<%=order.id%>.pdf" class="attachment">
-    <img style="margin: 0; margin-right: 2px" src="<%=ENV['BASE_URI']%>/images/icons/qr-code.svg">
+    <img style="margin: 0; margin-right: 2px" src="<%=ENV['BASE_URI']%>/images/icons/qr-code.png">
     Download <%= order.tickets.count == 1 ? 'ticket' : 'tickets' %> PDF
   </a>
 <% end %>
