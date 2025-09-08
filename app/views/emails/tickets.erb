@@ -46,21 +46,6 @@
           <a class="text-dark" target="_blank" <% if event.location != 'Online' %>href="https://www.google.com/maps?q=<%=event.location%>"<% end %>><%=event.location%></a>
           </td>
         </tr>
-        <tr>
-          <td colspan="2" class="event-detail-separator">&nbsp;</td>
-        </tr>
-        <tr>
-          <td>
-            <a href="<%=ENV['BASE_URI']%>/e/<%=event.slug%>" class="event-detail link copy-link-icon">
-              <img src="<%=ENV['BASE_URI']%>/images/icons/_link.png">
-            </a>
-          </td>
-          <td>
-            <a href="<%=ENV['BASE_URI']%>/e/<%=event.slug%>" class="copy-link text-dark">
-              <%=ENV['BASE_URI']%>/e/<%=event.slug%>
-            </a>
-          </td>
-        </tr>
       </tbody>
     </table>
 
@@ -70,7 +55,7 @@
         .gsub('[firstname]', account.firstname)
         .gsub('[lastname]', account.lastname || '')
         .gsub('[fullname]', account.name)
-        .gsub('[event_name]', event.name)
+        .gsub('[event_name]', "<a href='#{ENV['BASE_URI']}/e/#{event.slug}'>#{event.name}</a>")
         .gsub('[event_when]', event.when_details(account.try(:time_zone)))
         .gsub('[event_location]', event.location)
         .gsub('[event_url]', "#{ENV['BASE_URI']}/e/#{event.slug}")
