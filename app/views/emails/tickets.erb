@@ -13,13 +13,13 @@
   <table class="event-details">
     <tbody>
       <tr>
-        <td class="pr-2">
+        <td style="padding-right: 4px;">
           <span class="event-detail calendar-date">
             <span class="month"><%= event.start_time.strftime('%b') %></span>
             <span class="day"><%= event.start_time.day %></span>
           </span>
         </td>
-        <td class="pr-2">
+        <td style="padding-right: 4px;">
           <% when_parts = event.when_details(account.try(:time_zone), with_zone: true).split(', ') %>
           <%= when_parts[0] %>
           <div class="text-muted" style="font-size: 90%;">
