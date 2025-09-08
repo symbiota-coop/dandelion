@@ -122,14 +122,11 @@
   <a href="<%= ENV['BASE_URI'] %>">
     <img src="<%= ENV['BASE_URI'] %>/images/logos/logo-text.png" style="opacity: 0.33; max-width: 100px;">
   </a>
-  <div style="margin-top: 10px">
-    <a target="_blank" href="https://dandeliondotevents.substack.com/"><img src="<%= ENV['BASE_URI'] %>/images/substack-grey.png" style="opacity: 0.5; height: 18px; margin-right: 3px;"></a>
-  </div>
 </div>
 
 <% if !event.no_tickets_pdf && defined?(pdf_link) %>
   <a href="/orders/<%=order.id%>.pdf" class="attachment">
-    <img style="margin: 0; margin-right: 2px" src="<%=ENV['BASE_URI']%>/images/icons/qr-code.png">
+    <img style="margin: 0; margin-right: 2px; width: 16px;" src="<%=ENV['BASE_URI']%>/images/icons/qr-code.png">
     Download <%= order.tickets.count == 1 ? 'ticket' : 'tickets' %> PDF
   </a>
 <% end %>
