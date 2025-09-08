@@ -1,6 +1,10 @@
 @import "variables";
 @import "event_details";
 
+table.event-details td {
+  font-size: 1em;
+}
+
 .event-details {
   margin-top: 20px;
   margin-bottom: 20px
