@@ -122,6 +122,9 @@
   <a href="<%= ENV['BASE_URI'] %>">
     <img src="<%= ENV['BASE_URI'] %>/images/logos/logo-text.png" style="opacity: 0.33; max-width: 100px;">
   </a>
+  <div style="margin-top: 10px">
+    <a target="_blank" href="https://dandeliondotevents.substack.com/"><img src="<%= ENV['BASE_URI'] %>/images/substack-grey.png" style="opacity: 0.5; height: 18px; margin-right: 3px;"></a>
+  </div>
 </div>
 
 <% if !event.no_tickets_pdf && defined?(pdf_link) %>
