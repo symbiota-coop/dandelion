@@ -15,8 +15,8 @@
       <tr>
         <td class="pr-2">
           <span class="event-detail calendar-date">
-            <span class="month">Oct</span>
-            <span class="day">9</span>
+            <span class="month"><%= event.start_time.strftime('%b') %></span>
+            <span class="day"><%= event.start_time.day %></span>
           </span>
         </td>
         <td class="pr-2">
