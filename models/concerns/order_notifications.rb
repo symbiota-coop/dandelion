@@ -25,12 +25,21 @@ module OrderNotifications
     batch_message.finalize if ENV['MAILGUN_API_KEY']
   end
 
+  def sender_info
+    if event.organisation.send_ticket_emails_from_organisation && event.organisation.image
+      [event.organisation.image.thumb('1920x1920').url, "#{event.organisation.name} <#{ENV['TICKETS_EMAIL']}>"]
+    else
+      [nil, ENV['TICKETS_EMAIL_FULL']]
+    end
+  end
+
   def send_tickets
     mg_client = Mailgun::Client.new ENV['MAILGUN_API_KEY'], ENV['MAILGUN_REGION']
     batch_message = Mailgun::BatchMessage.new(mg_client, ENV['MAILGUN_TICKETS_HOST'])
 
     order = self
     event = order.event
+    header_image_url, from_email = sender_info
 
     account = order.account
     content = ERB.new(File.read(Padrino.root('app/views/emails/tickets.erb'))).result(binding)
@@ -40,13 +49,7 @@ module OrderNotifications
       .gsub('[event_name]', event.name)
     )
 
-    if event.organisation.send_ticket_emails_from_organisation && event.organisation.image
-      header_image_url = event.organisation.image.thumb('1920x1920').url
-      batch_message.from "#{event.organisation.name} <#{ENV['TICKETS_EMAIL']}>"
-    else
-      header_image_url = "#{ENV['BASE_URI']}/images/logos/black-on-transparent-sq.png"
-      batch_message.from ENV['TICKETS_EMAIL_FULL']
-    end
+    batch_message.from from_email
     batch_message.reply_to(event.email || event.organisation.reply_to)
 
     batch_message.body_html Premailer.new(ERB.new(File.read(Padrino.root('app/views/layouts/email.erb'))).result(binding), with_html_string: true, adapter: 'nokogiri', input_encoding: 'UTF-8').to_inline_css
@@ -125,7 +128,7 @@ module OrderNotifications
     batch_message.subject "Refund failed: #{account.name} in #{event.name}"
     batch_message.body_html Premailer.new(ERB.new(File.read(Padrino.root('app/views/layouts/email.erb'))).result(binding), with_html_string: true, adapter: 'nokogiri', input_encoding: 'UTF-8').to_inline_css
 
-    (event.event_facilitators + Account.and(admin: true)).uniq.each do |account|
+    (event.contacts + Account.and(admin: true)).uniq.each do |account|
       batch_message.add_recipient(:to, account.email, { 'firstname' => account.firstname || 'there', 'token' => account.sign_in_token, 'id' => account.id.to_s })
     end
 

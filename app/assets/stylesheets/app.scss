@@ -1,29 +1,6 @@
-$color_primary: rgb(0, 185, 99); // #00B963
-$color_primary_light: lighten($color_primary, 6.66%);
-$color_primary_transparent_7: rgba(0, 185, 99, 0.7);
-$color_primary_transparent_5: rgba(0, 185, 99, 0.5);
-$color_primary_transparent_3: rgba(0, 185, 99, 0.3);
-$color_primary_transparent_1: rgba(0, 185, 99, 0.1);
-$color_primary_hover: rgb(0, 165, 88); // #00A558
-$color_link_hover: rgb(0, 165, 88); // #00A558
-$color_theme: rgb(251, 174, 59); // #FBAE3B
-$color_theme_transparent: rgba(251, 174, 59, 0.5);
-$body_font_family: 'Plus Jakarta Sans', sans-serif;
-$body_font_size: 0.825rem;
-$badge_font_size: 0.75rem;
-$body_text: #212529;
-$bg_well: #F5F5F5;
-$placeholder_grey: #6c757d;
-$calendar_grey: $placeholder_grey;
-$color_highlight_1: #4400B9;
-$color_highlight_1_light_1: lighten($color_highlight_1, 57.5%);
-$color_highlight_1_light_2: lighten($color_highlight_1, 42.5%);
-$color_highlight_1_light_3: lighten($color_highlight_1, 60%);
-$color_highlight_2: #B900A1;
-$color_paper: #FFFAF3;
-$color_superlight: #F9F8FA;
-
+@import "variables";
 @import "../infinite_admin/scss/style";
+@import "event_details";
 
 .select-placeholder {
   color: $placeholder_grey !important;
@@ -587,59 +564,6 @@ img.private:hover {
 
 .CodeMirror-fullscreen .CodeMirror-scroll {
   max-height: none;
-}
-
-
-table.event-details td {
-  vertical-align: middle;
-  font-size: 1.175em;
-}
-
-.event-detail {
-  vertical-align: middle;
-  display: inline-block;
-  text-align: center;
-  border: 2px solid $color_primary_transparent_5;
-  border-radius: 4px;
-  width: 40px;
-  height: 40px;
-  color: #666;
-  background: white;
-}
-
-.event-detail:hover {
-  text-decoration: none;
-  color: white;
-  background-color: $color_primary;
-}
-
-.event-detail-separator {
-  font-size: 5px !important
-}
-
-.event-detail.location {
-  font-size: 24px;
-}
-
-.event-detail.link {
-  font-size: 24px;
-}
-
-span.event-detail.calendar-date {
-  cursor: default;
-}
-
-.event-detail.calendar-date .month {
-  display: block;
-  font-size: 0.65rem;
-  text-transform: uppercase;
-  background-color: $color_primary_transparent_3;
-  border-bottom: 2px solid $color_primary_transparent_5;
-}
-
-.event-detail.calendar-date .day {
-  display: block;
-  font-size: 0.75rem;
 }
 
 .ck-content blockquote,

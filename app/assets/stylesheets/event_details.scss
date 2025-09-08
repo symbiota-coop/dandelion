@@ -1,0 +1,60 @@
+@import "variables";
+
+table.event-details td {
+  vertical-align: middle;
+  font-size: 1.175em;
+}
+
+.event-detail {
+  vertical-align: middle;
+  display: inline-block;
+  text-align: center;
+  border: 2px solid $color_primary_transparent_5;
+  border-radius: 4px;
+  width: 40px;
+  height: 40px;
+  color: #666;
+  background: white;
+}
+
+.event-detail:hover {
+  text-decoration: none;
+  color: white;
+  background-color: $color_primary;
+}
+
+.event-detail-separator {
+  font-size: 5px !important
+}
+
+.event-detail.location {
+  font-size: 24px;
+}
+
+.event-detail img {
+  width: 24px;
+  position: relative;
+  top: 7px;
+  opacity: 0.5
+}
+
+.event-detail.link {
+  font-size: 24px;
+}
+
+span.event-detail.calendar-date {
+  cursor: default;
+}
+
+.event-detail.calendar-date .month {
+  display: block;
+  font-size: 0.65rem;
+  text-transform: uppercase;
+  background-color: $color_primary_transparent_3;
+  border-bottom: 2px solid $color_primary_transparent_5;
+}
+
+.event-detail.calendar-date .day {
+  display: block;
+  font-size: 0.75rem;
+}

@@ -30,7 +30,7 @@
     </style>
   </head>
   <body>
-    <% if defined?(header_image_url) %>
+    <% if defined?(header_image_url) && header_image_url %>
       <div style="text-align: center; font-size: 0">
         <img src="<%= header_image_url %>" style="max-width: 100px; margin-top: 16px; margin-bottom: 16px">
       </div>

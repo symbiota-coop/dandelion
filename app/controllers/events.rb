@@ -328,6 +328,8 @@ Dandelion::App.controller do
     order.tickets.new(ticket_type: @event.ticket_types.first)
     order.tickets.new(ticket_type: @event.ticket_types.first)
     order.account = account
+    header_image_url, from_email = order.sender_info
+
     content = ERB.new(File.read(Padrino.root('app/views/emails/tickets.erb'))).result(binding)
                  .gsub('%recipient.token%', current_account.sign_in_token)
     Premailer.new(ERB.new(File.read(Padrino.root('app/views/layouts/email.erb'))).result(binding), with_html_string: true, adapter: 'nokogiri', input_encoding: 'UTF-8').to_inline_css

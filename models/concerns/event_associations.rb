@@ -141,4 +141,10 @@ module EventAssociations
     a += local_group.admins_receiving_feedback if local_group
     a.uniq
   end
+
+  def contacts
+    a = [account, revenue_sharer, coordinator].compact
+    a += event_facilitators
+    a.uniq
+  end
 end

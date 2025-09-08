@@ -13,6 +13,12 @@ app/assets/stylesheets/app.css
 app/assets/stylesheets/app.css.map
 app/assets/stylesheets/organisation.css
 app/assets/stylesheets/organisation.css.map
+app/assets/stylesheets/email.css
+app/assets/stylesheets/email.css.map
+app/assets/stylesheets/event_details.css
+app/assets/stylesheets/event_details.css.map
+app/assets/stylesheets/variables.css
+app/assets/stylesheets/variables.css.map
 capybara
 node_modules
 *.js.map
