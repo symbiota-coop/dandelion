@@ -32,7 +32,7 @@
       </tr>
       <tr>
         <td>
-          <a target="_blank" <% if @event.location != 'Online' %>href="https://www.google.com/maps?q=<%=event.location%>"<% end %> class="event-detail location">
+          <a target="_blank" <% if event.location != 'Online' %>href="https://www.google.com/maps?q=<%=event.location%>"<% end %> class="event-detail location">
 
             <% if event.location == 'Online' %>
               <img src="<%=ENV['BASE_URI']%>/images/icons/camera-video.svg">
