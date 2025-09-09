@@ -26,12 +26,11 @@
       }
 
       p.action a:hover {
-        color: white !important;
         background: <%= pmail.organisation.theme_color ? pmail.organisation.theme_color.paint.darken : '#00A558' %> !important;
       }
 
       blockquote {
-        border-left: 0.25rem solid <%= pmail.organisation.theme_color ? pmail.organisation.theme_color.paint.opacity(0.33) : '#00B963'.paint.opacity(0.33) %> !important;
+        border-left: 0.25em solid <%= pmail.organisation.theme_color ? pmail.organisation.theme_color.paint.opacity(0.33) : '#00B963'.paint.opacity(0.33) %> !important;
       }
     </style>
   </head>
@@ -39,13 +38,13 @@
     <div class="tagline">
       <%= pmail.preview_text %>
     </div>
-    <div style="text-align: center">
+    <div class="header-image-container">
       <% if pmail.organisation.image %>
         <a href="<%= pmail.organisation.website || "#{ENV['BASE_URI']}/o/#{pmail.organisation.slug}" %>">
-          <img src="<%= pmail.organisation.image.thumb('200x200').url %>" style="max-width: 100px; padding-top: 16px">
+          <img src="<%= pmail.organisation.image.thumb('200x200').url %>">
         </a>
       <% else %>
-        <h1 style="margin: 0; padding-top: 16px; padding-bottom: 0">
+        <h1 style="margin: 0; padding: 0.5em 0">
           <a style="color: #222; text-decoration: none" href="<%= pmail.organisation.website || "#{ENV['BASE_URI']}/o/#{pmail.organisation.slug}" %>">
             <%= pmail.organisation.name %>
           </a>
@@ -55,7 +54,7 @@
     <div class="preview">
       <% if defined?(share_buttons) && share_buttons %>
         %share_buttons%
-        <div style="text-align: center; margin-top: 16px">
+        <div class="subscribe">
           <small><a href="<%= ENV['BASE_URI'] %>/o/<%= pmail.organisation.slug %>">Subscribe to <%= pmail.organisation.name %></a></small>
         </div>
       <% else %>

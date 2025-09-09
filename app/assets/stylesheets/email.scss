@@ -49,6 +49,10 @@ p.action a {
   border-radius: $width_2;
 }
 
+p.action a:hover {
+  color: white !important;
+}
+
 table {
   width: 100%;
   border-collapse: collapse
@@ -220,4 +224,9 @@ pre {
   margin: 0;
   margin-right: $width_2;
   width: 1em;
+}
+
+.subscribe {
+  text-align: center;
+  margin-top: 1em;
 }
