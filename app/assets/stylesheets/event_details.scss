@@ -5,7 +5,11 @@ $event_detail_border_width: 0.125em;
 table.event-details td {
   vertical-align: middle;
   font-size: 1.25em;
+}
+
+table.event-details td:first-child {
   min-width: 3.25em;
+  width: 1px;
 }
 
 .event-detail {
