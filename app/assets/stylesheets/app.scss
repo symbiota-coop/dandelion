@@ -11,6 +11,15 @@ table.event-details td {
   margin-top: 0.375em;
 }
 
+.event-detail:hover {
+  background-color: $color_primary;
+}
+
+.event-detail:hover img {
+  filter: invert(1);
+  opacity: 1;
+}
+
 .event-detail.calendar-date .day {
   padding: 0.1em;
 }

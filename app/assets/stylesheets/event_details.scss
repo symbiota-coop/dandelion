@@ -26,17 +26,6 @@ table.event-details td:first-child {
   line-height: 1;
 }
 
-.event-detail:hover {
-  text-decoration: none;
-  color: white;
-  background-color: $color_primary;
-}
-
-.event-detail:hover img {
-  filter: invert(1);
-  opacity: 1
-}
-
 .event-detail-separator {
   font-size: 0.2em !important
 }
