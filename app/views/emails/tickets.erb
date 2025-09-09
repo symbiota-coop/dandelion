@@ -13,13 +13,13 @@
   <table class="event-details">
     <tbody>
       <tr>
-        <td style="padding-right: 12px; width: 1px">
+        <td style="width: 56px">
           <span class="event-detail calendar-date">
             <span class="month"><%= event.start_time.strftime('%b') %></span>
             <span class="day"><%= event.start_time.day %></span>
           </span>
         </td>
-        <td style="padding-right: 12px;">
+        <td>
           <% when_parts = event.when_details(account.try(:time_zone), with_zone: true).split(', ') %>
           <%= when_parts[0] %>
           <div class="text-muted" style="font-size: 90%;">
@@ -98,7 +98,7 @@
         <% if account.sign_ins_count == 0 && account.persisted? %>
           <a href="<%= ENV['BASE_URI'] %>/accounts/edit?sign_in_token=%recipient.token%&event_id=<%= event.id %>">Click here to create a profile on Dandelion and connect with others <%= event.recording? ? 'who attended' : 'attending' %> the event.</a>
         <% else %>
-          <a href="<%= ENV['BASE_URI'] %>/e/<%= event.slug %>?sign_in_token=%recipient.token%">Sign in to Dandelion to show or hide your attendance and connect with others <%= event.recording? ? 'who attended' : 'attending' %> the event.</a>
+          <a href="<%= ENV['BASE_URI'] %>/e/<%= event.slug %>?sign_in_token=%recipient.token%">Sign in to Dandelion</a> to show or hide your attendance and connect with others <%= event.recording? ? 'who attended' : 'attending' %> the event.
         <% end %>
       </p>
     <% end %>
