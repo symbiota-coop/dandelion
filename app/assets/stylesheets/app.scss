@@ -2,8 +2,13 @@
 @import "../infinite_admin/scss/style";
 @import "event_details";
 
+
+table.event-details td {
+  font-size: 1.25em
+}
+
 .event-detail img {
-  margin-top: 0.375em;
+  margin-top: 0.425em;
 }
 
 .event-detail.calendar-date .day {
