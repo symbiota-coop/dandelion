@@ -1,6 +1,34 @@
 @import "variables";
 @import "event_details";
 
+$width_1: 0.0625em;
+$width_2: 0.125em;
+
+html,
+body,
+p,
+ul,
+ol,
+input,
+select,
+.form-control,
+blockquote {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, sans-serif;
+  font-size: 18px;
+  line-height: 1.45;
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6,
+.h {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, sans-serif;
+  margin-top: 0;
+}
+
 .font-weight-normal {
   font-weight: normal
 }
@@ -18,7 +46,7 @@ p.action a {
   color: white;
   text-decoration: none;
   padding: 0.75em;
-  border-radius: 0.125em;
+  border-radius: $width_2;
 }
 
 table {
@@ -70,30 +98,6 @@ td {
 .footer-logo {
   opacity: 0.33;
   width: 8rem;
-}
-
-body,
-p,
-ul,
-ol,
-input,
-select,
-.form-control,
-blockquote {
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, sans-serif;
-  font-size: 1em;
-  line-height: 1.45;
-}
-
-h1,
-h2,
-h3,
-h4,
-h5,
-h6,
-.h {
-  font-family: 'Roboto', sans-serif;
-  margin-top: 0;
 }
 
 .main img {
@@ -155,15 +159,15 @@ p.action {
 }
 
 hr {
-  border: 0.0625em solid #eee;
+  border: $width_1 solid #eee;
   margin: 1em 0;
 }
 
 a.attachment {
   margin-top: 1em;
-  padding: 1em;
-  border: 0.125em solid #eee;
-  border-radius: 0.125em;
+  padding: 0.75em;
+  border: $width_2 solid #eee;
+  border-radius: $width_2;
   text-decoration: none;
   display: block;
 }
@@ -172,8 +176,8 @@ pre {
   padding: 1em;
   color: #353535;
   background: #eee;
-  border: 0.0625em solid #c4c4c4;
-  border-radius: 0.125em;
+  border: $width_1 solid #c4c4c4;
+  border-radius: $width_2;
   text-align: left;
   direction: ltr;
   tab-size: 4;
@@ -214,6 +218,6 @@ pre {
 
 .qr-code {
   margin: 0;
-  margin-right: 0.125em;
+  margin-right: $width_2;
   width: 1em;
 }
