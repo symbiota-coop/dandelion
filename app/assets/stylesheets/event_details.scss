@@ -1,20 +1,24 @@
 @import "variables";
 
+$event_detail_border_width: 0.125em;
+
 table.event-details td {
   vertical-align: middle;
-  font-size: 1.175em;
+  font-size: 1.25em;
+  min-width: 3.25em;
 }
 
 .event-detail {
   vertical-align: middle;
   display: inline-block;
   text-align: center;
-  border: 2px solid $color_primary_transparent_5;
-  border-radius: 4px;
-  width: 40px;
-  height: 40px;
+  border: $event_detail_border_width solid $color_primary_transparent_5;
+  border-radius: 0.25em;
+  width: 2.5em;
+  height: 2.5em;
   color: #666;
   background: white;
+  line-height: 1;
 }
 
 .event-detail:hover {
@@ -24,21 +28,13 @@ table.event-details td {
 }
 
 .event-detail-separator {
-  font-size: 5px !important
-}
-
-.event-detail.location {
-  font-size: 24px;
+  font-size: 0.2em !important
 }
 
 .event-detail img {
-  width: 24px;
-  margin-top: 7px;
+  width: 1.5em;
+  margin-top: 0.5em;
   opacity: 0.5
-}
-
-.event-detail.link {
-  font-size: 24px;
 }
 
 span.event-detail.calendar-date {
@@ -47,13 +43,20 @@ span.event-detail.calendar-date {
 
 .event-detail.calendar-date .month {
   display: block;
-  font-size: 0.65rem;
   text-transform: uppercase;
   background-color: $color_primary_transparent_3;
-  border-bottom: 2px solid $color_primary_transparent_5;
+  border-bottom: $event_detail_border_width solid $color_primary_transparent_5;
+
+}
+
+.event-detail.calendar-date .month .month-text {
+  display: block;
+  font-size: 0.65em;
+  padding: 0.225em;
 }
 
 .event-detail.calendar-date .day {
   display: block;
-  font-size: 0.75rem;
+  padding-top: 0.25em;
+  font-size: 1em;
 }

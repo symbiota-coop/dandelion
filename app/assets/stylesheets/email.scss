@@ -1,28 +1,6 @@
 @import "variables";
 @import "event_details";
 
-table.event-details td {
-  font-size: 1em;
-}
-
-.event-details {
-  margin-top: 20px;
-  margin-bottom: 20px
-}
-
-.event-detail.calendar-date .month {
-  display: block;
-  font-size: 12px;
-  text-transform: uppercase;
-  background-color: $color_primary_transparent_3;
-  border-bottom: 2px solid $color_primary_transparent_5;
-}
-
-.event-detail.calendar-date .day {
-  display: block;
-  font-size: 15px;
-}
-
 .font-weight-normal {
   font-weight: normal
 }

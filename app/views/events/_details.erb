@@ -2,8 +2,8 @@
   <tr>
     <td class="pr-2" <% if @event.start_time.to_date != @event.end_time.to_date %>style="vertical-align: top;"<% end %>>
 
-      <span <% if @event.start_time.to_date != @event.end_time.to_date %>style="margin-top: 3px;"<% end %> class="event-detail calendar-date" data-toggle="tooltip" title="<% if @event.future? %>in <%=distance_of_time_in_words @event.start_time - Time.now %><% else %><%=distance_of_time_in_words @event.start_time - Time.now %> ago<% end %>">
-        <span class="month"><%= @event.start_time.strftime('%b') %></span>
+      <span class="event-detail calendar-date <% if @event.start_time.to_date != @event.end_time.to_date %>mt-1<% end %>" data-toggle="tooltip" title="<% if @event.future? %>in <%=distance_of_time_in_words @event.start_time - Time.now %><% else %><%=distance_of_time_in_words @event.start_time - Time.now %> ago<% end %>">
+        <span class="month"><span class="month-text"><%= @event.start_time.strftime('%b') %></span></span>
         <span class="day"><%= @event.start_time.day %></span>
       </span>
 
@@ -50,9 +50,9 @@
       <a data-toggle="tooltip" title="<% if @event.location == 'Online' %>Online<% else %>Location<% end %>" <% if @event.location != 'Online' %>target="_blank" href="https://www.google.com/maps?q=<%= @event.location %>"<% end %> class="event-detail location">
 
         <% if @event.location == 'Online' %>
-          <i class="bi bi-camera-video"></i>
+          <img src="<%=ENV['BASE_URI']%>/images/icons/_camera-video.png">
         <% else %>
-          <i class="bi bi-geo-alt"></i>
+          <img src="<%=ENV['BASE_URI']%>/images/icons/_geo-alt.png">
         <% end %>
 
       </a>
@@ -78,7 +78,7 @@
     <td>
 
       <a href="javascript:;" class="event-detail link copy-link-icon" data-toggle="tooltip" title="Event URL (click to copy)">
-        <i class="bi bi-link"></i>
+        <img src="<%=ENV['BASE_URI']%>/images/icons/_link.png">
       </a>
 
     </td>

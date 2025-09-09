@@ -2,6 +2,14 @@
 @import "../infinite_admin/scss/style";
 @import "event_details";
 
+.event-detail img {
+  margin-top: 0.375em;
+}
+
+.event-detail.calendar-date .day {
+  padding: 0.15em;
+}
+
 .select-placeholder {
   color: $placeholder_grey !important;
 }
