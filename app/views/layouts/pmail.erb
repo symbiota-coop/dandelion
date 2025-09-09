@@ -6,9 +6,11 @@
     <title><%= pmail.subject %></title>
     <style data-premailer="ignore">
       .d-none { display: none }
-      th, td { width: 50%; padding-right: 0.5em; padding-bottom: 0.5em }
+      th, td { width: 50%; padding-bottom: 0.5em }
+      tr th:not(:only-child):first-child, tr td:not(:only-child):first-child { padding-right: 0.5em }
+      tr th:not(:only-child):last-child, tr td:not(:only-child):last-child { padding-left: 0.5em }
       @media(max-width: 700px) {
-        th, td { width: 100%; padding-right: 0; display: inline-block; }
+        th, td { width: 100%; padding-left: 0 !important; padding-right: 0 !important; display: inline-block; }
       }
     </style>
     <style>
