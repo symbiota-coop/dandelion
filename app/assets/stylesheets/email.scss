@@ -3,6 +3,7 @@
 
 $width_1: 0.0625em;
 $width_2: 0.125em;
+$width_3: 0.25em;
 
 html,
 body,
@@ -46,7 +47,7 @@ p.action a {
   color: white;
   text-decoration: none;
   padding: 0.75em;
-  border-radius: $width_2;
+  border-radius: $width_3;
 }
 
 p.action a:hover {
