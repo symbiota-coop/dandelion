@@ -109,10 +109,16 @@ class Ticket
   end
 
   after_save do
-    event.clear_cache if event
+    if event
+      event.clear_cache
+      event.set(sold_out_cache: event.sold_out?)
+    end
   end
   after_destroy do
-    event.clear_cache if event
+    if event
+      event.clear_cache
+      event.set(sold_out_cache: event.sold_out?)
+    end
   end
 
   def self.email_viewer?(ticket, account)
