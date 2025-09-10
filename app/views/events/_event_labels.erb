@@ -5,7 +5,7 @@
     <span class="label label-yellow">Featured</span>
   <% end %>
 <% end %>
-<% if event.sold_out? %>
+<% if event.sold_out_cache %>
   <span class="label label-danger">Sold out</span>
 <% end %>
 <% if event.locked? %>

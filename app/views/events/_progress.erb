@@ -26,7 +26,7 @@
   <% if event.orders.incomplete.exists? %>
     <i data-toggle="tooltip" title="Someone is in the process of completing an order. If they don't complete it soon, the order will be removed." class="bi bi-spin bi-arrow-repeat"></i>
   <% end %>
-  <% if event.sold_out? %>
+  <% if event.sold_out_cache %>
     <div class="mt-1">
       <span class="label label-primary">Sold out</span>
     </div>

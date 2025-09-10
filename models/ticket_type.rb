@@ -76,6 +76,19 @@ class TicketType
     errors.add(:max_quantity_per_transaction, 'must not be < 0') if max_quantity_per_transaction && max_quantity_per_transaction < 0
   end
 
+  after_save do
+    if event
+      event.clear_cache
+      event.set(sold_out_cache: event.sold_out?)
+    end
+  end
+  after_destroy do
+    if event
+      event.clear_cache
+      event.set(sold_out_cache: event.sold_out?)
+    end
+  end
+
   def range
     range_min && range_max ? [range_min, range_max] : nil
   end
