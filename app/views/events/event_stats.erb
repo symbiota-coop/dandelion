@@ -35,7 +35,7 @@
         <label>containing the word</label>
         <%= text_field_tag :q, class: 'form-control mx-1', value: params[:q] %>
       </div>
-      <% if event_tags.count > 0 %>
+      <% if event_tags.exists? %>
         <div class="form-group col-12 col-sm-auto">
           <label>tagged</label>
           <%= select_tag :event_tag_id, options: [''] + event_tags.order('name asc').map { |event_tag| [event_tag.name, event_tag.id] }, selected: params[:event_tag_id], class: 'form-control' %>
@@ -47,25 +47,25 @@
       </div>
 
       <% if @organisation %>
-        <% if @organisation.local_groups.count > 0 %>
+        <% if @organisation.local_groups.exists? %>
           <div class="form-group col-12 col-sm-auto">
             <label>Local group</label>
             <%= select_tag :local_group_id, options: [''] + @organisation.local_groups.order('name asc').map { |local_group| [local_group.name, local_group.id] }, selected: params[:local_group_id], class: 'form-control mx-1' %>
           </div>
         <% end %>
-        <% if @organisation.activities.count > 0 %>
+        <% if @organisation.activities.exists? %>
           <div class="form-group col-12 col-sm-auto">
             <label>Activity</label>
             <%= select_tag :activity_id, options: [''] + @organisation.activities.order('name asc').map { |activity| [activity.name, activity.id] }, selected: params[:activity_id], class: 'form-control mx-1' %>
           </div>
         <% end %>
-        <% if @organisation.carousels.count > 0 %>
+        <% if @organisation.carousels.exists? %>
           <div class="form-group col-12 col-sm-auto">
             <label>Carousel</label>
             <%= select_tag :carousel_id, options: ['', ['Featured', 'featured']] + @organisation.carousels.order('o asc').map { |carousel| [carousel.name, carousel.id] }, selected: params[:carousel_id], class: 'form-control mx-1' %>
           </div>
         <% end %>
-        <% if @organisation.cohosts.count > 0 %>
+        <% if @organisation.cohosts.exists? %>
           <div class="form-group col-12 col-sm-auto">
             <label>Co-host</label>
             <%= select_tag :cohost_id, options: [''] + @organisation.cohosts.order('name asc').map { |organisation| [organisation.name, organisation.id] }, selected: params[:cohost_id], class: 'form-control mx-1' %>

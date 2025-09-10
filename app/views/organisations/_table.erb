@@ -23,7 +23,7 @@
       </td>
     </tr>
   <% end %>
-  <% if organisation_admin? or @organisation.admins.count > 0 %>
+  <% if organisation_admin? or @organisation.admins.exists? %>
     <tr>
       <td>Admins</td>
       <td>

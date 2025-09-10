@@ -53,7 +53,7 @@
 
 <%= partial :'events_build/drafts' %>
 
-<% if @event.errors.count > 0 %>
+<% if @event.errors.exists? %>
   <div class="alert alert-danger">
     <ul class="mb-0">
       <% @event.errors.full_messages.each { |message| %>
@@ -99,7 +99,7 @@
           <%= f.lookup_block :organiser_id, lookup_url: '/accounts.json', placeholder: 'Search accounts', selected_link: (%(<a class="d-inline-block mt-1" target="_blank" href="/u/#{@event.organiser.username}">View account</a>) if @event.organiser_id) %>
         <% end %>
 
-        <% if @event.organisation.activities.count > 0 || @event.organisation.local_groups.count > 0 %>
+        <% if @event.organisation.activities.exists? || @event.organisation.local_groups.exists? %>
           <div class="form-group">
             <label for="event_organisation" class="">
               Organisation
@@ -110,11 +110,11 @@
           </div>
         <% end %>
 
-        <% if @event.organisation.activities.count > 0 %>
+        <% if @event.organisation.activities.exists? %>
           <%= f.lookup_block :activity_id, lookup_url: "/o/#{@event.organisation_id}/activities.json", placeholder: 'Search activities', selected_link: (%(<a class="d-inline-block mt-1" target="_blank" href="/activities/#{@event.activity_id}">View activity</a>) if @event.activity_id) %>
         <% end %>
 
-        <% if @event.organisation.local_groups.count > 0 %>
+        <% if @event.organisation.local_groups.exists? %>
           <div id="local-group-select" <% unless @event.organisation.experimental? %> class="mb-3" <% end %>>
             <%= f.lookup_block :local_group_id, lookup_url: "/o/#{@event.organisation_id}/local_groups.json", placeholder: 'Search local groups', selected_link: (%(<a class="d-inline-block mt-1" target="_blank" href="/local_groups/#{@event.local_group_id}">View local group</a>) if @event.local_group_id) %>
           </div>
@@ -271,7 +271,7 @@
         <%= f.number_block :facebook_pixel_id %>
         <%= f.text_block :oc_slug %>
         <%= f.text_block :tax_rate_id %>
-        <% if current_account.memberships.and(admin: true).count > 0 %>
+        <% if current_account.memberships.and(admin: true).exists? %>
           <%= f.select_block :gathering_id, options: [''] + current_account.memberships.and(admin: true).map { |m| [m.gathering.name, m.gathering_id] }.sort_by { |a,b| a } %>
         <% end %>
         <%= f.check_box_block :hide_attendees %>

@@ -1,4 +1,4 @@
- <% if current_account.upcoming_events.count > 0 %>
+ <% if current_account.upcoming_events.exists? %>
   <table class="table table-borderless">
     <% current_account.upcoming_events.each { |event| %>
     <tr>
@@ -33,7 +33,7 @@
 <% else %>
   <p class="mb-0">
     Nothing upcoming. <a class="browse-events" href="/events">Browse events</a>
-    <% if current_account.previous_events.count > 0 %>
+    <% if current_account.previous_events.exists? %>
       or <a href="/events/my">see your past events &rarr;</a>
     <% end %>
   </p>

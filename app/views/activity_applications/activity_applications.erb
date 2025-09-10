@@ -28,7 +28,7 @@
         <label>Status</label>
         <%= select_tag :status, class: 'form-control', selected: @status, options: ActivityApplication.statuses.map { |s| ["#{s} (#{@activity.activity_applications.and(status: s).count})", s] } + [["All (#{@activity.activity_applications.count})", 'All']] %>
       </div>
-      <% if @activity.activity_applications.and(:statused_by.ne => nil).count > 0 %>
+      <% if @activity.activity_applications.and(:statused_by.ne => nil).exists? %>
         <div class="form-group col-12 col-sm-auto">
           <label>Processed by</label>
           <%= select_tag :statused_by, class: 'form-control', selected: params[:statused_by], options: [''] + @activity.activity_applications.pluck(:statused_by).compact.uniq.map { |account_id| ["#{Account.find(account_id).name} (#{@activity.activity_applications.and(statused_by: account_id).count})", account_id] } %>

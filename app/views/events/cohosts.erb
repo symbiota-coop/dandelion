@@ -1,6 +1,6 @@
 <%= partial :'events/nav', locals: { event: @event } %>
 
-<% if @cohostship && @cohostship.errors.count > 0 %>
+<% if @cohostship && @cohostship.errors.exists? %>
   <div class="alert alert-danger">
     <ul class="mb-0">
       <% @cohostship.errors.full_messages.each { |message| %>

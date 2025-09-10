@@ -7,10 +7,10 @@
 <% end %>
 
 <% unless params[:past_events_page] %>
-  <% if past_events.count > 0 %>
+  <% if past_events.exists? %>
     <h2 class="mb-3">Upcoming events</h2>
   <% end %>
-  <% if upcoming_events.count > 0 %>
+  <% if upcoming_events.exists? %>
     <%= partial :'events/blocks', locals: { events: upcoming_events } %>
     <div class="mt-3">
       <%= will_paginate upcoming_events, param_name: 'upcoming_events_page', inner_window: 0, outer_window: 0, renderer: WillPaginate::ViewHelpers::BootstrapRenderer %>
@@ -23,10 +23,10 @@
 <% end %>
 
 <% unless params[:upcoming_events_page] %>
-  <% if past_events.count > 0; events = past_events %>
+  <% if past_events.exists?; events = past_events %>
     <h2 class="mb-3">Past events</h2>
 
-    <% if events.count > 0 %>
+    <% if events.exists? %>
       <div class="mb-3">
         <div class="row" id="events">
           <% events.each { |event| next if event.locked? && !event_admin?(event) %>

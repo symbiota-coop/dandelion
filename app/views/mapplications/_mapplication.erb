@@ -13,7 +13,7 @@
 </div>
 <% end %>
 <% [%w[proposer propose], %w[supporter support]].each { |noun, verb| %>
-<% if @gathering.send("enable_#{noun.pluralize}") && mapplication.verdicts.send(noun.pluralize).count > 0 %>
+<% if @gathering.send("enable_#{noun.pluralize}") && mapplication.verdicts.send(noun.pluralize).exists? %>
   <div class="mb-5">
     <h4 class="mb-3"><%= noun.humanize.pluralize %></h4>
     <% mapplication.verdicts.send(noun.pluralize).each { |verdict| account = verdict.account %>

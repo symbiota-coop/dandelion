@@ -1,4 +1,4 @@
-<% if (links = account.farcaster_links) && links.count > 0 %>
+<% if (links = account.farcaster_links) && links.exists? %>
 
   <h2>
     <a target="_blank" class="text-dark" href="https://warpcast.com/<%= u = account.farcaster_user['username'] %>">

@@ -60,7 +60,7 @@ class Mapplication
   end
 
   def acceptable?
-    status == 'pending' && (!gathering.member_limit or (gathering.memberships.count < gathering.member_limit)) && (gathering.threshold == 0 || verdicts.proposers.count > 0)
+    status == 'pending' && (!gathering.member_limit or (gathering.memberships.count < gathering.member_limit)) && (gathering.threshold == 0 || verdicts.proposers.exists?)
   end
 
   def meets_threshold

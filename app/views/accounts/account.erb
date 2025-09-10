@@ -3,16 +3,16 @@
 
 <%= cp(:'accounts/farcaster', key: "/accounts/#{@account.id}/farcaster", locals: { account: @account }) %>
 
-<% if (events = Event.and(:id.in => EventFacilitation.and(:account_id.in => [@account.id] + @account.following_starred.pluck(:id)).pluck(:event_id)).live.public.future_and_current).count > 0 %>
-  <h2 class="mt-5">Upcoming events <% if @account.following_starred.count > 0 %>featuring <%=@account.firstname%> and <%=@account.pronoun%> stars<% end %></h2>
+<% if (events = Event.and(:id.in => EventFacilitation.and(:account_id.in => [@account.id] + @account.following_starred.pluck(:id)).pluck(:event_id)).live.public.future_and_current).exists? %>
+  <h2 class="mt-5">Upcoming events <% if @account.following_starred.exists? %>featuring <%=@account.firstname%> and <%=@account.pronoun%> stars<% end %></h2>
   <%= partial :'events/blocks', locals: { events: events } %>
 <% end %>
-<% if @account.unscoped_event_feedbacks_as_facilitator.count > 0 %>
+<% if @account.unscoped_event_feedbacks_as_facilitator.exists? %>
   <h2 id="feedback" class="mt-5">Feedback on <%=@account.firstname%>'s events</h2>
   <div class="mt-3" data-pagelet-url="/accounts/<%= @account.id %>/show_feedback"></div>
 <% end %>
 
-<% if (organisations = Organisation.and(:id.in => @account.organisationships.and(:hide_membership.ne => true).pluck(:organisation_id))).count > 0 %>
+<% if (organisations = Organisation.and(:id.in => @account.organisationships.and(:hide_membership.ne => true).pluck(:organisation_id))).exists? %>
   <% if viewable?(@account, :organisations, viewer_in_network: viewer_in_network) %>
     <div class="mt-5 row justify-content-between no-gutters">
       <div class="col">
@@ -28,7 +28,7 @@
   <% end %>
 <% end %>
 
-<% if (local_groups = LocalGroup.and(:id.in => @account.local_groupships.and(:hide_membership.ne => true).pluck(:local_group_id))).count > 0 %>
+<% if (local_groups = LocalGroup.and(:id.in => @account.local_groupships.and(:hide_membership.ne => true).pluck(:local_group_id))).exists? %>
   <% if viewable?(@account, :local_groups, viewer_in_network: viewer_in_network) %>
     <div class="mt-5 row justify-content-between no-gutters">
       <div class="col">
@@ -44,7 +44,7 @@
   <% end %>
 <% end %>
 
-<% if (activities = Activity.and(:id.in => @account.activityships.and(:hide_membership.ne => true).pluck(:activity_id))).count > 0 %>
+<% if (activities = Activity.and(:id.in => @account.activityships.and(:hide_membership.ne => true).pluck(:activity_id))).exists? %>
   <% if viewable?(@account, :activities, viewer_in_network: viewer_in_network) %>
     <div class="mt-5 row justify-content-between no-gutters">
       <div class="col">
@@ -60,7 +60,7 @@
   <% end %>
 <% end %>
 
-<% if (gatherings = Gathering.and(:id.in => @account.memberships.pluck(:gathering_id)).and(listed: true).and(:privacy.ne => 'secret')).count > 0 %>
+<% if (gatherings = Gathering.and(:id.in => @account.memberships.pluck(:gathering_id)).and(listed: true).and(:privacy.ne => 'secret')).exists? %>
   <% if viewable?(@account, :gatherings, viewer_in_network: viewer_in_network) %>
     <div class="mt-5 row justify-content-between no-gutters">
       <div class="col">
@@ -76,7 +76,7 @@
   <% end %>
 <% end %>
 
-<% if @account.follows_as_follower.count > 0 %>
+<% if @account.follows_as_follower.exists? %>
   <% if viewable?(@account, :following, viewer_in_network: viewer_in_network) %>
     <div class="mt-5 row justify-content-between no-gutters">
       <div class="col">
@@ -92,7 +92,7 @@
   <% end %>
 <% end %>
 
-<% if @account.follows_as_followee.count > 0 %>
+<% if @account.follows_as_followee.exists? %>
   <% if viewable?(@account, :followers, viewer_in_network: viewer_in_network) %>
     <div class="mt-5 row justify-content-between no-gutters">
       <div class="col">

@@ -43,7 +43,7 @@
 <% if @gathering.democratic_threshold %>
   <td><%= membership.desired_threshold %></td>
 <% end %>
-<% if @gathering.events.count > 0 %>
+<% if @gathering.events.exists? %>
   <td>
     <% @gathering.events.each { |event| %>
     <% event.tickets.complete.and(account: account).each { |ticket| %>
@@ -89,7 +89,7 @@
     </td>
   <% end %>
 <% end %>
-<% if @gathering.enable_rotas? && @gathering.rotas.count > 0 %>
+<% if @gathering.enable_rotas? && @gathering.rotas.exists? %>
   <td>
 
     <%= partial :'rotas/shift_summary', locals: {membership: membership} %>

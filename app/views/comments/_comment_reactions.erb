@@ -28,7 +28,7 @@
     </div>
   <% end %>
 <% end %>
-<% if comment.comment_reactions.count > 0 %>
+<% if comment.comment_reactions.exists? %>
   <% comment.comment_reactions.pluck(:body).uniq.each { |body| comment_reactions = comment.comment_reactions.and(body: body) %>
   <% c = 'd-inline-block border rounded p-1 text-dark' %>
   <a data-toggle="tooltip" style="text-decoration: none; background: white" <% if comment_reactions.find_by(account: current_account) %> class="pagelet-trigger border-primary <%= c %>" href="/comments/<%= comment.id %>/unreact" onclick="$(this).tooltip('hide')" <% else %> class="<%= c %> border-light" <% end %>>

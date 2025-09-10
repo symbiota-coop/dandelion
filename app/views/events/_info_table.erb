@@ -43,7 +43,7 @@
       </td>
     </tr>
   <% end %>
-  <% if event_admin? || (@event.event_facilitations.count > 0 && @event.event_facilitations.any? { |event_facilitation| event_facilitation.account.public? }) %>
+  <% if event_admin? || (@event.event_facilitations.exists? && @event.event_facilitations.any? { |event_facilitation| event_facilitation.account.public? }) %>
     <tr>
       <td>Facilitators</td>
       <td>
@@ -58,7 +58,7 @@
       </td>
     </tr>
   <% end %>
-  <% if !@event.hide_attendees? && @event.attendees.count > 0 %>
+  <% if !@event.hide_attendees? && @event.attendees.exists? %>
     <tr>
       <td>Attending</td>
       <td>

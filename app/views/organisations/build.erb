@@ -39,7 +39,7 @@
 
 <%= partial :'organisations/nav', locals: { organisation: @organisation } %>
 
-<% if current_account.organisations.count > 0 %>
+<% if current_account.organisations.exists? %>
   <p>
     <a target="_blank" href="/docs/organisations">
       <i class="bi bi-question-circle-fill"></i>
@@ -77,7 +77,7 @@
 
   })
 </script>
-<% if @organisation.errors.count > 0 %>
+<% if @organisation.errors.exists? %>
   <div class="alert alert-danger">
     <ul class="mb-0">
       <% @organisation.errors.full_messages.each { |message| %>

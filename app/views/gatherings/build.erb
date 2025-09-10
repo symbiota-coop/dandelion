@@ -107,7 +107,7 @@
 
   })
 </script>
-<% if @gathering.errors.count > 0 %>
+<% if @gathering.errors.exists? %>
   <div class="alert alert-danger">
     <ul class="mb-0">
       <% @gathering.errors.full_messages.each { |message| %>

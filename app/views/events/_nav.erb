@@ -29,7 +29,7 @@
           ([%(Payments <span class="badge badge-primary">#{event.rpayments.count}</span>), "/events/#{event.id}/rpayments"] if event.organisation.stripe_client_id),
           ([%(Waitlist <span class="badge badge-primary">#{event.waitships.count}</span>), "/events/#{event.id}/waitlist"] if event.waitships.count.positive?),
           ([%(Feedback <span class="badge badge-primary">#{event.event_feedbacks.count}</span>), "/events/#{event.id}/feedback"] if event.event_feedbacks.count.positive?),
-          (['Ticket type photos', "/events/#{event.id}/ticket_types"] if event.ticket_types.count > 0),
+          (['Ticket type photos', "/events/#{event.id}/ticket_types"] if event.ticket_types.exists?),
           (['Co-host settings', "/events/#{event.id}/cohosts"] if event.cohostships.count.positive?),          
           (['Preview confirmation email', "/events/#{event.id}/ticket_email"] if event.ticket_types.count.positive?),
           (['Preview reminder email', "/events/#{event.id}/reminder_email"] if event.ticket_types.count.positive?),

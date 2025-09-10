@@ -1,4 +1,4 @@
-<% if @event.activity && (events = @event.activity.events.live.public.future.and(:id.nin => [@event.id])).count > 0 %>
+<% if @event.activity && (events = @event.activity.events.live.public.future.and(:id.nin => [@event.id])).exists? %>
   <div class="card shadow-sm mt-3">
     <h3 class="card-header bg-primary text-white">Upcoming <%= @event.activity.name %> events</h3>
     <div class="card-body">

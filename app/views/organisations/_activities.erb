@@ -29,7 +29,7 @@
   <%= will_paginate activities, inner_window: 0, outer_window: 0, renderer: WillPaginate::ViewHelpers::BootstrapRenderer %>
 </div>
 <% if organisation_admin? %>
-  <% if (hidden_activities = @organisation.activities.inactive.order('name asc')).count > 0 %>
+  <% if (hidden_activities = @organisation.activities.inactive.order('name asc')).exists? %>
     <a class="btn btn-secondary" href="javascript:;" onclick="$(this).hide().next().show()">Show <%= pluralize(hidden_activities.count, 'hidden activity') %></a>
     <div style="display: none">
       <h3>Hidden activities</h3>

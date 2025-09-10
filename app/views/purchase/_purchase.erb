@@ -177,7 +177,7 @@ end
           </div>
         <% end %>
       <% end %>
-      <% if @event.opt_in_facilitator && @event.event_facilitators.count > 0 %>
+      <% if @event.opt_in_facilitator && @event.event_facilitators.exists? %>
         <script>
           $(function () {
             $('#opt-in-facilitator label').text('Get email updates from <%= @event.event_facilitators.map(&:firstname).to_sentence(last_word_connector: ' and ') %>')

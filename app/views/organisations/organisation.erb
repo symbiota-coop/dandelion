@@ -49,35 +49,35 @@
   </div>
 <% end %>
 
-<% if @organisation.news.count > 0 %>
+<% if @organisation.news.exists? %>
   <h2 class="mt-5 mb-3">Latest newsletters</h2>
   <div data-with-placeholder data-pagelet-url="/o/<%= @organisation.slug %>/news">
     <%= partial :'pmails/blocks_placeholder' %>
   </div>
 <% end %>
 
-<% if organisation_admin? or @organisation.events_for_search.future_and_current.count > 0 %>
+<% if organisation_admin? or @organisation.events_for_search.future_and_current.exists? %>
   <h2 class="mt-5">Events</h2>
   <div data-with-placeholder data-pagelet-url="/o/<%= @organisation.slug %>/events_block">
     <%= partial :'organisations/events_block_placeholder' %>
   </div>
 <% end %>
 
-<% if organisation_admin? or @organisation.activities.active.count > 0 %>
+<% if organisation_admin? or @organisation.activities.active.exists? %>
   <h2 class="mt-5">Activities</h2>
   <div data-with-placeholder data-pagelet-url="/o/<%= @organisation.slug %>/activities">
     <%= partial :placeholder %>
   </div>
 <% end %>
 
-<% if organisation_admin? or @organisation.local_groups.count > 0 %>
+<% if organisation_admin? or @organisation.local_groups.exists? %>
   <h2 class="mt-5">Local groups</h2>
   <div data-with-placeholder data-pagelet-url="/o/<%= @organisation.slug %>/local_groups">
     <%= partial :placeholder %>
   </div>
 <% end %>
 
-<% if @organisation.unscoped_event_feedbacks.count > 0 %>
+<% if @organisation.unscoped_event_feedbacks.exists? %>
   <h2 class="mt-5">Feedback on <%= @organisation.name %> events</h2>
   <div data-with-placeholder class="mt-3" data-pagelet-url="/o/<%= @organisation.slug %>/show_feedback">
     <%= partial :placeholder %>

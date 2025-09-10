@@ -29,7 +29,7 @@
       });
     </script>
   <% end %>
-  <% unscheduled = timetable.tactivities.and(space_id: nil); if unscheduled.count > 0 %>
+  <% unscheduled = timetable.tactivities.and(space_id: nil); if unscheduled.exists? %>
   <h3>Unscheduled</h3>
   <div class="row mt-3">
     <% unscheduled.sort_by { |tactivity| -tactivity.attendances.count }.each { |tactivity| %>

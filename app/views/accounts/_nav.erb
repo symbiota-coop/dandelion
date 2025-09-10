@@ -2,7 +2,7 @@
   <ul class="nav nav-tabs" role="tablist">
     <li role="presentation" class="nav-item"><a class="nav-link <%= 'active' if request.path == '/accounts/edit' %>" href="/accounts/edit">Edit profile</a></li>
     <li role="presentation" class="nav-item"><a class="nav-link <%= 'active' if request.path == '/accounts/subscriptions' %>" href="/accounts/subscriptions">Notifications</a></li>
-    <% if Provider.all.count > 0 %>
+    <% if Provider.all.exists? %>
       <li role="presentation" class="nav-item"><a class="nav-link <%= 'active' if request.path == '/accounts/providers' %>" href="/accounts/providers">Sign in with other services</a></li>
     <% end %>
     <li role="presentation" class="nav-item"><a class="nav-link <%= 'active' if request.path == '/accounts/delete' %>" href="/accounts/delete">Delete account</a></li>

@@ -8,7 +8,7 @@
     <%= partial :'accounts/account', locals: { account: @shift.account } %>
   </div>
 
-  <% if @shift.errors.count > 0 %>
+  <% if @shift.errors.exists? %>
     <div class="alert alert-danger">
       <ul class="mb-0">
         <% @shift.errors.full_messages.each { |message| %>

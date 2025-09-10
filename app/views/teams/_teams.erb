@@ -16,7 +16,7 @@
       </div>
     </td>
     <td>
-      <% if team.teamships.count > 0 %>
+      <% if team.teamships.exists? %>
         <% y = [] %>
         <% team.teamships.each { |teamship| account = teamship.account; %>
         <% if params[:view] == 'names' %>

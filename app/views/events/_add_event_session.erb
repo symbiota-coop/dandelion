@@ -53,7 +53,7 @@
           <%= f.submit_block button_text: 'Add session' %>
         <% end %>
       </div>
-      <% if event_sessions.count > 0 %>
+      <% if event_sessions.exists? %>
         <a data-toggle="tooltip" title="Remove a session" id="remove-event-session" href="javascript:;" onclick="$(this).hide().next().show();
         $('#add-event-session').hide()"><i class="bi bi-dash-square-fill"></i></a>
         <div style="display: none">

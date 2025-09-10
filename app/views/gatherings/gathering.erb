@@ -41,7 +41,7 @@
       <a class="btn btn-primary mb-1" href="/g/<%= @gathering.slug %>/copy">Copy</a>
       <a class="btn btn-primary mb-1" data-confirm="Are you sure you want to leave the gathering?" href="/g/<%= @gathering.slug %>/leave">Leave gathering</a>
     </div>
-    <% if @membership.admin? or @gathering.photos.count > 0 %>
+    <% if @membership.admin? or @gathering.photos.exists? %>
       <div class="my-3">
         <%= partial :'photos/photos', locals: { photoable: @gathering, add_photo_if: @membership.admin?, dimensions: '100x100#' } %>
       </div>

@@ -20,6 +20,6 @@
 </div>
 
 <%= partial :'mapplications/mapplications' %>
-<% if @gathering.mapplications.paused.count > 0 %>
+<% if @gathering.mapplications.paused.exists? %>
   <a href="/g/<%= @gathering.slug %>/applications/paused">View <%= pluralize(@gathering.mapplications.paused.count, 'paused application') %></a>
 <% end %>

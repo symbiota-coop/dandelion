@@ -7,8 +7,8 @@
         <th>Amount</th>
       </tr>
       <% Option.types.each { |type| %>
-      <% options = @gathering.options.and(type: type).select { |option| option.optionships.count > 0 } %>
-      <% if options.count > 0 %>
+      <% options = @gathering.options.and(type: type).select { |option| option.optionships.exists? } %>
+      <% if options.exists? %>
         <tr>
           <td colspan="2">
             <em><%= type == 'Ticket' ? 'Tickets' : type %></em>

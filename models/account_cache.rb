@@ -61,7 +61,7 @@ class AccountCache
         [event_id, people.select { |k, _v| participant_ids.include?(k) }]
       end
     end.compact
-    events = events.select { |_event_id, people| people.map { |_k, v| v }.flatten.count > 0 }
+    events = events.select { |_event_id, people| people.map { |_k, v| v }.flatten.exists? }
     events = events.sort_by { |_event_id, people| -people.map { |_k, v| v }.flatten.count }
     update_attribute(:recommended_events_cache, events)
   end

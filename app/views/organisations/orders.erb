@@ -12,7 +12,7 @@
     <label>containing the word</label>
     <%= text_field_tag :q, class: 'form-control typeWatch mx-1', value: params[:q] %>
   </div>
-  <% if (affiliates = Organisation.and(:id.in => @organisation.orders.and(:affiliate_type => 'Organisation').pluck(:affiliate_id))).count > 0 %>
+  <% if (affiliates = Organisation.and(:id.in => @organisation.orders.and(:affiliate_type => 'Organisation').pluck(:affiliate_id))).exists? %>
     <div class="form-group">
       <label>via affiliate</label>
       <%= select_tag :affiliate_id, selected: params[:affiliate_id], options: [''] + affiliates.map { |organisation| [organisation.name, organisation.id] }, class: 'form-control mx-1' %>

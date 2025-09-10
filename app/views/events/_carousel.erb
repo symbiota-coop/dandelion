@@ -27,7 +27,7 @@
 
   })
 </script>
-<% if events.count > 0 %>
+<% if events.exists? %>
   <div class="slick-container <% unless defined?(skip_margin) %> mt-5 <% end %> mb-lg-5" id="<%= slick_id %>">
     <% if defined? title %>
       <% unless defined?(hide_featured_title) && hide_featured_title && title == 'Featured' %>

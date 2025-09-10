@@ -151,7 +151,7 @@
       </td>
     </tr>
   <% end %>
-  <% if viewable?(account, :open_to, viewer_in_network: viewer_in_network) && account.open_to.count > 0 %>
+  <% if viewable?(account, :open_to, viewer_in_network: viewer_in_network) && account.open_to.exists? %>
     <tr>
       <td>Open to</td>
       <td>

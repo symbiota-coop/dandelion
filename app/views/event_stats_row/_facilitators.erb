@@ -1,5 +1,5 @@
 <td style="text-align: center">
-  <% if event.event_facilitations.count > 0 %>
+  <% if event.event_facilitations.exists? %>
     <% event.event_facilitations.each do |event_facilitation| %>
       <%= partial :'accounts/square', locals: { account: event_facilitation.account, width: '50px' } %>
       <br />

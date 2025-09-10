@@ -23,7 +23,7 @@
       </div>
     </a>
   <% end %>
-  <% if event.orders.incomplete.count > 0 %>
+  <% if event.orders.incomplete.exists? %>
     <i data-toggle="tooltip" title="Someone is in the process of completing an order. If they don't complete it soon, the order will be removed." class="bi bi-spin bi-arrow-repeat"></i>
   <% end %>
   <% if event.sold_out? %>

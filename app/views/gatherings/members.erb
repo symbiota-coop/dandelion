@@ -78,7 +78,7 @@
     <% } %>
   </div>
 <% when 'dietary_requirements' %>
-  <% if (memberships = @memberships.and(:account_id.in => Account.and(:dietary_requirements.ne => nil).pluck(:id))).count > 0 %>
+  <% if (memberships = @memberships.and(:account_id.in => Account.and(:dietary_requirements.ne => nil).pluck(:id))).exists? %>
     <table class="table table-striped">
       <thead>
         <tr>
@@ -131,7 +131,7 @@
         <% if @gathering.democratic_threshold %>
           <th>Suggested magic number</th>
         <% end %>
-        <% if @gathering.events.count > 0 %>
+        <% if @gathering.events.exists? %>
           <th>Tickets</th>
         <% end %>
         <% if @gathering.enable_contributions %>
@@ -141,7 +141,7 @@
             <th>Paid</th>
           <% end %>
         <% end %>
-        <% if @gathering.enable_rotas? && @gathering.rotas.count > 0 %>
+        <% if @gathering.enable_rotas? && @gathering.rotas.exists? %>
           <th>Shifts</th>
         <% end %>
         <% if (admin? || @membership.admin?) || !@gathering.hide_invitations %>
@@ -163,7 +163,7 @@
       <% if @gathering.democratic_threshold %>
         <th></th>
       <% end %>
-      <% if @gathering.events.count > 0 %>
+      <% if @gathering.events.exists? %>
         <th></th>
       <% end %>
       <% if @gathering.enable_contributions %>
@@ -176,7 +176,7 @@
           </th>
         <% end %>
       <% end %>
-      <% if @gathering.enable_rotas? && @gathering.rotas.count > 0 %>
+      <% if @gathering.enable_rotas? && @gathering.rotas.exists? %>
         <th></th>
       <% end %>
       <% if (admin? || @membership.admin?) || !@gathering.hide_invitations %>

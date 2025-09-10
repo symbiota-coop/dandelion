@@ -6,7 +6,7 @@
         $('#modal').modal('show')
       });">
     <%= mapplication.created_at %>
-    <% if mapplication.comments.count > 0 %>
+    <% if mapplication.comments.exists? %>
       &middot;
       <i class="bi bi-chat-left-text"></i> <%= mapplication.comments.count %>
     <% end %>

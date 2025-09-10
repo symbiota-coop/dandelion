@@ -12,7 +12,7 @@
 </style>
 
 <div id="subscriptions">
-  <% if @account.organisationships.count > 0 %>
+  <% if @account.organisationships.exists? %>
     <h2 class="my-3">Organisations</h2>
     <ul>
       <% @account.organisationships.each { |organisationship| organisation = organisationship.organisation %>
@@ -39,7 +39,7 @@
       <% } %>
     </ul>
   <% end %>
-  <% if @account.memberships.count > 0 %>
+  <% if @account.memberships.exists? %>
     <h2 class="my-3">Gatherings</h2>
     <ul>
       <% @account.memberships.each { |membership| gathering = membership.gathering %>

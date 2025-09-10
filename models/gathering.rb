@@ -110,7 +110,7 @@ class Gathering
   def incomings
     i = 0
     options.each do |option|
-      i += if option.split_cost && option.optionships.count > 0
+      i += if option.split_cost && option.optionships.exists?
              option.cost
            else
              option.cost * option.optionships.count
@@ -215,7 +215,7 @@ class Gathering
 
     if enable_contributions
       %w[Tier Accommodation Transport Food Extra].each do |o|
-        if optionships.and(:option_id.in => options.and(type: o).pluck(:id)).count > 0
+        if optionships.and(:option_id.in => options.and(type: o).pluck(:id)).exists?
           y << [:"with_#{o.downcase}", "With #{o.downcase}", memberships.and(:account_id.in => optionships.and(:option_id.in => options.and(type: o).pluck(:id)).pluck(:account_id))]
           y << [:"without_#{o.downcase}", "Without #{o.downcase}", memberships.and(:account_id.nin => optionships.and(:option_id.in => options.and(type: o).pluck(:id)).pluck(:account_id))]
         end

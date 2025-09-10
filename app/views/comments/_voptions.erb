@@ -9,7 +9,7 @@
       <a class="subtle pagelet-trigger" data-confirm="Are you sure?" href="/voptions/<%= voption.id %>/destroy"><i class="bi bi-x-lg"></i></a>
     <% end %>
   <% end %>
-  <% if voption.votes.count > 0 %>
+  <% if voption.votes.exists? %>
     <div class="image-wall">
       <% voption.votes.each { |vote| account = vote.account %>
       <%= partial :'accounts/square', locals: { account: account, width: '32px' } %>
@@ -25,7 +25,7 @@
     <%= hidden_field_tag :comment_id, value: comment.id %>
     <%= text_field_tag :text, class: 'form-control', placeholder: 'Add an option...' %>
   <% end %>
-  <% if comment.voptions.count > 0 %>
+  <% if comment.voptions.exists? %>
     <script>
       $(function () {
         $('#poll-for-<%= comment.id %>').hide().next().show()

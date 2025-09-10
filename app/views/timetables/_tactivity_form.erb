@@ -11,7 +11,7 @@
 
 <% form_for @tactivity ||= Tactivity.new, @tactivity.new_record? ? "/tactivities/create?timetable_id=#{timetable.id}" : "/tactivities/#{@tactivity.id}/edit" do |f| %>
 
-  <% if @tactivity.errors.count > 0 %>
+  <% if @tactivity.errors.exists? %>
     <div class="alert alert-danger">
       <ul class="mb-0">
         <% @tactivity.errors.full_messages.each { |message| %>

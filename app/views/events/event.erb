@@ -67,7 +67,7 @@
     <style>
       @media(max-width: 991px) { #content { padding-bottom: 4rem } }
     </style>
-  <% elsif (params[:ticket_type_id] || !@event.sold_out?) && @event.ticket_types.count > 0 %>
+  <% elsif (params[:ticket_type_id] || !@event.sold_out?) && @event.ticket_types.exists? %>
     <% sidebar = true %>
     <div id="buy-tickets" <%== buy_tickets_style %>>
       <a href="javascript:;" onclick="$(this).parent().hide();

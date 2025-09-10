@@ -11,7 +11,7 @@
       <% end %>
     </tr>
   </thead>
-  <% Option.types.each { |type| if (options = @gathering.options.and(type: type)).count > 0 %>
+  <% Option.types.each { |type| if (options = @gathering.options.and(type: type)).exists? %>
   <tr class="bg-white">
     <td colspan="5">
       <h3 class="mb-0"><i class="bi <%= Option.icon(type) %>"></i> <%= %w[Tier Extra].include?(type) ? type.pluralize : type %></h3>

@@ -1,4 +1,4 @@
-<% if defined?(data) || countable.count > 0 %>
+<% if defined?(data) || countable.exists? %>
   <canvas id="canvas-<%=r = SecureRandom.uuid%>"></canvas>
   <script>
     $(function() {

@@ -78,7 +78,7 @@ class Option
 
   def cost_per_person
     if split_cost
-      (cost.to_f / optionships.count).round if optionships.count > 0
+      (cost.to_f / optionships.count).round if optionships.exists?
     else
       cost
     end

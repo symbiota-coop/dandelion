@@ -1,6 +1,6 @@
 Dandelion::App.controller do
   get '/docs' do
-    halt unless DocPage.count > 0
+    halt unless DocPage.exists?
     redirect "/docs/#{DocPage.order('priority desc').first.slug}"
   end
 

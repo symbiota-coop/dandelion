@@ -1,5 +1,5 @@
 <% shifts = defined?(rota) ? membership.shifts.and(rota: rota) : membership.shifts %>
-<% if defined?(show_title) && show_title && shifts.count > 0 %>
+<% if defined?(show_title) && show_title && shifts.exists? %>
   <h3>Your shifts</h3>
 <% end %>
 <% shifts.each { |shift| %>

@@ -14,7 +14,7 @@
       </span>
     <% end %>
   </h2>
-  <% if @membership && @membership.shifts.count > 0 %>
+  <% if @membership && @membership.shifts.exists? %>
     <%= partial :'rotas/shift_summary', locals: {membership: @membership} %>
   <% else %>
     Sign up below!

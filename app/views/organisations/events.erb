@@ -37,12 +37,12 @@
 <% end %>
 
 <% if !params[:search] && !params[:event_tag_id] && !params[:page] && !params[:carousel_ids] && !params[:near] && !params[:display] %>
-  <% if @organisation.featured_events.count > 0 %>
+  <% if @organisation.featured_events.exists? %>
     <div data-with-placeholder data-pagelet-url="/o/<%= @organisation.slug %>/carousels/featured?hide_featured_title=<%=params[:hide_featured_title]%>">
       <%= partial :'events/carousel_placeholder' %>
     </div>
   <% end %>
-  <% if (carousels = @organisation.carousels.and(:hidden.ne => true).order('o asc')).count > 0 %>
+  <% if (carousels = @organisation.carousels.and(:hidden.ne => true).order('o asc')).exists? %>
     <% carousels.each_with_index { |carousel,i| next if params[:first_carousel_only] && i > 0 %>
     <div id="carousel-<%= carousel.id %>" data-with-placeholder data-pagelet-url="/o/<%= @organisation.slug %>/carousels/<%= carousel.id %>">
       <%= partial :'events/carousel_placeholder' %>

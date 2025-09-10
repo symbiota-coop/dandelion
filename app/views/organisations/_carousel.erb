@@ -1,7 +1,7 @@
 <% if (organisations = Organisation.and(:id.in =>
   current_account.organisationships.and(:hide_membership.ne => true).pluck(:organisation_id) +
   current_account.organisationships.and(:admin => true).pluck(:organisation_id)
-  )).count > 0 %>
+  )).exists? %>
 
 
 <% organisations = organisations.sort_by { |organisation| created_at = organisation.events.live.public.order('created_at desc').first.try(:created_at); created_at ? created_at.to_i : 0 }.reverse.first(12) %>
@@ -32,7 +32,7 @@
 <style>
   .slick-container .slick-item:nth-child(2) { display: block; }
 </style>
-<% if organisations.count > 0 %>
+<% if organisations.exists? %>
   <div class="slick-container mb-5" id="<%= slick_id %>">
     <% if defined? title %>
       <h2 class="text-center"><%= title %></h2>
@@ -40,7 +40,7 @@
     <div class="slick-responsive row justify-content-center">
       <% organisations.each { |organisation| %>
       <div class="col-6 col-lg-4 slick-item">
-        <%= partial :'organisations/block', locals: { organisation: organisation, most_recent: (organisation.events.live.public.future.count > 0) } %>
+        <%= partial :'organisations/block', locals: { organisation: organisation, most_recent: (organisation.events.live.public.future.exists?) } %>
       </div>
       <% } %>
     </div>

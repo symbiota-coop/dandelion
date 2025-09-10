@@ -4,7 +4,7 @@ if @draft
   drafts = drafts.and(:id.ne => @draft.id) 
 end
 %>
-<% if drafts.count > 0 %>
+<% if drafts.exists? %>
   <div class="card mb-3" id="drafts">
     <h4 class="card-header bg-light">
       Drafts

@@ -7,7 +7,7 @@
 <% end %>
 <% end %>
 <tr>
-  <td style="<% if no_border_top %>border-top: 0;<% end %> <% if ticket_type.photos.count > 0 %>border-bottom: 0;<% end %>" >
+  <td style="<% if no_border_top %>border-top: 0;<% end %> <% if ticket_type.photos.exists? %>border-bottom: 0;<% end %>" >
     <%= ticket_type.name %>
     <% if ticket_type.hidden %>
       <i data-toggle="tooltip" title="Available to you as you used a secret link" class="bi bi-lock"></i>
@@ -16,7 +16,7 @@
       <i data-toggle="tooltip" title="Available to those donating <%=m ticket_type.minimum_monthly_donation, @event.currency%>+/month" class="bi bi-lock"></i>
     <% end %>
   </td>
-  <td style="min-width: 8em; <% if no_border_top %>border-top: 0;<% end %> <% if ticket_type.photos.count > 0 %>border-bottom: 0;<% end %>">
+  <td style="min-width: 8em; <% if no_border_top %>border-top: 0;<% end %> <% if ticket_type.photos.exists? %>border-bottom: 0;<% end %>">
     <% if ticket_type.range %>
       <span><%= m ticket_type.range_min, @event.currency %> - <%= m ticket_type.range_max, @event.currency %></span>
       <%= range_field_tag :"prices[#{ticket_type.id}]",
@@ -38,7 +38,7 @@
       </div>
     <% end %>
   </td>
-  <td style="<% if no_border_top %>border-top: 0;<% end %> <% if ticket_type.photos.count > 0 %>border-bottom: 0;<% end %>">
+  <td style="<% if no_border_top %>border-top: 0;<% end %> <% if ticket_type.photos.exists? %>border-bottom: 0;<% end %>">
     <% if ticket_type.sales_end && Time.now > ticket_type.sales_end %>
       <span class="badge badge-default">Sales closed</span>
     <% elsif ticket_type.number_of_tickets_available_in_single_purchase > 0 %>
@@ -81,7 +81,7 @@
   <% end %>
 </td>
 </tr>
-<% if ticket_type.photos.count > 0 %>
+<% if ticket_type.photos.exists? %>
   <tr>
     <td colspan="3" style="border: 0">
       <%= partial :'photos/photos', locals: { photoable: ticket_type, dimensions: '100x100#' } %>

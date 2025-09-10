@@ -6,10 +6,10 @@ namespace :hourly do
     MonthlyContributionsCalculator.update_current_month
     puts 'check for payments'
     Organisation.and(:evm_address.ne => nil).each do |organisation|
-      organisation.check_evm_account if Order.and(:payment_completed.ne => true, :evm_secret.ne => nil, :event_id.in => organisation.events.pluck(:id)).count > 0
+      organisation.check_evm_account if Order.and(:payment_completed.ne => true, :evm_secret.ne => nil, :event_id.in => organisation.events.pluck(:id)).exists?
     end
     Event.live.and(:oc_slug.ne => nil).each do |event|
-      event.check_oc_event if event.orders.and(:payment_completed.ne => true, :oc_secret.ne => nil, :event_id => event.id).count > 0
+      event.check_oc_event if event.orders.and(:payment_completed.ne => true, :oc_secret.ne => nil, :event_id => event.id).exists?
     end
     Gathering.and(:evm_address.ne => nil).each(&:check_evm_account)
   end

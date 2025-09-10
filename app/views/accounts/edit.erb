@@ -94,7 +94,7 @@
   <%= f.wysiwyg_block :bio %>
   <%= f.select_block :default_currency %>
 
-  <% if @account.memberships.count > 0 %>
+  <% if @account.memberships.exists? %>
     <script>
       $(function() {
         var label = $('label[for=account_dietary_requirements]').css('display', 'block');

@@ -5,13 +5,13 @@
 <% end %>
 
 <table class="table table-borderless">
-  <% if @gathering.enable_contributions? && @gathering.options.count > 0 %>
+  <% if @gathering.enable_contributions? && @gathering.options.exists? %>
     <tr>
       <th>
         Your options
       </th>
       <td>
-        <% if @membership && @membership.optionships.count > 0 %>
+        <% if @membership && @membership.optionships.exists? %>
           <% @membership.optionships.each { |optionship| %>
           <a title="<%= optionship.option.type %>" href="/g/<%= @gathering.slug %>/options" class="label label-primary text-white d-inline-block mb-1">
             <i class="bi <%= optionship.option.icon %>"></i> <%= optionship.option.name %> (<%= m optionship.option.cost_per_person, @gathering.currency %>)
@@ -25,13 +25,13 @@
       </td>
     </tr>
   <% end %>
-  <% if @gathering.enable_teams? && @gathering.teams.count > 0 %>
+  <% if @gathering.enable_teams? && @gathering.teams.exists? %>
     <tr>
       <th>
         Your teams
       </th>
       <td>
-        <% if @membership && @membership.teamships.count > 0 %>
+        <% if @membership && @membership.teamships.exists? %>
           <% @membership.teamships.each { |teamship| %>
           <a href="/g/<%= @gathering.slug %>/teams/<%= teamship.team_id %>" class="label label-primary text-white d-inline-block mb-1">
             <%= teamship.team.name %>
@@ -43,13 +43,13 @@
       </td>
     </tr>
   <% end %>
-  <% if @gathering.enable_rotas? && @gathering.rotas.count > 0 %>
+  <% if @gathering.enable_rotas? && @gathering.rotas.exists? %>
     <tr>
       <th>
         Your shifts
       </th>
       <td>
-        <% if @membership && @membership.shifts.count > 0 %>
+        <% if @membership && @membership.shifts.exists? %>
           <%= partial :'rotas/shift_summary', locals: {membership: @membership} %>
         <% else %>
           <a href="/g/<%= @gathering.slug %>/rotas">Sign up to shifts</a>

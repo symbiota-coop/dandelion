@@ -5,7 +5,7 @@
   </div>
 </div>
 
-<% if current_account.recommended_events && current_account.recommended_events.count > 0 %>
+<% if current_account.recommended_events && current_account.recommended_events.exists? %>
   <div class="card shadow-sm mt-3">
     <h3 class="card-header chill">Recommended for you</h3>
     <div class="card-body">
