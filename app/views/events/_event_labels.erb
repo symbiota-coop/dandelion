@@ -1,0 +1,13 @@
+<% if @organisation %>
+  <% if @organisation == event.organisation && event.featured? %>
+    <span class="label label-yellow">Featured</span>
+  <% elsif event.cohostships.any? { |cohostship| cohostship.organisation == @organisation && cohostship.featured? } %>
+    <span class="label label-yellow">Featured</span>
+  <% end %>
+<% end %>
+<% if event.sold_out? %>
+  <span class="label label-danger">Sold out</span>
+<% end %>
+<% if event.locked? %>
+  <span class="label label-default">Locked</span>
+<% end %>

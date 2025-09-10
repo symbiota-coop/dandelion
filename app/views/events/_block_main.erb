@@ -4,19 +4,7 @@
       <%= event.name %>
     </a>
   </h4>
-  <% if @organisation %>
-    <% if @organisation == event.organisation && event.featured? %>
-      <span class="label label-yellow">Featured</span>
-    <% elsif event.cohostships.any? { |cohostship| cohostship.organisation == @organisation && cohostship.featured? } %>
-      <span class="label label-yellow">Featured</span>
-    <% end %>
-  <% end %>
-  <% if event.sold_out? %>
-    <span class="label label-danger">Sold out</span>
-  <% end %>
-  <% if event.locked? %>
-    <span class="label label-default">Locked</span>
-  <% end %>
+  <%= partial :'events/event_labels', locals: { event: event } %>
   <% if defined?(skip_pagelets) %>
   <% else %>
     <% if current_account %>
@@ -34,7 +22,7 @@
   <%= partial :'events/tag_labels', locals: { event: event, limit: 5 } %>
 </div>
 <ul style="font-size: 1rem" class="icon-list text-dark <%= defined?(custom_class) ? custom_class : '' %>">
-  <% if (ef = event.event_facilitations.select { |event_facilitation| event.organisation && event_facilitation.account.lastname && event_facilitation.account.name != event.organisation.name }).count > 0 || (!@organisation && event.organisation) %>
+  <% if (ef = event.event_facilitations.select { |event_facilitation| event.organisation && event_facilitation.account.lastname && event_facilitation.account.name != event.organisation.name }).exists? || (!@organisation && event.organisation) %>
     <li>
       <i data-toggle="tooltip" title="Host/facilitators" class="bi bi-flag-fill"></i>
       <%= partial :'events/facilitators', locals: {event: event, event_facilitators: ef} %>
