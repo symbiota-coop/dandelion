@@ -185,6 +185,15 @@ class Event
     zone ||= time_zone_or_default
     zone = time_zone if time_zone && location != 'Online'
     zone = zone.name unless zone.is_a?(String)
+    
+    # Prevent RangeError by checking for reasonable date bounds
+    # Unix timestamp safe range is roughly 1900-2038
+    min_date = Time.new(1900, 1, 1)
+    max_date = Time.new(2038, 1, 1)
+    
+    return "Invalid date range" if self.start_time < min_date || self.start_time > max_date ||
+                                    self.end_time < min_date || self.end_time > max_date
+    
     start_time = self.start_time.in_time_zone(zone)
     end_time = self.end_time.in_time_zone(zone)
     z = "#{start_time.strftime('%Z')} (UTC #{start_time.formatted_offset})"
@@ -201,6 +210,14 @@ class Event
     zone ||= time_zone_or_default
     zone = time_zone if time_zone && location != 'Online'
     zone = zone.name unless zone.is_a?(String)
+    
+    # Prevent RangeError by checking for reasonable date bounds
+    min_date = Time.new(1900, 1, 1)
+    max_date = Time.new(2038, 1, 1)
+    
+    return "Invalid date range" if self.start_time < min_date || self.start_time > max_date ||
+                                    self.end_time < min_date || self.end_time > max_date
+    
     start_time = self.start_time.in_time_zone(zone)
     end_time = self.end_time.in_time_zone(zone)
     z = "#{start_time.strftime('%Z')} (UTC #{start_time.formatted_offset})"
