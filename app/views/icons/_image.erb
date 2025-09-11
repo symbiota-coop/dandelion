@@ -1,0 +1,36 @@
+<%
+  # Configuration - base unit for scaling
+  base_unit = 8
+    
+  # Dimensions relative to base unit
+  svg_size = base_unit * 20          # 160
+  viewbox_size = base_unit * 20      # 160
+  
+  # Layout measurements
+  corner_radius = base_unit * 1      # 8
+  border_width = base_unit * 1       # 8
+  outer_padding = base_unit * 1      # 8
+  
+  # Icon positioning and scaling
+  icon_translate = base_unit * 4     # 32
+  icon_scale = base_unit * 0.75      # 6
+
+  # Colors
+  border_color = "#8DDCB2"           # Medium green border/stroke
+  icon_filter = "brightness(0) invert(22.5%)"  # Dark gray filter for icon  
+  
+  # Dynamically embed svg icon
+  icon_path = Padrino.root('app', 'assets', 'images', 'icons', "#{image}.svg")
+  icon_content = File.read(icon_path)
+%>
+
+<svg width="<%= svg_size %>" height="<%= svg_size %>" viewBox="0 0 <%= viewbox_size %> <%= viewbox_size %>" xmlns="http://www.w3.org/2000/svg">
+  <!-- Border -->
+  <rect x="<%= outer_padding %>" y="<%= outer_padding %>" width="<%= svg_size - outer_padding * 2 %>" height="<%= svg_size - outer_padding * 2 %>" rx="<%= corner_radius %>" ry="<%= corner_radius %>"
+    fill="transparent" stroke="<%= border_color %>" stroke-width="<%= border_width %>"/>
+
+  <!-- Image icon -->
+  <g transform="translate(<%= icon_translate %>, <%= icon_translate %>) scale(<%= icon_scale %>)" style="filter: <%= icon_filter %>;">
+    <%= icon_content.gsub(/<svg[^>]*>/, '').gsub(/<\/svg>/, '').html_safe %>
+  </g>
+</svg>

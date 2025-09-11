@@ -1,0 +1,15 @@
+<%
+  # Dynamically embed Plus Jakarta Sans Bold font
+  font_path = Padrino.root('app', 'assets', 'fonts', 'PlusJakartaSans', 'ttf', 'PlusJakartaSans-Medium.ttf')
+  font_data = Base64.encode64(File.read(font_path))
+%>
+<defs>
+  <style type="text/css">
+    <![CDATA[
+      @font-face {
+        font-family: 'Plus Jakarta Sans';
+        src: url(data:font/truetype;charset=utf-8;base64,<%= font_data %>) format('truetype');
+      }
+    ]]>
+  </style>
+</defs>

@@ -105,7 +105,7 @@ Dandelion::App.helpers do
   end
 
   def partial(*args)
-    if admin?
+    if admin? && !args.first.to_s.starts_with?('icons')
       t1 = Time.now
       output = super
       t2 = Time.now

@@ -1,0 +1,62 @@
+<%
+  # Configuration - base unit for scaling
+  base_unit = 8
+    
+  # Dimensions relative to base unit
+  svg_size = base_unit * 20          # 160
+  viewbox_size = base_unit * 20      # 160
+  
+  # Layout measurements
+  corner_radius = base_unit * 1      # 8  
+  border_width = base_unit * 1       # 8
+  outer_padding = base_unit * 1      # 8
+  inner_padding = base_unit * 1.5    # 12  
+  
+  # Month section
+  month_height = base_unit * 7       # 56
+  month_divider_y = base_unit * 8    # 64
+  
+  # Day section
+  day_height = base_unit * 10.5      # 84
+  
+  # Text positioning
+  month_text_x = base_unit * 10      # 80
+  month_text_y = base_unit * 6       # 48
+  day_text_x = base_unit * 10        # 80
+  day_text_y = base_unit * 16.375    # 131
+  
+  # Font sizes
+  month_font_size = base_unit * 4    # 32
+  day_font_size = base_unit * 8      # 64
+  
+  # Stroke width
+  stroke_width = base_unit * 1       # 8
+
+  # Colors
+  month_bg_color = "#B9EAD1"         # Light green background
+  border_color = "#8DDCB2"           # Medium green border/stroke
+  text_color = "#666"                # Gray text color  
+%>
+
+<svg width="<%= svg_size %>" height="<%= svg_size %>" viewBox="0 0 <%= viewbox_size %> <%= viewbox_size %>" xmlns="http://www.w3.org/2000/svg">
+  <!-- Month section background -->
+  <rect x="<%= inner_padding %>" y="<%= outer_padding %>" width="<%= svg_size - inner_padding * 2 %>" height="<%= month_height %>"
+        fill="<%= month_bg_color %>"/>
+  <!-- Main calendar border -->
+  <rect x="<%= outer_padding %>" y="<%= outer_padding %>" width="<%= svg_size - outer_padding * 2 %>" height="<%= svg_size - outer_padding * 2 %>" rx="<%= corner_radius %>" ry="<%= corner_radius %>"
+        fill="transparent" stroke="<%= border_color %>" stroke-width="<%= stroke_width %>"/>
+
+  <!-- Month divider line -->
+  <line x1="<%= outer_padding %>" y1="<%= month_divider_y %>" x2="<%= svg_size - outer_padding %>" y2="<%= month_divider_y %>"
+        stroke="<%= border_color %>" stroke-width="<%= stroke_width %>"/>
+
+  <!-- Month text -->
+  <text x="<%= month_text_x %>" y="<%= month_text_y %>" text-anchor="middle"
+        font-family="Helvetica Neue" font-size="<%= month_font_size %>"
+        fill="<%= text_color %>" text-transform="uppercase"><%= month %></text>
+
+  <!-- Day text -->
+  <text x="<%= day_text_x %>" y="<%= day_text_y %>" text-anchor="middle"
+        font-family="Helvetica Neue" font-size="<%= day_font_size %>"
+        fill="<%= text_color %>"><%= day %></text>
+</svg>

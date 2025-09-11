@@ -15,10 +15,7 @@
       <tbody>
         <tr>
           <td>
-            <span class="event-detail calendar-date">
-              <span class="month"><span class="month-text"><%= event.start_time.strftime('%b') %></span></span>
-              <span class="day"><%= event.start_time.day %></span>
-            </span>
+            <img style="width: 2.75em" src="<%=ENV['BASE_URI']%>/images/icons/calendar/png/<%= event.start_time.strftime('%b').downcase %>_<%= event.start_time.strftime('%d') %>.png">
           </td>
           <td>
             <% when_parts = event.when_details(account.try(:time_zone), with_zone: true).split(', ') %>
@@ -33,12 +30,12 @@
         </tr>
         <tr>
           <td>
-            <a target="_blank" <% if event.location != 'Online' %>href="https://www.google.com/maps?q=<%=event.location%>"<% end %> class="event-detail location">
+            <a <% if event.location != 'Online' %>href="https://www.google.com/maps?q=<%=event.location%>"<% end %> target="_blank">
 
               <% if event.location == 'Online' %>
-                <img src="<%=ENV['BASE_URI']%>/images/icons/_camera-video.png">
+                <img style="width: 2.75em" src="<%=ENV['BASE_URI']%>/images/icons/image/image-camera-video.png">
               <% else %>
-                <img src="<%=ENV['BASE_URI']%>/images/icons/_geo-alt.png">
+                <img style="width: 2.75em" src="<%=ENV['BASE_URI']%>/images/icons/image/image-geo-alt.png">
               <% end %>
 
             </a>
