@@ -5,10 +5,7 @@ Rack::Attack.cache.store = ActiveSupport::Cache::MongoStore.new(nil, collection:
 
 # General rate limiting - allow reasonable browsing but prevent abuse
 Rack::Attack.throttle('requests by ip', limit: 500, period: 5.minutes) do |request|
-  if !request.xhr? && %w[/fonts/ /images/ /infinite_admin/ /javascripts/ /stylesheets/ /manifest.json /service-worker.js].none? { |path| request.path.starts_with?(path) }
-    puts request.path
-    request.ip
-  end
+  request.ip if !request.xhr? && %w[/fonts/ /images/ /infinite_admin/ /javascripts/ /stylesheets/ /manifest.json /service-worker.js].none? { |path| request.path.starts_with?(path) }
 end
 
 # Define throttled paths with their limits and periods
@@ -20,6 +17,6 @@ THROTTLED_PATHS = {
 # Apply throttling rules for each path
 THROTTLED_PATHS.each do |path, config|
   Rack::Attack.throttle(path, limit: config[:limit], period: config[:period]) do |request|
-    request.ip if request.path.starts_with?(path) && !request.env['rack.session']&.dig('account_id')
+    request.ip if request.path.starts_with?(path)
   end
 end
