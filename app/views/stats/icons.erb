@@ -5,7 +5,7 @@ bi_counts = Hash.new(0)
 
 ['app', 'models', 'lib'].each do |dir|
   Find.find(dir) do |path|
-    if File.file?(path) && !path.split('/').last.starts_with?('.') && !path.include?('fonts') && !path.include?('infinite_admin') && !path.include?('images') && !path.include?('notification.ogg')
+    if File.file?(path) && !path.split('/').last.starts_with?('.') && !path.include?('fonts') && !path.include?('infinite_admin') && !path.include?('images')
       File.readlines(path).each do |line|
         # Find all matches of 'bi-*' and count them
         line.scan(/\bbi-[-\w]+/).each do |match|

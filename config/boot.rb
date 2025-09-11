@@ -10,10 +10,10 @@ require 'active_support/time'
 require 'will_paginate/array'
 Bundler.require(:default, RACK_ENV)
 
-Padrino.load!
-
 Mongoid.load!("#{PADRINO_ROOT}/config/mongoid.yml")
 Mongoid.raise_not_found_error = false
+
+Padrino.load!
 
 OmniAuth.config.allowed_request_methods = [:get]
 OmniAuth.config.logger = Logger.new(IO::NULL)

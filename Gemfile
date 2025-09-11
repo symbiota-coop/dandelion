@@ -95,6 +95,7 @@ gem 'sanitize'
 
 # Rack
 gem 'crawler_detect'
+gem 'rack-attack'
 gem 'rack-cors'
 gem 'rack-utf8_sanitizer'
 
