@@ -17,9 +17,9 @@ namespace :icons do
     calendar_template_path = Padrino.root('app', 'views', 'icons', '_calendar.erb')
     calendar_template_content = File.read(calendar_template_path)
 
-    # Month abbreviations
-    months = %w[JAN FEB MAR APR MAY JUN JUL AUG SEP OCT NOV DEC]
-    days_in_month = [31, 29, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31] # Feb has 29 for leap year
+    # Get month abbreviations and days dynamically from Ruby
+    months = (1..12).map { |m| Date::ABBR_MONTHNAMES[m].upcase }
+    days_in_month = (1..12).map { |m| Date.new(2024, m, -1).day } # Get last day of each month
 
     calendar_svg_generated = 0
     calendar_png_converted = 0
@@ -27,13 +27,6 @@ namespace :icons do
     months.each_with_index do |month, month_index|
       days_in_month[month_index].times do |day_num|
         day = (day_num + 1).to_s
-
-        # Skip invalid dates (like Feb 30)
-        begin
-          Date.new(2024, month_index + 1, day_num + 1)
-        rescue ArgumentError
-          next
-        end
 
         # Generate filenames
         svg_filename = "#{month.downcase}_#{day.rjust(2, '0')}.svg"

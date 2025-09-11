@@ -15,7 +15,7 @@
       <tbody>
         <tr>
           <td>
-            <img style="width: 2.75em" src="<%=ENV['BASE_URI']%>/images/icons/calendar/png/<%= event.start_time.strftime('%b').downcase %>_<%= event.start_time.strftime('%d') %>.png">
+            <img src="<%=ENV['BASE_URI']%>/images/icons/calendar/png/<%= event.start_time.strftime('%b').downcase %>_<%= event.start_time.strftime('%d') %>.png">
           </td>
           <td>
             <% when_parts = event.when_details(account.try(:time_zone), with_zone: true).split(', ') %>
@@ -31,13 +31,11 @@
         <tr>
           <td>
             <a <% if event.location != 'Online' %>href="https://www.google.com/maps?q=<%=event.location%>"<% end %> target="_blank">
-
               <% if event.location == 'Online' %>
-                <img style="width: 2.75em" src="<%=ENV['BASE_URI']%>/images/icons/image/image-camera-video.png">
+                <img src="<%=ENV['BASE_URI']%>/images/icons/image/image-camera-video.png">
               <% else %>
-                <img style="width: 2.75em" src="<%=ENV['BASE_URI']%>/images/icons/image/image-geo-alt.png">
+                <img src="<%=ENV['BASE_URI']%>/images/icons/image/image-geo-alt.png">
               <% end %>
-
             </a>
           </td>
           <td>
