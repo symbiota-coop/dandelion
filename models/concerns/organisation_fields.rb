@@ -103,9 +103,7 @@ module OrganisationFields
     field :start_date_placeholder, type: String
     field :end_date_placeholder, type: String
     field :event_types_placeholder, type: String
-
-    field :tokens, type: Float
-    index({ tokens: 1 })
+    field :show_details_table_in_ticket_emails, type: Mongoid::Boolean
   end
 
   class_methods do
@@ -211,6 +209,7 @@ module OrganisationFields
         terms_and_conditions_url: 'Terms and Conditions URL',
         add_a_donation_to: 'Text beside donation field',
         donation_text: 'Text below donation field',
+        show_details_table_in_ticket_emails: 'Show header with date and location icons in ticket emails',
         show_ticketholder_link_in_ticket_emails: 'Show link for people to provide details of ticketholders in ticket emails',
         event_image_required_width: 'Event image width',
         event_image_required_height: 'Event image height',

@@ -205,9 +205,10 @@
           <%= f.wysiwyg_block :feedback_email_body %>
           <%= f.wysiwyg_block :extra_info_for_ticket_email %>
           <%= f.text_block :reply_to %>
-          <%= f.check_box_block :send_ticket_emails_from_organisation %>
+          <%= f.check_box_block :show_details_table_in_ticket_emails %>
           <%= f.check_box_block :show_ticketholder_link_in_ticket_emails %>
           <%= f.check_box_block :show_sign_in_link_in_ticket_emails %>
+          <%= f.check_box_block :send_ticket_emails_from_organisation %>
         </div>
         <div role="tabpanel" class="tab-pane <%= 'active' if params[:tab] == 'mailgun'%>" id="tab-mailgun">
           <% if !@organisation.mailgun_api_key %>

@@ -1,55 +1,58 @@
 <div class="main">
 
-  <h2>
-    <span class="text-muted font-weight-normal">
-      Your <%= order.tickets.length == 1 ? 'ticket' : 'tickets' %> to
-    </span>
-    <br />
-    <%= event.name %>
-  </h2>
-
-  <hr />
-
-  <table class="event-details">
-    <tbody>
-      <tr>
-        <td>
-          <span class="event-detail calendar-date">
-            <span class="month"><span class="month-text"><%= event.start_time.strftime('%b') %></span></span>
-            <span class="day"><%= event.start_time.day %></span>
-          </span>
-        </td>
-        <td>
-          <% when_parts = event.when_details(account.try(:time_zone), with_zone: true).split(', ') %>
-          <%= when_parts[0] %>
-          <div class="text-muted" style="font-size: 90%;">
-            <%= when_parts[1..-1].join(', ') %>
-          </div>
-        </td>
-      </tr>
-      <tr>
-        <td colspan="2" class="event-detail-separator">&nbsp;</td>
-      </tr>
-      <tr>
-        <td>
-          <a target="_blank" <% if event.location != 'Online' %>href="https://www.google.com/maps?q=<%=event.location%>"<% end %> class="event-detail location">
-
-            <% if event.location == 'Online' %>
-              <img src="<%=ENV['BASE_URI']%>/images/icons/_camera-video.png">
-            <% else %>
-              <img src="<%=ENV['BASE_URI']%>/images/icons/_geo-alt.png">
-            <% end %>
-
-          </a>
-        </td>
-        <td>
-          <a class="text-dark" target="_blank" <% if event.location != 'Online' %>href="https://www.google.com/maps?q=<%=event.location%>"<% end %>><%=event.location%></a>
-          </td>
-        </tr>
-      </tbody>
-    </table>
+  <% if event.organisation.show_details_table_in_ticket_emails %>
+    <h2>
+      <span class="text-muted font-weight-normal">
+        Your <%= order.tickets.length == 1 ? 'ticket' : 'tickets' %> to
+      </span>
+      <br />
+      <%= event.name %>
+    </h2>
 
     <hr />
+
+    <table class="event-details">
+      <tbody>
+        <tr>
+          <td>
+            <span class="event-detail calendar-date">
+              <span class="month"><span class="month-text"><%= event.start_time.strftime('%b') %></span></span>
+              <span class="day"><%= event.start_time.day %></span>
+            </span>
+          </td>
+          <td>
+            <% when_parts = event.when_details(account.try(:time_zone), with_zone: true).split(', ') %>
+            <%= when_parts[0] %>
+            <div class="text-muted" style="font-size: 90%;">
+              <%= when_parts[1..-1].join(', ') %>
+            </div>
+          </td>
+        </tr>
+        <tr>
+          <td colspan="2" class="event-detail-separator">&nbsp;</td>
+        </tr>
+        <tr>
+          <td>
+            <a target="_blank" <% if event.location != 'Online' %>href="https://www.google.com/maps?q=<%=event.location%>"<% end %> class="event-detail location">
+
+              <% if event.location == 'Online' %>
+                <img src="<%=ENV['BASE_URI']%>/images/icons/_camera-video.png">
+              <% else %>
+                <img src="<%=ENV['BASE_URI']%>/images/icons/_geo-alt.png">
+              <% end %>
+
+            </a>
+          </td>
+          <td>
+            <a class="text-dark" target="_blank" <% if event.location != 'Online' %>href="https://www.google.com/maps?q=<%=event.location%>"<% end %>><%=event.location%></a>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+
+      <hr />
+
+    <% end %>
 
     <%= ((event.recording? ? event.recording_email_greeting : event.ticket_email_greeting) || (event.recording? ? event.organisation.recording_email_greeting : event.organisation.ticket_email_greeting))
         .gsub('[firstname]', account.firstname)
