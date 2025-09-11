@@ -92,6 +92,7 @@ Dandelion::App.controller do
   post '/o/new' do
     sign_in_required!
     @organisation = current_account.organisations.build(params[:organisation])
+    @organisation.show_details_table_in_ticket_emails = true
     @organisation.show_sign_in_link_in_ticket_emails = true
     @organisation.show_ticketholder_link_in_ticket_emails = true
     if @organisation.save
