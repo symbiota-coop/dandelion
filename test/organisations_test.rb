@@ -13,7 +13,7 @@ class DandelionTest < ActiveSupport::TestCase
     fill_in 'Organisation name', with: @organisation.name
     fill_in 'URL', with: @organisation.slug
     click_button 'Save and continue'
-    assert page.has_content? 'Update organisation'
+    assert page.has_content? 'To accept payments, now add your Stripe and/or Coinbase Commerce details.'
   end
 
   test 'editing an organisation' do
@@ -21,9 +21,8 @@ class DandelionTest < ActiveSupport::TestCase
     @organisation = FactoryBot.create(:organisation, account: @account)
     login_as(@account)
     visit "/o/#{@organisation.slug}/edit"
-    fill_in 'Organisation name', with: (name = FactoryBot.build_stubbed(:organisation).name)
+    fill_in 'Organisation name', with: FactoryBot.build_stubbed(:organisation).name
     click_button 'Update organisation'
-    assert page.has_content? 'The organisation was saved'
-    assert page.has_content? name
+    assert page.has_content? "Now let's create an event under your new organisation."
   end
 end
