@@ -4,12 +4,12 @@ namespace :icons do
     calendar_dir = Padrino.root('app', 'assets', 'images', 'icons', 'calendar')
     svg_dir = File.join(calendar_dir, 'svg')
     png_dir = File.join(calendar_dir, 'png')
-    FileUtils.mkdir_p(svg_dir) unless Dir.exist?(svg_dir)
-    FileUtils.mkdir_p(png_dir) unless Dir.exist?(png_dir)
+    FileUtils.mkdir_p(svg_dir)
+    FileUtils.mkdir_p(png_dir)
 
     # Create image icon directories if they don't exist
     image_dir = Padrino.root('app', 'assets', 'images', 'icons', 'image')
-    FileUtils.mkdir_p(image_dir) unless Dir.exist?(image_dir)
+    FileUtils.mkdir_p(image_dir)
 
     puts 'Generating calendar icons for all days of the year...'
 

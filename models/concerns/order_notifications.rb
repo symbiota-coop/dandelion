@@ -64,7 +64,7 @@ module OrderNotifications
 
     if event.event_sessions.empty?
       cal = event.ical(order: order)
-      ics_filename = "dandelion-#{event.name.parameterize}-#{order.id}.ics"
+      ics_filename = "event-#{event.name.parameterize}-#{order.id}.ics"
       ics_file = File.new(ics_filename, 'w+')
       ics_file.write cal.to_ical
       ics_file.rewind
@@ -72,7 +72,7 @@ module OrderNotifications
     else
       event.event_sessions.each do |event_session|
         cal = event_session.ical(order: order)
-        ics_filename = "dandelion-#{event_session.name.parameterize}-#{order.id}.ics"
+        ics_filename = "event-session-#{event_session.name.parameterize}-#{order.id}.ics"
         ics_file = File.new(ics_filename, 'w+')
         ics_file.write cal.to_ical
         ics_file.rewind
