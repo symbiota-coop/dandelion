@@ -41,31 +41,59 @@ Dandelion::App.helpers do
     if Padrino.env == :development
       klass.or(klass.admin_fields.map { |k, v| { k => /#{Regexp.escape(query)}/i } if v == :text || (v.is_a?(Hash) && v[:type] == :text) }.compact)
     else
-      pipeline = [
-        { '$search': {
-          index: klass.to_s.underscore.pluralize,
-          compound: {
-            should: [
-              { phrase: { query: query, path: { wildcard: '*' }, score: { boost: { value: 1.5 } } } },
-              { text: { query: query, path: { wildcard: '*' } } }
-            ]
-          }
-        } },
-        { '$addFields': { score: { '$meta': 'searchScore' } } },
-        { '$match': match.selector }
-      ]
+      # Try Atlas Search first
+      begin
+        pipeline = [
+          { '$search': {
+            index: klass.to_s.underscore.pluralize,
+            compound: {
+              should: [
+                { phrase: { query: query, path: { wildcard: '*' }, score: { boost: { value: 1.5 } } } },
+                { text: { query: query, path: { wildcard: '*' } } }
+              ]
+            }
+          } },
+          { '$addFields': { score: { '$meta': 'searchScore' } } },
+          { '$match': match.selector }
+        ]
 
-      results = klass.collection.aggregate(pipeline).first(number)
+        results = klass.collection.aggregate(pipeline).first(number)
 
-      # Filter by score threshold (50% of max score)
-      if results.any?
-        max_score = results.map { |doc| doc['score'] }.max
-        min_score = max_score * 0.5
-        results = results.select { |doc| doc['score'] >= min_score }
+        # Filter by score threshold (50% of max score)
+        if results.any?
+          max_score = results.map { |doc| doc['score'] }.max
+          min_score = max_score * 0.5
+          results = results.select { |doc| doc['score'] >= min_score }
+        end
+
+        results.map do |hash|
+          klass.new(hash.select { |k, _v| klass.fields.keys.include?(k.to_s) })
+        end
+      rescue Mongo::Error::OperationFailure => e
+        # If Atlas Search fails (e.g., "mongot is shutting down"), fall back to regex search
+        if e.message.include?('mongot') || e.message.include?('search')
+          Rails.logger.warn("Atlas Search unavailable, falling back to regex search: #{e.message}") if defined?(Rails)
+          fallback_search(klass, match, query, number)
+        else
+          raise e
+        end
       end
+    end
+  end
 
-      results.map do |hash|
-        klass.new(hash.select { |k, _v| klass.fields.keys.include?(k.to_s) })
+  private
+
+  def fallback_search(klass, match, query, number)
+    # Fallback to development-style regex search when Atlas Search is unavailable
+    if klass.admin_fields
+      match.or(klass.admin_fields.map { |k, v| { k => /#{Regexp.escape(query)}/i } if v == :text || (v.is_a?(Hash) && v[:type] == :text) }.compact).limit(number)
+    else
+      # Generic fallback for models without admin_fields
+      text_fields = klass.fields.select { |_k, v| v.type == String }.keys
+      if text_fields.any?
+        match.or(text_fields.map { |field| { field => /#{Regexp.escape(query)}/i } }).limit(number)
+      else
+        match.limit(number)
       end
     end
   end
