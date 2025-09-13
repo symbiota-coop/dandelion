@@ -25,25 +25,12 @@ jobs:
       uses: ruby/setup-ruby@v1
       with:
         ruby-version: 3.2.8
+        bundler-cache: true
 
     - name: Install MongoDB
       uses: supercharge/mongodb-github-action@1.12.0
       with:
         mongodb-version: 7.0
-
-    - name: Cache gems
-      uses: actions/cache@v4
-      with:
-        path: vendor/bundle
-        key: ${{ runner.os }}-gems-${{ hashFiles('**/Gemfile.lock') }}-${{ matrix.test_file }}
-        restore-keys: |
-          ${{ runner.os }}-gems-${{ hashFiles('**/Gemfile.lock') }}-
-          ${{ runner.os }}-gems-
-
-    - name: Install gems
-      run: |
-        bundle config path vendor/bundle
-        bundle install --jobs 4 --retry 3
 
     - name: Run RuboCop
       run: bundle exec rubocop --fail-level warning --display-only-fail-level-offenses
