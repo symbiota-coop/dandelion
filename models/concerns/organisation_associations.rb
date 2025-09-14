@@ -38,7 +38,9 @@ module OrganisationAssociations
   end
 
   def cohosts
-    Organisation.and(:id.in => Cohostship.and(:event_id.in => events.pluck(:id)).pluck(:organisation_id))
+    retry_mongo_operation do
+      Organisation.and(:id.in => Cohostship.and(:event_id.in => events.pluck(:id)).pluck(:organisation_id))
+    end
   end
 
   def cohosted_events
@@ -89,11 +91,32 @@ module OrganisationAssociations
   end
 
   def event_tags
-    EventTag.and(:id.in => EventTagship.and(:event_id.in => events.pluck(:id)).pluck(:event_tag_id))
+    retry_mongo_operation do
+      EventTag.and(:id.in => EventTagship.and(:event_id.in => events.pluck(:id)).pluck(:event_tag_id))
+    end
+  end
+
+  private
+
+  def retry_mongo_operation(max_attempts: 3, &block)
+    attempts = 0
+    begin
+      attempts += 1
+      yield
+    rescue Mongo::Error::SocketError => e
+      if e.message.include?('SSL_read: unexpected eof') && attempts < max_attempts
+        sleep(0.5 * attempts) # exponential backoff: 0.5s, 1.0s, 1.5s
+        retry
+      else
+        raise
+      end
+    end
   end
 
   def activity_tags
-    ActivityTag.and(:id.in => ActivityTagship.and(:activity_id.in => activities.pluck(:id)).pluck(:activity_tag_id))
+    retry_mongo_operation do
+      ActivityTag.and(:id.in => ActivityTagship.and(:activity_id.in => activities.pluck(:id)).pluck(:activity_tag_id))
+    end
   end
 
   def members
@@ -141,8 +164,10 @@ module OrganisationAssociations
   end
 
   def facilitators
-    Account.and(:id.in =>
-        EventFacilitation.and(:event_id.in => events.future.pluck(:id)).pluck(:account_id) +
-        Activityship.and(:activity_id.in => activities.pluck(:id), :admin => true).pluck(:account_id))
+    retry_mongo_operation do
+      Account.and(:id.in =>
+          EventFacilitation.and(:event_id.in => events.future.pluck(:id)).pluck(:account_id) +
+          Activityship.and(:activity_id.in => activities.pluck(:id), :admin => true).pluck(:account_id))
+    end
   end
 end
