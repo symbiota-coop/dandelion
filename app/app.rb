@@ -16,7 +16,6 @@ module Dandelion
     use Honeybadger::Rack::ErrorNotifier
 
     use Rack::Session::Cookie, expire_after: 1.year.to_i, secret: ENV['SESSION_SECRET']
-    use Rack::Attack
     use Rack::UTF8Sanitizer
     use Rack::CrawlerDetect
     use RackSessionAccess::Middleware if Padrino.env == :test
