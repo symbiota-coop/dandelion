@@ -63,6 +63,10 @@ $(function () {
   })
 
   $(document).on('click', '[data-pagelet-url] .pagination a', function () {
+    if (window.location.search.includes('minimal=')) {
+      return true
+    }
+
     const a = this
     const pagelet = $(a).closest('[data-pagelet-url]')
     if (!pagelet.is('[data-pagelet-no-opacity-change]')) {
@@ -79,12 +83,7 @@ $(function () {
       const offset = pagelet.offset()
       if (pagelet.attr('data-pagelet-scroll') != 'false') {
         const headerHeight = $('#header').length ? $('#header').height() : 0
-        const targetY = Math.max(0, offset.top - headerHeight - 20)
-        if (window.parentIFrame && typeof window.parentIFrame.scrollToOffset === 'function') {
-          window.parentIFrame.scrollToOffset(0, targetY)
-        } else {
-          window.scrollTo(0, targetY)
-        }
+        window.scrollTo(0, offset.top - headerHeight - 20)
       }
     })
     return false
