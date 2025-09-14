@@ -79,7 +79,12 @@ $(function () {
       const offset = pagelet.offset()
       if (pagelet.attr('data-pagelet-scroll') != 'false') {
         const headerHeight = $('#header').length ? $('#header').height() : 0
-        window.scrollTo(0, offset.top - headerHeight - 20)
+        const targetY = Math.max(0, offset.top - headerHeight - 20)
+        if (window.parentIFrame && typeof window.parentIFrame.scrollToOffset === 'function') {
+          window.parentIFrame.scrollToOffset(0, targetY)
+        } else {
+          window.scrollTo(0, targetY)
+        }
       }
     })
     return false
