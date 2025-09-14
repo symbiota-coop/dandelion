@@ -67,11 +67,6 @@ class Organisation
     CURRENCY_OPTIONS
   end
 
-  def calculate_tokens
-    Order.and(:event_id.in => events.pluck(:id), :value.ne => nil, :currency.in => MAJOR_CURRENCIES).sum { |o| Math.sqrt(Money.new(o.value * 100, o.currency).exchange_to('GBP').cents) } +
-      organisation_contributions.and(:amount.ne => nil, :currency.in => MAJOR_CURRENCIES).sum { |p| Math.sqrt(Money.new(p.amount * 100, p.currency).exchange_to('GBP').cents) }
-  end
-
   def banned_emails_a
     banned_emails ? banned_emails.split("\n").map(&:strip) : []
   end

@@ -41,7 +41,11 @@ class Account
   end
 
   def self.recommendable
-    Account.and(:id.in => Ticket.pluck(:account_id) + EventFacilitation.pluck(:account_id) + Membership.pluck(:account_id))
+    Account.or(
+      { :id.in => Ticket.distinct(:account_id).compact },
+      { :id.in => EventFacilitation.distinct(:account_id).compact },
+      { :id.in => Membership.distinct(:account_id).compact }
+    )
   end
 
   def self.generate_sign_in_token
@@ -84,13 +88,6 @@ class Account
 
     # Return self for method chaining
     self
-  end
-
-  def calculate_tokens
-    orders.and(:value.ne => nil, :currency.in => MAJOR_CURRENCIES).sum { |o| Math.sqrt(Money.new(o.value * 100, o.currency).exchange_to('GBP').cents) } +
-      Order.and(:event_id.in => events_revenue_sharing.pluck(:id), :value.ne => nil, :currency.in => MAJOR_CURRENCIES).sum { |o| 0.25 * Math.sqrt(Money.new(o.value * 100, o.currency).exchange_to('GBP').cents) } +
-      payments.and(:amount.ne => nil, :currency.in => MAJOR_CURRENCIES).sum { |p| 2 * Math.sqrt(Money.new(p.amount * 100, p.currency).exchange_to('GBP').cents) } +
-      account_contributions.and(:amount.ne => nil, :currency.in => MAJOR_CURRENCIES).sum { |p| Math.sqrt(Money.new(p.amount * 100, p.currency).exchange_to('GBP').cents) }
   end
 
   def public?
