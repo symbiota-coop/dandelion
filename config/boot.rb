@@ -15,6 +15,9 @@ Mongoid.raise_not_found_error = false
 
 Padrino.load!
 
+# Load MongoDB connection resilience after models are loaded
+require_relative '../lib/mongodb_connection_resilience'
+
 OmniAuth.config.allowed_request_methods = [:get]
 OmniAuth.config.logger = Logger.new(IO::NULL)
 
