@@ -3,10 +3,11 @@ require_relative 'mongo_store'
 # Use Mongo-backed cache for Rack::Attack throttling counters
 Rack::Attack.cache.store = ActiveSupport::Cache::MongoStore.new(nil, collection: 'rack_attack_cache')
 
-requests_per_minute = 60
+max_requests_per_minute = 60
+horizons = [1, 5]
 
-[1, 5].each do |horizon|
-  Rack::Attack.throttle("#{horizon} minutes", limit: requests_per_minute * horizon, period: horizon.minutes) do |request|
+horizons.each do |horizon|
+  Rack::Attack.throttle("#{horizon} minutes", limit: max_requests_per_minute * horizon, period: horizon.minutes) do |request|
     request.ip if !request.xhr? && %w[/fonts/ /images/ /infinite_admin/ /javascripts/ /stylesheets/ /manifest.json /service-worker.js].none? { |path| request.path.starts_with?(path) }
   end
 end

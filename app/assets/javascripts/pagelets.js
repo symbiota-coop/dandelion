@@ -78,7 +78,8 @@ $(function () {
       $('.tooltip').remove()
       const offset = pagelet.offset()
       if (pagelet.attr('data-pagelet-scroll') != 'false') {
-        window.scrollTo(0, offset.top - $('#header').height() - 20)
+        const headerHeight = $('#header').length ? $('#header').height() : 0
+        window.scrollTo(0, offset.top - headerHeight - 20)
       }
     })
     return false
