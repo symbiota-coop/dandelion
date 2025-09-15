@@ -20,7 +20,7 @@ Dandelion::App.controller do
                 @events.order('start_time asc')
               end
     q_ids = []
-    q_ids += search_events(params[:q]).pluck(:id) if params[:q]
+    q_ids += Event.search(params[:q]).pluck(:id) if params[:q]
     event_tag_ids = []
     if params[:event_type]
       event_tag_ids = if (event_tag = EventTag.find_by(name: params[:event_type]))
@@ -169,7 +169,7 @@ Dandelion::App.controller do
     @events = params[:deleted] || params[:exclude_co_hosted] ? @organisation.events : @organisation.events_including_cohosted
     @events = params[:order] == 'created_at' ? @events.order('created_at desc') : @events.order("#{@start_or_end}_time asc")
     q_ids = []
-    q_ids += search_events(params[:q]).pluck(:id) if params[:q]
+    q_ids += Event.search(params[:q]).pluck(:id) if params[:q]
     event_tag_ids = []
     event_tag_ids = EventTagship.and(event_tag_id: params[:event_tag_id]).pluck(:event_id) if params[:event_tag_id]
     event_ids = if q_ids.empty?

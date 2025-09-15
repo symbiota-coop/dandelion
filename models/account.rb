@@ -12,9 +12,14 @@ class Account
   include AccountFarcaster
   include AccountRecommendations
   include Geocoded
+  include Searchable
 
   def self.fu(username)
     Account.find_by(username: username)
+  end
+
+  def self.search_fields
+    %w[name name_transliterated email username]
   end
 
   def self.public

@@ -17,11 +17,16 @@ class Event
   include EventAccessControl
   include Geocoded
   include ImageWithValidation
+  include Searchable
 
   dragonfly_accessor :video
 
   def self.fs(slug)
     find_by(slug: slug)
+  end
+
+  def self.search_fields
+    %w[name description location event_tags_joined]
   end
 
   def to_param

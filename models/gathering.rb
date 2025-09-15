@@ -10,9 +10,14 @@ class Gathering
   include EvmTransactions
   include StripeWebhooks
   include ImageWithValidation
+  include Searchable
 
   def self.fs(slug)
     find_by(slug: slug)
+  end
+
+  def self.search_fields
+    %w[name intro_for_non_members]
   end
 
   def self.spring_clean

@@ -17,9 +17,14 @@ class Organisation
   include StripeWebhooks
   include ImportFromCsv
   include ImageWithValidation
+  include Searchable
 
   def self.fs(slug)
     find_by(slug: slug)
+  end
+
+  def self.search_fields
+    %w[name intro_text]
   end
 
   def to_param

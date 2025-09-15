@@ -62,7 +62,7 @@ Dandelion::App.controller do
         @event.tickets.unscoped.and(name: /#{Regexp.escape(params[:q])}/i).pluck(:id) +
         @event.tickets.unscoped.and(email: /#{Regexp.escape(params[:q])}/i).pluck(:id) +
         @event.tickets.unscoped.and(
-          :account_id.in => search_accounts(params[:q]).pluck(:id)
+          :account_id.in => Account.search(params[:q]).pluck(:id)
         ).pluck(:id))
     end
 

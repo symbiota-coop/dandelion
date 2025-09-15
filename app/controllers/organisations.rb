@@ -2,12 +2,7 @@ Dandelion::App.controller do
   get '/organisations', provides: %i[html json] do
     @organisations = Organisation.and(:hidden.ne => true)
     @organisations = params[:order] == 'created_at' ? @organisations.order('created_at desc') : @organisations.order('followers_count desc')
-    if params[:q]
-      @organisations = @organisations.and(:id.in => Organisation.all.or(
-        { name: /#{Regexp.escape(params[:q])}/i },
-        { intro_text: /#{Regexp.escape(params[:q])}/i }
-      ).pluck(:id))
-    end
+    @organisations = @organisations.and(:id.in => Organisation.search(params[:q]).pluck(:id)) if params[:q]
     @organisations = @organisations.and(:id.in => current_account.organisations_following.pluck(:id)) if current_account && params[:following]
 
     case content_type

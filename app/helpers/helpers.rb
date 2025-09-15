@@ -37,59 +37,6 @@ Dandelion::App.helpers do
     whenable.send(:when_details, current_account ? current_account.time_zone : session[:time_zone], with_zone: with_zone)
   end
 
-  def search(klass, match, query, number = nil)
-    if Padrino.env == :development
-      klass.or(klass.admin_fields.map { |k, v| { k => /#{Regexp.escape(query)}/i } if v == :text || (v.is_a?(Hash) && v[:type] == :text) }.compact)
-    else
-      pipeline = [
-        { '$search': {
-          index: klass.to_s.underscore.pluralize,
-          compound: {
-            should: [
-              { phrase: { query: query, path: { wildcard: '*' }, score: { boost: { value: 1.5 } } } },
-              { text: { query: query, path: { wildcard: '*' } } }
-            ]
-          }
-        } },
-        { '$addFields': { score: { '$meta': 'searchScore' } } },
-        { '$match': match.selector }
-      ]
-
-      results = klass.collection.aggregate(pipeline)
-      results = results.first(number) if number
-
-      # Filter by score threshold (50% of max score)
-      if results.any?
-        max_score = results.map { |doc| doc['score'] }.max
-        min_score = max_score * 0.5
-        results = results.select { |doc| doc['score'] >= min_score }
-      end
-
-      results.map do |hash|
-        klass.new(hash.select { |k, _v| klass.fields.keys.include?(k.to_s) })
-      end
-    end
-  end
-
-  def search_accounts(query)
-    Account.all.or(
-      { name: /#{Regexp.escape(query)}/i },
-      { name_transliterated: /#{Regexp.escape(query)}/i },
-      { email: /#{Regexp.escape(query)}/i },
-      { username: /#{Regexp.escape(query)}/i }
-    )
-  end
-
-  def search_events(query)
-    # Mongoid::Paranoia seems to break .or
-    Event.where('$or' => [
-                  { name: /#{Regexp.escape(query)}/i },
-                  { description: /#{Regexp.escape(query)}/i },
-                  { location: /#{Regexp.escape(query)}/i },
-                  { event_tags_joined: /#{Regexp.escape(query)}/i }
-                ])
-  end
-
   def pagination_details(collection, model: nil)
     if collection.total_pages < 2
       case collection.to_a.length
