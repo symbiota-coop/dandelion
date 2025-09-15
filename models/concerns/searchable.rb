@@ -9,16 +9,13 @@ module Searchable
         search_paths = search_fields
         self.or(search_paths.map { |field| { field => /#{Regexp.escape(query)}/i } })
       else
-        index_name = to_s.underscore.pluralize
-        search_paths = search_fields
-
         pipeline = [
           {
             '$search' => {
-              'index' => index_name,
+              'index' => to_s.underscore.pluralize,
               'text' => {
                 'query' => query,
-                'path' => search_paths
+                'path' => search_fields
               }
             }
           }
