@@ -48,4 +48,4 @@
   </tr>
   <% } %>
 </table>
-<%= will_paginate @donations, renderer: WillPaginate::ViewHelpers::BootstrapRenderer %>
+<%= will_paginate @donations, page_links: false, renderer: WillPaginate::ViewHelpers::BootstrapRenderer %>

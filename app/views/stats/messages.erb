@@ -23,4 +23,4 @@
     <% } %>
   </tbody>
 </table>
-<%= will_paginate @messages, renderer: WillPaginate::ViewHelpers::BootstrapRenderer %>
+<%= will_paginate @messages, page_links: false, renderer: WillPaginate::ViewHelpers::BootstrapRenderer %>

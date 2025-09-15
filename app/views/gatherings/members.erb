@@ -188,6 +188,6 @@
     </tr>
   </table>
   <div style="text-align: center">
-    <%= will_paginate @memberships, renderer: WillPaginate::ViewHelpers::BootstrapRenderer %>
+    <%= will_paginate @memberships, page_links: false, renderer: WillPaginate::ViewHelpers::BootstrapRenderer %>
   </div>
 <% end %>

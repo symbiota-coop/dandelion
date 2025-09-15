@@ -141,4 +141,4 @@
   </tr>
   <% } %>
 </table>
-<%= will_paginate @activity_applications, renderer: WillPaginate::ViewHelpers::BootstrapRenderer %>
+<%= will_paginate @activity_applications, page_links: false, renderer: WillPaginate::ViewHelpers::BootstrapRenderer %>

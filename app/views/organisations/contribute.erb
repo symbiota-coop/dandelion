@@ -31,7 +31,7 @@
     <% } %>
   </table>
 
-  <%= will_paginate events, param_name: 'events_page', renderer: WillPaginate::ViewHelpers::BootstrapRenderer %>
+  <%= will_paginate events, param_name: 'events_page', page_links: false, renderer: WillPaginate::ViewHelpers::BootstrapRenderer %>
 
 <% end %>
 
@@ -56,6 +56,6 @@
     <% } %>
   </table>
 
-  <%= will_paginate organisation_contributions, param_name: 'organisation_contributions_page', renderer: WillPaginate::ViewHelpers::BootstrapRenderer %>
+  <%= will_paginate organisation_contributions, param_name: 'organisation_contributions_page', page_links: false, renderer: WillPaginate::ViewHelpers::BootstrapRenderer %>
 
 <% end %>

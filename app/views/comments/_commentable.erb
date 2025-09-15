@@ -14,5 +14,5 @@
 <% end %>
 <% } %>
 <div style="text-align: center">
-  <%= will_paginate @posts, renderer: WillPaginate::ViewHelpers::BootstrapRenderer %>
+  <%= will_paginate @posts, page_links: false, renderer: WillPaginate::ViewHelpers::BootstrapRenderer %>
 </div>

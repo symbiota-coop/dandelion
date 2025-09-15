@@ -51,4 +51,4 @@
     <% } %>
   </tbody>
 </table>
-<%= will_paginate @accounts, renderer: WillPaginate::ViewHelpers::BootstrapRenderer %>
+<%= will_paginate @accounts, page_links: false, renderer: WillPaginate::ViewHelpers::BootstrapRenderer %>

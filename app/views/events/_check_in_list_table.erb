@@ -65,4 +65,4 @@
   </tr>
   <% } %>
 </table>
-<%= will_paginate @tickets, renderer: WillPaginate::ViewHelpers::BootstrapRenderer %>
+<%= will_paginate @tickets, page_links: false, renderer: WillPaginate::ViewHelpers::BootstrapRenderer %>

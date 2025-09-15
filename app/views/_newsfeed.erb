@@ -47,7 +47,7 @@
     </li>
     <% } %>
   </ul>
-  <%= will_paginate notifications, inner_window: 0, outer_window: 0, renderer: WillPaginate::ViewHelpers::BootstrapRenderer %>
+  <%= will_paginate notifications, page_links: false, renderer: WillPaginate::ViewHelpers::BootstrapRenderer %>
 <% end %>
 
 <% if params[:tour] || (!ENV['SKIP_TOURS'] && request.path == '/' && !current_account.seen_intro_tour) %>

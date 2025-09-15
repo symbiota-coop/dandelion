@@ -27,6 +27,6 @@
     <% } %>
   </table>
   <div style="text-align: center">
-    <%= will_paginate @mapplications, renderer: WillPaginate::ViewHelpers::BootstrapRenderer %>
+    <%= will_paginate @mapplications, page_links: false, renderer: WillPaginate::ViewHelpers::BootstrapRenderer %>
   </div>
 <% end %>

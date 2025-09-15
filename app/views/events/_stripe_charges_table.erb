@@ -74,4 +74,4 @@
   <% } %>
 </table>
 
-<%= will_paginate stripe_charges, renderer: WillPaginate::ViewHelpers::BootstrapRenderer %>
+<%= will_paginate stripe_charges, page_links: false, renderer: WillPaginate::ViewHelpers::BootstrapRenderer %>

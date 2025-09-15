@@ -15,4 +15,4 @@
   </li>
   <% } %>
 </ul>
-<%= will_paginate @account_ids, renderer: WillPaginate::ViewHelpers::BootstrapRenderer %>
+<%= will_paginate @account_ids, page_links: false, renderer: WillPaginate::ViewHelpers::BootstrapRenderer %>

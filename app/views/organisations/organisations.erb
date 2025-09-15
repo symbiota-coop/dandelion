@@ -64,5 +64,5 @@
   <%= partial :'organisations/network', locals: { organisations: @organisations } %>
 <% else %>
   <%= partial :'organisations/blocks', locals: { organisations: @organisations } %>
-  <%= will_paginate @organisations, param_name: 'organisations_page', inner_window: 0, outer_window: 0, renderer: WillPaginate::ViewHelpers::BootstrapRenderer %>
+  <%= will_paginate @organisations, param_name: 'organisations_page', page_links: false, renderer: WillPaginate::ViewHelpers::BootstrapRenderer %>
 <% end %>

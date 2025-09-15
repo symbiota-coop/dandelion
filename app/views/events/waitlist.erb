@@ -34,4 +34,4 @@
   </tr>
   <% } %>
 </table>
-<%= will_paginate @waitships, renderer: WillPaginate::ViewHelpers::BootstrapRenderer %>
+<%= will_paginate @waitships, page_links: false, renderer: WillPaginate::ViewHelpers::BootstrapRenderer %>

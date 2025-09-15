@@ -101,4 +101,4 @@
   </tr>
   <% } %>
 </table>
-<%= will_paginate event_feedbacks, renderer: WillPaginate::ViewHelpers::BootstrapRenderer %>
+<%= will_paginate event_feedbacks, page_links: false, renderer: WillPaginate::ViewHelpers::BootstrapRenderer %>

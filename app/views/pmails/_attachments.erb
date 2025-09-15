@@ -24,7 +24,7 @@
   </tr>
   <% } %>
 </table>
-<%= will_paginate attachments, inner_window: 0, outer_window: 0, renderer: WillPaginate::ViewHelpers::BootstrapRenderer %>
+<%= will_paginate attachments, page_links: false, renderer: WillPaginate::ViewHelpers::BootstrapRenderer %>
 
 <script>
   $(document).on('click', '.copy-url-btn', function() {
