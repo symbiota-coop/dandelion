@@ -1,5 +1,7 @@
+<% network_notifications = current_account.network_notifications %>
+
 <ul class="dropdown-menu dropdown-lg no-padding">
-  <% current_account.network_notifications.order('created_at desc').limit(5).each_with_index { |notification,i| %>
+  <% network_notifications.order('created_at desc').limit(5).each_with_index { |notification,i| %>
   <li class="notification">
     <a href="<%= notification.link[1] %>">
       <div class="notification-icon text-dark"><i class="bi <%= notification.icon %>"></i></div>
@@ -15,7 +17,7 @@
   <% } %>
   <li class="text-center"><a href="/">All notifications <i class="bi bi-arrow-right"></i></a></li>
 </ul>
-<% if current_account.unread_notifications? %>
+<% if current_account.unread_notifications?(network_notifications) %>
   <script>
     $(function () {
       $('#notifications-a').addClass('with-label')

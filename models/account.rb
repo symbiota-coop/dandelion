@@ -119,8 +119,8 @@ class Account
     end
   end
 
-  def unread_notifications?
-    (n = network_notifications.order('created_at desc').first) && (!last_checked_notifications || (n.created_at > last_checked_notifications))
+  def unread_notifications?(notifications = network_notifications)
+    (n = notifications.order('created_at desc').first) && (!last_checked_notifications || (n.created_at > last_checked_notifications))
   end
 
   def unread_messages?
