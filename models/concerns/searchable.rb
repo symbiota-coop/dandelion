@@ -7,6 +7,8 @@ module Searchable
 
       # Bot protection: reject queries with newlines
       return none if query.include?("\n") || query.include?("\r")
+      # Query length validation: 3-200 characters
+      return none if query.length < 3 || query.length > 200
 
       if Padrino.env == :development
         search_paths = search_fields

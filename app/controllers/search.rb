@@ -3,7 +3,7 @@ Dandelion::App.controller do
     if request.xhr?
       @q = params[:term]
       @type = params[:type]
-      halt if @q.nil? || @q.length < 3
+      halt if @q.nil? || @q.length < 3 || @q.length > 200
 
       results = []
 
