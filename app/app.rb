@@ -116,7 +116,11 @@ module Dandelion
       if current_account
         # signed in
         if request.xhr?
-          partial :newsfeed, locals: { notifications: current_account.network_notifications.order('created_at desc').page(params[:page]), include_circle_name: true }
+          seen = current_account.seen_intro_tour ? 1 : 0
+          cp(:newsfeed,
+             locals: { notifications: current_account.network_notifications.order('created_at desc').page(params[:page]), include_circle_name: true },
+             key: "/newsfeed?account_id=#{current_account.id}&page=#{params[:page] || 1}&seen_intro=#{seen}",
+             expires: 1.minute.from_now)
         else
           @body_class = 'greyed'
           erb :home_signed_in
