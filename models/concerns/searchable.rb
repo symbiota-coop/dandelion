@@ -5,6 +5,9 @@ module Searchable
     def search(query, all_fields: false)
       return none if query.blank?
 
+      # Bot protection: reject queries with newlines
+      return none if query.include?("\n") || query.include?("\r")
+
       if Padrino.env == :development
         search_paths = search_fields
         self.or(search_paths.map { |field| { field => /#{Regexp.escape(query)}/i } })
