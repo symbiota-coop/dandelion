@@ -12,17 +12,21 @@ module Searchable
         index_name = to_s.underscore.pluralize
         search_paths = search_fields
 
-        collection.aggregate([
-                               {
-                                 '$search' => {
-                                   'index' => index_name,
-                                   'text' => {
-                                     'query' => query,
-                                     'path' => search_paths
-                                   }
-                                 }
-                               }
-                             ])
+        results = collection.aggregate([
+                                         {
+                                           '$search' => {
+                                             'index' => index_name,
+                                             'text' => {
+                                               'query' => query,
+                                               'path' => search_paths
+                                             }
+                                           }
+                                         }
+                                       ])
+
+        results.map do |hash|
+          new(hash.select { |k, _v| fields.keys.include?(k.to_s) })
+        end
       end
     end
 
