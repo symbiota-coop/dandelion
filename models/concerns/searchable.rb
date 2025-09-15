@@ -2,7 +2,7 @@ module Searchable
   extend ActiveSupport::Concern
 
   class_methods do
-    def search(query)
+    def search(query, all_fields: false)
       return none if query.blank?
 
       if Padrino.env == :development
@@ -20,6 +20,14 @@ module Searchable
             }
           }
         ]
+
+        unless all_fields
+          pipeline << {
+            '$project' => {
+              '_id' => 1
+            }
+          }
+        end
 
         results = collection.aggregate(pipeline)
 
