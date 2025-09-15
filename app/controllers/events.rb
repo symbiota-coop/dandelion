@@ -15,7 +15,7 @@ Dandelion::App.controller do
                 @events.order('start_time asc')
               end
     @events = if params[:q]
-                @events.and(:id.in => search(Event, @events, params[:q]).pluck(:id))
+                @events.and(:id.in => Event.search(params[:q]).pluck(:id))
               else
                 @events
               end
