@@ -4,10 +4,13 @@
   </div>
 <% else %>
   <% unless params[:no_listings] %>
-    <% @events = @events.paginate(page: params[:page], per_page: (params[:per_page] || 20)) %>
+    <% if !params[:minimal] || params[:past] %>
+      <% @events = @events.paginate(page: params[:page], per_page: (params[:per_page] || 20)) %>
+    <% end %>
     <%= partial :'events/blocks', locals: { events: @events } %>
-    <div class="mt-3">
-      <%= will_paginate @events, page_links: false, renderer: WillPaginate::ViewHelpers::BootstrapRenderer %>
-    </div>
+    <% if !params[:minimal] || params[:past] %>
+      <div class="mt-3">
+        <%= will_paginate @events, page_links: false, renderer: WillPaginate::ViewHelpers::BootstrapRenderer %>
+      </div>
+    <% end %>
   <% end %>
-<% end %>
