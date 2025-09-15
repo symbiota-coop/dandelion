@@ -5,8 +5,6 @@ module Searchable
     def search(query, all_fields: false)
       return none if query.blank?
 
-      # Bot protection: reject queries with newlines
-      return none if query.include?("\n") || query.include?("\r")
       # Query length validation: 3-200 characters
       return none if query.length < 3 || query.length > 200
 
@@ -16,11 +14,11 @@ module Searchable
       else
         pipeline = [
           {
-            '$search' => {
-              'index' => to_s.underscore.pluralize,
-              'text' => {
-                'query' => query,
-                'path' => search_fields
+            '$search': {
+              index: to_s.underscore.pluralize,
+              phrase: {
+                query: query,
+                path: search_fields
               }
             }
           }
@@ -28,8 +26,8 @@ module Searchable
 
         unless all_fields
           pipeline << {
-            '$project' => {
-              '_id' => 1
+            '$project': {
+              _id: 1
             }
           }
         end
