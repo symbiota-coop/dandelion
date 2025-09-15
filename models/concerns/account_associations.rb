@@ -156,22 +156,31 @@ module AccountAssociations
   end
 
   def network_notifications
-    Notification.all.or(
-      { :circle_type => 'Gathering', :circle_id.in => memberships.pluck(:gathering_id) },
-      { :circle_type => 'Account', :circle_id.in => [id] + network.pluck(:id) },
-      { :circle_type => 'Activity', :circle_id.in => activities_following.pluck(:id) },
-      { :circle_type => 'LocalGroup', :circle_id.in => local_groups_following.pluck(:id) },
+    gathering_ids = memberships.pluck(:gathering_id)
+    account_ids = [id] + follows_as_follower.pluck(:followee_id)
+    activity_ids = activityships.pluck(:activity_id)
+    local_group_ids = local_groupships.pluck(:local_group_id)
+    organisation_follow_ids = organisationships.pluck(:organisation_id)
+    organisation_monthly_ids = organisationships.and(:monthly_donation_method.ne => nil).pluck(:organisation_id)
+
+    pipeline = [
       {
-        :circle_type => 'Organisation',
-        :circle_id.in => organisations_following.pluck(:id),
-        :type.ne => 'commented'
+        '$match' => {
+          '$or' => [
+            { 'circle_type' => 'Gathering', 'circle_id' => { '$in' => gathering_ids } },
+            { 'circle_type' => 'Account', 'circle_id' => { '$in' => account_ids } },
+            { 'circle_type' => 'Activity', 'circle_id' => { '$in' => activity_ids } },
+            { 'circle_type' => 'LocalGroup', 'circle_id' => { '$in' => local_group_ids } },
+            { 'circle_type' => 'Organisation', 'circle_id' => { '$in' => organisation_follow_ids }, 'type' => { '$ne' => 'commented' } },
+            { 'circle_type' => 'Organisation', 'circle_id' => { '$in' => organisation_monthly_ids }, 'type' => 'commented' }
+          ]
+        }
       },
-      {
-        :circle_type => 'Organisation',
-        :circle_id.in => organisations_monthly_donor.pluck(:id),
-        :type => 'commented'
-      }
-    )
+      { '$project' => { '_id' => 1 } }
+    ]
+
+    ids = Notification.collection.aggregate(pipeline).map { |doc| doc['_id'] }
+    Notification.and(:id.in => ids)
   end
 
   def messages
