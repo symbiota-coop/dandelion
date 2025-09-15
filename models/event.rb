@@ -17,6 +17,7 @@ class Event
   include EventAccessControl
   include Geocoded
   include ImageWithValidation
+  include CursorPagination
 
   dragonfly_accessor :video
 
