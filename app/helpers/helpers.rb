@@ -37,7 +37,7 @@ Dandelion::App.helpers do
     whenable.send(:when_details, current_account ? current_account.time_zone : session[:time_zone], with_zone: with_zone)
   end
 
-  def search(klass, match, query, number)
+  def search(klass, match, query, number = nil)
     if Padrino.env == :development
       klass.or(klass.admin_fields.map { |k, v| { k => /#{Regexp.escape(query)}/i } if v == :text || (v.is_a?(Hash) && v[:type] == :text) }.compact)
     else
@@ -55,7 +55,8 @@ Dandelion::App.helpers do
         { '$match': match.selector }
       ]
 
-      results = klass.collection.aggregate(pipeline).first(number)
+      results = klass.collection.aggregate(pipeline)
+      results = results.first(number) if number
 
       # Filter by score threshold (50% of max score)
       if results.any?
