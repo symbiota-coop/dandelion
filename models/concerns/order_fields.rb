@@ -32,7 +32,6 @@ module OrderFields
     field :answers, type: Array
     field :transferred, type: Mongoid::Boolean
     field :restored, type: Mongoid::Boolean
-    index({ transferred: 1 })
 
     field :gc_plan_id, type: String
     field :gc_given_name, type: String

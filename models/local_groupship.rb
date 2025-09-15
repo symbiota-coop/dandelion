@@ -8,7 +8,6 @@ class LocalGroupship
 
   %w[admin unsubscribed hide_membership receive_feedback].each do |b|
     field b.to_sym, type: Boolean
-    index({ b.to_s => 1 })
   end
 
   def self.admin_fields

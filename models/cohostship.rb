@@ -12,7 +12,6 @@ class Cohostship
   field :image_uid, type: String
   field :video_uid, type: String
   field :featured, type: Boolean
-  index({ featured: 1 })
 
   def self.admin_fields
     {

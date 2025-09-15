@@ -14,7 +14,6 @@ class Donation
   field :application_fee_paid_to_dandelion, type: Boolean
   field :payment_completed, type: Boolean
   field :transferred, type: Boolean
-  index({ transferred: 1 })
 
   def incomplete?
     !payment_completed

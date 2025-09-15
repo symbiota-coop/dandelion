@@ -18,7 +18,6 @@ class Membership
 
   %w[admin unsubscribed hide_from_sidebar].each do |b|
     field b.to_sym, type: Boolean
-    index({ b.to_s => 1 })
   end
 
   def self.admin_fields

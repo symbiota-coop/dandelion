@@ -8,7 +8,6 @@ class Follow
 
   %w[unsubscribed starred].each do |b|
     field b.to_sym, type: Boolean
-    index({ b.to_s => 1 })
   end
 
   def self.admin_fields

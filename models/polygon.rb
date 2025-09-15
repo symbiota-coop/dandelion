@@ -12,5 +12,5 @@ class Polygon
 
   embedded_in :local_group
 
-  index({ coordinates: '2d' })
+  # index({ coordinates: '2d' })
 end

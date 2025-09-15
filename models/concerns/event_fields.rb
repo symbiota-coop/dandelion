@@ -7,9 +7,7 @@ module EventFields
     attr_accessor :prevent_notifications, :update_tag_names, :tag_names, :duplicate
 
     field :name, type: String
-    index({ name: 1 })
     field :slug, type: String
-    index({ slug: 1 })
     field :start_time, type: Time
     field :end_time, type: Time
     field :location, type: String
@@ -17,7 +15,6 @@ module EventFields
     field :image_uid, type: String
     field :video_uid, type: String
     field :description, type: String
-    index({ description: 1 })
     field :email, type: String
     field :facebook_event_url, type: String
     field :feedback_questions, type: String
@@ -59,7 +56,6 @@ module EventFields
 
     %w[no_discounts hide_deleted_filters hide_attendees hide_discussion refund_deleted_orders monthly_donors_only locked secret zoom_party show_emails include_in_parent featured opt_in_organisation opt_in_facilitator hide_few_left hide_organisation_footer ask_hear_about send_order_notifications raw_description prevent_reminders trending hide_from_trending hide_from_carousels no_tickets_pdf half_width_images enable_resales donations_to_organisation browsable hide_unavailable_tickets hidden_from_homepage blank_price_for_free_tickets].each do |b|
       field b.to_sym, type: Mongoid::Boolean
-      index({ b.to_s => 1 })
     end
   end
 

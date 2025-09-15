@@ -35,7 +35,6 @@ class Ticket
   field :transferred, type: Boolean
   field :made_available_at, type: Time
   field :original_ticket_type_name, type: String
-  index({ transferred: 1 })
 
   def self.admin_fields
     {

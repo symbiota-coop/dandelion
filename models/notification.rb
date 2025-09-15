@@ -18,8 +18,6 @@ class Notification
     }
   end
 
-  index({ circle_type: 1, created_at: -1 })
-
   def self.circle_types
     %w[Account Gathering Activity LocalGroup Organisation]
   end

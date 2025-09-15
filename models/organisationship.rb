@@ -4,6 +4,7 @@ class Organisationship
   include BelongsToWithoutParentValidation
 
   include Geocoder::Model::Mongoid
+
   belongs_to_without_parent_validation :organisation, index: true
   belongs_to_without_parent_validation :account, inverse_of: :organisationships, index: true
   belongs_to_without_parent_validation :referrer, class_name: 'Account', inverse_of: :organisationships_as_referrer, index: true, optional: true
@@ -23,9 +24,7 @@ class Organisationship
 
   %w[admin unsubscribed hide_membership receive_feedback why_i_joined_public sent_welcome sent_monthly_donation_welcome hide_referrer].each do |b|
     field b.to_sym, type: Boolean
-    index({ b.to_s => 1 })
   end
-  index({ monthly_donation_method: 1 })
 
   after_save :clear_cache
   after_destroy :clear_cache

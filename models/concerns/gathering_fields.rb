@@ -35,12 +35,10 @@ module GatheringFields
 
     enablable.each do |x|
       field :"enable_#{x}", type: Mongoid::Boolean
-      index({ "enable_#{x}" => 1 })
     end
 
     %w[enable_supporters clear_up_optionships anonymise_supporters democratic_threshold require_reason_proposer require_reason_supporter demand_payment hide_members_on_application_form hide_invitations listed].each do |b|
       field b.to_sym, type: Mongoid::Boolean
-      index({ b.to_s => 1 })
     end
   end
 

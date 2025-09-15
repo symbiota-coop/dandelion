@@ -18,15 +18,11 @@ module AccountFields
     attr_accessor :password, :postcode, :country, :skip_confirmation_email, :gc_plan_id
 
     field :name, type: String
-    index({ name: 1 })
     field :name_transliterated, type: String
-    index({ name_transliterated: 1 })
     field :email, type: String
-    index({ email: 1 }, { unique: true })
     field :phone, type: String
     field :telegram_username, type: String
     field :username, type: String
-    index({ username: 1 }, { unique: true })
     field :website, type: String
     field :gender, type: String
     field :sexuality, type: String
@@ -37,22 +33,16 @@ module AccountFields
     field :image_uid, type: String
     field :sign_ins_count, type: Integer
     field :sign_in_token, type: String
-    index({ sign_in_token: 1 })
     field :api_key, type: String
-    index({ api_key: 1 })
     field :last_active, type: Time
     field :last_checked_notifications, type: Time
     field :last_checked_messages, type: Time
     field :location, type: String
-    index({ location: 1 })
     field :number_at_this_location, type: Integer
-    index({ number_at_this_location: 1 })
     field :coordinates, type: Array
     field :default_currency, type: String
     field :organisation_ids_cache, type: Array
-    index({ organisation_ids_cache: 1 })
     field :organisation_ids_public_cache, type: Array
-    index({ organisation_ids_public_cache: 1 })
     field :bio, type: String
     field :can_message, type: Mongoid::Boolean
     field :failed_sign_in_attempts, type: Integer
@@ -61,9 +51,6 @@ module AccountFields
     field :feedback_summary, type: String
     field :youtube_video_url, type: String
     field :sent_first_event_email, type: Time
-
-    field :tokens, type: Float
-    index({ tokens: 1 })
 
     %w[email_confirmed
        updated_profile
@@ -82,12 +69,10 @@ module AccountFields
        seen_intro_tour
        can_reset_passwords].each do |b|
       field b.to_sym, type: Mongoid::Boolean
-      index({ b.to_s => 1 })
     end
 
     privacyables.each do |p|
       field :"#{p}_privacy", type: String
-      index({ "#{p}_privacy" => 1 })
     end
   end
 
