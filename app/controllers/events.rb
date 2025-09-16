@@ -260,18 +260,20 @@ Dandelion::App.controller do
   end
 
   get '/e/:slug/edit' do
-    @event = Event.unscoped.find_by(slug: params[:slug]) || not_found
+    @event = Event.unscoped.find_by(slug: params[:slug])
+    halt 404 unless @event
     kick! unless @event.organisation
     event_admins_only!
     erb :'events_build/build'
   end
 
   post '/e/:slug/edit' do
-    @event = Event.find_by(slug: params[:slug]) || not_found
+    @event = Event.find_by(slug: params[:slug])
+    halt 404 unless @event
     kick! unless @event.organisation
     event_admins_only!
     @event.last_saved_by = current_account
-    if @event.update_attributes(mass_assigning(params[:event], Event))
+    if @event.update(mass_assigning(params[:event], Event))
       @event.set(locked: true) if !@event.organisation.payment_method? && @event.paid_tickets?
       flash[:notice] = 'The event was saved.'
       redirect "/e/#{@event.slug}/edit"
@@ -388,7 +390,7 @@ Dandelion::App.controller do
                  Account.new(account_hash)
                end
     successful_update_or_save = if @account.persisted?
-                                  @account.update_attributes(mass_assigning(account_hash.map { |k, v| [k, v] if v }.compact.to_h, Account))
+                                  @account.update(mass_assigning(account_hash.map { |k, v| [k, v] if v }.compact.to_h, Account))
                                 else
                                   @account.save
                                 end
@@ -418,7 +420,7 @@ Dandelion::App.controller do
                end
 
     successful_update_or_save = if @account.persisted?
-                                  @account.update_attributes(mass_assigning(account_hash.map { |k, v| [k, v] if v }.compact.to_h, Account))
+                                  @account.update(mass_assigning(account_hash.map { |k, v| [k, v] if v }.compact.to_h, Account))
                                 else
                                   @account.save
                                 end
@@ -539,7 +541,7 @@ Dandelion::App.controller do
     @event = Event.find(params[:id]) || not_found
     event_admins_only!
     @cohostship = @event.cohostships.find(params[:cohostship_id])
-    if @cohostship.update_attributes(mass_assigning(params[:cohostship], Cohostship))
+    if @cohostship.update(mass_assigning(params[:cohostship], Cohostship))
       redirect "/events/#{@event.id}/cohosts"
     else
       flash.now[:error] = 'There was an error saving the cohost.'
