@@ -65,12 +65,30 @@ Dandelion::App.controller do
       else
         @account = Account.new(mass_assigning(params[:account], Account))
         @account.password = Account.generate_password # not used
-        if @account.save
-          @account.sign_ins.create(env: env_yaml)
-          session[:account_id] = @account.id.to_s
-        else
-          flash[:error] = '<strong>Oops.</strong> Some errors prevented the account from being saved.'
-          redirect back
+        begin
+          if @account.save
+            @account.sign_ins.create(env: env_yaml)
+            session[:account_id] = @account.id.to_s
+          else
+            flash[:error] = '<strong>Oops.</strong> Some errors prevented the account from being saved.'
+            redirect back
+          end
+        rescue Mongo::Error::OperationFailure => e
+          if e.message.include?('E11000') && e.message.include?('email')
+            # Duplicate key error on email - the account was created by another request
+            # Find the existing account and sign in with it
+            @account = Account.find_by(email: params[:account][:email].downcase)
+            if @account
+              @account.sign_ins.create(env: env_yaml)
+              session[:account_id] = @account.id.to_s
+            else
+              flash[:error] = '<strong>Oops.</strong> There was a problem creating your account. Please try again.'
+              redirect back
+            end
+          else
+            # Re-raise other MongoDB errors
+            raise e
+          end
         end
       end
     end
@@ -110,9 +128,24 @@ Dandelion::App.controller do
 
     unless (@account = Account.find_by(email: params[:email].downcase))
       @account = Account.new(name: params[:email].split('@').first, email: params[:email], password: Account.generate_password)
-      unless @account.save
-        flash[:error] = '<strong>Oops.</strong> Some errors prevented the account from being saved.'
-        redirect back
+      begin
+        unless @account.save
+          flash[:error] = '<strong>Oops.</strong> Some errors prevented the account from being saved.'
+          redirect back
+        end
+      rescue Mongo::Error::OperationFailure => e
+        if e.message.include?('E11000') && e.message.include?('email')
+          # Duplicate key error on email - the account was created by another request
+          # Find the existing account and continue
+          @account = Account.find_by(email: params[:email].downcase)
+          unless @account
+            flash[:error] = '<strong>Oops.</strong> There was a problem creating the account. Please try again.'
+            redirect back
+          end
+        else
+          # Re-raise other MongoDB errors
+          raise e
+        end
       end
     end
 
