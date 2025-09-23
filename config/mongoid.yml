@@ -16,3 +16,13 @@ production:
   clients:
     default:
       uri: <%= ENV['MONGODB_URI'] || ENV['MONGO_URL'] %>
+      options:
+        max_pool_size: 10
+        min_pool_size: 1
+        wait_queue_timeout: 1
+        connect_timeout: 10
+        socket_timeout: 5
+        server_selection_timeout: 5
+        heartbeat_frequency: 10
+        retry_writes: true
+        retry_reads: true
