@@ -10,7 +10,10 @@ module AccountFields
             attachment.name = "#{SecureRandom.uuid}.jpg"
           end
 
-          attachment.process!(:thumb, '1920x1920>')
+          # Skip resize for SVG files as they are vector-based and scalable
+          unless attachment.format == 'svg'
+            attachment.process!(:thumb, '1920x1920>')
+          end
         end
       end
     end
