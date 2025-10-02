@@ -3,10 +3,12 @@ class AccountCache
   include Mongoid::Timestamps
   include BelongsToWithoutParentValidation
 
+  belongs_to_without_parent_validation :account, index: true
+
+  validates_uniqueness_of :account
+
   field :recommended_people_cache, type: Array
   field :recommended_events_cache, type: Array
-
-  belongs_to_without_parent_validation :account, index: true
 
   def self.admin_fields
     {

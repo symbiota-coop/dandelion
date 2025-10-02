@@ -25,4 +25,12 @@ class LocalGroupship
   def self.protected_attributes
     %w[admin]
   end
+
+  after_create do
+    account.account_notification_cache&.invalidate!
+  end
+
+  after_destroy do
+    account.account_notification_cache&.invalidate!
+  end
 end

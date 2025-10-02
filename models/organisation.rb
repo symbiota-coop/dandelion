@@ -86,7 +86,7 @@ class Organisation
   end
 
   after_save do
-    events.each(&:set_browsable) if hidden_changed? || paid_up_changed?
+    events.each(&:set_browsable) if saved_change_to_hidden? || saved_change_to_paid_up?
   end
 
   def stripe_webhook_url

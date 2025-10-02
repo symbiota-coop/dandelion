@@ -126,6 +126,8 @@ class Organisationship
   after_create do
     relevant_local_groups.each { |local_group| local_group.local_groupships.create account: account } if account.coordinates
     account.update_attribute(:organisation_ids_cache, ((account.organisation_ids_cache || []) + [organisation.id]).uniq)
+    # Invalidate notification cache
+    account.account_notification_cache&.invalidate!
   end
 
   def relevant_local_groups
@@ -143,6 +145,8 @@ class Organisationship
       account.update_attribute(:organisation_ids_public_cache, ((account.organisation_ids_public_cache || []) + [organisation.id]).uniq)
     end
     send_monthly_donation_welcome if monthly_donation_method && !sent_monthly_donation_welcome
+    # Invalidate notification cache when organisation following or donor status changes
+    account.account_notification_cache&.invalidate! if saved_change_to_monthly_donation_method?
   end
 
   def send_welcome(force: false)
@@ -239,6 +243,8 @@ class Organisationship
   after_destroy do
     account.update_attribute(:organisation_ids_cache, (account.organisation_ids_cache || []) - [organisation.id])
     account.update_attribute(:organisation_ids_public_cache, (account.organisation_ids_public_cache || []) - [organisation.id])
+    # Invalidate notification cache
+    account.account_notification_cache&.invalidate!
   end
 
   validates_uniqueness_of :account, scope: :organisation

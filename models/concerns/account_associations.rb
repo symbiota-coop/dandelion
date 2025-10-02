@@ -3,6 +3,7 @@ module AccountAssociations
 
   included do
     has_one :account_cache, dependent: :destroy
+    has_one :account_notification_cache, dependent: :destroy
 
     has_many :drafts, dependent: :destroy
 
@@ -156,19 +157,26 @@ module AccountAssociations
   end
 
   def network_notifications
+    # Use cached IDs if available and valid, otherwise refresh cache
+    cache = account_notification_cache || create_account_notification_cache
+    unless cache.cache_valid?
+      cache.refresh!
+      cache.reload
+    end
+
     Notification.all.or(
-      { :circle_type => 'Gathering', :circle_id.in => memberships.pluck(:gathering_id) },
-      { :circle_type => 'Account', :circle_id.in => [id] + network.pluck(:id) },
-      { :circle_type => 'Activity', :circle_id.in => activities_following.pluck(:id) },
-      { :circle_type => 'LocalGroup', :circle_id.in => local_groups_following.pluck(:id) },
+      { :circle_type => 'Gathering', :circle_id.in => cache.gathering_ids },
+      { :circle_type => 'Account', :circle_id.in => cache.account_ids },
+      { :circle_type => 'Activity', :circle_id.in => cache.activity_ids },
+      { :circle_type => 'LocalGroup', :circle_id.in => cache.local_group_ids },
       {
         :circle_type => 'Organisation',
-        :circle_id.in => organisations_following.pluck(:id),
+        :circle_id.in => cache.organisations_following_ids,
         :type.ne => 'commented'
       },
       {
         :circle_type => 'Organisation',
-        :circle_id.in => organisations_monthly_donor.pluck(:id),
+        :circle_id.in => cache.organisations_monthly_donor_ids,
         :type => 'commented'
       }
     )
