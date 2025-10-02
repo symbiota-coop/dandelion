@@ -8,7 +8,7 @@
 <% end %>
 <tr>
   <td style="<% if no_border_top %>border-top: 0;<% end %> <% if ticket_type.photos.exists? %>border-bottom: 0;<% end %>" >
-    <%= ticket_type.name %>
+    <%= ticket_type.name.downcase.include?('payment plan') ? ticket_type.name.gsub(/\s+\S+@\S+\.\S+\s*$/, '') : ticket_type.name %>
     <% if ticket_type.hidden %>
       <i data-toggle="tooltip" title="Available to you as you used a secret link" class="bi bi-lock"></i>
     <% end %>
