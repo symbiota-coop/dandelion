@@ -81,11 +81,11 @@ module OrganisationAssociations
   end
 
   def event_feedbacks
-    EventFeedback.and(:event_id.in => events.pluck(:id))
+    EventFeedback.and(:event_id.in => events_including_cohosted.pluck(:id))
   end
 
   def unscoped_event_feedbacks
-    EventFeedback.unscoped.and(:event_id.in => events.pluck(:id))
+    EventFeedback.unscoped.and(:event_id.in => events_including_cohosted.pluck(:id))
   end
 
   def event_tags
