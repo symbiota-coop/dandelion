@@ -12,7 +12,6 @@ Dandelion::App.controller do
       if (account_contribution = AccountContribution.find_by(session_id: session.id))
         account_contribution.set(payment_completed: true)
         account_contribution.send_notification
-        Fragment.and(key: %r{/accounts/pay_progress}).destroy_all
       end
     when 'customer.subscription.created'
       subscription = event.data.object
@@ -51,7 +50,6 @@ Dandelion::App.controller do
 
     if event.type == 'charge:confirmed' && event.data.respond_to?(:checkout) && (account_contribution = AccountContribution.find_by(coinbase_checkout_id: event.data.checkout.id))
       account_contribution.set(payment_completed: true)
-      Fragment.and(key: %r{/accounts/pay_progress}).destroy_all
     end
     halt 200
   end

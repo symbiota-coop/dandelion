@@ -161,7 +161,7 @@ class Event
 
   after_save :clear_cache
   def clear_cache
-    Fragment.and(key: %r{/events/#{id}}).destroy_all
+    Fragment.and(key: %r{^/events/#{id}}).destroy_all
   end
 
   def set_browsable

@@ -29,7 +29,7 @@ class Organisationship
   after_save :clear_cache
   after_destroy :clear_cache
   def clear_cache
-    Fragment.and(key: %r{/organisations/carousel/#{account_id}}).destroy_all
+    Fragment.and(key: "/organisations/carousel/#{account_id}").destroy_all
   end
 
   # Geocoder
