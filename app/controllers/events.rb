@@ -83,9 +83,10 @@ Dandelion::App.controller do
 
   get '/events/new' do
     sign_in_required!(redirect_url: '/accounts/new?list_an_event=1')
-    @draft = current_account.drafts.find(params[:draft_id]) if params[:draft_id]
     @event = Event.new
-    if params[:organisation_id]
+    if params[:draft_id] && (@draft = current_account.drafts.find(params[:draft_id]))
+      @event.organisation = JSON.parse(@draft.json)['organisation_id']
+    elsif params[:organisation_id]
       @event.organisation = Organisation.find(params[:organisation_id]) || not_found
     elsif params[:activity_id]
       @event.activity = Activity.find(params[:activity_id]) || not_found
