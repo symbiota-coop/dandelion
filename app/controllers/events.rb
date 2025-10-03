@@ -29,13 +29,13 @@ Dandelion::App.controller do
     end
     @events = @events.and(:hidden_from_homepage.ne => true) if params[:home]
     @events = @events.and(:image_uid.ne => nil) if params[:images]
-    @events = @events.and(:id.in => Event.search(params[:q], @events).pluck(:id)) if params[:q]
     content_type = (parts = URI(request.url).path.split('.')
                     parts.length == 2 ? parts.last.to_sym : :html)
     case content_type
     when :html
       @events = @events.future(@from)
       @events = @events.and(:start_time.lt => @to + 1) if @to
+      @events = @events.and(:id.in => Event.search(params[:q], @events).pluck(:id)) if params[:q]
       if params[:order] == 'random'
         event_ids = @events.pluck(:id)
         @events = @events.collection.aggregate([
@@ -56,6 +56,7 @@ Dandelion::App.controller do
       @events = @events.future(@from)
       @events = @events.and(:start_time.lt => @to + 1) if @to
       @events = @events.and(:locked.ne => true)
+      @events = @events.and(:id.in => Event.search(params[:q], @events).pluck(:id)) if params[:q]
       map_json(@events)
     when :ics
       @events = @events.current.limit(500)

@@ -284,4 +284,28 @@ Dandelion::App.helpers do
       }
     end.to_json
   end
+
+  def filter_events_by_search_and_tags(events)
+    q_ids = []
+    q_ids += Event.search(params[:q], events).pluck(:id) if params[:q]
+    event_tag_ids = []
+    if params[:event_type]
+      event_tag_ids = if (event_tag = EventTag.find_by(name: params[:event_type]))
+                        event_tag.event_tagships.pluck(:event_id)
+                      else
+                        []
+                      end
+    elsif params[:event_tag_id]
+      event_tag_ids = EventTagship.and(event_tag_id: params[:event_tag_id]).pluck(:event_id)
+    end
+    event_ids = if q_ids.empty?
+                  event_tag_ids
+                elsif event_tag_ids.empty?
+                  q_ids
+                else
+                  q_ids & event_tag_ids
+                end
+    events = events.and(:id.in => event_ids) if params[:q] || params[:event_tag_id] || params[:event_type]
+    events
+  end
 end

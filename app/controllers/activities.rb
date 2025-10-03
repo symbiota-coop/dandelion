@@ -60,18 +60,7 @@ Dandelion::App.controller do
       @events = @events.online if params[:online]
       @events = @events.in_person if params[:in_person]
     end
-    q_ids = []
-    q_ids += Event.search(params[:q], @events).pluck(:id) if params[:q]
-    event_tag_ids = []
-    event_tag_ids = EventTagship.and(event_tag_id: params[:event_tag_id]).pluck(:event_id) if params[:event_tag_id]
-    event_ids = if q_ids.empty?
-                  event_tag_ids
-                elsif event_tag_ids.empty?
-                  q_ids
-                else
-                  q_ids & event_tag_ids
-                end
-    @events = @events.and(:id.in => event_ids) if params[:q] || params[:event_tag_id]
+    @events = filter_events_by_search_and_tags(@events)
     erb :'events/event_stats'
   end
 

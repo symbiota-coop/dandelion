@@ -49,26 +49,6 @@ Dandelion::App.controller do
         @organisation.events.and(featured: true).pluck(:id) +
         @organisation.events.course.pluck(:id))
     end
-    q_ids = []
-    q_ids += Event.search(params[:q], @events).pluck(:id) if params[:q]
-    event_tag_ids = []
-    if params[:event_type]
-      event_tag_ids = if (event_tag = EventTag.find_by(name: params[:event_type]))
-                        event_tag.event_tagships.pluck(:event_id)
-                      else
-                        []
-                      end
-    elsif params[:event_tag_id]
-      event_tag_ids = EventTagship.and(event_tag_id: params[:event_tag_id]).pluck(:event_id)
-    end
-    event_ids = if q_ids.empty?
-                  event_tag_ids
-                elsif event_tag_ids.empty?
-                  q_ids
-                else
-                  q_ids & event_tag_ids
-                end
-    @events = @events.and(:id.in => event_ids) if params[:q] || params[:event_tag_id] || params[:event_type]
     case content_type
     when :html
       if params[:past] || (carousel && carousel.name.downcase.include?('past events'))
@@ -89,6 +69,7 @@ Dandelion::App.controller do
       elsif params[:order] == 'trending'
         @events = @events.trending(@from)
       end
+      @events = filter_events_by_search_and_tags(@events)
       if request.xhr?
         partial :'organisations/events'
       else
@@ -99,11 +80,13 @@ Dandelion::App.controller do
         @events = @events.future(@from)
         @events = @events.and(:start_time.lt => @to + 1) if @to
         @events = @events.and(:locked.ne => true)
+        @events = filter_events_by_search_and_tags(@events)
         calendar_json(@events)
       elsif params[:display] == 'map'
         @events = @events.future(@from)
         @events = @events.and(:start_time.lt => @to + 1) if @to
         @events = @events.and(:locked.ne => true)
+        @events = filter_events_by_search_and_tags(@events)
         map_json(@events)
       else
         # Regular JSON response for events
@@ -115,6 +98,7 @@ Dandelion::App.controller do
           @events = @events.future_and_current(@from)
           @events = @events.and(:start_time.lt => @to + 1) if @to
         end
+        @events = filter_events_by_search_and_tags(@events)
         @events.map do |event|
           {
             id: event.id.to_s,
@@ -204,18 +188,7 @@ Dandelion::App.controller do
       @events = @events.and(:id.in => events_with_discrepancy.pluck(:id))
     end
     @events = @events.deleted if params[:deleted]
-    q_ids = []
-    q_ids += Event.search(params[:q], @events).pluck(:id) if params[:q]
-    event_tag_ids = []
-    event_tag_ids = EventTagship.and(event_tag_id: params[:event_tag_id]).pluck(:event_id) if params[:event_tag_id]
-    event_ids = if q_ids.empty?
-                  event_tag_ids
-                elsif event_tag_ids.empty?
-                  q_ids
-                else
-                  q_ids & event_tag_ids
-                end
-    @events = @events.and(:id.in => event_ids) if params[:q] || params[:event_tag_id]
+    @events = filter_events_by_search_and_tags(@events)
     case content_type
     when :html
       erb :'events/event_stats'
