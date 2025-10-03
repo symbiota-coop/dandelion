@@ -8,7 +8,7 @@ module Searchable
       # Query length validation: 3-200 characters
       return none if query.length < 3 || query.length > 200
 
-      query = query.strip
+      query = "\"#{query.strip}\""
 
       if Padrino.env == :development
         self.or(search_fields.map { |field| { field => /#{Regexp.escape(query)}/i } })
