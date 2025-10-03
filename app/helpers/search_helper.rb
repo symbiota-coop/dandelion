@@ -3,6 +3,9 @@ Dandelion::App.helpers do
     if Padrino.env == :development
       klass.or(klass.admin_fields.map { |k, v| { k => /#{Regexp.escape(query)}/i } if v == :text || (v.is_a?(Hash) && v[:type] == :text) }.compact)
     else
+
+      query = query.strip
+
       pipeline = [
         {
           '$search': {
