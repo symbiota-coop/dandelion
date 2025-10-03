@@ -2,7 +2,7 @@ module AccountAssociations
   extend ActiveSupport::Concern
 
   included do
-    has_one :account_cache, dependent: :destroy
+    has_one :account_recommendation_cache, dependent: :destroy
     has_one :account_notification_cache, dependent: :destroy
 
     has_many :drafts, dependent: :destroy
