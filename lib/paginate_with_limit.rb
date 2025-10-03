@@ -15,8 +15,16 @@ module PaginateWithLimit
       # Cap the total_entries at max_limit
       capped_count = [actual_count, max_limit].min
 
-      # Pass total_entries to will_paginate so it knows the capped count
-      paginate_without_limit(options.merge(total_entries: capped_count))
+      # Calculate the maximum valid page number
+      max_page = (capped_count.to_f / per_page).ceil
+      max_page = 1 if max_page < 1 # Ensure at least page 1
+
+      # Clamp the requested page to the valid range
+      requested_page = (options[:page] || 1).to_i
+      clamped_page = requested_page.clamp(1, max_page)
+
+      # Pass total_entries and clamped page to will_paginate
+      paginate_without_limit(options.merge(total_entries: capped_count, page: clamped_page))
     else
       paginate_without_limit(options)
     end
