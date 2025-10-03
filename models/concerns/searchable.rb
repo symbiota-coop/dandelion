@@ -14,18 +14,9 @@ module Searchable
         self.or(search_fields.map { |field| { field => /#{Regexp.escape(query)}/i } })
       else
         pipeline = [
-          {
-            '$search': {
-              index: to_s.underscore.pluralize,
-              phrase: {
-                query: query,
-                path: search_fields
-              }
-            }
-          }
+          { '$match': { '$text': { '$search': query } } }
         ]
 
-        # If a scope is passed, extract its selector and apply as $match
         pipeline << { '$match': scope.selector } if scope
         pipeline << { '$project': { _id: 1 } }
 
