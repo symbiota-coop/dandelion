@@ -453,7 +453,7 @@ Dandelion::App.controller do
     @scope = "organisation_id=#{@organisation.id}"
     case content_type
     when :html
-      @pmails = @pmails.order('created_at desc').page(params[:page])
+      @pmails = @pmails.order('created_at desc').paginate(page: params[:page])
       erb :'pmails/pmails'
     when :json
       {

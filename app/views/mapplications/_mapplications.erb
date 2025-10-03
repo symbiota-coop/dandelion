@@ -10,7 +10,7 @@
     <%= partial :'accounts/image', locals: { account: account } %>
     <% } %>
   </div>
-<% else @mapplications = @mapplications.per_page(10).page(params[:page]) %>
+<% else @mapplications = @mapplications.paginate(page: params[:page], per_page: 10) %>
   <table class="table table-striped">
     <thead>
       <tr>

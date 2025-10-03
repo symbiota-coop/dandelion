@@ -47,7 +47,7 @@
       </div>
     <% end %>
     <div data-pagelet-url="/g/<%= @gathering.slug %>" data-pagelet-refresh="60">
-      <%= partial :newsfeed, locals: { notifications: @gathering.notifications_as_circle.order('created_at desc').page(params[:page]), include_circle_name: false } %>
+      <%= partial :newsfeed, locals: { notifications: @gathering.notifications_as_circle.order('created_at desc').paginate(page: params[:page]), include_circle_name: false } %>
     </div>
   </div>
 </div>

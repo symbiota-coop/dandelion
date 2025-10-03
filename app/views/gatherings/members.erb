@@ -120,7 +120,7 @@
     </li>
     <% } %>
   </ul>
-<% when 'details'; @memberships = @memberships.per_page(50).page(params[:page]) %>
+<% when 'details'; @memberships = @memberships.paginate(page: params[:page], per_page: 50) %>
   <table class="table table-striped">
     <thead>
       <tr>

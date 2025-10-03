@@ -223,7 +223,7 @@ Dandelion::App.controller do
     @local_group = LocalGroup.find(params[:id]) || not_found
     @_organisation = @local_group.organisation
     local_group_admins_only!
-    @pmails = @local_group.pmails_including_events.order('created_at desc').page(params[:page])
+    @pmails = @local_group.pmails_including_events.order('created_at desc').paginate(page: params[:page])
     @scope = "local_group_id=#{@local_group.id}"
     erb :'pmails/pmails'
   end

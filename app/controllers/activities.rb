@@ -244,7 +244,7 @@ Dandelion::App.controller do
     @activity = Activity.find(params[:id]) || not_found
     @_organisation = @activity.organisation
     activity_admins_only!
-    @pmails = @activity.pmails_including_events.order('created_at desc').page(params[:page])
+    @pmails = @activity.pmails_including_events.order('created_at desc').paginate(page: params[:page])
     @scope = "activity_id=#{@activity.id}"
     erb :'pmails/pmails'
   end
