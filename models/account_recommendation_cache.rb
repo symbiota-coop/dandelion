@@ -1,4 +1,4 @@
-class AccountCache
+class AccountRecommendationCache
   include Mongoid::Document
   include Mongoid::Timestamps
   include BelongsToWithoutParentValidation
