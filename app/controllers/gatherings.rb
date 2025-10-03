@@ -6,7 +6,7 @@ Dandelion::App.controller do
                     Gathering.and(:listed => true, :privacy.ne => 'secret')
                   end
     @gatherings = params[:order] == 'membership_count' ? @gatherings.order('membership_count desc') : @gatherings.order('created_at desc')
-    @gatherings = @gatherings.and(:id.in => Gathering.search(params[:q]).pluck(:id)) if params[:q]
+    @gatherings = @gatherings.and(:id.in => Gathering.search(params[:q], @gatherings).pluck(:id)) if params[:q]
 
     case content_type
     when :html

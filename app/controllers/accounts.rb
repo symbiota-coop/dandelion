@@ -3,8 +3,8 @@ Dandelion::App.controller do
     halt 400 unless params[:q] || params[:id]
 
     @accounts = Account.public
-    @accounts = @accounts.and(:id.in => Account.search(params[:q]).pluck(:id)) if params[:q]
     @accounts = @accounts.and(id: params[:id]) if params[:id]
+    @accounts = @accounts.and(:id.in => Account.search(params[:q], @accounts).pluck(:id)) if params[:q]
     case content_type
     when :json
       {

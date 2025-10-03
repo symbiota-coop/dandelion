@@ -1,5 +1,5 @@
 Dandelion::App.helpers do
-  def search(klass, match, query, number = nil)
+  def search(klass, scope, query, number = nil)
     if Padrino.env == :development
       klass.or(klass.admin_fields.map { |k, v| { k => /#{Regexp.escape(query)}/i } if v == :text || (v.is_a?(Hash) && v[:type] == :text) }.compact)
     else
@@ -16,7 +16,7 @@ Dandelion::App.helpers do
           }
         },
         { '$addFields': { score: { '$meta': 'searchScore' } } },
-        { '$match': match.selector }
+        { '$match': scope.selector }
       ]
 
       results = klass.collection.aggregate(pipeline)

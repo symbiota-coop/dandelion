@@ -2,7 +2,7 @@ module Searchable
   extend ActiveSupport::Concern
 
   class_methods do
-    def search(query, all_fields: false)
+    def search(query, scope = nil)
       return none if query.blank?
 
       # Query length validation: 3-200 characters
@@ -24,19 +24,11 @@ module Searchable
           }
         ]
 
-        unless all_fields
-          pipeline << {
-            '$project': {
-              _id: 1
-            }
-          }
-        end
+        # If a scope is passed, extract its selector and apply as $match
+        pipeline << { '$match': scope.selector } if scope
+        pipeline << { '$project': { _id: 1 } }
 
-        results = collection.aggregate(pipeline)
-
-        results.map do |hash|
-          new(hash.select { |k, _v| fields.keys.include?(k.to_s) })
-        end
+        collection.aggregate(pipeline).map { |doc| { id: doc[:_id] } }
       end
     end
 

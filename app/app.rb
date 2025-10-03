@@ -163,7 +163,9 @@ module Dandelion
     get '/network', provides: :json do
       sign_in_required!
       if (@q = params[:q])
-        current_account.network.and(:id.in => Account.search(@q).pluck(:id)).map do |account|
+        @accounts = current_account.network
+        @accounts = @accounts.and(:id.in => Account.search(@q, @accounts).pluck(:id))
+        @accounts.map do |account|
           { key: account.name, value: account.username }
         end.to_json
       end

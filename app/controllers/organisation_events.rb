@@ -19,26 +19,6 @@ Dandelion::App.controller do
               else
                 @events.order('start_time asc')
               end
-    q_ids = []
-    q_ids += Event.search(params[:q]).pluck(:id) if params[:q]
-    event_tag_ids = []
-    if params[:event_type]
-      event_tag_ids = if (event_tag = EventTag.find_by(name: params[:event_type]))
-                        event_tag.event_tagships.pluck(:event_id)
-                      else
-                        []
-                      end
-    elsif params[:event_tag_id]
-      event_tag_ids = EventTagship.and(event_tag_id: params[:event_tag_id]).pluck(:event_id)
-    end
-    event_ids = if q_ids.empty?
-                  event_tag_ids
-                elsif event_tag_ids.empty?
-                  q_ids
-                else
-                  q_ids & event_tag_ids
-                end
-    @events = @events.and(:id.in => event_ids) if params[:q] || params[:event_tag_id] || params[:event_type]
     if params[:near]
       if params[:near] == 'online'
         @events = @events.online
@@ -69,6 +49,26 @@ Dandelion::App.controller do
         @organisation.events.and(featured: true).pluck(:id) +
         @organisation.events.course.pluck(:id))
     end
+    q_ids = []
+    q_ids += Event.search(params[:q], @events).pluck(:id) if params[:q]
+    event_tag_ids = []
+    if params[:event_type]
+      event_tag_ids = if (event_tag = EventTag.find_by(name: params[:event_type]))
+                        event_tag.event_tagships.pluck(:event_id)
+                      else
+                        []
+                      end
+    elsif params[:event_tag_id]
+      event_tag_ids = EventTagship.and(event_tag_id: params[:event_tag_id]).pluck(:event_id)
+    end
+    event_ids = if q_ids.empty?
+                  event_tag_ids
+                elsif event_tag_ids.empty?
+                  q_ids
+                else
+                  q_ids & event_tag_ids
+                end
+    @events = @events.and(:id.in => event_ids) if params[:q] || params[:event_tag_id] || params[:event_type]
     case content_type
     when :html
       if params[:past] || (carousel && carousel.name.downcase.include?('past events'))
@@ -168,18 +168,6 @@ Dandelion::App.controller do
     @start_or_end = (params[:start_or_end] == 'end' ? 'end' : 'start')
     @events = params[:deleted] || params[:exclude_co_hosted] ? @organisation.events : @organisation.events_including_cohosted
     @events = params[:order] == 'created_at' ? @events.order('created_at desc') : @events.order("#{@start_or_end}_time asc")
-    q_ids = []
-    q_ids += Event.search(params[:q]).pluck(:id) if params[:q]
-    event_tag_ids = []
-    event_tag_ids = EventTagship.and(event_tag_id: params[:event_tag_id]).pluck(:event_id) if params[:event_tag_id]
-    event_ids = if q_ids.empty?
-                  event_tag_ids
-                elsif event_tag_ids.empty?
-                  q_ids
-                else
-                  q_ids & event_tag_ids
-                end
-    @events = @events.and(:id.in => event_ids) if params[:q] || params[:event_tag_id]
     @events = @events.and(:"#{@start_or_end}_time".gte => @from)
     @events = @events.and(:"#{@start_or_end}_time".lt => @to + 1) if @to
     @events = @events.and(coordinator_id: params[:coordinator_id]) if params[:coordinator_id]
@@ -216,6 +204,18 @@ Dandelion::App.controller do
       @events = @events.and(:id.in => events_with_discrepancy.pluck(:id))
     end
     @events = @events.deleted if params[:deleted]
+    q_ids = []
+    q_ids += Event.search(params[:q], @events).pluck(:id) if params[:q]
+    event_tag_ids = []
+    event_tag_ids = EventTagship.and(event_tag_id: params[:event_tag_id]).pluck(:event_id) if params[:event_tag_id]
+    event_ids = if q_ids.empty?
+                  event_tag_ids
+                elsif event_tag_ids.empty?
+                  q_ids
+                else
+                  q_ids & event_tag_ids
+                end
+    @events = @events.and(:id.in => event_ids) if params[:q] || params[:event_tag_id]
     case content_type
     when :html
       erb :'events/event_stats'

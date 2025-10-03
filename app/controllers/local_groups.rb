@@ -42,8 +42,17 @@ Dandelion::App.controller do
     @start_or_end = (params[:start_or_end] == 'end' ? 'end' : 'start')
     @events = @local_group.events
     @events = params[:order] == 'created_at' ? @events.order('created_at desc') : @events.order("#{@start_or_end}_time asc")
+    @events = @events.and(:"#{@start_or_end}_time".gte => @from)
+    @events = @events.and(:"#{@start_or_end}_time".lt => @to + 1) if @to
+    @events = @events.and(coordinator_id: params[:coordinator_id]) if params[:coordinator_id]
+    @events = @events.and(coordinator_id: nil) if params[:no_coordinator]
+    @events = @events.and(:id.nin => EventFacilitation.pluck(:event_id)) if params[:no_facilitators]
+    unless params[:online] && params[:in_person]
+      @events = @events.online if params[:online]
+      @events = @events.in_person if params[:in_person]
+    end
     q_ids = []
-    q_ids += Event.search(params[:q]).pluck(:id) if params[:q]
+    q_ids += Event.search(params[:q], @events).pluck(:id) if params[:q]
     event_tag_ids = []
     event_tag_ids = EventTagship.and(event_tag_id: params[:event_tag_id]).pluck(:event_id) if params[:event_tag_id]
     event_ids = if q_ids.empty?
@@ -54,15 +63,6 @@ Dandelion::App.controller do
                   q_ids & event_tag_ids
                 end
     @events = @events.and(:id.in => event_ids) if params[:q] || params[:event_tag_id]
-    @events = @events.and(:"#{@start_or_end}_time".gte => @from)
-    @events = @events.and(:"#{@start_or_end}_time".lt => @to + 1) if @to
-    @events = @events.and(coordinator_id: params[:coordinator_id]) if params[:coordinator_id]
-    @events = @events.and(coordinator_id: nil) if params[:no_coordinator]
-    @events = @events.and(:id.nin => EventFacilitation.pluck(:event_id)) if params[:no_facilitators]
-    unless params[:online] && params[:in_person]
-      @events = @events.online if params[:online]
-      @events = @events.in_person if params[:in_person]
-    end
     erb :'events/event_stats'
   end
 

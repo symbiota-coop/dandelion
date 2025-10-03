@@ -14,11 +14,6 @@ Dandelion::App.controller do
               else
                 @events.order('start_time asc')
               end
-    @events = if params[:q]
-                @events.and(:id.in => Event.search(params[:q]).pluck(:id))
-              else
-                @events
-              end
     @events = @events.and(coordinates: { '$geoWithin' => { '$box' => @bounding_box } }) if params[:near] && (@bounding_box = calculate_geographic_bounding_box(params[:near]))
     @events = @events.and(:id.in => EventTagship.and(event_tag_id: params[:event_tag_id]).pluck(:event_id)) if params[:event_tag_id]
     %i[organisation activity local_group].each do |r|
@@ -34,6 +29,7 @@ Dandelion::App.controller do
     end
     @events = @events.and(:hidden_from_homepage.ne => true) if params[:home]
     @events = @events.and(:image_uid.ne => nil) if params[:images]
+    @events = @events.and(:id.in => Event.search(params[:q], @events).pluck(:id)) if params[:q]
     content_type = (parts = URI(request.url).path.split('.')
                     parts.length == 2 ? parts.last.to_sym : :html)
     case content_type
