@@ -2,10 +2,13 @@ Dandelion::App.controller do
   before do
     @event = params[:slug] ? Event.find_by(slug: params[:slug]) : Event.find(params[:id]) || not_found
     @check_in_secret = Digest::SHA256.hexdigest("#{@event.id}#{ENV['SESSION_SECRET']}")[0..7]
-    @check_in_url = "#{ENV['BASE_URI']}/e/#{@event.slug}/check_in?p=#{@check_in_secret}"
-    if params[:p] || session[:check_in_secret]
-      halt 403 unless (params[:p] && params[:p] == @check_in_secret) || (session[:check_in_secret] && session[:check_in_secret] == @check_in_secret)
-      session[:check_in_secret] = @check_in_secret
+    @check_in_url = "#{ENV['BASE_URI']}/e/#{@event.slug}/check_in?secret=#{@check_in_secret}"
+    if params[:secret] || session[:check_in_secret]
+      if (params[:secret] && params[:secret] == @check_in_secret) || (session[:check_in_secret] && session[:check_in_secret] == @check_in_secret)
+        session[:check_in_secret] = @check_in_secret
+      else
+        halt 403, erb(:'events/check_in_secret_error')
+      end
     else
       event_admins_only!
     end
