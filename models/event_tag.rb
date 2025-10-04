@@ -24,7 +24,6 @@ class EventTag
 
     tag_counts = EventTagship.collection.aggregate([
                                                      { '$group': { _id: '$event_tag_id', count: { '$sum': 1 } } },
-                                                     { '$match': { count: { '$gt': 0 } } },
                                                      { '$sort': { count: -1 } },
                                                      { '$limit': 500 }
                                                    ]).to_a
