@@ -17,7 +17,22 @@ module Searchable
           { '$match': { '$text': { '$search': query } } }
         ]
 
-        pipeline << { '$match': scope.selector } if scope
+        # Handle scope parameter: can be a Mongoid scope or an Array of models
+        if scope
+          if scope.respond_to?(:selector)
+            # Mongoid scope - use its selector
+            pipeline << { '$match': scope.selector }
+          elsif scope.is_a?(Array)
+            # Array of models - extract IDs and match against them
+            if scope.empty?
+              return none  # No results if array is empty
+            else
+              ids = scope.map { |item| item.respond_to?(:id) ? item.id : item }
+              pipeline << { '$match': { '_id': { '$in': ids } } }
+            end
+          end
+        end
+        
         pipeline << { '$project': { _id: 1 } }
 
         collection.aggregate(pipeline).map { |doc| { id: doc[:_id] } }
