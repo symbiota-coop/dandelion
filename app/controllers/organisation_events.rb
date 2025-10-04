@@ -58,6 +58,7 @@ Dandelion::App.controller do
         @events = @events.future_and_current(@from)
         @events = @events.and(:start_time.lt => @to + 1) if @to
       end
+      @events = filter_events_by_search_and_tags(@events)
       if params[:order] == 'random'
         event_ids = @events.pluck(:id)
         @events = @events.collection.aggregate([
@@ -69,7 +70,6 @@ Dandelion::App.controller do
       elsif params[:order] == 'trending'
         @events = @events.trending(@from)
       end
-      @events = filter_events_by_search_and_tags(@events)
       if request.xhr?
         partial :'organisations/events'
       else
