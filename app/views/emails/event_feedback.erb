@@ -11,13 +11,15 @@
   <p style="color: #F5B042">
     <%= event_feedback.rating.times.each.map { '★' }.join if event_feedback.rating %>
   </p>
-  <table style="margin-bottom: 1em">
-    <% event_feedback.answers.each { |q,a| %>
-    <tr>
-      <th><%= q %></th>
-      <td><%= a %></td>
-    </tr>
-    <% } %>
-  </table>
+  <% if event_feedback.answers %>
+    <table style="margin-bottom: 1em">
+      <% event_feedback.answers.each { |q,a| %>
+      <tr>
+        <th><%= q %></th>
+        <td><%= a %></td>
+      </tr>
+      <% } %>
+    </table>
+  <% end %>
   <p><a href="<%= ENV['BASE_URI'] %>/events/<%= event.id %>/feedback">See all feedback for this event</a></p>
 </div>
