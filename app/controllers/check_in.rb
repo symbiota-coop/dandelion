@@ -58,15 +58,8 @@ Dandelion::App.controller do
     @tickets =  @tickets.incomplete if params[:incomplete]
     if params[:q]
       @tickets = @tickets.and(:id.in =>
-        Ticket.collection.aggregate([
-                                      { '$addFields' => { 'id' => { '$toString' => '$_id' } } },
-                                      { '$match' => { 'id' => { '$regex' => /#{Regexp.escape(params[:q])}/i } } }
-                                    ]).pluck(:id) +
-        @event.tickets.unscoped.and(name: /#{Regexp.escape(params[:q])}/i).pluck(:id) +
-        @event.tickets.unscoped.and(email: /#{Regexp.escape(params[:q])}/i).pluck(:id) +
-        @event.tickets.unscoped.and(
-          :account_id.in => Account.search(params[:q]).pluck(:id)
-        ).pluck(:id))
+        Ticket.search(params[:q], @tickets).pluck(:id) +
+        @tickets.and(:account_id.in => Account.search(params[:q]).pluck(:id)).pluck(:id))
     end
 
     if request.xhr?
