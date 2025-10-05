@@ -1,5 +1,8 @@
 Dandelion::App.helpers do
   def search(klass, scope, query, number = nil)
+    return klass.none if query.blank?
+    return klass.none if query.length < 3 || query.length > 200
+
     if Padrino.env == :development
       klass.or(klass.admin_fields.map { |k, v| { k => /#{Regexp.escape(query)}/i } if v == :text || (v.is_a?(Hash) && v[:type] == :text) }.compact)
     else

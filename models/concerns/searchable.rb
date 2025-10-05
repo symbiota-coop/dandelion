@@ -4,8 +4,6 @@ module Searchable
   class_methods do
     def search(query, scope = nil)
       return none if query.blank?
-
-      # Query length validation: 3-200 characters
       return none if query.length < 3 || query.length > 200
 
       query = "\"#{query.strip}\""
