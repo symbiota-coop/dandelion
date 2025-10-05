@@ -58,8 +58,10 @@ Dandelion::App.controller do
     @tickets =  @tickets.incomplete if params[:incomplete]
     if params[:q]
       @tickets = @tickets.and(:id.in =>
-        Ticket.search(params[:q], @tickets).pluck(:id) +
-        @tickets.and(:account_id.in => Account.search(params[:q]).pluck(:id)).pluck(:id))
+          @tickets.and(id_string: /#{Regexp.escape(params[:q])}/i).pluck(:id) +
+          @tickets.and(name: /#{Regexp.escape(params[:q])}/i).pluck(:id) +
+          @tickets.and(email: /#{Regexp.escape(params[:q])}/i).pluck(:id) +
+          @tickets.and(:account_id.in => Account.search(params[:q]).pluck(:id)).pluck(:id))
     end
 
     if request.xhr?
