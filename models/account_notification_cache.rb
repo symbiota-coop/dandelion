@@ -45,6 +45,8 @@ class AccountNotificationCache
   end
 
   def invalidate!
-    update_attribute(:expires_at, nil)
+    # Use update_columns to safely update the database without triggering callbacks
+    # or causing issues with frozen objects
+    update_columns(expires_at: nil)
   end
 end
