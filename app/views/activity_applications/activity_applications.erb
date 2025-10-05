@@ -13,12 +13,8 @@
         <%= text_field_tag :to, class: 'form-control datepicker mx-1', value: (@to.to_fs(:db_local) if @to) %>
       </div>
       <div class="form-group col-12 col-sm-auto">
-        <label>Name</label>
-        <%= text_field_tag :name, class: 'form-control', value: params[:name] %>
-      </div>
-      <div class="form-group col-12 col-sm-auto">
-        <label>Email</label>
-        <%= text_field_tag :email, class: 'form-control', value: params[:email] %>
+        <label>Name/email</label>
+        <%= text_field_tag :q, class: 'form-control', value: params[:q] %>
       </div>
       <div class="form-group col-12 col-sm-auto">
         <label>Gender</label>

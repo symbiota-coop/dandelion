@@ -44,8 +44,7 @@ Dandelion::App.controller do
     @from = parse_date(params[:from]) if params[:from]
     @to = parse_date(params[:to]) if params[:to]
     @activity_applications = @activity.activity_applications
-    @activity_applications = @activity_applications.and(:account_id.in => Account.and(name: /#{Regexp.escape(params[:name])}/i).pluck(:id)) if params[:name]
-    @activity_applications = @activity_applications.and(:account_id.in => Account.and(email: /#{Regexp.escape(params[:email])}/i).pluck(:id)) if params[:email]
+    @activity_applications = @activity_applications.and(:account_id.in => Account.search(params[:q]).pluck(:id)) if params[:q]
     @activity_applications = @activity_applications.and(:word_count.gte => params[:min_word_count]) if params[:min_word_count]
     @activity_applications = @activity_applications.and(:word_count.lte => params[:max_word_count]) if params[:max_word_count]
     @activity_applications = @activity_applications.and(:account_id.in => Account.and(:id.in => @activity.activity_applications.pluck(:account_id)).and(:image_uid.ne => nil).pluck(:id)) if params[:photo]
