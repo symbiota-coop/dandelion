@@ -45,6 +45,8 @@ class AccountNotificationCache
   end
 
   def invalidate!
+    return if destroyed?
+
     update_attribute(:expires_at, nil)
   end
 end
