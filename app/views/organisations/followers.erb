@@ -6,12 +6,8 @@
   <% form_tag '', method: 'get', class: 'submitOnChange searchForm mb-0 mb-lg-3' do %>
     <div class="form-row align-items-end">
       <div class="form-group col-12 col-sm-auto">
-        <label>Name</label>
-        <%= text_field_tag :name, class: 'form-control', value: params[:name] %>
-      </div>
-      <div class="form-group col-12 col-sm-auto">
-        <label>Email</label>
-        <%= text_field_tag :email, class: 'form-control', value: params[:email] %>
+        <label>Search people</label>
+        <%= text_field_tag :q, class: 'form-control', value: params[:q] %>
       </div>
     </div>
     <div class="form-row align-items-end mt-1">

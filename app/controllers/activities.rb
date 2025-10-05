@@ -200,8 +200,7 @@ Dandelion::App.controller do
     @activity = Activity.find(params[:id]) || not_found
     activity_admins_only!
     @activityships = @activity.activityships.order('created_at desc')
-    @activityships = @activityships.and(:account_id.in => Account.and(name: /#{Regexp.escape(params[:name])}/i).pluck(:id)) if params[:name]
-    @activityships = @activityships.and(:account_id.in => Account.and(email: /#{Regexp.escape(params[:email])}/i).pluck(:id)) if params[:email]
+    @activityships = @activityships.and(:account_id.in => Account.search(params[:q]).pluck(:id)) if params[:q]
     @activityships = @activityships.and(:account_id.in => @activity.subscribed_accounts.pluck(:id)) if params[:subscribed_to_mailer]
     case content_type
     when :html
