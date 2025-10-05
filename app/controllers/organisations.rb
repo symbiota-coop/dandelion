@@ -16,7 +16,7 @@ Dandelion::App.controller do
 
   get '/organisations/autocomplete', provides: :json do
     @organisations = Organisation.all.order('created_at desc')
-    @organisations = @organisations.and(name: /#{Regexp.escape(params[:q])}/i) if params[:q]
+    @organisations = @organisations.and(:id.in => Organisation.search(params[:q], @organisations).pluck(:id)) if params[:q]
     @organisations = @organisations.and(id: params[:id]) if params[:id]
     {
       results: @organisations.map { |organisation| { id: organisation.id.to_s, text: "#{organisation.name} (#{organisation.slug})" } }
