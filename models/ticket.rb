@@ -18,6 +18,7 @@ class Ticket
 
   field :price, type: Float
   field :discounted_price, type: Float
+  field :id_string, type: String
   ### from order
   field :currency, type: String
   field :percentage_discount, type: Integer
@@ -64,6 +65,8 @@ class Ticket
       e = EmailAddress.error(email)
       errors.add(:email, "- #{e}") if e
     end
+
+    self.id_string = id.to_s if id && !id_string
 
     self.price = ticket_type.price if !price && !complementary && ticket_type && ticket_type.price
     errors.add(:price, 'is too low') if price && ticket_type && ticket_type.range_min && price < ticket_type.range_min
