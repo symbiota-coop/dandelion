@@ -8,6 +8,7 @@ class Activity
   include ImportFromCsv
   include SendFollowersCsv
   include ImageWithValidation
+  include Searchable
 
   belongs_to_without_parent_validation :organisation, index: true
   belongs_to_without_parent_validation :account, index: true, optional: true
@@ -26,6 +27,10 @@ class Activity
   field :extra_info_for_acceptance_email, type: String
   field :feedback_summary, type: String
   field :slug, type: String
+
+  def self.search_fields
+    %w[name]
+  end
 
   def self.admin_fields
     {

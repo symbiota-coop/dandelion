@@ -4,6 +4,8 @@ class Pmail
   include BelongsToWithoutParentValidation
 
   include PmailMailgun
+  include Searchable
+
   belongs_to_without_parent_validation :organisation, index: true
   belongs_to_without_parent_validation :account, index: true
   belongs_to_without_parent_validation :mailable, polymorphic: true, index: true, optional: true
@@ -53,6 +55,10 @@ class Pmail
 
   def self.mailable_types
     %w[Activity ActivityTag LocalGroup Event]
+  end
+
+  def self.search_fields
+    %w[subject]
   end
 
   validates_presence_of :from, :subject, :body

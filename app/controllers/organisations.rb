@@ -26,7 +26,7 @@ Dandelion::App.controller do
   get '/o/:slug/activities', provides: %i[html json] do
     @organisation = Organisation.find_by(slug: params[:slug]) || Organisation.find(params[:slug]) || not_found
     @activities = @organisation.activities.order('name asc')
-    @activities = @activities.and(name: /#{Regexp.escape(params[:q])}/i) if params[:q]
+    @activities = @activities.and(:id.in => Activity.search(params[:q], @activities).pluck(:id)) if params[:q]
     @activities = @activities.and(id: params[:id]) if params[:id]
     case content_type
     when :html
@@ -46,7 +46,7 @@ Dandelion::App.controller do
   get '/o/:slug/local_groups', provides: %i[html json] do
     @organisation = Organisation.find_by(slug: params[:slug]) || Organisation.find(params[:slug]) || not_found
     @local_groups = @organisation.local_groups.order('name asc')
-    @local_groups = @local_groups.and(name: /#{Regexp.escape(params[:q])}/i) if params[:q]
+    @local_groups = @local_groups.and(:id.in => LocalGroup.search(params[:q], @local_groups).pluck(:id)) if params[:q]
     @local_groups = @local_groups.and(id: params[:id]) if params[:id]
     case content_type
     when :html
@@ -428,7 +428,7 @@ Dandelion::App.controller do
     @_organisation = @organisation
     organisation_admins_only!
     @pmails = @organisation.pmails
-    @pmails = @pmails.and(subject: /#{Regexp.escape(params[:q])}/i) if params[:q]
+    @pmails = @pmails.and(:id.in => Pmail.search(params[:q], @pmails).pluck(:id)) if params[:q]
     case params[:to]
     when 'everyone'
       @pmails = @pmails.and(everyone: true)

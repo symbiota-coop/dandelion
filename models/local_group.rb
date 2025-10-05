@@ -6,6 +6,7 @@ class LocalGroup
   extend Dragonfly::Model
   include ImportFromCsv
   include SendFollowersCsv
+  include Searchable
 
   belongs_to_without_parent_validation :organisation, index: true
   belongs_to_without_parent_validation :account, index: true
@@ -17,6 +18,10 @@ class LocalGroup
   field :hide_members, type: Boolean
   field :type, type: String
   field :slug, type: String
+
+  def self.search_fields
+    %w[name]
+  end
 
   def self.admin_fields
     {

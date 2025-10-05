@@ -5,7 +5,6 @@ class Ticket
 
   include Mongoid::Paranoia
   include TicketNotifications
-  include Searchable
 
   belongs_to_without_parent_validation :event, index: true
   belongs_to_without_parent_validation :account, index: true, optional: true
@@ -58,10 +57,6 @@ class Ticket
       ticket_type_id: :lookup,
       zoomship_id: :lookup
     }
-  end
-
-  def self.search_fields
-    %w[id_string name email]
   end
 
   before_validation do
