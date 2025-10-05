@@ -9,8 +9,6 @@
         <label>Search people</label>
         <%= text_field_tag :q, class: 'form-control', value: params[:q] %>
       </div>
-    </div>
-    <div class="form-row align-items-end mt-1">
       <%= checkbox 'Monthly donor', form_group_class: 'col-12 col-sm-auto' %>
       <%= checkbox 'Not a monthly donor', form_group_class: 'col-12 col-sm-auto' %>
       <%= checkbox 'Connected to Stripe', form_group_class: 'col-12 col-sm-auto' %>
