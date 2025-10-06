@@ -54,7 +54,21 @@ class Account
   end
 
   def self.generate_sign_in_token
-    SecureRandom.uuid.delete('-')
+    "#{Time.now.to_i}-#{SecureRandom.uuid.delete('-')}"
+  end
+
+  def sign_in_token_expired?
+    return true if sign_in_token.blank?
+
+    # Extract timestamp from token (format: timestamp-randomtoken)
+    parts = sign_in_token.split('-', 2)
+    return true if parts.length != 2
+
+    timestamp = parts[0].to_i
+    return true if timestamp.zero?
+
+    # Check if token is older than 24 hours
+    (Time.now.to_i - timestamp) > 24.hours.to_i
   end
 
   def merge(account_to_destroy)
