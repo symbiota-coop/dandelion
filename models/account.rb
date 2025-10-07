@@ -54,7 +54,14 @@ class Account
   end
 
   def self.generate_sign_in_token
-    "#{Time.now.to_i}-#{SecureRandom.uuid.delete('-')}"
+    "#{Time.now.to_i}-#{generate_password(5)}"
+  end
+
+  def generate_sign_in_token
+    loop do
+      token = Account.generate_sign_in_token
+      break self.sign_in_token = token unless Account.and(sign_in_token: token).exists?
+    end
   end
 
   def sign_in_token_expired?
@@ -251,9 +258,9 @@ class Account
     ::BCrypt::Password.new(crypted_password) == password
   end
 
-  def self.generate_password
+  def self.generate_password(length = 16)
     chars = ('a'..'z').to_a + ('0'..'9').to_a
-    Array.new(16) { chars[rand(chars.size)] }.join
+    Array.new(length) { chars[rand(chars.size)] }.join
   end
 
   private

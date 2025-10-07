@@ -11,7 +11,7 @@ Dandelion::App.helpers do
         account.send_activation_notification
       end
       session[:account_id] = account.id.to_s
-      account.update_attribute(:sign_in_token, Account.generate_sign_in_token)
+      account.generate_sign_in_token
     elsif !current_account
       kick! notice: "That sign in code/link isn't valid any longer. Please request a new one."
     end

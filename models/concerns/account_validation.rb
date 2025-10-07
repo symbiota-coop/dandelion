@@ -10,6 +10,8 @@ module AccountValidation
     validates_format_of :username, with: /\A[a-z0-9_.]+\z/
     validates_uniqueness_of :username
 
+    validates_uniqueness_of :sign_in_token
+
     before_validation do
       unless username
         u = Bazaar.super_object.parameterize.underscore
@@ -27,8 +29,9 @@ module AccountValidation
       self.name = username unless name
       self.name = name.split('@').first if name && name.include?('@')
 
+      generate_sign_in_token unless sign_in_token
+
       self.location = "#{postcode}, #{country}" if postcode && country
-      self.sign_in_token = Account.generate_sign_in_token unless sign_in_token
       self.name = name.strip if name
       self.name_transliterated = I18n.transliterate(name) if name
       self.username = username.downcase if username
