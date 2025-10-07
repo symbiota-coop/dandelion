@@ -64,6 +64,14 @@ Dandelion::App.controller do
 
   post '/pmails/:pmail_id/edit' do
     @pmail = @pmails.find(params[:pmail_id]) || not_found
+
+    if params[:duplicate]
+      @pmail.to_option = params[:pmail][:to_option]
+      duplicated_pmail = @pmail.duplicate!(current_account)
+      flash[:notice] = 'The mail was duplicated.'
+      redirect "/pmails/#{duplicated_pmail.id}/edit?#{@scope}"
+    end
+
     if @pmail.update_attributes(mass_assigning(params[:pmail], Pmail))
       flash[:notice] = 'The mail was saved. Preview and send using the buttons below.'
       if params[:send_test]
@@ -93,10 +101,6 @@ Dandelion::App.controller do
         end
       elsif params[:preview]
         redirect "/pmails/#{@pmail.id}/edit?#{@scope}&preview=1"
-      elsif params[:duplicate]
-        duplicated_pmail = @pmail.duplicate!(current_account)
-        flash[:notice] = 'The mail was duplicated.'
-        redirect "/pmails/#{duplicated_pmail.id}/edit?#{@scope}"
       elsif params[:file_q]
         redirect "/pmails/#{@pmail.id}/edit?#{@scope}&file_q=#{params[:file_q]}#attachments"
       else

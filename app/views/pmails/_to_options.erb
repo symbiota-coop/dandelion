@@ -2,7 +2,11 @@
 
 to_options = []
 
-if @organisation
+if @event || @pmail.mailable.is_a?(Event)
+  event = @event || @pmail.mailable
+  to_options << ["#{event.name} (#{when_details(event)})", "event:#{event.id}"]
+  to_options << ["Waitlist for #{event.name} (#{when_details(event)})", "waitlist:#{event.id}"]
+elsif @organisation
   if organisation_admin?
     to_options << ['', '']
     to_options << ["Everyone in #{@organisation.name}", 'everyone']
@@ -52,12 +56,6 @@ elsif @activity
   to_options << [@activity.name, "activity:#{@activity.id}"]
 elsif @local_group
   to_options << [@local_group.name, "local_group:#{@local_group.id}"]
-end
-
-if @event || @pmail.mailable.is_a?(Event)
-  event = @event || @pmail.mailable
-  to_options << ["#{event.name} (#{when_details(event)})", "event:#{event.id}"]
-  to_options << ["Waitlist for #{event.name} (#{when_details(event)})", "waitlist:#{event.id}"]
 end
 
 %>
