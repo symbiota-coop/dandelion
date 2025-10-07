@@ -54,6 +54,9 @@ module PmailMailgun
   end
 
   def metrics
+    # Return nil if the organisation doesn't have Mailgun configured
+    return nil if organisation.mailgun_domain.blank? || organisation.mailgun_api_key.blank?
+
     mg_client = Mailgun::Client.new organisation.mailgun_api_key, (organisation.mailgun_region == 'EU' ? 'api.eu.mailgun.net' : 'api.mailgun.net')
     tags = Mailgun::Tags.new(mg_client)
 
