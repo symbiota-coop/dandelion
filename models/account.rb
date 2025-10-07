@@ -64,6 +64,11 @@ class Account
     end
   end
 
+  def generate_sign_in_token!
+    generate_sign_in_token
+    save!
+  end
+
   def sign_in_token_expired?
     return true if sign_in_token.blank?
 
