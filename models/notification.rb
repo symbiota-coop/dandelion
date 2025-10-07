@@ -44,7 +44,7 @@ class Notification
   end
 
   def self.types
-    %w[created_gathering applied joined_gathering created_team created_timetable created_tactivity created_rota created_option created_spend created_profile updated_profile joined_team signed_up_to_a_shift interested_in_tactivity scheduled_tactivity unscheduled_tactivity made_admin unadmined commented reacted_to_a_comment left_gathering created_payment created_inventory_item mapplication_removed created_event updated_event created_organisation created_order left_feedback]
+    %w[created_gathering applied joined_gathering created_team created_timetable created_tactivity created_rota created_option created_spend created_profile updated_profile joined_team signed_up_to_a_shift interested_in_tactivity scheduled_tactivity unscheduled_tactivity made_admin unadmined commented reacted_to_a_comment left_gathering created_payment created_inventory_item mapplication_removed created_event updated_event created_organisation created_order left_feedback starred_event]
   end
 
   def self.mailable_types
@@ -195,6 +195,10 @@ class Notification
     when :left_feedback
       event_feedback = notifiable
       "<strong>#{event_feedback.account.name}</strong> left feedback on <strong>#{event_feedback.event.name}</strong>"
+    when :starred_event
+      account = circle
+      event = notifiable
+      "<strong>#{account.name}</strong> starred the event <strong>#{event.name}</strong>"
     end.html_safe
   end
 
@@ -258,6 +262,8 @@ class Notification
       ['View event', "#{ENV['BASE_URI']}/events/#{notifiable.event_id}"]
     when :left_feedback
       ['View event', "#{ENV['BASE_URI']}/events/#{notifiable.event_id}"]
+    when :starred_event
+      ['View event', "#{ENV['BASE_URI']}/events/#{notifiable.id}"]
     end
   end
 
@@ -321,6 +327,8 @@ class Notification
       'bi-ticket-detailed-fill'
     when :left_feedback
       'bi-chat-left-quote'
+    when :starred_event
+      'bi-star'
     end
   end
 end
