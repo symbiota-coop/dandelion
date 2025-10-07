@@ -25,8 +25,7 @@ Dandelion::App.helpers do
         { '$match': scope.selector }
       ]
 
-      results = klass.collection.aggregate(pipeline)
-      results = results.first(number) if number
+      results = search_with_retry(klass, pipeline, number)
 
       # Filter by score threshold (50% of max score)
       if results.any?
@@ -38,6 +37,33 @@ Dandelion::App.helpers do
       results.map do |hash|
         klass.new(hash.select { |k, _v| klass.fields.keys.include?(k.to_s) })
       end
+    end
+  end
+
+  private
+
+  def search_with_retry(klass, pipeline, number, max_retries = 3)
+    retries = 0
+    
+    begin
+      results = klass.collection.aggregate(pipeline)
+      results = results.first(number) if number
+      results
+    rescue Mongo::Error::OperationFailure => e
+      retries += 1
+      
+      if retries <= max_retries && (e.message.include?('HostUnreachable') || e.message.include?('Connection reset'))
+        sleep_time = 2 ** (retries - 1)
+        logger.warn "MongoDB connection failed (attempt #{retries}/#{max_retries}), retrying in #{sleep_time}s: #{e.message}"
+        sleep(sleep_time)
+        retry
+      else
+        logger.error "MongoDB search failed after #{retries} attempts: #{e.message}"
+        []
+      end
+    rescue => e
+      logger.error "Unexpected error during MongoDB search: #{e.message}"
+      []
     end
   end
 end
