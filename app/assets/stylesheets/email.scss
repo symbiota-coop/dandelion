@@ -115,6 +115,10 @@ td {
   margin-bottom: 0.5em;
 }
 
+.media img {
+  margin-bottom: 0
+}
+
 .header-image-container {
   text-align: center;
 }
@@ -239,7 +243,6 @@ pre {
 
 .media span {
   display: block;
-  margin-top: -0.5em;
   margin-bottom: 1em;
   font-size: 90%;
   color: #999;
