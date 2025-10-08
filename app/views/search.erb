@@ -18,13 +18,15 @@
     });
   </script>
 <% end %>
+
 <ul class="search-tab">
   <% { 'Events' => 'events', 'People' => 'accounts', 'Organisations' => 'organisations', 'Gatherings' => 'gatherings' }.each { |k,v| %>
   <li <% if @type == v %> class="active" <% end %>><a href="javascript:;" onclick="$('#type').val('<%= v %>');
           $('#search-form').submit()"><%= k %></a></li>
   <% } %>
 </ul>
-<% if @q %>
+
+<% if !@resubmit_search && @q %>
   <% case @type; when 'accounts' %>
     <ul class="search-result-list">
       <% @accounts.each { |account| %>
