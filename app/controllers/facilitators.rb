@@ -1,5 +1,6 @@
 Dandelion::App.controller do
   get '/facilitators' do
+    @event_tags = EventTag.all
     f = Fragment.find_by(key: 'facilitator_feedback_counts')
     @account_ids_freq = JSON.parse(f.value)
     @account_ids_freq = @account_ids_freq.paginate(page: params[:page], per_page: 10)
