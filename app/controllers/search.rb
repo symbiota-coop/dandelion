@@ -34,14 +34,14 @@ Dandelion::App.controller do
       results.to_json
     else
       @q = params[:q]
+      @type = params[:type] || 'events'
 
       referrer = request.referrer
       if referrer.nil? || !URI.parse(referrer).host&.include?(request.host)
-        flash.now[:error] = 'You look like you might be a bot. Please submit your search again.'
+        @resubmit_search = true
         halt 403, erb(:search)
       end
 
-      @type = params[:type] || 'events'
       if @q
         %w[gathering organisation event account].each do |t|
           next unless params[:q].starts_with?("#{t}:")
