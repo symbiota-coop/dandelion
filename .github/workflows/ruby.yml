@@ -38,6 +38,7 @@ jobs:
     - name: Run test (${{ matrix.test_file }})
       uses: nick-fields/retry@v3
       with:
+        timeout_minutes: 10
         max_attempts: 3
         retry_on: error
         command: bundle exec rake test:${{ matrix.test_file }}
