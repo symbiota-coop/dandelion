@@ -85,7 +85,7 @@
         <br>
         <a href="<%= ENV['BASE_URI'] %>/accounts/subscriptions?account_id=%recipient.id%">Manage your notifications</a>
         &middot;
-        <a href="<%= ENV['BASE_URI'] %>/o/<%= pmail.organisation.slug %>/unsubscribe?sign_in_token=%recipient.token%">Unsubscribe from <%= pmail.organisation.name %></a>
+        <a href="<%= ENV['BASE_URI'] %>/o/<%= pmail.organisation.slug %>/unsubscribe?account_id=%recipient.id%">Unsubscribe from <%= pmail.organisation.name %></a>
       </span>
     </div>
   </body>

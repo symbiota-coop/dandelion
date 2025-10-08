@@ -260,7 +260,7 @@ Dandelion::App.controller do
   end
 
   get '/o/:slug/unsubscribe' do
-    sign_in_required!
+    sign_in_code_required!
     @organisation = Organisation.find_by(slug: params[:slug]) || not_found
     erb :'organisations/unsubscribe'
   end
