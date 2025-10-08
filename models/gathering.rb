@@ -198,9 +198,9 @@ class Gathering
 
     y << [:paid_something, 'Paid something', memberships.and(:paid.gt => 0)]
     y << [:paid_nothing, 'Paid nothing', memberships.and(paid: 0)]
-    y << [:more_to_pay, 'More to pay', memberships.and(:id.in => memberships.where('this.paid < this.requested_contribution').pluck(:id))]
-    y << [:no_more_to_pay, 'No more to pay', memberships.and(:id.in => memberships.where('this.paid == this.requested_contribution').pluck(:id))]
-    y << [:overpaid, 'Overpaid', memberships.and(:id.in => memberships.where('this.paid > this.requested_contribution').pluck(:id))]
+    y << [:more_to_pay, 'More to pay', memberships.and(:id.in => memberships.where('$expr': { '$lt': ['$paid', '$requested_contribution'] }).pluck(:id))]
+    y << [:no_more_to_pay, 'No more to pay', memberships.and(:id.in => memberships.where('$expr': { '$eq': ['$paid', '$requested_contribution'] }).pluck(:id))]
+    y << [:overpaid, 'Overpaid', memberships.and(:id.in => memberships.where('$expr': { '$gt': ['$paid', '$requested_contribution'] }).pluck(:id))]
 
     y << [:invitations_granted, 'Custom number of invitations', memberships.and(:invitations_granted.ne => nil)]
 
