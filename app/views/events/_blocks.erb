@@ -1,4 +1,4 @@
-<% if events.exists? %>
+<% if events&.exists? %>
   <div class="mb-3">
     <div class="row" id="events">
       <% events.each { |event| next if event.locked? && !event_admin?(event) %>
