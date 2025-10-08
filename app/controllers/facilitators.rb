@@ -8,6 +8,7 @@ Dandelion::App.controller do
   end
 
   get '/facilitators/map', provides: %i[html json] do
+    @no_content_padding_bottom = true
     f = Fragment.find_by(key: 'facilitator_feedback_counts')
     @account_ids_freq = JSON.parse(f.value)
     @accounts = Account.and(:location_privacy => 'Public', :id.in => @account_ids_freq.map { |id, _freq| id })
