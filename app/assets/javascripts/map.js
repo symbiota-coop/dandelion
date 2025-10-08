@@ -340,11 +340,22 @@ window.DandelionMap = {
     google.maps.event.addListenerOnce(window.map, 'idle', function () {
       window.map.addListener('bounds_changed', function () {
         var bounds = window.map.getBounds().toJSON();
+
+        // Normalize bounds when crossing the antimeridian (date line)
+        // If west > east, we're crossing the date line
+        var west = bounds['west'];
+        var east = bounds['east'];
+
+        if (west > east) {
+          // When crossing date line, convert east from negative to 0-360 range
+          east += 360;
+        }
+
         var q = {
           south: bounds['south'],
-          west: bounds['west'],
+          west: west,
           north: bounds['north'],
-          east: bounds['east'],
+          east: east,
         };
 
         // Parse URL to extract base path and existing parameters
