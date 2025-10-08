@@ -63,7 +63,12 @@
       <% end %>
       <th>Via</th>
       <% if @event %>
-        <th>Answers</th>
+        <th>
+          Answers
+          <% if orders.unscoped.and(:answers.ne => nil).exists? %>
+            <a data-confirm="Clear the answers for all orders for this event, for data privacy reasons? This cannot be undone." href="/events/<%= @event.id %>/orders/clear_answers"><i class="bi bi-x-lg"></i></a>
+          <% end %>
+        </th>
         <th>Updates from organisation?</th>
         <th>Updates from facilitator?</th>
       <% end %>

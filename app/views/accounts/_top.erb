@@ -11,8 +11,6 @@
           <br class="d-block d-lg-none" />
           <small class="text-muted">@<%= account.username %></small>
         </h1>
-        <br class="d-block d-lg-none" />
-        <%= partial :'accounts/info_tags', locals: {account: account} %>
       </div>
     <% end %>
     <%= partial :'accounts/buttons', locals: { account: account, modal: (true if defined?(modal)) } %>
@@ -31,11 +29,9 @@ var temp = $('<input>');
       <% end %>
     <% end %>
     <%= partial :'accounts/unhide', locals: { account: account } %>
-    <% if defined?(modal) %>
-      <div class="mt-1">
-        <%= partial :'accounts/info_tags', locals: {account: account} %>
-      </div>
-    <% end %>
+    <div class="mt-1">
+      <%= partial :'accounts/info_tags', locals: {account: account} %>
+    </div>
     <div class="mt-2">
       <%= partial :'accounts/table', locals: { account: account } %>
     </div>

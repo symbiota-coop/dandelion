@@ -253,6 +253,13 @@ Dandelion::App.controller do
     { id: @order.id.to_s, payment_completed: @order.payment_completed }.to_json
   end
 
+  get '/events/:id/orders/clear_answers' do
+    @event = Event.find(params[:id]) || not_found
+    event_admins_only!
+    @event.orders.unscoped.set(answers: nil)
+    redirect back
+  end
+
   get '/events/:id/orders/:order_id/refund_and_destroy' do
     @event = Event.find(params[:id]) || not_found
     event_admins_only!
