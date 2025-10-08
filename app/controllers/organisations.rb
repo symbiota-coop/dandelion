@@ -260,18 +260,23 @@ Dandelion::App.controller do
   end
 
   get '/o/:slug/unsubscribe' do
-    sign_in_code_required!
+    @account = current_account || (params[:account_id] && Account.find(params[:account_id])) || sign_in_required!
     @organisation = Organisation.find_by(slug: params[:slug]) || not_found
     erb :'organisations/unsubscribe'
   end
 
   post '/o/:slug/unsubscribe' do
-    sign_in_required!
+    @account = current_account || (params[:account_id] && Account.find(params[:account_id])) || sign_in_required!
     @organisation = Organisation.find_by(slug: params[:slug]) || not_found
-    @organisationship = current_account.organisationships.find_by(organisation: @organisation) || current_account.organisationships.create(organisation: @organisation)
+    @organisationship = @account.organisationships.find_by(organisation: @organisation) || @account.organisationships.create(organisation: @organisation)
     @organisationship.update_attribute(:unsubscribed, true)
-    flash[:notice] = "You were unsubscribed from #{@organisation.name}."
-    redirect '/accounts/subscriptions'
+    if params[:account_id]
+      @unsubscribed = true
+      erb :'organisations/unsubscribe'
+    else
+      flash[:notice] = "You were unsubscribed from #{@organisation.name}."
+      redirect '/accounts/subscriptions'
+    end
   end
 
   get '/o/:slug/tiers' do

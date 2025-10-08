@@ -1,6 +1,11 @@
 <%= partial :'organisations/nav', locals: { organisation: @organisation } %>
 
-<% form_tag "/o/#{@organisation.slug}/unsubscribe" do %>
-  <p class="lead">Are you sure you want to unsubscribe <%= current_account.email %> from <%= @organisation.name %>?</p>
-  <%= submit_tag "Yes, unsubscribe", class: 'btn btn-primary' %>
+<% if @unsubscribed %>
+  <p class="lead"><%=@account.email %> was unsubscribed from <%= @organisation.name %>.</p>
+<% else %>
+  <% form_tag "/o/#{@organisation.slug}/unsubscribe" do %>
+    <p class="lead">Are you sure you want to unsubscribe <%= @account.email %> from <%= @organisation.name %>?</p>
+    <%= hidden_field_tag :account_id, value: @account.id %>
+    <%= submit_tag "Yes, unsubscribe", class: 'btn btn-primary' %>
+  <% end %>
 <% end %>
