@@ -1,9 +1,4 @@
 Dandelion::App.controller do
-  get '/facilitators' do
-    @event_tags = EventTag.all
-    erb :'events/facilitators'
-  end
-
   get '/events', provides: %i[html ics json] do
     @events = Event.live.public.browsable
     @from = params[:from] ? parse_date(params[:from]) : Date.today
