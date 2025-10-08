@@ -77,13 +77,13 @@
       <a href="<%= ENV['BASE_URI'] %>">Sent with Dandelion</a>
       <span class="%recipient.footer_class%">
         &middot;
-        <a href="<%= ENV['BASE_URI'] %>/accounts/edit?sign_in_token=%recipient.token%">%recipient.view_or_activate%</a>
+        <a href="<%= ENV['BASE_URI'] %>/accounts/edit?account_id=%recipient.id%">%recipient.view_or_activate%</a>
       </span>
       <br>
       You're receiving this email because you're <%= pmail.reason %>
       <span class="%recipient.footer_class%">
         <br>
-        <a href="<%= ENV['BASE_URI'] %>/accounts/subscriptions?sign_in_token=%recipient.token%">Manage your notifications</a>
+        <a href="<%= ENV['BASE_URI'] %>/accounts/subscriptions?account_id=%recipient.id%">Manage your notifications</a>
         &middot;
         <a href="<%= ENV['BASE_URI'] %>/o/<%= pmail.organisation.slug %>/unsubscribe?sign_in_token=%recipient.token%">Unsubscribe from <%= pmail.organisation.name %></a>
       </span>

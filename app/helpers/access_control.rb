@@ -1,15 +1,14 @@
 Dandelion::App.helpers do
   def viewable?(account, privacyable, viewer: current_account, viewer_in_network: nil)
-    (
-      account.respond_to?(privacyable) &&
-      account.send(privacyable)) &&
+    account.respond_to?(privacyable) &&
+      account.send(privacyable) &&
       (viewer || !Account.sensitive?(privacyable)) &&
       (
         (viewer && viewer.admin?) ||
         account.send("#{privacyable}_privacy").nil? ||
         (account.send("#{privacyable}_privacy") == 'Public') ||
         (account.send("#{privacyable}_privacy") == 'People I follow' && (viewer_in_network || (viewer && (viewer.id == account.id || account.network.find(viewer.id))))) ||
-        (account.send("#{privacyable}_privacy") == 'Only me' && (viewer && viewer.id == account.id))
+        (account.send("#{privacyable}_privacy") == 'Only me' && viewer && viewer.id == account.id)
       )
   end
 
@@ -19,7 +18,7 @@ Dandelion::App.helpers do
     else
       flash[notice_type] = notice
       session[:return_to] = request.url
-      redirect((redirect_url || (current_account ? '/' : '/accounts/sign_in')))
+      redirect(redirect_url || (current_account ? '/' : '/accounts/sign_in'))
     end
   end
 
@@ -165,6 +164,18 @@ Dandelion::App.helpers do
     kick!(notice: notice, redirect_url: redirect_url, notice_type: notice_type) unless current_account
   end
 
+  def sign_in_code_required!
+    return if current_account
+
+    if params[:account_id] && (@account = Account.find(params[:account_id]))
+      @account.generate_sign_in_token!
+      @account.send_sign_in_code
+      kick!(notice: nil, redirect_url: "/accounts/sign_in_code?account_id=#{params[:account_id]}")
+    else
+      sign_in_required!
+    end
+  end
+
   def membership_required!(gathering = nil, account = current_account)
     gathering ||= @gathering
     return if account && gathering && gathering.memberships.find_by(account: account)
@@ -177,7 +188,7 @@ Dandelion::App.helpers do
 
   def confirmed_membership_required!(gathering = nil, account = current_account)
     gathering ||= @gathering
-    return if account && gathering && ((membership = gathering.memberships.find_by(account: account)) && membership.confirmed?)
+    return if account && gathering && (membership = gathering.memberships.find_by(account: account)) && membership.confirmed?
 
     kick!(
       notice: (membership ? 'You must make a payment before accessing that page.' : 'You must be a member of the gathering to access that page.'),

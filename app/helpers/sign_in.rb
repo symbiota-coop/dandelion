@@ -3,7 +3,6 @@ Dandelion::App.helpers do
     account = Account.find_by(sign_in_token: params[:sign_in_token])
 
     if account && !account.sign_in_token_expired?
-      flash.now[:notice] = 'Signed in via a code/link'
       account.update_attribute(:failed_sign_in_attempts, 0)
       account.sign_ins.create(env: env_yaml, skip_increment: %w[unsubscribe give_feedback subscriptions].any? { |p| request.path.include?(p) })
       if account.sign_ins_count == 1
@@ -12,6 +11,11 @@ Dandelion::App.helpers do
       end
       session[:account_id] = account.id.to_s
       account.generate_sign_in_token!
+      if session[:return_to]
+        redirect session[:return_to]
+      else
+        flash.now[:notice] = 'Signed in via a code/link'
+      end
     elsif !current_account
       kick! notice: "That sign in code/link isn't valid any longer. Please request a new one."
     end

@@ -33,6 +33,13 @@ Dandelion::App.controller do
     erb :'accounts/sign_in'
   end
 
+  get '/accounts/sign_in_code' do
+    @body_class = 'gradient'
+    @hide_right_nav = true
+    @account = Account.find(params[:account_id]) || not_found
+    erb :'accounts/requested_sign_in_code'
+  end
+
   post '/accounts/sign_in_code' do
     if params[:email] && (@account = Account.find_by(email: params[:email].downcase))
       @account.generate_sign_in_token!
@@ -194,7 +201,7 @@ Dandelion::App.controller do
   end
 
   get '/accounts/edit' do
-    sign_in_required!
+    sign_in_code_required!
     @account = current_account
     if params[:organisation_id]
       @organisation = Organisation.find(params[:organisation_id])
@@ -209,7 +216,7 @@ Dandelion::App.controller do
   end
 
   get '/accounts/subscriptions' do
-    sign_in_required!
+    sign_in_code_required!
     @account = current_account
     erb :'accounts/subscriptions'
   end
