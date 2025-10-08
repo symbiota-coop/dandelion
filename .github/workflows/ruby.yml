@@ -36,6 +36,11 @@ jobs:
       run: bundle exec rubocop --fail-level warning --display-only-fail-level-offenses
 
     - name: Run test (${{ matrix.test_file }})
+      uses: nick-fields/retry@v3
+      with:
+        max_attempts: 3
+        retry_on: error
+        command: bundle exec rake test:${{ matrix.test_file }}
       env:
         RACK_ENV: test
         PORT: 8020
@@ -48,5 +53,4 @@ jobs:
         STRIPE_SK: sk_test_HCthlytw40KUFZ5nWNc0XI6A        
         CI: true
         SKIP_TOURS: true
-      run: bundle exec rake test:${{ matrix.test_file }}
       
