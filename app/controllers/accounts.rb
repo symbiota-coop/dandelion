@@ -36,6 +36,7 @@ Dandelion::App.controller do
   get '/accounts/sign_in_code' do
     @body_class = 'gradient'
     @hide_right_nav = true
+    not_found unless params[:account_id]
     @account = Account.find(params[:account_id]) || not_found
     erb :'accounts/requested_sign_in_code'
   end
