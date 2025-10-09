@@ -65,7 +65,7 @@ Dandelion::App.helpers do
     end
   end
 
-  def cp(slug, locals: {}, key: slug, expires: 1.hour.from_now)
+  def cp(slug, locals: {}, event: nil, key: slug, expires: 1.hour.from_now)
     if Padrino.env == :development
       partial(slug, locals: locals)
     else
@@ -74,7 +74,7 @@ Dandelion::App.helpers do
       else
         fragment.try(:destroy)
         begin
-          Fragment.create(key: key, value: partial(slug, locals: locals), expires: expires).value
+          Fragment.create(event: event, key: key, value: partial(slug, locals: locals), expires: expires).value
         rescue Mongo::Error::OperationFailure # protect against race condition
           Fragment.find_by(key: key).value
         end

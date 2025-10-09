@@ -3,6 +3,8 @@ class Fragment
   include Mongoid::Timestamps
   include BelongsToWithoutParentValidation
 
+  belongs_to_without_parent_validation :event, index: true, optional: true
+
   field :key, type: String
   # index({ key: 1 }, { unique: true })
   field :value, type: String
@@ -15,7 +17,8 @@ class Fragment
     {
       key: { type: :text, full: true },
       value: :text_area,
-      expires: :datetime
+      expires: :datetime,
+      event_id: :lookup
     }
   end
 end

@@ -13,6 +13,8 @@ module EventAssociations
     belongs_to_without_parent_validation :last_saved_by, class_name: 'Account', inverse_of: :events_last_saver, index: true, optional: true
     belongs_to_without_parent_validation :gathering, optional: true, index: true
 
+    has_many :fragments, dependent: :destroy
+
     has_many :stripe_charges
 
     has_many :rpayments, dependent: :destroy
