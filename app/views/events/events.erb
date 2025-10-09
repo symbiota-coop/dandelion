@@ -27,15 +27,22 @@
 </div>
 
 <%= partial :'events/search_form' %>
-
-<% if params[:display] == 'map' %>
-  <%= partial :'maps/map', locals: { url: "/events", bounding_box: @bounding_box&.flatten, fill_screen: true } %>
-<% elsif params[:display] == 'table' %>
-  <%= partial :'events/table' %>
-<% elsif params[:display] == 'concise' %>
-  <%= partial :'events/concise' %>
+<% if @resubmit_search %>
+  <script>
+    $(function () {
+      $('#events-search-form').submit();
+    });
+  </script>
 <% else %>
-  <div data-pagelet-url="/events?<%= request.query_string %>">
-    <%= partial :'events/events' %>
-  </div>
+  <% if params[:display] == 'map' %>
+    <%= partial :'maps/map', locals: { url: "/events", bounding_box: @bounding_box&.flatten, fill_screen: true } %>
+  <% elsif params[:display] == 'table' %>
+    <%= partial :'events/table' %>
+  <% elsif params[:display] == 'concise' %>
+    <%= partial :'events/concise' %>
+  <% else %>
+    <div data-pagelet-url="/events?<%= request.query_string %>">
+      <%= partial :'events/events' %>
+    </div>
+  <% end %>
 <% end %>

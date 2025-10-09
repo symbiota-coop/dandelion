@@ -14,7 +14,7 @@
 
 <div class="search well" style="<%= 'display: none;' if params[:display].in?(['map', 'calendar']) %>">
 
-  <% form_tag '/events', method: 'get', class: 'submitOnChange searchForm mb-3' do %>
+  <% form_tag '/events', method: 'get', class: 'submitOnChange searchForm mb-3', id: 'events-search-form' do %>
     <%= hidden_field_tag :display, value: params[:display] %>
     <%= hidden_field_tag :order, value: params[:order] %>
     <div class="form-row align-items-end">

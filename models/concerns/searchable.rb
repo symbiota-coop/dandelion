@@ -6,11 +6,11 @@ module Searchable
       return none if query.blank?
       return none if query.length < 3 || query.length > 200
 
-      query = "\"#{query.strip}\""
-
       if Padrino.env == :development
-        self.or(search_fields.map { |field| { field => /#{Regexp.escape(query)}/i } })
+        where('$or' => search_fields.map { |field| { field => /#{Regexp.escape(query)}/i } })
       else
+        query = "\"#{query.strip}\""
+
         pipeline = [
           { '$match': { '$text': { '$search': query } } }
         ]
