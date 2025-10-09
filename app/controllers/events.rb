@@ -8,7 +8,7 @@ Dandelion::App.controller do
                     parts.length == 2 ? parts.last.to_sym : :html)
 
     referrer = request.referrer
-    if (content_type == :html && referrer.nil?) || !URI.parse(referrer).host&.include?(request.host)
+    if (content_type == :html && referrer.nil?) || (referrer && !URI.parse(referrer).host&.include?(request.host))
       @resubmit_search = true
       halt 403, erb(:'events/events')
     end
