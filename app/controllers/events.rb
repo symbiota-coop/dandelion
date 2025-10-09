@@ -4,11 +4,11 @@ Dandelion::App.controller do
     @from = params[:from] ? parse_date(params[:from]) : Date.today
     @to = params[:to] ? parse_date(params[:to]) : nil
 
-    content_type = (parts = URI(request.url).path.split('.')
+    content_type = (parts = URI(uri).path.split('.')
                     parts.length == 2 ? parts.last.to_sym : :html)
 
     referrer = request.referrer
-    if (content_type == :html && referrer.nil?) || !URI.parse(referrer).host&.include?(request.host)
+    if content_type == :html && (referrer.nil? || !URI.parse(referrer).host&.include?(request.host))
       @resubmit_search = true
       halt 403, erb(:'events/events')
     end
