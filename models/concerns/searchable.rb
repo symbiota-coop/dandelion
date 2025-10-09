@@ -6,8 +6,15 @@ module Searchable
       return none if query.blank?
       return none if query.length < 3 || query.length > 200
 
+      # If query is an email address and model has an email field, search only email
+      if query.match?(EMAIL_REGEX) && fields.key?('email')
+        scope ||= all
+        return scope.and(email: query)
+      end
+
       if Padrino.env == :development
-        where('$or' => search_fields.map { |field| { field => /#{Regexp.escape(query)}/i } })
+        scope ||= all
+        scope.where('$or' => search_fields.map { |field| { field => /#{Regexp.escape(query)}/i } })
       else
         query = "\"#{query.strip}\""
 
