@@ -1,8 +1,8 @@
 Dandelion::App.controller do
   get '/facilitators', provides: %i[html json] do
-    f = Fragment.find_by(key: 'facilitator_feedback_counts')
-    @account_ids_freq = JSON.parse(f.value)
-    @accounts = Account.and(:id.in => @account_ids_freq.map { |id, _freq| id })
+    Fragment.find_by(key: 'facilitator_feedback_counts')
+
+    @accounts = Account.and(:event_feedbacks_as_facilitator_count.gt => 0).order('event_feedbacks_as_facilitator_count desc')
 
     if params[:q]
       # Search by account fields
@@ -54,15 +54,11 @@ Dandelion::App.controller do
 
     case content_type
     when :html
-      @account_ids_freq = @account_ids_freq.paginate(page: params[:page], per_page: 10)
+      @accounts = @accounts.paginate(page: params[:page], per_page: 10)
       erb :'facilitators/facilitators'
     when :json
       @no_content_padding_bottom = true
-      # Get public accounts from already filtered @accounts
-      public_account_ids = @accounts.and(location_privacy: 'Public').pluck(:id).map(&:to_s)
-      # Filter to only public accounts and keep the sorting by count, then take top 500
-      public_account_ids_freq = @account_ids_freq.select { |id, _freq| public_account_ids.include?(id) }.take(500)
-      @accounts = Account.and(:id.in => public_account_ids_freq.map { |id, _freq| id })
+      @accounts = @accounts.and(location_privacy: 'Public').limit(500)
       map_json(@accounts)
     end
   end

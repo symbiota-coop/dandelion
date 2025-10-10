@@ -64,11 +64,10 @@ class EventFeedback
   end
 
   def self.update_facilitator_feedback_counts
-    fragment = Fragment.find_or_create_by(key: 'facilitator_feedback_counts')
-    feedback_counts = Account.and(:id.in => EventFacilitation.pluck(:account_id)).map do |account|
-      [account.id.to_s, account.unscoped_event_feedbacks_as_facilitator.count]
+    Account.and(:event_feedbacks_as_facilitator_count.ne => nil).set(event_feedbacks_as_facilitator_count: nil)
+    Account.and(:id.in => EventFacilitation.pluck(:account_id)).each do |account|
+      account.set(event_feedbacks_as_facilitator_count: account.unscoped_event_feedbacks_as_facilitator.count)
     end
-    fragment.update_attributes expires: 1.day.from_now, value: feedback_counts.sort_by { |_, freq| -freq }.to_json
   end
 
   after_create :send_feedback

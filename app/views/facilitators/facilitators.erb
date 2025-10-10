@@ -5,7 +5,7 @@
 <% else %>
 
   <ul class="search-result-list">
-    <% @account_ids_freq.each { |id, freq|; account = @accounts.find { |a| a.id.to_s == id }; next unless account; %>
+    <% @accounts.each { |account| %>
     <li>
       <%= partial 'accounts/search_result', locals: { account: account, facilitator_info: true } %>
     </li>
@@ -13,7 +13,7 @@
   </ul>
 
   <div class="mt-3">
-    <%= will_paginate @account_ids_freq, page_links: false, renderer: WillPaginate::ViewHelpers::BootstrapRenderer %>
+    <%= will_paginate @accounts, page_links: false, renderer: WillPaginate::ViewHelpers::BootstrapRenderer %>
   </div>
 
 <% end %>
