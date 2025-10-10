@@ -334,7 +334,7 @@ class Pmail
                                   })
     end
 
-    batch_message.finalize if mailable.is_a?(Event) ? ENV['MAILGUN_API_KEY'] : organisation.mailgun_api_key
+    batch_message.finalize
   end
 
   def duplicate!(account)
