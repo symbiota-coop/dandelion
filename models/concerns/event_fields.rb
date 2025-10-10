@@ -42,7 +42,7 @@ module EventFields
     field :cap_gbp, type: Float
     field :oc_slug, type: String
     field :ai_tagged, type: Mongoid::Boolean
-    field :event_tags_joined, type: String
+    field :event_tag_names, type: Array
     field :tax_rate_id, type: String
     field :match_phrase, type: String
     field :sold_out_cache, type: Mongoid::Boolean

@@ -26,7 +26,7 @@ class Event
   end
 
   def self.search_fields
-    %w[name description location event_tags_joined]
+    %w[name description location event_tag_names]
   end
 
   def to_param
