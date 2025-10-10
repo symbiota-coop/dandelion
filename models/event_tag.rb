@@ -13,6 +13,10 @@ class EventTag
     }
   end
 
+  def self.search_fields
+    %w[name]
+  end
+
   validates_uniqueness_of :name
 
   has_many :event_tagships, dependent: :destroy
