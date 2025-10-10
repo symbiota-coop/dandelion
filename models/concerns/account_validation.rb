@@ -3,8 +3,8 @@ module AccountValidation
 
   included do
     validates_presence_of :name, :username, :email
-    validates_uniqueness_of   :email,    case_sensitive: false
-    validates_presence_of     :password, if: :password_required
+    validates_uniqueness_of :email
+    validates_presence_of :password, if: :password_required
     validates_password_strength :password, if: :password_required
 
     validates_format_of :username, with: /\A[a-z0-9_.]+\z/

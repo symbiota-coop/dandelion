@@ -4,7 +4,7 @@ Dandelion::App.helpers do
     return klass.none if query.length < 3 || query.length > 200
 
     if Padrino.env == :development
-      klass.or(klass.admin_fields.map { |k, v| { k => /#{Regexp.escape(query)}/i } if v == :text || (v.is_a?(Hash) && v[:type] == :text) }.compact)
+      scope.where('$or' => klass.search_fields.map { |field| { field => /#{Regexp.escape(query)}/i } })
     else
 
       query = query.strip
