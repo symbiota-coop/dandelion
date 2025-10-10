@@ -34,7 +34,7 @@
             <li class="breadcrumb-item active"><%= @account.name %></li>
           </ul>
         </div>
-        <div data-pagelet-url="/messages/<%= @account.id %>" data-pagelet-refresh="60" data-pagelet-also="/messages/index">
+        <div data-pagelet-url="/messages/<%= @account.id %>" data-pagelet-refresh="10" data-pagelet-also="/messages/index">
           <%= partial :'messages/thread' %>
         </div>
         <div id="message-send" data-pagelet-url="/messages/<%= @account.id %>/send" data-pagelet-also="/messages/<%= @account.id %>">
