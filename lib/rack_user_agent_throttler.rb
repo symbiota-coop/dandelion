@@ -20,7 +20,7 @@ class RackUserAgentThrottler
     if matched_agent_pattern
       # Check if the request path matches any of the paths for this agent
       throttled_paths = throttles[matched_agent_pattern]
-      matched_path = throttled_paths.find { |path| request_path == path || request_path.start_with?(path) }
+      matched_path = throttled_paths.find { |path| request_path == path }
 
       if matched_path
         throttle_key = "#{matched_agent_pattern}:#{matched_path}"
