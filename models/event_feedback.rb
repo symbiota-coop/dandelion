@@ -63,7 +63,7 @@ class EventFeedback
     end
   end
 
-  def self.update_facilitator_feedback_counts
+  def self.update_event_feedbacks_as_facilitator_counts
     Account.and(:event_feedbacks_as_facilitator_count.ne => nil).set(event_feedbacks_as_facilitator_count: nil)
     Account.and(:id.in => EventFacilitation.pluck(:account_id)).each do |account|
       account.set(event_feedbacks_as_facilitator_count: account.unscoped_event_feedbacks_as_facilitator.count)

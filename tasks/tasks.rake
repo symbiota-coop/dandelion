@@ -43,7 +43,7 @@ namespace :late do
     puts 'update event tags for select'
     EventTag.update_tags_for_select
     puts 'update feedback counts'
-    EventFeedback.update_facilitator_feedback_counts
+    EventFeedback.update_event_feedbacks_as_facilitator_counts
     puts 'monthly contributions'
     MonthlyContributionsCalculator.calculate
     puts 'MaxMinder upload'

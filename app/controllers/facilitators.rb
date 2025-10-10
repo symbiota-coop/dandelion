@@ -1,7 +1,5 @@
 Dandelion::App.controller do
   get '/facilitators', provides: %i[html json] do
-    Fragment.find_by(key: 'facilitator_feedback_counts')
-
     @accounts = Account.and(:event_feedbacks_as_facilitator_count.gt => 0).order('event_feedbacks_as_facilitator_count desc')
 
     if params[:q]
@@ -58,7 +56,7 @@ Dandelion::App.controller do
       erb :'facilitators/facilitators'
     when :json
       @no_content_padding_bottom = true
-      @accounts = @accounts.and(location_privacy: 'Public').limit(500)
+      @accounts = Account.and(:id.in => @accounts.and(location_privacy: 'Public').limit(500).pluck(:id))
       map_json(@accounts)
     end
   end
