@@ -166,7 +166,8 @@ module OrganisationFields
         terms_and_conditions: :text_area,
         terms_and_conditions_check_box: :check_box,
         billing_address_collection: :check_box,
-        feedback_summary: :text_area
+        feedback_summary: :text_area,
+        referrer_id: :lookup
       }.merge(email_admin_fields)
     end
 
@@ -249,7 +250,8 @@ module OrganisationFields
         oc_slug: 'Open Collective organisation slug',
         hide_ticket_revenue: 'Hide ticket revenue in event stats',
         collect_location: 'Request the location of ticket buyers at checkout',
-        tax_rate_id: 'Stripe tax rate ID to apply to ticket purchases'
+        tax_rate_id: 'Stripe tax rate ID to apply to ticket purchases',
+        referrer_id: 'Credit someone for referring you to Dandelion'
       }.merge(email_hints)
     end
 
