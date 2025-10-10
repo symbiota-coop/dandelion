@@ -299,6 +299,9 @@ class Pmail
 
       batch_message.from from_name ? "#{from_name} <mailer@#{ENV['MAILGUN_PMAILS_HOST']}>" : "mailer@#{ENV['MAILGUN_PMAILS_HOST']}"
       batch_message.reply_to from
+    else
+      # No valid mailgun configuration found
+      raise "No valid mailgun configuration found for organisation #{organisation.id}"
     end
 
     batch_message.subject(test_to ? "#{subject} [test sent #{Time.now}]" : subject)
