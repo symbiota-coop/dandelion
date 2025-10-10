@@ -1,0 +1,38 @@
+<script>
+  $(function () {
+
+    if (typeof google !== 'undefined') {
+      var autocomplete = new google.maps.places.Autocomplete($('#events-search-near')[0]);
+    }
+
+  })
+</script>
+
+<% if params[:display].in?(['map', 'calendar']) %>
+  <%= partial :'events/toggle_search_well' %>
+<% end %>
+
+<div class="search well" style="<%= 'display: none;' if params[:display].in?(['map', 'calendar']) %>">
+
+  <% form_tag '/facilitators', method: 'get', class: 'submitOnChange searchForm mb-3', id: 'facilitators-search-form' do %>
+    <%= hidden_field_tag :display, value: params[:display] %>
+    <%= hidden_field_tag :order, value: params[:order] %>
+    <div class="form-row align-items-end">
+      <div class="form-group col-12 col-sm-auto">
+        <label>Search facilitators</label>
+        <%= text_field_tag :q, class: 'form-control', value: params[:q] %>
+      </div>
+      <div class="form-group col-12 col-sm-auto">
+        <label>near</label>
+        <%= text_field_tag :near, class: 'form-control', value: params[:near], id: 'events-search-near', placeholder: '' %>
+      </div>
+      <div class="form-group col-12 col-sm-auto">
+        <%= submit_tag 'Search', class: 'btn btn-primary' %>
+      </div>
+      <%= hidden_field_tag :search, value: 1 %>
+    </div>
+  <% end %>
+
+  <%= partial :'facilitators/view_options', locals: { path: (path if defined?(path)) } %>
+
+</div>

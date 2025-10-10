@@ -1,0 +1,73 @@
+<% if params[:minimal] %>
+  <%== '<div class="container-fluid my-3">' %>
+<% end %>
+
+<style>
+  #view-options .btn {
+    background-color: white;
+  }
+  #view-options .btn:hover {
+    color: inherit;
+  }
+</style>
+<script>
+  $(function() {
+    function handleViewOptionsTooltips() {
+      var $tooltips = $('#view-options [title]');
+      if ($(window).width() >= 992) {
+        $tooltips.each(function() {
+          $(this).tooltip('dispose').removeAttr('data-toggle');
+        });
+      } else {
+        $tooltips.each(function() {
+          if (!$(this).attr('data-toggle')) {
+            $(this).attr('data-toggle', 'tooltip').tooltip({
+              html: true,
+              title: $(this).attr('title')
+            });
+          }
+        });
+      }
+    }
+
+    handleViewOptionsTooltips();
+    $(window).on('resize', handleViewOptionsTooltips);
+  });
+</script>
+<div class="row" id="view-options">
+
+  <div class="col-12 col-lg-auto">
+
+    <ul class="pl-0 mb-3 d-flex align-items-center">
+      <li class="list-inline-item">
+        <label class="mb-0">View as</label>
+      </li>
+      <li class="list-inline-item">
+        <a data-toggle="tooltip" title="List view" class="btn <%='btn-outline-primary' if !params[:display].in?(['map','calendar']) %>" href="<%= path if defined?(path) && path %>?<%= q = Rack::Utils.parse_nested_query(request.query_string); q.delete('search'); q.delete('display'); q.merge({search: 1, display: 'list' }).to_query %>">
+          <i class="bi bi-list-task"></i> <span class="d-none d-lg-inline">List</span>
+        </a>
+      </li>
+      <li class="list-inline-item">
+        <a data-toggle="tooltip" title="Map view" class="btn <%='btn-outline-primary' if params[:display] == 'map' %>" href="<%= path if defined?(path) && path %>?<%= q = Rack::Utils.parse_nested_query(request.query_string); q.delete('search'); q.delete('display'); q.merge({search: 1, display: 'map' }).to_query %>">
+          <i class="bi bi-geo-alt-fill"></i> <span class="d-none d-lg-inline">Map</span>
+        </a>
+      </li>
+    </ul>
+  </div>
+
+  <% if params[:display] != 'map' %>
+    <div class="col-12 col-lg-auto">
+      <% form_tag (defined?(path) && path ? path : ''), method: 'get', class: 'form-inline submitOnChange' do %>
+        <% params.each { |k,v| next if %w[format search order slug].include?(k) %>
+        <%= hidden_field_tag k, value: v %>
+        <% } %>
+        <%= hidden_field_tag :search, value: 1 %>
+      <% end %>
+    </div>
+  <% end %>
+
+</div>
+
+<% if params[:minimal] %>
+  <%== '</div>' %>
+<% end %>
