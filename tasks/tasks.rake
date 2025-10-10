@@ -74,3 +74,24 @@ namespace :other do
     CheckSquarespaceSignup.check
   end
 end
+
+namespace :db do
+  task ensure_text_indexes: :environment do
+    puts 'Ensuring text search indexes exist...'
+    
+    # Get all models that include Searchable
+    searchable_models = [Event, Gathering, EventTag, Pmail, LocalGroup, Activity, Organisation, Account]
+    
+    searchable_models.each do |model|
+      begin
+        puts "Creating text index for #{model.name}..."
+        model.ensure_text_index
+        puts "✓ Text index created/verified for #{model.name}"
+      rescue => e
+        puts "✗ Failed to create text index for #{model.name}: #{e.message}"
+      end
+    end
+    
+    puts 'Text search indexes setup complete!'
+  end
+end

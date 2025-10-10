@@ -16,6 +16,9 @@ module Searchable
         scope ||= all
         scope.where('$or' => search_fields.map { |field| { field => /#{Regexp.escape(query)}/i } })
       else
+        # Ensure text index exists before performing text search
+        ensure_text_index
+
         query = "\"#{query.strip}\""
 
         pipeline = [
@@ -31,6 +34,21 @@ module Searchable
 
     def search_fields
       raise NotImplementedError, "#{self} must implement search_fields class method"
+    end
+
+    def ensure_text_index
+      return if @text_index_created
+
+      begin
+        # Create a compound text index on all search fields
+        index_spec = search_fields.each_with_object({}) { |field, hash| hash[field] = 'text' }
+        collection.indexes.create_one(index_spec)
+        @text_index_created = true
+      rescue Mongo::Error::OperationFailure => e
+        # Index might already exist, which is fine
+        @text_index_created = true unless e.message.include?('IndexOptionsConflict')
+        raise e if e.message.include?('IndexOptionsConflict')
+      end
     end
   end
 end
