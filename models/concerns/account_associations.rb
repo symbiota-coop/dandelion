@@ -188,7 +188,7 @@ module AccountAssociations
 
   def upcoming_events
     Event.and(:organisation_id.ne => nil).future_and_current.and(:id.in =>
-        tickets.pluck(:event_id) +
+        tickets.complete.pluck(:event_id) +
         event_facilitations.pluck(:event_id) +
         events_coordinating.pluck(:id) +
         events_revenue_sharing.pluck(:id) +
