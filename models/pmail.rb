@@ -292,14 +292,13 @@ class Pmail
           result.to_h['items'].each { |item| recipients << item['recipient'] }
           puts recipients.count
         end
-      elsif organisation.free_mailgun?
-        mg_client = Mailgun::Client.new ENV['MAILGUN_API_KEY'], ENV['MAILGUN_REGION']
-        batch_message = Mailgun::BatchMessage.new(mg_client, ENV['MAILGUN_PMAILS_HOST'])
-
-        batch_message.from from_name ? "#{from_name} <mailer@#{ENV['MAILGUN_PMAILS_HOST']}>" : "mailer@#{ENV['MAILGUN_PMAILS_HOST']}"
-        batch_message.reply_to from
       end
+    elsif organisation.free_mailgun?
+      mg_client = Mailgun::Client.new ENV['MAILGUN_API_KEY'], ENV['MAILGUN_REGION']
+      batch_message = Mailgun::BatchMessage.new(mg_client, ENV['MAILGUN_PMAILS_HOST'])
 
+      batch_message.from from_name ? "#{from_name} <mailer@#{ENV['MAILGUN_PMAILS_HOST']}>" : "mailer@#{ENV['MAILGUN_PMAILS_HOST']}"
+      batch_message.reply_to from
     end
 
     batch_message.subject(test_to ? "#{subject} [test sent #{Time.now}]" : subject)
