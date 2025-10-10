@@ -7,7 +7,7 @@
       <% if @organisation %>
         <a <% if event.ai_tagged? %> data-toggle="tooltip" title="AI generated"<% end %> href="/o/<%= @organisation.slug %>/events?event_tag_id=<%= event_tag.id %><%= '&minimal=1' if params[:minimal] %>" class="text-white label <%= event.ai_tagged? ? 'label-primary' : 'label-primary' %> d-inline-block mb-1"><% if event.ai_tagged? %><i class="bi bi-stars"></i> <% end %><%== Sanitize.fragment(event_tag.name) %></a>
       <% else %>
-        <span <% if event.ai_tagged? %> data-toggle="tooltip" title="AI generated"<% end %> class="text-white label <%= event.ai_tagged? ? 'label-primary' : 'label-primary' %> d-inline-block mb-1"><% if event.ai_tagged? %><i class="bi bi-stars"></i> <% end %><%== Sanitize.fragment(event_tag.name) %></span>
+        <span <% if event.ai_tagged? %> data-toggle="tooltip" title="AI generated"<% end %> class="text-white label label-primary d-inline-block mb-1"><% if event.ai_tagged? %><i class="bi bi-stars"></i> <% end %><%== Sanitize.fragment(event_tag.name) %></span>
       <% end %>
     </span>
   <% end %>
