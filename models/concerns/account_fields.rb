@@ -184,7 +184,7 @@ module AccountFields
   Pansexual
   Queer
   Questioning
-  Sapiosexual).split("\n")
+  Sapiosexual).split("\n").map(&:strip)
     end
 
     def genders
@@ -209,7 +209,7 @@ module AccountFields
   Transsexual
   Trans Man
   Trans Woman
-  Two Spirit).split("\n")
+  Two Spirit).split("\n").map(&:strip)
     end
   end
 end
