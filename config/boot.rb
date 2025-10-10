@@ -17,7 +17,9 @@ Mongoid.raise_not_found_error = false
 Padrino.load!
 
 RackUserAgentThrottler.throttled_user_agents = [
-  'meta-webindexer/1.1'
+  'indexer/',
+  'bot/',
+  'crawler/'
 ]
 
 OmniAuth.config.allowed_request_methods = [:get]

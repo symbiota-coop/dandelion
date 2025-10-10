@@ -13,8 +13,8 @@ class RackUserAgentThrottler
     user_agent = env['HTTP_USER_AGENT'].to_s
     throttled_agents = self.class.throttled_user_agents || []
 
-    # Check if user agent matches any throttled patterns
-    matched_agent = throttled_agents.find { |pattern| user_agent.include?(pattern) }
+    # Check if user agent matches any throttled patterns (case-insensitive)
+    matched_agent = throttled_agents.find { |pattern| user_agent.downcase.include?(pattern.downcase) }
 
     if matched_agent
       @mutex.synchronize do
