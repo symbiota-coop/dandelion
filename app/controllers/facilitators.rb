@@ -7,7 +7,7 @@ Dandelion::App.controller do
       account_ids_from_search = Account.search(params[:q], @accounts).pluck(:id)
 
       # Search by event tags of past events
-      matching_tag_ids = EventTag.where(name: /#{Regexp.escape(params[:q])}/i).pluck(:id)
+      matching_tag_ids = EventTag.search(params[:q]).pluck(:id)
       if matching_tag_ids.any?
         # Use aggregation to efficiently find accounts who facilitated past events with matching tags
         account_ids_from_tags = EventFacilitation.collection.aggregate([

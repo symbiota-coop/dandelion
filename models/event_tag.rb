@@ -3,6 +3,8 @@ class EventTag
   include Mongoid::Timestamps
   include BelongsToWithoutParentValidation
 
+  include Searchable
+
   field :name, type: String
 
   def self.admin_fields
