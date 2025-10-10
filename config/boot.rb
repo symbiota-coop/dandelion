@@ -17,7 +17,10 @@ Mongoid.raise_not_found_error = false
 Padrino.load!
 
 RackUserAgentThrottler.throttles = {
-  'meta-webindexer/' => ['/o/the-psychedelic-society/events']
+  'meta-webindexer/' => [
+    '/o/the-psychedelic-society/events',
+    '/o/the-psychedelic-society/events.ics'
+  ]
 }
 
 OmniAuth.config.allowed_request_methods = [:get]
