@@ -72,6 +72,10 @@ class Organisation
     CURRENCY_OPTIONS
   end
 
+  def free_mailgun?
+    subscribed_accounts_count && subscribed_accounts_count <= 500 && pmails.and(:created_at.gte => 1.month.ago).count == 0
+  end
+
   def banned_emails_a
     banned_emails ? banned_emails.split("\n").map(&:strip) : []
   end
