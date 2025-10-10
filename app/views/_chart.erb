@@ -22,8 +22,8 @@
           months << (months.last + 1.month) while months.last < Date.new(Date.today.year, Date.today.month, 1)
 
           # Build criteria with date range, then use MongoDB aggregation
-          range_start = months.first.to_time
-          range_end = (months.last + 1.month).to_time
+          range_start = months.first
+          range_end = (months.last + 1.month)
           criteria = countable.where(:created_at.gte => range_start, :created_at.lt => range_end)
 
           # Use aggregation to group by month in a single query

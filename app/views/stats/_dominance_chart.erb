@@ -1,46 +1,13 @@
 <%
-# Build date range
-earliest = 24.months.ago.to_date
-months = [Date.new(earliest.year, earliest.month, 1)]
-months << (months.last + 1.month) while months.last < Date.new(Date.today.year, Date.today.month, 1)
-
-range_start = months.first.to_time
-range_end = (months.last + 1.month).to_time
-
-# Get lead organisation ID once
-lead_org = Organisation.find_by(slug: ENV['LEAD_ORG_SLUG'])
-lead_org_id = lead_org&.id
-
-# Use aggregation to count events by month, separated by lead org vs others
-results = Event.collection.aggregate([
-  { '$match' => { 'created_at' => { '$gte' => range_start, '$lt' => range_end } } },
-  { '$group' => {
-      '_id' => {
-        'year' => { '$year' => '$created_at' },
-        'month' => { '$month' => '$created_at' },
-        'is_lead' => { '$eq' => ['$organisation_id', lead_org_id] }
-      },
-      'count' => { '$sum' => 1 }
-    }
-  }
-]).to_a
-
-# Build lookup hash
-counts_by_month = Hash.new { |h, k| h[k] = { lead: 0, other: 0 } }
-results.each do |doc|
-  month_key = Date.new(doc['_id']['year'], doc['_id']['month'], 1)
-  if doc['_id']['is_lead']
-    counts_by_month[month_key][:lead] = doc['count']
-  else
-    counts_by_month[month_key][:other] = doc['count']
-  end
-end
-
-data = months.map do |month|
-  lead_count = counts_by_month[month][:lead]
-  other_count = counts_by_month[month][:other]
-  percentage = (lead_count == 0 || other_count == 0) ? 0 : (100 * (lead_count.to_f / other_count)).round
-  ["#{Date::MONTHNAMES[month.month]} #{month.year}", percentage]
-end.to_h
+d = [Date.new(24.months.ago.year, 24.months.ago.month, 1)]
+d << (d.last + 1.month) while d.last < Date.new(Date.today.year, Date.today.month, 1)
+organisation_id = Organisation.find_by(slug: ENV['LEAD_ORG_SLUG']).id
+data = d.map { |x|
+  start_time = x.to_time.utc
+  end_time = (x + 1.month).to_time.utc
+  lead_org_events_in_month = Event.and(organisation_id: organisation_id).and(:created_at.gte => start_time, :created_at.lt => end_time).count
+  other_events_in_month = Event.and(:organisation_id.ne => organisation_id).and(:created_at.gte => start_time, :created_at.lt => end_time).count
+  ["#{Date::MONTHNAMES[x.month]} #{x.year}", (lead_org_events_in_month == 0 || other_events_in_month == 0) ? 0 : (100*(lead_org_events_in_month.to_f/other_events_in_month)).round]
+}.to_h 
 %>
 <%= partial(:chart, locals: { unit_after: '%', data: data }) %>
