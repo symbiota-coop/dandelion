@@ -68,7 +68,7 @@ render_article("Trending events", "Create a two-paragraph summary of these trend
             <a class="text-dark" href="/u/<%= account.username %>"><%= account.name %></a>
           </h4>
           <div class="facilitator-info">
-            <%= cp(:'accounts/facilitator_info', key: "/facilitator_info?account_id=#{account.id}", locals: { account: account }) %>
+            <%= partial :'accounts/facilitator_info', locals: { account: account }) %>
           </div>
         </a>
       </div>
