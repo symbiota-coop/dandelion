@@ -73,7 +73,7 @@ class Organisation
   end
 
   def free_mailgun?
-    subscribed_accounts_count && subscribed_accounts_count <= 500 && pmails.and(:created_at.gte => 1.month.ago).count == 0
+    subscribed_accounts_count && subscribed_accounts_count <= 500 && !pmails.and(:sent_at.gte => 1.month.ago).exists?
   end
 
   def banned_emails_a
