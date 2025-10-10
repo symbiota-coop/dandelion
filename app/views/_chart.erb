@@ -15,15 +15,39 @@
       <%
         if !defined?(data)
           if !defined?(months_ago); months_ago = 12; end
-          earliest = countable.min(:created_at).to_date
-          d = [Date.new(earliest.year, earliest.month, 1) - 1.month]
-          if earliest < months_ago.months.ago
-            earliest = months_ago.months.ago
-            d = [Date.new(earliest.year, earliest.month, 1)]
+
+          # Start from months_ago instead of scanning entire collection
+          earliest = months_ago.months.ago.to_date
+          months = [Date.new(earliest.year, earliest.month, 1)]
+          months << (months.last + 1.month) while months.last < Date.new(Date.today.year, Date.today.month, 1)
+
+          # Build criteria with date range, then use MongoDB aggregation
+          range_start = months.first.to_time
+          range_end = (months.last + 1.month).to_time
+          criteria = countable.where(:created_at.gte => range_start, :created_at.lt => range_end)
+
+          # Use aggregation to group by month in a single query
+          results = criteria.collection.aggregate([
+            { '$match' => criteria.selector },
+            { '$group' => {
+                '_id' => {
+                  'year' => { '$year' => '$created_at' },
+                  'month' => { '$month' => '$created_at' }
+                },
+                'count' => { '$sum' => 1 }
+              }
+            }
+          ]).to_a
+
+          # Build lookup hash with default of 0 for missing months
+          counts_lookup = Hash.new(0)
+          results.each do |doc|
+            month_key = Date.new(doc['_id']['year'], doc['_id']['month'], 1)
+            counts_lookup[month_key] = doc['count']
           end
-          d << (d.last + 1.month) while d.last < Date.new(Date.today.year, Date.today.month, 1)
-          data = d.map do |x|
-            ["#{Date::MONTHNAMES[x.month]} #{x.year}", countable.and(:created_at.gte => x, :created_at.lt => (x + 1.month)).count]
+
+          data = months.map do |month|
+            ["#{Date::MONTHNAMES[month.month]} #{month.year}", counts_lookup[month]]
           end.to_h
         end
 
