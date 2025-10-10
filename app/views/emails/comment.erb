@@ -37,7 +37,7 @@
   <% close_divs << '</div>' %>
   <% } %>
   <%= close_divs %>
-  <p style="font-size: 13px">To continue the conversation, <a href="<%= comment.post.url %>?sign_in_token=%recipient.token%">view the post</a> or reply to this email.</p>
+  <p>To continue the conversation, <a href="<%= comment.post.url %>?sign_in_token=%recipient.token%">view the post</a> or reply to this email.</p>
 </div>
 <div class="footer">
   <a href="<%= ENV['BASE_URI'] %>/posts/<%= comment.post_id %>/unsubscribe?sign_in_token=%recipient.token%">

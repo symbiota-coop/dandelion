@@ -2,10 +2,10 @@
   <p>
     <strong><%= messenger.name %></strong> sent you a message via Dandelion.
   </p>
-  <p>
+  <blockquote>
     <%= message.body.gsub("\n", '<br />') %>
-  </p>
-  <p style="font-size: 13px"><a href="<%= ENV['BASE_URI'] %>/messages/<%= messenger.id %>">View message history</a></p>
+  </blockquote>
+  <p><a href="<%= ENV['BASE_URI'] %>/messages/<%= messenger.id %>">View message history</a></p>
 </div>
 <div class="footer">
   <a href="<%= ENV['BASE_URI'] %>/accounts/subscriptions?sign_in_token=%recipient.token%">Opt out of email notifications of messages</a>
