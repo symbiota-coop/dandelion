@@ -65,12 +65,15 @@ class EventFeedback
 
   def self.update_event_feedbacks_as_facilitator_counts
     Account.and(:event_feedbacks_as_facilitator_count.ne => nil).set(event_feedbacks_as_facilitator_count: nil)
+    event_tags_by_id = EventTag.pluck(:id, :name).to_h
     Account.and(:id.in => EventFacilitation.pluck(:account_id)).each do |account|
       # puts account.username
       account.set(event_feedbacks_as_facilitator_count: account.unscoped_event_feedbacks_as_facilitator.count)
       events = Event.past.and(:id.in => account.event_facilitations.pluck(:event_id))
-      event_tags = EventTag.and(:id.in => EventTagship.and(:event_id.in => events.pluck(:id)).pluck(:event_tag_id))
-      account.set(event_tag_names: event_tags.map(&:name))
+      event_tag_ids = EventTagship.and(:event_id.in => events.pluck(:id)).pluck(:event_tag_id)
+      tag_frequency = event_tag_ids.group_by(&:itself).transform_values(&:count)
+      event_tag_names = tag_frequency.sort_by { |_id, count| -count }.map { |id, _count| event_tags_by_id[id] }
+      account.set(event_tag_names: event_tag_names)
     end
   end
 
