@@ -22,7 +22,7 @@ Dandelion::App.controller do
     if params[:near]
       if params[:near] == 'online'
         @events = @events.online
-      elsif (@bounding_box = calculate_geographic_bounding_box(params[:near]))
+      elsif %w[north south east west].all? { |p| params[p].nil? } && (@bounding_box = calculate_geographic_bounding_box(params[:near]))
         @events = @events.and(coordinates: { '$geoWithin' => { '$box' => @bounding_box } })
       end
     end
@@ -38,9 +38,13 @@ Dandelion::App.controller do
                   @events.and(:id.in => EventTagship.and(:event_tag_id.in => event_tags.pluck(:id)).pluck(:event_id))
                 end
     end
-    unless params[:online] && params[:in_person]
-      @events = @events.online if params[:online]
-      @events = @events.in_person if params[:in_person]
+    if params[:online]
+      @events = @events.online
+      params[:in_person] = false
+    end
+    if params[:in_person]
+      @events = @events.in_person
+      params[:online] = false
     end
     @events = @events.and(monthly_donors_only: true) if params[:members_events]
     @events = @events.and(featured: true) if params[:featured]

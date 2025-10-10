@@ -19,7 +19,7 @@ Dandelion::App.controller do
               else
                 @events.order('start_time asc')
               end
-    @events = @events.and(coordinates: { '$geoWithin' => { '$box' => @bounding_box } }) if params[:near] && (@bounding_box = calculate_geographic_bounding_box(params[:near]))
+    @events = @events.and(coordinates: { '$geoWithin' => { '$box' => @bounding_box } }) if params[:near] && %w[north south east west].all? { |p| params[p].nil? } && (@bounding_box = calculate_geographic_bounding_box(params[:near]))
     @events = @events.and(:id.in => EventTagship.and(event_tag_id: params[:event_tag_id]).pluck(:event_id)) if params[:event_tag_id]
     %i[organisation activity local_group].each do |r|
       @events = @events.and("#{r}_id": params[:"#{r}_id"]) if params[:"#{r}_id"]
