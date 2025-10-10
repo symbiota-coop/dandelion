@@ -251,6 +251,9 @@ class Pmail
   end
 
   def send_batch_message(test_to: nil, check_already_sent: false)
+    # Early return if critical fields are missing
+    return nil if subject.blank? || from.blank? || body.blank?
+    
     pmail_links.destroy_all
     mailgun_sto = nil
 
@@ -302,7 +305,7 @@ class Pmail
 
     end
 
-    batch_message.subject(test_to ? "#{subject} [test sent #{Time.now}]" : subject)
+    batch_message.subject(test_to ? "#{subject || 'Untitled'} [test sent #{Time.now}]" : (subject || 'Untitled'))
     batch_message.body_html html
     batch_message.add_tag id
 
