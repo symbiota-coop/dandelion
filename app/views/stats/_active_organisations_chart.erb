@@ -1,10 +1,50 @@
 <%
-d = [Date.new(24.months.ago.year, 24.months.ago.month, 1)]
-d << (d.last + 1.month) while d.last < Date.new(Date.today.year, Date.today.month, 1)
-data = d.map { |x|
-  orders = Order.and(:created_at.gte => x, :created_at.lt => x + 1.month, :value.ne => nil)
-  organisations = Organisation.and(:id.in => Event.and(:id.in => orders.pluck(:event_id)).pluck(:organisation_id))
-  ["#{Date::MONTHNAMES[x.month]} #{x.year}", organisations.count]
-}.to_h
+# Build date range
+earliest = 24.months.ago.to_date
+months = [Date.new(earliest.year, earliest.month, 1)]
+months << (months.last + 1.month) while months.last < Date.new(Date.today.year, Date.today.month, 1)
+
+range_start = months.first.to_time
+range_end = (months.last + 1.month).to_time
+
+# Use aggregation to get distinct organisations per month in a single query
+results = Order.collection.aggregate([
+  { '$match' => { 'created_at' => { '$gte' => range_start, '$lt' => range_end }, 'value' => { '$ne' => nil } } },
+  { '$lookup' => {
+      'from' => 'events',
+      'localField' => 'event_id',
+      'foreignField' => '_id',
+      'as' => 'event'
+    }
+  },
+  { '$unwind' => '$event' },
+  { '$group' => {
+      '_id' => {
+        'year' => { '$year' => '$created_at' },
+        'month' => { '$month' => '$created_at' },
+        'organisation_id' => '$event.organisation_id'
+      }
+    }
+  },
+  { '$group' => {
+      '_id' => {
+        'year' => '$_id.year',
+        'month' => '$_id.month'
+      },
+      'count' => { '$sum' => 1 }
+    }
+  }
+]).to_a
+
+# Build lookup hash with default of 0 for missing months
+counts_lookup = Hash.new(0)
+results.each do |doc|
+  month_key = Date.new(doc['_id']['year'], doc['_id']['month'], 1)
+  counts_lookup[month_key] = doc['count']
+end
+
+data = months.map do |month|
+  ["#{Date::MONTHNAMES[month.month]} #{month.year}", counts_lookup[month]]
+end.to_h
 %>
 <%= partial(:chart, locals: { data: data }) %>
