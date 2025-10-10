@@ -52,6 +52,7 @@ module AccountFields
     field :youtube_video_url, type: String
     field :sent_first_event_email, type: Time
     field :event_feedbacks_as_facilitator_count, type: Integer
+    field :event_tags_joined, type: String
 
     %w[email_confirmed
        updated_profile
