@@ -1,9 +1,8 @@
 <%= partial :'facilitators/search_form' %>
 
 <% if params[:display] == 'map' %>
-  <%= partial :'maps/map', locals: { url: "/facilitators", fill_screen: true } %>
+  <%= partial :'maps/map', locals: { url: "/facilitators", bounding_box: @bounding_box&.flatten, fill_screen: true } %>
 <% else %>
-
   <ul class="search-result-list">
     <% @accounts.each { |account| %>
     <li>
@@ -15,5 +14,4 @@
   <div class="mt-3">
     <%= will_paginate @accounts, page_links: false, renderer: WillPaginate::ViewHelpers::BootstrapRenderer %>
   </div>
-
 <% end %>
