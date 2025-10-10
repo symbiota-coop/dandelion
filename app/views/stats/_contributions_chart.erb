@@ -1,0 +1,4 @@
+<% if (f = Fragment.find_by(key: 'monthly_contributions')) %>
+  <% data = JSON.parse(f.value).to_h %>
+  <%= partial(:chart, locals: { unit: '£', data: data, make_projection: true }) %>
+<% end %>
