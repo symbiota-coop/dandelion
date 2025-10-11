@@ -100,9 +100,9 @@
     <% end %>
   </div>
   <div id="get-tickets-sidebar" style="position: sticky; top: 3.75rem" class="d-none d-md-none">
-    <a href="javascript:;" onclick="$(window).scrollTop($('#purchase').offset()['top'] - $('#header').height() - 17)" class="btn btn-primary btn-block">
+    <a <% if @event.purchase_url %>target="_blank" href="<%= @event.purchase_url %>"<% else %>href="javascript:;" onclick="$(window).scrollTop($('#purchase').offset()['top'] - $('#header').height() - 17)"<% end %> class="btn btn-primary btn-block">
       <% if @event.purchase_url %>
-        <%= @event.rsvp_button_text || 'Get tickets' %>
+        <%= @event.rsvp_button_text || "Book via #{URI(@event.purchase_url).host.gsub('www.','')}" %>
       <% else %>
         Get tickets
       <% end %>
