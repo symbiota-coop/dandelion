@@ -302,7 +302,7 @@ class Pmail
           puts recipients.count
         end
       end
-    elsif organisation.free_mailgun?
+    elsif organisation.free_mailgun?(excluding_pmail: self)
       mg_client = Mailgun::Client.new ENV['MAILGUN_API_KEY'], ENV['MAILGUN_REGION']
       batch_message = Mailgun::BatchMessage.new(mg_client, ENV['MAILGUN_PMAILS_HOST'])
 

@@ -72,8 +72,10 @@ class Organisation
     CURRENCY_OPTIONS
   end
 
-  def free_mailgun?
-    organisationships.count <= ENV['MAILGUN_FREE_SUBSCRIBER_LIMIT'].to_i && !pmails.and(:mailable_type.ne => 'Event', :requested_send_at.gte => 1.month.ago).exists?
+  def free_mailgun?(excluding_pmail: nil)
+    pmails_scope = pmails.and(:mailable_type.ne => 'Event', :requested_send_at.gte => 1.month.ago)
+    pmails_scope = pmails_scope.and(:id.ne => excluding_pmail.id) if excluding_pmail
+    organisationships.count <= ENV['MAILGUN_FREE_SUBSCRIBER_LIMIT'].to_i && !pmails_scope.exists?
   end
 
   def mailgun_enabled?
