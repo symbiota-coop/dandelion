@@ -36,12 +36,6 @@ Dandelion::App.controller do
       @q = params[:q]
       @type = params[:type] || 'events'
 
-      referrer = request.referrer
-      if referrer.nil? || !URI.parse(referrer).host&.include?(request.host)
-        @resubmit_search = true
-        halt 403, erb(:search)
-      end
-
       if @q
         %w[gathering organisation event account].each do |t|
           next unless params[:q].starts_with?("#{t}:")

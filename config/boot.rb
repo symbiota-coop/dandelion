@@ -20,6 +20,16 @@ RackUserAgentThrottler.throttles = {
   'meta-webindexer/' => [
     '/o/the-psychedelic-society/events',
     '/o/the-psychedelic-society/events.ics'
+  ],
+  'bingbot/' => [
+    '/search',
+    '/events'
+  ],
+  'semrushbot/' => [
+    '/events'
+  ],
+  'barkrowler/' => [
+    '/events'
   ]
 }
 

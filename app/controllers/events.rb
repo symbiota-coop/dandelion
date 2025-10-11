@@ -7,12 +7,6 @@ Dandelion::App.controller do
     content_type = (parts = URI(request.url).path.split('.')
                     parts.length == 2 ? parts.last.to_sym : :html)
 
-    referrer = request.referrer
-    if content_type == :html && (referrer.nil? || !URI.parse(referrer).host&.include?(request.host))
-      @resubmit_search = true
-      halt 403, erb(:'events/events')
-    end
-
     @events = case params[:order]
               when 'created_at'
                 @events.order('created_at desc')
