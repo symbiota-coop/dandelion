@@ -17,8 +17,8 @@ module Dandelion
 
     use Rack::Session::Cookie, expire_after: 1.year.to_i, secret: ENV['SESSION_SECRET']
     use Rack::UTF8Sanitizer
-    use Rack::Attack
     use Rack::CrawlerDetect
+    use Rack::Attack
     use RackSessionAccess::Middleware if Padrino.env == :test
     use Dragonfly::Middleware
     use OmniAuth::Builder do
