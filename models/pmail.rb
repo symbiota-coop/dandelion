@@ -35,6 +35,7 @@ class Pmail
       subject: :text,
       from: :text,
       preview_text: :text,
+      gift: :check_box,
       body: :text_area,
       everyone: :check_box,
       monthly_donors: :check_box,
