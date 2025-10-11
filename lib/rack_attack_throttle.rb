@@ -2,7 +2,9 @@ require_relative 'mongo_store'
 
 Rack::Attack.cache.store = ActiveSupport::Cache::MongoStore.new(nil, collection: 'rack_attack_cache')
 
-BOT_USER_AGENT_PATTERNS = %w[bot/ crawler/ indexer/ barkrowler/].freeze
+BOT_USER_AGENT_PATTERNS = %w[
+  bot/ crawler/ /crawler indexer/ spider/ scraper/ spider-
+].freeze
 PROTECTED_PATH_PATTERNS = [%r{^/events$}, %r{^/search$}, %r{^/o/[a-z0-9-]+/events$}].freeze
 
 # Completely block bots that try to use q parameter on protected paths
