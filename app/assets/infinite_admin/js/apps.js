@@ -220,14 +220,27 @@ var handleHeaderSearchBar = function () {
     response: function () {
       $('.header-search-bar .right-icon').html('<i class="bi bi-x-lg"></i>')
     },
+    create: function () {
+      $(this).data('ui-autocomplete')._renderItem = function (ul, item) {
+        return $('<li>')
+          .append($('<a>').html(item.label).attr('data-value', item.value))
+          .appendTo(ul);
+      };
+    },
     select: function (event, ui) {
-      $('#header-search').val(ui.item.value);
       $('#header-search').closest('form').submit();
-    }
+      return false
+    },
   }).on('focus', function () {
     $(this).autocomplete('search');
   });
   $('#header-search').autocomplete('widget').addClass('search-bar-autocomplete animated fadeIn');
+
+  $(document).on('click', '.search-bar-autocomplete a', function (e) {
+    var value = $(this).attr('data-value');
+    $('#header-search').val(value);
+    $('#header-search').closest('form').submit();
+  });
 };
 
 
