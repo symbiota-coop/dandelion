@@ -7,6 +7,8 @@ module Dandelion
     helpers Activate::NavigationHelpers
 
     require 'sass/plugin/rack'
+    require 'rack/attack'
+    require_relative '../lib/rack_attack_throttle'
     Sass::Plugin.options[:template_location] = Padrino.root('app', 'assets', 'stylesheets')
     Sass::Plugin.options[:css_location] = Padrino.root('app', 'assets', 'stylesheets')
     use Sass::Plugin::Rack
