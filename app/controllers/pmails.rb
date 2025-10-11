@@ -118,6 +118,7 @@ Dandelion::App.controller do
 
   get '/pmails/:pmail_id/destroy' do
     @pmail = @pmails.find(params[:pmail_id]) || not_found
+    halt 403 if @pmail.sent_at
     @pmail.destroy
     if @organisation
       redirect "/o/#{@organisation.slug}/pmails"

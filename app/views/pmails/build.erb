@@ -71,9 +71,7 @@
     <% end %>
 
     <%= f.text_block :link_params %>
-    <% if @pmail.sent_at %>
-      <a data-confirm="Are you sure you want to delete this mail?" href="/pmails/<%= @pmail.id %>/destroy?<%= @scope %>" class="btn btn-danger">Delete</a>
-    <% else %>
+    <% if !@pmail.sent_at %>
       <%= f.submit_block destroy_url: "/pmails/#{@pmail.id}/destroy?#{@scope}", button_text: @pmail.new_record? ? 'Save and continue' : 'Save' %>
     <% end %>
 
