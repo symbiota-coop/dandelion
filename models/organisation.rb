@@ -202,7 +202,7 @@ class Organisation
       batch_message.add_recipient(:to, account.email, { 'firstname' => account.firstname || 'there', 'token' => account.sign_in_token, 'id' => account.id.to_s })
     end
 
-    batch_message.finalize if ENV['MAILGUN_API_KEY']
+    batch_message.finalize if Padrino.env == :production
     file.close
     file.unlink
   end

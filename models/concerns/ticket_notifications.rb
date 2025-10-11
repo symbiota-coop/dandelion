@@ -71,7 +71,7 @@ module TicketNotifications
       end
     end
 
-    batch_message.finalize if ENV['MAILGUN_API_KEY']
+    batch_message.finalize if Padrino.env == :production
 
     unless event.no_tickets_pdf
       tickets_pdf_file.close
@@ -98,7 +98,7 @@ module TicketNotifications
       batch_message.add_recipient(:to, account.email, { 'firstname' => account.firstname || 'there', 'token' => account.sign_in_token, 'id' => account.id.to_s })
     end
 
-    batch_message.finalize if ENV['MAILGUN_API_KEY']
+    batch_message.finalize if Padrino.env == :production
   end
 
   def send_resale_notification_to_previous_ticketholder(previous_account)
@@ -118,7 +118,7 @@ module TicketNotifications
       batch_message.add_recipient(:to, account.email, { 'firstname' => account.firstname || 'there', 'token' => account.sign_in_token, 'id' => account.id.to_s })
     end
 
-    batch_message.finalize if ENV['MAILGUN_API_KEY']
+    batch_message.finalize if Padrino.env == :production
   end
 
   def send_resale_notification_to_organiser(previous_account)
@@ -138,7 +138,7 @@ module TicketNotifications
       batch_message.add_recipient(:to, account.email, { 'firstname' => account.firstname || 'there', 'token' => account.sign_in_token, 'id' => account.id.to_s })
     end
 
-    batch_message.finalize if ENV['MAILGUN_API_KEY']
+    batch_message.finalize if Padrino.env == :production
   end
 
   def send_email_update_notification
@@ -161,6 +161,6 @@ module TicketNotifications
       batch_message.add_recipient(:to, account.email, { 'firstname' => account.firstname || 'there', 'token' => account.sign_in_token, 'id' => account.id.to_s })
     end
 
-    batch_message.finalize if ENV['MAILGUN_API_KEY']
+    batch_message.finalize if Padrino.env == :production
   end
 end

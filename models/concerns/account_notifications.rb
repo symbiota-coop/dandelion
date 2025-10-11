@@ -21,7 +21,7 @@ module AccountNotifications
       batch_message.add_recipient(:to, account.email, { 'firstname' => account.firstname || 'there' })
     end
 
-    batch_message.finalize if ENV['MAILGUN_API_KEY']
+    batch_message.finalize if Padrino.env == :production
     account.update_attribute(:sent_first_event_email, Time.now)
   end
 
@@ -39,7 +39,7 @@ module AccountNotifications
       batch_message.add_recipient(:to, account.email, { 'firstname' => account.firstname || 'there', 'token' => account.sign_in_token, 'id' => account.id.to_s })
     end
 
-    batch_message.finalize if ENV['MAILGUN_API_KEY']
+    batch_message.finalize if Padrino.env == :production
   end
 
   def send_confirmation_email
@@ -63,7 +63,7 @@ module AccountNotifications
                                   })
     end
 
-    batch_message.finalize if ENV['MAILGUN_API_KEY']
+    batch_message.finalize if Padrino.env == :production
   end
 
   def send_activation_notification
@@ -80,7 +80,7 @@ module AccountNotifications
       batch_message.add_recipient(:to, account.email, { 'firstname' => account.firstname || 'there', 'token' => account.sign_in_token, 'id' => account.id.to_s })
     end
 
-    batch_message.finalize if ENV['MAILGUN_API_KEY']
+    batch_message.finalize if Padrino.env == :production
   end
 
   def send_stripe_subscription_created_notification(subscription)
@@ -96,7 +96,7 @@ module AccountNotifications
       batch_message.add_recipient(:to, account.email, { 'firstname' => account.firstname || 'there', 'token' => account.sign_in_token, 'id' => account.id.to_s })
     end
 
-    batch_message.finalize if ENV['MAILGUN_API_KEY']
+    batch_message.finalize if Padrino.env == :production
   end
 
   def send_stripe_subscription_deleted_notification(subscription)
@@ -112,7 +112,7 @@ module AccountNotifications
       batch_message.add_recipient(:to, account.email, { 'firstname' => account.firstname || 'there', 'token' => account.sign_in_token, 'id' => account.id.to_s })
     end
 
-    batch_message.finalize if ENV['MAILGUN_API_KEY']
+    batch_message.finalize if Padrino.env == :production
   end
 
   def send_feedback_summary
@@ -129,6 +129,6 @@ module AccountNotifications
       batch_message.add_recipient(:to, account.email, { 'firstname' => account.firstname || 'there', 'token' => account.sign_in_token, 'id' => account.id.to_s })
     end
 
-    batch_message.finalize if ENV['MAILGUN_API_KEY']
+    batch_message.finalize if Padrino.env == :production
   end
 end

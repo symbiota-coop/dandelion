@@ -334,7 +334,7 @@ class Pmail
                                   })
     end
 
-    batch_message.finalize
+    batch_message.finalize if Padrino.env == :production
   end
 
   def duplicate!(account)

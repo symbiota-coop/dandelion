@@ -117,7 +117,7 @@ class TicketType
 
     batch_message.add_recipient(:to, email)
 
-    batch_message.finalize if ENV['MAILGUN_API_KEY']
+    batch_message.finalize if Padrino.env == :production
   end
   handle_asynchronously :send_payment_reminder
 
