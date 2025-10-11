@@ -16,23 +16,6 @@ Mongoid.raise_not_found_error = false
 
 Padrino.load!
 
-RackUserAgentThrottler.throttles = {
-  'meta-webindexer/' => [
-    '/o/the-psychedelic-society/events',
-    '/o/the-psychedelic-society/events.ics'
-  ],
-  'bingbot/' => [
-    '/search',
-    '/events'
-  ],
-  'semrushbot/' => [
-    '/events'
-  ],
-  'barkrowler/' => [
-    '/events'
-  ]
-}
-
 OmniAuth.config.allowed_request_methods = [:get]
 OmniAuth.config.logger = Logger.new(IO::NULL)
 
