@@ -126,7 +126,7 @@
           <% else %>
             <% if !@organisation.payment_method? %>
               <div class="alert alert-warning">
-                <p class="m-0"><i class="bi bi-exclamation-triangle-fill"></i> To accept payments, you must add either Stripe or Coinbase Commerce details.</p>
+                <p class="m-0"><i class="bi bi-exclamation-triangle-fill"></i> To accept payments, you must add details for at least one payment processor.</p>
               </div>
             <% end %>
           <% end %>

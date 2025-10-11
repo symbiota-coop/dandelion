@@ -200,7 +200,7 @@
       <div role="tabpanel" class="tab-pane" id="tab-payments">
         <% if !@gathering.stripe_sk && !@gathering.coinbase_api_key %>
           <div class="alert alert-warning">
-            <p class="m-0"><i class="bi bi-exclamation-triangle-fill"></i> To accept payments, you must add either Stripe or Coinbase Commerce details.</p>
+            <p class="m-0"><i class="bi bi-exclamation-triangle-fill"></i> To accept payments, you must add details for at least one payment processor.</p>
           </div>
         <% end %>
         <div class="card mb-3">
