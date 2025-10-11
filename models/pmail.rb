@@ -71,6 +71,9 @@ class Pmail
   before_validation do
     errors.add(:link_params, 'cannot contain spaces') if link_params && link_params.include?(' ')
 
+    self.will_send_at = nil if will_send_at && will_send_at < Time.now
+    self.will_send_at = nil if mailable.is_a?(Event) || !organisation.mailgun_api_key
+
     if to_option
       self.everyone = nil
       self.monthly_donors = nil

@@ -79,16 +79,15 @@ Dandelion::App.controller do
         flash[:notice] = 'Test sent.'
         redirect "/pmails/#{@pmail.id}/edit?#{@scope}"
       elsif params[:send] || params[:send_later]
+        @pmail.delayed_jobs.destroy_all
         if params[:send] && !@pmail.requested_send_at
           @pmail.update_attribute(:will_send_at, nil)
           @pmail.update_attribute(:requested_send_at, Time.now)
-          @pmail.delayed_jobs.destroy_all
           @pmail.delay.send_pmail
           flash[:notice] = 'Sent!'
         elsif params[:send_later] && @pmail.will_send_at
-          @pmail.delayed_jobs.destroy_all
           @pmail.delay(run_at: @pmail.will_send_at).send_pmail
-          flash[:notice] = 'Sent!'
+          flash[:notice] = 'Scheduled!'
         end
         if @organisation
           redirect "/o/#{@organisation.slug}/pmails"
