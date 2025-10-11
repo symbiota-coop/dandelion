@@ -385,3 +385,6 @@ class Pmail
     }[attr.to_sym] || super
   end
 end
+
+# Fix for DelayedJob serialization issue where 'Pm' is referenced instead of 'Pmail'
+Pm = Pmail
