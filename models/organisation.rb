@@ -73,9 +73,7 @@ class Organisation
   end
 
   def free_mailgun?
-    organisationships.count <= ENV['MAILGUN_FREE_SUBSCRIBER_LIMIT'].to_i &&
-      !pmails.and(:mailable_type.ne => 'Event', :requested_send_at.gte => 1.month.ago).exists? &&
-      !pmails.and(:mailable_type.ne => 'Event', :will_send_at.gte => 1.month.ago).exists?
+    organisationships.count <= ENV['MAILGUN_FREE_SUBSCRIBER_LIMIT'].to_i && !pmails.and(:mailable_type.ne => 'Event', :requested_send_at.gte => 1.month.ago).exists?
   end
 
   def mailgun_enabled?
