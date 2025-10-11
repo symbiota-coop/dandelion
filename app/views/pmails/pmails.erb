@@ -18,7 +18,7 @@
   </div>
 <% end %>
 
-<% if @organisation %>
+<% if @organisation && @organisation.pmails.exists? %>
   <div class="search well mt-3">
     <% form_tag '', method: 'get', class: 'submitOnChange searchForm mb-3' do %>
       <%= hidden_field_tag :order, value: params[:order] %>

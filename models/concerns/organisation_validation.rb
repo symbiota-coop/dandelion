@@ -13,10 +13,7 @@ module OrganisationValidation
         send("#{f}=", send(f).strip) if send(f)
       end
 
-      self.subscribed_accounts_count = 0 if new_record?
-      self.followers_count = 0 if new_record?
       self.paid_up = true if new_record?
-
       self.currency = 'GBP' unless currency
       %w[ticket_email_title ticket_email_greeting recording_email_title recording_email_greeting reminder_email_title reminder_email_body feedback_email_title feedback_email_body].each do |f|
         send("#{f}=", send("#{f}_default")) unless send(f)
