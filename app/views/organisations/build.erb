@@ -213,12 +213,13 @@
         <div role="tabpanel" class="tab-pane <%= 'active' if params[:tab] == 'mailgun'%>" id="tab-mailgun">
           <% if !@organisation.mailgun_enabled? %>
             <div class="alert alert-warning">
-              <p class="m-0">
-                <i class="bi bi-exclamation-triangle-fill"></i>
+              <p>
                 If you'd like to use Dandelion's mailer to email everyone following your organisation,
                 or people following your organisation's activities and local groups,
                 you'll need to link a <a class="text-warning text-underline" href="https://www.mailgun.com/pricing/">paid Mailgun account</a>.
-                (You can email event attendees without providing these details.)
+              </p>
+              <p class="m-0">
+                (We offer 1 free email per month for up to <%=ENV['MAILGUN_FREE_SUBSCRIBER_LIMIT'].to_i%> subscribers, and you can always email event attendees even without providing these details.)
               </p>
             </div>
           <% end %>
