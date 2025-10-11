@@ -231,6 +231,11 @@ Dandelion::App.controller do
       @order.notify_of_failed_purchase(e)
       @order.destroy
       halt 400
+    rescue GoCardlessPro::PermissionError => e
+      @order.event.set(locked: true)
+      @order.notify_of_failed_purchase(e)
+      @order.destroy
+      halt 400
     rescue StandardError => e
       Honeybadger.context({ order_id: @order.id })
       Honeybadger.notify(e)
