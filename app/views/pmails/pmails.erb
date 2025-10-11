@@ -11,7 +11,7 @@
   <a href="/pmails/new?<%= @scope %>" class="btn btn-primary"><i class="bi bi-pencil-fill"></i> New message</a>
 <% else %>
   <div class="alert alert-warning">
-    You've exceeded the free limit of 1 email per month for up to <%=ENV['MAILGUN_FREE_SUBSCRIBER_LIMIT'].to_i%> subscribers. <a class="text-warning text-underline" href="/o/<%=@_organisation.slug%>/edit">Link a Mailgun account to continue</a>
+    You've used your free gift of 1 email per month for up to <%=ENV['MAILGUN_FREE_SUBSCRIBER_LIMIT'].to_i%> subscribers. <a class="text-warning text-underline" href="/o/<%=@_organisation.slug%>/edit">Link a Mailgun account to continue</a>
   </div>
 <% end %>
 
