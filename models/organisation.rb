@@ -73,7 +73,11 @@ class Organisation
   end
 
   def free_mailgun?
-    subscribed_accounts_count && subscribed_accounts_count <= 500 && !pmails.and(:sent_at.gte => 1.month.ago).exists?
+    subscribed_accounts_count && subscribed_accounts_count <= ENV['FREE_MAILGUN_SUBSCRIBER_LIMIT'].to_i && !pmails.and(:mailable_type.ne => 'Event', :requested_send_at.gte => 1.month.ago).exists?
+  end
+
+  def mailgun_enabled?
+    mailgun_api_key || free_mailgun?
   end
 
   def banned_emails_a

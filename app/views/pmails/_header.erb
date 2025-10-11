@@ -6,7 +6,7 @@
           Sending completed at <%= @pmail.sent_at %>.
         </p>
       </div>
-      <% unless @pmail.mailable.is_a?(Event) %>
+      <% if !@pmail.mailable.is_a?(Event) && @pmail.organisation.mailgun_api_key %>
         <div class="col-auto">
           <a class="btn btn-primary mb-1" target="_blank" href="<%=@pmail.mailgun_url%>">
             <i class="bi bi-bar-chart-line-fill"></i>
@@ -15,7 +15,7 @@
         </div>
       <% end %>
     </div>
-    <% unless @pmail.mailable.is_a?(Event) %>
+    <% if !@pmail.mailable.is_a?(Event) && @pmail.organisation.mailgun_api_key %>
       <% if @pmail.metrics %>
         <table class="table">
           <% 
@@ -41,7 +41,9 @@
     <% end %>
     <div class="mb-3">
       <a class="btn btn-primary mb-1" href="/pmails/<%=@pmail.id%>" target="_blank">View</a>
-      <button type="submit" name="duplicate" value="1" class="btn btn-primary mb-1">Duplicate</button>
+      <% if @pmail.sendable? %>
+        <button type="submit" name="duplicate" value="1" class="btn btn-primary mb-1">Duplicate</button>
+      <% end %>
     </div>
   <% elsif @pmail.requested_send_at %>
     <p class="lead">Queued for sending at <%= @pmail.requested_send_at %></p>
@@ -54,10 +56,12 @@
       <div>
         <button type="submit" name="default" style="overflow: visible !important; height: 0 !important; width: 0 !important; margin: 0 !important; border: 0 !important; padding: 0 !important; display: block !important;" value="1"></button>
         <button type="submit" name="preview" value="1" class="btn btn-primary mb-1">Preview</button>
-        <button type="submit" name="send_test" value="1" class="btn btn-primary mb-1">Send test to <%= current_account.email %></button>
-        <button type="submit" name="send" value="1" class="btn btn-primary mb-1" data-confirm="Are you sure you want to send this mail to <%= pluralize(@pmail.send_count, 'person') %>?">Send</button>
-        <a href="javascript:;" onclick="$(this).parent().hide(); $('#send_later').show().find('input').attr('required', true); " class="btn btn-primary mb-1">Send later</a>
-        <button type="submit" name="duplicate" value="1" class="btn btn-outline-primary mb-1">Duplicate</button>
+        <% if @pmail.sendable? %>
+          <button type="submit" name="send_test" value="1" class="btn btn-primary mb-1">Send test to <%= current_account.email %></button>
+          <button type="submit" name="send" value="1" class="btn btn-primary mb-1" data-confirm="Are you sure you want to send this mail to <%= pluralize(@pmail.send_count, 'person') %>?">Send</button>
+          <a href="javascript:;" onclick="$(this).parent().hide(); $('#send_later').show().find('input').attr('required', true); " class="btn btn-primary mb-1">Send later</a>
+          <button type="submit" name="duplicate" value="1" class="btn btn-outline-primary mb-1">Duplicate</button>
+        <% end %>
       </div>
 
       <div id="send_later" style="display: none">

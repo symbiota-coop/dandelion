@@ -7,10 +7,12 @@
 <% elsif @event %>
   <%= partial :'events/nav', locals: { event: @event } %>
 <% end %>
-<% if Padrino.env == :test || @event || @_organisation.mailgun_api_key || (@_organisation.free_mailgun?) %>
+<% if Padrino.env == :test || @event || @_organisation.mailgun_enabled? %>
   <a href="/pmails/new?<%= @scope %>" class="btn btn-primary"><i class="bi bi-pencil-fill"></i> New message</a>
 <% else %>
-  <a href="/o/<%=@_organisation.slug%>/edit">Link a Mailgun account to get started</a>
+  <div class="alert alert-warning">
+    You've exceeded the free limit of 1 email per month for up to <%=ENV['FREE_MAILGUN_SUBSCRIBER_LIMIT'].to_i%> subscribers. <a class="text-warning text-underline" href="/o/<%=@_organisation.slug%>/edit">Link a Mailgun account to continue</a>
+  </div>
 <% end %>
 
 <% if @organisation %>

@@ -211,7 +211,7 @@
           <%= f.check_box_block :send_ticket_emails_from_organisation %>
         </div>
         <div role="tabpanel" class="tab-pane <%= 'active' if params[:tab] == 'mailgun'%>" id="tab-mailgun">
-          <% if !@organisation.mailgun_api_key %>
+          <% if !@organisation.mailgun_enabled? %>
             <div class="alert alert-warning">
               <p class="m-0">
                 <i class="bi bi-exclamation-triangle-fill"></i>

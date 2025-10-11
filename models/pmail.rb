@@ -170,6 +170,10 @@ class Pmail
     end
   end
 
+  def sendable?
+    mailable.is_a?(Event) || organisation.mailgun_api_key || organisation.free_mailgun?
+  end
+
   def event_emails
     emails = to_with_unsubscribes.pluck(:email)
     emails += mailable.tickets.complete.and(:email.ne => nil).reject { |ticket| emails.include?(ticket.email) }.map(&:email)
