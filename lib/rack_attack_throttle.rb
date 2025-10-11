@@ -10,12 +10,10 @@ PROTECTED_PATH_PATTERNS = [%r{^/search$}, %r{^/events$}, %r{^/events\.ics$}, %r{
 bot_request = ->(request) { request.user_agent && BOT_USER_AGENT_PATTERNS.any? { |pattern| request.user_agent.downcase.include?(pattern) } }
 protected_path = ->(request) { PROTECTED_PATH_PATTERNS.any? { |pattern| request.path.match?(pattern) } }
 
-# Completely block bots that try to use q parameter on protected paths
-Rack::Attack.blocklist('block bots using q param on protected paths') do |request|
+Rack::Attack.blocklist('crawlers on protected paths using q param') do |request|
   bot_request.call(request) && protected_path.call(request) && request.params['q']
 end
 
-# Throttle other bot/crawler requests to protected paths
-Rack::Attack.throttle('bots and crawlers', limit: 1, period: 1.minute) do |request|
+Rack::Attack.throttle('crawlers on protected paths', limit: 1, period: 1.minute) do |request|
   request.user_agent if bot_request.call(request) && protected_path.call(request)
 end
