@@ -11,7 +11,7 @@
   <a href="/pmails/new?<%= @scope %>" class="btn btn-primary"><i class="bi bi-pencil-fill"></i> New message</a>
 <% elsif !@_organisation.mailgun_api_key %>
   <div class="alert alert-warning">
-    <% if pmails.and(:mailable_type.ne => 'Event', :requested_send_at.gte => 1.month.ago).exists? %>
+    <% if @_organsation.pmails.and(:mailable_type.ne => 'Event', :requested_send_at.gte => 1.month.ago).exists? %>
       You've used your free gift of 1 email per month for up to <%=ENV['MAILGUN_FREE_SUBSCRIBER_LIMIT'].to_i%> subscribers.        
     <% end %>
     <a class="text-warning text-underline" href="/o/<%=@_organisation.slug%>/edit">Link a Mailgun account to continue</a>
