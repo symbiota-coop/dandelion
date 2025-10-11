@@ -150,6 +150,7 @@ class Organisationship
   end
 
   def send_welcome(force: false)
+    return unless organisation.mailgun_api_key
     return if sent_welcome && !force
     return unless organisation.welcome_from && organisation.welcome_subject
 
@@ -205,6 +206,7 @@ class Organisationship
   end
 
   def send_monthly_donation_welcome(force: false)
+    return unless organisation.mailgun_api_key
     return if sent_monthly_donation_welcome && !force
     return unless organisation.monthly_donation_welcome_from && organisation.monthly_donation_welcome_subject
 

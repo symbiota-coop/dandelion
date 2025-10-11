@@ -1,5 +1,11 @@
 <%= partial :'organisations/nav', locals: { organisation: @organisation } %>
 
+<% if !@organisation.mailgun_api_key %>
+  <div class="alert alert-warning">
+    <a class="text-warning text-underline" href="/o/<%=@organisation.slug%>/edit">Link a Mailgun account</a> to enable welcome emails.
+  </div>
+<% end %>
+
 <% form_for @organisation, "/o/#{@organisation.slug}/emails" do |f| %>
   <div class="nav-wrapper">
     <ul class="nav nav-tabs" role="tablist">
