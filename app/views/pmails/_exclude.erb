@@ -23,7 +23,7 @@
       <small>Exclude people attending an event</small>
     </a>
     <div id="exclude-event" style="display: none">
-      <%= f.select_block :event_id, options: ([''] + @organisation.events_including_cohosted.live.map { |event| [event.summary, event.id] }), selected: @pmail.event_id %>
+      <%= f.select_block :event_id, options: ([''] + @organisation.events_including_cohosted.map { |event| [event.summary, event.id] }), selected: @pmail.event_id %>
     </div>
     <span class="exclude-separator">&middot;</span>
     <a id="exclude-activity-btn" class="mb-3" href="javascript:;" style="display: inline-block" onclick="$(this).hide().next().show();
