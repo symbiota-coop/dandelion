@@ -25,7 +25,7 @@
     <tr>
       <td><%= payment.account.name %></td>
       <td><%= m payment.amount, payment.currency %></td>
-      <td><%= payment.created_at %></td>
+      <td data-sort="<%=payment.created_at.to_fs(:db_local)%>"><%= payment.created_at %></td>
       <td>
         <% if payment.membership %>
           <i class="bi bi-check-lg"></i>
