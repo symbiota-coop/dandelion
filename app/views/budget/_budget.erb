@@ -47,7 +47,7 @@
         <th style="width: 50%"></th>
         <th>
           <%= m @gathering.memberships.pluck(:paid).compact.sum, @gathering.currency %>
-          (<%= m @gathering.processed_via_dandelion, @gathering.currency %> processed via Dandelion)
+          <a href="/g/<%= @gathering.slug %>/payments">(<%= m @gathering.processed_via_dandelion, @gathering.currency %> processed via Dandelion)</a>
         </th>
       </tr>
     </table>

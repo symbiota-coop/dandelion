@@ -1,0 +1,33 @@
+<%= partial :'gatherings/nav', locals: { gathering: @gathering, membership: @membership } %>
+
+<script>
+  $(function() {
+    $('#payments').DataTable({
+      paging: false,
+      searching: false,
+      bInfo: false,
+      order: [[2, 'desc']]
+    });
+  });
+</script>
+
+<table class="table" id="payments">
+  <thead>
+    <tr>
+      <th>Paid by</th>
+      <th>Amount</th>
+      <th>Date</th>
+      <th>Still a member?</th>
+    </tr>
+  </thead>
+  <tbody>
+    <% @gathering.payments.and(membership: nil).each { |payment| %>
+    <tr>
+      <td><%= payment.account.name %></td>
+      <td><%= m payment.amount, payment.currency %></td>
+      <td><%= payment.created_at %></td>
+      <td><%= '<i class="bi bi-check-lg"></i>' if payment.membership %></td>
+    </tr>
+    <% } %>
+  </tbody>
+</table>

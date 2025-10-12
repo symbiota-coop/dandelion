@@ -70,4 +70,11 @@ Dandelion::App.controller do
     @team.update_attribute(:budget, params[:budget])
     200
   end
+
+  get '/g/:slug/payments' do
+    @gathering = Gathering.find_by(slug: params[:slug]) || not_found
+    @membership = @gathering.memberships.find_by(account: current_account)
+    confirmed_membership_required!
+    erb :'budget/payments'
+  end
 end
