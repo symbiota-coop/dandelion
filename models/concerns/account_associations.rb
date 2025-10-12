@@ -165,7 +165,7 @@ module AccountAssociations
       cache.reload
     end
 
-    Notification.all.or(
+    Notification.or(
       { :circle_type => 'Gathering', :circle_id.in => cache.gathering_ids },
       { :circle_type => 'Account', :circle_id.in => cache.account_ids },
       { :circle_type => 'Activity', :circle_id.in => cache.activity_ids },
@@ -184,7 +184,7 @@ module AccountAssociations
   end
 
   def messages
-    Message.all.or({ messenger: self }, { messengee: self })
+    Message.or({ messenger: self }, { messengee: self })
   end
 
   def upcoming_events

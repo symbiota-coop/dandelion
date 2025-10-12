@@ -6,7 +6,7 @@
 </div>
 <div id="thread-scroll">
   <ul class="widget-chat p-1">
-    <% messages = Message.all.or({ messenger: current_account, messengee_id: @account }, { messenger: @account, messengee_id: current_account }).order('created_at asc') %>
+    <% messages = Message.or({ messenger: current_account, messengee_id: @account }, { messenger: @account, messengee_id: current_account }).order('created_at asc') %>
     <% messages.each_with_index { |message,i| %>
     <% if message.messenger_id == @account.id %>
       <li>
