@@ -26,7 +26,11 @@
       <td><%= payment.account.name %></td>
       <td><%= m payment.amount, payment.currency %></td>
       <td><%= payment.created_at %></td>
-      <td><%== '<i class="bi bi-check-lg"></i>' if payment.membership %></td>
+      <td>
+        <% if payment.membership %>
+          <i class="bi bi-check-lg"></i>
+        <% end %>
+      </td>
     </tr>
     <% } %>
   </tbody>
