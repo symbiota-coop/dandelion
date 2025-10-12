@@ -8,8 +8,8 @@ PROTECTED_PATH_PATTERNS = [%r{^/search$}, %r{^/events$}, %r{^/events\.ics$}, %r{
 bot_request = ->(request) { request.user_agent && BOT_USER_AGENT_PATTERNS.any? { |pattern| request.user_agent.downcase.include?(pattern) } }
 protected_path = ->(request) { PROTECTED_PATH_PATTERNS.any? { |pattern| request.path.match?(pattern) } }
 
-Rack::Attack.blocklist('block bots on protected paths using q param') do |request|
-  bot_request.call(request) && protected_path.call(request) && request.params['q']
+Rack::Attack.blocklist('block bots on protected paths using search') do |request|
+  bot_request.call(request) && protected_path.call(request) && (request.params['q'] || request.params['search'])
 end
 
 Rack::Attack.throttle('throttle bots on protected paths', limit: 1, period: 1.minute) do |request|
@@ -17,7 +17,7 @@ Rack::Attack.throttle('throttle bots on protected paths', limit: 1, period: 1.mi
 end
 
 Rack::Attack.blocklist('js redirect') do |request|
-  protected_path.call(request) && request.params['q'] && request.referer.nil?
+  protected_path.call(request) && (request.params['q'] || request.params['search']) && request.referer.nil?
 end
 
 Rack::Attack.blocklisted_responder = lambda do |request|
