@@ -24,7 +24,8 @@ end
 
 Rack::Attack.blocklisted_responder = lambda do |request|
   if request.env['rack.attack.matched'] == 'js redirect'
-    [403, { 'Content-Type' => 'text/html' }, ["<script>window.location = '#{request.env['REQUEST_URI']}';</script>"]]
+    escaped_uri = request.env['REQUEST_URI'].to_json
+    [403, { 'Content-Type' => 'text/html' }, ["<script>window.location = #{escaped_uri};</script>"]]
   else
     [403, {}, ['Forbidden']]
   end
