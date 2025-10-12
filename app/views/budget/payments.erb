@@ -21,7 +21,7 @@
     </tr>
   </thead>
   <tbody>
-    <% @gathering.payments.and(membership: nil).each { |payment| %>
+    <% @gathering.payments.each { |payment| %>
     <tr>
       <td><%= payment.account.name %></td>
       <td><%= m payment.amount, payment.currency %></td>
