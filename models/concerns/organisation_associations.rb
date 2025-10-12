@@ -59,7 +59,7 @@ module OrganisationAssociations
     cohost_featured_events = Event.live.future_and_current.and(:image_uid.ne => nil).and(:id.in => featured_cohostship_event_ids)
 
     # Combine both sets of events and limit to 20, then reject sold out events
-    Event.and(:id.in => primary_host_featured_events.pluck(:id) + cohost_featured_events.pluck(:id)).limit(20).reject(&:sold_out?)
+    Event.and(:id.in => primary_host_featured_events.pluck(:id) + cohost_featured_events.pluck(:id)).order('start_time asc').limit(20).reject(&:sold_out?)
   end
 
   def contributable_events
