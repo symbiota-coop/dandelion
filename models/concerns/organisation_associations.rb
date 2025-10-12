@@ -50,24 +50,13 @@ module OrganisationAssociations
     Event.and(:id.in => events.pluck(:id) + cohostships.pluck(:event_id))
   end
 
-  def events_for_search(include_locked: false, include_secret: false, include_all_local_group_events: false)
-    events_for_search = Event.and(:id.in =>
-        events.and(local_group_id: nil).pluck(:id) +
-        events.and(:local_group_id.ne => nil, :locked => true).pluck(:id) +
-        (include_all_local_group_events ? events.and(:local_group_id.ne => nil).pluck(:id) : events.and(:local_group_id.ne => nil, :include_in_parent => true).pluck(:id)) +
-        cohostships.pluck(:event_id))
-    events_for_search = events_for_search.live unless include_locked
-    events_for_search = events_for_search.public unless include_secret
-    events_for_search
-  end
-
   def featured_events
     # Get events where this organisation is the primary host and event.featured = true
-    primary_host_featured_events = events_for_search.future_and_current.and(:locked.ne => true).and(:image_uid.ne => nil).and(featured: true).and(organisation_id: id)
+    primary_host_featured_events = events_including_cohosted.live.future_and_current.and(:locked.ne => true).and(:image_uid.ne => nil).and(featured: true).and(organisation_id: id)
 
     # Get events where this organisation is a featured cohost (cohostship.featured = true)
     featured_cohostship_event_ids = cohostships.and(featured: true).pluck(:event_id)
-    cohost_featured_events = events_for_search.future_and_current.and(:locked.ne => true).and(:image_uid.ne => nil).and(:id.in => featured_cohostship_event_ids)
+    cohost_featured_events = events_including_cohosted.live.future_and_current.and(:locked.ne => true).and(:image_uid.ne => nil).and(:id.in => featured_cohostship_event_ids)
 
     # Combine both sets of events and limit to 20, then reject sold out events
     Event.and(:id.in => primary_host_featured_events.pluck(:id) + cohost_featured_events.pluck(:id)).limit(20).reject(&:sold_out?)

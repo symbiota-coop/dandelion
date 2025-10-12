@@ -72,7 +72,6 @@ module EventValidation
         zoom_party: false,
         monthly_donors_only: false,
         no_discounts: false,
-        include_in_parent: false,
         affiliate_credit_percentage: organisation.try(:affiliate_credit_percentage),
         featured: false,
         show_emails: false,

@@ -238,7 +238,6 @@ $(function () {
     $('input[name="event[zoom_party]"]').prop('disabled', true)
     $('input[name="event[monthly_donors_only]"]').prop('disabled', true)
     $('input[name="event[no_discounts]"]').prop('disabled', true)
-    $('input[name="event[include_in_parent]"]').prop('disabled', true)
     $('input[name="event[affiliate_credit_percentage]"]').prop('disabled', true)
     $('input[name="event[featured]"]').prop('disabled', true)
     $('input[name="event[show_emails]"]').prop('disabled', true)

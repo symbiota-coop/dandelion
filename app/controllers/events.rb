@@ -116,7 +116,6 @@ Dandelion::App.controller do
       @event.opt_in_organisation = true
       @event.opt_in_facilitator = true
       @event.ask_hear_about = true
-      @event.include_in_parent = true if organisation_admin?(@event.organisation)
       erb :'events_build/build'
     end
   end

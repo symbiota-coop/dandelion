@@ -93,9 +93,9 @@
       <% n = 1; events = [];
       if @event.organisation
         future_events = if @event.match_phrase
-          @event.organisation.events_for_search.future.and(:id.in => Event.search(@event.match_phrase), :start_time.ne => @event.start_time)
+          @event.organisation.events_including_cohosted.live.future.and(:id.in => Event.search(@event.match_phrase), :start_time.ne => @event.start_time)
         else
-          @event.organisation.events_for_search.future.and(:name => @event.name, :location => @event.location, :start_time.ne => @event.start_time)
+          @event.organisation.events_including_cohosted.live.future.and(:name => @event.name, :location => @event.location, :start_time.ne => @event.start_time)
         end
         events = ([@event] + future_events).uniq
         n = events.count

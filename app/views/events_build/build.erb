@@ -288,7 +288,6 @@
         <%= f.check_box_block :show_emails %>
         <%= f.check_box_block :opt_in_organisation %>
         <%= f.check_box_block :opt_in_facilitator %>
-        <%= f.check_box_block :include_in_parent %>
         <%= f.check_box_block :refund_deleted_orders %>
         <% if !@event.organisation.stripe_client_id %>
           <%= f.text_area_block :notes %>

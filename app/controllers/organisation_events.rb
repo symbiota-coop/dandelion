@@ -1,14 +1,14 @@
 Dandelion::App.controller do
   get '/o/:slug/events_block' do
     @organisation = Organisation.find_by(slug: params[:slug]) || not_found
-    @events = @organisation.events_for_search(include_locked: true, include_all_local_group_events: (true if params[:local_group_id])).future_and_current
+    @events = @organisation.events_including_cohosted.future_and_current
     @events = @events.and(monthly_donors_only: true) if params[:members_events]
     partial :'organisations/events_block'
   end
 
   get '/o/:slug/events', provides: %i[html ics json] do
     @organisation = Organisation.find_by(slug: params[:slug]) || not_found
-    @events = @organisation.events_for_search(include_locked: true, include_all_local_group_events: (true if params[:local_group_id]))
+    @events = @organisation.events_including_cohosted
     @from = params[:from] ? parse_date(params[:from]) : Date.today
     @to = params[:to] ? parse_date(params[:to]) : nil
     @events = case params[:order]
