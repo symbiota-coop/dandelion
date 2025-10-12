@@ -51,14 +51,11 @@ module OrganisationAssociations
   end
 
   def featured_events
-    # Get events where this organisation is the primary host and event.featured = true
     primary_host_featured_events = events.live.future_and_current.and(:image_uid.ne => nil).and(featured: true)
 
-    # Get events where this organisation is a featured cohost (cohostship.featured = true)
     featured_cohostship_event_ids = cohostships.and(featured: true).pluck(:event_id)
     cohost_featured_events = Event.live.future_and_current.and(:image_uid.ne => nil).and(:id.in => featured_cohostship_event_ids)
 
-    # Combine both sets of events and limit to 20, then reject sold out events
     Event.and(:id.in => primary_host_featured_events.pluck(:id) + cohost_featured_events.pluck(:id)).order('start_time asc').limit(20).reject(&:sold_out?)
   end
 
