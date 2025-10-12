@@ -72,6 +72,10 @@ class Organisation
     CURRENCY_OPTIONS
   end
 
+  def self.lead
+    find_by(slug: ENV['LEAD_ORG_SLUG'])
+  end
+
   def free_mailgun?(excluding_pmail: nil)
     pmails_scope = pmails.and(:mailable_type.ne => 'Event', :requested_send_at.gte => 1.month.ago)
     pmails_scope = pmails_scope.and(:id.ne => excluding_pmail.id) if excluding_pmail
