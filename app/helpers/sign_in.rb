@@ -6,7 +6,7 @@ Dandelion::App.helpers do
       account.update_attribute(:failed_sign_in_attempts, 0)
       account.sign_ins.create(env: env_yaml, skip_increment: %w[unsubscribe give_feedback subscriptions].any? { |p| request.path.include?(p) })
       if account.sign_ins_count == 1
-        account.set(email_confirmed: true)
+        account.update_attribute(:email_confirmed, true)
         account.send_activation_notification
       end
       session[:account_id] = account.id.to_s

@@ -227,7 +227,7 @@ Dandelion::App.controller do
         { order_id: @order.id.to_s }.to_json
       end
     rescue Stripe::InvalidRequestError => e
-      @order.event.set(locked: true)
+      @order.event.update_attribute(:locked, true)
       @order.notify_of_failed_purchase(e)
       @order.destroy
       halt 400

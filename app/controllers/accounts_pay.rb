@@ -10,7 +10,7 @@ Dandelion::App.controller do
     when 'checkout.session.completed'
       session = event['data']['object']
       if (account_contribution = AccountContribution.find_by(session_id: session.id))
-        account_contribution.set(payment_completed: true)
+        account_contribution.update_attribute(:payment_completed, true)
         account_contribution.send_notification
       end
     when 'customer.subscription.created'
@@ -49,7 +49,7 @@ Dandelion::App.controller do
     end
 
     if event.type == 'charge:confirmed' && event.data.respond_to?(:checkout) && (account_contribution = AccountContribution.find_by(coinbase_checkout_id: event.data.checkout.id))
-      account_contribution.set(payment_completed: true)
+      account_contribution.update_attribute(:payment_completed, true)
     end
     halt 200
   end

@@ -113,13 +113,13 @@ class Ticket
   after_save do
     if event
       event.clear_cache
-      event.set(sold_out_cache: event.sold_out?)
+      event.update_attribute(:sold_out_cache, event.sold_out?)
     end
   end
   after_destroy do
     if event
       event.clear_cache
-      event.set(sold_out_cache: event.sold_out?)
+      event.update_attribute(:sold_out_cache, event.sold_out?)
     end
   end
 

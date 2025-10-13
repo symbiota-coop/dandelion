@@ -97,7 +97,7 @@ class Comment
 
     if post && (previous_comment = post.comments(true).last) && previous_comment.body == body
       errors.add(:body, 'cannot be a duplicate')
-      account.set(block_reply_by_email: true) if via_email
+      account.update_attribute(:block_reply_by_email, true) if via_email
     end
   end
 

@@ -54,7 +54,7 @@ module Dandelion
       @og_desc = "Find and host #{%w[soulful regenerative metamodern participatory conscious transformative holistic ethical].join(' · ')} events and co-created gatherings"
       @og_image = "#{ENV['BASE_URI']}/images/link.png"
       if current_account
-        current_account.set(last_active: Time.now)
+        current_account.update_attribute(:last_active, Time.now)
         Honeybadger.context({
                               user_id: current_account.id,
                               user_email: current_account.email

@@ -33,6 +33,6 @@ module AccountFeedbackSummaries
     # sentences = last_paragraph.split('. ')
     # last_paragraph = sentences[1..-1].join('. ') if sentences[0] =~ /The feedback .* positive/ || sentences[0] =~ /positive feedback/
     puts "#{last_paragraph}\n\n"
-    account.set(feedback_summary: last_paragraph)
+    account.update_attribute(:feedback_summary, last_paragraph)
   end
 end

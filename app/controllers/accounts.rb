@@ -22,7 +22,7 @@ Dandelion::App.controller do
 
   get '/confirm_email/:sign_in_token' do
     sign_in_required!
-    current_account.set(email_confirmed: true)
+    current_account.update_attribute(:email_confirmed, true)
     flash[:notice] = 'Your email address was confirmed.'
     redirect '/accounts/edit'
   end
@@ -124,7 +124,7 @@ Dandelion::App.controller do
       elsif params[:organisation_id]
         @organisation = Organisation.find(params[:organisation_id])
         organisationship = @organisation.organisationships.create account: @account, skip_welcome: params[:skip_welcome], referrer_id: params[:referrer_id]
-        @organisation.organisationships.find_by(account: @account).set(unsubscribed: nil)
+        @organisation.organisationships.find_by(account: @account).update_attribute(:unsubscribed, nil)
         if organisationship.referrer
           redirect "/o/#{@organisation.slug}/via/#{organisationship.referrer.username}?registered=true"
         else
@@ -133,25 +133,25 @@ Dandelion::App.controller do
       elsif params[:activity_id]
         @activity = Activity.find(params[:activity_id])
         @activity.organisation.organisationships.create account: @account
-        @activity.organisation.organisationships.find_by(account: @account).set(unsubscribed: nil)
+        @activity.organisation.organisationships.find_by(account: @account).update_attribute(:unsubscribed, nil)
         @activity.activityships.create account: @account
-        @activity.activityships.find_by(account: @account).set(unsubscribed: nil)
+        @activity.activityships.find_by(account: @account).update_attribute(:unsubscribed, nil)
         redirect "/accounts/edit?activity_id=#{@activity.id}"
       elsif params[:local_group_id]
         @local_group = LocalGroup.find(params[:local_group_id])
         @local_group.organisation.organisationships.create account: @account
-        @local_group.organisation.organisationships.find_by(account: @account).set(unsubscribed: nil)
+        @local_group.organisation.organisationships.find_by(account: @account).update_attribute(:unsubscribed, nil)
         @local_group.local_groupships.create account: @account
-        @local_group.local_groupships.find_by(account: @account).set(unsubscribed: nil)
+        @local_group.local_groupships.find_by(account: @account).update_attribute(:unsubscribed, nil)
         redirect "/accounts/edit?local_group_id=#{@local_group.id}"
       elsif params[:event_id]
         @event = Event.find(params[:event_id])
         @event.organisation.organisationships.create(account: @account)
-        @event.organisation.organisationships.find_by(account: @account).set(unsubscribed: nil)
+        @event.organisation.organisationships.find_by(account: @account).update_attribute(:unsubscribed, nil)
         @event.activity.activityships.create(account: @account) if @event.activity
-        @event.activity.activityships.find_by(account: @account).set(unsubscribed: nil)
+        @event.activity.activityships.find_by(account: @account).update_attribute(:unsubscribed, nil)
         @event.local_group.local_groupships.create(account: @account) if @event.local_group
-        @event.local_group.local_groupships.find_by(account: @account).set(unsubscribed: nil)
+        @event.local_group.local_groupships.find_by(account: @account).update_attribute(:unsubscribed, nil)
         redirect "/accounts/edit?event_id=#{@event.id}"
       else
         redirect '/accounts/edit'
@@ -161,27 +161,27 @@ Dandelion::App.controller do
         if params[:organisation_id]
           @organisation = Organisation.find(params[:organisation_id])
           @organisation.organisationships.create account: existing_account, skip_welcome: params[:skip_welcome], referrer_id: params[:referrer_id]
-          @organisation.organisationships.find_by(account: existing_account).set(unsubscribed: nil)
+          @organisation.organisationships.find_by(account: existing_account).update_attribute(:unsubscribed, nil)
         elsif params[:activity_id]
           @activity = Activity.find(params[:activity_id])
           @activity.organisation.organisationships.create account: existing_account
-          @activity.organisation.organisationships.find_by(account: existing_account).set(unsubscribed: nil)
+          @activity.organisation.organisationships.find_by(account: existing_account).update_attribute(:unsubscribed, nil)
           @activity.activityships.create account: existing_account
-          @activity.activityships.find_by(account: existing_account).set(unsubscribed: nil)
+          @activity.activityships.find_by(account: existing_account).update_attribute(:unsubscribed, nil)
         elsif params[:local_group_id]
           @local_group = LocalGroup.find(params[:local_group_id])
           @local_group.organisation.organisationships.create account: existing_account
-          @local_group.organisation.organisationships.find_by(account: existing_account).set(unsubscribed: nil)
+          @local_group.organisation.organisationships.find_by(account: existing_account).update_attribute(:unsubscribed, nil)
           @local_group.local_groupships.create account: existing_account
-          @local_group.local_groupships.find_by(account: existing_account).set(unsubscribed: nil)
+          @local_group.local_groupships.find_by(account: existing_account).update_attribute(:unsubscribed, nil)
         elsif params[:event_id]
           @event = Event.find(params[:event_id])
           @event.organisation.organisationships.create(account: existing_account)
-          @event.organisation.organisationships.find_by(account: existing_account).set(unsubscribed: nil)
+          @event.organisation.organisationships.find_by(account: existing_account).update_attribute(:unsubscribed, nil)
           @event.activity.activityships.create(account: existing_account) if @event.activity
-          @event.activity.activityships.find_by(account: existing_account).set(unsubscribed: nil)
+          @event.activity.activityships.find_by(account: existing_account).update_attribute(:unsubscribed, nil)
           @event.local_group.local_groupships.create(account: existing_account) if @event.local_group
-          @event.local_group.local_groupships.find_by(account: existing_account).set(unsubscribed: nil)
+          @event.local_group.local_groupships.find_by(account: existing_account).update_attribute(:unsubscribed, nil)
         end
         if params[:recaptcha_skip_secret]
           200

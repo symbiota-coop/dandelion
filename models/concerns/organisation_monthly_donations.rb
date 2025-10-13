@@ -26,7 +26,7 @@ module OrganisationMonthlyDonations
 
     organisationships.and(monthly_donation_method: 'GoCardless', monthly_donation_amount: nil).each do |organisationship|
       send_finished_monthly_donor_notification(organisationship)
-      organisationship.set(monthly_donation_method: nil)
+      organisationship.update_attribute(:monthly_donation_method, nil)
     end
   end
 
@@ -104,7 +104,7 @@ module OrganisationMonthlyDonations
 
     organisationships.and(monthly_donation_method: 'Patreon', monthly_donation_amount: nil).each do |organisationship|
       send_finished_monthly_donor_notification(organisationship)
-      organisationship.set(monthly_donation_method: nil)
+      organisationship.update_attribute(:monthly_donation_method, nil)
     end
   end
 
