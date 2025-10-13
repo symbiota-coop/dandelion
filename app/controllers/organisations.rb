@@ -215,7 +215,7 @@ Dandelion::App.controller do
     @organisation = Organisation.find_by(slug: params[:slug]) || not_found
     organisation_admins_only!
     @organisationship = @organisation.organisationships.find_by(account_id: params[:account_id]) || not_found
-    @organisationship.update_attribute(:admin, nil)
+    @organisationship.update_attribute(:admin, false)
     redirect back
   end
 

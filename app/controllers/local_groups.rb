@@ -126,7 +126,7 @@ Dandelion::App.controller do
     @local_group = LocalGroup.find(params[:id]) || not_found
     local_group_admins_only!
     @local_groupship = @local_group.local_groupships.find_by(account_id: params[:account_id]) || not_found
-    @local_groupship.update_attribute(:admin, nil)
+    @local_groupship.update_attribute(:admin, false)
     redirect back
   end
 

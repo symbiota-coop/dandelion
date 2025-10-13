@@ -135,7 +135,7 @@ Dandelion::App.controller do
     @activity = Activity.find(params[:id]) || not_found
     activity_admins_only!
     @activityship = @activity.activityships.find_by(account_id: params[:account_id]) || not_found
-    @activityship.update_attribute(:admin, nil)
+    @activityship.update_attribute(:admin, false)
     redirect back
   end
 

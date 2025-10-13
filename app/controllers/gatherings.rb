@@ -147,7 +147,7 @@ Dandelion::App.controller do
     @gathering = Gathering.find_by(slug: params[:slug]) || not_found
     @membership = @gathering.memberships.find_by(account: current_account)
     confirmed_membership_required!
-    @membership.update_attribute(:unsubscribed, nil)
+    @membership.update_attribute(:unsubscribed, false)
     request.xhr? ? 200 : redirect('/accounts/subscriptions')
   end
 
@@ -163,7 +163,7 @@ Dandelion::App.controller do
     @gathering = Gathering.find_by(slug: params[:slug]) || not_found
     @membership = @gathering.memberships.find_by(account: current_account)
     confirmed_membership_required!
-    @membership.update_attribute(:hide_from_sidebar, nil)
+    @membership.update_attribute(:hide_from_sidebar, false)
     redirect "/g/#{@gathering.slug}"
   end
 

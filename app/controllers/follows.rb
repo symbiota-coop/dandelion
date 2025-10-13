@@ -40,7 +40,7 @@ Dandelion::App.controller do
   get '/follow/unstar/:id' do
     sign_in_required!
     follow = current_account.follows_as_follower.find(params[:id])
-    follow.update_attribute(:starred, nil)
+    follow.update_attribute(:starred, false)
     200
   end
 end
