@@ -1,7 +1,7 @@
 class EventTag
   include Mongoid::Document
   include Mongoid::Timestamps
-  include BelongsToWithoutParentValidation
+  include DandelionMongo
 
   include Searchable
 

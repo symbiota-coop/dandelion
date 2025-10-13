@@ -1,7 +1,7 @@
 class Stash
   include Mongoid::Document
   include Mongoid::Timestamps
-  include BelongsToWithoutParentValidation
+  include DandelionMongo
 
   field :key, type: String
   # index({ key: 1 }, { unique: true })

@@ -1,7 +1,7 @@
 class PageView
   include Mongoid::Document
   include Mongoid::Timestamps
-  include BelongsToWithoutParentValidation
+  include DandelionMongo
 
   field :path, type: String
   field :query_string, type: String

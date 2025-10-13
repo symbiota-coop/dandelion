@@ -1,7 +1,7 @@
 class DocPage
   include Mongoid::Document
   include Mongoid::Timestamps
-  include BelongsToWithoutParentValidation
+  include DandelionMongo
 
   field :name, type: String
   field :slug, type: String

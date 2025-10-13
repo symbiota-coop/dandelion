@@ -1,5 +1,16 @@
-module BelongsToWithoutParentValidation
+module DandelionMongo
   extend ActiveSupport::Concern
+
+  included do
+    after_initialize :convert_nil_booleans_to_false
+    before_validation :convert_nil_booleans_to_false
+  end
+
+  def convert_nil_booleans_to_false
+    self.class.fields.each do |field_name, field|
+      send("#{field_name}=", false) if field.type == Mongoid::Boolean && send(field_name).nil?
+    end
+  end
 
   class_methods do
     def belongs_to_without_parent_validation(name, **opts)

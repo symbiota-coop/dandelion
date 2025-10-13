@@ -1,7 +1,7 @@
 class Organisationship
   include Mongoid::Document
   include Mongoid::Timestamps
-  include BelongsToWithoutParentValidation
+  include DandelionMongo
 
   include Geocoder::Model::Mongoid
 

@@ -1,7 +1,7 @@
 class EventSession
   include Mongoid::Document
   include Mongoid::Timestamps
-  include BelongsToWithoutParentValidation
+  include DandelionMongo
 
   field :start_time, type: Time
   field :end_time, type: Time

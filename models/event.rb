@@ -1,7 +1,7 @@
 class Event
   include Mongoid::Document
   include Mongoid::Timestamps
-  include BelongsToWithoutParentValidation
+  include DandelionMongo
 
   extend Dragonfly::Model
   include Mongoid::Paranoia

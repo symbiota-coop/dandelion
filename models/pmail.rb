@@ -1,7 +1,7 @@
 class Pmail
   include Mongoid::Document
   include Mongoid::Timestamps
-  include BelongsToWithoutParentValidation
+  include DandelionMongo
 
   include PmailMailgun
   include Searchable

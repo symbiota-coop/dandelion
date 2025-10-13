@@ -1,7 +1,7 @@
 class Ticket
   include Mongoid::Document
   include Mongoid::Timestamps
-  include BelongsToWithoutParentValidation
+  include DandelionMongo
 
   include Mongoid::Paranoia
   include TicketNotifications

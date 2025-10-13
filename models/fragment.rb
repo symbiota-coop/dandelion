@@ -1,7 +1,7 @@
 class Fragment
   include Mongoid::Document
   include Mongoid::Timestamps
-  include BelongsToWithoutParentValidation
+  include DandelionMongo
 
   belongs_to_without_parent_validation :event, index: true, optional: true
 
