@@ -56,7 +56,9 @@ Dandelion::App.controller do
       @events = @events.and(:id.in => Event.search(params[:q], @events).pluck(:id)) if params[:q]
       map_json(@events)
     when :ics
-      @events = @events.current.limit(500)
+      @events = @events.current
+      @events = @events.and(:id.in => Event.search(params[:q], @events).pluck(:id)) if params[:q]
+      @events = @events.limit(500)
       cal = Icalendar::Calendar.new
       cal.append_custom_property('X-WR-CALNAME', 'Dandelion')
       @events.each do |event|
