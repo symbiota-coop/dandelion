@@ -24,7 +24,7 @@ class Donation
   end
 
   def self.incomplete
-    self.and(:payment_completed.ne => true)
+    self.and(:payment_completed.in => [nil, false])
   end
 
   def self.complete

@@ -1,4 +1,4 @@
-<% if (carousels = @organisation.carousels.and(:hidden.ne => true).order('o asc')).exists? %>
+<% if (carousels = @organisation.carousels.and(:hidden.in => [nil, false]).order('o asc')).exists? %>
   <div class="form-group col-12 col-sm-auto">
     <label>Carousel</label>
     <%= select_tag :'carousel_ids[]', options: ['', ['Featured', 'featured']] + carousels.map { |carousel| [carousel.name, carousel.id] }, selected: (params[:carousel_ids].first if params[:carousel_ids] && params[:carousel_ids].count == 1), class: 'form-control' %>

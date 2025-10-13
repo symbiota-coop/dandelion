@@ -58,6 +58,6 @@ class Post
 
   def discussers
     # for comment.discussers
-    Account.and(:unsubscribed.ne => true).and(:id.in => subscriptions.pluck(:account_id))
+    Account.and(:unsubscribed.in => [nil, false]).and(:id.in => subscriptions.pluck(:account_id))
   end
 end

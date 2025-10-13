@@ -48,7 +48,7 @@ class Team
   end
 
   def discussers
-    gathering.discussers.and(:id.in => teamships.and(:unsubscribed.ne => true).pluck(:account_id))
+    gathering.discussers.and(:id.in => teamships.and(:unsubscribed.in => [nil, false]).pluck(:account_id))
   end
 
   def spent

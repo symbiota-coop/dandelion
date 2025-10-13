@@ -41,7 +41,7 @@ module EventScopes
     end
 
     def live
-      self.and(:locked.ne => true).and(:organisation_id.ne => nil)
+      self.and(:locked.in => [nil, false]).and(:organisation_id.ne => nil)
     end
 
     def secret
@@ -56,7 +56,7 @@ module EventScopes
       # If this is being called on an existing query, use that; otherwise use the default trending filters
       base_query = if self == Event
                      # Called as Event.trending - apply default filters
-                     live.public.browsable.future(from).and(:image_uid.ne => nil, :hide_from_trending.ne => true).and(
+                     live.public.browsable.future(from).and(:image_uid.ne => nil, :hide_from_trending.in => [nil, false]).and(
                        :organisation_id.in => Organisation.and(paid_up: true).pluck(:id)
                      )
                    else

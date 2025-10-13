@@ -115,7 +115,7 @@ class Activity
   validates_format_of :slug, with: /\A[a-z0-9-]+\z/
 
   def self.active
-    self.and(:locked.ne => true).and(:id.in => Event.future.pluck(:activity_id))
+    self.and(:locked.in => [nil, false]).and(:id.in => Event.future.pluck(:activity_id))
   end
 
   def self.inactive
@@ -145,7 +145,7 @@ class Activity
   end
 
   def subscribed_members
-    Account.and(:id.in => activityships.and(:unsubscribed.ne => true).pluck(:account_id))
+    Account.and(:id.in => activityships.and(:unsubscribed.in => [nil, false]).pluck(:account_id))
   end
 
   def subscribed_accounts

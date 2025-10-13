@@ -56,13 +56,13 @@ Dandelion::App.controller do
 
     if event['type'] == 'checkout.session.completed'
       session = event['data']['object']
-      if (@order = Order.find_by(:session_id => session.id, :payment_completed.ne => true))
+      if (@order = Order.find_by(:session_id => session.id, :payment_completed.in => [nil, false]))
         @order.payment_completed!
         @order.update_destination_payment
         @order.send_tickets
         @order.create_order_notification
         halt 200
-      elsif (@order = Order.deleted.find_by(:session_id => session.id, :payment_completed.ne => true))
+      elsif (@order = Order.deleted.find_by(:session_id => session.id, :payment_completed.in => [nil, false]))
         begin
           @order.restore_and_complete
           # raise Order::Restored

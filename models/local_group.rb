@@ -113,7 +113,7 @@ class LocalGroup
   end
 
   def subscribed_members
-    Account.and(:id.in => local_groupships.and(:unsubscribed.ne => true).pluck(:account_id))
+    Account.and(:id.in => local_groupships.and(:unsubscribed.in => [nil, false]).pluck(:account_id))
   end
 
   def subscribed_accounts

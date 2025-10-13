@@ -1,5 +1,5 @@
 <% if (organisations = Organisation.and(:id.in =>
-  current_account.organisationships.and(:hide_membership.ne => true).pluck(:organisation_id) +
+  current_account.organisationships.and(:hide_membership.in => [nil, false]).pluck(:organisation_id) +
   current_account.organisationships.and(:admin => true).pluck(:organisation_id)
   ).and(:id.in =>
   Event.live.public.future.pluck(:organisation_id)

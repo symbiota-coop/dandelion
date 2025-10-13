@@ -171,7 +171,7 @@ class Pmail
     if mailable.is_a?(Event)
       to
     else
-      to.and(:id.nin => organisation.unsubscribed_members.pluck(:id)).and(:unsubscribed.ne => true)
+      to.and(:id.nin => organisation.unsubscribed_members.pluck(:id)).and(:unsubscribed.in => [nil, false])
     end
   end
 

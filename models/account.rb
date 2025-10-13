@@ -23,7 +23,7 @@ class Account
   end
 
   def self.public
-    self.and(:sign_ins_count.gt => 0, :hidden.ne => true)
+    self.and(:sign_ins_count.gt => 0, :hidden.in => [nil, false])
   end
 
   def self.sensitive?(privacyable)
@@ -40,7 +40,7 @@ class Account
 
   def self.ids_by_next_birthday
     today = Date.today
-    self.and(:hidden.ne => true, :date_of_birth.ne => nil).pluck(:id, :date_of_birth)
+    self.and(:hidden.in => [nil, false], :date_of_birth.ne => nil).pluck(:id, :date_of_birth)
         .sort_by { |_, dob| (((dob.month * 100) + dob.day) - ((today.month * 100) + today.day)) % (12 * 100) }
         .map { |id, _| id }
   end

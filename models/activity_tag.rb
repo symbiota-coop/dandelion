@@ -17,7 +17,7 @@ class ActivityTag
   validates_uniqueness_of :name
 
   def subscribed_members
-    Account.and(:id.in => Activityship.and(:activity_id.in => activity_tagships.pluck(:activity_id)).and(:unsubscribed.ne => true).pluck(:account_id))
+    Account.and(:id.in => Activityship.and(:activity_id.in => activity_tagships.pluck(:activity_id)).and(:unsubscribed.in => [nil, false]).pluck(:account_id))
   end
 
   before_validation do

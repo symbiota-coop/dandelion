@@ -30,14 +30,13 @@ module GatheringFields
     field :redirect_on_acceptance, type: String
     field :redirect_home, type: String
     field :choose_and_pay_label, type: String
-    field :hide_paid, type: Mongoid::Boolean
     field :membership_count, type: Integer
 
     enablable.each do |x|
       field :"enable_#{x}", type: Mongoid::Boolean
     end
 
-    %w[enable_supporters clear_up_optionships anonymise_supporters democratic_threshold require_reason_proposer require_reason_supporter demand_payment hide_members_on_application_form hide_invitations listed].each do |b|
+    %w[enable_supporters clear_up_optionships anonymise_supporters democratic_threshold require_reason_proposer require_reason_supporter demand_payment hide_members_on_application_form hide_invitations listed hide_paid].each do |b|
       field b.to_sym, type: Mongoid::Boolean
     end
   end

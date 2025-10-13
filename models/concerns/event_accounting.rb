@@ -219,7 +219,7 @@ module EventAccounting
     instance_var = skip_transferred ? :@donation_revenue_without_transferred : :@donation_revenue
     instance_variable_get(instance_var) || instance_variable_set(instance_var, begin
       r = Money.new(0, currency)
-      donations = skip_transferred ? self.donations.and(:transferred.ne => true) : self.donations
+      donations = skip_transferred ? self.donations.and(:transferred.in => [nil, false]) : self.donations
       donations.each { |donation| r += Money.new((donation.amount || 0) * 100, donation.currency) }
       r
     rescue Money::Bank::UnknownRate, Money::Currency::UnknownCurrency
@@ -231,8 +231,8 @@ module EventAccounting
     instance_var = skip_transferred ? :@donation_revenue_without_transferred : :@donation_revenue
     instance_variable_get(instance_var) || instance_variable_set(instance_var, begin
       r = Money.new(0, currency)
-      donations = skip_transferred ? self.donations.and(:transferred.ne => true) : self.donations
-      donations.and(:application_fee_paid_to_dandelion.ne => true).each { |donation| r += Money.new((donation.amount || 0) * 100, donation.currency) }
+      donations = skip_transferred ? self.donations.and(:transferred.in => [nil, false]) : self.donations
+      donations.and(:application_fee_paid_to_dandelion.in => [nil, false]).each { |donation| r += Money.new((donation.amount || 0) * 100, donation.currency) }
       r
     rescue Money::Bank::UnknownRate, Money::Currency::UnknownCurrency
       Money.new(0, ENV['DEFAULT_CURRENCY'])
@@ -243,7 +243,7 @@ module EventAccounting
     instance_var = skip_transferred ? :@org_discounted_ticket_revenue_without_transferred : :@org_discounted_ticket_revenue
     instance_variable_get(instance_var) || instance_variable_set(instance_var, begin
       r = Money.new(0, currency)
-      tickets = skip_transferred ? self.tickets.and(:transferred.ne => true) : self.tickets
+      tickets = skip_transferred ? self.tickets.and(:transferred.in => [nil, false]) : self.tickets
       tickets.complete.each { |ticket| r += Money.new((ticket.discounted_price || 0) * 100 * (ticket.organisation_revenue_share || 1), ticket.currency) }
       r
     rescue Money::Bank::UnknownRate, Money::Currency::UnknownCurrency
@@ -255,7 +255,7 @@ module EventAccounting
     instance_var = skip_transferred ? :@revenue_sharer_discounted_ticket_revenue_without_transferred : :@revenue_sharer_discounted_ticket_revenue
     instance_variable_get(instance_var) || instance_variable_set(instance_var, begin
       r = Money.new(0, currency)
-      tickets = skip_transferred ? self.tickets.and(:transferred.ne => true) : self.tickets
+      tickets = skip_transferred ? self.tickets.and(:transferred.in => [nil, false]) : self.tickets
       tickets.complete.each { |ticket| r += Money.new((ticket.discounted_price || 0) * 100 * (1 - (ticket.organisation_revenue_share || 1)), ticket.currency) }
       r
     rescue Money::Bank::UnknownRate, Money::Currency::UnknownCurrency
