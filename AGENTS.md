@@ -1,3 +1,7 @@
+# MongoDB indexes
+
+Please note that MongoDB indexes are created directly in the database, and are not exhaustively defined in model files.
+
 # Dependencies
 
 ## Gemfile

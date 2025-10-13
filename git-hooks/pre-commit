@@ -3,8 +3,7 @@
 # Configuration
 GEMFILE_PATH="Gemfile"
 FRONTEND_DEPENDENCIES_PATH="app/views/layouts/_dependencies.erb"
-OUTPUT_PATH=".cursorrules"
-CLAUDE_PATH="CLAUDE.md"
+OUTPUT_PATH="AGENTS.md"
 
 # Function to add a dependency section to the output file
 add_dependency_section() {
@@ -21,14 +20,15 @@ add_dependency_section() {
   } >> "$OUTPUT_PATH"
 }
 
-# Create the output file, overwriting if it exists
-echo "# Dependencies" > "$OUTPUT_PATH"
+# Create the output file with initial instructions
+cat > "$OUTPUT_PATH" << 'EOF'
+# MongoDB indexes
+
+Please note that MongoDB indexes are created directly in the database, and are not exhaustively defined in model files.
+
+# Dependencies
+EOF
 
 # Add content
 add_dependency_section "Gemfile" "$GEMFILE_PATH"
 add_dependency_section "Frontend dependencies" "$FRONTEND_DEPENDENCIES_PATH"
-
-# Also save to CLAUDE.md
-cp "$OUTPUT_PATH" "$CLAUDE_PATH"
-
-echo "✅ Generated $OUTPUT_PATH and $CLAUDE_PATH"
