@@ -38,7 +38,7 @@ class Event
   end
 
   def self.public
-    self.and(:secret.ne => true).and(:organisation_id.ne => nil)
+    self.and(:secret.ne => true)
   end
 
   def self.recommend
