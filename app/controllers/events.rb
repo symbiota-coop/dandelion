@@ -26,7 +26,7 @@ Dandelion::App.controller do
       @events = @events.in_person
       params[:online] = false
     end
-    @events = @events.and(:hidden_from_homepage.in => [nil, false]) if params[:home]
+    @events = @events.and(hidden_from_homepage: false) if params[:home]
     @events = @events.and(:image_uid.ne => nil) if params[:images]
     case content_type
     when :html
@@ -52,7 +52,7 @@ Dandelion::App.controller do
     when :json
       @events = @events.future(@from)
       @events = @events.and(:start_time.lt => @to + 1) if @to
-      @events = @events.and(:locked.in => [nil, false])
+      @events = @events.and(locked: false)
       @events = @events.and(:id.in => Event.search(params[:q], @events).pluck(:id)) if params[:q]
       map_json(@events)
     when :ics

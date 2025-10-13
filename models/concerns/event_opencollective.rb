@@ -63,11 +63,11 @@ module EventOpenCollective
     oc_transactions.each do |currency, amount, secret, tx_created_at|
       next unless secret
 
-      if (@order = Order.find_by(:payment_completed.in => [nil, false], :currency => currency, :value => amount, :oc_secret => secret, :created_at.lt => tx_created_at))
+      if (@order = Order.find_by(:payment_completed => false, :currency => currency, :value => amount, :oc_secret => secret, :created_at.lt => tx_created_at))
         @order.payment_completed!
         @order.send_tickets
         @order.create_order_notification
-      elsif (@order = Order.deleted.find_by(:payment_completed.in => [nil, false], :currency => currency, :value => amount, :oc_secret => secret, :created_at.lt => tx_created_at))
+      elsif (@order = Order.deleted.find_by(:payment_completed => false, :currency => currency, :value => amount, :oc_secret => secret, :created_at.lt => tx_created_at))
         begin
           @order.restore_and_complete
           # raise Order::Restored

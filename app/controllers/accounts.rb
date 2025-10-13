@@ -353,19 +353,19 @@ Dandelion::App.controller do
 
   get '/accounts/:id/organisations' do
     @account = Account.find(params[:id]) || not_found
-    organisations = Organisation.and(:id.in => @account.organisationships.and(:hide_membership.in => [nil, false]).pluck(:organisation_id))
+    organisations = Organisation.and(:id.in => @account.organisationships.and(:hide_membership => false).pluck(:organisation_id))
     partial :'organisations/blocks', locals: { organisations: organisations }
   end
 
   get '/accounts/:id/local_groups' do
     @account = Account.find(params[:id]) || not_found
-    local_groups = LocalGroup.and(:id.in => @account.local_groupships.and(:hide_membership.in => [nil, false]).pluck(:local_group_id))
+    local_groups = LocalGroup.and(:id.in => @account.local_groupships.and(:hide_membership => false).pluck(:local_group_id))
     partial :'local_groups/blocks', locals: { local_groups: local_groups }
   end
 
   get '/accounts/:id/activities' do
     @account = Account.find(params[:id]) || not_found
-    activities = Activity.and(:id.in => @account.activityships.and(:hide_membership.in => [nil, false]).pluck(:activity_id))
+    activities = Activity.and(:id.in => @account.activityships.and(:hide_membership => false).pluck(:activity_id))
     partial :'activities/blocks', locals: { activities: activities }
   end
 

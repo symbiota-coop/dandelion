@@ -106,11 +106,11 @@ module EventAssociations
   end
 
   def public_attendees
-    Account.and(:id.in => tickets.complete.and(show_attendance: true).pluck(:account_id)).and(:hidden.in => [nil, false])
+    Account.and(:id.in => tickets.complete.and(show_attendance: true).pluck(:account_id)).and(hidden: false)
   end
 
   def private_attendees
-    Account.and(:id.in => tickets.complete.and(:show_attendance.in => [nil, false]).pluck(:account_id))
+    Account.and(:id.in => tickets.complete.and(show_attendance: false).pluck(:account_id))
   end
 
   def discussers

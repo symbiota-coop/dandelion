@@ -89,11 +89,11 @@ module OrganisationAssociations
   end
 
   def subscribed_accounts
-    subscribed_members.and(:unsubscribed.in => [nil, false])
+    subscribed_members.and(unsubscribed: false)
   end
 
   def subscribed_members
-    Account.and(:id.in => organisationships.and(:unsubscribed.in => [nil, false]).pluck(:account_id))
+    Account.and(:id.in => organisationships.and(unsubscribed: false).pluck(:account_id))
   end
 
   def unsubscribed_members
@@ -117,7 +117,7 @@ module OrganisationAssociations
   end
 
   def subscribed_monthly_donors
-    Account.and(:id.in => organisationships.and(:monthly_donation_method.ne => nil, :unsubscribed.in => [nil, false]).pluck(:account_id))
+    Account.and(:id.in => organisationships.and(:monthly_donation_method.ne => nil, :unsubscribed => false).pluck(:account_id))
   end
 
   def not_monthly_donors
@@ -125,7 +125,7 @@ module OrganisationAssociations
   end
 
   def subscribed_not_monthly_donors
-    Account.and(:id.in => organisationships.and(:monthly_donation_method => nil, :unsubscribed.in => [nil, false]).pluck(:account_id))
+    Account.and(:id.in => organisationships.and(monthly_donation_method: nil, unsubscribed: false).pluck(:account_id))
   end
 
   def facilitators

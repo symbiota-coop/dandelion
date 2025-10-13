@@ -52,6 +52,6 @@ module GatheringAssociations
   end
 
   def discussers
-    Account.and(:id.in => memberships.and(:unsubscribed.in => [nil, false]).pluck(:account_id))
+    Account.and(:id.in => memberships.and(unsubscribed: false).pluck(:account_id))
   end
 end

@@ -12,7 +12,7 @@
   <div class="mt-3" data-pagelet-url="/accounts/<%= @account.id %>/show_feedback"></div>
 <% end %>
 
-<% if (organisations = Organisation.and(:id.in => @account.organisationships.and(:hide_membership.in => [nil, false]).pluck(:organisation_id))).exists? %>
+<% if (organisations = Organisation.and(:id.in => @account.organisationships.and(:hide_membership => false).pluck(:organisation_id))).exists? %>
   <% if viewable?(@account, :organisations, viewer_in_network: viewer_in_network) %>
     <div class="mt-5 row justify-content-between no-gutters">
       <div class="col">
@@ -28,7 +28,7 @@
   <% end %>
 <% end %>
 
-<% if (local_groups = LocalGroup.and(:id.in => @account.local_groupships.and(:hide_membership.in => [nil, false]).pluck(:local_group_id))).exists? %>
+<% if (local_groups = LocalGroup.and(:id.in => @account.local_groupships.and(:hide_membership => false).pluck(:local_group_id))).exists? %>
   <% if viewable?(@account, :local_groups, viewer_in_network: viewer_in_network) %>
     <div class="mt-5 row justify-content-between no-gutters">
       <div class="col">
@@ -44,7 +44,7 @@
   <% end %>
 <% end %>
 
-<% if (activities = Activity.and(:id.in => @account.activityships.and(:hide_membership.in => [nil, false]).pluck(:activity_id))).exists? %>
+<% if (activities = Activity.and(:id.in => @account.activityships.and(:hide_membership => false).pluck(:activity_id))).exists? %>
   <% if viewable?(@account, :activities, viewer_in_network: viewer_in_network) %>
     <div class="mt-5 row justify-content-between no-gutters">
       <div class="col">

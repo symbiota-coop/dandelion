@@ -21,10 +21,10 @@ Dandelion::App.controller do
       @accounts = @accounts.and(organisation_ids_public_cache: @organisation.id)
     elsif params[:activity_id]
       @activity = Activity.find(params[:activity_id]) || not_found
-      @accounts = Account.and(:id.in => @activity.activityships.and(:hide_membership.in => [nil, false]).pluck(:account_id))
+      @accounts = Account.and(:id.in => @activity.activityships.and(hide_membership: false).pluck(:account_id))
     elsif params[:local_group_id]
       @local_group = LocalGroup.find(params[:local_group_id]) || not_found
-      @accounts = Account.and(:id.in => @local_group.local_groupships.and(:hide_membership.in => [nil, false]).pluck(:account_id))
+      @accounts = Account.and(:id.in => @local_group.local_groupships.and(hide_membership: false).pluck(:account_id))
     else
       @accounts = Account.all
     end

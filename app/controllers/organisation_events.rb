@@ -83,13 +83,13 @@ Dandelion::App.controller do
       if params[:display] == 'calendar'
         @events = @events.future(@from)
         @events = @events.and(:start_time.lt => @to + 1) if @to
-        @events = @events.and(:locked.in => [nil, false])
+        @events = @events.and(locked: false)
         @events = filter_events_by_search_and_tags(@events)
         calendar_json(@events)
       elsif params[:display] == 'map'
         @events = @events.future(@from)
         @events = @events.and(:start_time.lt => @to + 1) if @to
-        @events = @events.and(:locked.in => [nil, false])
+        @events = @events.and(locked: false)
         @events = filter_events_by_search_and_tags(@events)
         map_json(@events)
       else

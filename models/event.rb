@@ -38,7 +38,7 @@ class Event
   end
 
   def self.public
-    self.and(:secret.in => [nil, false])
+    self.and(secret: false)
   end
 
   def self.recommend
@@ -138,14 +138,14 @@ class Event
   end
 
   def sold_out?
-    ticket_types.exists? && ticket_types.and(:hidden.in => [nil, false]).all? do |ticket_type|
+    ticket_types.exists? && ticket_types.and(hidden: false).all? do |ticket_type|
       ticket_type.number_of_tickets_available_in_single_purchase <= 0 ||
         (ticket_type.sales_end && ticket_type.sales_end < Time.now)
     end
   end
 
   def tickets_available?
-    ticket_types.exists? && ticket_types.and(:hidden.in => [nil, false]).any? do |ticket_type|
+    ticket_types.exists? && ticket_types.and(hidden: false).any? do |ticket_type|
       ticket_type.number_of_tickets_available_in_single_purchase >= 1 &&
         (ticket_type.sales_end.nil? || ticket_type.sales_end >= Time.now)
     end
