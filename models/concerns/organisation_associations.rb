@@ -39,15 +39,16 @@ module OrganisationAssociations
   end
 
   def cohosts
-    Organisation.and(:id.in => Cohostship.and(:event_id.in => events.pluck(:id)).pluck(:organisation_id))
+    Organisation.and(:id.in => events.pluck(:cohosts_ids_cache).flatten)
   end
 
   def cohosted_events
-    Event.and(:id.in => cohostships.pluck(:event_id))
+    Event.and(cohosts_ids_cache: id)
   end
 
   def events_including_cohosted
-    Event.and(:id.in => events.pluck(:id) + cohostships.pluck(:event_id))
+    # was Event.and(:id.in => events.pluck(:id) + cohostships.pluck(:event_id))
+    Event.unscoped.or({ organisation_id: id }, { cohosts_ids_cache: id }).and(deleted_at: nil)
   end
 
   def featured_events

@@ -46,6 +46,7 @@ module EventFields
     field :tax_rate_id, type: String
     field :match_phrase, type: String
     field :sold_out_cache, type: Mongoid::Boolean
+    field :cohosts_ids_cache, type: Array
 
     field :revenue_share_to_revenue_sharer, type: Integer
     field :profit_share_to_organiser, type: Integer

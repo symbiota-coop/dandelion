@@ -130,6 +130,13 @@ class Organisationship
     account.account_notification_cache&.invalidate!
   end
 
+  after_destroy do
+    account.update_attribute(:organisation_ids_cache, (account.organisation_ids_cache || []) - [organisation.id])
+    account.update_attribute(:organisation_ids_public_cache, (account.organisation_ids_public_cache || []) - [organisation.id])
+    # Invalidate notification cache
+    account.account_notification_cache&.invalidate!
+  end
+
   def relevant_local_groups
     organisation.local_groups.geo_spatial(:polygons.intersects_point => account.coordinates)
   end
@@ -240,13 +247,6 @@ class Organisationship
 
     batch_message.finalize if organisation.mailgun_api_key
     set(sent_monthly_donation_welcome: true)
-  end
-
-  after_destroy do
-    account.update_attribute(:organisation_ids_cache, (account.organisation_ids_cache || []) - [organisation.id])
-    account.update_attribute(:organisation_ids_public_cache, (account.organisation_ids_public_cache || []) - [organisation.id])
-    # Invalidate notification cache
-    account.account_notification_cache&.invalidate!
   end
 
   validates_uniqueness_of :account, scope: :organisation

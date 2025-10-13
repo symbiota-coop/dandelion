@@ -36,5 +36,13 @@ class Cohostship
     end
   end
 
+  after_create do
+    event.update_attribute(:cohosts_ids_cache, ((event.cohosts_ids_cache || []) + [organisation.id]).uniq)
+  end
+
+  after_destroy do
+    event.update_attribute(:cohosts_ids_cache, (event.cohosts_ids_cache || []) - [organisation.id])
+  end
+
   validates_uniqueness_of :event, scope: :organisation
 end
