@@ -54,7 +54,7 @@ module AccountValidation
       if email_changed?
         e = EmailAddress.error(email)
         errors.add(:email, "- #{e}") if e
-        self.email_confirmed = nil
+        self.email_confirmed = false
       end
 
       %w[email phone telegram_username location].each do |p|

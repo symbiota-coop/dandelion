@@ -75,11 +75,11 @@ class Pmail
     self.will_send_at = nil if mailable.is_a?(Event) || !organisation.mailgun_api_key
 
     if to_option
-      self.everyone = nil
-      self.monthly_donors = nil
-      self.not_monthly_donors = nil
-      self.facilitators = nil
-      self.waitlist = nil
+      self.everyone = false
+      self.monthly_donors = false
+      self.not_monthly_donors = false
+      self.facilitators = false
+      self.waitlist = false
       self.mailable = nil
       if to_option == 'everyone'
         self.everyone = true

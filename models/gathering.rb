@@ -54,7 +54,7 @@ class Gathering
     errors.add(:stripe_pk, 'must start with pk_') if stripe_pk && !stripe_pk.starts_with?('pk_')
     errors.add(:stripe_sk, 'must be present if Stripe public key is present') if stripe_pk && !stripe_sk
 
-    self.listed = nil if privacy == 'secret'
+    self.listed = false if privacy == 'secret'
     self.balance = 0 if balance.nil?
     self.invitations_granted = 0 if invitations_granted.nil?
     self.processed_via_dandelion = 0 if processed_via_dandelion.nil?

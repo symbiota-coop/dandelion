@@ -254,7 +254,7 @@ class Organisationship
   before_validation do
     errors.add(:referrer, 'cannot be the same as account') if referrer && account && referrer_id == account_id
     self.referrer = nil if hide_referrer
-    self.hide_referrer = nil if referrer
+    self.hide_referrer = false if referrer
     if monthly_donation_amount.nil?
       self.monthly_donation_method = nil
       self.monthly_donation_currency = nil
