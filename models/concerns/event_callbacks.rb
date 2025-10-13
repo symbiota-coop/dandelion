@@ -56,7 +56,7 @@ module EventCallbacks
 
       notifications.destroy_all if locked? || secret?
 
-      account.send_first_event_email if !account.sent_first_event_email && account.events.count == 1
+      account.send_first_event_email if !account.sent_first_event_email && account.events.count == 1 && created_at > 1.week.ago
     end
 
     after_destroy do
