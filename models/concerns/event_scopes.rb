@@ -17,7 +17,12 @@ module EventScopes
     end
 
     def future_and_current(from = Date.today)
-      self.and(:id.in => future(from).pluck(:id) + current(from).pluck(:id)).order('start_time asc')
+      # Use $or to combine conditions in a single query instead of separate pluck operations
+      # This avoids the QueryPlanKilled error caused by complex index operations on separate queries
+      self.or(
+        { :start_time.gte => from },
+        { :end_time.gte => from }
+      ).order('start_time asc')
     end
 
     def past(from = Date.today)
