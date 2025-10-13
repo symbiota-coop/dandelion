@@ -19,11 +19,12 @@ Rack::Attack.blocklist('js challenge') do |request|
 end
 
 Rack::Attack.blocklisted_responder = lambda do |request|
-  if request.env['rack.attack.matched'] == 'js challenge'
+  case request.env['rack.attack.matched']
+  when 'block bots using search'
+    [403, {}, ['Forbidden']]
+  when 'js challenge'
     escaped_uri = request.env['REQUEST_URI'].to_json
     [403, { 'Content-Type' => 'text/html' }, ["<script>window.location = #{escaped_uri};</script>"]]
-  else
-    [403, {}, ['Forbidden']]
   end
 end
 
