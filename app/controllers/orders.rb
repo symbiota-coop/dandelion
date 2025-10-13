@@ -256,7 +256,7 @@ Dandelion::App.controller do
   get '/events/:id/orders/clear_answers' do
     @event = Event.find(params[:id]) || not_found
     event_admins_only!
-    @event.orders.unscoped.set(answers: nil)
+    @event.orders.unscoped.update_all(answers: nil)
     redirect back
   end
 

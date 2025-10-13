@@ -237,7 +237,7 @@ class Account
       location_change.each do |l|
         if l
           accounts = Account.and(location: location)
-          accounts.set(number_at_this_location: accounts.count)
+          accounts.update_all(number_at_this_location: accounts.count)
         end
       end
     end

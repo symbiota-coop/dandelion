@@ -23,7 +23,7 @@ class DandelionTest < ActiveSupport::TestCase
     click_button 'Save and continue'
     narrate %(Connect your Stripe account and click 'Update organisation'.)
     sleep 1
-    Organisation.first.set(stripe_pk: @organisation.stripe_pk, stripe_sk: @organisation.stripe_sk)
+    Organisation.first.update_attributes(stripe_pk: @organisation.stripe_pk, stripe_sk: @organisation.stripe_sk)
     click_button 'Update organisation'
     narrate %(OK, your organisation is ready! Now let's create an event. Provide an event title, and start and end time.), lambda {
       fill_in 'Event title*', with: @event.name

@@ -2,7 +2,7 @@ module OrganisationMonthlyDonations
   extend ActiveSupport::Concern
 
   def sync_with_gocardless
-    organisationships.and(monthly_donation_method: 'GoCardless').set(
+    organisationships.and(monthly_donation_method: 'GoCardless').update_all(
       monthly_donation_amount: nil,
       monthly_donation_currency: nil,
       monthly_donation_start_date: nil,
@@ -72,7 +72,7 @@ module OrganisationMonthlyDonations
   end
 
   def sync_with_patreon
-    organisationships.and(monthly_donation_method: 'Patreon').set(
+    organisationships.and(monthly_donation_method: 'Patreon').update_all(
       monthly_donation_amount: nil,
       monthly_donation_currency: nil,
       monthly_donation_start_date: nil,

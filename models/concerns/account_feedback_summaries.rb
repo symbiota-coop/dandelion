@@ -3,7 +3,7 @@ module AccountFeedbackSummaries
 
   class_methods do
     def set_feedback_summaries
-      # Account.and(:feedback_summary.ne => nil).set(feedback_summary: nil)
+      # Account.and(:feedback_summary.ne => nil).update_all(feedback_summary: nil)
       accounts = Account.and(:id.in => EventFacilitation.and(:event_id.in => Event.past.pluck(:id)).pluck(:account_id), :feedback_summary => nil)
       accounts = accounts.select { |account| account.event_feedbacks_as_facilitator.count >= 10 }
       accounts.each_with_index do |account, i|
