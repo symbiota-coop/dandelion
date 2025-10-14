@@ -29,7 +29,7 @@ Dandelion::App.controller do
       url = url[0..-2] if uri_params.empty?
 
       pmail_link = pmail.pmail_links.find_or_create_by(url: url)
-      pmail_link.update_attribute(:clicks, (pmail_link.clicks || 0) + 1) if pmail_link.persisted?
+      pmail_link.set(clicks: (pmail_link.clicks || 0) + 1) if pmail_link.persisted?
       halt 200
     else
       halt 406

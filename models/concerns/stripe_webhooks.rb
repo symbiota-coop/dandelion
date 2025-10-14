@@ -41,9 +41,9 @@ module StripeWebhooks
                                            'checkout.session.completed'
                                          ]
                                        })
-    update_attribute(:stripe_endpoint_secret, w['secret'])
+    set(stripe_endpoint_secret: w['secret'])
   rescue Stripe::AuthenticationError
-    update_attribute(:stripe_sk, nil)
-    update_attribute(:stripe_pk, nil)
+    set(stripe_sk: nil)
+    set(stripe_pk: nil)
   end
 end

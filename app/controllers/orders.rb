@@ -228,16 +228,16 @@ Dandelion::App.controller do
     event_admins_only!
     new_event = @event.organisation.events.find(params[:order][:event_id]) || not_found
     halt 400 unless event_admin?(new_event)
-    @order.update_attribute(:transferred, true)
-    @order.update_attribute(:event, new_event)
+    @order.set(transferred: true)
+    @order.set(event: new_event)
     @order.tickets.each do |ticket|
-      ticket.update_attribute(:transferred, true)
-      ticket.update_attribute(:event, new_event)
-      ticket.update_attribute(:ticket_type, nil)
+      ticket.set(transferred: true)
+      ticket.set(event: new_event)
+      ticket.set(ticket_type: nil)
     end
     @order.donations.each do |donation|
-      donation.update_attribute(:transferred, true)
-      donation.update_attribute(:event, new_event)
+      donation.set(transferred: true)
+      donation.set(event: new_event)
     end
     @order.send_tickets
     @event.clear_cache
@@ -302,7 +302,7 @@ Dandelion::App.controller do
     @event = Event.find(params[:id]) || not_found
     @order = @event.orders.complete.find(params[:order_id]) || not_found
     @ticket = @order.tickets.find(params[:ticket_id]) || not_found
-    @ticket.update_attribute(:name, params[:name])
+    @ticket.set(name: params[:name])
     200
   end
 
@@ -356,7 +356,7 @@ Dandelion::App.controller do
     @ticket = Ticket.find(params[:id]) || not_found
     halt 400 unless @ticket.account == current_account
     @event = @ticket.event
-    @ticket.update_attribute(:made_available_at, @ticket.made_available_at ? nil : Time.now)
+    @ticket.set(made_available_at: @ticket.made_available_at ? nil : Time.now)
     redirect back
   end
 
@@ -371,7 +371,7 @@ Dandelion::App.controller do
     @ticket = Ticket.find(params[:id]) || not_found
     @event = @ticket.event
     event_admins_only!
-    @ticket.update_attribute(:discounted_price, params[:price])
+    @ticket.set(discounted_price: params[:price])
     200
   end
 
@@ -386,7 +386,7 @@ Dandelion::App.controller do
     @ticket = Ticket.find(params[:id]) || not_found
     @event = @ticket.event
     event_admins_only!
-    @ticket.update_attribute(:ticket_type_id, params[:ticket_type_id])
+    @ticket.set(ticket_type_id: params[:ticket_type_id])
     200
   end
 

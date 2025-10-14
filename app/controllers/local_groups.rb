@@ -110,7 +110,7 @@ Dandelion::App.controller do
     @local_group = LocalGroup.find(params[:id]) || not_found
     local_group_admins_only!
     @local_groupship = @local_group.local_groupships.find_by(account: current_account) || not_found
-    @local_groupship.update_attribute(:receive_feedback, params[:f].to_i == 1)
+    @local_groupship.set(receive_feedback: params[:f].to_i == 1)
     redirect back
   end
 
@@ -118,7 +118,7 @@ Dandelion::App.controller do
     @local_group = LocalGroup.find(params[:id]) || not_found
     local_group_admins_only!
     @local_groupship = @local_group.local_groupships.find_by(account_id: params[:local_groupship][:account_id]) || @local_group.local_groupships.create(account_id: params[:local_groupship][:account_id])
-    @local_groupship.update_attribute(:admin, true)
+    @local_groupship.set(admin: true)
     redirect back
   end
 
@@ -126,7 +126,7 @@ Dandelion::App.controller do
     @local_group = LocalGroup.find(params[:id]) || not_found
     local_group_admins_only!
     @local_groupship = @local_group.local_groupships.find_by(account_id: params[:account_id]) || not_found
-    @local_groupship.update_attribute(:admin, false)
+    @local_groupship.set(admin: false)
     redirect back
   end
 
@@ -147,7 +147,7 @@ Dandelion::App.controller do
     sign_in_required!
     @local_group = LocalGroup.find(params[:id]) || not_found
     @local_groupship = current_account.local_groupships.find_by(local_group: @local_group) || current_account.local_groupships.create(local_group: @local_group)
-    @local_groupship.update_attribute(:unsubscribed, true)
+    @local_groupship.set(unsubscribed: true)
     flash[:notice] = "You were unsubscribed from #{@local_group.name}."
     redirect '/accounts/subscriptions'
   end
@@ -161,10 +161,10 @@ Dandelion::App.controller do
       local_groupship.destroy if local_groupship && !local_groupship.admin?
     when 'follow_without_subscribing'
       local_groupship = current_account.local_groupships.find_by(local_group: @local_group) || current_account.local_groupships.create(local_group: @local_group)
-      local_groupship.update_attribute(:unsubscribed, true)
+      local_groupship.set(unsubscribed: true)
     when 'follow_and_subscribe'
       local_groupship = current_account.local_groupships.find_by(local_group: @local_group) || current_account.local_groupships.create(local_group: @local_group)
-      local_groupship.update_attribute(:unsubscribed, false)
+      local_groupship.set(unsubscribed: false)
     end
     request.xhr? ? (partial :'activities_and_local_groups/resourceship', locals: { resource: @local_group, resourceship_name: 'local_groupship', resource_path: "/local_groups/#{@local_group.id}", membership_toggle: params[:membership_toggle], btn_class: params[:btn_class] }) : redirect("/local_groups/#{@local_group.id}")
   end
@@ -173,7 +173,7 @@ Dandelion::App.controller do
     sign_in_required!
     @local_group = LocalGroup.find(params[:id]) || not_found
     @local_groupship = @local_group.local_groupships.find_by(account: current_account) || not_found
-    @local_groupship.update_attribute(:hide_membership, true)
+    @local_groupship.set(hide_membership: true)
     redirect back
   end
 
@@ -181,7 +181,7 @@ Dandelion::App.controller do
     sign_in_required!
     @local_group = LocalGroup.find(params[:id]) || not_found
     @local_groupship = @local_group.local_groupships.find_by(account: current_account) || not_found
-    @local_groupship.update_attribute(:hide_membership, false)
+    @local_groupship.set(hide_membership: false)
     redirect back
   end
 
@@ -238,7 +238,7 @@ Dandelion::App.controller do
     @local_group = LocalGroup.find(params[:id]) || not_found
     local_group_admins_only!
     @local_groupship = @local_group.local_groupships.find(params[:local_groupship_id]) || not_found
-    @local_groupship.update_attribute(:unsubscribed, !params[:subscribed])
+    @local_groupship.set(unsubscribed: !params[:subscribed])
     200
   end
 

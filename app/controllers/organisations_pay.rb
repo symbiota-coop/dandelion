@@ -73,8 +73,8 @@ Dandelion::App.controller do
     payment_method = Stripe::PaymentMethod.retrieve(setup_intent.payment_method)
 
     if payment_method.respond_to?(:card)
-      @organisation.update_attribute(:stripe_customer_id, session.customer)
-      @organisation.update_attribute(:card_last4, payment_method.card.last4)
+      @organisation.set(stripe_customer_id: session.customer)
+      @organisation.set(card_last4: payment_method.card.last4)
       @organisation.stripe_topup
       @organisation.update_paid_up_without_delay
     end
@@ -88,7 +88,7 @@ Dandelion::App.controller do
     Stripe.api_key = ENV['STRIPE_SK']
     Stripe.api_version = '2020-08-27'
 
-    @organisation.update_attribute(:stripe_customer_id, nil)
+    @organisation.set(stripe_customer_id: nil)
     redirect "/o/#{@organisation.slug}/contribute"
   end
 

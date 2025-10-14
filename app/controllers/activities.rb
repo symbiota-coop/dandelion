@@ -119,7 +119,7 @@ Dandelion::App.controller do
     @activity = Activity.find(params[:id]) || not_found
     activity_admins_only!
     @activityship = @activity.activityships.find_by(account: current_account) || not_found
-    @activityship.update_attribute(:receive_feedback, params[:f].to_i == 1)
+    @activityship.set(receive_feedback: params[:f].to_i == 1)
     redirect back
   end
 
@@ -127,7 +127,7 @@ Dandelion::App.controller do
     @activity = Activity.find(params[:id]) || not_found
     activity_admins_only!
     @activityship = @activity.activityships.find_by(account_id: params[:activityship][:account_id]) || @activity.activityships.create(account_id: params[:activityship][:account_id])
-    @activityship.update_attribute(:admin, true)
+    @activityship.set(admin: true)
     redirect back
   end
 
@@ -135,7 +135,7 @@ Dandelion::App.controller do
     @activity = Activity.find(params[:id]) || not_found
     activity_admins_only!
     @activityship = @activity.activityships.find_by(account_id: params[:account_id]) || not_found
-    @activityship.update_attribute(:admin, false)
+    @activityship.set(admin: false)
     redirect back
   end
 
@@ -156,7 +156,7 @@ Dandelion::App.controller do
     sign_in_required!
     @activity = Activity.find(params[:id]) || not_found
     @activityship = current_account.activityships.find_by(activity: @activity) || current_account.activityships.create(activity: @activity)
-    @activityship.update_attribute(:unsubscribed, true)
+    @activityship.set(unsubscribed: true)
     flash[:notice] = "You were unsubscribed from #{@activity.name}."
     redirect '/accounts/subscriptions'
   end
@@ -171,10 +171,10 @@ Dandelion::App.controller do
         activityship.destroy if activityship && !activityship.admin?
       when 'follow_without_subscribing'
         activityship = current_account.activityships.find_by(activity: @activity) || current_account.activityships.create(activity: @activity)
-        activityship.update_attribute(:unsubscribed, true)
+        activityship.set(unsubscribed: true)
       when 'follow_and_subscribe'
         activityship = current_account.activityships.find_by(activity: @activity) || current_account.activityships.create(activity: @activity)
-        activityship.update_attribute(:unsubscribed, false)
+        activityship.set(unsubscribed: false)
       end
     end
     request.xhr? ? (partial :'activities_and_local_groups/resourceship', locals: { resource: @activity, resourceship_name: 'activityship', resource_path: "/activities/#{@activity.id}", membership_toggle: params[:membership_toggle], btn_class: params[:btn_class] }) : redirect("/activities/#{@activity.id}")
@@ -184,7 +184,7 @@ Dandelion::App.controller do
     sign_in_required!
     @activity = Activity.find(params[:id]) || not_found
     @activityship = @activity.activityships.find_by(account: current_account) || not_found
-    @activityship.update_attribute(:hide_membership, true)
+    @activityship.set(hide_membership: true)
     redirect back
   end
 
@@ -192,7 +192,7 @@ Dandelion::App.controller do
     sign_in_required!
     @activity = Activity.find(params[:id]) || not_found
     @activityship = @activity.activityships.find_by(account: current_account) || not_found
-    @activityship.update_attribute(:hide_membership, false)
+    @activityship.set(hide_membership: false)
     redirect back
   end
 
@@ -259,7 +259,7 @@ Dandelion::App.controller do
     @activity = Activity.find(params[:id]) || not_found
     activity_admins_only!
     @activityship = @activity.activityships.find(params[:activityship_id]) || not_found
-    @activityship.update_attribute(:unsubscribed, !params[:subscribed])
+    @activityship.set(unsubscribed: !params[:subscribed])
     200
   end
 

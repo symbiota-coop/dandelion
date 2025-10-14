@@ -76,7 +76,7 @@ Dandelion::App.controller do
     @membership = @gathering.memberships.find_by(account: current_account)
     gathering_admins_only!
     params[:space_ids].each_with_index do |space_id, i|
-      @timetable.spaces.find(space_id).update_attribute(:o, i)
+      @timetable.spaces.find(space_id).set(o: i)
     end
     200
   end
@@ -105,7 +105,7 @@ Dandelion::App.controller do
     @membership = @gathering.memberships.find_by(account: current_account)
     gathering_admins_only!
     params[:tslot_ids].each_with_index do |tslot_id, i|
-      @timetable.tslots.find(tslot_id).update_attribute(:o, i)
+      @timetable.tslots.find(tslot_id).set(o: i)
     end
     200
   end

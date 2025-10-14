@@ -52,7 +52,7 @@ class AccountRecommendationCache
     end
 
     people = people.sort_by { |_k, v| -v.count }
-    update_attribute(:recommended_people_cache, people)
+    set(recommended_people_cache: people)
   end
 
   def recommend_events!(events_with_participant_ids, people)
@@ -65,6 +65,6 @@ class AccountRecommendationCache
     end.compact
     events = events.select { |_event_id, people| people.map { |_k, v| v }.flatten.exists? }
     events = events.sort_by { |_event_id, people| -people.map { |_k, v| v }.flatten.count }
-    update_attribute(:recommended_events_cache, events)
+    set(recommended_events_cache: events)
   end
 end

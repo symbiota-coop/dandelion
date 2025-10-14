@@ -249,10 +249,10 @@ class Account
     if account.failed_sign_in_attempts && account.failed_sign_in_attempts >= 99
       nil
     elsif account.password_matches?(password)
-      account.update_attribute(:failed_sign_in_attempts, 0)
+      account.set(failed_sign_in_attempts: 0)
       account
     else
-      account.update_attribute(:failed_sign_in_attempts, (account.failed_sign_in_attempts || 0) + 1)
+      account.set(failed_sign_in_attempts: (account.failed_sign_in_attempts || 0) + 1)
       nil
     end
   end

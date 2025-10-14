@@ -22,7 +22,7 @@ Dandelion::App.controller do
 
   get '/confirm_email/:sign_in_token' do
     sign_in_required!
-    current_account.update_attribute(:email_confirmed, true)
+    current_account.set(email_confirmed: true)
     flash[:notice] = 'Your email address was confirmed.'
     redirect '/accounts/edit'
   end
@@ -61,7 +61,7 @@ Dandelion::App.controller do
 
   get '/accounts/unsubscribe' do
     sign_in_required!
-    current_account.update_attribute(:unsubscribed, true)
+    current_account.set(unsubscribed: true)
     flash[:notice] = 'You were unsubscribed from all emails.'
     redirect '/accounts/subscriptions'
   end
@@ -124,7 +124,7 @@ Dandelion::App.controller do
       elsif params[:organisation_id]
         @organisation = Organisation.find(params[:organisation_id])
         organisationship = @organisation.organisationships.create account: @account, skip_welcome: params[:skip_welcome], referrer_id: params[:referrer_id]
-        @organisation.organisationships.find_by(account: @account).update_attribute(:unsubscribed, false)
+        @organisation.organisationships.find_by(account: @account).set(unsubscribed: false)
         if organisationship.referrer
           redirect "/o/#{@organisation.slug}/via/#{organisationship.referrer.username}?registered=true"
         else
@@ -133,25 +133,25 @@ Dandelion::App.controller do
       elsif params[:activity_id]
         @activity = Activity.find(params[:activity_id])
         @activity.organisation.organisationships.create account: @account
-        @activity.organisation.organisationships.find_by(account: @account).update_attribute(:unsubscribed, false)
+        @activity.organisation.organisationships.find_by(account: @account).set(unsubscribed: false)
         @activity.activityships.create account: @account
-        @activity.activityships.find_by(account: @account).update_attribute(:unsubscribed, false)
+        @activity.activityships.find_by(account: @account).set(unsubscribed: false)
         redirect "/accounts/edit?activity_id=#{@activity.id}"
       elsif params[:local_group_id]
         @local_group = LocalGroup.find(params[:local_group_id])
         @local_group.organisation.organisationships.create account: @account
-        @local_group.organisation.organisationships.find_by(account: @account).update_attribute(:unsubscribed, false)
+        @local_group.organisation.organisationships.find_by(account: @account).set(unsubscribed: false)
         @local_group.local_groupships.create account: @account
-        @local_group.local_groupships.find_by(account: @account).update_attribute(:unsubscribed, false)
+        @local_group.local_groupships.find_by(account: @account).set(unsubscribed: false)
         redirect "/accounts/edit?local_group_id=#{@local_group.id}"
       elsif params[:event_id]
         @event = Event.find(params[:event_id])
         @event.organisation.organisationships.create(account: @account)
-        @event.organisation.organisationships.find_by(account: @account).update_attribute(:unsubscribed, false)
+        @event.organisation.organisationships.find_by(account: @account).set(unsubscribed: false)
         @event.activity.activityships.create(account: @account) if @event.activity
-        @event.activity.activityships.find_by(account: @account).update_attribute(:unsubscribed, false)
+        @event.activity.activityships.find_by(account: @account).set(unsubscribed: false)
         @event.local_group.local_groupships.create(account: @account) if @event.local_group
-        @event.local_group.local_groupships.find_by(account: @account).update_attribute(:unsubscribed, false)
+        @event.local_group.local_groupships.find_by(account: @account).set(unsubscribed: false)
         redirect "/accounts/edit?event_id=#{@event.id}"
       else
         redirect '/accounts/edit'
@@ -161,27 +161,27 @@ Dandelion::App.controller do
         if params[:organisation_id]
           @organisation = Organisation.find(params[:organisation_id])
           @organisation.organisationships.create account: existing_account, skip_welcome: params[:skip_welcome], referrer_id: params[:referrer_id]
-          @organisation.organisationships.find_by(account: existing_account).update_attribute(:unsubscribed, false)
+          @organisation.organisationships.find_by(account: existing_account).set(unsubscribed: false)
         elsif params[:activity_id]
           @activity = Activity.find(params[:activity_id])
           @activity.organisation.organisationships.create account: existing_account
-          @activity.organisation.organisationships.find_by(account: existing_account).update_attribute(:unsubscribed, false)
+          @activity.organisation.organisationships.find_by(account: existing_account).set(unsubscribed: false)
           @activity.activityships.create account: existing_account
-          @activity.activityships.find_by(account: existing_account).update_attribute(:unsubscribed, false)
+          @activity.activityships.find_by(account: existing_account).set(unsubscribed: false)
         elsif params[:local_group_id]
           @local_group = LocalGroup.find(params[:local_group_id])
           @local_group.organisation.organisationships.create account: existing_account
-          @local_group.organisation.organisationships.find_by(account: existing_account).update_attribute(:unsubscribed, false)
+          @local_group.organisation.organisationships.find_by(account: existing_account).set(unsubscribed: false)
           @local_group.local_groupships.create account: existing_account
-          @local_group.local_groupships.find_by(account: existing_account).update_attribute(:unsubscribed, false)
+          @local_group.local_groupships.find_by(account: existing_account).set(unsubscribed: false)
         elsif params[:event_id]
           @event = Event.find(params[:event_id])
           @event.organisation.organisationships.create(account: existing_account)
-          @event.organisation.organisationships.find_by(account: existing_account).update_attribute(:unsubscribed, false)
+          @event.organisation.organisationships.find_by(account: existing_account).set(unsubscribed: false)
           @event.activity.activityships.create(account: existing_account) if @event.activity
-          @event.activity.activityships.find_by(account: existing_account).update_attribute(:unsubscribed, false)
+          @event.activity.activityships.find_by(account: existing_account).set(unsubscribed: false)
           @event.local_group.local_groupships.create(account: existing_account) if @event.local_group
-          @event.local_group.local_groupships.find_by(account: existing_account).update_attribute(:unsubscribed, false)
+          @event.local_group.local_groupships.find_by(account: existing_account).set(unsubscribed: false)
         end
         if params[:recaptcha_skip_secret]
           200
@@ -294,16 +294,16 @@ Dandelion::App.controller do
     sign_in_required!
     @account = current_account
     halt 403 unless Account.privacyables.include?(params[:p])
-    current_account.update_attribute("#{params[:p]}_privacy", params[:level])
+    current_account.set("#{params[:p]}_privacy", params[:level])
     200
   end
 
   get '/accounts/unhide' do
     sign_in_required!
-    current_account.update_attribute(:hidden, false)
+    current_account.set(hidden: false)
     unless current_account.has_signed_in?
-      current_account.update_attribute(:sign_ins_count, 1)
-      current_account.update_attribute(:has_signed_in, true)
+      current_account.set(sign_ins_count: 1)
+      current_account.set(has_signed_in: true)
     end
     redirect back
   end
@@ -323,8 +323,8 @@ Dandelion::App.controller do
   post '/accounts/:id/reset_password', provides: :json do
     halt unless current_account && (current_account.admin? || current_account.can_reset_passwords?)
     @account = Account.find(params[:id]) || not_found
-    @account.update_attribute(:password, Account.generate_password)
-    @account.update_attribute(:failed_sign_in_attempts, nil)
+    @account.set(password: Account.generate_password)
+    @account.set(failed_sign_in_attempts: nil)
     { password: @account.password }.to_json
   end
 
@@ -434,7 +434,7 @@ Dandelion::App.controller do
   post '/accounts/:id/image' do
     admins_only!
     @account = Account.find(params[:id]) || not_found
-    @account.update_attribute(:image, params[:image])
+    @account.set(image: params[:image])
     redirect back
   end
 

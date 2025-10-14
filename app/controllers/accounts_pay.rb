@@ -10,7 +10,7 @@ Dandelion::App.controller do
     when 'checkout.session.completed'
       session = event['data']['object']
       if (account_contribution = AccountContribution.find_by(session_id: session.id))
-        account_contribution.update_attribute(:payment_completed, true)
+        account_contribution.set(payment_completed: true)
         account_contribution.send_notification
       end
     when 'customer.subscription.created'
@@ -20,13 +20,13 @@ Dandelion::App.controller do
       customer = Stripe::Customer.retrieve(subscription.customer)
       email = customer.email
       if (account = Account.find_by(email: email.downcase))
-        account.update_attribute(:stripe_subscription_id, subscription.id)
+        account.set(stripe_subscription_id: subscription.id)
         account.send_stripe_subscription_created_notification(subscription)
       end
     when 'customer.subscription.deleted'
       subscription = event.data.object
       if (account = Account.find_by(stripe_subscription_id: subscription.id))
-        account.update_attribute(:stripe_subscription_id, nil)
+        account.set(stripe_subscription_id: nil)
         account.send_stripe_subscription_deleted_notification(subscription)
       end
     end
@@ -49,7 +49,7 @@ Dandelion::App.controller do
     end
 
     if event.type == 'charge:confirmed' && event.data.respond_to?(:checkout) && (account_contribution = AccountContribution.find_by(coinbase_checkout_id: event.data.checkout.id))
-      account_contribution.update_attribute(:payment_completed, true)
+      account_contribution.set(payment_completed: true)
     end
     halt 200
   end

@@ -136,7 +136,7 @@ Dandelion::App.controller do
     @event.account = current_account
     @event.last_saved_by = current_account
     if @event.save
-      @event.update_attribute(:locked, true) if !@event.organisation.payment_method? && @event.paid_tickets?
+      @event.set(locked: true) if !@event.organisation.payment_method? && @event.paid_tickets?
       redirect "/e/#{@event.slug}?created=1"
     else
       flash.now[:error] = 'There was an error saving the event'
@@ -268,7 +268,7 @@ Dandelion::App.controller do
     event_admins_only!
     @event.last_saved_by = current_account
     if @event.update_attributes(mass_assigning(params[:event], Event))
-      @event.update_attribute(:locked, true) if !@event.organisation.payment_method? && @event.paid_tickets?
+      @event.set(locked: true) if !@event.organisation.payment_method? && @event.paid_tickets?
       flash[:notice] = 'The event was saved.'
       redirect "/e/#{@event.slug}/edit"
     else
@@ -287,7 +287,7 @@ Dandelion::App.controller do
     @event = Event.find(params[:id]) || not_found
     @organisation = @event.organisation
     organisation_admins_only!
-    @event.update_attribute(:refund_deleted_orders, false) if params[:no_refunds]
+    @event.set(refund_deleted_orders: false) if params[:no_refunds]
     @event.send_destroy_notification(current_account)
     @event.destroy
     flash[:notice] = 'The event was deleted.'
@@ -558,7 +558,7 @@ Dandelion::App.controller do
   post '/events/:id/notes' do
     @event = Event.find(params[:id]) || not_found
     event_admins_only!
-    @event.update_attribute(:notes, params[:notes])
+    @event.set(notes: params[:notes])
     200
   end
 
@@ -651,14 +651,14 @@ Dandelion::App.controller do
   get '/events/:id/do_hide_from_homepage' do
     @event = Event.find(params[:id]) || not_found
     event_admins_only!
-    @event.update_attribute(:hidden_from_homepage, true)
+    @event.set(hidden_from_homepage: true)
     200
   end
 
   get '/events/:id/unhide_from_homepage' do
     @event = Event.find(params[:id]) || not_found
     event_admins_only!
-    @event.update_attribute(:hidden_from_homepage, false)
+    @event.set(hidden_from_homepage: false)
     200
   end
 end

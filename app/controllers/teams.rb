@@ -130,7 +130,7 @@ Dandelion::App.controller do
     @membership = @gathering.memberships.find_by(account: current_account)
     confirmed_membership_required!
     halt unless (@teamship.account.id == current_account.id) || @membership.admin?
-    @teamship.update_attribute(:unsubscribed, false)
+    @teamship.set(unsubscribed: false)
     if request.xhr?
       200
     else
@@ -146,7 +146,7 @@ Dandelion::App.controller do
     @membership = @gathering.memberships.find_by(account: current_account)
     confirmed_membership_required!
     halt unless (@teamship.account.id == current_account.id) || @membership.admin?
-    @teamship.update_attribute(:unsubscribed, true)
+    @teamship.set(unsubscribed: true)
     @team.subscriptions.and(account: current_account).destroy_all
     if request.xhr?
       200

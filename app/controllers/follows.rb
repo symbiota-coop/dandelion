@@ -3,7 +3,7 @@ Dandelion::App.controller do
     sign_in_required!
     @account = Account.find_by(username: params[:username]) || not_found
     @follow = current_account.follows_as_follower.find_by(followee: @account) || current_account.follows_as_follower.create(followee: @account)
-    @follow.update_attribute(:unsubscribed, true)
+    @follow.set(unsubscribed: true)
     flash[:notice] = "You were unsubscribed from #{@account.name}."
     redirect "/u/#{@account.username}"
   end
@@ -16,10 +16,10 @@ Dandelion::App.controller do
       current_account.follows_as_follower.find_by(followee: @account).try(:destroy)
     when 'follow_without_subscribing'
       follow = current_account.follows_as_follower.find_by(followee: @account) || current_account.follows_as_follower.create(followee: @account)
-      follow.update_attribute(:unsubscribed, true)
+      follow.set(unsubscribed: true)
     when 'follow_and_subscribe'
       follow = current_account.follows_as_follower.find_by(followee: @account) || current_account.follows_as_follower.create(followee: @account)
-      follow.update_attribute(:unsubscribed, false)
+      follow.set(unsubscribed: false)
     end
     request.xhr? ? (partial :'accounts/follow', locals: { account: @account, btn_class: params[:btn_class] }) : redirect("/u/#{@account.username}")
   end
@@ -33,14 +33,14 @@ Dandelion::App.controller do
   get '/follow/star/:id' do
     sign_in_required!
     follow = current_account.follows_as_follower.find(params[:id])
-    follow.update_attribute(:starred, true)
+    follow.set(starred: true)
     200
   end
 
   get '/follow/unstar/:id' do
     sign_in_required!
     follow = current_account.follows_as_follower.find(params[:id])
-    follow.update_attribute(:starred, false)
+    follow.set(starred: false)
     200
   end
 end

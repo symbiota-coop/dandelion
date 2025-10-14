@@ -8,7 +8,7 @@ module EventCallbacks
       event_facilitations.create account: organisation.admins.first if organisation && organisation.admins.count == 1
       event_facilitations.create account: revenue_sharer if revenue_sharer
 
-      activity.update_attribute(:locked, false) if activity
+      activity.set(locked: false) if activity
       organisation.try(:update_paid_up)
     end
 
@@ -17,7 +17,7 @@ module EventCallbacks
       set(event_tag_names: event_tags.map(&:name))
 
       if previous_changes['name'] && (post = posts.find_by(subject: "Chat for #{previous_changes['name'][0]}"))
-        post.update_attribute(:subject, "Chat for #{name}")
+        post.set(subject: "Chat for #{name}")
       end
 
       if previous_changes['activity_id'] && activity && activity.privacy == 'open' && previous_changes['activity_id'][0]

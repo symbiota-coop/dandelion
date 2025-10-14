@@ -18,8 +18,8 @@ class SignIn
 
   after_create do
     unless skip_increment
-      account.update_attribute(:sign_ins_count, account.sign_ins_count + 1)
-      account.update_attribute(:has_signed_in, true)
+      account.set(sign_ins_count: account.sign_ins_count + 1)
+      account.set(has_signed_in: true)
     end
   end
 end

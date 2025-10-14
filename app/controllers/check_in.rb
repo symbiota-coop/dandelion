@@ -33,10 +33,10 @@ Dandelion::App.controller do
       409
     else
       if params[:checked_in]
-        ticket.update_attribute(:checked_in, true)
-        ticket.update_attribute(:checked_in_at, Time.now)
+        ticket.set(checked_in: true)
+        ticket.set(checked_in_at: Time.now)
       else
-        ticket.update_attribute(:checked_in, false)
+        ticket.set(checked_in: false)
       end
       ticket.account ? ticket.account.name : ''
     end

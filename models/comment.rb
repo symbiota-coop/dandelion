@@ -97,7 +97,7 @@ class Comment
 
     if post && (previous_comment = post.comments(true).last) && previous_comment.body == body
       errors.add(:body, 'cannot be a duplicate')
-      account.update_attribute(:block_reply_by_email, true) if via_email
+      account.set(block_reply_by_email: true) if via_email
     end
   end
 
@@ -127,7 +127,7 @@ class Comment
   end
 
   after_create do
-    post.update_attribute(:updated_at, Time.now)
+    post.set(updated_at: Time.now)
   end
 
   def email_subject
@@ -191,7 +191,7 @@ class Comment
     end
 
     batch_message.finalize if Padrino.env == :production
-    update_attribute(:sent_at, Time.now)
+    set(sent_at: Time.now)
   end
   handle_asynchronously :send_comment
 

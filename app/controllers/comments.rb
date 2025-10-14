@@ -49,7 +49,7 @@ Dandelion::App.controller do
     @comment = Comment.find(params[:id]) || not_found
     @commentable = @comment.commentable
     halt unless admin? || (@comment.account.id == current_account.id)
-    @comment.update_attribute(:body, params[:body])
+    @comment.set(body: params[:body])
     200
   end
 

@@ -66,7 +66,7 @@ Dandelion::App.controller do
       @order.filter_discounts if @order.discount_code && @order.discount_code.filter
       @order.apply_credit if current_account
       @order.apply_fixed_discount
-      @order.update_attribute(:original_description, @order.description)
+      @order.set(original_description: @order.description)
     rescue StandardError => e
       Honeybadger.notify(e)
       @order.try(:destroy)
@@ -227,7 +227,7 @@ Dandelion::App.controller do
         { order_id: @order.id.to_s }.to_json
       end
     rescue Stripe::InvalidRequestError => e
-      @order.event.update_attribute(:locked, true)
+      @order.event.set(locked: true)
       @order.notify_of_failed_purchase(e)
       @order.destroy
       halt 400

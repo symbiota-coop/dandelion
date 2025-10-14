@@ -86,7 +86,7 @@ module OrderNotifications
 
     if ENV['MAILGUN_API_KEY']
       message_ids = batch_message.finalize
-      update_attribute(:message_ids, message_ids)
+      set(message_ids: message_ids)
     end
 
     unless event.no_tickets_pdf

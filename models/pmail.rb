@@ -250,13 +250,13 @@ class Pmail
   def send_pmail
     return if sent_at # if already sent
 
-    update_attribute(:requested_send_at, Time.now) unless requested_send_at
+    set(requested_send_at: Time.now) unless requested_send_at
 
     # send_batch_message
     return unless (message_ids = send_batch_message)
 
-    update_attribute(:sent_at, Time.now)
-    update_attribute(:message_ids, message_ids)
+    set(sent_at: Time.now)
+    set(message_ids: message_ids)
   end
 
   def send_batch_message(test_to: nil, check_already_sent: false)

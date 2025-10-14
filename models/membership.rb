@@ -50,7 +50,7 @@ class Membership
   has_many :notifications, as: :notifiable, dependent: :destroy
   after_create do
     notifications.create! circle: circle, type: 'joined_gathering' unless prevent_notifications
-    gathering.update_attribute(:membership_count, gathering.memberships.count)
+    gathering.set(membership_count: gathering.memberships.count)
     gathering.members.each do |member|
       next if member.id == account.id
 
@@ -103,7 +103,7 @@ class Membership
 
   after_destroy do
     account.notifications_as_notifiable.create! circle: gathering, type: 'left_gathering'
-    gathering.update_attribute(:membership_count, gathering.memberships.count)
+    gathering.set(membership_count: gathering.memberships.count)
     if mapplication
       mapplication.prevent_notifications = true
       mapplication.destroy
@@ -160,7 +160,7 @@ class Membership
   end
 
   def update_requested_contribution
-    update_attribute(:requested_contribution, calculate_requested_contribution)
+    set(requested_contribution: calculate_requested_contribution)
   end
 
   def confirmed?

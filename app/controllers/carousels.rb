@@ -44,7 +44,7 @@ Dandelion::App.controller do
 
   post '/o/:slug/carousels/order' do
     params[:carousel_ids].each_with_index do |carousel_id, i|
-      @organisation.carousels.find(carousel_id).update_attribute(:o, i)
+      @organisation.carousels.find(carousel_id).set(o: i)
     end
     200
   end

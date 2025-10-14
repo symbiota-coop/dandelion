@@ -113,13 +113,13 @@ class Ticket
   after_save do
     if event
       event.clear_cache
-      event.update_attribute(:sold_out_cache, event.sold_out?)
+      event.set(sold_out_cache: event.sold_out?)
     end
   end
   after_destroy do
     if event
       event.clear_cache
-      event.update_attribute(:sold_out_cache, event.sold_out?)
+      event.set(sold_out_cache: event.sold_out?)
     end
   end
 
@@ -183,7 +183,7 @@ class Ticket
   after_create :update_zoomship_tickets_count, if: :zoomship
   after_destroy :update_zoomship_tickets_count, if: :zoomship
   def update_zoomship_tickets_count
-    zoomship.update_attribute(:tickets_count, zoomship.tickets.count)
+    zoomship.set(tickets_count: zoomship.tickets.count)
   end
 
   def refund

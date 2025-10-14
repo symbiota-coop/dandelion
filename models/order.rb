@@ -193,9 +193,9 @@ class Order
 
     current_total = discounted_ticket_revenue + donation_revenue
     if credit_balance >= current_total
-      update_attribute(:credit_applied, current_total.cents.to_f / 100)
+      set(credit_applied: current_total.cents.to_f / 100)
     elsif credit_balance < current_total
-      update_attribute(:credit_applied, credit_balance.cents.to_f / 100)
+      set(credit_applied: credit_balance.cents.to_f / 100)
     end
   end
 
@@ -205,9 +205,9 @@ class Order
     fixed_discount = discount_code.fixed_discount.exchange_to(currency)
     current_total = discounted_ticket_revenue + donation_revenue - Money.new((credit_applied || 0) * 100, currency)
     if fixed_discount >= current_total
-      update_attribute(:fixed_discount_applied, current_total.cents.to_f / 100)
+      set(fixed_discount_applied: current_total.cents.to_f / 100)
     elsif fixed_discount < current_total
-      update_attribute(:fixed_discount_applied, fixed_discount.cents.to_f / 100)
+      set(fixed_discount_applied: fixed_discount.cents.to_f / 100)
     end
   end
 

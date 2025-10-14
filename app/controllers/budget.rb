@@ -58,7 +58,7 @@ Dandelion::App.controller do
     @gathering = @spend.gathering
     @membership = @gathering.memberships.find_by(account: current_account)
     confirmed_membership_required!
-    @spend.update_attribute(:reimbursed, params[:reimbursed])
+    @spend.set(reimbursed: params[:reimbursed])
     200
   end
 
@@ -67,7 +67,7 @@ Dandelion::App.controller do
     @gathering = @team.gathering
     @membership = @gathering.memberships.find_by(account: current_account)
     confirmed_membership_required!
-    @team.update_attribute(:budget, params[:budget])
+    @team.set(budget: params[:budget])
     200
   end
 

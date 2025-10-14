@@ -147,7 +147,7 @@ Dandelion::App.controller do
     @gathering = Gathering.find_by(slug: params[:slug]) || not_found
     @membership = @gathering.memberships.find_by(account: current_account)
     confirmed_membership_required!
-    @membership.update_attribute(:unsubscribed, false)
+    @membership.set(unsubscribed: false)
     request.xhr? ? 200 : redirect('/accounts/subscriptions')
   end
 
@@ -155,7 +155,7 @@ Dandelion::App.controller do
     @gathering = Gathering.find_by(slug: params[:slug]) || not_found
     @membership = @gathering.memberships.find_by(account: current_account)
     confirmed_membership_required!
-    @membership.update_attribute(:unsubscribed, true)
+    @membership.set(unsubscribed: true)
     request.xhr? ? 200 : redirect('/accounts/subscriptions')
   end
 
@@ -163,7 +163,7 @@ Dandelion::App.controller do
     @gathering = Gathering.find_by(slug: params[:slug]) || not_found
     @membership = @gathering.memberships.find_by(account: current_account)
     confirmed_membership_required!
-    @membership.update_attribute(:hide_from_sidebar, false)
+    @membership.set(hide_from_sidebar: false)
     redirect "/g/#{@gathering.slug}"
   end
 
@@ -171,7 +171,7 @@ Dandelion::App.controller do
     @gathering = Gathering.find_by(slug: params[:slug]) || not_found
     @membership = @gathering.memberships.find_by(account: current_account)
     confirmed_membership_required!
-    @membership.update_attribute(:hide_from_sidebar, true)
+    @membership.set(hide_from_sidebar: true)
     redirect "/g/#{@gathering.slug}"
   end
 

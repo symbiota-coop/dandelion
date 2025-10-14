@@ -114,7 +114,7 @@ Dandelion::App.controller do
     @membership = @gathering.memberships.find_by(account: current_account)
     gathering_admins_only!
     params[:role_ids].each_with_index do |role_id, i|
-      @rota.roles.find(role_id).update_attribute(:o, i)
+      @rota.roles.find(role_id).set(o: i)
     end
     200
   end
@@ -166,7 +166,7 @@ Dandelion::App.controller do
     @membership = @gathering.memberships.find_by(account: current_account)
     gathering_admins_only!
     params[:rslot_ids].each_with_index do |rslot_id, i|
-      @rota.rslots.find(rslot_id).update_attribute(:o, i)
+      @rota.rslots.find(rslot_id).set(o: i)
     end
     200
   end

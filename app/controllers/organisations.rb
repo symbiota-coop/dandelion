@@ -158,7 +158,7 @@ Dandelion::App.controller do
   post '/o/:slug/banned_emails' do
     @organisation = Organisation.find_by(slug: params[:slug]) || not_found
     organisation_admins_only!
-    if @organisation.update_attribute(:banned_emails, params[:organisation][:banned_emails])
+    if @organisation.set(banned_emails: params[:organisation][:banned_emails])
       flash[:notice] = 'Your settings were saved.'
       redirect "/o/#{@organisation.slug}/banned_emails"
     else
@@ -207,7 +207,7 @@ Dandelion::App.controller do
     @organisation = Organisation.find_by(slug: params[:slug]) || not_found
     organisation_admins_only!
     @organisationship = @organisation.organisationships.find_by(account_id: params[:organisationship][:account_id]) || @organisation.organisationships.create(account_id: params[:organisationship][:account_id])
-    @organisationship.update_attribute(:admin, true) if @organisationship.persisted?
+    @organisationship.set(admin: true) if @organisationship.persisted?
     redirect back
   end
 
@@ -215,7 +215,7 @@ Dandelion::App.controller do
     @organisation = Organisation.find_by(slug: params[:slug]) || not_found
     organisation_admins_only!
     @organisationship = @organisation.organisationships.find_by(account_id: params[:account_id]) || not_found
-    @organisationship.update_attribute(:admin, false)
+    @organisationship.set(admin: false)
     redirect back
   end
 
@@ -247,10 +247,10 @@ Dandelion::App.controller do
       organisationship.destroy if organisationship && !organisationship.admin? && !organisationship.monthly_donor?
     when 'follow_without_subscribing'
       organisationship = current_account.organisationships.find_by(organisation: @organisation) || current_account.organisationships.create(organisation: @organisation)
-      organisationship.update_attribute(:unsubscribed, true)
+      organisationship.set(unsubscribed: true)
     when 'follow_and_subscribe'
       organisationship = current_account.organisationships.find_by(organisation: @organisation) || current_account.organisationships.create(organisation: @organisation)
-      organisationship.update_attribute(:unsubscribed, false)
+      organisationship.set(unsubscribed: false)
     end
     if request.xhr?
       partial :'organisations/organisationship', locals: { organisation: @organisation, membership_toggle: params[:membership_toggle], btn_class: params[:btn_class] }
@@ -269,7 +269,7 @@ Dandelion::App.controller do
     @account = current_account || (params[:account_id] && Account.find(params[:account_id])) || sign_in_required!
     @organisation = Organisation.find_by(slug: params[:slug]) || not_found
     @organisationship = @account.organisationships.find_by(organisation: @organisation) || @account.organisationships.create(organisation: @organisation)
-    @organisationship.update_attribute(:unsubscribed, true)
+    @organisationship.set(unsubscribed: true)
     if params[:account_id]
       @unsubscribed = true
       erb :'organisations/unsubscribe'
@@ -470,7 +470,7 @@ Dandelion::App.controller do
     sign_in_required!
     @organisation = Organisation.find_by(slug: params[:slug]) || not_found
     @organisationship = @organisation.organisationships.find_by(account: current_account) || not_found
-    @organisationship.update_attribute(:hide_membership, params[:f].to_i == 0)
+    @organisationship.set(hide_membership: params[:f].to_i == 0)
     redirect back
   end
 
@@ -487,7 +487,7 @@ Dandelion::App.controller do
     @organisation = Organisation.find_by(slug: params[:slug]) || not_found
     organisation_admins_only!
     @organisationship = @organisation.organisationships.find_by(account: current_account) || not_found
-    @organisationship.update_attribute(:receive_feedback, params[:f].to_i == 1)
+    @organisationship.set(receive_feedback: params[:f].to_i == 1)
     redirect back
   end
 
@@ -502,7 +502,7 @@ Dandelion::App.controller do
     @organisation = Organisation.find_by(slug: params[:slug]) || not_found
     organisation_admins_only!
     @organisationship = @organisation.organisationships.find(params[:organisationship_id]) || not_found
-    @organisationship.update_attribute(:unsubscribed, !params[:subscribed])
+    @organisationship.set(unsubscribed: !params[:subscribed])
     200
   end
 
@@ -517,7 +517,7 @@ Dandelion::App.controller do
     @organisationship = Organisationship.find(params[:id]) || not_found
     @organisation = @organisationship.organisation
     organisation_admins_only!
-    @organisationship.update_attribute(:notes, params[:notes])
+    @organisationship.set(notes: params[:notes])
     200
   end
 

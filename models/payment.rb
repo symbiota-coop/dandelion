@@ -48,9 +48,9 @@ class Payment
   end
 
   after_create do
-    membership.update_attribute(:paid, membership.paid + amount)
-    gathering.update_attribute(:processed_via_dandelion, gathering.processed_via_dandelion + amount)
-    gathering.update_attribute(:balance, gathering.balance + amount)
+    membership.set(paid: membership.paid + amount)
+    gathering.set(processed_via_dandelion: gathering.processed_via_dandelion + amount)
+    gathering.set(balance: gathering.balance + amount)
   end
 
   def update_metadata

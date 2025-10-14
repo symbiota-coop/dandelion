@@ -81,8 +81,8 @@ Dandelion::App.controller do
       elsif params[:send] || params[:send_later]
         @pmail.delayed_jobs.destroy_all
         if params[:send] && !@pmail.requested_send_at
-          @pmail.update_attribute(:will_send_at, nil)
-          @pmail.update_attribute(:requested_send_at, Time.now)
+          @pmail.set(will_send_at: nil)
+          @pmail.set(requested_send_at: Time.now)
           @pmail.delay.send_pmail
           flash[:notice] = 'Sent!'
         elsif params[:send_later] && @pmail.will_send_at

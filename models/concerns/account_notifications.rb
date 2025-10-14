@@ -22,7 +22,7 @@ module AccountNotifications
     end
 
     batch_message.finalize if Padrino.env == :production
-    account.update_attribute(:sent_first_event_email, Time.now)
+    account.set(sent_first_event_email: Time.now)
   end
 
   def send_sign_in_code
