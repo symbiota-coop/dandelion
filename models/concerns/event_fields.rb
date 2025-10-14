@@ -41,11 +41,9 @@ module EventFields
     field :fixed_contribution_gbp, type: Float
     field :cap_gbp, type: Float
     field :oc_slug, type: String
-    field :ai_tagged, type: Mongoid::Boolean
     field :event_tag_names, type: Array
     field :tax_rate_id, type: String
     field :match_phrase, type: String
-    field :sold_out_cache, type: Mongoid::Boolean
     field :cohosts_ids_cache, type: Array
 
     field :revenue_share_to_revenue_sharer, type: Integer
@@ -55,7 +53,7 @@ module EventFields
     field :profit_share_to_social_media, type: Integer
     field :stripe_revenue_adjustment, type: Float
 
-    %w[no_discounts hide_deleted_filters hide_attendees hide_discussion refund_deleted_orders monthly_donors_only locked secret zoom_party show_emails featured opt_in_organisation opt_in_facilitator hide_few_left hide_organisation_footer ask_hear_about send_order_notifications raw_description prevent_reminders trending hide_from_trending hide_from_carousels no_tickets_pdf half_width_images enable_resales donations_to_organisation browsable hide_unavailable_tickets hidden_from_homepage blank_price_for_free_tickets].each do |b|
+    %w[no_discounts hide_deleted_filters hide_attendees hide_discussion refund_deleted_orders monthly_donors_only locked secret zoom_party show_emails featured opt_in_organisation opt_in_facilitator hide_few_left hide_organisation_footer ask_hear_about send_order_notifications raw_description prevent_reminders trending hide_from_trending hide_from_carousels no_tickets_pdf half_width_images enable_resales donations_to_organisation browsable hide_unavailable_tickets hidden_from_homepage blank_price_for_free_tickets ai_tagged sold_out_cache has_organisation].each do |b|
       field b.to_sym, type: Mongoid::Boolean
     end
   end
