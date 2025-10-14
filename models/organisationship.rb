@@ -190,7 +190,7 @@ class Organisationship
     end
 
     batch_message.finalize if organisation.mailgun_api_key
-    update_attribute(:sent_welcome, true)
+    set(sent_welcome: true)
   end
 
   def monthly_donation_welcome_body
@@ -246,7 +246,7 @@ class Organisationship
     end
 
     batch_message.finalize if organisation.mailgun_api_key
-    update_attribute(:sent_monthly_donation_welcome, true)
+    set(sent_monthly_donation_welcome: true)
   end
 
   validates_uniqueness_of :account, scope: :organisation

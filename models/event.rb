@@ -165,7 +165,7 @@ class Event
   end
 
   def set_browsable
-    update_attribute(:browsable, !organisation.hidden && (organisation.paid_up || ticket_types.exists?))
+    set(browsable: !organisation.hidden && (organisation.paid_up || ticket_types.exists?))
   end
 
   def carousel_name
@@ -307,6 +307,6 @@ class Event
         event_tagships.create(event_tag: event_tag)
       end
     end
-    update_attribute(:ai_tagged, true)
+    set(ai_tagged: true)
   end
 end

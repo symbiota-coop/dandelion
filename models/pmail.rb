@@ -308,7 +308,7 @@ class Pmail
 
       batch_message.from from_name ? "#{from_name} <mailer@#{ENV['MAILGUN_PMAILS_HOST']}>" : "mailer@#{ENV['MAILGUN_PMAILS_HOST']}"
       batch_message.reply_to from
-      update_attribute(:gift, true)
+      set(gift: true)
     end
 
     batch_message.subject(test_to ? "#{subject} [test sent #{Time.now}]" : subject)
