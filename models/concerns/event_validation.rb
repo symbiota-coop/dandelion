@@ -16,6 +16,7 @@ module EventValidation
       self.ai_tagged = false
       self.description = description.gsub('href="www.', 'href="http://www.') if description
       self.suggested_donation = nil if organisation && !organisation.payment_method?
+      self.has_organisation = organisation ? true : false
 
       unless slug
         loop do

@@ -41,7 +41,7 @@ module EventScopes
     end
 
     def live
-      self.and(locked: false).and(:organisation_id.ne => nil)
+      self.and(locked: false).and(has_organisation: true)
     end
 
     def secret
