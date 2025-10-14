@@ -80,10 +80,10 @@ class Membership
     account = self.account
     gathering = self.gathering
 
-    sign_in_details = if account.sign_ins_count == 0
-                        %(<a href="#{ENV['BASE_URI']}/accounts/edit?sign_in_token=%recipient.token%&slug=#{gathering.slug}">Click here to finish setting up your account and get involved with the co-creation!</a>)
-                      else
+    sign_in_details = if account.has_signed_in?
                         %(<a href="#{ENV['BASE_URI']}/g/#{gathering.slug}?sign_in_token=%recipient.token%">Sign in to get involved with the co-creation!</a>)
+                      else
+                        %(<a href="#{ENV['BASE_URI']}/accounts/edit?sign_in_token=%recipient.token%&slug=#{gathering.slug}">Click here to finish setting up your account and get involved with the co-creation!</a>)
                       end
 
     content = gathering.welcome_email || ''
