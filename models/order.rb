@@ -118,7 +118,7 @@ class Order
   end
 
   def payment_completed!
-    set(payment_completed: true)
+    update_attribute(:payment_completed, true)
     tickets.update_all(payment_completed: true)
     donations.update_all(payment_completed: true)
     tickets.each(&:payment_completed!)
@@ -129,7 +129,7 @@ class Order
     tickets.deleted.each(&:restore)
     donations.deleted.each(&:restore)
     restore
-    set(restored: true)
+    update_attribute(:restored, true)
     payment_completed!
     update_destination_payment
     send_tickets
@@ -337,8 +337,8 @@ class Order
     f.at_css('button[type=submit]').scroll_into_view.click
     # sleep 5
     # f.screenshot(path: 'screenshot5.png')
-    %i[gc_plan_id gc_given_name gc_family_name gc_address_line1 gc_city gc_postal_code gc_branch_code gc_account_number].each { |f| set(f => nil) }
-    set(gc_success: true)
+    set(gc_plan_id: nil, gc_given_name: nil, gc_family_name: nil, gc_address_line1: nil, gc_city: nil, gc_postal_code: nil, gc_branch_code: nil, gc_account_number: nil)
+    update_attribute(:gc_success, true)
   end
   handle_asynchronously :sign_up_to_gocardless
 end

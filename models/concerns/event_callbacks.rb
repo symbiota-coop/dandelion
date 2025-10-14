@@ -14,7 +14,7 @@ module EventCallbacks
 
     after_save do
       set_browsable
-      set(event_tag_names: event_tags.map(&:name))
+      update_attribute(:event_tag_names, event_tags.map(&:name))
 
       if previous_changes['name'] && (post = posts.find_by(subject: "Chat for #{previous_changes['name'][0]}"))
         post.update_attribute(:subject, "Chat for #{name}")
