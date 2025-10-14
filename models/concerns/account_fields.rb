@@ -54,22 +54,7 @@ module AccountFields
     field :event_feedbacks_as_facilitator_count, type: Integer
     field :event_tag_names, type: Array
 
-    %w[email_confirmed
-       updated_profile
-       admin
-       unsubscribed
-       unsubscribed_messages
-       unsubscribed_feedback
-       unsubscribed_reminders
-       open_to_hookups
-       open_to_new_friends
-       open_to_short_term_dating
-       open_to_long_term_dating
-       open_to_open_relating
-       block_reply_by_email
-       hidden
-       seen_intro_tour
-       can_reset_passwords].each do |b|
+    %w[email_confirmed updated_profile admin unsubscribed unsubscribed_messages unsubscribed_feedback unsubscribed_reminders open_to_hookups open_to_new_friends open_to_short_term_dating open_to_long_term_dating open_to_open_relating block_reply_by_email hidden seen_intro_tour can_reset_passwords has_signed_in].each do |b|
       field b.to_sym, type: Mongoid::Boolean
     end
 

@@ -340,7 +340,7 @@ class Pmail
                                     'token' => account.sign_in_token,
                                     'id' => account.id.to_s,
                                     'username' => account.username,
-                                    'view_or_activate' => (account.sign_ins_count.zero? ? 'Activate your account' : 'View your profile')
+                                    'view_or_activate' => (account.has_signed_in? ? 'View your profile' : 'Activate your account')
                                   })
     end
 

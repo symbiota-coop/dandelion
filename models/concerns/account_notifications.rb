@@ -59,7 +59,7 @@ module AccountNotifications
                                     'firstname' => account.firstname || 'there',
                                     'token' => account.sign_in_token,
                                     'id' => account.id.to_s,
-                                    'confirm_or_activate' => (account.sign_ins_count.zero? ? "If you'd like to activate your account, click the link below:" : 'Click here to confirm your email address:')
+                                    'confirm_or_activate' => (account.has_signed_in? ? 'Click here to confirm your email address:' : "If you'd like to activate your account, click the link below:")
                                   })
     end
 

@@ -23,7 +23,7 @@ class Account
   end
 
   def self.public
-    self.and(:sign_ins_count.gt => 0, :hidden => false)
+    self.and(has_signed_in: true, hidden: false)
   end
 
   def self.sensitive?(privacyable)
@@ -122,7 +122,7 @@ class Account
   end
 
   def public?
-    sign_ins_count > 0 && !hidden?
+    has_signed_in && !hidden?
   end
 
   def private?

@@ -301,7 +301,10 @@ Dandelion::App.controller do
   get '/accounts/unhide' do
     sign_in_required!
     current_account.update_attribute(:hidden, false)
-    current_account.update_attribute(:sign_ins_count, 1) if current_account.sign_ins_count.zero?
+    unless current_account.has_signed_in?
+      current_account.update_attribute(:sign_ins_count, 1)
+      current_account.update_attribute(:has_signed_in, true)
+    end
     redirect back
   end
 
@@ -353,19 +356,19 @@ Dandelion::App.controller do
 
   get '/accounts/:id/organisations' do
     @account = Account.find(params[:id]) || not_found
-    organisations = Organisation.and(:id.in => @account.organisationships.and(:hide_membership => false).pluck(:organisation_id))
+    organisations = Organisation.and(:id.in => @account.organisationships.and(hide_membership: false).pluck(:organisation_id))
     partial :'organisations/blocks', locals: { organisations: organisations }
   end
 
   get '/accounts/:id/local_groups' do
     @account = Account.find(params[:id]) || not_found
-    local_groups = LocalGroup.and(:id.in => @account.local_groupships.and(:hide_membership => false).pluck(:local_group_id))
+    local_groups = LocalGroup.and(:id.in => @account.local_groupships.and(hide_membership: false).pluck(:local_group_id))
     partial :'local_groups/blocks', locals: { local_groups: local_groups }
   end
 
   get '/accounts/:id/activities' do
     @account = Account.find(params[:id]) || not_found
-    activities = Activity.and(:id.in => @account.activityships.and(:hide_membership => false).pluck(:activity_id))
+    activities = Activity.and(:id.in => @account.activityships.and(hide_membership: false).pluck(:activity_id))
     partial :'activities/blocks', locals: { activities: activities }
   end
 
