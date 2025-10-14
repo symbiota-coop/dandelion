@@ -64,11 +64,11 @@ module Dandelion
 
     error do
       Honeybadger.notify(env['sinatra.error'])
-      erb :error, layout: :application
+      erb :error, layout: 'application'
     end
 
     get '/error' do
-      erb :error, layout: :application
+      erb :error, layout: 'application'
     end
 
     get '/raise' do
