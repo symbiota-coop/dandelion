@@ -52,10 +52,10 @@ module OrganisationAssociations
   end
 
   def featured_events
-    primary_host_featured_events = events.live.future_and_current.and(:image_uid.ne => nil).and(featured: true)
+    primary_host_featured_events = events.live.public.future_and_current.and(:image_uid.ne => nil).and(featured: true)
 
     featured_cohostship_event_ids = cohostships.and(featured: true).pluck(:event_id)
-    cohost_featured_events = Event.live.future_and_current.and(:image_uid.ne => nil).and(:id.in => featured_cohostship_event_ids)
+    cohost_featured_events = Event.live.public.future_and_current.and(:image_uid.ne => nil).and(:id.in => featured_cohostship_event_ids)
 
     Event.and(:id.in => primary_host_featured_events.pluck(:id) + cohost_featured_events.pluck(:id)).order('start_time asc').limit(20).reject(&:sold_out?)
   end

@@ -3,7 +3,7 @@
   <div class="card-body">
     <p class="lead">
       Missed out on tickets to <%= @event.name %>?
-      <% if next_event = @event.organisation.events_including_cohosted.live.future.and(:id.nin => [@event.id]).and(name: @event.name).reject(&:sold_out?).first %>
+      <% if next_event = @event.organisation.events_including_cohosted.live.public.future.and(:id.nin => [@event.id]).and(name: @event.name).reject(&:sold_out?).first %>
         It's happening again on <a href="/events/<%=next_event.id%>"><%=next_event.start_time.to_date%></a>.
         If that date doesn't work for you, <mark>join the waitlist and we'll let you know when tickets become available to this event or future events.</mark>
       <% else %>

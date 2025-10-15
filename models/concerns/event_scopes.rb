@@ -12,12 +12,8 @@ module EventScopes
       self.and(:start_time.gte => from).order('start_time asc')
     end
 
-    def current(from = Date.today)
-      self.and(:end_time.gte => from).order('start_time asc')
-    end
-
     def future_and_current(from = Date.today)
-      self.and(:id.in => future(from).pluck(:id) + current(from).pluck(:id)).order('start_time asc')
+      self.and(:end_time.gte => from).order('start_time asc')
     end
 
     def past(from = Date.today)

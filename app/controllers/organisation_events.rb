@@ -1,14 +1,14 @@
 Dandelion::App.controller do
   get '/o/:slug/events_block' do
     @organisation = Organisation.find_by(slug: params[:slug]) || not_found
-    @events = @organisation.events_including_cohosted.future_and_current
+    @events = @organisation.events_including_cohosted.public.future_and_current
     @events = @events.and(monthly_donors_only: true) if params[:members_events]
     partial :'organisations/events_block'
   end
 
   get '/o/:slug/events', provides: %i[html ics json] do
     @organisation = Organisation.find_by(slug: params[:slug]) || not_found
-    @events = @organisation.events_including_cohosted
+    @events = @organisation.events_including_cohosted.public
     @from = params[:from] ? parse_date(params[:from]) : Date.today
     @to = params[:to] ? parse_date(params[:to]) : nil
     @events = case params[:order]
@@ -125,7 +125,7 @@ Dandelion::App.controller do
       end
     when :ics
       @events = @events.live
-      @events = @events.current(1.month.ago)
+      @events = @events.future_and_current(1.month.ago)
       @events = filter_events_by_search_and_tags(@events)
       @events = @events.limit(500)
       cal = Icalendar::Calendar.new
