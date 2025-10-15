@@ -21,7 +21,7 @@
 
 <% if @q %>
   <% case @type; when 'accounts' %>
-    <ul class="search-result-list">
+    <ul class="search-result-list mb-3">
       <% @accounts.each { |account| %>
       <li>
         <%= partial 'accounts/search_result', locals: { account: account } %>
@@ -42,7 +42,7 @@
       }
       }
     </style>
-    <ul class="search-result-list">
+    <ul class="search-result-list mb-3">
       <% @organisations.each { |organisation| %>
       <li>
         <div class="search-result-media" style="height: auto">
@@ -64,7 +64,7 @@
     </ul>
     <%= will_paginate @organisations, page_links: false, renderer: WillPaginate::ViewHelpers::BootstrapRenderer %>
   <% when 'gatherings' %>
-    <ul class="search-result-list">
+    <ul class="search-result-list mb-3">
       <% @gatherings.each { |gathering| %>
       <li>
         <% if gathering.image %>
