@@ -72,12 +72,12 @@ module Searchable
 
         # Only add $match stage if there are remaining complex conditions
         pipeline << { '$match': remaining_selector } if remaining_selector.any?
+        pipeline << { '$limit': limit } if limit
         pipeline << { '$project': { _id: 1 } } unless build_records
 
         puts pipeline.to_json
 
         results = collection.aggregate(pipeline)
-        results = results.first(limit) if limit
 
         if build_records
           results.map do |hash|
