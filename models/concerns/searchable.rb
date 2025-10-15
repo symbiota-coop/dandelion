@@ -2,7 +2,7 @@ module Searchable
   extend ActiveSupport::Concern
 
   class_methods do
-    def search(query, scope = all, limit: nil, build_records: false, score_threshold: nil, phrase_boost: 1, include_text_search: false)
+    def search(query, scope = all, limit: nil, build_records: false, phrase_boost: 1, include_text_search: false)
       return none if query.blank?
       return none if query.length < 3 || query.length > 200
 
@@ -78,13 +78,6 @@ module Searchable
 
         results = collection.aggregate(pipeline)
         results = results.first(limit) if limit
-
-        # Filter by score threshold
-        if score_threshold && results.any?
-          max_score = results.map { |doc| doc['score'] }.max
-          min_score = max_score * score_threshold
-          results = results.select { |doc| doc['score'] >= min_score }
-        end
 
         if build_records
           results.map do |hash|
