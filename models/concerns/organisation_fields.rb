@@ -11,6 +11,7 @@ module OrganisationFields
     field :intro_text, type: String
     field :telegram_group, type: String
     field :image_uid, type: String
+    field :has_image, type: Mongoid::Boolean
     field :plausible_analytics_domain, type: String
     field :simple_analytics_domain, type: String
     field :facebook_pixel_id, type: String

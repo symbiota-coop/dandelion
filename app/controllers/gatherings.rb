@@ -10,7 +10,7 @@ Dandelion::App.controller do
 
     case content_type
     when :html
-      @gatherings = @gatherings.and(:image_uid.ne => nil)
+      @gatherings = @gatherings.and(has_image: true)
       @gatherings = @gatherings.paginate(page: params[:gatherings_page], per_page: 50)
       erb :'gatherings/gatherings'
     when :json

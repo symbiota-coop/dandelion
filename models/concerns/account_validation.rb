@@ -39,6 +39,7 @@ module AccountValidation
       self.sign_ins_count = 0 unless sign_ins_count
       self.number_at_this_location = 0 unless number_at_this_location
 
+      self.has_image = image.present?
       if image
         begin
           if image.image?

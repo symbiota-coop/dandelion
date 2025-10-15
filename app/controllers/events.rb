@@ -27,7 +27,7 @@ Dandelion::App.controller do
       params[:online] = false
     end
     @events = @events.and(hidden_from_homepage: false) if params[:home]
-    @events = @events.and(:image_uid.ne => nil) if params[:images]
+    @events = @events.and(has_image: true) if params[:images]
     case content_type
     when :html
       @events = @events.future(@from)

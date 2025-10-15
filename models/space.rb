@@ -12,6 +12,7 @@ class Space
   field :name, type: String
   field :o, type: Integer
   field :image_uid, type: String
+  field :has_image, type: Boolean
 
   def self.admin_fields
     {

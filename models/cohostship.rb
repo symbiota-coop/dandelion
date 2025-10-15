@@ -10,6 +10,7 @@ class Cohostship
   belongs_to_without_parent_validation :organisation, index: true
 
   field :image_uid, type: String
+  field :has_image, type: Boolean
   field :video_uid, type: String
   field :featured, type: Boolean
 

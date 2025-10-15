@@ -10,7 +10,7 @@
     </small>
   </h2>
   <div class="image-wall">
-    <% (Account.and(:id.in => @gathering.memberships.pluck(:account_id)).and(:image_uid.ne => nil).shuffle + Account.and(:id.in => @gathering.memberships.pluck(:account_id)).and(image_uid: nil).shuffle).each { |account| %>
+    <% (Account.and(:id.in => @gathering.memberships.pluck(:account_id)).and(:has_image => true).shuffle + Account.and(:id.in => @gathering.memberships.pluck(:account_id)).and(image_uid: nil).shuffle).each { |account| %>
     <%= partial :'accounts/square', locals: { account: account, width: '50px' } %>
     <% } %>
   </div>

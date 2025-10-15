@@ -31,6 +31,7 @@ module AccountFields
     field :time_zone, type: String
     field :crypted_password, type: String
     field :image_uid, type: String
+    field :has_image, type: Mongoid::Boolean
     field :sign_ins_count, type: Integer
     field :sign_in_token, type: String
     field :api_key, type: String

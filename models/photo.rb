@@ -10,6 +10,7 @@ class Photo
   belongs_to_without_parent_validation :account, index: true
 
   field :image_uid, type: String
+  field :has_image, type: Boolean
 
   def self.admin_fields
     {

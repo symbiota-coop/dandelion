@@ -56,7 +56,7 @@ render_article("Trending events", "Create a two-paragraph summary of these trend
           account = Account.first
         else
           account = Account.and(
-            :image_uid.ne => nil,
+            :has_image => true,
             :event_feedbacks_as_facilitator_count.gte => 20,
             :id.in => EventFacilitation.and(:created_at.gt => 1.year.ago).pluck(:account_id).map(&:to_s).uniq
           ).sample

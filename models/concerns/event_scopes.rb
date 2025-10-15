@@ -52,7 +52,7 @@ module EventScopes
       # If this is being called on an existing query, use that; otherwise use the default trending filters
       base_query = if self == Event
                      # Called as Event.trending - apply default filters
-                     live.public.browsable.future(from).and(:image_uid.ne => nil, :hide_from_trending => false).and(
+                     live.public.browsable.future(from).and(has_image: true, hide_from_trending: false).and(
                        :organisation_id.in => Organisation.and(paid_up: true).pluck(:id)
                      )
                    else

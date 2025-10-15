@@ -18,6 +18,7 @@ class Tactivity
   field :name, type: String
   field :description, type: String
   field :image_uid, type: String
+  field :has_image, type: Boolean
 
   def tslot_ids
     [''] + timetable.tslots.map { |tslot| [tslot.name, tslot.id] }

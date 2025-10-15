@@ -47,7 +47,7 @@ Dandelion::App.controller do
     @activity_applications = @activity_applications.and(:account_id.in => Account.search(params[:q]).pluck(:id)) if params[:q]
     @activity_applications = @activity_applications.and(:word_count.gte => params[:min_word_count]) if params[:min_word_count]
     @activity_applications = @activity_applications.and(:word_count.lte => params[:max_word_count]) if params[:max_word_count]
-    @activity_applications = @activity_applications.and(:account_id.in => Account.and(:id.in => @activity.activity_applications.pluck(:account_id)).and(:image_uid.ne => nil).pluck(:id)) if params[:photo]
+    @activity_applications = @activity_applications.and(:account_id.in => Account.and(:id.in => @activity.activity_applications.pluck(:account_id)).and(has_image: true).pluck(:id)) if params[:photo]
     @activity_applications = @activity_applications.and(:account_id.in => Account.and(:id.in => @activity.activity_applications.pluck(:account_id)).and(:location.ne => nil).pluck(:id)) if params[:location]
     @gender = params[:gender] || 'All'
     @activity_applications = case @gender

@@ -19,6 +19,7 @@ class Activity
   field :telegram_group, type: String
   field :intro_text, type: String
   field :image_uid, type: String
+  field :has_image, type: Boolean
   field :privacy, type: String
   field :application_questions, type: String
   field :thank_you_message, type: String

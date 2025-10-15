@@ -8,7 +8,7 @@
 <h2 class="mt-5">Attendees</h2>
 
 <div class="image-wall">
-  <% (@event.attendees.and(:image_uid.ne => nil).shuffle + @event.attendees.and(image_uid: nil).shuffle).each { |account| %>
+  <% (@event.attendees.and(:has_image => true).shuffle + @event.attendees.and(image_uid: nil).shuffle).each { |account| %>
   <%= partial :'accounts/square', locals: { account: account, width: '75px' } %>
   <% } %>
 </div>

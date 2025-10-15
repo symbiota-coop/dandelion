@@ -1,5 +1,5 @@
 <% 
-image_accounts = @event.public_attendees.and(:image_uid.ne => nil)
+image_accounts = @event.public_attendees.and(:has_image => true)
 image_accounts_count = image_accounts.count
 no_image_accounts = @event.attendees.and(:id.nin => image_accounts.pluck(:id))
 others_count = no_image_accounts.count + (@event.tickets.complete.and(:email.ne => nil).pluck(:email).map(&:downcase) - @event.attendees.pluck(:email).map(&:downcase)).length
