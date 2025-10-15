@@ -51,6 +51,7 @@ Dandelion::App.controller do
             redirect "/e/#{@events.first.slug}" if @events.count == 1
           end
           @events = Event.search(@q, Event.live.public.browsable.future(1.month.ago), build_records: true, phrase_boost: 1.5, include_text_search: true)
+          @events = @events.paginate(page: params[:page], per_page: 20)
         when 'accounts'
           if params[:q] && params[:q].starts_with?('account:')
             @accounts = Account.public.and(name: @q)
@@ -63,18 +64,21 @@ Dandelion::App.controller do
             end
           end
           @accounts = Account.search(@q, Account.public, build_records: true, phrase_boost: 1.5, include_text_search: true)
+          @accounts = @accounts.paginate(page: params[:page], per_page: 20)
         when 'organisations'
           if params[:q] && params[:q].starts_with?('organisation:')
             @organisations = Organisation.and(name: @q)
             redirect "/o/#{@organisations.first.slug}" if @organisations.count == 1
           end
           @organisations = Organisation.search(@q, Organisation.all, build_records: true, phrase_boost: 1.5, include_text_search: true)
+          @organisations = @organisations.paginate(page: params[:page], per_page: 20)
         when 'gatherings'
           if params[:q] && params[:q].starts_with?('gathering:')
             @gatherings = Gathering.all.and(listed: true).and(:privacy.ne => 'secret').and(name: @q)
             redirect "/g/#{@gatherings.first.slug}" if @gatherings.count == 1
           end
           @gatherings = Gathering.search(@q, Gathering.and(listed: true).and(:privacy.ne => 'secret'), build_records: true, phrase_boost: 1.5, include_text_search: true)
+          @gatherings = @gatherings.paginate(page: params[:page], per_page: 20)
         end
       end
 

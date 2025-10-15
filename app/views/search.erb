@@ -28,10 +28,12 @@
       </li>
       <% } %>
     </ul>
+    <%= will_paginate @accounts, page_links: false, renderer: WillPaginate::ViewHelpers::BootstrapRenderer %>
   <% when 'events' %>
     <div class="mt-4">
       <%= partial 'events/blocks', locals: { events: @events } %>
     </div>
+    <%= will_paginate @events, page_links: false, renderer: WillPaginate::ViewHelpers::BootstrapRenderer %>
   <% when 'organisations' %>
     <style>
       @media(min-width: 768px) {
@@ -60,6 +62,7 @@
       </li>
       <% } %>
     </ul>
+    <%= will_paginate @organisations, page_links: false, renderer: WillPaginate::ViewHelpers::BootstrapRenderer %>
   <% when 'gatherings' %>
     <ul class="search-result-list">
       <% @gatherings.each { |gathering| %>
@@ -77,5 +80,6 @@
       </li>
       <% } %>
     </ul>
+    <%= will_paginate @gatherings, page_links: false, renderer: WillPaginate::ViewHelpers::BootstrapRenderer %>
   <% end %>
 <% end %>

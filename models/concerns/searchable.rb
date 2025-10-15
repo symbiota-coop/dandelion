@@ -2,7 +2,7 @@ module Searchable
   extend ActiveSupport::Concern
 
   class_methods do
-    def search(query, scope = all, limit: nil, build_records: false, phrase_boost: 1, include_text_search: false)
+    def search(query, scope = all, limit: 200, build_records: false, phrase_boost: 1, include_text_search: false)
       return none if query.blank?
       return none if query.length < 3 || query.length > 200
 
@@ -10,7 +10,7 @@ module Searchable
       return scope.and(email: query) if query.match?(EMAIL_REGEX) && fields.key?('email')
 
       if Padrino.env == :development
-        scope.where('$or' => search_fields.map { |field| { field => /#{Regexp.escape(query)}/i } })
+        scope.where('$or' => search_fields.map { |field| { field => /#{Regexp.escape(query)}/i } }).limit(limit)
       else
         query = query.strip
 
@@ -72,10 +72,8 @@ module Searchable
 
         # Only add $match stage if there are remaining complex conditions
         pipeline << { '$match': remaining_selector } if remaining_selector.any?
-        pipeline << { '$limit': limit } if limit
+        pipeline << { '$limit': limit }
         pipeline << { '$project': { _id: 1 } } unless build_records
-
-        puts pipeline.to_json
 
         results = collection.aggregate(pipeline)
 
