@@ -229,15 +229,15 @@ Dandelion::App.controller do
     new_event = @event.organisation.events.find(params[:order][:event_id]) || not_found
     halt 400 unless event_admin?(new_event)
     @order.set(transferred: true)
-    @order.set(event: new_event)
+    @order.set(event_id: new_event.id)
     @order.tickets.each do |ticket|
       ticket.set(transferred: true)
-      ticket.set(event: new_event)
+      ticket.set(event_id: new_event.id)
       ticket.set(ticket_type: nil)
     end
     @order.donations.each do |donation|
       donation.set(transferred: true)
-      donation.set(event: new_event)
+      donation.set(event_id: new_event.id)
     end
     @order.send_tickets
     @event.clear_cache
