@@ -18,7 +18,7 @@
   <% 
   # Use aggregation to join with accounts and events at database level
   pipeline = [
-    { '$match' => { 'anonymise' => false, 'public_answers' => { '$ne' => nil }, 'rating' => 5 } },
+    { '$match' => { 'anonymise' => false, 'has_public_answers' => true, 'rating' => 5 } },
     # Sort by account_id then created_at so $first picks the latest per account without in-memory sort
     { '$sort' => { 'account_id' => 1, 'created_at' => -1 } },
     # Group by account_id to get only one feedback per account (most recent due to sort)
