@@ -211,10 +211,10 @@
             <% if m = q.match(Order::SELECT_FIELD_REGEX) %>
               <% # Select field: Question text [opt1, opt2, opt3] %>
               <%== Sanitize.fragment(Rinku.auto_link(m[1]), Sanitize::Config::DANDELION) %>
-            <% elsif m = q.match(/\[(.*)\]/) %>
+            <% elsif m = q.match(Order::CHECKBOX_FIELD_REGEX) %>
               <% # Checkbox: [Question text] %>
               <%== Sanitize.fragment(Rinku.auto_link(m[1]), Sanitize::Config::DANDELION) %>
-            <% elsif m = q.match(/\{(.*)\}/) %>
+            <% elsif m = q.match(Order::DATE_FIELD_REGEX) %>
               <% # Date field: {Question text} %>
               <%== Sanitize.fragment(Rinku.auto_link(m[1]), Sanitize::Config::DANDELION) %>
             <% else %>

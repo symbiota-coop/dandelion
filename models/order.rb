@@ -9,8 +9,9 @@ class Order
     const_set(error_class, Class.new(StandardError))
   end
 
-  # Regex for matching select field questions: "Question text [option1, option2, option3]" or "Question text [option1, option2, option3]*"
   SELECT_FIELD_REGEX = /^(.+?)\s*\[\s*(.+?)\s*\]\*?$/
+  CHECKBOX_FIELD_REGEX = /^\s*\[(.+?)\]\s*\*?$/
+  DATE_FIELD_REGEX = /^\s*\{(.+?)\}\s*\*?$/
 
   include OrderFields
   include OrderNotifications
