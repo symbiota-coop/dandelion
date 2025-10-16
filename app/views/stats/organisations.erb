@@ -25,9 +25,13 @@
   tickets_by_event = tickets.group_by(&:event_id)
   orders_by_event = orders.group_by(&:event_id)
   
-  # Pre-fetch all events and group by organisation_id
-  events_in_range = Event.and(:id.in => (tickets.pluck(:event_id) + orders.pluck(:event_id)).uniq)
-  events_by_org = events_in_range.group_by(&:organisation_id)
+  # Pre-fetch ALL events for these organisations to match original behavior
+  # (original code used organisation.events.pluck(:id) which gets all events regardless of date)
+  all_events_by_org = {}
+  Event.and(:organisation_id.in => organisation_ids).only(:id, :organisation_id).each do |event|
+    all_events_by_org[event.organisation_id] ||= []
+    all_events_by_org[event.organisation_id] << event.id
+  end
   
   # Calculate total value for summary
   total_value = orders.inject(Money.new(0,'GBP')) { |sum, o| sum + Money.new(o.value*100, o.currency) }
@@ -60,13 +64,15 @@
       </tr>
     </thead>
     <% organisations.each { |organisation|
-      # Get this organisation's events in the date range
-      org_events = events_by_org[organisation.id] || []
-      org_event_ids = org_events.map(&:id)
+      # Get ALL event IDs for this organisation (not filtered by date, to match original)
+      all_org_event_ids = all_events_by_org[organisation.id] || []
       
-      # Get tickets and orders for this organisation's events
-      org_tickets = org_event_ids.flat_map { |eid| tickets_by_event[eid] || [] }
-      org_orders = org_event_ids.flat_map { |eid| orders_by_event[eid] || [] }
+      # Get tickets and orders for this organisation's events (already filtered by date)
+      org_tickets = all_org_event_ids.flat_map { |eid| tickets_by_event[eid] || [] }
+      org_orders = all_org_event_ids.flat_map { |eid| orders_by_event[eid] || [] }
+      
+      # Get unique event IDs that had tickets in the date range (for counting events)
+      org_event_ids_with_tickets = org_tickets.map(&:event_id).uniq
       
       # Calculate order sum
       orders_sum = org_orders.inject(Money.new(0, 'GBP')) do |sum, o|
@@ -79,7 +85,7 @@
         <a href="/o/<%=organisation.slug%>"><%=organisation.name%></a>
       </td>
       <td>
-        <%=org_events.count %>
+        <%=org_event_ids_with_tickets.count %>
       </td>
       <td>
         <%=org_tickets.count%>
