@@ -19,7 +19,12 @@
   # Use aggregation to join with accounts and events at database level
   pipeline = [
     { '$match' => { 'anonymise' => false, 'public_answers' => { '$ne' => nil }, 'rating' => 5 } },
-    { '$sort' => { 'created_at' => -1 } },
+    # Sort by account_id then created_at so $first picks the latest per account without in-memory sort
+    { '$sort' => { 'account_id' => 1, 'created_at' => -1 } },
+    # Group by account_id to get only one feedback per account (most recent due to sort)
+    { '$group' => { '_id' => '$account_id', 'feedback' => { '$first' => '$$ROOT' } } },
+    { '$replaceRoot' => { 'newRoot' => '$feedback' } },
+    # Perform lookups after grouping to reduce join volume
     { '$lookup' => { 'from' => 'accounts', 'localField' => 'account_id', 'foreignField' => '_id', 'as' => 'account_doc' } },
     { '$lookup' => { 'from' => 'events', 'localField' => 'event_id', 'foreignField' => '_id', 'as' => 'event_doc' } },
     { '$unwind' => '$account_doc' },
@@ -31,9 +36,7 @@
         'account_doc.name' => { '$not' => { '$regex' => '_' } }
       } 
     },
-    # Group by account_id to get only one feedback per account (most recent due to sort)
-    { '$group' => { '_id' => '$account_id', 'feedback' => { '$first' => '$$ROOT' } } },
-    { '$replaceRoot' => { 'newRoot' => '$feedback' } },
+    # Final sort by created_at to get the most recent feedbacks
     { '$sort' => { 'created_at' => -1 } },
     { '$limit' => 10 }
   ]
