@@ -208,9 +208,14 @@
         <% order.answers.each { |q,a| if q && a %>
         <p style="width: 400px">
           <strong>
-            <% if m = q.match(/\[(.*)\]/) %>
+            <% if m = q.match(Order::SELECT_FIELD_REGEX) %>
+              <% # Select field: Question text [opt1, opt2, opt3] %>
+              <%== Sanitize.fragment(Rinku.auto_link(m[1]), Sanitize::Config::DANDELION) %>
+            <% elsif m = q.match(/\[(.*)\]/) %>
+              <% # Checkbox: [Question text] %>
               <%== Sanitize.fragment(Rinku.auto_link(m[1]), Sanitize::Config::DANDELION) %>
             <% elsif m = q.match(/\{(.*)\}/) %>
+              <% # Date field: {Question text} %>
               <%== Sanitize.fragment(Rinku.auto_link(m[1]), Sanitize::Config::DANDELION) %>
             <% else %>
               <%== Sanitize.fragment(Rinku.auto_link(q), Sanitize::Config::DANDELION) %>
@@ -218,7 +223,11 @@
           </strong>
         </p>
         <p style="width: 400px">
-          <% if q =~ /\[.*\]/ %>
+          <% if q =~ Order::SELECT_FIELD_REGEX %>
+            <% # Select field answer: show the selected value %>
+            <%== Sanitize.fragment(Rinku.auto_link(a), Sanitize::Config::DANDELION) %>
+          <% elsif q =~ /\[.*\]/ %>
+            <% # Checkbox answer: show checkmark %>
             <i class="bi bi-check-lg"></i>
           <% else %>
             <%== Sanitize.fragment(Rinku.auto_link(a.gsub("\n", '<br />')), Sanitize::Config::DANDELION) %>
