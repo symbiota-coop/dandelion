@@ -80,9 +80,22 @@ Dandelion::App.controller do
   post '/o/:slug/gocardless_webhook' do
     @organisation = Organisation.find_by(slug: params[:slug]) || not_found
     webhook_endpoint_secret = @organisation.gocardless_endpoint_secret
+    
+    # Ensure webhook endpoint secret is configured and valid
+    if webhook_endpoint_secret.blank?
+      Honeybadger.notify("GoCardless webhook endpoint secret not configured for organisation #{@organisation.slug}")
+      halt 400
+    end
+    
     request_body = request.body.tap(&:rewind).read
     signature_header = request.env['HTTP_WEBHOOK_SIGNATURE']
-    events = GoCardlessPro::Webhook.parse(request_body: request_body, signature_header: signature_header, webhook_endpoint_secret: webhook_endpoint_secret)
+    
+    begin
+      events = GoCardlessPro::Webhook.parse(request_body: request_body, signature_header: signature_header, webhook_endpoint_secret: webhook_endpoint_secret)
+    rescue ArgumentError => e
+      Honeybadger.notify(e, context: { organisation_slug: @organisation.slug, error: e.message })
+      halt 400
+    end
 
     events.each do |event|
       if event.resource_type == 'subscriptions' && event.action == 'created'
