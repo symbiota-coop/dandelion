@@ -88,6 +88,10 @@ class Event
     q.empty? ? [] : q
   end
 
+  def questions_a_from_orders
+    orders.pluck(:answers).map { |answers| answers.map { |q, _a| q } }.flatten.uniq
+  end
+
   def recording?
     past? && extra_info_for_recording_email
   end
