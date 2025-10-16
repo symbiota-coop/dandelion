@@ -160,14 +160,15 @@
         </style>
         <div class="row">
           <div class="col-lg-6">
-            <%= f.text_area_block :questions, placeholder: "e.g. Any dietary requirements?\n[Check this box to agree to the terms and conditions]" %>
+            <%= f.text_area_block :questions, placeholder: "e.g. Any dietary requirements?\n[Check this box to agree to the terms and conditions]\nWhat is your experience? [beginner, intermediate, advanced]\n{When did you last attend?}" %>
             <div class="q-help">
               <p class="text-muted">Questions to ask participants upon booking.</p>
               <ul class="text-muted">
                 <li>One question per line</li>
-                <li>Add headers by starting a line with # </li>
-                <li>Wrap in [square brackets] to turn into a checkbox</li>
-                <li>Wrap in {curly brackets} to turn into a date field</li>
+                <li>Add headers by starting a line with # like: # header</li>
+                <li>Checkboxes like: [question?]</li>
+                <li>Select fields like: question? [option1, option2, option3]</li>
+                <li>Date fields like: {question?}</li>
                 <li>End a line with a star * to make the question required</li>
                 <li>View answers on the Orders page</li>
               </ul>
