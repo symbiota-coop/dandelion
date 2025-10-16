@@ -15,13 +15,34 @@
   })
 </script>
 <div class="grid mt-5">
-  <% account_ids = []; EventFeedback.and(:event_id.in => Event.pluck(:id), :account_id.in => Account.and(:has_image => true).pluck(:id), :anonymise => false, :public_answers.ne => nil, :rating => 5).order('created_at desc').limit(10).each { |event_feedback|
+  <% 
+  # Use aggregation to join with accounts and events at database level
+  pipeline = [
+    { '$match' => { 'anonymise' => false, 'public_answers' => { '$ne' => nil }, 'rating' => 5 } },
+    { '$sort' => { 'created_at' => -1 } },
+    { '$lookup' => { 'from' => 'accounts', 'localField' => 'account_id', 'foreignField' => '_id', 'as' => 'account_doc' } },
+    { '$lookup' => { 'from' => 'events', 'localField' => 'event_id', 'foreignField' => '_id', 'as' => 'event_doc' } },
+    { '$unwind' => '$account_doc' },
+    { '$unwind' => '$event_doc' },
+    { '$match' => { 
+        'account_doc.has_image' => true, 
+        'account_doc.has_signed_in' => true, 
+        'account_doc.hidden' => { '$ne' => true },
+        'account_doc.name' => { '$not' => { '$regex' => '_' } }
+      } 
+    },
+    # Group by account_id to get only one feedback per account (most recent due to sort)
+    { '$group' => { '_id' => '$account_id', 'feedback' => { '$first' => '$$ROOT' } } },
+    { '$replaceRoot' => { 'newRoot' => '$feedback' } },
+    { '$sort' => { 'created_at' => -1 } },
+    { '$limit' => 10 }
+  ]
+  
+  EventFeedback.collection.aggregate(pipeline).each { |doc|
+  event_feedback = EventFeedback.new(doc.select { |k, _v| EventFeedback.fields.keys.include?(k.to_s) })
   account = event_feedback.account
   quote = event_feedback.public_answers.map { |q,a| a unless a.blank? }.compact.join('<br /><br />')
-  next if quote.length > 500
-  next unless account.public?
-  next if account.name.include?('_')
-  next if account_ids.include?(account.id) %>
+  next if quote.length > 500 %>
   <div class="grid-sizer"></div>
   <div class="grid-item">
 
@@ -47,5 +68,5 @@
       </div>
     </div>
   </div>
-  <% account_ids << account.id } %>
+  <% } %>
 </div>
