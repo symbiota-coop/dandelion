@@ -8,6 +8,9 @@ module DandelionMongo
 
   def convert_nil_booleans_to_false
     self.class.fields.each do |field_name, field|
+      # Skip fields that weren't loaded (e.g., when using .only or .without)
+      next unless attribute_loaded?(field_name)
+      
       send("#{field_name}=", false) if field.type == Mongoid::Boolean && send(field_name).nil?
     end
   end
