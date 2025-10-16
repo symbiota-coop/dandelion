@@ -170,7 +170,7 @@ class Event
   end
 
   def set_browsable
-    set(browsable: !organisation.hidden && (organisation.paid_up || ticket_types.exists?))
+    set(browsable: !minimal_only? && !organisation.hidden && (organisation.paid_up || ticket_types.exists?))
   end
 
   def carousel_name
