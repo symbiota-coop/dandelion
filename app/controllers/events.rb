@@ -179,6 +179,9 @@ Dandelion::App.controller do
       @event = Event.find(id) || not_found
       redirect request.url.gsub(id, @event.slug) if @event.slug
     end
+
+    redirect @event.purchase_url if @event.minimal_only? && @event.purchase_url
+
     @order = Order.find(params[:order_id]) || not_found if params[:order_id]
     @og_desc = when_details(@event)
     kick! unless @event.organisation

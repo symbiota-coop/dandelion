@@ -63,6 +63,7 @@ Dandelion::App.controller do
         @events = @events.and(:start_time.lt => @to + 1) if @to
       end
       @events = filter_events_by_search_and_tags(@events)
+      @events = @events.and(minimal_only: false) unless params[:minimal]
       if params[:order] == 'random'
         event_ids = @events.pluck(:id)
         @events = @events.collection.aggregate([
