@@ -7,6 +7,7 @@ end
 %>
 
 <% questions_a.each_with_index { |q,i| %>
+<%= hidden_field_tag "questions[#{i}]", value: q %>
 <div class="form-group">
   <label class="feedback-question-label">
     <%== Sanitize.fragment(Rinku.auto_link(q), Sanitize::Config::DANDELION) %>
