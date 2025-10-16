@@ -18,6 +18,7 @@ class EventFeedback
   field :public_answers, type: Array
   field :rating, type: Integer
   field :response, type: String
+  field :has_public_answers, type: Boolean
 
   def self.admin_fields
     {
@@ -33,6 +34,10 @@ class EventFeedback
   end
 
   validates_uniqueness_of :event, scope: :account, allow_nil: true, conditions: -> { where(deleted_at: nil) }
+
+  before_validation do
+    self.has_public_answers = public_answers.present?
+  end
 
   after_save do
     event.clear_cache if event
