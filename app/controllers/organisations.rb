@@ -173,7 +173,7 @@ Dandelion::App.controller do
       partial :'events/carousel', locals: { title: 'Featured', events: @organisation.featured_events, hide_featured_title: params[:hide_featured_title], skip_margin: true }
     else
       carousel = @organisation.carousels.find(params[:id]) || not_found
-      partial :'events/carousel', locals: { title: carousel.name, events: carousel.events }
+      partial :'events/carousel', locals: { title: carousel.name, events: carousel.events(minimal: params[:minimal]) }
     end
   end
 
