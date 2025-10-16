@@ -12,15 +12,31 @@
 <% end %>
 
 <%
-  orders = Order.and(:created_at.gte => @from, :created_at.lt => @to + 1.day, :value.ne => nil, :currency.in => MAJOR_CURRENCIES)  
-  organisations = Organisation.and(:id.in => Event.and(:id.in => orders.pluck(:event_id)).pluck(:organisation_id))  
+  # Pre-fetch all orders and tickets in date range
+  orders = Order.and(:created_at.gte => @from, :created_at.lt => @to + 1.day, :value.ne => nil, :currency.in => MAJOR_CURRENCIES)
   tickets = Ticket.and(:created_at.gte => @from, :created_at.lt => @to + 1.day, :price.gt => 0)
+  
+  # Get organisations with events that have orders
+  event_ids_with_orders = orders.pluck(:event_id).uniq
+  organisation_ids = Event.and(:id.in => event_ids_with_orders).pluck(:organisation_id).uniq
+  organisations = Organisation.and(:id.in => organisation_ids)
+  
+  # Pre-group tickets and orders by event_id for faster lookup
+  tickets_by_event = tickets.group_by(&:event_id)
+  orders_by_event = orders.group_by(&:event_id)
+  
+  # Pre-fetch all events and group by organisation_id
+  events_in_range = Event.and(:id.in => (tickets.pluck(:event_id) + orders.pluck(:event_id)).uniq)
+  events_by_org = events_in_range.group_by(&:organisation_id)
+  
+  # Calculate total value for summary
+  total_value = orders.inject(Money.new(0,'GBP')) { |sum, o| sum + Money.new(o.value*100, o.currency) }
 %>
 <p class="lead mt-3">
   <%= pluralize(organisations.count, 'organisation') %> sold
   <%= pluralize(tickets.count, 'ticket') %>
   worth
-  <%= s = Money.new(0,'GBP'); orders.each { |o| s+= Money.new(o.value*100, o.currency) }; s.exchange_to('GBP').format(no_cents: true) %>
+  <%= total_value.exchange_to('GBP').format(no_cents: true) %>
 </p>
 
 <div class="mt-3">
@@ -43,25 +59,30 @@
         <th data-col-name="remaining">Remaining</th>
       </tr>
     </thead>
-    <% organisations = Organisation.and(:id.in => Event.and(:id.in => Order.and(:created_at.gte => @from, :created_at.lt => @to + 1.day, :value.ne => nil).pluck(:event_id)).pluck(:organisation_id)) %>
     <% organisations.each { |organisation|
-    
-    tickets = Ticket.and(:event_id.in => organisation.events.pluck(:id), :created_at.gte => @from, :created_at.lt => @to + 1.day, :price.gt => 0)
-    orders = Order.and(:event_id.in => organisation.events.pluck(:id), :created_at.gte => @from, :created_at.lt => @to + 1.day, :value.ne => nil, :currency.in => MAJOR_CURRENCIES)
-    events = Event.and(:id.in => tickets.pluck(:event_id))
-    orders_sum = orders.sum { |o| Money.new(o.value*100, o.currency) }
-    orders_sum = orders_sum > 0 ? orders_sum.exchange_to('GBP') : Money.new(0, 'GBP')
-
+      # Get this organisation's events in the date range
+      org_events = events_by_org[organisation.id] || []
+      org_event_ids = org_events.map(&:id)
+      
+      # Get tickets and orders for this organisation's events
+      org_tickets = org_event_ids.flat_map { |eid| tickets_by_event[eid] || [] }
+      org_orders = org_event_ids.flat_map { |eid| orders_by_event[eid] || [] }
+      
+      # Calculate order sum
+      orders_sum = org_orders.inject(Money.new(0, 'GBP')) do |sum, o|
+        sum + Money.new(o.value * 100, o.currency)
+      end
+      orders_sum = orders_sum.exchange_to('GBP') if orders_sum > 0
     %>
     <tr>
       <td>
         <a href="/o/<%=organisation.slug%>"><%=organisation.name%></a>
       </td>
       <td>
-        <%=events.count %>
+        <%=org_events.count %>
       </td>
       <td>
-        <%=tickets.count%>
+        <%=org_tickets.count%>
       </td>
       <td>
         <%= orders_sum.format(no_cents: true) %>

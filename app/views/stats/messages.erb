@@ -5,6 +5,7 @@
       <th>From</th>
       <th>To</th>
       <th>Message</th>
+      <th>Sent at</th>
     </tr>
   </thead>
   <tbody>
@@ -18,6 +19,9 @@
       </td>
       <td>
         <%= message.body %>
+      </td>
+      <td>
+        <%= message.created_at %>
       </td>
     </tr>
     <% } %>
