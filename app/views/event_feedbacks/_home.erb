@@ -17,26 +17,25 @@
 <div class="grid mt-5">
   <% 
   # Use aggregation to join with accounts and events at database level
+  # Step 1: Find eligible accounts (this should be fast with proper indexes)
+  eligible_account_ids = Account.and(
+    :has_image => true,
+    :has_signed_in => true,
+    :hidden => false,
+  ).pluck(:id)
+  
+  # Step 2: Find the most recent 5-star feedback from each eligible account
+  # Using a simpler aggregation that only works with filtered account IDs
   pipeline = [
-    { '$match' => { 'anonymise' => false, 'has_public_answers' => true, 'rating' => 5 } },
-    # Sort by account_id then created_at so $first picks the latest per account without in-memory sort
+    { '$match' => { 
+      'anonymise' => false, 
+      'has_public_answers' => true, 
+      'rating' => 5,
+      'account_id' => { '$in' => eligible_account_ids }
+    } },
     { '$sort' => { 'account_id' => 1, 'created_at' => -1 } },
-    # Group by account_id to get only one feedback per account (most recent due to sort)
     { '$group' => { '_id' => '$account_id', 'feedback' => { '$first' => '$$ROOT' } } },
     { '$replaceRoot' => { 'newRoot' => '$feedback' } },
-    # Perform lookups after grouping to reduce join volume
-    { '$lookup' => { 'from' => 'accounts', 'localField' => 'account_id', 'foreignField' => '_id', 'as' => 'account_doc' } },
-    { '$lookup' => { 'from' => 'events', 'localField' => 'event_id', 'foreignField' => '_id', 'as' => 'event_doc' } },
-    { '$unwind' => '$account_doc' },
-    { '$unwind' => '$event_doc' },
-    { '$match' => { 
-        'account_doc.has_image' => true, 
-        'account_doc.has_signed_in' => true, 
-        'account_doc.hidden' => { '$ne' => true },
-        'account_doc.name' => { '$not' => { '$regex' => '_' } }
-      } 
-    },
-    # Final sort by created_at to get the most recent feedbacks
     { '$sort' => { 'created_at' => -1 } },
     { '$limit' => 10 }
   ]
@@ -44,6 +43,7 @@
   EventFeedback.collection.aggregate(pipeline).each { |doc|
   event_feedback = EventFeedback.new(doc.select { |k, _v| EventFeedback.fields.keys.include?(k.to_s) })
   account = event_feedback.account
+  next if account.name.include?('_')
   quote = event_feedback.public_answers.map { |q,a| a unless a.blank? }.compact.join('<br /><br />')
   next if quote.length > 500 %>
   <div class="grid-sizer"></div>
