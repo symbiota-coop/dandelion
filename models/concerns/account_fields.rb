@@ -5,9 +5,9 @@ module AccountFields
     dragonfly_accessor :image do
       after_assign do |attachment|
         if attachment.image?
-          if attachment.format == 'heic'
+          if attachment.format != 'jpeg'
             attachment.convert('-format jpeg')
-            attachment.name = "#{SecureRandom.uuid}.jpg"
+            attachment.name = "#{SecureRandom.uuid}.jpeg"
           end
 
           attachment.process!(:thumb, '1920x1920>')

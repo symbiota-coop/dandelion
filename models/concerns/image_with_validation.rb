@@ -7,7 +7,7 @@ module ImageWithValidation
         if attachment.image?
           if attachment.format != 'jpeg'
             attachment.convert('-format jpeg')
-            attachment.name = "#{SecureRandom.uuid}.jpg"
+            attachment.name = "#{SecureRandom.uuid}.jpeg"
           end
 
           attachment.process!(:thumb, '1920x1920>')

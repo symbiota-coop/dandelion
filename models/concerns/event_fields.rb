@@ -161,7 +161,7 @@ module EventFields
     def new_hints
       {
         slug: 'Lowercase letters, numbers and dashes only (no spaces)',
-        image: 'At least 992px wide, and more wide than high',
+        image: 'At least 992px wide, and more wide than high. Use JPEG for best results (will be converted to JPEG if necessary)',
         start_time: "in &hellip; (your profile's time zone)",
         end_time: "in &hellip; (your profile's time zone)",
         add_a_donation_to: "Text to display beside the 'Add a donation' field (leave blank to use organisation default)",
