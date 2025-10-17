@@ -101,6 +101,10 @@ module EventAssociations
     Account.and(:id.in => tickets.complete.pluck(:account_id))
   end
 
+  def attendee_ids
+    tickets.complete.pluck(:account_id)
+  end
+
   def starrers
     Account.and(:id.in => event_stars.pluck(:account_id))
   end

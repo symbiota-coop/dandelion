@@ -161,7 +161,7 @@ class Pmail
         elsif mailable
           mailable.is_a?(Event) && waitlist ? mailable.waiters : mailable.subscribed_members
         end
-    t = t.and(:id.nin => event.attendees.pluck(:id)) if event
+    t = t.and(:id.nin => event.attendee_ids) if event
     t = t.and(:id.nin => activity.future_attendees.pluck(:id)) if activity
     t = t.and(:id.nin => local_group.members.pluck(:id)) if local_group
     t

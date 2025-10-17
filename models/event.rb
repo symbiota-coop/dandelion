@@ -43,7 +43,7 @@ class Event
 
   def self.recommend
     events_with_participant_ids = Event.live.public.future.map do |event|
-      [event.id.to_s, event.attendees.pluck(:id).map(&:to_s)]
+      [event.id.to_s, event.attendee_ids.map(&:to_s)]
     end
     # c = Account.recommendable.count
     Account.recommendable.each_with_index do |account, _i|

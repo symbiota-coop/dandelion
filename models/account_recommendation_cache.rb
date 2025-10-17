@@ -24,7 +24,7 @@ class AccountRecommendationCache
     people = {}
 
     events.each do |event|
-      event.attendees.pluck(:id).each do |attendee_id|
+      event.attendee_ids.each do |attendee_id|
         next if attendee_id == account_id
 
         connection = { type: 'Event', id: event.id.to_s }
