@@ -1,5 +1,7 @@
 <div class="card shadow-sm">
-  <h3 class="card-header bg-primary text-white">This event is sold out</h3>
+  <h3 class="card-header bg-primary text-white">
+    <%= @event.sold_out_due_to_sales_end? ? 'Sales have ended for this event' : 'This event is sold out' %>
+  </h3>
   <div class="card-body">
     <p class="lead">
       Missed out on tickets to <%= @event.name %>?

@@ -149,6 +149,12 @@ class Event
     end
   end
 
+  def sold_out_due_to_sales_end?
+    ticket_types.exists? && ticket_types.and(hidden: false).all? do |ticket_type|
+      ticket_type.sales_end && ticket_type.sales_end < Time.now
+    end
+  end
+
   def tickets_available?
     ticket_types.exists? && ticket_types.and(hidden: false).any? do |ticket_type|
       ticket_type.number_of_tickets_available_in_single_purchase >= 1 &&
