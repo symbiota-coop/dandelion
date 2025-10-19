@@ -63,6 +63,9 @@ module EventAssociations
       has_many_through :starrers, through: :event_stars
       has_many_through :waiters, through: :waitships
       has_many_through :event_facilitators, through: :event_facilitations
+      has_many_through :attendees, through: :tickets, conditions: { payment_completed: true }
+      has_many_through :public_attendees, through: :tickets, conditions: { payment_completed: true, show_attendance: true }
+      has_many_through :private_attendees, through: :tickets, conditions: { payment_completed: true, show_attendance: false }
     end
   end
 
@@ -98,24 +101,12 @@ module EventAssociations
     [organisation] + cohosts
   end
 
-  def attendees
-    Account.and(:id.in => tickets.complete.pluck(:account_id))
-  end
-
   def unscoped_attendees
     Account.and(:id.in => tickets.unscoped.pluck(:account_id))
   end
 
   def attendee_ids
     tickets.complete.pluck(:account_id)
-  end
-
-  def public_attendees
-    Account.and(:id.in => tickets.complete.and(show_attendance: true).pluck(:account_id)).and(hidden: false)
-  end
-
-  def private_attendees
-    Account.and(:id.in => tickets.complete.and(show_attendance: false).pluck(:account_id))
   end
 
   def discussers
