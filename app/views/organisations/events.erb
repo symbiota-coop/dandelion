@@ -28,7 +28,7 @@
 <% end %>
 <% if params[:no_search] %>
   <% unless params[:no_listings] || params[:no_view_options]  %>
-    <%= partial :'events/view_options', locals: { calendar_view: true } %>
+    <%= partial :'events/view_options', locals: { grid_view: true, calendar_view: true } %>
   <% end %>
 <% else %>
   <div class="<%= params[:minimal] ? 'mb-3 mt-1' : 'my-3' %>">
@@ -36,7 +36,8 @@
   </div>
 <% end %>
 
-<% if !params[:search] && !params[:event_tag_id] && !params[:page] && !params[:carousel_ids] && !params[:near] && !params[:display] %>
+<% if !params[:search] && !params[:event_tag_id] && !params[:page] && !params[:carousel_ids] && !params[:near] && (params[:display] == 'grid' || !params[:display]) %>
+  <% @carousels = true %>
   <% if @organisation.featured_events.exists? %>
     <div data-with-placeholder data-pagelet-url="/o/<%= @organisation.slug %>/carousels/featured?hide_featured_title=<%=params[:hide_featured_title]%>">
       <%= partial :'events/carousel_placeholder' %>
@@ -62,6 +63,8 @@
   <%= partial :'events/table' %>
 <% elsif params[:display] == 'concise' %>
   <%= partial :'events/concise' %>
+<% elsif params[:display] == 'grid' %>
+  <%= partial :'events/grid' %>
 <% else %>
   <div data-pagelet-url="/o/<%=@organisation.slug%>/events?<%= request.query_string %>">
     <%= partial :'organisations/events' %>

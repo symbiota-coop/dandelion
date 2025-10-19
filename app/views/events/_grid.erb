@@ -1,0 +1,12 @@
+<div id="events-grid">
+  <% if @carousels %>
+    <h2 class="text-center">All events</h2>
+  <% end %>
+  <div class="row">
+    <% @events.and(has_image: true).each { |event| %>
+    <div class="col-12 col-sm-6 col-lg-4" style="margin-bottom: 0.75rem">
+      <%= partial :'events/block_carousel', locals: {crop: (crop if defined?(crop)), event: event} %>
+    </div>
+    <% } %>
+  </div>
+</div>

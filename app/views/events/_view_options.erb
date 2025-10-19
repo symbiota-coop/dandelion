@@ -43,10 +43,17 @@
         <label class="mb-0">View as</label>
       </li>
       <li class="list-inline-item">
-        <a data-toggle="tooltip" title="List view" class="btn <%='btn-outline-primary' if !params[:display].in?(['map','calendar']) %>" href="<%= path if defined?(path) && path %>?<%= q = Rack::Utils.parse_nested_query(request.query_string); q.delete('search'); q.delete('display'); q.merge({search: 1, display: 'list' }).to_query %>">
+        <a data-toggle="tooltip" title="List view" class="btn <%='btn-outline-primary' if !params[:display].in?(['map','calendar','grid']) %>" href="<%= path if defined?(path) && path %>?<%= q = Rack::Utils.parse_nested_query(request.query_string); q.delete('search'); q.delete('display'); q.merge({search: 1, display: 'list' }).to_query %>">
           <i class="bi bi-list-task"></i> <span class="d-none d-lg-inline">List</span>
         </a>
       </li>
+      <% if defined?(grid_view) %>
+        <li class="list-inline-item">
+          <a data-toggle="tooltip" title="Grid view" class="btn <%='btn-outline-primary'if params[:display] == 'grid' %>" href="<%= path if defined?(path) && path %>?<%= q = Rack::Utils.parse_nested_query(request.query_string); q.delete('search'); q.delete('display'); q.merge({search: 1, display: 'grid' }).to_query %>">
+            <i class="bi bi-grid-3x3-gap-fill"></i> <span class="d-none d-lg-inline">Grid</span>
+          </a>
+        </li>
+      <% end %>
       <li class="list-inline-item">
         <a data-toggle="tooltip" title="Map view" class="btn <%='btn-outline-primary' if params[:display] == 'map' %>" href="<%= path if defined?(path) && path %>?<%= q = Rack::Utils.parse_nested_query(request.query_string); q.delete('search'); q.delete('display'); q.merge({search: 1, display: 'map' }).to_query %>">
           <i class="bi bi-geo-alt-fill"></i> <span class="d-none d-lg-inline">Map</span>
