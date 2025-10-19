@@ -145,6 +145,10 @@ class Activity
     Account.and(:id.in => activityships.pluck(:account_id))
   end
 
+  def applicants
+    Account.and(:id.in => activity_applications.pluck(:account_id))
+  end
+
   def subscribed_members
     Account.and(:id.in => activityships.and(unsubscribed: false).pluck(:account_id))
   end

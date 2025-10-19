@@ -51,7 +51,7 @@ Dandelion::App.controller do
     @orders =  @orders.deleted if params[:deleted]
     @orders =  @orders.complete if params[:complete]
     @orders =  @orders.incomplete if params[:incomplete]
-    @orders = @orders.and(:account_id.in => Account.search(params[:q]).pluck(:id)) if params[:q]
+    @orders = @orders.and(:account_id.in => Account.search(params[:q], @event.unscoped_attendees).pluck(:id)) if params[:q]
 
     case content_type
     when :html
@@ -132,7 +132,7 @@ Dandelion::App.controller do
         @tickets.and(id_string: /#{Regexp.escape(params[:q])}/i).pluck(:id) +
         @tickets.and(name: /#{Regexp.escape(params[:q])}/i).pluck(:id) +
         @tickets.and(email: /#{Regexp.escape(params[:q])}/i).pluck(:id) +
-        @tickets.and(:account_id.in => Account.search(params[:q]).pluck(:id)).pluck(:id))
+        @tickets.and(:account_id.in => Account.search(params[:q], @event.unscoped_attendees).pluck(:id)).pluck(:id))
     end
     case content_type
     when :html

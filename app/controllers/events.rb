@@ -438,7 +438,7 @@ Dandelion::App.controller do
     @event = Event.find(params[:id]) || not_found
     event_admins_only!
     @stripe_charges = @event.stripe_charges.and(:balance_transaction.ne => nil)
-    @stripe_charges = @stripe_charges.and(:account_id.in => Account.search(params[:q]).pluck(:id)) if params[:q]
+    @stripe_charges = @stripe_charges.and(:account_id.in => Account.search(params[:q], @event.unscoped_attendees).pluck(:id)) if params[:q]
 
     if request.xhr?
       partial :'events/stripe_charges_table', locals: { stripe_charges: @stripe_charges, show_emails: event_email_viewer? }
@@ -451,7 +451,7 @@ Dandelion::App.controller do
     @event = Event.unscoped.find(params[:id]) || not_found
     event_admins_only!
     @donations = @event.donations
-    @donations = @donations.and(:account_id.in => Account.search(params[:q]).pluck(:id)) if params[:q]
+    @donations = @donations.and(:account_id.in => Account.search(params[:q], @event.unscoped_attendees).pluck(:id)) if params[:q]
     erb :'events/donations'
   end
 

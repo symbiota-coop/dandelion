@@ -44,21 +44,21 @@ Dandelion::App.controller do
     @from = parse_date(params[:from]) if params[:from]
     @to = parse_date(params[:to]) if params[:to]
     @activity_applications = @activity.activity_applications
-    @activity_applications = @activity_applications.and(:account_id.in => Account.search(params[:q]).pluck(:id)) if params[:q]
+    @activity_applications = @activity_applications.and(:account_id.in => Account.search(params[:q], @activity.applicants).pluck(:id)) if params[:q]
     @activity_applications = @activity_applications.and(:word_count.gte => params[:min_word_count]) if params[:min_word_count]
     @activity_applications = @activity_applications.and(:word_count.lte => params[:max_word_count]) if params[:max_word_count]
-    @activity_applications = @activity_applications.and(:account_id.in => Account.and(:id.in => @activity.activity_applications.pluck(:account_id)).and(has_image: true).pluck(:id)) if params[:photo]
-    @activity_applications = @activity_applications.and(:account_id.in => Account.and(:id.in => @activity.activity_applications.pluck(:account_id)).and(:location.ne => nil).pluck(:id)) if params[:location]
+    @activity_applications = @activity_applications.and(:account_id.in => @activity.applicants.and(has_image: true).pluck(:id)) if params[:photo]
+    @activity_applications = @activity_applications.and(:account_id.in => @activity.applicants.and(:location.ne => nil).pluck(:id)) if params[:location]
     @gender = params[:gender] || 'All'
     @activity_applications = case @gender
                              when 'All'
                                @activity_applications
                              when 'Man'
-                               @activity_applications.and(:account_id.in => Account.and(:id.in => @activity.activity_applications.pluck(:account_id)).and(:gender.in => ['Man', 'Cis Man']).pluck(:id))
+                               @activity_applications.and(:account_id.in => @activity.applicants.and(:gender.in => ['Man', 'Cis Man']).pluck(:id))
                              when 'Woman'
-                               @activity_applications.and(:account_id.in => Account.and(:id.in => @activity.activity_applications.pluck(:account_id)).and(:gender.in => ['Woman', 'Cis Woman']).pluck(:id))
+                               @activity_applications.and(:account_id.in => @activity.applicants.and(:gender.in => ['Woman', 'Cis Woman']).pluck(:id))
                              else
-                               @activity_applications.and(:account_id.in => Account.and(:id.in => @activity.activity_applications.pluck(:account_id)).and(:gender.nin => ['Man', 'Woman', 'Cis Man', 'Cis Woman']).pluck(:id))
+                               @activity_applications.and(:account_id.in => @activity.applicants.and(:gender.nin => ['Man', 'Woman', 'Cis Man', 'Cis Woman']).pluck(:id))
                              end
     @status = params[:status] || 'Pending'
     @activity_applications = @activity_applications.and(status: @status) unless @status == 'All'
@@ -67,7 +67,7 @@ Dandelion::App.controller do
     @activity_applications = @activity_applications.and(:created_at.lt => @to + 1) if @to
     @order = params[:order] || 'created_at'
     @activity_applications = @activity_applications.order("#{@order} desc")
-    @points = @activity_applications.and(:account_id.in => Account.and(:id.in => @activity.activity_applications.pluck(:account_id)).and(:coordinates.ne => nil).pluck(:id))
+    @points = @activity_applications.and(:account_id.in => @activity.applicants.and(:coordinates.ne => nil).pluck(:id))
     case content_type
     when :html
       erb :'activity_applications/activity_applications'

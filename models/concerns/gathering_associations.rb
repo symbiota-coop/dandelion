@@ -47,6 +47,10 @@ module GatheringAssociations
     Account.and(:id.in => memberships.pluck(:account_id))
   end
 
+  def applicants
+    Account.and(:id.in => mapplications.pluck(:account_id))
+  end
+
   def admin_emails
     Account.and(:id.in => memberships.and(admin: true).pluck(:account_id)).pluck(:email)
   end

@@ -189,7 +189,7 @@ Dandelion::App.controller do
     @local_group = LocalGroup.find(params[:id]) || not_found
     local_group_admins_only!
     @local_groupships = @local_group.local_groupships.order('created_at desc')
-    @local_groupships = @local_groupships.and(:account_id.in => Account.search(params[:q]).pluck(:id)) if params[:q]
+    @local_groupships = @local_groupships.and(:account_id.in => Account.search(params[:q], @local_group.members).pluck(:id)) if params[:q]
     @local_groupships = @local_groupships.and(:account_id.in => @local_group.subscribed_accounts.pluck(:id)) if params[:subscribed_to_mailer]
     case content_type
     when :html

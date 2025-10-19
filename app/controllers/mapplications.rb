@@ -85,7 +85,7 @@ Dandelion::App.controller do
     @membership = @gathering.memberships.find_by(account: current_account)
     confirmed_membership_required!
     @mapplications = @gathering.mapplications.pending
-    @mapplications = @mapplications.and(:account_id.in => Account.search(params[:q]).pluck(:id)) if params[:q]
+    @mapplications = @mapplications.and(:account_id.in => Account.search(params[:q], @gathering.applicants).pluck(:id)) if params[:q]
     erb :'mapplications/pending'
   end
 

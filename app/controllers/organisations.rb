@@ -336,7 +336,7 @@ Dandelion::App.controller do
     @organisation = Organisation.find_by(slug: params[:slug]) || not_found
     organisation_admins_only!
     @organisationships = @organisation.organisationships.order('created_at desc')
-    @organisationships = @organisationships.and(:account_id.in => Account.search(params[:q]).pluck(:id)) if params[:q]
+    @organisationships = @organisationships.and(:account_id.in => Account.search(params[:q], @organisation.members).pluck(:id)) if params[:q]
     @organisationships = @organisationships.and(:monthly_donation_method.ne => nil) if params[:monthly_donor]
     @organisationships = @organisationships.and(monthly_donation_method: nil) if params[:not_a_monthly_donor]
     @organisationships = @organisationships.and(:stripe_connect_json.ne => nil) if params[:connected_to_stripe]
