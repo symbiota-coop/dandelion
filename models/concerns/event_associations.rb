@@ -105,10 +105,6 @@ module EventAssociations
     Account.and(:id.in => tickets.unscoped.pluck(:account_id))
   end
 
-  def attendee_ids
-    tickets.complete.pluck(:account_id)
-  end
-
   def discussers
     Account.and(:id.in =>
         [account.try(:id), revenue_sharer.try(:id), coordinator.try(:id)].compact +
