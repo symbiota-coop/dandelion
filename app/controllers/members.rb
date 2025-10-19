@@ -10,7 +10,7 @@ Dandelion::App.controller do
     @gathering.check_box_scopes.select { |k, _t, _r| params[k] }.each do |_k, _t, r|
       @memberships = @memberships.and(:id.in => r.pluck(:id))
     end
-    @memberships = @memberships.and(:account_id.in => Account.search(params[:q], @gathering.members).pluck(:id)) if params[:q]
+    @memberships = @memberships.and(:account_id.in => Account.search(params[:q], child_scope: @memberships).pluck(:id)) if params[:q]
     @memberships = @memberships.order('created_at desc')
     case content_type
     when :html

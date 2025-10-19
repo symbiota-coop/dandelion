@@ -2,9 +2,16 @@ module Searchable
   extend ActiveSupport::Concern
 
   class_methods do
-    def search(query, scope = all, limit: nil, build_records: false, phrase_boost: 1, include_text_search: false)
+    def search(query, scope = all, child_scope: nil, limit: nil, build_records: false, phrase_boost: 1, include_text_search: false)
       return none if query.blank?
       return none if query.length < 3 || query.length > 200
+
+      # If child_scope is provided, filter scope to only include records that have IDs in that relationship
+      # Derives the foreign key field name from the model (e.g., Account -> :account_id)
+      if child_scope
+        foreign_key = :"#{to_s.underscore}_id"
+        scope = scope.and(:id.in => child_scope.pluck(foreign_key))
+      end
 
       # If query is an email address and model has an email field, search only email
       return scope.and(email: query) if query.match?(EMAIL_REGEX) && fields.key?('email')
@@ -74,6 +81,7 @@ module Searchable
 
         # Only add $match stage if there are remaining complex conditions
         pipeline << { '$match': remaining_selector } if remaining_selector.any?
+
         pipeline << { '$limit': limit } if limit
         pipeline << { '$project': { _id: 1 } } unless build_records
 
