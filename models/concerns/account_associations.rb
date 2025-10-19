@@ -118,7 +118,6 @@ module AccountAssociations
 
     has_many_through :activities_following, class_name: 'Activity', through: :activityships
     has_many_through :local_groups_following, class_name: 'LocalGroup', through: :local_groupships
-    has_many_through :event_feedbacks_as_facilitator, class_name: 'EventFeedback', through: :event_facilitations, foreign_key: :event_id
     has_many_through :followers, class_name: 'Account', through: :follows_as_followee, foreign_key: :follower_id
 
     with_options class_name: 'Account', through: :follows_as_follower, foreign_key: :followee_id do
@@ -131,6 +130,10 @@ module AccountAssociations
       has_many_through :organisations_following
       has_many_through :organisations_monthly_donor, conditions: { :monthly_donation_method.ne => nil }
     end
+  end
+
+  def event_feedbacks_as_facilitator
+    EventFeedback.and(:event_id.in => event_facilitations.pluck(:event_id))
   end
 
   def unscoped_event_feedbacks_as_facilitator

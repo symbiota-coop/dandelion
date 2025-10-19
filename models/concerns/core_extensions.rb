@@ -66,6 +66,15 @@ module CoreExtensions
       end
     end
 
+    # Example:
+    # has_many_through :followers, class_name: 'Account', through: :follows_as_followee, foreign_key: :follower_id
+    # creates:
+    # def follower_ids
+    #   follows_as_followee.pluck(:follower_id)
+    # end
+    # def followers
+    #   Account.and(:id.in => follower_ids)
+    # end
     def has_many_through(name, through:, class_name: nil, foreign_key: nil, conditions: nil) # rubocop:disable Naming/PredicatePrefix
       class_name_string = class_name || name.to_s.singularize.camelize
 
