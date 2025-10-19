@@ -36,6 +36,8 @@ class Option
 
   has_many :optionships, dependent: :destroy
 
+  has_many_through :members, through: :optionships, class_name: 'Account'
+
   has_many :notifications, as: :notifiable, dependent: :destroy
   after_create do
     notifications.create! circle: circle, type: 'created_option'
@@ -47,10 +49,6 @@ class Option
 
   def circle
     gathering
-  end
-
-  def members
-    Account.and(:id.in => optionships.pluck(:account_id))
   end
 
   def self.types

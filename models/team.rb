@@ -32,6 +32,8 @@ class Team
   has_many :spends, dependent: :nullify
   has_many :inventory_items, dependent: :nullify
 
+  has_many_through :members, through: :teamships, class_name: 'Account'
+
   attr_accessor :prevent_notifications
 
   has_many :notifications, as: :notifiable, dependent: :destroy
@@ -41,10 +43,6 @@ class Team
 
   def circle
     gathering
-  end
-
-  def members
-    Account.and(:id.in => teamships.pluck(:account_id))
   end
 
   def discussers

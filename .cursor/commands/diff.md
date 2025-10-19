@@ -1,0 +1,1 @@
+Run `git diff` and verify the changes look good to commit

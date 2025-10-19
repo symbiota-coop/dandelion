@@ -60,9 +60,8 @@ class Tactivity
   validates_uniqueness_of :space, scope: :tslot, allow_nil: true
 
   has_many :attendances, dependent: :destroy
-  def attendees
-    Account.and(:id.in => attendances.pluck(:account_id))
-  end
+
+  has_many_through :attendees, through: :attendances, class_name: 'Account'
 
   def discussers
     gathering.discussers.and(:id.in => attendances.pluck(:account_id) + [account.id])
