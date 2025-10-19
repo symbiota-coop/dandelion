@@ -53,7 +53,20 @@ module Searchable
                 break
               end
             end
-            search_filters << range_filter if range_filter
+            # Validate range filter to ensure lower bounds are not greater than upper bounds
+            if range_filter
+              range_values = range_filter[:range]
+              lower_bound = range_values[:gt] || range_values[:gte]
+              upper_bound = range_values[:lt] || range_values[:lte]
+
+              # If both bounds exist and lower bound is greater than or equal to upper bound,
+              # skip this filter to avoid MongoDB error
+              if lower_bound && upper_bound && lower_bound >= upper_bound
+                remaining_selector[field] = value
+              else
+                search_filters << range_filter
+              end
+            end
           else
             # Simple equality
             search_filters << { equals: { path: field.to_s, value: value } }
