@@ -20,6 +20,11 @@ table.event-details td {
   opacity: 1;
 }
 
+.event-detail.calendar-date:hover {
+  color: white !important;
+  text-decoration: none !important;
+}
+
 .event-detail.calendar-date .day {
   padding: 0.1em;
 }
