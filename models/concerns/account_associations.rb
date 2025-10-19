@@ -167,8 +167,8 @@ module AccountAssociations
     Message.or({ messenger: self }, { messengee: self })
   end
 
-  def upcoming_events
-    Event.and(has_organisation: true).future_and_current.and(:id.in =>
+  def my_events
+    Event.and(has_organisation: true).and(:id.in =>
         tickets.complete.pluck(:event_id) +
         event_facilitations.pluck(:event_id) +
         events_coordinating_ids +
@@ -177,13 +177,11 @@ module AccountAssociations
         event_stars.pluck(:event_id))
   end
 
+  def upcoming_events
+    my_events.future_and_current
+  end
+
   def previous_events
-    Event.past.and(:id.in =>
-        tickets.pluck(:event_id) +
-        event_facilitations.pluck(:event_id) +
-        events_coordinating_ids +
-        events_revenue_sharing_ids +
-        events_organising_ids +
-        event_stars.pluck(:event_id))
+    my_events.past
   end
 end
