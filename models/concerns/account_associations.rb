@@ -171,9 +171,9 @@ module AccountAssociations
     Event.and(has_organisation: true).future_and_current.and(:id.in =>
         tickets.complete.pluck(:event_id) +
         event_facilitations.pluck(:event_id) +
-        events_coordinating.pluck(:id) +
-        events_revenue_sharing.pluck(:id) +
-        events_organising.pluck(:id) +
+        events_coordinating_ids +
+        events_revenue_sharing_ids +
+        events_organising_ids +
         event_stars.pluck(:event_id))
   end
 
@@ -181,9 +181,9 @@ module AccountAssociations
     Event.past.and(:id.in =>
         tickets.pluck(:event_id) +
         event_facilitations.pluck(:event_id) +
-        events_coordinating.pluck(:id) +
-        events_revenue_sharing.pluck(:id) +
-        events_organising.pluck(:id) +
+        events_coordinating_ids +
+        events_revenue_sharing_ids +
+        events_organising_ids +
         event_stars.pluck(:event_id))
   end
 end

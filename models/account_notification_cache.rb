@@ -31,11 +31,11 @@ class AccountNotificationCache
   def refresh!
     update_attributes(
       gathering_ids: account.memberships.pluck(:gathering_id),
-      account_ids: [account.id] + account.network.pluck(:id),
-      activity_ids: account.activities_following.pluck(:id),
-      local_group_ids: account.local_groups_following.pluck(:id),
-      organisations_following_ids: account.organisations_following.pluck(:id),
-      organisations_monthly_donor_ids: account.organisations_monthly_donor.pluck(:id),
+      account_ids: [account.id] + account.network_ids,
+      activity_ids: account.activities_following_ids,
+      local_group_ids: account.local_groups_following_ids,
+      organisations_following_ids: account.organisations_following_ids,
+      organisations_monthly_donor_ids: account.organisations_monthly_donor_ids,
       expires_at: 1.day.from_now
     )
   end

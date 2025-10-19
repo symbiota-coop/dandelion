@@ -163,7 +163,7 @@ class Pmail
         end
     t = t.and(:id.nin => event.attendee_ids) if event
     t = t.and(:id.nin => activity.future_attendees.pluck(:id)) if activity
-    t = t.and(:id.nin => local_group.members.pluck(:id)) if local_group
+    t = t.and(:id.nin => local_group.member_ids) if local_group
     t
   end
 
@@ -171,7 +171,7 @@ class Pmail
     if mailable.is_a?(Event)
       to
     else
-      to.and(:id.nin => organisation.unsubscribed_members.pluck(:id)).and(unsubscribed: false)
+      to.and(:id.nin => organisation.unsubscribed_member_ids).and(unsubscribed: false)
     end
   end
 

@@ -39,7 +39,7 @@ class AccountRecommendationCache
     # Get connections from gatherings
     gatherings = Gathering.and(:id.in => account.memberships.pluck(:gathering_id))
     gatherings.each do |gathering|
-      gathering.members.pluck(:id).each do |member_id|
+      gathering.member_ids.each do |member_id|
         next if member_id == account_id
 
         connection = { type: 'Gathering', id: gathering.id.to_s }

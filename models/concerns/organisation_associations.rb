@@ -107,6 +107,6 @@ module OrganisationAssociations
   def facilitators
     Account.and(:id.in =>
         EventFacilitation.and(:event_id.in => events.future.pluck(:id)).pluck(:account_id) +
-        Activityship.and(:activity_id.in => activities.pluck(:id), :admin => true).pluck(:account_id))
+        Activityship.and(:activity_id.in => activity_ids, :admin => true).pluck(:account_id))
   end
 end

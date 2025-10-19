@@ -30,7 +30,7 @@ class Mapplication
   has_many :comment_reactions, as: :commentable, dependent: :destroy
 
   def discussers
-    gathering.discussers.and(:id.in => (verdicts.pluck(:account_id) + gathering.admins.pluck(:id)))
+    gathering.discussers.and(:id.in => (verdicts.pluck(:account_id) + gathering.admin_ids))
   end
 
   validates_presence_of :status
