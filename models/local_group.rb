@@ -50,6 +50,14 @@ class LocalGroup
 
   has_many :zoomships, dependent: :destroy
 
+  with_options class_name: 'Account', through: :local_groupships do
+    has_many_through :members
+    has_many_through :subscribed_members, conditions: { unsubscribed: false }
+    has_many_through :unsubscribed_members, conditions: { unsubscribed: true }
+    has_many_through :admins, conditions: { admin: true }
+    has_many_through :admins_receiving_feedback, conditions: { admin: true, receive_feedback: true }
+  end
+
   embeds_many :polygons
 
   before_validation do
@@ -75,10 +83,6 @@ class LocalGroup
 
   def event_feedbacks
     EventFeedback.and(:event_id.in => events.pluck(:id))
-  end
-
-  def members
-    Account.and(:id.in => local_groupships.pluck(:account_id))
   end
 
   def organisation_members_within
@@ -112,23 +116,7 @@ class LocalGroup
     {}.merge(new_hints)
   end
 
-  def subscribed_members
-    Account.and(:id.in => local_groupships.and(unsubscribed: false).pluck(:account_id))
-  end
-
   def subscribed_accounts
     subscribed_members.and(:id.in => organisation.subscribed_accounts.pluck(:id))
-  end
-
-  def unsubscribed_members
-    Account.and(:id.in => local_groupships.and(unsubscribed: true).pluck(:account_id))
-  end
-
-  def admins
-    Account.and(:id.in => local_groupships.and(admin: true).pluck(:account_id))
-  end
-
-  def admins_receiving_feedback
-    Account.and(:id.in => local_groupships.and(admin: true).and(receive_feedback: true).pluck(:account_id))
   end
 end

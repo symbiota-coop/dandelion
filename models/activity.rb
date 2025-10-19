@@ -74,6 +74,17 @@ class Activity
     Pmail.and(:id.in => pmails_as_mailable.pluck(:id) + Pmail.and(:mailable_type => 'Event', :mailable_id.in => events.pluck(:id)).pluck(:id))
   end
 
+  has_many_through :activity_tags, through: :activity_tagships
+
+  with_options class_name: 'Account' do
+    has_many_through :members, through: :activityships
+    has_many_through :applicants, through: :activity_applications
+    has_many_through :subscribed_members, through: :activityships, conditions: { unsubscribed: false }
+    has_many_through :unsubscribed_members, through: :activityships, conditions: { unsubscribed: true }
+    has_many_through :admins, through: :activityships, conditions: { admin: true }
+    has_many_through :admins_receiving_feedback, through: :activityships, conditions: { admin: true, receive_feedback: true }
+  end
+
   def event_feedbacks
     EventFeedback.and(:event_id.in => events.pluck(:id))
   end
@@ -107,10 +118,6 @@ class Activity
     end
   end
 
-  def activity_tags
-    ActivityTag.and(:id.in => activity_tagships.pluck(:activity_tag_id))
-  end
-
   validates_presence_of :name, :slug
   validates_uniqueness_of :slug, scope: :organisation_id
   validates_format_of :slug, with: /\A[a-z0-9-]+\z/
@@ -141,32 +148,8 @@ class Activity
     Account.and(:id.in => Ticket.and(:event_id.in => events.live.public.future.pluck(:id)).pluck(:account_id))
   end
 
-  def members
-    Account.and(:id.in => activityships.pluck(:account_id))
-  end
-
-  def applicants
-    Account.and(:id.in => activity_applications.pluck(:account_id))
-  end
-
-  def subscribed_members
-    Account.and(:id.in => activityships.and(unsubscribed: false).pluck(:account_id))
-  end
-
   def subscribed_accounts
     subscribed_members.and(:id.in => organisation.subscribed_accounts.pluck(:id))
-  end
-
-  def unsubscribed_members
-    Account.and(:id.in => activityships.and(unsubscribed: true).pluck(:account_id))
-  end
-
-  def admins
-    Account.and(:id.in => activityships.and(admin: true).pluck(:account_id))
-  end
-
-  def admins_receiving_feedback
-    Account.and(:id.in => activityships.and(admin: true).and(receive_feedback: true).pluck(:account_id))
   end
 
   def sync_activityships

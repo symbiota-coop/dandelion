@@ -35,27 +35,18 @@ module GatheringAssociations
     has_many :spends, dependent: :destroy
     # Inventory
     has_many :inventory_items, dependent: :destroy
-    #  Photos
+    #  Photos
     has_many :photos, as: :photoable, dependent: :destroy
-  end
 
-  def admins
-    Account.and(:id.in => memberships.and(admin: true).pluck(:account_id))
-  end
-
-  def members
-    Account.and(:id.in => memberships.pluck(:account_id))
-  end
-
-  def applicants
-    Account.and(:id.in => mapplications.pluck(:account_id))
+    with_options class_name: 'Account' do
+      has_many_through :admins, through: :memberships, conditions: { admin: true }
+      has_many_through :members, through: :memberships
+      has_many_through :applicants, through: :mapplications
+      has_many_through :discussers, through: :memberships, conditions: { unsubscribed: false }
+    end
   end
 
   def admin_emails
     Account.and(:id.in => memberships.and(admin: true).pluck(:account_id)).pluck(:email)
-  end
-
-  def discussers
-    Account.and(:id.in => memberships.and(unsubscribed: false).pluck(:account_id))
   end
 end

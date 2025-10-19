@@ -55,6 +55,15 @@ module EventAssociations
 
     has_many :event_tagships, dependent: :destroy
     has_many :event_stars, dependent: :destroy
+
+    has_many_through :cohosts, class_name: 'Organisation', through: :cohostships
+    has_many_through :event_tags, through: :event_tagships
+
+    with_options class_name: 'Account' do
+      has_many_through :starrers, through: :event_stars
+      has_many_through :waiters, through: :waitships
+      has_many_through :event_facilitators, through: :event_facilitations
+    end
   end
 
   def organisationship_for_discount(account)
@@ -85,20 +94,8 @@ module EventAssociations
       (local_group ? local_group.discount_codes.pluck(:id) : []))
   end
 
-  def cohosts
-    Organisation.and(:id.in => cohostships.pluck(:organisation_id))
-  end
-
   def organisation_and_cohosts
     [organisation] + cohosts
-  end
-
-  def event_tags
-    EventTag.and(:id.in => event_tagships.pluck(:event_tag_id))
-  end
-
-  def event_tag_ids
-    event_tagships.pluck(:event_tag_id)
   end
 
   def attendees
@@ -111,10 +108,6 @@ module EventAssociations
 
   def attendee_ids
     tickets.complete.pluck(:account_id)
-  end
-
-  def starrers
-    Account.and(:id.in => event_stars.pluck(:account_id))
   end
 
   def public_attendees
@@ -137,14 +130,6 @@ module EventAssociations
         [account.try(:id), revenue_sharer.try(:id), coordinator.try(:id)].compact +
         event_facilitators.pluck(:id) +
         attendees.pluck(:id))
-  end
-
-  def waiters
-    Account.and(:id.in => waitships.pluck(:account_id))
-  end
-
-  def event_facilitators
-    Account.and(:id.in => event_facilitations.pluck(:account_id))
   end
 
   def accounts_receiving_feedback

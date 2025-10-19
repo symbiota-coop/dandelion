@@ -115,46 +115,26 @@ module AccountAssociations
 
     has_many :provider_links, dependent: :destroy
     accepts_nested_attributes_for :provider_links
-  end
 
-  def organisations_following
-    Organisation.and(:id.in => organisationships.pluck(:organisation_id))
-  end
+    has_many_through :activities_following, class_name: 'Activity', through: :activityships
+    has_many_through :local_groups_following, class_name: 'LocalGroup', through: :local_groupships
+    has_many_through :event_feedbacks_as_facilitator, class_name: 'EventFeedback', through: :event_facilitations, foreign_key: :event_id
+    has_many_through :followers, class_name: 'Account', through: :follows_as_followee, foreign_key: :follower_id
 
-  def organisations_monthly_donor
-    Organisation.and(:id.in => organisationships.and(:monthly_donation_method.ne => nil).pluck(:organisation_id))
-  end
+    with_options class_name: 'Account', through: :follows_as_follower, foreign_key: :followee_id do
+      has_many_through :following_starred, conditions: { starred: true }
+      has_many_through :following
+      has_many_through :network
+    end
 
-  def event_feedbacks_as_facilitator
-    EventFeedback.and(:event_id.in => event_facilitations.pluck(:event_id))
+    with_options class_name: 'Organisation', through: :organisationships do
+      has_many_through :organisations_following
+      has_many_through :organisations_monthly_donor, conditions: { :monthly_donation_method.ne => nil }
+    end
   end
 
   def unscoped_event_feedbacks_as_facilitator
     EventFeedback.unscoped.and(:event_id.in => event_facilitations.pluck(:event_id))
-  end
-
-  def activities_following
-    Activity.and(:id.in => activityships.pluck(:activity_id))
-  end
-
-  def local_groups_following
-    LocalGroup.and(:id.in => local_groupships.pluck(:local_group_id))
-  end
-
-  def following_starred
-    Account.and(:id.in => follows_as_follower.and(starred: true).pluck(:followee_id))
-  end
-
-  def followers
-    Account.and(:id.in => follows_as_followee.pluck(:follower_id))
-  end
-
-  def following
-    Account.and(:id.in => follows_as_follower.pluck(:followee_id))
-  end
-
-  def network
-    Account.and(:id.in => follows_as_follower.pluck(:followee_id))
   end
 
   def network_notifications

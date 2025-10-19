@@ -65,5 +65,60 @@ module DandelionMongo
         end
       end
     end
+
+    # Define a method that returns IDs from an association
+    # and automatically creates a corresponding method that returns the model objects
+    #
+    # Examples:
+    #   has_many_through :event_tags, through: :event_tagships
+    #   # Infers class_name 'EventTag' from :event_tags
+    #   # Creates:
+    #   #   def event_tag_ids
+    #   #     event_tagships.pluck(:event_tag_id)
+    #   #   end
+    #   #   def event_tags
+    #   #     EventTag.and(:id.in => event_tag_ids)
+    #   #   end
+    #
+    #   has_many_through :members, class_name: 'Account', through: :local_groupships
+    #   # Explicit class_name when it can't be inferred from name
+    #
+    #   has_many_through :admins, class_name: 'Account', through: :local_groupships, conditions: { admin: true }
+    #   # With conditions:
+    #   #   def admin_ids
+    #   #     local_groupships.and(admin: true).pluck(:account_id)
+    #   #   end
+    #   #   def admins
+    #   #     Account.and(:id.in => admin_ids)
+    #   #   end
+    #
+    #   has_many_through :following, class_name: 'Account', through: :follows_as_follower, foreign_key: :followee_id
+    #   # With custom foreign_key
+    #
+    #   with_options class_name: 'Account', through: :organisationships do
+    #     has_many_through :admins, conditions: { admin: true }
+    #     has_many_through :members
+    #   end
+    #   # Use with_options to DRY up multiple collections with shared options
+    def has_many_through(name, through:, class_name: nil, foreign_key: nil, conditions: nil) # rubocop:disable Naming/PredicatePrefix
+      # Infer class_name from the collection name if not provided
+      model_class = class_name ? class_name.constantize : name.to_s.singularize.camelize.constantize
+
+      # Infer the foreign key from the class name if not provided
+      fk = foreign_key || "#{model_class.name.underscore}_id"
+
+      ids_method = "#{name.to_s.singularize}_ids"
+      collection_method = name
+
+      define_method(ids_method) do
+        scope = send(through)
+        scope = scope.and(conditions) if conditions
+        scope.pluck(fk)
+      end
+
+      define_method(collection_method) do
+        model_class.and(:id.in => send(ids_method))
+      end
+    end
   end
 end

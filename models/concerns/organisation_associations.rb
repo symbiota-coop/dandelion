@@ -32,6 +32,18 @@ module OrganisationAssociations
     has_many :organisation_tiers, dependent: :destroy
 
     has_many :orders_as_affiliate, class_name: 'Order', as: :affiliate, dependent: :nullify
+
+    with_options class_name: 'Account', through: :organisationships do
+      has_many_through :subscribed_members, conditions: { unsubscribed: false }
+      has_many_through :unsubscribed_members, conditions: { unsubscribed: true }
+      has_many_through :admins, conditions: { admin: true }
+      has_many_through :admins_receiving_feedback, conditions: { admin: true, receive_feedback: true }
+      has_many_through :revenue_sharers, conditions: { :stripe_connect_json.ne => nil }
+      has_many_through :monthly_donors, conditions: { :monthly_donation_method.ne => nil }
+      has_many_through :subscribed_monthly_donors, conditions: { :monthly_donation_method.ne => nil, unsubscribed: false }
+      has_many_through :not_monthly_donors, conditions: { monthly_donation_method: nil }
+      has_many_through :subscribed_not_monthly_donors, conditions: { monthly_donation_method: nil, unsubscribed: false }
+    end
   end
 
   def news
@@ -90,42 +102,6 @@ module OrganisationAssociations
 
   def subscribed_accounts
     subscribed_members.and(unsubscribed: false)
-  end
-
-  def subscribed_members
-    Account.and(:id.in => organisationships.and(unsubscribed: false).pluck(:account_id))
-  end
-
-  def unsubscribed_members
-    Account.and(:id.in => organisationships.and(unsubscribed: true).pluck(:account_id))
-  end
-
-  def admins
-    Account.and(:id.in => organisationships.and(admin: true).pluck(:account_id))
-  end
-
-  def admins_receiving_feedback
-    Account.and(:id.in => organisationships.and(admin: true).and(receive_feedback: true).pluck(:account_id))
-  end
-
-  def revenue_sharers
-    Account.and(:id.in => organisationships.and(:stripe_connect_json.ne => nil).pluck(:account_id))
-  end
-
-  def monthly_donors
-    Account.and(:id.in => organisationships.and(:monthly_donation_method.ne => nil).pluck(:account_id))
-  end
-
-  def subscribed_monthly_donors
-    Account.and(:id.in => organisationships.and(:monthly_donation_method.ne => nil, :unsubscribed => false).pluck(:account_id))
-  end
-
-  def not_monthly_donors
-    Account.and(:id.in => organisationships.and(monthly_donation_method: nil).pluck(:account_id))
-  end
-
-  def subscribed_not_monthly_donors
-    Account.and(:id.in => organisationships.and(monthly_donation_method: nil, unsubscribed: false).pluck(:account_id))
   end
 
   def facilitators
