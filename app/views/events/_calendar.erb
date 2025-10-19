@@ -2,7 +2,10 @@
   document.addEventListener('DOMContentLoaded', function() {
     var calendarEl = document.getElementById('calendar');
     var calendar = new FullCalendar.Calendar(calendarEl, {
-      initialView: 'dayGridMonth',
+      initialView: '<%= params[:list] ? "listMonth" : "dayGridMonth" %>',
+      <% if params[:date] %>
+      initialDate: '<%= params[:date] %>',
+      <% end %>
       events: function(fetchInfo, successCallback, failureCallback) {
         // Fetch events from the server
         var currentQuery = window.location.search;
