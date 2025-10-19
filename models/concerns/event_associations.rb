@@ -97,6 +97,10 @@ module EventAssociations
     EventTag.and(:id.in => event_tagships.pluck(:event_tag_id))
   end
 
+  def event_tag_ids
+    event_tagships.pluck(:event_tag_id)
+  end
+
   def attendees
     Account.and(:id.in => tickets.complete.pluck(:account_id))
   end

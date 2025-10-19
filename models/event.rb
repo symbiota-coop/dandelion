@@ -186,8 +186,8 @@ class Event
     organisation.carousels.order('o desc').each do |carousel|
       next if carousel.name.downcase.include?('past events')
 
-      intersection = event_tags.pluck(:id) & carousel.event_tags.pluck(:id)
-      if intersection.exists?
+      intersection = event_tag_ids & carousel.event_tag_ids
+      if intersection.any?
         c = carousel.name
         break
       end
