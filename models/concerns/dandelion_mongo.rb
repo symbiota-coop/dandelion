@@ -101,11 +101,11 @@ module DandelionMongo
     #   end
     #   # Use with_options to DRY up multiple collections with shared options
     def has_many_through(name, through:, class_name: nil, foreign_key: nil, conditions: nil) # rubocop:disable Naming/PredicatePrefix
-      # Infer class_name from the collection name if not provided
-      model_class = class_name ? class_name.constantize : name.to_s.singularize.camelize.constantize
+      # Store the class_name string for later constantization
+      class_name_string = class_name || name.to_s.singularize.camelize
 
-      # Infer the foreign key from the class name if not provided
-      fk = foreign_key || "#{model_class.name.underscore}_id"
+      # Infer the foreign key from the class name string if not provided
+      fk = foreign_key || "#{class_name_string.underscore}_id"
 
       ids_method = "#{name.to_s.singularize}_ids"
       collection_method = name
@@ -117,6 +117,8 @@ module DandelionMongo
       end
 
       define_method(collection_method) do
+        # Constantize at runtime instead of at class definition time
+        model_class = class_name_string.constantize
         model_class.and(:id.in => send(ids_method))
       end
     end
