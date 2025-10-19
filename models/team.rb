@@ -32,7 +32,10 @@ class Team
   has_many :spends, dependent: :nullify
   has_many :inventory_items, dependent: :nullify
 
-  has_many_through :members, through: :teamships, class_name: 'Account'
+  with_options class_name: 'Account', through: :teamships do
+    has_many_through :members
+    has_many_through :subscribed_members, conditions: { unsubscribed: false }
+  end
 
   attr_accessor :prevent_notifications
 
@@ -46,7 +49,7 @@ class Team
   end
 
   def discussers
-    gathering.discussers.and(:id.in => teamships.and(unsubscribed: false).pluck(:account_id))
+    gathering.discussers.and(:id.in => subscribed_member_ids)
   end
 
   def spent

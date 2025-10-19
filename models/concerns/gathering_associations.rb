@@ -45,8 +45,4 @@ module GatheringAssociations
       has_many_through :discussers, through: :memberships, conditions: { unsubscribed: false }
     end
   end
-
-  def admin_emails
-    Account.and(:id.in => memberships.and(admin: true).pluck(:account_id)).pluck(:email)
-  end
 end
