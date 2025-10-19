@@ -101,6 +101,10 @@ module EventAssociations
     Account.and(:id.in => tickets.complete.pluck(:account_id))
   end
 
+  def unscoped_attendees
+    Account.and(:id.in => tickets.unscoped.pluck(:account_id))
+  end
+
   def attendee_ids
     tickets.complete.pluck(:account_id)
   end
