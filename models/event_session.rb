@@ -1,7 +1,7 @@
 class EventSession
   include Mongoid::Document
   include Mongoid::Timestamps
-  include DandelionMongo
+  include CoreExtensions
 
   field :start_time, type: Time
   field :end_time, type: Time

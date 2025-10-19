@@ -1,7 +1,7 @@
 class DocPage
   include Mongoid::Document
   include Mongoid::Timestamps
-  include DandelionMongo
+  include CoreExtensions
 
   field :name, type: String
   field :slug, type: String

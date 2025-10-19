@@ -1,7 +1,7 @@
 class InventoryItem
   include Mongoid::Document
   include Mongoid::Timestamps
-  include DandelionMongo
+  include CoreExtensions
 
   belongs_to_without_parent_validation :gathering, index: true
   belongs_to_without_parent_validation :account, index: true, optional: true, class_name: 'Account', inverse_of: :inventory_items_listed

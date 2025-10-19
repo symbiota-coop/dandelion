@@ -1,7 +1,7 @@
 class Subscription
   include Mongoid::Document
   include Mongoid::Timestamps
-  include DandelionMongo
+  include CoreExtensions
 
   belongs_to_without_parent_validation :account, index: true, inverse_of: :subscriptions_as_creator
   belongs_to_without_parent_validation :post, index: true

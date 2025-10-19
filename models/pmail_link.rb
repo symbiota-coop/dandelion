@@ -1,7 +1,7 @@
 class PmailLink
   include Mongoid::Document
   include Mongoid::Timestamps
-  include DandelionMongo
+  include CoreExtensions
 
   belongs_to_without_parent_validation :pmail, index: true
 

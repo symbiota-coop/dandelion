@@ -1,7 +1,7 @@
 class TicketGroup
   include Mongoid::Document
   include Mongoid::Timestamps
-  include DandelionMongo
+  include CoreExtensions
 
   belongs_to_without_parent_validation :event, index: true
 

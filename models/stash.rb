@@ -1,7 +1,7 @@
 class Stash
   include Mongoid::Document
   include Mongoid::Timestamps
-  include DandelionMongo
+  include CoreExtensions
 
   field :key, type: String
   # index({ key: 1 }, { unique: true })

@@ -1,7 +1,7 @@
 class Pmail
   include Mongoid::Document
   include Mongoid::Timestamps
-  include DandelionMongo
+  include CoreExtensions
 
   include PmailMailgun
   include Searchable

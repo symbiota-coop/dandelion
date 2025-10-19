@@ -1,7 +1,7 @@
 class Attachment
   include Mongoid::Document
   include Mongoid::Timestamps
-  include DandelionMongo
+  include CoreExtensions
 
   extend Dragonfly::Model
 

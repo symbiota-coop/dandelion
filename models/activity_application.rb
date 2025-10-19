@@ -1,7 +1,7 @@
 class ActivityApplication
   include Mongoid::Document
   include Mongoid::Timestamps
-  include DandelionMongo
+  include CoreExtensions
 
   belongs_to_without_parent_validation :activity, index: true
   belongs_to_without_parent_validation :account, class_name: 'Account', inverse_of: :activity_applications, index: true

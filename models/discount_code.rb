@@ -1,7 +1,7 @@
 class DiscountCode
   include Mongoid::Document
   include Mongoid::Timestamps
-  include DandelionMongo
+  include CoreExtensions
 
   belongs_to_without_parent_validation :codeable, polymorphic: true, index: true
   belongs_to_without_parent_validation :account, optional: true, index: true

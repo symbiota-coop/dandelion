@@ -1,7 +1,7 @@
 class Mapplication
   include Mongoid::Document
   include Mongoid::Timestamps
-  include DandelionMongo
+  include CoreExtensions
 
   belongs_to_without_parent_validation :gathering, index: true
   belongs_to_without_parent_validation :account, class_name: 'Account', inverse_of: :mapplications, index: true

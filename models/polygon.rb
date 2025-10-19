@@ -1,7 +1,7 @@
 class Polygon
   include Mongoid::Document
   include Mongoid::Timestamps
-  include DandelionMongo
+  include CoreExtensions
 
   field :coordinates, type: Array
   field :type, type: String

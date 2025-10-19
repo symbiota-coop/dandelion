@@ -1,7 +1,7 @@
 class StripeTransaction
   include Mongoid::Document
   include Mongoid::Timestamps
-  include DandelionMongo
+  include CoreExtensions
 
   belongs_to_without_parent_validation :organisation, index: true
   belongs_to_without_parent_validation :stripe_charge, optional: true, index: true
