@@ -120,7 +120,7 @@
     </div>
   </div>
 
-  <%= cp :'event_feedbacks/home' %>
+  <%= cp(:'event_feedbacks/home', expires: 1.day.from_now) %>
 
   <script>
     $(function () {
