@@ -465,7 +465,7 @@ Dandelion::App.controller do
     @event = Event.find(params[:id]) || not_found
     event_admins_only!
     @waitships = @event.waitships
-    @waitships = @waitships.and(:account_id.in => Account.search(params[:q]).pluck(:id)) if params[:q]
+    @waitships = @waitships.and(:account_id.in => Account.search(params[:q], @event.waiters).pluck(:id)) if params[:q]
     erb :'events/waitlist'
   end
 
