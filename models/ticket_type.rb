@@ -80,12 +80,14 @@ class TicketType
     if event
       event.clear_cache
       event.set(sold_out_cache: event.sold_out?)
+      event.set(sold_out_due_to_sales_end_cache: event.sold_out_due_to_sales_end?)
     end
   end
   after_destroy do
     if event
       event.clear_cache
       event.set(sold_out_cache: event.sold_out?)
+      event.set(sold_out_due_to_sales_end_cache: event.sold_out_due_to_sales_end?)
     end
   end
 

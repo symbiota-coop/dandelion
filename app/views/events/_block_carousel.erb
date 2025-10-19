@@ -33,7 +33,11 @@
 </span>
 <% if event.sold_out_cache %>
   <span class="label label-danger" style="opacity: 0.85; border-radius: 0; position: absolute; bottom: 0; right: 0">
-    Sold out
+    <% if event.sold_out_due_to_sales_end_cache %>
+      Sales ended
+    <% else %>
+      Sold out
+    <% end %>
   </span>
 <% end %>
 </div>

@@ -6,7 +6,13 @@
   <% end %>
 <% end %>
 <% if event.sold_out_cache %>
-  <span class="label label-danger">Sold out</span>
+  <span class="label label-danger">
+    <% if event.sold_out_due_to_sales_end_cache %>
+      Sales ended
+    <% else %>
+      Sold out
+    <% end %>
+  </span>
 <% end %>
 <% if event.locked? %>
   <span class="label label-default">Locked</span>
