@@ -1,12 +1,22 @@
 Dandelion::App.controller do
   get '/books' do
     @title = 'Books'
-    @books = Book.all(sort: { 'Original Publication Year or Year Published' => 'desc' }, filter: '{Dandelion} = 1')
+    begin
+      @books = Book.all(sort: { 'Original Publication Year or Year Published' => 'desc' }, filter: '{Dandelion} = 1')
+    rescue Airrecord::Error => e
+      @books = []
+      logger.error "Airtable API error in /books: #{e.message}"
+    end
     erb :'books/books'
   end
 
   get '/books/:slug', provides: [:html, :jpg] do
-    @book = Book.all(filter: "{Slug} = '#{params[:slug]}'").first || not_found
+    begin
+      @book = Book.all(filter: "{Slug} = '#{params[:slug]}'").first || not_found
+    rescue Airrecord::Error => e
+      logger.error "Airtable API error in /books/:slug: #{e.message}"
+      not_found
+    end
     @title = "#{@book['Title']} by #{@book['Author']}"
 
     case content_type
@@ -23,12 +33,22 @@ Dandelion::App.controller do
 
   get '/films' do
     @title = 'Films'
-    @films = Film.all(sort: { 'Year' => 'desc' })
+    begin
+      @films = Film.all(sort: { 'Year' => 'desc' })
+    rescue Airrecord::Error => e
+      @films = []
+      logger.error "Airtable API error in /films: #{e.message}"
+    end
     erb :'films/films'
   end
 
   get '/films/:slug', provides: :jpg do
-    @film = Film.all(filter: "{Slug} = '#{params[:slug]}'").first || not_found
+    begin
+      @film = Film.all(filter: "{Slug} = '#{params[:slug]}'").first || not_found
+    rescue Airrecord::Error => e
+      logger.error "Airtable API error in /films/:slug: #{e.message}"
+      not_found
+    end
     redirect @film['Images'].first['url']
   end
 
