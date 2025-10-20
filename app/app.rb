@@ -74,13 +74,16 @@ module Dandelion
     get '/raise' do
       admins_only!
       msg = params[:message] || 'test error'
-      raise msg unless params[:detail]
 
       begin
         raise msg
       rescue StandardError => e
-        Honeybadger.context({ detail: params[:detail] })
-        Honeybadger.notify(e)
+        if params[:detail]
+          Honeybadger.context({ detail: params[:detail] })
+          Honeybadger.notify(e)
+        else
+          raise e
+        end
       end
     end
 
