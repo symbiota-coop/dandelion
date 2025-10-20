@@ -52,7 +52,7 @@ module EmailFields
         reminder_email_title: 'Custom subject line for the reminder email',
         reminder_email_body: 'Custom body for the reminder email',
         feedback_email_title: 'Custom subject line for the feedback request email',
-        feedback_email_body: 'Custom body for the feedback request email. Make sure to include a link to [feedback url]'
+        feedback_email_body: 'Custom body for the feedback request email. Make sure to include a link to [feedback_url]'
       }
     end
   end
