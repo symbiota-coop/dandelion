@@ -37,6 +37,10 @@ class Event
     CURRENCY_OPTIONS
   end
 
+  def self.protected_attributes
+    %w[include_in_parent]
+  end
+
   def self.public
     self.and(secret: false)
   end
