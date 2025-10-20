@@ -38,10 +38,20 @@ module EventAssociations
     has_many :notifications, as: :notifiable, dependent: :destroy
 
     has_many :ticket_types, dependent: :destroy
-    accepts_nested_attributes_for :ticket_types, allow_destroy: true, reject_if: ->(attributes) { %w[name description price quantity].all? { |f| attributes[f].nil? } }
+    accepts_nested_attributes_for :ticket_types, allow_destroy: true, reject_if: lambda { |attributes|
+      return true if %w[name description price quantity].all? { |f| attributes[f].nil? }
+      return true if attributes[:id].present? && attributes[:_destroy].blank? && !TicketType.exists?(attributes[:id])
+
+      false
+    }
 
     has_many :ticket_groups, dependent: :destroy
-    accepts_nested_attributes_for :ticket_groups, allow_destroy: true, reject_if: ->(attributes) { %w[name capacity].all? { |f| attributes[f].nil? } }
+    accepts_nested_attributes_for :ticket_groups, allow_destroy: true, reject_if: lambda { |attributes|
+      return true if %w[name capacity].all? { |f| attributes[f].nil? }
+      return true if attributes[:id].present? && attributes[:_destroy].blank? && !TicketGroup.exists?(attributes[:id])
+
+      false
+    }
 
     has_many :tickets, dependent: :destroy
     has_many :donations, dependent: :nullify

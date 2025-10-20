@@ -114,7 +114,11 @@ module AccountAssociations
     has_many :discount_codes, dependent: :nullify
 
     has_many :provider_links, dependent: :destroy
-    accepts_nested_attributes_for :provider_links
+    accepts_nested_attributes_for :provider_links, reject_if: lambda { |attributes|
+      return true if attributes[:id].present? && attributes[:_destroy].blank? && !ProviderLink.exists?(attributes[:id])
+
+      false
+    }
 
     has_many_through :activities_following, class_name: 'Activity', through: :activityships
     has_many_through :local_groups_following, class_name: 'LocalGroup', through: :local_groupships
