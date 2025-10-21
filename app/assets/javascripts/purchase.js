@@ -169,6 +169,20 @@ $(function () {
   })
   setTotal()
 
+  // Remove error styling when a checkbox in a required group is checked
+  $('[class*="checkbox-group-"][data-required="true"]').each(function () {
+    const checkboxGroup = $(this)
+    const groupIndex = checkboxGroup.attr('class').match(/checkbox-group-(\d+)/)
+    if (groupIndex) {
+      const checkboxes = $('.checkbox-group-item-' + groupIndex[1])
+      checkboxes.on('change', function () {
+        if (checkboxes.is(':checked')) {
+          checkboxGroup.removeClass('has-error')
+        }
+      })
+    }
+  })
+
   $('#details form button[data-payment-method]').click(function () {
     $('input[type=hidden][name=payment_method]').prop('disabled', true)
     $('input[type=hidden][name=payment_method][value=' + $(this).attr('data-payment-method') + ']').prop('disabled', false)
@@ -184,6 +198,22 @@ $(function () {
     $('input[type=checkbox][data-required]').each(function () {
       if (!$(this).is(':checked')) {
         alert($(this).next().text().trim() + ' must be checked')
+        halt = true
+      }
+    })
+    if (halt) { return false }
+
+    // Validate required checkbox groups
+    $('[class*="checkbox-group-"][data-required="true"]').each(function () {
+      const checkboxGroup = $(this)
+      const groupIndex = checkboxGroup.attr('class').match(/checkbox-group-(\d+)/)[1]
+      const checkboxes = $('.checkbox-group-item-' + groupIndex)
+      const questionLabel = checkboxGroup.find('label').first().text().trim()
+
+      if (!checkboxes.is(':checked')) {
+        alert('Please select at least one option for: ' + questionLabel)
+        checkboxGroup.addClass('has-error')
+        checkboxes.first().focus()
         halt = true
       }
     })

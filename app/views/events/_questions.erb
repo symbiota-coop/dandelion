@@ -18,12 +18,30 @@ end
       <h4><%== Sanitize.fragment(Rinku.auto_link(match), Sanitize::Config::DANDELION) %></h4>
     <% end %>
   <% elsif m = q.match(Order::SELECT_FIELD_REGEX)  %>
-    <% # Select field: Question text [option1, option2, option3] or Question text [option1, option2, option3]* %>
+    <% # Select field: Question text <option1, option2, option3> or Question text <option1, option2, option3>* %>
     <% question_text = m[1] %>
     <% options = m[2].split(',').map(&:strip) %>
     <div class="form-group">
       <label><%== Sanitize.fragment(Rinku.auto_link(question_text.chomp('*')), Sanitize::Config::DANDELION) %></label>
       <%= select_tag "answers[#{i}]", options: [''] + options, selected: (params[:answers][i] if params[:answers]), required: q.ends_with?('*'), class: 'form-control', disabled: defined?(questions) %>
+    </div>
+  <% elsif m = q.match(Order::MULTIPLE_CHECKBOX_FIELD_REGEX)  %>
+    <% # Multiple checkboxes: Question text [option1, option2, option3] or Question text [option1, option2, option3]* %>
+    <% question_text = m[1] %>
+    <% options = m[2].split(',').map(&:strip) %>
+    <% is_required = q.ends_with?('*') %>
+    <div class="form-group checkbox-group-<%=i%>" data-required="<%= is_required %>">
+      <label><%== Sanitize.fragment(Rinku.auto_link(m[1]), Sanitize::Config::DANDELION) %></label>
+      <% options.each_with_index do |option, index| %>
+        <div>
+          <div class="checkbox-inline">
+            <%= check_box_tag "answers[#{i}][#{index}]", value: option, id: "answers-#{i}-#{index}", class: "checkbox-group-item-#{i}", checked: ((params[:answers][i] == 'true') if params[:answers]), disabled: defined?(questions) %>
+            <label class="font-weight-bold" for="answers-<%=i%>-<%=index%>">
+              <%== Sanitize.fragment(Rinku.auto_link(option), Sanitize::Config::DANDELION) %>
+            </label>
+          </div>
+        </div>
+      <% end %>
     </div>
   <% elsif m = q.match(Order::CHECKBOX_FIELD_REGEX)  %>
     <% # Checkbox: [Question text] %>
@@ -34,10 +52,8 @@ end
       </label>
     </div>
   <% elsif m = q.match(Order::DATE_FIELD_REGEX)  %>
-    <div class="form-group">
-      <label><%== Sanitize.fragment(Rinku.auto_link(m[1]), Sanitize::Config::DANDELION) %></label>
-      <%= date_field_tag "answers[#{i}]", required: q.ends_with?('*'), class: 'form-control', value: (params[:answers][i] if params[:answers] && params[:answers][i] != '__EMPTY__'), disabled: defined?(questions) %>
-    </div>
+    <label><%== Sanitize.fragment(Rinku.auto_link(m[1]), Sanitize::Config::DANDELION) %></label>
+    <%= date_field_tag "answers[#{i}]", required: q.ends_with?('*'), class: 'form-control', value: (params[:answers][i] if params[:answers] && params[:answers][i] != '__EMPTY__'), disabled: defined?(questions) %>
   <% else %>
     <label><%== Sanitize.fragment(Rinku.auto_link(q.chomp('*')), Sanitize::Config::DANDELION) %></label>
     <div>

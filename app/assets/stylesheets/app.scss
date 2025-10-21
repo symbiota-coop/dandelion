@@ -2,6 +2,9 @@
 @import "../infinite_admin/scss/style";
 @import "event_details";
 
+.checkbox-inline label {
+  cursor: pointer;
+}
 
 table.event-details td {
   font-size: 1.25em

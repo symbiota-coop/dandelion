@@ -9,7 +9,8 @@ class Order
     const_set(error_class, Class.new(StandardError))
   end
 
-  SELECT_FIELD_REGEX = /^(.+?)\s*\[\s*(.+?)\s*\]\*?$/
+  SELECT_FIELD_REGEX = /^(.+?)\s*<\s*(.+?)\s*>\*?$/
+  MULTIPLE_CHECKBOX_FIELD_REGEX = /^(.+?)\s*\[\s*(.+?)\s*\]\*?$/
   CHECKBOX_FIELD_REGEX = /^\s*\[(.+?)\]\s*\*?$/
   DATE_FIELD_REGEX = /^\s*\{(.+?)\}\s*\*?$/
 

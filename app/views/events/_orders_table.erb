@@ -209,7 +209,10 @@
         <p style="width: 400px">
           <strong>
             <% if m = q.match(Order::SELECT_FIELD_REGEX) %>
-              <% # Select field: Question text [opt1, opt2, opt3] %>
+              <% # Select field: Question text <opt1, opt2, opt3> %>
+              <%== Sanitize.fragment(Rinku.auto_link(m[1]), Sanitize::Config::DANDELION) %>
+            <% elsif m = q.match(Order::MULTIPLE_CHECKBOX_FIELD_REGEX) %>
+              <% # Multiple checkboxes: Question text [opt1, opt2, opt3] %>
               <%== Sanitize.fragment(Rinku.auto_link(m[1]), Sanitize::Config::DANDELION) %>
             <% elsif m = q.match(Order::CHECKBOX_FIELD_REGEX) %>
               <% # Checkbox: [Question text] %>
@@ -223,9 +226,12 @@
           </strong>
         </p>
         <p style="width: 400px">
-          <% if q =~ Order::SELECT_FIELD_REGEX %>
+          <% if m = q.match(Order::SELECT_FIELD_REGEX) %>
             <% # Select field answer: show the selected value %>
             <%== Sanitize.fragment(Rinku.auto_link(a), Sanitize::Config::DANDELION) %>
+          <% elsif q =~ Order::MULTIPLE_CHECKBOX_FIELD_REGEX %>
+            <% # Select field answer: show the selected value %>
+            <%= a.map { |v| Sanitize.fragment(Rinku.auto_link(v), Sanitize::Config::DANDELION) }.join(', ') %>
           <% elsif q =~ /\[.*\]/ %>
             <% # Checkbox answer: show checkmark %>
             <i class="bi bi-check-lg"></i>
