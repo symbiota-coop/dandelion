@@ -2,6 +2,11 @@
 @import "../infinite_admin/scss/style";
 @import "event_details";
 
+
+#carousel-buttons-container {
+  background: white;
+}
+
 .checkbox-inline label {
   cursor: pointer;
 }
