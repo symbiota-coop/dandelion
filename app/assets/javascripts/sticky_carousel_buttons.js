@@ -2,6 +2,7 @@
 (function () {
   let originalSearchFormTop = null;
   let isSticky = false;
+  let placeholder = null;
 
   window.iFrameResizer = {
     onMessage: function (message) {
@@ -24,6 +25,11 @@
           // Only stick when we've scrolled past the search form's original position
           if (iframeScrolledAbove > originalSearchFormTop) {
             if (!isSticky) {
+              // Create placeholder to maintain space in document flow
+              placeholder = document.createElement('div');
+              placeholder.style.height = searchForm.offsetHeight + 'px';
+              searchForm.parentNode.insertBefore(placeholder, searchForm);
+
               // First time sticking - add will-change for performance
               searchForm.style.willChange = 'transform';
               isSticky = true;
@@ -36,6 +42,12 @@
             searchForm.style.zIndex = '100';
           } else {
             if (isSticky) {
+              // Remove placeholder
+              if (placeholder && placeholder.parentNode) {
+                placeholder.parentNode.removeChild(placeholder);
+                placeholder = null;
+              }
+
               // Remove will-change when not sticky
               searchForm.style.willChange = '';
               isSticky = false;
