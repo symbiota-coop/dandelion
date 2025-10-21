@@ -68,6 +68,7 @@
   // Send message to parent on load to trigger initial scroll position update
   window.addEventListener('load', function () {
     if (window.parentIFrame) {
+      console.log('sending message to parent on load');
       window.parentIFrame.sendMessage('iframeLoaded');
     }
   });
