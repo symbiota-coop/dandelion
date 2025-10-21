@@ -53,7 +53,8 @@ class Activity
 
   def self.new_hints
     {
-      locked: 'Make the activity visible to admins only'
+      locked: 'Make the activity visible to admins only',
+      application_questions: 'Questions to ask applicants. One question per line.'
     }
   end
 
