@@ -9,7 +9,9 @@
     next if previous_name == event.name
     %>
     <div class="col-12 col-sm-6 col-lg-4" style="margin-bottom: 0.75rem">
-      <%= partial :'events/block_carousel', locals: {crop: (crop if defined?(crop)), event: event} %>
+      <div class="p-1">
+        <%= partial :'events/block_carousel', locals: {crop: (crop if defined?(crop)), event: event} %>
+      </div>
     </div>
     <% previous_name = event.name } %>
   </div>
