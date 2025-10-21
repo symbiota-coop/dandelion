@@ -5,6 +5,11 @@
   let placeholder = null;
 
   window.iFrameResizer = {
+    onReady: function () {
+      // Send message to parent when iframe-resizer is ready
+      console.log('iframe-resizer ready, sending message to parent');
+      window.parentIFrame.sendMessage('iframeLoaded');
+    },
     onMessage: function (message) {
       if (message.type === 'parentScroll') {
         // Only enable sticky on large screens (Bootstrap lg breakpoint = 992px)
@@ -64,12 +69,4 @@
       }
     }
   };
-
-  // Send message to parent on load to trigger initial scroll position update
-  window.addEventListener('load', function () {
-    if (window.parentIFrame) {
-      console.log('sending message to parent on load');
-      window.parentIFrame.sendMessage('iframeLoaded');
-    }
-  });
 })();
