@@ -1,3 +1,6 @@
+<% if params[:sticky_search_form] %>
+  <script src="/javascripts/sticky_search_form.js?<%= @cachebuster %>"></script>
+<% end %>
 <% unless params[:minimal] %>
   <%= partial :'organisations/nav', locals: { organisation: @organisation } %>
   <div class="row mb-3">
@@ -31,7 +34,7 @@
     <%= partial :'events/view_options', locals: { grid_view: true, calendar_view: true } %>
   <% end %>
 <% else %>
-  <div class="<%= params[:minimal] ? 'mb-3 mt-1' : 'my-3' %>">
+  <div id="events-search-form-container" class="<%= params[:minimal] ? 'mb-3 mt-1' : 'my-3' %>">
     <%= partial :'organisations/events_search_form' %>
   </div>
 <% end %>
