@@ -12,7 +12,9 @@
 
 <% @carousel_buttons = @organisation.carousels.and(button: true).exists? %>
 <% if @carousel_buttons %>
-  <%= partial :'organisations/carousel_buttons' %>
+  <div id="carousel-buttons-container">
+    <%= partial :'organisations/carousel_buttons' %>
+  </div>
 <% end %>
 
 <% if params[:display].in?(['map', 'calendar']) || @carousel_buttons %>

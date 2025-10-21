@@ -11,7 +11,7 @@
           return;
         }
 
-        const searchForm = document.getElementById('events-search-form-container');
+        const searchForm = document.getElementById('carousel-buttons-container');
         if (searchForm) {
           // Store the original position of the search form (once)
           if (originalSearchFormTop === null) {
