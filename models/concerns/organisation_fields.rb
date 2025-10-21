@@ -51,7 +51,6 @@ module OrganisationFields
     field :monthly_donors_count, type: Integer
     field :monthly_donations_count, type: String
     field :currency, type: String
-    field :auto_comment_sending, type: Mongoid::Boolean
     field :affiliate_credit_percentage, type: Integer
     field :affiliate_intro, type: String
     field :affiliate_share_image_url, type: String
@@ -206,7 +205,6 @@ module OrganisationFields
         monthly_donation_welcome_from: 'Welcome email for new monthly donors from',
         monthly_donation_welcome_subject: 'Welcome email for new monthly donors subject',
         monthly_donation_welcome_body: 'Welcome email for new monthly donors body',
-        auto_comment_sending: "Send comments in the Members' Area automatically",
         become_a_member_url: 'Become a Member URL',
         terms_and_conditions_url: 'Terms and Conditions URL',
         add_a_donation_to: 'Text beside donation field',

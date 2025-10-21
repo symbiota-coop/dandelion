@@ -169,7 +169,7 @@ class Comment
          end
   end
 
-  after_create :send_comment, if: proc { |comment| !comment.commentable.respond_to?(:auto_comment_sending) || comment.commentable.auto_comment_sending }
+  after_create :send_comment
   def send_comment
     return if body.nil?
     return if sent_at

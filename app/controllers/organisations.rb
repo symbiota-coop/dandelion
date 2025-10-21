@@ -325,13 +325,6 @@ Dandelion::App.controller do
     redirect "/o/#{@organisation.slug}/tiers"
   end
 
-  get '/o/:slug/members' do
-    @organisation = Organisation.find_by(slug: params[:slug]) || not_found
-    @organisationship = @organisation.organisationships.find_by(account: current_account)
-    organisation_monthly_donors_plus_only!
-    erb :'organisations/monthly_donors'
-  end
-
   get '/o/:slug/followers', provides: %i[html csv] do
     @organisation = Organisation.find_by(slug: params[:slug]) || not_found
     organisation_admins_only!
