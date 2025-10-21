@@ -59,10 +59,6 @@
   <%= partial :'maps/map', locals: { url: "/o/#{@organisation.slug}/events", bounding_box: @bounding_box&.flatten, fill_screen: true } %>
 <% elsif params[:display] == 'calendar' %>
   <%= partial :'events/calendar' %>
-<% elsif params[:display] == 'table' %>
-  <%= partial :'events/table' %>
-<% elsif params[:display] == 'concise' %>
-  <%= partial :'events/concise' %>
 <% elsif params[:display] == 'grid' %>
   <%= partial :'events/grid' %>
 <% else %>
