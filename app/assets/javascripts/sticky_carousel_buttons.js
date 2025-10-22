@@ -29,27 +29,26 @@
           // Calculate how much the iframe has scrolled above the parent viewport
           const iframeScrolledAbove = Math.max(0, -message.iframeTop);
 
-          // Hide immediately when scrolling starts
-          if (!isScrolling) {
-            isScrolling = true;
-            searchForm.style.opacity = '0';
-            searchForm.style.transition = 'opacity 0.25s ease-out';
-          }
-
-          // Clear previous timeout
-          if (scrollTimeout) {
-            clearTimeout(scrollTimeout);
-          }
-
-          // Set timeout to show again after scrolling stops
-          scrollTimeout = setTimeout(function () {
-            isScrolling = false;
-            searchForm.style.opacity = '1';
-            searchForm.style.transition = 'opacity 0.25s ease-in';
-          }, 150);
-
           // Only stick when we've scrolled past the search form's original position
           if (iframeScrolledAbove > originalSearchFormTop) {
+            // Hide immediately when scrolling starts (only when sticky)
+            if (!isScrolling) {
+              isScrolling = true;
+              searchForm.style.opacity = '0';
+              searchForm.style.transition = 'opacity 0.25s ease-out';
+            }
+
+            // Clear previous timeout
+            if (scrollTimeout) {
+              clearTimeout(scrollTimeout);
+            }
+
+            // Set timeout to show again after scrolling stops
+            scrollTimeout = setTimeout(function () {
+              isScrolling = false;
+              searchForm.style.opacity = '1';
+              searchForm.style.transition = 'opacity 0.25s ease-in';
+            }, 150);
             if (!isSticky) {
               // Create placeholder to maintain space in document flow
               placeholder = document.createElement('div');
