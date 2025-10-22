@@ -35,7 +35,7 @@
             if (!isScrolling) {
               isScrolling = true;
               searchForm.style.opacity = '0';
-              searchForm.style.transition = 'opacity 0.25s ease-out';
+              searchForm.style.transition = 'opacity 0s ease-out';
             }
 
             // Clear previous timeout
