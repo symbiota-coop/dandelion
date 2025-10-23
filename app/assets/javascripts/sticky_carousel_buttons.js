@@ -48,7 +48,7 @@
               isScrolling = false;
               searchForm.style.opacity = '1';
               searchForm.style.transition = 'opacity 0.25s ease-in';
-            }, 150);
+            }, 250);
             if (!isSticky) {
               // Create placeholder to maintain space in document flow
               placeholder = document.createElement('div');
