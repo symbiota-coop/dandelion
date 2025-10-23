@@ -40,7 +40,6 @@ jobs:
       with:
         timeout_minutes: 10
         max_attempts: 3
-        retry_on: error
         command: bundle exec rake test:${{ matrix.test_file }}
       env:
         RACK_ENV: test
