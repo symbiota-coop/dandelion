@@ -45,7 +45,9 @@ full_width = true
                         <%= partial :'events/block_main', locals: { event: event, skip_final_ul: true } %>
 
                         <li><i data-toggle="tooltip" title="People" class="bi bi-person-fill"></i>
-                          <% people.each { |k,v| account = Account.find(k) %>
+                          <% people.each { |k,v| account = Account.find(k);
+                          next if account.private?
+                          %>
                           <a href="/u/<%=account.username%>"><%=account.name%></a>,
                           <span data-toggle="tooltip">
                             <%=pluralize v.count, 'event'%> in common
