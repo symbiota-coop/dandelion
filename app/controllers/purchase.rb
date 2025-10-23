@@ -218,6 +218,12 @@ Dandelion::App.controller do
           { evm_secret: @order.evm_secret, evm_value: @order.evm_value, evm_wei: (@order.evm_value * 1e18.to_d).to_i, order_id: @order.id.to_s, order_expiry: (@order.created_at + 1.hour).to_datetime.strftime('%Q') }.to_json
 
         else
+          # Log the invalid payment method for debugging
+          Honeybadger.context({ 
+            order_id: @order.id, 
+            invalid_payment_method: params[:detailsForm][:payment_method],
+            supported_methods: %w[stripe coinbase gocardless opencollective evm]
+          })
           raise Order::PaymentMethodNotFound
         end
       else
@@ -231,6 +237,11 @@ Dandelion::App.controller do
       @order.notify_of_failed_purchase(e)
       @order.destroy
       halt 400
+    rescue Order::PaymentMethodNotFound => e
+      Honeybadger.context({ order_id: @order.id })
+      Honeybadger.notify(e)
+      @order.destroy
+      halt 422, { error: 'Invalid payment method. Supported methods: stripe, coinbase, gocardless, opencollective, evm' }.to_json
     rescue StandardError => e
       Honeybadger.context({ order_id: @order.id })
       Honeybadger.notify(e)
