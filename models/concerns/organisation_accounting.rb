@@ -82,8 +82,22 @@ module OrganisationAccounting
                                         })
       organisation_contribution = organisation_contributions.create amount: contribution_remaining.cents.to_f / 100, currency: contribution_remaining.currency, payment_intent: pi.id, payment_completed: true
       organisation_contribution.send_notification
+    rescue Stripe::CardError => e
+      # Handle card-specific errors (insufficient funds, declined, etc.)
+      case e.code
+      when 'insufficient_funds'
+        # Log the insufficient funds error but don't retry automatically
+        Honeybadger.notify(e, context: { organisation_id: id, error_type: 'insufficient_funds', amount: contribution_remaining.cents })
+      when 'card_declined'
+        # Handle other card decline reasons
+        Honeybadger.notify(e, context: { organisation_id: id, error_type: 'card_declined', decline_code: e.decline_code })
+      else
+        # Handle other card errors
+        Honeybadger.notify(e, context: { organisation_id: id, error_type: 'card_error', code: e.code })
+      end
     rescue StandardError => e
-      Honeybadger.notify(e)
+      # Handle all other errors
+      Honeybadger.notify(e, context: { organisation_id: id, error_type: 'general_error' })
     end
   end
 
