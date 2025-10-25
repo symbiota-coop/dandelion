@@ -89,7 +89,7 @@ class Event
   end
 
   def questions_a_from_orders
-    questions_from_orders = orders.pluck(:answers).map { |answers| answers.map { |q, _a| q } }.flatten.uniq
+    questions_from_orders = orders.pluck(:answers).compact.map { |answers| answers.map { |q, _a| q } }.flatten.uniq
     (questions_a + questions_from_orders).uniq
   end
 
