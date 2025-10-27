@@ -135,7 +135,7 @@ Dandelion::App.controller do
     @gathering = @mapplication.gathering
     @membership = @gathering.memberships.find_by(account: current_account)
     gathering_admins_only!
-    @mapplication.set(processed_by: current_account)
+    @mapplication.set(processed_by_id: current_account.id)
     case params[:status]
     when 'accepted'
       @mapplication.accept if @mapplication.acceptable?
