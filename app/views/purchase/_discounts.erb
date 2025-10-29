@@ -1,3 +1,43 @@
+<script>
+  function applyDiscountCode(discountCode) {
+    var qs = $.deparam(window.location.search.substring(1))
+    if (discountCode) {
+      qs['discount_code'] = discountCode
+    } else {
+      delete qs['discount_code']
+    }
+
+    var quantities = {}
+    $('#ticket-types form select[data-ticket-type-id]').each(function() {
+      quantities[$(this).attr('data-ticket-type-id')] = $(this).val()
+    })
+
+    var answersObj = {}
+    $('[name^=answers]').each(function() {
+      var name = $(this).attr('name')
+      var match = name.match(/answers\[(\d+)\](?:\[(\d+)\])?/)
+      if (match) {
+        var questionIndex = match[1]
+        var optionIndex = match[2]
+        if (optionIndex !== undefined) {
+          // Multiple checkbox field
+          if (!answersObj[questionIndex]) {
+            answersObj[questionIndex] = {}
+          }
+          answersObj[questionIndex][optionIndex] = $(this).is(':checked')
+        } else {
+          // Regular field (checkbox, text, select, etc)
+          answersObj[questionIndex] = $(this).is(':checkbox') ? $(this).is(':checked') : $(this).val()
+        }
+      }
+    })
+
+    qs['quantities'] = quantities
+    qs['answers'] = answersObj
+    window.location = window.location.pathname + '?' + $.param(qs) + '#select-tickets'
+  }
+</script>
+
 <% if @event.all_discount_codes.exists? %>
   <tr>
     <td></td>
@@ -9,32 +49,16 @@
           <%= text_field_tag :discount_code_display, id: 'discount_code_display', class: 'form-control', style: 'width: 5em', disabled: true, value: params[:discount_code].upcase %>
           <%= hidden_field_tag :discount_code_id, id: 'discount_code_id', value: discount_code.id %>
           <div class="input-group-append">
-            <button class="btn btn-outline-secondary" type="button" onclick="
-                              var qs = $.deparam(window.location.search.substring(1))
-                              delete qs['discount_code']
-                              var quantities = {}
-                              $('#ticket-types form select[data-ticket-type-id]').each(function() {
-                                quantities[$(this).attr('data-ticket-type-id')] = $(this).val()
-                              })
-                              var answers = []
-                              $('[name^=answers]').each(function() {
-                                answers.push($(this).is(':checkbox') ? $(this).is(':checked') : ($(this).val() || '__EMPTY__'))
-                              })
-                              qs['quantities'] = quantities
-                              qs['answers'] = answers
-                              window.location = window.location.pathname + '?' + $.param(qs) + '#select-tickets'
-                              ">Remove</button>
+            <button class="btn btn-outline-secondary" type="button" onclick="applyDiscountCode(null)">Remove</button>
           </div>
         </div>
         <% if discount_code.percentage_discount %>
           <strong>Discount applied</strong>
           <div class="input-group" style="margin: 5px 0">
-            <% if discount_code.percentage_discount %>
-              <%= number_field_tag :percentage_discount, id: 'percentage_discount', class: 'form-control', style: 'width: 5em', disabled: true, value: discount_code.percentage_discount %>
-              <div class="input-group-append">
-                <span class="py-0 input-group-text">%</span>
-              </div>
-            <% end %>
+            <%= number_field_tag :percentage_discount, id: 'percentage_discount', class: 'form-control', style: 'width: 5em', disabled: true, value: discount_code.percentage_discount %>
+            <div class="input-group-append">
+              <span class="py-0 input-group-text">%</span>
+            </div>
           </div>
         <% end %>
       <% else %>
@@ -46,21 +70,7 @@
         <div class="input-group" style="margin: 5px 0">
           <%= text_field_tag :discount_code, id: 'discount_code', class: 'form-control', style: 'width: 5em' %>
           <div class="input-group-append">
-            <button class="btn btn-outline-secondary" style="padding: 0 0.75rem" type="button" onclick="
-                              var qs = $.deparam(window.location.search.substring(1))
-                              qs['discount_code'] = $('#discount_code').val()
-                              var quantities = {}
-                              $('#ticket-types form select[data-ticket-type-id]').each(function() {
-                                quantities[$(this).attr('data-ticket-type-id')] = $(this).val()
-                              })
-                              var answers = []
-                              $('[name^=answers]').each(function() {
-                                answers.push($(this).is(':checkbox') ? $(this).is(':checked') : ($(this).val() || '__EMPTY__'))
-                              })                              
-                              qs['quantities'] = quantities
-                              qs['answers'] = answers
-                              window.location = window.location.pathname + '?' + $.param(qs) + '#select-tickets'
-                              ">Apply</button>
+            <button class="btn btn-outline-secondary" style="padding: 0 0.75rem" type="button" onclick="applyDiscountCode($('#discount_code').val())">Apply</button>
           </div>
         <% end %>
       </div>
