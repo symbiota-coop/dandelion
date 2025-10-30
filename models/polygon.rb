@@ -6,6 +6,13 @@ class Polygon
   field :coordinates, type: Array
   field :type, type: String
 
+  def self.admin_fields
+    {
+      coordinates: :text_area,
+      type: :text
+    }
+  end
+
   before_validation do
     self.type = 'Polygon'
   end
