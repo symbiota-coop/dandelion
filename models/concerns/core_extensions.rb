@@ -97,3 +97,13 @@ module CoreExtensions
     end
   end
 end
+
+# Fix for NoMethodError: undefined method `estimated_count' for Mongoid::Contextual::Memory
+# This happens when admin interfaces try to call estimated_count on embedded document collections
+if defined?(Mongoid::Contextual::Memory)
+  Mongoid::Contextual::Memory.class_eval do
+    def estimated_count
+      count
+    end
+  end
+end
