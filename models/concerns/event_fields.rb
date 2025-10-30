@@ -164,6 +164,7 @@ module EventFields
         start_time: "in &hellip; (your profile's time zone)",
         end_time: "in &hellip; (your profile's time zone)",
         add_a_donation_to: "Text to display beside the 'Add a donation' field (leave blank to use organisation default)",
+        location: 'Determines what time zone to display the event in. Make sure the country is part of the location',
         oc_slug: 'Event slug for taking payments via Open Collective',
         donation_text: "Text to display below the 'Add a donation' field  (leave blank to use organisation default)",
         carousel_text: 'Text to show on event listings or when hovering over the event in a carousel',
