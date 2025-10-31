@@ -12,7 +12,7 @@
       <%= tc %><% if event.capacity %>/<%= event.capacity %><% end %>
     <% end %>
   </a>
-  <% if event.capacity; w = ((tc/event.capacity.to_f)*100).round %>
+  <% if event.capacity && event.capacity > 0; w = ((tc/event.capacity.to_f)*100).round %>
     <a class="d-block" style="text-decoration: none" href="/events/<%= event.id %>/tickets">
       <div class="progress" data-toggle="tooltip" title="<%= tc %>/<%= event.capacity %> tickets sold">
         <div class="progress-bar" role="progressbar" style="width: <%= "#{w}%" %>;">

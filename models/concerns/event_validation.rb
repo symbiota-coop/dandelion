@@ -54,7 +54,7 @@ module EventValidation
       self.location = 'Online' if location && location.downcase == 'online'
       errors.add(:revenue_share_to_revenue_sharer, 'must be between 1 and 100') if revenue_share_to_revenue_sharer && revenue_share_to_revenue_sharer != 0 && (revenue_share_to_revenue_sharer < 1 || revenue_share_to_revenue_sharer > 100)
       errors.add(:affiliate_credit_percentage, 'must be between 1 and 100') if affiliate_credit_percentage && (affiliate_credit_percentage < 1 || affiliate_credit_percentage > 100)
-      errors.add(:capacity, 'must be greater than 0') if capacity && capacity.zero?
+      errors.add(:capacity, 'must be greater than 0') if capacity && capacity < 1
       errors.add(:suggested_donation, 'cannot be less than the minimum donation') if suggested_donation && minimum_donation && suggested_donation < minimum_donation
       errors.add(:oc_slug, "cannot be set until the organisation's Open Collective slug is set") if oc_slug && organisation && !organisation.oc_slug
       errors.add(:end_time, 'must be after the start time') if end_time && start_time && end_time <= start_time
