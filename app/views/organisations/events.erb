@@ -27,8 +27,11 @@
     </div>
   </div>
 <% end %>
-<% if !params[:no_events_banner] && @organisation.unsanitized_ok? && @organisation.events_banner && (!current_account || ((organisationship = @organisation.organisationships.find_by(account: current_account)) && !organisationship.monthly_donor?)) %>
-  <%== @organisation.events_banner %>
+<% if !params[:no_events_banner] && @organisation.unsanitized_ok? && @organisation.events_banner %>
+  <% if current_account && (organisationship = @organisation.organisationships.find_by(account: current_account)) && organisationship.monthly_donor? %>
+  <% else %>
+    <%== @organisation.events_banner %>
+  <% end %>
 <% end %>
 <% if params[:no_search] %>
   <% unless params[:no_listings] || params[:no_view_options]  %>
