@@ -106,7 +106,7 @@
                 <div class="input-group-prepend">
                   <span class="input-group-text">Secret?</span>
                 </div>
-                <%= o.check_box :hidden, :onclick => "$(this).tooltip('hide')", :'data-toggle' => "tooltip", :title => "Allow only people with the link to this ticket type to purchase", class: 'form-control', style: 'flex: 0 0 36px; min-width: 36px' %>
+                <%= o.check_box :hidden, :onclick => "$(this).tooltip('hide')", :'data-toggle' => "tooltip", :title => "Allow only people with the link to this ticket type to purchase", class: 'form-control', style: 'flex: 0 0 2.1rem; min-width: 2.1rem' %>
                 <% if o.object.hidden? %>
                   <div class="input-group-append">
                     <a target="_blank" data-toggle="tooltip" title="Link to secret ticket type" class="input-group-text text-dark" href="/events/<%= @event.id %>?ticket_type_id=<%= o.object.id %>"><i class="bi bi-box-arrow-up-right"></i></a>
@@ -246,7 +246,7 @@
           // Hidden checkbox column
           var hiddenCol = $('<div class="col-auto col-lg-auto mb-2"><div class="input-group"></div></div>');
           hiddenCol.find('.input-group').append('<div class="input-group-prepend"><span class="input-group-text">Secret?</span></div>');
-          var hiddenInput = $('<input type="checkbox" class="form-control" style="flex: 0 0 36px; min-width: 36px" onclick="$(this).tooltip(\'hide\')" data-toggle="tooltip" title="Allow only people with the link to this ticket type to purchase" />');
+          var hiddenInput = $('<input type="checkbox" class="form-control" style="flex: 0 0 2.1rem; min-width: 2.1rem" onclick="$(this).tooltip(\'hide\')" data-toggle="tooltip" title="Allow only people with the link to this ticket type to purchase" />');
           hiddenInput.attr('name', 'event[ticket_types_attributes][' + c + '][hidden]');
           hiddenInput.attr('id', 'event_ticket_types_attributes_' + c + '_hidden');
           hiddenCol.find('.input-group').append(hiddenInput);
