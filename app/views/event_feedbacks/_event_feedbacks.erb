@@ -10,10 +10,20 @@
         </big>
       </div>
     <% end %>
-    <% if admin? %>
-      <a href="/activities/<%= @activity.id %>/feedback_summary">Refresh feedback summary</a>
+    <% if activity_admin? %>
+      <div class="mt-1">
+        <% if admin? || (@activity.feedback_summary_last_refreshed_at.nil? || @activity.feedback_summary_last_refreshed_at <= 24.hours.ago) %>
+          <% if @activity.feedback_summary_last_refreshed_at.nil? %>
+            <a href="/activities/<%= @activity.id %>/feedback_summary">Refresh feedback summary</a>
+          <% else %>
+            Last refreshed <%= timeago @activity.feedback_summary_last_refreshed_at %>. <a href="/activities/<%= @activity.id %>/feedback_summary">Refresh now</a>
+          <% end %>
+        <% else %>
+          <span class="text-muted">Refresh again in <%= distance_of_time_in_words(Time.now, @activity.feedback_summary_last_refreshed_at + 24.hours) %></span>
+        <% end %>
+      </div>
     <% end %>
-  <% elsif  @account %>
+  <% elsif @account %>
     <% if @account.feedback_summary %>
       <div class="ai-well my-3" data-toggle="tooltip" title="AI-generated summary ✨">
         <big>
@@ -21,8 +31,18 @@
         </big>
       </div>
     <% end %>
-    <% if admin? %>
-      <a href="/accounts/<%= @account.id %>/feedback_summary">Refresh feedback summary</a>
+    <% if (admin? || (current_account && @account == current_account)) %>
+      <div class="mt-1">
+        <% if admin? || (@account.feedback_summary_last_refreshed_at.nil? || @account.feedback_summary_last_refreshed_at <= 24.hours.ago) %>
+          <% if @account.feedback_summary_last_refreshed_at.nil? %>
+            <a href="/accounts/<%= @account.id %>/feedback_summary">Refresh feedback summary</a>
+          <% else %>
+            Last refreshed <%= timeago @account.feedback_summary_last_refreshed_at %>. <a href="/accounts/<%= @account.id %>/feedback_summary">Refresh now</a>
+          <% end %>
+        <% else %>
+          <span class="text-muted">Refresh again in <%= distance_of_time_in_words(Time.now, @account.feedback_summary_last_refreshed_at + 24.hours) %></span>
+        <% end %>
+      </div>
     <% end %>
   <% elsif @organisation %>
     <% if @organisation.feedback_summary %>
@@ -32,8 +52,18 @@
         </big>
       </div>
     <% end %>
-    <% if admin? %>
-      <a href="/organisations/<%= @organisation.id %>/feedback_summary">Refresh feedback summary</a>
+    <% if organisation_admin? %>
+      <div class="mt-1">
+        <% if admin? || (@organisation.feedback_summary_last_refreshed_at.nil? || @organisation.feedback_summary_last_refreshed_at <= 24.hours.ago) %>
+          <% if @organisation.feedback_summary_last_refreshed_at.nil? %>
+            <a href="/organisations/<%= @organisation.id %>/feedback_summary">Refresh feedback summary</a>
+          <% else %>
+            Last refreshed <%= timeago @organisation.feedback_summary_last_refreshed_at %>. <a href="/organisations/<%= @organisation.id %>/feedback_summary">Refresh now</a>
+          <% end %>
+        <% else %>
+          <span class="text-muted">Refresh again in <%= distance_of_time_in_words(Time.now, @organisation.feedback_summary_last_refreshed_at + 24.hours) %></span>
+        <% end %>
+      </div>
     <% end %>
   <% end %>
 

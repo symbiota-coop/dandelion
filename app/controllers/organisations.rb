@@ -560,8 +560,12 @@ Dandelion::App.controller do
 
   get '/organisations/:id/feedback_summary' do
     @organisation = Organisation.find(params[:id]) || not_found
-    admins_only!
-    @organisation.feedback_summary!
-    redirect back
+    organisation_admins_only!
+    if !admin? && @organisation.feedback_summary_last_refreshed_at && @organisation.feedback_summary_last_refreshed_at > 24.hours.ago
+      flash[:error] = 'Feedback summary can only be refreshed once per day'
+    else
+      @organisation.feedback_summary!
+    end
+    redirect request.referrer ? "#{request.referrer}#feedback" : back
   end
 end

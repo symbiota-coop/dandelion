@@ -50,6 +50,7 @@ module AccountFields
     field :minimal_head, type: String
     field :stripe_subscription_id, type: String
     field :feedback_summary, type: String
+    field :feedback_summary_last_refreshed_at, type: Time
     field :youtube_video_url, type: String
     field :sent_first_event_email, type: Time
     field :event_feedbacks_as_facilitator_count, type: Integer

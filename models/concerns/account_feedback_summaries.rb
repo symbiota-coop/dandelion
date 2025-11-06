@@ -34,5 +34,6 @@ module AccountFeedbackSummaries
     # last_paragraph = sentences[1..-1].join('. ') if sentences[0] =~ /The feedback .* positive/ || sentences[0] =~ /positive feedback/
     puts "#{last_paragraph}\n\n"
     account.set(feedback_summary: last_paragraph)
+    account.set(feedback_summary_last_refreshed_at: Time.now)
   end
 end

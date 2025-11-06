@@ -27,6 +27,7 @@ class Activity
   field :extra_info_for_application_form, type: String
   field :extra_info_for_acceptance_email, type: String
   field :feedback_summary, type: String
+  field :feedback_summary_last_refreshed_at, type: Time
   field :slug, type: String
 
   def self.search_fields

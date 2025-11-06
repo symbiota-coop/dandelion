@@ -38,9 +38,13 @@ Dandelion::App.controller do
 
   get '/activities/:id/feedback_summary' do
     @activity = Activity.find(params[:id]) || not_found
-    admins_only!
-    @activity.feedback_summary!
-    redirect back
+    activity_admins_only!
+    if !admin? && @activity.feedback_summary_last_refreshed_at && @activity.feedback_summary_last_refreshed_at > 24.hours.ago
+      flash[:error] = 'Feedback summary can only be refreshed once per day'
+    else
+      @activity.feedback_summary!
+    end
+    redirect request.referrer ? "#{request.referrer}#feedback" : back
   end
 
   get '/activities/:id/events/stats' do

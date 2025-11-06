@@ -315,9 +315,13 @@ Dandelion::App.controller do
 
   get '/accounts/:id/feedback_summary' do
     @account = Account.find(params[:id]) || not_found
-    admins_only!
-    @account.feedback_summary!
-    redirect back
+    kick! unless admin? || (current_account && @account == current_account)
+    if !admin? && @account.feedback_summary_last_refreshed_at && @account.feedback_summary_last_refreshed_at > 24.hours.ago
+      flash[:error] = 'Feedback summary can only be refreshed once per day'
+    else
+      @account.feedback_summary!
+    end
+    redirect request.referrer ? "#{request.referrer}#feedback" : back
   end
 
   post '/accounts/:id/reset_password', provides: :json do
