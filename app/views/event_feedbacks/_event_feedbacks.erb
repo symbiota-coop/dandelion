@@ -16,7 +16,7 @@
           <% if @activity.feedback_summary_last_refreshed_at.nil? %>
             <a href="/activities/<%= @activity.id %>/feedback_summary">Refresh feedback summary</a>
           <% else %>
-            Last refreshed <%= timeago @activity.feedback_summary_last_refreshed_at %>. <a href="/activities/<%= @activity.id %>/feedback_summary">Refresh now</a>
+            <span class="text-muted">Last refreshed <%= timeago @activity.feedback_summary_last_refreshed_at %>.</span> <a href="/activities/<%= @activity.id %>/feedback_summary">Refresh now</a>
           <% end %>
         <% else %>
           <span class="text-muted">Refresh again in <%= distance_of_time_in_words(Time.now, @activity.feedback_summary_last_refreshed_at + 24.hours) %></span>
@@ -37,7 +37,7 @@
           <% if @account.feedback_summary_last_refreshed_at.nil? %>
             <a href="/accounts/<%= @account.id %>/feedback_summary">Refresh feedback summary</a>
           <% else %>
-            Last refreshed <%= timeago @account.feedback_summary_last_refreshed_at %>. <a href="/accounts/<%= @account.id %>/feedback_summary">Refresh now</a>
+            <span class="text-muted">Last refreshed <%= timeago @account.feedback_summary_last_refreshed_at %>.</span> <a href="/accounts/<%= @account.id %>/feedback_summary">Refresh now</a>
           <% end %>
         <% else %>
           <span class="text-muted">Refresh again in <%= distance_of_time_in_words(Time.now, @account.feedback_summary_last_refreshed_at + 24.hours) %></span>
@@ -58,7 +58,7 @@
           <% if @organisation.feedback_summary_last_refreshed_at.nil? %>
             <a href="/organisations/<%= @organisation.id %>/feedback_summary">Refresh feedback summary</a>
           <% else %>
-            Last refreshed <%= timeago @organisation.feedback_summary_last_refreshed_at %>. <a href="/organisations/<%= @organisation.id %>/feedback_summary">Refresh now</a>
+            <span class="text-muted">Last refreshed <%= timeago @organisation.feedback_summary_last_refreshed_at %>.</span> <a href="/organisations/<%= @organisation.id %>/feedback_summary">Refresh now</a>
           <% end %>
         <% else %>
           <span class="text-muted">Refresh again in <%= distance_of_time_in_words(Time.now, @organisation.feedback_summary_last_refreshed_at + 24.hours) %></span>
