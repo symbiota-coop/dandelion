@@ -104,6 +104,7 @@ module OrganisationFields
     field :end_date_placeholder, type: String
     field :event_types_placeholder, type: String
     field :show_details_table_in_ticket_emails, type: Mongoid::Boolean
+    field :adult_content, type: Mongoid::Boolean
   end
 
   class_methods do
