@@ -47,6 +47,15 @@ Dandelion::App.controller do
     redirect request.referrer ? "#{request.referrer}#feedback" : back
   end
 
+  get '/activities/:id/feedback_summary/delete' do
+    @activity = Activity.find(params[:id]) || not_found
+    activity_admins_only!
+    @activity.set(feedback_summary: nil)
+    @activity.set(feedback_summary_last_refreshed_at: Time.now)
+    flash[:notice] = 'Feedback summary removed.'
+    redirect request.referrer ? "#{request.referrer}#feedback" : back
+  end
+
   get '/activities/:id/events/stats' do
     @activity = Activity.find(params[:id]) || not_found
     activity_admins_only!

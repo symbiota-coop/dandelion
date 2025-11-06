@@ -324,6 +324,15 @@ Dandelion::App.controller do
     redirect request.referrer ? "#{request.referrer}#feedback" : back
   end
 
+  get '/accounts/:id/feedback_summary/delete' do
+    @account = Account.find(params[:id]) || not_found
+    kick! unless admin? || (current_account && @account == current_account)
+    @account.set(feedback_summary: nil)
+    @account.set(feedback_summary_last_refreshed_at: Time.now)
+    flash[:notice] = 'Feedback summary removed.'
+    redirect request.referrer ? "#{request.referrer}#feedback" : back
+  end
+
   post '/accounts/:id/reset_password', provides: :json do
     halt unless current_account && (current_account.admin? || current_account.can_reset_passwords?)
     @account = Account.find(params[:id]) || not_found

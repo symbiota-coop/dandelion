@@ -16,10 +16,13 @@
           <% if @activity.feedback_summary_last_refreshed_at.nil? %>
             <a href="/activities/<%= @activity.id %>/feedback_summary">Refresh feedback summary</a>
           <% else %>
-            <span class="text-muted">Last refreshed <%= timeago @activity.feedback_summary_last_refreshed_at %>.</span> <a href="/activities/<%= @activity.id %>/feedback_summary">Refresh now</a>
+            <span class="text-muted">Last updated <%= timeago @activity.feedback_summary_last_refreshed_at %> ·</span> <a href="/activities/<%= @activity.id %>/feedback_summary">Refresh</a>
           <% end %>
         <% else %>
           <span class="text-muted">Refresh again in <%= distance_of_time_in_words(Time.now, @activity.feedback_summary_last_refreshed_at + 24.hours) %></span>
+        <% end %>
+        <% if @activity.feedback_summary %>
+          <span class="text-muted"> · </span><a href="/activities/<%= @activity.id %>/feedback_summary/delete" data-confirm="Are you sure you want to remove this feedback summary?">Remove</a>
         <% end %>
       </div>
     <% end %>
@@ -37,10 +40,13 @@
           <% if @account.feedback_summary_last_refreshed_at.nil? %>
             <a href="/accounts/<%= @account.id %>/feedback_summary">Refresh feedback summary</a>
           <% else %>
-            <span class="text-muted">Last refreshed <%= timeago @account.feedback_summary_last_refreshed_at %>.</span> <a href="/accounts/<%= @account.id %>/feedback_summary">Refresh now</a>
+            <span class="text-muted">Last updated <%= timeago @account.feedback_summary_last_refreshed_at %> ·</span> <a href="/accounts/<%= @account.id %>/feedback_summary">Refresh</a>
           <% end %>
         <% else %>
           <span class="text-muted">Refresh again in <%= distance_of_time_in_words(Time.now, @account.feedback_summary_last_refreshed_at + 24.hours) %></span>
+        <% end %>
+        <% if @account.feedback_summary %>
+          <span class="text-muted"> · </span><a href="/accounts/<%= @account.id %>/feedback_summary/delete" data-confirm="Are you sure you want to remove this feedback summary?">Remove</a>
         <% end %>
       </div>
     <% end %>
@@ -58,10 +64,13 @@
           <% if @organisation.feedback_summary_last_refreshed_at.nil? %>
             <a href="/organisations/<%= @organisation.id %>/feedback_summary">Refresh feedback summary</a>
           <% else %>
-            <span class="text-muted">Last refreshed <%= timeago @organisation.feedback_summary_last_refreshed_at %>.</span> <a href="/organisations/<%= @organisation.id %>/feedback_summary">Refresh now</a>
+            <span class="text-muted">Last updated <%= timeago @organisation.feedback_summary_last_refreshed_at %> ·</span> <a href="/organisations/<%= @organisation.id %>/feedback_summary">Refresh</a>
           <% end %>
         <% else %>
           <span class="text-muted">Refresh again in <%= distance_of_time_in_words(Time.now, @organisation.feedback_summary_last_refreshed_at + 24.hours) %></span>
+        <% end %>
+        <% if @organisation.feedback_summary %>
+          <span class="text-muted"> · </span><a href="/organisations/<%= @organisation.id %>/feedback_summary/delete" data-confirm="Are you sure you want to remove this feedback summary?">Remove</a>
         <% end %>
       </div>
     <% end %>

@@ -4,7 +4,7 @@ module ActivityFeedbackSummaries
   class_methods do
     def set_feedback_summaries
       # Activity.and(:feedback_summary.ne => nil).update_all(feedback_summary: nil)
-      activities = Activity.and(:id.in => EventFeedback.pluck(:activity_id), :feedback_summary => nil)
+      activities = Activity.and(:id.in => EventFeedback.pluck(:activity_id), :feedback_summary => nil, :feedback_summary_last_refreshed_at => nil)
       activities = activities.select { |activity| activity.event_feedbacks.count >= 10 }
       activities.each_with_index do |activity, i|
         puts "#{i + 1}/#{activities.count} #{activity.organisation.name}: #{activity.name}"
