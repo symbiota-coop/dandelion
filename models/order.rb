@@ -60,10 +60,17 @@ class Order
   after_create do
     if opt_in_organisation
       event.organisation_and_cohosts.each do |organisation|
-        organisation.organisationships.create account: account
+        organisationship = organisation.organisationships.find_or_create_by(account: account)
+        organisationship.set(unsubscribed: false)
       end
-      event.activity.activityships.create account: account if event.activity && event.activity.privacy == 'open'
-      event.local_group.local_groupships.create account: account if event.local_group
+      if event.activity && event.activity.privacy == 'open'
+        activityship = event.activity.activityships.find_or_create_by(account: account)
+        activityship.set(unsubscribed: false)
+      end
+      if event.local_group
+        local_groupship = event.local_group.local_groupships.find_or_create_by(account: account)
+        local_groupship.set(unsubscribed: false)
+      end
     end
     sign_up_to_gocardless if gc_plan_id
   end
