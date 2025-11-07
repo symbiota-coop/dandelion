@@ -1,3 +1,10 @@
+<% if params[:duplicated] %>
+  <div class="alert alert-success">
+    <p class="mb-0">
+      The event was duplicated, and you're now editing the duplicate.
+    </p>
+  </div>
+<% end %>
 <% if @event.locked? || (@event.organisation && !@event.organisation.payment_method? && @event.paid_tickets?) %>
   <div class="alert alert-warning">
     <p class="mb-0">
@@ -8,7 +15,11 @@
       <% if @event.organisation && !@event.organisation.payment_method? && @event.paid_tickets? %>
         You must <a class="text-warning text-underline" href="/o/<%=@event.organisation.slug%>/edit">add either Stripe or Coinbase Commerce details in the Payments tab of your organisation</a> to take payments.
       <% elsif @event.locked? %>
-        <a class="text-warning text-underline" href="/events/<%= @event.id %>/edit">Edit the event</a>, unchecked the Locked checkbox and save to unlock it.
+        <% if request.path.include?('/edit') %>
+          Unchecked the Locked checkbox and save to unlock it.
+        <% else %>
+          <a class="text-warning text-underline" href="/events/<%= @event.id %>/edit">Edit the event</a>, unchecked the Locked checkbox and save to unlock it.
+        <% end %>
       <% end %>
     </p>
   </div>

@@ -307,8 +307,7 @@ Dandelion::App.controller do
       redirect "/o/#{@event.organisation.slug}/contribute"
     else
       duplicated_event = @event.duplicate!(current_account)
-      flash[:notice] = 'Event duplicated and locked'
-      redirect "/e/#{duplicated_event.slug}/edit"
+      redirect "/e/#{duplicated_event.slug}/edit?duplicated=1"
     end
   end
 
