@@ -20,20 +20,37 @@ module EvmTransactions
 
         j = JSON.parse(page.body)
         j['items'].each do |item|
-          to = item['to']['hash']
-          next unless to.downcase == evm_address.downcase
+          puts item['block_hash']
 
-          token_address = item['token']['address']
-          next unless token_address
+          to = item['to']['hash']
+          unless to.downcase == evm_address.downcase
+            # puts 'transaction is not to the address'
+            next
+          end
+
+          token_address = item['token']['address_hash']
+          unless token_address
+            # puts 'token address is missing'
+            next
+          end
 
           token_find = Token.by_contract_address.find { |k, _v| k.downcase == token_address.downcase }
-          next unless token_find
+          unless token_find
+            # puts 'token not found'
+            next
+          end
 
           token = token_find[1]
-          next unless token
+          unless token
+            # puts 'token is missing'
+            next
+          end
 
           amount = item['total']['value'].to_f / (10**item['total']['decimals'].to_i)
-          next unless amount
+          unless amount
+            # puts 'amount is missing'
+            next
+          end
 
           puts [token, amount]
           transactions << [token, amount]
