@@ -55,7 +55,10 @@ class Activity
   def self.new_hints
     {
       locked: 'Make the activity visible to admins only',
-      application_questions: 'Questions to ask applicants. One question per line.'
+      application_questions: 'Questions to ask applicants (answers in textboxes). One question per line.',
+      thank_you_message: 'Shown to applicants after they apply',
+      extra_info_for_application_form: 'Shown at the top of the application form',
+      extra_info_for_acceptance_email: 'Included in the email to accepted applicants'
     }
   end
 

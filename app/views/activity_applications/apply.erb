@@ -1,3 +1,5 @@
+<%= partial :'activities/nav', locals: { activity: @activity } %>
+
 <div class="row justify-content-center">
   <div class="col-12 col-lg-8">
     <% if @activityship %>
@@ -18,6 +20,8 @@
         <div class="wysiwyg">
           <%== Sanitize.fragment(@activity.thank_you_message, Sanitize::Config::DANDELION) %>
         </div>
+      <% else %>
+        <p>We'll get back to you as soon as possible!</p>
       <% end %>
     <% else %>
       <h1>Apply to <a href="/activities/<%= @activity.id %>"><%= @activity.name %></a></h1>

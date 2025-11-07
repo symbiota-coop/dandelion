@@ -11,6 +11,9 @@
       }
     })
     $('#activity_privacy').change()
+
+    $('#activity_application_questions').attr('rows', '3')
+    autosize($('#activity_application_questions')[0])
   })
 </script>
 <% form_for @activity, @activity.new_record ? '/activities/new' : "/activities/#{@activity.id}/edit" do |f| %>

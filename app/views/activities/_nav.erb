@@ -8,6 +8,7 @@
   <%= dropdown_nav [
         ['View activity', "/activities/#{activity.id}"],
         ['Settings', "/activities/#{activity.id}/edit"],
+        (['Preview application form', "/activities/#{activity.id}/apply"] if activity.privacy == 'closed'),
         ([%(Applications <span class="badge badge-primary">#{activity.activity_applications.outstanding.count}</span>), "/activities/#{activity.id}/applications"] if activity.privacy == 'closed'),
         [%(Followers <span class="badge badge-primary">#{activity.activityships.count}</span>), "/activities/#{activity.id}/followers"],
         ['Discount codes' + (activity.discount_codes.count.positive? ? " <span class='badge badge-primary'>#{activity.discount_codes.count}</span>" : ''), "/activities/#{activity.id}/discount_codes"],
