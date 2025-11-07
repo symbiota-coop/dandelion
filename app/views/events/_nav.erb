@@ -45,3 +45,13 @@
     <%= partial :'events/event_stats', locals: { events: Event.unscoped.and(:id.in => [event.id]), organisation: (params[:cohost] ? Organisation.find_by(slug: params[:cohost]) : event.organisation) } %>
   <% end %>
 <% end %>
+
+<script>
+  $(function () {
+    $('[href$="duplicate"]').click(function () {
+      if (!confirm('Are you sure you want to duplicate the event?')) {
+        return false
+      }
+    })
+  })
+</script>

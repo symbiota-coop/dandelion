@@ -76,18 +76,11 @@ $(function () {
       }
     })
 
-    $('[data-confirm], [href$="destroy"], [href$="duplicate"]').not('[data-confirm-registered]').attr('data-confirm-registered', 'true').each(function () {
+    $('[data-confirm], [href$="destroy"]').not('[data-confirm-registered]').attr('data-confirm-registered', 'true').each(function () {
       $(this).click(function () {
         $(this).removeClass('no-trigger')
 
-        let message = $(this).data('confirm')
-        if (!message) {
-          if ($(this).attr('href') && $(this).attr('href').endsWith('duplicate')) {
-            message = 'Are you sure you want to duplicate the event?'
-          } else {
-            message = 'Are you sure?'
-          }
-        }
+        const message = $(this).data('confirm') || 'Are you sure?'
         if (!confirm(message)) {
           $(this).addClass('no-trigger')
           return false
