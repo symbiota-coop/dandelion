@@ -304,7 +304,7 @@ end
     currencySymbol: money_symbol(@event.currency),
     minimumApplicationFee: min_app_fee,
     stripePk: (@event.organisation.stripe_connect_json ? ENV['STRIPE_PK'] : @event.organisation.stripe_pk),
-    stripeAccount: @event.organisation.stripe_user_id,
+    stripeAccount: @event.revenue_sharer_organisationship && @event.direct_charges ? @event.revenue_sharer_organisationship.stripe_user_id : @event.organisation.stripe_user_id,
     coinbase: !!@event.organisation.coinbase_api_key,
     gocardless: !!(@event.organisation.gocardless_instant_bank_pay && @event.organisation.gocardless_access_token),
     organisationOcSlug: @event.organisation.oc_slug,
