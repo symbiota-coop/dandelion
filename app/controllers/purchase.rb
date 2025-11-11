@@ -116,12 +116,18 @@ Dandelion::App.controller do
           application_fee_amount = nil
           if (organisationship = @event.revenue_sharer_organisationship)
             application_fee_amount = @order.calculate_application_fee_amount
-            payment_intent_data.merge!({
-                                         application_fee_amount: (application_fee_amount * 100).round,
-                                         transfer_data: {
-                                           destination: organisationship.stripe_user_id
-                                         }
-                                       })
+            if @event.direct_charges
+              payment_intent_data.merge!({
+                                           application_fee_amount: (application_fee_amount * 100).round
+                                         })
+            else
+              payment_intent_data.merge!({
+                                           application_fee_amount: (application_fee_amount * 100).round,
+                                           transfer_data: {
+                                             destination: organisationship.stripe_user_id
+                                           }
+                                         })
+            end
           elsif @event.donations_to_dandelion?
             application_fee_amount = @order.donation_revenue.cents.to_f / 100
             payment_intent_data.merge!({
@@ -132,7 +138,12 @@ Dandelion::App.controller do
           stripe_session_hash.merge!({
                                        payment_intent_data: payment_intent_data
                                      })
-          session = Stripe::Checkout::Session.create(stripe_session_hash, @event.organisation.stripe_connect_json ? { stripe_account: @event.organisation.stripe_user_id } : {})
+
+          session = if organisationship && @event.direct_charges
+                      Stripe::Checkout::Session.create(stripe_session_hash, { stripe_account: @event.revenue_sharer_organisationship.stripe_user_id })
+                    else
+                      Stripe::Checkout::Session.create(stripe_session_hash, @event.organisation.stripe_connect_json ? { stripe_account: @event.organisation.stripe_user_id } : {})
+                    end
           @order.update_attributes!(
             value: @order.total.round(2),
             session_id: session.id,
