@@ -131,7 +131,6 @@ class Membership
 
   has_many :verdicts, dependent: :destroy
   has_many :payments, dependent: :nullify
-  has_many :payment_attempts, dependent: :nullify
 
   # Timetable
   has_many :tactivities, dependent: :destroy

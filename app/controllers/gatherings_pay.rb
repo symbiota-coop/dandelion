@@ -14,9 +14,9 @@ Dandelion::App.controller do
 
     if event['type'] == 'checkout.session.completed'
       session = event['data']['object']
-      if (payment_attempt = @gathering.payment_attempts.find_by(session_id: session.id))
+      if (payment = @gathering.payments.find_by(session_id: session.id))
         begin
-          Payment.create!(payment_attempt: payment_attempt)
+          payment.payment_completed!
         rescue StandardError => e
           Honeybadger.notify(e)
           halt 200
@@ -41,8 +41,8 @@ Dandelion::App.controller do
       halt 400
     end
 
-    if event.type == 'charge:confirmed' && event.data.respond_to?(:checkout) && (payment_attempt = @gathering.payment_attempts.find_by(coinbase_checkout_id: event.data.checkout.id))
-      Payment.create!(payment_attempt: payment_attempt)
+    if event.type == 'charge:confirmed' && event.data.respond_to?(:checkout) && (payment = @gathering.payments.find_by(coinbase_checkout_id: event.data.checkout.id))
+      payment.payment_completed!
     end
     halt 200
   end
@@ -75,7 +75,7 @@ Dandelion::App.controller do
         }
       }
       session = Stripe::Checkout::Session.create(stripe_session_hash)
-      @membership.payment_attempts.create! amount: params[:amount].to_i, currency: @gathering.currency, session_id: session.id, payment_intent: session.payment_intent
+      payment = @membership.payments.create! amount: params[:amount].to_i, currency: @gathering.currency, session_id: session.id, payment_intent: session.payment_intent, payment_completed: false
       { session_id: session.id }.to_json
 
     when 'coinbase'
@@ -92,28 +92,29 @@ Dandelion::App.controller do
         },
         requested_info: %w[email]
       )
-      @membership.payment_attempts.create! amount: params[:amount].to_i, currency: @gathering.currency, coinbase_checkout_id: checkout.id
+      @membership.payments.create! amount: params[:amount].to_i, currency: @gathering.currency, coinbase_checkout_id: checkout.id, payment_completed: false
       { checkout_id: checkout.id }.to_json
 
     when 'evm'
 
       evm_secret = Array.new(4) { [*'1'..'9'].sample }.join
-      payment_attempt = @membership.payment_attempts.create!(
+      payment = @membership.payments.create!(
         amount: params[:amount].to_i,
         currency: @gathering.currency,
-        evm_secret: evm_secret
+        evm_secret: evm_secret,
+        payment_completed: false
       )
-      { evm_secret: payment_attempt.evm_secret, evm_amount: payment_attempt.evm_amount, evm_wei: (payment_attempt.evm_amount * 1e18.to_d).to_i, payment_attempt_id: payment_attempt.id.to_s, payment_attempt_expiry: (payment_attempt.created_at + 1.hour).to_datetime.strftime('%Q') }.to_json
+      { evm_secret: payment.evm_secret, evm_amount: payment.evm_amount, evm_wei: (payment.evm_amount * 1e18.to_d).to_i, payment_id: payment.id.to_s, payment_expiry: (payment.created_at + 1.hour).to_datetime.strftime('%Q') }.to_json
 
     end
   end
 
-  get '/g/:slug/payment_attempts/:payment_attempt_id', provides: :json do
+  get '/g/:slug/payments/:payment_id', provides: :json do
     @gathering = Gathering.find_by(slug: params[:slug]) || not_found
     @membership = @gathering.memberships.find_by(account: current_account)
     membership_required!
-    @payment_attempt = @gathering.payment_attempts.find(params[:payment_attempt_id])
-    @gathering.check_evm_account if @payment_attempt.evm_secret && @gathering.evm_address
-    { id: @payment_attempt.id.to_s, payment_completed: @gathering.payments.find_by(payment_attempt: @payment_attempt) ? true : false }.to_json
+    @payment = @gathering.payments.find(params[:payment_id])
+    @gathering.check_evm_account if @payment.evm_secret && @gathering.evm_address
+    { id: @payment.id.to_s, payment_completed: @payment.payment_completed || false }.to_json
   end
 end

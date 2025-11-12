@@ -135,8 +135,8 @@
           }
 
           setInterval(function() {
-            if (Date.now() < data['payment_attempt_expiry'])
-              $.getJSON('/g/<%=@gathering.slug%>/payment_attempts/' + data['payment_attempt_id'] , function(_data) {
+            if (Date.now() < data['payment_expiry'])
+              $.getJSON('/g/<%=@gathering.slug%>/payments/' + data['payment_id'] , function(_data) {
                 if (_data['payment_completed'])
                   window.location = '/g/<%=@gathering.slug%>/options'
               })

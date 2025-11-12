@@ -58,7 +58,6 @@ module AccountAssociations
     has_many :memberships_admin_status_changed, class_name: 'Membership', inverse_of: :admin_status_changed_by, dependent: :nullify
 
     has_many :payments, dependent: :destroy
-    has_many :payment_attempts, dependent: :destroy
 
     # Timetable
     has_many :timetables, dependent: :nullify

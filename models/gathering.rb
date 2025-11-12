@@ -167,7 +167,9 @@ class Gathering
 
   def check_evm_account
     evm_transactions.each do |token, amount|
-      Payment.create(payment_attempt: @payment_attempt) if (@payment_attempt = payment_attempts.find_by(currency: token, evm_amount: amount))
+      if (payment = payments.find_by(currency: token, evm_amount: amount))
+        payment.payment_completed! unless payment.payment_completed
+      end
     end
   end
 
