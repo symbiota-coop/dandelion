@@ -15,7 +15,7 @@ class Payment
   field :coinbase_checkout_id, type: String
   field :evm_secret, type: String
   field :evm_amount, type: BigDecimal
-  field :payment_completed, type: Mongoid::Boolean
+  field :payment_completed, type: Boolean
 
   def self.admin_fields
     {
@@ -56,14 +56,6 @@ class Payment
     self.gathering_name = gathering.name if gathering
 
     self.evm_amount = amount.to_d + evm_offset if evm_secret && !evm_amount
-  end
-
-  after_create do
-    if payment_completed
-      membership.set(paid: membership.paid + amount)
-      gathering.set(processed_via_dandelion: gathering.processed_via_dandelion + amount)
-      gathering.set(balance: gathering.balance + amount)
-    end
   end
 
   def payment_completed!

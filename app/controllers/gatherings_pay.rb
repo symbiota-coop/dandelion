@@ -75,7 +75,7 @@ Dandelion::App.controller do
         }
       }
       session = Stripe::Checkout::Session.create(stripe_session_hash)
-      payment = @membership.payments.create! amount: params[:amount].to_i, currency: @gathering.currency, session_id: session.id, payment_intent: session.payment_intent, payment_completed: false
+      @membership.payments.create! amount: params[:amount].to_i, currency: @gathering.currency, session_id: session.id, payment_intent: session.payment_intent, payment_completed: false
       { session_id: session.id }.to_json
 
     when 'coinbase'
