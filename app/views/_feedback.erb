@@ -6,10 +6,15 @@
     <% else %>
       <% form_tag '/feedback' do %>
         <div class="form-group">
-          <%= text_area_tag :feedback, class: 'form-control', rows: 2, placeholder: 'Share your praise, thoughts, suggestions or report an issue', required: true %>
+          <%= text_area_tag :feedback, id: 'feedback-textarea', class: 'form-control', rows: 2, placeholder: 'Send your praise, thoughts, suggestions or report an issue', required: true %>
         </div>
         <%= submit_tag 'Send feedback', class: 'btn btn-primary' %>
       <% end %>
     <% end %>
   </div>
 </div>
+<script>
+  $(function() {
+    autosize($('#feedback-textarea')[0]);
+  });
+</script>
