@@ -10,7 +10,7 @@
   <div class="col-lg-8">
     <%= cp(:'organisations/carousel', key: "/organisations/carousel/#{current_account.id}") %>
 
-    <% if current_account.organisations.exists? %>
+    <% if current_account.organisations.exists? || current_accout.tickets.exists? %>
       <%= partial :feedback %>
     <% end %>
 
