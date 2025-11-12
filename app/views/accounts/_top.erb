@@ -39,10 +39,8 @@ var temp = $('<input>');
     <% else %>
       <% if account.bio %>
         <div class="row justify-content-between no-gutters">
-          <div class="col wysiwyg links-blank">
-            <big>
-              <%== Sanitize.fragment(Rinku.auto_link(account.bio), Sanitize::Config::DANDELION) %>
-            </big>
+          <div class="col wysiwyg links-blank readable">
+            <%== Sanitize.fragment(Rinku.auto_link(account.bio), Sanitize::Config::DANDELION) %>
           </div>
           <% if current_account && current_account.id == account.id %>
             <div class="col-auto">

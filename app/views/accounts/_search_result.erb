@@ -19,10 +19,8 @@
 
     <% if account.feedback_summary %>
       <div class="mt-2">
-        <div class="mb-1" data-toggle="tooltip" title="AI-generated summary ✨">
-          <big>
-            <%= account.feedback_summary %>
-          </big>
+        <div class="mb-1 readable" data-toggle="tooltip" title="AI-generated summary ✨">
+          <%= account.feedback_summary %>
         </div>
       </div>
     <% end %>

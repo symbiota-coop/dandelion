@@ -4,10 +4,8 @@
 
   <% if @activity %>
     <% if @activity.feedback_summary %>
-      <div class="ai-well my-3" data-toggle="tooltip" title="AI-generated summary ✨">
-        <big>
-          <%= @activity.feedback_summary %>
-        </big>
+      <div class="ai-well my-3 readable" data-toggle="tooltip" title="AI-generated summary ✨">
+        <%= @activity.feedback_summary %>
       </div>
     <% end %>
     <% if activity_admin? %>
@@ -28,10 +26,8 @@
     <% end %>
   <% elsif @account %>
     <% if @account.feedback_summary %>
-      <div class="ai-well my-3" data-toggle="tooltip" title="AI-generated summary ✨">
-        <big>
-          <%= @account.feedback_summary %>
-        </big>
+      <div class="ai-well my-3 readable" data-toggle="tooltip" title="AI-generated summary ✨">
+        <%= @account.feedback_summary %>
       </div>
     <% end %>
     <% if (admin? || (current_account && @account == current_account)) %>
@@ -52,10 +48,8 @@
     <% end %>
   <% elsif @organisation %>
     <% if @organisation.feedback_summary %>
-      <div class="ai-well my-3" data-toggle="tooltip" title="AI-generated summary ✨">
-        <big>
-          <%= @organisation.feedback_summary %>
-        </big>
+      <div class="ai-well my-3 readable" data-toggle="tooltip" title="AI-generated summary ✨">
+        <%= @organisation.feedback_summary %>
       </div>
     <% end %>
     <% if organisation_admin? %>
