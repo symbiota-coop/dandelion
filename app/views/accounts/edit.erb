@@ -1,152 +1,155 @@
 <%= partial :'accounts/nav' %>
 
-<% via = %w[organisation activity local_group event].any? { |r| instance_variable_get("@#{r}") } %>
-<% if via or @account.sign_ins_count == 1 %>
-  <% if via %>
-    <% %w{organisation activity local_group event}.each { |r| if instance_variable_get("@#{r}") %>
-    <div class="alert alert-success">
-      <p class="lead">
-        Thanks for your interest in <%= instance_variable_get("@#{r}").name %>!
-      </p>
-      <p class="mb-0">
-        Complete your profile to get the most out of Dandelion:
-      </p>
-    </div>
-    <% break; end; } %>
-  <% elsif @account.sign_ins_count == 1 %>
+<div class="container">
 
-    <div class="alert alert-success">
-      <% if params[:sign_in_token] %>
+  <% via = %w[organisation activity local_group event].any? { |r| instance_variable_get("@#{r}") } %>
+  <% if via or @account.sign_ins_count == 1 %>
+    <% if via %>
+      <% %w{organisation activity local_group event}.each { |r| if instance_variable_get("@#{r}") %>
+      <div class="alert alert-success">
         <p class="lead">
-          Welcome! You've just signed in for the first time and activated your Dandelion account.
+          Thanks for your interest in <%= instance_variable_get("@#{r}").name %>!
         </p>
         <p class="mb-0">
-          Your privacy is important to us. Choose what you share using the toggles on the right.<br>
-          On this page you can also make your profile private and visible only to you, or delete your account.
+          Complete your profile to get the most out of Dandelion:
         </p>
-      <% else %>
-        <p class="lead">
-          Welcome to Dandelion!
-        </p>
-        <p class="mb-0">
-          Your privacy is important to us. Choose what you share using the toggles on the right.
-        </p>
-      <% end %>
+      </div>
+      <% break; end; } %>
+    <% elsif @account.sign_ins_count == 1 %>
+
+      <div class="alert alert-success">
+        <% if params[:sign_in_token] %>
+          <p class="lead">
+            Welcome! You've just signed in for the first time and activated your Dandelion account.
+          </p>
+          <p class="mb-0">
+            Your privacy is important to us. Choose what you share using the toggles on the right.<br>
+            On this page you can also make your profile private and visible only to you, or delete your account.
+          </p>
+        <% else %>
+          <p class="lead">
+            Welcome to Dandelion!
+          </p>
+          <p class="mb-0">
+            Your privacy is important to us. Choose what you share using the toggles on the right.
+          </p>
+        <% end %>
+      </div>
+
+    <% end %>
+  <% end %>
+
+  <%= partial :'accounts/unhide', locals: { account: @account } %>
+
+  <% form_for @account, '/accounts/edit', multipart: true do |f| %>
+    <%= hidden_field_tag :slug, value: params[:slug] %>
+    <% %w[organisation activity local_group event].each { |r| %>
+    <% if instance_variable_get("@#{r}") %>
+      <%= hidden_field_tag :"#{r}_id", value: instance_variable_get("@#{r}").id %>
+    <% end %>
+    <% } %>
+    <%= hidden_field_tag :'account[updated_profile]', value: true %>
+    <%= f.text_block :name %>
+    <%= f.text_block :username %>
+    <%= f.email_block :email %>
+    <% if !@account.email_confirmed? %>
+      <p style="margin-top: -0.75rem"><a href="/confirm_email">Resend confirmation email</a></p>
+    <% end %>
+    <%= f.password_block :password %>
+    <div class="my-3">
+      <%= f.check_box_block :hidden %>
     </div>
-
-  <% end %>
-<% end %>
-
-<%= partial :'accounts/unhide', locals: { account: @account } %>
-
-<% form_for @account, '/accounts/edit', multipart: true do |f| %>
-  <%= hidden_field_tag :slug, value: params[:slug] %>
-  <% %w[organisation activity local_group event].each { |r| %>
-  <% if instance_variable_get("@#{r}") %>
-    <%= hidden_field_tag :"#{r}_id", value: instance_variable_get("@#{r}").id %>
-  <% end %>
-  <% } %>
-  <%= hidden_field_tag :'account[updated_profile]', value: true %>
-  <%= f.text_block :name %>
-  <%= f.text_block :username %>
-  <%= f.email_block :email %>
-  <% if !@account.email_confirmed? %>
-    <p style="margin-top: -0.75rem"><a href="/confirm_email">Resend confirmation email</a></p>
-  <% end %>
-  <%= f.password_block :password %>
-  <div class="my-3">
-    <%= f.check_box_block :hidden %>
-  </div>
-  <script>
-    $(function () {
-      if (typeof google !== 'undefined') {
-        var autocomplete = new google.maps.places.Autocomplete($('#account_location')[0]);
-        $('#account_location').keydown(function (e) {
-          $('#account-map').hide()
-          if (e.which == 13 && $('.pac-container:visible').length)
-            return false;
-        });
-      }
-    })
-  </script>
-  <%= f.image_block :image, rotate: false %>
-  <%= f.text_block :location %>
-  <% if @account.time_zone %>
-    <p>
-      <small class="form-text text-muted">
-        Your time zone: <%= Time.zone.now.strftime('%Z') %> (UTC <%=Time.zone.now.formatted_offset%>)
-      </small>
-    </p>
-  <% end %>
-  <% if @account.coordinates %>
-    <div id="account-map">
-      <style>
-        #map-canvas { height: 200px !important; margin-bottom: 1rem; margin-top: 1rem }
-      </style>
-      <%= partial :'maps/map', locals: { points: [@account] } %>
-    </div>
-  <% end %>
-  <%= f.text_block :phone %>
-  <%= f.text_block :telegram_username %>
-  <%= f.url_block :website %>
-  <%= f.date_block :date_of_birth %>
-  <%= f.select_block :gender %>
-  <%= f.wysiwyg_block :bio %>
-  <%= f.select_block :default_currency %>
-
-  <% if @account.memberships.exists? %>
     <script>
-      $(function() {
-        var label = $('label[for=account_dietary_requirements]').css('display', 'block');
-        $(label).wrapInner('<div class="row justify-content-between no-gutters"><div class="col ml-2"></div></div>')
-        $('.row', label).append('<div class="col-auto"></div>')
-        $('.col-auto', label).append('<span class="font-weight-normal">Only visible to people in your gatherings</span>')
+      $(function () {
+        if (typeof google !== 'undefined') {
+          var autocomplete = new google.maps.places.Autocomplete($('#account_location')[0]);
+          $('#account_location').keydown(function (e) {
+            $('#account-map').hide()
+            if (e.which == 13 && $('.pac-container:visible').length)
+              return false;
+          });
+        }
       })
     </script>
-    <%= f.wysiwyg_block :dietary_requirements %>
+    <%= f.image_block :image, rotate: false %>
+    <%= f.text_block :location %>
+    <% if @account.time_zone %>
+      <p>
+        <small class="form-text text-muted">
+          Your time zone: <%= Time.zone.now.strftime('%Z') %> (UTC <%=Time.zone.now.formatted_offset%>)
+        </small>
+      </p>
+    <% end %>
+    <% if @account.coordinates %>
+      <div id="account-map">
+        <style>
+          #map-canvas { height: 200px !important; margin-bottom: 1rem; margin-top: 1rem }
+        </style>
+        <%= partial :'maps/map', locals: { points: [@account] } %>
+      </div>
+    <% end %>
+    <%= f.text_block :phone %>
+    <%= f.text_block :telegram_username %>
+    <%= f.url_block :website %>
+    <%= f.date_block :date_of_birth %>
+    <%= f.select_block :gender %>
+    <%= f.wysiwyg_block :bio %>
+    <%= f.select_block :default_currency %>
+
+    <% if @account.memberships.exists? %>
+      <script>
+        $(function() {
+          var label = $('label[for=account_dietary_requirements]').css('display', 'block');
+          $(label).wrapInner('<div class="row justify-content-between no-gutters"><div class="col ml-2"></div></div>')
+          $('.row', label).append('<div class="col-auto"></div>')
+          $('.col-auto', label).append('<span class="font-weight-normal">Only visible to people in your gatherings</span>')
+        })
+      </script>
+      <%= f.wysiwyg_block :dietary_requirements %>
+    <% end %>
+
+    <p><em>These questions are entirely optional:</em></p>
+    <%= f.select_block :sexuality %>
+    <div class="row justify-content-between no-gutters my-3">
+      <div class="col ml-2 labelize">
+        <%= f.check_box_block :open_to_new_friends %>
+        <%= f.check_box_block :open_to_short_term_dating %>
+        <%= f.check_box_block :open_to_long_term_dating %>
+        <%= f.check_box_block :open_to_hookups %>
+        <%= f.check_box_block :open_to_open_relating %>
+      </div>
+      <div class="col-auto">
+        <div data-pagelet-url="/accounts/privacyable/open_to"></div>
+      </div>
+    </div>
+
+    <div class="mt-3">
+      <button class="btn btn-primary btn-lg" type="submit">Save profile</button>
+    </div>
+
   <% end %>
 
-  <p><em>These questions are entirely optional:</em></p>
-  <%= f.select_block :sexuality %>
-  <div class="row justify-content-between no-gutters my-3">
-    <div class="col ml-2 labelize">
-      <%= f.check_box_block :open_to_new_friends %>
-      <%= f.check_box_block :open_to_short_term_dating %>
-      <%= f.check_box_block :open_to_long_term_dating %>
-      <%= f.check_box_block :open_to_hookups %>
-      <%= f.check_box_block :open_to_open_relating %>
-    </div>
-    <div class="col-auto">
-      <div data-pagelet-url="/accounts/privacyable/open_to"></div>
-    </div>
-  </div>
-
-  <div class="mt-3">
-    <button class="btn btn-primary btn-lg" type="submit">Save profile</button>
-  </div>
-
-<% end %>
-
-<% Account.privacyables.select { |p| %w[email location phone telegram_username website date_of_birth gender sexuality bio].include?(p) }.each { |p| %>
-<div style="font-weight: 500" data-privacy="<%= p %>" data-pagelet-url="/accounts/privacyable/<%= p %>"></div>
-<% } %>
-<script>
-  $(function () {
-    $('[data-privacy]').each(function () {
-      var dropdown = this;
-      $('label[for=account_' + $(this).attr('data-privacy') + ']').css('display', 'block').each(function () {
-        $(this).wrapInner('<div class="row justify-content-between no-gutters"><div class="col ml-2"></div></div>')
-        $('.row', this).append('<div class="col-auto"></div>')
-        $('.col-auto', this).append(dropdown)
+  <% Account.privacyables.select { |p| %w[email location phone telegram_username website date_of_birth gender sexuality bio].include?(p) }.each { |p| %>
+  <div style="font-weight: 500" data-privacy="<%= p %>" data-pagelet-url="/accounts/privacyable/<%= p %>"></div>
+  <% } %>
+  <script>
+    $(function () {
+      $('[data-privacy]').each(function () {
+        var dropdown = this;
+        $('label[for=account_' + $(this).attr('data-privacy') + ']').css('display', 'block').each(function () {
+          $(this).wrapInner('<div class="row justify-content-between no-gutters"><div class="col ml-2"></div></div>')
+          $('.row', this).append('<div class="col-auto"></div>')
+          $('.col-auto', this).append(dropdown)
+        })
       })
     })
-  })
-</script>
+  </script>
 
-<p class="mt-3 text-lg-right">
-  Your account ID: <%= @account.id %>
-  <% if @account.api_key %>
-    <br />
-    Your API key: <%= @account.api_key %>
-  <% end %>
-</p>
+  <p class="mt-3 text-lg-right">
+    Your account ID: <%= @account.id %>
+    <% if @account.api_key %>
+      <br />
+      Your API key: <%= @account.api_key %>
+    <% end %>
+  </p>
+</div>

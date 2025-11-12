@@ -1,10 +1,14 @@
 <%= partial :'accounts/nav' %>
-<p>To completely remove your account, type your email address (<%= @account.email %>) into the box below and click 'Delete account'.</p>
-<% form_tag '/accounts/destroy', class: 'form-inline' do %>
-  <div class="form-group mr-2">
-    <%= email_field_tag :email, class: 'form-control' %>
-  </div>
-  <div class="form-group">
-    <button type="submit" class="btn btn-danger">Delete account</button>
-  </div>
-<% end %>
+<div class="container">
+
+  <p>To completely remove your account, type your email address (<%= @account.email %>) into the box below and click 'Delete account'.</p>
+  <% form_tag '/accounts/destroy', class: 'form-inline' do %>
+    <div class="form-group mr-2">
+      <%= email_field_tag :email, class: 'form-control' %>
+    </div>
+    <div class="form-group">
+      <button type="submit" class="btn btn-danger">Delete account</button>
+    </div>
+  <% end %>
+
+</div>
