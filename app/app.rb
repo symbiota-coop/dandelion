@@ -169,7 +169,7 @@ module Dandelion
       batch_message = Mailgun::BatchMessage.new(mg_client, ENV['MAILGUN_NOTIFICATIONS_HOST'])
 
       batch_message.from ENV['NOTIFICATIONS_EMAIL_FULL']
-      batch_message.subject "[Feedback] Feedback from #{current_account.name}"
+      batch_message.subject "[Feedback] #{current_account.name}"
       batch_message.body_text "#{params[:feedback]}\n\nAccount: #{ENV['BASE_URI']}/u/#{current_account.username}\nEmail: #{current_account.email}"
       batch_message.reply_to current_account.email
 
