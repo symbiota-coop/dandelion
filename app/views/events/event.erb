@@ -129,22 +129,20 @@
             }
           </style>
         <% end %>
-        <div class="wysiwyg">
-          <big>
-            <% if @event.description %>
-              <% d = Rinku.auto_link(
+        <div class="wysiwyg readable">
+          <% if @event.description %>
+            <% d = Rinku.auto_link(
                 (@event.description.include?('<p') || @event.description.include?('<br') ? @event.description : "<p>#{@event.description.gsub("\n", '<br />')}</p>")
                 .gsub(%r{<a (href=".+?")>\[\[(.+?)\]\]</a>}, '<a \1 class="btn btn-primary">\2</a>')) %>
-              <% if @event.raw_description %>
-                <%== d %>
-              <% else # previously only if @event.organisation.allow_iframes? (otherwise Sanitize.fragment(d, Sanitize::Config::DANDELION)) %>
-                <%== Sanitize.fragment(d, Sanitize::Config::IFRAMES) %>
-              <% end %>
+            <% if @event.raw_description %>
+              <%== d %>
+            <% else # previously only if @event.organisation.allow_iframes? (otherwise Sanitize.fragment(d, Sanitize::Config::DANDELION)) %>
+              <%== Sanitize.fragment(d, Sanitize::Config::IFRAMES) %>
             <% end %>
-            <% if !@event.hide_organisation_footer && @event.organisation.event_footer && !@event.zoom_party? %>
-              <%== Sanitize.fragment(Rinku.auto_link(@event.organisation.event_footer), Sanitize::Config::DANDELION) %>
-            <% end %>
-          </big>
+          <% end %>
+          <% if !@event.hide_organisation_footer && @event.organisation.event_footer && !@event.zoom_party? %>
+            <%== Sanitize.fragment(Rinku.auto_link(@event.organisation.event_footer), Sanitize::Config::DANDELION) %>
+          <% end %>
         </div>
       <% end %>
 

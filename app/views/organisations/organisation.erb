@@ -19,22 +19,18 @@
     </div>
     <%= partial :'organisations/table' %>
     <% if @organisation.intro_text && !@organisation.intro_text.match(/<h[1-6]\b/) %>
-      <div class="wysiwyg links-blank">
-        <big>
-          <% buttons = @organisation.organisation_tiers.order('threshold asc').map { |organisation_tier| %(<a class="btn btn-primary mb-1" href="https://pay.gocardless.com/#{organisation_tier.gc_plan_id}">#{m organisation_tier.threshold, @organisation.currency}</a>) }.join(' ') %>
-          <%== Sanitize.fragment(@organisation.intro_text.gsub('[buttons]', buttons), Sanitize::Config::DANDELION) %>
-        </big>
+      <div class="wysiwyg links-blank readable">
+        <% buttons = @organisation.organisation_tiers.order('threshold asc').map { |organisation_tier| %(<a class="btn btn-primary mb-1" href="https://pay.gocardless.com/#{organisation_tier.gc_plan_id}">#{m organisation_tier.threshold, @organisation.currency}</a>) }.join(' ') %>
+        <%== Sanitize.fragment(@organisation.intro_text.gsub('[buttons]', buttons), Sanitize::Config::DANDELION) %>
       </div>
     <% end %>
   </div>
 </div>
 
 <% if @organisation.intro_text && @organisation.intro_text.match(/<h[1-6]\b/) %>
-  <div class="wysiwyg links-blank">
-    <big>
-      <% buttons = @organisation.organisation_tiers.order('threshold asc').map { |organisation_tier| %(<a class="btn btn-primary mb-1" href="https://pay.gocardless.com/#{organisation_tier.gc_plan_id}">#{m organisation_tier.threshold, @organisation.currency}</a>) }.join(' ') %>
-      <%== Sanitize.fragment(@organisation.intro_text.gsub('[buttons]', buttons), Sanitize::Config::DANDELION) %>
-    </big>
+  <div class="wysiwyg links-blank readable">
+    <% buttons = @organisation.organisation_tiers.order('threshold asc').map { |organisation_tier| %(<a class="btn btn-primary mb-1" href="https://pay.gocardless.com/#{organisation_tier.gc_plan_id}">#{m organisation_tier.threshold, @organisation.currency}</a>) }.join(' ') %>
+    <%== Sanitize.fragment(@organisation.intro_text.gsub('[buttons]', buttons), Sanitize::Config::DANDELION) %>
   </div>
 <% end %>
 
