@@ -35,9 +35,6 @@ class Payment
   end
 
   has_many :notifications, as: :notifiable, dependent: :destroy
-  after_create do
-    notifications.create! circle: circle, type: 'created_payment' unless gathering.hide_paid || gathering.options.any?(&:hide_members)
-  end
 
   def circle
     gathering
@@ -63,6 +60,7 @@ class Payment
     membership.set(paid: membership.paid + amount)
     gathering.set(processed_via_dandelion: gathering.processed_via_dandelion + amount)
     gathering.set(balance: gathering.balance + amount)
+    notifications.create! circle: circle, type: 'created_payment' unless gathering.hide_paid || gathering.options.any?(&:hide_members)
   end
 
   def update_metadata
