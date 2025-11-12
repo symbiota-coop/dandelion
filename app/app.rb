@@ -172,7 +172,7 @@ module Dandelion
       feedback_text = params[:feedback].strip
       batch_message.from ENV['NOTIFICATIONS_EMAIL_FULL']
       batch_message.subject "[Feedback] Feedback from #{account.name}"
-      batch_message.body_text "Feedback from #{account.name} (#{account.email})\n\n#{feedback_text}\n\nAccount: #{ENV['BASE_URI']}/u/#{account.username}\n\nEmail: #{account.email}"
+      batch_message.body_text "#{feedback_text}\n\nAccount: #{ENV['BASE_URI']}/u/#{account.username}\nEmail: #{account.email}"
 
       Account.and(admin: true).each do |admin_account|
         batch_message.add_recipient(:to, admin_account.email, { 'firstname' => admin_account.firstname || 'there', 'token' => admin_account.sign_in_token, 'id' => admin_account.id.to_s })
