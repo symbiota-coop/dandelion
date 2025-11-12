@@ -161,6 +161,29 @@ module Dandelion
       200
     end
 
+    post '/feedback' do
+      sign_in_required!
+      redirect '/' unless params[:feedback]
+
+      mg_client = Mailgun::Client.new ENV['MAILGUN_API_KEY'], ENV['MAILGUN_REGION']
+      batch_message = Mailgun::BatchMessage.new(mg_client, ENV['MAILGUN_NOTIFICATIONS_HOST'])
+
+      account = current_account
+      feedback_text = params[:feedback].strip
+      batch_message.from ENV['NOTIFICATIONS_EMAIL_FULL']
+      batch_message.subject "[Feedback] Feedback from #{account.name}"
+      batch_message.body_text "Feedback from #{account.name} (#{account.email})\n\n#{feedback_text}\n\nAccount: #{ENV['BASE_URI']}/u/#{account.username}\n\nEmail: #{account.email}"
+
+      Account.and(admin: true).each do |admin_account|
+        batch_message.add_recipient(:to, admin_account.email, { 'firstname' => admin_account.firstname || 'there', 'token' => admin_account.sign_in_token, 'id' => admin_account.id.to_s })
+      end
+
+      batch_message.finalize if Padrino.env == :production
+
+      flash[:feedback] = 'Thank you for your feedback!'
+      redirect '/'
+    end
+
     get '/network', provides: :json do
       sign_in_required!
       if (@q = params[:q])

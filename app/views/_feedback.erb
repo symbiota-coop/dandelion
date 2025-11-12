@@ -1,0 +1,15 @@
+<div class="card shadow-sm mb-3">
+  <h3 class="card-header chill">Give us feedback on Dandelion</h3>
+  <div class="card-body">
+    <% if flash[:feedback] %>
+      <div class="alert alert-success"><%= flash[:feedback] %></div>
+    <% else %>
+      <% form_tag '/feedback' do %>
+        <div class="form-group">
+          <%= text_area_tag :feedback, class: 'form-control', rows: 2, placeholder: 'Share your praise, thoughts, suggestions, or report any issues', required: true %>
+        </div>
+        <%= submit_tag 'Send feedback', class: 'btn btn-primary' %>
+      <% end %>
+    <% end %>
+  </div>
+</div>
