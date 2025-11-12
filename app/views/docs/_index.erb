@@ -29,7 +29,7 @@
   });
 </script>
 
-<ul class="list-unstyled" style="font-size: 1.5em">
+<ul class="list-unstyled" style="font-size: 1.25em">
   <% DocPage.order('priority desc').each { |doc_page| active = false %>
   <li>
     <a <% if @doc_page && @doc_page == doc_page; active = true %> class="font-weight-bold" <% end %> href="/docs/<%=doc_page.slug%>"><%=doc_page.name %></a>
