@@ -1,16 +1,16 @@
 class OpenRouter
   BASE_URL = 'https://openrouter.ai'.freeze
   INTELLIGENCE_LEVELS = {
-    'standard' => 'google/gemini-2.5-flash',
-    'smarter' => 'google/gemini-2.5-flash:thinking'
+    'standard' => 'anthropic/claude-haiku-4.5',
+    'smarter' => 'anthropic/claude-haiku-4.5:thinking'
   }.freeze
   DEFAULT_PROVIDERS = {
-    'google/gemini-2.5-flash' => %w[Google],
-    'google/gemini-2.5-flash:thinking' => %w[Google]
+    # 'anthropic/claude-haiku-4.5' => %w[Anthropic],
+    # 'anthropic/claude-haiku-4.5:thinking' => %w[Anthropic]
   }.freeze
   DEFAULT_CONTEXT_WINDOW_SIZES = {
-    'google/gemini-2.5-flash' => 1_000_000,
-    'google/gemini-2.5-flash:thinking' => 1_000_000
+    'anthropic/claude-haiku-4.5' => 200_000,
+    'anthropic/claude-haiku-4.5:thinking' => 200_000
   }.freeze
 
   class << self
@@ -41,12 +41,13 @@ class OpenRouter
           role: 'user',
           content: prompt
         }
-      ],
-      provider: {
-        order: providers
-      },
-      allow_fallbacks: 'false'
+      ]
     }
+
+    if providers
+      payload[:provider] = { order: providers }
+      payload[:allow_fallbacks] = 'false'
+    end
 
     if model.include?(':thinking')
       payload[:reasoning] = {
