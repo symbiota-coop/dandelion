@@ -1,13 +1,15 @@
 <script>
   $(function() {
     $('#doc-body h2:not(:first)').addClass('mt-5')
-    $('#sticky-index').css('top', $('#header').height() + parseInt($('.content').css('paddingTop')))
+    var headerHeight = $('#header').height() + parseInt($('.content').css('paddingTop'))
+    $('#sticky-index').css('top', headerHeight)
+    $('#sticky-index').css('max-height', 'calc(100vh - ' + headerHeight + 'px)')
   })
 </script>
 
 <div class="row">
   <div class="col-lg-3">
-    <div class="mr-3" style="position: sticky;" id="sticky-index">
+    <div class="mr-3" style="position: sticky; overflow-y: auto;" id="sticky-index">
       <%= partial :'docs/index' %>
     </div>
   </div>
