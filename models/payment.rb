@@ -47,6 +47,7 @@ class Payment
   validates_uniqueness_of :evm_secret, scope: :evm_amount, allow_nil: true
 
   def evm_offset
+    return 0 unless evm_secret
     evm_secret.to_d / 1e6
   end
 

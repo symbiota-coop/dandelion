@@ -115,6 +115,7 @@ class Order
   end
 
   def evm_offset
+    return 0 unless evm_secret
     evm_secret.to_d / 1e6
   end
 
