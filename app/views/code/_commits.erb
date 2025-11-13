@@ -8,10 +8,12 @@ year, month = @month.split('-').map(&:to_i)
 # Calculate date range for the selected month
 start_date = Date.new(year, month, 1)
 end_date = Date.new(year, month, -1)
+# GitHub API 'until' parameter is exclusive, so use the first day of next month
+until_date = (end_date + 1.day)
 
 repo = "symbiota-coop/dandelion"
 
-commits = client.commits(repo, since: start_date.iso8601, until: end_date.iso8601)
+commits = client.commits(repo, since: start_date.iso8601, until: until_date.iso8601)
 %>
 
 <% if commits.any? %>
