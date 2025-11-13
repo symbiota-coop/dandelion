@@ -17,12 +17,6 @@ commits = client.commits(repo, since: start_date.iso8601, until: until_date.iso8
 %>
 
 <% if commits.any? %>
-  <% if start_date < Date.today.beginning_of_month %>
-    <%= stash_partial(:'code/commit_summary', key: "/commit_summary?month=#{@month}", locals: { commits: commits, client: client, repo: repo }) %>
-  <% else %>
-    <%= partial :'code/commit_summary', locals: { commits: commits, client: client, repo: repo } %>
-  <% end %>
-
   <% commits.group_by { |c| c.commit.author.date.to_date }.each do |date, day_commits| %>
     <h6 class="mt-4">Commits on <%= date.strftime('%b %d, %Y') %></h6>
     <div class="table-responsive">
