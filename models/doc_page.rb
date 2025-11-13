@@ -19,13 +19,4 @@ class DocPage
       priority: :number
     }
   end
-
-  has_many :posts, as: :commentable, dependent: :destroy
-  has_many :subscriptions, as: :commentable, dependent: :destroy
-  has_many :comments, as: :commentable, dependent: :destroy
-  has_many :comment_reactions, as: :commentable, dependent: :destroy
-
-  def discussers
-    Account.and(admin: true)
-  end
 end

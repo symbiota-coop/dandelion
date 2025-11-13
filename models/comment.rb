@@ -74,11 +74,7 @@ class Comment
 
   def self.admin?(comment, account)
     comment && account && (
-      if %w[DocPage].include?(comment.commentable_type)
-        account.admin?
-      elsif %w[Team Tactivity Mapplication].include?(comment.commentable_type)
-        Gathering.admin?(comment.commentable.gathering, account)
-      end
+      Gathering.admin?(comment.commentable.gathering, account) if %w[Team Tactivity Mapplication].include?(comment.commentable_type)
     )
   end
 
@@ -132,10 +128,7 @@ class Comment
 
   def email_subject
     s = ''
-    if commentable.is_a?(DocPage)
-      doc_page = commentable
-      s << "[#{doc_page.name}] "
-    elsif commentable.is_a?(Event)
+    if commentable.is_a?(Event)
       event = commentable
       s << "[#{event.name}] "
     elsif commentable.is_a?(ActivityApplication)
