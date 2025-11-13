@@ -3,8 +3,7 @@ client = Octokit::Client.new(access_token: ENV['GITHUB_ACCESS_TOKEN'])
 client.auto_paginate = true  # Enable auto-pagination
 
 # Get selected month or default to current month
-selected_month = @month || Date.today.strftime('%Y-%m')
-year, month = selected_month.split('-').map(&:to_i)
+year, month = @month.split('-').map(&:to_i)
 
 # Calculate date range for the selected month
 start_date = Date.new(year, month, 1)
@@ -17,7 +16,7 @@ commits = client.commits(repo, since: start_date.iso8601, until: end_date.iso860
 
 <% if commits.any? %>
   <% if start_date < Date.today.beginning_of_month %>
-    <%= stash_partial(:'code/commit_summary', key: "/commit_summary?month=#{selected_month}", locals: { commits: commits, client: client, repo: repo }) %>
+    <%= stash_partial(:'code/commit_summary', key: "/commit_summary?month=#{@month}", locals: { commits: commits, client: client, repo: repo }) %>
   <% else %>
     <%= partial :'code/commit_summary', locals: { commits: commits, client: client, repo: repo } %>
   <% end %>
