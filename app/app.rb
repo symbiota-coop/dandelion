@@ -241,6 +241,7 @@ module Dandelion
     end
 
     get '/code' do
+      @month = params[:month] || Date.today.strftime('%Y-%m')
       erb :'code/code'
     end
 

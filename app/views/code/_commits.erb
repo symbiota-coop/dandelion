@@ -3,7 +3,7 @@ client = Octokit::Client.new(access_token: ENV['GITHUB_ACCESS_TOKEN'])
 client.auto_paginate = true  # Enable auto-pagination
 
 # Get selected month or default to current month
-selected_month = params[:month] || Date.today.strftime('%Y-%m')
+selected_month = @month || Date.today.strftime('%Y-%m')
 year, month = selected_month.split('-').map(&:to_i)
 
 # Calculate date range for the selected month

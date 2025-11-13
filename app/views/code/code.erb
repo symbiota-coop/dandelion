@@ -4,7 +4,7 @@
   <% form_tag '', method: 'get', class: 'submitOnChange form-inline' do %>
     <div class="row no-gutters">
       <div class="col-auto">
-        <%= month_field_tag :month, class: 'form-control', value: params[:month] || Date.today.strftime('%Y-%m') %>
+        <%= month_field_tag :month, class: 'form-control', value: @month %>
       </div>
       <div class="col-auto ml-2">
         <%= submit_tag 'View updates', class: 'btn btn-primary' %>
@@ -13,6 +13,6 @@
   <% end %>
 </div>
 
-<%= cp(:'code/commits', key: "/commits?month=#{params[:month]}", expires: 1.day.from_now) %>
+<%= cp(:'code/commits', key: "/commits?month=#{@month}", expires: 1.day.from_now) %>
 
 <%= partial :'code/network' %>
