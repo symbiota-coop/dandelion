@@ -48,12 +48,12 @@ end
       </table>
     </div>
   <% end %>
-
-  <div class="text-center my-4">
-    <%= will_paginate commits, page_links: false, renderer: WillPaginate::ViewHelpers::BootstrapRenderer %>
-  </div>
 <% else %>
   <p class="text-center mb-0">No commits found.</p>
 <% end %>
+
+<div class="text-center my-3">
+  <%= will_paginate commits, page_links: false, renderer: WillPaginate::ViewHelpers::BootstrapRenderer %>
+</div>
 
 <%= partial :'code/network' %>
