@@ -93,6 +93,8 @@ module OrderFields
       de_event_id: event.id,
       de_order_id: order.id,
       de_account_id: order.account_id,
+      de_account_name: order.account.name,
+      de_account_email: order.account.email,
       de_donation_revenue: order.donation_revenue,
       de_donation_to_dandelion: order.application_fee_paid_to_dandelion,
       de_ticket_revenue: order.ticket_revenue,
