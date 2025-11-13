@@ -49,6 +49,9 @@ module EventScopes
     end
 
     def trending(from = Date.today)
+      # Ensure from is not nil to prevent NoMethodError when calculating date ranges
+      from = Date.today if from.nil?
+      
       # If this is being called on an existing query, use that; otherwise use the default trending filters
       base_query = if self == Event
                      # Called as Event.trending - apply default filters
