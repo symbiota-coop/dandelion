@@ -37,7 +37,8 @@
           </div>
 
           <div class="row mb-2">
-            <div class="col-12 col-lg">
+
+            <div class="col-12 col-lg mb-2">
               <div class="input-group">
                 <div class="input-group-prepend">
                   <span class="input-group-text money-symbol">
@@ -46,12 +47,18 @@
                 </div>
                 <%= o.text_field :price_or_range, class: 'form-control', :'data-toggle' => 'tooltip', :title => 'Enter a price, a price range (two numbers separated by a dash) or leave blank to let the attendee pay as they feel' %>
                 <%= o.hidden_field :price_or_range_submitted, value: true %>
-                <div class="input-group-append">
-                  <span class="input-group-text border-right-0">&times;</span>
+              </div>
+            </div>
+
+            <div class="col-12 col-lg">
+              <div class="input-group">
+                <div class="input-group-prepend">
+                  <span class="input-group-text">Capacity</span>
                 </div>
                 <%= o.number_field :quantity, :class => 'form-control', :'data-toggle' => 'tooltip', :title => 'Total number of tickets of this type you want to issue', :required => true %>
               </div>
             </div>
+
           </div>
 
           <% if @event.organisation && ((@event.organisation.gocardless_subscriptions && @event.organisation.gocardless_access_token) || @event.organisation.patreon_api_key) %>
@@ -175,26 +182,39 @@
           descriptionRow.appendTo(d);
 
           // Price and quantity row
-          var priceRow = $('<div class="row mb-2"><div class="col-12 col-lg"><div class="input-group"></div></div></div>');
-          priceRow.find('.input-group')
-            .append('<div class="input-group-prepend"><span class="input-group-text money-symbol"><%= money_symbol(f.object.currency) %></span></div>');
+          var priceRow = $('<div class="row mb-2"></div>');
+
+          // Price column
+          var priceCol = $('<div class="col-12 col-lg mb-2"></div>');
+          var priceInputGroup = $('<div class="input-group"></div>');
+          priceInputGroup.append('<div class="input-group-prepend"><span class="input-group-text money-symbol"><%= money_symbol(f.object.currency) %></span></div>');
 
           var priceInput = $('<input type="text" class="form-control" data-toggle="tooltip" title="Enter a price, a price range (two numbers separated by a dash) or leave blank to let the attendee pay as they feel" />');
           priceInput.attr('name', 'event[ticket_types_attributes][' + c + '][price_or_range]');
           priceInput.attr('id', 'event_ticket_types_attributes_' + c + '_price_or_range');
-          priceRow.find('.input-group').append(priceInput);
+          priceInputGroup.append(priceInput);
 
           var priceSubmittedInput = $('<input type="hidden" value="true" />');
           priceSubmittedInput.attr('name', 'event[ticket_types_attributes][' + c + '][price_or_range_submitted]');
           priceSubmittedInput.attr('id', 'event_ticket_types_attributes_' + c + '_price_or_range_submitted');
-          priceRow.find('.input-group').append(priceSubmittedInput);
+          priceInputGroup.append(priceSubmittedInput);
 
-          priceRow.find('.input-group').append('<div class="input-group-append"><span class="input-group-text border-right-0">&times;</span></div>');
+          priceCol.append(priceInputGroup);
+          priceRow.append(priceCol);
+
+          // Quantity column
+          var quantityCol = $('<div class="col-12 col-lg"></div>');
+          var quantityInputGroup = $('<div class="input-group"></div>');
+          quantityInputGroup.append('<div class="input-group-prepend"><span class="input-group-text">Capacity</span></div>');
 
           var quantityInput = $('<input type="number" class="form-control" data-toggle="tooltip" title="Total number of tickets of this type you want to issue" required="required" />');
           quantityInput.attr('name', 'event[ticket_types_attributes][' + c + '][quantity]');
           quantityInput.attr('id', 'event_ticket_types_attributes_' + c + '_quantity');
-          priceRow.find('.input-group').append(quantityInput);
+          quantityInputGroup.append(quantityInput);
+
+          quantityCol.append(quantityInputGroup);
+          priceRow.append(quantityCol);
+
           priceRow.appendTo(d);
 
           <% if @event.organisation && ((@event.organisation.gocardless_subscriptions && @event.organisation.gocardless_access_token) || @event.organisation.patreon_api_key) %>
@@ -258,6 +278,11 @@
           $('<a class="btn btn-sm text-dark remove-ticket-type" href="javascript:;" onclick="$(this).closest(\'.ticket_type\').remove()"><i class="bi bi-x-lg"></i></a>').appendTo(d);
 
           d.appendTo('#ticket_types');
+
+          // Update currency symbol for newly added ticket type
+          if (typeof getCurrencySymbol !== 'undefined') {
+            d.find('.money-symbol').text(getCurrencySymbol($('#event_currency').val()));
+          }
 
           // Initialize tooltips and setup datetime input
           d.find('[data-toggle="tooltip"]').tooltip();
