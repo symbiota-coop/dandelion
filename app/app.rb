@@ -161,9 +161,14 @@ module Dandelion
       200
     end
 
+    get '/feedback' do
+      @sent = true
+      partial :feedback
+    end
+
     post '/feedback' do
       sign_in_required!
-      redirect '/' unless params[:feedback]
+      halt 400 unless params[:feedback]
 
       mg_client = Mailgun::Client.new ENV['MAILGUN_API_KEY'], ENV['MAILGUN_REGION']
       batch_message = Mailgun::BatchMessage.new(mg_client, ENV['MAILGUN_NOTIFICATIONS_HOST'])
@@ -179,8 +184,7 @@ module Dandelion
 
       batch_message.finalize if Padrino.env == :production
 
-      flash[:feedback] = 'Thank you for your feedback!'
-      redirect '/'
+      200
     end
 
     get '/network', provides: :json do

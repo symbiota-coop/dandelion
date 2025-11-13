@@ -1,8 +1,8 @@
 <div class="card shadow-sm mb-3">
   <h3 class="card-header chill">Give us feedback on Dandelion</h3>
   <div class="card-body">
-    <% if flash[:feedback] %>
-      <div class="alert alert-success"><%= flash[:feedback] %></div>
+    <% if @sent %>
+      <div class="alert alert-success">Thank you for your feedback!</div>
     <% else %>
       <% form_tag '/feedback' do %>
         <div class="form-group">

@@ -1,4 +1,30 @@
 Dandelion::App.controller do
+  get '/docs/question' do
+    @sent = true
+    partial :'docs/question'
+  end
+
+  post '/docs/question' do
+    sign_in_required!
+    halt 400 unless params[:question]
+
+    mg_client = Mailgun::Client.new ENV['MAILGUN_API_KEY'], ENV['MAILGUN_REGION']
+    batch_message = Mailgun::BatchMessage.new(mg_client, ENV['MAILGUN_NOTIFICATIONS_HOST'])
+
+    batch_message.from ENV['NOTIFICATIONS_EMAIL_FULL']
+    batch_message.subject "[Question] #{current_account.name}"
+    batch_message.body_text "#{params[:question]}\n\nAccount: #{ENV['BASE_URI']}/u/#{current_account.username}\nEmail: #{current_account.email}"
+    batch_message.reply_to current_account.email
+
+    Account.and(admin: true).each do |account|
+      batch_message.add_recipient(:to, account.email, { 'firstname' => account.firstname || 'there', 'token' => account.sign_in_token, 'id' => account.id.to_s })
+    end
+
+    batch_message.finalize if Padrino.env == :production
+
+    200
+  end
+
   get '/docs' do
     halt unless DocPage.exists?
     redirect "/docs/#{DocPage.order('priority desc').first.slug}"

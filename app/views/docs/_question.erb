@@ -1,0 +1,23 @@
+<div class="card shadow-sm mb-3">
+  <h3 class="card-header chill">Contact us</h3>
+  <div class="card-body">
+    <p>
+      Still need support? Contact us here and we'll get back to you as soon as possible.
+    </p>
+    <% if @sent %>
+      <div class="alert alert-success">Thanks for your message. We'll get back to you as soon as possible.</div>
+    <% else %>
+      <% form_tag '/docs/question' do %>
+        <div class="form-group">
+          <%= text_area_tag :question, id: 'question-textarea', class: 'form-control', rows: 2, placeholder: 'How can we help?', required: true %>
+        </div>
+        <%= submit_tag 'Send', class: 'btn btn-primary' %>
+      <% end %>
+    <% end %>
+  </div>
+</div>
+<script>
+  $(function() {
+    autosize($('#question-textarea')[0]);
+  });
+</script>

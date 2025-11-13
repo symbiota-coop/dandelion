@@ -11,7 +11,9 @@
     <%= cp(:'organisations/carousel', key: "/organisations/carousel/#{current_account.id}") %>
 
     <% if current_account.organisations.exists? || current_account.tickets.exists? %>
-      <%= partial :feedback %>
+      <div data-pagelet-url="/feedback">
+        <%= partial :feedback %>
+      </div>
     <% end %>
 
     <div class="card shadow-sm mb-3 d-lg-none">

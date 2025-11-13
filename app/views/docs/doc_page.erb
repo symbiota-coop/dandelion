@@ -35,16 +35,16 @@
         <%== doc.to_html %>
       </div>
     <% end %>
-    <% if current_account %>
-      <div class="mt-5" data-pagelet-url="/commentable?commentable_type=DocPage&commentable_id=<%= @doc_page.id %>">
-        <%= partial :'comments/commentable', locals: { commentable: @doc_page } %>
+
+    <% if current_account  %>
+      <div data-pagelet-url="/docs/question">
+        <%= partial :'docs/question' %>
       </div>
+    <% else %>
+      <p class="lead">
+        Still need support? <a href="mailto:<%=ENV['CONTACT_EMAIL']%>">Get in touch via email</a>
+      </p>
     <% end %>
-
-
-    <p class="lead">
-      Still need support? <a href="mailto:<%=ENV['CONTACT_EMAIL']%>">Get in touch via email</a>
-    </p>
 
   </div>
 </div>
