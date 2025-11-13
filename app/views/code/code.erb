@@ -1,18 +1,59 @@
 <p class="lead">Dandelion is an open-source project. <a target="_blank" href="https://github.com/symbiota-coop/dandelion">View the code on Github</a></p>
 
-<div class="mb-3">
-  <% form_tag '', method: 'get', class: 'submitOnChange form-inline' do %>
-    <div class="row no-gutters">
-      <div class="col-auto">
-        <%= month_field_tag :month, class: 'form-control', value: @month %>
-      </div>
-      <div class="col-auto ml-2">
-        <%= submit_tag 'View updates', class: 'btn btn-primary' %>
-      </div>
+<% 
+client = Octokit::Client.new(access_token: ENV['GITHUB_ACCESS_TOKEN'])
+
+repo = "symbiota-coop/dandelion"
+
+page = (params[:page] || 1).to_i
+per_page = 20
+
+# Fetch only the commits needed for this page (GitHub does the pagination)
+github_commits = client.commits(repo, per_page: per_page, page: page)
+
+# If we got a full page, assume there might be more (so total = page * per_page + 1)
+# This allows the "Next" button to show up without fetching the actual total
+total_entries = github_commits.length == per_page ? (page * per_page + 1) : (page - 1) * per_page + github_commits.length
+
+# Wrap in WillPaginate::Collection (GitHub already did the pagination)
+commits = WillPaginate::Collection.create(page, per_page, total_entries) do |pager|
+  pager.replace(github_commits)
+end
+%>
+
+<% if commits.any? %>
+  <% commits.group_by { |c| c.commit.author.date.to_date }.each do |date, day_commits| %>
+    <h6 class="mt-4">Commits on <%= date.strftime('%b %d, %Y') %></h6>
+    <div class="table-responsive">
+      <table class="table table-sm">
+        <tbody>
+          <% day_commits.each do |commit| %>
+            <tr>
+              <td style="width: 70px">
+                <a href="<%= commit.html_url %>" target="_blank">
+                  <%= commit.sha[0..6] %>
+                </a>
+              </td>
+              <td data-toggle="tooltip" title="AI-generated summary ✨">
+                <%== md(
+                commit.commit.message
+                .gsub('_', '\_')
+                .gsub(/\p{Emoji_Presentation}|\p{Extended_Pictographic}/u, '<br />\0')
+                .sub(/^<br \/>/, '')
+                ).gsub('\\_', '_') %>
+              </td>
+            </tr>
+          <% end %>
+        </tbody>
+      </table>
     </div>
   <% end %>
-</div>
 
-<%= cp(:'code/commits', key: "/commits?month=#{@month}", expires: 1.day.from_now) %>
+  <div class="text-center my-4">
+    <%= will_paginate commits, page_links: false, renderer: WillPaginate::ViewHelpers::BootstrapRenderer %>
+  </div>
+<% else %>
+  <p class="text-center mb-0">No commits found.</p>
+<% end %>
 
 <%= partial :'code/network' %>
