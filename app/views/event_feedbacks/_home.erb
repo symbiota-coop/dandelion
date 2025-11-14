@@ -51,7 +51,7 @@
 
     <div class="row no-gutters">
       <div class="col-auto mr-2"><i class="bi bi-quote"></i></div>
-      <div class="col mr-2">
+      <div class="col mr-3">
         <%= partial :'accounts/square', locals: { klass: 'float-left mr-3 mb-3', account: account, width: '150px' } %>
         <a class="home-feedback readable" href="/e/<%= event_feedback.event.slug %>">
           <%== Sanitize.fragment(quote, Sanitize::Config::DANDELION) %>
