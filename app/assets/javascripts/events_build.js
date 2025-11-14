@@ -102,9 +102,11 @@ $(function () {
   // Questions textareas and autosize
   $('#event_questions').attr('rows', '8')
   $('#event_feedback_questions').attr('rows', '8')
+  $('#event_notes').attr('rows', '2')
   if (typeof autosize !== 'undefined') {
     if ($('#event_questions')[0]) autosize($('#event_questions')[0])
     if ($('#event_feedback_questions')[0]) autosize($('#event_feedback_questions')[0])
+    if ($('#event_notes')[0]) autosize($('#event_notes')[0])
   }
 
   // Validate on tab change and keep textareas sized
