@@ -219,6 +219,36 @@ $(function () {
     })
     if (halt) { return false }
 
+    // Validate GoCardless: if any field is filled, all must be filled
+    const gcFields = [
+      'account_gc_plan_id',
+      'account_gc_given_name',
+      'account_gc_family_name',
+      'account_gc_address_line1',
+      'account_gc_city',
+      'account_gc_postal_code',
+      'account_gc_branch_code',
+      'account_gc_account_number'
+    ]
+    let gcFieldsFilled = 0
+    let gcFieldsEmpty = []
+    gcFields.forEach(function (fieldName) {
+      const field = $('#' + fieldName)
+      if (field.length > 0) {
+        const value = field.val()
+        if (value && value.trim() !== '') {
+          gcFieldsFilled++
+        } else {
+          gcFieldsEmpty.push(fieldName)
+        }
+      }
+    })
+    if (gcFieldsFilled > 0 && gcFieldsEmpty.length > 0) {
+      alert('Please fill in all GoCardless fields')
+      $('#' + gcFieldsEmpty[0]).focus()
+      return false
+    }
+
     let numberOfTickets = 0
     $('select[name^=quantities]').not(':disabled').each(function () {
       numberOfTickets += parseInt($(this).val())

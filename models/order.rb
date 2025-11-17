@@ -13,6 +13,7 @@ class Order
   MULTIPLE_CHECKBOX_FIELD_REGEX = /^(.+?)\s*\[\s*(.+?)\s*\]\*?$/
   CHECKBOX_FIELD_REGEX = /^\s*\[(.+?)\]\s*\*?$/
   DATE_FIELD_REGEX = /^\s*\{(.+?)\}\s*\*?$/
+  GOCARDLESS_FIELDS = %i[gc_plan_id gc_given_name gc_family_name gc_address_line1 gc_city gc_postal_code gc_branch_code gc_account_number].freeze
 
   include OrderFields
   include OrderNotifications
@@ -323,34 +324,38 @@ class Order
   end
 
   def sign_up_to_gocardless
-    return unless [gc_plan_id, gc_given_name, gc_family_name, gc_address_line1, gc_city, gc_postal_code, gc_branch_code, gc_account_number].all?(&:present?)
+    if GOCARDLESS_FIELDS.map { |f| send(f) }.all?(&:present?)
 
-    f = Ferrum::Browser.new
-    f.go_to("https://pay.gocardless.com/#{gc_plan_id}")
-    sleep 5
-    f.at_css('#given_name').focus.type(gc_given_name)
-    f.at_css('#family_name').focus.type(gc_family_name)
-    f.at_css('#email').focus.type(account.email)
-    # f.screenshot(path: 'screenshot1.png')
-    f.css('form button[type=button]').last.scroll_into_view.click
-    sleep 5
-    f.at_css('#address_line1').focus.type(gc_address_line1)
-    f.at_css('#city').focus.type(gc_city)
-    f.at_css('#postal_code').focus.type(gc_postal_code)
-    # f.screenshot(path: 'screenshot2.png')
-    f.at_css('form button[type=submit]').scroll_into_view.click
-    sleep 5
-    f.at_css('#branch_code').focus.type(gc_branch_code)
-    f.at_css('#account_number').focus.type(gc_account_number)
-    # f.screenshot(path: 'screenshot3.png')
-    f.at_css('form button[type=submit]').scroll_into_view.click
-    sleep 5
-    # f.screenshot(path: 'screenshot4.png')
-    f.at_css('button[type=submit]').scroll_into_view.click
-    # sleep 5
-    # f.screenshot(path: 'screenshot5.png')
-    %i[gc_plan_id gc_given_name gc_family_name gc_address_line1 gc_city gc_postal_code gc_branch_code gc_account_number].each { |f| set(f => nil) }
-    set(gc_success: true)
+      f = Ferrum::Browser.new
+      f.go_to("https://pay.gocardless.com/#{gc_plan_id}")
+      sleep 5
+      f.at_css('#given_name').focus.type(gc_given_name)
+      f.at_css('#family_name').focus.type(gc_family_name)
+      f.at_css('#email').focus.type(account.email)
+      # f.screenshot(path: 'screenshot1.png')
+      f.css('form button[type=button]').last.scroll_into_view.click
+      sleep 5
+      f.at_css('#address_line1').focus.type(gc_address_line1)
+      f.at_css('#city').focus.type(gc_city)
+      f.at_css('#postal_code').focus.type(gc_postal_code)
+      # f.screenshot(path: 'screenshot2.png')
+      f.at_css('form button[type=submit]').scroll_into_view.click
+      sleep 5
+      f.at_css('#branch_code').focus.type(gc_branch_code)
+      f.at_css('#account_number').focus.type(gc_account_number)
+      # f.screenshot(path: 'screenshot3.png')
+      f.at_css('form button[type=submit]').scroll_into_view.click
+      sleep 5
+      # f.screenshot(path: 'screenshot4.png')
+      f.at_css('button[type=submit]').scroll_into_view.click
+      # sleep 5
+      # f.screenshot(path: 'screenshot5.png')
+      GOCARDLESS_FIELDS.each { |f| set(f => nil) }
+      set(gc_success: true)
+    else
+      GOCARDLESS_FIELDS.each { |f| set(f => nil) }
+      nil
+    end
   end
   handle_asynchronously :sign_up_to_gocardless
 end
