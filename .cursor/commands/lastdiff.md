@@ -1,0 +1,1 @@
+Verify the last commit looks OK using `git diff`

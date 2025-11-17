@@ -106,6 +106,7 @@ module OrganisationFields
     field :event_types_placeholder, type: String
     field :show_details_table_in_ticket_emails, type: Mongoid::Boolean
     field :adult_content, type: Mongoid::Boolean
+    field :event_questions_to_include_in_metadata, type: Array
   end
 
   class_methods do

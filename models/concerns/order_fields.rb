@@ -89,7 +89,7 @@ module OrderFields
 
   def metadata
     order = self
-    {
+    metadata_hash = {
       de_event_id: event.id,
       de_order_id: order.id,
       de_account_id: order.account_id,
@@ -104,5 +104,43 @@ module OrderFields
       de_credit_applied: order.credit_applied,
       de_fixed_discount_applied: order.fixed_discount_applied
     }
+
+    # Include event question answers if configured
+    if event&.organisation&.event_questions_to_include_in_metadata.present? && order.answers.present?
+      questions_to_include = event.organisation.event_questions_to_include_in_metadata
+
+      order.answers.each do |question, answer|
+        next unless question && answer && questions_to_include.include?(question)
+
+        # Extract question text (remove formatting like <options>, [options], etc.)
+        question_text = question.dup
+        [
+          Order::SELECT_FIELD_REGEX,
+          Order::MULTIPLE_CHECKBOX_FIELD_REGEX,
+          Order::CHECKBOX_FIELD_REGEX,
+          Order::DATE_FIELD_REGEX
+        ].each do |regex|
+          if (match = question_text.match(regex))
+            question_text = match[1]
+            break
+          end
+        end
+        question_text = question_text.gsub(/^#\s*/, '') # Remove markdown headers
+        question_text = question_text.strip.chomp('*') # Remove trailing asterisk if required
+
+        # Parameterize the question text for use as metadata key
+        # Truncate by word count to avoid cutting words in half
+        parameterized = question_text.parameterize(separator: '_')
+        words = parameterized.split('_')
+        parameterized = words.first(5).join('_') if words.length > 5
+
+        # Format answer for metadata (handle arrays for multiple checkboxes)
+        answer_value = answer.is_a?(Array) ? answer.join(', ') : answer.to_s
+
+        metadata_hash[:"de_question_#{parameterized}"] = answer_value
+      end
+    end
+
+    metadata_hash
   end
 end
