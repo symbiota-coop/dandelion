@@ -3,7 +3,9 @@
   <head>
     <meta charset="utf-8">
     <meta content="width=device-width, initial-scale=1.0" name="viewport">
-    <title><%= @title %></title>
+    <% if @title %>
+      <title><%= @title %></title>
+    <% end %>
     <style>
       <% if !defined?(header_image_url) %>
         body { padding-top: 1em }
