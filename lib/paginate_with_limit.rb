@@ -8,23 +8,32 @@ module PaginateWithLimit
 
     # Apply limit before pagination for Mongoid queries
     if respond_to?(:limit) && is_a?(Mongoid::Criteria)
-      # Get the actual count (capped at max_limit + 1 to know if there are more)
-      limited_collection = limit(max_limit + 1)
-      actual_count = limited_collection.count
+      # Calculate the maximum allowed page based on max_limit
+      # This prevents access to excessive page numbers without needing to count
+      max_allowed_page = (max_limit.to_f / per_page).ceil
+      max_allowed_page = 1 if max_allowed_page < 1
 
-      # Cap the total_entries at max_limit
-      capped_count = [actual_count, max_limit].min
-
-      # Calculate the maximum valid page number
-      max_page = (capped_count.to_f / per_page).ceil
-      max_page = 1 if max_page < 1 # Ensure at least page 1
-
-      # Clamp the requested page to the valid range
       requested_page = (options[:page] || 1).to_i
-      clamped_page = requested_page.clamp(1, max_page)
+      clamped_page = requested_page.clamp(1, max_allowed_page)
 
-      # Pass total_entries and clamped page to will_paginate
-      paginate_without_limit(options.merge(total_entries: capped_count, page: clamped_page))
+      # Skip expensive count when page_links are disabled
+      if options[:page_links] == false
+        # Just clamp the page and paginate without counting
+        paginate_without_limit(options.merge(page: clamped_page))
+      else
+        # Cap the total_entries at max_limit
+        capped_count = [max_limit, count].min
+
+        # Calculate the maximum valid page number based on actual count
+        max_page = (capped_count.to_f / per_page).ceil
+        max_page = 1 if max_page < 1 # Ensure at least page 1
+
+        # Further clamp to actual data available
+        final_page = clamped_page.clamp(1, max_page)
+
+        # Pass total_entries and clamped page to will_paginate
+        paginate_without_limit(options.merge(total_entries: capped_count, page: final_page))
+      end
     else
       paginate_without_limit(options)
     end
