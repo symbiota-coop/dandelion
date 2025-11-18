@@ -101,9 +101,9 @@
         n = events.count
      end %>
 
-      <div class="row">
+      <div class="row no-gutters">
         <div class="col">
-          <h1 class="mb-1">
+          <h1 class="ml-2 mb-1">
             <%= @event.name %>
             <% if n > 1 %>
               <span class="badge badge-primary"><%= pluralize(n, 'dates') %></span>
@@ -111,7 +111,7 @@
           </h1>
         </div>
         <div class="col-auto">
-          <div class="d-inline" style="font-size: 1.5em;" data-pagelet-url="/events/<%=@event.id%>/star">
+          <div class="d-inline ml-3 mr-2" style="font-size: 1.5em;" data-pagelet-url="/events/<%=@event.id%>/star">
             <%= partial :'events/star', locals: {event: @event} %>
           </div>
         </div>
