@@ -95,6 +95,40 @@ module OrderNotifications
     end
     ics_file.close
     File.delete(ics_filename)
+
+    # Send WhatsApp message if account has phone number
+    send_whatsapp_order_link if account&.phone.present?
+  end
+
+  def send_whatsapp_order_link
+    return unless ENV['WHATSAPP_ACCESS_TOKEN'] && ENV['WHATSAPP_PHONE_NUMBER_ID']
+    return unless account&.phone.present?
+
+    order_url = "#{ENV['BASE_URI']}/orders/#{id}"
+    message_text = "Thanks for booking onto #{event.name}! View your order confirmation at #{order_url}"
+
+    # Normalize phone number (remove spaces, dashes, parentheses, and ensure it starts with country code)
+    phone_number = account.phone.gsub(/[\s\-()]/, '')
+    phone_number = phone_number[1..-1] if phone_number.start_with?('+')
+
+    begin
+      token = ENV['WHATSAPP_ACCESS_TOKEN']
+      http_client = HTTP.auth("Bearer #{token}")
+      messages_url = "https://graph.facebook.com/v21.0/#{ENV['WHATSAPP_PHONE_NUMBER_ID']}/messages"
+
+      payload = {
+        messaging_product: 'whatsapp',
+        to: phone_number,
+        type: 'text',
+        text: {
+          body: message_text
+        }
+      }
+
+      http_client.post(messages_url, json: payload)
+    rescue StandardError => e
+      Honeybadger.notify(e, context: { order_id: id.to_s, account_id: account.id.to_s, phone: phone_number })
+    end
   end
 
   def notify_of_failed_purchase(error)
