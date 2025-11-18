@@ -7,6 +7,8 @@ class SignIn
 
   field :env, type: String
 
+  index({ created_at: 1 }, { expire_after_seconds: 1.year.to_i })
+
   def self.admin_fields
     {
       account_id: :lookup,

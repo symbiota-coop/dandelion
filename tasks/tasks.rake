@@ -32,9 +32,6 @@ namespace :late do
   task errands: :environment do
     puts 'get Dandelion Daily'
     Faraday.get("#{ENV['BASE_URI']}/daily?date=#{Date.today.to_fs(:db_local)}", {}, { 'X-Requested-With' => 'XMLHttpRequest' })
-    puts 'delete old page views and sign ins'
-    PageView.and(:created_at.lt => 30.days.ago).delete_all
-    SignIn.and(:created_at.lt => 1.year.ago).delete_all
     puts 'create organisation edges'
     OrganisationEdge.delete_all
     OrganisationEdge.create_all(Organisation.and(:followers_count.gte => 50).and(:id.nin => Organisation.order('followers_count desc').limit(1).pluck(:id)))
