@@ -113,6 +113,13 @@ module OrderNotifications
       http_client = HTTP.auth("Bearer #{token}")
       messages_url = "https://graph.facebook.com/v21.0/#{ENV['WHATSAPP_PHONE_NUMBER_ID']}/messages"
 
+      max_event_name_length = 35
+      truncated_event_name = if event.name.length > max_event_name_length
+                               "#{event.name[0...max_event_name_length - 1]}…"
+                             else
+                               event.name
+                             end
+
       # Use template message (works outside 24-hour window)
       payload = {
         messaging_product: 'whatsapp',
@@ -125,7 +132,7 @@ module OrderNotifications
             {
               type: 'header',
               parameters: [
-                { type: 'text', text: event.name }
+                { type: 'text', text: truncated_event_name }
               ]
             },
             {
