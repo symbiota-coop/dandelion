@@ -198,6 +198,7 @@ Dandelion::App.controller do
 
     case content_type
     when :html
+      @title = "Order confirmation for #{@event.name}"
       Premailer.new(ERB.new(File.read(Padrino.root('app/views/layouts/email.erb'))).result(binding), with_html_string: true, adapter: 'nokogiri', input_encoding: 'UTF-8').to_inline_css
     when :ics
       @event.ical(order: @order).to_ical
