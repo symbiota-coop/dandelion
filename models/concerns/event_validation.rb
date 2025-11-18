@@ -17,7 +17,7 @@ module EventValidation
       self.description = description.gsub('href="www.', 'href="http://www.') if description
       self.suggested_donation = nil if organisation && !organisation.payment_method?
       self.has_organisation = organisation ? true : false
-      self.hidden_from_homepage = true if (name && %w[sex sexual erotic eros cock pussy anal orgasm ejaculation].any? { |word| name.downcase.split.include?(word) }) || (organisation && organisation.adult_content?)
+      self.hidden_from_homepage = true if (name && %w[naked sex sexual erotic eros cock pussy anal orgasm ejaculation].any? { |word| name.downcase.split.include?(word) }) || (organisation && organisation.adult_content?)
 
       unless slug
         loop do
