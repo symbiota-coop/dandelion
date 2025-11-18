@@ -233,7 +233,8 @@ module Dandelion
     end
 
     post '/stripe_row_splitter', provides: :csv do
-      StripeRowSplitter.split(File.read(params[:csv]))
+      halt 400 unless params[:csv].is_a?(Tempfile)
+      StripeRowSplitter.split(File.read(params[:csv].path))
     end
 
     get '/donate' do
