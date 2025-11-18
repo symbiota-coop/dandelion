@@ -104,9 +104,6 @@ module OrderNotifications
     return unless ENV['WHATSAPP_ACCESS_TOKEN'] && ENV['WHATSAPP_PHONE_NUMBER_ID']
     return unless account&.phone.present?
 
-    order_url = "#{ENV['BASE_URI']}/orders/#{id}"
-    message_text = "Thanks for booking onto #{event.name}! View your order confirmation at #{order_url}"
-
     # Normalize phone number (remove spaces, dashes, parentheses, and ensure it starts with country code)
     phone_number = account.phone.gsub(/[\s\-()]/, '')
     phone_number = phone_number[1..-1] if phone_number.start_with?('+')
@@ -116,12 +113,30 @@ module OrderNotifications
       http_client = HTTP.auth("Bearer #{token}")
       messages_url = "https://graph.facebook.com/v21.0/#{ENV['WHATSAPP_PHONE_NUMBER_ID']}/messages"
 
+      # Use template message (works outside 24-hour window)
       payload = {
         messaging_product: 'whatsapp',
         to: phone_number,
-        type: 'text',
-        text: {
-          body: message_text
+        type: 'template',
+        template: {
+          name: 'view_order',
+          language: { code: 'en' },
+          components: [
+            {
+              type: 'header',
+              parameters: [
+                { type: 'text', text: event.name }
+              ]
+            },
+            {
+              type: 'button',
+              sub_type: 'url',
+              index: '0',
+              parameters: [
+                { type: 'text', text: id.to_s }
+              ]
+            }
+          ]
         }
       }
 
