@@ -126,7 +126,7 @@ module OrderNotifications
         to: phone_number,
         type: 'template',
         template: {
-          name: 'view_order',
+          name: ENV['WHATSAPP_TEMPLATE_NAME'],
           language: { code: 'en' },
           components: [
             {
