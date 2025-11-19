@@ -8,7 +8,7 @@
 <% end %>
 <tr>
   <td style="<% if no_border_top %>border-top: 0;<% end %> <% if ticket_type.photos.exists? %>border-bottom: 0;<% end %>" >
-    <span class="font-weight-bold" style="font-size: 1.15em">
+    <span class="font-weight-bold" style="white-space: nowrap; font-size: 1.15em">
       <%= ticket_type.name.downcase.include?('payment plan') ? ticket_type.name.gsub(/\s+\S+@\S+\.\S+\s*$/, '') : ticket_type.name %>
     </span>
     <% if ticket_type.hidden %>
@@ -25,7 +25,12 @@
               class: 'form-control-range',
               min: ticket_type.range_min,
               max: ticket_type.range_max,
-              oninput: "$(this).prev().html('#{money_symbol(@event.currency)}' + this.value); $(this).parent().next().find('.select-a-price-first').hide(); $(this).parent().next().find('[name^=quantities]').attr('data-price',this.value).prop('disabled',false).change();" %>
+              oninput: "$(this).prev().html('#{money_symbol(@event.currency)}' + this.value); $(this).next().find('.select-a-price-first').css('visibility','hidden'); $(this).parent().next().find('[name^=quantities]').attr('data-price',this.value).prop('disabled',false).change();" %>
+
+      <div style="font-size: 0.8em" class="text-right">
+        <em class="select-a-price-first" style="white-space: nowrap;">Drag the slider</em>
+      </div>
+
     <% elsif ticket_type.price %>
       <% unless ticket_type.price == 0 && @event.blank_price_for_free_tickets %>
         <%= m ticket_type.price, @event.currency %>
@@ -36,7 +41,11 @@
           <span class="input-group-text"><%= money_symbol(@event.currency) %></span>
         </div>
         <%= number_field_tag :"prices[#{ticket_type.id}]", min: 1, class: 'form-control',
-              oninput: "$(this).parent().parent().next().find('.select-a-price-first').hide(); var qty = $(this).parent().parent().next().find('[name^=quantities]'); qty.attr('data-price',this.value); if (qty.prop('disabled')) { qty.val(1); }; qty.prop('disabled',false).change();" %>
+              oninput: "$(this).parent().next().find('.select-a-price-first').css('visibility','hidden'); var qty = $(this).parent().parent().next().find('[name^=quantities]'); qty.attr('data-price',this.value); if (qty.prop('disabled')) { qty.val(1); }; qty.prop('disabled',false).change();" %>
+      </div>
+
+      <div style="font-size: 0.8em" class="text-right">
+        <em class="select-a-price-first" style="white-space: nowrap;">Set a price first</em>
       </div>
     <% end %>
   </td>
@@ -63,37 +72,36 @@
       <div>
         <%= select_tag :"quantities[#{ticket_type.id}]", 'data-ticket-type-id': ticket_type.id, 'data-price': ticket_type.price, class: 'form-control w-100', options: (0..[99,ticket_type.number_of_tickets_available_in_single_purchase].min).to_a, value: (params[:quantities][ticket_type.id.to_s] if params[:quantities]), disabled: !ticket_type.price %>
       </div>
-      <% if ticket_type.range %>
-        <div>
-          <em class="select-a-price-first" style="white-space: nowrap;">Drag the slider</em>
-        </div>
-      <% elsif !ticket_type.price %>
-        <div>
-          <em class="select-a-price-first" style="white-space: nowrap;">Set a price first</em>
-        </div>
-      <% end %>
-      <% if !@event.organisation.hide_few_left && !@event.hide_few_left && ticket_type.wiser_remaining <= 3 %>
-        <div>
-          <span class="badge badge-secondary"><%= ticket_type.wiser_remaining %> left</span>
-        </div>
-      <% end %>
     <% end %>
   <% else %>
     <span class="badge badge-primary">Sold out</span>
   <% end %>
 </td>
 </tr>
+
+<tr>
+  <td style="border: 0; padding-top: 0" class="text-muted" colspan="3">
+    <div class="row justify-content-between">
+      <div class="col">
+        <% if ticket_type.description %>
+          <%== Sanitize.fragment(Rinku.auto_link(md(ticket_type.description)), Sanitize::Config::DANDELION) %>
+        <% end %>
+      </div>
+      <div class="col-auto">
+        <% if !@event.organisation.hide_few_left && !@event.hide_few_left && ticket_type.wiser_remaining <= 3 %>
+          <div class="mb-3">
+            <span class="badge badge-secondary"><%= ticket_type.wiser_remaining %> left</span>
+          </div>
+        <% end %>
+      </div>
+    </div>
+  </td>
+</tr>
+
 <% if ticket_type.photos.exists? %>
   <tr>
     <td colspan="3" style="border: 0">
       <%= partial :'photos/photos', locals: { photoable: ticket_type, dimensions: '100x100#' } %>
-    </td>
-  </tr>
-<% end %>
-<% if ticket_type.description %>
-  <tr>
-    <td style="border: 0; padding-top: 0" class="text-muted" colspan="3">
-      <%== Sanitize.fragment(Rinku.auto_link(md(ticket_type.description)), Sanitize::Config::DANDELION) %>
     </td>
   </tr>
 <% end %>
