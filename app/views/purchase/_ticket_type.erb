@@ -38,7 +38,7 @@
       </div>
     <% end %>
   </td>
-  <td style="<% if no_border_top %>border-top: 0;<% end %> <% if ticket_type.photos.exists? %>border-bottom: 0;<% end %>">
+  <td style="width: 1px; <% if no_border_top %>border-top: 0;<% end %> <% if ticket_type.photos.exists? %>border-bottom: 0;<% end %>">
     <% if ticket_type.sales_end && Time.now > ticket_type.sales_end %>
       <span class="badge badge-default">Sales closed</span>
     <% elsif ticket_type.number_of_tickets_available_in_single_purchase > 0 %>

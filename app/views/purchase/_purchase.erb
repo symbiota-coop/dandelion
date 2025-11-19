@@ -39,7 +39,7 @@ end
         <%= hidden_field_tag :affiliate_type, value: params[:affiliate_type] %>
         <%= hidden_field_tag :affiliate_id, value: params[:affiliate_id] %>
 
-        <table class="table">
+        <table class="table" style="font-size: 1.15em">
 
           <% @no_ticket_groups = @event.ticket_types.all? { |ticket_type| !ticket_type.ticket_group } %>
           <% @previous_ticket_group = 'Other tickets' %>

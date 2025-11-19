@@ -43,7 +43,7 @@ Dandelion::App.controller do
 
     text = JSON.parse(response.body)['text']
 
-    # Close and delete the temporary file
+    # close and delete the temporary file
     temp_file.close
     temp_file.unlink
 
@@ -51,7 +51,7 @@ Dandelion::App.controller do
     to = message['from']
     messages_url = "https://graph.facebook.com/v21.0/#{ENV['WHATSAPP_PHONE_NUMBER_ID']}/messages"
 
-    # Split the text into chunks of approximately 2048 characters at word boundaries
+    # split the text into chunks of approximately 2048 characters at word boundaries
     chunks = []
     current_chunk = ''
     text.split.each do |word|
