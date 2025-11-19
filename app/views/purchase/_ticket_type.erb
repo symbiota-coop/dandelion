@@ -11,7 +11,7 @@
   </td>
 </tr>
 <tr>
-  <td style="border-top: 0">
+  <td style="border-top: 0; vertical-align: middle">
     <span class="font-weight-bold" style="font-size: 1.2em">
       <%= ticket_type.name.downcase.include?('payment plan') ? ticket_type.name.gsub(/\s+\S+@\S+\.\S+\s*$/, '') : ticket_type.name %>
     </span>
@@ -22,7 +22,7 @@
       <i data-toggle="tooltip" title="Available to those donating <%=m ticket_type.minimum_monthly_donation, @event.currency%>+/month" class="bi bi-lock"></i>
     <% end %>
   </td>
-  <td style="font-size: 1.2em; border-top: 0">
+  <td style="font-size: 1.2em; border-top: 0; vertical-align: middle">
     <% if ticket_type.range %>
       <span><%= m ticket_type.range_min, @event.currency %> - <%= m ticket_type.range_max, @event.currency %></span>
       <%= range_field_tag :"prices[#{ticket_type.id}]",
