@@ -64,7 +64,7 @@ end
                 <div class="input-group-prepend">
                   <span class="input-group-text"><%= money_symbol(@event.currency) %></span>
                 </div>
-                <%= number_field_tag :totalDisplay, id: 'totalDisplay', class: 'form-control', style: 'width: 5em', disabled: true %>
+                <%= number_field_tag :totalDisplay, id: 'totalDisplay', class: 'form-control', style: 'width: 5em; border-top-right-radius: 0.25rem; border-bottom-right-radius: 0.25rem;', disabled: true %>
                 <%= hidden_field_tag :total, id: 'total' %>
               </div>
             </td>
