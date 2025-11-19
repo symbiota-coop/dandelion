@@ -115,7 +115,7 @@ module OrderNotifications
 
       max_event_name_length = 35
       truncated_event_name = if event.name.length > max_event_name_length
-                               "#{event.name[0...max_event_name_length - 1]}…"
+                               "#{event.name[0...(max_event_name_length - 1)]}…"
                              else
                                event.name
                              end
