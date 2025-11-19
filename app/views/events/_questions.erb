@@ -11,12 +11,7 @@ end
 <div class="form-group links-blank">
   <% if q =~ /^#\s*(.+)/ %>
     <% match = $1 %>
-    <% next_question = questions_a[i + 1] %>
-    <% if next_question && next_question.match(/\[.*\]/) %>
-      <strong><%== Sanitize.fragment(Rinku.auto_link(match), Sanitize::Config::DANDELION) %></strong>
-    <% else %>
-      <h4><%== Sanitize.fragment(Rinku.auto_link(match), Sanitize::Config::DANDELION) %></h4>
-    <% end %>
+    <h4><%== Sanitize.fragment(Rinku.auto_link(match), Sanitize::Config::DANDELION) %></h4>
   <% elsif m = q.match(Order::SELECT_FIELD_REGEX)  %>
     <% # Select field: Question text <option1, option2, option3> or Question text <option1, option2, option3>* %>
     <% question_text = m[1] %>
