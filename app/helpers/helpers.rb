@@ -111,6 +111,12 @@ Dandelion::App.helpers do
     @current_account ||= Account.find(session[:account_id]) if session[:account_id]
   end
 
+  def money_symbol(currency)
+    Money.new(0, currency).symbol
+  rescue Money::Currency::UnknownCurrency
+    currency
+  end
+
   def m(amount, currency)
     if amount.is_a?(Money)
       amount.exchange_to(currency).format(no_cents_if_whole: true)
@@ -167,12 +173,6 @@ Dandelion::App.helpers do
     end
 
     [[west, south], [east, north]]
-  end
-
-  def money_symbol(currency)
-    Money.new(0, currency).symbol
-  rescue Money::Currency::UnknownCurrency
-    currency
   end
 
   def u(url)

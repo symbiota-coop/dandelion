@@ -1,4 +1,4 @@
-FIAT_CURRENCIES = %w[GBP EUR USD SEK DKK CHF MXN CAD AUD NZD].freeze
+FIAT_CURRENCIES = %w[GBP EUR USD SEK DKK NOK CHF MXN CAD AUD NZD].freeze
 COINBASE_CURRENCIES = %w[BTC ETH].freeze
 EVM_CURRENCIES = Token.all.map(&:symbol)
 
@@ -35,6 +35,39 @@ Money::Currency.register({
                            name: 'Ethereum',
                            symbol: 'Ξ',
                            subunit: 'Cent',
+                           subunit_to_unit: 100,
+                           decimal_mark: '.',
+                           thousands_separator: ','
+                         })
+
+Money::Currency.register({
+                           priority: 1,
+                           iso_code: 'SEK',
+                           name: 'Swedish Krona',
+                           symbol: 'SEK',
+                           subunit: 'Öre',
+                           subunit_to_unit: 100,
+                           decimal_mark: '.',
+                           thousands_separator: ','
+                         })
+
+Money::Currency.register({
+                           priority: 1,
+                           iso_code: 'DKK',
+                           name: 'Danish Krone',
+                           symbol: 'DKK',
+                           subunit: 'Øre',
+                           subunit_to_unit: 100,
+                           decimal_mark: '.',
+                           thousands_separator: ','
+                         })
+
+Money::Currency.register({
+                           priority: 1,
+                           iso_code: 'NOK',
+                           name: 'Norwegian Krone',
+                           symbol: 'NOK',
+                           subunit: 'Øre',
                            subunit_to_unit: 100,
                            decimal_mark: '.',
                            thousands_separator: ','
