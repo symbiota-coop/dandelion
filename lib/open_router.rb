@@ -1,16 +1,16 @@
 class OpenRouter
   BASE_URL = 'https://openrouter.ai'.freeze
   INTELLIGENCE_LEVELS = {
-    'standard' => 'anthropic/claude-haiku-4.5',
-    'smarter' => 'anthropic/claude-haiku-4.5:thinking'
+    'standard' => 'google/gemini-2.5-flash',
+    'smarter' => 'google/gemini-2.5-flash:thinking'
   }.freeze
   DEFAULT_PROVIDERS = {
-    # 'anthropic/claude-haiku-4.5' => %w[Anthropic],
-    # 'anthropic/claude-haiku-4.5:thinking' => %w[Anthropic]
+    'google/gemini-2.5-flash' => %w[Google],
+    'google/gemini-2.5-flash:thinking' => %w[Google]
   }.freeze
   DEFAULT_CONTEXT_WINDOW_SIZES = {
-    'anthropic/claude-haiku-4.5' => 200_000,
-    'anthropic/claude-haiku-4.5:thinking' => 200_000
+    'google/gemini-2.5-flash' => 1_000_000,
+    'google/gemini-2.5-flash:thinking' => 1_000_000
   }.freeze
 
   class << self
