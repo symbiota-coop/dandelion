@@ -8,7 +8,9 @@
 <% end %>
 <tr>
   <td style="<% if no_border_top %>border-top: 0;<% end %> <% if ticket_type.photos.exists? %>border-bottom: 0;<% end %>" >
-    <%= ticket_type.name.downcase.include?('payment plan') ? ticket_type.name.gsub(/\s+\S+@\S+\.\S+\s*$/, '') : ticket_type.name %>
+    <span class="font-weight-bold" style="font-size: 1.15em">
+      <%= ticket_type.name.downcase.include?('payment plan') ? ticket_type.name.gsub(/\s+\S+@\S+\.\S+\s*$/, '') : ticket_type.name %>
+    </span>
     <% if ticket_type.hidden %>
       <i data-toggle="tooltip" title="Available to you as you used a secret link" class="bi bi-lock"></i>
     <% end %>
@@ -16,7 +18,7 @@
       <i data-toggle="tooltip" title="Available to those donating <%=m ticket_type.minimum_monthly_donation, @event.currency%>+/month" class="bi bi-lock"></i>
     <% end %>
   </td>
-  <td style="min-width: 8em; <% if no_border_top %>border-top: 0;<% end %> <% if ticket_type.photos.exists? %>border-bottom: 0;<% end %>">
+  <td style="font-size: 1.15em; min-width: 8em; <% if no_border_top %>border-top: 0;<% end %> <% if ticket_type.photos.exists? %>border-bottom: 0;<% end %>">
     <% if ticket_type.range %>
       <span><%= m ticket_type.range_min, @event.currency %> - <%= m ticket_type.range_max, @event.currency %></span>
       <%= range_field_tag :"prices[#{ticket_type.id}]",
@@ -59,17 +61,21 @@
       <% end %>
     <% else %>
       <div>
-        <%= select_tag :"quantities[#{ticket_type.id}]", 'data-ticket-type-id': ticket_type.id, 'data-price': ticket_type.price, style: 'width: auto; display: inline-block', class: 'form-control w-100', options: (0..[99,ticket_type.number_of_tickets_available_in_single_purchase].min).to_a, value: (params[:quantities][ticket_type.id.to_s] if params[:quantities]), disabled: !ticket_type.price %>
-        <% if ticket_type.range %>
-          <br />
-          <em class="select-a-price-first" style="font-size: 0.9em; white-space: nowrap;">Drag the slider</em>
-        <% elsif !ticket_type.price %>
-          <br />
-          <em class="select-a-price-first" style="font-size: 0.9em; white-space: nowrap;">Set a price first</em>
-        <% end %>
+        <%= select_tag :"quantities[#{ticket_type.id}]", 'data-ticket-type-id': ticket_type.id, 'data-price': ticket_type.price, class: 'form-control w-100', options: (0..[99,ticket_type.number_of_tickets_available_in_single_purchase].min).to_a, value: (params[:quantities][ticket_type.id.to_s] if params[:quantities]), disabled: !ticket_type.price %>
       </div>
+      <% if ticket_type.range %>
+        <div>
+          <em class="select-a-price-first" style="white-space: nowrap;">Drag the slider</em>
+        </div>
+      <% elsif !ticket_type.price %>
+        <div>
+          <em class="select-a-price-first" style="white-space: nowrap;">Set a price first</em>
+        </div>
+      <% end %>
       <% if !@event.organisation.hide_few_left && !@event.hide_few_left && ticket_type.wiser_remaining <= 3 %>
-        <span class="badge badge-secondary"><%= ticket_type.wiser_remaining %> left</span>
+        <div>
+          <span class="badge badge-secondary"><%= ticket_type.wiser_remaining %> left</span>
+        </div>
       <% end %>
     <% end %>
   <% else %>
