@@ -25,7 +25,7 @@
     <% if ticket_type.sales_end && Time.now > ticket_type.sales_end %>
     <% elsif ticket_type.number_of_tickets_available_in_single_purchase > 0 %>
       <% if !@event.organisation.hide_few_left && !@event.hide_few_left && ticket_type.wiser_remaining <= 3 %>
-        <span class="badge badge-secondary"><%= ticket_type.wiser_remaining %> left</span>
+        <span style="position: relative; top: -2px;" class="badge badge-secondary"><%= ticket_type.wiser_remaining %> left</span>
       <% end %>
     <% end %>
 
