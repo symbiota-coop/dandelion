@@ -7,8 +7,12 @@
 <% end %>
 <% end %>
 <tr>
-  <td style="<% if no_border_top %>border-top: 0;<% end %> <% if ticket_type.photos.exists? %>border-bottom: 0;<% end %>" >
-    <span class="font-weight-bold" style="white-space: nowrap; font-size: 1.15em">
+  <td style="<% if no_border_top %>border-top: 0;<% end %> padding-top: 0" colspan="3">
+  </td>
+</tr>
+<tr>
+  <td style="border-top: 0">
+    <span class="font-weight-bold" style="white-space: nowrap; font-size: 1.2em">
       <%= ticket_type.name.downcase.include?('payment plan') ? ticket_type.name.gsub(/\s+\S+@\S+\.\S+\s*$/, '') : ticket_type.name %>
     </span>
     <% if ticket_type.hidden %>
@@ -18,7 +22,7 @@
       <i data-toggle="tooltip" title="Available to those donating <%=m ticket_type.minimum_monthly_donation, @event.currency%>+/month" class="bi bi-lock"></i>
     <% end %>
   </td>
-  <td style="font-size: 1.15em; <% if no_border_top %>border-top: 0;<% end %> <% if ticket_type.photos.exists? %>border-bottom: 0;<% end %>">
+  <td style="font-size: 1.2em; border-top: 0">
     <% if ticket_type.range %>
       <span><%= m ticket_type.range_min, @event.currency %> - <%= m ticket_type.range_max, @event.currency %></span>
       <%= range_field_tag :"prices[#{ticket_type.id}]",
@@ -49,7 +53,7 @@
       </div>
     <% end %>
   </td>
-  <td style="<% if no_border_top %>border-top: 0;<% end %> <% if ticket_type.photos.exists? %>border-bottom: 0;<% end %>">
+  <td style="border-top: 0">
     <% if ticket_type.sales_end && Time.now > ticket_type.sales_end %>
       <span class="badge badge-default">Sales closed</span>
     <% elsif ticket_type.number_of_tickets_available_in_single_purchase > 0 %>
@@ -76,25 +80,19 @@
   <% else %>
     <span class="badge badge-primary">Sold out</span>
   <% end %>
+  <% if !@event.organisation.hide_few_left && !@event.hide_few_left && ticket_type.wiser_remaining <= 3 %>
+    <div class="text-right mt-1">
+      <span class="badge badge-secondary"><%= ticket_type.wiser_remaining %> left</span>
+    </div>
+  <% end %>
 </td>
 </tr>
 
 <tr>
-  <td style="border: 0; padding-top: 0" class="text-muted" colspan="3">
-    <div class="row justify-content-between">
-      <div class="col">
-        <% if ticket_type.description %>
-          <%== Sanitize.fragment(Rinku.auto_link(md(ticket_type.description)), Sanitize::Config::DANDELION) %>
-        <% end %>
-      </div>
-      <div class="col-auto">
-        <% if !@event.organisation.hide_few_left && !@event.hide_few_left && ticket_type.wiser_remaining <= 3 %>
-          <div class="mb-3">
-            <span class="badge badge-secondary"><%= ticket_type.wiser_remaining %> left</span>
-          </div>
-        <% end %>
-      </div>
-    </div>
+  <td style="border: 0; padding-top: 0" class="text-muted ticket-type-description" colspan="3">
+    <% if ticket_type.description %>
+      <%== Sanitize.fragment(Rinku.auto_link(md(ticket_type.description)), Sanitize::Config::DANDELION) %>
+    <% end %>
   </td>
 </tr>
 
