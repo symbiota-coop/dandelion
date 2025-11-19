@@ -30,7 +30,7 @@
     <% end %>
 
   </td>
-  <td style="font-size: 1.2em; border-top: 0; vertical-align: middle">
+  <td style="font-size: 1.2em; border-top: 0; vertical-align: middle; white-space: nowrap;">
     <% if ticket_type.range %>
       <span><%= m ticket_type.range_min, @event.currency %> - <%= m ticket_type.range_max, @event.currency %></span>
       <%= range_field_tag :"prices[#{ticket_type.id}]",
