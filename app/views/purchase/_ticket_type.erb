@@ -61,7 +61,7 @@
       </div>
     <% end %>
   </td>
-  <td style="border-top: 0">
+  <td style="border-top: 0; vertical-align: middle">
     <% if ticket_type.sales_end && Time.now > ticket_type.sales_end %>
       <span class="badge badge-default">Sales closed</span>
     <% elsif ticket_type.number_of_tickets_available_in_single_purchase > 0 %>
