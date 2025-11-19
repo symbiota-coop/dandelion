@@ -38,7 +38,7 @@
       </div>
     <% end %>
   </td>
-  <td style="width: 1px; <% if no_border_top %>border-top: 0;<% end %> <% if ticket_type.photos.exists? %>border-bottom: 0;<% end %>">
+  <td style="<% if no_border_top %>border-top: 0;<% end %> <% if ticket_type.photos.exists? %>border-bottom: 0;<% end %>">
     <% if ticket_type.sales_end && Time.now > ticket_type.sales_end %>
       <span class="badge badge-default">Sales closed</span>
     <% elsif ticket_type.number_of_tickets_available_in_single_purchase > 0 %>
@@ -58,23 +58,19 @@
         <a href="/accounts/sign_in">Sign in</a>
       <% end %>
     <% else %>
-      <div class="row justify-content-between align-items-center">
-        <div class="col-auto">
-          <%= select_tag :"quantities[#{ticket_type.id}]", 'data-ticket-type-id': ticket_type.id, 'data-price': ticket_type.price, style: 'width: auto; display: inline-block', class: 'form-control', options: (0..ticket_type.number_of_tickets_available_in_single_purchase).to_a, value: (params[:quantities][ticket_type.id.to_s] if params[:quantities]), disabled: !ticket_type.price %>
-          <% if ticket_type.range %>
-            <br />
-            <em class="select-a-price-first" style="white-space: nowrap;">Drag the slider</em>
-          <% elsif !ticket_type.price %>
-            <br />
-            <em class="select-a-price-first" style="white-space: nowrap;">Set a price first</em>
-          <% end %>
-        </div>
-        <% if !@event.organisation.hide_few_left && !@event.hide_few_left && ticket_type.wiser_remaining <= 3 %>
-          <div class="col-auto">
-            <span class="badge badge-secondary"><%= ticket_type.wiser_remaining %> left</span>
-          </div>
+      <div>
+        <%= select_tag :"quantities[#{ticket_type.id}]", 'data-ticket-type-id': ticket_type.id, 'data-price': ticket_type.price, style: 'width: auto; display: inline-block', class: 'form-control w-100', options: (0..[99,ticket_type.number_of_tickets_available_in_single_purchase].min).to_a, value: (params[:quantities][ticket_type.id.to_s] if params[:quantities]), disabled: !ticket_type.price %>
+        <% if ticket_type.range %>
+          <br />
+          <em class="select-a-price-first" style="font-size: 0.9em; white-space: nowrap;">Drag the slider</em>
+        <% elsif !ticket_type.price %>
+          <br />
+          <em class="select-a-price-first" style="font-size: 0.9em; white-space: nowrap;">Set a price first</em>
         <% end %>
       </div>
+      <% if !@event.organisation.hide_few_left && !@event.hide_few_left && ticket_type.wiser_remaining <= 3 %>
+        <span class="badge badge-secondary"><%= ticket_type.wiser_remaining %> left</span>
+      <% end %>
     <% end %>
   <% else %>
     <span class="badge badge-primary">Sold out</span>
