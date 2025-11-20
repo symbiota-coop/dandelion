@@ -278,6 +278,20 @@ $(function () {
       if (!confirm('You entered your email address as ' + $('#account_email').val() + '. Press OK to continue, or Cancel to go back.')) { return false }
     }
 
+    // Validate phone number: if entered, must start with +
+    const phoneField = $('#account_phone')
+    if (phoneField.length > 0) {
+      const phoneValue = phoneField.val()
+      if (phoneValue && phoneValue.trim() !== '') {
+        const trimmedPhone = phoneValue.trim()
+        if (!trimmedPhone.startsWith('+')) {
+          alert('Please include the + country code in your phone number (e.g. +1234567890)')
+          phoneField.focus()
+          return false
+        }
+      }
+    }
+
     $('#total').val($('#totalDisplay').val())
     $('#details form button[data-payment-method-clicked] i').show()
 

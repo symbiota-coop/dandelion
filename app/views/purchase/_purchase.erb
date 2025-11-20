@@ -146,7 +146,7 @@ end
         <p class="lead">Signed in as <%= current_account.name %> (<%= current_account.email %>)</p>
         <%= f.hidden_field :name %>
         <%= f.hidden_field :email %>
-        <% unless current_account.phone %>
+        <% if !current_account.phone || !current_account.phone.starts_with?('+') %>
           <%= f.text_block :phone %>
         <% end %>
       <% else %>

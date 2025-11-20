@@ -52,12 +52,8 @@
         <div class="input-group-prepend">
           <span class="input-group-text"><%= money_symbol(@event.currency) %></span>
         </div>
-        <%= number_field_tag :"prices[#{ticket_type.id}]", min: 1, class: 'form-control',
-              oninput: "$(this).parent().next().find('.select-a-price-first').css('visibility','hidden'); var qty = $(this).parent().parent().next().find('[name^=quantities]'); qty.attr('data-price',this.value); if (qty.prop('disabled')) { qty.val(1); }; qty.prop('disabled',false).change();" %>
-      </div>
-
-      <div style="font-size: 0.8em" class="text-right">
-        <em class="select-a-price-first" style="white-space: nowrap;">Set a price first</em>
+        <%= number_field_tag :"prices[#{ticket_type.id}]", min: 1, class: 'form-control', placeholder: 'Set a price',
+              oninput: "var qty = $(this).parent().parent().next().find('[name^=quantities]'); qty.attr('data-price',this.value); if (qty.prop('disabled')) { qty.val(1); }; qty.prop('disabled',false).change();" %>
       </div>
     <% end %>
   </td>
