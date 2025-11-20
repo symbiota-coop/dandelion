@@ -52,7 +52,7 @@
         <div class="input-group-prepend">
           <span class="input-group-text"><%= money_symbol(@event.currency) %></span>
         </div>
-        <%= number_field_tag :"prices[#{ticket_type.id}]", min: 1, class: 'form-control', placeholder: 'Set a price',
+        <%= number_field_tag :"prices[#{ticket_type.id}]", min: 1, class: 'form-control',
               oninput: "var qty = $(this).parent().parent().next().find('[name^=quantities]'); qty.attr('data-price',this.value); if (qty.prop('disabled')) { qty.val(1); }; qty.prop('disabled',false).change();" %>
       </div>
     <% end %>
@@ -89,6 +89,9 @@
 
 <tr>
   <td style="border: 0; padding-top: 0" class="text-muted ticket-type-description" colspan="3">
+    <% if !ticket_type.price %>
+      <p>Set a price first</p>
+    <% end %>
     <% if ticket_type.description %>
       <%== Sanitize.fragment(Rinku.auto_link(md(ticket_type.description)), Sanitize::Config::DANDELION) %>
     <% end %>
