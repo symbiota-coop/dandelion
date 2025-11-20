@@ -18,6 +18,7 @@ class Order
   include OrderFields
   include OrderNotifications
   include OrderAccounting
+  include WhatsappMessaging
 
   belongs_to_without_parent_validation :event, index: true, optional: true
   belongs_to_without_parent_validation :account, class_name: 'Account', inverse_of: :orders, index: true, optional: true
