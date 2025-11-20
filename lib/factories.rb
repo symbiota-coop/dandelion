@@ -14,10 +14,20 @@ FactoryBot.define do
     account
   end
 
+  factory :organisationship do
+    organisation
+    account
+  end
+
   factory :activity do
     sequence(:name) { |n| "Activity #{n}" }
     sequence(:slug) { |n| "activity-#{n}" }
     organisation
+    account
+  end
+
+  factory :activityship do
+    activity
     account
   end
 
@@ -58,6 +68,11 @@ FactoryBot.define do
       })
     end
     organisation
+    account
+  end
+
+  factory :local_groupship do
+    local_group
     account
   end
 
