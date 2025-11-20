@@ -2,6 +2,12 @@
 
 Please note that MongoDB indexes are created directly in the database, and are not exhaustively defined in model files.
 
+# Tests
+
+Use the following command structure to test a single file:
+
+`foreman run -e .env.test bundle exec ruby -I test test/$1_test.rb`
+
 # Dependencies
 
 ## Gemfile
