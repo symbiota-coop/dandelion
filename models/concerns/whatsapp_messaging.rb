@@ -1,8 +1,6 @@
 module WhatsappMessaging
   extend ActiveSupport::Concern
 
-  private
-
   def whatsapp_configured?
     ENV['WHATSAPP_ACCESS_TOKEN'].present? && ENV['WHATSAPP_PHONE_NUMBER_ID'].present?
   end
