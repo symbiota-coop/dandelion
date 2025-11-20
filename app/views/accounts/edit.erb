@@ -89,6 +89,11 @@
       </div>
     <% end %>
     <%= f.text_block :phone %>
+    <script>
+      $(function () {
+        $('#account_phone').next().text('Enter your phone number with +country code to receive order confirmations via WhatsApp')
+      })
+    </script>
     <%= f.text_block :telegram_username %>
     <%= f.url_block :website %>
     <%= f.date_block :date_of_birth %>

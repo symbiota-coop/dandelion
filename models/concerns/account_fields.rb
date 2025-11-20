@@ -114,6 +114,7 @@ module AccountFields
       {
         name: 'Full name',
         image: 'Photo',
+        phone: 'Phone number',
         unsubscribed: 'Opt out of all emails from Dandelion',
         unsubscribed_messages: 'Opt out of email notifications of direct messages',
         unsubscribed_feedback: 'Opt out of requests for feedback',
@@ -135,7 +136,8 @@ module AccountFields
       {
         location: 'Used for connecting you with events near you. Never displayed publicly without your consent.',
         date_of_birth: 'Never displayed publicly, though you can choose to show your age.',
-        username: 'Letters, numbers, underscores and periods'
+        username: 'Letters, numbers, underscores and periods',
+        phone: 'Enter your phone number with +country code to receive your order confirmation via WhatsApp'
       }
     end
 

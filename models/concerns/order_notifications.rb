@@ -102,11 +102,12 @@ module OrderNotifications
 
   def send_whatsapp_order_link
     return unless ENV['WHATSAPP_ACCESS_TOKEN'] && ENV['WHATSAPP_PHONE_NUMBER_ID']
-    return unless account&.phone.present?
+    return unless account&.phone.present? && (account.phone.start_with?('+') || account.phone.start_with?('00'))
 
     # Normalize phone number (remove spaces, dashes, parentheses, and ensure it starts with country code)
     phone_number = account.phone.gsub(/[\s\-()]/, '')
-    phone_number = phone_number[1..-1] if phone_number.start_with?('+')
+    phone_number = phone_number[1..] if phone_number.start_with?('+')
+    phone_number = phone_number[2..] if phone_number.start_with?('00')
 
     begin
       token = ENV['WHATSAPP_ACCESS_TOKEN']

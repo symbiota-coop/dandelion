@@ -146,9 +146,11 @@ end
         <p class="lead">Signed in as <%= current_account.name %> (<%= current_account.email %>)</p>
         <%= f.hidden_field :name %>
         <%= f.hidden_field :email %>
+        <%= f.text_block :phone %>
       <% else %>
         <%= f.text_block :name %>
         <%= f.email_block :email %>
+        <%= f.text_block :phone %>
         <% if @event.organisation.collect_location %>
           <%= f.text_block :postcode %>
           <%= f.select_block :country %>

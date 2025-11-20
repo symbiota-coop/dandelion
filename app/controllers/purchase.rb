@@ -5,7 +5,7 @@ Dandelion::App.controller do
     ticketForm = params[:ticketForm]
     detailsForm = params[:detailsForm]
 
-    account_hash = { name: detailsForm[:account][:name], email: detailsForm[:account][:email], postcode: detailsForm[:account][:postcode], country: detailsForm[:account][:country] }
+    account_hash = { name: detailsForm[:account][:name], email: detailsForm[:account][:email], phone: detailsForm[:account][:phone], postcode: detailsForm[:account][:postcode], country: detailsForm[:account][:country] }
     @account = if (account = Account.find_by(email: detailsForm[:account][:email].downcase))
                  account
                else
