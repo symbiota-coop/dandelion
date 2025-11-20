@@ -1,6 +1,5 @@
 module OrderNotifications
   extend ActiveSupport::Concern
-  include WhatsappMessaging
 
   included do
     handle_asynchronously :send_notification
