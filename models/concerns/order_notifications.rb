@@ -1,5 +1,6 @@
 module OrderNotifications
   extend ActiveSupport::Concern
+  include WhatsappMessaging
 
   included do
     handle_asynchronously :send_notification
@@ -101,54 +102,33 @@ module OrderNotifications
   end
 
   def send_whatsapp_order_link
-    return unless ENV['WHATSAPP_ACCESS_TOKEN'] && ENV['WHATSAPP_PHONE_NUMBER_ID']
-    return unless account&.phone.present? && (account.phone.start_with?('+') || account.phone.start_with?('00'))
+    return unless whatsapp_configured?
+    return unless account&.phone.present?
 
-    token = ENV['WHATSAPP_ACCESS_TOKEN']
-    http_client = HTTP.auth("Bearer #{token}")
-    messages_url = "https://graph.facebook.com/v21.0/#{ENV['WHATSAPP_PHONE_NUMBER_ID']}/messages"
+    phone_number = format_phone_number(account.phone)
+    return unless phone_number
 
     template_header = 'Thanks for booking onto {{1}}!'
-    max_event_name_length = 60 - template_header.gsub('{{1}}', '').length
-    truncated_event_name = if event.name.length > max_event_name_length
-                             "#{event.name[0...(max_event_name_length - 1)]}…"
-                           else
-                             event.name
-                           end
+    truncated_event_name = truncate_event_name_for_whatsapp(event.name, template_header)
 
-    phone_number = account.phone.gsub(/[\s\-()]/, '')
-    phone_number = phone_number[1..] if phone_number.start_with?('+')
-    phone_number = phone_number[2..] if phone_number.start_with?('00')
-
-    payload = {
-      messaging_product: 'whatsapp',
-      to: phone_number,
-      type: 'template',
-      template: {
-        name: ENV['WHATSAPP_TEMPLATE_NAME_ORDER'],
-        language: { code: 'en' },
-        components: [
-          {
-            type: 'header',
-            parameters: [
-              { type: 'text', text: truncated_event_name }
-            ]
-          },
-          {
-            type: 'button',
-            sub_type: 'url',
-            index: '0',
-            parameters: [
-              { type: 'text', text: id.to_s }
-            ]
-          }
+    components = [
+      {
+        type: 'header',
+        parameters: [
+          { type: 'text', text: truncated_event_name }
+        ]
+      },
+      {
+        type: 'button',
+        sub_type: 'url',
+        index: '0',
+        parameters: [
+          { type: 'text', text: id.to_s }
         ]
       }
-    }
+    ]
 
-    http_client.post(messages_url, json: payload)
-  rescue StandardError => e
-    Honeybadger.notify(e)
+    send_whatsapp_template(phone_number, ENV['WHATSAPP_TEMPLATE_NAME_ORDER'], components)
   end
 
   def notify_of_failed_purchase(error)

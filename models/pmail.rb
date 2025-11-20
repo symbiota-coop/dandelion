@@ -5,6 +5,7 @@ class Pmail
 
   include PmailMailgun
   include Searchable
+  include WhatsappMessaging
 
   belongs_to_without_parent_validation :organisation, index: true
   belongs_to_without_parent_validation :account, index: true
@@ -354,64 +355,43 @@ class Pmail
   end
 
   def send_whatsapp_messages(accounts)
-    return unless ENV['WHATSAPP_ACCESS_TOKEN'] && ENV['WHATSAPP_PHONE_NUMBER_ID']
+    return unless whatsapp_configured?
     return unless mailable.is_a?(Event)
 
-    token = ENV['WHATSAPP_ACCESS_TOKEN']
-    http_client = HTTP.auth("Bearer #{token}")
-    messages_url = "https://graph.facebook.com/v21.0/#{ENV['WHATSAPP_PHONE_NUMBER_ID']}/messages"
-
     template_header = 'New message about {{1}}'
-    max_event_name_length = 60 - template_header.gsub('{{1}}', '').length
-    truncated_event_name = if mailable.name.length > max_event_name_length
-                             "#{mailable.name[0...(max_event_name_length - 1)]}…"
-                           else
-                             mailable.name
-                           end
+    truncated_event_name = truncate_event_name_for_whatsapp(mailable.name, template_header)
 
     accounts.each do |account|
-      next unless account.phone.present? && (account.phone.start_with?('+') || account.phone.start_with?('00'))
+      next unless account.phone.present?
 
-      phone_number = account.phone.gsub(/[\s\-()]/, '')
-      phone_number = phone_number[1..] if phone_number.start_with?('+')
-      phone_number = phone_number[2..] if phone_number.start_with?('00')
+      phone_number = format_phone_number(account.phone)
+      next unless phone_number
 
-      payload = {
-        messaging_product: 'whatsapp',
-        to: phone_number,
-        type: 'template',
-        template: {
-          name: ENV['WHATSAPP_TEMPLATE_NAME_PMAIL'],
-          language: { code: 'en' },
-          components: [
-            {
-              type: 'header',
-              parameters: [
-                { type: 'text', text: truncated_event_name }
-              ]
-            },
-            {
-              type: 'body',
-              parameters: [
-                { type: 'text', text: subject }
-              ]
-            },
-            {
-              type: 'button',
-              sub_type: 'url',
-              index: '0',
-              parameters: [
-                { type: 'text', text: id.to_s }
-              ]
-            }
+      components = [
+        {
+          type: 'header',
+          parameters: [
+            { type: 'text', text: truncated_event_name }
+          ]
+        },
+        {
+          type: 'body',
+          parameters: [
+            { type: 'text', text: subject }
+          ]
+        },
+        {
+          type: 'button',
+          sub_type: 'url',
+          index: '0',
+          parameters: [
+            { type: 'text', text: id.to_s }
           ]
         }
-      }
+      ]
 
-      http_client.post(messages_url, json: payload)
+      send_whatsapp_template(phone_number, ENV['WHATSAPP_TEMPLATE_NAME_PMAIL'], components)
     end
-  rescue StandardError => e
-    Honeybadger.notify(e)
   end
 
   def duplicate!(account)
