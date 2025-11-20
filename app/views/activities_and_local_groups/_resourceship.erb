@@ -52,10 +52,10 @@
     <% end %>
   <% elsif resource.respond_to?(:privacy) && resource.privacy == 'closed'; activity = resource %>
     <% if existing_application = activity.activity_applications.and(account: current_account).first %>
-      <a class="btn btn-outline-primary" href="/activities/<%= activity.id %>/activity_applications/latest">View latest application</a>
+      <a class="btn mb-1 btn-outline-primary" href="/activities/<%= activity.id %>/activity_applications/latest">View latest application</a>
     <% end %>
-    <a class="btn btn-primary" href="/activities/<%= activity.id %>/apply"><%= existing_application ? 'Apply again' : 'Apply' %></a>
+    <a class="btn mb-1 btn-primary" href="/activities/<%= activity.id %>/apply"><%= existing_application ? 'Apply again' : 'Apply' %></a>
   <% elsif resource.respond_to?(:privacy) && resource.privacy == 'secret' %>
-    <span class="btn btn-outline-primary">Invitation-only</span>
+    <span class="btn mb-1 btn-outline-primary">Invitation-only</span>
   <% end %>
 <% end %>
