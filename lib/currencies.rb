@@ -18,70 +18,14 @@ CURRENCY_OPTIONS = CURRENCIES.map do |currency|
   ["#{currency} (#{means.uniq.join('/')})", currency]
 end
 
-Money::Currency.register({
-                           priority: 1,
-                           iso_code: 'SEEDS',
-                           name: 'Seeds',
-                           symbol: 'SEEDS',
-                           subunit: 'Cent',
-                           subunit_to_unit: 100,
-                           decimal_mark: '.',
-                           thousands_separator: ','
-                         })
+Money::Currency.with_options(priority: 1, symbol_first: true, subunit_to_unit: 100, decimal_mark: '.', thousands_separator: ',') do |currency|
+  currency.register(iso_code: 'ETH', name: 'Ethereum', symbol: 'Ξ', subunit: 'Cent')
+  currency.register(iso_code: 'SEEDS', name: 'Seeds', symbol: 'SEEDS ', subunit: 'Cent')
+  currency.register(iso_code: 'SEK', name: 'Swedish Krona', symbol: 'SEK ', subunit: 'Öre')
+  currency.register(iso_code: 'DKK', name: 'Danish Krone', symbol: 'DKK ', subunit: 'Øre')
+  currency.register(iso_code: 'NOK', name: 'Norwegian Krone', symbol: 'NOK ', subunit: 'Øre')
 
-Money::Currency.register({
-                           priority: 1,
-                           iso_code: 'ETH',
-                           name: 'Ethereum',
-                           symbol: 'Ξ',
-                           subunit: 'Cent',
-                           subunit_to_unit: 100,
-                           decimal_mark: '.',
-                           thousands_separator: ','
-                         })
-
-Money::Currency.register({
-                           priority: 1,
-                           iso_code: 'SEK',
-                           name: 'Swedish Krona',
-                           symbol: 'SEK',
-                           subunit: 'Öre',
-                           subunit_to_unit: 100,
-                           decimal_mark: '.',
-                           thousands_separator: ','
-                         })
-
-Money::Currency.register({
-                           priority: 1,
-                           iso_code: 'DKK',
-                           name: 'Danish Krone',
-                           symbol: 'DKK',
-                           subunit: 'Øre',
-                           subunit_to_unit: 100,
-                           decimal_mark: '.',
-                           thousands_separator: ','
-                         })
-
-Money::Currency.register({
-                           priority: 1,
-                           iso_code: 'NOK',
-                           name: 'Norwegian Krone',
-                           symbol: 'NOK',
-                           subunit: 'Øre',
-                           subunit_to_unit: 100,
-                           decimal_mark: '.',
-                           thousands_separator: ','
-                         })
-
-EVM_CURRENCIES.each do |c|
-  Money::Currency.register({
-                             priority: 1,
-                             iso_code: c,
-                             name: c,
-                             symbol: c,
-                             subunit: 'Cent',
-                             subunit_to_unit: 100,
-                             decimal_mark: '.',
-                             thousands_separator: ','
-                           })
+  EVM_CURRENCIES.each do |c|
+    currency.register(iso_code: c, name: c, symbol: c, subunit: 'Cent')
+  end
 end
