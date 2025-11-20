@@ -271,7 +271,9 @@ class Pmail
                  end
     from_domain = from_email.split('@').last
 
-    if mailable.is_a?(Event)
+    is_event_pmail = mailable.is_a?(Event)
+
+    if is_event_pmail
       mg_client = Mailgun::Client.new ENV['MAILGUN_API_KEY'], ENV['MAILGUN_REGION']
       batch_message = Mailgun::BatchMessage.new(mg_client, ENV['MAILGUN_TICKETS_HOST'])
 
@@ -344,7 +346,72 @@ class Pmail
                                   })
     end
 
-    batch_message.finalize if Padrino.env == :production
+    result = batch_message.finalize if Padrino.env == :production
+
+    send_whatsapp_messages(accounts) if is_event_pmail
+
+    result
+  end
+
+  def send_whatsapp_messages(accounts)
+    return unless ENV['WHATSAPP_ACCESS_TOKEN'] && ENV['WHATSAPP_PHONE_NUMBER_ID']
+    return unless mailable.is_a?(Event)
+
+    token = ENV['WHATSAPP_ACCESS_TOKEN']
+    http_client = HTTP.auth("Bearer #{token}")
+    messages_url = "https://graph.facebook.com/v21.0/#{ENV['WHATSAPP_PHONE_NUMBER_ID']}/messages"
+
+    template_header = 'New message about {{1}}'
+    max_event_name_length = 60 - template_header.gsub('{{1}}', '').length
+    truncated_event_name = if mailable.name.length > max_event_name_length
+                             "#{mailable.name[0...(max_event_name_length - 1)]}…"
+                           else
+                             mailable.name
+                           end
+
+    accounts.each do |account|
+      next unless account.phone.present? && (account.phone.start_with?('+') || account.phone.start_with?('00'))
+
+      phone_number = account.phone.gsub(/[\s\-()]/, '')
+      phone_number = phone_number[1..] if phone_number.start_with?('+')
+      phone_number = phone_number[2..] if phone_number.start_with?('00')
+
+      payload = {
+        messaging_product: 'whatsapp',
+        to: phone_number,
+        type: 'template',
+        template: {
+          name: ENV['WHATSAPP_TEMPLATE_NAME_PMAIL'],
+          language: { code: 'en' },
+          components: [
+            {
+              type: 'header',
+              parameters: [
+                { type: 'text', text: truncated_event_name }
+              ]
+            },
+            {
+              type: 'body',
+              parameters: [
+                { type: 'text', text: subject }
+              ]
+            },
+            {
+              type: 'button',
+              sub_type: 'url',
+              index: '0',
+              parameters: [
+                { type: 'text', text: id.to_s }
+              ]
+            }
+          ]
+        }
+      }
+
+      http_client.post(messages_url, json: payload)
+    end
+  rescue StandardError => e
+    Honeybadger.notify(e)
   end
 
   def duplicate!(account)
