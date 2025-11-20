@@ -11,12 +11,29 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
+  generate-matrix:
+    runs-on: ubuntu-latest
+    outputs:
+      test_files: ${{ steps.set-matrix.outputs.test_files }}
+    steps:
+    - name: Git checkout
+      uses: actions/checkout@v4
+    
+    - name: Generate test file matrix
+      id: set-matrix
+      run: |
+        # Find all *_test.rb files and extract the base names (without _test.rb suffix)
+        test_files=$(find test -name '*_test.rb' -type f | sed 's|test/||' | sed 's|_test.rb||' | sort | jq -R -s -c 'split("\n")[:-1]')
+        echo "test_files=$test_files" >> $GITHUB_OUTPUT
+        echo "Found test files: $test_files"
+
   test:
+    needs: generate-matrix
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
       matrix:
-        test_file: [accounts, activities, events, gatherings, how_to_create_a_gathering, how_to_create_an_event, local_groups, nav, organisations, pmails, tour]
+        test_file: ${{ fromJson(needs.generate-matrix.outputs.test_files) }}
     steps:
     - name: Git checkout
       uses: actions/checkout@v4
