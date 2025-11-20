@@ -147,7 +147,11 @@
   </li>
   <% if admin? %>
     <li class="nav-divider"></li>
-    <li class="nav-header">Stats</li>
+    <li id="git-badge">
+      <a target="_blank" href="https://github.com/symbiota-coop/dandelion/actions">
+        <img src="https://github.com/symbiota-coop/dandelion/actions/workflows/ruby.yml/badge.svg">
+      </a>
+    </li>
     <li>
       <a href="/stats/orders" data-toggle="tooltip" title="Orders" data-placement="right">
         <i class="bi bi-cart-fill"></i>
@@ -185,9 +189,15 @@
       </a>
     </li>
     <li>
-      <a href="/stats/icons" data-toggle="tooltip" title="Icons" data-placement="right">
-        <i class="bi bi-back"></i>
-        <span class="nav-link-text">Icons</span>
+      <a href="https://cloud.mongodb.com/v2/5f06d9c45cb05e7a12eeefdd#/metrics/replicaSet/65c6919dfe99a4313345176b/queryInsights/profiler?fromCta=queryInsightsPage&metric=Operation+Execution+Time" target="_blank" data-toggle="tooltip" title="MongoDB" data-placement="right">
+        <i class="bi bi-database"></i>
+        <span class="nav-link-text">MongoDB</span>
+      </a>
+    </li>
+    <li>
+      <a href="https://dash.cloudflare.com/4380fac59eaeff9144315acb831e7540/dandelion.events/analytics/traffic" target="_blank" data-toggle="tooltip" title="Cloudflare" data-placement="right">
+        <i class="bi bi-cloud"></i>
+        <span class="nav-link-text">Cloudflare</span>
       </a>
     </li>
     <li>
@@ -208,9 +218,10 @@
         <span class="nav-link-text">Charts</span>
       </a>
     </li>
-    <li id="git-badge">
-      <a target="_blank" href="https://github.com/symbiota-coop/dandelion/actions">
-        <img src="https://github.com/symbiota-coop/dandelion/actions/workflows/ruby.yml/badge.svg">
+    <li>
+      <a href="/stats/icons" data-toggle="tooltip" title="Icons" data-placement="right">
+        <i class="bi bi-back"></i>
+        <span class="nav-link-text">Icons</span>
       </a>
     </li>
   <% end %>
