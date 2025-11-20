@@ -12,6 +12,11 @@ Dandelion::App.controller do
     message = body.dig('entry', 0, 'changes', 0, 'value', 'messages', 0)
     halt 200 unless message && message['type'] == 'audio'
 
+    # only allow transcription if the message is from an admin account
+    from_phone = message['from']
+    account = Account.find_by(phone: "+#{from_phone}")
+    halt 200 unless account&.admin?
+
     media_id = message['audio']['id']
 
     # get the media url
