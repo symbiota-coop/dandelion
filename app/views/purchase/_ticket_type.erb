@@ -89,7 +89,7 @@
 
 <tr>
   <td style="border: 0; padding-top: 0" class="text-muted ticket-type-description" colspan="3">
-    <% if !ticket_type.price %>
+    <% if !ticket_type.range && !ticket_type.price %>
       <p>Set a price first</p>
     <% end %>
     <% if ticket_type.description %>
