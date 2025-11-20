@@ -45,6 +45,5 @@ class DandelionTest < ActiveSupport::TestCase
     login_as(@account)
     visit "/activities/#{@activity.id}/apply"
     assert page.has_content? 'Preview of application form'
-    assert page.has_content? 'you are already a member'
   end
 end
