@@ -1,4 +1,19 @@
 <div class="main">
+
+  <h2>
+    <span class="text-muted font-weight-normal">
+      Reminder about
+    </span>
+    <br />
+    <%= event.name %>
+  </h2>
+
+  <hr />
+
+  <%= tickets_table %>
+
+  <hr />
+
   <%= (event.reminder_email_body || event.organisation.reminder_email_body)
         .gsub('[firstname]', '%recipient.firstname%')
         .gsub('[event_link]', "<a href='#{ENV['BASE_URI']}/e/#{event.slug}'>#{event.name}</a>")

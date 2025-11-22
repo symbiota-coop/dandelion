@@ -27,6 +27,7 @@ module TicketNotifications
     order.tickets = [ticket]
     order.account = account
 
+    tickets_table = ERB.new(File.read(Padrino.root('app/views/emails/_tickets_table.erb'))).result(binding)
     content = ERB.new(File.read(Padrino.root('app/views/emails/tickets.erb'))).result(binding)
     batch_message.subject(event.ticket_email_title || "Ticket to #{event.name}")
 

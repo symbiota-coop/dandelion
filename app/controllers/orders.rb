@@ -191,6 +191,8 @@ Dandelion::App.controller do
     order = @order
     account = @order.account || not_found
     pdf_link = true
+
+    tickets_table = ERB.new(File.read(Padrino.root('app/views/emails/_tickets_table.erb'))).result(binding)
     content = ERB.new(File.read(Padrino.root('app/views/emails/tickets.erb'))).result(binding)
                  .gsub('%recipient.token%', account.sign_in_token)
 

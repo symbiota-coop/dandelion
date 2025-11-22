@@ -42,6 +42,8 @@ module OrderNotifications
     header_image_url, from_email = sender_info
 
     account = order.account
+
+    tickets_table = ERB.new(File.read(Padrino.root('app/views/emails/_tickets_table.erb'))).result(binding)
     content = ERB.new(File.read(Padrino.root('app/views/emails/tickets.erb'))).result(binding)
     batch_message.subject(
       ((event.recording? ? event.recording_email_title : event.ticket_email_title) || (event.recording? ? event.organisation.recording_email_title : event.organisation.ticket_email_title))

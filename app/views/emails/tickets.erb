@@ -11,45 +11,13 @@
 
     <hr />
 
-    <table class="event-details">
-      <tbody>
-        <tr>
-          <td>
-            <img src="<%=ENV['BASE_URI']%>/images/icons/calendar/png/<%= event.start_time.strftime('%b').downcase %>_<%= event.start_time.strftime('%d') %>.png">
-          </td>
-          <td>
-            <% when_parts = event.when_details(account.try(:time_zone), with_zone: true).split(', ') %>
-            <%= when_parts[0] %>
-            <div class="text-muted" style="font-size: 90%;">
-              <%= when_parts[1..-1].join(', ') %>
-            </div>
-          </td>
-        </tr>
-        <tr>
-          <td colspan="2" class="event-detail-separator">&nbsp;</td>
-        </tr>
-        <tr>
-          <td>
-            <a <% if event.location != 'Online' %>href="https://www.google.com/maps?q=<%=event.location%>"<% end %> target="_blank">
-              <% if event.location == 'Online' %>
-                <img src="<%=ENV['BASE_URI']%>/images/icons/image/image-camera-video.png">
-              <% else %>
-                <img src="<%=ENV['BASE_URI']%>/images/icons/image/image-geo-alt.png">
-              <% end %>
-            </a>
-          </td>
-          <td>
-            <a class="text-dark" target="_blank" <% if event.location != 'Online' %>href="https://www.google.com/maps?q=<%=event.location%>"<% end %>><%=event.location%></a>
-            </td>
-          </tr>
-        </tbody>
-      </table>
+    <%= tickets_table %>
 
-      <hr />
+    <hr />
 
-    <% end %>
+  <% end %>
 
-    <%= ((event.recording? ? event.recording_email_greeting : event.ticket_email_greeting) || (event.recording? ? event.organisation.recording_email_greeting : event.organisation.ticket_email_greeting))
+  <%= ((event.recording? ? event.recording_email_greeting : event.ticket_email_greeting) || (event.recording? ? event.organisation.recording_email_greeting : event.organisation.ticket_email_greeting))
         .gsub('[firstname]', account.firstname)
         .gsub('[lastname]', account.lastname || '')
         .gsub('[fullname]', account.name)
@@ -61,55 +29,55 @@
         .gsub('[tickets_are]', order.tickets.length == 1 ? 'ticket is' : 'tickets are')
         %>
 
-    <% if event.recording? %>
-      <% if event.extra_info_for_recording_email %>
-        <hr>
-        <%= event.extra_info_for_recording_email %>
-      <% end %>
-    <% else %>
-      <% if event.extra_info_for_ticket_email %>
-        <hr>
-        <%= event.extra_info_for_ticket_email %>
-      <% end %>
+  <% if event.recording? %>
+    <% if event.extra_info_for_recording_email %>
+      <hr>
+      <%= event.extra_info_for_recording_email %>
     <% end %>
-    <% if !event.hide_organisation_footer %>
-      <% if event.organisation.extra_info_for_ticket_email %>
-        <hr>
-        <%= event.organisation.extra_info_for_ticket_email %>
-      <% end %>
-      <% if !event.recording? && event.organisation.show_ticketholder_link_in_ticket_emails %>
-        <p>
-          <a href="<%=ENV['BASE_URI']%>/e/<%=event.slug%>?order_id=<%=order.id%>">Visit this page to add details of ticketholders.</a>
-        </p>
-      <% end %>
-      <% if event.affiliate_credit_percentage && account.persisted? %>
-        <% affiliate_link = "#{ENV['BASE_URI']}/e/#{event.slug}?affiliate_type=Account&affiliate_id=#{account.id}" %>
-        <p>
-          <a href="<%= affiliate_link %>">Here's your affiliate link for this event.</a>
-          For each person who buys a ticket via this link,
-          you receive credit that can used to attend future events equal to <%= event.affiliate_credit_percentage %>% of the order value.
-        </p>
-      <% end %>
+  <% else %>
+    <% if event.extra_info_for_ticket_email %>
+      <hr>
+      <%= event.extra_info_for_ticket_email %>
     <% end %>
-    <% if event.organisation.show_sign_in_link_in_ticket_emails && !event.hide_attendees %>
+  <% end %>
+  <% if !event.hide_organisation_footer %>
+    <% if event.organisation.extra_info_for_ticket_email %>
+      <hr>
+      <%= event.organisation.extra_info_for_ticket_email %>
+    <% end %>
+    <% if !event.recording? && event.organisation.show_ticketholder_link_in_ticket_emails %>
       <p>
-        <% if !account.has_signed_in? && account.persisted? %>
-          <a href="<%= ENV['BASE_URI'] %>/accounts/edit?sign_in_token=%recipient.token%&event_id=<%= event.id %>">Click here to create a profile on Dandelion and connect with others <%= event.recording? ? 'who attended' : 'attending' %> the event.</a>
-        <% else %>
-          <a href="<%= ENV['BASE_URI'] %>/e/<%= event.slug %>?sign_in_token=%recipient.token%">Sign in to Dandelion</a> to show or hide your attendance and connect with others <%= event.recording? ? 'who attended' : 'attending' %> the event.
-        <% end %>
+        <a href="<%=ENV['BASE_URI']%>/e/<%=event.slug%>?order_id=<%=order.id%>">Visit this page to add details of ticketholders.</a>
       </p>
     <% end %>
-  </div>
-  <div class="footer">
-    <a href="<%= ENV['BASE_URI'] %>">
-      <img class="footer-logo" src="<%= ENV['BASE_URI'] %>/images/logos/logo-text.png">
-    </a>
-  </div>
-
-  <% if !event.no_tickets_pdf && defined?(pdf_link) %>
-    <a href="/orders/<%=order.id%>.pdf" class="attachment">
-      <img class="qr-code" src="<%=ENV['BASE_URI']%>/images/icons/_qr-code.png">
-      Download <%= order.tickets.count == 1 ? 'ticket' : 'tickets' %> PDF
-    </a>
+    <% if event.affiliate_credit_percentage && account.persisted? %>
+      <% affiliate_link = "#{ENV['BASE_URI']}/e/#{event.slug}?affiliate_type=Account&affiliate_id=#{account.id}" %>
+      <p>
+        <a href="<%= affiliate_link %>">Here's your affiliate link for this event.</a>
+        For each person who buys a ticket via this link,
+        you receive credit that can used to attend future events equal to <%= event.affiliate_credit_percentage %>% of the order value.
+      </p>
+    <% end %>
   <% end %>
+  <% if event.organisation.show_sign_in_link_in_ticket_emails && !event.hide_attendees %>
+    <p>
+      <% if !account.has_signed_in? && account.persisted? %>
+        <a href="<%= ENV['BASE_URI'] %>/accounts/edit?sign_in_token=%recipient.token%&event_id=<%= event.id %>">Click here to create a profile on Dandelion and connect with others <%= event.recording? ? 'who attended' : 'attending' %> the event.</a>
+      <% else %>
+        <a href="<%= ENV['BASE_URI'] %>/e/<%= event.slug %>?sign_in_token=%recipient.token%">Sign in to Dandelion</a> to show or hide your attendance and connect with others <%= event.recording? ? 'who attended' : 'attending' %> the event.
+      <% end %>
+    </p>
+  <% end %>
+</div>
+<div class="footer">
+  <a href="<%= ENV['BASE_URI'] %>">
+    <img class="footer-logo" src="<%= ENV['BASE_URI'] %>/images/logos/logo-text.png">
+  </a>
+</div>
+
+<% if !event.no_tickets_pdf && defined?(pdf_link) %>
+  <a href="/orders/<%=order.id%>.pdf" class="attachment">
+    <img class="qr-code" src="<%=ENV['BASE_URI']%>/images/icons/_qr-code.png">
+    Download <%= order.tickets.count == 1 ? 'ticket' : 'tickets' %> PDF
+  </a>
+<% end %>

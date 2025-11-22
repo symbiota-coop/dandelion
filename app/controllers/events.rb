@@ -328,6 +328,7 @@ Dandelion::App.controller do
     order.account = account
     header_image_url, from_email = order.sender_info
 
+    tickets_table = ERB.new(File.read(Padrino.root('app/views/emails/_tickets_table.erb'))).result(binding)
     content = ERB.new(File.read(Padrino.root('app/views/emails/tickets.erb'))).result(binding)
                  .gsub('%recipient.token%', current_account.sign_in_token)
     Premailer.new(ERB.new(File.read(Padrino.root('app/views/layouts/email.erb'))).result(binding), with_html_string: true, adapter: 'nokogiri', input_encoding: 'UTF-8').to_inline_css
@@ -343,6 +344,9 @@ Dandelion::App.controller do
     @event = Event.find(params[:id]) || not_found
     event_admins_only!
     event = @event
+    account = current_account
+
+    tickets_table = ERB.new(File.read(Padrino.root('app/views/emails/_tickets_table.erb'))).result(binding)
     content = ERB.new(File.read(Padrino.root('app/views/emails/reminder.erb'))).result(binding)
                  .gsub('%recipient.firstname%', current_account.firstname)
                  .gsub('%recipient.token%', current_account.sign_in_token)
