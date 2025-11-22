@@ -86,7 +86,7 @@ module CoreExtensions
       define_method(ids_method) do
         scope = send(through)
         scope = scope.and(conditions) if conditions
-        scope.pluck(fk)
+        scope.distinct(fk)
       end
 
       define_method(collection_method) do
