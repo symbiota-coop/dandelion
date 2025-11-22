@@ -11,7 +11,8 @@ recommended_people = @account.recommended_people || []
   <ul class="search-result-list">
     <% recommended_people.each_with_index { |x,i| k,v = x;
     next if @account.follows_as_follower.find_by(followee: k); account = Account.find(k);
-    next if @account.private?;
+    next if !account;
+    next if account.private?;
     p = p + 1
     %>
     <li <% if i == 0 %> style="border-top: 0" <% end %>>
