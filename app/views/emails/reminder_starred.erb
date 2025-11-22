@@ -1,4 +1,19 @@
 <div class="main">
+
+  <h2>
+    <span class="text-muted font-weight-normal">
+      Reminder about
+    </span>
+    <br />
+    <%= event.name %>
+  </h2>
+
+  <hr />
+
+  <%= tickets_table %>
+
+  <hr />
+
   <p>Hi %recipient.firstname%,</p>
   <p>Just a reminder that your starred event <a href="<%= ENV['BASE_URI'] %>/events/<%= event.id %>"><%= event.name %></a> takes place a week from now.</p>
   <p>
