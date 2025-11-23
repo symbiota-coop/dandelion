@@ -9,7 +9,6 @@ module OrganisationFields
     field :website, type: String
     field :reply_to, type: String
     field :intro_text, type: String
-    field :telegram_group, type: String
     field :image_uid, type: String
     field :has_image, type: Mongoid::Boolean
     field :plausible_analytics_domain, type: String
@@ -116,7 +115,6 @@ module OrganisationFields
         slug: :slug,
         intro_text: :wysiwyg,
         website: :url,
-        telegram_group: :url,
         reply_to: :text,
         image: :image,
         hidden: :check_box,
@@ -179,7 +177,6 @@ module OrganisationFields
         name: 'Organisation name',
         slug: 'URL',
         intro_text: 'Intro text for organisation homepage',
-        telegram_group: 'Telegram group/channel URL',
         extra_info_for_ticket_email: 'Extra info for order confirmation email',
         plausible_analytics_domain: 'Plausible Analytics domain',
         simple_analytics_domain: 'Simple Analytics domain',

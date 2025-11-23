@@ -58,7 +58,7 @@ module AccountValidation
         self.email_confirmed = false
       end
 
-      %w[email phone telegram_username location].each do |p|
+      %w[email phone location].each do |p|
         send("#{p}_privacy=", 'People I follow') unless send("#{p}_privacy")
       end
 

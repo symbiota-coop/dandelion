@@ -16,14 +16,6 @@
       <% end %>
     </div>
     <table class="table table-hr">
-      <% if @local_group.telegram_group %>
-        <tr>
-          <td>Telegram group</td>
-          <td>
-            <a target="_blank" href="<%= @local_group.telegram_group %>"><%= @local_group.telegram_group %></a>
-          </td>
-        </tr>
-      <% end %>
       <% if local_group_admin? || @local_group.admins.exists? %>
         <tr>
           <td>Admins</td>

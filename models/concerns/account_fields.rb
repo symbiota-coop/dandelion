@@ -21,7 +21,6 @@ module AccountFields
     field :name_transliterated, type: String
     field :email, type: String
     field :phone, type: String
-    field :telegram_username, type: String
     field :username, type: String
     field :website, type: String
     field :gender, type: String
@@ -160,7 +159,7 @@ module AccountFields
     end
 
     def privacyables
-      %w[email location phone telegram_username website date_of_birth gender sexuality bio open_to last_active organisations local_groups activities gatherings following followers]
+      %w[email location phone website date_of_birth gender sexuality bio open_to last_active organisations local_groups activities gatherings following followers]
     end
 
     def sexualities

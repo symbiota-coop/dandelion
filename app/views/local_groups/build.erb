@@ -6,7 +6,6 @@
     <%= f.shorturl_block :slug, stem: "#{ENV['BASE_URI']}/o/#{@local_group.organisation.slug}/lg/" %>
   </div>
   <%= f.wysiwyg_block :intro_text %>
-  <%= f.url_block :telegram_group %>
   <script>
     $(document).ready(function() {
       $('#local_group_geometry').attr('rows', '8');

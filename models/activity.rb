@@ -16,7 +16,6 @@ class Activity
   field :name, type: String
   field :email, type: String
   field :website, type: String
-  field :telegram_group, type: String
   field :intro_text, type: String
   field :image_uid, type: String
   field :has_image, type: Boolean
@@ -41,7 +40,6 @@ class Activity
       website: :url,
       extra_info_for_acceptance_email: :wysiwyg,
       extra_info_for_application_form: :wysiwyg,
-      telegram_group: :url,
       intro_text: :wysiwyg,
       image: :image,
       events: :collection,
@@ -178,7 +176,6 @@ class Activity
   def self.human_attribute_name(attr, options = {})
     {
       privacy: 'Access',
-      telegram_group: 'Telegram group/channel URL',
       email: 'Contact email',
       slug: 'URL'
     }[attr.to_sym] || super

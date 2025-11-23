@@ -12,7 +12,6 @@ class LocalGroup
   belongs_to_without_parent_validation :account, index: true
 
   field :name, type: String
-  field :telegram_group, type: String
   field :intro_text, type: String
   field :geometry, type: String
   field :hide_members, type: Boolean
@@ -27,7 +26,6 @@ class LocalGroup
     {
       name: :text,
       type: :text,
-      telegram_group: :url,
       intro_text: :wysiwyg,
       geometry: :text_area,
       hide_members: :check_box
@@ -91,7 +89,6 @@ class LocalGroup
 
   def self.human_attribute_name(attr, options = {})
     {
-      telegram_group: 'Telegram group/channel URL',
       slug: 'URL',
       hide_members: 'Hide member map'
     }[attr.to_sym] || super

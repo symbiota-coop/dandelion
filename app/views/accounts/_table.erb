@@ -34,23 +34,6 @@
       </td>
     </tr>
   <% end %>
-  <% if viewable?(account, :telegram_username, viewer_in_network: viewer_in_network) %>
-    <tr>
-      <td>Telegram</td>
-      <td>
-        <div class="row justify-content-between no-gutters">
-          <div class="col">
-            <a target="_blank" href="https://t.me/<%= account.telegram_username %>"><%= account.telegram_username %></a>
-          </div>
-          <% if current_account && current_account.id == account.id %>
-            <div class="col-auto">
-              <div data-pagelet-url="/accounts/privacyable/telegram_username"></div>
-            </div>
-          <% end %>
-        </div>
-      </td>
-    </tr>
-  <% end %>
   <% if viewable?(account, :website, viewer_in_network: viewer_in_network) %>
     <tr>
       <td>Website</td>

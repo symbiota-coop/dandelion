@@ -94,7 +94,6 @@
         $('#account_phone').next().text('Enter your phone number with +country code to receive order confirmations via WhatsApp')
       })
     </script>
-    <%= f.text_block :telegram_username %>
     <%= f.url_block :website %>
     <%= f.date_block :date_of_birth %>
     <%= f.select_block :gender %>
@@ -134,7 +133,7 @@
 
   <% end %>
 
-  <% Account.privacyables.select { |p| %w[email location phone telegram_username website date_of_birth gender sexuality bio].include?(p) }.each { |p| %>
+  <% Account.privacyables.select { |p| %w[email location phone website date_of_birth gender sexuality bio].include?(p) }.each { |p| %>
   <div style="font-weight: 500" data-privacy="<%= p %>" data-pagelet-url="/accounts/privacyable/<%= p %>"></div>
   <% } %>
   <script>

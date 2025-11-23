@@ -7,14 +7,6 @@
       </td>
     </tr>
   <% end %>
-  <% if @organisation.telegram_group %>
-    <tr>
-      <td>Telegram group</td>
-      <td>
-        <a target="_blank" href="<%= @organisation.telegram_group %>"><%= @organisation.telegram_group %></a>
-      </td>
-    </tr>
-  <% end %>
   <% if @organisation.location %>
     <tr>
       <td>Location</td>
