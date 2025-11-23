@@ -37,7 +37,19 @@
               class: 'form-control-range',
               min: ticket_type.range_min,
               max: ticket_type.range_max,
-              oninput: "$(this).prev().html('#{money_symbol(@event.currency)}' + this.value); $(this).next().find('.select-a-price-first').css('visibility','hidden'); var qty = $(this).parent().next().find('[name^=quantities]'); qty.attr('data-price',this.value); if (qty.prop('disabled')) { qty.val(1); }; qty.prop('disabled',false).change();" %>
+              value: (params[:prices][ticket_type.id.to_s] if params[:prices]),
+              data: { interacted: (params[:prices] && params[:prices][ticket_type.id.to_s] ? 'true' : 'false') },
+              oninput: "$(this).attr('data-interacted', 'true'); $(this).prev().html('#{money_symbol(@event.currency)}' + this.value); $(this).next().find('.select-a-price-first').css('visibility','hidden'); var qty = $(this).parent().next().find('[name^=quantities]'); qty.attr('data-price',this.value); if (qty.prop('disabled')) { qty.val(1); }; qty.prop('disabled',false).change();" %>
+
+      <% if params[:prices] && params[:prices][ticket_type.id.to_s] %>
+        <script>
+          $(function() {
+            var $input = $('[name="prices[<%= ticket_type.id %>]"]');
+            $input.attr('data-interacted', 'true');
+            $input[0].oninput();
+          });
+        </script>
+      <% end %>
 
       <div style="font-size: 0.8em" class="text-right">
         <em class="select-a-price-first" style="white-space: nowrap;">Drag the slider</em>
@@ -54,7 +66,17 @@
             <span class="input-group-text"><%= money_symbol(@event.currency) %></span>
           </div>
           <%= number_field_tag :"prices[#{ticket_type.id}]", min: 1, class: 'form-control',
+              value: (params[:prices][ticket_type.id.to_s] if params[:prices]),
               oninput: "$(this).parent().next().find('.select-a-price-first').css('visibility','hidden'); var qty = $(this).parent().parent().parent().next().find('[name^=quantities]'); qty.attr('data-price',this.value); if (qty.prop('disabled')) { qty.val(1); }; qty.prop('disabled',false).change();" %>
+
+          <% if params[:prices] && params[:prices][ticket_type.id.to_s] %>
+            <script>
+              $(function() {
+                $('[name="prices[<%= ticket_type.id %>]"]')[0].oninput();
+              });
+            </script>
+          <% end %>
+
         </div>
         <div style="font-size: 0.8em; position: absolute; right: 0" class="text-right">
           <em class="select-a-price-first" style="white-space: nowrap;">Set a price first</em>

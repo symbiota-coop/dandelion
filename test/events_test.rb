@@ -98,7 +98,6 @@ class DandelionTest < ActiveSupport::TestCase
     login_as(@account)
     visit "/e/#{@event.slug}"
     execute_script %{$("[name='prices[#{@event.ticket_types.first.id}]']").val(#{selected_price = 50})[0].oninput()}
-    select 1, from: "quantities[#{@event.ticket_types.first.id}]"
     fill_in 'donation_amount', with: (donation_amount = 5)
     assert page.has_button? "Pay £#{format('%.2f', selected_price + donation_amount)}"
   end
@@ -110,7 +109,6 @@ class DandelionTest < ActiveSupport::TestCase
     login_as(@account)
     visit "/e/#{@event.slug}"
     fill_in "prices[#{@event.ticket_types.first.id}]", with: (selected_price = 50)
-    select 1, from: "quantities[#{@event.ticket_types.first.id}]"
     fill_in 'donation_amount', with: (donation_amount = 5)
     assert page.has_button? "Pay £#{format('%.2f', selected_price + donation_amount)}"
   end
@@ -132,5 +130,34 @@ class DandelionTest < ActiveSupport::TestCase
     assert_equal 'a2', find_field('answers[2]').value
     assert_equal donation_amount.to_s, find_field('donation_amount').value
     assert page.has_button? "Pay £#{format('%.2f', (ticket_price * (100 - percentage_discount).to_f / 100) + donation_amount)}"
+  end
+
+  test 'booking onto a paid event with a range and a discount code preserves custom price' do
+    @account = FactoryBot.create(:account)
+    @organisation = FactoryBot.create(:organisation, account: @account)
+    @event = FactoryBot.create(:event, organisation: @organisation, account: @account, last_saved_by: @account, price_or_range: '10-100', suggested_donation: 0)
+    @discount_code = FactoryBot.create(:discount_code, codeable: @event, code: (code = 'DISCOUNT10'), percentage_discount: (percentage_discount = 10))
+    login_as(@account)
+    visit "/e/#{@event.slug}"
+    execute_script %{$("[name='prices[#{@event.ticket_types.first.id}]']").val(#{selected_price = 50})[0].oninput()}
+    fill_in 'discount_code', with: code
+    click_button 'Apply'
+    assert_equal selected_price.to_s, find_field("prices[#{@event.ticket_types.first.id}]").value
+    assert page.has_button? "Pay £#{format('%.2f', selected_price * (100 - percentage_discount).to_f / 100)}"
+  end
+
+  test 'booking onto a paid event with a user-set price and a discount code preserves custom price' do
+    @account = FactoryBot.create(:account)
+    @organisation = FactoryBot.create(:organisation, account: @account)
+    @event = FactoryBot.create(:event, organisation: @organisation, account: @account, last_saved_by: @account, price_or_range: nil, suggested_donation: 0)
+    @discount_code = FactoryBot.create(:discount_code, codeable: @event, code: (code = 'DISCOUNT10'), percentage_discount: (percentage_discount = 10))
+    login_as(@account)
+    visit "/e/#{@event.slug}"
+    fill_in "prices[#{@event.ticket_types.first.id}]", with: (selected_price = 50)
+    execute_script %{$("[name='prices[#{@event.ticket_types.first.id}]']")[0].oninput()}
+    fill_in 'discount_code', with: code
+    click_button 'Apply'
+    assert_equal selected_price.to_s, find_field("prices[#{@event.ticket_types.first.id}]").value
+    assert page.has_button? "Pay £#{format('%.2f', selected_price * (100 - percentage_discount).to_f / 100)}"
   end
 end

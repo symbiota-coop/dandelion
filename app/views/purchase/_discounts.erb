@@ -12,6 +12,20 @@
       quantities[$(this).attr('data-ticket-type-id')] = $(this).val()
     })
 
+    var prices = {}
+    $('[name^=prices]').each(function() {
+      var name = $(this).attr('name')
+      var match = name.match(/prices\[([a-f0-9]+)\]/)
+      if (match && $(this).val()) {
+        // For range inputs, only include value if user has interacted with it
+        if ($(this).attr('type') === 'range' && $(this).attr('data-interacted') !== 'true') {
+          return
+        }
+        var ticketTypeId = match[1]
+        prices[ticketTypeId] = $(this).val()
+      }
+    })
+
     var answersObj = {}
     $('[name^=answers]').each(function() {
       var name = $(this).attr('name')
@@ -33,6 +47,7 @@
     })
 
     qs['quantities'] = quantities
+    qs['prices'] = prices
     qs['answers'] = answersObj
 
     // Preserve donation amount
