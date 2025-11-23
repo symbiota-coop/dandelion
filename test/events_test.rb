@@ -123,13 +123,14 @@ class DandelionTest < ActiveSupport::TestCase
     login_as(@account)
     visit "/e/#{@event.slug}"
     select 1, from: "quantities[#{@event.ticket_types.first.id}]"
-    # fill_in 'donation_amount', with: (donation_amount = 5) # donations aren't passed across discount codes yet
+    fill_in 'donation_amount', with: (donation_amount = 5)
     fill_in 'answers[0]', with: 'a0'
     fill_in 'answers[2]', with: 'a2'
     fill_in 'discount_code', with: code
     click_button 'Apply'
     assert_equal 'a0', find_field('answers[0]').value
     assert_equal 'a2', find_field('answers[2]').value
-    assert page.has_button? "Pay £#{format('%.2f', ticket_price * (100 - percentage_discount).to_f / 100)}"
+    assert_equal donation_amount.to_s, find_field('donation_amount').value
+    assert page.has_button? "Pay £#{format('%.2f', (ticket_price * (100 - percentage_discount).to_f / 100) + donation_amount)}"
   end
 end

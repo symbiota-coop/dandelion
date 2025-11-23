@@ -19,7 +19,7 @@
         <div class="input-group-prepend">
           <span class="input-group-text"><%= money_symbol(@event.currency) %></span>
         </div>
-        <%= number_field_tag :donation_amount, id: 'donation_amount', class: 'form-control', style: 'width: 5em' %>
+        <%= number_field_tag :donation_amount, id: 'donation_amount', class: 'form-control', style: 'width: 5em', value: params[:donation_amount]%>
       </div>
     </td>
   </tr>
@@ -52,7 +52,7 @@
             })
           </script>
         <% end %>
-        <%= number_field_tag :donation_amount, id: 'donation_amount', class: 'form-control', style: 'width: 5em', value: @event.suggested_donation, min: (@event.minimum_donation || 0) %>
+        <%= number_field_tag :donation_amount, id: 'donation_amount', class: 'form-control', style: 'width: 5em', value: (params[:donation_amount] || @event.suggested_donation), min: (@event.minimum_donation || 0) %>
       </div>
       <% donation_text = @event.donation_text || @event.organisation.donation_text %>
       <% donation_text_line_breaks = donation_text && %w[<br> <br /> <br/> <p>].any? { |pattern| donation_text.include?(pattern) } %>

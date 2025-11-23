@@ -34,6 +34,13 @@
 
     qs['quantities'] = quantities
     qs['answers'] = answersObj
+
+    // Preserve donation amount
+    var donationAmount = $('#donation_amount').val()
+    if (donationAmount) {
+      qs['donation_amount'] = donationAmount
+    }
+
     window.location = window.location.pathname + '?' + $.param(qs) + '#select-tickets'
   }
 </script>
