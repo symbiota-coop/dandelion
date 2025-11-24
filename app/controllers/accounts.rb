@@ -287,6 +287,7 @@ Dandelion::App.controller do
   get '/accounts/privacyable/:p' do
     sign_in_required!
     @account = current_account
+    halt 403 unless Account.privacyables.include?(params[:p])
     partial :'accounts/privacyable', locals: { p: params[:p] }
   end
 
