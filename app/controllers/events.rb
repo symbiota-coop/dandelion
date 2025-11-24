@@ -673,10 +673,4 @@ Dandelion::App.controller do
     event_admins_only!
     partial :'events/checked_in', locals: { event: @event }
   end
-
-  get '/events/:id/tickets_sold' do
-    @event = Event.find(params[:id]) || not_found
-    event_admins_only!
-    partial :'events/progress', locals: { event: @event }
-  end
 end
