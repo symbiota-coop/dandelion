@@ -1,3 +1,3 @@
 <td data-sort="<%=event.tickets.count%>">
-  <%= partial :'events/progress', locals: { event: event } %>
+  <div data-with-placeholder data-pagelet-url="/events/<%= event.id %>/tickets_sold"></div>
 </td>
