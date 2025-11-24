@@ -35,7 +35,7 @@
 </script>
 
 
-<% form_for @pmail, @pmail.new_record? ? '/pmails/new' : "/pmails/#{@pmail.id}/edit", id: 'pmail-form', multipart: true do |f| %>
+<% form_for @pmail ||= Pmail.new, (@pmail ||= Pmail.new).new_record? ? '/pmails/new' : "/pmails/#{@pmail.id}/edit", id: 'pmail-form', multipart: true do |f| %>
 
   <%= partial :'pmails/header', locals: { f: f, organisation: organisation } %>
   <%= partial :'pmails/clicks', locals: { f: f, organisation: organisation } %>
@@ -72,7 +72,7 @@
 
     <%= f.text_block :link_params %>
     <% if !@pmail.sent_at %>
-      <%= f.submit_block destroy_url: "/pmails/#{@pmail.id}/destroy?#{@scope}", button_text: @pmail.new_record? ? 'Save and continue' : 'Save' %>
+      <%= f.submit_block destroy_url: "/pmails/#{@pmail.id}/destroy?#{@scope}", button_text: (@pmail ||= Pmail.new).new_record? ? 'Save and continue' : 'Save' %>
     <% end %>
 
     <% if organisation %>

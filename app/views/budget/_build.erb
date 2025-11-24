@@ -1,4 +1,4 @@
-<% form_for @spend, @spend.new_record? ? "/g/#{@gathering.slug}/spends/new" : "/g/#{@gathering.slug}/spends/#{@spend.id}/edit", class: 'no-trigger' do |f| %>
+<% form_for @spend ||= Spend.new, (@spend ||= Spend.new).new_record? ? "/g/#{@gathering.slug}/spends/new" : "/g/#{@gathering.slug}/spends/#{@spend.id}/edit", class: 'no-trigger' do |f| %>
   <%= f.text_block :item %>
   <%= f.number_block :amount %>
   <%= f.select_block :team_id, options: @gathering.teams.order('name asc').map { |team| [team.name, team.id] } %>

@@ -1,4 +1,4 @@
-<% form_for @inventory_item, @inventory_item.new_record? ? "/g/#{@gathering.slug}/inventory_items/new" : "/g/#{@gathering.slug}/inventory_items/#{@inventory_item.id}/edit", class: 'no-trigger' do |f| %>
+<% form_for @inventory_item ||= InventoryItem.new, (@inventory_item ||= InventoryItem.new).new_record? ? "/g/#{@gathering.slug}/inventory_items/new" : "/g/#{@gathering.slug}/inventory_items/#{@inventory_item.id}/edit", class: 'no-trigger' do |f| %>
   <%= f.text_block :name %>
   <%= f.text_area_block :description %>
   <%= f.select_block :team_id, options: @gathering.teams.order('name asc').map { |team| [team.name, team.id] } %>

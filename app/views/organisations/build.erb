@@ -86,7 +86,7 @@
     </ul>
   </div>
 <% end %>
-<% form_for @organisation, @organisation.new_record? ? '/o/new' : "/o/#{@organisation.slug}/edit" do  |f| %>
+<% form_for @organisation ||= Organisation.new, (@organisation ||= Organisation.new).new_record? ? '/o/new' : "/o/#{@organisation.slug}/edit" do  |f| %>
   <% if @organisation.persisted? %>
     <div class="nav-wrapper">
       <ul id="organisation-build-nav" class="nav nav-tabs" role="tablist">

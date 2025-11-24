@@ -1,4 +1,4 @@
-<% form_for @organisation_tier, @organisation_tier.new_record? ? "/o/#{@organisation.slug}/organisation_tiers/new" : "/o/#{@organisation.slug}/organisation_tiers/#{@organisation_tier.id}/edit" do  |f| %>
+<% form_for @organisation_tier ||= OrganisationTier.new, (@organisation_tier ||= OrganisationTier.new).new_record? ? "/o/#{@organisation.slug}/organisation_tiers/new" : "/o/#{@organisation.slug}/organisation_tiers/#{@organisation_tier.id}/edit" do  |f| %>
   <%= f.text_block :name %>
   <%= f.text_area_block :description %>
   <script>

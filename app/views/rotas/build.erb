@@ -1,4 +1,4 @@
-<h2><%= @rota.new_record? ? 'Create a rota' : 'Edit rota' %></h2>
+<h2><%= (@rota ||= Rota.new).new_record? ? 'Create a rota' : 'Edit rota' %></h2>
 <div class="container">
   <% form_for @rota ||= Rota.new, @rota.new_record? ? "/g/#{@gathering.slug}/rotas/new" : "/g/#{@gathering.slug}/rotas/#{@rota.id}/edit" do |f| %>
     <%= f.text_block :name %>
