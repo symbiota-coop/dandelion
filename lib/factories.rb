@@ -111,11 +111,12 @@ FactoryBot.define do
     last_saved_by factory: :account
 
     transient do
-      ticket_types_count { 3 }
-      price_or_range { 0 }
+      prices { [] }
     end
     after(:create) do |event, evaluator|
-      create_list(:ticket_type, evaluator.ticket_types_count, event: event, price_or_range: evaluator.price_or_range)
+      evaluator.prices.each do |price|
+        create(:ticket_type, event: event, price_or_range: price)
+      end
       event.reload
     end
   end

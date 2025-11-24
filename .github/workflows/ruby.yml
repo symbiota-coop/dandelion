@@ -66,8 +66,8 @@ jobs:
         DEFAULT_CURRENCY: USD
         DEFAULT_TIME_ZONE: Europe/London
         SESSION_SECRET: ${{ github.run_id }}
-        STRIPE_PK: pk_test_hBG6G5aSlQWzUuSesRvMMj3v
-        STRIPE_SK: sk_test_HCthlytw40KUFZ5nWNc0XI6A        
+        STRIPE_PK: pk_test
+        STRIPE_SK: sk_test
         CI: true
         SKIP_TOURS: true
       
