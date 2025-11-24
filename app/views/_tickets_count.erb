@@ -1,31 +1,27 @@
-<script>
-  $(function() {
-    var c = new countUp.CountUp('ticket-count',
-      <%= ENV['CREATE_VIDEO'] ? 200_000 : Ticket.count%>
-    );
-    c.start();
-    var c = new countUp.CountUp('worth-count',
-      <%=
-      if ENV['CREATE_VIDEO']
-       m = Money.new(5_000_000_00,'GBP')
-      else
-       m = Money.new(0,'GBP')
-       Order.and(:value.ne => nil, :currency.in => MAJOR_CURRENCIES).each { |o| begin; m += Money.new(o.value*100, o.currency); rescue; end }
-      end
-      Float("%.3g" % m).to_i
-      %>
-    );
-    c.start();
-  })
-</script>
+<% unless ENV['CREATE_VIDEO'] %>
+  <script>
+    $(function() {
+      var c = new countUp.CountUp('ticket-count', <%= Ticket.count%>);
+      c.start();
+      var c = new countUp.CountUp('worth-count',
+        <%=
+         m = Money.new(0,'GBP')
+         Order.and(:value.ne => nil, :currency.in => MAJOR_CURRENCIES).each { |o| begin; m += Money.new(o.value*100, o.currency); rescue; end }
+         Float("%.3g" % m).to_i
+        %>
+      );
+      c.start();
+    })
+  </script>
+<% end %>
 <img src="/images/tickets.png" style="height: 50px">
 <span class="d-sm-none">
   <br />
 </span>
-<span id="ticket-count" style="text-decoration: underline">0</span> tickets
+<span id="ticket-count" style="text-decoration: underline"><%= ENV['CREATE_VIDEO'] ? '146,196' : 0 %></span> tickets
 <span class="d-sm-none">
   <br />
 </span>
 worth
-£<span id="worth-count" style="text-decoration: underline">0</span>+
+£<span id="worth-count" style="text-decoration: underline"><%= ENV['CREATE_VIDEO'] ? '5,330,000' : 0 %></span>+
 sold

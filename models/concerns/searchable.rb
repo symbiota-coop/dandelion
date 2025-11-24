@@ -2,7 +2,7 @@ module Searchable
   extend ActiveSupport::Concern
 
   class_methods do
-    def search(query, scope = all, child_scope: nil, limit: nil, build_records: false, phrase_boost: 1, include_text_search: false)
+    def search(query, scope = all, child_scope: nil, limit: nil, build_records: false, phrase_boost: 1, include_text_search: false, regex_search: Padrino.env == :development)
       return none if query.blank?
       return none if query.length < 3 || query.length > 200
 
@@ -16,7 +16,7 @@ module Searchable
       # If query is an email address and model has an email field, search only email
       return scope.and(email: query) if query.match?(EMAIL_REGEX) && fields.key?('email')
 
-      if Padrino.env == :development
+      if regex_search
         results = scope.where('$or' => search_fields.map { |field| { field => /#{Regexp.escape(query)}/i } })
         results = results.limit(limit) if limit
         results

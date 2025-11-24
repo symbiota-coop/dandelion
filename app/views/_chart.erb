@@ -24,7 +24,7 @@
           # Build criteria with date range, then use MongoDB aggregation
           range_start = months.first
           range_end = (months.last + 1.month)
-          criteria = countable.where(:created_at.gte => range_start, :created_at.lt => range_end)
+          criteria = countable.and(:created_at.gte => range_start, :created_at.lt => range_end)
 
           # Use aggregation to group by month in a single query
           results = criteria.collection.aggregate([

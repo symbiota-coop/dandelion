@@ -41,7 +41,7 @@ class DandelionTest < ActiveSupport::TestCase
     narrate %(Click 'Tickets', and add some ticket types.), lambda {
       execute_script %{$("a:contains('Add ticket type')").click()}
     }
-    narrate %(Fill in the ticket type name, price and quantity.), lambda {
+    narrate %(Fill in the ticket type name, price and capacity.), lambda {
       fill_in 'event_ticket_types_attributes_0_name', with: @ticket_type.name
       fill_in 'event_ticket_types_attributes_0_price_or_range', with: @ticket_type.price_or_range
       fill_in 'event_ticket_types_attributes_0_quantity', with: @ticket_type.quantity
