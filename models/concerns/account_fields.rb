@@ -127,7 +127,8 @@ module AccountFields
         gc_city: 'City',
         gc_postal_code: 'Post code',
         gc_branch_code: 'Sort code',
-        gc_account_number: 'Account number'
+        gc_account_number: 'Account number',
+        sexuality: 'Orientation'
       }[attr.to_sym] || super
     end
 
