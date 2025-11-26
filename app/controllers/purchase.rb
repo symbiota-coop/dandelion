@@ -5,6 +5,11 @@ Dandelion::App.controller do
     ticketForm = params[:ticketForm]
     detailsForm = params[:detailsForm]
 
+    # Check for required parameters
+    halt 400, { error: 'Missing ticketForm parameter' }.to_json unless ticketForm
+    halt 400, { error: 'Missing detailsForm parameter' }.to_json unless detailsForm
+    halt 400, { error: 'Missing account details in detailsForm' }.to_json unless detailsForm[:account]
+
     account_hash = { name: detailsForm[:account][:name], email: detailsForm[:account][:email], phone: detailsForm[:account][:phone], postcode: detailsForm[:account][:postcode], country: detailsForm[:account][:country] }
     @account = if (account = Account.find_by(email: detailsForm[:account][:email].downcase))
                  account
@@ -29,7 +34,7 @@ Dandelion::App.controller do
       @order = Order.create!(
         event: @event,
         account: @account,
-        currency: (params[:detailsForm][:payment_method] == 'evm' && @event.currency == 'USD' ? 'BREAD' : @event.currency),
+        currency: (detailsForm[:payment_method] == 'evm' && @event.currency == 'USD' ? 'BREAD' : @event.currency),
         organisation_revenue_share: @event.organisation_revenue_share,
         revenue_sharer: (@event.revenue_sharer_organisationship.account if @event.revenue_sharer_organisationship),
         cohost: ticketForm[:cohost],
@@ -53,6 +58,8 @@ Dandelion::App.controller do
         application_fee_paid_to_dandelion: !@event.revenue_sharer_organisationship && @event.donations_to_dandelion?
       )
 
+      halt 400, { error: 'Missing quantities in ticketForm' }.to_json unless ticketForm[:quantities]
+      
       ticketForm[:quantities].each do |ticket_type_id, quantity|
         ticket_type = @event.ticket_types.find(ticket_type_id) || not_found
         quantity.to_i.times do
@@ -75,8 +82,9 @@ Dandelion::App.controller do
 
     begin
       if @order.total > 0
+        halt 400, { error: 'Missing payment_method in detailsForm' }.to_json unless detailsForm[:payment_method]
 
-        case params[:detailsForm][:payment_method]
+        case detailsForm[:payment_method]
         when 'stripe'
 
           Stripe.api_key = if @event.organisation.stripe_connect_json
@@ -94,7 +102,7 @@ Dandelion::App.controller do
 
           stripe_session_hash = {
             customer_email: @account.email,
-            success_url: URI::DEFAULT_PARSER.escape("#{ENV['BASE_URI']}/e/#{@event.slug}?success=true&order_id=#{@order.id}&utm_source=#{params[:detailsForm][:utm_source]}&utm_medium=#{params[:detailsForm][:utm_medium]}&utm_campaign=#{params[:detailsForm][:utm_campaign]}"),
+            success_url: URI::DEFAULT_PARSER.escape("#{ENV['BASE_URI']}/e/#{@event.slug}?success=true&order_id=#{@order.id}&utm_source=#{detailsForm[:utm_source]}&utm_medium=#{detailsForm[:utm_medium]}&utm_campaign=#{detailsForm[:utm_campaign]}"),
             cancel_url: URI::DEFAULT_PARSER.escape("#{ENV['BASE_URI']}/e/#{@event.slug}?cancelled=true"),
             metadata: @order.metadata,
             billing_address_collection: @event.organisation.billing_address_collection? ? 'required' : nil,
@@ -200,7 +208,7 @@ Dandelion::App.controller do
 
           billing_request_flow = client.billing_request_flows.create(
             params: {
-              redirect_uri: URI::DEFAULT_PARSER.escape("#{ENV['BASE_URI']}/e/#{@event.slug}?success=true&order_id=#{@order.id}&utm_source=#{params[:detailsForm][:utm_source]}&utm_medium=#{params[:detailsForm][:utm_medium]}&utm_campaign=#{params[:detailsForm][:utm_campaign]}"),
+              redirect_uri: URI::DEFAULT_PARSER.escape("#{ENV['BASE_URI']}/e/#{@event.slug}?success=true&order_id=#{@order.id}&utm_source=#{detailsForm[:utm_source]}&utm_medium=#{detailsForm[:utm_medium]}&utm_campaign=#{detailsForm[:utm_campaign]}"),
               exit_uri: URI::DEFAULT_PARSER.escape("#{ENV['BASE_URI']}/e/#{@event.slug}?cancelled=true"),
               links: {
                 billing_request: billing_request.id
