@@ -49,7 +49,7 @@ Dandelion::App.controller do
         gc_branch_code: detailsForm[:account][:gc_branch_code],
         gc_account_number: detailsForm[:account][:gc_account_number],
         http_referrer: detailsForm[:account][:http_referrer],
-        answers: (detailsForm[:answers].map { |i, x| [detailsForm[:questions][i], ((x.is_a?(Hash) ? x.values : x) unless x == 'false')] } if detailsForm[:answers] && detailsForm[:questions]),
+        answers: (detailsForm[:answers].map.with_index { |x, i| [detailsForm[:questions][i], ((x.is_a?(Hash) ? x.values : x) unless x == 'false')] } if detailsForm[:answers] && detailsForm[:questions]),
         application_fee_paid_to_dandelion: !@event.revenue_sharer_organisationship && @event.donations_to_dandelion?
       )
 
