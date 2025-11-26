@@ -82,7 +82,7 @@ Dandelion::App.controller do
     webhook_endpoint_secret = @organisation.gocardless_endpoint_secret
     halt 200 unless webhook_endpoint_secret
 
-    request_body = request.body.tap(&:rewind).read
+    request_body = request.body.read
     signature_header = request.env['HTTP_WEBHOOK_SIGNATURE']
     events = GoCardlessPro::Webhook.parse(request_body: request_body, signature_header: signature_header, webhook_endpoint_secret: webhook_endpoint_secret)
 
