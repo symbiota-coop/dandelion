@@ -1,5 +1,5 @@
 # rubocop:disable Lint/Debugger
-$VERBOSE = false
+$VERBOSE = nil
 require File.expand_path('../config/boot', __dir__)
 
 require 'capybara'

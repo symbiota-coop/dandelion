@@ -21,7 +21,7 @@ module OmniAuth
       info { account.info }
 
       def account
-        @account ||= ::Account.authenticate(request['email'], request['password'])
+        @account ||= ::Account.authenticate(request.params['email'], request.params['password'])
       end
     end
   end

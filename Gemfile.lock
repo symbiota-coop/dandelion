@@ -5,6 +5,43 @@ GIT
     will_paginate (4.0.1)
 
 GIT
+  remote: https://github.com/padrino/padrino-framework.git
+  revision: 3e3a1d7c10278669ceeb9cf166fdd11e17dde0a8
+  specs:
+    padrino (0.16.0.pre4)
+      padrino-admin (= 0.16.0.pre4)
+      padrino-cache (= 0.16.0.pre4)
+      padrino-core (= 0.16.0.pre4)
+      padrino-gen (= 0.16.0.pre4)
+      padrino-helpers (= 0.16.0.pre4)
+      padrino-mailer (= 0.16.0.pre4)
+      padrino-support (= 0.16.0.pre4)
+    padrino-admin (0.16.0.pre4)
+      padrino-core (= 0.16.0.pre4)
+      padrino-helpers (= 0.16.0.pre4)
+    padrino-cache (0.16.0.pre4)
+      moneta (~> 1.6)
+      padrino-core (= 0.16.0.pre4)
+      padrino-helpers (= 0.16.0.pre4)
+    padrino-core (0.16.0.pre4)
+      padrino-support (= 0.16.0.pre4)
+      rackup (~> 2.1)
+      sinatra (~> 4)
+      thor (~> 1.0)
+    padrino-gen (0.16.0.pre4)
+      bundler (>= 1.0, < 3)
+      padrino-core (= 0.16.0.pre4)
+    padrino-helpers (0.16.0.pre4)
+      i18n (>= 0.6.7, < 2)
+      padrino-support (= 0.16.0.pre4)
+      tilt (>= 2.1, < 3)
+    padrino-mailer (0.16.0.pre4)
+      mail (~> 2.5)
+      mime-types (>= 3.1, < 4)
+      padrino-core (= 0.16.0.pre4)
+    padrino-support (0.16.0.pre4)
+
+GIT
   remote: https://github.com/prawnpdf/prawn.git
   revision: 1442068706058adb80ea623192b7ae45b344f1fc
   specs:
@@ -15,7 +52,7 @@ GIT
 
 GIT
   remote: https://github.com/q9f/omniauth-ethereum.rb.git
-  revision: ca3e57dce090f59de4d4f0d5eea99e842cbed873
+  revision: 503e27c49bf464ccd813ffc68289b9d72c5e6125
   specs:
     omniauth-ethereum (0.2.1)
       eth (~> 0.5)
@@ -33,7 +70,7 @@ GIT
 
 GIT
   remote: https://github.com/stephenreid321/activate-tools.git
-  revision: 39dda9d57eebe75d9a1ec017e6d6f560ce0ce732
+  revision: 4856297d21d48de75610d0addd241c25f4ca27bc
   specs:
     activate-tools (0.0.25)
       padrino
@@ -48,15 +85,15 @@ GIT
 GEM
   remote: https://rubygems.org/
   specs:
-    actionview (8.0.2.1)
-      activesupport (= 8.0.2.1)
+    actionview (8.0.4)
+      activesupport (= 8.0.4)
       builder (~> 3.1)
       erubi (~> 1.11)
       rails-dom-testing (~> 2.2)
       rails-html-sanitizer (~> 1.6)
-    activemodel (8.0.2.1)
-      activesupport (= 8.0.2.1)
-    activesupport (8.0.2.1)
+    activemodel (8.0.4)
+      activesupport (= 8.0.4)
+    activesupport (8.0.4)
       base64
       benchmark (>= 0.3)
       bigdecimal
@@ -69,8 +106,8 @@ GEM
       securerandom (>= 0.3)
       tzinfo (~> 2.0, >= 2.0.5)
       uri (>= 0.13.1)
-    addressable (2.8.7)
-      public_suffix (>= 2.0.2, < 7.0)
+    addressable (2.8.8)
+      public_suffix (>= 2.0.2, < 8.0)
     airrecord (1.0.12)
       faraday (>= 1.0, < 3.0)
       faraday-net_http_persistent
@@ -81,16 +118,18 @@ GEM
     bcrypt (3.1.20)
     bech32 (1.5.0)
       thor (>= 1.1.0)
-    benchmark (0.4.1)
-    better_html (2.1.1)
-      actionview (>= 6.0)
-      activesupport (>= 6.0)
+    benchmark (0.5.0)
+    better_html (2.2.0)
+      actionview (>= 7.0)
+      activesupport (>= 7.0)
       ast (~> 2.0)
       erubi (~> 1.4)
       parser (>= 2.4)
       smart_properties
-    bigdecimal (3.2.2)
-    bson (5.1.1)
+    bigdecimal (3.3.1)
+    bls12-381 (0.3.0)
+      h2c (~> 0.2.0)
+    bson (5.2.0)
     builder (3.3.0)
     capybara (3.40.0)
       addressable
@@ -107,11 +146,11 @@ GEM
       faraday (~> 2.6)
       multipart-post (~> 2.0)
     concurrent-ruby (1.3.5)
-    connection_pool (2.5.3)
-    countries (8.0.3)
+    connection_pool (2.5.5)
+    countries (8.0.4)
       unaccent (~> 0.3)
     crass (1.0.6)
-    crawler_detect (1.2.7)
+    crawler_detect (1.2.9)
       qonfig (>= 0.24)
     css_parser (1.21.1)
       addressable
@@ -119,13 +158,13 @@ GEM
     cuprite (0.15)
       capybara (~> 3.0)
       ferrum (~> 0.14.0)
-    date (3.4.1)
+    date (3.5.0)
     delayed_job (4.1.13)
       activesupport (>= 3.0, < 9.0)
     delayed_job_mongoid (3.0.0)
       delayed_job (>= 3.0, < 5)
       mongoid (>= 5.0)
-    digest (3.2.0)
+    digest (3.2.1)
     domain_name (0.6.20240107)
     dragonfly (1.4.1)
       addressable (~> 2.3)
@@ -136,10 +175,11 @@ GEM
       dragonfly (~> 1.0)
       fog-aws
     drb (2.2.3)
-    email_address (0.2.6)
+    ecdsa (1.2.0)
+    email_address (0.2.7)
       base64
       simpleidn
-    erb (5.0.2)
+    erb (6.0.0)
     erb_lint (0.9.0)
       activesupport
       better_html (>= 2.0.1)
@@ -148,9 +188,12 @@ GEM
       rubocop (>= 1)
       smart_properties
     erubi (1.13.1)
-    eth (0.5.15)
+    eth (0.5.16)
+      base64 (~> 0.1)
       bigdecimal (~> 3.1)
+      bls12-381 (~> 0.3)
       forwardable (~> 1.3)
+      httpx (~> 1.6)
       keccak (~> 1.3)
       konstructor (~> 1.0)
       openssl (~> 3.3)
@@ -160,18 +203,18 @@ GEM
       money (~> 6.13, >= 6.13.6)
       nokogiri (~> 1.9)
     event_stream_parser (1.0.0)
-    excon (1.3.0)
+    excon (1.3.1)
       logger
-    factory_bot (6.5.5)
+    factory_bot (6.5.6)
       activesupport (>= 6.1.0)
-    faraday (2.13.4)
+    faraday (2.14.0)
       faraday-net_http (>= 2.0, < 3.5)
       json
       logger
     faraday-multipart (1.1.1)
       multipart-post (~> 2.0)
-    faraday-net_http (3.4.1)
-      net-http (>= 0.5.0)
+    faraday-net_http (3.4.2)
+      net-http (~> 0.5)
     faraday-net_http_persistent (2.3.1)
       faraday (~> 2.5)
       net-http-persistent (>= 4.0.4, < 5)
@@ -185,7 +228,7 @@ GEM
     ffi-compiler (1.3.2)
       ffi (>= 1.15.5)
       rake
-    fog-aws (3.33.0)
+    fog-aws (3.33.1)
       base64 (>= 0.2, < 0.4)
       fog-core (~> 2.6)
       fog-json (~> 1.1)
@@ -201,32 +244,37 @@ GEM
     fog-xml (0.1.5)
       fog-core
       nokogiri (>= 1.5.11, < 2.0.0)
-    formatador (1.2.0)
+    formatador (1.2.3)
       reline
     forwardable (1.3.3)
-    geocoder (1.8.5)
+    geocoder (1.8.6)
       base64 (>= 0.1.0)
       csv (>= 3.0.0)
     gocardless_pro (4.2.0)
       faraday (>= 2, < 3)
+    h2c (0.2.1)
+      ecdsa (~> 1.2.0)
     hashie (5.0.0)
-    honeybadger (6.0.6)
+    honeybadger (6.1.3)
       logger
       ostruct
     html_truncator (0.4.2)
       nokogiri (~> 1.5)
-    htmlentities (4.3.4)
+    htmlentities (4.4.2)
+    http-2 (1.1.1)
     http (5.3.1)
       addressable (~> 2.8)
       http-cookie (~> 1.0)
       http-form_data (~> 2.2)
       llhttp-ffi (~> 0.5.0)
-    http-cookie (1.0.8)
+    http-cookie (1.1.0)
       domain_name (~> 0.5)
     http-form_data (2.3.0)
+    httpx (1.6.3)
+      http-2 (>= 1.0.0)
     i18n (1.14.7)
       concurrent-ruby (~> 1.0)
-    icalendar (2.11.2)
+    icalendar (2.12.1)
       base64
       ice_cube (~> 0.16)
       logger
@@ -236,11 +284,11 @@ GEM
       mail (~> 2.4)
       rack
     io-console (0.8.1)
-    irb (1.15.2)
+    irb (1.15.3)
       pp (>= 0.6.0)
       rdoc (>= 4.0.0)
       reline (>= 0.4.2)
-    json (2.13.2)
+    json (2.16.0)
     json-api-vanilla (1.0.4)
     jwt (3.1.2)
       base64
@@ -255,21 +303,22 @@ GEM
     loofah (2.24.1)
       crass (~> 1.0.2)
       nokogiri (>= 1.12.0)
-    mail (2.8.1)
+    mail (2.9.0)
+      logger
       mini_mime (>= 0.1.1)
       net-imap
       net-pop
       net-smtp
-    mailgun-ruby (1.3.9)
+    mailgun-ruby (1.4.0)
       faraday (~> 2.1)
       faraday-multipart (~> 1.1.0)
-      mime-types
+      mini_mime
     matrix (0.4.3)
-    maxmind-db (1.3.2)
-    maxmind-geoip2 (1.3.0)
+    maxmind-db (1.4.0)
+    maxmind-geoip2 (1.4.0)
       connection_pool (~> 2.2)
       http (>= 4.3, < 6.0)
-      maxmind-db (~> 1.2)
+      maxmind-db (~> 1.4)
     mechanize (2.14.0)
       addressable (~> 2.8)
       base64
@@ -286,21 +335,21 @@ GEM
     mime-types (3.7.0)
       logger
       mime-types-data (~> 3.2025, >= 3.2025.0507)
-    mime-types-data (3.2025.0826)
+    mime-types-data (3.2025.0924)
     mini_magick (5.3.1)
       logger
     mini_mime (1.1.5)
     mini_portile2 (2.8.9)
-    minitest (5.25.5)
+    minitest (5.26.2)
     minitest-rg (5.3.0)
       minitest (~> 5.0)
-    moneta (1.1.1)
+    moneta (1.6.0)
     money (6.19.0)
       i18n (>= 0.6.4, <= 2)
-    mongo (2.21.3)
+    mongo (2.22.0)
       base64
       bson (>= 4.14.1, < 6.0.0)
-    mongoid (9.0.7)
+    mongoid (9.0.8)
       activemodel (>= 5.1, < 8.1, != 7.0.0)
       concurrent-ruby (>= 1.0.5, < 2.0)
       mongo (>= 2.18.0, < 3.0.0)
@@ -312,12 +361,12 @@ GEM
     multipart-post (2.4.1)
     mustermann (3.0.4)
       ruby2_keywords (~> 0.0.1)
-    net-http (0.6.0)
-      uri
+    net-http (0.8.0)
+      uri (>= 0.11.1)
     net-http-digest_auth (1.4.1)
     net-http-persistent (4.0.6)
       connection_pool (~> 2.2, >= 2.2.4)
-    net-imap (0.5.10)
+    net-imap (0.5.12)
       date
       net-protocol
     net-pop (0.1.2)
@@ -326,26 +375,27 @@ GEM
       timeout
     net-smtp (0.5.1)
       net-protocol
-    nio4r (2.7.4)
+    nio4r (2.7.5)
     nkf (0.2.0)
-    nokogiri (1.18.9)
+    nokogiri (1.18.10)
       mini_portile2 (~> 2.8.2)
       racc (~> 1.4)
-    nokogiri (1.18.9-arm64-darwin)
+    nokogiri (1.18.10-arm64-darwin)
       racc (~> 1.4)
-    oauth2 (2.0.12)
+    oauth2 (2.0.18)
       faraday (>= 0.17.3, < 4.0)
       jwt (>= 1.0, < 4.0)
       logger (~> 1.2)
       multi_xml (~> 0.5)
       rack (>= 1.2, < 4)
       snaky_hash (~> 2.0, >= 2.0.3)
-      version_gem (>= 1.1.8, < 3)
+      version_gem (~> 1.1, >= 1.1.9)
     octokit (10.0.0)
       faraday (>= 1, < 3)
       sawyer (~> 0.9)
-    omniauth (2.1.3)
+    omniauth (2.1.4)
       hashie (>= 3.4.6)
+      logger
       rack (>= 2.2.3)
       rack-protection
     omniauth-google-oauth2 (1.2.1)
@@ -356,49 +406,18 @@ GEM
     omniauth-oauth2 (1.8.0)
       oauth2 (>= 1.4, < 3)
       omniauth (~> 2.0)
-    openssl (3.3.0)
+    openssl (3.3.2)
     ostruct (0.6.3)
-    padrino (0.15.3)
-      padrino-admin (= 0.15.3)
-      padrino-cache (= 0.15.3)
-      padrino-core (= 0.15.3)
-      padrino-gen (= 0.15.3)
-      padrino-helpers (= 0.15.3)
-      padrino-mailer (= 0.15.3)
-      padrino-support (= 0.15.3)
-    padrino-admin (0.15.3)
-      padrino-core (= 0.15.3)
-      padrino-helpers (= 0.15.3)
-    padrino-cache (0.15.3)
-      moneta (~> 1.1.0)
-      padrino-core (= 0.15.3)
-      padrino-helpers (= 0.15.3)
-    padrino-core (0.15.3)
-      padrino-support (= 0.15.3)
-      sinatra (>= 2.2.4)
-      thor (~> 1.0)
-    padrino-gen (0.15.3)
-      bundler (>= 1.0, < 3)
-      padrino-core (= 0.15.3)
-    padrino-helpers (0.15.3)
-      i18n (>= 0.6.7, < 2)
-      padrino-support (= 0.15.3)
-      tilt (>= 1.4.1, < 3)
-    padrino-mailer (0.15.3)
-      mail (~> 2.5)
-      mime-types (< 4)
-      padrino-core (= 0.15.3)
-    padrino-support (0.15.3)
     parallel (1.27.0)
-    parser (3.3.9.0)
+    parser (3.3.10.0)
       ast (~> 2.4.1)
       racc
     patreon (0.5.0)
       json-api-vanilla (~> 1.0.1)
       rack
     pdf-core (0.10.0)
-    pkg-config (1.6.2)
-    pp (0.6.2)
+    pkg-config (1.6.4)
+    pp (0.6.3)
       prettyprint
     prawn-qrcode (0.5.2)
       prawn (>= 1)
@@ -410,24 +429,29 @@ GEM
       css_parser (>= 1.19.0)
       htmlentities (>= 4.0.0)
     prettyprint (0.2.0)
-    prism (1.4.0)
+    prism (1.6.0)
     psych (5.2.6)
       date
       stringio
-    public_suffix (6.0.2)
-    puma (6.6.1)
+    public_suffix (7.0.0)
+    puma (7.1.0)
       nio4r (~> 2.0)
     qonfig (0.30.0)
       base64 (>= 0.2)
     racc (1.8.1)
-    rack (2.2.17)
-    rack-attack (6.7.0)
+    rack (3.2.4)
+    rack-attack (6.8.0)
       rack (>= 1.0, < 4)
-    rack-cors (2.0.2)
-      rack (>= 2.0.0)
-    rack-protection (3.2.0)
+    rack-cors (3.0.0)
+      logger
+      rack (>= 3.0.14)
+    rack-protection (4.2.1)
       base64 (>= 0.1.0)
-      rack (~> 2.2, >= 2.2.4)
+      logger (>= 1.6.0)
+      rack (>= 3.0.0, < 4)
+    rack-session (2.1.1)
+      base64 (>= 0.1.0)
+      rack (>= 3.0.0)
     rack-test (2.2.0)
       rack (>= 1.3)
     rack-utf8_sanitizer (1.10.1)
@@ -435,6 +459,8 @@ GEM
     rack_session_access (0.2.0)
       builder (>= 2.0.0)
       rack (>= 1.0.0)
+    rackup (2.2.1)
+      rack (>= 3)
     rails-dom-testing (2.3.0)
       activesupport (>= 5.0.0)
       minitest
@@ -443,7 +469,7 @@ GEM
       loofah (~> 2.21)
       nokogiri (>= 1.15.7, != 1.16.7, != 1.16.6, != 1.16.5, != 1.16.4, != 1.16.3, != 1.16.2, != 1.16.1, != 1.16.0.rc1, != 1.16.0)
     rainbow (3.1.1)
-    rake (13.3.0)
+    rake (13.3.1)
     rb-fsevent (0.11.2)
     rb-inotify (0.11.1)
       ffi (~> 1.0)
@@ -451,19 +477,20 @@ GEM
       mini_portile2 (~> 2.8)
       pkg-config (~> 1.5)
       rubyzip (~> 2.3)
-    rdoc (6.14.2)
+    rdoc (6.16.0)
       erb
       psych (>= 4.0.0)
+      tsort
     redcarpet (3.6.1)
-    regexp_parser (2.11.2)
-    reline (0.6.2)
+    regexp_parser (2.11.3)
+    reline (0.6.3)
       io-console (~> 0.5)
     rinku (2.0.6)
     rqrcode (3.1.0)
       chunky_png (~> 1.0)
       rqrcode_core (~> 2.0)
     rqrcode_core (2.0.0)
-    rubocop (1.80.0)
+    rubocop (1.81.7)
       json (~> 2.3)
       language_server-protocol (~> 3.17.0.2)
       lint_roller (~> 1.1.0)
@@ -471,13 +498,13 @@ GEM
       parser (>= 3.3.0.2)
       rainbow (>= 2.2.2, < 4.0)
       regexp_parser (>= 2.9.3, < 3.0)
-      rubocop-ast (>= 1.46.0, < 2.0)
+      rubocop-ast (>= 1.47.1, < 2.0)
       ruby-progressbar (~> 1.7)
       unicode-display_width (>= 2.4.0, < 4.0)
-    rubocop-ast (1.46.0)
+    rubocop-ast (1.48.0)
       parser (>= 3.3.7.2)
       prism (~> 1.4)
-    ruby-openai (8.2.0)
+    ruby-openai (8.3.0)
       event_stream_parser (>= 0.3.0, < 2.0.0)
       faraday (>= 1)
       faraday-multipart (>= 1)
@@ -494,7 +521,7 @@ GEM
     sass-listen (4.0.0)
       rb-fsevent (~> 0.9, >= 0.9.4)
       rb-inotify (~> 0.9, >= 0.9.7)
-    sawyer (0.9.2)
+    sawyer (0.9.3)
       addressable (>= 2.3.5)
       faraday (>= 0.17.3, < 3)
     scrypt (3.1.0)
@@ -502,24 +529,27 @@ GEM
       rake (~> 13)
     securerandom (0.4.1)
     simpleidn (0.2.3)
-    sinatra (3.2.0)
+    sinatra (4.2.1)
+      logger (>= 1.6.0)
       mustermann (~> 3.0)
-      rack (~> 2.2, >= 2.2.4)
-      rack-protection (= 3.2.0)
+      rack (>= 3.0.0, < 4)
+      rack-protection (= 4.2.1)
+      rack-session (>= 2.0.0, < 3)
       tilt (~> 2.0)
     smart_properties (1.17.0)
     snaky_hash (2.0.3)
       hashie (>= 0.1.0, < 6)
       version_gem (>= 1.1.8, < 3)
-    stringio (3.1.7)
-    stripe (15.4.0)
+    stringio (3.1.8)
+    stripe (18.0.1)
     strong_password (0.0.10)
     thor (1.4.0)
     tilt (2.6.1)
-    timeout (0.4.3)
+    timeout (0.4.4)
     timezone (1.3.29)
       base64 (~> 0.2)
       ostruct (~> 0.6)
+    tsort (0.2.0)
     ttfunk (1.8.0)
       bigdecimal (~> 3.1)
     tzinfo (2.0.6)
@@ -527,11 +557,11 @@ GEM
     tzinfo-data (1.2025.2)
       tzinfo (>= 1.0.0)
     unaccent (0.4.0)
-    unicode-display_width (3.1.5)
-      unicode-emoji (~> 4.0, >= 4.0.4)
-    unicode-emoji (4.0.4)
-    uri (1.0.3)
-    version_gem (1.1.8)
+    unicode-display_width (3.2.0)
+      unicode-emoji (~> 4.1)
+    unicode-emoji (4.1.0)
+    uri (1.1.1)
+    version_gem (1.1.9)
     webrick (1.9.1)
     webrobots (0.1.2)
     websocket-driver (0.7.7)
@@ -596,14 +626,14 @@ DEPENDENCIES
   omniauth
   omniauth-ethereum!
   omniauth-google-oauth2
-  padrino
+  padrino!
   patreon
   prawn!
   prawn-qrcode
   prawn-table
   premailer
   puma
-  rack (~> 2.0)
+  rack
   rack-attack
   rack-cors
   rack-utf8_sanitizer
@@ -625,7 +655,7 @@ DEPENDENCIES
   yt
 
 RUBY VERSION
-   ruby 3.2.8p263
+   ruby 3.4.7p58
 
 BUNDLED WITH
    2.4.19

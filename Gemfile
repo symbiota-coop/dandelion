@@ -1,11 +1,11 @@
 source 'https://rubygems.org'
 
-ruby '3.2.8'
+ruby '3.4.7'
 gem 'activesupport'
 gem 'irb'
-gem 'padrino'
+gem 'padrino', github: 'padrino/padrino-framework'
 gem 'puma'
-gem 'rack', '~> 2.0' # until padrino 0.16
+gem 'rack'
 gem 'rake'
 gem 'sass'
 gem 'sinatra'
