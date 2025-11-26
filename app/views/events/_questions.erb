@@ -7,7 +7,9 @@ end
 %>
 
 <% questions_a.each_with_index { |q,i| %>
-<%= hidden_field_tag "questions[#{i}]", value: q %>
+<% unless defined?(questions) %>
+  <%= hidden_field_tag "questions[#{i}]", value: q %>
+<% end %>
 <div class="form-group links-blank">
   <% if q =~ /^#\s*(.+)/ %>
     <% match = $1 %>
