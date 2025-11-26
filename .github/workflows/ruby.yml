@@ -52,6 +52,10 @@ jobs:
     - name: Run RuboCop
       run: bundle exec rubocop --fail-level warning --display-only-fail-level-offenses
 
+    - name: Generate session secret
+      id: session-secret
+      run: echo "secret=$(openssl rand -hex 32)" >> $GITHUB_OUTPUT
+
     - name: Run test (${{ matrix.test_file }})
       uses: nick-fields/retry@v3
       with:
@@ -65,7 +69,7 @@ jobs:
         DOMAIN: dandelion.events
         DEFAULT_CURRENCY: USD
         DEFAULT_TIME_ZONE: Europe/London
-        SESSION_SECRET: ${{ github.run_id }}
+        SESSION_SECRET: ${{ steps.session-secret.outputs.secret }}
         STRIPE_PK: pk_test
         STRIPE_SK: sk_test
         CI: true
