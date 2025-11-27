@@ -667,10 +667,4 @@ Dandelion::App.controller do
     @event.set(hidden_from_homepage: false)
     200
   end
-
-  get '/events/:id/checked_in' do
-    @event = Event.find(params[:id]) || not_found
-    event_admins_only!
-    partial :'events/checked_in', locals: { event: @event }
-  end
 end
