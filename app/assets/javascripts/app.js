@@ -27,8 +27,7 @@ $.fn.serializeObject = function () {
     for (let i = 0; i < keys.length - 1; i++) {
       const key = keys[i]
       if (!(key in current)) {
-        // Check if next key is numeric for array
-        current[key] = /^\d+$/.test(keys[i + 1]) ? [] : {}
+        current[key] = {}
       }
       current = current[key]
     }
