@@ -40,6 +40,7 @@ Dandelion::App.controller do
       else
         ticket.set(checked_in: false)
       end
+      @event.clear_cache
       ticket.account ? ticket.account.name : ''
     end
   end
