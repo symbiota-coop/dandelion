@@ -31,9 +31,4 @@ Dandelion::App.controller do
     @film = Film.all(filter: "{Slug} = '#{params[:slug]}'").first || not_found
     redirect @film['Images'].first['url']
   end
-
-  get '/treasure-map' do
-    @title = 'Treasure Map'
-    erb :treasure_map
-  end
 end
