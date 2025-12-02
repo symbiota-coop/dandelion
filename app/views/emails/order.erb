@@ -3,5 +3,14 @@
   <p>
     <%= account.name %> booked onto <%= order.original_description %>
   </p>
+  <% if order.answers.any? { |q, a| q && a } %>
+    <% order.answers.each { |q, a| if q && a %>
+    <p>
+      <% question_text = [Order::SELECT_FIELD_REGEX, Order::MULTIPLE_CHECKBOX_FIELD_REGEX, Order::CHECKBOX_FIELD_REGEX, Order::DATE_FIELD_REGEX].inject(nil) { |r, regex| r || q.match(regex)&.dig(1) } || q %>
+      <strong><%== Sanitize.fragment(Rinku.auto_link(question_text), Sanitize::Config::DANDELION) %></strong><br>
+      <%== Sanitize.fragment(Rinku.auto_link(a), Sanitize::Config::DANDELION) %>
+    </p>
+    <% } end %>
+  <% end %>
   <p><a href="<%= ENV['BASE_URI'] %>/events/<%=event.id%>/orders?sign_in_token=%recipient.token%">View all orders</a></p>
 </div>
