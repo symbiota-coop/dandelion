@@ -327,32 +327,36 @@ class Order
   def sign_up_to_gocardless
     if GOCARDLESS_FIELDS.map { |f| send(f) }.all?(&:present?)
 
-      f = Ferrum::Browser.new
-      f.go_to("https://pay.gocardless.com/#{gc_plan_id}")
-      sleep 5
-      f.at_css('#given_name').focus.type(gc_given_name)
-      f.at_css('#family_name').focus.type(gc_family_name)
-      f.at_css('#email').focus.type(account.email)
-      # f.screenshot(path: 'screenshot1.png')
-      f.css('form button[type=button]').last.scroll_into_view.click
-      sleep 5
-      f.at_css('#address_line1').focus.type(gc_address_line1)
-      f.at_css('#city').focus.type(gc_city)
-      f.at_css('#postal_code').focus.type(gc_postal_code)
-      # f.screenshot(path: 'screenshot2.png')
-      f.at_css('form button[type=submit]').scroll_into_view.click
-      sleep 5
-      f.at_css('#branch_code').focus.type(gc_branch_code)
-      f.at_css('#account_number').focus.type(gc_account_number)
-      # f.screenshot(path: 'screenshot3.png')
-      f.at_css('form button[type=submit]').scroll_into_view.click
-      sleep 5
-      # f.screenshot(path: 'screenshot4.png')
-      f.at_css('button[type=submit]').scroll_into_view.click
-      # sleep 5
-      # f.screenshot(path: 'screenshot5.png')
-      GOCARDLESS_FIELDS.each { |f| set(f => nil) }
-      set(gc_success: true)
+      browser = Ferrum::Browser.new
+      begin
+        browser.go_to("https://pay.gocardless.com/#{gc_plan_id}")
+        sleep 5
+        browser.at_css('#given_name').focus.type(gc_given_name)
+        browser.at_css('#family_name').focus.type(gc_family_name)
+        browser.at_css('#email').focus.type(account.email)
+        # browser.screenshot(path: 'screenshot1.png')
+        browser.css('form button[type=button]').last.scroll_into_view.click
+        sleep 5
+        browser.at_css('#address_line1').focus.type(gc_address_line1)
+        browser.at_css('#city').focus.type(gc_city)
+        browser.at_css('#postal_code').focus.type(gc_postal_code)
+        # browser.screenshot(path: 'screenshot2.png')
+        browser.at_css('form button[type=submit]').scroll_into_view.click
+        sleep 5
+        browser.at_css('#branch_code').focus.type(gc_branch_code)
+        browser.at_css('#account_number').focus.type(gc_account_number)
+        # browser.screenshot(path: 'screenshot3.png')
+        browser.at_css('form button[type=submit]').scroll_into_view.click
+        sleep 5
+        # browser.screenshot(path: 'screenshot4.png')
+        browser.at_css('button[type=submit]').scroll_into_view.click
+        # sleep 5
+        # browser.screenshot(path: 'screenshot5.png')
+        GOCARDLESS_FIELDS.each { |f| set(f => nil) }
+        set(gc_success: true)
+      ensure
+        browser.quit # Clean up Chrome temp files
+      end
     else
       GOCARDLESS_FIELDS.each { |f| set(f => nil) }
       nil
