@@ -1,5 +1,5 @@
 Dandelion::App.controller do
-  get '/events', provides: %i[html ics json] do
+  get '/events', provides: %i[html hxml ics json] do
     @events = Event.live.public.browsable
     @from = params[:from] ? parse_date(params[:from]) : Date.today
     @to = params[:to] ? parse_date(params[:to]) : nil
@@ -29,7 +29,7 @@ Dandelion::App.controller do
     @events = @events.and(hidden_from_homepage: false) if params[:home]
     @events = @events.and(has_image: true) if params[:images]
     case content_type
-    when :html
+    when :html, :hxml
       @events = @events.future(@from)
       @events = @events.and(:start_time.lt => @to + 1) if @to
       @events = @events.and(:id.in => Event.search(params[:q], @events).pluck(:id)) if params[:q]
@@ -46,6 +46,8 @@ Dandelion::App.controller do
       end
       if request.xhr?
         partial :'events/events'
+      elsif params[:hp]
+        hyperview_partial :'events/events'
       else
         erb :'events/events'
       end
@@ -166,7 +168,7 @@ Dandelion::App.controller do
     end
   end
 
-  get '/e/:slug', provides: %i[html ics json] do
+  get '/e/:slug', provides: %i[html hxml ics json] do
     session[:via] = params[:via] if params[:via]
     session[:return_to] = request.url
     @event = Event.find_by(slug: params[:slug])
@@ -216,6 +218,8 @@ Dandelion::App.controller do
         @body_class = 'greyed'
         erb :'events/event'
       end
+    when :hxml
+      hyperview :'events/event'
     when :json
       {
         name: @event.name,

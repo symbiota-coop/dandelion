@@ -40,6 +40,8 @@ module Dandelion
     set :default_builder, 'ActivateFormBuilder'
     set :protection, except: :frame_options
 
+    mime_type :hxml, 'application/vnd.hyperview+xml'
+
     before do
       @cachebuster = Padrino.env == :development ? SecureRandom.uuid : (ENV['RENDER_GIT_COMMIT'] || ENV['HEROKU_SLUG_COMMIT'])
       redirect "#{ENV['BASE_URI']}#{request.path}#{"?#{request.query_string}" unless request.query_string.blank?}" if ENV['REDIRECT_BASE'] && ENV['BASE_URI'] && (ENV['BASE_URI'] != "#{request.scheme}://#{request.env['HTTP_HOST']}")
@@ -130,7 +132,15 @@ module Dandelion
         @events_search_order = 'trending'
         @no_content_padding_bottom = true
         @accounts = []
-        erb :home_not_signed_in
+        if hyperview_request?
+          if params[:initialized]
+            hyperview :home_not_signed_in
+          else
+            hyperview :hyperview_init
+          end
+        else
+          erb :home_not_signed_in
+        end
       end
     end
 

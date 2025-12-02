@@ -1,0 +1,14 @@
+<view xmlns="https://hyperview.org/hyperview">
+  <% @events.each do |event| %>
+    <view style="EventCard" href="/e/<%= event.slug %>.hxml" action="push">
+      <% if event.image %>
+        <image style="EventImage" source="<%= event.image.thumb('992x992').url %>"></image>
+      <% end %>
+      <view style="EventContent">
+        <text style="EventTitle"><%= event.name %></text>
+        <text style="EventDate"><%= when_details(event) %></text>
+        <text style="EventLocation"><%= event.location %></text>
+      </view>
+    </view>
+  <% end %>
+</view>

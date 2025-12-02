@@ -1,0 +1,19 @@
+<screen>
+  <styles>
+    <%= hyperview_styles :main %>
+  </styles>
+
+  <body style="Body" scroll="true">
+    <behavior trigger="refresh" action="reload"></behavior>
+
+    <view style="EventsSection">
+      <view id="events-list">
+        <behavior trigger="load" once="true" action="replace-inner" href="/events.hxml?hp=1"></behavior>
+        <view style="SpinnerContainer">
+          <spinner color="#6C63FF"></spinner>
+        </view>
+      </view>
+    </view>
+
+  </body>
+</screen>

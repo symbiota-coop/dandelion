@@ -1,0 +1,46 @@
+<!-- Event Details -->
+<view style="EventDetails">
+  <!-- Date & Time -->
+  <view style="EventDetailRow">
+    <image style="CalendarDateImage" source="<%= ENV['BASE_URI'] %>/images/icons/calendar/png/<%= @event.start_time.strftime('%b').downcase %>_<%= @event.start_time.strftime('%d') %>.png"></image>
+    <view style="EventDetailContent">
+      <% when_parts = when_details(@event, with_zone: true).split(', ') %>
+      <text style="EventDetailPrimary"><%= when_parts[0] %></text>
+      <text style="EventDetailSecondary"><%= when_parts[1..-1].join(', ') %></text>
+      <% if @event.event_sessions.exists? %>
+        <view style="SessionBadge">
+          <text style="SessionBadgeText"><%= pluralize @event.event_sessions.count, 'session' %></text>
+        </view>
+      <% end %>
+    </view>
+  </view>
+
+  <!-- Location -->
+  <view style="EventDetailRow">
+    <% if @event.location == 'Online' %>
+      <image style="EventDetailIconImage" source="<%= ENV['BASE_URI'] %>/images/icons/image/image-camera-video.png"></image>
+    <% else %>
+      <image style="EventDetailIconImage" source="<%= ENV['BASE_URI'] %>/images/icons/image/image-geo-alt.png"></image>
+    <% end %>
+    <view style="EventDetailContent">
+      <% if @event.location == 'Online' %>
+        <text style="EventDetailPrimary">Online</text>
+      <% elsif @event.location =~ URI::regexp %>
+        <text style="EventDetailPrimary EventDetailLink" href="<%= @event.location %>" action="deep-link"><%= @event.location %></text>
+      <% else %>
+        <text style="EventDetailPrimary EventDetailLink" href="https://www.google.com/maps?q=<%= ERB::Util.url_encode(@event.location) %>" action="deep-link"><%= @event.location %></text>
+      <% end %>
+    </view>
+  </view>
+
+  <!-- Tags -->
+  <% if @event.event_tags.exists? %>
+    <view style="EventTagsRow">
+      <% @event.event_tagships.includes(:event_tag).each do |event_tagship| %>
+        <view style="EventTag">
+          <text style="EventTagText"><%= event_tagship.event_tag.name %></text>
+        </view>
+      <% end %>
+    </view>
+  <% end %>
+</view>

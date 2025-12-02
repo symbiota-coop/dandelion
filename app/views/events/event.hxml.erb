@@ -1,0 +1,28 @@
+<screen>
+  <styles>
+    <%= hyperview_styles :main %>
+    <%= hyperview_styles :events %>
+  </styles>
+
+  <body style="Body" scroll="true">
+    <behavior trigger="refresh" action="reload"></behavior>
+
+    <!-- Event Image -->
+    <% if @event_image %>
+      <image style="EventDetailImage" source="<%= @event_image.url %>"></image>
+    <% end %>
+
+    <!-- Event Header -->
+    <view style="EventDetailHeader">
+      <text style="EventDetailTitle"><%= @event.name %></text>
+    </view>
+
+    <%= hyperview_partial :'events/details' %>
+
+    <%= hyperview_partial :'events/info_table' %>
+
+    <!-- Footer Padding -->
+    <view style="FooterPadding"></view>
+
+  </body>
+</screen>

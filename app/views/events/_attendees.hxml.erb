@@ -1,0 +1,36 @@
+<% 
+  image_accounts = @event.public_attendees.and(has_image: true).and(hidden: false)
+  image_accounts_count = image_accounts.count
+  no_image_accounts = @event.attendees.and(:id.nin => image_accounts.pluck(:id))
+  others_count = no_image_accounts.count + (@event.tickets.complete.and(:email.ne => nil).pluck(:email).map(&:downcase) - @event.attendees.pluck(:email).map(&:downcase)).length
+%>
+<% if !@event.hide_attendees? && @event.organisation && (image_accounts_count + others_count) > 0 %>
+  <!-- Attending -->
+  <view style="InfoTableRow">
+    <text style="InfoTableLabel">Attending</text>
+    <view style="InfoTableValue">
+      <view style="AttendeeImageWall">
+        <% image_accounts.limit(8).each do |account| %>
+          <image style="AttendeeAvatar" source="<%= account.image.thumb('100x100#').url %>"></image>
+        <% end %>
+      </view>
+      <% if others_count > 0 %>
+        <text style="InfoTableText">
+          <% if image_accounts_count == 0 %>
+            <% if others_count < 10 %>
+              &lt; 10 people
+            <% else %>
+              <%= others_count %>+ people
+            <% end %>
+          <% else %>
+            <% if others_count < 10 %>
+              + others
+            <% else %>
+              + <%= others_count %> people
+            <% end %>
+          <% end %>
+        </text>
+      <% end %>
+    </view>
+  </view>
+<% end %>

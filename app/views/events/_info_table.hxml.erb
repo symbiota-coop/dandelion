@@ -1,0 +1,93 @@
+<!-- Info Table -->
+<view style="InfoTable">
+  <!-- Hosted by -->
+  <view style="InfoTableRow">
+    <text style="InfoTableLabel"><%= (@event.purchase_url || (@event.organiser && @event.organisation && @event.organisation.experimental?) || @event.revenue_sharer) ? 'Promoted by' : 'Hosted by' %></text>
+    <view style="InfoTableValue">
+      <view style="InfoTableOrgRow" href="/o/<%= @event.organisation.slug %>.hxml" action="push">
+        <% if @event.organisation.image %>
+          <image style="InfoTableOrgImage" source="<%= @event.organisation.image.thumb('100x100#').url %>"></image>
+        <% end %>
+        <text style="InfoTableLink"><%= @event.organisation.name %></text>
+      </view>
+      <% @event.cohosts.order('name asc').each do |cohost| %>
+        <view style="InfoTableOrgRow CoHostRow" href="/o/<%= cohost.slug %>.hxml" action="push">
+          <% if cohost.image %>
+            <image style="InfoTableOrgImage" source="<%= cohost.image.thumb('100x100#').url %>"></image>
+          <% end %>
+          <text style="InfoTableLink"><%= cohost.name %></text>
+        </view>
+      <% end %>
+    </view>
+  </view>
+
+  <% if @event.activity && @event.activity.name != @event.organisation.name %>
+    <!-- Activity -->
+    <view style="InfoTableRow">
+      <text style="InfoTableLabel">Activity</text>
+      <view style="InfoTableValue">
+        <text style="InfoTableLink"><%= @event.activity.name %></text>
+      </view>
+    </view>
+  <% end %>
+
+  <% if @event.local_group %>
+    <!-- Local group -->
+    <view style="InfoTableRow">
+      <text style="InfoTableLabel">Local group</text>
+      <view style="InfoTableValue">
+        <text style="InfoTableLink"><%= @event.local_group.name %></text>
+      </view>
+    </view>
+  <% end %>
+
+  <% if @event.event_facilitations.exists? %>
+    <!-- Facilitators -->
+    <view style="InfoTableRow">
+      <text style="InfoTableLabel">Facilitators</text>
+      <view style="InfoTableValue">
+        <view style="AttendeeImageWall">
+          <% @event.event_facilitators.order('name asc').each do |account| %>
+            <% if account.image %>
+              <image style="AttendeeAvatar" source="<%= account.image.thumb('100x100#').url %>"></image>
+            <% end %>
+          <% end %>
+        </view>
+      </view>
+    </view>
+  <% end %>
+
+  <%= hyperview_partial :'events/attendees' %>
+
+  <% if @event.facebook_event_url %>
+    <!-- Facebook event -->
+    <view style="InfoTableRow" href="<%= @event.facebook_event_url %>" action="deep-link">
+      <text style="InfoTableLabel">Facebook event</text>
+      <view style="InfoTableValue">
+        <text style="InfoTableLink">📘</text>
+      </view>
+    </view>
+  <% end %>
+
+  <% if @event.email %>
+    <!-- Enquiries to -->
+    <view style="InfoTableRow" href="mailto:<%= @event.email %>" action="deep-link">
+      <text style="InfoTableLabel">Enquiries to</text>
+      <view style="InfoTableValue">
+        <text style="InfoTableLink"><%= @event.email %></text>
+      </view>
+    </view>
+  <% end %>
+
+  <%= hyperview_partial :'events/add_to_calendar', locals: { event: @event } %>
+
+  <% unless @event.secret? %>
+    <!-- QR code -->
+    <view style="InfoTableRow">
+      <text style="InfoTableLabel">QR code</text>
+      <view style="InfoTableValue">
+        <image style="InfoTableQR" source="<%= ENV['BASE_URI'] %>/qr?url=<%= ENV['BASE_URI'] %>/e/<%= @event.slug %>"></image>
+      </view>
+    </view>
+  <% end %>
+</view>
