@@ -1,11 +1,7 @@
 namespace :hourly do
   task errands: :environment do
     puts 'clean up old temp files'
-    Dir.glob('/tmp/*').each do |f|
-      File.delete(f) if File.file?(f) && File.mtime(f) < 1.hour.ago
-    rescue StandardError
-      nil
-    end
+    system('find /tmp -maxdepth 1 -type f -mmin +60 -delete 2>/dev/null')
     puts 'delete stale uncompleted orders'
     Order.incomplete.and(:created_at.lt => 1.hour.ago).destroy_all
     puts 'update monthly contributions current month'
