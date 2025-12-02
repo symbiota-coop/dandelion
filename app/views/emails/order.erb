@@ -6,7 +6,7 @@
   <% if order.answers.any? { |q, a| q && a } %>
     <% order.answers.each { |q, a| if q && a %>
     <p>
-      <% question_text = [Order::SELECT_FIELD_REGEX, Order::MULTIPLE_CHECKBOX_FIELD_REGEX, Order::CHECKBOX_FIELD_REGEX, Order::DATE_FIELD_REGEX].inject(nil) { |r, regex| r || q.match(regex)&.dig(1) } || q %>
+      <% question_text = [Order::SELECT_FIELD_REGEX, Order::MULTIPLE_CHECKBOX_FIELD_REGEX, Order::CHECKBOX_FIELD_REGEX, Order::DATE_FIELD_REGEX].inject(nil) { |r, regex| r || q.match(regex)&.[](1) } || q %>
       <strong><%= question_text %></strong><br>
     </p>
     <p>
