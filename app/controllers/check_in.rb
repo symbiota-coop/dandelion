@@ -40,7 +40,6 @@ Dandelion::App.controller do
       else
         ticket.set(checked_in: false)
       end
-      Fragment.and(key: %r{^/events/#{@event.id}/stats_row}).delete_all
       ticket.account ? ticket.account.name : ''
     end
   end
