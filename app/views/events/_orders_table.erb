@@ -212,10 +212,8 @@
         </p>
         <p style="width: 400px">
           <% if m = q.match(Order::SELECT_FIELD_REGEX) %>
-            <% # Select field answer: show the selected value %>
             <%== Sanitize.fragment(Rinku.auto_link(a), Sanitize::Config::DANDELION) %>
           <% elsif q =~ Order::MULTIPLE_CHECKBOX_FIELD_REGEX %>
-            <% # Select field answer: show the selected value %>
             <%= a.map { |v| Sanitize.fragment(Rinku.auto_link(v), Sanitize::Config::DANDELION) }.join(', ') %>
           <% elsif q =~ /\[.*\]/ %>
             <% # Checkbox answer: show checkmark %>
