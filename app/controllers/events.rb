@@ -47,6 +47,7 @@ Dandelion::App.controller do
       if request.xhr?
         partial :'events/events'
       elsif params[:hp]
+        @events = @events.limit(10)
         hyperview_partial :'events/events'
       else
         erb :'events/events'
