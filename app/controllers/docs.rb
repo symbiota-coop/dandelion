@@ -16,9 +16,7 @@ Dandelion::App.controller do
     batch_message.body_text "#{params[:question]}\n\nAccount: #{ENV['BASE_URI']}/u/#{current_account.username}\nEmail: #{current_account.email}"
     batch_message.reply_to current_account.email
 
-    Account.and(admin: true).each do |account|
-      batch_message.add_recipient(:to, account.email, { 'firstname' => account.firstname || 'there', 'token' => account.sign_in_token, 'id' => account.id.to_s })
-    end
+    batch_message.add_recipient(:to, ENV['FOUNDER_EMAIL'])
 
     batch_message.finalize if Padrino.env == :production
 
