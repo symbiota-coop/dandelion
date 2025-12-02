@@ -116,7 +116,7 @@ $(function () {
   }
 
   function loadEmptyPagelets () {
-    $('[data-pagelet-url]').each(function () {
+    $('[data-pagelet-url]:not([data-pagelet-loaded])').each(function () {
       const rawPagelet = this
       const placeholder = $(rawPagelet)[0].hasAttribute('data-with-placeholder')
       if ($(rawPagelet).html().length == 0 || placeholder) {
@@ -131,6 +131,7 @@ $(function () {
             $(rawPagelet).html('<i class="pagelet-loading bi bi-spin bi-slash-lg"></i>')
           }
         }
+        $(rawPagelet).attr('data-pagelet-loaded', 'true')
         $(rawPagelet).load($(rawPagelet).attr('data-pagelet-url'))
       }
     })
