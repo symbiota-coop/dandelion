@@ -31,6 +31,11 @@ Dandelion::App.controller do
     end
 
     content_type 'image/jpeg'
-    result.to_blob
+    blob = result.to_blob
+
+    # Clean up temp files (only remote images, not local overlay)
+    [base_image, result].each { |img| img.destroy! if img.respond_to?(:destroy!) }
+
+    blob
   end
 end

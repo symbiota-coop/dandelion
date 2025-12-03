@@ -1,5 +1,7 @@
 namespace :hourly do
   task errands: :environment do
+    puts 'clean up old temp files'
+    system('find /tmp -maxdepth 1 -type f -mmin +60 -delete 2>/dev/null')
     puts 'delete stale uncompleted orders'
     Order.incomplete.and(:created_at.lt => 1.hour.ago).destroy_all
     puts 'update monthly contributions current month'

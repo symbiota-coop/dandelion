@@ -207,30 +207,13 @@
       <td>
         <% order.answers.each { |q,a| if q && a %>
         <p style="width: 400px">
-          <strong>
-            <% if m = q.match(Order::SELECT_FIELD_REGEX) %>
-              <% # Select field: Question text <opt1, opt2, opt3> %>
-              <%== Sanitize.fragment(Rinku.auto_link(m[1]), Sanitize::Config::DANDELION) %>
-            <% elsif m = q.match(Order::MULTIPLE_CHECKBOX_FIELD_REGEX) %>
-              <% # Multiple checkboxes: Question text [opt1, opt2, opt3] %>
-              <%== Sanitize.fragment(Rinku.auto_link(m[1]), Sanitize::Config::DANDELION) %>
-            <% elsif m = q.match(Order::CHECKBOX_FIELD_REGEX) %>
-              <% # Checkbox: [Question text] %>
-              <%== Sanitize.fragment(Rinku.auto_link(m[1]), Sanitize::Config::DANDELION) %>
-            <% elsif m = q.match(Order::DATE_FIELD_REGEX) %>
-              <% # Date field: {Question text} %>
-              <%== Sanitize.fragment(Rinku.auto_link(m[1]), Sanitize::Config::DANDELION) %>
-            <% else %>
-              <%== Sanitize.fragment(Rinku.auto_link(q), Sanitize::Config::DANDELION) %>
-            <% end %>
-          </strong>
+          <% question_text = [Order::SELECT_FIELD_REGEX, Order::MULTIPLE_CHECKBOX_FIELD_REGEX, Order::CHECKBOX_FIELD_REGEX, Order::DATE_FIELD_REGEX].inject(nil) { |r, regex| r || q.match(regex)&.[](1) } || q %>
+          <strong><%== Sanitize.fragment(Rinku.auto_link(question_text), Sanitize::Config::DANDELION) %></strong>
         </p>
         <p style="width: 400px">
-          <% if m = q.match(Order::SELECT_FIELD_REGEX) %>
-            <% # Select field answer: show the selected value %>
+          <% if q =~ Order::SELECT_FIELD_REGEX %>
             <%== Sanitize.fragment(Rinku.auto_link(a), Sanitize::Config::DANDELION) %>
           <% elsif q =~ Order::MULTIPLE_CHECKBOX_FIELD_REGEX %>
-            <% # Select field answer: show the selected value %>
             <%= a.map { |v| Sanitize.fragment(Rinku.auto_link(v), Sanitize::Config::DANDELION) }.join(', ') %>
           <% elsif q =~ /\[.*\]/ %>
             <% # Checkbox answer: show checkmark %>
