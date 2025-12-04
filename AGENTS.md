@@ -18,7 +18,7 @@ source 'https://rubygems.org'
 ruby '3.4.7'
 gem 'activesupport'
 gem 'irb'
-gem 'padrino', github: 'padrino/padrino-framework'
+gem 'padrino'
 gem 'puma'
 gem 'rack'
 gem 'rake'
@@ -112,7 +112,7 @@ gem 'sanitize'
 gem 'crawler_detect'
 gem 'rack-attack'
 gem 'rack-cors'
-gem 'rack-utf8_sanitizer'
+gem 'rack-utf8_sanitizer', '1.10.1'
 
 #  Everything else
 gem 'bazaar' # for generating random names

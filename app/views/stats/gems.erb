@@ -1,0 +1,56 @@
+<div class="table-responsive">
+  <table id="gems-table" class="table table-hover">
+    <thead>
+      <tr>
+        <th>Gem</th>
+        <th>Version</th>
+        <th>Last Updated</th>
+        <th class="text-right">Downloads</th>
+        <th>Description</th>
+        <th>Links</th>
+      </tr>
+    </thead>
+    <tbody>
+      <% @gems.each do |gem| %>
+        <tr >
+          <td>
+            <a href="https://rubygems.org/gems/<%= gem[:name] %>" target="_blank"><%= gem[:name] %></a>
+          </td>
+          <td><code><%= gem[:version] %></code></td>
+          <td data-order="<%= gem[:updated_at]&.to_i || 0 %>">
+            <% if gem[:updated_at] %>
+              <span title="<%= gem[:updated_at].strftime('%Y-%m-%d %H:%M:%S UTC') %>">
+                <%= gem[:updated_at].strftime('%Y-%m-%d') %>
+              </span>
+            <% end %>
+          </td>
+          <td class="text-right" data-order="<%= gem[:downloads] || 0 %>">
+            <%= gem[:downloads]&.to_s&.reverse&.gsub(/(\d{3})(?=\d)/, '\\1,')&.reverse %>
+          </td>
+          <td>
+            <small><%= gem[:info] %></small>
+          </td>
+          <td>
+            <% if gem[:homepage] %>
+              <a href="<%= gem[:homepage] %>" target="_blank" title="Homepage"><i class="bi bi-house"></i></a>
+            <% end %>
+            <% if gem[:source_code] %>
+              <a href="<%= gem[:source_code] %>" target="_blank" title="Source Code" class="ml-2"><i class="bi bi-github"></i></a>
+            <% end %>
+          </td>
+        </tr>
+      <% end %>
+    </tbody>
+  </table>
+</div>
+
+<script>
+  $(function() {
+    $('#gems-table').DataTable({
+      paging: false,
+      searching: false,
+      bInfo: false,
+      order: [[2, 'asc']],
+    });
+  });
+</script>

@@ -1,0 +1,37 @@
+<li class="nav-divider"></li>
+<li id="git-badge">
+  <a target="_blank" href="https://github.com/symbiota-coop/dandelion/actions">
+    <img src="https://github.com/symbiota-coop/dandelion/actions/workflows/ruby.yml/badge.svg">
+  </a>
+</li>
+<% [
+  ['Orders', 'orders', 'cart-fill'],
+  ['Feedback', 'feedback', 'chat-left-quote'],
+  ['Comments', 'comments', 'chat-left-text'],
+  ['Messages', 'messages', 'chat-left'],
+  ['Accounts', 'accounts', 'person-fill'],
+  ['Organisations', 'organisations', 'flag-fill'],
+  ['Charts', 'charts', 'bar-chart-line-fill'],  
+  ['Gems', 'gems', 'gem'],
+  ['Icons', 'icons', 'back']
+].each do |title, path, icon| %>
+  <li class="<%= 'active' if request.path == "/stats/#{path}" %>">
+    <a href="/stats/<%= path %>" data-toggle="tooltip" title="<%= title %>" data-placement="right">
+      <i class="bi bi-<%= icon %>"></i>
+      <span class="nav-link-text"><%= title %></span>
+    </a>
+  </li>
+<% end %>
+<% [
+  ['MongoDB', ENV['NAV_MONGODB_URL'], 'database'],
+  ['Cloudflare', ENV['NAV_CLOUDFLARE_URL'], 'cloud'],
+  ['Mailgun', 'https://app.eu.mailgun.com/mg/sending/domains', 'envelope-fill'],
+  ['Logs', ENV['NAV_LOGS_URL'], 'terminal']
+].each do |title, url, icon| %>
+  <li>
+    <a href="<%= url %>" target="_blank" data-toggle="tooltip" title="<%= title %>" data-placement="right">
+      <i class="bi bi-<%= icon %>"></i>
+      <span class="nav-link-text"><%= title %></span>
+    </a>
+  </li>
+<% end %>

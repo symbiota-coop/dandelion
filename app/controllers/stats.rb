@@ -45,4 +45,44 @@ Dandelion::App.controller do
   get '/stats/icons' do
     erb :'stats/icons'
   end
+
+  get '/stats/gems' do
+    @gems = []
+    gemfile_content = File.read(Padrino.root('Gemfile'))
+
+    # Extract gem names (excluding GitHub gems which won't be on RubyGems)
+    gem_names = []
+    gemfile_content.each_line do |line|
+      next if line.strip.start_with?('#')
+      next if line.include?('github:')
+
+      gem_names << Regexp.last_match(1) if line =~ /gem ['"]([^'"]+)['"]/
+    end
+    gem_names.uniq!
+
+    gem_names.each do |gem_name|
+      response = Faraday.get("https://rubygems.org/api/v1/gems/#{gem_name}.json")
+      if response.status == 200
+        data = JSON.parse(response.body)
+        @gems << {
+          name: data['name'],
+          version: data['version'],
+          updated_at: Time.parse(data['version_created_at']),
+          downloads: data['downloads'],
+          homepage: data['homepage_uri'],
+          source_code: data['source_code_uri'],
+          info: data['info']&.to_s&.split('.')&.first
+        }
+      else
+        @gems << { name: gem_name, version: nil, updated_at: nil, downloads: nil, homepage: nil, source_code: nil, info: nil }
+      end
+    rescue StandardError
+      @gems << { name: gem_name, version: nil, updated_at: nil, downloads: nil, homepage: nil, source_code: nil, info: nil }
+    end
+
+    # Sort by last updated (oldest first to highlight outdated gems, nils at top)
+    @gems.sort_by! { |g| g[:updated_at] || Time.at(0) }
+
+    erb :'stats/gems'
+  end
 end
