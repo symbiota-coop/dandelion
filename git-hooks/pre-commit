@@ -38,3 +38,6 @@ EOF
 # Add content
 add_dependency_section "Gemfile" "$GEMFILE_PATH"
 add_dependency_section "Frontend dependencies" "$FRONTEND_DEPENDENCIES_PATH"
+
+# Stage the updated file so it's included in this commit
+git add "$OUTPUT_PATH"

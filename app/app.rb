@@ -19,7 +19,6 @@ module Dandelion
     use Rack::UTF8Sanitizer
     use Rack::CrawlerDetect
     use Rack::Attack
-    use RackSessionAccess::Middleware if Padrino.env == :test
     use Dragonfly::Middleware
     use OmniAuth::Builder do
       provider :account

@@ -8,7 +8,6 @@ require 'capybara/cuprite'
 require 'factory_bot'
 require 'minitest/autorun'
 require 'minitest/rg'
-require 'rack_session_access/capybara'
 
 Capybara.app = Padrino.application
 Capybara.server_port = ENV['PORT']
@@ -51,8 +50,8 @@ module ActiveSupport
     end
 
     def login_as(account)
-      page.set_rack_session(account_id: account.id.to_s)
-      visit '/'
+      account.generate_sign_in_token!
+      visit "/?sign_in_token=#{account.sign_in_token}"
     end
 
     def narrate(narration, action = nil)

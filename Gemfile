@@ -41,7 +41,6 @@ group :test do
   gem 'capybara'
   gem 'cuprite'
   gem 'minitest-rg'
-  gem 'rack_session_access'
 end
 
 # Interacting with other websites
