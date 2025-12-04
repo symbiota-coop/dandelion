@@ -15,7 +15,7 @@ class DandelionTest < ActiveSupport::TestCase
       This feature was originally developed to support camps at European Burning Man events, and has since been used for several standalone microburns, along with online-only unconferences.
       Click 'Create a gathering' to get started.
     )
-    click_link 'Create a gathering'
+    within('#sidebar') { click_link 'Create a gathering' }
     narrate %(Enter the name of the gathering.), lambda {
       fill_in 'Name', with: @gathering.name
     }
@@ -42,7 +42,7 @@ class DandelionTest < ActiveSupport::TestCase
     }
     click_link 'Features'
     narrate %(OK, that'll do for now. We go to the final tab and click 'Create gathering'.), lambda {
-      click_button 'Create gathering'
+      within('#content') { click_button 'Create gathering' }
     }
     click_link 'Members'
     sleep 1

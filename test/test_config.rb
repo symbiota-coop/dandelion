@@ -29,6 +29,7 @@ Capybara.default_driver = :cuprite
 module ActiveSupport
   class TestCase
     setup do
+      puts "\n🧪 Running: #{name}"
       reset!
       if ENV['CREATE_VIDEO']
         FileUtils.rm_f(Dir.glob("#{Capybara.save_path}/*.{png,mp4}"))

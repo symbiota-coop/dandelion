@@ -123,13 +123,21 @@ gem 'mini_magick' # for image processing
 ## Frontend dependencies
 
 ```
+<link rel="preconnect" href="https://cdnjs.cloudflare.com">
+<link rel="preconnect" href="https://rawcdn.githack.com">
+<link rel="preconnect" href="https://cdn.jsdelivr.net">
+<link rel="preconnect" href="https://js.stripe.com">
+<link rel="preconnect" href="https://maps.googleapis.com">
+<link rel="preconnect" href="https://cdn.iframe.ly">
+<link rel="preconnect" href="https://challenges.cloudflare.com">
+
 <link href="/infinite_admin/plugins/icon/themify-icons/themify-icons.css" rel="stylesheet">
 <link href="/infinite_admin/plugins/bootstrap/bootstrap4/css/bootstrap.css" rel="stylesheet">
 <link href="/infinite_admin/plugins/animate/animate.min.css" rel="stylesheet">
 
-<link rel="preconnect" href="https://cdnjs.cloudflare.com">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+
 <% {
-      'jquery/3.7.1' => 'jquery.min.js',
       'jqueryui/1.13.2' => 'jquery-ui.min.js themes/base/jquery-ui.min.css',
       'jquery-timeago/1.4.3' => 'jquery.timeago.min.js',
       'moment.js/2.17.1' => 'moment.min.js locale/en-gb.js',
@@ -154,7 +162,7 @@ gem 'mini_magick' # for image processing
      }.each { |k,v| %>
 <% v.split(' ').each { |f| u = "https://cdnjs.cloudflare.com/ajax/libs/#{k}/#{f}" %>
 <% case f.split('.').last.to_sym; when :js %>
-  <script src="<%= u %>"></script>
+  <script src="<%= u %>" defer></script>
 <% when :css %>
   <link rel="stylesheet" href="<%= u %>">
 <% end %>
@@ -189,27 +197,28 @@ gem 'mini_magick' # for image processing
      "/javascripts/map.js?#{@cachebuster}",
      "/javascripts/app.js?#{@cachebuster}"
    ].each { |f| %>
-<script src="<%= f %>"></script>
+<script src="<%= f %>" defer></script>
 <% } %>
-
 
 <% unless ENV['CREATE_VIDEO'] %>
   <script>
-    paceOptions = {
+    window.paceOptions = {
         ajax: {
             trackWebSockets: false
         }
     };
   </script>
-  <script src="/infinite_admin/plugins/loader/pace/pace.min.js"></script>
+  <script src="/infinite_admin/plugins/loader/pace/pace.min.js" defer></script>
 <% end %>
-<script src="/infinite_admin/plugins/cookie/js/js.cookie.js"></script>
-<script src="/infinite_admin/plugins/tooltip/popper/popper.min.js"></script>
-<script src="/infinite_admin/plugins/bootstrap/bootstrap4/js/bootstrap.js"></script>
-<script src="/infinite_admin/plugins/scrollbar/slimscroll/jquery.slimscroll.min.js"></script>
-<script src="/infinite_admin/js/apps.js?<%= @cachebuster %>"></script>
+<script src="/infinite_admin/plugins/cookie/js/js.cookie.js" defer></script>
+<script src="/infinite_admin/plugins/tooltip/popper/popper.min.js" defer></script>
+<script src="/infinite_admin/plugins/bootstrap/bootstrap4/js/bootstrap.js" defer></script>
+<script src="/infinite_admin/plugins/scrollbar/slimscroll/jquery.slimscroll.min.js" defer></script>
+<script src="/infinite_admin/js/apps.js?<%= @cachebuster %>" defer></script>
+
 <script>
   $(function () {
     App.init();
   });
-</script>```
+</script>
+```
