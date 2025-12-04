@@ -9,7 +9,7 @@ class DandelionTest < ActiveSupport::TestCase
     login_as(@account)
     click_link 'Gatherings'
     click_link 'All gatherings'
-    click_link 'Create a gathering'
+    within('#content') { click_link 'Create a gathering' }
     fill_in 'Name', with: @gathering.name
     fill_in 'URL', with: @gathering.slug
     click_link 'Next'

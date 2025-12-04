@@ -62,7 +62,7 @@
       </a>
     </li>
   <% else %>
-    <li class="has-sub <%= 'active' if @organisation %>">
+    <li class="has-sub <%= 'active' if @organisation || request.path == '/organisations' %>">
       <a href="javascript:;">
         <b class="caret caret-right pull-right"></b>
         <i class="bi bi-flag-fill"></i>
@@ -95,7 +95,7 @@
       </a>
     </li>
   <% else %>
-    <li class="has-sub <%= 'active' if @gathering %>">
+    <li class="has-sub <%= 'active' if @gathering || request.path == '/gatherings' %>">
       <a href="javascript:;">
         <b class="caret caret-right pull-right"></b>
         <i class="bi bi-moon-fill"></i>

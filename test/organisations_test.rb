@@ -9,7 +9,7 @@ class DandelionTest < ActiveSupport::TestCase
     login_as(@account)
     click_link 'Organisations'
     click_link 'All organisations'
-    click_link 'Create an organisation'
+    within('#content') { click_link 'Create an organisation' }
     fill_in 'Organisation name', with: @organisation.name
     fill_in 'URL', with: @organisation.slug
     click_button 'Save and continue'
