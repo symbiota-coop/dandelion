@@ -1,7 +1,18 @@
 Dandelion::App.controller do
-  get '/qr', provides: :png do
+  get '/qr', provides: [:png, :pdf] do
     halt 400 unless params[:url]
-    RQRCode::QRCode.new(params[:url]).as_png(border_modules: 0, size: 500).to_blob
+    case content_type
+    when :pdf
+      unit = 2.83466666667 # units / mm
+      cm = 10 * unit
+      page_size = 15 * cm # square page size
+      qr_size = page_size
+      Prawn::Document.new(page_size: [page_size, page_size], margin: 0) do |pdf|
+        pdf.print_qr_code params[:url], extent: qr_size, stroke: false
+      end.render
+    else
+      RQRCode::QRCode.new(params[:url]).as_png(border_modules: 0, size: 500).to_blob
+    end
   end
 
   get '/youtube_thumb/:id' do
