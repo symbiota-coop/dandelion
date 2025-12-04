@@ -8,7 +8,7 @@ render_article("Today's events", "Create a two-paragraph summary of these event(
 <%=
 events = Event.live.public.browsable
   .and(:end_time.gte => @date - 2, :end_time.lt => @date - 1)
-  .reject { |event| event.event_feedbacks.empty? || event.event_feedbacks.all? { |ef| ef.answers.map { |q,a| a.blank? }.all? } }
+  .reject { |event| event.event_feedbacks.empty? || event.event_feedbacks.all? { |ef| !ef.answers || ef.answers.map { |q,a| a.blank? }.all? } }
 render_article("Feedback report", "Create a two-paragraph summary of the feedback on these event(s). IMPORTANT: Two paragraphs only.", events, use_feedback: true)
 %>
 
