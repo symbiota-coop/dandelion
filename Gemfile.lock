@@ -5,43 +5,6 @@ GIT
     will_paginate (4.0.1)
 
 GIT
-  remote: https://github.com/padrino/padrino-framework.git
-  revision: 3e3a1d7c10278669ceeb9cf166fdd11e17dde0a8
-  specs:
-    padrino (0.16.0.pre4)
-      padrino-admin (= 0.16.0.pre4)
-      padrino-cache (= 0.16.0.pre4)
-      padrino-core (= 0.16.0.pre4)
-      padrino-gen (= 0.16.0.pre4)
-      padrino-helpers (= 0.16.0.pre4)
-      padrino-mailer (= 0.16.0.pre4)
-      padrino-support (= 0.16.0.pre4)
-    padrino-admin (0.16.0.pre4)
-      padrino-core (= 0.16.0.pre4)
-      padrino-helpers (= 0.16.0.pre4)
-    padrino-cache (0.16.0.pre4)
-      moneta (~> 1.6)
-      padrino-core (= 0.16.0.pre4)
-      padrino-helpers (= 0.16.0.pre4)
-    padrino-core (0.16.0.pre4)
-      padrino-support (= 0.16.0.pre4)
-      rackup (~> 2.1)
-      sinatra (~> 4)
-      thor (~> 1.0)
-    padrino-gen (0.16.0.pre4)
-      bundler (>= 1.0, < 3)
-      padrino-core (= 0.16.0.pre4)
-    padrino-helpers (0.16.0.pre4)
-      i18n (>= 0.6.7, < 2)
-      padrino-support (= 0.16.0.pre4)
-      tilt (>= 2.1, < 3)
-    padrino-mailer (0.16.0.pre4)
-      mail (~> 2.5)
-      mime-types (>= 3.1, < 4)
-      padrino-core (= 0.16.0.pre4)
-    padrino-support (0.16.0.pre4)
-
-GIT
   remote: https://github.com/prawnpdf/prawn.git
   revision: 1442068706058adb80ea623192b7ae45b344f1fc
   specs:
@@ -52,7 +15,7 @@ GIT
 
 GIT
   remote: https://github.com/q9f/omniauth-ethereum.rb.git
-  revision: 503e27c49bf464ccd813ffc68289b9d72c5e6125
+  revision: 0cc83f29f9ef1d002434f36fd40eed361a9cc830
   specs:
     omniauth-ethereum (0.2.1)
       eth (~> 0.5)
@@ -203,7 +166,7 @@ GEM
       money (~> 6.13, >= 6.13.6)
       nokogiri (~> 1.9)
     event_stream_parser (1.0.0)
-    excon (1.3.1)
+    excon (1.3.2)
       logger
     factory_bot (6.5.6)
       activesupport (>= 6.1.0)
@@ -288,7 +251,7 @@ GEM
       pp (>= 0.6.0)
       rdoc (>= 4.0.0)
       reline (>= 0.4.2)
-    json (2.16.0)
+    json (2.17.1)
     json-api-vanilla (1.0.4)
     jwt (3.1.2)
       base64
@@ -355,7 +318,7 @@ GEM
       mongo (>= 2.18.0, < 3.0.0)
     mongoid_paranoia (0.6.0)
       mongoid (>= 7.3)
-    multi_json (1.17.0)
+    multi_json (1.18.0)
     multi_xml (0.7.2)
       bigdecimal (~> 3.1)
     multipart-post (2.4.1)
@@ -408,6 +371,38 @@ GEM
       omniauth (~> 2.0)
     openssl (3.3.2)
     ostruct (0.6.3)
+    padrino (0.16.0)
+      padrino-admin (= 0.16.0)
+      padrino-cache (= 0.16.0)
+      padrino-core (= 0.16.0)
+      padrino-gen (= 0.16.0)
+      padrino-helpers (= 0.16.0)
+      padrino-mailer (= 0.16.0)
+      padrino-support (= 0.16.0)
+    padrino-admin (0.16.0)
+      padrino-core (= 0.16.0)
+      padrino-helpers (= 0.16.0)
+    padrino-cache (0.16.0)
+      moneta (~> 1.6)
+      padrino-core (= 0.16.0)
+      padrino-helpers (= 0.16.0)
+    padrino-core (0.16.0)
+      padrino-support (= 0.16.0)
+      rackup (~> 2.1)
+      sinatra (~> 4)
+      thor (~> 1.0)
+    padrino-gen (0.16.0)
+      bundler (>= 1.0, < 3)
+      padrino-core (= 0.16.0)
+    padrino-helpers (0.16.0)
+      i18n (>= 0.6.7, < 2)
+      padrino-support (= 0.16.0)
+      tilt (>= 2.1, < 3)
+    padrino-mailer (0.16.0)
+      mail (~> 2.5)
+      mime-types (>= 3.1, < 4)
+      padrino-core (= 0.16.0)
+    padrino-support (0.16.0)
     parallel (1.27.0)
     parser (3.3.10.0)
       ast (~> 2.4.1)
@@ -416,7 +411,7 @@ GEM
       json-api-vanilla (~> 1.0.1)
       rack
     pdf-core (0.10.0)
-    pkg-config (1.6.4)
+    pkg-config (1.6.5)
     pp (0.6.3)
       prettyprint
     prawn-qrcode (0.5.2)
@@ -477,7 +472,7 @@ GEM
       mini_portile2 (~> 2.8)
       pkg-config (~> 1.5)
       rubyzip (~> 2.3)
-    rdoc (6.16.0)
+    rdoc (6.16.1)
       erb
       psych (>= 4.0.0)
       tsort
@@ -486,10 +481,10 @@ GEM
     reline (0.6.3)
       io-console (~> 0.5)
     rinku (2.0.6)
-    rqrcode (3.1.0)
+    rqrcode (3.1.1)
       chunky_png (~> 1.0)
       rqrcode_core (~> 2.0)
-    rqrcode_core (2.0.0)
+    rqrcode_core (2.0.1)
     rubocop (1.81.7)
       json (~> 2.3)
       language_server-protocol (~> 3.17.0.2)
@@ -540,7 +535,7 @@ GEM
     snaky_hash (2.0.3)
       hashie (>= 0.1.0, < 6)
       version_gem (>= 1.1.8, < 3)
-    stringio (3.1.8)
+    stringio (3.1.9)
     stripe (18.0.1)
     strong_password (0.0.10)
     thor (1.4.0)
@@ -562,7 +557,7 @@ GEM
     unicode-emoji (4.1.0)
     uri (1.1.1)
     version_gem (1.1.9)
-    webrick (1.9.1)
+    webrick (1.9.2)
     webrobots (0.1.2)
     websocket-driver (0.7.7)
       base64
@@ -626,7 +621,7 @@ DEPENDENCIES
   omniauth
   omniauth-ethereum!
   omniauth-google-oauth2
-  padrino!
+  padrino
   patreon
   prawn!
   prawn-qrcode
@@ -636,7 +631,7 @@ DEPENDENCIES
   rack
   rack-attack
   rack-cors
-  rack-utf8_sanitizer
+  rack-utf8_sanitizer (= 1.10.1)
   rack_session_access
   rake
   redcarpet
