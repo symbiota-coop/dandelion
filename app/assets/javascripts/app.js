@@ -197,6 +197,29 @@ $(function () {
       $(this).html(nl2br($(this).html()))
     })
 
+    $('.read-more').not('[data-read-more-processed]').attr('data-read-more-processed', true).each(function () {
+      const $element = $(this)
+      const html = $element.html()
+      const brIndex = html.indexOf('<br')
+
+      if (brIndex !== -1) {
+        const beforeBr = html.substring(0, brIndex)
+
+        // Store the full content
+        $element.data('full-content', html)
+
+        // Set initial truncated content with ellipsis
+        $element.html(beforeBr + '<br /><a href="javascript:;" class="read-more-toggle">Read more</a>')
+
+        // Add click handler - expand permanently
+        $element.on('click', '.read-more-toggle', function (e) {
+          e.preventDefault()
+          // Expand to show full content
+          $element.html($element.data('full-content'))
+        })
+      }
+    })
+
     $('textarea[id=comment_body], textarea.autosize').not('[data-autosized]').attr('data-autosized', true).each(function () {
       autosize(this)
     })
