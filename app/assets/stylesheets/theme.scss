@@ -10,24 +10,6 @@ $theme-color: #00B963 !default;
   color: $theme-color !important;
 }
 
-#calendar a.fc-event {
-  color: $theme-color !important;
-}
-
-.event-detail,
-.event-detail.calendar-date .month {
-  border-color: rgba($theme-color, 0.5);
-}
-
-.event-detail.calendar-date .month {
-  background: rgba($theme-color, 0.3);
-}
-
-.dropdown-item.active,
-.dropdown-item:active {
-  background: $theme-color;
-}
-
 // =============================================================================
 // SEARCH COMPONENTS
 // =============================================================================
@@ -49,6 +31,11 @@ a:active {
 
 .nav-pills .nav-link.active,
 .nav-pills .show>.nav-link {
+  background: $theme-color;
+}
+
+.dropdown-item.active,
+.dropdown-item:active {
   background: $theme-color;
 }
 
@@ -170,6 +157,27 @@ a.text-primary:focus {
 .checkbox-inline input:checked+label:before {
   background: $theme-color;
   border-color: $theme-color;
+}
+
+// =============================================================================
+// CALENDAR AND EVENTS
+// =============================================================================
+
+#calendar a.fc-event {
+  color: $theme-color !important;
+}
+
+.event-detail,
+.event-detail.calendar-date .month {
+  border-color: rgba($theme-color, 0.5);
+}
+
+.event-detail:hover {
+  background: $theme-color;
+}
+
+.event-detail.calendar-date .month {
+  background: rgba($theme-color, 0.3);
 }
 
 // =============================================================================
