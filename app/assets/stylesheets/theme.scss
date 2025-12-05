@@ -3,7 +3,7 @@ $theme-color: #00B963 !default;
 
 .bg-primary,
 .bg-primary.text-white {
-  background-color: $theme-color !important;
+  background: $theme-color !important;
 }
 
 .text-primary {
@@ -12,6 +12,20 @@ $theme-color: #00B963 !default;
 
 #calendar a.fc-event {
   color: $theme-color !important;
+}
+
+.event-detail,
+.event-detail.calendar-date .month {
+  border-color: rgba($theme-color, 0.5);
+}
+
+.event-detail.calendar-date .month {
+  background: rgba($theme-color, 0.3);
+}
+
+.dropdown-item.active,
+.dropdown-item:active {
+  background: $theme-color;
 }
 
 // =============================================================================
@@ -35,7 +49,7 @@ a:active {
 
 .nav-pills .nav-link.active,
 .nav-pills .show>.nav-link {
-  background-color: $theme-color;
+  background: $theme-color;
 }
 
 a:hover,

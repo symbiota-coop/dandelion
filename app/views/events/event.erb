@@ -1,3 +1,7 @@
+<% if @event.theme_color %>
+  <link href="/theme.css?theme_color=<%=CGI.escape(@event.theme_color || '#00B963')%>" rel="stylesheet">
+<% end %>
+
 <style>
   .btn-outline-primary {
     background: white;

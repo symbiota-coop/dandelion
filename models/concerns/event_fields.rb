@@ -48,6 +48,7 @@ module EventFields
     field :tax_rate_id, type: String
     field :match_phrase, type: String
     field :cohosts_ids_cache, type: Array
+    field :theme_color, type: String
 
     field :revenue_share_to_revenue_sharer, type: Integer
     field :profit_share_to_organiser, type: Integer
@@ -152,7 +153,8 @@ module EventFields
         tax_rate_id: 'Stripe tax rate ID',
         carousel_text: 'Preview text',
         match_phrase: 'Dropdown match phrase',
-        minimal_only: 'Show only in embeds'
+        minimal_only: 'Show only in embeds',
+        theme_color: 'Theme color'
       }.merge(email_human_attribute_names).merge({
                                                    recording_email_title: 'Order confirmation email subject for the recording of the event',
                                                    recording_email_greeting: 'Order confirmation email greeting for the recording of the event'
@@ -204,7 +206,8 @@ module EventFields
         tax_rate_id: 'Stripe tax rate ID to apply to ticket purchases',
         hide_unavailable_tickets: 'Hide tickets that have sold out or where sales have ended',
         match_phrase: 'Create a dropdown on the event page with future events containing this term',
-        blank_price_for_free_tickets: 'Show a blank price for free tickets instead of zero'
+        blank_price_for_free_tickets: 'Show a blank price for free tickets instead of zero',
+        theme_color: 'Theme color for the event page'
       }.merge(email_hints).merge({
                                    recording_email_title: 'Custom subject line for the order confirmation email for the recording of the event',
                                    recording_email_greeting: 'Custom greeting for the order confirmation email for the recording of the event'

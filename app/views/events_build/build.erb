@@ -71,7 +71,7 @@
       <li role="presentation" class="nav-item"><a class="nav-link" href="#tab-tickets" role="tab" data-toggle="tab">Tickets</a></li>
       <li role="presentation" class="nav-item"><a class="nav-link" href="#tab-questions" role="tab" data-toggle="tab">Questions</a></li>
       <li role="presentation" class="nav-item"><a class="nav-link" href="#tab-donations" role="tab" data-toggle="tab">Donations</a></li>
-      <li role="presentation" class="nav-item"><a class="nav-link" href="#tab-labels" role="tab" data-toggle="tab">Labels</a></li>
+      <li role="presentation" class="nav-item"><a class="nav-link" href="#tab-appearance" role="tab" data-toggle="tab">Appearance</a></li>
       <li role="presentation" class="nav-item"><a class="nav-link" href="#tab-emails" role="tab" data-toggle="tab">Emails</a></li>
       <li role="presentation" class="nav-item"><a class="nav-link" href="#tab-everything-else" role="tab" data-toggle="tab">Everything else</a></li>
       <% if @event.persisted? && @event.past? %>
@@ -231,7 +231,7 @@
           <%= f.text_block :donation_text %>
         </div>
       </div>
-      <div role="tabpanel" class="tab-pane" id="tab-labels">
+      <div role="tabpanel" class="tab-pane" id="tab-appearance">
         <% if Padrino.env == :development || @event.organisation.change_select_tickets_title || @event.organisation.experimental? %>
           <%= f.text_block :select_tickets_title %>
         <% end %>
@@ -240,6 +240,7 @@
         <%= f.text_block :carousel_text %>
         <%= f.text_block :rsvp_button_text %>
         <%= f.check_box_block :blank_price_for_free_tickets %>
+        <%= f.color_block :theme_color %>
       </div>
       <div role="tabpanel" class="tab-pane" id="tab-emails">
         <%= f.text_block :ticket_email_title %>

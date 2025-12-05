@@ -548,16 +548,6 @@ Dandelion::App.controller do
     200
   end
 
-  get '/organisations/stylesheet.css' do
-    content_type 'text/css'
-    scss_content = File.read(Padrino.root('app/assets/stylesheets/organisation.scss'))
-    if (theme_color = params[:theme_color])
-      theme_color = "##{theme_color}" unless theme_color.start_with?('#')
-      scss_content.sub!(/\$theme-color:.*?;/, "$theme-color: #{theme_color};")
-    end
-    Sass::Engine.new(scss_content, syntax: :scss).render
-  end
-
   get '/organisations/:id/feedback_summary' do
     @organisation = Organisation.find(params[:id]) || not_found
     organisation_admins_only!

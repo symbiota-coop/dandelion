@@ -5,10 +5,6 @@
 
     if ($(window).width() < 992)
       $('#sidebar ul.nav li a[data-toggle]').tooltip('disable')
-
-  <% if @gathering %>
-      $('.sub-menu a[href="/g/<%= @gathering.slug %>"]').parent().addClass('active')
-  <% end %>
   })
 </script>
 <ul class="nav">
@@ -48,7 +44,7 @@
       </a>
     </li>
   <% end %>
-  <li class="<%= 'active' if request.path == '/events' %>">
+  <li class="<%= 'active' if ['/events', '/e/'].any? { |path| request.path.starts_with?(path) } %>">
     <a href="/events" data-toggle="tooltip" title="Events" data-placement="right">
       <i class="bi bi-calendar-event"></i>
       <span class="nav-link-text">Events</span>
@@ -62,7 +58,7 @@
       </a>
     </li>
   <% else %>
-    <li class="has-sub <%= 'active' if @organisation || request.path == '/organisations' %>">
+    <li class="has-sub <%= 'active' if ['/organisations', '/o/'].any? { |path| request.path.starts_with?(path) } %>">
       <a href="javascript:;">
         <b class="caret caret-right pull-right"></b>
         <i class="bi bi-flag-fill"></i>
@@ -88,14 +84,14 @@
     </a>
   </li>
   <% if !current_account %>
-    <li class="<%= 'active' if request.path == '/gatherings' %>">
+    <li class="<%= 'active' if ['/gatherings', '/g/'].any? { |path| request.path.starts_with?(path) } %>">
       <a href="/gatherings" data-toggle="tooltip" title="Gatherings" data-placement="right">
         <i class="bi bi-moon-fill"></i>
         <span class="nav-link-text">Gatherings</span>
       </a>
     </li>
   <% else %>
-    <li class="has-sub <%= 'active' if @gathering || request.path == '/gatherings' %>">
+    <li class="has-sub <%= 'active' if ['/gatherings', '/g/'].any? { |path| request.path.starts_with?(path) } %>">
       <a href="javascript:;">
         <b class="caret caret-right pull-right"></b>
         <i class="bi bi-moon-fill"></i>

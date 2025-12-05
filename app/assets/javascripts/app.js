@@ -365,6 +365,9 @@ $(function () {
     })
   })
 
+  $('.colorpicker').not('[data-coloris]').attr('data-coloris', true)
+  Coloris({ alpha: false });
+
   $('.search.well .checkbox-inline input[type="checkbox"]').on('change', function () {
     $(this).closest('.checkbox-inline').toggleClass('checked', this.checked);
   });

@@ -257,5 +257,15 @@ module Dandelion
     get '/contact' do
       erb :contact
     end
+
+    get '/theme.css' do
+      content_type 'text/css'
+      scss_content = File.read(Padrino.root('app/assets/stylesheets/theme.scss'))
+      if (theme_color = params[:theme_color])
+        theme_color = "##{theme_color}" unless theme_color.start_with?('#')
+        scss_content.sub!(/\$theme-color:.*?;/, "$theme-color: #{theme_color};")
+      end
+      Sass::Engine.new(scss_content, syntax: :scss).render
+    end
   end
 end
