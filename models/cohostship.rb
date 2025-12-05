@@ -10,6 +10,8 @@ class Cohostship
   belongs_to_without_parent_validation :organisation, index: true
 
   field :image_uid, type: String
+  field :image_width, type: Integer
+  field :image_height, type: Integer
   field :has_image, type: Boolean
   field :video_uid, type: String
   field :featured, type: Boolean
@@ -29,8 +31,10 @@ class Cohostship
   before_validation do
     if image
       begin
-        errors.add(:image, 'must be at least 992px wide') if image && image.width < 800 # legacy images are 800px
-        errors.add(:image, 'must be more wide than high') if image && image.height > image.width
+        self.image_width = image.width
+        self.image_height = image.height
+        errors.add(:image, 'must be at least 992px wide') if image_width < 800 # legacy images are 800px
+        errors.add(:image, 'must be more wide than high') if image_height > image_width
       rescue StandardError
         self.image = nil
       end

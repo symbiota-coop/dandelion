@@ -13,6 +13,8 @@ module EventFields
     field :location, type: String
     field :coordinates, type: Array
     field :image_uid, type: String
+    field :image_width, type: Integer
+    field :image_height, type: Integer
     field :has_image, type: Mongoid::Boolean
     field :video_uid, type: String
     field :description, type: String
