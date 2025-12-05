@@ -6,7 +6,7 @@
       <video src="<%=cohostship.video.url%>" type="video/mp4" controls muted playsinline onmouseover="this.play();" onmouseout="this.pause();"></video>
     </div>
   <% elsif cohostship.image %>
-    <img class="w-100" src="<%= u cohostship.image.thumb((crop if defined?(crop) && crop) || '992x992').url %>">
+    <img class="w-100" <% if cohostship.image_width_unmagic && cohostship.image_height_unmagic %>style="aspect-ratio: <%= cohostship.image_width_unmagic %> / <%= cohostship.image_height_unmagic %>"<% end %> src="<%= u cohostship.image.thumb((crop if defined?(crop) && crop) || '992x992').url %>">
   <% end %>
 </a>
 <% else %>
@@ -16,7 +16,7 @@
     <video src="<%=event.video.url%>" type="video/mp4" controls muted playsinline onmouseover="this.play();" onmouseout="this.pause();"></video>
   </div>
 <% else %>
-  <img class="w-100" src="<%= u event.image.thumb((crop if defined?(crop) && crop) || '992x992').url %>">
+  <img class="w-100" <% if event.image_width_unmagic && event.image_height_unmagic %>style="aspect-ratio: <%= event.image_width_unmagic %> / <%= event.image_height_unmagic %>"<% end %> src="<%= u event.image.thumb((crop if defined?(crop) && crop) || '992x992').url %>">
 <% end %>
 </a>
 <% end %>

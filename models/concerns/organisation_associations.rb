@@ -44,7 +44,6 @@ module OrganisationAssociations
     end
   end
 
-  # Fast cached lookups using indexed arrays on Account (same pattern as members/organisation_ids_cache)
   def subscribed_member_ids
     Account.and(subscribed_organisation_ids_cache: id).pluck(:id)
   end
