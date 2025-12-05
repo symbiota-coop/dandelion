@@ -43,6 +43,8 @@ module AccountFields
     field :default_currency, type: String
     field :organisation_ids_cache, type: Array
     field :organisation_ids_public_cache, type: Array
+    field :subscribed_organisation_ids_cache, type: Array
+    field :unsubscribed_organisation_ids_cache, type: Array
     field :bio, type: String
     field :can_message, type: Mongoid::Boolean
     field :failed_sign_in_attempts, type: Integer

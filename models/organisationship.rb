@@ -126,6 +126,12 @@ class Organisationship
   after_create do
     relevant_local_groups.each { |local_group| local_group.local_groupships.create account: account } if account.coordinates
     account.set(organisation_ids_cache: ((account.organisation_ids_cache || []) + [organisation.id]).uniq)
+    # Update account's subscribed/unsubscribed organisation caches
+    if unsubscribed
+      account.set(unsubscribed_organisation_ids_cache: ((account.unsubscribed_organisation_ids_cache || []) + [organisation.id]).uniq)
+    else
+      account.set(subscribed_organisation_ids_cache: ((account.subscribed_organisation_ids_cache || []) + [organisation.id]).uniq)
+    end
     # Invalidate notification cache
     account.account_notification_cache&.invalidate!
   end
@@ -133,6 +139,9 @@ class Organisationship
   after_destroy do
     account.set(organisation_ids_cache: (account.organisation_ids_cache || []) - [organisation.id])
     account.set(organisation_ids_public_cache: (account.organisation_ids_public_cache || []) - [organisation.id])
+    # Update account's subscribed/unsubscribed organisation caches
+    account.set(subscribed_organisation_ids_cache: (account.subscribed_organisation_ids_cache || []) - [organisation.id])
+    account.set(unsubscribed_organisation_ids_cache: (account.unsubscribed_organisation_ids_cache || []) - [organisation.id])
     # Invalidate notification cache
     account.account_notification_cache&.invalidate!
   end
@@ -150,6 +159,16 @@ class Organisationship
       account.set(organisation_ids_public_cache: (account.organisation_ids_public_cache || []) - [organisation.id])
     else
       account.set(organisation_ids_public_cache: ((account.organisation_ids_public_cache || []) + [organisation.id]).uniq)
+    end
+    # Update account's subscribed/unsubscribed organisation caches when unsubscribed status changes
+    if saved_change_to_unsubscribed?
+      if unsubscribed
+        account.set(subscribed_organisation_ids_cache: (account.subscribed_organisation_ids_cache || []) - [organisation.id])
+        account.set(unsubscribed_organisation_ids_cache: ((account.unsubscribed_organisation_ids_cache || []) + [organisation.id]).uniq)
+      else
+        account.set(unsubscribed_organisation_ids_cache: (account.unsubscribed_organisation_ids_cache || []) - [organisation.id])
+        account.set(subscribed_organisation_ids_cache: ((account.subscribed_organisation_ids_cache || []) + [organisation.id]).uniq)
+      end
     end
     send_monthly_donation_welcome if monthly_donation_method && !sent_monthly_donation_welcome
     # Invalidate notification cache when organisation following or donor status changes

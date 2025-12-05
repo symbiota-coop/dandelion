@@ -34,8 +34,6 @@ module OrganisationAssociations
     has_many :orders_as_affiliate, class_name: 'Order', as: :affiliate, dependent: :nullify
 
     with_options class_name: 'Account', through: :organisationships do
-      has_many_through :subscribed_members, conditions: { unsubscribed: false }
-      has_many_through :unsubscribed_members, conditions: { unsubscribed: true }
       has_many_through :admins, conditions: { admin: true }
       has_many_through :admins_receiving_feedback, conditions: { admin: true, receive_feedback: true }
       has_many_through :revenue_sharers, conditions: { :stripe_connect_json.ne => nil }
@@ -44,6 +42,23 @@ module OrganisationAssociations
       has_many_through :not_monthly_donors, conditions: { monthly_donation_method: nil }
       has_many_through :subscribed_not_monthly_donors, conditions: { monthly_donation_method: nil, unsubscribed: false }
     end
+  end
+
+  # Fast cached lookups using indexed arrays on Account (same pattern as members/organisation_ids_cache)
+  def subscribed_member_ids
+    Account.and(subscribed_organisation_ids_cache: id).pluck(:id)
+  end
+
+  def subscribed_members
+    Account.and(subscribed_organisation_ids_cache: id)
+  end
+
+  def unsubscribed_member_ids
+    Account.and(unsubscribed_organisation_ids_cache: id).pluck(:id)
+  end
+
+  def unsubscribed_members
+    Account.and(unsubscribed_organisation_ids_cache: id)
   end
 
   def news
