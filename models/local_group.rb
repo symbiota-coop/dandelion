@@ -114,6 +114,7 @@ class LocalGroup
   end
 
   def subscribed_accounts
-    subscribed_members.and(:id.in => organisation.subscribed_accounts.pluck(:id))
+    # Members subscribed to local_group AND subscribed to org AND not globally unsubscribed
+    subscribed_members.and(subscribed_organisation_ids_cache: organisation_id, unsubscribed: false)
   end
 end

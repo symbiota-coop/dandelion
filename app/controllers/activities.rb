@@ -214,7 +214,14 @@ Dandelion::App.controller do
     activity_admins_only!
     @activityships = @activity.activityships.order('created_at desc')
     @activityships = @activityships.and(:account_id.in => Account.search(params[:q], child_scope: @activityships).pluck(:id)) if params[:q]
-    @activityships = @activityships.and(:account_id.in => @activity.subscribed_accounts.pluck(:id)) if params[:subscribed_to_mailer]
+    if params[:subscribed_to_mailer]
+      # Filter to activity-subscribed, then exclude globally unsubscribed and org-unsubscribed
+      @activityships = @activityships.and(unsubscribed: false)
+      excluded_ids = Account.and(organisation_ids_cache: @activity.organisation_id).and(
+        :$or => [{ unsubscribed: true }, { :subscribed_organisation_ids_cache.ne => @activity.organisation_id }]
+      ).pluck(:id)
+      @activityships = @activityships.and(:account_id.nin => excluded_ids) if excluded_ids.any?
+    end
     case content_type
     when :html
       @activityships = @activityships.paginate(page: params[:page], per_page: 25)

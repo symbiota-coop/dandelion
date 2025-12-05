@@ -333,7 +333,11 @@ Dandelion::App.controller do
     @organisationships = @organisationships.and(:monthly_donation_method.ne => nil) if params[:monthly_donor]
     @organisationships = @organisationships.and(monthly_donation_method: nil) if params[:not_a_monthly_donor]
     @organisationships = @organisationships.and(:stripe_connect_json.ne => nil) if params[:connected_to_stripe]
-    @organisationships = @organisationships.and(:account_id.in => @organisation.subscribed_accounts.pluck(:id)) if params[:subscribed_to_mailer]
+    if params[:subscribed_to_mailer]
+      @organisationships = @organisationships.and(unsubscribed: false)
+      globally_unsubscribed_member_ids = Account.and(organisation_ids_cache: @organisation.id, unsubscribed: true).pluck(:id)
+      @organisationships = @organisationships.and(:account_id.nin => globally_unsubscribed_member_ids) if globally_unsubscribed_member_ids.any?
+    end
     case content_type
     when :html
       erb :'organisations/followers'
