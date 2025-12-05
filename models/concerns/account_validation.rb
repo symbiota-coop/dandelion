@@ -14,7 +14,7 @@ module AccountValidation
 
     before_validation do
       unless username
-        u = Bazaar.super_object.parameterize.underscore
+        u = Haikunator.haikunate(0).underscore
         if Account.find_by(username: u)
           n = 1
           n += 1 while Account.find_by(username: "#{u}_#{n}")

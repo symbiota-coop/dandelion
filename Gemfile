@@ -99,7 +99,7 @@ gem 'rack-cors'
 gem 'rack-utf8_sanitizer', '1.10.1'
 
 #  Everything else
-gem 'bazaar' # for generating random names
 gem 'chroma' # for manipulating colours
 gem 'digest' # for generating hashes
+gem 'haikunator' # for generating random names
 gem 'mini_magick' # for image processing
