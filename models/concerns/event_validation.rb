@@ -90,13 +90,13 @@ module EventValidation
 
       if image
         begin
-          self.image_width = image.width
-          self.image_height = image.height
-          errors.add(:image, 'must be at least 992px wide') if image_width < 800 # legacy images are 800px
-          errors.add(:image, 'must be more wide than high') if image_height > image_width
+          self.image_width_unmagic = image.width
+          self.image_height_unmagic = image.height
+          errors.add(:image, 'must be at least 992px wide') if image_width_unmagic < 800 # legacy images are 800px
+          errors.add(:image, 'must be more wide than high') if image_height_unmagic > image_width_unmagic
 
-          errors.add(:image, "must be #{organisation.event_image_required_width}px wide") if organisation && organisation.event_image_required_width && image_width != organisation.event_image_required_width
-          errors.add(:image, "must be #{organisation.event_image_required_height}px high") if organisation && organisation.event_image_required_height && image_height != organisation.event_image_required_height
+          errors.add(:image, "must be #{organisation.event_image_required_width}px wide") if organisation && organisation.event_image_required_width && image_width_unmagic != organisation.event_image_required_width
+          errors.add(:image, "must be #{organisation.event_image_required_height}px high") if organisation && organisation.event_image_required_height && image_height_unmagic != organisation.event_image_required_height
         rescue StandardError => e
           Honeybadger.notify(e)
           self.image = nil
