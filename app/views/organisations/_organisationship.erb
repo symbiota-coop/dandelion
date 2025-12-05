@@ -22,10 +22,10 @@
     <a class="pagelet-trigger btn mb-1 btn-outline-primary <%= btn_class if defined?(btn_class) %>" href="/o/<%= organisation.slug %>/organisationship?f=follow_and_subscribe">Follow</a>
   <% else %>
     <div class="dropdown d-inline-block">
-      <button class="btn mb-1 <%= btn_class if defined?(btn_class) %> <%= current_state == 'not_following' ? 'btn-outline-primary' : 'btn-primary' %> dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+      <button class="btn mb-1 <%= btn_class if defined?(btn_class) %> <%= current_state == 'not_following' ? 'btn-outline-primary' : 'btn-primary' %> dropdown-toggle" type="button" data-toggle="dropdown">
         <%== text %>
       </button>
-      <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+      <div class="dropdown-menu">
         <% action_options.invert.each { |text,value| %>
         <a class="pagelet-trigger dropdown-item" href="/o/<%= organisation.slug %>/organisationship?f=<%= value %>"><%== text %></a>
         <% } %>

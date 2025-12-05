@@ -26,7 +26,7 @@
         <button class="btn mb-1 <%= btn_class if defined?(btn_class) %> <%= current_state == 'not_following' ? 'btn-outline-primary' : 'btn-primary' %> dropdown-toggle" type="button" data-toggle="dropdown">
           <%== text %>
         </button>
-        <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+        <div class="dropdown-menu">
           <% action_options.invert.each { |text,value| %>
           <a class="pagelet-trigger dropdown-item" href="<%=resource_path%>/<%=resourceship_name%>?f=<%= value %>"><%== text %></a>
           <% } %>
