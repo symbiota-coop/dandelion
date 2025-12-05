@@ -63,7 +63,7 @@ class Order
     if opt_in_organisation
       event.organisation_and_cohosts.each do |organisation|
         organisationship = organisation.organisationships.find_or_create_by(account: account)
-        organisationship.set(unsubscribed: false)
+        organisationship.set_unsubscribed!(false)
       end
       if event.activity && event.activity.privacy == 'open'
         activityship = event.activity.activityships.find_or_create_by(account: account)

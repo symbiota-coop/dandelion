@@ -301,6 +301,19 @@ class Organisationship
     monthly_donation_method
   end
 
+  def set_unsubscribed!(value)
+    return if unsubscribed == value
+
+    set(unsubscribed: value)
+    if value
+      account.set(subscribed_organisation_ids_cache: (account.subscribed_organisation_ids_cache || []) - [organisation.id])
+      account.set(unsubscribed_organisation_ids_cache: ((account.unsubscribed_organisation_ids_cache || []) + [organisation.id]).uniq)
+    else
+      account.set(unsubscribed_organisation_ids_cache: (account.unsubscribed_organisation_ids_cache || []) - [organisation.id])
+      account.set(subscribed_organisation_ids_cache: ((account.subscribed_organisation_ids_cache || []) + [organisation.id]).uniq)
+    end
+  end
+
   def organisation_tier
     organisation_tier = nil
     organisation.organisation_tiers.order('threshold asc').each do |ot|

@@ -247,10 +247,10 @@ Dandelion::App.controller do
       organisationship.destroy if organisationship && !organisationship.admin? && !organisationship.monthly_donor?
     when 'follow_without_subscribing'
       organisationship = current_account.organisationships.find_by(organisation: @organisation) || current_account.organisationships.create(organisation: @organisation)
-      organisationship.set(unsubscribed: true)
+      organisationship.set_unsubscribed!(true)
     when 'follow_and_subscribe'
       organisationship = current_account.organisationships.find_by(organisation: @organisation) || current_account.organisationships.create(organisation: @organisation)
-      organisationship.set(unsubscribed: false)
+      organisationship.set_unsubscribed!(false)
     end
     if request.xhr?
       partial :'organisations/organisationship', locals: { organisation: @organisation, membership_toggle: params[:membership_toggle], btn_class: params[:btn_class] }
@@ -269,7 +269,7 @@ Dandelion::App.controller do
     @account = current_account || (params[:account_id] && Account.find(params[:account_id])) || sign_in_required!
     @organisation = Organisation.find_by(slug: params[:slug]) || not_found
     @organisationship = @account.organisationships.find_by(organisation: @organisation) || @account.organisationships.create(organisation: @organisation)
-    @organisationship.set(unsubscribed: true)
+    @organisationship.set_unsubscribed!(true)
     if params[:account_id]
       @unsubscribed = true
       erb :'organisations/unsubscribe'
@@ -495,7 +495,7 @@ Dandelion::App.controller do
     @organisation = Organisation.find_by(slug: params[:slug]) || not_found
     organisation_admins_only!
     @organisationship = @organisation.organisationships.find(params[:organisationship_id]) || not_found
-    @organisationship.set(unsubscribed: !params[:subscribed])
+    @organisationship.set_unsubscribed!(!params[:subscribed])
     200
   end
 
