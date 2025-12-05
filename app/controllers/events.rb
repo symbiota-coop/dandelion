@@ -192,13 +192,13 @@ Dandelion::App.controller do
     cohostship = nil
     if params[:cohost] && (cohost = Organisation.find_by(slug: params[:cohost])) && (cohostship = @event.cohostships.find_by(organisation: cohost)) && cohostship.image
       @event_image = cohostship.image.thumb('1920x1920')
-      @event_image_width = cohostship.image_width
-      @event_image_height = cohostship.image_height
+      @event_image_width = cohostship.image_width_unmagic
+      @event_image_height = cohostship.image_height_unmagic
       @og_image = cohostship.image.encode('jpg', '-quality 90').thumb('1200x630').url
     elsif @event.image
       @event_image = @event.image.thumb('1920x1920')
-      @event_image_width = @event.image_width
-      @event_image_height = @event.image_height
+      @event_image_width = @event.image_width_unmagic
+      @event_image_height = @event.image_height_unmagic
       @og_image = @event.image.encode('jpg', '-quality 90').thumb('1200x630').url
     elsif @event.organisation && @event.organisation.image
       @og_image = @event.organisation.image.encode('jpg', '-quality 90').thumb('1200x630').url
