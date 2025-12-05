@@ -98,6 +98,7 @@ module EventValidation
           errors.add(:image, "must be #{organisation.event_image_required_width}px wide") if organisation && organisation.event_image_required_width && image_width != organisation.event_image_required_width
           errors.add(:image, "must be #{organisation.event_image_required_height}px high") if organisation && organisation.event_image_required_height && image_height != organisation.event_image_required_height
         rescue StandardError
+          Honeybadger.notify(e)
           self.image = nil
         end
       end
