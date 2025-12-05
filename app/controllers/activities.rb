@@ -218,7 +218,7 @@ Dandelion::App.controller do
       # Filter to activity-subscribed, then exclude globally unsubscribed and org-unsubscribed
       @activityships = @activityships.and(unsubscribed: false)
       excluded_ids = Account.and(organisation_ids_cache: @activity.organisation_id).and(
-        :$or => [{ unsubscribed: true }, { :subscribed_organisation_ids_cache.ne => @activity.organisation_id }]
+        :$or => [{ unsubscribed: true }, { unsubscribed_organisation_ids_cache: @activity.organisation_id }]
       ).pluck(:id)
       @activityships = @activityships.and(:account_id.nin => excluded_ids) if excluded_ids.any?
     end
