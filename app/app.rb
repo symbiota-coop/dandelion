@@ -83,6 +83,14 @@ module Dandelion
       end
     end
 
+    get '/raise_job' do
+      admins_only!
+      msg = params[:message] || 'Test job error'
+      Delayed::Job.enqueue TestJob.new(message: msg)
+      flash[:notice] = 'Test job enqueued - it will fail when the worker processes it'
+      redirect back
+    end
+
     not_found do
       content_type 'text/html'
       erb :not_found, layout: :application
