@@ -70,27 +70,6 @@ module Dandelion
       erb :error, layout: :application
     end
 
-    get '/raise' do
-      admins_only!
-      msg = params[:message] || 'test error'
-      raise msg unless params[:detail]
-
-      begin
-        raise msg
-      rescue StandardError => e
-        Honeybadger.context({ detail: params[:detail] })
-        Honeybadger.notify(e)
-      end
-    end
-
-    get '/raise_job' do
-      admins_only!
-      msg = params[:message] || 'Test job error'
-      Delayed::Job.enqueue TestJob.new(message: msg)
-      flash[:notice] = 'Test job enqueued - it will fail when the worker processes it'
-      redirect back
-    end
-
     not_found do
       content_type 'text/html'
       erb :not_found, layout: :application
@@ -98,24 +77,6 @@ module Dandelion
 
     get '/not_found' do
       erb :not_found, layout: :application
-    end
-
-    ###
-
-    get '/fragments/delete/:q' do
-      admins_only!
-      if params[:q]
-        count = Fragment.and(key: /#{Regexp.escape(params[:q])}/i).delete_all
-        flash[:notice] = "Deleted #{pluralize(count, 'fragment')}"
-      end
-      redirect '/'
-    end
-
-    get '/geolocate' do
-      admins_only!
-      MaxMind::GeoIP2::Reader.new(database: 'GeoLite2-City.mmdb').city(ip_from_cloudflare).to_json
-    rescue StandardError => e
-      e.to_s
     end
 
     ###

@@ -85,4 +85,39 @@ Dandelion::App.controller do
 
     erb :'stats/gems'
   end
+
+  ###
+
+  get '/raise' do
+    msg = params[:message] || 'test error'
+    raise msg unless params[:detail]
+
+    begin
+      raise msg
+    rescue StandardError => e
+      Honeybadger.context({ detail: params[:detail] })
+      Honeybadger.notify(e)
+    end
+  end
+
+  get '/raise_job' do
+    msg = params[:message] || 'Test job error'
+    Delayed::Job.enqueue TestJob.new(message: msg)
+    flash[:notice] = 'Test job enqueued - it will fail when the worker processes it'
+    redirect back
+  end
+
+  get '/fragments/delete/:q' do
+    if params[:q]
+      count = Fragment.and(key: /#{Regexp.escape(params[:q])}/i).delete_all
+      flash[:notice] = "Deleted #{pluralize(count, 'fragment')}"
+    end
+    redirect '/'
+  end
+
+  get '/geolocate' do
+    MaxMind::GeoIP2::Reader.new(database: 'GeoLite2-City.mmdb').city(ip_from_cloudflare).to_json
+  rescue StandardError => e
+    e.to_s
+  end
 end
