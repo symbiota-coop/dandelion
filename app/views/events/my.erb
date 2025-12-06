@@ -39,9 +39,9 @@
                 <% else %>
                   <div class="col-lg-6 order-lg-2 mb-2 mb-lg-0 bg-white">
                     <% if @organisation && (cohostship = event.cohostships.find_by(organisation: @organisation)) && cohostship.image %>
-                      <a target="_parent" href="/e/<%= event.slug %>?cohost=<%=@organisation.slug%>"><img class="w-100" <% if cohostship.image_width_unmagic && cohostship.image_height_unmagic %>style="aspect-ratio: <%= cohostship.image_width_unmagic %> / <%= cohostship.image_height_unmagic %>"<% end %> src="<%= u cohostship.image.thumb('992x992').url %>"></a>
+                      <a target="_parent" href="/e/<%= event.slug %>?cohost=<%=@organisation.slug%>"><%= lazy_image_tag(cohostship.image, width: cohostship.image_width_unmagic, height: cohostship.image_height_unmagic) %></a>
                     <% elsif event.image %>
-                      <a target="_parent" href="/e/<%= event.slug %>"><img class="w-100" <% if event.image_width_unmagic && event.image_height_unmagic %>style="aspect-ratio: <%= event.image_width_unmagic %> / <%= event.image_height_unmagic %>"<% end %> src="<%= u event.image.thumb('992x992').url %>"></a>
+                      <a target="_parent" href="/e/<%= event.slug %>"><%= lazy_image_tag(event.image, width: event.image_width_unmagic, height: event.image_height_unmagic) %></a>
                     <% end %>
                   </div>
                 <% end %>
