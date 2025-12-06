@@ -9,7 +9,7 @@
     next if previous_event && previous_event.name == event.name && !previous_event.sold_out?
     %>
     <div class="col-12 col-sm-6 col-lg-4" style="margin-bottom: 0.75rem;">
-      <%= partial :'events/block_carousel', locals: {crop: (crop if defined?(crop)), event: event} %>
+      <%= partial :'events/block_carousel', locals: {event: event} %>
     </div>
     <% previous_event = event } %>
   </div>

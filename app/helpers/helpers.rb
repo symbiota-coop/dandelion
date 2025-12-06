@@ -24,18 +24,15 @@ Dandelion::App.helpers do
     }.html_safe
   end
 
-  def lazy_image_tag(image, width: nil, height: nil, crop: nil, full_size: '992x992', css_class: 'w-100', id: nil)
+  def lazy_image_tag(image, width: nil, height: nil, full_size: '992x992', css_class: 'w-100', id: nil)
     attrs = []
-    attrs << %{class="#{css_class}"} if css_class
-    attrs << %{id="#{id}"} if id
-    if width && height
-      attrs << %{style="aspect-ratio: #{width} / #{height}"}
-    end
-    attrs << %{src="#{u image.thumb('32x32').url}"}
-    full_size_thumb = crop || full_size
-    attrs << %{data-src="#{u image.thumb(full_size_thumb).url}"}
+    attrs << %(class="#{css_class}") if css_class
+    attrs << %(id="#{id}") if id
+    attrs << %(style="aspect-ratio: #{width} / #{height}") if width && height
+    attrs << %(src="#{u image.thumb('32x32').url}")
+    attrs << %(data-src="#{u image.thumb(full_size).url}")
     attrs << blur_up
-    %{<img #{attrs.join(' ')}>}.html_safe
+    %(<img #{attrs.join(' ')}>).html_safe
   end
 
   def md(text, hard_wrap: false)
