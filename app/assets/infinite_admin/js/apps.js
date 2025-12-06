@@ -1,159 +1,4 @@
-/*
- Template Name: Infinite Admin - Responsive Admin Dashboard Template build with Twitter Bootstrap 3.3.7 & Bootstrap 4
- Version: 1.3.0
- Author: Sean Ngu
- Website: http://www.seantheme.com/infinite-admin/admin/html/
- ----------------------------
- APPS CONTENT TABLE
- ----------------------------
-
- <!-- ======== GLOBAL SCRIPT SETTING ======== -->
- 01. Global Variable
- 02. Handle Scrollbar
- 03. Handle Header Search Bar
- 04. Handle Sidebar Menu
- 05. Handle Sidebar Minify
- 06. Handle Sidebar Scroll Memory
- 07. Handle Sidebar Minify Float Menu
- 08. Handle Dropdown Close Option
- 09. Handle App Notification
- 10. Handle Theme Panel & Cookie
- 11. Handle Panel - Remove / Reload / Collapse / Expand
- 12. Handle Tooltip & Popover Activation
- 13. Handle Scroll to Top Button Activation
- 14. Handle Page Load Fade In
-
- <!-- ======== APPLICATION SETTING ======== -->
- Application Controller
- */
-
-
-
-/* 01. Global Variable
- ------------------------------------------------ */
-var MUTED_COLOR = '#8A8A8F';
-var MUTED_TRANSPARENT_1_COLOR = 'rgba(138, 138, 143, 0.1)';
-var MUTED_TRANSPARENT_2_COLOR = 'rgba(138, 138, 143, 0.2)';
-var MUTED_TRANSPARENT_3_COLOR = 'rgba(138, 138, 143, 0.3)';
-var MUTED_TRANSPARENT_4_COLOR = 'rgba(138, 138, 143, 0.4)';
-var MUTED_TRANSPARENT_5_COLOR = 'rgba(138, 138, 143, 0.5)';
-var MUTED_TRANSPARENT_6_COLOR = 'rgba(138, 138, 143, 0.6)';
-var MUTED_TRANSPARENT_7_COLOR = 'rgba(138, 138, 143, 0.7)';
-var MUTED_TRANSPARENT_8_COLOR = 'rgba(138, 138, 143, 0.8)';
-var MUTED_TRANSPARENT_9_COLOR = 'rgba(138, 138, 143, 0.9)';
-
-var PRIMARY_COLOR = '#007AFF';
-var PRIMARY_TRANSPARENT_1_COLOR = 'rgba(0, 185, 99, 0.1)';
-var PRIMARY_TRANSPARENT_2_COLOR = 'rgba(0, 185, 99, 0.2)';
-var PRIMARY_TRANSPARENT_3_COLOR = 'rgba(0, 185, 99, 0.3)';
-var PRIMARY_TRANSPARENT_4_COLOR = 'rgba(0, 185, 99, 0.4)';
-var PRIMARY_TRANSPARENT_5_COLOR = 'rgba(0, 185, 99, 0.5)';
-var PRIMARY_TRANSPARENT_6_COLOR = 'rgba(0, 185, 99, 0.6)';
-var PRIMARY_TRANSPARENT_7_COLOR = 'rgba(0, 185, 99, 0.7)';
-var PRIMARY_TRANSPARENT_8_COLOR = 'rgba(0, 185, 99, 0.8)';
-var PRIMARY_TRANSPARENT_9_COLOR = 'rgba(0, 185, 99, 0.9)';
-
-var SUCCESS_COLOR = '#4CD964';
-var SUCCESS_TRANSPARENT_1_COLOR = 'rgba(76, 217, 100, 0.1)';
-var SUCCESS_TRANSPARENT_2_COLOR = 'rgba(76, 217, 100, 0.2)';
-var SUCCESS_TRANSPARENT_3_COLOR = 'rgba(76, 217, 100, 0.3)';
-var SUCCESS_TRANSPARENT_4_COLOR = 'rgba(76, 217, 100, 0.4)';
-var SUCCESS_TRANSPARENT_5_COLOR = 'rgba(76, 217, 100, 0.5)';
-var SUCCESS_TRANSPARENT_6_COLOR = 'rgba(76, 217, 100, 0.6)';
-var SUCCESS_TRANSPARENT_7_COLOR = 'rgba(76, 217, 100, 0.7)';
-var SUCCESS_TRANSPARENT_8_COLOR = 'rgba(76, 217, 100, 0.8)';
-var SUCCESS_TRANSPARENT_9_COLOR = 'rgba(76, 217, 100, 0.9)';
-
-var INFO_COLOR = '#5AC8FA';
-var INFO_TRANSPARENT_1_COLOR = 'rgba(90, 200, 250, 0.1)';
-var INFO_TRANSPARENT_2_COLOR = 'rgba(90, 200, 250, 0.2)';
-var INFO_TRANSPARENT_3_COLOR = 'rgba(90, 200, 250, 0.3)';
-var INFO_TRANSPARENT_4_COLOR = 'rgba(90, 200, 250, 0.4)';
-var INFO_TRANSPARENT_5_COLOR = 'rgba(90, 200, 250, 0.5)';
-var INFO_TRANSPARENT_6_COLOR = 'rgba(90, 200, 250, 0.6)';
-var INFO_TRANSPARENT_7_COLOR = 'rgba(90, 200, 250, 0.7)';
-var INFO_TRANSPARENT_8_COLOR = 'rgba(90, 200, 250, 0.8)';
-var INFO_TRANSPARENT_9_COLOR = 'rgba(90, 200, 250, 0.9)';
-
-var WARNING_COLOR = '#FF9500';
-var WARNING_TRANSPARENT_1_COLOR = 'rgba(255, 149, 0, 0.1)';
-var WARNING_TRANSPARENT_2_COLOR = 'rgba(255, 149, 0, 0.2)';
-var WARNING_TRANSPARENT_3_COLOR = 'rgba(255, 149, 0, 0.3)';
-var WARNING_TRANSPARENT_4_COLOR = 'rgba(255, 149, 0, 0.4)';
-var WARNING_TRANSPARENT_5_COLOR = 'rgba(255, 149, 0, 0.5)';
-var WARNING_TRANSPARENT_6_COLOR = 'rgba(255, 149, 0, 0.6)';
-var WARNING_TRANSPARENT_7_COLOR = 'rgba(255, 149, 0, 0.7)';
-var WARNING_TRANSPARENT_8_COLOR = 'rgba(255, 149, 0, 0.8)';
-var WARNING_TRANSPARENT_9_COLOR = 'rgba(255, 149, 0, 0.9)';
-
-var DANGER_COLOR = '#FF3B30';
-var DANGER_TRANSPARENT_1_COLOR = 'rgba(255, 59, 48, 0.1)';
-var DANGER_TRANSPARENT_2_COLOR = 'rgba(255, 59, 48, 0.2)';
-var DANGER_TRANSPARENT_3_COLOR = 'rgba(255, 59, 48, 0.3)';
-var DANGER_TRANSPARENT_4_COLOR = 'rgba(255, 59, 48, 0.4)';
-var DANGER_TRANSPARENT_5_COLOR = 'rgba(255, 59, 48, 0.5)';
-var DANGER_TRANSPARENT_6_COLOR = 'rgba(255, 59, 48, 0.6)';
-var DANGER_TRANSPARENT_7_COLOR = 'rgba(255, 59, 48, 0.7)';
-var DANGER_TRANSPARENT_8_COLOR = 'rgba(255, 59, 48, 0.8)';
-var DANGER_TRANSPARENT_9_COLOR = 'rgba(255, 59, 48, 0.9)';
-
-var PINK_COLOR = '#FF2D55';
-var PINK_TRANSPARENT_1_COLOR = 'rgba(255, 45, 85, 0.1)';
-var PINK_TRANSPARENT_2_COLOR = 'rgba(255, 45, 85, 0.2)';
-var PINK_TRANSPARENT_3_COLOR = 'rgba(255, 45, 85, 0.3)';
-var PINK_TRANSPARENT_4_COLOR = 'rgba(255, 45, 85, 0.4)';
-var PINK_TRANSPARENT_5_COLOR = 'rgba(255, 45, 85, 0.5)';
-var PINK_TRANSPARENT_6_COLOR = 'rgba(255, 45, 85, 0.6)';
-var PINK_TRANSPARENT_7_COLOR = 'rgba(255, 45, 85, 0.7)';
-var PINK_TRANSPARENT_8_COLOR = 'rgba(255, 45, 85, 0.8)';
-var PINK_TRANSPARENT_9_COLOR = 'rgba(255, 45, 85, 0.9)';
-
-var PURPLE_COLOR = '#5856D6';
-var PURPLE_TRANSPARENT_1_COLOR = 'rgba(88, 86, 214, 0.1)';
-var PURPLE_TRANSPARENT_2_COLOR = 'rgba(88, 86, 214, 0.2)';
-var PURPLE_TRANSPARENT_3_COLOR = 'rgba(88, 86, 214, 0.3)';
-var PURPLE_TRANSPARENT_4_COLOR = 'rgba(88, 86, 214, 0.4)';
-var PURPLE_TRANSPARENT_5_COLOR = 'rgba(88, 86, 214, 0.5)';
-var PURPLE_TRANSPARENT_6_COLOR = 'rgba(88, 86, 214, 0.6)';
-var PURPLE_TRANSPARENT_7_COLOR = 'rgba(88, 86, 214, 0.7)';
-var PURPLE_TRANSPARENT_8_COLOR = 'rgba(88, 86, 214, 0.8)';
-var PURPLE_TRANSPARENT_9_COLOR = 'rgba(88, 86, 214, 0.9)';
-
-var YELLOW_COLOR = '#FFCC00';
-var YELLOW_TRANSPARENT_1_COLOR = 'rgba(255, 204, 0, 0.1)';
-var YELLOW_TRANSPARENT_2_COLOR = 'rgba(255, 204, 0, 0.2)';
-var YELLOW_TRANSPARENT_3_COLOR = 'rgba(255, 204, 0, 0.3)';
-var YELLOW_TRANSPARENT_4_COLOR = 'rgba(255, 204, 0, 0.4)';
-var YELLOW_TRANSPARENT_5_COLOR = 'rgba(255, 204, 0, 0.5)';
-var YELLOW_TRANSPARENT_6_COLOR = 'rgba(255, 204, 0, 0.6)';
-var YELLOW_TRANSPARENT_7_COLOR = 'rgba(255, 204, 0, 0.7)';
-var YELLOW_TRANSPARENT_8_COLOR = 'rgba(255, 204, 0, 0.8)';
-var YELLOW_TRANSPARENT_9_COLOR = 'rgba(255, 204, 0, 0.9)';
-
-var INVERSE_COLOR = '#000000';
-var INVERSE_TRANSPARENT_1_COLOR = 'rgba(0, 0, 0, 0.1)';
-var INVERSE_TRANSPARENT_2_COLOR = 'rgba(0, 0, 0, 0.2)';
-var INVERSE_TRANSPARENT_3_COLOR = 'rgba(0, 0, 0, 0.3)';
-var INVERSE_TRANSPARENT_4_COLOR = 'rgba(0, 0, 0, 0.4)';
-var INVERSE_TRANSPARENT_5_COLOR = 'rgba(0, 0, 0, 0.5)';
-var INVERSE_TRANSPARENT_6_COLOR = 'rgba(0, 0, 0, 0.6)';
-var INVERSE_TRANSPARENT_7_COLOR = 'rgba(0, 0, 0, 0.7)';
-var INVERSE_TRANSPARENT_8_COLOR = 'rgba(0, 0, 0, 0.8)';
-var INVERSE_TRANSPARENT_9_COLOR = 'rgba(0, 0, 0, 0.9)';
-
-var WHITE_COLOR = '#FFFFFF';
-var WHITE_TRANSPARENT_1_COLOR = 'rgba(255, 255, 255, 0.1)';
-var WHITE_TRANSPARENT_2_COLOR = 'rgba(255, 255, 255, 0.2)';
-var WHITE_TRANSPARENT_3_COLOR = 'rgba(255, 255, 255, 0.3)';
-var WHITE_TRANSPARENT_4_COLOR = 'rgba(255, 255, 255, 0.4)';
-var WHITE_TRANSPARENT_5_COLOR = 'rgba(255, 255, 255, 0.5)';
-var WHITE_TRANSPARENT_6_COLOR = 'rgba(255, 255, 255, 0.6)';
-var WHITE_TRANSPARENT_7_COLOR = 'rgba(255, 255, 255, 0.7)';
-var WHITE_TRANSPARENT_8_COLOR = 'rgba(255, 255, 255, 0.8)';
-var WHITE_TRANSPARENT_9_COLOR = 'rgba(255, 255, 255, 0.9)';
-
-
-/* 02. Handle Scrollbar
+/* 01. Handle Scrollbar
  ------------------------------------------------ */
 var handleSlimScroll = function () {
   "use strict";
@@ -183,7 +28,7 @@ var generateSlimScroll = function (element) {
 };
 
 
-/* 03. Handle Header Search Bar
+/* 02. Handle Header Search Bar
  ------------------------------------------------ */
 var handleHeaderSearchBar = function () {
   $(document).on('click', '[data-toggle="search-bar"]', function (e) {
@@ -244,7 +89,7 @@ var handleHeaderSearchBar = function () {
 };
 
 
-/* 04. Handle Sidebar Menu
+/* 03. Handle Sidebar Menu
  ------------------------------------------------ */
 var handleSidebarMenu = function () {
   "use strict";
@@ -289,7 +134,7 @@ var handleSidebarMenu = function () {
 };
 
 
-/* 05. Handle Sidebar Minify
+/* 04. Handle Sidebar Minify
  ------------------------------------------------ */
 var handleSidebarMinify = function () {
   $('[data-click="sidebar-minify"]').click(function (e) {
@@ -307,7 +152,7 @@ var handleSidebarMinify = function () {
 };
 
 
-/* 06. Handle Sidebar Scroll Memory
+/* 05. Handle Sidebar Scroll Memory
  ------------------------------------------------ */
 var handleSidebarScrollMemory = function () {
   if (!(/Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent))) {
@@ -323,7 +168,7 @@ var handleSidebarScrollMemory = function () {
 };
 
 
-/* 07. Handle Sidebar Minify Float Menu
+/* 06. Handle Sidebar Minify Float Menu
  ------------------------------------------------ */
 var floatSubMenuTimeout;
 var targetFloatMenu;
@@ -414,391 +259,12 @@ var handleSidebarMinifyFloatMenu = function () {
 }
 
 
-/* 08. Handle Dropdown Close Option
+/* 07. Handle Dropdown Close Option
  ------------------------------------------------ */
 var handleDropdownClose = function () {
   $(document).on('click', '[data-dropdown-close="false"]', function (e) {
     e.stopPropagation();
   });
-};
-
-
-/* 09. Handle App Notification
- ------------------------------------------------ */
-var handleAppNotification = function () {
-  $.extend({
-    notification: function (data) {
-      var title = (data.title) ? data.title : '';
-      var content = (data.content) ? data.content : '';
-      var icon = (data.icon) ? data.icon : '';
-      var iconClass = (data.iconClass) ? data.iconClass : '';
-      var img = (data.img) ? data.img : '';
-      var imgClass = (data.imgClass) ? data.imgClass : '';
-      var closeBtn = (data.closeBtn) ? data.closeBtn : '';
-      var closeBtnText = (data.closeBtnText) ? data.closeBtnText : '';
-      var btn = (data.btn) ? data.btn : '';
-      var btnText = (data.btnText) ? data.btnText : '';
-      var btnAttr = (data.btnAttr) ? data.btnAttr : '';
-      var btnUrl = (data.btnUrl) ? data.btnUrl : '#';
-      var autoclose = (data.autoclose) ? data.autoclose : '';
-      var autocloseTime = (data.autocloseTime) ? data.autocloseTime : 5000;
-      var customClass = (data.class) ? data.class : '';
-      var inverseMode = (data.inverseMode) ? 'page-notification-inverse' : '';
-
-      var titleHtml = (title) ? '<h4 class="notification-title">' + title + '</h4>' : '';
-      var contentHtml = (content) ? '<p class="notification-desc">' + content + '</p>' : '';
-      var mediaHtml = (icon) ? '<div class="notification-media"><i class="' + icon + ' ' + iconClass + '"></i></div>' : '';
-      mediaHtml = (img) ? '<div class="notification-media"><img src="' + img + '" class="' + imgClass + '"></i></div>' : mediaHtml;
-      var customBtnHtml = (btn && btnText) ? '<a href="' + btnUrl + '" ' + btnAttr + '>' + btnText + '</a>' : '';
-      var closeBtnHtml = (closeBtn && closeBtn == 'disabled') ? '' : '<a href="#" data-dismiss="notification">Close</a>';
-      var infoHtml = (!titleHtml && !contentHtml) ? '' : '<div class="notification-info">' + titleHtml + contentHtml + '</div>';
-      var btnHtmlClass = (!customBtnHtml && closeBtnHtml || customBtnHtml && !closeBtnHtml) ? 'single-btn' : '';
-      var btnHtml = '<div class="notification-btn ' + btnHtmlClass + '">' + customBtnHtml + closeBtnHtml + '</div>';
-      var finalHtml = '<div class="page-notification ' + customClass + ' bounceInRight animated ' + inverseMode + '">' + mediaHtml + infoHtml + btnHtml + '</div>';
-
-      if ($('#page-notification-container').length === 0) {
-        $('body').append('<div id="page-notification-container" class="page-notification-container"></div>');
-      }
-      $('#page-notification-container').append(finalHtml);
-      if (autoclose) {
-        var targetElm = $('#page-notification-container').find('.page-notification').last();
-        setTimeout(function () {
-          $(targetElm).fadeOut(function () {
-            $(this).remove();
-          });
-        }, autocloseTime);
-      }
-    }
-  });
-
-  $(document).on('click', '[data-toggle="notification"]', function (e) {
-    e.preventDefault();
-    var data = {
-      title: ($(this).attr('data-title')) ? $(this).attr('data-title') : '',
-      content: ($(this).attr('data-content')) ? $(this).attr('data-content') : '',
-      icon: ($(this).attr('data-icon')) ? $(this).attr('data-icon') : '',
-      iconClass: ($(this).attr('data-icon-class')) ? $(this).attr('data-icon-class') : '',
-      img: ($(this).attr('data-img')) ? $(this).attr('data-img') : '',
-      imgClass: ($(this).attr('data-img-class')) ? $(this).attr('data-img-class') : '',
-      btn: ($(this).attr('data-btn')) ? $(this).attr('data-btn') : '',
-      btnText: ($(this).attr('data-btn-text')) ? $(this).attr('data-btn-text') : '',
-      btnAttr: ($(this).attr('data-btn-attr')) ? $(this).attr('data-btn-attr') : '',
-      btnUrl: ($(this).attr('data-btn-url')) ? $(this).attr('data-btn-url') : '',
-      autoclose: ($(this).attr('data-autoclose')) ? $(this).attr('data-autoclose') : '',
-      autocloseTime: ($(this).attr('data-autoclose-time')) ? $(this).attr('data-autoclose-time') : '',
-      customClass: ($(this).attr('data-class')) ? $(this).attr('data-class') : '',
-      inverseMode: ($(this).attr('data-inverse-mode')) ? $(this).attr('data-inverse-mode') : '',
-    };
-    $.notification(data);
-  });
-  $(document).on('click', '[data-dismiss="notification"]', function (e) {
-    e.preventDefault();
-    $(this).closest('.page-notification').fadeOut(function () {
-      $(this).remove();
-    });
-  });
-};
-
-
-/* 10. Handle Theme Panel & Cookie
- ------------------------------------------------ */
-var handleThemePanelExpand = function () {
-  $('[data-click="theme-panel-expand"]').click(function (e) {
-    e.preventDefault();
-
-    var targetElm = '.theme-panel';
-    var targetClass = 'active';
-
-    if ($(targetElm).hasClass(targetClass)) {
-      $(targetElm).removeClass(targetClass);
-    } else {
-      $(targetElm).addClass(targetClass);
-    }
-  });
-};
-var handleThemePanelReset = function () {
-  $('[data-click="reset-theme-setting"]').click(function (e) {
-    e.preventDefault();
-    Cookies.remove('theme');
-    window.location.href = document.URL;
-  });
-};
-var handleSetThemeCookie = function (field, value) {
-  var cookie = (Cookies.getJSON('theme')) ? Cookies.getJSON('theme') : {};
-  cookie[field] = value;
-  Cookies.set('theme', cookie);
-};
-var handelThemePanelColorSelector = function () {
-  $('[data-click="theme-selector"]').click(function (e) {
-    e.preventDefault();
-    var targetFile = $(this).attr('data-theme-file');
-    var targetTheme = $(this).attr('data-theme');
-
-    $('#theme').attr('href', targetFile);
-    $('[data-click="theme-selector"]').not(this).closest('li').removeClass('active');
-    $(this).closest('li').addClass('active');
-    handleSetThemeCookie('color', targetTheme);
-  });
-};
-var handleThemePanelCookie = function () {
-
-  // SIDEBAR FIXED
-  $('.theme-panel #sidebar_fixed').change(function (e) {
-    var cookieValue = ($(this).is(':checked')) ? 'fixed' : '';
-    if (cookieValue) {
-      $('#page-container').addClass('page-sidebar-fixed');
-      if (!$('.theme-panel #header_fixed').is(':checked')) {
-        $('.theme-panel #header_fixed').prop('checked', true);
-        $('.theme-panel #header_fixed').trigger('change');
-      }
-    } else {
-      $('#page-container').removeClass('page-sidebar-fixed');
-    }
-    handleSetThemeCookie('sidebarPosition', cookieValue);
-  });
-
-
-  // SIDEBAR LIGHT
-  $('.theme-panel #sidebar_light').change(function (e) {
-    var cookieValue = ($(this).is(':checked')) ? 'light' : '';
-    if (cookieValue) {
-      $('#sidebar').removeClass('sidebar-inverse');
-    } else {
-      $('#sidebar').addClass('sidebar-inverse');
-    }
-    handleSetThemeCookie('sidebarColor', cookieValue);
-  });
-
-
-  // HEADER FIXED
-  $('.theme-panel #header_fixed').change(function (e) {
-    var cookieValue = ($(this).is(':checked')) ? 'fixed' : '';
-    if (cookieValue) {
-      $('#page-container').addClass('page-header-fixed');
-    } else {
-      $('#page-container').removeClass('page-header-fixed');
-      if ($('.theme-panel #sidebar_fixed').is(':checked')) {
-        $('.theme-panel #sidebar_fixed').prop('checked', false);
-        $('.theme-panel #sidebar_fixed').trigger('change');
-      }
-    }
-    handleSetThemeCookie('headerPosition', cookieValue);
-  });
-
-
-  // HEADER DARK
-  $('.theme-panel #header_dark').change(function (e) {
-    var cookieValue = ($(this).is(':checked')) ? 'dark' : '';
-    if (cookieValue) {
-      $('#header').addClass('navbar-inverse').removeClass('navbar-default');
-    } else {
-      $('#header').addClass('navbar-default').removeClass('navbar-inverse');
-    }
-    handleSetThemeCookie('headerColor', cookieValue);
-  });
-
-
-  // PAGE LOAD COOKIE
-  if (Cookies.getJSON('theme')) {
-    cookie = Cookies.getJSON('theme');
-
-    if (cookie.color) {
-      $('[data-theme="' + cookie.color + '"]').trigger('click');
-    }
-    if (cookie.headerColor && cookie.headerColor == 'dark') {
-      $('.theme-panel #header_dark').prop('checked', true).trigger('change');
-    }
-    if (cookie.headerFixed && cookie.headerFixed == 'fixed') {
-      $('.theme-panel #header_fixed').prop('checked', true).trigger('change');
-    }
-    if (cookie.sidebarColor && cookie.sidebarColor == 'light') {
-      $('.theme-panel #sidebar_light').prop('checked', true).trigger('change');
-    }
-    if (cookie.sidebarFixed && cookie.sidebarFixed == 'fixed') {
-      $('.theme-panel #sidebar_fixed').prop('checked', true).trigger('change');
-    }
-  } else {
-    $('.theme-panel').addClass('active');
-  }
-};
-
-
-/* 11. Handle Panel - Remove / Reload / Collapse / Expand
- ------------------------------------------------ */
-var panelActionRunning = false;
-var handlePanelAction = function () {
-  "use strict";
-
-  if (panelActionRunning) {
-    return false;
-  }
-  panelActionRunning = true;
-
-  // remove
-  $(document).on('hover', '[data-toggle=panel-remove]', function (e) {
-    if (!$(this).attr('data-init')) {
-      $(this).tooltip({
-        title: 'Remove',
-        placement: 'bottom',
-        trigger: 'hover',
-        container: 'body'
-      });
-      $(this).tooltip('show');
-      $(this).attr('data-init', true);
-    }
-  });
-  $(document).on('click', '[data-toggle=panel-remove]', function (e) {
-    e.preventDefault();
-    $(this).tooltip('destroy');
-    $(this).closest('.panel').remove();
-  });
-
-  // collapse
-  $(document).on('hover', '[data-toggle=panel-collapse]', function (e) {
-    if (!$(this).attr('data-init')) {
-      $(this).tooltip({
-        title: 'Collapse / Expand',
-        placement: 'bottom',
-        trigger: 'hover',
-        container: 'body'
-      });
-      $(this).tooltip('show');
-      $(this).attr('data-init', true);
-    }
-  });
-  $(document).on('click', '[data-toggle=panel-collapse]', function (e) {
-    e.preventDefault();
-    $(this).closest('.panel').find('.panel-body').slideToggle();
-  });
-
-  // reload
-  $(document).on('hover', '[data-toggle=panel-reload]', function (e) {
-    if (!$(this).attr('data-init')) {
-      $(this).tooltip({
-        title: 'Reload',
-        placement: 'bottom',
-        trigger: 'hover',
-        container: 'body'
-      });
-      $(this).tooltip('show');
-      $(this).attr('data-init', true);
-    }
-  });
-  $(document).on('click', '[data-toggle=panel-reload]', function (e) {
-    e.preventDefault();
-    var target = $(this).closest('.panel');
-    if (!$(target).hasClass('panel-loading')) {
-      var targetBody = $(target).find('.panel-body');
-      var spinnerHtml = '<div class="panel-loading"><div class="spinner"></div></div>';
-      $(target).addClass('panel-loading');
-      $(targetBody).prepend(spinnerHtml);
-      setTimeout(function () {
-        $(target).removeClass('panel-loading');
-        $(target).find('.panel-loading').remove();
-      }, 2000);
-    }
-  });
-
-  // expand
-  $(document).on('hover', '[data-toggle=panel-expand]', function (e) {
-    if (!$(this).attr('data-init')) {
-      $(this).tooltip({
-        title: 'Expand / Compress',
-        placement: 'bottom',
-        trigger: 'hover',
-        container: 'body'
-      });
-      $(this).tooltip('show');
-      $(this).attr('data-init', true);
-    }
-  });
-  $(document).on('click', '[data-toggle=panel-expand]', function (e) {
-    e.preventDefault();
-    var target = $(this).closest('.panel');
-    var targetBody = $(target).find('.panel-body');
-    var targetTop = 40;
-    if ($(targetBody).length !== 0) {
-      var targetOffsetTop = $(target).offset().top;
-      var targetBodyOffsetTop = $(targetBody).offset().top;
-      targetTop = targetBodyOffsetTop - targetOffsetTop;
-    }
-
-    if ($('body').hasClass('panel-expand') && $(target).hasClass('panel-expand')) {
-      $('body, .panel').removeClass('panel-expand');
-      $('.panel').removeAttr('style');
-      $(targetBody).removeAttr('style');
-    } else {
-      $('body').addClass('panel-expand');
-      $(this).closest('.panel').addClass('panel-expand');
-
-      if ($(targetBody).length !== 0 && targetTop != 40) {
-        var finalHeight = 40;
-        $(target).find(' > *').each(function () {
-          var targetClass = $(this).attr('class');
-
-          if (targetClass != 'panel-heading' && targetClass != 'panel-body') {
-            finalHeight += $(this).height() + 30;
-          }
-        });
-        if (finalHeight != 40) {
-          $(targetBody).css('top', finalHeight + 'px');
-        }
-      }
-    }
-    $(window).trigger('resize');
-  });
-};
-
-
-/* 12. Handle Tooltip & Popover Activation
- ------------------------------------------------ */
-var handelTooltipPopoverActivation = function () {
-  "use strict";
-  if ($('[data-toggle="tooltip"]').length !== 0) {
-    $('[data-toggle=tooltip]').tooltip();
-  }
-  if ($('[data-toggle="popover"]').length !== 0) {
-    $('[data-toggle=popover]').popover();
-  }
-};
-
-
-/* 13. Handle Scroll to Top Button Activation
- ------------------------------------------------ */
-var handleScrollToTopButton = function () {
-  "use strict";
-  $(document).scroll(function () {
-    var totalScroll = $(document).scrollTop();
-
-    if (totalScroll >= 200) {
-      $('[data-click=scroll-top]').addClass('in');
-    } else {
-      $('[data-click=scroll-top]').removeClass('in');
-    }
-  });
-  $('.content').scroll(function () {
-    var totalScroll = $('.content').scrollTop();
-
-    if (totalScroll >= 200) {
-      $('[data-click=scroll-top]').addClass('in');
-    } else {
-      $('[data-click=scroll-top]').removeClass('in');
-    }
-  });
-
-  $('[data-click=scroll-top]').click(function (e) {
-    e.preventDefault();
-    $('html, body, .content').animate({
-      scrollTop: $("body").offset().top
-    }, 500);
-  });
-};
-
-
-/* 14. Handle Page Load Fade In
- ------------------------------------------------ */
-var handlePageLoadFadeIn = function () {
-  $('#page-container').addClass('in');
 };
 
 
@@ -813,11 +279,6 @@ var App = function () {
       this.initSidebar();
       this.initHeader();
       this.initComponent();
-      this.initThemePanel();
-      this.initPage();
-    },
-    initPage: function () {
-      //      handlePageLoadFadeIn();
     },
     initSidebar: function () {
       handleSidebarMinifyFloatMenu();
@@ -830,22 +291,7 @@ var App = function () {
     },
     initComponent: function () {
       handleSlimScroll();
-      handlePanelAction();
-      // handelTooltipPopoverActivation();
-      handleScrollToTopButton();
       handleDropdownClose();
-      handleAppNotification();
-    },
-    initThemePanel: function () {
-      handleThemePanelExpand();
-      handleThemePanelReset();
-      handelThemePanelColorSelector();
-      handleThemePanelCookie();
-    },
-    scrollTop: function () {
-      $('html, body, .content').animate({
-        scrollTop: $('body').offset().top
-      }, 0);
     }
   };
 }();
