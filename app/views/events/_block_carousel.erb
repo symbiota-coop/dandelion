@@ -6,7 +6,7 @@
       <video src="<%=cohostship.video.url%>" type="video/mp4" controls muted playsinline onmouseover="this.play();" onmouseout="this.pause();"></video>
     </div>
   <% elsif cohostship.image %>
-    <%= lazy_image_tag(cohostship.image, width: cohostship.image_width_unmagic, height: cohostship.image_height_unmagic) %>
+    <%= blurred_image_tag(cohostship.image, width: cohostship.image_width_unmagic, height: cohostship.image_height_unmagic) %>
   <% end %>
 </a>
 <% else %>
@@ -16,7 +16,7 @@
     <video src="<%=event.video.url%>" type="video/mp4" controls muted playsinline onmouseover="this.play();" onmouseout="this.pause();"></video>
   </div>
 <% else %>
-  <%= lazy_image_tag(event.image, width: event.image_width_unmagic, height: event.image_height_unmagic) %>
+  <%= blurred_image_tag(event.image, width: event.image_width_unmagic, height: event.image_height_unmagic) %>
 <% end %>
 </a>
 <% end %>

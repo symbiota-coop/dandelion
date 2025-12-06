@@ -24,7 +24,7 @@ Dandelion::App.helpers do
     }.html_safe
   end
 
-  def lazy_image_tag(image, width: nil, height: nil, full_size: '992x992', css_class: 'w-100', id: nil)
+  def blurred_image_tag(image, width: nil, height: nil, full_size: '992x992', css_class: 'w-100', id: nil)
     attrs = []
     attrs << %(class="#{css_class}") if css_class
     attrs << %(id="#{id}") if id
