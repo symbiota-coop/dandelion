@@ -76,16 +76,16 @@
     </div>
 
     <div class="form-row align-items-end mt-1">
-      <%= checkbox 'Online', form_group_class: 'col-12 col-sm-auto' %>
-      <%= checkbox 'In person', form_group_class: 'col-12 col-sm-auto' %>
-      <%= checkbox 'No coordinator', form_group_class: 'col-12 col-sm-auto' %>
-      <%= checkbox 'No facilitators', form_group_class: 'col-12 col-sm-auto' %>
+      <%= checkbox 'Online', form_group_class: 'col-auto col-sm-auto' %>
+      <%= checkbox 'In person', form_group_class: 'col-auto col-sm-auto' %>
+      <%= checkbox 'No coordinator', form_group_class: 'col-auto col-sm-auto' %>
+      <%= checkbox 'No facilitators', form_group_class: 'col-auto col-sm-auto' %>
       <% if @organisation %>
-        <%= checkbox 'Exclude co-hosted', form_group_class: 'col-12 col-sm-auto' %>
+        <%= checkbox 'Exclude co-hosted', form_group_class: 'col-auto col-sm-auto' %>
         <% if @organisation.stripe_client_id %>
-          <%= checkbox 'Discrepancy', form_group_class: 'col-12 col-sm-auto' %>
+          <%= checkbox 'Discrepancy', form_group_class: 'col-auto col-sm-auto' %>
         <% end %>
-        <%= checkbox 'Deleted', form_group_class: 'col-12 col-sm-auto' %>
+        <%= checkbox 'Deleted', form_group_class: 'col-auto col-sm-auto' %>
       <% end %>
       <div class="form-group col-12 col-sm-auto">
         <%= submit_tag 'Search', class: 'btn btn-primary mb-0' %>
