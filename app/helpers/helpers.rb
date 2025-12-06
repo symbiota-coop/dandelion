@@ -3,6 +3,27 @@ Dandelion::App.helpers do
     request.env['HTTP_CF_CONNECTING_IP'] || request.env['HTTP_X_FORWARDED_FOR']
   end
 
+  def blur_up
+    %{
+      onload="if (this.dataset.src && !this.dataset.loaded) {
+        var el = this;
+        var img = new Image();
+        img.src = this.dataset.src;
+        if (img.complete) {
+          el.dataset.loaded = 'true';
+          el.src = el.dataset.src;
+        } else {
+          el.style.filter = 'blur(8px)';
+          img.onload = function() {
+            el.dataset.loaded = 'true';
+            el.src = el.dataset.src;
+            el.style.filter = 'none';
+          }
+        }
+      }"
+    }.html_safe
+  end
+
   def md(text, hard_wrap: false)
     markdown = Redcarpet::Markdown.new(hard_wrap ? Redcarpet::Render::HTML.new(hard_wrap: true) : Redcarpet::Render::HTML, autolink: true, tables: true, fenced_code_blocks: true)
     markdown.render(text)

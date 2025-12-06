@@ -239,6 +239,12 @@
         <%= f.text_block :select_tickets_outro %>
         <%= f.text_block :carousel_text %>
         <%= f.text_block :rsvp_button_text %>
+        <%= f.check_box_block :hide_attendees %>
+        <%= f.check_box_block :hide_discussion %>
+        <%= f.check_box_block :hide_from_carousels %>
+        <%= f.check_box_block :hide_few_left %>
+        <%= f.check_box_block :hide_organisation_footer %>
+        <%= f.check_box_block :hide_unavailable_tickets %>
         <%= f.check_box_block :blank_price_for_free_tickets %>
         <%= f.color_block :theme_color %>
       </div>
@@ -277,12 +283,6 @@
         <% if current_account.memberships.and(admin: true).exists? %>
           <%= f.select_block :gathering_id, options: [''] + current_account.memberships.and(admin: true).map { |m| [m.gathering.name, m.gathering_id] }.sort_by { |a,b| a } %>
         <% end %>
-        <%= f.check_box_block :hide_attendees %>
-        <%= f.check_box_block :hide_discussion %>
-        <%= f.check_box_block :hide_from_carousels %>
-        <%= f.check_box_block :hide_few_left %>
-        <%= f.check_box_block :hide_organisation_footer %>
-        <%= f.check_box_block :hide_unavailable_tickets %>
         <%= f.check_box_block :no_tickets_pdf %>
         <%= f.check_box_block :prevent_reminders %>
         <%= f.check_box_block :monthly_donors_only %>
