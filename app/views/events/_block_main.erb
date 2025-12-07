@@ -30,7 +30,7 @@
   <% end %>
   <li>
     <i data-toggle="tooltip" title="Dates/times" class="bi bi-calendar-event"></i>
-    <%= when_details(event) %>
+    <%= when_details(event).split(' (UTC')[0] %>
   </li>
   <li>
     <i data-toggle="tooltip" title="Location" class="bi bi-geo-alt-fill"></i>
