@@ -47,7 +47,7 @@
       <li>
         <div class="search-result-media" style="height: auto">
           <% if organisation.image %>
-            <a href="/o/<%= organisation.slug %>"><%= blurred_image_tag(organisation.image, full_size: '400x400') %></a>
+            <a href="/o/<%= organisation.slug %>"><img src="<%= u organisation.image.thumb('400x400').url %>"></a>
           <% else %>
             <a href="/o/<%= organisation.slug %>">
               <div style="border: 2px solid #212529; height: 5.625rem"></div>
@@ -69,7 +69,7 @@
       <li>
         <% if gathering.image %>
           <div class="search-result-media" style="height: auto">
-            <a href="/g/<%= gathering.slug %>"><%= blurred_image_tag(gathering.image, full_size: '400x400') %></a>
+            <a href="/g/<%= gathering.slug %>"><img src="<%= u gathering.image.thumb('400x400').url %>"></a>
           </div>
         <% end %>
         <div class="search-result-content">
