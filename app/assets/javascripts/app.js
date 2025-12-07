@@ -79,23 +79,22 @@ $(function () {
     }
   }
 
-  $('select').change(function () {
-    styleSelectElement(this);
-  })
-
-  $('select').each(function () {
-    styleSelectElement(this);
-    $(this).removeClass('select-placeholder');
-  })
-
-  $('.either-or input[type="checkbox"]').change(function () {
-    if (this.checked) {
-      $('.either-or input[type="checkbox"]').not(this).prop('checked', false);
-    }
-  });
-
   function ajaxCompleted () {
-    $('input[type=file]').change(function () {
+    $('select').not('[data-select-styled]').attr('data-select-styled', true).each(function () {
+      styleSelectElement(this);
+      $(this).removeClass('select-placeholder');
+      $(this).change(function () {
+        styleSelectElement(this);
+      })
+    })
+
+    $('.either-or input[type="checkbox"]').not('[data-either-or-registered]').attr('data-either-or-registered', true).change(function () {
+      if (this.checked) {
+        $('.either-or input[type="checkbox"]').not(this).prop('checked', false);
+      }
+    });
+
+    $('input[type=file]').not('[data-file-size-check]').attr('data-file-size-check', true).change(function () {
       if (this.files.length > 0 && this.files[0].size > 10e6) {
         alert('That file is too large, the maximum file size is 10MB. Please resize it before uploading.')
         $(this).val('')
@@ -234,143 +233,145 @@ $(function () {
     $('.links-blank').not('[data-links-blank-done]').attr('data-links-blank-done', true).each(function () {
       $('a[href^=http]', this).attr('target', '_blank')
     })
+
+    $('code, pre').not('[data-highlighted]').attr('data-highlighted', true).each(function () {
+      hljs.highlightElement(this)
+    })
+
+    $('input[type=hidden].lookup').not('[data-lookup-initialized]').attr('data-lookup-initialized', true).each(function () {
+      $(this).lookup({
+        lookup_url: $(this).attr('data-lookup-url'),
+        placeholder: $(this).attr('placeholder'),
+        id_param: 'id'
+      })
+    })
+
+    $('[data-upload-url]').not('[data-upload-registered]').attr('data-upload-registered', true).click(function () {
+      const form = $('<form action="' + $(this).attr('data-upload-url') + '" method="post" enctype="multipart/form-data"><input style="display: none" type="file" name="upload"></form>')
+      form.insertAfter(this)
+      form.find('input').click().change(function () {
+        this.form.submit()
+      })
+    })
+
+    $('input[type=text].slug, div.slugify input[type=text].shorturl').not('[data-slug-initialized]').attr('data-slug-initialized', true).each(function () {
+      const slug = $(this)
+      const start_length = slug.val().length
+      const pos = $.inArray(this, $('input', this.form)) - 1
+      const title = $($('input', this.form).get(pos))
+      slug.focus(function () {
+        slug.data('focus', true)
+      })
+      title.keyup(function () {
+        if (start_length == 0 && slug.data('focus') != true) { slug.val(title.val().toLowerCase().replace(/ /g, '-').replace(/[^a-z0-9-]/g, '')) }
+      })
+    })
+
+    $('input[type=text].shorturl').not('[data-shorturl-initialized]').attr('data-shorturl-initialized', true).each(function () {
+      const input = $(this)
+      const stem = $(this).prev()
+      const link = $(this).next()
+      link.attr('data-toggle', 'tooltip')
+      link.attr('title', 'Click to copy')
+      link.click(function () {
+        navigator.clipboard.writeText(stem.text() + input.val())
+        link.attr('title', 'Copied!')
+        link.tooltip('dispose').tooltip().tooltip('show')
+        return false
+      })
+      input.keydown(function () {
+        link.hide()
+      })
+    })
+
+    $('a.popup').not('[data-popup-registered]').attr('data-popup-registered', true).click(function () {
+      window.open(this.href, null, 'scrollbars=yes,width=600,height=600,left=150,top=150').focus()
+      return false
+    })
+
+    if (window.location.hash.startsWith('#photo-')) { $("[data-target='" + window.location.hash + "']").not('[data-photo-clicked]').attr('data-photo-clicked', true).click() }
+
+    $('textarea.wysiwyg').not('[data-wysiwyg-initialized]').attr('data-wysiwyg-initialized', true).each(function () {
+      const textarea = this
+      ClassicEditor.create(textarea, {
+        simpleUpload: {
+          uploadUrl: '/upload'
+        },
+        mediaEmbed: {
+          removeProviders: ['facebook', 'twitter', 'instagram', 'googleMaps', 'flickr']
+        }
+      }).then(editor => {
+        editor.editing.view.document.on('clipboardInput', (evt, data) => {
+          const content = data.dataTransfer.getData('text/html')
+
+          if (content) {
+            // We have HTML content from the clipboard.
+            const domParser = new DOMParser()
+            const documentFragment = domParser.parseFromString(content, 'text/html')
+
+            // Traverse the tree and remove color styles.
+            const walker = document.createTreeWalker(
+              documentFragment,
+              NodeFilter.SHOW_ELEMENT,
+              {
+                acceptNode: function (node) {
+                  return (node.style.color || node.style.backgroundColor) ? NodeFilter.FILTER_ACCEPT : NodeFilter.FILTER_SKIP
+                }
+              }
+            )
+
+            while (walker.nextNode()) {
+              walker.currentNode.style.removeProperty('color')
+              walker.currentNode.style.removeProperty('background-color')
+            }
+
+            // Update the clipboard content.
+            data.content = editor.data.processor.toView(documentFragment.body.innerHTML)
+          }
+        })
+      }).catch(error => {
+        console.error(error)
+      })
+    })
+
+    $('input.typeWatch').not('[data-typewatch-initialized]').attr('data-typewatch-initialized', true).typeWatch({ wait: 500, callback: function () { $(this.form).submit() } })
+
+    $('form.submitOnChange').not('[data-submit-on-change-initialized]').attr('data-submit-on-change-initialized', true).each(function () {
+      $('select, .flatpickr-input, input[type=checkbox], input[type=month]', this).change(function () {
+        $(this.form).submit()
+      })
+    })
+
+    $('.labelize').not('[data-labelize-initialized]').attr('data-labelize-initialized', true).each(function () {
+      $('div.checkbox', this).each(function () {
+        const div = this
+        $(div).hide()
+        const button = $('<a href="javascript:;" class="d-inline-block mb-1 mr-1"><span class="label label-outline-primary">' + $(this).find('label').text() + '</span></a>').insertAfter(this)
+        if ($('input[type=checkbox]:checked', div).length > 0) { $('span', button).removeClass('label-outline-primary').addClass('label-primary') }
+        $(button).click(function () {
+          if ($('input[type=checkbox]:checked', div).length > 0) {
+            $('input[type=checkbox]', div).prop('checked', false)
+            $('span', button).removeClass('label-primary').addClass('label-outline-primary')
+          } else {
+            $('input[type=checkbox]', div).prop('checked', true)
+            $('span', button).removeClass('label-outline-primary').addClass('label-primary')
+          }
+        })
+      })
+    })
+
+    $('.colorpicker').not('[data-coloris]').attr('data-coloris', true)
+    Coloris({ alpha: false });
+
+    $('.search.well .checkbox-inline input[type="checkbox"]').not('[data-search-checkbox-registered]').attr('data-search-checkbox-registered', true).on('change', function () {
+      $(this).closest('.checkbox-inline').toggleClass('checked', this.checked);
+    });
   }
 
   $(document).ajaxComplete(function () {
     ajaxCompleted()
   })
   ajaxCompleted()
-
-  hljs.highlightAll()
-
-  $('input[type=hidden].lookup').each(function () {
-    $(this).lookup({
-      lookup_url: $(this).attr('data-lookup-url'),
-      placeholder: $(this).attr('placeholder'),
-      id_param: 'id'
-    })
-  })
-
-  $('[data-upload-url]').click(function () {
-    const form = $('<form action="' + $(this).attr('data-upload-url') + '" method="post" enctype="multipart/form-data"><input style="display: none" type="file" name="upload"></form>')
-    form.insertAfter(this)
-    form.find('input').click().change(function () {
-      this.form.submit()
-    })
-  })
-
-  $('input[type=text].slug, div.slugify input[type=text].shorturl').each(function () {
-    const slug = $(this)
-    const start_length = slug.val().length
-    const pos = $.inArray(this, $('input', this.form)) - 1
-    const title = $($('input', this.form).get(pos))
-    slug.focus(function () {
-      slug.data('focus', true)
-    })
-    title.keyup(function () {
-      if (start_length == 0 && slug.data('focus') != true) { slug.val(title.val().toLowerCase().replace(/ /g, '-').replace(/[^a-z0-9-]/g, '')) }
-    })
-  })
-
-  $('input[type=text].shorturl').each(function () {
-    const input = $(this)
-    const stem = $(this).prev()
-    const link = $(this).next()
-    link.attr('data-toggle', 'tooltip')
-    link.attr('title', 'Click to copy')
-    link.click(function () {
-      navigator.clipboard.writeText(stem.text() + input.val())
-      link.attr('title', 'Copied!')
-      link.tooltip('dispose').tooltip().tooltip('show')
-      return false
-    })
-    input.keydown(function () {
-      link.hide()
-    })
-  })
-
-  $(document).on('click', 'a.popup', function () {
-    window.open(this.href, null, 'scrollbars=yes,width=600,height=600,left=150,top=150').focus()
-    return false
-  })
-
-  if (window.location.hash.startsWith('#photo-')) { $("[data-target='" + window.location.hash + "']").click() }
-
-  $('textarea.wysiwyg').each(function () {
-    const textarea = this
-    ClassicEditor.create(textarea, {
-      simpleUpload: {
-        uploadUrl: '/upload'
-      },
-      mediaEmbed: {
-        removeProviders: ['facebook', 'twitter', 'instagram', 'googleMaps', 'flickr']
-      }
-    }).then(editor => {
-      editor.editing.view.document.on('clipboardInput', (evt, data) => {
-        const content = data.dataTransfer.getData('text/html')
-
-        if (content) {
-          // We have HTML content from the clipboard.
-          const domParser = new DOMParser()
-          const documentFragment = domParser.parseFromString(content, 'text/html')
-
-          // Traverse the tree and remove color styles.
-          const walker = document.createTreeWalker(
-            documentFragment,
-            NodeFilter.SHOW_ELEMENT,
-            {
-              acceptNode: function (node) {
-                return (node.style.color || node.style.backgroundColor) ? NodeFilter.FILTER_ACCEPT : NodeFilter.FILTER_SKIP
-              }
-            }
-          )
-
-          while (walker.nextNode()) {
-            walker.currentNode.style.removeProperty('color')
-            walker.currentNode.style.removeProperty('background-color')
-          }
-
-          // Update the clipboard content.
-          data.content = editor.data.processor.toView(documentFragment.body.innerHTML)
-        }
-      })
-    }).catch(error => {
-      console.error(error)
-    })
-  })
-
-  $('input.typeWatch').typeWatch({ wait: 500, callback: function () { $(this.form).submit() } })
-
-  $('form.submitOnChange').each(function () {
-    $('select, .flatpickr-input, input[type=checkbox], input[type=month]', this).change(function () {
-      $(this.form).submit()
-    })
-  })
-
-  $('.labelize').each(function () {
-    $('div.checkbox', this).each(function () {
-      const div = this
-      $(div).hide()
-      const button = $('<a href="javascript:;" class="d-inline-block mb-1 mr-1"><span class="label label-outline-primary">' + $(this).find('label').text() + '</span></a>').insertAfter(this)
-      if ($('input[type=checkbox]:checked', div).length > 0) { $('span', button).removeClass('label-outline-primary').addClass('label-primary') }
-      $(button).click(function () {
-        if ($('input[type=checkbox]:checked', div).length > 0) {
-          $('input[type=checkbox]', div).prop('checked', false)
-          $('span', button).removeClass('label-primary').addClass('label-outline-primary')
-        } else {
-          $('input[type=checkbox]', div).prop('checked', true)
-          $('span', button).removeClass('label-outline-primary').addClass('label-primary')
-        }
-      })
-    })
-  })
-
-  $('.colorpicker').not('[data-coloris]').attr('data-coloris', true)
-  Coloris({ alpha: false });
-
-  $('.search.well .checkbox-inline input[type="checkbox"]').on('change', function () {
-    $(this).closest('.checkbox-inline').toggleClass('checked', this.checked);
-  });
 
   $(window).on('beforeunload', function () {
     if ($('#page-container').hasClass('page-sidebar-toggled') && $(window).width() < 768) {
