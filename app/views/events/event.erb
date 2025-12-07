@@ -52,7 +52,7 @@
         <video src="<%=@event_video.url%>" type="video/mp4" controls muted playsinline onmouseover="this.play();" onmouseout="this.pause();"></video>
       </div>
     <% elsif @event_image %>
-      <a href="/e/<%=@event.slug%><% if params[:cohost] %>?cohost=<%=params[:cohost]%><% end %>"><%= blurred_image_tag(@event_image, width: @event_image_width, height: @event_image_height, full_size: '1920x1920', css_class: 'w-100 mb-3', id: 'event-image') %></a>
+      <a href="/e/<%=@event.slug%><% if params[:cohost] %>?cohost=<%=params[:cohost]%><% end %>"><%= blurred_image_tag(@event_image, width: @event_image_width, height: @event_image_height, full_size: '1920x1920', md_size: '992x992', css_class: 'w-100 mb-3', id: 'event-image') %></a>
     <% end %>
     <% if @order %>
       <%= partial :'events/success' %>

@@ -8,15 +8,16 @@ Dandelion::App.helpers do
       onload="if (this.dataset.src && !this.dataset.loaded) {
         var el = this;
         var img = new Image();
-        img.src = this.dataset.src;
+        var targetSrc = (el.dataset.srcMd && window.innerWidth < 992) ? el.dataset.srcMd : el.dataset.src;
+        img.src = targetSrc;
         if (img.complete) {
           el.dataset.loaded = 'true';
-          el.src = el.dataset.src;
+          el.src = targetSrc;
         } else {
           el.style.filter = 'blur(8px)';
           img.onload = function() {
             el.dataset.loaded = 'true';
-            el.src = el.dataset.src;
+            el.src = targetSrc;
             el.style.filter = 'none';
           }
         }
@@ -24,13 +25,14 @@ Dandelion::App.helpers do
     }.html_safe
   end
 
-  def blurred_image_tag(image, width: nil, height: nil, full_size: '992x992', css_class: 'w-100', id: nil)
+  def blurred_image_tag(image, width: nil, height: nil, full_size: '992x992', md_size: nil, css_class: 'w-100', id: nil)
     attrs = []
     attrs << %(class="#{css_class}") if css_class
     attrs << %(id="#{id}") if id
     attrs << %(style="aspect-ratio: #{width} / #{height}") if width && height
     attrs << %(src="#{u image.thumb('32x32').url}")
     attrs << %(data-src="#{u image.thumb(full_size).url}")
+    attrs << %(data-src-md="#{u image.thumb(md_size).url}") if md_size
     attrs << blur_up
     %(<img #{attrs.join(' ')}>).html_safe
   end
