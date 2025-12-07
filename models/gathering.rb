@@ -61,6 +61,17 @@ class Gathering
     self.enable_teams = true if enable_budget
     self.member_limit = memberships.count if member_limit && (member_limit < memberships.count)
     self.fixed_threshold = nil if democratic_threshold
+
+    if image
+      begin
+        self.image_width_unmagic = image.width
+        self.image_height_unmagic = image.height
+      rescue StandardError => e
+        Honeybadger.notify(e)
+        self.image = nil
+      end
+    end
+
     true
   end
 

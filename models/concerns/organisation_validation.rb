@@ -31,6 +31,16 @@ module OrganisationValidation
 
       errors.add(:tax_rate_id, 'must start with txr_') if tax_rate_id && !tax_rate_id.starts_with?('txr_')
 
+      if image
+        begin
+          self.image_width_unmagic = image.width
+          self.image_height_unmagic = image.height
+        rescue StandardError => e
+          Honeybadger.notify(e)
+          self.image = nil
+        end
+      end
+
       if Padrino.env == :production && account && !account.admin?
         errors.add(:stripe_sk, 'must start with sk_live_') if stripe_sk && !stripe_sk.starts_with?('sk_live_')
         errors.add(:stripe_pk, 'must start with pk_live_') if stripe_pk && !stripe_pk.starts_with?('pk_live_')

@@ -31,7 +31,8 @@ class Cohostship
         self.image_height_unmagic = image.height
         errors.add(:image, 'must be at least 992px wide') if image_width_unmagic < 800 # legacy images are 800px
         errors.add(:image, 'must be more wide than high') if image_height_unmagic > image_width_unmagic
-      rescue StandardError
+      rescue StandardError => e
+        Honeybadger.notify(e)
         self.image = nil
       end
     end

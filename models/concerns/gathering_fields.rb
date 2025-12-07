@@ -7,6 +7,8 @@ module GatheringFields
     field :location, type: String
     field :coordinates, type: Array
     field :image_uid, type: String
+    field :image_width_unmagic, type: Integer
+    field :image_height_unmagic, type: Integer
     field :has_image, type: Mongoid::Boolean
     field :intro_for_members, type: String
     field :welcome_email, type: String

@@ -2,7 +2,7 @@
 <div class="row">
   <% if @organisation.image %>
     <div class="col-12 col-lg-auto text-center">
-      <img style="width: 200px" class="mb-3" src="<%= u @organisation.image.thumb('400x400').url %>">
+      <img style="width: 200px<% if @organisation.image_width_unmagic && @organisation.image_height_unmagic %>; aspect-ratio: <%= @organisation.image_width_unmagic %> / <%= @organisation.image_height_unmagic %><% end %>" class="mb-3" src="<%= u @organisation.image.thumb('400x400').url %>">
     </div>
   <% end %>
   <div class="col-12 col-sm">
