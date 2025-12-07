@@ -2,7 +2,7 @@
 <div class="row">
   <% if @activity.image %>
     <div class="col-12 col-lg-auto text-center">
-      <%= blurred_image_tag(@activity.image, full_size: '400x400', css_class: 'mb-3', max_width: 200) %>
+      <%= blurred_image_tag(@activity.image, full_size: '400x400', css_class: 'mb-3', fixed_width: 200) %>
     </div>
   <% end %>
   <div class="col-12 col-sm">
