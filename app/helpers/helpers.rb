@@ -25,21 +25,12 @@ Dandelion::App.helpers do
     }.html_safe
   end
 
-  def blurred_image_tag(image, width: nil, height: nil, fixed_width: nil, full_size: '992x992', md_size: nil, css_class: 'w-100', id: nil)
+  def blurred_image_tag(image, width: nil, height: nil, full_size: '992x992', md_size: nil, css_class: 'w-100', id: nil)
     attrs = []
     attrs << %(class="#{css_class}") if css_class
     attrs << %(id="#{id}") if id
-    thumb_geometry = full_size.end_with?('#') ? '32x32#' : '32x32'
-    thumb = image.thumb(thumb_geometry)
-    unless width && height
-      width = thumb.width
-      height = thumb.height
-    end
-    styles = []
-    styles << "aspect-ratio: #{width} / #{height}"
-    styles << "width: #{fixed_width}px" if fixed_width
-    attrs << %(style="#{styles.join('; ')}")
-    attrs << %(src="#{u thumb.url}")
+    attrs << %(style="aspect-ratio: #{width} / #{height}") if width && height
+    attrs << %(src="#{u image.thumb('32x32').url}")
     attrs << %(data-src="#{u image.thumb(full_size).url}")
     attrs << %(data-src-md="#{u image.thumb(md_size).url}") if md_size
     attrs << blur_up
