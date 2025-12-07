@@ -1,16 +1,21 @@
 $(function () {
 
   function ajaxCompleted () {
+
+    function styleSelectElement (select) {
+      if ($(select).find('option:selected').is(':disabled')) {
+        $(select).css('color', '#6c757d');
+      } else {
+        $(select).css('color', '');
+      }
+    }
+
     $('select').not('[data-select-styled]').attr('data-select-styled', true).each(function () {
-      const $select = $(this);
-      $select.removeClass('select-placeholder');
-      $select.change(function () {
-        if ($(this).find('option:selected').is(':disabled')) {
-          $(this).css('color', '#6c757d');
-        } else {
-          $(this).css('color', '');
-        }
-      }).change()
+      styleSelectElement(this);
+      $(this).removeClass('select-placeholder');
+      $(this).change(function () {
+        styleSelectElement(this);
+      })
     })
 
     $('.either-or input[type="checkbox"]').not('[data-either-or-registered]').attr('data-either-or-registered', true).change(function () {
