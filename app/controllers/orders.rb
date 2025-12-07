@@ -4,7 +4,7 @@ Dandelion::App.controller do
     organisation_admins_only!
     @from = params[:from] ? parse_date(params[:from]) : nil
     @to = params[:to] ? parse_date(params[:to]) : nil
-    @orders = @organisation.orders
+    @orders = @organisation.orders.includes(:account, :event, :revenue_sharer, :discount_code)
     @orders = @orders.deleted if params[:deleted]
     @orders = @orders.and(:account_id.in => Account.search(params[:q], child_scope: @orders).pluck(:id)) if params[:q]
     @orders = @orders.and(:created_at.gte => @from) if @from
@@ -46,7 +46,7 @@ Dandelion::App.controller do
   get '/events/:id/orders', provides: %i[html csv pdf] do
     @event = Event.unscoped.find(params[:id]) || not_found
     event_admins_only!
-    @orders = @event.orders
+    @orders = @event.orders.includes(:account, :revenue_sharer, :discount_code)
     @orders =  @orders.discounted if params[:discounted]
     @orders =  @orders.deleted if params[:deleted]
     @orders =  @orders.complete if params[:complete]
@@ -117,12 +117,12 @@ Dandelion::App.controller do
     event_admins_only!
     @tickets = if params[:ticket_type_id]
                  tt = @event.ticket_types.find(params[:ticket_type_id]) || not_found
-                 tt.tickets
+                 tt.tickets.includes(:account, :ticket_type, :order)
                elsif params[:ticket_group_id]
                  tg = @event.ticket_groups.find(params[:ticket_group_id]) || not_found
-                 tg.tickets
+                 tg.tickets.includes(:account, :ticket_type, :order)
                else
-                 @event.tickets
+                 @event.tickets.includes(:account, :ticket_type, :order)
                end
     @tickets =  @tickets.discounted if params[:discounted]
     @tickets =  @tickets.deleted if params[:deleted]

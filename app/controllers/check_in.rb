@@ -47,12 +47,12 @@ Dandelion::App.controller do
   get '/e/:slug/check_in_list' do
     @tickets = if params[:ticket_type_id]
                  tt = @event.ticket_types.find(params[:ticket_type_id]) || not_found
-                 tt.tickets
+                 tt.tickets.includes(:account, :ticket_type)
                elsif params[:ticket_group_id]
                  tg = @event.ticket_groups.find(params[:ticket_group_id]) || not_found
-                 tg.tickets
+                 tg.tickets.includes(:account, :ticket_type)
                else
-                 @event.tickets
+                 @event.tickets.includes(:account, :ticket_type)
                end
     @tickets =  @tickets.discounted if params[:discounted]
     @tickets =  @tickets.deleted if params[:deleted]

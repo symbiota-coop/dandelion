@@ -1,5 +1,10 @@
 <% orders = orders.order('created_at desc')
-   orders = orders.paginate(page: params[:page], per_page: 50) %>
+   orders = orders.paginate(page: params[:page], per_page: 50)
+   # Batch load event feedbacks to avoid N+1 queries
+   if @event
+     order_account_ids = orders.map(&:account_id).compact
+     event_feedbacks_by_account = @event.event_feedbacks.where(:account_id.in => order_account_ids).index_by(&:account_id)
+   end %>
 <% if @event %>
   <% if event_email_viewer? %>
     <pre>
@@ -236,7 +241,8 @@
   </td>
   <td>
     <% if order.account %>
-      <% if (event_feedback = order.event.event_feedbacks.find_by(account: order.account)) && !event_feedback.anonymise %>
+      <% event_feedback = @event ? event_feedbacks_by_account[order.account_id] : order.event.event_feedbacks.find_by(account: order.account) %>
+      <% if event_feedback && !event_feedback.anonymise %>
         <a href="/event_feedbacks/<%= event_feedback.id %>">
           <% if event_feedback.rating %>
             <% event_feedback.rating.times do %><i class="bi bi-star-fill"></i><% end %>

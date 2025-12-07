@@ -15,7 +15,7 @@ Dandelion::App.controller do
   end
 
   get '/stats/orders' do
-    @orders = Order.order('created_at desc')
+    @orders = Order.includes(:account, :event, :revenue_sharer, :discount_code).order('created_at desc')
     erb :'stats/orders'
   end
 
