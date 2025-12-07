@@ -23,7 +23,7 @@
                         }
                    }
                  end),
-    "image": @event_image.try(:url),
+    "image": (@event_image.thumb('1920x1920').url if @event_image),
     "description": (if @event.description
                       Nokogiri::HTML(@event.description).search('h1,h2,h3,h4,h5,h6,p').first.try(:text).try(:strip)
                     end),
