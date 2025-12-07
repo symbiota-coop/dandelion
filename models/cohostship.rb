@@ -13,20 +13,16 @@ class Cohostship
   field :image_width_unmagic, type: Integer
   field :image_height_unmagic, type: Integer
   field :has_image, type: Boolean
-  field :video_uid, type: String
   field :featured, type: Boolean
 
   def self.admin_fields
     {
       image: :image,
-      video: :file,
       featured: :checkbox,
       event_id: :lookup,
       organisation_id: :lookup
     }
   end
-
-  dragonfly_accessor :video
 
   before_validation do
     if image

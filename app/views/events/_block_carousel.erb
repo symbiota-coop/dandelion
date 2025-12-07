@@ -1,25 +1,13 @@
 <div style="position: relative;" class="m-1">
-  <% if @organisation && (cohostship = event.cohostships.find_by(organisation: @organisation)) && (cohostship.image || cohostship.video) %>
+  <% if @organisation && (cohostship = event.cohostships.find_by(organisation: @organisation)) && cohostship.image %>
     <a target="_parent" href="/e/<%= event.slug %>?cohost=<%=@organisation.slug%>" <% if event.carousel_text %> data-toggle="tooltip" title="<%=event.carousel_text%>" <% end %>>  
-      <% if cohostship.video %>    
-      <div class="embed-responsive embed-responsive-16by9">
-      <video src="<%=cohostship.video.url%>" type="video/mp4" controls muted playsinline onmouseover="this.play();" onmouseout="this.pause();"></video>
-    </div>
-  <% elsif cohostship.image %>
-    <%= blurred_image_tag(cohostship.image, width: cohostship.image_width_unmagic, height: cohostship.image_height_unmagic) %>
+      <%= blurred_image_tag(cohostship.image, width: cohostship.image_width_unmagic, height: cohostship.image_height_unmagic) %>
+    </a>
+  <% else %>
+    <a target="_parent" href="/e/<%= event.slug %>" <% if event.carousel_text %> data-toggle="tooltip" title="<%=event.carousel_text%>" <% end %>>
+      <%= blurred_image_tag(event.image, width: event.image_width_unmagic, height: event.image_height_unmagic) %>
+    </a>
   <% end %>
-</a>
-<% else %>
-  <a target="_parent" href="/e/<%= event.slug %>" <% if event.carousel_text %> data-toggle="tooltip" title="<%=event.carousel_text%>" <% end %>>
-  <% if event.video %>  
-    <div class="embed-responsive embed-responsive-16by9">
-    <video src="<%=event.video.url%>" type="video/mp4" controls muted playsinline onmouseover="this.play();" onmouseout="this.pause();"></video>
-  </div>
-<% else %>
-  <%= blurred_image_tag(event.image, width: event.image_width_unmagic, height: event.image_height_unmagic) %>
-<% end %>
-</a>
-<% end %>
 <span data-toggle="tooltip" title="<%= when_details(event) %>" class="label label-primary" style="opacity: 0.85; border-radius: 0; position: absolute; top: 0; right: 0">
   <% if event.recording? %>
     Recording from

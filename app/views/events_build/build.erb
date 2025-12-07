@@ -298,7 +298,6 @@
 
         <% if Padrino.env == :development || @event.organisation.experimental? %>
           <div class="border border-primary rounded p-3 mb-3" style="border-style: dashed !important">
-            <%= f.file_block :video %>
             <%= f.number_block :affiliate_credit_percentage %>
             <%= f.check_box_block :minimal_only %>
           </div>

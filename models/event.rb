@@ -19,8 +19,6 @@ class Event
   include ImageWithValidation
   include Searchable
 
-  dragonfly_accessor :video
-
   def self.fs(slug)
     find_by(slug: slug)
   end

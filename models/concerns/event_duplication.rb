@@ -10,7 +10,6 @@ module EventDuplication
       currency: currency,
       location: location,
       image: image,
-      video: video,
       description: description,
       email: email,
       feedback_questions: feedback_questions,
@@ -71,8 +70,7 @@ module EventDuplication
     cohostships.each do |cohostship|
       event.cohostships.create(
         organisation: cohostship.organisation,
-        image: cohostship.image,
-        video: cohostship.video
+        image: cohostship.image
       )
     end
     ticket_groups.each do |ticket_group|

@@ -16,7 +16,6 @@ module EventFields
     field :image_width_unmagic, type: Integer
     field :image_height_unmagic, type: Integer
     field :has_image, type: Mongoid::Boolean
-    field :video_uid, type: String
     field :description, type: String
     field :email, type: String
     field :facebook_event_url, type: String
@@ -79,7 +78,6 @@ module EventFields
         select_tickets_title: :text,
         rsvp_button_text: :text,
         image: :image,
-        video: :file,
         description: :wysiwyg,
         email: :email,
         facebook_event_url: :url,

@@ -27,7 +27,6 @@
   <thead>
     <th>Co-host</th>
     <th>Image</th>
-    <th>Video</th>
     <th>Featured</th>
   </thead>
   <% @event.cohostships.each { |cohostship| organisation = cohostship.organisation %>
@@ -41,12 +40,6 @@
     <td class="no-labels no-buttons">
       <% form_for cohostship, "/events/#{@event.id}/cohostships/#{cohostship.id}" do |f| %>
         <%= f.image_block :image %>
-        <%= f.submit_block %>
-      <% end %>
-    </td>
-    <td class="no-labels no-buttons">
-      <% form_for cohostship, "/events/#{@event.id}/cohostships/#{cohostship.id}" do |f| %>
-        <%= f.file_block :video %>
         <%= f.submit_block %>
       <% end %>
     </td>
