@@ -1,11 +1,3 @@
-<% if request.user_agent =~ /android/i %>
-  <div id="a2hs" class="card shadow-sm mb-3" style="display: none">
-    <div class="card-body text-center">
-      <a id="a2hs-btn" class="btn btn-primary" href="javascript:;">Add Dandelion to your home screen</a>
-    </div>
-  </div>
-<% end %>
-
 <div class="row">
   <div class="col-lg-8">
     <%= cp(:'organisations/carousel', key: "/organisations/carousel/#{current_account.id}") %>
