@@ -5,7 +5,7 @@
 
   <% if Padrino.env == :production %>
     <% if !params[:minimal] && !params[:ticket_form_only] %>
-      <script type="text/javascript" src="https://app.termly.io/resource-blocker/<%=ENV["TERMLY_WEBSITE_UUID"]%>?autoBlock=on"></script>
+      <script type="text/javascript" src="https://app.termly.io/resource-blocker/<%=ENV["TERMLY_WEBSITE_UUID"]%>?autoBlock=off"></script>
     <% end %>
 
     <%= partial :'layouts/analytics' %>
