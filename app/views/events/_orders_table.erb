@@ -78,7 +78,9 @@
         <th>Updates from facilitator?</th>
       <% end %>
       <th data-col-name="created-at">Created at</th>
-      <th>Feedback</th>
+      <% if @event %>
+        <th>Feedback</th>
+      <% end %>
       <th>Actions</th>
     </tr>
   </thead>
@@ -239,32 +241,33 @@
   <td data-sort="<%= order.created_at.iso8601 %>">
     <%= order.created_at %>
   </td>
-  <td>
-    <% if order.account %>
-      <% event_feedback = @event ? event_feedbacks_by_account[order.account_id] : order.event.event_feedbacks.find_by(account: order.account) %>
-      <% if event_feedback && !event_feedback.anonymise %>
-        <a href="/event_feedbacks/<%= event_feedback.id %>">
-          <% if event_feedback.rating %>
-            <% event_feedback.rating.times do %><i class="bi bi-star-fill"></i><% end %>
-          <% else %>
-            <%= event_feedback.id %>
-          <% end %>
-        </a>
-      <% elsif order.event.started? %>
-        <% if order.account.unsubscribed || order.account.unsubscribed_feedback %>
-          <span class="text-muted">Unsubscribed from feedback emails</span>
-        <% else %>
-          <a href="<%= ENV['BASE_URI'] %>/events/<%= order.event_id %>/resend_feedback_email/<%= order.account_id %>">
-            <% if order.event.finished? %>
-              Resend feedback email
-            <% elsif order.event.started? %>
-              Send feedback email
+  <% if @event %>
+    <td>
+      <% if order.account %>
+        <% if (event_feedback = event_feedbacks_by_account[order.account_id]) && !event_feedback.anonymise %>
+          <a href="/event_feedbacks/<%= event_feedback.id %>">
+            <% if event_feedback.rating %>
+              <% event_feedback.rating.times do %><i class="bi bi-star-fill"></i><% end %>
+            <% else %>
+              <%= event_feedback.id %>
             <% end %>
           </a>
+        <% elsif order.event.started? %>
+          <% if order.account.unsubscribed || order.account.unsubscribed_feedback %>
+            <span class="text-muted">Unsubscribed from feedback emails</span>
+          <% else %>
+            <a href="<%= ENV['BASE_URI'] %>/events/<%= order.event_id %>/resend_feedback_email/<%= order.account_id %>">
+              <% if order.event.finished? %>
+                Resend feedback email
+              <% elsif order.event.started? %>
+                Send feedback email
+              <% end %>
+            </a>
+          <% end %>
         <% end %>
       <% end %>
-    <% end %>
-  </td>
+    </td>
+  <% end %>
   <td nowrap>
     <% if order.deleted? %>
       <%= dropdown_nav [
