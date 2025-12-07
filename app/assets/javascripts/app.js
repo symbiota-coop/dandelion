@@ -1,91 +1,16 @@
-function nl2br (str) {
-  return str.replace(/(?:\r\n|\r|\n)/g, '<br>')
-}
-
-function getCurrencySymbol (currency) {
-  try {
-    const parts = new Intl.NumberFormat('en', { style: 'currency', currency: currency })
-      .formatToParts();
-    const symbol = parts.find(part => part.type === 'currency');
-    const symbolValue = symbol ? symbol.value : currency;
-
-    // If symbol is compound (>1 char) and ends with $, return original currency code
-    return (symbolValue.length > 1 && symbolValue.endsWith('$')) ? currency : symbolValue;
-  } catch (e) {
-    return currency;
-  }
-}
-
-$.fn.serializeObject = function () {
-  const o = {};
-  const a = this.serializeArray();
-
-  // Helper to set nested value
-  function setNestedValue (obj, path, value) {
-    const keys = path.replace(/\]/g, '').split('[')
-    let current = obj
-    for (let i = 0; i < keys.length - 1; i++) {
-      const key = keys[i]
-      if (!(key in current)) {
-        current[key] = {}
-      }
-      current = current[key]
-    }
-    const lastKey = keys[keys.length - 1]
-    // Handle multiple values (checkboxes, multi-select)
-    if (lastKey in current) {
-      if (!Array.isArray(current[lastKey])) {
-        current[lastKey] = [current[lastKey]]
-      }
-      current[lastKey].push(value)
-    } else {
-      current[lastKey] = value
-    }
-  }
-
-  // Handle regular form fields
-  $.each(a, function () {
-    setNestedValue(o, this.name, this.value || '')
-  });
-
-  // Handle CKEditor 5 fields (overwrite any existing value from hidden textarea)
-  this.find('.ck[contenteditable]').each(function () {
-    const editorInstance = this.ckeditorInstance;
-    const fieldName = editorInstance.sourceElement.getAttribute('name');
-    const data = editorInstance.getData();
-    // Parse the field name and set directly (overwriting, not appending)
-    const keys = fieldName.replace(/\]/g, '').split('[')
-    let current = o
-    for (let i = 0; i < keys.length - 1; i++) {
-      const key = keys[i]
-      if (!(key in current)) {
-        current[key] = {}
-      }
-      current = current[key]
-    }
-    current[keys[keys.length - 1]] = data
-  });
-
-  return o;
-};
-
 $(function () {
-
-  function styleSelectElement (select) {
-    if ($(select).find('option:selected').is(':disabled')) {
-      $(select).css('color', '#6c757d');
-    } else {
-      $(select).css('color', '');
-    }
-  }
 
   function ajaxCompleted () {
     $('select').not('[data-select-styled]').attr('data-select-styled', true).each(function () {
-      styleSelectElement(this);
-      $(this).removeClass('select-placeholder');
-      $(this).change(function () {
-        styleSelectElement(this);
-      })
+      const $select = $(this);
+      $select.removeClass('select-placeholder');
+      $select.change(function () {
+        if ($(this).find('option:selected').is(':disabled')) {
+          $(this).css('color', '#6c757d');
+        } else {
+          $(this).css('color', '');
+        }
+      }).change()
     })
 
     $('.either-or input[type="checkbox"]').not('[data-either-or-registered]').attr('data-either-or-registered', true).change(function () {
@@ -193,7 +118,7 @@ $(function () {
     })
 
     $('.nl2br').not('[data-nl2br]').attr('data-nl2br', true).each(function () {
-      $(this).html(nl2br($(this).html()))
+      $(this).html($(this).html().replace(/(?:\r\n|\r|\n)/g, '<br>'))
     })
 
     $('.read-more').not('[data-read-more-processed]').attr('data-read-more-processed', true).each(function () {
@@ -246,14 +171,6 @@ $(function () {
       })
     })
 
-    $('[data-upload-url]').not('[data-upload-registered]').attr('data-upload-registered', true).click(function () {
-      const form = $('<form action="' + $(this).attr('data-upload-url') + '" method="post" enctype="multipart/form-data"><input style="display: none" type="file" name="upload"></form>')
-      form.insertAfter(this)
-      form.find('input').click().change(function () {
-        this.form.submit()
-      })
-    })
-
     $('input[type=text].slug, div.slugify input[type=text].shorturl').not('[data-slug-initialized]').attr('data-slug-initialized', true).each(function () {
       const slug = $(this)
       const start_length = slug.val().length
@@ -282,11 +199,6 @@ $(function () {
       input.keydown(function () {
         link.hide()
       })
-    })
-
-    $('a.popup').not('[data-popup-registered]').attr('data-popup-registered', true).click(function () {
-      window.open(this.href, null, 'scrollbars=yes,width=600,height=600,left=150,top=150').focus()
-      return false
     })
 
     if (window.location.hash.startsWith('#photo-')) { $("[data-target='" + window.location.hash + "']").not('[data-photo-clicked]').attr('data-photo-clicked', true).click() }

@@ -32,7 +32,7 @@
     <script>
       $(function () {
         $('#discount_code_fixed_discount_currency').change(function() {
-          $('.money-symbol').text(getCurrencySymbol($(this).val()))
+          $('.money-symbol').text($.currencySymbol($(this).val()))
         })
         $('#discount_code_fixed_discount_currency').change()
       })

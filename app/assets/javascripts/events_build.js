@@ -223,8 +223,8 @@ $(function () {
 
   // Currency symbol updates
   $('#event_currency').change(function () {
-    if (typeof getCurrencySymbol !== 'undefined') {
-      $('.money-symbol').text(getCurrencySymbol($(this).val()))
+    if (typeof $.currencySymbol !== 'undefined') {
+      $('.money-symbol').text($.currencySymbol($(this).val()))
     }
   })
 

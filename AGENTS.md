@@ -197,6 +197,8 @@ gem 'mini_magick' # for image processing
      "/javascripts/pagelets.js?#{@cachebuster}",
      "/javascripts/jquery.lookup.js?#{@cachebuster}",
      "/javascripts/map.js?#{@cachebuster}",
+     "/javascripts/currencySymbol.js?#{@cachebuster}",
+     "/javascripts/serializeObject.js?#{@cachebuster}",
      "/javascripts/app.js?#{@cachebuster}"
    ].each { |f| %>
 <script src="<%= f %>" defer></script>

@@ -280,8 +280,8 @@
           d.appendTo('#ticket_types');
 
           // Update currency symbol for newly added ticket type
-          if (typeof getCurrencySymbol !== 'undefined') {
-            d.find('.money-symbol').text(getCurrencySymbol($('#event_currency').val()));
+          if (typeof $.currencySymbol !== 'undefined') {
+            d.find('.money-symbol').text($.currencySymbol($('#event_currency').val()));
           }
 
           // Initialize tooltips and setup datetime input
