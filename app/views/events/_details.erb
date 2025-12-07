@@ -84,12 +84,12 @@
     </td>
     <td>
 
-      <a href="javascript:;" class="copy-link text-dark" data-toggle="tooltip" title="Click to copy"><%=ENV['BASE_URI']%>/e/<%=@event.slug%></a>
+      <a href="javascript:;" class="copy-link text-dark" data-toggle="tooltip" title="Click to copy" data-url="<%=ENV['BASE_URI']%>/e/<%=@event.slug%>"><%=ENV['BASE_URI'].gsub(%r{https?://}, '')%>/e/<%=@event.slug%></a>
       <script>
         $(function() {
           $('.copy-link, .copy-link-icon').on('click', function(e) {
             e.preventDefault();
-            var textToCopy = $('.copy-link').text();
+            var textToCopy = $('.copy-link').data('url');
             var $clicked = $(this);
 
             navigator.clipboard.writeText(textToCopy).then(function() {
