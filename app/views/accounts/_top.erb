@@ -1,7 +1,7 @@
 <div class="row">
   <div class="col-12 col-lg-auto text-center">
     <% if account.image %>
-      <%= blurred_image_tag(account.image, full_size: '400x400#', css_class: 'mb-3', width: 200, height: 200) %>
+      <%= blurred_image_tag(account.image, full_size: '400x400#', css_class: 'mb-3', max_width: 200) %>
     <% else %>
       <img title="<%= account.name %>" style="width: 200px; background: white; border: 3px solid white" src="<%= u account.image_thumb_or_gravatar_url %>">
     <% end %>
