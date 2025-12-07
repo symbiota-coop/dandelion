@@ -164,10 +164,6 @@ $(function () {
       $('a[href^=http]', this).attr('target', '_blank')
     })
 
-    $('code, pre').not('[data-highlighted]').attr('data-highlighted', true).each(function () {
-      hljs.highlightElement(this)
-    })
-
     $('input[type=hidden].lookup').not('[data-lookup-initialized]').attr('data-lookup-initialized', true).each(function () {
       $(this).lookup({
         lookup_url: $(this).attr('data-lookup-url'),

@@ -20,7 +20,6 @@ module.exports = {
     Tribute: true,
     iframely: true,
     autosize: true,
-    hljs: true,
     Pace: true,
     ClassicEditor: true
   }
