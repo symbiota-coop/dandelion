@@ -5,7 +5,7 @@
   <div class="modal-dialog" role="document">
     <div class="modal-content">
       <div class="modal-body">
-        <img class="w-100" src="<%= photo.image.thumb('1920x1920').url %>">
+        <%= blurred_image_tag(photo.image, full_size: '1920x1920', css_class: 'w-100') %>
       </div>
       <div class="modal-footer">
         <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
