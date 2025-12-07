@@ -203,8 +203,11 @@ Dandelion::App.controller do
     elsif @event.organisation && @event.organisation.image
       @og_image = @event.organisation.image.encode('jpg', '-quality 90').thumb('1200x630').url
     end
-    @event_video = @event.video if @event.video
-    @event_video = cohostship.video if cohostship && cohostship.video
+    if cohostship && cohostship.video
+      @event_video = cohostship.video
+    elsif @event.video
+      @event_video = @event.video
+    end
     case content_type
     when :html
       @hide_right_nav = true
