@@ -2,7 +2,7 @@
 <div class="row">
   <% if @organisation.image %>
     <div class="col-12 col-lg-auto text-center">
-      <img style="width: 200px" class="mb-3" src="<%= u @organisation.image.thumb('400x400').url %>">
+      <%= blurred_image_tag(@organisation.image, full_size: '400x400', css_class: 'mb-3', width: 200, height: 200) %>
     </div>
   <% end %>
   <div class="col-12 col-sm">
