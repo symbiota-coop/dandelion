@@ -228,6 +228,10 @@ class Account
     { email: email, name: name }
   end
 
+  before_destroy do
+    throw :abort if admin
+  end
+
   after_create do
     notifications_as_notifiable.create! circle: self, type: 'created_profile'
   end
