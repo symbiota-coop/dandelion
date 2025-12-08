@@ -23,10 +23,20 @@
     <% if @gathering.member_limit and @gathering.memberships.count >= @gathering.member_limit %>
       <p><em><%= @gathering.name %> is now full with all <%= @gathering.member_limit %> places taken</em></p>
     <% else %>
-      <% form_for @account, "/g/#{@gathering.slug}/join", style: 'margin-top: 20px' do |f| %>
+      <% form_for @account, "/g/#{@gathering.slug}/join", style: 'margin-top: 20px', id: 'join' do |f| %>
         <script>
           $(function () {
             $('.form-group > div.col-lg-6').removeClass('col-lg-6').addClass('col-lg-8')
+
+            <% if !current_account || @membership %>
+              $('#join').submit(function () {
+                if (!grecaptcha || grecaptcha.getResponse().length == 0) {
+                  alert('Please confirm you are not a robot');
+                  return false
+                }
+              })
+            <% end %>
+
           })
         </script>
         <% if !current_account or @membership %>
@@ -45,6 +55,7 @@
           </div>
         </div>
         <% } %>
+        <div class="g-recaptcha mb-2" data-sitekey="<%= ENV['RECAPTCHA_SITE_KEY'] %>"></div>
         <%= f.submit_block button_text: 'Join' %>
       <% end %>
     <% end %>
