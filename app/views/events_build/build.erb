@@ -273,9 +273,7 @@
       <div role="tabpanel" class="tab-pane" id="tab-everything-else">
         <%= f.shorturl_block :slug, stem: "#{ENV['BASE_URI']}/e/" %>
         <%= f.url_block :redirect_url %>
-        <% if Padrino.env == :development || @event.purchase_url || @event.organisation.allow_purchase_url? || @event.organisation.experimental? %>
-          <%= f.url_block :purchase_url %>
-        <% end %>
+        <%= f.url_block :purchase_url %>
         <%= f.text_block :match_phrase %>
         <%= f.number_block :facebook_pixel_id %>
         <%= f.text_block :oc_slug %>
