@@ -227,6 +227,25 @@ module Dandelion
       erb :contact
     end
 
+    get '/search' do
+      if request.xhr?
+        @q = params[:term]
+        @type = params[:type]
+        halt if @q.nil? || @q.length < 3 || @q.length > 200
+
+        model_class = @type ? search_type_to_model(@type) : nil
+        perform_ajax_search(@q, model_class).to_json
+      else
+        detected_type, @q = parse_search_query(params[:q])
+        @type = detected_type || params[:type] || 'events'
+        model_class = search_type_to_model(@type)
+
+        perform_full_search(@q, model_class) if @q
+
+        erb :search
+      end
+    end
+
     get '/theme.css' do
       content_type 'text/css'
       scss_content = File.read(Padrino.root('app/assets/stylesheets/theme.scss'))

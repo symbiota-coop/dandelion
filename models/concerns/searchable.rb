@@ -2,7 +2,7 @@ module Searchable
   extend ActiveSupport::Concern
 
   class_methods do
-    def search(query, scope = all, child_scope: nil, limit: nil, build_records: false, phrase_boost: 1, include_text_search: false, regex_search: Padrino.env == :development)
+    def search(query, scope = all, child_scope: nil, limit: nil, build_records: false, phrase_boost: 1, include_text_search: false, regex_search: Padrino.env != :production)
       return none if query.blank?
       return none if query.length < 3 || query.length > 200
 
