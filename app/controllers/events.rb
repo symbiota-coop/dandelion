@@ -242,6 +242,25 @@ Dandelion::App.controller do
     @event_session.ical.to_ical
   end
 
+  post '/events/:id/purchase', provides: :json do
+    @event = Event.find(params[:id]) || not_found
+    @account = find_or_create_account(params[:detailsForm])
+    halt 400 if @event.organisation.banned_emails_a.include?(@account.email)
+
+    @order = create_order_with_tickets(params[:ticketForm], params[:detailsForm])
+    process_payment(params[:detailsForm], params[:ticketForm])
+  rescue Stripe::InvalidRequestError => e
+    @order.event.set(locked: true)
+    @order.notify_of_failed_purchase(e)
+    @order.destroy
+    halt 400
+  rescue StandardError => e
+    Honeybadger.context({ order_id: @order.id }) if @order
+    Honeybadger.notify(e)
+    @order.try(:destroy)
+    halt 400
+  end
+
   get '/events/:id/progress' do
     @event = Event.find(params[:id]) || not_found
     event_admins_only!
