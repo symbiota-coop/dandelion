@@ -8,17 +8,17 @@ if params[:discount_code]
   end
 end
 
-@single_free_ticket = @event.ticket_types.count == 1 &&
-  (free_ticket = @event.ticket_types.first) &&
-  free_ticket.price &&
-  free_ticket.price.zero? &&
-  free_ticket.number_of_tickets_available_in_single_purchase > 0 &&
-  !(free_ticket.sales_end && Time.now > free_ticket.sales_end)
+@single_free_ticket_type = @event.ticket_types.count == 1 &&
+  (free_ticket_type = @event.ticket_types.first) &&
+  free_ticket_type.price &&
+  free_ticket_type.price.zero? &&
+  free_ticket_type.number_of_tickets_available_in_single_purchase > 0 &&
+  !(free_ticket_type.sales_end && Time.now > free_ticket_type.sales_end)
 %>
 
 <div class="card shadow-sm <% if @event.no_discounts %>no-discounts<% end %>" id="select-tickets">
 
-  <% unless @single_free_ticket %>
+  <% unless @single_free_ticket_type %>
     <h3 class="card-header bg-primary text-white"><%= @event.select_tickets_title || 'Select tickets' %></h3>
     <div class="card-body">
       <% if @event.past? %>
@@ -43,14 +43,14 @@ end
       <% end %>
     <% end %>
 
-    <div id="ticket-types" <% if @single_free_ticket %>style="display: none"<% end %>>
+    <div id="ticket-types" <% if @single_free_ticket_type %>style="display: none"<% end %>>
       <% form_tag '' do %>
         <%= hidden_field_tag :cohost, value: params[:cohost] %>
         <%= hidden_field_tag :affiliate_type, value: params[:affiliate_type] %>
         <%= hidden_field_tag :affiliate_id, value: params[:affiliate_id] %>
 
-        <% if @single_free_ticket %>
-          <%= hidden_field_tag :"quantities[#{free_ticket.id}]", value: 1, 'data-ticket-type-id': free_ticket.id, 'data-price': 0 %>
+        <% if @single_free_ticket_type %>
+          <%= hidden_field_tag :"quantities[#{free_ticket_type.id}]", value: 1, 'data-ticket-type-id': free_ticket_type.id, 'data-price': 0 %>
         <% else %>
           <table class="table">
 
@@ -138,7 +138,7 @@ end
       <% end %>
     </div>
 
-    <% unless @single_free_ticket %>
+    <% unless @single_free_ticket_type %>
       <% if @event.select_tickets_outro %>
         <table class="table table-borderless mb-0">
           <tr>
@@ -151,8 +151,8 @@ end
     </div>
   <% end %>
 
-  <h3 class="card-header bg-primary text-white <% if @single_free_ticket %>rounded-top<% end %>">
-    <% if @single_free_ticket %>
+  <h3 class="card-header bg-primary text-white <% if @single_free_ticket_type %>rounded-top<% end %>">
+    <% if @single_free_ticket_type %>
       Register for free
     <% else %>
       Your details
