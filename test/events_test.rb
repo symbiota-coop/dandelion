@@ -75,7 +75,7 @@ class DandelionTest < ActiveSupport::TestCase
     @event = FactoryBot.create(:event, organisation: @organisation, account: @account, last_saved_by: @account, prices: [0])
     login_as(@account)
     visit "/e/#{@event.slug}"
-    select 1, from: "quantities[#{@event.ticket_types.first.id}]"
+    assert page.has_content? 'Register for free'
     click_button 'RSVP'
     assert page.has_content? 'Thanks for booking!'
   end
