@@ -14,6 +14,7 @@ end
   free_ticket.number_of_tickets_available_in_single_purchase > 0 &&
   !(free_ticket.sales_end && Time.now > free_ticket.sales_end)
 %>
+
 <div class="card shadow-sm <% if @event.no_discounts %>no-discounts<% end %>" id="select-tickets">
 
   <% unless @single_free_ticket %>
@@ -193,8 +194,7 @@ end
         <% else %>
           <div id="opt-in-organisation">
             <div class="checkbox">
-              <input type="hidden" name="account[opt_in_organisation]" value="0">
-              <input type="checkbox" name="account[opt_in_organisation]" value="1" id="account_opt_in_organisation" class="form-check-input ">
+              <%= f.check_box :opt_in_organisation, class: 'form-check-input' %>
               <label for="account_opt_in_organisation" class="">Get email updates from <%== @event.organisation_and_cohosts.map { |organisation| Sanitize.fragment(organisation.name) }.to_sentence(last_word_connector: ' and ') %></label>
             </div>
           </div>
@@ -203,8 +203,7 @@ end
       <% if @event.opt_in_facilitator && @event.event_facilitators.exists? %>
         <div id="opt-in-facilitator">
           <div class="checkbox">
-            <input type="hidden" name="account[opt_in_facilitator]" value="0">
-            <input type="checkbox" name="account[opt_in_facilitator]" value="1" id="account_opt_in_facilitator" class="form-check-input ">
+            <%= f.check_box :opt_in_facilitator, class: 'form-check-input' %>
             <label for="account_opt_in_facilitator" class="">Get email updates from <%= @event.event_facilitators.map(&:firstname).to_sentence(last_word_connector: ' and ') %></label>
           </div>
         </div>
