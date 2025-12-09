@@ -1,6 +1,6 @@
 require File.expand_path("#{File.dirname(__FILE__)}/test_config.rb")
 
-class DandelionTest < ActiveSupport::TestCase
+class SearchTest < ActiveSupport::TestCase
   include Capybara::DSL
 
   test 'search page loads' do

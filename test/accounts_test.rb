@@ -1,6 +1,6 @@
 require File.expand_path("#{File.dirname(__FILE__)}/test_config.rb")
 
-class DandelionTest < ActiveSupport::TestCase
+class AccountsTest < ActiveSupport::TestCase
   include Capybara::DSL
 
   test 'signing up' do

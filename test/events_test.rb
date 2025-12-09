@@ -1,6 +1,6 @@
 require File.expand_path("#{File.dirname(__FILE__)}/test_config.rb")
 
-class DandelionTest < ActiveSupport::TestCase
+class EventsTest < ActiveSupport::TestCase
   include Capybara::DSL
 
   test 'creating an event' do
