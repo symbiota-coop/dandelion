@@ -10,6 +10,7 @@ end
 
 @single_free_ticket = @event.ticket_types.count == 1 &&
   (free_ticket = @event.ticket_types.first) &&
+  free_ticket.price &&
   free_ticket.price.zero? &&
   free_ticket.number_of_tickets_available_in_single_purchase > 0 &&
   !(free_ticket.sales_end && Time.now > free_ticket.sales_end)
