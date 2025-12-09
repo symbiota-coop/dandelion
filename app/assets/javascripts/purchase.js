@@ -250,7 +250,7 @@ $(function () {
     }
 
     let numberOfTickets = 0
-    $('select[name^=quantities]').not(':disabled').each(function () {
+    $('[name^=quantities]').not(':disabled').each(function () {
       numberOfTickets += parseInt($(this).val())
     })
     if (numberOfTickets == 0) {

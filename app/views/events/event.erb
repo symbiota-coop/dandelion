@@ -59,9 +59,9 @@
 <% unless @order %>
   <% sidebar = false %>
   <% sidebar = true if @event.sold_out? || @event.purchase_url %>
-  <% buy_tickets_style = 'class="fixed-bottom bg-white p-3 w-100 d-block d-md-none" style="z-index: 1019; box-shadow: 0px -2px 4px 0px rgba(0,0,0,0.3);"' %>
+  <% get_tickets_fixed_bottom_style = 'class="fixed-bottom bg-white p-3 w-100 d-block d-md-none" style="z-index: 1019; box-shadow: 0px -2px 4px 0px rgba(0,0,0,0.3);"' %>
   <% if @event.purchase_url %>
-    <div id="buy-tickets" <%== buy_tickets_style %>>
+    <div id="get-tickets-fixed-bottom" <%== get_tickets_fixed_bottom_style %>>
       <a target="_blank" href="<%=@event.purchase_url%>" class="btn btn-primary btn-block"><%= @event.rsvp_button_text || "Book via #{URI(@event.purchase_url).host.gsub('www.','')}" %></a>
     </div>
     <style>
@@ -69,7 +69,7 @@
     </style>
   <% elsif (params[:ticket_type_id] || !@event.sold_out?) && @event.ticket_types.exists? %>
     <% sidebar = true %>
-    <div id="buy-tickets" <%== buy_tickets_style %>>
+    <div id="get-tickets-fixed-bottom" <%== get_tickets_fixed_bottom_style %>>
       <a href="javascript:;" onclick="$(this).parent().hide();
             $(window).scrollTop($('#purchase').offset()['top'] - $('#header').height() - 17)
            " class="btn btn-primary btn-block">Get tickets</a>
@@ -78,9 +78,9 @@
       $(function () {
         $(window).scroll(function () {
           if ((window.scrollY + window.innerHeight) > $('#purchase').offset()['top']) {
-            $('#buy-tickets').addClass('d-none').removeClass('d-block')
+            $('#get-tickets-fixed-bottom').addClass('d-none').removeClass('d-block')
           } else {
-            $('#buy-tickets').addClass('d-block').removeClass('d-none')
+            $('#get-tickets-fixed-bottom').addClass('d-block').removeClass('d-none')
           }
         })
         $(window).scroll()
