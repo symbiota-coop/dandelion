@@ -197,7 +197,7 @@ Dandelion::App.controller do
     if @organisation.organisationships.find_by(account: @account)
       flash[:warning] = 'That person is already following the organisation'
     else
-      @organisation.organisationships.create! account: @account
+      @account.associate_with_organisation!(@organisation)
     end
 
     redirect back

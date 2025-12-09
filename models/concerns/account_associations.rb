@@ -190,4 +190,43 @@ module AccountAssociations
   def previous_events
     my_events.past
   end
+
+  def associate_with_organisation!(organisation, options = {})
+    organisationship = organisation.organisationships.create(
+      account: self,
+      skip_welcome: options[:skip_welcome],
+      referrer_id: options[:referrer_id]
+    )
+    organisation.organisationships.find_by(account: self).set_unsubscribed!(false)
+    organisationship
+  end
+
+  def associate_with_activity!(activity)
+    activity.organisation.organisationships.create(account: self)
+    activity.organisation.organisationships.find_by(account: self).set_unsubscribed!(false)
+    activity.activityships.create(account: self)
+    activity.activityships.find_by(account: self).set(unsubscribed: false)
+  end
+
+  def associate_with_local_group!(local_group)
+    local_group.organisation.organisationships.create(account: self)
+    local_group.organisation.organisationships.find_by(account: self).set_unsubscribed!(false)
+    local_group.local_groupships.create(account: self)
+    local_group.local_groupships.find_by(account: self).set(unsubscribed: false)
+  end
+
+  def associate_with_event!(event)
+    event.organisation.organisationships.create(account: self)
+    event.organisation.organisationships.find_by(account: self).set_unsubscribed!(false)
+    if event.activity
+      event.activity.activityships.create(account: self)
+      event.activity.activityships.find_by(account: self).set(unsubscribed: false)
+    end
+    # rubocop:disable Style/GuardClause
+    if event.local_group
+      event.local_group.local_groupships.create(account: self)
+      event.local_group.local_groupships.find_by(account: self).set(unsubscribed: false)
+    end
+    # rubocop:enable Style/GuardClause
+  end
 end

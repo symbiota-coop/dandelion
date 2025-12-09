@@ -17,7 +17,7 @@ Dandelion::App.controller do
         if account # someone's already connected
           flash[:error] = "Someone's already connected to that account!"
         else # connect; Account never reaches here
-          current_account.provider_links.build(provider: @provider.display_name, provider_uid: env['omniauth.auth']['uid'], omniauth_hash: env['omniauth.auth'])
+          link_omniauth_provider(current_account)
           # current_account.image_url = @provider.image.call(env['omniauth.auth']) unless current_account.image
           if current_account.save
             flash[:notice] = "<i class=\"#{@provider.icon}\"></i> Connected!"
@@ -38,7 +38,7 @@ Dandelion::App.controller do
         @account.name = env['omniauth.auth']['info']['name']
         @account.email = env['omniauth.auth']['info']['email']
         # @account.image_url = @provider.image.call(env['omniauth.auth'])
-        @account.provider_links.build(provider: @provider.display_name, provider_uid: env['omniauth.auth']['uid'], omniauth_hash: env['omniauth.auth'])
+        link_omniauth_provider(@account)
         erb :'accounts/new'
       end
     end

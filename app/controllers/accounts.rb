@@ -69,16 +69,7 @@ Dandelion::App.controller do
   get '/accounts/new' do
     @body_class = 'gradient'
     @account = Account.new
-    if params[:organisation_id]
-      @organisation = Organisation.find(params[:organisation_id])
-    elsif params[:activity_id]
-      @activity = Activity.find(params[:activity_id])
-    elsif params[:local_group_id]
-      @local_group = LocalGroup.find(params[:local_group_id])
-    elsif params[:event_id]
-      @event = Event.find(params[:event_id])
-    end
-
+    load_context
     @hide_right_nav = true
     erb :'accounts/new'
   end
@@ -86,113 +77,15 @@ Dandelion::App.controller do
   post '/accounts/new' do
     @account = Account.new(mass_assigning(params[:account], Account))
     @account.password = Account.generate_password # not used
-    if params[:organisation_id]
-      @organisation = Organisation.find(params[:organisation_id])
-    elsif params[:activity_id]
-      @activity = Activity.find(params[:activity_id])
-    elsif params[:local_group_id]
-      @local_group = LocalGroup.find(params[:local_group_id])
-    elsif params[:event_id]
-      @event = Event.find(params[:event_id])
-    end
+    load_context
 
-    if params[:recaptcha_skip_secret] == ENV['RECAPTCHA_SKIP_SECRET']
-      # continue
-    elsif ENV['RECAPTCHA_SECRET_KEY']
-      agent = Mechanize.new
-      captcha_response = JSON.parse(agent.post(ENV['RECAPTCHA_VERIFY_URL'], { secret: ENV['RECAPTCHA_SECRET_KEY'], response: params['g-recaptcha-response'] }).body)
-      unless captcha_response['success'] == true
-        flash[:error] = "Our systems think you're a bot. Please try a different device or browser, or email #{ENV['CONTACT_EMAIL']} if you keep having trouble."
-        redirect(back)
-      end
-    end
-
-    if session['omniauth.auth']
-      @provider = Provider.object(session['omniauth.auth']['provider'])
-      @account.provider_links.build(provider: @provider.display_name, provider_uid: session['omniauth.auth']['uid'], omniauth_hash: session['omniauth.auth'])
-      # @account.image_url = @provider.image.call(session['omniauth.auth']) unless @account.image
-    end
+    validate_recaptcha unless params[:recaptcha_skip_secret] == ENV['RECAPTCHA_SKIP_SECRET']
+    link_omniauth_provider(@account) if session['omniauth.auth']
 
     if @account.save
-      flash[:notice] = '<strong>Awesome!</strong> Your account was created successfully.'
-      unless params[:recaptcha_skip_secret]
-        @account.sign_ins.create(env: env_yaml)
-        session[:account_id] = @account.id.to_s
-      end
-      if params[:list_an_event]
-        redirect '/events/new'
-      elsif params[:organisation_id]
-        @organisation = Organisation.find(params[:organisation_id])
-        organisationship = @organisation.organisationships.create account: @account, skip_welcome: params[:skip_welcome], referrer_id: params[:referrer_id]
-        @organisation.organisationships.find_by(account: @account).set_unsubscribed!(false)
-        if organisationship.referrer
-          redirect "/o/#{@organisation.slug}/via/#{organisationship.referrer.username}?registered=true"
-        else
-          redirect "/accounts/edit?organisation_id=#{@organisation.id}"
-        end
-      elsif params[:activity_id]
-        @activity = Activity.find(params[:activity_id])
-        @activity.organisation.organisationships.create account: @account
-        @activity.organisation.organisationships.find_by(account: @account).set_unsubscribed!(false)
-        @activity.activityships.create account: @account
-        @activity.activityships.find_by(account: @account).set(unsubscribed: false)
-        redirect "/accounts/edit?activity_id=#{@activity.id}"
-      elsif params[:local_group_id]
-        @local_group = LocalGroup.find(params[:local_group_id])
-        @local_group.organisation.organisationships.create account: @account
-        @local_group.organisation.organisationships.find_by(account: @account).set_unsubscribed!(false)
-        @local_group.local_groupships.create account: @account
-        @local_group.local_groupships.find_by(account: @account).set(unsubscribed: false)
-        redirect "/accounts/edit?local_group_id=#{@local_group.id}"
-      elsif params[:event_id]
-        @event = Event.find(params[:event_id])
-        @event.organisation.organisationships.create(account: @account)
-        @event.organisation.organisationships.find_by(account: @account).set_unsubscribed!(false)
-        @event.activity.activityships.create(account: @account) if @event.activity
-        @event.activity.activityships.find_by(account: @account).set(unsubscribed: false)
-        @event.local_group.local_groupships.create(account: @account) if @event.local_group
-        @event.local_group.local_groupships.find_by(account: @account).set(unsubscribed: false)
-        redirect "/accounts/edit?event_id=#{@event.id}"
-      else
-        redirect '/accounts/edit'
-      end
+      handle_successful_account_creation
     elsif @account.email && (existing_account = Account.find_by(email: @account.email.downcase))
-      if params[:organisation_id] || params[:activity_id] || params[:local_group_id] || params[:event_id]
-        if params[:organisation_id]
-          @organisation = Organisation.find(params[:organisation_id])
-          @organisation.organisationships.create account: existing_account, skip_welcome: params[:skip_welcome], referrer_id: params[:referrer_id]
-          @organisation.organisationships.find_by(account: existing_account).set_unsubscribed!(false)
-        elsif params[:activity_id]
-          @activity = Activity.find(params[:activity_id])
-          @activity.organisation.organisationships.create account: existing_account
-          @activity.organisation.organisationships.find_by(account: existing_account).set_unsubscribed!(false)
-          @activity.activityships.create account: existing_account
-          @activity.activityships.find_by(account: existing_account).set(unsubscribed: false)
-        elsif params[:local_group_id]
-          @local_group = LocalGroup.find(params[:local_group_id])
-          @local_group.organisation.organisationships.create account: existing_account
-          @local_group.organisation.organisationships.find_by(account: existing_account).set_unsubscribed!(false)
-          @local_group.local_groupships.create account: existing_account
-          @local_group.local_groupships.find_by(account: existing_account).set(unsubscribed: false)
-        elsif params[:event_id]
-          @event = Event.find(params[:event_id])
-          @event.organisation.organisationships.create(account: existing_account)
-          @event.organisation.organisationships.find_by(account: existing_account).set_unsubscribed!(false)
-          @event.activity.activityships.create(account: existing_account) if @event.activity
-          @event.activity.activityships.find_by(account: existing_account).set(unsubscribed: false)
-          @event.local_group.local_groupships.create(account: existing_account) if @event.local_group
-          @event.local_group.local_groupships.find_by(account: existing_account).set(unsubscribed: false)
-        end
-        if params[:recaptcha_skip_secret]
-          200
-        else
-          flash[:notice] = "OK, you're on the list!"
-          redirect(back)
-        end
-      else
-        flash[:error] = "There's already an account registered under that email address. You can request a sign in code below."
-        redirect '/accounts/sign_in'
-      end
+      handle_existing_account(existing_account)
     elsif params[:recaptcha_skip_secret]
       400
     else

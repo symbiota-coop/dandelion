@@ -375,14 +375,7 @@ Dandelion::App.controller do
   post '/events/:id/waitship/new' do
     @event = Event.find(params[:id]) || not_found
 
-    if ENV['RECAPTCHA_SECRET_KEY']
-      agent = Mechanize.new
-      captcha_response = JSON.parse(agent.post(ENV['RECAPTCHA_VERIFY_URL'], { secret: ENV['RECAPTCHA_SECRET_KEY'], response: params['g-recaptcha-response'] }).body)
-      unless captcha_response['success'] == true
-        flash[:error] = "Our systems think you're a bot. Please try a different device or browser, or email #{ENV['CONTACT_EMAIL']} if you keep having trouble."
-        redirect(back)
-      end
-    end
+    validate_recaptcha
 
     email = params[:waitship][:email]
     account_hash = { name: params[:waitship][:name], email: params[:waitship][:email], password: Account.generate_password }

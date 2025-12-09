@@ -99,8 +99,7 @@ Dandelion::App.controller do
     if @local_group.local_groupships.find_by(account: @account)
       flash[:warning] = 'That person is already following the local group'
     else
-      @local_group.organisation.organisationships.create account: @account
-      @local_group.local_groupships.create! account: @account
+      @account.associate_with_local_group!(@local_group)
     end
 
     redirect back
