@@ -22,7 +22,7 @@
       <i data-toggle="tooltip" title="Available to those donating <%=m ticket_type.minimum_monthly_donation, @event.currency%>+/month" class="bi bi-lock"></i>
     <% end %>
 
-    <% if ticket_type.sales_end && Time.now > ticket_type.sales_end %>
+    <% if ticket_type.sales_ended? || @event.sales_closed_due_to_event_end? %>
     <% elsif ticket_type.number_of_tickets_available_in_single_purchase > 0 %>
       <% if !@event.organisation.hide_few_left && !@event.hide_few_left && ticket_type.wiser_remaining <= 3 %>
         <span style="position: relative; top: -2px;" class="badge badge-secondary"><%= ticket_type.wiser_remaining %> left</span>
@@ -85,7 +85,7 @@
     <% end %>
   </td>
   <td style="border-top: 0; vertical-align: middle">
-    <% if ticket_type.sales_end && Time.now > ticket_type.sales_end %>
+    <% if ticket_type.sales_ended? || @event.sales_closed_due_to_event_end? %>
       <span class="badge badge-default">Sales closed</span>
     <% elsif ticket_type.number_of_tickets_available_in_single_purchase > 0 %>
       <% if ticket_type.minimum_monthly_donation && (

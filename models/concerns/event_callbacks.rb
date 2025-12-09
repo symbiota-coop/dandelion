@@ -16,6 +16,11 @@ module EventCallbacks
       set_browsable
       set(event_tag_names: event_tags.map(&:name))
 
+      if previous_changes['no_sales_after_end_time'] || previous_changes['end_time']
+        set(sold_out_cache: sold_out?)
+        set(sold_out_due_to_sales_end_cache: sold_out_due_to_sales_end?)
+      end
+
       if previous_changes['name'] && (post = posts.find_by(subject: "Chat for #{previous_changes['name'][0]}"))
         post.set(subject: "Chat for #{name}")
       end

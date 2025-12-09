@@ -95,6 +95,10 @@ class TicketType
     range_min && range_max ? [range_min, range_max] : nil
   end
 
+  def sales_ended?
+    sales_end && Time.now > sales_end
+  end
+
   def floaty?(obj)
     !Float(obj).nil?
   rescue StandardError

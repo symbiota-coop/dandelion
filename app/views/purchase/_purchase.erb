@@ -13,7 +13,7 @@ end
   free_ticket_type.price &&
   free_ticket_type.price.zero? &&
   free_ticket_type.number_of_tickets_available_in_single_purchase > 0 &&
-  !(free_ticket_type.sales_end && Time.now > free_ticket_type.sales_end)
+  !free_ticket_type.sales_ended? && !@event.sales_closed_due_to_event_end?
 %>
 
 <div class="card shadow-sm <% if @event.no_discounts %>no-discounts<% end %>" id="select-tickets">
@@ -60,7 +60,7 @@ end
             <% @event.ticket_types.order('order asc, price desc').each_with_index { |ticket_type,i| %>
             <% next if ticket_type.hidden && params[:ticket_type_id] != ticket_type.id.to_s; %>
             <% next if discount_code && discount_code.filter && !discount_code.filter.downcase.split(',').map(&:strip).any? { |filter| ticket_type.name.downcase.include?(filter) } %>
-            <% next if @event.hide_unavailable_tickets? && (ticket_type.number_of_tickets_available_in_single_purchase == 0  || (ticket_type.sales_end && Time.now > ticket_type.sales_end)) %>
+            <% next if @event.hide_unavailable_tickets? && (ticket_type.number_of_tickets_available_in_single_purchase == 0 || ticket_type.sales_ended? || @event.sales_closed_due_to_event_end?) %>
             <%= partial :'purchase/ticket_type', locals: { ticket_type: ticket_type, no_border_top: (i == 0) } %>
             <% } %>
 

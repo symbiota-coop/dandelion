@@ -55,7 +55,8 @@ module EventDuplication
       time_zone: time_zone,
       questions: questions,
       redirect_url: redirect_url,
-      purchase_url: purchase_url
+      purchase_url: purchase_url,
+      no_sales_after_end_time: no_sales_after_end_time
     )
     event_tags.each do |event_tag|
       event.event_tagships.create(

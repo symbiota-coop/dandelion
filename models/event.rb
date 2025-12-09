@@ -136,27 +136,37 @@ class Event
     !locked?
   end
 
+  def sales_closed_due_to_event_end?
+    no_sales_after_end_time? && end_time && Time.now > end_time
+  end
+
   def public?
     !secret?
   end
 
   def sold_out?
+    return true if sales_closed_due_to_event_end?
+
     ticket_types.exists? && ticket_types.and(hidden: false).all? do |ticket_type|
       ticket_type.number_of_tickets_available_in_single_purchase <= 0 ||
-        (ticket_type.sales_end && ticket_type.sales_end < Time.now)
+        ticket_type.sales_ended?
     end
   end
 
   def sold_out_due_to_sales_end?
+    return true if sales_closed_due_to_event_end?
+
     ticket_types.exists? && ticket_types.and(hidden: false).all? do |ticket_type|
-      ticket_type.sales_end && ticket_type.sales_end < Time.now
+      ticket_type.sales_ended?
     end
   end
 
   def tickets_available?
+    return false if sales_closed_due_to_event_end?
+
     ticket_types.exists? && ticket_types.and(hidden: false).any? do |ticket_type|
       ticket_type.number_of_tickets_available_in_single_purchase >= 1 &&
-        (ticket_type.sales_end.nil? || ticket_type.sales_end >= Time.now)
+        !ticket_type.sales_ended?
     end
   end
 
