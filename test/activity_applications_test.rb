@@ -41,7 +41,6 @@ class ActivityApplicationsTest < ActiveSupport::TestCase
     @account = FactoryBot.create(:account)
     @organisation = FactoryBot.create(:organisation, account: @account)
     @activity = FactoryBot.create(:activity, organisation: @organisation, account: @account)
-    FactoryBot.create(:activityship, activity: @activity, account: @account)
     login_as(@account)
     visit "/activities/#{@activity.id}/apply"
     assert page.has_content? 'Preview of application form'

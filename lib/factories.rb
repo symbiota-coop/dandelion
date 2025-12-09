@@ -3,7 +3,7 @@ FactoryBot.define do
     sequence(:name) { |n| "Account #{n}" }
     sequence(:email) { |n| "account#{n}@#{ENV['DOMAIN']}" }
     sequence(:password) { |_n| Account.generate_password }
-    location { 'Stockholm, Sweden' }
+    location { '111 28, Sweden' }
   end
 
   factory :organisation do
@@ -24,6 +24,10 @@ FactoryBot.define do
     sequence(:slug) { |n| "activity-#{n}" }
     organisation
     account
+
+    after(:create) do |activity|
+      activity.activityships.find_or_create_by(account: activity.account).set(admin: true) if activity.account
+    end
   end
 
   factory :activityship do
@@ -69,6 +73,10 @@ FactoryBot.define do
     end
     organisation
     account
+
+    after(:create) do |local_group|
+      local_group.local_groupships.find_or_create_by(account: local_group.account).set(admin: true) if local_group.account
+    end
   end
 
   factory :local_groupship do
@@ -104,7 +112,7 @@ FactoryBot.define do
     sequence(:name) { |n| "Event #{n}" }
     sequence(:start_time) { |n| Time.now + 1.month + n.days }
     sequence(:end_time) { |n| Time.now + 1.month + (n + 1).days }
-    location { 'Stockholm, Sweden' }
+    location { '111 28, Sweden' }
     currency { 'GBP' }
     organisation
     account

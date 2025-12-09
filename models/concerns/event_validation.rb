@@ -111,7 +111,7 @@ module EventValidation
           if coordinates
             self.time_zone = begin
               Timezone.lookup(*coordinates.reverse)
-            rescue Timezone::Error::InvalidZone, Timezone::Error::InvalidConfig
+            rescue Timezone::Error::InvalidZone, Timezone::Error::InvalidConfig, Timezone::Error::Google
               nil
             end
           end

@@ -72,6 +72,7 @@ jobs:
         SESSION_SECRET: ${{ steps.session-secret.outputs.secret }}
         STRIPE_PK: pk_test
         STRIPE_SK: sk_test
+        GOOGLE_MAPS_API_KEY: test
         CI: true
         SKIP_TOURS: true
       

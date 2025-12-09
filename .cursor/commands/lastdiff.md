@@ -1,1 +1,1 @@
-Verify the last commit looks OK using `git diff`
+Verify the last commit looks OK using `git diff` and inspecting any altered files

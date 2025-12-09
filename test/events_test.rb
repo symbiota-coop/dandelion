@@ -138,4 +138,106 @@ class EventsTest < ActiveSupport::TestCase
     assert_equal find_field('discount_code_display', disabled: true).value, code
     assert page.has_button? "Pay £#{format('%.2f', ((price_0 + price_1 + price_2) * (100 - percentage_discount).to_f / 100) + donation_amount)}"
   end
+
+  # ═══════════════════════════════════════════════════════════════════════════
+  # Ticket Booking Subscriptions
+  # ═══════════════════════════════════════════════════════════════════════════
+
+  test 'new user booking ticket to free event gets subscribed to org, activity, and local_group' do
+    create_full_event_hierarchy(event_options: { prices: [0], opt_in_organisation: true })
+    @account = FactoryBot.create(:account)
+
+    login_as(@account)
+    visit "/e/#{@event.slug}"
+    assert page.has_content? 'Register for free'
+
+    # Click the label to check the custom-styled checkbox (actual input is hidden via CSS)
+    find('label[for="account_opt_in_organisation"]').click
+
+    click_button 'RSVP'
+    assert page.has_content? 'Thanks for booking!'
+
+    # Verify account is associated and subscribed
+    assert_associated(@organisation, @account, :organisationships)
+    assert_associated(@activity, @account, :activityships)
+    assert_associated(@local_group, @account, :local_groupships)
+
+    # Verify they're subscribed (not unsubscribed)
+    assert_equal false, @organisation.organisationships.find_by(account: @account).unsubscribed
+    assert_equal false, @activity.activityships.find_by(account: @account).unsubscribed
+    assert_equal false, @local_group.local_groupships.find_by(account: @account).unsubscribed
+  end
+
+  test 'collect_location with postcode in local_group area subscribes user to local_group' do
+    @org_account = FactoryBot.create(:account)
+    @organisation = FactoryBot.create(:organisation, account: @org_account, collect_location: true)
+    # Local group with Gamla Stan polygon (from factory)
+    @local_group = FactoryBot.create(:local_group, organisation: @organisation, account: @org_account)
+    # Event WITHOUT local_group - we want to test geo-based local_groupship creation
+    @event = FactoryBot.create(:event,
+                               organisation: @organisation,
+                               account: @org_account,
+                               last_saved_by: @org_account,
+                               prices: [0],
+                               opt_in_organisation: true)
+
+    visit "/e/#{@event.slug}"
+    assert page.has_content? 'Register for free'
+
+    # New users (not logged in) should see postcode and country fields
+    assert page.has_field?('account_postcode'), 'Postcode field should be visible'
+    assert page.has_field?('account_country'), 'Country field should be visible'
+
+    # Fill in the form with a Gamla Stan postcode (111 28 is in the polygon)
+    fill_in 'account_name', with: 'Stockholm User'
+    fill_in 'account_email', with: 'gamlastan@example.com'
+    fill_in 'account_postcode', with: '111 28'
+    select 'Sweden', from: 'account_country'
+
+    # Check opt-in checkbox
+    find('label[for="account_opt_in_organisation"]').click
+
+    click_button 'RSVP'
+    assert page.has_content? 'Thanks for booking!'
+
+    # Verify account was created with location and coordinates
+    new_account = Account.find_by(email: 'gamlastan@example.com')
+    assert new_account.present?, 'Account should be created'
+    assert new_account.location.include?('111 28'), "Location should include postcode, got: #{new_account.location}"
+    assert new_account.coordinates.present?, 'Account should have coordinates from geocoding'
+
+    # Check organisationship was created
+    organisationship = @organisation.organisationships.find_by(account: new_account)
+    assert organisationship, 'User should be subscribed to organisation'
+
+    # Verify user is auto-subscribed to local_group based on their geocoded location
+    # (organisationship.after_create creates local_groupship when account coordinates are within polygon)
+    local_groupship = @local_group.local_groupships.find_by(account: new_account)
+    assert local_groupship, 'User with coordinates in Gamla Stan should be subscribed to local_group'
+  end
+
+  test 'existing unsubscribed user booking ticket to free event gets resubscribed' do
+    create_full_event_hierarchy(event_options: { prices: [0], opt_in_organisation: true })
+
+    # Create an existing account that's unsubscribed from org, activity, and local_group
+    @account = FactoryBot.create(:account)
+    @organisation.organisationships.find_or_create_by(account: @account).set_unsubscribed!(true)
+    @activity.activityships.find_or_create_by(account: @account).set(unsubscribed: true)
+    @local_group.local_groupships.find_or_create_by(account: @account).set(unsubscribed: true)
+
+    # Book ticket with opt-in (existing members have hidden field set to 1 automatically)
+    login_as(@account)
+    visit "/e/#{@event.slug}"
+    assert page.has_content? 'Register for free'
+
+    # For existing members, opt_in_organisation is automatically set via hidden field
+
+    click_button 'RSVP'
+    assert page.has_content? 'Thanks for booking!'
+
+    # Verify they're resubscribed
+    assert_equal false, @organisation.organisationships.find_by(account: @account).unsubscribed
+    assert_equal false, @activity.activityships.find_by(account: @account).unsubscribed
+    assert_equal false, @local_group.local_groupships.find_by(account: @account).unsubscribed
+  end
 end

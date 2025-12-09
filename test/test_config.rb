@@ -26,6 +26,10 @@ end
 Capybara.javascript_driver = :cuprite
 Capybara.default_driver = :cuprite
 
+# Configure Geocoder for testing (avoid real API calls)
+Geocoder.configure(lookup: :test)
+Geocoder::Lookup::Test.set_default_stub([{ 'coordinates' => [59.3251, 18.0685] }]) # Gamla Stan coords (111 28, Sweden)
+
 module ActiveSupport
   class TestCase
     setup do
@@ -53,6 +57,29 @@ module ActiveSupport
     def login_as(account)
       account.generate_sign_in_token!
       visit "/?sign_in_token=#{account.sign_in_token}"
+    end
+
+    def create_full_event_hierarchy(options = {})
+      @org_account = FactoryBot.create(:account)
+      @organisation = FactoryBot.create(:organisation, account: @org_account, **options.fetch(:organisation_options, {}))
+      @activity = FactoryBot.create(:activity, organisation: @organisation, account: @org_account, privacy: 'open')
+      @local_group = FactoryBot.create(:local_group, organisation: @organisation, account: @org_account)
+
+      event_attrs = {
+        organisation: @organisation,
+        account: @org_account,
+        last_saved_by: @org_account,
+        **options.fetch(:event_options, {})
+      }
+      event_attrs[:activity] = @activity unless options[:skip_activity]
+      event_attrs[:local_group] = @local_group unless options[:skip_local_group]
+
+      @event = FactoryBot.create(:event, **event_attrs)
+    end
+
+    def assert_associated(entity, account, association_name)
+      assert entity.send(association_name).find_by(account: account),
+             "Expected #{account.email} to be associated with #{entity.class.name} '#{entity.try(:name) || entity.id}'"
     end
 
     def narrate(narration, action = nil)
