@@ -1,0 +1,57 @@
+<div class="mb-3">
+  <p>
+    Showing <strong><%= @files.count %></strong> files
+    <% if @total_size %>
+      totaling <strong><%= ActiveSupport::NumberHelper.number_to_human_size(@total_size) %></strong>
+    <% end %>
+  </p>
+</div>
+
+<div class="table-responsive">
+  <table id="files-table" class="table table-hover">
+    <thead>
+      <tr>
+        <th>File</th>
+        <th class="text-right">Size</th>
+        <th>Modified</th>
+      </tr>
+    </thead>
+    <tbody>
+      <% @files.each do |file| %>
+        <tr>
+          <td>
+            <code><%= file[:path] %></code>
+          </td>
+          <td class="text-right" data-order="<%= file[:size] %>">
+            <% if file[:size] < 1024 %>
+              <%= file[:size] %> B
+            <% elsif file[:size] < 1024 * 1024 %>
+              <%= sprintf('%.1f KB', file[:size] / 1024.0) %>
+            <% else %>
+              <%= ActiveSupport::NumberHelper.number_to_human_size(file[:size]) %>
+            <% end %>
+          </td>
+          <td data-order="<%= file[:modified].to_i %>">
+            <span title="<%= file[:modified].strftime('%Y-%m-%d %H:%M:%S') %>">
+              <%= file[:modified].strftime('%Y-%m-%d %H:%M') %>
+            </span>
+          </td>
+        </tr>
+      <% end %>
+    </tbody>
+  </table>
+</div>
+
+<script>
+  $(function() {
+    $('#files-table').DataTable({
+      paging: true,
+      pageLength: 50,
+      searching: true,
+      order: [[1, 'desc']], // Sort by size descending
+      columnDefs: [
+        { type: 'num', targets: 1 } // Size column is numeric
+      ]
+    });
+  });
+</script>

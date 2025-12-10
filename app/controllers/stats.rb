@@ -86,6 +86,61 @@ Dandelion::App.controller do
     erb :'stats/gems'
   end
 
+  get '/stats/files' do
+    # Read repomix config to get ignore patterns
+    config_path = Padrino.root('repomix.config.json')
+    ignore_patterns = []
+    if File.exist?(config_path)
+      config = JSON.parse(File.read(config_path))
+      ignore_patterns = config.dig('ignore', 'customPatterns') || []
+    end
+
+    @files = []
+    root_path = Padrino.root.to_s
+
+    # Traverse all files
+    Find.find(root_path) do |file_path|
+      # Skip hidden directories entirely (like .git)
+      Find.prune if File.directory?(file_path) && File.basename(file_path).start_with?('.')
+      next unless File.file?(file_path)
+
+      # Get relative path from root
+      relative_path = file_path.sub("#{root_path}/", '')
+      # Handle root-level files
+      relative_path = File.basename(file_path) if relative_path == file_path
+
+      # Check if file matches any ignore pattern
+      # FNM_PATHNAME: wildcards don't match /
+      # FNM_EXTGLOB: enables ** (globstar) to match directories recursively
+      fnmatch_flags = File::FNM_PATHNAME | File::FNM_EXTGLOB
+      ignored = ignore_patterns.any? do |pattern|
+        # Convert glob pattern to match relative paths
+        # Handle both relative and absolute path matching
+        File.fnmatch?(pattern, relative_path, fnmatch_flags) ||
+          File.fnmatch?(pattern, file_path, fnmatch_flags) ||
+          File.fnmatch?("#{root_path}/#{pattern}", file_path, fnmatch_flags)
+      end
+
+      next if ignored
+
+      # Only show .rb, .erb, and .js files
+      next unless ['.rb', '.erb', '.js'].include?(File.extname(file_path))
+
+      file_size = File.size(file_path)
+      @files << {
+        path: relative_path,
+        size: file_size,
+        modified: File.mtime(file_path)
+      }
+    end
+
+    # Sort by size (largest first)
+    @files.sort_by! { |f| -f[:size] }
+    @total_size = @files.sum { |f| f[:size] }
+
+    erb :'stats/files'
+  end
+
   ###
 
   get '/raise' do

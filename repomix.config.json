@@ -1,8 +1,8 @@
 {
   "ignore": {
     "customPatterns": [
-      "app/assets/infinite_admin/plugins/**",
-      "app/assets/javascripts/ext/**",
+      "app/assets/infinite_admin/plugins/**/*",
+      "app/assets/javascripts/ext/**/*",
       "**/*.svg",
       "**/*.txt",
       "GPLv3-LICENSE.md"
