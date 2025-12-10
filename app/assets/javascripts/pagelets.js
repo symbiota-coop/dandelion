@@ -159,6 +159,12 @@ $(function () {
       }
 
       function performRefresh () {
+        // Stop refreshing if pagelet was removed from DOM (prevents memory leak)
+        if (!$.contains(document, pagelet[0])) {
+          clearInterval(intervalId)
+          return
+        }
+
         if (!pagelet[0].hasAttribute('data-pagelet-refresh-paused')) {
           reloadPagelet(pagelet, function () {
             bindRefreshPause()
@@ -170,7 +176,7 @@ $(function () {
       bindRefreshPause()
 
       const refreshInterval = parseInt(pagelet.attr('data-pagelet-refresh'), 10) * 1000
-      setInterval(performRefresh, refreshInterval)
+      const intervalId = setInterval(performRefresh, refreshInterval)
     })
   }
 
