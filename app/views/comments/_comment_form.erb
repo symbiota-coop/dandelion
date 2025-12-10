@@ -1,4 +1,4 @@
-<% form_for comment, comment.new_record ? '/comment' : "/comments/#{comment.id}/edit", class: 'comment-form add-placeholders mb-3', multipart: true do |f| %>
+<% form_for comment, comment.new_record ? '/comment' : "/comments/#{comment.id}/edit", class: 'comment-form add-placeholders mb-3' do |f| %>
   <%= f.hidden_field :commentable_id %>
   <%= f.hidden_field :commentable_type %>
   <%= f.hidden_field :post_id, value: comment.post_id %>
@@ -16,35 +16,11 @@
       </div>
     <% end %>
     <%= f.text_area_block :body, placeholder: (defined?(placeholder) ? placeholder : 'Write a comment... (optional)'), label_class: 'd-none' %>
-    <div id="comment-file-container" style="display: none">
-      <%= f.file_block :file, label_class: 'd-none' %>
-    </div>
-    <% if comment.first_in_post? %>
-      <!--
-            <div style="margin-bottom: 5px; margin-top: -10px;">
-
-              <a id="attach-a-file" style="text-decoration: none" href="javascript:;" onclick="$(this).hide();
-                  $('#divider').hide();
-                  $('#comment-file-container').show().find('input').click();">
-                <i class="bi bi-paperclip"></i>
-                Attach a file
-              </a>
-      <% if comment.file %>
-                        <script>
-                          $(function () {
-                            $('#attach-a-file').hide();
-                            $('#divider').hide();
-                            $('#comment-file-container').show()
-                          })
-                        </script>
-      <% end %>
-
-            </div>
-
-      -->
-    <% end %>
   <% end %>
   <div class="comment-options <% unless @show_buttons %> d-none <% end %> ">
+    <p class="text-muted" style="margin-top: -1em">
+      Add files, photos and polls after posting
+    </p>
     <% if comment.allow_force?(current_account) %>
       <%= f.check_box_block :force %>
     <% end %>

@@ -1,5 +1,5 @@
 <% if !comment.comment_reactions.find_by(account: current_account) %>
-  <a data-toggle="tooltip" title="React" style="background: white; text-decoration: none" class="rounded p-1 border border-primary mr-1" href="javascript:;" onclick="$(this).tooltip('hide').hide().next().css('display', 'inline')">
+  <a data-toggle="tooltip" title="React" class="btn btn-sm btn-outline-primary" href="javascript:;" onclick="$(this).tooltip('hide').hide().next().css('display', 'inline')">
     <i class="bi bi-heart-fill"></i>
   </a>
   <% form_tag "/comments/#{comment.id}/react", class: 'form-inline', style: 'display: none;' do %>
@@ -7,7 +7,7 @@
       <div class="col-auto">
         <div style="position: relative; top: 5px">
           <% %w[💚 👍 🙏 👀 🙌 🎉].each { |e| %>
-          <a style="text-decoration: none; background: white" class="rounded p-1 border border-light" href="javascript:;" onclick="$(this).closest('form').find('input').val($(this).html().includes('bi-heart-fill') ? '💚' : $(this).text()).closest('form').submit()">
+          <a class="btn btn-sm btn-outline-light" href="javascript:;" onclick="$(this).closest('form').find('input').val($(this).html().includes('bi-heart-fill') ? '💚' : $(this).text()).closest('form').submit()">
             <% if e == "💚" %>
               <i class="text-primary bi bi-heart-fill"></i>
             <% else %>

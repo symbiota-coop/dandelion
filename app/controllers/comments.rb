@@ -53,6 +53,26 @@ Dandelion::App.controller do
     200
   end
 
+  post '/comments/:id/file' do
+    sign_in_required!
+    @comment = Comment.find(params[:id]) || not_found
+    @commentable = @comment.commentable
+    halt unless admin? || (@comment.account.id == current_account.id)
+    @comment.file = params[:file]
+    @comment.save!
+    redirect back
+  end
+
+  get '/comments/:id/file/destroy' do
+    sign_in_required!
+    @comment = Comment.find(params[:id]) || not_found
+    @commentable = @comment.commentable
+    halt unless admin? || (@comment.account.id == current_account.id)
+    @comment.file = nil
+    @comment.save!
+    redirect back
+  end
+
   get '/comments/:id/destroy' do
     sign_in_required!
     @comment = Comment.find(params[:id]) || not_found

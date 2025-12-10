@@ -12,7 +12,7 @@
   <div data-pagelet-url="/comments/<%= comment.id %>/voptions" class="mt-3 <%= comment.voptions.empty? ? 'd-inline-block' : 'd-block' %>">
     <%= partial :'comments/voptions', locals: { comment: comment } %>
   </div>
-  <div class="<% comment.photos.empty? ? 'd-inline-block' : 'd-block' %> my-3">
+  <div class="<%= comment.photos.empty? ? 'd-inline-block' : 'd-block' %> mt-3">
     <%= partial :'photos/photos', locals: { photoable: comment } %>
   </div>
   <%= partial :'comments/file', locals: { comment: comment } %>

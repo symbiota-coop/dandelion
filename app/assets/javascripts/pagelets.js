@@ -1,146 +1,222 @@
 $(function () {
+  'use strict'
+
+  // Constants
+  const OPACITY_LOADING = '0.3'
+  const OPACITY_LOADED = '1'
+
+  // Cache busting for all AJAX requests
   $.ajaxPrefilter(function (options) {
-    const t = '_t=' + Date.now()
-    if (options.data) { options.data += '&' + t } else { options.data = t }
+    const cacheBuster = '_t=' + Date.now()
+    options.data = options.data ? options.data + '&' + cacheBuster : cacheBuster
   })
 
-  function postLoad (pagelet) {
+  // ─────────────────────────────────────────────────────────────
+  // Helper Functions
+  // ─────────────────────────────────────────────────────────────
+
+  function setPageletLoading (pagelet) {
     if (!pagelet.is('[data-pagelet-no-opacity-change]')) {
-      pagelet.css('opacity', '1')
-    }
-    $('.tooltip').remove()
-    $('[data-pagelet-refresh-paused]').removeAttr('data-pagelet-refresh-paused')
-    if (pagelet.attr('data-pagelet-also')) {
-      let alsoRefresh = $('[data-pagelet-url="' + pagelet.attr('data-pagelet-also') + '"]')
-      alsoRefresh.load(alsoRefresh.attr('data-pagelet-url'))
+      pagelet.css('opacity', OPACITY_LOADING)
     }
   }
 
-  $(document).on('submit', '[data-pagelet-url] form:not(.no-trigger)', function () {
-    const form = this
-    const pagelet = $(form).closest('[data-pagelet-url]')
+  function setPageletLoaded (pagelet) {
     if (!pagelet.is('[data-pagelet-no-opacity-change]')) {
-      pagelet.css('opacity', '0.3')
+      pagelet.css('opacity', OPACITY_LOADED)
     }
-    if ($(this).hasClass('no-submit')) {
-      pagelet.load(pagelet.attr('data-pagelet-url'), function () { postLoad(pagelet) })
+  }
+
+  function refreshAlsoPagelet (pagelet) {
+    const alsoUrl = pagelet.attr('data-pagelet-also')
+    if (alsoUrl) {
+      const alsoPagelet = $('[data-pagelet-url="' + alsoUrl + '"]')
+      alsoPagelet.load(alsoPagelet.attr('data-pagelet-url'))
+    }
+  }
+
+  function reloadPagelet (pagelet, callback) {
+    pagelet.load(pagelet.attr('data-pagelet-url'), callback)
+  }
+
+  function postLoad (pagelet) {
+    setPageletLoaded(pagelet)
+    $('.tooltip').remove()
+    $('[data-pagelet-refresh-paused]').removeAttr('data-pagelet-refresh-paused')
+    refreshAlsoPagelet(pagelet)
+  }
+
+  function hasFilesSelected ($form) {
+    const $fileInputs = $form.find('input[type=file]')
+    if ($fileInputs.length === 0) return false
+
+    const fileValues = $fileInputs.map(function () {
+      return $(this).val()
+    }).toArray().join('')
+
+    return fileValues !== ''
+  }
+
+  // ─────────────────────────────────────────────────────────────
+  // Form Submission Handler
+  // ─────────────────────────────────────────────────────────────
+
+  $(document).on('submit', '[data-pagelet-url] form:not(.no-trigger)', function () {
+    const $form = $(this)
+    const pagelet = $form.closest('[data-pagelet-url]')
+
+    setPageletLoading(pagelet)
+
+    if ($form.hasClass('no-submit')) {
+      reloadPagelet(pagelet, function () { postLoad(pagelet) })
+      return false
+    }
+
+    if (hasFilesSelected($form)) {
+      // Handle file uploads with FormData
+      $.ajax({
+        type: 'POST',
+        url: $form.attr('action'),
+        data: new FormData(this),
+        success: function () {
+          reloadPagelet(pagelet, function () { postLoad(pagelet) })
+        }
+      })
     } else {
-      if ($(form).find('input[type=file]').length > 0 && $(form).find('input[type=file]').map(function () {
-        return $(this).val()
-      }).toArray().join('') != '') {
-        const formData = new FormData(form)
-        $.ajax({
-          type: 'POST',
-          url: $(form).attr('action'),
-          data: formData,
-          success: function () {
-            pagelet.load(pagelet.attr('data-pagelet-url'), function () { postLoad(pagelet) })
-          }
-        })
-      } else {
-        $.post($(form).attr('action'), $(form).serialize(), function () {
-          pagelet.load(pagelet.attr('data-pagelet-url'), function () { postLoad(pagelet) })
-        })
-      }
+      // Standard form submission
+      $.post($form.attr('action'), $form.serialize(), function () {
+        reloadPagelet(pagelet, function () { postLoad(pagelet) })
+      })
     }
+
     return false
   })
 
+  // ─────────────────────────────────────────────────────────────
+  // Click Handlers
+  // ─────────────────────────────────────────────────────────────
+
   $(document).on('click', '[data-pagelet-url] a.pagelet-trigger', function () {
-    const a = this
-    if ($(a).hasClass('no-trigger')) {
-      $(a).removeClass('no-trigger')
+    const $link = $(this)
+
+    if ($link.hasClass('no-trigger')) {
+      $link.removeClass('no-trigger')
       return false
     }
-    const pagelet = $(a).closest('[data-pagelet-url]')
-    if (!pagelet.is('[data-pagelet-no-opacity-change]')) {
-      pagelet.css('opacity', '0.3')
-    }
-    $.get($(a).attr('href'), function () {
-      pagelet.load(pagelet.attr('data-pagelet-url'), function () { postLoad(pagelet) })
+
+    const pagelet = $link.closest('[data-pagelet-url]')
+    setPageletLoading(pagelet)
+
+    $.get($link.attr('href'), function () {
+      reloadPagelet(pagelet, function () { postLoad(pagelet) })
     })
+
     return false
   })
 
   $(document).on('click', '[data-pagelet-url] .pagination a', function () {
+    // Allow normal navigation in minimal mode
     if (window.location.search.includes('minimal=')) {
       return true
     }
 
-    const a = this
-    const pagelet = $(a).closest('[data-pagelet-url]')
-    if (!pagelet.is('[data-pagelet-no-opacity-change]')) {
-      pagelet.css('opacity', '0.3')
-    }
+    const $link = $(this)
+    const pagelet = $link.closest('[data-pagelet-url]')
+
+    setPageletLoading(pagelet)
+
     if (pagelet.attr('data-pagelet-refresh')) {
       pagelet.attr('data-pagelet-refresh-paused', 'true')
     }
-    pagelet.load($(a).attr('href'), function () {
-      if (!pagelet.is('[data-pagelet-no-opacity-change]')) {
-        pagelet.css('opacity', '1')
-      }
+
+    pagelet.load($link.attr('href'), function () {
+      setPageletLoaded(pagelet)
       $('.tooltip').remove()
-      const offset = pagelet.offset()
-      if (pagelet.attr('data-pagelet-scroll') != 'false') {
+
+      if (pagelet.attr('data-pagelet-scroll') !== 'false') {
         const headerHeight = $('#header').length ? $('#header').height() : 0
-        window.scrollTo(0, offset.top - headerHeight - 20)
+        const scrollTarget = pagelet.offset().top - headerHeight - 20
+        window.scrollTo(0, scrollTarget)
       }
     })
+
     return false
   })
 
+  // ─────────────────────────────────────────────────────────────
+  // Auto-refresh Pagelets
+  // ─────────────────────────────────────────────────────────────
 
-  function pageletRefresh () {
-    $('[data-pagelet-refresh]:not([data-pagelet-refresh-registered])').attr('data-pagelet-refresh-registered', 'true').each(function () {
-      const rawPagelet = this
+  function initPageletRefresh () {
+    $('[data-pagelet-refresh]:not([data-pagelet-refresh-registered])').each(function () {
       const pagelet = $(this)
-      function applyRefreshPause () {
-        $("a[href='javascript:;']", pagelet).click(function () {
+      pagelet.attr('data-pagelet-refresh-registered', 'true')
+
+      function bindRefreshPause () {
+        pagelet.find("a[href='javascript:;']").on('click', function () {
           pagelet.attr('data-pagelet-refresh-paused', 'true')
-        });
+        })
       }
-      function refreshProcess () {
-        if (!$(rawPagelet)[0].hasAttribute('data-pagelet-refresh-paused')) {
-          pagelet.load(pagelet.attr('data-pagelet-url'), function () {
-            applyRefreshPause()
-            if (pagelet.attr('data-pagelet-also')) {
-              let alsoRefresh = $('[data-pagelet-url="' + pagelet.attr('data-pagelet-also') + '"]')
-              alsoRefresh.load(alsoRefresh.attr('data-pagelet-url'))
-            }
+
+      function performRefresh () {
+        if (!pagelet[0].hasAttribute('data-pagelet-refresh-paused')) {
+          reloadPagelet(pagelet, function () {
+            bindRefreshPause()
+            refreshAlsoPagelet(pagelet)
           })
         }
       }
-      applyRefreshPause()
-      setInterval(refreshProcess, parseInt(pagelet.attr('data-pagelet-refresh')) * 1000)
+
+      bindRefreshPause()
+
+      const refreshInterval = parseInt(pagelet.attr('data-pagelet-refresh'), 10) * 1000
+      setInterval(performRefresh, refreshInterval)
     })
   }
+
+  // ─────────────────────────────────────────────────────────────
+  // Lazy Loading Empty Pagelets
+  // ─────────────────────────────────────────────────────────────
 
   function loadEmptyPagelets () {
     $('[data-pagelet-url]:not([data-pagelet-loaded])').each(function () {
-      const rawPagelet = this
-      const placeholder = $(rawPagelet)[0].hasAttribute('data-with-placeholder')
-      if ($(rawPagelet).html().length == 0 || placeholder) {
-        if (placeholder) {
-          $(rawPagelet).removeAttr('data-with-placeholder')
+      const pagelet = $(this)
+      const hasPlaceholder = pagelet[0].hasAttribute('data-with-placeholder')
+      const isEmpty = pagelet.html().length === 0
+
+      if (!isEmpty && !hasPlaceholder) return
+
+      if (hasPlaceholder) {
+        pagelet.removeAttr('data-with-placeholder')
+      } else {
+        // Insert loading spinner
+        const loadingSpinner = '<i class="pagelet-loading bi bi-spin bi-slash-lg"></i>'
+
+        if (pagelet.is('tr')) {
+          const $table = pagelet.closest('table')
+          const colCount = $table.find('thead th').length ||
+            $table.find('tr:first th').length || 1
+          pagelet.html('<td colspan="' + colCount + '">' + loadingSpinner + '</td>')
         } else {
-          if ($(rawPagelet).is('tr')) {
-            const table = $(rawPagelet).closest('table')
-            const colCount = table.find('thead th').length || table.find('tr:first th').length || 1
-            $(rawPagelet).html('<td colspan="' + colCount + '"><i class="pagelet-loading bi bi-spin bi-slash-lg"></i></td>')
-          } else {
-            $(rawPagelet).html('<i class="pagelet-loading bi bi-spin bi-slash-lg"></i>')
-          }
+          pagelet.html(loadingSpinner)
         }
-        $(rawPagelet).attr('data-pagelet-loaded', 'true')
-        $(rawPagelet).load($(rawPagelet).attr('data-pagelet-url'))
       }
+
+      pagelet.attr('data-pagelet-loaded', 'true')
+      reloadPagelet(pagelet)
     })
   }
 
+  // ─────────────────────────────────────────────────────────────
+  // Initialize
+  // ─────────────────────────────────────────────────────────────
+
   $(document).ajaxComplete(function () {
-    pageletRefresh()
+    initPageletRefresh()
     loadEmptyPagelets()
   })
-  pageletRefresh()
+
+  // Initial load
+  initPageletRefresh()
   loadEmptyPagelets()
 })
