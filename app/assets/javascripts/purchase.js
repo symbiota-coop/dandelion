@@ -1,16 +1,15 @@
 /* global Stripe, Web3, ethereum */
 
 $(function () {
-  // Centralized configuration: prefer JSON from #purchase-config, then window.purchaseConfig, else {}
+  // Load config from JSON script tag or window fallback
   const config = (function () {
     try {
       const el = document.getElementById('purchase-config')
       if (el) { return JSON.parse(el.textContent || '{}') }
-    } catch (e) {
-      // fall through to window.purchaseConfig
-    }
+    } catch (e) { }
     return (window.purchaseConfig || {})
   })()
+
   $('#details form').on('keyup keypress', function (e) {
     const keyCode = e.keyCode || e.which
     if (keyCode === 13 && e.target.tagName !== 'TEXTAREA') {

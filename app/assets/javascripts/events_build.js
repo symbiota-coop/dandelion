@@ -9,6 +9,7 @@ $(function () {
     } catch (e) { }
     return (window.eventsBuildConfig || {})
   })()
+
   // Intro tour on new org creation
   if (config.showIntro && $(window).width() > 992) {
     if (typeof introJs !== 'undefined') {
