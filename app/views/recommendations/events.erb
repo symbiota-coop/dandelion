@@ -2,6 +2,7 @@
 recommended_events = @account.recommended_events || []
 show_image = (Padrino.env == :production)
 full_width = true
+events_by_id = Event.and(:id.in => recommended_events.map(&:first)).includes(:event_facilitations, :cohostships).index_by { |e| e.id.to_s }
 %>
 
 <%= partial :'recommendations/nav' %>
@@ -12,7 +13,7 @@ full_width = true
 <% else %>
   <div class="mb-3">
     <div class="row" id="events">
-      <% recommended_events.each { |event_id,people|  event = Event.find(event_id);
+      <% recommended_events.each { |event_id,people| event = events_by_id[event_id.to_s]; next unless event;
         next if event.locked? && !event_admin?(event)
         next if event.sold_out?
         next if event.created_at < 1.year.ago
@@ -44,8 +45,9 @@ full_width = true
                       <div class="col ml-1 p-lg-3">
                         <%= partial :'events/block_main', locals: { event: event, skip_final_ul: true } %>
 
+                        <% people_accounts = Account.and(:id.in => people.keys) %>
                         <li><i data-toggle="tooltip" title="People" class="bi bi-person-fill"></i>
-                          <% people.each { |k,v| account = Account.find(k);
+                          <% people.each { |k,v| account = people_accounts.find { |a| a.id.to_s == k.to_s }; next unless account;
                           next if account.private?
                           %>
                           <a href="/u/<%=account.username%>"><%=account.name%></a>,

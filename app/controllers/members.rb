@@ -11,7 +11,7 @@ Dandelion::App.controller do
       @memberships = @memberships.and(:id.in => r.pluck(:id))
     end
     @memberships = @memberships.and(:account_id.in => Account.search(params[:q], child_scope: @memberships).pluck(:id)) if params[:q]
-    @memberships = @memberships.order('created_at desc')
+    @memberships = @memberships.includes(:account, teamships: :team, optionships: :option).order('created_at desc')
     case content_type
     when :html
       erb :'gatherings/members'

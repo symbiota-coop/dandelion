@@ -172,7 +172,7 @@ Dandelion::App.controller do
   get '/o/:slug/followers', provides: %i[html csv] do
     @organisation = Organisation.find_by(slug: params[:slug]) || not_found
     organisation_admins_only!
-    @organisationships = @organisation.organisationships.order('created_at desc')
+    @organisationships = @organisation.organisationships.includes(:account).order('created_at desc')
     @organisationships = @organisationships.and(:account_id.in => Account.search(params[:q], @organisation.members).pluck(:id)) if params[:q]
     @organisationships = @organisationships.and(:monthly_donation_method.ne => nil) if params[:monthly_donor]
     @organisationships = @organisationships.and(monthly_donation_method: nil) if params[:not_a_monthly_donor]

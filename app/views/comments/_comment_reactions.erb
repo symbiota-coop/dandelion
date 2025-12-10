@@ -29,9 +29,10 @@
   <% end %>
 <% end %>
 <% if comment.comment_reactions.exists? %>
-  <% comment.comment_reactions.pluck(:body).uniq.each { |body| comment_reactions = comment.comment_reactions.and(body: body) %>
+  <% all_reactions = comment.comment_reactions.includes(:account); reactions_by_body = all_reactions.group_by(&:body) %>
+  <% reactions_by_body.each { |body, comment_reactions| %>
   <% c = 'd-inline-block border rounded p-1 text-dark' %>
-  <a data-toggle="tooltip" style="text-decoration: none; background: white" <% if comment_reactions.find_by(account: current_account) %> class="pagelet-trigger border-primary <%= c %>" href="/comments/<%= comment.id %>/unreact" onclick="$(this).tooltip('hide')" <% else %> class="<%= c %> border-light" <% end %>>
+  <a data-toggle="tooltip" style="text-decoration: none; background: white" <% if comment_reactions.find { |r| r.account_id == current_account.id } %> class="pagelet-trigger border-primary <%= c %>" href="/comments/<%= comment.id %>/unreact" onclick="$(this).tooltip('hide')" <% else %> class="<%= c %> border-light" <% end %>>
     <% if body == "💚" %>
       <i class="text-primary bi bi-heart-fill"></i>
 <% else %>

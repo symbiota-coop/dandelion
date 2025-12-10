@@ -211,7 +211,7 @@ Dandelion::App.controller do
   get '/activities/:id/followers', provides: %i[html csv] do
     @activity = Activity.find(params[:id]) || not_found
     activity_admins_only!
-    @activityships = @activity.activityships.order('created_at desc')
+    @activityships = @activity.activityships.includes(:account).order('created_at desc')
     @activityships = @activityships.and(:account_id.in => Account.search(params[:q], child_scope: @activityships).pluck(:id)) if params[:q]
     if params[:subscribed_to_mailer]
       # Filter to activity-subscribed, then exclude globally unsubscribed and org-unsubscribed
@@ -252,7 +252,7 @@ Dandelion::App.controller do
     @activity = Activity.find(params[:id]) || not_found
     @organisation = @activity.organisation
     if request.xhr? || params[:minimal]
-      partial :'event_feedbacks/event_feedbacks', locals: { event_feedbacks: @activity.event_feedbacks }, layout: (params[:minimal] ? 'minimal' : false)
+      partial :'event_feedbacks/event_feedbacks', locals: { event_feedbacks: @activity.event_feedbacks.includes(:account, event: :organisation) }, layout: (params[:minimal] ? 'minimal' : false)
     else
       redirect "/activities/#{@activity.id}"
     end

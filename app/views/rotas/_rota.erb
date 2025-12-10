@@ -4,6 +4,7 @@
   <%= partial :'rotas/shift_summary', locals: {membership: @membership, rota: @rota, show_title: true} %>
 </div>
 
+<% shifts_by_rslot_role = rota.shifts.includes(:account).index_by { |s| [s.rslot_id, s.role_id] } %>
 <table class="table table-striped mt-3">
   <tr>
     <td></td>
@@ -51,7 +52,7 @@
     </td>
     <% rota.roles.order('o asc').each { |role| %>
     <td>
-      <%= partial :'rotas/rota_rslot_role', locals: { rota: rota, rslot: rslot, role: role } %>
+      <%= partial :'rotas/rota_rslot_role', locals: { rota: rota, rslot: rslot, role: role, shift: shifts_by_rslot_role[[rslot.id, role.id]] } %>
     </td>
     <% } %>
     <% if @membership.admin? %>

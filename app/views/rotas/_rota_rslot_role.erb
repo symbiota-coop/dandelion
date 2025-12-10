@@ -1,4 +1,4 @@
-<% if (shift = Shift.find_by(rslot: rslot, role: role)) %>
+<% if shift %>
   <% account = shift.account %>
   <% if (shift.account && shift.account_id == current_account.id) || @membership.admin? %>
     <% if shift.account %>

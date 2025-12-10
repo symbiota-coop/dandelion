@@ -8,7 +8,7 @@ Dandelion::App.controller do
   end
 
   get '/stats/feedback' do
-    @event_feedbacks = EventFeedback.order('created_at desc')
+    @event_feedbacks = EventFeedback.includes(:account, event: :organisation).order('created_at desc')
     @event_feedbacks = @event_feedbacks.and(:id.in => search(EventFeedback, @event_feedbacks, params[:q], 25).map(&:id)) if params[:q]
     @event_feedbacks = @event_feedbacks.and(:rating.ne => 5) if params[:hide_5_stars]
     erb :'stats/feedback'
@@ -28,17 +28,17 @@ Dandelion::App.controller do
   end
 
   get '/stats/comments' do
-    @comments = Comment.and(:body.ne => nil).order('created_at desc').paginate(page: params[:page], per_page: 20)
+    @comments = Comment.includes(:account, :post).and(:body.ne => nil).order('created_at desc').paginate(page: params[:page], per_page: 20)
     erb :'stats/comments'
   end
 
   get '/stats/accounts' do
-    @accounts = Account.public.order('created_at desc').paginate(page: params[:page], per_page: 20)
+    @accounts = Account.includes(organisationships: :organisation, memberships: :gathering, mapplications: :gathering).public.order('created_at desc').paginate(page: params[:page], per_page: 20)
     erb :'stats/accounts'
   end
 
   get '/stats/messages' do
-    @messages = Message.order('created_at desc').paginate(page: params[:page], per_page: 20)
+    @messages = Message.includes(:messenger, :messengee).order('created_at desc').paginate(page: params[:page], per_page: 20)
     erb :'stats/messages'
   end
 

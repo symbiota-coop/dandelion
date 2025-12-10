@@ -5,7 +5,7 @@
       <th>Members</th>
     </tr>
   </thead>
-  <% @gathering.teams.order('name asc').each { |team| %>
+  <% @gathering.teams.includes(teamships: :account).order('name asc').each { |team| %>
   <tr>
     <td>
       <a href="/g/<%= @gathering.slug %>/teams/<%= team.id %>">

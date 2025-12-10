@@ -30,7 +30,8 @@
           <h3 class="card-header chill">Upcoming birthdays</h3>
           <div class="card-body">
             <div class="mb-3">
-              <% current_account.following.ids_by_next_birthday.first(5).each { |account_id| account = Account.find(account_id) %>
+              <% birthday_ids = current_account.following.ids_by_next_birthday.first(5); birthday_accounts = Account.and(:id.in => birthday_ids).index_by { |a| a.id.to_s } %>
+              <% birthday_ids.each { |account_id| account = birthday_accounts[account_id.to_s]; next unless account %>
               <%= partial :'accounts/birthday', locals: {account: account} %>
               <% } %>
             </div>

@@ -8,8 +8,9 @@
     </a>
   </div>
 </div>
+<% accounts_by_id = Account.and(:id.in => @account_ids).index_by { |a| a.id.to_s } %>
 <ul class="search-result-list mb-3">
-  <% @account_ids.each { |account_id| account = Account.find(account_id) %>
+  <% @account_ids.each { |account_id| account = accounts_by_id[account_id.to_s]; next unless account %>
   <li>
     <%= partial 'accounts/search_result', locals: { account: account, birthday: true } %>
   </li>

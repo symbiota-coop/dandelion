@@ -41,7 +41,11 @@
   <% end %>
 </div>
 
-<% organisationships = @organisationships.paginate(page: params[:page], per_page: 10) %>
+<% organisationships = @organisationships.includes(:account).paginate(page: params[:page], per_page: 10) %>
+<% org_activity_ids = @organisation.activities.pluck(:id); org_local_group_ids = @organisation.local_groups.pluck(:id) %>
+<% account_ids = organisationships.pluck(:account_id) %>
+<% activityships_by_account = Activityship.includes(:activity).and(:account_id.in => account_ids, :activity_id.in => org_activity_ids).group_by(&:account_id) %>
+<% local_groupships_by_account = LocalGroupship.includes(:local_group).and(:account_id.in => account_ids, :local_group_id.in => org_local_group_ids).group_by(&:account_id) %>
 <p><%== pagination_details organisationships, model: 'Person' %></p>
 <div class="table-responsive">
   <table class="table">
@@ -69,12 +73,12 @@
         </div>
       </td>
       <td>
-        <% Activityship.and(:account => account, :activity_id.in => @organisation.activities.pluck(:id)).each { |activityship| %>
+        <% (activityships_by_account[account.id] || []).each { |activityship| %>
         <a href="/activities/<%= activityship.activity_id %>" class="label label-primary text-white d-inline-block mb-1"><%= activityship.activity.name %></a>
         <% } %>
       </td>
       <td>
-        <% LocalGroupship.and(:account => account, :local_group_id.in => @organisation.local_groups.pluck(:id)).each { |local_groupship| %>
+        <% (local_groupships_by_account[account.id] || []).each { |local_groupship| %>
         <a href="/local_groups/<%= local_groupship.local_group_id %>" class="label label-primary text-white d-inline-block mb-1"><%= local_groupship.local_group.name %></a>
         <% } %>
       </td>

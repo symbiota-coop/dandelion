@@ -2,28 +2,28 @@ Dandelion::App.controller do
   get '/o/:slug/feedback' do
     @organisation = Organisation.find_by(slug: params[:slug]) || not_found
     organisation_admins_only!
-    @event_feedbacks = @organisation.event_feedbacks
+    @event_feedbacks = @organisation.event_feedbacks.includes(:account, event: :organisation)
     erb :'organisations/event_feedbacks'
   end
 
   get '/activities/:id/feedback' do
     @activity = Activity.find(params[:id]) || not_found
     activity_admins_only!
-    @event_feedbacks = @activity.event_feedbacks
+    @event_feedbacks = @activity.event_feedbacks.includes(:account, event: :organisation)
     erb :'activities/event_feedbacks'
   end
 
   get '/local_groups/:id/feedback' do
     @local_group = LocalGroup.find(params[:id]) || not_found
     local_group_admins_only!
-    @event_feedbacks = @local_group.event_feedbacks
+    @event_feedbacks = @local_group.event_feedbacks.includes(:account, event: :organisation)
     erb :'local_groups/event_feedbacks'
   end
 
   get '/events/:id/feedback' do
     @event = Event.find(params[:id]) || not_found
     event_admins_only!
-    @event_feedbacks = @event.event_feedbacks
+    @event_feedbacks = @event.event_feedbacks.includes(:account, event: :organisation)
     erb :'events/event_feedbacks'
   end
 

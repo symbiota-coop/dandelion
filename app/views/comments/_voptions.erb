@@ -1,4 +1,4 @@
-<% comment.voptions.sort_by { |voption| -voption.votes.count }.each { |voption| %>
+<% comment.voptions.includes(votes: :account).sort_by { |voption| -voption.votes.count }.each { |voption| %>
 <div class="mb-1">
   <% form_tag "/voptions/#{voption.id}/vote" do %>
     <label class="p-1 m-0 mb-1" style="background: #e9ecef; display: inline-block ">

@@ -156,7 +156,7 @@ Dandelion::App.controller do
   get '/events/:id/stripe_charges' do
     @event = Event.find(params[:id]) || not_found
     event_admins_only!
-    @stripe_charges = @event.stripe_charges.and(:balance_transaction.ne => nil)
+    @stripe_charges = @event.stripe_charges.includes(:account, order: :account).and(:balance_transaction.ne => nil)
     @stripe_charges = @stripe_charges.and(:account_id.in => Account.search(params[:q], child_scope: @stripe_charges).pluck(:id)) if params[:q]
 
     if request.xhr?
@@ -169,7 +169,7 @@ Dandelion::App.controller do
   get '/events/:id/donations' do
     @event = Event.unscoped.find(params[:id]) || not_found
     event_admins_only!
-    @donations = @event.donations
+    @donations = @event.donations.includes(:account, :order)
     @donations = @donations.and(:account_id.in => Account.search(params[:q], child_scope: @donations).pluck(:id)) if params[:q]
     erb :'events/donations'
   end
@@ -183,7 +183,7 @@ Dandelion::App.controller do
   get '/events/:id/waitlist' do
     @event = Event.find(params[:id]) || not_found
     event_admins_only!
-    @waitships = @event.waitships
+    @waitships = @event.waitships.includes(:account)
     @waitships = @waitships.and(:account_id.in => Account.search(params[:q], child_scope: @waitships).pluck(:id)) if params[:q]
     erb :'events/waitlist'
   end
@@ -206,7 +206,7 @@ Dandelion::App.controller do
     @event = Event.find(params[:id]) || not_found
     @_organisation = @event.organisation
     event_admins_only!
-    @pmails = @event.pmails_as_mailable.order('created_at desc').paginate(page: params[:page])
+    @pmails = @event.pmails_as_mailable.includes(:account).order('created_at desc').paginate(page: params[:page])
     @scope = "event_id=#{@event.id}"
     erb :'pmails/pmails'
   end

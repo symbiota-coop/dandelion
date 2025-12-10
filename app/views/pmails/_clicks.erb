@@ -7,7 +7,7 @@
       </tr>
     </thead>
     <tbody>
-      <% max_clicks = 0; @pmail.pmail_links.order('clicks desc').limit(20).each_with_index { |link,i| max_clicks = link.clicks if i == 0; w = (link.clicks.to_f/max_clicks)*100; event = link.event %>
+      <% max_clicks = 0; @pmail.pmail_links.includes(:event).order('clicks desc').limit(20).each_with_index { |link,i| max_clicks = link.clicks if i == 0; w = (link.clicks.to_f/max_clicks)*100; event = link.event %>
       <tr>
         <td><a class="<%= 'text-dark' unless event %>" target="_blank" href="<%= link.url %>"><%= event ? link.event.name : link.url %></a></td>
         <td>

@@ -16,7 +16,7 @@
       <% end %>
     <% end %>
     <div class="image-wall">
-      <% mapplication.verdicts.send(noun.pluralize).each { |verdict| account = verdict.account %>
+      <% mapplication.verdicts.includes(:account).send(noun.pluralize).each { |verdict| account = verdict.account %>
       <a href="javascript:;" onclick="$('#modal .modal-content').load('/g/<%= @gathering.slug %>/mapplications/<%= mapplication.id %>', function () {
                 $('#modal').modal('show')
               });">

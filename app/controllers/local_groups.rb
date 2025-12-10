@@ -187,7 +187,7 @@ Dandelion::App.controller do
   get '/local_groups/:id/followers', provides: %i[html csv] do
     @local_group = LocalGroup.find(params[:id]) || not_found
     local_group_admins_only!
-    @local_groupships = @local_group.local_groupships.order('created_at desc')
+    @local_groupships = @local_group.local_groupships.includes(:account).order('created_at desc')
     @local_groupships = @local_groupships.and(:account_id.in => Account.search(params[:q], child_scope: @local_groupships).pluck(:id)) if params[:q]
     if params[:subscribed_to_mailer]
       # Filter to local_group-subscribed, then exclude globally unsubscribed and org-unsubscribed

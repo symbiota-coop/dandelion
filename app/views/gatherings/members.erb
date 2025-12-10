@@ -72,8 +72,9 @@
 <% end %>
 
 <% case (params[:view] || 'details'); when 'pictures' %>
+  <% member_account_ids = @memberships.pluck(:account_id); all_member_accounts = Account.and(:id.in => member_account_ids) %>
   <div class="row mt-3">
-    <% (Account.and(:id.in => @memberships.pluck(:account_id)).and(:has_image => true).shuffle + Account.and(:id.in => @memberships.pluck(:account_id)).and(image_uid: nil).shuffle).each { |account| %>
+    <% (all_member_accounts.and(:has_image => true).shuffle + all_member_accounts.and(image_uid: nil).shuffle).each { |account| %>
     <%= partial :'accounts/image', locals: { account: account } %>
     <% } %>
   </div>
@@ -86,7 +87,7 @@
           <th>Dietary requirements</th>
         </tr>
       </thead>
-      <% memberships.each { |membership| account = membership.account %>
+      <% memberships.includes(:account, teamships: :team).each { |membership| account = membership.account %>
       <tr>
         <td>
           <%= partial :'accounts/account', object: account, locals: { membership: membership, show_email: viewable?(account, :email) } %>
@@ -113,8 +114,9 @@
   <a data-toggle="tooltip" title="iCal feed" style="font-size: 1rem" class="text-primary" id="ical" target="_blank" href="/g/<%=@gathering.slug%>/birthdays.ics?api_key=<%=current_account.api_key%>">
     <i class="bi bi-rss-fill"></i>
   </a>
+  <% birthday_ids = Account.and(:id.in => @memberships.pluck(:account_id)).ids_by_next_birthday; birthday_accounts = Account.and(:id.in => birthday_ids).index_by { |a| a.id.to_s } %>
   <ul class="search-result-list my-3">
-    <% Account.and(:id.in => @memberships.pluck(:account_id)).ids_by_next_birthday.each { |account_id| account = Account.find(account_id) %>
+    <% birthday_ids.each { |account_id| account = birthday_accounts[account_id.to_s]; next unless account %>
     <li>
       <%= partial 'accounts/search_result', locals: { account: account, birthday: true } %>
     </li>

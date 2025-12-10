@@ -1,10 +1,11 @@
-<% i = 0; current_account.recommended_events.each { |event_id,people| event = Event.find(event_id);
+<% recommended = current_account.recommended_events; events_by_id = Event.and(:id.in => recommended.map(&:first)).includes(:event_facilitations).index_by { |e| e.id.to_s } %>
+<% i = 0; recommended.each { |event_id,people| event = events_by_id[event_id.to_s];
   next unless event
   next if event.locked? && !event_admin?(event)
   next if event.sold_out?
   next if event.created_at < 1.year.ago
-  next if event.event_facilitations.find_by(account: current_account)    
-  next unless event.image_uid  
+  next if event.event_facilitations.find_by(account: current_account)
+  next unless event.image_uid
 %>
 <div class="mb-1">
   <%= partial :'events/block_carousel', locals: {event: event} %>

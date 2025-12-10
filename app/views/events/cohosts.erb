@@ -29,7 +29,7 @@
     <th>Image</th>
     <th>Featured</th>
   </thead>
-  <% @event.cohostships.each { |cohostship| organisation = cohostship.organisation %>
+  <% @event.cohostships.includes(:organisation).each { |cohostship| organisation = cohostship.organisation %>
   <tr>
     <td>
       <% if organisation.image %>

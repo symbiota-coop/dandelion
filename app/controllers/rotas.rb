@@ -44,10 +44,11 @@ Dandelion::App.controller do
       when :csv
         CSV.generate do |csv|
           csv << ([''] + @rota.roles.order('o asc').map(&:name))
+          shifts_by_rslot_role = @rota.shifts.includes(:account).index_by { |s| [s.rslot_id, s.role_id] }
           @rota.rslots.order('o asc').each do |rslot|
             row = [rslot.name]
             @rota.roles.order('o asc').each do |role|
-              row << if (shift = Shift.find_by(rslot: rslot, role: role)) && shift.account
+              row << if (shift = shifts_by_rslot_role[[rslot.id, role.id]]) && shift.account
                        "#{shift.account.name} #{shift.account.phone}"
                      else
                        ''
@@ -218,7 +219,7 @@ Dandelion::App.controller do
     @gathering = @rota.gathering
     @membership = @gathering.memberships.find_by(account: current_account)
     confirmed_membership_required!
-    partial :'rotas/rota_rslot_role', locals: { rota: @rota, rslot: @rslot, role: @role }
+    partial :'rotas/rota_rslot_role', locals: { rota: @rota, rslot: @rslot, role: @role, shift: Shift.includes(:account).find_by(rslot: @rslot, role: @role) }
   end
 
   get '/shifts/create' do
