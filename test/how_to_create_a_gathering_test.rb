@@ -1,7 +1,9 @@
 require File.expand_path("#{File.dirname(__FILE__)}/test_config.rb")
+require File.expand_path("#{File.dirname(__FILE__)}/video_narration_helper.rb")
 
 class HowToCreateAGatheringTest < ActiveSupport::TestCase
   include Capybara::DSL
+  include VideoNarrationHelper
 
   test 'how to create a gathering' do
     @account1 = FactoryBot.create(:account, name: 'Maria Sabina', email: 'maria@symbiota.coop')

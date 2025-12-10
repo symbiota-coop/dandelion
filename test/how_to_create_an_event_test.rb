@@ -1,7 +1,9 @@
 require File.expand_path("#{File.dirname(__FILE__)}/test_config.rb")
+require File.expand_path("#{File.dirname(__FILE__)}/video_narration_helper.rb")
 
 class HowToCreateAnEventTest < ActiveSupport::TestCase
   include Capybara::DSL
+  include VideoNarrationHelper
 
   test 'how to create an event' do
     @account = FactoryBot.build_stubbed(:account, name: 'Maria Sabina', email: 'maria@symbiota.coop', location: nil)
