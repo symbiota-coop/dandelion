@@ -27,10 +27,10 @@ class Activityship
   end
 
   after_create do
-    account.account_notification_cache&.invalidate!
+    account.account_notification_cache&.refresh_activity_ids!
   end
 
   after_destroy do
-    account.account_notification_cache&.invalidate!
+    account.account_notification_cache&.refresh_activity_ids!
   end
 end

@@ -132,8 +132,8 @@ class Organisationship
     else
       account.set(subscribed_organisation_ids_cache: ((account.subscribed_organisation_ids_cache || []) + [organisation.id]).uniq)
     end
-    # Invalidate notification cache
-    account.account_notification_cache&.invalidate!
+    # Refresh organisations IDs in notification cache
+    account.account_notification_cache&.refresh_organisations_ids!
   end
 
   after_destroy do
@@ -142,8 +142,8 @@ class Organisationship
     # Update account's subscribed/unsubscribed organisation caches
     account.set(subscribed_organisation_ids_cache: (account.subscribed_organisation_ids_cache || []) - [organisation.id])
     account.set(unsubscribed_organisation_ids_cache: (account.unsubscribed_organisation_ids_cache || []) - [organisation.id])
-    # Invalidate notification cache
-    account.account_notification_cache&.invalidate!
+    # Refresh organisations IDs in notification cache
+    account.account_notification_cache&.refresh_organisations_ids!
   end
 
   def relevant_local_groups
@@ -171,8 +171,6 @@ class Organisationship
       end
     end
     send_monthly_donation_welcome if monthly_donation_method && !sent_monthly_donation_welcome
-    # Invalidate notification cache when organisation following or donor status changes
-    account.account_notification_cache&.invalidate! if saved_change_to_monthly_donation_method?
   end
 
   def send_welcome(force: false)

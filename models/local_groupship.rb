@@ -27,10 +27,10 @@ class LocalGroupship
   end
 
   after_create do
-    account.account_notification_cache&.invalidate!
+    account.account_notification_cache&.refresh_local_group_ids!
   end
 
   after_destroy do
-    account.account_notification_cache&.invalidate!
+    account.account_notification_cache&.refresh_local_group_ids!
   end
 end

@@ -60,8 +60,8 @@ class Membership
     if (general = gathering.teams.find_by(name: 'General'))
       general.teamships.create! account: account, prevent_notifications: true
     end
-    # Invalidate notification cache for this account
-    account.account_notification_cache&.invalidate!
+    # Refresh gathering IDs in notification cache for this account
+    account.account_notification_cache&.refresh_gathering_ids!
   end
 
   def circle
@@ -113,8 +113,8 @@ class Membership
         item.subscriptions.and(account: account).destroy_all
       end
     end
-    # Invalidate notification cache for this account
-    account.account_notification_cache&.invalidate!
+    # Refresh gathering IDs in notification cache for this account
+    account.account_notification_cache&.refresh_gathering_ids!
   end
 
   def invitations_extended

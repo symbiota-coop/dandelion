@@ -31,10 +31,10 @@ class Follow
   has_many :notifications, as: :notifiable, dependent: :destroy
 
   after_create do
-    follower.account_notification_cache&.invalidate!
+    follower.account_notification_cache&.refresh_account_ids!
   end
 
   after_destroy do
-    follower.account_notification_cache&.invalidate!
+    follower.account_notification_cache&.refresh_account_ids!
   end
 end

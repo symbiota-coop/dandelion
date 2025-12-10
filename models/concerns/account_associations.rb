@@ -156,16 +156,7 @@ module AccountAssociations
       { :circle_type => 'Account', :circle_id.in => cache.account_ids },
       { :circle_type => 'Activity', :circle_id.in => cache.activity_ids },
       { :circle_type => 'LocalGroup', :circle_id.in => cache.local_group_ids },
-      {
-        :circle_type => 'Organisation',
-        :circle_id.in => cache.organisations_following_ids,
-        :type.ne => 'commented'
-      },
-      {
-        :circle_type => 'Organisation',
-        :circle_id.in => cache.organisations_monthly_donor_ids,
-        :type => 'commented'
-      }
+      { :circle_type => 'Organisation', :circle_id.in => cache.organisations_ids }
     )
   end
 
