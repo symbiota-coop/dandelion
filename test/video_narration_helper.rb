@@ -13,12 +13,12 @@ module VideoNarrationHelper
         File.binwrite("#{Capybara.save_path}/#{label}_#{hash}.aac", response)
       end
 
-      save_screenshot("#{label}_before_#{hash}.png")
+      save_screenshot("#{label}_before_#{hash}.png") # rubocop:disable Lint/Debugger
     end
 
     unless action.nil?
       action.call
-      save_screenshot("#{label}_after_#{hash}.png") if ENV['CREATE_VIDEO']
+      save_screenshot("#{label}_after_#{hash}.png") if ENV['CREATE_VIDEO'] # rubocop:disable Lint/Debugger
     end
 
     @step += 1 if ENV['CREATE_VIDEO']
