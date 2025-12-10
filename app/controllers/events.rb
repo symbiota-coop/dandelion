@@ -244,7 +244,7 @@ Dandelion::App.controller do
 
   post '/events/:id/purchase', provides: :json do
     @event = Event.find(params[:id]) || not_found
-    @account = find_or_create_account(params[:detailsForm])
+    @account = find_or_create_account_for_purchase(params[:detailsForm])
     halt 400 if @event.organisation.banned_emails_a.include?(@account.email)
 
     @order = create_order_with_tickets(params[:ticketForm], params[:detailsForm])

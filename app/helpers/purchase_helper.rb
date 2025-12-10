@@ -1,5 +1,5 @@
 Dandelion::App.helpers do
-  def find_or_create_account(details_form)
+  def find_or_create_account_for_purchase(details_form)
     account_hash = {
       name: details_form[:account][:name],
       email: details_form[:account][:email],
@@ -84,7 +84,7 @@ Dandelion::App.helpers do
       when 'coinbase'
         process_coinbase_payment
       when 'gocardless'
-        process_gocardless_payment(details_form)
+        process_gocardless_payment
       when 'opencollective'
         process_opencollective_payment
       when 'evm'
@@ -207,7 +207,7 @@ Dandelion::App.helpers do
     { checkout_id: checkout.id }.to_json
   end
 
-  def process_gocardless_payment(details_form)
+  def process_gocardless_payment
     client = GoCardlessPro::Client.new(access_token: @event.organisation.gocardless_access_token)
     billing_request = client.billing_requests.create(
       params: {
@@ -226,7 +226,7 @@ Dandelion::App.helpers do
 
     billing_request_flow = client.billing_request_flows.create(
       params: {
-        redirect_uri: URI::DEFAULT_PARSER.escape("#{ENV['BASE_URI']}/e/#{@event.slug}?success=true&order_id=#{@order.id}&utm_source=#{details_form[:utm_source]}&utm_medium=#{details_form[:utm_medium]}&utm_campaign=#{details_form[:utm_campaign]}"),
+        redirect_uri: URI::DEFAULT_PARSER.escape("#{ENV['BASE_URI']}/e/#{@event.slug}?success=true&order_id=#{@order.id}"),
         exit_uri: URI::DEFAULT_PARSER.escape("#{ENV['BASE_URI']}/e/#{@event.slug}?cancelled=true"),
         links: {
           billing_request: billing_request.id
