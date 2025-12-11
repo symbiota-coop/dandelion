@@ -15,7 +15,7 @@ Dandelion::App.controller do
       erb :'organisations/orders'
     when :csv
       CSV.generate do |csv|
-        row = %w[name firstname lastname email value discounted_ticket_revenue donation_revenue currency opt_in_organisation opt_in_facilitator hear_about via created_at]
+        row = %w[name firstname lastname email event_name event_slug value discounted_ticket_revenue donation_revenue currency opt_in_organisation opt_in_facilitator hear_about via created_at]
         csv << row
         @orders.each do |order|
           row = [
@@ -27,6 +27,8 @@ Dandelion::App.controller do
             else
               ''
             end,
+            order.event ? order.event.name : '',
+            order.event ? order.event.slug : '',
             order.value,
             order.discounted_ticket_revenue,
             order.donation_revenue,
