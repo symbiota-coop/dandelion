@@ -1,6 +1,16 @@
 <% unless @hide_alert %>
   <style>
-    #alert-wrap { position: absolute; z-index: 9999; top: 0; left: 50%; width: 90%; margin-left: -45% }
+    #alert-wrap {
+      position: absolute;
+    z-index: 9999;
+    top: 0;
+    left: 50%;
+    width: 90%;
+    margin-left: -45%;
+    <% if event_admin? %>
+      display: none;
+    <% end %>
+    }
     @media(min-width: 992px) {
       #alert-wrap { width: 50%; margin-left: -25% }
     }
@@ -12,6 +22,9 @@
   </div>
   <script>
     $(function () {
+      <% if event_admin? %>
+        $("#alert-wrap").fadeIn(500);
+      <% end %>
       window.setTimeout(function () {
         $("#alert-wrap .alert").alert('close');
       }, 3000);
