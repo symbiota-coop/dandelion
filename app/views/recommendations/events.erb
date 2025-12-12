@@ -47,6 +47,7 @@ events_by_id = Event.and(:id.in => recommended_events.map(&:first)).includes(:ev
 
                         <% people_accounts = Account.and(:id.in => people.map(&:first)) %>
                         <% private_count = people_accounts.count(&:private?) %>
+                        <% public_count = people_accounts.count - private_count %>
                         <li><i data-toggle="tooltip" title="People" class="bi bi-person-fill"></i>
                           <% people.each { |k,v| account = people_accounts.find { |a| a.id.to_s == k.to_s }; next unless account;
                           next if account.private?
@@ -75,7 +76,11 @@ events_by_id = Event.and(:id.in => recommended_events.map(&:first)).includes(:ev
                           <br />
                           <% } %>
                           <% if private_count > 0 %>
-                            <%= pluralize(private_count, 'other person', 'other people') %>
+                            <% if public_count > 0 %>
+                              and <%= pluralize(private_count, 'other person', 'other people') %>
+                            <% else %>
+                              <%= pluralize(private_count, 'person', 'people') %>
+                            <% end %>
                           <% end %>
                         </li>
                       </ul>
