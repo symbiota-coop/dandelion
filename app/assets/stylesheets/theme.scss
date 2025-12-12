@@ -53,6 +53,7 @@ a.text-primary:focus {
 
 .btn {
   box-shadow: none !important;
+  transition: none !important;
 }
 
 .btn-primary {
@@ -74,8 +75,8 @@ a.text-primary:focus {
 .btn-primary.disabled:focus,
 .btn-primary[disabled]:focus {
   color: #fff;
-  background: $theme-color;
-  border-color: $theme-color;
+  background: $theme-color !important;
+  border-color: $theme-color !important;
 }
 
 .btn-outline-primary {
