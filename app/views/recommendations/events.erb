@@ -75,7 +75,7 @@ events_by_id = Event.and(:id.in => recommended_events.map(&:first)).includes(:ev
                           <br />
                           <% } %>
                           <% if private_count > 0 %>
-                            and <%= pluralize(private_count, 'other person', 'other people') %>
+                            <%= pluralize(private_count, 'other person', 'other people') %>
                           <% end %>
                         </li>
                       </ul>
