@@ -250,7 +250,8 @@ Dandelion::App.controller do
     @order = create_order_with_tickets(params[:ticketForm], params[:detailsForm])
     process_payment(params[:detailsForm], params[:ticketForm])
   rescue Stripe::InvalidRequestError => e
-    @order.event.set(locked: true)
+    # Don't lock the event if the error is simply that the value is not high enough
+    @order.event.set(locked: true) unless e.message&.include?('must add up to at least')
     @order.notify_of_failed_purchase(e)
     @order.destroy
     halt 400

@@ -6,11 +6,17 @@
   <blockquote>
     <%= Rinku.auto_link(error.message) %>
   </blockquote>
-  <p>
-    We've locked the event on Dandelion to prevent further errors.
-  </p>
-  <p>
-    Please log into your Stripe account and resolve any warnings or notifications you see there.
-    Once you've done that, you can <a href="<%= ENV['BASE_URI'] %>/e/<%=event.slug%>/edit">edit the event</a> to uncheck the Locked checkbox and save to allow purchases again.
-  </p>
+  <% unless error.message&.include?('must add up to at least') %>
+    <% if event.locked? %>
+      <p>
+        We've locked the event on Dandelion to prevent further errors.
+      </p>
+    <% end %>
+    <p>
+      Please log into your Stripe account and resolve any warnings or notifications you see there.
+      <% if event.locked? %>
+        Once you've done that, you can <a href="<%= ENV['BASE_URI'] %>/e/<%=event.slug%>/edit">edit the event</a> to uncheck the Locked checkbox and save to allow purchases again.
+      <% end %>
+    </p>
+  <% end %>
 </div>
