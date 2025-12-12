@@ -251,7 +251,10 @@ module Dandelion
       scss_content = File.read(Padrino.root('app/assets/stylesheets/theme.scss'))
       if (theme_color = params[:theme_color])
         theme_color = "##{theme_color}" unless theme_color.start_with?('#')
-        scss_content.sub!(/\$theme-color:.*?;/, "$theme-color: #{theme_color};")
+        # Validate hex color format: # followed by 3 or 6 hexadecimal characters
+        if theme_color.match?(/\A#[0-9A-Fa-f]{3}\z|\A#[0-9A-Fa-f]{6}\z/)
+          scss_content.sub!(/\$theme-color:.*?;/, "$theme-color: #{theme_color};")
+        end
       end
       Sass::Engine.new(scss_content, syntax: :scss).render
     end

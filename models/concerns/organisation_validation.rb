@@ -31,6 +31,15 @@ module OrganisationValidation
 
       errors.add(:tax_rate_id, 'must start with txr_') if tax_rate_id && !tax_rate_id.starts_with?('txr_')
 
+      if theme_color.present?
+        theme_color_normalized = theme_color.start_with?('#') ? theme_color : "##{theme_color}"
+        if theme_color_normalized.match?(/\A#[0-9A-Fa-f]{3}\z|\A#[0-9A-Fa-f]{6}\z/)
+          self.theme_color = theme_color_normalized
+        else
+          errors.add(:theme_color, 'must be a valid hex color (e.g., #ABC or #ABCDEF)')
+        end
+      end
+
       if image
         begin
           self.image_width_unmagic = image.width
