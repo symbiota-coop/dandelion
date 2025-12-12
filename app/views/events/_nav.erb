@@ -1,5 +1,7 @@
-<% if event_admin? && event.theme_color %>
-  <link href="/theme.css?theme_color=<%=CGI.escape(event.theme_color)%>" rel="stylesheet">
+<% if event_admin? %>
+  <% if event.theme_color %>
+    <link href="/theme.css?theme_color=<%=CGI.escape(event.theme_color)%>" rel="stylesheet">
+  <% end %>
   <% if event.organisation %>
     <%= partial :'organisations/nav', locals: { organisation: event.organisation, inline: true } %>
   <% end %>
