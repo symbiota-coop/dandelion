@@ -1,7 +1,5 @@
 // Map functionality
 window.DandelionMap = {
-  // Constants
-  POINTS_LIMIT: 500,
   // Configuration settings - lazy loaded to avoid referencing google before it's available
   get mapOptions () {
     return {
@@ -420,7 +418,7 @@ window.DandelionMap = {
     }
 
     // Update points warning
-    if (data.pointsCount > this.POINTS_LIMIT) {
+    if (data.pointsCount > (config.pointsLimit || 1000)) {
       $('#points-warning').show();
     } else {
       $('#points-warning').hide();

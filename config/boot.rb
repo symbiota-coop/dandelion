@@ -2,6 +2,7 @@
 RACK_ENV = ENV['RACK_ENV'] ||= 'development' unless defined?(RACK_ENV)
 PADRINO_ROOT = File.expand_path('..', __dir__) unless defined?(PADRINO_ROOT)
 EMAIL_REGEX = /\A[^@\s]+@[^@\s]+\.[^@\s]+\z/
+MAP_POINTS_LIMIT = 1000
 
 # Load our dependencies
 require 'rubygems' unless defined?(Gem)

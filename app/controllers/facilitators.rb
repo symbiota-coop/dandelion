@@ -14,7 +14,7 @@ Dandelion::App.controller do
       erb :'facilitators/facilitators'
     when :json
       @no_content_padding_bottom = true
-      @accounts = Account.and(:id.in => @accounts.and(location_privacy: 'Public').limit(500).pluck(:id))
+      @accounts = Account.and(:id.in => @accounts.and(location_privacy: 'Public').limit(MAP_POINTS_LIMIT).pluck(:id))
       map_json(@accounts)
     end
   end

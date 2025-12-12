@@ -287,7 +287,7 @@ Dandelion::App.helpers do
     points = points.and(coordinates: { '$geoWithin' => { '$box' => box } })
 
     {
-      points: if points.count > 500
+      points: if points.count > MAP_POINTS_LIMIT
                 []
               else
                 points.map.with_index do |point, n|
