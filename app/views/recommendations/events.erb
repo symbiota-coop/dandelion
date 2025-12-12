@@ -46,7 +46,9 @@ events_by_id = Event.and(:id.in => recommended_events.map(&:first)).includes(:ev
                         <%= partial :'events/block_main', locals: { event: event, skip_final_ul: true } %>
 
                         <% people_accounts = Account.and(:id.in => people.map(&:first)) %>
-                        <% private_count = people_accounts.count(&:private?) %>
+                        <% private_account_ids = people_accounts.select(&:private?).map { |a| a.id.to_s } %>
+                        <% private_count = private_account_ids.count %>
+                        <% private_events_count = people.select { |k, _v| private_account_ids.include?(k.to_s) }.sum { |_k, v| v.count } %>
                         <% public_count = people_accounts.count - private_count %>
                         <li><i data-toggle="tooltip" title="People" class="bi bi-person-fill"></i>
                           <% people.each { |k,v| account = people_accounts.find { |a| a.id.to_s == k.to_s }; next unless account;
@@ -77,9 +79,9 @@ events_by_id = Event.and(:id.in => recommended_events.map(&:first)).includes(:ev
                           <% } %>
                           <% if private_count > 0 %>
                             <% if public_count > 0 %>
-                              and <%= pluralize(private_count, 'other person', 'other people') %>
+                              and <%= pluralize(private_count, 'other person', 'other people') %> with <%= pluralize(private_events_count, 'event') %> in common
                             <% else %>
-                              <%= pluralize(private_count, 'person', 'people') %>
+                              <%= pluralize(private_count, 'person', 'people') %> with <%= pluralize(private_events_count, 'event') %> in common
                             <% end %>
                           <% end %>
                         </li>
