@@ -34,9 +34,8 @@ module ImageWithValidation
       else
         errors.add(:image, 'must be an image')
       end
-    rescue StandardError
-      self.image = nil
-      errors.add(:image, 'must be an image')
+    rescue StandardError, Dragonfly::Shell::CommandFailed
+      errors.add(:image, 'is not supported or corrupted')
     end
   end
 end

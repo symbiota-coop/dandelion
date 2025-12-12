@@ -97,9 +97,8 @@ module EventValidation
 
           errors.add(:image, "must be #{organisation.event_image_required_width}px wide") if organisation && organisation.event_image_required_width && image_width_unmagic != organisation.event_image_required_width
           errors.add(:image, "must be #{organisation.event_image_required_height}px high") if organisation && organisation.event_image_required_height && image_height_unmagic != organisation.event_image_required_height
-        rescue StandardError => e
-          Honeybadger.notify(e)
-          self.image = nil
+        rescue StandardError, Dragonfly::Shell::CommandFailed
+          errors.add(:image, 'is not supported or corrupted')
         end
       end
     end

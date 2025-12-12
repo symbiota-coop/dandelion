@@ -144,10 +144,18 @@ class Account
 
   def image_thumb_or_gravatar_url
     if image
-      image.thumb('400x400#').url
+      begin
+        image.thumb('400x400#').url
+      rescue StandardError, Dragonfly::Shell::CommandFailed
+        gravatar_url
+      end
     else
-      (Padrino.env == :development ? '/images/silhouette.png' : "https://www.gravatar.com/avatar/#{Digest::MD5.hexdigest(email.downcase)}?s=400&d=#{Addressable::URI.escape("#{ENV['BASE_URI']}/images/silhouette.png")}")
+      gravatar_url
     end
+  end
+
+  def gravatar_url
+    Padrino.env == :development ? '/images/silhouette.png' : "https://www.gravatar.com/avatar/#{Digest::MD5.hexdigest(email.downcase)}?s=400&d=#{Addressable::URI.escape("#{ENV['BASE_URI']}/images/silhouette.png")}"
   end
 
   def unread_notifications?(notifications = network_notifications)

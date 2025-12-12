@@ -35,9 +35,8 @@ module OrganisationValidation
         begin
           self.image_width_unmagic = image.width
           self.image_height_unmagic = image.height
-        rescue StandardError => e
-          Honeybadger.notify(e)
-          self.image = nil
+        rescue StandardError, Dragonfly::Shell::CommandFailed
+          errors.add(:image, 'is not supported or corrupted')
         end
       end
 

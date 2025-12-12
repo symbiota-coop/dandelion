@@ -45,10 +45,10 @@ module AccountValidation
           if image.image?
             image.name = "#{SecureRandom.uuid}.#{image.format}"
           else
-            self.image = nil
+            errors.add(:image, 'must be an image')
           end
-        rescue StandardError
-          self.image = nil
+        rescue StandardError, Dragonfly::Shell::CommandFailed
+          errors.add(:image, 'is not supported or corrupted')
         end
       end
 
