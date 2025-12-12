@@ -14,34 +14,7 @@ Dandelion::App.controller do
     when :html
       erb :'organisations/orders'
     when :csv
-      CSV.generate do |csv|
-        row = %w[name firstname lastname email event_name event_slug value discounted_ticket_revenue donation_revenue currency opt_in_organisation opt_in_facilitator hear_about via created_at]
-        csv << row
-        @orders.each do |order|
-          row = [
-            order.account ? order.account.name : '',
-            order.account ? order.account.firstname : '',
-            order.account ? order.account.lastname : '',
-            if order_email_viewer?(order)
-              order.account ? order.account.email : ''
-            else
-              ''
-            end,
-            order.event ? order.event.name : '',
-            order.event ? order.event.slug : '',
-            order.value,
-            order.discounted_ticket_revenue,
-            order.donation_revenue,
-            order.currency,
-            order.opt_in_organisation,
-            order.opt_in_facilitator,
-            order.hear_about,
-            order.via,
-            order.created_at.to_fs(:db_local)
-          ]
-          csv << row
-        end
-      end
+      @orders.generate_csv(account: current_account)
     end
   end
 
@@ -63,34 +36,7 @@ Dandelion::App.controller do
         erb :'events/orders'
       end
     when :csv
-      CSV.generate do |csv|
-        row = %w[name firstname lastname email value discounted_ticket_revenue donation_revenue currency opt_in_organisation opt_in_facilitator hear_about via created_at]
-        @event.questions_a_from_orders.each { |q| row << q }
-        csv << row
-        @orders.each do |order|
-          row = [
-            order.account ? order.account.name : '',
-            order.account ? order.account.firstname : '',
-            order.account ? order.account.lastname : '',
-            if order_email_viewer?(order)
-              order.account ? order.account.email : ''
-            else
-              ''
-            end,
-            order.value,
-            order.discounted_ticket_revenue,
-            order.donation_revenue,
-            order.currency,
-            order.opt_in_organisation,
-            order.opt_in_facilitator,
-            order.hear_about,
-            order.via,
-            order.created_at.to_fs(:db_local)
-          ]
-          @event.questions_a_from_orders.each { |q| row << order.answers.to_h[q] } if order.answers
-          csv << row
-        end
-      end
+      @orders.generate_csv(account: current_account, event: @event)
     when :pdf
       @orders = @orders.sort_by { |order| order.account.try(:name) || '' }
       Prawn::Document.new do |pdf|

@@ -363,4 +363,47 @@ class Order
     end
   end
   handle_asynchronously :sign_up_to_gocardless
+
+  def self.generate_csv(account:, event: nil)
+    orders = self
+    CSV.generate do |csv|
+      row = %w[name firstname lastname email event_name event_slug original_description value discounted_ticket_revenue donation_revenue currency opt_in_organisation opt_in_facilitator hear_about via created_at]
+      event&.questions_a_from_orders&.each { |q| row << q }
+      csv << row
+      orders.each do |order|
+        row = [
+          order.account ? order.account.name : '',
+          order.account ? order.account.firstname : '',
+          order.account ? order.account.lastname : '',
+          if email_viewer?(order, account)
+            order.account ? order.account.email : ''
+          else
+            ''
+          end,
+          if event
+            event.name
+          else
+            (order.event ? order.event.name : '')
+          end,
+          if event
+            event.slug
+          else
+            (order.event ? order.event.slug : '')
+          end,
+          order.original_description,
+          order.value,
+          order.discounted_ticket_revenue,
+          order.donation_revenue,
+          order.currency,
+          order.opt_in_organisation,
+          order.opt_in_facilitator,
+          order.hear_about,
+          order.via,
+          order.created_at.to_fs(:db_local)
+        ]
+        event&.questions_a_from_orders&.each { |q| row << order.answers.to_h[q] } if order.answers
+        csv << row
+      end
+    end
+  end
 end
