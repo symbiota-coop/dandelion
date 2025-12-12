@@ -3,15 +3,11 @@ $theme-color: #00B963 !default;
 
 .bg-primary,
 .bg-primary.text-white {
-  background: $theme-color !important;
+  background: linear-gradient(135deg, $theme-color 0%, $theme-color 50%, lighten($theme-color, 6.66%) 100%) !important;
 }
 
 .text-primary {
   color: $theme-color !important;
-}
-
-.form-control:focus {
-  border-color: $theme-color;
 }
 
 // =============================================================================
@@ -59,43 +55,16 @@ a.text-primary:focus {
   box-shadow: none !important;
 }
 
-.btn-outline-primary,
-.btn-outline-primary:hover,
-.btn-outline-primary:focus,
-.btn-outline-primary:active {
-  color: $theme-color;
-  border-color: $theme-color;
-}
-
-.btn-outline-primary:not(:disabled):not(.disabled):active,
-.btn-outline-primary:not(:disabled):not(.disabled).active,
-.show>.btn-outline-primary.dropdown-toggle {
-  background: $theme-color;
-  border-color: $theme-color;
-  color: white;
-}
-
-.btn-outline-primary:hover {
-  background: $theme-color;
-  color: white;
-}
-
 .btn-primary {
-  background: $theme-color;
+  background: linear-gradient(135deg, $theme-color 0%, $theme-color 50%, lighten($theme-color, 6.66%) 100%);
   border-color: $theme-color;
 }
 
 .btn-primary:hover,
 .btn-primary:focus,
-.btn-primary:active {
-  background: darken($theme-color, 6.66%);
-}
-
-.btn-primary:not([disabled]):not(.disabled).active,
-.btn-primary:not([disabled]):not(.disabled):active,
+.btn-primary:active,
 .show>.btn-primary.dropdown-toggle {
-  background: $theme-color;
-  border-color: $theme-color;
+  background: darken($theme-color, 6.66%) !important;
 }
 
 .btn-primary.disabled,
@@ -109,16 +78,27 @@ a.text-primary:focus {
   border-color: $theme-color;
 }
 
+.btn-outline-primary {
+  color: $theme-color;
+  border-color: $theme-color;
+}
+
+.btn-outline-primary:hover,
+.btn-outline-primary:focus,
+.btn-outline-primary:active,
+.show>.btn-outline-primary.dropdown-toggle {
+  color: white !important;
+  border-color: $theme-color !important;
+  background: $theme-color !important;
+}
+
 // =============================================================================
 // LABELS AND BADGES
 // =============================================================================
 
-.badge-primary {
-  background: $theme-color !important;
-}
-
+.badge-primary,
 .badge-primary[href] {
-  background: $theme-color !important;
+  background: linear-gradient(135deg, $theme-color 0%, $theme-color 50%, lighten($theme-color, 6.66%) 100%) !important;
 }
 
 .badge-primary[href]:hover,
@@ -127,12 +107,9 @@ a.text-primary:focus {
   background: darken($theme-color, 6.66%) !important;
 }
 
-.label-primary {
-  background: $theme-color !important;
-}
-
+.label-primary,
 .label-primary[href] {
-  background: $theme-color !important;
+  background: linear-gradient(135deg, $theme-color 0%, $theme-color 50%, lighten($theme-color, 6.66%) 100%) !important;
 }
 
 .label-primary[href]:hover,
@@ -160,6 +137,10 @@ a.text-primary:focus {
 
 .form-control {
   box-shadow: none !important;
+}
+
+.form-control:focus {
+  border-color: $theme-color;
 }
 
 .checkbox input:checked+label:before,
@@ -248,9 +229,9 @@ a.text-primary:focus {
 
 .ai-well {
   background: linear-gradient(135deg,
-      rgba($theme-color, 0.15) 0%,
-      rgba($theme-color, 0.15) 50%,
-      rgba($theme-color, 0.3) 100%) !important;
+      rgba($theme-color, 0.425 - 0.25) 0%,
+      rgba($theme-color, 0.425 - 0.25) 50%,
+      rgba($theme-color, 0.575 - 0.25) 100%) !important;
   padding: 1rem;
   border-radius: 0.5rem;
 }
