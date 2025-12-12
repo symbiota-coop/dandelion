@@ -116,7 +116,7 @@
     </ul>
   </div>
 <% end %>
-<% form_for @gathering, @gathering.new_record? ? '/g/new' : "/g/#{@gathering.slug}/edit", multipart: true do |f| %>
+<% form_for @gathering, @gathering.new_record? ? '/g/new' : "/g/#{@edit_slug || @gathering.slug}/edit", multipart: true do |f| %>
   <div class="nav-wrapper">
     <ul id="gathering-build-nav" class="nav nav-tabs" role="tablist">
       <li role="presentation" class="nav-item"><a class="nav-link active" href="#tab-basics" role="tab" data-toggle="tab">Basics</a></li>

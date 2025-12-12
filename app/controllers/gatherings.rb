@@ -122,6 +122,7 @@ Dandelion::App.controller do
       flash[:notice] = 'The gathering was saved.'
       redirect "/g/#{@gathering.slug}"
     else
+      @edit_slug = params[:slug] # Use original slug for form action, not the (possibly invalid) in-memory value
       flash.now[:error] = 'Some errors prevented the gathering from being created'
       erb :'gatherings/build'
     end

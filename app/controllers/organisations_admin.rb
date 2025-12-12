@@ -21,6 +21,7 @@ Dandelion::App.controller do
         end
       )
     else
+      @edit_slug = params[:slug] # Use original slug for form action, not the (possibly invalid) in-memory value
       flash.now[:error] = 'There was an error saving the organisation.'
       erb :'organisations/build'
     end

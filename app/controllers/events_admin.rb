@@ -16,6 +16,7 @@ Dandelion::App.controller do
       flash[:notice] = 'The event was saved.'
       redirect "/e/#{@event.slug}/edit"
     else
+      @edit_slug = params[:slug] # Use original slug for form action, not the (possibly invalid) in-memory value
       flash.now[:error] = 'There was an error saving the event.'
       erb :'events_build/build'
     end

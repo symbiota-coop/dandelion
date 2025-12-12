@@ -46,6 +46,7 @@ Dandelion::App.controller do
       flash[:notice] = 'The page was saved.'
       redirect "/docs/#{@doc_page.slug}"
     else
+      @edit_slug = params[:slug] # Use original slug for form action, not the (possibly invalid) in-memory value
       flash.now[:error] = 'There was an error saving the page.'
       erb :'docs/build'
     end
