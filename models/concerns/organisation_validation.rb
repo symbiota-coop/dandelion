@@ -33,10 +33,10 @@ module OrganisationValidation
 
       if theme_color.present?
         theme_color_normalized = theme_color.start_with?('#') ? theme_color : "##{theme_color}"
-        if theme_color_normalized.match?(/\A#[0-9A-Fa-f]{3}\z|\A#[0-9A-Fa-f]{6}\z/)
+        if theme_color_normalized.match?(/\A#[0-9A-Fa-f]{6}\z/)
           self.theme_color = theme_color_normalized
         else
-          errors.add(:theme_color, 'must be a valid hex color (e.g., #ABC or #ABCDEF)')
+          errors.add(:theme_color, 'must be a valid hex color (e.g., #ABCDEF)')
         end
       end
 
