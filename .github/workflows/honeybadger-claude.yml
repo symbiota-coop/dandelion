@@ -14,8 +14,7 @@ jobs:
       - name: Check if issue was created by Honeybadger
         id: check-honeybadger
         run: |
-          # Check if the issue was created by Honeybadger
-          if [[ "${{ github.event.issue.user.login }}" == *"honeybadger"* ]]; then
+          if [[ "${{ github.event.issue.title }}" == *"[Dandelion/production]"* ]]; then
             echo "is_honeybadger=true" >> $GITHUB_OUTPUT
           else
             echo "is_honeybadger=false" >> $GITHUB_OUTPUT
