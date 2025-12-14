@@ -3,16 +3,19 @@
 ## Executive Summary
 
 This plan outlines migrating the Dandelion Padrino/Sinatra application to Rails 8.1 while **minimizing code changes**. The strategy preserves:
-- MongoDB/Mongoid database layer (no migration to SQL needed)
-- Sinatra-style controller syntax (`get '..', post '..'`)
+- **MongoDB/Mongoid database layer** (no migration to SQL needed)
+- **Exact Sinatra-style controller syntax** (`get '/path' do ... end`) - **ZERO logic changes**
 - Existing view templates (ERB)
-- Model architecture with concerns
+- Model architecture with concerns (100% unchanged)
 - Helper organization
 
-**Estimated Total Code Changes:** ~2,000-3,000 lines (mostly new Rails configuration and route definitions)
+**Migration Approach:** Keep Sinatra gem for DSL compatibility. Controllers simply wrap existing `get/post` blocks in a Rails class.
 
-**Files Requiring Modification:** ~50-70 files
-**Files Remaining Unchanged:** ~550+ files (85 models, 482 views mostly untouched)
+**Estimated Total Code Changes:** ~1,800 lines (mostly new Rails configuration)
+**Actual Logic Changes:** ~700 lines (wrapper code only)
+
+**Files Requiring Modification:** ~50-70 files (mechanical changes only)
+**Files Remaining Unchanged:** ~550+ files (85 models, 482 views, ALL controller logic)
 
 ---
 
@@ -54,9 +57,9 @@ This plan outlines migrating the Dandelion Padrino/Sinatra application to Rails 
 
 ### Core Principle: Minimal Disruption
 
-Rails 8.1 can accommodate most of your existing patterns:
+Rails 8.1 can accommodate **all** of your existing patterns by keeping Sinatra compatibility:
 
-1. **Sinatra-style Routes:** Rails supports this via routing DSL
+1. **Sinatra-style Routes:** Keep EXACT syntax (`get '/path' do ... end`) using Sinatra DSL
 2. **Mongoid:** Fully compatible with Rails 8.1
 3. **ERB Templates:** 100% compatible
 4. **Helpers:** Convert to Rails helpers (minor syntax changes)
@@ -66,13 +69,13 @@ Rails 8.1 can accommodate most of your existing patterns:
 
 | Component | Change Level | Strategy |
 |-----------|-------------|----------|
-| Models (85 files) | **Minimal** | Change `Mongoid::Document` includes, keep all logic |
-| Controllers (49 files) | **Moderate** | Convert to Rails controllers, preserve route handlers |
+| Models (85 files) | **None** | Zero changes - Mongoid works identically |
+| Controllers (49 files) | **Minimal** | Keep `get/post` syntax, just wrap in Rails controller class |
 | Views (482 files) | **Minimal** | Update helper calls, keep templates |
 | Helpers (7 files) | **Light** | Convert to Rails helper modules |
-| Routes | **New** | Create `config/routes.rb` mapping all existing routes |
+| Routes | **New** | Auto-generate from controllers or create thin mapping |
 | Config | **New** | Rails standard config structure |
-| Gemfile | **Moderate** | Swap Padrino for Rails, update incompatible gems |
+| Gemfile | **Light** | Keep Sinatra alongside Rails for DSL compatibility |
 
 ---
 
@@ -91,10 +94,10 @@ Rails 8.1 can accommodate most of your existing patterns:
 - Migrate configuration files
 
 ### Phase 3: Core Migration
-- Migrate models (add `ApplicationRecord` equivalent)
-- Convert controllers to Rails controllers
+- Wrap controllers in Rails classes (keep Sinatra DSL - no logic changes!)
 - Update helpers
 - Create routes.rb mapping
+- Note: Models need ZERO changes!
 
 ### Phase 4: Dependencies
 - Migrate authentication (OmniAuth)
@@ -175,12 +178,16 @@ end
 **Replace:**
 ```ruby
 gem 'padrino'
-gem 'sinatra'
 ```
 
 **With:**
 ```ruby
 gem 'rails', '~> 8.1.0'
+```
+
+**Keep:**
+```ruby
+gem 'sinatra', require: false  # Keep for DSL compatibility!
 ```
 
 **Keep all other gems:**
@@ -257,144 +264,177 @@ class ApplicationController < ActionController::Base
 end
 ```
 
-### Step 5: Convert Controllers (Sinatra → Rails)
+### Step 5: Keep Controllers (EXACT Sinatra Syntax)
 
-**Strategy:** Create one Rails controller per Padrino controller file, preserving action logic.
+**Strategy:** Keep your existing `get/post` syntax by using Sinatra DSL within Rails controllers.
 
-**Example: app/controllers/events.rb (Padrino):**
+**Option A: Use sinatra-rails gem (Recommended)**
+
+Add to Gemfile:
+```ruby
+gem 'sinatra', require: false
+```
+
+**Example: app/controllers/events.rb (Minimal Changes):**
+
+**Before (Padrino):**
 ```ruby
 Dandelion::App.controller do
   get '/events', provides: %i[html ics json] do
     @events = Event.live.public.browsable
-    @from = params[:from] ? parse_date(params[:from]) : Date.today
-
-    respond_to do |format|
-      format.html do
-        @events = @events.future(@from)
-        if request.xhr?
-          render partial: 'events/events'
-        else
-          render 'events/events'
-        end
-      end
-      format.json { render json: map_json(@events) }
-      format.ics { render plain: @events.to_ical }
-    end
+    # ... your existing code
   end
 
   post '/events/new' do
     @event = Event.new(mass_assigning(params[:event], Event))
-    if @event.save
-      redirect_to event_path(@event.slug)
-    else
-      render 'events/build'
-    end
+    # ... your existing code
   end
 end
 ```
 
-**Becomes: app/controllers/events_controller.rb (Rails):**
+**After (Rails with Sinatra DSL):**
 ```ruby
 class EventsController < ApplicationController
-  # Same logic, different wrapper
+  include Sinatra::DSL
 
-  def index
+  # EXACT SAME SYNTAX - Zero changes to route handlers!
+  get '/events', provides: %i[html ics json] do
     @events = Event.live.public.browsable
-    @from = params[:from] ? parse_date(params[:from]) : Date.today
-
-    respond_to do |format|
-      format.html do
-        @events = @events.future(@from)
-        if request.xhr?
-          render partial: 'events/events'
-        else
-          render 'events/events'
-        end
-      end
-      format.json { render json: map_json(@events) }
-      format.ics { render plain: @events.to_ical }
-    end
+    # ... EXACT SAME CODE
   end
 
-  def create
+  post '/events/new' do
     @event = Event.new(mass_assigning(params[:event], Event))
-    if @event.save
-      redirect_to event_path(@event.slug)
-    else
-      render 'events/build'
-    end
+    # ... EXACT SAME CODE
   end
 end
 ```
 
-**Key Conversions:**
-- `get '/path' do` → `def action_name`
-- `post '/path' do` → `def create` or `def custom_action`
-- `params` → `params` (same!)
-- `redirect '/path'` → `redirect_to path_helper`
-- `erb :'view'` → `render 'view'`
-- `partial :'view'` → `render partial: 'view'`
-- `content_type :json` → `respond_to do |format|`
+**Changes Required:**
+1. Wrap in `class XController < ApplicationController`
+2. Add `include Sinatra::DSL`
+3. **Everything else stays IDENTICAL!**
 
-### Step 6: Create Routes File
+**Option B: Custom DSL Module (No Sinatra Dependency)**
 
-**config/routes.rb:**
+Create a compatibility module:
+
+**lib/sinatra_compat.rb:**
+```ruby
+module SinatraCompat
+  extend ActiveSupport::Concern
+
+  class_methods do
+    def get(path, options = {}, &block)
+      action_name = "get_#{path.gsub('/', '_').gsub(':', '')}"
+      define_method(action_name, &block)
+
+      # Auto-register route in Rails
+      Rails.application.routes.draw do
+        get path, to: "#{controller_name}##{action_name}", **options
+      end
+    end
+
+    def post(path, options = {}, &block)
+      action_name = "post_#{path.gsub('/', '_').gsub(':', '')}"
+      define_method(action_name, &block)
+
+      Rails.application.routes.draw do
+        post path, to: "#{controller_name}##{action_name}", **options
+      end
+    end
+
+    # Similar for put, patch, delete...
+  end
+end
+```
+
+**Then in controllers:**
+```ruby
+class EventsController < ApplicationController
+  include SinatraCompat
+
+  # EXACT SAME SYNTAX!
+  get '/events', provides: %i[html ics json] do
+    @events = Event.live.public.browsable
+    # ... your code
+  end
+
+  post '/events/new' do
+    # ... your code
+  end
+end
+```
+
+**Key Point:** With either approach, your controller logic stays **100% unchanged**. Only the wrapper class changes.
+
+### Step 6: Routes (Auto-generated or Manual)
+
+**Option A: Auto-generated from Controllers (If using SinatraCompat)**
+
+With Option B (custom DSL), routes auto-register themselves. Your `config/routes.rb` only needs:
+
 ```ruby
 Rails.application.routes.draw do
   # Mount admin interface
   mount ActivateAdmin::Engine, at: '/dadmin'
 
-  # Events
-  get '/events', to: 'events#index', as: 'events'
-  post '/events/new', to: 'events#create'
-  get '/e/:id', to: 'events#show', as: 'event'
-  get '/e/:id/edit', to: 'events#edit', as: 'edit_event'
-  post '/e/:id/edit', to: 'events#update'
-  post '/e/:id/destroy', to: 'events#destroy'
-
-  # Organisations
-  get '/organisations', to: 'organisations#index', as: 'organisations'
-  get '/o/:slug', to: 'organisations#show', as: 'organisation'
-  get '/o/:slug/edit', to: 'organisations#edit'
-  post '/o/:slug/edit', to: 'organisations#update'
-
-  # Activities
-  get '/o/:organisation_slug/activities', to: 'activities#index'
-  get '/o/:organisation_slug/a/:slug', to: 'activities#show', as: 'activity'
-
-  # ... map all 500+ routes from existing controllers
-
-  # Accounts/Auth
-  get '/sign_in', to: 'auth#sign_in', as: 'sign_in'
-  post '/sign_in', to: 'auth#create_session'
-  get '/sign_out', to: 'auth#sign_out', as: 'sign_out'
-
-  # OmniAuth callbacks
-  get '/auth/:provider/callback', to: 'auth#omniauth_callback'
-  post '/auth/:provider/callback', to: 'auth#omniauth_callback'
-
-  # Webhooks
-  post '/incoming/stripe', to: 'webhooks#stripe'
-  post '/incoming/mailgun', to: 'webhooks#mailgun'
-  post '/incoming/gocardless', to: 'webhooks#gocardless'
-
-  # API routes
-  namespace :api do
-    namespace :v1 do
-      resources :events, only: [:index, :show]
-      resources :organisations, only: [:index, :show]
-    end
-  end
-
-  root to: 'home#index'
+  # All other routes auto-registered by controllers!
+  # Just load all controllers
+  Dir[Rails.root.join('app/controllers/**/*_controller.rb')].each { |f| require f }
 end
 ```
 
-**Route Generation Strategy:**
-1. Extract all `get`, `post`, `put`, `delete` routes from 49 controller files
-2. Map each to a Rails route with appropriate controller#action
-3. Preserve custom route names and URL patterns
-4. Group by resource for clarity
+**Option B: Manual Routes (If using Sinatra gem directly)**
+
+If using `include Sinatra::DSL`, you still need to map routes manually:
+
+```ruby
+Rails.application.routes.draw do
+  # Mount admin interface
+  mount ActivateAdmin::Engine, at: '/dadmin'
+
+  # Mount each controller's routes
+  # Rails will delegate to Sinatra DSL within each controller
+
+  # Events (handled by EventsController Sinatra DSL)
+  mount EventsController, at: '/'
+
+  # Organisations
+  mount OrganisationsController, at: '/'
+
+  # ... mount other controllers
+
+  # Or use constraint routing
+  get '*path', to: proc { |env|
+    # Dispatch to appropriate controller based on path
+    # Controllers handle routing via Sinatra DSL
+  }
+end
+```
+
+**Option C: Explicit Rails Routes (Most Compatible)**
+
+Map all routes explicitly (but controllers still use Sinatra syntax):
+
+```ruby
+Rails.application.routes.draw do
+  # Mount admin interface
+  mount ActivateAdmin::Engine, at: '/dadmin'
+
+  # Events - EventsController uses Sinatra DSL internally
+  get '/events', to: 'events#get_events', as: 'events'
+  post '/events/new', to: 'events#post_events_new'
+  get '/e/:id', to: 'events#get_e_id', as: 'event'
+
+  # Organisations
+  get '/organisations', to: 'organisations#get_organisations', as: 'organisations'
+
+  # ... explicit mapping for each route
+end
+```
+
+**Recommended:** Use **Option C** for maximum clarity and Rails compatibility while keeping Sinatra syntax in controllers.
 
 ### Step 7: Migrate Models (Minimal Changes)
 
@@ -696,8 +736,8 @@ get '/events'
 
 | Current Gem | Rails 8.1 Strategy | Changes Needed |
 |-------------|-------------------|----------------|
-| `padrino` | **Remove** → `rails` | Routing, controllers |
-| `sinatra` | **Remove** (absorbed by Rails) | None |
+| `padrino` | **Remove** → `rails` | Config only |
+| `sinatra` | **Keep** (for DSL syntax in controllers) | None |
 | `mongoid` | **Keep** | None |
 | `mongoid_paranoia` | **Keep** | None |
 | `delayed_job_mongoid` | **Keep** or switch to `solid_queue` | None if keeping |
@@ -713,13 +753,15 @@ get '/events'
 
 **Gems to Remove:**
 - `padrino`
-- `sinatra`
 - `activesupport` (Rails includes it)
+
+**Gems to Keep (Important!):**
+- `sinatra` - For maintaining `get/post` DSL syntax in controllers
 
 **Gems to Add:**
 - `rails` ~> 8.1.0
 
-**Total Gemfile changes:** ~5 lines
+**Total Gemfile changes:** ~3 lines
 
 ---
 
@@ -753,11 +795,13 @@ get '/events'
 
 ### Files to Modify (~55 files)
 
-**Controllers (49 files):**
+**Controllers (49 files) - MINIMAL CHANGES:**
 - Rename: `app/controllers/*.rb` → `app/controllers/*_controller.rb`
-- Convert: `Dandelion::App.controller do` → `class XController < ApplicationController`
-- Convert: `get/post` blocks → `def action_name`
-- Update: Redirect/render syntax
+- Replace: `Dandelion::App.controller do` → `class XController < ApplicationController`
+- Add: `include Sinatra::DSL` at top of class
+- Replace: `end` (at bottom) → `end`
+- **Keep ALL `get/post` blocks EXACTLY as-is!**
+- No changes to route handler logic
 
 **Helpers (7 files):**
 - Wrap in `module XHelper` if not already
@@ -894,29 +938,31 @@ git checkout main
 
 ## Summary
 
-### Code Change Estimate
+### Code Change Estimate (with Sinatra DSL)
 
 | Component | Files Changed | Lines Changed | Lines Added | Difficulty |
 |-----------|---------------|---------------|-------------|------------|
-| Controllers | 49 | ~1,000 | ~500 | Medium |
+| Controllers | 49 | ~200 (wrapper only) | ~100 (class + include) | **Low** |
 | Routes | 1 new | 0 | ~700 | Low |
 | Config | 15 new | 0 | ~800 | Low |
 | Helpers | 7 | ~200 | ~100 | Low |
 | Models | 0 | 0 | 0 | None |
 | Views | 10-20 | ~100 | 0 | Low |
 | Tests | 20 | ~200 | ~100 | Low |
-| **Total** | **~100** | **~1,500** | **~2,200** | **Medium** |
+| **Total** | **~100** | **~700** | **~1,800** | **Low-Medium** |
+
+**Key Point:** By keeping Sinatra DSL, controller logic stays 100% unchanged! Only class wrapper changes.
 
 ### Timeline Estimate
 
-- **Preparation:** 1-2 days
+- **Preparation:** 1 day
 - **Rails Setup & Config:** 2-3 days
-- **Controller Migration:** 5-7 days (49 controllers)
+- **Controller Migration:** 2-3 days (just wrapping in classes - mechanical change)
 - **Routes Definition:** 2-3 days
-- **Testing & Debugging:** 5-7 days
+- **Testing & Debugging:** 3-5 days
 - **Deployment:** 1-2 days
 
-**Total:** ~3-4 weeks for complete migration with testing
+**Total:** ~2-3 weeks for complete migration with testing (reduced from 3-4 weeks)
 
 ### Risk Assessment
 
@@ -965,7 +1011,7 @@ GET /o/:slug → organisations#show
 
 ---
 
-## Appendix B: Controller Conversion Template
+## Appendix B: Controller Conversion Template (with Sinatra DSL)
 
 **Before (Padrino):**
 ```ruby
@@ -982,25 +1028,35 @@ Dandelion::App.controller do
 end
 ```
 
-**After (Rails):**
+**After (Rails with Sinatra DSL):**
 ```ruby
 class ResourceController < ApplicationController
-  def index
+  include Sinatra::DSL
+
+  # EXACT SAME CODE - just wrapped in class!
+  get '/resource' do
     @items = Model.all
-    render 'resource/index'
+    erb :'resource/index'
   end
 
-  def create
+  post '/resource/new' do
     @item = Model.create(params[:item])
-    redirect_to resource_path(@item.id)
+    redirect "/resource/#{@item.id}"
   end
 end
 ```
 
-**Route mapping:**
+**Changes made:**
+1. Line 1: `Dandelion::App.controller do` → `class ResourceController < ApplicationController`
+2. Line 2: Added `include Sinatra::DSL`
+3. Lines 4-15: **UNCHANGED** - identical code
+4. Line 16: `end` → `end` (closes class instead of controller block)
+
+**Route mapping (in config/routes.rb):**
 ```ruby
-get '/resource', to: 'resource#index'
-post '/resource/new', to: 'resource#create'
+# Map Sinatra-style routes to Rails
+get '/resource', to: 'resource#get_resource'
+post '/resource/new', to: 'resource#post_resource_new'
 ```
 
 ---
