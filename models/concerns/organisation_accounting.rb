@@ -7,7 +7,7 @@ module OrganisationAccounting
 
   class_methods do
     def paid_up_fraction
-      0.8
+      0.90
     end
   end
 

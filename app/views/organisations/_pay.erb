@@ -82,7 +82,7 @@
                 })
         ">Save time by enabling auto top-ups</a>
             <br />
-            When you fall below 80% of the suggested amount, we'll top you up to 100%,
+            When you fall below <%= (Organisation.paid_up_fraction * 100).to_i %>% of the suggested amount, we'll top you up to 100%,
             and donations will always go to your organisation.
           <% end %>
         </p>
