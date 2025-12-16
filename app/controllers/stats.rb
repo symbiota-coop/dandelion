@@ -3,6 +3,31 @@ Dandelion::App.controller do
     admins_only!
   end
 
+  get '/stats/routes' do
+    # Collect all routes from the Padrino application
+    @routes = []
+
+    # Access routes from the application
+    Dandelion::App.routes.each do |route|
+      # Extract route information
+      verb = route.verb.to_s
+      # Skip HEAD routes
+      next if verb == 'HEAD'
+
+      path = route.path.to_s
+
+      @routes << {
+        verb: verb,
+        path: path
+      }
+    end
+
+    # Sort routes by path for better readability
+    @routes.sort_by! { |r| [r[:path], r[:verb]] }
+
+    erb :'stats/routes'
+  end
+
   get '/stats/charts' do
     erb :'stats/charts'
   end

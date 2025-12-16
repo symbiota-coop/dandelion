@@ -1,0 +1,30 @@
+<div class="table-responsive">
+  <table id="routes-table" class="table table-hover">
+    <thead>
+      <tr>
+        <th>Verb</th>
+        <th>Path</th>
+      </tr>
+    </thead>
+    <tbody>
+      <% @routes.each do |route| %>
+        <tr>
+          <td>
+            <span class="badge badge-<%= case route[:verb]
+                                          when 'GET' then 'secondary'
+                                          when 'POST' then 'success'
+                                          when 'PUT' then 'warning'
+                                          when 'PATCH' then 'info'
+                                          when 'DELETE' then 'danger'
+                                          end %>">
+              <%= route[:verb] %>
+            </span>
+          </td>
+          <td>
+            <code><%= route[:path] %></code>
+          </td>
+        </tr>
+      <% end %>
+    </tbody>
+  </table>
+</div>
