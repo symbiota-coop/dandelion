@@ -2,6 +2,48 @@
 @import "../infinite_admin/scss/style";
 @import "event_details";
 
+/* View Transitions - MPA navigation */
+@view-transition {
+  navigation: auto;
+}
+
+#header {
+  view-transition-name: header;
+}
+
+#sidebar {
+  view-transition-name: sidebar;
+}
+
+::view-transition-old(header),
+::view-transition-new(header),
+::view-transition-old(sidebar),
+::view-transition-new(sidebar) {
+  animation: none;
+}
+
+::view-transition-old(root) {
+  animation: vt-blur-out 0.25s ease-out forwards;
+}
+
+::view-transition-new(root) {
+  animation: vt-blur-in 0.25s ease-out forwards;
+}
+
+@keyframes vt-blur-out {
+  to {
+    filter: blur(4px);
+    opacity: 0;
+  }
+}
+
+@keyframes vt-blur-in {
+  from {
+    filter: blur(4px);
+    opacity: 0;
+  }
+}
+
 
 .ticket-type-description p {
   margin-bottom: 0;

@@ -1,3 +1,10 @@
+// Skip view transition if navigating to the same URL
+window.addEventListener('pageswap', (e) => {
+  if (e.viewTransition && e.activation.entry.url === e.activation.from.url) {
+    e.viewTransition.skipTransition();
+  }
+});
+
 $(function () {
 
   function ajaxCompleted () {
