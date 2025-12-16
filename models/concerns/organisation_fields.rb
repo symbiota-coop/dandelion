@@ -69,6 +69,7 @@ module OrganisationFields
     field :events_banner, type: String
     field :banned_emails, type: String
     field :paid_up, type: Mongoid::Boolean
+    field :paid_up_fraction, type: Float
     field :send_ticket_emails_from_organisation, type: Mongoid::Boolean
     field :show_sign_in_link_in_ticket_emails, type: Mongoid::Boolean
     field :show_ticketholder_link_in_ticket_emails, type: Mongoid::Boolean

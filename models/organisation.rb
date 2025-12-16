@@ -47,7 +47,7 @@ class Organisation
       if organisation.stripe_customer_id
         cr = organisation.contribution_requested
         cp = organisation.contribution_paid
-        organisation.stripe_topup if cp < (Organisation.paid_up_fraction * cr)
+        organisation.stripe_topup if cp < (organisation.paid_up_fraction_or_default * cr)
       end
 
       organisation.set(subscribed_accounts_count: organisation.subscribed_accounts.count)
