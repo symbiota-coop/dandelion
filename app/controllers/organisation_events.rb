@@ -104,7 +104,7 @@ Dandelion::App.controller do
           @events = @events.and(:start_time.lt => @to + 1) if @to
         end
         @events = filter_events_by_search_and_tags(@events)
-        @events = @events.includes(:cohosts, :event_facilitators, :activity, :local_group, :event_tags)
+        @events = @events.includes(:activity, :local_group)
         @events.map do |event|
           {
             id: event.id.to_s,
