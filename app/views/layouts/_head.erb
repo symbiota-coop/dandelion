@@ -22,7 +22,7 @@
 
   <%= favicon_tag 'logos/black-on-transparent-sq.png' %>
   <%= partial :'layouts/opengraph' %>
-  <% if !current_account && @hide_right_nav %>
+  <% if !current_account || @hide_right_nav %>
     <style>
       @media (max-width: 991px) {
         ul.nav.navbar-nav.navbar-right {

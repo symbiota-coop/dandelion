@@ -23,23 +23,59 @@
 }
 
 ::view-transition-old(root) {
-  animation: vt-blur-out 0.25s ease-out forwards;
+  animation: vt-slide-left-out 0.25s ease-out forwards;
 }
 
 ::view-transition-new(root) {
-  animation: vt-blur-in 0.25s ease-out forwards;
+  animation: vt-slide-left-in 0.25s ease-out forwards;
 }
 
-@keyframes vt-blur-out {
+/* Back navigation: slide right */
+html:active-view-transition-type(backward) {
+  &::view-transition-old(root) {
+    animation: vt-slide-right-out 0.25s ease-out forwards;
+  }
+
+  &::view-transition-new(root) {
+    animation: vt-slide-right-in 0.25s ease-out forwards;
+  }
+}
+
+/* Forward navigation: slide left */
+html:active-view-transition-type(forward) {
+  &::view-transition-old(root) {
+    animation: vt-slide-left-out 0.25s ease-out forwards;
+  }
+
+  &::view-transition-new(root) {
+    animation: vt-slide-left-in 0.25s ease-out forwards;
+  }
+}
+
+@keyframes vt-slide-left-out {
   to {
-    filter: blur(4px);
+    transform: translateX(-100%);
     opacity: 0;
   }
 }
 
-@keyframes vt-blur-in {
+@keyframes vt-slide-left-in {
   from {
-    filter: blur(4px);
+    transform: translateX(100%);
+    opacity: 0;
+  }
+}
+
+@keyframes vt-slide-right-out {
+  to {
+    transform: translateX(100%);
+    opacity: 0;
+  }
+}
+
+@keyframes vt-slide-right-in {
+  from {
+    transform: translateX(-100%);
     opacity: 0;
   }
 }
