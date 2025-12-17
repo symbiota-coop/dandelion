@@ -12,7 +12,7 @@ Dandelion::App.controller do
       flash[:notice] = 'The organisation was saved.'
 
       redirect(
-        if @organisation.events.count == 0
+        if @organisation.events.empty?
           "/events/new?organisation_id=#{@organisation.id}&new_org=1"
         elsif current_account.organisations.count == 1
           "/o/#{@organisation.slug}"

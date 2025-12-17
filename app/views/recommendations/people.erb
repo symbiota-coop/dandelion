@@ -5,7 +5,7 @@ recommended_people = @account.recommended_people || []
 <%= partial :'recommendations/nav' %>
 <% p = 0 %>
 
-<% if recommended_people.count == 0 %>
+<% if recommended_people.empty? %>
   <em>No recommended people</em>
 <% else %>
   <ul class="search-result-list">

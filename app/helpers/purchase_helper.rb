@@ -40,7 +40,7 @@ Dandelion::App.helpers do
         )
       end
     end
-    raise Order::NoTickets if order.tickets.count == 0
+    raise Order::NoTickets if order.tickets.empty?
 
     order.donations.create!(event: @event, account: @account, amount: ticket_form[:donation_amount]) if ticket_form[:donation_amount].to_f > 0
 

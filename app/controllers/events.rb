@@ -95,7 +95,7 @@ Dandelion::App.controller do
       @event.organisation = @event.local_group.organisation
     end
     unless @event.organisation
-      if current_account.organisations.count == 0
+      if current_account.organisations.empty?
         redirect '/o/new'
       else
         redirect '/events'
@@ -127,7 +127,7 @@ Dandelion::App.controller do
     @event = Event.new(mass_assigning(params[:event], Event))
     unless @event.organisation
       flash[:error] = 'There was an error saving the event'
-      if current_account.organisations.count == 0
+      if current_account.organisations.empty?
         redirect '/o/new'
       else
         redirect '/events'

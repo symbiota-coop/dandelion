@@ -13,7 +13,7 @@
         }, {
           element: $('#upcoming-events')[0],
           intro: "Here's where you'll see your upcoming events"
-        }, <% if current_account.upcoming_events.count == 0 %> {
+        }, <% if current_account.upcoming_events.empty? %> {
           element: $('.browse-events:visible')[0],
           intro: "Time to find your first event!"
         } <% end %>]

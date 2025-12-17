@@ -8,7 +8,7 @@ events_by_id = Event.and(:id.in => recommended_events.map(&:first)).includes(:ev
 <%= partial :'recommendations/nav' %>
 <% r = 0 %>
 
-<% if recommended_events.count == 0 %>
+<% if recommended_events.empty? %>
   <em>No recommended events</em>
 <% else %>
   <div class="mb-3">

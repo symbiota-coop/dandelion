@@ -60,7 +60,7 @@ class Organisation
     ignore = %i[organisationships notifications_as_notifiable]
     Organisation.all.each do |organisation|
       next unless Organisation.reflect_on_all_associations(:has_many).all? do |assoc|
-        organisation.send(assoc.name).count == 0 || ignore.include?(assoc.name)
+        organisation.send(assoc.name).empty? || ignore.include?(assoc.name)
       end && fields.all? { |f| organisation.send(f).blank? } && organisation.created_at < 1.month.ago
 
       puts organisation.name

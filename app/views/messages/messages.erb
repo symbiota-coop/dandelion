@@ -40,7 +40,7 @@
         <div id="message-send" data-pagelet-url="/messages/<%= @account.id %>/send" data-pagelet-also="/messages/<%= @account.id %>">
           <%= partial :'messages/send' %>
         </div>
-      <% elsif current_account.messages.count == 0 %>
+      <% elsif current_account.messages.empty? %>
         <p class="text-center"><em>Your messages will appear here.</em></p>
       <% end %>
     </div>

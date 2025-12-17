@@ -299,7 +299,7 @@ class Pmail
         result = mg_events.get(options)
         result.to_h['items'].each { |item| recipients << item['recipient'] }
         while (result = mg_events.next(options))
-          break if result.to_h['items'].count == 0
+          break if result.to_h['items'].empty?
 
           result.to_h['items'].each { |item| recipients << item['recipient'] }
           puts recipients.count
