@@ -7,6 +7,9 @@
   <body class="<%= @body_class %>">
     <!-- BEGIN #page-container -->
     <div id="page-container" class="page-header-fixed page-sidebar-fixed <% if session[:sidebar_minified] == 'minified' || (!session[:sidebar_minified] && (!current_account || ENV['CREATE_VIDEO'])) %> page-sidebar-minified <% end %>  ">
+      <% unless ENV['CREATE_VIDEO'] %>
+        <%= partial :alert %>
+      <% end %>
       <!-- BEGIN #header -->
       <div id="header" class="header navbar navbar-inverse navbar-fixed-top">
         <!-- BEGIN container-fluid -->
@@ -58,9 +61,6 @@
       <!-- END #sidebar -->
       <!-- BEGIN #content -->
       <div id="content" class="content">
-        <% unless ENV['CREATE_VIDEO'] %>
-          <%= partial :alert %>
-        <% end %>
         <%= content_blocks[:content.to_sym].present? ? yield_content(:content) : yield %>
       </div>
       <!-- END #content -->

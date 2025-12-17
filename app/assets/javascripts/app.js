@@ -1,26 +1,3 @@
-// Skip view transition if navigating to the same URL
-window.addEventListener('pageswap', (e) => {
-  if (e.viewTransition && e.activation.entry.url === e.activation.from.url) {
-    e.viewTransition.skipTransition();
-  }
-});
-
-// Detect back/forward navigation for slide direction
-window.addEventListener('pagereveal', (e) => {
-  if (!e.viewTransition) return;
-  if (!navigation.activation) return;
-
-  const { navigationType, entry, from } = navigation.activation;
-
-  // Only handle traverse (back/forward) navigation
-  if (navigationType !== 'traverse') return;
-
-  const isBackward = entry.index < from.index;
-
-  // Add transition type - CSS will handle the rest
-  e.viewTransition.types.add(isBackward ? 'backward' : 'forward');
-});
-
 $(function () {
 
   function ajaxCompleted () {
