@@ -1,16 +1,18 @@
 class OpenRouter
   BASE_URL = 'https://openrouter.ai'.freeze
   INTELLIGENCE_LEVELS = {
-    'standard' => 'google/gemini-2.5-flash',
-    'smarter' => 'google/gemini-2.5-flash:thinking'
+    'standard' => 'google/gemini-3-flash-preview',
+    'smarter' => 'google/gemini-3-flash-preview:thinking'
   }.freeze
-  DEFAULT_PROVIDERS = {
-    'google/gemini-2.5-flash' => %w[Google],
-    'google/gemini-2.5-flash:thinking' => %w[Google]
-  }.freeze
-  DEFAULT_CONTEXT_WINDOW_SIZES = {
-    'google/gemini-2.5-flash' => 1_000_000,
-    'google/gemini-2.5-flash:thinking' => 1_000_000
+  MODELS = {
+    'google/gemini-3-flash-preview' => {
+      providers: %w[Google],
+      context_window_size: 1_000_000
+    },
+    'google/gemini-3-flash-preview:thinking' => {
+      providers: %w[Google],
+      context_window_size: 1_000_000
+    }
   }.freeze
 
   class << self
@@ -29,8 +31,9 @@ class OpenRouter
 
   def chat(prompt, full_response: false, max_tokens: nil, schema: nil, model: INTELLIGENCE_LEVELS['standard'], providers: nil, context_window_size: nil, intelligence: nil)
     model = INTELLIGENCE_LEVELS[intelligence] if intelligence
-    providers ||= DEFAULT_PROVIDERS[model]
-    context_window_size ||= DEFAULT_CONTEXT_WINDOW_SIZES[model]
+    model_config = MODELS[model] || {}
+    providers ||= model_config[:providers]
+    context_window_size ||= model_config[:context_window_size]
     prompt = prompt[0..(context_window_size * 4 * 0.66)]
 
     payload = {
