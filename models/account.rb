@@ -9,7 +9,6 @@ class Account
   include AccountValidation
   include AccountNotifications
   include AccountFeedbackSummaries
-  include AccountFarcaster
   include AccountRecommendations
   include Geocoded
   include Searchable

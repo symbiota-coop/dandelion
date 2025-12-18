@@ -44,11 +44,6 @@ Time.zone = ENV['DEFAULT_TIME_ZONE']
 
 Airrecord.api_key = ENV['AIRTABLE_API_KEY']
 
-FARQUEST = Faraday.new(
-  url: 'https://build.far.quest/farcaster/v2',
-  headers: { 'Content-Type': 'application/json', 'API-KEY': ENV['FARQUEST_API_KEY'] }
-)
-
 Yt.configure do |config|
   config.api_key = ENV['YOUTUBE_API_KEY']
 end
