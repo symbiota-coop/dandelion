@@ -88,12 +88,16 @@ class Activity
     has_many_through :admins_receiving_feedback, through: :activityships, conditions: { admin: true, receive_feedback: true }
   end
 
+  def all_feedback_event_ids
+    events.pluck(:id) + events_as_feedback_activity.pluck(:id)
+  end
+
   def event_feedbacks
-    EventFeedback.and(:event_id.in => events.pluck(:id))
+    EventFeedback.and(:event_id.in => all_feedback_event_ids)
   end
 
   def unscoped_event_feedbacks
-    EventFeedback.unscoped.and(:event_id.in => events.pluck(:id))
+    EventFeedback.unscoped.and(:event_id.in => all_feedback_event_ids)
   end
 
   def event_tags
