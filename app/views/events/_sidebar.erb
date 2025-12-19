@@ -43,6 +43,7 @@
         <div class="card-body">
           <p><%= @event.select_tickets_intro %></p>
           <a target="_blank" href="<%= @event.purchase_url %>" class="btn btn-outline-primary btn-block mb-3"><%= @event.rsvp_button_text || "Book via #{URI(@event.purchase_url).host.gsub('www.','')}" %></a>
+          <p><%= @event.select_tickets_outro %></p>
         </div>
       </div>
     <% elsif @event.sold_out? && !params[:ticket_type_id] %>
