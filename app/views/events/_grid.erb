@@ -3,14 +3,20 @@
     <h2 class="text-center">All events</h2>
   <% end %>
   <div class="row">
-    <% previous_event = nil; @events.each { |event|    
+    <% previous_event = nil; event_count = 0; @events.each { |event|    
     next unless event.has_image?
     next if event.locked? && !event_admin?(event)
     next if previous_event && previous_event.name == event.name && !previous_event.sold_out?
+    event_count += 1
     %>
-    <div class="col-12 col-sm-6 col-lg-4" style="margin-bottom: 0.75rem;">
+    <div class="col-12 col-sm-6 col-lg-4 event-block" style="margin-bottom: 0.75rem;<%= ' display: none;' if params[:show_more] && event_count > 6 %>">
       <%= partial :'events/block_carousel', locals: {event: event} %>
     </div>
     <% previous_event = event } %>
   </div>
+  <% if params[:show_more] && event_count > 6 %>
+    <div class="text-center mt-3">
+      <a onclick="$('.event-block').show(); $(this).hide();" href="javascript:;">Show more</a>
+    </div>
+  <% end %>
 </div>
