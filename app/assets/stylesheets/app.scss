@@ -17,9 +17,20 @@
   animation-duration: 0.15s;
 }
 
-#header,
+#header {
+  view-transition-name: header;
+}
+
 #sidebar {
-  view-transition-name: none;
+  view-transition-name: sidebar;
+}
+
+::view-transition-old(header),
+::view-transition-new(header),
+::view-transition-old(sidebar),
+::view-transition-new(sidebar) {
+  animation: none;
+  mix-blend-mode: normal;
 }
 
 .ticket-type-description p {
