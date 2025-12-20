@@ -1,0 +1,1 @@
+Evaluate the last commit by running `git diff HEAD~1 HEAD` and inspecting any altered files
