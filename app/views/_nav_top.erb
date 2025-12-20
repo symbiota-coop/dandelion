@@ -1,3 +1,21 @@
+<% if !current_account && @hide_right_nav %>
+  <script>
+    window.addEventListener('pagereveal', (e) => {
+      if (e.viewTransition) e.viewTransition.skipTransition();
+    });
+  </script>
+  <style>
+    @media (max-width: 991px) {
+      ul.nav.navbar-nav.navbar-right {
+        display: none;
+      }
+      #page-container {
+        padding-top: 2.75rem;
+      }
+    }
+  </style>
+<% end %>
+
 <style>
   #docs-li { display: none }
   @media(min-width: 992px) { #docs-li { display: list-item } }

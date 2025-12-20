@@ -22,18 +22,6 @@
 
   <%= favicon_tag 'logos/black-on-transparent-sq.png' %>
   <%= partial :'layouts/opengraph' %>
-  <% if !current_account && @hide_right_nav %>
-    <style>
-      @media (max-width: 991px) {
-        ul.nav.navbar-nav.navbar-right {
-          display: none;
-        }
-        #page-container {
-          padding-top: 2.75rem;
-        }
-      }
-    </style>
-  <% end %>
   <% if @no_content_padding_bottom || params[:display] == 'map' %>
     <style>
       #content {
