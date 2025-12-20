@@ -94,6 +94,22 @@ a.text-primary:focus {
 }
 
 // =============================================================================
+// ACTION LINKS
+// =============================================================================
+
+p.action {
+  text-align: center;
+}
+
+p.action a {
+  background: $theme-color !important;
+}
+
+p.action a:hover {
+  background: darken($theme-color, 6.66%) !important;
+}
+
+// =============================================================================
 // LABELS AND BADGES
 // =============================================================================
 
@@ -117,6 +133,11 @@ a.text-primary:focus {
 .label-primary[href]:focus,
 .label-primary[href]:active {
   background: darken($theme-color, 6.66%) !important;
+}
+
+.label-outline-primary {
+  color: $theme-color;
+  border-color: $theme-color;
 }
 
 // =============================================================================
