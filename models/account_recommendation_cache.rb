@@ -67,7 +67,6 @@ class AccountRecommendationCache
     events = events_with_participant_ids.filter_map do |event_id, participant_ids|
       next if participant_ids.include?(my_account_id_str)
 
-      # Use Set intersection for O(n) instead of O(n*m)
       participant_set = participant_ids.to_set
       matching_people = people.to_h.slice(*participant_set)
       [event_id, matching_people]
