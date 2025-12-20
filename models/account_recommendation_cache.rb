@@ -69,7 +69,7 @@ class AccountRecommendationCache
 
       # Use Set intersection for O(n) instead of O(n*m)
       participant_set = participant_ids.to_set
-      matching_people = people.select { |k, _v| participant_set.include?(k) }
+      matching_people = people.to_h.slice(*participant_set)
       [event_id, matching_people]
     end
 
