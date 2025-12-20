@@ -43,9 +43,9 @@ class Event
     events_with_participant_ids = Event.live.public.future.map do |event|
       [event.id.to_s, event.attendee_ids.map(&:to_s)]
     end
-    # c = Account.recommendable.count
-    Account.recommendable.each_with_index do |account, _i|
-      # puts "#{i + 1}/#{c}"
+    total = Account.recommendable.count
+    Account.recommendable.each_with_index do |account, i|
+      puts "#{i + 1}/#{total}" if ((i + 1) % 1000).zero?
       account.recommend_people!
       account.recommend_events!(events_with_participant_ids)
     end
