@@ -2,6 +2,25 @@
 @import "../infinite_admin/scss/style";
 @import "event_details";
 
+@media (prefers-reduced-motion: reduce) {
+  @view-transition {
+    navigation: none;
+  }
+}
+
+@view-transition {
+  navigation: auto;
+}
+
+::view-transition-old(root),
+::view-transition-new(root) {
+  animation-duration: 0.15s;
+}
+
+#header,
+#sidebar {
+  view-transition-name: none;
+}
 
 .ticket-type-description p {
   margin-bottom: 0;
