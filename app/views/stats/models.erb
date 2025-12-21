@@ -45,11 +45,15 @@
       <button id="reset-zoom" class="btn btn-sm btn-outline-secondary">Reset Zoom</button>
     </div>
     <div class="card-body">
-      <canvas id="cost-intelligence-chart" height="120"></canvas>
-    </div>
-    <div class="card-footer">
-      <strong>Pareto Frontier:</strong>
-      <div id="pareto-list" class="mt-2">Loading...</div>
+      <div class="row">
+        <div class="col-md-9">
+          <canvas id="cost-intelligence-chart" height="140"></canvas>
+        </div>
+        <div class="col-md-3">
+          <strong>Pareto Frontier:</strong>
+          <div id="pareto-list" class="mt-2">Loading...</div>
+        </div>
+      </div>
     </div>
   </div>
 </div>
@@ -190,12 +194,12 @@
         plugins: {
           datalabels: {
             align: function(context) {
-              var idx = context.dataset.data[context.dataIndex].paretoIndex || 0;
-              return idx % 2 === 0 ? 'right' : 'left';
+              var point = context.dataset.data[context.dataIndex];
+              return point.alternateLabel ? 'left' : 'right';
             },
             anchor: function(context) {
-              var idx = context.dataset.data[context.dataIndex].paretoIndex || 0;
-              return idx % 2 === 0 ? 'end' : 'start';
+              var point = context.dataset.data[context.dataIndex];
+              return point.alternateLabel ? 'start' : 'end';
             },
             offset: 4,
             font: { size: 10 },
@@ -354,6 +358,31 @@
         }
       }
 
+      // Determine which points should alternate labels (if within epsilon of previous point)
+      var costRatioThreshold = 2.0; // Points must be within 2x cost to be considered close
+      for (var i = 0; i < paretoPoints.length; i++) {
+        paretoPoints[i].alternateLabel = false;
+        paretoPoints[i].inCluster = false;
+      }
+      for (var i = 1; i < paretoPoints.length; i++) {
+        var prevPoint = paretoPoints[i - 1];
+        var currPoint = paretoPoints[i];
+        // Check if points are close on both axes (Y within epsilon, X within cost ratio)
+        var yClose = Math.abs(currPoint.y - prevPoint.y) <= epsilon;
+        var costRatio = Math.max(currPoint.x, prevPoint.x) / Math.min(currPoint.x, prevPoint.x);
+        var xClose = costRatio <= costRatioThreshold;
+        if (yClose && xClose) {
+          currPoint.inCluster = true;
+          // If previous point isn't already in a cluster, start the cluster on the left
+          if (!prevPoint.inCluster) {
+            prevPoint.inCluster = true;
+            prevPoint.alternateLabel = true; // Start on left
+          }
+          // Alternate based on previous point's state
+          currPoint.alternateLabel = !prevPoint.alternateLabel;
+        }
+      }
+
       chart.data.datasets = [];
 
       Object.keys(groups).forEach(function(label) {
@@ -364,7 +393,15 @@
             label: label,
             data: models.map(function(m) {
               var pIdx = paretoInfo[m.name];
-              return { x: m.costToRun, y: getIndexValue(m, selectedIndex), label: m.name, isPareto: pIdx !== undefined, paretoIndex: pIdx || 0 };
+              var paretoPoint = pIdx !== undefined ? paretoPoints[pIdx] : null;
+              return {
+                x: m.costToRun,
+                y: getIndexValue(m, selectedIndex),
+                label: m.name,
+                isPareto: pIdx !== undefined,
+                paretoIndex: pIdx || 0,
+                alternateLabel: paretoPoint ? paretoPoint.alternateLabel : false
+              };
             }),
             backgroundColor: group.color + 'cc',
             borderColor: group.color,
