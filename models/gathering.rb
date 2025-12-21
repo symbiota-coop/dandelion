@@ -183,6 +183,42 @@ class Gathering
     end
   end
 
+  def copy_structure_to(destination, account:)
+    timetables.each do |timetable|
+      new_timetable = destination.timetables.create!(name: timetable.name, account: account)
+      timetable.tslots.each do |tslot|
+        new_timetable.tslots.create!(name: tslot.name, o: tslot.o)
+      end
+      timetable.spaces.each do |space|
+        new_timetable.spaces.create!(name: space.name, o: space.o)
+      end
+    end
+
+    rotas.each do |rota|
+      new_rota = destination.rotas.create!(name: rota.name, account: account)
+      rota.rslots.each do |rslot|
+        new_rota.rslots.create!(name: rslot.name, o: rslot.o, worth: rslot.worth)
+      end
+      rota.roles.each do |role|
+        new_rota.roles.create!(name: role.name, o: role.o, worth: role.worth)
+      end
+    end
+
+    options.each do |option|
+      destination.options.create!(
+        account: option.account,
+        name: option.name,
+        description: option.description,
+        capacity: option.capacity,
+        cost: option.cost,
+        split_cost: option.split_cost,
+        type: option.type,
+        by_invitation: option.by_invitation,
+        hide_members: option.hide_members
+      )
+    end
+  end
+
   def radio_scopes
     []
 
