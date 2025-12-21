@@ -186,6 +186,8 @@ gem 'mini_magick' # for image processing
      '//rawcdn.githack.com/scottdejonge/map-icons/dbf6fd7caedd60d11b5bfb5f267a114a6847d012/dist/js/map-icons.js',
      '//rawcdn.githack.com/scottgonzalez/jquery-ui-extensions/fb7fd7df3d70e0288394f07bfe78262b548c30d6/src/autocomplete/jquery.ui.autocomplete.html.js',
      '//cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.0.0',
+     '//cdn.jsdelivr.net/npm/hammerjs@2.0.8/hammer.min.js',
+     '//cdn.jsdelivr.net/npm/chartjs-plugin-zoom@2.0.1/dist/chartjs-plugin-zoom.min.js',
      '//cdn.jsdelivr.net/gh/mdbassit/Coloris@latest/dist/coloris.min.js',
      "/javascripts/ext/ckeditor.js?#{@cachebuster}",     
      '/javascripts/ext/autosize.js',     

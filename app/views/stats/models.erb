@@ -1,0 +1,468 @@
+<div class="mb-3">
+  <div class="row">
+    <div class="col-md-3">
+      <label for="index-selector" class="form-label">Index:</label>
+      <select id="index-selector" class="form-control">
+        <option value="intelligence" selected>Intelligence</option>
+        <option value="agentic">Agentic</option>
+        <option value="coding">Coding</option>
+        <option value="math">Math</option>
+      </select>
+    </div>
+    <div class="col-md-2">
+      <label for="reasoning-filter" class="form-label">Reasoning:</label>
+      <select id="reasoning-filter" class="form-control">
+        <option value="">All</option>
+        <option value="reasoning">Yes</option>
+        <option value="non-reasoning">No</option>
+      </select>
+    </div>
+    <div class="col-md-2">
+      <label for="open-source-filter" class="form-label">Open Source:</label>
+      <select id="open-source-filter" class="form-control">
+        <option value="">All</option>
+        <option value="yes">Yes</option>
+        <option value="no">No</option>
+      </select>
+    </div>
+    <div class="col-md-2">
+      <label for="release-filter" class="form-label">Released in last:</label>
+      <select id="release-filter" class="form-control">
+        <option value="">All time</option>
+        <option value="3">3 months</option>
+        <option value="6">6 months</option>
+        <option value="12">12 months</option>
+        <option value="24">24 months</option>
+      </select>
+    </div>
+  </div>
+</div>
+
+<div class="mb-4">
+  <div class="card">
+    <div class="card-header d-flex justify-content-between align-items-center">
+      <h5 class="mb-0" id="chart-title">Intelligence Index vs Cost to Run</h5>
+      <button id="reset-zoom" class="btn btn-sm btn-outline-secondary">Reset Zoom</button>
+    </div>
+    <div class="card-body">
+      <canvas id="cost-intelligence-chart" height="120"></canvas>
+    </div>
+    <div class="card-footer">
+      <strong>Pareto Frontier:</strong>
+      <div id="pareto-list" class="mt-2">Loading...</div>
+    </div>
+  </div>
+</div>
+
+<div class="table-responsive">
+  <table id="models-table" class="table table-hover">
+    <thead>
+      <tr>
+        <th>Model</th>
+        <th>Creator</th>
+        <th>Release</th>
+        <th>Reasoning</th>
+        <th>Open Source</th>
+        <th>Intelligence Index</th>
+        <th>Agentic Index</th>
+        <th>Coding Index</th>
+        <th>Math Index</th>
+        <th>Cost to Run</th>
+      </tr>
+    </thead>
+    <tbody>
+      <% @models.each do |model| %>
+        <tr>
+          <td>
+            <strong><%= model['name'] %></strong>
+            <br>
+            <small class="text-muted"><code><%= model['slug'] %></code></small>
+          </td>
+          <td>
+            <%= model.dig('model_creators', 'name') || 'N/A' %>
+          </td>
+          <td data-order="<%= model['release_date'] || '0000-00-00' %>">
+            <% if model['release_date'] %>
+              <%= Date.parse(model['release_date']).strftime('%b %Y') rescue model['release_date'] %>
+            <% else %>
+              <span class="text-muted">—</span>
+            <% end %>
+          </td>
+          <td>
+            <% if model['reasoning_model'] %>
+              <span class="badge badge-success">Reasoning</span>
+            <% else %>
+              <span class="badge badge-secondary">Non-reasoning</span>
+            <% end %>
+          </td>
+          <td>
+            <% if model['is_open_weights'] %>
+              <span class="badge badge-success">Yes</span>
+            <% else %>
+              <span class="badge badge-secondary">No</span>
+            <% end %>
+          </td>
+          <td data-order="<%= model['intelligence_index'] || 0 %>">
+            <% if (score = model['intelligence_index']) %>
+              <%= sprintf('%.1f', score) %>
+            <% else %>
+              <span class="text-muted">—</span>
+            <% end %>
+          </td>
+          <td data-order="<%= model['agentic_index'] || 0 %>">
+            <% if (score = model['agentic_index']) %>
+              <%= sprintf('%.1f', score) %>
+            <% else %>
+              <span class="text-muted">—</span>
+            <% end %>
+          </td>
+          <td data-order="<%= model['coding_index'] || 0 %>">
+            <% if (score = model['coding_index']) %>
+              <%= sprintf('%.1f', score) %>
+            <% else %>
+              <span class="text-muted">—</span>
+            <% end %>
+          </td>
+          <td data-order="<%= model['math_index'] || 0 %>">
+            <% if (score = model['math_index']) %>
+              <%= sprintf('%.1f', score) %>
+            <% else %>
+              <span class="text-muted">—</span>
+            <% end %>
+          </td>
+          <td data-order="<%= model['cost_to_run'] || 0 %>">
+            <% if model['cost_to_run'] %>
+              $<%= sprintf('%.0f', model['cost_to_run']) %>
+            <% else %>
+              <span class="text-muted">—</span>
+            <% end %>
+          </td>
+        </tr>
+      <% end %>
+    </tbody>
+  </table>
+</div>
+
+<script>
+  var modelsData = <%== @models.map { |m|
+    {
+      name: m['name'],
+      intelligenceIndex: (m['intelligence_index'] || 0).to_f,
+      agenticIndex: (m['agentic_index'] || 0).to_f,
+      codingIndex: (m['coding_index'] || 0).to_f,
+      mathIndex: (m['math_index'] || 0).to_f,
+      costToRun: (m['cost_to_run'] || 0).to_f,
+      reasoningModel: !!m['reasoning_model'],
+      isOpenWeights: !!m['is_open_weights'],
+      releaseDate: m['release_date']
+    }
+  }.to_json %>;
+
+  var indexLabels = {
+    intelligence: 'Intelligence Index',
+    agentic: 'Agentic Index',
+    coding: 'Coding Index',
+    math: 'Math Index'
+  };
+
+  $(function() {
+    var table = $('#models-table').DataTable({
+      paging: false,
+      searching: true,
+      order: [[5, 'desc']], // Sort by Intelligence Index descending
+      columnDefs: [
+        { type: 'num', targets: [5, 6, 7, 8, 9] } // Numeric columns
+      ]
+    });
+
+    // Initialize scatter chart
+    var ctx = document.getElementById('cost-intelligence-chart').getContext('2d');
+    Chart.register(ChartDataLabels);
+    var chart = new Chart(ctx, {
+      type: 'scatter',
+      data: { datasets: [] },
+      options: {
+        responsive: true,
+        maintainAspectRatio: true,
+        layout: {
+          padding: { left: 20, right: 20 }
+        },
+        plugins: {
+          datalabels: {
+            align: function(context) {
+              var idx = context.dataset.data[context.dataIndex].paretoIndex || 0;
+              return idx % 2 === 0 ? 'right' : 'left';
+            },
+            anchor: function(context) {
+              var idx = context.dataset.data[context.dataIndex].paretoIndex || 0;
+              return idx % 2 === 0 ? 'end' : 'start';
+            },
+            offset: 4,
+            font: { size: 10 },
+            color: '#666',
+            formatter: function(value) {
+              return value.label;
+            }
+          },
+          tooltip: {
+            callbacks: {
+              label: function(context) {
+                var point = context.raw;
+                return point.label + ': Cost $' + point.x.toFixed(0) + ', Intelligence ' + point.y.toFixed(1);
+              }
+            }
+          },
+          legend: {
+            display: true,
+            position: 'bottom',
+            labels: {
+              usePointStyle: true,
+              padding: 20
+            }
+          },
+          zoom: {
+            pan: {
+              enabled: true,
+              mode: 'xy'
+            },
+            zoom: {
+              wheel: { enabled: true },
+              pinch: { enabled: true },
+              mode: 'xy'
+            }
+          }
+        },
+        scales: {
+          x: {
+            type: 'logarithmic',
+            title: { display: true, text: 'Cost to Run ($)', font: { weight: 'bold' } },
+            grid: { color: 'rgba(0,0,0,0.05)' }
+          },
+          y: {
+            title: { display: true, text: 'Intelligence Index', font: { weight: 'bold' } },
+            grid: { color: 'rgba(0,0,0,0.05)' }
+          }
+        }
+      }
+    });
+
+    // Reset zoom button
+    $('#reset-zoom').on('click', function() {
+      chart.resetZoom();
+    });
+
+    function getIndexValue(model, indexType) {
+      switch(indexType) {
+        case 'agentic': return model.agenticIndex;
+        case 'coding': return model.codingIndex;
+        case 'math': return model.mathIndex;
+        default: return model.intelligenceIndex;
+      }
+    }
+
+    function updateChart() {
+      var selectedIndex = $('#index-selector').val();
+      var reasoningFilter = $('#reasoning-filter').val();
+      var openSourceFilter = $('#open-source-filter').val();
+      var releaseFilter = $('#release-filter').val();
+
+      // Update title and axis label
+      var indexLabel = indexLabels[selectedIndex];
+      $('#chart-title').text(indexLabel + ' vs Cost to Run');
+      chart.options.scales.y.title.text = indexLabel;
+
+      // Calculate cutoff date for release filter
+      var cutoffDate = null;
+      if (releaseFilter) {
+        cutoffDate = new Date();
+        cutoffDate.setMonth(cutoffDate.getMonth() - parseInt(releaseFilter));
+      }
+
+      // Filter models based on current filters
+      var filteredModels = modelsData.filter(function(model) {
+        var reasoningMatch = true;
+        var openSourceMatch = true;
+        var releaseMatch = true;
+
+        if (reasoningFilter === 'reasoning') reasoningMatch = model.reasoningModel;
+        else if (reasoningFilter === 'non-reasoning') reasoningMatch = !model.reasoningModel;
+
+        if (openSourceFilter === 'yes') openSourceMatch = model.isOpenWeights;
+        else if (openSourceFilter === 'no') openSourceMatch = !model.isOpenWeights;
+
+        if (cutoffDate && model.releaseDate) {
+          var modelDate = new Date(model.releaseDate);
+          releaseMatch = modelDate >= cutoffDate;
+        } else if (cutoffDate) {
+          releaseMatch = false;
+        }
+
+        var indexValue = getIndexValue(model, selectedIndex);
+        return reasoningMatch && openSourceMatch && releaseMatch && indexValue > 0 && model.costToRun > 0;
+      });
+
+      // Group by reasoning and open source
+      // Colors: primary green for open source, grey for closed source
+      // Shapes: triangle for reasoning (like a bright idea), circle for non-reasoning
+      var openColor = '#00B963';
+      var closedColor = '#6c757d';
+
+      var groups = {
+        'Reasoning + Open Source': {
+          filter: function(m) { return m.reasoningModel && m.isOpenWeights; },
+          color: openColor,
+          pointStyle: 'triangle'
+        },
+        'Reasoning + Closed': {
+          filter: function(m) { return m.reasoningModel && !m.isOpenWeights; },
+          color: closedColor,
+          pointStyle: 'triangle'
+        },
+        'Non-reasoning + Open Source': {
+          filter: function(m) { return !m.reasoningModel && m.isOpenWeights; },
+          color: openColor,
+          pointStyle: 'circle'
+        },
+        'Non-reasoning + Closed': {
+          filter: function(m) { return !m.reasoningModel && !m.isOpenWeights; },
+          color: closedColor,
+          pointStyle: 'circle'
+        }
+      };
+
+      // Calculate Pareto frontier FIRST so we can label only those points
+      var allPoints = filteredModels.map(function(m) {
+        return { x: m.costToRun, y: getIndexValue(m, selectedIndex), label: m.name };
+      });
+
+      // Sort by cost (ascending)
+      allPoints.sort(function(a, b) { return a.x - b.x; });
+
+      // Find Pareto-optimal points (with epsilon for near-ties)
+      var paretoPoints = [];
+      var paretoInfo = {}; // Store both membership and index
+      var maxIntelligence = -Infinity;
+      var epsilon = 1.0; // Include points within 1 intelligence point of the frontier
+
+      for (var i = 0; i < allPoints.length; i++) {
+        if (allPoints[i].y > maxIntelligence - epsilon) {
+          paretoInfo[allPoints[i].label] = paretoPoints.length; // Store index
+          paretoPoints.push(allPoints[i]);
+          if (allPoints[i].y > maxIntelligence) {
+            maxIntelligence = allPoints[i].y;
+          }
+        }
+      }
+
+      chart.data.datasets = [];
+
+      Object.keys(groups).forEach(function(label) {
+        var group = groups[label];
+        var models = filteredModels.filter(group.filter);
+        if (models.length > 0) {
+          chart.data.datasets.push({
+            label: label,
+            data: models.map(function(m) {
+              var pIdx = paretoInfo[m.name];
+              return { x: m.costToRun, y: getIndexValue(m, selectedIndex), label: m.name, isPareto: pIdx !== undefined, paretoIndex: pIdx || 0 };
+            }),
+            backgroundColor: group.color + 'cc',
+            borderColor: group.color,
+            pointStyle: group.pointStyle,
+            pointRadius: 10,
+            pointHoverRadius: 12,
+            datalabels: {
+              display: function(context) {
+                return context.dataset.data[context.dataIndex].isPareto;
+              }
+            }
+          });
+        }
+      });
+
+      // Add Pareto frontier as a line
+      if (paretoPoints.length > 1) {
+        chart.data.datasets.unshift({
+          label: 'Pareto Frontier',
+          data: paretoPoints,
+          type: 'line',
+          borderColor: '#ff6b6b',
+          borderWidth: 2,
+          borderDash: [5, 5],
+          fill: false,
+          pointRadius: 0,
+          pointStyle: 'line',
+          tension: 0,
+          datalabels: { display: false }
+        });
+      }
+
+      // Update Pareto list (sorted by intelligence, highest first)
+      if (paretoPoints.length > 0) {
+        var sortedPareto = paretoPoints.slice().sort(function(a, b) { return b.y - a.y; });
+        var paretoHtml = '<ul class="list-unstyled mb-0">' + sortedPareto.map(function(p) {
+          return '<li><strong>' + p.label + '</strong> <span class="text-muted">(' + p.y.toFixed(1) + ' @ $' + p.x.toFixed(0) + ')</span></li>';
+        }).join('') + '</ul>';
+        $('#pareto-list').html(paretoHtml);
+      } else {
+        $('#pareto-list').html('<em>No models match current filters</em>');
+      }
+
+      chart.update();
+    }
+
+    // Custom filter function for table
+    $.fn.dataTable.ext.search.push(
+      function(settings, data, dataIndex) {
+        var reasoningFilter = $('#reasoning-filter').val();
+        var openSourceFilter = $('#open-source-filter').val();
+        var releaseFilter = $('#release-filter').val();
+
+        if (settings.nTable.id !== 'models-table') return true;
+
+        var row = table.row(dataIndex).node();
+        var reasoningCell = $(row).find('td:eq(3)');
+        var openSourceCell = $(row).find('td:eq(4)');
+
+        var reasoningMatch = true;
+        var openSourceMatch = true;
+        var releaseMatch = true;
+
+        if (reasoningFilter === 'reasoning') {
+          reasoningMatch = reasoningCell.find('.badge-success').length > 0 && reasoningCell.text().includes('Reasoning');
+        } else if (reasoningFilter === 'non-reasoning') {
+          reasoningMatch = reasoningCell.find('.badge-secondary').length > 0 && reasoningCell.text().includes('Non-reasoning');
+        }
+
+        if (openSourceFilter === 'yes') {
+          openSourceMatch = openSourceCell.find('.badge-success').length > 0 && openSourceCell.text().includes('Yes');
+        } else if (openSourceFilter === 'no') {
+          openSourceMatch = openSourceCell.find('.badge-secondary').length > 0 && openSourceCell.text().includes('No');
+        }
+
+        if (releaseFilter) {
+          var cutoffDate = new Date();
+          cutoffDate.setMonth(cutoffDate.getMonth() - parseInt(releaseFilter));
+          var cellData = $(row).find('td:eq(2)').data('order') || '';
+          if (cellData && cellData !== '0000-00-00') {
+            var modelDate = new Date(cellData);
+            releaseMatch = modelDate >= cutoffDate;
+          } else {
+            releaseMatch = false;
+          }
+        }
+
+        return reasoningMatch && openSourceMatch && releaseMatch;
+      }
+    );
+
+    // Apply filters when dropdowns change
+    $('#index-selector, #reasoning-filter, #open-source-filter, #release-filter').on('change', function() {
+      table.draw();
+      updateChart();
+    });
+
+    // Initial chart render
+    updateChart();
+  });
+</script>
