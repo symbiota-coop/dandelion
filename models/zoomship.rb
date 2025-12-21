@@ -32,6 +32,6 @@ class Zoomship
   end
 
   after_create do
-    tickets.create(account: account, event: event, complementary: true) if account
+    tickets.create(account: account, event: event, complimentary: true) if account
   end
 end

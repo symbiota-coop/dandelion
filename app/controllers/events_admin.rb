@@ -137,7 +137,7 @@ Dandelion::App.controller do
                                   @account.save
                                 end
     if successful_update_or_save
-      ticket = @account.tickets.create(event: @event, ticket_type: params[:ticket][:ticket_type_id], price: params[:ticket][:price], complementary: true)
+      ticket = @account.tickets.create(event: @event, ticket_type: params[:ticket][:ticket_type_id], price: params[:ticket][:price], complimentary: true)
       if ticket.persisted?
         ticket.send_ticket
       else

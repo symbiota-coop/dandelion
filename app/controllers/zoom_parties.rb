@@ -22,7 +22,7 @@ Dandelion::App.controller do
   get '/zoom_parties/attending' do
     sign_in_required!
     @event = Event.find(params[:event_id]) || not_found
-    current_account.tickets.create!(event: @event, zoomship_id: params[:zoomship_id], complementary: true)
+    current_account.tickets.create!(event: @event, zoomship_id: params[:zoomship_id], complimentary: true)
     redirect back
   end
 

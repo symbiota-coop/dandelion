@@ -14,7 +14,7 @@ class Ticket
 
   has_many :notifications, as: :notifiable, dependent: :destroy
 
-  attr_accessor :complementary, :prevent_notifications
+  attr_accessor :complimentary, :prevent_notifications
 
   field :price, type: Float
   field :discounted_price, type: Float
@@ -68,10 +68,10 @@ class Ticket
 
     self.id_string = id.to_s if id && !id_string
 
-    self.price = ticket_type.price if !price && !complementary && ticket_type && ticket_type.price
+    self.price = ticket_type.price if !price && !complimentary && ticket_type && ticket_type.price
     errors.add(:price, 'is too low') if price && ticket_type && ticket_type.range_min && price < ticket_type.range_min
 
-    self.payment_completed = true if complementary || price.nil? || price == 0
+    self.payment_completed = true if complimentary || price.nil? || price == 0
 
     self.original_ticket_type_name = ticket_type.name if ticket_type && !original_ticket_type_name
     self.currency = (order.try(:currency) || event.try(:currency)) unless currency
@@ -82,7 +82,7 @@ class Ticket
     self.discounted_price = calculate_discounted_price
 
     if new_record?
-      unless complementary
+      unless complimentary
         errors.add(:ticket_type, 'is full') if ticket_type && (ticket_type.number_of_tickets_available_in_single_purchase < 1)
         errors.add(:ticket_type, 'is not available as sales have ended') if (ticket_type && ticket_type.sales_ended?) || (event && event.sales_closed_due_to_event_end?)
         if ticket_type && ticket_type.minimum_monthly_donation && (
