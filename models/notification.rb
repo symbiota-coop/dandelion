@@ -60,10 +60,9 @@ class Notification
 
     notification = self
     circle = self.circle
-    content = ERB.new(File.read(Padrino.root('app/views/emails/notification.erb'))).result(binding)
     batch_message.from ENV['NOTIFICATIONS_EMAIL_FULL']
     batch_message.subject "[#{circle.name}] #{Nokogiri::HTML(notification.sentence).text}"
-    batch_message.body_html Premailer.new(ERB.new(File.read(Padrino.root('app/views/layouts/email.erb'))).result(binding), with_html_string: true, adapter: 'nokogiri', input_encoding: 'UTF-8').to_inline_css
+    batch_message.body_html EmailHelper.html(:notification, notification: notification, circle: circle)
 
     circle.discussers.each do |account|
       batch_message.add_recipient(:to, account.email, { 'firstname' => account.firstname || 'there', 'token' => account.sign_in_token, 'id' => account.id.to_s })

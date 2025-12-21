@@ -12,10 +12,9 @@ module EventNotifications
     batch_message = Mailgun::BatchMessage.new(mg_client, ENV['MAILGUN_NOTIFICATIONS_HOST'])
 
     event = self
-    content = ERB.new(File.read(Padrino.root('app/views/emails/event_destroyed.erb'))).result(binding)
     batch_message.from ENV['NOTIFICATIONS_EMAIL_FULL']
     batch_message.subject "#{destroyed_by.name} deleted the event #{event.name}"
-    batch_message.body_html Premailer.new(ERB.new(File.read(Padrino.root('app/views/layouts/email.erb'))).result(binding), with_html_string: true, adapter: 'nokogiri', input_encoding: 'UTF-8').to_inline_css
+    batch_message.body_html EmailHelper.html(:event_destroyed, destroyed_by: destroyed_by, event: event)
 
     accounts_receiving_feedback.each do |account|
       batch_message.add_recipient(:to, account.email, { 'firstname' => account.firstname || 'there', 'token' => account.sign_in_token, 'id' => account.id.to_s })
@@ -33,15 +32,15 @@ module EventNotifications
 
     event = self
 
-    tickets_table = ERB.new(File.read(Padrino.root('app/views/emails/_tickets_table.erb'))).result(binding)
-    content = ERB.new(File.read(Padrino.root('app/views/emails/reminder.erb'))).result(binding)
     batch_message.from ENV['REMINDERS_EMAIL_FULL']
     batch_message.reply_to(event.email || event.organisation.try(:reply_to))
     batch_message.subject(
       (event.reminder_email_title || event.organisation.reminder_email_title)
       .gsub('[event_name]', event.name)
     )
-    batch_message.body_html Premailer.new(ERB.new(File.read(Padrino.root('app/views/layouts/email.erb'))).result(binding), with_html_string: true, adapter: 'nokogiri', input_encoding: 'UTF-8').to_inline_css
+
+    tickets_table = EmailHelper.render(:_tickets_table, event: event)
+    batch_message.body_html EmailHelper.html(:reminder, event: event, tickets_table: tickets_table)
 
     (account_id == :all ? attendees.and(unsubscribed: false).and(unsubscribed_reminders: false) : attendees.and(unsubscribed: false).and(unsubscribed_reminders: false).and(id: account_id)).each do |account|
       when_parts = event.when_details(account.try(:time_zone), with_zone: true).split(', ')
@@ -59,12 +58,12 @@ module EventNotifications
 
     event = self
 
-    tickets_table = ERB.new(File.read(Padrino.root('app/views/emails/_tickets_table.erb'))).result(binding)
-    content = ERB.new(File.read(Padrino.root('app/views/emails/reminder_starred.erb'))).result(binding)
     batch_message.from ENV['REMINDERS_EMAIL_FULL']
     batch_message.reply_to(event.email || event.organisation.try(:reply_to))
     batch_message.subject "#{event.name} is next week"
-    batch_message.body_html Premailer.new(ERB.new(File.read(Padrino.root('app/views/layouts/email.erb'))).result(binding), with_html_string: true, adapter: 'nokogiri', input_encoding: 'UTF-8').to_inline_css
+
+    tickets_table = EmailHelper.render(:_tickets_table, event: event)
+    batch_message.body_html EmailHelper.html(:reminder_starred, event: event, tickets_table: tickets_table)
 
     (account_id == :all ? starrers.and(unsubscribed: false).and(unsubscribed_reminders: false) : starrers.and(unsubscribed: false).and(unsubscribed_reminders: false).and(id: account_id)).each do |account|
       when_parts = event.when_details(account.try(:time_zone), with_zone: true).split(', ')
@@ -82,14 +81,13 @@ module EventNotifications
     batch_message = Mailgun::BatchMessage.new(mg_client, ENV['MAILGUN_NOTIFICATIONS_HOST'])
 
     event = self
-    content = ERB.new(File.read(Padrino.root('app/views/emails/feedback.erb'))).result(binding)
     batch_message.from ENV['FEEDBACK_EMAIL_FULL']
     batch_message.reply_to(event.email || event.organisation.try(:reply_to))
     batch_message.subject(
       (event.feedback_email_title || event.organisation.feedback_email_title)
       .gsub('[event_name]', event.name)
     )
-    batch_message.body_html Premailer.new(ERB.new(File.read(Padrino.root('app/views/layouts/email.erb'))).result(binding), with_html_string: true, adapter: 'nokogiri', input_encoding: 'UTF-8').to_inline_css
+    batch_message.body_html EmailHelper.html(:feedback, event: event)
 
     (account_id == :all ? attendees.and(unsubscribed: false).and(unsubscribed_feedback: false) : attendees.and(unsubscribed: false).and(unsubscribed_feedback: false).and(id: account_id)).each do |account|
       batch_message.add_recipient(:to, account.email, { 'firstname' => account.firstname || 'there', 'token' => account.sign_in_token, 'id' => account.id.to_s })

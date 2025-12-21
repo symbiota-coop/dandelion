@@ -221,7 +221,7 @@ class Pmail
 
   def html(share_buttons: false)
     pmail = self
-    html = Premailer.new(ERB.new(File.read(Padrino.root('app/views/layouts/pmail.erb'))).result(binding), with_html_string: true, adapter: 'nokogiri', input_encoding: 'UTF-8').to_inline_css
+    html = EmailHelper.html(layout: 'pmail.erb', pmail: pmail, share_buttons: share_buttons)
     if link_params
       html.gsub(/href\s*=\s*"([^"]*)"/) do
         url = Regexp.last_match[1]

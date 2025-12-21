@@ -27,8 +27,6 @@ module TicketNotifications
     order.tickets = [ticket]
     order.account = account
 
-    tickets_table = ERB.new(File.read(Padrino.root('app/views/emails/_tickets_table.erb'))).result(binding)
-    content = ERB.new(File.read(Padrino.root('app/views/emails/tickets.erb'))).result(binding)
     batch_message.subject(event.ticket_email_title || "Ticket to #{event.name}")
 
     header_image_url, from_email = sender_info
@@ -36,7 +34,8 @@ module TicketNotifications
     batch_message.from from_email
     batch_message.reply_to(event.email || event.organisation.reply_to)
 
-    batch_message.body_html Premailer.new(ERB.new(File.read(Padrino.root('app/views/layouts/email.erb'))).result(binding), with_html_string: true, adapter: 'nokogiri', input_encoding: 'UTF-8').to_inline_css
+    tickets_table = EmailHelper.render(:_tickets_table, event: event, account: account)
+    batch_message.body_html EmailHelper.html(:tickets, event: event, order: order, account: account, tickets_table: tickets_table, header_image_url: header_image_url)
 
     unless event.no_tickets_pdf
       tickets_pdf_filename = "ticket-#{event.name.parameterize}-#{order.id}.pdf"
@@ -90,10 +89,9 @@ module TicketNotifications
     order = ticket.order
     event = order.event
     account = order.account
-    content = ERB.new(File.read(Padrino.root('app/views/emails/refund_failed_ticket.erb'))).result(binding)
     batch_message.from ENV['NOTIFICATIONS_EMAIL_FULL']
     batch_message.subject "Refund failed: #{account.name} in #{event.name}"
-    batch_message.body_html Premailer.new(ERB.new(File.read(Padrino.root('app/views/layouts/email.erb'))).result(binding), with_html_string: true, adapter: 'nokogiri', input_encoding: 'UTF-8').to_inline_css
+    batch_message.body_html EmailHelper.html(:refund_failed_ticket, account: account, event: event, error: error)
 
     (event.contacts + Account.and(admin: true)).uniq.each do |account|
       batch_message.add_recipient(:to, account.email, { 'firstname' => account.firstname || 'there', 'token' => account.sign_in_token, 'id' => account.id.to_s })
@@ -109,11 +107,9 @@ module TicketNotifications
     ticket = self
     order = ticket.order
     event = order.event
-    account = order.account
-    content = ERB.new(File.read(Padrino.root('app/views/emails/ticket_resale_previous_ticketholder.erb'))).result(binding)
     batch_message.from ENV['NOTIFICATIONS_EMAIL_FULL']
     batch_message.subject "Your ticket to #{event.name} was resold"
-    batch_message.body_html Premailer.new(ERB.new(File.read(Padrino.root('app/views/layouts/email.erb'))).result(binding), with_html_string: true, adapter: 'nokogiri', input_encoding: 'UTF-8').to_inline_css
+    batch_message.body_html EmailHelper.html(:ticket_resale_previous_ticketholder, event: event)
 
     [previous_account].each do |account|
       batch_message.add_recipient(:to, account.email, { 'firstname' => account.firstname || 'there', 'token' => account.sign_in_token, 'id' => account.id.to_s })
@@ -130,10 +126,9 @@ module TicketNotifications
     order = ticket.order
     event = order.event
     account = order.account
-    content = ERB.new(File.read(Padrino.root('app/views/emails/ticket_resale.erb'))).result(binding)
     batch_message.from ENV['NOTIFICATIONS_EMAIL_FULL']
     batch_message.subject "Ticket resale: #{account.name} in #{event.name}"
-    batch_message.body_html Premailer.new(ERB.new(File.read(Padrino.root('app/views/layouts/email.erb'))).result(binding), with_html_string: true, adapter: 'nokogiri', input_encoding: 'UTF-8').to_inline_css
+    batch_message.body_html EmailHelper.html(:ticket_resale, account: account, event: event, previous_account: previous_account)
 
     event.event_facilitators.each do |account|
       batch_message.add_recipient(:to, account.email, { 'firstname' => account.firstname || 'there', 'token' => account.sign_in_token, 'id' => account.id.to_s })
@@ -153,10 +148,9 @@ module TicketNotifications
 
     return unless account && ticket.email
 
-    content = ERB.new(File.read(Padrino.root('app/views/emails/ticket_email_update.erb'))).result(binding)
     batch_message.from ENV['NOTIFICATIONS_EMAIL_FULL']
     batch_message.subject "Ticket email update: #{account.name} in #{event.name}"
-    batch_message.body_html Premailer.new(ERB.new(File.read(Padrino.root('app/views/layouts/email.erb'))).result(binding), with_html_string: true, adapter: 'nokogiri', input_encoding: 'UTF-8').to_inline_css
+    batch_message.body_html EmailHelper.html(:ticket_email_update, account: account, event: event, ticket: ticket)
 
     event.event_facilitators.each do |account|
       batch_message.add_recipient(:to, account.email, { 'firstname' => account.firstname || 'there', 'token' => account.sign_in_token, 'id' => account.id.to_s })

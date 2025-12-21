@@ -87,11 +87,12 @@ class Membership
                       end
 
     content = gathering.welcome_email || ''
-    content = content.gsub('%gathering.name%', gathering.name)
-    content = content.gsub('%sign_in_details%', sign_in_details)
     batch_message.from ENV['NOTIFICATIONS_EMAIL_FULL']
     batch_message.subject "You're now a member of #{gathering.name}"
-    batch_message.body_html Premailer.new(ERB.new(File.read(Padrino.root('app/views/layouts/email.erb'))).result(binding), with_html_string: true, adapter: 'nokogiri', input_encoding: 'UTF-8').to_inline_css
+    batch_message.body_html EmailHelper.html(content: content) do |c|
+      c.gsub('%gathering.name%', gathering.name)
+       .gsub('%sign_in_details%', sign_in_details)
+    end
 
     [account].each do |account|
       batch_message.add_recipient(:to, account.email, { 'firstname' => account.firstname || 'there', 'token' => account.sign_in_token, 'id' => account.id.to_s })

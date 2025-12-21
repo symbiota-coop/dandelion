@@ -43,11 +43,10 @@ class Message
     message = self
     messenger = message.messenger
     messengee = message.messengee
-    content = ERB.new(File.read(Padrino.root('app/views/emails/message.erb'))).result(binding)
     batch_message.from "#{messenger.name} <#{ENV['NOTIFICATIONS_EMAIL']}>"
     batch_message.reply_to "#{messenger.name} <#{messenger.email}>"
     batch_message.subject "[Dandelion] Message from #{messenger.name}"
-    batch_message.body_html Premailer.new(ERB.new(File.read(Padrino.root('app/views/layouts/email.erb'))).result(binding), with_html_string: true, adapter: 'nokogiri', input_encoding: 'UTF-8').to_inline_css
+    batch_message.body_html EmailHelper.html(:message, messenger: messenger, message: message)
 
     [messengee].each do |account|
       batch_message.add_recipient(:to, account.email, { 'firstname' => account.firstname || 'there', 'token' => account.sign_in_token, 'id' => account.id.to_s })

@@ -2,25 +2,22 @@ Dandelion::App.controller do
   get '/orders/:id', provides: %i[html pdf ics] do
     @order = Order.find(params[:id]) || not_found
     @event = @order.event
-    event = @event
-    order = @order
     account = @order.account || not_found
-    pdf_link = true
-
-    tickets_table = ERB.new(File.read(Padrino.root('app/views/emails/_tickets_table.erb'))).result(binding)
-    content = ERB.new(File.read(Padrino.root('app/views/emails/tickets.erb'))).result(binding)
-                 .gsub('%recipient.token%', account.sign_in_token)
-
-    header_image_url, from_email = order.sender_info
 
     case content_type
     when :html
       @title = "Order confirmation for #{@event.name}"
-      Premailer.new(ERB.new(File.read(Padrino.root('app/views/layouts/email.erb'))).result(binding), with_html_string: true, adapter: 'nokogiri', input_encoding: 'UTF-8').to_inline_css
+      header_image_url, = @order.sender_info
+
+      tickets_table = EmailHelper.render(:_tickets_table, event: @event, account: account)
+      EmailHelper.html(:tickets, event: @event, order: @order, account: account, tickets_table: tickets_table, header_image_url: header_image_url, pdf_link: true) do |content|
+        content.gsub('%recipient.token%', account.sign_in_token)
+      end
+
     when :ics
       @event.ical(order: @order).to_ical
     when :pdf
-      order.tickets_pdf.render
+      @order.tickets_pdf.render
     end
   end
 

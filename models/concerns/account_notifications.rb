@@ -11,11 +11,10 @@ module AccountNotifications
     batch_message = Mailgun::BatchMessage.new(mg_client, ENV['MAILGUN_NOTIFICATIONS_HOST'])
 
     account = self
-    content = ERB.new(File.read(Padrino.root('app/views/emails/first_event.erb'))).result(binding)
     batch_message.from ENV['FOUNDER_EMAIL_FULL']
     batch_message.reply_to ENV['FOUNDER_EMAIL']
     batch_message.subject 'Congratulations on listing your first event on Dandelion!'
-    batch_message.body_text content
+    batch_message.body_text EmailHelper.render(:first_event)
 
     [account].each do |account|
       batch_message.add_recipient(:to, account.email, { 'firstname' => account.firstname || 'there' })
@@ -30,10 +29,9 @@ module AccountNotifications
     batch_message = Mailgun::BatchMessage.new(mg_client, ENV['MAILGUN_NOTIFICATIONS_HOST'])
 
     account = self
-    content = ERB.new(File.read(Padrino.root('app/views/emails/sign_in_code.erb'))).result(binding)
     batch_message.from ENV['NOTIFICATIONS_EMAIL_FULL']
     batch_message.subject 'Sign in code for Dandelion'
-    batch_message.body_html Premailer.new(ERB.new(File.read(Padrino.root('app/views/layouts/email.erb'))).result(binding), with_html_string: true, adapter: 'nokogiri', input_encoding: 'UTF-8').to_inline_css
+    batch_message.body_html EmailHelper.html(:sign_in_code)
 
     [account].each do |account|
       batch_message.add_recipient(:to, account.email, { 'firstname' => account.firstname || 'there', 'token' => account.sign_in_token, 'id' => account.id.to_s })
@@ -49,10 +47,9 @@ module AccountNotifications
     batch_message = Mailgun::BatchMessage.new(mg_client, ENV['MAILGUN_NOTIFICATIONS_HOST'])
 
     account = self
-    content = ERB.new(File.read(Padrino.root('app/views/emails/confirm_email.erb'))).result(binding)
     batch_message.from ENV['NOTIFICATIONS_EMAIL_FULL']
     batch_message.subject 'Confirm your email address'
-    batch_message.body_html Premailer.new(ERB.new(File.read(Padrino.root('app/views/layouts/email.erb'))).result(binding), with_html_string: true, adapter: 'nokogiri', input_encoding: 'UTF-8').to_inline_css
+    batch_message.body_html EmailHelper.html(:confirm_email)
 
     [account].each do |account|
       batch_message.add_recipient(:to, account.email, {
@@ -71,10 +68,9 @@ module AccountNotifications
     batch_message = Mailgun::BatchMessage.new(mg_client, ENV['MAILGUN_NOTIFICATIONS_HOST'])
 
     account = self
-    content = ERB.new(File.read(Padrino.root('app/views/emails/activation_notification.erb'))).result(binding)
     batch_message.from ENV['NOTIFICATIONS_EMAIL_FULL']
     batch_message.subject "You've activated your Dandelion account"
-    batch_message.body_html Premailer.new(ERB.new(File.read(Padrino.root('app/views/layouts/email.erb'))).result(binding), with_html_string: true, adapter: 'nokogiri', input_encoding: 'UTF-8').to_inline_css
+    batch_message.body_html EmailHelper.html(:activation_notification)
 
     [account].each do |account|
       batch_message.add_recipient(:to, account.email, { 'firstname' => account.firstname || 'there', 'token' => account.sign_in_token, 'id' => account.id.to_s })
@@ -120,10 +116,9 @@ module AccountNotifications
     batch_message = Mailgun::BatchMessage.new(mg_client, ENV['MAILGUN_NOTIFICATIONS_HOST'])
 
     account = self
-    content = ERB.new(File.read(Padrino.root('app/views/emails/feedback_summary.erb'))).result(binding)
     batch_message.from ENV['CONTACT_EMAIL_FULL']
     batch_message.subject 'New feedback summary from Dandelion'
-    batch_message.body_html Premailer.new(ERB.new(File.read(Padrino.root('app/views/layouts/email.erb'))).result(binding), with_html_string: true, adapter: 'nokogiri', input_encoding: 'UTF-8').to_inline_css
+    batch_message.body_html EmailHelper.html(:feedback_summary, account: account)
 
     [account].each do |account|
       batch_message.add_recipient(:to, account.email, { 'firstname' => account.firstname || 'there', 'token' => account.sign_in_token, 'id' => account.id.to_s })

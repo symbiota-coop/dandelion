@@ -115,11 +115,10 @@ class TicketType
 
     ticket_type = self
     event = self.event
-    content = ERB.new(File.read(Padrino.root('app/views/emails/payment_reminder.erb'))).result(binding)
     batch_message.from ENV['REMINDERS_EMAIL_FULL']
     batch_message.reply_to(event.email || event.organisation.reply_to)
     batch_message.subject "Payment reminder for #{event.name}"
-    batch_message.body_html Premailer.new(ERB.new(File.read(Padrino.root('app/views/layouts/email.erb'))).result(binding), with_html_string: true, adapter: 'nokogiri', input_encoding: 'UTF-8').to_inline_css
+    batch_message.body_html EmailHelper.html(:payment_reminder, event: event, ticket_type: ticket_type)
 
     batch_message.add_recipient(:to, email)
 

@@ -75,18 +75,16 @@ Dandelion::App.controller do
   get '/events/:id/ticket_email_preview' do
     @event = Event.find(params[:id]) || not_found
     event_admins_only!
-    event = @event
-    account = current_account
     order = @event.orders.new
     order.tickets.new(ticket_type: @event.ticket_types.first)
     order.tickets.new(ticket_type: @event.ticket_types.first)
-    order.account = account
-    header_image_url, from_email = order.sender_info
+    order.account = current_account
+    header_image_url, = order.sender_info
 
-    tickets_table = ERB.new(File.read(Padrino.root('app/views/emails/_tickets_table.erb'))).result(binding)
-    content = ERB.new(File.read(Padrino.root('app/views/emails/tickets.erb'))).result(binding)
-                 .gsub('%recipient.token%', current_account.sign_in_token)
-    Premailer.new(ERB.new(File.read(Padrino.root('app/views/layouts/email.erb'))).result(binding), with_html_string: true, adapter: 'nokogiri', input_encoding: 'UTF-8').to_inline_css
+    tickets_table = EmailHelper.render(:_tickets_table, event: @event, account: current_account)
+    EmailHelper.html(:tickets, event: @event, order: order, account: current_account, tickets_table: tickets_table, header_image_url: header_image_url) do |content|
+      content.gsub('%recipient.token%', current_account.sign_in_token)
+    end
   end
 
   get '/events/:id/reminder_email' do
@@ -98,14 +96,12 @@ Dandelion::App.controller do
   get '/events/:id/reminder_email_preview' do
     @event = Event.find(params[:id]) || not_found
     event_admins_only!
-    event = @event
-    account = current_account
 
-    tickets_table = ERB.new(File.read(Padrino.root('app/views/emails/_tickets_table.erb'))).result(binding)
-    content = ERB.new(File.read(Padrino.root('app/views/emails/reminder.erb'))).result(binding)
-                 .gsub('%recipient.firstname%', current_account.firstname)
-                 .gsub('%recipient.token%', current_account.sign_in_token)
-    Premailer.new(ERB.new(File.read(Padrino.root('app/views/layouts/email.erb'))).result(binding), with_html_string: true, adapter: 'nokogiri', input_encoding: 'UTF-8').to_inline_css
+    tickets_table = EmailHelper.render(:_tickets_table, event: @event)
+    EmailHelper.html(:reminder, event: @event, tickets_table: tickets_table) do |content|
+      content.gsub('%recipient.firstname%', current_account.firstname)
+             .gsub('%recipient.token%', current_account.sign_in_token)
+    end
   end
 
   get '/events/:id/feedback_request_email' do
@@ -117,12 +113,11 @@ Dandelion::App.controller do
   get '/events/:id/feedback_request_email_preview' do
     @event = Event.find(params[:id]) || not_found
     event_admins_only!
-    event = @event
-    content = ERB.new(File.read(Padrino.root('app/views/emails/feedback.erb'))).result(binding)
-                 .gsub('%recipient.firstname%', current_account.firstname)
-                 .gsub('%recipient.token%', current_account.sign_in_token)
-                 .gsub('%recipient.id%', current_account.id)
-    Premailer.new(ERB.new(File.read(Padrino.root('app/views/layouts/email.erb'))).result(binding), with_html_string: true, adapter: 'nokogiri', input_encoding: 'UTF-8').to_inline_css
+    EmailHelper.html(:feedback, event: @event) do |content|
+      content.gsub('%recipient.firstname%', current_account.firstname)
+             .gsub('%recipient.token%', current_account.sign_in_token)
+             .gsub('%recipient.id%', current_account.id)
+    end
   end
 
   post '/events/:id/create_ticket' do

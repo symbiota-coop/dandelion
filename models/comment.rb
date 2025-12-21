@@ -171,10 +171,9 @@ class Comment
     batch_message = Mailgun::BatchMessage.new(mg_client, ENV['MAILGUN_POSTS_HOST'])
 
     comment = self
-    content = ERB.new(File.read(Padrino.root('app/views/emails/comment.erb'))).result(binding)
     batch_message.from "Dandelion <#{comment.post_id}@#{ENV['MAILGUN_POSTS_HOST']}>"
     batch_message.subject comment.email_subject
-    batch_message.body_html Premailer.new(ERB.new(File.read(Padrino.root('app/views/layouts/email.erb'))).result(binding), with_html_string: true, adapter: 'nokogiri', input_encoding: 'UTF-8').to_inline_css
+    batch_message.body_html EmailHelper.html(:comment, comment: comment)
 
     accounts = Account.public
     accounts = accounts.and(unsubscribed: false) unless force

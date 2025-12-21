@@ -200,11 +200,9 @@ class Organisationship
     </div>)
     batch_message.from organisation.welcome_from
     batch_message.subject organisation.welcome_subject
-    batch_message.body_html Premailer.new(ERB.new(File.read(Padrino.root('app/views/layouts/email.erb'))).result(binding), with_html_string: true, adapter: 'nokogiri', input_encoding: 'UTF-8').to_inline_css
+    batch_message.body_html EmailHelper.html(content: content)
 
-    [account].each do |account|
-      batch_message.add_recipient(:to, account.email, { 'firstname' => account.firstname || 'there', 'token' => account.sign_in_token, 'id' => account.id.to_s })
-    end
+    batch_message.add_recipient(:to, account.email, { 'firstname' => account.firstname || 'there', 'token' => account.sign_in_token, 'id' => account.id.to_s })
 
     batch_message.finalize if organisation.mailgun_api_key
     set(sent_welcome: true)
@@ -256,11 +254,9 @@ class Organisationship
     </div>)
     batch_message.from organisation.monthly_donation_welcome_from
     batch_message.subject organisation.monthly_donation_welcome_subject
-    batch_message.body_html Premailer.new(ERB.new(File.read(Padrino.root('app/views/layouts/email.erb'))).result(binding), with_html_string: true, adapter: 'nokogiri', input_encoding: 'UTF-8').to_inline_css
+    batch_message.body_html EmailHelper.html(content: content)
 
-    [account].each do |account|
-      batch_message.add_recipient(:to, account.email, { 'firstname' => account.firstname || 'there', 'token' => account.sign_in_token, 'id' => account.id.to_s, 'username' => account.username })
-    end
+    batch_message.add_recipient(:to, account.email, { 'firstname' => account.firstname || 'there', 'token' => account.sign_in_token, 'id' => account.id.to_s, 'username' => account.username })
 
     batch_message.finalize if organisation.mailgun_api_key
     set(sent_monthly_donation_welcome: true)
