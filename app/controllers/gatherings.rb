@@ -31,13 +31,7 @@ Dandelion::App.controller do
   get '/g/new' do
     sign_in_required!
     @gathering = Gathering.new(currency: current_account.default_currency)
-    @gathering.welcome_email = %(<p>Hi %recipient.firstname%,</p>
-
-<p>You're now a member of %gathering.name% on Dandelion.</p>
-
-<p>
-  %sign_in_details%
-</p>)
+    @gathering.welcome_email = @gathering.welcome_email_default
     Gathering.enablable.each do |x|
       @gathering.send("enable_#{x}=", true) unless x == 'shift_worth'
     end

@@ -117,9 +117,7 @@ class EventFeedback
     batch_message.subject "#{event.organisation.name} responded to your feedback on #{event.name}"
     batch_message.body_html EmailHelper.html(:event_feedback_response, event_feedback: event_feedback, event: event)
 
-    [account].each do |account|
-      batch_message.add_recipient(:to, account.email, { 'firstname' => account.firstname || 'there', 'token' => account.sign_in_token, 'id' => account.id.to_s })
-    end
+    batch_message.add_recipient(:to, account.email, { 'firstname' => account.firstname || 'there', 'token' => account.sign_in_token, 'id' => account.id.to_s })
 
     batch_message.finalize if Padrino.env == :production
   end

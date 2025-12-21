@@ -104,6 +104,16 @@ class Gathering
     self
   end
 
+  def welcome_email_default
+    %(<p>Hi %recipient.firstname%,</p>
+
+<p>You're now a member of %gathering.name% on Dandelion.</p>
+
+<p>
+  %sign_in_details%
+</p>)
+  end
+
   def application_questions_a
     q = (application_questions || '').split("\n").map(&:strip).reject(&:blank?)
     q.empty? ? [] : q

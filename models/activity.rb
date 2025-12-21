@@ -219,9 +219,7 @@ class Activity
     file.rewind
     batch_message.add_attachment(file.path, 'applications.csv')
 
-    [account].each do |account|
-      batch_message.add_recipient(:to, account.email, { 'firstname' => account.firstname || 'there', 'token' => account.sign_in_token, 'id' => account.id.to_s })
-    end
+    batch_message.add_recipient(:to, account.email, { 'firstname' => account.firstname || 'there', 'token' => account.sign_in_token, 'id' => account.id.to_s })
 
     batch_message.finalize if Padrino.env == :production
     file.close

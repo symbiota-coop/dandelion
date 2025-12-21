@@ -66,9 +66,7 @@ module TicketNotifications
     if email
       batch_message.add_recipient(:to, email)
     else
-      [account].each do |account|
-        batch_message.add_recipient(:to, account.email, { 'token' => account.sign_in_token, 'id' => account.id.to_s })
-      end
+      batch_message.add_recipient(:to, account.email, { 'token' => account.sign_in_token, 'id' => account.id.to_s })
     end
 
     batch_message.finalize if Padrino.env == :production

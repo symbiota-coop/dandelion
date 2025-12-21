@@ -80,9 +80,7 @@ module OrderNotifications
       end
     end
 
-    [account].each do |account|
-      batch_message.add_recipient(:to, account.email, { 'token' => account.sign_in_token, 'id' => account.id.to_s })
-    end
+    batch_message.add_recipient(:to, account.email, { 'token' => account.sign_in_token, 'id' => account.id.to_s })
 
     if ENV['MAILGUN_API_KEY']
       message_ids = batch_message.finalize
