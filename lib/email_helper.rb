@@ -23,11 +23,8 @@ module EmailHelper
     raise ArgumentError, 'Either template or content must be provided' if template.nil? && content.nil? && layout == 'email.erb'
     raise ArgumentError, 'Cannot provide both template and content' if template && content
 
-    if template
-      content = render(template.to_sym, **locals)
-      content = block.call(content) if block_given?
-    end
-
+    content = render(template.to_sym, **locals) if template
+    content = block.call(content) if block_given?
     context = TemplateContext.new(locals.merge(content: content))
 
     Premailer.new(
