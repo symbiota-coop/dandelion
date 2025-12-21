@@ -29,6 +29,7 @@
       <label for="release-filter" class="form-label">Released in last:</label>
       <select id="release-filter" class="form-control">
         <option value="">All time</option>
+        <option value="1" selected>1 month</option>
         <option value="3">3 months</option>
         <option value="6">6 months</option>
         <option value="12">12 months</option>
@@ -50,7 +51,6 @@
           <canvas id="cost-intelligence-chart" height="140"></canvas>
         </div>
         <div class="col-md-3">
-          <strong>Pareto Frontier:</strong>
           <div id="pareto-list" class="mt-2">Loading...</div>
         </div>
       </div>
@@ -179,12 +179,153 @@
       ]
     });
 
+    // Custom plugin for leader lines with collision avoidance
+    var leaderLinePlugin = {
+      id: 'leaderLines',
+      afterDatasetsDraw: function(chart) {
+        var ctx = chart.ctx;
+        var labels = [];
+        var allPoints = []; // All Pareto point positions
+        var labelHeight = 12;
+        var labelPadding = 4;
+        var baseLineLength = 25;
+        var pointRadius = 12; // Approximate point radius for collision
+
+        // First pass: collect all Pareto points
+        chart.data.datasets.forEach(function(dataset, datasetIndex) {
+          if (dataset.type === 'line') return;
+          var meta = chart.getDatasetMeta(datasetIndex);
+          meta.data.forEach(function(element, index) {
+            var dataPoint = dataset.data[index];
+            if (!dataPoint.isPareto) return;
+
+            ctx.font = '10px sans-serif';
+            var textWidth = ctx.measureText(dataPoint.label).width;
+
+            var pointInfo = {
+              label: dataPoint.label,
+              pointX: element.x,
+              pointY: element.y,
+              textWidth: textWidth,
+              angle: 0,
+              lineLength: baseLineLength
+            };
+            labels.push(pointInfo);
+            allPoints.push({ x: element.x, y: element.y });
+          });
+        });
+
+        // Sort by x position (left to right along Pareto frontier)
+        labels.sort(function(a, b) { return a.pointX - b.pointX; });
+
+        // Calculate label end positions
+        function calcLabelBox(lbl) {
+          var endX = lbl.pointX + Math.cos(lbl.angle) * lbl.lineLength;
+          var endY = lbl.pointY + Math.sin(lbl.angle) * lbl.lineLength;
+          return {
+            x: endX + labelPadding,
+            y: endY - labelHeight / 2,
+            width: lbl.textWidth,
+            height: labelHeight,
+            endX: endX,
+            endY: endY
+          };
+        }
+
+        // Check if two boxes overlap
+        function boxesOverlap(a, b) {
+          return !(a.x + a.width < b.x || b.x + b.width < a.x ||
+                   a.y + a.height < b.y || b.y + b.height < a.y);
+        }
+
+        // Check if a box overlaps with a circle (point)
+        function boxOverlapsPoint(box, point) {
+          // Find closest point on box to circle center
+          var closestX = Math.max(box.x, Math.min(point.x, box.x + box.width));
+          var closestY = Math.max(box.y, Math.min(point.y, box.y + box.height));
+          var dx = point.x - closestX;
+          var dy = point.y - closestY;
+          return (dx * dx + dy * dy) < (pointRadius * pointRadius);
+        }
+
+        // Try to resolve collisions iteratively
+        var angles = [0, Math.PI/6, Math.PI/4, Math.PI/3, Math.PI/2.5, -Math.PI/8, -Math.PI/6];
+        var lengths = [25, 35, 45, 55, 65, 75];
+
+        for (var i = 0; i < labels.length; i++) {
+          var currentLabel = labels[i];
+          var bestConfig = { angle: 0, lineLength: baseLineLength, collisions: Infinity };
+
+          // Try different angle/length combinations
+          for (var ai = 0; ai < angles.length; ai++) {
+            for (var li = 0; li < lengths.length; li++) {
+              currentLabel.angle = angles[ai];
+              currentLabel.lineLength = lengths[li];
+              var currentBox = calcLabelBox(currentLabel);
+
+              var collisionCount = 0;
+
+              // Check against all previous labels
+              for (var j = 0; j < i; j++) {
+                var otherBox = calcLabelBox(labels[j]);
+                if (boxesOverlap(currentBox, otherBox)) {
+                  collisionCount++;
+                }
+              }
+
+              // Check against all Pareto points
+              for (var p = 0; p < allPoints.length; p++) {
+                if (boxOverlapsPoint(currentBox, allPoints[p])) {
+                  collisionCount++;
+                }
+              }
+
+              // Prefer shorter lines and smaller angles when no collisions
+              var score = collisionCount * 1000 + lengths[li] + Math.abs(angles[ai]) * 10;
+              if (score < bestConfig.collisions * 1000 + bestConfig.lineLength + Math.abs(bestConfig.angle) * 10) {
+                bestConfig = { angle: angles[ai], lineLength: lengths[li], collisions: collisionCount };
+              }
+
+              if (collisionCount === 0) break; // Found good config, stop searching lengths
+            }
+            if (bestConfig.collisions === 0) break; // Found good config, stop searching angles
+          }
+
+          currentLabel.angle = bestConfig.angle;
+          currentLabel.lineLength = bestConfig.lineLength;
+        }
+
+        // Draw all labels with resolved positions
+        labels.forEach(function(lbl) {
+          var box = calcLabelBox(lbl);
+
+          ctx.save();
+          // Draw leader line
+          ctx.beginPath();
+          ctx.moveTo(lbl.pointX, lbl.pointY);
+          ctx.lineTo(box.endX, box.endY);
+          ctx.strokeStyle = '#999';
+          ctx.lineWidth = 1;
+          ctx.stroke();
+
+          // Draw label
+          ctx.font = '10px sans-serif';
+          ctx.fillStyle = '#666';
+          ctx.textBaseline = 'middle';
+          ctx.textAlign = 'left';
+          ctx.fillText(lbl.label, box.endX + labelPadding, box.endY);
+          ctx.restore();
+        });
+      }
+    };
+
     // Initialize scatter chart
     var ctx = document.getElementById('cost-intelligence-chart').getContext('2d');
     Chart.register(ChartDataLabels);
     var chart = new Chart(ctx, {
       type: 'scatter',
       data: { datasets: [] },
+      plugins: [leaderLinePlugin],
       options: {
         responsive: true,
         maintainAspectRatio: true,
@@ -193,20 +334,7 @@
         },
         plugins: {
           datalabels: {
-            align: function(context) {
-              var point = context.dataset.data[context.dataIndex];
-              return point.alternateLabel ? 'left' : 'right';
-            },
-            anchor: function(context) {
-              var point = context.dataset.data[context.dataIndex];
-              return point.alternateLabel ? 'start' : 'end';
-            },
-            offset: 4,
-            font: { size: 10 },
-            color: '#666',
-            formatter: function(value) {
-              return value.label;
-            }
+            display: false // Labels drawn by leaderLinePlugin
           },
           tooltip: {
             callbacks: {
@@ -308,8 +436,8 @@
       // Group by reasoning and open source
       // Colors: primary green for open source, grey for closed source
       // Shapes: triangle for reasoning (like a bright idea), circle for non-reasoning
-      var openColor = '#00B963';
-      var closedColor = '#6c757d';
+      var openColor = '#4F9DFA';
+      var closedColor = '#000000';
 
       var groups = {
         'Reasoning + Open Source': {
@@ -358,30 +486,6 @@
         }
       }
 
-      // Determine which points should alternate labels (if within epsilon of previous point)
-      var costRatioThreshold = 2.0; // Points must be within 2x cost to be considered close
-      for (var i = 0; i < paretoPoints.length; i++) {
-        paretoPoints[i].alternateLabel = false;
-        paretoPoints[i].inCluster = false;
-      }
-      for (var i = 1; i < paretoPoints.length; i++) {
-        var prevPoint = paretoPoints[i - 1];
-        var currPoint = paretoPoints[i];
-        // Check if points are close on both axes (Y within epsilon, X within cost ratio)
-        var yClose = Math.abs(currPoint.y - prevPoint.y) <= epsilon;
-        var costRatio = Math.max(currPoint.x, prevPoint.x) / Math.min(currPoint.x, prevPoint.x);
-        var xClose = costRatio <= costRatioThreshold;
-        if (yClose && xClose) {
-          currPoint.inCluster = true;
-          // If previous point isn't already in a cluster, start the cluster on the left
-          if (!prevPoint.inCluster) {
-            prevPoint.inCluster = true;
-            prevPoint.alternateLabel = true; // Start on left
-          }
-          // Alternate based on previous point's state
-          currPoint.alternateLabel = !prevPoint.alternateLabel;
-        }
-      }
 
       chart.data.datasets = [];
 
@@ -389,30 +493,27 @@
         var group = groups[label];
         var models = filteredModels.filter(group.filter);
         if (models.length > 0) {
+          var dataPoints = models.map(function(m) {
+            var pIdx = paretoInfo[m.name];
+            return {
+              x: m.costToRun,
+              y: getIndexValue(m, selectedIndex),
+              label: m.name,
+              isPareto: pIdx !== undefined,
+              paretoIndex: pIdx || 0
+            };
+          });
           chart.data.datasets.push({
             label: label,
-            data: models.map(function(m) {
-              var pIdx = paretoInfo[m.name];
-              var paretoPoint = pIdx !== undefined ? paretoPoints[pIdx] : null;
-              return {
-                x: m.costToRun,
-                y: getIndexValue(m, selectedIndex),
-                label: m.name,
-                isPareto: pIdx !== undefined,
-                paretoIndex: pIdx || 0,
-                alternateLabel: paretoPoint ? paretoPoint.alternateLabel : false
-              };
+            data: dataPoints,
+            backgroundColor: dataPoints.map(function(point) {
+              return group.color + (point.isPareto ? 'ff' : '33');
             }),
-            backgroundColor: group.color + 'cc',
-            borderColor: group.color,
+            borderWidth: 0,
             pointStyle: group.pointStyle,
             pointRadius: 10,
             pointHoverRadius: 12,
-            datalabels: {
-              display: function(context) {
-                return context.dataset.data[context.dataIndex].isPareto;
-              }
-            }
+            datalabels: { display: false }
           });
         }
       });
@@ -434,11 +535,11 @@
         });
       }
 
-      // Update Pareto list (sorted by intelligence, highest first)
+      // Update Pareto list (sorted by cost, highest first)
       if (paretoPoints.length > 0) {
-        var sortedPareto = paretoPoints.slice().sort(function(a, b) { return b.y - a.y; });
+        var sortedPareto = paretoPoints.slice().sort(function(a, b) { return b.x - a.x; });
         var paretoHtml = '<ul class="list-unstyled mb-0">' + sortedPareto.map(function(p) {
-          return '<li><strong>' + p.label + '</strong> <span class="text-muted">(' + p.y.toFixed(1) + ' @ $' + p.x.toFixed(0) + ')</span></li>';
+          return '<li><strong>' + p.label + '</strong> <span class="text-muted">($' + p.x.toFixed(0) + ' @ ' + p.y.toFixed(1) + ')</span></li>';
         }).join('') + '</ul>';
         $('#pareto-list').html(paretoHtml);
       } else {

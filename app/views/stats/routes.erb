@@ -1,30 +1,68 @@
+<div class="mb-3">
+  <p>
+    Showing <strong><%= pluralize(@methods.count, 'route') %></strong>
+    <% if @methods.any? %>
+      (sorted by lines of code)
+    <% end %>
+  </p>
+</div>
+
 <div class="table-responsive">
-  <table id="routes-table" class="table table-hover">
+  <table id="controller-methods-table" class="table table-hover">
     <thead>
       <tr>
-        <th>Verb</th>
-        <th>Path</th>
+        <th>#</th>
+        <th>Method</th>
+        <th class="text-right">LOC</th>
+        <th>File</th>
+        <th>Lines</th>
       </tr>
     </thead>
     <tbody>
-      <% @routes.each do |route| %>
+      <% @methods.each_with_index do |method, idx| %>
         <tr>
+          <td><%= idx + 1 %></td>
           <td>
-            <span class="badge badge-<%= case route[:verb]
-                                          when 'GET' then 'secondary'
-                                          when 'POST' then 'success'
-                                          when 'PUT' then 'warning'
-                                          when 'PATCH' then 'info'
-                                          when 'DELETE' then 'danger'
+            <% route_parts = method[:name].split(' ', 2) %>
+            <% route_type = route_parts[0] %>
+            <% route_path = route_parts[1] %>
+            <span class="badge badge-<%= case route_type.downcase
+                                          when 'get' then 'secondary'
+                                          when 'post' then 'success'
+                                          when 'put' then 'warning'
+                                          when 'patch' then 'info'
+                                          when 'delete' then 'danger'
+                                          else 'secondary'
                                           end %>">
-              <%= route[:verb] %>
+              <%= route_type.upcase %>
             </span>
+            <code><%= route_path %></code>
+          </td>
+          <td class="text-right" data-order="<%= method[:loc] %>">
+            <strong><%= method[:loc] %></strong>
           </td>
           <td>
-            <code><%= route[:path] %></code>
+            <code><%= method[:file] %></code>
+          </td>
+          <td>
+            <code><%= method[:start_line] %>-<%= method[:end_line] %></code>
           </td>
         </tr>
       <% end %>
     </tbody>
   </table>
 </div>
+
+<script>
+  $(function() {
+    $('#controller-methods-table').DataTable({
+      paging: true,
+      pageLength: 50,
+      searching: true,
+      order: [[2, 'desc']], // Sort by LOC descending
+      columnDefs: [
+        { type: 'num', targets: 2 } // LOC column is numeric
+      ]
+    });
+  });
+</script>

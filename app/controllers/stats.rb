@@ -3,7 +3,7 @@ Dandelion::App.controller do
     admins_only!
   end
 
-  get '/stats/models' do
+  get '/stats/llms' do
     response = Faraday.get('https://artificialanalysis.ai/models') do |req|
       req.headers['RSC'] = '1'
     end
@@ -59,32 +59,7 @@ Dandelion::App.controller do
       model['cost_to_run'] = input_cost + output_cost
     end
 
-    erb :'stats/models'
-  end
-
-  get '/stats/routes' do
-    # Collect all routes from the Padrino application
-    @routes = []
-
-    # Access routes from the application
-    Dandelion::App.routes.each do |route|
-      # Extract route information
-      verb = route.verb.to_s
-      # Skip HEAD routes
-      next if verb == 'HEAD'
-
-      path = route.path.to_s
-
-      @routes << {
-        verb: verb,
-        path: path
-      }
-    end
-
-    # Sort routes by path for better readability
-    @routes.sort_by! { |r| [r[:path], r[:verb]] }
-
-    erb :'stats/routes'
+    erb :'stats/llms'
   end
 
   get '/stats/charts' do
@@ -223,6 +198,39 @@ Dandelion::App.controller do
     @total_size = @files.sum { |f| f[:size] }
 
     erb :'stats/files'
+  end
+
+  get '/stats/routes' do
+    route_pattern = /^(\s*)(get|post|put|delete|patch|options|head)\s+['"]([^'"]+)['"]/
+
+    @methods = (Dir.glob(Padrino.root('app/controllers/*.rb')) + [Padrino.root('app/app.rb')]).flat_map do |file_path|
+      lines = File.readlines(file_path)
+      filename = File.basename(file_path)
+
+      # Find all route starts with their line numbers and indentation
+      route_starts = lines.each_with_index.filter_map do |line, idx|
+        next unless (match = line.match(route_pattern))
+
+        { name: "#{match[2]} #{match[3]}", indent: match[1].size, start: idx }
+      end
+
+      # For each route, find its matching 'end'
+      route_starts.map do |route|
+        end_line = lines[(route[:start] + 1)..].each_with_index.find do |line, _|
+          line.strip == 'end' && line[/\A */].size == route[:indent]
+        end&.last
+
+        next unless end_line
+
+        end_idx = route[:start] + 1 + end_line + 1
+        { name: route[:name], file: filename, start_line: route[:start] + 1,
+          end_line: end_idx, loc: end_idx - route[:start] }
+      end.compact
+    rescue StandardError
+      []
+    end.sort_by { |m| -m[:loc] }
+
+    erb :'stats/routes'
   end
 
   ###
