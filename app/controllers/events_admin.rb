@@ -97,7 +97,7 @@ Dandelion::App.controller do
     @event = Event.find(params[:id]) || not_found
     event_admins_only!
 
-    tickets_table = EmailHelper.render(:_tickets_table, event: @event)
+    tickets_table = EmailHelper.render(:_tickets_table, event: @event, account: current_account)
     EmailHelper.html(:reminder, event: @event, tickets_table: tickets_table) do |content|
       content.gsub('%recipient.firstname%', current_account.firstname)
              .gsub('%recipient.token%', current_account.sign_in_token)
