@@ -221,7 +221,7 @@ class Pmail
 
   def html(share_buttons: false)
     pmail = self
-    html = EmailHelper.html(layout: 'pmail.erb', pmail: pmail, share_buttons: share_buttons)
+    html = EmailHelper.html(layout: :pmail, pmail: pmail, share_buttons: share_buttons)
     if link_params
       html.gsub(/href\s*=\s*"([^"]*)"/) do
         url = Regexp.last_match[1]
