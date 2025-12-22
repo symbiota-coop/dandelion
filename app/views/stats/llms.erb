@@ -3,8 +3,8 @@
     <div class="col-md-3">
       <label for="index-selector" class="form-label">Index:</label>
       <select id="index-selector" class="form-control">
-        <option value="intelligence" selected>Intelligence</option>
-        <option value="agentic">Agentic</option>
+        <option value="intelligence">Intelligence</option>
+        <option value="agentic" selected>Agentic</option>
         <option value="coding">Coding</option>
         <option value="math">Math</option>
       </select>
@@ -29,8 +29,8 @@
       <label for="release-filter" class="form-label">Released in last:</label>
       <select id="release-filter" class="form-control">
         <option value="">All time</option>
-        <option value="1" selected>1 month</option>
-        <option value="3">3 months</option>
+        <option value="1">1 month</option>
+        <option value="3" selected>3 months</option>
         <option value="6">6 months</option>
         <option value="12">12 months</option>
         <option value="24">24 months</option>
@@ -42,7 +42,7 @@
 <div class="mb-4">
   <div class="card">
     <div class="card-header d-flex justify-content-between align-items-center">
-      <h5 class="mb-0" id="chart-title">Intelligence Index vs Cost to Run</h5>
+      <h5 class="mb-0" id="chart-title"></h5>
       <button id="reset-zoom" class="btn btn-sm btn-outline-secondary">Reset Zoom</button>
     </div>
     <div class="card-body">
@@ -78,7 +78,7 @@
       <% @models.each do |model| %>
         <tr>
           <td>
-            <strong><%= model['name'] %></strong>
+            <strong><%= model['name'].gsub(/\s*\(Reasoning\)\s*/i, '').gsub(/\s*\(Non-reasoning\)\s*/i, '').strip %><% if model['reasoning_model'] %> <i class="bi bi-lightbulb"></i><% end %></strong>
             <br>
             <small class="text-muted"><code><%= model['slug'] %></code></small>
           </td>
@@ -169,11 +169,16 @@
     math: 'Math Index'
   };
 
+  // Clean model names for display (remove reasoning/non-reasoning suffixes)
+  function cleanModelName(name) {
+    return name.replace(/\s*\(Reasoning\)\s*/gi, '').replace(/\s*\(Non-reasoning\)\s*/gi, '').trim();
+  }
+
   $(function() {
     var table = $('#models-table').DataTable({
       paging: false,
       searching: true,
-      order: [[5, 'desc']], // Sort by Intelligence Index descending
+      order: [[6, 'desc']], // Sort by Agentic Index descending
       columnDefs: [
         { type: 'num', targets: [5, 6, 7, 8, 9] } // Numeric columns
       ]
@@ -200,10 +205,11 @@
             if (!dataPoint.isPareto) return;
 
             ctx.font = '10px sans-serif';
-            var textWidth = ctx.measureText(dataPoint.label).width;
+            var displayLabel = cleanModelName(dataPoint.label);
+            var textWidth = ctx.measureText(displayLabel).width;
 
             var pointInfo = {
-              label: dataPoint.label,
+              label: displayLabel,
               pointX: element.x,
               pointY: element.y,
               textWidth: textWidth,
@@ -215,8 +221,8 @@
           });
         });
 
-        // Sort by x position (left to right along Pareto frontier)
-        labels.sort(function(a, b) { return a.pointX - b.pointX; });
+        // Sort by x position (right to left, highest cost first)
+        labels.sort(function(a, b) { return b.pointX - a.pointX; });
 
         // Calculate label end positions
         function calcLabelBox(lbl) {
@@ -340,7 +346,7 @@
             callbacks: {
               label: function(context) {
                 var point = context.raw;
-                return point.label + ': Cost $' + point.x.toFixed(0) + ', Intelligence ' + point.y.toFixed(1);
+                return cleanModelName(point.label) + ': Cost $' + point.x.toFixed(0) + ', Intelligence ' + point.y.toFixed(1);
               }
             }
           },
@@ -464,7 +470,7 @@
 
       // Calculate Pareto frontier FIRST so we can label only those points
       var allPoints = filteredModels.map(function(m) {
-        return { x: m.costToRun, y: getIndexValue(m, selectedIndex), label: m.name };
+        return { x: m.costToRun, y: getIndexValue(m, selectedIndex), label: m.name, reasoningModel: m.reasoningModel };
       });
 
       // Sort by cost (ascending)
@@ -539,7 +545,8 @@
       if (paretoPoints.length > 0) {
         var sortedPareto = paretoPoints.slice().sort(function(a, b) { return b.x - a.x; });
         var paretoHtml = '<ul class="list-unstyled mb-0">' + sortedPareto.map(function(p) {
-          return '<li><strong>' + p.label + '</strong> <span class="text-muted">($' + p.x.toFixed(0) + ' @ ' + p.y.toFixed(1) + ')</span></li>';
+          var lightbulbIcon = p.reasoningModel ? ' <i class="bi bi-lightbulb"></i>' : '';
+          return '<li><strong>' + cleanModelName(p.label) + lightbulbIcon + '</strong> <span class="text-muted">($' + p.x.toFixed(0) + ' @ ' + p.y.toFixed(1) + ')</span></li>';
         }).join('') + '</ul>';
         $('#pareto-list').html(paretoHtml);
       } else {
