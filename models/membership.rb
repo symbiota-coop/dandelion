@@ -100,7 +100,8 @@ class Membership
   handle_asynchronously :send_email
 
   after_destroy do
-    account.notifications_as_notifiable.create! circle: gathering, type: 'left_gathering'
+    # Only create notification if account is not being destroyed (voluntary leave vs. account deletion)
+    account.notifications_as_notifiable.create! circle: gathering, type: 'left_gathering' if account && !account.flagged_for_destroy?
     gathering.set(membership_count: gathering.memberships.count)
     if mapplication
       mapplication.prevent_notifications = true
