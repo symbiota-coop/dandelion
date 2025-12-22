@@ -30,7 +30,7 @@
     <% end %>
 
   </td>
-  <td style="font-size: 1.2em; border-top: 0; vertical-align: middle; white-space: nowrap;">
+  <td style="font-size: 1.2em; border-top: 0; vertical-align: middle;">
     <% if ticket_type.range %>
       <span><%= m ticket_type.range_min, @event.currency %> - <%= m ticket_type.range_max, @event.currency %></span>
       <%= range_field_tag :"prices[#{ticket_type.id}]",
@@ -65,7 +65,7 @@
           <div class="input-group-prepend">
             <span class="input-group-text"><%= money_symbol(@event.currency) %></span>
           </div>
-          <%= number_field_tag :"prices[#{ticket_type.id}]", min: 1, class: 'form-control',
+          <%= number_field_tag :"prices[#{ticket_type.id}]", min: 1, class: 'form-control', style: 'min-width: 3em',
               value: (params[:prices][ticket_type.id.to_s] if params[:prices]),
               oninput: "$(this).parent().next().find('.select-a-price-first').css('visibility','hidden'); var qty = $(this).parent().parent().parent().next().find('[name^=quantities]'); qty.attr('data-price',this.value); if (qty.prop('disabled')) { qty.val(1); }; qty.prop('disabled',false).change();" %>
 

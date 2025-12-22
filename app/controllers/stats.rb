@@ -48,7 +48,7 @@ Dandelion::App.controller do
       unless host
         non_free = host_models.select { |hm| (hm['price_1m_blended_3_to_1'] || 0) > 0 }
         most_common_price = non_free.group_by { |hm| hm['price_1m_blended_3_to_1'].round(4) }
-                                    .max_by { |_price, providers| providers.size }
+                                    .max_by { |price, providers| [providers.size, -price] }
                                     &.first
         host = non_free.find { |hm| hm['price_1m_blended_3_to_1'].round(4) == most_common_price } if most_common_price
       end
