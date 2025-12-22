@@ -11,6 +11,16 @@ module EmailHelper
     end
   end
 
+  def self.theme_css(color)
+    %(
+      a { color: #{color}; }
+      a:hover { color: #{color.paint.darken} !important; }
+      p.action a { background: #{color}; }
+      p.action a:hover { background: #{color.paint.darken} !important; }
+      blockquote { border-left: 0.25em solid #{color.paint.opacity(0.33)} !important; }
+    )
+  end
+
   def self.render(template_name, **locals)
     context = TemplateContext.new(locals)
     ERB.new(File.read(Padrino.root("app/views/emails/#{template_name}.erb"))).result(context.get_binding)

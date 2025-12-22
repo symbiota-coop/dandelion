@@ -32,10 +32,10 @@
   # Stroke width
   stroke_width = base_unit * 1       # 8
 
-  # Colors
-  month_bg_color = "#B9EAD1"         # Light green background
-  border_color = "#8DDCB2"           # Medium green border/stroke
-  text_color = "#666"                # Gray text color  
+  # Colors (can be set from rake task, defaults provided)
+  month_bg_color ||= "#B9EAD1"         # Light green background
+  border_color ||= "#8DDCB2"           # Medium green border/stroke
+  text_color ||= "#666"                # Gray text color  
 %>
 
 <svg width="<%= svg_size %>" height="<%= svg_size %>" viewBox="0 0 <%= viewbox_size %> <%= viewbox_size %>" xmlns="http://www.w3.org/2000/svg">

@@ -200,7 +200,7 @@ module OrganisationFields
         collect_location: 'Ask for location of ticket buyers',
         reply_to: 'Reply address for ticket emails',
         minimal_head: 'Extra content for &lt;head&gt; when embedding events page',
-        theme_color: 'Theme color when embedding events page',
+        theme_color: 'Theme color',
         affiliate_share_image_url: 'Affiliate share image URL',
         welcome_from: 'Welcome email from',
         welcome_subject: 'Welcome email subject',

@@ -11,25 +11,9 @@
         body { padding-top: 1em }
       <% end %>
       <%= File.read(Padrino.root('app/assets/stylesheets/email.css')) %>
-        a {
-          color: #00B963;
-        }
 
-        a:hover {
-          color: #00A558;
-        }
-
-        p.action a {
-          background: #00B963;
-        }
-
-        p.action a:hover {
-          background: #00A558 !important;
-        }
-
-        blockquote {
-          border-left: 0.25em solid rgba(0, 185, 99, 0.33);
-        }
+      <% email_theme_color = (defined?(event) && event.theme_color_or_organisation_theme_color) || '#00B963' %>
+      <%= EmailHelper.theme_css(email_theme_color) %>
     </style>
   </head>
   <body>

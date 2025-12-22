@@ -2,7 +2,7 @@
   <tbody>
     <tr>
       <td>
-        <img src="<%=ENV['BASE_URI']%>/images/icons/calendar/png/<%= event.start_time.strftime('%b').downcase %>_<%= event.start_time.strftime('%d') %>.png">
+        <img src="<%=ENV['BASE_URI']%>/images/icons/calendar/png/<%= event.theme_color_or_organisation_theme_color ? 'greyscale' : 'green' %>/<%= event.start_time.strftime('%b').downcase %>_<%= event.start_time.strftime('%d') %>.png">
       </td>
       <td>
         <% if defined?(account) %>
@@ -26,9 +26,9 @@
       <td>
         <a <% if event.location != 'Online' %>href="https://www.google.com/maps?q=<%=event.location%>"<% end %> target="_blank">
           <% if event.location == 'Online' %>
-            <img src="<%=ENV['BASE_URI']%>/images/icons/image/image-camera-video.png">
+            <img src="<%=ENV['BASE_URI']%>/images/icons/image/<%= event.theme_color_or_organisation_theme_color ? 'greyscale' : 'green' %>/image-camera-video.png">
           <% else %>
-            <img src="<%=ENV['BASE_URI']%>/images/icons/image/image-geo-alt.png">
+            <img src="<%=ENV['BASE_URI']%>/images/icons/image/<%= event.theme_color_or_organisation_theme_color ? 'greyscale' : 'green' %>/image-geo-alt.png">
           <% end %>
         </a>
       </td>

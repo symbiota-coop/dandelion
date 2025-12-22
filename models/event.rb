@@ -178,6 +178,10 @@ class Event
     time_zone || organisation.try(:time_zone) || ENV['DEFAULT_TIME_ZONE']
   end
 
+  def theme_color_or_organisation_theme_color
+    theme_color || organisation.try(:theme_color)
+  end
+
   after_save :clear_cache
   def clear_cache
     fragments.delete_all
