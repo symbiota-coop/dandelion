@@ -206,10 +206,12 @@
 
             ctx.font = '10px sans-serif';
             var displayLabel = cleanModelName(dataPoint.label);
-            var textWidth = ctx.measureText(displayLabel).width;
+            var lightbulbSymbol = dataPoint.reasoningModel ? ' ▲' : '';
+            var labelWithIcon = displayLabel + lightbulbSymbol;
+            var textWidth = ctx.measureText(labelWithIcon).width;
 
             var pointInfo = {
-              label: displayLabel,
+              label: labelWithIcon,
               pointX: element.x,
               pointY: element.y,
               textWidth: textWidth,
@@ -506,7 +508,8 @@
               y: getIndexValue(m, selectedIndex),
               label: m.name,
               isPareto: pIdx !== undefined,
-              paretoIndex: pIdx || 0
+              paretoIndex: pIdx || 0,
+              reasoningModel: m.reasoningModel
             };
           });
           chart.data.datasets.push({
