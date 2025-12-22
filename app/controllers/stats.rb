@@ -47,10 +47,7 @@ Dandelion::App.controller do
       host = host_models.find { |hm| hm['id'] == primary_host_id }
       unless host
         non_free = host_models.select { |hm| (hm['price_1m_blended_3_to_1'] || 0) > 0 }
-        most_common_price = non_free.group_by { |hm| hm['price_1m_blended_3_to_1'].round(4) }
-                                    .max_by { |price, providers| [providers.size, -price] }
-                                    &.first
-        host = non_free.find { |hm| hm['price_1m_blended_3_to_1'].round(4) == most_common_price } if most_common_price
+        host = non_free.min_by { |hm| hm['price_1m_blended_3_to_1'] }
       end
       next unless host && host['price_1m_input_tokens'] && host['price_1m_output_tokens']
 
