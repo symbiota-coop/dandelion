@@ -52,7 +52,7 @@ module OrderNotifications
     batch_message.reply_to(event.email || event.organisation.reply_to)
 
     tickets_table = EmailHelper.render(:_tickets_table, event: event, account: account)
-    batch_message.body_html EmailHelper.html(:tickets, event: event, order: order, account: account, tickets_table: tickets_table, header_image_url: header_image_url, pdf_link: true)
+    batch_message.body_html EmailHelper.html(:tickets, event: event, order: order, account: account, tickets_table: tickets_table, header_image_url: header_image_url)
 
     unless event.no_tickets_pdf
       tickets_pdf_filename = "#{tickets.count == 1 ? 'ticket' : 'tickets'}-#{event.name.parameterize}-#{order.id}.pdf"
