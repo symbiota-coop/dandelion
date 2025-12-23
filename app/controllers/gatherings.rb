@@ -52,7 +52,7 @@ Dandelion::App.controller do
     end
   end
 
-  get '/g/:slug' do
+  get '/g/:slug', prerender: true do
     @gathering = Gathering.find_by(slug: params[:slug]) || not_found
     @membership = @gathering.memberships.find_by(account: current_account)
     if @membership

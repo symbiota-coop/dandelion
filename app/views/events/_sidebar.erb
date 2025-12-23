@@ -89,7 +89,7 @@
               <% else %>
                 You must be signed in and a member of the
               <% end %>
-              <a href="/activities/<%= @event.activity_id %>"><%= @event.activity.name %></a> activity to book tickets to this event.
+              <a href="/o/<%= @event.activity.organisation.slug %>/a/<%= @event.activity.slug %>"><%= @event.activity.name %></a> activity to book tickets to this event.
               <% if !current_account %><a href="/accounts/sign_in">Sign in</a> &middot; <% end %>
               <a href="/activities/<%= @event.activity_id %>/apply">Apply</a>
             </p>

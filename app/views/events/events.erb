@@ -30,7 +30,7 @@
 <% if params[:display] == 'map' %>
   <%= partial :'maps/map', locals: { url: "/events", bounding_box: @bounding_box&.flatten, fill_screen: true } %>
 <% else %>
-  <div data-pagelet-url="/events?<%= request.query_string %>">
-    <%= partial :'events/events' %>
+  <div data-with-placeholder data-pagelet-url="/events?<%= request.query_string %>">
+    <%= partial :'events/blocks_placeholder' %>
   </div>
 <% end %>

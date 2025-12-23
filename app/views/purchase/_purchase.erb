@@ -319,7 +319,7 @@ end
 
   config = {
     eventId: @event.id,
-    eventUrl: "#{ENV['BASE_URI']}/events/#{@event.id}",
+    eventUrl: "#{ENV['BASE_URI']}/e/#{@event.slug}",
     placesRemaining: @event.places_remaining,
     currency: @event.currency,
     currencySymbol: money_symbol(@event.currency),

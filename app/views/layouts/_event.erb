@@ -35,7 +35,7 @@
     "offers": (@event.ticket_types.map { |ticket_type|
       {
         "@type": "Offer",
-        "url": "#{ENV['BASE_URI']}/events/#{@event.id}",
+        "url": "#{ENV['BASE_URI']}/e/#{@event.slug}",
         "price": (ticket_type.price || ticket_type.range_min),
         "priceCurrency": @event.currency,
         "availability": ticket_type.number_of_tickets_available_in_single_purchase > 0 ? "https://schema.org/InStock" : "https://schema.org/SoldOut",

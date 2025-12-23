@@ -6,7 +6,7 @@
     <%= partial :'organisations/nav', locals: { organisation: local_group.organisation, inline: true } %>
   <% end %>
   <%= dropdown_nav [
-        ['View local group', "/local_groups/#{local_group.id}"],
+        ['View local group', "/o/#{local_group.organisation.slug}/lg/#{local_group.slug}"],
         ['Settings', "/local_groups/#{local_group.id}/edit"],
         [%(Followers <span class="badge badge-primary">#{local_group.local_groupships.count}</span>), "/local_groups/#{local_group.id}/followers"],
         ['Discount codes' + (local_group.discount_codes.count.positive? ? " <span class='badge badge-primary'>#{local_group.discount_codes.count}</span>" : ''), "/local_groups/#{local_group.id}/discount_codes"],

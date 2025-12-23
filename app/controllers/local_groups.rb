@@ -27,7 +27,7 @@ Dandelion::App.controller do
     redirect "/o/#{@local_group.organisation.slug}/lg/#{@local_group.slug}"
   end
 
-  get '/o/:organisation_slug/lg/:slug' do
+  get '/o/:organisation_slug/lg/:slug', prerender: true do
     organisation = Organisation.find_by(slug: params[:organisation_slug]) || not_found
     @local_group = organisation.local_groups.find_by(slug: params[:slug]) || not_found
     @title = @local_group.name

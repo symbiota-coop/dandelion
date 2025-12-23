@@ -111,12 +111,12 @@
         <% end %>
 
         <% if @event.organisation.activities.exists? %>
-          <%= f.lookup_block :activity_id, lookup_url: "/o/#{@event.organisation_id}/activities.json", placeholder: 'Search activities', selected_link: (%(<a class="d-inline-block mt-1" target="_blank" href="/activities/#{@event.activity_id}">View activity</a>) if @event.activity_id) %>
+          <%= f.lookup_block :activity_id, lookup_url: "/o/#{@event.organisation_id}/activities.json", placeholder: 'Search activities', selected_link: (%(<a class="d-inline-block mt-1" target="_blank" href="/o/#{@event.activity.organisation.slug}/a/#{@event.activity.slug}">View activity</a>) if @event.activity) %>
         <% end %>
 
         <% if @event.organisation.local_groups.exists? %>
           <div id="local-group-select" <% unless @event.organisation.experimental? %> class="mb-3" <% end %>>
-            <%= f.lookup_block :local_group_id, lookup_url: "/o/#{@event.organisation_id}/local_groups.json", placeholder: 'Search local groups', selected_link: (%(<a class="d-inline-block mt-1" target="_blank" href="/local_groups/#{@event.local_group_id}">View local group</a>) if @event.local_group_id) %>
+            <%= f.lookup_block :local_group_id, lookup_url: "/o/#{@event.organisation_id}/local_groups.json", placeholder: 'Search local groups', selected_link: (%(<a class="d-inline-block mt-1" target="_blank" href="/o/#{@event.local_group.organisation.slug}/lg/#{@event.local_group.slug}">View local group</a>) if @event.local_group) %>
           </div>
           <% if Padrino.env == :development || @event.organisation.experimental? %>
             <p id="do-zoom-party">or <a href="javascript:;">turn this event into a Zoom party (experimental)</a></p>

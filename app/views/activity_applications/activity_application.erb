@@ -7,7 +7,7 @@
     <div class="mb-3">
       <h1 class="my-0">
         <a class="text-dark" href="/u/<%= @account.username %>"><%= @account.name %></a>'s application to
-        <a class="text-dark" href="/activities/<%= @activity.id %>"><%= @activity.name %></a>
+        <a class="text-dark" href="/o/<%= @activity.organisation.slug %>/a/<%= @activity.slug %>"><%= @activity.name %></a>
       </h1>
       <div data-pagelet-url="/activities/<%= @activity.id %>/activity_applications/<%= @activity_application.id %>/set_status">
         <%= partial :'activity_applications/set_status' %>

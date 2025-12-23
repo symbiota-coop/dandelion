@@ -6,7 +6,7 @@
     <%= partial :'organisations/nav', locals: { organisation: activity.organisation, inline: true } %>
   <% end %>
   <%= dropdown_nav [
-        ['View activity', "/activities/#{activity.id}"],
+        ['View activity', "/o/#{activity.organisation.slug}/a/#{activity.slug}"],
         ['Settings', "/activities/#{activity.id}/edit"],
         (['Preview application form', "/activities/#{activity.id}/apply"] if activity.privacy == 'closed'),
         ([%(Applications <span class="badge badge-primary">#{activity.activity_applications.outstanding.count}</span>), "/activities/#{activity.id}/applications"] if activity.privacy == 'closed'),

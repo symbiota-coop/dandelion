@@ -25,7 +25,7 @@
           <ul>
             <% @account.activityships.includes(:activity).and(:activity_id.in => organisation.activities.pluck(:id)).each { |activityship| activity = activityship.activity %>
             <li>
-              <a href="/activities/<%= activity.id %>"><%= activity.name %></a>
+              <a href="/o/<%= activity.organisation.slug %>/a/<%= activity.slug %>"><%= activity.name %></a>
               <div class="d-inline-block" data-pagelet-url="/activities/<%= activity.id %>/activityship"></div>
             </li>
             <% } %>
@@ -33,7 +33,7 @@
           <ul>
             <% @account.local_groupships.includes(:local_group).and(:local_group_id.in => organisation.local_groups.pluck(:id)).each { |local_groupship| local_group = local_groupship.local_group %>
             <li>
-              <a href="/local_groups/<%= local_group.id %>"><%= local_group.name %></a>
+              <a href="/o/<%= local_group.organisation.slug %>/lg/<%= local_group.slug %>"><%= local_group.name %></a>
               <div class="d-inline-block" data-pagelet-url="/local_groups/<%= local_group.id %>/local_groupship"></div>
             </li>
             <% } %>

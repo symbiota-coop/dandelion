@@ -1,5 +1,5 @@
 Dandelion::App.controller do
-  get '/events', provides: %i[html ics json] do
+  get '/events', provides: %i[html ics json], prefetch: true do
     @events = Event.live.public.browsable
     @from = params[:from] ? parse_date(params[:from]) : Date.today
     @to = params[:to] ? parse_date(params[:to]) : nil
@@ -166,7 +166,7 @@ Dandelion::App.controller do
     end
   end
 
-  get '/e/:slug', provides: %i[html ics json] do
+  get '/e/:slug', provides: %i[html ics json], prerender: true do
     session[:via] = params[:via] if params[:via]
     session[:return_to] = request.url
     @event = Event.find_by(slug: params[:slug])

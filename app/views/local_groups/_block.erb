@@ -1,6 +1,6 @@
 <div class="block">
   <h4 class="block-title">
-    <a class="text-dark" href="<%= "/local_groups/#{local_group.id}" %>" onclick="event.stopPropagation();"><%= local_group.name %></a>
+    <a class="text-dark" href="<%= "/o/#{local_group.organisation.slug}/lg/#{local_group.slug}" %>" onclick="event.stopPropagation();"><%= local_group.name %></a>
     <small>
       <%= local_group.organisation.name %>
     </small>

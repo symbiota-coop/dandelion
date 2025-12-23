@@ -74,12 +74,12 @@
       </td>
       <td>
         <% (activityships_by_account[account.id] || []).each { |activityship| %>
-        <a href="/activities/<%= activityship.activity_id %>" class="label label-primary text-white d-inline-block mb-1"><%= activityship.activity.name %></a>
+        <a href="/o/<%= activityship.activity.organisation.slug %>/a/<%= activityship.activity.slug %>" class="label label-primary text-white d-inline-block mb-1"><%= activityship.activity.name %></a>
         <% } %>
       </td>
       <td>
         <% (local_groupships_by_account[account.id] || []).each { |local_groupship| %>
-        <a href="/local_groups/<%= local_groupship.local_group_id %>" class="label label-primary text-white d-inline-block mb-1"><%= local_groupship.local_group.name %></a>
+        <a href="/o/<%= local_groupship.local_group.organisation.slug %>/lg/<%= local_groupship.local_group.slug %>" class="label label-primary text-white d-inline-block mb-1"><%= local_groupship.local_group.name %></a>
         <% } %>
       </td>
       <td>

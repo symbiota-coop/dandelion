@@ -1,11 +1,11 @@
 <td style="text-align: center">
   <% if event.activity %>
     <% if event.activity.image %>
-      <a href="/activities/<%= event.activity.id %>">
+      <a href="/o/<%= event.activity.organisation.slug %>/a/<%= event.activity.slug %>">
         <img src="<%= u event.activity.image.thumb('500x500#').url %>" style="width: 50px">
       </a>
       <br>
     <% end %>
-    <a href="/activities/<%= event.activity.id %>"><%= event.activity.name %></a>
+    <a href="/o/<%= event.activity.organisation.slug %>/a/<%= event.activity.slug %>"><%= event.activity.name %></a>
   <% end %>
 </td>

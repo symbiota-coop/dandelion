@@ -3,18 +3,7 @@
   <meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" name="viewport">
   <link rel="manifest" href="/manifest.json">
 
-  <script type="speculationrules">
-    {
-      "prerender": [
-        {
-          "where": {
-            "href_matches": "/e/:slug"
-          },
-          "eagerness": "moderate"
-        }
-      ]
-    }
-  </script>
+  <%== SpeculativeRoutes.script %>
 
   <% if Padrino.env == :production %>
     <% if !params[:minimal] && !params[:ticket_form_only] %>

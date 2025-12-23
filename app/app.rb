@@ -252,9 +252,7 @@ module Dandelion
       if (theme_color = params[:theme_color])
         theme_color = "##{theme_color}" unless theme_color.start_with?('#')
         # Validate hex color format: # followed by 3 or 6 hexadecimal characters
-        if theme_color.match?(/\A#[0-9A-Fa-f]{3}\z|\A#[0-9A-Fa-f]{6}\z/)
-          scss_content.sub!(/\$theme-color:.*?;/, "$theme-color: #{theme_color};")
-        end
+        scss_content.sub!(/\$theme-color:.*?;/, "$theme-color: #{theme_color};") if theme_color.match?(/\A#[0-9A-Fa-f]{3}\z|\A#[0-9A-Fa-f]{6}\z/)
       end
       Sass::Engine.new(scss_content, syntax: :scss).render
     end

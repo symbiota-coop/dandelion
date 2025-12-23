@@ -8,17 +8,17 @@
   Facilitators
 <% elsif pmail.mailable %>
   <% if pmail.mailable.is_a?(Activity) %>
-    Activity: <a href="/activities/<%= pmail.mailable_id %>"><%= pmail.mailable.name %></a>
+    Activity: <a href="/o/<%= pmail.mailable.organisation.slug %>/a/<%= pmail.mailable.slug %>"><%= pmail.mailable.name %></a>
   <% elsif pmail.mailable.is_a?(ActivityTag) %>
     Activity tag:
     <span class="text-white label label-primary d-inline-block mb-1"><%= pmail.mailable.name %></span>
   <% elsif pmail.mailable.is_a?(LocalGroup) %>
-    Local group: <a href="/local_groups/<%= pmail.mailable_id %>"><%= pmail.mailable.name %></a>
+    Local group: <a href="/o/<%= pmail.mailable.organisation.slug %>/lg/<%= pmail.mailable.slug %>"><%= pmail.mailable.name %></a>
   <% elsif pmail.mailable.is_a?(Event) %>
     <% if pmail.waitlist %>
-      Waitlist: <a href="/events/<%= pmail.mailable_id %>"><%= pmail.mailable.name %></a>
+      Waitlist: <a href="/e/<%= pmail.mailable.slug %>"><%= pmail.mailable.name %></a>
     <% else %>
-      Event: <a href="/events/<%= pmail.mailable_id %>"><%= pmail.mailable.name %></a>
+      Event: <a href="/e/<%= pmail.mailable.slug %>"><%= pmail.mailable.name %></a>
     <% end %>
     <br />
     <small><%= concise_when_details(pmail.mailable) %></small>

@@ -233,7 +233,7 @@ Dandelion::App.controller do
     { password: @account.password }.to_json
   end
 
-  get '/u/:username' do
+  get '/u/:username', prerender: true do
     @account = Account.find_by(username: params[:username]) || not_found
     if request.xhr?
       if @account.private?

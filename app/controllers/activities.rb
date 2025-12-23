@@ -27,7 +27,7 @@ Dandelion::App.controller do
     redirect "/o/#{@activity.organisation.slug}/a/#{@activity.slug}"
   end
 
-  get '/o/:organisation_slug/a/:slug' do
+  get '/o/:organisation_slug/a/:slug', prerender: true do
     organisation = Organisation.find_by(slug: params[:organisation_slug]) || not_found
     @activity = organisation.activities.find_by(slug: params[:slug]) || not_found
     @title = @activity.name

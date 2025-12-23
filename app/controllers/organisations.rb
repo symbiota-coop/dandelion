@@ -98,7 +98,7 @@ Dandelion::App.controller do
     end
   end
 
-  get '/o/:slug' do
+  get '/o/:slug', prerender: true do
     @organisation = Organisation.find_by(slug: params[:slug]) || not_found
     @title = @organisation.name
     erb :'organisations/organisation'

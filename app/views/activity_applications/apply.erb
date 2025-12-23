@@ -15,7 +15,7 @@
       </div>
     <% end %>
     <% if params[:applied] %>
-      <h1>Thanks for applying to <a href="/activities/<%= @activity.id %>"><%= @activity.name %></a></h1>
+      <h1>Thanks for applying to <a href="/o/<%= @activity.organisation.slug %>/a/<%= @activity.slug %>"><%= @activity.name %></a></h1>
       <% if @activity.thank_you_message %>
         <div class="wysiwyg">
           <%== Sanitize.fragment(@activity.thank_you_message, Sanitize::Config::DANDELION) %>
@@ -24,7 +24,7 @@
         <p>We'll get back to you as soon as possible!</p>
       <% end %>
     <% else %>
-      <h1>Apply to <a href="/activities/<%= @activity.id %>"><%= @activity.name %></a></h1>
+      <h1>Apply to <a href="/o/<%= @activity.organisation.slug %>/a/<%= @activity.slug %>"><%= @activity.name %></a></h1>
       <% if @activity.extra_info_for_application_form %>
         <%== Sanitize.fragment(@activity.extra_info_for_application_form, Sanitize::Config::DANDELION) %>
       <% end %>

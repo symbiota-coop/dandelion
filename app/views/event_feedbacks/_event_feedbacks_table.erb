@@ -51,7 +51,7 @@
     <% if defined?(activity_name) %>
       <td>
         <% if event_feedback.event && event_feedback.event.activity %>
-          <a href="/activities/<%= event_feedback.event.activity_id %>"><%= event_feedback.event.activity.name %></a>
+          <a href="/o/<%= event_feedback.event.activity.organisation.slug %>/a/<%= event_feedback.event.activity.slug %>"><%= event_feedback.event.activity.name %></a>
         <% end %>
       </td>
     <% end %>

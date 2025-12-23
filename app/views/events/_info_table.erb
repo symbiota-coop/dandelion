@@ -31,7 +31,7 @@
     <tr>
       <td>Activity</td>
       <td>
-        <a href="/activities/<%= @event.activity_id %>"><%= @event.activity.name %></a>
+        <a href="/o/<%= @event.activity.organisation.slug %>/a/<%= @event.activity.slug %>"><%= @event.activity.name %></a>
       </td>
     </tr>
   <% end %>
@@ -39,7 +39,7 @@
     <tr>
       <td>Local group</td>
       <td>
-        <a href="/local_groups/<%= @event.local_group_id %>"><%= @event.local_group.name %></a>
+        <a href="/o/<%= @event.local_group.organisation.slug %>/lg/<%= @event.local_group.slug %>"><%= @event.local_group.name %></a>
       </td>
     </tr>
   <% end %>

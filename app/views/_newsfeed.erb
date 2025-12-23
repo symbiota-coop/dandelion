@@ -20,7 +20,7 @@
               <span class="float-right label label-<%= mapplication.label %>"><%= mapplication.status.capitalize %></span>
             <% end %>
             <% if notification.type.to_sym == :left_feedback; event_feedback = notification.notifiable %>
-              <a href="/events/<%= event_feedback.event_id %>" class="float-right">
+              <a href="/e/<%= event_feedback.event.slug %>" class="float-right">
                 <% if event_feedback.rating %>
                   <% event_feedback.rating.times do %><i class="bi bi-star-fill"></i><% end %>
                 <% end %>

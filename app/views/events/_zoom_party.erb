@@ -19,7 +19,7 @@
     <td style="width: 1px" data-sort="<%= 1 if my_local_group_ids_in_this_organisation.include?(zoomship.local_group.id) %>">
     </td>
     <td class="text-dark">
-      <a href="/local_groups/<%= zoomship.local_group.id %>"><%= zoomship.local_group.name %></a>
+      <a href="/o/<%= zoomship.local_group.organisation.slug %>/lg/<%= zoomship.local_group.slug %>"><%= zoomship.local_group.name %></a>
     </td>
     <td class="text-dark">
       <a target="_blank" href="<%= zoomship.link %>"><%= zoomship.link %></a>

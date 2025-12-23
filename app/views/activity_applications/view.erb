@@ -6,7 +6,7 @@
     <div class="mb-3">
       <h1 class="my-0">
         <a class="text-dark" href="/u/<%= @account.username %>"><%= @account.name %></a>'s application to
-        <a class="text-dark" href="/activities/<%= @activity.id %>"><%= @activity.name %></a>
+        <a class="text-dark" href="/o/<%= @activity.organisation.slug %>/a/<%= @activity.slug %>"><%= @activity.name %></a>
       </h1>
     </div>
     <div class="mt-2">
