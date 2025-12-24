@@ -62,7 +62,7 @@
         </div>
 
         <p class="mb-5">
-          <a href="/u/<%= account.username %>"><%= account.name %></a> on <a href="/events/<%= event_feedback.event.id %>"><%= event_feedback.event.name %></a>
+          <a href="/u/<%= account.username %>"><%= account.name %></a> on <a href="/e/<%= event_feedback.event.slug %>"><%= event_feedback.event.name %></a>
           <small><%= timeago event_feedback.created_at %></small>
         </p>
 

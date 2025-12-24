@@ -91,7 +91,7 @@
         <% end %>
       <% end %>
       <% if event_feedback.event %>
-        on <a <% if params[:minimal] %>target="_blank"<% end %>  href="/events/<%= event_feedback.event.id %>"><%= event_feedback.event.name %></a>
+        on <a <% if params[:minimal] %>target="_blank"<% end %>  href="/e/<%= event_feedback.event.slug %>"><%= event_feedback.event.name %></a>
       <% end %>
     </td>
     <td style="white-space: nowrap;"><% if event_feedback.deleted_at%><em>Removed</em><% else %><% event_feedback.rating.times do %><i class="bi bi-star-fill"></i><% end %><% end %></td>

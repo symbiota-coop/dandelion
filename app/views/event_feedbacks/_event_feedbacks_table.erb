@@ -44,7 +44,7 @@
     <% if defined?(event_name) %>
       <td>
         <% if event_feedback.event %>
-          <a href="/events/<%= event_feedback.event_id %>"><%= event_feedback.event.name %></a>
+          <a href="/e/<%= event_feedback.event.slug %>"><%= event_feedback.event.name %></a>
         <% end %>
       </td>
     <% end %>
