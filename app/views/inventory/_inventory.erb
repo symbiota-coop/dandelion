@@ -29,7 +29,7 @@
     </td>
     <td>
       <% if inventory_item.account %>
-        <a href="/accounts/<%= inventory_item.account_id %>"><%= inventory_item.account.name %></a>
+        <a href="/u/<%= inventory_item.account.username %>"><%= inventory_item.account.name %></a>
       <% end %>
     </td>
     <td>

@@ -14,7 +14,7 @@
     <span style="display: none"><%= tactivity.description.truncate(150) if tactivity.description %></span>
     <span class="<% if image %>text-white<% else %>text-dark<% end %>">
       by
-      <a class="<% if image %>text-white<% else %>text-dark<% end %>" href="/accounts/<%= tactivity.account_id %>"><%= tactivity.account.name %></a>
+      <a class="<% if image %>text-white<% else %>text-dark<% end %>" href="/u/<%= tactivity.account.username %>"><%= tactivity.account.name %></a>
     </span>
     <div>
       <div class="<% if image %>text-white<% else %>text-dark<% end %>" style="display: inline-block" data-pagelet-url="/tactivities/<%= tactivity.id %>/attendees"></div>

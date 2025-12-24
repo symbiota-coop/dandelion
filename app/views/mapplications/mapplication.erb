@@ -1,4 +1,4 @@
 <h2>
-  <a href="/accounts/<%= @mapplication.account_id %>"><%= @mapplication.account.name %></a>'s application
+  <a href="/u/<%= @mapplication.account.username %>"><%= @mapplication.account.name %></a>'s application
 </h2>
 <%= partial :'mapplications/mapplication', locals: { mapplication: @mapplication } %>

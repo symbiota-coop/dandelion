@@ -125,7 +125,7 @@
             <a href="/g/<%= @gathering.slug %>/teams/<%= spend.team_id %>"><%= spend.team.name %></a>
           <% end %>
         </td>
-        <td><a href="/accounts/<%= spend.account_id %>"><%= spend.account.name %></a></td>
+        <td><a href="/u/<%= spend.account.username %>"><%= spend.account.name %></a></td>
         <td>
           <% if spend.reimbursed %>
             <i style="cursor: pointer" class="bi bi-check-lg" onclick="$(this).hide().next().show().find('input').click()"></i>

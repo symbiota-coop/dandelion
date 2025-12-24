@@ -24,7 +24,7 @@
             <% end %>
           <% end %>
         </span>
-        <strong><a href="/accounts/<%= comment.account_id %>"><%= comment.account.name %></a></strong>
+        <strong><a href="/u/<%= comment.account.username %>"><%= comment.account.name %></a></strong>
         <small class="subtle">
           <a class="text-muted" href="#post-<%= post.id %>"><%= timeago(comment.created_at) %></a>
           <% if admin? or (current_account && comment.account_id == current_account.id) %>
