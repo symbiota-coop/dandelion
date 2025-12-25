@@ -874,7 +874,23 @@ figure.image,
 }
 
 .row.block.no-gutters.align-items-stretch {
-  margin: 0
+  margin: 0;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.row.block.no-gutters.align-items-stretch:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.12);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .row.block.no-gutters.align-items-stretch {
+    transition: none;
+  }
+
+  .row.block.no-gutters.align-items-stretch:hover {
+    transform: none;
+  }
 }
 
 @media(min-width: 992px) {
