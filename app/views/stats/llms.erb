@@ -1,40 +1,28 @@
 <div class="mb-3">
-  <div class="row">
-    <div class="col-md-3">
-      <label for="index-selector" class="form-label">Index:</label>
-      <select id="index-selector" class="form-control">
-        <option value="intelligence">Intelligence</option>
-        <option value="agentic" selected>Agentic</option>
-        <option value="coding">Coding</option>
-        <option value="math">Math</option>
-      </select>
+  <div class="form-row">
+    <div class="form-group col-md-3 mb-2">
+      <label for="index-selector">Index</label>
+      <%= select_tag :index, options: %w[intelligence agentic coding math].map { |i| [i.capitalize, i] }, selected: (params[:index] || 'agentic'), id: 'index-selector', class: 'form-control' %>
     </div>
-    <div class="col-md-2">
-      <label for="reasoning-filter" class="form-label">Reasoning:</label>
-      <select id="reasoning-filter" class="form-control">
-        <option value="">All</option>
-        <option value="reasoning">Yes</option>
-        <option value="non-reasoning">No</option>
-      </select>
+    <div class="form-group col-md-2 mb-2">
+      <label for="reasoning-filter">Reasoning</label>
+      <%= select_tag :reasoning, options: [
+        ['All', ''],
+        ['Yes', 'reasoning'],
+        ['No', 'non-reasoning']
+      ], selected: params[:reasoning], id: 'reasoning-filter', class: 'form-control' %>
     </div>
-    <div class="col-md-2">
-      <label for="open-source-filter" class="form-label">Open Source:</label>
-      <select id="open-source-filter" class="form-control">
-        <option value="">All</option>
-        <option value="yes">Yes</option>
-        <option value="no">No</option>
-      </select>
+    <div class="form-group col-md-2 mb-2">
+      <label for="open-source-filter">Open source</label>
+      <%= select_tag :open_source, options: [
+        ['All', ''],
+        ['Yes', 'yes'],
+        ['No', 'no']
+      ], selected: params[:open_source], id: 'open-source-filter', class: 'form-control' %>
     </div>
-    <div class="col-md-2">
-      <label for="release-filter" class="form-label">Released in last:</label>
-      <select id="release-filter" class="form-control">
-        <option value="">All time</option>
-        <option value="1">1 month</option>
-        <option value="3" selected>3 months</option>
-        <option value="6">6 months</option>
-        <option value="12">12 months</option>
-        <option value="24">24 months</option>
-      </select>
+    <div class="form-group col-md-2 mb-2">
+      <label for="release-filter">Released in last</label>
+      <%= select_tag :release, options: [['All time', '']] + [1, 3, 6, 12, 24].map { |m| ["#{pluralize(m, 'month')}", m.to_s] }, selected: (params[:release] || '3'), id: 'release-filter', class: 'form-control' %>
     </div>
   </div>
 </div>
@@ -47,10 +35,12 @@
     </div>
     <div class="card-body">
       <div class="row">
-        <div class="col-md-9">
-          <canvas id="cost-intelligence-chart" height="140"></canvas>
+        <div class="col-12 col-lg-9">
+          <div style="position: relative; height: 400px;">
+            <canvas id="cost-intelligence-chart"></canvas>
+          </div>
         </div>
-        <div class="col-md-3">
+        <div class="col-12 col-lg-3 mt-3 mt-lg-0">
           <div id="pareto-list" class="mt-2">Loading...</div>
         </div>
       </div>
@@ -66,7 +56,7 @@
         <th>Creator</th>
         <th>Release</th>
         <th>Reasoning</th>
-        <th>Open Source</th>
+        <th>Open source</th>
         <th>Intelligence Index</th>
         <th>Agentic Index</th>
         <th>Coding Index</th>
@@ -76,7 +66,7 @@
     </thead>
     <tbody>
       <% @models.each do |model| %>
-        <tr>
+        <tr data-slug="<%= model['slug'] %>">
           <td>
             <strong><%= model['name'].gsub(/\s*\(Reasoning\)\s*/i, '').gsub(/\s*\(Non-reasoning\)\s*/i, '').strip %><% if model['reasoning_model'] %> <i class="bi bi-lightbulb"></i><% end %></strong>
             <br>
@@ -106,30 +96,34 @@
               <span class="badge badge-secondary">No</span>
             <% end %>
           </td>
-          <td data-order="<%= model['intelligence_index'] || 0 %>">
+          <td data-order="<%= model['intelligence_index'] || 0 %>" class="intelligence-index-cell">
             <% if (score = model['intelligence_index']) %>
               <%= sprintf('%.1f', score) %>
+              <small class="text-muted rank-display"></small>
             <% else %>
               <span class="text-muted">—</span>
             <% end %>
           </td>
-          <td data-order="<%= model['agentic_index'] || 0 %>">
+          <td data-order="<%= model['agentic_index'] || 0 %>" class="agentic-index-cell">
             <% if (score = model['agentic_index']) %>
               <%= sprintf('%.1f', score) %>
+              <small class="text-muted rank-display"></small>
             <% else %>
               <span class="text-muted">—</span>
             <% end %>
           </td>
-          <td data-order="<%= model['coding_index'] || 0 %>">
+          <td data-order="<%= model['coding_index'] || 0 %>" class="coding-index-cell">
             <% if (score = model['coding_index']) %>
               <%= sprintf('%.1f', score) %>
+              <small class="text-muted rank-display"></small>
             <% else %>
               <span class="text-muted">—</span>
             <% end %>
           </td>
-          <td data-order="<%= model['math_index'] || 0 %>">
+          <td data-order="<%= model['math_index'] || 0 %>" class="math-index-cell">
             <% if (score = model['math_index']) %>
               <%= sprintf('%.1f', score) %>
+              <small class="text-muted rank-display"></small>
             <% else %>
               <span class="text-muted">—</span>
             <% end %>
@@ -150,6 +144,7 @@
 <script>
   var modelsData = <%== @models.map { |m|
     {
+      slug: m['slug'],
       name: m['name'],
       intelligenceIndex: (m['intelligence_index'] || 0).to_f,
       agenticIndex: (m['agentic_index'] || 0).to_f,
@@ -178,11 +173,53 @@
     var table = $('#models-table').DataTable({
       paging: false,
       searching: true,
-      order: [[6, 'desc']], // Sort by Agentic Index descending
+      order: [[2, 'desc']], // Sort by Release date descending
       columnDefs: [
         { type: 'num', targets: [5, 6, 7, 8, 9] } // Numeric columns
       ]
     });
+
+    // Calculate and update ranks based on visible (filtered) rows
+    function updateRanks() {
+      var visibleRows = table.rows({ search: 'applied' }).nodes();
+      var indexColumns = [
+        { name: 'intelligence_index', cellClass: 'intelligence-index-cell', colIndex: 5 },
+        { name: 'agentic_index', cellClass: 'agentic-index-cell', colIndex: 6 },
+        { name: 'coding_index', cellClass: 'coding-index-cell', colIndex: 7 },
+        { name: 'math_index', cellClass: 'math-index-cell', colIndex: 8 }
+      ];
+
+      indexColumns.forEach(function(indexCol) {
+        // First, clear all rank displays for this column
+        $('td.' + indexCol.cellClass + ' .rank-display').text('');
+
+        // Collect scores from visible rows
+        var scores = [];
+        $(visibleRows).each(function() {
+          var row = $(this);
+          var cell = row.find('td.' + indexCol.cellClass);
+          var score = parseFloat(cell.data('order')) || 0;
+
+          if (score > 0) {
+            scores.push({ score: score, cell: cell });
+          }
+        });
+
+        // Sort by score descending
+        scores.sort(function(a, b) { return b.score - a.score; });
+
+        // Calculate ranks (handle ties)
+        var currentRank = 1;
+        scores.forEach(function(item, idx) {
+          if (idx > 0 && scores[idx - 1].score !== item.score) {
+            currentRank = idx + 1;
+          }
+
+          var rankDisplay = item.cell.find('.rank-display');
+          rankDisplay.text('(' + currentRank + '/' + scores.length + ')');
+        });
+      });
+    }
 
     // Custom plugin for leader lines with collision avoidance
     var leaderLinePlugin = {
@@ -336,9 +373,9 @@
       plugins: [leaderLinePlugin],
       options: {
         responsive: true,
-        maintainAspectRatio: true,
+        maintainAspectRatio: false,
         layout: {
-          padding: { left: 20, right: 20 }
+          padding: { left: 20, right: 20, top: 10, bottom: 10 }
         },
         plugins: {
           datalabels: {
@@ -607,10 +644,27 @@
     // Apply filters when dropdowns change
     $('#index-selector, #reasoning-filter, #open-source-filter, #release-filter').on('change', function() {
       table.draw();
+      updateRanks();
       updateChart();
     });
 
-    // Initial chart render
+    // Update ranks when table is redrawn (for search/filter changes)
+    table.on('draw', function() {
+      updateRanks();
+    });
+
+    // Handle window resize for mobile responsiveness
+    var resizeTimer;
+    $(window).on('resize', function() {
+      clearTimeout(resizeTimer);
+      resizeTimer = setTimeout(function() {
+        chart.resize();
+        updateChart();
+      }, 250);
+    });
+
+    // Initial chart render and rank update
+    updateRanks();
     updateChart();
   });
 </script>
