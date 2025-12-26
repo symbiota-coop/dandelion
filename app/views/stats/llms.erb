@@ -24,6 +24,37 @@
       <label for="release-filter">Released in last</label>
       <%= select_tag :release, options: [['All time', '']] + [1, 3, 6, 12, 24].map { |m| ["#{pluralize(m, 'month')}", m.to_s] }, selected: (params[:release] || '3'), id: 'release-filter', class: 'form-control' %>
     </div>
+    <div class="form-group col-md-2 mb-2">
+      <label for="x-axis-selector">X-axis</label>
+      <%= select_tag :x_axis, options: [['Cost', 'cost'], ['Speed', 'speed']], selected: (params[:x_axis] || 'cost'), id: 'x-axis-selector', class: 'form-control' %>
+    </div>
+  </div>
+  <div class="form-row">
+    <div class="form-group col-md-12 mb-2">
+      <label class="mb-2">&gt;=</label>
+      <div class="d-flex flex-wrap gap-3">
+        <div class="form-group mb-0 mr-1">
+          <label for="min-score-intelligence" class="small">Intelligence</label>
+          <%= number_field_tag :min_score_intelligence, value: params[:min_score_intelligence], id: 'min-score-intelligence', class: 'form-control form-control-sm', step: 0.1, placeholder: '0.0' %>
+        </div>
+        <div class="form-group mb-0 mr-1">
+          <label for="min-score-agentic" class="small">Agentic</label>
+          <%= number_field_tag :min_score_agentic, value: params[:min_score_agentic], id: 'min-score-agentic', class: 'form-control form-control-sm', step: 0.1, placeholder: '0.0' %>
+        </div>
+        <div class="form-group mb-0 mr-1">
+          <label for="min-score-coding" class="small">Coding</label>
+          <%= number_field_tag :min_score_coding, value: params[:min_score_coding], id: 'min-score-coding', class: 'form-control form-control-sm', step: 0.1, placeholder: '0.0' %>
+        </div>
+        <div class="form-group mb-0 mr-1">
+          <label for="min-score-math" class="small">Math</label>
+          <%= number_field_tag :min_score_math, value: params[:min_score_math], id: 'min-score-math', class: 'form-control form-control-sm', step: 0.1, placeholder: '0.0' %>
+        </div>
+        <div class="form-group mb-0 mr-1">
+          <label for="min-score-openness" class="small">Openness</label>
+          <%= number_field_tag :min_score_openness, value: params[:min_score_openness], id: 'min-score-openness', class: 'form-control form-control-sm', step: 0.1, placeholder: '0.0' %>
+        </div>
+      </div>
+    </div>
   </div>
 </div>
 
@@ -406,7 +437,9 @@
             callbacks: {
               label: function(context) {
                 var point = context.raw;
-                return cleanModelName(point.label) + ': Score ' + point.y.toFixed(1) + ', Cost $' + point.x.toFixed(0);
+                var xAxisType = $('#x-axis-selector').val();
+                var xLabel = xAxisType === 'speed' ? 'Speed ' + point.x.toFixed(0) + ' tok/s' : 'Cost $' + point.x.toFixed(0);
+                return cleanModelName(point.label) + ': Score ' + point.y.toFixed(1) + ', ' + xLabel;
               }
             }
           },
@@ -461,14 +494,27 @@
 
     function updateChart() {
       var selectedIndex = $('#index-selector').val();
+      var xAxisType = $('#x-axis-selector').val();
       var reasoningFilter = $('#reasoning-filter').val();
       var openSourceFilter = $('#open-source-filter').val();
       var releaseFilter = $('#release-filter').val();
+      var minScores = {
+        intelligence: parseFloat($('#min-score-intelligence').val()) || 0,
+        agentic: parseFloat($('#min-score-agentic').val()) || 0,
+        coding: parseFloat($('#min-score-coding').val()) || 0,
+        math: parseFloat($('#min-score-math').val()) || 0,
+        openness: parseFloat($('#min-score-openness').val()) || 0
+      };
 
-      // Update title and axis label
+      // Update title and axis labels
       var indexLabel = indexLabels[selectedIndex];
-      $('#chart-title').text(indexLabel + ' vs Cost to Run');
+      var xAxisLabel = xAxisType === 'speed' ? 'Speed' : 'Cost to Run';
+      var xAxisUnit = xAxisType === 'speed' ? ' (tok/s)' : ' ($)';
+      $('#chart-title').text(indexLabel + ' vs ' + xAxisLabel);
       chart.options.scales.y.title.text = indexLabel;
+      chart.options.scales.x.title.text = xAxisLabel + xAxisUnit;
+      // Use linear scale for speed, logarithmic for cost
+      chart.options.scales.x.type = xAxisType === 'speed' ? 'linear' : 'logarithmic';
 
       // Calculate cutoff date for release filter
       var cutoffDate = null;
@@ -497,7 +543,17 @@
         }
 
         var indexValue = getIndexValue(model, selectedIndex);
-        return reasoningMatch && openSourceMatch && releaseMatch && indexValue > 0 && model.costToRun > 0;
+        var xAxisValue = xAxisType === 'speed' ? model.speed : model.costToRun;
+
+        // Check all min score filters
+        var scoreMatch = true;
+        if (minScores.intelligence > 0 && model.intelligenceIndex < minScores.intelligence) scoreMatch = false;
+        if (minScores.agentic > 0 && model.agenticIndex < minScores.agentic) scoreMatch = false;
+        if (minScores.coding > 0 && model.codingIndex < minScores.coding) scoreMatch = false;
+        if (minScores.math > 0 && model.mathIndex < minScores.math) scoreMatch = false;
+        if (minScores.openness > 0 && model.opennessIndex < minScores.openness) scoreMatch = false;
+
+        return reasoningMatch && openSourceMatch && releaseMatch && scoreMatch && indexValue > 0 && xAxisValue > 0;
       });
 
       // Group by reasoning and open source
@@ -531,11 +587,16 @@
 
       // Calculate Pareto frontier FIRST so we can label only those points
       var allPoints = filteredModels.map(function(m) {
-        return { x: m.costToRun, y: getIndexValue(m, selectedIndex), label: m.name, reasoningModel: m.reasoningModel };
+        var xValue = xAxisType === 'speed' ? m.speed : m.costToRun;
+        return { x: xValue, y: getIndexValue(m, selectedIndex), label: m.name, reasoningModel: m.reasoningModel };
       });
 
-      // Sort by cost (ascending)
-      allPoints.sort(function(a, b) { return a.x - b.x; });
+      // Sort by x-axis value (ascending for cost, descending for speed)
+      if (xAxisType === 'speed') {
+        allPoints.sort(function(a, b) { return b.x - a.x; }); // Higher speed first
+      } else {
+        allPoints.sort(function(a, b) { return a.x - b.x; }); // Lower cost first
+      }
 
       // Find Pareto-optimal points (with epsilon for near-ties)
       var paretoPoints = [];
@@ -562,8 +623,9 @@
         if (models.length > 0) {
           var dataPoints = models.map(function(m) {
             var pIdx = paretoInfo[m.name];
+            var xValue = xAxisType === 'speed' ? m.speed : m.costToRun;
             return {
-              x: m.costToRun,
+              x: xValue,
               y: getIndexValue(m, selectedIndex),
               label: m.name,
               isPareto: pIdx !== undefined,
@@ -603,12 +665,13 @@
         });
       }
 
-      // Update Pareto list (sorted by cost, highest first)
+      // Update Pareto list (sorted by x-axis value, highest first)
       if (paretoPoints.length > 0) {
         var sortedPareto = paretoPoints.slice().sort(function(a, b) { return b.x - a.x; });
         var paretoHtml = '<ul class="list-unstyled mb-0">' + sortedPareto.map(function(p) {
           var lightbulbIcon = p.reasoningModel ? ' <i class="bi bi-lightbulb"></i>' : '';
-          return '<li><strong>' + cleanModelName(p.label) + lightbulbIcon + '</strong> <span class="text-muted">($' + p.x.toFixed(0) + ' @ ' + p.y.toFixed(1) + ')</span></li>';
+          var xDisplay = xAxisType === 'speed' ? p.x.toFixed(0) + ' tok/s' : '$' + p.x.toFixed(0);
+          return '<li><strong>' + cleanModelName(p.label) + lightbulbIcon + '</strong> <span class="text-muted">(' + xDisplay + ' @ ' + p.y.toFixed(1) + ')</span></li>';
         }).join('') + '</ul>';
         $('#pareto-list').html(paretoHtml);
       } else {
@@ -624,6 +687,14 @@
         var reasoningFilter = $('#reasoning-filter').val();
         var openSourceFilter = $('#open-source-filter').val();
         var releaseFilter = $('#release-filter').val();
+        var selectedIndex = $('#index-selector').val();
+        var minScores = {
+          intelligence: parseFloat($('#min-score-intelligence').val()) || 0,
+          agentic: parseFloat($('#min-score-agentic').val()) || 0,
+          coding: parseFloat($('#min-score-coding').val()) || 0,
+          math: parseFloat($('#min-score-math').val()) || 0,
+          openness: parseFloat($('#min-score-openness').val()) || 0
+        };
 
         if (settings.nTable.id !== 'models-table') return true;
 
@@ -634,6 +705,7 @@
         var reasoningMatch = true;
         var openSourceMatch = true;
         var releaseMatch = true;
+        var scoreMatch = true;
 
         if (reasoningFilter === 'reasoning') {
           reasoningMatch = reasoningCell.find('.badge-success').length > 0 && reasoningCell.text().includes('Reasoning');
@@ -659,12 +731,42 @@
           }
         }
 
-        return reasoningMatch && openSourceMatch && releaseMatch;
+        // Check all min score filters
+        var indexColIndices = {
+          'intelligence': 5,
+          'agentic': 6,
+          'coding': 7,
+          'math': 8,
+          'openness': 9
+        };
+
+        if (minScores.intelligence > 0) {
+          var score = parseFloat($(row).find('td:eq(' + indexColIndices.intelligence + ')').data('order')) || 0;
+          if (score < minScores.intelligence) scoreMatch = false;
+        }
+        if (minScores.agentic > 0) {
+          var score = parseFloat($(row).find('td:eq(' + indexColIndices.agentic + ')').data('order')) || 0;
+          if (score < minScores.agentic) scoreMatch = false;
+        }
+        if (minScores.coding > 0) {
+          var score = parseFloat($(row).find('td:eq(' + indexColIndices.coding + ')').data('order')) || 0;
+          if (score < minScores.coding) scoreMatch = false;
+        }
+        if (minScores.math > 0) {
+          var score = parseFloat($(row).find('td:eq(' + indexColIndices.math + ')').data('order')) || 0;
+          if (score < minScores.math) scoreMatch = false;
+        }
+        if (minScores.openness > 0) {
+          var score = parseFloat($(row).find('td:eq(' + indexColIndices.openness + ')').data('order')) || 0;
+          if (score < minScores.openness) scoreMatch = false;
+        }
+
+        return reasoningMatch && openSourceMatch && releaseMatch && scoreMatch;
       }
     );
 
     // Apply filters when dropdowns change
-    $('#index-selector, #reasoning-filter, #open-source-filter, #release-filter').on('change', function() {
+    $('#index-selector, #reasoning-filter, #open-source-filter, #release-filter, #x-axis-selector, #min-score-intelligence, #min-score-agentic, #min-score-coding, #min-score-math, #min-score-openness').on('change input', function() {
       table.draw();
       updateRanks();
       updateChart();
