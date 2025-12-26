@@ -32,19 +32,19 @@ Dandelion::App.controller do
       @models = []
     end
 
-    # Extract openness scores and build lookup by model ID
-    openness_by_model_id = {}
-    body.scan(/"openness":\{[^}]+\}/).each do |match|
-      data = JSON.parse("{#{match}}")['openness']
-      openness_by_model_id[data['modelId']] = data['opennessIndex'] if data
+    # Extract data from body and build lookup by model ID
+    extract_model_data = lambda do |json_key, model_id_key, value_key|
+      pattern = /"#{json_key}":\{[^}]+\}/
+      result = {}
+      body.scan(pattern).each do |match|
+        data = JSON.parse("{#{match}}")[json_key]
+        result[data[model_id_key]] = data[value_key] if data
+      end
+      result
     end
 
-    # Extract speed data from timescaleData objects and build lookup by model ID
-    speed_by_model_id = {}
-    body.scan(/"timescaleData":\{[^}]+\}/).each do |match|
-      data = JSON.parse("{#{match}}")['timescaleData']
-      speed_by_model_id[data['model_id']] = data['median_output_speed'] if data && data['model_id'] && data['median_output_speed']
-    end
+    openness_by_model_id = extract_model_data.call('openness', 'modelId', 'opennessIndex')
+    speed_by_model_id = extract_model_data.call('timescaleData', 'model_id', 'median_output_speed')
 
     # Merge openness and speed data into models
     @models.each do |model|
