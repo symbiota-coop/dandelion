@@ -1,8 +1,12 @@
 <div class="mb-3">
   <div class="form-row">
-    <div class="form-group col-md-3 mb-2">
-      <label for="index-selector">Index</label>
+    <div class="form-group col-md-2 mb-2">
+      <label for="index-selector">Y-axis</label>
       <%= select_tag :index, options: %w[intelligence agentic coding math openness].map { |i| [i.capitalize, i] }, selected: (params[:index] || 'agentic'), id: 'index-selector', class: 'form-control' %>
+    </div>
+    <div class="form-group col-md-2 mb-2">
+      <label for="x-axis-selector">X-axis</label>
+      <%= select_tag :x_axis, options: [['Cost', 'cost'], ['Speed', 'speed']], selected: (params[:x_axis] || 'cost'), id: 'x-axis-selector', class: 'form-control' %>
     </div>
     <div class="form-group col-md-2 mb-2">
       <label for="reasoning-filter">Reasoning</label>
@@ -24,14 +28,9 @@
       <label for="release-filter">Released in last</label>
       <%= select_tag :release, options: [['All time', '']] + [1, 3, 6, 12, 24].map { |m| ["#{pluralize(m, 'month')}", m.to_s] }, selected: (params[:release] || '3'), id: 'release-filter', class: 'form-control' %>
     </div>
-    <div class="form-group col-md-2 mb-2">
-      <label for="x-axis-selector">X-axis</label>
-      <%= select_tag :x_axis, options: [['Cost', 'cost'], ['Speed', 'speed']], selected: (params[:x_axis] || 'cost'), id: 'x-axis-selector', class: 'form-control' %>
-    </div>
   </div>
   <div class="form-row">
     <div class="form-group col-md-12 mb-2">
-      <label class="mb-2">&gt;=</label>
       <div class="d-flex flex-wrap gap-3">
         <div class="form-group mb-0 mr-1">
           <label for="min-score-intelligence" class="small">Intelligence</label>
