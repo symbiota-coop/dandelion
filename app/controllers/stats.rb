@@ -32,6 +32,24 @@ Dandelion::App.controller do
       @models = []
     end
 
+    # Fetch openness data separately
+    openness_response = Faraday.get('https://artificialanalysis.ai/evaluations/artificial-analysis-openness-index') do |req|
+      req.headers['RSC'] = '1'
+    end
+    openness_body = openness_response.body.force_encoding('UTF-8').scrub
+
+    # Extract openness scores and build lookup by model ID
+    openness_by_model_id = {}
+    openness_body.scan(/"openness":\{[^}]+\}/).each do |match|
+      data = JSON.parse("{#{match}}")['openness']
+      openness_by_model_id[data['modelId']] = data['opennessIndex'] if data
+    end
+
+    # Merge openness data into models
+    @models.each do |model|
+      model['openness_index'] = openness_by_model_id[model['id']]
+    end
+
     # Calculate cost to run for each model using primary provider
     @models.each do |model|
       token_counts = model['intelligence_index_token_counts']

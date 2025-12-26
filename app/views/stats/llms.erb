@@ -2,7 +2,7 @@
   <div class="form-row">
     <div class="form-group col-md-3 mb-2">
       <label for="index-selector">Index</label>
-      <%= select_tag :index, options: %w[intelligence agentic coding math].map { |i| [i.capitalize, i] }, selected: (params[:index] || 'agentic'), id: 'index-selector', class: 'form-control' %>
+      <%= select_tag :index, options: %w[intelligence agentic coding math openness].map { |i| [i.capitalize, i] }, selected: (params[:index] || 'agentic'), id: 'index-selector', class: 'form-control' %>
     </div>
     <div class="form-group col-md-2 mb-2">
       <label for="reasoning-filter">Reasoning</label>
@@ -61,6 +61,7 @@
         <th>Agentic Index</th>
         <th>Coding Index</th>
         <th>Math Index</th>
+        <th>Openness Index</th>
         <th>Cost to Run</th>
       </tr>
     </thead>
@@ -128,6 +129,14 @@
               <span class="text-muted">—</span>
             <% end %>
           </td>
+          <td data-order="<%= model['openness_index'] || 0 %>" class="openness-index-cell">
+            <% if (score = model['openness_index']) %>
+              <%= sprintf('%.1f', score) %>
+              <small class="text-muted rank-display"></small>
+            <% else %>
+              <span class="text-muted">—</span>
+            <% end %>
+          </td>
           <td data-order="<%= model['cost_to_run'] || 0 %>">
             <% if model['cost_to_run'] %>
               $<%= sprintf('%.0f', model['cost_to_run']) %>
@@ -150,6 +159,7 @@
       agenticIndex: (m['agentic_index'] || 0).to_f,
       codingIndex: (m['coding_index'] || 0).to_f,
       mathIndex: (m['math_index'] || 0).to_f,
+      opennessIndex: (m['openness_index'] || 0).to_f,
       costToRun: (m['cost_to_run'] || 0).to_f,
       reasoningModel: !!m['reasoning_model'],
       isOpenWeights: !!m['is_open_weights'],
@@ -161,7 +171,8 @@
     intelligence: 'Intelligence Index',
     agentic: 'Agentic Index',
     coding: 'Coding Index',
-    math: 'Math Index'
+    math: 'Math Index',
+    openness: 'Openness Index'
   };
 
   // Clean model names for display (remove reasoning/non-reasoning suffixes)
@@ -175,7 +186,7 @@
       searching: true,
       order: [[2, 'desc']], // Sort by Release date descending
       columnDefs: [
-        { type: 'num', targets: [5, 6, 7, 8, 9] } // Numeric columns
+        { type: 'num', targets: [5, 6, 7, 8, 9, 10] } // Numeric columns
       ]
     });
 
@@ -186,7 +197,8 @@
         { name: 'intelligence_index', cellClass: 'intelligence-index-cell', colIndex: 5 },
         { name: 'agentic_index', cellClass: 'agentic-index-cell', colIndex: 6 },
         { name: 'coding_index', cellClass: 'coding-index-cell', colIndex: 7 },
-        { name: 'math_index', cellClass: 'math-index-cell', colIndex: 8 }
+        { name: 'math_index', cellClass: 'math-index-cell', colIndex: 8 },
+        { name: 'openness_index', cellClass: 'openness-index-cell', colIndex: 9 }
       ];
 
       indexColumns.forEach(function(indexCol) {
@@ -433,6 +445,7 @@
         case 'agentic': return model.agenticIndex;
         case 'coding': return model.codingIndex;
         case 'math': return model.mathIndex;
+        case 'openness': return model.opennessIndex;
         default: return model.intelligenceIndex;
       }
     }
