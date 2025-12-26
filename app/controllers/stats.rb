@@ -46,14 +46,10 @@ Dandelion::App.controller do
     openness_by_model_id = extract_model_data.call('openness', 'modelId', 'opennessIndex')
     speed_by_model_id = extract_model_data.call('timescaleData', 'model_id', 'median_output_speed')
 
-    # Merge openness and speed data into models
     @models.each do |model|
       model['openness_index'] = openness_by_model_id[model['id']]
       model['speed'] = speed_by_model_id[model['id']]
-    end
 
-    # Calculate cost to run for each model using primary provider
-    @models.each do |model|
       token_counts = model['intelligence_index_token_counts']
       host_models = model['host_models']
       primary_host_id = model['computed_performance_host_model_id']
