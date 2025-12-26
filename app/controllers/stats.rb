@@ -32,22 +32,24 @@ Dandelion::App.controller do
       @models = []
     end
 
-    # Fetch openness data separately
-    openness_response = Faraday.get('https://artificialanalysis.ai/evaluations/artificial-analysis-openness-index') do |req|
-      req.headers['RSC'] = '1'
-    end
-    openness_body = openness_response.body.force_encoding('UTF-8').scrub
-
     # Extract openness scores and build lookup by model ID
     openness_by_model_id = {}
-    openness_body.scan(/"openness":\{[^}]+\}/).each do |match|
+    body.scan(/"openness":\{[^}]+\}/).each do |match|
       data = JSON.parse("{#{match}}")['openness']
       openness_by_model_id[data['modelId']] = data['opennessIndex'] if data
     end
 
-    # Merge openness data into models
+    # Extract speed data from timescaleData objects and build lookup by model ID
+    speed_by_model_id = {}
+    body.scan(/"timescaleData":\{[^}]+\}/).each do |match|
+      data = JSON.parse("{#{match}}")['timescaleData']
+      speed_by_model_id[data['model_id']] = data['median_output_speed'] if data && data['model_id'] && data['median_output_speed']
+    end
+
+    # Merge openness and speed data into models
     @models.each do |model|
       model['openness_index'] = openness_by_model_id[model['id']]
+      model['speed'] = speed_by_model_id[model['id']]
     end
 
     # Calculate cost to run for each model using primary provider

@@ -62,6 +62,7 @@
         <th>Coding Index</th>
         <th>Math Index</th>
         <th>Openness Index</th>
+        <th>Speed</th>
         <th>Cost to Run</th>
       </tr>
     </thead>
@@ -137,6 +138,13 @@
               <span class="text-muted">—</span>
             <% end %>
           </td>
+          <td data-order="<%= model['speed'] || 0 %>">
+            <% if (speed = model['speed']) %>
+              <%= sprintf('%.0f', speed) %> <small class="text-muted">tok/s</small>
+            <% else %>
+              <span class="text-muted">—</span>
+            <% end %>
+          </td>
           <td data-order="<%= model['cost_to_run'] || 0 %>">
             <% if model['cost_to_run'] %>
               $<%= sprintf('%.0f', model['cost_to_run']) %>
@@ -160,6 +168,7 @@
       codingIndex: (m['coding_index'] || 0).to_f,
       mathIndex: (m['math_index'] || 0).to_f,
       opennessIndex: (m['openness_index'] || 0).to_f,
+      speed: (m['speed'] || 0).to_f,
       costToRun: (m['cost_to_run'] || 0).to_f,
       reasoningModel: !!m['reasoning_model'],
       isOpenWeights: !!m['is_open_weights'],
@@ -397,7 +406,7 @@
             callbacks: {
               label: function(context) {
                 var point = context.raw;
-                return cleanModelName(point.label) + ': Cost $' + point.x.toFixed(0) + ', Intelligence ' + point.y.toFixed(1);
+                return cleanModelName(point.label) + ': Score ' + point.y.toFixed(1) + ', Cost $' + point.x.toFixed(0);
               }
             }
           },
