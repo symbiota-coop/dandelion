@@ -7,25 +7,13 @@ Dandelion::App.controller do
     content_type = (parts = URI(request.url).path.split('.')
                     parts.length == 2 ? parts.last.to_sym : :html)
 
-    @events = case params[:order]
-              when 'created_at'
-                @events.order('created_at desc')
-              else
-                @events.order('start_time asc')
-              end
-    @events = @events.and(coordinates: { '$geoWithin' => { '$box' => @bounding_box } }) if params[:near] && %w[north south east west].all? { |p| params[p].nil? } && (@bounding_box = calculate_geographic_bounding_box(params[:near]))
+    @events = apply_events_order(@events, params)
+    @events = apply_geo_filter(@events, params)
     @events = @events.and(:id.in => EventTagship.and(event_tag_id: params[:event_tag_id]).pluck(:event_id)) if params[:event_tag_id]
     %i[organisation activity local_group].each do |r|
       @events = @events.and("#{r}_id": params[:"#{r}_id"]) if params[:"#{r}_id"]
     end
-    if params[:online]
-      @events = @events.online
-      params[:in_person] = false
-    end
-    if params[:in_person]
-      @events = @events.in_person
-      params[:online] = false
-    end
+    @events = apply_online_in_person_filter(@events, params)
     @events = @events.and(hidden_from_homepage: false) if params[:home]
     @events = @events.and(has_image: true) if params[:images]
     case content_type
@@ -33,22 +21,8 @@ Dandelion::App.controller do
       @events = @events.future(@from)
       @events = @events.and(:start_time.lt => @to + 1) if @to
       @events = @events.and(:id.in => Event.search(params[:q], @events).pluck(:id)) if params[:q]
-      if params[:order] == 'random'
-        event_ids = @events.pluck(:id)
-        @events = @events.collection.aggregate([
-                                                 { '$match' => { '_id' => { '$in' => event_ids } } },
-                                                 { '$sample' => { size: event_ids.length } }
-                                               ]).map do |hash|
-          Event.new(hash.select { |k, _v| Event.fields.keys.include?(k.to_s) })
-        end
-      elsif params[:order] == 'trending'
-        @events = @events.trending(@from)
-      end
-      if request.xhr?
-        partial :'events/events'
-      else
-        erb :'events/events'
-      end
+      @events = apply_random_or_trending_order(@events, @from)
+      request.xhr? ? partial(:'events/events') : erb(:'events/events')
     when :json
       @events = @events.future(@from)
       @events = @events.and(:start_time.lt => @to + 1) if @to
@@ -59,19 +33,7 @@ Dandelion::App.controller do
       @events = @events.future_and_current
       @events = @events.and(:id.in => Event.search(params[:q], @events).pluck(:id)) if params[:q]
       @events = @events.limit(500)
-      cal = Icalendar::Calendar.new
-      cal.append_custom_property('X-WR-CALNAME', 'Dandelion')
-      @events.each do |event|
-        cal.event do |e|
-          e.summary = (event.start_time.to_date == event.end_time.to_date ? event.name : "#{event.name} starts")
-          e.dtstart = (event.start_time.to_date == event.end_time.to_date ? event.start_time.utc.strftime('%Y%m%dT%H%M%SZ') : Icalendar::Values::Date.new(event.start_time.to_date))
-          e.dtend = (event.start_time.to_date == event.end_time.to_date ? event.end_time.utc.strftime('%Y%m%dT%H%M%SZ') : nil)
-          e.location = event.location
-          e.description = %(#{ENV['BASE_URI']}/events/#{event.id})
-          e.uid = event.id.to_s
-        end
-      end
-      cal.to_ical
+      build_events_ical(@events, 'Dandelion')
     end
   end
 

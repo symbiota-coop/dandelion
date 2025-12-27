@@ -11,23 +11,9 @@ Dandelion::App.controller do
     @events = @organisation.events_including_cohosted.public
     @from = params[:from] ? parse_date(params[:from]) : Date.today
     @to = params[:to] ? parse_date(params[:to]) : nil
-    @events = case params[:order]
-              when 'created_at'
-                @events.order('created_at desc')
-              when 'featured'
-                @events.order('featured desc, start_time asc')
-              else
-                @events.order('start_time asc')
-              end
-    if params[:near]
-      if params[:near] == 'online'
-        @events = @events.online
-      elsif %w[north south east west].all? { |p| params[p].nil? } && (@bounding_box = calculate_geographic_bounding_box(params[:near]))
-        @events = @events.and(coordinates: { '$geoWithin' => { '$box' => @bounding_box } })
-      end
-    end
-    @events = @events.and(local_group_id: params[:local_group_id]) if params[:local_group_id]
-    @events = @events.and(activity_id: params[:activity_id]) if params[:activity_id]
+    @events = apply_events_order(@events, params)
+    @events = apply_geo_filter(@events, params)
+    @events = apply_activity_local_group_filter(@events, params)
     carousel = nil
     params[:carousel_ids] = [params[:carousel_id]] if params[:carousel_id]
     if params[:carousel_ids] && params[:carousel_ids].any?
@@ -38,14 +24,7 @@ Dandelion::App.controller do
                   @events.and(:id.in => EventTagship.and(:event_tag_id.in => event_tags.pluck(:id)).pluck(:event_id))
                 end
     end
-    if params[:online]
-      @events = @events.online
-      params[:in_person] = false
-    end
-    if params[:in_person]
-      @events = @events.in_person
-      params[:online] = false
-    end
+    @events = apply_online_in_person_filter(@events, params)
     @events = @events.and(monthly_donors_only: true) if params[:members_events]
     @events = @events.and(featured: true) if params[:featured]
     if params[:featured_or_course]
@@ -64,22 +43,8 @@ Dandelion::App.controller do
       end
       @events = filter_events_by_search_and_tags(@events)
       @events = @events.and(minimal_only: false) unless params[:minimal]
-      if params[:order] == 'random'
-        event_ids = @events.pluck(:id)
-        @events = @events.collection.aggregate([
-                                                 { '$match' => { '_id' => { '$in' => event_ids } } },
-                                                 { '$sample' => { size: event_ids.length } }
-                                               ]).map do |hash|
-          Event.new(hash.select { |k, _v| Event.fields.keys.include?(k.to_s) })
-        end
-      elsif params[:order] == 'trending'
-        @events = @events.trending(@from)
-      end
-      if request.xhr?
-        partial :'organisations/events'
-      else
-        erb :'organisations/events', layout: (params[:minimal] ? 'minimal' : nil)
-      end
+      @events = apply_random_or_trending_order(@events, @from)
+      request.xhr? ? partial(:'organisations/events') : erb(:'organisations/events', layout: (params[:minimal] ? 'minimal' : nil))
     when :json
       if params[:display] == 'calendar'
         @events = @events.future(@from)
@@ -130,25 +95,7 @@ Dandelion::App.controller do
       @events = @events.future_and_current(1.month.ago)
       @events = filter_events_by_search_and_tags(@events)
       @events = @events.limit(500)
-      cal = Icalendar::Calendar.new
-      cal.append_custom_property('X-WR-CALNAME', @organisation.name)
-      @events.each do |event|
-        cal.event do |e|
-          if @organisation.ical_full
-            e.summary = event.name
-            e.dtstart = event.start_time.utc.strftime('%Y%m%dT%H%M%SZ')
-            e.dtend = event.end_time.utc.strftime('%Y%m%dT%H%M%SZ')
-          else
-            e.summary = (event.start_time.to_date == event.end_time.to_date ? event.name : "#{event.name} starts")
-            e.dtstart = (event.start_time.to_date == event.end_time.to_date ? event.start_time.utc.strftime('%Y%m%dT%H%M%SZ') : Icalendar::Values::Date.new(event.start_time.to_date))
-            e.dtend = (event.start_time.to_date == event.end_time.to_date ? event.end_time.utc.strftime('%Y%m%dT%H%M%SZ') : nil)
-          end
-          e.location = event.location
-          e.description = %(#{ENV['BASE_URI']}/events/#{event.id})
-          e.uid = event.id.to_s
-        end
-      end
-      cal.to_ical
+      build_events_ical(@events, @organisation.name, ical_full: @organisation.ical_full)
     end
   end
 
@@ -165,16 +112,8 @@ Dandelion::App.controller do
     @events = @events.and(coordinator_id: params[:coordinator_id]) if params[:coordinator_id]
     @events = @events.and(coordinator_id: nil) if params[:no_coordinator]
     @events = @events.and(:id.nin => EventFacilitation.pluck(:event_id)) if params[:no_facilitators]
-    if params[:online]
-      @events = @events.online
-      params[:in_person] = false
-    end
-    if params[:in_person]
-      @events = @events.in_person
-      params[:online] = false
-    end
-    @events = @events.and(local_group_id: params[:local_group_id]) if params[:local_group_id]
-    @events = @events.and(activity_id: params[:activity_id]) if params[:activity_id]
+    @events = apply_online_in_person_filter(@events, params)
+    @events = apply_activity_local_group_filter(@events, params)
     if params[:cohost_id]
       @cohost = Organisation.find(params[:cohost_id])
       @events = @events.and(:id.in => @cohost.cohosted_events.pluck(:id))
