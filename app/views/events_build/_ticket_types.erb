@@ -11,7 +11,7 @@
 
 <template id="ticket_type_template">
   <div class="ticket_type bg-light shadow-sm pt-3 pb-0 pl-3 pr-5 mb-3">
-    <%= partial 'events_build/ticket_type_fields', locals: { currency: f.object.currency, show_donation_field: show_donation_field, persisted_ticket_groups: persisted_ticket_groups } %>
+    <%= partial 'events_build/ticket_type_fields', locals: { form: nil, currency: f.object.currency, show_donation_field: show_donation_field, persisted_ticket_groups: persisted_ticket_groups } %>
 
     <a class="btn btn-sm text-dark remove-ticket-type" href="javascript:;" onclick="$(this).closest('.ticket_type').remove()">
       <i class="bi bi-x-lg"></i>

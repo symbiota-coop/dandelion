@@ -282,6 +282,16 @@ Dandelion::App.helpers do
     }
   end
 
+  def form_or_tag_field(form, type, field_name, **options)
+    if defined?(form) && form
+      # For check_box, strip value/checked options as form builder handles these via model
+      options = options.except(:value, :checked) if type == :check_box
+      form.send(type, field_name, **options)
+    else
+      send("#{type}_tag", nil, **options, 'data-field': field_name.to_s)
+    end
+  end
+
   def map_json(points)
     box = [[params[:west].to_f, params[:south].to_f], [params[:east].to_f, params[:north].to_f]]
     points = points.and(coordinates: { '$geoWithin' => { '$box' => box } })

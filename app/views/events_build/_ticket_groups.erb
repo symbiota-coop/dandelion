@@ -5,7 +5,7 @@
 
 <template id="ticket_group_template">
   <div class="ticket_group bg-light shadow-sm pt-3 pb-0 pl-3 pr-5 mb-3">
-    <%= partial 'events_build/ticket_group_fields' %>
+    <%= partial 'events_build/ticket_group_fields', locals: { form: nil } %>
 
     <a class="btn btn-sm text-dark remove-ticket-group" href="javascript:;" onclick="$(this).closest('.ticket_group').remove()">
       <i class="bi bi-x-lg"></i>

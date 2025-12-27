@@ -1,8 +1,4 @@
-<% if defined?(form) && form %>
-  <%= form.hidden_field :order %>
-<% else %>
-  <%= hidden_field_tag nil, 'data-field': 'order' %>
-<% end %>
+<%= form_or_tag_field(form, :hidden_field, :order) %>
 
 <div class="row mb-2">
   <div class="col-12 col-lg">
@@ -10,11 +6,7 @@
       <div class="input-group-prepend">
         <span class="input-group-text">Name</span>
       </div>
-      <% if defined?(form) && form %>
-        <%= form.text_field :name, class: 'form-control', required: true %>
-      <% else %>
-        <%= text_field_tag nil, class: 'form-control', required: true, 'data-field': 'name' %>
-      <% end %>
+      <%= form_or_tag_field(form, :text_field, :name, class: 'form-control', required: true) %>
     </div>
   </div>
 </div>
@@ -25,11 +17,7 @@
       <div class="input-group-prepend">
         <span class="input-group-text">Description</span>
       </div>
-      <% if defined?(form) && form %>
-        <%= form.text_field :description, class: 'form-control' %>
-      <% else %>
-        <%= text_field_tag nil, class: 'form-control', 'data-field': 'description' %>
-      <% end %>
+      <%= form_or_tag_field(form, :text_field, :description, class: 'form-control') %>
     </div>
   </div>
 </div>
@@ -41,13 +29,8 @@
         <span class="input-group-text money-symbol"><%= money_symbol(currency) %></span>
       </div>
       <% price_tooltip = 'Enter a price, a price range (two numbers separated by a dash) or leave blank to let the attendee pay as they feel' %>
-      <% if defined?(form) && form %>
-        <%= form.text_field :price_or_range, class: 'form-control', 'data-toggle': 'tooltip', title: price_tooltip %>
-        <%= form.hidden_field :price_or_range_submitted, value: true %>
-      <% else %>
-        <%= text_field_tag nil, class: 'form-control', 'data-toggle': 'tooltip', title: price_tooltip, 'data-field': 'price_or_range' %>
-        <%= hidden_field_tag nil, value: true, 'data-field': 'price_or_range_submitted' %>
-      <% end %>
+      <%= form_or_tag_field(form, :text_field, :price_or_range, class: 'form-control', 'data-toggle': 'tooltip', title: price_tooltip) %>
+      <%= form_or_tag_field(form, :hidden_field, :price_or_range_submitted, value: true) %>
     </div>
   </div>
 
@@ -57,11 +40,7 @@
         <span class="input-group-text">Capacity</span>
       </div>
       <% capacity_tooltip = 'Total number of tickets of this type you want to issue' %>
-      <% if defined?(form) && form %>
-        <%= form.number_field :quantity, class: 'form-control', 'data-toggle': 'tooltip', title: capacity_tooltip, required: true %>
-      <% else %>
-        <%= number_field_tag nil, class: 'form-control', 'data-toggle': 'tooltip', title: capacity_tooltip, required: true, 'data-field': 'quantity' %>
-      <% end %>
+      <%= form_or_tag_field(form, :number_field, :quantity, class: 'form-control', 'data-toggle': 'tooltip', title: capacity_tooltip, required: true) %>
     </div>
   </div>
 </div>
@@ -76,11 +55,7 @@
             <span class="money-symbol"><%= money_symbol(currency) %></span>
           </span>
         </div>
-        <% if defined?(form) && form %>
-          <%= form.number_field :minimum_monthly_donation, class: 'form-control', step: 'any' %>
-        <% else %>
-          <%= number_field_tag nil, class: 'form-control', step: 'any', 'data-field': 'minimum_monthly_donation' %>
-        <% end %>
+        <%= form_or_tag_field(form, :number_field, :minimum_monthly_donation, class: 'form-control', step: 'any') %>
       </div>
     </div>
   </div>
@@ -93,11 +68,7 @@
         <div class="input-group-prepend">
           <span class="input-group-text">Group</span>
         </div>
-        <% if defined?(form) && form %>
-          <%= form.select :ticket_group_id, options: [''] + persisted_ticket_groups.map { |ticket_group| [ticket_group.name, ticket_group.id] }, class: 'form-control' %>
-        <% else %>
-          <%= select_tag nil, options: [''] + persisted_ticket_groups.map { |ticket_group| [ticket_group.name, ticket_group.id] }, class: 'form-control', 'data-field': 'ticket_group_id' %>
-        <% end %>
+        <%= form_or_tag_field(form, :select, :ticket_group_id, options: [''] + persisted_ticket_groups.map { |ticket_group| [ticket_group.name, ticket_group.id] }, class: 'form-control') %>
       </div>
     </div>
   <% end %>
@@ -107,11 +78,8 @@
       <div class="input-group-prepend">
         <span class="input-group-text">Sales end</span>
       </div>
-      <% if defined?(form) && form %>
-        <%= form.text_field :sales_end, class: 'form-control datetimepicker', value: (if v = form.object.sales_end; v.strftime('%Y-%m-%d %H:%M'); end) %>
-      <% else %>
-        <%= text_field_tag nil, class: 'form-control datetimepicker', 'data-field': 'sales_end' %>
-      <% end %>
+      <% sales_end_value = form.object.sales_end&.strftime('%Y-%m-%d %H:%M') if form %>
+      <%= form_or_tag_field(form, :text_field, :sales_end, class: 'form-control datetimepicker', value: sales_end_value) %>
     </div>
   </div>
 
@@ -121,11 +89,7 @@
         <span class="input-group-text">Limit per order</span>
       </div>
       <% max_quantity_tooltip = 'Maximum number of tickets of this type someone can purchase in a single order' %>
-      <% if defined?(form) && form %>
-        <%= form.number_field :max_quantity_per_transaction, class: 'form-control', 'data-toggle': 'tooltip', title: max_quantity_tooltip, min: 0 %>
-      <% else %>
-        <%= number_field_tag nil, class: 'form-control', 'data-toggle': 'tooltip', title: max_quantity_tooltip, min: 0, 'data-field': 'max_quantity_per_transaction' %>
-      <% end %>
+      <%= form_or_tag_field(form, :number_field, :max_quantity_per_transaction, class: 'form-control', 'data-toggle': 'tooltip', title: max_quantity_tooltip, min: 0) %>
     </div>
   </div>
 
@@ -135,15 +99,11 @@
         <span class="input-group-text">Secret?</span>
       </div>
       <% secret_tooltip = 'Allow only people with the link to this ticket type to purchase' %>
-      <% if defined?(form) && form %>
-        <%= form.check_box :hidden, onclick: "$(this).tooltip('hide')", 'data-toggle': 'tooltip', title: secret_tooltip, class: 'form-control', style: 'flex: 0 0 2.1rem; min-width: 2.1rem' %>
-        <% if form.object.hidden? %>
-          <div class="input-group-append">
-            <a target="_blank" data-toggle="tooltip" title="Link to secret ticket type" class="input-group-text text-dark" href="/events/<%= @event.id %>?ticket_type_id=<%= form.object.id %>"><i class="bi bi-box-arrow-up-right"></i></a>
-          </div>
-        <% end %>
-      <% else %>
-        <%= check_box_tag nil, value: '1', checked: false, class: 'form-control', style: 'flex: 0 0 2.1rem; min-width: 2.1rem', onclick: "$(this).tooltip('hide')", 'data-toggle': 'tooltip', title: secret_tooltip, 'data-field': 'hidden' %>
+      <%= form_or_tag_field(form, :check_box, :hidden, value: '1', checked: false, onclick: "$(this).tooltip('hide')", 'data-toggle': 'tooltip', title: secret_tooltip, class: 'form-control', style: 'flex: 0 0 2.1rem; min-width: 2.1rem') %>
+      <% if form && form.object.hidden? %>
+        <div class="input-group-append">
+          <a target="_blank" data-toggle="tooltip" title="Link to secret ticket type" class="input-group-text text-dark" href="/events/<%= @event.id %>?ticket_type_id=<%= form.object.id %>"><i class="bi bi-box-arrow-up-right"></i></a>
+        </div>
       <% end %>
     </div>
   </div>
