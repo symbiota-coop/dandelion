@@ -14,6 +14,28 @@ Dandelion::App.helpers do
     end.to_json
   end
 
+  def events_json(events)
+    events.includes(:activity, :local_group).map do |event|
+      {
+        id: event.id.to_s,
+        slug: event.slug,
+        name: event.name,
+        cohosts: event.cohosts.map { |organisation| { name: organisation.name, slug: organisation.slug } },
+        facilitators: event.event_facilitators.map { |account| { name: account.name, username: account.username } },
+        activity: event.activity ? { name: event.activity.name, id: event.activity_id.to_s } : nil,
+        local_group: event.local_group ? { name: event.local_group.name, id: event.local_group_id.to_s } : nil,
+        email: event.email,
+        tags: event.event_tags.map(&:name),
+        start_time: event.start_time,
+        end_time: event.end_time,
+        location: event.location,
+        time_zone: event.time_zone,
+        image: event.image ? event.image.thumb('1920x1920').url : nil,
+        description: event.description
+      }
+    end.to_json
+  end
+
   def filter_events_by_search_and_tags(events)
     q_ids = []
     q_ids += Event.search(params[:q], events).pluck(:id) if params[:q]
@@ -111,5 +133,61 @@ Dandelion::App.helpers do
       end
     end
     cal.to_ical
+  end
+
+  def build_events_stats_csv(events, organisation)
+    CSV.generate do |csv|
+      headers = ['name']
+      headers_basic = %w[date coordinator organiser facilitators tags activity local_group facebook_event 30d_views tickets_sold checked_in ticket_revenue donations]
+      headers += headers_basic
+
+      if organisation.stripe_client_id
+        headers_stripe_client_id = %w[ticket_revenue_to_revenue_sharer ticket_revenue_to_organisation revenue_reported_by_dandelion revenue_reported_by_stripe stripe_fees]
+        headers += headers_stripe_client_id
+        headers += %w[profit profit_less_donations_before_allocations]
+        Event.profit_share_roles.each { |role| headers << "allocated_to_#{role}" }
+        headers += %w[profit_less_donations_after_allocations profit_including_donations_after_allocations]
+        Event.profit_share_roles.each { |role| headers << "remaining_to_#{role}" }
+        headers << 'remaining_to_be_paid'
+      end
+      headers << 'feedback'
+      csv << headers
+
+      events.each do |event|
+        row = [event.name]
+        row += headers_basic.map { |h| partial(:"event_stats_row/#{h}", locals: { event: event, organisation: organisation }) }
+
+        if organisation.stripe_client_id
+          row += headers_stripe_client_id.map { |h| partial(:"event_stats_row/#{h}", locals: { event: event, organisation: organisation }) }
+          if event_revenue_admin?(event)
+            row += [
+              partial(:'event_stats_row/profit', locals: { event: event, organisation: organisation }),
+              partial(:'event_stats_row/profit_less_donations_before_allocations', locals: { event: event, organisation: organisation })
+            ]
+            Event.profit_share_roles.each { |role| row << partial(:'event_stats_row/allocated_to_role', locals: { event: event, organisation: organisation, role: role }) }
+            row += [
+              partial(:'event_stats_row/profit_less_donations_after_allocations', locals: { event: event, organisation: organisation }),
+              partial(:'event_stats_row/profit_including_donations_after_allocations', locals: { event: event, organisation: organisation })
+            ]
+            Event.profit_share_roles.each { |role| row << m(event.send("remaining_to_#{role}").abs, event.currency) }
+            row << partial(:'event_stats_row/remaining_to_be_paid', locals: { event: event, organisation: organisation })
+          else
+            row += 13.times.map { '' }
+          end
+        end
+
+        row << partial(:'event_stats_row/feedback', locals: { event: event, organisation: organisation })
+        row.map! { |cell| extract_csv_cell_text(cell) }
+        csv << row
+      end
+    end
+  end
+
+  def extract_csv_cell_text(cell)
+    html = Nokogiri::HTML(cell)
+    return cell if html.search('td').empty?
+
+    html.search('script').remove
+    html.search('td').children.text.split("\n").reject(&:blank?).map(&:strip).join(', ')
   end
 end
