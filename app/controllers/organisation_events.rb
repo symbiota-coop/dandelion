@@ -13,7 +13,8 @@ Dandelion::App.controller do
     @to = params[:to] ? parse_date(params[:to]) : nil
     @events = apply_events_order(@events, params)
     @events = apply_geo_filter(@events, params)
-    @events = apply_activity_local_group_filter(@events, params)
+    @events = @events.and(local_group_id: params[:local_group_id]) if params[:local_group_id]
+    @events = @events.and(activity_id: params[:activity_id]) if params[:activity_id]
     carousel = nil
     params[:carousel_ids] = [params[:carousel_id]] if params[:carousel_id]
     if params[:carousel_ids] && params[:carousel_ids].any?
@@ -44,7 +45,11 @@ Dandelion::App.controller do
       @events = filter_events_by_search_and_tags(@events)
       @events = @events.and(minimal_only: false) unless params[:minimal]
       @events = apply_random_or_trending_order(@events, @from)
-      request.xhr? ? partial(:'organisations/events') : erb(:'organisations/events', layout: (params[:minimal] ? 'minimal' : nil))
+      if request.xhr?
+        partial(:'organisations/events')
+      else
+        erb(:'organisations/events', layout: (params[:minimal] ? 'minimal' : nil))
+      end
     when :json
       if params[:display] == 'calendar'
         @events = @events.future(@from)
@@ -113,7 +118,8 @@ Dandelion::App.controller do
     @events = @events.and(coordinator_id: nil) if params[:no_coordinator]
     @events = @events.and(:id.nin => EventFacilitation.pluck(:event_id)) if params[:no_facilitators]
     @events = apply_online_in_person_filter(@events, params)
-    @events = apply_activity_local_group_filter(@events, params)
+    @events = @events.and(local_group_id: params[:local_group_id]) if params[:local_group_id]
+    @events = @events.and(activity_id: params[:activity_id]) if params[:activity_id]
     if params[:cohost_id]
       @cohost = Organisation.find(params[:cohost_id])
       @events = @events.and(:id.in => @cohost.cohosted_events.pluck(:id))

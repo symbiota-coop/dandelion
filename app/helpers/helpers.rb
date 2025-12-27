@@ -303,43 +303,4 @@ Dandelion::App.helpers do
       pointsCount: points.count
     }.to_json
   end
-
-  def calendar_json(events)
-    user_time_zone = current_account ? current_account.time_zone : session[:time_zone]
-    events.map do |event|
-      {
-        id: event.id.to_s,
-        name: event.name,
-        start_time: event.start_time.iso8601,
-        end_time: event.end_time.iso8601,
-        slug: event.slug,
-        location: event.location,
-        when_details: event.when_details(user_time_zone)
-      }
-    end.to_json
-  end
-
-  def filter_events_by_search_and_tags(events)
-    q_ids = []
-    q_ids += Event.search(params[:q], events).pluck(:id) if params[:q]
-    event_tag_ids = []
-    if params[:event_type]
-      event_tag_ids = if (event_tag = EventTag.find_by(name: params[:event_type]))
-                        event_tag.event_tagships.pluck(:event_id)
-                      else
-                        []
-                      end
-    elsif params[:event_tag_id]
-      event_tag_ids = EventTagship.and(event_tag_id: params[:event_tag_id]).pluck(:event_id)
-    end
-    event_ids = if q_ids.empty?
-                  event_tag_ids
-                elsif event_tag_ids.empty?
-                  q_ids
-                else
-                  q_ids & event_tag_ids
-                end
-    events = events.and(:id.in => event_ids) if params[:q] || params[:event_tag_id] || params[:event_type]
-    events
-  end
 end
