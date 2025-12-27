@@ -1,3 +1,13 @@
+<style>
+  #totalDisplay, #credit, #fixed-discount, #balance {
+    width: 5em;
+  }
+  #totalDisplay {
+    border-top-right-radius: 0.25rem;
+    border-bottom-right-radius: 0.25rem;
+  }
+</style>
+
 <%
 discount_code = nil
 if params[:discount_code]
@@ -68,7 +78,7 @@ end
 
             <%= partial :'purchase/suggested_donation' %>
 
-            <%== currency_input_row(label: 'Total', field_name: 'totalDisplay', field_id: 'totalDisplay', value: '0.00', style: 'width: 5em; border-top-right-radius: 0.25rem; border-bottom-right-radius: 0.25rem;') %>
+            <%== currency_input_row(label: 'Total', field_name: 'totalDisplay', field_id: 'totalDisplay', value: '0.00') %>
             <%= hidden_field_tag :total, id: 'total' %>
 
             <% if current_account && (organisationship = @event.organisation.organisationships.find_by(account: current_account)) && organisationship.credit_balance > 0 && FIAT_CURRENCIES.include?(@event.currency) %>

@@ -1,6 +1,6 @@
 Dandelion::App.helpers do
-  def currency_input_row(label:, field_name:, field_id:, value: nil, style: 'width: 5em')
-    input = number_field_tag field_name, value: value, id: field_id, class: 'form-control', style: style, disabled: true
+  def currency_input_row(label:, field_name:, field_id:, value: nil)
+    input = number_field_tag field_name, value: value, id: field_id, class: 'form-control', disabled: true
     <<-HTML
       <tr>
         <td></td>
