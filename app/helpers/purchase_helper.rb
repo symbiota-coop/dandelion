@@ -1,4 +1,39 @@
 Dandelion::App.helpers do
+  def currency_input_row(label:, field_name:, field_id:, value: nil, style: 'width: 5em')
+    input = number_field_tag field_name, value: value, id: field_id, class: 'form-control', style: style, disabled: true
+    <<-HTML
+      <tr>
+        <td></td>
+        <td></td>
+        <td style="min-width: 8em">
+          <strong>#{label}</strong>
+          <div class="input-group" style="margin: 5px 0">
+            <div class="input-group-prepend">
+              <span class="input-group-text">#{money_symbol(@event.currency)}</span>
+            </div>
+            #{input}
+          </div>
+        </td>
+      </tr>
+    HTML
+  end
+
+  def payment_button(method:, label:, condition:, dotted: true, visible: false)
+    return '' unless condition
+
+    style = visible ? '' : 'display: none'
+    btn_class = 'btn btn-primary btn-block mb-1'
+    btn_class += ' btn-dotted' if dotted
+    hidden_input = hidden_field_tag :payment_method, value: method, disabled: true
+    <<-HTML
+      <button style="#{style}" class="#{btn_class}" type="submit" data-payment-method="#{method}">
+        <span>#{label}</span>
+        <i class="bi bi-spin bi-slash-lg" style="display: none"></i>
+      </button>
+      #{hidden_input}
+    HTML
+  end
+
   def find_or_create_account_for_purchase(details_form)
     account_hash = {
       name: details_form[:account][:name],

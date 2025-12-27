@@ -68,69 +68,21 @@ end
 
             <%= partial :'purchase/suggested_donation' %>
 
-            <tr>
-              <td></td>
-              <td></td>
-              <td style="min-width: 8em">
-                <strong>Total</strong>
-                <div class="input-group" style="margin: 5px 0">
-                  <div class="input-group-prepend">
-                    <span class="input-group-text"><%= money_symbol(@event.currency) %></span>
-                  </div>
-                  <%= number_field_tag :totalDisplay, id: 'totalDisplay', class: 'form-control', style: 'width: 5em; border-top-right-radius: 0.25rem; border-bottom-right-radius: 0.25rem;', disabled: true %>
-                  <%= hidden_field_tag :total, id: 'total' %>
-                </div>
-              </td>
-            </tr>
+            <%== currency_input_row(label: 'Total', field_name: 'totalDisplay', field_id: 'totalDisplay', value: '0.00', style: 'width: 5em; border-top-right-radius: 0.25rem; border-bottom-right-radius: 0.25rem;') %>
+            <%= hidden_field_tag :total, id: 'total' %>
 
             <% if current_account && (organisationship = @event.organisation.organisationships.find_by(account: current_account)) && organisationship.credit_balance > 0 && FIAT_CURRENCIES.include?(@event.currency) %>
               <% show_balance = true %>
-              <tr>
-                <td></td>
-                <td></td>
-                <td>
-                  <strong>Credit</strong>
-                  <div class="input-group" style="margin: 5px 0">
-                    <div class="input-group-prepend">
-                      <span class="input-group-text"><%= money_symbol(@event.currency) %></span>
-                    </div>
-                    <%= number_field_tag :credit, id: 'credit', class: 'form-control', style: 'width: 5em', disabled: true, value: format('%.2f', (organisationship.credit_balance.exchange_to(@event.currency).cents.to_f / 100)) %>
-                  </div>
-                </td>
-              </tr>
+              <%== currency_input_row(label: 'Credit', field_name: 'credit', field_id: 'credit', value: format('%.2f', (organisationship.credit_balance.exchange_to(@event.currency).cents.to_f / 100))) %>
             <% end %>
 
             <% if discount_code && discount_code.fixed_discount %>
               <% show_balance = true %>
-              <tr>
-                <td></td>
-                <td></td>
-                <td>
-                  <strong>Discount</strong>
-                  <div class="input-group" style="margin: 5px 0">
-                    <div class="input-group-prepend">
-                      <span class="input-group-text"><%= money_symbol(@event.currency) %></span>
-                    </div>
-                    <%= number_field_tag :fixed_discount, id: 'fixed-discount', class: 'form-control', style: 'width: 5em', disabled: true, value: format('%.2f', (discount_code.fixed_discount.exchange_to(@event.currency).cents.to_f / 100)) %>
-                  </div>
-                </td>
-              </tr>
+              <%== currency_input_row(label: 'Discount', field_name: 'fixed_discount', field_id: 'fixed-discount', value: format('%.2f', (discount_code.fixed_discount.exchange_to(@event.currency).cents.to_f / 100))) %>
             <% end %>
 
             <% if show_balance %>
-              <tr>
-                <td></td>
-                <td></td>
-                <td>
-                  <strong>Balance</strong>
-                  <div class="input-group" style="margin: 5px 0">
-                    <div class="input-group-prepend">
-                      <span class="input-group-text"><%= money_symbol(@event.currency) %></span>
-                    </div>
-                    <%= number_field_tag :balance, id: 'balance', class: 'form-control', style: 'width: 5em', disabled: true %>
-                  </div>
-                </td>
-              </tr>
+              <%== currency_input_row(label: 'Balance', field_name: 'balance', field_id: 'balance') %>
             <% end %>
 
           </table>
@@ -214,51 +166,14 @@ end
 
       <%= partial :'purchase/gocardless_details', locals: { f: f } %>
 
-      <button class="btn btn-primary btn-block mb-1" type="submit" data-payment-method="rsvp">
-        <span><%= @event.rsvp_button_text || 'RSVP' %></span>
-        <i class="bi bi-spin bi-slash-lg" style="display: none"></i>
-      </button>
-      <%= hidden_field_tag :payment_method, value: 'rsvp', disabled: true %>
+      <%== payment_button(method: 'rsvp', label: @event.rsvp_button_text || 'RSVP', dotted: false, visible: true, condition: true) %>
 
-      <% if (@event.organisation.stripe_connect_json || @event.organisation.stripe_sk) && FIAT_CURRENCIES.include?(@event.currency) %>
-        <button style="display: none" class="btn btn-primary btn-block mb-1" type="submit" data-payment-method="stripe">
-          <span>Pay</span>
-          <i class="bi bi-spin bi-slash-lg" style="display: none"></i>
-        </button>
-        <%= hidden_field_tag :payment_method, value: 'stripe', disabled: true %>
-      <% end %>
-
-      <% if @event.organisation.coinbase_api_key && (FIAT_CURRENCIES.include?(@event.currency) || COINBASE_CURRENCIES.include?(@event.currency)) %>
-        <button style="display: none" class="btn btn-primary btn-block mb-1 btn-dotted" type="submit" data-payment-method="coinbase">
-          <span>Pay with crypto</span>
-          <i class="bi bi-spin bi-slash-lg" style="display: none"></i>
-        </button>
-        <%= hidden_field_tag :payment_method, value: 'coinbase', disabled: true %>
-      <% end %>
-
-      <% if @event.organisation.gocardless_instant_bank_pay && @event.organisation.gocardless_access_token && FIAT_CURRENCIES.include?(@event.currency) %>
-        <button style="display: none" class="btn btn-primary btn-block mb-1 btn-dotted" type="submit" data-payment-method="gocardless">
-          <span>Pay with GoCardless</span>
-          <i class="bi bi-spin bi-slash-lg" style="display: none"></i>
-        </button>
-        <%= hidden_field_tag :payment_method, value: 'gocardless', disabled: true %>
-      <% end %>
-
-      <% if @event.oc_slug %>
-        <button style="display: none" class="btn btn-primary btn-block mb-1 btn-dotted" type="submit" data-payment-method="opencollective">
-          <span>Pay with Open Collective</span>
-          <i class="bi bi-spin bi-slash-lg" style="display: none"></i>
-        </button>
-        <%= hidden_field_tag :payment_method, value: 'opencollective', disabled: true %>
-      <% end %>
-
-      <% if @event.organisation.evm_address && (EVM_CURRENCIES.include?(@event.currency) || (@event.currency == 'USD')) %>
-        <button style="display: none" class="btn btn-primary btn-block mb-1 btn-dotted" type="submit" data-payment-method="evm">
-          <span><% if @event.currency.in?(['BREAD', 'USD'])%>Pay with BREAD on Gnosis Chain<% else %>Pay with <%= @event.chain.name %><% end %></span>
-          <i class="bi bi-spin bi-slash-lg" style="display: none"></i>
-        </button>
-        <%= hidden_field_tag :payment_method, value: 'evm', disabled: true %>
-      <% end %>
+      <%== payment_button(method: 'stripe', label: 'Pay', dotted: false, condition: (@event.organisation.stripe_connect_json || @event.organisation.stripe_sk) && FIAT_CURRENCIES.include?(@event.currency)) %>
+      <%== payment_button(method: 'coinbase', label: 'Pay with crypto', condition: @event.organisation.coinbase_api_key && (FIAT_CURRENCIES.include?(@event.currency) || COINBASE_CURRENCIES.include?(@event.currency))) %>
+      <%== payment_button(method: 'gocardless', label: 'Pay with GoCardless', condition: @event.organisation.gocardless_instant_bank_pay && @event.organisation.gocardless_access_token && FIAT_CURRENCIES.include?(@event.currency)) %>
+      <%== payment_button(method: 'opencollective', label: 'Pay with Open Collective', condition: @event.oc_slug) %>
+      <% evm_label = @event.currency.in?(['BREAD', 'USD']) ? 'Pay with BREAD on Gnosis Chain' : "Pay with #{@event.chain.try(:name)}" %>
+      <%== payment_button(method: 'evm', label: evm_label, condition: @event.organisation.evm_address && (EVM_CURRENCIES.include?(@event.currency) || @event.currency == 'USD')) %>
 
 
       <%= hidden_field_tag :utm_source, value: params[:utm_source] %>
