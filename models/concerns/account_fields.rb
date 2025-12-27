@@ -56,6 +56,7 @@ module AccountFields
     field :sent_first_event_email, type: Time
     field :event_feedbacks_as_facilitator_count, type: Integer
     field :event_tag_names, type: Array
+    field :atproto_handle, type: String
 
     %w[email_confirmed updated_profile admin unsubscribed unsubscribed_messages unsubscribed_feedback unsubscribed_reminders open_to_hookups open_to_new_friends open_to_short_term_dating open_to_long_term_dating open_to_open_relating block_reply_by_email hidden seen_intro_tour can_reset_passwords has_signed_in].each do |b|
       field b.to_sym, type: Mongoid::Boolean
@@ -129,7 +130,8 @@ module AccountFields
         gc_city: 'City',
         gc_postal_code: 'Post code',
         gc_branch_code: 'Sort code',
-        gc_account_number: 'Account number'
+        gc_account_number: 'Account number',
+        atproto_handle: 'ATproto (Bluesky) handle'
       }[attr.to_sym] || super
     end
 

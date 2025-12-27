@@ -10,6 +10,7 @@ class Account
   include AccountNotifications
   include AccountFeedbackSummaries
   include AccountRecommendations
+  include AccountAtproto
   include Geocoded
   include Searchable
 
