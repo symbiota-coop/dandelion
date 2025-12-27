@@ -1,41 +1,4 @@
 Dandelion::App.helpers do
-  def calendar_json(events)
-    user_time_zone = current_account ? current_account.time_zone : session[:time_zone]
-    events.map do |event|
-      {
-        id: event.id.to_s,
-        name: event.name,
-        start_time: event.start_time.iso8601,
-        end_time: event.end_time.iso8601,
-        slug: event.slug,
-        location: event.location,
-        when_details: event.when_details(user_time_zone)
-      }
-    end.to_json
-  end
-
-  def events_json(events)
-    events.includes(:activity, :local_group).map do |event|
-      {
-        id: event.id.to_s,
-        slug: event.slug,
-        name: event.name,
-        cohosts: event.cohosts.map { |organisation| { name: organisation.name, slug: organisation.slug } },
-        facilitators: event.event_facilitators.map { |account| { name: account.name, username: account.username } },
-        activity: event.activity ? { name: event.activity.name, id: event.activity_id.to_s } : nil,
-        local_group: event.local_group ? { name: event.local_group.name, id: event.local_group_id.to_s } : nil,
-        email: event.email,
-        tags: event.event_tags.map(&:name),
-        start_time: event.start_time,
-        end_time: event.end_time,
-        location: event.location,
-        time_zone: event.time_zone,
-        image: event.image ? event.image.thumb('1920x1920').url : nil,
-        description: event.description
-      }
-    end.to_json
-  end
-
   def filter_events_by_search_and_tags(events)
     q_ids = []
     q_ids += Event.search(params[:q], events).pluck(:id) if params[:q]
@@ -110,6 +73,43 @@ Dandelion::App.helpers do
     else
       events
     end
+  end
+
+  def calendar_json(events)
+    user_time_zone = current_account ? current_account.time_zone : session[:time_zone]
+    events.map do |event|
+      {
+        id: event.id.to_s,
+        name: event.name,
+        start_time: event.start_time.iso8601,
+        end_time: event.end_time.iso8601,
+        slug: event.slug,
+        location: event.location,
+        when_details: event.when_details(user_time_zone)
+      }
+    end.to_json
+  end
+
+  def events_json(events)
+    events.includes(:activity, :local_group).map do |event|
+      {
+        id: event.id.to_s,
+        slug: event.slug,
+        name: event.name,
+        cohosts: event.cohosts.map { |organisation| { name: organisation.name, slug: organisation.slug } },
+        facilitators: event.event_facilitators.map { |account| { name: account.name, username: account.username } },
+        activity: event.activity ? { name: event.activity.name, id: event.activity_id.to_s } : nil,
+        local_group: event.local_group ? { name: event.local_group.name, id: event.local_group_id.to_s } : nil,
+        email: event.email,
+        tags: event.event_tags.map(&:name),
+        start_time: event.start_time,
+        end_time: event.end_time,
+        location: event.location,
+        time_zone: event.time_zone,
+        image: event.image ? event.image.thumb('1920x1920').url : nil,
+        description: event.description
+      }
+    end.to_json
   end
 
   def build_events_ical(events, calendar_name, ical_full: false)
