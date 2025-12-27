@@ -1,8 +1,8 @@
 <% if (links = account.atproto_links) && links.any? %>
 
   <h2 class="mt-5">
-    <a target="_blank" class="text-dark" href="https://bsky.app/profile/<%= u = account.atproto_handle %>">
-      @<%= account.atproto_handle %>
+    <a target="_blank" class="text-dark" href="https://bsky.app/profile/<%= account.atproto_handle %>" style="text-decoration: none">
+      <i class="bi bi-bluesky"></i> <%= account.atproto_handle %>
     </a>
   </h2>
 
@@ -36,7 +36,7 @@
                       <%= URI(og['url']).host.gsub('www.', '') %>
                     </a>
                     &middot;
-                    <a target="_blank" class="text-muted" href="https://bsky.app/profile/<%= u %>/post/<%= og['hash'] %>">
+                    <a target="_blank" class="text-muted" href="https://bsky.app/profile/<%= account.atproto_handle %>/post/<%= og['hash'] %>">
                       <%= Time.at(og['timestamp']/1e3).to_date.to_s(:post) %>
                     </a>
                   </p>
