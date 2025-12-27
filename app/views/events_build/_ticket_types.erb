@@ -1,8 +1,23 @@
+<%
+  show_donation_field = @event.organisation && ((@event.organisation.gocardless_subscriptions && @event.organisation.gocardless_access_token) || @event.organisation.patreon_api_key)
+  persisted_ticket_groups = f.object.ticket_groups.select(&:persisted?)
+%>
+
 <style>
   .ticket_type { position: relative; border: 1px solid #DADADE; border-radius: 5px; cursor: grab; }
   .ticket_type.ui-sortable-helper { cursor: grabbing; }
   .ticket_type .remove-ticket-type { position: absolute; right: 0; top: 0; }
 </style>
+
+<template id="ticket_type_template">
+  <div class="ticket_type bg-light shadow-sm pt-3 pb-0 pl-3 pr-5 mb-3">
+    <%= partial 'events_build/ticket_type_fields', locals: { currency: f.object.currency, show_donation_field: show_donation_field, persisted_ticket_groups: persisted_ticket_groups } %>
+
+    <a class="btn btn-sm text-dark remove-ticket-type" href="javascript:;" onclick="$(this).closest('.ticket_type').remove()">
+      <i class="bi bi-x-lg"></i>
+    </a>
+  </div>
+</template>
 
 <div class="form-group">
   <label>
@@ -12,118 +27,7 @@
     <div id="ticket_types">
       <% f.fields_for :ticket_types, f.object.ticket_types.sort_by(&:order) do |o| %>
         <div class="ticket_type bg-light shadow-sm pt-3 pb-0 pl-3 pr-5 mb-3 <%= 'has-error' if o.object.invalid? %>">
-          <%= o.hidden_field :order %>
-
-          <div class="row mb-2">
-            <div class="col-12 col-lg">
-              <div class="input-group">
-                <div class="input-group-prepend">
-                  <span class="input-group-text">Name</span>
-                </div>
-                <%= o.text_field :name, class: 'form-control', required: true %>
-              </div>
-            </div>
-          </div>
-
-          <div class="row mb-2">
-            <div class="col-12 col-lg">
-              <div class="input-group">
-                <div class="input-group-prepend">
-                  <span class="input-group-text">Description</span>
-                </div>
-                <%= o.text_field :description, class: 'form-control' %>
-              </div>
-            </div>
-          </div>
-
-          <div class="row mb-2">
-
-            <div class="col-12 col-lg mb-2">
-              <div class="input-group">
-                <div class="input-group-prepend">
-                  <span class="input-group-text money-symbol">
-                    <%= money_symbol(f.object.currency) %>
-                  </span>
-                </div>
-                <%= o.text_field :price_or_range, class: 'form-control', :'data-toggle' => 'tooltip', :title => 'Enter a price, a price range (two numbers separated by a dash) or leave blank to let the attendee pay as they feel' %>
-                <%= o.hidden_field :price_or_range_submitted, value: true %>
-              </div>
-            </div>
-
-            <div class="col-12 col-lg">
-              <div class="input-group">
-                <div class="input-group-prepend">
-                  <span class="input-group-text">Capacity</span>
-                </div>
-                <%= o.number_field :quantity, :class => 'form-control', :'data-toggle' => 'tooltip', :title => 'Total number of tickets of this type you want to issue', :required => true %>
-              </div>
-            </div>
-
-          </div>
-
-          <% if @event.organisation && ((@event.organisation.gocardless_subscriptions && @event.organisation.gocardless_access_token) || @event.organisation.patreon_api_key) %>
-            <div class="row mb-2">
-              <div class="col-12 col-lg">
-                <div class="input-group">
-                  <div class="input-group-prepend">
-                    <span class="input-group-text">
-                      <span class="mr-1">Min. monthly donation</span>
-                      <span class="money-symbol"><%= money_symbol(f.object.currency) %></span>
-                    </span>
-                  </div>
-                  <%= o.number_field :minimum_monthly_donation, class: 'form-control', step: 'any' %>
-                </div>
-              </div>
-            </div>
-          <% end %>
-
-          <div class="row mb-2">
-
-            <% if f.object.ticket_groups.select(&:persisted?).length > 0 %>
-              <div class="col-12 col-lg mb-2">
-                <div class="input-group">
-                  <div class="input-group-prepend">
-                    <span class="input-group-text">Group</span>
-                  </div>
-                  <%= o.select :ticket_group_id, options: [''] + f.object.ticket_groups.select(&:persisted?).map { |ticket_group| [ticket_group.name, ticket_group.id] }, class: 'form-control' %>
-                </div>
-              </div>
-            <% end %>
-
-            <div class="col-12 col-lg mb-2">
-              <div class="input-group">
-                <div class="input-group-prepend">
-                  <span class="input-group-text">Sales end</span>
-                </div>
-                <%= o.text_field :sales_end, class: 'form-control datetimepicker', value: (if v = o.object.sales_end; v.strftime('%Y-%m-%d %H:%M'); end) %>
-              </div>
-            </div>
-
-            <div class="col col-lg mb-2">
-              <div class="input-group">
-                <div class="input-group-prepend">
-                  <span class="input-group-text">Limit per order</span>
-                </div>
-                <%= o.number_field :max_quantity_per_transaction, class: 'form-control', :'data-toggle' => 'tooltip', :title => 'Maximum number of tickets of this type someone can purchase in a single order', min: 0 %>
-              </div>
-            </div>
-
-            <div class="col-auto col-lg-auto mb-2">
-              <div class="input-group">
-                <div class="input-group-prepend">
-                  <span class="input-group-text">Secret?</span>
-                </div>
-                <%= o.check_box :hidden, :onclick => "$(this).tooltip('hide')", :'data-toggle' => "tooltip", :title => "Allow only people with the link to this ticket type to purchase", class: 'form-control', style: 'flex: 0 0 2.1rem; min-width: 2.1rem' %>
-                <% if o.object.hidden? %>
-                  <div class="input-group-append">
-                    <a target="_blank" data-toggle="tooltip" title="Link to secret ticket type" class="input-group-text text-dark" href="/events/<%= @event.id %>?ticket_type_id=<%= o.object.id %>"><i class="bi bi-box-arrow-up-right"></i></a>
-                  </div>
-                <% end %>
-              </div>
-            </div>
-
-          </div>
-
+          <%= partial 'events_build/ticket_type_fields', locals: { form: o, currency: f.object.currency, show_donation_field: show_donation_field, persisted_ticket_groups: persisted_ticket_groups } %>
 
           <% if o.object.new_record? %>
             <a class="btn btn-sm text-dark remove-ticket-type" href="javascript:;" onclick="$(this).closest('.ticket_type').remove()">
@@ -135,7 +39,6 @@
               <%= o.check_box '_destroy', style: 'display: none' %>
             </a>
           <% end %>
-
         </div>
       <% end %>
     </div>
@@ -144,7 +47,6 @@
 
     <script>
       $(function () {
-
         $("#ticket_types").sortable({
           cursor: 'grabbing'
         }).closest('form').submit(function () {
@@ -155,147 +57,32 @@
 
         $('#ticket_types_add').click(function () {
           var c = $('.ticket_type').length
+          var template = document.getElementById('ticket_type_template')
+          var clone = $(template.content.cloneNode(true))
+          var d = clone.find('.ticket_type')
 
-          var d = $('<div class="ticket_type bg-light shadow-sm pt-3 pb-0 pl-3 pr-5 mb-3"/>');
+          d.find('[data-field]').each(function () {
+            var field = $(this).data('field')
+            $(this).attr('name', 'event[ticket_types_attributes][' + c + '][' + field + ']')
+            $(this).attr('id', 'event_ticket_types_attributes_' + c + '_' + field)
+          })
 
-          var orderInput = $('<input type="hidden" />');
-          orderInput.attr('name', 'event[ticket_types_attributes][' + c + '][order]');
-          orderInput.attr('id', 'event_ticket_types_attributes_' + c + '_order');
-          orderInput.appendTo(d);
+          d.appendTo('#ticket_types')
 
-          // Name row
-          var nameRow = $('<div class="row mb-2"><div class="col-12 col-lg"><div class="input-group"></div></div></div>');
-          nameRow.find('.input-group').append('<div class="input-group-prepend"><span class="input-group-text">Name</span></div>');
-          var nameInput = $('<input type="text" class="form-control" required="required" />');
-          nameInput.attr('name', 'event[ticket_types_attributes][' + c + '][name]');
-          nameInput.attr('id', 'event_ticket_types_attributes_' + c + '_name');
-          nameRow.find('.input-group').append(nameInput);
-          nameRow.appendTo(d);
-
-          // Description row
-          var descriptionRow = $('<div class="row mb-2"><div class="col-12 col-lg"><div class="input-group"></div></div></div>');
-          descriptionRow.find('.input-group').append('<div class="input-group-prepend"><span class="input-group-text">Description</span></div>');
-          var descriptionInput = $('<input type="text" class="form-control" />');
-          descriptionInput.attr('name', 'event[ticket_types_attributes][' + c + '][description]');
-          descriptionInput.attr('id', 'event_ticket_types_attributes_' + c + '_description');
-          descriptionRow.find('.input-group').append(descriptionInput);
-          descriptionRow.appendTo(d);
-
-          // Price and quantity row
-          var priceRow = $('<div class="row mb-2"></div>');
-
-          // Price column
-          var priceCol = $('<div class="col-12 col-lg mb-2"></div>');
-          var priceInputGroup = $('<div class="input-group"></div>');
-          priceInputGroup.append('<div class="input-group-prepend"><span class="input-group-text money-symbol"><%= money_symbol(f.object.currency) %></span></div>');
-
-          var priceInput = $('<input type="text" class="form-control" data-toggle="tooltip" title="Enter a price, a price range (two numbers separated by a dash) or leave blank to let the attendee pay as they feel" />');
-          priceInput.attr('name', 'event[ticket_types_attributes][' + c + '][price_or_range]');
-          priceInput.attr('id', 'event_ticket_types_attributes_' + c + '_price_or_range');
-          priceInputGroup.append(priceInput);
-
-          var priceSubmittedInput = $('<input type="hidden" value="true" />');
-          priceSubmittedInput.attr('name', 'event[ticket_types_attributes][' + c + '][price_or_range_submitted]');
-          priceSubmittedInput.attr('id', 'event_ticket_types_attributes_' + c + '_price_or_range_submitted');
-          priceInputGroup.append(priceSubmittedInput);
-
-          priceCol.append(priceInputGroup);
-          priceRow.append(priceCol);
-
-          // Quantity column
-          var quantityCol = $('<div class="col-12 col-lg"></div>');
-          var quantityInputGroup = $('<div class="input-group"></div>');
-          quantityInputGroup.append('<div class="input-group-prepend"><span class="input-group-text">Capacity</span></div>');
-
-          var quantityInput = $('<input type="number" class="form-control" data-toggle="tooltip" title="Total number of tickets of this type you want to issue" required="required" />');
-          quantityInput.attr('name', 'event[ticket_types_attributes][' + c + '][quantity]');
-          quantityInput.attr('id', 'event_ticket_types_attributes_' + c + '_quantity');
-          quantityInputGroup.append(quantityInput);
-
-          quantityCol.append(quantityInputGroup);
-          priceRow.append(quantityCol);
-
-          priceRow.appendTo(d);
-
-          <% if @event.organisation && ((@event.organisation.gocardless_subscriptions && @event.organisation.gocardless_access_token) || @event.organisation.patreon_api_key) %>
-            // Minimum monthly donation row
-            var donationRow = $('<div class="row mb-2"><div class="col-12 col-lg"><div class="input-group"></div></div></div>');
-            donationRow.find('.input-group').append('<div class="input-group-prepend"><span class="input-group-text"><span class="mr-1">Min. monthly donation</span><span class="money-symbol"><%= money_symbol(f.object.currency) %></span></span></div>');
-            var donationInput = $('<input type="number" class="form-control" step="any" />');
-            donationInput.attr('name', 'event[ticket_types_attributes][' + c + '][minimum_monthly_donation]');
-            donationInput.attr('id', 'event_ticket_types_attributes_' + c + '_minimum_monthly_donation');
-            donationRow.find('.input-group').append(donationInput);
-            donationRow.appendTo(d);
-          <% end %>
-
-          // Final row containing multiple columns
-          var finalRow = $('<div class="row mb-2"></div>');
-
-          <% if f.object.ticket_groups.select(&:persisted?).length > 0 %>
-            // Ticket group column
-            var groupCol = $('<div class="col-12 col-lg mb-2"><div class="input-group"></div></div>');
-            groupCol.find('.input-group').append('<div class="input-group-prepend"><span class="input-group-text">Group</span></div>');
-            var groupSelect = $('<select class="form-control"><option value=""></option></select>');
-            <% f.object.ticket_groups.select(&:persisted?).each { |ticket_group| %>
-              groupSelect.append('<option value="<%= ticket_group.id %>"><%= escape_html ticket_group.name %></option>');
-            <% } %>
-            groupSelect.attr('name', 'event[ticket_types_attributes][' + c + '][ticket_group_id]');
-            groupSelect.attr('id', 'event_ticket_types_attributes_' + c + '_ticket_group_id');
-            groupCol.find('.input-group').append(groupSelect);
-            finalRow.append(groupCol);
-          <% end %>
-
-          // Sales end column
-          var salesEndCol = $('<div class="col-12 col-lg mb-2"><div class="input-group"></div></div>');
-          salesEndCol.find('.input-group').append('<div class="input-group-prepend"><span class="input-group-text">Sales end</span></div>');
-          var salesEndInput = $('<input type="text" class="form-control datetimepicker" />');
-          salesEndInput.attr('name', 'event[ticket_types_attributes][' + c + '][sales_end]');
-          salesEndInput.attr('id', 'event_ticket_types_attributes_' + c + '_sales_end');
-          salesEndCol.find('.input-group').append(salesEndInput);
-          finalRow.append(salesEndCol);
-
-          // Max quantity per transaction column
-          var maxQuantityCol = $('<div class="col col-lg mb-2"><div class="input-group"></div></div>');
-          maxQuantityCol.find('.input-group').append('<div class="input-group-prepend"><span class="input-group-text">Limit per order</span></div>');
-          var maxQuantityInput = $('<input type="number" class="form-control" data-toggle="tooltip" title="Maximum number of tickets of this type someone can purchase in a single order" min="0" />');
-          maxQuantityInput.attr('name', 'event[ticket_types_attributes][' + c + '][max_quantity_per_transaction]');
-          maxQuantityInput.attr('id', 'event_ticket_types_attributes_' + c + '_max_quantity_per_transaction');
-          maxQuantityCol.find('.input-group').append(maxQuantityInput);
-          finalRow.append(maxQuantityCol);
-
-          // Hidden checkbox column
-          var hiddenCol = $('<div class="col-auto col-lg-auto mb-2"><div class="input-group"></div></div>');
-          hiddenCol.find('.input-group').append('<div class="input-group-prepend"><span class="input-group-text">Secret?</span></div>');
-          var hiddenInput = $('<input type="checkbox" class="form-control" style="flex: 0 0 2.1rem; min-width: 2.1rem" onclick="$(this).tooltip(\'hide\')" data-toggle="tooltip" title="Allow only people with the link to this ticket type to purchase" />');
-          hiddenInput.attr('name', 'event[ticket_types_attributes][' + c + '][hidden]');
-          hiddenInput.attr('id', 'event_ticket_types_attributes_' + c + '_hidden');
-          hiddenCol.find('.input-group').append(hiddenInput);
-          finalRow.append(hiddenCol);
-
-          finalRow.appendTo(d);
-
-          // Remove button
-          $('<a class="btn btn-sm text-dark remove-ticket-type" href="javascript:;" onclick="$(this).closest(\'.ticket_type\').remove()"><i class="bi bi-x-lg"></i></a>').appendTo(d);
-
-          d.appendTo('#ticket_types');
-
-          // Update currency symbol for newly added ticket type
           if (typeof $.currencySymbol !== 'undefined') {
-            d.find('.money-symbol').text($.currencySymbol($('#event_currency').val()));
+            d.find('.money-symbol').text($.currencySymbol($('#event_currency').val()))
           }
 
-          // Initialize tooltips and setup datetime input
-          d.find('[data-toggle="tooltip"]').tooltip();
+          d.find('[data-toggle="tooltip"]').tooltip()
 
-          // Initialize flatpickr for the datetime input
-          salesEndInput.flatpickr({
+          d.find('.datetimepicker').flatpickr({
             altInput: true,
             altFormat: 'J F Y, H:i',
             enableTime: true,
             time_24hr: true
-          });
-        });
-      });
+          })
+        })
+      })
     </script>
   </div>
 </div>

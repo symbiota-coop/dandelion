@@ -1,0 +1,26 @@
+<div class="row mb-2">
+  <div class="col-12 col-lg mb-2 mb-lg-0">
+    <div class="input-group">
+      <div class="input-group-prepend">
+        <span class="input-group-text">Name</span>
+      </div>
+      <% if defined?(form) && form %>
+        <%= form.text_field :name, class: 'form-control', required: true %>
+      <% else %>
+        <%= text_field_tag nil, class: 'form-control', required: true, 'data-field': 'name' %>
+      <% end %>
+    </div>
+  </div>
+  <div class="col-12 col-lg">
+    <div class="input-group">
+      <div class="input-group-prepend">
+        <span class="input-group-text">Capacity</span>
+      </div>
+      <% if defined?(form) && form %>
+        <%= form.number_field :capacity, class: 'form-control', required: true %>
+      <% else %>
+        <%= number_field_tag nil, class: 'form-control', required: true, 'data-field': 'capacity' %>
+      <% end %>
+    </div>
+  </div>
+</div>
