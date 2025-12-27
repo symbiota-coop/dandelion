@@ -1,6 +1,5 @@
 class AtprotoClient
-  PUBLIC_API = 'https://public.api.bsky.app/xrpc'
-  AUTH_API = 'https://bsky.social/xrpc'
+  PUBLIC_API = 'https://public.api.bsky.app/xrpc'.freeze
 
   def initialize
     @client = Faraday.new(url: PUBLIC_API) do |conn|
@@ -39,22 +38,5 @@ class AtprotoClient
     }
   rescue StandardError
     nil
-  end
-
-  def display_posts(feed_data)
-    feed_data['feed'].each do |item|
-      post = item['post']
-      record = post['record']
-      author = post['author']
-
-      puts '=' * 60
-      puts "Author: #{author['displayName']} (@#{author['handle']})"
-      puts "Date: #{record['createdAt']}"
-      puts '-' * 40
-      puts record['text']
-      puts
-      puts "Likes: #{post['likeCount'] || 0} | Reposts: #{post['repostCount'] || 0} | Replies: #{post['replyCount'] || 0}"
-      puts
-    end
   end
 end
