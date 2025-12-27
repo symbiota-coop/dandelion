@@ -15,8 +15,7 @@
   ['Routes', 'routes', 'diagram-3'],
   ['Files', 'files', 'file-earmark'],
   ['Icons', 'icons', 'back'],
-  ['Gems', 'gems', 'gem'],
-  ['LLMs', 'llms', 'cpu']  
+  ['Gems', 'gems', 'gem'] 
 ].each do |title, path, icon| %>
   <li class="<%= 'active' if request.path == "/stats/#{path}" %>">
     <a href="/stats/<%= path %>" data-toggle="tooltip" title="<%= title %>" data-placement="right">
