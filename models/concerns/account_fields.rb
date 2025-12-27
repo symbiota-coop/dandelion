@@ -131,7 +131,7 @@ module AccountFields
         gc_postal_code: 'Post code',
         gc_branch_code: 'Sort code',
         gc_account_number: 'Account number',
-        atproto_handle: 'ATproto (Bluesky) handle'
+        atproto_handle: 'ATProto (Bluesky) handle'
       }[attr.to_sym] || super
     end
 
