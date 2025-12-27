@@ -7,13 +7,13 @@ Dandelion::App.controller do
     content_type = (parts = URI(request.url).path.split('.')
                     parts.length == 2 ? parts.last.to_sym : :html)
 
-    @events = apply_events_order(@events, params)
-    @events = apply_geo_filter(@events, params)
+    @events = apply_events_order(@events)
+    @events = apply_geo_filter(@events)
     @events = @events.and(:id.in => EventTagship.and(event_tag_id: params[:event_tag_id]).pluck(:event_id)) if params[:event_tag_id]
     %i[organisation activity local_group].each do |r|
       @events = @events.and("#{r}_id": params[:"#{r}_id"]) if params[:"#{r}_id"]
     end
-    @events = apply_online_in_person_filter(@events, params)
+    @events = apply_online_in_person_filter(@events)
     @events = @events.and(hidden_from_homepage: false) if params[:home]
     @events = @events.and(has_image: true) if params[:images]
     case content_type

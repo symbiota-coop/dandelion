@@ -38,7 +38,7 @@ Dandelion::App.helpers do
     events
   end
 
-  def apply_online_in_person_filter(events, params)
+  def apply_online_in_person_filter(events)
     if params[:online]
       events = events.online
       params[:in_person] = false
@@ -50,7 +50,7 @@ Dandelion::App.helpers do
     events
   end
 
-  def apply_events_order(events, params)
+  def apply_events_order(events)
     case params[:order]
     when 'created_at'
       events.order('created_at desc')
@@ -78,7 +78,7 @@ Dandelion::App.helpers do
     end
   end
 
-  def apply_geo_filter(events, params)
+  def apply_geo_filter(events)
     return events unless params[:near]
 
     if params[:near] == 'online'

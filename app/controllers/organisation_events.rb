@@ -11,8 +11,8 @@ Dandelion::App.controller do
     @events = @organisation.events_including_cohosted.public
     @from = params[:from] ? parse_date(params[:from]) : Date.today
     @to = params[:to] ? parse_date(params[:to]) : nil
-    @events = apply_events_order(@events, params)
-    @events = apply_geo_filter(@events, params)
+    @events = apply_events_order(@events)
+    @events = apply_geo_filter(@events)
     @events = @events.and(local_group_id: params[:local_group_id]) if params[:local_group_id]
     @events = @events.and(activity_id: params[:activity_id]) if params[:activity_id]
     carousel = nil
@@ -25,7 +25,7 @@ Dandelion::App.controller do
                   @events.and(:id.in => EventTagship.and(:event_tag_id.in => event_tags.pluck(:id)).pluck(:event_id))
                 end
     end
-    @events = apply_online_in_person_filter(@events, params)
+    @events = apply_online_in_person_filter(@events)
     @events = @events.and(monthly_donors_only: true) if params[:members_events]
     @events = @events.and(featured: true) if params[:featured]
     if params[:featured_or_course]
@@ -117,7 +117,7 @@ Dandelion::App.controller do
     @events = @events.and(coordinator_id: params[:coordinator_id]) if params[:coordinator_id]
     @events = @events.and(coordinator_id: nil) if params[:no_coordinator]
     @events = @events.and(:id.nin => EventFacilitation.pluck(:event_id)) if params[:no_facilitators]
-    @events = apply_online_in_person_filter(@events, params)
+    @events = apply_online_in_person_filter(@events)
     @events = @events.and(local_group_id: params[:local_group_id]) if params[:local_group_id]
     @events = @events.and(activity_id: params[:activity_id]) if params[:activity_id]
     if params[:cohost_id]
