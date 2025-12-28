@@ -26,6 +26,10 @@ Dandelion::App.helpers do
     params
   end
 
+  def pagination_details(collection, model: nil)
+    page_entries_info(collection, model: model)
+  end
+
   def set_time_zone
     Time.zone = if current_account && current_account.time_zone
                   current_account.time_zone
