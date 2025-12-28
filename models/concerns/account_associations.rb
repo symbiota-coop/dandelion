@@ -209,11 +209,11 @@ module AccountAssociations
   def associate_with_event!(event)
     event.organisation.organisationships.create(account: self)
     event.organisation.organisationships.find_by(account: self).set_unsubscribed!(false)
+    # rubocop:disable Style/GuardClause
     if event.activity
       event.activity.activityships.create(account: self)
       event.activity.activityships.find_by(account: self).set(unsubscribed: false)
     end
-    # rubocop:disable Style/GuardClause
     if event.local_group
       event.local_group.local_groupships.create(account: self)
       event.local_group.local_groupships.find_by(account: self).set(unsubscribed: false)
