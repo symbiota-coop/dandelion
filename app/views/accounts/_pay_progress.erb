@@ -1,4 +1,4 @@
-<% contribution_data = monthly_contribution_data(currency) %>
+<% contribution_data = MonthlyContributionsCalculator.contribution_data(currency) %>
 
 <% if contribution_data %>
   <% monthly_contributions = contribution_data[:current]

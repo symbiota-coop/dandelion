@@ -1,4 +1,4 @@
-<td data-sort="<%=money_sort(event, organisation, :revenue)%>">
+<td data-sort="<%=event_method_in_organisation_currency(event, :revenue, organisation)%>">
   <% dandelion = "#{m(event.revenue, event.currency)} from #{pluralize(event.orders.and(:transferred => false, :payment_intent.ne => nil).count, 'order')}" %>
   <%= dandelion.split(' from ').first %> from <a href="/events/<%=event.id%>/orders"><%= dandelion.split(' from ').last %></a>
 </td>

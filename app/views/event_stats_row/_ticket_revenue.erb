@@ -1,5 +1,5 @@
 <% if organisation.stripe_client_id %>
-  <td data-sort="<%=money_sort(event, organisation, :discounted_ticket_revenue)%>">
+  <td data-sort="<%=event_method_in_organisation_currency(event, :discounted_ticket_revenue, organisation)%>">
     <span data-toggle="tooltip" title="Reported by Dandelion" class="label label-primary d-block mb-1"><%= m event.discounted_ticket_revenue, event.currency %></span>
     <span data-toggle="tooltip" title="Reported by Stripe (48h delay)" class="label label-stripe d-block mb-1"><%= m event.stripe_ticket_revenue, event.currency %></span>
   </td>
@@ -7,7 +7,7 @@
   <% if organisation.hide_ticket_revenue %>
     <td></td>
   <% else %>
-    <td data-sort="<%=money_sort(event, organisation, :discounted_ticket_revenue)%>">
+    <td data-sort="<%=event_method_in_organisation_currency(event, :discounted_ticket_revenue, organisation)%>">
       <% if event.discounted_ticket_revenue > 0 %>
         <%= m event.discounted_ticket_revenue, event.currency %>
         <% if event.credit_applied > 0 %>

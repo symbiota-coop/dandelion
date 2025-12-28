@@ -1,5 +1,5 @@
 <% if event.revenue_sharer %>
-  <td data-sort="<%=money_sort(event, organisation, :stripe_ticket_revenue_to_revenue_sharer)%>">
+  <td data-sort="<%=event_method_in_organisation_currency(event, :stripe_ticket_revenue_to_revenue_sharer, organisation)%>">
     <span data-toggle="tooltip" title="Reported by Dandelion" class="label label-primary d-block mb-1"><%= m event.ticket_revenue_to_revenue_sharer, event.currency %></span>
     <span data-toggle="tooltip" title="Reported by Stripe (48h delay)" class="label label-stripe d-block mb-1"><%= m event.stripe_ticket_revenue_to_revenue_sharer, event.currency %></span>
   </td>

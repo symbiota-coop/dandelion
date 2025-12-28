@@ -1,7 +1,7 @@
 <% if role == 'organiser' && event.revenue_sharer %>
   <td></td>
 <% else %>
-  <td data-sort="<%=money_sort(event, organisation, :"profit_to_#{role}")%>">
+  <td data-sort="<%=event_method_in_organisation_currency(event, :"profit_to_#{role}", organisation)%>">
     <% if event.revenue_sharer %>
       <%= "#{event.send("profit_share_to_#{role}")}/#{event.revenue_share_to_organisation}" %><br />
     <% else %>

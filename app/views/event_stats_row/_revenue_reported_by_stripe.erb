@@ -10,7 +10,7 @@
   close_enough = (stripe_charges_money - event.revenue).abs.cents < 100
   bg_class = if event.end_time && event.end_time.to_date < Date.today - 1; (close_enough ? 'bg-success' : 'bg-warning'); end
 %>
-<td data-sort="<%=money_sort(event, organisation, :stripe_revenue)%>" <% if bg_class %> class="<%= bg_class %>" <% end %>>
+<td data-sort="<%=event_method_in_organisation_currency(event, :stripe_revenue, organisation)%>" <% if bg_class %> class="<%= bg_class %>" <% end %>>
   <%= stripe.split(' from ').first %> from <a <% if bg_class %> class="text-white font-weight-bold" <% end %> href="/events/<%=event.id%>/stripe_charges"><%= stripe.split(' from ').last %></a>
   <% if stripe_charges_transferred.exists? %>
     +

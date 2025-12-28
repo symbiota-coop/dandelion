@@ -1,3 +1,3 @@
-<td data-sort="<%=money_sort(event, organisation, :profit)%>">
+<td data-sort="<%=event_method_in_organisation_currency(event, :profit, organisation)%>">
   <%= m event.profit, event.currency %>
 </td>
