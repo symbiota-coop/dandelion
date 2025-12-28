@@ -11,11 +11,6 @@ Dandelion::App.helpers do
     @current_account ||= Account.find(session[:account_id]) if session[:account_id]
   end
 
-  def random(relation, number)
-    count = relation.count
-    (0..(count - 1)).sort_by { rand }.slice(0, number).collect! { |i| relation.skip(i).first }
-  end
-
   def event_method_in_organisation_currency(event, method, organisation)
     event.send(method).exchange_to(organisation.currency)
   rescue Money::Bank::UnknownRate, Money::Currency::UnknownCurrency
