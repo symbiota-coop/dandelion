@@ -30,10 +30,10 @@
 <link rel="stylesheet" href="/stylesheets/app.css?<%= @cachebuster %>">
 
 <% [
-     '//challenges.cloudflare.com/turnstile/v0/api.js?compat=recaptcha',
-     '//js.stripe.com/v3/',
-     "//cdn.iframe.ly/embed.js?key=#{ENV['IFRAMELY_KEY']}",
-     "//maps.googleapis.com/maps/api/js?key=#{ENV['GOOGLE_MAPS_PUBLIC_API_KEY']}&libraries=places"
+     'https://challenges.cloudflare.com/turnstile/v0/api.js?compat=recaptcha',
+     'https://js.stripe.com/v3/',
+     "https://cdn.iframe.ly/embed.js?key=#{ENV['IFRAMELY_KEY']}",
+     "https://maps.googleapis.com/maps/api/js?key=#{ENV['GOOGLE_MAPS_PUBLIC_API_KEY']}&libraries=places"
    ].each do |f| %>
   <script src="<%= f %>" defer></script>
 <% end %>
