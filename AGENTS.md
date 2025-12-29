@@ -122,6 +122,7 @@ gem 'chroma' # for manipulating colours
 gem 'digest' # for generating hashes
 gem 'haikunator' # for generating random names
 gem 'mini_magick' # for image processing
+
 ```
 
 ## Frontend dependencies
@@ -182,6 +183,7 @@ gem 'mini_magick' # for image processing
 <script>
   $(function () { App.init(); });
 </script>
+
 FRONTEND_DEPENDENCIES = {
   'https://cdnjs.cloudflare.com/ajax/libs/' => {
     'jqueryui/1.13.2' => 'jquery-ui.min.js themes/base/jquery-ui.min.css',
@@ -218,4 +220,5 @@ FRONTEND_DEPENDENCIES = {
     nil => 'pagelets.js jquery.lookup.js map.js currencySymbol.js serializeObject.js app.js'
   }
 }
+
 ```

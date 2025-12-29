@@ -18,6 +18,7 @@ add_dependency_section() {
     echo "\`\`\`"
     for file_path in "$@"; do
       cat "$file_path"
+      echo ""
     done
     echo "\`\`\`"
   } >> "$OUTPUT_PATH"
