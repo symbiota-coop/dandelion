@@ -1,99 +1,50 @@
-<% {
-     'cytoscape/3.9.4' => 'cytoscape.min.js',
-     'chroma-js/2.0.6' => 'chroma.min.js'
-   }.each { |k,v| %>
-<% v.split(' ').each { |f| u = "https://cdnjs.cloudflare.com/ajax/libs/#{k}/#{f}" %>
-<script src="<%= u %>"></script>
-<% } %>
-<% } %>
-
-<% [
-     '//rawcdn.githack.com/tgdwyer/WebCola/aab7e61cd9580c4c89180cc0a30594e12743a242/WebCola/cola.min.js',
-     '//rawcdn.githack.com/cytoscape/cytoscape.js-cola/8c78f9d5c11ff6162b7d902f0639e1f787277b9f/cytoscape-cola.js'
-   ].each { |f| %>
-<script src="<%= f %>"></script>
-<% } %>
-
-<% models = Dir.entries("#{PADRINO_ROOT}/models").select { |filename| filename.ends_with?('.rb') }.map { |filename| filename.split('.rb').first.camelize.constantize } %>
-
-<script>
-  function drawNetwork() {
-
-  scale = chroma.scale(['#00B963', '#00B963']);
-
+<%
   node_min_width = 0
-  node_min_color = 0
-  node_color_scale = 1
-  edge_min_color = 0
-  edge_color_scale = 1
   edge_min_opacity = 0.25
   edge_opacity_scale = 10
+  color = '#00B963'
 
-          cy = cytoscape({
+  models = Dir.entries("#{PADRINO_ROOT}/models")
+    .select { |filename| filename.ends_with?('.rb') }
+    .map { |filename| filename.split('.rb').first.camelize.constantize }
 
-          container: $('#cy'),
-                  elements: [
-  <% models.each { |model| %>
-                    {
-                      data: {
-                      id: '<%= model.name.underscore %>',
-                      name: '<%= model.name %>',
-                      weight: <%= w = model.fields.count + model.reflect_on_all_associations(:belongs_to).count %>,
-                      width: (node_min_width +<%= w %>),
-                      color: scale(node_min_color + <%= w %>/node_color_scale).hex()}
-                    },
-                    <% model.reflect_on_all_associations(:has_many).each_with_index { |assoc,i| %>
-                    {
-                      data: {
-                        id: '<%= assoc.class_name.underscore %>-<%= model.name.underscore %>-<%= i %>',
-                        source: '<%= assoc.class_name.underscore %>',
-                        target: '<%= model.name.underscore %>',
-                        weight: <%= w = 1 %>,
-                        color: scale(edge_min_color + <%= w %>/edge_color_scale).hex(),
-                        opacity: (edge_min_opacity + <%= w %>/edge_opacity_scale)
-                      }
-                    },
-                    <% } %>
-  <% } %>
-                  ],
-                  style: [
-                  {
-                  selector: 'node',
-                  style: {
-                      'color': '#212529',
-                      'background-color': 'data(color)',
-                      'opacity': 0.85,
-                      'label': 'data(name)',
-                      'width': 'data(width)',
-                      'height': 'data(width)'
-                    }
-                  },
-                  {
-                  selector: 'edge',
-                  style: {
-                      'opacity': 'data(opacity)',
-                      'line-color': 'data(color)',
-                    }
-                  }
-                  ],
-                  layout: {
-                  name: 'cola',
-                          //infinite: true,
-                          nodeSpacing: function(node){ return 40; },
-                  }
+  elements = []
 
-          });
-  //cy.$('[weight < 2]').hide()
-  cy.minZoom(0.5)
-  cy.on('tap', 'node', function(){
-   window.open('https://github.com/symbiota-coop/dandelion/blob/master/models/' + this.data('id') + '.rb')
+  models.each do |model|
+    w = model.fields.count + model.reflect_on_all_associations(:belongs_to).count
+    elements << {
+      data: {
+        id: model.name.underscore,
+        name: model.name,
+        weight: w,
+        width: node_min_width + w,
+        color: color
+      }
+    }
 
-  });
-  }
+    model.reflect_on_all_associations(:has_many).each_with_index do |assoc, i|
+      elements << {
+        data: {
+          id: "#{assoc.class_name.underscore}-#{model.name.underscore}-#{i}",
+          source: assoc.class_name.underscore,
+          target: model.name.underscore,
+          weight: 1,
+          color: color,
+          opacity: edge_min_opacity + 1.0 / edge_opacity_scale
+        }
+      }
+    end
+  end
+%>
 
-  $(function() {
-  drawNetwork()
-          $(window).one('focus', function() { drawNetwork() })
-  })
-</script>
-<div id="cy" style="height: 600px"></div>
+<%= partial :network_script, locals: {
+  node_min_width: node_min_width,
+  node_min_color: 0,
+  node_color_scale: 1,
+  edge_min_color: 0,
+  edge_color_scale: 1,
+  edge_min_opacity: edge_min_opacity,
+  edge_opacity_scale: edge_opacity_scale,
+  elements: elements.to_json,
+  tap_handler: "window.open('https://github.com/symbiota-coop/dandelion/blob/master/models/' + this.data('id') + '.rb')"
+} %>

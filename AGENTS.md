@@ -130,10 +130,11 @@ gem 'mini_magick' # for image processing
 ```
 <link rel="preconnect" href="https://cdnjs.cloudflare.com">
 <link rel="preconnect" href="https://rawcdn.githack.com">
-<link rel="preconnect" href="https://js.stripe.com">
-<link rel="preconnect" href="https://maps.googleapis.com">
-<link rel="preconnect" href="https://cdn.iframe.ly">
+
 <link rel="preconnect" href="https://challenges.cloudflare.com">
+<link rel="preconnect" href="https://js.stripe.com">
+<link rel="preconnect" href="https://cdn.iframe.ly">
+<link rel="preconnect" href="https://maps.googleapis.com">
 
 <link href="/infinite_admin/plugins/icon/themify-icons/themify-icons.css" rel="stylesheet">
 <link href="/infinite_admin/plugins/bootstrap/bootstrap4/css/bootstrap.css" rel="stylesheet">
@@ -188,8 +189,6 @@ FRONTEND_DEPENDENCIES = {
   'https://cdnjs.cloudflare.com/ajax/libs/' => {
     'jqueryui/1.13.2' => 'jquery-ui.min.js themes/base/jquery-ui.min.css',
     'jquery-timeago/1.4.3' => 'jquery.timeago.min.js',
-    'moment.js/2.17.1' => 'moment.min.js locale/en-gb.js',
-    'moment-timezone/0.5.43' => 'moment-timezone.min.js moment-timezone-with-data.min.js',
     'flatpickr/4.6.13' => 'flatpickr.min.js flatpickr.min.css',
     'datatables/1.10.16' => 'js/jquery.dataTables.min.js js/dataTables.bootstrap4.min.js css/dataTables.bootstrap4.min.css',
     'tributejs/3.5.3' => 'tribute.min.js tribute.min.css',
@@ -209,7 +208,6 @@ FRONTEND_DEPENDENCIES = {
     'chartjs-plugin-datalabels/2.0.0' => 'chartjs-plugin-datalabels.min.js'
   },
   'https://rawcdn.githack.com/' => {
-    'bassjobsen/Bootstrap-3-Typeahead/067bd296184a4dda8c669923417124065b4ebced' => 'bootstrap3-typeahead.min.js',
     'mahnunchik/markerclustererplus/736b0e3a7d916fbeb2ee5007494f17a5329b11a8' => 'src/markerclusterer.js',
     'scottdejonge/map-icons/dbf6fd7caedd60d11b5bfb5f267a114a6847d012' => 'dist/js/map-icons.js dist/css/map-icons.min.css',
     'scottgonzalez/jquery-ui-extensions/fb7fd7df3d70e0288394f07bfe78262b548c30d6' => 'src/autocomplete/jquery.ui.autocomplete.html.js',
