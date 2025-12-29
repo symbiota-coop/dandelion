@@ -46,8 +46,36 @@ Dandelion::App.controller do
     erb :'stats/icons'
   end
 
+  get '/stats/frontend_dependencies' do
+    @dependencies = []
+    mutex = Mutex.new
+    threads = []
+
+    FRONTEND_DEPENDENCIES.each do |base_url, libs|
+      # Skip local files
+      next if base_url.start_with?('/')
+
+      libs.each_key do |path|
+        threads << Thread.new do
+          dep = fetch_frontend_dependency(base_url, path)
+          mutex.synchronize { @dependencies << dep } if dep
+        end
+      end
+    end
+
+    threads.each(&:join)
+
+    # Sort by date (oldest first, nils at top)
+    @dependencies.sort_by! { |d| d[:release_date] || d[:commit_date] || Time.at(0) }
+
+    erb :'stats/frontend_dependencies'
+  end
+
   get '/stats/gems' do
     @gems = []
+    mutex = Mutex.new
+    threads = []
+
     gemfile_content = File.read(Padrino.root('Gemfile'))
 
     # Extract gem names (excluding GitHub gems which won't be on RubyGems)
@@ -61,24 +89,13 @@ Dandelion::App.controller do
     gem_names.uniq!
 
     gem_names.each do |gem_name|
-      response = Faraday.get("https://rubygems.org/api/v1/gems/#{gem_name}.json")
-      if response.status == 200
-        data = JSON.parse(response.body)
-        @gems << {
-          name: data['name'],
-          version: data['version'],
-          updated_at: Time.parse(data['version_created_at']),
-          downloads: data['downloads'],
-          homepage: data['homepage_uri'],
-          source_code: data['source_code_uri'],
-          info: data['info']&.to_s&.split('.')&.first
-        }
-      else
-        @gems << { name: gem_name, version: nil, updated_at: nil, downloads: nil, homepage: nil, source_code: nil, info: nil }
+      threads << Thread.new do
+        gem_info = fetch_gem_info(gem_name)
+        mutex.synchronize { @gems << gem_info }
       end
-    rescue StandardError
-      @gems << { name: gem_name, version: nil, updated_at: nil, downloads: nil, homepage: nil, source_code: nil, info: nil }
     end
+
+    threads.each(&:join)
 
     # Sort by last updated (oldest first to highlight outdated gems, nils at top)
     @gems.sort_by! { |g| g[:updated_at] || Time.at(0) }

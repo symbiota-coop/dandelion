@@ -1,0 +1,73 @@
+<div class="table-responsive">
+  <table id="frontend-deps-table" class="table table-hover">
+    <thead>
+      <tr>
+        <th>Package</th>
+        <th>Version</th>
+        <th>Latest</th>
+        <th>Release date</th>
+        <th>Description</th>
+        <th>Links</th>
+      </tr>
+    </thead>
+    <tbody>
+      <% @dependencies.each do |dep| %>
+        <tr>
+          <td>
+            <% if dep[:source] == 'cdnjs' %>
+              <a href="https://cdnjs.com/libraries/<%= dep[:name] %>" target="_blank"><%= dep[:name] %></a>
+            <% elsif dep[:homepage] %>
+              <a href="<%= dep[:homepage] %>" target="_blank"><%= dep[:name] %></a>
+            <% else %>
+              <%= dep[:name] %>
+            <% end %>
+          </td>
+          <td><code><%= dep[:version] %></code></td>
+          <td>
+            <% if dep[:latest_version] %>
+              <% if dep[:version] != dep[:latest_version] %>
+                <code>
+                  <%= dep[:latest_version] %>
+                </code>
+              <% else %>
+                <i class="bi bi-check-lg" />
+              <% end %>
+            <% else %>
+              <i class="bi bi-question-lg" />
+            <% end %>
+          </td>
+          <% date = dep[:release_date] || dep[:commit_date] %>
+          <td data-order="<%= date&.to_i || 0 %>">
+            <% if date %>
+              <span title="<%= date.strftime('%Y-%m-%d %H:%M:%S UTC') %>">
+                <%= date.strftime('%Y-%m-%d') %>
+              </span>
+            <% end %>
+          </td>
+          <td>
+            <small><%= dep[:description] %></small>
+          </td>
+          <td>
+            <% if dep[:homepage] %>
+              <a href="<%= dep[:homepage] %>" target="_blank" title="Homepage" class="mr-1"><i class="bi bi-house"></i></a>
+            <% end %>
+            <% if dep[:repository] %>
+              <a href="<%= dep[:repository].sub(/^git\+/, '') %>" target="_blank" title="Github"><i class="bi bi-github"></i></a>
+            <% end %>
+          </td>
+        </tr>
+      <% end %>
+    </tbody>
+  </table>
+</div>
+
+<script>
+  $(function() {
+    $('#frontend-deps-table').DataTable({
+      paging: false,
+      searching: false,
+      bInfo: false,
+      order: [[3, 'asc']],
+    });
+  });
+</script>

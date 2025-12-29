@@ -22,7 +22,7 @@ FRONTEND_DEPENDENCIES = {
     'fullcalendar/6.1.19' => 'index.global.min.js',
     'chartjs-plugin-datalabels/2.0.0' => 'chartjs-plugin-datalabels.min.js'
   },
-  '//rawcdn.githack.com/' => {
+  'https://rawcdn.githack.com/' => {
     'bassjobsen/Bootstrap-3-Typeahead/067bd296184a4dda8c669923417124065b4ebced' => 'bootstrap3-typeahead.min.js',
     'mahnunchik/markerclustererplus/736b0e3a7d916fbeb2ee5007494f17a5329b11a8' => 'src/markerclusterer.js',
     'scottdejonge/map-icons/dbf6fd7caedd60d11b5bfb5f267a114a6847d012' => 'dist/js/map-icons.js dist/css/map-icons.min.css',
