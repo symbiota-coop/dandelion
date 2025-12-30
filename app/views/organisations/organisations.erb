@@ -61,6 +61,9 @@
 <% if params[:display] == 'map' %>
   <%= partial :'maps/map', locals: { url: "/organisations", fill_screen: true } %>
 <% elsif params[:display] == 'network' %>
+  <p>
+    Node size ~ number of followers, edge weight ~ number of mutual followers.
+  </p>
   <%= partial :'organisations/network', locals: { organisations: @organisations } %>
 <% else %>
   <%= partial :'organisations/blocks', locals: { organisations: @organisations } %>

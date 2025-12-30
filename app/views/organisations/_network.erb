@@ -1,7 +1,3 @@
-<p>
-  Node size ~ number of followers, edge weight ~ number of mutual followers.
-</p>
-
 <%
   node_min_width = 10
   node_width_scale = 20
@@ -44,14 +40,6 @@
 %>
 
 <%= partial :network_script, locals: {
-  node_min_color: 0,
-  node_color_scale: 1,
-  node_min_width: node_min_width,
-  node_width_scale: node_width_scale,
-  edge_min_color: 0,
-  edge_color_scale: 1,
-  edge_min_opacity: edge_min_opacity,
-  edge_opacity_scale: edge_opacity_scale,
   elements: elements.to_json,
   tap_handler: "window.location.href = '/o/' + this.data('slug');"
 } %>

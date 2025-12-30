@@ -1,7 +1,6 @@
 <% {
      'https://cdnjs.cloudflare.com/ajax/libs/' => {
-       'cytoscape/3.9.4' => 'cytoscape.min.js',
-       'chroma-js/2.0.6' => 'chroma.min.js'
+       'cytoscape/3.9.4' => 'cytoscape.min.js'
      },
      'https://rawcdn.githack.com/' => {
        'tgdwyer/WebCola/aab7e61cd9580c4c89180cc0a30594e12743a242/WebCola' => 'cola.min.js',
@@ -17,68 +16,45 @@
 <% end %>
 
 <script>
+  var elements = <%== elements %>;
+  var tapHandler = function() { <%== tap_handler %> };
+
   function drawNetwork() {
-
-  scale = chroma.scale(['#00B963', '#00B963']);
-
-  node_min_color = <%= node_min_color || 0 %>
-  node_color_scale = <%= node_color_scale || 1 %>
-  node_min_width = <%= node_min_width || 0 %>
-  <% if node_width_scale %>
-  node_width_scale = <%= node_width_scale %>
-  <% end %>
-
-  edge_min_color = <%= edge_min_color || 0 %>
-  edge_color_scale = <%= edge_color_scale || 1 %>
-  edge_min_opacity = <%= edge_min_opacity || 0.25 %>
-  edge_opacity_scale = <%= edge_opacity_scale || 10 %>
-
-          cy = cytoscape({
-
-          container: $('#cy'),
-                  elements: <%== elements %>,
-                  style: [
-                  {
-                  selector: 'node',
-                  style: {
-                      'color': '#212529',
-                      'background-color': 'data(color)',
-                      'opacity': 0.85,
-                      'label': 'data(name)',
-                      'width': 'data(width)',
-                      'height': 'data(width)'
-                    }
-                  },
-                  {
-                  selector: 'edge',
-                  style: {
-                      'opacity': 'data(opacity)',
-                      'line-color': 'data(color)',
-                    }
-                  }
-                  ],
-                  layout: {
-                    name: 'cola',
-                    <% if defined?(randomize) && randomize %>
-                    //randomize: true,
-                    <% end %>
-                    <% if defined?(infinite) && infinite %>
-                    //infinite: true,
-                    <% end %>
-                    nodeSpacing: function(node){ return 40; },
-                  }
-
-          });
-  //cy.$('[weight < 2]').hide()
-  cy.minZoom(0.5)
-  cy.on('tap', 'node', function(){
-  <%== tap_handler %>
-  });
+    var cy = cytoscape({
+      container: $('#cy'),
+      elements: elements,
+      style: [
+        {
+          selector: 'node',
+          style: {
+            'color': '#212529',
+            'background-color': 'data(color)',
+            'opacity': 0.85,
+            'label': 'data(name)',
+            'width': 'data(width)',
+            'height': 'data(width)'
+          }
+        },
+        {
+          selector: 'edge',
+          style: {
+            'opacity': 'data(opacity)',
+            'line-color': 'data(color)',
+          }
+        }
+      ],
+      layout: {
+        name: 'cola',
+        nodeSpacing: function(node) { return 40; },
+      }
+    });
+    cy.minZoom(0.5);
+    cy.on('tap', 'node', tapHandler);
   }
 
   $(function() {
-  drawNetwork()
-          $(window).one('focus', function() { drawNetwork() })
-  })
+    drawNetwork();
+    $(window).one('focus', function() { drawNetwork(); });
+  });
 </script>
 <div id="cy" style="height: 600px"></div>
