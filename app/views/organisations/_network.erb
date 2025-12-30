@@ -41,5 +41,5 @@
 
 <%= partial :network_script, locals: {
   elements: elements.to_json,
-  tap_handler: "window.location.href = '/o/' + this.data('slug');"
+  tap_handler: "window.open('/o/' + this.data('slug'), '_blank');"
 } %>
