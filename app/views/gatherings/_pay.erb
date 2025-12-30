@@ -39,6 +39,9 @@
 
 <% end %>
 
+<% if @gathering.evm_address && @gathering.chain %>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/web3/1.3.4/web3.min.js"></script>
+<% end %>
 <script>
   $(function () {
 

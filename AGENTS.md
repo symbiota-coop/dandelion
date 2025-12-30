@@ -197,7 +197,6 @@ FRONTEND_DEPENDENCIES = {
     'iframe-resizer/4.2.10' => 'iframeResizer.contentWindow.min.js',
     'slick-carousel/1.8.1' => 'slick.min.js slick.min.css slick-theme.min.css',
     'Chart.js/3.5.1' => 'chart.js',
-    'web3/1.3.4' => 'web3.min.js',
     'intro.js/6.0.0' => 'intro.min.js introjs.min.css',
     'qrcodejs/1.0.0' => 'qrcode.min.js',
     'masonry/4.0.0' => 'masonry.pkgd.min.js',
