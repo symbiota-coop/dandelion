@@ -39,120 +39,22 @@
 
 <% end %>
 
+<%
+  pay_config = {
+    gatheringSlug: @gathering.slug,
+    currency: @gathering.currency,
+    currencySymbol: money_symbol(@gathering.currency),
+    stripePk: @gathering.stripe_pk,
+    evmAddress: @gathering.evm_address,
+    contractAddress: (@gathering.currency == 'USD' ? Token.object('BREAD').contract_address : @gathering.token.try(:contract_address)),
+    networkId: @gathering.chain.try(:network_id),
+    networkName: @gathering.chain.try(:name)
+  }
+%>
+<script type="application/json" id="gathering-pay-config">
+  <%== pay_config.to_json %>
+</script>
 <% if @gathering.evm_address && @gathering.chain %>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/web3/1.3.4/web3.min.js"></script>
 <% end %>
-<script>
-  $(function () {
-
-    currency = <%== @gathering.currency.to_json %>
-    currencySymbol = <%== money_symbol(@gathering.currency).to_json %>
-
-    $('#pay-form button[data-payment-method]').click(function () {
-      $('input[type=hidden][name=payment_method]').attr('disabled', true)
-      $('input[type=hidden][name=payment_method][value=' + $(this).attr('data-payment-method') + ']').removeAttr('disabled')
-      $(this).attr('data-payment-method-clicked', true)
-    })
-
-    $('#pay-form').submit(function () {
-      $('#pay-form button[data-payment-method-clicked] i').show()
-      $.post('/g/<%= @gathering.slug %>/pay', $(this).serializeObject(), function (data) {
-        if (data['session_id']) {
-          // Stripe
-          var stripe = Stripe('<%= @gathering.stripe_pk %>');
-          stripe.redirectToCheckout({sessionId: data['session_id']})
-        } else if (data['checkout_id']) {
-          // Coinbase
-          window.location = 'https://commerce.coinbase.com/checkout/' + data['checkout_id']
-        } else if (data['evm_secret']) {
-          // EVM
-          evmAddress = <%== @gathering.evm_address.to_json %>
-          contractAddress = <%== @gathering.currency == 'USD' ? Token.object('BREAD').contract_address.to_json : @gathering.token.try(:contract_address).to_json %>
-          networkId = <%= @gathering.chain.try(:network_id) %>
-          networkName = '<%=@gathering.chain.try(:name) %>'
-          $('#owed').hide()
-          $('#pay-with-evm').show()
-          $('#pay-with-evm').find('.card-body p.lead.please').html('Send EXACTLY <strong>' + data['evm_amount'] + ' ' + currency + '</strong> to <strong>' + evmAddress + '</strong>')
-          var offset = $('#pay-with-evm').offset()
-          window.scrollTo(0, offset['top'] - $('#header').height() - 10);
-
-          var web3 = new Web3(ethereum);
-
-          web3.eth.net.getId().then(thisNetworkId => {
-            if (thisNetworkId != networkId) {
-              $('#pay-with-evm').find('.card-body p.web3wallet').html("<mark>Please switch your web3 wallet's network to " + networkName + '</mark>')
-              ethereum.on('chainChanged', function() {
-                web3.eth.net.getId().then(thisNetworkId => {
-                  if (thisNetworkId == networkId)
-                    connectWeb3Wallet()
-                })
-              });
-            } else if (thisNetworkId == networkId) {
-              connectWeb3Wallet()
-            }
-          })
-
-          function connectWeb3Wallet() {
-            if (!ethereum.selectedAddress) {
-              $('#pay-with-evm').find('.card-body p.web3wallet').html('<a href="javascript:;">Connect your web3 wallet</a>')
-              $('#pay-with-evm').find('.card-body p.web3wallet a').click(function() {
-                ethereum.request({
-                  method: 'eth_requestAccounts'
-                }).then(pay)
-              }).click()
-            } else {
-              pay()
-            }
-          }
-
-          function pay() {
-            $('#pay-with-evm').find('.card-body p.web3wallet').remove()
-
-            var abi = [{
-              "constant": false,
-              "inputs": [{
-                  "name": "_to",
-                  "type": "address"
-                },
-                {
-                  "name": "_value",
-                  "type": "uint256"
-                }
-              ],
-              "name": "transfer",
-              "outputs": [{
-                "name": "",
-                "type": "bool"
-              }],
-              "type": "function"
-            }];
-
-            var toAddress = evmAddress
-            var fromAddress = ethereum.selectedAddress
-            var amount = parseInt(data['evm_wei']).toString()
-
-            var contractInstance = new web3.eth.Contract(abi, contractAddress);
-            contractInstance.methods.transfer(toAddress, amount).send({
-              from: fromAddress
-            })
-          }
-
-          setInterval(function() {
-            if (Date.now() < data['payment_expiry'])
-              $.getJSON('/g/<%=@gathering.slug%>/payments/' + data['payment_id'] , function(_data) {
-                if (_data['payment_completed'])
-                  window.location = '/g/<%=@gathering.slug%>/options'
-              })
-          }, 10 * 1000);
-        }
-      }).fail(function () {
-        $('#pay-form').hide()
-      }).always(function () {
-        $('#pay-form').css('opacity', 1)
-      })
-
-      return false
-
-    })
-  })
-</script>
+<script src="/javascripts/gathering_pay.js?<%= @cachebuster %>"></script>
