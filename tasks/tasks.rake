@@ -36,7 +36,7 @@ namespace :late do
     Faraday.get("#{ENV['BASE_URI']}/daily?date=#{Date.today.to_fs(:db_local)}", {}, { 'X-Requested-With' => 'XMLHttpRequest' })
     puts 'create organisation edges'
     OrganisationEdge.delete_all
-    OrganisationEdge.create_all(Organisation.and(:followers_count.gte => 50).and(:id.nin => Organisation.order('followers_count desc').limit(1).pluck(:id)))
+    OrganisationEdge.create_all(Organisation.and(:followers_count.gte => 50))
     puts 'clear up optionships'
     Gathering.and(clear_up_optionships: true).each(&:clear_up_optionships!)
     puts 'update event tags for select'
