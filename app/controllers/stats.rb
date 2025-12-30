@@ -55,10 +55,17 @@ Dandelion::App.controller do
       # Skip local files
       next if base_url.start_with?('/')
 
-      libs.each_key do |path|
+      libs.each do |path, files|
         threads << Thread.new do
           dep = fetch_frontend_dependency(base_url, path)
-          mutex.synchronize { @dependencies << dep } if dep
+          if dep
+            # Build file URLs for size calculation
+            file_urls = files.split.map do |f|
+              path.nil? ? "#{base_url}#{f}" : "#{base_url}#{path}/#{f}"
+            end
+            dep[:file_urls] = file_urls
+            mutex.synchronize { @dependencies << dep }
+          end
         end
       end
     end

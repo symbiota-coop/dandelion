@@ -6,13 +6,14 @@
         <th>Version</th>
         <th>Latest</th>
         <th>Release date</th>
+        <th>Size</th>
         <th>Description</th>
         <th>Links</th>
       </tr>
     </thead>
     <tbody>
       <% @dependencies.each do |dep| %>
-        <tr>
+        <tr data-file-urls="<%= dep[:file_urls]&.to_json %>">
           <td>
             <% if dep[:source] == 'cdnjs' %>
               <a href="https://cdnjs.com/libraries/<%= dep[:name] %>" target="_blank"><%= dep[:name] %></a>
@@ -44,6 +45,9 @@
               </span>
             <% end %>
           </td>
+          <td class="file-size" data-order="0">
+            <small class="text-muted">...</small>
+          </td>
           <td>
             <small><%= dep[:description] %></small>
           </td>
@@ -63,11 +67,46 @@
 
 <script>
   $(function() {
-    $('#frontend-deps-table').DataTable({
+    var table = $('#frontend-deps-table').DataTable({
       paging: false,
       searching: false,
       bInfo: false,
       order: [[3, 'asc']],
+    });
+
+    function formatBytes(bytes) {
+      if (bytes === 0) return '0 B';
+      var k = 1024;
+      var sizes = ['B', 'KB', 'MB'];
+      var i = Math.floor(Math.log(bytes) / Math.log(k));
+      return parseFloat((bytes / Math.pow(k, i)).toFixed(1)) + ' ' + sizes[i];
+    }
+
+    $('#frontend-deps-table tbody tr').each(function() {
+      var $row = $(this);
+      var $sizeCell = $row.find('.file-size');
+      var fileUrls = $row.data('file-urls');
+
+      if (!fileUrls || !fileUrls.length) {
+        $sizeCell.html('<small>-</small>');
+        return;
+      }
+
+      var sizePromises = fileUrls.map(function(url) {
+        return fetch(url, { method: 'HEAD', cache: 'force-cache' })
+          .then(function(response) {
+            var contentLength = response.headers.get('content-length');
+            return contentLength ? parseInt(contentLength, 10) : 0;
+          })
+          .catch(function() { return 0; });
+      });
+
+      Promise.all(sizePromises).then(function(sizes) {
+        var totalSize = sizes.reduce(function(a, b) { return a + b; }, 0);
+        $sizeCell.attr('data-order', totalSize);
+        $sizeCell.html('<small>' + formatBytes(totalSize) + '</small>');
+        table.row($row).invalidate();
+      });
     });
   });
 </script>
