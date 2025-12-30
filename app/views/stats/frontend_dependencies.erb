@@ -4,8 +4,8 @@
       <tr>
         <th>Package</th>
         <th>Version</th>
-        <th>Latest</th>
         <th>Release date</th>
+        <th>Latest</th>
         <th>Size</th>
         <th>Description</th>
         <th>Links</th>
@@ -24,6 +24,14 @@
             <% end %>
           </td>
           <td><code><%= dep[:version] %></code></td>
+          <% date = dep[:release_date] || dep[:commit_date] %>
+          <td data-order="<%= date&.to_i || 0 %>">
+            <% if date %>
+              <span title="<%= date.strftime('%Y-%m-%d %H:%M:%S UTC') %>">
+                <%= date.strftime('%Y-%m-%d') %>
+              </span>
+            <% end %>
+          </td>
           <td>
             <% if dep[:latest_version] %>
               <% if dep[:version] != dep[:latest_version] %>
@@ -35,14 +43,6 @@
               <% end %>
             <% else %>
               <i class="bi bi-question-lg" />
-            <% end %>
-          </td>
-          <% date = dep[:release_date] || dep[:commit_date] %>
-          <td data-order="<%= date&.to_i || 0 %>">
-            <% if date %>
-              <span title="<%= date.strftime('%Y-%m-%d %H:%M:%S UTC') %>">
-                <%= date.strftime('%Y-%m-%d') %>
-              </span>
             <% end %>
           </td>
           <td class="file-size" data-order="0">
@@ -71,7 +71,7 @@
       paging: false,
       searching: false,
       bInfo: false,
-      order: [[3, 'asc']],
+      order: [[2, 'asc']],
     });
 
     function formatBytes(bytes) {
