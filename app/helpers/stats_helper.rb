@@ -119,8 +119,19 @@ Dandelion::App.helpers do
     return nil unless File.exist?(gemfile_lock_path)
 
     content = File.read(gemfile_lock_path)
-    # Look for gem entry in Gemfile.lock format: "gem_name (version)"
-    match = content.match(/^\s+#{Regexp.escape(gem_name)}\s+\(([^)]+)\)/)
-    match ? match[1] : nil
+    # Look for all gem entries in Gemfile.lock format: "gem_name (version)"
+    # Actual installed gems are at 4 spaces indentation and have simple version numbers
+    # Dependency requirements are at 6+ spaces and have constraints like ">= 5.0"
+    matches = content.scan(/^(\s+)#{Regexp.escape(gem_name)}\s+\(([^)]+)\)/)
+
+    # Find the actual gem entry (4 spaces) with a simple version number (not a constraint)
+    matches.each do |indent, version|
+      # Actual gem entries are at 4 spaces, and version should look like a version number
+      # (not contain operators like >=, ~>, <, etc.)
+      return version if indent.length == 4 && !version.match?(/[<>=~]/)
+    end
+
+    # Fallback: return the last match (actual gems come after dependencies)
+    matches.last&.last
   end
 end
