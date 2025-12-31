@@ -36,10 +36,10 @@ module EventSerialization
   end
 
   def to_public_xml
-    public_data.to_public_xml
+    public_data.to_xml(root: 'event')
   end
 
   def to_public_json
-    public_data.to_public_json
+    public_data.to_json
   end
 end
