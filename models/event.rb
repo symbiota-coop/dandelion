@@ -9,6 +9,7 @@ class Event
   include EventAssociations
   include EventCallbacks
   include EventScopes
+  include EventSerialization
   include EventAccounting
   include EventDuplication
   include EventNotifications

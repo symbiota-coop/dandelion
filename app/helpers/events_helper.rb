@@ -90,28 +90,6 @@ Dandelion::App.helpers do
     end.to_json
   end
 
-  def events_json(events)
-    events.includes(:activity, :local_group).map do |event|
-      {
-        id: event.id.to_s,
-        slug: event.slug,
-        name: event.name,
-        cohosts: event.cohosts.map { |organisation| { name: organisation.name, slug: organisation.slug } },
-        facilitators: event.event_facilitators.map { |account| { name: account.name, username: account.username } },
-        activity: event.activity ? { name: event.activity.name, id: event.activity_id.to_s } : nil,
-        local_group: event.local_group ? { name: event.local_group.name, id: event.local_group_id.to_s } : nil,
-        email: event.email,
-        tags: event.event_tags.map(&:name),
-        start_time: event.start_time,
-        end_time: event.end_time,
-        location: event.location,
-        time_zone: event.time_zone,
-        image: event.image ? event.image.thumb('1920x1920').url : nil,
-        description: event.description
-      }
-    end.to_json
-  end
-
   def build_events_ical(events, calendar_name, ical_full: false)
     cal = Icalendar::Calendar.new
     cal.append_custom_property('X-WR-CALNAME', calendar_name)

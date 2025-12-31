@@ -74,7 +74,7 @@ Dandelion::App.controller do
           @events = @events.and(:start_time.lt => @to + 1) if @to
         end
         @events = filter_events_by_search_and_tags(@events)
-        events_json(@events)
+        @events.to_public_json
       end
     when :ics
       @events = @events.live
