@@ -113,5 +113,41 @@ module Searchable
     def search_fields
       raise NotImplementedError, "#{self} must implement search_fields class method"
     end
+
+    def vector_search(query_or_vector = nil, query: nil, query_vector: nil, limit: 10, num_candidates: nil)
+      # Handle positional argument for convenience
+      if query_or_vector.present?
+        if query_or_vector.is_a?(Array)
+          query_vector = query_or_vector
+        else
+          query = query_or_vector
+        end
+      end
+
+      # Convert query string to vector if provided
+      query_vector = OpenRouter.embedding(query) if query.present?
+
+      return none if query_vector.blank? || !query_vector.is_a?(Array)
+
+      num_candidates ||= 20 * limit
+
+      pipeline = [
+        {
+          '$vectorSearch' => {
+            'index' => 'vector_index',
+            'path' => 'embedding',
+            'queryVector' => query_vector,
+            'numCandidates' => num_candidates,
+            'limit' => limit
+          }
+        }
+      ]
+
+      results = collection.aggregate(pipeline)
+      ids = results.map { |doc| doc['_id'] }
+
+      results_by_id = where(:id.in => ids).index_by(&:id)
+      ids.map { |id| results_by_id[id] }.compact
+    end
   end
 end
