@@ -166,7 +166,7 @@ module Searchable
         earliest_by_name[record.name] = record if existing.nil? || record.start_time < existing.start_time
       end
 
-      kept_ids = earliest_by_name.values.map(&:id).to_set
+      kept_ids = earliest_by_name.values.to_set(&:id)
       ordered_results.select { |record| kept_ids.include?(record.id) }
     end
   end
