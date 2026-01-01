@@ -1,9 +1,14 @@
 <form action="/search" id="search-form">
-  <div class="search-input <% if @type == 'events' %>mb-1<% end %>">
+  <div class="search-input <% if %w[ai events].include?(@type) %>mb-1<% end %>">
     <a href="javascript:;" onclick="$(this).next().val('').focus()" class="search-close">×</a>
     <input name="q" type="text" class="form-control input-lg" value="<%= @q %>">
   </div>
-  <% if @type == 'events' %>
+  <% if @type == 'ai' %>
+    <p class="mb-3">
+      AI search for events. <br class="d-sm-none" />
+      <a href="/events?q=<%=@q%>&search=1">See full search options &rarr;</a>
+    </p>
+  <% elsif @type == 'events' %>
     <p class="mb-3">
       Fuzzy search for recent and future events. <br class="d-sm-none" />
       <a href="/events?q=<%=@q%>&search=1">See full search options &rarr;</a>
@@ -21,8 +26,10 @@
 
 <% if @q %>
   <% case @type; when 'ai'; %>
-    <div class="mt-4">
-      <%= partial :ai %>
+    <div data-pagelet-url="/search?type=<%= @type %>&q=<%= @q %>" data-with-placeholder class="mt-4">
+      <div class="container">
+        <%= partial :placeholder %>
+      </div>
     </div>
   <% when 'accounts' %>
     <ul class="search-result-list mb-3">

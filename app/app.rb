@@ -229,22 +229,23 @@ module Dandelion
 
     get '/search' do
       if request.xhr?
-        @q = params[:term]
         @type = params[:type]
-        halt if @q.nil? || @q.length < 3 || @q.length > 200
-
-        model_class = @type ? search_type_to_model(@type) : nil
-        perform_ajax_search(@q, model_class).to_json
+        if @type == 'ai'
+          @q = params[:q]
+          @events = Event.vector_search(@q, limit: 5)
+          partial :ai
+        else
+          @q = params[:term]
+          halt if @q.nil? || @q.length < 3 || @q.length > 200
+          model_class = @type ? search_type_to_model(@type) : nil
+          perform_ajax_search(@q, model_class).to_json
+        end
       else
         detected_type, @q = parse_search_query(params[:q])
         @type = detected_type || params[:type] || 'events'
-        if @q
-          if @type == 'ai'
-            @events = Event.vector_search(@q, limit: 5)
-          else
-            model_class = search_type_to_model(@type)
-            perform_full_search(@q, model_class)
-          end
+        if @q && (@type != 'ai')
+          model_class = search_type_to_model(@type)
+          perform_full_search(@q, model_class)
         end
 
         erb :search
