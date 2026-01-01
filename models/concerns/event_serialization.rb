@@ -13,6 +13,22 @@ module EventSerialization
     def to_public_xml
       with_public_includes.map(&:public_data).to_xml(root: 'events')
     end
+
+    def to_public_markdown
+      with_public_includes.map(&:public_data).to_markdown
+    end
+  end
+
+  def to_public_json
+    public_data.to_json
+  end
+
+  def to_public_xml
+    public_data.to_xml(root: 'event')
+  end
+
+  def to_public_markdown
+    public_data.to_markdown(title: :name, html_keys: %i[description])
   end
 
   def public_data
@@ -33,13 +49,5 @@ module EventSerialization
       image: image ? image.thumb('1920x1920').url : nil,
       description: description
     }
-  end
-
-  def to_public_xml
-    public_data.to_xml(root: 'event')
-  end
-
-  def to_public_json
-    public_data.to_json
   end
 end

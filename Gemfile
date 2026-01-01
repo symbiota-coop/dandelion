@@ -89,6 +89,7 @@ gem 'geocoder'
 gem 'addressable'
 gem 'html_truncator'
 gem 'redcarpet'
+gem 'reverse_markdown'
 gem 'rinku'
 gem 'sanitize'
 
