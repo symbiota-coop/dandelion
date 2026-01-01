@@ -6,12 +6,12 @@
   <% if @type == 'ai' %>
     <p class="mb-3">
       AI search for events. <br class="d-sm-none" />
-      <a href="/events?q=<%=@q%>&search=1">See full search options &rarr;</a>
+      <a href="/events?q=<%=@q%>&search=1">See precise search options &rarr;</a>
     </p>
   <% elsif @type == 'events' %>
     <p class="mb-3">
       Fuzzy search for recent and future events. <br class="d-sm-none" />
-      <a href="/events?q=<%=@q%>&search=1">See full search options &rarr;</a>
+      <a href="/events?q=<%=@q%>&search=1">See precise search options &rarr;</a>
     </p>
   <% end %>
   <input type="hidden" name="type" id="type" value="<%= @type %>">
