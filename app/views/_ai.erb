@@ -11,7 +11,9 @@ These are the top results from a vector search.
 
 Always link to events using the slug, e.g. [Event name](#{ENV['BASE_URI']}/e/event-slug).
 
-Do not use bullet points.
+Write about the events in the same order as in the results below.
+
+One paragraph per event. Do not use bullet points.
 
 #{@events.map(&:to_public_xml).join("\n\n")}"
 
@@ -23,7 +25,6 @@ ai_response = OpenRouter.chat(prompt)
         <% else %>
           <p>Hmm, we're having trouble generating an AI summary right now.</p>
         <% end %>
-        §
       <% else %>
         <p>We didn't find any good matches for your query. Please try again.</p>
       <% end %>
