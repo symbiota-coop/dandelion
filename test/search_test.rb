@@ -46,14 +46,9 @@ class SearchTest < ActiveSupport::TestCase
     assert page.has_content?('Full Page Gathering Search')
   end
 
-  test 'full page search defaults to events type' do
-    @account = FactoryBot.create(:account)
-    @organisation = FactoryBot.create(:organisation, account: @account)
-    @event = FactoryBot.create(:event, organisation: @organisation, account: @account, last_saved_by: @account, name: 'Default Event Search', prices: [0])
-
-    visit '/search?q=Default'
-    assert page.has_selector?('ul.search-tab li.active', text: 'Events')
-    assert page.has_content?('Default Event Search')
+  test 'full page search defaults to AI mode' do
+    visit '/search?q=test'
+    assert page.has_selector?('ul.search-tab li.active', text: 'AI Mode')
   end
 
   test 'search with event prefix redirects to event page when exact match' do

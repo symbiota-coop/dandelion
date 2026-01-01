@@ -1,31 +1,35 @@
 <div style="position: relative;" class="m-1">
   <% if @organisation && (cohostship = event.cohostships.find_by(organisation: @organisation)) && cohostship.image %>
-    <a target="_parent" href="/e/<%= event.slug %>?cohost=<%=@organisation.slug%>" <% if event.carousel_text %> data-toggle="tooltip" title="<%=event.carousel_text%>" <% end %>>  
+    <a target="_parent" href="/e/<%= event.slug %>?cohost=<%=@organisation.slug%>"
+    <% if event.carousel_text %> data-toggle="tooltip" title="<%=event.carousel_text%>" <% end %>
+    >
       <%= blurred_image_tag(cohostship.image, width: cohostship.image_width_unmagic, height: cohostship.image_height_unmagic) %>
     </a>
-  <% else %>
-    <a target="_parent" href="/e/<%= event.slug %>" <% if event.carousel_text %> data-toggle="tooltip" title="<%=event.carousel_text%>" <% end %>>
+  <% elsif event.image %>
+    <a target="_parent" href="/e/<%= event.slug %>"
+    <% if event.carousel_text %> data-toggle="tooltip" title="<%=event.carousel_text%>" <% end %>
+    >
       <%= blurred_image_tag(event.image, width: event.image_width_unmagic, height: event.image_height_unmagic) %>
     </a>
   <% end %>
-<span data-toggle="tooltip" title="<%= when_details(event) %>" class="label label-primary" style="opacity: 0.85; border-radius: 0; position: absolute; top: 0; right: 0">
-  <% if event.recording? %>
-    Recording from
-    <%= event.start_time.to_date.to_fs(:month_year) %> 🍿
-  <% else %>
-    <% if event.start_time.to_date != event.end_time.to_date %>
-      Starts
-    <% end %>
-    <%= event.start_time.to_date.to_fs(:no_year) %>
-  <% end %>
-</span>
-<% if event.sold_out_cache %>
-  <span class="label label-danger" style="opacity: 0.85; border-radius: 0; position: absolute; bottom: 0; right: 0">
-    <% if event.sold_out_due_to_sales_end_cache %>
-      Sales ended
+  <span data-toggle="tooltip" title="<%= when_details(event) %>" class="label label-primary" style="opacity: 0.85; border-radius: 0; position: absolute; top: 0; right: 0">
+    <% if event.recording? %>
+      Recording from
+      <%= event.start_time.to_date.to_fs(:month_year) %> 🍿
     <% else %>
-      Sold out
+      <% if event.start_time.to_date != event.end_time.to_date %>
+        Starts
+      <% end %>
+      <%= event.start_time.to_date.to_fs(:no_year) %>
     <% end %>
   </span>
-<% end %>
+  <% if event.sold_out_cache %>
+    <span class="label label-danger" style="opacity: 0.85; border-radius: 0; position: absolute; bottom: 0; right: 0">
+      <% if event.sold_out_due_to_sales_end_cache %>
+        Sales ended
+      <% else %>
+        Sold out
+      <% end %>
+    </span>
+  <% end %>
 </div>
