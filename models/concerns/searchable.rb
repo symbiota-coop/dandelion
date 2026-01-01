@@ -131,7 +131,9 @@ module Searchable
 
       return none if query_vector.blank? || !query_vector.is_a?(Array)
 
-      num_candidates ||= 20 * limit
+      # Request extra results to account for deduplication by name
+      fetch_limit = limit * 2
+      num_candidates ||= 20 * fetch_limit
 
       # If called on a scope (not directly on the model class), use the existing query
       # This allows chaining like: Event.live.public.browsable.vector_search(@q)
@@ -143,7 +145,7 @@ module Searchable
           'path' => 'embedding',
           'queryVector' => query_vector,
           'numCandidates' => num_candidates,
-          'limit' => limit
+          'limit' => fetch_limit
         }
       }]
 
@@ -167,7 +169,7 @@ module Searchable
       end
 
       kept_ids = earliest_by_name.values.to_set(&:id)
-      ordered_results.select { |record| kept_ids.include?(record.id) }
+      ordered_results.select { |record| kept_ids.include?(record.id) }.first(limit)
     end
   end
 end
