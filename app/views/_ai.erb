@@ -7,15 +7,7 @@
         <% 
 prompt = "The user searched for '#{@q}'.
 
-These are the top results from a vector search.
-
-Always link to events using the slug, e.g. [Event name](#{ENV['BASE_URI']}/e/event-slug).
-
-Write in British English, putting day numbers before month names.
-
-Write about the events in the same order as in the results below.
-
-One paragraph per event. Do not use bullet points.
+#{Stash.find_by(key: 'vector_search').try(:value) || 'These are the top results from a vector search.'}
 
 #{@events.map(&:to_public_xml).join("\n\n")}"
 
