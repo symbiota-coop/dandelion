@@ -1,4 +1,12 @@
 Dandelion::App.helpers do
+  def set_bounding_box
+    return @bounding_box if defined?(@bounding_box)
+    return nil unless params[:near] && params[:near] != 'online'
+    return nil unless %w[north south east west].all? { |p| params[p].nil? }
+
+    @bounding_box = calculate_geographic_bounding_box(params[:near])
+  end
+
   def calculate_geographic_bounding_box(location_query)
     return nil unless location_query && (result = Geocoder.search(location_query).first)
 

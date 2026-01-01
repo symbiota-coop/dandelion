@@ -68,8 +68,8 @@ Dandelion::App.helpers do
 
     if params[:near] == 'online'
       events.online
-    elsif %w[north south east west].all? { |p| params[p].nil? } && (bounding_box = calculate_geographic_bounding_box(params[:near]))
-      events.and(coordinates: { '$geoWithin' => { '$box' => bounding_box } })
+    elsif set_bounding_box
+      events.and(coordinates: { '$geoWithin' => { '$box' => @bounding_box } })
     else
       events
     end
