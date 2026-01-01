@@ -15,7 +15,14 @@ module EventValidation
       self.organiser = account if account && !revenue_sharer && !organiser && organisation && organisation.stripe_client_id
       self.ai_tagged = false
       self.description = description.gsub('href="www.', 'href="http://www.') if description
-      self.embedding = OpenRouter.embedding(to_public_markdown) if Padrino.env == :production
+      if Padrino.env == :production
+        self.embedding = (begin
+          OpenRouter.embedding(to_public_markdown)
+        rescue StandardError => e
+          Honeybadger.notify(e)
+          nil
+        end)
+      end
 
       self.suggested_donation = nil if organisation && !organisation.payment_method?
       self.has_organisation = organisation ? true : false
