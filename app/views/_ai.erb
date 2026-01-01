@@ -2,14 +2,17 @@
   <div class="row">
     <div class="col-lg-9 readable">
 
-      <% 
-ai_response = OpenRouter.chat("The user searched for '#{@q}'.
+      <% if @events.exists? %>
+        <% 
+        prompt = "The user searched for '#{@q}'.
 
 These are the top results from a vector search.
 
 Always link to events using the slug, e.g. [Event name](#{ENV['BASE_URI']}/e/event-slug).
 
-#{@events.map(&:to_public_xml).join("\n\n")}")
+#{@events.map(&:to_public_xml).join("\n\n")}"
+
+ai_response = OpenRouter.chat(prompt)
     # Normalize markdown: ensure blank line before bullet lists (not between them)
     lines = ai_response.gsub(/^\* /m, '- ').split("\n")
     normalized_lines = []
@@ -20,8 +23,11 @@ Always link to events using the slug, e.g. [Event name](#{ENV['BASE_URI']}/e/eve
       normalized_lines << line
     end
     ai_response_normalized = normalized_lines.join("\n")
-  %>
-      <%== md(ai_response_normalized, hard_wrap: true) %>
+%>
+        <%== md(ai_response_normalized, hard_wrap: true) %>
+      <% else %>
+        <p>We didn't find any good matches for your query. Please try again.</p>
+      <% end %>
     </div>
     <div class="col-lg-3" style="margin-top: -0.25rem;">
       <% @events.each do |event| %>

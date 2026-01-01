@@ -242,7 +242,7 @@ module Dandelion
         end
       else
         detected_type, @q = parse_search_query(params[:q])
-        @type = detected_type || params[:type] || 'events'
+        @type = detected_type || params[:type] || 'ai'
         if @q && (@type != 'ai')
           model_class = search_type_to_model(@type)
           perform_full_search(@q, model_class)
@@ -250,11 +250,6 @@ module Dandelion
 
         erb :search
       end
-    end
-
-    get '/ai' do
-      @q = params[:q]
-      erb :ai
     end
 
     get '/theme.css' do
