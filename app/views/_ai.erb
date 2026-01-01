@@ -11,29 +11,19 @@ These are the top results from a vector search.
 
 Always link to events using the slug, e.g. [Event name](#{ENV['BASE_URI']}/e/event-slug).
 
+Do not use bullet points.
+
 #{@events.map(&:to_public_xml).join("\n\n")}"
 
 ai_response = OpenRouter.chat(prompt)
 %>
 
         <% if ai_response %>
-
-          <% 
-            # Normalize markdown: ensure blank line before bullet lists (not between them)
-            lines = ai_response.gsub(/^\* /m, '- ').split("\n")
-            normalized_lines = []
-            lines.each_with_index do |line, i|
-              if line.start_with?('- ') && i > 0 && !lines[i - 1].start_with?('- ') && !lines[i - 1].empty?
-                normalized_lines << ''
-              end
-              normalized_lines << line
-            end
-            ai_response_normalized = normalized_lines.join("\n")
-          %>
-          <%== md(ai_response_normalized, hard_wrap: true) %>
+          <%== md(ai_response, hard_wrap: true) %>
         <% else %>
           <p>Hmm, we're having trouble generating an AI summary right now.</p>
         <% end %>
+        §
       <% else %>
         <p>We didn't find any good matches for your query. Please try again.</p>
       <% end %>
