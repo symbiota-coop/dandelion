@@ -63,7 +63,7 @@ Dandelion::App.controller do
           @tickets.and(id_string: /#{Regexp.escape(params[:q])}/i).pluck(:id) +
           @tickets.and(name: /#{Regexp.escape(params[:q])}/i).pluck(:id) +
           @tickets.and(email: /#{Regexp.escape(params[:q])}/i).pluck(:id) +
-          @tickets.and(:account_id.in => Account.search(params[:q], child_scope: @tickets).pluck(:id)).pluck(:id))
+          @tickets.and(:account_id.in => Account.search(params[:q], child_scope: @tickets, regex_search: true).pluck(:id)).pluck(:id))
     end
 
     if request.xhr?

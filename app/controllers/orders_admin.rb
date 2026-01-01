@@ -6,7 +6,7 @@ Dandelion::App.controller do
     @to = params[:to] ? parse_date(params[:to]) : nil
     @orders = @organisation.orders.includes(:account, :event, :revenue_sharer, :discount_code)
     @orders = @orders.deleted if params[:deleted]
-    @orders = @orders.and(:account_id.in => Account.search(params[:q], child_scope: @orders).pluck(:id)) if params[:q]
+    @orders = @orders.and(:account_id.in => Account.search(params[:q], child_scope: @orders, regex_search: true).pluck(:id)) if params[:q]
     @orders = @orders.and(:created_at.gte => @from) if @from
     @orders = @orders.and(:created_at.lt => @to + 1) if @to
     @orders = @orders.and(affiliate_type: 'Organisation', affiliate_id: params[:affiliate_id]) if params[:affiliate_id]
