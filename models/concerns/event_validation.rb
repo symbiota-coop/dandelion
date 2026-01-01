@@ -15,6 +15,8 @@ module EventValidation
       self.organiser = account if account && !revenue_sharer && !organiser && organisation && organisation.stripe_client_id
       self.ai_tagged = false
       self.description = description.gsub('href="www.', 'href="http://www.') if description
+      self.embedding = OpenRouter.embedding(to_public_markdown) if Padrino.env == :production
+
       self.suggested_donation = nil if organisation && !organisation.payment_method?
       self.has_organisation = organisation ? true : false
       self.hidden_from_homepage = true if (name && %w[naked sex sexual erotic eros cock pussy anal orgasm ejaculation].any? { |word| name.downcase.split.include?(word) }) || (organisation && organisation.adult_content?)
