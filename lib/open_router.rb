@@ -19,6 +19,10 @@ class OpenRouter
     def chat(prompt, **)
       new.chat(prompt, **)
     end
+
+    def embedding(input, **)
+      new.embedding(input, **)
+    end
   end
 
   def initialize
@@ -69,17 +73,38 @@ class OpenRouter
       }
     end
 
-    response = @client.post('/api/v1/chat/completions') do |req|
-      req.headers['Content-Type'] = 'application/json'
-      req.headers['Authorization'] = "Bearer #{ENV['OPENROUTER_API_KEY']}"
-      req.body = payload
-    end
+    response = api_post('/api/v1/chat/completions', payload)
 
     if full_response
       response.body
     else
       r = response.body.dig('choices', 0, 'message', 'content')
       schema ? JSON.parse(r) : r
+    end
+  end
+
+  def embedding(input, full_response: false, model: 'google/gemini-embedding-001')
+    payload = {
+      model: model,
+      input: input
+    }
+
+    response = api_post('/api/v1/embeddings', payload)
+
+    if full_response
+      response.body
+    else
+      response.body.dig('data', 0, 'embedding')
+    end
+  end
+
+  private
+
+  def api_post(endpoint, payload)
+    @client.post(endpoint) do |req|
+      req.headers['Content-Type'] = 'application/json'
+      req.headers['Authorization'] = "Bearer #{ENV['OPENROUTER_API_KEY']}"
+      req.body = payload
     end
   end
 end

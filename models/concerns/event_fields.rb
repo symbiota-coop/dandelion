@@ -48,6 +48,7 @@ module EventFields
     field :match_phrase, type: String
     field :cohosts_ids_cache, type: Array
     field :theme_color, type: String
+    field :embedding, type: Array
 
     field :revenue_share_to_revenue_sharer, type: Integer
     field :profit_share_to_organiser, type: Integer
