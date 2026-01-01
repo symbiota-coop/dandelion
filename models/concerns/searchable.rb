@@ -159,17 +159,15 @@ module Searchable
       results_by_id = where(:id.in => ids).index_by(&:id)
       ordered_results = ids.map { |id| results_by_id[id] }.compact
 
-      # Deduplicate by name, keeping only the first (highest-scoring) result for each name
-      seen_names = Set.new
-      ordered_results.select do |record|
-        name = record.try(:name)
-        if name.present? && seen_names.include?(name)
-          false
-        else
-          seen_names.add(name) if name.present?
-          true
-        end
+      # Deduplicate by name, keeping only the earliest dated event for each name
+      earliest_by_name = {}
+      ordered_results.each do |record|
+        existing = earliest_by_name[record.name]
+        earliest_by_name[record.name] = record if existing.nil? || record.start_time < existing.start_time
       end
+
+      kept_ids = earliest_by_name.values.map(&:id).to_set
+      ordered_results.select { |record| kept_ids.include?(record.id) }
     end
   end
 end
