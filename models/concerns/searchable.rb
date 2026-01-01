@@ -157,7 +157,19 @@ module Searchable
       ids = results.map { |doc| doc['_id'] }
 
       results_by_id = where(:id.in => ids).index_by(&:id)
-      ids.map { |id| results_by_id[id] }.compact
+      ordered_results = ids.map { |id| results_by_id[id] }.compact
+
+      # Deduplicate by name, keeping only the first (highest-scoring) result for each name
+      seen_names = Set.new
+      ordered_results.select do |record|
+        name = record.try(:name)
+        if name.present? && seen_names.include?(name)
+          false
+        else
+          seen_names.add(name) if name.present?
+          true
+        end
+      end
     end
   end
 end
