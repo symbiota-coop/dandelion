@@ -238,12 +238,22 @@ module Dandelion
       else
         detected_type, @q = parse_search_query(params[:q])
         @type = detected_type || params[:type] || 'events'
-        model_class = search_type_to_model(@type)
-
-        perform_full_search(@q, model_class) if @q
+        if @q
+          if @type == 'ai'
+            @events = Event.vector_search(@q, limit: 5)
+          else
+            model_class = search_type_to_model(@type)
+            perform_full_search(@q, model_class)
+          end
+        end
 
         erb :search
       end
+    end
+
+    get '/ai' do
+      @q = params[:q]
+      erb :ai
     end
 
     get '/theme.css' do

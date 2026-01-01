@@ -124,6 +124,8 @@ module Searchable
         end
       end
 
+      return search(query) unless Padrino.env == :production
+
       # Convert query string to vector if provided
       query_vector = OpenRouter.embedding(query) if query.present?
 

@@ -1,0 +1,32 @@
+<div class="container">
+  <div class="row">
+    <div class="col-lg-9 readable">
+
+      <% 
+ai_response = OpenRouter.chat("The user searched for '#{@q}'.
+
+These are the top results from a vector search.
+
+Always link to events using the slug, e.g. [Event name](#{ENV['BASE_URI']}/e/event-slug).
+
+#{@events.map(&:to_public_xml).join("\n\n")}")
+    # Normalize markdown: ensure blank line before bullet lists (not between them)
+    lines = ai_response.gsub(/^\* /m, '- ').split("\n")
+    normalized_lines = []
+    lines.each_with_index do |line, i|
+      if line.start_with?('- ') && i > 0 && !lines[i - 1].start_with?('- ') && !lines[i - 1].empty?
+        normalized_lines << ''
+      end
+      normalized_lines << line
+    end
+    ai_response_normalized = normalized_lines.join("\n")
+  %>
+      <%== md(ai_response_normalized, hard_wrap: true) %>
+    </div>
+    <div class="col-lg-3" style="margin-top: -0.25rem;">
+      <% @events.each do |event| %>
+        <%= partial :'events/block_carousel', locals: {event: event} %>
+      <% end %>
+    </div>
+  </div>
+</div>
