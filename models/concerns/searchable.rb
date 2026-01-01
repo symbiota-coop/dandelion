@@ -133,17 +133,25 @@ module Searchable
 
       num_candidates ||= 20 * limit
 
-      pipeline = [
-        {
-          '$vectorSearch' => {
-            'index' => 'vector_index',
-            'path' => 'embedding',
-            'queryVector' => query_vector,
-            'numCandidates' => num_candidates,
-            'limit' => limit
-          }
+      # If called on a scope (not directly on the model class), use the existing query
+      # This allows chaining like: Event.live.public.browsable.vector_search(@q)
+      base_query = is_a?(Class) ? nil : self
+
+      pipeline = [{
+        '$vectorSearch' => {
+          'index' => 'vector_index',
+          'path' => 'embedding',
+          'queryVector' => query_vector,
+          'numCandidates' => num_candidates,
+          'limit' => limit
         }
-      ]
+      }]
+
+      if base_query
+        pipeline[0]['$vectorSearch']['filter'] = {
+          '_id' => { '$in' => base_query.pluck(:id) }
+        }
+      end
 
       results = collection.aggregate(pipeline)
       ids = results.map { |doc| doc['_id'] }

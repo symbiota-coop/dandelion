@@ -232,7 +232,7 @@ module Dandelion
         @type = params[:type]
         if @type == 'ai'
           @q = params[:q]
-          @events = Event.vector_search(@q, limit: 5)
+          @events = Event.live.public.browsable.future.vector_search(@q, limit: 5)
           partial :ai
         else
           @q = params[:term]
