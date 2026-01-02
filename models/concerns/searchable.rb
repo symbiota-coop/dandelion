@@ -22,7 +22,6 @@ module Searchable
         results
       else
         query = query.strip
-        text_search_index = to_s.underscore.pluralize
 
         search_filters = []
         remaining_selector = {}
@@ -81,7 +80,7 @@ module Searchable
 
         # Build text search stage (used in both vector+text and text-only searches)
         text_search_stage = {
-          index: text_search_index,
+          index: to_s.underscore.pluralize,
           compound: {
             should: should_clauses,
             filter: search_filters,
