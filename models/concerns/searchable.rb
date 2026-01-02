@@ -2,7 +2,7 @@ module Searchable
   extend ActiveSupport::Concern
 
   class_methods do
-    def search(query, scope = all, child_scope: nil, limit: nil, build_records: false, phrase_boost: 1, text_search: false, regex_search: Padrino.env != :production, vector_weight: 0.5, text_weight: 0.5)
+    def search(query, scope = all, child_scope: nil, limit: nil, build_records: false, phrase_boost: 1, text_search: false, vector_weight: nil, regex_search: Padrino.env != :production)
       return none if query.blank?
       return none if query.length < 3 || query.length > 200
 
@@ -92,7 +92,7 @@ module Searchable
 
         # Try to get embedding for vector search if enabled and model has embedding field
         query_vector = nil
-        if vector_weight > 0 && fields.key?('embedding')
+        if vector_weight && vector_weight > 0 && fields.key?('embedding')
           query_vector = begin
             OpenRouter.embedding(query)
           rescue StandardError
@@ -129,7 +129,7 @@ module Searchable
                 combination: {
                   weights: {
                     vectorPipeline: vector_weight,
-                    textPipeline: text_weight
+                    textPipeline: 1 - vector_weight
                   }
                 }
               }

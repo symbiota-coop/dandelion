@@ -50,7 +50,7 @@ Dandelion::App.helpers do
       next if model_class && config_model_class != model_class
 
       scope = config[:scope].call
-      items = config_model_class.search(q, scope, limit: 5, build_records: true, phrase_boost: 1.5, text_search: true)
+      items = config_model_class.search(q, scope, limit: 5, build_records: true, phrase_boost: 1.5, text_search: true, vector_weight: 0.5)
       prefix = search_prefix(config_model_class)
       results += items.map do |item|
         {
@@ -78,7 +78,7 @@ Dandelion::App.helpers do
     end
 
     # Perform search
-    results = model_class.search(q, scope, build_records: true, phrase_boost: 1.5, text_search: true)
+    results = model_class.search(q, scope, build_records: true, phrase_boost: 1.5, text_search: true, vector_weight: 0.5)
     instance_variable_set(var_name, results.paginate(page: params[:page], per_page: 20))
   end
 
