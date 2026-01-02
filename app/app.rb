@@ -230,24 +230,15 @@ module Dandelion
     get '/search' do
       if request.xhr?
         @type = params[:type]
-        if @type == 'ai'
-          @q = params[:q]
-          @events = Event.live.public.browsable.future.vector_search(@q, limit: 5)
-          partial :ai
-        else
-          @q = params[:term]
-          halt if @q.nil? || @q.length < 3 || @q.length > 200
-          model_class = @type ? search_type_to_model(@type) : nil
-          perform_ajax_search(@q, model_class).to_json
-        end
+        @q = params[:term]
+        halt if @q.nil? || @q.length < 3 || @q.length > 200
+        model_class = @type ? search_type_to_model(@type) : nil
+        perform_ajax_search(@q, model_class).to_json
       else
         detected_type, @q = parse_search_query(params[:q])
-        @type = detected_type || params[:type] || 'ai'
-        if @q && (@type != 'ai')
-          model_class = search_type_to_model(@type)
-          perform_full_search(@q, model_class)
-        end
-
+        @type = detected_type || params[:type] || 'events'
+        model_class = search_type_to_model(@type)
+        perform_full_search(@q, model_class)
         erb :search
       end
     end

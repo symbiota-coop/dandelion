@@ -46,9 +46,9 @@ class SearchTest < ActiveSupport::TestCase
     assert page.has_content?('Full Page Gathering Search')
   end
 
-  test 'full page search defaults to AI mode' do
+  test 'full page search defaults to events' do
     visit '/search?q=test'
-    assert page.has_selector?('ul.search-tab li.active', text: 'AI Mode')
+    assert page.has_selector?('ul.search-tab li.active', text: 'Events')
   end
 
   test 'search with event prefix redirects to event page when exact match' do

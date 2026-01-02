@@ -2,7 +2,7 @@ module Searchable
   extend ActiveSupport::Concern
 
   class_methods do
-    def search(query, scope = all, child_scope: nil, limit: nil, build_records: false, phrase_boost: 1, include_text_search: false, regex_search: Padrino.env != :production)
+    def search(query, scope = all, child_scope: nil, limit: nil, build_records: false, phrase_boost: 1, text_search: false, regex_search: Padrino.env != :production, vector_weight: 0.5, text_weight: 0.5)
       return none if query.blank?
       return none if query.length < 3 || query.length > 200
 
@@ -17,11 +17,13 @@ module Searchable
       return scope.and(email: query) if query.match?(EMAIL_REGEX) && fields.key?('email')
 
       if regex_search
-        results = scope.where('$or' => search_fields.map { |field| { field => /#{Regexp.escape(query)}/i } })
+        results = scope.where('$or': search_fields.map { |field| { field => /#{Regexp.escape(query)}/i } })
         results = results.limit(limit) if limit
         results
       else
         query = query.strip
+        text_search_index = to_s.underscore.pluralize
+        fetch_limit = limit ? limit * 2 : 100
 
         search_filters = []
         remaining_selector = {}
@@ -76,21 +78,70 @@ module Searchable
         should_clauses = [
           { phrase: { query: query, path: { wildcard: '*' }, score: { boost: { value: phrase_boost } } } }
         ]
-        should_clauses << { text: { query: query, path: { wildcard: '*' } } } if include_text_search
+        should_clauses << { text: { query: query, path: { wildcard: '*' } } } if text_search
 
-        pipeline = [
-          {
-            '$search': {
-              index: to_s.underscore.pluralize,
-              compound: {
-                should: should_clauses,
-                filter: search_filters,
-                minimumShouldMatch: 1
+        # Build text search stage (used in both vector+text and text-only searches)
+        text_search_stage = {
+          index: text_search_index,
+          compound: {
+            should: should_clauses,
+            filter: search_filters,
+            minimumShouldMatch: 1
+          }
+        }
+
+        # Try to get embedding for vector search if enabled and model has embedding field
+        query_vector = nil
+        if vector_weight > 0 && fields.key?('embedding')
+          query_vector = begin
+            OpenRouter.embedding(query)
+          rescue StandardError
+            nil
+          end
+        end
+
+        if query_vector
+          # Use $rankFusion to combine vector and text search
+          num_candidates = 20 * fetch_limit
+
+          vector_search_stage = {
+            index: 'vector_index',
+            path: 'embedding',
+            queryVector: query_vector,
+            numCandidates: num_candidates,
+            limit: fetch_limit
+          }
+
+          pipeline = [
+            {
+              '$rankFusion': {
+                input: {
+                  pipelines: {
+                    vectorPipeline: [
+                      { '$vectorSearch': vector_search_stage }
+                    ],
+                    textPipeline: [
+                      { '$search': text_search_stage },
+                      { '$limit': fetch_limit }
+                    ]
+                  }
+                },
+                combination: {
+                  weights: {
+                    vectorPipeline: vector_weight,
+                    textPipeline: text_weight
+                  }
+                }
               }
             }
-          },
-          { '$addFields': { score: { '$meta': 'searchScore' } } }
-        ]
+          ]
+        else
+          # Fall back to text-only search
+          pipeline = [
+            { '$search': text_search_stage },
+            { '$addFields': { score: { '$meta': 'searchScore' } } }
+          ]
+        end
 
         # Only add $match stage if there are remaining complex conditions
         pipeline << { '$match': remaining_selector } if remaining_selector.any?
@@ -140,23 +191,23 @@ module Searchable
       base_query = is_a?(Class) ? nil : self
 
       pipeline = [{
-        '$vectorSearch' => {
-          'index' => 'vector_index',
-          'path' => 'embedding',
-          'queryVector' => query_vector,
-          'numCandidates' => num_candidates,
-          'limit' => fetch_limit
+        '$vectorSearch': {
+          index: 'vector_index',
+          path: 'embedding',
+          queryVector: query_vector,
+          numCandidates: num_candidates,
+          limit: fetch_limit
         }
       }]
 
       if base_query
-        pipeline[0]['$vectorSearch']['filter'] = {
-          '_id' => { '$in' => base_query.pluck(:id) }
+        pipeline[0]['$vectorSearch'][:filter] = {
+          _id: { '$in': base_query.pluck(:id) }
         }
       end
 
       results = collection.aggregate(pipeline)
-      ids = results.map { |doc| doc['_id'] }
+      ids = results.map { |doc| doc[:_id] }
 
       results_by_id = where(:id.in => ids).index_by(&:id)
       ordered_results = ids.map { |id| results_by_id[id] }.compact

@@ -1,14 +1,9 @@
 <form action="/search" id="search-form">
-  <div class="search-input <% if %w[ai events].include?(@type) %>mb-1<% end %>">
+  <div class="search-input <% if @type == 'events' %>mb-1<% end %>">
     <a href="javascript:;" onclick="$(this).next().val('').focus()" class="search-close">×</a>
     <input name="q" type="text" class="form-control input-lg" value="<%= @q %>">
   </div>
-  <% if @type == 'ai' %>
-    <p class="mb-3">
-      AI search for events. <br class="d-sm-none" />
-      <a href="/events?q=<%=@q%>&search=1">See precise search options &rarr;</a>
-    </p>
-  <% elsif @type == 'events' %>
+  <% if @type == 'events' %>
     <p class="mb-3">
       Fuzzy search for recent and future events. <br class="d-sm-none" />
       <a href="/events?q=<%=@q%>&search=1">See precise search options &rarr;</a>
@@ -18,20 +13,14 @@
 </form>
 
 <ul class="search-tab">
-  <% { 'AI Mode' => 'ai', 'Events' => 'events', 'People' => 'accounts', 'Organisations' => 'organisations', 'Gatherings' => 'gatherings' }.each { |k,v| %>
+  <% { 'Events' => 'events', 'People' => 'accounts', 'Organisations' => 'organisations', 'Gatherings' => 'gatherings' }.each { |k,v| %>
   <li <% if @type == v %> class="active" <% end %>><a href="javascript:;" onclick="$('#type').val('<%= v %>');
           $('#search-form').submit()"><%= k %></a></li>
   <% } %>
 </ul>
 
 <% if @q %>
-  <% case @type; when 'ai'; %>
-    <div data-pagelet-url="/search?type=<%= @type %>&q=<%= CGI.escape(@q) %>" data-with-placeholder class="mt-4">
-      <div class="container">
-        <%= partial :placeholder %>
-      </div>
-    </div>
-  <% when 'accounts' %>
+  <% case @type; when 'accounts' %>
     <ul class="search-result-list mb-3">
       <% @accounts.each { |account| %>
       <li>
