@@ -80,16 +80,8 @@ Dandelion::App.helpers do
     # Perform search
     results = model_class.search(q, scope, build_records: true, phrase_boost: 1.5, text_search: true, vector_weight: 0.5)
 
-    # Deduplicate events by name, keeping only the earliest dated event for each name
-    if model_class == Event
-      earliest_by_name = {}
-      results.each do |event|
-        existing = earliest_by_name[event.name]
-        earliest_by_name[event.name] = event if existing.nil? || event.start_time < existing.start_time
-      end
-      kept_ids = earliest_by_name.values.map(&:id).to_set
-      results = results.select { |event| kept_ids.include?(event.id) }
-    end
+    # Deduplicate events by name and location, keeping only the first result for each combination
+    results = results.uniq { |e| [e.name, e.location] } if model_class == Event
 
     instance_variable_set(var_name, results.paginate(page: params[:page], per_page: 20))
   end
