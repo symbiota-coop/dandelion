@@ -23,7 +23,6 @@ module Searchable
       else
         query = query.strip
         text_search_index = to_s.underscore.pluralize
-        fetch_limit = limit ? limit * 2 : 100
 
         search_filters = []
         remaining_selector = {}
@@ -102,6 +101,7 @@ module Searchable
 
         if query_vector
           # Use $rankFusion to combine vector and text search
+          fetch_limit = limit ? limit * 2 : 100
           num_candidates = 20 * fetch_limit
 
           vector_search_stage = {
