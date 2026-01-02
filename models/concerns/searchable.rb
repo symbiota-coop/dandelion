@@ -76,7 +76,7 @@ module Searchable
         should_clauses = [
           { phrase: { query: query, path: { wildcard: '*' }, score: { boost: { value: phrase_boost } } } }
         ]
-        should_clauses << { text: { query: query, path: { wildcard: '*' } } } if text_search
+        should_clauses << { text: { query: query, path: { wildcard: '*' }, fuzzy: { maxEdits: 2, prefixLength: 2 } } } if text_search
 
         # Build text search stage (used in both vector+text and text-only searches)
         text_search_stage = {
