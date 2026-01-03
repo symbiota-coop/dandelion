@@ -1,12 +1,12 @@
 <% if @organisation %>
   <% if @organisation == event.organisation && event.featured? %>
-    <span class="label label-yellow">Featured</span>
+    <span class="label label-yellow mr-1">Featured</span>
   <% elsif event.cohostships.any? { |cohostship| cohostship.organisation == @organisation && cohostship.featured? } %>
-    <span class="label label-yellow">Featured</span>
+    <span class="label label-yellow mr-1">Featured</span>
   <% end %>
 <% end %>
 <% if event.sold_out_cache %>
-  <span class="label label-danger">
+  <span class="label label-danger mr-1">
     <% if event.sold_out_due_to_sales_end_cache %>
       Sales ended
     <% else %>
@@ -15,5 +15,5 @@
   </span>
 <% end %>
 <% if event.locked? %>
-  <span class="label label-default">Locked</span>
+  <span class="label label-default mr-1">Locked</span>
 <% end %>
