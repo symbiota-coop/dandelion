@@ -168,6 +168,20 @@ $(function () {
   })
   setTotal()
 
+  // Validate phone number starts with + and provide instant feedback
+  $('#account_phone').on('input blur', function () {
+    const phoneValue = $(this).val().trim()
+    if (phoneValue.length > 0 && !phoneValue.startsWith('+')) {
+      $(this).addClass('is-invalid')
+      if (!$(this).next('.invalid-feedback').length) {
+        $(this).after('<div class="invalid-feedback">Please include the + country code (e.g. +1234567890)</div>')
+      }
+    } else {
+      $(this).removeClass('is-invalid')
+      $(this).next('.invalid-feedback').remove()
+    }
+  })
+
   // Remove error styling when a checkbox in a required group is checked
   $('[class*="checkbox-group-"][data-required="true"]').each(function () {
     const checkboxGroup = $(this)
