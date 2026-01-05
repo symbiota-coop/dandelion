@@ -12,15 +12,5 @@ module.exports = {
   ignorePatterns: [
     'app/assets/javascripts/ext/**/*.js',
     'app/assets/infinite_admin/**/*.js'
-  ],
-  globals: {
-    Stripe: true,
-    ethereum: true,
-    Web3: true,
-    Tribute: true,
-    iframely: true,
-    autosize: true,
-    Pace: true,
-    ClassicEditor: true
-  }
+  ]
 }
