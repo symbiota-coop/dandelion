@@ -1,7 +1,6 @@
 <%
 recommended_events = @account.recommended_events || []
 show_image = (Padrino.env == :production)
-full_width = true
 events_by_id = Event.and(:id.in => recommended_events.map(&:first)).includes(:event_facilitations, :cohostships).index_by { |e| e.id.to_s }
 %>
 
@@ -24,20 +23,16 @@ events_by_id = Event.and(:id.in => recommended_events.map(&:first)).includes(:ev
         <div class="mb-4">
 
           <div class="row block no-gutters align-items-stretch <% if event.locked? %>event-locked<% end %>">
-            <% if show_image %>
-              <% if !event.image && (defined?(full_width) && full_width) %>
-
-              <% else %>
-                <div class="col-lg-6 order-lg-2 mb-2 mb-lg-0 bg-white">
-                  <% if @organisation && (cohostship = event.cohostships.find_by(organisation: @organisation)) && cohostship.image %>
-                    <a target="_parent" href="/e/<%= event.slug %>?cohost=<%=@organisation.slug%>"><%= blurred_image_tag(cohostship.image, width: cohostship.image_width_unmagic, height: cohostship.image_height_unmagic) %></a>
-                  <% elsif event.image %>
-                    <a target="_parent" href="/e/<%= event.slug %>"><%= blurred_image_tag(event.image, width: event.image_width_unmagic, height: event.image_height_unmagic) %></a>
-                  <% end %>
-                </div>
-              <% end %>
+            <% if show_image && event.image %>
+              <div class="col-lg-6 order-lg-2 mb-2 mb-lg-0 bg-white">
+                <% if @organisation && (cohostship = event.cohostships.find_by(organisation: @organisation)) && cohostship.image %>
+                  <a target="_parent" href="/e/<%= event.slug %>?cohost=<%=@organisation.slug%>"><%= blurred_image_tag(cohostship.image, width: cohostship.image_width_unmagic, height: cohostship.image_height_unmagic) %></a>
+                <% elsif event.image %>
+                  <a target="_parent" href="/e/<%= event.slug %>"><%= blurred_image_tag(event.image, width: event.image_width_unmagic, height: event.image_height_unmagic) %></a>
+                <% end %>
+              </div>
             <% end %>
-            <div class="<% if show_image && !event.image && (defined?(full_width) && full_width) %>col-lg-12<% else %>col-lg-6<% end %> order-lg-1">
+            <div class="<% if show_image && !event.image %>col-lg-12<% else %>col-lg-6<% end %> order-lg-1">
               <table style="width: 100%; height: 100%">
                 <tr>
                   <td style="vertical-align: top">

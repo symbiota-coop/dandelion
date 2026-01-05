@@ -1,6 +1,5 @@
 <% upcoming_events = current_account.upcoming_events.paginate(page: params[:upcoming_events_page], per_page: 10) %>
 <% past_events = current_account.previous_events.paginate(page: params[:past_events_page], per_page: 10) %>
-<% full_width = true %>
 
 <% if params[:past_events_page] || params[:upcoming_events_page] %>
   <p><a href="/events/my">&larr; All your events</a></p>
@@ -34,9 +33,7 @@
             <div class="mb-4">
 
               <div class="row block no-gutters align-items-stretch <% if event.locked? %>event-locked<% end %>">
-                <% if !event.image && (defined?(full_width) && full_width) %>
-
-                <% else %>
+                <% if event.image %>
                   <div class="col-lg-6 order-lg-2 mb-2 mb-lg-0 bg-white">
                     <% if @organisation && (cohostship = event.cohostships.find_by(organisation: @organisation)) && cohostship.image %>
                       <a target="_parent" href="/e/<%= event.slug %>?cohost=<%=@organisation.slug%>"><%= blurred_image_tag(cohostship.image, width: cohostship.image_width_unmagic, height: cohostship.image_height_unmagic) %></a>
@@ -45,7 +42,7 @@
                     <% end %>
                   </div>
                 <% end %>
-                <div class="<% if !event.image && (defined?(full_width) && full_width) %>col-lg-12<% else %>col-lg-6<% end %> order-lg-1">
+                <div class="<% if !event.image %>col-lg-12<% else %>col-lg-6<% end %> order-lg-1">
                   <table style="width: 100%; height: 100%">
                     <tr>
                       <td style="vertical-align: top">
