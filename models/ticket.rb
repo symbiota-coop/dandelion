@@ -37,6 +37,10 @@ class Ticket
   field :made_available_at, type: Time
   field :original_ticket_type_name, type: String
 
+  def self.protected_attributes
+    %w[payment_completed]
+  end
+
   def self.admin_fields
     {
       summary: { type: :text, edit: false },

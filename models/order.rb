@@ -36,6 +36,10 @@ class Order
   validates_uniqueness_of :session_id, :payment_intent, :coinbase_checkout_id, allow_nil: true
   validates_uniqueness_of :evm_secret, scope: :evm_value, allow_nil: true
 
+  def self.protected_attributes
+    %w[payment_completed]
+  end
+
   before_validation do
     self.evm_value = value.to_d + evm_offset if evm_secret && !evm_value
     self.discount_code = nil if discount_code && !discount_code.applies_to?(event)

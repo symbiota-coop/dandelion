@@ -43,6 +43,10 @@ class Payment
   validates_presence_of :gathering_name, :amount, :currency
   validates_uniqueness_of :evm_secret, scope: :evm_amount, allow_nil: true
 
+  def self.protected_attributes
+    %w[payment_completed]
+  end
+
   def evm_offset
     evm_secret.to_d / 1e6
   end

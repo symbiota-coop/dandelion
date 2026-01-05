@@ -31,6 +31,10 @@ class Donation
     self.and(payment_completed: true)
   end
 
+  def self.protected_attributes
+    %w[payment_completed]
+  end
+
   def self.admin_fields
     {
       amount: :number,
