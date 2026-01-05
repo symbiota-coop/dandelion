@@ -1,9 +1,13 @@
 module CoreExtensions
   extend ActiveSupport::Concern
 
+  # Fields to auto-strip HTML from
+  SANITIZED_FIELDS = %i[name title subject].freeze
+
   included do
     after_initialize :convert_nil_booleans_to_false
     before_validation :convert_nil_booleans_to_false
+    before_validation :sanitize_fields
   end
 
   def convert_nil_booleans_to_false
@@ -94,6 +98,19 @@ module CoreExtensions
         model_class = class_name_string.constantize
         model_class.and(:id.in => send(ids_method))
       end
+    end
+  end
+
+  private
+
+  def sanitize_fields
+    CoreExtensions::SANITIZED_FIELDS.each do |field|
+      next unless respond_to?(field) && respond_to?("#{field}=")
+
+      value = send(field)
+      next unless value.present?
+
+      send("#{field}=", Sanitize.fragment(value.to_s))
     end
   end
 end
