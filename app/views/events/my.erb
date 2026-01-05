@@ -32,17 +32,14 @@
           <div class="col-12 <%= block_class if defined?(block_class) %>" id="<%= event.id %>">
             <div class="mb-4">
 
+              <% image_source = event.display_image_source_for(@organisation) %>
               <div class="row block no-gutters align-items-stretch <% if event.locked? %>event-locked<% end %>">
-                <% if event.image %>
+                <% if image_source %>
                   <div class="col-lg-6 order-lg-2 mb-2 mb-lg-0 bg-white">
-                    <% if @organisation && (cohostship = event.cohostships.find_by(organisation: @organisation)) && cohostship.image %>
-                      <a target="_parent" href="/e/<%= event.slug %>?cohost=<%=@organisation.slug%>"><%= blurred_image_tag(cohostship.image, width: cohostship.image_width_unmagic, height: cohostship.image_height_unmagic) %></a>
-                    <% elsif event.image %>
-                      <a target="_parent" href="/e/<%= event.slug %>"><%= blurred_image_tag(event.image, width: event.image_width_unmagic, height: event.image_height_unmagic) %></a>
-                    <% end %>
+                    <a target="_parent" href="/e/<%= event.slug %><%= "?cohost=#{@organisation.slug}" if image_source.is_a?(Cohostship) %>"><%= blurred_image_tag(image_source.image, width: image_source.image_width_unmagic, height: image_source.image_height_unmagic) %></a>
                   </div>
                 <% end %>
-                <div class="<% if !event.image %>col-lg-12<% else %>col-lg-6<% end %> order-lg-1">
+                <div class="<% if !image_source %>col-lg-12<% else %>col-lg-6<% end %> order-lg-1">
                   <table style="width: 100%; height: 100%">
                     <tr>
                       <td style="vertical-align: top">

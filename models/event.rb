@@ -24,6 +24,14 @@ class Event
     find_by(slug: slug)
   end
 
+  def display_image_source_for(organisation)
+    cohostship = organisation && cohostships.find_by(organisation: organisation)
+    return cohostship if cohostship&.image
+    return self if image
+
+    nil
+  end
+
   def self.search_fields
     %w[name description location event_tag_names]
   end
