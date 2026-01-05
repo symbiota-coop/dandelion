@@ -148,11 +148,9 @@ Dandelion::App.helpers do
   end
 
   def get_event_image(ticket_form)
-    if ticket_form[:cohost] && (cohost = Organisation.find_by(slug: ticket_form[:cohost])) && (cohostship = @event.cohostships.find_by(organisation: cohost)) && cohostship.image
-      cohostship.image.thumb('1920x1920')
-    elsif @event.image
-      @event.image.thumb('1920x1920')
-    end
+    cohost = ticket_form[:cohost] && Organisation.find_by(slug: ticket_form[:cohost])
+    image_source = @event.display_image_source_for(cohost)
+    image_source&.image&.thumb('1920x1920')
   end
 
   def build_stripe_session_hash(details_form, event_image)

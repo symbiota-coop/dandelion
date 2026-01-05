@@ -151,18 +151,14 @@ Dandelion::App.controller do
     @title = @event.name
     @organisation = @event.organisation
     @event.check_oc_event if @order && params[:success] && !@order.payment_completed && @event.oc_slug
-    cohostship = nil
-    if params[:cohost] && (cohost = Organisation.find_by(slug: params[:cohost])) && (cohostship = @event.cohostships.find_by(organisation: cohost)) && cohostship.image
-      @event_image = cohostship.image
-      @event_image_width = cohostship.image_width_unmagic
-      @event_image_height = cohostship.image_height_unmagic
-      @og_image = cohostship.image.encode('jpg', '-quality 90').thumb('1200x630').url
-    elsif @event.image
-      @event_image = @event.image
-      @event_image_width = @event.image_width_unmagic
-      @event_image_height = @event.image_height_unmagic
-      @og_image = @event.image.encode('jpg', '-quality 90').thumb('1200x630').url
-    elsif @event.organisation && @event.organisation.image
+    cohost = params[:cohost] && Organisation.find_by(slug: params[:cohost])
+    image_source = @event.display_image_source_for(cohost)
+    if image_source
+      @event_image = image_source.image
+      @event_image_width = image_source.image_width_unmagic
+      @event_image_height = image_source.image_height_unmagic
+      @og_image = image_source.image.encode('jpg', '-quality 90').thumb('1200x630').url
+    elsif @event.organisation&.image
       @og_image = @event.organisation.image.encode('jpg', '-quality 90').thumb('1200x630').url
     end
     case content_type
