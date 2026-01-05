@@ -3,27 +3,25 @@
   <% image_source = event.image_source(organisation) %>
   <% if image_source %>
     <a data-toggle="tooltip" title="Copy linked image" class="btn btn-sm btn-primary" href="javascript:;" onclick="
+        var div = $(this).next().show();
+        var node = $(div).find('a')[0];
 
-  var div = $(this).next().show();
-  var node = $(div).find('a')[0];
+        // Create a range and select the node's content
+        var range = document.createRange();
+        range.selectNode(node);
 
-  // Create a range and select the node's content
-  var range = document.createRange();
-  range.selectNode(node);
+        // Add the selected content to the clipboard
+        var selection = window.getSelection();
+        selection.removeAllRanges();
+        selection.addRange(range);
+        document.execCommand('copy');
 
-  // Add the selected content to the clipboard
-  var selection = window.getSelection();
-  selection.removeAllRanges();
-  selection.addRange(range);
-  document.execCommand('copy');
+        // Deselect the content
+        selection.removeAllRanges();
 
-  // Deselect the content
-  selection.removeAllRanges();
-
-  $(div).hide();
-  // Alert the user that the node has been copied
-  alert('Linked image copied');
-
+        $(div).hide();
+        // Alert the user that the node has been copied
+        alert('Linked image copied');
     "><i class="bi bi-image"></i></a>
     <div style="display: none">
       <a target="_parent" href="<%= ENV['BASE_URI'] %>/e/<%=event.slug%>"><img src="<%= u image_source.image.thumb('1920x1920').url %>"></a>
