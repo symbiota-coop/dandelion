@@ -24,8 +24,8 @@ class Event
     find_by(slug: slug)
   end
 
-  def image_source(organisation)
-    cohostship = organisation && cohostships.find_by(organisation: organisation)
+  def image_source(cohost)
+    cohostship = cohost && cohostships.find_by(organisation: cohost)
     return cohostship if cohostship&.image
     return self if image
 
