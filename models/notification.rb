@@ -99,7 +99,7 @@ class Notification
       "<strong>#{teamship.account.name}</strong> joined the <strong>#{teamship.team.name}</strong> team"
     when :created_spend
       spend = notifiable
-      "<strong>#{spend.account.name}</strong> spent #{Money.new(spend.amount * 100, spend.gathering.currency).format(no_cents_if_whole: true)} on <strong>#{spend.item}</strong>"
+      "<strong>#{spend.account.name}</strong> spent #{Money.new(spend.amount * 100, spend.gathering.currency).format(no_cents_if_whole: true)} on <strong>#{Sanitize.fragment(spend.item)}</strong>"
     when :created_profile
       account = notifiable
       "<strong>#{account.name}</strong> joined Dandelion!"
@@ -158,7 +158,7 @@ class Notification
       end
     when :reacted_to_a_comment
       comment_reaction = notifiable
-      "<strong>#{comment_reaction.account.name}</strong> reacted with #{comment_reaction.body == '💚' ? '<i class="text-primary bi bi-heart-fill"></i>' : comment_reaction.body} to <strong>#{comment_reaction.comment.account.name}'s</strong> comment in <strong>#{comment_reaction.commentable.name}/#{comment_reaction.comment.post.subject}</strong>"
+      "<strong>#{comment_reaction.account.name}</strong> reacted with #{comment_reaction.body == '💚' ? '<i class="text-primary bi bi-heart-fill"></i>' : Sanitize.fragment(comment_reaction.body)} to <strong>#{comment_reaction.comment.account.name}'s</strong> comment in <strong>#{comment_reaction.commentable.name}/#{comment_reaction.comment.post.subject}</strong>"
     when :left_gathering
       account = notifiable
       "<strong>#{account.name}</strong> is no longer a member"
