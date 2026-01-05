@@ -1,4 +1,4 @@
-<% image_source = event.display_image_source_for(@organisation) %>
+<% image_source = event.image_source(@organisation) %>
 <div style="position: relative;" class="m-1">
   <% if image_source %>
     <a target="_parent" href="/e/<%= event.slug %><%= "?cohost=#{@organisation.slug}" if image_source.is_a?(Cohostship) %>"

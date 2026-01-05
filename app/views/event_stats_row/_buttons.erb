@@ -1,6 +1,6 @@
 <td nowrap>
   <a data-toggle="tooltip" title="Edit event" class="btn btn-sm btn-primary" href="/e/<%= event.slug %>/edit"><i class="bi bi-pencil-fill"></i></a>
-  <% image_source = event.display_image_source_for(organisation) %>
+  <% image_source = event.image_source(organisation) %>
   <% if image_source %>
     <a data-toggle="tooltip" title="Copy linked image" class="btn btn-sm btn-primary" href="javascript:;" onclick="
 

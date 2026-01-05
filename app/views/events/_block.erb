@@ -1,4 +1,4 @@
-<% image_source = event.display_image_source_for(@organisation) %>
+<% image_source = event.image_source(@organisation) %>
 <div class="row block no-gutters align-items-stretch <% if event.locked? %>event-locked<% end %>" style="<% if admin? && event.hidden_from_homepage? %>opacity: 0.3<% end %>">
   <% if image_source %>
     <div class="col-lg-6 order-lg-2 mb-2 mb-lg-0 bg-white">

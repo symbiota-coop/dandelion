@@ -149,7 +149,7 @@ Dandelion::App.helpers do
 
   def get_event_image(ticket_form)
     cohost = ticket_form[:cohost] && Organisation.find_by(slug: ticket_form[:cohost])
-    image_source = @event.display_image_source_for(cohost)
+    image_source = @event.image_source(cohost)
     image_source&.image&.thumb('1920x1920')
   end
 

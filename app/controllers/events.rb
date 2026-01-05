@@ -152,7 +152,7 @@ Dandelion::App.controller do
     @organisation = @event.organisation
     @event.check_oc_event if @order && params[:success] && !@order.payment_completed && @event.oc_slug
     cohost = params[:cohost] && Organisation.find_by(slug: params[:cohost])
-    image_source = @event.display_image_source_for(cohost)
+    image_source = @event.image_source(cohost)
     if image_source
       @event_image = image_source.image
       @event_image_width = image_source.image_width_unmagic
