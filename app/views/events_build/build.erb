@@ -298,8 +298,16 @@
         <% end %>
 
         <% if Padrino.env == :development || @event.organisation.experimental? %>
-          <div class="border border-primary rounded p-3 mb-3" style="border-style: dashed !important">
-            <%= f.number_block :affiliate_credit_percentage %>
+          <div class="well">
+            <div class="form-group">
+              <label for="event_affiliate_credit_percentage">Affiliate credit percentage</label>
+              <div class="input-group">
+                <%= f.number_field :affiliate_credit_percentage, class: 'form-control' %>
+                <div class="input-group-append">
+                  <span class="input-group-text">%</span>
+                </div>
+              </div>
+            </div>
             <%= f.check_box_block :minimal_only %>
           </div>
         <% end %>
