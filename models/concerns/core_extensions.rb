@@ -110,7 +110,7 @@ module CoreExtensions
       value = send(field)
       next unless value.present?
 
-      send("#{field}=", Sanitize.fragment(value.to_s))
+      send("#{field}=", Nokogiri::HTML.fragment(value.to_s).text.squish)
     end
   end
 end
