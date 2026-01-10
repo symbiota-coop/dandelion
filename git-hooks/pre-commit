@@ -36,6 +36,8 @@ Please note that MongoDB indexes are created directly in the database, and are n
 
 # Tests
 
+Never run the full test suite.
+
 Use the following command structure to test a single file:
 
 `foreman run -e .env.test bundle exec ruby -I test test/$1_test.rb`
