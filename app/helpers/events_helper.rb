@@ -50,6 +50,8 @@ Dandelion::App.helpers do
     case params[:order]
     when 'random'
       event_ids = events.pluck(:id)
+      return [] if event_ids.empty?
+
       events.collection.aggregate([
                                     { '$match' => { '_id' => { '$in' => event_ids } } },
                                     { '$sample' => { size: event_ids.length } }
