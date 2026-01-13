@@ -174,7 +174,7 @@ $(function () {
     if (phoneValue.length > 0 && !phoneValue.startsWith('+')) {
       $(this).addClass('is-invalid')
       if (!$(this).next('.invalid-feedback').length) {
-        $(this).after('<div class="invalid-feedback">Please include the + country code (e.g. +1234567890)</div>')
+        $(this).after('<div class="invalid-feedback">Please start with the +country code (+44 for UK)</div>')
       }
     } else {
       $(this).removeClass('is-invalid')
