@@ -1,0 +1,14 @@
+<ul class="text-muted">
+  <li>One question per line</li>
+  <li>Text fields like: question?</li>
+  <li>Checkboxes like: [question?]</li>
+  <li>Multiple checkboxes like: question? [option1, option2, option3]</li>
+  <li>Select fields like: question? &lt;option1, option2, option3&gt;</li>
+  <li>Date fields like: {question?}</li>
+  <li>Headers like: # header</li>
+  <li>Standard text like: - text</li>
+  <li>End a line with a star * to make the question required</li>
+  <% if defined?(answers_url) && answers_url %>
+    <li>View answers on the <a target="_blank" href="<%= answers_url %>">Orders</a> page</li>
+  <% end %>
+</ul>

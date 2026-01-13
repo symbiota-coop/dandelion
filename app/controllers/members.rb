@@ -82,7 +82,7 @@ Dandelion::App.controller do
       flash[:notice] = "You're already part of that gathering"
       redirect back
     else
-      @gathering.memberships.create! account: @account, unsubscribed: true, answers: (params[:answers].map { |i, x| [params[:questions][i], (x unless x == 'false')] } if params[:answers] && params[:questions])
+      @gathering.memberships.create! account: @account, unsubscribed: true, answers: question_answer_pairs(params)
       redirect "/g/#{@gathering.slug}"
     end
   end

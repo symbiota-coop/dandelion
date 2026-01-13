@@ -212,79 +212,62 @@
     </td>
     <% if @event %>
       <td>
-        <% order.answers.each { |q,a| if q && a %>
-        <p style="width: 400px">
-          <% question_text = [Order::SELECT_FIELD_REGEX, Order::MULTIPLE_CHECKBOX_FIELD_REGEX, Order::CHECKBOX_FIELD_REGEX, Order::DATE_FIELD_REGEX].inject(nil) { |r, regex| r || q.match(regex)&.[](1) } || q %>
-          <strong><%== Sanitize.fragment(Rinku.auto_link(question_text), Sanitize::Config::DANDELION) %></strong>
-        </p>
-        <p style="width: 400px">
-          <% if q =~ Order::SELECT_FIELD_REGEX %>
-            <%== Sanitize.fragment(Rinku.auto_link(a), Sanitize::Config::DANDELION) %>
-          <% elsif q =~ Order::MULTIPLE_CHECKBOX_FIELD_REGEX %>
-            <%= a.map { |v| Sanitize.fragment(Rinku.auto_link(v), Sanitize::Config::DANDELION) }.join(', ') %>
-          <% elsif q =~ /\[.*\]/ %>
-            <% # Checkbox answer: show checkmark %>
-            <i class="bi bi-check-lg"></i>
-          <% else %>
-            <%== Sanitize.fragment(Rinku.auto_link(a.gsub("\n", '<br />')), Sanitize::Config::DANDELION) %>
-          <% end %>
-        </p>
-      <% end } if order.answers %>
+        <%= partial :answers, locals: { answers: order.answers } if order.answers %>
+      </td>
+      <td>
+        <% if order.opt_in_organisation %><i class="bi bi-check-lg"></i><% end %>
+      </td>
+      <td>
+        <% if order.opt_in_facilitator %><i class="bi bi-check-lg"></i><% end %>
+      </td>
+    <% end %>
+    <td data-sort="<%= order.created_at.iso8601 %>">
+      <%= order.created_at %>
     </td>
-    <td>
-      <% if order.opt_in_organisation %><i class="bi bi-check-lg"></i><% end %>
-    </td>
-    <td>
-      <% if order.opt_in_facilitator %><i class="bi bi-check-lg"></i><% end %>
-    </td>
-  <% end %>
-  <td data-sort="<%= order.created_at.iso8601 %>">
-    <%= order.created_at %>
-  </td>
-  <% if @event %>
-    <td>
-      <% if order.account %>
-        <% if (event_feedback = event_feedbacks_by_account[order.account_id]) && !event_feedback.anonymise %>
-          <a href="/event_feedbacks/<%= event_feedback.id %>">
-            <% if event_feedback.rating %>
-              <% event_feedback.rating.times do %><i class="bi bi-star-fill"></i><% end %>
-            <% else %>
-              <%= event_feedback.id %>
-            <% end %>
-          </a>
-        <% elsif order.event.started? %>
-          <% if order.account.unsubscribed || order.account.unsubscribed_feedback %>
-            <span class="text-muted">Unsubscribed from feedback emails</span>
-          <% else %>
-            <a href="<%= ENV['BASE_URI'] %>/events/<%= order.event_id %>/resend_feedback_email/<%= order.account_id %>">
-              <% if order.event.finished? %>
-                Resend feedback email
-              <% elsif order.event.started? %>
-                Send feedback email
+    <% if @event %>
+      <td>
+        <% if order.account %>
+          <% if (event_feedback = event_feedbacks_by_account[order.account_id]) && !event_feedback.anonymise %>
+            <a href="/event_feedbacks/<%= event_feedback.id %>">
+              <% if event_feedback.rating %>
+                <% event_feedback.rating.times do %><i class="bi bi-star-fill"></i><% end %>
+              <% else %>
+                <%= event_feedback.id %>
               <% end %>
             </a>
+          <% elsif order.event.started? %>
+            <% if order.account.unsubscribed || order.account.unsubscribed_feedback %>
+              <span class="text-muted">Unsubscribed from feedback emails</span>
+            <% else %>
+              <a href="<%= ENV['BASE_URI'] %>/events/<%= order.event_id %>/resend_feedback_email/<%= order.account_id %>">
+                <% if order.event.finished? %>
+                  Resend feedback email
+                <% elsif order.event.started? %>
+                  Send feedback email
+                <% end %>
+              </a>
+            <% end %>
           <% end %>
         <% end %>
-      <% end %>
-    </td>
-  <% end %>
-  <td nowrap>
-    <% if order.deleted? %>
-      <%= dropdown_nav [
+      </td>
+    <% end %>
+    <td nowrap>
+      <% if order.deleted? %>
+        <%= dropdown_nav [
         ['Restore and complete', "/events/#{order.event_id}/orders/#{order.id}/restore_and_complete"],
       ].compact, button_text: %(Actions <i class="bi bi-caret-down-fill"></i>), container_class: 'btn-group mb-1' %>
-    <% else %>
-      <%= dropdown_nav [
+      <% else %>
+        <%= dropdown_nav [
         ['Link to order confirmation', "/orders/#{order.id}"],
         ['Resend order confirmation', "/orders/#{order.id}/send_tickets"],
         ['Transfer to another event', "/orders/#{order.id}/transfer"],
         (['Remove and refund order', "/events/#{order.event.id}/orders/#{order.id}/refund_and_destroy"] if order.event.refund_deleted_orders && order.session_id),
         ['Remove order', "/events/#{order.event.id}/orders/#{order.id}/destroy"],
       ].compact, button_text: %(Actions <i class="bi bi-caret-down-fill"></i>), container_class: 'btn-group mb-1' %>
-    <% end %>
-  </td>
-</tr>
-<% } %>
+      <% end %>
+    </td>
+  </tr>
+  <% } %>
 </table>
 
 <%= will_paginate orders, page_links: false, renderer: WillPaginate::ViewHelpers::BootstrapRenderer %>

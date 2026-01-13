@@ -113,18 +113,7 @@ module OrderFields
         next unless question && answer && questions_to_include.include?(question)
 
         # Extract question text (remove formatting like <options>, [options], etc.)
-        question_text = question.dup
-        [
-          Order::SELECT_FIELD_REGEX,
-          Order::MULTIPLE_CHECKBOX_FIELD_REGEX,
-          Order::CHECKBOX_FIELD_REGEX,
-          Order::DATE_FIELD_REGEX
-        ].each do |regex|
-          if (match = question_text.match(regex))
-            question_text = match[1]
-            break
-          end
-        end
+        question_text = Questions::FIELD_REGEXES.inject(nil) { |result, regex| result || question.match(regex)&.[](1) } || question
         question_text = question_text.gsub(/^#\s*/, '') # Remove markdown headers
         question_text = question_text.strip.chomp('*') # Remove trailing asterisk if required
 

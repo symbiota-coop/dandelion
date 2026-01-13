@@ -58,7 +58,7 @@ Dandelion::App.controller do
       flash[:notice] = "You've already applied to that gathering"
       redirect back
     else
-      @mapplication = @gathering.mapplications.build account: @account, status: 'pending', answers: (params[:answers].map { |i, x| [params[:questions][i], (x unless x == 'false')] } if params[:answers] && params[:questions])
+      @mapplication = @gathering.mapplications.build account: @account, status: 'pending', answers: question_answer_pairs(params)
       if @mapplication.save
         if @mapplication.acceptable? && @mapplication.meets_threshold
           @mapplication.accept

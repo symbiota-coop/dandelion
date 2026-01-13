@@ -1,0 +1,19 @@
+<% answers.each { |q, a| %>
+<% if q && a %>
+  <% question_text = (Questions::FIELD_REGEXES.inject(nil) { |result, regex| result || q.match(regex)&.[](1) } || q).chomp('*') %>
+  <p>
+    <strong><%== Sanitize.fragment(Rinku.auto_link(question_text), Sanitize::Config::DANDELION) %></strong>
+  </p>
+  <p>
+    <% if q =~ Questions::SELECT_FIELD_REGEX %>
+      <%== Sanitize.fragment(Rinku.auto_link(a), Sanitize::Config::DANDELION) %>
+    <% elsif q =~ Questions::MULTIPLE_CHECKBOX_FIELD_REGEX %>
+      <%== a.map { |v| Sanitize.fragment(Rinku.auto_link(v), Sanitize::Config::DANDELION) }.join(', ') %>
+    <% elsif q =~ Questions::CHECKBOX_FIELD_REGEX %>
+      <i class="bi bi-check-lg"></i>
+    <% else %>
+      <%== Sanitize.fragment(Rinku.auto_link(a.gsub("\n", '<br />')), Sanitize::Config::DANDELION) %>
+    <% end %>
+  </p>
+<% end %>
+<% } %>

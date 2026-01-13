@@ -163,18 +163,7 @@
             <%= f.text_area_block :questions, placeholder: "e.g. Any dietary requirements?\n[Check this box to agree to the terms and conditions]" %>
             <div class="q-help">
               <p class="text-muted">Questions to ask participants upon booking.</p>
-              <ul class="text-muted">
-                <li>One question per line</li>
-                <li>Add headers by starting a line with # like: # header</li>
-                <li>Text fields like: question?</li>
-                <li>Checkboxes like: [question?]</li>
-                <li>Multiple checkboxes like: question? [option1, option2, option3]</li>
-                <li>Select fields like: question? &lt;option1, option2, option3&gt;</li>
-                <li>Date fields like: {question?}</li>
-                <li>Standard text like: - text</li>
-                <li>End a line with a star * to make the question required</li>
-                <li>View answers on the <a target="_blank" href="/events/<%=@event.id%>/orders">Orders</a> page</li>
-              </ul>
+              <%= partial :questions_help, locals: { answers_url: "/events/#{@event.id}/orders" } %>
             </div>
           </div>
           <div class="col-lg-6">

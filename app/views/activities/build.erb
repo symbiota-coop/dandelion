@@ -33,6 +33,9 @@
   </div>
   <div id="application-options" style="display: none">
     <%= f.text_area_block :application_questions %>
+    <div class="mb-3" style="margin-top: -1rem">
+      <%= partial :questions_help %>
+    </div>
     <%= f.wysiwyg_block :extra_info_for_application_form %>
     <%= f.wysiwyg_block :thank_you_message %>
     <%= f.wysiwyg_block :extra_info_for_acceptance_email %>

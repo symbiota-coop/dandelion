@@ -57,4 +57,23 @@ Dandelion::App.helpers do
     Honeybadger.notify(e)
     Time.zone = ENV['DEFAULT_TIME_ZONE']
   end
+
+  def question_answer_pairs(data = nil)
+    return nil unless data && data[:answers] && data[:questions]
+
+    answers = data[:answers]
+    questions = data[:questions]
+
+    answers.map do |i, x|
+      question = questions[i]
+      answer = if x == 'false'
+                 nil
+               elsif x.is_a?(Hash)
+                 x.values
+               else
+                 x
+               end
+      [question, answer]
+    end
+  end
 end

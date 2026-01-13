@@ -149,7 +149,7 @@ end
       <%= f.hidden_field :http_referrer, value: request.referrer %>
       <%= f.hidden_field :via, value: params[:via] %>
 
-      <%= partial :'events/questions' %>
+      <%= partial :questions, locals: { questions: @event.questions } %>
 
       <% if @event.opt_in_organisation %>
         <% if current_account && @event.organisation_and_cohosts.all? { |organisation| current_account.organisationships.find_by(organisation: organisation) } %>

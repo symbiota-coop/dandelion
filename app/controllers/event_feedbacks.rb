@@ -86,7 +86,7 @@ Dandelion::App.controller do
     @event_feedback = @event.event_feedbacks.new(mass_assigning(params[:event_feedback], EventFeedback))
     @event_feedback.public = params[:public]
     @event_feedback.anonymise = params[:anonymise]
-    @event_feedback.answers = (params[:answers].map { |i, x| [params[:questions][i], (x unless x == 'false')] } if params[:answers] && params[:questions])
+    @event_feedback.answers = question_answer_pairs(params)
     @event_feedback.save
     flash[:notice] = 'Thanks for your feedback!'
 

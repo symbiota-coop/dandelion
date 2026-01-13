@@ -100,7 +100,7 @@ Dandelion::App.helpers do
       revenue_sharer: (@event.revenue_sharer_organisationship.account if @event.revenue_sharer_organisationship),
       opt_in_organisation: account_data[:opt_in_organisation] == '1' || (account_data[:opt_in_organisation].is_a?(Array) && account_data[:opt_in_organisation].include?('1')),
       opt_in_facilitator: account_data[:opt_in_facilitator].is_a?(Array) && account_data[:opt_in_facilitator].include?('1'),
-      answers: (details_form[:answers].map { |i, x| [details_form[:questions][i], ((x.is_a?(Hash) ? x.values : x) unless x == 'false')] } if details_form[:answers] && details_form[:questions]),
+      answers: question_answer_pairs(details_form),
       application_fee_paid_to_dandelion: !@event.revenue_sharer_organisationship && @event.donations_to_dandelion?
     }
 

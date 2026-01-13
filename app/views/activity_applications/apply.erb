@@ -48,17 +48,7 @@
         <%= f.text_block :location %>
         <%= f.date_block :date_of_birth %>
         <%= f.select_block :gender %>
-        <% @activity.application_questions_a.each_with_index { |q,i| %>
-        <%= hidden_field_tag "questions[#{i}]", value: q %>
-        <div class="form-group">
-          <label>
-            <%== Sanitize.fragment(Rinku.auto_link(q), Sanitize::Config::DANDELION) %>*
-          </label>
-          <div>
-            <%= text_area_tag "answers[#{i}]", required: true, class: 'autosize form-control', value: (params[:answers][i.to_s] if params[:answers]) %>
-          </div>
-        </div>
-        <% } %>
+        <%= partial :questions, locals: { questions: @activity.application_questions } %>
         <%= f.submit_block button_text: 'Apply' %>
       <% end %>
     <% end %>

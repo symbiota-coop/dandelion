@@ -1,0 +1,19 @@
+<% answers.each { |q, a| %>
+<% if q && a %>
+  <% question_text = (Questions::FIELD_REGEXES.inject(nil) { |result, regex| result || q.match(regex)&.[](1) } || q).chomp('*') %>
+  <p>
+    <strong><%= question_text %></strong>
+  </p>
+  <p>
+    <% if q =~ Questions::SELECT_FIELD_REGEX %>
+      <%= a %>
+    <% elsif q =~ Questions::MULTIPLE_CHECKBOX_FIELD_REGEX %>
+      <%= a.join(', ') %>
+    <% elsif q =~ Questions::CHECKBOX_FIELD_REGEX %>
+      ✓
+    <% else %>
+      <%= a.gsub("\n", '<br />') %>
+    <% end %>
+  </p>
+<% end %>
+<% } %>

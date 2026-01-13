@@ -9,10 +9,6 @@ class Order
     const_set(error_class, Class.new(StandardError))
   end
 
-  SELECT_FIELD_REGEX = /^(.+?)\s*<\s*(.+?)\s*>\*?$/
-  MULTIPLE_CHECKBOX_FIELD_REGEX = /^(.+?)\s*\[\s*(.+?)\s*\]\*?$/
-  CHECKBOX_FIELD_REGEX = /^\s*\[(.+?)\]\s*\*?$/
-  DATE_FIELD_REGEX = /^\s*\{(.+?)\}\s*\*?$/
   GOCARDLESS_FIELDS = %i[gc_plan_id gc_given_name gc_family_name gc_address_line1 gc_city gc_postal_code gc_branch_code gc_account_number].freeze
 
   include OrderFields
