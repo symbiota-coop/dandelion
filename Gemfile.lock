@@ -138,7 +138,7 @@ GEM
       fog-aws
     drb (2.2.3)
     ecdsa (1.2.0)
-    email_address (0.2.7)
+    email_address (0.2.8)
       base64
       simpleidn
     erb (6.0.0)
