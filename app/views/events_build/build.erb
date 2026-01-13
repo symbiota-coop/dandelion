@@ -146,41 +146,7 @@
       <div role="tabpanel" class="tab-pane" id="tab-questions">
         <%= f.check_box_block :ask_hear_about %>
 
-
-        <style>
-          .q-help p { margin-top: -1em }
-            @media (min-width: 992px) {
-              .q-help p {
-                margin-top: 1.5em;
-              }
-              .q-help ul {
-                padding-left: 2em;
-              }
-            }
-        </style>
-        <div class="row">
-          <div class="col-lg-6">
-            <%= f.text_area_block :questions, placeholder: "e.g. Any dietary requirements?\n[Check this box to agree to the terms and conditions]" %>
-            <div class="q-help">
-              <p class="text-muted">Questions to ask participants upon booking.</p>
-              <%= partial :questions_help, locals: { answers_url: "/events/#{@event.id}/orders" } %>
-            </div>
-          </div>
-          <div class="col-lg-6">
-            <style>
-              input[type=checkbox][disabled] + label { opacity: 1 }
-            </style>
-            <fieldset class="ml-lg-5 border p-3 rounded mb-3">
-              <legend class="w-auto px-2" style="font-size: 1rem">
-                Preview
-                <span id="questions-spinner" style="display: none;" class="ml-1">
-                  <i class="bi bi-spin bi-slash-lg"></i>
-                </span>
-              </legend>
-              <div id="questions-preview"></div>
-            </fieldset>
-          </div>
-        </div>
+        <%= partial :questions_with_preview, locals: { f: f, field_name: :questions, placeholder: "e.g. Any dietary requirements?\n[Check this box to agree to the terms and conditions]", help_text: 'Questions to ask participants upon booking.', questions_help_locals: { answers_url: "/events/#{@event.id}/orders" } } %>
         <div class="row">
           <div class="col-lg-6">
             <%= f.text_area_block :feedback_questions %>

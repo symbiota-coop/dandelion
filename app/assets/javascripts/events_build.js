@@ -285,32 +285,8 @@ $(function () {
   })
 
   // Live preview for questions
-  function loadQuestions () {
-    if (!config.eventId) return
-    $('#questions-preview').load('/events/' + config.eventId + '/questions?questions=' + encodeURIComponent($('#event_questions').val()), function () {
-      $('#questions-spinner').hide()
-    })
+  if (config.eventId) {
+    initQuestionsPreview('#event_questions', '/events/' + config.eventId + '/questions')
+    initQuestionsPreview('#event_feedback_questions', '/events/' + config.eventId + '/feedback_questions')
   }
-  let questionsTimer
-  $('#event_questions').on('input', function () {
-    $('#questions-spinner').show()
-    clearTimeout(questionsTimer)
-    questionsTimer = setTimeout(function () { loadQuestions() }, 500)
-  })
-  loadQuestions()
-
-  // Live preview for feedback questions
-  function loadFeedbackQuestions () {
-    if (!config.eventId) return
-    $('#feedback-questions-preview').load('/events/' + config.eventId + '/feedback_questions?questions=' + encodeURIComponent($('#event_feedback_questions').val()), function () {
-      $('#feedback-questions-spinner').hide()
-    })
-  }
-  let feedbackQuestionsTimer
-  $('#event_feedback_questions').on('input', function () {
-    $('#feedback-questions-spinner').show()
-    clearTimeout(feedbackQuestionsTimer)
-    feedbackQuestionsTimer = setTimeout(function () { loadFeedbackQuestions() }, 500)
-  })
-  loadFeedbackQuestions()
 })

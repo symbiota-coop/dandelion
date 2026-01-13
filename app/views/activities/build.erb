@@ -14,6 +14,10 @@
 
     $('#activity_application_questions').attr('rows', '3')
     autosize($('#activity_application_questions')[0])
+
+    <% if @activity.persisted? %>
+      initQuestionsPreview('#activity_application_questions', '/activities/<%= @activity.id %>/application_questions')
+    <% end %>
   })
 </script>
 <% form_for @activity, @activity.new_record ? '/activities/new' : "/activities/#{@activity.id}/edit" do |f| %>
@@ -32,10 +36,7 @@
     <%= f.select_block :privacy %>
   </div>
   <div id="application-options" style="display: none">
-    <%= f.text_area_block :application_questions %>
-    <div class="mb-3" style="margin-top: -1rem">
-      <%= partial :questions_help %>
-    </div>
+    <%= partial :questions_with_preview, locals: { f: f, field_name: :application_questions, help_text: 'Questions to ask applicants.', placeholder: "e.g. Why do you want to join?\n[I have read and agree to the code of conduct]" } %>
     <%= f.wysiwyg_block :extra_info_for_application_form %>
     <%= f.wysiwyg_block :thank_you_message %>
     <%= f.wysiwyg_block :extra_info_for_acceptance_email %>

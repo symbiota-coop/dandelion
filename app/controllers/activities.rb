@@ -289,4 +289,10 @@ Dandelion::App.controller do
     @scope = "activity_id=#{@activity.id}"
     erb :'discount_codes/discount_codes'
   end
+
+  get '/activities/:id/application_questions' do
+    @activity = Activity.find(params[:id]) || not_found
+    activity_admins_only!
+    partial :questions, locals: { questions: params[:questions], preview: true }
+  end
 end

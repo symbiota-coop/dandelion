@@ -1,0 +1,33 @@
+<%
+  id_base = field_name.to_s.tr('_', '-')
+  spinner_id = "#{id_base}-spinner"
+  preview_id = "#{id_base}-preview"
+%>
+<style>
+  .q-help p { margin-top: -1em }
+  @media (min-width: 992px) {
+    .q-help p { margin-top: 1.5em; }
+    .q-help ul { padding-left: 2em; }
+  }
+  input[type=checkbox][disabled] + label { opacity: 1 }
+</style>
+<div class="row">
+  <div class="col-lg-6">
+    <%= f.text_area_block field_name, placeholder: (defined?(placeholder) ? placeholder : nil) %>
+    <div class="q-help">
+      <p class="text-muted"><%= help_text %></p>
+      <%= partial :questions_help, locals: (defined?(questions_help_locals) && questions_help_locals ? questions_help_locals : {}) %>
+    </div>
+  </div>
+  <div class="col-lg-6">
+    <fieldset class="ml-lg-5 border p-3 rounded mb-3">
+      <legend class="w-auto px-2" style="font-size: 1rem">
+        Preview
+        <span id="<%= spinner_id %>" style="display: none;" class="ml-1">
+          <i class="bi bi-spin bi-slash-lg"></i>
+        </span>
+      </legend>
+      <div id="<%= preview_id %>"></div>
+    </fieldset>
+  </div>
+</div>

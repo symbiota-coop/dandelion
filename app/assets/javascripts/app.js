@@ -1,3 +1,22 @@
+function initQuestionsPreview (inputSelector, previewUrl) {
+  const fieldName = inputSelector.replace(/^#\w+?_/, '').replace(/_/g, '-')
+  const previewSelector = '#' + fieldName + '-preview'
+  const spinnerSelector = '#' + fieldName + '-spinner'
+  let timer
+  function load () {
+    if (!previewUrl) return
+    $(previewSelector).load(previewUrl + '?questions=' + encodeURIComponent($(inputSelector).val()), function () {
+      $(spinnerSelector).hide()
+    })
+  }
+  $(inputSelector).on('input', function () {
+    $(spinnerSelector).show()
+    clearTimeout(timer)
+    timer = setTimeout(load, 500)
+  })
+  load()
+}
+
 $(function () {
 
   function ajaxCompleted () {
