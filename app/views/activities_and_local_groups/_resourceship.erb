@@ -43,9 +43,9 @@
 
       <% if defined?(membership_toggle) && membership_toggle %>
         <% if !resourceship.hide_membership? %>
-          <a class="btn mb-1 btn-primary" href="<%=resource_path %>/hide_membership">Membership public</a>
+          <a class="btn mb-1 btn-primary" href="<%=resource_path %>/hide_membership">Showing on your profile</a>
         <% else %>
-          <a class="btn mb-1 btn-outline-primary" href="<%=resource_path %>/show_membership">Membership hidden</a>
+          <a class="btn mb-1 btn-outline-primary" href="<%=resource_path %>/show_membership">Not showing on your profile</a>
         <% end %>
       <% end %>
 
