@@ -14,6 +14,9 @@ end
   <% if q =~ /^#\s*(.+)/ %>
     <% match = $1 %>
     <h4><%== Sanitize.fragment(Rinku.auto_link(match), Sanitize::Config::DANDELION) %></h4>
+  <% elsif q =~ /^-\s*(.+)/ %>
+    <% match = $1 %>
+    <p><%== Sanitize.fragment(Rinku.auto_link(match.chomp('*')), Sanitize::Config::DANDELION) %></p>
   <% elsif m = q.match(Order::SELECT_FIELD_REGEX)  %>
     <% # Select field: Question text <option1, option2, option3> or Question text <option1, option2, option3>* %>
     <% question_text = m[1] %>
