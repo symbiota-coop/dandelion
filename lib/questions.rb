@@ -10,4 +10,8 @@ module Questions
     CHECKBOX_FIELD_REGEX,
     DATE_FIELD_REGEX
   ].freeze
+
+  def self.extract_question_text(question)
+    FIELD_REGEXES.inject(nil) { |result, regex| result || question.match(regex)&.[](1) } || question
+  end
 end

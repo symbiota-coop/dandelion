@@ -113,7 +113,7 @@ module OrderFields
         next unless question && answer && questions_to_include.include?(question)
 
         # Extract question text (remove formatting like <options>, [options], etc.)
-        question_text = Questions::FIELD_REGEXES.inject(nil) { |result, regex| result || question.match(regex)&.[](1) } || question
+        question_text = Questions.extract_question_text(question)
         question_text = question_text.gsub(/^#\s*/, '') # Remove markdown headers
         question_text = question_text.strip.chomp('*') # Remove trailing asterisk if required
 

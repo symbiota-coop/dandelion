@@ -6,7 +6,7 @@
   <% if order.answers && order.answers.any? { |q, a| q && a } %>
     <% order.answers.each { |q, a| %>
     <% if q && a %>
-      <% question_text = (Questions::FIELD_REGEXES.inject(nil) { |result, regex| result || q.match(regex)&.[](1) } || q).chomp('*') %>
+      <% question_text = Questions.extract_question_text(q).chomp('*') %>
       <p>
         <strong><%= question_text %></strong>
       </p>
