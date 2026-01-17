@@ -293,6 +293,6 @@ Dandelion::App.controller do
   get '/activities/:id/application_questions' do
     @activity = Activity.find(params[:id]) || not_found
     activity_admins_only!
-    partial :questions, locals: { questions: params[:questions], preview: true }
+    partial :'questions/questions', locals: { questions: params[:questions], preview: true }
   end
 end

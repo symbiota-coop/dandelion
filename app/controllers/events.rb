@@ -318,7 +318,7 @@ Dandelion::App.controller do
   end
 
   get '/events/:id/questions' do
-    partial :questions, locals: { questions: params[:questions], preview: true }
+    partial :'questions/questions', locals: { questions: params[:questions], preview: true }
   end
 
   get '/events/:id/feedback_questions' do
