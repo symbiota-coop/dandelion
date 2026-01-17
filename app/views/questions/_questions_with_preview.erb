@@ -16,7 +16,7 @@
     <%= f.text_area_block field_name, placeholder: (defined?(placeholder) ? placeholder : nil) %>
     <div class="q-help">
       <p class="text-muted"><%= help_text %></p>
-      <%= partial :questions_help, locals: (defined?(questions_help_locals) && questions_help_locals ? questions_help_locals : {}) %>
+      <%= partial :'questions/questions_help', locals: (defined?(questions_help_locals) && questions_help_locals ? questions_help_locals : {}) %>
     </div>
   </div>
   <div class="col-lg-6">

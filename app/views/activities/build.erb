@@ -36,7 +36,7 @@
     <%= f.select_block :privacy %>
   </div>
   <div id="application-options" style="display: none">
-    <%= partial :questions_with_preview, locals: { f: f, field_name: :application_questions, help_text: 'Questions to ask applicants.', placeholder: "e.g. Why do you want to join?\n[I have read and agree to the code of conduct]" } %>
+    <%= partial :'questions/questions_with_preview', locals: { f: f, field_name: :application_questions, help_text: 'Questions to ask applicants.', placeholder: "e.g. Why do you want to join?\n[I have read and agree to the code of conduct]" } %>
     <%= f.wysiwyg_block :extra_info_for_application_form %>
     <%= f.wysiwyg_block :thank_you_message %>
     <%= f.wysiwyg_block :extra_info_for_acceptance_email %>

@@ -4,7 +4,7 @@
     <%= account.name %> booked onto <%= order.original_description %>
   </p>
   <% if order.answers && order.answers.any? { |q, a| q && a } %>
-    <%= partial :answers_email, locals: { answers: order.answers } %>
+    <%= partial :'questions/answers_email', locals: { answers: order.answers } %>
   <% end %>
   <p><a href="<%= ENV['BASE_URI'] %>/events/<%=event.id%>/orders?sign_in_token=%recipient.token%">View all orders</a></p>
 </div>

@@ -212,7 +212,7 @@
     </td>
     <% if @event %>
       <td>
-        <%= partial :answers, locals: { answers: order.answers } if order.answers %>
+        <%= partial :'questions/answers', locals: { answers: order.answers } if order.answers %>
       </td>
       <td>
         <% if order.opt_in_organisation %><i class="bi bi-check-lg"></i><% end %>

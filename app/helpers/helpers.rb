@@ -58,8 +58,8 @@ Dandelion::App.helpers do
     Time.zone = ENV['DEFAULT_TIME_ZONE']
   end
 
-  def question_answer_pairs(data = nil)
-    return nil unless data && data[:answers] && data[:questions]
+  def question_answer_pairs(data)
+    return nil unless data[:answers] && data[:questions]
 
     answers = data[:answers]
     questions = data[:questions]

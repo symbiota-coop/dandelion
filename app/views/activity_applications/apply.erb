@@ -48,7 +48,7 @@
         <%= f.text_block :location %>
         <%= f.date_block :date_of_birth %>
         <%= f.select_block :gender %>
-        <%= partial :questions, locals: { questions: @activity.application_questions } %>
+        <%= partial :'questions/questions', locals: { questions: @activity.application_questions } %>
         <%= f.submit_block button_text: 'Apply' %>
       <% end %>
     <% end %>

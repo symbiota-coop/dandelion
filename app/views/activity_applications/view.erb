@@ -13,7 +13,7 @@
       <%= partial :'accounts/table', locals: { account: @account } %>
       <% if @activity_application.answers %>
         <div class="mb-5">
-          <%= partial :answers, locals: { answers: @activity_application.answers } %>
+          <%= partial :'questions/answers', locals: { answers: @activity_application.answers } %>
         </div>
       <% end %>
   </div>
