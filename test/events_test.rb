@@ -240,4 +240,51 @@ class EventsTest < ActiveSupport::TestCase
     assert_equal false, @activity.activityships.find_by(account: @account).unsubscribed
     assert_equal false, @local_group.local_groupships.find_by(account: @account).unsubscribed
   end
+
+  test 'event with questions' do
+    @account = FactoryBot.create(:account)
+    @organisation = FactoryBot.create(:organisation, account: @account)
+    questions = <<~QUESTIONS.strip
+      # Registration Details
+      - Please fill out all fields
+      Full name
+      T-shirt size <XS, S, M, L, XL>
+      Dietary requirements [None, Vegetarian, Vegan, Gluten-free]
+      [I have read the event guidelines]
+      {Arrival date}
+    QUESTIONS
+    @event = FactoryBot.create(:event,
+                               organisation: @organisation,
+                               account: @account,
+                               last_saved_by: @account,
+                               prices: [0],
+                               questions: questions)
+    login_as(@account)
+    visit "/e/#{@event.slug}"
+
+    # Verify header and plain text are displayed
+    assert page.has_content?('Registration Details')
+    assert page.has_content?('Please fill out all fields')
+
+    # Fill in all question types (indices 0 and 1 are header and plain text)
+    fill_in 'answers[2]', with: 'Test User'
+    select 'M', from: 'answers[3]'
+    find('label[for="answers-4-1"]').click # Vegetarian
+    find('label[for="answers-4-2"]').click # Vegan
+    find('label[for="answers-5"]').click   # Single checkbox
+    fill_in 'answers[6]', with: '2024-06-01'
+
+    click_button 'RSVP'
+    assert page.has_content?('Thanks for booking')
+
+    order = @event.orders.last
+    answers = order.answers.to_h
+    q = @event.questions_a
+
+    assert_equal 'Test User', answers[q[2]]
+    assert_equal 'M', answers[q[3]]
+    assert_equal %w[Vegetarian Vegan], answers[q[4]]
+    assert_equal '1', answers[q[5]]
+    assert_equal '2024-06-01', answers[q[6]]
+  end
 end
