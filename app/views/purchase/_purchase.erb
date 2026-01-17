@@ -18,7 +18,8 @@ if params[:discount_code]
   end
 end
 
-@single_free_ticket_type = @event.ticket_types.count == 1 &&
+@concise_ticket_form = !@event.always_show_full_ticket_form? &&
+  @event.ticket_types.count == 1 &&
   (free_ticket_type = @event.ticket_types.first) &&
   free_ticket_type.price &&
   free_ticket_type.price.zero? &&
@@ -28,9 +29,13 @@ end
 
 <div class="card shadow-sm <% if @event.no_discounts %>no-discounts<% end %>" id="select-tickets">
 
-  <% unless @single_free_ticket_type %>
+  <% unless @concise_ticket_form %>
     <h3 class="card-header bg-primary text-white"><%= @event.select_tickets_title || 'Select tickets' %></h3>
-    <div class="card-body">
+  <% end %>
+
+  <div class="<% unless @concise_ticket_form %>card-body<% end %>">
+
+    <% unless @concise_ticket_form %>
       <% if @event.past? %>
         <% if @event.recording? %>
           <div class="alert alert-success">
@@ -53,13 +58,13 @@ end
       <% end %>
     <% end %>
 
-    <div id="ticket-types" <% if @single_free_ticket_type %>style="display: none"<% end %>>
+    <div id="ticket-types" <% if @concise_ticket_form %>style="display: none"<% end %>>
       <% form_tag '' do %>
         <%= hidden_field_tag :cohost, value: params[:cohost] %>
         <%= hidden_field_tag :affiliate_type, value: params[:affiliate_type] %>
         <%= hidden_field_tag :affiliate_id, value: params[:affiliate_id] %>
 
-        <% if @single_free_ticket_type %>
+        <% if @concise_ticket_form %>
           <%= hidden_field_tag :"quantities[#{free_ticket_type.id}]", value: 1, 'data-ticket-type-id': free_ticket_type.id, 'data-price': 0 %>
         <% else %>
           <table class="table">
@@ -100,7 +105,7 @@ end
       <% end %>
     </div>
 
-    <% unless @single_free_ticket_type %>
+    <% unless @concise_ticket_form %>
       <% if @event.select_tickets_outro %>
         <table class="table table-borderless mb-0">
           <tr>
@@ -110,11 +115,12 @@ end
           </tr>
         </table>
       <% end %>
-    </div>
-  <% end %>
+    <% end %>
 
-  <h3 class="card-header bg-primary text-white <% if @single_free_ticket_type %>rounded-top<% end %>">
-    <% if @single_free_ticket_type %>
+  </div>
+
+  <h3 class="card-header bg-primary text-white <% if @concise_ticket_form %>rounded-top<% end %>">
+    <% if @concise_ticket_form %>
       Register for free
     <% else %>
       Your details
