@@ -1,9 +1,9 @@
 <%
   node_min_width = 10
-  node_max_width = 50
+  node_max_width = 10*node_min_width
   node_width_scale = 20
   edge_min_opacity = 0.25
-  edge_opacity_scale = 100
+  edge_opacity_scale = 1000
   color = '#00B963'
 
   organisation_edges = OrganisationEdge.and(:mutual_followers.gte => Padrino.env == :development ? 1 : 10)
