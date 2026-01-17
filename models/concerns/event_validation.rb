@@ -15,15 +15,6 @@ module EventValidation
       self.organiser = account if account && !revenue_sharer && !organiser && organisation && organisation.stripe_client_id
       self.ai_tagged = false
       self.description = description.gsub('href="www.', 'href="http://www.') if description
-      if Padrino.env == :production
-        self.embedding = (begin
-          OpenRouter.embedding(to_public_markdown)
-        rescue StandardError => e
-          Honeybadger.notify(e)
-          nil
-        end)
-      end
-
       self.suggested_donation = nil if organisation && !organisation.payment_method?
       self.has_organisation = organisation ? true : false
       self.hidden_from_homepage = true if (name && %w[naked sex sexual erotic eros cock pussy anal orgasm ejaculation].any? { |word| name.downcase.split.include?(word) }) || (organisation && organisation.adult_content?)
@@ -136,6 +127,24 @@ module EventValidation
           self.coordinates = nil
         end
       end
+    end
+
+    after_save do
+      update_embedding_with_retries if Padrino.env == :production
+    end
+
+    handle_asynchronously :update_embedding_with_retries
+  end
+
+  def update_embedding_with_retries
+    attempts = 0
+    begin
+      attempts += 1
+      embedding = OpenRouter.embedding(to_public_markdown)
+      set(embedding: embedding)
+    rescue StandardError => e
+      retry if attempts < 3
+      Honeybadger.notify(e)
     end
   end
 end
