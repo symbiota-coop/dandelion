@@ -64,7 +64,7 @@ class Organisation
       end && fields.all? { |f| organisation.send(f).blank? } && organisation.created_at < 1.month.ago
 
       puts organisation.name
-      organisation.destroy
+      # organisation.destroy
     end
   end
 
