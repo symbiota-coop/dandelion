@@ -1,6 +1,8 @@
 module Searchable
   extend ActiveSupport::Concern
 
+  APOSTROPHE_VARIANTS = /['’]/
+
   class_methods do
     def search(query, scope = all, child_scope: nil, limit: nil, build_records: false, phrase_boost: 1, text_search: false, vector_weight: nil, regex_search: Padrino.env != :production)
       return none if query.blank?
@@ -17,11 +19,13 @@ module Searchable
       return scope.and(email: query) if query.match?(EMAIL_REGEX) && fields.key?('email')
 
       if regex_search
-        results = scope.where('$or': search_fields.map { |field| { field => /#{Regexp.escape(query)}/i } })
+        pattern = Regexp.escape(query).gsub(APOSTROPHE_VARIANTS, "[’']")
+        results = scope.where('$or': search_fields.map { |field| { field => /#{pattern}/i } })
         results = results.limit(limit) if limit
         results
       else
         query = query.strip
+        query_variants = apostrophe_variants(query)
 
         search_filters = []
         remaining_selector = {}
@@ -73,10 +77,14 @@ module Searchable
           end
         end
 
-        should_clauses = [
-          { phrase: { query: query, path: { wildcard: '*' }, score: { boost: { value: phrase_boost } } } }
-        ]
-        should_clauses << { text: { query: query, path: { wildcard: '*' }, fuzzy: { maxEdits: 2, prefixLength: 2 } } } if text_search
+        should_clauses = query_variants.map do |variant|
+          { phrase: { query: variant, path: { wildcard: '*' }, score: { boost: { value: phrase_boost } } } }
+        end
+        if text_search
+          should_clauses.concat(query_variants.map do |variant|
+            { text: { query: variant, path: { wildcard: '*' }, fuzzy: { maxEdits: 2, prefixLength: 2 } } }
+          end)
+        end
 
         # Build text search stage (used in both vector+text and text-only searches)
         text_search_stage = {
@@ -162,6 +170,16 @@ module Searchable
 
     def search_fields
       raise NotImplementedError, "#{self} must implement search_fields class method"
+    end
+
+    def apostrophe_variants(query)
+      return [query] unless query.match?(APOSTROPHE_VARIANTS)
+
+      [
+        query,
+        query.gsub(APOSTROPHE_VARIANTS, "'"),
+        query.gsub(APOSTROPHE_VARIANTS, '’')
+      ].uniq
     end
   end
 end
