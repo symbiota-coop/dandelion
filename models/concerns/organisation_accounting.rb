@@ -51,13 +51,20 @@ module OrganisationAccounting
     else
       cr = contribution_requested
       cp = contribution_paid
-      contribution_remaining = cr - cp
       update_attributes(
         contribution_requested_gbp_cache: cr.exchange_to('GBP').to_f,
         contribution_paid_gbp_cache: cp.exchange_to('GBP').to_f,
-        paid_up: (contribution_remaining < Money.new(1 * 100, 'GBP')) || cp >= (paid_up_fraction_or_default * cr)
+        paid_up: paid_up_by_contribution?(cr: cr, cp: cp)
       )
     end
+  end
+
+  def paid_up_by_contribution?(cr: contribution_requested, cp: contribution_paid,
+                               paid_up_tolerance: Money.new(1 * 100, 'GBP'))
+    contribution_remaining = cr - cp
+    contribution_remaining <= Money.new(100 * 100, 'GBP') &&
+      ((contribution_remaining < paid_up_tolerance) ||
+        cp >= (paid_up_fraction_or_default * cr))
   end
 
   def stripe_topup
