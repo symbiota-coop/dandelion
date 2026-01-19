@@ -1,7 +1,9 @@
 module Searchable
   extend ActiveSupport::Concern
 
-  APOSTROPHE_VARIANTS = /['’]/
+  APOSTROPHES = %w[' ’ ‘ ʼ ＇ ′ ´].freeze
+  APOSTROPHE_VARIANTS = Regexp.union(APOSTROPHES)
+  APOSTROPHE_CHAR_CLASS = "[#{APOSTROPHES.map { |ch| Regexp.escape(ch) }.join}]"
 
   class_methods do
     def search(query, scope = all, child_scope: nil, limit: nil, build_records: false, phrase_boost: 1, text_search: false, vector_weight: nil, regex_search: Padrino.env != :production)
@@ -19,7 +21,7 @@ module Searchable
       return scope.and(email: query) if query.match?(EMAIL_REGEX) && fields.key?('email')
 
       if regex_search
-        pattern = Regexp.escape(query).gsub(APOSTROPHE_VARIANTS, "[’']")
+        pattern = Regexp.escape(query).gsub(APOSTROPHE_VARIANTS, APOSTROPHE_CHAR_CLASS)
         results = scope.where('$or': search_fields.map { |field| { field => /#{pattern}/i } })
         results = results.limit(limit) if limit
         results
@@ -175,11 +177,7 @@ module Searchable
     def apostrophe_variants(query)
       return [query] unless query.match?(APOSTROPHE_VARIANTS)
 
-      [
-        query,
-        query.gsub(APOSTROPHE_VARIANTS, "'"),
-        query.gsub(APOSTROPHE_VARIANTS, '’')
-      ].uniq
+      ([query] + APOSTROPHES.map { |ch| query.gsub(APOSTROPHE_VARIANTS, ch) }).uniq
     end
   end
 end
