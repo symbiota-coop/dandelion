@@ -6,7 +6,7 @@
     <% previous_event = nil; event_count = 0; @events.each { |event|    
     next unless event.has_image?
     next if event.locked? && !event_admin?(event)
-    next if previous_event && previous_event.name == event.name && !previous_event.sold_out?
+    next if !params[:show_events_with_same_name] && previous_event && previous_event.name == event.name && !previous_event.sold_out?
     event_count += 1
     %>
     <div class="col-12 col-sm-6 col-lg-4 event-block" style="margin-bottom: 0.75rem;<%= ' display: none;' if params[:show_more] && event_count > 6 %>">
