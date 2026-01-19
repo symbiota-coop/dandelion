@@ -3,7 +3,7 @@ module Searchable
 
   APOSTROPHES = %w[' ’ ‘ ʼ ＇ ′ ´].freeze
   APOSTROPHE_VARIANTS = Regexp.union(APOSTROPHES)
-  APOSTROPHE_CHAR_CLASS = "[#{APOSTROPHES.map { |ch| Regexp.escape(ch) }.join}]"
+  APOSTROPHE_CHAR_CLASS = "[#{APOSTROPHES.map { |ch| Regexp.escape(ch) }.join}]".freeze
 
   class_methods do
     def search(query, scope = all, child_scope: nil, limit: nil, build_records: false, phrase_boost: 1, text_search: false, vector_weight: nil, regex_search: Padrino.env != :production)
