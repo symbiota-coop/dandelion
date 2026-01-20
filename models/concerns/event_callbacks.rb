@@ -14,7 +14,6 @@ module EventCallbacks
 
     after_save do
       set_browsable
-      set(event_tag_names: event_tags.map(&:name))
 
       if previous_changes['no_sales_after_end_time'] || previous_changes['end_time']
         set(sold_out_cache: sold_out?)

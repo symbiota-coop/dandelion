@@ -293,6 +293,8 @@ class Event
         event_tagships.create(event_tag: event_tag)
       end
     end
+
+    set(event_tag_names: event_tagships(true).map(&:event_tag_name))
   end
 
   after_save :ai_tag
