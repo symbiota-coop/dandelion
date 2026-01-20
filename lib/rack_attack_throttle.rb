@@ -22,8 +22,13 @@ invalid_xhr_header = lambda do |request|
 end
 
 Rack::Attack.blocklist(INVALID_XHR_HEADER) do |request|
-  Rack::Attack::Fail2Ban.filter("invalid-xhr:#{request.ip}", maxretry: 0, findtime: 6.hours, bantime: 6.hours) do
-    invalid_xhr_header.call(request)
+  key = "invalid-xhr:#{request.ip}"
+
+  if invalid_xhr_header.call(request)
+    Rack::Attack.cache.store.write(key, true, expires_in: 6.hours)
+    true
+  else
+    Rack::Attack.cache.store.read(key)
   end
 end
 
