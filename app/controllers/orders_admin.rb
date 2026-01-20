@@ -155,7 +155,7 @@ Dandelion::App.controller do
     original_event_id = @order.event_id
     event_admins_only!
     new_event = @event.organisation.events.find(params[:order][:event_id]) || not_found
-    halt 400 unless event_admin?(new_event)
+    halt 403 unless event_admin?(new_event)
     @order.set(transferred: true)
     @order.set(event_id: new_event.id)
     @order.tickets.each do |ticket|

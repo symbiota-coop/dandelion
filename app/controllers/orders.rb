@@ -63,7 +63,7 @@ Dandelion::App.controller do
 
   get '/tickets/:id/toggle_resale' do
     @ticket = Ticket.find(params[:id]) || not_found
-    halt 400 unless @ticket.account == current_account
+    halt 403 unless @ticket.account == current_account
     @event = @ticket.event
     @ticket.set(made_available_at: @ticket.made_available_at ? nil : Time.now)
     redirect back
