@@ -346,7 +346,7 @@ class Event
 
   after_save :set_hidden_from_homepage
   def set_hidden_from_homepage
-    adult_words = %w[naked sex sexual erotic eros cock pussy anal orgasm ejaculation]
+    adult_words = %w[naked sex sexual sexuality erotic eros cock pussy anal orgasm ejaculation]
     name_words = name ? name.downcase.split : []
     tag_words = Array(event_tag_names).flat_map { |tag| tag.to_s.downcase.split }
     set(hidden_from_homepage: true) if (adult_words & (name_words + tag_words)).any? || (organisation && organisation.adult_content?)
