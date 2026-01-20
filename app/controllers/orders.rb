@@ -68,4 +68,13 @@ Dandelion::App.controller do
     @ticket.set(made_available_at: @ticket.made_available_at ? nil : Time.now)
     redirect back
   end
+
+  get '/orders/:id/destroy' do
+    @order = Order.find(params[:id]) || not_found
+    halt 403 unless @order.account == current_account
+    halt 403 unless @order.value.nil? || @order.value.zero?
+    @order.prevent_refund = true
+    @order.destroy
+    redirect back
+  end
 end
