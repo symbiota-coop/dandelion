@@ -44,12 +44,12 @@ end
 Rack::Attack.blocklisted_responder = lambda do |request|
   case request.env['rack.attack.matched']
   when BLOCK_BOTS_USING_SEARCH
-    [403, {}, ['Forbidden']]
+    [403, {}, ["Forbidden: Bots are not permitted to use search features. Please email #{ENV['CONTACT_EMAIL']} if you believe you have received this message in error."]]
   when JS_CHALLENGE
     escaped_uri = request.env['REQUEST_URI'].to_json
     [403, { 'Content-Type' => 'text/html' }, ["<script>window.location = #{escaped_uri};</script>"]]
   when INVALID_XHR_HEADER
-    [403, {}, ['Forbidden']]
+    [403, {}, ["Forbidden: Malicious request headers detected. Your IP has been temporarily blocked. Please email #{ENV['CONTACT_EMAIL']} if you believe you have received this message in error."]]
   end
 end
 
