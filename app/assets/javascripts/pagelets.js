@@ -5,6 +5,31 @@ $(function () {
   const OPACITY_LOADING = '0.3'
   const OPACITY_LOADED = '1'
 
+  // ─────────────────────────────────────────────────────────────
+  // Page Visibility Tracking
+  // ─────────────────────────────────────────────────────────────
+
+  let pageIsVisible = !document.hidden
+  let pendingRefreshOnVisible = false
+
+  document.addEventListener('visibilitychange', function () {
+    pageIsVisible = !document.hidden
+
+    // When page becomes visible again, refresh all pagelets that missed updates
+    if (pageIsVisible && pendingRefreshOnVisible) {
+      pendingRefreshOnVisible = false
+      $('[data-pagelet-refresh][data-pagelet-refresh-registered]').each(function () {
+        const pagelet = $(this)
+        if (!pagelet[0].hasAttribute('data-pagelet-refresh-paused') && $.contains(document, pagelet[0])) {
+          reloadPagelet(pagelet, function () {
+            bindRefreshPauseForPagelet(pagelet)
+            refreshAlsoPagelet(pagelet)
+          })
+        }
+      })
+    }
+  })
+
   // Cache busting for all AJAX requests
   $.ajaxPrefilter(function (options) {
     const cacheBuster = '_t=' + Date.now()
@@ -33,6 +58,12 @@ $(function () {
       const alsoPagelet = $('[data-pagelet-url="' + alsoUrl + '"]')
       alsoPagelet.load(alsoPagelet.attr('data-pagelet-url'))
     }
+  }
+
+  function bindRefreshPauseForPagelet (pagelet) {
+    pagelet.find("a[href='javascript:;']").on('click', function () {
+      pagelet.attr('data-pagelet-refresh-paused', 'true')
+    })
   }
 
   function reloadPagelet (pagelet, callback) {
@@ -152,12 +183,6 @@ $(function () {
       const pagelet = $(this)
       pagelet.attr('data-pagelet-refresh-registered', 'true')
 
-      function bindRefreshPause () {
-        pagelet.find("a[href='javascript:;']").on('click', function () {
-          pagelet.attr('data-pagelet-refresh-paused', 'true')
-        })
-      }
-
       function performRefresh () {
         // Stop refreshing if pagelet was removed from DOM (prevents memory leak)
         if (!$.contains(document, pagelet[0])) {
@@ -165,15 +190,21 @@ $(function () {
           return
         }
 
+        // Skip refresh if page is not visible (tab in background)
+        if (!pageIsVisible) {
+          pendingRefreshOnVisible = true
+          return
+        }
+
         if (!pagelet[0].hasAttribute('data-pagelet-refresh-paused')) {
           reloadPagelet(pagelet, function () {
-            bindRefreshPause()
+            bindRefreshPauseForPagelet(pagelet)
             refreshAlsoPagelet(pagelet)
           })
         }
       }
 
-      bindRefreshPause()
+      bindRefreshPauseForPagelet(pagelet)
 
       const refreshInterval = parseInt(pagelet.attr('data-pagelet-refresh'), 10) * 1000
       const intervalId = setInterval(performRefresh, refreshInterval)
