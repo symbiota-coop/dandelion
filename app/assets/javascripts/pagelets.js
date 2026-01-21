@@ -10,14 +10,12 @@ $(function () {
   // ─────────────────────────────────────────────────────────────
 
   let pageIsVisible = !document.hidden
-  let pendingRefreshOnVisible = false
 
   document.addEventListener('visibilitychange', function () {
     pageIsVisible = !document.hidden
 
-    // When page becomes visible again, refresh all pagelets that missed updates
-    if (pageIsVisible && pendingRefreshOnVisible) {
-      pendingRefreshOnVisible = false
+    // When page becomes visible again, immediately refresh all pagelets
+    if (pageIsVisible) {
       $('[data-pagelet-refresh][data-pagelet-refresh-registered]').each(function () {
         const pagelet = $(this)
         if (!pagelet[0].hasAttribute('data-pagelet-refresh-paused') && $.contains(document, pagelet[0])) {
@@ -192,7 +190,6 @@ $(function () {
 
         // Skip refresh if page is not visible (tab in background)
         if (!pageIsVisible) {
-          pendingRefreshOnVisible = true
           return
         }
 
