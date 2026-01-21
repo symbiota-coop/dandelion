@@ -367,7 +367,7 @@ class Order
   def self.generate_csv(account:, event: nil)
     orders = self
     CSV.generate do |csv|
-      row = %w[name firstname lastname email event_name event_slug original_description value discounted_ticket_revenue donation_revenue currency opt_in_organisation opt_in_facilitator hear_about via created_at]
+      row = %w[name firstname lastname email event_name event_slug event_start_time event_end_time original_description value discounted_ticket_revenue donation_revenue currency opt_in_organisation opt_in_facilitator hear_about via created_at]
       event&.questions_a_from_orders&.each { |q| row << q }
       csv << row
       orders.each do |order|
@@ -389,6 +389,16 @@ class Order
             event.slug
           else
             (order.event ? order.event.slug : '')
+          end,
+          if event
+            event.start_time
+          else
+            (order.event ? order.event.start_time : '')
+          end,
+          if event
+            event.end_time
+          else
+            (order.event ? order.event.end_time : '')
           end,
           order.original_description,
           order.value,
