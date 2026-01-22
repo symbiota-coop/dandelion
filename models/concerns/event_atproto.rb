@@ -20,11 +20,10 @@ module EventAtproto
 
     after_create :publish_to_atproto, if: :should_publish_to_atproto?
     after_update :update_atproto, if: :should_update_atproto?
-    after_destroy :delete_atproto, if: :atproto_uri?
+    before_destroy :delete_atproto, if: :atproto_uri?
 
     handle_asynchronously :publish_to_atproto
     handle_asynchronously :update_atproto
-    handle_asynchronously :delete_atproto
   end
 
   def should_publish_to_atproto?
@@ -163,7 +162,7 @@ module EventAtproto
 
     client = AtprotoClient.new
     client.delete_record(uri: atproto_uri)
-    set(atproto_uri: nil)
+    set(atproto_uri: nil) unless destroyed?
   rescue StandardError => e
     Honeybadger.notify(e, context: { event_id: id.to_s, action: 'delete' })
   end
