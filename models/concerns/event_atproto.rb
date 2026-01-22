@@ -139,9 +139,17 @@ module EventAtproto
       return
     end
 
-    # Delete and recreate (ATProto doesn't have native update)
-    delete_atproto
-    publish_to_atproto
+    client = AtprotoClient.new
+    record = build_atproto_record
+
+    # Extract rkey from URI (at://did/collection/rkey)
+    rkey = atproto_uri.split('/').last
+
+    client.put_record(
+      collection: 'community.lexicon.calendar.event',
+      rkey: rkey,
+      record: record
+    )
   rescue StandardError => e
     Honeybadger.notify(e, context: { event_id: id.to_s, action: 'update' })
   end

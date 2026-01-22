@@ -93,6 +93,21 @@ class AtprotoClient
     end
   end
 
+  def put_record(collection:, rkey:, record:)
+    ensure_session
+
+    response = @auth_client.post('com.atproto.repo.putRecord', {
+                                   repo: @session['did'],
+                                   collection: collection,
+                                   rkey: rkey,
+                                   record: record
+                                 }) do |req|
+      req.headers['Authorization'] = "Bearer #{@session['accessJwt']}"
+    end
+
+    response.body
+  end
+
   private
 
   def ensure_session
