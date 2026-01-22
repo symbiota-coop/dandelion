@@ -28,7 +28,10 @@ module EventAtproto
   end
 
   def should_update_atproto?
-    atproto_enabled? && atproto_uri.present? && atproto_fields_changed?
+    return false unless atproto_enabled? && atproto_fields_changed?
+
+    # Trigger if we have an existing record to update, OR if secret/locked changed (to handle publish on unlock)
+    atproto_uri.present? || (previous_changes.keys & %w[secret locked]).any?
   end
 
   def atproto_enabled?
@@ -136,6 +139,12 @@ module EventAtproto
     # If event became secret/locked, delete the ATProto record
     if secret? || locked?
       delete_atproto
+      return
+    end
+
+    # If event became unsecret/unlocked and has no ATProto record, publish it
+    if atproto_uri.blank?
+      publish_to_atproto
       return
     end
 
