@@ -1,39 +1,126 @@
 module EventAtproto
   extend ActiveSupport::Concern
 
+  ATPROTO_MODES = {
+    virtual: 'community.lexicon.calendar.event#virtual',
+    inperson: 'community.lexicon.calendar.event#inperson',
+    hybrid: 'community.lexicon.calendar.event#hybrid'
+  }.freeze
+
+  ATPROTO_STATUSES = {
+    scheduled: 'community.lexicon.calendar.event#scheduled',
+    cancelled: 'community.lexicon.calendar.event#cancelled',
+    planned: 'community.lexicon.calendar.event#planned',
+    postponed: 'community.lexicon.calendar.event#postponed',
+    rescheduled: 'community.lexicon.calendar.event#rescheduled'
+  }.freeze
+
   included do
     field :atproto_uri, type: String
 
     after_create :publish_to_atproto, if: :should_publish_to_atproto?
+    after_update :update_atproto, if: :should_update_atproto?
+    after_destroy :delete_atproto, if: :atproto_uri?
   end
 
   def should_publish_to_atproto?
-    ENV['ATPROTO_HANDLE'].present? &&
-      ENV['ATPROTO_APP_PASSWORD'].present? &&
-      !secret && !locked
+    atproto_enabled? && !secret && !locked
   end
 
-  def publish_to_atproto
-    client = AtprotoClient.new
+  def should_update_atproto?
+    atproto_enabled? && atproto_uri.present? && atproto_fields_changed?
+  end
 
+  def atproto_enabled?
+    ENV['ATPROTO_HANDLE'].present? && ENV['ATPROTO_APP_PASSWORD'].present?
+  end
+
+  def atproto_fields_changed?
+    (previous_changes.keys & %w[name description start_time end_time location coordinates secret locked slug]).any?
+  end
+
+  # Determine event mode: virtual or inperson
+  def atproto_mode
+    location == 'Online' ? ATPROTO_MODES[:virtual] : ATPROTO_MODES[:inperson]
+  end
+
+  # Determine event status (extensible for future cancellation support)
+  def atproto_status
+    # Future: check for cancelled/postponed fields when added
+    ATPROTO_STATUSES[:scheduled]
+  end
+
+  # Build locations array supporting multiple location types
+  def atproto_locations
+    locations = []
+
+    # Add physical geo location if available
+    if location.present? && location != 'Online' && coordinates.present?
+      locations << {
+        '$type' => 'community.lexicon.location.geo',
+        'latitude' => coordinates[1].to_s,
+        'longitude' => coordinates[0].to_s,
+        'name' => location
+      }
+    end
+
+    # Add address-only location if no coordinates but location string exists
+    if location.present? && location != 'Online' && coordinates.blank?
+      locations << {
+        '$type' => 'community.lexicon.calendar.event#uri',
+        'uri' => "#{ENV['BASE_URI']}/e/#{slug}",
+        'name' => location
+      }
+    end
+
+    locations.presence
+  end
+
+  # Build URIs array with event link and optional external links
+  def atproto_uris
+    uris = []
+
+    # Primary event URI
+    uris << {
+      '$type' => 'community.lexicon.calendar.event#uri',
+      'uri' => "#{ENV['BASE_URI']}/e/#{slug}",
+      'name' => name
+    }
+
+    # Facebook event URL if present
+    if facebook_event_url.present?
+      uris << {
+        '$type' => 'community.lexicon.calendar.event#uri',
+        'uri' => facebook_event_url,
+        'name' => 'Facebook event'
+      }
+    end
+
+    uris
+  end
+
+  # Build the complete ATProto record
+  def build_atproto_record
     record = {
       '$type' => 'community.lexicon.calendar.event',
       'name' => name,
-      'createdAt' => Time.now.utc.iso8601
+      'createdAt' => created_at.utc.iso8601
     }
 
     record['description'] = ReverseMarkdown.convert(description).strip if description.present?
     record['startsAt'] = start_time.utc.iso8601 if start_time
     record['endsAt'] = end_time.utc.iso8601 if end_time
-    record['mode'] = location == 'Online' ? 'virtual' : 'in-person'
-    record['status'] = 'scheduled'
+    record['mode'] = atproto_mode
+    record['status'] = atproto_status
+    record['locations'] = atproto_locations if atproto_locations
+    record['uris'] = atproto_uris
 
-    record['locations'] = [{ 'name' => location }] if location.present? && location != 'Online'
+    record
+  end
 
-    record['uris'] = [{
-      'uri' => "#{ENV['BASE_URI']}/e/#{slug}",
-      'name' => name
-    }]
+  def publish_to_atproto
+    client = AtprotoClient.new
+    record = build_atproto_record
 
     result = client.create_record(
       collection: 'community.lexicon.calendar.event',
@@ -42,6 +129,30 @@ module EventAtproto
 
     set(atproto_uri: result['uri']) if result['uri']
   rescue StandardError => e
-    Honeybadger.notify(e, context: { event_id: id.to_s })
+    Honeybadger.notify(e, context: { event_id: id.to_s, action: 'publish' })
+  end
+
+  def update_atproto
+    # If event became secret/locked, delete the ATProto record
+    if secret? || locked?
+      delete_atproto
+      return
+    end
+
+    # Delete and recreate (ATProto doesn't have native update)
+    delete_atproto
+    publish_to_atproto
+  rescue StandardError => e
+    Honeybadger.notify(e, context: { event_id: id.to_s, action: 'update' })
+  end
+
+  def delete_atproto
+    return unless atproto_uri.present?
+
+    client = AtprotoClient.new
+    client.delete_record(uri: atproto_uri)
+    set(atproto_uri: nil)
+  rescue StandardError => e
+    Honeybadger.notify(e, context: { event_id: id.to_s, action: 'delete' })
   end
 end
