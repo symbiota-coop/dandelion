@@ -71,15 +71,6 @@ module EventAtproto
       }
     end
 
-    # Add address-only location if no coordinates but location string exists
-    if location.present? && location != 'Online' && coordinates.blank?
-      locations << {
-        '$type' => 'community.lexicon.calendar.event#uri',
-        'uri' => "#{ENV['BASE_URI']}/e/#{slug}",
-        'name' => location
-      }
-    end
-
     locations.presence
   end
 
