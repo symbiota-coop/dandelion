@@ -104,7 +104,7 @@ module EventAtproto
       'createdAt' => created_at.utc.iso8601
     }
 
-    record['description'] = ReverseMarkdown.convert(description).strip if description.present?
+    record['description'] = ReverseMarkdown.convert(description).gsub('&nbsp;', ' ').strip if description.present?
     record['startsAt'] = start_time.utc.iso8601 if start_time
     record['endsAt'] = end_time.utc.iso8601 if end_time
     record['mode'] = atproto_mode
