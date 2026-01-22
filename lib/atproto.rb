@@ -1,29 +1,42 @@
 class AtprotoClient
   PUBLIC_API = 'https://public.api.bsky.app/xrpc'.freeze
+  BSKY_API = 'https://bsky.social/xrpc'.freeze
 
-  def initialize
-    @client = Faraday.new(url: PUBLIC_API) do |conn|
+  def initialize(handle: nil, app_password: nil)
+    @handle = handle || ENV['ATPROTO_HANDLE']
+    @app_password = app_password || ENV['ATPROTO_APP_PASSWORD']
+    @session = nil
+
+    @public_client = Faraday.new(url: PUBLIC_API) do |conn|
+      conn.request :json
+      conn.response :json
+      conn.response :raise_error
+    end
+
+    @auth_client = Faraday.new(url: BSKY_API) do |conn|
       conn.request :json
       conn.response :json
       conn.response :raise_error
     end
   end
 
+  # Public API methods (no auth required)
+
   def get_author_feed(handle, limit: 10)
     did = resolve_handle(handle)
 
-    response = @client.get('app.bsky.feed.getAuthorFeed', {
-                             actor: did,
-                             limit: limit
-                           })
+    response = @public_client.get('app.bsky.feed.getAuthorFeed', {
+                                    actor: did,
+                                    limit: limit
+                                  })
 
     response.body
   end
 
   def resolve_handle(handle)
-    response = @client.get('com.atproto.identity.resolveHandle', {
-                             handle: handle
-                           })
+    response = @public_client.get('com.atproto.identity.resolveHandle', {
+                                    handle: handle
+                                  })
 
     response.body['did']
   end
@@ -38,5 +51,51 @@ class AtprotoClient
     }
   rescue StandardError
     nil
+  end
+
+  # Authenticated API methods
+
+  def create_session
+    response = @auth_client.post('com.atproto.server.createSession', {
+                                   identifier: @handle,
+                                   password: @app_password
+                                 })
+    @session = response.body
+  end
+
+  def create_record(collection:, record:)
+    ensure_session
+
+    response = @auth_client.post('com.atproto.repo.createRecord', {
+                                   repo: @session['did'],
+                                   collection: collection,
+                                   record: record
+                                 }) do |req|
+      req.headers['Authorization'] = "Bearer #{@session['accessJwt']}"
+    end
+
+    response.body
+  end
+
+  def delete_record(uri:)
+    ensure_session
+
+    parts = uri.split('/')
+    rkey = parts.last
+    collection = parts[-2]
+
+    @auth_client.post('com.atproto.repo.deleteRecord', {
+                        repo: @session['did'],
+                        collection: collection,
+                        rkey: rkey
+                      }) do |req|
+      req.headers['Authorization'] = "Bearer #{@session['accessJwt']}"
+    end
+  end
+
+  private
+
+  def ensure_session
+    create_session unless @session
   end
 end

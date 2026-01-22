@@ -16,6 +16,7 @@ class Event
   include EventOpenCollective
   include EventValidation
   include EventAccessControl
+  include EventAtproto
   include Geocoded
   include ImageWithValidation
   include Searchable
