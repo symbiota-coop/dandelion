@@ -1,6 +1,6 @@
 <div id="<%= id %>" style="display: none"<%= " class=\"#{wrapper_class}\"" if defined?(wrapper_class) && wrapper_class %>>
   <% form_tag '/auth/atproto', method: 'post', class: form_class do %>
     <%= text_field_tag :handle, class: 'form-control d-inline', style: 'max-width: 15em', placeholder: 'handle.bsky.social', required: true %>
-    <%= submit_tag (defined?(button_text) && button_text) || 'Connect', class: 'btn btn-primary d-inline ml-2' %>
+    <%= submit_tag (defined?(button_text) && button_text) || 'Connect', class: 'btn btn-primary d-inline ml-1' %>
   <% end %>
 </div>
