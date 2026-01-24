@@ -29,7 +29,8 @@ module Dandelion
                nil,
                scope: 'atproto',
                private_key: AtprotoKeyManager.current_private_key,
-               client_jwk: AtprotoKeyManager.current_jwk
+               client_jwk: AtprotoKeyManager.current_jwk,
+               setup: AtprotoSetup.setup_proc
     end
     use Rack::Cors do
       allow do

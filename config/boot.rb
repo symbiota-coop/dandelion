@@ -17,9 +17,7 @@ Mongoid.raise_not_found_error = false
 
 Padrino.load!
 
-OmniAuth.config.allowed_request_methods = %i[get post]
-OmniAuth.config.silence_get_warning = true
-OmniAuth.config.request_validation_phase = nil
+OmniAuth.config.allowed_request_methods = [:get]
 OmniAuth.config.logger = Logger.new(IO::NULL)
 
 Delayed::Worker.max_attempts = 1
