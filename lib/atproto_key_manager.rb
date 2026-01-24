@@ -76,7 +76,7 @@ class AtprotoKeyManager
     def client_metadata
       base_uri = ENV['BASE_URI']
       {
-        client_id: "#{base_uri}/oauth-client-metadata.json",
+        client_id: "#{base_uri}/atproto/oauth-client-metadata.json",
         application_type: 'web',
         client_name: ENV['APP_NAME'] || 'Dandelion',
         client_uri: base_uri,

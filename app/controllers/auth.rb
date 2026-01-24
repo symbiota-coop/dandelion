@@ -1,5 +1,5 @@
 Dandelion::App.controller do
-  get '/oauth-client-metadata.json', provides: :json do
+  get '/atproto/oauth-client-metadata.json', provides: :json do
     content_type 'application/json'
     AtprotoKeyManager.client_metadata.to_json
   end
