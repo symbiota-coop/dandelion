@@ -19,7 +19,7 @@
             <br>
           <% end %>
           <% if current_account %>
-            <a class="btn btn-danger mb-1" href="/accounts/disconnect/<%= provider.omniauth_name %>">Disconnect</a>
+            <a class="btn btn-outline-secondary mb-1" href="/accounts/disconnect/<%= provider.omniauth_name %>">Disconnect</a>
           <% end %>
         <% else %>
           <% if provider.omniauth_name == 'atproto' %>
