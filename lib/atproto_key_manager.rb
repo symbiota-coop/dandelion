@@ -5,12 +5,10 @@ require 'base64'
 class AtprotoKeyManager
   class << self
     def current_private_key
-      @current_private_key ||= begin
-        return nil unless ENV['ATPROTO_PRIVATE_KEY_PEM']
-
-        pem = ENV['ATPROTO_PRIVATE_KEY_PEM'].gsub('\\n', "\n")
-        OpenSSL::PKey::EC.new(pem)
-      end
+      @current_private_key ||= if ENV['ATPROTO_PRIVATE_KEY_PEM']
+                                 pem = ENV['ATPROTO_PRIVATE_KEY_PEM'].gsub('\\n', "\n")
+                                 OpenSSL::PKey::EC.new(pem)
+                               end
     end
 
     def current_jwk
