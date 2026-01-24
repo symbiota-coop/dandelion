@@ -24,3 +24,9 @@ end
 
 Provider.new('Google', omniauth_name: 'google_oauth2', icon: 'bi bi-google')
 Provider.new('Ethereum', icon: 'bi bi-suit-diamond-fill')
+Provider.new('Bluesky',
+             omniauth_name: 'atproto',
+             icon: 'bi bi-bluesky',
+             nickname: ->(hash) { hash.dig('info', 'handle') },
+             profile_url: ->(hash) { "https://bsky.app/profile/#{hash.dig('info', 'handle') || hash.dig('info', 'did')}" },
+             image: ->(hash) { hash.dig('info', 'avatar') })

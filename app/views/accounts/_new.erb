@@ -5,8 +5,13 @@
     </div>
     <% if !Provider.all.empty? %>
       <% Provider.all.each { |provider| %>
-      <a class="btn btn-primary mb-1" href="/auth/<%= provider.omniauth_name %>"><i class="<%= provider.icon %>"></i> Sign up with <%= provider.display_name %></a>
+        <% if provider.omniauth_name == 'atproto' %>
+          <a class="btn btn-primary mb-1" href="javascript:;" onclick="$('#atproto-signup-form').show().find('input[type=text]').focus();$(this).hide()"><i class="<%= provider.icon %>"></i> Sign up with <%= provider.display_name %></a>
+        <% else %>
+          <a class="btn btn-primary mb-1" href="/auth/<%= provider.omniauth_name %>"><i class="<%= provider.icon %>"></i> Sign up with <%= provider.display_name %></a>
+        <% end %>
       <% } %>
+      <%= partial :'accounts/atproto_form', locals: { id: 'atproto-signup-form', form_class: 'd-flex justify-content-center' } %>
     <% end %>
   </div>
 <% end %>

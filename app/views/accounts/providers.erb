@@ -18,7 +18,12 @@
             <a class="btn btn-danger mb-1" href="/accounts/disconnect/<%= provider.omniauth_name %>">Disconnect</a>
           <% end %>
         <% else %>
-          <a class="btn btn-primary mb-1" href="/auth/<%= provider.omniauth_name %>"><i class="<%= provider.icon %>"></i> Connect</a>
+          <% if provider.omniauth_name == 'atproto' %>
+            <a class="btn btn-primary mb-1" href="javascript:;" onclick="$('#atproto-connect-form').show().find('input[type=text]').focus();$(this).hide()"><i class="<%= provider.icon %>"></i> Connect</a>
+            <%= partial :'accounts/atproto_form', locals: { id: 'atproto-connect-form', form_class: 'd-flex' } %>
+          <% else %>
+            <a class="btn btn-primary mb-1" href="/auth/<%= provider.omniauth_name %>"><i class="<%= provider.icon %>"></i> Connect</a>
+          <% end %>
         <% end %>
       </td>
     </tr>

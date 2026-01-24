@@ -53,6 +53,13 @@ class AtprotoClient
     nil
   end
 
+  def get_profile(actor)
+    response = @public_client.get('app.bsky.actor.getProfile', { actor: actor })
+    response.body
+  rescue StandardError
+    nil
+  end
+
   # Authenticated API methods
 
   def create_session

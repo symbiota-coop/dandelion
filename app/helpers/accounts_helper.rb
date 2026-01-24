@@ -4,9 +4,13 @@ Dandelion::App.helpers do
     return unless omniauth_data
 
     provider = Provider.object(omniauth_data['provider'])
+    # atproto uses info.did instead of uid
+    provider_uid = omniauth_data['uid'] || omniauth_data.dig('info', 'did')
+    raise "Missing provider UID for #{provider.display_name}" unless provider_uid
+
     account.provider_links.build(
       provider: provider.display_name,
-      provider_uid: omniauth_data['uid'],
+      provider_uid: provider_uid,
       omniauth_hash: omniauth_data
     )
   end

@@ -1,6 +1,10 @@
 module AccountAtproto
   extend ActiveSupport::Concern
 
+  def atproto_handle
+    provider_links.find_by(provider: 'Bluesky')&.omniauth_hash&.dig('info', 'handle')
+  end
+
   def atproto_posts
     return unless atproto_handle
 

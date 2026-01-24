@@ -7,16 +7,20 @@
       </div>
       <div class="card-body">
         <div id="t1">
+          <div class="text-center mb-3">
+            <% if !Provider.all.empty? %>
+              <% Provider.all.each { |provider| %>
+                <% if provider.omniauth_name == 'atproto' %>
+                  <a class="btn btn-primary mb-1" id="atproto-btn" href="javascript:;" onclick="$('#atproto-form').show().find('input[type=text]').focus();$(this).hide()"><i class="<%= provider.icon %>"></i> Sign in with <%= provider.display_name %></a>
+                <% else %>
+                  <a class="btn btn-primary mb-1" href="/auth/<%= provider.omniauth_name %>"><i class="<%= provider.icon %>"></i> Sign in with <%= provider.display_name %></a>
+                <% end %>
+              <% } %>
+            <% end %>
+            <%= partial :'accounts/atproto_form', locals: { id: 'atproto-form', form_class: 'd-inline-flex', button_text: 'Sign in' } %>
+          </div>
+
           <% form_tag '/auth/account/callback', class: 'mb-3' do %>
-
-            <div class="text-center mb-3">
-              <% if !Provider.all.empty? %>
-                <% Provider.all.each { |provider| %>
-                <a class="btn btn-primary mb-1" href="/auth/<%= provider.omniauth_name %>"><i class="<%= provider.icon %>"></i> Sign in with <%= provider.display_name %></a>
-                <% } %>
-              <% end %>
-            </div>
-
             <div class="form-group mb-1">
               <label class="sr-only">Email</label>
               <%= email_field_tag :email, id: 'email', class: 'form-control', placeholder: 'Email' %>

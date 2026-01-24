@@ -36,7 +36,6 @@ module AccountValidation
       self.name_transliterated = I18n.transliterate(name) if name
       self.username = username.downcase if username
       self.email = email.downcase.strip if email
-      self.atproto_handle = atproto_handle&.gsub(/\A@+/, '')&.strip if atproto_handle
       self.sign_ins_count = 0 unless sign_ins_count
       self.number_at_this_location = 0 unless number_at_this_location
 

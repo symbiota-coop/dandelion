@@ -1,4 +1,9 @@
 Dandelion::App.controller do
+  get '/oauth-client-metadata.json', provides: :json do
+    content_type 'application/json'
+    AtprotoKeyManager.client_metadata.to_json
+  end
+
   get '/auth/failure' do
     flash.now[:error] = '<strong>Hmm.</strong> There was a problem signing you in.'
     erb :'accounts/sign_in'
@@ -11,7 +16,15 @@ Dandelion::App.controller do
                 else
                   env['omniauth.auth'].delete('extra')
                   @provider = Provider.object(env['omniauth.auth']['provider'])
-                  ProviderLink.find_by(provider: @provider.display_name, provider_uid: env['omniauth.auth']['uid']).try(:account)
+                  # atproto uses info.did instead of uid
+                  provider_uid = env['omniauth.auth']['uid'] || env['omniauth.auth'].dig('info', 'did')
+                  # Resolve handle, avatar, and display name for atproto
+                  if env['omniauth.auth']['provider'] == 'atproto' && provider_uid && (profile = AtprotoClient.new.get_profile(provider_uid))
+                    env['omniauth.auth']['info']['handle'] = profile['handle']
+                    env['omniauth.auth']['info']['avatar'] = profile['avatar']
+                    env['omniauth.auth']['info']['name'] = profile['displayName']
+                  end
+                  provider_uid ? ProviderLink.find_by(provider: @provider.display_name, provider_uid: provider_uid).try(:account) : nil
                 end
       if current_account && env['omniauth.auth']['provider'] != 'account' # already signed in; attempt to connect
         if account # someone's already connected
@@ -32,7 +45,7 @@ Dandelion::App.controller do
         flash[:notice] = 'Signed in!'
         redirect session[:return_to] || '/'
       else
-        flash.now[:notice] = "<i class=\"#{@provider.icon}\"></i> There's no account connected to that address. Let's create one for you!"
+        flash.now[:notice] = "<i class=\"#{@provider.icon}\"></i> That #{@provider.display_name} #{@provider.display_name == 'Ethereum' ? 'address' : 'account'} isn't yet connected to a Dandelion account. Let's create a new Dandelion account for you!"
         session['omniauth.auth'] = env['omniauth.auth']
         @account = Account.new
         @account.name = env['omniauth.auth']['info']['name']

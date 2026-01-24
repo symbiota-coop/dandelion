@@ -76,6 +76,9 @@ GEM
       faraday-net_http_persistent
       net-http-persistent
     ast (2.4.3)
+    atproto_client (0.1.4)
+      jwt (~> 2.7)
+      openssl (~> 3.0)
     base64 (0.3.0)
     bcrypt (3.1.20)
     bech32 (1.5.0)
@@ -126,6 +129,7 @@ GEM
     delayed_job_mongoid (3.0.0)
       delayed_job (>= 3.0, < 5)
       mongoid (>= 5.0)
+    didkit (0.3.1)
     digest (3.2.1)
     domain_name (0.6.20240107)
     dragonfly (1.4.1)
@@ -253,7 +257,7 @@ GEM
       reline (>= 0.4.2)
     json (2.18.0)
     json-api-vanilla (1.0.4)
-    jwt (3.1.2)
+    jwt (2.10.2)
       base64
     keccak (1.3.2)
     konstructor (1.0.2)
@@ -361,6 +365,12 @@ GEM
       logger
       rack (>= 2.2.3)
       rack-protection
+    omniauth-atproto (0.1.3)
+      atproto_client (~> 0.1.4)
+      didkit
+      faraday
+      jwt (~> 2.7)
+      omniauth-oauth2 (~> 1.8)
     omniauth-google-oauth2 (1.2.1)
       jwt (>= 2.9.2)
       oauth2 (~> 2.0)
@@ -618,6 +628,7 @@ DEPENDENCIES
   mongoid_paranoia
   octokit
   omniauth
+  omniauth-atproto
   omniauth-ethereum!
   omniauth-google-oauth2
   padrino

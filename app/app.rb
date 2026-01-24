@@ -24,6 +24,12 @@ module Dandelion
       provider :account
       provider :google_oauth2, ENV['GOOGLE_CLIENT_ID'], ENV['GOOGLE_CLIENT_SECRET'], { image_size: 400 }
       provider :ethereum, { custom_title: 'Sign in with Ethereum' }
+      provider :atproto,
+               "#{ENV['BASE_URI']}/oauth-client-metadata.json",
+               nil,
+               scope: 'atproto',
+               private_key: AtprotoKeyManager.current_private_key,
+               client_jwk: AtprotoKeyManager.current_jwk
     end
     use Rack::Cors do
       allow do
