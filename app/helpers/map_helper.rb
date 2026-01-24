@@ -12,7 +12,7 @@ Dandelion::App.helpers do
 
     normalized_query = location_query.strip.downcase
     cache_key = "geocode-bounds:#{normalized_query}"
-    if (cached_bounds = read_geocode_cache(cache_key))
+    if (cached_bounds = geocode_cache.read(cache_key))
       return cached_bounds
     end
 
@@ -62,29 +62,12 @@ Dandelion::App.helpers do
     end
 
     bounds = [[west, south], [east, north]]
-    write_geocode_cache(cache_key, bounds)
+    geocode_cache.write(cache_key, bounds, expires_in: 30.days)
     bounds
   end
 
-  def read_geocode_cache(cache_key)
-    fragment = Fragment.find_by(key: cache_key)
-    return nil unless fragment && fragment.expires > Time.now
-
-    JSON.parse(fragment.value)
-  rescue StandardError
-    nil
-  end
-
-  def write_geocode_cache(cache_key, bounds)
-    expires = 30.days.from_now
-    fragment = Fragment.find_by(key: cache_key)
-    if fragment
-      fragment.update(value: bounds.to_json, expires: expires)
-    else
-      Fragment.create(key: cache_key, value: bounds.to_json, expires: expires)
-    end
-  rescue Mongo::Error::OperationFailure
-    Fragment.find_by(key: cache_key)&.update(value: bounds.to_json, expires: expires)
+  def geocode_cache
+    @geocode_cache ||= ActiveSupport::Cache::MongoStore.new(nil, collection: 'geocode_cache')
   end
 
   def map_json(points)
