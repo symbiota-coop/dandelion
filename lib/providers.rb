@@ -22,8 +22,15 @@ class Provider
   end
 end
 
-Provider.new('Google', omniauth_name: 'google_oauth2', icon: 'bi bi-google')
-Provider.new('Ethereum', icon: 'bi bi-suit-diamond-fill')
+Provider.new('Google',
+             omniauth_name: 'google_oauth2',
+             icon: 'bi bi-google',
+             nickname: ->(hash) { hash.dig('info', 'email') },
+             profile_url: ->(_hash) { nil })
+Provider.new('Ethereum',
+             icon: 'bi bi-suit-diamond-fill',
+             nickname: ->(hash) { hash['uid'] },
+             profile_url: ->(hash) { "https://etherscan.io/address/#{hash['uid']}" })
 Provider.new('Bluesky',
              omniauth_name: 'atproto',
              icon: 'bi bi-bluesky',
