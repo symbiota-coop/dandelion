@@ -16,8 +16,6 @@ module EventAtproto
   }.freeze
 
   included do
-    field :atproto_uri, type: String
-
     after_create :publish_to_atproto, if: :should_publish_to_atproto?
     after_update :update_atproto, if: :should_update_atproto?
     before_destroy :delete_atproto, if: :atproto_uri?
@@ -38,7 +36,31 @@ module EventAtproto
   end
 
   def atproto_enabled?
-    ENV['ATPROTO_HANDLE'].present? && ENV['ATPROTO_APP_PASSWORD'].present?
+    organisation&.atproto_connected? ||
+      (ENV['ATPROTO_HANDLE'].present? && ENV['ATPROTO_APP_PASSWORD'].present?)
+  end
+
+  def atproto_client_for_publishing
+    if organisation&.atproto_connected?
+      organisation.atproto_client
+    elsif ENV['ATPROTO_HANDLE'].present? && ENV['ATPROTO_APP_PASSWORD'].present?
+      AtprotoClient.new
+    end
+  end
+
+  def atproto_record_did
+    atproto_uri&.split('/')&.[](2)
+  end
+
+  def atproto_client_for_record
+    record_did = atproto_record_did
+    return unless record_did
+
+    return organisation.atproto_client if organisation&.atproto_connected? && organisation.atproto_did == record_did
+
+    return AtprotoClient.new if ENV['ATPROTO_DID'] == record_did
+
+    nil
   end
 
   def atproto_fields_changed?
@@ -116,7 +138,9 @@ module EventAtproto
   end
 
   def publish_to_atproto
-    client = AtprotoClient.new
+    client = atproto_client_for_publishing
+    return unless client
+
     record = build_atproto_record
 
     result = client.create_record(
@@ -142,7 +166,9 @@ module EventAtproto
       return
     end
 
-    client = AtprotoClient.new
+    client = atproto_client_for_record
+    return unless client
+
     record = build_atproto_record
 
     # Extract rkey from URI (at://did/collection/rkey)
@@ -160,7 +186,9 @@ module EventAtproto
   def delete_atproto
     return unless atproto_uri.present?
 
-    client = AtprotoClient.new
+    client = atproto_client_for_record
+    return unless client
+
     client.delete_record(uri: atproto_uri)
     set(atproto_uri: nil) unless destroyed?
   rescue StandardError => e

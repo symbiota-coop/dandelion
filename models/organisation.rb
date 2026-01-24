@@ -12,6 +12,7 @@ class Organisation
   include OrganisationEvm
   include OrganisationValidation
   include OrganisationFeedbackSummaries
+  include OrganisationAtproto
   include Geocoded
   include EvmTransactions
   include StripeWebhooks

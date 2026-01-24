@@ -49,6 +49,7 @@ module EventFields
     field :cohosts_ids_cache, type: Array
     field :theme_color, type: String
     field :embedding, type: Array
+    field :atproto_uri, type: String
 
     field :revenue_share_to_revenue_sharer, type: Integer
     field :profit_share_to_organiser, type: Integer

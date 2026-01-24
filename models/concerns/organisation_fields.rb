@@ -109,6 +109,9 @@ module OrganisationFields
     field :show_details_table_in_ticket_emails, type: Mongoid::Boolean
     field :adult_content, type: Mongoid::Boolean
     field :event_questions_to_include_in_metadata, type: Array
+    field :atproto_handle, type: String
+    field :atproto_app_password, type: String
+    field :atproto_did, type: String
   end
 
   class_methods do
@@ -218,7 +221,9 @@ module OrganisationFields
         event_image_required_height: 'Event image height',
         restrict_cohosting: 'Restrict cohosting to admins',
         oc_slug: 'Open Collective slug',
-        tax_rate_id: 'Stripe tax rate ID'
+        tax_rate_id: 'Stripe tax rate ID',
+        atproto_handle: 'Bluesky/ATProto handle',
+        atproto_app_password: 'Bluesky/ATProto app password'
       }.merge(email_human_attribute_names)[attr.to_sym] || super
     end
 

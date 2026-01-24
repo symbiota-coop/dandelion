@@ -1,0 +1,48 @@
+<%= partial :'organisations/nav', locals: { organisation: @organisation } %>
+
+<p class="text-muted">
+  Dandelion publishes events to ATProto under the handle <a href="https://pdsls.dev/at://did:plc:l4fwwgqgc5gdvtebisdumf4x/community.lexicon.calendar.event" target="_blank">@dandelion.events</a>.
+  <br />
+  Here you can connect your organisation's Bluesky/ATProto account to publish events under your own identity.
+</p>
+
+<% if @organisation.atproto_connected? %>
+  <big class="d-block mb-2">
+    <i class="bi bi-bluesky"></i>
+    Connected as
+    <a href="<%= @organisation.atproto_profile_url %>" target="_blank">@<%= @organisation.atproto_handle %></a>
+  </big>
+  <a class="btn btn-outline-secondary btn-sm mb-3" href="/o/<%= @organisation.slug %>/atproto/disconnect">Disconnect</a>
+<% elsif ENV['ATPROTO_HANDLE'].present? %>
+  <p class="text-muted mt-2">
+    <small>Without a connected account, events will be published via <a href="https://bsky.app/profile/<%= ENV['ATPROTO_HANDLE'] %>" target="_blank">@<%= ENV['ATPROTO_HANDLE'] %></a>.</small>
+  </p>
+<% end %>
+
+<% unless @organisation.atproto_connected? %>
+  <div class="alert alert-success">
+    <p class="mb-2"><strong>How to create an App Password:</strong></p>
+    <ol class="mb-0">
+      <li>Go to <a href="https://bsky.app/settings/app-passwords" target="_blank">bsky.app/settings/app-passwords</a></li>
+      <li>Click "Add App Password"</li>
+      <li>Give it a name (e.g., "Dandelion")</li>
+      <li>Copy the generated password and paste it below</li>
+    </ol>
+  </div>
+
+  <% form_tag "/o/#{@organisation.slug}/atproto/connect", method: 'post' do %>
+    <div class="form-group">
+      <label for="atproto_handle">Bluesky/ATProto handle</label>
+      <%= text_field_tag :atproto_handle, value: @organisation.atproto_handle, class: 'form-control', placeholder: 'yourhandle.bsky.social', required: true %>
+    </div>
+    <div class="form-group">
+      <label for="atproto_app_password">App Password</label>
+      <%= password_field_tag :atproto_app_password, class: 'form-control', placeholder: 'xxxx-xxxx-xxxx-xxxx', required: true %>
+      <small class="form-text text-muted">
+        This is not your Bluesky/ATProto login password.
+        <a href="https://bsky.app/settings/app-passwords" target="_blank">Create an App Password</a>
+      </small>
+    </div>
+    <%= submit_tag 'Connect', class: 'btn btn-primary' %>
+  <% end %>
+<% end %>
