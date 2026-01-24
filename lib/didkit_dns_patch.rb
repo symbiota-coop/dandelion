@@ -20,7 +20,7 @@ module DIDKit
         next unless answer['type'] == 16 # TXT record
 
         txt = answer['data'].to_s.gsub(/\A"|"\z/, '')
-        if did = parse_did_from_dns(txt)
+        if (did = parse_did_from_dns(txt))
           return did
         end
       end
