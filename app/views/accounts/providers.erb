@@ -24,7 +24,7 @@
         <% else %>
           <% if provider.omniauth_name == 'atproto' %>
             <a class="btn btn-primary mb-1" href="javascript:;" onclick="$('#atproto-connect-form').show().find('input[type=text]').focus();$(this).hide()"><i class="<%= provider.icon %>"></i> Connect</a>
-            <%= partial :'accounts/atproto_form', locals: { id: 'atproto-connect-form', form_class: 'd-flex' } %>
+            <%= partial :'accounts/atproto_form', locals: { id: 'atproto-connect-form', form_class: 'd-flex', button_text: 'Connect' } %>
           <% else %>
             <a class="btn btn-primary mb-1" href="/auth/<%= provider.omniauth_name %>"><i class="<%= provider.icon %>"></i> Connect</a>
           <% end %>
