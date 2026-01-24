@@ -12,10 +12,14 @@ class AtprotoKeyManager
     end
 
     def current_jwk
+      return nil unless current_private_key
+
       @current_jwk ||= build_jwk(current_private_key)
     end
 
     def build_jwk(key)
+      return nil unless key
+
       point = key.public_key
       bn = point.to_bn(:uncompressed)
       bytes = bn.to_s(2)
@@ -35,6 +39,8 @@ class AtprotoKeyManager
     end
 
     def generate_kid(key)
+      return nil unless key
+
       jwk = build_jwk_without_kid(key)
       thumbprint_input = JSON.generate({
                                          crv: jwk[:crv],
@@ -46,6 +52,8 @@ class AtprotoKeyManager
     end
 
     def build_jwk_without_kid(key)
+      return nil unless key
+
       point = key.public_key
       bn = point.to_bn(:uncompressed)
       bytes = bn.to_s(2)
