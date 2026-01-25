@@ -1,161 +1,6 @@
 module EventAtproto
   extend ActiveSupport::Concern
 
-  class_methods do
-    # Sync events created or modified in the last X hours to AT Protocol
-    # Useful for catching up after AT Protocol endpoints were temporarily offline
-    #
-    # @param hours [Integer] number of hours to look back (default: 24)
-    # @param dry_run [Boolean] if true, just returns the events that would be synced
-    # @return [Hash] results with :published, :updated, :deleted, :skipped, :errors counts
-    def sync_atproto(hours: 24, dry_run: false)
-      cutoff = hours.hours.ago
-      results = { published: 0, updated: 0, deleted: 0, skipped: 0, errors: [], dry_run: dry_run }
-
-      # Find events created or updated since the cutoff
-      events = Event.where(
-        '$or' => [
-          { created_at: { '$gte' => cutoff } },
-          { updated_at: { '$gte' => cutoff } }
-        ]
-      )
-
-      events.each do |event|
-        sync_result = event.sync_to_atproto(dry_run: dry_run)
-        case sync_result[:action]
-        when :published
-          results[:published] += 1
-        when :updated
-          results[:updated] += 1
-        when :deleted
-          results[:deleted] += 1
-        when :skipped
-          results[:skipped] += 1
-        when :error
-          results[:errors] << { event_id: event.id.to_s, error: sync_result[:error] }
-        end
-      rescue StandardError => e
-        results[:errors] << { event_id: event.id.to_s, error: e.message }
-      end
-
-      results
-    end
-
-    # Verify all records in the AT Protocol collection match expected local state
-    # Checks for orphaned records, missing records, and content mismatches
-    #
-    # @param client [AtprotoClient] optional client (defaults to env-based client)
-    # @param fix [Boolean] if true, attempts to fix any issues found
-    # @return [Hash] results with :valid, :orphaned, :missing, :stale, :errors
-    def verify_atproto_collection(client: nil, fix: false)
-      client ||= AtprotoClient.new
-      results = {
-        valid: [],
-        orphaned: [],      # Records on AT Protocol with no matching local event
-        missing: [],       # Local events with atproto_uri but not found on AT Protocol
-        stale: [],         # Records that exist but content doesn't match
-        errors: [],
-        fix: fix
-      }
-
-      # Get all records from AT Protocol
-      remote_records = client.list_records(
-        collection: ATPROTO_COLLECTION,
-        repo: client.send(:session)['did']
-      )
-      remote_by_uri = remote_records.index_by { |r| r['uri'] }
-
-      # Get all local events that should have AT Protocol records
-      local_events = Event.where(:atproto_uri.ne => nil)
-      local_by_uri = local_events.index_by(&:atproto_uri)
-
-      # Check each remote record
-      remote_records.each do |record|
-        uri = record['uri']
-        event = local_by_uri[uri]
-
-        if event.nil?
-          # Orphaned record - exists on AT Protocol but not in local DB
-          results[:orphaned] << { uri: uri, record: record['value'] }
-          if fix
-            begin
-              client.delete_record(uri: uri)
-            rescue StandardError => e
-              results[:errors] << { uri: uri, action: 'delete_orphan', error: e.message }
-            end
-          end
-        elsif event.secret? || event.locked?
-          # Record should have been deleted (event is now secret/locked)
-          results[:orphaned] << { uri: uri, event_id: event.id.to_s, reason: 'should_be_deleted' }
-          if fix
-            begin
-              event.delete_atproto
-            rescue StandardError => e
-              results[:errors] << { event_id: event.id.to_s, action: 'delete_secret', error: e.message }
-            end
-          end
-        else
-          # Check if content matches
-          expected = event.build_atproto_record
-          actual = record['value']
-
-          # Compare key fields
-          mismatches = []
-          %w[name description startsAt endsAt mode status].each do |field|
-            mismatches << field if expected[field] != actual[field]
-          end
-
-          if mismatches.any?
-            results[:stale] << { uri: uri, event_id: event.id.to_s, mismatches: mismatches }
-            if fix
-              begin
-                event.update_atproto_without_delay(force: true)
-              rescue StandardError => e
-                results[:errors] << { event_id: event.id.to_s, action: 'update_stale', error: e.message }
-              end
-            end
-          else
-            results[:valid] << { uri: uri, event_id: event.id.to_s }
-          end
-        end
-      rescue StandardError => e
-        results[:errors] << { uri: record['uri'], action: 'verify', error: e.message }
-      end
-
-      # Check for missing records (local events with atproto_uri not found remotely)
-      local_events.each do |event|
-        next if remote_by_uri.key?(event.atproto_uri)
-        next if event.secret? || event.locked? # Expected to be missing
-
-        results[:missing] << { uri: event.atproto_uri, event_id: event.id.to_s }
-        if fix
-          begin
-            # Clear the stale URI and republish
-            event.set(atproto_uri: nil)
-            event.publish_to_atproto_without_delay
-          rescue StandardError => e
-            results[:errors] << { event_id: event.id.to_s, action: 'republish_missing', error: e.message }
-          end
-        end
-      rescue StandardError => e
-        results[:errors] << { event_id: event.id.to_s, action: 'check_missing', error: e.message }
-      end
-
-      # Summary counts
-      results[:summary] = {
-        total_remote: remote_records.count,
-        total_local: local_events.count,
-        valid: results[:valid].count,
-        orphaned: results[:orphaned].count,
-        missing: results[:missing].count,
-        stale: results[:stale].count,
-        errors: results[:errors].count
-      }
-
-      results
-    end
-  end
-
   ATPROTO_MODES = {
     virtual: 'community.lexicon.calendar.event#virtual',
     inperson: 'community.lexicon.calendar.event#inperson',
@@ -377,5 +222,160 @@ module EventAtproto
   rescue StandardError => e
     Honeybadger.notify(e, context: { event_id: id.to_s, action: 'sync' })
     { action: :error, error: e.message }
+  end
+
+  class_methods do
+    # Sync events created or modified in the last X hours to AT Protocol
+    # Useful for catching up after AT Protocol endpoints were temporarily offline
+    #
+    # @param hours [Integer] number of hours to look back (default: 24)
+    # @param dry_run [Boolean] if true, just returns the events that would be synced
+    # @return [Hash] results with :published, :updated, :deleted, :skipped, :errors counts
+    def sync_atproto(hours: 24, dry_run: false)
+      cutoff = hours.hours.ago
+      results = { published: 0, updated: 0, deleted: 0, skipped: 0, errors: [], dry_run: dry_run }
+
+      # Find events created or updated since the cutoff
+      events = Event.where(
+        '$or' => [
+          { created_at: { '$gte' => cutoff } },
+          { updated_at: { '$gte' => cutoff } }
+        ]
+      )
+
+      events.each do |event|
+        sync_result = event.sync_to_atproto(dry_run: dry_run)
+        case sync_result[:action]
+        when :published
+          results[:published] += 1
+        when :updated
+          results[:updated] += 1
+        when :deleted
+          results[:deleted] += 1
+        when :skipped
+          results[:skipped] += 1
+        when :error
+          results[:errors] << { event_id: event.id.to_s, error: sync_result[:error] }
+        end
+      rescue StandardError => e
+        results[:errors] << { event_id: event.id.to_s, error: e.message }
+      end
+
+      results
+    end
+
+    # Verify all records in the AT Protocol collection match expected local state
+    # Checks for orphaned records, missing records, and content mismatches
+    #
+    # @param client [AtprotoClient] optional client (defaults to env-based client)
+    # @param fix [Boolean] if true, attempts to fix any issues found
+    # @return [Hash] results with :valid, :orphaned, :missing, :stale, :errors
+    def verify_atproto_collection(client: nil, fix: false)
+      client ||= AtprotoClient.new
+      results = {
+        valid: [],
+        orphaned: [],      # Records on AT Protocol with no matching local event
+        missing: [],       # Local events with atproto_uri but not found on AT Protocol
+        stale: [],         # Records that exist but content doesn't match
+        errors: [],
+        fix: fix
+      }
+
+      # Get all records from AT Protocol
+      remote_records = client.list_records(
+        collection: ATPROTO_COLLECTION,
+        repo: client.did
+      )
+      remote_by_uri = remote_records.index_by { |r| r['uri'] }
+
+      # Get all local events that should have AT Protocol records
+      local_events = Event.where(:atproto_uri.ne => nil)
+      local_by_uri = local_events.index_by(&:atproto_uri)
+
+      # Check each remote record
+      remote_records.each do |record|
+        uri = record['uri']
+        event = local_by_uri[uri]
+
+        if event.nil?
+          # Orphaned record - exists on AT Protocol but not in local DB
+          results[:orphaned] << { uri: uri, record: record['value'] }
+          if fix
+            begin
+              client.delete_record(uri: uri)
+            rescue StandardError => e
+              results[:errors] << { uri: uri, action: 'delete_orphan', error: e.message }
+            end
+          end
+        elsif event.secret? || event.locked?
+          # Record should have been deleted (event is now secret/locked)
+          results[:orphaned] << { uri: uri, event_id: event.id.to_s, reason: 'should_be_deleted' }
+          if fix
+            begin
+              event.delete_atproto
+            rescue StandardError => e
+              results[:errors] << { event_id: event.id.to_s, action: 'delete_secret', error: e.message }
+            end
+          end
+        else
+          # Check if content matches
+          expected = event.build_atproto_record
+          actual = record['value']
+
+          # Compare key fields
+          mismatches = []
+          %w[name description startsAt endsAt mode status].each do |field|
+            mismatches << field if expected[field] != actual[field]
+          end
+
+          if mismatches.any?
+            results[:stale] << { uri: uri, event_id: event.id.to_s, mismatches: mismatches }
+            if fix
+              begin
+                event.update_atproto_without_delay(force: true)
+              rescue StandardError => e
+                results[:errors] << { event_id: event.id.to_s, action: 'update_stale', error: e.message }
+              end
+            end
+          else
+            results[:valid] << { uri: uri, event_id: event.id.to_s }
+          end
+        end
+      rescue StandardError => e
+        results[:errors] << { uri: record['uri'], action: 'verify', error: e.message }
+      end
+
+      # Check for missing records (local events with atproto_uri not found remotely)
+      local_events.each do |event|
+        next if remote_by_uri.key?(event.atproto_uri)
+        next if event.secret? || event.locked? # Expected to be missing
+
+        results[:missing] << { uri: event.atproto_uri, event_id: event.id.to_s }
+        if fix
+          begin
+            # Clear the stale URI and republish
+            event.set(atproto_uri: nil)
+            event.publish_to_atproto_without_delay
+          rescue StandardError => e
+            results[:errors] << { event_id: event.id.to_s, action: 'republish_missing', error: e.message }
+          end
+        end
+      rescue StandardError => e
+        results[:errors] << { event_id: event.id.to_s, action: 'check_missing', error: e.message }
+      end
+
+      # Summary counts
+      results[:summary] = {
+        total_remote: remote_records.count,
+        total_local: local_events.count,
+        valid: results[:valid].count,
+        orphaned: results[:orphaned].count,
+        missing: results[:missing].count,
+        stale: results[:stale].count,
+        errors: results[:errors].count
+      }
+
+      results
+    end
   end
 end

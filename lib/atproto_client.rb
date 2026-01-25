@@ -68,6 +68,10 @@ class AtprotoClient
     post('com.atproto.repo.deleteRecord', repo: session['did'], collection: collection, rkey: rkey)
   end
 
+  def did
+    session['did']
+  end
+
   private
 
   def parse_uri(uri)
