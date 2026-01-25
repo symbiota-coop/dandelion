@@ -107,7 +107,7 @@ module OrganisationFields
     field :end_date_placeholder, type: String
     field :event_types_placeholder, type: String
     field :show_details_table_in_ticket_emails, type: Mongoid::Boolean
-    field :adult_content, type: Mongoid::Boolean
+    field :hide_from_homepage, type: Mongoid::Boolean
     field :event_questions_to_include_in_metadata, type: Array
     field :atproto_handle, type: String
     field :atproto_app_password, type: String

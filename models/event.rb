@@ -348,8 +348,11 @@ class Event
   after_save :set_hidden_from_homepage
   def set_hidden_from_homepage
     adult_words = %w[naked sex sexual sexuality erotic eros cock pussy anal orgasm ejaculation]
+    forbidden_phrases = ['friday night dance']
+
     name_words = name ? name.downcase.split : []
     tag_words = Array(event_tag_names).flat_map { |tag| tag.to_s.downcase.split }
-    set(hidden_from_homepage: true) if (adult_words & (name_words + tag_words)).any? || (organisation && organisation.adult_content?)
+    name_matches_forbidden = forbidden_phrases.any? { |phrase| name&.downcase&.include?(phrase.downcase) }
+    set(hidden_from_homepage: true) if adult_words.intersect?(name_words + tag_words) || name_matches_forbidden || (organisation && organisation.hide_from_homepage?)
   end
 end
