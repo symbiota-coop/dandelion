@@ -13,23 +13,21 @@ class AtprotoClient
     end
   end
 
-  # Public API methods (no auth required)
-
   def get_author_feed(handle, limit: 10)
     did = resolve_handle(handle)
 
     response = @client.get('app.bsky.feed.getAuthorFeed', {
-                                    actor: did,
-                                    limit: limit
-                                  })
+                             actor: did,
+                             limit: limit
+                           })
 
     response.body
   end
 
   def resolve_handle(handle)
     response = @client.get('com.atproto.identity.resolveHandle', {
-                                    handle: handle
-                                  })
+                             handle: handle
+                           })
 
     response.body['did']
   end
@@ -52,8 +50,6 @@ class AtprotoClient
   rescue StandardError
     nil
   end
-
-  # Authenticated API methods
 
   def list_records(collection:, repo: nil, handle: nil, limit: 100)
     repo ||= resolve_handle(handle) if handle
@@ -79,9 +75,9 @@ class AtprotoClient
 
   def create_session
     response = @client.post('com.atproto.server.createSession', {
-                                   identifier: @handle,
-                                   password: @app_password
-                                 })
+                              identifier: @handle,
+                              password: @app_password
+                            })
     @session = response.body
   end
 
@@ -89,10 +85,10 @@ class AtprotoClient
     ensure_session
 
     response = @client.post('com.atproto.repo.createRecord', {
-                                   repo: @session['did'],
-                                   collection: collection,
-                                   record: record
-                                 }) do |req|
+                              repo: @session['did'],
+                              collection: collection,
+                              record: record
+                            }) do |req|
       req.headers['Authorization'] = "Bearer #{@session['accessJwt']}"
     end
 
@@ -107,10 +103,10 @@ class AtprotoClient
     collection = parts[-2]
 
     @client.post('com.atproto.repo.deleteRecord', {
-                        repo: @session['did'],
-                        collection: collection,
-                        rkey: rkey
-                      }) do |req|
+                   repo: @session['did'],
+                   collection: collection,
+                   rkey: rkey
+                 }) do |req|
       req.headers['Authorization'] = "Bearer #{@session['accessJwt']}"
     end
   end
@@ -119,11 +115,11 @@ class AtprotoClient
     ensure_session
 
     response = @client.post('com.atproto.repo.putRecord', {
-                                   repo: @session['did'],
-                                   collection: collection,
-                                   rkey: rkey,
-                                   record: record
-                                 }) do |req|
+                              repo: @session['did'],
+                              collection: collection,
+                              rkey: rkey,
+                              record: record
+                            }) do |req|
       req.headers['Authorization'] = "Bearer #{@session['accessJwt']}"
     end
 
