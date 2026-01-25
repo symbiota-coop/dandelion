@@ -1,5 +1,6 @@
 class AtprotoClient
   API_URL = 'https://bsky.social/xrpc'.freeze
+  PUBLIC_API_URL = 'https://public.api.bsky.app/xrpc'.freeze
 
   def initialize(handle: nil, app_password: nil)
     @handle = handle || ENV['ATPROTO_HANDLE']
@@ -11,28 +12,24 @@ class AtprotoClient
       conn.response :json
       conn.response :raise_error
     end
+
+    @public_client = Faraday.new(url: PUBLIC_API_URL) do |conn|
+      conn.request :json
+      conn.response :json
+      conn.response :raise_error
+    end
   end
 
   def resolve_handle(handle)
-    get('com.atproto.identity.resolveHandle', handle: handle)['did']
+    get('com.atproto.identity.resolveHandle', { handle: handle }, auth: false)['did']
   end
 
-  def get_user_info(handle, display_name: nil)
-    did = resolve_handle(handle)
-    { 'handle' => handle, 'did' => did, 'displayName' => display_name || handle }
-  rescue StandardError
-    nil
-  end
-
-  def get_author_feed(handle, limit: 10)
-    did = resolve_handle(handle)
-    get('app.bsky.feed.getAuthorFeed', actor: did, limit: limit)
+  def get_author_feed(actor, limit: 10)
+    get('app.bsky.feed.getAuthorFeed', { actor: actor, limit: limit }, auth: false, public_api: true)
   end
 
   def get_profile(actor)
-    get('app.bsky.actor.getProfile', actor: actor)
-  rescue StandardError
-    nil
+    get('app.bsky.actor.getProfile', { actor: actor }, auth: false, public_api: true)
   end
 
   def list_records(collection:, repo: nil, handle: nil, limit: 100)
@@ -46,7 +43,7 @@ class AtprotoClient
       params = { repo: repo, collection: collection, limit: limit }
       params[:cursor] = cursor if cursor
 
-      response = get('com.atproto.repo.listRecords', params)
+      response = get('com.atproto.repo.listRecords', params, auth: false)
       records = response['records'] || []
       all_records.concat(records)
 
@@ -85,8 +82,14 @@ class AtprotoClient
                               }).body
   end
 
-  def get(endpoint, params = {})
-    @client.get(endpoint, params) { |req| req.headers['Authorization'] = "Bearer #{session['accessJwt']}" }.body
+  def get(endpoint, params = {}, auth: true, public_api: false)
+    if public_api
+      @public_client.get(endpoint, params).body
+    elsif auth
+      @client.get(endpoint, params) { |req| req.headers['Authorization'] = "Bearer #{session['accessJwt']}" }.body
+    else
+      @client.get(endpoint, params).body
+    end
   end
 
   def post(endpoint, body = {})

@@ -19,10 +19,14 @@ Dandelion::App.controller do
                   # atproto uses info.did instead of uid
                   provider_uid = env['omniauth.auth']['uid'] || env['omniauth.auth'].dig('info', 'did')
                   # Resolve handle, avatar, and display name for atproto
-                  if env['omniauth.auth']['provider'] == 'atproto' && provider_uid && (profile = AtprotoClient.new.get_profile(provider_uid))
-                    env['omniauth.auth']['info']['handle'] = profile['handle']
-                    env['omniauth.auth']['info']['avatar'] = profile['avatar']
-                    env['omniauth.auth']['info']['name'] = profile['displayName']
+                  begin
+                    if env['omniauth.auth']['provider'] == 'atproto' && provider_uid && (profile = AtprotoClient.new.get_profile(provider_uid))
+                      env['omniauth.auth']['info']['handle'] = profile['handle']
+                      env['omniauth.auth']['info']['avatar'] = profile['avatar']
+                      env['omniauth.auth']['info']['name'] = profile['displayName']
+                    end
+                  rescue StandardError
+                    nil
                   end
                   provider_uid ? ProviderLink.find_by(provider: @provider.display_name, provider_uid: provider_uid).try(:account) : nil
                 end
