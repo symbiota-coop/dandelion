@@ -14,39 +14,23 @@ class AtprotoClient
   end
 
   def resolve_handle(handle)
-    response = @client.get('com.atproto.identity.resolveHandle', {
-                             handle: handle
-                           })
-
-    response.body['did']
+    get('com.atproto.identity.resolveHandle', handle: handle)['did']
   end
 
   def get_user_info(handle, display_name: nil)
     did = resolve_handle(handle)
-
-    {
-      'handle' => handle,
-      'did' => did,
-      'displayName' => display_name || handle
-    }
+    { 'handle' => handle, 'did' => did, 'displayName' => display_name || handle }
   rescue StandardError
     nil
   end
 
   def get_author_feed(handle, limit: 10)
     did = resolve_handle(handle)
-
-    response = @client.get('app.bsky.feed.getAuthorFeed', {
-                             actor: did,
-                             limit: limit
-                           })
-
-    response.body
+    get('app.bsky.feed.getAuthorFeed', actor: did, limit: limit)
   end
 
   def get_profile(actor)
-    response = @client.get('app.bsky.actor.getProfile', { actor: actor })
-    response.body
+    get('app.bsky.actor.getProfile', actor: actor)
   rescue StandardError
     nil
   end
@@ -62,73 +46,51 @@ class AtprotoClient
       params = { repo: repo, collection: collection, limit: limit }
       params[:cursor] = cursor if cursor
 
-      response = @client.get('com.atproto.repo.listRecords', params)
-      records = response.body['records'] || []
+      response = get('com.atproto.repo.listRecords', params)
+      records = response['records'] || []
       all_records.concat(records)
 
-      cursor = response.body['cursor']
+      cursor = response['cursor']
       break if cursor.nil? || records.empty?
     end
 
     all_records
   end
 
-  def create_session
+  def create_record(collection:, record:)
+    post('com.atproto.repo.createRecord', repo: @session['did'], collection: collection, record: record)
+  end
+
+  def delete_record(uri:)
+    parts = uri.split('/')
+    rkey = parts.last
+    collection = parts[-2]
+    post('com.atproto.repo.deleteRecord', repo: @session['did'], collection: collection, rkey: rkey)
+  end
+
+  def put_record(collection:, rkey:, record:)
+    post('com.atproto.repo.putRecord', repo: @session['did'], collection: collection, rkey: rkey, record: record)
+  end
+
+  private
+
+  def get(endpoint, params = {})
+    ensure_session
+    @client.get(endpoint, params) { |req| req.headers['Authorization'] = "Bearer #{@session['accessJwt']}" }.body
+  end
+
+  def post(endpoint, body = {})
+    ensure_session
+    @client.post(endpoint, body) { |req| req.headers['Authorization'] = "Bearer #{@session['accessJwt']}" }.body
+  end
+
+  def ensure_session
+    return if @session
+
     response = @client.post('com.atproto.server.createSession', {
                               identifier: @handle,
                               password: @app_password
                             })
     @session = response.body
-  end
-
-  def create_record(collection:, record:)
-    ensure_session
-
-    response = @client.post('com.atproto.repo.createRecord', {
-                              repo: @session['did'],
-                              collection: collection,
-                              record: record
-                            }) do |req|
-      req.headers['Authorization'] = "Bearer #{@session['accessJwt']}"
-    end
-
-    response.body
-  end
-
-  def delete_record(uri:)
-    ensure_session
-
-    parts = uri.split('/')
-    rkey = parts.last
-    collection = parts[-2]
-
-    @client.post('com.atproto.repo.deleteRecord', {
-                   repo: @session['did'],
-                   collection: collection,
-                   rkey: rkey
-                 }) do |req|
-      req.headers['Authorization'] = "Bearer #{@session['accessJwt']}"
-    end
-  end
-
-  def put_record(collection:, rkey:, record:)
-    ensure_session
-
-    response = @client.post('com.atproto.repo.putRecord', {
-                              repo: @session['did'],
-                              collection: collection,
-                              rkey: rkey,
-                              record: record
-                            }) do |req|
-      req.headers['Authorization'] = "Bearer #{@session['accessJwt']}"
-    end
-
-    response.body
-  end
-
-  private
-
-  def ensure_session
-    create_session unless @session
   end
 end
