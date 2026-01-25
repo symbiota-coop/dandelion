@@ -12,8 +12,7 @@ Dandelion::App.controller do
     @organisation.atproto_handle = params[:atproto_handle]&.strip&.delete_prefix('@')
     @organisation.atproto_app_password = params[:atproto_app_password]&.strip
 
-    if @organisation.verify_atproto_credentials!
-      @organisation.save
+    if @organisation.verify_and_set_atproto_credentials!
       flash[:notice] = 'Connected to Bluesky/ATProto!'
       redirect "/o/#{@organisation.slug}/atproto/connect"
     else

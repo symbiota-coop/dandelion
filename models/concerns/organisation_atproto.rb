@@ -17,7 +17,7 @@ module OrganisationAtproto
     "https://bsky.app/profile/#{atproto_handle}"
   end
 
-  def verify_atproto_credentials!
+  def verify_and_set_atproto_credentials!
     return false unless atproto_connected?
 
     session = atproto_client.create_session
@@ -25,6 +25,7 @@ module OrganisationAtproto
 
     set(atproto_did: session['did']) if session['did']
     set(atproto_handle: session['handle']) if session['handle']
+    set(atproto_app_password: atproto_app_password) if atproto_app_password.present?
     true
   rescue StandardError
     false
