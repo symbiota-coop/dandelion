@@ -15,6 +15,10 @@ module EventAtproto
     rescheduled: 'community.lexicon.calendar.event#rescheduled'
   }.freeze
 
+  ATPROTO_COLLECTION = 'community.lexicon.calendar.event'.freeze
+  ATPROTO_TRACKED_FIELDS = %w[name description start_time end_time location coordinates secret locked slug facebook_event_url].freeze
+  ATPROTO_VISIBILITY_FIELDS = %w[secret locked].freeze
+
   included do
     after_create :publish_to_atproto, if: :should_publish_to_atproto?
     after_update :update_atproto, if: :should_update_atproto?
@@ -32,7 +36,7 @@ module EventAtproto
     return false unless atproto_enabled? && atproto_fields_changed?
 
     # Trigger if we have an existing record to update, OR if secret/locked changed (to handle publish on unlock)
-    atproto_uri.present? || (previous_changes.keys & %w[secret locked]).any?
+    atproto_uri.present? || previous_changes.keys.intersect?(ATPROTO_VISIBILITY_FIELDS)
   end
 
   def atproto_enabled?
@@ -64,7 +68,7 @@ module EventAtproto
   end
 
   def atproto_fields_changed?
-    (previous_changes.keys & %w[name description start_time end_time location coordinates secret locked slug facebook_event_url]).any?
+    previous_changes.keys.intersect?(ATPROTO_TRACKED_FIELDS)
   end
 
   # Determine event mode: virtual or inperson
@@ -121,7 +125,7 @@ module EventAtproto
   # Build the complete ATProto record
   def build_atproto_record
     record = {
-      '$type' => 'community.lexicon.calendar.event',
+      '$type' => ATPROTO_COLLECTION,
       'name' => name,
       'createdAt' => created_at.utc.iso8601
     }
@@ -144,7 +148,7 @@ module EventAtproto
     record = build_atproto_record
 
     result = client.create_record(
-      collection: 'community.lexicon.calendar.event',
+      collection: ATPROTO_COLLECTION,
       record: record
     )
 
@@ -175,7 +179,7 @@ module EventAtproto
     rkey = atproto_uri.split('/').last
 
     client.put_record(
-      collection: 'community.lexicon.calendar.event',
+      collection: ATPROTO_COLLECTION,
       rkey: rkey,
       record: record
     )

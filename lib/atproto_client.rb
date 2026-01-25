@@ -60,6 +60,28 @@ class AtprotoClient
     nil
   end
 
+  def list_records(collection:, repo: nil, handle: nil, limit: 100)
+    repo ||= resolve_handle(handle) if handle
+    raise ArgumentError, 'Must provide repo or handle' unless repo
+
+    all_records = []
+    cursor = nil
+
+    loop do
+      params = { repo: repo, collection: collection, limit: limit }
+      params[:cursor] = cursor if cursor
+
+      response = @auth_client.get('com.atproto.repo.listRecords', params)
+      records = response.body['records'] || []
+      all_records.concat(records)
+
+      cursor = response.body['cursor']
+      break if cursor.nil? || records.empty?
+    end
+
+    all_records
+  end
+
   # Authenticated API methods
 
   def create_session
