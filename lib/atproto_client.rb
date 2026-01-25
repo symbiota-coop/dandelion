@@ -1,19 +1,12 @@
 class AtprotoClient
-  PUBLIC_API = 'https://public.api.bsky.app/xrpc'.freeze
-  BSKY_API = 'https://bsky.social/xrpc'.freeze
+  API_URL = 'https://bsky.social/xrpc'.freeze
 
   def initialize(handle: nil, app_password: nil)
     @handle = handle || ENV['ATPROTO_HANDLE']
     @app_password = app_password || ENV['ATPROTO_APP_PASSWORD']
     @session = nil
 
-    @public_client = Faraday.new(url: PUBLIC_API) do |conn|
-      conn.request :json
-      conn.response :json
-      conn.response :raise_error
-    end
-
-    @auth_client = Faraday.new(url: BSKY_API) do |conn|
+    @client = Faraday.new(url: API_URL) do |conn|
       conn.request :json
       conn.response :json
       conn.response :raise_error
@@ -25,7 +18,7 @@ class AtprotoClient
   def get_author_feed(handle, limit: 10)
     did = resolve_handle(handle)
 
-    response = @public_client.get('app.bsky.feed.getAuthorFeed', {
+    response = @client.get('app.bsky.feed.getAuthorFeed', {
                                     actor: did,
                                     limit: limit
                                   })
@@ -34,7 +27,7 @@ class AtprotoClient
   end
 
   def resolve_handle(handle)
-    response = @public_client.get('com.atproto.identity.resolveHandle', {
+    response = @client.get('com.atproto.identity.resolveHandle', {
                                     handle: handle
                                   })
 
@@ -54,7 +47,7 @@ class AtprotoClient
   end
 
   def get_profile(actor)
-    response = @public_client.get('app.bsky.actor.getProfile', { actor: actor })
+    response = @client.get('app.bsky.actor.getProfile', { actor: actor })
     response.body
   rescue StandardError
     nil
@@ -73,7 +66,7 @@ class AtprotoClient
       params = { repo: repo, collection: collection, limit: limit }
       params[:cursor] = cursor if cursor
 
-      response = @auth_client.get('com.atproto.repo.listRecords', params)
+      response = @client.get('com.atproto.repo.listRecords', params)
       records = response.body['records'] || []
       all_records.concat(records)
 
@@ -85,7 +78,7 @@ class AtprotoClient
   end
 
   def create_session
-    response = @auth_client.post('com.atproto.server.createSession', {
+    response = @client.post('com.atproto.server.createSession', {
                                    identifier: @handle,
                                    password: @app_password
                                  })
@@ -95,7 +88,7 @@ class AtprotoClient
   def create_record(collection:, record:)
     ensure_session
 
-    response = @auth_client.post('com.atproto.repo.createRecord', {
+    response = @client.post('com.atproto.repo.createRecord', {
                                    repo: @session['did'],
                                    collection: collection,
                                    record: record
@@ -113,7 +106,7 @@ class AtprotoClient
     rkey = parts.last
     collection = parts[-2]
 
-    @auth_client.post('com.atproto.repo.deleteRecord', {
+    @client.post('com.atproto.repo.deleteRecord', {
                         repo: @session['did'],
                         collection: collection,
                         rkey: rkey
@@ -125,7 +118,7 @@ class AtprotoClient
   def put_record(collection:, rkey:, record:)
     ensure_session
 
-    response = @auth_client.post('com.atproto.repo.putRecord', {
+    response = @client.post('com.atproto.repo.putRecord', {
                                    repo: @session['did'],
                                    collection: collection,
                                    rkey: rkey,
