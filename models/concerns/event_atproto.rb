@@ -147,10 +147,7 @@ module EventAtproto
 
     record = build_atproto_record
 
-    result = client.create_record(
-      collection: ATPROTO_COLLECTION,
-      record: record
-    )
+    result = client.create_record(collection: ATPROTO_COLLECTION, record: record)
 
     set(atproto_uri: result['uri']) if result['uri']
   rescue StandardError => e
@@ -175,14 +172,7 @@ module EventAtproto
 
     record = build_atproto_record
 
-    # Extract rkey from URI (at://did/collection/rkey)
-    rkey = atproto_uri.split('/').last
-
-    client.put_record(
-      collection: ATPROTO_COLLECTION,
-      rkey: rkey,
-      record: record
-    )
+    client.put_record(uri: atproto_uri, record: record)
   rescue StandardError => e
     Honeybadger.notify(e, context: { event_id: id.to_s, action: 'update' })
   end

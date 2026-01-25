@@ -61,18 +61,22 @@ class AtprotoClient
     post('com.atproto.repo.createRecord', repo: session['did'], collection: collection, record: record)
   end
 
-  def delete_record(uri:)
-    parts = uri.split('/')
-    rkey = parts.last
-    collection = parts[-2]
-    post('com.atproto.repo.deleteRecord', repo: session['did'], collection: collection, rkey: rkey)
-  end
-
-  def put_record(collection:, rkey:, record:)
+  def put_record(uri:, record:)
+    collection, rkey = parse_uri(uri)
     post('com.atproto.repo.putRecord', repo: session['did'], collection: collection, rkey: rkey, record: record)
   end
 
+  def delete_record(uri:)
+    collection, rkey = parse_uri(uri)
+    post('com.atproto.repo.deleteRecord', repo: session['did'], collection: collection, rkey: rkey)
+  end
+
   private
+
+  def parse_uri(uri)
+    parts = uri.split('/')
+    [parts[-2], parts.last]
+  end
 
   def session
     @session ||= @client.post('com.atproto.server.createSession', {
