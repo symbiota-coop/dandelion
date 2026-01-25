@@ -25,11 +25,11 @@ class AtprotoClient
   end
 
   def get_author_feed(actor, limit: 10)
-    get('app.bsky.feed.getAuthorFeed', { actor: actor, limit: limit }, auth: false, public_api: true)
+    get('app.bsky.feed.getAuthorFeed', { actor: actor, limit: limit })
   end
 
   def get_profile(actor)
-    get('app.bsky.actor.getProfile', { actor: actor }, auth: false, public_api: true)
+    get('app.bsky.actor.getProfile', { actor: actor })
   end
 
   def list_records(collection:, repo: nil, handle: nil, limit: 100)
@@ -82,8 +82,8 @@ class AtprotoClient
                               }).body
   end
 
-  def get(endpoint, params = {}, auth: true, public_api: false)
-    if public_api
+  def get(endpoint, params = {}, auth: true)
+    if endpoint.start_with?('app.bsky.')
       @public_client.get(endpoint, params).body
     elsif auth
       @client.get(endpoint, params) { |req| req.headers['Authorization'] = "Bearer #{session['accessJwt']}" }.body
