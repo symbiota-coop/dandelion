@@ -60,6 +60,8 @@ class AtprotoClient
     nil
   end
 
+  # Authenticated API methods
+
   def list_records(collection:, repo: nil, handle: nil, limit: 100)
     repo ||= resolve_handle(handle) if handle
     raise ArgumentError, 'Must provide repo or handle' unless repo
@@ -81,8 +83,6 @@ class AtprotoClient
 
     all_records
   end
-
-  # Authenticated API methods
 
   def create_session
     response = @auth_client.post('com.atproto.server.createSession', {
