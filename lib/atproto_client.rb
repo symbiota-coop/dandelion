@@ -58,39 +58,34 @@ class AtprotoClient
   end
 
   def create_record(collection:, record:)
-    post('com.atproto.repo.createRecord', repo: @session['did'], collection: collection, record: record)
+    post('com.atproto.repo.createRecord', repo: session['did'], collection: collection, record: record)
   end
 
   def delete_record(uri:)
     parts = uri.split('/')
     rkey = parts.last
     collection = parts[-2]
-    post('com.atproto.repo.deleteRecord', repo: @session['did'], collection: collection, rkey: rkey)
+    post('com.atproto.repo.deleteRecord', repo: session['did'], collection: collection, rkey: rkey)
   end
 
   def put_record(collection:, rkey:, record:)
-    post('com.atproto.repo.putRecord', repo: @session['did'], collection: collection, rkey: rkey, record: record)
+    post('com.atproto.repo.putRecord', repo: session['did'], collection: collection, rkey: rkey, record: record)
   end
 
   private
 
+  def session
+    @session ||= @client.post('com.atproto.server.createSession', {
+                                identifier: @handle,
+                                password: @app_password
+                              }).body
+  end
+
   def get(endpoint, params = {})
-    ensure_session
-    @client.get(endpoint, params) { |req| req.headers['Authorization'] = "Bearer #{@session['accessJwt']}" }.body
+    @client.get(endpoint, params) { |req| req.headers['Authorization'] = "Bearer #{session['accessJwt']}" }.body
   end
 
   def post(endpoint, body = {})
-    ensure_session
-    @client.post(endpoint, body) { |req| req.headers['Authorization'] = "Bearer #{@session['accessJwt']}" }.body
-  end
-
-  def ensure_session
-    return if @session
-
-    response = @client.post('com.atproto.server.createSession', {
-                              identifier: @handle,
-                              password: @app_password
-                            })
-    @session = response.body
+    @client.post(endpoint, body) { |req| req.headers['Authorization'] = "Bearer #{session['accessJwt']}" }.body
   end
 end
