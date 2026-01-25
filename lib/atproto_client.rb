@@ -13,17 +13,6 @@ class AtprotoClient
     end
   end
 
-  def get_author_feed(handle, limit: 10)
-    did = resolve_handle(handle)
-
-    response = @client.get('app.bsky.feed.getAuthorFeed', {
-                             actor: did,
-                             limit: limit
-                           })
-
-    response.body
-  end
-
   def resolve_handle(handle)
     response = @client.get('com.atproto.identity.resolveHandle', {
                              handle: handle
@@ -42,6 +31,17 @@ class AtprotoClient
     }
   rescue StandardError
     nil
+  end
+
+  def get_author_feed(handle, limit: 10)
+    did = resolve_handle(handle)
+
+    response = @client.get('app.bsky.feed.getAuthorFeed', {
+                             actor: did,
+                             limit: limit
+                           })
+
+    response.body
   end
 
   def get_profile(actor)
