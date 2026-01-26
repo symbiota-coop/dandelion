@@ -154,7 +154,7 @@ module EventAtproto
     Honeybadger.notify(e, context: { event_id: id.to_s, action: 'publish' })
   end
 
-  def update_atproto(force: false)
+  def update_atproto
     # If event became secret/locked, delete the ATProto record
     if secret? || locked?
       delete_atproto
@@ -166,9 +166,6 @@ module EventAtproto
       publish_to_atproto
       return
     end
-
-    # Skip if no relevant fields changed (unless force is true)
-    return if !force && !atproto_fields_changed?
 
     client = atproto_client_for_record
     return unless client
@@ -217,7 +214,7 @@ module EventAtproto
     end
 
     # Already published - refresh the record
-    update_atproto_without_delay(force: true) unless dry_run
+    update_atproto_without_delay unless dry_run
     { action: :updated }
   rescue StandardError => e
     Honeybadger.notify(e, context: { event_id: id.to_s, action: 'sync' })
@@ -333,7 +330,7 @@ module EventAtproto
             results[:stale] << { uri: uri, event_id: event.id.to_s, mismatches: mismatches }
             if fix
               begin
-                event.update_atproto_without_delay(force: true)
+                event.update_atproto_without_delay
               rescue StandardError => e
                 results[:errors] << { event_id: event.id.to_s, action: 'update_stale', error: e.message }
               end
