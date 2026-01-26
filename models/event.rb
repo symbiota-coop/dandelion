@@ -334,9 +334,11 @@ class Event
     end
     return unless content && content.include?(', ') && !content.include?('#')
 
-    content.split(':').last.strip.split(',').map(&:strip).map do |name|
+    tag_names = content.split(':').last.strip.split(',').map(&:strip).map do |name|
       name.gsub('_', ' ').gsub('-', ' ').downcase
-    end.each do |name|
+    end
+
+    tag_names.each do |name|
       puts name
       if (event_tag = EventTag.find_or_create_by(name: name)).persisted?
         event_tagships.create(event_tag: event_tag)
