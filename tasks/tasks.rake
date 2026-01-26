@@ -67,9 +67,3 @@ namespace :late do
     puts 'done!'
   end
 end
-
-namespace :other do
-  task check_squarespace_signup: :environment do
-    CheckSquarespaceSignup.check
-  end
-end
