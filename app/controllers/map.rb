@@ -40,4 +40,8 @@ Dandelion::App.controller do
   get '/map/trigger' do
     200
   end
+
+  get '/map/home' do
+    partial :'maps/map', locals: { url: '/events', fill_screen: true }
+  end
 end

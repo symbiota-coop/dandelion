@@ -122,14 +122,28 @@
 
   <%= cp(:'event_feedbacks/home', expires: 1.day.from_now) %>
 
+  <div id="homepage-map" data-lazy-map="/map/home">
+    <div style="height: 50vh"></div>
+  </div>
   <script>
     $(function () {
+      var $mapContainer = $('#homepage-map');
+      var mapLoaded = false;
+
       if (typeof google === 'undefined') {
-        $('#homepage-map').hide();
+        $mapContainer.hide();
+        return;
       }
+
+      var observer = new IntersectionObserver(function (entries) {
+        if (entries[0].isIntersecting && !mapLoaded) {
+          mapLoaded = true;
+          observer.disconnect();
+          $mapContainer.load($mapContainer.data('lazy-map'));
+        }
+      }, { rootMargin: '200px' });
+
+      observer.observe($mapContainer[0]);
     });
   </script>
-  <div id="homepage-map">
-    <%= partial :'maps/map', locals: { url: "/events", fill_screen: true } %>
-  </div>
 </div>
