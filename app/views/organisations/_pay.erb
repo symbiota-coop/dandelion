@@ -20,7 +20,7 @@
             <% else %>
               a special payment feature,
             <% end %>
-            we ask that you meet the suggested donation before creating more events. 
+            we ask that you meet the suggested contribution before creating more events. 
           </mark>
         <% else %>
           <mark>
@@ -30,7 +30,7 @@
         <% end %>
 
         <p class="lead">
-          The suggested donation is <%= organisation.percent_requested || 1 %>% of ticket sales per event.
+          The suggested contribution is <%= organisation.percent_requested || 1 %>% of ticket sales per event.
         </p>
 
         <p class="lead">
