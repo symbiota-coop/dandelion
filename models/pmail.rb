@@ -276,7 +276,8 @@ class Pmail
 
     if is_event_pmail
       mg_client = Mailgun::Client.new ENV['MAILGUN_API_KEY'], ENV['MAILGUN_REGION']
-      batch_message = Mailgun::BatchMessage.new(mg_client, ENV['MAILGUN_TICKETS_HOST'])
+      mailgun_host = ENV['MICROSOFT_EMAIL_WORKAROUND'] ? ENV['MAILGUN_PMAILS_HOST'] : ENV['MAILGUN_TICKETS_HOST']
+      batch_message = Mailgun::BatchMessage.new(mg_client, mailgun_host)
 
       batch_message.from from_name ? "#{from_name} <#{ENV['MAILER_EMAIL']}>" : ENV['MAILER_EMAIL_FULL']
       batch_message.reply_to from
