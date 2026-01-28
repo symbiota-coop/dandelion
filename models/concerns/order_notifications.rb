@@ -34,7 +34,8 @@ module OrderNotifications
 
   def send_tickets
     mg_client = Mailgun::Client.new ENV['MAILGUN_API_KEY'], ENV['MAILGUN_REGION']
-    batch_message = Mailgun::BatchMessage.new(mg_client, ENV['MAILGUN_TICKETS_HOST'])
+    mailgun_host = EmailHelper.microsoft_email?(account.email) ? ENV['MAILGUN_PMAILS_HOST'] : ENV['MAILGUN_TICKETS_HOST']
+    batch_message = Mailgun::BatchMessage.new(mg_client, mailgun_host)
 
     order = self
     event = order.event

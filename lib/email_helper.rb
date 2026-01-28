@@ -1,4 +1,14 @@
 module EmailHelper
+  MICROSOFT_DOMAINS = %w[hotmail msn outlook live].freeze
+
+  def self.microsoft_email?(email)
+    return false unless email
+
+    domain = email.to_s.split('@').last.to_s.downcase
+    base_domain = domain.split('.').first
+    MICROSOFT_DOMAINS.include?(base_domain)
+  end
+
   class TemplateContext
     def initialize(locals)
       locals.each do |key, value|
