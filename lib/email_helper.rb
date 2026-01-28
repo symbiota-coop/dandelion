@@ -1,12 +1,13 @@
 module EmailHelper
   MICROSOFT_DOMAINS = %w[hotmail msn outlook live].freeze
 
-  def self.microsoft_email?(email)
-    return false unless email
+  def self.mailgun_host(email, default_host)
+    return default_host unless ENV['MICROSOFT_EMAIL_WORKAROUND']
+    return default_host unless email
 
     domain = email.to_s.split('@').last.to_s.downcase
     base_domain = domain.split('.').first
-    MICROSOFT_DOMAINS.include?(base_domain)
+    MICROSOFT_DOMAINS.include?(base_domain) ? ENV['MAILGUN_PMAILS_HOST'] : default_host
   end
 
   class TemplateContext

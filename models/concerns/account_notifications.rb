@@ -24,7 +24,7 @@ module AccountNotifications
 
   def send_sign_in_code
     mg_client = Mailgun::Client.new ENV['MAILGUN_API_KEY'], ENV['MAILGUN_REGION']
-    batch_message = Mailgun::BatchMessage.new(mg_client, ENV['MAILGUN_NOTIFICATIONS_HOST'])
+    batch_message = Mailgun::BatchMessage.new(mg_client, EmailHelper.mailgun_host(email, ENV['MAILGUN_NOTIFICATIONS_HOST']))
 
     account = self
     batch_message.from ENV['NOTIFICATIONS_EMAIL_FULL']
@@ -40,7 +40,7 @@ module AccountNotifications
     return if skip_confirmation_email
 
     mg_client = Mailgun::Client.new ENV['MAILGUN_API_KEY'], ENV['MAILGUN_REGION']
-    batch_message = Mailgun::BatchMessage.new(mg_client, ENV['MAILGUN_NOTIFICATIONS_HOST'])
+    batch_message = Mailgun::BatchMessage.new(mg_client, EmailHelper.mailgun_host(email, ENV['MAILGUN_NOTIFICATIONS_HOST']))
 
     account = self
     batch_message.from ENV['NOTIFICATIONS_EMAIL_FULL']
