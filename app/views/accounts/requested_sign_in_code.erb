@@ -5,7 +5,11 @@
         <h2 class="text-center my-0">Sign in</h2>
       </div>
       <div class="card-body">
-        A sign in code was sent to <%=@account.email%>. Please check your email app and paste the code below ✨
+        <p>A sign in code was sent to <%=@account.email%>. Please check your email app and paste the code below ✨</p>
+
+        <p>
+          (If you don't receive a code within 2 minutes, please email <a href="mailto:<%=ENV['CONTACT_EMAIL']%>"><%=ENV['CONTACT_EMAIL']%></a>.)
+        </p>
 
         <% form_tag '/accounts/sign_in_code', class: 'my-3' do %>
 
