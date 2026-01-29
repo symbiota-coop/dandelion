@@ -77,7 +77,7 @@ class Carousel
   end
 
   def events(minimal: false)
-    future_events = organisation.events_including_cohosted.live.public.future_and_current.and(:start_time.lt => weeks.weeks.from_now).and(hide_from_carousels: false).and(has_image: true).and(:id.in => EventTagship.and(:event_tag_id.in => event_tag_ids).pluck(:event_id))
+    future_events = organisation.events_including_cohosted.live.public.future_and_current_featured.and(:start_time.lt => weeks.weeks.from_now).and(hide_from_carousels: false).and(has_image: true).and(:id.in => EventTagship.and(:event_tag_id.in => event_tag_ids).pluck(:event_id))
     past_events = organisation.events_including_cohosted.live.public.past.and(:extra_info_for_recording_email.ne => nil).and(hide_from_carousels: false).and(has_image: true).and(:id.in => EventTagship.and(:event_tag_id.in => event_tag_ids).pluck(:event_id))
 
     unless minimal

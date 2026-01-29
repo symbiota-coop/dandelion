@@ -41,7 +41,7 @@
   </div>
 <% end %>
 
-<% if organisation_admin? or @organisation.events_including_cohosted.live.public.future_and_current.exists? %>
+<% if organisation_admin? or @organisation.events_including_cohosted.live.public.future_and_current_featured.exists? %>
   <h2 class="mt-5">Events</h2>
   <div data-with-placeholder data-pagelet-url="/o/<%= @organisation.slug %>/events_block">
     <%= partial :'organisations/events_block_placeholder' %>
