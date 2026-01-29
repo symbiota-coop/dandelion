@@ -44,7 +44,7 @@ Dandelion::App.controller do
         end
         redirect '/accounts/providers'
       elsif account # not signed in
-        account.sign_ins.create(env: env_yaml)
+        account.sign_ins.create(request: request)
         session[:account_id] = account.id.to_s
         flash[:notice] = 'Signed in!'
         redirect session[:return_to] || '/'

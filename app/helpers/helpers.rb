@@ -3,10 +3,6 @@ Dandelion::App.helpers do
     request.env['HTTP_CF_CONNECTING_IP'] || request.env['HTTP_X_FORWARDED_FOR']
   end
 
-  def env_yaml
-    request.env.select { |k, v| v.is_a?(String) && k != 'rack.request.form_vars' }.to_yaml
-  end
-
   def current_account
     @current_account ||= Account.find(session[:account_id]) if session[:account_id]
   end

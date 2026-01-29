@@ -69,7 +69,7 @@ Dandelion::App.controller do
         @account = Account.new(mass_assigning(params[:account], Account))
         @account.password = Account.generate_password # not used
         if @account.save
-          @account.sign_ins.create(env: env_yaml)
+          @account.sign_ins.create(request: request)
           session[:account_id] = @account.id.to_s
         else
           flash[:error] = '<strong>Oops.</strong> Some errors prevented the account from being saved.'

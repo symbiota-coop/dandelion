@@ -20,7 +20,7 @@ invalid_xhr_header = lambda do |request|
   xhr = request.env['HTTP_X_REQUESTED_WITH']
   xhr && xhr != 'XMLHttpRequest' && xhr.match?(INVALID_XHR_HEADER_CHARS)
 end
-real_ip = ->(request) { request.env['HTTP_CF_CONNECTING_IP'] || request.ip }
+real_ip = ->(request) { request.env['HTTP_CF_CONNECTING_IP'] || request.env['HTTP_X_FORWARDED_FOR'] || request.ip }
 
 Rack::Attack.blocklist(INVALID_XHR_HEADER) do |request|
   key = "invalid-xhr:#{real_ip.call(request)}"

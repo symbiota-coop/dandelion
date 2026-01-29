@@ -41,7 +41,7 @@ Dandelion::App.helpers do
   def handle_successful_account_creation
     flash[:notice] = '<strong>Awesome!</strong> Your account was created successfully.'
     unless params[:recaptcha_skip_secret]
-      @account.sign_ins.create(env: env_yaml)
+      @account.sign_ins.create(request: request)
       session[:account_id] = @account.id.to_s
     end
 

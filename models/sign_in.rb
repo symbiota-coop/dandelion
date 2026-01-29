@@ -2,21 +2,17 @@ class SignIn
   include Mongoid::Document
   include Mongoid::Timestamps
   include CoreExtensions
+  include RequestFields
 
   belongs_to_without_parent_validation :account, index: true
 
-  field :env, type: String
+  attr_accessor :skip_increment
 
   index({ created_at: 1 }, { expire_after_seconds: 1.year.to_i })
 
   def self.admin_fields
-    {
-      account_id: :lookup,
-      env: :text_area
-    }
+    { account_id: :lookup }.merge(RequestFields.admin_fields)
   end
-
-  attr_accessor :skip_increment
 
   after_create do
     unless skip_increment
