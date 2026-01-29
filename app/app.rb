@@ -56,7 +56,7 @@ module Dandelion
       elsif params[:api_key]
         sign_in_via_api_key
       end
-      PageView.create(path: request.path, query_string: request.query_string) if File.extname(request.path).blank? && !request.xhr? && !request.is_crawler? && !request.path.start_with?('/z/')
+      PageView.create(request: request) if File.extname(request.path).blank? && !request.xhr? && !request.is_crawler? && !request.path.start_with?('/z/')
       @og_desc = "Find and host #{%w[soulful regenerative metamodern participatory conscious transformative holistic ethical].join(' · ')} events and co-created gatherings"
       @og_image = "#{ENV['BASE_URI']}/images/link.png"
       if current_account
