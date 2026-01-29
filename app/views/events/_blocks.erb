@@ -3,6 +3,7 @@
     <div class="row" id="events">
       <% events.each { |event|
       next if event.locked? && !event_admin?(event)
+      # Skip past events for co-hosts; only the primary host can show featured events that have started
       next if @organisation && event.past? && event.organisation_id != @organisation.id
       %>
       <div class="col-12 <%= block_class if defined?(block_class) %>" id="<%= event.id %>">
