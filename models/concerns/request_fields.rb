@@ -8,6 +8,7 @@ module RequestFields
     field :referrer, type: String
     field :ip, type: String
     field :country, type: String
+    field :source_asn, type: String
     field :x_requested_with, type: String
 
     attr_accessor :request
@@ -24,6 +25,7 @@ module RequestFields
     self.referrer = request.referrer
     self.ip = request.env['HTTP_CF_CONNECTING_IP'] || request.env['HTTP_X_FORWARDED_FOR'] || request.ip
     self.country = request.env['HTTP_CF_IPCOUNTRY']
+    self.source_asn = request.env['HTTP_CF_CONNECTING_ASN']
     self.x_requested_with = request.env['HTTP_X_REQUESTED_WITH']
   end
 
@@ -35,6 +37,7 @@ module RequestFields
       referrer: :text,
       ip: :text,
       country: :text,
+      source_asn: :text,
       x_requested_with: :text
     }
   end
