@@ -7,14 +7,23 @@ class AtprotoClient
     @app_password = app_password || ENV['ATPROTO_APP_PASSWORD']
     @session = nil
 
+    retry_options = {
+      max: 3,
+      interval: 1,
+      backoff_factor: 2,
+      exceptions: [Faraday::ServerError, Faraday::ConnectionFailed, Faraday::TimeoutError]
+    }
+
     @client = Faraday.new(url: API_URL) do |conn|
       conn.request :json
+      conn.request :retry, retry_options
       conn.response :json
       conn.response :raise_error
     end
 
     @public_client = Faraday.new(url: PUBLIC_API_URL) do |conn|
       conn.request :json
+      conn.request :retry, retry_options
       conn.response :json
       conn.response :raise_error
     end

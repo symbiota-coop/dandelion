@@ -101,7 +101,7 @@ class Membership
 
   after_destroy do
     # Only create notification if account is not being destroyed (voluntary leave vs. account deletion)
-    account.notifications_as_notifiable.create! circle: gathering, type: 'left_gathering' if account && !account.flagged_for_destroy?
+    account.notifications_as_notifiable.create! circle: gathering, type: 'left_gathering' if account && !account.flagged_for_destroy? && gathering && !gathering.flagged_for_destroy?
     gathering.set(membership_count: gathering.memberships.count)
     if mapplication
       mapplication.prevent_notifications = true

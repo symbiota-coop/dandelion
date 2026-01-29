@@ -12,7 +12,7 @@ Dandelion::App.controller do
     event_admins_only!
     @event.last_saved_by = current_account
     if @event.update_attributes(mass_assigning(params[:event], Event))
-      @event.set(locked: true) if !@event.organisation.payment_method? && @event.paid_tickets?
+      @event.lock! if !@event.organisation.payment_method? && @event.paid_tickets?
       flash[:notice] = 'The event was saved.'
       redirect "/e/#{@event.slug}/edit"
     else

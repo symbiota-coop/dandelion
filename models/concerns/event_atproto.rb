@@ -189,6 +189,13 @@ module EventAtproto
     Honeybadger.notify(e, context: { event_id: id.to_s, action: 'delete' })
   end
 
+  # Lock the event and ensure AT Protocol record is cleaned up
+  # Use this instead of .set(locked: true) to ensure proper AT Protocol cleanup
+  def lock!
+    set(locked: true)
+    delete_atproto
+  end
+
   # Sync this event to AT Protocol, determining the appropriate action
   # Returns a hash with :action and optionally :error
   #

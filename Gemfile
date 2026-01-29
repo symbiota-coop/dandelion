@@ -47,6 +47,7 @@ end
 # Interacting with other websites
 gem 'airrecord'
 gem 'faraday'
+gem 'faraday-retry'
 gem 'ferrum', '~> 0.14.0' # scroll behaviour changed in 0.15
 gem 'honeybadger'
 gem 'jwt'
