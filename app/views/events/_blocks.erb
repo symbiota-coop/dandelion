@@ -1,7 +1,10 @@
 <% if events.exists? %>
   <div class="mb-3">
     <div class="row" id="events">
-      <% events.each { |event| next if event.locked? && !event_admin?(event) %>
+      <% events.each { |event|
+      next if event.locked? && !event_admin?(event)
+      next if @organisation && event.past? && event.organisation_id != @organisation.id
+      %>
       <div class="col-12 <%= block_class if defined?(block_class) %>" id="<%= event.id %>">
         <div class="mb-4">
           <% if admin? %>
