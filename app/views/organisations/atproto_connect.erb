@@ -18,16 +18,6 @@
 <% end %>
 
 <% unless @organisation.atproto_connected? %>
-  <div class="alert alert-success">
-    <p class="mb-2"><strong>How to create an App Password:</strong></p>
-    <ol class="mb-0">
-      <li>Go to <a href="https://bsky.app/settings/app-passwords" target="_blank">bsky.app/settings/app-passwords</a></li>
-      <li>Click "Add App Password"</li>
-      <li>Give it a name (e.g., "Dandelion")</li>
-      <li>Copy the generated password and paste it below</li>
-    </ol>
-  </div>
-
   <% form_tag "/o/#{@organisation.slug}/atproto/connect", method: 'post' do %>
     <div class="form-group">
       <label for="atproto_handle">Bluesky/ATProto handle</label>
@@ -38,7 +28,7 @@
       <%= password_field_tag :atproto_app_password, class: 'form-control', placeholder: 'xxxx-xxxx-xxxx-xxxx', required: true %>
       <small class="form-text text-muted">
         This is not your Bluesky login password.
-        <a href="https://bsky.app/settings/app-passwords" target="_blank">Create an App Password</a>
+        <a href="https://bsky.app/settings/app-passwords" target="_blank">Create an App Password</a> (the password name is unimportant)
       </small>
     </div>
     <%= submit_tag 'Connect', class: 'btn btn-primary' %>
