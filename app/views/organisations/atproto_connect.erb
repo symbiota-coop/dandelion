@@ -1,12 +1,10 @@
 <%= partial :'organisations/nav', locals: { organisation: @organisation } %>
 
-<big>
-  <p>
-    By default, Dandelion publishes events to ATProto under <a href="https://www.atproto-browser.dev/at/did:plc:l4fwwgqgc5gdvtebisdumf4x" target="_blank">@dandelion.events</a>.
-    <br />
-    Here you can connect your organisation's Bluesky/ATProto account to publish events to ATProto under your own identity.
-  </p>
-</big>
+<p class="lead">
+  By default, Dandelion publishes events to ATProto under <a href="https://www.atproto-browser.dev/at/did:plc:l4fwwgqgc5gdvtebisdumf4x" target="_blank">@dandelion.events</a>.
+  <br />
+  Here you can connect your organisation's Bluesky/ATProto account to publish events to ATProto under your own identity.
+</p>
 
 <% if @organisation.atproto_connected? %>
   <big class="d-block mb-2">
