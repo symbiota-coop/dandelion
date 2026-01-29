@@ -5,6 +5,7 @@ Rack::Attack.cache.store = ActiveSupport::Cache::MongoStore.new(nil, collection:
 BOT_USER_AGENT_PATTERNS = %w[bot crawler indexer spider scraper].map { |pattern| ["/#{pattern}", "#{pattern}/", "-#{pattern}", "#{pattern}-"] }.flatten.freeze
 BLOCKED_PATH_PATTERNS = [%r{^/search$}, %r{^/events$}, %r{^/o/[a-z0-9-]+/events$}].freeze
 THROTTLED_PATH_PATTERNS = BLOCKED_PATH_PATTERNS + [%r{^/events\.ics$}, %r{^/o/[a-z0-9-]+/events\.ics$}].freeze
+BLOCKED_IP_PREFIXES = ENV['BLOCKED_IP_PREFIXES']&.split(',')&.map(&:strip) || []
 
 # Characters not expected in valid X-Requested-With values (XMLHttpRequest or Android package names)
 INVALID_XHR_HEADER_CHARS = %r{[^A-Za-z0-9_./-]}
@@ -12,6 +13,7 @@ INVALID_XHR_HEADER_CHARS = %r{[^A-Za-z0-9_./-]}
 BLOCK_BOTS_USING_SEARCH = 'block bots using search'.freeze
 JS_CHALLENGE = 'js challenge'.freeze
 INVALID_XHR_HEADER = 'invalid xhr header'.freeze
+BLOCKED_IP_RANGE = 'blocked ip range'.freeze
 
 bot_request = ->(request) { request.user_agent && BOT_USER_AGENT_PATTERNS.any? { |pattern| request.user_agent.downcase.include?(pattern) } }
 blocked_path = ->(request) { BLOCKED_PATH_PATTERNS.any? { |pattern| request.path.match?(pattern) } }
@@ -21,6 +23,10 @@ invalid_xhr_header = lambda do |request|
   xhr && xhr != 'XMLHttpRequest' && xhr.match?(INVALID_XHR_HEADER_CHARS)
 end
 real_ip = ->(request) { request.env['HTTP_CF_CONNECTING_IP'] || request.env['HTTP_X_FORWARDED_FOR'] || request.ip }
+
+Rack::Attack.blocklist(BLOCKED_IP_RANGE) do |request|
+  BLOCKED_IP_PREFIXES.any? { |prefix| real_ip.call(request)&.start_with?(prefix) }
+end
 
 Rack::Attack.blocklist(INVALID_XHR_HEADER) do |request|
   key = "invalid-xhr:#{real_ip.call(request)}"
@@ -43,6 +49,8 @@ end
 
 Rack::Attack.blocklisted_responder = lambda do |request|
   case request.env['rack.attack.matched']
+  when BLOCKED_IP_RANGE
+    [403, {}, ["Forbidden: Your IP range has been blocked due to suspicious activity. Please email #{ENV['CONTACT_EMAIL']} if you believe you have received this message in error."]]
   when BLOCK_BOTS_USING_SEARCH
     [403, {}, ["Forbidden: Bots are not permitted to use search features. Please email #{ENV['CONTACT_EMAIL']} if you believe you have received this message in error."]]
   when JS_CHALLENGE
