@@ -48,6 +48,7 @@ module EventNotifications
     end
 
     batch_message.finalize if Padrino.env == :production
+    set(sent_reminders_at: Time.now) if account_id == :all
   end
 
   def send_star_reminders(account_id)
@@ -71,6 +72,7 @@ module EventNotifications
     end
 
     batch_message.finalize if Padrino.env == :production
+    set(sent_star_reminders_at: Time.now) if account_id == :all
   end
 
   def send_feedback_requests(account_id)
@@ -94,5 +96,6 @@ module EventNotifications
     end
 
     batch_message.finalize if Padrino.env == :production
+    set(sent_feedback_requests_at: Time.now) if account_id == :all
   end
 end

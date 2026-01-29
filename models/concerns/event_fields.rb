@@ -20,6 +20,9 @@ module EventFields
     field :email, type: String
     field :facebook_event_url, type: String
     field :feedback_questions, type: String
+    field :sent_feedback_requests_at, type: Time
+    field :sent_reminders_at, type: Time
+    field :sent_star_reminders_at, type: Time
     field :suggested_donation, type: Float
     field :minimum_donation, type: Float
     field :capacity, type: Integer
