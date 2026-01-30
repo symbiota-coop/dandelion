@@ -1,7 +1,7 @@
 namespace :hourly do
   task errands: :environment do
     puts 'feedback requests'
-    Event.live.and(:end_time.gte => Time.now.beginning_of_hour, :end_time.lt => Time.now.beginning_of_hour + 1.hour).each { |event| event.send_feedback_requests(:all) }
+    Event.live.and(:end_time.gt => Time.now.beginning_of_hour, :end_time.lte => Time.now.beginning_of_hour + 1.hour).each { |event| event.send_feedback_requests(:all) }
     puts 'clean up old temp files'
     system('find /tmp -maxdepth 1 -type f -mmin +60 -delete 2>/dev/null')
     puts 'delete stale uncompleted orders'
