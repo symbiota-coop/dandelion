@@ -194,7 +194,7 @@ module EventFields
         opt_in_organisation: 'Allow people to opt in to receive emails from host organisation(s)',
         opt_in_facilitator: "Allow people to opt in to receive emails from any facilitators' personal lists",
         monthly_donors_only: 'Only allow people making a monthly donation to the organisation to purchase tickets',
-        no_discounts: "Don't apply usual discounts for monthly donors to the organisation",
+        no_discounts: "Don't apply usual discounts for the organisation's monthly donors",
         refund_deleted_orders: 'Refund deleted orders/tickets via Stripe, and all orders if the event is deleted',
         redirect_url: 'Optional. By default people will be shown a thank you page on Dandelion.',
         facebook_pixel_id: 'Your Facebook Pixel ID for tracking sales',

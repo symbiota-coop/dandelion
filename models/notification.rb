@@ -193,7 +193,11 @@ class Notification
       "<strong>#{order.account.name}</strong> is going to <strong>#{order.event.name}</strong>"
     when :left_feedback
       event_feedback = notifiable
-      "<strong>#{event_feedback.account.name}</strong> left feedback on <strong>#{event_feedback.event.name}</strong>"
+      if event_feedback.event
+        "<strong>#{event_feedback.account.name}</strong> left feedback on <strong>#{event_feedback.event.name}</strong>"
+      else
+        "<strong>#{event_feedback.account.name}</strong> left feedback on an event"
+      end
     when :starred_event
       account = circle
       event = notifiable
