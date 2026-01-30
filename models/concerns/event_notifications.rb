@@ -78,6 +78,7 @@ module EventNotifications
   def send_feedback_requests(account_id)
     return if feedback_questions.nil?
     return unless organisation
+    return if sent_feedback_requests_at && account_id == :all
 
     mg_client = Mailgun::Client.new ENV['MAILGUN_API_KEY'], ENV['MAILGUN_REGION']
     batch_message = Mailgun::BatchMessage.new(mg_client, ENV['MAILGUN_NOTIFICATIONS_HOST'])

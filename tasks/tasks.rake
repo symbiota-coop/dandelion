@@ -1,5 +1,7 @@
 namespace :hourly do
   task errands: :environment do
+    puts 'feedback requests'
+    Event.live.and(:end_time.gte => Time.now.beginning_of_hour, :end_time.lt => Time.now.beginning_of_hour + 1.hour).each { |event| event.send_feedback_requests(:all) }
     puts 'clean up old temp files'
     system('find /tmp -maxdepth 1 -type f -mmin +60 -delete 2>/dev/null')
     puts 'delete stale uncompleted orders'
@@ -19,8 +21,6 @@ end
 
 namespace :morning do
   task errands: :environment do
-    puts 'feedback requests'
-    Event.live.and(:end_time.gte => Date.yesterday, :end_time.lt => Date.today).each { |event| event.send_feedback_requests(:all) }
     puts 'event reminders'
     Event.live.and(:start_time.gte => Date.tomorrow, :start_time.lt => Date.tomorrow + 1).each { |event| event.send_reminders(:all) }
     puts 'star reminders'
