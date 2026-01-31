@@ -1,5 +1,5 @@
 <td>
-  <% if event.past? and event.attendees.exists? and event.event_feedbacks.exists? %>
+  <% if event.event_feedbacks.exists? %>
     <a href="/events/<%= event.id %>/feedback"><%= pluralize(event.event_feedbacks.count, 'response') %></a>
     (<%= "#{(100 * (event.event_feedbacks.count.to_f / event.attendees.count)).round}%" %>)
     <% if average_rating = event.event_feedbacks.average_rating %>
