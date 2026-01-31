@@ -209,8 +209,23 @@ $(function () {
   }
 
   // ─────────────────────────────────────────────────────────────
-  // Lazy Loading Empty Pagelets
+  // Lazy Loading Empty Pagelets (concurrency-limited)
   // ─────────────────────────────────────────────────────────────
+
+  const PAGELET_MAX_CONCURRENT = 4
+  let pageletQueue = []
+  let pageletInFlight = 0
+
+  function drainPageletQueue () {
+    while (pageletInFlight < PAGELET_MAX_CONCURRENT && pageletQueue.length > 0) {
+      const pagelet = pageletQueue.shift()
+      pageletInFlight++
+      pagelet.load(pagelet.attr('data-pagelet-url'), function () {
+        pageletInFlight--
+        drainPageletQueue()
+      })
+    }
+  }
 
   function loadEmptyPagelets () {
     $('[data-pagelet-url]:not([data-pagelet-loaded])').each(function () {
@@ -237,8 +252,9 @@ $(function () {
       }
 
       pagelet.attr('data-pagelet-loaded', 'true')
-      reloadPagelet(pagelet)
+      pageletQueue.push(pagelet)
     })
+    drainPageletQueue()
   }
 
   // ─────────────────────────────────────────────────────────────
