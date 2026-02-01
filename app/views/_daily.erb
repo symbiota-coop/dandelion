@@ -2,14 +2,14 @@
 events = Event.live.public.browsable
   .and(:description.ne => nil)
   .and(:start_time.gte => @date, :start_time.lt => @date + 1)
-render_article("Today's events", "Create a two-paragraph summary of these event(s), happening today. IMPORTANT: Two paragraphs only.", events)
+render_article("Today's events", "Create a two-paragraph summary of these events, happening today. IMPORTANT: Two paragraphs only.", events)
 %>
 
 <%=
 events = Event.live.public.browsable
   .and(:end_time.gte => @date - 2, :end_time.lt => @date - 1)
   .reject { |event| event.event_feedbacks.empty? || event.event_feedbacks.all? { |ef| !ef.answers || ef.answers.map { |q,a| a.blank? }.all? } }
-render_article("Feedback report", "Create a two-paragraph summary of the feedback on these event(s). IMPORTANT: Two paragraphs only.", events, use_feedback: true)
+render_article("Feedback report", "Create a two-paragraph summary of the feedback on these events. IMPORTANT: Two paragraphs only.", events, use_feedback: true)
 %>
 
 <%=
