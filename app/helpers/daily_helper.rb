@@ -27,7 +27,7 @@ Dandelion::App.helpers do
 
       output << "# #{event.name}, #{event.when_details(ENV['DEFAULT_TIME_ZONE'])} at #{event.location}\n"
       output << "URL: #{ENV['BASE_URI']}/e/#{event.slug}\n\n"
-      output << (use_feedback ? event.event_feedbacks.joined(base_header: '#') : event.description)
+      output << (use_feedback ? event.event_feedbacks.joined(base_header: '#') : (event.description || ''))
       output << "\n\n"
     end
 
