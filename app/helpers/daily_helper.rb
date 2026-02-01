@@ -15,7 +15,7 @@ Dandelion::App.helpers do
     content.html_safe
   end
 
-  def generate_events_summary(prompt_prefix, events, use_feedback: false)
+  def generate_events_summary(prompt_prefix, events, use_feedback: false, general_instructions: 'Do not mention specific dates or times. Return well-formatted markdown. Do not use italics. Do not use headers. Link all event names using proper markdown syntax like [Event Name](URL).')
     output = ''
     seen_event_names = Set.new
 
@@ -31,7 +31,6 @@ Dandelion::App.helpers do
       output << "\n\n"
     end
 
-    general_instructions = 'Do not mention specific dates or times. Return well-formatted markdown. Do not use italics. Do not use headers. Link all event names using proper markdown syntax like [Event Name](URL).'
     prompt = %(#{prompt_prefix}\n\n#{general_instructions}\n\n#{output})
 
     result = OpenRouter.chat(prompt)

@@ -3,6 +3,8 @@ Dandelion::App.controller do
     halt 404 unless params[:near]
     params[:in_person] = true
 
+    @title = "Events near #{params[:near]}"
+
     @events = Event.live.public.browsable
     @from = params[:from] ? parse_date(params[:from]) : Date.today
     @to = params[:to] ? parse_date(params[:to]) : nil
