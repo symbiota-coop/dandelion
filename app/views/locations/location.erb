@@ -6,8 +6,13 @@
   </small>
 </h1>
 
-<div data-with-placeholder class="readable" data-pagelet-url="/locations/<%=@location.name%>">
-  <%= partial :placeholder, locals: { count: 1 } %>
+<% fragment = Fragment.find_by(key: "/locations/#{@location.name}") %>
+<div <% unless fragment %>data-with-placeholder<% end %> class="readable" data-pagelet-url="/locations/<%=@location.name%>">
+  <% if fragment %>
+    <%== fragment.value %>
+  <% else %>
+    <%= partial :placeholder, locals: { count: 1 } %>
+  <% end %>
 </div>
 
 <%= partial :'events/search_form', locals: { path: '/events' } %>
