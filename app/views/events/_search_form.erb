@@ -10,7 +10,7 @@
 
 
 <div class="mb-3">
-  <span class="d-inline-block mb-1">Popular locations:</span><% Location.order('order asc').each do |location| %>
+  <span>Popular locations:</span><% Location.order('order asc').each do |location| %>
     <a class="btn mb-1 <% if @location && @location == location %> btn-primary <% else %> btn-outline-primary <% end %> btn-xs" href="/locations/<%= location.name %>"><%= location.name %></a>
   <% end %>
 </div>
