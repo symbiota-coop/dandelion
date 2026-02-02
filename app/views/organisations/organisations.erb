@@ -17,6 +17,13 @@
   <%= hidden_field_tag :search, value: 1 %>
 <% end %>
 
+<%
+  view_options = [
+    { key: 'blocks', label: 'Blocks', icon: 'bi-grid-fill', active: !params[:display] || params[:display] == 'blocks' },
+    { key: 'network', label: 'Network', icon: 'bi-share', active: params[:display] == 'network' },
+    { key: 'map', label: 'Map', icon: 'bi-geo-alt-fill', active: params[:display] == 'map' }
+  ]
+%>
 <div class="row justify-content-between mb-3 mb-lg-0">
 
   <div class="col-12 col-sm">
@@ -25,30 +32,22 @@
       <li class="list-inline-item">
         <label class="mb-0">View as</label>
       </li>
-      <li class="list-inline-item">
-        <a class="btn <%='btn-outline-primary' if !params[:display] || params[:display] == 'blocks' %>" href="<%= path if defined?(path) %>?<%= q = Rack::Utils.parse_nested_query(request.query_string); q.delete('search'); q.delete('display'); q.merge({search: 1, display: 'blocks' }).to_query %>">
-          <i class="bi bi-grid-fill"></i> Blocks
-        </a>
-      </li>
-      <li class="list-inline-item">
-        <a class="btn <%='btn-outline-primary' if params[:display] == 'network' %>" href="<%= path if defined?(path) %>?<%= q = Rack::Utils.parse_nested_query(request.query_string); q.delete('search'); q.delete('display'); q.merge({search: 1, display: 'network' }).to_query %>">
-          <i class="bi bi-share"></i> Network
-        </a>
-      </li>
-      <li class="list-inline-item">
-        <a class="btn <%='btn-outline-primary' if params[:display] == 'map' %>" href="<%= path if defined?(path) %>?<%= q = Rack::Utils.parse_nested_query(request.query_string); q.delete('search'); q.delete('display'); q.merge({search: 1, display: 'map' }).to_query %>">
-          <i class="bi bi-geo-alt-fill"></i> Map
-        </a>
-      </li>
+      <% view_options.each do |opt| %>
+        <li class="list-inline-item">
+          <a class="btn <%= 'btn-outline-primary' if opt[:active] %>" href="<%= view_url(opt[:key], path: (path if defined?(path))) %>">
+            <i class="bi <%= opt[:icon] %>"></i> <%= opt[:label] %>
+          </a>
+        </li>
+      <% end %>
     </ul>
   </div>
 
   <% if !params[:display] || params[:display] == 'blocks' %>
     <div class="col-12 col-lg-auto">
-      <% form_tag (defined?(path) && path ? path : ''), method: 'get', class: 'form-inline submitOnChange' do %>
-        <% params.each { |k,v| next if %w[format search order slug].include?(k) %>
-        <%= hidden_field_tag k, value: v %>
-        <% } %>
+      <% form_tag (path if defined?(path)).to_s, method: 'get', class: 'form-inline submitOnChange' do %>
+        <% view_base_params.reject { |k, _| %w[search order slug].include?(k) }.each do |k, v| %>
+          <%= hidden_field_tag k, value: v %>
+        <% end %>
         <%= hidden_field_tag :search, value: 1 %>
         <label class="mr-sm-2">Sort by</label>
         <%= select_tag :order, options: { 'Most followers' => 'followers_count', 'Most recently created' => 'created_at' }, selected: params[:order], class: 'form-control' %>

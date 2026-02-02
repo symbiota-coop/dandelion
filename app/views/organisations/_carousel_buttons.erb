@@ -43,14 +43,8 @@
         new_carousel_ids = current_carousel_ids + [carousel.id.to_s]
       end
       
-      # Build query string preserving other query params (not route params)
-      # Parse query string manually for Sinatra
-      query_params = {}
-      if request.query_string
-        Rack::Utils.parse_nested_query(request.query_string).each do |key, value|
-          query_params[key] = value unless key == 'carousel_ids'
-        end
-      end
+      # Build query string preserving other params (not route params)
+      query_params = params.to_h.reject { |k, _| %w[captures format carousel_ids].include?(k) }
       
       # Build the href manually to handle multiple carousel_ids[] properly
       param_strings = []

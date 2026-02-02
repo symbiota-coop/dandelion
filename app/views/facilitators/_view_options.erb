@@ -34,6 +34,12 @@
     $(window).on('resize', handleViewOptionsTooltips);
   });
 </script>
+<%
+  view_options = [
+    { key: 'list', label: 'List', icon: 'bi-list-task', active: !params[:display].in?(%w[map calendar]) },
+    { key: 'map', label: 'Map', icon: 'bi-geo-alt-fill', active: params[:display] == 'map' }
+  ]
+%>
 <div class="row" id="view-options">
 
   <div class="col-12 col-lg-auto">
@@ -42,25 +48,22 @@
       <li class="list-inline-item">
         <label class="mb-0">View as</label>
       </li>
-      <li class="list-inline-item">
-        <a data-toggle="tooltip" title="List view" class="btn <%='btn-outline-primary' if !params[:display].in?(['map','calendar']) %>" href="<%= path if defined?(path) && path %>?<%= q = Rack::Utils.parse_nested_query(request.query_string); q.delete('search'); q.delete('display'); q.merge({search: 1, display: 'list' }).to_query %>">
-          <i class="bi bi-list-task"></i> <span class="d-none d-lg-inline">List</span>
-        </a>
-      </li>
-      <li class="list-inline-item">
-        <a data-toggle="tooltip" title="Map view" class="btn <%='btn-outline-primary' if params[:display] == 'map' %>" href="<%= path if defined?(path) && path %>?<%= q = Rack::Utils.parse_nested_query(request.query_string); q.delete('search'); q.delete('display'); q.merge({search: 1, display: 'map' }).to_query %>">
-          <i class="bi bi-geo-alt-fill"></i> <span class="d-none d-lg-inline">Map</span>
-        </a>
-      </li>
+      <% view_options.each do |opt| %>
+        <li class="list-inline-item">
+          <a data-toggle="tooltip" title="<%= opt[:label] %> view" class="btn <%= 'btn-outline-primary' if opt[:active] %>" href="<%= view_url(opt[:key], path: (path if defined?(path))) %>">
+            <i class="bi <%= opt[:icon] %>"></i> <span class="d-none d-lg-inline"><%= opt[:label] %></span>
+          </a>
+        </li>
+      <% end %>
     </ul>
   </div>
 
   <% if params[:display] != 'map' %>
     <div class="col-12 col-lg-auto">
-      <% form_tag (defined?(path) && path ? path : ''), method: 'get', class: 'form-inline submitOnChange' do %>
-        <% params.each { |k,v| next if %w[format search order slug].include?(k) %>
-        <%= hidden_field_tag k, value: v %>
-        <% } %>
+      <% form_tag (path if defined?(path)).to_s, method: 'get', class: 'form-inline submitOnChange' do %>
+        <% view_base_params.reject { |k, _| %w[search order slug].include?(k) }.each do |k, v| %>
+          <%= hidden_field_tag k, value: v %>
+        <% end %>
         <%= hidden_field_tag :search, value: 1 %>
       <% end %>
     </div>

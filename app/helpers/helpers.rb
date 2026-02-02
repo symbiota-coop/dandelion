@@ -72,4 +72,12 @@ Dandelion::App.helpers do
       [question, answer]
     end
   end
+
+  def view_base_params
+    params.to_h.reject { |k, _| %w[captures format search display].include?(k) }
+  end
+
+  def view_url(display, path: nil)
+    "#{path}?#{view_base_params.merge('search' => 1, 'display' => display).to_query}"
+  end
 end
