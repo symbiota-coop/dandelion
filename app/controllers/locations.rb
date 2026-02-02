@@ -2,9 +2,8 @@ Dandelion::App.controller do
   get '/locations/:name' do
     @location = Location.find_by(name: params[:name]) || not_found
 
+    @title = @location.name
     params[:near] = @location.query
-
-    @title = "Events near #{@location.name}"
 
     @events = Event.live.public.browsable
     @from = params[:from] ? parse_date(params[:from]) : Date.today
