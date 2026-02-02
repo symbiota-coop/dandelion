@@ -44,7 +44,7 @@
       end
       
       # Build query string preserving other params (not route params)
-      query_params = params.to_h.reject { |k, _| %w[captures format carousel_ids].include?(k) }
+      query_params = params.to_h.reject { |k, v| %w[captures format carousel_ids].include?(k) || v == 'false' }
       
       # Build the href manually to handle multiple carousel_ids[] properly
       param_strings = []
