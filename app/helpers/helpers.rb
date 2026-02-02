@@ -74,7 +74,7 @@ Dandelion::App.helpers do
   end
 
   def view_base_params
-    params.to_h.reject { |k, v| %w[captures format search display].include?(k) || v == 'false' }
+    params.to_h.reject { |k, v| %w[captures format search name display].include?(k) || v == 'false' }
   end
 
   def view_url(display, path: nil)
