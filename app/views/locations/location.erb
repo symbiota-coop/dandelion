@@ -1,17 +1,17 @@
 <h1 class="mb-3">
-  <%= params[:near] %>
+  <%= @location.name %>
   <br />
   <small class="text-muted" style="font-size: 70%;">
-    Check out <%= pluralize(@events.count, 'upcoming event') %> near <%= params[:near] %> on Dandelion
+    Check out <%= pluralize(@events.count, 'upcoming event') %> near <%= @location.query %> on Dandelion
   </small>
 </h1>
 
-<div data-with-placeholder class="readable" data-pagelet-url="/near/<%=CGI.escape(params[:near])%>">
-  <%= partial :'events/blocks_placeholder' %>
+<div data-with-placeholder class="readable" data-pagelet-url="/locations/<%=@location.name%>">
+  <%= partial :placeholder, locals: { count: 1 } %>
 </div>
 
 <%= partial :'events/search_form', locals: { path: '/events' } %>
 
-<div data-with-placeholder data-pagelet-url="/events?near=<%=CGI.escape(params[:near])%>">
+<div data-with-placeholder data-pagelet-url="/events?near=<%=CGI.escape(@location.query)%>">
   <%= partial :'events/blocks_placeholder' %>
 </div>

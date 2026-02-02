@@ -8,11 +8,18 @@
   })
 </script>
 
-<% if params[:display].in?(['map', 'calendar']) %>
+
+<div class="mb-3">
+  Popular locations:<% Location.order('order asc').each do |location| %>
+    <a class="btn <% if @location && @location == location %> btn-primary <% else %> btn-outline-primary <% end %> btn-xs" href="/locations/<%= location.name %>"><%= location.name %></a>
+  <% end %>
+</div>
+
+<% if params[:display].in?(['map', 'calendar']) || @location %>
   <%= partial :'events/toggle_search_well' %>
 <% end %>
 
-<div class="search well" style="<%= 'display: none;' if params[:display].in?(['map', 'calendar']) %>">
+<div class="search well" style="<%= 'display: none;' if params[:display].in?(['map', 'calendar']) || @location %>">
 
   <% form_tag '/events', method: 'get', class: 'submitOnChange searchForm mb-3', id: 'events-search-form' do %>
     <%= hidden_field_tag :display, value: params[:display] %>

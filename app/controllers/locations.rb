@@ -1,9 +1,11 @@
 Dandelion::App.controller do
-  get '/near/:near' do
-    halt 404 unless params[:near]
+  get '/locations/:name' do
+    @location = Location.find_by(name: params[:name]) || not_found
+
+    params[:near] = @location.query
     params[:in_person] = true
 
-    @title = "Events near #{params[:near]}"
+    @title = "Events near #{@location.name}"
 
     @events = Event.live.public.browsable
     @from = params[:from] ? parse_date(params[:from]) : Date.today
@@ -14,7 +16,7 @@ Dandelion::App.controller do
     @events = @events.and(:start_time.lt => @to + 1) if @to
 
     if request.xhr?
-      cp(:'locations/location', key: "/locations/#{params[:near]}")
+      cp(:'locations/location', key: "/locations/#{@location.name}", expires: 1.day.from_now)
     else
       erb :'locations/location'
     end
