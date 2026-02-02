@@ -1,5 +1,7 @@
 <p class="lead">Dandelion is a <a href="https://fair.io/">fair source</a> project. <a target="_blank" href="https://github.com/symbiota-coop/dandelion">View the code on Github</a></p>
 
+<%= partial :'code/network' %>
+
 <% 
 client = Octokit::Client.new(access_token: ENV['GITHUB_ACCESS_TOKEN'])
 
@@ -55,5 +57,3 @@ end
 <div class="text-center mb-5">
   <%= will_paginate commits, page_links: false, renderer: WillPaginate::ViewHelpers::BootstrapRenderer %>
 </div>
-
-<%= partial :'code/network' %>
