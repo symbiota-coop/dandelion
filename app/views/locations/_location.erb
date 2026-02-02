@@ -1,5 +1,5 @@
 <%== md generate_events_summary(
   "Create a summary of these events, happening in #{params[:near]}, in one paragraph of three sentences. Don't mention specific events, just give a general sense of the vibe.",
-  @events.first(20),
+  @events.sample(20),
   general_instructions: 'Return well-formatted markdown. Do not use italics. Do not use headers.'
   ) %>
