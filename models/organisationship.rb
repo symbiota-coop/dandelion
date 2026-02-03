@@ -123,17 +123,28 @@ class Organisationship
 
   attr_accessor :skip_welcome
 
+  def associate_with_relevant_local_groups!
+    return unless account.coordinates
+
+    relevant_local_groups.each { |local_group| local_group.local_groupships.find_or_create_by(account: account).set(unsubscribed: false) }
+  end
+
+  def relevant_local_groups
+    organisation.local_groups.geo_spatial(:polygons.intersects_point => account.coordinates)
+  end
+
   after_create do
-    relevant_local_groups.each { |local_group| local_group.local_groupships.create account: account } if account.coordinates
     account.set(organisation_ids_cache: ((account.organisation_ids_cache || []) + [organisation.id]).uniq)
     # Update account's subscribed/unsubscribed organisation caches
     if unsubscribed
       account.set(unsubscribed_organisation_ids_cache: ((account.unsubscribed_organisation_ids_cache || []) + [organisation.id]).uniq)
     else
       account.set(subscribed_organisation_ids_cache: ((account.subscribed_organisation_ids_cache || []) + [organisation.id]).uniq)
+      associate_with_relevant_local_groups!
     end
     # Refresh organisations IDs in notification cache
     account.account_notification_cache&.refresh_organisations_ids!
+    send_welcome unless skip_welcome
   end
 
   after_destroy do
@@ -144,14 +155,6 @@ class Organisationship
     account.set(unsubscribed_organisation_ids_cache: (account.unsubscribed_organisation_ids_cache || []) - [organisation.id])
     # Refresh organisations IDs in notification cache
     account.account_notification_cache&.refresh_organisations_ids!
-  end
-
-  def relevant_local_groups
-    organisation.local_groups.geo_spatial(:polygons.intersects_point => account.coordinates)
-  end
-
-  after_create do
-    send_welcome unless skip_welcome
   end
 
   after_save do
@@ -305,6 +308,7 @@ class Organisationship
     else
       account.set(unsubscribed_organisation_ids_cache: (account.unsubscribed_organisation_ids_cache || []) - [organisation.id])
       account.set(subscribed_organisation_ids_cache: ((account.subscribed_organisation_ids_cache || []) + [organisation.id]).uniq)
+      associate_with_relevant_local_groups!
     end
   end
 

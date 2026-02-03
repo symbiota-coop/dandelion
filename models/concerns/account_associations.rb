@@ -183,41 +183,29 @@ module AccountAssociations
   end
 
   def associate_with_organisation!(organisation, options = {})
-    organisationship = organisation.organisationships.create(
+    organisation.organisationships.create(
       account: self,
       skip_welcome: options[:skip_welcome],
       referrer_id: options[:referrer_id]
     )
-    organisation.organisationships.find_by(account: self).set_unsubscribed!(false)
+    organisationship = organisation.organisationships.find_by(account: self)
+    organisationship.set_unsubscribed!(false)
     organisationship
   end
 
   def associate_with_activity!(activity)
-    activity.organisation.organisationships.create(account: self)
-    activity.organisation.organisationships.find_by(account: self).set_unsubscribed!(false)
-    activity.activityships.create(account: self)
-    activity.activityships.find_by(account: self).set(unsubscribed: false)
+    activity.organisation.organisationships.find_or_create_by(account: self).set_unsubscribed!(false)
+    activity.activityships.find_or_create_by(account: self).set(unsubscribed: false)
   end
 
   def associate_with_local_group!(local_group)
-    local_group.organisation.organisationships.create(account: self)
-    local_group.organisation.organisationships.find_by(account: self).set_unsubscribed!(false)
-    local_group.local_groupships.create(account: self)
-    local_group.local_groupships.find_by(account: self).set(unsubscribed: false)
+    local_group.organisation.organisationships.find_or_create_by(account: self).set_unsubscribed!(false)
+    local_group.local_groupships.find_or_create_by(account: self).set(unsubscribed: false)
   end
 
   def associate_with_event!(event)
-    event.organisation.organisationships.create(account: self)
-    event.organisation.organisationships.find_by(account: self).set_unsubscribed!(false)
-    # rubocop:disable Style/GuardClause
-    if event.activity
-      event.activity.activityships.create(account: self)
-      event.activity.activityships.find_by(account: self).set(unsubscribed: false)
-    end
-    if event.local_group
-      event.local_group.local_groupships.create(account: self)
-      event.local_group.local_groupships.find_by(account: self).set(unsubscribed: false)
-    end
-    # rubocop:enable Style/GuardClause
+    event.organisation.organisationships.find_or_create_by(account: self).set_unsubscribed!(false)
+    event.activity.activityships.find_or_create_by(account: self).set(unsubscribed: false) if event.activity
+    event.local_group.local_groupships.find_or_create_by(account: self).set(unsubscribed: false) if event.local_group
   end
 end
