@@ -5,7 +5,7 @@ class Location
 
   field :name, type: String
   field :query, type: String
-  field :order, type: Integer
+  field :events_count, type: Integer
 
   validates_uniqueness_of :name
 
@@ -13,7 +13,7 @@ class Location
     {
       name: :text,
       query: :text,
-      order: :number
+      events_count: :number
     }
   end
 end

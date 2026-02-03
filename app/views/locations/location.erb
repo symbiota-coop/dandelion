@@ -1,10 +1,4 @@
-<h1 class="mb-3">
-  <%= @location.name %>
-  <br />
-  <small class="text-muted" style="font-size: 70%;">
-    Check out <%= pluralize(@events.count, 'upcoming event') %> near <%= @location.query %> on Dandelion
-  </small>
-</h1>
+<%= cp :'locations/header', locals: { location: @location, events: @events } %>
 
 <% fragment = Fragment.find_by(key: "/locations/#{@location.name}") %>
 <div <% unless fragment %>data-with-placeholder<% end %> class="readable" data-pagelet-url="/locations/<%=@location.name%>">
