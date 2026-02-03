@@ -18,11 +18,9 @@ class Organisationship
   field :monthly_donation_postcode, type: String
   field :monthly_donation_annual, type: Boolean
   field :coordinates, type: Array
-  field :why_i_joined, type: String
-  field :why_i_joined_edited, type: String
   field :notes, type: String
 
-  %w[admin unsubscribed hide_membership receive_feedback why_i_joined_public sent_welcome sent_monthly_donation_welcome hide_referrer].each do |b|
+  %w[admin unsubscribed hide_membership receive_feedback sent_welcome sent_monthly_donation_welcome hide_referrer].each do |b|
     field b.to_sym, type: Boolean
   end
 
@@ -69,10 +67,7 @@ class Organisationship
       monthly_donation_currency: :text,
       monthly_donation_method: :select,
       monthly_donation_start_date: :date,
-      monthly_donation_postcode: :text,
-      why_i_joined: :text_area,
-      why_i_joined_public: :check_box,
-      why_i_joined_edited: :text_area
+      monthly_donation_postcode: :text
     }
   end
 
