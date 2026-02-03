@@ -88,7 +88,7 @@
       <div class="input-group-prepend">
         <span class="input-group-text">Limit per order</span>
       </div>
-      <% max_quantity_tooltip = 'Maximum number of tickets of this type someone can purchase in a single order' %>
+      <% max_quantity_tooltip = 'Maximum number of tickets of this type someone can purchase in a single order. (Entering 0 makes the ticket type appear sold out)' %>
       <%= form_or_tag_field(form, :number_field, :max_quantity_per_transaction, class: 'form-control', 'data-toggle': 'tooltip', title: max_quantity_tooltip, min: 0) %>
     </div>
   </div>
