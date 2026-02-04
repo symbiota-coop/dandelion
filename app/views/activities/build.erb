@@ -30,7 +30,7 @@
   <%= f.url_block :website %>
   <%= f.email_block :email %>
   <%= f.image_block :image %>
-  <%= partial :'activities/tags', locals: { f: f } %>
+  <%= partial :tags_select, locals: { object: @activity, tag_class: ActivityTag } %>
   <%= f.check_box_block :locked %>
   <div class="mb-2">
     <%= f.select_block :privacy %>

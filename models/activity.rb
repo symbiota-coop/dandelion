@@ -9,6 +9,9 @@ class Activity
   include SendFollowersCsv
   include ImageWithValidation
   include Searchable
+  include Taggable
+
+  taggable tagships: :activity_tagships, tag_class: ActivityTag
 
   belongs_to_without_parent_validation :organisation, index: true
   belongs_to_without_parent_validation :account, index: true, optional: true
@@ -104,25 +107,6 @@ class Activity
   end
 
   has_many :activity_tagships, dependent: :destroy
-  attr_accessor :tag_names
-
-  after_save :update_activity_tags
-  def update_activity_tags
-    @tag_names ||= ''
-    @tag_names_a = @tag_names.split(',')
-    current_tag_names = activity_tagships.map(&:activity_tag_name)
-    tags_to_remove = current_tag_names - @tag_names_a
-    tags_to_add = @tag_names_a - current_tag_names
-    tags_to_remove.each do |name|
-      activity_tag = ActivityTag.find_by(name: name)
-      activity_tagships.find_by(activity_tag: activity_tag).destroy
-    end
-    tags_to_add.each do |name|
-      if (activity_tag = ActivityTag.find_or_create_by(name: name)).persisted?
-        activity_tagships.create(activity_tag: activity_tag)
-      end
-    end
-  end
 
   validates_presence_of :name, :slug
   validates_uniqueness_of :slug, scope: :organisation_id

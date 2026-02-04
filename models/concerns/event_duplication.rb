@@ -43,7 +43,7 @@ module EventDuplication
       coordinator: coordinator,
       revenue_sharer: revenue_sharer,
       organiser: (organiser || account unless revenue_sharer),
-      tag_names: event_tags.pluck(:name).join(','),
+      tag_names: event_tags.pluck(:name),
       add_a_donation_to: add_a_donation_to,
       donation_text: donation_text,
       carousel_text: carousel_text,

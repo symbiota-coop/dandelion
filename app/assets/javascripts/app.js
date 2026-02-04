@@ -19,6 +19,8 @@ function initQuestionsPreview (inputSelector, previewUrl) {
 
 $(function () {
 
+  $.fn.select2.defaults.set('theme', 'bootstrap4')
+
   function ajaxCompleted () {
 
     function styleSelectElement (select) {
@@ -183,7 +185,7 @@ $(function () {
       $('a[href^=http]', this).attr('target', '_blank')
     })
 
-    $('input[type=hidden].lookup').not('[data-lookup-initialized]').attr('data-lookup-initialized', true).each(function () {
+    $('select.lookup').not('[data-lookup-initialized]').attr('data-lookup-initialized', true).each(function () {
       $(this).lookup({
         lookup_url: $(this).attr('data-lookup-url'),
         placeholder: $(this).attr('placeholder'),

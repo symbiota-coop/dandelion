@@ -4,7 +4,7 @@
   <% form_for @carousel, @carousel.new_record? ? "/o/#{@organisation.slug}/carousels/new" : "/o/#{@organisation.slug}/carousels/#{@carousel.id}/edit", multipart: true do |f| %>
     <%= f.text_block :name %>
     <%= f.number_block :weeks %>
-    <%= partial :'carousels/tags', locals: { f: f } %>
+    <%= partial :tags_select, locals: { object: @carousel, tag_class: EventTag } %>
     <%= f.check_box_block :button %>
     <%= f.check_box_block :hidden %>
     <%= f.submit_block destroy_url: "/o/#{@organisation.slug}/carousels/#{@carousel.id}/destroy" %>

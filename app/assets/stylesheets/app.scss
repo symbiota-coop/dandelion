@@ -2,6 +2,10 @@
 @import "../infinite_admin/scss/style";
 @import "event_details";
 
+.select2-container--bootstrap4 .select2-selection--single .select2-selection__placeholder {
+  font-weight: 400
+}
+
 @media (prefers-reduced-motion: reduce) {
   @view-transition {
     navigation: none;

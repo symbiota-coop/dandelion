@@ -20,6 +20,11 @@
         }
       })
 
+    $("[name='account[country]']").select2({
+      placeholder: 'Country',
+      allowClear: true
+    })
+
     })
   </script>
   <div class="card-body">
@@ -31,7 +36,9 @@
       <% } %>
       <%= text_field_tag :'account[name]', class: 'form-control mr-1 mb-1', required: true, placeholder: 'Name' %>
       <%= email_field_tag :'account[email]', class: 'form-control mr-1 mb-1', required: true, placeholder: 'Email' %>
-      <div class="g-recaptcha" style="margin-bottom: 2px" data-sitekey="<%= ENV['RECAPTCHA_SITE_KEY'] %>"></div>
+      <%= text_field_tag :'account[postcode]', class: 'form-control mr-1 mb-1', required: true, placeholder: 'Postcode' %>
+      <%= select_tag :'account[country]', class: 'mr-1', required: true, placeholder: 'Country', options: Account.countries %>
+      <div class="g-recaptcha" style="margin-bottom: 5px" data-sitekey="<%= ENV['RECAPTCHA_SITE_KEY'] %>"></div>
       <%= submit_tag 'Subscribe', class: 'btn d-block d-lg-inline btn-primary mb-1' %>
     <% end %>
   </div>

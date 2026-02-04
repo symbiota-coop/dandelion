@@ -65,7 +65,7 @@ end
     if ($('#pmail_to_option option').length == 1)
       $('#pmail_to_option').hide().after('<input class="form-control" type="text" disabled value="' + $('#pmail_to_option option:selected').text() + '">')
     else
-      $("#pmail_to_option").removeClass('form-control').css('width', '100%').select2();
+      $("#pmail_to_option").select2();
   })
 </script>
 

@@ -1,47 +1,53 @@
 (function ($) {
   $.fn.lookup = function (options) {
-    const settings = { lookup_url: null, placeholder: null, rtype: null, id_param: null }
-
     return this.each(function () {
-      if (options) {
-        $.extend(settings, options)
+      var $el = $(this)
+      var initialId = $el.find('option:selected').val()
+
+      // If there's an initial value, fetch its display text from the server (like v3 initSelection)
+      if (initialId && initialId !== '') {
+        var $option = $el.find('option:selected')
+        $option.text('Loading...')
+        var data = {}
+        data[(options.id_param || $el.attr('name'))] = initialId
+        data.rtype = options.rtype
+        $.getJSON(options.lookup_url, data, function (response) {
+          var result = response.results.filter(function (r) {
+            return r.id == initialId
+          })[0]
+          $option.text(result ? result.text : initialId)
+          initSelect2()
+        }).fail(function () {
+          $option.text(initialId) // Show ID as fallback
+          initSelect2()
+        })
+      } else {
+        initSelect2()
       }
 
-      $(this).select2({
-        placeholder: options.placeholder,
-        allowClear: true,
-        minimumInputLength: 1,
-        width: '100%',
-        ajax: {
-          url: options.lookup_url,
-          dataType: 'json',
-          data: function (term) {
-            return {
-              q: term,
-              rtype: options.rtype
+      function initSelect2 () {
+        $el.select2({
+          placeholder: options.placeholder,
+          allowClear: true,
+          minimumInputLength: 1,
+          ajax: {
+            url: options.lookup_url,
+            dataType: 'json',
+            delay: 250,
+            data: function (params) {
+              return {
+                q: params.term,
+                rtype: options.rtype
+              }
+            },
+            processResults: function (data) {
+              return { results: data.results }
             }
-          },
-          results: function (data) {
-            return { results: data.results }
           }
-        },
-        initSelection: function (element, callback) {
-          const id = $(element).val()
-          if (id !== '') {
-            const data = {}
-            data[(options.id_param || $(element).attr('name'))] = id
-            data.rtype = options.rtype
-            $.getJSON(options.lookup_url, data, function (data) {
-              const result = data.results.filter(function (result) {
-                return result.id == id
-              })[0]
-              callback(result)
-            })
-          }
-        }
-      })
+        })
+      }
 
-      $(this).addClass('lookupd')
+      $el.addClass('lookupd')
     })
   }
 })(jQuery)

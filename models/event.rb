@@ -18,6 +18,9 @@ class Event
   include EventAccessControl
   include EventAtproto
   include Geocoded
+  include Taggable
+
+  taggable tagships: :event_tagships, tag_class: EventTag, update_flag: true, store_field: :event_tag_names
   include ImageWithValidation
   include Searchable
 
@@ -274,28 +277,6 @@ class Event
       end
     end
     cal
-  end
-
-  after_save :update_event_tags
-  def update_event_tags
-    return unless @update_tag_names
-
-    @tag_names ||= ''
-    @tag_names_a = @tag_names.split(',').map { |tag_name| tag_name.strip }
-    current_tag_names = event_tagships.map(&:event_tag_name)
-    tags_to_remove = current_tag_names - @tag_names_a
-    tags_to_add = @tag_names_a - current_tag_names
-    tags_to_remove.each do |name|
-      event_tag = EventTag.find_by(name: name)
-      event_tagships.find_by(event_tag: event_tag).destroy
-    end
-    tags_to_add.each do |name|
-      if (event_tag = EventTag.find_or_create_by(name: name)).persisted?
-        event_tagships.create(event_tag: event_tag)
-      end
-    end
-
-    set(event_tag_names: event_tagships(true).map(&:event_tag_name))
   end
 
   after_save :ai_tag

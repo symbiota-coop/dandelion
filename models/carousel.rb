@@ -2,6 +2,9 @@ class Carousel
   include Mongoid::Document
   include Mongoid::Timestamps
   include CoreExtensions
+  include Taggable
+
+  taggable tagships: :carouselships, tag_class: EventTag
 
   belongs_to_without_parent_validation :organisation, index: true
 
@@ -44,8 +47,6 @@ class Carousel
 
   has_many :carouselships, dependent: :destroy
 
-  attr_accessor :tag_names
-
   before_validation do
     self.weeks = 8 unless weeks
   end
@@ -56,24 +57,6 @@ class Carousel
 
   def event_tag_ids
     carouselships.pluck(:event_tag_id)
-  end
-
-  after_save :update_event_tags
-  def update_event_tags
-    @tag_names ||= ''
-    @tag_names_a = @tag_names.split(',').map { |tag_name| tag_name.strip }
-    current_tag_names = carouselships.map(&:event_tag_name)
-    tags_to_remove = current_tag_names - @tag_names_a
-    tags_to_add = @tag_names_a - current_tag_names
-    tags_to_remove.each do |name|
-      event_tag = EventTag.find_by(name: name)
-      carouselships.find_by(event_tag: event_tag).destroy
-    end
-    tags_to_add.each do |name|
-      if (event_tag = EventTag.find_or_create_by(name: name)).persisted?
-        carouselships.create(event_tag: event_tag)
-      end
-    end
   end
 
   def events(minimal: false)

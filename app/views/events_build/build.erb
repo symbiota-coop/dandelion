@@ -93,7 +93,7 @@
         <%= f.email_block :email %>
         <%= f.image_block :image %>
         <%= f.url_block :facebook_event_url %>
-        <%= partial :'events_build/tags', locals: { f: f } %>
+        <%= partial :tags_select, locals: { object: @event, tag_class: EventTag, update_flag: true } %>
         <%= f.lookup_block :coordinator_id, lookup_url: '/accounts.json', placeholder: 'Search accounts', selected_link: (%(<a class="d-inline-block mt-1" target="_blank" href="/u/#{@event.coordinator.username}">View account</a>) if @event.coordinator) %>
         <% if Padrino.env == :development || @event.organisation.experimental? %>
           <%= f.lookup_block :organiser_id, lookup_url: '/accounts.json', placeholder: 'Search accounts', selected_link: (%(<a class="d-inline-block mt-1" target="_blank" href="/u/#{@event.organiser.username}">View account</a>) if @event.organiser_id) %>

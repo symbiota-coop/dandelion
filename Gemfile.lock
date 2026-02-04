@@ -33,9 +33,9 @@ GIT
 
 GIT
   remote: https://github.com/stephenreid321/activate-tools.git
-  revision: 39182486cbd3f1910633b6bdeeaa37e0076596a5
+  revision: 2b739ecef619fc5b935c7db5dfa1d19e18662ebf
   specs:
-    activate-tools (0.0.26)
+    activate-tools (0.0.28)
       padrino
 
 GIT
