@@ -6,6 +6,11 @@
   font-weight: 400
 }
 
+.select2-container--bootstrap4 .select2-selection__clear {
+  line-height: .65em;
+  margin-top: .8em;
+}
+
 @media (prefers-reduced-motion: reduce) {
   @view-transition {
     navigation: none;

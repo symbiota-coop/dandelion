@@ -38,8 +38,8 @@
       <%= text_field_tag :'account[name]', class: 'form-control mr-1 mb-1', required: true, placeholder: 'Name' %>
       <%= email_field_tag :'account[email]', class: 'form-control mr-1 mb-1', required: true, placeholder: 'Email' %>
       <%= text_field_tag :'account[postcode]', class: 'form-control mr-1 mb-1', required: true, placeholder: 'Postcode' %>
-      <%= select_tag :'account[country]', class: 'mr-1', required: true, placeholder: 'Country', options: Account.countries %>
-      <div class="g-recaptcha" style="margin-bottom: 5px" data-sitekey="<%= ENV['RECAPTCHA_SITE_KEY'] %>"></div>
+      <%= select_tag :'account[country]', class: 'mr-1', required: true, placeholder: 'Country', options: (['',''] + Account.countries) %>
+      <div class="g-recaptcha" style="margin-bottom: 4px" data-sitekey="<%= ENV['RECAPTCHA_SITE_KEY'] %>"></div>
       <%= submit_tag 'Subscribe', class: 'btn d-block d-lg-inline btn-primary mb-1' %>
     <% end %>
   </div>
