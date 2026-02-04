@@ -24,7 +24,10 @@
       }
     }).on('select2:select', function(e) {
       // Move newly selected item to the end
-      var $option = $(this).find('option[value="' + e.params.data.id + '"]');
+      var id = e.params.data.id;
+      var $option = $(this).find('option').filter(function () {
+        return this.value === id;
+      });
       $option.detach().appendTo($(this));
       $(this).trigger('change.select2');
     });
