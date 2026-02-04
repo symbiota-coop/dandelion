@@ -112,7 +112,7 @@ module EventNotifications
     event = self
     batch_message.from ENV['NOTIFICATIONS_EMAIL_FULL']
     batch_message.reply_to(event.email || event.organisation.try(:reply_to))
-    batch_message.subject "Tickets available for #{event.name}"
+    batch_message.subject "Tickets now available for #{event.name}"
     batch_message.body_html EmailHelper.html(:waitlist_tickets_available, event: event)
 
     waiters.and(unsubscribed: false).each do |account|

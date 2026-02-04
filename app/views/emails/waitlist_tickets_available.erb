@@ -2,8 +2,8 @@
   <p>Hi %recipient.firstname%,</p>
 
   <p>
-    Good news! Tickets are now available for <a href="<%= ENV['BASE_URI'] %>/e/<%= event.slug %>"><%=event.name %></a>.
-    Book now before it sells out again.
+    You previously joined the waitlist for <a href="<%= ENV['BASE_URI'] %>/e/<%= event.slug %>"><%=event.name %></a>.
+    Well, good news! Tickets are now available. <a href="<%= ENV['BASE_URI'] %>/e/<%= event.slug %>">Book now before it sells out again</a>.
   </p>
 
   <p class="action">
