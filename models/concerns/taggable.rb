@@ -4,6 +4,7 @@ module Taggable
   class_methods do
     def taggable(tagships:, tag_class:, update_flag: false, store_field: nil)
       attr_accessor :tag_names
+      attr_accessor :update_tag_names if update_flag
 
       after_save :update_tags
 

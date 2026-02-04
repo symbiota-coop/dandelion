@@ -4,7 +4,7 @@ module EventFields
   included do
     include EmailFields
 
-    attr_accessor :prevent_notifications, :update_tag_names, :tag_names, :duplicate
+    attr_accessor :prevent_notifications, :duplicate
 
     field :name, type: String
     field :slug, type: String
