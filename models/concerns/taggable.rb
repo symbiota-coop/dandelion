@@ -4,6 +4,7 @@ module Taggable
   class_methods do
     def taggable(tagships:, tag_class:, update_flag: false, store_field: nil)
       attr_accessor :tag_names
+
       attr_accessor :update_tag_names if update_flag
 
       after_save :update_tags
@@ -24,7 +25,8 @@ module Taggable
         return if taggable_config[:update_flag] && !@update_tag_names
 
         @tag_names ||= []
-        new_tag_names = @tag_names.flatten.map(&:strip).reject(&:blank?)
+        @tag_names = @tag_names.split(',') if @tag_names.is_a?(String)
+        new_tag_names = @tag_names.map(&:strip).reject(&:blank?)
         current_tag_names = send(taggable_config[:tagships]).map(&taggable_config[:tag_name_method])
         tags_to_remove = current_tag_names - new_tag_names
         tags_to_add = new_tag_names - current_tag_names
@@ -39,9 +41,9 @@ module Taggable
           send(taggable_config[:tagships]).create(taggable_config[:tag_class].name.underscore => tag) if tag.persisted?
         end
 
-        if taggable_config[:store_field]
-          set(taggable_config[:store_field] => send(taggable_config[:tagships], true).map(&taggable_config[:tag_name_method]))
-        end
+        return unless taggable_config[:store_field]
+
+        set(taggable_config[:store_field] => send(taggable_config[:tagships], true).map(&taggable_config[:tag_name_method]))
       end
 
       define_method(:tag_names_for_form) do
