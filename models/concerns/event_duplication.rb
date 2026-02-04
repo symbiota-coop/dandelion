@@ -44,6 +44,7 @@ module EventDuplication
       revenue_sharer: revenue_sharer,
       organiser: (organiser || account unless revenue_sharer),
       tag_names: event_tags.pluck(:name),
+      update_tag_names: true,
       add_a_donation_to: add_a_donation_to,
       donation_text: donation_text,
       carousel_text: carousel_text,
