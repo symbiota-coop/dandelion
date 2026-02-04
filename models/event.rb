@@ -252,6 +252,15 @@ class Event
     end
   end
 
+  def refresh_sold_out_cache_and_notify_waitlist
+    was_sold_out = sold_out_cache.nil? ? sold_out? : sold_out_cache
+    now_sold_out = sold_out?
+    clear_cache
+    set(sold_out_cache: now_sold_out)
+    set(sold_out_due_to_sales_end_cache: sold_out_due_to_sales_end?)
+    send_waitlist_tickets_available if was_sold_out && !now_sold_out
+  end
+
   def ical(order: nil)
     event = self
     cal = Icalendar::Calendar.new

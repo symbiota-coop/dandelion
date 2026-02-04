@@ -1,0 +1,12 @@
+<div class="main">
+  <p>Hi %recipient.firstname%,</p>
+
+  <p>
+    Good news! Tickets are now available for <a href="<%= ENV['BASE_URI'] %>/e/<%= event.slug %>"><%=event.name %></a>.
+    Book now before it sells out again.
+  </p>
+
+  <p class="action">
+    <a href="<%= ENV['BASE_URI'] %>/e/<%= event.slug %>">Get tickets</a>
+  </p>
+</div>

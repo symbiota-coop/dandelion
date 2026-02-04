@@ -65,7 +65,8 @@ Dandelion::App.controller do
     @ticket = Ticket.find(params[:id]) || not_found
     halt 403 unless @ticket.account == current_account
     @event = @ticket.event
-    @ticket.set(made_available_at: @ticket.made_available_at ? nil : Time.now)
+    @ticket.made_available_at = @ticket.made_available_at ? nil : Time.now
+    @ticket.save
     redirect back
   end
 
