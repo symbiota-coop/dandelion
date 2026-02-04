@@ -2,12 +2,10 @@ module Taggable
   extend ActiveSupport::Concern
 
   class_methods do
-    def taggable(tagships:, tag_class:, update_flag: false)
+    def taggable(tagships:, tag_class:)
       field :tag_names_cache, type: Array
 
-      attr_accessor :tag_names
-
-      attr_accessor :update_tag_names if update_flag
+      attr_accessor :tag_names, :update_tag_names
 
       after_save :update_tags
 
@@ -17,13 +15,12 @@ module Taggable
         {
           tagships: tagships,
           tag_class: tag_class,
-          tag_name_method: tag_name_method,
-          update_flag: update_flag
+          tag_name_method: tag_name_method
         }
       end
 
       define_method(:update_tags) do
-        return if taggable_config[:update_flag] && !@update_tag_names
+        return unless @update_tag_names
 
         @tag_names ||= []
         @tag_names = @tag_names.split(',') if @tag_names.is_a?(String)
