@@ -29,6 +29,7 @@ class OpenRouter
     @client = Faraday.new(url: BASE_URL) do |conn|
       conn.request :json
       conn.response :json
+      conn.request :retry, max: 3, interval: 0.5, backoff_factor: 2, retry_statuses: [429, 500, 502, 503, 504]
       conn.adapter Faraday.default_adapter
     end
   end
@@ -73,14 +74,21 @@ class OpenRouter
       }
     end
 
-    response = api_post('/api/v1/chat/completions', payload)
+    result = nil
+    3.times do
+      response = api_post('/api/v1/chat/completions', payload)
 
-    if full_response
-      response.body
-    else
-      r = response.body.dig('choices', 0, 'message', 'content')
-      schema ? JSON.parse(r) : r
+      if full_response
+        result = response.body
+      else
+        r = response.body.dig('choices', 0, 'message', 'content')
+        result = schema ? JSON.parse(r) : r
+      end
+
+      break if result
     end
+
+    result
   end
 
   def embedding(input, full_response: false, model: 'google/gemini-embedding-001')

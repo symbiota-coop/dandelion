@@ -34,6 +34,7 @@ Dandelion::App.helpers do
     prompt = %(#{prompt_prefix}\n\n#{general_instructions}\n\n#{output})
 
     result = OpenRouter.chat(prompt)
+    return '' if result.nil?
 
     # Remove first paragraph if starts with 'Here' or ends with a colon
     paragraphs = result.split("\n\n")
