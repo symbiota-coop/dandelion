@@ -2,7 +2,9 @@ module Taggable
   extend ActiveSupport::Concern
 
   class_methods do
-    def taggable(tagships:, tag_class:, update_flag: false, store_field: nil)
+    def taggable(tagships:, tag_class:, update_flag: false)
+      field :tag_names_cache, type: Array
+
       attr_accessor :tag_names
 
       attr_accessor :update_tag_names if update_flag
@@ -16,8 +18,7 @@ module Taggable
           tagships: tagships,
           tag_class: tag_class,
           tag_name_method: tag_name_method,
-          update_flag: update_flag,
-          store_field: store_field
+          update_flag: update_flag
         }
       end
 
@@ -41,13 +42,19 @@ module Taggable
           send(taggable_config[:tagships]).create(taggable_config[:tag_class].name.underscore => tag) if tag.persisted?
         end
 
-        return unless taggable_config[:store_field]
-
-        set(taggable_config[:store_field] => send(taggable_config[:tagships], true).map(&taggable_config[:tag_name_method]))
+        set(tag_names_cache: send(taggable_config[:tagships], true).map(&taggable_config[:tag_name_method]))
       end
 
       define_method(:tag_names_for_form) do
         tag_names.presence || send(taggable_config[:tagships]).map(&taggable_config[:tag_name_method])
+      end
+
+      define_method(:populate_tag_names_cache) do
+        set(tag_names_cache: send(taggable_config[:tagships]).map(&taggable_config[:tag_name_method]))
+      end
+
+      define_singleton_method(:populate_all_tag_names_cache) do
+        all.each(&:populate_tag_names_cache)
       end
     end
   end

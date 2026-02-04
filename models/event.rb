@@ -20,7 +20,7 @@ class Event
   include Geocoded
   include Taggable
 
-  taggable tagships: :event_tagships, tag_class: EventTag, update_flag: true, store_field: :event_tag_names
+  taggable tagships: :event_tagships, tag_class: EventTag, update_flag: true
   include ImageWithValidation
   include Searchable
 
@@ -37,7 +37,7 @@ class Event
   end
 
   def self.search_fields
-    %w[name description location event_tag_names]
+    %w[name description location tag_names_cache]
   end
 
   def to_param
@@ -334,7 +334,7 @@ class Event
     forbidden_phrases = ['friday night dance']
 
     name_words = name ? name.downcase.split : []
-    tag_words = Array(event_tag_names).flat_map { |tag| tag.to_s.downcase.split }
+    tag_words = Array(tag_names_cache).flat_map { |tag| tag.to_s.downcase.split }
     name_matches_forbidden = forbidden_phrases.any? { |phrase| name&.downcase&.include?(phrase.downcase) }
     set(hidden_from_homepage: true) if adult_words.intersect?(name_words + tag_words) || name_matches_forbidden || (organisation && organisation.hide_from_homepage?)
   end
