@@ -13,6 +13,7 @@
   $(function () {
     var $select = $("#<%= model_name %>_tag_names");
     $select.select2({
+      theme: 'bootstrap4',
       tags: true,
       data: <%== tag_class.for_select.map { |t| { id: t, text: t } }.to_json %>,
       tokenSeparators: [',', '#'],

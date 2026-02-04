@@ -19,8 +19,6 @@ function initQuestionsPreview (inputSelector, previewUrl) {
 
 $(function () {
 
-  $.fn.select2.defaults.set('theme', 'bootstrap4')
-
   function ajaxCompleted () {
 
     function styleSelectElement (select) {

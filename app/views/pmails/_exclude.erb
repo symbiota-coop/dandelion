@@ -2,9 +2,9 @@
   <script>
     $(function () {
 
-          $("#pmail_event_id").select2({allowClear: true});
-          $("#pmail_activity_id").select2({allowClear: true});
-          $("#pmail_local_group_id").select2({allowClear: true});
+          $("#pmail_event_id").select2({theme: 'bootstrap4', allowClear: true});
+          $("#pmail_activity_id").select2({theme: 'bootstrap4', allowClear: true});
+          $("#pmail_local_group_id").select2({theme: 'bootstrap4', allowClear: true});
 
         <% if @pmail.event %>
         $('#exclude-event-btn').click()
