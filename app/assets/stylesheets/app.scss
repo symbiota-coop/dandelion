@@ -11,6 +11,14 @@
   margin-top: .8em;
 }
 
+.select2-container--bootstrap4 .select2-selection--multiple .select2-selection__choice {
+  margin-top: calc(.375rem - 1px)
+}
+
+.select2-container--bootstrap4 .select2-selection {
+  border-color: #C8C7CC
+}
+
 @media (prefers-reduced-motion: reduce) {
   @view-transition {
     navigation: none;
