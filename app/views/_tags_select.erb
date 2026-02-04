@@ -11,7 +11,8 @@
 </div>
 <script>
   $(function () {
-    $("#<%= model_name %>_tag_names").select2({
+    var $select = $("#<%= model_name %>_tag_names");
+    $select.select2({
       tags: true,
       data: <%== tag_class.for_select.map { |t| { id: t, text: t } }.to_json %>,
       tokenSeparators: [',', '#'],
@@ -20,6 +21,11 @@
         if (term === '') return null;
         return { id: term, text: term };
       }
+    }).on('select2:select', function(e) {
+      // Move newly selected item to the end
+      var $option = $(this).find('option[value="' + e.params.data.id + '"]');
+      $option.detach().appendTo($(this));
+      $(this).trigger('change.select2');
     });
   })
 </script>
