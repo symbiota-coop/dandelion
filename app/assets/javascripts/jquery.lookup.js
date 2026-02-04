@@ -27,6 +27,7 @@
 
       function initSelect2 () {
         $el.select2({
+          theme: 'bootstrap4',
           placeholder: options.placeholder,
           allowClear: true,
           minimumInputLength: 1,
