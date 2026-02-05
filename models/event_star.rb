@@ -16,7 +16,7 @@ class EventStar
   end
 
   after_create do
-    account.notifications_as_circle.create! notifiable: event, type: 'starred_event'
+    account.notifications_as_circle.create!(notifiable: event, type: 'starred_event') if event.live? && event.public?
   end
 
   after_destroy do
