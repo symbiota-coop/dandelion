@@ -30,6 +30,7 @@ module Searchable
         query_variants = apostrophe_variants(query)
 
         search_filters = []
+        search_filters_vector = []
         remaining_selector = {}
         # Parse scope selector to extract conditions that can be handled by Atlas Search
         selector = scope.selector
@@ -46,16 +47,19 @@ module Searchable
           elsif value.is_a?(Hash)
             # Handle range operators ($gt, $gte, $lt, $lte)
             range_filter = nil
+            range_filter_vector = {}
             value.each do |operator, operand|
               case operator.to_s
               when '$gt', '$gte', '$lt', '$lte'
                 range_filter ||= { range: { path: field.to_s } }
                 range_key = operator.to_s.delete_prefix('$')
                 range_filter[:range][range_key.to_sym] = operand
+                range_filter_vector[operator] = operand
               else
                 # Unsupported operator, move entire field to remaining_selector
                 remaining_selector[field] = value
                 range_filter = nil
+                range_filter_vector = {}
                 break
               end
             end
@@ -71,11 +75,13 @@ module Searchable
                 remaining_selector[field] = value
               else
                 search_filters << range_filter
+                search_filters_vector << { field => range_filter_vector }
               end
             end
           else
             # Simple equality
             search_filters << { equals: { path: field.to_s, value: value } }
+            search_filters_vector << { field => value }
           end
         end
 
@@ -109,6 +115,14 @@ module Searchable
         end
 
         if query_vector
+          vector_filter = if search_filters_vector.empty?
+                            nil
+                          elsif search_filters_vector.length == 1
+                            search_filters_vector.first
+                          else
+                            { '$and' => search_filters_vector }
+                          end
+
           # Use $rankFusion to combine vector and text search
           fetch_limit = limit ? limit * 2 : 100
           num_candidates = 20 * fetch_limit
@@ -120,6 +134,7 @@ module Searchable
             numCandidates: num_candidates,
             limit: fetch_limit
           }
+          vector_search_stage[:filter] = vector_filter if vector_filter
 
           pipeline = [
             {
