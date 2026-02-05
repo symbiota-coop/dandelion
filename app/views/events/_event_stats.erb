@@ -103,7 +103,7 @@
     </tr>
   </thead>
   <% events.each { |event| %>
-  <tr data-pagelet-url="/events/<%= event.id %>/stats_row<%= "?timezone=#{event.start_time.strftime('%Z')}&organisation_id=#{organisation.id}&event_revenue_admin=#{event_revenue_admin?(event) ? 1 : 0}" %>"><% if @event %><%= cp(:'events/event_stats_row', locals: { event: @event, organisation: organisation, event_revenue_admin: event_revenue_admin? }, event: @event, key: "/events/#{@event.id}/stats_row?timezone=#{@event.start_time.strftime('%Z')}&organisation_id=#{organisation.id}&event_revenue_admin=#{event_revenue_admin? ? 1 : 0}") %><% end %></tr>
+  <tr data-pagelet-url="/events/<%= event.id %>/stats_row<%= "?timezone=#{event.start_time&.strftime('%Z')}&organisation_id=#{organisation.id}&event_revenue_admin=#{event_revenue_admin?(event) ? 1 : 0}" %>"><% if @event %><%= cp(:'events/event_stats_row', locals: { event: @event, organisation: organisation, event_revenue_admin: event_revenue_admin? }, event: @event, key: "/events/#{@event.id}/stats_row?timezone=#{@event.start_time&.strftime('%Z')}&organisation_id=#{organisation.id}&event_revenue_admin=#{event_revenue_admin? ? 1 : 0}") %><% end %></tr>
   <% } %>
   <% unless @event %>
     <tfoot>

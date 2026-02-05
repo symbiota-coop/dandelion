@@ -11,7 +11,7 @@
           <% if admin? %>
             <%= partial :'events/block', locals: { event: event } %>
           <% else %>
-            <%= cp(:'events/block', locals: { event: event }, event: event, key: "/events/#{event.id}?organisation_id=#{@organisation.try(:id)}&timezone=#{event.start_time.strftime('%Z')}&current_account=#{current_account ? 1 : 0}&event_admin=#{event_admin?(event) ? 1 : 0}") %>
+            <%= cp(:'events/block', locals: { event: event }, event: event, key: "/events/#{event.id}?organisation_id=#{@organisation.try(:id)}&timezone=#{event.start_time&.strftime('%Z')}&current_account=#{current_account ? 1 : 0}&event_admin=#{event_admin?(event) ? 1 : 0}") %>
           <% end %>
         </div>
       </div>
