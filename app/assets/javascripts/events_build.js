@@ -250,7 +250,7 @@ $(function () {
   // Revenue share UI if Stripe connected
   if (config.revenueSharingEnabled) {
     $('#event_revenue_sharer_id').change(function () {
-      if ($(this).val().length > 0) {
+      if ($(this).val()) {
         $('#revenue-share').show()
         $('#event_profit_share_to_organiser').val(0).closest('.form-group').hide()
         $('#event_profit_share_to_coordinator, #event_profit_share_to_category_steward, #event_profit_share_to_social_media, #event_profit_share_to_organisation').parent().find('.input-group-text').text('/' + (100 - $('#event_revenue_share_to_revenue_sharer').val()))
@@ -262,7 +262,7 @@ $(function () {
     }).change()
 
     $('#event_revenue_share_to_revenue_sharer').change(function () {
-      if ($('#event_revenue_sharer_id').val().length > 0) {
+      if ($('#event_revenue_sharer_id').val()) {
         $('#event_profit_share_to_coordinator, #event_profit_share_to_category_steward, #event_profit_share_to_social_media, #event_profit_share_to_organisation').parent().find('.input-group-text').text('/' + (100 - $('#event_revenue_share_to_revenue_sharer').val()))
       }
     }).change()
