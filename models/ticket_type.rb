@@ -103,27 +103,6 @@ class TicketType
     false
   end
 
-  def send_payment_reminder
-    email = name.split.last
-    return if EmailAddress.error(email)
-    return if remaining <= 0
-
-    mg_client = Mailgun::Client.new ENV['MAILGUN_API_KEY'], ENV['MAILGUN_REGION']
-    batch_message = Mailgun::BatchMessage.new(mg_client, ENV['MAILGUN_NOTIFICATIONS_HOST'])
-
-    ticket_type = self
-    event = self.event
-    batch_message.from ENV['REMINDERS_EMAIL_FULL']
-    batch_message.reply_to(event.email || event.organisation.reply_to)
-    batch_message.subject "Payment reminder for #{event.name}"
-    batch_message.body_html EmailHelper.html(:payment_reminder, event: event, ticket_type: ticket_type)
-
-    batch_message.add_recipient(:to, email)
-
-    batch_message.finalize if Padrino.env == :production
-  end
-  handle_asynchronously :send_payment_reminder
-
   def remaining
     (quantity || 0) - tickets.and(made_available_at: nil).count
   end

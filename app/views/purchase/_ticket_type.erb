@@ -13,7 +13,7 @@
 <tr>
   <td style="border-top: 0; vertical-align: middle">
     <span class="font-weight-bold" style="font-size: 1.2em">
-      <%= ticket_type.name.downcase.include?('payment plan') ? ticket_type.name.gsub(/\s+\S+@\S+\.\S+\s*$/, '') : ticket_type.name %>
+      <%= ticket_type.name %>
     </span>
     <% if ticket_type.hidden %>
       <i data-toggle="tooltip" title="Available to you as you used a secret link" class="bi bi-lock"></i>

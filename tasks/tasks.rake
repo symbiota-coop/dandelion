@@ -25,8 +25,6 @@ namespace :morning do
     Event.live.and(:start_time.gte => Date.tomorrow, :start_time.lt => Date.tomorrow + 1).each { |event| event.send_reminders(:all) }
     puts 'star reminders'
     Event.live.and(:start_time.gte => Date.tomorrow + 6, :start_time.lt => Date.tomorrow + 7).each { |event| event.send_star_reminders(:all) }
-    puts 'payment reminders'
-    TicketType.and(name: /payment plan/i).each(&:send_payment_reminder) if Date.today.day == 1
   end
 end
 
