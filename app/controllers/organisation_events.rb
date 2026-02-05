@@ -6,7 +6,7 @@ Dandelion::App.controller do
     partial :'organisations/events_block'
   end
 
-  get '/o/:slug/events', provides: %i[html ics json] do
+  get '/o/:slug/events', provides: %i[html ics json], prefetch: true do
     @organisation = Organisation.find_by(slug: params[:slug]) || not_found
     @events = @organisation.events_including_cohosted.public
     @from = params[:from] ? parse_date(params[:from]) : Date.today

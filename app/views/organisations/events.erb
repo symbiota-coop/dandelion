@@ -69,8 +69,8 @@
 <% elsif params[:display] == 'grid' %>
   <%= partial :'events/grid' %>
 <% else %>
-  <div data-pagelet-url="/o/<%=@organisation.slug%>/events?<%= request.query_string %>">
-    <%= partial :'organisations/events' %>
+  <div data-with-placeholder data-pagelet-url="/o/<%=@organisation.slug%>/events?<%= request.query_string %>">
+    <%= partial :'events/blocks_placeholder' %>
   </div>
 <% end %>
 <% if params[:minimal] %>
