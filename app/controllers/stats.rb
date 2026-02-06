@@ -284,13 +284,14 @@ Dandelion::App.controller do
       @asn_countries[asn] ||= country
     end
 
-    # Bucket into 6-hour windows
+    # Bucket into n-hour windows
+    window_length = 6
     @windows = []
     tz = TZInfo::Timezone.get('Europe/Stockholm')
     now = tz.to_local(Time.now.utc)
-    window_start = tz.local_time(now.year, now.month, now.day, (now.hour / 6) * 6) - (7 * 86_400)
+    window_start = tz.local_time(now.year, now.month, now.day, (now.hour / window_length) * window_length) - (7 * 86_400)
     while window_start < now
-      window_end = window_start + (6 * 3600)
+      window_end = window_start + (window_length * 3600)
       window_start = window_end and next if window_start.hour == 0
 
       window_rows = rows.select do |r|
