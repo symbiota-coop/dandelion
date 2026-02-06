@@ -286,6 +286,7 @@ Dandelion::App.controller do
 
     # Bucket into n-hour windows
     window_length = 6
+    baseline_asn = 2856
     @windows = []
     tz = TZInfo::Timezone.get('Europe/Stockholm')
     now = tz.to_local(Time.now.utc)
@@ -302,7 +303,7 @@ Dandelion::App.controller do
       by_asn = window_rows.group_by { |r| r.dig('dimensions', 'clientAsn') }.map do |asn, rs|
         { 'asn' => asn, 'description' => rs.first.dig('dimensions', 'clientASNDescription'), 'count' => rs.sum { |r| r['count'] } }
       end
-      bt_count = by_asn.find { |r| r['asn'].to_s == '2856' }&.dig('count') || 0
+      bt_count = by_asn.find { |r| r['asn'].to_s == baseline_asn.to_s }&.dig('count') || 0
       filtered = by_asn.select { |r| r['count'] > bt_count && !@legit_asns.include?(r['asn'].to_s) }.sort_by { |r| -r['count'] }
 
       @windows << { start: window_start, end: window_end, asns: filtered } if filtered.any?
