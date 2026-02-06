@@ -306,7 +306,7 @@ Dandelion::App.controller do
       bt_count = by_asn.find { |r| r['asn'].to_s == baseline_asn.to_s }&.dig('count') || 0
       filtered = by_asn.select { |r| r['count'] > bt_count && !@legit_asns.include?(r['asn'].to_s) }.sort_by { |r| -r['count'] }
 
-      @windows << { start: window_start, end: window_end, asns: filtered } if filtered.any?
+      @windows << { start: window_start, end: window_end, baseline: bt_count, asns: filtered } if filtered.any?
       window_start = window_end
     end
     @windows.reverse!

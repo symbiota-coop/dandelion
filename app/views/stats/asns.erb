@@ -14,7 +14,7 @@
           <th>ASN</th>
           <th>Description</th>
           <th>Country</th>
-          <th class="text-right">Requests</th>
+          <th class="text-right">Baseline</th>
           <th></th>
         </tr>
       </thead>
@@ -27,7 +27,7 @@
               <td><a href="https://radar.cloudflare.com/as<%= row['asn'] %>" target="_blank"><code>AS<%= row['asn'] %></code></a></td>
               <td><%= row['description'] %></td>
               <td><%= @asn_countries[row['asn'].to_s] %></td>
-              <td class="text-right"><%= row['count'].to_s.reverse.gsub(/(\d{3})(?=\d)/, '\\1,').reverse %></td>
+              <td class="text-right"><%= window[:baseline] > 0 ? "#{(row['count'].to_f / window[:baseline]).round(1)}x" : '&ndash;'.html_safe %></td>
               <td class="text-nowrap">
                 <% if blocked %>
                   <form method="post" action="/stats/asns/unblock/<%= row['asn'] %>" class="d-inline">
