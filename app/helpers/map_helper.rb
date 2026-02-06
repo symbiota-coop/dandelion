@@ -74,11 +74,12 @@ Dandelion::App.helpers do
     box = [[params[:west].to_f, params[:south].to_f], [params[:east].to_f, params[:north].to_f]]
     points = points.and(coordinates: { '$geoWithin' => { '$box' => box } })
 
+    points_count = points.count
     {
-      points: if points.count > MAP_POINTS_LIMIT
+      points: if points_count > MAP_POINTS_LIMIT
                 []
               else
-                points.map.with_index do |point, n|
+                points.only(:coordinates).map.with_index do |point, n|
                   {
                     model_name: point.class.to_s,
                     id: point.id.to_s,
@@ -88,7 +89,7 @@ Dandelion::App.helpers do
                   }
                 end
               end,
-      pointsCount: points.count
+      pointsCount: points_count
     }.to_json
   end
 end

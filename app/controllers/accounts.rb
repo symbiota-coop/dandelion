@@ -8,7 +8,7 @@ Dandelion::App.controller do
     case content_type
     when :json
       {
-        results: @accounts.map { |account| { id: account.id.to_s, text: "#{account.name} (#{account.username})" } }
+        results: @accounts.only(:name, :username).map { |account| { id: account.id.to_s, text: "#{account.name} (#{account.username})" } }
       }.to_json
     end
   end

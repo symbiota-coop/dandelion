@@ -24,7 +24,7 @@ Dandelion::App.controller do
     @gatherings = @gatherings.and(:id.in => Gathering.search(params[:q], @gatherings).pluck(:id)) if params[:q]
     @gatherings = @gatherings.and(id: params[:id]) if params[:id]
     {
-      results: @gatherings.map { |gathering| { id: gathering.id.to_s, text: "#{gathering.name} (id:#{gathering.id})" } }
+      results: @gatherings.only(:name).map { |gathering| { id: gathering.id.to_s, text: "#{gathering.name} (id:#{gathering.id})" } }
     }.to_json
   end
 

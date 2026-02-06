@@ -10,7 +10,7 @@ Dandelion::App.controller do
 
   get '/z/organisation_events', provides: :json do
     @organisation = Organisation.find_by(slug: params[:organisation_slug]) || not_found
-    @organisation.events_including_cohosted.live.public.order('start_time desc').map do |event|
+    @organisation.events_including_cohosted.live.public.order('start_time desc').only(:name, :start_time, :end_time, :time_zone, :location).map do |event|
       {
         id: event.id.to_s,
         name: "#{event.name} (#{event.concise_when_details(nil)})"
@@ -21,7 +21,7 @@ Dandelion::App.controller do
   get '/z/organisation_followers', provides: :json do
     @organisation = Organisation.find_by(slug: params[:organisation_slug]) || not_found
     organisation_admins_only!
-    @organisation.organisationships.includes(:account).and(:created_at.gte => 1.day.ago).order('created_at desc').map do |organisationship|
+    @organisation.organisationships.only(:account_id, :created_at).includes(:account).and(:created_at.gte => 1.day.ago).order('created_at desc').map do |organisationship|
       {
         id: organisationship.id.to_s,
         name: organisationship.account.name,

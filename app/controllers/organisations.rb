@@ -19,7 +19,7 @@ Dandelion::App.controller do
     @organisations = @organisations.and(:id.in => Organisation.search(params[:q], @organisations).pluck(:id)) if params[:q]
     @organisations = @organisations.and(id: params[:id]) if params[:id]
     {
-      results: @organisations.map { |organisation| { id: organisation.id.to_s, text: "#{organisation.name} (#{organisation.slug})" } }
+      results: @organisations.only(:name, :slug).map { |organisation| { id: organisation.id.to_s, text: "#{organisation.name} (#{organisation.slug})" } }
     }.to_json
   end
 
@@ -38,7 +38,7 @@ Dandelion::App.controller do
       end
     when :json
       {
-        results: @activities.map { |activity| { id: activity.id.to_s, text: "#{activity.name} (id:#{activity.id})" } }
+        results: @activities.only(:name).map { |activity| { id: activity.id.to_s, text: "#{activity.name} (id:#{activity.id})" } }
       }.to_json
     end
   end
@@ -57,7 +57,7 @@ Dandelion::App.controller do
       end
     when :json
       {
-        results: @local_groups.map { |local_group| { id: local_group.id.to_s, text: "#{local_group.name} (id:#{local_group.id})" } }
+        results: @local_groups.only(:name).map { |local_group| { id: local_group.id.to_s, text: "#{local_group.name} (id:#{local_group.id})" } }
       }.to_json
     end
   end

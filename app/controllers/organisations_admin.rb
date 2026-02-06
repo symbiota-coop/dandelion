@@ -264,7 +264,7 @@ Dandelion::App.controller do
       erb :'pmails/pmails'
     when :json
       {
-        results: @pmails.map { |pmail| { id: pmail.id.to_s, text: "#{pmail.subject} (id:#{pmail.id})" } }
+        results: @pmails.only(:subject).map { |pmail| { id: pmail.id.to_s, text: "#{pmail.subject} (id:#{pmail.id})" } }
       }.to_json
     end
   end
