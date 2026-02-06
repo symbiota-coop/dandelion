@@ -198,6 +198,171 @@ Dandelion::App.controller do
     erb :'stats/routes'
   end
 
+  get '/stats/asns' do
+    conn = Faraday.new(url: 'https://api.cloudflare.com') { |f| f.response :json }
+    since = (Time.now.utc - (7 * 86_400)).strftime('%Y-%m-%dT%H:%M:%SZ')
+
+    detail = nil
+    analytics = nil
+    country_data = nil
+    threads = [
+      Thread.new do
+        detail = conn.get("/client/v4/zones/#{ENV['CLOUDFLARE_ZONE_ID']}/rulesets/#{ENV['CLOUDFLARE_RULESET_ID']}") do |req|
+          req.headers['Authorization'] = "Bearer #{ENV['CLOUDFLARE_API_KEY']}"
+        end.body
+      end,
+      Thread.new do
+        query = <<~GRAPHQL
+          {
+            viewer {
+              zones(filter: {zoneTag: "#{ENV['CLOUDFLARE_ZONE_ID']}"}) {
+                httpRequestsAdaptiveGroups(
+                  filter: {datetime_geq: "#{since}", cacheStatus: "dynamic", edgeResponseStatus: 200}
+                  limit: 10000
+                  orderBy: [count_DESC]
+                ) {
+                  count
+                  dimensions {
+                    datetimeHour
+                    clientAsn
+                    clientASNDescription
+                  }
+                }
+              }
+            }
+          }
+        GRAPHQL
+        analytics = conn.post('/client/v4/graphql') do |req|
+          req.headers['Authorization'] = "Bearer #{ENV['CLOUDFLARE_API_KEY']}"
+          req.headers['Content-Type'] = 'application/json'
+          req.body = { query: query }.to_json
+        end.body
+      end,
+      Thread.new do
+        country_query = <<~GRAPHQL
+          {
+            viewer {
+              zones(filter: {zoneTag: "#{ENV['CLOUDFLARE_ZONE_ID']}"}) {
+                httpRequestsAdaptiveGroups(
+                  filter: {datetime_geq: "#{since}", cacheStatus: "dynamic", edgeResponseStatus: 200}
+                  limit: 500
+                  orderBy: [count_DESC]
+                ) {
+                  count
+                  dimensions {
+                    clientAsn
+                    clientCountryName
+                  }
+                }
+              }
+            }
+          }
+        GRAPHQL
+        country_data = conn.post('/client/v4/graphql') do |req|
+          req.headers['Authorization'] = "Bearer #{ENV['CLOUDFLARE_API_KEY']}"
+          req.headers['Content-Type'] = 'application/json'
+          req.body = { query: country_query }.to_json
+        end.body
+      end
+    ]
+    threads.each(&:join)
+
+    @rule = detail['success'] && detail['result']['rules']&.find { |r| r['id'] == ENV['CLOUDFLARE_ASN_RULE_ID'] }
+    @asns = @rule ? @rule['expression'].scan(/ip\.src\.asnum eq (\d+)/).flatten : []
+    @legit_asns = Stash.find_by(key: 'legit_asns')&.value&.split(',')&.map(&:strip) || []
+    rows = analytics.dig('data', 'viewer', 'zones', 0, 'httpRequestsAdaptiveGroups') || []
+    country_rows = country_data.dig('data', 'viewer', 'zones', 0, 'httpRequestsAdaptiveGroups') || []
+    @asn_names = {}
+    @asn_countries = {}
+    rows.each do |r|
+      asn = r.dig('dimensions', 'clientAsn').to_s
+      @asn_names[asn] ||= r.dig('dimensions', 'clientASNDescription')
+    end
+    country_rows.each do |r|
+      asn = r.dig('dimensions', 'clientAsn').to_s
+      country = r.dig('dimensions', 'clientCountryName')
+      @asn_countries[asn] ||= country
+    end
+
+    # Bucket into 6-hour windows
+    @windows = []
+    tz = TZInfo::Timezone.get('Europe/Stockholm')
+    now = tz.to_local(Time.now.utc)
+    window_start = tz.local_time(now.year, now.month, now.day, (now.hour / 6) * 6) - (7 * 86_400)
+    while window_start < now
+      window_end = window_start + (6 * 3600)
+      window_start = window_end and next if window_start.hour == 0
+
+      window_rows = rows.select do |r|
+        t = Time.parse(r.dig('dimensions', 'datetimeHour'))
+        t >= window_start && t < window_end
+      end
+
+      by_asn = window_rows.group_by { |r| r.dig('dimensions', 'clientAsn') }.map do |asn, rs|
+        { 'asn' => asn, 'description' => rs.first.dig('dimensions', 'clientASNDescription'), 'count' => rs.sum { |r| r['count'] } }
+      end
+      bt_count = by_asn.find { |r| r['asn'].to_s == '2856' }&.dig('count') || 0
+      filtered = by_asn.select { |r| r['count'] > bt_count && !@legit_asns.include?(r['asn'].to_s) }.sort_by { |r| -r['count'] }
+
+      @windows << { start: window_start, end: window_end, asns: filtered } if filtered.any?
+      window_start = window_end
+    end
+    @windows.reverse!
+
+    erb :'stats/asns'
+  end
+
+  post '/stats/asns/block/:asn' do
+    conn = Faraday.new(url: 'https://api.cloudflare.com') { |f| f.response :json }
+    detail = conn.get("/client/v4/zones/#{ENV['CLOUDFLARE_ZONE_ID']}/rulesets/#{ENV['CLOUDFLARE_RULESET_ID']}") do |req|
+      req.headers['Authorization'] = "Bearer #{ENV['CLOUDFLARE_API_KEY']}"
+    end.body
+    rule = detail['success'] && detail['result']['rules']&.find { |r| r['id'] == ENV['CLOUDFLARE_ASN_RULE_ID'] }
+    halt 400 unless rule
+
+    asns = rule['expression'].scan(/ip\.src\.asnum eq (\d+)/).flatten
+    unless asns.include?(params[:asn])
+      new_expression = "#{rule['expression']} or (ip.src.asnum eq #{params[:asn]})"
+      conn.patch("/client/v4/zones/#{ENV['CLOUDFLARE_ZONE_ID']}/rulesets/#{ENV['CLOUDFLARE_RULESET_ID']}/rules/#{ENV['CLOUDFLARE_ASN_RULE_ID']}") do |req|
+        req.headers['Authorization'] = "Bearer #{ENV['CLOUDFLARE_API_KEY']}"
+        req.headers['Content-Type'] = 'application/json'
+        req.body = { expression: new_expression, action: rule['action'], description: rule['description'] }.to_json
+      end
+    end
+    redirect '/stats/asns'
+  end
+
+  post '/stats/asns/unblock/:asn' do
+    conn = Faraday.new(url: 'https://api.cloudflare.com') { |f| f.response :json }
+    detail = conn.get("/client/v4/zones/#{ENV['CLOUDFLARE_ZONE_ID']}/rulesets/#{ENV['CLOUDFLARE_RULESET_ID']}") do |req|
+      req.headers['Authorization'] = "Bearer #{ENV['CLOUDFLARE_API_KEY']}"
+    end.body
+    rule = detail['success'] && detail['result']['rules']&.find { |r| r['id'] == ENV['CLOUDFLARE_ASN_RULE_ID'] }
+    halt 400 unless rule
+
+    asns = rule['expression'].scan(/ip\.src\.asnum eq (\d+)/).flatten - [params[:asn]]
+    halt 400 if asns.empty?
+    new_expression = asns.map { |a| "(ip.src.asnum eq #{a})" }.join(' or ')
+    conn.patch("/client/v4/zones/#{ENV['CLOUDFLARE_ZONE_ID']}/rulesets/#{ENV['CLOUDFLARE_RULESET_ID']}/rules/#{ENV['CLOUDFLARE_ASN_RULE_ID']}") do |req|
+      req.headers['Authorization'] = "Bearer #{ENV['CLOUDFLARE_API_KEY']}"
+      req.headers['Content-Type'] = 'application/json'
+      req.body = { expression: new_expression, action: rule['action'], description: rule['description'] }.to_json
+    end
+    redirect '/stats/asns'
+  end
+
+  post '/stats/asns/legit/:asn' do
+    stash = Stash.find_or_create_by(key: 'legit_asns') { |s| s.value = '' }
+    legit = stash.value.to_s.split(',').map(&:strip).reject(&:empty?)
+    if legit.include?(params[:asn])
+      legit.delete(params[:asn])
+    else
+      legit << params[:asn]
+    end
+    stash.update(value: legit.join(','))
+    redirect '/stats/asns'
+  end
+
   ###
 
   get '/raise' do
