@@ -56,7 +56,13 @@ class Event
     events_with_participant_ids = Event.live.public.future.map do |event|
       [event.id.to_s, event.attendee_ids.map(&:to_s)]
     end
-    total = Account.recommendable.count
+
+    # Clean up caches for non-recommendable accounts
+    recommendable_ids = Account.recommendable.pluck(:id)
+    purged = AccountRecommendationCache.where(:account_id.nin => recommendable_ids).delete_all
+    puts "Purged #{purged} orphaned recommendation caches" if purged.positive?
+
+    total = recommendable_ids.count
     Account.recommendable.each_with_index do |account, i|
       puts "#{i + 1}/#{total}" if ((i + 1) % 1000).zero?
       account.recommend_people!

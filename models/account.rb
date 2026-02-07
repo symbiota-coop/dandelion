@@ -50,7 +50,7 @@ class Account
       { :id.in => Ticket.distinct(:account_id).compact },
       { :id.in => EventFacilitation.distinct(:account_id).compact },
       { :id.in => Membership.distinct(:account_id).compact }
-    )
+    ).and(has_signed_in: true)
   end
 
   def self.generate_sign_in_token
