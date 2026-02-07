@@ -3,8 +3,8 @@ class Option
   include Mongoid::Timestamps
   include CoreExtensions
 
-  belongs_to_without_parent_validation :gathering, index: true
-  belongs_to_without_parent_validation :account, index: true
+  belongs_to_without_parent_validation :gathering
+  belongs_to_without_parent_validation :account
 
   field :name, type: String
   field :description, type: String

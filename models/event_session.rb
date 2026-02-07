@@ -6,7 +6,7 @@ class EventSession
   field :start_time, type: Time
   field :end_time, type: Time
 
-  belongs_to_without_parent_validation :event, index: true
+  belongs_to_without_parent_validation :event
 
   validates_presence_of :start_time
   validates_presence_of :end_time

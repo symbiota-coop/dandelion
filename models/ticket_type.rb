@@ -3,8 +3,8 @@ class TicketType
   include Mongoid::Timestamps
   include CoreExtensions
 
-  belongs_to_without_parent_validation :event, index: true
-  belongs_to_without_parent_validation :ticket_group, optional: true, index: true
+  belongs_to_without_parent_validation :event
+  belongs_to_without_parent_validation :ticket_group, optional: true
 
   field :name, type: String
   field :description, type: String

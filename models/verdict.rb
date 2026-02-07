@@ -3,10 +3,10 @@ class Verdict
   include Mongoid::Timestamps
   include CoreExtensions
 
-  belongs_to_without_parent_validation :account, index: true
-  belongs_to_without_parent_validation :gathering, index: true
-  belongs_to_without_parent_validation :membership, index: true
-  belongs_to_without_parent_validation :mapplication, index: true
+  belongs_to_without_parent_validation :account
+  belongs_to_without_parent_validation :gathering
+  belongs_to_without_parent_validation :membership
+  belongs_to_without_parent_validation :mapplication
 
   field :type, type: String
   field :reason, type: String

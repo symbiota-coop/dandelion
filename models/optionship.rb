@@ -3,10 +3,10 @@ class Optionship
   include Mongoid::Timestamps
   include CoreExtensions
 
-  belongs_to_without_parent_validation :account, index: true
-  belongs_to_without_parent_validation :option, index: true
-  belongs_to_without_parent_validation :gathering, index: true
-  belongs_to_without_parent_validation :membership, index: true
+  belongs_to_without_parent_validation :account
+  belongs_to_without_parent_validation :option
+  belongs_to_without_parent_validation :gathering
+  belongs_to_without_parent_validation :membership
 
   def self.admin_fields
     {

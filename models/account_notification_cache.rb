@@ -3,7 +3,7 @@ class AccountNotificationCache
   include Mongoid::Timestamps
   include CoreExtensions
 
-  belongs_to_without_parent_validation :account, index: true
+  belongs_to_without_parent_validation :account
 
   validates_uniqueness_of :account
 

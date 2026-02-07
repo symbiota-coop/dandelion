@@ -3,7 +3,7 @@ class OrganisationTier
   include Mongoid::Timestamps
   include CoreExtensions
 
-  belongs_to_without_parent_validation :organisation, index: true
+  belongs_to_without_parent_validation :organisation
 
   field :name, type: String
   field :description, type: String

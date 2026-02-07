@@ -3,9 +3,9 @@ class AccountContribution
   include Mongoid::Timestamps
   include CoreExtensions
 
-  belongs_to_without_parent_validation :account, index: true
-  belongs_to_without_parent_validation :event, index: true, optional: true
-  belongs_to_without_parent_validation :event_feedback, index: true, optional: true
+  belongs_to_without_parent_validation :account
+  belongs_to_without_parent_validation :event, optional: true
+  belongs_to_without_parent_validation :event_feedback, optional: true
 
   field :amount, type: Float
   field :currency, type: String

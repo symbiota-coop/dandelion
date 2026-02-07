@@ -3,8 +3,8 @@ class Notification
   include Mongoid::Timestamps
   include CoreExtensions
 
-  belongs_to_without_parent_validation :circle, polymorphic: true, index: true
-  belongs_to_without_parent_validation :notifiable, polymorphic: true, index: true
+  belongs_to_without_parent_validation :circle, polymorphic: true
+  belongs_to_without_parent_validation :notifiable, polymorphic: true
 
   field :type, type: String
 

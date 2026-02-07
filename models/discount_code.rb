@@ -3,8 +3,8 @@ class DiscountCode
   include Mongoid::Timestamps
   include CoreExtensions
 
-  belongs_to_without_parent_validation :codeable, polymorphic: true, index: true
-  belongs_to_without_parent_validation :account, optional: true, index: true
+  belongs_to_without_parent_validation :codeable, polymorphic: true
+  belongs_to_without_parent_validation :account, optional: true
 
   field :code, type: String
   field :description, type: String

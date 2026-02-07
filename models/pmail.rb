@@ -7,12 +7,12 @@ class Pmail
   include Searchable
   include WhatsappMessaging
 
-  belongs_to_without_parent_validation :organisation, index: true
-  belongs_to_without_parent_validation :account, index: true
-  belongs_to_without_parent_validation :mailable, polymorphic: true, index: true, optional: true
-  belongs_to_without_parent_validation :event, index: true, optional: true, inverse_of: :pmails_as_exclusion # Exclude people attending an event
-  belongs_to_without_parent_validation :activity, index: true, optional: true, inverse_of: :pmails_as_exclusion # Exclude people attending upcoming events in an activity
-  belongs_to_without_parent_validation :local_group, index: true, optional: true, inverse_of: :pmails_as_exclusion # Exclude people in a local group
+  belongs_to_without_parent_validation :organisation
+  belongs_to_without_parent_validation :account
+  belongs_to_without_parent_validation :mailable, polymorphic: true, optional: true
+  belongs_to_without_parent_validation :event, optional: true, inverse_of: :pmails_as_exclusion # Exclude people attending an event
+  belongs_to_without_parent_validation :activity, optional: true, inverse_of: :pmails_as_exclusion # Exclude people attending upcoming events in an activity
+  belongs_to_without_parent_validation :local_group, optional: true, inverse_of: :pmails_as_exclusion # Exclude people in a local group
 
   field :from, type: String
   field :subject, type: String

@@ -3,8 +3,8 @@ class Activityship
   include Mongoid::Timestamps
   include CoreExtensions
 
-  belongs_to_without_parent_validation :account, index: true
-  belongs_to_without_parent_validation :activity, index: true
+  belongs_to_without_parent_validation :account
+  belongs_to_without_parent_validation :activity
 
   %w[admin unsubscribed hide_membership receive_feedback].each do |b|
     field b.to_sym, type: Boolean

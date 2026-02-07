@@ -3,8 +3,8 @@ class ActivityTagship
   include Mongoid::Timestamps
   include CoreExtensions
 
-  belongs_to_without_parent_validation :activity, index: true
-  belongs_to_without_parent_validation :activity_tag, index: true
+  belongs_to_without_parent_validation :activity
+  belongs_to_without_parent_validation :activity_tag
 
   def self.admin_fields
     {

@@ -3,9 +3,9 @@ class Zoomship
   include Mongoid::Timestamps
   include CoreExtensions
 
-  belongs_to_without_parent_validation :event, index: true
-  belongs_to_without_parent_validation :local_group, index: true
-  belongs_to_without_parent_validation :account, index: true, optional: true
+  belongs_to_without_parent_validation :event
+  belongs_to_without_parent_validation :local_group
+  belongs_to_without_parent_validation :account, optional: true
 
   field :link, type: String
   field :tickets_count, type: Integer

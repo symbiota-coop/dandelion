@@ -3,7 +3,7 @@ class OrganisationContribution
   include Mongoid::Timestamps
   include CoreExtensions
 
-  belongs_to_without_parent_validation :organisation, index: true
+  belongs_to_without_parent_validation :organisation
 
   field :amount, type: Float
   field :currency, type: String

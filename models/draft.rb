@@ -3,7 +3,7 @@ class Draft
   include Mongoid::Timestamps
   include CoreExtensions
 
-  belongs_to_without_parent_validation :account, index: true
+  belongs_to_without_parent_validation :account
 
   field :model, type: String
   field :name, type: String

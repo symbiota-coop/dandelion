@@ -6,8 +6,8 @@ class Cohostship
   extend Dragonfly::Model
   include ImageWithValidation
 
-  belongs_to_without_parent_validation :event, index: true
-  belongs_to_without_parent_validation :organisation, index: true
+  belongs_to_without_parent_validation :event
+  belongs_to_without_parent_validation :organisation
 
   field :image_uid, type: String
   field :image_width_unmagic, type: Integer

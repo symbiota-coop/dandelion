@@ -3,8 +3,8 @@ class Vote
   include Mongoid::Timestamps
   include CoreExtensions
 
-  belongs_to_without_parent_validation :voption, index: true
-  belongs_to_without_parent_validation :account, index: true
+  belongs_to_without_parent_validation :voption
+  belongs_to_without_parent_validation :account
 
   def self.admin_fields
     {

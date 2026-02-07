@@ -3,12 +3,12 @@ class Shift
   include Mongoid::Timestamps
   include CoreExtensions
 
-  belongs_to_without_parent_validation :role, index: true
-  belongs_to_without_parent_validation :rslot, index: true
-  belongs_to_without_parent_validation :rota, index: true
-  belongs_to_without_parent_validation :gathering, index: true
-  belongs_to_without_parent_validation :account, index: true, optional: true
-  belongs_to_without_parent_validation :membership, index: true, optional: true
+  belongs_to_without_parent_validation :role
+  belongs_to_without_parent_validation :rslot
+  belongs_to_without_parent_validation :rota
+  belongs_to_without_parent_validation :gathering
+  belongs_to_without_parent_validation :account, optional: true
+  belongs_to_without_parent_validation :membership, optional: true
 
   def self.admin_fields
     {

@@ -3,10 +3,9 @@ class Fragment
   include Mongoid::Timestamps
   include CoreExtensions
 
-  belongs_to_without_parent_validation :event, index: true, optional: true
+  belongs_to_without_parent_validation :event, optional: true
 
   field :key, type: String
-  # index({ key: 1 }, { unique: true })
   field :value, type: String
   field :expires, type: Time
 

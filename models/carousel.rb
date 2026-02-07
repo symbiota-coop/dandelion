@@ -6,7 +6,7 @@ class Carousel
 
   taggable tagships: :carouselships, tag_class: EventTag
 
-  belongs_to_without_parent_validation :organisation, index: true
+  belongs_to_without_parent_validation :organisation
 
   field :name, type: String
   field :weeks, type: Integer

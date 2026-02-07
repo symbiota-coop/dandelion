@@ -3,9 +3,9 @@ class Subscription
   include Mongoid::Timestamps
   include CoreExtensions
 
-  belongs_to_without_parent_validation :account, index: true, inverse_of: :subscriptions_as_creator
-  belongs_to_without_parent_validation :post, index: true
-  belongs_to_without_parent_validation :commentable, polymorphic: true, index: true
+  belongs_to_without_parent_validation :account, inverse_of: :subscriptions_as_creator
+  belongs_to_without_parent_validation :post
+  belongs_to_without_parent_validation :commentable, polymorphic: true
 
   def self.admin_fields
     {

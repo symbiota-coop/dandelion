@@ -3,8 +3,8 @@ class StripeTransaction
   include Mongoid::Timestamps
   include CoreExtensions
 
-  belongs_to_without_parent_validation :organisation, index: true
-  belongs_to_without_parent_validation :stripe_charge, optional: true, index: true
+  belongs_to_without_parent_validation :organisation
+  belongs_to_without_parent_validation :stripe_charge, optional: true
 
   field :created_utc, type: Time
   field :available_on_utc, type: Time

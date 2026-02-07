@@ -5,7 +5,7 @@ class Upload
 
   extend Dragonfly::Model
 
-  belongs_to_without_parent_validation :account, index: true
+  belongs_to_without_parent_validation :account
 
   field :file_name, type: String
   field :file_uid, type: String

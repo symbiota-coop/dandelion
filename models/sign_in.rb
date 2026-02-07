@@ -4,13 +4,11 @@ class SignIn
   include CoreExtensions
   include RequestFields
 
-  index({ created_at: 1 }, { expire_after_seconds: 1.year.to_i })
-
   def self.admin_fields
     { account_id: :lookup }.merge(RequestFields.admin_fields)
   end
 
-  belongs_to_without_parent_validation :account, index: true
+  belongs_to_without_parent_validation :account
 
   attr_accessor :skip_increment
 

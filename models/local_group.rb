@@ -8,8 +8,8 @@ class LocalGroup
   include SendFollowersCsv
   include Searchable
 
-  belongs_to_without_parent_validation :organisation, index: true
-  belongs_to_without_parent_validation :account, index: true
+  belongs_to_without_parent_validation :organisation
+  belongs_to_without_parent_validation :account
 
   field :name, type: String
   field :intro_text, type: String

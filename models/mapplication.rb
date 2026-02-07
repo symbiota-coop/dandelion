@@ -3,9 +3,9 @@ class Mapplication
   include Mongoid::Timestamps
   include CoreExtensions
 
-  belongs_to_without_parent_validation :gathering, index: true
-  belongs_to_without_parent_validation :account, class_name: 'Account', inverse_of: :mapplications, index: true
-  belongs_to_without_parent_validation :processed_by, class_name: 'Account', inverse_of: :mapplications_processed, index: true, optional: true
+  belongs_to_without_parent_validation :gathering
+  belongs_to_without_parent_validation :account, class_name: 'Account', inverse_of: :mapplications
+  belongs_to_without_parent_validation :processed_by, class_name: 'Account', inverse_of: :mapplications_processed, optional: true
 
   field :status, type: String
   field :answers, type: Array

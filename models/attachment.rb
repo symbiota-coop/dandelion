@@ -5,7 +5,7 @@ class Attachment
 
   extend Dragonfly::Model
 
-  belongs_to_without_parent_validation :organisation, index: true
+  belongs_to_without_parent_validation :organisation
 
   field :file_uid, type: String
   field :file_name, type: String

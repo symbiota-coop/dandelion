@@ -5,9 +5,9 @@ class Organisationship
 
   include Geocoder::Model::Mongoid
 
-  belongs_to_without_parent_validation :organisation, index: true
-  belongs_to_without_parent_validation :account, inverse_of: :organisationships, index: true
-  belongs_to_without_parent_validation :referrer, class_name: 'Account', inverse_of: :organisationships_as_referrer, index: true, optional: true
+  belongs_to_without_parent_validation :organisation
+  belongs_to_without_parent_validation :account, inverse_of: :organisationships
+  belongs_to_without_parent_validation :referrer, class_name: 'Account', inverse_of: :organisationships_as_referrer, optional: true
 
   field :stripe_connect_json, type: String
   field :stripe_account_json, type: String

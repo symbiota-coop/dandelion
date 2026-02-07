@@ -3,8 +3,8 @@ class Follow
   include Mongoid::Timestamps
   include CoreExtensions
 
-  belongs_to_without_parent_validation :follower, class_name: 'Account', inverse_of: :follows_as_follower, index: true
-  belongs_to_without_parent_validation :followee, class_name: 'Account', inverse_of: :follows_as_followee, index: true
+  belongs_to_without_parent_validation :follower, class_name: 'Account', inverse_of: :follows_as_follower
+  belongs_to_without_parent_validation :followee, class_name: 'Account', inverse_of: :follows_as_followee
 
   %w[unsubscribed starred].each do |b|
     field b.to_sym, type: Boolean

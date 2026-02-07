@@ -3,8 +3,8 @@ class OrganisationEdge
   include Mongoid::Timestamps
   include CoreExtensions
 
-  belongs_to_without_parent_validation :source, class_name: 'Organisation', inverse_of: :organisation_edges_as_source, index: true
-  belongs_to_without_parent_validation :sink, class_name: 'Organisation', inverse_of: :organisation_edges_as_sink, index: true
+  belongs_to_without_parent_validation :source, class_name: 'Organisation', inverse_of: :organisation_edges_as_source
+  belongs_to_without_parent_validation :sink, class_name: 'Organisation', inverse_of: :organisation_edges_as_sink
 
   field :mutual_followers, type: Integer
 

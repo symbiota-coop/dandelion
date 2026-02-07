@@ -3,10 +3,10 @@ class CommentReaction
   include Mongoid::Timestamps
   include CoreExtensions
 
-  belongs_to_without_parent_validation :account, index: true, inverse_of: :comment_reactions_as_creator
-  belongs_to_without_parent_validation :comment, index: true
-  belongs_to_without_parent_validation :post, index: true
-  belongs_to_without_parent_validation :commentable, polymorphic: true, index: true
+  belongs_to_without_parent_validation :account, inverse_of: :comment_reactions_as_creator
+  belongs_to_without_parent_validation :comment
+  belongs_to_without_parent_validation :post
+  belongs_to_without_parent_validation :commentable, polymorphic: true
 
   field :body, type: String
 

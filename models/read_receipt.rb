@@ -3,8 +3,8 @@ class ReadReceipt
   include Mongoid::Timestamps
   include CoreExtensions
 
-  belongs_to_without_parent_validation :comment, index: true
-  belongs_to_without_parent_validation :account, index: true
+  belongs_to_without_parent_validation :comment
+  belongs_to_without_parent_validation :account
 
   def self.admin_fields
     {

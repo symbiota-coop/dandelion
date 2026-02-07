@@ -3,11 +3,11 @@ class InventoryItem
   include Mongoid::Timestamps
   include CoreExtensions
 
-  belongs_to_without_parent_validation :gathering, index: true
-  belongs_to_without_parent_validation :account, index: true, optional: true, class_name: 'Account', inverse_of: :inventory_items_listed
-  belongs_to_without_parent_validation :responsible, index: true, optional: true, class_name: 'Account', inverse_of: :inventory_items_provided
-  belongs_to_without_parent_validation :membership, index: true, optional: true
-  belongs_to_without_parent_validation :team, index: true
+  belongs_to_without_parent_validation :gathering
+  belongs_to_without_parent_validation :account, optional: true, class_name: 'Account', inverse_of: :inventory_items_listed
+  belongs_to_without_parent_validation :responsible, optional: true, class_name: 'Account', inverse_of: :inventory_items_provided
+  belongs_to_without_parent_validation :membership, optional: true
+  belongs_to_without_parent_validation :team
 
   field :name, type: String
   field :description, type: String

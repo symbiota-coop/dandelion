@@ -3,10 +3,10 @@ class StripeCharge
   include Mongoid::Timestamps
   include CoreExtensions
 
-  belongs_to_without_parent_validation :organisation, index: true
-  belongs_to_without_parent_validation :event, optional: true, index: true
-  belongs_to_without_parent_validation :order, optional: true, index: true
-  belongs_to_without_parent_validation :account, optional: true, index: true
+  belongs_to_without_parent_validation :organisation
+  belongs_to_without_parent_validation :event, optional: true
+  belongs_to_without_parent_validation :order, optional: true
+  belongs_to_without_parent_validation :account, optional: true
 
   has_many :stripe_transactions
 

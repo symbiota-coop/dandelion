@@ -5,8 +5,8 @@ class Crediting
 
   extend Dragonfly::Model
 
-  belongs_to_without_parent_validation :account, index: true
-  belongs_to_without_parent_validation :organisationship, index: true
+  belongs_to_without_parent_validation :account
+  belongs_to_without_parent_validation :organisationship
 
   field :amount, type: Integer
   field :currency, type: String

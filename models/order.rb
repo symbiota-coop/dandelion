@@ -16,11 +16,11 @@ class Order
   include OrderAccounting
   include WhatsappMessaging
 
-  belongs_to_without_parent_validation :event, index: true, optional: true
-  belongs_to_without_parent_validation :account, class_name: 'Account', inverse_of: :orders, index: true, optional: true
-  belongs_to_without_parent_validation :revenue_sharer, class_name: 'Account', inverse_of: :orders_as_revenue_sharer, index: true, optional: true
-  belongs_to_without_parent_validation :affiliate, polymorphic: true, index: true, optional: true
-  belongs_to_without_parent_validation :discount_code, optional: true # removed index
+  belongs_to_without_parent_validation :event, optional: true
+  belongs_to_without_parent_validation :account, class_name: 'Account', inverse_of: :orders, optional: true
+  belongs_to_without_parent_validation :revenue_sharer, class_name: 'Account', inverse_of: :orders_as_revenue_sharer, optional: true
+  belongs_to_without_parent_validation :affiliate, polymorphic: true, optional: true
+  belongs_to_without_parent_validation :discount_code, optional: true
 
   has_many :stripe_charges
 

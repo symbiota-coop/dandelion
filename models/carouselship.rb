@@ -3,8 +3,8 @@ class Carouselship
   include Mongoid::Timestamps
   include CoreExtensions
 
-  belongs_to_without_parent_validation :carousel, index: true
-  belongs_to_without_parent_validation :event_tag, index: true
+  belongs_to_without_parent_validation :carousel
+  belongs_to_without_parent_validation :event_tag
 
   def self.admin_fields
     {

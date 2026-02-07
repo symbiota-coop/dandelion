@@ -6,8 +6,8 @@ class Space
   extend Dragonfly::Model
   include ImageWithValidation
 
-  belongs_to_without_parent_validation :timetable, index: true
-  belongs_to_without_parent_validation :gathering, index: true
+  belongs_to_without_parent_validation :timetable
+  belongs_to_without_parent_validation :gathering
 
   field :name, type: String
   field :o, type: Integer

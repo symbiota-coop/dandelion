@@ -6,8 +6,8 @@ class Photo
   extend Dragonfly::Model
   include ImageWithValidation
 
-  belongs_to_without_parent_validation :photoable, polymorphic: true, index: true
-  belongs_to_without_parent_validation :account, index: true
+  belongs_to_without_parent_validation :photoable, polymorphic: true
+  belongs_to_without_parent_validation :account
 
   field :image_uid, type: String
   field :has_image, type: Boolean

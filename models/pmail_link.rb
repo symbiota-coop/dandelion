@@ -3,7 +3,7 @@ class PmailLink
   include Mongoid::Timestamps
   include CoreExtensions
 
-  belongs_to_without_parent_validation :pmail, index: true
+  belongs_to_without_parent_validation :pmail
 
   field :url, type: String
   field :clicks, type: Integer

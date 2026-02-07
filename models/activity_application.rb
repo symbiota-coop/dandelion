@@ -3,9 +3,9 @@ class ActivityApplication
   include Mongoid::Timestamps
   include CoreExtensions
 
-  belongs_to_without_parent_validation :activity, index: true
-  belongs_to_without_parent_validation :account, class_name: 'Account', inverse_of: :activity_applications, index: true
-  belongs_to_without_parent_validation :statused_by, class_name: 'Account', inverse_of: :statused_activity_applications, index: true, optional: true
+  belongs_to_without_parent_validation :activity
+  belongs_to_without_parent_validation :account, class_name: 'Account', inverse_of: :activity_applications
+  belongs_to_without_parent_validation :statused_by, class_name: 'Account', inverse_of: :statused_activity_applications, optional: true
 
   field :answers, type: Array
   field :status, type: String

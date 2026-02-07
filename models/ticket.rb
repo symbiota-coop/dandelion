@@ -6,11 +6,11 @@ class Ticket
   include Mongoid::Paranoia
   include TicketNotifications
 
-  belongs_to_without_parent_validation :event, index: true
-  belongs_to_without_parent_validation :account, index: true, optional: true
-  belongs_to_without_parent_validation :order, index: true, optional: true
-  belongs_to_without_parent_validation :ticket_type, index: true, optional: true
-  belongs_to_without_parent_validation :zoomship, index: true, optional: true
+  belongs_to_without_parent_validation :event
+  belongs_to_without_parent_validation :account, optional: true
+  belongs_to_without_parent_validation :order, optional: true
+  belongs_to_without_parent_validation :ticket_type, optional: true
+  belongs_to_without_parent_validation :zoomship, optional: true
 
   has_many :notifications, as: :notifiable, dependent: :destroy
 

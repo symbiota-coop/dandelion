@@ -5,10 +5,10 @@ class Attendance
 
   extend Dragonfly::Model
 
-  belongs_to_without_parent_validation :tactivity, index: true
-  belongs_to_without_parent_validation :account, index: true
-  belongs_to_without_parent_validation :gathering, index: true
-  belongs_to_without_parent_validation :membership, index: true
+  belongs_to_without_parent_validation :tactivity
+  belongs_to_without_parent_validation :account
+  belongs_to_without_parent_validation :gathering
+  belongs_to_without_parent_validation :membership
 
   def self.admin_fields
     {

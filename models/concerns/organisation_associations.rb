@@ -2,8 +2,8 @@ module OrganisationAssociations
   extend ActiveSupport::Concern
 
   included do
-    belongs_to_without_parent_validation :account, inverse_of: :organisations, index: true, optional: true
-    belongs_to_without_parent_validation :referrer, class_name: 'Account', inverse_of: :organisations_as_referrer, index: true, optional: true
+    belongs_to_without_parent_validation :account, inverse_of: :organisations, optional: true
+    belongs_to_without_parent_validation :referrer, class_name: 'Account', inverse_of: :organisations_as_referrer, optional: true
 
     has_many :stripe_charges, dependent: :destroy
     has_many :stripe_transactions, dependent: :destroy

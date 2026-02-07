@@ -13,8 +13,8 @@ class Activity
 
   taggable tagships: :activity_tagships, tag_class: ActivityTag
 
-  belongs_to_without_parent_validation :organisation, index: true
-  belongs_to_without_parent_validation :account, index: true, optional: true
+  belongs_to_without_parent_validation :organisation
+  belongs_to_without_parent_validation :account, optional: true
 
   field :name, type: String
   field :email, type: String

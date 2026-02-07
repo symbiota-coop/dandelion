@@ -5,8 +5,8 @@ class EventFeedback
 
   include Mongoid::Paranoia
 
-  belongs_to_without_parent_validation :event, index: true, optional: true
-  belongs_to_without_parent_validation :account, index: true
+  belongs_to_without_parent_validation :event, optional: true
+  belongs_to_without_parent_validation :account
 
   has_many :account_contributions, dependent: :nullify
 

@@ -3,9 +3,9 @@ class Payment
   include Mongoid::Timestamps
   include CoreExtensions
 
-  belongs_to_without_parent_validation :account, index: true
-  belongs_to_without_parent_validation :gathering, index: true
-  belongs_to_without_parent_validation :membership, index: true
+  belongs_to_without_parent_validation :account
+  belongs_to_without_parent_validation :gathering
+  belongs_to_without_parent_validation :membership
 
   field :gathering_name, type: String
   field :amount, type: Integer

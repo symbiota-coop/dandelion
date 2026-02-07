@@ -3,7 +3,7 @@ class TicketGroup
   include Mongoid::Timestamps
   include CoreExtensions
 
-  belongs_to_without_parent_validation :event, index: true
+  belongs_to_without_parent_validation :event
 
   field :name, type: String
   field :capacity, type: Integer
