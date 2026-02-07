@@ -1,7 +1,7 @@
 Dandelion::App.controller do
   get '/o/:slug/events_block' do
     @organisation = Organisation.find_by(slug: params[:slug]) || not_found
-    @events = @organisation.events_including_cohosted.public.future_and_current_featured
+    @events = @organisation.events_including_cohosted.public.future_and_current_featured.without_heavy_fields
     @events = @events.and(monthly_donors_only: true) if params[:members_events]
     partial :'organisations/events_block'
   end
@@ -35,6 +35,7 @@ Dandelion::App.controller do
     end
     case content_type
     when :html
+      @events = @events.without_heavy_fields
       if params[:past] || (carousel && carousel.name.downcase.include?('past events'))
         @past = true
         @events = @events.past
@@ -52,12 +53,14 @@ Dandelion::App.controller do
       end
     when :json
       if params[:display] == 'calendar'
+        @events = @events.without_heavy_fields
         @events = @events.future(@from)
         @events = @events.and(:start_time.lt => @to + 1) if @to
         @events = @events.and(locked: false)
         @events = filter_events_by_search_and_tags(@events)
         calendar_json(@events)
       elsif params[:display] == 'map'
+        @events = @events.without_heavy_fields
         @events = @events.future(@from)
         @events = @events.and(:start_time.lt => @to + 1) if @to
         @events = @events.and(locked: false)
@@ -65,7 +68,9 @@ Dandelion::App.controller do
         map_json(@events)
       else
         # Regular JSON response for events
+        @events = @events.without(:extra_info_for_ticket_email, :embedding)
         @events = @events.live
+
         if params[:past] || (carousel && carousel.name.downcase.include?('past events'))
           @past = true
           @events = @events.past
@@ -77,6 +82,7 @@ Dandelion::App.controller do
         @events.to_public_json
       end
     when :ics
+      @events = @events.without_heavy_fields
       @events = @events.live
       @events = @events.future_and_current_featured(1.month.ago)
       @events = filter_events_by_search_and_tags(@events)
@@ -92,6 +98,7 @@ Dandelion::App.controller do
     @to = params[:to] ? parse_date(params[:to]) : nil
     @start_or_end = (params[:start_or_end] == 'end' ? 'end' : 'start')
     @events = params[:deleted] || params[:exclude_co_hosted] ? @organisation.events : @organisation.events_including_cohosted
+    @events = @events.without_heavy_fields
     @events = params[:order] == 'created_at' ? @events.order('created_at desc') : @events.order("#{@start_or_end}_time asc")
     @events = @events.and(:"#{@start_or_end}_time".gte => @from)
     @events = @events.and(:"#{@start_or_end}_time".lt => @to + 1) if @to

@@ -62,7 +62,7 @@ Dandelion::App.controller do
     @from = params[:from] ? parse_date(params[:from]) : Date.today
     @to = params[:to] ? parse_date(params[:to]) : nil
     @start_or_end = (params[:start_or_end] == 'end' ? 'end' : 'start')
-    @events = @activity.events
+    @events = @activity.events.without_heavy_fields
     @events = params[:order] == 'created_at' ? @events.order('created_at desc') : @events.order("#{@start_or_end}_time asc")
     @events = @events.and(:"#{@start_or_end}_time".gte => @from)
     @events = @events.and(:"#{@start_or_end}_time".lt => @to + 1) if @to

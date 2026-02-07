@@ -51,6 +51,10 @@ module EventScopes
       self.and(secret: true)
     end
 
+    def without_heavy_fields
+      without(:description, :extra_info_for_ticket_email, :embedding)
+    end
+
     def in_person
       self.and(:location.ne => 'Online')
     end
