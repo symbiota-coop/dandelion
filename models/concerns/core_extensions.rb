@@ -13,6 +13,8 @@ module CoreExtensions
   def convert_nil_booleans_to_false
     self.class.fields.each do |field_name, field|
       send("#{field_name}=", false) if field.type == Mongoid::Boolean && send(field_name).nil?
+    rescue Mongoid::Errors::AttributeNotLoaded
+      next
     end
   end
 
