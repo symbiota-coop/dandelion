@@ -72,7 +72,7 @@ Dandelion::App.helpers do
 
   def map_json(points)
     box = [[params[:west].to_f, params[:south].to_f], [params[:east].to_f, params[:north].to_f]]
-    points = points.and(coordinates: { '$geoWithin' => { '$box' => box } })
+    points = points.only(:coordinates).and(coordinates: { '$geoWithin' => { '$box' => box } })
 
     points_count = points.count
     {

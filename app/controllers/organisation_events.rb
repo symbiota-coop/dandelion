@@ -60,7 +60,6 @@ Dandelion::App.controller do
         @events = filter_events_by_search_and_tags(@events)
         calendar_json(@events)
       elsif params[:display] == 'map'
-        @events = @events.without_heavy_fields
         @events = @events.future(@from)
         @events = @events.and(:start_time.lt => @to + 1) if @to
         @events = @events.and(locked: false)

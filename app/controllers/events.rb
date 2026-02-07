@@ -1,6 +1,6 @@
 Dandelion::App.controller do
   get '/events', provides: %i[html ics json], prefetch: true do
-    @events = Event.live.public.browsable.without_heavy_fields
+    @events = Event.live.public.browsable
     @from = params[:from] ? parse_date(params[:from]) : Date.today
     @to = params[:to] ? parse_date(params[:to]) : nil
 
@@ -18,6 +18,7 @@ Dandelion::App.controller do
     @events = @events.and(has_image: true) if params[:images]
     case content_type
     when :html
+      @events = @events.without_heavy_fields
       @events = @events.future(@from)
       @events = @events.and(:start_time.lt => @to + 1) if @to
       @events = @events.and(:id.in => Event.search(params[:q], @events).pluck(:id)) if params[:q]
@@ -30,6 +31,7 @@ Dandelion::App.controller do
       @events = @events.and(:id.in => Event.search(params[:q], @events).pluck(:id)) if params[:q]
       map_json(@events)
     when :ics
+      @events = @events.without_heavy_fields
       @events = @events.future_and_current
       @events = @events.and(:id.in => Event.search(params[:q], @events).pluck(:id)) if params[:q]
       @events = @events.limit(500)
