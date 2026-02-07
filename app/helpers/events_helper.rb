@@ -79,7 +79,7 @@ Dandelion::App.helpers do
 
   def calendar_json(events)
     user_time_zone = current_account ? current_account.time_zone : session[:time_zone]
-    events.only(:name, :start_time, :end_time, :slug, :location, :time_zone).map do |event|
+    events.map do |event|
       {
         id: event.id.to_s,
         name: event.name,

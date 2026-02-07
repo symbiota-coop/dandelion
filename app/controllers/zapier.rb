@@ -10,7 +10,7 @@ Dandelion::App.controller do
 
   get '/z/organisation_events', provides: :json do
     @organisation = Organisation.find_by(slug: params[:organisation_slug]) || not_found
-    @organisation.events_including_cohosted.live.public.order('start_time desc').only(:name, :start_time, :end_time, :time_zone, :location).map do |event|
+    @organisation.events_including_cohosted.live.public.without_heavy_fields.order('start_time desc').map do |event|
       {
         id: event.id.to_s,
         name: "#{event.name} (#{event.concise_when_details(nil)})"

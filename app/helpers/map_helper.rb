@@ -79,7 +79,7 @@ Dandelion::App.helpers do
       points: if points_count > MAP_POINTS_LIMIT
                 []
               else
-                points.only(:coordinates).map.with_index do |point, n|
+                points.map.with_index do |point, n|
                   {
                     model_name: point.class.to_s,
                     id: point.id.to_s,
