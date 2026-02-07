@@ -1,6 +1,6 @@
 Dandelion::App.controller do
   get '/e/:slug/edit' do
-    @event = Event.unscoped.find_by(slug: params[:slug]) || not_found
+    @event = Event.unscoped.without(:embedding).find_by(slug: params[:slug]) || not_found
     kick! unless @event.organisation
     event_admins_only!
     erb :'events_build/build'

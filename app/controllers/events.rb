@@ -122,7 +122,7 @@ Dandelion::App.controller do
   end
 
   get '/events/:id', provides: %i[html ics json] do
-    @event = Event.find(params[:id]) || not_found
+    @event = Event.without_heavy_fields.find(params[:id]) || not_found
     if @event.slug
       redirect request.url.gsub('/events/', '/e/').gsub(params[:id], @event.slug)
     else
@@ -133,14 +133,14 @@ Dandelion::App.controller do
   get '/e/:slug', provides: %i[html ics json], prerender: true do
     session[:via] = params[:via] if params[:via]
     session[:return_to] = request.url
-    @event = Event.find_by(slug: params[:slug])
+    @event = Event.without(:embedding).find_by(slug: params[:slug])
     if !@event && params[:slug] =~ /[A-Z]/
-      @event = Event.find_by(slug: params[:slug].downcase)
+      @event = Event.without(:embedding).find_by(slug: params[:slug].downcase)
       redirect "/e/#{@event.slug}" if @event
     end
     unless @event
       id = params[:slug]
-      @event = Event.find(id) || not_found
+      @event = Event.without(:embedding).find(id) || not_found
       redirect request.url.gsub(id, @event.slug) if @event.slug
     end
 
