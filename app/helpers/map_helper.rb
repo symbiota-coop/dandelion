@@ -67,7 +67,7 @@ Dandelion::App.helpers do
   end
 
   def geocode_cache
-    @geocode_cache ||= ActiveSupport::Cache::MongoStore.new(nil, collection: 'geocode_cache')
+    @geocode_cache ||= ActiveSupport::Cache::RedisCacheStore.new(url: ENV['REDIS_URL'], namespace: 'geocode')
   end
 
   def map_json(points)
