@@ -80,9 +80,9 @@ class AccountRecommendationCache
       [event_id, matching_people, connections.size]
     end.compact
 
-    # Sort by connection count descending, then remove the count from output
+    # Sort by connection count descending, then sort people within each event
     events = events.sort_by { |_event_id, _people, count| -count }
-                   .map { |event_id, matching_people, _count| [event_id, matching_people] }
+                   .map { |event_id, matching_people, _count| [event_id, matching_people.sort_by { |_k, v| -v.size }] }
 
     set(recommended_events_cache: events)
   end
