@@ -200,7 +200,8 @@ Dandelion::App.controller do
 
   get '/stats/asns' do
     conn = Faraday.new(url: 'https://api.cloudflare.com') { |f| f.response :json }
-    since = (Time.now.utc - (7 * 86_400)).strftime('%Y-%m-%dT%H:%M:%SZ')
+    days = 7
+    since = (Time.now.utc - (days * 86_400)).strftime('%Y-%m-%dT%H:%M:%SZ')
 
     detail = nil
     analytics = nil
@@ -290,7 +291,7 @@ Dandelion::App.controller do
     @windows = []
     tz = TZInfo::Timezone.get('Europe/Stockholm')
     now = tz.to_local(Time.now.utc)
-    window_start = tz.local_time(now.year, now.month, now.day, (now.hour / window_length) * window_length) - (7 * 86_400)
+    window_start = tz.local_time(now.year, now.month, now.day, (now.hour / window_length) * window_length) - (days * 86_400)
     while window_start < now
       window_end = window_start + (window_length * 3600)
       window_start = window_end and next if window_start.hour == 0
