@@ -27,7 +27,7 @@
             <tr<%= ' style="background-color: #fff0f0"'.html_safe if blocked %>>
               <td><%= "#{window[:start].strftime('%a %d %b %H:%M')} &ndash; #{window[:end].strftime('%H:%M')}".html_safe if i == 0 %></td>
               <td><%= window[:baseline] if i == 0 %></td>
-              <td><a href="https://radar.cloudflare.com/as<%= row['asn'] %>" target="_blank"><code>AS<%= row['asn'] %></code></a></td>
+              <td><a href="https://radar.cloudflare.com/as<%= row['asn'] %>" target="_blank"><code><%= row['asn'] %></code></a></td>
               <td><%= row['description'] %></td>
               <td><%= @asn_countries[row['asn'].to_s] %></td>
               <td><%= row['count'] %></td>
@@ -71,7 +71,7 @@
       <tbody>
         <% @asns.each do |asn| %>
           <tr>
-            <td class="col-asn"><a href="https://radar.cloudflare.com/as<%= asn %>" target="_blank"><code>AS<%= asn %></code></a></td>
+            <td class="col-asn"><a href="https://radar.cloudflare.com/as<%= asn %>" target="_blank"><code><%= asn %></code></a></td>
             <td class="col-name"><%= @asn_names[asn] %></td>
             <td class="col-country"><%= @asn_countries[asn] %></td>
             <td class="col-actions">
@@ -103,7 +103,7 @@
       <tbody>
         <% @legit_asns.each do |asn| %>
           <tr>
-            <td class="col-asn"><a href="https://radar.cloudflare.com/as<%= asn %>" target="_blank"><code>AS<%= asn %></code></a></td>
+            <td class="col-asn"><a href="https://radar.cloudflare.com/as<%= asn %>" target="_blank"><code><%= asn %></code></a></td>
             <td class="col-name"><%= @asn_names[asn] %></td>
             <td class="col-country"><%= @asn_countries[asn] %></td>
             <td class="col-actions">
