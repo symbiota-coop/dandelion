@@ -29,7 +29,7 @@
     <span class="label label-default bg-secondary mr-1">EVM: <%= ticket.order.evm_secret %></span>
   <% elsif ticket.order.oc_secret %>
     <span class="label label-default bg-secondary mr-1">OC: <%= ticket.order.oc_secret.split('dandelion:').last %></span>
-  <% elsif ticket.order.gocardless_billing_request_id %>
+  <% elsif ticket.order.gocardless_payment_request_id %>
     <span class="label label-default bg-gocardless mr-1">GoCardless</span>
   <% end %>
   <% if ticket.incomplete? %><i data-toggle="tooltip" title="This person is in the process of completing the order. If they don't complete it soon, the order will be removed." class="bi bi-spin bi-arrow-repeat"></i><% end %>

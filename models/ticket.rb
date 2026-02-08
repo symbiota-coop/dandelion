@@ -4,6 +4,7 @@ class Ticket
   include CoreExtensions
 
   include Mongoid::Paranoia
+  include Refundable
   include TicketNotifications
 
   belongs_to_without_parent_validation :event
@@ -26,6 +27,8 @@ class Ticket
   field :organisation_revenue_share, type: Float
   field :session_id, type: String
   field :payment_intent, type: String
+  field :gocardless_payment_request_id, type: String
+  field :gocardless_payment_id, type: String
   field :show_attendance, type: Boolean
   field :subscribed_discussion, type: Boolean
   field :checked_in, type: Boolean
@@ -51,6 +54,9 @@ class Ticket
       currency: :text,
       payment_completed: :check_box,
       organisation_revenue_share: :number,
+      payment_intent: :text,
+      gocardless_payment_request_id: :text,
+      gocardless_payment_id: :text,
       show_attendance: :check_box,
       checked_in: :check_box,
       name: :text,
@@ -189,31 +195,24 @@ class Ticket
   end
 
   def refund
-    return unless event.refund_deleted_orders && event.organisation && discounted_price && discounted_price > 0 && payment_completed && payment_intent
+    return unless event.refund_deleted_orders && event.organisation && discounted_price && discounted_price > 0 && payment_completed && (payment_intent || gocardless_payment_id)
 
-    # begin
-    Stripe.api_key = event.organisation.stripe_connect_json ? ENV['STRIPE_SK'] : event.organisation.stripe_sk
-    Stripe.api_version = '2020-08-27'
-    pi = Stripe::PaymentIntent.retrieve payment_intent, { stripe_account: event.organisation.stripe_user_id }.compact
-
-    # to handle cases where there was an order-wide discount applied
     refund_amount = order ? [discounted_price, order.total].min : discounted_price
     return if refund_amount <= 0
 
-    if event.revenue_sharer_organisationship
-      Stripe::Refund.create(
-        amount: (refund_amount * 100).to_i,
-        charge: pi.charges.first.id,
-        refund_application_fee: true,
-        reverse_transfer: true
+    if payment_intent
+      refund_via_stripe(
+        payment_intent: payment_intent,
+        amount: refund_amount,
+        on_error: ->(error) { notify_of_failed_refund(error) }
       )
     else
-      Stripe::Refund.create({
-                              amount: (refund_amount * 100).to_i,
-                              charge: pi.charges.first.id
-                            }, { stripe_account: event.organisation.stripe_user_id }.compact)
+      refund_via_gocardless(
+        amount: refund_amount,
+        payment_id: gocardless_payment_id
+      )
     end
-  rescue Stripe::InvalidRequestError => e
+  rescue StandardError => e
     notify_of_failed_refund(e)
     true
   end

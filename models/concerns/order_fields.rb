@@ -12,7 +12,8 @@ module OrderFields
     field :payment_intent, type: String
     field :transfer_id, type: String
     field :coinbase_checkout_id, type: String
-    field :gocardless_billing_request_id, type: String
+    field :gocardless_payment_request_id, type: String
+    field :gocardless_payment_id, type: String
     field :evm_secret, type: String
     field :evm_value, type: BigDecimal
     field :oc_secret, type: String
@@ -60,6 +61,8 @@ module OrderFields
         payment_intent: :text,
         transfer_id: :text,
         coinbase_checkout_id: :text,
+        gocardless_payment_request_id: :text,
+        gocardless_payment_id: :text,
         evm_secret: :text,
         evm_value: :number,
         oc_secret: :text,

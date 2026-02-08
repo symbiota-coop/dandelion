@@ -14,6 +14,7 @@ class Order
   include OrderFields
   include OrderNotifications
   include OrderAccounting
+  include Refundable
   include WhatsappMessaging
 
   belongs_to_without_parent_validation :event, optional: true
@@ -129,6 +130,15 @@ class Order
 
   def coinbase_payment_status
     event.organisation.coinbase_confirmed_checkout_ids.include?(coinbase_checkout_id)
+  end
+
+  def persist_gocardless_payment_id(payment_id)
+    return if gocardless_payment_id.present? || payment_id.blank?
+
+    set(gocardless_payment_id: payment_id)
+    tickets.each do |ticket|
+      ticket.update_attributes!(gocardless_payment_id: payment_id)
+    end
   end
 
   def payment_completed!
@@ -251,35 +261,21 @@ class Order
 
   after_destroy :refund
   def refund
-    return unless event.refund_deleted_orders && !prevent_refund && event.organisation && value && value.positive? && payment_completed && payment_intent
+    return unless event.refund_deleted_orders && !prevent_refund && event.organisation && value && value.positive? && payment_completed && (payment_intent || gocardless_payment_id)
 
-    # begin
-    Stripe.api_key = event.organisation.stripe_connect_json ? ENV['STRIPE_SK'] : event.organisation.stripe_sk
-    Stripe.api_version = '2020-08-27'
-    pi = Stripe::PaymentIntent.retrieve payment_intent, { stripe_account: event.organisation.stripe_user_id }.compact
-    if event.revenue_sharer_organisationship
-      Stripe::Refund.create(
-        charge: pi.charges.first.id,
-        refund_application_fee: true,
-        reverse_transfer: true
+    if payment_intent
+      refund_via_stripe(
+        payment_intent: payment_intent,
+        refund_application_fee: application_fee_amount && application_fee_amount > 0,
+        on_error: ->(error) { notify_of_failed_refund(error) }
       )
-    elsif event.organisation.stripe_user_id
-      if application_fee_amount && application_fee_amount > 0
-        Stripe::Refund.create({
-                                charge: pi.charges.first.id,
-                                refund_application_fee: true
-                              },
-                              { stripe_account: event.organisation.stripe_user_id })
-      else
-        Stripe::Refund.create({
-                                charge: pi.charges.first.id
-                              },
-                              { stripe_account: event.organisation.stripe_user_id })
-      end
     else
-      Stripe::Refund.create({ charge: pi.charges.first.id })
+      refund_via_gocardless(
+        amount: value,
+        payment_id: gocardless_payment_id
+      )
     end
-  rescue Stripe::InvalidRequestError => e
+  rescue StandardError => e
     notify_of_failed_refund(e)
     true
   end

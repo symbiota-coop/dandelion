@@ -89,18 +89,20 @@ Dandelion::App.controller do
     events.each do |event|
       if event.resource_type == 'subscriptions' && event.action == 'created'
         @organisation.gocardless_subscribe(subscription_id: event.links.subscription)
-      elsif event.resource_type == 'billing_requests' && event.action == 'fulfilled'
-        billing_request_id = event.links.billing_request
+      elsif event.resource_type == 'payments' && event.action == 'confirmed'
+        payment_request_id = event.links.payment_request
+        payment_id = event.links.payment
 
-        if (@order = @organisation.orders.find_by(gocardless_billing_request_id: billing_request_id))
+        if (@order = @organisation.orders.find_by(gocardless_payment_request_id: payment_request_id))
+          @order.persist_gocardless_payment_id(payment_id)
           @order.payment_completed!
           @order.send_tickets
           @order.create_order_notification
           halt 200
-        elsif (@order = Order.deleted.find_by(gocardless_billing_request_id: billing_request_id))
+        elsif (@order = Order.deleted.find_by(gocardless_payment_request_id: payment_request_id))
           begin
+            @order.persist_gocardless_payment_id(payment_id)
             @order.restore_and_complete
-            # raise Order::Restored
           rescue StandardError => e
             Honeybadger.context({ event_id: event.id })
             Honeybadger.notify(e)
@@ -109,7 +111,6 @@ Dandelion::App.controller do
         else
           halt 200
         end
-
       end
     end
     200

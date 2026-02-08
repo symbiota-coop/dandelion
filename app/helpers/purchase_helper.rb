@@ -221,6 +221,18 @@ Dandelion::App.helpers do
     end
   end
 
+  def update_order_with_gocardless_billing_request(billing_request)
+    @order.update_attributes!(
+      value: @order.total.round(2),
+      gocardless_payment_request_id: billing_request.links.payment_request
+    )
+    @order.tickets.each do |ticket|
+      ticket.update_attributes!(
+        gocardless_payment_request_id: billing_request.links.payment_request
+      )
+    end
+  end
+
   def process_coinbase_payment
     client = CoinbaseCommerceClient::Client.new(api_key: @event.organisation.coinbase_api_key)
     checkout = client.checkout.create(
@@ -252,10 +264,7 @@ Dandelion::App.helpers do
       }
     )
 
-    @order.update_attributes!(
-      value: @order.total.round(2),
-      gocardless_billing_request_id: billing_request.id
-    )
+    update_order_with_gocardless_billing_request(billing_request)
 
     billing_request_flow = client.billing_request_flows.create(
       params: {
