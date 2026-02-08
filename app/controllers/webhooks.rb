@@ -90,7 +90,7 @@ Dandelion::App.controller do
       if event.resource_type == 'subscriptions' && event.action == 'created'
         @organisation.gocardless_subscribe(subscription_id: event.links.subscription)
       elsif event.resource_type == 'payments' && event.action == 'confirmed'
-        payment_request_id = event.links.payment_request
+        payment_request_id = event.to_h.dig('links', 'payment_request')
         payment_id = event.links.payment
 
         if (@order = @organisation.orders.find_by(gocardless_payment_request_id: payment_request_id))
