@@ -1,12 +1,12 @@
 <div class="main">
   <p>Hi %recipient.firstname%,</p>
   <p>
-    We tried to refund the ticket of <%= account.name %> (<a href="mailto:<%=account.email%>"><%=account.email%></a>) for the event <a href="<%= ENV['BASE_URI'] %>/e/<%=event.slug%>"><%= event.name %></a>, but we received an error from Stripe:
+    We tried to refund the ticket of <%= account.name %> (<a href="mailto:<%=account.email%>"><%=account.email%></a>) for the event <a href="<%= ENV['BASE_URI'] %>/e/<%=event.slug%>"><%= event.name %></a> via <%= provider %>, but we received an error:
   </p>
   <blockquote>
     <%= Rinku.auto_link(error.message) %>
   </blockquote>
   <p>
-    You can attempt the refund again via your Stripe dashboard.
+    You can attempt the refund again via your <%= provider %> dashboard.
   </p>
 </div>

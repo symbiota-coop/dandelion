@@ -272,12 +272,10 @@ class Order
     else
       refund_via_gocardless(
         amount: value,
-        payment_id: gocardless_payment_id
+        payment_id: gocardless_payment_id,
+        on_error: ->(error) { notify_of_failed_refund(error) }
       )
     end
-  rescue StandardError => e
-    notify_of_failed_refund(e)
-    true
   end
 
   def tickets_pdf

@@ -121,14 +121,10 @@ class Ticket
   end
 
   after_save do
-    if event
-      event.refresh_sold_out_cache_and_notify_waitlist
-    end
+    event.refresh_sold_out_cache_and_notify_waitlist if event
   end
   after_destroy do
-    if event
-      event.refresh_sold_out_cache_and_notify_waitlist
-    end
+    event.refresh_sold_out_cache_and_notify_waitlist if event
   end
 
   def self.email_viewer?(ticket, account)
@@ -209,11 +205,9 @@ class Ticket
     else
       refund_via_gocardless(
         amount: refund_amount,
-        payment_id: gocardless_payment_id
+        payment_id: gocardless_payment_id,
+        on_error: ->(error) { notify_of_failed_refund(error) }
       )
     end
-  rescue StandardError => e
-    notify_of_failed_refund(e)
-    true
   end
 end

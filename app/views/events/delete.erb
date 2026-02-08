@@ -11,9 +11,9 @@
   <% end %>
 
   <div class="text-center">
-    <p><a class="d-block d-lg-inline btn btn-danger" href="/events/<%= @event.id %>/destroy">Delete event and attempt to refund all Stripe orders</a></p>
+    <p><a class="d-block d-lg-inline btn btn-danger" href="/events/<%= @event.id %>/destroy">Delete event and attempt to refund all orders</a></p>
     <p>or</p>
-    <p><a class="d-block d-lg-inline btn btn-outline-danger" href="/events/<%= @event.id %>/destroy?no_refunds=1">Delete event without refunding Stripe orders</a></p>
+    <p><a class="d-block d-lg-inline btn btn-outline-danger" href="/events/<%= @event.id %>/destroy?no_refunds=1">Delete event without refunding orders</a></p>
   </div>
 <% else %>
   <div class="alert alert-warning">
