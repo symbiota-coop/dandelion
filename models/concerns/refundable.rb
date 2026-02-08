@@ -31,7 +31,7 @@ module Refundable
     true
   end
 
-  def refund_via_gocardless(amount:, payment_id:, on_error: nil)
+  def refund_via_gocardless(payment_id:, amount:, on_error:)
     return if payment_id.blank?
 
     client = GoCardlessPro::Client.new(access_token: event.organisation.gocardless_access_token)

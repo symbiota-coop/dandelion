@@ -204,8 +204,8 @@ class Ticket
       )
     else
       refund_via_gocardless(
-        amount: refund_amount,
         payment_id: gocardless_payment_id,
+        amount: refund_amount,
         on_error: ->(error) { notify_of_failed_refund(error) }
       )
     end

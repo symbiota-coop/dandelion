@@ -266,13 +266,13 @@ class Order
     if payment_intent
       refund_via_stripe(
         payment_intent: payment_intent,
-        refund_application_fee: application_fee_amount && application_fee_amount > 0,
-        on_error: ->(error) { notify_of_failed_refund(error) }
+        on_error: ->(error) { notify_of_failed_refund(error) },
+        refund_application_fee: application_fee_amount && application_fee_amount > 0
       )
     else
       refund_via_gocardless(
-        amount: value,
         payment_id: gocardless_payment_id,
+        amount: value,
         on_error: ->(error) { notify_of_failed_refund(error) }
       )
     end
