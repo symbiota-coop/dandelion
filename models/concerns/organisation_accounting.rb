@@ -10,6 +10,8 @@ module OrganisationAccounting
   end
 
   def contribution_required
+    return false if contribution_not_required
+
     !paid_up && (stripe_client_id || gocardless_instant_bank_pay)
   end
 
