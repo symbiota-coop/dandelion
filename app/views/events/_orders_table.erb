@@ -261,7 +261,7 @@
         ['Link to order confirmation', "/orders/#{order.id}"],
         ['Resend order confirmation', "/orders/#{order.id}/send_tickets"],
         ['Transfer to another event', "/orders/#{order.id}/transfer"],
-        (['Remove and refund order', "/events/#{order.event.id}/orders/#{order.id}/refund_and_destroy"] if order.event.refund_deleted_orders && order.session_id),
+        (['Remove and refund order', "/events/#{order.event.id}/orders/#{order.id}/refund_and_destroy"] if order.event.refund_deleted_orders && order.refundable?),
         ['Remove order', "/events/#{order.event.id}/orders/#{order.id}/destroy"],
       ].compact, button_text: %(Actions <i class="bi bi-caret-down-fill"></i>), container_class: 'btn-group mb-1' %>
       <% end %>

@@ -1,4 +1,8 @@
 module Refundable
+  def refundable?
+    session_id || gocardless_payment_id
+  end
+
   def refund_via_stripe(payment_intent:, on_error:, amount: nil, refund_application_fee: false)
     Stripe.api_key = event.organisation.stripe_connect_json ? ENV['STRIPE_SK'] : event.organisation.stripe_sk
     Stripe.api_version = '2020-08-27'
