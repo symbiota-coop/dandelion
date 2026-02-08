@@ -200,7 +200,7 @@ Dandelion::App.controller do
 
   get '/stats/asns' do
     conn = Faraday.new(url: 'https://api.cloudflare.com') { |f| f.response :json }
-    days = 7
+    days = 3
     since = (Time.now.utc - (days * 86_400)).strftime('%Y-%m-%dT%H:%M:%SZ')
 
     detail = nil
