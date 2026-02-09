@@ -103,7 +103,7 @@ module OrderNotifications
     return unless account&.phone.present?
 
     order_url = "#{ENV['BASE_URI']}/orders/#{id}"
-    message = "Thanks for booking onto #{event.name}!\n\nView your order confirmation at #{order_url}"
+    message = "Thanks for booking onto #{event.name}, #{event.when_details(account.try(:time_zone))}!\n\nView your order confirmation at #{order_url}"
 
     send_signal_message(account.phone, message)
   end
