@@ -137,7 +137,7 @@ module AccountFields
         location: 'Used for connecting you with events near you. Never displayed publicly without your consent.',
         date_of_birth: 'Never displayed publicly, though you can choose to show your age.',
         username: 'Letters, numbers, underscores and periods',
-        phone: 'Enter your phone number with +country code to receive your order confirmation via WhatsApp'
+        phone: 'Enter your phone number with +country code to receive your order confirmation via Signal'
       }
     end
 

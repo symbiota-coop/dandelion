@@ -5,7 +5,7 @@ class Pmail
 
   include PmailMailgun
   include Searchable
-  include WhatsappMessaging
+  include SignalMessaging
 
   belongs_to_without_parent_validation :organisation
   belongs_to_without_parent_validation :account
@@ -350,48 +350,22 @@ class Pmail
 
     result = batch_message.finalize if Padrino.env == :production
 
-    send_whatsapp_messages(accounts) if is_event_pmail
+    send_signal_messages(accounts) if is_event_pmail
 
     result
   end
 
-  def send_whatsapp_messages(accounts)
-    return unless whatsapp_configured?
+  def send_signal_messages(accounts)
+    return unless signal_configured?
     return unless mailable.is_a?(Event)
-
-    template_header = 'New message about {{1}}'
-    truncated_event_name = truncate_event_name_for_whatsapp(mailable.name, template_header)
 
     accounts.each do |account|
       next unless account.phone.present?
 
-      phone_number = format_phone_number(account.phone)
-      next unless phone_number
+      pmail_url = "#{ENV['BASE_URI']}/pmails/#{id}"
+      message = "New message about #{mailable.name}\n\nView the message '#{subject}' at #{pmail_url}"
 
-      components = [
-        {
-          type: 'header',
-          parameters: [
-            { type: 'text', text: truncated_event_name }
-          ]
-        },
-        {
-          type: 'body',
-          parameters: [
-            { type: 'text', text: subject }
-          ]
-        },
-        {
-          type: 'button',
-          sub_type: 'url',
-          index: '0',
-          parameters: [
-            { type: 'text', text: id.to_s }
-          ]
-        }
-      ]
-
-      send_whatsapp_template(phone_number, ENV['WHATSAPP_TEMPLATE_NAME_PMAIL'], components)
+      send_signal_message(account.phone, message)
     end
   end
 

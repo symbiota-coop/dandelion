@@ -94,38 +94,18 @@ module OrderNotifications
     ics_file.close
     File.delete(ics_filename)
 
-    # Send WhatsApp message if account has phone number
-    send_whatsapp_order_link if account&.phone.present?
+    # Send Signal message if account has phone number
+    send_signal_order_link if account&.phone.present?
   end
 
-  def send_whatsapp_order_link
-    return unless whatsapp_configured?
+  def send_signal_order_link
+    return unless signal_configured?
     return unless account&.phone.present?
 
-    phone_number = format_phone_number(account.phone)
-    return unless phone_number
+    order_url = "#{ENV['BASE_URI']}/orders/#{id}"
+    message = "Thanks for booking onto #{event.name}!\n\nView your order confirmation at #{order_url}"
 
-    template_header = 'Thanks for booking onto {{1}}!'
-    truncated_event_name = truncate_event_name_for_whatsapp(event.name, template_header)
-
-    components = [
-      {
-        type: 'header',
-        parameters: [
-          { type: 'text', text: truncated_event_name }
-        ]
-      },
-      {
-        type: 'button',
-        sub_type: 'url',
-        index: '0',
-        parameters: [
-          { type: 'text', text: id.to_s }
-        ]
-      }
-    ]
-
-    send_whatsapp_template(phone_number, ENV['WHATSAPP_TEMPLATE_NAME_ORDER'], components)
+    send_signal_message(account.phone, message)
   end
 
   def notify_of_failed_purchase(error)

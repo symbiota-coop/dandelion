@@ -15,7 +15,7 @@ class Order
   include OrderNotifications
   include OrderAccounting
   include Refundable
-  include WhatsappMessaging
+  include SignalMessaging
 
   belongs_to_without_parent_validation :event, optional: true
   belongs_to_without_parent_validation :account, class_name: 'Account', inverse_of: :orders, optional: true
