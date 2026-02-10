@@ -295,7 +295,6 @@ class Event
   end
 
   after_save :ai_tag
-  handle_asynchronously :ai_tag
   def ai_tag
     return unless ENV['OPENROUTER_API_KEY']
     return if duplicate
@@ -343,6 +342,7 @@ class Event
     end
     set(ai_tagged: true)
   end
+  handle_asynchronously :ai_tag
 
   after_save :set_hidden_from_homepage
   def set_hidden_from_homepage
