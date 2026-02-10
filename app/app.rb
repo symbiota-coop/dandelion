@@ -239,7 +239,7 @@ module Dandelion
 
       @organisation.set(reward_claimer_id: current_account.id)
 
-      flash[:notice] = 'Your referral reward claim has been submitted.'
+      flash[:notice] = "Your referral reward claim has been submitted, and we'll be in touch soon."
       redirect '/referrals'
     end
 
