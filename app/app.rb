@@ -201,6 +201,38 @@ module Dandelion
       { default: upload.file.url }.to_json
     end
 
+    get '/referrals' do
+      sign_in_required!
+      @organisations = current_account.organisations_as_referrer
+      erb :referrals
+    end
+
+    get '/referrals/:id/claim' do
+      sign_in_required!
+      @organisation = current_account.organisations_as_referrer.find(params[:id]) || not_found
+      revenue_eur = @organisation.referral_revenue_eur
+
+      halt 400 if revenue_eur < 100 || @organisation.reward_claimer_id.present?
+
+      mg_client = Mailgun::Client.new ENV['MAILGUN_API_KEY'], ENV['MAILGUN_REGION']
+      batch_message = Mailgun::BatchMessage.new(mg_client, ENV['MAILGUN_NOTIFICATIONS_HOST'])
+
+      batch_message.from ENV['NOTIFICATIONS_EMAIL_FULL']
+      batch_message.subject "[Referral] #{current_account.name} is claiming a referral reward for #{@organisation.name}"
+      batch_message.body_text "Account: #{ENV['BASE_URI']}/u/#{current_account.username}\nOrganisation: #{ENV['BASE_URI']}/o/#{@organisation.slug}\nTotal revenue: €#{'%.2f' % revenue_eur}"
+
+      Account.and(admin: true).each do |account|
+        batch_message.add_recipient(:to, account.email, { 'firstname' => account.firstname || 'there', 'token' => account.sign_in_token, 'id' => account.id.to_s })
+      end
+
+      batch_message.finalize if Padrino.env == :production
+
+      @organisation.set(reward_claimer_id: current_account.id)
+
+      flash[:notice] = 'Your referral reward claim has been submitted.'
+      redirect '/referrals'
+    end
+
     get '/stripe_row_splitter' do
       erb :stripe_row_splitter
     end

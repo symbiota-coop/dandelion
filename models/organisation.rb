@@ -158,6 +158,21 @@ class Organisation
     stripe_connect_json && !stripe_pk && !coinbase_api_key && !(gocardless_instant_bank_pay && gocardless_access_token) && !evm_address && !oc_slug
   end
 
+  def referral_revenue_eur
+    to_eur = lambda { |amount, currency|
+      begin
+        Money.new((amount || 0) * 100, currency).exchange_to('EUR').cents
+      rescue Money::Bank::UnknownRate, Money::Currency::UnknownCurrency
+        0
+      end
+    }
+
+    event_ids = events.pluck(:id)
+    cents = Donation.and(:event_id.in => event_ids, payment_completed: true, application_fee_paid_to_dandelion: true).sum { |d| to_eur.call(d.amount, d.currency) }
+    cents += organisation_contributions.and(payment_completed: true).sum { |oc| to_eur.call(oc.amount, oc.currency) }
+    cents / 100.0
+  end
+
   def donations_to_dandelion?
     stripe_connect_only? && !paid_up
   end

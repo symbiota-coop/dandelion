@@ -4,6 +4,7 @@ module OrganisationAssociations
   included do
     belongs_to_without_parent_validation :account, inverse_of: :organisations, optional: true
     belongs_to_without_parent_validation :referrer, class_name: 'Account', inverse_of: :organisations_as_referrer, optional: true
+    belongs_to_without_parent_validation :reward_claimer, class_name: 'Account', inverse_of: :organisations_as_reward_claimer, optional: true
 
     has_many :stripe_charges, dependent: :destroy
     has_many :stripe_transactions, dependent: :destroy

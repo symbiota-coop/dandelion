@@ -1,0 +1,28 @@
+<h2 class="mb-3">Referrals</h2>
+
+<p>Organisations that have listed you as their referrer. When an organisation generates at least &euro;100 in donation revenue for Dandelion, you can claim a &euro;100 reward.</p>
+
+<% @organisations.each do |organisation| %>
+  <%
+    revenue_eur = organisation.referral_revenue_eur
+    percentage = [revenue_eur, 100].min
+  %>
+  <div class="card mb-3">
+    <div class="card-body">
+      <h5 class="card-title"><a href="/o/<%= organisation.slug %>"><%= organisation.name %></a></h5>
+      <div class="progress mb-2" style="height: 20px;">
+        <div class="progress-bar <% if percentage >= 100 %>bg-success<% end %>" role="progressbar" style="width: <%= percentage %>%"></div>
+      </div>
+      <div class="d-flex justify-content-between align-items-center">
+        <span>&euro;<%= '%.2f' % revenue_eur %> / &euro;100.00</span>
+        <% if organisation.reward_claimer_id.present? %>
+          <button class="btn btn-primary btn-sm" disabled>Claimed</button>
+        <% elsif revenue_eur >= 100 %>
+          <a href="/referrals/<%= organisation.id %>/claim" class="btn btn-primary btn-sm">Claim reward</a>
+        <% else %>
+          <button class="btn btn-primary btn-sm" disabled>Claim reward</button>
+        <% end %>
+      </div>
+    </div>
+  </div>
+<% end %>
