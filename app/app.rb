@@ -57,7 +57,7 @@ module Dandelion
         sign_in_via_api_key
       end
       PageView.create(request: request) if File.extname(request.path).blank? && !request.xhr? && !request.is_crawler? && !request.path.start_with?('/z/')
-      @og_desc = "Find and host #{%w[soulful regenerative metamodern participatory conscious transformative holistic ethical].join(' · ')} events and co-created gatherings"
+      @og_desc = "Find and host #{ADJECTIVES.join(' · ')} events and co-created gatherings"
       @og_image = "#{ENV['BASE_URI']}/images/link.png"
       if current_account
         current_account.set(last_active: Time.now)
@@ -274,6 +274,11 @@ module Dandelion
 
     get '/contact' do
       erb :contact
+    end
+
+    get '/features' do
+      @no_content_padding_bottom = true
+      erb :features
     end
 
     get '/search' do

@@ -1,0 +1,222 @@
+<style>
+  #content { padding-left: 0; padding-right: 0; padding-top: 0; }
+
+  .features-section { padding: 3.5rem 1.5rem; }
+  @media(min-width: 992px) { .features-section { padding: 5rem 2rem; } }
+
+  .features-hero { padding-top: 0; }
+
+  .features-gradient-text {
+    background: radial-gradient(circle at 0 0,#099ef1 0%,#6863f8 18.82%,#d84ffa 32.6%,#f058c5 52.83%,#ff4f90 68.03%,#ff6558 87.66%,#ff891f 100%);
+    background-clip: text;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    display: inline-block;
+    background-size: 100% 100%;
+  }
+  #features-strapline { font-size: 1.75rem; }
+  @media(min-width: 992px) { #features-strapline { font-size: 3.1vw; line-height: 130%; } }
+  /* #features-subtitle { font-size: 1rem; } */
+  /* @media(min-width: 992px) { #features-subtitle { font-size: 1.5vw; line-height: 130%; } } */
+
+  .feature-card {
+    background: #fff;
+    border: 1px solid rgba(0,0,0,0.08);
+    border-radius: 0.75rem;
+    padding: 1.75rem;
+    height: 100%;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+  }
+  .feature-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 8px 24px rgba(0,0,0,0.1);
+  }
+
+  .feature-icon {
+    width: 3rem;
+    height: 3rem;
+    border-radius: 0.5rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.35rem;
+    margin-bottom: 1rem;
+  }
+  .feature-icon.yellow { background: rgba(251,174,59,0.15); color: #d99520; }
+  .feature-icon.rose { background: rgba(224,96,122,0.12); color: #d94f6e; }
+  .feature-icon.magenta { background: rgba(185,0,161,0.1); color: #B900A1; }
+  .feature-icon.purple { background: rgba(68,0,185,0.1); color: #4400B9; }
+
+  .section-heading { font-size: 1.5rem; font-weight: 700; margin-bottom: 0.5rem; }
+  @media(min-width: 992px) { .section-heading { font-size: 2vw; } }
+  .section-divider { width: 3rem; height: 3px; border-radius: 2px; margin-bottom: 1.5rem; }
+  .section-divider.yellow { background: linear-gradient(90deg, #FBAE3B, #fcc56e); }
+  .section-divider.rose { background: linear-gradient(90deg, #d94f6e, #f0889a); }
+  .section-divider.magenta { background: linear-gradient(90deg, #B900A1, #e84dc4); }
+  .section-divider.purple { background: linear-gradient(90deg, #4400B9, #7c5ce7); }
+
+  .events-section {
+    background: linear-gradient(to bottom, #ffffff 30%, #fdf0dc);
+  }
+
+  .gatherings-section {
+    background: linear-gradient(to bottom, #fdf0dc, #fce8e6 30%);
+  }
+
+  .orgs-section {
+    background: linear-gradient(to bottom, #fce8e6, #f4e6f5 30%);
+  }
+
+  .values-section {
+    background: linear-gradient(to bottom, #f4e6f5, #ece0f0 30%);
+  }
+
+  .cta-section {
+    background:
+      radial-gradient(ellipse at 15% 80%, rgba(68,0,185,0.5) 0%, transparent 50%),
+      radial-gradient(ellipse at 85% 20%, rgba(185,0,161,0.4) 0%, transparent 50%),
+      radial-gradient(ellipse at 50% 50%, rgba(124,60,230,0.3) 0%, transparent 60%),
+      linear-gradient(to bottom, #5a1fd6, #4c10c0 30%, #4400B9 60%, #3a0099 100%);
+    color: #fff;
+  }
+  .cta-section .btn-light:focus { color: #212529; }
+  .cta-section .btn-outline-light:hover { background: #fff; color: #4400B9; }
+</style>
+
+<!-- Hero -->
+<div class="gradient content-padding-x features-section features-hero text-center">
+  <div class="row justify-content-center mx-0 py-5">
+    <div class="col-lg-8">
+      <p id="features-strapline" class="mb-3">Everything you need to host <strong class="features-gradient-text">meaningful events</strong></p>
+      <p id="features-subtitle" class="readable">An open, fee-free platform built by a worker co-operative.</p>
+      <a class="btn btn-primary btn-lg" href="/events/new">List an event</a>
+      <a class="btn btn-outline-primary btn-lg ml-1" href="/events">Explore events</a>
+    </div>
+  </div>
+</div>
+
+<!-- Events & Ticketing -->
+<div class="features-section events-section">
+  <div class="container">
+    <div class="text-center mb-5">
+      <h2 class="section-heading">Events &amp; Ticketing</h2>
+      <div class="section-divider yellow mx-auto"></div>
+      <p class="text-muted">Everything you need to list, manage and sell tickets for your events.</p>
+    </div>
+    <div class="row">
+      <% [
+        ['bi-calendar-event', 'Event listings', 'Create beautiful event pages with images, descriptions, locations and all the details attendees need.'],
+        ['bi-ticket-detailed', 'Flexible ticketing', 'Offer free, paid, donation-based or pay-what-you-feel tickets with capacity limits and waitlists.'],
+        ['bi-credit-card', 'Multiple payment options', 'Accept payments via Stripe, GoCardless, Coinbase Commerce, Open Collective and more.'],
+        ['bi-qr-code-scan', 'Check-in scanner', 'Check people in with a mobile scanner. Share a check-in link with assistants without giving them full admin access.'],
+        ['bi-star', 'Feedback & ratings', 'Collect post-event feedback to build your reputation and improve future events.'],
+        ['bi-tags', 'AI-powered tagging', 'Events are automatically tagged using AI so they surface in the right searches.'],
+      ].each do |icon, title, desc| %>
+        <div class="col-md-6 col-lg-4 mb-4">
+          <div class="feature-card">
+            <div class="feature-icon yellow"><i class="bi <%= icon %>"></i></div>
+            <h5><%= title %></h5>
+            <p class="text-muted mb-0"><%= desc %></p>
+          </div>
+        </div>
+      <% end %>
+    </div>
+  </div>
+</div>
+
+<!-- Co-created Gatherings -->
+<div class="features-section gatherings-section">
+  <div class="container">
+    <div class="text-center mb-5">
+      <h2 class="section-heading">Co-created Gatherings</h2>
+      <div class="section-divider rose mx-auto"></div>
+      <p class="text-muted">Tools for participatory events where everyone contributes.</p>
+    </div>
+    <div class="row">
+      <% [
+        ['bi-moon', 'Gathering spaces', 'Create dedicated spaces with open, application-based or invitation-only access modes.'],
+        ['bi-calendar3', 'Timetables', 'Co-create unconference-style timetables that participants can contribute sessions to.'],
+        ['bi-clock-history', 'Shift rotas', 'Organise volunteer shifts so the work of running your gathering is shared fairly.'],
+        ['bi-people', 'Teams', 'Create channels to organise different aspects of the gathering, from logistics to programming.'],
+        ['bi-wallet2', 'Choose & Pay', 'Set up contribution tiers so participants can choose their level and pay towards shared costs.'],
+        ['bi-box-seam', 'Inventory & budget', 'Track shared resources, equipment and budgets transparently with all organisers.'],
+      ].each do |icon, title, desc| %>
+        <div class="col-md-6 col-lg-4 mb-4">
+          <div class="feature-card">
+            <div class="feature-icon rose"><i class="bi <%= icon %>"></i></div>
+            <h5><%= title %></h5>
+            <p class="text-muted mb-0"><%= desc %></p>
+          </div>
+        </div>
+      <% end %>
+    </div>
+  </div>
+</div>
+
+<!-- Organisations & Community -->
+<div class="features-section orgs-section">
+  <div class="container">
+    <div class="text-center mb-5">
+      <h2 class="section-heading">Organisations &amp; Community</h2>
+      <div class="section-divider magenta mx-auto"></div>
+      <p class="text-muted">Grow your community and keep everyone in the loop.</p>
+    </div>
+    <div class="row">
+      <% [
+        ['bi-flag', 'Organisation profiles', 'Create a public profile for your organisation with events, members and a custom landing page.'],
+        ['bi-envelope-paper', 'Email campaigns', 'Send targeted emails to your attendees and community members directly from the platform.'],
+        ['bi-collection', 'Activities', 'Bundle families of similar events together. Gate access with application forms to curate your audience.'],
+        ['bi-graph-up', 'Analytics & stats', 'Track ticket sales, revenue, attendance and other key metrics in real time.'],
+        ['bi-megaphone', 'Local groups', 'Tap into local community groups to reach attendees near your events.'],
+        ['bi-code-square', 'Embeddable widgets', 'Embed event listings or ticket forms on your own website with auto-resizing iframes.'],
+      ].each do |icon, title, desc| %>
+        <div class="col-md-6 col-lg-4 mb-4">
+          <div class="feature-card">
+            <div class="feature-icon magenta"><i class="bi <%= icon %>"></i></div>
+            <h5><%= title %></h5>
+            <p class="text-muted mb-0"><%= desc %></p>
+          </div>
+        </div>
+      <% end %>
+    </div>
+  </div>
+</div>
+
+<!-- Values -->
+<div class="features-section values-section">
+  <div class="container">
+    <div class="text-center mb-5">
+      <h2 class="section-heading">Built on values, not venture capital</h2>
+      <div class="section-divider purple mx-auto"></div>
+    </div>
+    <div class="row justify-content-center mb-5">
+      <% [
+        ['bi-gift', 'No platform fees', 'Dandelion doesn\'t charge any platform fees. 100% of ticket revenue goes to organisers.'],
+        ['bi-heart', 'Worker co-operative', 'We\'re owned and run by the people who build and maintain the platform.'],
+        ['bi-unlock', 'Fair source & open data', 'Our code is fair source and your data is always exportable and belongs to you.'],
+      ].each do |icon, title, desc| %>
+        <div class="col-md-6 col-lg-4 mb-4">
+          <div class="feature-card text-center">
+            <div class="feature-icon purple mx-auto"><i class="bi <%= icon %>"></i></div>
+            <h5><%= title %></h5>
+            <p class="text-muted mb-0"><%= desc %></p>
+          </div>
+        </div>
+      <% end %>
+    </div>
+  </div>
+</div>
+
+<!-- CTA -->
+<div class="features-section cta-section text-center">
+  <div class="container">
+    <div class="row justify-content-center">
+      <div class="col-lg-7">
+        <h2 class="mb-3" style="font-weight: 700;">Ready to host something meaningful?</h2>
+        <p class="lead mb-4" style="opacity: 0.9;">Join a growing community of organisers creating soulful, participatory and regenerative events.</p>
+        <a class="btn btn-light btn-lg" href="/events/new">List an event</a>
+        <a class="btn btn-outline-light btn-lg ml-1" href="/events">Explore events</a>
+      </div>
+    </div>
+  </div>
+</div>

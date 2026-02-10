@@ -1,0 +1,20 @@
+<style>
+  #payment-methods img { filter: grayscale(100%); }
+  #payment-methods img:hover { filter: none; opacity: 1 !important }
+  #payment-methods img.stripe { opacity: 0.5; }
+  #payment-methods img.coinbase { opacity: 0.5 }
+  #payment-methods img.opencollective { opacity: 0.5; }
+  #payment-methods img.gocardless { opacity: 0.33; }
+  #payment-methods img.bread { opacity: 0.33 }
+</style>
+<% {
+  'gocardless.png' => 'https://gocardless.com/',
+  'coinbase.png' => 'https://www.coinbase.com/en-gb/commerce',
+  'stripe.png' => 'https://stripe.com/',
+  'opencollective.png' => 'https://opencollective.com/',
+  'bread.png' => 'https://bread.coop/solidarity-fund',
+}.each do |k, v| %>
+  <div class="col">
+    <a href="<%= v %>"><img class="<%= k.split('.').first %> w-100" src="/images/payment_methods/<%= k %>" /></a>
+  </div>
+<% end %>
