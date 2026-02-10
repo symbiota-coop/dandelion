@@ -33,7 +33,7 @@
           <div class="progress-bar <% if percentage >= 100 %>bg-success<% end %>" role="progressbar" style="width: <%= percentage %>%"></div>
         </div>
         <div class="d-flex justify-content-between align-items-center">
-          <span>&euro;<%= '%.2f' % revenue_eur %> / &euro;100.00</span>
+          <span><%= [revenue_eur, 100].min.round %> / 100 max</span>
           <% if organisation.reward_claimer_id.present? %>
             <button class="btn btn-primary btn-sm" disabled>Claimed</button>
           <% elsif revenue_eur >= 100 %>
