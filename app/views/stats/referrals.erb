@@ -13,7 +13,6 @@
     <% @organisations.each do |organisation| %>
       <%
         revenue = organisation.referral_revenue
-        percentage = [revenue.cents.to_f / Organisation::REFERRAL_REWARD_THRESHOLD.cents * 100, 100].min
       %>
       <tr>
         <td><a href="/o/<%= organisation.slug %>"><%= organisation.name %></a></td>
