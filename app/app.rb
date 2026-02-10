@@ -218,7 +218,7 @@ module Dandelion
       batch_message = Mailgun::BatchMessage.new(mg_client, ENV['MAILGUN_NOTIFICATIONS_HOST'])
 
       batch_message.from ENV['NOTIFICATIONS_EMAIL_FULL']
-      batch_message.subject "[Referral] #{current_account.name} is claiming a referral reward for #{@organisation.name}"
+      batch_message.subject "[Reward claim] #{current_account.name} is claiming a referral reward for #{@organisation.name}"
       batch_message.body_text "Account: #{ENV['BASE_URI']}/u/#{current_account.username}\nOrganisation: #{ENV['BASE_URI']}/o/#{@organisation.slug}\nTotal revenue: #{m(revenue, 'EUR')}"
 
       Account.and(admin: true).each do |account|
