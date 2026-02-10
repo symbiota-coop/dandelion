@@ -1,0 +1,32 @@
+<h2 class="mb-3">Referrals</h2>
+
+<table class="table">
+  <thead>
+    <tr>
+      <th>Organisation</th>
+      <th>Referrer</th>
+      <th>Revenue</th>
+      <th>Status</th>
+    </tr>
+  </thead>
+  <tbody>
+    <% @organisations.each do |organisation| %>
+      <%
+        revenue = organisation.referral_revenue
+        percentage = [revenue.cents.to_f / Organisation::REFERRAL_REWARD_THRESHOLD.cents * 100, 100].min
+      %>
+      <tr>
+        <td><a href="/o/<%= organisation.slug %>"><%= organisation.name %></a></td>
+        <td><a href="/u/<%= organisation.referrer.username %>"><%= organisation.referrer.name %></a></td>
+        <td><%= m(revenue, 'EUR') %></td>
+        <td>
+          <% if organisation.reward_claimer_id.present? %>
+            <span class="badge badge-success">Claimed</span>
+          <% elsif revenue >= Organisation::REFERRAL_REWARD_THRESHOLD %>
+            <span class="badge badge-secondary">Claimable</span>
+          <% end %>
+        </td>
+      </tr>
+    <% end %>
+  </tbody>
+</table>

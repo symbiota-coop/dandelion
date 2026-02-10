@@ -3,6 +3,11 @@ Dandelion::App.controller do
     admins_only!
   end
 
+  get '/stats/referrals' do
+    @organisations = Organisation.and(:referrer_id.ne => nil).includes(:referrer)
+    erb :'stats/referrals'
+  end
+
   get '/stats/charts' do
     erb :'stats/charts'
   end
