@@ -1,4 +1,6 @@
 class Organisation
+  REFERRAL_REWARD_THRESHOLD = Money.new(100_00, 'EUR').freeze
+
   include Mongoid::Document
   include Mongoid::Timestamps
   include CoreExtensions
@@ -158,19 +160,20 @@ class Organisation
     stripe_connect_json && !stripe_pk && !coinbase_api_key && !(gocardless_instant_bank_pay && gocardless_access_token) && !evm_address && !oc_slug
   end
 
-  def referral_revenue_eur
-    to_eur = lambda { |amount, currency|
+  def referral_revenue
+    target_currency = REFERRAL_REWARD_THRESHOLD.currency
+    to_target = lambda { |amount, currency|
       begin
-        Money.new((amount || 0) * 100, currency).exchange_to('EUR').cents
+        Money.new((amount || 0) * 100, currency).exchange_to(target_currency).cents
       rescue Money::Bank::UnknownRate, Money::Currency::UnknownCurrency
         0
       end
     }
 
     event_ids = events.pluck(:id)
-    cents = Donation.and(:event_id.in => event_ids, payment_completed: true, application_fee_paid_to_dandelion: true).sum { |d| to_eur.call(d.amount, d.currency) }
-    cents += organisation_contributions.and(payment_completed: true).sum { |oc| to_eur.call(oc.amount, oc.currency) }
-    cents / 100.0
+    cents = Donation.and(:event_id.in => event_ids, payment_completed: true, application_fee_paid_to_dandelion: true).sum { |d| to_target.call(d.amount, d.currency) }
+    cents += organisation_contributions.and(payment_completed: true).sum { |oc| to_target.call(oc.amount, oc.currency) }
+    Money.new(cents, target_currency)
   end
 
   def donations_to_dandelion?
