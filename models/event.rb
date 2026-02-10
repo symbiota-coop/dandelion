@@ -295,6 +295,7 @@ class Event
   end
 
   after_save :ai_tag
+  handle_asynchronously :ai_tag
   def ai_tag
     return unless ENV['OPENROUTER_API_KEY']
     return if duplicate
