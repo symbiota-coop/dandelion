@@ -4,7 +4,7 @@ Dandelion::App.controller do
   end
 
   get '/stats/referrals' do
-    @organisations = Organisation.and(:referrer_id.ne => nil).includes(:referrer)
+    @organisations = Organisation.and(:referrer_id.ne => nil).includes(:referrer, :reward_claimer)
     erb :'stats/referrals'
   end
 

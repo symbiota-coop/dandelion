@@ -6,7 +6,7 @@
       <th>Organisation</th>
       <th>Referrer</th>
       <th>Revenue</th>
-      <th>Status</th>
+      <th>Reward</th>
     </tr>
   </thead>
   <tbody>
@@ -20,7 +20,7 @@
         <td><%= m(revenue, 'EUR') %></td>
         <td>
           <% if organisation.reward_claimer_id.present? %>
-            <span class="badge badge-success">Claimed</span>
+            Claimed by <a href="/u/<%= organisation.reward_claimer.username %>"><%= organisation.reward_claimer.name %></a>
           <% elsif revenue >= Organisation::REFERRAL_REWARD_THRESHOLD %>
             <span class="badge badge-secondary">Claimable</span>
           <% end %>
