@@ -112,6 +112,7 @@ module OrganisationFields
     field :atproto_handle, type: String
     field :atproto_app_password, type: String
     field :atproto_did, type: String
+    field :no_referrer, type: Mongoid::Boolean
   end
 
   class_methods do
@@ -174,7 +175,8 @@ module OrganisationFields
         terms_and_conditions_check_box: :check_box,
         billing_address_collection: :check_box,
         feedback_summary: :text_area,
-        referrer_id: :lookup
+        referrer_id: :lookup,
+        no_referrer: :check_box
       }.merge(email_admin_fields)
     end
 
