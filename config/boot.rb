@@ -21,6 +21,7 @@ OmniAuth.config.allowed_request_methods = [:get]
 OmniAuth.config.logger = Logger.new(IO::NULL)
 
 Delayed::Worker.max_attempts = 1
+Delayed::Worker.destroy_failed_jobs = false
 
 require 'money/bank/uphold'
 Money.default_bank = Money::Bank::Uphold.new
