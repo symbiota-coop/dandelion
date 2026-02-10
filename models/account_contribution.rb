@@ -41,15 +41,15 @@ class AccountContribution
   end
 
   def body_text
-    b = "Account: #{ENV['BASE_URI']}/u/#{account.username}"
+    lines = ["Account: #{ENV['BASE_URI']}/u/#{account.username}"]
     if event
-      b << "\nEvent name: #{event.name}" if event
-      b << "\nEvent URL: #{ENV['BASE_URI']}/e/#{event.slug}" if event
-      b << "\nEvent Feedback URL: #{ENV['BASE_URI']}/event_feedbacks/#{event_feedback.id}" if event_feedback
+      lines << "Event name: #{event.name}"
+      lines << "Event URL: #{ENV['BASE_URI']}/e/#{event.slug}"
+      lines << "Event Feedback URL: #{ENV['BASE_URI']}/event_feedbacks/#{event_feedback.id}" if event_feedback
     else
-      b << "\nSource: #{source}"
+      lines << "Source: #{source}"
     end
-    b
+    lines.join("\n")
   end
 
   validates_presence_of :amount, :currency

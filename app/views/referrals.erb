@@ -5,11 +5,11 @@
 </p>
 <p>
   New organisations can list you as their referrer (the reason they joined Dandelion) in organisation settings under 'Everything else'.
-  Once an organisation has generated &euro;100 in donation revenue, you can claim a &euro;100 reward.    
+  Once an organisation has generated <%= m(Organisation::REFERRAL_REWARD_THRESHOLD, 'EUR') %> in donations to Dandelion, you can claim a <%= m(Organisation::REFERRAL_REWARD_THRESHOLD, 'EUR') %> reward.    
 </p>
 
 <p>
-  You'll see organisations that have listed you as their referrer below, along with a progress bar towards the &euro;100 reward.
+  You'll see organisations that have listed you as their referrer below, along with a progress bar towards the <%= m(Organisation::REFERRAL_REWARD_THRESHOLD, 'EUR') %> reward.
 </p>
 
 

@@ -13,7 +13,12 @@ Dandelion::App.controller do
 
     batch_message.from ENV['NOTIFICATIONS_EMAIL_FULL']
     batch_message.subject "[Question] #{current_account.name}"
-    batch_message.body_text "#{params[:question]}\n\nAccount: #{ENV['BASE_URI']}/u/#{current_account.username}\nEmail: #{current_account.email}"
+    batch_message.body_text [
+      params[:question],
+      '',
+      "Account: #{ENV['BASE_URI']}/u/#{current_account.username}",
+      "Email: #{current_account.email}"
+    ].join("\n")
     batch_message.reply_to current_account.email
 
     batch_message.add_recipient(:to, ENV['FOUNDER_EMAIL'])

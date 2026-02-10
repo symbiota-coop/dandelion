@@ -150,7 +150,12 @@ module Dandelion
 
       batch_message.from ENV['NOTIFICATIONS_EMAIL_FULL']
       batch_message.subject "[Feedback] #{current_account.name}"
-      batch_message.body_text "#{params[:feedback]}\n\nAccount: #{ENV['BASE_URI']}/u/#{current_account.username}\nEmail: #{current_account.email}"
+      batch_message.body_text [
+        params[:feedback],
+        '',
+        "Account: #{ENV['BASE_URI']}/u/#{current_account.username}",
+        "Email: #{current_account.email}"
+      ].join("\n")
       batch_message.reply_to current_account.email
 
       batch_message.add_recipient(:to, ENV['FOUNDER_EMAIL'])
@@ -219,7 +224,12 @@ module Dandelion
 
       batch_message.from ENV['NOTIFICATIONS_EMAIL_FULL']
       batch_message.subject "[Reward claim] #{current_account.name} for #{@organisation.name}"
-      batch_message.body_text "Account: #{ENV['BASE_URI']}/u/#{current_account.username}\nOrganisation: #{ENV['BASE_URI']}/o/#{@organisation.slug}\nTotal revenue: #{m(revenue, 'EUR')}"
+      batch_message.body_text [
+        "Reward claimer: #{ENV['BASE_URI']}/u/#{current_account.username}",
+        "Referrer: #{@organisation.referrer ? "#{ENV['BASE_URI']}/u/#{@organisation.referrer.username}" : '—'}",
+        "Organisation: #{ENV['BASE_URI']}/o/#{@organisation.slug}",
+        "Total revenue: #{m(revenue, 'EUR')}"
+      ].join("\n")
 
       Account.and(admin: true).each do |account|
         batch_message.add_recipient(:to, account.email, { 'firstname' => account.firstname || 'there', 'token' => account.sign_in_token, 'id' => account.id.to_s })
