@@ -1,19 +1,4 @@
 namespace :db do
-  def format_bytes(bytes)
-    return '0 B' if bytes == 0
-
-    units = %w[B KB MB GB TB]
-    size = bytes.to_f
-    unit_index = 0
-
-    while size >= 1024 && unit_index < units.length - 1
-      size /= 1024
-      unit_index += 1
-    end
-
-    "#{size.round(2)} #{units[unit_index]}"
-  end
-
   desc 'Get sizes of all MongoDB collections'
   task collection_sizes: :environment do
     db = Mongoid.default_client.database
@@ -54,19 +39,19 @@ namespace :db do
       printf "%-30s %12s %15s %15s %15s %12s\n",
              data[:name],
              data[:count].to_s.reverse.gsub(/(\d{3})(?=\d)/, '\\1,').reverse,
-             format_bytes(data[:size]),
-             format_bytes(data[:storage_size]),
-             format_bytes(data[:total_index_size]),
-             format_bytes(data[:avg_obj_size])
+             ActiveSupport::NumberHelper.number_to_human_size(data[:size]),
+             ActiveSupport::NumberHelper.number_to_human_size(data[:storage_size]),
+             ActiveSupport::NumberHelper.number_to_human_size(data[:total_index_size]),
+             ActiveSupport::NumberHelper.number_to_human_size(data[:avg_obj_size])
     end
 
     puts '-' * 80
     printf "%-30s %12s %15s %15s %15s\n",
            'TOTAL',
            collection_data.sum { |c| c[:count] }.to_s.reverse.gsub(/(\d{3})(?=\d)/, '\\1,').reverse,
-           format_bytes(total_size),
-           format_bytes(total_storage),
-           format_bytes(total_indexes)
+           ActiveSupport::NumberHelper.number_to_human_size(total_size),
+           ActiveSupport::NumberHelper.number_to_human_size(total_storage),
+           ActiveSupport::NumberHelper.number_to_human_size(total_indexes)
 
     puts "\n"
   end
@@ -110,22 +95,22 @@ namespace :db do
           begin
             collection.indexes.drop_one(s['name'])
             total_dropped += 1
-            printf "  %-45s %10d %15s %10s\n", s['name'], 0, format_bytes(size), '✅ dropped'
+            printf "  %-45s %10d %15s %10s\n", s['name'], 0, ActiveSupport::NumberHelper.number_to_human_size(size), '✅ dropped'
           rescue Mongo::Error::OperationFailure => e
-            printf "  %-45s %10d %15s %10s\n", s['name'], 0, format_bytes(size), '❌ failed'
+            printf "  %-45s %10d %15s %10s\n", s['name'], 0, ActiveSupport::NumberHelper.number_to_human_size(size), '❌ failed'
             puts "    Error: #{e.message}"
           end
         else
-          printf "  %-45s %10d %15s\n", s['name'], 0, format_bytes(size)
+          printf "  %-45s %10d %15s\n", s['name'], 0, ActiveSupport::NumberHelper.number_to_human_size(size)
         end
       end
     end
 
     puts "\n#{'=' * 90}"
     if drop
-      puts "🎉 Dropped #{total_dropped}/#{total_unused} unused indexes, freed ~#{format_bytes(total_wasted)}"
+      puts "🎉 Dropped #{total_dropped}/#{total_unused} unused indexes, freed ~#{ActiveSupport::NumberHelper.number_to_human_size(total_wasted)}"
     else
-      puts "📊 Found #{total_unused} unused indexes wasting #{format_bytes(total_wasted)}"
+      puts "📊 Found #{total_unused} unused indexes wasting #{ActiveSupport::NumberHelper.number_to_human_size(total_wasted)}"
       puts '👉 Run with DROP=1 to drop them all'
     end
     puts
