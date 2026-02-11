@@ -187,18 +187,12 @@ module Asn
   end
 
   def self.notify_asn_blocked(asn, v)
-    mg_client = Mailgun::Client.new ENV['MAILGUN_API_KEY'], ENV['MAILGUN_REGION']
-    batch_message = Mailgun::BatchMessage.new(mg_client, ENV['MAILGUN_NOTIFICATIONS_HOST'])
-
-    batch_message.from ENV['NOTIFICATIONS_EMAIL_FULL']
-    batch_message.subject "[ASN blocked] #{asn} (#{v[:bot]}% bot)"
-    batch_message.body_text [
-      "ASN #{asn} was automatically blocked due to suspicious bot traffic.",
-      "Review blocks at #{ENV['BASE_URI']}/stats/asns"
-    ].join("\n")
-
-    batch_message.add_recipient(:to, ENV['FOUNDER_EMAIL'])
-
-    batch_message.finalize if Padrino.env == :production
+    EmailHelper.send_to_founder(
+      subject: "[ASN blocked] #{asn} (#{v[:bot]}% bot)",
+      body_text: [
+        "ASN #{asn} was automatically blocked due to suspicious bot traffic.",
+        "Review blocks at #{ENV['BASE_URI']}/stats/asns"
+      ].join("\n")
+    )
   end
 end

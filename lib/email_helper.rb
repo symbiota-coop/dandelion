@@ -37,6 +37,21 @@ module EmailHelper
     ERB.new(File.read(Padrino.root("app/views/emails/#{template_name}.erb"))).result(context.get_binding)
   end
 
+  def self.send_to_founder(subject:, body_text: nil, body_html: nil, reply_to: nil)
+    mg_client = Mailgun::Client.new ENV['MAILGUN_API_KEY'], ENV['MAILGUN_REGION']
+    batch_message = Mailgun::BatchMessage.new(mg_client, ENV['MAILGUN_NOTIFICATIONS_HOST'])
+
+    batch_message.from ENV['NOTIFICATIONS_EMAIL_FULL']
+    batch_message.subject subject
+    batch_message.body_text body_text if body_text
+    batch_message.body_html body_html if body_html
+    batch_message.reply_to reply_to if reply_to
+
+    batch_message.add_recipient(:to, ENV['FOUNDER_EMAIL'])
+
+    batch_message.finalize if Padrino.env == :production
+  end
+
   def self.html(template_or_first_arg = nil, template: nil, content: nil, layout: :email, **locals, &block)
     # If first arg is a symbol or string, treat it as template name
     template = template_or_first_arg.to_s if template_or_first_arg.is_a?(Symbol) || template_or_first_arg.is_a?(String)

@@ -8,22 +8,16 @@ Dandelion::App.controller do
     sign_in_required!
     halt 400 unless params[:question]
 
-    mg_client = Mailgun::Client.new ENV['MAILGUN_API_KEY'], ENV['MAILGUN_REGION']
-    batch_message = Mailgun::BatchMessage.new(mg_client, ENV['MAILGUN_NOTIFICATIONS_HOST'])
-
-    batch_message.from ENV['NOTIFICATIONS_EMAIL_FULL']
-    batch_message.subject "[Question] #{current_account.name}"
-    batch_message.body_text [
-      params[:question],
-      '',
-      "Account: #{ENV['BASE_URI']}/u/#{current_account.username}",
-      "Email: #{current_account.email}"
-    ].join("\n")
-    batch_message.reply_to current_account.email
-
-    batch_message.add_recipient(:to, ENV['FOUNDER_EMAIL'])
-
-    batch_message.finalize if Padrino.env == :production
+    EmailHelper.send_to_founder(
+      subject: "[Question] #{current_account.name}",
+      body_text: [
+        params[:question],
+        '',
+        "Account: #{ENV['BASE_URI']}/u/#{current_account.username}",
+        "Email: #{current_account.email}"
+      ].join("\n"),
+      reply_to: current_account.email
+    )
 
     200
   end
