@@ -7,17 +7,10 @@
   .features-hero { padding-top: 0; }
 
   .features-gradient-text {
-    background: radial-gradient(circle at 0 0,#099ef1 0%,#6863f8 18.82%,#d84ffa 32.6%,#f058c5 52.83%,#ff4f90 68.03%,#ff6558 87.66%,#ff891f 100%);
-    background-clip: text;
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    display: inline-block;
     background-size: 100% 100%;
   }
-  #features-strapline { font-size: 1.75rem; }
-  @media(min-width: 992px) { #features-strapline { font-size: 3.1vw; line-height: 130%; } }
-  /* #features-subtitle { font-size: 1rem; } */
-  /* @media(min-width: 992px) { #features-subtitle { font-size: 1.5vw; line-height: 130%; } } */
+  .features-strapline { font-size: 1.3rem; }
+  @media(min-width: 992px) { .features-strapline { font-size: 3.1vw; line-height: 130%; } }
 
   .feature-card {
     background: #fff;
@@ -84,11 +77,12 @@
 </style>
 
 <!-- Hero -->
-<div class="gradient content-padding-x features-section features-hero text-center">
+<div class="gradient content-padding-x features-section features-hero text-lg-center">
   <div class="row justify-content-center mx-0 py-5">
-    <div class="col-lg-8">
-      <p id="features-strapline" class="mb-3">Everything you need to host <strong class="features-gradient-text">meaningful events</strong></p>
-      <p id="features-subtitle" class="readable">An open, fee-free platform built by a worker co-operative.</p>
+    <div class="col-lg-9 col-xl-8">
+      <p class="features-strapline mb-3">The platform for <strong class="gradient-text features-gradient-text">events that matter</strong></p>
+      <p class="readable mb-3">Run by a not-for-profit worker co-op.<br class="d-lg-none" />
+        No platform fees.</p>
       <a class="btn btn-primary btn-lg" href="/events/new">List an event</a>
       <a class="btn btn-outline-primary btn-lg ml-1" href="/events">Explore events</a>
     </div>
@@ -107,10 +101,10 @@
       <% [
         ['bi-calendar-event', 'Event listings', 'Create beautiful event pages with images, descriptions, locations and all the details attendees need.'],
         ['bi-ticket-detailed', 'Flexible ticketing', 'Offer free, paid, donation-based or pay-what-you-feel tickets with capacity limits, waitlists and discount codes.'],
-        ['bi-credit-card', 'Multiple payment options', 'Accept payments via Stripe, GoCardless, Open Collective or crypto (Coinbase Commerce and direct on-chain payments on Optimism, Gnosis, Base, Arbitrum and Celo).'],
+        ['bi-credit-card', 'Multiple payment options', 'Accept payments via Stripe, GoCardless, Open Collective or crypto.'],
         ['bi-qr-code-scan', 'Check-in scanner', 'Check people in with a mobile scanner. Share a check-in link with assistants without giving them full admin access.'],
         ['bi-star', 'Feedback & ratings', 'Collect post-event feedback with AI-powered summaries to build your reputation and improve future events.'],
-        ['bi-people', 'Smart recommendations', 'Get personalised suggestions for events and people based on your interests and attendance history.'],
+        ['bi-people', 'Smart recommendations', 'Get personalised suggestions for events and people based on your attendance history and community connections.'],
       ].each do |icon, title, desc| %>
         <div class="col-md-6 col-lg-4 mb-4">
           <div class="feature-card">
@@ -167,7 +161,7 @@
         ['bi-collection', 'Activities', 'Bundle families of similar events together. Gate access with application forms to curate your audience.'],
         ['bi-map', 'Local groups', 'Tap into local community groups to reach attendees near your events.'],        
         ['bi-envelope-paper', 'Email campaigns', 'Send targeted emails to your attendees and community members directly from the platform.'],
-        ['bi-graph-up', 'Analytics & stats', 'Track ticket sales, revenue, attendance and other key metrics in real time.'],
+        ['bi-graph-up', 'Analytics & stats', 'Track ticket sales, revenue, attendance and other key metrics at a glance.'],
         ['bi-code-square', 'Embeddable widgets', 'Embed event listings or ticket forms on your own website with auto-resizing iframes.'],
       ].each do |icon, title, desc| %>
         <div class="col-md-6 col-lg-4 mb-4">
@@ -191,13 +185,13 @@
     </div>
     <div class="row justify-content-center mb-5">
       <% [
-        ['bi-gift', 'No platform fees', 'We don\'t take a cut. You only pay the payment processor — everything else goes straight to you.'],
-        ['bi-heart', 'Worker co-operative', 'We\'re owned and run by the people who build and maintain the platform.'],
-        ['bi-unlock', 'Fair source & open data', 'Our code is fair source, and events are cross-posted to the open ATProtocol.'],
-      ].each do |icon, title, desc| %>
+        ['/images/gift.png', '339/385', 'No platform fees', 'We don\'t take a cut from ticket sales. You only pay the payment processor.'],
+        ['/images/coop.png', '115/116', 'Run by a worker co-op', 'We\'re owned and run by the people who build and maintain the platform.'],
+        ['/images/opendata.png', '570/569', 'Fair source & open data', 'Our code is fair source, and events are cross-posted to ATProto.'],
+      ].each do |img, aspect, title, desc| %>
         <div class="col-md-6 col-lg-4 mb-4">
           <div class="feature-card text-center">
-            <div class="feature-icon purple mx-auto"><i class="bi <%= icon %>"></i></div>
+            <div class="mx-auto mb-3" style="width: 5rem;"><img src="<%= img %>" class="w-100" style="aspect-ratio: <%= aspect %>;"></div>
             <h5><%= title %></h5>
             <p class="text-muted mb-0"><%= desc %></p>
           </div>
@@ -208,15 +202,18 @@
 </div>
 
 <!-- CTA -->
-<div class="features-section cta-section text-center">
-  <div class="container">
-    <div class="row justify-content-center">
-      <div class="col-lg-7">
-        <h2 class="mb-3" style="font-weight: 700;">Ready to host something meaningful?</h2>
-        <p class="lead mb-4" style="opacity: 0.9;">Join a growing community of organisers creating soulful, participatory and regenerative events.</p>
-        <a class="btn btn-light btn-lg" href="/events/new">List an event</a>
-        <a class="btn btn-outline-light btn-lg ml-1" href="/events">Explore events</a>
+<div class="features-section cta-section text-lg-center">
+  <div class="row justify-content-center mx-0">
+    <div class="col-lg-9 col-xl-8">
+      <p class="features-strapline mb-3">What will you bring people together for?</p>
+      <p class="readable mb-4" style="opacity: 0.9;">Join a growing community of organisers creating soulful, participatory and regenerative events.</p>
+      <a class="btn btn-light btn-lg" href="/events/new">List an event</a>
+      <a class="btn btn-outline-light btn-lg ml-1" href="/events">Explore events</a>
+      <div class="embed-responsive embed-responsive-16by9 mt-4 mb-3">
+        <iframe class="embed-responsive-item" src="https://player.vimeo.com/video/1030013082?badge=0&amp;autopause=0&amp;player_id=0&amp;app_id=58479" frameborder="0" allow="autoplay; fullscreen; picture-in-picture; clipboard-write" title="How to create an event on Dandelion" allowfullscreen="">
+        </iframe>
       </div>
+      <script src="https://player.vimeo.com/api/player.js"></script>
     </div>
   </div>
 </div>
