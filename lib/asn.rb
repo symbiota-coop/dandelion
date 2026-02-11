@@ -116,17 +116,13 @@ module Asn
     c = conn
     asns.map do |asn|
       Thread.new do
-        resp = c.get("/client/v4/radar/http/summary/bot_class?asn=#{asn}&dateRange=7d&format=json") do |req|
+        response = c.get("/client/v4/radar/http/summary/bot_class?asn=#{asn}&dateRange=7d&format=json") do |req|
           req.headers['Authorization'] = "Bearer #{ENV['CLOUDFLARE_API_KEY']}"
         end.body
-        if resp['success']
-          summary = resp.dig('result', 'summary_0') || {}
-          bot = summary['bot']&.to_f
-          human = summary['human']&.to_f
-          mutex.synchronize { bot_pct[asn] = { bot: bot&.round(1), human: human&.round(1) } } if bot && human
-        end
-      rescue StandardError
-        nil
+        summary = response.dig('result', 'summary_0') || {}
+        bot = summary['bot']&.to_f
+        human = summary['human']&.to_f
+        mutex.synchronize { bot_pct[asn] = { bot: bot&.round(1), human: human&.round(1) } } if bot && human
       end
     end.each(&:join)
     bot_pct
