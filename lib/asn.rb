@@ -165,7 +165,7 @@ module Asn
   end
 
   def self.autoblock
-    days = 3
+    days = 1
 
     rule = nil
     rows = nil
