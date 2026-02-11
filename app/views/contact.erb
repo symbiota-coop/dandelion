@@ -30,40 +30,20 @@
       <h2>Connect with us</h2>
 
       <p>
-        <a href="https://www.youtube.com/@dandelion.events.321" target="_blank">
-          <i class="bi bi-youtube"></i>
-          <span class="nav-link-text">YouTube</span>
-        </a>
-        <span class="mx-1">&middot;</span>
-        <a href="https://open.spotify.com/show/3pHYC5Zgh8jTFBBfd69LN7" target="_blank">
-          <i class="bi bi-spotify"></i>
-          <span class="nav-link-text">Spotify</span>
-        </a>
-        <span class="mx-1">&middot;</span>
-        <a href="https://dandeliondotevents.substack.com/" target="_blank">
-          <i class="bi bi-substack"></i>
-          <span class="nav-link-text">Substack</span>
-        </a>
-        <span class="mx-1">&middot;</span>
-        <a href="https://www.instagram.com/dandelion.events_/" target="_blank">
-          <i class="bi bi-instagram"></i>
-          <span class="nav-link-text">Instagram</span>
-        </a>
-        <span class="mx-1">&middot;</span>
-        <a href="https://www.reddit.com/r/dandelion_events/" target="_blank">
-          <i class="bi bi-reddit"></i>
-          <span class="nav-link-text">Reddit</span>
-        </a>
-        <span class="mx-1">&middot;</span>
-        <a href="https://t.me/dandelion_events" target="_blank">
-          <i class="bi bi-telegram"></i>
-          <span class="nav-link-text">Telegram</span>
-        </a>
-        <span class="mx-1">&middot;</span>
-        <a href="https://github.com/symbiota-coop/dandelion" target="_blank">
-          <i class="bi bi-github"></i>
-          <span class="nav-link-text">Github</span>
-        </a>
+        <% [
+          ['https://bsky.app/profile/dandelion.events', 'bluesky', 'Bluesky'],
+          ['https://www.youtube.com/@dandelion.events.321', 'youtube', 'YouTube'],
+          ['https://open.spotify.com/show/3pHYC5Zgh8jTFBBfd69LN7', 'spotify', 'Spotify'],
+          ['https://dandeliondotevents.substack.com/', 'substack', 'Substack'],
+          ['https://www.instagram.com/dandelion.events_/', 'instagram', 'Instagram'],
+          ['https://github.com/symbiota-coop/dandelion', 'github', 'Github']
+        ].each_with_index do |(url, icon, label), i| %>
+          <%= '<span class="mx-1">&middot;</span>'.html_safe if i > 0 %>
+          <a href="<%= url %>" target="_blank">
+            <i class="bi bi-<%= icon %>"></i>
+            <span class="nav-link-text"><%= label %></span>
+          </a>
+        <% end %>
       </p>
 
       <h2>Advisors</h2>
