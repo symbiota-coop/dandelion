@@ -31,7 +31,7 @@
       <tbody>
         <% @windows.each do |window| %>
           <% window[:asns].each_with_index do |row, i| %>
-            <% blocked = @asns.include?(row['asn'].to_s) %>
+            <% blocked = @blocked_asns.include?(row['asn'].to_s) %>
             <tr<%= ' style="background-color: #fff0f0"'.html_safe if blocked %>>
               <td><%= "#{window[:start].strftime('%a %d %b %H:%M')} &ndash; #{window[:end].strftime('%H:%M')}".html_safe if i == 0 %></td>
               <td><%= window[:baseline] if i == 0 %></td>
@@ -84,7 +84,7 @@
           </tr>
         </thead>
         <tbody>
-          <% @asns.each do |asn| %>
+          <% @blocked_asns.each do |asn| %>
             <% bp = @bot_pct[asn] %>
             <tr>
               <td></td>

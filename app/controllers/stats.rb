@@ -215,7 +215,7 @@ Dandelion::App.controller do
     ]
     threads.each(&:join)
 
-    @asns = Asn.blocked_asns(@rule)
+    @blocked_asns = Asn.blocked_asns(@rule)
     @legit_asns = Asn.legit_asns
     @asn_names = {}
     @asn_countries = {}
@@ -230,7 +230,7 @@ Dandelion::App.controller do
 
     @windows = Asn.suspicious_windows(rows: rows, days: @days, legit_asns: @legit_asns)
 
-    all_unique_asns = (@windows.flat_map { |w| w[:asns].map { |r| r['asn'].to_s } } + @asns).uniq
+    all_unique_asns = (@windows.flat_map { |w| w[:asns].map { |r| r['asn'].to_s } } + @blocked_asns).uniq
     @bot_pct = Asn.fetch_bot_classifications(all_unique_asns)
 
     erb :'stats/asns'
