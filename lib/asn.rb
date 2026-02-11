@@ -23,8 +23,8 @@ module Asn
     Stash.find_by(key: 'legit_asns')&.value&.split(',')&.map(&:strip) || []
   end
 
-  def self.fetch_analytics(days:)
-    since = (Time.now.utc - (days * 86_400)).strftime('%Y-%m-%dT%H:%M:%SZ')
+  def self.fetch_analytics(hours:)
+    since = (Time.now.utc - (hours * 3600)).strftime('%Y-%m-%dT%H:%M:%SZ')
     query = <<~GRAPHQL
       {
         viewer {
@@ -53,8 +53,8 @@ module Asn
     resp.dig('data', 'viewer', 'zones', 0, 'httpRequestsAdaptiveGroups') || []
   end
 
-  def self.fetch_country_data(days:)
-    since = (Time.now.utc - (days * 86_400)).strftime('%Y-%m-%dT%H:%M:%SZ')
+  def self.fetch_country_data(hours:)
+    since = (Time.now.utc - (hours * 3600)).strftime('%Y-%m-%dT%H:%M:%SZ')
     query = <<~GRAPHQL
       {
         viewer {
@@ -82,12 +82,12 @@ module Asn
     resp.dig('data', 'viewer', 'zones', 0, 'httpRequestsAdaptiveGroups') || []
   end
 
-  def self.suspicious_windows(rows:, days:, legit_asns:)
+  def self.suspicious_windows(rows:, hours:, legit_asns:)
     windows = []
     last_baseline_count = 0
     tz = TZInfo::Timezone.get(TIMEZONE)
     now = tz.to_local(Time.now.utc)
-    window_start = tz.local_time(now.year, now.month, now.day, (now.hour / WINDOW_LENGTH) * WINDOW_LENGTH) - (days * 86_400)
+    window_start = tz.local_time(now.year, now.month, now.day, (now.hour / WINDOW_LENGTH) * WINDOW_LENGTH) - (hours * 3600)
     while window_start < now
       window_end = window_start + (WINDOW_LENGTH * 3600)
 
@@ -162,19 +162,17 @@ module Asn
   end
 
   def self.autoblock
-    days = WINDOW_LENGTH / 24.0
-
     rule = nil
     rows = nil
     threads = [
       Thread.new { rule = fetch_rule },
-      Thread.new { rows = fetch_analytics(days: days) }
+      Thread.new { rows = fetch_analytics(hours: WINDOW_LENGTH) }
     ]
     threads.each(&:join)
 
     blocked = blocked_asns(rule)
     legit = legit_asns
-    windows = suspicious_windows(rows: rows, days: days, legit_asns: legit)
+    windows = suspicious_windows(rows: rows, hours: WINDOW_LENGTH, legit_asns: legit)
     candidates = windows.flat_map { |w| w[:asns].map { |r| r['asn'].to_s } }.uniq - blocked
 
     bot_pct = fetch_bot_classifications(candidates)

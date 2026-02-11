@@ -63,7 +63,7 @@
       </table>
     </div>
   <% else %>
-    <p class="text-muted text-center">No ASNs above threshold in the last <%= @days %> days.</p>
+    <p class="text-muted text-center">No ASNs above threshold in the last <%= @hours / 24 %> days.</p>
   <% end %>
 
   <% if @rule %>

@@ -204,14 +204,14 @@ Dandelion::App.controller do
   end
 
   get '/stats/asns' do
-    @days = 3
+    @hours = 3 * 24
 
     rows = nil
     country_rows = nil
     threads = [
       Thread.new { @rule = Asn.fetch_rule },
-      Thread.new { rows = Asn.fetch_analytics(days: @days) },
-      Thread.new { country_rows = Asn.fetch_country_data(days: @days) }
+      Thread.new { rows = Asn.fetch_analytics(hours: @hours) },
+      Thread.new { country_rows = Asn.fetch_country_data(hours: @hours) }
     ]
     threads.each(&:join)
 
@@ -228,7 +228,7 @@ Dandelion::App.controller do
       @asn_countries[asn] ||= r.dig('dimensions', 'clientCountryName')
     end
 
-    @windows = Asn.suspicious_windows(rows: rows, days: @days, legit_asns: @legit_asns)
+    @windows = Asn.suspicious_windows(rows: rows, hours: @hours, legit_asns: @legit_asns)
 
     all_unique_asns = (@windows.flat_map { |w| w[:asns].map { |r| r['asn'].to_s } } + @blocked_asns).uniq
     @bot_pct = Asn.fetch_bot_classifications(all_unique_asns)
