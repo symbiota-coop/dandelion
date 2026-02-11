@@ -205,8 +205,9 @@ Dandelion::App.controller do
 
   get '/stats/asns' do
     conn = Faraday.new(url: 'https://api.cloudflare.com') { |f| f.response :json }
-    days = 3
-    since = (Time.now.utc - (days * 86_400)).strftime('%Y-%m-%dT%H:%M:%SZ')
+    @days = 3
+    threshold = 1
+    since = (Time.now.utc - (@days * 86_400)).strftime('%Y-%m-%dT%H:%M:%SZ')
 
     detail = nil
     analytics = nil
@@ -296,7 +297,7 @@ Dandelion::App.controller do
     @windows = []
     tz = TZInfo::Timezone.get('Europe/Stockholm')
     now = tz.to_local(Time.now.utc)
-    window_start = tz.local_time(now.year, now.month, now.day, (now.hour / window_length) * window_length) - (days * 86_400)
+    window_start = tz.local_time(now.year, now.month, now.day, (now.hour / window_length) * window_length) - (@days * 86_400)
     while window_start < now
       window_end = window_start + (window_length * 3600)
       window_start = window_end and next if window_start.hour == 0
@@ -310,12 +311,36 @@ Dandelion::App.controller do
         { 'asn' => asn, 'description' => rs.first.dig('dimensions', 'clientASNDescription'), 'count' => rs.sum { |r| r['count'] } }
       end
       bt_count = by_asn.find { |r| r['asn'].to_s == baseline_asn.to_s }&.dig('count') || 0
-      filtered = by_asn.select { |r| r['count'] > bt_count && !@legit_asns.include?(r['asn'].to_s) }.sort_by { |r| -r['count'] }
+      filtered = by_asn.select { |r| r['asn'].to_s != baseline_asn.to_s && r['count'] > bt_count * threshold && !@legit_asns.include?(r['asn'].to_s) }.sort_by { |r| -r['count'] }
 
       @windows << { start: window_start, end: window_end, baseline: bt_count, asns: filtered } if filtered.any?
       window_start = window_end
     end
     @windows.reverse!
+
+    # Fetch bot classification from Cloudflare Radar
+    all_unique_asns = (
+      @windows.flat_map { |w| w[:asns].map { |r| r['asn'].to_s } } +
+      @asns
+    ).uniq
+    @bot_pct = {}
+    mutex = Mutex.new
+    radar_conn = Faraday.new(url: 'https://api.cloudflare.com') { |f| f.response :json }
+    all_unique_asns.map do |asn|
+      Thread.new do
+        resp = radar_conn.get("/client/v4/radar/http/summary/bot_class?asn=#{asn}&dateRange=7d&format=json") do |req|
+          req.headers['Authorization'] = "Bearer #{ENV['CLOUDFLARE_API_KEY']}"
+        end.body
+        if resp['success']
+          summary = resp.dig('result', 'summary_0') || {}
+          bot = summary['bot']&.to_f
+          human = summary['human']&.to_f
+          mutex.synchronize { @bot_pct[asn] = { bot: bot&.round(1), human: human&.round(1) } } if bot && human
+        end
+      rescue StandardError
+        nil
+      end
+    end.each(&:join)
 
     erb :'stats/asns'
   end

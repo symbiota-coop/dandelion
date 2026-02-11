@@ -1,23 +1,31 @@
 <style>
-  .col-asn { width: 10em; }
+  table.asn-table { table-layout: fixed; width: 100%; }
+  .col-window { width: 14em; }
+  .col-baseline { width: 5em; }
+  .col-asn { width: 7em; }
   .col-name { width: auto; }
   .col-country { width: 8em; }
+  .col-bot { width: 5em; }
+  .col-count { width: 5em; }
+  .col-mult { width: 6em; }
   .col-actions { width: 8em; }
 </style>
 
+<h4 class="text-center">Suspicious ASNs</h4>
 <% if @windows.any? %>
   <div class="table-responsive">
-    <table class="table table-hover table-sm">
+    <table class="table table-hover table-sm asn-table">
       <thead>
         <tr>
-          <th>Window (CET)</th>
-          <th>Baseline</th>
-          <th>ASN</th>
-          <th>Description</th>
-          <th>Country</th>
-          <th>Count</th>
-          <th>Multiplier</th>
-          <th></th>
+          <th class="col-window">Window (CET)</th>
+          <th class="col-baseline">Baseline</th>
+          <th class="col-asn">ASN</th>
+          <th class="col-name">Description</th>
+          <th class="col-country">Country</th>
+          <th class="col-bot">Bot %</th>
+          <th class="col-count">Count</th>
+          <th class="col-mult">Multiplier</th>
+          <th class="col-actions"></th>
         </tr>
       </thead>
       <tbody>
@@ -28,92 +36,115 @@
               <td><%= "#{window[:start].strftime('%a %d %b %H:%M')} &ndash; #{window[:end].strftime('%H:%M')}".html_safe if i == 0 %></td>
               <td><%= window[:baseline] if i == 0 %></td>
               <td><a href="https://radar.cloudflare.com/as<%= row['asn'] %>" target="_blank"><code><%= row['asn'] %></code></a></td>
-              <td><%= row['description'] %></td>
+              <td class="text-truncate"><%= row['description'] %></td>
               <td><%= @asn_countries[row['asn'].to_s] %></td>
-              <td><%= row['count'] %></td>
-              <td><%= window[:baseline] > 0 ? "#{(row['count'].to_f / window[:baseline]).round(1)}x" : '&ndash;'.html_safe %></td>
-              <td class="text-nowrap">
-                <% if blocked %>
-                  <form method="post" action="/stats/asns/unblock/<%= row['asn'] %>" class="d-inline">
+              <% bp = @bot_pct[row['asn'].to_s] %>
+              <td<%= " style=\"color: #{bp[:bot] >= 60 ? '#dc3545' : bp[:bot] >= 30 ? '#fd7e14' : '#28a745'}\"".html_safe if bp %>><%= bp ? "#{bp[:bot]}%" : '&ndash;'.html_safe %></td>
+                <td><%= row['count'] %></td>
+                <td><%= window[:baseline] > 0 ? "#{(row['count'].to_f / window[:baseline]).round(1)}x" : '&ndash;'.html_safe %></td>
+                <td class="text-nowrap">
+                  <% if blocked %>
+                    <form method="post" action="/stats/asns/unblock/<%= row['asn'] %>" class="d-inline">
+                      <button type="submit" class="btn btn-outline-success btn-sm" title="Unblock"><i class="bi bi-shield-x"></i></button>
+                    </form>
+                  <% else %>
+                    <form method="post" action="/stats/asns/block/<%= row['asn'] %>" class="d-inline">
+                      <button type="submit" class="btn btn-outline-danger btn-sm" title="Block"><i class="bi bi-shield-check"></i></button>
+                    </form>
+                  <% end %>
+                  <form method="post" action="/stats/asns/legit/<%= row['asn'] %>" class="d-inline">
+                    <button type="submit" class="btn btn-outline-secondary btn-sm" title="Mark as legit"><i class="bi bi-check-lg"></i></button>
+                  </form>
+                </td>
+              </tr>
+            <% end %>
+          <% end %>
+        </tbody>
+      </table>
+    </div>
+  <% else %>
+    <p class="text-muted text-center">No ASNs above threshold in the last <%= @days %> days.</p>
+  <% end %>
+
+  <% if @rule %>
+    <h4 class="mt-4 text-center">Blocked ASNs</h4>
+    <div class="table-responsive">
+      <table class="table table-hover table-sm asn-table">
+        <thead>
+          <tr>
+            <th class="col-window"></th>
+            <th class="col-baseline"></th>
+            <th class="col-asn">ASN</th>
+            <th class="col-name">Name</th>
+            <th class="col-country">Country</th>
+            <th class="col-bot">Bot %</th>
+            <th class="col-count"></th>
+            <th class="col-mult"></th>
+            <th class="col-actions"></th>
+          </tr>
+        </thead>
+        <tbody>
+          <% @asns.each do |asn| %>
+            <% bp = @bot_pct[asn] %>
+            <tr>
+              <td></td>
+              <td></td>
+              <td><a href="https://radar.cloudflare.com/as<%= asn %>" target="_blank"><code><%= asn %></code></a></td>
+              <td class="text-truncate"><%= @asn_names[asn] %></td>
+              <td><%= @asn_countries[asn] %></td>
+              <td<%= " style=\"color: #{bp[:bot] >= 60 ? '#dc3545' : bp[:bot] >= 30 ? '#fd7e14' : '#28a745'}\"".html_safe if bp %>><%= bp ? "#{bp[:bot]}%" : '&ndash;'.html_safe %></td>
+                <td></td>
+                <td></td>
+                <td>
+                  <form method="post" action="/stats/asns/unblock/<%= asn %>" class="d-inline">
                     <button type="submit" class="btn btn-outline-success btn-sm" title="Unblock"><i class="bi bi-shield-x"></i></button>
                   </form>
-                <% else %>
-                  <form method="post" action="/stats/asns/block/<%= row['asn'] %>" class="d-inline">
-                    <button type="submit" class="btn btn-outline-danger btn-sm" title="Block"><i class="bi bi-shield-check"></i></button>
-                  </form>
-                <% end %>
-                <form method="post" action="/stats/asns/legit/<%= row['asn'] %>" class="d-inline">
-                  <button type="submit" class="btn btn-outline-secondary btn-sm" title="Mark as legit"><i class="bi bi-check-lg"></i></button>
-                </form>
-              </td>
+                </td>
+              </tr>
+            <% end %>
+          </tbody>
+        </table>
+      </div>
+    <% else %>
+      <div class="alert alert-danger">Could not fetch rule from Cloudflare API.</div>
+    <% end %>
+
+    <% if @legit_asns.any? %>
+      <h4 class="mt-4 text-center">Legit ASNs</h4>
+      <div class="table-responsive">
+        <table class="table table-hover table-sm asn-table">
+          <thead>
+            <tr>
+              <th class="col-window"></th>
+              <th class="col-baseline"></th>
+              <th class="col-asn">ASN</th>
+              <th class="col-name">Name</th>
+              <th class="col-country">Country</th>
+              <th class="col-bot"></th>
+              <th class="col-count"></th>
+              <th class="col-mult"></th>
+              <th class="col-actions"></th>
             </tr>
-          <% end %>
-        <% end %>
-      </tbody>
-    </table>
-  </div>
-<% else %>
-  <p class="text-muted">No ASNs above threshold in the last 7 days.</p>
-<% end %>
-
-<% if @rule %>
-  <h4 class="mt-4">Blocked ASNs</h4>
-  <div class="table-responsive">
-    <table class="table table-hover table-sm">
-      <thead>
-        <tr>
-          <th class="col-asn">ASN</th>
-          <th class="col-name">Name</th>
-          <th class="col-country">Country</th>
-          <th class="col-actions"></th>
-        </tr>
-      </thead>
-      <tbody>
-        <% @asns.each do |asn| %>
-          <tr>
-            <td class="col-asn"><a href="https://radar.cloudflare.com/as<%= asn %>" target="_blank"><code><%= asn %></code></a></td>
-            <td class="col-name"><%= @asn_names[asn] %></td>
-            <td class="col-country"><%= @asn_countries[asn] %></td>
-            <td class="col-actions">
-              <form method="post" action="/stats/asns/unblock/<%= asn %>" class="d-inline">
-                <button type="submit" class="btn btn-outline-success btn-sm" title="Unblock"><i class="bi bi-shield-x"></i></button>
-              </form>
-            </td>
-          </tr>
-        <% end %>
-      </tbody>
-    </table>
-  </div>
-<% else %>
-  <div class="alert alert-danger">Could not fetch rule from Cloudflare API.</div>
-<% end %>
-
-<% if @legit_asns.any? %>
-  <h4 class="mt-4">Legit ASNs</h4>
-  <div class="table-responsive">
-    <table class="table table-hover table-sm">
-      <thead>
-        <tr>
-          <th class="col-asn">ASN</th>
-          <th class="col-name">Name</th>
-          <th class="col-country">Country</th>
-          <th class="col-actions"></th>
-        </tr>
-      </thead>
-      <tbody>
-        <% @legit_asns.each do |asn| %>
-          <tr>
-            <td class="col-asn"><a href="https://radar.cloudflare.com/as<%= asn %>" target="_blank"><code><%= asn %></code></a></td>
-            <td class="col-name"><%= @asn_names[asn] %></td>
-            <td class="col-country"><%= @asn_countries[asn] %></td>
-            <td class="col-actions">
-              <form method="post" action="/stats/asns/legit/<%= asn %>" class="d-inline">
-                <button type="submit" class="btn btn-outline-danger btn-sm" title="Remove from legit"><i class="bi bi-x-lg"></i></button>
-              </form>
-            </td>
-          </tr>
-        <% end %>
-      </tbody>
-    </table>
-  </div>
-<% end %>
+          </thead>
+          <tbody>
+            <% @legit_asns.each do |asn| %>
+              <tr>
+                <td></td>
+                <td></td>
+                <td><a href="https://radar.cloudflare.com/as<%= asn %>" target="_blank"><code><%= asn %></code></a></td>
+                <td class="text-truncate"><%= @asn_names[asn] %></td>
+                <td><%= @asn_countries[asn] %></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td>
+                  <form method="post" action="/stats/asns/legit/<%= asn %>" class="d-inline">
+                    <button type="submit" class="btn btn-outline-danger btn-sm" title="Remove from legit"><i class="bi bi-x-lg"></i></button>
+                  </form>
+                </td>
+              </tr>
+            <% end %>
+          </tbody>
+        </table>
+      </div>
+    <% end %>
