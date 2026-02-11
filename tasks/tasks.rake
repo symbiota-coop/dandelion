@@ -16,6 +16,8 @@ namespace :hourly do
       event.check_oc_event if event.orders.and(:payment_completed => false, :oc_secret.ne => nil, :event_id => event.id).exists?
     end
     Gathering.and(:evm_address.ne => nil).each(&:check_evm_account)
+    puts 'autoblock ASNs'
+    Asn.autoblock
   end
 end
 
