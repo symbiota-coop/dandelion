@@ -2,6 +2,7 @@ module Asn
   BASELINE_ASN = 2856
   WINDOW_LENGTH = 6
   THRESHOLD = 1
+  TIMEZONE = 'Europe/Stockholm'
 
   def self.conn
     Faraday.new(url: 'https://api.cloudflare.com') { |f| f.response :json }
@@ -84,7 +85,7 @@ module Asn
   def self.suspicious_windows(rows:, days:, legit_asns:)
     windows = []
     last_baseline_count = 0
-    tz = TZInfo::Timezone.get('Europe/Stockholm')
+    tz = TZInfo::Timezone.get(TIMEZONE)
     now = tz.to_local(Time.now.utc)
     window_start = tz.local_time(now.year, now.month, now.day, (now.hour / WINDOW_LENGTH) * WINDOW_LENGTH) - (days * 86_400)
     while window_start < now
