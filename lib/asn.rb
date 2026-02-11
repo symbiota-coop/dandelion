@@ -162,7 +162,7 @@ module Asn
   end
 
   def self.autoblock
-    days = 1
+    days = WINDOW_LENGTH / 24.0
 
     rule = nil
     rows = nil
