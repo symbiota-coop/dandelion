@@ -13,7 +13,7 @@ class OrganisationsTest < ActiveSupport::TestCase
     fill_in 'Organisation name', with: @organisation.name
     fill_in 'URL', with: @organisation.slug
     click_button 'Save and continue'
-    assert page.has_content? 'To accept payments, now add your Stripe and/or Coinbase Commerce details.'
+    assert page.has_content? 'To accept payments, now add details for Stripe or another payment processor.'
   end
 
   test 'editing an organisation' do

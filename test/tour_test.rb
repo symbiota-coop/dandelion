@@ -25,7 +25,7 @@ class TourTest < ActiveSupport::TestCase
     execute_script %{$('.introjs-nextbutton').click()}
     assert page.has_content? "Here's the admin dropdown for the organisation"
     execute_script %{$('.introjs-nextbutton').click()}
-    assert page.has_content? 'To accept payments, now add your Stripe and/or Coinbase Commerce details.'
+    assert page.has_content? 'To accept payments, now add details for Stripe or another payment processor.'
   end
 
   test 'event tour' do
