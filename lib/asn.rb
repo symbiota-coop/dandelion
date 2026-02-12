@@ -84,7 +84,6 @@ module Asn
 
   def self.suspicious_windows(rows:, hours:, legit_asns:)
     windows = []
-    last_baseline_count = 0
     tz = TZInfo::Timezone.get(TIMEZONE)
     now = tz.to_local(Time.now.utc)
     window_start = tz.local_time(now.year, now.month, now.day, (now.hour / WINDOW_LENGTH) * WINDOW_LENGTH) - (hours * 3600)
@@ -99,9 +98,9 @@ module Asn
       by_asn = window_rows.group_by { |r| r.dig('dimensions', 'clientAsn') }.map do |asn, rs|
         { 'asn' => asn, 'description' => rs.first.dig('dimensions', 'clientASNDescription'), 'count' => rs.sum { |r| r['count'] } }
       end
+      next window_start = window_end if window_start.hour < 6
+
       baseline_count = by_asn.find { |r| r['asn'].to_s == BASELINE_ASN.to_s }&.dig('count') || 0
-      baseline_count = last_baseline_count if window_start.hour == 0
-      last_baseline_count = baseline_count
       filtered = by_asn.select { |r| r['asn'].to_s != BASELINE_ASN.to_s && r['count'] > baseline_count * THRESHOLD && !legit_asns.include?(r['asn'].to_s) }.sort_by { |r| -r['count'] }
 
       windows << { start: window_start, end: window_end, baseline: baseline_count, asns: filtered } if filtered.any?
@@ -190,14 +189,18 @@ module Asn
     end
 
     if new_expression != rule['expression']
-      conn.patch("/client/v4/zones/#{ENV['CLOUDFLARE_ZONE_ID']}/rulesets/#{ENV['CLOUDFLARE_RULESET_ID']}/rules/#{ENV['CLOUDFLARE_ASN_RULE_ID']}") do |req|
+      response = conn.patch("/client/v4/zones/#{ENV['CLOUDFLARE_ZONE_ID']}/rulesets/#{ENV['CLOUDFLARE_RULESET_ID']}/rules/#{ENV['CLOUDFLARE_ASN_RULE_ID']}") do |req|
         req.headers['Authorization'] = "Bearer #{ENV['CLOUDFLARE_API_KEY']}"
         req.headers['Content-Type'] = 'application/json'
         req.body = { expression: new_expression, action: rule['action'], description: rule['description'] }.to_json
-      end
+      end.body
+
+      raise "failed to update Cloudflare rule: #{response.dig('errors')}" unless response['success']
     end
 
     to_block.each { |asn, v| notify_asn_blocked(asn, v) }
+  rescue StandardError => e
+    Honeybadger.notify(e)
   end
 
   def self.notify_asn_blocked(asn, v)
