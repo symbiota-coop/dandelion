@@ -13,8 +13,8 @@ class EventFeedback
   has_many :notifications, as: :notifiable, dependent: :destroy
 
   field :answers, type: Array
-  field :public, type: Boolean
-  field :anonymise, type: Boolean
+  field :publicly_visible, type: Boolean
+  field :anonymous, type: Boolean
   field :public_answers, type: Array
   field :rating, type: Integer
   field :response, type: String
@@ -23,8 +23,8 @@ class EventFeedback
   def self.admin_fields
     {
       rating: :radio,
-      public: :check_box,
-      anonymise: :check_box,
+      publicly_visible: :check_box,
+      anonymous: :check_box,
       answers: { type: :text_area, disabled: true },
       public_answers: { type: :text_area, disabled: true },
       response: :text_area,
@@ -51,7 +51,7 @@ class EventFeedback
   end
 
   after_create do
-    notifications.create! circle: circle, type: 'left_feedback' unless anonymise
+    notifications.create! circle: circle, type: 'left_feedback' unless anonymous
   end
 
   def self.average_rating
@@ -92,7 +92,7 @@ class EventFeedback
     event_feedback = self
     event = event_feedback.event
     batch_message.from ENV['NOTIFICATIONS_EMAIL_FULL']
-    batch_message.subject "#{event_feedback.rating.times.each.map { '★' }.join if event_feedback.rating} #{event.name}/#{event_feedback.anonymise? ? 'Anonymous' : event_feedback.account.name}"
+    batch_message.subject "#{event_feedback.rating.times.each.map { '★' }.join if event_feedback.rating} #{event.name}/#{event_feedback.anonymous? ? 'Anonymous' : event_feedback.account.name}"
     batch_message.body_html EmailHelper.html(:event_feedback, event_feedback: event_feedback, event: event)
 
     event.accounts_receiving_feedback.each do |account|
@@ -104,7 +104,7 @@ class EventFeedback
   handle_asynchronously :send_feedback
 
   def send_response
-    return if anonymise
+    return if anonymous
     return unless response
 
     mg_client = Mailgun::Client.new ENV['MAILGUN_API_KEY'], ENV['MAILGUN_REGION']

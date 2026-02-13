@@ -100,7 +100,7 @@
       </div>
     </td>
     <td>
-      <% if (event_feedback = event_feedbacks_by_account[ticket.account_id]) && !event_feedback.anonymise %>
+      <% if (event_feedback = event_feedbacks_by_account[ticket.account_id]) && !event_feedback.anonymous %>
         <a href="/event_feedbacks/<%= event_feedback.id %>">
           <% if event_feedback.rating %>
             <% event_feedback.rating.times do %><i class="bi bi-star-fill"></i><% end %>

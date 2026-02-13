@@ -21,7 +21,7 @@
       Attendee
     </th>
     <td>
-      <% if !@event_feedback.account || @event_feedback.anonymise %>
+      <% if !@event_feedback.account || @event_feedback.anonymous %>
         Anonymous
       <% else %>
         <a target="_blank" href="/u/<%= @event_feedback.account.username %>"><%= @event_feedback.account.name %> (<%= @event_feedback.account.email %>)</a>
@@ -46,7 +46,7 @@
     <td>
       <% if a %>
         <%== Sanitize.fragment(Rinku.auto_link(a), Sanitize::Config::DANDELION) %>
-        <% if @event_feedback.public? %>
+        <% if @event_feedback.publicly_visible? %>
           <div class="mt-3">
             <div data-pagelet-url="/event_feedbacks/<%= @event_feedback.id %>/public/<%= i %>"></div>
           </div>

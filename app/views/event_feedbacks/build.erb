@@ -38,8 +38,8 @@
         .feedback-question-label, .feedback-question-answer { font-size: 1.1rem }
       </style>
       <%= partial :'events/feedback_questions' %>
-      <%= checkbox 'Allow this feedback to be quoted publicly', slug: :public, checked: true %>
-      <%= checkbox 'Anonymise this feedback', slug: :anonymise %>
+      <%= checkbox 'Allow this feedback to be quoted publicly', slug: :publicly_visible, checked: true %>
+      <%= checkbox 'Anonymise this feedback', slug: :anonymous %>
       <%= f.submit_block button_text: 'Submit' %>
     <% end %>
   </div>

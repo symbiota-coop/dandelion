@@ -1,7 +1,7 @@
 <div class="main">
   <p><strong><%= destroyed_by.name %></strong> deleted feedback for the event <strong><a href="<%= ENV['BASE_URI'] %>/events/<%=event.id%>"><%= event.name %>, <%= event.when_details(nil) %></a></strong>:</p>
   <p>
-    Feedback from <% if event_feedback.anonymise? %>Anonymous<% else %><a href="<%= ENV['BASE_URI'] %>/u/<%= event_feedback.account.username %>"><%= event_feedback.account.name %></a><% end %>
+    Feedback from <% if event_feedback.anonymous? %>Anonymous<% else %><a href="<%= ENV['BASE_URI'] %>/u/<%= event_feedback.account.username %>"><%= event_feedback.account.name %></a><% end %>
   </p>
   <p style="color: #F5B042">
     <%= event_feedback.rating.times.each.map { '★' }.join if event_feedback.rating %>

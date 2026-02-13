@@ -3,5 +3,5 @@
 <% end %>
 <% form_tag "/event_feedbacks/#{@event_feedback.id}/response", style: ('display: none' if !@event_feedback.response) do %>
   <%= text_area_tag :response, onclick: '$(this).next().show()', class: 'form-control autosize mb-1', value: @event_feedback.response, placeholder: "#{@event_feedback.event.organisation.name}'s public response to this feedback" %>
-  <%= submit_tag (@event_feedback.public ? 'Send' : 'Save'), class: 'btn btn-primary', style: ('display: none' if @event_feedback.response) %>
+  <%= submit_tag (@event_feedback.publicly_visible ? 'Send' : 'Save'), class: 'btn btn-primary', style: ('display: none' if @event_feedback.response) %>
 <% end %>

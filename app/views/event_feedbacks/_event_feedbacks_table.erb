@@ -24,7 +24,7 @@
   event_feedbacks.each { |event_feedback| account = event_feedback.account %>
   <tr>
     <td>
-      <% if !account || event_feedback.anonymise? %>
+      <% if !account || event_feedback.anonymous? %>
         Anonymous
       <% else %>
         <%= partial :'accounts/account', locals: { account: account, show_email: (v || (event_feedback.event ? event_email_viewer?(event_feedback.event) : false)) } %>
@@ -73,7 +73,7 @@
           </strong>
           <br>
           <%== Sanitize.fragment(Rinku.auto_link(a), Sanitize::Config::DANDELION) %>
-          <% if event_feedback.public? %>
+          <% if event_feedback.publicly_visible? %>
             <div class="my-3">
               <div data-pagelet-url="/event_feedbacks/<%= event_feedback.id %>/public/<%= i %>"></div>
             </div>

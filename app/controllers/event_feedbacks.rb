@@ -84,8 +84,8 @@ Dandelion::App.controller do
     @event = Event.find(params[:id]) || not_found
     @title = "Feedback on #{@event.name}"
     @event_feedback = @event.event_feedbacks.new(mass_assigning(params[:event_feedback], EventFeedback))
-    @event_feedback.public = params[:public]
-    @event_feedback.anonymise = params[:anonymise]
+    @event_feedback.publicly_visible = params[:publicly_visible]
+    @event_feedback.anonymous = params[:anonymous]
     @event_feedback.answers = question_answer_pairs(params)
     @event_feedback.save
     flash[:notice] = 'Thanks for your feedback!'
