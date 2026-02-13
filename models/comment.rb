@@ -175,7 +175,7 @@ class Comment
     batch_message.subject comment.email_subject
     batch_message.body_html EmailHelper.html(:comment, comment: comment)
 
-    accounts = Account.public
+    accounts = Account.publicly_visible
     accounts = accounts.and(unsubscribed: false) unless force
     accounts = accounts.and(:id.in => post.subscriptions.pluck(:account_id))
     accounts.each do |account|

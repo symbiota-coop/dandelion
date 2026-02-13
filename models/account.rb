@@ -22,7 +22,7 @@ class Account
     %w[name name_transliterated email username]
   end
 
-  def self.public
+  def self.publicly_visible
     self.and(has_signed_in: true, hidden: false)
   end
 

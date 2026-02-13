@@ -4,7 +4,7 @@
   )).exists? %>
 
 
-<% organisations = organisations.sort_by { |organisation| created_at = organisation.events.live.public.order('created_at desc').first.try(:created_at); created_at ? created_at.to_i : 0 }.reverse.first(12) %>
+<% organisations = organisations.sort_by { |organisation| created_at = organisation.events.live.publicly_visible.order('created_at desc').first.try(:created_at); created_at ? created_at.to_i : 0 }.reverse.first(12) %>
 
 <% slick_id = "slick-#{SecureRandom.uuid}" %>
 <script>
@@ -40,7 +40,7 @@
     <div class="slick-responsive row justify-content-center">
       <% organisations.each { |organisation| %>
       <div class="col-6 col-lg-4 slick-item">
-        <%= partial :'organisations/block', locals: { organisation: organisation, most_recent: (organisation.events.live.public.future.exists?) } %>
+        <%= partial :'organisations/block', locals: { organisation: organisation, most_recent: (organisation.events.live.publicly_visible.future.exists?) } %>
       </div>
       <% } %>
     </div>

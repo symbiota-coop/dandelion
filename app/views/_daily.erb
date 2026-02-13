@@ -1,19 +1,19 @@
 <%=
-events = Event.live.public.browsable
+events = Event.live.publicly_visible.browsable
   .and(:description.ne => nil)
   .and(:start_time.gte => @date, :start_time.lt => @date + 1)
 render_article("Today's events", "Create a two-paragraph summary of these events, happening today. IMPORTANT: Two paragraphs only.", events)
 %>
 
 <%=
-events = Event.live.public.browsable
+events = Event.live.publicly_visible.browsable
   .and(:end_time.gte => @date - 2, :end_time.lt => @date - 1)
   .reject { |event| event.event_feedbacks.empty? || event.event_feedbacks.all? { |ef| !ef.answers || ef.answers.map { |q,a| a.blank? }.all? } }
 render_article("Feedback report", "Create a two-paragraph summary of the feedback on these events. IMPORTANT: Two paragraphs only.", events, use_feedback: true)
 %>
 
 <%=
-events = Event.live.public.browsable
+events = Event.live.publicly_visible.browsable
   .and(:description.ne => nil)
   .and(:created_at.gte => @date - 1, :created_at.lt => @date)
 render_article("Recently listed", "Create a two-paragraph summary of these newly-listed event(s). IMPORTANT: Two paragraphs only.", events)

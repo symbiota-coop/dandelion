@@ -5,7 +5,7 @@ Dandelion::App.controller do
     @title = @location.name
     params[:near] = @location.query
 
-    @events = Event.live.public.browsable
+    @events = Event.live.publicly_visible.browsable
     @from = params[:from] ? parse_date(params[:from]) : Date.today
     @to = params[:to] ? parse_date(params[:to]) : nil
 

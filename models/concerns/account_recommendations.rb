@@ -6,7 +6,7 @@ module AccountRecommendations
     account_recommendation_cache.recommend_people!
   end
 
-  def recommend_events!(events_with_participant_ids = Event.live.public.future.map do |event|
+  def recommend_events!(events_with_participant_ids = Event.live.publicly_visible.future.map do |event|
     [event.id.to_s, event.attendee_ids.map(&:to_s)]
   end, people = recommended_people)
     create_account_recommendation_cache unless account_recommendation_cache

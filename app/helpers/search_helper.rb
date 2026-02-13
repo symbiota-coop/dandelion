@@ -3,13 +3,13 @@ Dandelion::App.helpers do
   def search_type_config
     {
       Event => {
-        scope: -> { Event.live.public.browsable.future(1.week.ago) },
+        scope: -> { Event.live.publicly_visible.browsable.future(1.week.ago) },
         icon: 'bi-calendar-event',
         redirect_path: ->(item) { "/e/#{item.slug}" },
         label_formatter: ->(item) { "#{item.name} (#{concise_when_details(item)})" }
       },
       Account => {
-        scope: -> { Account.public },
+        scope: -> { Account.publicly_visible },
         icon: 'bi-person-fill',
         redirect_path: ->(item) { params[:message] ? "/messages/#{item.id}" : "/u/#{item.username}" },
         label_formatter: ->(item) { item.name }

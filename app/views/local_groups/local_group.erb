@@ -51,7 +51,7 @@
   <a class="btn btn-primary mb-3" href="/events/new?local_group_id=<%= @local_group.id %>">Create an event</a>
 <% end %>
 
-<% events = @local_group.events.live.public.future_and_current_featured.paginate(page: params[:events_page], per_page: 5) %>
+<% events = @local_group.events.live.publicly_visible.future_and_current_featured.paginate(page: params[:events_page], per_page: 5) %>
 <% if events.exists? %>
   <%= partial :'events/blocks', locals: { events: events } %>
   <div class="mt-3">
@@ -63,7 +63,7 @@
   </div>
 <% end %>
 
-<% events = @local_group.events.live.public.past.paginate(page: params[:past_events_page], per_page: 5) %>
+<% events = @local_group.events.live.publicly_visible.past.paginate(page: params[:past_events_page], per_page: 5) %>
 <% if events.exists? %>
   <h3 class="mt-3">Past events</h3>
   <%= partial :'events/blocks', locals: { events: events } %>

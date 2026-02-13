@@ -63,7 +63,7 @@ module EventScopes
       # If this is being called on an existing query, use that; otherwise use the default trending filters
       base_query = if self == Event
                      # Called as Event.trending - apply default filters
-                     live.public.browsable.future(from).and(has_image: true).and(hidden_from_homepage: false)
+                     live.publicly_visible.browsable.future(from).and(has_image: true).and(hidden_from_homepage: false)
                    else
                      # Called as a chain like @events.trending - use the existing query
                      self

@@ -2,11 +2,11 @@
   current_account.organisationships.and(:hide_membership => false).pluck(:organisation_id) +
   current_account.organisationships.and(:admin => true).pluck(:organisation_id)
   ).and(:id.in =>
-  Event.live.public.future.pluck(:organisation_id)
+  Event.live.publicly_visible.future.pluck(:organisation_id)
   )
   ).exists? %>
 
-<% organisations = organisations.sort_by { |organisation| created_at = organisation.events.live.public.order('created_at desc').first.try(:created_at); created_at ? created_at.to_i : 0 }.reverse %>
+<% organisations = organisations.sort_by { |organisation| created_at = organisation.events.live.publicly_visible.order('created_at desc').first.try(:created_at); created_at ? created_at.to_i : 0 }.reverse %>
 
 <% slick_id = "slick-#{SecureRandom.uuid}" %>
 <script>

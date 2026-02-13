@@ -8,7 +8,7 @@
   })
 </script>
 
-<% @future_and_current_featured_event_ids = @organisation.events_including_cohosted.live.public.future_and_current_featured.pluck(:id) %>
+<% @future_and_current_featured_event_ids = @organisation.events_including_cohosted.live.publicly_visible.future_and_current_featured.pluck(:id) %>
 
 <% @carousel_buttons = @organisation.carousels.and(button: true).exists? %>
 <% if @carousel_buttons %>

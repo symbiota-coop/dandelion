@@ -135,7 +135,7 @@ class Activity
   end
 
   def future_attendees
-    Account.and(:id.in => Ticket.and(:event_id.in => events.live.public.future.pluck(:id)).pluck(:account_id))
+    Account.and(:id.in => Ticket.and(:event_id.in => events.live.publicly_visible.future.pluck(:id)).pluck(:account_id))
   end
 
   def subscribed_accounts

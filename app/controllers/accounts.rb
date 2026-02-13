@@ -2,7 +2,7 @@ Dandelion::App.controller do
   get '/accounts', provides: :json do
     halt 400 unless params[:q] || params[:id]
 
-    @accounts = Account.public
+    @accounts = Account.publicly_visible
     @accounts = @accounts.and(id: params[:id]) if params[:id]
     @accounts = @accounts.and(:id.in => Account.search(params[:q], @accounts).pluck(:id)) if params[:q]
     case content_type
@@ -356,7 +356,7 @@ Dandelion::App.controller do
 
   get '/accounts/:id/events' do
     @account = Account.find(params[:id]) || not_found
-    events = Event.and(:id.in => EventFacilitation.and(:account_id.in => [@account.id] + @account.following_starred.pluck(:id)).pluck(:event_id)).live.public.future_and_current.and(hidden_from_homepage: false)
+    events = Event.and(:id.in => EventFacilitation.and(:account_id.in => [@account.id] + @account.following_starred.pluck(:id)).pluck(:event_id)).live.publicly_visible.future_and_current.and(hidden_from_homepage: false)
     partial :'events/blocks', locals: { events: events }, layout: 'minimal'
   end
 end

@@ -1,6 +1,6 @@
 Dandelion::App.controller do
   get '/events', provides: %i[html ics json], prefetch: true do
-    @events = Event.live.public.browsable
+    @events = Event.live.publicly_visible.browsable
     @from = params[:from] ? parse_date(params[:from]) : Date.today
     @to = params[:to] ? parse_date(params[:to]) : nil
 

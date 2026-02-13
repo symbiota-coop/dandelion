@@ -49,7 +49,7 @@ class Event
   end
 
   def self.recommend
-    events_with_participant_ids = Event.live.public.future.map do |event|
+    events_with_participant_ids = Event.live.publicly_visible.future.map do |event|
       [event.id.to_s, event.attendee_ids.map(&:to_s)]
     end
 
@@ -351,8 +351,7 @@ class Event
     set(hidden_from_homepage: true) if adult_words.intersect?(name_words + tag_words) || name_matches_forbidden || (organisation && organisation.hide_from_homepage?)
   end
 
-  # Must be defined after all handle_asynchronously calls, as it shadows Module#public
-  def self.public
+  def self.publicly_visible
     self.and(secret: false)
   end
 end
