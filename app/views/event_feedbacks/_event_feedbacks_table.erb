@@ -75,7 +75,7 @@
           <%== Sanitize.fragment(Rinku.auto_link(a), Sanitize::Config::DANDELION) %>
           <% if event_feedback.publicly_visible? %>
             <div class="my-3">
-              <div data-pagelet-url="/event_feedbacks/<%= event_feedback.id %>/public/<%= i %>"></div>
+              <div data-pagelet-url="/event_feedbacks/<%= event_feedback.id %>/public_answers/<%= i %>"></div>
             </div>
           <% end %>
         </div>

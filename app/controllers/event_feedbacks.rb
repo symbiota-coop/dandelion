@@ -117,19 +117,19 @@ Dandelion::App.controller do
     200
   end
 
-  get '/event_feedbacks/:id/public/:i' do
+  get '/event_feedbacks/:id/public_answers/:i' do
     @event_feedback = EventFeedback.find(params[:id]) || not_found
     @event = @event_feedback.event
     event_admins_only!
     partial :'event_feedbacks/public'
   end
 
-  post '/event_feedbacks/:id/public/:i' do
+  post '/event_feedbacks/:id/public_answers/:i' do
     @event_feedback = EventFeedback.find(params[:id]) || not_found
     @event = @event_feedback.event
     event_admins_only!
     @event_feedback.public_answers ||= @event_feedback.answers.map { |q, _a| [q, ''] }
-    @event_feedback.public_answers[params[:i].to_i][1] = params[:public]
+    @event_feedback.public_answers[params[:i].to_i][1] = params[:public_answer]
     @event_feedback.save
     200
   end
