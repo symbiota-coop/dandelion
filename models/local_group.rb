@@ -87,6 +87,12 @@ class LocalGroup
     organisation.members.and(coordinates: { '$geoWithin' => { '$geometry' => JSON.parse(geometry) } })
   end
 
+  def add_organisation_members_within
+    organisation_members_within.each do |account|
+      local_groupships.create(account: account)
+    end
+  end
+
   def self.human_attribute_name(attr, options = {})
     {
       slug: 'URL',
