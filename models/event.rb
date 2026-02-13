@@ -28,6 +28,10 @@ class Event
     find_by(slug: slug)
   end
 
+  def self.publicly_visible
+    self.and(secret: false)
+  end
+
   def image_source(cohost)
     cohostship = cohost && cohostships.find_by(organisation: cohost)
     return cohostship if cohostship&.image
@@ -349,9 +353,5 @@ class Event
     tag_words = Array(tag_names_cache).flat_map { |tag| tag.to_s.downcase.split }
     name_matches_forbidden = forbidden_phrases.any? { |phrase| name&.downcase&.include?(phrase.downcase) }
     set(hidden_from_homepage: true) if adult_words.intersect?(name_words + tag_words) || name_matches_forbidden || (organisation && organisation.hide_from_homepage?)
-  end
-
-  def self.publicly_visible
-    self.and(secret: false)
   end
 end
