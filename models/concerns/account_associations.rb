@@ -176,7 +176,7 @@ module AccountAssociations
   end
 
   def upcoming_events
-    my_events.future_and_current
+    my_events.future
   end
 
   def previous_events

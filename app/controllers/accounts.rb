@@ -356,7 +356,7 @@ Dandelion::App.controller do
 
   get '/accounts/:id/events' do
     @account = Account.find(params[:id]) || not_found
-    events = Event.and(:id.in => EventFacilitation.and(:account_id.in => [@account.id] + @account.following_starred.pluck(:id)).pluck(:event_id)).live.publicly_visible.future_and_current.and(hidden_from_homepage: false)
+    events = Event.and(:id.in => EventFacilitation.and(:account_id.in => [@account.id] + @account.following_starred.pluck(:id)).pluck(:event_id)).live.publicly_visible.future.and(hidden_from_homepage: false)
     partial :'events/blocks', locals: { events: events }, layout: 'minimal'
   end
 end

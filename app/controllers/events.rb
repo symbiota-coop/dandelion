@@ -32,7 +32,7 @@ Dandelion::App.controller do
       map_json(@events)
     when :ics
       @events = @events.without_heavy_fields
-      @events = @events.future_and_current
+      @events = @events.future
       @events = @events.and(:id.in => Event.search(params[:q], @events).pluck(:id)) if params[:q]
       @events = @events.limit(500)
       build_events_ical(@events, 'Dandelion')
