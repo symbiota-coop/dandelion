@@ -30,6 +30,11 @@ jobs:
   test:
     needs: generate-matrix
     runs-on: ubuntu-latest
+    services:
+      mongodb:
+        image: mongo:8.2
+        ports:
+          - 27017:27017
     strategy:
       fail-fast: false
       matrix:
@@ -43,11 +48,6 @@ jobs:
       with:
         ruby-version: 3.4.7
         bundler-cache: true
-
-    - name: Install MongoDB
-      uses: supercharge/mongodb-github-action@1.12.0
-      with:
-        mongodb-version: 8.2
 
     - name: Run RuboCop
       run: bundle exec rubocop --fail-level warning --display-only-fail-level-offenses
