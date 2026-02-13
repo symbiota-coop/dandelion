@@ -11,6 +11,21 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Git checkout
+      uses: actions/checkout@v4
+
+    - name: Install Ruby
+      uses: ruby/setup-ruby@v1
+      with:
+        ruby-version: 3.4.7
+        bundler-cache: true
+
+    - name: Run RuboCop
+      run: bundle exec rubocop --fail-level warning --display-only-fail-level-offenses
+
   generate-matrix:
     runs-on: ubuntu-latest
     outputs:
@@ -18,7 +33,7 @@ jobs:
     steps:
     - name: Git checkout
       uses: actions/checkout@v4
-    
+
     - name: Generate test file matrix
       id: set-matrix
       run: |
@@ -48,9 +63,6 @@ jobs:
       with:
         ruby-version: 3.4.7
         bundler-cache: true
-
-    - name: Run RuboCop
-      run: bundle exec rubocop --fail-level warning --display-only-fail-level-offenses
 
     - name: Generate session secret
       id: session-secret
