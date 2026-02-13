@@ -346,7 +346,7 @@ class Event
 
   after_save :set_hidden_from_homepage
   def set_hidden_from_homepage
-    adult_words = %w[naked sex sexual sexuality erotic eros cock pussy anal orgasm ejaculation]
+    adult_words = %w[naked sex sexual sexuality erotic eros cock pussy anal orgasm ejaculation dmt psilocybin lsd iboga ayahuasca mescaline mdma ketamine]
     forbidden_phrases = ['friday night dance']
 
     name_words = name ? name.downcase.split : []
