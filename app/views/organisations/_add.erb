@@ -11,7 +11,7 @@
     <a id="add-organisation" href="javascript:;" onclick="$(this).hide().next().show();
         $('#remove-organisation').hide()"><i class="bi bi-plus-square-fill"></i></a>
     <div style="display: none">
-      <% form_for new_object, new_url do |f| %>
+      <% form_for new_object, new_url, class: 'add-block bg-white shadow-sm p-3 mt-2 mb-3 rounded' do |f| %>
         <%= f.lookup_block :organisation_id, lookup_url: '/organisations/autocomplete.json', placeholder: 'Search organisations' %>
         <%= f.submit_block button_text: "Add #{role}" %>
       <% end %>
@@ -20,7 +20,7 @@
       <a id="remove-organisation" href="javascript:;" onclick="$(this).hide().next().show();
         $('#add-organisation').hide()"><i class="bi bi-dash-square-fill"></i></a>
       <div style="display: none">
-        <% form_tag destroy_url do |f| %>
+        <% form_tag destroy_url, class: 'add-block bg-white shadow-sm p-3 mt-2 mb-3 rounded' do |f| %>
           <%= select_tag :organisation_id, options: organisations.map { |organisation| ["#{organisation.name} (#{organisation.slug})", organisation.id] }, class: 'form-control mb-1' %>
           <%= submit_tag "Remove #{role}", class: 'btn btn-danger' %>
         <% end %>
