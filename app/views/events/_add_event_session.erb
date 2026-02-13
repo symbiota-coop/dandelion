@@ -2,10 +2,14 @@
   $(function() {
     $('#event-sessions').hover(
       function() {
-        $(this).find('.add-to-calendar').show();
+        if (!$(this).find('#add-event-session').next('div').is(':visible')) {
+          $(this).find('.add-to-calendar').show();
+        }
       },
       function() {
-        $(this).find('.add-to-calendar').hide();
+        if (!$(this).find('#add-event-session').next('div').is(':visible')) {
+          $(this).find('.add-to-calendar').hide();
+        }
       }
     );
   });
@@ -34,30 +38,19 @@
     <li>
       <i class="bi bi-clock"></i>
       <a data-toggle="tooltip" title="Add a session" id="add-event-session" href="javascript:;" onclick="$(this).hide().next().show();
-        $('#remove-event-session').hide()"><i class="bi bi-plus-square-fill"></i></a>
-      <div style="display: none">
-        <script>
-          $(function() {
-            $('#event_session_start_time')[0]._flatpickr.set('minDate', <%==@event.start_time.to_fs(:db_local).to_json%>)
-            $('#event_session_start_time')[0]._flatpickr.set('maxDate', <%==@event.end_time.to_fs(:db_local).to_json%>)
-            $('#event_session_end_time')[0]._flatpickr.set('minDate', <%==@event.start_time.to_fs(:db_local).to_json%>)
-            $('#event_session_end_time')[0]._flatpickr.set('maxDate', <%==@event.end_time.to_fs(:db_local).to_json%>)
-            $('#event_session_start_time').change(function() {
-            $('#event_session_end_time')[0]._flatpickr.set('minDate', $('#event_session_start_time')[0]._flatpickr.selectedDates[0])
-              })
-          })
-        </script>
-        <% form_for new_object, new_url, class: 'mb-3' do |f| %>
-          <%= f.datetime_block :start_time %>
-          <%= f.datetime_block :end_time %>
+        $('#remove-event-session').hide(); $('#event-sessions .add-to-calendar').hide()"><i class="bi bi-plus-square-fill"></i></a>
+      <div style="display: none;">
+        <% form_for new_object, new_url, class: 'bg-white shadow-sm p-3 mt-1 mb-3 rounded' do |f| %>
+          <%= f.datetime_block :start_time, data: { 'flatpickr-min-date': @event.start_time.to_fs(:db_local), 'flatpickr-max-date': @event.end_time.to_fs(:db_local), 'flatpickr-linked-end': '#event_session_end_time' } %>
+          <%= f.datetime_block :end_time, data: { 'flatpickr-min-date': @event.start_time.to_fs(:db_local), 'flatpickr-max-date': @event.end_time.to_fs(:db_local) } %>
           <%= f.submit_block button_text: 'Add session' %>
         <% end %>
       </div>
       <% if event_sessions.exists? %>
         <a data-toggle="tooltip" title="Remove a session" id="remove-event-session" href="javascript:;" onclick="$(this).hide().next().show();
-        $('#add-event-session').hide()"><i class="bi bi-dash-square-fill"></i></a>
+        $('#add-event-session').hide(); $('#event-sessions .add-to-calendar').hide()"><i class="bi bi-dash-square-fill"></i></a>
         <div style="display: none">
-          <% form_tag destroy_url do |f| %>
+          <% form_tag destroy_url, class: 'bg-white shadow-sm p-3 mt-1 mb-3 rounded' do |f| %>
             <%= select_tag :event_session_id, options: event_sessions.map { |event_session| [when_details(event_session, with_zone: false), event_session.id] }, class: 'form-control mb-1' %>
             <%= submit_tag 'Remove session', class: 'btn btn-danger' %>
           <% end %>

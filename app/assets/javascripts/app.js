@@ -72,11 +72,28 @@ $(function () {
       altInput: true,
       altFormat: 'Y-m-d'
     })
-    $('.datetimepicker').not('.flatpickr-registered').addClass('flatpickr-registered').flatpickr({
-      altInput: true,
-      altFormat: 'J F Y, H:i',
-      enableTime: true,
-      time_24hr: true
+    $('.datetimepicker').not('.flatpickr-registered').addClass('flatpickr-registered').each(function () {
+      var opts = {
+        altInput: true,
+        altFormat: 'J F Y, H:i',
+        enableTime: true,
+        time_24hr: true
+      }
+      var minDate = $(this).data('flatpickr-min-date')
+      var maxDate = $(this).data('flatpickr-max-date')
+      if (minDate) opts.minDate = minDate
+      if (maxDate) opts.maxDate = maxDate
+      $(this).flatpickr(opts)
+
+      var linkedEnd = $(this).data('flatpickr-linked-end')
+      if (linkedEnd) {
+        $(this).on('change', function () {
+          var endEl = $(linkedEnd)[0]
+          if (endEl && endEl._flatpickr) {
+            endEl._flatpickr.set('minDate', this._flatpickr.selectedDates[0])
+          }
+        })
+      }
     })
 
     $('[id=comment_body]').not('[data-tributed]').attr('data-tributed', true).each(function () {
