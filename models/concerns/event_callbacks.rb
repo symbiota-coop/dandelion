@@ -68,13 +68,13 @@ module EventCallbacks
     end
 
     after_create do
-      if circle && !prevent_notifications && live? && public?
+      if circle && !prevent_notifications && live? && publicly_visible?
         notifications.and(:type.in => %w[created_event updated_event]).destroy_all
         notifications.create! circle: circle, type: 'created_event'
       end
     end
     after_update do
-      if circle && !prevent_notifications && live? && public?
+      if circle && !prevent_notifications && live? && publicly_visible?
         notifications.and(:type.in => %w[created_event updated_event]).destroy_all
         notifications.create! circle: circle, type: 'updated_event'
       end

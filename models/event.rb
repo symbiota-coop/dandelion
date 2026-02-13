@@ -155,7 +155,7 @@ class Event
     no_sales_after_end_time? && end_time && Time.now > end_time
   end
 
-  def public?
+  def publicly_visible?
     !secret?
   end
 

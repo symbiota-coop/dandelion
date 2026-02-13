@@ -43,7 +43,7 @@
       </td>
     </tr>
   <% end %>
-  <% if event_admin? || (@event.event_facilitations.exists? && @event.event_facilitations.any? { |event_facilitation| event_facilitation.account.public? }) %>
+  <% if event_admin? || (@event.event_facilitations.exists? && @event.event_facilitations.any? { |event_facilitation| event_facilitation.account.publicly_visible? }) %>
     <tr>
       <td>Facilitators</td>
       <td>

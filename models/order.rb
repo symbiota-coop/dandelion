@@ -313,7 +313,7 @@ class Order
   def create_order_notification
     send_notification if event.send_order_notifications
     Notification.and(type: 'created_order').and(:notifiable_id.in => event.orders.and(account: account).pluck(:id)).destroy_all
-    return unless account.public? && event.live? && event.public?
+    return unless account.publicly_visible? && event.live? && event.publicly_visible?
 
     notifications.create! circle: circle, type: 'created_order'
   end

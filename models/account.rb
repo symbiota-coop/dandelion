@@ -121,12 +121,12 @@ class Account
     self
   end
 
-  def public?
+  def publicly_visible?
     has_signed_in && !hidden?
   end
 
   def private?
-    !public?
+    !publicly_visible?
   end
 
   def live_player?

@@ -80,7 +80,7 @@
       <% if !account || event_feedback.anonymous? %>
         Anonymous
       <% else %>
-        <% if account.public? %>
+        <% if account.publicly_visible? %>
           <% if account.image && !params[:hide_pictures] %>
             <%= partial :'accounts/square', locals: { account: account, width: '50px' } %>
             <br class="d-lg-none" />
