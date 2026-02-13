@@ -1,7 +1,7 @@
 Dandelion::App.controller do
   get '/o/:slug/events_block' do
     @organisation = Organisation.find_by(slug: params[:slug]) || not_found
-    @events = @organisation.events_including_cohosted.publicly_visible.future_and_current_featured.without_heavy_fields
+    @events = @organisation.events_including_cohosted.publicly_visible.future_and_current.without_heavy_fields
     @events = @events.and(monthly_donors_only: true) if params[:members_events]
     partial :'organisations/events_block'
   end
@@ -40,7 +40,7 @@ Dandelion::App.controller do
         @past = true
         @events = @events.past
       else
-        @events = @events.future_and_current_featured(@from)
+        @events = @events.future_and_current(@from)
         @events = @events.and(:start_time.lt => @to + 1) if @to
       end
       @events = filter_events_by_search_and_tags(@events)
@@ -74,7 +74,7 @@ Dandelion::App.controller do
           @past = true
           @events = @events.past
         else
-          @events = @events.future_and_current_featured(@from)
+          @events = @events.future_and_current(@from)
           @events = @events.and(:start_time.lt => @to + 1) if @to
         end
         @events = filter_events_by_search_and_tags(@events)
@@ -83,7 +83,7 @@ Dandelion::App.controller do
     when :ics
       @events = @events.without_heavy_fields
       @events = @events.live
-      @events = @events.future_and_current_featured(1.month.ago)
+      @events = @events.future_and_current(1.month.ago)
       @events = filter_events_by_search_and_tags(@events)
       @events = @events.limit(500)
       build_events_ical(@events, @organisation.name, ical_full: @organisation.ical_full)

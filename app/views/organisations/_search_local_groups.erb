@@ -1,4 +1,4 @@
-<% if (local_groups = @organisation.local_groups.order('name asc').and(:id.in => [params[:local_group_id]].compact + Event.and(:id.in => @future_and_current_featured_event_ids).pluck(:local_group_id))).exists? %>
+<% if (local_groups = @organisation.local_groups.order('name asc').and(:id.in => [params[:local_group_id]].compact + Event.and(:id.in => @future_and_current_event_ids).pluck(:local_group_id))).exists? %>
   <div class="form-group col-12 col-sm-auto">
     <label>Local group</label>
     <%= select_tag :local_group_id, options: [''] + local_groups.order('name asc').map { |local_group| [local_group.name, local_group.id] }, selected: params[:local_group_id], class: 'form-control' %>

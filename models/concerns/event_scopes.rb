@@ -12,10 +12,10 @@ module EventScopes
       self.and(:start_time.gte => from).order('start_time asc')
     end
 
-    def future_and_current_featured(from = Date.today)
+    def future_and_current(from = Date.today)
       self.and('$or' => [
                  { start_time: { '$gte' => from } },
-                 { end_time: { '$gte' => from }, featured: true }
+                 { end_time: { '$gte' => from }, show_after_start_time: true }
                ]).order('start_time asc')
     end
 

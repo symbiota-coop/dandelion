@@ -3,7 +3,7 @@
 <h2>Transfer <%=@order.account.name%>'s order</h2>
 
 <% form_for @order, "/orders/#{@order.id}/transfer" do |f| %>
-  <%= f.select_block :event_id, options: @order.event.organisation.events.future_and_current_featured.order('name asc').map { |event|
+  <%= f.select_block :event_id, options: @order.event.organisation.events.future_and_current.order('name asc').map { |event|
    event_admin?(event) ? [event.summary, event.id] : nil
   }.compact %>
   <%= f.submit_block %>
