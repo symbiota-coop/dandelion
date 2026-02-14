@@ -98,7 +98,7 @@ module Asn
       by_asn = window_rows.group_by { |r| r.dig('dimensions', 'clientAsn') }.map do |asn, rs|
         { 'asn' => asn, 'description' => rs.first.dig('dimensions', 'clientASNDescription'), 'count' => rs.sum { |r| r['count'] } }
       end
-      next window_start = window_end if window_start.hour < 6
+      next window_start = window_end if window_start.hour < 6 || window_end > now
 
       baseline_count = by_asn.find { |r| r['asn'].to_s == BASELINE_ASN.to_s }&.dig('count') || 0
       filtered = by_asn.select { |r| r['asn'].to_s != BASELINE_ASN.to_s && r['count'] > baseline_count * THRESHOLD && !legit_asns.include?(r['asn'].to_s) }.sort_by { |r| -r['count'] }
