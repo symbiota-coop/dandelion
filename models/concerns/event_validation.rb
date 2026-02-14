@@ -17,6 +17,7 @@ module EventValidation
       self.description = description.gsub('href="www.', 'href="http://www.') if description
       self.suggested_donation = nil if organisation && !organisation.payment_method?
       self.has_organisation = organisation ? true : false
+      self.has_recording = extra_info_for_recording_email || recording_email_greeting || recording_email_title
 
       unless slug
         loop do

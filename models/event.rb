@@ -111,7 +111,7 @@ class Event
   end
 
   def recording?
-    past? && extra_info_for_recording_email
+    past? && has_recording?
   end
 
   def summary
