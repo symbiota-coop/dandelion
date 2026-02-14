@@ -213,11 +213,6 @@
         <% if @event.persisted? %>
           <p style="margin-top: -1rem"><a target="_blank" href="/events/<%=@event.id%>/ticket_email">Preview order confirmation email &rarr;</a></p>
         <% end %>
-        <%= f.text_block :recording_email_title %>
-        <%= f.wysiwyg_block :recording_email_greeting %>
-        <% if @event.persisted? %>
-          <p style="margin-top: -1rem"><a target="_blank" href="/events/<%=@event.id%>/ticket_email">Preview order confirmation email &rarr;</a></p>
-        <% end %>
         <%= f.text_block :reminder_email_title %>
         <%= f.wysiwyg_block :reminder_email_body %>
         <% if @event.persisted? %>
@@ -227,6 +222,13 @@
         <%= f.wysiwyg_block :feedback_email_body %>
         <% if @event.persisted? %>
           <p style="margin-top: -1rem"><a target="_blank" href="/events/<%=@event.id%>/feedback_request_email">Preview feedback request email &rarr;</a></p>
+        <% end %>
+        <% if (@event.persisted? && @event.start_time && @event.past?) || @event.recording_email_title || @event.recording_email_greeting %>
+          <%= f.text_block :recording_email_title %>
+          <%= f.wysiwyg_block :recording_email_greeting %>
+          <% if @event.persisted? %>
+            <p style="margin-top: -1rem"><a target="_blank" href="/events/<%=@event.id%>/ticket_email">Preview order confirmation email &rarr;</a></p>
+          <% end %>
         <% end %>
       </div>
       <div role="tabpanel" class="tab-pane" id="tab-everything-else">
