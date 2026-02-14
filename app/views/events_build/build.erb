@@ -208,27 +208,35 @@
         <%= f.color_block :theme_color %>
       </div>
       <div role="tabpanel" class="tab-pane" id="tab-emails">
-        <%= f.text_block :ticket_email_title %>
-        <%= f.wysiwyg_block :ticket_email_greeting %>
-        <% if @event.persisted? %>
-          <p style="margin-top: -1rem"><a target="_blank" href="/events/<%=@event.id%>/ticket_email">Preview order confirmation email &rarr;</a></p>
-        <% end %>
-        <%= f.text_block :reminder_email_title %>
-        <%= f.wysiwyg_block :reminder_email_body %>
-        <% if @event.persisted? %>
-          <p style="margin-top: -1rem"><a target="_blank" href="/events/<%=@event.id%>/reminder_email">Preview reminder email &rarr;</a></p>
-        <% end %>
-        <%= f.text_block :feedback_email_title %>
-        <%= f.wysiwyg_block :feedback_email_body %>
-        <% if @event.persisted? %>
-          <p style="margin-top: -1rem"><a target="_blank" href="/events/<%=@event.id%>/feedback_request_email">Preview feedback request email &rarr;</a></p>
-        <% end %>
-        <% if (@event.persisted? && @event.start_time && @event.past?) || @event.recording_email_title || @event.recording_email_greeting %>
-          <%= f.text_block :recording_email_title %>
-          <%= f.wysiwyg_block :recording_email_greeting %>
+        <div>
+          <%= f.text_block :ticket_email_title %>
+          <%= f.wysiwyg_block :ticket_email_greeting %>
           <% if @event.persisted? %>
             <p style="margin-top: -1rem"><a target="_blank" href="/events/<%=@event.id%>/ticket_email">Preview order confirmation email &rarr;</a></p>
           <% end %>
+        </div>
+        <div class="mt-5">
+          <%= f.text_block :reminder_email_title %>
+          <%= f.wysiwyg_block :reminder_email_body %>
+          <% if @event.persisted? %>
+            <p style="margin-top: -1rem"><a target="_blank" href="/events/<%=@event.id%>/reminder_email">Preview reminder email &rarr;</a></p>
+          <% end %>
+        </div>
+        <div class="mt-5">
+          <%= f.text_block :feedback_email_title %>
+          <%= f.wysiwyg_block :feedback_email_body %>
+          <% if @event.persisted? %>
+            <p style="margin-top: -1rem"><a target="_blank" href="/events/<%=@event.id%>/feedback_request_email">Preview feedback request email &rarr;</a></p>
+          <% end %>
+        </div>
+        <% if (@event.persisted? && @event.start_time && @event.past?) || @event.recording_email_title || @event.recording_email_greeting %>
+          <div class="mt-5">
+            <%= f.text_block :recording_email_title %>
+            <%= f.wysiwyg_block :recording_email_greeting %>
+            <% if @event.persisted? %>
+              <p style="margin-top: -1rem"><a target="_blank" href="/events/<%=@event.id%>/ticket_email">Preview order confirmation email &rarr;</a></p>
+            <% end %>
+          </div>
         <% end %>
       </div>
       <div role="tabpanel" class="tab-pane" id="tab-everything-else">
