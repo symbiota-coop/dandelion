@@ -1,5 +1,5 @@
 <% if !defined?(bottom_url) && !admin %>
-  <a target="_parent" href="<%= view_url %>" class="p-2 d-block block"
+  <a target="_parent" href="<%= view_url %>" class="p-2 d-block block rounded"
      style="
      text-decoration: none;
      height: 10rem; overflow: hidden;
@@ -7,7 +7,7 @@
      <% if image %>background: linear-gradient( rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5) ), url('<%= image.thumb('400x400').url %>'); background-size: cover; background-position: center center;<% end %>
      ">
   <% else %>
-    <div class="p-2 d-block block"
+    <div class="p-2 d-block block rounded"
      style="
      height: 10rem; overflow: hidden;
      <% if !image %>border: 0.175rem solid #212529; background: white;<% end %>
