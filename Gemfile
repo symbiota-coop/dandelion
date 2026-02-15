@@ -104,6 +104,7 @@ gem 'redis'
 
 #  Everything else
 gem 'chroma' # for manipulating colours
+gem 'luminosity_contrast' # for WCAG contrast ratio calculations
 gem 'digest' # for generating hashes
 gem 'haikunator' # for generating random names
 gem 'mini_magick' # for image processing

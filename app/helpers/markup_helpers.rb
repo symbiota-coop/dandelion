@@ -57,6 +57,34 @@ Dandelion::App.helpers do
     </div>).html_safe
   end
 
+  def quick_colors(count: 13, saturation: 80, lightness: 50, primary: '#00B963')
+    step = 360.0 / count
+    base_hue = Chroma.paint(primary).hsl.h.round
+    (0...count).map { |i| i == 0 ? primary : Chroma.paint("hsl(#{(base_hue + (i * step)) % 360}, #{saturation}%, #{lightness}%)").to_hex }
+  end
+
+  def clamp_color(hex, min_contrast: 2.5, min_lightness: 0.25)
+    hsl = Chroma.paint(hex).hsl
+    if LuminosityContrast.ratio(hex.delete('#'), 'fff') < min_contrast
+      low = 0.0
+      high = hsl.l
+      7.times do
+        mid = (low + high) / 2.0
+        test_hex = Chroma.paint("hsl(#{hsl.h}, #{(hsl.s * 100).round}%, #{(mid * 100).round}%)").to_hex
+        if LuminosityContrast.ratio(test_hex.delete('#'), 'fff') >= min_contrast
+          low = mid
+        else
+          high = mid
+        end
+      end
+      Chroma.paint("hsl(#{hsl.h}, #{(hsl.s * 100).round}%, #{(low * 100).round}%)").to_hex
+    elsif hsl.l < min_lightness
+      Chroma.paint("hsl(#{hsl.h}, #{(hsl.s * 100).round}%, #{(min_lightness * 100).round}%)").to_hex
+    else
+      hex
+    end
+  end
+
   def blurred_image_tag(image, width: nil, height: nil, full_size: '992x992', md_size: nil, css_class: 'w-100', id: nil)
     attrs = []
     attrs << %(class="#{css_class}") if css_class

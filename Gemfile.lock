@@ -272,6 +272,7 @@ GEM
     loofah (2.24.1)
       crass (~> 1.0.2)
       nokogiri (>= 1.12.0)
+    luminosity_contrast (0.2.1)
     mail (2.9.0)
       logger
       mini_mime (>= 0.1.1)
@@ -623,6 +624,7 @@ DEPENDENCIES
   incoming
   irb
   jwt
+  luminosity_contrast
   mail
   mailgun-ruby
   maxmind-geoip2
