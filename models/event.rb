@@ -27,6 +27,7 @@ class Event
   COPY_FIELDS = %w[
     name location email image
     description extra_info_for_ticket_email
+    capacity
     last_saved_by
   ].freeze
 
