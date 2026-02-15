@@ -4,7 +4,7 @@ module EventFields
   included do
     include EmailFields
 
-    attr_accessor :prevent_notifications, :duplicate
+    attr_accessor :prevent_notifications, :duplicate, :update_activity_events
 
     field :name, type: String
     field :slug, type: String
@@ -159,7 +159,8 @@ module EventFields
         minimal_only: 'Show only in embeds',
         theme_color: 'Theme color',
         no_sales_after_end_time: 'No sales after event ends',
-        show_after_start_time: 'Show after start time'
+        show_after_start_time: 'Show after start time',
+        update_activity_events: 'Update all future events in this activity with the same key information'
       }.merge(email_human_attribute_names).merge({
                                                    recording_email_title: 'Order confirmation email subject for the recording of the event',
                                                    recording_email_greeting: 'Order confirmation email greeting for the recording of the event'
@@ -215,7 +216,8 @@ module EventFields
         theme_color: 'Theme color for the event page',
         no_sales_after_end_time: 'Prevent ticket sales after the event end time, regardless of individual ticket type settings',
         always_show_full_ticket_form: 'Always show the full ticket form, even if there is only one free ticket type',
-        show_after_start_time: 'Keep showing the event in listings after the start time has passed'
+        show_after_start_time: 'Keep showing the event in listings after the start time has passed',
+        update_activity_events: "Applies to #{(Event::COPY_FIELDS - %w[last_saved_by]).map { |f| Event.human_attribute_name(f).downcase }.to_sentence(last_word_connector: ' and ')}"
       }.merge(email_hints).merge({
                                    recording_email_title: 'Custom subject line for the order confirmation email for the recording of the event',
                                    recording_email_greeting: 'Custom greeting for the order confirmation email for the recording of the event'

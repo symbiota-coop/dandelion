@@ -261,6 +261,9 @@
         <%= f.check_box_block :opt_in_organisation %>
         <%= f.check_box_block :opt_in_facilitator %>
         <%= f.check_box_block :refund_deleted_orders %>
+        <% if @event.activity %>
+          <%= f.check_box_block :update_activity_events %>
+        <% end %>
         <% if !@event.organisation.stripe_client_id %>
           <%= f.text_area_block :notes %>
         <% end %>
