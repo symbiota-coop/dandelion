@@ -299,16 +299,15 @@ $(function () {
   }
   const updateThemeCSS = () => {
     const hex = normalizeHex(themeColorInput.val())
-    let $link = $('link[href^="/theme.css"]')
+    const $oldLink = $('link[href^="/theme.css"]')
     if (hex) {
       const href = '/theme.css?theme_color=' + encodeURIComponent('#' + hex)
-      if ($link.length) {
-        $link.attr('href', href)
-      } else {
-        $('<link>', { rel: 'stylesheet', href: href }).appendTo('head')
-      }
+      if ($oldLink.length && $oldLink.attr('href') === href) return
+      const $newLink = $('<link>', { rel: 'stylesheet', href: href })
+      $newLink.on('load', function () { $oldLink.remove() })
+      $newLink.appendTo('head')
     } else {
-      $link.remove()
+      $oldLink.remove()
     }
   }
   updateQuickColorSelection()
