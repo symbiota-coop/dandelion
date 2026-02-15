@@ -63,7 +63,7 @@ Dandelion::App.helpers do
     (0...count).map { |i| i == 0 ? primary : Chroma.paint("hsl(#{(base_hue + (i * step)) % 360}, #{saturation}%, #{lightness}%)").to_hex }
   end
 
-  def clamp_color(hex, min_contrast: 2.5, min_lightness: 0.25)
+  def clamp_color(hex, min_contrast: 2, min_lightness: 0.25)
     hsl = Chroma.paint(hex).hsl
     if LuminosityContrast.ratio(hex.delete('#'), 'fff') < min_contrast
       low = 0.0
