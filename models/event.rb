@@ -31,10 +31,8 @@ class Event
     last_saved_by
   ].freeze
 
-  after_save :bulk_update_activity_events
+  after_save :bulk_update_activity_events, if: -> { activity && update_activity_events.to_s == '1' }
   def bulk_update_activity_events
-    return unless activity && update_activity_events.to_s == '1'
-
     activity.events.future.and(:id.ne => id).each do |event|
       COPY_FIELDS.each { |f| event.send("#{f}=", send(f)) }
       event.save!
