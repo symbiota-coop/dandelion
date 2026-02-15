@@ -297,8 +297,25 @@ $(function () {
       $(this).toggleClass('selected', normalizeHex($(this).data('color')) === val)
     })
   }
+  const updateThemeCSS = () => {
+    const hex = normalizeHex(themeColorInput.val())
+    let $link = $('link[href^="/theme.css"]')
+    if (hex) {
+      const href = '/theme.css?theme_color=' + encodeURIComponent('#' + hex)
+      if ($link.length) {
+        $link.attr('href', href)
+      } else {
+        $('<link>', { rel: 'stylesheet', href: href }).appendTo('head')
+      }
+    } else {
+      $link.remove()
+    }
+  }
   updateQuickColorSelection()
-  themeColorInput.on('change', updateQuickColorSelection)
+  themeColorInput.on('change', function () {
+    updateQuickColorSelection()
+    updateThemeCSS()
+  })
   $('.quick-color-btn').click(function () {
     const color = $(this).data('color')
     if (themeColorInput.length && color) {
