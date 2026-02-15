@@ -31,20 +31,16 @@ class Event
     last_saved_by
   ].freeze
 
-  def copy_to(events)
-    events.each do |event|
+  after_save :bulk_update_activity_events
+  def bulk_update_activity_events
+    return unless activity && update_activity_events.to_s == '1'
+
+    activity.events.future.and(:id.ne => id).each do |event|
       COPY_FIELDS.each { |f| event.send("#{f}=", send(f)) }
       event.save!
     rescue StandardError => e
       Honeybadger.notify(e)
     end
-  end
-
-  after_save :bulk_update_activity_events
-  def bulk_update_activity_events
-    return unless activity && update_activity_events.to_s == '1'
-
-    copy_to(activity.events.future.and(:id.ne => id))
   end
   handle_asynchronously :bulk_update_activity_events
 
