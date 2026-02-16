@@ -89,10 +89,29 @@ module OrganisationAccounting
                                         })
       organisation_contribution = organisation_contributions.create amount: contribution_remaining.cents.to_f / 100, currency: contribution_remaining.currency, payment_intent: pi.id, payment_completed: true
       organisation_contribution.send_notification
+    rescue Stripe::CardError => e
+      send_insufficient_funds_topup_notification if e.message.to_s.downcase.include?('insufficient funds')
+      Honeybadger.notify(e, context: { organisation_slug: slug })
     rescue StandardError => e
       Honeybadger.notify(e, context: { organisation_slug: slug })
     end
   end
+
+  def send_insufficient_funds_topup_notification
+    mg_client = Mailgun::Client.new ENV['MAILGUN_API_KEY'], ENV['MAILGUN_REGION']
+    batch_message = Mailgun::BatchMessage.new(mg_client, ENV['MAILGUN_NOTIFICATIONS_HOST'])
+
+    batch_message.from ENV['NOTIFICATIONS_EMAIL_FULL']
+    batch_message.subject "Action needed: top up your contribution for #{name}"
+    batch_message.body_html EmailHelper.html(:insufficient_funds_topup, organisation: self)
+
+    admins.each do |account|
+      batch_message.add_recipient(:to, account.email, { 'firstname' => account.firstname || 'there', 'token' => account.sign_in_token, 'id' => account.id.to_s })
+    end
+
+    batch_message.finalize if Padrino.env == :production
+  end
+  handle_asynchronously :send_insufficient_funds_topup_notification
 
   def coinbase_confirmed_checkout_ids
     confirmed_checkout_ids = []
