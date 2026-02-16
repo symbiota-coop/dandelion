@@ -1,7 +1,7 @@
 <div class="main">
   <p>Hi %recipient.firstname%,</p>
   <p>
-    We tried to automatically top up the contribution for <%= organisation.name %> using your saved card, but the payment was declined because your card has insufficient funds.
+    We tried to automatically top-up the contribution for <%= organisation.name %> using your saved card, but the payment was declined because the card had insufficient funds.
   </p>
   <p>
     We'll try again tomorrow in case it's a temporary issue. You can also <a href="<%= ENV['BASE_URI'] %>/o/<%= organisation.slug %>/contribute">visit your contribution page</a> to update your payment method.

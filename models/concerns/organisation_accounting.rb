@@ -102,7 +102,7 @@ module OrganisationAccounting
     batch_message = Mailgun::BatchMessage.new(mg_client, ENV['MAILGUN_NOTIFICATIONS_HOST'])
 
     batch_message.from ENV['NOTIFICATIONS_EMAIL_FULL']
-    batch_message.subject "Action needed: top up your contribution for #{name}"
+    batch_message.subject "#{name}: top-up failed due to insufficient funds"
     batch_message.body_html EmailHelper.html(:insufficient_funds_topup, organisation: self)
 
     admins.each do |account|
