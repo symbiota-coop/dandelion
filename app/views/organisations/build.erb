@@ -95,6 +95,7 @@
         <li role="presentation" class="nav-item"><a class="nav-link <%= 'active' if params[:tab] == 'emails'%>" href="#tab-emails" role="tab" data-toggle="tab">Emails</a></li>
         <li role="presentation" class="nav-item"><a class="nav-link <%= 'active' if params[:tab] == 'mailgun'%>" href="#tab-mailgun" role="tab" data-toggle="tab">Mailgun</a></li>
         <li role="presentation" class="nav-item"><a class="nav-link <%= 'active' if params[:tab] == 'analytics'%>" href="#tab-analytics" role="tab" data-toggle="tab">Analytics</a></li>
+        <li role="presentation" class="nav-item"><a class="nav-link <%= 'active' if params[:tab] == 'embeds'%>" href="#tab-embeds" role="tab" data-toggle="tab">Embeds</a></li>
         <li role="presentation" class="nav-item"><a class="nav-link <%= 'active' if params[:tab] == 'everything-else'%>" href="#tab-everything-else" role="tab" data-toggle="tab">Everything else</a></li>
         <% if Padrino.env == :development || @organisation.experimental? %>
           <li role="presentation" class="nav-item"><a class="nav-link <%= 'active' if params[:tab] == 'experimental'%>" href="#tab-experimental" role="tab" data-toggle="tab">Experimental</a></li>
@@ -235,6 +236,11 @@
           <%= f.text_block :simple_analytics_domain %>
           <%= f.text_block :facebook_pixel_id %>
         </div>
+        <div role="tabpanel" class="tab-pane <%= 'active' if params[:tab] == 'embeds'%>" id="tab-embeds">
+          <p><a target="_blank" href="/docs/events#embedding-event-listings">Read more about embedding event listings</a></p>
+          <%= f.color_block :theme_color %>
+          <%= f.text_area_block :minimal_head %>
+        </div>
         <div role="tabpanel" class="tab-pane <%= 'active' if params[:tab] == 'everything-else'%>" id="tab-everything-else">
           <%= f.wysiwyg_block :event_footer %>
           <%= f.text_block :add_a_donation_to %>
@@ -267,8 +273,6 @@
             <%= f.text_block :stripe_pk %>
             <%= f.text_block :stripe_sk %>
             <%= f.text_block :stripe_client_id %>
-            <%= f.color_block :theme_color %>
-            <%= f.text_area_block :minimal_head %>
             <%= f.text_area_block :events_banner %>
           </div>
         <% end %>

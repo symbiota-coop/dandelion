@@ -256,7 +256,9 @@ module OrganisationFields
         hide_ticket_revenue: 'Hide ticket revenue in event stats',
         collect_location: 'Request the location of ticket buyers at checkout',
         tax_rate_id: 'Stripe tax rate ID to apply to ticket purchases',
-        referrer_id: 'Credit someone for referring you to Dandelion'
+        referrer_id: 'Credit someone for referring you to Dandelion',
+        theme_color: 'Theme color when embedding your events page',
+        minimal_head: 'Custom CSS/JS to include in the &lt;head&gt; when embedding your events page'
       }.merge(email_hints)
     end
 
