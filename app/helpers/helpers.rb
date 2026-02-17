@@ -80,4 +80,25 @@ Dandelion::App.helpers do
   def view_url(display, path: nil)
     "#{path}?#{view_base_params.merge('search' => 1, 'display' => display).to_query}"
   end
+
+  def resolve_feedback_account!
+    @account = if admin? && params[:email]
+                 Account.find_by(email: params[:email].downcase)
+               elsif params[:token]
+                 Account.from_feedback_token(@event, params[:token])
+               elsif params[:t]
+                 Account.find(params[:t])
+               else
+                 current_account
+               end
+    kick! unless @account
+    unless @event.attendees.include?(@account)
+      flash[:error] = "You didn't attend that event!"
+      redirect "/o/#{@event.organisation.slug}/events"
+    end
+    if @event.event_feedbacks.find_by(account: @account)
+      flash[:error] = "You've already left feedback on that event"
+      redirect "/o/#{@event.organisation.slug}/events"
+    end
+  end
 end

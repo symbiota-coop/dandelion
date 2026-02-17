@@ -59,24 +59,7 @@ Dandelion::App.controller do
 
   get '/events/:id/give_feedback' do
     @event = Event.find(params[:id]) || not_found
-    @account = if admin? && params[:email]
-                 Account.find_by(email: params[:email].downcase)
-               elsif params[:token]
-                 Account.from_feedback_token(@event, params[:token])
-               elsif params[:t]
-                 Account.find(params[:t])
-               else
-                 current_account
-               end
-    kick! unless @account
-    unless @account && @event.attendees.include?(@account)
-      flash[:error] = "You didn't attend that event!"
-      redirect "/o/#{@event.organisation.slug}/events"
-    end
-    if @event.event_feedbacks.find_by(account: @account)
-      flash[:error] = "You've already left feedback on that event"
-      redirect "/o/#{@event.organisation.slug}/events"
-    end
+    resolve_feedback_account!
     @title = "Feedback on #{@event.name}#{" for #{@account.name}" if params[:email]}"
     @event_feedback = @event.event_feedbacks.build(account: @account)
     erb :'event_feedbacks/build'
@@ -84,8 +67,10 @@ Dandelion::App.controller do
 
   post '/events/:id/give_feedback' do
     @event = Event.find(params[:id]) || not_found
+    resolve_feedback_account!
     @title = "Feedback on #{@event.name}"
     @event_feedback = @event.event_feedbacks.new(mass_assigning(params[:event_feedback], EventFeedback))
+    @event_feedback.account = @account
     @event_feedback.publicly_visible = params[:publicly_visible]
     @event_feedback.anonymous = params[:anonymous]
     @event_feedback.answers = question_answer_pairs(params)

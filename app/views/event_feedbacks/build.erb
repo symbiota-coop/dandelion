@@ -2,7 +2,13 @@
   <div class="col-12 col-lg-8">
     <h1>Feedback on <%= @event.summary %></h1>
     <% form_for @event_feedback, "/events/#{@event.id}/give_feedback" do |f| %>
-      <%= f.hidden_field :account_id %>
+      <% if params[:email] %>
+        <%= hidden_field_tag :email, value: params[:email] %>
+      <% elsif params[:token] %>
+        <%= hidden_field_tag :token, value: params[:token] %>
+      <% elsif params[:t] %>
+        <%= hidden_field_tag :t, value: params[:t] %>
+      <% end %>
       <%= f.hidden_field :rating %>
       <script>
         $(function() {
