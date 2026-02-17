@@ -66,10 +66,6 @@ module AccountFields
   end
 
   class_methods do
-    def admin_fields
-      auto_admin_fields.merge(password: :password)
-    end
-
     def human_attribute_name(attr, options = {})
       {
         name: 'Full name',

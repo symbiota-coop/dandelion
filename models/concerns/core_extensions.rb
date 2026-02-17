@@ -50,6 +50,8 @@ module CoreExtensions
         end
         result[:id] = { type: :text, disabled: true } unless found_identifying_field
       end
+      result[:email] = :email if fields.key?('email')
+      result[:password] = :password if method_defined?(:password)
 
       # Prep: Detect dragonfly accessors (must have *_uid field AND dragonfly accessor method)
       dragonfly_fields = fields.keys.select { |f| f.end_with?('_uid') }.map { |f| f.sub(/_uid\z/, '') }.select do |name|
@@ -67,7 +69,7 @@ module CoreExtensions
         next unless field_def.type.to_s =~ /Boolean|TrueClass|FalseClass/
         next if ADMIN_FIELDS_EXCLUDED.include?(field_name)
 
-        checkboxes[field_name.to_sym] = :check_box
+        checkboxes[field_name.to_sym] = { type: :check_box, index: false }
       end
 
       # 2. Add checkboxes (sorted alphabetically, before belongs_to)
@@ -131,7 +133,7 @@ module CoreExtensions
       when 'Time', 'DateTime', 'ActiveSupport::TimeWithZone'
         :datetime
       when 'Array', 'Hash'
-        { type: :text_area, disabled: true }
+        { type: :text_area, disabled: true, index: false }
       when 'BSON::ObjectId'
         nil # Skip ObjectId fields
       else
