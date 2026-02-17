@@ -205,23 +205,6 @@ $(function () {
     }
   }
 
-  // Zoom party toggle
-  $('#event_local_group_id').closest('.form-group').css('margin-bottom', '0.25rem')
-  $('#do-zoom-party a').click(function () {
-    $('#event_zoom_party').click()
-  })
-  $('#event_zoom_party').change(function () {
-    if ($(this).is(':checked')) {
-      $('#local-group-select').hide()
-      $('#do-zoom-party').hide()
-      $('#zoom-party-checkbox').show()
-    } else {
-      $('#local-group-select').show()
-      $('#do-zoom-party').show()
-      $('#zoom-party-checkbox').hide()
-    }
-  }).change()
-
   // Currency symbol updates
   $('#event_currency').change(function () {
     if (typeof $.currencySymbol !== 'undefined') {
@@ -237,8 +220,6 @@ $(function () {
 
   // Disable controls for non-admin org members
   if (!config.isOrgAdmin) {
-    $('#do-zoom-party').hide()
-    $('input[name="event[zoom_party]"]').prop('disabled', true)
     $('input[name="event[monthly_donors_only]"]').prop('disabled', true)
     $('input[name="event[no_discounts]"]').prop('disabled', true)
     $('input[name="event[featured]"]').prop('disabled', true)

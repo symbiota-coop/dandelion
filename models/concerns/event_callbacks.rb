@@ -52,12 +52,6 @@ module EventCallbacks
         end
       end
 
-      if organisation && zoom_party
-        organisation.local_groups.each do |local_group|
-          zoomships.create local_group: local_group
-        end
-      end
-
       notifications.destroy_all if locked? || secret?
 
       account.send_first_event_email if !account.sent_first_event_email && account.events.count == 1 && created_at > 1.week.ago

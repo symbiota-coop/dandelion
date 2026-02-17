@@ -144,20 +144,10 @@
               <%== Sanitize.fragment(d, Sanitize::Config::IFRAMES) %>
             <% end %>
           <% end %>
-          <% if !@event.hide_organisation_footer && @event.organisation.event_footer && !@event.zoom_party? %>
+          <% if !@event.hide_organisation_footer && @event.organisation.event_footer %>
             <%== Sanitize.fragment(Rinku.auto_link(@event.organisation.event_footer), Sanitize::Config::DANDELION) %>
           <% end %>
         </div>
-      <% end %>
-
-      <% if @event.zoom_party? %>
-        <% if current_account %>
-          <div data-pagelet-url="/zoom_parties?event_id=<%= @event.id %>"></div>
-        <% else %>
-          <p class="text-center lead mt-3">
-            <a href="/accounts/new?event_id=<%= @event.id %>">Sign up</a> or <a href="/accounts/sign_in">sign in</a> to see the videocall links for this event
-          </p>
-        <% end %>
       <% end %>
 
     </div>

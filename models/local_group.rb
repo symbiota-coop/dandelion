@@ -42,11 +42,10 @@ class LocalGroup
   has_many :local_groupships, dependent: :destroy
   has_many :pmails_as_mailable, class_name: 'Pmail', as: :mailable, dependent: :destroy
   has_many :pmails_as_exclusion, class_name: 'Pmail', inverse_of: :local_group, dependent: :nullify
+
   def pmails_including_events
     Pmail.and(:id.in => pmails_as_mailable.pluck(:id) + Pmail.and(:mailable_type => 'Event', :mailable_id.in => events.pluck(:id)).pluck(:id))
   end
-
-  has_many :zoomships, dependent: :destroy
 
   with_options class_name: 'Account', through: :local_groupships do
     has_many_through :members

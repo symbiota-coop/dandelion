@@ -32,10 +32,6 @@ module EventValidation
         errors.add(:local_group, '- you are not an admin of this local group') if local_group && !LocalGroup.admin?(local_group, account)
       end
 
-      if zoom_party?
-        self.local_group = nil
-        self.capacity = nil
-      end
       self.stripe_revenue_adjustment = 0 unless stripe_revenue_adjustment
       self.revenue_share_to_revenue_sharer = 0 unless revenue_share_to_revenue_sharer
       self.revenue_share_to_revenue_sharer = 0 unless revenue_sharer
@@ -79,7 +75,6 @@ module EventValidation
       # rubocop:enable Style/CombinableLoops
 
       {
-        zoom_party: false,
         monthly_donors_only: false,
         no_discounts: false,
         featured: false,

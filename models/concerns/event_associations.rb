@@ -61,8 +61,6 @@ module EventAssociations
     has_many :event_feedbacks, dependent: :destroy
     has_many :event_facilitations, dependent: :destroy
 
-    has_many :zoomships, dependent: :destroy
-
     has_many :event_tagships, dependent: :destroy
     has_many :event_stars, dependent: :destroy
 

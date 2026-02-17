@@ -28,7 +28,6 @@ module EventDuplication
       no_discounts: no_discounts,
       extra_info_for_ticket_email: extra_info_for_ticket_email,
       extra_info_for_recording_email: extra_info_for_recording_email,
-      zoom_party: zoom_party,
       show_emails: show_emails,
       opt_in_organisation: opt_in_organisation,
       opt_in_facilitator: opt_in_facilitator,

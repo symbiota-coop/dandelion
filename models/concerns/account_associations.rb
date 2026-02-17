@@ -35,7 +35,6 @@ module AccountAssociations
     has_many :events_organising, class_name: 'Event', inverse_of: :organiser, dependent: :nullify
     has_many :events_last_saver, class_name: 'Event', inverse_of: :last_saved_by, dependent: :nullify
     has_many :event_stars, dependent: :destroy
-    has_many :zoomships, dependent: :destroy
     has_many :event_facilitations, dependent: :destroy
     has_many :waitships, dependent: :destroy
     has_many :event_feedbacks, dependent: :nullify

@@ -11,8 +11,6 @@ class Ticket
   belongs_to_without_parent_validation :account, optional: true
   belongs_to_without_parent_validation :order, optional: true
   belongs_to_without_parent_validation :ticket_type, optional: true
-  belongs_to_without_parent_validation :zoomship, optional: true
-
   has_many :notifications, as: :notifiable, dependent: :destroy
 
   attr_accessor :complimentary, :prevent_notifications
@@ -64,8 +62,7 @@ class Ticket
       event_id: :lookup,
       account_id: :lookup,
       order_id: :lookup,
-      ticket_type_id: :lookup,
-      zoomship_id: :lookup
+      ticket_type_id: :lookup
     }
   end
 
@@ -104,7 +101,6 @@ class Ticket
           errors.add(:ticket_type, 'is not available to someone donating this amount')
         end
       end
-      errors.add(:account, 'already has a ticket to this event') if event && zoomship && event.tickets.complete.find_by(account: account)
     end
   end
 
@@ -182,12 +178,6 @@ class Ticket
 
   def circle
     account
-  end
-
-  after_create :update_zoomship_tickets_count, if: :zoomship
-  after_destroy :update_zoomship_tickets_count, if: :zoomship
-  def update_zoomship_tickets_count
-    zoomship.set(tickets_count: zoomship.tickets.count)
   end
 
   def refund
