@@ -23,7 +23,6 @@ module AccountAssociations
     has_many :organisations_as_referrer, class_name: 'Organisation', inverse_of: :referrer, dependent: :nullify
     has_many :organisations_as_reward_claimer, class_name: 'Organisation', inverse_of: :reward_claimer, dependent: :nullify
     has_many :organisationships, class_name: 'Organisationship', inverse_of: :account, dependent: :destroy
-    has_many :organisationships_as_referrer, class_name: 'Organisationship', inverse_of: :referrer, dependent: :nullify
 
     has_many :creditings, dependent: :nullify
 
@@ -186,8 +185,7 @@ module AccountAssociations
   def associate_with_organisation!(organisation, options = {})
     organisation.organisationships.create(
       account: self,
-      skip_welcome: options[:skip_welcome],
-      referrer_id: options[:referrer_id]
+      skip_welcome: options[:skip_welcome]
     )
     organisationship = organisation.organisationships.find_by(account: self)
     organisationship.set_unsubscribed!(false)

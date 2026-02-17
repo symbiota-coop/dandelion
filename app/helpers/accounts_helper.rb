@@ -49,15 +49,11 @@ Dandelion::App.helpers do
       redirect '/events/new'
     elsif params[:organisation_id]
       @organisation ||= Organisation.find(params[:organisation_id])
-      organisationship = @account.associate_with_organisation!(@organisation, skip_welcome: params[:skip_welcome], referrer_id: params[:referrer_id])
-      if organisationship&.referrer
-        redirect "/o/#{@organisation.slug}/via/#{organisationship.referrer.username}?registered=true"
-      else
-        redirect "/accounts/edit?organisation_id=#{@organisation.id}"
-      end
+      @account.associate_with_organisation!(@organisation, skip_welcome: params[:skip_welcome])
+      redirect "/accounts/edit?organisation_id=#{@organisation.id}"
     elsif params[:activity_id] || params[:local_group_id] || params[:event_id]
       associate_account_with_context(@account)
-      redirect_to_edit_or_referral
+      redirect_to_edit_with_context
     else
       redirect '/accounts/edit'
     end
@@ -81,7 +77,7 @@ Dandelion::App.helpers do
   def associate_account_with_context(account)
     if params[:organisation_id]
       @organisation ||= Organisation.find(params[:organisation_id])
-      account.associate_with_organisation!(@organisation, skip_welcome: params[:skip_welcome], referrer_id: params[:referrer_id])
+      account.associate_with_organisation!(@organisation, skip_welcome: params[:skip_welcome])
     elsif params[:activity_id]
       @activity ||= Activity.find(params[:activity_id])
       account.associate_with_activity!(@activity)
@@ -94,7 +90,7 @@ Dandelion::App.helpers do
     end
   end
 
-  def redirect_to_edit_or_referral
+  def redirect_to_edit_with_context
     if params[:activity_id]
       redirect "/accounts/edit?activity_id=#{@activity.id}"
     elsif params[:local_group_id]

@@ -48,13 +48,10 @@ module OrganisationFields
     field :near_select_suffix, type: String
     field :followers_count, type: Integer
     field :subscribed_accounts_count, type: Integer
-    field :monthly_donor_affiliate_reward, type: Integer
     field :monthly_donors_count, type: Integer
     field :monthly_donations_count, type: String
     field :currency, type: String
     field :affiliate_credit_percentage, type: Integer
-    field :affiliate_intro, type: String
-    field :affiliate_share_image_url, type: String
     field :hidden, type: Mongoid::Boolean
     field :welcome_from, type: String
     field :welcome_subject, type: String
@@ -206,7 +203,6 @@ module OrganisationFields
         reply_to: 'Reply address for ticket emails',
         minimal_head: 'Extra content for &lt;head&gt; when embedding events page',
         theme_color: 'Theme color',
-        affiliate_share_image_url: 'Affiliate share image URL',
         welcome_from: 'Welcome email from',
         welcome_subject: 'Welcome email subject',
         welcome_body: 'Welcome email body',
@@ -242,7 +238,6 @@ module OrganisationFields
         mailgun_api_key: '<code>Settings</code> > <code>API keys</code>',
         mailgun_domain: '<code>Sending</code> > <code>Domains</code> > <code>Add new domain</code>',
         affiliate_credit_percentage: 'Default affiliate credit percentage when creating an event',
-        monthly_donor_affiliate_reward: 'When an existing monthly donor gets a friend to sign up via their affiliate link, credit of this amount is issued to both the existing monthly donor and the friend/new member.',
         add_a_donation_to: "Text to display beside the 'Add a donation' field",
         donation_text: "Text to display below the 'Add a donation' field",
         patreon_api_key: 'Registers people with active Patreon subscriptions as monthly donors',

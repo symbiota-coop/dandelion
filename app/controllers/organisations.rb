@@ -172,31 +172,6 @@ Dandelion::App.controller do
     @organisation.monthly_donations_count.to_s
   end
 
-  get '/o/:slug/via/:username' do
-    @organisation = Organisation.find_by(slug: params[:slug]) || not_found
-    @account = Account.find_by(username: params[:username]) || not_found
-    @og_image = @organisation.affiliate_share_image_url
-    @fulltitle = "#{@account.name} invites you to become a member of #{@organisation.name}"
-    erb :'organisations/referral'
-  end
-
-  post '/organisationships/:id/referrer' do
-    sign_in_required!
-    @organisationship = current_account.organisationships.find(params[:id]) || not_found
-    @organisationship.hide_referrer = nil
-    @organisationship.referrer_id = params[:organisationship][:referrer_id]
-    @organisationship.save
-    redirect back
-  end
-
-  get '/organisationships/:id/hide_referrer' do
-    sign_in_required!
-    @organisationship = current_account.organisationships.find(params[:id]) || not_found
-    @organisationship.hide_referrer = true
-    @organisationship.save
-    redirect back
-  end
-
   get '/o/:slug/show_membership/:f' do
     sign_in_required!
     @organisation = Organisation.find_by(slug: params[:slug]) || not_found

@@ -7,7 +7,6 @@ class Organisationship
 
   belongs_to_without_parent_validation :organisation
   belongs_to_without_parent_validation :account, inverse_of: :organisationships
-  belongs_to_without_parent_validation :referrer, class_name: 'Account', inverse_of: :organisationships_as_referrer, optional: true
 
   field :stripe_connect_json, type: String
   field :stripe_account_json, type: String
@@ -20,7 +19,7 @@ class Organisationship
   field :coordinates, type: Array
   field :notes, type: String
 
-  %w[admin unsubscribed hide_membership receive_feedback sent_welcome sent_monthly_donation_welcome hide_referrer].each do |b|
+  %w[admin unsubscribed hide_membership receive_feedback sent_welcome sent_monthly_donation_welcome].each do |b|
     field b.to_sym, type: Boolean
   end
 
@@ -54,13 +53,11 @@ class Organisationship
     {
       account_id: :lookup,
       organisation_id: :lookup,
-      referrer_id: :lookup,
       admin: :check_box,
       unsubscribed: :check_box,
       receive_feedback: :check_box,
       hide_membership: :check_box,
       sent_monthly_donation_welcome: :check_box,
-      hide_referrer: :check_box,
       stripe_connect_json: :text_area,
       stripe_account_json: :text_area,
       monthly_donation_amount: :number,
@@ -80,14 +77,6 @@ class Organisationship
     end
     account.orders_as_affiliate.and(:payment_completed => true, :event_id.in => organisation.events.pluck(:id)).each do |order|
       credits << [Money.new(order.event.affiliate_credit_percentage.to_f / 100 * (order.value || 0) * 100, order.currency), "for #{order.account ? order.account.name : 'deleted account'}'s order to #{order.event.name} at #{order.created_at}"] if order.event.affiliate_credit_percentage
-    end
-    if organisation.monthly_donor_affiliate_reward && monthly_donor?
-      if referrer && (referrer_organisationship = organisation.organisationships.find_by(account: referrer)) && referrer_organisationship.monthly_donor?
-        credits << [Money.new(organisation.monthly_donor_affiliate_reward * 100, organisation.currency), "for being referred by @#{referrer.username}"]
-      end
-      account.organisationships_as_referrer.and(organisation: organisation).each do |organisationship|
-        credits << [Money.new(organisation.monthly_donor_affiliate_reward * 100, organisation.currency), "for referring @#{organisationship.account.username}"] if organisationship.monthly_donor?
-      end
     end
     if description_hash
       credits.map { |c| [c[0].exchange_to(organisation.currency).format, c[1]] }
@@ -263,9 +252,6 @@ class Organisationship
   validates_uniqueness_of :account, scope: :organisation
 
   before_validation do
-    errors.add(:referrer, 'cannot be the same as account') if referrer && account && referrer_id == account_id
-    self.referrer = nil if hide_referrer
-    self.hide_referrer = false if referrer
     if monthly_donation_amount.nil?
       self.monthly_donation_method = nil
       self.monthly_donation_currency = nil
