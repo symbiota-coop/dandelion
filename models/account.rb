@@ -83,6 +83,27 @@ class Account
     (Time.now.to_i - timestamp) > 24.hours.to_i
   end
 
+  def feedback_token_for(event)
+    return unless event && (secret = ENV['SESSION_SECRET'])
+
+    data = "#{event.id}:#{id}"
+    signature = OpenSSL::HMAC.hexdigest('SHA256', secret, data)[0, 16]
+    "#{id}-#{signature}"
+  end
+
+  def self.from_feedback_token(event, token)
+    return unless event && (secret = ENV['SESSION_SECRET'])
+
+    account_id, signature = token.to_s.split('-', 2)
+    return unless account_id && signature
+
+    data = "#{event.id}:#{account_id}"
+    expected = OpenSSL::HMAC.hexdigest('SHA256', secret, data)[0, 16]
+    return unless ActiveSupport::SecurityUtils.secure_compare(signature, expected)
+
+    find_by(id: account_id)
+  end
+
   def merge(account_to_destroy)
     # Don't allow merging with self
     return if id == account_to_destroy.id

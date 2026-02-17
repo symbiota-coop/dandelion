@@ -61,6 +61,8 @@ Dandelion::App.controller do
     @event = Event.find(params[:id]) || not_found
     @account = if admin? && params[:email]
                  Account.find_by(email: params[:email].downcase)
+               elsif params[:token]
+                 Account.from_feedback_token(@event, params[:token])
                elsif params[:t]
                  Account.find(params[:t])
                else

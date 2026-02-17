@@ -10,6 +10,7 @@ require 'rubygems' unless defined?(Gem)
 require 'bundler/setup'
 require 'open-uri'
 require 'active_support/time'
+require 'active_support/security_utils'
 require 'will_paginate/array'
 Bundler.require(:default, RACK_ENV)
 

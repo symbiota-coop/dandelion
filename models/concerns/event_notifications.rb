@@ -94,7 +94,7 @@ module EventNotifications
     batch_message.body_html EmailHelper.html(:feedback, event: event)
 
     (account_id == :all ? attendees.and(unsubscribed: false).and(unsubscribed_feedback: false) : attendees.and(unsubscribed: false).and(unsubscribed_feedback: false).and(id: account_id)).each do |account|
-      batch_message.add_recipient(:to, account.email, { 'firstname' => account.firstname || 'there', 'token' => account.sign_in_token, 'id' => account.id.to_s })
+      batch_message.add_recipient(:to, account.email, { 'firstname' => account.firstname || 'there', 'token' => account.sign_in_token, 'id' => account.id.to_s, 'feedback_token' => account.feedback_token_for(event) })
     end
 
     batch_message.finalize if Padrino.env == :production
