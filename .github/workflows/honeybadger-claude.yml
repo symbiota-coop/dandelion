@@ -13,8 +13,10 @@ jobs:
     steps:
       - name: Check if issue was created by Honeybadger
         id: check-honeybadger
+        env:
+          ISSUE_TITLE: ${{ github.event.issue.title }}
         run: |
-          if [[ "${{ github.event.issue.title }}" == *"[Dandelion/production]"* ]]; then
+          if [[ "$ISSUE_TITLE" == *"[Dandelion/production]"* ]]; then
             echo "is_honeybadger=true" >> $GITHUB_OUTPUT
           else
             echo "is_honeybadger=false" >> $GITHUB_OUTPUT
