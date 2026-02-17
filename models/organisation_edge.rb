@@ -10,14 +10,6 @@ class OrganisationEdge
 
   validates_uniqueness_of :sink, scope: :source
 
-  def self.admin_fields
-    {
-      mutual_followers: :number,
-      source_id: :lookup,
-      sink_id: :lookup
-    }
-  end
-
   def self.create_all(organisations)
     organisations.each do |source|
       organisations.each do |sink|

@@ -10,16 +10,6 @@ class Mapplication
   field :status, type: String
   field :answers, type: Array
 
-  def self.admin_fields
-    {
-      summary: { type: :text, index: false, edit: false },
-      account_id: :lookup,
-      gathering_id: :lookup,
-      verdicts: :collection,
-      status: :select,
-      answers: { type: :text_area, disabled: true }
-    }
-  end
 
   has_many :verdicts, dependent: :destroy
   # has_one :membership, :dependent => :destroy

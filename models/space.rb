@@ -14,16 +14,6 @@ class Space
   field :image_uid, type: String
   field :has_image, type: Boolean
 
-  def self.admin_fields
-    {
-      name: :text,
-      image: :image,
-      o: :number,
-      timetable_id: :lookup,
-      gathering_id: :lookup
-    }
-  end
-
   has_many :tactivities, dependent: :nullify
 
   validates_presence_of :name, :o

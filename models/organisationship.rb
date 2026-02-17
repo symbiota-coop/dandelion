@@ -49,24 +49,6 @@ class Organisationship
     end
   end
 
-  def self.admin_fields
-    {
-      account_id: :lookup,
-      organisation_id: :lookup,
-      admin: :check_box,
-      unsubscribed: :check_box,
-      receive_feedback: :check_box,
-      hide_membership: :check_box,
-      sent_monthly_donation_welcome: :check_box,
-      stripe_connect_json: :text_area,
-      stripe_account_json: :text_area,
-      monthly_donation_amount: :number,
-      monthly_donation_currency: :text,
-      monthly_donation_method: :select,
-      monthly_donation_start_date: :date,
-      monthly_donation_postcode: :text
-    }
-  end
 
   has_many :creditings, dependent: :destroy
 

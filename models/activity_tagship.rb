@@ -6,13 +6,6 @@ class ActivityTagship
   belongs_to_without_parent_validation :activity
   belongs_to_without_parent_validation :activity_tag
 
-  def self.admin_fields
-    {
-      activity_id: :lookup,
-      activity_tag_id: :lookup
-    }
-  end
-
   validates_uniqueness_of :activity_tag, scope: :activity
 
   def activity_tag_name

@@ -10,14 +10,6 @@ class Upload
   field :file_name, type: String
   field :file_uid, type: String
 
-  def self.admin_fields
-    {
-      file_name: { type: :text, edit: false },
-      file: :file,
-      account_id: :lookup
-    }
-  end
-
   dragonfly_accessor :file do
     after_assign do |attachment|
       if attachment.image?
@@ -29,5 +21,9 @@ class Upload
         attachment.process!(:thumb, '1920x1920>')
       end
     end
+  end
+
+  def summary
+    file_name
   end
 end

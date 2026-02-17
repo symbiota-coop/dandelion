@@ -36,22 +36,6 @@ class Activity
     %w[name]
   end
 
-  def self.admin_fields
-    {
-      name: :text,
-      email: :email,
-      website: :url,
-      extra_info_for_acceptance_email: :wysiwyg,
-      extra_info_for_application_form: :wysiwyg,
-      intro_text: :wysiwyg,
-      image: :image,
-      events: :collection,
-      privacy: :select,
-      application_questions: :text_area,
-      thank_you_message: :wysiwyg,
-      locked: :check_box
-    }
-  end
 
   def self.new_hints
     {

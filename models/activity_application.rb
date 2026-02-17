@@ -13,14 +13,6 @@ class ActivityApplication
   field :word_count, type: Integer
   field :via, type: String
 
-  def self.admin_fields
-    {
-      account_id: :lookup,
-      status: :select,
-      statused_at: :datetime,
-      answers: { type: :text_area, disabled: true }
-    }
-  end
 
   has_many :posts, as: :commentable, dependent: :destroy
   has_many :subscriptions, as: :commentable, dependent: :destroy

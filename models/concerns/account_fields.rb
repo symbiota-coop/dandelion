@@ -67,47 +67,7 @@ module AccountFields
 
   class_methods do
     def admin_fields
-      {
-        email: :email,
-        name: :text,
-        name_transliterated: { type: :text, disabled: true },
-        api_key: :text,
-        updated_profile: :check_box,
-        default_currency: :select,
-        phone: :text,
-        location: :text,
-        number_at_this_location: :number,
-        username: :text,
-        website: :url,
-        gender: :select,
-        sexuality: :select,
-        date_of_birth: :date,
-        dietary_requirements: :text,
-        image: :image,
-        can_message: :check_box,
-        email_confirmed: :check_box,
-        admin: :check_box,
-        unsubscribed: :check_box,
-        unsubscribed_messages: :check_box,
-        unsubscribed_feedback: :check_box,
-        unsubscribed_reminders: :check_box,
-        hidden: :check_box,
-        block_reply_by_email: :check_box,
-        can_reset_passwords: :check_box,
-        password: :password,
-        sign_ins_count: :number,
-        failed_sign_in_attempts: :number,
-        provider_links: :collection,
-        memberships: :collection,
-        mapplications: :collection,
-        organisationships: :collection,
-        tickets: :collection,
-        orders: :collection,
-        last_active: :datetime,
-        stripe_subscription_id: :text,
-        minimal_head: :text_area,
-        youtube_video_url: :url
-      }
+      auto_admin_fields.merge(password: :password)
     end
 
     def human_attribute_name(attr, options = {})

@@ -20,21 +20,6 @@ class Membership
     field b.to_sym, type: Boolean
   end
 
-  def self.admin_fields
-    {
-      account_id: :lookup,
-      gathering_id: :lookup,
-      mapplication_id: :lookup,
-      admin: :check_box,
-      paid: :number,
-      desired_threshold: :number,
-      requested_contribution: :number,
-      invitations_granted: :number,
-      unsubscribed: :check_box,
-      hide_from_sidebar: :check_box,
-      answers: { type: :text_area, disabled: true }
-    }
-  end
 
   validates_uniqueness_of :account, scope: :gathering
 

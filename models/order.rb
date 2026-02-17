@@ -89,6 +89,10 @@ class Order
     CURRENCY_OPTIONS
   end
 
+  def self.affiliate_types
+    %w[Account Organisation]
+  end
+
   def self.incomplete
     self.and(payment_completed: false)
   end

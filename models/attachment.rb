@@ -11,15 +11,6 @@ class Attachment
   field :file_name, type: String
   field :cid, type: String
 
-  def self.admin_fields
-    {
-      pmail_id: :lookup,
-      file: :file,
-      file_name: :text,
-      cid: :text
-    }
-  end
-
   validates_presence_of :file
   dragonfly_accessor :file
 end

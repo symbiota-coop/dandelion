@@ -10,16 +10,6 @@ class Team
   field :intro, type: String
   field :budget, type: Integer
 
-  def self.admin_fields
-    {
-      name: :text,
-      intro: :wysiwyg,
-      gathering_id: :lookup,
-      account_id: :lookup,
-      teamships: :collection
-    }
-  end
-
   validates_presence_of :name, :gathering
 
   has_many :teamships, dependent: :destroy

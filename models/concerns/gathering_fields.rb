@@ -53,53 +53,6 @@ module GatheringFields
       %w[contributions teams timetables rotas shift_worth inventory budget partial_payments]
     end
 
-    def admin_fields
-      h = {
-        name: :text,
-        slug: :slug,
-        location: :text,
-        image: :image,
-        intro_for_members: :wysiwyg,
-        welcome_email: :wysiwyg,
-        fixed_threshold: :number,
-        member_limit: :number,
-        proposing_delay: :number,
-        require_reason_proposer: :check_box,
-        require_reason_supporter: :check_box,
-        hide_invitations: :check_box,
-        processed_via_dandelion: :number,
-        stripe_pk: :text,
-        stripe_sk: :text,
-        stripe_endpoint_secret: :text,
-        coinbase_api_key: :text,
-        coinbase_webhook_secret: :text,
-        balance: :number,
-        democratic_threshold: :check_box,
-        privacy: :select,
-        intro_for_non_members: :wysiwyg,
-        application_questions: :text_area,
-        joining_questions: :text_area,
-        enable_supporters: :check_box,
-        anonymise_supporters: :check_box,
-        clear_up_optionships: :check_box,
-        demand_payment: :check_box,
-        hide_members_on_application_form: :check_box,
-        listed: :check_box,
-        paypal_email: :text,
-        redirect_on_acceptance: :text,
-        currency: :select,
-        account_id: :lookup,
-        memberships: :collection,
-        mapplications: :collection,
-        spends: :collection,
-        rotas: :collection,
-        teams: :collection
-      }
-      h.merge(enablable.to_h do |x|
-                [:"enable_#{x}", :check_box]
-              end)
-    end
-
     def human_attribute_name(attr, options = {})
       {
         slug: 'URL',

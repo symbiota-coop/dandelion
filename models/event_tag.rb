@@ -7,11 +7,6 @@ class EventTag
 
   field :name, type: String
 
-  def self.admin_fields
-    {
-      name: { type: :text, full: true }
-    }
-  end
 
   def self.search_fields
     %w[name]

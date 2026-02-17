@@ -8,13 +8,6 @@ class TicketGroup
   field :name, type: String
   field :capacity, type: Integer
 
-  def self.admin_fields
-    {
-      name: :text,
-      capacity: :number
-    }
-  end
-
   has_many :ticket_types, dependent: :nullify
 
   def tickets

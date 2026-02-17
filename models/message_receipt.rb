@@ -8,13 +8,5 @@ class MessageReceipt
 
   field :received_at, type: Time
 
-  def self.admin_fields
-    {
-      received_at: :datetime,
-      messenger_id: :lookup,
-      messengee_id: :lookup
-    }
-  end
-
   validates_uniqueness_of :messenger, scope: :messengee
 end

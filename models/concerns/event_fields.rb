@@ -65,58 +65,6 @@ module EventFields
   end
 
   class_methods do
-    def admin_fields
-      {
-        summary: { type: :text, index: false, edit: false },
-        name: { type: :text, full: true },
-        slug: :slug,
-        start_time: :datetime,
-        end_time: :datetime,
-        location: :text,
-        add_a_donation_to: :text,
-        donation_text: :text,
-        carousel_text: :text,
-        select_tickets_intro: :text,
-        select_tickets_outro: :text,
-        select_tickets_title: :text,
-        rsvp_button_text: :text,
-        image: :image,
-        description: :wysiwyg,
-        email: :email,
-        facebook_event_url: :url,
-        feedback_questions: :text_area,
-        hide_attendees: :check_box,
-        hide_discussion: :check_box,
-        refund_deleted_orders: :check_box,
-        monthly_donors_only: :check_box,
-        no_discounts: :check_box,
-        trending: :check_box,
-        extra_info_for_ticket_email: :wysiwyg,
-        extra_info_for_recording_email: :wysiwyg,
-        suggested_donation: :number,
-        minimum_donation: :number,
-        capacity: :number,
-        notes: :text_area,
-        redirect_url: :url,
-        purchase_url: :url,
-        locked: :check_box,
-        secret: :check_box,
-        hide_few_left: :check_box,
-        questions: :text_area,
-        show_emails: :check_box,
-        opt_in_organisation: :check_box,
-        opt_in_facilitator: :check_box,
-        hide_organisation_footer: :check_box,
-        send_order_notifications: :check_box,
-        raw_description: :check_box,
-        donations_to_organisation: :check_box,
-        show_after_start_time: :check_box,
-        account_id: :lookup,
-        organisation_id: :lookup,
-        activity_id: :lookup,
-        ticket_types: :collection
-      }.merge(email_admin_fields)
-    end
 
     def human_attribute_name(attr, options = {})
       {

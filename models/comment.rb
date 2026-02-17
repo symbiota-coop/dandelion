@@ -14,18 +14,6 @@ class Comment
   field :force, type: Boolean
   field :sent_at, type: Time
 
-  def self.admin_fields
-    {
-      body: :text_area,
-      file: :file,
-      force: :check_box,
-      account_id: :lookup,
-      sent_at: :datetime,
-      commentable_id: :text,
-      commentable_type: :select,
-      post_id: :lookup
-    }
-  end
 
   def self.commentable_types
     Post.commentable_types

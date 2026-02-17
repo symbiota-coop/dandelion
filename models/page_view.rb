@@ -4,7 +4,4 @@ class PageView
   include CoreExtensions
   include RequestFields
 
-  def self.admin_fields
-    RequestFields.admin_fields
-  end
 end

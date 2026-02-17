@@ -6,13 +6,6 @@ class Carouselship
   belongs_to_without_parent_validation :carousel
   belongs_to_without_parent_validation :event_tag
 
-  def self.admin_fields
-    {
-      carousel_id: :lookup,
-      event_tag_id: :lookup
-    }
-  end
-
   validates_uniqueness_of :event_tag, scope: :carousel
 
   def event_tag_name

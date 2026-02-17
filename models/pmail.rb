@@ -31,29 +31,6 @@ class Pmail
   field :markdown, type: Boolean
   field :gift, type: Boolean
 
-  def self.admin_fields
-    {
-      subject: :text,
-      from: :text,
-      preview_text: :text,
-      gift: :check_box,
-      body: :text_area,
-      everyone: :check_box,
-      monthly_donors: :check_box,
-      not_monthly_donors: :check_box,
-      facilitators: :check_box,
-      waitlist: :check_box,
-      link_params: :text,
-      will_send_at: :datetime,
-      requested_send_at: :datetime,
-      sent_at: :datetime,
-      message_ids: :text_area,
-      markdown: :check_box,
-      account_id: :lookup,
-      organisation_id: :lookup
-    }
-  end
-
   has_many :pmail_links, dependent: :destroy
 
   def self.mailable_types

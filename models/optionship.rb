@@ -8,15 +8,6 @@ class Optionship
   belongs_to_without_parent_validation :gathering
   belongs_to_without_parent_validation :membership
 
-  def self.admin_fields
-    {
-      account_id: :lookup,
-      option_id: :lookup,
-      gathering_id: :lookup,
-      membership_id: :lookup
-    }
-  end
-
   validates_uniqueness_of :account, scope: :option
 
   before_validation do

@@ -29,24 +29,6 @@ class TicketType
     ) || (price.to_i == price ? price.to_i : price)
   end
 
-  def self.admin_fields
-    {
-      name: :text,
-      description: :text,
-      price: :number,
-      range_min: :number,
-      range_max: :number,
-      quantity: :number,
-      order: :number,
-      minimum_monthly_donation: :number,
-      hidden: :check_box,
-      max_quantity_per_transaction: :number,
-      sales_end: :datetime,
-      event_id: :lookup,
-      tickets: :collection
-    }
-  end
-
   has_many :tickets, dependent: :nullify
   has_many :photos, as: :photoable, dependent: :destroy
 

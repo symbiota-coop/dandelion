@@ -7,16 +7,6 @@ class Subscription
   belongs_to_without_parent_validation :post
   belongs_to_without_parent_validation :commentable, polymorphic: true
 
-  def self.admin_fields
-    {
-      id: { type: :text, edit: false },
-      post_id: :lookup,
-      account_id: :lookup,
-      commentable_id: :text,
-      commentable_type: :select
-    }
-  end
-
   validates_presence_of :post, :account, :commentable
   validates_uniqueness_of :account, scope: :post
 
@@ -26,5 +16,9 @@ class Subscription
 
   def self.commentable_types
     Post.commentable_types
+  end
+
+  def summary
+    id
   end
 end

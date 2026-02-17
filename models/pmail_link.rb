@@ -8,14 +8,6 @@ class PmailLink
   field :url, type: String
   field :clicks, type: Integer
 
-  def self.admin_fields
-    {
-      url: :url,
-      clicks: :number,
-      pmail_id: :lookup
-    }
-  end
-
   validates_presence_of :url
 
   before_validation do

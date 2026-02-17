@@ -17,23 +17,6 @@ class Payment
   field :evm_amount, type: BigDecimal
   field :payment_completed, type: Boolean
 
-  def self.admin_fields
-    {
-      account_id: :lookup,
-      gathering_id: :lookup,
-      membership_id: :lookup,
-      gathering_name: :text,
-      currency: :text,
-      amount: :number,
-      session_id: :text,
-      payment_intent: :text,
-      coinbase_checkout_id: :text,
-      evm_secret: :text,
-      evm_amount: :number,
-      payment_completed: :check_box
-    }
-  end
-
   has_many :notifications, as: :notifiable, dependent: :destroy
 
   def circle

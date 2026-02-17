@@ -10,13 +10,6 @@ class AccountRecommendationCache
   field :recommended_people_cache, type: Array
   field :recommended_events_cache, type: Array
 
-  def self.admin_fields
-    {
-      recommended_people_cache: { type: :text_area, disabled: true },
-      recommended_events_cache: { type: :text_area, disabled: true },
-      account_id: :lookup
-    }
-  end
 
   def recommend_people!
     people = Hash.new { |h, k| h[k] = [] }

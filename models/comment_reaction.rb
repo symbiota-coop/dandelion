@@ -10,16 +10,6 @@ class CommentReaction
 
   field :body, type: String
 
-  def self.admin_fields
-    {
-      body: :text,
-      comment_id: :lookup,
-      account_id: :lookup,
-      commentable_id: :text,
-      commentable_type: :select,
-      post_id: :lookup
-    }
-  end
 
   before_validation do
     self.post = comment.post if comment

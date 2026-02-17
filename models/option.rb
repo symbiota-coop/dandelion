@@ -16,22 +16,6 @@ class Option
   field :hide_members, type: Boolean
   field :order, type: Integer
 
-  def self.admin_fields
-    {
-      name: :text,
-      description: :text_area,
-      capacity: :number,
-      cost: :number,
-      order: :number,
-      split_cost: :check_box,
-      type: :text,
-      gathering_id: :lookup,
-      account_id: :lookup,
-      optionships: :collection,
-      by_invitation: :check_box
-    }
-  end
-
   validates_presence_of :name
 
   has_many :optionships, dependent: :destroy

@@ -17,16 +17,6 @@ class Rpayment
     Event.profit_share_roles
   end
 
-  def self.admin_fields
-    {
-      event_id: :lookup,
-      account_id: :lookup,
-      amount: :number,
-      currency: :text,
-      role: :select,
-      notes: :text_area
-    }
-  end
 
   def self.currencies
     CURRENCY_OPTIONS

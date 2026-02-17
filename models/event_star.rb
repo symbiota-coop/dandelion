@@ -8,13 +8,6 @@ class EventStar
 
   validates_uniqueness_of :event, scope: :account
 
-  def self.admin_fields
-    {
-      event_id: :lookup,
-      account_id: :lookup
-    }
-  end
-
   after_create do
     account.notifications_as_circle.create!(notifiable: event, type: 'starred_event') if event.live? && event.publicly_visible?
   end

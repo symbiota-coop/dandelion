@@ -20,18 +20,6 @@ class EventFeedback
   field :response, type: String
   field :has_public_answers, type: Boolean
 
-  def self.admin_fields
-    {
-      rating: :radio,
-      publicly_visible: :check_box,
-      anonymous: :check_box,
-      answers: { type: :text_area, disabled: true },
-      public_answers: { type: :text_area, disabled: true },
-      response: :text_area,
-      event_id: :lookup,
-      account_id: :lookup
-    }
-  end
 
   validates_uniqueness_of :event, scope: :account, allow_nil: true, conditions: -> { where(deleted_at: nil) }
 

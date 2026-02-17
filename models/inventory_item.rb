@@ -12,18 +12,6 @@ class InventoryItem
   field :name, type: String
   field :description, type: String
 
-  def self.admin_fields
-    {
-      name: :text,
-      description: :text_area,
-      account_id: :lookup,
-      responsible_id: :lookup,
-      gathering_id: :lookup,
-      membership_id: :lookup,
-      team_id: :lookup
-    }
-  end
-
   validates_presence_of :name, :gathering, :account, :membership
 
   before_validation do

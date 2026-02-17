@@ -8,18 +8,6 @@ class Post
 
   field :subject, type: String
 
-  def self.admin_fields
-    {
-      id: { type: :text, edit: false },
-      subject: :text,
-      account_id: :lookup,
-      commentable_id: :text,
-      commentable_type: :select,
-      subscriptions: :collection,
-      comments: :collection
-    }
-  end
-
   has_many :subscriptions, dependent: :destroy
   has_many :comments, dependent: :destroy
   has_many :comment_reactions, dependent: :destroy

@@ -10,15 +10,6 @@ class Follow
     field b.to_sym, type: Boolean
   end
 
-  def self.admin_fields
-    {
-      unsubscribed: :check_box,
-      starred: :check_box,
-      follower_id: :lookup,
-      followee_id: :lookup
-    }
-  end
-
   validates_uniqueness_of :followee, scope: :follower
   before_validation do
     errors.add(:followee, 'cannot be the same as follower') if follower.id == followee.id

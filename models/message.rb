@@ -8,14 +8,6 @@ class Message
 
   field :body, type: String
 
-  def self.admin_fields
-    {
-      messenger_id: :lookup,
-      messengee_id: :lookup,
-      body: :text_area
-    }
-  end
-
   before_validation do
     errors.add(:messenger, 'is not able to message') unless messenger && messenger.able_to_message
   end

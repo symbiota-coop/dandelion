@@ -11,20 +11,6 @@ class Timetable
   field :hide_schedule, type: Boolean
   field :scheduling_by_all, type: Boolean
 
-  def self.admin_fields
-    {
-      name: :text,
-      description: :wysiwyg,
-      hide_schedule: :check_box,
-      scheduling_by_all: :check_box,
-      gathering_id: :lookup,
-      account_id: :lookup,
-      spaces: :collection,
-      tslots: :collection,
-      tactivities: :collection
-    }
-  end
-
   validates_presence_of :name
 
   has_many :spaces, dependent: :destroy

@@ -12,18 +12,6 @@ class Spend
   field :amount, type: Integer
   field :reimbursed, type: Boolean
 
-  def self.admin_fields
-    {
-      item: :text,
-      amount: :number,
-      team_id: :lookup,
-      reimbursed: :check_box,
-      gathering_id: :lookup,
-      account_id: :lookup,
-      membership_id: :lookup
-    }
-  end
-
   validates_presence_of :item, :amount
 
   before_validation do

@@ -14,17 +14,6 @@ class AccountNotificationCache
   field :organisations_ids, type: Array, default: []
   field :expires_at, type: Time
 
-  def self.admin_fields
-    {
-      account_id: :lookup,
-      gathering_ids: { type: :text_area, disabled: true },
-      account_ids: { type: :text_area, disabled: true },
-      activity_ids: { type: :text_area, disabled: true },
-      local_group_ids: { type: :text_area, disabled: true },
-      organisations_ids: { type: :text_area, disabled: true },
-      expires_at: :datetime
-    }
-  end
 
   REFRESH_FIELD_MAPPINGS = {
     gathering_ids: ->(account) { account.memberships.pluck(:gathering_id) },

@@ -12,15 +12,8 @@ class Photo
   field :image_uid, type: String
   field :has_image, type: Boolean
 
-  def self.admin_fields
-    {
-      image: :image,
-      photoable_id: :text,
-      photoable_type: :select
-    }
-  end
 
-  def self.photoables
+  def self.photoable_types
     %w[Gathering Comment TicketType]
   end
 

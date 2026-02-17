@@ -39,34 +39,6 @@ class StripeCharge
     Money.new(amount, currency).format(no_cents_if_whole: true)
   end
 
-  def self.admin_fields
-    {
-      summary: { type: :text, edit: false },
-      organisation_id: :lookup,
-      event_id: :lookup,
-      order_id: :lookup,
-      account_id: :lookup,
-      amount: :number,
-      application_fee: :text,
-      application_fee_amount: :number,
-      balance_transaction: :text,
-      created: :datetime,
-      currency: :text,
-      customer: :text,
-      description: :text,
-      destination: { type: :text, full: true },
-      payment_intent: :text,
-      de_donation_revenue: :number,
-      de_ticket_revenue: :number,
-      de_discounted_ticket_revenue: :number,
-      de_percentage_discount: :number,
-      de_percentage_discount_monthly_donor: :number,
-      de_credit_applied: :number,
-      de_fixed_discount_applied: :number,
-      stripe_transactions: :collection
-    }
-  end
-
   def self.transfer(organisation, from: 1.week.ago, to: Date.today - 1)
     # unless from
     #   most_recent_stripe_charge = organisation.stripe_charges.order('created desc').first

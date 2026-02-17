@@ -35,18 +35,6 @@ class Donation
     %w[payment_completed]
   end
 
-  def self.admin_fields
-    {
-      amount: :number,
-      currency: :text,
-      payment_completed: :check_box,
-      application_fee_paid_to_dandelion: :check_box,
-      account_id: :lookup,
-      event_id: :lookup,
-      order_id: :lookup
-    }
-  end
-
   def self.currencies
     CURRENCY_OPTIONS
   end

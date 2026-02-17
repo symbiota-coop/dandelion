@@ -11,16 +11,6 @@ class Verdict
   field :type, type: String
   field :reason, type: String
 
-  def self.admin_fields
-    {
-      account_id: :lookup,
-      mapplication_id: :lookup,
-      gathering_id: :lookup,
-      membership_id: :lookup,
-      type: :select,
-      reason: :text
-    }
-  end
 
   validates_presence_of :type
   validates_uniqueness_of :account, scope: :mapplication

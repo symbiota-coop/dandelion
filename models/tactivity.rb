@@ -28,20 +28,6 @@ class Tactivity
     [''] + timetable.spaces.map { |space| [space.name, space.id] }
   end
 
-  def self.admin_fields
-    {
-      name: :text,
-      description: :text_area,
-      image: :image,
-      account_id: :lookup,
-      space_id: :lookup,
-      tslot_id: :lookup,
-      timetable_id: :lookup,
-      gathering_id: :lookup,
-      membership_id: :lookup
-    }
-  end
-
   has_many :posts, as: :commentable, dependent: :destroy
   has_many :subscriptions, as: :commentable, dependent: :destroy
   has_many :comments, as: :commentable, dependent: :destroy

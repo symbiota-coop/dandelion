@@ -4,10 +4,6 @@ class SignIn
   include CoreExtensions
   include RequestFields
 
-  def self.admin_fields
-    { account_id: :lookup }.merge(RequestFields.admin_fields)
-  end
-
   belongs_to_without_parent_validation :account
 
   attr_accessor :skip_increment

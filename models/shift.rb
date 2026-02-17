@@ -10,17 +10,6 @@ class Shift
   belongs_to_without_parent_validation :account, optional: true
   belongs_to_without_parent_validation :membership, optional: true
 
-  def self.admin_fields
-    {
-      account_id: :lookup,
-      role_id: :lookup,
-      rslot_id: :lookup,
-      rota_id: :lookup,
-      gathering_id: :lookup,
-      membership_id: :lookup
-    }
-  end
-
   validates_uniqueness_of :rslot, scope: :role
 
   before_validation do

@@ -5,11 +5,6 @@ class ActivityTag
 
   field :name, type: String
 
-  def self.admin_fields
-    {
-      name: { type: :text, full: true }
-    }
-  end
 
   has_many :activity_tagships, dependent: :destroy
   has_many :pmails_as_mailable, class_name: 'Pmail', as: :mailable, dependent: :destroy

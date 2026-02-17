@@ -6,13 +6,6 @@ class Waitship
   belongs_to_without_parent_validation :account
   belongs_to_without_parent_validation :event
 
-  def self.admin_fields
-    {
-      account_id: :lookup,
-      event_id: :lookup
-    }
-  end
-
   validates_uniqueness_of :account, scope: :event
 
   after_create do

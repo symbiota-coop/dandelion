@@ -16,13 +16,4 @@ class Draft
     Draft.and(account: account, model: model, name: name).destroy_all
   end
 
-  def self.admin_fields
-    {
-      account_id: :lookup,
-      model: :text,
-      name: :text,
-      url: :url,
-      json: :text_area
-    }
-  end
 end

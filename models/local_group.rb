@@ -22,16 +22,6 @@ class LocalGroup
     %w[name]
   end
 
-  def self.admin_fields
-    {
-      name: :text,
-      type: :text,
-      intro_text: :wysiwyg,
-      geometry: :text_area,
-      hide_members: :check_box
-    }
-  end
-
   validates_presence_of :name, :geometry, :slug
   validates_uniqueness_of :slug, scope: :organisation_id
   validates_format_of :slug, with: /\A[a-z0-9-]+\z/

@@ -11,12 +11,4 @@ class DocPage
   validates_presence_of :name, :slug
   validates_uniqueness_of :slug
 
-  def self.admin_fields
-    {
-      name: :text,
-      slug: :slug,
-      body: :text_area,
-      priority: :number
-    }
-  end
 end

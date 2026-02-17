@@ -15,21 +15,6 @@ class AccountContribution
   field :payment_completed, type: Boolean
   field :source, type: String
 
-  def self.admin_fields
-    {
-      session_id: :text,
-      payment_intent: :text,
-      coinbase_checkout_id: :text,
-      payment_completed: :check_box,
-      account_id: :lookup,
-      currency: :text,
-      amount: :number,
-      source: :text,
-      event_id: :lookup,
-      event_feedback_id: :lookup
-    }
-  end
-
   before_validation do
     if source
       if source.starts_with?('event:')

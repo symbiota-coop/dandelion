@@ -27,15 +27,4 @@ module RequestFields
     self.x_requested_with = request.env['HTTP_X_REQUESTED_WITH']
   end
 
-  def self.admin_fields
-    {
-      path: :text,
-      query_string: :text,
-      user_agent: :text,
-      referrer: :text,
-      ip: :text,
-      country: :text,
-      x_requested_with: :text
-    }
-  end
 end

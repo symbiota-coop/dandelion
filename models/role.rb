@@ -10,16 +10,6 @@ class Role
   field :o, type: Integer
   field :worth, type: Float
 
-  def self.admin_fields
-    {
-      name: :text,
-      o: :number,
-      worth: :number,
-      rota_id: :lookup,
-      gathering_id: :lookup
-    }
-  end
-
   before_validation do
     self.worth = 1 unless worth
   end

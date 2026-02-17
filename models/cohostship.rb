@@ -15,15 +15,6 @@ class Cohostship
   field :has_image, type: Boolean
   field :featured, type: Boolean
 
-  def self.admin_fields
-    {
-      image: :image,
-      featured: :checkbox,
-      event_id: :lookup,
-      organisation_id: :lookup
-    }
-  end
-
   before_validation do
     if image
       begin

@@ -20,26 +20,6 @@ class StripeTransaction
   field :automatic_payout_id, type: String
   field :automatic_payout_effective_at, type: Time
 
-  def self.admin_fields
-    {
-      organisation_id: :lookup,
-      stripe_charge_id: :lookup,
-      created_utc: :datetime,
-      available_on_utc: :datetime,
-      currency: :text,
-      gross: :number,
-      fee: :number,
-      net: :number,
-      reporting_category: :text,
-      source_id: :text,
-      description: :text,
-      customer_facing_amount: :number,
-      customer_facing_currency: :text,
-      automatic_payout_id: :text,
-      automatic_payout_effective_at: :datetime
-    }
-  end
-
   def gross_money
     Money.new(gross * 100, currency)
   end

@@ -8,18 +8,12 @@ class Notification
 
   field :type, type: String
 
-  def self.admin_fields
-    {
-      circle_type: :text,
-      circle_id: :text,
-      notifiable_type: :text,
-      notifiable_id: :text,
-      type: :text
-    }
-  end
-
   def self.circle_types
     %w[Account Gathering Activity LocalGroup Organisation]
+  end
+
+  def self.notifiable_types
+    %w[Gathering Mapplication Membership Teamship Spend Account Tactivity Shift Attendance Team Option Rota Timetable Comment CommentReaction Payment InventoryItem Event Organisation Order EventFeedback]
   end
 
   def circle_url

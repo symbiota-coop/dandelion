@@ -42,29 +42,6 @@ class Ticket
     %w[payment_completed]
   end
 
-  def self.admin_fields
-    {
-      summary: { type: :text, edit: false },
-      price: :number,
-      discounted_price: :number,
-      percentage_discount: :number,
-      percentage_discount_monthly_donor: :number,
-      currency: :text,
-      payment_completed: :check_box,
-      organisation_revenue_share: :number,
-      payment_intent: :text,
-      gocardless_payment_request_id: :text,
-      gocardless_payment_id: :text,
-      show_attendance: :check_box,
-      checked_in: :check_box,
-      name: :text,
-      email: :email,
-      event_id: :lookup,
-      account_id: :lookup,
-      order_id: :lookup,
-      ticket_type_id: :lookup
-    }
-  end
 
   before_validation do
     if email

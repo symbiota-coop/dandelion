@@ -16,18 +16,6 @@ class Carousel
 
   validates_presence_of :name
 
-  def self.admin_fields
-    {
-      organisation_id: :lookup,
-      name: :text,
-      hidden: :check_box,
-      button: :check_box,
-      weeks: :number,
-      o: :number,
-      carouselships: :collection
-    }
-  end
-
   def self.new_hints
     {
       weeks: 'Show events up to this many weeks from now'

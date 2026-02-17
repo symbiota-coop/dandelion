@@ -10,16 +10,6 @@ class Teamship
 
   field :unsubscribed, type: Boolean
 
-  def self.admin_fields
-    {
-      account_id: :lookup,
-      team_id: :lookup,
-      gathering_id: :lookup,
-      membership_id: :lookup,
-      unsubscribed: :check_box
-    }
-  end
-
   validates_uniqueness_of :account, scope: :team
 
   after_create do

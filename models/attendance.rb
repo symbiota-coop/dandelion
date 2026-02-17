@@ -10,15 +10,6 @@ class Attendance
   belongs_to_without_parent_validation :gathering
   belongs_to_without_parent_validation :membership
 
-  def self.admin_fields
-    {
-      tactivity_id: :lookup,
-      account_id: :lookup,
-      gathering_id: :lookup,
-      membership_id: :lookup
-    }
-  end
-
   before_validation do
     self.gathering = tactivity.gathering if tactivity
     self.membership = gathering.memberships.find_by(account: account) if gathering && account && !membership

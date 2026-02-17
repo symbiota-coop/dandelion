@@ -45,51 +45,6 @@ module OrderFields
     field :gc_success, type: Mongoid::Boolean
   end
 
-  class_methods do
-    def admin_fields
-      {
-        value: :number,
-        currency: :text,
-        credit_applied: :number,
-        percentage_discount: :number,
-        percentage_discount_monthly_donor: :number,
-        application_fee_amount: :number,
-        application_fee_paid_to_dandelion: :check_box,
-        organisation_revenue_share: :number,
-        http_referrer: :text,
-        session_id: :text,
-        payment_intent: :text,
-        transfer_id: :text,
-        coinbase_checkout_id: :text,
-        gocardless_payment_request_id: :text,
-        gocardless_payment_id: :text,
-        evm_secret: :text,
-        evm_value: :number,
-        oc_secret: :text,
-        payment_completed: :check_box,
-        opt_in_organisation: :check_box,
-        opt_in_facilitator: :check_box,
-        message_ids: :text_area,
-        answers: { type: :text_area, disabled: true },
-        event_id: :lookup,
-        account_id: :lookup,
-        discount_code_id: :lookup,
-        original_description: :text_area,
-        gc_plan_id: :text,
-        gc_given_name: :text,
-        gc_family_name: :text,
-        gc_address_line1: :text,
-        gc_city: :text,
-        gc_postal_code: :text,
-        gc_branch_code: :text,
-        gc_account_number: :text,
-        gc_success: :check_box,
-        tickets: :collection,
-        donations: :collection
-      }
-    end
-  end
-
   def metadata
     order = self
     metadata_hash = {

@@ -26,20 +26,6 @@ class DiscountCode
     errors.add(:fixed_discount_amount, 'must be positive') if fixed_discount_amount && fixed_discount_amount <= 0
   end
 
-  def self.admin_fields
-    {
-      code: :text,
-      description: :text,
-      filter: :text,
-      maximum_uses: :number,
-      percentage_discount: :number,
-      fixed_discount_amount: :number,
-      fixed_discount_currency: :select,
-      codeable_type: :select,
-      codeable_id: :text,
-      account_id: :lookup
-    }
-  end
 
   before_validation do
     self.code = code.upcase if code

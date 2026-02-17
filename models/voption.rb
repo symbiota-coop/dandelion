@@ -8,13 +8,6 @@ class Voption
 
   field :text, type: String
 
-  def self.admin_fields
-    {
-      text: :text,
-      account_id: :lookup
-    }
-  end
-
   has_many :votes, dependent: :destroy
 
   validates_presence_of :text

@@ -9,15 +9,6 @@ class Tslot
   field :name, type: String
   field :o, type: Integer
 
-  def self.admin_fields
-    {
-      name: :text,
-      o: :number,
-      timetable_id: :lookup,
-      gathering_id: :lookup
-    }
-  end
-
   has_many :tactivities, dependent: :nullify
 
   validates_presence_of :name, :o
