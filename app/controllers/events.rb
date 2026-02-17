@@ -74,7 +74,6 @@ Dandelion::App.controller do
     else
       @event.location = 'Online'
       @event.feedback_questions = 'Comments/suggestions'
-      @event.affiliate_credit_percentage = @event.organisation.affiliate_credit_percentage
       @event.currency = @event.organisation.currency
       @event.suggested_donation = 0
       @event.coordinator = current_account

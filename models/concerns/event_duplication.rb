@@ -15,7 +15,6 @@ module EventDuplication
       feedback_questions: feedback_questions,
       suggested_donation: suggested_donation,
       minimum_donation: minimum_donation,
-      affiliate_credit_percentage: affiliate_credit_percentage,
       capacity: capacity,
       revenue_share_to_revenue_sharer: revenue_share_to_revenue_sharer,
       profit_share_to_organiser: profit_share_to_organiser,

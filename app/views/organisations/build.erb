@@ -248,6 +248,16 @@
           <%= f.check_box_block :collect_location %>
           <%= f.check_box_block :restrict_cohosting %>
           <%= f.check_box_block :hide_ticket_revenue %>
+          <div class="form-group">
+            <label for="organisation_affiliate_credit_percentage"><%= Organisation.human_attribute_name(:affiliate_credit_percentage) %></label>
+            <div class="input-group">
+              <%= f.number_field :affiliate_credit_percentage, class: 'form-control' %>
+              <div class="input-group-append">
+                <span class="input-group-text">%</span>
+              </div>
+            </div>
+            <small class="form-text text-muted"><%= Organisation.edit_hints[:affiliate_credit_percentage] %></small>
+          </div>
           <% unless @organisation.no_referrer %>
             <%= f.lookup_block :referrer_id, lookup_url: '/accounts.json', placeholder: 'Search accounts' %>
           <% end %>
@@ -260,7 +270,6 @@
             <%= f.color_block :theme_color %>
             <%= f.text_area_block :minimal_head %>
             <%= f.text_area_block :events_banner %>
-            <%= f.number_block :affiliate_credit_percentage %>
           </div>
         <% end %>
       <% end %>

@@ -221,7 +221,8 @@ module OrganisationFields
         oc_slug: 'Open Collective slug',
         tax_rate_id: 'Stripe tax rate ID',
         atproto_handle: 'Bluesky/ATProto handle',
-        atproto_app_password: 'Bluesky/ATProto app password'
+        atproto_app_password: 'Bluesky/ATProto app password',
+        affiliate_credit_percentage: 'Order reward %'
       }.merge(email_human_attribute_names)[attr.to_sym] || super
     end
 
@@ -237,7 +238,7 @@ module OrganisationFields
         coinbase_webhook_secret: '<code>Settings</code> > <code>Webhook subscriptions</code> > <code>Show shared secret</code>',
         mailgun_api_key: '<code>Settings</code> > <code>API keys</code>',
         mailgun_domain: '<code>Sending</code> > <code>Domains</code> > <code>Add new domain</code>',
-        affiliate_credit_percentage: 'Default affiliate credit percentage when creating an event',
+        affiliate_credit_percentage: 'When set, attendees receive a personalised, shareable link in the order confirmation email that allows them to earn this % of the order value as credit toward future events',
         add_a_donation_to: "Text to display beside the 'Add a donation' field",
         donation_text: "Text to display below the 'Add a donation' field",
         patreon_api_key: 'Registers people with active Patreon subscriptions as monthly donors',

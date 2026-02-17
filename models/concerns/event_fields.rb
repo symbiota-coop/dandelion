@@ -26,7 +26,6 @@ module EventFields
     field :suggested_donation, type: Float
     field :minimum_donation, type: Float
     field :capacity, type: Integer
-    field :affiliate_credit_percentage, type: Integer
     field :extra_info_for_ticket_email, type: String
     field :extra_info_for_recording_email, type: String
     field :notes, type: String

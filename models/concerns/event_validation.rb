@@ -62,7 +62,6 @@ module EventValidation
       errors.add(:revenue_sharer, 'is not connected to this organisation') if revenue_sharer && !revenue_sharer_organisationship
       self.location = 'Online' if location && location.downcase == 'online'
       errors.add(:revenue_share_to_revenue_sharer, 'must be between 1 and 100') if revenue_share_to_revenue_sharer && revenue_share_to_revenue_sharer != 0 && (revenue_share_to_revenue_sharer < 1 || revenue_share_to_revenue_sharer > 100)
-      errors.add(:affiliate_credit_percentage, 'must be between 1 and 100') if affiliate_credit_percentage && (affiliate_credit_percentage < 1 || affiliate_credit_percentage > 100)
       errors.add(:capacity, 'must be greater than 0') if capacity && capacity < 1
       errors.add(:suggested_donation, 'cannot be less than the minimum donation') if suggested_donation && minimum_donation && suggested_donation < minimum_donation
       errors.add(:oc_slug, "cannot be set until the organisation's Open Collective slug is set") if oc_slug && organisation && !organisation.oc_slug
@@ -83,7 +82,6 @@ module EventValidation
         zoom_party: false,
         monthly_donors_only: false,
         no_discounts: false,
-        affiliate_credit_percentage: organisation.try(:affiliate_credit_percentage),
         featured: false,
         show_emails: false,
         refund_deleted_orders: true

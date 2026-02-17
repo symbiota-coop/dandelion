@@ -18,11 +18,11 @@
 <% unless @organisation.atproto_connected? %>
   <% form_tag "/o/#{@organisation.slug}/atproto/connect", method: 'post' do %>
     <div class="form-group">
-      <label for="atproto_handle">Bluesky/ATProto handle</label>
+      <label for="atproto_handle"><%= Organisation.human_attribute_name(:atproto_handle) %></label>
       <%= text_field_tag :atproto_handle, value: @organisation.atproto_handle, class: 'form-control', placeholder: 'yourhandle.bsky.social', required: true %>
     </div>
     <div class="form-group">
-      <label for="atproto_app_password">App Password</label>
+      <label for="atproto_app_password"><%= Organisation.human_attribute_name(:atproto_app_password) %></label>
       <%= password_field_tag :atproto_app_password, class: 'form-control', placeholder: 'xxxx-xxxx-xxxx-xxxx', required: true %>
       <small class="form-text text-muted">
         This is not your Bluesky login password.

@@ -50,12 +50,12 @@
         <a href="<%=ENV['BASE_URI']%>/e/<%=event.slug%>?order_id=<%=order.id%>">Visit this page to add details of ticketholders.</a>
       </p>
     <% end %>
-    <% if event.affiliate_credit_percentage && account.persisted? %>
+    <% if event.organisation&.affiliate_credit_percentage && account.persisted? %>
       <% affiliate_link = "#{ENV['BASE_URI']}/e/#{event.slug}?affiliate_type=Account&affiliate_id=#{account.id}" %>
       <p>
         <a href="<%= affiliate_link %>">Here's your affiliate link for this event.</a>
         For each person who buys a ticket via this link,
-        you receive credit that can used to attend future events equal to <%= event.affiliate_credit_percentage %>% of the order value.
+        you receive credit that can used to attend future events equal to <%= event.organisation.affiliate_credit_percentage %>% of the order value.
       </p>
     <% end %>
   <% end %>
