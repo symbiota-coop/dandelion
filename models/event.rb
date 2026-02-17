@@ -89,7 +89,7 @@ class Event
   end
 
   def responsible_name
-    if organiser && organisation && organisation.experimental?
+    if organiser && organisation && organisation.stripe_client_id
       organiser
     elsif revenue_sharer
       revenue_sharer

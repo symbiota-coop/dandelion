@@ -98,7 +98,7 @@
         <%= f.url_block :facebook_event_url %>
         <%= partial :tags_select, locals: { object: @event, tag_class: EventTag } %>
         <%= f.lookup_block :coordinator_id, lookup_url: '/accounts.json', placeholder: 'Search accounts', selected_link: (%(<a class="d-inline-block mt-1" target="_blank" href="/u/#{@event.coordinator.username}">View account</a>) if @event.coordinator) %>
-        <% if Padrino.env == :development || @event.organisation.experimental? %>
+        <% if Padrino.env == :development || @event.organisation.stripe_client_id %>
           <%= f.lookup_block :organiser_id, lookup_url: '/accounts.json', placeholder: 'Search accounts', selected_link: (%(<a class="d-inline-block mt-1" target="_blank" href="/u/#{@event.organiser.username}">View account</a>) if @event.organiser_id) %>
         <% end %>
 
