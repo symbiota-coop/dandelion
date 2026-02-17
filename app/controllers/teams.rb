@@ -11,7 +11,7 @@ Dandelion::App.controller do
     @gathering = Gathering.find_by(slug: params[:slug]) || not_found
     @membership = @gathering.memberships.find_by(account: current_account)
     confirmed_membership_required!
-    @team = @gathering.teams.build(params[:team])
+    @team = @gathering.teams.build(mass_assigning(params[:team], Team))
     @team.account = current_account
     if @team.save
       @team.teamships.create(account: current_account)
@@ -95,7 +95,7 @@ Dandelion::App.controller do
     @gathering = Gathering.find_by(slug: params[:slug]) || not_found
     @membership = @gathering.memberships.find_by(account: current_account)
     gathering_admins_only!
-    @teamship = @gathering.teamships.build(params[:teamship])
+    @teamship = @gathering.teamships.build(mass_assigning(params[:teamship], Teamship))
     if @teamship.save
       redirect "/g/#{@gathering.slug}/teams"
     else

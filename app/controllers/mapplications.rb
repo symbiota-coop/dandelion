@@ -110,7 +110,7 @@ Dandelion::App.controller do
     @mapplication = Mapplication.find(params[:id]) || not_found
     @gathering = @mapplication.gathering
     confirmed_membership_required!
-    verdict = @mapplication.verdicts.build(params[:verdict])
+    verdict = @mapplication.verdicts.build(mass_assigning(params[:verdict], Verdict))
     verdict.account = current_account
     verdict.save
     200

@@ -31,6 +31,10 @@ class Comment
     Post.commentable_types
   end
 
+  def self.protected_attributes
+    %w[force sent_at file_uid]
+  end
+
   attr_accessor :via_email
 
   dragonfly_accessor :file

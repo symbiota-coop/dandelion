@@ -80,13 +80,15 @@ Dandelion::App.controller do
 
   get '/o/new' do
     sign_in_required!
-    @organisation = current_account.organisations.build(params[:organisation])
+    @organisation = Organisation.new(mass_assigning(params[:organisation], Organisation))
+    @organisation.account = current_account
     erb :'organisations/build'
   end
 
   post '/o/new' do
     sign_in_required!
-    @organisation = current_account.organisations.build(params[:organisation])
+    @organisation = Organisation.new(mass_assigning(params[:organisation], Organisation))
+    @organisation.account = current_account
     @organisation.show_details_table_in_ticket_emails = true
     @organisation.show_sign_in_link_in_ticket_emails = true
     @organisation.show_ticketholder_link_in_ticket_emails = true

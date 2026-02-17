@@ -134,7 +134,7 @@ Dandelion::App.controller do
   post '/o/:slug/organisation_tiers/new' do
     @organisation = Organisation.find_by(slug: params[:slug]) || not_found
     organisation_admins_only!
-    @organisation_tier = @organisation.organisation_tiers.build(params[:organisation_tier])
+    @organisation_tier = @organisation.organisation_tiers.build(mass_assigning(params[:organisation_tier], OrganisationTier))
     if @organisation_tier.save
       redirect "/o/#{@organisation.slug}/tiers"
     else

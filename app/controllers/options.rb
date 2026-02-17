@@ -3,7 +3,7 @@ Dandelion::App.controller do
     @gathering = Gathering.find_by(slug: params[:slug]) || not_found
     @membership = @gathering.memberships.find_by(account: current_account)
     membership_required!
-    @option = @gathering.options.build(params[:option])
+    @option = @gathering.options.build(mass_assigning(params[:option], Option))
     @option.account = current_account
     if @option.save
       redirect "/g/#{@gathering.slug}/options"
@@ -95,7 +95,7 @@ Dandelion::App.controller do
     @gathering = Gathering.find_by(slug: params[:slug]) || not_found
     @membership = @gathering.memberships.find_by(account: current_account)
     gathering_admins_only!
-    @optionship = @gathering.optionships.build(params[:optionship])
+    @optionship = @gathering.optionships.build(mass_assigning(params[:optionship], Optionship))
     if @optionship.save
       redirect "/g/#{@gathering.slug}/options"
     else

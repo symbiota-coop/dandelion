@@ -11,7 +11,7 @@ Dandelion::App.controller do
     @gathering = Gathering.find_by(slug: params[:slug]) || not_found
     @membership = @gathering.memberships.find_by(account: current_account)
     gathering_admins_only!
-    @rota = @gathering.rotas.build(params[:rota])
+    @rota = @gathering.rotas.build(mass_assigning(params[:rota], Rota))
     @rota.account = current_account
     if @rota.save
       redirect "/g/#{@gathering.slug}/rotas/#{@rota.id}"

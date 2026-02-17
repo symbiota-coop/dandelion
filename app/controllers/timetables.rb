@@ -11,7 +11,7 @@ Dandelion::App.controller do
     @gathering = Gathering.find_by(slug: params[:slug]) || not_found
     @membership = @gathering.memberships.find_by(account: current_account)
     gathering_admins_only!
-    @timetable = @gathering.timetables.build(params[:timetable])
+    @timetable = @gathering.timetables.build(mass_assigning(params[:timetable], Timetable))
     @timetable.account = current_account
     if @timetable.save
       redirect "/g/#{@gathering.slug}/timetables/#{@timetable.id}"

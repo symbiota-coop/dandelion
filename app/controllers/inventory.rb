@@ -3,7 +3,7 @@ Dandelion::App.controller do
     @gathering = Gathering.find_by(slug: params[:slug]) || not_found
     @membership = @gathering.memberships.find_by(account: current_account)
     confirmed_membership_required!
-    @inventory_item = @gathering.inventory_items.build(params[:inventory_item])
+    @inventory_item = @gathering.inventory_items.build(mass_assigning(params[:inventory_item], InventoryItem))
     if request.xhr?
       partial :'inventory/inventory'
     else
@@ -15,7 +15,7 @@ Dandelion::App.controller do
     @gathering = Gathering.find_by(slug: params[:slug]) || not_found
     @membership = @gathering.memberships.find_by(account: current_account)
     confirmed_membership_required!
-    @inventory_item = @gathering.inventory_items.build(params[:inventory_item])
+    @inventory_item = @gathering.inventory_items.build(mass_assigning(params[:inventory_item], InventoryItem))
     @inventory_item.account = current_account
     if @inventory_item.save
       redirect "/g/#{@gathering.slug}/inventory"
