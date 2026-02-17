@@ -4,6 +4,9 @@ module CoreExtensions
   # Fields to auto-strip HTML from
   SANITIZED_FIELDS = %i[name title subject].freeze
 
+  # Fields that identify a record (get full-width text input in admin)
+  IDENTIFYING_FIELDS = (SANITIZED_FIELDS + %i[key]).freeze
+
   # Fields to exclude from auto-generated admin_fields
   ADMIN_FIELDS_EXCLUDED = %w[_id _type created_at updated_at deleted_at crypted_password].freeze
 
@@ -36,12 +39,12 @@ module CoreExtensions
     def auto_admin_fields
       result = {}
 
-      # 1. Add first identifying field (summary method, or name/title/subject field)
+      # 1. Add first identifying field (summary method, or name/title/subject/key field)
       if method_defined?(:summary)
         result[:summary] = { type: :text, edit: false }
       else
         found_identifying_field = false
-        SANITIZED_FIELDS.map(&:to_s).each do |f|
+        IDENTIFYING_FIELDS.map(&:to_s).each do |f|
           next unless fields.key?(f)
 
           result[f.to_sym] = { type: :text, full: true }
@@ -145,8 +148,8 @@ module CoreExtensions
       # Check if this field has a corresponding select options method
       return :select if select_method_for?(field_name)
 
-      # Name and key fields get full width
-      return { type: :text, full: true } if %w[name key].include?(field_name.to_s)
+      # Identifying fields get full width
+      return { type: :text, full: true } if IDENTIFYING_FIELDS.map(&:to_s).include?(field_name.to_s)
 
       ADMIN_FIELD_PATTERNS.each do |admin_type, pattern|
         return admin_type if field_name.to_s.match?(pattern)
