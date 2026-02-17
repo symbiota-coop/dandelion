@@ -60,12 +60,13 @@ Dandelion::App.helpers do
   def quick_colors(count: 13, saturation_start: 80, saturation_end: 95, lightness: 50, primary: '#00B963')
     step = 360.0 / count
     base_hue = Chroma.paint(primary).hsl.h.round
-    (0...count).map do |i|
+    colors = (0...count).map do |i|
       next primary if i == 0
 
       saturation = saturation_start + ((saturation_end - saturation_start) * i.to_f / (count - 1))
       Chroma.paint("hsl(#{(base_hue + (i * step)) % 360}, #{saturation.round}%, #{lightness}%)").to_hex
     end
+    colors.reject.with_index { |_, i| i == 1 }[0..-4]
   end
 
   def clamp_color(hex, min_contrast: 2, min_lightness: 0.25)

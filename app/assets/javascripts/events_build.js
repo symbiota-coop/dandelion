@@ -259,53 +259,6 @@ $(function () {
       }).change()
   }
 
-  // Quick theme color circles
-  const themeColorInput = $('#build-event').find('input[name="event[theme_color]"]')
-  const normalizeHex = (hex) => {
-    if (!hex) return ''
-    hex = String(hex).replace(/^#/, '').toLowerCase()
-    if (hex.length === 3) hex = hex[0] + hex[0] + hex[1] + hex[1] + hex[2] + hex[2]
-    return hex
-  }
-  const updateQuickColorSelection = () => {
-    const val = normalizeHex(themeColorInput.val())
-    if (!val) {
-      $('.quick-color-btn').removeClass('selected')
-      return
-    }
-    $('.quick-color-btn').each(function () {
-      $(this).toggleClass('selected', normalizeHex($(this).data('color')) === val)
-    })
-  }
-  const updateThemeCSS = () => {
-    const hex = normalizeHex(themeColorInput.val())
-    const $oldLink = $('link[href^="/theme.css"]')
-    if (hex) {
-      const href = '/theme.css?theme_color=' + encodeURIComponent('#' + hex)
-      if ($oldLink.length && $oldLink.attr('href') === href) return
-      const $newLink = $('<link>', { rel: 'stylesheet', href: href })
-      $newLink.on('load', function () { $oldLink.remove() })
-      $newLink.appendTo('head')
-    } else {
-      $oldLink.remove()
-    }
-  }
-  updateQuickColorSelection()
-  themeColorInput.on('change', function () {
-    updateQuickColorSelection()
-    updateThemeCSS()
-  })
-  $('.quick-color-btn').click(function () {
-    const color = $(this).data('color')
-    if (themeColorInput.length && color) {
-      themeColorInput.val(color)
-      if (themeColorInput.data('colorpicker')) {
-        themeColorInput.colorpicker('setValue', color)
-      }
-      themeColorInput.trigger('change')
-    }
-  })
-
   // Prevent double-submit
   $('#build-event').submit(function () {
     $(this).find('button[type=submit]').prop('disabled', true)

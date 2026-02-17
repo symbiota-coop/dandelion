@@ -721,6 +721,23 @@ button.bg-warning:focus {
   background: white
 }
 
+.quick-color-btn {
+  cursor: pointer;
+  transition: transform 0.15s, box-shadow 0.15s;
+  outline: none;
+
+  &:hover {
+    transform: scale(1.1);
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+  }
+
+  &:focus,
+  &.selected {
+    outline: none;
+    box-shadow: 0 0 0 2px #fff, 0 0 0 4px var(--ring-color);
+  }
+}
+
 .searchForm .form-group,
 .searchForm .form-check {
   margin-bottom: 0.25rem;

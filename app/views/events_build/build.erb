@@ -2,9 +2,6 @@
 
 <style>
   #build-event .input-group-text { font-size: 1em; }
-  .quick-color-btn { cursor: pointer; transition: transform 0.15s, box-shadow 0.15s; outline: none; }
-  .quick-color-btn:hover { transform: scale(1.1); box-shadow: 0 2px 6px rgba(0,0,0,0.2); }
-  .quick-color-btn:focus, .quick-color-btn.selected { outline: none; box-shadow: 0 0 0 2px #fff, 0 0 0 4px var(--ring-color); }
 </style>
 
 <% if params[:new_org] && !params[:draft_id] %>
@@ -188,11 +185,7 @@
       </div>
       <div role="tabpanel" class="tab-pane" id="tab-appearance">
         <%= f.color_block :theme_color %>
-        <div class="quick-theme-colors mb-3 d-flex flex-wrap align-items-center">
-          <% quick_colors.reject.with_index { |_, i| i == 1 }[0..-4].each do |color| %>
-            <button type="button" class="quick-color-btn rounded-circle border p-0 mr-2 mb-1" style="width: 28px; height: 28px; background: <%= color %>; --ring-color: <%= color %>" data-color="<%= color %>" title="<%= color %>" aria-label="Set theme color to <%= color %>"></button>
-          <% end %>
-        </div>
+        <%= partial :'quick_theme_colors', locals: { input_name: 'event[theme_color]', preview_theme: true } %>
         <% if Padrino.env == :development || @event.organisation.change_select_tickets_title %>
           <%= f.text_block :select_tickets_title %>
         <% end %>

@@ -50,6 +50,7 @@
 
 <style>
   #organisation_minimal_head { height: 5em }
+  #organisation_terms_and_conditions { height: 5em }
 </style>
 <script>
   $(function () {
@@ -63,6 +64,7 @@
     }
 
     autosize($('#organisation_minimal_head')[0])
+    autosize($('#organisation_terms_and_conditions')[0])
 
     $('#organisation-build-nav a[data-toggle="tab"]').on('show.bs.tab', function (e) {
       var form = $('#organisation-build-nav').closest('form')[0]
@@ -95,7 +97,6 @@
         <li role="presentation" class="nav-item"><a class="nav-link <%= 'active' if params[:tab] == 'emails'%>" href="#tab-emails" role="tab" data-toggle="tab">Emails</a></li>
         <li role="presentation" class="nav-item"><a class="nav-link <%= 'active' if params[:tab] == 'mailgun'%>" href="#tab-mailgun" role="tab" data-toggle="tab">Mailgun</a></li>
         <li role="presentation" class="nav-item"><a class="nav-link <%= 'active' if params[:tab] == 'analytics'%>" href="#tab-analytics" role="tab" data-toggle="tab">Analytics</a></li>
-        <li role="presentation" class="nav-item"><a class="nav-link <%= 'active' if params[:tab] == 'embeds'%>" href="#tab-embeds" role="tab" data-toggle="tab">Embeds</a></li>
         <li role="presentation" class="nav-item"><a class="nav-link <%= 'active' if params[:tab] == 'everything-else'%>" href="#tab-everything-else" role="tab" data-toggle="tab">Everything else</a></li>
         <% if Padrino.env == :development || @organisation.experimental? %>
           <li role="presentation" class="nav-item"><a class="nav-link <%= 'active' if params[:tab] == 'experimental'%>" href="#tab-experimental" role="tab" data-toggle="tab">Experimental</a></li>
@@ -236,12 +237,19 @@
           <%= f.text_block :simple_analytics_domain %>
           <%= f.text_block :facebook_pixel_id %>
         </div>
-        <div role="tabpanel" class="tab-pane <%= 'active' if params[:tab] == 'embeds'%>" id="tab-embeds">
-          <p><a target="_blank" href="/docs/events#embedding-event-listings">Read more about embedding event listings</a></p>
-          <%= f.color_block :theme_color %>
-          <%= f.text_area_block :minimal_head %>
-        </div>
         <div role="tabpanel" class="tab-pane <%= 'active' if params[:tab] == 'everything-else'%>" id="tab-everything-else">
+          <%= f.color_block :theme_color %>
+          <%= partial :'quick_theme_colors', locals: { input_name: 'organisation[theme_color]' } %>
+          <div class="form-group">
+            <label for="organisation_affiliate_credit_percentage"><%= Organisation.human_attribute_name(:affiliate_credit_percentage) %></label>
+            <div class="input-group">
+              <%= f.number_field :affiliate_credit_percentage, class: 'form-control' %>
+              <div class="input-group-append">
+                <span class="input-group-text">%</span>
+              </div>
+            </div>
+            <small class="form-text text-muted"><%= Organisation.edit_hints[:affiliate_credit_percentage] %></small>
+          </div>
           <%= f.wysiwyg_block :event_footer %>
           <%= f.text_block :add_a_donation_to %>
           <%= f.text_block :donation_text %>
@@ -254,16 +262,6 @@
           <%= f.check_box_block :collect_location %>
           <%= f.check_box_block :restrict_cohosting %>
           <%= f.check_box_block :hide_ticket_revenue %>
-          <div class="form-group">
-            <label for="organisation_affiliate_credit_percentage"><%= Organisation.human_attribute_name(:affiliate_credit_percentage) %></label>
-            <div class="input-group">
-              <%= f.number_field :affiliate_credit_percentage, class: 'form-control' %>
-              <div class="input-group-append">
-                <span class="input-group-text">%</span>
-              </div>
-            </div>
-            <small class="form-text text-muted"><%= Organisation.edit_hints[:affiliate_credit_percentage] %></small>
-          </div>
           <% unless @organisation.no_referrer %>
             <%= f.lookup_block :referrer_id, lookup_url: '/accounts.json', placeholder: 'Search accounts' %>
           <% end %>
@@ -273,6 +271,7 @@
             <%= f.text_block :stripe_pk %>
             <%= f.text_block :stripe_sk %>
             <%= f.text_block :stripe_client_id %>
+            <%= f.text_area_block :minimal_head %>
             <%= f.text_area_block :events_banner %>
           </div>
         <% end %>
