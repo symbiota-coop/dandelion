@@ -76,10 +76,7 @@ module CoreExtensions
       # 3. Add belongs_to associations as :lookup (sorted alphabetically)
       reflect_on_all_associations(:belongs_to).sort_by(&:name).each do |assoc|
         if assoc.polymorphic?
-          # Add _type field as :select if a types method exists
-          type_field = :"#{assoc.name}_type"
-          result[type_field] = :select if select_method_for?(assoc.name, polymorphic: true)
-          # Add _id field as :text for polymorphic
+          result[:"#{assoc.name}_type"] = :select
           result[:"#{assoc.name}_id"] = :text
         else
           result[:"#{assoc.name}_id"] = :lookup
@@ -89,7 +86,6 @@ module CoreExtensions
       # 4. Add has_many associations as :collection (sorted alphabetically)
       reflect_on_all_associations(:has_many).sort_by(&:name).each do |assoc|
         next if assoc.options[:as] # Skip polymorphic (as: :notifiable etc)
-        next if assoc.name == :notifications # Skip notifications collection
 
         result[assoc.name] = :collection
       end
