@@ -118,7 +118,7 @@
         <% end %>
 
         <% if @event.organisation.local_groups.exists? %>
-          <div id="local-group-select" <% unless @event.organisation.experimental? %> class="mb-3" <% end %>>
+          <div id="local-group-select">
             <%= f.lookup_block :local_group_id, lookup_url: "/o/#{@event.organisation_id}/local_groups.json", placeholder: 'Search local groups', selected_link: (%(<a class="d-inline-block mt-1" target="_blank" href="/o/#{@event.local_group.organisation.slug}/lg/#{@event.local_group.slug}">View local group</a>) if @event.local_group) %>
           </div>
           <% if Padrino.env == :development || @event.organisation.experimental? %>
@@ -199,7 +199,7 @@
             <button type="button" class="quick-color-btn rounded-circle border p-0 mr-2 mb-1" style="width: 28px; height: 28px; background: <%= color %>; --ring-color: <%= color %>" data-color="<%= color %>" title="<%= color %>" aria-label="Set theme color to <%= color %>"></button>
           <% end %>
         </div>
-        <% if Padrino.env == :development || @event.organisation.change_select_tickets_title || @event.organisation.experimental? %>
+        <% if Padrino.env == :development || @event.organisation.change_select_tickets_title %>
           <%= f.text_block :select_tickets_title %>
         <% end %>
         <%= f.text_block :select_tickets_intro %>
