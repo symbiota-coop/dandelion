@@ -9,6 +9,10 @@
   <% end %>
 </div>
 
+<% if @location.signal_group_link %>
+  <a href="<%= @location.signal_group_link %>" target="_blank" class="btn btn-signal mb-3"><i class="bi bi-signal"></i> Join the Signal group</a>
+<% end %>
+
 <%= partial :'events/search_form', locals: { path: '/events' } %>
 
 <div data-with-placeholder data-pagelet-url="/events?near=<%=CGI.escape(@location.query)%>">

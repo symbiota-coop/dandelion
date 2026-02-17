@@ -6,6 +6,7 @@ class Location
   field :name, type: String
   field :query, type: String
   field :events_count, type: Integer
+  field :signal_group_link, type: String
 
   validates_uniqueness_of :name
 
@@ -13,7 +14,8 @@ class Location
     {
       name: :text,
       query: :text,
-      events_count: :number
+      events_count: :number,
+      signal_group_link: :url
     }
   end
 end

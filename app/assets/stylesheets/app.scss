@@ -764,6 +764,21 @@ body {
   color: white
 }
 
+.btn-signal {
+  background-color: #3B45FE;
+  border-color: #3B45FE;
+  color: white;
+}
+
+.btn-signal:hover,
+.btn-signal:focus,
+.btn-signal:active {
+  background-color: #2a32d4 !important;
+  border-color: #2a32d4 !important;
+  color: white !important;
+  box-shadow: 0 0 0 0.2rem rgba(59, 69, 254, 0.25) !important;
+}
+
 .dropdown-menu {
   z-index: 9999
 }
