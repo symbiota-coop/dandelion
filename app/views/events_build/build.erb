@@ -277,9 +277,7 @@
         <% end %>
 
         <% if Padrino.env == :development || @event.organisation.experimental? %>
-          <div class="well">
-            <%= f.check_box_block :minimal_only %>
-          </div>
+          <%= f.check_box_block :minimal_only %>
         <% end %>
 
         <% if !@event.organisation.stripe_client_id && @event.new_record? %>
