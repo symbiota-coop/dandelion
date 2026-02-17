@@ -1,6 +1,10 @@
 module OrganisationMonthlyDonations
   extend ActiveSupport::Concern
 
+  def monthly_donations_enabled?
+    (gocardless_subscriptions && gocardless_access_token) || patreon_api_key
+  end
+
   def sync_with_gocardless
     organisationships.and(monthly_donation_method: 'GoCardless').update_all(
       monthly_donation_amount: nil,

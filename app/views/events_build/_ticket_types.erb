@@ -1,5 +1,5 @@
 <%
-  show_donation_field = @event.organisation && ((@event.organisation.gocardless_subscriptions && @event.organisation.gocardless_access_token) || @event.organisation.patreon_api_key)
+  show_donation_field = @event.organisation && @event.organisation.monthly_donations_enabled?
   persisted_ticket_groups = f.object.ticket_groups.select(&:persisted?)
 %>
 
