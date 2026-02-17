@@ -48,7 +48,7 @@ Dandelion::App.controller do
     sign_in_required!
     @comment = Comment.find(params[:id]) || not_found
     @commentable = @comment.commentable
-    halt unless admin? || (@comment.account.id == current_account.id)
+    halt 403 unless @comment.account.id == current_account.id
     @comment.set(body: params[:body])
     200
   end
@@ -57,7 +57,7 @@ Dandelion::App.controller do
     sign_in_required!
     @comment = Comment.find(params[:id]) || not_found
     @commentable = @comment.commentable
-    halt unless admin? || (@comment.account.id == current_account.id)
+    halt 403 unless @comment.account.id == current_account.id
     @comment.file = params[:file]
     @comment.save!
     redirect back
@@ -67,7 +67,7 @@ Dandelion::App.controller do
     sign_in_required!
     @comment = Comment.find(params[:id]) || not_found
     @commentable = @comment.commentable
-    halt unless admin? || (@comment.account.id == current_account.id)
+    halt 403 unless @comment.account.id == current_account.id
     @comment.file = nil
     @comment.save!
     redirect back
@@ -77,7 +77,7 @@ Dandelion::App.controller do
     sign_in_required!
     @comment = Comment.find(params[:id]) || not_found
     @commentable = @comment.commentable
-    halt unless admin? || (@comment.account.id == current_account.id)
+    halt 403 unless @comment.account.id == current_account.id
     if @comment.first_in_post?
       @comment.post.destroy
     else
@@ -117,6 +117,8 @@ Dandelion::App.controller do
   get '/comments/:id/send' do
     sign_in_required!
     @comment = Comment.find(params[:id]) || not_found
+    @commentable = @comment.commentable
+    halt 403 unless comment_admin?(@comment)
     @comment.send_comment
     redirect back
   end
@@ -169,6 +171,7 @@ Dandelion::App.controller do
   get '/voptions/:id/destroy' do
     sign_in_required!
     @voption = Voption.find(params[:id]) || not_found
+    halt 403 unless @voption.account.id == current_account.id
     @voption.destroy
     200
   end
@@ -183,6 +186,7 @@ Dandelion::App.controller do
   get '/subscriptions/:id/unsubscribe' do
     sign_in_required!
     @subscription = Subscription.find(params[:id]) || not_found
+    halt 403 unless @subscription.account.id == current_account.id
     @subscription.destroy
     200
   end
