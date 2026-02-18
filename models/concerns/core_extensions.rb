@@ -5,7 +5,7 @@ module CoreExtensions
   SANITIZED_FIELDS = %i[name title subject].freeze
 
   # Fields that identify a record (get full-width text input in admin)
-  IDENTIFYING_FIELDS = (SANITIZED_FIELDS + %i[key]).freeze
+  IDENTIFYING_FIELDS = (SANITIZED_FIELDS + %i[slug username email key]).freeze
 
   # Fields to exclude from auto-generated admin_fields
   ADMIN_FIELDS_EXCLUDED = %w[_id _type created_at updated_at deleted_at crypted_password].freeze
@@ -39,21 +39,19 @@ module CoreExtensions
     def auto_admin_fields
       result = {}
 
-      # 1. Add first identifying field (name/title/subject/key field, or summary method)
+      # 1. Add all identifying fields at top (before checkboxes)
       found_identifying_field = false
       IDENTIFYING_FIELDS.map(&:to_s).each do |f|
         next unless fields.key?(f)
 
         result[f.to_sym] = { type: :text, full: true }
         found_identifying_field = true
-        break
       end
       if !found_identifying_field && method_defined?(:summary)
         result[:summary] = { type: :text, edit: false }
       elsif !found_identifying_field
         result[:id] = { type: :text, disabled: true }
       end
-      result[:email] = :email if fields.key?('email')
       result[:password] = :password if method_defined?(:password)
 
       # Prep: Detect dragonfly accessors (must have *_uid field AND dragonfly accessor method)
@@ -99,6 +97,7 @@ module CoreExtensions
       fields.keys.sort.each do |field_name|
         field_def = fields[field_name]
         next if ADMIN_FIELDS_EXCLUDED.include?(field_name)
+        next if IDENTIFYING_FIELDS.map(&:to_s).include?(field_name) # Already added at top
         next if dragonfly_fields.any? { |df| field_name == "#{df}_uid" } # Skip dragonfly uid fields only
         next if belongs_to_fields.include?(field_name) # Skip belongs_to foreign keys
         next if checkboxes.key?(field_name.to_sym) # Skip checkboxes (already added)
