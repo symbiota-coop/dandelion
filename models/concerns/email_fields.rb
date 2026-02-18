@@ -17,19 +17,6 @@ module EmailFields
   end
 
   class_methods do
-    def email_admin_fields
-      {
-        ticket_email_title: :text,
-        ticket_email_greeting: :text_area,
-        recording_email_title: :text,
-        recording_email_greeting: :text_area,
-        reminder_email_title: :text,
-        reminder_email_body: :text_area,
-        feedback_email_title: :text,
-        feedback_email_body: :text_area
-      }
-    end
-
     def email_human_attribute_names
       {
         ticket_email_title: 'Order confirmation email subject',
