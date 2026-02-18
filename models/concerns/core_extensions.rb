@@ -39,19 +39,19 @@ module CoreExtensions
     def auto_admin_fields
       result = {}
 
-      # 1. Add first identifying field (summary method, or name/title/subject/key field)
-      if method_defined?(:summary)
-        result[:summary] = { type: :text, edit: false }
-      else
-        found_identifying_field = false
-        IDENTIFYING_FIELDS.map(&:to_s).each do |f|
-          next unless fields.key?(f)
+      # 1. Add first identifying field (name/title/subject/key field, or summary method)
+      found_identifying_field = false
+      IDENTIFYING_FIELDS.map(&:to_s).each do |f|
+        next unless fields.key?(f)
 
-          result[f.to_sym] = { type: :text, full: true }
-          found_identifying_field = true
-          break
-        end
-        result[:id] = { type: :text, disabled: true } unless found_identifying_field
+        result[f.to_sym] = { type: :text, full: true }
+        found_identifying_field = true
+        break
+      end
+      if !found_identifying_field && method_defined?(:summary)
+        result[:summary] = { type: :text, edit: false }
+      elsif !found_identifying_field
+        result[:id] = { type: :text, disabled: true }
       end
       result[:email] = :email if fields.key?('email')
       result[:password] = :password if method_defined?(:password)
