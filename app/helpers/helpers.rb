@@ -1,4 +1,14 @@
 Dandelion::App.helpers do
+  def back
+    url = request.referer || '/'
+    uri = URI.parse(url)
+    params = uri.query ? Rack::Utils.parse_query(uri.query) : {}
+    params.except!('_')
+    params['_'] = Time.now.to_i
+    uri.query = Rack::Utils.build_query(params)
+    uri.to_s
+  end
+
   def ip_from_cloudflare
     request.env['HTTP_CF_CONNECTING_IP'] || request.env['HTTP_X_FORWARDED_FOR']
   end
@@ -96,9 +106,9 @@ Dandelion::App.helpers do
       flash[:error] = "You didn't attend that event!"
       redirect "/o/#{@event.organisation.slug}/events"
     end
-    if @event.event_feedbacks.find_by(account: @account)
-      flash[:error] = "You've already left feedback on that event"
-      redirect "/o/#{@event.organisation.slug}/events"
-    end
+    return unless @event.event_feedbacks.find_by(account: @account)
+
+    flash[:error] = "You've already left feedback on that event"
+    redirect "/o/#{@event.organisation.slug}/events"
   end
 end
