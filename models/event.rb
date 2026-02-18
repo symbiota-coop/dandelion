@@ -364,12 +364,15 @@ class Event
 
   after_save :set_hidden_from_homepage
   def set_hidden_from_homepage
-    adult_words = %w[naked sex sexual sexuality erotic eros cock pussy anal orgasm ejaculation dmt psilocybin lsd iboga ayahuasca mescaline mdma ketamine]
-    forbidden_phrases = ['friday night dance']
+    forbidden_words = ENV['FORBIDDEN_WORDS'] ? ENV['FORBIDDEN_WORDS'].split.map(&:strip).reject(&:empty?) : []
+    forbidden_locations = ENV['FORBIDDEN_LOCATIONS'] ? ENV['FORBIDDEN_LOCATIONS'].split(',').map(&:strip).reject(&:empty?) : []
 
     name_words = name ? name.downcase.split : []
     tag_words = Array(tag_names_cache).flat_map { |tag| tag.to_s.downcase.split }
-    name_matches_forbidden = forbidden_phrases.any? { |phrase| name&.downcase&.include?(phrase.downcase) }
-    set(hidden_from_homepage: true) if adult_words.intersect?(name_words + tag_words) || name_matches_forbidden || (organisation && organisation.hide_from_homepage?)
+
+    name_forbidden = forbidden_words.intersect?(name_words + tag_words)
+    location_forbidden = forbidden_locations.any? { |phrase| location&.downcase&.include?(phrase.downcase) }
+
+    set(hidden_from_homepage: true) if name_forbidden || location_forbidden || (organisation && organisation.hide_from_homepage?)
   end
 end
