@@ -279,12 +279,15 @@ table.dataTable.table-sm>thead>tr>th {
   border: none !important;
 }
 
+.card-header {
+  padding-bottom: 0.65rem;
+}
+
 .card-header.chill {
   background: white !important;
   color: #212529 !important;
   border: none !important;
   position: relative;
-  padding-bottom: 0.65rem;
 }
 
 .card-header.chill::after {
