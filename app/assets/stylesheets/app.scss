@@ -2,6 +2,46 @@
 @import "../infinite_admin/scss/style";
 @import "event_details";
 
+h1,
+h2,
+h3,
+h4,
+h5,
+h6,
+.h1,
+.h2,
+.h3,
+.h4,
+.h5,
+.h6 {
+  font-family: $header_font_family;
+  font-weight: bold;
+  letter-spacing: -0.02em;
+}
+
+.btn,
+button,
+.nav,
+.label,
+.badge,
+.dropdown-menu,
+.ui-widget,
+#header,
+#sidebar {
+  font-family: $header_font_family;
+  letter-spacing: -0.02em;
+}
+
+.regular,
+.introjs-tooltipReferenceLayer,
+.introjs-tooltipReferenceLayer *,
+.gm-style,
+.notification-title,
+.notification {
+  font-family: $body_font_family;
+  letter-spacing: normal;
+}
+
 .gradient-text {
   background: radial-gradient(circle at 0 0, #099ef1 0%, #6863f8 18.82%, #d84ffa 32.6%, #f058c5 52.83%, #ff4f90 68.03%, #ff6558 87.66%, #ff891f 100%);
   background-clip: text;
@@ -210,18 +250,6 @@ body.greyed #content {
   background: linear-gradient(45deg, #222 0%, #222 66%, $color_highlight_1 100%) !important;
 }
 
-
-.btn,
-button,
-.nav,
-.label,
-.badge,
-#header,
-#sidebar {
-  font-family: $header_font_family;
-  letter-spacing: -0.02em;
-}
-
 .ai-well {
   background: linear-gradient(135deg, $color_highlight_1_light_1 0%, $color_highlight_1_light_1 50%, $color_highlight_1_light_2 100%) !important;
   padding: 1rem;
@@ -298,10 +326,6 @@ a.ui-menu-item-wrapper:hover {
   color: #333
 }
 
-.ui-widget {
-  font-family: $body_font_family
-}
-
 .ui-state-active,
 .ui-widget-content .ui-state-active,
 .ui-widget-header .ui-state-active,
@@ -309,28 +333,6 @@ a.ui-button:active,
 .ui-button:active,
 .ui-button.ui-state-active:hover {
   font-weight: inherit
-}
-
-.introjs-tooltipReferenceLayer,
-.introjs-tooltipReferenceLayer * {
-  font-family: $body_font_family
-}
-
-h1,
-h2,
-h3,
-h4,
-h5,
-h6,
-.h1,
-.h2,
-.h3,
-.h4,
-.h5,
-.h6 {
-  font-family: $header_font_family;
-  font-weight: bold;
-  letter-spacing: -0.02em;
 }
 
 .ck-heading_paragraph_lead {
@@ -418,10 +420,6 @@ button.bg-primary:focus,
 .flatpickr-day.endRange.nextMonthDay {
   background: $color_primary;
   border-color: $color_primary
-}
-
-.gm-style {
-  font-family: $body_font_family
 }
 
 body[contenteditable] {
