@@ -1,12 +1,12 @@
 <% if current_account.upcoming_events.exists? %>
 
   <%
-  days_until, sabbat_name = Almanac.days_until_next_sabbat
-  sabbat_link = "<a target=\"_blank\" href=\"https://claude.ai/public/artifacts/92901b91-0170-465f-a40a-8ed018b01f6b\">#{sabbat_name}</a>"
-  sabbat_text = case days_until
-    when 0 then "Happy #{sabbat_link}!"
-    when 1 then "1 day until #{sabbat_link}"
-    else "#{days_until} days until #{sabbat_link}"
+  sabbat_date, sabbat = Almanac.next_sabbat
+  sabbat_link = "<a target=\"_blank\" href=\"https://claude.ai/public/artifacts/92901b91-0170-465f-a40a-8ed018b01f6b\">#{sabbat[:name]}</a>"
+  sabbat_text = if sabbat_date == Date.today
+    "Happy #{sabbat_link}!"
+  else
+    "#{distance_of_time_in_words(Date.today, sabbat_date)} until #{sabbat_link}"
   end
 %>
   <div class="mb-3">
