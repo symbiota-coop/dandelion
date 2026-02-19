@@ -9,7 +9,7 @@ $color_link_hover: rgb(0, 165, 88); // #00A558
 $color_theme: rgb(251, 174, 59); // #FBAE3B
 $color_theme_transparent: rgba(251, 174, 59, 0.5);
 $body_font_family: 'Plus Jakarta Sans', sans-serif;
-$header_font_family: 'Hanken Grotesk', sans-serif;
+$header_font_family: 'Hanken Grotesk', 'Plus Jakarta Sans', sans-serif;
 $body_font_size: 0.825rem;
 $badge_font_size: 0.75rem;
 $body_text: #212529;
