@@ -5,7 +5,7 @@
       <span class="label label-outline-primary"><%=ticket_group.name%></span>
     </td>
     <td>
-      <a href="/events/<%=@event.id%>/tickets?ticket_group_id=<%=ticket_group.id%>">
+      <a href="/events/<%=@event.id%>/tickets<%= params[:ticket_group_id] == ticket_group.id.to_s ? '' : "?ticket_group_id=#{ticket_group.id}" %>">
         <%= ticket_group.tickets.count %>/<%= ticket_group.capacity %>
         <% if ticket_group.capacity > 0 %>
           <% w = ((ticket_group.tickets.count / ticket_group.capacity.to_f) * 100).round %>
@@ -21,7 +21,7 @@
   <tr <% if params[:ticket_type_id] == ticket_type.id.to_s %> <% elsif params[:ticket_type_id] || params[:ticket_group_id] %>style="opacity: 0.4" <% end %>>
     <td style="width: 1px; white-space: nowrap" class="pr-3">
       <% if ticket_type.hidden %>
-        <a href="/events/<%= @event.id %>?ticket_type_id=<%= ticket_type.id %>"><%= ticket_type.name %></a>
+        <a href="/events/<%= @event.id %><%= params[:ticket_type_id] == ticket_type.id.to_s ? '' : "?ticket_type_id=#{ticket_type.id}" %>"><%= ticket_type.name %></a>
         <% if ticket_type.ticket_group %>
           <span class="label label-outline-primary"><%=ticket_type.ticket_group.name%></span>
         <% end %>
@@ -35,7 +35,7 @@
     </td>
     <td>
       <% w = ((ticket_type.tickets.count / ticket_type.quantity.to_f) * 100).round %>
-      <a href="/events/<%=@event.id%>/tickets?ticket_type_id=<%=ticket_type.id%>">
+      <a href="/events/<%=@event.id%>/tickets<%= params[:ticket_type_id] == ticket_type.id.to_s ? '' : "?ticket_type_id=#{ticket_type.id}" %>">
         <%= ticket_type.tickets.count %>/<%= ticket_type.quantity %>
         <div class="progress">
           <div class="progress-bar" role="progressbar" style="width: <%= "#{w}%" %>;"></div>
