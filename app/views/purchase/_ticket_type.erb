@@ -1,7 +1,7 @@
 <% unless @no_ticket_groups %>
   <% tg = ticket_type.ticket_group.try(:name) || 'Other tickets'; if tg != @previous_ticket_group %>
   <tr>
-    <td colspan="3" style="text-transform: uppercase; font-size: 80%" class="bg-primary text-white text-center font-weight-bold"><%= tg %></td>
+    <td colspan="3" style="text-transform: uppercase; font-size: 80%" class="bg-primary text-white text-center font-weight-bold header-font"><%= tg %></td>
   </tr>
   <% @previous_ticket_group = ticket_type.ticket_group.try(:name) %>
 <% end %>
