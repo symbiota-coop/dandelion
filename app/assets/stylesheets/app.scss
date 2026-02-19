@@ -2,6 +2,15 @@
 @import "../infinite_admin/scss/style";
 @import "event_details";
 
+@font-face {
+  font-family: 'Space Grotesk';
+  src: url('https://rawcdn.githack.com/floriankarsten/space-grotesk/03507d024a01282884232081fc6011c09ff4e849/fonts/woff2/SpaceGrotesk%5Bwght%5D.woff2') format('woff2');
+  font-weight: 300 700;
+  font-style: normal;
+  font-display: swap;
+  size-adjust: 105%;
+}
+
 h1,
 h2,
 h3,
@@ -14,8 +23,8 @@ h6,
 .h4,
 .h5,
 .h6 {
-  font-family: $header_font_family;
   font-weight: bold;
+  font-family: $header_font_family;
   letter-spacing: -0.02em;
 }
 
@@ -276,10 +285,6 @@ table.dataTable.table-sm>thead>tr>th {
 .progress-bar {
   background: linear-gradient(135deg, $color_primary 0%, $color_primary 50%, $color_primary_light 100%) !important;
   border: none !important;
-}
-
-.card-header {
-  padding-bottom: 0.65rem;
 }
 
 .card-header.chill {
