@@ -204,7 +204,7 @@ Dandelion::App.controller do
   end
 
   get '/stats/asns' do
-    @hours = 3 * 24
+    @hours = 1 * 24
 
     rows = nil
     country_rows = nil
