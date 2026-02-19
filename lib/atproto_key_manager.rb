@@ -1,6 +1,5 @@
+require 'jwt'
 require 'openssl'
-require 'json'
-require 'base64'
 
 class AtprotoKeyManager
   class << self
@@ -20,57 +19,8 @@ class AtprotoKeyManager
     def build_jwk(key)
       return nil unless key
 
-      point = key.public_key
-      bn = point.to_bn(:uncompressed)
-      bytes = bn.to_s(2)
-
-      x = bytes[1, 32]
-      y = bytes[33, 32]
-
-      {
-        kty: 'EC',
-        crv: 'P-256',
-        x: base64url_encode(x),
-        y: base64url_encode(y),
-        use: 'sig',
-        alg: 'ES256',
-        kid: generate_kid(key)
-      }
-    end
-
-    def generate_kid(key)
-      return nil unless key
-
-      jwk = build_jwk_without_kid(key)
-      thumbprint_input = JSON.generate({
-                                         crv: jwk[:crv],
-                                         kty: jwk[:kty],
-                                         x: jwk[:x],
-                                         y: jwk[:y]
-                                       })
-      base64url_encode(OpenSSL::Digest::SHA256.digest(thumbprint_input))
-    end
-
-    def build_jwk_without_kid(key)
-      return nil unless key
-
-      point = key.public_key
-      bn = point.to_bn(:uncompressed)
-      bytes = bn.to_s(2)
-
-      x = bytes[1, 32]
-      y = bytes[33, 32]
-
-      {
-        kty: 'EC',
-        crv: 'P-256',
-        x: base64url_encode(x),
-        y: base64url_encode(y)
-      }
-    end
-
-    def base64url_encode(data)
-      Base64.urlsafe_encode64(data, padding: false)
+      jwk = JWT::JWK::EC.new(key, nil, kid_generator: JWT::JWK::Thumbprint)
+      jwk.export.merge(use: 'sig', alg: 'ES256')
     end
 
     def client_metadata
