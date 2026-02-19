@@ -22,12 +22,11 @@ h6,
 .btn,
 button,
 .nav,
-.label,
-.badge,
 .dropdown-menu,
 .ui-widget,
 #header,
-#sidebar {
+#sidebar,
+.header-font {
   font-family: $header_font_family;
   letter-spacing: -0.02em;
 }

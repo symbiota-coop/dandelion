@@ -17,7 +17,7 @@
           <a class="btn btn-primary" href="javascript:;" onclick="$(this).parent().hide().next().show()"><i class="bi bi-plus-lg"></i> Create an event</a>
         </p>
         <% form_tag '/events/new', style: 'display: none', method: :get, class: 'my-3 form-inline' do %>
-          <span class="mr-1">Create an event under</span>
+          <span class="mr-1 header-font">Create an event under</span>
           <%= select_tag :organisation_id, onchange: "window.location = '/events/new?organisation_id=' + $(this).val()", class: 'form-control', options: ['']+current_account.organisations.order('name asc').map { |organisation| [organisation.name, organisation.id] } %>
         <% end %>
       <% end %>
