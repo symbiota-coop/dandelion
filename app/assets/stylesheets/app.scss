@@ -244,6 +244,7 @@ table.dataTable.table-sm>thead>tr>th {
   color: #212529 !important;
   border: none !important;
   position: relative;
+  padding-bottom: 0.65rem;
 }
 
 .card-header.chill::after {
@@ -308,8 +309,15 @@ h2,
 h3,
 h4,
 h5,
-h6 {
-  font-weight: bold
+h6,
+.h1,
+.h2,
+.h3,
+.h4,
+.h5,
+.h6 {
+  font-family: $header_font_family;
+  font-weight: bold;
 }
 
 .ck-heading_paragraph_lead {
