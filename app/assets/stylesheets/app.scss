@@ -35,9 +35,13 @@ button,
 .dropdown-menu,
 .ui-widget,
 #header,
-#sidebar,
-.header-font {
+#sidebar {
   font-weight: 400;
+  font-family: $header_font_family;
+  letter-spacing: -0.02em;
+}
+
+.header-font {
   font-family: $header_font_family;
   letter-spacing: -0.02em;
 }
