@@ -3,10 +3,20 @@
 @import "event_details";
 
 @font-face {
-  font-family: 'Space Grotesk';
-  src: url('https://rawcdn.githack.com/floriankarsten/space-grotesk/03507d024a01282884232081fc6011c09ff4e849/fonts/woff2/SpaceGrotesk%5Bwght%5D.woff2') format('woff2');
-  font-weight: 300 700;
+  font-family: 'Hanken Grotesk';
+  src: url('https://rawcdn.githack.com/marcologous/hanken-grotesk/1ab416e82130b2d3ddb7710abf7ceabf07156a13/fonts/variable/HankenGrotesk%5Bwght%5D.ttf') format('truetype');
+  font-weight: 100 900;
   font-style: normal;
+  font-display: swap;
+  size-adjust: 107%;
+  ascent-override: 110%;
+}
+
+@font-face {
+  font-family: 'Hanken Grotesk';
+  src: url('https://rawcdn.githack.com/marcologous/hanken-grotesk/1ab416e82130b2d3ddb7710abf7ceabf07156a13/fonts/variable/HankenGrotesk-Italic%5Bwght%5D.ttf') format('truetype');
+  font-weight: 100 900;
+  font-style: italic;
   font-display: swap;
   size-adjust: 105%;
   ascent-override: 110%;
@@ -29,6 +39,7 @@ h6,
   letter-spacing: -0.02em;
 }
 
+/*
 .btn,
 button,
 .nav,
@@ -40,7 +51,9 @@ button,
   font-family: $header_font_family;
   letter-spacing: -0.02em;
 }
+*/
 
+.strapline,
 .header-font {
   font-family: $header_font_family;
   letter-spacing: -0.02em;

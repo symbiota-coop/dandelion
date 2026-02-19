@@ -40,7 +40,7 @@
 <%= partial :'organisations/nav', locals: { organisation: @organisation } %>
 
 <% if current_account.organisations.exists? %>
-  <p <% if @organisation.persisted? %> class="header-font" <% end %>>
+  <p>
     <a target="_blank" href="/docs/organisations">
       <i class="bi bi-question-circle-fill"></i>
       Need support? Check out the docs
