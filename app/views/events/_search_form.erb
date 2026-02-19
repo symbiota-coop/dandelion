@@ -12,7 +12,7 @@
 <% unless params[:search] %>
   <div class="mb-3">
     <span class="d-inline-block mb-1">Popular locations:</span><% Location.order('events_count desc').each do |location| %>
-      <a class="btn mb-1 <% if @location && @location == location %> btn-primary <% else %> btn-outline-primary <% end %> btn-xs" href="/locations/<%= location.name %>"><%= location.name %></a>
+      <a class="regular btn mb-1 <% if @location && @location == location %> btn-primary <% else %> btn-outline-primary <% end %> btn-xs" href="/locations/<%= location.name %>"><%= location.name %></a>
     <% end %>
   </div>
 <% end %>
