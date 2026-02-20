@@ -27,11 +27,6 @@
   .almanac-moon { filter: grayscale(1); font-size: 1.3em; }
 </style>
 <ul class="nav navbar-nav navbar-right">
-  <li class="d-none d-md-inline">
-    <a href="/wheel-of-the-year.html" target="_blank" class="navbar-text text-white almanac-moon" title="<%= almanac_tooltip %>" data-toggle="tooltip">
-      <%= Almanac.moon_icon %>
-    </a>
-  </li>
   <% if current_account %>
     <% if admin? && request.path == '/' && (contribution_data = MonthlyContributionsCalculator.contribution_data) %>
       <li class="d-none d-lg-inline">
@@ -40,6 +35,13 @@
         </a>
       </li>
     <% end %>
+  <% end %>
+  <li class="d-none d-md-inline">
+    <a href="/wheel-of-the-year.html" target="_blank" class="navbar-text text-white almanac-moon" title="<%= almanac_tooltip %>" data-toggle="tooltip">
+      <%= Almanac.moon_icon %>
+    </a>
+  </li>
+  <% if current_account %>
     <li>
       <a href="javascript:;" data-toggle="search-bar" class="navbar-icon">
         <i class="bi bi-search"></i>
