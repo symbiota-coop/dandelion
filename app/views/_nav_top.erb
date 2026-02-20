@@ -16,11 +16,22 @@
   </style>
 <% end %>
 
+<%
+  sabbat_date, sabbat = Almanac.next_sabbat
+  sabbat_plain = sabbat_date == Date.today ? "Happy #{sabbat[:name]}!" : "#{distance_of_time_in_words(Date.today, sabbat_date)} until #{sabbat[:name]}"
+  almanac_tooltip = "#{Almanac.moon_name} · #{sabbat_plain}"
+%>
 <style>
   #docs-li { display: none }
   @media(min-width: 992px) { #docs-li { display: list-item } }
+  .almanac-moon { filter: grayscale(1); font-size: 1.3em; }
 </style>
 <ul class="nav navbar-nav navbar-right">
+  <li class="d-none d-md-inline">
+    <a href="/wheel-of-the-year.html" target="_blank" class="navbar-text text-white almanac-moon" title="<%= almanac_tooltip %>" data-toggle="tooltip">
+      <%= Almanac.moon_icon %>
+    </a>
+  </li>
   <% if current_account %>
     <% if admin? && request.path == '/' && (contribution_data = MonthlyContributionsCalculator.contribution_data) %>
       <li class="d-none d-lg-inline">

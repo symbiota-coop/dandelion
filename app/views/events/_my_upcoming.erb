@@ -1,20 +1,5 @@
 <% if current_account.upcoming_events.exists? %>
 
-  <%
-  sabbat_date, sabbat = Almanac.next_sabbat
-  sabbat_link = "<a target=\"_blank\" href=\"https://claude.ai/public/artifacts/92901b91-0170-465f-a40a-8ed018b01f6b\">#{sabbat[:name]}</a>"
-  sabbat_text = if sabbat_date == Date.today
-    "Happy #{sabbat_link}!"
-  else
-    "#{distance_of_time_in_words(Date.today, sabbat_date)} until #{sabbat_link}"
-  end
-%>
-  <div class="mb-3">
-    <%= Almanac.moon_icon %> <%= Almanac.moon_name %>
-    &middot;
-    <%== sabbat_text %>
-  </div>
-
   <table class="table table-borderless">
     <% current_account.upcoming_events.each { |event| %>
     <tr>
