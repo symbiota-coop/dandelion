@@ -21,13 +21,13 @@
 
       <% end %>
 
-      <%if @event.event_sessions.exists? %>
+      <% if @event.event_sessions.exists? %>
         <div style="font-size: 0.85rem" class="my-2">
           <span class="label label-primary"><%= pluralize @event.event_sessions.count, 'session' %></span>
         </div>
       <% end %>
 
-      <% if @event.start_time.to_date != @event.end_time.to_date %>
+      <% if @event.event_sessions.exists? || (@event.start_time.to_date != @event.end_time.to_date) %>
         <div class="my-1" style="font-size: 0.85rem">
           <%= partial :'events/add_event_session', locals: {
           event_sessions: @event.event_sessions.order('start_time asc'),
