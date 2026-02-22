@@ -31,7 +31,7 @@ Check out the video below, which does assume you have a [Stripe](https://stripe.
 >
 > You're done!
 
-<p class="action">[List an event](https://dandelion.events/events/new)</p>
+<p class="action"><a href="https://dandelion.events/events/new">List an event</a></p>
 
 ### If you already have a Dandelion account
 
@@ -98,7 +98,8 @@ You can also copy email addresses of attendees into your own email app from the 
 You have two options here:
 
 1. **Use a single event with multiple Ticket Groups:** Create a single event with the start date as the start date of the first event in the series and the end date as the end date of the last event in the series; then use Ticket Groups to list the different dates ([example here](/events/630e122b1fb42b0010b5d792)).
-
+<br /> 
+<br /> 
 Ticket groups are created on the Tickets tab when editing your event. To assign tickets to new ticket groups, save the event then return to the Tickets tab.
 
 2. **Create multiple events under a single Activity:** Create an Activity under your Organisation (see the [Organisations](/docs/organisations) page for details on how to do this), and then create multiple events under this activity. Share the link to the Activity for people to view all available dates.

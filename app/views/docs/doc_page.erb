@@ -27,6 +27,9 @@
         <% doc = Nokogiri::HTML.fragment(@doc_page[:html_body])
           doc.css('h2').each do |h2|
             h2['id'] = h2.text.parameterize
+          end
+          doc.css('table').each do |table|
+            table['class'] = ['table', 'table-bordered', 'mb-3', table['class']].compact.join(' ')
           end %>
         <%== doc.to_html %>
       </div>
