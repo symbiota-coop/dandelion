@@ -163,7 +163,7 @@ GET /z/organisation_event_orders?organisation_slug=my-organisation&event_id=507f
     "opt_in_facilitator": false,
     "hear_about": "Social media",
     "via": "instagram-ad",
-    "answers": { "dietary_requirements": "Vegan" },
+    "answers": [["Dietary requirements?", "Vegan"]],
     "created_at": "2024-01-15T14:22:00Z"
   }
 ]
@@ -182,7 +182,7 @@ GET /z/organisation_event_orders?organisation_slug=my-organisation&event_id=507f
 | `opt_in_facilitator` | boolean | Whether the purchaser opted in to facilitator communications |
 | `hear_about` | string | How the purchaser heard about the event |
 | `via` | string | Tracking parameter from URL (e.g. `?via=newsletter`) |
-| `answers` | object | Custom question responses from the ticket form |
+| `answers` | array | Custom question responses from the ticket form. Array of `[question, answer]` pairs. |
 | `created_at` | string | ISO 8601 timestamp of when the order was created |
 
 **Notes:**
