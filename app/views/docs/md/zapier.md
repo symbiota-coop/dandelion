@@ -37,7 +37,7 @@ Returns information about the currently authenticated user.
 
 Returns a list of live, publicly visible events for a given organisation (including co-hosted events).
 
-**Authentication:** Not required
+**Authentication:** Required (must be an admin of the organisation)
 
 **Parameters:**
 
