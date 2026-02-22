@@ -42,11 +42,13 @@
       <ul class="doc-index-headings" style="list-style-type: square; font-size: 85%; max-height: 50vh; overflow-y: scroll">
         <% doc_page[:headings].each do |heading| %>
           <li>
-            <a href="/docs/<%= doc_page[:slug] %>#<%= heading[:text].parameterize %>" class="doc-link"><%= heading[:text] %></a>
+            <% h2_text = heading[:text].to_s.gsub('\\', '') %>
+            <a href="/docs/<%= doc_page[:slug] %>#<%= h2_text.parameterize %>" class="doc-link"><%= h2_text %></a>
             <% if heading[:h3s].any? %>
               <ul style="list-style-type: circle; font-size: 90%; padding-left: 0.75em">
                 <% heading[:h3s].each do |h3| %>
-                  <li><a href="/docs/<%= doc_page[:slug] %>#<%= h3.parameterize %>" class="doc-link"><%= h3 %></a></li>
+                  <% h3_text = h3.to_s.gsub('\\', '') %>
+                  <li><a href="/docs/<%= doc_page[:slug] %>#<%= h3_text.parameterize %>" class="doc-link"><%= h3_text %></a></li>
                 <% end %>
               </ul>
             <% end %>
