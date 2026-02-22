@@ -17,7 +17,8 @@ FRONTEND_DEPENDENCIES = {
     'bootstrap-icons/1.13.1' => 'font/bootstrap-icons.min.css',
     'typed.js/2.0.10' => 'typed.min.js',
     'fullcalendar/6.1.19' => 'index.global.min.js',
-    'chartjs-plugin-datalabels/2.0.0' => 'chartjs-plugin-datalabels.min.js'
+    'chartjs-plugin-datalabels/2.0.0' => 'chartjs-plugin-datalabels.min.js',
+    'highlight.js/11.9.0' => 'highlight.min.js styles/atom-one-dark.min.css'
   },
   'https://rawcdn.githack.com/' => {
     'mahnunchik/markerclustererplus/736b0e3a7d916fbeb2ee5007494f17a5329b11a8' => 'src/markerclusterer.js',

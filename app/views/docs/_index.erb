@@ -30,13 +30,13 @@
 </script>
 
 <ul class="list-unstyled" style="font-size: 1.25em">
-  <% DocPage.order('priority desc').each { |doc_page| active = false %>
+  <% @doc_pages.each { |doc_page| active = @doc_page && @doc_page[:slug] == doc_page[:slug] %>
   <li>
-    <a <% if @doc_page && @doc_page == doc_page; active = true %> class="font-weight-bold" <% end %> href="/docs/<%=doc_page.slug%>"><%=doc_page.name %></a>
+    <a <% if active %> class="font-weight-bold" <% end %> href="/docs/<%= doc_page[:slug] %>"><%= doc_page[:name] %></a>
     <% if active %>
       <ul style="list-style-type: square; font-size: 85%">
-        <% doc_page.body.scan(/<h2>(.*?)<\/h2>/).each do |h2| %>
-          <li><a href="/docs/<%=doc_page.slug%>#<%=h2.first.parameterize%>" class="doc-link"><%= h2.first %></a></li>
+        <% doc_page[:h2_headings].each do |heading| %>
+          <li><a href="/docs/<%= doc_page[:slug] %>#<%= heading.parameterize %>" class="doc-link"><%= heading %></a></li>
         <% end %>
       </ul>
     <% end %>

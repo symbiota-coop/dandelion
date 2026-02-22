@@ -1,4 +1,9 @@
 Dandelion::App.controller do
+  before do
+    @docs_dir = File.expand_path('app/views/docs/md', Padrino.root)
+    @doc_order = %w[events organisations gatherings mailer zapier].freeze
+  end
+
   get '/docs/question' do
     @sent = true
     partial :'docs/question'
@@ -23,31 +28,26 @@ Dandelion::App.controller do
   end
 
   get '/docs' do
-    halt unless DocPage.exists?
-    redirect "/docs/#{DocPage.order('priority desc').first.slug}"
+    first = @doc_order.find { |slug| File.exist?(File.join(@docs_dir, "#{slug}.md")) }
+    halt 404 if first.nil?
+    redirect "/docs/#{first}"
   end
 
   get '/docs/:slug' do
-    @doc_page = DocPage.find_by(slug: params[:slug]) || not_found
-    erb :'docs/doc_page'
-  end
+    path = File.join(@docs_dir, "#{params[:slug]}.md")
+    halt 404 unless File.exist?(path) && @doc_order.include?(params[:slug])
 
-  get '/docs/:slug/edit' do
-    admins_only!
-    @doc_page = DocPage.find_by(slug: params[:slug]) || not_found
-    erb :'docs/build'
-  end
+    raw = File.read(path)
+    @doc_page = { slug: params[:slug], name: params[:slug].to_s.humanize, raw_content: raw, html_body: md(raw), h2_headings: raw.scan(/^## (.+)$/).flatten.map(&:strip) }
 
-  post '/docs/:slug/edit' do
-    admins_only!
-    @doc_page = DocPage.find_by(slug: params[:slug]) || not_found
-    if @doc_page.update_attributes(mass_assigning(params[:doc_page], DocPage))
-      flash[:notice] = 'The page was saved.'
-      redirect "/docs/#{@doc_page.slug}"
-    else
-      @edit_slug = params[:slug] # Use original slug for form action, not the (possibly invalid) in-memory value
-      flash.now[:error] = 'There was an error saving the page.'
-      erb :'docs/build'
+    @doc_pages = @doc_order.filter_map do |slug|
+      p = File.join(@docs_dir, "#{slug}.md")
+      next unless File.exist?(p)
+
+      r = File.read(p)
+      { slug: slug, name: slug.to_s.humanize, h2_headings: r.scan(/^## (.+)$/).flatten.map(&:strip) }
     end
+
+    erb :'docs/doc_page'
   end
 end
