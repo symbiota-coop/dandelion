@@ -38,14 +38,29 @@ Dandelion::App.controller do
     halt 404 unless File.exist?(path) && @doc_order.include?(params[:slug])
 
     raw = File.read(path)
-    @doc_page = { slug: params[:slug], name: params[:slug].to_s.humanize, raw_content: raw, html_body: md(raw), h2_headings: raw.scan(/^## (.+)$/).flatten.map(&:strip) }
+
+    extract_headings = lambda do |content|
+      headings = []
+      current_h2 = nil
+      content.each_line do |line|
+        if line =~ /^## (.+)$/
+          current_h2 = { text: ::Regexp.last_match(1).strip, h3s: [] }
+          headings << current_h2
+        elsif line =~ /^### (.+)$/ && current_h2
+          current_h2[:h3s] << ::Regexp.last_match(1).strip
+        end
+      end
+      headings
+    end
+
+    @doc_page = { slug: params[:slug], name: params[:slug].to_s.humanize, raw_content: raw, html_body: md(raw), headings: extract_headings.call(raw) }
 
     @doc_pages = @doc_order.filter_map do |slug|
       p = File.join(@docs_dir, "#{slug}.md")
       next unless File.exist?(p)
 
       r = File.read(p)
-      { slug: slug, name: slug.to_s.humanize, h2_headings: r.scan(/^## (.+)$/).flatten.map(&:strip) }
+      { slug: slug, name: slug.to_s.humanize, headings: extract_headings.call(r) }
     end
 
     erb :'docs/doc_page'
