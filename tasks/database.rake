@@ -1,4 +1,25 @@
 namespace :db do
+  desc 'Find MongoDB collections without an associated Mongoid model'
+  task orphan_collections: :environment do
+    db = Mongoid.default_client.database
+    db_collections = db.collections.map(&:name).reject { |n| n.start_with?('system.') }.to_set
+
+    model_collections = ObjectSpace.each_object(Class).select do |c|
+      c.name.present? && c.include?(Mongoid::Document) && !c.name.start_with?('Mongoid::')
+    end.map { |m| m.collection.name }.to_set
+
+    orphaned = (db_collections - model_collections).sort
+
+    puts "\n🔍 Collections without associated models\n"
+    puts '=' * 60
+    if orphaned.empty?
+      puts "✅ All collections have associated models.\n\n"
+    else
+      orphaned.each { |name| puts "  • #{name}" }
+      puts "\n📊 Found #{orphaned.size} collection(s) without models\n\n"
+    end
+  end
+
   desc 'Get sizes of all MongoDB collections'
   task collection_sizes: :environment do
     db = Mongoid.default_client.database
