@@ -35,7 +35,7 @@ Returns information about the currently authenticated user.
 
 ### GET /z/organisation\_events
 
-Returns a list of live, publicly visible events for a given organisation (including co-hosted events).
+Returns a list of events for a given organisation (including co-hosted events).
 
 **Authentication:** Required (must be an admin of the organisation)
 
@@ -74,8 +74,7 @@ GET /z/organisation_events?organisation_slug=my-organisation
 **Notes:**
 
 - Events are sorted by start time (most recent first)
-- Only live, publicly visible events are returned
-- Includes events where the organisation is a co-host
+- Includes all events where the organisation is host or co-host
 
 ---
 
