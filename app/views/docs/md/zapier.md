@@ -3,7 +3,7 @@ The Dandelion Zapier API allows you to integrate Dandelion event data with thous
 
 **Base URL:** `https://dandelion.events`
 
-**Authentication:** Session-based authentication via Dandelion account login. The Zapier integration uses OAuth to authenticate users.
+**Authentication:** API key. Find your API key on your [profile edit page](/accounts/edit).
 
 ## API Endpoints
 
