@@ -220,7 +220,7 @@ The following triggers are available in the Dandelion Zapier integration:
 | Trigger | Description | Endpoint |
 |---------|-------------|----------|
 | New Follower | Triggers when someone follows your organisation | `/z/organisation_followers` |
-| New Order | Triggers when someone purchases tickets to your event | `/z/organisation_event_orders` |
+| Order Confirmed | Triggers when someone purchases tickets to your event | `/z/organisation_event_orders` |
 
 ## Support
 
