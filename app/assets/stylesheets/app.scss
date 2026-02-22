@@ -58,6 +58,23 @@ button,
   letter-spacing: -0.02em;
 }
 
+.strapline {
+  font-size: 5.5vw;
+  line-height: 130%
+}
+
+@media(min-width: 768px) {
+  .strapline {
+    font-size: 4.5vw;
+  }
+}
+
+@media(min-width: 992px) {
+  .strapline {
+    font-size: 3.1vw;
+  }
+}
+
 .ui-widget,
 .regular,
 .introjs-tooltipReferenceLayer,

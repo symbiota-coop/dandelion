@@ -39,7 +39,7 @@
   <li>
     <a <% if active %> class="font-weight-bold" <% end %> href="/docs/<%= doc_page[:slug] %>"><%= doc_page[:name] %></a>
     <% if active %>
-      <ul class="doc-index-headings" style="list-style-type: square; font-size: 85%; max-height: 50vh; overflow-y: scroll">
+      <ul class="doc-index-headings" style="list-style-type: square; font-size: 85%; max-height: 50vh; overflow-y: auto">
         <% doc_page[:headings].each do |heading| %>
           <li>
             <% h2_text = heading[:text].to_s.gsub('\\', '') %>
