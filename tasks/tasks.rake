@@ -6,6 +6,8 @@ namespace :hourly do
     system('find /tmp -maxdepth 1 -type f -mmin +60 -delete 2>/dev/null')
     puts 'delete stale uncompleted orders'
     Order.incomplete.and(:created_at.lt => 1.hour.ago).destroy_all
+    puts 'update paid up status for organisations with orders in the last hour'
+    Organisation.and(:id.in => Event.and(:id.in => Order.complete.and(:created_at.gt => 1.hour.ago).pluck(:event_id)).pluck(:organisation_id)).each(&:update_paid_up_without_delay)
     puts 'update monthly contributions current month'
     MonthlyContributionsCalculator.update_current_month
     puts 'check for payments'
@@ -50,8 +52,12 @@ namespace :late do
     MonthlyContributionsCalculator.calculate
     puts 'MaxMinder upload'
     MaxMinder.upload
-    puts 'set counts'
-    Organisation.set_counts
+    puts 'set counts, update paid up status and stripe topup'
+    Organisation.all.each do |organisation|
+      organisation.set_counts
+      organisation.update_paid_up_without_delay
+      organisation.stripe_topup if organisation.stripe_customer_id && !organisation.paid_up_by_contribution?
+    end
     puts 'sync monthly donations'
     Organisation.and(:gocardless_subscriptions => true, :gocardless_access_token.ne => nil).each(&:sync_with_gocardless)
     Organisation.and(:patreon_api_key.ne => nil).each(&:sync_with_patreon)

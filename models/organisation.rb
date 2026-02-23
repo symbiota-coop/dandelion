@@ -38,24 +38,18 @@ class Organisation
     slug
   end
 
-  def self.set_counts
-    Organisation.all.each do |organisation|
-      monthly_donations_count = organisation.organisationships.and(:monthly_donation_method.ne => nil).and(:monthly_donation_method.ne => 'Other').map do |organisationship|
-        Money.new(
-          organisationship.monthly_donation_amount * 100,
-          organisationship.monthly_donation_currency
-        )
-      end.sum
-      monthly_donations_count = monthly_donations_count.format(no_cents: true) if monthly_donations_count > 0
-      organisation.set(monthly_donations_count: monthly_donations_count)
-      organisation.set(monthly_donors_count: organisation.monthly_donors.count)
-
-      organisation.update_paid_up_without_delay
-      organisation.stripe_topup if organisation.stripe_customer_id && !organisation.paid_up_by_contribution?
-
-      organisation.set(subscribed_accounts_count: organisation.subscribed_accounts.count)
-      organisation.set(followers_count: organisation.organisationships.count)
-    end
+  def set_counts
+    monthly_donations_count = organisationships.and(:monthly_donation_method.ne => nil).and(:monthly_donation_method.ne => 'Other').map do |organisationship|
+      Money.new(
+        organisationship.monthly_donation_amount * 100,
+        organisationship.monthly_donation_currency
+      )
+    end.sum
+    monthly_donations_count = monthly_donations_count.format(no_cents: true) if monthly_donations_count > 0
+    set(monthly_donations_count: monthly_donations_count)
+    set(monthly_donors_count: monthly_donors.count)
+    set(subscribed_accounts_count: subscribed_accounts.count)
+    set(followers_count: organisationships.count)
   end
 
   def self.spring_clean
