@@ -80,7 +80,7 @@ module CoreExtensions
       reflect_on_all_associations(:belongs_to).sort_by(&:name).each do |assoc|
         if assoc.polymorphic?
           result[:"#{assoc.name}_type"] = :select
-          result[:"#{assoc.name}_id"] = :text
+          result[:"#{assoc.name}_id"] = :id
         else
           result[:"#{assoc.name}_id"] = :lookup
         end
