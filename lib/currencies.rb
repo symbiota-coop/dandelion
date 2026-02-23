@@ -26,6 +26,6 @@ Money::Currency.with_options(priority: 1, symbol_first: true, subunit_to_unit: 1
   currency.register(iso_code: 'NOK', name: 'Norwegian Krone', symbol: 'NOK ', subunit: 'Øre')
 
   EVM_CURRENCIES.each do |c|
-    currency.register(iso_code: c, name: c, symbol: c, subunit: 'Cent')
+    currency.register(iso_code: c, name: c, symbol: "#{c} ", subunit: 'Cent')
   end
 end
