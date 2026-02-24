@@ -1,33 +1,38 @@
 <%= partial :'organisations/nav', locals: { organisation: @organisation } %>
 <h1 class="mb-3">
   <a href="/u/<%= @organisationship.account.username %>"><%= @organisationship.account.name %></a>'s credit balance
+  at <%= @organisation.name %>
 </h1>
 <p class="lead">
   <span class="label label-primary"><%= m @organisationship.credit_balance, @organisation.currency %></span>
-  <a href="javascript:;" onclick="$(this).hide();
-    $('#plus-credit').show().find('input').focus();
-    $(this).parent().find('a i').hide()"><i class="bi bi-plus-square-fill"></i></a>
-  <a href="javascript:;" onclick="$(this).hide();
-    $('#minus-credit').show().find('input').focus();
-    $(this).parent().find('a i').hide()"><i class="bi bi-dash-square-fill"></i></a>
+  <% if organisation_admin? %>
+    <a href="javascript:;" onclick="$(this).hide();
+      $('#plus-credit').show().find('input').focus();
+      $(this).parent().find('a i').hide()"><i class="bi bi-plus-square-fill"></i></a>
+    <a href="javascript:;" onclick="$(this).hide();
+      $('#minus-credit').show().find('input').focus();
+      $(this).parent().find('a i').hide()"><i class="bi bi-dash-square-fill"></i></a>
+  <% end %>
 </p>
-<% form_tag "/organisationships/#{@organisationship.id}/credit/plus", class: 'form-inline mb-3', id: 'plus-credit', style: 'display: none' do %>
-  <i style="margin-right: 5px" class="bi bi-plus-square-fill"></i>
-  <div class="input-group">
-    <div class="input-group-prepend">
-      <span class="input-group-text"><%= money_symbol(@organisation.currency) %></span>
+<% if organisation_admin? %>
+  <% form_tag "/organisationships/#{@organisationship.id}/credit/plus", class: 'form-inline mb-3', id: 'plus-credit', style: 'display: none' do %>
+    <i style="margin-right: 5px" class="bi bi-plus-square-fill"></i>
+    <div class="input-group">
+      <div class="input-group-prepend">
+        <span class="input-group-text"><%= money_symbol(@organisation.currency) %></span>
+      </div>
+      <%= number_field_tag :amount, class: 'form-control', style: 'width: 6em' %>
     </div>
-    <%= number_field_tag :amount, class: 'form-control', style: 'width: 6em' %>
-  </div>
-<% end %>
-<% form_tag "/organisationships/#{@organisationship.id}/credit/minus", class: 'form-inline mb-3', id: 'minus-credit', style: 'display: none' do %>
-  <i style="margin-right: 5px" class="bi bi-dash-square-fill"></i>
-  <div class="input-group">
-    <div class="input-group-prepend">
-      <span class="input-group-text"><%= money_symbol(@organisation.currency) %></span>
+  <% end %>
+  <% form_tag "/organisationships/#{@organisationship.id}/credit/minus", class: 'form-inline mb-3', id: 'minus-credit', style: 'display: none' do %>
+    <i style="margin-right: 5px" class="bi bi-dash-square-fill"></i>
+    <div class="input-group">
+      <div class="input-group-prepend">
+        <span class="input-group-text"><%= money_symbol(@organisation.currency) %></span>
+      </div>
+      <%= number_field_tag :amount, class: 'form-control', style: 'width: 6em' %>
     </div>
-    <%= number_field_tag :amount, class: 'form-control', style: 'width: 6em' %>
-  </div>
+  <% end %>
 <% end %>
 <ul class="icon-list">
   <% @organisationship.credit_granted(description_hash: true).each { |c| %>

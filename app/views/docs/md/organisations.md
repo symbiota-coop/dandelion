@@ -14,6 +14,19 @@ We offer a free gift of 1 email per month for up to 1000 subscribers. Beyond tha
 
 Provide a GoCardless access token and/or Patreon API key, and people with active subscriptions will be recognised as monthly donors/members of the organisation.
 
+## Affiliate credits
+
+Enable affiliate credits to reward attendees for referring others to your events.
+
+1. Go to your organisation settings and set 'Order reward %' (e.g. 10%)
+2. Attendees will now receive a personal affiliate link in their order confirmation email
+3. For each order made via that link, the referrer earns credit equal to the set percentage of the order value
+4. Credit is automatically applied at checkout when the referrer purchases tickets to future events
+
+**For attendees:** If you have credit, your balance is shown on the organisation page. Click it to see a breakdown of credits earned and used.
+
+**For admins:** View and manage credit balances from the Followers page in the organisation dropdown.
+
 ## Activities
 
 Activities are used for bundling families of similar events. To create a new activity, go to the organisation dropdown and click Activities, then Create an activity.
