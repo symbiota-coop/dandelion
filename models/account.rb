@@ -32,7 +32,7 @@ class Account
 
   def self.permitted_attributes
     %w[
-      name username email password image location phone website
+      name username email password image remove_image location phone website
       postcode country
       date_of_birth gender sexuality bio dietary_requirements
       default_currency
