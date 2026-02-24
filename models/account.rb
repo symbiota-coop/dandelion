@@ -31,7 +31,7 @@ class Account
   end
 
   def self.protected_attributes
-    %w[admin]
+    %w[admin password crypted_password sign_in_token failed_sign_in_attempts api_key]
   end
 
   def self.default_currencies
