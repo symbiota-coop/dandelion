@@ -30,15 +30,16 @@ class Account
     true if privacyable.in?(%i[organisations local_groups activities gatherings])
   end
 
-  def self.protected_attributes
+  def self.permitted_attributes
     %w[
-      admin password crypted_password sign_in_token failed_sign_in_attempts api_key
-      email_confirmed can_reset_passwords stripe_subscription_id
-      has_signed_in sign_ins_count
-      feedback_summary feedback_summary_last_refreshed_at
-      event_feedbacks_as_facilitator_count event_tag_names
-      organisation_ids_cache organisation_ids_public_cache
-      subscribed_organisation_ids_cache unsubscribed_organisation_ids_cache
+      name username email password image location phone website
+      postcode country
+      date_of_birth gender sexuality bio dietary_requirements
+      default_currency
+      hidden
+      unsubscribed unsubscribed_messages unsubscribed_feedback unsubscribed_reminders
+      open_to_new_friends open_to_short_term_dating open_to_long_term_dating open_to_open_relating
+      updated_profile
     ]
   end
 

@@ -25,11 +25,18 @@ Dandelion::App.helpers do
 
   def mass_assigning(params, model)
     params ||= {}
-    if model.respond_to?(:protected_attributes)
-      intersection = model.protected_attributes & params.keys
+    if model.respond_to?(:permitted_attributes)
+      permitted = model.permitted_attributes.map(&:to_s)
+      unpermitted = params.keys.reject { |k| permitted.include?(k.to_s) }
+      raise "Attributes #{unpermitted} are not permitted" unless unpermitted.empty?
+      params.select { |k, _| permitted.include?(k.to_s) }
+    elsif model.respond_to?(:protected_attributes)
+      intersection = model.protected_attributes & params.keys.map(&:to_s)
       raise "Attributes #{intersection} are protected" unless intersection.empty?
+      params
+    else
+      params
     end
-    params
   end
 
   def pagination_details(collection, model: nil)
