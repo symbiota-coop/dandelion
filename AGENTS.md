@@ -4,7 +4,7 @@ Files in lib are auto-loaded by Padrino.load!. No explicit require is necessary.
 
 # MongoDB indexes
 
-Please note that MongoDB indexes are created directly in the database, and are not exhaustively defined in model files.
+Please note that MongoDB indexes are created directly in the database, and are not defined in model files.
 
 # Tests
 
