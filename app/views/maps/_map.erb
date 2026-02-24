@@ -6,7 +6,7 @@
       <% points.each_with_index { |point, n| %>
         points.push({
           model_name: '<%= point.class.to_s %>',
-          id: '<%= point.id %>',
+          id: '<%= encrypt_map_id(point.class.to_s, point.id.to_s) %>',
           lat: <%= point.lat %>,
           lng: <%= point.lng %>,
           n: <%= n %>

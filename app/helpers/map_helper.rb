@@ -70,6 +70,30 @@ Dandelion::App.helpers do
     @geocode_cache ||= ActiveSupport::Cache::RedisCacheStore.new(url: ENV['REDIS_URL'])
   end
 
+  def encrypt_map_id(model_name, id)
+    return unless (secret = ENV['SESSION_SECRET'])
+
+    crypt = ActiveSupport::MessageEncryptor.new(secret[0, 32])
+    token = crypt.encrypt_and_sign("map:#{model_name}:#{id}")
+    Base64.urlsafe_encode64(token)
+  end
+
+  def decrypt_map_id(token)
+    return unless token && (secret = ENV['SESSION_SECRET'])
+
+    decoded_token = Base64.urlsafe_decode64(token)
+    crypt = ActiveSupport::MessageEncryptor.new(secret[0, 32])
+    data = crypt.decrypt_and_verify(decoded_token)
+    return unless data&.start_with?('map:')
+
+    parts = data.split(':', 3)
+    return unless parts.length == 3
+
+    { model_name: parts[1], id: parts[2] }
+  rescue ActiveSupport::MessageVerifier::InvalidSignature, ActiveSupport::MessageEncryptor::InvalidMessage, ArgumentError
+    nil
+  end
+
   def map_json(points)
     box = [[params[:west].to_f, params[:south].to_f], [params[:east].to_f, params[:north].to_f]]
     points = points.only(:coordinates).and(coordinates: { '$geoWithin' => { '$box' => box } })
@@ -82,7 +106,7 @@ Dandelion::App.helpers do
                 points.map.with_index do |point, n|
                   {
                     model_name: point.class.to_s,
-                    id: point.id.to_s,
+                    id: encrypt_map_id(point.class.to_s, point.id.to_s),
                     lat: point.lat,
                     lng: point.lng,
                     n: n

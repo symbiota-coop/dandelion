@@ -1,15 +1,18 @@
 Dandelion::App.controller do
   get '/points/:model/:id' do
-    halt 400 unless %w[Account ActivityApplication Event Gathering Organisation Organisationship].include?(params[:model])
+    decrypted = decrypt_map_id(params[:id])
+    halt 400 unless decrypted
+    halt 400 unless decrypted[:model_name] == params[:model]
+    halt 400 unless %w[Account ActivityApplication Event Gathering Organisation Organisationship].include?(decrypted[:model_name])
 
-    object = params[:model].constantize.find(params[:id])
+    object = decrypted[:model_name].constantize.find(decrypted[:id])
 
     unless admin?
-      halt 403 if %w[Account].include?(params[:model]) && (object.location_privacy != 'Public')
-      halt 403 if %w[ActivityApplication Organisationship].include?(params[:model]) && (object.account.location_privacy != 'Public')
+      halt 403 if decrypted[:model_name] == 'Account' && (object.location_privacy != 'Public')
+      halt 403 if %w[ActivityApplication Organisationship].include?(decrypted[:model_name]) && (object.account.location_privacy != 'Public')
     end
 
-    partial :"points/#{params[:model].underscore}", object: object
+    partial :"points/#{decrypted[:model_name].underscore}", object: object
   end
 
   get '/map', provides: %i[html json] do
