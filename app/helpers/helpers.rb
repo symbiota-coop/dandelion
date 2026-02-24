@@ -14,7 +14,7 @@ Dandelion::App.helpers do
   end
 
   def current_account
-    @current_account ||= Account.find(session[:account_id]) if session[:account_id]
+    @current_account ||= @current_account_via_api_key || (Account.find(session[:account_id]) if session[:account_id])
   end
 
   def event_method_in_organisation_currency(event, method, organisation)

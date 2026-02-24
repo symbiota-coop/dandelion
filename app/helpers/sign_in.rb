@@ -23,7 +23,7 @@ Dandelion::App.helpers do
 
   def sign_in_via_api_key
     if (account = Account.find_by(api_key: params[:api_key]))
-      session[:account_id] = account.id.to_s
+      @current_account_via_api_key = account
     elsif !current_account
       403
     end
