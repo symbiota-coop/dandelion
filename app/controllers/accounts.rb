@@ -22,9 +22,14 @@ Dandelion::App.controller do
 
   get '/confirm_email/:sign_in_token' do
     sign_in_required!
-    current_account.set(email_confirmed: true)
-    flash[:notice] = 'Your email address was confirmed.'
-    redirect '/accounts/edit'
+    if params[:sign_in_token].present? && ActiveSupport::SecurityUtils.secure_compare(params[:sign_in_token], current_account.sign_in_token.to_s)
+      current_account.set(email_confirmed: true)
+      flash[:notice] = 'Your email address was confirmed.'
+      redirect '/accounts/edit'
+    else
+      flash[:error] = "That confirmation link isn't valid. Please request a new one."
+      redirect '/accounts/edit'
+    end
   end
 
   get '/accounts/sign_in' do
