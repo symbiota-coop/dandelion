@@ -273,11 +273,11 @@ module EventAtproto
     #
     # @param client [AtprotoClient] optional client (defaults to env-based client)
     # @param fix [Boolean] if true, attempts to fix any issues found
-    # @return [Hash] results with :valid, :orphaned, :missing, :stale, :errors
+    # @return [Hash] results with :orphaned, :missing, :stale, :errors, :summary (includes valid count)
     def verify_atproto_collection(client: nil, fix: false)
       client ||= AtprotoClient.new
       results = {
-        valid: [],
+        valid: [],         # Tracked for count only, excluded from final output
         orphaned: [],      # Records on AT Protocol with no matching local event
         missing: [],       # Local events with atproto_uri but not found on AT Protocol
         stale: [],         # Records that exist but content doesn't match
@@ -380,6 +380,7 @@ module EventAtproto
         errors: results[:errors].count
       }
 
+      results.delete(:valid)
       results
     end
   end
