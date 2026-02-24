@@ -160,6 +160,21 @@ Dandelion::App.helpers do
     kick! unless comment_admin?
   end
 
+  def can_add_photo_to?(photoable, account = current_account)
+    return false unless account && photoable
+
+    case photoable
+    when Gathering
+      Gathering.admin?(photoable, account)
+    when Comment
+      photoable.account_id == account.id
+    when TicketType
+      Event.admin?(photoable.event, account)
+    else
+      false
+    end
+  end
+
   def sign_in_required!(notice: 'Please sign up or sign in to continue', redirect_url: '/accounts/new', notice_type: :notice)
     kick!(notice: notice, redirect_url: redirect_url, notice_type: notice_type) unless current_account
   end
