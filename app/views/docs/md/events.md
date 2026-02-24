@@ -200,7 +200,7 @@ Dandelion has a unique revenue sharing feature allowing organisations to share t
 
 ## What's the difference between an 'abundant' and 'standard' ticket?
 
-Typically, nothing. Some organisations list the same ticket at different prices simply to give those than can afford to contribute more, an opportunity to do so.
+Typically, nothing. Some organisations list the same ticket at different prices simply to give those who can afford to contribute more, an opportunity to do so.
 
 ## Embedding event listings
 
@@ -216,7 +216,7 @@ Put this in your head to set the iframe to the correct height:
 
 ```html
 <script src="//code.jquery.com/jquery-latest.js"></script>
-<script src="//cdnjs.cloudflare.com/ajax/libs/iframe-resizer/4.2.1/iframeResizer.min.js"></script>
+<script src="//cdnjs.cloudflare.com/ajax/libs/iframe-resizer/4.2.10/iframeResizer.min.js"></script>
 <script>
   $(function () {
     $('.dandelion-auto-height').iFrameResize({log: true, checkOrigin: false, heightCalculationMethod : 'taggedElement'})

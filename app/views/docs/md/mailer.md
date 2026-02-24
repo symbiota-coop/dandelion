@@ -8,7 +8,7 @@
 ## Emailing a waitlist for an event
 
 - Click the event dropdown, select Mailer, and click 'New message'
-- Change to 'To' field to 'Waitlist'
+- Change the 'To' field to 'Waitlist'
 - Enter a subject and body and follow the steps above to preview and send your mail
 
 ## Emailing your organisation
@@ -16,7 +16,7 @@
 We offer a free gift of 1 email per month for up to 1000 subscribers.
 
 - Click the organisation dropdown, select Mailer, and click 'New message'
-- Change to 'To' field to 'Everyone' or another option
+- Change the 'To' field to 'Everyone' or another option
 - Enter a subject and body and follow the steps above to preview and send your mail
 
 ## Creating buttons

@@ -224,4 +224,4 @@ The following triggers are available in the Dandelion Zapier integration:
 
 ## Support
 
-For API support or questions about the Zapier integration, please [contact us](mailto:contact@dandelion.earth).
+For API support or questions about the Zapier integration, please [contact us](mailto:contact@dandelion.events).

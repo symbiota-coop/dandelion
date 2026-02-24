@@ -7,7 +7,7 @@ This feature was originally developed to support camps at European Burning Man e
 Check out the video below, which does assume you have a [Stripe](https://stripe.com/) account.
 
 <div class="raw-html-embed"><div class="embed-responsive embed-responsive-16by9 mb-3">
-  <iframe class="embed-responsive-item" src="https://player.vimeo.com/video/1030016108?badge=0&amp;autopause=0&amp;player_id=0&amp;app_id=58479" frameborder="0" allow="autoplay; fullscreen; picture-in-picture; clipboard-write" title="How to create an event on Dandelion" allowfullscreen="">
+  <iframe class="embed-responsive-item" src="https://player.vimeo.com/video/1030016108?badge=0&amp;autopause=0&amp;player_id=0&amp;app_id=58479" frameborder="0" allow="autoplay; fullscreen; picture-in-picture; clipboard-write" title="How to create a gathering on Dandelion" allowfullscreen="">
   </iframe>
 </div>
 <script src="https://player.vimeo.com/api/player.js"></script>
