@@ -96,8 +96,6 @@ Dandelion::App.helpers do
                  Account.find_by(email: params[:email].downcase)
                elsif params[:token]
                  Account.from_feedback_token(@event, params[:token])
-               elsif params[:t]
-                 Account.find(params[:t])
                else
                  current_account
                end

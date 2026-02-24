@@ -6,8 +6,6 @@
         <%= hidden_field_tag :email, value: params[:email] %>
       <% elsif params[:token] %>
         <%= hidden_field_tag :token, value: params[:token] %>
-      <% elsif params[:t] %>
-        <%= hidden_field_tag :t, value: params[:t] %>
       <% end %>
       <%= f.hidden_field :rating %>
       <script>
