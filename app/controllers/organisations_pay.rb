@@ -47,6 +47,7 @@ Dandelion::App.controller do
 
   post '/organisations/:id/stripe_setup', provides: :json do
     @organisation = Organisation.find(params[:id])
+    organisation_admins_only!
 
     Stripe.api_key = ENV['STRIPE_SK']
     Stripe.api_version = '2020-08-27'
@@ -64,6 +65,7 @@ Dandelion::App.controller do
 
   get '/organisations/:id/stripe_setup_complete' do
     @organisation = Organisation.find(params[:id])
+    organisation_admins_only!
 
     Stripe.api_key = ENV['STRIPE_SK']
     Stripe.api_version = '2020-08-27'
@@ -84,6 +86,7 @@ Dandelion::App.controller do
 
   get '/organisations/:id/clear_stripe_customer_id' do
     @organisation = Organisation.find(params[:id])
+    organisation_admins_only!
 
     Stripe.api_key = ENV['STRIPE_SK']
     Stripe.api_version = '2020-08-27'
@@ -94,6 +97,8 @@ Dandelion::App.controller do
 
   post '/organisations/:id/pay', provides: :json do
     @organisation = Organisation.find(params[:id])
+    organisation_admins_only!
+
     halt 400 unless params[:amount] && params[:amount].to_f > 0
 
     case params[:payment_method]
