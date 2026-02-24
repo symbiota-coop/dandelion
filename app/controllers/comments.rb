@@ -26,8 +26,10 @@ Dandelion::App.controller do
     halt 403 unless Post.commentable_types.include?(params[:comment][:commentable_type])
     @commentable = params[:comment][:commentable_type].constantize.find(params[:comment][:commentable_id])
     subject = params[:comment].delete(:subject)
+    force_param = params[:comment].delete(:force)
     @comment = @commentable.comments.build(mass_assigning(params[:comment], Comment))
     @comment.account = current_account
+    @comment.force = true if @comment.allow_force?(current_account) && force_param.present?
     unless @comment.post
       @post = @commentable.posts.create!(account: current_account, subject: subject)
       @comment.post = @post
