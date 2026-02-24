@@ -31,7 +31,15 @@ class Account
   end
 
   def self.protected_attributes
-    %w[admin password crypted_password sign_in_token failed_sign_in_attempts api_key]
+    %w[
+      admin password crypted_password sign_in_token failed_sign_in_attempts api_key
+      email_confirmed can_reset_passwords stripe_subscription_id
+      has_signed_in sign_ins_count
+      feedback_summary feedback_summary_last_refreshed_at
+      event_feedbacks_as_facilitator_count event_tag_names
+      organisation_ids_cache organisation_ids_public_cache
+      subscribed_organisation_ids_cache unsubscribed_organisation_ids_cache
+    ]
   end
 
   def self.default_currencies
