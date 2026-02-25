@@ -25,7 +25,7 @@ add_dependency_section() {
 }
 
 # Keep content before "# Dependencies", overwrite that section
-awk '/^# Dependencies$/ {exit} {print}' "$OUTPUT_PATH" > "$OUTPUT_PATH.tmp"
+awk '/^## Dependencies$/ {exit} {print}' "$OUTPUT_PATH" > "$OUTPUT_PATH.tmp"
 mv "$OUTPUT_PATH.tmp" "$OUTPUT_PATH"
 
 # Append the regenerated Dependencies section
