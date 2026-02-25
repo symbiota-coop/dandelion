@@ -25,7 +25,9 @@ Use the following command structure to test a single file:
 
 - Install the `foreman` gem with `gem install foreman`
 - Copy `.env.example` to `.env` and `.env.test.example` to `.env.test`
+- Run `bundle exec rake db:seed` to seed the database
 - The app preloads on boot (~15s). Wait for `Listening on http://0.0.0.0:3000` before making requests
+- Login with the account in `.env.example`
 
 # Dependencies
 
