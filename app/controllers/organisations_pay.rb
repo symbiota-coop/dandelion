@@ -74,15 +74,13 @@ Dandelion::App.controller do
     setup_intent = Stripe::SetupIntent.retrieve(session.setup_intent)
     payment_method = Stripe::PaymentMethod.retrieve(setup_intent.payment_method)
 
-    if payment_method.respond_to?(:card) && payment_method.card
-      begin
-        @organisation.set(card_last4: payment_method.card.last4)
-        @organisation.set(stripe_customer_id: session.customer)
-        @organisation.stripe_topup
-        @organisation.update_paid_up_without_delay
-      rescue StandardError => e
-        Honeybadger.notify(e, context: { payment_method: payment_method })
-      end
+    begin
+      @organisation.set(card_last4: payment_method.card.last4)
+      @organisation.set(stripe_customer_id: session.customer)
+      @organisation.stripe_topup
+      @organisation.update_paid_up_without_delay
+    rescue StandardError => e
+      Honeybadger.notify(e, context: { payment_method: payment_method })
     end
 
     redirect "/o/#{@organisation.slug}/contribute"
