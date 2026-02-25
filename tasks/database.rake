@@ -333,4 +333,55 @@ namespace :db do
     end
     puts
   end
+
+  desc 'List all TTL indexes across collections'
+  task ttl_indexes: :environment do
+    db = Mongoid.default_client.database
+
+    puts "\n⏰ TTL Indexes\n"
+    puts '=' * 90
+
+    ttl_indexes = []
+
+    db.collections.sort_by(&:name).each do |collection|
+      collection.indexes.each do |index|
+        next unless index.key?('expireAfterSeconds')
+
+        ttl_indexes << {
+          collection: collection.name,
+          index_name: index['name'],
+          key: index['key'].keys.first,
+          expire_after: index['expireAfterSeconds']
+        }
+      end
+    end
+
+    if ttl_indexes.empty?
+      puts "No TTL indexes found.\n\n"
+    else
+      printf "%-30s %-25s %-20s %s\n", 'Collection', 'Index', 'Field', 'Expires After'
+      puts '-' * 90
+
+      ttl_indexes.each do |idx|
+        expire_str = if idx[:expire_after].zero?
+                       'at field value'
+                     elsif idx[:expire_after] < 86_400
+                       "#{idx[:expire_after] / 3600} hours"
+                     elsif idx[:expire_after] < 2_592_000
+                       "#{idx[:expire_after] / 86_400} days"
+                     else
+                       "#{idx[:expire_after] / 2_592_000} months (~#{idx[:expire_after] / 86_400} days)"
+                     end
+
+        printf "%-30s %-25s %-20s %s\n",
+               idx[:collection],
+               idx[:index_name],
+               idx[:key],
+               expire_str
+      end
+
+      puts '-' * 90
+      puts "📊 Found #{ttl_indexes.length} TTL index(es)\n\n"
+    end
+  end
 end
