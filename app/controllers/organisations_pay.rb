@@ -75,7 +75,7 @@ Dandelion::App.controller do
     payment_method = Stripe::PaymentMethod.retrieve(setup_intent.payment_method)
 
     begin
-      @organisation.set(card_last4: payment_method.card.last4)
+      @organisation.set(card_last4: payment_method.card&.last4)
       @organisation.set(stripe_customer_id: session.customer)
       @organisation.stripe_topup
       @organisation.update_paid_up_without_delay
