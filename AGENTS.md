@@ -14,7 +14,7 @@ Use the following command structure to test a single file:
 
 `foreman run -e .env.test bundle exec ruby -I test test/$1_test.rb`
 
-# Cursor Cloud specific instructions
+# Setup instructions
 
 | Service | Start command | Notes |
 |---------|--------------|-------|
@@ -24,9 +24,10 @@ Use the following command structure to test a single file:
 | Worker | `foreman start -e .env worker` | Background jobs (optional for dev) |
 
 - Install the `foreman` gem with `gem install foreman`
+- Run `bundle install` to install dependencies
 - Copy `.env.example` to `.env` and `.env.test.example` to `.env.test`
+- Start the services as described in the table above
 - Run `bundle exec rake db:seed` to seed the database
-- The app preloads on boot (~15s). Wait for `Listening on http://0.0.0.0:3000` before making requests
 - Login with the account in `.env.example`
 
 # Dependencies
