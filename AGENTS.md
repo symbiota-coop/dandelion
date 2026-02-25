@@ -14,6 +14,19 @@ Use the following command structure to test a single file:
 
 `foreman run -e .env.test bundle exec ruby -I test test/$1_test.rb`
 
+# Cursor Cloud specific instructions
+
+| Service | Start command | Notes |
+|---------|--------------|-------|
+| MongoDB | `mongod --fork --logpath /tmp/mongod.log --dbpath /data/db` | Must be running before app or tests |
+| Redis | `sudo redis-server --daemonize yes` | Must be running for Rack::Attack |
+| Web (Puma) | `foreman start -e .env web` | Runs on port 3000 |
+| Worker | `foreman start -e .env worker` | Background jobs (optional for basic dev) |
+
+- Install the `foreman` gem with `gem install foreman`
+- Copy `.env.example` to `.env` and `.env.test.example` to `.env.test`
+- The app preloads on boot (~15s). Wait for `Listening on http://0.0.0.0:3000` before making requests
+
 # Dependencies
 
 ## Gemfile

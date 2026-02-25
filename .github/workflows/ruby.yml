@@ -64,9 +64,11 @@ jobs:
         ruby-version: 3.4.7
         bundler-cache: true
 
-    - name: Generate session secret
-      id: session-secret
-      run: echo "secret=$(openssl rand -hex 32)" >> $GITHUB_OUTPUT
+    - name: Load env from .env.test.example
+      run: |
+        grep -v '^#' .env.test.example | grep -v '^$' | while IFS='=' read -r key value; do
+          echo "$key=$value" >> $GITHUB_ENV
+        done
 
     - name: Run test (${{ matrix.test_file }})
       uses: nick-fields/retry@v3
@@ -74,17 +76,3 @@ jobs:
         timeout_minutes: 10
         max_attempts: 3
         command: bundle exec rake test:${{ matrix.test_file }}
-      env:
-        RACK_ENV: test
-        PORT: 8020
-        BASE_URI: http://127.0.0.1:8020
-        DOMAIN: dandelion.events
-        DEFAULT_CURRENCY: USD
-        DEFAULT_TIME_ZONE: Europe/London
-        SESSION_SECRET: ${{ steps.session-secret.outputs.secret }}
-        STRIPE_PK: pk_test
-        STRIPE_SK: sk_test
-        GOOGLE_MAPS_API_KEY: test
-        CI: true
-        SKIP_TOURS: true
-      
