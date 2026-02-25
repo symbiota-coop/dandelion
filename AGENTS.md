@@ -20,8 +20,8 @@ Use the following command structure to test a single file:
 |---------|--------------|-------|
 | MongoDB | `mongod --fork --logpath /tmp/mongod.log --dbpath /data/db` | Must be running before app or tests |
 | Redis | `sudo redis-server --daemonize yes` | Must be running for Rack::Attack |
-| Web (Puma) | `foreman start -e .env web` | Runs on port 3000 |
-| Worker | `foreman start -e .env worker` | Background jobs (optional for basic dev) |
+| Web (Puma) | `foreman start -e .env web` | |
+| Worker | `foreman start -e .env worker` | Background jobs (optional for dev) |
 
 - Install the `foreman` gem with `gem install foreman`
 - Copy `.env.example` to `.env` and `.env.test.example` to `.env.test`

@@ -58,7 +58,7 @@ module OrganisationValidation
 
     after_validation do
       if location_changed?
-        if location && ENV['GOOGLE_MAPS_API_KEY']
+        if location
           geocode || (self.coordinates = nil)
           if coordinates
             self.time_zone = begin

@@ -76,7 +76,7 @@ class Gathering
 
   after_validation do
     if location_changed?
-      if location && ENV['GOOGLE_MAPS_API_KEY']
+      if location
         geocode || (self.coordinates = nil)
       else
         self.coordinates = nil

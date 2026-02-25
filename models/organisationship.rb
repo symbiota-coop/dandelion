@@ -41,14 +41,13 @@ class Organisationship
   end
   after_validation do
     if monthly_donation_postcode_changed?
-      if monthly_donation_postcode && ENV['GOOGLE_MAPS_API_KEY']
+      if monthly_donation_postcode
         geocode || (self.coordinates = nil)
       else
         self.coordinates = nil
       end
     end
   end
-
 
   has_many :creditings, dependent: :destroy
 

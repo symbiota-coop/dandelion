@@ -51,17 +51,15 @@ Yt.configure do |config|
   config.api_key = ENV['YOUTUBE_API_KEY']
 end
 
-if ENV['GOOGLE_MAPS_API_KEY']
-  Geocoder.configure(
-    lookup: :google,
-    google: {
-      api_key: ENV['GOOGLE_MAPS_API_KEY']
-    }
-  )
+Geocoder.configure(
+  lookup: :google,
+  google: {
+    api_key: ENV['GOOGLE_MAPS_API_KEY'] || 'missing_api_key'
+  }
+)
 
-  Timezone::Lookup.config(:google) do |c|
-    c.api_key = ENV['GOOGLE_MAPS_API_KEY']
-  end
+Timezone::Lookup.config(:google) do |c|
+  c.api_key = ENV['GOOGLE_MAPS_API_KEY'] || 'missing_api_key'
 end
 
 OpenAI.configure do |config|

@@ -66,6 +66,7 @@ jobs:
 
     - name: Load env from .env.test.example
       run: |
+        echo "CI=true" >> $GITHUB_ENV
         grep -v '^#' .env.test.example | grep -v '^$' | while IFS='=' read -r key value; do
           echo "$key=$value" >> $GITHUB_ENV
         done
