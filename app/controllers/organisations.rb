@@ -176,7 +176,13 @@ Dandelion::App.controller do
     sign_in_required!
     @organisation = Organisation.find_by(slug: params[:slug]) || not_found
     @organisationship = @organisation.organisationships.find_by(account: current_account) || not_found
-    @organisationship.set(hide_membership: params[:f].to_i == 0)
+    hide = params[:f].to_i == 0
+    @organisationship.set(hide_membership: hide)
+    if hide
+      current_account.set(organisation_ids_public_cache: (current_account.organisation_ids_public_cache || []) - [@organisation.id])
+    else
+      current_account.set(organisation_ids_public_cache: ((current_account.organisation_ids_public_cache || []) + [@organisation.id]).uniq)
+    end
     redirect back
   end
 

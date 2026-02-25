@@ -1,4 +1,125 @@
 namespace :db do
+  desc 'Find accounts where organisation cache fields are out of sync (FIX=1 to repair)'
+  task organisation_cache_sync: :environment do
+    fix = ENV['FIX'] == '1'
+    out_of_sync = []
+
+    puts "\n🔍 Checking organisation cache sync for all accounts...\n"
+    puts "⚠️  Mode: #{fix ? '🔧 FIXING out of sync caches' : '👀 Dry run (set FIX=1 to repair)'}\n"
+    puts '=' * 90
+
+    # Single aggregation to compute expected caches for all accounts at once
+    puts '📊 Aggregating organisationships...'
+    expected_caches = Organisationship.collection.aggregate([
+                                                              {
+                                                                '$group' => {
+                                                                  '_id' => '$account_id',
+                                                                  'org_ids' => { '$push' => '$organisation_id' },
+                                                                  'public_ids' => {
+                                                                    '$push' => {
+                                                                      '$cond' => [{ '$ne' => ['$hide_membership', true] }, '$organisation_id', '$$REMOVE']
+                                                                    }
+                                                                  },
+                                                                  'subscribed_ids' => {
+                                                                    '$push' => {
+                                                                      '$cond' => [{ '$ne' => ['$unsubscribed', true] }, '$organisation_id', '$$REMOVE']
+                                                                    }
+                                                                  },
+                                                                  'unsubscribed_ids' => {
+                                                                    '$push' => {
+                                                                      '$cond' => [{ '$eq' => ['$unsubscribed', true] }, '$organisation_id', '$$REMOVE']
+                                                                    }
+                                                                  }
+                                                                }
+                                                              }
+                                                            ]).to_a.to_h { |doc| [doc['_id'], doc] }
+
+    puts "   Found #{expected_caches.size} accounts with organisationships"
+
+    # Get accounts that either have organisationships OR have stale cache fields
+    account_ids_with_caches = Account.or(
+      { :organisation_ids_cache.ne => nil },
+      { :organisation_ids_public_cache.ne => nil },
+      { :subscribed_organisation_ids_cache.ne => nil },
+      { :unsubscribed_organisation_ids_cache.ne => nil }
+    ).pluck(:id)
+
+    relevant_account_ids = (expected_caches.keys + account_ids_with_caches).uniq
+    puts "📋 Checking #{relevant_account_ids.size} relevant accounts..."
+
+    # Process in batches of 1000
+    relevant_account_ids.each_slice(1000) do |batch_ids|
+      Account.in(id: batch_ids).each do |account|
+        expected = expected_caches[account.id] || {}
+
+        expected_org_ids = (expected['org_ids'] || []).map(&:to_s).sort
+        expected_public_ids = (expected['public_ids'] || []).map(&:to_s).sort
+        expected_subscribed_ids = (expected['subscribed_ids'] || []).map(&:to_s).sort
+        expected_unsubscribed_ids = (expected['unsubscribed_ids'] || []).map(&:to_s).sort
+
+        current_org_ids = (account.organisation_ids_cache || []).map(&:to_s).sort
+        current_public_ids = (account.organisation_ids_public_cache || []).map(&:to_s).sort
+        current_subscribed_ids = (account.subscribed_organisation_ids_cache || []).map(&:to_s).sort
+        current_unsubscribed_ids = (account.unsubscribed_organisation_ids_cache || []).map(&:to_s).sort
+
+        mismatches = []
+        mismatches << 'organisation_ids_cache' if current_org_ids != expected_org_ids
+        mismatches << 'organisation_ids_public_cache' if current_public_ids != expected_public_ids
+        mismatches << 'subscribed_organisation_ids_cache' if current_subscribed_ids != expected_subscribed_ids
+        mismatches << 'unsubscribed_organisation_ids_cache' if current_unsubscribed_ids != expected_unsubscribed_ids
+
+        next if mismatches.empty?
+
+        out_of_sync << {
+          account: account,
+          mismatches: mismatches,
+          details: {
+            organisation_ids_cache: { current: current_org_ids, expected: expected_org_ids },
+            organisation_ids_public_cache: { current: current_public_ids, expected: expected_public_ids },
+            subscribed_organisation_ids_cache: { current: current_subscribed_ids, expected: expected_subscribed_ids },
+            unsubscribed_organisation_ids_cache: { current: current_unsubscribed_ids, expected: expected_unsubscribed_ids }
+          }
+        }
+
+        next unless fix
+
+        account.set(
+          organisation_ids_cache: expected_org_ids.map { |id| BSON::ObjectId.from_string(id) },
+          organisation_ids_public_cache: expected_public_ids.map { |id| BSON::ObjectId.from_string(id) },
+          subscribed_organisation_ids_cache: expected_subscribed_ids.map { |id| BSON::ObjectId.from_string(id) },
+          unsubscribed_organisation_ids_cache: expected_unsubscribed_ids.map { |id| BSON::ObjectId.from_string(id) }
+        )
+      end
+    end
+
+    if out_of_sync.empty?
+      puts "\n✅ All accounts have synced organisation caches.\n\n"
+    else
+      puts "\n📋 Accounts with out of sync caches:\n"
+      puts '-' * 90
+
+      out_of_sync.each do |entry|
+        account = entry[:account]
+        puts "\n👤 #{account.name || 'No name'} (#{account.email || account.id})"
+        puts "   Mismatched fields: #{entry[:mismatches].join(', ')}"
+
+        entry[:mismatches].each do |field|
+          details = entry[:details][field.to_sym]
+          puts "   #{field}:"
+          puts "     Current:  #{details[:current].empty? ? '[]' : details[:current]}"
+          puts "     Expected: #{details[:expected].empty? ? '[]' : details[:expected]}"
+        end
+
+        puts "   Status: #{fix ? '✅ Fixed' : '⚠️  Needs fix'}"
+      end
+
+      puts "\n#{'=' * 90}"
+      puts "📊 Found #{out_of_sync.length} account(s) with out of sync caches"
+      puts(fix ? '🎉 All caches have been repaired!' : '👉 Run with FIX=1 to repair them')
+      puts
+    end
+  end
+
   desc 'Find MongoDB collections without an associated Mongoid model'
   task orphan_collections: :environment do
     db = Mongoid.default_client.database
