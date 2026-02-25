@@ -120,6 +120,77 @@ namespace :db do
     end
   end
 
+  desc 'Find events where cohosts_ids_cache is out of sync (FIX=1 to repair)'
+  task cohosts_cache_sync: :environment do
+    fix = ENV['FIX'] == '1'
+    out_of_sync = []
+
+    puts "\n🔍 Checking cohosts_ids_cache sync for all events...\n"
+    puts "⚠️  Mode: #{fix ? '🔧 FIXING out of sync caches' : '👀 Dry run (set FIX=1 to repair)'}\n"
+    puts '=' * 90
+
+    # Aggregate cohostships to compute expected cache for each event
+    puts '📊 Aggregating cohostships...'
+    expected_caches = Cohostship.collection.aggregate([
+                                                        {
+                                                          '$group' => {
+                                                            '_id' => '$event_id',
+                                                            'cohost_ids' => { '$push' => '$organisation_id' }
+                                                          }
+                                                        }
+                                                      ]).to_a.to_h { |doc| [doc['_id'], doc['cohost_ids']] }
+
+    puts "   Found #{expected_caches.size} events with cohostships"
+
+    # Get events that either have cohostships OR have stale cache fields
+    event_ids_with_caches = Event.and(:cohosts_ids_cache.ne => nil).pluck(:id)
+
+    relevant_event_ids = (expected_caches.keys + event_ids_with_caches).uniq
+    puts "📋 Checking #{relevant_event_ids.size} relevant events..."
+
+    # Process in batches of 1000
+    relevant_event_ids.each_slice(1000) do |batch_ids|
+      Event.unscoped.in(id: batch_ids).each do |event|
+        expected_ids = (expected_caches[event.id] || []).map(&:to_s).sort
+        current_ids = (event.cohosts_ids_cache || []).map(&:to_s).sort
+
+        next if current_ids == expected_ids
+
+        out_of_sync << {
+          event: event,
+          current: current_ids,
+          expected: expected_ids
+        }
+
+        next unless fix
+
+        event.set(cohosts_ids_cache: expected_ids.map { |id| BSON::ObjectId.from_string(id) })
+      end
+    end
+
+    if out_of_sync.empty?
+      puts "\n✅ All events have synced cohosts_ids_cache.\n\n"
+    else
+      puts "\n📋 Events with out of sync caches:\n"
+      puts '-' * 90
+
+      out_of_sync.each do |entry|
+        event = entry[:event]
+        puts "\n📅 #{event.name} (#{event.id})"
+        puts "   Organisation: #{event.organisation&.name || 'None'}"
+        puts "   cohosts_ids_cache:"
+        puts "     Current:  #{entry[:current].empty? ? '[]' : entry[:current]}"
+        puts "     Expected: #{entry[:expected].empty? ? '[]' : entry[:expected]}"
+        puts "   Status: #{fix ? '✅ Fixed' : '⚠️  Needs fix'}"
+      end
+
+      puts "\n#{'=' * 90}"
+      puts "📊 Found #{out_of_sync.length} event(s) with out of sync caches"
+      puts(fix ? '🎉 All caches have been repaired!' : '👉 Run with FIX=1 to repair them')
+      puts
+    end
+  end
+
   desc 'Find MongoDB collections without an associated Mongoid model'
   task orphan_collections: :environment do
     db = Mongoid.default_client.database
