@@ -178,7 +178,7 @@ namespace :db do
         event = entry[:event]
         puts "\n📅 #{event.name} (#{event.id})"
         puts "   Organisation: #{event.organisation&.name || 'None'}"
-        puts "   cohosts_ids_cache:"
+        puts '   cohosts_ids_cache:'
         puts "     Current:  #{entry[:current].empty? ? '[]' : entry[:current]}"
         puts "     Expected: #{entry[:expected].empty? ? '[]' : entry[:expected]}"
         puts "   Status: #{fix ? '✅ Fixed' : '⚠️  Needs fix'}"
@@ -280,7 +280,8 @@ namespace :db do
     total_dropped = 0
 
     puts "\n🔍 Scanning all collections for unused indexes...\n"
-    puts "⚠️  Mode: #{drop ? '🔴 DROPPING unused indexes' : '👀 Dry run (set DROP=1 to drop)'}\n"
+    puts "⚠️  Mode: #{drop ? '🔴 DROPPING unused indexes' : '👀 Dry run (set DROP=1 to drop)'}"
+    puts "ℹ️  TTL indexes are automatically excluded (used by background monitor, not queries)\n"
 
     collections.each do |collection|
       # Get index usage stats via $indexStats aggregation
@@ -289,8 +290,12 @@ namespace :db do
       coll_stats = db.command(collStats: collection.name).first
       index_sizes = coll_stats['indexSizes'] || {}
 
+      # Get TTL index names (they show 0 query ops but are used by background TTL monitor)
+      ttl_index_names = collection.indexes.select { |idx| idx.key?('expireAfterSeconds') }.map { |idx| idx['name'] }
+
       unused = stats.select { |s| s['accesses']['ops'] == 0 }
                     .reject { |s| s['name'] == '_id_' } # never drop _id
+                    .reject { |s| ttl_index_names.include?(s['name']) } # never drop TTL indexes
 
       next if unused.empty?
 
