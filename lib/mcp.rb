@@ -132,7 +132,7 @@ module Dandelion
             description "Get a Dandelion #{model_name.downcase} by #{finder_field} or ID."
             input_schema(properties: {
                            finder_field => { type: 'string', description: "#{model_name} #{finder_field}" },
-                           id: { type: 'string', description: "#{model_name} ID (BSON)" }
+                           id: { type: 'string', description: "#{model_name} ID" }
                          })
             annotations(read_only_hint: true, destructive_hint: false)
 
@@ -150,7 +150,7 @@ module Dandelion
           description 'Get upcoming events for a Dandelion organisation by slug or ID. Optionally filter by from and to dates (YYYY-MM-DD).'
           input_schema(properties: {
                          slug: { type: 'string', description: 'Organisation slug' },
-                         id: { type: 'string', description: 'Organisation ID (BSON)' },
+                         id: { type: 'string', description: 'Organisation ID' },
                          from: { type: 'string', description: 'Start date for events (YYYY-MM-DD). Defaults to today.' },
                          to: { type: 'string', description: 'End date for events (YYYY-MM-DD). Optional.' },
                          limit: { type: 'integer', description: 'Max results (default 20, max 100)' }
