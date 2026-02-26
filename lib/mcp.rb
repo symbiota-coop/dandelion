@@ -89,70 +89,80 @@ module Dandelion
       ::MCP::Tool::Response.new([{ type: 'text', text: result.to_json }])
     end
 
-    # Generate Search and Get tools from MODEL_CONFIGS
-    TOOLS = [
-      *MODEL_CONFIGS.flat_map do |model_name, config|
-        finder_field = config[:finder_field]
+    # Generate Search and Get tools from MODEL_CONFIGS (lazy loaded)
+    def self.tools
+      @tools ||= [
+        *MODEL_CONFIGS.flat_map do |model_name, config|
+          finder_field = config[:finder_field]
 
-        search_tool = Class.new(::MCP::Tool) do
-          title "Search #{model_name.pluralize}"
-          description config[:search_description]
-          input_schema(properties: { query: { type: 'string', description: 'Search term' } }, required: [:query])
-          annotations(read_only_hint: true, destructive_hint: false)
+          search_tool = Class.new(::MCP::Tool) do
+            title "Search #{model_name.pluralize}"
+            description config[:search_description]
+            input_schema(properties: { query: { type: 'string', description: 'Search term' } }, required: [:query])
+            annotations(read_only_hint: true, destructive_hint: false)
 
-          define_singleton_method(:call) do |query:, _server_context: {}|
-            Dandelion::MCP.perform_search(model_name.constantize, query)
+            define_singleton_method(:call) do |query:, _server_context: {}|
+              Dandelion::MCP.perform_search(model_name.constantize, query)
+            end
           end
-        end
-        const_set("Search#{model_name.pluralize}Tool", search_tool)
+          const_set("Search#{model_name.pluralize}Tool", search_tool)
 
-        get_tool = Class.new(::MCP::Tool) do
-          title "Get #{model_name}"
-          description "Get a Dandelion #{model_name.downcase} by #{finder_field} or ID."
+          get_tool = Class.new(::MCP::Tool) do
+            title "Get #{model_name}"
+            description "Get a Dandelion #{model_name.downcase} by #{finder_field} or ID."
+            input_schema(properties: {
+                           finder_field => { type: 'string', description: "#{model_name} #{finder_field}" },
+                           id: { type: 'string', description: "#{model_name} ID (BSON)" }
+                         })
+            annotations(read_only_hint: true, destructive_hint: false)
+
+            define_singleton_method(:call) do |id: nil, _server_context: {}, **finder_args|
+              Dandelion::MCP.perform_get(model_name.constantize, id: id, **finder_args)
+            end
+          end
+          const_set("Get#{model_name}Tool", get_tool)
+
+          [search_tool, get_tool]
+        end,
+        Class.new(::MCP::Tool) do
+          title 'Get Organisation Upcoming Events'
+          description 'Get upcoming events for a Dandelion organisation by slug or ID. Optionally filter by from and to dates (YYYY-MM-DD).'
           input_schema(properties: {
-                         finder_field => { type: 'string', description: "#{model_name} #{finder_field}" },
-                         id: { type: 'string', description: "#{model_name} ID (BSON)" }
+                         slug: { type: 'string', description: 'Organisation slug' },
+                         id: { type: 'string', description: 'Organisation ID (BSON)' },
+                         from: { type: 'string', description: 'Start date for events (YYYY-MM-DD). Defaults to today.' },
+                         to: { type: 'string', description: 'End date for events (YYYY-MM-DD). Optional.' }
                        })
           annotations(read_only_hint: true, destructive_hint: false)
 
-          define_singleton_method(:call) do |id: nil, _server_context: {}, **finder_args|
-            Dandelion::MCP.perform_get(model_name.constantize, id: id, **finder_args)
+          define_singleton_method(:call) do |slug: nil, id: nil, from: nil, to: nil, _server_context: {}|
+            Dandelion::MCP.perform_get_upcoming_organisation_events(slug: slug, id: id, from: from, to: to)
           end
         end
-        const_set("Get#{model_name}Tool", get_tool)
+      ].freeze
+    end
 
-        [search_tool, get_tool]
-      end,
-      Class.new(::MCP::Tool) do
-        title 'Get Organisation Upcoming Events'
-        description 'Get upcoming events for a Dandelion organisation by slug or ID. Optionally filter by from and to dates (YYYY-MM-DD).'
-        input_schema(properties: {
-                       slug: { type: 'string', description: 'Organisation slug' },
-                       id: { type: 'string', description: 'Organisation ID (BSON)' },
-                       from: { type: 'string', description: 'Start date for events (YYYY-MM-DD). Defaults to today.' },
-                       to: { type: 'string', description: 'End date for events (YYYY-MM-DD). Optional.' }
-                     })
-        annotations(read_only_hint: true, destructive_hint: false)
-
-        define_singleton_method(:call) do |slug: nil, id: nil, from: nil, to: nil, _server_context: {}|
-          Dandelion::MCP.perform_get_upcoming_organisation_events(slug: slug, id: id, from: from, to: to)
-        end
+    def self.server
+      @server ||= begin
+        s = ::MCP::Server.new(
+          name: 'dandelion',
+          title: 'Dandelion',
+          version: '1.0.0',
+          instructions: 'Tools for querying Dandelion accounts, events, organisations, and gatherings.',
+          tools: tools
+        )
+        transport = ::MCP::Server::Transports::StreamableHTTPTransport.new(s, stateless: true)
+        s.transport = transport
+        s
       end
-    ].freeze
+    end
 
-    SERVER = ::MCP::Server.new(
-      name: 'dandelion',
-      title: 'Dandelion',
-      version: '1.0.0',
-      instructions: 'Tools for querying Dandelion accounts, events, organisations, and gatherings.',
-      tools: TOOLS
-    )
-
-    HTTP_TRANSPORT = ::MCP::Server::Transports::StreamableHTTPTransport.new(SERVER, stateless: true)
-    SERVER.transport = HTTP_TRANSPORT
+    def self.http_transport
+      server.transport
+    end
 
     def self.handle_http_request(rack_request)
-      HTTP_TRANSPORT.handle_request(rack_request)
+      http_transport.handle_request(rack_request)
     end
   end
 end
