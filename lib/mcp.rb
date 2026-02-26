@@ -62,8 +62,8 @@ module Dandelion
       nil
     end
 
-    def self.perform_get_trending_events(limit: nil)
-      limit = (limit || 20).to_i.clamp(1, 100)
+    def self.perform_get_trending_events(limit: 20)
+      limit = limit.to_i.clamp(1, 100)
 
       events = Event.live.publicly_visible.browsable
                     .future
@@ -76,7 +76,7 @@ module Dandelion
       ::MCP::Tool::Response.new([{ type: 'text', text: result.to_json }])
     end
 
-    def self.perform_get_upcoming_organisation_events(slug: nil, id: nil, from: nil, to: nil)
+    def self.perform_get_upcoming_organisation_events(slug: nil, id: nil, from: nil, to: nil, limit: 20)
       return ::MCP::Tool::Response.new([{ type: 'text', text: 'Provide organisation slug or id' }], error: true) if slug.blank? && id.blank?
 
       organisation = if id.present?
@@ -91,12 +91,13 @@ module Dandelion
       to_date = to.present? ? parse_date(to) : nil
       return ::MCP::Tool::Response.new([{ type: 'text', text: 'Invalid from or to date format' }], error: true) if (from.present? && from_date.nil?) || (to.present? && to_date.nil?)
 
+      limit = limit.to_i.clamp(1, 100)
       events = organisation.events_including_cohosted
                            .live
                            .publicly_visible
                            .future_and_current(from_date)
                            .order('start_time asc')
-                           .limit(100)
+                           .limit(limit)
       events = events.and(:start_time.lt => to_date + 1) if to_date
 
       config = config_for(Event)
@@ -151,12 +152,13 @@ module Dandelion
                          slug: { type: 'string', description: 'Organisation slug' },
                          id: { type: 'string', description: 'Organisation ID (BSON)' },
                          from: { type: 'string', description: 'Start date for events (YYYY-MM-DD). Defaults to today.' },
-                         to: { type: 'string', description: 'End date for events (YYYY-MM-DD). Optional.' }
+                         to: { type: 'string', description: 'End date for events (YYYY-MM-DD). Optional.' },
+                         limit: { type: 'integer', description: 'Max results (default 20, max 100)' }
                        })
           annotations(read_only_hint: true, destructive_hint: false)
 
-          define_singleton_method(:call) do |slug: nil, id: nil, from: nil, to: nil, _server_context: {}|
-            Dandelion::MCP.perform_get_upcoming_organisation_events(slug: slug, id: id, from: from, to: to)
+          define_singleton_method(:call) do |slug: nil, id: nil, from: nil, to: nil, limit: nil, _server_context: {}|
+            Dandelion::MCP.perform_get_upcoming_organisation_events(slug: slug, id: id, from: from, to: to, limit: limit)
           end
         end,
         Class.new(::MCP::Tool) do
