@@ -28,11 +28,12 @@ module Dandelion
       MODEL_CONFIGS[model_class.name]
     end
 
-    def self.perform_search(model_class, query)
+    def self.perform_search(model_class, query, limit: 20)
+      limit = limit.to_i.clamp(1, 100)
       config = config_for(model_class)
       scope = model_class.search_scope
       scope = scope.with_public_includes if scope.respond_to?(:with_public_includes)
-      results = model_class.search(query, scope, build_records: true, phrase_boost: 1.5, text_search: true, vector_weight: 0.5)
+      results = model_class.search(query, scope, limit: limit, build_records: true, phrase_boost: 1.5, text_search: true, vector_weight: 0.5)
       results = config[:post_process].call(results) if config[:post_process]
       ::MCP::Tool::Response.new([{ type: 'text', text: results.map { |r| config[:fields].call(r) }.to_json }])
     end
@@ -98,11 +99,14 @@ module Dandelion
           search_tool = Class.new(::MCP::Tool) do
             title "Search #{model_name.pluralize}"
             description config[:search_description]
-            input_schema(properties: { query: { type: 'string', description: 'Search term' } }, required: [:query])
+            input_schema(properties: {
+                           query: { type: 'string', description: 'Search term' },
+                           limit: { type: 'integer', description: 'Max results (default 20, max 100)' }
+                         }, required: [:query])
             annotations(read_only_hint: true, destructive_hint: false)
 
-            define_singleton_method(:call) do |query:, _server_context: {}|
-              Dandelion::MCP.perform_search(model_name.constantize, query)
+            define_singleton_method(:call) do |query:, limit: nil, _server_context: {}|
+              Dandelion::MCP.perform_search(model_name.constantize, query, limit: limit)
             end
           end
           const_set("Search#{model_name.pluralize}Tool", search_tool)
@@ -149,7 +153,7 @@ module Dandelion
           name: 'dandelion',
           title: 'Dandelion',
           version: '1.0.0',
-          instructions: 'Tools for querying Dandelion accounts, events, organisations, and gatherings.',
+          instructions: 'Tools for querying Dandelion accounts, events, organisations and gatherings.',
           tools: tools
         )
         transport = ::MCP::Server::Transports::StreamableHTTPTransport.new(s, stateless: true)
