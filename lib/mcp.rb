@@ -28,8 +28,8 @@ module Dandelion
       MODEL_CONFIGS[model_class.name]
     end
 
-    def self.perform_search(model_class, query, limit: 20)
-      limit = limit.to_i.clamp(1, 100)
+    def self.perform_search(model_class, query, limit: nil)
+      limit = (limit || 20).to_i.clamp(1, 100)
       config = config_for(model_class)
       scope = model_class.search_scope
       results = model_class.search(query, scope, limit: limit, build_records: true, phrase_boost: 1.5, text_search: true, vector_weight: 0.5)
@@ -62,8 +62,8 @@ module Dandelion
       nil
     end
 
-    def self.perform_get_trending_events(limit: 20)
-      limit = limit.to_i.clamp(1, 100)
+    def self.perform_get_trending_events(limit: nil)
+      limit = (limit || 20).to_i.clamp(1, 100)
 
       events = Event.live.publicly_visible.browsable
                     .future
@@ -76,7 +76,7 @@ module Dandelion
       ::MCP::Tool::Response.new([{ type: 'text', text: result.to_json }])
     end
 
-    def self.perform_get_upcoming_organisation_events(slug: nil, id: nil, from: nil, to: nil, limit: 20)
+    def self.perform_get_upcoming_organisation_events(slug: nil, id: nil, from: nil, to: nil, limit: nil)
       return ::MCP::Tool::Response.new([{ type: 'text', text: 'Provide organisation slug or id' }], error: true) if slug.blank? && id.blank?
 
       organisation = if id.present?
@@ -91,7 +91,7 @@ module Dandelion
       to_date = to.present? ? parse_date(to) : nil
       return ::MCP::Tool::Response.new([{ type: 'text', text: 'Invalid from or to date format' }], error: true) if (from.present? && from_date.nil?) || (to.present? && to_date.nil?)
 
-      limit = limit.to_i.clamp(1, 100)
+      limit = (limit || 20).to_i.clamp(1, 100)
       events = organisation.events_including_cohosted
                            .live
                            .publicly_visible
