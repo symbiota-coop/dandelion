@@ -27,7 +27,7 @@ class AccountRecommendationCache
     event_attendees.each do |event_id, attendee_ids|
       event_id_str = event_id.to_s
       attendee_ids.each do |attendee_id|
-        next if attendee_id == account_id
+        next if attendee_id.blank? || attendee_id == account_id
 
         people[attendee_id.to_s] << { type: 'Event', id: event_id_str }
       end
@@ -44,7 +44,7 @@ class AccountRecommendationCache
     gathering_members.each do |gathering_id, member_ids|
       gathering_id_str = gathering_id.to_s
       member_ids.each do |member_id|
-        next if member_id == account_id
+        next if member_id.blank? || member_id == account_id
 
         people[member_id.to_s] << { type: 'Gathering', id: gathering_id_str }
       end
@@ -58,6 +58,7 @@ class AccountRecommendationCache
     my_account_id_str = account_id.to_s
 
     events = events_with_participant_ids.filter_map do |event_id, participant_ids|
+      participant_ids = participant_ids.reject(&:blank?)
       next if participant_ids.include?(my_account_id_str)
 
       participant_set = participant_ids.to_set

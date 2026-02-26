@@ -76,7 +76,7 @@ class Event
 
   def self.recommend
     events_with_participant_ids = Event.live.publicly_visible.future.map do |event|
-      [event.id.to_s, event.attendee_ids.map(&:to_s)]
+      [event.id.to_s, event.attendee_ids.compact.map(&:to_s).reject(&:blank?)]
     end
 
     # Clean up caches for non-recommendable accounts
