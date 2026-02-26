@@ -53,14 +53,15 @@ Dandelion::App.controller do
       headings
     end
 
-    @doc_page = { slug: params[:slug], name: params[:slug].to_s.humanize, raw_content: raw, html_body: md(raw), headings: extract_headings.call(raw) }
+    doc_display_name = ->(slug) { slug.to_s == 'mcp' ? 'MCP' : slug.to_s.humanize }
+    @doc_page = { slug: params[:slug], name: doc_display_name.(params[:slug]), raw_content: raw, html_body: md(raw), headings: extract_headings.call(raw) }
 
     @doc_pages = @doc_order.filter_map do |slug|
       p = File.join(@docs_dir, "#{slug}.md")
       next unless File.exist?(p)
 
       r = File.read(p)
-      { slug: slug, name: slug.to_s.humanize, headings: extract_headings.call(r) }
+      { slug: slug, name: doc_display_name.(slug), headings: extract_headings.call(r) }
     end
 
     erb :'docs/doc_page'

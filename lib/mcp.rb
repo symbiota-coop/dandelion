@@ -1,31 +1,35 @@
 module Dandelion
   module MCP
-    CONFIG = {
-      Event => {
+    MODEL_CONFIGS = {
+      'Event' => {
         finder_field: :slug,
         fields: lambda(&:public_data),
         post_process: ->(results) { results.uniq { |e| [e.name, e.location] } },
         search_description: 'Search recent and upcoming Dandelion events.'
       },
-      Account => {
+      'Account' => {
         finder_field: :username,
         fields: ->(a) { { id: a.id.to_s, name: a.name, username: a.username, location: a.location, bio: a.bio, url: "#{ENV['BASE_URI']}/u/#{a.username}" } },
         search_description: 'Search Dandelion accounts.'
       },
-      Organisation => {
+      'Organisation' => {
         finder_field: :slug,
         fields: ->(o) { { id: o.id.to_s, name: o.name, slug: o.slug, intro: o.intro_text, url: "#{ENV['BASE_URI']}/o/#{o.slug}" } },
         search_description: 'Search Dandelion organisations.'
       },
-      Gathering => {
+      'Gathering' => {
         finder_field: :slug,
         fields: ->(g) { { id: g.id.to_s, name: g.name, slug: g.slug, intro: g.intro, url: "#{ENV['BASE_URI']}/g/#{g.slug}" } },
         search_description: 'Search Dandelion gatherings.'
       }
     }.freeze
 
+    def self.config_for(model_class)
+      MODEL_CONFIGS[model_class.name]
+    end
+
     def self.perform_search(model_class, query)
-      config = CONFIG[model_class]
+      config = config_for(model_class)
       scope = model_class.search_scope
       scope = scope.with_public_includes if scope.respond_to?(:with_public_includes)
       results = model_class.search(query, scope, build_records: true, phrase_boost: 1.5, text_search: true, vector_weight: 0.5)
@@ -34,7 +38,7 @@ module Dandelion
     end
 
     def self.perform_get(model_class, id: nil, **finder_args)
-      config = CONFIG[model_class]
+      config = config_for(model_class)
       scope = model_class.search_scope
       scope = scope.with_public_includes if scope.respond_to?(:with_public_includes)
       finder_value = finder_args[config[:finder_field]]
@@ -85,10 +89,9 @@ module Dandelion
       ::MCP::Tool::Response.new([{ type: 'text', text: result.to_json }])
     end
 
-    # Generate Search and Get tools from CONFIG
+    # Generate Search and Get tools from MODEL_CONFIGS
     TOOLS = [
-      *CONFIG.flat_map do |model_class, config|
-        model_name = model_class.name
+      *MODEL_CONFIGS.flat_map do |model_name, config|
         finder_field = config[:finder_field]
 
         search_tool = Class.new(::MCP::Tool) do
@@ -98,7 +101,7 @@ module Dandelion
           annotations(read_only_hint: true, destructive_hint: false)
 
           define_singleton_method(:call) do |query:, _server_context: {}|
-            Dandelion::MCP.perform_search(model_class, query)
+            Dandelion::MCP.perform_search(model_name.constantize, query)
           end
         end
         const_set("Search#{model_name.pluralize}Tool", search_tool)
@@ -113,7 +116,7 @@ module Dandelion
           annotations(read_only_hint: true, destructive_hint: false)
 
           define_singleton_method(:call) do |id: nil, _server_context: {}, **finder_args|
-            Dandelion::MCP.perform_get(model_class, id: id, **finder_args)
+            Dandelion::MCP.perform_get(model_name.constantize, id: id, **finder_args)
           end
         end
         const_set("Get#{model_name}Tool", get_tool)
