@@ -137,7 +137,8 @@
           <% if @event.description %>
             <% d = Rinku.auto_link(
                 (@event.description.include?('<p') || @event.description.include?('<br') ? @event.description : "<p>#{@event.description.gsub("\n", '<br />')}</p>")
-                .gsub(%r{<a (href=".+?")>\[\[(.+?)\]\]</a>}, '<a \1 class="btn btn-primary">\2</a>')) %>
+                .gsub(%r{<a (href=".+?")>\[\[(.+?)\]\]</a>}, '<a \1 class="btn btn-primary">\2</a>')
+                .gsub('<table', '<table class="table table-bordered"')) %>
             <% if @event.raw_description %>
               <%== d %>
             <% else # previously only if @event.organisation.allow_iframes? (otherwise Sanitize.fragment(d, Sanitize::Config::DANDELION)) %>
