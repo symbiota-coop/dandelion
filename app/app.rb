@@ -37,6 +37,10 @@ module Dandelion
         origins '*'
         resource '*', headers: :any, methods: [:get]
       end
+      allow do
+        origins '*'
+        resource '/mcp', headers: :any, methods: [:get, :post]
+      end
     end
     OmniAuth.config.on_failure = proc { |env|
       OmniAuth::FailureEndpoint.new(env).redirect_to_failure
@@ -47,6 +51,8 @@ module Dandelion
     set :protection, except: :frame_options
 
     before do
+      next if request.path == '/mcp'
+
       @cachebuster = Padrino.env == :development ? SecureRandom.uuid : (ENV['RENDER_GIT_COMMIT'] || ENV['HEROKU_SLUG_COMMIT'])
       redirect "#{ENV['BASE_URI']}#{request.path}#{"?#{request.query_string}" unless request.query_string.blank?}" if ENV['REDIRECT_BASE'] && ENV['BASE_URI'] && (ENV['BASE_URI'] != "#{request.scheme}://#{request.env['HTTP_HOST']}")
       set_time_zone
@@ -288,6 +294,13 @@ module Dandelion
         model_class = search_type_to_model(@type)
         perform_full_search(@q, model_class)
         erb :search
+      end
+    end
+
+    %w[get post].each do |method|
+      send(method, '/mcp', provides: :json) do
+        status, headers, body = Dandelion::MCP.handle_http_request(request)
+        [status, headers, body]
       end
     end
 

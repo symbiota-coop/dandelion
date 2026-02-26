@@ -102,6 +102,9 @@ gem 'rack-cors'
 gem 'rack-utf8_sanitizer', '1.10.1'
 gem 'redis'
 
+# MCP (Model Context Protocol)
+gem 'mcp'
+
 #  Everything else
 gem 'chroma' # for manipulating colours
 gem 'digest' # for generating hashes

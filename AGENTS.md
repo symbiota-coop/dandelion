@@ -22,6 +22,10 @@ The ORM is Mongoid, not ActiveRecord.
 - Run `foreman run bundle exec rake db:seed` to seed the database
 - Login with the account in `.env.example`
 
+## Documentation
+
+You can find documentation at app/views/docs/md. Keep it up to date.
+
 ## Files in lib
 
 Files in lib are auto-loaded by Padrino.load!. No explicit require is necessary.
@@ -148,6 +152,9 @@ gem 'rack-attack'
 gem 'rack-cors'
 gem 'rack-utf8_sanitizer', '1.10.1'
 gem 'redis'
+
+# MCP (Model Context Protocol)
+gem 'mcp'
 
 #  Everything else
 gem 'chroma' # for manipulating colours

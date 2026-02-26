@@ -1,7 +1,7 @@
 Dandelion::App.controller do
   before do
     @docs_dir = File.expand_path('app/views/docs/md', Padrino.root)
-    @doc_order = %w[events organisations gatherings mailer zapier].freeze
+    @doc_order = %w[events organisations gatherings mailer zapier mcp].freeze
   end
 
   get '/docs/question' do
