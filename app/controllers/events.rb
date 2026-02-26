@@ -232,12 +232,13 @@ Dandelion::App.controller do
     validate_recaptcha
 
     email = params[:waitship][:email]
-    account_hash = { name: params[:waitship][:name], email: params[:waitship][:email], password: Account.generate_password }
+    account_hash = { name: params[:waitship][:name], email: params[:waitship][:email] }
     @account = if (account = Account.find_by(email: email.try(:downcase)))
                  account
                else
                  Account.new(account_hash)
                end
+    @account.password = Account.generate_password unless @account.persisted?
     successful_update_or_save = if @account.persisted?
                                   @account.update_attributes(mass_assigning(account_hash.map { |k, v| [k, v] if v }.compact.to_h, Account))
                                 else
