@@ -982,6 +982,10 @@ figure.image,
   margin-bottom: 1em !important
 }
 
+figure.table figure.image {
+  margin-bottom: 0 !important;
+}
+
 @keyframes opacity {
   0% {
     opacity: 0.5;
