@@ -84,12 +84,13 @@ module Dandelion
                            .live
                            .publicly_visible
                            .future_and_current(from_date)
-                           .with_public_includes
                            .order('start_time asc')
                            .limit(100)
       events = events.and(:start_time.lt => to_date + 1) if to_date
 
-      result = events.map(&:public_data)
+      config = config_for(Event)
+      fields_proc = config[:search_fields] || config[:fields]
+      result = events.map { |e| fields_proc.call(e) }
       ::MCP::Tool::Response.new([{ type: 'text', text: result.to_json }])
     end
 
