@@ -145,7 +145,7 @@ module Dandelion
           [search_tool, get_tool]
         end,
         Class.new(::MCP::Tool) do
-          tool_name 'get_organisation_upcoming_events'
+          tool_name 'get_organisation_upcoming_events_tool'
           title 'Get Organisation Upcoming Events'
           description 'Get upcoming events for a Dandelion organisation by slug or ID. Optionally filter by from and to dates (YYYY-MM-DD).'
           input_schema(properties: {
@@ -162,7 +162,7 @@ module Dandelion
           end
         end,
         Class.new(::MCP::Tool) do
-          tool_name 'get_trending_events'
+          tool_name 'get_trending_events_tool'
           title 'Get Trending Events'
           description 'Get trending Dandelion events.'
           input_schema(properties: {
