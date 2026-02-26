@@ -35,6 +35,7 @@ module EventSerialization
     {
       id: id.to_s,
       slug: slug,
+      url: "#{ENV['BASE_URI']}/e/#{slug}",
       name: name,
       cohosts: cohostships.map { |cohostship| { name: cohostship.organisation.name, slug: cohostship.organisation.slug } },
       facilitators: event_facilitations.map { |event_facilitation| { name: event_facilitation.account.name, username: event_facilitation.account.username } },

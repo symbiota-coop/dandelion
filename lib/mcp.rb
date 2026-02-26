@@ -9,17 +9,17 @@ module Dandelion
       },
       Account => {
         finder_field: :username,
-        fields: ->(a) { { id: a.id.to_s, name: a.name, username: a.username, location: a.location, bio: a.bio } },
+        fields: ->(a) { { id: a.id.to_s, name: a.name, username: a.username, location: a.location, bio: a.bio, url: "#{ENV['BASE_URI']}/u/#{a.username}" } },
         search_description: 'Search Dandelion accounts.'
       },
       Organisation => {
         finder_field: :slug,
-        fields: ->(o) { { id: o.id.to_s, name: o.name, slug: o.slug, intro: o.intro_text } },
+        fields: ->(o) { { id: o.id.to_s, name: o.name, slug: o.slug, intro: o.intro_text, url: "#{ENV['BASE_URI']}/o/#{o.slug}" } },
         search_description: 'Search Dandelion organisations.'
       },
       Gathering => {
         finder_field: :slug,
-        fields: ->(g) { { id: g.id.to_s, name: g.name, slug: g.slug, intro: g.intro } },
+        fields: ->(g) { { id: g.id.to_s, name: g.name, slug: g.slug, intro: g.intro, url: "#{ENV['BASE_URI']}/g/#{g.slug}" } },
         search_description: 'Search Dandelion gatherings.'
       }
     }.freeze
