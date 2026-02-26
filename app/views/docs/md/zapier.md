@@ -1,11 +1,20 @@
 
-The Dandelion Zapier API allows you to integrate Dandelion event data with thousands of other apps. The API uses JSON for request and response formats.
+The [Dandelion Zapier integration](https://zapier.com/apps/dandelion/) allows you to integrate Dandelion with thousands of other apps. You'll need your API key, which you can find on your [profile edit page](/accounts/edit).
 
-**Base URL:** `https://dandelion.events`
+<a href="https://zapier.com/apps/dandelion/"><img src="/images/zapier.png" class="w-100"></a>
 
-**Authentication:** API key. Find your API key on your [profile edit page](/accounts/edit).
+## Zapier Integration Triggers
+
+The following triggers are available in the Dandelion Zapier integration:
+
+| Trigger | Description | Endpoint |
+|---------|-------------|----------|
+| Order Confirmed | Triggers when someone purchases tickets to your event | `/z/organisation_event_orders` |
+| New Follower | Triggers when someone follows your organisation | `/z/organisation_followers` |
 
 ## API Endpoints
+
+The API endpoints behind the Zapier triggers. For reference only– Zapier handles all the complexity!
 
 ### GET /z
 
@@ -189,39 +198,3 @@ GET /z/organisation_event_orders?organisation_slug=my-organisation&event_id=507f
 - Only completed (paid) orders are returned
 - Results are sorted by creation time (most recent first)
 - Email visibility depends on event privacy settings
-
-## Error Responses
-
-The API uses standard HTTP status codes:
-
-| Status Code | Description |
-|-------------|-------------|
-| `200` | Success |
-| `401` | Unauthorized - authentication required |
-| `403` | Forbidden - insufficient permissions |
-| `404` | Not Found - organisation or event does not exist |
-
-**Error Response Format:**
-
-```json
-{
-  "error": "Not found"
-}
-```
-
-## Rate Limiting
-
-API requests are subject to rate limiting. If you exceed the rate limit, you will receive a `429 Too Many Requests` response. Please implement exponential backoff in your integrations.
-
-## Zapier Integration Triggers
-
-The following triggers are available in the Dandelion Zapier integration:
-
-| Trigger | Description | Endpoint |
-|---------|-------------|----------|
-| New Follower | Triggers when someone follows your organisation | `/z/organisation_followers` |
-| Order Confirmed | Triggers when someone purchases tickets to your event | `/z/organisation_event_orders` |
-
-## Support
-
-For API support or questions about the Zapier integration, please [contact us](mailto:contact@dandelion.events).
