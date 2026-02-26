@@ -33,7 +33,6 @@ module Dandelion
       limit = limit.to_i.clamp(1, 100)
       config = config_for(model_class)
       scope = model_class.search_scope
-      scope = scope.with_public_includes if scope.respond_to?(:with_public_includes)
       results = model_class.search(query, scope, limit: limit, build_records: true, phrase_boost: 1.5, text_search: true, vector_weight: 0.5)
       results = config[:post_process].call(results) if config[:post_process]
       fields_proc = config[:search_fields] || config[:fields]
