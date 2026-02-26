@@ -3,25 +3,21 @@ Dandelion::App.helpers do
   def search_type_config
     {
       Event => {
-        scope: -> { Event.live.publicly_visible.browsable.future(1.week.ago) },
         icon: 'bi-calendar-event',
         redirect_path: ->(item) { "/e/#{item.slug}" },
         label_formatter: ->(item) { "#{item.name} (#{concise_when_details(item)})" }
       },
       Account => {
-        scope: -> { Account.publicly_visible },
         icon: 'bi-person-fill',
         redirect_path: ->(item) { params[:message] ? "/messages/#{item.id}" : "/u/#{item.username}" },
         label_formatter: ->(item) { item.name }
       },
       Organisation => {
-        scope: -> { Organisation.all },
         icon: 'bi-flag-fill',
         redirect_path: ->(item) { "/o/#{item.slug}" },
         label_formatter: ->(item) { item.name }
       },
       Gathering => {
-        scope: -> { Gathering.and(listed: true).and(:privacy.ne => 'secret') },
         icon: 'bi-moon-fill',
         redirect_path: ->(item) { "/g/#{item.slug}" },
         label_formatter: ->(item) { item.name }
@@ -49,7 +45,7 @@ Dandelion::App.helpers do
     search_type_config.each do |config_model_class, config|
       next if model_class && config_model_class != model_class
 
-      scope = config[:scope].call
+      scope = config_model_class.search_scope
       items = config_model_class.search(q, scope, limit: 5, build_records: true, phrase_boost: 1.5, text_search: true, vector_weight: 0.5)
       prefix = search_prefix(config_model_class)
       results += items.map do |item|
@@ -67,7 +63,7 @@ Dandelion::App.helpers do
     config = search_type_config[model_class]
     return unless config
 
-    scope = config[:scope].call
+    scope = model_class.search_scope
     prefix = search_prefix(model_class)
     var_name = "@#{model_to_search_type(model_class)}"
 

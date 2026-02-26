@@ -20,6 +20,10 @@ class Gathering
     %w[name intro_for_non_members]
   end
 
+  def self.search_scope
+    self.and(listed: true).and(:privacy.ne => 'secret')
+  end
+
   def self.spring_clean
     ignore = %i[memberships teams teamships notifications_as_notifiable notifications_as_circle]
     Gathering.and(listed: true).each do |gathering|

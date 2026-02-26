@@ -62,6 +62,10 @@ class Event
     %w[name description location tag_names_cache]
   end
 
+  def self.search_scope
+    live.publicly_visible.browsable.future(1.week.ago)
+  end
+
   def to_param
     slug
   end

@@ -10,7 +10,7 @@ Dandelion supports the [Model Context Protocol](https://modelcontextprotocol.io/
 - Search accounts
 - Look up by slug or ID — a specific event, organisation, gathering, or account
 
-All access is read-only. AI assistants can query public Dandelion data to help you plan, research, or answer questions.
+All access is read-only.
 
 ## MCP endpoint
 
@@ -19,5 +19,3 @@ Add the Dandelion MCP server to your AI assistant's MCP configuration:
 ```
 https://dandelion.events/mcp
 ```
-
-Once configured, you can ask your AI assistant to search for events, find organisations, and more.

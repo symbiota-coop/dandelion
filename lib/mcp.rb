@@ -2,26 +2,22 @@ module Dandelion
   module MCP
     CONFIG = {
       Event => {
-        scope: -> { Event.live.publicly_visible.browsable.future(1.week.ago).with_public_includes },
         finder_field: :slug,
         fields: lambda(&:public_data),
         post_process: ->(results) { results.uniq { |e| [e.name, e.location] } },
         search_description: 'Search recent and upcoming Dandelion events.'
       },
       Account => {
-        scope: -> { Account.publicly_visible },
         finder_field: :username,
         fields: ->(a) { { id: a.id.to_s, name: a.name, username: a.username, location: a.location, bio: a.bio } },
         search_description: 'Search Dandelion accounts.'
       },
       Organisation => {
-        scope: -> { Organisation.all },
         finder_field: :slug,
         fields: ->(o) { { id: o.id.to_s, name: o.name, slug: o.slug, intro: o.intro_text } },
         search_description: 'Search Dandelion organisations.'
       },
       Gathering => {
-        scope: -> { Gathering.and(listed: true).and(:privacy.ne => 'secret') },
         finder_field: :slug,
         fields: ->(g) { { id: g.id.to_s, name: g.name, slug: g.slug, intro: g.intro } },
         search_description: 'Search Dandelion gatherings.'
@@ -30,7 +26,8 @@ module Dandelion
 
     def self.perform_search(model_class, query)
       config = CONFIG[model_class]
-      scope = config[:scope].call
+      scope = model_class.search_scope
+      scope = scope.with_public_includes if scope.respond_to?(:with_public_includes)
       results = model_class.search(query, scope, build_records: true, phrase_boost: 1.5, text_search: true, vector_weight: 0.5)
       results = config[:post_process].call(results) if config[:post_process]
       ::MCP::Tool::Response.new([{ type: 'text', text: results.map { |r| config[:fields].call(r) }.to_json }])
@@ -38,7 +35,8 @@ module Dandelion
 
     def self.perform_get(model_class, id: nil, **finder_args)
       config = CONFIG[model_class]
-      scope = config[:scope].call
+      scope = model_class.search_scope
+      scope = scope.with_public_includes if scope.respond_to?(:with_public_includes)
       finder_value = finder_args[config[:finder_field]]
 
       record = if id.present?

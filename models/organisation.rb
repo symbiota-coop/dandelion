@@ -30,6 +30,10 @@ class Organisation
     %w[name intro_text]
   end
 
+  def self.search_scope
+    all
+  end
+
   def self.protected_attributes
     %w[paid_up paid_up_fraction]
   end
