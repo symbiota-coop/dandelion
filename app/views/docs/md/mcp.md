@@ -9,6 +9,7 @@ Dandelion supports the [Model Context Protocol](https://modelcontextprotocol.io/
 - Search gatherings
 - Search accounts
 - Look up by slug or ID — a specific event, organisation, gathering, or account
+- Get upcoming events for an organisation
 
 All access is read-only.
 

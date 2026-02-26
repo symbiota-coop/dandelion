@@ -45,46 +45,97 @@ module Dandelion
                  scope.find_by(config[:finder_field] => finder_value)
                end
 
-      return ::MCP::Tool::Response.new([{ type: 'text', text: "#{model_class.name} not found" }], is_error: true) unless record
+      return ::MCP::Tool::Response.new([{ type: 'text', text: "#{model_class.name} not found" }], error: true) unless record
 
       result = config[:fields].call(record)
       ::MCP::Tool::Response.new([{ type: 'text', text: result.to_json }])
     end
 
+    def self.parse_date(date)
+      Date.parse(date)
+    rescue Date::Error
+      nil
+    end
+
+    def self.perform_get_upcoming_organisation_events(slug: nil, id: nil, from: nil, to: nil)
+      return ::MCP::Tool::Response.new([{ type: 'text', text: 'Provide organisation slug or id' }], error: true) if slug.blank? && id.blank?
+
+      organisation = if id.present?
+                       Organisation.find(id)
+                     elsif slug.present?
+                       Organisation.find_by(slug: slug)
+                     end
+
+      return ::MCP::Tool::Response.new([{ type: 'text', text: 'Organisation not found' }], error: true) unless organisation
+
+      from_date = from.present? ? parse_date(from) : Date.today
+      to_date = to.present? ? parse_date(to) : nil
+      return ::MCP::Tool::Response.new([{ type: 'text', text: 'Invalid from or to date format' }], error: true) if (from.present? && from_date.nil?) || (to.present? && to_date.nil?)
+
+      events = organisation.events_including_cohosted
+                           .live
+                           .publicly_visible
+                           .future_and_current(from_date)
+                           .with_public_includes
+                           .order('start_time asc')
+                           .limit(100)
+      events = events.and(:start_time.lt => to_date + 1) if to_date
+
+      result = events.map(&:public_data)
+      ::MCP::Tool::Response.new([{ type: 'text', text: result.to_json }])
+    end
+
     # Generate Search and Get tools from CONFIG
-    TOOLS = CONFIG.flat_map do |model_class, config|
-      model_name = model_class.name
-      finder_field = config[:finder_field]
+    TOOLS = [
+      *CONFIG.flat_map do |model_class, config|
+        model_name = model_class.name
+        finder_field = config[:finder_field]
 
-      search_tool = Class.new(::MCP::Tool) do
-        title "Search #{model_name.pluralize}"
-        description config[:search_description]
-        input_schema(properties: { query: { type: 'string', description: 'Search term' } }, required: [:query])
-        annotations(read_only_hint: true, destructive_hint: false)
+        search_tool = Class.new(::MCP::Tool) do
+          title "Search #{model_name.pluralize}"
+          description config[:search_description]
+          input_schema(properties: { query: { type: 'string', description: 'Search term' } }, required: [:query])
+          annotations(read_only_hint: true, destructive_hint: false)
 
-        define_singleton_method(:call) do |query:, _server_context: {}|
-          Dandelion::MCP.perform_search(model_class, query)
+          define_singleton_method(:call) do |query:, _server_context: {}|
+            Dandelion::MCP.perform_search(model_class, query)
+          end
         end
-      end
-      const_set("Search#{model_name.pluralize}Tool", search_tool)
+        const_set("Search#{model_name.pluralize}Tool", search_tool)
 
-      get_tool = Class.new(::MCP::Tool) do
-        title "Get #{model_name}"
-        description "Get a Dandelion #{model_name.downcase} by #{finder_field} or ID."
+        get_tool = Class.new(::MCP::Tool) do
+          title "Get #{model_name}"
+          description "Get a Dandelion #{model_name.downcase} by #{finder_field} or ID."
+          input_schema(properties: {
+                         finder_field => { type: 'string', description: "#{model_name} #{finder_field}" },
+                         id: { type: 'string', description: "#{model_name} ID (BSON)" }
+                       })
+          annotations(read_only_hint: true, destructive_hint: false)
+
+          define_singleton_method(:call) do |id: nil, _server_context: {}, **finder_args|
+            Dandelion::MCP.perform_get(model_class, id: id, **finder_args)
+          end
+        end
+        const_set("Get#{model_name}Tool", get_tool)
+
+        [search_tool, get_tool]
+      end,
+      Class.new(::MCP::Tool) do
+        title 'Get Organisation Upcoming Events'
+        description 'Get upcoming events for a Dandelion organisation by slug or ID. Optionally filter by from and to dates (YYYY-MM-DD).'
         input_schema(properties: {
-                       finder_field => { type: 'string', description: "#{model_name} #{finder_field}" },
-                       id: { type: 'string', description: "#{model_name} ID (BSON)" }
+                       slug: { type: 'string', description: 'Organisation slug' },
+                       id: { type: 'string', description: 'Organisation ID (BSON)' },
+                       from: { type: 'string', description: 'Start date for events (YYYY-MM-DD). Defaults to today.' },
+                       to: { type: 'string', description: 'End date for events (YYYY-MM-DD). Optional.' }
                      })
         annotations(read_only_hint: true, destructive_hint: false)
 
-        define_singleton_method(:call) do |id: nil, _server_context: {}, **finder_args|
-          Dandelion::MCP.perform_get(model_class, id: id, **finder_args)
+        define_singleton_method(:call) do |slug: nil, id: nil, from: nil, to: nil, _server_context: {}|
+          Dandelion::MCP.perform_get_upcoming_organisation_events(slug: slug, id: id, from: from, to: to)
         end
       end
-      const_set("Get#{model_name}Tool", get_tool)
-
-      [search_tool, get_tool]
-    end.freeze
+    ].freeze
 
     SERVER = ::MCP::Server.new(
       name: 'dandelion',
