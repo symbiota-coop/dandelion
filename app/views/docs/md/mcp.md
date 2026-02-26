@@ -2,11 +2,9 @@ Dandelion supports the [Model Context Protocol](https://modelcontextprotocol.io/
 
 ## What AI assistants can do
 
-- Search events — recent and upcoming events
-- Search organisations
-- Search gatherings
-- Search accounts
+- Search events (recent and upcoming), organisations, gatherings and accounts
 - Look up events, organisations, gatherings and accounts, by slug/username or ID
+- Get trending events
 - Get upcoming events for an organisation
 
 All access is read-only.

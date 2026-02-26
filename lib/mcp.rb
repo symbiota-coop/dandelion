@@ -62,6 +62,20 @@ module Dandelion
       nil
     end
 
+    def self.perform_get_trending_events(limit: nil)
+      limit = (limit || 20).to_i.clamp(1, 100)
+
+      events = Event.live.publicly_visible.browsable
+                    .future
+                    .trending
+                    .first(limit)
+
+      config = config_for(Event)
+      fields_proc = config[:search_fields] || config[:fields]
+      result = events.map { |e| fields_proc.call(e) }
+      ::MCP::Tool::Response.new([{ type: 'text', text: result.to_json }])
+    end
+
     def self.perform_get_upcoming_organisation_events(slug: nil, id: nil, from: nil, to: nil)
       return ::MCP::Tool::Response.new([{ type: 'text', text: 'Provide organisation slug or id' }], error: true) if slug.blank? && id.blank?
 
@@ -143,6 +157,19 @@ module Dandelion
 
           define_singleton_method(:call) do |slug: nil, id: nil, from: nil, to: nil, _server_context: {}|
             Dandelion::MCP.perform_get_upcoming_organisation_events(slug: slug, id: id, from: from, to: to)
+          end
+        end,
+        Class.new(::MCP::Tool) do
+          tool_name 'get_trending_events'
+          title 'Get Trending Events'
+          description 'Get trending Dandelion events.'
+          input_schema(properties: {
+                         limit: { type: 'integer', description: 'Max results (default 20, max 100)' }
+                       })
+          annotations(read_only_hint: true, destructive_hint: false)
+
+          define_singleton_method(:call) do |limit: nil, _server_context: {}|
+            Dandelion::MCP.perform_get_trending_events(limit: limit)
           end
         end
       ].freeze
