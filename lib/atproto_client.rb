@@ -11,6 +11,7 @@ class AtprotoClient
       max: 3,
       interval: 1,
       backoff_factor: 2,
+      methods: %i[get post put delete head options],
       exceptions: [Faraday::ServerError, Faraday::ConnectionFailed, Faraday::TimeoutError]
     }
 
