@@ -3,7 +3,8 @@ module Dandelion
     MODEL_CONFIGS = {
       'Event' => {
         finder_field: :slug,
-        fields: lambda(&:public_data),
+        search_fields: ->(e) { { id: e.id.to_s, name: e.name, slug: e.slug, url: "#{ENV['BASE_URI']}/e/#{e.slug}", start_time: e.start_time, end_time: e.end_time, location: e.location } },
+        get_fields: lambda(&:public_data),
         post_process: ->(results) { results.uniq { |e| [e.name, e.location] } },
         search_description: 'Search recent and upcoming Dandelion events.'
       },
@@ -35,7 +36,8 @@ module Dandelion
       scope = scope.with_public_includes if scope.respond_to?(:with_public_includes)
       results = model_class.search(query, scope, limit: limit, build_records: true, phrase_boost: 1.5, text_search: true, vector_weight: 0.5)
       results = config[:post_process].call(results) if config[:post_process]
-      ::MCP::Tool::Response.new([{ type: 'text', text: results.map { |r| config[:fields].call(r) }.to_json }])
+      fields_proc = config[:search_fields] || config[:fields]
+      ::MCP::Tool::Response.new([{ type: 'text', text: results.map { |r| fields_proc.call(r) }.to_json }])
     end
 
     def self.perform_get(model_class, id: nil, **finder_args)
@@ -52,7 +54,8 @@ module Dandelion
 
       return ::MCP::Tool::Response.new([{ type: 'text', text: "#{model_class.name} not found" }], error: true) unless record
 
-      result = config[:fields].call(record)
+      fields_proc = config[:get_fields] || config[:fields]
+      result = fields_proc.call(record)
       ::MCP::Tool::Response.new([{ type: 'text', text: result.to_json }])
     end
 
