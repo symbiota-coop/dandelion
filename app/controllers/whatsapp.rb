@@ -26,15 +26,34 @@ Dandelion::App.controller do
 
     # download the media
     response = http_client.get(media_download_url)
-    audio_data = response.body.to_s
+    temp_file = Tempfile.new(['whatsapp_media', File.extname(media_download_url)])
+    temp_file.binmode
+    temp_file.write(response.body)
+    temp_file.rewind
 
-    # transcribe and clean up the audio
-    text = OpenRouter.chat(
-      'Transcribe this audio. Remove filler words and add paragraph breaks where appropriate. Output only the cleaned transcript, without titles, introductions or conclusions.',
-      audio: audio_data,
-      audio_format: 'ogg',
-      intelligence: 'smarter'
-    )
+    # transcribe the audio
+    conn = Faraday.new(url: 'https://api.openai.com/v1') do |f|
+      f.request :multipart
+      f.request :url_encoded
+      f.adapter Faraday.default_adapter
+    end
+
+    response = conn.post('/v1/audio/transcriptions') do |req|
+      req.headers['Authorization'] = "Bearer #{ENV['OPENAI_API_KEY']}"
+      req.body = {
+        model: 'whisper-1',
+        file: Faraday::UploadIO.new(temp_file.path, 'audio/ogg')
+      }
+    end
+
+    text = JSON.parse(response.body)['text']
+
+    # clean up the transcript
+    text = OpenRouter.chat("Produce a verbatim version of this transcript, just with filler words removed and paragraph breaks added where appropriate. Do not add any text to the beginning or end.\n\n#{text}")
+
+    # close and delete the temporary file
+    temp_file.close
+    temp_file.unlink
 
     # send the transcription to the user
     to = message['from']
