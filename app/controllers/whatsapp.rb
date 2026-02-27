@@ -48,6 +48,9 @@ Dandelion::App.controller do
 
     text = JSON.parse(response.body)['text']
 
+    # clean up the transcript
+    text = OpenRouter.chat("Produce a verbatim version of this transcript, just with filler words removed and paragraph breaks added where appropriate. Do not add any text to the beginning or end.\n\n#{text}")
+
     # close and delete the temporary file
     temp_file.close
     temp_file.unlink
