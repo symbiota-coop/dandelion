@@ -59,15 +59,32 @@ Dandelion::App.controller do
     to = message['from']
     messages_url = "https://graph.facebook.com/v21.0/#{ENV['WHATSAPP_PHONE_NUMBER_ID']}/messages"
 
-    # split the text into chunks of approximately 2048 characters at word boundaries
+    # split the text into chunks, preferring paragraph boundaries
     chunks = []
     current_chunk = ''
-    text.split.each do |word|
-      if (current_chunk + ' ' + word).length <= 2048
-        current_chunk += (current_chunk.empty? ? '' : ' ') + word
+    text.split(/\n\n+/).each do |paragraph|
+      # paragraph fits in current chunk
+      if current_chunk.empty?
+        current_chunk = paragraph
+      elsif (current_chunk + "\n\n" + paragraph).length <= 2048
+        current_chunk += "\n\n" + paragraph
       else
+        # start new chunk with this paragraph
         chunks << current_chunk
-        current_chunk = word
+        current_chunk = paragraph
+      end
+
+      # if paragraph itself is too long, split on words
+      next if current_chunk.length <= 2048
+
+      current_chunk = ''
+      paragraph.split(/ +/).each do |word|
+        if (current_chunk + ' ' + word).length <= 2048
+          current_chunk += (current_chunk.empty? ? '' : ' ') + word
+        else
+          chunks << current_chunk
+          current_chunk = word
+        end
       end
     end
     chunks << current_chunk unless current_chunk.empty?
