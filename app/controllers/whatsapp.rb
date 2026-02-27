@@ -32,7 +32,8 @@ Dandelion::App.controller do
     text = OpenRouter.chat(
       'Transcribe this audio. Remove filler words and add paragraph breaks where appropriate. Output only the cleaned transcript, without titles, introductions or conclusions.',
       audio: audio_data,
-      audio_format: 'ogg'
+      audio_format: 'ogg',
+      intelligence: 'smarter'
     )
 
     # send the transcription to the user
