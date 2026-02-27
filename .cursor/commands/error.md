@@ -1,0 +1,1 @@
+Use the Honeybadger MCP to get the details of the most recent unresolved fault, and fix it
