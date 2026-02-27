@@ -34,12 +34,22 @@ class OpenRouter
     end
   end
 
-  def chat(prompt, full_response: false, max_tokens: nil, schema: nil, model: INTELLIGENCE_LEVELS['standard'], providers: nil, context_window_size: nil, intelligence: nil)
+  def chat(prompt, full_response: false, max_tokens: nil, schema: nil, model: INTELLIGENCE_LEVELS['standard'], providers: nil, context_window_size: nil, intelligence: nil, audio: nil, audio_format: 'ogg')
     model = INTELLIGENCE_LEVELS[intelligence] if intelligence
     model_config = MODELS[model] || {}
     providers ||= model_config[:providers]
     context_window_size ||= model_config[:context_window_size]
-    prompt = prompt[0..(context_window_size * 4 * 0.66)]
+    prompt = prompt[0..(context_window_size * 4 * 0.66)] unless audio
+
+    content = if audio
+                audio_base64 = Base64.strict_encode64(audio)
+                [
+                  { type: 'text', text: prompt },
+                  { type: 'input_audio', input_audio: { data: audio_base64, format: audio_format } }
+                ]
+              else
+                prompt
+              end
 
     payload = {
       model: model.split(':thinking').first,
@@ -47,7 +57,7 @@ class OpenRouter
       messages: [
         {
           role: 'user',
-          content: prompt
+          content: content
         }
       ]
     }
