@@ -62,7 +62,6 @@ gem 'yt'
 gem 'coinbase_commerce_client'
 gem 'gocardless_pro'
 gem 'money'
-gem 'money-uphold-bank', github: 'stephenreid321/money-uphold-bank'
 gem 'patreon'
 gem 'stripe'
 

@@ -38,13 +38,6 @@ GIT
     activate-tools (0.0.30)
       padrino
 
-GIT
-  remote: https://github.com/stephenreid321/money-uphold-bank.git
-  revision: 55cd6f1db35f754cb51fdc97cc77f48ed82fff19
-  specs:
-    money-uphold-bank (0.0.6)
-      money (~> 6.12)
-
 GEM
   remote: https://rubygems.org/
   specs:
@@ -631,7 +624,6 @@ DEPENDENCIES
   mini_magick
   minitest-rg
   money
-  money-uphold-bank!
   mongoid
   mongoid_paranoia
   octokit

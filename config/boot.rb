@@ -25,8 +25,8 @@ OmniAuth.config.logger = Logger.new(IO::NULL)
 Delayed::Worker.max_attempts = 1
 Delayed::Worker.destroy_failed_jobs = false
 
-require 'money/bank/uphold'
-Money.default_bank = Money::Bank::Uphold.new
+require 'net/http'
+Money.default_bank = DandelionBank.new
 Money.locale_backend = :currency
 Money.rounding_mode = BigDecimal::ROUND_HALF_EVEN
 
