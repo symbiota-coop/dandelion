@@ -79,7 +79,6 @@ Dandelion::App.controller do
       @event.coordinator = current_account
       @event.refund_deleted_orders = true
       @event.opt_in_organisation = true
-      @event.opt_in_facilitator = true
       @event.ask_hear_about = true
       erb :'events_build/build'
     end
