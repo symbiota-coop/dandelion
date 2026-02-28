@@ -78,7 +78,6 @@ gem 'mongoid_paranoia'
 
 # Authentication
 gem 'bcrypt'
-gem 'bech32'
 gem 'omniauth'
 gem 'omniauth-atproto'
 gem 'omniauth-ethereum', github: 'q9f/omniauth-ethereum.rb'
