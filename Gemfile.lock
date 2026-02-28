@@ -165,9 +165,6 @@ GEM
       openssl (~> 3.3)
       rbsecp256k1 (~> 6.0)
       scrypt (~> 3.0)
-    eu_central_bank (1.7.0)
-      money (~> 6.13, >= 6.13.6)
-      nokogiri (~> 1.9)
     event_stream_parser (1.0.0)
     excon (1.3.2)
       logger
@@ -615,7 +612,6 @@ DEPENDENCIES
   dragonfly-s3_data_store
   email_address
   erb_lint
-  eu_central_bank
   factory_bot
   faraday
   faraday-retry

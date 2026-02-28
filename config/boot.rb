@@ -27,11 +27,6 @@ Delayed::Worker.destroy_failed_jobs = false
 
 require 'money/bank/uphold'
 Money.default_bank = Money::Bank::Uphold.new
-# require 'eu_central_bank'
-# eu_bank = EuCentralBank.new
-# Money.default_bank = eu_bank
-# eu_bank.update_rates
-
 Money.locale_backend = :currency
 Money.rounding_mode = BigDecimal::ROUND_HALF_EVEN
 
