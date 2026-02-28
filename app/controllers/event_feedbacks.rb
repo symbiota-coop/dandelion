@@ -59,7 +59,8 @@ Dandelion::App.controller do
 
   get '/events/:id/give_feedback' do
     @event = Event.find(params[:id]) || not_found
-    resolve_feedback_account!
+    @preview = params[:token] == 'preview'
+    resolve_feedback_account! unless @preview
     @title = "Feedback on #{@event.name}#{" for #{@account.name}" if params[:email]}"
     @event_feedback = @event.event_feedbacks.build(account: @account)
     erb :'event_feedbacks/build'
@@ -67,6 +68,7 @@ Dandelion::App.controller do
 
   post '/events/:id/give_feedback' do
     @event = Event.find(params[:id]) || not_found
+    halt 403 if params[:token] == 'preview'
     resolve_feedback_account!
     @title = "Feedback on #{@event.name}"
     @event_feedback = @event.event_feedbacks.new(mass_assigning(params[:event_feedback], EventFeedback))

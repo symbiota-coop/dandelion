@@ -1,6 +1,9 @@
 <div class="row justify-content-center">
   <div class="col-12 col-lg-8">
     <h1>Feedback on <%= @event.summary %></h1>
+    <% if @preview %>
+      <div class="alert alert-warning">This is a preview of the feedback form. Submission is disabled.</div>
+    <% end %>
     <% form_for @event_feedback, "/events/#{@event.id}/give_feedback" do |f| %>
       <% if params[:email] %>
         <%= hidden_field_tag :email, value: params[:email] %>
@@ -44,7 +47,9 @@
       <%= partial :'events/feedback_questions' %>
       <%= checkbox 'Allow this feedback to be quoted publicly', slug: :publicly_visible, checked: true %>
       <%= checkbox 'Anonymise this feedback', slug: :anonymous %>
-      <%= f.submit_block button_text: 'Submit' %>
+      <% unless @preview %>
+        <%= f.submit_block button_text: 'Submit' %>
+      <% end %>
     <% end %>
   </div>
 </div>

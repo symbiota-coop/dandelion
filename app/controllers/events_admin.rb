@@ -117,6 +117,7 @@ Dandelion::App.controller do
       content.gsub('%recipient.firstname%', current_account.firstname)
              .gsub('%recipient.token%', current_account.sign_in_token)
              .gsub('%recipient.id%', current_account.id)
+             .gsub('%recipient.feedback_token%', 'preview')
     end
   end
 
