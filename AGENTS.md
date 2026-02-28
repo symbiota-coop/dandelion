@@ -75,6 +75,7 @@ gem 'dragonfly'
 gem 'dragonfly-s3_data_store'
 gem 'mongoid'
 gem 'mongoid_paranoia'
+gem 'redis'
 
 # Authentication
 gem 'bcrypt'
@@ -104,6 +105,7 @@ gem 'ferrum', '~> 0.14.0' # scroll behaviour changed in 0.15
 gem 'honeybadger'
 gem 'jwt'
 gem 'maxmind-geoip2'
+gem 'mcp'
 gem 'mechanize'
 gem 'octokit'
 gem 'ruby-openai'
@@ -151,10 +153,6 @@ gem 'crawler_detect'
 gem 'rack-attack'
 gem 'rack-cors'
 gem 'rack-utf8_sanitizer', '1.10.1'
-gem 'redis'
-
-# MCP (Model Context Protocol)
-gem 'mcp'
 
 #  Everything else
 gem 'chroma' # for manipulating colours
