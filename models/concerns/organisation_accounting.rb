@@ -84,6 +84,7 @@ module OrganisationAccounting
                                           currency: contribution_remaining.currency,
                                           customer: stripe_customer_id,
                                           payment_method: payment_method_id,
+                                          automatic_payment_methods: { enabled: true, allow_redirects: 'never' },
                                           off_session: true,
                                           confirm: true
                                         })
