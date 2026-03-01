@@ -12,7 +12,11 @@ class DandelionBank < Money::Bank::VariableExchange
   end
 
   def update_rates
-    usd_rates = fetch_uphold_rates rescue fetch_fallback_rates
+    usd_rates = begin
+      fetch_uphold_rates
+    rescue Faraday::Error, JSON::ParserError
+      fetch_fallback_rates
+    end
     currencies = usd_rates.keys
 
     # Add direct USD pairs
@@ -44,17 +48,19 @@ class DandelionBank < Money::Bank::VariableExchange
   end
 
   # Returns { 'GBP' => 0.79, 'EUR' => 0.92, 'BTC' => 0.000015, ... } (rates per 1 USD)
+  def http
+    @http ||= Faraday.new { |f| f.options.timeout = 10; f.options.open_timeout = 5; f.response :json }
+  end
+
   def fetch_uphold_rates
-    uri = URI('https://api.uphold.com/v0/ticker/USD')
-    response = Net::HTTP.get(uri)
-    data = JSON.parse(response)
+    data = http.get('https://api.uphold.com/v0/ticker/USD').body
     rates = {}
     known = Money::Currency.table.keys.map { |k| k.to_s.upcase }
     data.each do |ticker|
       pair = ticker['pair']
       next unless pair.start_with?('USD')
 
-      currency = pair.sub('USD', '')
+      currency = pair.delete_prefix('USD')
       next unless known.include?(currency)
 
       rates[currency] = (ticker['ask'].to_f + ticker['bid'].to_f) / 2
@@ -63,13 +69,9 @@ class DandelionBank < Money::Bank::VariableExchange
   end
 
   def fetch_fallback_rates
-    uri = URI('https://api.frankfurter.app/latest?from=USD')
-    response = Net::HTTP.get(uri)
-    rates = JSON.parse(response)['rates']
+    rates = http.get('https://api.frankfurter.app/latest?from=USD').body['rates']
 
-    uri = URI('https://api.coingecko.com/api/v3/simple/price?ids=bitcoin,ethereum&vs_currencies=usd')
-    response = Net::HTTP.get(uri)
-    data = JSON.parse(response)
+    data = http.get('https://api.coingecko.com/api/v3/simple/price?ids=bitcoin,ethereum&vs_currencies=usd').body
     rates['BTC'] = 1.0 / data['bitcoin']['usd']
     rates['ETH'] = 1.0 / data['ethereum']['usd']
     rates
