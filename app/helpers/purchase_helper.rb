@@ -134,7 +134,7 @@ Dandelion::App.helpers do
 
   def process_stripe_payment(details_form, ticket_form)
     Stripe.api_key = @event.organisation.stripe_connect_json ? ENV['STRIPE_SK'] : @event.organisation.stripe_sk
-    Stripe.api_version = '2020-08-27'
+    Stripe.api_version = ENV['STRIPE_API_VERSION']
 
     event_image = get_event_image(ticket_form)
     stripe_session_hash = build_stripe_session_hash(details_form, event_image)

@@ -71,7 +71,7 @@ module OrganisationAccounting
 
   def stripe_topup
     Stripe.api_key = ENV['STRIPE_SK']
-    Stripe.api_version = '2020-08-27'
+    Stripe.api_version = ENV['STRIPE_API_VERSION']
 
     return unless stripe_customer_id && contribution_remaining > 0
     return if contribution_remaining < Money.new(1 * 100, 'GBP')

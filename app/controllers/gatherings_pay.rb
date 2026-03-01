@@ -56,7 +56,7 @@ Dandelion::App.controller do
     when 'stripe'
 
       Stripe.api_key = @gathering.stripe_sk
-      Stripe.api_version = '2020-08-27'
+      Stripe.api_version = ENV['STRIPE_API_VERSION']
       stripe_session_hash = {
         line_items: [{
           name: 'Dandelion',

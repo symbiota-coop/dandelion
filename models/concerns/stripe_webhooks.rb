@@ -7,7 +7,7 @@ module StripeWebhooks
 
   def stripe_webhooks
     Stripe.api_key = stripe_sk
-    Stripe.api_version = '2020-08-27'
+    Stripe.api_version = ENV['STRIPE_API_VERSION']
     webhooks = []
     has_more = true
     starting_after = nil
@@ -22,7 +22,7 @@ module StripeWebhooks
 
   def delete_stripe_webhook
     Stripe.api_key = stripe_sk
-    Stripe.api_version = '2020-08-27'
+    Stripe.api_version = ENV['STRIPE_API_VERSION']
     webhook = stripe_webhooks.find { |w| w['url'] == stripe_webhook_url }
     Stripe::WebhookEndpoint.delete(webhook.id) if webhook
   end
@@ -31,7 +31,7 @@ module StripeWebhooks
     return unless Padrino.env == :production
 
     Stripe.api_key = stripe_sk
-    Stripe.api_version = '2020-08-27'
+    Stripe.api_version = ENV['STRIPE_API_VERSION']
 
     return if stripe_webhooks.find { |w| w['url'] == stripe_webhook_url }
 

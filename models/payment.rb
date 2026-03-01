@@ -54,7 +54,7 @@ class Payment
     return unless payment_intent
 
     Stripe.api_key = gathering.stripe_sk
-    Stripe.api_version = '2020-08-27'
+    Stripe.api_version = ENV['STRIPE_API_VERSION']
     pi = Stripe::PaymentIntent.retrieve payment_intent
     charge = Stripe::Charge.retrieve pi.charges.first.id
     Stripe::Charge.update(charge.id, { metadata: {

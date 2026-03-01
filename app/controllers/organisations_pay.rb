@@ -50,7 +50,7 @@ Dandelion::App.controller do
     organisation_admins_only!
 
     Stripe.api_key = ENV['STRIPE_SK']
-    Stripe.api_version = '2020-08-27'
+    Stripe.api_version = ENV['STRIPE_API_VERSION']
 
     session = Stripe::Checkout::Session.create({
                                                  mode: 'setup',
@@ -68,7 +68,7 @@ Dandelion::App.controller do
     organisation_admins_only!
 
     Stripe.api_key = ENV['STRIPE_SK']
-    Stripe.api_version = '2020-08-27'
+    Stripe.api_version = ENV['STRIPE_API_VERSION']
 
     session = Stripe::Checkout::Session.retrieve(params[:session_id])
     setup_intent = Stripe::SetupIntent.retrieve(session.setup_intent)
@@ -91,7 +91,7 @@ Dandelion::App.controller do
     organisation_admins_only!
 
     Stripe.api_key = ENV['STRIPE_SK']
-    Stripe.api_version = '2020-08-27'
+    Stripe.api_version = ENV['STRIPE_API_VERSION']
 
     @organisation.set(stripe_customer_id: nil)
     redirect "/o/#{@organisation.slug}/contribute"
@@ -107,7 +107,7 @@ Dandelion::App.controller do
     when 'stripe'
 
       Stripe.api_key = ENV['STRIPE_SK']
-      Stripe.api_version = '2020-08-27'
+      Stripe.api_version = ENV['STRIPE_API_VERSION']
       stripe_session_hash = {
         line_items: [{
           name: 'Dandelion',

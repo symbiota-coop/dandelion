@@ -16,7 +16,7 @@ Dandelion::App.controller do
     when 'customer.subscription.created'
       subscription = event.data.object
       Stripe.api_key = ENV['STRIPE_SK']
-      Stripe.api_version = '2020-08-27'
+      Stripe.api_version = ENV['STRIPE_API_VERSION']
       customer = Stripe::Customer.retrieve(subscription.customer)
       email = customer.email
       if (account = Account.find_by(email: email.downcase))
@@ -62,7 +62,7 @@ Dandelion::App.controller do
     when 'stripe'
 
       Stripe.api_key = ENV['STRIPE_SK']
-      Stripe.api_version = '2020-08-27'
+      Stripe.api_version = ENV['STRIPE_API_VERSION']
       stripe_session_hash = {
         line_items: [{
           name: 'Dandelion',

@@ -42,7 +42,7 @@ class StripeTransaction
     puts "transferring transactions for #{organisation.slug} from #{from} to #{to}"
 
     Stripe.api_key = organisation.stripe_sk
-    Stripe.api_version = '2020-08-27'
+    Stripe.api_version = ENV['STRIPE_API_VERSION']
 
     run = Stripe::Reporting::ReportRun.create({
                                                 report_type: 'balance_change_from_activity.itemized.1',

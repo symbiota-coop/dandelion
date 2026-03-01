@@ -127,7 +127,7 @@ class Order
 
   def stripe_payment_status
     Stripe.api_key = event.organisation.stripe_connect_json ? ENV['STRIPE_SK'] : event.organisation.stripe_sk
-    Stripe.api_version = '2020-08-27'
+    Stripe.api_version = ENV['STRIPE_API_VERSION']
     session = Stripe::Checkout::Session.retrieve(session_id)
     session.payment_status
   end
@@ -245,12 +245,12 @@ class Order
 
     begin
       Stripe.api_key = event.organisation.stripe_sk
-      Stripe.api_version = '2020-08-27'
+      Stripe.api_version = ENV['STRIPE_API_VERSION']
       pi = Stripe::PaymentIntent.retrieve payment_intent
       transfer = Stripe::Transfer.retrieve pi.charges.first.transfer
 
       Stripe.api_key = JSON.parse(event.revenue_sharer_organisationship.stripe_connect_json)['access_token']
-      Stripe.api_version = '2020-08-27'
+      Stripe.api_version = ENV['STRIPE_API_VERSION']
       destination_payment = Stripe::Charge.retrieve transfer.destination_payment
       Stripe::Charge.update(destination_payment.id, {
                               description: "#{account.name}: #{description}",

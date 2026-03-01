@@ -25,7 +25,7 @@ module MonthlyContributionsCalculator
 
   def self.setup_stripe
     Stripe.api_key = ENV['STRIPE_SK']
-    Stripe.api_version = '2020-08-27'
+    Stripe.api_version = ENV['STRIPE_API_VERSION']
   end
 
   def self.generate_month_range

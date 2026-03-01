@@ -5,7 +5,7 @@ module Refundable
 
   def refund_via_stripe(payment_intent:, on_error:, amount: nil, refund_application_fee: false)
     Stripe.api_key = event.organisation.stripe_connect_json ? ENV['STRIPE_SK'] : event.organisation.stripe_sk
-    Stripe.api_version = '2020-08-27'
+    Stripe.api_version = ENV['STRIPE_API_VERSION']
     pi = Stripe::PaymentIntent.retrieve payment_intent, { stripe_account: event.organisation.stripe_user_id }.compact
 
     if event.revenue_sharer_organisationship
