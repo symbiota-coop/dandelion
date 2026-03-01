@@ -97,36 +97,23 @@ class Account
   end
 
   def feedback_token_for(event)
-    return unless event && (secret = ENV['SESSION_SECRET'])
+    return unless event
 
-    verifier = ActiveSupport::MessageVerifier.new(secret)
+    verifier = ActiveSupport::MessageVerifier.new(ENV['SESSION_SECRET'])
     verifier.generate("feedback:#{event.id}:#{id}")
   end
 
   def self.from_feedback_token(event, token)
     return unless event && (secret = ENV['SESSION_SECRET'])
 
-    # Try new MessageVerifier format first
     verifier = ActiveSupport::MessageVerifier.new(secret)
-    begin
-      data = verifier.verify(token)
-      prefix, event_id, account_id = data.split(':', 3)
-      return unless prefix == 'feedback' && event_id == event.id.to_s
-
-      return find_by(id: account_id)
-    rescue ActiveSupport::MessageVerifier::InvalidSignature
-      # Fall through to legacy format
-    end
-
-    # TODO: Remove legacy HMAC format support
-    account_id, signature = token.to_s.split('-', 2)
-    return unless account_id && signature
-
-    data = "#{event.id}:#{account_id}"
-    expected = OpenSSL::HMAC.hexdigest('SHA256', secret, data)[0, 16]
-    return unless ActiveSupport::SecurityUtils.secure_compare(signature, expected)
+    data = verifier.verify(token)
+    prefix, event_id, account_id = data.split(':', 3)
+    return unless prefix == 'feedback' && event_id == event.id.to_s
 
     find_by(id: account_id)
+  rescue ActiveSupport::MessageVerifier::InvalidSignature
+    nil
   end
 
   def merge(account_to_destroy)
