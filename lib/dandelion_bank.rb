@@ -10,7 +10,14 @@ class DandelionBank < Money::Bank::VariableExchange
 
   def get_rate(iso_from, iso_to, *)
     update_rates if rates_expired?
-    super
+    rate = super
+    return rate if rate
+
+    from_usd = super('USD', iso_to)
+    to_usd = super(iso_from, 'USD')
+    return from_usd * to_usd if from_usd && to_usd
+
+    nil
   end
 
   def update_rates
