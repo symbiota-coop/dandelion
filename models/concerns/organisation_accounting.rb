@@ -20,7 +20,7 @@ module OrganisationAccounting
     contributable_events.each do |event|
       c += event.contribution_gbp
     end
-    c.exchange_to(MAJOR_CURRENCIES.include?(currency) ? currency : ENV['DEFAULT_CURRENCY'])
+    c.exchange_to(FIAT_CURRENCIES.include?(currency) ? currency : ENV['DEFAULT_CURRENCY'])
   end
 
   def contribution_paid
@@ -28,7 +28,7 @@ module OrganisationAccounting
     organisation_contributions.and(payment_completed: true).each do |organisation_contribution|
       s += Money.new(organisation_contribution.amount * 100, organisation_contribution.currency)
     end
-    s.exchange_to(MAJOR_CURRENCIES.include?(currency) ? currency : ENV['DEFAULT_CURRENCY'])
+    s.exchange_to(FIAT_CURRENCIES.include?(currency) ? currency : ENV['DEFAULT_CURRENCY'])
   end
 
   def fraction_paid

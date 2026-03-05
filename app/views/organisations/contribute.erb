@@ -1,7 +1,7 @@
 <%= partial :'organisations/nav', locals: { organisation: @organisation } %>
 <%= partial :'organisations/pay', locals: { organisation: @organisation, force: true } %>
 
-<% currency = MAJOR_CURRENCIES.include?(@organisation.currency) ? @organisation.currency : ENV['DEFAULT_CURRENCY'] %>
+<% currency = FIAT_CURRENCIES.include?(@organisation.currency) ? @organisation.currency : ENV['DEFAULT_CURRENCY'] %>
 
 <% if (events = @organisation.contributable_events.order('start_time desc')).exists? %>
 

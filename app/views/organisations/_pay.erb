@@ -1,4 +1,4 @@
-<% currency = MAJOR_CURRENCIES.include?(organisation.currency) ? organisation.currency : ENV['DEFAULT_CURRENCY'] %>
+<% currency = FIAT_CURRENCIES.include?(organisation.currency) ? organisation.currency : ENV['DEFAULT_CURRENCY'] %>
 
 <% c = organisation.contributable_events.count %>
 <% r = organisation.contribution_requested %>

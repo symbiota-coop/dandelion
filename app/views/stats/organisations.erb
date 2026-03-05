@@ -13,7 +13,7 @@
 
 <%
   # Pre-fetch all orders and tickets in date range
-  orders = Order.and(:created_at.gte => @from, :created_at.lt => @to + 1.day, :value.ne => nil, :currency.in => MAJOR_CURRENCIES)
+  orders = Order.and(:created_at.gte => @from, :created_at.lt => @to + 1.day, :value.ne => nil, :currency.in => FIAT_CURRENCIES)
   tickets = Ticket.and(:created_at.gte => @from, :created_at.lt => @to + 1.day, :price.gt => 0)
   
   # Get organisations with events that have orders
