@@ -4,7 +4,7 @@ Click Organisations > Create an organisation in the sidebar. Provide the basic d
 
 ## Payments
 
-To accept payments for tickets to events created under the organisation, you must add Stripe details to your organisation.
+To accept payments for tickets to events created under the organisation, you must add details for Stripe or another payment processor in the Payments tab of your organisation's settings.
 
 ## Mailgun
 
