@@ -85,16 +85,16 @@ class DandelionBank < Money::Bank::VariableExchange
     rates = http.get('https://api.frankfurter.app/latest?from=USD').body['rates'] || {}
     rates.select! { |k, _| known_currency?(k) }
 
-    data = http.get('https://api.coingecko.com/api/v3/simple/price?ids=bitcoin,ethereum&vs_currencies=usd').body
-    if data.is_a?(Hash)
-      rates['BTC'] = 1.0 / data.dig('bitcoin', 'usd') if data.dig('bitcoin', 'usd')&.positive?
-      rates['ETH'] = 1.0 / data.dig('ethereum', 'usd') if data.dig('ethereum', 'usd')&.positive?
+    begin
+      data = http.get('https://api.coingecko.com/api/v3/simple/price?ids=bitcoin,ethereum&vs_currencies=usd').body
+      if data.is_a?(Hash)
+        rates['BTC'] = 1.0 / data.dig('bitcoin', 'usd') if data.dig('bitcoin', 'usd')&.positive?
+        rates['ETH'] = 1.0 / data.dig('ethereum', 'usd') if data.dig('ethereum', 'usd')&.positive?
+      end
+    rescue Faraday::Error, JSON::ParserError => e
+      Honeybadger.notify(e) unless rates.empty?
     end
-    rates
-  rescue Faraday::Error, JSON::ParserError => e
-    raise if rates.nil? || rates.empty?
 
-    Honeybadger.notify(e)
     rates
   end
 end
