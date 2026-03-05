@@ -47,9 +47,7 @@
       <%= partial :'events/feedback_questions' %>
       <%= checkbox 'Allow this feedback to be quoted publicly', slug: :publicly_visible, checked: true %>
       <%= checkbox 'Anonymise this feedback', slug: :anonymous %>
-      <% unless @preview %>
-        <%= f.submit_block button_text: 'Submit' %>
-      <% end %>
+      <%= f.submit_block button_text: 'Submit', disabled: @preview %>
     <% end %>
   </div>
 </div>
