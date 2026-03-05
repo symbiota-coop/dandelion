@@ -1,6 +1,5 @@
 class DandelionBank < Money::Bank::VariableExchange
   TTL = 3600 # 1 hour
-  KNOWN_CURRENCIES = Money::Currency.table.keys.map { |k| k.to_s.upcase }.freeze
 
   def initialize(*)
     super
@@ -54,6 +53,10 @@ class DandelionBank < Money::Bank::VariableExchange
     @rates_updated_at.nil? || (Time.now - @rates_updated_at) > TTL
   end
 
+  def known_currency?(iso_code)
+    Money::Currency.find(iso_code).present?
+  end
+
   def http
     @http ||= Faraday.new do |f|
       f.options.timeout = 10
@@ -71,7 +74,7 @@ class DandelionBank < Money::Bank::VariableExchange
       next unless pair.start_with?('USD')
 
       currency = pair.delete_prefix('USD')
-      next unless KNOWN_CURRENCIES.include?(currency)
+      next unless known_currency?(currency)
 
       rates[currency] = (ticker['ask'].to_f + ticker['bid'].to_f) / 2
     end
@@ -80,7 +83,7 @@ class DandelionBank < Money::Bank::VariableExchange
 
   def fetch_fallback_rates
     rates = http.get('https://api.frankfurter.app/latest?from=USD').body['rates'] || {}
-    rates.select! { |k, _| KNOWN_CURRENCIES.include?(k) }
+    rates.select! { |k, _| known_currency?(k) }
 
     data = http.get('https://api.coingecko.com/api/v3/simple/price?ids=bitcoin,ethereum&vs_currencies=usd').body
     if data.is_a?(Hash)
