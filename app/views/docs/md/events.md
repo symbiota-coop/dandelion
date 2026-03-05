@@ -151,7 +151,6 @@ Dandelion does not take any money from ticket sales. Your chosen payment process
 
 - [Stripe fees](https://stripe.com/gb/pricing) and [Stripe payout times](https://support.stripe.com/questions/common-questions-about-payout-schedules?locale=en-GB) (You may be able to change from weekly payouts to daily payouts [here](https://dashboard.stripe.com/settings/payouts))
 - [GoCardless fees](https://gocardless.com/pricing/)
-- [Coinbase Commerce fees](https://help.coinbase.com/en/commerce/getting-started/fees)
 - [Open Collective fees](https://opencollective.com/)
 
 Alternatively, you can accept completely fee-free crypto payments via Gnosis, Celo, Optimism or Base.

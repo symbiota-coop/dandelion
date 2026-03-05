@@ -26,27 +26,6 @@ Dandelion::App.controller do
     halt 200
   end
 
-  post '/g/:slug/coinbase_webhook' do
-    @gathering = Gathering.find_by(slug: params[:slug]) || not_found
-    payload = request.body.read
-    sig_header = request.env['HTTP_X_CC_WEBHOOK_SIGNATURE']
-
-    begin
-      event = CoinbaseCommerceClient::Webhook.construct_event(payload, sig_header, @gathering.coinbase_webhook_secret)
-    rescue JSON::ParserError
-      halt 400
-    rescue CoinbaseCommerceClient::Errors::SignatureVerificationError
-      halt 400
-    rescue CoinbaseCommerceClient::Errors::WebhookInvalidPayload
-      halt 400
-    end
-
-    if event.type == 'charge:confirmed' && event.data.respond_to?(:checkout) && (payment = @gathering.payments.find_by(coinbase_checkout_id: event.data.checkout.id))
-      payment.payment_completed!
-    end
-    halt 200
-  end
-
   post '/g/:slug/pay', provides: :json do
     @gathering = Gathering.find_by(slug: params[:slug]) || not_found
     @membership = @gathering.memberships.find_by(account: current_account)
@@ -77,23 +56,6 @@ Dandelion::App.controller do
       session = Stripe::Checkout::Session.create(stripe_session_hash)
       @membership.payments.create! amount: params[:amount].to_i, currency: @gathering.currency, session_id: session.id, payment_intent: session.payment_intent, payment_completed: false
       { session_id: session.id }.to_json
-
-    when 'coinbase'
-
-      client = CoinbaseCommerceClient::Client.new(api_key: @gathering.coinbase_api_key)
-
-      checkout = client.checkout.create(
-        name: 'Dandelion',
-        description: "Payment for #{@gathering.name}",
-        pricing_type: 'fixed_price',
-        local_price: {
-          amount: params[:amount].to_i,
-          currency: @gathering.currency
-        },
-        requested_info: %w[email]
-      )
-      @membership.payments.create! amount: params[:amount].to_i, currency: @gathering.currency, coinbase_checkout_id: checkout.id, payment_completed: false
-      { checkout_id: checkout.id }.to_json
 
     when 'evm'
 

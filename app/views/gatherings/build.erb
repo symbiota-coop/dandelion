@@ -14,7 +14,6 @@
 
     $('#gathering_slug, #gathering_name').keyup(function () {
       $('#slug-replace-stripe-webhook').text('<%= ENV['BASE_URI'] %>/g/' + $('#gathering_slug').val() + '/stripe_webhook');
-      $('#slug-replace-coinbase-webhook').text('<%= ENV['BASE_URI'] %>/g/' + $('#gathering_slug').val() + '/coinbase_webhook');
     }).keyup();
 
     $('#gathering-build-nav a[data-toggle="tab"]').on('show.bs.tab', function (e) {
@@ -198,7 +197,7 @@
         <%= f.wysiwyg_block :intro_for_members %>
       </div>
       <div role="tabpanel" class="tab-pane" id="tab-payments">
-        <% if !@gathering.stripe_sk && !@gathering.coinbase_api_key %>
+        <% if !@gathering.stripe_sk %>
           <div class="alert alert-warning">
             <p class="m-0"><i class="bi bi-exclamation-triangle-fill"></i> To accept payments, you must add details for at least one payment processor.</p>
           </div>
@@ -213,21 +212,6 @@
             </p>
             <%= f.text_block :stripe_pk %>
             <%= f.text_block :stripe_sk %>
-          </div>
-        </div>
-        <div class="card mb-3">
-          <div class="card-header text-white bg-primary">
-            <h4 class="my-0">Crypto payments via Coinbase Commerce</h4>
-          </div>
-          <div class="card-body pb-0">
-            <p>
-              First go to <code>Settings</code> > <code>Webhook subscriptions</code> > <code>Add an endpoint</code> and add
-              <span style="text-decoration: underline dotted">
-                <span id="slug-replace-coinbase-webhook"></span>
-              </span>
-            </p>
-            <%= f.text_block :coinbase_api_key %>
-            <%= f.text_block :coinbase_webhook_secret %>
           </div>
         </div>
         <div class="card mb-3">

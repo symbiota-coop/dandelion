@@ -27,8 +27,6 @@ module GatheringFields
     field :stripe_endpoint_secret, type: String
     field :stripe_pk, type: String
     field :stripe_sk, type: String
-    field :coinbase_api_key, type: String
-    field :coinbase_webhook_secret, type: String
     field :evm_address, type: String
     field :redirect_on_acceptance, type: String
     field :redirect_home, type: String
@@ -71,8 +69,6 @@ module GatheringFields
         stripe_endpoint_secret: 'Stripe endpoint secret',
         stripe_pk: 'Stripe public key',
         stripe_sk: 'Stripe secret key',
-        coinbase_api_key: 'Coinbase Commerce API key',
-        coinbase_webhook_secret: 'Coinbase Commerce webhook secret',
         evm_address: 'EVM address',
         privacy: 'Access',
         listed: 'List this gathering publicly',
@@ -92,8 +88,6 @@ module GatheringFields
         stripe_pk: '<code>Developers</code> > <code>API keys</code> > <code>Publishable key</code>. Starts <code>pk_live_</code>',
         stripe_sk: '<code>Developers</code> > <code>API keys</code> > <code>Secret key</code>. Starts <code>sk_live_</code>',
         stripe_endpoint_secret: '<code>Developers</code> > <code>Webhooks</code> > <code>Signing secret</code>. Starts <code>whsec_</code>',
-        coinbase_api_key: '<code>Settings</code> > <code>API keys</code>',
-        coinbase_webhook_secret: '<code>Settings</code> > <code>Webhook subscriptions</code> > <code>Show shared secret</code>',
         redirect_on_acceptance: 'Experimental',
         enable_teams: 'Create Slack/Facebook-like channels to organise different aspects of the gathering',
         enable_timetables: 'Co-create unconference-style timetables of workshops and activities',

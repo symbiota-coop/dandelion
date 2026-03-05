@@ -185,7 +185,6 @@ end
       <%== payment_button(method: 'rsvp', label: @event.rsvp_button_text || 'RSVP', dotted: false, visible: true, condition: true) %>
 
       <%== payment_button(method: 'stripe', label: 'Pay', dotted: false, condition: (@event.organisation.stripe_connect_json || @event.organisation.stripe_sk) && FIAT_CURRENCIES.include?(@event.currency)) %>
-      <%== payment_button(method: 'coinbase', label: 'Pay with crypto', condition: @event.organisation.coinbase_api_key && (FIAT_CURRENCIES.include?(@event.currency) || COINBASE_CURRENCIES.include?(@event.currency))) %>
       <%== payment_button(method: 'gocardless', label: 'Pay with GoCardless', condition: @event.organisation.gocardless_instant_bank_pay && @event.organisation.gocardless_access_token && FIAT_CURRENCIES.include?(@event.currency)) %>
       <%== payment_button(method: 'opencollective', label: 'Pay with Open Collective', condition: @event.oc_slug) %>
       <% evm_label = @event.currency.in?(['BREAD', 'USD']) ? 'Pay with BREAD on Gnosis Chain' : "Pay with #{@event.chain.try(:name)}" %>
@@ -257,7 +256,6 @@ end
     minimumApplicationFee: min_app_fee,
     stripePk: (@event.organisation.stripe_connect_json ? ENV['STRIPE_PK'] : @event.organisation.stripe_pk),
     stripeAccount: @event.revenue_sharer_organisationship && @event.direct_charges ? @event.revenue_sharer_organisationship.stripe_user_id : @event.organisation.stripe_user_id,
-    coinbase: !!@event.organisation.coinbase_api_key,
     gocardless: !!(@event.organisation.gocardless_instant_bank_pay && @event.organisation.gocardless_access_token),
     organisationOcSlug: @event.organisation.oc_slug,
     ocSlug: @event.oc_slug,

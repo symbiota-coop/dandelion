@@ -79,15 +79,6 @@
                 </button>
                 <%= hidden_field_tag :payment_method, value: 'stripe', disabled: true %>
               <% end %>
-              <% if MAJOR_CURRENCIES.include?(currency) %>
-                <div class="d-none d-lg-block">
-                  <button data-payment-method="coinbase" type="submit" class="btn mb-1 <% if FIAT_CURRENCIES.include?(currency) %> btn-outline-primary border-0  <% else %> btn-primary <% end %> " style="height: 2.125rem">
-                    via crypto
-                    <i class="bi bi-spin bi-slash-lg" style="display: none"></i>
-                  </button>
-                  <%= hidden_field_tag :payment_method, value: 'coinbase', disabled: true %>
-                </div>
-              <% end %>
             <% end %>
           </div>
 
@@ -106,8 +97,6 @@
                   if (data['session_id']) {
                     var stripe = Stripe('<%= ENV['STRIPE_PK'] %>');
                     stripe.redirectToCheckout({sessionId: data['session_id']})
-                  } else if (data['checkout_id']) {
-                    window.location = 'https://commerce.coinbase.com/checkout/' + data['checkout_id']
                   }
                 }).fail(function () {
                   $('#pay-form').hide()

@@ -116,8 +116,6 @@ Dandelion::App.helpers do
       case payment_method
       when 'stripe'
         process_stripe_payment(details_form, ticket_form)
-      when 'coinbase'
-        process_coinbase_payment
       when 'gocardless'
         process_gocardless_payment
       when 'opencollective'
@@ -231,25 +229,6 @@ Dandelion::App.helpers do
         gocardless_payment_request_id: billing_request.links.payment_request
       )
     end
-  end
-
-  def process_coinbase_payment
-    client = CoinbaseCommerceClient::Client.new(api_key: @event.organisation.coinbase_api_key)
-    checkout = client.checkout.create(
-      name: @event.name,
-      description: @order.description.truncate(200),
-      pricing_type: 'fixed_price',
-      local_price: {
-        amount: @order.total,
-        currency: @order.currency
-      },
-      requested_info: %w[email]
-    )
-    @order.update_attributes!(
-      value: @order.total.round(2),
-      coinbase_checkout_id: checkout.id
-    )
-    { checkout_id: checkout.id }.to_json
   end
 
   def process_gocardless_payment

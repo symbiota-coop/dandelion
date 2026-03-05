@@ -22,9 +22,6 @@ $(function () {
         // Stripe
         const stripe = Stripe(config.stripePk)
         stripe.redirectToCheckout({ sessionId: data.session_id })
-      } else if (data.checkout_id) {
-        // Coinbase
-        window.location = 'https://commerce.coinbase.com/checkout/' + data.checkout_id
       } else if (data.evm_secret) {
         // EVM
         $('#owed').hide()

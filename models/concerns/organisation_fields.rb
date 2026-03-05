@@ -24,8 +24,6 @@ module OrganisationFields
     field :stripe_sk, type: String
     field :stripe_customer_id, type: String
     field :card_last4, type: String
-    field :coinbase_api_key, type: String
-    field :coinbase_webhook_secret, type: String
     field :gocardless_access_token, type: String
     field :gocardless_endpoint_secret, type: String
     field :gocardless_filter, type: String
@@ -131,8 +129,6 @@ module OrganisationFields
         gocardless_endpoint_secret: 'GoCardless webhook secret',
         gocardless_instant_bank_pay: 'Enable GoCardless Instant Bank Pay',
         gocardless_subscriptions: 'Register people with active GoCardless subscriptions as monthly donors',
-        coinbase_api_key: 'Coinbase Commerce API key',
-        coinbase_webhook_secret: 'Coinbase Commerce webhook secret',
         patreon_api_key: 'Patreon API key',
         mailgun_api_key: 'Mailgun API key',
         evm_address: 'EVM address',
@@ -171,8 +167,6 @@ module OrganisationFields
         stripe_sk: '<code>Developers</code> > <code>API keys</code> > <code>Secret key</code>. Starts <code>sk_live_</code>',
         stripe_endpoint_secret: '<code>Developers</code> > <code>Webhooks</code> > <code>Signing secret</code>. Starts <code>whsec_</code>',
         stripe_client_id: 'Used for automated revenue sharing. <code>Settings</code> > <code>Connect</code> > <code>Live mode client ID</code>. Starts <code>ca_</code>',
-        coinbase_api_key: '<code>Settings</code> > <code>API keys</code>',
-        coinbase_webhook_secret: '<code>Settings</code> > <code>Webhook subscriptions</code> > <code>Show shared secret</code>',
         mailgun_api_key: '<code>Settings</code> > <code>API keys</code>',
         mailgun_domain: '<code>Sending</code> > <code>Domains</code> > <code>Add new domain</code>',
         affiliate_credit_percentage: 'When set, attendees receive a personal affiliate link in the order confirmation email. For each order made via the link, the source receives credit towards future events equal to this % of the order value.',

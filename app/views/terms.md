@@ -12,7 +12,7 @@ Please read these terms and conditions carefully before using the Dandelion tick
 1.4. You must be at least 18 years old to use Dandelion. If you are under 18, you may only use Dandelion with the involvement and consent of a parent or legal guardian.
 
 ## Ticket Purchases
-2.1. Payments are taken by third-party payment processors including Stripe and Coinbase Commerce directly to accounts run by Event Organisers. **Dandelion does not handle or receive payments for tickets on the platform.**
+2.1. Payments are taken by third-party payment processors including Stripe directly to accounts run by Event Organisers. **Dandelion does not handle or receive payments for tickets on the platform.**
 
 2.2. Ticket purchases made through Dandelion may be subject to additional terms and conditions set by respective Event Organisers.
 

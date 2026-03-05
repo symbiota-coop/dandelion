@@ -111,7 +111,6 @@ gem 'ruby-openai'
 gem 'yt'
 
 # Payments
-gem 'coinbase_commerce_client'
 gem 'gocardless_pro'
 gem 'money'
 gem 'patreon'

@@ -151,11 +151,11 @@ class Organisation
   end
 
   def payment_method?
-    stripe_connect_json || stripe_pk || coinbase_api_key || (gocardless_instant_bank_pay && gocardless_access_token) || evm_address || oc_slug
+    stripe_connect_json || stripe_pk || (gocardless_instant_bank_pay && gocardless_access_token) || evm_address || oc_slug
   end
 
   def stripe_connect_only?
-    stripe_connect_json && !stripe_pk && !coinbase_api_key && !(gocardless_instant_bank_pay && gocardless_access_token) && !evm_address && !oc_slug
+    stripe_connect_json && !stripe_pk && !(gocardless_instant_bank_pay && gocardless_access_token) && !evm_address && !oc_slug
   end
 
   def referral_revenue

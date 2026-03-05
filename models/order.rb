@@ -132,10 +132,6 @@ class Order
     session.payment_status
   end
 
-  def coinbase_payment_status
-    event.organisation.coinbase_confirmed_checkout_ids.include?(coinbase_checkout_id)
-  end
-
   def persist_gocardless_payment_id(payment_id)
     return if gocardless_payment_id.present? || payment_id.blank?
 
