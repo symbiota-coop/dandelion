@@ -99,21 +99,30 @@ class Account
   def feedback_token_for(event)
     return unless event
 
-    verifier = ActiveSupport::MessageVerifier.new(ENV['SESSION_SECRET'])
-    verifier.generate("feedback:#{event.id}:#{id}")
+    TokenEncryptor.encrypt("feedback:#{event.id}:#{id}")
   end
 
   def self.from_feedback_token(event, token)
-    return unless event && (secret = ENV['SESSION_SECRET'])
+    return unless event
 
-    verifier = ActiveSupport::MessageVerifier.new(secret)
-    data = verifier.verify(token)
+    data = TokenEncryptor.decrypt(token)
+
+    # TODO: Remove legacy fallback
+    if data.nil? && (secret = ENV['SESSION_SECRET'])
+      begin
+        verifier = ActiveSupport::MessageVerifier.new(secret)
+        data = verifier.verify(token)
+      rescue ActiveSupport::MessageVerifier::InvalidSignature
+        return nil
+      end
+    end
+
+    return unless data
+
     prefix, event_id, account_id = data.split(':', 3)
     return unless prefix == 'feedback' && event_id == event.id.to_s
 
     find_by(id: account_id)
-  rescue ActiveSupport::MessageVerifier::InvalidSignature
-    nil
   end
 
   def merge(account_to_destroy)

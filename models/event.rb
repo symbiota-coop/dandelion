@@ -366,6 +366,14 @@ class Event
   end
   handle_asynchronously :ai_tag
 
+  def feedback_preview_token
+    TokenEncryptor.encrypt("feedback_preview:#{id}")
+  end
+
+  def valid_feedback_preview_token?(token)
+    TokenEncryptor.decrypt(token) == "feedback_preview:#{id}"
+  end
+
   after_save :set_hidden_from_homepage
   def set_hidden_from_homepage
     forbidden_words = ENV['FORBIDDEN_WORDS'] ? ENV['FORBIDDEN_WORDS'].split.map(&:strip).reject(&:empty?) : []

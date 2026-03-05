@@ -71,27 +71,17 @@ Dandelion::App.helpers do
   end
 
   def encrypt_map_id(model_name, id)
-    return unless (secret = ENV['SESSION_SECRET'])
-
-    crypt = ActiveSupport::MessageEncryptor.new(secret[0, 32])
-    token = crypt.encrypt_and_sign("map:#{model_name}:#{id}")
-    Base64.urlsafe_encode64(token)
+    TokenEncryptor.encrypt("map:#{model_name}:#{id}")
   end
 
   def decrypt_map_id(token)
-    return unless token && (secret = ENV['SESSION_SECRET'])
-
-    decoded_token = Base64.urlsafe_decode64(token)
-    crypt = ActiveSupport::MessageEncryptor.new(secret[0, 32])
-    data = crypt.decrypt_and_verify(decoded_token)
+    data = TokenEncryptor.decrypt(token)
     return unless data&.start_with?('map:')
 
     parts = data.split(':', 3)
     return unless parts.length == 3
 
     { model_name: parts[1], id: parts[2] }
-  rescue ActiveSupport::MessageVerifier::InvalidSignature, ActiveSupport::MessageEncryptor::InvalidMessage, ArgumentError
-    nil
   end
 
   def map_json(points)
