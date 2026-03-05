@@ -4,13 +4,11 @@
   #payment-methods img.stripe { opacity: 0.5; }
   #payment-methods img.opencollective { opacity: 0.5; }
   #payment-methods img.gocardless { opacity: 0.33; }
-  #payment-methods img.bread { opacity: 0.33 }
 </style>
 <% {
   'gocardless.png' => 'https://gocardless.com/',
   'stripe.png' => 'https://stripe.com/',
-  'opencollective.png' => 'https://opencollective.com/',
-  'bread.png' => 'https://bread.coop/solidarity-fund',
+  'opencollective.png' => 'https://opencollective.com/'
 }.each do |k, v| %>
   <div class="col">
     <a href="<%= v %>"><img class="<%= k.split('.').first %> w-100" src="/images/payment_methods/<%= k %>" /></a>
