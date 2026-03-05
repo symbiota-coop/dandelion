@@ -1,4 +1,4 @@
-FIAT_CURRENCIES = %w[GBP EUR USD SEK DKK NOK CHF MXN CAD AUD NZD].freeze
+FIAT_CURRENCIES = %w[GBP EUR USD SEK DKK NOK CHF MXN CAD AUD NZD JPY SGD PLN INR BRL].freeze
 EVM_CURRENCIES = Token.all.map(&:symbol)
 
 MAJOR_CURRENCIES = FIAT_CURRENCIES
@@ -6,14 +6,12 @@ CRYPTOCURRENCIES = EVM_CURRENCIES
 CURRENCIES = FIAT_CURRENCIES + CRYPTOCURRENCIES
 
 CURRENCY_OPTIONS = CURRENCIES.map do |currency|
-  means = []
-  means << 'Stripe' if FIAT_CURRENCIES.include?(currency)
-  means << 'Gnosis Chain' if currency == 'USD' # BREAD
-  Chain.all.each do |chain|
-    means << chain.name if chain.tokens.map(&:symbol).include?(currency)
+  if FIAT_CURRENCIES.include?(currency)
+    [currency, currency]
+  else
+    means = Chain.all.filter_map { |c| c.name if c.tokens.map(&:symbol).include?(currency) }.uniq.join('/')
+    ["#{currency} (#{means})", currency]
   end
-
-  ["#{currency} (#{means.uniq.join('/')})", currency]
 end
 
 Money::Currency.with_options(priority: 1, symbol_first: true, subunit_to_unit: 100, decimal_mark: '.', thousands_separator: ',') do |currency|
