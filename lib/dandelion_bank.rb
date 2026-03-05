@@ -42,7 +42,7 @@ class DandelionBank < Money::Bank::VariableExchange
 
       @rates_updated_at = Time.now
     end
-  rescue StandardError => e
+  rescue Faraday::Error, JSON::ParserError => e
     raise unless @rates_updated_at
 
     Honeybadger.notify(e)
@@ -55,7 +55,11 @@ class DandelionBank < Money::Bank::VariableExchange
   end
 
   def http
-    @http ||= Faraday.new { |f| f.options.timeout = 10; f.options.open_timeout = 5; f.response :json }
+    @http ||= Faraday.new do |f|
+      f.options.timeout = 10
+      f.options.open_timeout = 5
+      f.response :json
+    end
   end
 
   # Returns { 'GBP' => 0.79, 'EUR' => 0.92, 'BTC' => 0.000015, ... } (rates per 1 USD)
