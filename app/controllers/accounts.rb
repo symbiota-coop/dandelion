@@ -234,8 +234,9 @@ Dandelion::App.controller do
   post '/accounts/:id/reset_password', provides: :json do
     halt unless current_account && (current_account.admin? || current_account.can_reset_passwords?)
     @account = Account.find(params[:id]) || not_found
-    @account.set(password: Account.generate_password)
-    @account.set(failed_sign_in_attempts: nil)
+    @account.password = Account.generate_password
+    @account.failed_sign_in_attempts = nil
+    @account.save!
     { password: @account.password }.to_json
   end
 
