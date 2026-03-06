@@ -166,6 +166,19 @@ class AccountsTest < ActiveSupport::TestCase
     assert_associated(@local_group, @existing_account, :local_groupships)
   end
 
+  test 'reset password updates crypted_password so new password works' do
+    @account = FactoryBot.create(:account)
+    original_password = @account.password
+    assert Account.authenticate(@account.email, original_password), 'Original password should work'
+
+    new_password = Account.generate_password
+    @account.set(crypted_password: BCrypt::Password.create(new_password), failed_sign_in_attempts: nil)
+    @account.reload
+
+    assert Account.authenticate(@account.email, new_password), 'New password should work after reset'
+    refute Account.authenticate(@account.email, original_password), 'Original password should no longer work'
+  end
+
   test 'existing account with event_id resubscribes unsubscribed accounts' do
     create_full_event_hierarchy
 
