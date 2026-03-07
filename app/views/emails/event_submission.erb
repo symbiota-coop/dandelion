@@ -1,0 +1,10 @@
+<div class="main">
+  <p>Hi %recipient.firstname%,</p>
+  <p>
+    <%= account.name %> submitted a new event "<%= event.name %>" to <%= event.organisation.name %>.
+  </p>
+  <p>
+    The event is currently locked and needs your review.
+    <a href="<%= ENV['BASE_URI'] %>/e/<%= event.slug %>/edit?sign_in_token=%recipient.token%">Review the event</a>
+  </p>
+</div>

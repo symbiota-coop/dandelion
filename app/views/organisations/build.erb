@@ -249,6 +249,7 @@
           <%= f.check_box_block :terms_and_conditions_check_box %>
           <%= f.check_box_block :collect_location %>
           <%= f.check_box_block :restrict_cohosting %>
+          <%= f.check_box_block :allow_public_event_submissions %>
           <%= f.check_box_block :hide_ticket_revenue %>
           <% unless @organisation.no_referrer %>
             <%= f.lookup_block :referrer_id, lookup_url: '/accounts.json', placeholder: 'Search accounts' %>

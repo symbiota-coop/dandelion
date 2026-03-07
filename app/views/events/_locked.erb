@@ -9,16 +9,20 @@
   <div class="alert alert-warning">
     <p class="mb-0">
       <i class="bi bi-exclamation-triangle-fill"></i>
-      <% if @event.locked? %>
+      <% if @event.locked? && event_lock_admin? %>
         This event is currently locked and visible to event admins only.
       <% end %>
       <% if @event.organisation && !@event.organisation.payment_method? && @event.paid_tickets? %>
         You must <a class="text-warning text-underline" href="/o/<%=@event.organisation.slug%>/edit">add details for Stripe or another payment processor in the Payments tab of your organisation</a> to take payments.
       <% elsif @event.locked? %>
-        <% if request.path.include?('/edit') %>
-          Unchecked the Locked checkbox and save to unlock it.
+        <% if event_lock_admin? %>
+          <% if request.path.include?('/edit') %>
+            Uncheck the Locked checkbox and save to unlock it.
+          <% else %>
+            <a class="text-warning text-underline" href="/events/<%= @event.id %>/edit">Edit the event</a>, uncheck the Locked checkbox and save to unlock it.
+          <% end %>
         <% else %>
-          <a class="text-warning text-underline" href="/events/<%= @event.id %>/edit">Edit the event</a>, unchecked the Locked checkbox and save to unlock it.
+          The event has been submitted for review. It's currently locked and visible to event admins only.
         <% end %>
       <% end %>
     </p>

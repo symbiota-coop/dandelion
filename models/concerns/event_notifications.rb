@@ -6,6 +6,25 @@ module EventNotifications
     handle_asynchronously :send_star_reminders
     handle_asynchronously :send_feedback_requests
     handle_asynchronously :send_waitlist_tickets_available
+    handle_asynchronously :send_public_submission_notification
+  end
+
+  def send_public_submission_notification
+    return unless organisation
+
+    mg_client = Mailgun::Client.new ENV['MAILGUN_API_KEY'], ENV['MAILGUN_REGION']
+    batch_message = Mailgun::BatchMessage.new(mg_client, ENV['MAILGUN_NOTIFICATIONS_HOST'])
+
+    event = self
+    batch_message.from ENV['NOTIFICATIONS_EMAIL_FULL']
+    batch_message.subject "New event submission: #{name}"
+    batch_message.body_html EmailHelper.html(:event_submission, event: event, account: account)
+
+    organisation.admins.each do |admin|
+      batch_message.add_recipient(:to, admin.email, { 'firstname' => admin.firstname || 'there', 'token' => admin.sign_in_token, 'id' => admin.id.to_s })
+    end
+
+    batch_message.finalize if Padrino.env == :production
   end
 
   def send_destroy_notification(destroyed_by)

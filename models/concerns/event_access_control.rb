@@ -38,5 +38,9 @@ module EventAccessControl
     def email_viewer?(event, account)
       account && event && ((event.show_emails && Event.admin?(event, account)) || Organisation.admin?(event.organisation, account))
     end
+
+    def lock_admin?(event, account)
+      revenue_admin?(event, account)
+    end
   end
 end

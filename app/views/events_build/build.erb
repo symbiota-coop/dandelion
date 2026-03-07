@@ -119,7 +119,9 @@
             <%= f.lookup_block :local_group_id, lookup_url: "/o/#{@event.organisation_id}/local_groups.json", placeholder: 'Search local groups', selected_link: (%(<a class="d-inline-block mt-1" target="_blank" href="/o/#{@event.local_group.organisation.slug}/lg/#{@event.local_group.slug}">View local group</a>) if @event.local_group) %>
           </div>
         <% end %>
-        <%= f.check_box_block :locked %>
+        <% if event_lock_admin? %>
+          <%= f.check_box_block :locked %>
+        <% end %>
         <%= f.check_box_block :secret %>
         <%= f.check_box_block :featured %>
         <%= f.check_box_block :send_order_notifications %>

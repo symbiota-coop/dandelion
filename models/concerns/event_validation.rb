@@ -27,7 +27,7 @@ module EventValidation
       end
 
       if new_record? && !duplicate
-        errors.add(:organisation, '- you are not an admin of this organisation') if !local_group && !activity && !Organisation.admin?(organisation, account)
+        errors.add(:organisation, '- you are not an admin of this organisation') if !local_group && !activity && !Organisation.admin?(organisation, account) && !organisation&.allow_public_event_submissions
         errors.add(:activity, '- you are not an admin of this activity') if activity && !Activity.admin?(activity, account)
         errors.add(:local_group, '- you are not an admin of this local group') if local_group && !LocalGroup.admin?(local_group, account)
       end

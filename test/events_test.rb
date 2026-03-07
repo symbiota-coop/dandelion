@@ -241,6 +241,37 @@ class EventsTest < ActiveSupport::TestCase
     assert_equal false, @local_group.local_groupships.find_by(account: @account).unsubscribed
   end
 
+  test 'public event submission creates draft and notifies admins' do
+    Delayed::Job.delete_all if defined?(Delayed::Job)
+    @admin_account = FactoryBot.create(:account)
+    @organisation = FactoryBot.create(:organisation, account: @admin_account, allow_public_event_submissions: true)
+    @submitter_account = FactoryBot.create(:account)
+    @event = FactoryBot.build_stubbed(:event)
+
+    login_as(@submitter_account)
+    visit "/o/#{@organisation.slug}/events"
+    assert page.has_link?('Submit an event for review'), 'Non-admin should see submit button when org allows public submissions'
+
+    click_link 'Submit an event for review'
+    fill_in 'Event title*', with: @event.name
+    execute_script %{$('#event_start_time').val('#{@event.start_time.to_fs(:db_local)}')}
+    execute_script %{$('#event_end_time').val('#{@event.end_time.to_fs(:db_local)}')}
+    click_link 'Everything else'
+    click_button 'Create event'
+
+    created_event = Event.find_by(name: @event.name)
+    assert created_event, 'Event should be created'
+    assert created_event.locked?, 'Event should be locked when submitted by non-admin'
+    assert_equal @submitter_account.id, created_event.account_id, 'Event should be attributed to submitter'
+    assert_equal 0, created_event.notifications.and(type: 'created_event').count, 'Locked submission should not create a public event notification'
+    assert_equal 1, Delayed::Job.and(handler: /send_public_submission_notification/).count, 'Submission email should be queued'
+
+    visit "/e/#{created_event.slug}/edit"
+    assert page.has_content?('Event title'), 'Submitter should be able to access edit page'
+    refute page.has_css?('label[for="event_locked"]'), 'Submitter should not see locked checkbox'
+    assert page.has_content?('submitted for review'), 'Submitter should see unlock message'
+  end
+
   test 'event with questions' do
     @account = FactoryBot.create(:account)
     @organisation = FactoryBot.create(:organisation, account: @account)

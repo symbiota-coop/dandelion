@@ -98,8 +98,10 @@ Dandelion::App.controller do
     end
     @event.account = current_account
     @event.last_saved_by = current_account
+    public_submission = @event.organisation.allow_public_event_submissions && !Event.lock_admin?(@event, current_account)
+    @event.locked = true if public_submission || (!@event.organisation.payment_method? && @event.paid_tickets?)
     if @event.save
-      @event.lock! if !@event.organisation.payment_method? && @event.paid_tickets?
+      @event.send_public_submission_notification if public_submission
       redirect "/e/#{@event.slug}?created=1"
     else
       flash.now[:error] = 'There was an error saving the event'
@@ -210,7 +212,10 @@ Dandelion::App.controller do
     process_payment(params[:detailsForm], params[:ticketForm])
   rescue Stripe::InvalidRequestError => e
     # Don't lock the event if the error is simply that the value is not high enough
-    @order.event.lock! unless e.message&.include?('must add up to at least')
+    unless e.message&.include?('must add up to at least')
+      @order.event.set(locked: true)
+      @order.event.delete_atproto
+    end
     @order.notify_of_failed_purchase(e)
     @order.destroy
     halt 400

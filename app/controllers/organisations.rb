@@ -131,7 +131,7 @@ Dandelion::App.controller do
       organisationship.set_unsubscribed!(false)
     end
     if request.xhr?
-      partial :'organisations/organisationship', locals: { organisation: @organisation, membership_toggle: params[:membership_toggle], btn_class: params[:btn_class] }
+      partial :'organisations/organisationship', locals: { organisation: @organisation, membership_toggle: params[:membership_toggle], create_event: params[:create_event], btn_class: params[:btn_class] }
     else
       redirect "/o/#{@organisation.slug}"
     end

@@ -106,6 +106,11 @@ Dandelion::App.helpers do
     kick! unless event_email_viewer?
   end
 
+  def event_lock_admin?(event = nil, account = current_account)
+    event ||= @event
+    Event.lock_admin?(event, account)
+  end
+
   def event_participant?(event = nil, account = current_account)
     event ||= @event
     Event.participant?(event, account)
