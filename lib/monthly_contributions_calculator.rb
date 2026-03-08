@@ -38,8 +38,10 @@ module MonthlyContributionsCalculator
     start_timestamp = month.to_time.to_i
     end_timestamp = (month + 1.month).to_time.to_i
 
-    monthly_contributions = process_charges(start_timestamp, end_timestamp)
-    monthly_contributions += process_fees(start_timestamp, end_timestamp)
+    charges_contrib, charges_stripe_fees = process_charges(start_timestamp, end_timestamp)
+    fees_contrib, fees_stripe_fees = process_fees(start_timestamp, end_timestamp)
+
+    monthly_contributions = charges_contrib + fees_contrib - charges_stripe_fees - fees_stripe_fees
     monthly_contributions = monthly_contributions.exchange_to('GBP')
 
     ["#{Date::MONTHNAMES[month.month]} #{month.year}", monthly_contributions.to_i]
@@ -47,10 +49,12 @@ module MonthlyContributionsCalculator
 
   def self.process_charges(start_timestamp, end_timestamp)
     contributions = Money.new(0, 'GBP')
+    stripe_fees = Money.new(0, 'GBP')
 
     charges = Stripe::Charge.list({
                                     created: { gte: start_timestamp, lt: end_timestamp },
-                                    limit: 100
+                                    limit: 100,
+                                    expand: ['data.balance_transaction']
                                   })
 
     charges.auto_paging_each do |c|
@@ -59,26 +63,36 @@ module MonthlyContributionsCalculator
       next if ENV['STRIPE_PAYMENT_INTENTS_TO_IGNORE'] && c.payment_intent.in?(ENV['STRIPE_PAYMENT_INTENTS_TO_IGNORE'].split(','))
 
       contributions += Money.new(c['amount'], c['currency'])
+      if c.balance_transaction && c.balance_transaction['fee']
+        bt = c.balance_transaction
+        stripe_fees += Money.new(bt['fee'], bt['currency'] || 'usd')
+      end
     end
 
-    contributions
+    [contributions, stripe_fees]
   end
 
   def self.process_fees(start_timestamp, end_timestamp)
     contributions = Money.new(0, 'GBP')
+    stripe_fees = Money.new(0, 'GBP')
 
     fees = Stripe::ApplicationFee.list({
                                          created: { gte: start_timestamp, lt: end_timestamp },
-                                         limit: 100
+                                         limit: 100,
+                                         expand: ['data.balance_transaction']
                                        })
 
     fees.auto_paging_each do |f|
       next if f.refunded
 
       contributions += Money.new(f['amount'], f['currency'])
+      if f.balance_transaction && f.balance_transaction['fee']
+        bt = f.balance_transaction
+        stripe_fees += Money.new(bt['fee'], bt['currency'] || 'usd')
+      end
     end
 
-    contributions
+    [contributions, stripe_fees]
   end
 
   def self.update_month_in_data(existing_data, current_month_data)
