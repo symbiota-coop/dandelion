@@ -6,7 +6,7 @@ module MonthlyContributionsCalculator
     fragment = Fragment.find_or_create_by(key: 'monthly_contributions')
 
     monthly_data = d.map { |month| calculate_month_data(month) }
-    fragment.update_attributes expires: 1.day.from_now, value: monthly_data.to_json
+    fragment.update_attributes expires: 2.days.from_now, value: monthly_data.to_json
   end
 
   def self.update_current_month
