@@ -55,12 +55,11 @@ Dandelion::App.controller do
         payment_request_id = event.to_h.dig('links', 'payment_request')
         payment_id = event.links.payment
 
-        if (@order = @organisation.orders.find_by(gocardless_payment_request_id: payment_request_id))
+        if (@order = @organisation.orders.find_by(gocardless_payment_request_id: payment_request_id, payment_completed: false))
           @order.persist_gocardless_payment_id(payment_id)
           @order.payment_completed!
           @order.send_tickets
           @order.create_order_notification
-          halt 200
         elsif (@order = Order.deleted.find_by(gocardless_payment_request_id: payment_request_id))
           begin
             @order.persist_gocardless_payment_id(payment_id)
@@ -68,10 +67,7 @@ Dandelion::App.controller do
           rescue StandardError => e
             Honeybadger.context({ event_id: event.id })
             Honeybadger.notify(e)
-            halt 200
           end
-        else
-          halt 200
         end
       end
     end

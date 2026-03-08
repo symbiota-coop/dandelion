@@ -14,7 +14,7 @@ Dandelion::App.controller do
 
     if event['type'] == 'checkout.session.completed'
       session = event['data']['object']
-      if (payment = @gathering.payments.find_by(session_id: session.id))
+      if (payment = @gathering.payments.find_by(session_id: session.id, payment_completed: false))
         begin
           payment.payment_completed!
         rescue StandardError => e
