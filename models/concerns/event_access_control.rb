@@ -10,7 +10,7 @@ module EventAccessControl
           (event.activity && Activity.admin?(event.activity, account)) ||
           (event.local_group && LocalGroup.admin?(event.local_group, account)) ||
           (event.organisation && Organisation.admin?(event.organisation, account)) ||
-          (event.cohosts.any? { |cohost| Organisation.admin?(cohost, account) })
+          event.cohosts.any? { |cohost| Organisation.admin?(cohost, account) }
       )
     end
 
@@ -27,7 +27,7 @@ module EventAccessControl
           (event.activity && Activity.admin?(event.activity, account)) ||
           (event.local_group && LocalGroup.admin?(event.local_group, account)) ||
           (event.organisation && Organisation.admin?(event.organisation, account)) ||
-          (event.cohosts.any? { |cohost| Organisation.admin?(cohost, account) })
+          event.cohosts.any? { |cohost| Organisation.admin?(cohost, account) }
       )
     end
 
@@ -40,7 +40,7 @@ module EventAccessControl
     end
 
     def lock_admin?(event, account)
-      revenue_admin?(event, account)
+      event && event.organisation.allow_public_event_submissions? ? revenue_admin?(event, account) : admin?(event, account)
     end
   end
 end
