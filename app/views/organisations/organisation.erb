@@ -41,21 +41,21 @@
   </div>
 <% end %>
 
-<% if organisation_admin? or @organisation.events_including_cohosted.live.publicly_visible.future_and_current.exists? %>
+<% if organisation_admin? || @organisation.allow_event_submissions? || @organisation.events_including_cohosted.live.publicly_visible.future_and_current.exists? %>
   <h2 class="mt-5">Events</h2>
   <div data-with-placeholder data-pagelet-url="/o/<%= @organisation.slug %>/events_block">
     <%= partial :'organisations/events_block_placeholder' %>
   </div>
 <% end %>
 
-<% if organisation_admin? or @organisation.activities.active.exists? %>
+<% if organisation_admin? || @organisation.activities.active.exists? %>
   <h2 class="mt-5">Activities</h2>
   <div data-with-placeholder data-pagelet-url="/o/<%= @organisation.slug %>/activities">
     <%= partial :placeholder %>
   </div>
 <% end %>
 
-<% if organisation_admin? or @organisation.local_groups.exists? %>
+<% if organisation_admin? || @organisation.local_groups.exists? %>
   <h2 class="mt-5">Local groups</h2>
   <div data-with-placeholder data-pagelet-url="/o/<%= @organisation.slug %>/local_groups">
     <%= partial :placeholder %>
