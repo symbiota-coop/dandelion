@@ -108,7 +108,7 @@ module OrganisationFields
     field :atproto_app_password, type: String
     field :atproto_did, type: String
     field :no_referrer, type: Mongoid::Boolean
-    field :allow_public_event_submissions, type: Mongoid::Boolean
+    field :allow_event_submissions, type: Mongoid::Boolean
   end
 
   class_methods do
@@ -156,7 +156,7 @@ module OrganisationFields
         atproto_handle: 'Bluesky/ATProto handle',
         atproto_app_password: 'Bluesky/ATProto app password',
         affiliate_credit_percentage: 'Order reward %',
-        allow_public_event_submissions: 'Allow anyone to submit events for review'
+        allow_event_submissions: 'Allow anyone to submit events for review'
       }.merge(email_human_attribute_names)[attr.to_sym] || super
     end
 
@@ -191,7 +191,7 @@ module OrganisationFields
         referrer_id: 'Credit someone for referring you to Dandelion',
         theme_color: 'Theme color when embedding your events page',
         minimal_head: 'Custom CSS/JS to include in the &lt;head&gt; when embedding your events page',
-        allow_public_event_submissions: 'When enabled, any signed-in user can submit an event. Submissions are saved as locked and admins receive an email notification.'
+        allow_event_submissions: 'When enabled, any signed-in user can submit an event. Submissions are saved as locked and admins receive an email notification.'
       }.merge(email_hints)
     end
 

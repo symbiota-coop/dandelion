@@ -244,7 +244,7 @@ class EventsTest < ActiveSupport::TestCase
   test 'public event submission creates draft and notifies admins' do
     Delayed::Job.delete_all if defined?(Delayed::Job)
     @admin_account = FactoryBot.create(:account)
-    @organisation = FactoryBot.create(:organisation, account: @admin_account, allow_public_event_submissions: true)
+    @organisation = FactoryBot.create(:organisation, account: @admin_account, allow_event_submissions: true)
     @submitter_account = FactoryBot.create(:account)
     @event = FactoryBot.build_stubbed(:event)
 

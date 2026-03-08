@@ -22,7 +22,7 @@
     <a class="pagelet-trigger btn mb-1 btn-outline-primary <%= btn_class if defined?(btn_class) %>" href="/o/<%= organisation.slug %>/organisationship?f=follow_and_subscribe">Follow</a>
 
     <% if defined?(create_event) && create_event %>
-      <% if @organisation.allow_public_event_submissions %>
+      <% if @organisation.allow_event_submissions %>
         <a class="btn mb-1 btn-outline-primary" href="/events/new?organisation_id=<%= @organisation.id %>">Submit an event for review</a>
       <% end %>
     <% end %>
@@ -58,7 +58,7 @@
     <% if defined?(create_event) && create_event %>
       <% if organisation_assistant? %>
         <a class="btn mb-1 btn-primary" href="/events/new?organisation_id=<%= @organisation.id %>">Create an event</a>
-      <% elsif @organisation.allow_public_event_submissions %>
+      <% elsif @organisation.allow_event_submissions %>
         <a class="btn mb-1 btn-primary" href="/events/new?organisation_id=<%= @organisation.id %>">Submit an event for review</a>
       <% end %>
     <% end %>

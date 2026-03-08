@@ -40,7 +40,7 @@ module EventAccessControl
     end
 
     def lock_admin?(event, account)
-      event && event.organisation.allow_public_event_submissions? ? revenue_admin?(event, account) : admin?(event, account)
+      event && event.organisation.allow_event_submissions? ? revenue_admin?(event, account) : admin?(event, account)
     end
   end
 end

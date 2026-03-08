@@ -1,5 +1,5 @@
 <a class="btn btn-primary mb-3" href="/o/<%= @organisation.slug %>/events">All events</a>
-<% if organisation_assistant? || @organisation.allow_public_event_submissions %>
+<% if organisation_assistant? || @organisation.allow_event_submissions %>
   <a class="btn btn-primary mb-3" href="/events/new?organisation_id=<%= @organisation.id %>">
     <% if organisation_assistant? %>
       Create an event
