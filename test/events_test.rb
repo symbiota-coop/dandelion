@@ -272,6 +272,45 @@ class EventsTest < ActiveSupport::TestCase
     assert page.has_content?('submitted for review'), 'Submitter should see unlock message'
   end
 
+  test 'event admin can lock but only lock admin can unlock' do
+    @org_admin = FactoryBot.create(:account)
+    @organisation = FactoryBot.create(:organisation, account: @org_admin, allow_event_submissions: true)
+    @coordinator = FactoryBot.create(:account)
+    @event = FactoryBot.create(:event,
+                               organisation: @organisation,
+                               account: @org_admin,
+                               coordinator: @coordinator,
+                               last_saved_by: @org_admin,
+                               locked: false,
+                               prices: [0])
+
+    assert Event.admin?(@event, @coordinator), 'Coordinator should be event admin'
+    refute Event.lock_admin?(@event, @coordinator), 'Coordinator should not be lock admin'
+
+    # Event admin (coordinator) can lock an unlocked event
+    login_as(@coordinator)
+    visit "/e/#{@event.slug}/edit"
+    assert page.has_css?('label[for="event_locked"]'), 'Event admin should see locked checkbox when event is unlocked'
+    find('label[for="event_locked"]').click
+    click_button 'Update event'
+    assert page.has_content?('The event was saved')
+    assert @event.reload.locked?, 'Event should be locked after event admin checks the box'
+
+    # Event admin (coordinator) cannot unlock - checkbox should be hidden
+    visit "/e/#{@event.slug}/edit"
+    refute page.has_css?('label[for="event_locked"]'), 'Event admin should not see locked checkbox when event is locked (cannot unlock)'
+    assert page.has_content?('submitted for review'), 'Non-lock-admin should see unlock message'
+
+    # Lock admin (org admin) can unlock
+    login_as(@org_admin)
+    visit "/e/#{@event.slug}/edit"
+    assert page.has_css?('label[for="event_locked"]'), 'Lock admin should see locked checkbox'
+    find('label[for="event_locked"]').click
+    click_button 'Update event'
+    assert page.has_content?('The event was saved')
+    refute @event.reload.locked?, 'Event should be unlocked after lock admin unchecks the box'
+  end
+
   test 'event with questions' do
     @account = FactoryBot.create(:account)
     @organisation = FactoryBot.create(:organisation, account: @account)
