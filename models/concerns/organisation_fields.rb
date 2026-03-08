@@ -191,7 +191,7 @@ module OrganisationFields
         referrer_id: 'Credit someone for referring you to Dandelion',
         theme_color: 'Theme color when embedding your events page',
         minimal_head: 'Custom CSS/JS to include in the &lt;head&gt; when embedding your events page',
-        allow_event_submissions: 'When enabled, any signed-in user can submit an event. Submissions are saved as locked and admins receive an email notification.'
+        allow_event_submissions: 'When enabled, any signed-in user can submit an event. Submissions are initially visible only to admins, who receive an email notification.'
       }.merge(email_hints)
     end
 
