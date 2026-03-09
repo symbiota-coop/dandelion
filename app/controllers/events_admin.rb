@@ -12,7 +12,10 @@ Dandelion::App.controller do
     event_admins_only!
     @event.last_saved_by = current_account
     params[:event].delete('locked') if @event.locked? && !Event.lock_admin?(@event, current_account)
-    @event.locked = true if !@event.organisation.payment_method? && @event.paid_tickets?
+    if !@event.organisation.payment_method? && @event.paid_tickets?
+      params[:event].delete('locked')
+      @event.locked = true
+    end
     if @event.update_attributes(mass_assigning(params[:event], Event))
       @event.delete_atproto if @event.locked
       flash[:notice] = 'The event was saved.'
