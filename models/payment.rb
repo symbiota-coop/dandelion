@@ -44,9 +44,8 @@ class Payment
 
   def payment_completed!
     set(payment_completed: true)
-    membership.set(paid: membership.paid + amount)
-    gathering.set(processed_via_dandelion: gathering.processed_via_dandelion + amount)
-    gathering.set(balance: gathering.balance + amount)
+    membership.inc(paid: amount)
+    gathering.inc(processed_via_dandelion: amount, balance: amount)
     notifications.create! circle: circle, type: 'created_payment' unless gathering.hide_paid || gathering.options.any?(&:hide_members)
   end
 

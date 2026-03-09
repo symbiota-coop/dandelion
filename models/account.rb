@@ -306,7 +306,7 @@ class Account
       account.set(failed_sign_in_attempts: 0)
       account
     else
-      account.set(failed_sign_in_attempts: (account.failed_sign_in_attempts || 0) + 1)
+      account.inc(failed_sign_in_attempts: 1)
       nil
     end
   end

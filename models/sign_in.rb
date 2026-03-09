@@ -10,7 +10,7 @@ class SignIn
 
   after_create do
     unless skip_increment
-      account.set(sign_ins_count: account.sign_ins_count + 1)
+      account.inc(sign_ins_count: 1)
       account.set(has_signed_in: true)
     end
   end
