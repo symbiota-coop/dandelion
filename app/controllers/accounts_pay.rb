@@ -9,7 +9,7 @@ Dandelion::App.controller do
     case event['type']
     when 'checkout.session.completed'
       session = event['data']['object']
-      if (account_contribution = AccountContribution.find_by(session_id: session.id))
+      if (account_contribution = AccountContribution.find_by(session_id: session.id, payment_completed: false))
         account_contribution.set(payment_completed: true)
         account_contribution.send_notification
       end

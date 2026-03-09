@@ -14,7 +14,7 @@ Dandelion::App.controller do
 
     if event['type'] == 'checkout.session.completed'
       session = event['data']['object']
-      if (organisation_contribution = OrganisationContribution.find_by(session_id: session.id))
+      if (organisation_contribution = OrganisationContribution.find_by(session_id: session.id, payment_completed: false))
         organisation_contribution.payment_completed = true
         organisation_contribution.save
         organisation_contribution.send_notification

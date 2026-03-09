@@ -55,13 +55,13 @@ Dandelion::App.controller do
         payment_request_id = event.to_h.dig('links', 'payment_request')
         payment_id = event.links.payment
 
-        if (@order = @organisation.orders.find_by(gocardless_payment_request_id: payment_request_id))
+        if (@order = @organisation.orders.find_by(gocardless_payment_request_id: payment_request_id, payment_completed: false))
           @order.persist_gocardless_payment_id(payment_id)
           @order.payment_completed!
           @order.send_tickets
           @order.create_order_notification
           halt 200
-        elsif (@order = Order.deleted.find_by(gocardless_payment_request_id: payment_request_id))
+        elsif (@order = Order.deleted.find_by(gocardless_payment_request_id: payment_request_id, payment_completed: false))
           begin
             @order.persist_gocardless_payment_id(payment_id)
             @order.restore_and_complete
