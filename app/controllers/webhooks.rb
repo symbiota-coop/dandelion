@@ -54,6 +54,7 @@ Dandelion::App.controller do
       elsif event.resource_type == 'payments' && event.action == 'confirmed'
         payment_request_id = event.to_h.dig('links', 'payment_request')
         payment_id = event.links.payment
+        halt 200 unless payment_request_id
 
         if (@order = @organisation.orders.find_by(gocardless_payment_request_id: payment_request_id, payment_completed: false))
           @order.persist_gocardless_payment_id(payment_id)
