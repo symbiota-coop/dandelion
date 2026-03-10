@@ -74,8 +74,10 @@ class Membership
     batch_message.from ENV['NOTIFICATIONS_EMAIL_FULL']
     batch_message.subject "You're now a member of #{gathering.name}"
     batch_message.body_html EmailHelper.html(content: gathering.welcome_email) do |content|
-      content.gsub('%gathering.name%', gathering.name)
-             .gsub('%sign_in_details%', sign_in_details)
+      EmailHelper.replace_youtube_oembeds(
+        content.gsub('%gathering.name%', gathering.name)
+               .gsub('%sign_in_details%', sign_in_details)
+      )
     end
 
     batch_message.add_recipient(:to, account.email, { 'firstname' => account.firstname || 'there', 'token' => account.sign_in_token, 'id' => account.id.to_s })

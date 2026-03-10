@@ -164,7 +164,7 @@ class Organisationship
     content = %(
     #{header}
     <div class="main">
-      #{organisation.welcome_body}
+      #{EmailHelper.replace_youtube_oembeds(organisation.welcome_body)}
     </div>)
     batch_message.from organisation.welcome_from
     batch_message.subject organisation.welcome_subject
@@ -218,7 +218,7 @@ class Organisationship
     content = %(
     #{header}
     <div class="main">
-      #{monthly_donation_welcome_body}
+      #{EmailHelper.replace_youtube_oembeds(monthly_donation_welcome_body)}
     </div>)
     batch_message.from organisation.monthly_donation_welcome_from
     batch_message.subject organisation.monthly_donation_welcome_subject
