@@ -1,5 +1,8 @@
 name: Daily Bug Review
 
+env:
+  CLAUDE_MODEL: claude-opus-4-6
+
 on:
   schedule:
     - cron: '0 8 * * 1-5' # 8am UTC, Mon–Fri
@@ -19,12 +22,11 @@ jobs:
         with:
           fetch-depth: 50
 
-      - name: Run bug review
-        uses: anthropics/claude-code-action@beta
+      - uses: anthropics/claude-code-action@beta
         with:
           mode: agent
           claude_code_oauth_token: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
-
+          model: ${{ env.CLAUDE_MODEL }}
           override_prompt: |
             You are a deep bug-finding automation for Dandelion, a Ruby/Mongo app built on
             the Padrino framework (Sinatra-based, NOT Rails). The ORM is Mongoid, not ActiveRecord.
