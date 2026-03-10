@@ -22,9 +22,10 @@ jobs:
       - name: Run bug review
         uses: anthropics/claude-code-action@beta
         with:
+          mode: agent
           claude_code_oauth_token: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
 
-          direct_prompt: |
+          override_prompt: |
             You are a deep bug-finding automation for Dandelion, a Ruby/Mongo app built on
             the Padrino framework (Sinatra-based, NOT Rails). The ORM is Mongoid, not ActiveRecord.
             Read AGENTS.md at the repo root for full setup and architecture context.
