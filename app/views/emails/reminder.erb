@@ -14,11 +14,12 @@
 
   <hr />
 
-  <%= (event.reminder_email_body || event.organisation.reminder_email_body)
+  <%= EmailHelper.replace_youtube_oembeds(
+        (event.reminder_email_body || event.organisation.reminder_email_body)
         .gsub('[firstname]', '%recipient.firstname%')
         .gsub('[event_link]', "<a href='#{ENV['BASE_URI']}/e/#{event.slug}'>#{event.name}</a>")
         .gsub('[key_information_again]', event.extra_info_for_ticket_email ? "<p>Here's the key information again for your convenience:</p><hr><p>#{event.extra_info_for_ticket_email}</p>" : '')
-        %>
+      ) %>
 </div>
 <div class="footer">
   <a href="<%= ENV['BASE_URI'] %>/accounts/subscriptions?sign_in_token=%recipient.token%">Opt out of reminders</a>

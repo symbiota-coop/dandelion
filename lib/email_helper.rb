@@ -1,6 +1,19 @@
 module EmailHelper
   MICROSOFT_DOMAINS = %w[hotmail msn outlook live].freeze
 
+  def self.replace_youtube_oembeds(html)
+    return html unless html
+
+    html
+      .gsub(%r{<oembed url="https://(?:youtu\.be/|www\.youtube\.com/watch\?v=)(\w+)"></oembed>}) do
+        video_id = ::Regexp.last_match(1)
+        title = Yt::Video.new(id: video_id).title
+        %(<div><a href="https://www.youtube.com/watch?v=#{video_id}"><img src="#{ENV['BASE_URI']}/youtube_thumb/#{video_id}"></a><span>#{title}</span></div>)
+      end
+      .gsub(/<figure([^>]*)>/, '<div\1>').gsub('</figure>', '</div>')
+                                         .gsub(/<figcaption([^>]*)>/, '<span\1>').gsub('</figcaption>', '</span>')
+  end
+
   def self.mailgun_host(email, default_host)
     return default_host unless ENV['MICROSOFT_EMAIL_WORKAROUND']
     return default_host unless email

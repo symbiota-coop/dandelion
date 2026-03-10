@@ -7,6 +7,6 @@
   </p>
   <% if activity.extra_info_for_acceptance_email %>
     <hr>
-    <%= activity.extra_info_for_acceptance_email %>
+    <%= EmailHelper.replace_youtube_oembeds(activity.extra_info_for_acceptance_email) %>
   <% end %>
 </div>

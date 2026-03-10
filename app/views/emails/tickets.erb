@@ -17,7 +17,8 @@
 
   <% end %>
 
-  <%= ((event.recording? ? event.recording_email_greeting : event.ticket_email_greeting) || (event.recording? ? event.organisation.recording_email_greeting : event.organisation.ticket_email_greeting))
+  <%= EmailHelper.replace_youtube_oembeds(
+        ((event.recording? ? event.recording_email_greeting : event.ticket_email_greeting) || (event.recording? ? event.organisation.recording_email_greeting : event.organisation.ticket_email_greeting))
         .gsub('[firstname]', account.firstname)
         .gsub('[lastname]', account.lastname || '')
         .gsub('[fullname]', account.name)
@@ -27,23 +28,23 @@
         .gsub('[event_url]', "#{ENV['BASE_URI']}/e/#{event.slug}")
         .gsub(' [at_event_location_if_not_online]', event.online? ? '' : " at #{event.location}")
         .gsub('[tickets_are]', order.tickets.length == 1 ? 'ticket is' : 'tickets are')
-        %>
+      ) %>
 
   <% if event.recording? %>
     <% if event.extra_info_for_recording_email %>
       <hr>
-      <%= event.extra_info_for_recording_email %>
+      <%= EmailHelper.replace_youtube_oembeds(event.extra_info_for_recording_email) %>
     <% end %>
   <% else %>
     <% if event.extra_info_for_ticket_email %>
       <hr>
-      <%= event.extra_info_for_ticket_email %>
+      <%= EmailHelper.replace_youtube_oembeds(event.extra_info_for_ticket_email) %>
     <% end %>
   <% end %>
   <% if !event.hide_organisation_footer %>
     <% if event.organisation.extra_info_for_ticket_email %>
       <hr>
-      <%= event.organisation.extra_info_for_ticket_email %>
+      <%= EmailHelper.replace_youtube_oembeds(event.organisation.extra_info_for_ticket_email) %>
     <% end %>
     <% if !event.recording? && event.organisation.show_ticketholder_link_in_ticket_emails %>
       <p>

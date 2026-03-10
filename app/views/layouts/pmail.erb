@@ -53,7 +53,7 @@
           <%= markdown = Redcarpet::Markdown.new(Redcarpet::Render::HTML.new(hard_wrap: true), autolink: true, tables: true)
             markdown.render(pmail.body) %>
         <% else %>
-          <%= pmail.body_with_additions %>
+          <%= EmailHelper.replace_youtube_oembeds(pmail.body) %>
         <% end %>
       </div>
     </div>
