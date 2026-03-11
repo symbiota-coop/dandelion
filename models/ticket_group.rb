@@ -21,6 +21,6 @@ class TicketGroup
   end
 
   def places_remaining
-    capacity - tickets.count
+    capacity - tickets.and(made_available_at: nil).count
   end
 end

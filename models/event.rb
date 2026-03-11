@@ -212,7 +212,7 @@ class Event
   end
 
   def places_remaining
-    capacity - tickets.count if capacity
+    capacity - tickets.and(made_available_at: nil).count if capacity
   end
 
   def time_zone_or_default
