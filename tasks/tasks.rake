@@ -21,7 +21,7 @@ namespace :hourly do
     puts 'event reminders'
     Event.live.future.and(:reminder_hours_before.ne => nil, :sent_reminders_at => nil).each do |event|
       reminder_time = event.start_time - event.reminder_hours_before.hours
-      next unless reminder_time <= Time.now
+      next unless reminder_time <= Time.now + 1.hour
 
       event.send_reminders(:all)
     end
