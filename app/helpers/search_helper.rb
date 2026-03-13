@@ -46,7 +46,7 @@ Dandelion::App.helpers do
       next if model_class && config_model_class != model_class
 
       scope = config_model_class.search_scope
-      items = config_model_class.search(q, scope, limit: 5, build_records: true, phrase_boost: 1.5, text_search: true, vector_weight: 0.5)
+      items = config_model_class.search(q, scope, limit: 5, build_records: true, phrase_boost: 1.5, text_search: true, vector_weight: 0)
       prefix = search_prefix(config_model_class)
       results += items.map do |item|
         {
