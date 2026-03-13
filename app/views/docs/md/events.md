@@ -62,6 +62,16 @@ First, [add a tax rate on Stripe](https://dashboard.stripe.com/tax-rates) (for t
 
 To enable automated receipts for Stripe payments, toggle 'Successful payments' on in your [customer emails settings](https://dashboard.stripe.com/settings/emails).
 
+## Taking payments with Open Collective
+
+If your organisation has an [Open Collective](https://opencollective.com/) account, you can accept payments through it:
+
+1. Go to your organisation settings and enter your Open Collective organisation slug under **Payments** (e.g. if your Open Collective URL is `https://opencollective.com/my-org`, the slug is `my-org`)
+2. Create an event on Open Collective under your organisation
+3. Edit your Dandelion event and enter the Open Collective event slug in the **Open Collective event slug** field under **Everything else**
+
+Ticket buyers will then see a 'Pay with Open Collective' option at checkout.
+
 ## Get email notifications of orders
 
 Make sure the 'Send email notifications of orders' checkbox is checked in the first tab 'Basics' when creating/editing your event.
