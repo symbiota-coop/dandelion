@@ -22,7 +22,21 @@ jobs:
         with:
           fetch-depth: 50
 
+      - name: Check for recent commits
+        id: check-commits
+        run: |
+          COMMITS=$(git log --since='24 hours ago' --oneline --no-merges)
+          if [ -z "$COMMITS" ]; then
+            echo "No commits in the past 24 hours"
+            echo "has_commits=false" >> $GITHUB_OUTPUT
+          else
+            echo "Found commits:"
+            echo "$COMMITS"
+            echo "has_commits=true" >> $GITHUB_OUTPUT
+          fi
+
       - uses: anthropics/claude-code-action@beta
+        if: steps.check-commits.outputs.has_commits == 'true'
         with:
           mode: agent
           claude_code_oauth_token: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
@@ -33,11 +47,12 @@ jobs:
             Read AGENTS.md at the repo root for full setup and architecture context.
 
             ## Goal
-            Inspect recent commits and identify critical correctness bugs that escaped review.
-            Only surface issues that would cause data loss, crashes, security holes, or significant
-            user-facing breakage.
+            Inspect commits from the past 24 hours and identify critical correctness bugs that
+            escaped review. Only surface issues that would cause data loss, crashes, security holes,
+            or significant user-facing breakage. Do not review older commits.
 
             ## Investigation strategy
+            - Only review files changed in commits from the past 24 hours.
             - Focus on behavioral changes with meaningful blast radius.
             - Look for: data corruption, race conditions that lose writes, nil dereferences in
               critical paths (note: Mongoid.raise_not_found_error = false so Model.find returns nil
