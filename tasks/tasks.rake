@@ -19,9 +19,9 @@ namespace :hourly do
     end
     Gathering.and(:evm_address.ne => nil).each(&:check_evm_account)
     puts 'event reminders'
-    Event.live.future.and(:reminder_hours_before.ne => nil, :sent_reminders_at => nil).each do |event|
-      reminder_time = event.start_time - event.reminder_hours_before.hours
-      next unless reminder_time <= Time.now + 1.hour
+    now = Time.now
+    Event.live.and(:start_time.gt => now, :reminder_hours_before.ne => nil, :sent_reminders_at => nil).each do |event|
+      next unless event.reminder_due_within?(1.hour, now)
 
       event.send_reminders(:all)
     end

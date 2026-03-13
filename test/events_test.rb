@@ -69,6 +69,20 @@ class EventsTest < ActiveSupport::TestCase
     assert page.has_content? name
   end
 
+  test 'reminder is due when its send time falls within the next hour' do
+    now = Time.utc(2026, 3, 13, 8, 55, 0)
+    event = Event.new(start_time: Time.utc(2026, 3, 13, 10, 0, 0), reminder_hours_before: 1)
+
+    assert event.reminder_due_within?(1.hour, now)
+  end
+
+  test 'reminder is not due once the event has started' do
+    now = Time.utc(2026, 3, 13, 10, 0, 0)
+    event = Event.new(start_time: now - 5.minutes, reminder_hours_before: 1)
+
+    refute event.reminder_due_within?(1.hour, now)
+  end
+
   test 'booking onto a free event' do
     @account = FactoryBot.create(:account)
     @organisation = FactoryBot.create(:organisation, account: @account)

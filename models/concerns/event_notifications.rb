@@ -71,6 +71,16 @@ module EventNotifications
     set(sent_reminders_at: Time.now) if account_id == :all
   end
 
+  def reminder_due_within?(window, from = Time.now)
+    return false unless reminder_hours_before
+    return false unless start_time
+    return false if sent_reminders_at
+    return false if start_time <= from
+
+    reminder_time = start_time - reminder_hours_before.hours
+    reminder_time <= from + window
+  end
+
   def send_star_reminders(account_id)
     return unless organisation
 

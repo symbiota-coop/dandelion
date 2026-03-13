@@ -5,7 +5,7 @@ env:
 
 on:
   schedule:
-    - cron: '0 4 * * 1-5'
+    - cron: '0 4 * * *'
   workflow_dispatch:
 
 jobs:
@@ -27,7 +27,7 @@ jobs:
         run: |
           COMMITS=$(git log --since='24 hours ago' --oneline --no-merges)
           if [ -z "$COMMITS" ]; then
-            echo "No commits in the past 24 hours"
+            echo "No commits in the review window"
             echo "has_commits=false" >> $GITHUB_OUTPUT
           else
             echo "Found commits:"
