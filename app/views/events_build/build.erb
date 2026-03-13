@@ -218,6 +218,7 @@
           <% if @event.persisted? %>
             <p style="margin-top: -1rem"><a target="_blank" href="/events/<%=@event.id%>/reminder_email">Preview reminder email &rarr;</a></p>
           <% end %>
+          <%= f.number_block :reminder_hours_before %>
         </div>
         <div class="mt-5">
           <%= f.text_block :feedback_email_title %>
@@ -247,7 +248,6 @@
         <% if current_account.memberships.and(admin: true).exists? %>
           <%= f.select_block :gathering_id, options: [''] + current_account.memberships.and(admin: true).map { |m| [m.gathering.name, m.gathering_id] }.sort_by { |a,b| a } %>
         <% end %>
-        <%= f.number_block :reminder_hours_before %>
         <%= f.check_box_block :no_tickets_pdf %>
         <%= f.check_box_block :monthly_donors_only %>
         <%= f.check_box_block :no_sales_after_end_time %>

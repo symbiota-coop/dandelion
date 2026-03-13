@@ -148,7 +148,7 @@ module EventFields
         purchase_url: "URL where people can buy tickets (if you're not selling tickets on Dandelion)",
         capacity: 'Caps the total number of tickets issued across all ticket types. Optional',
         send_order_notifications: 'Send email notifications of orders to event facilitators',
-        reminder_hours_before: 'Number of hours before the event to send the reminder email. Leave blank to skip the reminder',
+        reminder_hours_before: 'Number of hours before the event to send the reminder email. Leave blank to skip the reminder.',
         stripe_revenue_adjustment: 'Positive or negative adjustment to the revenue reported by Stripe, e.g. +20 or -10',
         enable_resales: 'Allow ticketholders to resell tickets via the event once a ticket type sells out (experimental)',
         hide_few_left: "Hide the 'few tickets left' labels at checkout when tickets are running low",
