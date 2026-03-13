@@ -45,7 +45,7 @@ module EventNotifications
 
   def send_reminders(account_id)
     return unless organisation
-    return if prevent_reminders
+    return unless reminder_hours_before
 
     mg_client = Mailgun::Client.new ENV['MAILGUN_API_KEY'], ENV['MAILGUN_REGION']
     batch_message = Mailgun::BatchMessage.new(mg_client, ENV['MAILGUN_NOTIFICATIONS_HOST'])

@@ -247,8 +247,8 @@
         <% if current_account.memberships.and(admin: true).exists? %>
           <%= f.select_block :gathering_id, options: [''] + current_account.memberships.and(admin: true).map { |m| [m.gathering.name, m.gathering_id] }.sort_by { |a,b| a } %>
         <% end %>
+        <%= f.number_block :reminder_hours_before %>
         <%= f.check_box_block :no_tickets_pdf %>
-        <%= f.check_box_block :prevent_reminders %>
         <%= f.check_box_block :monthly_donors_only %>
         <%= f.check_box_block :no_sales_after_end_time %>
         <%= f.check_box_block :show_after_start_time %>

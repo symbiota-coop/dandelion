@@ -81,6 +81,7 @@ Dandelion::App.controller do
       @event.opt_in_organisation = true
       @event.opt_in_facilitator = true unless @event.organisation.name == current_account.name
       @event.ask_hear_about = true
+      @event.reminder_hours_before = 24
       erb :'events_build/build'
     end
   end

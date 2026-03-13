@@ -51,6 +51,7 @@ module EventFields
     field :theme_color, type: String
     field :embedding, type: Array
     field :atproto_uri, type: String
+    field :reminder_hours_before, type: Integer
 
     field :revenue_share_to_revenue_sharer, type: Integer
     field :profit_share_to_organiser, type: Integer
@@ -59,13 +60,12 @@ module EventFields
     field :profit_share_to_social_media, type: Integer
     field :stripe_revenue_adjustment, type: Float
 
-    %w[no_discounts hide_deleted_filters hide_attendees hide_discussion refund_deleted_orders monthly_donors_only locked secret show_emails featured opt_in_organisation opt_in_facilitator hide_few_left hide_organisation_footer ask_hear_about send_order_notifications raw_description prevent_reminders trending hide_from_carousels no_tickets_pdf half_width_images enable_resales donations_to_organisation browsable hide_unavailable_tickets hidden_from_homepage blank_price_for_free_tickets ai_tagged sold_out_cache sold_out_due_to_sales_end_cache has_organisation minimal_only direct_charges no_sales_after_end_time always_show_full_ticket_form show_after_start_time has_recording].each do |b|
+    %w[no_discounts hide_deleted_filters hide_attendees hide_discussion refund_deleted_orders monthly_donors_only locked secret show_emails featured opt_in_organisation opt_in_facilitator hide_few_left hide_organisation_footer ask_hear_about send_order_notifications raw_description trending hide_from_carousels no_tickets_pdf half_width_images enable_resales donations_to_organisation browsable hide_unavailable_tickets hidden_from_homepage blank_price_for_free_tickets ai_tagged sold_out_cache sold_out_due_to_sales_end_cache has_organisation minimal_only direct_charges no_sales_after_end_time always_show_full_ticket_form show_after_start_time has_recording].each do |b|
       field b.to_sym, type: Mongoid::Boolean
     end
   end
 
   class_methods do
-
     def human_attribute_name(attr, options = {})
       {
         description: 'Public event description',
@@ -93,7 +93,7 @@ module EventFields
         capacity: 'Total capacity',
         gathering_id: 'Add people that buy tickets to this gathering',
         send_order_notifications: 'Send email notifications of orders',
-        prevent_reminders: 'Prevent reminder email',
+        reminder_hours_before: 'Hours before the event to send the reminder email',
         oc_slug: 'Open Collective event slug',
         no_tickets_pdf: "Don't include tickets PDF in confirmation email",
         hide_few_left: "Hide 'few tickets left' labels",
@@ -148,7 +148,7 @@ module EventFields
         purchase_url: "URL where people can buy tickets (if you're not selling tickets on Dandelion)",
         capacity: 'Caps the total number of tickets issued across all ticket types. Optional',
         send_order_notifications: 'Send email notifications of orders to event facilitators',
-        prevent_reminders: 'Prevent reminder email from being sent before the event',
+        reminder_hours_before: 'Number of hours before the event to send the reminder email. Leave blank to skip the reminder',
         stripe_revenue_adjustment: 'Positive or negative adjustment to the revenue reported by Stripe, e.g. +20 or -10',
         enable_resales: 'Allow ticketholders to resell tickets via the event once a ticket type sells out (experimental)',
         hide_few_left: "Hide the 'few tickets left' labels at checkout when tickets are running low",

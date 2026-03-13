@@ -18,6 +18,13 @@ namespace :hourly do
       event.check_oc_event if event.orders.and(:payment_completed => false, :oc_secret.ne => nil, :event_id => event.id).exists?
     end
     Gathering.and(:evm_address.ne => nil).each(&:check_evm_account)
+    puts 'event reminders'
+    Event.live.future.and(:reminder_hours_before.ne => nil, :sent_reminders_at => nil).each do |event|
+      reminder_time = event.start_time - event.reminder_hours_before.hours
+      next unless reminder_time <= Time.now
+
+      event.send_reminders(:all)
+    end
     current_hour = TZInfo::Timezone.get(Asn::TIMEZONE).to_local(Time.now.utc).hour
     if (current_hour % Asn::WINDOW_LENGTH).zero?
       puts 'autoblock ASNs'
@@ -28,8 +35,6 @@ end
 
 namespace :morning do
   task errands: :environment do
-    puts 'event reminders'
-    Event.live.and(:start_time.gte => Date.tomorrow, :start_time.lt => Date.tomorrow + 1).each { |event| event.send_reminders(:all) }
     puts 'star reminders'
     Event.live.and(:start_time.gte => Date.tomorrow + 6, :start_time.lt => Date.tomorrow + 7).each { |event| event.send_star_reminders(:all) }
   end
