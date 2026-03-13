@@ -42,9 +42,8 @@ jobs:
           claude_code_oauth_token: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
           model: ${{ env.CLAUDE_MODEL }}
           override_prompt: |
-            You are a deep bug-finding automation for Dandelion, a Ruby/Mongo app built on
-            the Padrino framework (Sinatra-based, NOT Rails). The ORM is Mongoid, not ActiveRecord.
-            Read AGENTS.md at the repo root for full setup and architecture context.
+            You are a deep bug-finding automation for Dandelion.
+            Read AGENTS.md at the repo root for setup and architecture context.
 
             ## Goal
             Inspect commits from the past 24 hours and identify critical correctness bugs that
@@ -55,12 +54,11 @@ jobs:
             - Only review files changed in commits from the past 24 hours.
             - Focus on behavioral changes with meaningful blast radius.
             - Look for: data corruption, race conditions that lose writes, nil dereferences in
-              critical paths (note: Mongoid.raise_not_found_error = false so Model.find returns nil
-              for invalid ids), auth/permission bypasses, infinite loops, resource leaks, silent
+              critical paths, auth/permission bypasses, infinite loops, resource leaks, silent
               data truncation, and Mongoid query mistakes (e.g. wrong query operators, missing
               scoping on multi-tenant data).
             - Trace through the full code path — don't just pattern-match on the diff. Understand
-              the caller chain and downstream effects. Files in lib/ are auto-loaded by Padrino.
+              the caller chain and downstream effects.
             - Ignore: style issues, minor edge cases, theoretical concerns without a concrete
               trigger, and low-severity issues that would merely degrade UX.
 
@@ -71,8 +69,7 @@ jobs:
 
             ## Fix strategy
             - If you find a critical bug, implement a minimal, high-confidence fix.
-            - Add or update tests when possible (run tests with:
-              foreman run -e .env.test bundle exec ruby -I test test/$1_test.rb).
+            - Add or update tests when possible.
             - Avoid broad refactors in the same PR.
 
             ## Safety rules
