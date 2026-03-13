@@ -66,9 +66,9 @@ To enable automated receipts for Stripe payments, toggle 'Successful payments' o
 
 If your organisation has an [Open Collective](https://opencollective.com/) account, you can accept payments through it:
 
-1. Go to your organisation settings and enter your Open Collective organisation slug under **Payments** (e.g. if your Open Collective URL is `https://opencollective.com/my-org`, the slug is `my-org`)
+1. Go to the Payments tab in your organisation's settings and enter your Open Collective organisation slug (e.g. if your Open Collective URL is `https://opencollective.com/mystica`, the slug is `mystica`)
 2. Create an event on Open Collective under your organisation
-3. Edit your Dandelion event and enter the Open Collective event slug in the **Open Collective event slug** field under **Everything else**
+3. Edit your Dandelion event and enter the Open Collective event slug under Everything else
 
 Ticket buyers will then see a 'Pay with Open Collective' option at checkout.
 
