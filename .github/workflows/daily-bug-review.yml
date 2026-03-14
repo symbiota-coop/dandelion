@@ -40,7 +40,7 @@ jobs:
           claude_code_oauth_token: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
           claude_args: |
             --model ${{ env.CLAUDE_MODEL }}
-            --allowedTools "Write,Bash(gh *)"
+            --allowedTools "Bash(gh *)"
           prompt: |
             You are a deep bug-finding automation for Dandelion.
             Read AGENTS.md at the repo root for setup and architecture context.
@@ -68,21 +68,16 @@ jobs:
             - When in doubt, do not open an issue.
 
             ## Issue creation
-            If you find a critical bug, create a GitHub issue using the Write tool to create the body file:
+            If you find a critical bug, create a GitHub issue using:
+            ```
+            gh issue create --title "🐛 <brief description>" --body "<body>" --label "bug"
+            ```
 
-            1. Use the Write tool to create /tmp/issue-body.md with properly formatted markdown:
-               - Use ## headers for sections
-               - Use numbered lists for steps
-               - Use blank lines between sections
-               - Use `code` backticks for file/method names
-
-            2. Then run: gh issue create --title "🐛 <brief description>" --body-file /tmp/issue-body.md --label "bug"
-
-            Required sections in the issue body:
-            - ## Bug - What the bug is and its impact
-            - ## Trigger scenario - Numbered steps that cause the bug
-            - ## Root cause - Why the bug exists, with file:line references
-            - ## Suggested fix - How to fix it (can include code snippets)
+            The issue body must include:
+            - **Bug**: What the bug is and its impact
+            - **Trigger scenario**: Concrete steps or conditions that cause the bug
+            - **Root cause**: Why the bug exists (with file/line references)
+            - **Suggested fix**: How to fix it (can include code snippets)
 
             ## Safety rules
             - Do not open an issue unless you are highly confident the bug is real.
