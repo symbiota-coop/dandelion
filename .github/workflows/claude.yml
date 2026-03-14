@@ -16,6 +16,7 @@ on:
     types: [opened, assigned]
 
 jobs:
+  # Responds to @claude mentions in issue comments, PR review comments, PR reviews, and issues
   claude:
     if: |
       (github.event_name == 'issue_comment' && contains(github.event.comment.body, '@claude')) ||
@@ -42,6 +43,7 @@ jobs:
           additional_permissions: |
             actions: read
 
+  # Auto-reviews every new or updated pull request
   review:
     if: github.event_name == 'pull_request'
     runs-on: ubuntu-latest
@@ -73,6 +75,7 @@ jobs:
 
             Be constructive and helpful in your feedback.
 
+  # Auto-triages production errors reported by Honeybadger, attempts a fix PR or comments with analysis
   honeybadger:
     if: |
       github.event_name == 'issues' &&
