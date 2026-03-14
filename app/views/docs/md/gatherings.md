@@ -93,3 +93,17 @@ There are 6 optional features of gatherings that can be enabled or disabled acco
 - **Shifts**: Allow people to sign up for shifts, for example cooking, washing or community care
 - **Inventory**: Allow people to list useful items and take responsibility for bringing them
 - **Budget**: Show a live and transparent budget of the gathering's finances
+
+## Copying a gathering's structure
+
+If you're running a gathering similar to a previous one, you can copy the structure from the previous gathering into the new one, saving you from having to recreate everything from scratch.
+
+To copy a gathering's structure, navigate to the old gathering and click Copy. You'll then be asked to select the gathering you want to copy to.
+
+The following elements are copied:
+
+- **Timetables**: including all time slots and spaces (but not scheduled activities)
+- **Rotas**: including all time slots and roles (but not shift signups)
+- **Options**: including name, description, capacity, cost and other settings
+
+Members, payments, activities and shift signups are not copied — only the structure is transferred.
