@@ -37,6 +37,7 @@ jobs:
       - uses: anthropics/claude-code-action@v1
         if: steps.check-commits.outputs.has_commits == 'true'
         with:
+          show_full_output: true
           claude_code_oauth_token: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
           claude_args: |
             --model ${{ env.CLAUDE_MODEL }}
@@ -68,16 +69,30 @@ jobs:
             - When in doubt, do not open an issue.
 
             ## Issue creation
-            If you find a critical bug, create a GitHub issue using:
+            If you find a critical bug, create a GitHub issue. To preserve Markdown formatting
+            (newlines, headers, lists), write the body to a temp file and use --body-file:
             ```
-            gh issue create --title "🐛 <brief description>" --body "<body>" --label "bug"
+            cat > /tmp/issue-body.md << 'ISSUE_EOF'
+            ## Bug
+            ...
+
+            ## Trigger scenario
+            ...
+
+            ## Root cause
+            ...
+
+            ## Suggested fix
+            ...
+            ISSUE_EOF
+            gh issue create --title "🐛 <brief description>" --body-file /tmp/issue-body.md --label "bug"
             ```
 
-            The issue body must include:
-            - **Bug**: What the bug is and its impact
-            - **Trigger scenario**: Concrete steps or conditions that cause the bug
-            - **Root cause**: Why the bug exists (with file/line references)
-            - **Suggested fix**: How to fix it (can include code snippets)
+            The issue body must use Markdown with separate sections:
+            - **## Bug** — What the bug is and its impact
+            - **## Trigger scenario** — Concrete steps or conditions that cause the bug
+            - **## Root cause** — Why the bug exists (with file/line references)
+            - **## Suggested fix** — How to fix it (can include code snippets)
 
             ## Safety rules
             - Do not open an issue unless you are highly confident the bug is real.
