@@ -40,7 +40,7 @@ jobs:
           claude_code_oauth_token: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
           claude_args: |
             --model ${{ env.CLAUDE_MODEL }}
-            --allowedTools "Bash(gh *)"
+            --allowedTools "Bash(cat *),Bash(gh *)"
           prompt: |
             You are a deep bug-finding automation for Dandelion.
             Read AGENTS.md at the repo root for setup and architecture context.
@@ -68,16 +68,26 @@ jobs:
             - When in doubt, do not open an issue.
 
             ## Issue creation
-            If you find a critical bug, create a GitHub issue using:
-            ```
-            gh issue create --title "🐛 <brief description>" --body "<body>" --label "bug"
-            ```
+            If you find a critical bug, create a GitHub issue. Use --body-file for proper formatting:
+            ```bash
+            cat > /tmp/issue-body.md << 'EOF'
+            ## Bug
+            <What the bug is and its impact>
 
-            The issue body must include:
-            - **Bug**: What the bug is and its impact
-            - **Trigger scenario**: Concrete steps or conditions that cause the bug
-            - **Root cause**: Why the bug exists (with file/line references)
-            - **Suggested fix**: How to fix it (can include code snippets)
+            ## Trigger scenario
+            1. <Step 1>
+            2. <Step 2>
+            3. <etc>
+
+            ## Root cause
+            <Why the bug exists, with file:line references>
+
+            ## Suggested fix
+            <How to fix it, can include code snippets>
+            EOF
+
+            gh issue create --title "🐛 <brief description>" --body-file /tmp/issue-body.md --label "bug"
+            ```
 
             ## Safety rules
             - Do not open an issue unless you are highly confident the bug is real.
