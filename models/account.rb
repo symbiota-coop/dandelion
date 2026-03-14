@@ -107,16 +107,6 @@ class Account
 
     data = TokenEncryptor.decrypt(token)
 
-    # TODO: Remove legacy fallback
-    if data.nil? && (secret = ENV['SESSION_SECRET'])
-      begin
-        verifier = ActiveSupport::MessageVerifier.new(secret)
-        data = verifier.verify(token)
-      rescue ActiveSupport::MessageVerifier::InvalidSignature
-        return nil
-      end
-    end
-
     return unless data
 
     prefix, event_id, account_id = data.split(':', 3)
