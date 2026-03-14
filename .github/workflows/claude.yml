@@ -61,6 +61,9 @@ jobs:
           claude_args: |
             --model ${{ env.CLAUDE_MODEL }}
           prompt: |
+            REPO: ${{ github.repository }}
+            PR NUMBER: ${{ github.event.pull_request.number }}
+
             Please review this pull request and provide feedback on:
             - Code quality and best practices
             - Potential bugs or issues
