@@ -182,6 +182,12 @@ Dandelion::App.controller do
     @gathering = Gathering.find_by(slug: params[:slug]) || not_found
     @membership = @gathering.memberships.find_by(account: current_account)
     confirmed_membership_required!
+    @destination_memberships = current_account.memberships.and(admin: true).and(:gathering_id.ne => @gathering.id)
+    if @destination_memberships.empty?
+      flash[:error] = 'You need to be an admin of another gathering to copy into it.'
+      redirect "/g/#{@gathering.slug}"
+    end
+
     erb :'gatherings/copy'
   end
 
@@ -190,7 +196,13 @@ Dandelion::App.controller do
     @membership = @gathering.memberships.find_by(account: current_account)
     confirmed_membership_required!
 
-    destination = current_account.memberships.find_by(admin: true, gathering_id: params[:gathering_id]).gathering
+    destination_membership = current_account.memberships.and(admin: true).and(:gathering_id.ne => @gathering.id).find_by(gathering_id: params[:gathering_id])
+    unless destination_membership
+      flash[:error] = "Please choose a gathering you're an admin of."
+      redirect "/g/#{@gathering.slug}/copy"
+    end
+
+    destination = destination_membership.gathering
     @gathering.copy_structure_to(destination, account: destination.account)
 
     redirect "/g/#{destination.slug}"

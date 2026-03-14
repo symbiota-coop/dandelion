@@ -30,4 +30,17 @@ class GatheringsTest < ActiveSupport::TestCase
     assert page.has_content? 'The gathering was saved'
     assert page.has_content? name
   end
+
+  test 'copying a gathering without another admin destination redirects safely' do
+    @account = FactoryBot.create(:account)
+    @gathering = FactoryBot.create(:gathering, account: @account)
+    login_as(@account)
+
+    visit "/g/#{@gathering.slug}"
+    assert page.has_no_link? 'Copy'
+
+    visit "/g/#{@gathering.slug}/copy"
+    assert page.has_content? 'You need to be an admin of another gathering to copy into it.'
+    assert_equal "/g/#{@gathering.slug}", page.current_path
+  end
 end
