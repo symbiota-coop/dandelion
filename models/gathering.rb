@@ -52,7 +52,7 @@ class Gathering
 
   before_validation do
     errors.add(:fixed_threshold, 'cannot be negative') if fixed_threshold && fixed_threshold.negative?
-    errors.add(:member_limit, 'must be positive') if fixed_threshold && !fixed_threshold.positive?
+    errors.add(:member_limit, 'must be positive') if member_limit && !member_limit.positive?
 
     errors.add(:stripe_sk, 'must start with sk_') if stripe_sk && !stripe_sk.starts_with?('sk_')
     errors.add(:stripe_pk, 'must start with pk_') if stripe_pk && !stripe_pk.starts_with?('pk_')
