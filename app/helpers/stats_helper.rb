@@ -1,10 +1,14 @@
 Dandelion::App.helpers do
   def fetch_frontend_dependency(base_url, path)
-    if base_url.include?('cdnjs.cloudflare.com')
+    host = URI.parse(base_url.to_s.sub(/\Agit\+/, ''))&.host&.downcase
+    case host
+    when 'cdnjs.cloudflare.com'
       fetch_cdnjs_dependency(path)
-    elsif base_url.include?('rawcdn.githack.com')
+    when 'rawcdn.githack.com'
       fetch_github_dependency(path)
     end
+  rescue URI::InvalidURIError
+    nil
   end
 
   def fetch_cdnjs_dependency(path)
@@ -38,16 +42,9 @@ Dandelion::App.helpers do
   end
 
   def fetch_github_release_date(repo_url, version)
-    return nil unless repo_url&.include?('github.com')
+    github_repo = github_repo_from_url(repo_url)
+    return nil unless github_repo
 
-    # Parse repo from URL formats like:
-    # https://github.com/owner/repo, git://github.com/owner/repo.git, git+https://...
-    # Repo names can contain dots (e.g. Chart.js), so capture everything then strip .git suffix
-    repo_match = repo_url.match(%r{github\.com[/:]([^/]+)/([^/?#]+)})
-    return nil unless repo_match
-
-    repo_name = repo_match[2].sub(/\.git$/, '')
-    github_repo = "#{repo_match[1]}/#{repo_name}"
     client = Octokit::Client.new(access_token: ENV['GITHUB_ACCESS_TOKEN'])
 
     # Try common tag formats: v1.2.3, 1.2.3
@@ -88,6 +85,22 @@ Dandelion::App.helpers do
     }
   rescue StandardError
     { name: "#{user}/#{repo}", version: commit[0..6], source: 'github' }
+  end
+
+  def github_repo_from_url(repo_url)
+    repo_url = repo_url.to_s.sub(/\Agit\+/, '')
+    return nil if repo_url.empty?
+
+    scp_match = repo_url.match(%r{\Agit@github\.com:(?<owner>[^/]+)/(?<repo>[^/?#]+?)(?:\.git)?\z}i)
+    return "#{scp_match[:owner]}/#{scp_match[:repo]}" if scp_match
+
+    uri = URI.parse(repo_url)
+    return nil unless uri&.host&.downcase == 'github.com'
+
+    owner, repo = uri.path.to_s.split('/').reject(&:empty?)
+    return nil if owner.nil? || repo.nil?
+
+    "#{owner}/#{repo.sub(/\.git$/, '')}"
   end
 
   def fetch_gem_info(gem_name)
