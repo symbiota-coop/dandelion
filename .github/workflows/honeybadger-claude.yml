@@ -1,36 +1,42 @@
 name: Auto-Claude for Honeybadger Issues
 
+env:
+  CLAUDE_MODEL: claude-opus-4-6
+
 on:
   issues:
     types: [opened]
 
 jobs:
   auto-claude:
+    if: contains(github.event.issue.title, '[Dandelion/production]')
     runs-on: ubuntu-latest
     permissions:
-      issues: write
       contents: read
+      pull-requests: read
+      issues: read
+      id-token: write
     steps:
-      - name: Check if issue was created by Honeybadger
-        id: check-honeybadger
-        env:
-          ISSUE_TITLE: ${{ github.event.issue.title }}
-        run: |
-          if [[ "$ISSUE_TITLE" == *"[Dandelion/production]"* ]]; then
-            echo "is_honeybadger=true" >> $GITHUB_OUTPUT
-          else
-            echo "is_honeybadger=false" >> $GITHUB_OUTPUT
-          fi
-
-      - name: Add Claude comment
-        if: steps.check-honeybadger.outputs.is_honeybadger == 'true'
-        uses: actions/github-script@v7
+      - uses: actions/checkout@v4
         with:
-          github-token: ${{ secrets.PERSONAL_ACCESS_TOKEN }}
-          script: |
-            github.rest.issues.createComment({
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              issue_number: context.issue.number,
-              body: '@claude please provide a fix'
-            }); 
+          fetch-depth: 1
+
+      - uses: anthropics/claude-code-action@v1
+        with:
+          claude_code_oauth_token: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
+          claude_args: |
+            --model ${{ env.CLAUDE_MODEL }}
+          trigger_phrase: ""
+          prompt: |
+            A production error was reported by Honeybadger.
+            Read AGENTS.md at the repo root for setup and architecture context.
+
+            ## Error details
+            Title: ${{ github.event.issue.title }}
+            Body: ${{ github.event.issue.body }}
+
+            ## Instructions
+            - Investigate the error by tracing through the codebase
+            - Identify the root cause
+            - Provide a fix as a pull request if you're confident in the solution
+            - If you're not confident, comment on the issue with your analysis and suggested approach
