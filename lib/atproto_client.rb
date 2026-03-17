@@ -1,6 +1,8 @@
 class AtprotoClient
   API_URL = 'https://bsky.social/xrpc'.freeze
   PUBLIC_API_URL = 'https://public.api.bsky.app/xrpc'.freeze
+  TIMEOUT = 10
+  OPEN_TIMEOUT = 5
 
   def initialize(handle: nil, app_password: nil)
     @handle = handle || ENV['ATPROTO_HANDLE']
@@ -16,6 +18,8 @@ class AtprotoClient
     }
 
     @client = Faraday.new(url: API_URL) do |conn|
+      conn.options.timeout = TIMEOUT
+      conn.options.open_timeout = OPEN_TIMEOUT
       conn.request :json
       conn.request :retry, retry_options
       conn.response :json
@@ -23,6 +27,8 @@ class AtprotoClient
     end
 
     @public_client = Faraday.new(url: PUBLIC_API_URL) do |conn|
+      conn.options.timeout = TIMEOUT
+      conn.options.open_timeout = OPEN_TIMEOUT
       conn.request :json
       conn.request :retry, retry_options
       conn.response :json

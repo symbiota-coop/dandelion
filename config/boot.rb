@@ -23,6 +23,7 @@ OmniAuth.config.allowed_request_methods = [:get]
 OmniAuth.config.logger = Logger.new(IO::NULL)
 
 Delayed::Worker.max_attempts = 1
+Delayed::Worker.max_run_time = 15.minutes
 Delayed::Worker.destroy_failed_jobs = false
 
 Money.default_bank = DandelionBank.new
