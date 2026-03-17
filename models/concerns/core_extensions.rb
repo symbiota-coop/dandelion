@@ -24,6 +24,8 @@ module CoreExtensions
   end
 
   def convert_nil_booleans_to_false
+    return if flagged_for_destroy?
+
     self.class.fields.each do |field_name, field|
       send("#{field_name}=", false) if field.type == Mongoid::Boolean && send(field_name).nil?
     rescue Mongoid::Errors::AttributeNotLoaded
@@ -254,6 +256,8 @@ module CoreExtensions
   end
 
   def sanitize_fields
+    return if flagged_for_destroy?
+
     CoreExtensions::SANITIZED_FIELDS.each do |field|
       next unless respond_to?(field) && respond_to?("#{field}=")
 
