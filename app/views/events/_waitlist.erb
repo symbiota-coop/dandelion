@@ -4,31 +4,44 @@
   </h3>
   <div class="card-body">
     <p class="lead">
-      Missed out on tickets to <%= @event.name %>?
       <% if next_event = @event.organisation.events_including_cohosted.live.publicly_visible.future.and(:id.nin => [@event.id]).and(name: @event.name).reject(&:sold_out?).first %>
+        Missed out on tickets to <%= @event.name %>?
         It's happening again on <a href="/e/<%=next_event.slug%>"><%=next_event.start_time.to_date%></a>.
-        If that date doesn't work for you, <mark>join the waitlist and we'll let you know when tickets become available to this event or future events.</mark>
+        <% unless @event.hide_waitlist %>
+          If that date doesn't work for you, <mark>join the waitlist and we'll let you know when tickets become available to this event or future events.</mark>
+        <% end %>
       <% else %>
-        <mark>Join the waitlist and we'll let you know when tickets become available to this event or future events.</mark>
+        <% if @event.hide_waitlist %>
+          <% if @event.email %>
+            You can <a href="mailto:<%= @event.email %>">contact the event organiser</a> with any queries.
+          <% else %>
+            See all <%=@event.organisation.name%>'s <a href="/o/<%= @event.organisation.slug %>">upcoming events</a>
+          <% end %>
+        <% else %>
+          Missed out on tickets to <%= @event.name %>?
+          <mark>Join the waitlist and we'll let you know when tickets become available to this event or future events.</mark>
+        <% end %>
       <% end %>
     </p>
-    <script>
-      $(function () {
+    <% unless @event.hide_waitlist %>
+      <script>
+        $(function () {
 
-        $('#waitlist-form').submit(function () {
-          if (!grecaptcha || grecaptcha.getResponse().length == 0) {
-            alert('Please confirm you are not a robot');
-            return false
-          }
+          $('#waitlist-form').submit(function () {
+            if (!grecaptcha || grecaptcha.getResponse().length == 0) {
+              alert('Please confirm you are not a robot');
+              return false
+            }
+          })
+
         })
-
-      })
-    </script>
-    <% form_for Waitship.new, "/events/#{@event.id}/waitship/new", id: 'waitlist-form'  do |f| %>
-      <%= f.text_block :name %>
-      <%= f.text_block :email %>
-      <div class="g-recaptcha mb-2" data-sitekey="<%= ENV['RECAPTCHA_SITE_KEY'] %>"></div>
-      <%= f.submit_block button_text: 'Submit' %>
+      </script>
+      <% form_for Waitship.new, "/events/#{@event.id}/waitship/new", id: 'waitlist-form'  do |f| %>
+        <%= f.text_block :name %>
+        <%= f.text_block :email %>
+        <div class="g-recaptcha mb-2" data-sitekey="<%= ENV['RECAPTCHA_SITE_KEY'] %>"></div>
+        <%= f.submit_block button_text: 'Submit' %>
+      <% end %>
     <% end %>
   </div>
 </div>
