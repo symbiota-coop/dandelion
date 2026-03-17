@@ -298,7 +298,7 @@ module Dandelion
     end
 
     %w[get post].each do |method|
-      send(method, '/mcp', provides: :json) do
+      send(method, '/mcp') do
         status, headers, body = Dandelion::MCP.handle_http_request(request)
         [status, headers, body]
       end
