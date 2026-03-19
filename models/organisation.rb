@@ -31,7 +31,7 @@ class Organisation
   end
 
   def self.search_scope
-    all
+    self.and(hidden: false)
   end
 
   def self.protected_attributes
