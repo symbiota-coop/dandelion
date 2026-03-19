@@ -1,0 +1,47 @@
+{
+  "mcpServers": {
+    "cloudflare-api": {
+      "type": "http",
+      "url": "https://mcp.cloudflare.com/mcp"
+    },
+    "honeybadger": {
+      "command": "docker",
+      "args": [
+        "run",
+        "-i",
+        "--rm",
+        "-e",
+        "HONEYBADGER_PERSONAL_AUTH_TOKEN",
+        "ghcr.io/honeybadger-io/honeybadger-mcp-server"
+      ],
+      "env": {
+        "HONEYBADGER_PERSONAL_AUTH_TOKEN": "$HONEYBADGER_PERSONAL_AUTH_TOKEN"
+      }
+    },
+    "Dandelion": {
+      "type": "http",
+      "url": "https://dandelion.events/mcp"
+    },
+    "render": {
+      "type": "http",
+      "url": "https://mcp.render.com/mcp",
+      "headers": {
+        "Authorization": "Bearer $RENDER_AUTH_TOKEN"
+      }
+    },
+    "MongoDB": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "mongodb-mcp-server",
+        "--connectionString",
+        "$MONGODB_CONNECTION_STRING",
+        "--readOnly"
+      ]
+    },
+    "stripe": {
+      "type": "http",
+      "url": "https://mcp.stripe.com"
+    }
+  }
+}
