@@ -108,7 +108,7 @@ Dandelion::App.helpers do
           e.dtend = same_day ? event.end_time.utc.strftime('%Y%m%dT%H%M%SZ') : nil
         end
         e.location = event.location
-        e.description = "#{ENV['BASE_URI']}/events/#{event.id}"
+        e.description = "#{ENV['BASE_URI']}/e/#{event.slug}"
         e.uid = event.id.to_s
       end
     end

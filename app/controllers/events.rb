@@ -132,7 +132,7 @@ Dandelion::App.controller do
     end
   end
 
-  get '/e/:slug', provides: %i[html ics json], prerender: true do
+  get '/e/:slug', provides: %i[html ics json jpg], prerender: true do
     session[:via] = params[:via] if params[:via]
     session[:return_to] = request.url
     @event = Event.without(:embedding).find_by(slug: params[:slug])
@@ -196,6 +196,8 @@ Dandelion::App.controller do
       }.to_json
     when :ics
       @event.ical.to_ical
+    when :jpg
+      redirect @og_image
     end
   end
 
