@@ -58,11 +58,15 @@ jobs:
   review:
     if: github.event_name == 'pull_request'
     runs-on: ubuntu-latest
+    concurrency:
+      group: claude-review-${{ github.event.pull_request.number }}
+      cancel-in-progress: true
     permissions:
-      contents: read
+      contents: write
       pull-requests: write
       issues: write
       id-token: write
+      actions: read
     steps:
       - uses: actions/checkout@v4
         with:
@@ -76,6 +80,8 @@ jobs:
           claude_args: |
             --model ${{ env.CLAUDE_MODEL }}
             --dangerously-skip-permissions
+          additional_permissions: |
+            actions: read
           prompt: |
             REPO: ${{ github.repository }}
             PR NUMBER: ${{ github.event.pull_request.number }}
@@ -102,6 +108,7 @@ jobs:
       pull-requests: write
       issues: write
       id-token: write
+      actions: read
     steps:
       - uses: actions/checkout@v4
         with:
@@ -115,6 +122,8 @@ jobs:
           claude_args: |
             --model ${{ env.CLAUDE_MODEL }}
             --dangerously-skip-permissions
+          additional_permissions: |
+            actions: read
           trigger_phrase: ""
           prompt: |
             A production error was reported by Honeybadger.

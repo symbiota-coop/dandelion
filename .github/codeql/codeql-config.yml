@@ -3,5 +3,3 @@ query-filters:
       id: js/xss-through-dom
   - exclude:
       id: rb/reflected-xss
-  - exclude:
-      id: actions/missing-workflow-permissions
