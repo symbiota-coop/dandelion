@@ -101,7 +101,7 @@
     <span class="badge badge-primary"><%= pluralize @events.count, 'event' %></span>
   </div>
   <div class="col-auto">
-    <% if @organisation && @organisation.stripe_client_id %>
+    <% if @organisation %>
       <a class="btn btn-primary" href="/o/<%= organisation.slug %>/events/stats.csv?<%= request.query_string %>"><i class="bi bi-download"></i> CSV</a>
     <% end %>
   </div>
