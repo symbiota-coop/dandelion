@@ -45,9 +45,12 @@ jobs:
 
       - uses: anthropics/claude-code-action@v1
         with:
+          show_full_output: true
+          display_report: true
           claude_code_oauth_token: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
           claude_args: |
             --model ${{ env.CLAUDE_MODEL }}
+            --dangerously-skip-permissions
           additional_permissions: |
             actions: read
 
@@ -67,9 +70,12 @@ jobs:
 
       - uses: anthropics/claude-code-action@v1
         with:
+          show_full_output: true
+          display_report: true
           claude_code_oauth_token: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
           claude_args: |
             --model ${{ env.CLAUDE_MODEL }}
+            --dangerously-skip-permissions
           prompt: |
             REPO: ${{ github.repository }}
             PR NUMBER: ${{ github.event.pull_request.number }}
@@ -104,9 +110,11 @@ jobs:
       - uses: anthropics/claude-code-action@v1
         with:
           show_full_output: true
+          display_report: true
           claude_code_oauth_token: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
           claude_args: |
             --model ${{ env.CLAUDE_MODEL }}
+            --dangerously-skip-permissions
           trigger_phrase: ""
           prompt: |
             A production error was reported by Honeybadger.
