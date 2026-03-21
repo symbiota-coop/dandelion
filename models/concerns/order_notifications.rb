@@ -33,14 +33,15 @@ module OrderNotifications
   end
 
   def send_tickets
+    order = self
+    event = order.event
+    account = order.account
+    return unless account
+
     mg_client = Mailgun::Client.new ENV['MAILGUN_API_KEY'], ENV['MAILGUN_REGION']
     batch_message = Mailgun::BatchMessage.new(mg_client, EmailHelper.mailgun_host(account.email, ENV['MAILGUN_TICKETS_HOST']))
 
-    order = self
-    event = order.event
     header_image_url, from_email = sender_info
-
-    account = order.account
 
     batch_message.subject(
       ((event.recording? ? event.recording_email_title : event.ticket_email_title) || (event.recording? ? event.organisation.recording_email_title : event.organisation.ticket_email_title))
