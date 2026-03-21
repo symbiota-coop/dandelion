@@ -127,5 +127,5 @@ jobs:
             ## Instructions
             - Investigate the error by tracing through the codebase
             - Identify the root cause
-            - Provide a fix as a pull request if you're confident in the solution
-            - If you're not confident, comment on the issue with your analysis and suggested approach
+            - If you're confident in the solution, create a pull request and comment on this issue with a link to the pull request
+            - If you're not confident, don't create a pull request, just comment on the issue with your analysis and suggested approach
