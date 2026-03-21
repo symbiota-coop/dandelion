@@ -83,13 +83,13 @@ jobs:
 
             Be constructive and helpful in your feedback.
 
-  # Auto-triages production errors reported by the Honeybadger GitHub app
+  # Auto-triages production errors from Honeybadger
   honeybadger:
     if: |
       github.event_name == 'issues' &&
       github.event.action == 'opened' &&
-      github.event.issue.user.login == 'honeybadger[bot]' &&
-      contains(github.event.issue.title, '[Dandelion/production]')
+      contains(github.event.issue.title, '[Dandelion/production]') &&
+      contains(fromJSON('["OWNER","MEMBER","COLLABORATOR"]'), github.event.issue.author_association)
     runs-on: ubuntu-latest
     permissions:
       contents: write
