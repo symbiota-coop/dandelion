@@ -162,6 +162,7 @@ Dandelion::App.controller do
       @event_image_width = image_source.image_width_unmagic
       @event_image_height = image_source.image_height_unmagic
       @og_image = image_source.image.encode('jpg', '-quality 90').thumb('1200x630').url
+      @ical_image = @og_image
     elsif @event.organisation&.image
       @og_image = @event.organisation.image.encode('jpg', '-quality 90').thumb('1200x630').url
     end
@@ -197,7 +198,7 @@ Dandelion::App.controller do
     when :ics
       @event.ical.to_ical
     when :jpg
-      redirect @og_image
+      @ical_image ? redirect(@ical_image) : not_found
     end
   end
 
