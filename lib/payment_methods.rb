@@ -5,7 +5,7 @@ class PaymentMethod
     attr_accessor :all
   end
 
-  attr_accessor :name, :label, :dotted, :visible, :condition, :org_condition, :logo, :url, :process
+  attr_accessor :name, :label, :dotted, :visible, :condition, :org_condition, :logo, :url, :process, :partial
 
   def initialize(name, options = {})
     @name = name
@@ -17,6 +17,7 @@ class PaymentMethod
     @logo = options[:logo]
     @url = options[:url]
     @process = options[:process]
+    @partial = options[:partial]
     self.class.all << self
   end
 
@@ -167,6 +168,7 @@ PaymentMethod.new('opencollective',
                    condition: ->(event) { event.oc_slug },
                    logo: 'opencollective.png',
                    url: 'https://opencollective.com/',
+                   partial: 'purchase/pay_with_opencollective',
                    process: lambda { |order:, **|
                      oc_secret = "dandelion:#{Array.new(5) { [*'a'..'z', *'0'..'9'].sample }.join}"
                      order.update_attributes!(
@@ -188,9 +190,11 @@ PaymentMethod.new('evm',
                    },
                    org_condition: ->(org) { org.evm_address },
                    condition: ->(event) {
-                     event.organisation.evm_address &&
+                     event.chain &&
+                       event.organisation.evm_address &&
                        (EVM_CURRENCIES.include?(event.currency) || event.currency == 'USD')
                    },
+                   partial: 'purchase/pay_with_evm',
                    process: lambda { |order:, **|
                      evm_secret = Array.new(4) { [*'1'..'9'].sample }.join
                      order.update_attributes!(
