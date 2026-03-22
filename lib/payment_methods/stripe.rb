@@ -6,7 +6,7 @@ class PaymentMethod
 
       cohost = ticket_form[:cohost] && Organisation.find_by(slug: ticket_form[:cohost])
       event_image = event.image_source(cohost)&.image&.thumb('1920x1920')
-      organisationship = event.revenue_sharer_organisationship
+      revenue_sharer_organisationship = event.revenue_sharer_organisationship
 
       stripe_session_hash = {
         customer_email: account.email,
@@ -27,14 +27,14 @@ class PaymentMethod
 
       payment_intent_data = { description: order.description, metadata: order.metadata }
       application_fee_amount = nil
-      if organisationship
+      if revenue_sharer_organisationship
         application_fee_amount = order.calculate_application_fee_amount
         if event.direct_charges
           payment_intent_data.merge!(application_fee_amount: (application_fee_amount * 100).round)
         else
           payment_intent_data.merge!(
             application_fee_amount: (application_fee_amount * 100).round,
-            transfer_data: { destination: organisationship.stripe_user_id }
+            transfer_data: { destination: revenue_sharer_organisationship.stripe_user_id }
           )
         end
       elsif event.donations_to_dandelion?
@@ -43,8 +43,8 @@ class PaymentMethod
       end
       stripe_session_hash.merge!(payment_intent_data: payment_intent_data)
 
-      session = if organisationship && event.direct_charges
-                  ::Stripe::Checkout::Session.create(stripe_session_hash, { stripe_account: organisationship.stripe_user_id })
+      session = if revenue_sharer_organisationship && event.direct_charges
+                  ::Stripe::Checkout::Session.create(stripe_session_hash, { stripe_account: revenue_sharer_organisationship.stripe_user_id })
                 else
                   ::Stripe::Checkout::Session.create(stripe_session_hash, event.organisation.stripe_connect_json ? { stripe_account: event.organisation.stripe_user_id } : {})
                 end
