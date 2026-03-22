@@ -1,4 +1,4 @@
-class PaymentMethod
+class EventPaymentMethod
   module GoCardless
     def self.call(order:, event:, **)
       client = GoCardlessPro::Client.new(access_token: event.organisation.gocardless_access_token)

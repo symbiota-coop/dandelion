@@ -214,9 +214,9 @@ Dandelion::App.controller do
 
     @order = create_order_with_tickets(params[:ticketForm], params[:detailsForm])
     pm = if @order.total > 0
-           PaymentMethod.object(params[:detailsForm][:payment_method].to_s)
+           EventPaymentMethod.object(params[:detailsForm][:payment_method].to_s)
          else
-           PaymentMethod.object('rsvp')
+           EventPaymentMethod.object('rsvp')
          end
     raise Order::PaymentMethodNotFound if @order.total.positive? && pm&.name == 'rsvp'
     raise Order::PaymentMethodNotFound unless pm&.process

@@ -1,4 +1,4 @@
-class PaymentMethod
+class EventPaymentMethod
   module Stripe
     def self.call(order:, event:, account:, details_form:, ticket_form:)
       ::Stripe.api_key = event.organisation.stripe_connect_json ? ENV['STRIPE_SK'] : event.organisation.stripe_sk

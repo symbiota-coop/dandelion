@@ -12,21 +12,13 @@
       <% end %>
     </div>
   </div>
-  <% if @gathering.stripe_sk && FIAT_CURRENCIES.include?(@gathering.currency) %>
-    <button data-payment-method="stripe" type="submit" class="btn btn-default mb-1 ml-0 mr-1" style="height: 2.125rem">
-      Pay with card
+  <% GatheringPaymentMethod.all.each do |pm| %>
+    <% next unless pm.available?(@gathering) %>
+    <button data-payment-method="<%= pm.name %>" type="submit" class="btn btn-default mb-1 ml-0 mr-1" style="height: 2.125rem">
+      <span><%= pm.button_label(@gathering) %></span>
       <i class="bi bi-spin bi-slash-lg" style="display: none"></i>
     </button>
-    <%= hidden_field_tag :payment_method, value: 'stripe', disabled: true %>
-  <% end %>
-  <% if @gathering.evm_address && EVM_CURRENCIES.include?(@gathering.currency) %>
-    <button data-payment-method="evm" type="submit" class="btn btn-default mb-1 ml-0 mr-1" style="height: 2.125rem">
-      <span>
-        Pay with <%= @gathering.chain.name %>
-      </span>
-      <i class="bi bi-spin bi-slash-lg" style="display: none"></i>
-    </button>
-    <%= hidden_field_tag :payment_method, value: 'evm', disabled: true %>
+    <%= hidden_field_tag :payment_method, value: pm.name, disabled: true %>
   <% end %>
 
 

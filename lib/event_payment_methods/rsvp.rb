@@ -1,4 +1,4 @@
-class PaymentMethod
+class EventPaymentMethod
   module Rsvp
     def self.call(order:, **)
       order.payment_completed!

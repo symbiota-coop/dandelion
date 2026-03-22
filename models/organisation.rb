@@ -151,14 +151,14 @@ class Organisation
   end
 
   def payment_method?
-    PaymentMethod.all.any? { |pm| pm.org_condition&.call(self) }
+    EventPaymentMethod.all.any? { |pm| pm.org_condition&.call(self) }
   end
 
   def stripe_connect_only?
     return false unless stripe_connect_json
     return false if stripe_pk
 
-    PaymentMethod.all.none? do |pm|
+    EventPaymentMethod.all.none? do |pm|
       pm.name != 'stripe' && pm.org_condition&.call(self)
     end
   end

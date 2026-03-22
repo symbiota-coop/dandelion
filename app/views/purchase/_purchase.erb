@@ -182,7 +182,7 @@ end
 
       <%= partial :'purchase/gocardless_details', locals: { f: f } %>
 
-      <% PaymentMethod.all.each do |pm| %>
+      <% EventPaymentMethod.all.each do |pm| %>
         <%== payment_button(method: pm.name, label: pm.button_label(@event), dotted: pm.dotted, visible: pm.visible, condition: pm.available?(@event)) %>
       <% end %>
 
@@ -203,7 +203,7 @@ end
   </div>
 </div>
 
-<% PaymentMethod.all.select { |pm| pm.partial && pm.available?(@event) }.each do |pm| %>
+<% EventPaymentMethod.all.select { |pm| pm.partial && pm.available?(@event) }.each do |pm| %>
   <%= partial pm.partial.to_sym %>
 <% end %>
 

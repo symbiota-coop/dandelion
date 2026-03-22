@@ -31,44 +31,11 @@ Dandelion::App.controller do
     @membership = @gathering.memberships.find_by(account: current_account)
     membership_required!
 
-    case params[:payment_method]
-    when 'stripe'
+    pm = GatheringPaymentMethod.object(params[:payment_method].to_s)
+    halt 400 unless pm&.process
+    halt 400 unless pm.available?(@gathering)
 
-      Stripe.api_key = @gathering.stripe_sk
-      Stripe.api_version = ENV['STRIPE_API_VERSION']
-      stripe_session_hash = {
-        line_items: [{
-          name: 'Dandelion',
-          description: "Payment for #{@gathering.name}",
-          images: [@gathering.image.try(:url)].compact,
-          amount: params[:amount].to_i * 100,
-          currency: @gathering.currency,
-          quantity: 1
-        }],
-        customer_email: current_account.email,
-        success_url: "#{ENV['BASE_URI']}/g/#{@gathering.slug}",
-        cancel_url: "#{ENV['BASE_URI']}/g/#{@gathering.slug}",
-        metadata: {
-          de_gathering_id: @gathering.id,
-          de_account_id: @membership.account.id
-        }
-      }
-      session = Stripe::Checkout::Session.create(stripe_session_hash)
-      @membership.payments.create! amount: params[:amount].to_i, currency: @gathering.currency, session_id: session.id, payment_intent: session.payment_intent, payment_completed: false
-      { session_id: session.id }.to_json
-
-    when 'evm'
-
-      evm_secret = Array.new(4) { [*'1'..'9'].sample }.join
-      payment = @membership.payments.create!(
-        amount: params[:amount].to_i,
-        currency: @gathering.currency,
-        evm_secret: evm_secret,
-        payment_completed: false
-      )
-      { evm_secret: payment.evm_secret, value: payment.evm_amount, wei: (payment.evm_amount * 1e18.to_d).to_i, payment_id: payment.id.to_s, payment_expiry: (payment.created_at + 1.hour).to_datetime.strftime('%Q') }.to_json
-
-    end
+    pm.process_payment(gathering: @gathering, membership: @membership, account: current_account, params: params)
   end
 
   get '/g/:slug/payments/:payment_id', provides: :json do
