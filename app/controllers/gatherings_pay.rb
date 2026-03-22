@@ -66,7 +66,7 @@ Dandelion::App.controller do
         evm_secret: evm_secret,
         payment_completed: false
       )
-      { evm_secret: payment.evm_secret, evm_amount: payment.evm_amount, evm_wei: (payment.evm_amount * 1e18.to_d).to_i, payment_id: payment.id.to_s, payment_expiry: (payment.created_at + 1.hour).to_datetime.strftime('%Q') }.to_json
+      { evm_secret: payment.evm_secret, value: payment.evm_amount, wei: (payment.evm_amount * 1e18.to_d).to_i, payment_id: payment.id.to_s, payment_expiry: (payment.created_at + 1.hour).to_datetime.strftime('%Q') }.to_json
 
     end
   end

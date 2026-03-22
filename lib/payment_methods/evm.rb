@@ -8,8 +8,8 @@ class PaymentMethod
       )
       {
         evm_secret: order.evm_secret,
-        evm_value: order.evm_value,
-        evm_wei: (order.evm_value * 1e18.to_d).to_i,
+        value: order.evm_value,
+        wei: (order.evm_value * 1e18.to_d).to_i,
         order_id: order.id.to_s,
         order_expiry: (order.created_at + 1.hour).to_datetime.strftime('%Q')
       }.to_json

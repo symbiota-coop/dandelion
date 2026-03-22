@@ -26,7 +26,7 @@ $(function () {
         // EVM
         $('#owed').hide()
         $('#pay-with-evm').show()
-        $('#pay-with-evm').find('.card-body p.lead.please').html('Send EXACTLY <strong>' + data.evm_amount + ' ' + config.currency + '</strong> to <strong>' + config.evmAddress + '</strong>')
+        $('#pay-with-evm').find('.card-body p.lead.please').html('Send EXACTLY <strong>' + data.value + ' ' + config.currency + '</strong> to <strong>' + config.evmAddress + '</strong>')
         const offset = $('#pay-with-evm').offset()
         window.scrollTo(0, offset.top - $('#header').height() - 10)
 
@@ -82,7 +82,7 @@ $(function () {
 
           const toAddress = config.evmAddress
           const fromAddress = ethereum.selectedAddress
-          const amount = parseInt(data.evm_wei).toString()
+          const amount = parseInt(data.wei).toString()
 
           const contractInstance = new web3.eth.Contract(abi, config.contractAddress)
           contractInstance.methods.transfer(toAddress, amount).send({

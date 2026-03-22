@@ -8,7 +8,6 @@ class PaymentMethod
       )
       {
         oc_secret: order.oc_secret,
-        currency: order.currency,
         value: order.value,
         order_id: order.id.to_s,
         order_expiry: (order.created_at + 1.hour).to_datetime.strftime('%Q')
