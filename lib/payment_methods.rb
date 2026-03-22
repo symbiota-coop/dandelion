@@ -18,6 +18,7 @@ class PaymentMethod
     @url = options[:url]
     @process = options[:process]
     @partial = options[:partial]
+    @order_currency = options[:order_currency]
     self.class.all << self
   end
 
@@ -35,6 +36,11 @@ class PaymentMethod
 
   def process_payment(order:, event:, account: nil, details_form: nil, ticket_form: nil)
     process.call(order: order, event: event, account: account, details_form: details_form, ticket_form: ticket_form)
+  end
+
+  # Currency stored on the order when this payment method is selected (e.g. EVM + USD → BREAD).
+  def order_currency_for(event)
+    @order_currency&.call(event) || event.currency
   end
 end
 
@@ -194,6 +200,7 @@ PaymentMethod.new('evm',
                        event.organisation.evm_address &&
                        (EVM_CURRENCIES.include?(event.currency) || event.currency == 'USD')
                    },
+                   order_currency: ->(event) { event.currency == 'USD' ? 'BREAD' : event.currency },
                    partial: 'purchase/pay_with_evm',
                    process: lambda { |order:, **|
                      evm_secret = Array.new(4) { [*'1'..'9'].sample }.join

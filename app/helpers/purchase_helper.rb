@@ -95,7 +95,7 @@ Dandelion::App.helpers do
     attributes = {
       event: @event,
       account: @account,
-      currency: (details_form[:payment_method] == 'evm' && @event.currency == 'USD' ? 'BREAD' : @event.currency),
+      currency: PaymentMethod.object(details_form[:payment_method])&.order_currency_for(@event) || @event.currency,
       organisation_revenue_share: @event.organisation_revenue_share,
       revenue_sharer: (@event.revenue_sharer_organisationship.account if @event.revenue_sharer_organisationship),
       opt_in_organisation: account_data[:opt_in_organisation] == '1' || (account_data[:opt_in_organisation].is_a?(Array) && account_data[:opt_in_organisation].include?('1')),
