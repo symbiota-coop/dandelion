@@ -112,19 +112,11 @@ Dandelion::App.helpers do
 
   def process_payment(details_form, ticket_form)
     if @order.total > 0
-      payment_method = details_form[:payment_method]
-      case payment_method
-      when 'stripe'
-        process_stripe_payment(details_form, ticket_form)
-      when 'gocardless'
-        process_gocardless_payment
-      when 'opencollective'
-        process_opencollective_payment
-      when 'evm'
-        process_evm_payment
-      else
-        raise Order::PaymentMethodNotFound
-      end
+      payment_method = details_form[:payment_method].to_s
+      processor_method = "process_#{payment_method}_payment"
+      raise Order::PaymentMethodNotFound unless PaymentMethod.object(payment_method) && respond_to?(processor_method)
+
+      public_send(processor_method, details_form, ticket_form)
     else
       process_free_order
     end
@@ -231,7 +223,7 @@ Dandelion::App.helpers do
     end
   end
 
-  def process_gocardless_payment
+  def process_gocardless_payment(_details_form = nil, _ticket_form = nil)
     client = GoCardlessPro::Client.new(access_token: @event.organisation.gocardless_access_token)
     billing_request = client.billing_requests.create(
       params: {
@@ -258,7 +250,7 @@ Dandelion::App.helpers do
     { gocardless_billing_request_flow: billing_request_flow }.to_json
   end
 
-  def process_opencollective_payment
+  def process_opencollective_payment(_details_form = nil, _ticket_form = nil)
     oc_secret = "dandelion:#{Array.new(5) { [*'a'..'z', *'0'..'9'].sample }.join}"
     @order.update_attributes!(
       value: @order.total.round(2),
@@ -273,7 +265,7 @@ Dandelion::App.helpers do
     }.to_json
   end
 
-  def process_evm_payment
+  def process_evm_payment(_details_form = nil, _ticket_form = nil)
     evm_secret = Array.new(4) { [*'1'..'9'].sample }.join
     @order.update_attributes!(
       value: @order.total.round(2),

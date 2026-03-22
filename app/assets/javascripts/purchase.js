@@ -133,28 +133,24 @@ $(function () {
 
     $('#totalDisplay').val((+p).toFixed(2))
     $('#balance').val((+b).toFixed(2))
+    const $rsvp = $('#details form button[data-payment-method=rsvp]')
+    const $stripe = $('#details form button[data-payment-method=stripe]')
+    const $paid = $('#details form button[data-payment-method]').not($rsvp)
+
     if (p == 0) {
-      $('#details form button[data-payment-method=rsvp]').show()
-      $('#details form button[data-payment-method=stripe]').hide()
-      $('#details form button[data-payment-method=gocardless]').hide()
-      $('#details form button[data-payment-method=opencollective]').hide()
-      $('#details form button[data-payment-method=evm]').hide()
+      $rsvp.show()
+      $paid.hide()
     } else if (b == 0) {
-      $('#details form button[data-payment-method=rsvp]').show().find('span').text('Use credit')
-      $('#details form button[data-payment-method=stripe]').hide()
-      $('#details form button[data-payment-method=gocardless]').hide()
-      $('#details form button[data-payment-method=opencollective]').hide()
-      $('#details form button[data-payment-method=evm]').hide()
+      $rsvp.show().find('span').text('Use credit')
+      $paid.hide()
     } else if (b > 0) {
       $('#balance').val((+b).toFixed(2))
       let via_card
       if (config.gocardless || config.ocSlug || config.evmAddress) { via_card = ' via card' } else { via_card = '' }
       $('#details form button[data-payment-method]:eq(1)').removeClass('btn-dotted')
-      $('#details form button[data-payment-method=rsvp]').hide()
-      $('#details form button[data-payment-method=stripe]').show().find('span').text('Pay ' + config.currencySymbol + (+b).toFixed(2) + via_card)
-      $('#details form button[data-payment-method=gocardless]').show()
-      $('#details form button[data-payment-method=opencollective]').show()
-      $('#details form button[data-payment-method=evm]').show()
+      $rsvp.hide()
+      $paid.show()
+      $stripe.find('span').text('Pay ' + config.currencySymbol + (+b).toFixed(2) + via_card)
     }
 
     $('input[type=hidden][name=payment_method]').prop('disabled', true)

@@ -182,13 +182,9 @@ end
 
       <%= partial :'purchase/gocardless_details', locals: { f: f } %>
 
-      <%== payment_button(method: 'rsvp', label: @event.rsvp_button_text || 'RSVP', dotted: false, visible: true, condition: true) %>
-
-      <%== payment_button(method: 'stripe', label: 'Pay', dotted: false, condition: (@event.organisation.stripe_connect_json || @event.organisation.stripe_sk) && FIAT_CURRENCIES.include?(@event.currency)) %>
-      <%== payment_button(method: 'gocardless', label: 'Pay with GoCardless', condition: @event.organisation.gocardless_instant_bank_pay && @event.organisation.gocardless_access_token && FIAT_CURRENCIES.include?(@event.currency)) %>
-      <%== payment_button(method: 'opencollective', label: 'Pay with Open Collective', condition: @event.oc_slug) %>
-      <% evm_label = @event.currency.in?(['BREAD', 'USD']) ? 'Pay with BREAD on Gnosis Chain' : "Pay with #{@event.chain.try(:name)}" %>
-      <%== payment_button(method: 'evm', label: evm_label, condition: @event.organisation.evm_address && (EVM_CURRENCIES.include?(@event.currency) || @event.currency == 'USD')) %>
+      <% PaymentMethod.all.each do |pm| %>
+        <%== payment_button(method: pm.name, label: pm.button_label(@event), dotted: pm.dotted, visible: pm.visible, condition: pm.available?(@event)) %>
+      <% end %>
 
 
       <%= hidden_field_tag :utm_source, value: params[:utm_source] %>

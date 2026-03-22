@@ -151,11 +151,16 @@ class Organisation
   end
 
   def payment_method?
-    stripe_connect_json || stripe_pk || (gocardless_instant_bank_pay && gocardless_access_token) || evm_address || oc_slug
+    PaymentMethod.all.any? { |pm| pm.org_condition&.call(self) }
   end
 
   def stripe_connect_only?
-    stripe_connect_json && !stripe_pk && !(gocardless_instant_bank_pay && gocardless_access_token) && !evm_address && !oc_slug
+    return false unless stripe_connect_json
+    return false if stripe_pk
+
+    PaymentMethod.all.none? do |pm|
+      pm.name != 'stripe' && pm.org_condition&.call(self)
+    end
   end
 
   def referral_revenue
