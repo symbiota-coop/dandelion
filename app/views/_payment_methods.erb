@@ -5,8 +5,12 @@
   #payment-methods img.opencollective { opacity: 0.5; }
   #payment-methods img.gocardless { opacity: 0.33; }
 </style>
-<% PaymentMethod.all.select(&:logo).each do |pm| %>
+<% {
+  'gocardless.png' => 'https://gocardless.com/',
+  'stripe.png' => 'https://stripe.com/',
+  'opencollective.png' => 'https://opencollective.com/'
+}.each do |k, v| %>
   <div class="col">
-    <a href="<%= pm.url %>"><img class="<%= pm.name %> w-100" src="/images/payment_methods/<%= pm.logo %>" /></a>
+    <a href="<%= v %>"><img class="<%= k.split('.').first %> w-100" src="/images/payment_methods/<%= k %>" /></a>
   </div>
 <% end %>

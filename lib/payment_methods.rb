@@ -5,7 +5,7 @@ class PaymentMethod
     attr_accessor :all
   end
 
-  attr_accessor :name, :label, :dotted, :visible, :condition, :org_condition, :logo, :url, :process, :partial
+  attr_accessor :name, :label, :dotted, :visible, :condition, :org_condition, :process, :partial
 
   def initialize(name, options = {})
     @name = name
@@ -14,8 +14,6 @@ class PaymentMethod
     @visible = options.fetch(:visible, false)
     @condition = options[:condition] || ->(_event) { true }
     @org_condition = options[:org_condition]
-    @logo = options[:logo]
-    @url = options[:url]
     @process = options[:process]
     @partial = options[:partial]
     @order_currency = options[:order_currency]
@@ -58,8 +56,6 @@ PaymentMethod.new('stripe',
                     (event.organisation.stripe_connect_json || event.organisation.stripe_sk) &&
                       FIAT_CURRENCIES.include?(event.currency)
                   },
-                  logo: 'stripe.png',
-                  url: 'https://stripe.com/',
                   process: ->(**kwargs) { PaymentMethod::Stripe.call(**kwargs) })
 
 PaymentMethod.new('gocardless',
@@ -70,16 +66,12 @@ PaymentMethod.new('gocardless',
                       event.organisation.gocardless_access_token &&
                       FIAT_CURRENCIES.include?(event.currency)
                   },
-                  logo: 'gocardless.png',
-                  url: 'https://gocardless.com/',
                   process: ->(**kwargs) { PaymentMethod::GoCardless.call(**kwargs) })
 
 PaymentMethod.new('opencollective',
                   label: 'Pay with Open Collective',
                   org_condition: ->(org) { org.oc_slug },
                   condition: ->(event) { event.oc_slug },
-                  logo: 'opencollective.png',
-                  url: 'https://opencollective.com/',
                   partial: 'purchase/pay_with_opencollective',
                   process: ->(**kwargs) { PaymentMethod::OpenCollective.call(**kwargs) })
 
