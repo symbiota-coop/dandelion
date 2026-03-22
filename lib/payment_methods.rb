@@ -5,14 +5,14 @@ class PaymentMethod
     attr_accessor :all
   end
 
-  attr_accessor :name, :label, :dotted, :visible, :condition, :org_condition, :process, :partial
+  attr_accessor :name, :label, :dotted, :visible, :event_condition, :org_condition, :process, :partial
 
   def initialize(name, options = {})
     @name = name
     @label = options[:label] || name.capitalize
     @dotted = options.fetch(:dotted, true)
     @visible = options.fetch(:visible, false)
-    @condition = options[:condition] || ->(_event) { true }
+    @event_condition = options[:event_condition] || ->(_event) { true }
     @org_condition = options[:org_condition]
     @process = options[:process]
     @partial = options[:partial]
@@ -25,7 +25,9 @@ class PaymentMethod
   end
 
   def available?(event)
-    condition.call(event)
+    return false if org_condition && !org_condition.call(event.organisation)
+
+    event_condition.call(event)
   end
 
   def button_label(event)
@@ -51,27 +53,20 @@ PaymentMethod.new('rsvp',
 PaymentMethod.new('stripe',
                   label: 'Pay',
                   dotted: false,
-                  org_condition: ->(org) { org.stripe_connect_json || org.stripe_pk },
-                  condition: lambda { |event|
-                    (event.organisation.stripe_connect_json || event.organisation.stripe_sk) &&
-                      FIAT_CURRENCIES.include?(event.currency)
-                  },
+                  org_condition: ->(org) { org.stripe_connect_json || org.stripe_sk },
+                  event_condition: ->(event) { FIAT_CURRENCIES.include?(event.currency) },
                   process: ->(**kwargs) { PaymentMethod::Stripe.call(**kwargs) })
 
 PaymentMethod.new('gocardless',
                   label: 'Pay with GoCardless',
                   org_condition: ->(org) { org.gocardless_instant_bank_pay && org.gocardless_access_token },
-                  condition: lambda { |event|
-                    event.organisation.gocardless_instant_bank_pay &&
-                      event.organisation.gocardless_access_token &&
-                      FIAT_CURRENCIES.include?(event.currency)
-                  },
+                  event_condition: ->(event) { FIAT_CURRENCIES.include?(event.currency) },
                   process: ->(**kwargs) { PaymentMethod::GoCardless.call(**kwargs) })
 
 PaymentMethod.new('opencollective',
                   label: 'Pay with Open Collective',
-                  org_condition: ->(org) { org.oc_slug },
-                  condition: ->(event) { event.oc_slug },
+                  org_condition: lambda(&:oc_slug),
+                  event_condition: lambda(&:oc_slug),
                   partial: 'purchase/pay_with_opencollective',
                   process: ->(**kwargs) { PaymentMethod::OpenCollective.call(**kwargs) })
 
@@ -79,11 +74,9 @@ PaymentMethod.new('evm',
                   label: lambda { |event|
                     event.currency.in?(%w[BREAD USD]) ? 'Pay with BREAD on Gnosis Chain' : "Pay with #{event.chain.try(:name)}"
                   },
-                  org_condition: ->(org) { org.evm_address },
-                  condition: lambda { |event|
-                    event.chain &&
-                      event.organisation.evm_address &&
-                      (EVM_CURRENCIES.include?(event.currency) || event.currency == 'USD')
+                  org_condition: lambda(&:evm_address),
+                  event_condition: lambda { |event|
+                    event.chain && (EVM_CURRENCIES.include?(event.currency) || event.currency == 'USD')
                   },
                   order_currency: ->(event) { event.currency == 'USD' ? 'BREAD' : event.currency },
                   partial: 'purchase/pay_with_evm',
