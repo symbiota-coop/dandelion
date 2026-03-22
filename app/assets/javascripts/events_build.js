@@ -1,4 +1,4 @@
-/* global introJs, ClassicEditor, Tribute, autosize, google */
+/* global introJs, autosize, google */
 
 $(function () {
   // Load config from JSON script tag or window fallback

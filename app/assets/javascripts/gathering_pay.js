@@ -1,4 +1,4 @@
-/* global Stripe, Web3, ethereum */
+/* global gatheringPaymentHandlers */
 
 $(function () {
   const config = (function () {
@@ -17,17 +17,12 @@ $(function () {
 
   $('#pay-form').submit(function () {
     $('#pay-form button[data-payment-method-clicked] i').show()
+
+    const handlers = gatheringPaymentHandlers(config)
+    const method = $('input[type=hidden][name=payment_method]:not(:disabled)').val()
+
     $.post('/g/' + config.gatheringSlug + '/pay', $(this).serializeObject(), function (data) {
-      if (data.session_id) {
-        // Stripe
-        const stripe = Stripe(config.stripePk)
-        stripe.redirectToCheckout({ sessionId: data.session_id })
-      } else if (data.evm_secret) {
-        runEvmPaymentFlow(config, data, {
-          pollUrl: '/g/' + config.gatheringSlug + '/payments/' + data.payment_id,
-          onComplete: function () { window.location = '/g/' + config.gatheringSlug + '/options' }
-        })
-      }
+      handlers[method](data)
     }).fail(function () {
       $('#pay-form').hide()
     }).always(function () {

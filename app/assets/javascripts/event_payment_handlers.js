@@ -1,7 +1,7 @@
-/* global Stripe */
+/* global Stripe, runEvmPaymentFlow */
 
 // eslint-disable-next-line no-unused-vars
-function paymentHandlers (config) {
+function eventPaymentHandlers (config) {
   return {
     rsvp: function (data) {
       window.location = '?success=true&order_id=' + data.order_id

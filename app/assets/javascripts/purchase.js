@@ -1,4 +1,4 @@
-/* global Stripe, Web3, ethereum */
+/* global eventPaymentHandlers */
 
 $(function () {
   // Load config from JSON script tag or window fallback
@@ -301,7 +301,7 @@ $(function () {
     $('#total').val($('#totalDisplay').val())
     $('#details form button[data-payment-method-clicked] i').show()
 
-    const handlers = paymentHandlers(config)
+    const handlers = eventPaymentHandlers(config)
     const method = $('input[type=hidden][name=payment_method]:not(:disabled)').val()
 
     $.post('/events/' + config.eventId + '/purchase', {
