@@ -220,6 +220,7 @@ Dandelion::App.controller do
          end
     raise Order::PaymentMethodNotFound if @order.total.positive? && pm&.name == 'rsvp'
     raise Order::PaymentMethodNotFound unless pm&.process
+    raise Order::PaymentMethodNotFound unless pm&.available?(@event)
 
     pm.process_payment(order: @order, event: @event, account: @account, details_form: params[:detailsForm], ticket_form: params[:ticketForm])
   rescue Stripe::InvalidRequestError => e

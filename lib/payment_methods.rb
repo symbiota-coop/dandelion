@@ -44,61 +44,55 @@ class PaymentMethod
   end
 end
 
-require_relative 'payment_methods/rsvp'
-require_relative 'payment_methods/stripe'
-require_relative 'payment_methods/gocardless'
-require_relative 'payment_methods/opencollective'
-require_relative 'payment_methods/evm'
-
 PaymentMethod.new('rsvp',
-                   label: ->(event) { event.rsvp_button_text || 'RSVP' },
-                   dotted: false,
-                   visible: true,
-                   process: ->(**kwargs) { PaymentMethod::Rsvp.call(**kwargs) })
+                  label: ->(event) { event.rsvp_button_text || 'RSVP' },
+                  dotted: false,
+                  visible: true,
+                  process: ->(**kwargs) { PaymentMethod::Rsvp.call(**kwargs) })
 
 PaymentMethod.new('stripe',
-                   label: 'Pay',
-                   dotted: false,
-                   org_condition: ->(org) { org.stripe_connect_json || org.stripe_pk },
-                   condition: ->(event) {
-                     (event.organisation.stripe_connect_json || event.organisation.stripe_sk) &&
-                       FIAT_CURRENCIES.include?(event.currency)
-                   },
-                   logo: 'stripe.png',
-                   url: 'https://stripe.com/',
-                   process: ->(**kwargs) { PaymentMethod::Stripe.call(**kwargs) })
+                  label: 'Pay',
+                  dotted: false,
+                  org_condition: ->(org) { org.stripe_connect_json || org.stripe_pk },
+                  condition: lambda { |event|
+                    (event.organisation.stripe_connect_json || event.organisation.stripe_sk) &&
+                      FIAT_CURRENCIES.include?(event.currency)
+                  },
+                  logo: 'stripe.png',
+                  url: 'https://stripe.com/',
+                  process: ->(**kwargs) { PaymentMethod::Stripe.call(**kwargs) })
 
 PaymentMethod.new('gocardless',
-                   label: 'Pay with GoCardless',
-                   org_condition: ->(org) { org.gocardless_instant_bank_pay && org.gocardless_access_token },
-                   condition: ->(event) {
-                     event.organisation.gocardless_instant_bank_pay &&
-                       event.organisation.gocardless_access_token &&
-                       FIAT_CURRENCIES.include?(event.currency)
-                   },
-                   logo: 'gocardless.png',
-                   url: 'https://gocardless.com/',
-                   process: ->(**kwargs) { PaymentMethod::GoCardless.call(**kwargs) })
+                  label: 'Pay with GoCardless',
+                  org_condition: ->(org) { org.gocardless_instant_bank_pay && org.gocardless_access_token },
+                  condition: lambda { |event|
+                    event.organisation.gocardless_instant_bank_pay &&
+                      event.organisation.gocardless_access_token &&
+                      FIAT_CURRENCIES.include?(event.currency)
+                  },
+                  logo: 'gocardless.png',
+                  url: 'https://gocardless.com/',
+                  process: ->(**kwargs) { PaymentMethod::GoCardless.call(**kwargs) })
 
 PaymentMethod.new('opencollective',
-                   label: 'Pay with Open Collective',
-                   org_condition: ->(org) { org.oc_slug },
-                   condition: ->(event) { event.oc_slug },
-                   logo: 'opencollective.png',
-                   url: 'https://opencollective.com/',
-                   partial: 'purchase/pay_with_opencollective',
-                   process: ->(**kwargs) { PaymentMethod::OpenCollective.call(**kwargs) })
+                  label: 'Pay with Open Collective',
+                  org_condition: ->(org) { org.oc_slug },
+                  condition: ->(event) { event.oc_slug },
+                  logo: 'opencollective.png',
+                  url: 'https://opencollective.com/',
+                  partial: 'purchase/pay_with_opencollective',
+                  process: ->(**kwargs) { PaymentMethod::OpenCollective.call(**kwargs) })
 
 PaymentMethod.new('evm',
-                   label: ->(event) {
-                     event.currency.in?(%w[BREAD USD]) ? 'Pay with BREAD on Gnosis Chain' : "Pay with #{event.chain.try(:name)}"
-                   },
-                   org_condition: ->(org) { org.evm_address },
-                   condition: ->(event) {
-                     event.chain &&
-                       event.organisation.evm_address &&
-                       (EVM_CURRENCIES.include?(event.currency) || event.currency == 'USD')
-                   },
-                   order_currency: ->(event) { event.currency == 'USD' ? 'BREAD' : event.currency },
-                   partial: 'purchase/pay_with_evm',
-                   process: ->(**kwargs) { PaymentMethod::Evm.call(**kwargs) })
+                  label: lambda { |event|
+                    event.currency.in?(%w[BREAD USD]) ? 'Pay with BREAD on Gnosis Chain' : "Pay with #{event.chain.try(:name)}"
+                  },
+                  org_condition: ->(org) { org.evm_address },
+                  condition: lambda { |event|
+                    event.chain &&
+                      event.organisation.evm_address &&
+                      (EVM_CURRENCIES.include?(event.currency) || event.currency == 'USD')
+                  },
+                  order_currency: ->(event) { event.currency == 'USD' ? 'BREAD' : event.currency },
+                  partial: 'purchase/pay_with_evm',
+                  process: ->(**kwargs) { PaymentMethod::Evm.call(**kwargs) })

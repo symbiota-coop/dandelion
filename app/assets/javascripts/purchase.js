@@ -147,7 +147,7 @@ $(function () {
       $('#balance').val((+b).toFixed(2))
       let via_card
       if (config.gocardless || config.ocSlug || config.evmAddress) { via_card = ' via card' } else { via_card = '' }
-      $('#details form button[data-payment-method]:eq(1)').removeClass('btn-dotted')
+      $stripe.removeClass('btn-dotted')
       $rsvp.hide()
       $paid.show()
       $stripe.find('span').text('Pay ' + config.currencySymbol + (+b).toFixed(2) + via_card)
