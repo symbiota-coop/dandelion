@@ -38,7 +38,6 @@ class PaymentMethod
     process.call(order: order, event: event, account: account, details_form: details_form, ticket_form: ticket_form)
   end
 
-  # Currency stored on the order when this payment method is selected (e.g. EVM + USD → BREAD).
   def order_currency_for(event)
     @order_currency&.call(event) || event.currency
   end
