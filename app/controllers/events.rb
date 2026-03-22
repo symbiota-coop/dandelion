@@ -213,7 +213,15 @@ Dandelion::App.controller do
     halt 403 if @event.organisation.banned_emails_a.include?(@account.email)
 
     @order = create_order_with_tickets(params[:ticketForm], params[:detailsForm])
-    process_payment(params[:detailsForm], params[:ticketForm])
+    pm = if @order.total > 0
+           PaymentMethod.object(params[:detailsForm][:payment_method].to_s)
+         else
+           PaymentMethod.object('rsvp')
+         end
+    raise Order::PaymentMethodNotFound if @order.total.positive? && pm&.name == 'rsvp'
+    raise Order::PaymentMethodNotFound unless pm&.process
+
+    pm.process_payment(order: @order, event: @event, account: @account, details_form: params[:detailsForm], ticket_form: params[:ticketForm])
   rescue Stripe::InvalidRequestError => e
     # Don't lock the event if the error is simply that the value is not high enough
     unless e.message&.include?('must add up to at least')
