@@ -301,107 +301,14 @@ $(function () {
     $('#total').val($('#totalDisplay').val())
     $('#details form button[data-payment-method-clicked] i').show()
 
+    const handlers = paymentHandlers(config)
+    const method = $('input[type=hidden][name=payment_method]:not(:disabled)').val()
+
     $.post('/events/' + config.eventId + '/purchase', {
       ticketForm: $('#ticket-types form').serializeObject(),
       detailsForm: $('#details form').serializeObject()
     }, function (data) {
-      if (balance() > 0) {
-        if (data.session_id) {
-          // Stripe
-          const stripe = config.stripeAccount ? Stripe(config.stripePk, { stripeAccount: config.stripeAccount }) : Stripe(config.stripePk)
-          stripe.redirectToCheckout({
-            sessionId: data.session_id
-          })
-        } else if (data.gocardless_billing_request_flow) {
-          // GoCardless
-          window.location = data.gocardless_billing_request_flow['authorisation_url']
-        } else if (data.oc_secret) {
-          // Open Collective
-          window.location = 'https://opencollective.com/' + config.organisationOcSlug + '/events/' + config.ocSlug + '/donate?interval=oneTime&amount=' + data.value + '&tags=' + data.oc_secret + '&redirect=' + encodeURIComponent(config.eventUrl + '?success=true&order_id=' + data.order_id)
-        } else if (data.evm_secret) {
-          // EVM
-          $('#select-tickets').hide()
-          $('#pay-with-evm').show()
-          $('#pay-with-evm').find('.card-body p.lead.please').html('Send EXACTLY <strong>' + data.evm_value + ' ' + (config.currency == 'USD' ? 'BREAD' : config.currency) + '</strong> to <strong>' + config.evmAddress + '</strong>')
-          const offset = $('#pay-with-evm').offset()
-          window.scrollTo(0, offset.top - $('#header').height() - 10)
-
-          const web3 = new Web3(ethereum)
-
-          web3.eth.net.getId().then(thisNetworkId => {
-            if (thisNetworkId != config.networkId) {
-              $('#pay-with-evm').find('.card-body p.web3wallet').html("<mark>Please switch your web3 wallet's network to " + config.networkName + '</mark>')
-              ethereum.request({
-                method: 'wallet_switchEthereumChain',
-                params: [{ chainId: '0x' + config.networkId.toString(16) }]
-              })
-              ethereum.on('chainChanged', function () {
-                web3.eth.net.getId().then(thisNetworkId => {
-                  if (thisNetworkId == config.networkId) { connectWeb3Wallet() }
-                })
-              })
-            } else if (thisNetworkId == config.networkId) {
-              connectWeb3Wallet()
-            }
-          })
-
-          const connectWeb3Wallet = function () {
-            if (!ethereum.selectedAddress) {
-              $('#pay-with-evm').find('.card-body p.web3wallet').html('<a href="javascript:;">Connect your web3 wallet</a>')
-              $('#pay-with-evm').find('.card-body p.web3wallet a').click(function () {
-                ethereum.request({
-                  method: 'eth_requestAccounts'
-                }).then(pay)
-              }).click()
-            } else {
-              pay()
-            }
-          }
-
-          const pay = function () {
-            $('#pay-with-evm').find('.card-body p.web3wallet').remove()
-
-            const abi = [{
-              constant: false,
-              inputs: [{
-                name: '_to',
-                type: 'address'
-              },
-              {
-                name: '_value',
-                type: 'uint256'
-              }
-              ],
-              name: 'transfer',
-              outputs: [{
-                name: '',
-                type: 'bool'
-              }],
-              type: 'function'
-            }]
-
-            const toAddress = config.evmAddress
-            const fromAddress = ethereum.selectedAddress
-            const amount = parseInt(data.evm_wei).toString()
-
-            const contractInstance = new web3.eth.Contract(abi, config.contractAddress)
-            contractInstance.methods.transfer(toAddress, amount).send({
-              from: fromAddress
-            })
-          }
-
-          setInterval(function () {
-            if (Date.now() < data.order_expiry) {
-              $.getJSON('/events/' + config.eventId + '/orders/' + data.order_id + '/payment_completed', function (_data) {
-                if (_data.payment_completed) { window.location = '?success=true&order_id=' + data.order_id }
-              })
-            }
-          }, 10 * 1000)
-        }
-      } else {
-        // RSVP
-        window.location = '?success=true&order_id=' + data.order_id
-      }
+      handlers[method](data)
     }).fail(function () {
       $('#select-tickets, #details').hide()
       $('#card-error').show()

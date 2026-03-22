@@ -241,4 +241,5 @@ end
 <% if @event.organisation.evm_address && @event.chain %>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/web3/1.3.4/web3.min.js"></script>
 <% end %>
+<script src="/javascripts/payment_handlers.js?<%= @cachebuster %>"></script>
 <script src="/javascripts/purchase.js?<%= @cachebuster %>"></script>
