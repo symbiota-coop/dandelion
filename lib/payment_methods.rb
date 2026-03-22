@@ -65,6 +65,7 @@ PaymentMethod.new('stripe',
 
                      cohost = ticket_form[:cohost] && Organisation.find_by(slug: ticket_form[:cohost])
                      event_image = event.image_source(cohost)&.image&.thumb('1920x1920')
+                     organisationship = event.revenue_sharer_organisationship
 
                      stripe_session_hash = {
                        customer_email: account.email,
@@ -85,7 +86,7 @@ PaymentMethod.new('stripe',
 
                      payment_intent_data = { description: order.description, metadata: order.metadata }
                      application_fee_amount = nil
-                     if (organisationship = event.revenue_sharer_organisationship)
+                     if organisationship
                        application_fee_amount = order.calculate_application_fee_amount
                        if event.direct_charges
                          payment_intent_data.merge!(application_fee_amount: (application_fee_amount * 100).round)
@@ -101,7 +102,6 @@ PaymentMethod.new('stripe',
                      end
                      stripe_session_hash.merge!(payment_intent_data: payment_intent_data)
 
-                     organisationship = event.revenue_sharer_organisationship
                      session = if organisationship && event.direct_charges
                                  Stripe::Checkout::Session.create(stripe_session_hash, { stripe_account: organisationship.stripe_user_id })
                                else
