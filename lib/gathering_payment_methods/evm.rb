@@ -1,6 +1,6 @@
 class GatheringPaymentMethod
   module Evm
-    def self.call(gathering:, membership:, account:, params:)
+    def self.call(gathering:, membership:, _account:, params:)
       evm_secret = Array.new(4) { [*'1'..'9'].sample }.join
       payment = membership.payments.create!(
         amount: params[:amount].to_i,
