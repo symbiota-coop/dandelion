@@ -1,18 +1,16 @@
 <div class="main">
 
-  <% if event.organisation.show_details_table_in_ticket_emails && !event.evergreen? %>
+  <% if event.organisation.show_details_table_in_ticket_emails %>
     <h2>
       <span class="text-muted font-weight-normal">
-        Your <%= order.tickets.length == 1 ? 'ticket' : 'tickets' %> to
+        Your <%= event.evergreen? ? 'link' : (order.tickets.length == 1 ? 'ticket' : 'tickets') %> to
       </span>
       <br />
       <%= event.name %>
     </h2>
-
     <hr />
 
     <%= tickets_table %>
-
     <hr />
 
   <% end %>
