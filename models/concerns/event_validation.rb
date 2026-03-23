@@ -15,6 +15,7 @@ module EventValidation
         self.end_time = nil
         self.location = 'Online'
         self.reminder_hours_before = nil
+        self.no_tickets_pdf = true
       end
 
       self.name = name.strip if name
