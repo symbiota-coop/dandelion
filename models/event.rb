@@ -145,6 +145,11 @@ class Event
     q.empty? ? [] : q
   end
 
+  def questions_a_from_event_feedbacks
+    questions_from_feedbacks = event_feedbacks.pluck(:answers).compact.map { |answers| answers.map { |q, _a| q } }.flatten.uniq
+    (feedback_questions_a + questions_from_feedbacks).uniq
+  end
+
   def future?(from = Date.today)
     return true if evergreen?
 

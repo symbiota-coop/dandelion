@@ -20,7 +20,6 @@ class EventFeedback
   field :response, type: String
   field :has_public_answers, type: Boolean
 
-
   validates_uniqueness_of :event, scope: :account, allow_nil: true, conditions: -> { where(deleted_at: nil) }
 
   before_validation do
@@ -139,5 +138,46 @@ class EventFeedback
 
       "#{base_header}# Feedback on #{ef.event.name}, #{ef.event.when_details(ENV['DEFAULT_TIME_ZONE'])} at #{ef.event.location}\n\n#{ef.answers.map { |q, a| "#{base_header}## #{q}\n#{a}" }.join("\n\n")}"
     end.compact.join("\n\n")
+  end
+
+  def self.email_viewer?(event_feedback, account)
+    account && event_feedback && event_feedback.event && Event.email_viewer?(event_feedback.event, account)
+  end
+
+  def self.generate_csv(account:, event: nil)
+    event_feedbacks = order('created_at desc')
+    questions = event&.questions_a_from_event_feedbacks || []
+    CSV.generate do |csv|
+      row = %w[id name email anonymous rating]
+      questions.each { |q| row << q }
+      row += %w[response created_at]
+      csv << row
+      event_feedbacks.each do |ef|
+        show_email = EventFeedback.email_viewer?(ef, account)
+        name = if ef.anonymous? || !ef.account
+                 'Anonymous'
+               else
+                 ef.account.name.to_s
+               end
+        email = if show_email && ef.account && !ef.anonymous?
+                  ef.account.email.to_s
+                else
+                  ''
+                end
+        row = [
+          ef.id.to_s,
+          name,
+          email,
+          ef.anonymous? ? 'yes' : 'no',
+          ef.rating.to_s
+        ]
+        questions.each { |q| row << (ef.answers || []).to_h[q] }
+        row += [
+          ef.response,
+          ef.created_at.to_fs(:db_local)
+        ]
+        csv << row
+      end
+    end
   end
 end

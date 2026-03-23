@@ -20,11 +20,16 @@ Dandelion::App.controller do
     erb :'local_groups/event_feedbacks'
   end
 
-  get '/events/:id/feedback' do
+  get '/events/:id/feedback', provides: %i[html csv] do
     @event = Event.find(params[:id]) || not_found
     event_admins_only!
     @event_feedbacks = @event.event_feedbacks.includes(:account, event: :organisation)
-    erb :'events/event_feedbacks'
+    case content_type
+    when :html
+      erb :'events/event_feedbacks'
+    when :csv
+      @event_feedbacks.generate_csv(account: current_account, event: @event)
+    end
   end
 
   get '/event_feedbacks/report' do

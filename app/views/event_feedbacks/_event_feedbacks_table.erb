@@ -1,3 +1,10 @@
+<% if @event %>
+  <div class="row justify-content-end mb-2">
+    <div class="col-auto">
+      <a class="btn btn-primary" href="/events/<%= @event.id %>/feedback.csv?<%= request.query_string %>"><i class="bi bi-download"></i> CSV</a>
+    </div>
+  </div>
+<% end %>
 <table class="table">
   <thead>
     <tr>
