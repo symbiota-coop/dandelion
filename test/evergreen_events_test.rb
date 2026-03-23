@@ -1,10 +1,12 @@
 require File.expand_path("#{File.dirname(__FILE__)}/test_config.rb")
+require 'rack/test'
 
 class EvergreenEventsTest < ActiveSupport::TestCase
   include Capybara::DSL
+  include Rack::Test::Methods
 
-  def raw_get(path)
-    Rack::MockRequest.new(Padrino.application).get(path)
+  def app
+    Padrino.application
   end
 
   test 'creating an evergreen event without dates' do
@@ -142,10 +144,10 @@ class EvergreenEventsTest < ActiveSupport::TestCase
     @event = FactoryBot.create(:event, organisation: @organisation, account: @account, last_saved_by: @account,
                                        evergreen: true, start_time: nil, end_time: nil, location: nil, prices: [0])
 
-    response = raw_get("/e/#{@event.slug}.json")
+    get "/e/#{@event.slug}.json"
 
-    assert_equal 200, response.status
-    json = JSON.parse(response.body)
+    assert_equal 200, last_response.status
+    json = JSON.parse(last_response.body)
     assert_equal @event.name, json['name']
     assert_nil json['start_date']
     assert_nil json['end_date']
@@ -174,8 +176,10 @@ class EvergreenEventsTest < ActiveSupport::TestCase
                                        evergreen: true, start_time: nil, end_time: nil, location: nil, prices: [0])
     @order = @event.orders.create!(account: @attendee, currency: @event.currency, value: 0, payment_completed: true, original_description: 'Manual test order')
 
-    assert_equal 404, raw_get("/e/#{@event.slug}.ics").status
-    assert_equal 404, raw_get("/orders/#{@order.id}.ics").status
+    get "/e/#{@event.slug}.ics"
+    assert_equal 404, last_response.status
+    get "/orders/#{@order.id}.ics"
+    assert_equal 404, last_response.status
   end
 
   test 'converting a scheduled event to evergreen wipes start time, end time, and location' do
