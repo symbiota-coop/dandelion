@@ -24,11 +24,11 @@ module EventScopes
     end
 
     def past(from = Date.today)
-      self.and(:start_time.lt => from, :evergreen.ne => true).order('start_time desc')
+      self.and(:start_time.lt => from, :evergreen => false).order('start_time desc')
     end
 
     def finished(from = Date.today)
-      self.and(:end_time.lt => from, :evergreen.ne => true).order('start_time desc')
+      self.and(:end_time.lt => from, :evergreen => false).order('start_time desc')
     end
 
     def online
