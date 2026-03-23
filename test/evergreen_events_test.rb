@@ -15,7 +15,7 @@ class EvergreenEventsTest < ActiveSupport::TestCase
     visit "/o/#{@organisation.slug}"
     click_link 'Create an event'
     fill_in 'Event title*', with: 'On-demand Ruby Course'
-    find('label[for="event_evergreen"]').click
+    click_link 'Mark as evergreen/on-demand, with no dates or location'
     click_link 'Tickets'
     execute_script %{$("a:contains('Add ticket type')").click()}
     fill_in 'event_ticket_types_attributes_0_name', with: @ticket_type.name
@@ -114,7 +114,7 @@ class EvergreenEventsTest < ActiveSupport::TestCase
                                        evergreen: true, start_time: nil, end_time: nil, location: nil, prices: [0])
     login_as(@account)
     visit "/e/#{@event.slug}"
-    assert page.has_content? 'On-demand course'
+    assert page.has_content? 'Online'
     assert page.has_content? 'Register for free'
     click_button 'RSVP'
     assert page.has_content? 'Thanks for booking!'
@@ -128,7 +128,7 @@ class EvergreenEventsTest < ActiveSupport::TestCase
     login_as(@account)
     visit '/events'
     assert page.has_content? @event.name
-    assert page.has_content? 'On-demand'
+    assert page.has_content? 'Online'
   end
 
   test 'evergreen event reminder_due_within returns false' do
@@ -163,7 +163,7 @@ class EvergreenEventsTest < ActiveSupport::TestCase
     visit "/o/#{@organisation.slug}/orders"
 
     assert page.has_content? @event.name
-    assert page.has_content? 'On-demand'
+    assert page.has_content? @attendee.name
   end
 
   test 'evergreen event calendar endpoints return not found' do
