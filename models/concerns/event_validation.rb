@@ -2,12 +2,21 @@ module EventValidation
   extend ActiveSupport::Concern
 
   included do
-    validates_presence_of :name, :start_time, :end_time, :location, :currency
+    validates_presence_of :name, :currency
+    validates_presence_of :start_time, :end_time, :location, unless: :evergreen?
     validates_uniqueness_of :slug, allow_nil: true
-    validates_uniqueness_of :name, scope: [:start_time, :organisation_id], conditions: -> { where(deleted_at: nil) }, message: 'is invalid: an event with this title and start time already exists for this organisation', unless: :duplicate
+    validates_uniqueness_of :name, scope: [:start_time, :organisation_id], conditions: -> { where(deleted_at: nil) }, message: 'is invalid: an event with this title and start time already exists for this organisation', unless: -> { duplicate || evergreen? }
+    validates_uniqueness_of :name, scope: [:organisation_id], conditions: -> { where(deleted_at: nil, evergreen: true) }, message: 'is invalid: an on-demand course with this title already exists for this organisation', if: -> { evergreen? && !duplicate }
     validates_format_of :slug, with: /\A[a-z0-9-]+\z/, if: :slug
 
     before_validation do
+      if evergreen?
+        self.start_time = nil
+        self.end_time = nil
+        self.location = 'Online'
+        self.reminder_hours_before = nil
+      end
+
       self.name = name.strip if name
       self.suggested_donation = suggested_donation.round(2) if suggested_donation
       self.minimum_donation = nil unless suggested_donation

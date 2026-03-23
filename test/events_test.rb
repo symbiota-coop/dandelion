@@ -14,7 +14,7 @@ class EventsTest < ActiveSupport::TestCase
     fill_in 'Event title*', with: @event.name
     execute_script %{$('#event_start_time').val('#{@event.start_time.to_fs(:db_local)}')}
     execute_script %{$('#event_end_time').val('#{@event.end_time.to_fs(:db_local)}')}
-    fill_in 'Location*', with: @event.location
+    fill_in 'Location', with: @event.location
     click_link 'Tickets'
     execute_script %{$("a:contains('Add ticket type')").click()}
     fill_in 'event_ticket_types_attributes_0_name', with: @ticket_type.name
@@ -36,7 +36,7 @@ class EventsTest < ActiveSupport::TestCase
     fill_in 'Event title*', with: @event.name
     execute_script %{$('#event_start_time').val('#{@event.start_time.to_fs(:db_local)}')}
     execute_script %{$('#event_end_time').val('#{@event.end_time.to_fs(:db_local)}')}
-    fill_in 'Location*', with: @event.location
+    fill_in 'Location', with: @event.location
     click_link 'Tickets'
     execute_script %{$("a:contains('Add ticket type')").click()}
     fill_in 'event_ticket_types_attributes_0_name', with: @ticket_type.name

@@ -146,18 +146,26 @@ class Event
   end
 
   def future?(from = Date.today)
+    return true if evergreen?
+
     start_time >= from
   end
 
   def past?(from = Date.today)
+    return false if evergreen?
+
     start_time < from
   end
 
   def started?(from = Date.today)
+    return false if evergreen?
+
     from >= start_time
   end
 
   def finished?(from = Date.today)
+    return false if evergreen?
+
     end_time < from
   end
 
@@ -290,6 +298,8 @@ class Event
   end
 
   def ical(order: nil)
+    return nil if evergreen?
+
     event = self
     cal = Icalendar::Calendar.new
     cal.append_custom_property('METHOD', 'REQUEST') if order

@@ -84,14 +84,16 @@
       </td>
     </tr>
   <% end %>
-  <tr>
-    <td>
-      Add to calendar
-    </td>
-    <td>
-      <%= partial :'events/add_to_calendar', locals: { event: @event } %>
-    </td>
-  </tr>
+  <% unless @event.evergreen? %>
+    <tr>
+      <td>
+        Add to calendar
+      </td>
+      <td>
+        <%= partial :'events/add_to_calendar', locals: { event: @event } %>
+      </td>
+    </tr>
+  <% end %>
   <% unless @event.secret? %>
     <tr>
       <td>QR code</td>

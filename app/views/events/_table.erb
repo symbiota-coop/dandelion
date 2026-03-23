@@ -43,8 +43,8 @@
     <td>
       <%= partial :'events/facilitators', locals: {event: event} %>
     </td>
-    <td data-sort="<%= event.start_time.iso8601 %>">
-      <%= when_details(event) %>
+    <td data-sort="<%= event.start_time&.iso8601 %>">
+      <%= when_details(event) || 'On-demand' %>
     </td>
     <td>
       <%= partial :'events/location', locals: {event: event} %>

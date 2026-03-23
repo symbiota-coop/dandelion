@@ -129,10 +129,37 @@ $(function () {
     }
   })
 
-  // Timezone hint
+  // Evergreen toggle
+  $('#event_evergreen').change(function () {
+    if ($(this).is(':checked')) {
+      $('#time-fields, .evergreen-hide').hide()
+      $('#event_start_time, #event_end_time, #event_location').removeAttr('required')
+      $('#event_location').val('')
+        ;['#event_start_time', '#event_end_time'].forEach(function (sel) {
+          const el = document.querySelector(sel)
+          if (el && el._flatpickr) el._flatpickr.clear()
+        })
+    } else {
+      $('#time-fields, .evergreen-hide').show()
+    }
+  }).change()
+
+  // Timezone hint (start_time <small> matches gem: sibling of hidden #event_start_time inside the field wrapper)
   if (config.timeZoneSuffix) {
     $('#event_start_time').siblings('small').text(config.timeZoneSuffix)
     $('#event_end_time').siblings('small').text(config.timeZoneSuffix)
+  }
+
+  const $evergreen = $('#event_evergreen')
+  if (!$evergreen.is(':checked')) {
+    const $startSmall = $('#event_start_time').siblings('small')
+    $('<a href="javascript:;" class="mt-1">Mark as evergreen/on-demand, with no dates or location</a>')
+      .insertAfter($startSmall)
+      .on('click', function (e) {
+        $(this).hide()
+        $evergreen.prop('checked', true).trigger('change')
+        $evergreen.closest('.checkbox').parent().show()
+      })
   }
 
   // Google Places Autocomplete for location

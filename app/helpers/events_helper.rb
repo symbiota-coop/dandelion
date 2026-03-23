@@ -79,7 +79,7 @@ Dandelion::App.helpers do
 
   def calendar_json(events)
     user_time_zone = current_account ? current_account.time_zone : session[:time_zone]
-    events.map do |event|
+    events.reject(&:evergreen?).map do |event|
       {
         id: event.id.to_s,
         name: event.name,
@@ -96,6 +96,8 @@ Dandelion::App.helpers do
     cal = Icalendar::Calendar.new
     cal.append_custom_property('X-WR-CALNAME', calendar_name)
     events.each do |event|
+      next if event.evergreen?
+
       cal.event do |e|
         if ical_full
           e.summary = event.name

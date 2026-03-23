@@ -44,6 +44,7 @@ module EventNotifications
   end
 
   def send_reminders(account_id)
+    return if evergreen?
     return unless organisation
     return unless reminder_hours_before
 
@@ -82,6 +83,7 @@ module EventNotifications
   end
 
   def send_star_reminders(account_id)
+    return if evergreen?
     return unless organisation
 
     mg_client = Mailgun::Client.new ENV['MAILGUN_API_KEY'], ENV['MAILGUN_REGION']
@@ -106,6 +108,7 @@ module EventNotifications
   end
 
   def send_feedback_requests(account_id)
+    return if evergreen?
     return if feedback_questions.nil?
     return unless organisation
     return if sent_feedback_requests_at && account_id == :all

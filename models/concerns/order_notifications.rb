@@ -62,21 +62,26 @@ module OrderNotifications
       batch_message.add_attachment tickets_pdf_file, tickets_pdf_filename
     end
 
-    if event.event_sessions.empty?
-      cal = event.ical(order: order)
-      ics_filename = "event-#{event.name.parameterize}-#{order.id}.ics"
-      ics_file = File.new(ics_filename, 'w+')
-      ics_file.write cal.to_ical
-      ics_file.rewind
-      batch_message.add_attachment ics_file, ics_filename
-    else
-      event.event_sessions.each do |event_session|
-        cal = event_session.ical(order: order)
-        ics_filename = "event-session-#{event_session.name.parameterize}-#{order.id}.ics"
+    ics_files = []
+    unless event.evergreen?
+      if event.event_sessions.empty?
+        cal = event.ical(order: order)
+        ics_filename = "event-#{event.name.parameterize}-#{order.id}.ics"
         ics_file = File.new(ics_filename, 'w+')
         ics_file.write cal.to_ical
         ics_file.rewind
         batch_message.add_attachment ics_file, ics_filename
+        ics_files << [ics_file, ics_filename]
+      else
+        event.event_sessions.each do |event_session|
+          cal = event_session.ical(order: order)
+          ics_filename = "event-session-#{event_session.name.parameterize}-#{order.id}.ics"
+          ics_file = File.new(ics_filename, 'w+')
+          ics_file.write cal.to_ical
+          ics_file.rewind
+          batch_message.add_attachment ics_file, ics_filename
+          ics_files << [ics_file, ics_filename]
+        end
       end
     end
 
@@ -91,8 +96,10 @@ module OrderNotifications
       tickets_pdf_file.close
       File.delete(tickets_pdf_filename)
     end
-    ics_file.close
-    File.delete(ics_filename)
+    ics_files.each do |f, fn|
+      f.close
+      File.delete(fn)
+    end
 
     # Send Signal message if account has phone number
     send_signal_order_link if account&.phone.present?
@@ -103,7 +110,9 @@ module OrderNotifications
     return unless account&.phone.present?
 
     order_url = "#{ENV['BASE_URI']}/orders/#{id}"
-    message = "Thanks for booking onto #{event.name}, #{event.when_details(account.try(:time_zone)).split(' (UTC')[0]}!\n\nView your order confirmation at #{order_url}"
+    wd = event.when_details(account.try(:time_zone))
+    when_text = wd ? ", #{wd.split(' (UTC')[0]}" : ''
+    message = "Thanks for booking onto #{event.name}#{when_text}!\n\nView your order confirmation at #{order_url}"
 
     send_signal_message(account.phone, message)
   end

@@ -89,10 +89,12 @@
         </div>
       <% end %>
 
-      <h5 class="mb-1">Add to calendar</h5>
-      <p class="mb-1"><% if @event.event_sessions.exists? %>Full event: <% end %><%= partial :'events/add_to_calendar', locals: { event: @event } %></p>
-      <% @event.event_sessions.each do |event_session| %>
-        <p class="mb-1">Session <%= event_session.session_number %>: <%= partial :'events/add_to_calendar', locals: { event_session: event_session } %></p>
+      <% if (@event.start_time && @event.end_time) || @event.event_sessions.exists? %>
+        <h5 class="mb-1">Add to calendar</h5>
+        <p class="mb-1"><% if @event.event_sessions.exists? %>Full event: <% end %><%= partial :'events/add_to_calendar', locals: { event: @event } %></p>
+        <% @event.event_sessions.each do |event_session| %>
+          <p class="mb-1">Session <%= event_session.session_number %>: <%= partial :'events/add_to_calendar', locals: { event_session: event_session } %></p>
+        <% end %>
       <% end %>
       <% if @order.account && !@event.donations_to_dandelion? %>
         <%= partial :'accounts/pay', locals: {div_class: 'mt-5', source: "event:#{@event.id}", account: @order.account } %>

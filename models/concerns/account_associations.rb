@@ -174,11 +174,11 @@ module AccountAssociations
   end
 
   def upcoming_events
-    my_events.future
+    my_events.and(:evergreen.ne => true).future
   end
 
   def previous_events
-    my_events.past
+    my_events.and(:evergreen.ne => true).past
   end
 
   def associate_with_organisation!(organisation, options = {})

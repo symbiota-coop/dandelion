@@ -1,27 +1,29 @@
 <table class="event-details">
   <tbody>
-    <tr>
-      <td>
-        <img src="<%=ENV['BASE_URI']%>/images/icons/calendar/png/<%= event.theme_color_or_organisation_theme_color ? 'greyscale' : 'green' %>/<%= event.start_time.strftime('%b').downcase %>_<%= event.start_time.strftime('%d') %>.png">
-      </td>
-      <td>
-        <% if defined?(account) %>
-          <% when_parts = event.when_details(account.try(:time_zone), with_zone: true).split(', ') %>
-          <%= when_parts[0] %>
-          <div class="text-muted" style="font-size: 90%;">
-            <%= when_parts[1..].join(', ') %>
-          </div>
-        <% else %>
-          %recipient.when_parts_0%
-          <div class="text-muted" style="font-size: 90%;">
-            %recipient.when_parts_1%
-          </div>
-        <% end %>
-      </td>
-    </tr>
-    <tr>
-      <td colspan="2" class="event-detail-separator">&nbsp;</td>
-    </tr>
+    <% unless event.evergreen? %>
+      <tr>
+        <td>
+          <img src="<%=ENV['BASE_URI']%>/images/icons/calendar/png/<%= event.theme_color_or_organisation_theme_color ? 'greyscale' : 'green' %>/<%= event.start_time.strftime('%b').downcase %>_<%= event.start_time.strftime('%d') %>.png">
+        </td>
+        <td>
+          <% if defined?(account) %>
+            <% when_parts = event.when_details(account.try(:time_zone), with_zone: true).split(', ') %>
+            <%= when_parts[0] %>
+            <div class="text-muted" style="font-size: 90%;">
+              <%= when_parts[1..].join(', ') %>
+            </div>
+          <% else %>
+            %recipient.when_parts_0%
+            <div class="text-muted" style="font-size: 90%;">
+              %recipient.when_parts_1%
+            </div>
+          <% end %>
+        </td>
+      </tr>
+      <tr>
+        <td colspan="2" class="event-detail-separator">&nbsp;</td>
+      </tr>
+    <% end %>
     <tr>
       <td>
         <a <% if event.location != 'Online' %>href="https://www.google.com/maps?q=<%=event.location%>"<% end %> target="_blank">

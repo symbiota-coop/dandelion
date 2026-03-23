@@ -87,9 +87,14 @@
       <div role="tabpanel" class="tab-pane active" id="tab-basics">
         <%= f.hidden_field :organisation_id, value: @event.organisation_id %>
         <%= f.text_block :name %>
-        <%= f.datetime_block :start_time %>
-        <%= f.datetime_block :end_time %>
-        <%= f.text_block :location %>
+        <div <% unless @event.evergreen? %>style="display: none;"<% end %>>
+          <%= f.check_box_block :evergreen %>
+        </div>
+        <div id="time-fields" style="<%= 'display:none' if @event.evergreen? %>">
+          <%= f.datetime_block :start_time %>
+          <%= f.datetime_block :end_time %>
+          <%= f.text_block :location %>
+        </div>
         <%= f.email_block :email %>
         <%= f.image_block :image %>
         <%= f.url_block :facebook_event_url %>
@@ -219,7 +224,9 @@
           <% if @event.persisted? %>
             <p style="margin-top: -1rem"><a target="_blank" href="/events/<%=@event.id%>/reminder_email">Preview reminder email &rarr;</a></p>
           <% end %>
-          <%= f.number_block :reminder_hours_before %>
+          <div class="evergreen-hide" style="<%= 'display:none' if @event.evergreen? %>">
+            <%= f.number_block :reminder_hours_before %>
+          </div>
         </div>
         <div class="mt-5">
           <%= f.text_block :feedback_email_title %>
@@ -251,8 +258,10 @@
         <% end %>
         <%= f.check_box_block :no_tickets_pdf %>
         <%= f.check_box_block :monthly_donors_only %>
-        <%= f.check_box_block :no_sales_after_end_time %>
-        <%= f.check_box_block :show_after_start_time %>
+        <div class="evergreen-hide" style="<%= 'display:none' if @event.evergreen? %>">
+          <%= f.check_box_block :no_sales_after_end_time %>
+          <%= f.check_box_block :show_after_start_time %>
+        </div>
         <%= f.check_box_block :no_discounts %>
         <%= f.check_box_block :enable_resales %>
         <%= f.check_box_block :show_emails %>

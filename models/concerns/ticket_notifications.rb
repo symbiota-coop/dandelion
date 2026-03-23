@@ -46,21 +46,26 @@ module TicketNotifications
       batch_message.add_attachment tickets_pdf_file, tickets_pdf_filename
     end
 
-    if event.event_sessions.empty?
-      cal = event.ical(order: order)
-      ics_filename = "event-#{event.name.parameterize}-#{order.id}.ics"
-      ics_file = File.new(ics_filename, 'w+')
-      ics_file.write cal.to_ical
-      ics_file.rewind
-      batch_message.add_attachment ics_file, ics_filename
-    else
-      event.event_sessions.each do |event_session|
-        cal = event_session.ical(order: order)
-        ics_filename = "event-session-#{event_session.name.parameterize}-#{order.id}.ics"
+    ics_files = []
+    unless event.evergreen?
+      if event.event_sessions.empty?
+        cal = event.ical(order: order)
+        ics_filename = "event-#{event.name.parameterize}-#{order.id}.ics"
         ics_file = File.new(ics_filename, 'w+')
         ics_file.write cal.to_ical
         ics_file.rewind
         batch_message.add_attachment ics_file, ics_filename
+        ics_files << [ics_file, ics_filename]
+      else
+        event.event_sessions.each do |event_session|
+          cal = event_session.ical(order: order)
+          ics_filename = "event-session-#{event_session.name.parameterize}-#{order.id}.ics"
+          ics_file = File.new(ics_filename, 'w+')
+          ics_file.write cal.to_ical
+          ics_file.rewind
+          batch_message.add_attachment ics_file, ics_filename
+          ics_files << [ics_file, ics_filename]
+        end
       end
     end
 
@@ -76,8 +81,10 @@ module TicketNotifications
       tickets_pdf_file.close
       File.delete(tickets_pdf_filename)
     end
-    ics_file.close
-    File.delete(ics_filename)
+    ics_files.each do |f, fn|
+      f.close
+      File.delete(fn)
+    end
   end
 
   def notify_of_failed_refund(error)

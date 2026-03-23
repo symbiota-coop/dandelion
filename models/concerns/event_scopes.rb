@@ -9,22 +9,26 @@ module EventScopes
     end
 
     def future(from = Date.today)
-      self.and(:start_time.gte => from).order('start_time asc')
+      self.and('$or' => [
+                 { :start_time.gte => from },
+                 { evergreen: true }
+               ]).order('start_time asc')
     end
 
     def future_and_current(from = Date.today)
       self.and('$or' => [
                  { start_time: { '$gte' => from } },
-                 { end_time: { '$gte' => from }, show_after_start_time: true }
+                 { end_time: { '$gte' => from }, show_after_start_time: true },
+                 { evergreen: true }
                ]).order('start_time asc')
     end
 
     def past(from = Date.today)
-      self.and(:start_time.lt => from).order('start_time desc')
+      self.and(:start_time.lt => from, :evergreen.ne => true).order('start_time desc')
     end
 
     def finished(from = Date.today)
-      self.and(:end_time.lt => from).order('start_time desc')
+      self.and(:end_time.lt => from, :evergreen.ne => true).order('start_time desc')
     end
 
     def online

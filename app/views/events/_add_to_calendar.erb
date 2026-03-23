@@ -4,18 +4,22 @@ if defined?(event)
 elsif defined?(event_session)
   addable = event_session
 end
-
-name = addable.name
-details = "#{ENV['BASE_URI']}/e/#{addable.slug}"
-location = addable.location
-start_time = addable.start_time.utc.iso8601.gsub('-', '').gsub(':', '')
-end_time = addable.end_time.utc.iso8601.gsub('-', '').gsub(':', '')
 %>
 
-<a target="_blank" href="https://www.google.com/calendar/render?action=TEMPLATE&text=<%= ERB::Util.url_encode(name) %>&details=<%= ERB::Util.url_encode(details) %>&location=<%= ERB::Util.url_encode(location) %>&dates=<%= ERB::Util.url_encode("#{start_time}/#{end_time}") %>">
-  <%= defined?(add_to) ? 'Add to Google Calendar' : 'Google' %>
-</a>
-&middot;
-<a target="_blank" href="/<%= addable.class.name.underscore.pluralize %>/<%= addable.id %>.ics">
-  <%= defined?(add_to) ? 'Add as ICS' : 'ICS' %>
-</a>
+<% if addable.start_time && addable.end_time %>
+  <%
+  name = addable.name
+  details = "#{ENV['BASE_URI']}/e/#{addable.slug}"
+  location = addable.location
+  start_time = addable.start_time.utc.iso8601.gsub('-', '').gsub(':', '')
+  end_time = addable.end_time.utc.iso8601.gsub('-', '').gsub(':', '')
+  %>
+
+  <a target="_blank" href="https://www.google.com/calendar/render?action=TEMPLATE&text=<%= ERB::Util.url_encode(name) %>&details=<%= ERB::Util.url_encode(details) %>&location=<%= ERB::Util.url_encode(location) %>&dates=<%= ERB::Util.url_encode("#{start_time}/#{end_time}") %>">
+    <%= defined?(add_to) ? 'Add to Google Calendar' : 'Google' %>
+  </a>
+  &middot;
+  <a target="_blank" href="/<%= addable.class.name.underscore.pluralize %>/<%= addable.id %>.ics">
+    <%= defined?(add_to) ? 'Add as ICS' : 'ICS' %>
+  </a>
+<% end %>

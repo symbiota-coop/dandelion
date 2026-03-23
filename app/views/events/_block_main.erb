@@ -28,10 +28,12 @@
       <%= partial :'events/facilitators', locals: {event: event, event_facilitators: ef} %>
     </li>
   <% end %>
-  <li>
-    <i data-toggle="tooltip" title="Dates/times" class="bi bi-calendar-event"></i>
-    <%= when_details(event).split(' (UTC')[0] %>
-  </li>
+  <% unless event.evergreen? %>
+    <li>
+      <i data-toggle="tooltip" title="Dates/times" class="bi bi-calendar-event"></i>
+      <%= when_details(event).split(' (UTC')[0] %>
+    </li>
+  <% end %>
   <li>
     <i data-toggle="tooltip" title="Location" class="bi bi-geo-alt-fill"></i>
     <%= partial :'events/location', locals: {event: event} %>

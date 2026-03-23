@@ -149,7 +149,7 @@ Dandelion::App.controller do
     redirect @event.purchase_url if @event.minimal_only? && @event.purchase_url
 
     @order = Order.find(params[:order_id]) || not_found if params[:order_id]
-    @og_desc = when_details(@event)
+    @og_desc = when_details(@event) || 'On-demand'
     kick! unless @event.organisation
     kick!(redirect_url: "/o/#{@event.organisation.slug}/events") if @event.locked? && !event_admin?
     @title = @event.name
@@ -184,8 +184,8 @@ Dandelion::App.controller do
     when :json
       {
         name: @event.name,
-        start_date: @event.start_time.to_date.to_fs(:db_local),
-        end_date: @event.end_time.to_date.to_fs(:db_local),
+        start_date: @event.start_time&.to_date&.to_fs(:db_local),
+        end_date: @event.end_time&.to_date&.to_fs(:db_local),
         activity: ("#{@event.activity.name} (#{@event.activity_id})" if @event.activity),
         event_coordinator: ("#{@event.coordinator.name} (#{@event.coordinator_id})" if @event.coordinator),
         carousel: @event.carousel_name,
@@ -196,7 +196,7 @@ Dandelion::App.controller do
         organisation_revenue_share: (@event.organisation_revenue_share if @event.revenue_sharer)
       }.to_json
     when :ics
-      @event.ical.to_ical
+      (cal = @event.ical) ? cal.to_ical : not_found
     when :jpg
       @ical_image ? redirect(@ical_image) : not_found
     end

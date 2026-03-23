@@ -15,7 +15,7 @@ Dandelion::App.controller do
       end
 
     when :ics
-      @event.ical(order: @order).to_ical
+      (cal = @event.ical(order: @order)) ? cal.to_ical : not_found
     when :pdf
       @order.tickets_pdf.render
     end

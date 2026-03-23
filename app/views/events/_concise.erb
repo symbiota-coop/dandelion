@@ -1,8 +1,8 @@
 <ul>
   <% @events.each { |event| %>
   <li>
-    <a href="/e/<%=event.slug%>"><%= event.name %></a>, 
-    <%= event.start_time.to_date.to_fs(:no_year) %>
+    <a href="/e/<%=event.slug%>"><%= event.name %></a>,
+    <%= event.evergreen? ? 'On-demand' : event.start_time.to_date.to_fs(:no_year) %>
   </li>
   <% } %>
 </ul>
