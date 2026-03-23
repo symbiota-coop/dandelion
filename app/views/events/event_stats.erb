@@ -80,6 +80,7 @@
       <%= checkbox 'In person', form_group_class: 'col-auto col-sm-auto' %>
       <%= checkbox 'No coordinator', form_group_class: 'col-auto col-sm-auto' %>
       <%= checkbox 'No facilitators', form_group_class: 'col-auto col-sm-auto' %>
+      <%= checkbox 'Evergreen', form_group_class: 'col-auto col-sm-auto' %>
       <% if @organisation %>
         <%= checkbox 'Exclude co-hosted', form_group_class: 'col-auto col-sm-auto' %>
         <% if @organisation.stripe_client_id %>

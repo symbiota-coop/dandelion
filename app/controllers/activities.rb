@@ -64,8 +64,7 @@ Dandelion::App.controller do
     @start_or_end = (params[:start_or_end] == 'end' ? 'end' : 'start')
     @events = @activity.events.without_heavy_fields
     @events = params[:order] == 'created_at' ? @events.order('created_at desc') : @events.order("#{@start_or_end}_time asc")
-    @events = @events.and(:"#{@start_or_end}_time".gte => @from)
-    @events = @events.and(:"#{@start_or_end}_time".lt => @to + 1) if @to
+    @events = apply_event_stats_date_filter(@events, from: @from, to: @to, start_or_end: @start_or_end, include_evergreen: params[:evergreen])
     @events = @events.and(coordinator_id: params[:coordinator_id]) if params[:coordinator_id]
     @events = @events.and(coordinator_id: nil) if params[:no_coordinator]
     @events = @events.and(:id.nin => EventFacilitation.pluck(:event_id)) if params[:no_facilitators]

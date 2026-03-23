@@ -35,6 +35,15 @@ Dandelion::App.helpers do
     events
   end
 
+  def apply_event_stats_date_filter(events, from:, to:, start_or_end:, include_evergreen:)
+    return events.and(evergreen: true) if include_evergreen
+
+    date_field = :"#{start_or_end}_time"
+    events = events.and(date_field.gte => from)
+    events = events.and(date_field.lt => to + 1) if to
+    events
+  end
+
   def apply_events_order(events)
     case params[:order]
     when 'created_at'
