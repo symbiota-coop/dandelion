@@ -78,7 +78,7 @@ Make sure the 'Send email notifications of orders' checkbox is checked in the fi
 
 ## Track how people discovered the event
 
-Add ?via= to the end of your event URL and you will see the result on the Orders page e.g. [https://dandelion.events/e123f?via=may-newsletter](https://dandelion.events/e123f?via=may-newsletter)
+Add `?via=` to the end of your event URL and you will see the result on the Orders page e.g. [https://dandelion.events/e123f?via=may-newsletter](https://dandelion.events/e123f?via=may-newsletter)
 
 ## Checking people in
 
@@ -213,13 +213,13 @@ Typically, nothing. Some organisations list the same ticket at different prices 
 
 ## Embedding event listings
 
-Embed an [iframe](https://www.techtarget.com/whatis/definition/IFrame-Inline-Frame) like this, replacing the-psychedelic-society with your organisation's slug:
+Embed an [iframe](https://www.techtarget.com/whatis/definition/IFrame-Inline-Frame) like this, replacing `the-psychedelic-society` with your organisation's slug:
 
 ```html
 <iframe style="overflow: scroll; border: 0; width:100%; height: 100vh;" class="dandelion-auto-height"  src="https://dandelion.events/o/the-psychedelic-society/events?minimal=1"></iframe>
 ```
 
-You can also experiment with the parameters hide_featured_title, no_search, no_view_options, no_listings and first_carousel_only e.g. ?minimal=1&hide_featured_title=1&no_search=1&no_view_options=1&no_listings=1&first_carousel_only=1
+You can also experiment with the parameters `hide_featured_title`, `no_search`, `no_view_options`, `no_listings` and `first_carousel_only` e.g. `?minimal=1&hide_featured_title=1&no_search=1&no_view_options=1&no_listings=1&first_carousel_only=1`
 
 Put this in your head to set the iframe to the correct height:
 
@@ -235,7 +235,7 @@ Put this in your head to set the iframe to the correct height:
 
 ## Embedding ticket forms
 
-Embed an iframe like this, replacing https://dandelion.events/e/my-event with your event URL:
+Embed an iframe like this, replacing `https://dandelion.events/e/my-event` with your event URL. The `ticket_form_only` query parameter limits the embed to the ticket form:
 
 ```html
 <iframe style="overflow: scroll; border: 0; width:100%; height: 100vh" class="dandelion-auto-height" src="https://dandelion.events/e/my-event?ticket_form_only=1"></iframe>
