@@ -23,7 +23,7 @@
         .gsub('[lastname]', account.lastname || '')
         .gsub('[fullname]', account.name)
         .gsub('[event_name]', "<a href='#{ENV['BASE_URI']}/e/#{event.slug}'>#{event.name}</a>")
-        .gsub('[event_when]', event.when_details(account.try(:time_zone)) || 'an on-demand product')
+        .gsub('[event_when]', event.when_details(account.try(:time_zone)) || '')
         .gsub('[event_location]', event.location)
         .gsub('[event_url]', "#{ENV['BASE_URI']}/e/#{event.slug}")
         .gsub(' [at_event_location_if_not_online]', event.online? ? '' : " at #{event.location}")        
