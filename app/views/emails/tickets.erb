@@ -60,7 +60,7 @@
       </p>
     <% end %>
   <% end %>
-  <% if event.organisation.show_sign_in_link_in_ticket_emails && !event.hide_attendees %>
+  <% if event.organisation.show_sign_in_link_in_ticket_emails && !event.hide_attendees && !event.evergreen? %>
     <p>
       <% if !account.has_signed_in? && account.persisted? %>
         <a href="<%= ENV['BASE_URI'] %>/accounts/edit?sign_in_token=%recipient.token%&event_id=<%= event.id %>">Click here to create a profile on Dandelion and connect with others <%= event.recording? ? 'who attended' : 'attending' %> the event.</a>
