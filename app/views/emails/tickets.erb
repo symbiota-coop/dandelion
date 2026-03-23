@@ -1,6 +1,6 @@
 <div class="main">
 
-  <% if event.organisation.show_details_table_in_ticket_emails %>
+  <% if event.organisation.show_details_table_in_ticket_emails && !event.evergreen? %>
     <h2>
       <span class="text-muted font-weight-normal">
         Your <%= order.tickets.length == 1 ? 'ticket' : 'tickets' %> to
@@ -19,6 +19,8 @@
 
   <%= EmailHelper.replace_youtube_oembeds(
         ((event.recording? ? event.recording_email_greeting : event.ticket_email_greeting) || (event.recording? ? event.organisation.recording_email_greeting : event.organisation.ticket_email_greeting))
+        .then { |html| event.evergreen? ? html.gsub(/,\s*\[event_when\]\s+\[at_event_location_if_not_online\]/, '') : html }
+        .then { |html| event.no_tickets_pdf ? html.gsub(/\s*Your \[tickets_are\] attached\.?/, '') : html }
         .gsub('[firstname]', account.firstname)
         .gsub('[lastname]', account.lastname || '')
         .gsub('[fullname]', account.name)
@@ -26,8 +28,7 @@
         .gsub('[event_when]', event.when_details(account.try(:time_zone)) || 'an on-demand product')
         .gsub('[event_location]', event.location)
         .gsub('[event_url]', "#{ENV['BASE_URI']}/e/#{event.slug}")
-        .gsub(' [at_event_location_if_not_online]', event.online? ? '' : " at #{event.location}")
-        .then { |html| event.no_tickets_pdf ? html.gsub(/\s*Your \[tickets_are\] attached\.?/, '') : html }
+        .gsub(' [at_event_location_if_not_online]', event.online? ? '' : " at #{event.location}")        
         .gsub('[tickets_are]', order.tickets.length == 1 ? 'ticket is' : 'tickets are')
       ) %>
 

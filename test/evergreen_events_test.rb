@@ -122,13 +122,13 @@ class EvergreenEventsTest < ActiveSupport::TestCase
     assert page.has_content? 'Thanks for booking!'
   end
 
-  test 'evergreen event appears on events listing page' do
+  test 'evergreen event appears on organisation events page' do
     @account = FactoryBot.create(:account)
     @organisation = FactoryBot.create(:organisation, account: @account)
     @event = FactoryBot.create(:event, organisation: @organisation, account: @account, last_saved_by: @account,
                                        evergreen: true, start_time: nil, end_time: nil, location: nil, prices: [0])
     login_as(@account)
-    visit '/events'
+    visit "/o/#{@organisation.slug}/events"
     assert page.has_content? @event.name
     assert page.has_content? 'Online'
   end
