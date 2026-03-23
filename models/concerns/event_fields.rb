@@ -106,7 +106,7 @@ module EventFields
         hide_waitlist: 'Hide waitlist',
         no_sales_after_end_time: 'No sales after event ends',
         show_after_start_time: 'Show after start time',
-        evergreen: 'Evergreen/On-demand',
+        evergreen: 'Evergreen',
         update_activity_events: 'Update all future events in this activity with the same key information'
       }.merge(email_human_attribute_names).merge({
                                                    recording_email_title: 'Order confirmation email subject for the recording of the event',

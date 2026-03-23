@@ -46,7 +46,7 @@
       <hr>
       <%= EmailHelper.replace_youtube_oembeds(event.organisation.extra_info_for_ticket_email) %>
     <% end %>
-    <% if !event.recording? && event.organisation.show_ticketholder_link_in_ticket_emails %>
+    <% if !event.evergreen? && !event.recording? && event.organisation.show_ticketholder_link_in_ticket_emails %>
       <p>
         <a href="<%=ENV['BASE_URI']%>/e/<%=event.slug%>?order_id=<%=order.id%>">Visit this page to add details of ticketholders.</a>
       </p>

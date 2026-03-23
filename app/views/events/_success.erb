@@ -25,56 +25,58 @@
     <% else %>
 
 
-      <script>
-        function showSavedTooltipAndSubmit(element) {
-          // Create tooltip if it doesn't exist
-          if (!$(element).data('bs.tooltip')) {
-            $(element).tooltip({
-              title: 'Saved!',
-              trigger: 'manual',
-              placement: 'top'
-            });
+      <% unless @event.evergreen? %>
+        <script>
+          function showSavedTooltipAndSubmit(element) {
+            // Create tooltip if it doesn't exist
+            if (!$(element).data('bs.tooltip')) {
+              $(element).tooltip({
+                title: 'Saved!',
+                trigger: 'manual',
+                placement: 'top'
+              });
+            }
+
+            // Show tooltip
+            $(element).tooltip('show');
+
+            // Hide and submit
+            setTimeout(function() {
+              $(element).tooltip('hide');
+              $(element.form).submit();
+            }, 500);
           }
-
-          // Show tooltip
-          $(element).tooltip('show');
-
-          // Hide and submit
-          setTimeout(function() {
-            $(element).tooltip('hide');
-            $(element.form).submit();
-          }, 500);
-        }
-      </script>
-      <p class="mb-3">
-        <strong>
-          If you booked
-          <%= @order.tickets.count == 1 ? 'the ticket' : 'tickets' %>
-          for someone else, you're welcome to let us know the
-          <%= @order.tickets.count == 1 ? 'name and email address of the ticketholder' : 'names and email addresses of ticketholders' %>
-          so they hear about any important updates to the event (we won't use these details for anything else):</strong></p>
-      <div class="mb-3">
-        <% @order.tickets.each_with_index { |ticket,i| %>
-        <div class="alert alert-success ticket">
-          <h4 class="mb-2">
-            <i class="bi bi-ticket-detailed-fill"></i>
-            <%=ticket.ticket_type.try(:name)%>
-          </h4>
-          <div class="row">
-            <div class="col-6">
-              <div data-pagelet-url="/events/<%=@event.id%>/orders/<%=@order.id%>/ticketholders/<%=ticket.id%>/name" data-pagelet-no-opacity-change="true">
-                <%= partial :"events/ticketholder_name", locals: { ticket: ticket } %>
+        </script>
+        <p class="mb-3">
+          <strong>
+            If you booked
+            <%= @order.tickets.count == 1 ? 'the ticket' : 'tickets' %>
+            for someone else, you're welcome to let us know the
+            <%= @order.tickets.count == 1 ? 'name and email address of the ticketholder' : 'names and email addresses of ticketholders' %>
+            so they hear about any important updates to the event (we won't use these details for anything else):</strong></p>
+        <div class="mb-3">
+          <% @order.tickets.each_with_index { |ticket,i| %>
+          <div class="alert alert-success ticket">
+            <h4 class="mb-2">
+              <i class="bi bi-ticket-detailed-fill"></i>
+              <%=ticket.ticket_type.try(:name)%>
+            </h4>
+            <div class="row">
+              <div class="col-6">
+                <div data-pagelet-url="/events/<%=@event.id%>/orders/<%=@order.id%>/ticketholders/<%=ticket.id%>/name" data-pagelet-no-opacity-change="true">
+                  <%= partial :"events/ticketholder_name", locals: { ticket: ticket } %>
+                </div>
               </div>
-            </div>
-            <div class="col-6">
-              <div data-pagelet-url="/events/<%=@event.id%>/orders/<%=@order.id%>/ticketholders/<%=ticket.id%>/email?success=<%=params[:success] ? 1 : 0 %>" data-pagelet-no-opacity-change="true">
-                <%= partial :"events/ticketholder_email", locals: { ticket: ticket, success: (params[:success] ? 1 : 0) } %>
+              <div class="col-6">
+                <div data-pagelet-url="/events/<%=@event.id%>/orders/<%=@order.id%>/ticketholders/<%=ticket.id%>/email?success=<%=params[:success] ? 1 : 0 %>" data-pagelet-no-opacity-change="true">
+                  <%= partial :"events/ticketholder_email", locals: { ticket: ticket, success: (params[:success] ? 1 : 0) } %>
+                </div>
               </div>
             </div>
           </div>
+          <% } %>
         </div>
-        <% } %>
-      </div>
+      <% end %>
 
       <% if @event.organisation&.affiliate_credit_percentage %>
         <% affiliate_link = "#{ENV['BASE_URI']}/e/#{@event.slug}?affiliate_type=Account&affiliate_id=#{@order.account_id}" %>
