@@ -141,7 +141,7 @@ Alternatively, attendees can provide feedback by logging in to Dandelion, going 
 After a scheduled event has finished, you can sell or give access to a recording of it. The event stays tied to its original date; buyers see that they are getting access to a recording of that session.
 
 - **Save the event with a start and end time** and run it as usual.
-- Once the event is **in the past**, edit it again: a **Recording** tab appears. Open it and add **Extra info for order confirmation email**—usually the link to the recording (Vimeo, YouTube, etc.) and any password or viewing instructions. This content is included in the order confirmation email sent to people who book from that point on.
+- Once the event is **in the past**, edit it again: a **Recording** tab appears. Open it and add to **Extra info for order confirmation email**—usually the link to the recording (Vimeo, YouTube, etc.) and any password or viewing instructions. This content is included in the order confirmation email sent to people who book from that point on.
 - Optionally, further customise the **Order confirmation email for the recording of the event** in the **Emails** tab.
 
 Recordings are distinct from **evergreen/on-demand** events, which never had a fixed date (see below).
