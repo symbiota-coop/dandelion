@@ -141,8 +141,9 @@ module Asn
     bot_pct
   end
 
-  def self.fetch_asn_countries(asns)
-    asn_countries = {}
+  def self.fetch_asn_details(asns)
+    countries = {}
+    names = {}
     mutex = Mutex.new
     c = conn
     asns.uniq.map do |asn|
@@ -153,10 +154,15 @@ module Asn
         details = response.dig('result', 'asn') || {}
         country = details['country']
         confidence = details['confidenceLevel'].to_i
-        mutex.synchronize { asn_countries[asn] = country } if country && confidence >= 5
+        next unless confidence >= 5
+
+        mutex.synchronize do
+          countries[asn] = country if country
+          names[asn] = details['name'] if details['name']
+        end
       end
     end.each(&:join)
-    asn_countries
+    { countries: countries, names: names }
   end
 
   def self.block!(asn)
@@ -210,7 +216,7 @@ module Asn
     asn_countries = nil
     [
       Thread.new { bot_pct = fetch_bot_classifications(candidates) },
-      Thread.new { asn_countries = fetch_asn_countries(candidates) }
+      Thread.new { asn_countries = fetch_asn_details(candidates)[:countries] }
     ].each(&:join)
 
     puts "[ASN autoblock] suspicious_windows=#{windows.size} candidate_asns=#{candidates.size} already_blocked=#{blocked.size}"

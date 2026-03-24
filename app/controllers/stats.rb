@@ -227,6 +227,9 @@ Dandelion::App.controller do
       asn = r.dig('dimensions', 'clientAsn').to_s
       @asn_countries[asn] ||= r.dig('dimensions', 'clientCountryName')
     end
+    details = Asn.fetch_asn_details(@blocked_asns)
+    details[:countries].each { |asn, country| @asn_countries[asn] ||= country if country }
+    details[:names].each { |asn, name| @asn_names[asn] ||= name if name }
 
     @windows = Asn.suspicious_windows(rows: rows, hours: @hours, legit_asns: @legit_asns)
 
