@@ -237,12 +237,14 @@ module Asn
     # Apply all blocks in a single API call
     new_expression = rule['expression']
     current = blocked_asns(rule)
+    newly_blocked = []
     to_block.each do |asn, v|
       next if current.include?(asn.to_s)
 
       country = asn_countries[asn]
       threshold = autoblock_bot_threshold(country)
       new_expression = "#{new_expression} or (ip.src.asnum eq #{asn})"
+      newly_blocked << [asn, v]
       puts "[ASN autoblock] blocked ASN #{asn} (#{v[:bot]}% bot, threshold #{threshold}%, #{country || 'country unknown'})"
     end
 
@@ -260,7 +262,7 @@ module Asn
       puts '[ASN autoblock] Cloudflare rule updated'
     end
 
-    to_block.each { |asn, v| notify_asn_blocked(asn, v) }
+    newly_blocked.each { |asn, v| notify_asn_blocked(asn, v) }
     puts '[ASN autoblock] done'
   rescue StandardError => e
     puts "[ASN autoblock] error: #{e.class}: #{e.message}"
