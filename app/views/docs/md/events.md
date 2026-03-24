@@ -136,6 +136,28 @@ You can resend these emails by going to the Orders page for your event and click
 
 Alternatively, attendees can provide feedback by logging in to Dandelion, going to the event page and clicking 'Give feedback'.
 
+## Event recordings
+
+After a scheduled event has finished, you can sell or give access to a recording of it. The event stays tied to its original date; buyers see that they are getting access to a recording of that session.
+
+- **Save the event with a start and end time** and run it as usual.
+- Once the event is **in the past**, edit it again: a **Recording** tab appears. Open it and add **Extra info for order confirmation email**—usually the link to the recording (Vimeo, YouTube, etc.) and any password or viewing instructions. This content is included in the order confirmation email sent to people who book from that point on.
+- Optionally, further customise the **Order confirmation email for the recording of the event** in the **Emails** tab.
+
+Recordings are distinct from **evergreen/on-demand** events, which never had a fixed date (see below).
+
+## Evergreen (on-demand) events
+
+Evergreen events are for selling access to something that has **no fixed start time, end time, or location**—for example an on-demand course or pre-recorded content.
+
+- When creating or editing an event, use the link **Mark as evergreen/on-demand, with no dates or location** on the **Basics** tab. That reveals the evergreen option; once enabled, date, time, and location fields are hidden.
+- Enter the link to the video/course etc on the **Description and confirmation** tab under **Extra info for order confirmation email** (similar to where you'd enter a Zoom link for a live, online event). 
+- In listings and carousels, evergreen events show first, as **On-demand** instead of under a date.
+- **Reminder emails** and **automated feedback request** emails are not sent for evergreen events. You can still use the Mailer to email attendees manually.
+- **PDF tickets** are not issued, and the order confirmation refers to access as a **link** rather than tickets.
+
+Evergreen events are different from **recordings of dated live events** (see above): recordings keep the original event date for context.
+
 ## Displaying feedback publicly
 
 Click the dropdown for your event (/activity/local group/organisation), and select Feedback.
