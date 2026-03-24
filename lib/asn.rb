@@ -4,6 +4,19 @@ module Asn
   THRESHOLD = 1
   TIMEZONE = 'Europe/Stockholm'
 
+  AUTOBLOCK_BOT_PCT_DEFAULT = 50
+  AUTOBLOCK_BOT_PCT_BY_COUNTRY = {
+    'CN' => 25, # China
+    'RU' => 25, # Russia
+    'IN' => 25, # India
+    'ID' => 25, # Indonesia
+    'VN' => 25 # Vietnam
+  }.freeze
+
+  def self.autoblock_bot_threshold(country)
+    AUTOBLOCK_BOT_PCT_BY_COUNTRY.fetch(country, AUTOBLOCK_BOT_PCT_DEFAULT)
+  end
+
   def self.conn
     Faraday.new(url: 'https://api.cloudflare.com') { |f| f.response :json }
   end
@@ -128,6 +141,24 @@ module Asn
     bot_pct
   end
 
+  def self.fetch_asn_countries(asns)
+    asn_countries = {}
+    mutex = Mutex.new
+    c = conn
+    asns.uniq.map do |asn|
+      Thread.new do
+        response = c.get("/client/v4/radar/entities/asns/#{asn}") do |req|
+          req.headers['Authorization'] = "Bearer #{ENV['CLOUDFLARE_API_KEY']}"
+        end.body
+        details = response.dig('result', 'asn') || {}
+        country = details['country']
+        confidence = details['confidenceLevel'].to_i
+        mutex.synchronize { asn_countries[asn] = country } if country && confidence >= 5
+      end
+    end.each(&:join)
+    asn_countries
+  end
+
   def self.block!(asn)
     rule = fetch_rule
     return unless rule
@@ -161,6 +192,7 @@ module Asn
   end
 
   def self.autoblock
+    puts '[ASN autoblock] start'
     rule = nil
     rows = nil
     threads = [
@@ -174,9 +206,27 @@ module Asn
     windows = suspicious_windows(rows: rows, hours: WINDOW_LENGTH, legit_asns: legit)
     candidates = windows.flat_map { |w| w[:asns].map { |r| r['asn'].to_s } }.uniq - blocked
 
-    bot_pct = fetch_bot_classifications(candidates)
-    to_block = bot_pct.select { |_, v| v[:bot] > 50 }
-    return if to_block.empty?
+    bot_pct = nil
+    asn_countries = nil
+    [
+      Thread.new { bot_pct = fetch_bot_classifications(candidates) },
+      Thread.new { asn_countries = fetch_asn_countries(candidates) }
+    ].each(&:join)
+
+    puts "[ASN autoblock] suspicious_windows=#{windows.size} candidate_asns=#{candidates.size} already_blocked=#{blocked.size}"
+    puts "[ASN autoblock] candidates #{candidates.map { |a| "#{a} country=#{asn_countries[a] || 'unknown'}" }.join(', ')}"
+    puts "[ASN autoblock] bot_classifications=#{bot_pct.size}"
+    puts "[ASN autoblock] country_lookups=#{asn_countries.size}"
+    to_block = bot_pct.select do |asn, v|
+      v[:bot] > autoblock_bot_threshold(asn_countries[asn])
+    end
+    if to_block.empty?
+      puts '[ASN autoblock] nothing to block (no candidate above bot threshold)'
+      puts '[ASN autoblock] done'
+      return
+    end
+
+    puts "[ASN autoblock] to_block=#{to_block.size} #{to_block.map { |asn, v| "#{asn}:#{v[:bot]}% country=#{asn_countries[asn] || 'unknown'}" }.join(', ')}"
 
     # Apply all blocks in a single API call
     new_expression = rule['expression']
@@ -184,11 +234,15 @@ module Asn
     to_block.each do |asn, v|
       next if current.include?(asn.to_s)
 
+      country = asn_countries[asn]
+      threshold = autoblock_bot_threshold(country)
       new_expression = "#{new_expression} or (ip.src.asnum eq #{asn})"
-      puts "blocked ASN #{asn} (#{v[:bot]}% bot)"
+      puts "[ASN autoblock] blocked ASN #{asn} (#{v[:bot]}% bot, threshold #{threshold}%, #{country || 'country unknown'})"
     end
 
-    if new_expression != rule['expression']
+    if new_expression == rule['expression']
+      puts '[ASN autoblock] rule unchanged (new ASNs already in rule)'
+    else
       response = conn.patch("/client/v4/zones/#{ENV['CLOUDFLARE_ZONE_ID']}/rulesets/#{ENV['CLOUDFLARE_RULESET_ID']}/rules/#{ENV['CLOUDFLARE_ASN_RULE_ID']}") do |req|
         req.headers['Authorization'] = "Bearer #{ENV['CLOUDFLARE_API_KEY']}"
         req.headers['Content-Type'] = 'application/json'
@@ -196,10 +250,14 @@ module Asn
       end.body
 
       raise "failed to update Cloudflare rule: #{response.dig('errors')}" unless response['success']
+
+      puts '[ASN autoblock] Cloudflare rule updated'
     end
 
     to_block.each { |asn, v| notify_asn_blocked(asn, v) }
+    puts '[ASN autoblock] done'
   rescue StandardError => e
+    puts "[ASN autoblock] error: #{e.class}: #{e.message}"
     Honeybadger.notify(e)
   end
 
