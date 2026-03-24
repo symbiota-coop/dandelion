@@ -382,11 +382,11 @@ class Event
   handle_asynchronously :ai_tag
 
   def feedback_preview_token
-    TokenEncryptor.encrypt("feedback_preview:#{id}")
+    TokenVerifier.generate("feedback_preview:#{id}")
   end
 
   def valid_feedback_preview_token?(token)
-    TokenEncryptor.decrypt(token) == "feedback_preview:#{id}"
+    TokenVerifier.verify(token) == "feedback_preview:#{id}"
   end
 
   after_save :set_hidden_from_homepage

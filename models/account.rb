@@ -99,13 +99,13 @@ class Account
   def feedback_token_for(event)
     return unless event
 
-    TokenEncryptor.encrypt("feedback:#{event.id}:#{id}")
+    TokenVerifier.generate("feedback:#{event.id}:#{id}")
   end
 
   def self.from_feedback_token(event, token)
     return unless event
 
-    data = TokenEncryptor.decrypt(token)
+    data = TokenVerifier.verify(token)
 
     return unless data
 
