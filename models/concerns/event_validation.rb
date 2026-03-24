@@ -19,6 +19,7 @@ module EventValidation
       end
 
       self.name = name.strip if name
+      self.purchase_url = purchase_url.strip if purchase_url
       self.suggested_donation = suggested_donation.round(2) if suggested_donation
       self.minimum_donation = nil unless suggested_donation
       self.minimum_donation = minimum_donation.round(2) if minimum_donation
