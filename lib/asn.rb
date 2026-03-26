@@ -5,16 +5,11 @@ module Asn
   TIMEZONE = 'Europe/Stockholm'
 
   AUTOBLOCK_BOT_PCT_DEFAULT = 50
-  AUTOBLOCK_BOT_PCT_BY_COUNTRY = {
-    'CN' => 25, # China
-    'RU' => 25, # Russia
-    'IN' => 25, # India
-    'ID' => 25, # Indonesia
-    'VN' => 25 # Vietnam
-  }.freeze
+  AUTOBLOCK_BOT_PCT_LOW = 25
+  AUTOBLOCK_BOT_PCT_LOW_COUNTRIES = %w[CN RU IN ID VN HK SG MX ZA BR].freeze
 
   def self.autoblock_bot_threshold(country)
-    AUTOBLOCK_BOT_PCT_BY_COUNTRY.fetch(country, AUTOBLOCK_BOT_PCT_DEFAULT)
+    AUTOBLOCK_BOT_PCT_LOW_COUNTRIES.include?(country) ? AUTOBLOCK_BOT_PCT_LOW : AUTOBLOCK_BOT_PCT_DEFAULT
   end
 
   def self.conn
