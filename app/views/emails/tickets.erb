@@ -28,6 +28,7 @@
         .gsub('[event_url]', "#{ENV['BASE_URI']}/e/#{event.slug}")
         .gsub(' [at_event_location_if_not_online]', event.online? ? '' : " at #{event.location}")        
         .gsub('[tickets_are]', order.tickets.length == 1 ? 'ticket is' : 'tickets are')
+        .gsub('[description_elements]', order.description_elements.join(', '))
       ) %>
 
   <% if event.recording? %>
