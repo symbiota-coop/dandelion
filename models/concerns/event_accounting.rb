@@ -53,7 +53,7 @@ module EventAccounting
   end
 
   def contribution_gbp
-    if ticket_types.empty?
+    if purchase_url.present? || ticket_types.empty?
       Money.new(Event.contribution_gbp_fallback * 100, 'GBP')
     elsif fixed_contribution
       fixed_contribution
