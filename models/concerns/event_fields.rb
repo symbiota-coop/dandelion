@@ -168,8 +168,8 @@ module EventFields
         evergreen: 'Mark as evergreen/on-demand, with no dates or location',
         update_activity_events: "Applies to #{(Event::COPY_FIELDS - %w[last_saved_by]).map { |f| Event.human_attribute_name(f).downcase }.to_sentence(last_word_connector: ' and ')}"
       }.merge(email_hints).merge({
-                                   recording_email_title: 'Custom subject line for the order confirmation email for the recording of the event',
-                                   recording_email_greeting: 'Custom greeting for the order confirmation email for the recording of the event'
+                                   recording_email_title: "Custom subject line for the order confirmation email for the recording of the event. #{EmailFields.magic_tags(EmailFields::ORDER_CONFIRMATION_SUBJECT_PLACEHOLDERS)}",
+                                   recording_email_greeting: "Custom greeting for the order confirmation email for the recording of the event. #{EmailFields.magic_tags(EmailFields::ORDER_CONFIRMATION_BODY_PLACEHOLDERS)}"
                                  })
     end
 
