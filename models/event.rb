@@ -81,7 +81,7 @@ class Event
 
     # Clean up caches for non-recommendable accounts
     recommendable_ids = Account.recommendable.pluck(:id)
-    purged = AccountRecommendationCache.where(:account_id.nin => recommendable_ids).delete_all
+    purged = AccountRecommendationCache.and(:account_id.nin => recommendable_ids).delete_all
     puts "Purged #{purged} orphaned recommendation caches" if purged.positive?
 
     total = recommendable_ids.count

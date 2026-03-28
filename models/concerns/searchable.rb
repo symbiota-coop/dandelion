@@ -22,7 +22,7 @@ module Searchable
 
       if regex_search
         pattern = Regexp.escape(query).gsub(APOSTROPHE_VARIANTS, APOSTROPHE_CHAR_CLASS)
-        results = scope.where('$or': search_fields.map { |field| { field => /#{pattern}/i } })
+        results = scope.and('$or': search_fields.map { |field| { field => /#{pattern}/i } })
         results = results.limit(limit) if limit
         results
       else

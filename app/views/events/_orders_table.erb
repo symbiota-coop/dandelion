@@ -3,7 +3,7 @@
    # Batch load event feedbacks to avoid N+1 queries
    if @event
      order_account_ids = orders.map(&:account_id).compact
-     event_feedbacks_by_account = @event.event_feedbacks.where(:account_id.in => order_account_ids).index_by(&:account_id)
+     event_feedbacks_by_account = @event.event_feedbacks.and(:account_id.in => order_account_ids).index_by(&:account_id)
    end %>
 <% if @event %>
   <% if event_email_viewer? %>

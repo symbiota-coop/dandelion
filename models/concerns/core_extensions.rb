@@ -203,7 +203,7 @@ module CoreExtensions
           # Check if the parent exists in memory first (for nested attributes)
           return if send(name).present?
 
-          return if klass.where(id: send("#{name}_id")).exists?
+          return if klass.and(id: send("#{name}_id")).exists?
 
           errors.add(:"#{name}", 'does not exist')
         end
@@ -217,7 +217,7 @@ module CoreExtensions
           return if send(name).present?
 
           association_class = self.class.reflect_on_association(name.to_sym).klass
-          return if association_class.where(id: send("#{name}_id")).exists?
+          return if association_class.and(id: send("#{name}_id")).exists?
 
           errors.add(:"#{name}", 'does not exist')
         end

@@ -233,7 +233,7 @@ module EventAtproto
       results = { published: 0, updated: 0, deleted: 0, skipped: 0, errors: [], dry_run: dry_run }
 
       # Find events created or updated since the cutoff
-      events = Event.where(
+      events = Event.and(
         '$or' => [
           { created_at: { '$gte' => cutoff } },
           { updated_at: { '$gte' => cutoff } }
@@ -287,7 +287,7 @@ module EventAtproto
 
       # Get all local events that should have AT Protocol records FOR THIS DID
       # (records may be published under different handles/DIDs)
-      local_events = Event.where(:atproto_uri.ne => nil).select { |e| e.atproto_record_did == client.did }
+      local_events = Event.and(:atproto_uri.ne => nil).select { |e| e.atproto_record_did == client.did }
       local_by_uri = local_events.index_by(&:atproto_uri)
 
       # Check each remote record

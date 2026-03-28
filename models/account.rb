@@ -135,7 +135,7 @@ class Account
         # Update the polymorphic association
         klass = association.klass
         if klass.respond_to?(:unscoped)
-          klass.unscoped.where(type_key => account_to_destroy.class.name, id_key => account_to_destroy.id)
+          klass.unscoped.and(type_key => account_to_destroy.class.name, id_key => account_to_destroy.id)
                .update_all(id_key => id)
         end
         next

@@ -2,7 +2,7 @@
    @tickets = @tickets.paginate(page: params[:page], per_page: 50)
    # Batch load event feedbacks to avoid N+1 queries
    ticket_account_ids = @tickets.map(&:account_id).compact
-   event_feedbacks_by_account = @event.event_feedbacks.where(:account_id.in => ticket_account_ids).index_by(&:account_id) %>
+   event_feedbacks_by_account = @event.event_feedbacks.and(:account_id.in => ticket_account_ids).index_by(&:account_id) %>
 <% if event_email_viewer? %>
   <pre>
     <% 
