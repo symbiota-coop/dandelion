@@ -4,12 +4,15 @@ Dandelion::App.controller do
     event_admins_only!
 
     @event_boosts = @event.event_boosts.order('created_at desc')
+    currency = @event.currency_or_default
+    @min_hourly_boost = EventBoost.minimum_hourly_amount(currency)
+
     @event_boost = @event.event_boosts.build(
       account: current_account,
       start_time: Time.zone.now.beginning_of_hour + 1.hour,
       hours: 1,
-      hourly_amount: 5,
-      currency: @event.currency_or_default
+      hourly_amount: @min_hourly_boost,
+      currency: currency
     )
 
     now_floor = Time.zone.now.beginning_of_hour

@@ -32,6 +32,13 @@ Dandelion::App.helpers do
     "#{currency} #{amount}"
   end
 
+  def compact_amount_for_input(amount)
+    return '' if amount.nil?
+
+    x = amount.to_f.round(2)
+    format('%.2f', x).sub(/\.?0+$/, '').sub(/\.$/, '')
+  end
+
   def u(url)
     URI::Parser.new.escape(url) if url
   end

@@ -17,7 +17,7 @@ class EventBoostsCapybaraTest < ActiveSupport::TestCase
     start_time = (Time.zone.now.beginning_of_hour + 2.hours).strftime('%Y-%m-%d %H:%M')
     execute_script %(document.getElementById('event_boost_start_time').value = #{start_time.to_json})
     fill_in 'event_boost_hours', with: 2
-    fill_in 'event_boost_hourly_amount', with: 4
+    fill_in 'event_boost_hourly_amount', with: 12
 
     stripe_session = OpenStruct.new(id: 'cs_test_boost', payment_intent: 'pi_test_boost')
     Stripe::Checkout::Session.stub :create, stripe_session do
@@ -48,7 +48,7 @@ class EventBoostsCapybaraTest < ActiveSupport::TestCase
     start_time = (Time.zone.now.beginning_of_hour + 2.hours).strftime('%Y-%m-%d %H:%M')
     execute_script %(document.getElementById('event_boost_start_time').value = #{start_time.to_json})
     fill_in 'event_boost_hours', with: 1
-    fill_in 'event_boost_hourly_amount', with: 5
+    fill_in 'event_boost_hourly_amount', with: 10
 
     stripe_session = OpenStruct.new(id: 'cs_complete_me', payment_intent: 'pi_test')
     Stripe::Checkout::Session.stub :create, stripe_session do
@@ -80,7 +80,7 @@ class EventBoostsCapybaraTest < ActiveSupport::TestCase
                       account: @account,
                       start_time: Time.zone.now.beginning_of_hour,
                       hours: 2,
-                      hourly_amount: 5)
+                      hourly_amount: 10)
 
     visit "/events?organisation_id=#{@organisation.id}"
 
@@ -104,7 +104,7 @@ class EventBoostsCapybaraTest < ActiveSupport::TestCase
                       account: @account,
                       start_time: Time.zone.now.beginning_of_hour + 2.hours,
                       hours: 1,
-                      hourly_amount: 5)
+                      hourly_amount: 10)
 
     visit "/o/#{@organisation_1.slug}/events"
 
@@ -123,7 +123,7 @@ class EventBoostsCapybaraTest < ActiveSupport::TestCase
                       account: @account,
                       start_time: Time.zone.now.beginning_of_hour + 2.hours,
                       hours: 1,
-                      hourly_amount: 5)
+                      hourly_amount: 10)
 
     visit '/events?home=1&images=1&order=trending'
     assert page.has_no_content?('Boosted')

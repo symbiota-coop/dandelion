@@ -208,12 +208,7 @@ end
 <% end %>
 
 <%
-  min_app_fee = nil
-  if FIAT_CURRENCIES.include?(@event.currency)
-    amount = Money.new(100, 'GBP').exchange_to(@event.currency).cents.to_f / 100
-    power = Math.log10(amount).floor
-    min_app_fee = 10 ** power
-  end
+  min_app_fee = FiatCurrency.minimum_unit_amount(@event.currency)
 
   config = {
     eventId: @event.id,

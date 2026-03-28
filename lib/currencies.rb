@@ -1,6 +1,20 @@
 FIAT_CURRENCIES = %w[GBP EUR USD SEK DKK NOK CHF MXN CAD AUD NZD JPY SGD PLN].freeze
 EVM_CURRENCIES = Token.all.map(&:symbol)
 
+module FiatCurrency
+  module_function
+
+  def minimum_unit_amount(currency)
+    return nil unless FIAT_CURRENCIES.include?(currency)
+
+    amount = Money.new(100, 'GBP').exchange_to(currency).cents.to_f / 100
+    return nil unless amount.positive?
+
+    power = Math.log10(amount).floor
+    10**power
+  end
+end
+
 CURRENCIES = FIAT_CURRENCIES + EVM_CURRENCIES
 
 CURRENCY_OPTIONS = CURRENCIES.map do |currency|

@@ -3,6 +3,9 @@ class EventBoost
   include Mongoid::Timestamps
   include CoreExtensions
 
+  # Applied to FiatCurrency.minimum_unit_amount (~1 GBP floor) for the minimum hourly boost rate.
+  MINIMUM_HOURLY_AMOUNT_MULTIPLIER = 10
+
   belongs_to_without_parent_validation :event
   belongs_to_without_parent_validation :account
 
@@ -29,6 +32,7 @@ class EventBoost
   end
 
   validate :event_can_be_boosted
+  validate :hourly_amount_meets_minimum
   validate :start_time_on_the_hour
   validate :start_time_in_the_future
   validate :start_time_before_event_listing_ends
@@ -129,6 +133,13 @@ class EventBoost
     nil
   end
 
+  def self.minimum_hourly_amount(currency)
+    m = FiatCurrency.minimum_unit_amount(currency)
+    return nil unless m
+
+    m * MINIMUM_HOURLY_AMOUNT_MULTIPLIER
+  end
+
   def complete?
     payment_completed?
   end
@@ -157,6 +168,16 @@ class EventBoost
     self.end_time = start_time + hours.hours
     self.total_amount = (hourly_amount.to_f * hours.to_i).round(2)
     self.hourly_weight_gbp_pence = self.class.convert_hourly_amount_to_gbp_pence(hourly_amount, currency)
+  end
+
+  def hourly_amount_meets_minimum
+    return unless hourly_amount && currency
+
+    min = self.class.minimum_hourly_amount(currency)
+    return unless min && hourly_amount < min
+
+    formatted = Money.new((min * 100).round, currency).format(no_cents_if_whole: true)
+    errors.add(:hourly_amount, "must be at least #{formatted}")
   end
 
   def event_can_be_boosted

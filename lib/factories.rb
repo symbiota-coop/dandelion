@@ -134,8 +134,8 @@ FactoryBot.define do
     account { event.account }
     start_time { Time.zone.now.beginning_of_hour + 2.hours }
     hours { 1 }
-    hourly_amount { 5.0 }
     currency { 'GBP' }
+    hourly_amount { EventBoost.minimum_hourly_amount(currency) }
     payment_completed { true }
 
     trait :pending_payment do
