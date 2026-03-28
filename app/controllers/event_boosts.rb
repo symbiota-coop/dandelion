@@ -49,8 +49,8 @@ Dandelion::App.controller do
                                                  success_url: "#{ENV['BASE_URI']}/events/#{@event.id}/boosts?thanks=1",
                                                  cancel_url: "#{ENV['BASE_URI']}/events/#{@event.id}/boosts?cancelled=1",
                                                  line_items: [{
-                                                   name: 'Event boost',
-                                                   description: "#{@event.name}: #{@event_boost.hours}h at #{@event_boost.hourly_amount}/h, starting #{@event_boost.start_time.in_time_zone(Time.zone).strftime('%Y-%m-%d %H:%M')}",
+                                                   name: "Event boost for #{@event.name}",
+                                                   description: "#{@event_boost.hours}h at #{Money.new((@event_boost.hourly_amount * 100).round, @event_boost.currency).format(no_cents_if_whole: true)}/h, starting #{@event_boost.start_time}",
                                                    amount: (@event_boost.total_amount * 100).round,
                                                    currency: @event_boost.currency,
                                                    quantity: 1
