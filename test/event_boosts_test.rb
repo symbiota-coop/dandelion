@@ -1,7 +1,7 @@
 require File.expand_path("#{File.dirname(__FILE__)}/test_config.rb")
 require 'ostruct'
 
-class EventBoostsCapybaraTest < ActiveSupport::TestCase
+class EventBoostsTest < ActiveSupport::TestCase
   include Capybara::DSL
 
   test 'event admin can view boosts page and pending boost shows checkout ids' do
@@ -92,7 +92,7 @@ class EventBoostsCapybaraTest < ActiveSupport::TestCase
     assert page.has_no_content?('Boosted by')
   end
 
-  test 'listing respects filters and ignores incomplete boosts' do
+  test 'public listing ignores incomplete active boosts' do
     @account = FactoryBot.create(:account)
     @organisation_1 = FactoryBot.create(:organisation, account: @account, name: 'Visible Org')
     @organisation_2 = FactoryBot.create(:organisation, account: @account, name: 'Other Org')
@@ -102,14 +102,15 @@ class EventBoostsCapybaraTest < ActiveSupport::TestCase
     FactoryBot.create(:event_boost, :pending_payment,
                       event: @event_1,
                       account: @account,
-                      start_time: Time.zone.now.beginning_of_hour + 2.hours,
+                      start_time: Time.zone.now.beginning_of_hour,
                       hours: 1,
-                      hourly_amount: 10)
+                      hourly_amount: EventBoost.minimum_hourly_amount(@event_1.currency_or_default))
 
-    visit "/o/#{@organisation_1.slug}/events"
+    visit '/events'
 
     assert page.has_no_content?('Boosted')
-    assert page.has_no_content?('Org two event')
+    assert page.has_content?('Org one event')
+    assert page.has_content?('Org two event')
   end
 
   test 'boost slot is not shown on homepage teasers or minimal embeds' do

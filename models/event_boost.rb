@@ -36,6 +36,7 @@ class EventBoost
   validate :start_time_on_the_hour
   validate :start_time_in_the_future
   validate :start_time_before_event_listing_ends
+  validate :end_time_before_event_listing_ends
 
   before_validation :set_derived_fields
 
@@ -87,7 +88,7 @@ class EventBoost
   end
 
   def self.browse_pool_hour_weights(event_id, time: Time.current)
-    browse_event_ids = Event.live.publicly_visible.browsable.pluck(:id)
+    browse_event_ids = public_listing_event_ids(from: time.to_date)
     weights = active_hourly_weights_by_event_id(browse_event_ids, time: time)
     event_w = weights[event_id].to_i
     total = weights.values.sum
@@ -110,7 +111,7 @@ class EventBoost
 
   def self.browse_pool_hour_display(event, time: Time.current)
     target_currency = event.currency_or_default
-    browse_event_ids = Event.live.publicly_visible.browsable.pluck(:id)
+    browse_event_ids = public_listing_event_ids(from: time.to_date)
     boosts = active_at(time).and(:event_id.in => browse_event_ids).to_a
     my_boosts = boosts.select { |b| b.event_id == event.id }
 
@@ -136,6 +137,14 @@ class EventBoost
     return nil unless m
 
     m * MINIMUM_HOURLY_AMOUNT_MULTIPLIER
+  end
+
+  def self.public_listing_scope(from: Date.today)
+    Event.live.publicly_visible.browsable.future(from)
+  end
+
+  def self.public_listing_event_ids(from: Date.today)
+    public_listing_scope(from: from).pluck(:id)
   end
 
   def complete?
@@ -202,5 +211,12 @@ class EventBoost
     return unless start_time && event&.start_time
 
     errors.add(:start_time, 'must be on or before the event date') unless start_time.to_date <= event.start_time.to_date
+  end
+
+  def end_time_before_event_listing_ends
+    return unless end_time && event&.start_time
+
+    listing_end = event.start_time.to_date.next_day.in_time_zone
+    errors.add(:hours, 'would make the boost run past the event date') unless end_time <= listing_end
   end
 end
