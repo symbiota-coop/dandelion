@@ -39,7 +39,7 @@ Dandelion::App.controller do
       mass_assigning(params[:event_boost], EventBoost).merge(account: current_account)
     )
 
-    halt 400, { error: @event_boost.errors.full_messages.to_sentence }.to_json unless @event_boost.save
+    halt 400, { error: @event_boost.errors.full_messages.first }.to_json unless @event_boost.save
 
     Stripe.api_key = ENV['STRIPE_SK']
     Stripe.api_version = ENV['STRIPE_API_VERSION']
