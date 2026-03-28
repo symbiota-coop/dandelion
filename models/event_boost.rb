@@ -12,13 +12,13 @@ class EventBoost
   field :start_time, type: Time
   field :end_time, type: Time
   field :hours, type: Integer
-  field :hourly_amount, type: Float
   field :currency, type: String
+  field :hourly_amount, type: Float
   field :total_amount, type: Float
   field :hourly_weight_gbp_pence, type: Integer
   field :session_id, type: String
   field :payment_intent, type: String
-  field :payment_completed, type: Mongoid::Boolean
+  field :payment_completed, type: Boolean
 
   validates_presence_of :event, :account, :start_time, :hours, :hourly_amount, :currency, :total_amount
   validates_inclusion_of :currency, in: FIAT_CURRENCIES
@@ -86,7 +86,6 @@ class EventBoost
     nil
   end
 
-  # Weights for the unfiltered public events listing (same base scope as /events without filters).
   def self.browse_pool_hour_weights(event_id, time: Time.current)
     browse_event_ids = Event.live.publicly_visible.browsable.pluck(:id)
     weights = active_hourly_weights_by_event_id(browse_event_ids, time: time)
@@ -96,7 +95,6 @@ class EventBoost
     { event_weight: event_w, total_weight: total, share: share }
   end
 
-  # Sums hourly_amount for each boost (converted to target_currency). Used for UI; lottery still uses GBP pence.
   def self.hourly_spend_sum_in_currency(boosts, target_currency)
     return Money.new(0, target_currency) if boosts.blank?
 
