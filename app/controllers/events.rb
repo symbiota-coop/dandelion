@@ -22,6 +22,16 @@ Dandelion::App.controller do
       @events = @events.future(@from)
       @events = @events.and(:start_time.lt => @to + 1) if @to
       @events = @events.and(:id.in => Event.search(params[:q], @events).pluck(:id)) if params[:q]
+      @boosted_event =
+        if (params[:page] && params[:page].to_i > 1) ||
+           params[:home] ||
+           params[:minimal] ||
+           params[:past] ||
+           params[:display].in?(%w[grid map calendar])
+          nil
+        else
+          EventBoost.pick_event_for_scope(@events)
+        end
       @events = apply_random_or_trending_order(@events, @from)
       request.xhr? ? partial(:'events/events') : erb(:'events/events')
     when :json

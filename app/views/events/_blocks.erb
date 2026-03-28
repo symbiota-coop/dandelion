@@ -1,3 +1,12 @@
+<% if @boosted_event %>
+  <div class="mb-3">
+    <div class="mb-1">
+      <small class="text-muted">Boosted by <a class="text-muted" href="/o/<%= @boosted_event.organisation.slug %>/events"><%= @boosted_event.organisation.name %></a></small>
+    </div>
+    <%= partial :'events/block', locals: { event: @boosted_event } %>
+  </div>
+<% end %>
+
 <% if events.exists? %>
   <div class="mb-3">
     <div class="row" id="events">
@@ -5,6 +14,7 @@
       next if event.locked? && !event_admin?(event)
       # Skip past events for co-hosts; only the primary host can show events that have started
       next if @organisation && event.past? && event.organisation_id != @organisation.id
+      next if @boosted_event && event.id == @boosted_event.id
       %>
       <div class="col-12 <%= block_class if defined?(block_class) %>" id="<%= event.id %>">
         <div class="mb-4">

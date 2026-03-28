@@ -129,6 +129,20 @@ FactoryBot.define do
     end
   end
 
+  factory :event_boost do
+    event
+    account { event.account }
+    start_time { Time.zone.now.beginning_of_hour + 2.hours }
+    hours { 1 }
+    hourly_amount { 5.0 }
+    currency { 'GBP' }
+    payment_completed { true }
+
+    trait :pending_payment do
+      payment_completed { false }
+    end
+  end
+
   factory :discount_code do
     trait :for_event do
       association :codable, factory: :event

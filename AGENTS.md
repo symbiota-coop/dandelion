@@ -42,7 +42,7 @@ Never run the full test suite.
 
 Use the following command structure to test a single file:
 
-`foreman run -e .env.test bundle exec ruby -I test test/$1_test.rb`
+`env -u BUNDLE_PATH foreman run -e .env.test bundle exec ruby -I test test/$1_test.rb`
 
 ## Dependencies
 

@@ -9,7 +9,10 @@ Time::DATE_FORMATS.merge!(
   time: ->(time) { time.strftime("#{(t = time.hour % 12) == 0 ? 12 : t}:%M#{time.strftime('%p').downcase}") },
   no_double_zeros: lambda { |time|
                      time.strftime("#{(t = time.hour % 12) == 0 ? 12 : t}#{time.strftime(':%M') unless time.strftime(':%M') == ':00'}#{time.strftime('%p').downcase}")
-                   }
+                   },
+  date_no_double_zeros: lambda { |time|
+    time.strftime("#{time.to_date.to_fs(:date)}, #{time.to_fs(:no_double_zeros)}")
+  }
 )
 
 Date::DATE_FORMATS.merge!(

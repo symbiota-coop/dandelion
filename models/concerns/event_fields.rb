@@ -65,6 +65,10 @@ module EventFields
     end
   end
 
+  def currency_or_default
+    FIAT_CURRENCIES.include?(currency) ? currency : ENV['DEFAULT_CURRENCY']
+  end
+
   class_methods do
     def human_attribute_name(attr, options = {})
       {

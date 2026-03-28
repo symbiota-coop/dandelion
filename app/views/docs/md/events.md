@@ -225,6 +225,15 @@ Edit your event(s) and assign them to this new activity. Now, people will have t
 
 You'll be notified via email when people apply.
 
+## Event boosts
+
+Event admins can buy a boost for an event from the **Boosts** page in the event admin menu.
+
+- Boosts are bought in whole-hour blocks.
+- You choose a start time, a number of hours, and an amount per hour.
+- When multiple boosts are active at the same moment, Dandelion shows one boosted event in the top slot of the main list views, with probability proportional to the amount paid.
+- Overlapping boosts for the same event stack together.
+
 ## Using automated revenue sharing
 
 Dandelion has a unique revenue sharing feature allowing organisations to share ticket revenue with their facilitators at the time of purchase. Please [contact us](mailto:contact@dandelion.events) if you'd like to try it.

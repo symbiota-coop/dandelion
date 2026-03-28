@@ -1,0 +1,194 @@
+<%= partial :'events/nav', locals: { event: @event } %>
+
+<script>
+  $(function () {
+    var currencyPrefix = <%== money_symbol(@event_boost.currency).to_json %>;
+
+    function updateBoostTotal() {
+      var hours = parseInt($('#event_boost_hours').val(), 10);
+      var hourlyAmount = parseFloat($('#event_boost_hourly_amount').val());
+
+      if (isNaN(hours) || isNaN(hourlyAmount)) {
+        $('#event-boost-total').text('');
+        return;
+      }
+
+      var total = hours * hourlyAmount;
+      $('#event-boost-total').text(currencyPrefix + total.toFixed(2));
+    }
+
+    $('#event_boost_hours, #event_boost_hourly_amount').on('input', updateBoostTotal);
+    updateBoostTotal();
+
+    $('#event-boost-form').submit(function () {
+      var $form = $(this);
+      var $button = $form.find('button[type=submit]');
+
+      $button.find('i').show();
+      $form.css('opacity', 0.5);
+
+      $.post('/events/<%= @event.id %>/boosts', $form.serializeObject(), function (data) {
+        if (data.session_id) {
+          var stripe = Stripe('<%= ENV['STRIPE_PK'] %>');
+          stripe.redirectToCheckout({sessionId: data.session_id});
+        } else if (data.error) {
+          alert(data.error);
+        }
+      }).fail(function (xhr) {
+        alert((xhr.responseJSON && xhr.responseJSON.error) || 'There was an error creating the boost.');
+      }).always(function () {
+        $button.find('i').hide();
+        $form.css('opacity', 1);
+      });
+
+      return false;
+    });
+  });
+</script>
+
+<div class="row">
+  <div class="col-lg-6">
+    <div class="card mb-4">
+      <div class="card-body">
+        <h2 class="h4">Boost this event</h2>
+
+        <% total_amount = (@event_boost.total_amount || (@event_boost.hourly_amount.to_f * @event_boost.hours.to_i)).round(2) %>
+
+        <% form_tag '', class: 'mb-0', id: 'event-boost-form' do %>
+          <%= hidden_field_tag :'event_boost[currency]', value: @event_boost.currency %>
+          <div class="form-group">
+            <label for="event_boost_start_time">Start at</label>
+            <%= text_field_tag :'event_boost[start_time]', value: (@event_boost.start_time&.to_s(:db)), class: 'form-control datetimepicker', id: 'event_boost_start_time', required: true %>
+            <small class="form-text text-muted">Start time must be on the hour</small>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group col-sm-6">
+              <label for="event_boost_hours">Hours</label>
+              <%= number_field_tag :'event_boost[hours]', value: @event_boost.hours, min: 1, step: 1, class: 'form-control', id: 'event_boost_hours', required: true %>
+            </div>
+            <div class="form-group col-sm-6">
+              <label for="event_boost_hourly_amount">Amount per hour</label>
+              <div class="input-group">
+                <div class="input-group-prepend">
+                  <span class="input-group-text"><%= money_symbol(@event_boost.currency) %></span>
+                </div>
+                <%= number_field_tag :'event_boost[hourly_amount]', value: @event_boost.hourly_amount, min: 0.01, step: 0.01, class: 'form-control', id: 'event_boost_hourly_amount', required: true %>
+              </div>
+            </div>
+          </div>
+
+          <p class="lead">
+            Total: <strong><span id="event-boost-total"><%= "#{money_symbol(@event_boost.currency)}#{format('%.2f', total_amount)}" %></span></strong>
+          </p>
+
+          <button type="submit" class="btn btn-primary">
+            Buy boost
+            <i class="bi bi-spin bi-slash-lg" style="display: none"></i>
+          </button>
+        <% end %>
+
+      </div>
+    </div>
+  </div>
+
+  <div class="col-lg-6 mt-3 mt-lg-0">
+    <h2 class="h4">Boost pool</h2>
+    <p class="text-muted">
+      This event's share of the boost pool corresponds to the probability of the event being shown in the boost slot at the top of the unfiltered public events listing (the probability will be even higher for filtered listings).
+    </p>
+    <table class="table table-sm mb-4">
+      <thead>
+        <tr>
+          <th>Hour</th>
+          <th class="text-right">Boost</th>
+          <th class="text-right">Pool total</th>
+          <th class="text-right">Share</th>
+        </tr>
+      </thead>
+      <tbody>
+        <% if @paid_boost_hour_slots.any? %>
+          <% @paid_boost_hour_slots.each do |row| %>
+            <% slot = row[:slot_start] %>
+            <% ew = row[:event_weight] %>
+            <% tw = row[:pool_total] %>
+            <% sh = row[:share] %>
+            <tr>
+              <td>
+                <%= slot.in_time_zone(Time.zone).to_s(:date_no_double_zeros) %>
+                <br>
+                <small class="text-muted">to <%= (slot + 1.hour).in_time_zone(Time.zone).to_s(:no_double_zeros) %></small>
+              </td>
+              <td class="text-right"><%= ew.format %></td>
+              <td class="text-right"><%= tw.format %></td>
+              <td class="text-right">
+                <% if !tw.zero? %>
+                  <%= number_to_percentage(sh * 100, precision: 0) %>
+                <% else %>
+                  —
+                <% end %>
+              </td>
+            </tr>
+          <% end %>
+        <% else %>
+          <tr>
+            <td colspan="4" class="text-center">
+              <em>No boosts yet</em>
+            </td>
+          </tr>
+        <% end %>
+      </tbody>
+    </table>
+  </div>
+
+</div>
+
+
+<h2 class="h4">Boost history</h2>
+<% if @event_boosts.exists? %>
+  <table class="table table-sm">
+    <thead>
+      <tr>
+        <th>When</th>
+        <th>Hours</th>
+        <th></th>
+        <th>Rate</th>
+        <th></th>
+        <th>Total</th>
+        <th>Status</th>
+        <th>Boosted at</th>
+      </tr>
+    </thead>
+    <tbody>
+      <% @event_boosts.each do |event_boost| %>
+        <tr>
+          <td>
+            <%= event_boost.start_time&.in_time_zone(Time.zone)&.to_s(:date_no_double_zeros) %>
+            <% if event_boost.end_time %>
+              <br>
+              <small class="text-muted">to <%= event_boost.end_time.in_time_zone(Time.zone).to_s(:date_no_double_zeros) %></small>
+            <% end %>
+          </td>
+          <td><%= event_boost.hours %></td>
+          <td>&times;</td>
+          <td><%= m event_boost.hourly_amount, event_boost.currency %>/hour</td>
+          <td>=</td>
+          <td><%= m event_boost.total_amount, event_boost.currency %></td>
+          <td>
+            <% text, label_class = event_boost.status.first %>
+            <span class="label <%= label_class %>"><%= text %></span>
+          </td>
+          <td>
+            <%= event_boost.created_at %>
+            <% if event_boost.account %>
+              <br>
+              <small class="text-muted">by <%= event_boost.account.name %></small>
+            <% end %>
+          </td>
+        </tr>
+      <% end %>
+    </tbody>
+  </table>
+<% else %>
+  <p><em>No boosts yet</em></p>
+<% end %>
