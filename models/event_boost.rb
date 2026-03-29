@@ -66,33 +66,26 @@ class EventBoost
     event_ids = events.and(:id.in => boost_event_ids).pluck(:id)
     return if event_ids.blank?
 
-    event_id = weighted_pick(active_hourly_weights_by_event_id(event_ids, time: time), rng: rng)
-    return unless event_id
-
-    events.find(event_id)
-  end
-
-  def self.weighted_pick(weight_by_event_id, rng: Random.new)
+    weight_by_event_id = active_hourly_weights_by_event_id(event_ids, time: time)
     total_weight = weight_by_event_id.values.sum
     return if total_weight <= 0
 
     target = rng.rand(total_weight)
     running_total = 0
+    picked_event_id = nil
 
     weight_by_event_id.each do |event_id, weight|
       next unless weight.positive?
 
       running_total += weight
-      return event_id if target < running_total
+      if target < running_total
+        picked_event_id = event_id
+        break
+      end
     end
+    return unless picked_event_id
 
-    nil
-  end
-
-  def self.browse_pool_hour_weights(event_id, time: Time.current)
-    browse_event_ids = public_listing_event_ids(from: time.to_date)
-    weights = active_hourly_weights_by_event_id(browse_event_ids, time: time)
-    share_from_hourly_weights(weights, event_id)
+    events.find(picked_event_id)
   end
 
   def self.hourly_spend_sum_in_currency(boosts, target_currency)
@@ -114,7 +107,9 @@ class EventBoost
     weights = active_hourly_weights_by_event_id(browse_event_ids, time: time)
     boosts = active_at(time).and(:event_id.in => browse_event_ids).only(:hourly_amount, :currency, :event_id).to_a
     my_boosts = boosts.select { |b| b.event_id == event.id }
-    share = share_from_hourly_weights(weights, event.id)[:share]
+    event_w = weights[event.id].to_i
+    total_w = weights.values.sum
+    share = total_w.positive? ? event_w.to_f / total_w : 0.0
 
     {
       event_weight: hourly_spend_sum_in_currency(my_boosts, target_currency),
@@ -124,14 +119,6 @@ class EventBoost
     }
   end
 
-  def self.convert_hourly_amount_to_gbp_pence(amount, currency)
-    return unless amount && currency
-
-    Money.new((amount.to_f * 100).round, currency).exchange_to('GBP').cents
-  rescue Money::Bank::UnknownRate, Money::Currency::UnknownCurrency
-    nil
-  end
-
   def self.minimum_hourly_amount(currency)
     m = FiatCurrency.minimum_unit_amount(currency)
     return nil unless m
@@ -139,12 +126,8 @@ class EventBoost
     m * MINIMUM_HOURLY_AMOUNT_MULTIPLIER
   end
 
-  def self.public_listing_scope(from: Date.today)
-    Event.live.publicly_visible.browsable.future(from)
-  end
-
   def self.public_listing_event_ids(from: Date.today)
-    public_listing_scope(from: from).pluck(:id)
+    Event.live.publicly_visible.browsable.future(from).pluck(:id)
   end
 
   def complete?
@@ -167,13 +150,6 @@ class EventBoost
     { 'Ended' => 'label-default' }
   end
 
-  def self.share_from_hourly_weights(weights, event_id)
-    event_w = weights[event_id].to_i
-    total = weights.values.sum
-    share = total.positive? ? event_w.to_f / total : 0.0
-    { event_weight: event_w, total_weight: total, share: share }
-  end
-
   private
 
   def set_derived_fields
@@ -181,7 +157,11 @@ class EventBoost
 
     self.end_time = start_time + hours.hours
     self.total_amount = (hourly_amount.to_f * hours.to_i).round(2)
-    self.hourly_weight_gbp_pence = self.class.convert_hourly_amount_to_gbp_pence(hourly_amount, currency)
+    self.hourly_weight_gbp_pence = begin
+      Money.new((hourly_amount.to_f * 100).round, currency).exchange_to('GBP').cents
+    rescue Money::Bank::UnknownRate, Money::Currency::UnknownCurrency
+      nil
+    end
   end
 
   def hourly_amount_meets_minimum
