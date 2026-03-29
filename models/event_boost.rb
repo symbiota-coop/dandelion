@@ -52,7 +52,7 @@ class EventBoost
   def self.active_hourly_weights_by_event_id(event_ids, time: Time.current)
     return {} if event_ids.blank?
 
-    active_at(time).and(:event_id.in => event_ids).to_a.each_with_object({}) do |event_boost, weights|
+    active_at(time).and(:event_id.in => event_ids).only(:event_id, :hourly_weight_gbp_pence).to_a.each_with_object({}) do |event_boost, weights|
       next unless event_boost.hourly_weight_gbp_pence.to_i.positive?
 
       weights[event_boost.event_id] = weights.fetch(event_boost.event_id, 0) + event_boost.hourly_weight_gbp_pence
@@ -92,10 +92,7 @@ class EventBoost
   def self.browse_pool_hour_weights(event_id, time: Time.current)
     browse_event_ids = public_listing_event_ids(from: time.to_date)
     weights = active_hourly_weights_by_event_id(browse_event_ids, time: time)
-    event_w = weights[event_id].to_i
-    total = weights.values.sum
-    share = total.positive? ? event_w.to_f / total : 0.0
-    { event_weight: event_w, total_weight: total, share: share }
+    share_from_hourly_weights(weights, event_id)
   end
 
   def self.hourly_spend_sum_in_currency(boosts, target_currency)
@@ -114,14 +111,15 @@ class EventBoost
   def self.browse_pool_hour_display(event, time: Time.current)
     target_currency = event.currency_or_default
     browse_event_ids = public_listing_event_ids(from: time.to_date)
-    boosts = active_at(time).and(:event_id.in => browse_event_ids).to_a
+    weights = active_hourly_weights_by_event_id(browse_event_ids, time: time)
+    boosts = active_at(time).and(:event_id.in => browse_event_ids).only(:hourly_amount, :currency, :event_id).to_a
     my_boosts = boosts.select { |b| b.event_id == event.id }
+    share = share_from_hourly_weights(weights, event.id)[:share]
 
-    gbp = browse_pool_hour_weights(event.id, time: time)
     {
       event_weight: hourly_spend_sum_in_currency(my_boosts, target_currency),
       pool_total: hourly_spend_sum_in_currency(boosts, target_currency),
-      share: gbp[:share],
+      share: share,
       currency: target_currency
     }
   end
@@ -170,6 +168,13 @@ class EventBoost
   end
 
   private
+
+  def self.share_from_hourly_weights(weights, event_id)
+    event_w = weights[event_id].to_i
+    total = weights.values.sum
+    share = total.positive? ? event_w.to_f / total : 0.0
+    { event_weight: event_w, total_weight: total, share: share }
+  end
 
   def set_derived_fields
     return unless start_time && hours && hourly_amount && currency
