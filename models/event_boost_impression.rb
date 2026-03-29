@@ -1,4 +1,4 @@
-class EventBoostDisplay
+class EventBoostImpression
   include Mongoid::Document
   include Mongoid::Timestamps
   include CoreExtensions

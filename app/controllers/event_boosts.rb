@@ -25,7 +25,7 @@ Dandelion::App.controller do
       end
     end
     @paid_boost_hour_slots = slot_starts.uniq.sort.map do |slot_start|
-      EventBoost.browse_pool_hour_display(@event, slot_start: slot_start)
+      EventBoost.pool_hour_stats(@event, slot_start: slot_start)
     end
 
     erb :'event_boosts/boosts'

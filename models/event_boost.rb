@@ -101,10 +101,10 @@ class EventBoost
     end
   end
 
-  def self.browse_pool_hour_display(event, slot_start:)
+  def self.pool_hour_stats(event, slot_start:)
     time = slot_start + 30.minutes
     slot_end = slot_start + 1.hour
-    display_count = event.event_boost_displays.and(
+    impression_count = event.event_boost_impressions.and(
       :created_at.gte => slot_start,
       :created_at.lt => slot_end
     ).count
@@ -124,7 +124,7 @@ class EventBoost
       share: share,
       currency: target_currency,
       slot_start: slot_start,
-      display_count: display_count
+      impression_count: impression_count
     }
   end
 
