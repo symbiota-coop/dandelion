@@ -1,4 +1,5 @@
 <% if @boosted_event %>
+  <% @boosted_event&.event_boost_displays&.create! %>
   <div class="mb-3">
     <div class="mb-1">
       <small class="text-muted">Boosted by <a class="text-muted" href="/o/<%= @boosted_event.organisation.slug %>/events"><%= @boosted_event.organisation.name %></a></small>

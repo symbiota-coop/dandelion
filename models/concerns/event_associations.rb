@@ -19,6 +19,7 @@ module EventAssociations
 
     has_many :rpayments, dependent: :destroy
     has_many :event_boosts, dependent: :destroy
+    has_many :event_boost_displays, dependent: :destroy
 
     has_many :posts, as: :commentable, dependent: :destroy
     has_many :subscriptions, as: :commentable, dependent: :destroy

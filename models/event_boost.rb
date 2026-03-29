@@ -101,7 +101,14 @@ class EventBoost
     end
   end
 
-  def self.browse_pool_hour_display(event, time: Time.current)
+  def self.browse_pool_hour_display(event, slot_start:)
+    time = slot_start + 30.minutes
+    slot_end = slot_start + 1.hour
+    display_count = event.event_boost_displays.and(
+      :created_at.gte => slot_start,
+      :created_at.lt => slot_end
+    ).count
+
     target_currency = event.currency_or_default
     browse_event_ids = public_listing_event_ids(from: time.to_date)
     weights = active_hourly_weights_by_event_id(browse_event_ids, time: time)
@@ -115,7 +122,9 @@ class EventBoost
       event_weight: hourly_spend_sum_in_currency(my_boosts, target_currency),
       pool_total: hourly_spend_sum_in_currency(boosts, target_currency),
       share: share,
-      currency: target_currency
+      currency: target_currency,
+      slot_start: slot_start,
+      display_count: display_count
     }
   end
 

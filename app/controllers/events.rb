@@ -18,22 +18,26 @@ Dandelion::App.controller do
     @events = @events.and(has_image: true) if params[:images]
     case content_type
     when :html
-      @events = @events.without_heavy_fields
-      @events = @events.future(@from)
-      @events = @events.and(:start_time.lt => @to + 1) if @to
-      @events = @events.and(:id.in => Event.search(params[:q], @events).pluck(:id)) if params[:q]
-      @boosted_event =
-        if (params[:page] && params[:page].to_i > 1) ||
-           params[:home] ||
-           params[:minimal] ||
-           params[:past] ||
-           params[:display].in?(%w[grid map calendar])
-          nil
-        else
-          EventBoost.pick_event_for_scope(@events)
-        end
-      @events = apply_random_or_trending_order(@events, @from)
-      request.xhr? ? partial(:'events/events') : erb(:'events/events')
+      if request.xhr?
+        @events = @events.without_heavy_fields
+        @events = @events.future(@from)
+        @events = @events.and(:start_time.lt => @to + 1) if @to
+        @events = @events.and(:id.in => Event.search(params[:q], @events).pluck(:id)) if params[:q]
+        @boosted_event =
+          if (params[:page] && params[:page].to_i > 1) ||
+             params[:home] ||
+             params[:minimal] ||
+             params[:past] ||
+             params[:display].in?(%w[grid map calendar])
+            nil
+          else
+            EventBoost.pick_event_for_scope(@events)
+          end
+        @events = apply_random_or_trending_order(@events, @from)
+        partial :'events/events'
+      else
+        erb :'events/events'
+      end
     when :json
       @events = @events.future(@from)
       @events = @events.and(:start_time.lt => @to + 1) if @to

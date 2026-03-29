@@ -87,6 +87,7 @@ class EventBoostsTest < ActiveSupport::TestCase
     assert page.has_content?('Boosted by')
     assert_equal 1, page.text.scan('Spotlight listing event').length
     assert page.has_content?('Regular listing event')
+    assert_equal 1, @event_1.event_boost_displays.count
 
     visit "/events?organisation_id=#{@organisation.id}&page=2"
     assert page.has_no_content?('Boosted by')
