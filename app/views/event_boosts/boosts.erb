@@ -120,7 +120,7 @@
     <p class="text-muted">
       This event's share of the boost pool corresponds to the probability of the event being shown in the boost slot at the top of the unfiltered public events listing
       (the probability will be even higher for filtered listings as the pool will be smaller).
-      <strong>Impressions</strong> counts how many times this event was shown in the boost slot.
+      <strong>Impressions</strong> counts how many times this event was actually shown in the boost slot.
     </p>
     <table class="table table-sm mb-4">
       <thead>
@@ -140,7 +140,7 @@
             <% tw = row[:pool_total] %>
             <% sh = row[:share] %>
             <% dc = row[:impression_count] %>
-            <tr>
+            <tr class="<%= 'text-muted' if slot < Time.zone.now.beginning_of_hour %>">
               <td>
                 <%= slot.to_s(:date_no_double_zeros) %>
                 <br>

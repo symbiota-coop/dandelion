@@ -15,12 +15,11 @@ Dandelion::App.controller do
       currency: currency
     )
 
-    now_floor = Time.zone.now.beginning_of_hour
     slot_starts = []
-    @event.event_boosts.and(:end_time.gt => now_floor, :payment_completed => true).each do |boost|
+    @event.event_boosts.and(:payment_completed => true).each do |boost|
       t = boost.start_time.beginning_of_hour
       while t < boost.end_time
-        slot_starts << t if t >= now_floor
+        slot_starts << t
         t += 1.hour
       end
     end
