@@ -227,12 +227,20 @@ You'll be notified via email when people apply.
 
 ## Event boosts
 
-Event admins can buy a boost for an event from the **Boosts** page in the event admin menu.
+Dandelion has a 'boosted event' slot at the top the event listings. You can boost your event from the **Boosts** page in the event admin menu.
 
 - Boosts are bought in whole-hour blocks.
 - You choose a start time, a number of hours, and an amount per hour.
-- When multiple boosts are active at the same moment, Dandelion shows one boosted event in the top slot of the main list views, with probability proportional to the amount paid.
 - Overlapping boosts for the same event stack together.
+
+An event's share of the boost pool corresponds to the probability of the event being shown in the boost slot at the top of the unfiltered public events listing (the probability will be even higher for filtered listings as the pool will be smaller).
+
+For example:
+
+Event 1 is boosted for £2 during 9am-10am<br />
+Event 2 is boosted for £8 during 9am-10am
+
+Then the probability that Event 1 will be shown in the boosted slot when someone views the page is 2/(2+8) = 20%.
 
 ## Using automated revenue sharing
 
