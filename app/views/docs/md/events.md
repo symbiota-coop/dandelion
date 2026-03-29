@@ -233,7 +233,7 @@ Dandelion has a 'boosted event' slot at the top of the event listings. If you'd 
 - You choose a start time, a number of hours, and an amount per hour.
 - Overlapping boosts for the same event stack together.
 
-An event's share of the boost pool corresponds to the probability of the event being shown in the boost slot at the top of the unfiltered public events listing (the probability will be even higher for filtered listings as the number of relevant events will be smaller).
+An event's share of the boost pool corresponds to the probability of the event being shown in the boost slot at the top of the unfiltered public events listing (the probability can be higher for filtered listings where the number of relevant events is smaller).
 
 For example, if during one hour:
 
