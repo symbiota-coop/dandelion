@@ -167,14 +167,14 @@ class EventBoost
     { 'Ended' => 'label-default' }
   end
 
-  private
-
   def self.share_from_hourly_weights(weights, event_id)
     event_w = weights[event_id].to_i
     total = weights.values.sum
     share = total.positive? ? event_w.to_f / total : 0.0
     { event_weight: event_w, total_weight: total, share: share }
   end
+
+  private
 
   def set_derived_fields
     return unless start_time && hours && hourly_amount && currency
