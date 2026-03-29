@@ -227,7 +227,7 @@ You'll be notified via email when people apply.
 
 ## Event boosts
 
-Dandelion has a 'boosted event' slot at the top the event listings. If you'd like your event to show there, you can boost your event from the **Boosts** page in the event admin menu.
+Dandelion has a 'boosted event' slot at the top of the event listings. If you'd like your event to show there, you can boost your event from the **Boosts** page in the event admin menu.
 
 - Boosts are bought in whole-hour blocks.
 - You choose a start time, a number of hours, and an amount per hour.
