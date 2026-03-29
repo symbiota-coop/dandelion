@@ -3,7 +3,7 @@ class EventBoost
   include Mongoid::Timestamps
   include CoreExtensions
 
-  MINIMUM_HOURLY_AMOUNT_MULTIPLIER = 10
+  MINIMUM_HOURLY_AMOUNT_MULTIPLIER = 1
 
   belongs_to_without_parent_validation :event
   belongs_to_without_parent_validation :account
