@@ -15,6 +15,6 @@
 
 <%= partial :'events/search_form', locals: { path: '/events' } %>
 
-<div data-with-placeholder data-pagelet-url="/events?near=<%=CGI.escape(@location.query)%>">
+<div data-with-placeholder data-pagelet-url="/events?near=<%=CGI.escape(@location.query) if @location.query %>">
   <%= partial :'events/blocks_placeholder' %>
 </div>
