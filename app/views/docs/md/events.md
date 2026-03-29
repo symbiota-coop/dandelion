@@ -227,18 +227,18 @@ You'll be notified via email when people apply.
 
 ## Event boosts
 
-Dandelion has a 'boosted event' slot at the top the event listings. You can boost your event from the **Boosts** page in the event admin menu.
+Dandelion has a 'boosted event' slot at the top the event listings. If you'd like your event to show there, you can boost your event from the **Boosts** page in the event admin menu.
 
 - Boosts are bought in whole-hour blocks.
 - You choose a start time, a number of hours, and an amount per hour.
 - Overlapping boosts for the same event stack together.
 
-An event's share of the boost pool corresponds to the probability of the event being shown in the boost slot at the top of the unfiltered public events listing (the probability will be even higher for filtered listings as the pool will be smaller).
+An event's share of the boost pool corresponds to the probability of the event being shown in the boost slot at the top of the unfiltered public events listing (the probability will be even higher for filtered listings as the number of relevant events will be smaller).
 
-For example:
+For example, if during one hour:
 
-Event 1 is boosted for £2 during 9am-10am<br />
-Event 2 is boosted for £8 during 9am-10am
+Event 1 is boosted for £2<br />
+Event 2 is boosted for £8
 
 Then the probability that Event 1 will be shown in the boosted slot when someone views the page is 2/(2+8) = 20%.
 

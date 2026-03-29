@@ -74,6 +74,10 @@
       <div class="card-body">
         <h2 class="h4">Boost this event</h2>
 
+        <p>
+          <a target="_blank" href="/docs/events#event-boosts">Read more about boosts</a>
+        </p>
+
         <% total_amount = (@event_boost.total_amount || (@event_boost.hourly_amount.to_f * @event_boost.hours.to_i)).round(2) %>
 
         <% form_tag '', class: 'mb-0', id: 'event-boost-form' do %>
@@ -116,20 +120,15 @@
   </div>
 
   <div class="col-lg-6 mt-3 mt-lg-0">
-    <h2 class="h4">Boost pool</h2>
-    <p class="text-muted">
-      This event's share of the boost pool corresponds to the probability of the event being shown in the boost slot at the top of the unfiltered public events listing
-      (the probability will be even higher for filtered listings as the pool will be smaller).
-      <strong>Impressions</strong> counts how many times this event was actually shown in the boost slot.
-    </p>
+    <h2 class="h4">Boosts</h2>
     <table class="table table-sm mb-4">
       <thead>
         <tr>
           <th>Hour</th>
           <th class="text-right">Boost</th>
           <th class="text-right">Pool total</th>
-          <th class="text-right">Share</th>
-          <th class="text-right">Impressions</th>
+          <th class="text-right"><span data-toggle="tooltip" title="Corresponds to the probability of the event being shown in the boost slot at the top of the unfiltered public events listing">Share <i class="bi bi-info-circle"></i></span></th>
+          <th class="text-right"><span data-toggle="tooltip" title="How many times this event was actually shown in the boost slot">Impressions <i class="bi bi-info-circle"></i></span></th>
         </tr>
       </thead>
       <tbody>
