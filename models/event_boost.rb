@@ -110,7 +110,8 @@ class EventBoost
     ).count
 
     target_currency = event.currency_or_default
-    browse_event_ids = public_listing_event_ids(from: time.to_date)
+    browse_event_ids = Event.live.publicly_visible.browsable.future(time.to_date).pluck(:id)
+
     weights = active_hourly_weights_by_event_id(browse_event_ids, time: time)
     boosts = active_at(time).and(:event_id.in => browse_event_ids).only(:hourly_amount, :currency, :event_id).to_a
     my_boosts = boosts.select { |b| b.event_id == event.id }
@@ -133,10 +134,6 @@ class EventBoost
     return nil unless m
 
     m * MINIMUM_HOURLY_AMOUNT_MULTIPLIER
-  end
-
-  def self.public_listing_event_ids(from: Date.today)
-    Event.live.publicly_visible.browsable.future(from).pluck(:id)
   end
 
   def complete?
