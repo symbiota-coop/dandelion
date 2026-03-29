@@ -3,7 +3,6 @@ class EventBoost
   include Mongoid::Timestamps
   include CoreExtensions
 
-  # Applied to FiatCurrency.minimum_unit_amount (~1 GBP floor) for the minimum hourly boost rate.
   MINIMUM_HOURLY_AMOUNT_MULTIPLIER = 10
 
   belongs_to_without_parent_validation :event
