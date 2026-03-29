@@ -34,8 +34,6 @@ class EventBoost
   validate :hourly_amount_meets_minimum
   validate :start_time_on_the_hour
   validate :start_time_in_the_future
-  validate :start_time_before_event_listing_ends
-  validate :end_time_before_event_listing_ends
 
   before_validation :set_derived_fields
 
@@ -204,18 +202,5 @@ class EventBoost
     return unless start_time
 
     errors.add(:start_time, 'must be this hour or later') unless start_time >= Time.current.beginning_of_hour
-  end
-
-  def start_time_before_event_listing_ends
-    return unless start_time && event&.start_time
-
-    errors.add(:start_time, 'must be on or before the event date') unless start_time.to_date <= event.start_time.to_date
-  end
-
-  def end_time_before_event_listing_ends
-    return unless end_time && event&.start_time
-
-    listing_end = event.start_time.to_date.next_day.in_time_zone
-    errors.add(:hours, 'would make the boost run past the event date') unless end_time <= listing_end
   end
 end
