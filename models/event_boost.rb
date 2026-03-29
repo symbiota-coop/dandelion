@@ -60,7 +60,12 @@ class EventBoost
   end
 
   def self.pick_event_for_scope(events, time: Time.current, rng: Random.new)
-    event_ids = events.pluck(:id)
+    boost_event_ids = active_at(time).distinct(:event_id).compact
+    return if boost_event_ids.blank?
+
+    event_ids = events.and(:id.in => boost_event_ids).pluck(:id)
+    return if event_ids.blank?
+
     event_id = weighted_pick(active_hourly_weights_by_event_id(event_ids, time: time), rng: rng)
     return unless event_id
 
