@@ -44,6 +44,8 @@ Use the following command structure to test a single file:
 
 `env -u BUNDLE_PATH foreman run -e .env.test bundle exec ruby -I test test/$1_test.rb`
 
+On Codex, run this outside the sandbox.
+
 ## Dependencies
 
 Ruby gems: 
