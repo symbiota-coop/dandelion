@@ -169,10 +169,14 @@ class EventBoost
     batch_message.from ENV['NOTIFICATIONS_EMAIL_FULL']
     batch_message.subject "[Event boost] #{account.name} boosted #{event.name}"
     batch_message.body_text [
-      "Account: #{account.name}",
       "Event: #{event.name}",
-      "Hours: #{event_boost.hours}, total: #{event_boost.total_amount} #{event_boost.currency}",
-      "#{ENV['BASE_URI']}/events/#{event.id}/boosts"
+      "Account: #{account.name}",
+      "Start time: #{event_boost.start_time}",
+      "Hours: #{event_boost.hours}",
+      "Currency: #{event_boost.currency}",
+      "Hourly amount: #{event_boost.hourly_amount}",
+      "Total amount: #{event_boost.total_amount}",
+      "Boosts URL: #{ENV['BASE_URI']}/events/#{event.id}/boosts"
     ].join("\n")
 
     Account.and(admin: true).each do |admin_account|
