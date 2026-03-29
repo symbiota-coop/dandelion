@@ -237,10 +237,14 @@ An event's share of the boost pool corresponds to the probability of the event b
 
 For example, if during one hour:
 
-Event 1 is boosted for £2<br />
-Event 2 is boosted for £8
+'Breathwork Journey' tagged 'breathwork' is boosted for £2<br />
+'Day Rave' tagged 'rave' is boosted for £8
 
-Then the probability that Event 1 will be shown in the boosted slot when someone views the page is 2/(2+8) = 20%.
+Then the probability that 'Breathwork Journey' will be shown in the boosted slot when someone views the unfiltered public events listing is 2/(2+8) = 20%.
+
+The probability that 'Breathwork Journey' will be shown in the boosted slot when someone views the public events listings, filtered for the tag 'breathwork' is 100% (as it's the only boosted event that matches the filters).
+
+Likewise, the probability that 'Day Rave' will be shown in the boosted slot when someone views the public events listings, filtered for the tag 'rave' is 100%.
 
 ## Using automated revenue sharing
 
