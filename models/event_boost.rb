@@ -171,7 +171,7 @@ class EventBoost
     batch_message.body_text [
       "Event: #{event.name}",
       "Account: #{account.name}",
-      "Start time: #{event_boost.start_time}",
+      "Start time: #{event_boost.start_time.iso8601}",
       "Hours: #{event_boost.hours}",
       "Currency: #{event_boost.currency}",
       "Hourly amount: #{event_boost.hourly_amount}",
