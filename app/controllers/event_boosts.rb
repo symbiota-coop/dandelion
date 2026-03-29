@@ -82,6 +82,7 @@ Dandelion::App.controller do
       session = stripe_event['data']['object']
       if (event_boost = EventBoost.find_by(session_id: session.id, payment_completed: false))
         event_boost.set(payment_completed: true)
+        event_boost.send_admin_notification
       end
     end
 

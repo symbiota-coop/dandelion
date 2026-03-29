@@ -156,6 +156,33 @@ class EventBoost
     { 'Ended' => 'label-default' }
   end
 
+  def send_admin_notification
+    return unless payment_completed?
+
+    mg_client = Mailgun::Client.new ENV['MAILGUN_API_KEY'], ENV['MAILGUN_REGION']
+    batch_message = Mailgun::BatchMessage.new(mg_client, ENV['MAILGUN_NOTIFICATIONS_HOST'])
+
+    event_boost = self
+    event = self.event
+    account = self.account
+
+    batch_message.from ENV['NOTIFICATIONS_EMAIL_FULL']
+    batch_message.subject "[Event boost] #{account.name} boosted #{event.name}"
+    batch_message.body_text [
+      "Account: #{account.name}",
+      "Event: #{event.name}",
+      "Hours: #{event_boost.hours}, total: #{event_boost.total_amount} #{event_boost.currency}",
+      "#{ENV['BASE_URI']}/events/#{event.id}/boosts"
+    ].join("\n")
+
+    Account.and(admin: true).each do |admin_account|
+      batch_message.add_recipient(:to, admin_account.email, { 'firstname' => admin_account.firstname || 'there', 'token' => admin_account.sign_in_token, 'id' => admin_account.id.to_s })
+    end
+
+    batch_message.finalize if Padrino.env == :production
+  end
+  handle_asynchronously :send_admin_notification
+
   private
 
   def set_derived_fields
