@@ -11,9 +11,21 @@
 
 <% unless params[:search] %>
   <div class="mb-3">
-    <span class="d-inline-block mb-1">Popular locations:</span><% Location.order('events_count desc').each do |location| %>
-      <a class="regular btn mb-1 <% if @location && @location == location %> btn-primary <% else %> btn-outline-primary <% end %> btn-xs" href="/locations/<%= location.name %>"><%= location.name %></a>
-    <% end %>
+    <% popular_locations = Location.order('events_count desc').to_a %>
+    <% show_more_limit = 12 %>
+    <span class="d-inline-block mb-1">Popular locations:</span>
+    <span class="popular-locations-container">
+      <% popular_locations.each_with_index do |location, index| %>
+        <span class="location-item <%= 'd-none' if index >= show_more_limit %>">
+          <a class="regular btn mb-1 <% if @location && @location == location %> btn-primary <% else %> btn-outline-primary <% end %> btn-xs" href="/locations/<%= location.name %>"><%= location.name %></a>
+        </span>
+      <% end %>
+      <% if popular_locations.size > show_more_limit %>
+        <a href="javascript:;" onclick="$(this).closest('.popular-locations-container').find('.location-item').removeClass('d-none'); $(this).remove();">
+          <i class="bi bi-three-dots"></i>
+        </a>
+      <% end %>
+    </span>
   </div>
 <% end %>
 
