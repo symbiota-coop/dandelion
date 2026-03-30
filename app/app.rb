@@ -278,11 +278,15 @@ module Dandelion
 
     get '/features' do
       @no_content_padding_bottom = true
+      @title = 'Features'
+      @og_image = "#{ENV['BASE_URI']}/images/features.png"
       erb :features
     end
 
     get '/dandelion-vs-luma' do
       @no_content_padding_bottom = true
+      @title = 'Dandelion vs Luma'
+      @og_image = "#{ENV['BASE_URI']}/images/dandelion_vs_luma.png"
       erb :dandelion_vs_luma
     end
 
