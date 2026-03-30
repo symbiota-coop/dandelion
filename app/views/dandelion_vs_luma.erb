@@ -1,0 +1,188 @@
+<style>
+  #content { padding-left: 0; padding-right: 0; padding-top: 0; }
+
+  .vs-section { padding-top: 3.5rem; padding-bottom: 3.5rem; }
+  @media(min-width: 992px) { .vs-section { padding-top: 5rem; padding-bottom: 5rem; } }
+
+  .vs-hero { padding-top: 0; }
+
+  .vs-gradient-text {
+    background-size: 100% 100%;
+  }
+
+  .vs-strapline-bottom {
+    font-size: 4.7vw;
+    line-height: 130%
+  }
+
+  @media(min-width: 768px) {
+    .vs-strapline-bottom {
+      font-size: 4.2vw;
+    }
+  }
+
+  @media(min-width: 992px) {
+    .vs-strapline-bottom {
+      font-size: 2.9vw;
+    }
+  }
+
+  .reason-card {
+    background: #fff;
+    border: 1px solid rgba(0,0,0,0.08);
+    border-radius: 0.75rem;
+    padding: 2rem;
+    height: 100%;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+  }
+  .reason-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 8px 24px rgba(0,0,0,0.1);
+  }
+
+  .reason-number {
+    width: 2.5rem;
+    height: 2.5rem;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.1rem;
+    font-weight: 700;
+    margin-bottom: 1rem;
+    color: #fff;
+  }
+
+  .reason-icon {
+    width: 3rem;
+    height: 3rem;
+    border-radius: 0.5rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.35rem;
+    margin-bottom: 1rem;
+  }
+
+  .section-heading { font-size: 1.5rem; font-weight: 700; margin-bottom: 0.5rem; }
+  @media(min-width: 992px) { .section-heading { font-size: 2vw; } }
+  .section-divider { width: 3rem; height: 3px; border-radius: 2px; margin-bottom: 1.5rem; }
+  .section-divider.magenta { background: linear-gradient(90deg, #B900A1, #e84dc4); }
+
+  .reasons-section {
+    background: linear-gradient(to bottom, #ffffff 30%, #f4e6f5);
+  }
+
+  .cta-section {
+    background:
+      radial-gradient(ellipse at 15% 80%, rgba(68,0,185,0.5) 0%, transparent 50%),
+      radial-gradient(ellipse at 85% 20%, rgba(185,0,161,0.4) 0%, transparent 50%),
+      radial-gradient(ellipse at 50% 50%, rgba(124,60,230,0.3) 0%, transparent 60%),
+      linear-gradient(to bottom, #5a1fd6, #4c10c0 30%, #4400B9 60%, #3a0099 100%);
+    color: #fff;
+  }
+  .cta-section .btn-light:focus { color: #212529; }
+  .cta-section .btn-outline-light:hover { background: #fff; color: #4400B9; }
+</style>
+
+<!-- Hero -->
+<div class="gradient content-padding-x vs-section vs-hero text-lg-center">
+  <div class="row justify-content-center mx-0 py-5">
+    <div class="col-lg-9 col-xl-8">
+      <p class="features-strapline strapline mb-3">The top 5 reasons to choose <strong class="gradient-text vs-gradient-text">Dandelion over Luma</strong></p>
+      <p class="readable mb-3">Luma is a popular events platform, but it isn't built for everyone. Here's why organisers are choosing a fee-free, co-op-run alternative with stunning event pages, AI-powered feedback and open data.</p>
+      <a class="btn btn-primary btn-lg" href="/events/new">List an event</a>
+      <a class="btn btn-outline-primary btn-lg ml-1" href="/features">See all features</a>
+    </div>
+  </div>
+</div>
+
+<!-- 5 Reasons -->
+<div class="vs-section reasons-section content-padding-x">
+  <div class="container">
+    <div class="text-center mb-5">
+      <h2 class="section-heading">Why organisers are switching</h2>
+      <div class="section-divider magenta mx-auto"></div>
+    </div>
+
+    <% [
+      {
+        number: 1,
+        color: '#B900A1',
+        bg: 'rgba(185,0,161,0.1)',
+        icon: 'bi-gift',
+        title: 'No platform fees, ever',
+        desc: 'Luma charges a 5% platform fee on paid tickets, or $59/month to remove it. On Dandelion, there are no platform fees, full stop. You only pay what the payment processor charges. That means more money goes directly to you and your event.',
+        detail: 'As a not-for-profit worker co-op, we don\'t need to extract fees to satisfy investors.'
+      },
+      {
+        number: 2,
+        color: '#9D00AD',
+        bg: 'rgba(157,0,173,0.1)',
+        icon: 'bi-star',
+        title: 'Reputation, feedback and AI summaries',
+        desc: 'On Dandelion, attendee ratings are public, building a visible reputation for you as an organiser. AI-powered summaries surface actionable insights from your feedback. Luma has feedback too, but it\'s private and doesn\'t build reputation.',
+        detail: 'A transparent reputation system that helps attendees find great organisers and helps you continuously improve.'
+      },
+      {
+        number: 3,
+        color: '#8000B5',
+        bg: 'rgba(128,0,181,0.1)',
+        icon: 'bi-image',
+        title: 'Full-width event banners',
+        desc: 'Dandelion gives your events the visual impact they deserve with full-width banner images that make your event page stand out. On Luma, your event imagery is constrained to a small box at the top of the page.',
+        detail: 'First impressions matter. A stunning full-width banner sets the tone for your event before attendees read a single word.'
+      },
+      {
+        number: 4,
+        color: '#6200B7',
+        bg: 'rgba(98,0,183,0.1)',
+        icon: 'bi-people',
+        title: 'Run by a worker co-op, not venture capital',
+        desc: 'Luma is a VC-backed startup that needs to generate returns for investors. Dandelion is owned and run by the people who build it. Our incentives are aligned with yours: making the best possible platform for event organisers.',
+        detail: 'We\'ll never enshittify the platform, add intrusive ads, or chase growth metrics at the expense of our mission.'
+      },
+      {
+        number: 5,
+        color: '#4400B9',
+        bg: 'rgba(68,0,185,0.1)',
+        icon: 'bi-code-square',
+        title: 'Fair source and open data',
+        desc: 'Luma is a closed platform. Dandelion\'s code is fair source and events are cross-posted to ATProto, so your data isn\'t locked away in a walled garden.',
+        detail: 'You can inspect how the platform works, and your events live on the open web, not just inside one company\'s silo.'
+      },
+    ].each do |reason| %>
+      <div class="row mb-4 justify-content-center">
+        <div class="col-lg-8">
+          <div class="reason-card">
+            <div class="d-flex align-items-start">
+              <div class="mr-3 flex-shrink-0">
+                <div class="reason-number" style="background: <%= reason[:color] %>;"><%= reason[:number] %></div>
+              </div>
+              <div>
+                <div class="reason-icon" style="background: <%= reason[:bg] %>; color: <%= reason[:color] %>;">
+                  <i class="bi <%= reason[:icon] %>"></i>
+                </div>
+                <h4 class="mb-2"><%= reason[:title] %></h4>
+                <p class="text-muted mb-2"><%= reason[:desc] %></p>
+                <p class="mb-0" style="font-size: 0.9rem; color: <%= reason[:color] %>;"><i class="bi bi-arrow-right mr-1"></i><%= reason[:detail] %></p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    <% end %>
+  </div>
+</div>
+
+<!-- CTA -->
+<div class="vs-section cta-section content-padding-x text-lg-center pt-5 pb-5">
+  <div class="row justify-content-center mx-0">
+    <div class="col-lg-9 col-xl-8">
+      <p class="vs-strapline-bottom strapline mb-3">Ready to make the switch?</p>
+      <p class="readable mb-4" style="opacity: 0.9;">Join a growing community of organisers creating soulful, participatory and regenerative events, on a platform that puts people before profit.</p>
+      <a class="btn btn-light btn-lg" href="/events/new">List an event</a>
+      <a class="btn btn-outline-light btn-lg ml-1" href="/features">See all features</a>
+    </div>
+  </div>
+</div>

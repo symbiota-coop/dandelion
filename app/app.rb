@@ -281,6 +281,11 @@ module Dandelion
       erb :features
     end
 
+    get '/dandelion-vs-luma' do
+      @no_content_padding_bottom = true
+      erb :dandelion_vs_luma
+    end
+
     get '/search' do
       if request.xhr?
         @type = params[:type]
