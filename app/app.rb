@@ -287,6 +287,7 @@ module Dandelion
       @no_content_padding_bottom = true
       @title = 'Dandelion vs Luma'
       @og_image = "#{ENV['BASE_URI']}/images/dandelion_vs_luma.png"
+      @og_desc = "Here's why organisers are choosing a fee-free, co-op-run alternative with a transparent reputation system"
       erb :dandelion_vs_luma
     end
 
