@@ -233,7 +233,14 @@
             <p style="margin-top: -1rem"><a target="_blank" href="/events/<%=@event.id%>/reminder_email">Preview reminder email &rarr;</a></p>
           <% end %>
           <div class="evergreen-hide" style="<%= 'display:none' if @event.evergreen? %>">
-            <%= f.number_block :reminder_hours_before %>
+            <% if @event.sent_reminders_at %>
+              <div class="form-group">
+                <label><%= Event.human_attribute_name(:reminder_hours_before) %></label>
+                <input type="text" class="form-control" disabled value="<%= "Reminder sent #{@event.sent_reminders_at}" %>">
+              </div>
+            <% else %>
+              <%= f.number_block :reminder_hours_before %>
+            <% end %>
           </div>
         </div>
         <div class="mt-5">
