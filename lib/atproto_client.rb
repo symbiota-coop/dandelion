@@ -88,6 +88,10 @@ class AtprotoClient
     session['did']
   end
 
+  def session_handle
+    session['handle']
+  end
+
   private
 
   def parse_uri(uri)
