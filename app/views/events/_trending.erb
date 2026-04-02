@@ -1,4 +1,4 @@
-<% Event.trending.first(3).each { |event| %>
+<% Event.trending(limit: 3).each { |event| %>
 <div class="mb-1">
   <%= partial :'events/block_carousel', locals: {event: event} %>
 </div>

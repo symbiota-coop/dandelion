@@ -20,7 +20,7 @@ render_article("Recently listed", "Create a two-paragraph summary of these newly
 %>
 
 <%=
-events = Event.trending(@date).first(3)
+events = Event.trending(@date, limit: 3)
 render_article("Trending events", "Create a two-paragraph summary of these trending, upcoming event(s). IMPORTANT: Two paragraphs only.", events)
 %>
 

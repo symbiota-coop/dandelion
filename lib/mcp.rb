@@ -67,8 +67,7 @@ module Dandelion
 
       events = Event.live.publicly_visible.browsable
                     .future
-                    .trending
-                    .first(limit)
+                    .trending(limit: limit)
 
       config = config_for(Event)
       fields_proc = config[:search_fields] || config[:fields]
