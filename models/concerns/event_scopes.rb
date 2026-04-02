@@ -59,7 +59,7 @@ module EventScopes
       self.and(:location.ne => 'Online')
     end
 
-    def trending(from = Date.today, limit: nil)
+    def trending(from = Date.today, limit: 100)
       base_query = if self == Event
                      live.publicly_visible.browsable.future(from).and(has_image: true).and(hidden_from_homepage: false)
                    else
