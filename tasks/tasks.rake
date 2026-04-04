@@ -61,7 +61,7 @@ namespace :late do
     Organisation.all.each do |organisation|
       organisation.set_counts
       organisation.update_paid_up_without_delay
-      organisation.stripe_topup if organisation.stripe_customer_id && !organisation.paid_up_by_contribution?
+      organisation.stripe_topup if organisation.stripe_customer_id
     end
     puts 'sync monthly donations'
     Organisation.and(:gocardless_subscriptions => true, :gocardless_access_token.ne => nil).each(&:sync_with_gocardless)

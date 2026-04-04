@@ -73,7 +73,14 @@ module OrganisationAccounting
     Stripe.api_key = ENV['STRIPE_SK']
     Stripe.api_version = ENV['STRIPE_API_VERSION']
 
-    return unless stripe_customer_id && contribution_remaining > 0
+    return unless stripe_customer_id
+
+    cr = contribution_requested
+    cp = contribution_paid
+    return if paid_up_by_contribution?(cr: cr, cp: cp)
+
+    contribution_remaining = cr - cp
+    return unless contribution_remaining > 0
     return if contribution_remaining < Money.new(1 * 100, 'GBP')
 
     # charge customer

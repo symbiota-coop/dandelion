@@ -43,17 +43,19 @@ class Organisation
   end
 
   def set_counts
-    monthly_donations_count = organisationships.and(:monthly_donation_method.ne => nil).and(:monthly_donation_method.ne => 'Other').map do |organisationship|
-      Money.new(
-        organisationship.monthly_donation_amount * 100,
-        organisationship.monthly_donation_currency
-      )
+    monthly_rows = organisationships.and(:monthly_donation_method.ne => nil).and(:monthly_donation_method.ne => 'Other').pluck(:monthly_donation_amount, :monthly_donation_currency)
+    monthly_donations_count = monthly_rows.map do |amount, currency|
+      next Money.new(0, 'GBP') if amount.nil? || currency.blank?
+
+      Money.new(amount * 100, currency)
     end.sum
     monthly_donations_count = monthly_donations_count.format(no_cents: true) if monthly_donations_count > 0
-    set(monthly_donations_count: monthly_donations_count)
-    set(monthly_donors_count: monthly_donors.count)
-    set(subscribed_accounts_count: subscribed_accounts.count)
-    set(followers_count: organisationships.count)
+    set(
+      monthly_donations_count: monthly_donations_count,
+      monthly_donors_count: monthly_donors.count,
+      subscribed_accounts_count: subscribed_accounts.count,
+      followers_count: organisationships.count
+    )
   end
 
   def self.spring_clean
