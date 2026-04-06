@@ -1,19 +1,24 @@
 <div class="main">
   <p>Hi %recipient.firstname%,</p>
   <p>
-    We received an error from Stripe when <%= account.name %> (<a href="mailto:<%=account.email%>"><%=account.email%></a>) attempted to purchase ticket(s) for the event <a href="<%= ENV['BASE_URI'] %>/e/<%=event.slug%>"><%= event.name %></a>:
+    We received an error from <%= provider %> when <%= account.name %> (<a href="mailto:<%=account.email%>"><%=account.email%></a>) attempted to purchase ticket(s) for the event <a href="<%= ENV['BASE_URI'] %>/e/<%=event.slug%>"><%= event.name %></a>:
   </p>
   <blockquote>
     <%= Rinku.auto_link(error.message) %>
   </blockquote>
-  <% unless error.message&.include?('must add up to at least') %>
+  <% unless provider == 'Stripe' && error.message&.include?('must add up to at least') %>
     <% if event.locked? %>
       <p>
         We've locked the event on Dandelion to prevent further errors.
       </p>
     <% end %>
     <p>
-      Please log into your Stripe account and resolve any warnings or notifications you see there.
+      <% case provider %>
+      <% when 'Stripe' %>
+        Please log into your Stripe account and resolve any warnings or notifications you see there.
+      <% when 'GoCardless' %>
+        Please log into your GoCardless account and resolve any warnings or notifications you see there. Also, make sure your access token has read-write access.
+      <% end %>
       <% if event.locked? %>
         Once you've done that, you can <a href="<%= ENV['BASE_URI'] %>/e/<%=event.slug%>/edit">edit the event</a> to uncheck the Locked checkbox and save to allow purchases again.
       <% end %>

@@ -237,6 +237,13 @@ Dandelion::App.controller do
     @order.notify_of_failed_purchase(e)
     @order.destroy
     halt 400
+  rescue GoCardlessPro::InvalidApiUsageError => e
+    # Credential or permission issue on the organisation's GoCardless token (not an app bug)
+    @order.event.set(locked: true)
+    @order.event.delete_atproto
+    @order.notify_of_failed_purchase(e, provider: 'GoCardless')
+    @order.destroy
+    halt 400
   rescue StandardError => e
     Honeybadger.context({ order_id: @order.id }) if @order
     Honeybadger.notify(e)
