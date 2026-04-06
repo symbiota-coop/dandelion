@@ -13,10 +13,9 @@
       </p>
     <% end %>
     <p>
-      <% case provider %>
-      <% when 'Stripe' %>
+      <% if provider == 'Stripe' %>
         Please log into your Stripe account and resolve any warnings or notifications you see there.
-      <% when 'GoCardless' %>
+      <% elsif provider == 'GoCardless' %>
         Please log into your GoCardless account and resolve any warnings or notifications you see there. Also, make sure your access token has read-write access.
       <% end %>
       <% if event.locked? %>
