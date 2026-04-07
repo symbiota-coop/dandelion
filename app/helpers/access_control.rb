@@ -43,6 +43,13 @@ Dandelion::App.helpers do
     kick!(redirect_url: "/o/#{@organisation.slug}") unless organisation_admin?
   end
 
+  def organisation_creator_only!
+    return unless @organisation.editable_by_creator_only?
+    return if current_account && (current_account.admin? || @organisation.account_id == current_account.id)
+
+    kick!(notice: 'Only the organisation creator can edit the settings of this organisation', redirect_url: "/o/#{@organisation.slug}")
+  end
+
   def organisation_assistant?(organisation = nil, account = current_account)
     organisation ||= @organisation
     Organisation.assistant?(organisation, account)

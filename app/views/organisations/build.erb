@@ -1,4 +1,4 @@
-<% if current_account.organisations.empty? %>
+<% if @organisation.new_record? && current_account.organisations.empty? %>
   <div class="alert alert-success">
     <p class="lead">
       Let's create your first organisation!
