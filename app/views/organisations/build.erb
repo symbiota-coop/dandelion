@@ -137,7 +137,12 @@
               <h4 class="my-0">Card payments via Stripe</h4>
             </div>
             <div class="card-body">
-              <% if @organisation.stripe_sk %>
+              <% if @organisation.stripe_client_id %>
+                <big>
+                  <i class="bi bi-credit-card"></i>
+                  Using Stripe Connect
+                </big>
+              <% elsif @organisation.stripe_sk %>
                 <big>
                   <i class="bi bi-credit-card"></i>
                   Using Stripe API keys (legacy)
