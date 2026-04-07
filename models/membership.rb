@@ -141,7 +141,7 @@ class Membership
   def calculate_requested_contribution
     c = 0
     optionships.each do |optionship|
-      c += optionship.option.cost_per_person unless optionship.flagged_for_destroy?
+      c += optionship.option&.cost_per_person.to_i unless optionship.flagged_for_destroy?
     end
     c
   end
