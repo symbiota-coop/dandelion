@@ -26,6 +26,16 @@ Dandelion::App.helpers do
     account and createable.account and createable.account.id == account.id
   end
 
+  def creator_only!(createable, notice: nil, redirect_url: nil)
+    return unless createable.respond_to?(:editable_by_creator_only?) && createable.editable_by_creator_only?
+    return if current_account && (admin? || creator?(createable))
+
+    opts = {}
+    opts[:notice] = notice if notice
+    opts[:redirect_url] = redirect_url if redirect_url
+    kick!(**opts)
+  end
+
   def admin?(account = current_account)
     account && account.admin?
   end
@@ -41,13 +51,6 @@ Dandelion::App.helpers do
 
   def organisation_admins_only!
     kick!(redirect_url: "/o/#{@organisation.slug}") unless organisation_admin?
-  end
-
-  def organisation_creator_only!
-    return unless @organisation.editable_by_creator_only?
-    return if current_account && (current_account.admin? || @organisation.account_id == current_account.id)
-
-    kick!(notice: 'Only the organisation creator can edit the settings of this organisation', redirect_url: "/o/#{@organisation.slug}")
   end
 
   def organisation_assistant?(organisation = nil, account = current_account)

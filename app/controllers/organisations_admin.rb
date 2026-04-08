@@ -8,7 +8,7 @@ Dandelion::App.controller do
   post '/o/:slug/edit' do
     @organisation = Organisation.find_by(slug: params[:slug]) || not_found
     organisation_admins_only!
-    organisation_creator_only!
+    creator_only!(@organisation, notice: 'Only the creator can edit the settings of this organisation', redirect_url: "/o/#{@organisation.slug}")
     if @organisation.update_attributes(mass_assigning(params[:organisation], Organisation))
       flash[:notice] = 'The organisation was saved.'
 
