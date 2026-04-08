@@ -98,7 +98,7 @@
         <li role="presentation" class="nav-item"><a class="nav-link <%= 'active' if params[:tab] == 'mailgun'%>" href="#tab-mailgun" role="tab" data-toggle="tab">Mailgun</a></li>
         <li role="presentation" class="nav-item"><a class="nav-link <%= 'active' if params[:tab] == 'analytics'%>" href="#tab-analytics" role="tab" data-toggle="tab">Analytics</a></li>
         <li role="presentation" class="nav-item"><a class="nav-link <%= 'active' if params[:tab] == 'everything-else'%>" href="#tab-everything-else" role="tab" data-toggle="tab">Everything else</a></li>
-        <% if Padrino.env == :development || @organisation.experimental? %>
+        <% if (Padrino.env == :development || @organisation.experimental?) && (!@organisation.editable_by_creator_only? || admin? || creator?(@organisation)) %>
           <li role="presentation" class="nav-item"><a class="nav-link <%= 'active' if params[:tab] == 'experimental'%>" href="#tab-experimental" role="tab" data-toggle="tab">Experimental</a></li>
         <% end %>
       </ul>
@@ -265,7 +265,7 @@
             <%= f.lookup_block :referrer_id, lookup_url: '/accounts.json', placeholder: 'Search accounts' %>
           <% end %>
         </div>
-        <% if Padrino.env == :development || @organisation.experimental? %>
+        <% if (Padrino.env == :development || @organisation.experimental?) && (!@organisation.editable_by_creator_only? || admin? || creator?(@organisation)) %>
           <div role="tabpanel" class="tab-pane <%= 'active' if params[:tab] == 'experimental'%>" id="tab-experimental">
             <%= f.text_block :stripe_pk %>
             <%= f.text_block :stripe_sk %>
