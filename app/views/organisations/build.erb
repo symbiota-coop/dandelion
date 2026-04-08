@@ -89,16 +89,23 @@
   </div>
 <% end %>
 <% form_for @organisation, @organisation.new_record? ? '/o/new' : "/o/#{@edit_slug || @organisation.slug}/edit" do  |f| %>
+  <% sensitive_org_tabs = !@organisation.editable_by_creator_only? || admin? || creator?(@organisation) %>
   <% if @organisation.persisted? %>
     <div class="nav-wrapper">
       <ul id="organisation-build-nav" class="nav nav-tabs" role="tablist">
         <li role="presentation" class="nav-item"><a class="nav-link <%= 'active' if !params[:tab] || params[:tab] == 'basics'%>" href="#tab-basics" role="tab" data-toggle="tab">Basics</a></li>
-        <li role="presentation" class="nav-item"><a class="nav-link <%= 'active' if params[:tab] == 'payments'%>" href="#tab-payments" role="tab" data-toggle="tab">Payments</a></li>
+        <% if sensitive_org_tabs %>
+          <li role="presentation" class="nav-item"><a class="nav-link <%= 'active' if params[:tab] == 'payments'%>" href="#tab-payments" role="tab" data-toggle="tab">Payments</a></li>
+        <% end %>
         <li role="presentation" class="nav-item"><a class="nav-link <%= 'active' if params[:tab] == 'emails'%>" href="#tab-emails" role="tab" data-toggle="tab">Emails</a></li>
-        <li role="presentation" class="nav-item"><a class="nav-link <%= 'active' if params[:tab] == 'mailgun'%>" href="#tab-mailgun" role="tab" data-toggle="tab">Mailgun</a></li>
-        <li role="presentation" class="nav-item"><a class="nav-link <%= 'active' if params[:tab] == 'analytics'%>" href="#tab-analytics" role="tab" data-toggle="tab">Analytics</a></li>
+        <% if sensitive_org_tabs %>
+          <li role="presentation" class="nav-item"><a class="nav-link <%= 'active' if params[:tab] == 'mailgun'%>" href="#tab-mailgun" role="tab" data-toggle="tab">Mailgun</a></li>
+        <% end %>
+        <% if sensitive_org_tabs %>
+          <li role="presentation" class="nav-item"><a class="nav-link <%= 'active' if params[:tab] == 'analytics'%>" href="#tab-analytics" role="tab" data-toggle="tab">Analytics</a></li>
+        <% end %>
         <li role="presentation" class="nav-item"><a class="nav-link <%= 'active' if params[:tab] == 'everything-else'%>" href="#tab-everything-else" role="tab" data-toggle="tab">Everything else</a></li>
-        <% if (Padrino.env == :development || @organisation.experimental?) && (!@organisation.editable_by_creator_only? || admin? || creator?(@organisation)) %>
+        <% if (Padrino.env == :development || @organisation.experimental?) && sensitive_org_tabs %>
           <li role="presentation" class="nav-item"><a class="nav-link <%= 'active' if params[:tab] == 'experimental'%>" href="#tab-experimental" role="tab" data-toggle="tab">Experimental</a></li>
         <% end %>
       </ul>
@@ -119,75 +126,77 @@
         <% end %>
       </div>
       <% if @organisation.persisted? %>
-        <div role="tabpanel" class="tab-pane <%= 'active' if params[:tab] == 'payments'%>" id="tab-payments">
-          <% if params[:created] %>
-            <div class="alert alert-success">
-              <p class="m-0">To accept payments, now add details for Stripe or another payment processor.</p>
-            </div>
-          <% else %>
-            <% if !@organisation.payment_method? %>
-              <div class="alert alert-warning">
-                <p class="m-0"><i class="bi bi-exclamation-triangle-fill"></i> To accept payments, you must add details for at least one payment processor.</p>
+        <% if sensitive_org_tabs %>
+          <div role="tabpanel" class="tab-pane <%= 'active' if params[:tab] == 'payments'%>" id="tab-payments">
+            <% if params[:created] %>
+              <div class="alert alert-success">
+                <p class="m-0">To accept payments, now add details for Stripe or another payment processor.</p>
               </div>
-            <% end %>
-          <% end %>
-          <%= f.select_block :currency %>
-          <div class="card mb-3">
-            <div class="card-header text-white bg-primary">
-              <h4 class="my-0">Card payments via Stripe</h4>
-            </div>
-            <div class="card-body">
-              <% if @organisation.stripe_client_id %>
-                <big>
-                  <i class="bi bi-credit-card"></i>
-                  Using revenue sharing
-                </big>
-              <% elsif @organisation.stripe_sk %>
-                <big>
-                  <i class="bi bi-credit-card"></i>
-                  Using Stripe API keys (legacy)
-                </big>
-              <% elsif @organisation.stripe_connect_json %>
-                <big class="d-block mb-1">
-                  <i class="bi bi-credit-card"></i>
-                  Connected to <%= @organisation.stripe_account_name ? "#{@organisation.stripe_account_name}'s Stripe account" : 'Stripe' %>
-                  (id: <%= @organisation.stripe_user_id %>)
-                </big>
-                <a class="btn btn-danger btn-sm" href="/organisations/stripe_disconnect?organisation_id=<%= @organisation.id %>">Disconnect</a>
-              <% else %>
-                <a class="btn btn-outline-primary mb-1" href="https://connect.stripe.com/oauth/authorize?response_type=code&client_id=<%= ENV['STRIPE_CLIENT_ID'] %>&scope=read_write&state=<%= @organisation.id %>">Connect Stripe</a>
+            <% else %>
+              <% if !@organisation.payment_method? %>
+                <div class="alert alert-warning">
+                  <p class="m-0"><i class="bi bi-exclamation-triangle-fill"></i> To accept payments, you must add details for at least one payment processor.</p>
+                </div>
               <% end %>
+            <% end %>
+            <%= f.select_block :currency %>
+            <div class="card mb-3">
+              <div class="card-header text-white bg-primary">
+                <h4 class="my-0">Card payments via Stripe</h4>
+              </div>
+              <div class="card-body">
+                <% if @organisation.stripe_client_id %>
+                  <big>
+                    <i class="bi bi-credit-card"></i>
+                    Using revenue sharing
+                  </big>
+                <% elsif @organisation.stripe_sk %>
+                  <big>
+                    <i class="bi bi-credit-card"></i>
+                    Using Stripe API keys (legacy)
+                  </big>
+                <% elsif @organisation.stripe_connect_json %>
+                  <big class="d-block mb-1">
+                    <i class="bi bi-credit-card"></i>
+                    Connected to <%= @organisation.stripe_account_name ? "#{@organisation.stripe_account_name}'s Stripe account" : 'Stripe' %>
+                    (id: <%= @organisation.stripe_user_id %>)
+                  </big>
+                  <a class="btn btn-danger btn-sm" href="/organisations/stripe_disconnect?organisation_id=<%= @organisation.id %>">Disconnect</a>
+                <% else %>
+                  <a class="btn btn-outline-primary mb-1" href="https://connect.stripe.com/oauth/authorize?response_type=code&client_id=<%= ENV['STRIPE_CLIENT_ID'] %>&scope=read_write&state=<%= @organisation.id %>">Connect Stripe</a>
+                <% end %>
+              </div>
+            </div>
+            <div class="card mb-3">
+              <div class="card-header text-white bg-primary">
+                <h4 class="my-0">Instant Bank Pay via GoCardless</h4>
+              </div>
+              <div class="card-body pb-0">
+                <p>
+                  Go to <code>Developers</code> > <code>Create</code> > <code>Access token</code> and create an access token with <code>Read-write access</code>
+                  <br />
+                  Go to <code>Developers</code> > <code>Create</code> > <code>Webhook endpoint</code> and add
+                  <span style="text-decoration: underline dotted"><%=ENV['BASE_URI']%>/o/<%= @organisation.slug %>/gocardless_webhook</span>
+                </p>
+                <%= f.text_block :gocardless_access_token %>
+                <%= f.text_block :gocardless_endpoint_secret %>
+                <%= f.check_box_block :gocardless_instant_bank_pay %>
+                <%= f.check_box_block :gocardless_subscriptions %>
+              </div>
+            </div>
+            <div class="card mb-3">
+              <div class="card-header text-white bg-primary">
+                <h4 class="my-0">Experimental</h4>
+              </div>
+              <div class="card-body pb-0">
+                <%= f.text_block :patreon_api_key %>
+                <%= f.text_block :tax_rate_id %>
+                <%= f.text_block :evm_address %>
+                <%= f.text_block :oc_slug %>
+              </div>
             </div>
           </div>
-          <div class="card mb-3">
-            <div class="card-header text-white bg-primary">
-              <h4 class="my-0">Instant Bank Pay via GoCardless</h4>
-            </div>
-            <div class="card-body pb-0">
-              <p>
-                Go to <code>Developers</code> > <code>Create</code> > <code>Access token</code> and create an access token with <code>Read-write access</code>
-                <br />
-                Go to <code>Developers</code> > <code>Create</code> > <code>Webhook endpoint</code> and add
-                <span style="text-decoration: underline dotted"><%=ENV['BASE_URI']%>/o/<%= @organisation.slug %>/gocardless_webhook</span>
-              </p>
-              <%= f.text_block :gocardless_access_token %>
-              <%= f.text_block :gocardless_endpoint_secret %>
-              <%= f.check_box_block :gocardless_instant_bank_pay %>
-              <%= f.check_box_block :gocardless_subscriptions %>
-            </div>
-          </div>
-          <div class="card mb-3">
-            <div class="card-header text-white bg-primary">
-              <h4 class="my-0">Experimental</h4>
-            </div>
-            <div class="card-body pb-0">
-              <%= f.text_block :patreon_api_key %>
-              <%= f.text_block :tax_rate_id %>
-              <%= f.text_block :evm_address %>
-              <%= f.text_block :oc_slug %>
-            </div>
-          </div>
-        </div>
+        <% end %>
         <div role="tabpanel" class="tab-pane <%= 'active' if params[:tab] == 'emails'%>" id="tab-emails">
           <script>
             $(function() {
@@ -212,29 +221,33 @@
           <%= f.check_box_block :show_sign_in_link_in_ticket_emails %>
           <%= f.check_box_block :send_ticket_emails_from_organisation %>
         </div>
-        <div role="tabpanel" class="tab-pane <%= 'active' if params[:tab] == 'mailgun'%>" id="tab-mailgun">
-          <% if !@organisation.mailgun_enabled? %>
-            <div class="alert alert-warning">
-              <p>
-                If you'd like to use Dandelion's mailer to email everyone following your organisation,
-                or people following your organisation's activities and local groups,
-                you'll need to link a <a class="text-warning text-underline" href="https://www.mailgun.com/pricing/">paid Mailgun account</a>
-                (from $15/month for 10,000 emails).
-              </p>
-              <p class="m-0">
-                (We offer a free gift of 1 email per month for up to <%=ENV['MAILGUN_FREE_SUBSCRIBER_LIMIT'].to_i%> subscribers, and you can always email event attendees even without providing these details.)
-              </p>
-            </div>
-          <% end %>
-          <%= f.text_block :mailgun_api_key %>
-          <%= f.text_block :mailgun_domain %>
-          <%= f.select_block :mailgun_region %>
-        </div>
-        <div role="tabpanel" class="tab-pane <%= 'active' if params[:tab] == 'analytics'%>" id="tab-analytics">
-          <%= f.text_block :plausible_analytics_domain %>
-          <%= f.text_block :simple_analytics_domain %>
-          <%= f.text_block :facebook_pixel_id %>
-        </div>
+        <% if sensitive_org_tabs %>
+          <div role="tabpanel" class="tab-pane <%= 'active' if params[:tab] == 'mailgun'%>" id="tab-mailgun">
+            <% if !@organisation.mailgun_enabled? %>
+              <div class="alert alert-warning">
+                <p>
+                  If you'd like to use Dandelion's mailer to email everyone following your organisation,
+                  or people following your organisation's activities and local groups,
+                  you'll need to link a <a class="text-warning text-underline" href="https://www.mailgun.com/pricing/">paid Mailgun account</a>
+                  (from $15/month for 10,000 emails).
+                </p>
+                <p class="m-0">
+                  (We offer a free gift of 1 email per month for up to <%=ENV['MAILGUN_FREE_SUBSCRIBER_LIMIT'].to_i%> subscribers, and you can always email event attendees even without providing these details.)
+                </p>
+              </div>
+            <% end %>
+            <%= f.text_block :mailgun_api_key %>
+            <%= f.text_block :mailgun_domain %>
+            <%= f.select_block :mailgun_region %>
+          </div>
+        <% end %>
+        <% if sensitive_org_tabs %>
+          <div role="tabpanel" class="tab-pane <%= 'active' if params[:tab] == 'analytics'%>" id="tab-analytics">
+            <%= f.text_block :plausible_analytics_domain %>
+            <%= f.text_block :simple_analytics_domain %>
+            <%= f.text_block :facebook_pixel_id %>
+          </div>
+        <% end %>
         <div role="tabpanel" class="tab-pane <%= 'active' if params[:tab] == 'everything-else'%>" id="tab-everything-else">
           <%= f.color_block :theme_color %>
           <%= partial :'quick_theme_colors', locals: { input_name: 'organisation[theme_color]' } %>
@@ -265,7 +278,7 @@
             <%= f.lookup_block :referrer_id, lookup_url: '/accounts.json', placeholder: 'Search accounts' %>
           <% end %>
         </div>
-        <% if (Padrino.env == :development || @organisation.experimental?) && (!@organisation.editable_by_creator_only? || admin? || creator?(@organisation)) %>
+        <% if (Padrino.env == :development || @organisation.experimental?) && sensitive_org_tabs %>
           <div role="tabpanel" class="tab-pane <%= 'active' if params[:tab] == 'experimental'%>" id="tab-experimental">
             <%= f.text_block :stripe_pk %>
             <%= f.text_block :stripe_sk %>
