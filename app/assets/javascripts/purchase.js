@@ -122,6 +122,7 @@ $(function () {
         setDonationAmountValue(fee)
         $donationAmount.trigger('change')
       }
+      $('#donation_via_modal').val('1')
       syncPreviousDonationValue()
       $('#donation-cleared-modal').modal('hide')
     })

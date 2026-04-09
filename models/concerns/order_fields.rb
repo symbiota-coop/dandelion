@@ -43,6 +43,7 @@ module OrderFields
     field :gc_branch_code, type: String
     field :gc_account_number, type: String
     field :gc_success, type: Mongoid::Boolean
+    field :donation_via_modal, type: Mongoid::Boolean
   end
 
   def metadata

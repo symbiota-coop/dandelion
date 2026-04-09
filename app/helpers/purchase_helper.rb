@@ -101,7 +101,8 @@ Dandelion::App.helpers do
       opt_in_organisation: account_data[:opt_in_organisation] == '1' || (account_data[:opt_in_organisation].is_a?(Array) && account_data[:opt_in_organisation].include?('1')),
       opt_in_facilitator: account_data[:opt_in_facilitator].is_a?(Array) && account_data[:opt_in_facilitator].include?('1'),
       answers: question_answer_pairs(details_form),
-      application_fee_paid_to_dandelion: !@event.revenue_sharer_organisationship && @event.donations_to_dandelion?
+      application_fee_paid_to_dandelion: !@event.revenue_sharer_organisationship && @event.donations_to_dandelion?,
+      donation_via_modal: ticket_form[:donation_via_modal].to_s == '1'
     }
 
     ticket_attrs.each { |attr| attributes[attr] = ticket_form[attr] }

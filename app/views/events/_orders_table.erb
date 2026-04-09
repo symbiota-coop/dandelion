@@ -181,7 +181,7 @@
     <% if defined?(donation_to_dandelion) %>
       <td>
         <% if order.application_fee_paid_to_dandelion? && order.donation_revenue > 0 %>
-          <%= m order.donation_revenue, order.currency %>
+          <%= m order.donation_revenue, order.currency %> <% if order.donation_via_modal? %><span class="label label-default">via modal</span><% end %>
         <% end %>
       </td>
     <% end %>
