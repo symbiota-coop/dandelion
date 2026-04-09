@@ -9,6 +9,20 @@ $(function () {
     } catch (e) { }
     return (window.purchaseConfig || {})
   })()
+  const $donationAmount = $('#donation_amount')
+
+  function currentDonationAmountValue () {
+    return (($donationAmount.val() || '').trim())
+  }
+
+  function syncPreviousDonationValue () {
+    $donationAmount.data('previousDonationValue', currentDonationAmountValue())
+  }
+
+  function setDonationAmountValue (value) {
+    $donationAmount.val(value)
+    syncPreviousDonationValue()
+  }
 
   $('#details form').on('keyup keypress', function (e) {
     const keyCode = e.keyCode || e.which
@@ -18,15 +32,15 @@ $(function () {
     }
   })
 
-  $('#donation_amount').change(function () {
-    if ($('#donation_amount').val().length > 0) {
-      const donationAmount = parseFloat($('#donation_amount').val())
+  $donationAmount.change(function () {
+    if ($donationAmount.val().length > 0) {
+      const donationAmount = parseFloat($donationAmount.val())
       if (donationAmount < 0) {
-        $('#donation_amount').val('')
+        setDonationAmountValue('')
       } else if (donationAmount > 0 && config.minimumApplicationFee && donationAmount < config.minimumApplicationFee) {
-        $('#donation_amount').val(config.minimumApplicationFee)
+        setDonationAmountValue(config.minimumApplicationFee)
       } else {
-        $('#donation_amount').val(donationAmount.toFixed(2).endsWith('00') ? donationAmount.toFixed(0) : donationAmount.toFixed(2))
+        setDonationAmountValue(donationAmount.toFixed(2).endsWith('00') ? donationAmount.toFixed(0) : donationAmount.toFixed(2))
       }
     }
   }).change()
@@ -77,9 +91,41 @@ $(function () {
     return b
   }
 
-  $('#donation_amount').focus(function () {
+  $donationAmount.focus(function () {
     $('#donation-percent-buttons button').addClass('btn-outline-secondary').removeClass('btn-secondary selected-percent')
   })
+
+  if ($('#donation-percent-buttons').length && $('#donation-cleared-modal').length) {
+    syncPreviousDonationValue()
+
+    $donationAmount.on('input', function () {
+      const previousDonationAmount = parseFloat($donationAmount.data('previousDonationValue'))
+      const currentDonationValue = currentDonationAmountValue()
+
+      if (
+        currentDonationValue === '' &&
+        !isNaN(previousDonationAmount) &&
+        previousDonationAmount > 0 &&
+        !$('#donation-cleared-modal').hasClass('show')
+      ) {
+        $('#donation-cleared-modal').modal('show')
+      }
+
+      syncPreviousDonationValue()
+    })
+    $donationAmount.on('change', function () {
+      syncPreviousDonationValue()
+    })
+    $('#donation-cleared-one').on('click', function () {
+      const fee = config.minimumApplicationFee
+      if (fee != null) {
+        setDonationAmountValue(fee)
+        $donationAmount.trigger('change')
+      }
+      syncPreviousDonationValue()
+      $('#donation-cleared-modal').modal('hide')
+    })
+  }
 
   $('#donation-percent-buttons button').click(function () {
     $('#donation-percent-buttons button').addClass('btn-outline-secondary').removeClass('btn-secondary selected-percent')
@@ -118,10 +164,10 @@ $(function () {
       let donationAmount = parseFloat(p * (dp / 100))
       if (config.minimumApplicationFee && donationAmount < config.minimumApplicationFee) {
         $('#donation-percent-buttons button').addClass('btn-outline-secondary').removeClass('btn-secondary')
-        $('#donation_amount').val(config.minimumApplicationFee)
+        setDonationAmountValue(config.minimumApplicationFee)
       } else {
         $('#donation-percent-buttons button.selected-percent').removeClass('btn-outline-secondary').addClass('btn-secondary')
-        $('#donation_amount').val(donationAmount.toFixed(2).endsWith('00') ? donationAmount.toFixed(0) : donationAmount.toFixed(2))
+        setDonationAmountValue(donationAmount.toFixed(2).endsWith('00') ? donationAmount.toFixed(0) : donationAmount.toFixed(2))
       }
     }
   }

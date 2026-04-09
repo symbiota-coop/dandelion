@@ -20,6 +20,32 @@
           <span class="input-group-text"><%= money_symbol(@event.currency) %></span>
         </div>
         <%= number_field_tag :donation_amount, id: 'donation_amount', class: 'form-control', style: 'width: 5em', value: params[:donation_amount]%>
+        <div class="modal fade" id="donation-cleared-modal" tabindex="-1" role="dialog" aria-labelledby="donation-cleared-modal-title" aria-hidden="true">
+          <div class="modal-dialog" role="document">
+            <div class="modal-content">
+              <div class="modal-header">
+                <h3 class="modal-title" id="donation-cleared-modal-title">Please will you include a <%= m FiatCurrency.minimum_unit_amount(@event.currency), @event.currency %> donation?</h3>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                  <span aria-hidden="true">&times;</span>
+                </button>
+              </div>
+              <div class="modal-body">
+                <p>
+                  Dandelion is part of a not-for-profit worker co-operative.              
+                  We rely on the generosity of people like you.
+                </p>
+                <p class="mb-0">
+                  Will you include a small donation to help us keep the platform running?
+                </p>
+                <%= partial :badges %>
+              </div>
+              <div class="modal-footer justify-content-between">
+                <button type="button" class="btn btn-outline-secondary" data-dismiss="modal" id="donation-cleared-nothing">Donate nothing</button>
+                <button type="button" class="btn btn-primary" id="donation-cleared-one">Donate <%= m FiatCurrency.minimum_unit_amount(@event.currency), @event.currency %></button>
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
     </td>
   </tr>

@@ -208,15 +208,13 @@ end
 <% end %>
 
 <%
-  min_app_fee = FiatCurrency.minimum_unit_amount(@event.currency)
-
   config = {
     eventId: @event.id,
     eventUrl: "#{ENV['BASE_URI']}/e/#{@event.slug}",
     placesRemaining: @event.places_remaining,
     currency: @event.currency,
     currencySymbol: money_symbol(@event.currency),
-    minimumApplicationFee: min_app_fee,
+    minimumApplicationFee: FiatCurrency.minimum_unit_amount(@event.currency),
     stripePk: (@event.organisation.stripe_connect_json ? ENV['STRIPE_PK'] : @event.organisation.stripe_pk),
     stripeAccount: @event.revenue_sharer_organisationship && @event.direct_charges ? @event.revenue_sharer_organisationship.stripe_user_id : @event.organisation.stripe_user_id,
     gocardless: !!(@event.organisation.gocardless_instant_bank_pay && @event.organisation.gocardless_access_token),
