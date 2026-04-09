@@ -12,7 +12,7 @@ module OrganisationAccounting
   def contribution_required
     return false if contribution_not_required
 
-    !paid_up && (stripe_client_id || gocardless_instant_bank_pay)
+    !paid_up && (stripe_client_id || (gocardless_instant_bank_pay && !stripe_connect_json))
   end
 
   def contribution_requested
@@ -120,5 +120,4 @@ module OrganisationAccounting
     batch_message.finalize if Padrino.env == :production
   end
   handle_asynchronously :send_insufficient_funds_topup_notification
-
 end
