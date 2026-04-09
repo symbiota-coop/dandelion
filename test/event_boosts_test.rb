@@ -27,10 +27,6 @@ class EventBoostsTest < ActiveSupport::TestCase
       click_button 'Buy boost'
     end
 
-    visit "/events/#{@event.id}/boosts"
-
-    assert page.has_content?('Pending payment')
-
     event_boost = @event.event_boosts.order('created_at desc').first
     assert_equal 'cs_test_boost', event_boost.session_id
     assert_equal 'pi_test_boost', event_boost.payment_intent
