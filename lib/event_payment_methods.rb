@@ -5,12 +5,12 @@ class EventPaymentMethod
     attr_accessor :all
   end
 
-  attr_accessor :name, :label, :dotted, :visible, :event_condition, :org_condition, :process, :partial
+  attr_accessor :name, :label, :outline, :visible, :event_condition, :org_condition, :process, :partial
 
   def initialize(name, options = {})
     @name = name
     @label = options[:label] || name.capitalize
-    @dotted = options.fetch(:dotted, true)
+    @outline = options.fetch(:outline, true)
     @visible = options.fetch(:visible, false)
     @event_condition = options[:event_condition] || ->(_event) { true }
     @org_condition = options[:org_condition]
@@ -45,13 +45,13 @@ end
 
 EventPaymentMethod.new('rsvp',
                        label: ->(event) { event.rsvp_button_text || 'RSVP' },
-                       dotted: false,
+                       outline: false,
                        visible: true,
                        process: ->(**kwargs) { EventPaymentMethod::Rsvp.call(**kwargs) })
 
 EventPaymentMethod.new('stripe',
                        label: 'Pay',
-                       dotted: false,
+                       outline: false,
                        org_condition: ->(org) { org.stripe_connect_json || org.stripe_sk },
                        event_condition: ->(event) { FIAT_CURRENCIES.include?(event.currency) },
                        process: ->(**kwargs) { EventPaymentMethod::Stripe.call(**kwargs) })

@@ -868,19 +868,6 @@ body {
 
 
 
-.btn-dotted {
-  background: white;
-  color: $color_primary;
-  border: none;
-  border-radius: 0;
-  border-bottom: 1px dotted $color_primary
-}
-
-.btn-dotted:hover {
-  border-radius: 0.25rem
-}
-
-
 .slick-container .slick-responsive {
   margin-bottom: 25px
 }

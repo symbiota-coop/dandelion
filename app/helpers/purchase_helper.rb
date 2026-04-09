@@ -18,12 +18,11 @@ Dandelion::App.helpers do
     HTML
   end
 
-  def payment_button(method:, label:, condition:, dotted: true, visible: false)
+  def payment_button(method:, label:, condition:, outline: true, visible: false)
     return '' unless condition
 
     style = visible ? '' : 'display: none'
-    btn_class = 'btn btn-primary btn-block mb-1'
-    btn_class += ' btn-dotted' if dotted
+    btn_class = outline ? 'btn btn-outline-primary btn-block mb-1' : 'btn btn-primary btn-block mb-1'
     hidden_input = hidden_field_tag :payment_method, value: method, disabled: true
     <<-HTML
       <button style="#{style}" class="#{btn_class}" type="submit" data-payment-method="#{method}">

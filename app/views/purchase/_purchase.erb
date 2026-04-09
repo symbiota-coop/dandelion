@@ -183,7 +183,7 @@ end
       <%= partial :'purchase/gocardless_details', locals: { f: f } %>
 
       <% EventPaymentMethod.all.each do |pm| %>
-        <%== payment_button(method: pm.name, label: pm.button_label(@event), dotted: pm.dotted, visible: pm.visible, condition: pm.available?(@event)) %>
+        <%== payment_button(method: pm.name, label: pm.button_label(@event), outline: pm.outline, visible: pm.visible, condition: pm.available?(@event)) %>
       <% end %>
 
 
