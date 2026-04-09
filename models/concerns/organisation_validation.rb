@@ -54,6 +54,8 @@ module OrganisationValidation
         errors.add(:stripe_pk, 'must start with pk_live_') if stripe_pk && !stripe_pk.starts_with?('pk_live_')
       end
       errors.add(:stripe_sk, 'must be present if Stripe public key is present') if stripe_pk && !stripe_sk
+
+      errors.add(:gocardless_instant_bank_pay, 'requires GoCardless webhook secret') if gocardless_instant_bank_pay && !gocardless_endpoint_secret
     end
 
     after_validation do
