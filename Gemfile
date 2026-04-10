@@ -1,7 +1,7 @@
 source 'https://rubygems.org'
 
 ruby '3.4.7'
-gem 'activesupport'
+gem 'activesupport', '>= 8.0.4.1'
 gem 'irb'
 gem 'padrino'
 gem 'puma'
