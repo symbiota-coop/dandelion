@@ -573,6 +573,7 @@ GEM
       nokogiri (~> 1.8)
     yt (0.34.0)
       activesupport
+    zstd-ruby (2.0.6)
 
 PLATFORMS
   arm64-darwin-23
@@ -655,6 +656,7 @@ DEPENDENCIES
   tzinfo-data
   will_paginate!
   yt
+  zstd-ruby
 
 RUBY VERSION
    ruby 3.4.7p58

@@ -23,6 +23,7 @@ gem 'dragonfly-s3_data_store'
 gem 'mongoid'
 gem 'mongoid_paranoia'
 gem 'redis'
+gem 'zstd-ruby'
 
 # Authentication
 gem 'bcrypt'
