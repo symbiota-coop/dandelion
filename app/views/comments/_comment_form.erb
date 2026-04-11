@@ -18,9 +18,11 @@
     <%= f.text_area_block :body, placeholder: (defined?(placeholder) ? placeholder : 'Write a comment... (optional)'), label_class: 'd-none' %>
   <% end %>
   <div class="comment-options <% unless @show_buttons %> d-none <% end %> ">
-    <p class="text-muted" style="margin-top: -1em">
-      Add files, photos and polls after posting
-    </p>
+    <% unless defined?(chat) %>
+      <p class="text-muted" style="margin-top: -1em">
+        Add files, photos and polls after posting
+      </p>
+    <% end %>
     <% if comment.allow_force?(current_account) %>
       <%= f.check_box_block :force %>
     <% end %>
