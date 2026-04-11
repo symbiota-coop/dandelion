@@ -22,12 +22,8 @@
         <tr>
           <th>Provider</th>
           <th class="text-right">Delivered</th>
-          <th class="text-right">Failed</th>
-          <th class="text-right">Perm. fail</th>
           <th class="text-right">Bounce</th>
-          <th class="text-right">Complaints</th>
           <th class="text-right">Delivered %</th>
-          <th class="text-right">Bounce %</th>
         </tr>
       </thead>
       <tbody>
@@ -35,12 +31,8 @@
           <tr class="<%= 'table-warning' if row[:delivered_rate_f] && row[:delivered_rate_f] < 0.95 %>">
             <td><code><%= row[:label] %></code></td>
             <td class="text-right"><%= row[:delivered_count] %></td>
-            <td class="text-right"><%= row[:failed_count] %></td>
-            <td class="text-right"><%= row[:permanent_failed_count] %></td>
             <td class="text-right"><%= row[:bounced_count] %></td>
-            <td class="text-right"><%= row[:complained_count] %></td>
             <td class="text-right"><%= MailgunDeliveryStats.format_pct(row[:delivered_rate_f]) %></td>
-            <td class="text-right"><%= MailgunDeliveryStats.format_pct(row[:bounce_rate_f]) %></td>
           </tr>
         <% end %>
       </tbody>

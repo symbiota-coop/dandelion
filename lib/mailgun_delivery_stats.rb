@@ -1,9 +1,5 @@
 module MailgunDeliveryStats
-  METRICS = %w[
-    delivered_count failed_count permanent_failed_count temporary_failed_count
-    bounced_count hard_bounces_count soft_bounces_count complained_count
-    delivered_rate bounce_rate permanent_fail_rate
-  ].freeze
+  METRICS = %w[delivered_count bounced_count delivered_rate].freeze
 
   MIN_DELIVERIES = 10
   ALERT_THRESHOLD = 0.95
@@ -84,20 +80,12 @@ module MailgunDeliveryStats
         label = dim&.dig('display_value').to_s.strip.presence || dim&.dig('value').to_s.strip.presence
         label = '(unknown provider)' if label.blank?
         m = item['metrics'] || {}
-        delivered_count = m['delivered_count'].to_i
-        bounced_count = m['bounced_count'].to_i
-        bounce_rate_f = parse_rate(m['bounce_rate'])
-        bounce_rate_f = fallback_bounce_rate_f(delivered_count, bounced_count) if bounce_rate_f.nil? || (bounce_rate_f.zero? && bounced_count.positive?)
 
         {
           label: label,
-          delivered_count: delivered_count,
-          failed_count: m['failed_count'].to_i,
-          permanent_failed_count: m['permanent_failed_count'].to_i,
-          bounced_count: bounced_count,
-          complained_count: m['complained_count'].to_i,
-          delivered_rate_f: parse_rate(m['delivered_rate']),
-          bounce_rate_f: bounce_rate_f
+          delivered_count: m['delivered_count'].to_i,
+          bounced_count: m['bounced_count'].to_i,
+          delivered_rate_f: parse_rate(m['delivered_rate'])
         }
       end
     end
@@ -111,15 +99,6 @@ module MailgunDeliveryStats
 
       v = s.to_f
       v > 1 ? v / 100.0 : v
-    end
-
-    def fallback_bounce_rate_f(delivered_count, bounced_count)
-      return nil unless bounced_count.positive?
-
-      denom = delivered_count + bounced_count
-      return nil unless denom.positive?
-
-      bounced_count.to_f / denom
     end
 
     def notify_error(message)
