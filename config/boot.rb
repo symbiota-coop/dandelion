@@ -26,6 +26,7 @@ Delayed::Worker.max_attempts = 1
 Delayed::Worker.max_run_time = 15.minutes
 Delayed::Worker.destroy_failed_jobs = false
 
+Money.default_currency = ENV['DEFAULT_CURRENCY']
 Money.default_bank = DandelionBank.new
 Money.locale_backend = :currency
 Money.rounding_mode = BigDecimal::ROUND_HALF_EVEN
