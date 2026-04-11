@@ -8,13 +8,13 @@ module MailgunDeliveryStats
   MIN_DELIVERIES = 10
 
   class << self
-    def fetch(period: '24', sending_domain: nil)
+    def fetch(period: '24')
       api_key = ENV['MAILGUN_API_KEY']
       api_host = ENV['MAILGUN_REGION']
-      domain = sending_domain.presence || ENV['MAILGUN_TICKETS_HOST'].presence
+      domain = ENV['MAILGUN_TICKETS_HOST'].presence
 
       return { error: 'MAILGUN_API_KEY is not set' } if api_key.blank?
-      return { error: 'sending domain is not set (pass sending_domain or set MAILGUN_TICKETS_HOST)' } if domain.blank?
+      return { error: 'MAILGUN_TICKETS_HOST is not set' } if domain.blank?
       return { error: 'MAILGUN_REGION is not set' } if api_host.blank?
 
       duration = case period.to_s
