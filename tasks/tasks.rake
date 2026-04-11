@@ -78,6 +78,8 @@ namespace :late do
     end
     puts 'event recommendations'
     Event.recommend
+    puts 'mailgun delivery stats alert'
+    MailgunDeliveryStats.check_and_notify
     puts 'done!'
   end
 end

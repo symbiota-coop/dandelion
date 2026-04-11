@@ -6,6 +6,8 @@ module MailgunDeliveryStats
   ].freeze
 
   MIN_DELIVERIES = 10
+  ALERT_THRESHOLD = 0.99
+  ALERT_PERIOD = 24
 
   class << self
     def fetch(period: '24')
@@ -59,6 +61,21 @@ module MailgunDeliveryStats
       rate_f.nil? ? '—' : "#{format('%0.2f', rate_f * 100)}%"
     end
 
+    def check_and_notify
+      result = fetch(period: ALERT_PERIOD)
+
+      if result[:error]
+        notify_error(result[:error])
+        return
+      end
+
+      rows = result[:by_provider] || []
+      low = rows.select { |r| r[:delivered_rate_f].present? && r[:delivered_rate_f] < ALERT_THRESHOLD }
+      return if low.empty?
+
+      notify_low_delivery(low)
+    end
+
     private
 
     def provider_rows(items)
@@ -103,6 +120,52 @@ module MailgunDeliveryStats
       return nil unless denom.positive?
 
       bounced_count.to_f / denom
+    end
+
+    def notify_error(message)
+      send_to_admins(
+        subject: '[Mailgun] Delivery stats unavailable',
+        body: "Could not load Mailgun analytics for #{ENV['MAILGUN_TICKETS_HOST']} (last #{ALERT_PERIOD}h):\n\n#{message}"
+      )
+    end
+
+    def notify_low_delivery(rows)
+      domain = ENV['MAILGUN_TICKETS_HOST']
+      lines = rows.map do |r|
+        "- #{r[:label]}: #{format_pct(r[:delivered_rate_f])} (#{r[:delivered_count]} delivered)"
+      end
+      body = <<~TEXT.strip
+        Mailgun delivered rate is below #{(ALERT_THRESHOLD * 100).to_i}% for at least one recipient provider (domain #{domain}, last #{ALERT_PERIOD}h):
+
+        #{lines.join("\n")}
+
+        Stats: #{ENV['BASE_URI']}/stats/delivery
+      TEXT
+
+      send_to_admins(
+        subject: '[Mailgun] Low delivery rate by ESP',
+        body: body
+      )
+    end
+
+    def send_to_admins(subject:, body:)
+      unless ENV['MAILGUN_API_KEY'].present? && ENV['MAILGUN_REGION'].present? && ENV['MAILGUN_NOTIFICATIONS_HOST'].present?
+        puts 'MailgunDeliveryStats: skipped (set MAILGUN_API_KEY, MAILGUN_REGION, MAILGUN_NOTIFICATIONS_HOST to email admins)'
+        return
+      end
+
+      mg_client = Mailgun::Client.new(ENV['MAILGUN_API_KEY'], ENV['MAILGUN_REGION'])
+      batch_message = Mailgun::BatchMessage.new(mg_client, ENV['MAILGUN_NOTIFICATIONS_HOST'])
+
+      batch_message.from ENV['NOTIFICATIONS_EMAIL_FULL']
+      batch_message.subject subject
+      batch_message.body_text body
+
+      Account.and(admin: true).each do |account|
+        batch_message.add_recipient(:to, account.email, { 'firstname' => account.firstname || 'there', 'token' => account.sign_in_token, 'id' => account.id.to_s })
+      end
+
+      batch_message.finalize if Padrino.env == :production
     end
   end
 end
