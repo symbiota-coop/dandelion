@@ -24,14 +24,6 @@
   </div>
 <% end %>
 
-<% if @event.persisted? %>
-  <div class="alert alert-success">
-    <p class="mb-0">
-      By popular demand: You can now <u><a href="/events/<%= @event.id %>/boosts">boost your event</a></u> to have it show at the top of event listings.
-    </p>
-  </div>
-<% end %>
-
 <%= partial :'events/locked' %>
 
 <p class="mt-3">

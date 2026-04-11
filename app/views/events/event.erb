@@ -14,6 +14,11 @@
 <% if event_admin? %>
   <%= partial :'events/nav', locals: { event: @event } %>
   <%= partial :'events/locked' %>
+  <div class="alert alert-success">
+    <p class="mb-0">
+      By popular demand: You can now <u><a href="/events/<%= @event.id %>/boosts">boost your event</a></u> to have it show at the top of event listings.
+    </p>
+  </div>
   <div data-pagelet-url="/events/<%= @event.id %>/notes" class="mb-3">
     <%= partial :'events/notes' %>
   </div>
