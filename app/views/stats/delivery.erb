@@ -28,7 +28,7 @@
       </thead>
       <tbody>
         <% @stats[:by_provider].each do |row| %>
-          <tr class="<%= 'table-warning' if row[:delivered_rate_f] && row[:delivered_rate_f] < 0.95 %>">
+          <tr class="<%= 'table-warning' if row[:delivered_rate_f] && row[:delivered_rate_f] < MailgunDeliveryStats::ALERT_THRESHOLD %>">
             <td><code><%= row[:label] %></code></td>
             <td class="text-right"><%= row[:delivered_count] %></td>
             <td class="text-right"><%= row[:bounced_count] %></td>
