@@ -12,7 +12,7 @@
 <% unless params[:search] %>
   <div class="mb-3">
     <% popular_locations = Location.order('events_count desc').to_a %>
-    <% show_more_limit = 15 %>
+    <% show_more_limit = @location ? popular_locations.size : 15 %>
     <span class="d-inline-block mb-1">Popular locations:</span>
     <span class="popular-locations-container">
       <% popular_locations.each_with_index do |location, index| %>
