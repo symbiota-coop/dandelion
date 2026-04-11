@@ -9,10 +9,10 @@ module OrganisationAccounting
     paid_up_fraction || 0.90
   end
 
-  def contribution_required
+  def contribution_reminder
     return false if contribution_not_required
 
-    !paid_up && (stripe_client_id || (gocardless_instant_bank_pay && !stripe_connect_json))
+    !paid_up && (stripe_client_id || gocardless_instant_bank_pay)
   end
 
   def contribution_requested

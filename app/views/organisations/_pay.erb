@@ -12,15 +12,20 @@
 
       <p class="lead">
 
-        <% if organisation.contribution_required %>
+        <% if organisation.contribution_reminder %>
           <mark>
-            Since you're using
+            You're using
             <% if organisation.stripe_client_id %>
-              our advanced revenue sharing feature,
+              Stripe Connect,
+            <% elsif organisation.gocardless_instant_bank_pay %>
+              GoCardless Instant Bank Pay,
             <% else %>
               a special payment feature,
             <% end %>
-            we ask that you meet the suggested contribution before creating more events. 
+            which means we can't collect donations for Dandelion at checkout.
+            Please will you donate on behalf of your organisation instead,
+            to help us remain donation-based and ad-free?
+            <%= %w[🦄 🌈 🌸 🌻 🌼 ☘️ 🌱].sample %>
           </mark>
         <% else %>
           <mark>
@@ -63,6 +68,10 @@
             Contribute via card
             <i class="bi bi-spin bi-slash-lg" style="display: none"></i>
           </button>
+          <% if params[:return_to].present? %>
+            <% rt = params[:return_to] %>
+            <a class="btn btn-outline-secondary mb-1 mr-1" style="height: 2.125rem" href="<%= rt.include?('?') ? "#{rt}&contribution_skipped=1" : "#{rt}?contribution_skipped=1" %>">Not now</a>
+          <% end %>
           <%= hidden_field_tag :payment_method, value: 'stripe', disabled: true %>
         <% end %>
 
