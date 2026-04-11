@@ -203,6 +203,12 @@ Dandelion::App.controller do
     erb :'stats/routes'
   end
 
+  get '/stats/delivery' do
+    @period = params[:period].presence || '24'
+    @stats = MailgunTicketsDeliveryStats.fetch(period: @period)
+    erb :'stats/delivery'
+  end
+
   get '/stats/asns' do
     @hours = 1 * 24
 
