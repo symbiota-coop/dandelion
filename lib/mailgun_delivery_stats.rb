@@ -1,5 +1,4 @@
-# Mailgun Analytics (recipient_provider / ESP) for the tickets sending domain.
-module MailgunTicketsDeliveryStats
+module MailgunDeliveryStats
   METRICS = %w[
     delivered_count failed_count permanent_failed_count temporary_failed_count
     bounced_count hard_bounces_count soft_bounces_count complained_count
@@ -12,9 +11,10 @@ module MailgunTicketsDeliveryStats
     def fetch(period: '24', sending_domain: nil)
       api_key = ENV['MAILGUN_API_KEY']
       api_host = ENV['MAILGUN_REGION']
-      domain = sending_domain.presence || ENV['MAILGUN_TICKETS_HOST'].presence || 'tickets.dandelion.events'
+      domain = sending_domain.presence || ENV['MAILGUN_TICKETS_HOST'].presence
 
       return { error: 'MAILGUN_API_KEY is not set' } if api_key.blank?
+      return { error: 'sending domain is not set (pass sending_domain or set MAILGUN_TICKETS_HOST)' } if domain.blank?
       return { error: 'MAILGUN_REGION is not set' } if api_host.blank?
 
       duration = case period.to_s
@@ -42,9 +42,9 @@ module MailgunTicketsDeliveryStats
       }
 
       provider = metrics.account_metrics(base.merge(
-        dimensions: ['recipient_provider'],
-        pagination: { limit: 500, skip: 0, sort: 'delivered_count:desc' }
-      ))
+                                           dimensions: ['recipient_provider'],
+                                           pagination: { limit: 500, skip: 0, sort: 'delivered_count:desc' }
+                                         ))
 
       { by_provider: filter_min_deliveries(provider_rows(provider['items'])) }
     rescue Mailgun::CommunicationError => e
@@ -70,9 +70,7 @@ module MailgunTicketsDeliveryStats
         delivered_count = m['delivered_count'].to_i
         bounced_count = m['bounced_count'].to_i
         bounce_rate_f = parse_rate(m['bounce_rate'])
-        if bounce_rate_f.nil? || (bounce_rate_f.zero? && bounced_count.positive?)
-          bounce_rate_f = fallback_bounce_rate_f(delivered_count, bounced_count)
-        end
+        bounce_rate_f = fallback_bounce_rate_f(delivered_count, bounced_count) if bounce_rate_f.nil? || (bounce_rate_f.zero? && bounced_count.positive?)
 
         {
           label: label,
