@@ -6,7 +6,7 @@ module MailgunDeliveryStats
   ].freeze
 
   MIN_DELIVERIES = 10
-  ALERT_THRESHOLD = 0.99
+  ALERT_THRESHOLD = 0.95
   ALERT_PERIOD = 24
 
   class << self
@@ -130,20 +130,17 @@ module MailgunDeliveryStats
     end
 
     def notify_low_delivery(rows)
-      domain = ENV['MAILGUN_TICKETS_HOST']
       lines = rows.map do |r|
-        "- #{r[:label]}: #{format_pct(r[:delivered_rate_f])} (#{r[:delivered_count]} delivered)"
+        "- #{r[:label]}: #{format_pct(r[:delivered_rate_f])}"
       end
       body = <<~TEXT.strip
-        Mailgun delivered rate is below #{(ALERT_THRESHOLD * 100).to_i}% for at least one recipient provider (domain #{domain}, last #{ALERT_PERIOD}h):
-
         #{lines.join("\n")}
 
-        Stats: #{ENV['BASE_URI']}/stats/delivery
+        #{ENV['BASE_URI']}/stats/delivery
       TEXT
 
       send_to_admins(
-        subject: '[Mailgun] Low delivery rate by ESP',
+        subject: '[Mailgun] Low delivery rate',
         body: body
       )
     end
