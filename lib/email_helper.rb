@@ -7,8 +7,12 @@ module EmailHelper
     html
       .gsub(%r{<oembed url="https://(?:youtu\.be/|www\.youtube\.com/watch\?v=)(\w+)"></oembed>}) do
         video_id = ::Regexp.last_match(1)
-        title = Yt::Video.new(id: video_id).title
-        %(<div><a href="https://www.youtube.com/watch?v=#{video_id}"><img src="#{ENV['BASE_URI']}/youtube_thumb/#{video_id}"></a><span>#{title}</span></div>)
+        begin
+          title = Yt::Video.new(id: video_id).title
+          %(<div><a href="https://www.youtube.com/watch?v=#{video_id}"><img src="#{ENV['BASE_URI']}/youtube_thumb/#{video_id}"></a><span>#{title}</span></div>)
+        rescue Yt::Errors::NoItems
+          %(<div><a href="https://www.youtube.com/watch?v=#{video_id}">link to private YouTube video</a></div>)
+        end
       end
       .gsub(/<figure([^>]*)>/, '<div\1>').gsub('</figure>', '</div>')
                                          .gsub(/<figcaption([^>]*)>/, '<span\1>').gsub('</figcaption>', '</span>')
