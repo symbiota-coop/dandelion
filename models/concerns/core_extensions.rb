@@ -5,7 +5,7 @@ module CoreExtensions
   SANITIZED_FIELDS = %i[name title subject].freeze
 
   # Fields that identify a record (get full-width text input in admin)
-  IDENTIFYING_FIELDS = (%i[slug username email key] + SANITIZED_FIELDS).freeze
+  IDENTIFYING_FIELDS = (%i[slug email username key] + SANITIZED_FIELDS).freeze
 
   # Fields to exclude from auto-generated admin_fields
   ADMIN_FIELDS_EXCLUDED = %w[_id _type created_at updated_at deleted_at crypted_password].freeze
@@ -264,6 +264,7 @@ module CoreExtensions
 
       value = send(field)
       next unless value.present?
+
       sanitized_value = Nokogiri::HTML.fragment(value.to_s).text.squish
       next if sanitized_value == value.to_s
 
