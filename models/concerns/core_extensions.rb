@@ -260,11 +260,14 @@ module CoreExtensions
 
     CoreExtensions::SANITIZED_FIELDS.each do |field|
       next unless respond_to?(field) && respond_to?("#{field}=")
+      next if persisted? && respond_to?("#{field}_changed?") && !send("#{field}_changed?")
 
       value = send(field)
       next unless value.present?
+      sanitized_value = Nokogiri::HTML.fragment(value.to_s).text.squish
+      next if sanitized_value == value.to_s
 
-      send("#{field}=", Nokogiri::HTML.fragment(value.to_s).text.squish)
+      send("#{field}=", sanitized_value)
     end
   end
 end
