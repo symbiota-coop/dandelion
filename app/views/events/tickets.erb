@@ -1,4 +1,7 @@
 <%= partial :'events/nav', locals: { event: @event } %>
+<% if @event.questions_a.any? %>
+  <div class="alert alert-success">View answers to booking questions on the <a href="/events/<%= @event.id %>/orders">Orders</a> page</div>
+<% end %>
 <div class="row">
   <div class="col">
     <% form_tag '', method: 'get', class: 'submitOnChange searchForm form-inline mb-3', onsubmit: %{
