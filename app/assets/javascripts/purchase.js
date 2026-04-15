@@ -96,6 +96,8 @@ $(function () {
   })
 
   if ($('#donation-percent-buttons').length && $('#donation-cleared-modal').length) {
+    let donationClearedModalShown = false
+
     syncPreviousDonationValue()
 
     $donationAmount.on('input', function () {
@@ -106,8 +108,10 @@ $(function () {
         currentDonationValue === '' &&
         !isNaN(previousDonationAmount) &&
         previousDonationAmount > 0 &&
-        !$('#donation-cleared-modal').hasClass('show')
+        !$('#donation-cleared-modal').hasClass('show') &&
+        !donationClearedModalShown
       ) {
+        donationClearedModalShown = true
         $('#donation-cleared-modal').modal('show')
       }
 
@@ -115,6 +119,12 @@ $(function () {
     })
     $donationAmount.on('change', function () {
       syncPreviousDonationValue()
+    })
+    $('#donation-cleared-another').on('click', function () {
+      $('#donation-cleared-modal').one('hidden.bs.modal', function () {
+        $donationAmount.trigger('focus')
+      })
+      $('#donation-cleared-modal').modal('hide')
     })
     $('#donation-cleared-one').on('click', function () {
       const fee = config.minimumApplicationFee

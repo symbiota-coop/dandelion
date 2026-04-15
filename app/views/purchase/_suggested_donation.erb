@@ -23,32 +23,35 @@
         <%= number_field_tag :donation_amount, id: 'donation_amount', class: 'form-control', style: 'width: 5em', value: params[:donation_amount]%>
         <%= hidden_field_tag :donation_via_modal, id: 'donation_via_modal', value: 0 %>
         <% if dandelion_suggested_min %>
-        <div class="modal fade" id="donation-cleared-modal" tabindex="-1" role="dialog" aria-labelledby="donation-cleared-modal-title" aria-hidden="true">
-          <div class="modal-dialog" role="document">
-            <div class="modal-content">
-              <div class="modal-header">
-                <h3 class="modal-title" id="donation-cleared-modal-title">Please will you include a <%= m dandelion_suggested_min, @event.currency %> donation?</h3>
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                  <span aria-hidden="true">&times;</span>
-                </button>
-              </div>
-              <div class="modal-body">
-                <p>
-                  Dandelion is part of a not-for-profit worker co-operative.              
-                  We rely on the generosity of people like you.
-                </p>
-                <p class="mb-0">
-                  Will you include a small donation to help us keep the platform running?
-                </p>
-                <%= partial :badges %>
-              </div>
-              <div class="modal-footer justify-content-between">
-                <button type="button" class="btn btn-outline-secondary" data-dismiss="modal" id="donation-cleared-nothing">Donate nothing</button>
-                <button type="button" class="btn btn-primary" id="donation-cleared-one">Donate <%= m dandelion_suggested_min, @event.currency %></button>
+          <div class="modal fade" id="donation-cleared-modal" tabindex="-1" role="dialog" aria-labelledby="donation-cleared-modal-title" aria-hidden="true">
+            <div class="modal-dialog" role="document">
+              <div class="modal-content">
+                <div class="modal-header">
+                  <h3 class="modal-title" id="donation-cleared-modal-title">Please will you include a <%= m dandelion_suggested_min, @event.currency %> donation?</h3>
+                  <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                  </button>
+                </div>
+                <div class="modal-body">
+                  <p>
+                    Dandelion is part of a not-for-profit worker co-operative.              
+                    We rely on the generosity of people like you.
+                  </p>
+                  <p class="mb-0">
+                    Will you include a small donation to help us keep the platform running?
+                  </p>
+                  <%= partial :badges %>
+                </div>
+                <div class="modal-footer justify-content-between flex-wrap">
+                  <button type="button" class="btn btn-outline-secondary" data-dismiss="modal" id="donation-cleared-nothing">Donate nothing</button>
+                  <div>
+                    <button type="button" class="btn btn-outline-secondary" id="donation-cleared-another">Donate another amount</button>
+                    <button type="button" class="btn btn-primary ml-2" id="donation-cleared-one">Donate <%= m dandelion_suggested_min, @event.currency %></button>
+                  </div>
+                </div>
               </div>
             </div>
           </div>
-        </div>
         <% end %>
       </div>
     </td>
