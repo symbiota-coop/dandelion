@@ -18,8 +18,12 @@ Dandelion::App.helpers do
   def validate_recaptcha
     return unless ENV['RECAPTCHA_SECRET_KEY']
 
-    agent = Mechanize.new
-    captcha_response = JSON.parse(agent.post(ENV['RECAPTCHA_VERIFY_URL'], { secret: ENV['RECAPTCHA_SECRET_KEY'], response: params['g-recaptcha-response'] }).body)
+    verify_response = Faraday.new { |f| f.request :url_encoded }.post(
+      ENV['RECAPTCHA_VERIFY_URL'],
+      secret: ENV['RECAPTCHA_SECRET_KEY'],
+      response: params['g-recaptcha-response']
+    )
+    captcha_response = JSON.parse(verify_response.body)
     return if captcha_response['success'] == true
 
     flash[:error] = "Our systems think you're a bot. Please try a different device or browser, or email #{ENV['CONTACT_EMAIL']} if you keep having trouble."

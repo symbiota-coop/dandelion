@@ -3,11 +3,20 @@ Dandelion::App.controller do
     @organisation = Organisation.find(params[:state]) || not_found
     organisation_admins_only!
     begin
-      response = Mechanize.new.post 'https://connect.stripe.com/oauth/token', client_secret: ENV['STRIPE_SK'], code: params[:code], grant_type: 'authorization_code'
-      @organisation.set(stripe_connect_json: response.body)
+      response = Faraday.new { |f| f.request :url_encoded }.post(
+        'https://connect.stripe.com/oauth/token',
+        client_secret: ENV['STRIPE_SK'],
+        code: params[:code],
+        grant_type: 'authorization_code'
+      )
+      raise "Stripe OAuth token exchange failed with status #{response.status}" unless response.success?
+
+      stripe_connect_json = response.body
+      stripe_user_id = JSON.parse(stripe_connect_json).fetch('stripe_user_id')
       Stripe.api_key = ENV['STRIPE_SK']
       Stripe.api_version = ENV['STRIPE_API_VERSION']
-      @organisation.set(stripe_account_json: Stripe::Account.retrieve(@organisation.stripe_user_id).to_json)
+      stripe_account_json = Stripe::Account.retrieve(stripe_user_id).to_json
+      @organisation.set(stripe_connect_json: stripe_connect_json, stripe_account_json: stripe_account_json)
       flash[:notice] = 'Connected!'
     rescue StandardError
       flash[:error] = 'There was an error connecting your organisation'
@@ -27,11 +36,20 @@ Dandelion::App.controller do
     @organisation = Organisation.find_by(slug: params[:slug]) || not_found
     @organisationship = current_account.organisationships.find_by(organisation: @organisation) || current_account.organisationships.create(organisation: @organisation)
     begin
-      response = Mechanize.new.post 'https://connect.stripe.com/oauth/token', client_secret: @organisation.stripe_sk, code: params[:code], grant_type: 'authorization_code'
-      @organisationship.set(stripe_connect_json: response.body)
+      response = Faraday.new { |f| f.request :url_encoded }.post(
+        'https://connect.stripe.com/oauth/token',
+        client_secret: @organisation.stripe_sk,
+        code: params[:code],
+        grant_type: 'authorization_code'
+      )
+      raise "Stripe OAuth token exchange failed with status #{response.status}" unless response.success?
+
+      stripe_connect_json = response.body
+      stripe_user_id = JSON.parse(stripe_connect_json).fetch('stripe_user_id')
       Stripe.api_key = @organisation.stripe_sk
       Stripe.api_version = ENV['STRIPE_API_VERSION']
-      @organisationship.set(stripe_account_json: Stripe::Account.retrieve(@organisationship.stripe_user_id).to_json)
+      stripe_account_json = Stripe::Account.retrieve(stripe_user_id).to_json
+      @organisationship.set(stripe_connect_json: stripe_connect_json, stripe_account_json: stripe_account_json)
       flash[:notice] = "Connected to #{@organisation.name}!"
     rescue StandardError
       flash[:error] = 'There was an error connecting your account'

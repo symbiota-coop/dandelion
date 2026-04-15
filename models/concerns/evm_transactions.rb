@@ -4,7 +4,6 @@ module EvmTransactions
   class_methods do
     def evm_transactions(evm_address)
       transactions = []
-      agent = Mechanize.new
 
       # Blockscout v2
       [
@@ -15,10 +14,14 @@ module EvmTransactions
         "https://celo.blockscout.com/api/v2/addresses/#{evm_address}/token-transfers"
       ].each do |url|
         puts url
-        page = begin; agent.get(url); rescue Mechanize::ResponseCodeError; end
-        next unless page
+        response = begin
+          Faraday.get(url)
+        rescue Faraday::Error
+          nil
+        end
+        next unless response&.success?
 
-        j = JSON.parse(page.body)
+        j = JSON.parse(response.body)
         j['items'].each do |item|
           puts item['block_hash']
 

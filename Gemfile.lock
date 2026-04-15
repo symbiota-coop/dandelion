@@ -280,19 +280,6 @@ GEM
       maxmind-db (~> 1.4)
     mcp (0.10.0)
       json-schema (>= 4.1)
-    mechanize (2.14.0)
-      addressable (~> 2.8)
-      base64
-      domain_name (~> 0.5, >= 0.5.20190701)
-      http-cookie (~> 1.0, >= 1.0.3)
-      mime-types (~> 3.3)
-      net-http-digest_auth (~> 1.4, >= 1.4.1)
-      net-http-persistent (>= 2.5.2, < 5.0.dev)
-      nkf
-      nokogiri (~> 1.11, >= 1.11.2)
-      rubyntlm (~> 0.6, >= 0.6.3)
-      webrick (~> 1.7)
-      webrobots (~> 0.1.2)
     mime-types (3.7.0)
       logger
       mime-types-data (~> 3.2025, >= 3.2025.0507)
@@ -324,7 +311,6 @@ GEM
       ruby2_keywords (~> 0.0.1)
     net-http (0.8.0)
       uri (>= 0.11.1)
-    net-http-digest_auth (1.4.1)
     net-http-persistent (4.0.6)
       connection_pool (~> 2.2, >= 2.2.4)
     net-imap (0.5.12)
@@ -337,7 +323,6 @@ GEM
     net-smtp (0.5.1)
       net-protocol
     nio4r (2.7.5)
-    nkf (0.2.0)
     nokogiri (1.19.1)
       mini_portile2 (~> 2.8.2)
       racc (~> 1.4)
@@ -512,8 +497,6 @@ GEM
       faraday-multipart (>= 1)
     ruby-progressbar (1.13.0)
     ruby2_keywords (0.0.5)
-    rubyntlm (0.6.5)
-      base64
     rubyzip (2.4.1)
     sanitize (7.0.0)
       crass (~> 1.0.2)
@@ -564,7 +547,6 @@ GEM
     uri (1.1.1)
     version_gem (1.1.9)
     webrick (1.9.2)
-    webrobots (0.1.2)
     websocket-driver (0.7.7)
       base64
       websocket-extensions (>= 0.1.0)
@@ -618,7 +600,6 @@ DEPENDENCIES
   mailgun-ruby
   maxmind-geoip2
   mcp
-  mechanize
   mini_magick
   minitest-rg
   money
