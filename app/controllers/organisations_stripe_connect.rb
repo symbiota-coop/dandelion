@@ -18,7 +18,8 @@ Dandelion::App.controller do
       stripe_account_json = Stripe::Account.retrieve(stripe_user_id).to_json
       @organisation.set(stripe_connect_json: stripe_connect_json, stripe_account_json: stripe_account_json)
       flash[:notice] = 'Connected!'
-    rescue StandardError
+    rescue StandardError => e
+      Honeybadger.notify(e)
       flash[:error] = 'There was an error connecting your organisation'
     end
     redirect "/o/#{@organisation.slug}/edit?tab=payments"
@@ -51,7 +52,8 @@ Dandelion::App.controller do
       stripe_account_json = Stripe::Account.retrieve(stripe_user_id).to_json
       @organisationship.set(stripe_connect_json: stripe_connect_json, stripe_account_json: stripe_account_json)
       flash[:notice] = "Connected to #{@organisation.name}!"
-    rescue StandardError
+    rescue StandardError => e
+      Honeybadger.notify(e)
       flash[:error] = 'There was an error connecting your account'
     end
     redirect "/o/#{@organisation.slug}"
