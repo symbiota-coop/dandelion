@@ -1,6 +1,14 @@
 module EvmTransactions
   extend ActiveSupport::Concern
 
+  included do
+    before_validation :strip_evm_address
+  end
+
+  def strip_evm_address
+    self.evm_address = evm_address&.strip
+  end
+
   class_methods do
     def evm_transactions(evm_address)
       transactions = []
