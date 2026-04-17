@@ -158,6 +158,7 @@ class Organisation
       created: results.sum { |result| result[:created] || 0 },
       updated: results.sum { |result| result[:updated] || 0 },
       skipped: results.sum { |result| result[:skipped] || 0 },
+      removed: results.sum { |result| result[:removed] || 0 },
       feeds: results,
       errors: errors
     }

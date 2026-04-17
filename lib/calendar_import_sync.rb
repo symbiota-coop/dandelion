@@ -57,6 +57,11 @@ class CalendarImportSync
     value.to_s.strip.presence
   end
 
+  def self.valid_calendar_body?(body)
+    text = body.to_s
+    text.match?(/BEGIN:VCALENDAR\b/i) && text.match?(/END:VCALENDAR\b/i)
+  end
+
   def initialize(organisation, feed_url:)
     @organisation = organisation
     @feed_url = feed_url
@@ -67,6 +72,7 @@ class CalendarImportSync
 
     response = Faraday.get(normalized_feed_url)
     raise ConfigurationError, "iCal feed returned #{response.status}" unless response.success?
+    raise ConfigurationError, 'iCal feed did not return a VCALENDAR payload' unless self.class.valid_calendar_body?(response.body)
 
     calendars = Icalendar::Calendar.parse(response.body)
     calendar_name = self.class.calendar_name_from_parsed_calendars(calendars)
@@ -74,6 +80,7 @@ class CalendarImportSync
     created = 0
     updated = 0
     skipped = 0
+    @present_import_event_ids = Set.new
 
     calendars.flat_map(&:events).each do |ical_event|
       case upsert_event(ical_event, feed_url: normalized_feed_url)
@@ -86,7 +93,9 @@ class CalendarImportSync
       end
     end
 
-    { created: created, updated: updated, skipped: skipped, feed_url: normalized_feed_url, calendar_name: calendar_name }
+    removed = destroy_absent_imported_events(normalized_feed_url)
+
+    { created: created, updated: updated, skipped: skipped, removed: removed, feed_url: normalized_feed_url, calendar_name: calendar_name }
   rescue StandardError => e
     Honeybadger.notify(e, context: { organisation_id: organisation.id.to_s, calendar_import_url: feed_url }) unless e.is_a?(ConfigurationError)
     { error: e.message, feed_url: feed_url }
@@ -115,12 +124,12 @@ class CalendarImportSync
     source_url = url
     source_url ||= location_text if luma_event_page_url?(location_text)
     # In-person Luma events often omit URL and put the venue in LOCATION; UID still points at the event page.
-    if luma_calendar_feed && source_url.blank?
-      source_url = luma_event_url_from_uid(uid).presence
-    end
+    source_url = luma_event_url_from_uid(uid).presence if luma_calendar_feed && source_url.blank?
 
     event = find_existing_event(feed_url: feed_url, uid: uid, source_url: source_url, summary: summary, start_time: start_time)
     return unpublish_cancelled_event(event) if property_text(ical_event.status).to_s.casecmp('CANCELLED').zero?
+
+    mark_present_imported(event) if event&.persisted?
 
     return :skipped unless start_time
     return :skipped if start_time < 1.day.ago
@@ -139,7 +148,6 @@ class CalendarImportSync
     event.account ||= sync_account
     event.last_saved_by = sync_account
     event.prevent_notifications = true
-    event.ai_tagged = true if event_was_new
 
     previous_theme_color = event.theme_color
 
@@ -244,7 +252,21 @@ class CalendarImportSync
       event.theme_color = previous_theme_color
       event.save!
     end
+    mark_present_imported(event)
     event_was_new ? :created : :updated
+  end
+
+  def mark_present_imported(event)
+    @present_import_event_ids.add(event.id) if event&.id
+  end
+
+  def destroy_absent_imported_events(normalized_feed_url)
+    scope = organisation.events.where(calendar_import_feed_url: normalized_feed_url)
+    keep = @present_import_event_ids.to_a
+    to_destroy = keep.empty? ? scope : scope.where(:id.nin => keep)
+    count = to_destroy.count
+    to_destroy.each(&:destroy)
+    count
   end
 
   def find_existing_event(feed_url:, uid:, source_url:, summary:, start_time:)

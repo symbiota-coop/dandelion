@@ -40,6 +40,8 @@ class CalendarImportsTest < ActiveSupport::TestCase
   ICAL
 
   LUMA_ICS_URL = 'https://api2.luma.com/ics/get?entity=calendar&id=cal-test'.freeze
+  LUMA_OG_IMAGE_URL = 'https://placehold.co/1200x630.jpg'.freeze
+  LUMA_OG_IMAGE_FIXTURE_PATH = File.expand_path('../app/assets/images/test-event.jpg', __dir__).freeze
 
   LUMA_ICAL_LOCATION_ONLY = <<~ICAL.freeze
     BEGIN:VCALENDAR
@@ -108,6 +110,15 @@ class CalendarImportsTest < ActiveSupport::TestCase
     Faraday.stub(:get, responder) do
       Faraday.stub(:new, connection_builder) { yield }
     end
+  end
+
+  def stub_dragonfly_fetch_url(responses)
+    fetcher = lambda do |url, *_args, **_kwargs, &_block|
+      path = responses.fetch(url.to_s) { raise "Unexpected Dragonfly fetch_url for #{url}" }
+      Dragonfly.app.fetch_file(path)
+    end
+
+    Dragonfly.app.stub(:fetch_url, fetcher) { yield }
   end
 
   test 'syncing multiple iCal feeds creates events from each feed' do
@@ -193,6 +204,58 @@ class CalendarImportsTest < ActiveSupport::TestCase
     assert_equal "#{ICS_URL_2}: iCal feed returned 404", organisation.reload.calendar_import_last_sync_error
   end
 
+  EMPTY_ICAL = <<~ICAL.freeze
+    BEGIN:VCALENDAR
+    VERSION:2.0
+    END:VCALENDAR
+  ICAL
+
+  INVALID_ICAL_RESPONSE = '<html><body>Sign in first</body></html>'.freeze
+
+  test 'syncing when an event drops out of the feed destroys the imported event' do
+    account = FactoryBot.create(:account)
+    organisation = FactoryBot.create(:organisation, account: account, calendar_import_urls: ICS_URL_1)
+
+    stub_faraday(ICS_URL_1 => { status: 200, body: TEST_ICAL_1 }) do
+      organisation.sync_calendar_imports
+    end
+
+    event = organisation.events.find_by(calendar_import_feed_url: ICS_URL_1)
+    assert event.present?
+
+    stub_faraday(ICS_URL_1 => { status: 200, body: EMPTY_ICAL }) do
+      result = organisation.sync_calendar_imports
+
+      assert_equal 1, result[:removed]
+      assert_empty result[:errors]
+    end
+
+    assert_nil Event.find(event.id)
+    assert Event.unscoped.find(event.id).deleted_at.present?
+  end
+
+  test 'syncing when the feed returns a non-calendar 200 response keeps imported events' do
+    account = FactoryBot.create(:account)
+    organisation = FactoryBot.create(:organisation, account: account, calendar_import_urls: ICS_URL_1)
+
+    stub_faraday(ICS_URL_1 => { status: 200, body: TEST_ICAL_1 }) do
+      organisation.sync_calendar_imports
+    end
+
+    event = organisation.events.find_by(calendar_import_feed_url: ICS_URL_1)
+    assert event.present?
+
+    stub_faraday(ICS_URL_1 => { status: 200, body: INVALID_ICAL_RESPONSE }) do
+      result = organisation.sync_calendar_imports
+
+      assert_equal 0, result[:removed]
+      assert_equal ["#{ICS_URL_1}: iCal feed did not return a VCALENDAR payload"], result[:errors]
+    end
+
+    assert_equal event.id, organisation.events.find_by(calendar_import_feed_url: ICS_URL_1)&.id
+    assert_nil Event.unscoped.find(event.id).deleted_at
+  end
+
   test 'syncing a cancelled iCal event unpublishes the imported event' do
     account = FactoryBot.create(:account)
     organisation = FactoryBot.create(:organisation, account: account, calendar_import_urls: ICS_URL_1)
@@ -220,17 +283,21 @@ class CalendarImportsTest < ActiveSupport::TestCase
     luma_event_url = 'https://luma.com/event/evt-test'
     resolved_page_url = 'https://lu.ma/evt-test'
     # Wide image for validation; production Luma pages 307 to a short URL then serve og tags
-    html = '<!DOCTYPE html><html><head><meta property="og:image" content="https://placehold.co/1200x630.jpg"></head><body></body></html>'
+    html = "<!DOCTYPE html><html><head><meta property=\"og:image\" content=\"#{LUMA_OG_IMAGE_URL}\"></head><body></body></html>"
 
-    stub_faraday(
-      LUMA_ICS_URL => { status: 200, body: LUMA_ICAL_LOCATION_ONLY },
-      luma_event_url => { status: 307, body: '', headers: { 'location' => resolved_page_url } },
-      resolved_page_url => { status: 200, body: html }
+    stub_dragonfly_fetch_url(
+      LUMA_OG_IMAGE_URL => LUMA_OG_IMAGE_FIXTURE_PATH
     ) do
-      result = organisation.sync_calendar_imports
+      stub_faraday(
+        LUMA_ICS_URL => { status: 200, body: LUMA_ICAL_LOCATION_ONLY },
+        luma_event_url => { status: 307, body: '', headers: { 'location' => resolved_page_url } },
+        resolved_page_url => { status: 200, body: html }
+      ) do
+        result = organisation.sync_calendar_imports
 
-      assert_equal 1, result[:created]
-      assert_empty result[:errors]
+        assert_equal 1, result[:created]
+        assert_empty result[:errors]
+      end
     end
 
     event = organisation.events.find_by(calendar_import_feed_url: LUMA_ICS_URL)
@@ -269,7 +336,7 @@ class CalendarImportsTest < ActiveSupport::TestCase
     account = FactoryBot.create(:account)
     organisation = FactoryBot.create(:organisation, account: account, calendar_import_urls: LUMA_ICS_URL)
     luma_event_url = 'https://luma.com/event/evt-inperson'
-    html = '<!DOCTYPE html><html><head><meta property="og:image" content="https://placehold.co/1200x630.jpg"></head><body></body></html>'
+    html = "<!DOCTYPE html><html><head><meta property=\"og:image\" content=\"#{LUMA_OG_IMAGE_URL}\"></head><body></body></html>"
     ical = <<~ICAL
       BEGIN:VCALENDAR
       VERSION:2.0
@@ -284,15 +351,19 @@ class CalendarImportsTest < ActiveSupport::TestCase
       END:VCALENDAR
     ICAL
 
-    stub_faraday(
-      LUMA_ICS_URL => { status: 200, body: ical },
-      luma_event_url => { status: 307, body: '', headers: { 'location' => 'https://lu.ma/inperson' } },
-      'https://lu.ma/inperson' => { status: 200, body: html }
+    stub_dragonfly_fetch_url(
+      LUMA_OG_IMAGE_URL => LUMA_OG_IMAGE_FIXTURE_PATH
     ) do
-      result = organisation.sync_calendar_imports
+      stub_faraday(
+        LUMA_ICS_URL => { status: 200, body: ical },
+        luma_event_url => { status: 307, body: '', headers: { 'location' => 'https://lu.ma/inperson' } },
+        'https://lu.ma/inperson' => { status: 200, body: html }
+      ) do
+        result = organisation.sync_calendar_imports
 
-      assert_equal 1, result[:created]
-      assert_empty result[:errors]
+        assert_equal 1, result[:created]
+        assert_empty result[:errors]
+      end
     end
 
     event = organisation.events.find_by(calendar_import_feed_url: LUMA_ICS_URL)

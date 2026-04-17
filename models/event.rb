@@ -335,6 +335,7 @@ class Event
   def ai_tag
     return unless ENV['OPENROUTER_API_KEY']
     return if duplicate
+    return if calendar_import_feed_url
     return unless event_tagships(true).empty?
 
     # tags = nil
