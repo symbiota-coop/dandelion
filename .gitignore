@@ -1,6 +1,7 @@
 .DS_Store
 log/**/*
 tmp/**/*
+app/assets/dragonfly/**/*
 bin/*
 vendor/bundle
 vendor/gems/*
