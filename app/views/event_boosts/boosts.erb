@@ -202,10 +202,8 @@
           <td>=</td>
           <td><%= m event_boost.total_amount, event_boost.currency %></td>
           <td>
-            <% if event_boost.complete? %>
-              <% text, label_class = event_boost.status.first %>
-              <span class="label <%= label_class %>"><%= text %></span>
-            <% end %>
+            <% text, label_class = event_boost.status.first %>
+            <span class="label <%= label_class %>"><%= text %></span>
           </td>
           <td>
             <%= event_boost.created_at %>

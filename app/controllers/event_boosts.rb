@@ -3,7 +3,7 @@ Dandelion::App.controller do
     @event = Event.find(params[:id]) || not_found
     event_admins_only!
 
-    @event_boosts = @event.event_boosts.order('created_at desc')
+    @event_boosts = @event.event_boosts.and(:payment_completed => true).order('created_at desc')
     currency = @event.currency_or_default
     @min_hourly_boost = EventBoost.minimum_hourly_amount(currency)
 
