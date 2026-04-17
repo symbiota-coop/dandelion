@@ -34,6 +34,10 @@ module OrganisationFields
     field :mailgun_domain, type: String
     field :mailgun_region, type: String
     field :mailgun_sto, type: Mongoid::Boolean
+    field :calendar_import_urls, type: String
+    field :calendar_import_last_synced_at, type: Time
+    field :calendar_import_last_sync_error, type: String
+    field :calendar_import_feed_calendar_names, type: Hash, default: {}
     field :location, type: String
     field :coordinates, type: Array
     field :collect_location, type: Mongoid::Boolean
@@ -132,6 +136,7 @@ module OrganisationFields
         gocardless_subscriptions: 'Register people with active GoCardless subscriptions as monthly donors',
         patreon_api_key: 'Patreon API key',
         mailgun_api_key: 'Mailgun API key',
+        calendar_import_urls: 'iCal URLs',
         evm_address: 'EVM address',
         collect_location: 'Ask for location of ticket buyers',
         reply_to: 'Reply address for ticket emails',
@@ -171,6 +176,7 @@ module OrganisationFields
         stripe_client_id: 'Used for automated revenue sharing. <code>Settings</code> > <code>Connect</code> > <code>Live mode client ID</code>. Starts <code>ca_</code>',
         mailgun_api_key: '<code>Settings</code> > <code>API keys</code>',
         mailgun_domain: '<code>Sending</code> > <code>Domains</code> > <code>Add new domain</code>',
+        calendar_import_urls: 'One iCal URL per line. Dandelion will import upcoming events when you save and keep them in sync automatically.',
         affiliate_credit_percentage: 'When set, attendees receive a personal affiliate link in the order confirmation email. For each order made via the link, the source receives credit towards future events equal to this % of the order value.',
         add_a_donation_to: "Text to display beside the 'Add a donation' field",
         donation_text: "Text to display below the 'Add a donation' field",

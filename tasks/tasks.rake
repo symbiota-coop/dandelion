@@ -25,6 +25,12 @@ namespace :hourly do
 
       event.send_reminders(:all)
     end
+    puts 'sync iCal imports'
+    Organisation.all.each do |organisation|
+      next if organisation.calendar_import_urls_a.empty?
+
+      organisation.sync_calendar_imports
+    end
     current_hour = TZInfo::Timezone.get(Asn::TIMEZONE).to_local(Time.now.utc).hour
     if (current_hour % Asn::WINDOW_LENGTH).zero?
       puts 'autoblock ASNs'

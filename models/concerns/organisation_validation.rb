@@ -9,7 +9,7 @@ module OrganisationValidation
     validates_format_of :stripe_pk, with: /\A[a-z0-9_]+\z/i, allow_nil: true
 
     before_validation do
-      %w[name facebook_pixel_id gocardless_access_token gocardless_endpoint_secret patreon_api_key mailgun_api_key evm_address oc_slug].each do |f|
+      %w[name facebook_pixel_id gocardless_access_token gocardless_endpoint_secret patreon_api_key mailgun_api_key calendar_import_urls evm_address oc_slug].each do |f|
         send("#{f}=", send(f).strip) if send(f)
       end
 
@@ -30,6 +30,14 @@ module OrganisationValidation
       errors.add(:event_image_required_height, 'must be greater than 0') if event_image_required_height && event_image_required_height <= 0
 
       errors.add(:tax_rate_id, 'must start with txr_') if tax_rate_id && !tax_rate_id.starts_with?('txr_')
+
+      calendar_import_urls_a.each do |calendar_import_url|
+        uri = URI.parse(calendar_import_url)
+        valid_scheme = %w[http https webcal].include?(uri.scheme&.downcase)
+        errors.add(:calendar_import_urls, "#{calendar_import_url} is not a valid iCal URL") unless valid_scheme && uri.host.present?
+      rescue URI::InvalidURIError
+        errors.add(:calendar_import_urls, "#{calendar_import_url} is not a valid URL")
+      end
 
       if theme_color.present?
         theme_color_normalized = theme_color.start_with?('#') ? theme_color : "##{theme_color}"

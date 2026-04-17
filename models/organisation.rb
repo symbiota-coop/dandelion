@@ -93,6 +93,25 @@ class Organisation
     banned_emails ? banned_emails.split("\n").map(&:strip) : []
   end
 
+  def calendar_import_urls_a
+    calendar_import_urls ? calendar_import_urls.split("\n").map(&:strip).reject(&:blank?) : []
+  end
+
+  def calendar_import_feeds_in_url_order
+    names = (calendar_import_feed_calendar_names || {}).stringify_keys
+    seen = {}
+    calendar_import_urls_a.filter_map do |line|
+      url = CalendarImportSync.normalize_feed_url(line)
+      next if seen[url]
+
+      seen[url] = true
+      n = names[url]
+      [url, n] if n.present?
+    rescue CalendarImportSync::ConfigurationError
+      nil
+    end
+  end
+
   after_create do
     notifications_as_notifiable.create! circle: account, type: 'created_organisation'
 
@@ -108,6 +127,40 @@ class Organisation
 
   def stripe_webhook_url
     "#{ENV['BASE_URI']}/o/#{slug}/stripe_webhook"
+  end
+
+  def sync_calendar_imports
+    names_by_feed = (calendar_import_feed_calendar_names || {}).stringify_keys
+    normalized_feed_urls = calendar_import_urls_a.filter_map do |u|
+      CalendarImportSync.normalize_feed_url(u)
+    rescue CalendarImportSync::ConfigurationError
+      nil
+    end
+
+    results = calendar_import_urls_a.map { |feed_url| CalendarImportSync.new(self, feed_url: feed_url).sync }
+    errors = results.filter_map { |result| "#{result[:feed_url]}: #{result[:error]}" if result[:error] }
+
+    results.each do |result|
+      next if result[:error].present?
+      next if result[:calendar_name].blank?
+
+      names_by_feed[result[:feed_url].to_s] = result[:calendar_name]
+    end
+    names_by_feed.keep_if { |url, _| normalized_feed_urls.include?(url) }
+
+    set(
+      calendar_import_last_synced_at: Time.now,
+      calendar_import_last_sync_error: errors.any? ? errors.join("\n") : nil,
+      calendar_import_feed_calendar_names: names_by_feed
+    )
+
+    {
+      created: results.sum { |result| result[:created] || 0 },
+      updated: results.sum { |result| result[:updated] || 0 },
+      skipped: results.sum { |result| result[:skipped] || 0 },
+      feeds: results,
+      errors: errors
+    }
   end
 
   def ticket_email_title_default

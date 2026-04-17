@@ -26,6 +26,14 @@
 
 <%= partial :'events/locked' %>
 
+<% if @event.calendar_import_feed_url.present? || @event.calendar_import_source_url.present? || @event.calendar_import_uid.present? %>
+  <div class="alert alert-warning">
+    <p class="mb-0">
+      This event is synced from an external iCal feed<% if @event.calendar_import_source_url.present? %> to <a class="text-warning text-underline" target="_blank" href="<%= @event.calendar_import_source_url %>">the source event</a><% end %>. Changes will be overwritten the next time the organisation syncs.
+    </p>
+  </div>
+<% end %>
+
 <p class="mt-3">
   <a target="_blank" href="/docs/events">
     <i class="bi bi-question-circle-fill"></i>

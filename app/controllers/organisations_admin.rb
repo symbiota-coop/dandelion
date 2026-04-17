@@ -65,6 +65,29 @@ Dandelion::App.controller do
     end
   end
 
+  get '/o/:slug/calendar_import' do
+    @organisation = Organisation.find_by(slug: params[:slug]) || not_found
+    organisation_admins_only!
+    erb :'organisations/calendar_import'
+  end
+
+  post '/o/:slug/calendar_import' do
+    @organisation = Organisation.find_by(slug: params[:slug]) || not_found
+    organisation_admins_only!
+    if @organisation.update_attributes(mass_assigning(params[:organisation], Organisation))
+      if @organisation.calendar_import_urls_a.any?
+        Padrino.env == :production ? @organisation.delay.sync_calendar_imports : @organisation.sync_calendar_imports
+        flash[:notice] = 'Your iCal feeds were saved and will sync in the background.'
+      else
+        flash[:notice] = 'Your iCal feed settings were saved.'
+      end
+      redirect "/o/#{@organisation.slug}/calendar_import"
+    else
+      flash.now[:error] = 'There was an error saving your settings.'
+      erb :'organisations/calendar_import'
+    end
+  end
+
   get '/o/:slug/banned_emails' do
     @organisation = Organisation.find_by(slug: params[:slug]) || not_found
     organisation_admins_only!

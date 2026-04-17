@@ -10,6 +10,7 @@ module EventDuplication
       currency: currency,
       location: location,
       image: image,
+      theme_color: theme_color,
       description: description,
       email: email,
       feedback_questions: feedback_questions,

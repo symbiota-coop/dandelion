@@ -1,0 +1,51 @@
+<%= partial :'organisations/nav', locals: { organisation: @organisation } %>
+
+<p class="readable">
+  Add one iCal URL per line. After you save, Dandelion imports upcoming events and keeps them in sync.
+  <a target="_blank" href="/docs/organisations#ical-import">Read more</a>
+</p>
+
+<% if @organisation.errors.exists? %>
+  <div class="alert alert-danger">
+    <ul class="mb-0">
+      <% @organisation.errors.full_messages.each do |message| %>
+        <li><%= message %></li>
+      <% end %>
+    </ul>
+  </div>
+<% end %>
+
+<% form_for @organisation, "/o/#{@organisation.slug}/calendar_import" do |f| %>
+  <%= f.text_area_block :calendar_import_urls %>
+  <% if @organisation.calendar_import_last_synced_at %>
+    <div class="text-muted mb-0">
+      Last synced on <%= @organisation.calendar_import_last_synced_at.strftime('%d %b %Y %H:%M %Z') %>
+      <% feeds = @organisation.calendar_import_feeds_in_url_order %>
+      <% if feeds.any? %>
+        <ul class="mb-3 mt-1">
+          <% feeds.each do |feed_url, cal_name| %>
+            <li>
+              <%= ERB::Util.html_escape(cal_name.to_s.strip) %>
+              <code class="text-break small"><%= ERB::Util.html_escape(feed_url) %></code>
+            </li>
+          <% end %>
+        </ul>
+      <% end %>
+    </div>
+  <% end %>
+  <% err_lines = @organisation.calendar_import_last_sync_error.to_s.split("\n").reject(&:blank?) %>
+  <% if err_lines.any? %>
+    <div class="mt-3 mb-3 alert alert-warning">
+      <% if err_lines.one? %>
+        <p class="mb-0"><%= err_lines.first %></p>
+      <% else %>
+        <ul class="mb-0">
+          <% err_lines.each do |line| %>
+            <li><%= line %></li>
+          <% end %>
+        </ul>
+      <% end %>
+    </div>
+  <% end %>
+  <%= f.submit_block button_text: 'Save iCal feeds' %>
+<% end %>

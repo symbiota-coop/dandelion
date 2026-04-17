@@ -51,6 +51,10 @@ module EventFields
     field :theme_color, type: String
     field :embedding, type: Array
     field :atproto_uri, type: String
+    field :calendar_import_feed_url, type: String
+    field :calendar_import_uid, type: String
+    field :calendar_import_source_url, type: String
+    field :calendar_import_last_synced_at, type: Time
     field :reminder_hours_before, type: Integer
 
     field :revenue_share_to_revenue_sharer, type: Integer

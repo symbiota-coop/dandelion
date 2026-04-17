@@ -10,6 +10,12 @@ To accept payments for tickets to events created under the organisation, you mus
 
 We offer a free gift of 1 email per month for up to 1000 subscribers. Beyond that, you'll need to link a paid [Mailgun](https://www.mailgun.com/) account. (You can always email attendees of events even without linking a Mailgun account.)
 
+## iCal import
+
+Paste one or more iCal URLs on the **iCal import** page (organisation dropdown → iCal import), one per line. Dandelion will import upcoming events for that organisation when you save, and then keep them in sync automatically.
+
+Imported events use the feed's event URL as their RSVP/ticket button, so people can still register on the original platform while discovering the event on Dandelion.
+
 ## Recognising monthly donors
 
 Provide a GoCardless access token and/or Patreon API key, and people with active subscriptions will be recognised as monthly donors/members of the organisation.
