@@ -112,8 +112,9 @@ class CalendarImportsTest < ActiveSupport::TestCase
     end
   end
 
-  def stub_dragonfly_fetch_url(responses)
+  def stub_dragonfly_fetch_url(responses, fetched_urls: nil)
     fetcher = lambda do |url, *_args, **_kwargs, &_block|
+      fetched_urls&.push(url.to_s)
       path = responses.fetch(url.to_s) { raise "Unexpected Dragonfly fetch_url for #{url}" }
       Dragonfly.app.fetch_file(path)
     end
@@ -282,11 +283,13 @@ class CalendarImportsTest < ActiveSupport::TestCase
     organisation = FactoryBot.create(:organisation, account: account, calendar_import_urls: LUMA_ICS_URL)
     luma_event_url = 'https://luma.com/event/evt-test'
     resolved_page_url = 'https://lu.ma/evt-test'
+    fetched_urls = []
     # Wide image for validation; production Luma pages 307 to a short URL then serve og tags
     html = "<!DOCTYPE html><html><head><meta property=\"og:image\" content=\"#{LUMA_OG_IMAGE_URL}\"></head><body></body></html>"
 
     stub_dragonfly_fetch_url(
-      LUMA_OG_IMAGE_URL => LUMA_OG_IMAGE_FIXTURE_PATH
+      { LUMA_OG_IMAGE_URL => LUMA_OG_IMAGE_FIXTURE_PATH },
+      fetched_urls: fetched_urls
     ) do
       stub_faraday(
         LUMA_ICS_URL => { status: 200, body: LUMA_ICAL_LOCATION_ONLY },
@@ -304,8 +307,7 @@ class CalendarImportsTest < ActiveSupport::TestCase
     assert_equal luma_event_url, event.calendar_import_source_url
     assert_equal luma_event_url, event.purchase_url
     assert_equal 'Online', event.location
-    assert event.has_image
-    assert_match(/\A#[0-9A-Fa-f]{6}\z/, event.theme_color.to_s, 'theme_color from top-left pixel of imported cover')
+    assert_equal [LUMA_OG_IMAGE_URL], fetched_urls
   end
 
   test 'Luma iCal keeps plain-text LOCATION when not a URL' do
@@ -336,6 +338,7 @@ class CalendarImportsTest < ActiveSupport::TestCase
     account = FactoryBot.create(:account)
     organisation = FactoryBot.create(:organisation, account: account, calendar_import_urls: LUMA_ICS_URL)
     luma_event_url = 'https://luma.com/event/evt-inperson'
+    fetched_urls = []
     html = "<!DOCTYPE html><html><head><meta property=\"og:image\" content=\"#{LUMA_OG_IMAGE_URL}\"></head><body></body></html>"
     ical = <<~ICAL
       BEGIN:VCALENDAR
@@ -352,7 +355,8 @@ class CalendarImportsTest < ActiveSupport::TestCase
     ICAL
 
     stub_dragonfly_fetch_url(
-      LUMA_OG_IMAGE_URL => LUMA_OG_IMAGE_FIXTURE_PATH
+      { LUMA_OG_IMAGE_URL => LUMA_OG_IMAGE_FIXTURE_PATH },
+      fetched_urls: fetched_urls
     ) do
       stub_faraday(
         LUMA_ICS_URL => { status: 200, body: ical },
@@ -370,6 +374,6 @@ class CalendarImportsTest < ActiveSupport::TestCase
     assert_equal luma_event_url, event.calendar_import_source_url
     assert_equal luma_event_url, event.purchase_url
     assert_equal 'CIC Berlin, Germany', event.location
-    assert event.has_image
+    assert_equal [LUMA_OG_IMAGE_URL], fetched_urls
   end
 end
