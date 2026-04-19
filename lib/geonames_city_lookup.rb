@@ -102,7 +102,7 @@ class GeonamesCityLookup
       p2 = lat2 * Math::PI / 180
       d_lat = (lat2 - lat1) * Math::PI / 180
       d_lon = (lon2 - lon1) * Math::PI / 180
-      a = Math.sin(d_lat / 2)**2 + Math.cos(p1) * Math.cos(p2) * Math.sin(d_lon / 2)**2
+      a = (Math.sin(d_lat / 2)**2) + (Math.cos(p1) * Math.cos(p2) * (Math.sin(d_lon / 2)**2))
       2 * r * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a))
     end
   end
