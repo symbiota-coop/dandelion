@@ -10,6 +10,10 @@ To accept payments for tickets to events created under the organisation, you mus
 
 We offer a free gift of 1 email per month for up to 1000 subscribers. Beyond that, you'll need to link a paid [Mailgun](https://www.mailgun.com/) account. (You can always email attendees of events even without linking a Mailgun account.)
 
+## Community event submissions
+
+In your organisation settings, enable **Allow anyone to submit events for review** so that any signed-in user can propose a new event under your organisation. Those events are not public until an organisation admin publishes them; admins receive an email when someone submits an event.
+
 ## iCal import
 
 Paste one or more iCal URLs on the **iCal import** page (organisation dropdown → iCal import), one per line. Dandelion will import upcoming events for that organisation when you save, and then keep them in sync automatically.
