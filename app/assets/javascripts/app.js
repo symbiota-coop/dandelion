@@ -337,7 +337,6 @@ $(function () {
         })
       }
       const updateThemeCSS = () => {
-        if (!$container.data('preview-theme')) return
         const hex = normalizeHex($input.val())
         const $oldLink = $('link[href^="/theme.css"]')
         if (hex) {

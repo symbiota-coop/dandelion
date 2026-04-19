@@ -1,18 +1,5 @@
-<% if !event_admin? && @event.theme_color %>
-  <link href="/theme.css?theme_color=<%=CGI.escape(@event.theme_color)%>" rel="stylesheet">
-<% end %>
-
-<style>
-  .btn-outline-primary {
-    background: white;
-  }
-  .btn.btn-outline-primary.dropdown-toggle {
-    box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075) !important
-  }
-</style>
-
+<%= partial :'events/nav', locals: { event: @event } %>
 <% if event_admin? %>
-  <%= partial :'events/nav', locals: { event: @event } %>
   <%= partial :'events/locked' %>
   <div class="alert alert-success">
     <p class="mb-0">

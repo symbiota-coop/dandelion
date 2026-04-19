@@ -200,7 +200,7 @@
       </div>
       <div role="tabpanel" class="tab-pane" id="tab-appearance">
         <%= f.color_block :theme_color %>
-        <%= partial :'quick_theme_colors', locals: { input_name: 'event[theme_color]', preview_theme: true } %>
+        <%= partial :'quick_theme_colors', locals: { input_name: 'event[theme_color]' } %>
         <% if Padrino.env == :development || @event.organisation.change_select_tickets_title %>
           <%= f.text_block :select_tickets_title %>
         <% end %>

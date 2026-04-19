@@ -1,3 +1,7 @@
+<% if !@event && organisation.theme_color %>
+  <link href="/theme.css?theme_color=<%=CGI.escape(organisation.theme_color)%>" rel="stylesheet">
+<% end %>
+
 <% if organisation.persisted? && organisation_admin?(organisation) %>
   <% unless defined?(inline) %>
     <%== '<div class="mb-3">' %>
