@@ -245,6 +245,19 @@ class Event
     set(browsable: !evergreen? && !minimal_only? && !organisation.hidden && (organisation.paid_up || ticket_types.exists?))
   end
 
+  # Event uses Mongoid::Paranoia, so destroy is a soft delete.
+  # Keep Dragonfly assets available for deleted events and only remove them
+  # when the record is permanently removed via destroy!.
+  after_remove :destroy_dragonfly_attachments!
+
+  def destroy_dragonfly_attachments
+    nil
+  end
+
+  def destroy_dragonfly_attachments!
+    dragonfly_attachments.each_value(&:destroy!)
+  end
+
   def carousel_name
     return unless organisation && organisation.carousels
 
