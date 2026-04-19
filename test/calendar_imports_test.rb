@@ -56,6 +56,21 @@ class CalendarImportsTest < ActiveSupport::TestCase
     END:VCALENDAR
   ICAL
 
+  # LOCATION is a Luma URL but GEO marks a physical venue (address hidden until registration).
+  LUMA_ICAL_LOCATION_URL_WITH_GEO = <<~ICAL.freeze
+    BEGIN:VCALENDAR
+    VERSION:2.0
+    BEGIN:VEVENT
+    UID:evt-test@events.lu.ma
+    DTSTART:20270501T180000Z
+    DTEND:20270501T200000Z
+    SUMMARY:Luma Event
+    GEO:52.495;13.4475
+    LOCATION:https://luma.com/event/evt-test
+    END:VEVENT
+    END:VCALENDAR
+  ICAL
+
   UPDATED_TEST_ICAL_1 = <<~ICAL.freeze
     BEGIN:VCALENDAR
     VERSION:2.0
@@ -307,6 +322,37 @@ class CalendarImportsTest < ActiveSupport::TestCase
     assert_equal luma_event_url, event.calendar_import_source_url
     assert_equal luma_event_url, event.purchase_url
     assert_equal 'Online', event.location
+    assert_equal [LUMA_OG_IMAGE_URL], fetched_urls
+  end
+
+  test 'Luma iCal reverse-geocodes GEO to a city when LOCATION is a gated Luma URL' do
+    GeonamesCityLookup.reset!
+
+    account = FactoryBot.create(:account)
+    organisation = FactoryBot.create(:organisation, account: account, calendar_import_urls: LUMA_ICS_URL)
+    luma_event_url = 'https://luma.com/event/evt-test'
+    resolved_page_url = 'https://lu.ma/evt-test'
+    fetched_urls = []
+    html = "<!DOCTYPE html><html><head><meta property=\"og:image\" content=\"#{LUMA_OG_IMAGE_URL}\"></head><body></body></html>"
+
+    stub_dragonfly_fetch_url(
+      { LUMA_OG_IMAGE_URL => LUMA_OG_IMAGE_FIXTURE_PATH },
+      fetched_urls: fetched_urls
+    ) do
+      stub_faraday(
+        LUMA_ICS_URL => { status: 200, body: LUMA_ICAL_LOCATION_URL_WITH_GEO },
+        luma_event_url => { status: 307, body: '', headers: { 'location' => resolved_page_url } },
+        resolved_page_url => { status: 200, body: html }
+      ) do
+        result = organisation.sync_calendar_imports
+
+        assert_equal 1, result[:created]
+        assert_empty result[:errors]
+      end
+    end
+
+    event = organisation.events.find_by(calendar_import_feed_url: LUMA_ICS_URL)
+    assert_equal 'Berlin', event.location
     assert_equal [LUMA_OG_IMAGE_URL], fetched_urls
   end
 

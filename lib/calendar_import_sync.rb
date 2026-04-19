@@ -162,8 +162,11 @@ class CalendarImportSync
                                   false
                                 end
 
+    # Luma often puts the public event URL in LOCATION when the street address is gated ("Register to
+    # see address"); GEO still reflects the real venue. Reverse-geocode GEO for a city label when we can.
+    # Without GEO, URL-only LOCATION means online.
     import_location = if luma_calendar_feed && location_text_is_http_url
-                        'Online'
+                        luma_ical_geo_lat_lon(ical_event).present? ? luma_location_label_from_ical_geo(ical_event) : 'Online'
                       else
                         location_text.presence || 'Online'
                       end
@@ -306,6 +309,33 @@ class CalendarImportSync
     when ->(v) { v.respond_to?(:to_time) }
       value.to_time
     end
+  end
+
+  # Returns [lat, lon] or nil (iCal GEO is latitude;longitude).
+  def luma_ical_geo_lat_lon(ical_event)
+    return unless ical_event.respond_to?(:geo)
+
+    geo = unwrap_property(ical_event.geo)
+    return if geo.blank?
+
+    coords = geo.is_a?(Array) ? geo : Array(geo)
+    return if coords.size < 2
+
+    lat = coords[0].to_f
+    lon = coords[1].to_f
+    return unless lat.abs <= 90 && lon.abs <= 180 && !(lat.zero? && lon.zero?)
+
+    [lat, lon]
+  end
+
+  # GeoNames vendored list; otherwise "In person". (GeonamesCityLookup memoizes the loaded TSV.)
+  def luma_location_label_from_ical_geo(ical_event)
+    lat, lon = luma_ical_geo_lat_lon(ical_event)
+    return 'In person' unless lat && lon
+
+    GeonamesCityLookup.nearest_city_name(lat, lon).presence || 'In person'
+  rescue StandardError
+    'In person'
   end
 
   # evt-xxx@events.lu.ma -> https://luma.com/event/evt-xxx (resolves to the public slug URL)
