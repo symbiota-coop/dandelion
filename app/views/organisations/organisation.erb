@@ -13,7 +13,7 @@
       </h1>
       <% if current_account %>
         <%= partial :'organisations/buttons' %>
-      <% else %>
+      <% elsif !@organisation.disable_new_account_form? %>
         <%= partial :'accounts/new_compact' %>
       <% end %>
     </div>

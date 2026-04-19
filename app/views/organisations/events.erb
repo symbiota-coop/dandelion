@@ -18,7 +18,7 @@
         <div class="d-inline-block" data-pagelet-url="/o/<%= @organisation.slug %>/organisationship?membership_toggle=1&create_event=1">
           <%= partial :'organisations/organisationship', locals: { organisation: @organisation, membership_toggle: true, create_event: true } %>
         </div>
-      <% else %>
+      <% elsif !@organisation.disable_new_account_form? %>
         <%= partial :'accounts/new_compact' %>
       <% end %>
     </div>

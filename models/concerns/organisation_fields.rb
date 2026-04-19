@@ -114,6 +114,7 @@ module OrganisationFields
     field :atproto_did, type: String
     field :no_referrer, type: Mongoid::Boolean
     field :allow_event_submissions, type: Mongoid::Boolean
+    field :disable_new_account_form, type: Mongoid::Boolean
   end
 
   class_methods do
