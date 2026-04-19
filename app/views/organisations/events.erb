@@ -4,25 +4,16 @@
 
 <% unless params[:minimal] %>
   <%= partial :'organisations/nav', locals: { organisation: @organisation } %>
-  <div class="row mb-3">
-    <% if @organisation.image %>
-      <div class="col-12 col-lg-auto text-center">
-        <a href="/o/<%= @organisation.slug %>"><img src="<%= u @organisation.image.thumb('200x200').url %>"<% if @organisation.image_width_unmagic && @organisation.image_height_unmagic %> style="aspect-ratio: <%= @organisation.image_width_unmagic %> / <%= @organisation.image_height_unmagic %>"<% end %>></a>
-      </div>
-    <% end %>
-    <div class="col-12 col-sm text-center text-lg-left">
-      <h1>
-        <a href="/o/<%= @organisation.slug %>"><%= @organisation.name %></a>'s events
-      </h1>
-      <% if current_account %>
-        <div class="d-inline-block" data-pagelet-url="/o/<%= @organisation.slug %>/organisationship?membership_toggle=1&create_event=1">
-          <%= partial :'organisations/organisationship', locals: { organisation: @organisation, membership_toggle: true, create_event: true } %>
-        </div>
-      <% elsif !@organisation.disable_new_account_form? %>
-        <%= partial :'accounts/new_compact' %>
-      <% end %>
+  <h1>
+    <a href="/o/<%= @organisation.slug %>"><%= @organisation.name %></a>'s events
+  </h1>
+  <% if current_account %>
+    <div class="d-inline-block" data-pagelet-url="/o/<%= @organisation.slug %>/organisationship?membership_toggle=1&create_event=1">
+      <%= partial :'organisations/organisationship', locals: { organisation: @organisation, membership_toggle: true, create_event: true } %>
     </div>
-  </div>
+  <% elsif !@organisation.disable_new_account_form? %>
+    <%= partial :'accounts/new_compact' %>
+  <% end %>
 <% end %>
 <% if !params[:no_events_banner] && @organisation.unsanitized_ok? && @organisation.events_banner %>
   <% if current_account && (organisationship = @organisation.organisationships.find_by(account: current_account)) && organisationship.monthly_donor? %>
