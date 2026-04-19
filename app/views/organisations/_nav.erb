@@ -1,4 +1,4 @@
-<% if !@event && organisation.theme_color %>
+<% if !@event && !organisation.theme_background_color &&organisation.theme_color %>
   <link href="/theme.css?theme_color=<%=CGI.escape(organisation.theme_color)%>" rel="stylesheet">
 <% end %>
 
