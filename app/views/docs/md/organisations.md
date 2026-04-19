@@ -14,9 +14,9 @@ We offer a free gift of 1 email per month for up to 1000 subscribers. Beyond tha
 
 In your organisation settings, enable **Allow anyone to submit events for review** so that any signed-in user can propose a new event under your organisation. Those events are not public until an organisation admin publishes them; admins receive an email when someone submits an event.
 
-## iCal import
+## iCal sync
 
-Paste one or more iCal URLs on the **iCal import** page (organisation dropdown → iCal import), one per line. Dandelion will import upcoming events for that organisation when you save, and then keep them in sync automatically.
+Paste one or more iCal URLs on the **iCal sync** page (organisation dropdown → iCal sync), one per line. Dandelion will import upcoming events for that organisation when you save, and then keep them in sync automatically.
 
 Imported events use the feed's event URL as their RSVP/ticket button, so people can still register on the original platform while discovering the event on Dandelion.
 
