@@ -11,7 +11,9 @@
   elements = []
 
   models.each do |model|
-    w = model.fields.count + model.reflect_on_all_associations(:belongs_to).count
+    w = model.fields.count +
+      model.reflect_on_all_associations(:belongs_to).count +
+      model.reflect_on_all_associations(:has_one).count
     elements << {
       data: {
         id: model.name.underscore,
@@ -22,17 +24,19 @@
       }
     }
 
-    model.reflect_on_all_associations(:has_many).each_with_index do |assoc, i|
-      elements << {
-        data: {
-          id: "#{assoc.class_name.underscore}-#{model.name.underscore}-#{i}",
-          source: assoc.class_name.underscore,
-          target: model.name.underscore,
-          weight: 1,
-          color: color,
-          opacity: edge_min_opacity + 1.0 / edge_opacity_scale
+    [:has_many, :has_one].each do |macro|
+      model.reflect_on_all_associations(macro).each_with_index do |assoc, i|
+        elements << {
+          data: {
+            id: "#{assoc.class_name.underscore}-#{model.name.underscore}-#{macro}-#{i}",
+            source: assoc.class_name.underscore,
+            target: model.name.underscore,
+            weight: 1,
+            color: color,
+            opacity: edge_min_opacity + 1.0 / edge_opacity_scale
+          }
         }
-      }
+      end
     end
   end
 %>
