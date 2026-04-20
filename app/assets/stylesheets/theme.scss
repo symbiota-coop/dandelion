@@ -47,6 +47,18 @@ a:active {
   background: $theme-color;
 }
 
+.dropdown-menu>.active>a,
+.dropdown-menu>.active>a:focus,
+.dropdown-menu>.active>a:hover {
+  background: $theme-color;
+}
+
+.nav .open>a,
+.nav .open>a:focus,
+.nav .open>a:hover {
+  border-color: $theme-color;
+}
+
 a.text-primary:hover,
 a.text-primary:focus {
   color: darken($theme-color, 6.66%) !important;
@@ -174,6 +186,22 @@ p.action a:hover {
 .checkbox-inline input:checked+label:before {
   background: $theme-color;
   border-color: $theme-color;
+}
+
+.radio input:checked+label:before,
+.radio-inline input:checked+label:before {
+  background: $theme-color;
+  border-color: $theme-color;
+}
+
+// Native range controls (e.g. pay-what-you-will ticket slider on purchase with minimal layout)
+.form-control-range {
+  accent-color: $theme-color;
+}
+
+// Bootstrap utility (e.g. comment reaction borders)
+.border-primary {
+  border-color: $theme-color !important;
 }
 
 .switcher input:checked+label:before {
