@@ -60,6 +60,6 @@ Rack::Attack.blocklisted_responder = lambda do |request|
   end
 end
 
-Rack::Attack.throttle('throttle bots', limit: 1, period: 1.minute) do |request|
+Rack::Attack.throttle('throttle bots', limit: 1, period: 1.hour) do |request|
   "#{request.user_agent}:#{request.path}" if throttled_path.call(request) && bot_request.call(request)
 end
