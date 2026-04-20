@@ -176,6 +176,11 @@ p.action a:hover {
   border-color: $theme-color;
 }
 
+.switcher input:checked+label:before {
+  background: $theme-color;
+  border-color: $theme-color;
+}
+
 // =============================================================================
 // CALENDAR AND EVENTS
 // =============================================================================
