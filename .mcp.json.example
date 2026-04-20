@@ -45,6 +45,10 @@
       "headers": {
         "Authorization": "Bearer $GITHUB_PAT"
       }
-    }    
+    },
+    "cloudflare-api": {
+      "type": "http",
+      "url": "https://mcp.cloudflare.com/mcp"
+    }
   }
 }

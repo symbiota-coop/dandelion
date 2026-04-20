@@ -1,0 +1,44 @@
+[mcp_servers.honeybadger]
+command = "docker"
+args = [
+  "run",
+  "-i",
+  "--rm",
+  "-e",
+  "HONEYBADGER_PERSONAL_AUTH_TOKEN",
+  "ghcr.io/honeybadger-io/honeybadger-mcp-server",
+]
+
+[mcp_servers.honeybadger.env]
+HONEYBADGER_PERSONAL_AUTH_TOKEN = "$HONEYBADGER_PERSONAL_AUTH_TOKEN"
+
+[mcp_servers.Dandelion]
+url = "https://dandelion.events/mcp"
+
+[mcp_servers.render]
+url = "https://mcp.render.com/mcp"
+
+[mcp_servers.render.http_headers]
+Authorization = "Bearer $RENDER_AUTH_TOKEN"
+
+[mcp_servers.mongodb]
+command = "npx"
+args = [
+  "-y",
+  "mongodb-mcp-server",
+  "--connectionString",
+  "$MONGODB_CONNECTION_STRING",
+  "--readOnly",
+]
+
+[mcp_servers.stripe]
+url = "https://mcp.stripe.com"
+
+[mcp_servers.github]
+url = "https://api.githubcopilot.com/mcp/"
+
+[mcp_servers.github.http_headers]
+Authorization = "Bearer $GITHUB_PAT"
+
+[mcp_servers.cloudflare-api]
+url = "https://mcp.cloudflare.com/mcp"

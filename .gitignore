@@ -55,3 +55,4 @@ GeoLite2-City.mmdb
 repomix-output.xml
 iframe-test.html
 .mcp.json
+.codex/config.toml
