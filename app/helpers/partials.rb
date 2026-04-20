@@ -1,12 +1,11 @@
 Dandelion::App.helpers do
   def partial(*args)
-    if admin? && !args.first.to_s.starts_with?('icons') && !args.first.to_s.end_with?('events_ical')
-      t1 = Time.now
+    if admin?
+      t0 = Process.clock_gettime(Process::CLOCK_MONOTONIC)
       output = super
-      t2 = Time.now
-      ms = ((t2 - t1) * 1000).round
-      t = "<script>console.log('PARTIAL #{ms.times.map { '=' }.join} #{args.first} #{ms}ms')</script>".html_safe
-      output + t
+      ms = ((Process.clock_gettime(Process::CLOCK_MONOTONIC) - t0) * 1000).round
+      Padrino.logger.info("[partial] #{args.first} #{ms}ms")
+      output
     else
       super
     end
