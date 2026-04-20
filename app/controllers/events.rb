@@ -40,7 +40,7 @@ Dandelion::App.controller do
       @events = @events.future
       @events = @events.and(:id.in => Event.search(params[:q], @events).pluck(:id)) if params[:q]
       @events = @events.limit(500)
-      build_events_ical(@events, 'Dandelion')
+      cp(:'events/events_ical', locals: { events: @events }, key: "/events.ics?#{request.query_string}")
     end
   end
 

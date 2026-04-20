@@ -1,6 +1,6 @@
 Dandelion::App.helpers do
   def partial(*args)
-    if admin? && !args.first.to_s.starts_with?('icons')
+    if admin? && !args.first.to_s.starts_with?('icons') && !args.first.to_s.end_with?('events_ical')
       t1 = Time.now
       output = super
       t2 = Time.now

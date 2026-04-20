@@ -89,7 +89,7 @@ Dandelion::App.controller do
       @events = @events.future_and_current(1.month.ago)
       @events = filter_events_by_search_and_tags(@events)
       @events = @events.limit(500)
-      build_events_ical(@events, @organisation.name, ical_full: @organisation.ical_full)
+      cp(:'organisations/events_ical', locals: { events: @events, organisation: @organisation }, key: "/o/#{@organisation.slug}/events.ics?ical_full=#{@organisation.ical_full ? 1 : 0}&#{request.query_string}")
     end
   end
 
