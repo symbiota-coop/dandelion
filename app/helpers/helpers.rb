@@ -98,6 +98,12 @@ Dandelion::App.helpers do
     "#{path}?#{view_base_params.merge('search' => 1, 'display' => display).to_query}"
   end
 
+  def theme_css_redundant?(color)
+    hex = String(color).strip.downcase.delete_prefix('#')
+    hex = "#{hex[0]}#{hex[0]}#{hex[1]}#{hex[1]}#{hex[2]}#{hex[2]}" if hex.length == 3
+    hex == '00b963'
+  end
+
   def resolve_feedback_account!
     @account = if admin? && params[:email]
                  Account.find_by(email: params[:email].downcase)
