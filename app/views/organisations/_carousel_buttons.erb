@@ -1,17 +1,11 @@
 <script>
-  function updateCarouselHref(element) {
+  function navigateCarousel(button) {
     var searchWell = $('.search.well');
     var isSearchWellVisible = searchWell.is(':visible');
-
-    if (isSearchWellVisible) {
-      // Use full href with all existing parameters
-      element.href = element.getAttribute('data-full-href');
-    } else {
-      // Use carousel-only href without search parameters
-      element.href = element.getAttribute('data-carousel-only-href');
-    }
-
-    return true; // Allow the link to proceed
+    var href = isSearchWellVisible
+      ? button.getAttribute('data-full-href')
+      : button.getAttribute('data-carousel-only-href');
+    window.location.href = href;
   }
 
   // Preserve all query parameters if search well is visible
@@ -63,13 +57,13 @@
       new_carousel_ids.each { |id| carousel_only_params << "carousel_ids[]=#{CGI.escape(id)}" }
       carousel_only_href = carousel_only_params.any? ? "?#{carousel_only_params.join('&')}" : "?"
     %>
-    <a href="<%= base_href %>" 
-         data-full-href="<%= base_href %>" 
+    <button type="button"
+         data-full-href="<%= base_href %>"
          data-carousel-only-href="<%= carousel_only_href %>"
-         onclick="updateCarouselHref(this)"
+         onclick="navigateCarousel(this)"
          class="mb-1 btn <%= params[:carousel_ids] && params[:carousel_ids].include?(carousel.id.to_s) ? 'btn-primary' : 'btn-outline-primary' %>">
       <%= carousel.name %>
-    </a>
+    </button>
   <% end %>
 </div>
 
