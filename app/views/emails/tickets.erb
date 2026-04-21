@@ -70,6 +70,11 @@
       <% end %>
     </p>
   <% end %>
+  <% if order.persisted? && (order.value.nil? || order.value.zero?) %>
+    <p>
+      <a href="<%= ENV['BASE_URI'] %>/orders/<%= order.id %>/confirm_destroy?sign_in_token=%recipient.token%">Cancel your RSVP</a> if your plans change (you may need to request a sign in link).
+    </p>
+  <% end %>
 </div>
 <div class="footer">
   <a href="<%= ENV['BASE_URI'] %>">

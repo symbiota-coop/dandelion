@@ -1,0 +1,11 @@
+<p class="lead">
+  Are you sure you want to cancel your RSVP to
+  <a href="/e/<%= @event.slug %>"><%= @event.name %></a>?
+</p>
+<div class="mb-4">
+  <% form_tag "/orders/#{@order.id}/destroy", method: 'get', class: 'd-inline-block mb-2' do %>
+    <%= hidden_field_tag :from_confirm, value: '1' %>
+    <a class="btn btn-outline-secondary mr-1" href="/e/<%= @event.slug %>">No, keep my RSVP</a>
+    <button type="submit" class="btn btn-danger">Yes, cancel my RSVP</button>
+  <% end %>
+</div>

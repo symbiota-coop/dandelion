@@ -62,6 +62,7 @@ Dandelion::App.controller do
   end
 
   get '/tickets/:id/toggle_resale' do
+    sign_in_required!
     @ticket = Ticket.find(params[:id]) || not_found
     halt 403 unless @ticket.account == current_account
     @event = @ticket.event
@@ -70,12 +71,26 @@ Dandelion::App.controller do
     redirect back
   end
 
+  get '/orders/:id/confirm_destroy' do
+    sign_in_required!
+    @order = Order.find(params[:id]) || not_found
+    @event = @order.event
+    halt 403 unless @order.account == current_account
+    halt 403 unless @order.value.nil? || @order.value.zero?
+    erb :'orders/confirm_destroy'
+  end
+
   get '/orders/:id/destroy' do
+    sign_in_required!
     @order = Order.find(params[:id]) || not_found
     halt 403 unless @order.account == current_account
     halt 403 unless @order.value.nil? || @order.value.zero?
     @order.prevent_refund = true
     @order.destroy
-    redirect back
+    if params[:from_confirm].present?
+      redirect "/e/#{@order.event.slug}"
+    else
+      redirect back
+    end
   end
 end
