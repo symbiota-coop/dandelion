@@ -117,7 +117,7 @@ Dandelion::App.controller do
                   @events.and(featured: true)
                 else
                   carousel = Carousel.find(params[:carousel_id]) || not_found
-                  @events.and(:id.in => carousel.event_ids_for_tags)
+                  @events.and(:id.in => carousel.event_ids_cache)
                 end
     end
     if params[:discrepancy]
