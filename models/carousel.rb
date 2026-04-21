@@ -38,7 +38,7 @@ class Carousel
     return if event_tag_id.blank?
 
     carousel_ids = Carouselship.and(event_tag_id: event_tag_id).only(:carousel_id).pluck(:carousel_id).compact.uniq
-    Carousel.and(:id.in => carousel_ids).find_each(&:refresh_event_ids_cache!) if carousel_ids.any?
+    Carousel.and(:id.in => carousel_ids).each { |c| c.refresh_event_ids_cache! } if carousel_ids.any?
   end
 
   def self.event_ids_for_carousel_ids(carousel_ids)
