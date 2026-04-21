@@ -1,18 +1,21 @@
 class AtprotoClient
   API_URL = 'https://bsky.social/xrpc'.freeze
   PUBLIC_API_URL = 'https://public.api.bsky.app/xrpc'.freeze
-  TIMEOUT = 10
-  OPEN_TIMEOUT = 5
+  TIMEOUT = 60
+  OPEN_TIMEOUT = 10
 
   def initialize(handle: nil, app_password: nil)
     @handle = handle || ENV['ATPROTO_HANDLE']
     @app_password = app_password || ENV['ATPROTO_APP_PASSWORD']
     @session = nil
 
+    # max_interval caps Retry-After / exponential backoff sleeps (default is unbounded and can
+    # exceed Delayed::Worker.max_run_time when the API returns a large Retry-After).
     retry_options = {
       max: 3,
       interval: 1,
       backoff_factor: 2,
+      max_interval: TIMEOUT,
       methods: %i[get post put delete head options],
       exceptions: [Faraday::ServerError, Faraday::ConnectionFailed, Faraday::TimeoutError]
     }
