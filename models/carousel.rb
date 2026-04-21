@@ -33,6 +33,27 @@ class Carousel
     }[attr] || super
   end
 
+  def self.event_ids_for_carousel_ids(carousel_ids)
+    carousel_ids = Array(carousel_ids)
+    return [] if carousel_ids.empty?
+
+    match_on_carousels = Carouselship.and(:carousel_id.in => carousel_ids)
+    Carouselship.collection.aggregate([
+                                        { '$match' => match_on_carousels.selector },
+                                        { '$group' => { '_id' => '$event_tag_id' } },
+                                        {
+                                          '$lookup' => {
+                                            'from' => 'event_tagships',
+                                            'localField' => '_id',
+                                            'foreignField' => 'event_tag_id',
+                                            'as' => 'event_tagships'
+                                          }
+                                        },
+                                        { '$unwind' => '$event_tagships' },
+                                        { '$group' => { '_id' => '$event_tagships.event_id' } }
+                                      ]).map { |doc| doc['_id'] }
+  end
+
   has_many :carouselships, dependent: :destroy
 
   before_validation do

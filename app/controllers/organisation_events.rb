@@ -24,8 +24,7 @@ Dandelion::App.controller do
       @events = if params[:carousel_ids].include?('featured')
                   @events.and(featured: true)
                 else
-                  event_tags = EventTag.and(:id.in => Carouselship.and(:carousel_id.in => params[:carousel_ids]).pluck(:event_tag_id))
-                  @events.and(:id.in => EventTagship.and(:event_tag_id.in => event_tags.pluck(:id)).pluck(:event_id))
+                  @events.and(:id.in => Carousel.event_ids_for_carousel_ids(params[:carousel_ids]))
                 end
     end
     @events = apply_online_in_person_filter(@events)
