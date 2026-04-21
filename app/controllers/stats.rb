@@ -204,7 +204,7 @@ Dandelion::App.controller do
   end
 
   get '/stats/delivery' do
-    @period = params[:period].presence || '24'
+    @period = params[:period] || '24'
     @stats = MailgunDeliveryStats.fetch(period: @period)
     erb :'stats/delivery'
   end
