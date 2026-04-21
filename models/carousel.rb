@@ -55,22 +55,20 @@ class Carousel
   end
 
   has_many :carouselships, dependent: :destroy
+  has_many_through :event_tags, through: :carouselships
 
   before_validation do
     self.weeks = 8 unless weeks
   end
 
-  def event_tags
-    EventTag.and(:id.in => carouselships.pluck(:event_tag_id))
-  end
-
-  def event_tag_ids
-    carouselships.pluck(:event_tag_id)
+  def event_ids_for_tags
+    EventTagship.and(:event_tag_id.in => event_tag_ids).pluck(:event_id)
   end
 
   def events(minimal: false)
-    future_events = organisation.events_including_cohosted.live.publicly_visible.future_and_current.and(:start_time.lt => weeks.weeks.from_now).and(hide_from_carousels: false).and(has_image: true).and(:id.in => EventTagship.and(:event_tag_id.in => event_tag_ids).pluck(:event_id))
-    past_events = organisation.events_including_cohosted.live.publicly_visible.past.and(has_recording: true).and(hide_from_carousels: false).and(has_image: true).and(:id.in => EventTagship.and(:event_tag_id.in => event_tag_ids).pluck(:event_id))
+    eids = event_ids_for_tags
+    future_events = organisation.events_including_cohosted.live.publicly_visible.future_and_current.and(:start_time.lt => weeks.weeks.from_now).and(hide_from_carousels: false).and(has_image: true).and(:id.in => eids)
+    past_events = organisation.events_including_cohosted.live.publicly_visible.past.and(has_recording: true).and(hide_from_carousels: false).and(has_image: true).and(:id.in => eids)
 
     unless minimal
       future_events = future_events.and(minimal_only: false)
