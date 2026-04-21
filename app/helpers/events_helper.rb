@@ -5,7 +5,7 @@ Dandelion::App.helpers do
     event_tag_ids = []
     if params[:event_type]
       event_tag_ids = if (event_tag = EventTag.find_by(name: params[:event_type]))
-                        event_tag.event_tagships.pluck(:event_id)
+                        event_tag.event_ids
                       else
                         []
                       end

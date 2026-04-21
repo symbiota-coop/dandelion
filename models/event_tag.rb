@@ -15,6 +15,7 @@ class EventTag
   validates_uniqueness_of :name
 
   has_many :event_tagships, dependent: :destroy
+  has_many_through :events, through: :event_tagships
 
   before_validation do
     self.name = name.downcase if name

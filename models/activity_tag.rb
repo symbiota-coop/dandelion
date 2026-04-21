@@ -7,6 +7,8 @@ class ActivityTag
 
 
   has_many :activity_tagships, dependent: :destroy
+  has_many_through :activities, through: :activity_tagships
+
   has_many :pmails_as_mailable, class_name: 'Pmail', as: :mailable, dependent: :destroy
 
   validates_uniqueness_of :name
@@ -16,7 +18,7 @@ class ActivityTag
   end
 
   def subscribed_members
-    Account.and(:id.in => Activityship.and(:activity_id.in => activity_tagships.pluck(:activity_id)).and(unsubscribed: false).pluck(:account_id))
+    Account.and(:id.in => Activityship.and(:activity_id.in => activity_ids).and(unsubscribed: false).pluck(:account_id))
   end
 
   before_validation do
