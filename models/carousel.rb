@@ -13,6 +13,7 @@ class Carousel
   field :o, type: Integer
   field :hidden, type: Boolean
   field :button, type: Boolean
+  field :event_ids_cache, type: Array
 
   validates_presence_of :name
 
@@ -33,25 +34,24 @@ class Carousel
     }[attr] || super
   end
 
+  def self.invalidate_event_ids_cache_for_event_tag_id(event_tag_id)
+    return if event_tag_id.blank?
+
+    carousel_ids = Carouselship.and(event_tag_id: event_tag_id).only(:carousel_id).pluck(:carousel_id).compact.uniq
+    Carousel.and(:id.in => carousel_ids).find_each(&:refresh_event_ids_cache!) if carousel_ids.any?
+  end
+
   def self.event_ids_for_carousel_ids(carousel_ids)
     carousel_ids = Array(carousel_ids)
     return [] if carousel_ids.empty?
 
-    match_on_carousels = Carouselship.and(:carousel_id.in => carousel_ids)
-    Carouselship.collection.aggregate([
-                                        { '$match' => match_on_carousels.selector },
-                                        { '$group' => { '_id' => '$event_tag_id' } },
-                                        {
-                                          '$lookup' => {
-                                            'from' => 'event_tagships',
-                                            'localField' => '_id',
-                                            'foreignField' => 'event_tag_id',
-                                            'as' => 'event_tagships'
-                                          }
-                                        },
-                                        { '$unwind' => '$event_tagships' },
-                                        { '$group' => { '_id' => '$event_tagships.event_id' } }
-                                      ]).map { |doc| doc['_id'] }
+    Carousel.and(:id.in => carousel_ids).only(:event_ids_cache).pluck(:event_ids_cache).flatten.compact.uniq
+  end
+
+  def refresh_event_ids_cache!
+    ids = event_ids_for_tags.uniq
+    set(event_ids_cache: ids)
+    ids
   end
 
   has_many :carouselships, dependent: :destroy
@@ -61,12 +61,14 @@ class Carousel
     self.weeks = 8 unless weeks
   end
 
+  after_create :refresh_event_ids_cache!
+
   def event_ids_for_tags
     EventTagship.and(:event_tag_id.in => event_tag_ids).pluck(:event_id)
   end
 
   def events(minimal: false)
-    eids = event_ids_for_tags
+    eids = event_ids_cache
     future_events = organisation.events_including_cohosted.live.publicly_visible.future_and_current.and(:start_time.lt => weeks.weeks.from_now).and(hide_from_carousels: false).and(has_image: true).and(:id.in => eids)
     past_events = organisation.events_including_cohosted.live.publicly_visible.past.and(has_recording: true).and(hide_from_carousels: false).and(has_image: true).and(:id.in => eids)
 
