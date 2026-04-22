@@ -312,6 +312,92 @@ class Account
     Array.new(length) { chars[rand(chars.size)] }.join
   end
 
+  def self.check_organisation_cache_sync(fix: false)
+    out_of_sync = []
+
+    # Single aggregation to compute expected caches for all accounts at once
+    expected_caches = Organisationship.collection.aggregate([
+                                                              {
+                                                                '$group' => {
+                                                                  '_id' => '$account_id',
+                                                                  'org_ids' => { '$push' => '$organisation_id' },
+                                                                  'public_ids' => {
+                                                                    '$push' => {
+                                                                      '$cond' => [{ '$ne' => ['$hide_membership', true] }, '$organisation_id', '$$REMOVE']
+                                                                    }
+                                                                  },
+                                                                  'subscribed_ids' => {
+                                                                    '$push' => {
+                                                                      '$cond' => [{ '$ne' => ['$unsubscribed', true] }, '$organisation_id', '$$REMOVE']
+                                                                    }
+                                                                  },
+                                                                  'unsubscribed_ids' => {
+                                                                    '$push' => {
+                                                                      '$cond' => [{ '$eq' => ['$unsubscribed', true] }, '$organisation_id', '$$REMOVE']
+                                                                    }
+                                                                  }
+                                                                }
+                                                              }
+                                                            ]).to_a.to_h { |doc| [doc['_id'], doc] }
+
+    # Get accounts that either have organisationships OR have stale cache fields
+    account_ids_with_caches = Account.or(
+      { :organisation_ids_cache.ne => nil },
+      { :organisation_ids_public_cache.ne => nil },
+      { :subscribed_organisation_ids_cache.ne => nil },
+      { :unsubscribed_organisation_ids_cache.ne => nil }
+    ).pluck(:id)
+
+    relevant_account_ids = (expected_caches.keys + account_ids_with_caches).uniq
+
+    # Process in batches of 1000
+    relevant_account_ids.each_slice(1000) do |batch_ids|
+      Account.in(id: batch_ids).each do |account|
+        expected = expected_caches[account.id] || {}
+
+        expected_org_ids = (expected['org_ids'] || []).map(&:to_s).sort
+        expected_public_ids = (expected['public_ids'] || []).map(&:to_s).sort
+        expected_subscribed_ids = (expected['subscribed_ids'] || []).map(&:to_s).sort
+        expected_unsubscribed_ids = (expected['unsubscribed_ids'] || []).map(&:to_s).sort
+
+        current_org_ids = (account.organisation_ids_cache || []).map(&:to_s).sort
+        current_public_ids = (account.organisation_ids_public_cache || []).map(&:to_s).sort
+        current_subscribed_ids = (account.subscribed_organisation_ids_cache || []).map(&:to_s).sort
+        current_unsubscribed_ids = (account.unsubscribed_organisation_ids_cache || []).map(&:to_s).sort
+
+        mismatches = []
+        mismatches << 'organisation_ids_cache' if current_org_ids != expected_org_ids
+        mismatches << 'organisation_ids_public_cache' if current_public_ids != expected_public_ids
+        mismatches << 'subscribed_organisation_ids_cache' if current_subscribed_ids != expected_subscribed_ids
+        mismatches << 'unsubscribed_organisation_ids_cache' if current_unsubscribed_ids != expected_unsubscribed_ids
+
+        next if mismatches.empty?
+
+        out_of_sync << {
+          account: account,
+          mismatches: mismatches,
+          details: {
+            organisation_ids_cache: { current: current_org_ids, expected: expected_org_ids },
+            organisation_ids_public_cache: { current: current_public_ids, expected: expected_public_ids },
+            subscribed_organisation_ids_cache: { current: current_subscribed_ids, expected: expected_subscribed_ids },
+            unsubscribed_organisation_ids_cache: { current: current_unsubscribed_ids, expected: expected_unsubscribed_ids }
+          }
+        }
+
+        next unless fix
+
+        account.set(
+          organisation_ids_cache: expected_org_ids.map { |id| BSON::ObjectId.from_string(id) },
+          organisation_ids_public_cache: expected_public_ids.map { |id| BSON::ObjectId.from_string(id) },
+          subscribed_organisation_ids_cache: expected_subscribed_ids.map { |id| BSON::ObjectId.from_string(id) },
+          unsubscribed_organisation_ids_cache: expected_unsubscribed_ids.map { |id| BSON::ObjectId.from_string(id) }
+        )
+      end
+    end
+
+    out_of_sync
+  end
+
   private
 
   def encrypt_password

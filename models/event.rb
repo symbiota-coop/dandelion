@@ -416,4 +416,45 @@ class Event
 
     set(hidden_from_homepage: true) if name_forbidden || location_forbidden || (organisation && organisation.hide_from_homepage?)
   end
+
+  def self.check_cohosts_cache_sync(fix: false)
+    out_of_sync = []
+
+    # Aggregate cohostships to compute expected cache for each event
+    expected_caches = Cohostship.collection.aggregate([
+                                                        {
+                                                          '$group' => {
+                                                            '_id' => '$event_id',
+                                                            'cohost_ids' => { '$push' => '$organisation_id' }
+                                                          }
+                                                        }
+                                                      ]).to_a.to_h { |doc| [doc['_id'], doc['cohost_ids']] }
+
+    # Get events that either have cohostships OR have stale cache fields
+    event_ids_with_caches = Event.and(:cohosts_ids_cache.ne => nil).pluck(:id)
+
+    relevant_event_ids = (expected_caches.keys + event_ids_with_caches).uniq
+
+    # Process in batches of 1000
+    relevant_event_ids.each_slice(1000) do |batch_ids|
+      Event.unscoped.in(id: batch_ids).each do |event|
+        expected_ids = (expected_caches[event.id] || []).map(&:to_s).sort
+        current_ids = (event.cohosts_ids_cache || []).map(&:to_s).sort
+
+        next if current_ids == expected_ids
+
+        out_of_sync << {
+          event: event,
+          current: current_ids,
+          expected: expected_ids
+        }
+
+        next unless fix
+
+        event.set(cohosts_ids_cache: expected_ids.map { |id| BSON::ObjectId.from_string(id) })
+      end
+    end
+
+    out_of_sync
+  end
 end
