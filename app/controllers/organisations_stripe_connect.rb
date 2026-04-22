@@ -2,6 +2,10 @@ Dandelion::App.controller do
   get '/organisations/stripe_connect' do
     @organisation = Organisation.find(params[:state]) || not_found
     organisation_admins_only!
+    if params[:error]
+      flash[:error] = params[:error_description] || 'Stripe connection was cancelled'
+      redirect "/o/#{@organisation.slug}/edit?tab=payments"
+    end
     begin
       response = Faraday.new { |f| f.request :url_encoded }.post(
         'https://connect.stripe.com/oauth/token',
@@ -36,6 +40,10 @@ Dandelion::App.controller do
     sign_in_required!
     @organisation = Organisation.find_by(slug: params[:slug]) || not_found
     @organisationship = current_account.organisationships.find_by(organisation: @organisation) || current_account.organisationships.create(organisation: @organisation)
+    if params[:error]
+      flash[:error] = params[:error_description] || 'Stripe connection was cancelled'
+      redirect "/o/#{@organisation.slug}"
+    end
     begin
       response = Faraday.new { |f| f.request :url_encoded }.post(
         'https://connect.stripe.com/oauth/token',
