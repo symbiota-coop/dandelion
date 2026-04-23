@@ -177,6 +177,8 @@
                   <br />
                   Go to <code>Developers</code> > <code>Create</code> > <code>Webhook endpoint</code> and add
                   <span style="text-decoration: underline dotted"><%=ENV['BASE_URI']%>/o/<%= @organisation.slug %>/gocardless_webhook</span>
+                  <br />
+                  (We recommending leaving <code>Secret (optional)</code> blank then copying the auto-generated secret on the next screen)
                 </p>
                 <%= f.text_block :gocardless_access_token %>
                 <%= f.text_block :gocardless_endpoint_secret %>
