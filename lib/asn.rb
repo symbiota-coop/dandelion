@@ -1,6 +1,6 @@
 module Asn
   BASELINE_ASN = 2856
-  WINDOW_LENGTH = 6
+  WINDOW_LENGTH = 3
   THRESHOLD = 1
   TIMEZONE = 'Europe/Stockholm'
 
