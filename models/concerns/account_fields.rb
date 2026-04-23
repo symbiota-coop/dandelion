@@ -49,6 +49,7 @@ module AccountFields
     field :can_message, type: Mongoid::Boolean
     field :failed_sign_in_attempts, type: Integer
     field :minimal_head, type: String
+    field :theme_color, type: String
     field :stripe_subscription_id, type: String
     field :feedback_summary, type: String
     field :feedback_summary_last_refreshed_at, type: Time
