@@ -61,6 +61,7 @@ class TicketType
   after_save do
     if event
       event.refresh_sold_out_cache_and_notify_waitlist
+      event.set_browsable
     end
   end
   after_destroy do
@@ -68,6 +69,7 @@ class TicketType
       event.clear_cache
       event.set(sold_out_cache: event.sold_out?)
       event.set(sold_out_due_to_sales_end_cache: event.sold_out_due_to_sales_end?)
+      event.set_browsable
     end
   end
 
