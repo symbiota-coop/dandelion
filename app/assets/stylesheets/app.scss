@@ -342,6 +342,10 @@ table.dataTable.table-sm>thead>tr>th {
 
 .newsfeed-icon {
   font-size: 16px;
+  color: $color_primary;
+  background-color: $color_primary_transparent_1;
+  width: 2.25em;
+  height: 2.25em;
 }
 
 .newsfeed-icon .bi-ticket-detailed-fill {
@@ -742,7 +746,7 @@ img.private:hover {
 blockquote {
   margin-bottom: 1rem;
   font-size: 1rem;
-  border-left: 0.25rem solid rgba(0, 185, 99, 0.33) !important;
+  border-left: 0.25rem solid rgba(0, 175, 94, 0.33) !important;
   padding-left: 1rem;
   font-style: italic;
 }
@@ -1253,4 +1257,24 @@ label.remove-image input {
 .search-result-list>li {
   border-top: 0;
   border-bottom: 2px solid #ddd
+}
+
+
+.sidebar .nav>li.active>a,
+.sidebar .nav>li.active>a:hover,
+.sidebar .nav>li.active>a:focus,
+.sidebar.sidebar-inverse .nav>li.active>a,
+.sidebar.sidebar-inverse .nav>li.active>a:hover,
+.sidebar.sidebar-inverse .nav>li.active>a:focus,
+.media-list.media-stat .media .media-icon,
+.navbar .with-label:before,
+.navbar .navbar-brand i.navbar-logo,
+.widget.with-cover .widget-cover-bg,
+.pace .pace-progress,
+.bg-theme {
+  border-radius: 5px;
+}
+
+.sidebar .nav {
+  padding: 0 0.5em
 }

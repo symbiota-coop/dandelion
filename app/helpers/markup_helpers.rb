@@ -64,7 +64,7 @@ Dandelion::App.helpers do
     </div>).html_safe
   end
 
-  def quick_colors(count: 13, saturation_start: 80, saturation_end: 95, lightness: 50, primary: '#00B963')
+  def quick_colors(count: 13, saturation_start: 80, saturation_end: 95, lightness: 50, primary: '#00AF5E')
     step = 360.0 / count
     base_hue = Chroma.paint(primary).hsl.h.round
     colors = (0...count).map do |i|

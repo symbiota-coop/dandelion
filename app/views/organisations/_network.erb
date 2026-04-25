@@ -4,7 +4,7 @@
   node_width_scale = 20
   edge_min_opacity = 0.25
   edge_opacity_scale = 1000
-  color = '#00B963'
+  color = '#00AF5E'
 
   organisation_edges = OrganisationEdge.and(:mutual_followers.gte => Padrino.env == :development ? 1 : 10)
   organisations = Organisation.and(:id.in => organisation_edges.pluck(:source_id) + organisation_edges.pluck(:sink_id))

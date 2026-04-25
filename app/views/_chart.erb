@@ -66,13 +66,13 @@
         labels: <%== data.keys.to_json %>,
         datasets: [
           {
-            backgroundColor: 'rgba(0, 185, 99, 1)',
-            borderColor: 'rgba(0, 185, 99, 1)',
+            backgroundColor: 'rgba(0, 175, 94, 1)',
+            borderColor: 'rgba(0, 175, 94, 1)',
             data: <%== data.values.to_json %>
           },
           {
-            backgroundColor: 'rgba(0, 185, 99, 0.5)',
-            borderColor: 'rgba(0, 185, 99, 0.5)',
+            backgroundColor: 'rgba(0, 175, 94, 0.5)',
+            borderColor: 'rgba(0, 175, 94, 0.5)',
             data: <%== data.size.times.map { |i| i == data.size - 1 ? (defined?(projection) ? projection : nil) : nil }.to_json %>
           }
         ],

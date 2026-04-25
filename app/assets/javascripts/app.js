@@ -339,7 +339,7 @@ $(function () {
       const updateThemeCSS = () => {
         const hex = normalizeHex($input.val())
         const $oldLink = $('link[href^="/theme.css"]')
-        if (hex && hex !== '00b963') {
+        if (hex && hex !== '00af5e') {
           const href = '/theme.css?theme_color=' + encodeURIComponent('#' + hex)
           if ($oldLink.length && $oldLink.attr('href') === href) return
           const $newLink = $('<link>', { rel: 'stylesheet', href: href })

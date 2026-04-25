@@ -101,7 +101,7 @@ Dandelion::App.helpers do
   def theme_css_redundant?(color)
     hex = String(color).strip.downcase.delete_prefix('#')
     hex = "#{hex[0]}#{hex[0]}#{hex[1]}#{hex[1]}#{hex[2]}#{hex[2]}" if hex.length == 3
-    hex == '00b963'
+    hex == '00af5e'
   end
 
   def resolve_feedback_account!
