@@ -1,7 +1,7 @@
 module Asn
   BASELINE_ASN = 2856
-  WINDOW_LENGTH = 3
-  THRESHOLD = 1
+  WINDOW_LENGTH = 1
+  THRESHOLD = 2
   TIMEZONE = 'Europe/Stockholm'
 
   AUTOBLOCK_BOT_PCT_DEFAULT = 50
@@ -12,6 +12,7 @@ module Asn
 
   def self.autoblock_bot_threshold(country)
     return AUTOBLOCK_BOT_PCT_HIGH if AUTOBLOCK_BOT_PCT_HIGH_COUNTRIES.include?(country)
+
     AUTOBLOCK_BOT_PCT_LOW_COUNTRIES.include?(country) ? AUTOBLOCK_BOT_PCT_LOW : AUTOBLOCK_BOT_PCT_DEFAULT
   end
 
