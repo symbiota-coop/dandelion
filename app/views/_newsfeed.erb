@@ -29,7 +29,7 @@
               <% end %>
             <% end %>
             <br />
-            <span style="font-size: 11px" class="text-muted"><%= timeago(notification.created_at) %></span>
+            <span style="font-size: 90%" class="text-muted"><%= timeago(notification.created_at) %></span>
           </p>
           <% if notification.type == 'commented'; comment = notification.notifiable %>
             <div class="media ml-2 my-2">
