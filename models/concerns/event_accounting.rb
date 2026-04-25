@@ -52,8 +52,14 @@ module EventAccounting
     Money.new(fixed_contribution_gbp * 100, 'GBP')
   end
 
-  def contribution_gbp
-    if purchase_url.present? || ticket_types.empty?
+  def promotion_fee?
+    purchase_url.present? || ticket_types.empty?
+  end
+
+  def contribution_gbp(exclude_promotion_fee: false)
+    if promotion_fee?
+      return Money.new(0, 'GBP') if exclude_promotion_fee
+
       Money.new(Event.contribution_gbp_fallback * 100, 'GBP')
     elsif fixed_contribution
       fixed_contribution

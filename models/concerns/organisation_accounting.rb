@@ -15,12 +15,16 @@ module OrganisationAccounting
     !paid_up && (stripe_client_id || gocardless_instant_bank_pay)
   end
 
-  def contribution_requested
+  def contribution_requested(exclude_promotion_fees: false)
     c = Money.new(0, 'GBP')
     contributable_events.each do |event|
-      c += event.contribution_gbp
+      c += event.contribution_gbp(exclude_promotion_fee: exclude_promotion_fees)
     end
     c.exchange_to(FIAT_CURRENCIES.include?(currency) ? currency : ENV['DEFAULT_CURRENCY'])
+  end
+
+  def auto_topup_contribution_requested
+    contribution_requested(exclude_promotion_fees: true)
   end
 
   def contribution_paid
@@ -75,7 +79,8 @@ module OrganisationAccounting
 
     return unless stripe_customer_id
 
-    cr = contribution_requested
+    # Promotion-fee events still appear in contribution totals, but we do not auto-charge them
+    cr = auto_topup_contribution_requested
     cp = contribution_paid
     return if paid_up_by_contribution?(cr: cr, cp: cp)
 
