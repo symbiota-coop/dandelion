@@ -38,9 +38,11 @@ Please note that Mongo indexes are created directly in the database, and are not
 
 ## Tests
 
-Never run the full test suite.
+Always ask permission before running tests.
 
-Use the following command structure to test a single file:
+Never attempt to run the full test suite.
+
+You can use the following command structure to test a single file:
 
 `env -u BUNDLE_PATH foreman run -e .env.test bundle exec ruby -I test test/$1_test.rb`
 
