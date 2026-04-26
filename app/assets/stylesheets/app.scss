@@ -149,6 +149,10 @@ button,
   }
 }
 
+#sidebar {
+  z-index: 1025;
+}
+
 .ticket-type-description p {
   margin-bottom: 0;
 }
