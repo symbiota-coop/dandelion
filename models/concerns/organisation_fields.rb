@@ -84,7 +84,6 @@ module OrganisationFields
     field :event_image_required_height, type: Integer
     field :event_image_required_width, type: Integer
     field :restrict_cohosting, type: Mongoid::Boolean
-    field :editable_by_creator_only, type: Mongoid::Boolean
     field :psychedelic, type: Mongoid::Boolean
     field :hide_few_left, type: Mongoid::Boolean
     field :terms_and_conditions_url, type: String

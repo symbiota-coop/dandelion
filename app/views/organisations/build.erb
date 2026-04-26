@@ -89,23 +89,16 @@
   </div>
 <% end %>
 <% form_for @organisation, @organisation.new_record? ? '/o/new' : "/o/#{@edit_slug || @organisation.slug}/edit" do  |f| %>
-  <% sensitive_org_tabs = !@organisation.editable_by_creator_only? || admin? || creator?(@organisation) %>
   <% if @organisation.persisted? %>
     <div class="nav-wrapper">
       <ul id="organisation-build-nav" class="nav nav-tabs" role="tablist">
         <li role="presentation" class="nav-item"><a class="nav-link <%= 'active' if !params[:tab] || params[:tab] == 'basics'%>" href="#tab-basics" role="tab" data-toggle="tab">Basics</a></li>
-        <% if sensitive_org_tabs %>
-          <li role="presentation" class="nav-item"><a class="nav-link <%= 'active' if params[:tab] == 'payments'%>" href="#tab-payments" role="tab" data-toggle="tab">Payments</a></li>
-        <% end %>
+        <li role="presentation" class="nav-item"><a class="nav-link <%= 'active' if params[:tab] == 'payments'%>" href="#tab-payments" role="tab" data-toggle="tab">Payments</a></li>
         <li role="presentation" class="nav-item"><a class="nav-link <%= 'active' if params[:tab] == 'emails'%>" href="#tab-emails" role="tab" data-toggle="tab">Emails</a></li>
-        <% if sensitive_org_tabs %>
-          <li role="presentation" class="nav-item"><a class="nav-link <%= 'active' if params[:tab] == 'mailgun'%>" href="#tab-mailgun" role="tab" data-toggle="tab">Mailgun</a></li>
-        <% end %>
-        <% if sensitive_org_tabs %>
-          <li role="presentation" class="nav-item"><a class="nav-link <%= 'active' if params[:tab] == 'analytics'%>" href="#tab-analytics" role="tab" data-toggle="tab">Analytics</a></li>
-        <% end %>
+        <li role="presentation" class="nav-item"><a class="nav-link <%= 'active' if params[:tab] == 'mailgun'%>" href="#tab-mailgun" role="tab" data-toggle="tab">Mailgun</a></li>
+        <li role="presentation" class="nav-item"><a class="nav-link <%= 'active' if params[:tab] == 'analytics'%>" href="#tab-analytics" role="tab" data-toggle="tab">Analytics</a></li>
         <li role="presentation" class="nav-item"><a class="nav-link <%= 'active' if params[:tab] == 'everything-else'%>" href="#tab-everything-else" role="tab" data-toggle="tab">Everything else</a></li>
-        <% if (Padrino.env == :development || @organisation.experimental?) && sensitive_org_tabs %>
+        <% if Padrino.env == :development || @organisation.experimental? %>
           <li role="presentation" class="nav-item"><a class="nav-link <%= 'active' if params[:tab] == 'experimental'%>" href="#tab-experimental" role="tab" data-toggle="tab">Experimental</a></li>
         <% end %>
       </ul>
@@ -126,7 +119,6 @@
         <% end %>
       </div>
       <% if @organisation.persisted? %>
-        <% if sensitive_org_tabs %>
           <div role="tabpanel" class="tab-pane <%= 'active' if params[:tab] == 'payments'%>" id="tab-payments">
             <% if params[:created] %>
               <div class="alert alert-success">
@@ -198,7 +190,6 @@
               </div>
             </div>
           </div>
-        <% end %>
         <div role="tabpanel" class="tab-pane <%= 'active' if params[:tab] == 'emails'%>" id="tab-emails">
           <script>
             $(function() {
@@ -223,7 +214,6 @@
           <%= f.check_box_block :show_sign_in_link_in_ticket_emails %>
           <%= f.check_box_block :send_ticket_emails_from_organisation %>
         </div>
-        <% if sensitive_org_tabs %>
           <div role="tabpanel" class="tab-pane <%= 'active' if params[:tab] == 'mailgun'%>" id="tab-mailgun">
             <% if !@organisation.mailgun_enabled? %>
               <div class="alert alert-warning">
@@ -242,14 +232,11 @@
             <%= f.text_block :mailgun_domain %>
             <%= f.select_block :mailgun_region %>
           </div>
-        <% end %>
-        <% if sensitive_org_tabs %>
           <div role="tabpanel" class="tab-pane <%= 'active' if params[:tab] == 'analytics'%>" id="tab-analytics">
             <%= f.text_block :plausible_analytics_domain %>
             <%= f.text_block :simple_analytics_domain %>
             <%= f.text_block :facebook_pixel_id %>
           </div>
-        <% end %>
         <div role="tabpanel" class="tab-pane <%= 'active' if params[:tab] == 'everything-else'%>" id="tab-everything-else">
           <%= f.color_block :theme_color %>
           <%= partial :'quick_theme_colors', locals: { input_name: 'organisation[theme_color]' } %>
@@ -280,7 +267,7 @@
             <%= f.lookup_block :referrer_id, lookup_url: '/accounts.json', placeholder: 'Search accounts' %>
           <% end %>
         </div>
-        <% if (Padrino.env == :development || @organisation.experimental?) && sensitive_org_tabs %>
+        <% if Padrino.env == :development || @organisation.experimental? %>
           <div role="tabpanel" class="tab-pane <%= 'active' if params[:tab] == 'experimental'%>" id="tab-experimental">
             <%= f.text_block :stripe_pk %>
             <%= f.text_block :stripe_sk %>

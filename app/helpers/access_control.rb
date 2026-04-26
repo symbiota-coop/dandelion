@@ -22,20 +22,6 @@ Dandelion::App.helpers do
     end
   end
 
-  def creator?(createable, account = current_account)
-    account and createable.account and createable.account.id == account.id
-  end
-
-  def creator_only!(createable, notice: nil, redirect_url: nil)
-    return unless createable.respond_to?(:editable_by_creator_only?) && createable.editable_by_creator_only?
-    return if current_account && (admin? || creator?(createable))
-
-    opts = {}
-    opts[:notice] = notice if notice
-    opts[:redirect_url] = redirect_url if redirect_url
-    kick!(**opts)
-  end
-
   def admin?(account = current_account)
     account && account.admin?
   end
