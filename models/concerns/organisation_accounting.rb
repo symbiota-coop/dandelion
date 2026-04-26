@@ -12,7 +12,7 @@ module OrganisationAccounting
   def contribution_reminder
     return false if contribution_not_required
 
-    !paid_up && (stripe_client_id || gocardless_instant_bank_pay)
+    !paid_up && (stripe_client_id || gocardless_instant_bank_pay || oc_slug)
   end
 
   def contribution_requested(exclude_promotion_fees: false)

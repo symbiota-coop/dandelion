@@ -19,6 +19,8 @@
               Stripe Connect,
             <% elsif organisation.gocardless_instant_bank_pay %>
               GoCardless Instant Bank Pay,
+            <% elsif organisation.oc_slug %>
+              Open Collective,
             <% else %>
               a special payment feature,
             <% end %>
