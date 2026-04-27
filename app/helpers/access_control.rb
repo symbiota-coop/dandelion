@@ -44,10 +44,6 @@ Dandelion::App.helpers do
     Organisation.can_create_events_for_organisation?(organisation, account)
   end
 
-  def can_create_events_for_organisation_only!
-    kick! unless can_create_events_for_organisation?
-  end
-
   def organisation_monthly_donor_plus?(organisation = nil, account = current_account)
     organisation ||= @organisation
     Organisation.monthly_donor_plus?(organisation, account)
