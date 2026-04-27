@@ -17,6 +17,19 @@ Dandelion::App.controller do
     account = Account.find_by(phone: "+#{from_phone}")
     halt 200 unless account&.admin?
 
+    # Meta retries the webhook if we do not respond quickly; duplicate deliveries share the same wamid.
+    wamid = message['id']
+    if wamid.present? && ENV['REDIS_URL'].present?
+      @whatsapp_webhook_cache ||= ActiveSupport::Cache::RedisCacheStore.new(url: ENV['REDIS_URL'])
+      claimed = @whatsapp_webhook_cache.write(
+        "whatsapp/webhook/wamid/#{wamid}",
+        '1',
+        expires_in: 48.hours,
+        unless_exist: true
+      )
+      halt 200 unless claimed
+    end
+
     media_id = message['audio']['id']
 
     # get the media url
