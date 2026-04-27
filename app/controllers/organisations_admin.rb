@@ -210,6 +210,7 @@ Dandelion::App.controller do
       @organisationships = @organisationships.and(:account_id.nin => excluded_ids) if excluded_ids.any?
     end
     @organisationships = @organisationships.and(event_creator: true) if params[:event_creator]
+    @organisationships = @organisationships.and(admin: true) if params[:admin]
     case content_type
     when :html
       erb :'organisations/followers'
