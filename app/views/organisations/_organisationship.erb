@@ -56,7 +56,7 @@
     <% end %>
 
     <% if defined?(create_event) && create_event %>
-      <% if organisation_assistant? %>
+      <% if can_create_events_for_organisation? %>
         <a class="btn mb-1 btn-primary" href="/events/new?organisation_id=<%= @organisation.id %>">Create an event</a>
       <% elsif @organisation.allow_event_submissions %>
         <a class="btn mb-1 btn-primary" href="/events/new?organisation_id=<%= @organisation.id %>">Submit an event for review</a>

@@ -71,7 +71,7 @@ Dandelion::App.controller do
       end
     end
 
-    unless organisation_assistant?(@event.organisation) || @event.organisation.allow_event_submissions?
+    unless can_create_events_for_organisation?(@event.organisation) || @event.organisation.allow_event_submissions?
       flash[:error] = "You don't have permission to create events for this organisation"
       redirect '/events'
     end
@@ -107,7 +107,7 @@ Dandelion::App.controller do
         redirect '/events'
       end
     end
-    unless organisation_assistant?(@event.organisation) || @event.organisation.allow_event_submissions?
+    unless can_create_events_for_organisation?(@event.organisation) || @event.organisation.allow_event_submissions?
       flash[:error] = "You don't have permission to create events for this organisation"
       redirect '/events'
     end

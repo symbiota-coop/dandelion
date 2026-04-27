@@ -41,7 +41,7 @@
   </div>
 <% end %>
 
-<% if organisation_assistant? || @organisation.allow_event_submissions? || @organisation.events_including_cohosted.live.publicly_visible.future_and_current.exists? %>
+<% if can_create_events_for_organisation? || @organisation.allow_event_submissions? || @organisation.events_including_cohosted.live.publicly_visible.future_and_current.exists? %>
   <h2 class="mt-5">Events</h2>
   <div data-with-placeholder data-pagelet-url="/o/<%= @organisation.slug %>/events_block">
     <%= partial :'organisations/events_block_placeholder' %>

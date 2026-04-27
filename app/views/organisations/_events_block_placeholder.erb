@@ -1,7 +1,7 @@
 <a class="btn btn-primary mb-3" href="/o/<%= @organisation.slug %>/events">All events</a>
-<% if organisation_assistant? || @organisation.allow_event_submissions %>
+<% if can_create_events_for_organisation? || @organisation.allow_event_submissions %>
   <a class="btn btn-primary mb-3" href="/events/new?organisation_id=<%= @organisation.id %>">
-    <% if organisation_assistant? %>
+    <% if can_create_events_for_organisation? %>
       Create an event
     <% else %>
       Submit an event for review

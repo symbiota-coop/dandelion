@@ -60,14 +60,14 @@ class EventCreatorPermissionsTest < ActiveSupport::TestCase
     assert_includes ids, org.id
   end
 
-  # ─── Organisation.assistant? ───────────────────────────────────────────────
+  # ─── Organisation.can_create_events_for_organisation? ───────────────────────
 
-  test 'assistant? is true for account with event_creator on organisationship' do
+  test 'can_create_events_for_organisation? is true for account with event_creator on organisationship' do
     org_owner = FactoryBot.create(:account)
     org = FactoryBot.create(:organisation, account: org_owner)
     other = FactoryBot.create(:account)
     other.organisationships.create!(organisation: org, event_creator: true, unsubscribed: false)
-    assert Organisation.assistant?(org, other)
+    assert Organisation.can_create_events_for_organisation?(org, other)
   end
 
   # ─── Event validation (org-wide, no public submissions) ────────────────────

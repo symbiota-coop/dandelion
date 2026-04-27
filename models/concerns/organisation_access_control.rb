@@ -10,7 +10,7 @@ module OrganisationAccessControl
         )
     end
 
-    def assistant?(organisation, account)
+    def can_create_events_for_organisation?(organisation, account)
       return false unless account && organisation
 
       Organisation.admin?(organisation, account) ||
