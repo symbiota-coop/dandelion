@@ -5,8 +5,8 @@
 </div>
 <% if add_and_remove %>
   <div>
-    <a id="add-role" href="javascript:;" onclick="$(this).hide().next().show();
-        $('#remove-role').hide()"><i class="bi bi-plus-square-fill"></i></a>
+    <a class="add-role-toggle" href="javascript:;" onclick="$(this).hide().next().show();
+        $(this).siblings('.remove-role-toggle').hide()"><i class="bi bi-plus-square-fill"></i></a>
     <div style="display: none">
       <% form_for new_object, new_url, class: 'add-block bg-white shadow-sm p-3 mt-2 mb-3 rounded' do |f| %>
         <%= f.lookup_block :account_id, lookup_url: '/accounts.json', placeholder: 'Search accounts' %>
@@ -14,8 +14,8 @@
       <% end %>
     </div>
     <% if accounts.count > (defined?(min_accounts) ? min_accounts : 0) %>
-      <a id="remove-role" href="javascript:;" onclick="$(this).hide().next().show();
-        $('#add-role').hide()"><i class="bi bi-dash-square-fill"></i></a>
+      <a class="remove-role-toggle" href="javascript:;" onclick="$(this).hide().next().show();
+        $(this).siblings('.add-role-toggle').hide()"><i class="bi bi-dash-square-fill"></i></a>
       <div style="display: none">
         <% form_tag destroy_url, class: 'add-block bg-white shadow-sm p-3 mt-2 mb-3 rounded' do |f| %>
           <%= select_tag :account_id, options: accounts.map { |account| ["#{account.name} (#{account.username})", account.id] }, class: 'form-control mb-1' %>

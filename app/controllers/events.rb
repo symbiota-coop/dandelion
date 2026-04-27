@@ -64,11 +64,16 @@ Dandelion::App.controller do
       @event.organisation = @event.local_group.organisation
     end
     unless @event.organisation
-      if current_account.organisations.empty?
+      if current_account.organisations_for_creating_events.empty?
         redirect '/o/new'
       else
         redirect '/events'
       end
+    end
+
+    unless organisation_assistant?(@event.organisation) || @event.organisation.allow_event_submissions?
+      flash[:error] = "You don't have permission to create events for this organisation"
+      redirect '/events'
     end
 
     if Padrino.env == :production && !@event.organisation.stripe_client_id && @event.organisation.stripe_sk && !@event.organisation.stripe_connect_json
@@ -96,11 +101,15 @@ Dandelion::App.controller do
     @event = Event.new(mass_assigning(params[:event], Event))
     unless @event.organisation
       flash[:error] = 'There was an error saving the event'
-      if current_account.organisations.empty?
+      if current_account.organisations_for_creating_events.empty?
         redirect '/o/new'
       else
         redirect '/events'
       end
+    end
+    unless organisation_assistant?(@event.organisation) || @event.organisation.allow_event_submissions?
+      flash[:error] = "You don't have permission to create events for this organisation"
+      redirect '/events'
     end
     @event.account = current_account
     @event.last_saved_by = current_account

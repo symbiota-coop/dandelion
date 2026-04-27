@@ -36,6 +36,7 @@ module OrganisationAssociations
 
     with_options class_name: 'Account', through: :organisationships do
       has_many_through :admins, conditions: { admin: true }
+      has_many_through :event_creators, conditions: { event_creator: true }
       has_many_through :admins_receiving_feedback, conditions: { admin: true, receive_feedback: true }
       has_many_through :revenue_sharers, conditions: { :stripe_connect_json.ne => nil }
       has_many_through :monthly_donors, conditions: { :monthly_donation_method.ne => nil }

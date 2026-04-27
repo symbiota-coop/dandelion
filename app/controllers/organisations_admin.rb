@@ -135,7 +135,9 @@ Dandelion::App.controller do
     @organisation = Organisation.find_by(slug: params[:slug]) || not_found
     organisation_admins_only!
     @organisationship = @organisation.organisationships.find_by(account_id: params[:organisationship][:account_id]) || @organisation.organisationships.create(account_id: params[:organisationship][:account_id])
-    @organisationship.set(admin: true) if @organisationship.persisted?
+    if @organisationship.persisted?
+      @organisationship.set(admin: true, event_creator: false)
+    end
     redirect back
   end
 
@@ -207,6 +209,7 @@ Dandelion::App.controller do
       excluded_ids = Account.and(organisation_ids_cache: @organisation.id, unsubscribed: true).pluck(:id)
       @organisationships = @organisationships.and(:account_id.nin => excluded_ids) if excluded_ids.any?
     end
+    @organisationships = @organisationships.and(event_creator: true) if params[:event_creator]
     case content_type
     when :html
       erb :'organisations/followers'
@@ -312,6 +315,27 @@ Dandelion::App.controller do
     organisation_admins_only!
     @organisationship = @organisation.organisationships.find(params[:organisationship_id]) || not_found
     @organisationship.set_unsubscribed!(!params[:subscribed])
+    200
+  end
+
+  get '/o/:slug/event_creator/:organisationship_id' do
+    @organisation = Organisation.find_by(slug: params[:slug]) || not_found
+    organisation_admins_only!
+    @organisationship = @organisation.organisationships.find(params[:organisationship_id]) || not_found
+    partial :'organisations/event_creator', locals: { organisationship: @organisationship }
+  end
+
+  post '/o/:slug/event_creator/:organisationship_id' do
+    @organisation = Organisation.find_by(slug: params[:slug]) || not_found
+    organisation_admins_only!
+    @organisationship = @organisation.organisationships.find(params[:organisationship_id]) || not_found
+    unless Organisation.admin?(@organisation, @organisationship.account)
+      if params[:event_creator]
+        @organisationship.set(event_creator: true, admin: false)
+      else
+        @organisationship.set(event_creator: false)
+      end
+    end
     200
   end
 

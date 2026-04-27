@@ -1,0 +1,10 @@
+<% if Organisation.admin?(@organisation, organisationship.account) %>
+  <i class="bi bi-key-fill" title="Admin" data-toggle="tooltip"></i>
+<% else %>
+  <% form_tag "/o/#{@organisation.slug}/event_creator/#{organisationship.id}" do %>
+    <div class="switcher">
+      <%= check_box_tag :event_creator, id: "organisationship-event-creator-#{organisationship.id}", class: 'form-check-input', checked: organisationship.event_creator == true, onclick: '$(this.form).submit()' %>
+      <label for="<%= "organisationship-event-creator-#{organisationship.id}" %>"></label>
+    </div>
+  <% end %>
+<% end %>

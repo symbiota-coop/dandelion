@@ -8,7 +8,7 @@
         <a class="btn btn-primary" href="/accounts/new?list_an_event=1">List an event</a>
       </p>
     <% else %>
-      <% if current_account.organisations.empty? %>
+      <% if current_account.organisations_for_creating_events.empty? %>
         <p class="lead">
           Want to list an event? First you'll need to <a href="/o/new">create an organisation</a>
         </p>
@@ -18,7 +18,7 @@
         </p>
         <% form_tag '/events/new', style: 'display: none', method: :get, class: 'mb-3 form-inline' do %>
           <span class="mr-1">Create an event under</span>
-          <%= select_tag :organisation_id, onchange: "window.location = '/events/new?organisation_id=' + $(this).val()", class: 'form-control', options: ['']+current_account.organisations.order('name asc').map { |organisation| [organisation.name, organisation.id] } %>
+          <%= select_tag :organisation_id, onchange: "window.location = '/events/new?organisation_id=' + $(this).val()", class: 'form-control', options: ['']+current_account.organisations_for_creating_events.map { |organisation| [organisation.name, organisation.id] } %>
         <% end %>
       <% end %>
       <p><a href="/events/my">View your upcoming and past events</a></p>

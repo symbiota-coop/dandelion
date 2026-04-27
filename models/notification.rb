@@ -297,7 +297,7 @@ class Notification
     when :unscheduled_tactivity
       'bi-calendar-minus'
     when :made_admin
-      'bi-key'
+      'bi-key-fill'
     when :unadmined
       'bi-key'
     when :created_timetable

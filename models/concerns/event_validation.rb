@@ -38,9 +38,16 @@ module EventValidation
       end
 
       if new_record? && !duplicate
-        errors.add(:organisation, '- you are not an admin of this organisation') if !local_group && !activity && !Organisation.admin?(organisation, account) && !organisation&.allow_event_submissions
-        errors.add(:activity, '- you are not an admin of this activity') if activity && !Activity.admin?(activity, account)
-        errors.add(:local_group, '- you are not an admin of this local group') if local_group && !LocalGroup.admin?(local_group, account)
+        org_wide_ok = Organisation.admin?(organisation, account) || (organisation && account && organisation.organisationships.find_by(account: account, event_creator: true))
+        errors.add(:organisation, "- you don't have permission to create events for this organisation") if !local_group && !activity && !organisation&.allow_event_submissions && !org_wide_ok
+        if activity
+          activity_ok = Activity.admin?(activity, account) || (organisation && activity.organisation_id == organisation.id && org_wide_ok)
+          errors.add(:activity, "- you don't have permission to create events for this activity") unless activity_ok
+        end
+        if local_group
+          local_group_ok = LocalGroup.admin?(local_group, account) || (organisation && local_group.organisation_id == organisation.id && org_wide_ok)
+          errors.add(:local_group, "- you don't have permission to create events for this local group") unless local_group_ok
+        end
       end
 
       self.stripe_revenue_adjustment = 0 unless stripe_revenue_adjustment

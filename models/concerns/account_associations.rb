@@ -181,6 +181,16 @@ module AccountAssociations
     my_events.and(evergreen: false).past
   end
 
+  def organisations_for_creating_events
+    org_ids = organisations.pluck(:id)
+    org_ids += organisationships.and('$or' => [{ admin: true }, { event_creator: true }]).pluck(:organisation_id)
+    activity_ids = activityships.where(admin: true).pluck(:activity_id)
+    org_ids += activity_ids.empty? ? [] : Activity.where(:id.in => activity_ids).pluck(:organisation_id)
+    local_group_ids = local_groupships.where(admin: true).pluck(:local_group_id)
+    org_ids += local_group_ids.empty? ? [] : LocalGroup.where(:id.in => local_group_ids).pluck(:organisation_id)
+    Organisation.where(:id.in => org_ids.uniq).order('name asc')
+  end
+
   def associate_with_organisation!(organisation, options = {})
     organisation.organisationships.create(
       account: self,
