@@ -16,6 +16,7 @@ Bundler.require(:default, RACK_ENV)
 
 Mongoid.load!("#{PADRINO_ROOT}/config/mongoid.yml")
 Mongoid.raise_not_found_error = false
+Mongoid.autosave_saves_unchanged_documents = false
 
 Padrino.load!
 
@@ -29,7 +30,7 @@ Delayed::Worker.destroy_failed_jobs = false
 Money.default_currency = ENV['DEFAULT_CURRENCY']
 Money.default_bank = DandelionBank.new
 Money.locale_backend = :currency
-Money.rounding_mode = BigDecimal::ROUND_HALF_EVEN
+Money.rounding_mode = BigDecimal::ROUND_HALF_UP
 
 if Padrino.env == :production
   begin

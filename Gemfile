@@ -1,7 +1,7 @@
 source 'https://rubygems.org'
 
 ruby '3.4.7'
-gem 'activesupport', '>= 8.0.4.1'
+gem 'activesupport'
 gem 'irb'
 gem 'padrino'
 gem 'puma'
@@ -41,6 +41,7 @@ gem 'rubocop'
 group :test do
   gem 'capybara'
   gem 'cuprite'
+  gem 'minitest-mock'
   gem 'minitest-rg'
 end
 

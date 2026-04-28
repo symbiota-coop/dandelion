@@ -7,6 +7,7 @@ require 'capybara/dsl'
 require 'capybara/cuprite'
 require 'factory_bot'
 require 'minitest/autorun'
+require 'minitest/mock'
 require 'minitest/rg'
 
 Capybara.app = Padrino.application
