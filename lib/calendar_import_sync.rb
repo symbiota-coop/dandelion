@@ -77,6 +77,8 @@ class CalendarImportSync
     calendars = Icalendar::Calendar.parse(response.body)
     calendar_name = self.class.calendar_name_from_parsed_calendars(calendars)
 
+    @initial_calendar_import = !organisation.events.and(calendar_import_feed_url: normalized_feed_url).exists?
+
     created = 0
     updated = 0
     skipped = 0
@@ -147,7 +149,7 @@ class CalendarImportSync
     event.organisation = organisation
     event.account ||= sync_account
     event.last_saved_by = sync_account
-    event.prevent_notifications = true
+    event.prevent_notifications = true if @initial_calendar_import
 
     previous_theme_color = event.theme_color
 
