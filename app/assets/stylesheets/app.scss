@@ -150,7 +150,13 @@ button,
 }
 
 #sidebar {
-  z-index: 999;
+  z-index: 1021;
+}
+
+@media (min-width: 767px) {
+  #sidebar {
+    z-index: 999;
+  }
 }
 
 .ticket-type-description p {
