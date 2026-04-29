@@ -23,13 +23,13 @@
         <%= number_field_tag :donation_amount, id: 'donation_amount', class: 'form-control', style: 'width: 5em', value: params[:donation_amount]%>
         <%= hidden_field_tag :donation_via_modal, id: 'donation_via_modal', value: 0 %>
         <% if dandelion_suggested_min %>
-          <div class="modal fade" id="donation-cleared-modal" tabindex="-1" role="dialog" aria-labelledby="donation-cleared-modal-title" aria-hidden="true">
+          <div class="modal fade" id="donation-cleared-modal" tabindex="-1" role="dialog">
             <div class="modal-dialog" role="document">
               <div class="modal-content">
                 <div class="modal-header">
                   <h3 class="modal-title" id="donation-cleared-modal-title">Please will you include a <%= m dandelion_suggested_min, @event.currency %> donation?</h3>
-                  <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                    <span aria-hidden="true">&times;</span>
+                  <button type="button" class="close" data-dismiss="modal">
+                    <span>&times;</span>
                   </button>
                 </div>
                 <div class="modal-body">

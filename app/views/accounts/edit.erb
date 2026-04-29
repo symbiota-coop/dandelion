@@ -7,7 +7,7 @@
     <% if via %>
       <% %w{organisation activity local_group event}.each { |r| if instance_variable_get("@#{r}") %>
       <div class="alert alert-success d-flex align-items-start">
-        <i class="bi bi-stars mr-3 mt-1" style="font-size: 1.75rem; opacity: 0.85" aria-hidden="true"></i>
+        <i class="bi bi-stars mr-3 mt-1" style="font-size: 1.75rem; opacity: 0.85"></i>
         <div>
           <p class="lead mb-2">
             Thanks for your interest in <%= instance_variable_get("@#{r}").name %>!
@@ -21,7 +21,7 @@
     <% elsif @account.sign_ins_count == 1 %>
 
       <div class="alert alert-success d-flex align-items-start">
-        <i class="bi bi-stars mr-3 mt-1" style="font-size: 1.75rem; opacity: 0.85" aria-hidden="true"></i>
+        <i class="bi bi-stars mr-3 mt-1" style="font-size: 1.75rem; opacity: 0.85"></i>
         <div>
           <% if params[:sign_in_token] %>
             <p class="lead mb-2">
