@@ -27,6 +27,10 @@
         }
     });
 
+    $('#gathering-build-nav a[data-toggle="tab"]').on('shown.bs.tab', function () {
+      window.scrollTo(0, 0)
+    })
+
   <% if @gathering.new_record? %>
       $('.tab-pane').each(function () {
         var tabPane = this

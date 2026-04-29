@@ -77,6 +77,10 @@
         }
     });
 
+    $('#organisation-build-nav a[data-toggle="tab"]').on('shown.bs.tab', function () {
+      window.scrollTo(0, 0)
+    })
+
   })
 </script>
 <% if @organisation.errors.exists? %>

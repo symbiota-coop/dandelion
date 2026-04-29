@@ -129,6 +129,10 @@ $(function () {
     }
   })
 
+  $('#event-build-nav a[data-toggle="tab"]').on('shown.bs.tab', function () {
+    window.scrollTo(0, 0)
+  })
+
   // Evergreen toggle
   $('#event_evergreen').change(function () {
     if ($(this).is(':checked')) {
