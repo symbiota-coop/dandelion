@@ -9,8 +9,14 @@ module EventAccessControl
         account.admin? ||
           (event.activity && Activity.admin?(event.activity, account)) ||
           (event.local_group && LocalGroup.admin?(event.local_group, account)) ||
-          (event.organisation && Organisation.admin?(event.organisation, account)) ||
-          event.cohosts.any? { |cohost| Organisation.admin?(cohost, account) }
+          (event.organisation && (
+            Organisation.admin?(event.organisation, account) ||
+              event.organisation.organisationships.find_by(account: account, event_creator: true)
+          )) ||
+          event.cohosts.any? { |cohost|
+            Organisation.admin?(cohost, account) ||
+              cohost.organisationships.find_by(account: account, event_creator: true)
+          }
       )
     end
 
