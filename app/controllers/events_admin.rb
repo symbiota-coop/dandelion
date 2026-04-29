@@ -53,7 +53,7 @@ Dandelion::App.controller do
   get '/events/:id/stats_row' do
     @event = Event.unscoped.find(params[:id]) || not_found
     @organisation = Organisation.find(params[:organisation_id]) || not_found
-    event_admins_only!
+    event_admins_or_revenue_admins_only!
     cp(:'events/event_stats_row', locals: { event: @event, organisation: @organisation, event_revenue_admin: event_revenue_admin? }, event: @event, key: "/events/#{@event.id}/stats_row?timezone=#{@event.start_time&.strftime('%Z')}&organisation_id=#{@organisation.id}&event_revenue_admin=#{event_revenue_admin? ? 1 : 0}")
   end
 

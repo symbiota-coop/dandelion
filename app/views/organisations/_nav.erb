@@ -2,11 +2,12 @@
   <link href="/theme.css?theme_color=<%=CGI.escape(organisation.theme_color)%>" rel="stylesheet">
 <% end %>
 
-<% if organisation.persisted? && organisation_admin?(organisation) %>
-  <% unless defined?(inline) %>
-    <%== '<div class="mb-3">' %>
-  <% end %>
-  <%= dropdown_nav [
+<% if organisation.persisted? %>
+  <% if organisation_admin?(organisation) %>
+    <% unless defined?(inline) %>
+      <%== '<div class="mb-3">' %>
+    <% end %>
+    <%= dropdown_nav [
         ['<i class="bi bi-flag-fill"></i> View organisation', "/o/#{organisation.slug}"],
         ['<i class="bi bi-gear-fill"></i>  Settings', "/o/#{organisation.slug}/edit"],
         [%(<i class="bi bi-people-fill"></i> Followers <span class="badge badge-primary">#{organisation.organisationships.count}</span>), "/o/#{organisation.slug}/followers"],
@@ -32,7 +33,22 @@
         [],
         ['Delete organisation', "/o/#{organisation.slug}/delete"]
       ].compact, button_text: %(#{organisation.name} <i class="bi bi-caret-down-fill"></i>), container_class: 'btn-group mb-1' %>
-  <% unless defined?(inline) %>
-    <%== '</div>' %>
+    <% unless defined?(inline) %>
+      <%== '</div>' %>
+    <% end %>
+  <% elsif can_create_events_for_organisation?(organisation) %>
+    <% unless defined?(inline) %>
+      <%== '<div class="mb-3">' %>
+    <% end %>
+    <%= dropdown_nav [
+        ['<i class="bi bi-flag-fill"></i> View organisation', "/o/#{organisation.slug}"],
+        [],
+        ['<i class="bi bi-calendar-event"></i>  Events', "/o/#{organisation.slug}/events"],
+        ['<i class="bi bi-bar-chart-line-fill"></i> Event stats', "/o/#{organisation.slug}/events/stats"],
+        ['<i class="bi bi-plus-square-fill"></i>  Create an event', "/events/new?organisation_id=#{organisation.id}"]
+      ].compact, button_text: %(#{organisation.name} <i class="bi bi-caret-down-fill"></i>), container_class: 'btn-group mb-1' %>
+    <% unless defined?(inline) %>
+      <%== '</div>' %>
+    <% end %>
   <% end %>
 <% end %>

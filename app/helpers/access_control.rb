@@ -44,6 +44,10 @@ Dandelion::App.helpers do
     Organisation.can_create_events_for_organisation?(organisation, account)
   end
 
+  def can_create_events_for_organisation_only!
+    kick!(redirect_url: "/o/#{@organisation.slug}") unless can_create_events_for_organisation?
+  end
+
   def organisation_monthly_donor_plus?(organisation = nil, account = current_account)
     organisation ||= @organisation
     Organisation.monthly_donor_plus?(organisation, account)
@@ -87,6 +91,10 @@ Dandelion::App.helpers do
 
   def event_revenue_admins_only!
     kick!(redirect_url: "/e/#{@event.slug}") unless event_revenue_admin?
+  end
+
+  def event_admins_or_revenue_admins_only!
+    kick!(redirect_url: "/e/#{@event.slug}") unless event_admin? || event_revenue_admin?
   end
 
   def event_email_viewer?(event = nil, account = current_account)
