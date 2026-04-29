@@ -5,13 +5,16 @@
 </style>
 
 <% if params[:new_org] && !params[:draft_id] %>
-  <div class="alert alert-success mt-3">
-    <p class="lead">
-      Now let's create an event under your new organisation.
-    </p>
-    <p class="mb-0">
-      Step through the tabs then click 'Create event'.
-    </p>
+  <div class="alert alert-success mt-3 d-flex align-items-start">
+    <i class="bi bi-calendar-event mr-3 mt-1" style="font-size: 1.75rem; opacity: 0.85" aria-hidden="true"></i>
+    <div>
+      <p class="lead mb-2">
+        Now let's create an event under your new organisation.
+      </p>
+      <p class="mb-0">
+        Step through the tabs then click 'Create event'.
+      </p>
+    </div>
   </div>
 <% end %>
 
