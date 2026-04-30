@@ -42,11 +42,9 @@ Always ask permission before running tests.
 
 Never attempt to run the full test suite.
 
-Use the following command structure to test a single file:
+IMPORTANT: Use the following command structure to test a single file:
 
 `env -u BUNDLE_PATH foreman run -e .env.test bundle exec ruby -I test test/$1_test.rb`
-
-IMPORTANT: Always use `env -u BUNDLE_PATH` and `-e .env.test`.
 
 On Codex, run this outside the sandbox.
 
