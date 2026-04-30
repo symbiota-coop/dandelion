@@ -250,6 +250,12 @@ $(function () {
           removeProviders: ['facebook', 'twitter', 'instagram', 'googleMaps', 'flickr']
         }
       }).then(editor => {
+        textarea.ckeditorInstance = editor
+        textarea.dispatchEvent(new CustomEvent('wysiwyg:ready', {
+          bubbles: true,
+          detail: { editor: editor }
+        }))
+
         editor.editing.view.document.on('clipboardInput', (evt, data) => {
           const content = data.dataTransfer.getData('text/html')
 

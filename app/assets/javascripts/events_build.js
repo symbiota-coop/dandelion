@@ -51,17 +51,26 @@ $(function () {
       }
     })
 
-    // Set CKEditor content
+    // Set CKEditor content when editors report readiness.
+    const hydratedEditors = new WeakSet()
+    const applyDraftToEditor = function (editorInstance) {
+      if (!editorInstance || hydratedEditors.has(editorInstance) || !editorInstance.sourceElement) return
+      const name = editorInstance.sourceElement.getAttribute('name')
+      if (!name) return
+      const match = name.match(/event\[(.+)\]/)
+      const key = match && match[1]
+      const html = key && draft[key]
+      if (!html) return
+      hydratedEditors.add(editorInstance)
+      editorInstance.setData(html)
+    }
     $(form).find('textarea.wysiwyg').each(function () {
-      const field = $(this)
-      const fieldName = field.attr('name')
-      if (fieldName) {
-        const match = fieldName.match(/event\[(.+)\]/)
-        if (match && draft[match[1]]) {
-          const editorInstance = field.next().find('[contenteditable]')[0].ckeditorInstance
-          editorInstance.setData(draft[match[1]])
-        }
-      }
+      applyDraftToEditor(this.ckeditorInstance)
+    })
+    $(form).on('wysiwyg:ready', function (event) {
+      const originalEvent = event.originalEvent
+      if (!originalEvent || !originalEvent.detail) return
+      applyDraftToEditor(originalEvent.detail.editor)
     })
   }
 

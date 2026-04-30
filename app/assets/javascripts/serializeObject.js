@@ -31,10 +31,12 @@ $.fn.serializeObject = function () {
   });
 
   // Handle CKEditor 5 fields (overwrite any existing value from hidden textarea)
-  this.find('.ck[contenteditable]').each(function () {
-    const editorInstance = this.ckeditorInstance;
-    const fieldName = editorInstance.sourceElement.getAttribute('name');
-    const data = editorInstance.getData();
+  this.find('textarea.wysiwyg').each(function () {
+    const editorInstance = this.ckeditorInstance
+    if (!editorInstance) return
+    const fieldName = this.getAttribute('name') || (editorInstance.sourceElement && editorInstance.sourceElement.getAttribute('name'))
+    if (!fieldName) return
+    const data = editorInstance.getData()
     // Parse the field name and set directly (overwriting, not appending)
     const keys = fieldName.replace(/\]/g, '').split('[')
     let current = o
@@ -46,7 +48,7 @@ $.fn.serializeObject = function () {
       current = current[key]
     }
     current[keys[keys.length - 1]] = data
-  });
+  })
 
   return o;
 };
