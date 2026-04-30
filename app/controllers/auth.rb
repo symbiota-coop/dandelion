@@ -5,6 +5,7 @@ Dandelion::App.controller do
   end
 
   get '/auth/failure' do
+    @body_class = 'gradient'
     flash.now[:error] = '<strong>Hmm.</strong> There was a problem signing you in.'
     erb :'accounts/sign_in'
   end
