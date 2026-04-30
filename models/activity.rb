@@ -36,7 +36,6 @@ class Activity
     %w[name]
   end
 
-
   def self.new_hints
     {
       locked: 'Make the activity visible to admins only',
@@ -96,12 +95,12 @@ class Activity
   validates_uniqueness_of :slug, scope: :organisation_id
   validates_format_of :slug, with: /\A[a-z0-9-]+\z/
 
-  def self.active
-    self.and(locked: false).and(:id.in => Event.future.pluck(:activity_id))
+  def self.with_upcoming_events
+    self.and(:id.in => Event.future.pluck(:activity_id).compact.uniq)
   end
 
-  def self.inactive
-    self.and(:id.in => Activity.and(locked: true).pluck(:id) + Activity.and(:id.nin => Event.future.pluck(:activity_id)).pluck(:id))
+  def self.without_upcoming_events
+    self.and(:id.nin => Event.future.pluck(:activity_id).compact.uniq)
   end
 
   def application_questions_a

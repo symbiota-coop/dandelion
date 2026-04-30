@@ -28,12 +28,19 @@
 <div class="mt-3">
   <%= will_paginate activities, page_links: false, renderer: WillPaginate::ViewHelpers::BootstrapRenderer %>
 </div>
+<% if @inactive_activities&.exists? %>
+  <a class="btn btn-secondary" href="javascript:;" onclick="$(this).hide().next().show()">Show <%= pluralize(@inactive_activities.count, 'inactive activity') %></a>
+  <div style="display: none">
+    <h3 class="mt-3">Inactive activities</h3>
+    <%= partial :'activities/blocks', locals: { activities: @inactive_activities.order('name asc') } %>
+  </div>
+<% end %>
 <% if organisation_admin? %>
-  <% if (hidden_activities = @organisation.activities.inactive.order('name asc')).exists? %>
-    <a class="btn btn-secondary" href="javascript:;" onclick="$(this).hide().next().show()">Show <%= pluralize(hidden_activities.count, 'hidden activity') %></a>
+  <% if (locked_activities = @organisation.activities.and(locked: true).order('name asc')).exists? %>
+    <a class="btn btn-secondary" href="javascript:;" onclick="$(this).hide().next().show()">Show <%= pluralize(locked_activities.count, 'locked activity') %></a>
     <div style="display: none">
-      <h3>Hidden activities</h3>
-      <%= partial :'activities/blocks', locals: { activities: hidden_activities } %>
+      <h3 class="mt-3">Locked activities</h3>
+      <%= partial :'activities/blocks', locals: { activities: locked_activities } %>
     </div>
   <% end %>
 <% end %>

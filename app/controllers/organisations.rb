@@ -30,7 +30,9 @@ Dandelion::App.controller do
     @activities = @activities.and(id: params[:id]) if params[:id]
     case content_type
     when :html
-      @activities = @activities.active
+      unlocked = @activities.and(locked: false)
+      @inactive_activities = unlocked.without_upcoming_events
+      @activities = unlocked.with_upcoming_events
       if request.xhr?
         partial :'organisations/activities'
       else

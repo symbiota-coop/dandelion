@@ -48,7 +48,7 @@
   </div>
 <% end %>
 
-<% if organisation_admin? || @organisation.activities.active.exists? %>
+<% if organisation_admin? || @organisation.activities.and(locked: false).exists? %>
   <h2 class="mt-5">Activities</h2>
   <div data-with-placeholder data-pagelet-url="/o/<%= @organisation.slug %>/activities">
     <%= partial :placeholder %>
