@@ -39,6 +39,12 @@ Dandelion::App.helpers do
     kick!(redirect_url: "/o/#{@organisation.slug}") unless organisation_admin?
   end
 
+  def organisation_admins_or_event_creators_only!
+    allowed = organisation_admin? ||
+      (current_account && @organisation.organisationships.find_by(account: current_account, event_creator: true))
+    kick!(redirect_url: "/o/#{@organisation.slug}") unless allowed
+  end
+
   def can_create_events_for_organisation?(organisation = nil, account = current_account)
     organisation ||= @organisation
     Organisation.can_create_events_for_organisation?(organisation, account)

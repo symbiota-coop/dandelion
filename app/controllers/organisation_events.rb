@@ -94,7 +94,7 @@ Dandelion::App.controller do
 
   get '/o/:slug/events/stats', provides: %i[html csv] do
     @organisation = Organisation.find_by(slug: params[:slug]) || not_found
-    can_create_events_for_organisation_only!
+    organisation_admins_or_event_creators_only!
     @from = params[:from] ? parse_date(params[:from]) : Date.today
     @to = params[:to] ? parse_date(params[:to]) : nil
     @start_or_end = (params[:start_or_end] == 'end' ? 'end' : 'start')
