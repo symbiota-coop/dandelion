@@ -32,6 +32,7 @@ module ErrorTracking
           config.environment = ENV['RACK_ENV'] || 'development'
           config.enabled_environments = sentry_enabled_environments
         end
+        require 'sentry-delayed_job'
       when :none
         # no-op
       else

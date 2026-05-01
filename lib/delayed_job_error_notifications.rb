@@ -31,7 +31,7 @@ module Delayed
   end
 end
 
-Delayed::Worker.plugins << Delayed::Plugins::ErrorTrackingNotifier
+Delayed::Worker.plugins << Delayed::Plugins::ErrorTrackingNotifier unless ErrorTracking.backend_name == :sentry
 
 class TestJob
   class TestJobError < StandardError; end

@@ -53,6 +53,7 @@ gem 'faraday-retry'
 gem 'ferrum', '~> 0.14.0' # scroll behaviour changed in 0.15
 gem 'honeybadger'
 gem 'sentry-ruby'
+gem 'sentry-delayed_job'
 gem 'jwt'
 gem 'maxmind-geoip2'
 gem 'mcp'
