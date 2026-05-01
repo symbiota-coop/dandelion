@@ -99,7 +99,7 @@ class CalendarImportSync
 
     { created: created, updated: updated, skipped: skipped, removed: removed, feed_url: normalized_feed_url, calendar_name: calendar_name }
   rescue StandardError => e
-    Honeybadger.notify(e, context: { organisation_id: organisation.id.to_s, calendar_import_url: feed_url }) unless e.is_a?(ConfigurationError)
+    ErrorReporting.capture_exception(e, context: { organisation_id: organisation.id.to_s, calendar_import_url: feed_url }) unless e.is_a?(ConfigurationError)
     { error: e.message, feed_url: feed_url }
   end
 

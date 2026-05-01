@@ -58,7 +58,7 @@ Dandelion::App.controller do
       @organisation.stripe_topup
       @organisation.update_paid_up_without_delay
     rescue StandardError => e
-      Honeybadger.notify(e, context: { payment_method: payment_method })
+      ErrorReporting.capture_exception(e, context: { payment_method_id: payment_method&.id })
     end
 
     redirect "/o/#{@organisation.slug}/contribute"

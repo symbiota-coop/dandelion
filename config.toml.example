@@ -1,16 +1,5 @@
-[mcp_servers.honeybadger]
-command = "docker"
-args = [
-  "run",
-  "-i",
-  "--rm",
-  "-e",
-  "HONEYBADGER_PERSONAL_AUTH_TOKEN",
-  "ghcr.io/honeybadger-io/honeybadger-mcp-server",
-]
-
-[mcp_servers.honeybadger.env]
-HONEYBADGER_PERSONAL_AUTH_TOKEN = "$HONEYBADGER_PERSONAL_AUTH_TOKEN"
+[mcp_servers.sentry]
+url = "https://mcp.sentry.dev/mcp"
 
 [mcp_servers.Dandelion]
 url = "https://dandelion.events/mcp"

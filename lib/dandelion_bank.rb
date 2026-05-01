@@ -44,7 +44,7 @@ class DandelionBank < Money::Bank::VariableExchange
   rescue Faraday::Error, JSON::ParserError => e
     raise unless @rates_updated_at
 
-    Honeybadger.notify(e)
+    ErrorReporting.capture_exception(e)
   end
 
   private
@@ -92,7 +92,7 @@ class DandelionBank < Money::Bank::VariableExchange
         rates['ETH'] = 1.0 / data.dig('ethereum', 'usd') if data.dig('ethereum', 'usd')&.positive?
       end
     rescue Faraday::Error, JSON::ParserError => e
-      Honeybadger.notify(e) unless rates.empty?
+      ErrorReporting.capture_exception(e) unless rates.empty?
     end
 
     rates

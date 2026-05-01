@@ -265,7 +265,7 @@ module Asn
     puts '[ASN autoblock] done'
   rescue StandardError => e
     puts "[ASN autoblock] error: #{e.class}: #{e.message}"
-    Honeybadger.notify(e)
+    ErrorReporting.capture_exception(e)
   end
 
   def self.notify_asn_blocked(asn, v)

@@ -254,8 +254,9 @@ Dandelion::App.controller do
     @order.destroy
     halt 400
   rescue StandardError => e
-    Honeybadger.context({ order_id: @order.id }) if @order
-    Honeybadger.notify(e)
+    ctx = {}
+    ctx[:order_id] = @order.id.to_s if @order
+    ErrorReporting.capture_exception(e, context: ctx.presence)
     @order.try(:destroy)
     halt 400
   end

@@ -21,7 +21,7 @@ class EmailReceiver < Incoming::Strategies::Mailgun
     begin
       html = Premailer.new(html, with_html_string: true, adapter: 'nokogiri', input_encoding: 'UTF-8').to_inline_css
     rescue StandardError => e
-      Honeybadger.notify(e)
+      ErrorReporting.capture_exception(e)
     end
 
     [/Reply above this line/, /On.+, .+ wrote:/].each do |pattern|

@@ -37,7 +37,7 @@ class Event
       COPY_FIELDS.each { |f| event.send("#{f}=", send(f)) }
       event.save!
     rescue StandardError => e
-      Honeybadger.notify(e)
+      ErrorReporting.capture_exception(e)
     end
   end
   handle_asynchronously :bulk_update_activity_events

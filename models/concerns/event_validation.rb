@@ -155,7 +155,7 @@ module EventValidation
       set(embedding: embedding)
     rescue StandardError => e
       retry if attempts < 3
-      Honeybadger.notify(e)
+      ErrorReporting.capture_exception(e)
     end
   end
 end

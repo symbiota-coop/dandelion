@@ -276,8 +276,7 @@ Dandelion::App.controller do
     begin
       raise msg
     rescue StandardError => e
-      Honeybadger.context({ detail: params[:detail] })
-      Honeybadger.notify(e)
+      ErrorReporting.capture_exception(e, context: { detail: params[:detail] })
     end
   end
 

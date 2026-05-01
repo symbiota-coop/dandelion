@@ -11,9 +11,7 @@ module Dandelion
     Sass::Plugin.options[:css_location] = Padrino.root('app', 'assets', 'stylesheets')
     use Sass::Plugin::Rack
 
-    use Honeybadger::Rack::UserFeedback
-    use Honeybadger::Rack::UserInformer
-    use Honeybadger::Rack::ErrorNotifier
+    use Sentry::Rack::CaptureExceptions
 
     use Rack::Session::Cookie, expire_after: 1.year.to_i, secret: ENV['SESSION_SECRET']
     use Rack::UTF8Sanitizer
@@ -67,15 +65,11 @@ module Dandelion
       @og_image = "#{ENV['BASE_URI']}/images/link.png"
       if current_account
         current_account.set(last_active: Time.now)
-        Honeybadger.context({
-                              user_id: current_account.id,
-                              user_email: current_account.email
-                            })
+        Sentry.set_user(id: current_account.id.to_s, email: current_account.email)
       end
     end
 
     error do
-      Honeybadger.notify(env['sinatra.error'])
       erb :error, layout: :application
     end
 

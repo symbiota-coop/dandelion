@@ -1,18 +1,8 @@
 {
   "mcpServers": {
-    "honeybadger": {
-      "command": "docker",
-      "args": [
-        "run",
-        "-i",
-        "--rm",
-        "-e",
-        "HONEYBADGER_PERSONAL_AUTH_TOKEN",
-        "ghcr.io/honeybadger-io/honeybadger-mcp-server"
-      ],
-      "env": {
-        "HONEYBADGER_PERSONAL_AUTH_TOKEN": "$HONEYBADGER_PERSONAL_AUTH_TOKEN"
-      }
+    "sentry": {
+      "type": "http",
+      "url": "https://mcp.sentry.dev/mcp"
     },
     "Dandelion": {
       "type": "http",
