@@ -1,6 +1,6 @@
 module Delayed
   module Plugins
-    class HoneybadgerNotifier < Delayed::Plugin
+    class ErrorTrackingNotifier < Delayed::Plugin
       callbacks do |lifecycle|
         lifecycle.around(:invoke_job) do |job, *args, &block|
           block.call(job, *args)
@@ -22,8 +22,8 @@ module Delayed
           if handler.respond_to?(:method_name)
             job_info[:method_name] = handler.method_name
           end
-          Honeybadger.context(job_info)
-          Honeybadger.notify(e, component: 'delayed_job', action: job_info[:method_name] || handler.class.name)
+          ErrorTracking.context(job_info)
+          ErrorTracking.notify(e, component: 'delayed_job', action: job_info[:method_name] || handler.class.name)
           raise
         end
       end
@@ -31,7 +31,7 @@ module Delayed
   end
 end
 
-Delayed::Worker.plugins << Delayed::Plugins::HoneybadgerNotifier
+Delayed::Worker.plugins << Delayed::Plugins::ErrorTrackingNotifier
 
 class TestJob
   class TestJobError < StandardError; end

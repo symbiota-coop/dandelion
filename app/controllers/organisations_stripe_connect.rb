@@ -23,7 +23,7 @@ Dandelion::App.controller do
       @organisation.set(stripe_connect_json: stripe_connect_json, stripe_account_json: stripe_account_json)
       flash[:notice] = 'Connected!'
     rescue StandardError => e
-      Honeybadger.notify(e)
+      ErrorTracking.notify(e)
       flash[:error] = 'There was an error connecting your organisation'
     end
     redirect "/o/#{@organisation.slug}/edit?tab=payments"
@@ -61,7 +61,7 @@ Dandelion::App.controller do
       @organisationship.set(stripe_connect_json: stripe_connect_json, stripe_account_json: stripe_account_json)
       flash[:notice] = "Connected to #{@organisation.name}!"
     rescue StandardError => e
-      Honeybadger.notify(e)
+      ErrorTracking.notify(e)
       flash[:error] = 'There was an error connecting your account'
     end
     redirect "/o/#{@organisation.slug}"
@@ -95,8 +95,8 @@ Dandelion::App.controller do
           @order.restore_and_complete
           # raise Order::Restored
         rescue StandardError => e
-          Honeybadger.context({ event_id: event.id })
-          Honeybadger.notify(e)
+          ErrorTracking.context({ event_id: event.id })
+          ErrorTracking.notify(e)
           halt 200
         end
       else

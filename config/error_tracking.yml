@@ -1,0 +1,3 @@
+# backend: honeybadger | sentry | none
+# For Sentry, set SENTRY_DSN in the environment (and optional SENTRY_ENABLED_ENVIRONMENTS=production,staging)
+backend: honeybadger

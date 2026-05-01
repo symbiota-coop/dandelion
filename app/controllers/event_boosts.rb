@@ -60,7 +60,7 @@ Dandelion::App.controller do
 
     { session_id: session.id }.to_json
   rescue StandardError => e
-    Honeybadger.notify(e)
+    ErrorTracking.notify(e)
     @event_boost.destroy if @event_boost&.persisted? && @event_boost.session_id.blank? && !@event_boost.payment_completed?
     halt 400, { error: 'There was an error creating the boost.' }.to_json
   end
@@ -74,7 +74,7 @@ Dandelion::App.controller do
     begin
       stripe_event = Stripe::Webhook.construct_event(payload, sig_header, endpoint_secret)
     rescue Stripe::SignatureVerificationError => e
-      Honeybadger.notify(e)
+      ErrorTracking.notify(e)
       halt 200
     end
 

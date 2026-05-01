@@ -61,6 +61,6 @@ class Payment
                             de_account_id: account.id
                           } })
   rescue StandardError => e
-    Honeybadger.notify(e)
+    ErrorTracking.notify(e)
   end
 end

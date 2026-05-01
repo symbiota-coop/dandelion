@@ -34,6 +34,6 @@ module SignalMessaging
       }
     end
   rescue StandardError => e
-    Honeybadger.notify(e)
+    ErrorTracking.notify(e)
   end
 end

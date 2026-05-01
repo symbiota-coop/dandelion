@@ -151,7 +151,7 @@ module EventAtproto
 
     set(atproto_uri: result['uri']) if result['uri']
   rescue StandardError => e
-    Honeybadger.notify(e, context: { event_id: id.to_s, action: 'publish' })
+    ErrorTracking.notify(e, context: { event_id: id.to_s, action: 'publish' })
   end
 
   def update_atproto
@@ -174,7 +174,7 @@ module EventAtproto
 
     client.put_record(uri: atproto_uri, record: record)
   rescue StandardError => e
-    Honeybadger.notify(e, context: { event_id: id.to_s, action: 'update' })
+    ErrorTracking.notify(e, context: { event_id: id.to_s, action: 'update' })
   end
 
   def delete_atproto
@@ -186,7 +186,7 @@ module EventAtproto
     client.delete_record(uri: atproto_uri)
     set(atproto_uri: nil) unless destroyed?
   rescue StandardError => e
-    Honeybadger.notify(e, context: { event_id: id.to_s, action: 'delete' })
+    ErrorTracking.notify(e, context: { event_id: id.to_s, action: 'delete' })
   end
 
   # Sync this event to AT Protocol, determining the appropriate action
@@ -217,7 +217,7 @@ module EventAtproto
     update_atproto_without_delay unless dry_run
     { action: :updated }
   rescue StandardError => e
-    Honeybadger.notify(e, context: { event_id: id.to_s, action: 'sync' })
+    ErrorTracking.notify(e, context: { event_id: id.to_s, action: 'sync' })
     { action: :error, error: e.message }
   end
 

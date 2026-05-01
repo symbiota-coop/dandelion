@@ -253,9 +253,9 @@ class Order
                               metadata: metadata
                             })
     rescue Stripe::InvalidRequestError => e
-      Honeybadger.notify(e) unless e.message.include?('No such charge') || e.message.include?('No such transfer')
+      ErrorTracking.notify(e) unless e.message.include?('No such charge') || e.message.include?('No such transfer')
     rescue StandardError => e
-      Honeybadger.notify(e)
+      ErrorTracking.notify(e)
     end
   end
 

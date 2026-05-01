@@ -104,9 +104,9 @@ module OrganisationAccounting
       organisation_contribution.send_notification
     rescue Stripe::CardError => e
       send_insufficient_funds_topup_notification if e.message.to_s.downcase.include?('insufficient funds')
-      Honeybadger.notify(e, context: { organisation_slug: slug })
+      ErrorTracking.notify(e, context: { organisation_slug: slug })
     rescue StandardError => e
-      Honeybadger.notify(e, context: { organisation_slug: slug })
+      ErrorTracking.notify(e, context: { organisation_slug: slug })
     end
   end
 

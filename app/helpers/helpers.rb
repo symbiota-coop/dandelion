@@ -67,7 +67,7 @@ Dandelion::App.helpers do
   rescue MaxMind::GeoIP2::AddressNotFoundError
     Time.zone = ENV['DEFAULT_TIME_ZONE']
   rescue StandardError => e
-    Honeybadger.notify(e)
+    ErrorTracking.notify(e)
     Time.zone = ENV['DEFAULT_TIME_ZONE']
   end
 

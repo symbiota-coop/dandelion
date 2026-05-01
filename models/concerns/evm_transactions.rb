@@ -67,7 +67,7 @@ module EvmTransactions
           transactions << [token, amount]
         end
       rescue StandardError => e
-        Honeybadger.notify(e)
+        ErrorTracking.notify(e)
       end
 
       transactions

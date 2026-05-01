@@ -14,6 +14,9 @@ require 'active_support/security_utils'
 require 'will_paginate/array'
 Bundler.require(:default, RACK_ENV)
 
+require File.expand_path('../lib/error_tracking', __dir__)
+ErrorTracking.bootstrap!(root: PADRINO_ROOT)
+
 Mongoid.load!("#{PADRINO_ROOT}/config/mongoid.yml")
 Mongoid.raise_not_found_error = false
 Mongoid.autosave_saves_unchanged_documents = false
@@ -36,7 +39,7 @@ if Padrino.env == :production
   begin
     MaxMinder.download
   rescue StandardError => e
-    Honeybadger.notify(e)
+    ErrorTracking.notify(e)
   end
 end
 
