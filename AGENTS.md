@@ -58,28 +58,3 @@ Frontend dependencies:
 
 @app/views/layouts/_dependencies.erb
 @lib/frontend_dependencies.rb
-
-## Cursor Cloud specific instructions
-
-Ruby 3.4.7 is installed at `/usr/local/ruby-3.4.7/bin` and is on the PATH via `~/.bashrc`. The `foreman` gem is installed globally via `sudo gem install foreman` (not via bundler).
-
-Bundle path is configured locally (`vendor/bundle`) via `.bundle/config`. Use `env -u BUNDLE_PATH` prefix when running foreman commands to avoid path conflicts, as documented in the Tests section.
-
-### Starting services
-
-Before running the app or tests, start MongoDB and Redis:
-
-```
-sudo mkdir -p /data/db && sudo chown -R $(whoami) /data/db
-mongod --fork --logpath /tmp/mongod.log --dbpath /data/db
-sudo redis-server --daemonize yes
-```
-
-Then start the web server: `env -u BUNDLE_PATH foreman start -e .env web` (runs on port 3000).
-
-### Gotchas
-
-- The `/data/db` directory must be owned by the current user, not root. Use `sudo chown -R $(whoami) /data/db` if MongoDB fails with permission errors.
-- Google Maps API errors during `db:seed` are harmless — they occur because no `GOOGLE_MAPS_API_KEY` is set.
-- Tests use Capybara with Cuprite (headless Chrome). Chrome must be installed for tests to run.
-- The seeded login account is `maria@symbiota.coop` / `psilocybe-caerulescens` (from `.env.example`).
