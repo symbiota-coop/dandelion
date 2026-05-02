@@ -39,13 +39,6 @@ namespace :hourly do
   end
 end
 
-namespace :morning do
-  task errands: :environment do
-    puts 'star reminders'
-    Event.live.and(:start_time.gte => Date.tomorrow + 6, :start_time.lt => Date.tomorrow + 7).each { |event| event.send_star_reminders(:all) }
-  end
-end
-
 namespace :late do
   task errands: :environment do
     puts 'get Dandelion Daily'
@@ -86,6 +79,8 @@ namespace :late do
     Event.recommend
     puts 'mailgun delivery stats alert'
     MailgunDeliveryStats.check_and_notify
+    puts 'star reminders'
+    Event.live.and(:start_time.gte => Date.tomorrow + 6, :start_time.lt => Date.tomorrow + 7).each { |event| event.send_star_reminders(:all) }
     puts 'done!'
   end
 end
