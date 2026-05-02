@@ -1,5 +1,7 @@
 <% if event.theme_color && !theme_css_redundant?(event.theme_color) %>
   <link href="/theme.css?theme_color=<%=CGI.escape(event.theme_color)%>" rel="stylesheet">
+<% elsif event.organisation && !event.organisation.theme_background_color && event.organisation.theme_color && !theme_css_redundant?(event.organisation.theme_color) %>
+  <link href="/theme.css?theme_color=<%=CGI.escape(event.organisation.theme_color)%>" rel="stylesheet">
 <% end %>
 
 <% if event_admin? %>
