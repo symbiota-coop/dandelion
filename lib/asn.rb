@@ -10,6 +10,19 @@ module Asn
   AUTOBLOCK_BOT_PCT_HIGH = 75
   AUTOBLOCK_BOT_PCT_HIGH_COUNTRIES = %w[SE GB].freeze
 
+  AUTOBLOCK_SKIP_ASN_DESCRIPTIONS = [
+    'Amazon.com, Inc.',
+    'Facebook, Inc.',
+    'Microsoft Corporation',
+    'Google LLC'
+  ].freeze
+
+  def self.skip_autoblock_for_description?(description)
+    return false if description.nil? || description.to_s.strip.empty?
+
+    AUTOBLOCK_SKIP_ASN_DESCRIPTIONS.include?(description.to_s.strip)
+  end
+
   def self.autoblock_bot_threshold(country)
     return AUTOBLOCK_BOT_PCT_HIGH if AUTOBLOCK_BOT_PCT_HIGH_COUNTRIES.include?(country)
 
@@ -113,7 +126,12 @@ module Asn
       next window_start = window_end if window_start.hour < 6 || window_end > now
 
       baseline_count = by_asn.find { |r| r['asn'].to_s == BASELINE_ASN.to_s }&.dig('count') || 0
-      filtered = by_asn.select { |r| r['asn'].to_s != BASELINE_ASN.to_s && r['count'] > baseline_count * THRESHOLD && !legit_asns.include?(r['asn'].to_s) }.sort_by { |r| -r['count'] }
+      filtered = by_asn.select do |r|
+        r['asn'].to_s != BASELINE_ASN.to_s &&
+          r['count'] > baseline_count * THRESHOLD &&
+          !legit_asns.include?(r['asn'].to_s) &&
+          !skip_autoblock_for_description?(r['description'])
+      end.sort_by { |r| -r['count'] }
 
       windows << { start: window_start, end: window_end, baseline: baseline_count, asns: filtered } if filtered.any?
       window_start = window_end
@@ -212,17 +230,21 @@ module Asn
     candidates = windows.flat_map { |w| w[:asns].map { |r| r['asn'].to_s } }.uniq - blocked
 
     bot_pct = nil
-    asn_countries = nil
+    asn_details = nil
     [
       Thread.new { bot_pct = fetch_bot_classifications(candidates) },
-      Thread.new { asn_countries = fetch_asn_details(candidates)[:countries] }
+      Thread.new { asn_details = fetch_asn_details(candidates) }
     ].each(&:join)
+    asn_countries = asn_details[:countries]
+    asn_names = asn_details[:names]
 
     puts "[ASN autoblock] suspicious_windows=#{windows.size} candidate_asns=#{candidates.size} already_blocked=#{blocked.size}"
     puts "[ASN autoblock] candidates #{candidates.map { |a| "#{a} country=#{asn_countries[a] || 'unknown'}" }.join(', ')}"
     puts "[ASN autoblock] bot_classifications=#{bot_pct.size}"
     puts "[ASN autoblock] country_lookups=#{asn_countries.size}"
     to_block = bot_pct.select do |asn, v|
+      next false if skip_autoblock_for_description?(asn_names[asn])
+
       v[:bot] > autoblock_bot_threshold(asn_countries[asn])
     end
     if to_block.empty?
