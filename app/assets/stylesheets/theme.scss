@@ -199,6 +199,25 @@ p.action a:hover {
   accent-color: $theme-color;
 }
 
+input[type="checkbox"] {
+  accent-color: $theme-color;
+}
+
+.secret-ticket-checkbox:checked {
+  background: $theme-color;
+  border-color: $theme-color;
+}
+
+.secret-ticket-checkbox:focus {
+  border-color: #ced4da;
+  box-shadow: none;
+}
+
+.secret-ticket-checkbox:checked:focus {
+  border-color: $theme-color;
+  box-shadow: 0 0 0 0.2rem rgba($theme-color, 0.25);
+}
+
 // Bootstrap utility (e.g. comment reaction borders)
 .border-primary {
   border-color: $theme-color !important;

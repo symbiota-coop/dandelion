@@ -99,7 +99,7 @@
         <span class="input-group-text">Secret?</span>
       </div>
       <% secret_tooltip = 'Allow only people with the link to this ticket type to purchase' %>
-      <%= form_or_tag_field(form, :check_box, :hidden, value: '1', checked: false, onclick: "$(this).tooltip('hide')", 'data-toggle': 'tooltip', title: secret_tooltip, class: 'form-control', style: 'flex: 0 0 2.1rem; min-width: 2.1rem') %>
+      <%= form_or_tag_field(form, :check_box, :hidden, value: '1', checked: false, onclick: "$(this).tooltip('hide')", 'data-toggle': 'tooltip', title: secret_tooltip, class: 'form-control secret-ticket-checkbox') %>
       <% if form && form.object.hidden? %>
         <div class="input-group-append">
           <a target="_blank" data-toggle="tooltip" title="Link to secret ticket type" class="input-group-text text-dark" href="/events/<%= @event.id %>?ticket_type_id=<%= form.object.id %>"><i class="bi bi-box-arrow-up-right"></i></a>

@@ -1228,7 +1228,56 @@ p.action a:hover {
 }
 
 input[type="checkbox"] {
-  accent-color: #29A95B;
+  accent-color: $color_primary;
+}
+
+.secret-ticket-checkbox {
+  flex: 0 0 2.1rem !important;
+  min-width: 2.1rem;
+  max-width: 2.1rem;
+  margin: 0;
+  background: #fff;
+  border-color: #ced4da;
+  appearance: none;
+  -webkit-appearance: none;
+  position: relative;
+  display: inline-grid;
+  place-content: center;
+  cursor: pointer;
+  border-left: 0;
+  border-top-left-radius: 0;
+  border-bottom-left-radius: 0;
+}
+
+.secret-ticket-checkbox::after {
+  content: '';
+  width: 0.45rem;
+  height: 0.9rem;
+  border-right: 0.18rem solid #fff;
+  border-bottom: 0.18rem solid #fff;
+  transform: rotate(45deg) scale(0);
+  transform-origin: center;
+  transition: transform 0.12s ease-out;
+  margin-top: -0.06rem;
+}
+
+.secret-ticket-checkbox:checked {
+  background: $color_primary;
+  border-color: $color_primary;
+}
+
+.secret-ticket-checkbox:checked::after {
+  transform: rotate(45deg) scale(1);
+}
+
+.secret-ticket-checkbox:focus {
+  border-color: #ced4da;
+  box-shadow: none;
+}
+
+.secret-ticket-checkbox:checked:focus {
+  border-color: $color_primary;
+  box-shadow: 0 0 0 0.2rem rgba($color_primary, 0.25);
 }
 
 label.remove-file,
