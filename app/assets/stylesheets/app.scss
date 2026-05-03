@@ -707,6 +707,32 @@ div.wysiwyg img,
   max-width: 100%
 }
 
+// Event description images: full width of the text column on small viewports
+// CKEditor stores width on <figure class="image"> (inline style), not only on <img>
+@media (max-width: 767px) {
+
+  div.wysiwyg.readable figure.image,
+  #tab-description .ck-content figure.image {
+    width: 100% !important;
+    max-width: 100% !important;
+  }
+
+  div.wysiwyg.readable img,
+  #tab-description .ck-content img {
+    width: 100% !important;
+    height: auto;
+  }
+}
+
+// Event build (description tab): WYSIWYG editables match live .wysiwyg.readable typography beside admin sidebar.
+#tab-description .ck.ck-editor .ck.ck-editor__editable.ck-content {
+  font-family: $body_font_family !important;
+  letter-spacing: normal !important;
+  font-size: 1rem !important;
+  line-height: 1.5;
+  color: $body_text;
+}
+
 .ck-content .image {
   margin: 0 !important
 }
