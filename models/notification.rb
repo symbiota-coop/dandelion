@@ -169,12 +169,12 @@ class Notification
     when :mapplication_removed
       account = notifiable
       "<strong>#{account.name}</strong>'s application was deleted"
-    when :created_event
+    when :created_event, :updated_event
       event = notifiable
-      "<strong>#{event.organisation.name}</strong> created the event <strong>#{event.name}</strong>, #{event.concise_when_details(nil)}"
-    when :updated_event
-      event = notifiable
-      "<strong>#{event.organisation.name}</strong> updated the event <strong>#{event.name}</strong>, #{event.concise_when_details(nil)}"
+      verb = type.to_sym == :created_event ? 'created' : 'updated'
+      when_suffix = event.evergreen? ? nil : event.concise_when_details(nil)
+      suffix = when_suffix ? ", #{when_suffix}" : ''
+      "<strong>#{event.organisation.name}</strong> #{verb} the event <strong>#{event.name}</strong>#{suffix}"
     when :created_organisation
       organisation = notifiable
       if organisation.account
