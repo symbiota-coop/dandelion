@@ -29,6 +29,6 @@ FRONTEND_DEPENDENCIES = {
   },
   '/javascripts/' => {
     'ext' => 'ckeditor.js autosize.js countUp.umd.js jquery-deparam.js linkify.min.js linkify-jquery.min.js',
-    nil => 'pagelets.js jquery.lookup.js map.js currencySymbol.js serializeObject.js app.js'
+    nil => 'pagelets.js jquery.lookup.js map.js currencySymbol.js serializeObject.js cookie_consent.js app.js'
   }
 }

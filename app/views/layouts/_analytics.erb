@@ -1,10 +1,10 @@
 <% if @organisation && @organisation.plausible_analytics_domain %>
-  <script defer data-domain="<%= @organisation.plausible_analytics_domain %>" src="https://plausible.io/js/script.pageview-props.revenue.tagged-events.js"></script>
-  <script>
+  <script type="text/plain" data-cookie-category="analytics" defer data-domain="<%= @organisation.plausible_analytics_domain %>" src="https://plausible.io/js/script.pageview-props.revenue.tagged-events.js"></script>
+  <script type="text/plain" data-cookie-category="analytics">
     window.plausible = window.plausible || function() { (window.plausible.q = window.plausible.q || []).push(arguments) }
   </script>
   <% if @order && params[:success] %>
-    <script>
+    <script type="text/plain" data-cookie-category="analytics">
       plausible('Purchase', {
         props: {
           order_id: <%== @order.id.to_s.to_json %>
@@ -20,12 +20,12 @@
 
 
 <% if @organisation && @organisation.simple_analytics_domain %>
-  <script>
+  <script type="text/plain" data-cookie-category="analytics">
     window.sa_event=window.sa_event||function(){var a=[].slice.call(arguments);window.sa_event.q?window.sa_event.q.push(a):window.sa_event.q=[a]};
   </script>
-  <script async data-hostname="<%= @organisation.simple_analytics_domain %>" src="https://scripts.simpleanalyticscdn.com/latest.js"></script>
+  <script type="text/plain" data-cookie-category="analytics" async data-hostname="<%= @organisation.simple_analytics_domain %>" src="https://scripts.simpleanalyticscdn.com/latest.js"></script>
   <% if @order && params[:success] %>
-    <script>
+    <script type="text/plain" data-cookie-category="analytics">
       sa_event('purchase', {
           order_id: <%== @order.id.to_s.to_json %>,
           currency: <%== @order.currency.to_json %>,
@@ -37,7 +37,7 @@
 
 
 <% if (@organisation && @organisation.facebook_pixel_id) || (@event && @event.facebook_pixel_id) %>
-  <script>
+  <script type="text/plain" data-cookie-category="marketing">
     !function (f, b, e, v, n, t, s)
     {
       if (f.fbq)

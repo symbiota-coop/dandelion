@@ -1249,10 +1249,6 @@ p.action a:hover {
   font-size: 2em;
 }
 
-input[type="checkbox"] {
-  accent-color: $color_primary;
-}
-
 .secret-ticket-checkbox {
   flex: 0 0 2.1rem !important;
   min-width: 2.1rem;
@@ -1362,4 +1358,64 @@ label.remove-image input {
 
 .sidebar .nav {
   padding: 0 0.5em
+}
+
+.cookie-consent {
+  position: fixed;
+  right: 1rem;
+  bottom: 1rem;
+  left: 1rem;
+  z-index: 1100;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto auto;
+  gap: 1rem;
+  align-items: center;
+  max-width: 64rem;
+  margin: 0 auto;
+  padding: 1rem;
+  background: #fff;
+  border: 1px solid #d8dde3;
+  border-radius: 5px;
+  box-shadow: 0 0.5rem 1.5rem rgba(0, 0, 0, 0.16);
+}
+
+.cookie-consent h2 {
+  margin: 0 0 0.25rem;
+  font-size: 1rem;
+}
+
+.cookie-consent p {
+  margin: 0;
+}
+
+.cookie-consent__settings {
+  display: grid;
+  gap: 0.35rem;
+  white-space: nowrap;
+}
+
+.cookie-consent__settings label {
+  margin: 0;
+}
+
+.cookie-consent__actions {
+  display: flex;
+  gap: 0.5rem;
+  justify-content: flex-end;
+  flex-wrap: wrap;
+}
+
+@media (max-width: 767px) {
+  .cookie-consent {
+    grid-template-columns: 1fr;
+    align-items: stretch;
+  }
+
+  .cookie-consent__actions {
+    justify-content: stretch;
+  }
+
+  .cookie-consent__actions .btn {
+    flex: 1 1 auto;
+  }
 }
