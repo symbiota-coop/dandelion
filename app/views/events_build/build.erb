@@ -222,11 +222,19 @@
         <%= f.check_box_block :blank_price_for_free_tickets %>
       </div>
       <div role="tabpanel" class="tab-pane" id="tab-emails">
+        <div class="alert alert-success">
+          <p class="mb-0">
+            Leaving a field blank will mean the email uses the value from the <u><a target="_blank" href="/o/<%=@event.organisation.slug%>/edit?tab=emails">organisation's email settings</a></u> instead.
+          </p>
+        </div>
         <div>
           <%= f.text_block :ticket_email_title %>
           <%= f.wysiwyg_block :ticket_email_greeting %>
           <% if @event.persisted? %>
-            <p style="margin-top: -1rem"><a target="_blank" href="/events/<%=@event.id%>/ticket_email">Preview order confirmation email &rarr;</a></p>
+            <p style="margin-top: -1rem" class="text-muted">
+              No need to repeat information you already entered on the <code>Description and confirmation</code> tab; it will be included below this greeting.
+              <br />
+              <a target="_blank" href="/events/<%=@event.id%>/ticket_email">Preview order confirmation email &rarr;</a></p>
           <% end %>
         </div>
         <div class="mt-5">
