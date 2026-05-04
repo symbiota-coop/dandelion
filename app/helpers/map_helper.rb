@@ -89,20 +89,25 @@ Dandelion::App.helpers do
     points = points.only(:coordinates).and(coordinates: { '$geoWithin' => { '$box' => box } })
 
     points_count = points.count
+
+    point_hashes = []
+    if points_count <= MAP_POINTS_LIMIT
+      point_records = points.pluck(:id, :coordinates)
+
+      model_name = points.klass.to_s
+      point_hashes = point_records.map.with_index do |(id, coordinates), n|
+        {
+          model_name: model_name,
+          id: encrypt_map_id(model_name, id.to_s),
+          lat: coordinates[1],
+          lng: coordinates[0],
+          n: n
+        }
+      end
+    end
+
     {
-      points: if points_count > MAP_POINTS_LIMIT
-                []
-              else
-                points.map.with_index do |point, n|
-                  {
-                    model_name: point.class.to_s,
-                    id: encrypt_map_id(point.class.to_s, point.id.to_s),
-                    lat: point.lat,
-                    lng: point.lng,
-                    n: n
-                  }
-                end
-              end,
+      points: point_hashes,
       pointsCount: points_count
     }.to_json
   end
