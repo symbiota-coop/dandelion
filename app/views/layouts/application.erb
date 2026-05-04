@@ -67,7 +67,9 @@
     </div>
     <!-- END #page-container -->
 
-    <%= partial :'layouts/cookie_consent' %>
+    <% unless Padrino.env == :test %>
+      <%= partial :'layouts/cookie_consent' %>
+    <% end %>
 
     <div class="modal fade" tabindex="-1" role="dialog" id="modal">
       <div class="modal-dialog" role="document">

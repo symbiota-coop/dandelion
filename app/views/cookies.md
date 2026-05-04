@@ -8,7 +8,7 @@ This policy explains how Dandelion uses cookies and similar technologies. For mo
 
 We use necessary cookies to make Dandelion work and keep it secure. Optional analytics and marketing cookies are only used if you choose to allow them.
 
-You can change your choice at any time from <a href="#" class="cookie-consent-preferences">Consent preferences</a>.
+You can change your choice at any time from <a href="javascript:;" class="cookie-consent-preferences">Cookie preferences</a>.
 
 ## Necessary Cookies
 
