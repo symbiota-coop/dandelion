@@ -184,7 +184,9 @@ module Searchable
           span&.set_data('search.vector_enabled', !!query_vector)
           span&.set_data('search.pipeline', query_vector ? 'rank_fusion' : 'text')
 
-          collection.aggregate(pipeline)
+          collection.aggregate(pipeline).to_a.tap do |documents|
+            span&.set_data('search.result_count', documents.length)
+          end
         end
 
         if build_records
