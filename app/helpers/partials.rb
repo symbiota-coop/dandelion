@@ -1,6 +1,6 @@
 Dandelion::App.helpers do
   def partial(*args)
-    if admin?
+    if admin? || request.path == '/search'
       partial_name = args.first.to_s
       Sentry.with_child_span(op: 'template.partial', description: partial_name) do |span|
         span&.set_data('partial.name', partial_name)
