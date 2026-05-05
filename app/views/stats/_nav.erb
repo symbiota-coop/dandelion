@@ -29,6 +29,7 @@
   </li>
 <% end %>
 <% [
+  ['Sentry', ENV['NAV_SENTRY_URL'], 'lightning-fill'],
   ['MongoDB', ENV['NAV_MONGODB_URL'], 'database'],
   ['Cloudflare', ENV['NAV_CLOUDFLARE_URL'], 'cloud'],
   ['Mailgun', 'https://app.eu.mailgun.com/mg/sending/domains', 'envelope-fill'],
