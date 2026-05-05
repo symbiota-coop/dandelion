@@ -319,7 +319,7 @@ class Order
     default_logo = "#{Padrino.root}/app/assets/images/logos/black-on-transparent-trim.png"
     return default_logo unless event.organisation.send_ticket_emails_from_organisation && event.organisation.image
 
-    event.organisation.image.thumb('1920x1920').file
+    event.organisation.image.file
   end
 
   def create_order_notification
