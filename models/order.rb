@@ -160,7 +160,7 @@ class Order
     create_order_notification
   end
 
-  def description_elements
+  def description_elements(include_donations: true)
     d = []
     TicketType.and(:id.in => tickets.pluck(:ticket_type_id)).each do |ticket_type|
       d << "#{"#{ticket_type.name} " if ticket_type}#{Money.new(ticket_type.price * 100, currency).format(no_cents_if_whole: true) if ticket_type.price}x#{tickets.and(ticket_type: ticket_type).count}"
@@ -169,8 +169,10 @@ class Order
     d << "#{percentage_discount}% discount" if percentage_discount
     d << "#{percentage_discount_monthly_donor}% discount" if percentage_discount_monthly_donor
 
-    donations.each do |donation|
-      d << "#{Money.new(donation.amount * 100, currency).format(no_cents_if_whole: true)} donation #{'to Dandelion' if application_fee_paid_to_dandelion}"
+    if include_donations
+      donations.each do |donation|
+        d << "#{Money.new(donation.amount * 100, currency).format(no_cents_if_whole: true)} donation #{'to Dandelion' if application_fee_paid_to_dandelion}"
+      end
     end
 
     d << "#{Money.new(credit_applied * 100, currency).format(no_cents_if_whole: true)} credit applied" if credit_applied
@@ -180,8 +182,8 @@ class Order
     d
   end
 
-  def description
-    d = description_elements
+  def description(include_donations: true)
+    d = description_elements(include_donations: include_donations)
     text = event.organisation.use_event_slugs_in_order_descriptions ? "#{event.slug}, " : "#{event.name}, "
     text + "#{event.when_details(account.try(:time_zone))}#{" at #{event.location}" if event.location != 'Online'}#{": #{d.join(', ')}" unless d.empty?}"
   end

@@ -7,6 +7,7 @@ class EventPaymentMethod
       cohost = ticket_form[:cohost] && Organisation.find_by(slug: ticket_form[:cohost])
       event_image = event.image_source(cohost)&.image&.thumb('1920x1920')
       revenue_sharer_organisationship = event.revenue_sharer_organisationship
+      tax_rate_id = event.tax_rate_id || event.organisation.tax_rate_id
 
       stripe_session_hash = {
         customer_email: account.email,
@@ -14,15 +15,7 @@ class EventPaymentMethod
         cancel_url: URI::DEFAULT_PARSER.escape("#{ENV['BASE_URI']}/e/#{event.slug}?cancelled=true"),
         metadata: order.metadata,
         billing_address_collection: event.organisation.billing_address_collection? ? 'required' : nil,
-        line_items: [{
-          name: event.name,
-          description: order.description,
-          images: [event_image.try(:url)].compact,
-          amount: (order.total * 100).round,
-          currency: order.currency,
-          quantity: 1,
-          tax_rates: event.tax_rate_id || event.organisation.tax_rate_id ? [event.tax_rate_id || event.organisation.tax_rate_id] : nil
-        }]
+        line_items: line_items(order: order, event: event, event_image: event_image, tax_rate_id: tax_rate_id)
       }
 
       payment_intent_data = { description: order.description, metadata: order.metadata }
@@ -60,6 +53,40 @@ class EventPaymentMethod
       end
 
       { session_id: session.id }.to_json
+    end
+
+    def self.line_items(order:, event:, event_image:, tax_rate_id:)
+      total_cents = (order.total * 100).round
+      untaxed_donation_cents = if tax_rate_id
+                                 [order.donation_revenue.cents, total_cents].min
+                               else
+                                 0
+                               end
+      ticket_cents = total_cents - untaxed_donation_cents
+
+      items = []
+      if ticket_cents.positive?
+        items << {
+          name: event.name,
+          description: order.description(include_donations: !untaxed_donation_cents.positive?),
+          images: [event_image.try(:url)].compact,
+          amount: ticket_cents,
+          currency: order.currency,
+          quantity: 1,
+          tax_rates: tax_rate_id ? [tax_rate_id] : nil
+        }
+      end
+
+      if untaxed_donation_cents.positive?
+        items << {
+          name: order.application_fee_paid_to_dandelion? ? 'Donation to Dandelion' : "Donation to #{event.organisation.name}",
+          amount: untaxed_donation_cents,
+          currency: order.currency,
+          quantity: 1
+        }
+      end
+
+      items
     end
   end
 end
