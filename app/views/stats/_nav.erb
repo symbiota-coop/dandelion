@@ -32,8 +32,7 @@
   ['Sentry', ENV['NAV_SENTRY_URL'], 'lightning-fill'],
   ['MongoDB', ENV['NAV_MONGODB_URL'], 'database'],
   ['Cloudflare', ENV['NAV_CLOUDFLARE_URL'], 'cloud'],
-  ['Mailgun', 'https://app.eu.mailgun.com/mg/sending/domains', 'envelope-fill'],
-  ['Logs', ENV['NAV_LOGS_URL'], 'terminal']
+  ['Mailgun', 'https://app.eu.mailgun.com/mg/sending/domains', 'envelope-fill']
 ].each do |title, url, icon| %>
   <li>
     <a href="<%= url %>" target="_blank" data-toggle="tooltip" title="<%= title %>" data-placement="right">
