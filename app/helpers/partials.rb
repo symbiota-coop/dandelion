@@ -1,11 +1,11 @@
 Dandelion::App.helpers do
   def partial(*args)
     if admin?
-      t0 = Process.clock_gettime(Process::CLOCK_MONOTONIC)
-      output = super
-      ms = ((Process.clock_gettime(Process::CLOCK_MONOTONIC) - t0) * 1000).round
-      Padrino.logger.info("[partial] #{args.first} #{ms}ms")
-      output
+      partial_name = args.first.to_s
+      Sentry.with_child_span(op: 'template.partial', description: partial_name) do |span|
+        span&.set_data('partial.name', partial_name)
+        super(*args)
+      end
     else
       super
     end
