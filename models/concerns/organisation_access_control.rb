@@ -13,10 +13,11 @@ module OrganisationAccessControl
     def can_create_events_for_organisation?(organisation, account)
       return false unless account && organisation
 
-      Organisation.admin?(organisation, account) ||
-        organisation.local_groups.any? { |local_group| LocalGroup.admin?(local_group, account) } ||
-        organisation.activities.any? { |activity| Activity.admin?(activity, account) } ||
-        organisation.organisationships.find_by(account: account, event_creator: true)
+      return true if account.admin?
+
+      organisation.organisationships.and(account: account).and('$or' => [{ admin: true }, { event_creator: true }]).exists? ||
+        Activityship.and(account: account, admin: true, :activity_id.in => organisation.activities.pluck(:id)).exists? ||
+        LocalGroupship.and(account: account, admin: true, :local_group_id.in => organisation.local_groups.pluck(:id)).exists?
     end
 
     def monthly_donor_plus?(organisation, account)

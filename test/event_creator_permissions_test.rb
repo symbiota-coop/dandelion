@@ -70,6 +70,34 @@ class EventCreatorPermissionsTest < ActiveSupport::TestCase
     assert Organisation.can_create_events_for_organisation?(org, other)
   end
 
+  test 'can_create_events_for_organisation? is true for activity admin' do
+    org_owner = FactoryBot.create(:account)
+    org = FactoryBot.create(:organisation, account: org_owner, slug: "org-can-act-#{SecureRandom.hex(4)}")
+    activity = FactoryBot.create(:activity, organisation: org, account: org_owner, slug: "can-act-#{SecureRandom.hex(4)}")
+    other = FactoryBot.create(:account)
+    activity.activityships.create!(account: other, admin: true, unsubscribed: false)
+    assert Organisation.can_create_events_for_organisation?(org, other)
+  end
+
+  test 'can_create_events_for_organisation? is true for local group admin' do
+    org_owner = FactoryBot.create(:account)
+    org = FactoryBot.create(:organisation, account: org_owner, slug: "org-can-lg-#{SecureRandom.hex(4)}")
+    local_group = FactoryBot.create(:local_group, organisation: org, account: org_owner, slug: "can-lg-#{SecureRandom.hex(4)}")
+    other = FactoryBot.create(:account)
+    local_group.local_groupships.create!(account: other, admin: true, unsubscribed: false)
+    assert Organisation.can_create_events_for_organisation?(org, other)
+  end
+
+  test 'can_create_events_for_organisation? is false for unrelated activity admin' do
+    org_owner = FactoryBot.create(:account)
+    org = FactoryBot.create(:organisation, account: org_owner, slug: "org-can-no-#{SecureRandom.hex(4)}")
+    other_org = FactoryBot.create(:organisation, account: org_owner, slug: "other-org-can-no-#{SecureRandom.hex(4)}")
+    activity = FactoryBot.create(:activity, organisation: other_org, account: org_owner, slug: "other-act-can-no-#{SecureRandom.hex(4)}")
+    other = FactoryBot.create(:account)
+    activity.activityships.create!(account: other, admin: true, unsubscribed: false)
+    refute Organisation.can_create_events_for_organisation?(org, other)
+  end
+
   # ─── Event validation (org-wide, no public submissions) ────────────────────
 
   test 'event is valid for org-wide create when account has event_creator' do

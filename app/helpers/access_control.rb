@@ -32,7 +32,11 @@ Dandelion::App.helpers do
 
   def organisation_admin?(organisation = nil, account = current_account)
     organisation ||= @organisation
-    Organisation.admin?(organisation, account)
+    @organisation_admin_cache ||= {}
+    key = [organisation&.id&.to_s, account&.id&.to_s]
+    @organisation_admin_cache.fetch(key) do
+      @organisation_admin_cache[key] = Organisation.admin?(organisation, account)
+    end
   end
 
   def organisation_admins_only!
@@ -47,7 +51,11 @@ Dandelion::App.helpers do
 
   def can_create_events_for_organisation?(organisation = nil, account = current_account)
     organisation ||= @organisation
-    Organisation.can_create_events_for_organisation?(organisation, account)
+    @can_create_events_for_organisation_cache ||= {}
+    key = [organisation&.id&.to_s, account&.id&.to_s]
+    @can_create_events_for_organisation_cache.fetch(key) do
+      @can_create_events_for_organisation_cache[key] = Organisation.can_create_events_for_organisation?(organisation, account)
+    end
   end
 
   def can_create_events_for_organisation_only!
