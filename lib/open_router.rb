@@ -119,10 +119,20 @@ class OpenRouter
   private
 
   def api_post(endpoint, payload)
-    @client.post(endpoint) do |req|
-      req.headers['Content-Type'] = 'application/json'
-      req.headers['Authorization'] = "Bearer #{ENV['OPENROUTER_API_KEY']}"
-      req.body = payload
+    Sentry.with_child_span(op: 'http.client', description: "POST #{BASE_URL}#{endpoint}") do |span|
+      span&.set_data('url', "#{BASE_URL}#{endpoint}")
+      span&.set_data('http.request.method', 'POST')
+      span&.set_data('openrouter.endpoint', endpoint)
+      span&.set_data('openrouter.model', payload[:model])
+
+      response = @client.post(endpoint) do |req|
+        req.headers['Content-Type'] = 'application/json'
+        req.headers['Authorization'] = "Bearer #{ENV['OPENROUTER_API_KEY']}"
+        req.body = payload
+      end
+
+      span&.set_http_status(response.status)
+      response
     end
   end
 end
