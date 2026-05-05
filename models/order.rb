@@ -285,11 +285,12 @@ class Order
     width = 21 * cm
     margin = 1 * cm
     qr_size = width / 2.5
+    logo_source = tickets_pdf_logo_source
     Prawn::Document.new(page_size: 'A4', margin: margin) do |pdf|
       order.tickets.each_with_index do |ticket, i|
         pdf.start_new_page unless i.zero?
         pdf.font "#{Padrino.root}/app/assets/fonts/PlusJakartaSans/ttf/PlusJakartaSans-Regular.ttf"
-        pdf.image (event.organisation.send_ticket_emails_from_organisation && event.organisation.image ? URI.parse(Addressable::URI.escape(event.organisation.image.thumb('1920x1920').url)).open : "#{Padrino.root}/app/assets/images/logos/black-on-transparent-trim.png"), width: width / 4, position: :center
+        pdf.image logo_source, width: width / 4, position: :center
         pdf.move_down 0.5 * cm
         pdf.text order.event.name, align: :center, size: 32
         pdf.move_down 0.5 * cm
@@ -308,6 +309,13 @@ class Order
         pdf.text ticket.id.to_s, align: :center, size: 10
       end
     end
+  end
+
+  def tickets_pdf_logo_source
+    default_logo = "#{Padrino.root}/app/assets/images/logos/black-on-transparent-trim.png"
+    return default_logo unless event.organisation.send_ticket_emails_from_organisation && event.organisation.image
+
+    event.organisation.image.thumb('1920x1920').path
   end
 
   def create_order_notification
