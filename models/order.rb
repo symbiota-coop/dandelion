@@ -293,7 +293,7 @@ class Order
     begin
       Sentry.with_child_span(op: 'pdf.build', description: 'tickets pdf document') do |span|
         rendered_ticket_count = 0
-        Prawn::Document.new(page_size: 'A4', margin: margin) do |pdf|
+        document = Prawn::Document.new(page_size: 'A4', margin: margin) do |pdf|
           order.tickets.each_with_index do |ticket, i|
             rendered_ticket_count += 1
             pdf.start_new_page unless i.zero?
@@ -318,6 +318,7 @@ class Order
           end
         end
         span&.set_data('ticket_count', rendered_ticket_count)
+        document
       end
     ensure
       logo_source.close if logo_source.respond_to?(:close) && !logo_source.closed?

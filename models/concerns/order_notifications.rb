@@ -89,6 +89,8 @@ module OrderNotifications
     end
     batch_message.body_html body_html
 
+    tickets_pdf_file = nil
+    tickets_pdf_filename = nil
     unless event.no_tickets_pdf
       Sentry.with_child_span(op: 'email.attachment.pdf', description: 'order tickets pdf attachment') do |span|
         tickets_pdf_filename = "#{ticket_count == 1 ? 'ticket' : 'tickets'}-#{event.name.parameterize}-#{order.id}.pdf"
@@ -149,7 +151,7 @@ module OrderNotifications
 
     Sentry.with_child_span(op: 'file.cleanup', description: 'ticket email attachments') do |span|
       span&.set_data('attachment.count', ics_files.length + (event.no_tickets_pdf ? 0 : 1))
-      unless event.no_tickets_pdf
+      if tickets_pdf_file && tickets_pdf_filename
         tickets_pdf_file.close
         File.delete(tickets_pdf_filename)
       end
