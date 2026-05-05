@@ -193,6 +193,12 @@
               The settings below won't take effect until you've met the <a class="text-warning text-underline" target="_blank" href="/o/<%=@event.organisation.slug%>/contribute">suggested contribution</a>.
             </p>
           </div>
+        <% elsif @event.organisation.stripe_connect_only? %>
+          <div class="alert alert-success">
+            <p class="mb-0">
+              For as long as your organisation meets the <strong><u><a target="_blank" href="/o/<%=@event.organisation.slug%>/contribute">suggested donation</a></u></strong> of 1% of ticket sales, we'll apply the settings below and pass on donations to your organisation. <strong><u><a target="_blank" href="/docs/events#about-the-suggested-donation">Read more</a></u></strong>
+            </p>
+          </div>
         <% end %>
         <%= f.currency_block :suggested_donation, money_symbol: money_symbol(@event.currency) %>
         <div id="donation-options">

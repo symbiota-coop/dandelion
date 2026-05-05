@@ -193,7 +193,9 @@ Dandelion operates on a donation/gift economy basis. We ask for donations from o
 
 **From organisations:** We ask for a donation of 1% of ticket sales. (If an event has no ticket types listed and is simply an advertisement for an event where tickets are sold elsewhere, we ask for a fixed £25 promotion fee.) Click your organisation dropdown and select Contribute to make a contribution.
 
-**From ticket purchasers at checkout:** By default, donations from ticket purchasers at checkout go to Dandelion. However, if your organisation meets the suggested donation of 1% of ticket sales, we pass on future donations to the organisation instead.
+**From ticket purchasers at checkout:** By default, donations from ticket purchasers at checkout go to Dandelion. However, if your organisation meets the suggested donation of 1% of ticket sales, we pass on future donations to your organisation instead.
+
+The easiest way to ensure that donations always go to your organisation is to enable auto top-up on the Contribute page.
 
 ## Transferring tickets
 
