@@ -30,7 +30,7 @@ Dandelion::App.controller do
         erb :'events/events'
       end
     when :json
-      @events = @events.future(@from)
+      @events = @events.future_for_map(@from)
       @events = @events.and(:start_time.lt => @to + 1) if @to
       @events = @events.and(locked: false)
       @events = @events.and(:id.in => Event.search(params[:q], @events).pluck(:id)) if params[:q]

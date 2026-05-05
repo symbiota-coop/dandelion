@@ -15,6 +15,11 @@ module EventScopes
                ]).order('start_time asc')
     end
 
+    # Map JSON only plots coordinates; evergreen events never have a location, so start_time alone matches map-visible rows.
+    def future_for_map(from = Date.today)
+      self.and(:start_time.gte => from).order('start_time asc')
+    end
+
     def future_and_current(from = Date.today)
       self.and('$or' => [
                  { start_time: { '$gte' => from } },
