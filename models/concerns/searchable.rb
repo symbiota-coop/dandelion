@@ -171,6 +171,9 @@ module Searchable
         pipeline << { '$match': remaining_selector } if remaining_selector.any?
 
         pipeline << { '$limit': limit } if limit
+
+        pipeline << { '$unset' => %w[embedding] } if build_records && fields.key?('embedding')
+
         pipeline << { '$project': { _id: 1 } } unless build_records
 
         results = Sentry.with_child_span(op: 'db.mongo.aggregate', description: "#{collection.name}.aggregate search") do |span|
