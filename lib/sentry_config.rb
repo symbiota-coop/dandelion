@@ -1,10 +1,15 @@
 Sentry.init do |config|
   config.dsn = ENV['SENTRY_DSN']
-  config.send_default_pii = true
   config.environment = ENV['RACK_ENV']
-  if (commit = ENV['RENDER_GIT_COMMIT'] || ENV['HEROKU_SLUG_COMMIT'])
+  if (commit = ENV['RENDER_GIT_COMMIT'])
     config.release = commit
   end
+
+  config.send_default_pii = true
+  config.enable_logs = true
+  config.profiles_sample_rate = 1.0
+  config.traces_sample_rate = 1.0
+  config.profiler_class = Sentry::Vernier::Profiler
 
   config.before_send = lambda do |event, hint|
     exception = hint[:exception]

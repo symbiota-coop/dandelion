@@ -108,3 +108,4 @@ gem 'haikunator' # for generating random names
 gem 'htmlbeautifier' # for beautifying HTML
 gem 'luminosity_contrast' # for WCAG contrast ratio calculations
 gem 'mini_magick' # for image processing
+gem 'vernier' # for profiling

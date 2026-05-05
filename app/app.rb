@@ -51,7 +51,7 @@ module Dandelion
     before do
       next if request.path == '/mcp'
 
-      @cachebuster = Padrino.env == :development ? SecureRandom.uuid : (ENV['RENDER_GIT_COMMIT'] || ENV['HEROKU_SLUG_COMMIT'])
+      @cachebuster = Padrino.env == :development ? SecureRandom.uuid : ENV['RENDER_GIT_COMMIT']
       redirect "#{ENV['BASE_URI']}#{request.fullpath}" if ENV['REDIRECT_BASE'] && ENV['BASE_URI'] && (ENV['BASE_URI'] != "#{request.scheme}://#{request.env['HTTP_HOST']}")
       set_time_zone
       fix_params!
