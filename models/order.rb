@@ -286,28 +286,32 @@ class Order
     margin = 1 * cm
     qr_size = width / 2.5
     logo_source = tickets_pdf_logo_source
-    Prawn::Document.new(page_size: 'A4', margin: margin) do |pdf|
-      order.tickets.each_with_index do |ticket, i|
-        pdf.start_new_page unless i.zero?
-        pdf.font "#{Padrino.root}/app/assets/fonts/PlusJakartaSans/ttf/PlusJakartaSans-Regular.ttf"
-        pdf.image logo_source, width: width / 4, position: :center
-        pdf.move_down 0.5 * cm
-        pdf.text order.event.name, align: :center, size: 32
-        pdf.move_down 0.5 * cm
-        pdf.text order.event.when_details(order.account.try(:time_zone)), align: :center, size: 14
-        pdf.move_down 0.5 * cm
-        pdf.indent((width / 2) - (qr_size / 2) - margin) do
-          pdf.print_qr_code ticket.id.to_s, extent: qr_size
-        end
-        pdf.move_down 0.5 * cm
-        pdf.text order.account.name, align: :center, size: 14
-        if ticket.ticket_type
+    begin
+      Prawn::Document.new(page_size: 'A4', margin: margin) do |pdf|
+        order.tickets.each_with_index do |ticket, i|
+          pdf.start_new_page unless i.zero?
+          pdf.font "#{Padrino.root}/app/assets/fonts/PlusJakartaSans/ttf/PlusJakartaSans-Regular.ttf"
+          pdf.image logo_source, width: width / 4, position: :center
           pdf.move_down 0.5 * cm
-          pdf.text "#{ticket.ticket_type.name}, #{Money.new((ticket.discounted_price || 0) * 100, ticket.currency).format(no_cents_if_whole: true)}", align: :center, size: 14
+          pdf.text order.event.name, align: :center, size: 32
+          pdf.move_down 0.5 * cm
+          pdf.text order.event.when_details(order.account.try(:time_zone)), align: :center, size: 14
+          pdf.move_down 0.5 * cm
+          pdf.indent((width / 2) - (qr_size / 2) - margin) do
+            pdf.print_qr_code ticket.id.to_s, extent: qr_size
+          end
+          pdf.move_down 0.5 * cm
+          pdf.text order.account.name, align: :center, size: 14
+          if ticket.ticket_type
+            pdf.move_down 0.5 * cm
+            pdf.text "#{ticket.ticket_type.name}, #{Money.new((ticket.discounted_price || 0) * 100, ticket.currency).format(no_cents_if_whole: true)}", align: :center, size: 14
+          end
+          pdf.move_down 0.5 * cm
+          pdf.text ticket.id.to_s, align: :center, size: 10
         end
-        pdf.move_down 0.5 * cm
-        pdf.text ticket.id.to_s, align: :center, size: 10
-      end
+        end
+    ensure
+      logo_source.close if logo_source.respond_to?(:close) && !logo_source.closed?
     end
   end
 
@@ -315,7 +319,7 @@ class Order
     default_logo = "#{Padrino.root}/app/assets/images/logos/black-on-transparent-trim.png"
     return default_logo unless event.organisation.send_ticket_emails_from_organisation && event.organisation.image
 
-    event.organisation.image.thumb('1920x1920').path
+    event.organisation.image.thumb('1920x1920').file
   end
 
   def create_order_notification
