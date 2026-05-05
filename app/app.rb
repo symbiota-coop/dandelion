@@ -69,6 +69,14 @@ module Dandelion
       end
     end
 
+    after do
+      next unless request.path.match?(%r{\A/e/[^/]+\z})
+
+      scope = Sentry.get_current_scope
+      scope.set_transaction_name('/e/*', source: :route)
+      scope.get_transaction&.set_name('/e/*', source: :route)
+    end
+
     error do
       erb :error, layout: :application
     end
