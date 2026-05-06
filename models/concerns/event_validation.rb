@@ -38,7 +38,7 @@ module EventValidation
       end
 
       if new_record? && !duplicate
-        org_wide_ok = Organisation.admin?(organisation, account) || (organisation && account && organisation.organisationships.find_by(account: account, event_creator: true))
+        org_wide_ok = Organisation.admin_or_event_creator?(organisation, account)
         errors.add(:organisation, "- you don't have permission to create events for this organisation") if !local_group && !activity && !organisation&.allow_event_submissions && !org_wide_ok
         if activity
           activity_ok = Activity.admin?(activity, account) || (organisation && activity.organisation_id == organisation.id && org_wide_ok)
@@ -92,6 +92,7 @@ module EventValidation
       end
       # rubocop:enable Style/CombinableLoops
 
+      can_change_org_event_flags = Organisation.admin_or_event_creator?(organisation, last_saved_by)
       {
         monthly_donors_only: false,
         no_discounts: false,
@@ -99,7 +100,7 @@ module EventValidation
         show_emails: false,
         refund_deleted_orders: true
       }.each do |k, v|
-        if !duplicate && !Organisation.admin?(organisation, last_saved_by)
+        if !duplicate && !can_change_org_event_flags
           if new_record?
             send("#{k}=", v)
           elsif send("#{k}_changed?")
