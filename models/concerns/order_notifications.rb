@@ -33,132 +33,74 @@ module OrderNotifications
   end
 
   def send_tickets
+    mg_client = Mailgun::Client.new ENV['MAILGUN_API_KEY'], ENV['MAILGUN_REGION']
+    batch_message = Mailgun::BatchMessage.new(mg_client, EmailHelper.mailgun_host(account.email, ENV['MAILGUN_TICKETS_HOST']))
+
     order = self
-    event = Sentry.with_child_span(op: 'db.mongo.read', description: 'order.event') { order.event }
-    account = Sentry.with_child_span(op: 'db.mongo.read', description: 'order.account') { order.account }
-    ticket_count = Sentry.with_child_span(op: 'db.mongo.count', description: 'order.tickets.count') { tickets.count }
-    event_session_count = Sentry.with_child_span(op: 'db.mongo.count', description: 'event.event_sessions.count') { event.event_sessions.count }
+    event = order.event
+    header_image_url, from_email = sender_info
 
-    Sentry.configure_scope do |scope|
-      scope.set_context('send_tickets', {
-                          order_id: id.to_s,
-                          event_id: event&.id.to_s,
-                          account_id: account&.id.to_s,
-                          ticket_count: ticket_count,
-                          event_session_count: event_session_count,
-                          no_tickets_pdf: event.no_tickets_pdf,
-                          evergreen: event.evergreen?,
-                          signal_order_link: account&.phone.present?
-                        })
-    end
+    account = order.account
 
-    mg_client = Sentry.with_child_span(op: 'mailgun.client', description: 'Mailgun::Client.new') do
-      Mailgun::Client.new ENV['MAILGUN_API_KEY'], ENV['MAILGUN_REGION']
-    end
-    batch_message = Sentry.with_child_span(op: 'mailgun.batch', description: 'Mailgun::BatchMessage.new') do |span|
-      mailgun_host = EmailHelper.mailgun_host(account.email, ENV['MAILGUN_TICKETS_HOST'])
-      span&.set_data('mailgun.host', mailgun_host)
-      Mailgun::BatchMessage.new(mg_client, mailgun_host)
-    end
-
-    header_image_url, from_email = Sentry.with_child_span(op: 'email.sender', description: 'order ticket sender info') do |span|
-      result = sender_info
-      span&.set_data('email.sender_has_header_image', result.first.present?)
-      result
-    end
-
-    subject = Sentry.with_child_span(op: 'email.subject', description: 'order ticket subject') do |span|
-      span&.set_data('ticket_count', ticket_count)
+    batch_message.subject(
       ((event.recording? ? event.recording_email_title : event.ticket_email_title) || (event.recording? ? event.organisation.recording_email_title : event.organisation.ticket_email_title))
-        .gsub('[ticket_or_tickets]', ticket_count == 1 ? 'Ticket' : 'Tickets')
-        .gsub('[event_name]', event.name)
-    end
-    batch_message.subject(subject)
+      .gsub('[ticket_or_tickets]', tickets.count == 1 ? 'Ticket' : 'Tickets')
+      .gsub('[event_name]', event.name)
+    )
 
     batch_message.from from_email
     batch_message.reply_to(event.email || event.organisation.reply_to)
 
-    tickets_table = Sentry.with_child_span(op: 'template.render', description: 'emails/_tickets_table') do |span|
-      span&.set_data('ticket_count', ticket_count)
-      EmailHelper.render(:_tickets_table, event: event, account: account)
-    end
-    body_html = Sentry.with_child_span(op: 'email.html', description: 'emails/tickets premailer') do |span|
-      html = EmailHelper.html(:tickets, event: event, order: order, account: account, tickets_table: tickets_table, header_image_url: header_image_url)
-      span&.set_data('email.html_bytes', html.bytesize)
-      html
-    end
-    batch_message.body_html body_html
+    tickets_table = EmailHelper.render(:_tickets_table, event: event, account: account)
+    batch_message.body_html EmailHelper.html(:tickets, event: event, order: order, account: account, tickets_table: tickets_table, header_image_url: header_image_url)
 
     tickets_pdf_file = nil
     tickets_pdf_filename = nil
     unless event.no_tickets_pdf
-      Sentry.with_child_span(op: 'email.attachment.pdf', description: 'order tickets pdf attachment') do |span|
-        tickets_pdf_filename = "#{ticket_count == 1 ? 'ticket' : 'tickets'}-#{event.name.parameterize}-#{order.id}.pdf"
-        span&.set_data('ticket_count', ticket_count)
-        tickets_pdf_file = File.new(tickets_pdf_filename, 'w+')
-        pdf = Sentry.with_child_span(op: 'pdf.render', description: 'order.tickets_pdf.render') do |render_span|
-          rendered_pdf = order.tickets_pdf.render
-          render_span&.set_data('pdf.bytes', rendered_pdf.bytesize)
-          rendered_pdf
-        end
-        tickets_pdf_file.write pdf
-        tickets_pdf_file.rewind
-        batch_message.add_attachment tickets_pdf_file, tickets_pdf_filename
-      end
+      tickets_pdf_filename = "#{tickets.count == 1 ? 'ticket' : 'tickets'}-#{event.name.parameterize}-#{order.id}.pdf"
+      tickets_pdf_file = File.new(tickets_pdf_filename, 'w+')
+      tickets_pdf_file.write order.tickets_pdf.render
+      tickets_pdf_file.rewind
+      batch_message.add_attachment tickets_pdf_file, tickets_pdf_filename
     end
 
     ics_files = []
     unless event.evergreen?
-      Sentry.with_child_span(op: 'email.attachment.ics', description: 'order calendar attachments') do |span|
-        span&.set_data('event_session_count', event_session_count)
-        if event.event_sessions.empty?
-          cal = event.ical(order: order)
-          ics_filename = "event-#{event.name.parameterize}-#{order.id}.ics"
+      if event.event_sessions.empty?
+        cal = event.ical(order: order)
+        ics_filename = "event-#{event.name.parameterize}-#{order.id}.ics"
+        ics_file = File.new(ics_filename, 'w+')
+        ics_file.write cal.to_ical
+        ics_file.rewind
+        batch_message.add_attachment ics_file, ics_filename
+        ics_files << [ics_file, ics_filename]
+      else
+        event.event_sessions.each do |event_session|
+          cal = event_session.ical(order: order)
+          ics_filename = "event-session-#{event_session.name.parameterize}-#{order.id}.ics"
           ics_file = File.new(ics_filename, 'w+')
           ics_file.write cal.to_ical
           ics_file.rewind
           batch_message.add_attachment ics_file, ics_filename
           ics_files << [ics_file, ics_filename]
-        else
-          event.event_sessions.each do |event_session|
-            cal = event_session.ical(order: order)
-            ics_filename = "event-session-#{event_session.name.parameterize}-#{order.id}.ics"
-            ics_file = File.new(ics_filename, 'w+')
-            ics_file.write cal.to_ical
-            ics_file.rewind
-            batch_message.add_attachment ics_file, ics_filename
-            ics_files << [ics_file, ics_filename]
-          end
         end
-        span&.set_data('attachment.count', ics_files.length)
       end
     end
 
-    Sentry.with_child_span(op: 'mailgun.recipient', description: 'add ticket recipient') do
-      batch_message.add_recipient(:to, account.email, { 'token' => account.sign_in_token, 'id' => account.id.to_s })
-    end
+    batch_message.add_recipient(:to, account.email, { 'token' => account.sign_in_token, 'id' => account.id.to_s })
 
     if ENV['MAILGUN_API_KEY']
-      message_ids = Sentry.with_child_span(op: 'mailgun.finalize', description: 'send ticket email') do |span|
-        span&.set_data('attachment.count', ics_files.length + (event.no_tickets_pdf ? 0 : 1))
-        span&.set_data('ticket_count', ticket_count)
-        batch_message.finalize
-      end
-      Sentry.with_child_span(op: 'db.mongo.write', description: 'order.set message_ids') do
-        set(message_ids: message_ids)
-      end
+      message_ids = batch_message.finalize
+      set(message_ids: message_ids)
     end
 
-    Sentry.with_child_span(op: 'file.cleanup', description: 'ticket email attachments') do |span|
-      span&.set_data('attachment.count', ics_files.length + (event.no_tickets_pdf ? 0 : 1))
-      if tickets_pdf_file && tickets_pdf_filename
-        tickets_pdf_file.close
-        File.delete(tickets_pdf_filename)
-      end
-      ics_files.each do |f, fn|
-        f.close
-        File.delete(fn)
-      end
+    if tickets_pdf_file && tickets_pdf_filename
+      tickets_pdf_file.close
+      File.delete(tickets_pdf_filename)
+    end
+    ics_files.each do |f, fn|
+      f.close
+      File.delete(fn)
     end
 
     # Send Signal message if account has phone number

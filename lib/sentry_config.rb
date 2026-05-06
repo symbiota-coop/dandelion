@@ -33,3 +33,94 @@ Sentry.init do |config|
     should_ignore ? nil : event
   end
 end
+
+unless defined?(SentryMongoCommandSubscriber)
+  class SentryMongoCommandSubscriber
+    SPAN_ORIGIN = 'auto.db.mongo'
+
+    def initialize
+      @spans = {}
+      @mutex = Mutex.new
+    end
+
+    def started(event)
+      return unless Sentry.initialized?
+
+      parent_span = Sentry.get_current_scope.get_span
+      return unless parent_span
+
+      span = parent_span.start_child(
+        op: "db.mongo.#{event.command_name}",
+        description: description_for(event),
+        origin: SPAN_ORIGIN
+      )
+      record_common_data(span, event)
+
+      @mutex.synchronize { @spans[span_key(event)] = span }
+    end
+
+    def succeeded(event)
+      finish(event, 'ok')
+    end
+
+    def failed(event)
+      finish(event, 'internal_error') do |span|
+        span.set_data('db.mongo.failure', event.message)
+      end
+    end
+
+    private
+
+    def finish(event, status)
+      span = @mutex.synchronize { @spans.delete(span_key(event)) }
+      return unless span
+
+      span.set_status(status)
+      span.set_data('db.duration_ms', (event.duration.to_f * 1000).round(2))
+      yield(span) if block_given?
+      span.finish(end_timestamp: span.start_timestamp + event.duration.to_f)
+    end
+
+    def record_common_data(span, event)
+      span.set_data(Sentry::Span::DataConventions::DB_SYSTEM, 'mongodb')
+      span.set_data(Sentry::Span::DataConventions::DB_NAME, event.database_name)
+      span.set_data(Sentry::Span::DataConventions::SERVER_ADDRESS, event.address.host)
+      span.set_data(Sentry::Span::DataConventions::SERVER_PORT, event.address.port)
+      span.set_data('db.operation', event.command_name)
+
+      collection = collection_for(event)
+      span.set_data('db.collection.name', collection) if collection
+    end
+
+    def description_for(event)
+      collection = collection_for(event)
+      namespace = [event.database_name, collection].compact.join('.')
+      parts = [event.command_name]
+      parts << namespace unless namespace.empty?
+      parts.join(' ')
+    end
+
+    def collection_for(event)
+      command = event.command
+      value = command[event.command_name] || command[event.command_name.to_sym]
+      return if value.nil? || value == 1
+
+      value.to_s
+    end
+
+    def span_key(event)
+      [event.operation_id, event.request_id, event.address.to_s]
+    end
+  end
+end
+
+if defined?(Mongo::Monitoring) && !defined?(SENTRY_MONGO_COMMAND_SUBSCRIBER)
+  SENTRY_MONGO_COMMAND_SUBSCRIBER = SentryMongoCommandSubscriber.new
+  Mongo::Monitoring::Global.subscribe(Mongo::Monitoring::COMMAND, SENTRY_MONGO_COMMAND_SUBSCRIBER)
+
+  if defined?(Mongoid::Clients)
+    Mongoid::Clients.clients.each_value do |client|
+      client.subscribe(Mongo::Monitoring::COMMAND, SENTRY_MONGO_COMMAND_SUBSCRIBER)
+    end
+  end
+end
