@@ -93,8 +93,9 @@
   <a class="btn btn-primary mb-3" href="/events/new?activity_id=<%= @activity.id %>">Create an event</a>
 <% end %>
 
-<% upcoming_events = @activity.events.live.publicly_visible.future_and_current.paginate(page: params[:upcoming_events_page], per_page: 5) %>
-<% past_events = @activity.events.live.publicly_visible.past.paginate(page: params[:past_events_page], per_page: 3) %>
+<% event_block_includes = [:organisation, { cohostships: :organisation, event_facilitations: :account, event_tagships: :event_tag }] %>
+<% upcoming_events = @activity.events.live.publicly_visible.future_and_current.includes(*event_block_includes).paginate(page: params[:upcoming_events_page], per_page: 5) %>
+<% past_events = @activity.events.live.publicly_visible.past.includes(*event_block_includes).paginate(page: params[:past_events_page], per_page: 3) %>
 
 <% if past_events.exists? %>
   <h3 class="mb-3">Upcoming events</h3>
