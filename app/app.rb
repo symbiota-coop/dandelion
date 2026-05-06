@@ -101,7 +101,7 @@ module Dandelion
     ###
 
     head '/' do
-      status 200
+      200
     end
 
     get '/' do
