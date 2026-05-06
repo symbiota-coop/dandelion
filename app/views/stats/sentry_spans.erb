@@ -1,0 +1,59 @@
+<div class="mb-3">
+  <p>
+    Showing <strong><%= @spans.count %></strong> Sentry spans
+    across <strong><%= @span_files_count %></strong> files.
+  </p>
+</div>
+
+<div class="table-responsive">
+  <table id="sentry-spans-table" class="table table-hover">
+    <thead>
+      <tr>
+        <th>Op</th>
+        <th>Description</th>
+        <th>File</th>
+        <th class="text-right">Line</th>
+        <th>Call</th>
+        <th>Origin</th>
+      </tr>
+    </thead>
+    <tbody>
+      <% @spans.each do |span| %>
+        <tr>
+          <td>
+            <% if span[:op] %>
+              <code><%= span[:op] %></code>
+            <% end %>
+          </td>
+          <td>
+            <% if span[:description] %>
+              <code><%= span[:description] %></code>
+            <% end %>
+          </td>
+          <td><code><%= span[:file] %></code></td>
+          <td class="text-right" data-order="<%= span[:line] %>"><%= span[:line] %></td>
+          <td><code><%= span[:call] %></code></td>
+          <td>
+            <% if span[:origin] %>
+              <code><%= span[:origin] %></code>
+            <% end %>
+          </td>
+        </tr>
+      <% end %>
+    </tbody>
+  </table>
+</div>
+
+<script>
+  $(function() {
+    $('#sentry-spans-table').DataTable({
+      paging: true,
+      pageLength: 50,
+      searching: true,
+      order: [[0, 'asc'], [2, 'asc'], [3, 'asc']],
+      columnDefs: [
+        { type: 'num', targets: 3 }
+      ]
+    });
+  });
+</script>

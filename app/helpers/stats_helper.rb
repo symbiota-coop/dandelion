@@ -1,4 +1,76 @@
 Dandelion::App.helpers do
+  def sentry_span_entries
+    sentry_span_source_files.flat_map do |file_path|
+      sentry_spans_in_file(file_path)
+    end.sort_by { |span| [span[:op].to_s, span[:file], span[:line]] }
+  end
+
+  def sentry_span_source_files
+    root_path = Padrino.root.to_s
+    ignored_dirs = %w[.git .bundle log tmp vendor node_modules public]
+
+    files = []
+    Find.find(root_path) do |file_path|
+      if File.directory?(file_path)
+        Find.prune if ignored_dirs.include?(File.basename(file_path))
+        next
+      end
+
+      next unless File.file?(file_path)
+      next unless %w[.rb .erb .rake].include?(File.extname(file_path))
+
+      files << file_path
+    end
+    files
+  end
+
+  def sentry_spans_in_file(file_path)
+    lines = File.readlines(file_path)
+    relative_path = file_path.sub("#{Padrino.root}/", '')
+
+    lines.each_with_index.filter_map do |line, index|
+      next unless sentry_span_creation_line?(line)
+
+      snippet = lines[index, 8].join
+      {
+        file: relative_path,
+        line: index + 1,
+        call: sentry_span_call_name(line),
+        op: sentry_span_keyword_value(snippet, 'op'),
+        description: sentry_span_keyword_value(snippet, 'description'),
+        origin: sentry_span_keyword_value(snippet, 'origin')
+      }
+    end
+  rescue StandardError
+    []
+  end
+
+  def sentry_span_call_name(line)
+    return 'Sentry.with_child_span' if line.include?('Sentry.with_child_span')
+    return 'Sentry.start_span' if line.include?('Sentry.start_span')
+    return 'Sentry.start_transaction' if line.include?('Sentry.start_transaction')
+    return 'start_child' if line.include?('start_child(')
+
+    'span'
+  end
+
+  def sentry_span_creation_line?(line)
+    line.match?(/(?:\A|[=\s(])Sentry\.(?:with_child_span|start_span|start_transaction)\s*\(/) ||
+      line.match?(/(?:\A|[=\s])\w+\.start_child\(/)
+  end
+
+  def sentry_span_keyword_value(snippet, keyword)
+    match = snippet.match(/#{Regexp.escape(keyword)}:\s*(?<value>(?:"(?:\\"|[^"])*")|(?:'(?:\\'|[^'])*')|[^,\n)]+)/)
+    return unless match
+
+    value = match[:value].strip
+    if (value.start_with?("'") && value.end_with?("'")) || (value.start_with?('"') && value.end_with?('"'))
+      value[1..-2]
+    else
+      value
+    end
+  end
+
   def fetch_frontend_dependency(base_url, path)
     host = URI.parse(base_url.to_s.sub(/\Agit\+/, ''))&.host&.downcase
     case host

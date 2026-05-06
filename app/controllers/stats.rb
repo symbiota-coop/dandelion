@@ -170,6 +170,12 @@ Dandelion::App.controller do
     erb :'stats/files'
   end
 
+  get '/stats/sentry_spans' do
+    @spans = sentry_span_entries
+    @span_files_count = @spans.map { |span| span[:file] }.uniq.count
+    erb :'stats/sentry_spans'
+  end
+
   get '/stats/routes' do
     route_pattern = /^(\s*)(get|post|put|delete|patch|options|head)\s+['"]([^'"]+)['"]/
 
