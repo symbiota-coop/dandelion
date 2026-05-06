@@ -70,11 +70,12 @@ module Dandelion
     end
 
     after do
-      next unless request.path.match?(%r{\A/e/[^/]+\z})
+      name = env['sinatra.route']
+      next unless name
 
       scope = Sentry.get_current_scope
-      scope.set_transaction_name('/e/*', source: :route)
-      scope.get_transaction&.set_name('/e/*', source: :route)
+      scope.set_transaction_name(name, source: :route)
+      scope.get_transaction&.set_name(name, source: :route)
     end
 
     error do
