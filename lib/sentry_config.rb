@@ -84,8 +84,6 @@ unless defined?(SentryMongoCommandSubscriber)
     def record_common_data(span, event)
       span.set_data(Sentry::Span::DataConventions::DB_SYSTEM, 'mongodb')
       span.set_data(Sentry::Span::DataConventions::DB_NAME, event.database_name)
-      span.set_data(Sentry::Span::DataConventions::SERVER_ADDRESS, event.address.host)
-      span.set_data(Sentry::Span::DataConventions::SERVER_PORT, event.address.port)
       span.set_data('db.operation', event.command_name)
 
       collection = collection_for(event)
