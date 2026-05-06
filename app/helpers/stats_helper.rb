@@ -53,6 +53,7 @@ Dandelion::App.helpers do
     return unless match
 
     value = match[:value].strip
+    value = value.sub(/\s*\)\s*do(?:\s*\|.*)?\z/, '')
     if (value.start_with?("'") && value.end_with?("'")) || (value.start_with?('"') && value.end_with?('"'))
       value[1..-2]
     else
