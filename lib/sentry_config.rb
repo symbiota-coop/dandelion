@@ -50,7 +50,7 @@ unless defined?(SentryMongoCommandSubscriber)
       return unless parent_span
 
       span = parent_span.start_child(
-        op: "db.mongo.#{event.command_name}",
+        op: 'db.query',
         description: description_for(event),
         origin: SPAN_ORIGIN
       )

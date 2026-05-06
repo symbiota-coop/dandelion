@@ -104,7 +104,9 @@ module OrderNotifications
     end
 
     # Send Signal message if account has phone number
-    Sentry.with_child_span(op: 'signal.send', description: 'send order link') do |span|
+    Sentry.with_child_span(op: 'http.client', description: 'POST Signal /v2/send') do |span|
+      span&.set_data('http.request.method', 'POST')
+      span&.set_data('url', "#{ENV['SIGNAL_API_URL']}/v2/send") if ENV['SIGNAL_API_URL'].present?
       span&.set_data('signal.configured', signal_configured?)
       send_signal_order_link
     end if account&.phone.present?
