@@ -287,41 +287,32 @@ class Order
     width = 21 * cm
     margin = 1 * cm
     qr_size = width / 2.5
-    logo_source = Sentry.with_child_span(op: 'pdf.asset', description: 'tickets pdf logo source') do |span|
-      source = tickets_pdf_logo_source
-      span&.set_data('pdf.logo_custom', source != "#{Padrino.root}/app/assets/images/logos/black-on-transparent-trim.png")
-      source
-    end
+    logo_source = tickets_pdf_logo_source
     begin
-      Sentry.with_child_span(op: 'pdf.build', description: 'tickets pdf document') do |span|
-        rendered_ticket_count = 0
-        document = Prawn::Document.new(page_size: 'A4', margin: margin) do |pdf|
-          order.tickets.each_with_index do |ticket, i|
-            rendered_ticket_count += 1
-            pdf.start_new_page unless i.zero?
-            pdf.font "#{Padrino.root}/app/assets/fonts/PlusJakartaSans/ttf/PlusJakartaSans-Regular.ttf"
-            pdf.image logo_source, width: width / 4, position: :center
-            pdf.move_down 0.5 * cm
-            pdf.text order.event.name, align: :center, size: 32
-            pdf.move_down 0.5 * cm
-            pdf.text order.event.when_details(order.account.try(:time_zone)), align: :center, size: 14
-            pdf.move_down 0.5 * cm
-            pdf.indent((width / 2) - (qr_size / 2) - margin) do
-              pdf.print_qr_code ticket.id.to_s, extent: qr_size
-            end
-            pdf.move_down 0.5 * cm
-            pdf.text order.account.name, align: :center, size: 14
-            if ticket.ticket_type
-              pdf.move_down 0.5 * cm
-              pdf.text "#{ticket.ticket_type.name}, #{Money.new((ticket.discounted_price || 0) * 100, ticket.currency).format(no_cents_if_whole: true)}", align: :center, size: 14
-            end
-            pdf.move_down 0.5 * cm
-            pdf.text ticket.id.to_s, align: :center, size: 10
+      document = Prawn::Document.new(page_size: 'A4', margin: margin) do |pdf|
+        order.tickets.each_with_index do |ticket, i|
+          pdf.start_new_page unless i.zero?
+          pdf.font "#{Padrino.root}/app/assets/fonts/PlusJakartaSans/ttf/PlusJakartaSans-Regular.ttf"
+          pdf.image logo_source, width: width / 4, position: :center
+          pdf.move_down 0.5 * cm
+          pdf.text order.event.name, align: :center, size: 32
+          pdf.move_down 0.5 * cm
+          pdf.text order.event.when_details(order.account.try(:time_zone)), align: :center, size: 14
+          pdf.move_down 0.5 * cm
+          pdf.indent((width / 2) - (qr_size / 2) - margin) do
+            pdf.print_qr_code ticket.id.to_s, extent: qr_size
           end
+          pdf.move_down 0.5 * cm
+          pdf.text order.account.name, align: :center, size: 14
+          if ticket.ticket_type
+            pdf.move_down 0.5 * cm
+            pdf.text "#{ticket.ticket_type.name}, #{Money.new((ticket.discounted_price || 0) * 100, ticket.currency).format(no_cents_if_whole: true)}", align: :center, size: 14
+          end
+          pdf.move_down 0.5 * cm
+          pdf.text ticket.id.to_s, align: :center, size: 10
         end
-        span&.set_data('ticket_count', rendered_ticket_count)
-        document
       end
+      document
     ensure
       logo_source.close if logo_source.respond_to?(:close) && !logo_source.closed?
     end
