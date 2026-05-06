@@ -94,16 +94,17 @@ unless defined?(SentryMongoCommandSubscriber)
 
     def description_for(event)
       collection = collection_for(event)
-      namespace = [event.database_name, collection].compact.join('.')
       parts = [event.command_name]
-      parts << namespace unless namespace.empty?
+      parts << collection if collection
       parts.join(' ')
     end
 
     def collection_for(event)
       command = event.command
-      value = command[event.command_name] || command[event.command_name.to_sym]
+      value = command['collection'] || command[:collection] || command[event.command_name] || command[event.command_name.to_sym]
       return if value.nil? || value == 1
+      return if defined?(BSON::Int64) && value.is_a?(BSON::Int64)
+      return if value.is_a?(Numeric)
 
       value.to_s
     end
