@@ -104,7 +104,8 @@ module Dandelion
       if current_account
         # signed in
         if request.xhr?
-          partial :newsfeed, locals: { notifications: current_account.network_notifications.order('created_at desc').paginate(page: params[:page]), include_circle_name: true }
+          notifications = current_account.network_notifications.includes(:circle, :notifiable).order('created_at desc').paginate(page: params[:page])
+          partial :newsfeed, locals: { notifications: notifications, include_circle_name: true }
         else
           @body_class = 'greyed'
           erb :home_signed_in
