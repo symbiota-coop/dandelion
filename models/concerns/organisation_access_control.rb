@@ -10,8 +10,9 @@ module OrganisationAccessControl
         )
     end
 
-    def admin_or_event_creator?(organisation, account)
-      admin?(organisation, account) ||
+    def admin_or_event_creator?(organisation, account, organisation_admin: nil)
+      organisation_admin ||
+        (organisation_admin.nil? && admin?(organisation, account)) ||
         (account && organisation && organisation.organisationships.find_by(account: account, event_creator: true))
     end
 

@@ -108,12 +108,13 @@ class Activity
     q.empty? ? [] : q
   end
 
-  def self.admin?(activity, account)
+  def self.admin?(activity, account, organisation_admin: nil)
     account && activity &&
       (
         account.admin? ||
+        organisation_admin ||
         activity.activityships.find_by(account: account, admin: true) ||
-        Organisation.admin?(activity.organisation, account)
+        (organisation_admin.nil? && Organisation.admin?(activity.organisation, account))
       )
   end
 

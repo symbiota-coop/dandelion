@@ -89,12 +89,13 @@ class LocalGroup
     }[attr.to_sym] || super
   end
 
-  def self.admin?(local_group, account)
+  def self.admin?(local_group, account, organisation_admin: nil)
     account && local_group &&
       (
         account.admin? ||
+        organisation_admin ||
         local_group.local_groupships.find_by(account: account, admin: true) ||
-        Organisation.admin?(local_group.organisation, account)
+        (organisation_admin.nil? && Organisation.admin?(local_group.organisation, account))
       )
   end
 

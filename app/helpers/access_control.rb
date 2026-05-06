@@ -30,12 +30,18 @@ Dandelion::App.helpers do
     kick! unless admin?
   end
 
+  def cached_permission(cache_name, record, account)
+    cache = instance_variable_get(cache_name) || instance_variable_set(cache_name, {})
+    key = [record&.class&.name, record&.id&.to_s, account&.id&.to_s]
+    cache.fetch(key) do
+      cache[key] = yield
+    end
+  end
+
   def organisation_admin?(organisation = nil, account = current_account)
     organisation ||= @organisation
-    @organisation_admin_cache ||= {}
-    key = [organisation&.id&.to_s, account&.id&.to_s]
-    @organisation_admin_cache.fetch(key) do
-      @organisation_admin_cache[key] = Organisation.admin?(organisation, account)
+    cached_permission(:@organisation_admin_cache, organisation, account) do
+      Organisation.admin?(organisation, account)
     end
   end
 
@@ -50,10 +56,8 @@ Dandelion::App.helpers do
 
   def can_create_events_for_organisation?(organisation = nil, account = current_account)
     organisation ||= @organisation
-    @can_create_events_for_organisation_cache ||= {}
-    key = [organisation&.id&.to_s, account&.id&.to_s]
-    @can_create_events_for_organisation_cache.fetch(key) do
-      @can_create_events_for_organisation_cache[key] = Organisation.can_create_events_for_organisation?(organisation, account)
+    cached_permission(:@can_create_events_for_organisation_cache, organisation, account) do
+      Organisation.can_create_events_for_organisation?(organisation, account)
     end
   end
 
@@ -63,7 +67,9 @@ Dandelion::App.helpers do
 
   def organisation_monthly_donor_plus?(organisation = nil, account = current_account)
     organisation ||= @organisation
-    Organisation.monthly_donor_plus?(organisation, account)
+    cached_permission(:@organisation_monthly_donor_plus_cache, organisation, account) do
+      Organisation.monthly_donor_plus?(organisation, account)
+    end
   end
 
   def organisation_monthly_donors_plus_only!
@@ -72,7 +78,9 @@ Dandelion::App.helpers do
 
   def activity_admin?(activity = nil, account = current_account)
     activity ||= @activity
-    Activity.admin?(activity, account)
+    cached_permission(:@activity_admin_cache, activity, account) do
+      Activity.admin?(activity, account, organisation_admin: (organisation_admin?(activity.organisation, account) if activity))
+    end
   end
 
   def activity_admins_only!
@@ -81,7 +89,9 @@ Dandelion::App.helpers do
 
   def local_group_admin?(local_group = nil, account = current_account)
     local_group ||= @local_group
-    LocalGroup.admin?(local_group, account)
+    cached_permission(:@local_group_admin_cache, local_group, account) do
+      LocalGroup.admin?(local_group, account, organisation_admin: (organisation_admin?(local_group.organisation, account) if local_group))
+    end
   end
 
   def local_group_admins_only!
@@ -90,7 +100,15 @@ Dandelion::App.helpers do
 
   def event_admin?(event = nil, account = current_account)
     event ||= @event
-    Event.admin?(event, account)
+    cached_permission(:@event_admin_cache, event, account) do
+      Event.admin?(
+        event,
+        account,
+        activity_admin: (activity_admin?(event.activity, account) if event&.activity),
+        local_group_admin: (local_group_admin?(event.local_group, account) if event&.local_group),
+        organisation_admin: (organisation_admin?(event.organisation, account) if event&.organisation)
+      )
+    end
   end
 
   def event_admins_only!
@@ -99,7 +117,15 @@ Dandelion::App.helpers do
 
   def event_revenue_admin?(event = nil, account = current_account)
     event ||= @event
-    Event.revenue_admin?(event, account)
+    cached_permission(:@event_revenue_admin_cache, event, account) do
+      Event.revenue_admin?(
+        event,
+        account,
+        activity_admin: (activity_admin?(event.activity, account) if event&.activity),
+        local_group_admin: (local_group_admin?(event.local_group, account) if event&.local_group),
+        organisation_admin: (organisation_admin?(event.organisation, account) if event&.organisation)
+      )
+    end
   end
 
   def event_revenue_admins_only!
@@ -112,7 +138,14 @@ Dandelion::App.helpers do
 
   def event_email_viewer?(event = nil, account = current_account)
     event ||= @event
-    Event.email_viewer?(event, account)
+    cached_permission(:@event_email_viewer_cache, event, account) do
+      Event.email_viewer?(
+        event,
+        account,
+        event_admin: (event_admin?(event, account) if event&.show_emails),
+        organisation_admin: (organisation_admin?(event.organisation, account) if event&.organisation)
+      )
+    end
   end
 
   def event_email_viewers_only!
@@ -121,12 +154,21 @@ Dandelion::App.helpers do
 
   def event_lock_admin?(event = nil, account = current_account)
     event ||= @event
-    Event.lock_admin?(event, account)
+    cached_permission(:@event_lock_admin_cache, event, account) do
+      Event.lock_admin?(
+        event,
+        account,
+        event_admin: (event_admin?(event, account) if event && !event.organisation.allow_event_submissions?),
+        event_revenue_admin: (event_revenue_admin?(event, account) if event&.organisation&.allow_event_submissions?)
+      )
+    end
   end
 
   def event_participant?(event = nil, account = current_account)
     event ||= @event
-    Event.participant?(event, account)
+    cached_permission(:@event_participant_cache, event, account) do
+      Event.participant?(event, account, event_admin: event_admin?(event, account))
+    end
   end
 
   def event_participants_only!
@@ -135,7 +177,14 @@ Dandelion::App.helpers do
 
   def order_email_viewer?(order = nil, account = current_account)
     order ||= @order
-    Order.email_viewer?(order, account)
+    cached_permission(:@order_email_viewer_cache, order, account) do
+      Order.email_viewer?(
+        order,
+        account,
+        event_email_viewer: (event_email_viewer?(order.event, account) if order&.event),
+        event_admin: (event_admin?(order.event, account) if order&.opt_in_facilitator && order&.event)
+      )
+    end
   end
 
   def order_email_viewers_only!
@@ -144,7 +193,9 @@ Dandelion::App.helpers do
 
   def ticket_email_viewer?(ticket = nil, account = current_account)
     ticket ||= @ticket
-    Ticket.email_viewer?(ticket, account)
+    cached_permission(:@ticket_email_viewer_cache, ticket, account) do
+      Ticket.email_viewer?(ticket, account, order_email_viewer: (order_email_viewer?(ticket.order, account) if ticket&.order))
+    end
   end
 
   def ticket_email_viewers_only!
@@ -153,7 +204,9 @@ Dandelion::App.helpers do
 
   def donation_email_viewer?(donation = nil, account = current_account)
     donation ||= @donation
-    Donation.email_viewer?(donation, account)
+    cached_permission(:@donation_email_viewer_cache, donation, account) do
+      Donation.email_viewer?(donation, account, order_email_viewer: (order_email_viewer?(donation.order, account) if donation&.order))
+    end
   end
 
   def donation_email_viewers_only!
@@ -162,7 +215,9 @@ Dandelion::App.helpers do
 
   def gathering_admin?(gathering = nil, account = current_account)
     gathering ||= @gathering
-    Gathering.admin?(gathering, account)
+    cached_permission(:@gathering_admin_cache, gathering, account) do
+      Gathering.admin?(gathering, account)
+    end
   end
 
   def gathering_admins_only!
@@ -171,7 +226,10 @@ Dandelion::App.helpers do
 
   def comment_admin?(comment = nil, account = current_account)
     comment ||= @comment
-    Comment.admin?(comment, account)
+    cached_permission(:@comment_admin_cache, comment, account) do
+      gathering = comment.commentable.gathering if comment && %w[Team Tactivity Mapplication].include?(comment.commentable_type)
+      Comment.admin?(comment, account, gathering_admin: (gathering_admin?(gathering, account) if gathering))
+    end
   end
 
   def comment_admins_only!
@@ -183,11 +241,11 @@ Dandelion::App.helpers do
 
     case photoable
     when Gathering
-      Gathering.admin?(photoable, account)
+      gathering_admin?(photoable, account)
     when Comment
       photoable.account_id == account.id
     when TicketType
-      Event.admin?(photoable.event, account)
+      event_admin?(photoable.event, account)
     else
       false
     end

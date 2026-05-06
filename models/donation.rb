@@ -39,8 +39,8 @@ class Donation
     CURRENCY_OPTIONS
   end
 
-  def self.email_viewer?(donation, account)
-    account && Order.email_viewer?(donation.order, account)
+  def self.email_viewer?(donation, account, order_email_viewer: nil)
+    account && (order_email_viewer || (order_email_viewer.nil? && Order.email_viewer?(donation.order, account)))
   end
 
   validates_presence_of :amount

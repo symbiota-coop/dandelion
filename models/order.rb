@@ -105,8 +105,12 @@ class Order
     self.and(:id.in => self.and(:percentage_discount.ne => nil).pluck(:id) + self.and(:percentage_discount_monthly_donor.ne => nil).pluck(:id))
   end
 
-  def self.email_viewer?(order, account)
-    account && order && (Event.email_viewer?(order.event, account) || (order.opt_in_facilitator && Event.admin?(order.event, account)))
+  def self.email_viewer?(order, account, event_email_viewer: nil, event_admin: nil)
+    account && order && (
+      event_email_viewer ||
+        (event_email_viewer.nil? && Event.email_viewer?(order.event, account)) ||
+        (order.opt_in_facilitator && (event_admin || (event_admin.nil? && Event.admin?(order.event, account))))
+    )
   end
 
   def circle

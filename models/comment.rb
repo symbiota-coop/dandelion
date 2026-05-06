@@ -64,9 +64,11 @@ class Comment
     end
   end
 
-  def self.admin?(comment, account)
+  def self.admin?(comment, account, gathering_admin: nil)
     comment && account && (
-      Gathering.admin?(comment.commentable.gathering, account) if %w[Team Tactivity Mapplication].include?(comment.commentable_type)
+      if %w[Team Tactivity Mapplication].include?(comment.commentable_type)
+        gathering_admin || (gathering_admin.nil? && Gathering.admin?(comment.commentable.gathering, account))
+      end
     )
   end
 

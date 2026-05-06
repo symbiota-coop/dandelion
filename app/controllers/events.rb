@@ -113,7 +113,7 @@ Dandelion::App.controller do
     end
     @event.account = current_account
     @event.last_saved_by = current_account
-    public_submission = !Event.lock_admin?(@event, current_account)
+    public_submission = !event_lock_admin?
     @event.locked = true if public_submission || (!@event.organisation.payment_method? && @event.paid_tickets?)
     if @event.save
       @event.send_public_submission_notification if public_submission

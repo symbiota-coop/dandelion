@@ -100,8 +100,8 @@ class Ticket
     event.refresh_sold_out_cache_and_notify_waitlist if event
   end
 
-  def self.email_viewer?(ticket, account)
-    account && (!ticket.order || Order.email_viewer?(ticket.order, account))
+  def self.email_viewer?(ticket, account, order_email_viewer: nil)
+    account && (!ticket.order || order_email_viewer || (order_email_viewer.nil? && Order.email_viewer?(ticket.order, account)))
   end
 
   def self.currencies

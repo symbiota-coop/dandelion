@@ -11,7 +11,7 @@ Dandelion::App.controller do
     kick! unless @event.organisation
     event_admins_only!
     @event.last_saved_by = current_account
-    params[:event].delete('locked') if @event.locked? && !Event.lock_admin?(@event, current_account)
+    params[:event].delete('locked') if @event.locked? && !event_lock_admin?
     if !@event.organisation.payment_method? && @event.paid_tickets?
       params[:event].delete('locked')
       @event.locked = true
