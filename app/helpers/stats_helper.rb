@@ -35,23 +35,12 @@ Dandelion::App.helpers do
       {
         file: relative_path,
         line: index + 1,
-        call: sentry_span_call_name(line),
         op: sentry_span_keyword_value(snippet, 'op'),
-        description: sentry_span_keyword_value(snippet, 'description'),
-        origin: sentry_span_keyword_value(snippet, 'origin')
+        description: sentry_span_keyword_value(snippet, 'description')
       }
     end
   rescue StandardError
     []
-  end
-
-  def sentry_span_call_name(line)
-    return 'Sentry.with_child_span' if line.include?('Sentry.with_child_span')
-    return 'Sentry.start_span' if line.include?('Sentry.start_span')
-    return 'Sentry.start_transaction' if line.include?('Sentry.start_transaction')
-    return 'start_child' if line.include?('start_child(')
-
-    'span'
   end
 
   def sentry_span_creation_line?(line)
@@ -60,7 +49,7 @@ Dandelion::App.helpers do
   end
 
   def sentry_span_keyword_value(snippet, keyword)
-    match = snippet.match(/#{Regexp.escape(keyword)}:\s*(?<value>(?:"(?:\\"|[^"])*")|(?:'(?:\\'|[^'])*')|[^,\n)]+)/)
+    match = snippet.match(/#{Regexp.escape(keyword)}:\s*(?<value>(?:"(?:\\"|[^"])*")|(?:'(?:\\'|[^'])*')|[^,\n]+)/)
     return unless match
 
     value = match[:value].strip

@@ -120,9 +120,8 @@ class OpenRouter
 
   def api_post(endpoint, payload)
     operation_name = endpoint.include?('embeddings') ? 'embeddings' : 'chat'
-    span_op = endpoint.include?('embeddings') ? 'gen_ai.embeddings' : 'gen_ai.request'
 
-    Sentry.with_child_span(op: span_op, description: "#{operation_name} #{payload[:model]}") do |span|
+    Sentry.with_child_span(op: endpoint.include?('embeddings') ? 'gen_ai.embeddings' : 'gen_ai.request', description: "#{operation_name} #{payload[:model]}") do |span|
       span&.set_data('gen_ai.operation.name', operation_name)
       span&.set_data('gen_ai.request.model', payload[:model])
       span&.set_data('gen_ai.request.max_tokens', payload[:max_tokens]) if payload[:max_tokens]

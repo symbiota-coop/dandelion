@@ -13,8 +13,6 @@
         <th>Description</th>
         <th>File</th>
         <th class="text-right">Line</th>
-        <th>Call</th>
-        <th>Origin</th>
       </tr>
     </thead>
     <tbody>
@@ -32,12 +30,6 @@
           </td>
           <td><code><%= span[:file] %></code></td>
           <td class="text-right" data-order="<%= span[:line] %>"><%= span[:line] %></td>
-          <td><code><%= span[:call] %></code></td>
-          <td>
-            <% if span[:origin] %>
-              <code><%= span[:origin] %></code>
-            <% end %>
-          </td>
         </tr>
       <% end %>
     </tbody>

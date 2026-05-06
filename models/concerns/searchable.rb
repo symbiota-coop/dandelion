@@ -176,10 +176,7 @@ module Searchable
 
         pipeline << { '$project': { _id: 1 } } unless build_records
 
-        results = Sentry.with_child_span(op: 'db.query', description: "#{collection.name}.search") do |span|
-          span&.set_data('db.system', 'mongodb')
-          span&.set_data('db.operation', 'aggregate')
-          span&.set_data('db.collection.name', collection.name.to_s)
+        results = Sentry.with_child_span(op: 'search.query', description: 'Atlas Search') do |span|
           span&.set_data('search.model', name)
           span&.set_data('search.limit', limit) if limit
           span&.set_data('search.build_records', build_records)
