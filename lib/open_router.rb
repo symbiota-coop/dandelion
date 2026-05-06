@@ -119,7 +119,12 @@ class OpenRouter
   private
 
   def api_post(endpoint, payload)
-    Sentry.with_child_span(op: 'http.client', description: "POST #{BASE_URL}#{endpoint}") do |span|
+    operation_name = endpoint.include?('embeddings') ? 'embeddings' : 'chat'
+
+    Sentry.with_child_span(op: "gen_ai.#{operation_name}", description: "#{operation_name} #{payload[:model]}") do |span|
+      span&.set_data('gen_ai.operation.name', operation_name)
+      span&.set_data('gen_ai.request.model', payload[:model])
+      span&.set_data('gen_ai.request.max_tokens', payload[:max_tokens]) if payload[:max_tokens]
       span&.set_data('url', "#{BASE_URL}#{endpoint}")
       span&.set_data('http.request.method', 'POST')
       span&.set_data('openrouter.endpoint', endpoint)
@@ -132,6 +137,13 @@ class OpenRouter
       end
 
       span&.set_http_status(response.status)
+      usage = response.body['usage'] if response.body.is_a?(Hash)
+      if usage
+        span&.set_data('gen_ai.usage.input_tokens', usage['prompt_tokens']) if usage['prompt_tokens']
+        span&.set_data('gen_ai.usage.output_tokens', usage['completion_tokens']) if usage['completion_tokens']
+        span&.set_data('gen_ai.usage.total_tokens', usage['total_tokens']) if usage['total_tokens']
+      end
+
       response
     end
   end
