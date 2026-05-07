@@ -109,6 +109,27 @@ class EventCreatorPermissionsTest < ActiveSupport::TestCase
     assert event.valid?, event.errors.full_messages.join(', ')
   end
 
+  test 'event_creator is event admin for organisation event' do
+    org_owner = FactoryBot.create(:account)
+    org = FactoryBot.create(:organisation, account: org_owner)
+    creator = FactoryBot.create(:account)
+    creator.organisationships.create!(organisation: org, event_creator: true, unsubscribed: false)
+    event = FactoryBot.create(:event, organisation: org, account: org_owner)
+    assert Event.admin?(event, creator)
+  end
+
+  test 'event_creator is event admin for cohosted event' do
+    org_owner = FactoryBot.create(:account)
+    org = FactoryBot.create(:organisation, account: org_owner)
+    cohost_owner = FactoryBot.create(:account)
+    cohost = FactoryBot.create(:organisation, account: cohost_owner)
+    creator = FactoryBot.create(:account)
+    creator.organisationships.create!(organisation: cohost, event_creator: true, unsubscribed: false)
+    event = FactoryBot.create(:event, organisation: org, account: org_owner)
+    event.cohostships.create!(organisation: cohost)
+    assert Event.admin?(event, creator)
+  end
+
   test 'event is invalid for org-wide create when account is only a follower' do
     org_owner = FactoryBot.create(:account)
     org = FactoryBot.create(:organisation, account: org_owner, allow_event_submissions: false)

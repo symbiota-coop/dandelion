@@ -26,8 +26,8 @@ module EventAccessControl
           event.event_facilitations.find_by(account: account) ||
           (event.activity && (activity_admin || (activity_admin.nil? && Activity.admin?(event.activity, account)))) ||
           (event.local_group && (local_group_admin || (local_group_admin.nil? && LocalGroup.admin?(event.local_group, account)))) ||
-          (event.organisation && (organisation_admin || (organisation_admin.nil? && Organisation.admin?(event.organisation, account)))) ||
-          event.cohosts.any? { |cohost| Organisation.admin?(cohost, account) }
+          (event.organisation && Organisation.admin_or_event_creator?(event.organisation, account, organisation_admin: organisation_admin)) ||
+          event.cohosts.any? { |cohost| Organisation.admin_or_event_creator?(cohost, account) }
       )
     end
 
