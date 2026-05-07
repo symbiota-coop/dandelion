@@ -26,6 +26,7 @@ module EventAtproto
 
     handle_asynchronously :publish_to_atproto
     handle_asynchronously :update_atproto
+    handle_asynchronously :delete_atproto
   end
 
   def should_publish_to_atproto?
