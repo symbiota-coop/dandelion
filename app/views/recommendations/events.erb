@@ -1,6 +1,6 @@
 <%
 recommended_events = @account.recommended_events || []
-events_by_id = Event.and(:id.in => recommended_events.map(&:first)).includes(:event_facilitations, :cohostships).index_by { |e| e.id.to_s }
+events_by_id = Event.and(:id.in => recommended_events.map(&:first)).with_key_includes.index_by { |e| e.id.to_s }
 %>
 
 <%= partial :'recommendations/nav' %>

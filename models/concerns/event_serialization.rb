@@ -2,20 +2,16 @@ module EventSerialization
   extend ActiveSupport::Concern
 
   class_methods do
-    def with_public_includes
-      includes(:activity, :local_group, cohostships: :organisation, event_facilitations: :account, event_tagships: :event_tag)
-    end
-
     def to_public_json
-      with_public_includes.map(&:public_data).to_json
+      with_key_includes.map(&:public_data).to_json
     end
 
     def to_public_xml
-      with_public_includes.map(&:public_data).to_xml(root: 'events')
+      with_key_includes.map(&:public_data).to_xml(root: 'events')
     end
 
     def to_public_markdown
-      with_public_includes.map(&:public_data).to_markdown
+      with_key_includes.map(&:public_data).to_markdown
     end
   end
 

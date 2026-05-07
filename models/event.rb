@@ -24,6 +24,11 @@ class Event
   include ImageWithValidation
   include Searchable
 
+  # Key associations for `public_data`, event cards (`events/blocks`), etc.
+  def self.with_key_includes
+    includes(:organisation, :activity, :local_group, cohostships: :organisation, event_facilitations: :account, event_tagships: :event_tag)
+  end
+
   COPY_FIELDS = %w[
     name location email image
     description extra_info_for_ticket_email

@@ -24,6 +24,7 @@ Dandelion::App.controller do
         @events = @events.and(:start_time.lt => @to + 1) if @to
         @events = @events.and(:id.in => Event.search(params[:q], @events).pluck(:id)) if params[:q]
         @boosted_event = EventBoost.pick_event_for_scope(@events) unless (params[:page] && params[:page].to_i > 1) || params[:home]
+        @events = @events.with_key_includes
         @events = apply_random_or_trending_order(@events, @from)
         partial :'events/events'
       else

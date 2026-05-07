@@ -1,9 +1,7 @@
 Dandelion::App.controller do
   get '/o/:slug/events_block' do
     @organisation = Organisation.find_by(slug: params[:slug]) || not_found
-    @events = @organisation.events_including_cohosted.publicly_visible.future_and_current.without_heavy_fields
-    event_block_includes = [:organisation, :activity, :local_group, { cohostships: :organisation, event_facilitations: :account, event_tagships: :event_tag }]
-    @events = @events.includes(*event_block_includes)
+    @events = @organisation.events_including_cohosted.publicly_visible.future_and_current.without_heavy_fields.with_key_includes
     @events = @events.and(monthly_donors_only: true) if params[:members_events]
     partial :'organisations/events_block'
   end
@@ -49,6 +47,7 @@ Dandelion::App.controller do
       end
       @events = filter_events_by_search_and_tags(@events)
       @events = @events.and(minimal_only: false) unless params[:minimal]
+      @events = @events.with_key_includes
       @events = apply_random_or_trending_order(@events, @from)
       if request.xhr?
         partial(:'organisations/events')

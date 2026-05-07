@@ -40,7 +40,7 @@ module Dandelion
     def self.perform_get(model_class, id: nil, **finder_args)
       config = config_for(model_class)
       scope = model_class.search_scope
-      scope = scope.with_public_includes if scope.respond_to?(:with_public_includes)
+      scope = scope.with_key_includes if scope.respond_to?(:with_key_includes)
       finder_value = finder_args[config[:finder_field]]
 
       record = if id.present?
