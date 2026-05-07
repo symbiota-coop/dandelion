@@ -86,11 +86,11 @@ module Searchable
         end
 
         should_clauses = query_variants.map do |variant|
-          { phrase: { query: variant, path: { wildcard: '*' }, score: { boost: { value: phrase_boost } } } }
+          { phrase: { query: variant, path: search_fields, score: { boost: { value: phrase_boost } } } }
         end
         if text_search
           should_clauses.concat(query_variants.map do |variant|
-            { text: { query: variant, path: { wildcard: '*' }, fuzzy: { maxEdits: 2, prefixLength: 2 } } }
+            { text: { query: variant, path: search_fields, fuzzy: { maxEdits: 2, prefixLength: 2 } } }
           end)
         end
 
