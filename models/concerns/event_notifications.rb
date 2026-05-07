@@ -49,35 +49,51 @@ module EventNotifications
     return unless reminder_hours_before
 
     mg_client = Mailgun::Client.new ENV['MAILGUN_API_KEY'], ENV['MAILGUN_REGION']
-    batch_message = Mailgun::BatchMessage.new(mg_client, ENV['MAILGUN_NOTIFICATIONS_HOST'])
+    batch_with_cancel = Mailgun::BatchMessage.new(mg_client, ENV['MAILGUN_NOTIFICATIONS_HOST'])
+    batch_without_cancel = Mailgun::BatchMessage.new(mg_client, ENV['MAILGUN_NOTIFICATIONS_HOST'])
 
     event = self
 
-    batch_message.from ENV['REMINDERS_EMAIL_FULL']
-    batch_message.reply_to(event.email || event.organisation.try(:reply_to))
-    batch_message.subject(
+    reminder_subject = (
       (event.reminder_email_title || event.organisation.reminder_email_title)
       .gsub('[event_name]', event.name)
     )
 
     tickets_table = EmailHelper.render(:_tickets_table, event: event)
-    batch_message.body_html EmailHelper.html(:reminder, event: event, tickets_table: tickets_table)
+    batch_with_cancel.body_html EmailHelper.html(:reminder, event: event, tickets_table: tickets_table, include_cancel_rsvp: true)
+    batch_without_cancel.body_html EmailHelper.html(:reminder, event: event, tickets_table: tickets_table, include_cancel_rsvp: false)
+
+    [batch_with_cancel, batch_without_cancel].each do |batch_message|
+      batch_message.from ENV['REMINDERS_EMAIL_FULL']
+      batch_message.reply_to(event.email || event.organisation.try(:reply_to))
+      batch_message.subject reminder_subject
+    end
+
+    recipients_with_cancel = 0
+    recipients_without_cancel = 0
 
     (account_id == :all ? attendees.and(unsubscribed: false).and(unsubscribed_reminders: false) : attendees.and(unsubscribed: false).and(unsubscribed_reminders: false).and(id: account_id)).each do |account|
       cancellable_order = event.orders.complete
                                 .and(account: account, :value.in => [nil, 0])
                                 .first
-      cancel_rsvp_link = if cancellable_order
-                           %(<p><a href="#{ENV['BASE_URI']}/orders/#{cancellable_order.id}/confirm_destroy?sign_in_token=#{account.sign_in_token}">Cancel your RSVP</a> if your plans change.</p>)
-                         else
-                           ''
-                         end
 
       when_parts = event.when_details(account.try(:time_zone), with_zone: true).split(', ')
-      batch_message.add_recipient(:to, account.email, { 'firstname' => account.firstname || 'there', 'token' => account.sign_in_token, 'id' => account.id.to_s, 'when_parts_0' => when_parts[0], 'when_parts_1' => when_parts[1..].join(', '), 'cancel_rsvp_link' => cancel_rsvp_link })
+      recipient_vars = { 'firstname' => account.firstname || 'there', 'token' => account.sign_in_token, 'id' => account.id.to_s, 'when_parts_0' => when_parts[0], 'when_parts_1' => when_parts[1..].join(', ') }
+
+      if cancellable_order
+        cancel_rsvp_url = "#{ENV['BASE_URI']}/orders/#{cancellable_order.id}/confirm_destroy?sign_in_token=#{account.sign_in_token}"
+        batch_with_cancel.add_recipient(:to, account.email, recipient_vars.merge('cancel_rsvp_url' => cancel_rsvp_url))
+        recipients_with_cancel += 1
+      else
+        batch_without_cancel.add_recipient(:to, account.email, recipient_vars)
+        recipients_without_cancel += 1
+      end
     end
 
-    batch_message.finalize if Padrino.env == :production
+    if Padrino.env == :production
+      batch_with_cancel.finalize if recipients_with_cancel.positive?
+      batch_without_cancel.finalize if recipients_without_cancel.positive?
+    end
     set(sent_reminders_at: Time.now) if account_id == :all
   end
 
