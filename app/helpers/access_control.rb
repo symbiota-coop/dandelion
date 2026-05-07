@@ -182,7 +182,7 @@ Dandelion::App.helpers do
         order,
         account,
         event_email_viewer: (event_email_viewer?(order.event, account) if order&.event),
-        event_admin: (event_admin?(order.event, account) if order&.opt_in_facilitator && order&.event)
+        event_admin: (event_admin?(order.event, account) if order&.opt_in_facilitator && order.event)
       )
     end
   end
