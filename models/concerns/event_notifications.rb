@@ -64,8 +64,17 @@ module EventNotifications
     batch_message.body_html EmailHelper.html(:reminder, event: event, tickets_table: tickets_table)
 
     (account_id == :all ? attendees.and(unsubscribed: false).and(unsubscribed_reminders: false) : attendees.and(unsubscribed: false).and(unsubscribed_reminders: false).and(id: account_id)).each do |account|
+      cancellable_order = event.orders.complete
+                                .and(account: account, :value.in => [nil, 0])
+                                .first
+      cancel_rsvp_link = if cancellable_order
+                           %(<p><a href="#{ENV['BASE_URI']}/orders/#{cancellable_order.id}/confirm_destroy?sign_in_token=#{account.sign_in_token}">Cancel your RSVP</a> if your plans change.</p>)
+                         else
+                           ''
+                         end
+
       when_parts = event.when_details(account.try(:time_zone), with_zone: true).split(', ')
-      batch_message.add_recipient(:to, account.email, { 'firstname' => account.firstname || 'there', 'token' => account.sign_in_token, 'id' => account.id.to_s, 'when_parts_0' => when_parts[0], 'when_parts_1' => when_parts[1..].join(', ') })
+      batch_message.add_recipient(:to, account.email, { 'firstname' => account.firstname || 'there', 'token' => account.sign_in_token, 'id' => account.id.to_s, 'when_parts_0' => when_parts[0], 'when_parts_1' => when_parts[1..].join(', '), 'cancel_rsvp_link' => cancel_rsvp_link })
     end
 
     batch_message.finalize if Padrino.env == :production

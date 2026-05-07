@@ -22,5 +22,8 @@
       ) %>
 </div>
 <div class="footer">
-  <a href="<%= ENV['BASE_URI'] %>/accounts/subscriptions?sign_in_token=%recipient.token%">Opt out of reminders</a>
+  %recipient.cancel_rsvp_link%
+  <p>
+    <a href="<%= ENV['BASE_URI'] %>/accounts/subscriptions?sign_in_token=%recipient.token%">Opt out of reminders</a>
+  </p>
 </div>
