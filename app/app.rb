@@ -70,8 +70,10 @@ module Dandelion
     end
 
     after do
-      name = env['sinatra.route']
-      next unless name
+      route = request.route_obj
+      next unless route
+
+      name = "#{request.request_method} #{route.original_path}"
 
       ext = File.extname(request.path)
       name = "#{name}#{ext}" if !ext.empty? && !name.end_with?(ext)
