@@ -1,9 +1,13 @@
+<%
+  availability = ticket_type.number_of_tickets_available_in_single_purchase
+  ticket_group_name = ticket_type.ticket_group.try(:name)
+%>
 <% unless @no_ticket_groups %>
-  <% tg = ticket_type.ticket_group.try(:name) || 'Other tickets'; if tg != @previous_ticket_group %>
+  <% tg = ticket_group_name || 'Other tickets'; if tg != @previous_ticket_group %>
   <tr>
     <td colspan="3" style="text-transform: uppercase; font-size: 80%" class="bg-primary text-white text-center font-weight-bold header-font"><%= tg %></td>
   </tr>
-  <% @previous_ticket_group = ticket_type.ticket_group.try(:name) %>
+  <% @previous_ticket_group = ticket_group_name %>
 <% end %>
 <% end %>
 <tr>
@@ -23,9 +27,9 @@
     <% end %>
 
     <% if ticket_type.sales_ended? || @event.sales_closed_due_to_event_end? %>
-    <% elsif ticket_type.number_of_tickets_available_in_single_purchase > 0 %>
-      <% if !@event.organisation.hide_few_left && !@event.hide_few_left && ticket_type.wiser_remaining <= 3 %>
-        <span style="position: relative; top: -2px;" class="badge badge-secondary"><%= ticket_type.wiser_remaining %> left</span>
+    <% elsif availability > 0 %>
+      <% if !@event.organisation.hide_few_left && !@event.hide_few_left && (wiser_remaining = ticket_type.wiser_remaining) <= 3 %>
+        <span style="position: relative; top: -2px;" class="badge badge-secondary"><%= wiser_remaining %> left</span>
       <% end %>
     <% end %>
 
@@ -87,7 +91,7 @@
   <td style="border-top: 0; vertical-align: middle">
     <% if ticket_type.sales_ended? || @event.sales_closed_due_to_event_end? %>
       <span class="badge badge-default">Sales closed</span>
-    <% elsif ticket_type.number_of_tickets_available_in_single_purchase > 0 %>
+    <% elsif availability > 0 %>
       <% if ticket_type.minimum_monthly_donation && (
                   !current_account ||
                   !(organisationship = @event.organisation.organisationships.find_by(account: current_account)) ||
@@ -105,7 +109,7 @@
       <% end %>
     <% else %>
       <div>
-        <%= select_tag :"quantities[#{ticket_type.id}]", 'data-ticket-type-id': ticket_type.id, 'data-price': ticket_type.price, class: 'form-control w-100', options: (0..[99,ticket_type.number_of_tickets_available_in_single_purchase].min).to_a, value: (params[:quantities][ticket_type.id.to_s] if params[:quantities]), disabled: !ticket_type.price %>
+        <%= select_tag :"quantities[#{ticket_type.id}]", 'data-ticket-type-id': ticket_type.id, 'data-price': ticket_type.price, class: 'form-control w-100', options: (0..[99, availability].min).to_a, value: (params[:quantities][ticket_type.id.to_s] if params[:quantities]), disabled: !ticket_type.price %>
       </div>
     <% end %>
   <% else %>
