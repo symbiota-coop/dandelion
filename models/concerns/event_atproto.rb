@@ -158,7 +158,7 @@ module EventAtproto
   def update_atproto
     # If event became secret/locked, delete the ATProto record
     if secret? || locked?
-      delete_atproto
+      delete_atproto_without_delay
       return
     end
 
@@ -199,7 +199,7 @@ module EventAtproto
     # Event should not be on AT Protocol (secret/locked)
     if secret? || locked?
       if atproto_uri.present?
-        delete_atproto unless dry_run
+        delete_atproto_without_delay unless dry_run
         return { action: :deleted }
       end
       return { action: :skipped, reason: 'secret_or_locked' }
@@ -311,7 +311,7 @@ module EventAtproto
           results[:orphaned] << { uri: uri, event_id: event.id.to_s, reason: 'should_be_deleted' }
           if fix
             begin
-              event.delete_atproto
+              event.delete_atproto_without_delay
             rescue StandardError => e
               results[:errors] << { event_id: event.id.to_s, action: 'delete_secret', error: e.message }
             end
