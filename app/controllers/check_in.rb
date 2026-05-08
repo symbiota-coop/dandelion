@@ -1,6 +1,6 @@
 Dandelion::App.controller do
   before do
-    @event = params[:slug] ? Event.find_by(slug: params[:slug]) : Event.find(params[:id]) || not_found
+    @event = (params[:slug] ? Event.find_by(slug: params[:slug]) : Event.find(params[:id])) || not_found
     @check_in_secret = Digest::SHA256.hexdigest("#{@event.id}#{ENV['SESSION_SECRET']}")[0..7]
     @check_in_url = "#{ENV['BASE_URI']}/e/#{@event.slug}/check_in?secret=#{@check_in_secret}"
     unless event_admin?
