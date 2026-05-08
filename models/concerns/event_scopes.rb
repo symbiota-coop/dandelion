@@ -106,9 +106,16 @@ module EventScopes
       ]
 
       pipeline << { '$limit' => limit } if limit
-      pipeline << { '$unset' => %w[recent_orders trending_priority recent_order_count embedding extra_info_for_ticket_email] }
 
-      collection.aggregate(pipeline).map { |hash| Event.new(hash.select { |k, _v| Event.fields.keys.include?(k.to_s) }) }
+      event_ids = collection.aggregate(pipeline).map { |hash| hash['_id'] }
+      base_query.without(:embedding, :extra_info_for_ticket_email).with_key_includes.in_id_order(event_ids)
+    end
+
+    def in_id_order(ids)
+      return [] if ids.empty?
+
+      events_by_id = self.and(:id.in => ids).index_by { |event| event.id.to_s }
+      ids.filter_map { |id| events_by_id[id.to_s] }
     end
   end
 end

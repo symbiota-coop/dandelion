@@ -61,12 +61,12 @@ Dandelion::App.helpers do
       event_ids = events.pluck(:id)
       return [] if event_ids.empty?
 
-      events.collection.aggregate([
-                                    { '$match' => { '_id' => { '$in' => event_ids } } },
-                                    { '$sample' => { size: event_ids.length } }
-                                  ]).map do |hash|
-        Event.new(hash.select { |k, _v| Event.fields.keys.include?(k.to_s) })
-      end
+      sampled_ids = events.collection.aggregate([
+                                                  { '$match' => { '_id' => { '$in' => event_ids } } },
+                                                  { '$sample' => { size: event_ids.length } },
+                                                  { '$project' => { '_id' => 1 } }
+                                                ]).map { |hash| hash['_id'] }
+      events.in_id_order(sampled_ids)
     when 'trending'
       events.trending(from)
     else
