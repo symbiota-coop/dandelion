@@ -20,14 +20,14 @@
         .gsub('[event_link]', "<a href='#{ENV['BASE_URI']}/e/#{event.slug}'>#{event.name}</a>")
         .gsub('[key_information_again]', event.extra_info_for_ticket_email ? "<p>Here's the key information again for your convenience:</p><hr><p>#{event.extra_info_for_ticket_email}</p>" : '')
       ) %>
-</div>
-<div class="footer">
+
   <% if defined?(include_cancel_rsvp) && include_cancel_rsvp %>
     <p>
-      <a href="%recipient.cancel_rsvp_url%">Cancel your RSVP</a> if your plans change.
+      <a href="%recipient.cancel_rsvp_url%">Cancel your RSVP</a> if you can no longer make it (you may need to request a sign in link).
     </p>
   <% end %>
-  <p>
-    <a href="<%= ENV['BASE_URI'] %>/accounts/subscriptions?sign_in_token=%recipient.token%">Opt out of reminders</a>
-  </p>
+
+</div>
+<div class="footer">
+  <a href="<%= ENV['BASE_URI'] %>/accounts/subscriptions?sign_in_token=%recipient.token%">Opt out of reminders</a>
 </div>
