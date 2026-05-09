@@ -41,6 +41,8 @@ end
 
 namespace :late do
   task errands: :environment do
+    puts 'public home ticket stats (daily)'
+    Ticket.refresh_home_page_stats!
     puts 'get Dandelion Daily'
     Faraday.get("#{ENV['BASE_URI']}/daily?date=#{Date.today.to_fs(:db_local)}", {}, { 'X-Requested-With' => 'XMLHttpRequest' })
     puts 'create organisation edges'

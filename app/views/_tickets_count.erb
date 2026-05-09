@@ -1,27 +1,20 @@
+<% s = Ticket.home_page_stats unless ENV['CREATE_VIDEO'] %>
 <% unless ENV['CREATE_VIDEO'] %>
-  <script>
-    $(function() {
-      var c = new countUp.CountUp('ticket-count', <%= Ticket.count%>);
-      c.start();
-      var c = new countUp.CountUp('worth-count',
-        <%=
-         m = Money.new(0,'GBP')
-         Order.and(:value.ne => nil, :currency.in => FIAT_CURRENCIES).each { |o| begin; m += Money.new(o.value*100, o.currency); rescue; end }
-         Float("%.3g" % m).to_i
-        %>
-      );
-      c.start();
-    })
-  </script>
+<script>
+$(function() {
+  new countUp.CountUp('ticket-count', <%= s[:ticket_count] %>).start();
+  new countUp.CountUp('worth-count', <%= s[:worth_gbp_integer] %>).start();
+})
+</script>
 <% end %>
 <img src="/images/tickets.png" style="height: 50px">
 <span class="d-sm-none">
   <br />
 </span>
-<span id="ticket-count" style="text-decoration: underline"><%= ENV['CREATE_VIDEO'] ? '146,196' : 0 %></span> tickets
+<span id="ticket-count" style="text-decoration: underline"><%= ENV['CREATE_VIDEO'] ? '146,196' : s[:ticket_count] %></span> tickets
 <span class="d-sm-none">
   <br />
 </span>
 worth
-£<span id="worth-count" style="text-decoration: underline"><%= ENV['CREATE_VIDEO'] ? '5,330,000' : 0 %></span>+
+£<span id="worth-count" style="text-decoration: underline"><%= ENV['CREATE_VIDEO'] ? '5,330,000' : s[:worth_gbp_integer] %></span>+
 sold

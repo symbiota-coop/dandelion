@@ -42,7 +42,6 @@ class Ticket
     %w[payment_completed]
   end
 
-
   before_validation do
     if email
       self.email = email.downcase.strip
@@ -65,18 +64,16 @@ class Ticket
 
     self.discounted_price = calculate_discounted_price
 
-    if new_record?
-      unless complimentary
-        errors.add(:ticket_type, 'is full') if ticket_type && (ticket_type.number_of_tickets_available_in_single_purchase < 1)
-        errors.add(:ticket_type, 'is not available as sales have ended') if (ticket_type && ticket_type.sales_ended?) || (event && event.sales_closed_due_to_event_end?)
-        if ticket_type && ticket_type.minimum_monthly_donation && (
-            !account ||
-            !(organisationship = event.organisation.organisationships.find_by(account: account)) ||
-            !organisationship.monthly_donation_amount ||
-            Money.new(organisationship.monthly_donation_amount * 100, organisationship.monthly_donation_currency) < Money.new(ticket_type.minimum_monthly_donation * 100, event.currency)
-          )
-          errors.add(:ticket_type, 'is not available to someone donating this amount')
-        end
+    if new_record? && !complimentary
+      errors.add(:ticket_type, 'is full') if ticket_type && (ticket_type.number_of_tickets_available_in_single_purchase < 1)
+      errors.add(:ticket_type, 'is not available as sales have ended') if (ticket_type && ticket_type.sales_ended?) || (event && event.sales_closed_due_to_event_end?)
+      if ticket_type && ticket_type.minimum_monthly_donation && (
+          !account ||
+          !(organisationship = event.organisation.organisationships.find_by(account: account)) ||
+          !organisationship.monthly_donation_amount ||
+          Money.new(organisationship.monthly_donation_amount * 100, organisationship.monthly_donation_currency) < Money.new(ticket_type.minimum_monthly_donation * 100, event.currency)
+        )
+        errors.add(:ticket_type, 'is not available to someone donating this amount')
       end
     end
   end
@@ -89,8 +86,8 @@ class Ticket
       send_resale_notification_to_previous_ticketholder(resold_account)
       send_resale_notification_to_organiser(resold_account)
     end
-    event.waitships.find_by(account: self.account).try(:destroy)
-    event.gathering.memberships.create(account: self.account, unsubscribed: true) if event.gathering
+    event.waitships.find_by(account: account).try(:destroy)
+    event.gathering.memberships.create(account: account, unsubscribed: true) if event.gathering
   end
 
   after_save do
@@ -118,6 +115,30 @@ class Ticket
 
   def self.discounted
     self.and(:id.in => self.and(:percentage_discount.ne => nil).pluck(:id) + self.and(:percentage_discount_monthly_donor.ne => nil).pluck(:id))
+  end
+
+  def self.home_page_stats
+    raw = Stash.find_by(key: 'public_home_ticket_stats')&.value
+    return { ticket_count: 0, worth_gbp_integer: 0 } if raw.blank?
+
+    h = JSON.parse(raw)
+    { ticket_count: h['ticket_count'].to_i, worth_gbp_integer: h['worth_gbp_integer'].to_i }
+  rescue JSON::ParserError
+    { ticket_count: 0, worth_gbp_integer: 0 }
+  end
+
+  def self.refresh_home_page_stats!
+    m = Money.new(0, 'GBP')
+    Order.and(:value.ne => nil, :currency.in => FIAT_CURRENCIES).each do |o|
+      m += Money.new(o.value * 100, o.currency)
+    rescue StandardError
+    end
+    stats = { ticket_count: count, worth_gbp_integer: Float('%.3g' % m).to_i }
+    Stash.find_or_initialize_by(key: 'public_home_ticket_stats').tap do |stash|
+      stash.value = stats.to_json
+      stash.save!
+    end
+    stats
   end
 
   def incomplete?
