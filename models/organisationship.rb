@@ -154,7 +154,7 @@ class Organisationship
                %(
       <div style="text-align: center">
           <a href="#{organisation.website || "#{ENV['BASE_URI']}/o/#{organisation.slug}"}">
-            <img src="#{organisation.image.thumb('1920x1920').url}" style="max-width: 100px; padding-top: 16px">
+            <img src="#{organisation.image.url}" style="max-width: 100px; padding-top: 16px">
           </a>
       </div>
     )
@@ -208,7 +208,7 @@ class Organisationship
                %(
       <div style="text-align: center">
           <a href="#{organisation.website || "#{ENV['BASE_URI']}/o/#{organisation.slug}"}">
-            <img src="#{organisation.image.thumb('1920x1920').url}" style="max-width: 100px; padding-top: 16px">
+            <img src="#{organisation.image.url}" style="max-width: 100px; padding-top: 16px">
           </a>
       </div>
     )

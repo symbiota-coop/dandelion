@@ -26,7 +26,7 @@ module OrderNotifications
 
   def sender_info
     if event.organisation.send_ticket_emails_from_organisation && event.organisation.image
-      [event.organisation.image.thumb('1920x1920').url, "#{event.organisation.name} <#{ENV['TICKETS_EMAIL']}>"]
+      [event.organisation.image.url, "#{event.organisation.name} <#{ENV['TICKETS_EMAIL']}>"]
     else
       [nil, ENV['TICKETS_EMAIL_FULL']]
     end

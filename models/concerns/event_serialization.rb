@@ -43,7 +43,7 @@ module EventSerialization
       end_time: end_time,
       location: location,
       time_zone: time_zone,
-      image: image ? image.thumb('1920x1920').url : nil,
+      image: image ? image.url : nil,
       description: description
     }
   end

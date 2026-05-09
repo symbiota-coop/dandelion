@@ -5,7 +5,7 @@ class EventPaymentMethod
       ::Stripe.api_version = ENV['STRIPE_API_VERSION']
 
       cohost = ticket_form[:cohost] && Organisation.find_by(slug: ticket_form[:cohost])
-      event_image = event.image_source(cohost)&.image&.thumb('1920x1920')
+      event_image = event.image_source(cohost)&.image
       revenue_sharer_organisationship = event.revenue_sharer_organisationship
       tax_rate_id = event.tax_rate_id || event.organisation.tax_rate_id
 
