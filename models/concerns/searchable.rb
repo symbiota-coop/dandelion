@@ -1,5 +1,11 @@
+require 'timeout'
+
 module Searchable
   extend ActiveSupport::Concern
+
+  # Hard cap on vector-enhanced search; beyond this we run text-only Atlas Search instead.
+  VECTOR_EMBEDDING_TIMEOUT_SECONDS = 1.0
+  VECTOR_AGGREGATE_MAX_TIME_MS = 1_000
 
   APOSTROPHES = %w[' ’ ‘ ʼ ＇ ′ ´].freeze
   APOSTROPHE_VARIANTS = Regexp.union(APOSTROPHES)
@@ -108,73 +114,69 @@ module Searchable
         query_vector = nil
         if vector_weight && vector_weight > 0 && fields.key?('embedding')
           query_vector = begin
-            OpenRouter.embedding(query)
-          rescue StandardError
+            Timeout.timeout(VECTOR_EMBEDDING_TIMEOUT_SECONDS) { OpenRouter.embedding(query) }
+          rescue Timeout::Error, StandardError
             nil
           end
         end
 
-        if query_vector
-          vector_filter = if search_filters_vector.empty?
-                            nil
-                          elsif search_filters_vector.length == 1
-                            search_filters_vector.first
-                          else
-                            { '$and' => search_filters_vector }
-                          end
+        suffix_stages = []
+        suffix_stages << { '$match': remaining_selector } if remaining_selector.any?
+        suffix_stages << { '$limit': limit } if limit
+        suffix_stages << { '$unset' => %w[embedding] } if build_records && fields.key?('embedding')
+        suffix_stages << { '$project': { _id: 1 } } unless build_records
 
-          # Use $rankFusion to combine vector and text search
-          fetch_limit = limit ? limit * 2 : 100
-          num_candidates = 20 * fetch_limit
+        text_core_stages = [
+          { '$search': text_search_stage },
+          { '$addFields': { score: { '$meta': 'searchScore' } } }
+        ]
 
-          vector_search_stage = {
-            index: 'vector_index',
-            path: 'embedding',
-            queryVector: query_vector,
-            numCandidates: num_candidates,
-            limit: fetch_limit
-          }
-          vector_search_stage[:filter] = vector_filter if vector_filter
+        fusion_head_stages =
+          if query_vector
+            vector_filter = if search_filters_vector.empty?
+                              nil
+                            elsif search_filters_vector.length == 1
+                              search_filters_vector.first
+                            else
+                              { '$and' => search_filters_vector }
+                            end
 
-          pipeline = [
-            {
-              '$rankFusion': {
-                input: {
-                  pipelines: {
-                    vectorPipeline: [
-                      { '$vectorSearch': vector_search_stage }
-                    ],
-                    textPipeline: [
-                      { '$search': text_search_stage },
-                      { '$limit': fetch_limit }
-                    ]
-                  }
-                },
-                combination: {
-                  weights: {
-                    vectorPipeline: vector_weight,
-                    textPipeline: 1 - vector_weight
+            fetch_limit = limit ? limit * 2 : 100
+            num_candidates = 20 * fetch_limit
+
+            vector_search_stage = {
+              index: 'vector_index',
+              path: 'embedding',
+              queryVector: query_vector,
+              numCandidates: num_candidates,
+              limit: fetch_limit
+            }
+            vector_search_stage[:filter] = vector_filter if vector_filter
+
+            [
+              {
+                '$rankFusion': {
+                  input: {
+                    pipelines: {
+                      vectorPipeline: [
+                        { '$vectorSearch': vector_search_stage }
+                      ],
+                      textPipeline: [
+                        { '$search': text_search_stage },
+                        { '$limit': fetch_limit }
+                      ]
+                    }
+                  },
+                  combination: {
+                    weights: {
+                      vectorPipeline: vector_weight,
+                      textPipeline: 1 - vector_weight
+                    }
                   }
                 }
               }
-            }
-          ]
-        else
-          # Fall back to text-only search
-          pipeline = [
-            { '$search': text_search_stage },
-            { '$addFields': { score: { '$meta': 'searchScore' } } }
-          ]
-        end
-
-        # Only add $match stage if there are remaining complex conditions
-        pipeline << { '$match': remaining_selector } if remaining_selector.any?
-
-        pipeline << { '$limit': limit } if limit
-
-        pipeline << { '$unset' => %w[embedding] } if build_records && fields.key?('embedding')
-
-        pipeline << { '$project': { _id: 1 } } unless build_records
+            ]
+          end
 
         results = Sentry.with_child_span(op: 'search.query', description: 'Atlas Search') do |span|
           span&.set_data('search.model', name)
@@ -182,11 +184,37 @@ module Searchable
           span&.set_data('search.build_records', build_records)
           span&.set_data('search.text_search', text_search)
           span&.set_data('search.vector_enabled', !!query_vector)
-          span&.set_data('search.pipeline', query_vector ? 'rank_fusion' : 'text')
 
-          collection.aggregate(pipeline).to_a.tap do |documents|
-            span&.set_data('search.result_count', documents.length)
-          end
+          fusion_fallback = false
+          documents =
+            if fusion_head_stages
+              begin
+                collection
+                  .aggregate(fusion_head_stages + suffix_stages, max_time_ms: VECTOR_AGGREGATE_MAX_TIME_MS)
+                  .to_a
+              rescue Mongo::Error::OperationFailure => e
+                raise unless e.max_time_ms_expired?
+
+                fusion_fallback = true
+                span&.set_data('search.vector_aggregate_fallback', 'max_time_ms')
+                collection.aggregate(text_core_stages + suffix_stages).to_a
+              end
+            else
+              collection.aggregate(text_core_stages + suffix_stages).to_a
+            end
+
+          pipeline_label =
+            if fusion_head_stages && !fusion_fallback
+              'rank_fusion'
+            elsif fusion_head_stages && fusion_fallback
+              'text_after_vector_timeout'
+            else
+              'text'
+            end
+          span&.set_data('search.pipeline', pipeline_label)
+          span&.set_data('search.result_count', documents.length)
+
+          documents
         end
 
         if build_records
