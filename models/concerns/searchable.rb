@@ -181,9 +181,8 @@ module Searchable
           span&.set_data('search.limit', limit) if limit
           span&.set_data('search.build_records', build_records)
           span&.set_data('search.text_search', text_search)
-          span&.set_data('search.vector_enabled', !!query_vector)
 
-          fusion_fallback = false
+          text_fallback = false
           documents =
             if fusion_head_stages
               begin
@@ -193,8 +192,7 @@ module Searchable
               rescue Mongo::Error::OperationFailure => e
                 raise unless e.max_time_ms_expired?
 
-                fusion_fallback = true
-                span&.set_data('search.vector_aggregate_fallback', 'max_time_ms')
+                text_fallback = true
                 collection.aggregate(text_core_stages + suffix_stages).to_a
               end
             else
@@ -202,10 +200,10 @@ module Searchable
             end
 
           pipeline_label =
-            if fusion_head_stages && !fusion_fallback
-              'rank_fusion'
-            elsif fusion_head_stages && fusion_fallback
-              'text_after_vector_timeout'
+            if fusion_head_stages && !text_fallback
+              'vector'
+            elsif fusion_head_stages && text_fallback
+              'text_fallback'
             else
               'text'
             end
