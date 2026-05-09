@@ -29,7 +29,10 @@ class OpenRouter
     @client = Faraday.new(url: BASE_URL) do |conn|
       conn.request :json
       conn.response :json
-      conn.request :retry, max: 3, interval: 0.5, backoff_factor: 2, retry_statuses: [429, 500, 502, 503, 504]
+      # Only Faraday::RetriableResponse (retry_statuses), not timeouts — so embedding timeouts stay a hard cap.
+      conn.request :retry, max: 3, interval: 0.5, backoff_factor: 2,
+                           retry_statuses: [429, 500, 502, 503, 504],
+                           exceptions: [Faraday::RetriableResponse]
       conn.adapter Faraday.default_adapter
     end
   end
@@ -101,13 +104,13 @@ class OpenRouter
     result
   end
 
-  def embedding(input, full_response: false, model: 'google/gemini-embedding-001')
+  def embedding(input, full_response: false, model: 'google/gemini-embedding-001', timeout: nil)
     payload = {
       model: model,
       input: input
     }
 
-    response = api_post('/api/v1/embeddings', payload)
+    response = api_post('/api/v1/embeddings', payload, timeout: timeout)
 
     if full_response
       response.body
@@ -118,7 +121,7 @@ class OpenRouter
 
   private
 
-  def api_post(endpoint, payload)
+  def api_post(endpoint, payload, timeout: nil)
     operation_name = endpoint.include?('embeddings') ? 'embeddings' : 'chat'
 
     Sentry.with_child_span(op: endpoint.include?('embeddings') ? 'gen_ai.embeddings' : 'gen_ai.request', description: "#{operation_name} #{payload[:model]}") do |span|
@@ -133,6 +136,10 @@ class OpenRouter
         req.headers['Content-Type'] = 'application/json'
         req.headers['Authorization'] = "Bearer #{ENV['OPENROUTER_API_KEY']}"
         req.body = payload
+        if timeout
+          req.options.timeout = timeout
+          req.options.open_timeout = timeout
+        end
       end
 
       span&.set_http_status(response.status)

@@ -1,5 +1,3 @@
-require 'timeout'
-
 module Searchable
   extend ActiveSupport::Concern
 
@@ -114,8 +112,8 @@ module Searchable
         query_vector = nil
         if vector_weight && vector_weight > 0 && fields.key?('embedding')
           query_vector = begin
-            Timeout.timeout(VECTOR_EMBEDDING_TIMEOUT_SECONDS) { OpenRouter.embedding(query) }
-          rescue Timeout::Error, StandardError
+            OpenRouter.embedding(query, timeout: VECTOR_EMBEDDING_TIMEOUT_SECONDS)
+          rescue StandardError
             nil
           end
         end
