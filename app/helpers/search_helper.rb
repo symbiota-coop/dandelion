@@ -46,7 +46,7 @@ Dandelion::App.helpers do
       next if model_class && config_model_class != model_class
 
       scope = config_model_class.search_scope
-      items = config_model_class.search(q, scope, limit: 5, build_records: true, phrase_boost: 1.5, text_search: true, vector_weight: 0)
+      items = config_model_class.search(q, scope, limit: 5, build_records: true, phrase_boost: 1.5, fuzzy_text: true, vector_weight: 0)
       prefix = search_prefix(config_model_class)
       results += items.map do |item|
         {
@@ -74,7 +74,7 @@ Dandelion::App.helpers do
     end
 
     # Perform search
-    results = model_class.search(q, scope, limit: 100, build_records: true, phrase_boost: 1.5, text_search: true, vector_weight: 0.5)
+    results = model_class.search(q, scope, limit: 100, build_records: true, phrase_boost: 1.5, fuzzy_text: true, vector_weight: 0.5)
 
     # Deduplicate events by name and location, keeping only the first result for each combination
     results = results.uniq { |e| [e.name, e.location] } if model_class == Event

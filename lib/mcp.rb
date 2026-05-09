@@ -32,7 +32,7 @@ module Dandelion
       limit = (limit || 20).to_i.clamp(1, 100)
       config = config_for(model_class)
       scope = model_class.search_scope
-      results = model_class.search(query, scope, limit: limit, build_records: true, phrase_boost: 1.5, text_search: true, vector_weight: 0.5)
+      results = model_class.search(query, scope, limit: limit, build_records: true, phrase_boost: 1.5, fuzzy_text: true, vector_weight: 0.5)
       fields_proc = config[:search_fields] || config[:fields]
       ::MCP::Tool::Response.new([{ type: 'text', text: results.map { |r| fields_proc.call(r) }.to_json }])
     end

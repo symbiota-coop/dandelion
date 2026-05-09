@@ -10,7 +10,7 @@ module Searchable
   APOSTROPHE_CHAR_CLASS = "[#{APOSTROPHES.map { |ch| Regexp.escape(ch) }.join}]".freeze
 
   class_methods do
-    def search(query, scope = all, child_scope: nil, limit: nil, build_records: false, phrase_boost: 1, text_search: false, vector_weight: nil, regex_search: Padrino.env != :production)
+    def search(query, scope = all, child_scope: nil, limit: nil, build_records: false, phrase_boost: 1, fuzzy_text: false, vector_weight: nil, regex_search: Padrino.env != :production)
       return none if query.blank?
       return none if query.length < 3 || query.length > 200
 
@@ -92,14 +92,14 @@ module Searchable
         should_clauses = query_variants.map do |variant|
           { phrase: { query: variant, path: search_fields, score: { boost: { value: phrase_boost } } } }
         end
-        if text_search
+        if fuzzy_text
           should_clauses.concat(query_variants.map do |variant|
             { text: { query: variant, path: search_fields, fuzzy: { maxEdits: 2, prefixLength: 2 } } }
           end)
         end
 
-        # Build text search stage (used in both vector+text and text-only searches)
-        text_search_stage = {
+        # Atlas $search compound spec (passed as the stage body for $search).
+        search_spec = {
           index: to_s.underscore.pluralize,
           compound: {
             should: should_clauses,
@@ -107,6 +107,17 @@ module Searchable
             minimumShouldMatch: 1
           }
         }
+
+        text_stages = [
+          { '$search': search_spec },
+          { '$addFields': { score: { '$meta': 'searchScore' } } }
+        ]
+
+        suffix_stages = []
+        suffix_stages << { '$match': remaining_selector } if remaining_selector.any?
+        suffix_stages << { '$limit': limit } if limit
+        suffix_stages << { '$unset' => %w[embedding] } if build_records && fields.key?('embedding')
+        suffix_stages << { '$project': { _id: 1 } } unless build_records
 
         # Try to get embedding for vector search if enabled and model has embedding field
         query_vector = nil
@@ -118,18 +129,7 @@ module Searchable
           end
         end
 
-        suffix_stages = []
-        suffix_stages << { '$match': remaining_selector } if remaining_selector.any?
-        suffix_stages << { '$limit': limit } if limit
-        suffix_stages << { '$unset' => %w[embedding] } if build_records && fields.key?('embedding')
-        suffix_stages << { '$project': { _id: 1 } } unless build_records
-
-        text_core_stages = [
-          { '$search': text_search_stage },
-          { '$addFields': { score: { '$meta': 'searchScore' } } }
-        ]
-
-        fusion_head_stages =
+        fusion_stages =
           if query_vector
             vector_filter = if search_filters_vector.empty?
                               nil
@@ -160,7 +160,7 @@ module Searchable
                         { '$vectorSearch': vector_search_stage }
                       ],
                       textPipeline: [
-                        { '$search': text_search_stage },
+                        { '$search': search_spec },
                         { '$limit': fetch_limit }
                       ]
                     }
@@ -180,29 +180,29 @@ module Searchable
           span&.set_data('search.model', name)
           span&.set_data('search.limit', limit) if limit
           span&.set_data('search.build_records', build_records)
-          span&.set_data('search.text_search', text_search)
+          span&.set_data('search.fuzzy_text', fuzzy_text)
 
           text_fallback = false
           documents =
-            if fusion_head_stages
+            if fusion_stages
               begin
                 collection
-                  .aggregate(fusion_head_stages + suffix_stages, max_time_ms: VECTOR_AGGREGATE_MAX_TIME_MS)
+                  .aggregate(fusion_stages + suffix_stages, max_time_ms: VECTOR_AGGREGATE_MAX_TIME_MS)
                   .to_a
               rescue Mongo::Error::OperationFailure => e
                 raise unless e.max_time_ms_expired?
 
                 text_fallback = true
-                collection.aggregate(text_core_stages + suffix_stages).to_a
+                collection.aggregate(text_stages + suffix_stages).to_a
               end
             else
-              collection.aggregate(text_core_stages + suffix_stages).to_a
+              collection.aggregate(text_stages + suffix_stages).to_a
             end
 
           pipeline_label =
-            if fusion_head_stages && !text_fallback
+            if fusion_stages && !text_fallback
               'vector'
-            elsif fusion_head_stages && text_fallback
+            elsif fusion_stages && text_fallback
               'text_fallback'
             else
               'text'
