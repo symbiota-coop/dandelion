@@ -10,7 +10,7 @@ module Searchable
   APOSTROPHE_CHAR_CLASS = "[#{APOSTROPHES.map { |ch| Regexp.escape(ch) }.join}]".freeze
 
   class_methods do
-    def search(query, scope = all, child_scope: nil, limit: nil, build_records: false, phrase_boost: 1, fuzzy_text: false, vector_weight: nil, regex_search: Padrino.env != :production)
+    def search(query, scope = all, child_scope: nil, limit: nil, build_records: false, phrase_boost: 1, fuzzy_text: false, vector_weight: nil, regex_search: Padrino.env != :production, pipeline_metadata: nil)
       return none if query.blank?
       return none if query.length < 3 || query.length > 200
 
@@ -207,6 +207,7 @@ module Searchable
             else
               'text'
             end
+          pipeline_metadata[:pipeline] = pipeline_label if pipeline_metadata
           span&.set_data('search.pipeline', pipeline_label)
           span&.set_data('search.result_count', documents.length)
 

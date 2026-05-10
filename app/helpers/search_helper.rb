@@ -74,7 +74,10 @@ Dandelion::App.helpers do
     end
 
     # Perform search
-    results = model_class.search(q, scope, limit: 100, build_records: true, phrase_boost: 1.5, fuzzy_text: true, vector_weight: 0.5)
+    pipeline_metadata = {}
+    results = model_class.search(q, scope, limit: 100, build_records: true, phrase_boost: 1.5, fuzzy_text: true, vector_weight: 0.5,
+                                 pipeline_metadata: pipeline_metadata)
+    @search_pipeline = pipeline_metadata[:pipeline]
 
     # Deduplicate events by name and location, keeping only the first result for each combination
     results = results.uniq { |e| [e.name, e.location] } if model_class == Event
