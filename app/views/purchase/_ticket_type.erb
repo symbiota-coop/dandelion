@@ -113,7 +113,7 @@
       </div>
     <% end %>
   <% else %>
-    <span class="badge badge-primary">Sold out</span>
+    <span class="badge badge-primary"><%= waitlist_available ? 'Waitlist' : 'Sold out' %></span>
   <% end %>
 </td>
 </tr>

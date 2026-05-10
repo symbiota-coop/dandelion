@@ -59,7 +59,7 @@ class WaitlistTest < ActiveSupport::TestCase
     @event.refresh_sold_out_cache_and_notify_waitlist
 
     visit "/e/#{@event.slug}"
-    assert page.has_content?('Join the waitlist for a sold-out ticket type'), 'Should show ticket-type waitlist'
+    assert page.has_content?("Join the waitlist for #{sold_out_ticket_type.name}"), 'Should show ticket-type waitlist for the sold-out ticket type'
     fill_in 'waitship_name', with: 'Partial Sellout Waiter'
     fill_in 'waitship_email', with: 'partial-sellout-waiter@example.com'
     execute_script "window.grecaptcha = { getResponse: function() { return 'test-token'; } }"
