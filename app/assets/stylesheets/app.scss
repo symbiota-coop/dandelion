@@ -707,19 +707,34 @@ div.wysiwyg img,
   max-width: 100%
 }
 
-// Event description images: full width of the text column on small viewports
+// Event description images on small viewports:
+// - Figures without inline width: do not stretch small images (max-width only).
+// - Figures with inline width (CKEditor): use full column width; img fills the figure.
 // CKEditor stores width on <figure class="image"> (inline style), not only on <img>
 @media (max-width: 767px) {
 
   div.wysiwyg.readable figure.image,
   #tab-description .ck-content figure.image {
-    width: 100% !important;
     max-width: 100% !important;
   }
 
   div.wysiwyg.readable img,
   #tab-description .ck-content img {
+    max-width: 100% !important;
+    height: auto;
+  }
+
+  // Inline width on figure (e.g. width: 75% / 400px) — span the text column on mobile
+  div.wysiwyg.readable figure.image[style*="width:"],
+  #tab-description .ck-content figure.image[style*="width:"] {
     width: 100% !important;
+    max-width: 100% !important;
+  }
+
+  div.wysiwyg.readable figure.image[style*="width:"] img,
+  #tab-description .ck-content figure.image[style*="width:"] img {
+    width: 100% !important;
+    max-width: 100% !important;
     height: auto;
   }
 }
