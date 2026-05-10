@@ -6,7 +6,7 @@
     <% if theme_color && !theme_css_redundant?(theme_color) %>
       <link href="/theme.css?theme_color=<%=CGI.escape(theme_color)%>" rel="stylesheet">
   <% end %>
-  <% if @organisation && @organisation.unsanitized_ok? && @organisation.minimal_head %>
+  <% if @organisation && @organisation.unsanitized_ok? && @organisation.minimal_head && !@minimal_subscribe %>
     <%== @organisation.minimal_head %>
   <% end %>
   <% if @account && @account.admin? && @account.minimal_head %>

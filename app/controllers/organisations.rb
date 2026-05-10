@@ -82,7 +82,7 @@ Dandelion::App.controller do
 
   get '/o/:slug/subscribe' do
     @organisation = Organisation.find_by(slug: params[:slug]) || Organisation.find(params[:slug]) || not_found
-    @minimal = true
+    @minimal_subscribe = true
     partial :'accounts/new_compact', layout: 'minimal'
   end
 
