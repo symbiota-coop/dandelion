@@ -25,6 +25,13 @@ end
   free_ticket_type.price.zero? &&
   free_ticket_type.number_of_tickets_available_in_single_purchase > 0 &&
   !free_ticket_type.sales_ended? && !@event.sales_closed_due_to_event_end?
+
+waitlist_ticket_types = []
+if @event.waitlist_by_ticket_type? && !@event.hide_waitlist? && !@event.sales_closed_due_to_event_end?
+  waitlist_ticket_types = @event.ticket_types.and(hidden: false).order('order asc, price desc').select do |ticket_type|
+    ticket_type.number_of_tickets_available_in_single_purchase <= 0 && !ticket_type.sales_ended?
+  end
+end
 %>
 
 <div class="card shadow-sm <% if @event.no_discounts %>no-discounts<% end %>" id="select-tickets">
@@ -104,16 +111,6 @@ end
         <% end %>
       <% end %>
 
-      <% if @event.waitlist_by_ticket_type? && !@event.hide_waitlist? && !@event.sales_closed_due_to_event_end? %>
-        <%
-          waitlist_ticket_types = @event.ticket_types.and(hidden: false).order('order asc, price desc').select do |ticket_type|
-            ticket_type.number_of_tickets_available_in_single_purchase <= 0 && !ticket_type.sales_ended?
-          end
-        %>
-        <% if waitlist_ticket_types.any? %>
-          <%= partial :'purchase/ticket_type_waitlist', locals: { ticket_types: waitlist_ticket_types } %>
-        <% end %>
-      <% end %>
     </div>
 
     <% unless @concise_ticket_form %>
@@ -203,6 +200,15 @@ end
       <%= hidden_field_tag :utm_campaign, value: params[:utm_campaign] %>
     <% end %>
   </div>
+
+  <% if waitlist_ticket_types.any? %>
+    <h3 class="card-header bg-primary text-white">
+      Waitlist
+    </h3>
+    <div class="card-body">
+      <%= partial :'purchase/ticket_type_waitlist', locals: { ticket_types: waitlist_ticket_types } %>
+    </div>
+  <% end %>
 </div>
 
 <div class="card shadow-sm" id="card-error" style="display: none">

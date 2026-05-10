@@ -11,11 +11,15 @@
 
 <div class="alert alert-secondary">
   <p>
-    Join the waitlist for a sold-out ticket type and we'll let you know when it becomes available.
+    <% if ticket_types.one? %>
+      Join the waitlist for <%= ticket_types.first.name %> and we'll let you know when it becomes available.
+    <% else %>
+      Join the waitlist for a sold-out ticket type and we'll let you know when it becomes available.
+    <% end %>
   </p>
   <% form_for Waitship.new, "/events/#{@event.id}/waitship/new", id: 'ticket-type-waitlist-form' do |f| %>
     <%= f.text_block :name %>
-    <%= f.text_block :email %>
+    <%= f.email_block :email, required: true %>
     <% if ticket_types.one? %>
       <p class="mb-2"><strong><%= ticket_types.first.name %></strong></p>
       <%= hidden_field_tag :'waitship[ticket_type_id]', value: ticket_types.first.id %>
