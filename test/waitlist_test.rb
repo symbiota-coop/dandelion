@@ -31,6 +31,48 @@ class WaitlistTest < ActiveSupport::TestCase
     assert @event.waitships.find_by(account: waitlist_account), 'Waitship should exist'
   end
 
+  test 'joining ticket-type waitlist stores the selected ticket type' do
+    create_full_event_hierarchy(event_options: { prices: [10, 20], waitlist_mode: 'ticket_type' })
+    ticket_type = @event.ticket_types.first
+    ticket_type.set(quantity: 0)
+    @event.ticket_types.last.set(quantity: 0)
+    @event.refresh_sold_out_cache_and_notify_waitlist
+
+    visit "/e/#{@event.slug}"
+    fill_in 'waitship_name', with: 'Ticket Type Waiter'
+    fill_in 'waitship_email', with: 'ticket-type-waiter@example.com'
+    select ticket_type.name, from: 'waitship_ticket_type_id'
+    execute_script "window.grecaptcha = { getResponse: function() { return 'test-token'; } }"
+
+    click_button 'Submit'
+
+    waitlist_account = Account.find_by(email: 'ticket-type-waiter@example.com')
+    waitship = @event.waitships.find_by(account: waitlist_account)
+    assert waitship, 'Waitship should exist'
+    assert_equal ticket_type.id, waitship.ticket_type_id
+  end
+
+  test 'can join ticket-type waitlist when only one ticket type is sold out' do
+    create_full_event_hierarchy(event_options: { prices: [10, 20], waitlist_mode: 'ticket_type' })
+    sold_out_ticket_type = @event.ticket_types.first
+    sold_out_ticket_type.set(quantity: 0)
+    @event.refresh_sold_out_cache_and_notify_waitlist
+
+    visit "/e/#{@event.slug}"
+    assert page.has_content?('Join the waitlist for a sold-out ticket type'), 'Should show ticket-type waitlist'
+    fill_in 'waitship_name', with: 'Partial Sellout Waiter'
+    fill_in 'waitship_email', with: 'partial-sellout-waiter@example.com'
+    execute_script "window.grecaptcha = { getResponse: function() { return 'test-token'; } }"
+
+    click_button 'Join waitlist'
+
+    waitlist_account = Account.find_by(email: 'partial-sellout-waiter@example.com')
+    waitship = @event.waitships.find_by(account: waitlist_account)
+    assert waitship, 'Waitship should exist'
+    assert_equal sold_out_ticket_type.id, waitship.ticket_type_id
+  end
+
+
   test 'waitlist creates organisationship, activityship, and local_groupship' do
     create_full_event_hierarchy(event_options: { prices: [10] })
     @account = FactoryBot.create(:account)
@@ -100,6 +142,19 @@ class WaitlistTest < ActiveSupport::TestCase
     # Mongoid puts uniqueness errors on the field name (account_id)
     assert waitship2.errors[:account_id].present? || waitship2.errors[:account].present?,
            "Should have uniqueness error. All errors: #{waitship2.errors.full_messages}"
+  end
+
+  test 'can join separate waitlists for different ticket types' do
+    create_full_event_hierarchy(event_options: { prices: [10, 20], waitlist_mode: 'ticket_type' })
+    @account = FactoryBot.create(:account)
+
+    waitship1 = Waitship.create!(account: @account, event: @event, ticket_type: @event.ticket_types[0])
+    waitship2 = Waitship.create!(account: @account, event: @event, ticket_type: @event.ticket_types[1])
+    duplicate = Waitship.new(account: @account, event: @event, ticket_type: @event.ticket_types[0])
+
+    assert waitship1.persisted?, 'First ticket-type waitship should be created'
+    assert waitship2.persisted?, 'Second ticket-type waitship should be created'
+    assert_not duplicate.valid?, 'Duplicate waitship for the same ticket type should not be valid'
   end
 
   test 'waitlist notification triggered when tickets become available' do

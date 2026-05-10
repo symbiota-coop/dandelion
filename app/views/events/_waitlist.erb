@@ -12,7 +12,7 @@
           There's also an <a href="/e/<%=next_event.slug%>">on-demand version</a> available.
         <% end %>
         <% unless @event.hide_waitlist %>
-          If that date doesn't work for you, <mark>join the waitlist and we'll let you know when tickets become available to this event or future events.</mark>
+          If that date doesn't work for you, <mark>join the waitlist and we'll let you know when <%= @event.waitlist_by_ticket_type? ? 'your ticket type becomes' : 'tickets become' %> available for this event or future events.</mark>
         <% end %>
       <% else %>
         <% if @event.hide_waitlist %>
@@ -23,11 +23,17 @@
           <% end %>
         <% else %>
           Missed out on tickets to <%= @event.name %>?
-          <mark>Join the waitlist and we'll let you know when tickets become available to this event or future events.</mark>
+          <mark>Join the waitlist and we'll let you know when <%= @event.waitlist_by_ticket_type? ? 'your ticket type becomes' : 'tickets become' %> available for this event or future events.</mark>
         <% end %>
       <% end %>
     </p>
     <% unless @event.hide_waitlist %>
+      <%
+        waitlist_ticket_types = @event.ticket_types.and(hidden: false).order('order asc, price desc').select do |ticket_type|
+          ticket_type.number_of_tickets_available_in_single_purchase <= 0 || ticket_type.sales_ended? || @event.sales_closed_due_to_event_end?
+        end
+        waitlist_ticket_types = @event.ticket_types.and(hidden: false).order('order asc, price desc').to_a if waitlist_ticket_types.empty?
+      %>
       <script>
         $(function () {
 
@@ -43,6 +49,11 @@
       <% form_for Waitship.new, "/events/#{@event.id}/waitship/new", id: 'waitlist-form'  do |f| %>
         <%= f.text_block :name %>
         <%= f.text_block :email %>
+        <% if @event.waitlist_by_ticket_type? && waitlist_ticket_types.one? %>
+          <%= hidden_field_tag :'waitship[ticket_type_id]', value: waitlist_ticket_types.first.id %>
+        <% elsif @event.waitlist_by_ticket_type? && waitlist_ticket_types.many? %>
+          <%= f.select_block :ticket_type_id, options: waitlist_ticket_types.map { |ticket_type| [ticket_type.name, ticket_type.id] } %>
+        <% end %>
         <div class="g-recaptcha mb-2" data-sitekey="<%= ENV['RECAPTCHA_SITE_KEY'] %>"></div>
         <%= f.submit_block button_text: 'Submit' %>
       <% end %>

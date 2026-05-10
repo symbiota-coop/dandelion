@@ -175,6 +175,8 @@ If your event sells out, a waitlist will be activated automatically. You can vie
 
 Dandelion automatically emails people on your waitlist if tickets become available again (either by you releasing more tickets, cancelling existing orders, or someone marking a ticket for resale with resales enabled).
 
+By default, each event has one waitlist. In the event editor, you can change the waitlist mode to use separate waitlists for each ticket type. With ticket-type waitlists, people choose which sold-out ticket type they are waiting for and only receive an email when that ticket type becomes available.
+
 You can email your waitlist via Dandelion by going to Mailer in the event dropdown, creating a new message and selecting the waitlist under the To field. Alternatively, you can simply copy and paste the email addresses from the waitlist page into your own email app.
 
 ## Fees and payouts

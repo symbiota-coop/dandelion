@@ -86,15 +86,32 @@ class Ticket
       send_resale_notification_to_previous_ticketholder(resold_account)
       send_resale_notification_to_organiser(resold_account)
     end
-    event.waitships.find_by(account: account).try(:destroy)
+    if event && account
+      event.waitships.and(account: account, ticket_type_id: ticket_type_id).destroy_all if ticket_type_id
+      event.waitships.and(account: account, ticket_type_id: nil).destroy_all
+    end
     event.gathering.memberships.create(account: account, unsubscribed: true) if event.gathering
   end
 
+  before_save :capture_ticket_type_waitlist_availability
+  before_destroy :capture_ticket_type_waitlist_availability
+
   after_save do
-    event.refresh_sold_out_cache_and_notify_waitlist if event
+    refresh_waitlist_availability
   end
   after_destroy do
-    event.refresh_sold_out_cache_and_notify_waitlist if event
+    refresh_waitlist_availability
+  end
+
+  def capture_ticket_type_waitlist_availability
+    @ticket_type_was_available_for_waitlist = ticket_type && ticket_type.available_for_waitlist?
+  end
+
+  def refresh_waitlist_availability
+    if event
+      event.refresh_sold_out_cache_and_notify_waitlist
+      event.send_waitlist_tickets_available_for_ticket_type(ticket_type_id) if ticket_type_id && !@ticket_type_was_available_for_waitlist && ticket_type&.available_for_waitlist?
+    end
   end
 
   def self.email_viewer?(ticket, account, order_email_viewer: nil)

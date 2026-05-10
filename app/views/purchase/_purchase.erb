@@ -103,6 +103,17 @@ end
           </table>
         <% end %>
       <% end %>
+
+      <% if @event.waitlist_by_ticket_type? && !@event.hide_waitlist? && !@event.sales_closed_due_to_event_end? %>
+        <%
+          waitlist_ticket_types = @event.ticket_types.and(hidden: false).order('order asc, price desc').select do |ticket_type|
+            ticket_type.number_of_tickets_available_in_single_purchase <= 0 && !ticket_type.sales_ended?
+          end
+        %>
+        <% if waitlist_ticket_types.any? %>
+          <%= partial :'purchase/ticket_type_waitlist', locals: { ticket_types: waitlist_ticket_types } %>
+        <% end %>
+      <% end %>
     </div>
 
     <% unless @concise_ticket_form %>

@@ -1,9 +1,10 @@
 <div class="main">
+  <% ticket_type = nil unless defined?(ticket_type) %>
   <p>Hi %recipient.firstname%,</p>
 
   <p>
-    You previously joined the waitlist for <a href="<%= ENV['BASE_URI'] %>/e/<%= event.slug %>"><%=event.name %></a>.
-    Well, good news! Tickets are now available. <a href="<%= ENV['BASE_URI'] %>/e/<%= event.slug %>">Book now before it sells out again</a>.
+    You previously joined the waitlist for <a href="<%= ENV['BASE_URI'] %>/e/<%= event.slug %>"><%=event.name %></a><%= " (#{ticket_type.name})" if ticket_type %>.
+    Well, good news! <%= ticket_type ? "#{ticket_type.name} tickets are" : 'Tickets are' %> now available. <a href="<%= ENV['BASE_URI'] %>/e/<%= event.slug %>">Book now before it sells out again</a>.
   </p>
 
   <p class="action">

@@ -1,0 +1,28 @@
+<script>
+  $(function () {
+    $('#ticket-type-waitlist-form').submit(function () {
+      if (!grecaptcha || grecaptcha.getResponse().length == 0) {
+        alert('Please confirm you are not a robot');
+        return false
+      }
+    })
+  })
+</script>
+
+<div class="alert alert-secondary">
+  <p>
+    Join the waitlist for a sold-out ticket type and we'll let you know when it becomes available.
+  </p>
+  <% form_for Waitship.new, "/events/#{@event.id}/waitship/new", id: 'ticket-type-waitlist-form' do |f| %>
+    <%= f.text_block :name %>
+    <%= f.text_block :email %>
+    <% if ticket_types.one? %>
+      <p class="mb-2"><strong><%= ticket_types.first.name %></strong></p>
+      <%= hidden_field_tag :'waitship[ticket_type_id]', value: ticket_types.first.id %>
+    <% else %>
+      <%= f.select_block :ticket_type_id, options: ticket_types.map { |ticket_type| [ticket_type.name, ticket_type.id] } %>
+    <% end %>
+    <div class="g-recaptcha mb-2" data-sitekey="<%= ENV['RECAPTCHA_SITE_KEY'] %>"></div>
+    <%= f.submit_block button_text: 'Join waitlist' %>
+  <% end %>
+</div>

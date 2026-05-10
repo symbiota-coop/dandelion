@@ -6,6 +6,7 @@ module EventNotifications
     handle_asynchronously :send_star_reminders
     handle_asynchronously :send_feedback_requests
     handle_asynchronously :send_waitlist_tickets_available
+    handle_asynchronously :send_waitlist_tickets_available_for_ticket_type
     handle_asynchronously :send_public_submission_notification
   end
 
@@ -161,7 +162,21 @@ module EventNotifications
   def send_waitlist_tickets_available
     return unless organisation
     return unless tickets_available?
-    return if waitships.empty?
+
+    send_waitlist_tickets_available_to(waitships.and(ticket_type_id: nil))
+  end
+
+  def send_waitlist_tickets_available_for_ticket_type(ticket_type_id)
+    return unless organisation
+
+    ticket_type = ticket_types.find(ticket_type_id)
+    return unless ticket_type&.available_for_waitlist?
+
+    send_waitlist_tickets_available_to(waitships.and(ticket_type_id: ticket_type.id), ticket_type: ticket_type)
+  end
+
+  def send_waitlist_tickets_available_to(waitships_to_notify, ticket_type: nil)
+    return if waitships_to_notify.empty?
 
     mg_client = Mailgun::Client.new ENV['MAILGUN_API_KEY'], ENV['MAILGUN_REGION']
     batch_message = Mailgun::BatchMessage.new(mg_client, ENV['MAILGUN_NOTIFICATIONS_HOST'])
@@ -169,10 +184,10 @@ module EventNotifications
     event = self
     batch_message.from ENV['NOTIFICATIONS_EMAIL_FULL']
     batch_message.reply_to(event.email || event.organisation.try(:reply_to))
-    batch_message.subject "Tickets now available for #{event.name}"
-    batch_message.body_html EmailHelper.html(:waitlist_tickets_available, event: event)
+    batch_message.subject "#{ticket_type ? "#{ticket_type.name} tickets" : 'Tickets'} now available for #{event.name}"
+    batch_message.body_html EmailHelper.html(:waitlist_tickets_available, event: event, ticket_type: ticket_type)
 
-    waiters.and(unsubscribed: false).each do |account|
+    Account.and(:id.in => waitships_to_notify.pluck(:account_id)).and(unsubscribed: false).each do |account|
       batch_message.add_recipient(:to, account.email, { 'firstname' => account.firstname || 'there', 'token' => account.sign_in_token, 'id' => account.id.to_s })
     end
 

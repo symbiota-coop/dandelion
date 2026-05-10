@@ -4,12 +4,18 @@
     <label>Search waitlist</label>
     <%= text_field_tag :q, class: 'form-control', value: params[:q] %>
   </div>
+  <% if @event.waitlist_by_ticket_type? %>
+    <div class="form-group">
+      <label>Ticket type</label>
+      <%= select_tag :ticket_type_id, class: 'form-control', selected: params[:ticket_type_id], options: [''] + @event.ticket_types.order('order asc, price desc').map { |ticket_type| [ticket_type.name, ticket_type.id] } %>
+    </div>
+  <% end %>
   <%= hidden_field_tag :search, value: 1 %>
   <%= submit_tag 'Search', class: 'btn btn-primary' %>
 <% end %>
 <% if event_email_viewer? %>
   <pre>
-    <%== Account.and(:id.in => @waitships.pluck(:account_id)).map { |account| "#{Sanitize.fragment(account.name)} &lt;#{Sanitize.fragment(account.email)}&gt;" }.join(', ') %>
+    <%== @waitships.map { |waitship| "#{Sanitize.fragment(waitship.account.name)} &lt;#{Sanitize.fragment(waitship.account.email)}&gt;#{" (#{Sanitize.fragment(waitship.ticket_type.name)})" if @event.waitlist_by_ticket_type? && waitship.ticket_type}" }.join(', ') %>
   </pre>
 <% end %>
 <% v = event_email_viewer?
@@ -20,6 +26,9 @@
   <thead>
     <tr>
       <th>Name</th>
+      <% if @event.waitlist_by_ticket_type? %>
+        <th>Ticket type</th>
+      <% end %>
       <th>Joined</th>
     </tr>
   </thead>
@@ -28,6 +37,11 @@
     <td>
       <%= partial :'accounts/account', locals: { account: waitship.account, show_email: v } %>
     </td>
+    <% if @event.waitlist_by_ticket_type? %>
+      <td>
+        <%= waitship.ticket_type.try(:name) || 'Any ticket' %>
+      </td>
+    <% end %>
     <td>
       <%= waitship.created_at %>
     </td>

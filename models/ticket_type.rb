@@ -30,6 +30,7 @@ class TicketType
   end
 
   has_many :tickets, dependent: :nullify
+  has_many :waitships, dependent: :nullify
   has_many :photos, as: :photoable, dependent: :destroy
 
   validates_presence_of :name, :quantity
@@ -58,9 +59,17 @@ class TicketType
     errors.add(:max_quantity_per_transaction, 'must not be < 0') if max_quantity_per_transaction && max_quantity_per_transaction < 0
   end
 
+  before_save do
+    @was_available_for_waitlist = persisted? && event && begin
+      previous_ticket_type = self.class.find(id)
+      previous_ticket_type && previous_ticket_type.available_for_waitlist?
+    end
+  end
+
   after_save do
     if event
       event.refresh_sold_out_cache_and_notify_waitlist
+      event.send_waitlist_tickets_available_for_ticket_type(id) if !@was_available_for_waitlist && available_for_waitlist?
       event.set_browsable
     end
   end
@@ -101,5 +110,9 @@ class TicketType
 
   def number_of_tickets_available_in_single_purchase
     [remaining, ticket_group ? ticket_group.places_remaining : nil, event.places_remaining, max_quantity_per_transaction || nil].compact.min
+  end
+
+  def available_for_waitlist?
+    event && number_of_tickets_available_in_single_purchase >= 1 && !sales_ended? && !event.sales_closed_due_to_event_end?
   end
 end

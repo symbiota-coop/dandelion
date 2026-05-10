@@ -56,6 +56,7 @@ module EventFields
     field :calendar_import_source_url, type: String
     field :calendar_import_last_synced_at, type: Time
     field :reminder_hours_before, type: Integer
+    field :waitlist_mode, type: String, default: 'event'
 
     field :revenue_share_to_revenue_sharer, type: Integer
     field :profit_share_to_organiser, type: Integer
@@ -112,6 +113,7 @@ module EventFields
         minimal_only: 'Show only in embeds',
         theme_color: 'Theme color',
         hide_waitlist: 'Hide waitlist',
+        waitlist_mode: 'Waitlist mode',
         no_sales_after_end_time: 'No sales after event ends',
         show_after_start_time: 'Show after start time',
         evergreen: 'Evergreen',
@@ -170,6 +172,7 @@ module EventFields
         blank_price_for_free_tickets: 'Show a blank price for free tickets instead of zero',
         theme_color: 'Theme color for the event page',
         hide_waitlist: "Don't show a waitlist when the event is sold out",
+        waitlist_mode: 'Choose whether people join one waitlist for the whole event, or a separate waitlist for a specific ticket type',
         no_sales_after_end_time: 'Prevent ticket sales after the event end time, regardless of individual ticket type settings',
         always_show_full_ticket_form: 'Always show the full ticket form, even if there is only one free ticket type',
         show_after_start_time: 'Keep showing the event in listings after the start time has passed',
@@ -184,5 +187,20 @@ module EventFields
     def edit_hints
       {}.merge(new_hints)
     end
+  end
+
+  def waitlist_modes
+    [
+      ['One waitlist for the whole event', 'event'],
+      ['Separate waitlists by ticket type', 'ticket_type']
+    ]
+  end
+
+  def waitlist_mode
+    self[:waitlist_mode].presence || 'event'
+  end
+
+  def waitlist_by_ticket_type?
+    waitlist_mode == 'ticket_type'
   end
 end

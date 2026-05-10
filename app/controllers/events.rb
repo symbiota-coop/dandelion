@@ -272,8 +272,11 @@ Dandelion::App.controller do
 
     validate_recaptcha
 
-    email = params[:waitship][:email]
-    account_hash = { name: params[:waitship][:name], email: params[:waitship][:email] }
+    waitship_params = params[:waitship] || {}
+    email = waitship_params[:email]
+    account_hash = { name: waitship_params[:name], email: waitship_params[:email] }
+    ticket_type = @event.ticket_types.find(waitship_params[:ticket_type_id]) if @event.waitlist_by_ticket_type? && waitship_params[:ticket_type_id].present?
+
     @account = if (account = Account.find_by(email: email.try(:downcase)))
                  account
                else
@@ -286,9 +289,9 @@ Dandelion::App.controller do
                                   @account.save
                                 end
     if successful_update_or_save
-      waitship = @event.waitships.create(account: @account)
-      if @event.waitships.find_by(account: @account)
-        redirect "/e/#{@event.slug}?added_to_waitlist=true"
+      waitship = @event.waitships.create(account: @account, ticket_type: ticket_type)
+      if @event.waitships.find_by(account: @account, ticket_type: ticket_type)
+        redirect "/e/#{@event.slug}?added_to_waitlist=true#{"&waitlist_ticket_type_id=#{ticket_type.id}" if ticket_type}"
       else
         flash[:error] = waitship.errors.full_messages.join('; ')
         redirect "/e/#{@event.slug}"

@@ -187,6 +187,7 @@ Dandelion::App.controller do
     event_admins_only!
     @waitships = @event.waitships.includes(:account)
     @waitships = @waitships.and(:account_id.in => Account.search(params[:q], child_scope: @waitships).pluck(:id)) if params[:q]
+    @waitships = @waitships.and(ticket_type_id: params[:ticket_type_id]) if params[:ticket_type_id].present?
     erb :'events/waitlist'
   end
 
