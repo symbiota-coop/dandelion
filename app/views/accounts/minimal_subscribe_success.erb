@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<script>
+  window.iFrameResizer = {
+    onReady: function () {
+      if (window.parentIFrame && window.parentIFrame.sendMessage) {
+        window.parentIFrame.sendMessage('subscribed');
+      }
+    }
+  };
+</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/iframe-resizer/4.2.10/iframeResizer.contentWindow.min.js"></script>
+</head>
+<body></body>
+</html>
