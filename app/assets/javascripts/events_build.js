@@ -260,11 +260,8 @@ $(function () {
 
   // Disable controls for non-admin org members
   if (!config.isOrgAdmin) {
-    $('input[name="event[monthly_donors_only]"]').prop('disabled', true)
-    $('input[name="event[no_discounts]"]').prop('disabled', true)
     $('input[name="event[featured]"]').prop('disabled', true)
     $('input[name="event[show_emails]"]').prop('disabled', true)
-    $('input[name="event[refund_deleted_orders]"]').prop('disabled', true)
   }
 
   // Revenue share UI if Stripe connected

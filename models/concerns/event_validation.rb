@@ -94,11 +94,8 @@ module EventValidation
 
       can_change_org_event_flags = Organisation.admin_or_event_creator?(organisation, last_saved_by)
       {
-        monthly_donors_only: false,
-        no_discounts: false,
         featured: false,
-        show_emails: false,
-        refund_deleted_orders: true
+        show_emails: false
       }.each do |k, v|
         if !duplicate && !can_change_org_event_flags
           if new_record?
