@@ -1,19 +1,15 @@
-<% unless @minimal_subscribe %>
-  <a href="javascript:;" onclick="$(this).hide().next().show().find('input[type=text]').first().focus()" class="btn btn-primary mb-3">Subscribe</a>
-<% end %>
-<div class="text-left <% unless @minimal_subscribe %>card shadow-sm mb-3 <% end %>" <% unless @minimal_subscribe %> style="display: none"<% end %>>
-  <% unless @minimal_subscribe %>
-    <div class="card-header text-white bg-primary">
-      <h4 class="my-0">
-        <% %w{organisation activity local_group event}.each { |r| if instance_variable_get("@#{r}") %>
-        Get email updates from <%= instance_variable_get("@#{r}").name %>
-        <% if instance_variable_get("@#{r}").respond_to?(:organisation) %>
-          and <%= instance_variable_get("@#{r}").organisation.name %>
-        <% end %>
-        <% break; end; } %>
-      </h4>
-    </div>
-  <% end %>
+<a href="javascript:;" onclick="$(this).hide().next().show().find('input[type=text]').first().focus()" class="btn btn-primary mb-3">Subscribe</a>
+<div class="text-left card shadow-sm mb-3" style="display: none">
+  <div class="card-header text-white bg-primary">
+    <h4 class="my-0">
+      <% %w{organisation activity local_group event}.each { |r| if instance_variable_get("@#{r}") %>
+      Get email updates from <%= instance_variable_get("@#{r}").name %>
+      <% if instance_variable_get("@#{r}").respond_to?(:organisation) %>
+        and <%= instance_variable_get("@#{r}").organisation.name %>
+      <% end %>
+      <% break; end; } %>
+    </h4>
+  </div>
   <script>
     $(function () {
 
@@ -31,17 +27,10 @@
       width: '100%'
     })
 
-    <% if @minimal_subscribe %>
-    $('#new-account-form input[type=text]').first().focus()
-    <% end %>
-
     })
   </script>
-  <div class="<% unless @minimal_subscribe %> card-body <% end %>">
+  <div class="card-body">
     <% form_tag '/accounts/new', id: 'new-account-form' do |f| %>
-      <% if @minimal_subscribe %>
-        <%= hidden_field_tag :minimal_subscribe, value: true %>
-      <% end %>
       <% %w{organisation activity local_group event}.each { |r| %>
       <% if instance_variable_get("@#{r}") %>
         <%= hidden_field_tag :"#{r}_id", value: instance_variable_get("@#{r}").id %>
