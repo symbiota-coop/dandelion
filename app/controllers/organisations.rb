@@ -7,7 +7,7 @@ Dandelion::App.controller do
 
     case content_type
     when :html
-      @organisations = @organisations.paginate(page: params[:organisations_page], per_page: 50)
+      @organisations = @organisations.paginate(page: params[:organisations_page], per_page: 16)
       erb :'organisations/organisations'
     when :json
       map_json(@organisations)
