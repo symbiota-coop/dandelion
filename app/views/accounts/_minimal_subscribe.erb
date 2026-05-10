@@ -12,18 +12,16 @@
 
   })
 </script>
-<div class="text-left">
-  <% form_tag '/accounts/new', id: 'new-account-form-minimal-subscribe' do |f| %>
-    <%= hidden_field_tag :minimal_subscribe, value: true %>
-    <% %w{organisation activity local_group event}.each { |r| %>
-    <% if instance_variable_get("@#{r}") %>
-      <%= hidden_field_tag :"#{r}_id", value: instance_variable_get("@#{r}").id %>
-    <% end %>
-    <% } %>
-    <%= text_field_tag :'account[name]', class: 'form-control mr-1 mb-1', required: true, placeholder: 'Name' %>
-    <%= email_field_tag :'account[email]', class: 'form-control mr-1 mb-1', required: true, placeholder: 'Email' %>
-    <%= text_field_tag :'account[location]', class: 'form-control mr-1 mb-1', placeholder: 'Location (postcode works best in the UK)' %>
-    <div class="g-recaptcha" style="margin-bottom: 4px" data-sitekey="<%= ENV['RECAPTCHA_SITE_KEY'] %>"></div>
-    <%= submit_tag 'Subscribe', class: 'btn d-block d-lg-inline btn-primary mb-1' %>
+<% form_tag '/accounts/new', id: 'new-account-form-minimal-subscribe', class: 'text-left' do |f| %>
+  <%= hidden_field_tag :minimal_subscribe, value: true %>
+  <% %w{organisation activity local_group event}.each { |r| %>
+  <% if instance_variable_get("@#{r}") %>
+    <%= hidden_field_tag :"#{r}_id", value: instance_variable_get("@#{r}").id %>
   <% end %>
-</div>
+  <% } %>
+  <%= text_field_tag :'account[name]', class: 'form-control mr-1 mb-1', required: true, placeholder: 'Name' %>
+  <%= email_field_tag :'account[email]', class: 'form-control mr-1 mb-1', required: true, placeholder: 'Email' %>
+  <%= text_field_tag :'account[location]', class: 'form-control mr-1 mb-1', placeholder: 'Location (postcode works best in the UK)' %>
+  <div class="g-recaptcha" style="margin-bottom: 4px" data-sitekey="<%= ENV['RECAPTCHA_SITE_KEY'] %>"></div>
+  <%= submit_tag 'Subscribe', class: 'btn d-block d-lg-inline btn-primary mb-1' %>
+<% end %>
