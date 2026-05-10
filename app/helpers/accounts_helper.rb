@@ -54,6 +54,9 @@ Dandelion::App.helpers do
     elsif params[:organisation_id]
       @organisation ||= Organisation.find(params[:organisation_id])
       @account.associate_with_organisation!(@organisation, skip_welcome: params[:skip_welcome])
+
+      halt 200, "<script>window.parentIFrame.sendMessage('subscribed');</script>" if params[:minimal_subscribe]
+
       redirect "/accounts/edit?organisation_id=#{@organisation.id}"
     elsif params[:activity_id] || params[:local_group_id] || params[:event_id]
       associate_account_with_context(@account)

@@ -38,7 +38,10 @@
     })
   </script>
   <div class="<% unless @minimal_subscribe %> card-body <% end %>">
-    <% form_tag '/accounts/new', { id: 'new-account-form' }.merge(@minimal_subscribe ? { target: '_blank' } : {}) do |f| %>
+    <% form_tag '/accounts/new', id: 'new-account-form' do |f| %>
+      <% if @minimal_subscribe %>
+        <%= hidden_field_tag :minimal_subscribe, value: true %>
+      <% end %>
       <% %w{organisation activity local_group event}.each { |r| %>
       <% if instance_variable_get("@#{r}") %>
         <%= hidden_field_tag :"#{r}_id", value: instance_variable_get("@#{r}").id %>
