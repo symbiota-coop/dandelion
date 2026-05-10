@@ -80,6 +80,12 @@ Dandelion::App.controller do
     redirect "/pmails/#{@pmails.first.id}"
   end
 
+  get '/o/:slug/subscribe' do
+    @organisation = Organisation.find_by(slug: params[:slug]) || Organisation.find(params[:slug]) || not_found
+    @minimal = true
+    partial :'accounts/new_compact', layout: 'minimal'
+  end
+
   get '/o/new' do
     sign_in_required!
     @organisation = Organisation.new(mass_assigning(params[:organisation], Organisation))
