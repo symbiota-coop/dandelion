@@ -55,6 +55,7 @@ module Dandelion
       redirect "#{ENV['BASE_URI']}#{request.fullpath}" if ENV['REDIRECT_BASE'] && ENV['BASE_URI'] && (ENV['BASE_URI'] != "#{request.scheme}://#{request.env['HTTP_HOST']}")
       set_time_zone
       fix_params!
+      Sentry.set_tags(xhr: request.xhr? ? 'true' : 'false')
       if params[:sign_in_token]
         sign_in_via_token
       elsif params[:api_key]
