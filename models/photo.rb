@@ -12,6 +12,9 @@ class Photo
   field :image_uid, type: String
   field :has_image, type: Boolean
 
+  def self.prewarmed_image_derivative_sizes
+    %w[200x200#]
+  end
 
   def self.photoable_types
     %w[Gathering Comment TicketType]

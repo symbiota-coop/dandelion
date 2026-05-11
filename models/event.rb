@@ -29,6 +29,14 @@ class Event
     includes(:organisation, :activity, :local_group, cohostships: :organisation, event_facilitations: :account, event_tagships: :event_tag)
   end
 
+  def self.prewarmed_image_derivative_sizes
+    %w[32x32 992x992]
+  end
+
+  def self.prewarm_opengraph_image_derivative?
+    true
+  end
+
   COPY_FIELDS = %w[
     name location email image
     description extra_info_for_ticket_email

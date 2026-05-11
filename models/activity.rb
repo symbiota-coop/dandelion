@@ -13,6 +13,10 @@ class Activity
 
   taggable tagships: :activity_tagships, tag_class: ActivityTag
 
+  def self.prewarmed_image_derivative_sizes
+    %w[200x200 400x400 500x500#]
+  end
+
   belongs_to_without_parent_validation :organisation
   belongs_to_without_parent_validation :account, optional: true
 

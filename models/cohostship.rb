@@ -9,6 +9,14 @@ class Cohostship
   belongs_to_without_parent_validation :event
   belongs_to_without_parent_validation :organisation
 
+  def self.prewarmed_image_derivative_sizes
+    %w[32x32 992x992]
+  end
+
+  def self.prewarm_opengraph_image_derivative?
+    true
+  end
+
   field :image_uid, type: String
   field :image_width_unmagic, type: Integer
   field :image_height_unmagic, type: Integer

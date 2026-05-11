@@ -16,6 +16,14 @@ class Gathering
     find_by(slug: slug)
   end
 
+  def self.prewarmed_image_derivative_sizes
+    %w[400x400]
+  end
+
+  def self.prewarm_opengraph_image_derivative?
+    true
+  end
+
   def self.search_fields
     %w[name intro_for_non_members]
   end

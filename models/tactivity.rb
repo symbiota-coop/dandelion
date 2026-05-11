@@ -20,6 +20,10 @@ class Tactivity
   field :image_uid, type: String
   field :has_image, type: Boolean
 
+  def self.prewarmed_image_derivative_sizes
+    %w[400x400]
+  end
+
   def tslot_ids
     [''] + timetable.tslots.map { |tslot| [tslot.name, tslot.id] }
   end

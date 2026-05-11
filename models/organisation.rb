@@ -26,6 +26,14 @@ class Organisation
     find_by(slug: slug)
   end
 
+  def self.prewarmed_image_derivative_sizes
+    %w[200x200 400x400 500x500#]
+  end
+
+  def self.prewarm_opengraph_image_derivative?
+    true
+  end
+
   def self.search_fields
     %w[name intro_text]
   end

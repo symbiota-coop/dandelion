@@ -104,7 +104,7 @@ Dandelion::App.helpers do
     attrs << %(id="#{id}") if id
     attrs << %(style="aspect-ratio: #{width} / #{height}") if width && height
     attrs << %(src="#{u image.thumb('32x32').url}")
-    attrs << %(data-src="#{u image.thumb(full_size).url}")
+    attrs << %(data-src="#{u full_size == '1920x1920' ? image.url : image.thumb(full_size).url}")
     attrs << %(data-src-md="#{u image.thumb(md_size).url}") if md_size
     attrs << %{
     onload="if (this.dataset.src && !this.dataset.loaded) {
