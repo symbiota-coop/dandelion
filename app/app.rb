@@ -81,8 +81,8 @@ module Dandelion
       name = "#{name}#{ext}" if !ext.empty? && !name.end_with?(ext)
 
       scope = Sentry.get_current_scope
-      scope.set_transaction_name(name, source: :route)
-      scope.get_transaction&.set_name(name, source: :route)
+      scope&.set_transaction_name(name, source: :route)
+      scope&.get_transaction&.set_name(name, source: :route)
     end
 
     error do

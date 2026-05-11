@@ -46,7 +46,7 @@ unless defined?(SentryMongoCommandSubscriber)
     def started(event)
       return unless Sentry.initialized?
 
-      parent_span = Sentry.get_current_scope.get_span
+      parent_span = Sentry.get_current_scope&.get_span
       return unless parent_span
 
       span = parent_span.start_child(
