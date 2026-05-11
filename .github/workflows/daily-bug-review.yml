@@ -1,7 +1,7 @@
 name: Daily Bug Review
 
 env:
-  CLAUDE_MODEL: claude-opus-4-6
+  CLAUDE_MODEL: claude-opus-4-7
 
 on:
   schedule:
