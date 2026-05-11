@@ -39,19 +39,6 @@ module AccountValidation
       self.sign_ins_count = 0 unless sign_ins_count
       self.number_at_this_location = 0 unless number_at_this_location
 
-      self.has_image = image.present?
-      if image
-        begin
-          if image.image?
-            image.name = "#{SecureRandom.uuid}.#{image.format}"
-          else
-            errors.add(:image, 'must be an image')
-          end
-        rescue StandardError, Dragonfly::Shell::CommandFailed
-          errors.add(:image, 'is not supported or corrupted')
-        end
-      end
-
       if email_changed?
         e = EmailAddress.error(email)
         errors.add(:email, "- #{e}") if e

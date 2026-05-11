@@ -5,6 +5,7 @@ class Account
 
   extend Dragonfly::Model
   include AccountFields
+  include ImageWithValidation
   include AccountAssociations
   include AccountValidation
   include AccountNotifications
@@ -16,6 +17,10 @@ class Account
 
   def self.fu(username)
     Account.find_by(username: username)
+  end
+
+  def self.prewarmed_image_derivative_sizes
+    %w[400x400#]
   end
 
   def self.search_fields
