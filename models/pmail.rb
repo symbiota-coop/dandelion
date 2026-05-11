@@ -175,9 +175,9 @@ class Pmail
     organisation.attachments.create(file: file) if file
   end
 
-  def html(share_buttons: false)
+  def html(viewing_on_web: false)
     pmail = self
-    html = EmailHelper.html(layout: :pmail, pmail: pmail, share_buttons: share_buttons)
+    html = EmailHelper.html(layout: :pmail, pmail: pmail, viewing_on_web: viewing_on_web)
     if link_params
       html.gsub(/href\s*=\s*"([^"]*)"/) do
         url = Regexp.last_match[1]

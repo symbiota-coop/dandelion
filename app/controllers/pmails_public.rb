@@ -2,14 +2,10 @@ Dandelion::App.controller do
   get '/pmails/:pmail_id' do
     pass if params[:pmail_id] == 'new'
     @pmail = Pmail.find(params[:pmail_id]) || not_found
-    @pmail.html(share_buttons: true)
+    @pmail.html(viewing_on_web: true)
           .gsub('%recipient.firstname%', 'there')
           .gsub('%recipient.view_or_activate%', 'View your profile')
           .gsub(/%recipient\.\w+%/, '_')
-          .gsub('%share_buttons%', partial(:share, locals: {
-                                             share_url: "#{ENV['BASE_URI']}/pmails/#{@pmail.id}",
-                                             div_style: 'display: flex; justify-content: center;'
-                                           }))
   end
 
   post '/o/:slug/mailgun_webhook' do

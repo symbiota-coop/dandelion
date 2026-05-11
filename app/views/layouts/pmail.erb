@@ -36,12 +36,7 @@
       <% end %>
     </div>
     <div class="preview">
-      <% if defined?(share_buttons) && share_buttons %>
-        %share_buttons%
-        <div class="subscribe">
-          <small><a href="<%= ENV['BASE_URI'] %>/o/<%= pmail.organisation.slug %>">Subscribe to <%= pmail.organisation.name %></a></small>
-        </div>
-      <% else %>
+      <% unless defined?(viewing_on_web) && viewing_on_web %>
         <small>
           <a href="<%= ENV['BASE_URI'] %>/pmails/<%= pmail.id %>">Read and share this email in your browser</a>
         </small>
