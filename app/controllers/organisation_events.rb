@@ -1,7 +1,7 @@
 Dandelion::App.controller do
   get '/o/:slug/events_block' do
     @organisation = Organisation.find_by(slug: params[:slug]) || not_found
-    @events = @organisation.events_including_cohosted.publicly_visible.future_and_current.without_heavy_fields.with_key_includes
+    @events = @organisation.events_including_cohosted.publicly_visible.future_current_evergreen.without_heavy_fields.with_key_includes
     @events = @events.and(monthly_donors_only: true) if params[:members_events]
     partial :'organisations/events_block'
   end
@@ -42,7 +42,7 @@ Dandelion::App.controller do
         @past = true
         @events = @events.past
       else
-        @events = @events.future_and_current(@from)
+        @events = @events.future_current_evergreen(@from)
         @events = @events.and(:start_time.lt => @to + 1) if @to
       end
       @events = filter_events_by_search_and_tags(@events)
@@ -63,7 +63,7 @@ Dandelion::App.controller do
         @events = filter_events_by_search_and_tags(@events)
         calendar_json(@events)
       elsif params[:display] == 'map'
-        @events = @events.future_for_map(@from)
+        @events = @events.future(@from)
         @events = @events.and(:start_time.lt => @to + 1) if @to
         @events = @events.and(locked: false)
         @events = filter_events_by_search_and_tags(@events)
@@ -77,7 +77,7 @@ Dandelion::App.controller do
           @past = true
           @events = @events.past
         else
-          @events = @events.future_and_current(@from)
+          @events = @events.future_current_evergreen(@from)
           @events = @events.and(:start_time.lt => @to + 1) if @to
         end
         @events = filter_events_by_search_and_tags(@events)

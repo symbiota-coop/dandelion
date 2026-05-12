@@ -94,7 +94,7 @@ module Dandelion
       events = organisation.events_including_cohosted
                            .live
                            .publicly_visible
-                           .future_and_current(from_date)
+                           .future_current_evergreen(from_date)
                            .order('start_time asc')
                            .limit(limit)
       events = events.and(:start_time.lt => to_date + 1) if to_date

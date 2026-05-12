@@ -69,7 +69,7 @@ class Carousel
 
   def events(minimal: false)
     eids = event_ids_cache
-    future_events = organisation.events_including_cohosted.live.publicly_visible.future_and_current.and(:start_time.lt => weeks.weeks.from_now).and(hide_from_carousels: false).and(has_image: true).and(:id.in => eids)
+    future_events = organisation.events_including_cohosted.live.publicly_visible.future_current_evergreen.and(:start_time.lt => weeks.weeks.from_now).and(hide_from_carousels: false).and(has_image: true).and(:id.in => eids)
     past_events = organisation.events_including_cohosted.live.publicly_visible.past.and(has_recording: true).and(hide_from_carousels: false).and(has_image: true).and(:id.in => eids)
 
     unless minimal

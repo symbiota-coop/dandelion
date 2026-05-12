@@ -93,7 +93,7 @@
   <a class="btn btn-primary mb-3" href="/events/new?activity_id=<%= @activity.id %>">Create an event</a>
 <% end %>
 
-<% upcoming_events = @activity.events.live.publicly_visible.future_and_current.with_key_includes.paginate(page: params[:upcoming_events_page], per_page: 5) %>
+<% upcoming_events = @activity.events.live.publicly_visible.future_current_evergreen.with_key_includes.paginate(page: params[:upcoming_events_page], per_page: 5) %>
 <% past_events = @activity.events.live.publicly_visible.past.with_key_includes.paginate(page: params[:past_events_page], per_page: 3) %>
 
 <% if past_events.exists? %>

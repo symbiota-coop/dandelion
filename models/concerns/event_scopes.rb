@@ -9,18 +9,18 @@ module EventScopes
     end
 
     def future(from = Date.today)
-      self.and('$or' => [
-                 { :start_time.gte => from },
-                 { evergreen: true }
-               ]).order('start_time asc')
-    end
-
-    # Map JSON only plots coordinates; evergreen events never have a location, so start_time alone matches map-visible rows.
-    def future_for_map(from = Date.today)
       self.and(:start_time.gte => from).order('start_time asc')
     end
 
     def future_and_current(from = Date.today)
+      self.and('$or' => [
+                 { start_time: { '$gte' => from } },
+                 { end_time: { '$gte' => from }, show_after_start_time: true }
+               ]).order('start_time asc')
+    end
+
+    # Only use behind an organisation-, activity-, or local-group-scoped relation chain. Prefer future / future_and_current elsewhere
+    def future_current_evergreen(from = Date.today)
       self.and('$or' => [
                  { start_time: { '$gte' => from } },
                  { end_time: { '$gte' => from }, show_after_start_time: true },

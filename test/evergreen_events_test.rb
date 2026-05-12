@@ -33,8 +33,7 @@ class EvergreenEventsTest < ActiveSupport::TestCase
     @organisation = FactoryBot.create(:organisation, account: @account)
     @event = FactoryBot.create(:event, organisation: @organisation, account: @account, last_saved_by: @account,
                                        evergreen: true, start_time: nil, end_time: nil, location: nil, prices: [0])
-    assert_includes Event.future.pluck(:id), @event.id
-    assert_includes Event.future_and_current.pluck(:id), @event.id
+    assert_includes Event.future_current_evergreen.pluck(:id), @event.id
     refute_includes Event.past.pluck(:id), @event.id
     refute_includes Event.finished.pluck(:id), @event.id
   end
