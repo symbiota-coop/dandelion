@@ -36,7 +36,7 @@ Dandelion::App.controller do
   get '/events/:id/destroy' do
     @event = Event.find(params[:id]) || not_found
     @organisation = @event.organisation
-    organisation_admins_only!
+    organisation_admins_or_event_creators_only!
     @event.set(refund_deleted_orders: false) if params[:no_refunds]
     @event.send_destroy_notification(current_account)
     @event.destroy

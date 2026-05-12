@@ -1,6 +1,6 @@
 <%= partial :'events/nav', locals: { event: @event } %>
 
-<% if organisation_admin?(@event.organisation) %>
+<% if organisation_admins_or_event_creators?(@event.organisation) %>
 
   <% if @event.orders.exists? %>
     <div class="alert alert-warning">
