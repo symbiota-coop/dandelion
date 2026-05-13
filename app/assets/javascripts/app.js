@@ -18,6 +18,26 @@ function initQuestionsPreview (inputSelector, previewUrl) {
 }
 
 $(function () {
+  const wysiwygEditors = []
+
+  function fixedHeaderHeight () {
+    const header = document.getElementById('header')
+    return header ? header.getBoundingClientRect().height : 0
+  }
+
+  function syncFixedHeaderHeight () {
+    const headerHeight = fixedHeaderHeight()
+    document.documentElement.style.setProperty('--fixed-header-height', headerHeight + 'px')
+
+    wysiwygEditors.forEach(function (editor) {
+      if (editor.ui && editor.ui.view && editor.ui.view.stickyPanel) {
+        editor.ui.view.stickyPanel.viewportTopOffset = headerHeight
+      }
+    })
+  }
+
+  syncFixedHeaderHeight()
+  $(window).on('resize', syncFixedHeaderHeight)
 
   function ajaxCompleted () {
 
@@ -243,6 +263,9 @@ $(function () {
     $('textarea.wysiwyg').not('[data-wysiwyg-initialized]').attr('data-wysiwyg-initialized', true).each(function () {
       const textarea = this
       ClassicEditor.create(textarea, {
+        toolbar: {
+          viewportTopOffset: fixedHeaderHeight()
+        },
         simpleUpload: {
           uploadUrl: '/upload'
         },
@@ -251,6 +274,9 @@ $(function () {
         }
       }).then(editor => {
         textarea.ckeditorInstance = editor
+        wysiwygEditors.push(editor)
+        syncFixedHeaderHeight()
+
         textarea.dispatchEvent(new CustomEvent('wysiwyg:ready', {
           bubbles: true,
           detail: { editor: editor }
