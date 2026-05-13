@@ -47,6 +47,8 @@ class LocalGroup
 
   embeds_many :polygons
 
+  after_create :add_organisation_members_within
+
   before_validation do
     polygons.destroy_all
     g = JSON.parse(geometry)
@@ -78,9 +80,10 @@ class LocalGroup
 
   def add_organisation_members_within
     organisation_members_within.each do |account|
-      local_groupships.create(account: account)
+      local_groupships.find_or_create_by(account: account).set(unsubscribed: false)
     end
   end
+  handle_asynchronously :add_organisation_members_within
 
   def self.human_attribute_name(attr, options = {})
     {
