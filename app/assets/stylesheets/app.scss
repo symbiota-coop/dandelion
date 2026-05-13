@@ -689,6 +689,10 @@ div.block-title .label {
   background: $color_inverse
 }
 
+.ck-editor__editable {
+  max-height: 500px
+}
+
 .select2-container {
   height: auto;
 }
