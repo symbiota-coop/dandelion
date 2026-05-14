@@ -177,6 +177,16 @@ Dandelion automatically emails people on your waitlist if tickets become availab
 
 You can email your waitlist via Dandelion by going to Mailer in the event dropdown, creating a new message and selecting the waitlist under the To field. Alternatively, you can simply copy and paste the email addresses from the waitlist page into your own email app.
 
+### Waitlists for individual ticket types
+
+This is optional and separate from the event-wide waitlist above.
+
+When **Waitlists for ticket types** is turned on (under **Everything else** while editing your event), people can join a waitlist for each ticket type once that ticket type is sold out, as long as sales for that ticket type are still open (for example its per-ticket-type sales deadline has not passed, and the event is not treating sales as closed).
+
+On the booking form, sold-out ticket types show a **Join waitlist** action for that row.
+
+To see who joined: choose **Ticket type waitlists** in the event dropdown (the item appears once at least one person has joined). From there you can filter by ticket type and copy email addresses for outreach. (Currently we do not automatically email people on ticket type waitlists.)
+
 ## Fees and payouts
 
 Dandelion does not take any money from ticket sales. Your chosen payment processor, however, likely charges a fee. Read more on:
