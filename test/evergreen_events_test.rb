@@ -118,7 +118,7 @@ class EvergreenEventsTest < ActiveSupport::TestCase
     assert page.has_content? 'Online'
     assert page.has_content? 'Register for free'
     click_button 'RSVP'
-    assert page.has_content? 'Thanks for booking!'
+    assert page.has_content? 'Thanks for booking'
   end
 
   test 'evergreen event appears on organisation events page' do

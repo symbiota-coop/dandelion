@@ -91,7 +91,7 @@ class EventsTest < ActiveSupport::TestCase
     visit "/e/#{@event.slug}"
     assert page.has_content? 'Register for free'
     click_button 'RSVP'
-    assert page.has_content? 'Thanks for booking!'
+    assert page.has_content? 'Thanks for booking'
   end
 
   test 'booking onto a paid event' do
@@ -169,7 +169,7 @@ class EventsTest < ActiveSupport::TestCase
     find('label[for="account_opt_in_organisation"]').click
 
     click_button 'RSVP'
-    assert page.has_content? 'Thanks for booking!'
+    assert page.has_content? 'Thanks for booking'
 
     # Verify account is associated and subscribed
     assert_associated(@organisation, @account, :organisationships)
@@ -212,7 +212,7 @@ class EventsTest < ActiveSupport::TestCase
     find('label[for="account_opt_in_organisation"]').click
 
     click_button 'RSVP'
-    assert page.has_content? 'Thanks for booking!'
+    assert page.has_content? 'Thanks for booking'
 
     # Verify account was created with location and coordinates
     new_account = Account.find_by(email: 'gamlastan@example.com')
@@ -247,7 +247,7 @@ class EventsTest < ActiveSupport::TestCase
     # For existing members, opt_in_organisation is automatically set via hidden field
 
     click_button 'RSVP'
-    assert page.has_content? 'Thanks for booking!'
+    assert page.has_content? 'Thanks for booking'
 
     # Verify they're resubscribed
     assert_equal false, @organisation.organisationships.find_by(account: @account).unsubscribed
