@@ -36,6 +36,8 @@ We set `Mongoid.raise_not_found_error = false` in `boot.rb` so `Model.find(id)` 
 
 Nil booleans are converted to false using `after_initialize :convert_nil_booleans_to_false` and `before_validation :convert_nil_booleans_to_false`.
 
+Use `scope.and` rather than `scope.where`.
+
 Please note that Mongo indexes are created directly in the database, and are not defined in model files.
 
 ## Tests

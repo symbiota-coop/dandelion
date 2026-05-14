@@ -266,9 +266,9 @@ class CalendarImportSync
   end
 
   def destroy_absent_imported_events(normalized_feed_url)
-    scope = organisation.events.where(calendar_import_feed_url: normalized_feed_url)
+    scope = organisation.events.and(calendar_import_feed_url: normalized_feed_url)
     keep = @present_import_event_ids.to_a
-    to_destroy = keep.empty? ? scope : scope.where(:id.nin => keep)
+    to_destroy = keep.empty? ? scope : scope.and(:id.nin => keep)
     count = to_destroy.count
     to_destroy.each(&:destroy)
     count
