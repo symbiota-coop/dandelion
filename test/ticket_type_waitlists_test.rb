@@ -98,4 +98,22 @@ class TicketTypeWaitlistsTest < ActiveSupport::TestCase
     assert_nil @ticket_type.reload.ticket_type_waitships.find_by(account: account),
                'Ticket type waitship should be removed after purchase'
   end
+
+  test 'ticket type waitlist notification triggered when tickets become available' do
+    Delayed::Job.delete_all if defined?(Delayed::Job)
+    create_ticket_type_waitlist_event
+    sell_out_ticket_type
+    account = FactoryBot.create(:account)
+
+    TicketTypeWaitship.create!(ticket_type: @ticket_type, account: account)
+    assert @ticket_type.reload.sold_out?, 'Ticket type should be sold out'
+    assert @ticket_type.sold_out_cache?, 'Ticket type sold-out cache should be primed'
+
+    @ticket_type.set(quantity: 1)
+    @event.refresh_sold_out_cache_and_notify_waitlist
+
+    assert_not @ticket_type.reload.sold_out?, 'Ticket type should no longer be sold out'
+    assert_equal 1, Delayed::Job.and(handler: /send_ticket_type_waitlist_tickets_available/).count,
+                 'Ticket type waitlist notification should be queued'
+  end
 end

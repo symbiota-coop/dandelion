@@ -6,6 +6,7 @@ module EventNotifications
     handle_asynchronously :send_star_reminders
     handle_asynchronously :send_feedback_requests
     handle_asynchronously :send_waitlist_tickets_available
+    handle_asynchronously :send_ticket_type_waitlist_tickets_available
     handle_asynchronously :send_public_submission_notification
   end
 
@@ -173,6 +174,31 @@ module EventNotifications
     batch_message.body_html EmailHelper.html(:waitlist_tickets_available, event: event)
 
     waiters.and(unsubscribed: false).each do |account|
+      batch_message.add_recipient(:to, account.email, { 'firstname' => account.firstname || 'there', 'token' => account.sign_in_token, 'id' => account.id.to_s })
+    end
+
+    batch_message.finalize if Padrino.env == :production
+  end
+
+  def send_ticket_type_waitlist_tickets_available(ticket_type_id)
+    return unless organisation
+    return unless allow_ticket_type_waitlists?
+
+    ticket_type = ticket_types.find(ticket_type_id)
+    return unless ticket_type
+    return unless ticket_type.tickets_available?
+    return if ticket_type.ticket_type_waitships.empty?
+
+    mg_client = Mailgun::Client.new ENV['MAILGUN_API_KEY'], ENV['MAILGUN_REGION']
+    batch_message = Mailgun::BatchMessage.new(mg_client, ENV['MAILGUN_NOTIFICATIONS_HOST'])
+
+    event = self
+    batch_message.from ENV['NOTIFICATIONS_EMAIL_FULL']
+    batch_message.reply_to(event.email || event.organisation.try(:reply_to))
+    batch_message.subject "Tickets now available for #{ticket_type.name} at #{event.name}"
+    batch_message.body_html EmailHelper.html(:waitlist_tickets_available, event: event, ticket_type: ticket_type)
+
+    Account.and(:id.in => ticket_type.ticket_type_waitships.pluck(:account_id).compact, unsubscribed: false).each do |account|
       batch_message.add_recipient(:to, account.email, { 'firstname' => account.firstname || 'there', 'token' => account.sign_in_token, 'id' => account.id.to_s })
     end
 

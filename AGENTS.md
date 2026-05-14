@@ -34,6 +34,8 @@ Files in lib are auto-loaded by Padrino.load!. No explicit require is necessary.
 
 We set `Mongoid.raise_not_found_error = false` in `boot.rb` so `Model.find(id)` returns `nil` for invalid ids.
 
+Nil booleans are converted to false using `after_initialize :convert_nil_booleans_to_false` and `before_validation :convert_nil_booleans_to_false`.
+
 Please note that Mongo indexes are created directly in the database, and are not defined in model files.
 
 ## Tests

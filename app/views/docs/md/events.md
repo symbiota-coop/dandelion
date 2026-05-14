@@ -185,7 +185,9 @@ When **Waitlists for ticket types** is turned on (under **Everything else** whil
 
 On the booking form, sold-out ticket types show a **Join waitlist** action for that row.
 
-To see who joined: choose **Ticket type waitlists** in the event dropdown (the item appears once at least one person has joined). From there you can filter by ticket type and copy email addresses for outreach. (Currently we do not automatically email people on ticket type waitlists.)
+Dandelion automatically emails people on a ticket type waitlist if tickets for that ticket type become available again.
+
+To see who joined: choose **Ticket type waitlists** in the event dropdown (the item appears once at least one person has joined). From there you can filter by ticket type and copy email addresses for outreach.
 
 ## Fees and payouts
 

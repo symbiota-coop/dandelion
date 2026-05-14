@@ -17,6 +17,7 @@ class TicketType
   field :max_quantity_per_transaction, type: Integer
   field :minimum_monthly_donation, type: Float
   field :sales_end, type: Time
+  field :sold_out_cache, type: Mongoid::Boolean
 
   attr_writer :price_or_range
   attr_accessor :price_or_range_submitted
@@ -80,6 +81,25 @@ class TicketType
 
   def sales_ended?
     sales_end && Time.now > sales_end
+  end
+
+  def sold_out?
+    return true if event&.sales_closed_due_to_event_end?
+
+    number_of_tickets_available_in_single_purchase <= 0 || sales_ended?
+  end
+
+  def tickets_available?
+    return false if event&.sales_closed_due_to_event_end?
+
+    number_of_tickets_available_in_single_purchase >= 1 && !sales_ended?
+  end
+
+  def refresh_sold_out_cache_and_notify_waitlist
+    was_sold_out = sold_out_cache.nil? ? sold_out? : sold_out_cache
+    now_sold_out = sold_out?
+    set(sold_out_cache: now_sold_out)
+    event.send_ticket_type_waitlist_tickets_available(id) if was_sold_out && !now_sold_out && event
   end
 
   def floaty?(obj)

@@ -10,6 +10,10 @@ class TicketTypeWaitship
 
   validate :eligible_for_ticket_type_waitlist, on: :create
 
+  after_create do
+    ticket_type.refresh_sold_out_cache_and_notify_waitlist if ticket_type
+  end
+
   private
 
   # Matches checkout UX: join only when sales are open but this ticket type has no checkout availability.
