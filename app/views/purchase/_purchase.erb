@@ -75,7 +75,10 @@ end
             <% @event.ticket_types.order('order asc, price desc').each_with_index { |ticket_type,i| %>
             <% next if ticket_type.hidden && params[:ticket_type_id] != ticket_type.id.to_s; %>
             <% next if discount_code && discount_code.filter && !discount_code.filter.downcase.split(',').map(&:strip).any? { |filter| ticket_type.name.downcase.include?(filter) } %>
-            <% next if @event.hide_unavailable_tickets? && (ticket_type.number_of_tickets_available_in_single_purchase == 0 || ticket_type.sales_ended? || @event.sales_closed_due_to_event_end?) %>
+            <% ticket_type_availability = ticket_type.number_of_tickets_available_in_single_purchase %>
+            <% ticket_type_sales_closed = ticket_type.sales_ended? || @event.sales_closed_due_to_event_end? %>
+            <% ticket_type_waitlistable = @event.allow_ticket_type_waitlists? && ticket_type_availability <= 0 && !ticket_type_sales_closed %>
+            <% next if @event.hide_unavailable_tickets? && !ticket_type_waitlistable && (ticket_type_availability <= 0 || ticket_type_sales_closed) %>
             <%= partial :'purchase/ticket_type', locals: { ticket_type: ticket_type, no_border_top: (i == 0) } %>
             <% } %>
 
@@ -186,13 +189,14 @@ end
         <%== payment_button(method: pm.name, label: pm.button_label(@event), outline: pm.outline, visible: pm.visible, condition: pm.available?(@event)) %>
       <% end %>
 
-
       <%= hidden_field_tag :utm_source, value: params[:utm_source] %>
       <%= hidden_field_tag :utm_medium, value: params[:utm_medium] %>
       <%= hidden_field_tag :utm_campaign, value: params[:utm_campaign] %>
     <% end %>
   </div>
 </div>
+
+<%= partial :'purchase/ticket_type_waitlist_modal' if @event.allow_ticket_type_waitlists? %>
 
 <div class="card shadow-sm" id="card-error" style="display: none">
   <h3 class="card-header bg-danger text-white">There was an error processing the transaction</h3>
@@ -225,6 +229,7 @@ end
     networkId: @event.chain.try(:network_id),
     networkName: @event.chain.try(:name),
     signedIn: !!current_account,
+    recaptchaEnabled: !!ENV['RECAPTCHA_SITE_KEY'],
     timeAgo: (@event.past? && !@event.recording? ? time_ago_in_words(@event.start_time) : nil)
   }
 %>

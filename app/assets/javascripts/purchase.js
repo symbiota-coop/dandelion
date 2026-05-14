@@ -219,6 +219,64 @@ $(function () {
   })
   setTotal()
 
+  let $ticketTypeWaitlistButton = $()
+
+  $(document).on('click', '.join-ticket-type-waitlist', function (e) {
+    e.preventDefault()
+    e.stopPropagation()
+    if (!config.eventId) { return }
+
+    $ticketTypeWaitlistButton = $(this)
+    $('#ticket-type-waitlist-ticket-type-id').val($ticketTypeWaitlistButton.data('ticket-type-id'))
+    $('#ticket-type-waitlist-error').hide().text('')
+    $('#ticket-type-waitlist-modal').modal('show')
+  })
+
+  $('#ticket-type-waitlist-modal').on('shown.bs.modal', function () {
+    $('#ticket-type-waitlist-name').trigger('focus')
+  })
+
+  $('#ticket-type-waitlist-form').on('submit', function (e) {
+    e.preventDefault()
+    if (!config.eventId) { return }
+
+    const name = ($('#ticket-type-waitlist-name').val() || '').trim()
+    const email = ($('#ticket-type-waitlist-email').val() || '').trim()
+
+    let recaptchaResponse = ''
+    if (config.recaptchaEnabled) {
+      recaptchaResponse = window.grecaptcha && window.grecaptcha.getResponse()
+      if (!recaptchaResponse) {
+        $('#ticket-type-waitlist-error').text('Please confirm you are not a robot.').show()
+        return
+      }
+    }
+
+    $('#ticket-type-waitlist-error').hide().text('')
+    $('#ticket-type-waitlist-submit').prop('disabled', true)
+    $ticketTypeWaitlistButton.prop('disabled', true)
+    $.post('/events/' + config.eventId + '/ticket_type_waitships', {
+      ticket_type_id: $('#ticket-type-waitlist-ticket-type-id').val(),
+      name: name,
+      email: email,
+      'g-recaptcha-response': recaptchaResponse
+    }).done(function () {
+      $ticketTypeWaitlistButton.replaceWith($('<span class="text-muted joined-ticket-type-waitlist">Joined waitlist!</span>'))
+      $('#ticket-type-waitlist-modal').modal('hide')
+    }).fail(function (xhr) {
+      $ticketTypeWaitlistButton.prop('disabled', false)
+      let msg = 'Something went wrong. Please try again.'
+      try {
+        const json = xhr.responseJSON || JSON.parse(xhr.responseText || '{}')
+        if (json && json.error) { msg = json.error }
+      } catch (err) { }
+      $('#ticket-type-waitlist-error').text(msg).show()
+    }).always(function () {
+      $('#ticket-type-waitlist-submit').prop('disabled', false)
+      if (config.recaptchaEnabled && window.grecaptcha) { window.grecaptcha.reset() }
+    })
+  })
+
   // Validate phone number starts with + and provide instant feedback
   $('#account_phone').on('input blur', function () {
     const phoneValue = $(this).val().trim()

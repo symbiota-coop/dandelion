@@ -60,12 +60,12 @@
     <style>
       @media(max-width: 767px) { #content { padding-bottom: 5.5rem } }
     </style>
-  <% elsif (params[:ticket_type_id] || !@event.sold_out?) && @event.ticket_types.exists? %>
+  <% elsif (params[:ticket_type_id] || !@event.sold_out? || @event.ticket_type_waitlists_available?) && @event.ticket_types.exists? %>
     <% sidebar = true %>
     <div id="get-tickets-fixed-bottom" <%== get_tickets_fixed_bottom_style %>>
       <a href="javascript:;" onclick="$(this).parent().hide();
             $(window).scrollTop($('#purchase').offset()['top'] - $('#header').height() - 17)
-           " class="btn btn-primary btn-block">Get tickets</a>
+           " class="btn btn-primary btn-block"><%= @event.sold_out? && @event.ticket_type_waitlists_available? ? 'Join waitlist' : 'Get tickets' %></a>
     </div>
     <script>
       $(function () {

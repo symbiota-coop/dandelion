@@ -30,6 +30,7 @@ class TicketType
   end
 
   has_many :tickets, dependent: :nullify
+  has_many :ticket_type_waitships, dependent: :destroy
   has_many :photos, as: :photoable, dependent: :destroy
 
   validates_presence_of :name, :quantity

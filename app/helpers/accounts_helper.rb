@@ -15,7 +15,7 @@ Dandelion::App.helpers do
     )
   end
 
-  def validate_recaptcha
+  def validate_recaptcha(json: false)
     return unless ENV['RECAPTCHA_SECRET_KEY']
 
     verify_response = Faraday.new { |f| f.request :url_encoded }.post(
@@ -26,8 +26,13 @@ Dandelion::App.helpers do
     captcha_response = JSON.parse(verify_response.body)
     return if captcha_response['success'] == true
 
-    flash[:error] = "Our systems think you're a bot. Please try a different device or browser, or email #{ENV['CONTACT_EMAIL']} if you keep having trouble."
-    redirect(back)
+    msg = "Our systems think you're a bot. Please try a different device or browser, or email #{ENV['CONTACT_EMAIL']} if you keep having trouble."
+    if json
+      halt 400, { error: msg }.to_json
+    else
+      flash[:error] = msg
+      redirect(back)
+    end
   end
 
   def load_context

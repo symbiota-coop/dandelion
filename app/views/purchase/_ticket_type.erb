@@ -1,6 +1,12 @@
 <%
   availability = ticket_type.number_of_tickets_available_in_single_purchase
   ticket_group_name = ticket_type.ticket_group.try(:name)
+  ticket_type_monthly_donor_required = ticket_type.minimum_monthly_donation && (
+    !current_account ||
+    !(organisationship = @event.organisation.organisationships.find_by(account: current_account)) ||
+    !(organisationship.monthly_donation_amount) ||
+    !(Money.new(organisationship.monthly_donation_amount * 100, organisationship.monthly_donation_currency) >= Money.new(ticket_type.minimum_monthly_donation * 100, @event.currency))
+  )
 %>
 <% unless @no_ticket_groups %>
   <% tg = ticket_group_name || 'Other tickets'; if tg != @previous_ticket_group %>
@@ -92,12 +98,7 @@
     <% if ticket_type.sales_ended? || @event.sales_closed_due_to_event_end? %>
       <span class="badge badge-default">Sales closed</span>
     <% elsif availability > 0 %>
-      <% if ticket_type.minimum_monthly_donation && (
-                  !current_account ||
-                  !(organisationship = @event.organisation.organisationships.find_by(account: current_account)) ||
-                  !(organisationship.monthly_donation_amount) ||
-                  !(Money.new(organisationship.monthly_donation_amount * 100, organisationship.monthly_donation_currency) >= Money.new(ticket_type.minimum_monthly_donation * 100, @event.currency))
-                ) %>
+      <% if ticket_type_monthly_donor_required %>
       <% if current_account %>
         <% if @event.organisation.become_a_member_url %>
           <a href="<%= @event.organisation.become_a_member_url %>">Become a member</a>
@@ -113,7 +114,17 @@
       </div>
     <% end %>
   <% else %>
-    <span class="badge badge-primary">Sold out</span>
+    <% if @event.allow_ticket_type_waitlists? %>
+      <div class="text-right">
+        <button type="button"
+        class="btn btn-sm btn-outline-primary join-ticket-type-waitlist"
+        data-ticket-type-id="<%= ticket_type.id %>">
+          Join waitlist
+        </button>
+      </div>
+    <% else %>
+      <span class="badge badge-primary">Sold out</span>
+    <% end %>
   <% end %>
 </td>
 </tr>

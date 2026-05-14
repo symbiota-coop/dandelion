@@ -1,0 +1,33 @@
+<div class="modal fade" id="ticket-type-waitlist-modal" tabindex="-1" role="dialog">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <form id="ticket-type-waitlist-form">
+        <div class="modal-header">
+          <h3 class="modal-title" id="ticket-type-waitlist-modal-title">Join waitlist</h3>
+          <button type="button" class="close" data-dismiss="modal">
+            <span>&times;</span>
+          </button>
+        </div>
+        <div class="modal-body">
+          <input type="hidden" id="ticket-type-waitlist-ticket-type-id">
+          <div class="form-group">
+            <label for="ticket-type-waitlist-name">Name</label>
+            <input type="text" class="form-control" id="ticket-type-waitlist-name" value="<%= current_account.try(:name) %>" required>
+          </div>
+          <div class="form-group">
+            <label for="ticket-type-waitlist-email">Email</label>
+            <input type="email" class="form-control" id="ticket-type-waitlist-email" value="<%= current_account.try(:email) %>" required>
+          </div>
+          <% if ENV['RECAPTCHA_SITE_KEY'] %>
+            <div class="g-recaptcha mb-2" data-sitekey="<%= ENV['RECAPTCHA_SITE_KEY'] %>"></div>
+          <% end %>
+          <div class="alert alert-danger mb-0" id="ticket-type-waitlist-error" style="display: none"></div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-outline-secondary" data-dismiss="modal">Cancel</button>
+          <button type="submit" class="btn btn-primary" id="ticket-type-waitlist-submit">Join waitlist</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>

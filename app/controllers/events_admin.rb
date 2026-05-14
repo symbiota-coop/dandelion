@@ -190,6 +190,15 @@ Dandelion::App.controller do
     erb :'events/waitlist'
   end
 
+  get '/events/:id/ticket_type_waitlists' do
+    @event = Event.find(params[:id]) || not_found
+    event_admins_only!
+    @ticket_type_waitships = TicketTypeWaitship.and(:ticket_type_id.in => @event.ticket_type_ids).includes(:account, :ticket_type)
+    @ticket_type_waitships = @ticket_type_waitships.and(ticket_type_id: params[:ticket_type_id]) if params[:ticket_type_id]
+    @ticket_type_waitships = @ticket_type_waitships.and(:account_id.in => Account.search(params[:q], child_scope: @ticket_type_waitships).pluck(:id)) if params[:q]
+    erb :'events/ticket_type_waitlists'
+  end
+
   post '/events/:id/event_facilitations/new' do
     @event = Event.find(params[:id]) || not_found
     event_admins_only!

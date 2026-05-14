@@ -46,7 +46,7 @@
           <p><%= @event.select_tickets_outro %></p>
         </div>
       </div>
-    <% elsif @event.sold_out? && !params[:ticket_type_id] %>
+    <% elsif @event.sold_out? && !params[:ticket_type_id] && !@event.ticket_type_waitlists_available? %>
       <% if params[:added_to_waitlist] %>
         <div class="card shadow-sm">
           <h3 class="card-header bg-primary text-white">Thanks!</h3>

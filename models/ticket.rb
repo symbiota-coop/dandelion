@@ -87,6 +87,7 @@ class Ticket
       send_resale_notification_to_organiser(resold_account)
     end
     event.waitships.find_by(account: account).try(:destroy)
+    ticket_type.ticket_type_waitships.find_by(account: account).try(:destroy) if ticket_type && account
     event.gathering.memberships.create(account: account, unsubscribed: true) if event.gathering
   end
 

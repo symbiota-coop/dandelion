@@ -37,6 +37,7 @@ module AccountAssociations
     has_many :event_stars, dependent: :destroy
     has_many :event_facilitations, dependent: :destroy
     has_many :waitships, dependent: :destroy
+    has_many :ticket_type_waitships, dependent: :destroy
     has_many :event_feedbacks, dependent: :nullify
 
     has_many :activities, dependent: :nullify

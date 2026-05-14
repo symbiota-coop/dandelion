@@ -267,6 +267,35 @@ Dandelion::App.controller do
     redirect "/e/#{@event.slug}/edit"
   end
 
+  post '/events/:id/ticket_type_waitships', provides: :json do
+    @event = Event.find(params[:id]) || not_found
+
+    validate_recaptcha(json: true)
+
+    ticket_type = @event.ticket_types.find(params[:ticket_type_id]) || not_found
+
+    email = params[:email]
+    account_hash = { name: params[:name], email: params[:email] }
+    account = if (existing = Account.find_by(email: email.try(:downcase)))
+                existing
+              else
+                Account.new(account_hash)
+              end
+    account.password = Account.generate_password unless account.persisted?
+    successful_update_or_save = if account.persisted?
+                                  account.update_attributes(mass_assigning(account_hash.map { |k, v| [k, v] if v }.compact.to_h, Account))
+                                else
+                                  account.save
+                                end
+    halt 400, { error: account.errors.full_messages.join('; ') }.to_json unless successful_update_or_save
+
+    unless ticket_type.ticket_type_waitships.find_by(account: account)
+      waitship = TicketTypeWaitship.create(ticket_type: ticket_type, account: account)
+      halt 400, { error: waitship.errors.full_messages.join('; ') }.to_json unless waitship.persisted?
+    end
+    { ok: true }.to_json
+  end
+
   post '/events/:id/waitship/new' do
     @event = Event.find(params[:id]) || not_found
 

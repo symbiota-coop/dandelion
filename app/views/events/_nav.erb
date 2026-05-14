@@ -35,6 +35,10 @@
           ['Boosts' + (event.event_boosts.count.positive? ? " <span class='badge badge-primary'>#{event.event_boosts.count}</span>" : ''), "/events/#{event.id}/boosts"],
           ([%(Payments <span class="badge badge-primary">#{event.rpayments.count}</span>), "/events/#{event.id}/rpayments"] if event.organisation.stripe_client_id),
           ([%(Waitlist <span class="badge badge-primary">#{event.waitships.count}</span>), "/events/#{event.id}/waitlist"] if event.waitships.count.positive?),
+          (if event.allow_ticket_type_waitlists?
+               ticket_type_waitship_count = TicketTypeWaitship.and(:ticket_type_id.in => event.ticket_type_ids).count
+               [%(Ticket type waitlists <span class="badge badge-primary">#{ticket_type_waitship_count}</span>), "/events/#{event.id}/ticket_type_waitlists"] if ticket_type_waitship_count.positive?
+             end),
           ([%(Feedback <span class="badge badge-primary">#{event.event_feedbacks.count}</span>), "/events/#{event.id}/feedback"] if event.event_feedbacks.count.positive?),
           (['Ticket type photos', "/events/#{event.id}/ticket_types"] if event.ticket_types.exists?),
           (['Co-host settings', "/events/#{event.id}/cohosts"] if event.cohostships.count.positive?),          

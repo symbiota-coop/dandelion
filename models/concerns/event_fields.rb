@@ -64,7 +64,7 @@ module EventFields
     field :profit_share_to_social_media, type: Integer
     field :stripe_revenue_adjustment, type: Float
 
-    %w[no_discounts hide_deleted_filters hide_attendees hide_discussion refund_deleted_orders monthly_donors_only locked secret show_emails featured opt_in_organisation opt_in_facilitator hide_few_left hide_organisation_footer ask_hear_about send_order_notifications raw_description trending hide_from_carousels no_tickets_pdf enable_resales donations_to_organisation browsable hide_unavailable_tickets hidden_from_homepage blank_price_for_free_tickets ai_tagged sold_out_cache sold_out_due_to_sales_end_cache has_organisation minimal_only direct_charges no_sales_after_end_time always_show_full_ticket_form show_after_start_time has_recording hide_waitlist evergreen].each do |b|
+    %w[no_discounts hide_deleted_filters hide_attendees hide_discussion refund_deleted_orders monthly_donors_only locked secret show_emails featured opt_in_organisation opt_in_facilitator hide_few_left hide_organisation_footer ask_hear_about send_order_notifications raw_description trending hide_from_carousels no_tickets_pdf enable_resales donations_to_organisation browsable hide_unavailable_tickets hidden_from_homepage blank_price_for_free_tickets ai_tagged sold_out_cache sold_out_due_to_sales_end_cache has_organisation minimal_only direct_charges no_sales_after_end_time always_show_full_ticket_form show_after_start_time has_recording hide_waitlist allow_ticket_type_waitlists evergreen].each do |b|
       field b.to_sym, type: Mongoid::Boolean
     end
   end
@@ -112,6 +112,7 @@ module EventFields
         minimal_only: 'Show only in embeds',
         theme_color: 'Theme color',
         hide_waitlist: 'Hide waitlist',
+        allow_ticket_type_waitlists: 'Waitlists for ticket types',
         no_sales_after_end_time: 'No sales after event ends',
         show_after_start_time: 'Show after start time',
         evergreen: 'Evergreen',
@@ -170,6 +171,7 @@ module EventFields
         blank_price_for_free_tickets: 'Show a blank price for free tickets instead of zero',
         theme_color: 'Theme color for the event page',
         hide_waitlist: "Don't show a waitlist when the event is sold out",
+        allow_ticket_type_waitlists: 'Allow people to join waitlists for each ticket type, once the ticket type is sold out',
         no_sales_after_end_time: 'Prevent ticket sales after the event end time, regardless of individual ticket type settings',
         always_show_full_ticket_form: 'Always show the full ticket form, even if there is only one free ticket type',
         show_after_start_time: 'Keep showing the event in listings after the start time has passed',

@@ -237,6 +237,15 @@ class Event
     end
   end
 
+  def ticket_type_waitlists_available?
+    allow_ticket_type_waitlists? &&
+      !sales_closed_due_to_event_end? &&
+      ticket_types.and(hidden: false).any? do |ticket_type|
+        ticket_type.number_of_tickets_available_in_single_purchase <= 0 &&
+          !ticket_type.sales_ended?
+      end
+  end
+
   def places_remaining
     capacity - tickets.and(made_available_at: nil).count if capacity
   end

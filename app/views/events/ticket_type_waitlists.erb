@@ -1,0 +1,45 @@
+<%= partial :'events/nav', locals: { event: @event } %>
+<% form_tag '', method: 'get', class: 'submitOnChange searchForm form-inline mb-3' do %>
+  <div class="form-group">
+    <label>Search ticket type waitlists</label>
+    <%= text_field_tag :q, class: 'form-control mx-1', value: params[:q] %>
+  </div>
+  <div class="form-group">
+    <label>Ticket type</label>
+    <%= select_tag :ticket_type_id, options: [''] + @event.ticket_types.order('name asc').map { |tt| [tt.name, tt.id] }, selected: params[:ticket_type_id], class: 'form-control mx-1' %>
+  </div>
+  <%= hidden_field_tag :search, value: 1 %>
+  <%= submit_tag 'Search', class: 'btn btn-primary' %>
+<% end %>
+<% if event_email_viewer? %>
+  <pre>
+    <%== Account.and(:id.in => @ticket_type_waitships.pluck(:account_id).uniq.compact).map { |account| "#{Sanitize.fragment(account.name)} &lt;#{Sanitize.fragment(account.email)}&gt;" }.join(', ') %>
+  </pre>
+<% end %>
+<% v = event_email_viewer?
+   @ticket_type_waitships = @ticket_type_waitships.order('created_at desc')
+   @ticket_type_waitships = @ticket_type_waitships.paginate(page: params[:page], per_page: 50) %>
+<p><%== pagination_details @ticket_type_waitships, model: 'Person' %></p>
+<table class="table">
+  <thead>
+    <tr>
+      <th>Name</th>
+      <th>Ticket type</th>
+      <th>Joined</th>
+    </tr>
+  </thead>
+  <% @ticket_type_waitships.each { |waitship| %>
+  <tr>
+    <td>
+      <%= partial :'accounts/account', locals: { account: waitship.account, show_email: v } %>
+    </td>
+    <td>
+      <%= Sanitize.fragment(waitship.ticket_type.try(:name).to_s) %>
+    </td>
+    <td>
+      <%= waitship.created_at %>
+    </td>
+  </tr>
+  <% } %>
+</table>
+<%= will_paginate @ticket_type_waitships, page_links: false, renderer: WillPaginate::ViewHelpers::BootstrapRenderer %>
