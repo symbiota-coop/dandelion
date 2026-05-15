@@ -12,7 +12,7 @@ The Cursor image installs Ruby, Bundler, Foreman, MongoDB, Chromium, and ImageMa
 
 - Run `foreman run bundle exec rake db:seed` to seed the database
 - Run `foreman start -e .env web` to start the web process
-- Login with the account in `.env.example`
+- Login with `SEED_ACCOUNT_EMAIL` and `SEED_ACCOUNT_PASSWORD` in `.env`
 
 ## Documentation
 
