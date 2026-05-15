@@ -14,6 +14,15 @@ The Cursor image installs Ruby, Bundler, Foreman, MongoDB, Chromium, and ImageMa
 - Run `foreman start -e .env web` to start the web process
 - Login with `SEED_ACCOUNT_EMAIL` and `SEED_ACCOUNT_PASSWORD` in `.env`
 
+## Cursor Cloud specific instructions
+
+- **Redis**: Must be running (`redis-server --daemonize yes`) before starting the web server. It's used by `Rack::Attack` for rate limiting and by `map_helper.rb` for geocode caching.
+- **MongoDB**: Must be started before seeding or running the web server. Use `bash .cursor/start-services.sh` or `mongod --fork --logpath /tmp/mongod.log --dbpath /data/db --bind_ip 127.0.0.1`.
+- **Google API errors during `db:seed`** are expected and harmless when no `GOOGLE_MAPS_API_KEY` is set — geocoding simply fails silently.
+- **Rubocop**: The codebase has pre-existing offenses (173 as of setup). Run `foreman run -e .env bundle exec rubocop` to lint.
+- **Test a single file**: `env -u BUNDLE_PATH foreman run -e .env.test bundle exec ruby -I test test/<name>_test.rb` — tests start their own Puma on port 8020.
+- **Chromium** is needed for Capybara/Cuprite integration tests. Ensure `BROWSER_PATH` points to the chromium binary.
+
 ## Documentation
 
 You can find documentation at app/views/docs/md. Keep it up to date.
