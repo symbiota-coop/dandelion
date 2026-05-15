@@ -1,6 +1,7 @@
 FROM ruby:3.4.7-bookworm
 
 ARG TARGETARCH
+ARG BUNDLER_VERSION=2.4.19
 ARG MONGODB_VERSION=8.2.6
 
 ENV DEBIAN_FRONTEND=noninteractive \
@@ -47,7 +48,7 @@ RUN case "$TARGETARCH" in \
     cp /tmp/mongodb/bin/mongod /tmp/mongodb/bin/mongos /usr/local/bin/ && \
     rm -rf /tmp/mongodb /tmp/mongodb.tgz
 
-RUN gem install bundler -v 2.4.19 && \
+RUN gem install bundler -v "${BUNDLER_VERSION}" && \
     gem install foreman && \
     ln -sf /usr/local/bundle/bin/bundle /usr/local/bin/bundle && \
     ln -sf /usr/local/bundle/bin/bundler /usr/local/bin/bundler && \
