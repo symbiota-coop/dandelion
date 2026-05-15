@@ -1,3 +1,4 @@
+<% @theme_color ||= resolved_event_theme_color(@event) %>
 <div class="card shadow-sm">
   <h3 class="card-header bg-primary text-white">Thanks for booking onto <%= @event.name %>!</h3>
   <div class="card-body readable">
@@ -111,7 +112,7 @@
 
       <iframe
       id="circles"
-      src="https://circles.gnosis.io/pilots/kudos-ga?group=dandelion&address=0xC067cAd5F4A0c4652866371b723483f83B1ED0aA"
+      src="https://circles.gnosis.io/pilots/kudos-ga?group=dandelion&address=0xC067cAd5F4A0c4652866371b723483f83B1ED0aA&theme_color=<%= CGI.escape(@theme_color || '') %>"
       style="width: 100%; border: 0;"      
       loading="lazy">
       </iframe>

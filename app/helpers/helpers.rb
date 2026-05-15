@@ -104,6 +104,14 @@ Dandelion::App.helpers do
     hex == '00af5e'
   end
 
+  def resolved_event_theme_color(event)
+    if event.theme_color && !theme_css_redundant?(event.theme_color)
+      event.theme_color
+    elsif event.organisation && !event.organisation.theme_background_color && event.organisation.theme_color && !theme_css_redundant?(event.organisation.theme_color)
+      event.organisation.theme_color
+    end
+  end
+
   def resolve_feedback_account!
     @account = if admin? && params[:email]
                  Account.find_by(email: params[:email].downcase)
