@@ -11,6 +11,7 @@ Cursor Cloud Agent setup lives in `.cursor/environment.json`.
 The Cursor image installs Ruby, Bundler, Foreman, MongoDB, Chromium, and ImageMagick. The start command runs MongoDB.
 
 - Run `foreman run bundle exec rake db:seed` to seed the database
+- Run `foreman start -e .env web` to start the web process
 - Login with the account in `.env.example`
 
 ## Documentation
