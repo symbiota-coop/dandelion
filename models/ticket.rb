@@ -92,10 +92,10 @@ class Ticket
   end
 
   after_save do
-    event.refresh_sold_out_cache_and_notify_waitlist if event
+    event.refresh_sold_out_cache_and_notify_waitlist if event && !event.flagged_for_destroy?
   end
   after_destroy do
-    event.refresh_sold_out_cache_and_notify_waitlist if event
+    event.refresh_sold_out_cache_and_notify_waitlist if event && !event.flagged_for_destroy?
   end
 
   def self.email_viewer?(ticket, account, order_email_viewer: nil)
