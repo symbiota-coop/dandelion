@@ -8,11 +8,10 @@ The ORM is Mongoid, not ActiveRecord.
 
 Cursor Cloud Agent setup lives in `.cursor/environment.json`.
 
-The Cursor image installs Ruby, Bundler, Foreman, MongoDB, Chromium, and ImageMagick.
+The Cursor image installs Ruby, Bundler, Foreman, MongoDB, Chromium, and ImageMagick. The start command runs MongoDB.
 
-The install command runs `bundle install`, copies `.env.example` to `.env` when needed, copies `.env.test.example` to `.env.test` when needed, and creates local runtime directories.
-
-The start command runs MongoDB.
+- Run `foreman run bundle exec rake db:seed` to seed the database
+- Login with the account in `.env.example`
 
 ## Documentation
 
