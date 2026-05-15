@@ -1,1 +1,0 @@
-Use the Sentry MCP to get details of the most recent unresolved production error, and fix it
