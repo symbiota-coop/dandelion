@@ -4,23 +4,15 @@ Dandelion is a Ruby/Mongo app based on the Padrino framework, which is in turn b
 
 The ORM is Mongoid, not ActiveRecord.
 
-## Setup instructions
+## Cursor Cloud Agent
 
-- Use `ruby-build` to install `ruby`
-- Install the `foreman` gem with `gem install foreman`
-- Run `bundle install` to install dependencies
-- Copy `.env.example` to `.env` and `.env.test.example` to `.env.test`
-- Start the following services:
+Cursor Cloud Agent setup lives in `.cursor/environment.json`.
 
-| Service | Start command | Notes |
-|---------|--------------|-------|
-| MongoDB | `mongod --fork --logpath /tmp/mongod.log --dbpath /data/db` | Must be running before app or tests |
-| Redis | `sudo redis-server --daemonize yes` | Must be running for Rack::Attack |
-| Web (Puma) | `foreman start -e .env web` | |
-| Worker | `foreman start -e .env worker` | Background jobs (optional for dev) |
+The Cursor image installs Ruby, Bundler, Foreman, MongoDB, Chromium, and ImageMagick.
 
-- Run `foreman run bundle exec rake db:seed` to seed the database
-- Login with the account in `.env.example`
+The install command runs `bundle install`, copies `.env.example` to `.env` when needed, copies `.env.test.example` to `.env.test` when needed, and creates local runtime directories.
+
+The start command runs MongoDB.
 
 ## Documentation
 
