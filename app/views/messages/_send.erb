@@ -1,4 +1,6 @@
-<% if !current_account.able_to_message %>
+<% if current_account.blocked_from_messaging %>
+  <p class="lead">You are not able to send messages. If you think this is a mistake, please <a href="mailto:<%= ENV['CONTACT_EMAIL'] %>">contact us</a>.</p>
+<% elsif !current_account.able_to_message %>
   <p class="lead">You must <a href="/accounts/edit">confirm your email address</a> and <a href="/donate">donate to Dandelion</a>, join a gathering or attend an event before messaging.</p>
 <% else %>
   <% form_tag "/messages/#{@account.id}/send", id: 'compose', class: 'mt-3', style: 'position: relative' do %>

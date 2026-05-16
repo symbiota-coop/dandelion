@@ -34,6 +34,7 @@ module AccountFields
     field :unsubscribed_organisation_ids_cache, type: Array
     field :bio, type: String
     field :can_message, type: Mongoid::Boolean
+    field :blocked_from_messaging, type: Mongoid::Boolean
     field :failed_sign_in_attempts, type: Integer
     field :minimal_head, type: String
     field :theme_color, type: String

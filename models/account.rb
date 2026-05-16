@@ -171,6 +171,8 @@ class Account
   end
 
   def able_to_message
+    return false if blocked_from_messaging
+
     email_confirmed && (can_message || live_player?)
   end
 
