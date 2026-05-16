@@ -23,6 +23,21 @@ Dandelion::App.helpers do
     0
   end
 
+  # Resolve account by email from a public form: new rows are created as before; existing accounts are
+  # only updated when the signed-in user is that same account. Guests and logged-in users acting for
+  # someone else must not overwrite another person's profile.
+  def save_or_update_account_from_email_form(account, attrs, model: Account)
+    attrs ||= {}
+    filtered = attrs.map { |k, v| [k, v] if v }.compact.to_h
+    if account.persisted?
+      return true unless current_account && current_account.id == account.id
+
+      account.update_attributes(mass_assigning(filtered, model))
+    else
+      account.save
+    end
+  end
+
   def mass_assigning(params, model)
     params ||= {}
     if model.respond_to?(:permitted_attributes)

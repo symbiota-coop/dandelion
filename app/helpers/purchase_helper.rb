@@ -46,7 +46,10 @@ Dandelion::App.helpers do
     account ||= Account.new(account_hash.merge(skip_confirmation_email: true))
 
     if account.persisted?
-      account.update_attributes!(account_hash.map { |k, v| [k, v] if v }.compact.to_h)
+      # Only the account owner may merge checkout fields into an existing profile.
+      if current_account && current_account.id == account.id
+        account.update_attributes!(account_hash.map { |k, v| [k, v] if v }.compact.to_h)
+      end
     else
       begin
         account.save!

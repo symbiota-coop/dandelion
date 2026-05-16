@@ -28,11 +28,7 @@ module ImportFromCsv
       account = Account.find_by(email: email.downcase)
       account ||= Account.new(account_hash)
       begin
-        if account.persisted?
-          account.update_attributes!(account_hash.map { |k, v| [k, v] if v }.compact.to_h)
-        else
-          account.save!
-        end
+        account.save! unless account.persisted?
         send(association).create account: account
       rescue StandardError
         next

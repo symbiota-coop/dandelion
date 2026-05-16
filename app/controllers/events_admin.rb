@@ -137,11 +137,7 @@ Dandelion::App.controller do
                  Account.new(mass_assigning(account_hash, Account))
                end
 
-    successful_update_or_save = if @account.persisted?
-                                  @account.update_attributes(mass_assigning(account_hash.map { |k, v| [k, v] if v }.compact.to_h, Account))
-                                else
-                                  @account.save
-                                end
+    successful_update_or_save = save_or_update_account_from_email_form(@account, account_hash)
     if successful_update_or_save
       ticket = @account.tickets.create(event: @event, ticket_type: params[:ticket][:ticket_type_id], price: params[:ticket][:price], complimentary: true)
       if ticket.persisted?

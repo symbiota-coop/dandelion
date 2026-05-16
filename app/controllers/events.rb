@@ -282,11 +282,7 @@ Dandelion::App.controller do
                 Account.new(account_hash)
               end
     account.password = Account.generate_password unless account.persisted?
-    successful_update_or_save = if account.persisted?
-                                  account.update_attributes(mass_assigning(account_hash.map { |k, v| [k, v] if v }.compact.to_h, Account))
-                                else
-                                  account.save
-                                end
+    successful_update_or_save = save_or_update_account_from_email_form(account, account_hash)
     halt 400, { error: account.errors.full_messages.join('; ') }.to_json unless successful_update_or_save
 
     unless ticket_type.ticket_type_waitships.find_by(account: account)
@@ -309,11 +305,7 @@ Dandelion::App.controller do
                  Account.new(account_hash)
                end
     @account.password = Account.generate_password unless @account.persisted?
-    successful_update_or_save = if @account.persisted?
-                                  @account.update_attributes(mass_assigning(account_hash.map { |k, v| [k, v] if v }.compact.to_h, Account))
-                                else
-                                  @account.save
-                                end
+    successful_update_or_save = save_or_update_account_from_email_form(@account, account_hash)
     if successful_update_or_save
       waitship = @event.waitships.create(account: @account)
       if @event.waitships.find_by(account: @account)
