@@ -35,7 +35,11 @@ Dandelion::App.controller do
   end
 
   post '/messages/:id/send' do
-    Message.create!(body: params[:body], messenger: current_account, messengee_id: params[:id]) if params[:body]
-    200
+    message = Message.new(body: params[:body], messenger: current_account, messengee_id: params[:id])
+    if message.save
+      200
+    else
+      halt 400, message.errors.full_messages.join('; ')
+    end
   end
 end
