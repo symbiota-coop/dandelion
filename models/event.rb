@@ -334,7 +334,8 @@ class Event
     clear_cache
     set(sold_out_cache: now_sold_out)
     set(sold_out_due_to_sales_end_cache: sold_out_due_to_sales_end?)
-    ticket_types.each(&:refresh_sold_out_cache_and_notify_waitlist)
+    # Nested ticket type autosave can leave association target documents frozen.
+    TicketType.and(event_id: id).each(&:refresh_sold_out_cache_and_notify_waitlist)
     send_waitlist_tickets_available if was_sold_out && !now_sold_out
   end
 
