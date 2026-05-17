@@ -21,10 +21,6 @@ module EmailFields
     field :reminder_email_body, type: String
     field :feedback_email_title, type: String
     field :feedback_email_body, type: String
-
-    before_validation do
-      errors.add(:feedback_email_body, 'must contain [feedback_url]') if feedback_email_body && !feedback_email_body.include?('[feedback_url]')
-    end
   end
 
   class_methods do
@@ -50,7 +46,7 @@ module EmailFields
         reminder_email_title: "Custom subject line for the reminder email. #{EmailFields.magic_tags(EmailFields::REMINDER_SUBJECT_PLACEHOLDERS)}",
         reminder_email_body: "Custom body for the reminder email. #{EmailFields.magic_tags(EmailFields::REMINDER_BODY_PLACEHOLDERS)}",
         feedback_email_title: "Custom subject line for the feedback request email. #{EmailFields.magic_tags(EmailFields::FEEDBACK_SUBJECT_PLACEHOLDERS)}",
-        feedback_email_body: "Custom body for the feedback request email. #{EmailFields.magic_tags(EmailFields::FEEDBACK_BODY_PLACEHOLDERS)}. You must include [feedback_url] which Dandelion replaces with a real URL unique to each attendee."
+        feedback_email_body: "Custom body for the feedback request email. #{EmailFields.magic_tags(EmailFields::FEEDBACK_BODY_PLACEHOLDERS)}. Include the magic tag [feedback_url], which we replace with a real URL unique to each attendee, if you want attendees to be able to leave feedback on Dandelion."
       }
     end
   end
