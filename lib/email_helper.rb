@@ -24,7 +24,7 @@ module EmailHelper
 
     domain = email.to_s.split('@').last.to_s.downcase
     base_domain = domain.split('.').first
-    MICROSOFT_DOMAINS.include?(base_domain) ? ENV['MAILGUN_PMAILS_HOST'] : default_host
+    MICROSOFT_DOMAINS.include?(base_domain) ? ENV['MAILGUN_MICROSOFT_HOST'] : default_host
   end
 
   class TemplateContext
