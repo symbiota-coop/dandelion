@@ -57,7 +57,16 @@ module EventDuplication
       redirect_url: redirect_url,
       purchase_url: purchase_url,
       no_sales_after_end_time: no_sales_after_end_time,
-      evergreen: evergreen
+      evergreen: evergreen,
+      reminder_hours_before: reminder_hours_before,
+      ticket_email_title: ticket_email_title,
+      ticket_email_greeting: ticket_email_greeting,
+      recording_email_title: recording_email_title,
+      recording_email_greeting: recording_email_greeting,
+      reminder_email_title: reminder_email_title,
+      reminder_email_body: reminder_email_body,
+      feedback_email_title: feedback_email_title,
+      feedback_email_body: feedback_email_body
     )
     event_tags.each do |event_tag|
       event.event_tagships.create(
