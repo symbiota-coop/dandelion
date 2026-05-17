@@ -79,7 +79,12 @@
       <% end %>
       <th data-col-name="created-at">Created at</th>
       <% if @event %>
-        <th>Feedback</th>
+        <th>
+          Feedback
+          <% if @event.started? && @event.organisation && !@event.evergreen? && @event.feedback_questions.present? %>
+            <a data-confirm="<% if @event.finished? %>Resend<% else %>Send<% end %> the feedback email to all eligible attendees?" href="/events/<%= @event.id %>/resend_all_feedback_emails"><i class="bi bi-send"></i></a>
+          <% end %>
+        </th>
       <% end %>
       <th>Actions</th>
     </tr>

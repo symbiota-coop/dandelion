@@ -133,11 +133,11 @@ module EventNotifications
     set(sent_star_reminders_at: Time.now) if account_id == :all
   end
 
-  def send_feedback_requests(account_id)
+  def send_feedback_requests(account_id, force_all = false)
     return if evergreen?
     return if feedback_questions.nil?
     return unless organisation
-    return if sent_feedback_requests_at && account_id == :all
+    return if sent_feedback_requests_at && account_id == :all && !force_all
 
     mg_client = Mailgun::Client.new ENV['MAILGUN_API_KEY'], ENV['MAILGUN_REGION']
     batch_message = Mailgun::BatchMessage.new(mg_client, ENV['MAILGUN_NOTIFICATIONS_HOST'])

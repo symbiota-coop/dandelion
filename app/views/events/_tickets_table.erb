@@ -54,7 +54,12 @@
       <th>Price</th>
       <th data-col-name="created-at">Created at</th>
       <th>Checked in</th>
-      <th>Feedback</th>
+      <th>
+        Feedback
+        <% if @event && @event.started? && @event.organisation && !@event.evergreen? && @event.feedback_questions.present? %>
+          <a data-confirm="<% if @event.finished? %>Resend<% else %>Send<% end %> the feedback email to all eligible attendees?" href="/events/<%= @event.id %>/resend_all_feedback_emails"><i class="bi bi-send"></i></a>
+        <% end %>
+      </th>
       <th>Actions</th>
     </tr>
   </thead>

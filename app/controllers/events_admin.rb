@@ -284,6 +284,14 @@ Dandelion::App.controller do
     redirect back
   end
 
+  get '/events/:id/resend_all_feedback_emails' do
+    @event = Event.find(params[:id]) || not_found
+    event_admins_only!
+    @event.send_feedback_requests(:all, true)
+    flash[:notice] = 'Feedback emails are being sent to all eligible attendees.'
+    redirect back
+  end
+
   get '/events/:id/discount_codes' do
     @event = Event.find(params[:id]) || not_found
     event_admins_only!
