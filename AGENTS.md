@@ -22,6 +22,12 @@ You can find documentation at app/views/docs/md. Keep it up to date.
 
 Files in lib are auto-loaded by Padrino.load!. No explicit require is necessary.
 
+## ActivateTools
+
+The `activate_tools` gem defines the `_block` helpers like `text_block`, `wysiwyg_block` etc.
+
+It also runs `blanks_to_nils!` on `params` so we can just do `if params[:x]` (no need for `if params[:x].present?`)
+
 ## Mongo
 
 We set `Mongoid.raise_not_found_error = false` in `boot.rb` so `Model.find(id)` returns `nil` for invalid ids.
