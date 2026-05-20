@@ -289,6 +289,11 @@ input[type="checkbox"] {
   border-color: darken($theme-color, 10%);
 }
 
+.alert.alert-success .alert-link,
+.alert.alert-success a {
+  color: darken($theme-color, 10%);
+}
+
 // =============================================================================
 // PROGRESS
 // =============================================================================
