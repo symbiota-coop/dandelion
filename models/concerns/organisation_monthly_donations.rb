@@ -76,18 +76,19 @@ module OrganisationMonthlyDonations
   end
 
   def sync_with_patreon
+    api_client = Patreon::API.new(patreon_api_key)
+
+    campaign = api_client.fetch_campaign.data&.first
+    return unless campaign
+
+    campaign_id = campaign.id
+
     organisationships.and(monthly_donation_method: 'Patreon').update_all(
       monthly_donation_amount: nil,
       monthly_donation_currency: nil,
       monthly_donation_start_date: nil,
       monthly_donation_annual: nil
     )
-
-    api_client = Patreon::API.new(patreon_api_key)
-
-    # Get the campaign ID
-    campaign_response = api_client.fetch_campaign
-    campaign_id = campaign_response.data[0].id
 
     # Fetch all pledges
     all_pledges = []

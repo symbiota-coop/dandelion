@@ -64,6 +64,14 @@ module OrganisationValidation
       errors.add(:stripe_sk, 'must be present if Stripe public key is present') if stripe_pk && !stripe_sk
 
       errors.add(:gocardless_instant_bank_pay, 'requires GoCardless webhook secret') if gocardless_instant_bank_pay && !gocardless_endpoint_secret
+
+      if patreon_api_key.present?
+        if patreon_api_key.match?(%r{\Ahttps?://}i) || patreon_api_key.include?('patreon.com')
+          errors.add(:patreon_api_key, 'must be a creator access token, not a Patreon page URL')
+        elsif !patreon_api_key.match?(/\A[A-Za-z0-9_-]+\z/)
+          errors.add(:patreon_api_key, 'must be a creator access token')
+        end
+      end
     end
 
     after_validation do
