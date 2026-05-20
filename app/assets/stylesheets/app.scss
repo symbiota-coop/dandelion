@@ -629,22 +629,6 @@ textarea[id=verdict_reason] {
   text-decoration: underline
 }
 
-.alert-success a {
-  color: $color_primary
-}
-
-.alert-info a {
-  color: $color_alert_info_link
-}
-
-.alert-warning a {
-  color: $color_alert_warning_link
-}
-
-.alert-danger a {
-  color: $color_alert_danger_link
-}
-
 li.reply .widget-chat-message a {
   color: white;
   text-decoration: underline

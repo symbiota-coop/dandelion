@@ -28,7 +28,8 @@ $color_inverse_bg_dark_1: darken($color_inverse_bg, 15%);
     border: 1px solid $color_primary;
 }
 
-.alert-success .alert-link {
+.alert-success .alert-link,
+.alert-success a {
     color: $color_primary;
 }
 
@@ -41,7 +42,8 @@ $color_inverse_bg_dark_1: darken($color_inverse_bg, 15%);
     border-color: $color_info;
 }
 
-.alert-info .alert-link {
+.alert-info .alert-link,
+.alert-info a {
     color: #50b0dc;
 }
 
@@ -54,7 +56,8 @@ $color_inverse_bg_dark_1: darken($color_inverse_bg, 15%);
     border-color: $color_warning;
 }
 
-.alert-warning .alert-link {
+.alert-warning .alert-link,
+.alert-warning a {
     color: #e28502;
 }
 
@@ -67,7 +70,8 @@ $color_inverse_bg_dark_1: darken($color_inverse_bg, 15%);
     border-color: #fe3b30;
 }
 
-.alert-danger .alert-link {
+.alert-danger .alert-link,
+.alert-danger a {
     color: #e2342a;
 }
 
