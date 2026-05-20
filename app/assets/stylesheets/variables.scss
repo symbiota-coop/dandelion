@@ -23,3 +23,8 @@ $color_highlight_1_light_3: lighten($color_highlight_1, 60%);
 $color_highlight_2: #B900A1;
 $color_paper: #FFFAF3;
 $color_superlight: #F9F8FA;
+
+// Alert link colours (match infinite_admin .alert-link)
+$color_alert_info_link: #50b0dc;
+$color_alert_warning_link: #e28502;
+$color_alert_danger_link: #e2342a;

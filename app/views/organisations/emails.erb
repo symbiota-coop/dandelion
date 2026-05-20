@@ -2,7 +2,7 @@
 
 <% if !@organisation.mailgun_api_key %>
   <div class="alert alert-warning">
-    <a class="text-warning text-underline" href="/o/<%=@organisation.slug%>/edit">Link a Mailgun account</a> to enable welcome emails.
+    <a href="/o/<%=@organisation.slug%>/edit">Link a Mailgun account</a> to enable welcome emails.
   </div>
 <% end %>
 

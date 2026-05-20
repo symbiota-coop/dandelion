@@ -5,7 +5,7 @@
   <% if @event.orders.exists? %>
     <div class="alert alert-warning">
       <p class="mb-0">
-        Make sure you <a class="text-warning text-underline" href="/pmails/new?event_id=<%= @event.id %>">contact ticketholders to let them know the event is cancelled</a> before you delete the event!
+        Make sure you <a href="/pmails/new?event_id=<%= @event.id %>">contact ticketholders to let them know the event is cancelled</a> before you delete the event!
       </p>
     </div>
   <% end %>
@@ -17,6 +17,6 @@
   </div>
 <% else %>
   <div class="alert alert-warning">
-    Please ask an admin of <a class="text-warning text-underline" href="/o/<%=@event.organisation.slug%>"><%=@event.organisation.name%></a> to delete the event.
+    Please ask an admin of <a href="/o/<%=@event.organisation.slug%>"><%=@event.organisation.name%></a> to delete the event.
   </div>
 <% end %>

@@ -624,13 +624,25 @@ textarea[id=verdict_reason] {
   font-size: 1rem
 }
 
-.alert-danger a {
-  color: #e2342a;
-  font-weight: bold
+.alert a {
+  font-weight: bold;
+  text-decoration: underline
 }
 
-.alert a {
-  font-weight: bold
+.alert-success a {
+  color: $color_primary
+}
+
+.alert-info a {
+  color: $color_alert_info_link
+}
+
+.alert-warning a {
+  color: $color_alert_warning_link
+}
+
+.alert-danger a {
+  color: $color_alert_danger_link
 }
 
 li.reply .widget-chat-message a {

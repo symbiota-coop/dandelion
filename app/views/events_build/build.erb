@@ -32,7 +32,7 @@
 <% if @event.calendar_import_feed_url.present? || @event.calendar_import_source_url.present? || @event.calendar_import_uid.present? %>
   <div class="alert alert-warning">
     <p class="mb-0">
-      This event is synced from an external iCal feed<% if @event.calendar_import_source_url.present? %> to <a class="text-warning text-underline" target="_blank" href="<%= @event.calendar_import_source_url %>">the source event</a><% end %>. Changes will be overwritten the next time the organisation syncs.
+      This event is synced from an external iCal feed<% if @event.calendar_import_source_url.present? %> to <a target="_blank" href="<%= @event.calendar_import_source_url %>">the source event</a><% end %>. Changes will be overwritten the next time the organisation syncs.
     </p>
   </div>
 <% end %>
@@ -190,13 +190,13 @@
         <% if @event.donations_to_dandelion? %>
           <div class="alert alert-warning">
             <p class="mb-0">
-              The settings below won't take effect until you've met the <a class="text-warning text-underline" target="_blank" href="/o/<%=@event.organisation.slug%>/contribute">suggested contribution</a>.
+              The settings below won't take effect until you've met the <a target="_blank" href="/o/<%=@event.organisation.slug%>/contribute">suggested contribution</a>.
             </p>
           </div>
         <% elsif @event.organisation.stripe_connect_only? %>
           <div class="alert alert-success">
             <p class="mb-0">
-              For as long as your organisation meets the <strong><u><a target="_blank" href="/o/<%=@event.organisation.slug%>/contribute">suggested donation</a></u></strong> of 1% of ticket sales, we'll apply the settings below and pass on donations to your organisation. <strong><u><a target="_blank" href="/docs/events#about-the-suggested-donation">Read more</a></u></strong>
+              For as long as your organisation meets the <strong><a target="_blank" href="/o/<%=@event.organisation.slug%>/contribute">suggested donation</a></strong> of 1% of ticket sales, we'll apply the settings below and pass on donations to your organisation. <strong><a target="_blank" href="/docs/events#about-the-suggested-donation">Read more</a></strong>
             </p>
           </div>
         <% end %>
@@ -230,7 +230,7 @@
       <div role="tabpanel" class="tab-pane" id="tab-emails">
         <div class="alert alert-success">
           <p class="mb-0">
-            Leaving a field blank will mean the email uses the value from the <u><a target="_blank" href="/o/<%=@event.organisation.slug%>/edit?tab=emails">organisation's email settings</a></u> instead.
+            Leaving a field blank will mean the email uses the value from the <a target="_blank" href="/o/<%=@event.organisation.slug%>/edit?tab=emails">organisation's email settings</a> instead.
           </p>
         </div>
         <div>
