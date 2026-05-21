@@ -1,0 +1,48 @@
+name: Daily Bug Review (Claude)
+
+concurrency:
+  group: daily-bug-review-claude
+  cancel-in-progress: true
+
+env:
+  CLAUDE_MODEL: claude-opus-4-7
+
+on:
+  schedule:
+    - cron: '0 4 * * *'
+  workflow_dispatch:
+
+jobs:
+  bug-review:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      issues: write
+      id-token: write
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 100
+
+      - name: Setup
+        id: setup
+        uses: ./.github/actions/bug-review-setup
+
+      - name: Load prompt
+        if: steps.setup.outputs.has_commits == 'true'
+        id: prompt
+        uses: ./.github/actions/bug-review-prompt
+        with:
+          title_prefix: '[Claude] '
+
+      - uses: anthropics/claude-code-action@v1
+        if: steps.setup.outputs.has_commits == 'true'
+        with:
+          show_full_output: true
+          display_report: true
+          claude_code_oauth_token: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
+          claude_args: |
+            --model ${{ env.CLAUDE_MODEL }}
+            --dangerously-skip-permissions
+          prompt: ${{ steps.prompt.outputs.text }}
