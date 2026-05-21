@@ -1,0 +1,28 @@
+name: Load bug review prompt
+description: Read the shared daily bug review prompt into a step output
+
+inputs:
+  title_prefix:
+    description: Issue title prefix (e.g. "[Claude] " or "[Cursor] ")
+    required: true
+
+outputs:
+  text:
+    description: The bug review prompt text
+    value: ${{ steps.load.outputs.text }}
+
+runs:
+  using: composite
+  steps:
+    - name: Load prompt
+      id: load
+      shell: bash
+      env:
+        TITLE_PREFIX: ${{ inputs.title_prefix }}
+      run: |
+        PROMPT=$(sed "s|TITLE_PREFIX|${TITLE_PREFIX}|g" .github/prompts/daily-bug-review.md)
+        {
+          echo 'text<<EOF'
+          echo "$PROMPT"
+          echo 'EOF'
+        } >> "$GITHUB_OUTPUT"

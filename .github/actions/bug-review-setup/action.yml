@@ -1,0 +1,28 @@
+name: Bug review setup
+description: Checkout repo and check for commits in the last 24 hours
+
+outputs:
+  has_commits:
+    description: Whether there are commits in the review window
+    value: ${{ steps.check-commits.outputs.has_commits }}
+
+runs:
+  using: composite
+  steps:
+    - uses: actions/checkout@v4
+      with:
+        fetch-depth: 100
+
+    - name: Check for recent commits
+      id: check-commits
+      shell: bash
+      run: |
+        COMMITS=$(git log --since='24 hours ago' --oneline --no-merges)
+        if [ -z "$COMMITS" ]; then
+          echo "No commits in the review window"
+          echo "has_commits=false" >> "$GITHUB_OUTPUT"
+        else
+          echo "Found commits:"
+          echo "$COMMITS"
+          echo "has_commits=true" >> "$GITHUB_OUTPUT"
+        fi
