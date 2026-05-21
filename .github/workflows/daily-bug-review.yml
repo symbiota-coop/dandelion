@@ -1,5 +1,9 @@
 name: Daily Bug Review
 
+concurrency:
+  group: daily-bug-review
+  cancel-in-progress: true
+
 env:
   CLAUDE_MODEL: claude-opus-4-7
   CURSOR_MODEL: composer-2.5
@@ -10,18 +14,11 @@ on:
   workflow_dispatch:
 
 jobs:
-  check-commits:
-    runs-on: ubuntu-latest
-    outputs:
-      has_commits: ${{ steps.setup.outputs.has_commits }}
-    steps:
-      - name: Setup
-        id: setup
-        uses: ./.github/actions/bug-review-setup
-
-  claude-bug-review:
-    needs: check-commits
-    if: needs.check-commits.outputs.has_commits == 'true'
+  bug-review:
+    strategy:
+      fail-fast: false
+      matrix:
+        reviewer: [claude, cursor]
     runs-on: ubuntu-latest
     permissions:
       contents: read
@@ -29,17 +26,19 @@ jobs:
       id-token: write
 
     steps:
-      - uses: actions/checkout@v4
-        with:
-          fetch-depth: 100
+      - name: Setup
+        id: setup
+        uses: ./.github/actions/bug-review-setup
 
       - name: Load prompt
+        if: steps.setup.outputs.has_commits == 'true'
         id: prompt
         uses: ./.github/actions/bug-review-prompt
         with:
-          title_prefix: '[Claude] '
+          title_prefix: ${{ matrix.reviewer == 'claude' && '[Claude] ' || '[Cursor] ' }}
 
       - uses: anthropics/claude-code-action@v1
+        if: steps.setup.outputs.has_commits == 'true' && matrix.reviewer == 'claude'
         with:
           show_full_output: true
           display_report: true
@@ -49,31 +48,14 @@ jobs:
             --dangerously-skip-permissions
           prompt: ${{ steps.prompt.outputs.text }}
 
-  cursor-bug-review:
-    needs: check-commits
-    if: needs.check-commits.outputs.has_commits == 'true'
-    runs-on: ubuntu-latest
-    permissions:
-      contents: read
-      issues: write
-
-    steps:
-      - uses: actions/checkout@v4
-        with:
-          fetch-depth: 100
-
-      - name: Load prompt
-        id: prompt
-        uses: ./.github/actions/bug-review-prompt
-        with:
-          title_prefix: '[Cursor] '
-
       - name: Install Cursor CLI
+        if: steps.setup.outputs.has_commits == 'true' && matrix.reviewer == 'cursor'
         run: |
           curl https://cursor.com/install -fsS | bash
           echo "$HOME/.cursor/bin" >> "$GITHUB_PATH"
 
       - name: Run bug review
+        if: steps.setup.outputs.has_commits == 'true' && matrix.reviewer == 'cursor'
         env:
           CURSOR_API_KEY: ${{ secrets.CURSOR_API_KEY }}
           GH_TOKEN: ${{ github.token }}
