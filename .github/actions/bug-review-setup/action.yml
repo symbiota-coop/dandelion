@@ -1,5 +1,5 @@
 name: Bug review setup
-description: Checkout repo and check for commits in the last 24 hours
+description: Check for commits in the last 24 hours (requires checkout first)
 
 outputs:
   has_commits:
@@ -9,10 +9,6 @@ outputs:
 runs:
   using: composite
   steps:
-    - uses: actions/checkout@v4
-      with:
-        fetch-depth: 100
-
     - name: Check for recent commits
       id: check-commits
       shell: bash
