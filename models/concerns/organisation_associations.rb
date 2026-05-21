@@ -75,7 +75,6 @@ module OrganisationAssociations
   end
 
   def events_including_cohosted
-    # was Event.and(:id.in => events.pluck(:id) + cohostships.pluck(:event_id))
     Event.unscoped.or({ organisation_id: id }, { cohosts_ids_cache: id }).and(deleted_at: nil)
   end
 
