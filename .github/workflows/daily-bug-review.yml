@@ -65,6 +65,6 @@ jobs:
           GH_TOKEN: ${{ github.token }}
           PROMPT_TEXT: ${{ steps.prompt.outputs.text }}
         run: |
-          agent -p --trust --model "$CURSOR_MODEL" \
+          agent -p --trust --force --model "$CURSOR_MODEL" \
             --output-format stream-json \
             "$PROMPT_TEXT"
