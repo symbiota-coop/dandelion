@@ -6,8 +6,10 @@
   edge_opacity_scale = 1000
   color = '#00AF5E'
 
-  organisation_edges = OrganisationEdge.and(:mutual_followers.gte => Padrino.env == :development ? 1 : 10)
-  organisations = Organisation.and(:id.in => organisation_edges.pluck(:source_id) + organisation_edges.pluck(:sink_id))
+  organisation_edges = OrganisationEdge.and(:mutual_followers.gte => Padrino.env == :development ? 1 : 10).to_a
+  org_ids = organisation_edges.flat_map { |edge| [edge.source_id, edge.sink_id] }.uniq
+  organisations = Organisation.and(:id.in => org_ids)
+  edges_by_source = organisation_edges.group_by(&:source_id)
 
   elements = []
 
@@ -24,13 +26,13 @@
       }
     }
 
-    organisation_edges.and(source: organisation).each do |edge|
+    (edges_by_source[organisation.id] || []).each do |edge|
       w = edge.mutual_followers
       elements << {
         data: {
           id: edge.id.to_s,
-          source: edge.source.id.to_s,
-          target: edge.sink.id.to_s,
+          source: edge.source_id.to_s,
+          target: edge.sink_id.to_s,
           weight: w,
           color: color,
           opacity: edge_min_opacity + w.to_f / edge_opacity_scale
