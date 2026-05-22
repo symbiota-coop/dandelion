@@ -163,10 +163,12 @@ Dandelion::App.controller do
 
     redirect @event.purchase_url if @event.minimal_only? && @event.purchase_url
 
-    @order = Order.find(params[:order_id]) || not_found if params[:order_id]
-    @og_desc = when_details(@event) || 'On-demand'
     kick! unless @event.organisation
     kick!(redirect_url: "/o/#{@event.organisation.slug}/events") if @event.locked? && !event_admin?
+    halt 200 if request.head?
+
+    @order = Order.find(params[:order_id]) || not_found if params[:order_id]
+    @og_desc = when_details(@event) || 'On-demand'
     @title = @event.name
     @organisation = @event.organisation
     @event.check_oc_event if @order && params[:success] && !@order.payment_completed && @event.oc_slug
