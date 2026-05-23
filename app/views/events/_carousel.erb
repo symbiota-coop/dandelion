@@ -37,7 +37,7 @@
     <div class="slick-responsive row justify-content-center">
       <% events.each { |event| %>
       <div class="col-12 col-sm-6 col-lg-4 slick-item">
-        <%= partial :'events/block_carousel', locals: {event: event} %>
+        <%= cp(:'events/block_carousel', locals: { event: event }, event: event, key: "/events/#{event.id}/block_carousel?organisation_id=#{@organisation.try(:id)}&timezone=#{current_account ? current_account.time_zone : session[:time_zone]}") %>
       </div>
       <% } %>
     </div>
