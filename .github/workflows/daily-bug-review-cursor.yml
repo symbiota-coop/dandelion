@@ -48,6 +48,53 @@ jobs:
           GH_TOKEN: ${{ github.token }}
           PROMPT_TEXT: ${{ steps.prompt.outputs.text }}
         run: |
+          cursor_log="$(mktemp)"
+          cursor_err="$(mktemp)"
+
+          set +e
           agent -p --trust --force --model "$CURSOR_MODEL" \
             --output-format stream-json \
-            "$PROMPT_TEXT"
+            "$PROMPT_TEXT" \
+            2> >(tee "$cursor_err" >&2) | tee "$cursor_log"
+          agent_status=${PIPESTATUS[0]}
+          set -e
+
+          {
+            echo "## Cursor Agent Report"
+            echo
+
+            if jq -e -R 'fromjson? | select(.type == "result")' "$cursor_log" > /dev/null; then
+              jq -r -R '
+                fromjson?
+                | select(.type == "result")
+                | "### Final Result\n\n"
+                  + ((.result // "Cursor did not return a final result.") | tostring)
+                  + "\n\n---\n\n"
+                  + "Duration: "
+                  + (if .duration_ms then (((.duration_ms / 1000 * 10) | round) / 10 | tostring) + "s" else "unknown" end)
+                  + "\n\nSession: `"
+                  + ((.session_id // "unknown") | tostring)
+                  + "`"
+              ' "$cursor_log"
+            else
+              echo "Cursor did not emit a final result event."
+            fi
+
+            if [ "$agent_status" -ne 0 ]; then
+              echo
+              echo "### Exit Status"
+              echo
+              echo "\`agent\` exited with status \`$agent_status\`."
+
+              if [ -s "$cursor_err" ]; then
+                echo
+                echo "### Error Output"
+                echo
+                echo '```text'
+                tail -n 120 "$cursor_err"
+                echo '```'
+              fi
+            fi
+          } >> "$GITHUB_STEP_SUMMARY"
+
+          exit "$agent_status"
