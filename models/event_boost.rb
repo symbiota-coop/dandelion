@@ -172,8 +172,8 @@ class EventBoost
       "Event: #{event.name}",
       "Account: #{account.name}",
       "Start time: #{event_boost.start_time.iso8601}",
-      "Hours: #{event_boost.hours}",
       "Currency: #{event_boost.currency}",
+      "Hours: #{event_boost.hours}",
       "Hourly amount: #{event_boost.hourly_amount}",
       "Total amount: #{event_boost.total_amount}",
       "Boosts URL: #{ENV['BASE_URI']}/events/#{event.id}/boosts"
