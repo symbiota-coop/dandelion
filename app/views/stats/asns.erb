@@ -17,7 +17,7 @@
 <p class="text-muted text-center mb-3">
   Last <%= pluralize(@hours, 'hour') %> &middot;
   <% Asn::DETECTION_CONFIGS.each_with_index do |config, i| %>
-    <%== ' &middot; ' unless i.zero? %>
+    <%== i.zero? ? '' : ' &middot; ' %>
     <%= config[:window_length] %>h window, &ge;<%= config[:threshold] %>&times; baseline (AS<%= Asn::BASELINE_ASN %>)
   <% end %>
 </p>
@@ -45,8 +45,8 @@
             <% blocked = @blocked_asns.include?(row['asn'].to_s) %>
             <% bp = @bot_pct[row['asn'].to_s] %>
             <% mult = window[:baseline] > 0 ? (row['count'].to_f / window[:baseline]).round(1) : nil %>
-            <tr class="<%= 'asn-window-start' if i.zero? %>"<%== ' style="background-color: #fff0f0"' if blocked %>>
-              <td><%== "#{window[:start].strftime('%a %d %b %H:%M')} &ndash; #{window[:end].strftime('%H:%M')}" if i.zero? %></td>
+            <tr class="<%= 'asn-window-start' if i.zero? %>"<%== blocked ? ' style="background-color: #fff0f0"' : '' %>>
+              <td><%== i.zero? ? "#{window[:start].strftime('%a %d %b %H:%M')} &ndash; #{window[:end].strftime('%H:%M')}" : '' %></td>
               <td>
                 <% if i.zero? %>
                   <span class="badge badge-secondary" title="<%= window[:window_length] %>-hour window, threshold &ge;<%= window[:threshold] %>&times; baseline">
@@ -58,9 +58,9 @@
               <td><a href="https://radar.cloudflare.com/as<%= row['asn'] %>" target="_blank"><code><%= row['asn'] %></code></a></td>
               <td class="text-truncate"><%= row['description'] %></td>
               <td><%= @asn_countries[row['asn'].to_s] %></td>
-              <td<%== " style=\"color: #{bp[:bot] >= 60 ? '#dc3545' : bp[:bot] >= 30 ? '#fd7e14' : '#28a745'}\"" if bp %>><%== bp ? "#{bp[:bot]}%" : '&ndash;' %></td>
-                <td><%= row['count'] %></td>
-                <td><%== mult ? "#{mult}&times;" : '&ndash;' %></td>
+              <td<%== bp ? " style=\"color: #{bp[:bot] >= 60 ? '#dc3545' : bp[:bot] >= 30 ? '#fd7e14' : '#28a745'}\"" : '' %>><%== bp ? "#{bp[:bot]}%" : '&ndash;' %></td>
+              <td><%= row['count'] %></td>
+              <td><%== mult ? "#{mult}&times;" : '&ndash;' %></td>
                 <td class="text-nowrap">
                   <% if blocked %>
                     <form method="post" action="/stats/asns/unblock/<%= row['asn'] %>" class="d-inline">
@@ -106,7 +106,7 @@
                 <td><a href="https://radar.cloudflare.com/as<%= asn %>" target="_blank"><code><%= asn %></code></a></td>
                 <td class="text-truncate"><%= @asn_names[asn] %></td>
                 <td><%= @asn_countries[asn] %></td>
-                <td<%== " style=\"color: #{bp[:bot] >= 60 ? '#dc3545' : bp[:bot] >= 30 ? '#fd7e14' : '#28a745'}\"" if bp %>><%== bp ? "#{bp[:bot]}%" : '&ndash;' %></td>
+              <td<%== bp ? " style=\"color: #{bp[:bot] >= 60 ? '#dc3545' : bp[:bot] >= 30 ? '#fd7e14' : '#28a745'}\"" : '' %>><%== bp ? "#{bp[:bot]}%" : '&ndash;' %></td>
                   <td>
                     <form method="post" action="/stats/asns/unblock/<%= asn %>" class="d-inline">
                       <button type="submit" class="btn btn-outline-success btn-sm" title="Unblock"><i class="bi bi-shield-x"></i></button>
