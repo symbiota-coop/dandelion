@@ -1,5 +1,6 @@
 module Asn
   BASELINE_ASN = 2856
+  MIN_BASELINE_PER_HOUR = 100
   DETECTION_CONFIGS = [
     { window_length: 1, threshold: 3.0 },
     { window_length: 3, threshold: 1.5 }
@@ -142,6 +143,8 @@ module Asn
       next window_start = window_end if window_start.hour < 6 || window_end > now
 
       baseline_count = by_asn.find { |r| r['asn'].to_s == BASELINE_ASN.to_s }&.dig('count') || 0
+      next window_start = window_end if baseline_count < MIN_BASELINE_PER_HOUR * window_length
+
       filtered = by_asn.select do |r|
         r['asn'].to_s != BASELINE_ASN.to_s &&
           r['count'] > baseline_count * threshold &&

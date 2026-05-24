@@ -14,10 +14,10 @@
 </style>
 
 <h4 class="text-center">Suspicious ASNs</h4>
-<p class="text-muted text-center small mb-3">
+<p class="text-muted text-center mb-3">
   Last <%= pluralize(@hours, 'hour') %> &middot;
   <% Asn::DETECTION_CONFIGS.each_with_index do |config, i| %>
-    <%= ' &middot; '.html_safe unless i.zero? %>
+    <%== ' &middot; ' unless i.zero? %>
     <%= config[:window_length] %>h window, &ge;<%= config[:threshold] %>&times; baseline (AS<%= Asn::BASELINE_ASN %>)
   <% end %>
 </p>
@@ -45,11 +45,11 @@
             <% blocked = @blocked_asns.include?(row['asn'].to_s) %>
             <% bp = @bot_pct[row['asn'].to_s] %>
             <% mult = window[:baseline] > 0 ? (row['count'].to_f / window[:baseline]).round(1) : nil %>
-            <tr class="<%= 'asn-window-start' if i.zero? %>"<%= ' style="background-color: #fff0f0"'.html_safe if blocked %>>
-              <td><%= "#{window[:start].strftime('%a %d %b %H:%M')} &ndash; #{window[:end].strftime('%H:%M')}".html_safe if i.zero? %></td>
+            <tr class="<%= 'asn-window-start' if i.zero? %>"<%== ' style="background-color: #fff0f0"' if blocked %>>
+              <td><%== "#{window[:start].strftime('%a %d %b %H:%M')} &ndash; #{window[:end].strftime('%H:%M')}" if i.zero? %></td>
               <td>
                 <% if i.zero? %>
-                  <span class="badge badge-<%= window[:window_length] == 1 ? 'info' : 'secondary' %>" title="<%= window[:window_length] %>-hour window, threshold &ge;<%= window[:threshold] %>&times; baseline">
+                  <span class="badge badge-secondary" title="<%= window[:window_length] %>-hour window, threshold &ge;<%= window[:threshold] %>&times; baseline">
                     <%= window[:window_length] %>h
                   </span>
                 <% end %>
@@ -58,98 +58,98 @@
               <td><a href="https://radar.cloudflare.com/as<%= row['asn'] %>" target="_blank"><code><%= row['asn'] %></code></a></td>
               <td class="text-truncate"><%= row['description'] %></td>
               <td><%= @asn_countries[row['asn'].to_s] %></td>
-              <td<%= " style=\"color: #{bp[:bot] >= 60 ? '#dc3545' : bp[:bot] >= 30 ? '#fd7e14' : '#28a745'}\"".html_safe if bp %>><%= bp ? "#{bp[:bot]}%" : '&ndash;'.html_safe %></td>
-              <td><%= row['count'] %></td>
-              <td><%= mult ? "#{mult}&times;" : '&ndash;'.html_safe %></td>
-              <td class="text-nowrap">
-                <% if blocked %>
-                  <form method="post" action="/stats/asns/unblock/<%= row['asn'] %>" class="d-inline">
-                    <button type="submit" class="btn btn-outline-success btn-sm" title="Unblock"><i class="bi bi-shield-x"></i></button>
+              <td<%== " style=\"color: #{bp[:bot] >= 60 ? '#dc3545' : bp[:bot] >= 30 ? '#fd7e14' : '#28a745'}\"" if bp %>><%== bp ? "#{bp[:bot]}%" : '&ndash;' %></td>
+                <td><%= row['count'] %></td>
+                <td><%== mult ? "#{mult}&times;" : '&ndash;' %></td>
+                <td class="text-nowrap">
+                  <% if blocked %>
+                    <form method="post" action="/stats/asns/unblock/<%= row['asn'] %>" class="d-inline">
+                      <button type="submit" class="btn btn-outline-success btn-sm" title="Unblock"><i class="bi bi-shield-x"></i></button>
+                    </form>
+                  <% else %>
+                    <form method="post" action="/stats/asns/block/<%= row['asn'] %>" class="d-inline">
+                      <button type="submit" class="btn btn-outline-danger btn-sm" title="Block"><i class="bi bi-shield-check"></i></button>
+                    </form>
+                  <% end %>
+                  <form method="post" action="/stats/asns/legit/<%= row['asn'] %>" class="d-inline">
+                    <button type="submit" class="btn btn-outline-secondary btn-sm" title="Mark as legit"><i class="bi bi-check-lg"></i></button>
                   </form>
-                <% else %>
-                  <form method="post" action="/stats/asns/block/<%= row['asn'] %>" class="d-inline">
-                    <button type="submit" class="btn btn-outline-danger btn-sm" title="Block"><i class="bi bi-shield-check"></i></button>
-                  </form>
-                <% end %>
-                <form method="post" action="/stats/asns/legit/<%= row['asn'] %>" class="d-inline">
-                  <button type="submit" class="btn btn-outline-secondary btn-sm" title="Mark as legit"><i class="bi bi-check-lg"></i></button>
-                </form>
-              </td>
-            </tr>
-          <% end %>
-        <% end %>
-      </tbody>
-    </table>
-  </div>
-<% else %>
-  <p class="text-muted text-center">No ASNs above threshold in the last <%= pluralize(@hours, 'hour') %>.</p>
-<% end %>
-
-<% if @rule %>
-  <h4 class="mt-4 text-center">Blocked ASNs</h4>
-  <% if @blocked_asns.any? %>
-    <div class="table-responsive">
-      <table class="table table-hover table-sm">
-        <thead>
-          <tr>
-            <th style="width: 7em">ASN</th>
-            <th>Name</th>
-            <th style="width: 8em">Country</th>
-            <th style="width: 5em">Bot %</th>
-            <th style="width: 4em"></th>
-          </tr>
-        </thead>
-        <tbody>
-          <% @blocked_asns.each do |asn| %>
-            <% bp = @bot_pct[asn] %>
-            <tr>
-              <td><a href="https://radar.cloudflare.com/as<%= asn %>" target="_blank"><code><%= asn %></code></a></td>
-              <td class="text-truncate"><%= @asn_names[asn] %></td>
-              <td><%= @asn_countries[asn] %></td>
-              <td<%= " style=\"color: #{bp[:bot] >= 60 ? '#dc3545' : bp[:bot] >= 30 ? '#fd7e14' : '#28a745'}\"".html_safe if bp %>><%= bp ? "#{bp[:bot]}%" : '&ndash;'.html_safe %></td>
-              <td>
-                <form method="post" action="/stats/asns/unblock/<%= asn %>" class="d-inline">
-                  <button type="submit" class="btn btn-outline-success btn-sm" title="Unblock"><i class="bi bi-shield-x"></i></button>
-                </form>
-              </td>
-            </tr>
+                </td>
+              </tr>
+            <% end %>
           <% end %>
         </tbody>
       </table>
     </div>
   <% else %>
-    <p class="text-muted text-center">No blocked ASNs.</p>
+    <p class="text-muted text-center">No ASNs above threshold in the last <%= pluralize(@hours, 'hour') %>.</p>
   <% end %>
-<% else %>
-  <div class="alert alert-danger">Could not fetch rule from Cloudflare API.</div>
-<% end %>
 
-<% if @legit_asns.any? %>
-  <h4 class="mt-4 text-center">Legit ASNs</h4>
-  <div class="table-responsive">
-    <table class="table table-hover table-sm">
-      <thead>
-        <tr>
-          <th style="width: 7em">ASN</th>
-          <th>Name</th>
-          <th style="width: 8em">Country</th>
-          <th style="width: 4em"></th>
-        </tr>
-      </thead>
-      <tbody>
-        <% @legit_asns.each do |asn| %>
-          <tr>
-            <td><a href="https://radar.cloudflare.com/as<%= asn %>" target="_blank"><code><%= asn %></code></a></td>
-            <td class="text-truncate"><%= @asn_names[asn] %></td>
-            <td><%= @asn_countries[asn] %></td>
-            <td>
-              <form method="post" action="/stats/asns/legit/<%= asn %>" class="d-inline">
-                <button type="submit" class="btn btn-outline-danger btn-sm" title="Remove from legit"><i class="bi bi-x-lg"></i></button>
-              </form>
-            </td>
-          </tr>
-        <% end %>
-      </tbody>
-    </table>
-  </div>
-<% end %>
+  <% if @rule %>
+    <h4 class="mt-4 text-center">Blocked ASNs</h4>
+    <% if @blocked_asns.any? %>
+      <div class="table-responsive">
+        <table class="table table-hover table-sm">
+          <thead>
+            <tr>
+              <th style="width: 7em">ASN</th>
+              <th>Name</th>
+              <th style="width: 8em">Country</th>
+              <th style="width: 5em">Bot %</th>
+              <th style="width: 4em"></th>
+            </tr>
+          </thead>
+          <tbody>
+            <% @blocked_asns.each do |asn| %>
+              <% bp = @bot_pct[asn] %>
+              <tr>
+                <td><a href="https://radar.cloudflare.com/as<%= asn %>" target="_blank"><code><%= asn %></code></a></td>
+                <td class="text-truncate"><%= @asn_names[asn] %></td>
+                <td><%= @asn_countries[asn] %></td>
+                <td<%== " style=\"color: #{bp[:bot] >= 60 ? '#dc3545' : bp[:bot] >= 30 ? '#fd7e14' : '#28a745'}\"" if bp %>><%== bp ? "#{bp[:bot]}%" : '&ndash;' %></td>
+                  <td>
+                    <form method="post" action="/stats/asns/unblock/<%= asn %>" class="d-inline">
+                      <button type="submit" class="btn btn-outline-success btn-sm" title="Unblock"><i class="bi bi-shield-x"></i></button>
+                    </form>
+                  </td>
+                </tr>
+              <% end %>
+            </tbody>
+          </table>
+        </div>
+      <% else %>
+        <p class="text-muted text-center">No blocked ASNs.</p>
+      <% end %>
+    <% else %>
+      <div class="alert alert-danger">Could not fetch rule from Cloudflare API.</div>
+    <% end %>
+
+    <% if @legit_asns.any? %>
+      <h4 class="mt-4 text-center">Legit ASNs</h4>
+      <div class="table-responsive">
+        <table class="table table-hover table-sm">
+          <thead>
+            <tr>
+              <th style="width: 7em">ASN</th>
+              <th>Name</th>
+              <th style="width: 8em">Country</th>
+              <th style="width: 4em"></th>
+            </tr>
+          </thead>
+          <tbody>
+            <% @legit_asns.each do |asn| %>
+              <tr>
+                <td><a href="https://radar.cloudflare.com/as<%= asn %>" target="_blank"><code><%= asn %></code></a></td>
+                <td class="text-truncate"><%= @asn_names[asn] %></td>
+                <td><%= @asn_countries[asn] %></td>
+                <td>
+                  <form method="post" action="/stats/asns/legit/<%= asn %>" class="d-inline">
+                    <button type="submit" class="btn btn-outline-danger btn-sm" title="Remove from legit"><i class="bi bi-x-lg"></i></button>
+                  </form>
+                </td>
+              </tr>
+            <% end %>
+          </tbody>
+        </table>
+      </div>
+    <% end %>
