@@ -31,11 +31,8 @@ namespace :hourly do
 
       organisation.sync_calendar_imports
     end
-    current_hour = TZInfo::Timezone.get(Asn::TIMEZONE).to_local(Time.now.utc).hour
-    if (current_hour % Asn::WINDOW_LENGTH).zero?
-      puts 'autoblock ASNs'
-      Asn.autoblock
-    end
+    puts 'autoblock ASNs'
+    Asn.autoblock
   end
 end
 

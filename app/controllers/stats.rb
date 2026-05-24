@@ -243,7 +243,7 @@ Dandelion::App.controller do
     details[:countries].each { |asn, country| @asn_countries[asn] ||= country if country }
     details[:names].each { |asn, name| @asn_names[asn] ||= name if name }
 
-    @windows = Asn.suspicious_windows(rows: rows, hours: @hours, legit_asns: @legit_asns)
+    @windows = Asn.all_suspicious_windows(rows: rows, hours: @hours, legit_asns: @legit_asns)
 
     all_unique_asns = (@windows.flat_map { |w| w[:asns].map { |r| r['asn'].to_s } } + @blocked_asns).uniq
     @bot_pct = Asn.fetch_bot_classifications(all_unique_asns)

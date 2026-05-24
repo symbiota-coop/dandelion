@@ -1,7 +1,10 @@
 module Asn
   BASELINE_ASN = 2856
-  WINDOW_LENGTH = 3
-  THRESHOLD = 1.5
+  DETECTION_CONFIGS = [
+    { window_length: 1, threshold: 3.0 },
+    { window_length: 3, threshold: 1.5 }
+  ].freeze
+  MAX_WINDOW_LENGTH = DETECTION_CONFIGS.map { |c| c[:window_length] }.max
   TIMEZONE = 'Europe/Stockholm'
 
   AUTOBLOCK_BOT_PCT_DEFAULT = 50
@@ -107,13 +110,26 @@ module Asn
     resp.dig('data', 'viewer', 'zones', 0, 'httpRequestsAdaptiveGroups') || []
   end
 
-  def self.suspicious_windows(rows:, hours:, legit_asns:)
+  def self.all_suspicious_windows(rows:, legit_asns:, hours: nil)
+    windows = DETECTION_CONFIGS.flat_map do |config|
+      suspicious_windows(
+        rows: rows,
+        hours: hours || config[:window_length],
+        legit_asns: legit_asns,
+        window_length: config[:window_length],
+        threshold: config[:threshold]
+      )
+    end
+    windows.sort_by { |w| -w[:start].to_i }
+  end
+
+  def self.suspicious_windows(rows:, hours:, legit_asns:, window_length:, threshold:)
     windows = []
     tz = TZInfo::Timezone.get(TIMEZONE)
     now = tz.to_local(Time.now.utc)
-    window_start = tz.local_time(now.year, now.month, now.day, (now.hour / WINDOW_LENGTH) * WINDOW_LENGTH) - (hours * 3600)
+    window_start = tz.local_time(now.year, now.month, now.day, (now.hour / window_length) * window_length) - (hours * 3600)
     while window_start < now
-      window_end = window_start + (WINDOW_LENGTH * 3600)
+      window_end = window_start + (window_length * 3600)
 
       window_rows = rows.select do |r|
         t = Time.parse(r.dig('dimensions', 'datetimeHour'))
@@ -128,12 +144,12 @@ module Asn
       baseline_count = by_asn.find { |r| r['asn'].to_s == BASELINE_ASN.to_s }&.dig('count') || 0
       filtered = by_asn.select do |r|
         r['asn'].to_s != BASELINE_ASN.to_s &&
-          r['count'] > baseline_count * THRESHOLD &&
+          r['count'] > baseline_count * threshold &&
           !legit_asns.include?(r['asn'].to_s) &&
           !skip_autoblock_for_description?(r['description'])
       end.sort_by { |r| -r['count'] }
 
-      windows << { start: window_start, end: window_end, baseline: baseline_count, asns: filtered } if filtered.any?
+      windows << { start: window_start, end: window_end, baseline: baseline_count, window_length: window_length, threshold: threshold, asns: filtered } if filtered.any?
       window_start = window_end
     end
     windows.reverse!
@@ -220,13 +236,13 @@ module Asn
     rows = nil
     threads = [
       Thread.new { rule = fetch_rule },
-      Thread.new { rows = fetch_analytics(hours: WINDOW_LENGTH) }
+      Thread.new { rows = fetch_analytics(hours: MAX_WINDOW_LENGTH) }
     ]
     threads.each(&:join)
 
     blocked = blocked_asns(rule)
     legit = legit_asns
-    windows = suspicious_windows(rows: rows, hours: WINDOW_LENGTH, legit_asns: legit)
+    windows = all_suspicious_windows(rows: rows, legit_asns: legit)
     candidates = windows.flat_map { |w| w[:asns].map { |r| r['asn'].to_s } }.uniq - blocked
 
     bot_pct = nil
