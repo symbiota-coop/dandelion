@@ -41,7 +41,7 @@ end
           <div class="alert alert-success">
             <p class="mb-0">Access a recording of this event that started on <%=@event.start_time.to_date%> 🍿</p>
           </div>
-        <% else %>
+        <% elsif !@event.show_after_start_time? %>
           <div class="alert alert-danger">
             <p class="mb-0">This event started <%= time_ago_in_words @event.start_time %> ago</p>
           </div>
@@ -230,7 +230,7 @@ end
     networkName: @event.chain.try(:name),
     signedIn: !!current_account,
     recaptchaEnabled: !!ENV['RECAPTCHA_SITE_KEY'],
-    timeAgo: (@event.past? && !@event.recording? ? time_ago_in_words(@event.start_time) : nil)
+    timeAgo: (@event.past? && !@event.recording? && !@event.show_after_start_time? ? time_ago_in_words(@event.start_time) : nil)
   }
 %>
 <script type="application/json" id="purchase-config">
