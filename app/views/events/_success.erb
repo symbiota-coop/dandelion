@@ -100,19 +100,9 @@
         <% end %>
       <% end %>
 
-      <div class="text-center mt-3">
-        <img src="/images/circles.svg">
-      </div>
-      <p class="mt-3">
-        Dandelion is proud to partner with <a target="_blank" href="https://aboutcircles.com/">Circles</a>,
-        a new, decentralised form of money where everyone gets 1 CRC per hour, currently worth about $100/year.
-        Click to send some CRC to Dandelion &ndash; <strong>if you don't yet have an account,
-          click the send button anyway and you'll be guided through the signup process.</strong>
-      </p>
-
       <iframe
       id="circles"
-      src="https://circles.gnosis.io/pilots/kudos-ga?group=dandelion&address=0xC067cAd5F4A0c4652866371b723483f83B1ED0aA&theme_color=<%= CGI.escape(@theme_color || '') %>"
+      src="https://circles.gnosis.io/pilots/kudos-ga?group=dandelion&text=v2&address=0xC067cAd5F4A0c4652866371b723483f83B1ED0aA&theme_color=<%= CGI.escape(@theme_color || '') %>"
       style="width: 100%; border: 0;"      
       loading="lazy">
       </iframe>
