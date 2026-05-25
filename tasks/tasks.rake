@@ -80,6 +80,12 @@ namespace :late do
     MailgunDeliveryStats.check_and_notify
     puts 'star reminders'
     Event.live.and(:start_time.gte => Date.tomorrow + 6, :start_time.lt => Date.tomorrow + 7).each { |event| event.send_star_reminders(:all) }
+    if ENV['ATPROTO_HANDLE'].present? && ENV['ATPROTO_APP_PASSWORD'].present?
+      puts 'sync AT Protocol events'
+      Event.sync_atproto(hours: 24)
+      puts 'verify AT Protocol collection'
+      Event.verify_atproto_collection(fix: true)
+    end
     puts 'done!'
   end
 end
