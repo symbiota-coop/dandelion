@@ -154,12 +154,15 @@ module OrganisationMonthlyDonations
   end
 
   def send_finished_monthly_donor_notification(organisationship)
+    account = organisationship.account
+    return unless account
+
     mg_client = Mailgun::Client.new ENV['MAILGUN_API_KEY'], ENV['MAILGUN_REGION']
     batch_message = Mailgun::BatchMessage.new(mg_client, ENV['MAILGUN_NOTIFICATIONS_HOST'])
 
     organisation = self
     batch_message.from ENV['NOTIFICATIONS_EMAIL_FULL']
-    batch_message.subject "Monthly donation ended for #{organisation.name}: #{organisationship.account.name}"
+    batch_message.subject "Monthly donation ended for #{organisation.name}: #{account.name}"
     batch_message.body_html EmailHelper.html(:finished_monthly_donor, organisationship: organisationship, organisation: organisation)
 
     admins_receiving_feedback.each do |account|
