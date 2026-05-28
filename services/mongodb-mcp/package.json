@@ -1,0 +1,10 @@
+{
+  "name": "dandelion-mongodb-mcp",
+  "private": true,
+  "scripts": {
+    "start": "bash start.sh"
+  },
+  "dependencies": {
+    "mongodb-mcp-server": "1.11.0"
+  }
+}
