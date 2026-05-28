@@ -132,7 +132,7 @@ Dandelion::App.controller do
     @local_group = LocalGroup.find(params[:id]) || not_found
     local_group_admins_only!
     @local_group.destroy
-    redirect '/local_groups/new'
+    redirect "/o/#{@local_group.organisation.slug}/local_groups"
   end
 
   get '/local_groups/:id/unsubscribe' do
