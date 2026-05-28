@@ -1,7 +1,7 @@
 name: Claude Code
 
 env:
-  CLAUDE_MODEL: claude-opus-4-7
+  CLAUDE_MODEL: claude-opus-4-8
 
 on:
   issue_comment:
