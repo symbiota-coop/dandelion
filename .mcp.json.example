@@ -4,7 +4,7 @@
       "type": "http",
       "url": "https://mcp.sentry.dev/mcp"
     },
-    "Dandelion": {
+    "dandelion": {
       "type": "http",
       "url": "https://dandelion.events/mcp"
     },
@@ -16,14 +16,11 @@
       }
     },
     "MongoDB": {
-      "command": "npx",
-      "args": [
-        "-y",
-        "mongodb-mcp-server",
-        "--connectionString",
-        "$MONGODB_CONNECTION_STRING",
-        "--readOnly"
-      ]
+      "type": "http",
+      "url": "$MONGODB_MCP_URL",
+      "headers": {
+        "Authorization": "Bearer $MONGODB_MCP_TOKEN"
+      }
     },
     "stripe": {
       "type": "http",
