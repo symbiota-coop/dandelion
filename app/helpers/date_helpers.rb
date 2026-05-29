@@ -7,6 +7,13 @@ Dandelion::App.helpers do
     whenable.send(:when_details, current_account ? current_account.time_zone : session[:time_zone], with_zone: with_zone)
   end
 
+  def event_viewer_timezone_query(event)
+    return if event.time_zone && event.location != 'Online'
+
+    tz = current_account ? current_account.time_zone : session[:time_zone]
+    "&timezone=#{tz}" if tz
+  end
+
   def parse_date(date)
     Date.parse(date)
   rescue Date::Error

@@ -8,6 +8,6 @@
   next unless event.image_uid
 %>
 <div class="mb-1">
-  <%= cp(:'events/block_carousel', locals: { event: event }, event: event, key: "/events/#{event.id}/block_carousel?organisation_id=#{@organisation.try(:id)}&timezone=#{current_account ? current_account.time_zone : session[:time_zone]}") %>
+  <%= cp(:'events/block_carousel', locals: { event: event }, event: event, key: "/events/#{event.id}/block_carousel?organisation_id=#{@organisation.try(:id)}#{event_viewer_timezone_query(event)}") %>
 </div>
 <% i += 1; if i == 3; break; end  }  %>
