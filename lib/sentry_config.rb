@@ -28,7 +28,7 @@ Sentry.init do |config|
       error_type == 'Mongoid::Errors::Validations' && error_message.include?('Ticket type is not available as sales have ended'),
       error_type == 'Errno::EIO' && error_message.include?('Input/output error'),
       error_type == 'Encoding::CompatibilityError' && error_message.include?('invalid byte sequence in UTF-8'),
-      error_type == 'Faraday::ServerError' && error_message.include?('status 502') &&
+      error_type == 'Faraday::ServerError' && error_message.match?(/status 50[023]/) &&
         error_message.match?(/bsky\.(social|app)|public\.api\.bsky\.app/)
     ].any?
 

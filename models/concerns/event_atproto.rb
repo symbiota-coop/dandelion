@@ -280,10 +280,25 @@ module EventAtproto
       }
 
       # Get all records from AT Protocol
-      remote_records = client.list_records(
-        collection: ATPROTO_COLLECTION,
-        repo: client.did
-      )
+      begin
+        remote_records = client.list_records(
+          collection: ATPROTO_COLLECTION,
+          repo: client.did
+        )
+      rescue Faraday::ServerError, Faraday::ConnectionFailed, Faraday::TimeoutError => e
+        results[:errors] << { action: 'list_records', error: e.message }
+        results[:summary] = {
+          total_remote: 0,
+          total_local: 0,
+          valid: 0,
+          orphaned: 0,
+          missing: 0,
+          stale: 0,
+          errors: results[:errors].count
+        }
+        results.delete(:valid)
+        return results
+      end
       remote_by_uri = remote_records.index_by { |r| r['uri'] }
 
       # Get all local events that should have AT Protocol records FOR THIS DID
