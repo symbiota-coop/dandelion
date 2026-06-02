@@ -407,8 +407,12 @@ $(function () {
   ajaxCompleted()
 
   let navTabsFormSubmitting = false
+  let navTabsFormTouched = false
   $(document).on('submit', 'form:has(.nav-tabs)', function () {
     navTabsFormSubmitting = true
+  })
+  $(document).on('focusin', 'form:has(.nav-tabs) :input', function () {
+    navTabsFormTouched = true
   })
 
   $(window).on('beforeunload', function (e) {
@@ -418,7 +422,7 @@ $(function () {
     }
     $('.pace-inactive').show() // start spinner as user starts navigating away from page
 
-    if (!navTabsFormSubmitting && $('form:has(.nav-tabs)').length) {
+    if (!navTabsFormSubmitting && navTabsFormTouched && $('form:has(.nav-tabs)').length) {
       e.preventDefault()
       e.returnValue = ''
       return ''
