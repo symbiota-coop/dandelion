@@ -406,12 +406,23 @@ $(function () {
   })
   ajaxCompleted()
 
-  $(window).on('beforeunload', function () {
+  let navTabsFormSubmitting = false
+  $(document).on('submit', 'form:has(.nav-tabs)', function () {
+    navTabsFormSubmitting = true
+  })
+
+  $(window).on('beforeunload', function (e) {
     if ($('#page-container').hasClass('page-sidebar-toggled') && $(window).width() < 768) {
       $('#page-container').removeClass('page-sidebar-toggled');
       $('[data-click="sidebar-toggled"]').removeClass('active');
     }
     $('.pace-inactive').show() // start spinner as user starts navigating away from page
+
+    if (!navTabsFormSubmitting && $('form:has(.nav-tabs)').length) {
+      e.preventDefault()
+      e.returnValue = ''
+      return ''
+    }
   })
 
   $(window).on('pagehide', function () {
