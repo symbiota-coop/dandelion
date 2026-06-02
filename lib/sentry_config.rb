@@ -8,8 +8,8 @@ Sentry.init do |config|
   config.send_default_pii = true
   config.enable_logs = true
   config.enabled_patches = [:logger]
-  config.profiles_sample_rate = ENV['SENTRY_PROFILES_SAMPLE_RATE'] || 0.01
-  config.traces_sample_rate = ENV['SENTRY_TRACES_SAMPLE_RATE'] || 0.01
+  config.profiles_sample_rate = (ENV['SENTRY_PROFILES_SAMPLE_RATE'] || 0.01).to_f
+  config.traces_sample_rate = (ENV['SENTRY_TRACES_SAMPLE_RATE'] || 0.01).to_f
   config.profiler_class = Sentry::Vernier::Profiler
 
   config.before_send = lambda do |event, hint|
