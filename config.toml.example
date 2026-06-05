@@ -11,10 +11,14 @@ url = "https://mcp.render.com/mcp"
 Authorization = "Bearer $RENDER_AUTH_TOKEN"
 
 [mcp_servers.mongodb]
-url = "$MONGODB_MCP_URL"
-
-[mcp_servers.mongodb.http_headers]
-Authorization = "Bearer $MONGODB_MCP_TOKEN"
+command = "npx"
+args = [
+  "-y",
+  "mongodb-mcp-server",
+  "--connectionString",
+  "$MONGODB_CONNECTION_STRING",
+  "--readOnly",
+]
 
 [mcp_servers.stripe]
 url = "https://mcp.stripe.com"

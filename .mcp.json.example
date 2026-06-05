@@ -16,11 +16,14 @@
       }
     },
     "mongodb": {
-      "type": "http",
-      "url": "$MONGODB_MCP_URL",
-      "headers": {
-        "Authorization": "Bearer $MONGODB_MCP_TOKEN"
-      }
+      "command": "npx",
+      "args": [
+        "-y",
+        "mongodb-mcp-server",
+        "--connectionString",
+        "$MONGODB_CONNECTION_STRING",
+        "--readOnly"
+      ]
     },
     "stripe": {
       "type": "http",
