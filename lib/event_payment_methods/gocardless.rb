@@ -12,18 +12,20 @@ class EventPaymentMethod
         }
       )
 
+      payment_request_id = billing_request.links.payment_request
       order.update_attributes!(
         value: order.total.round(2),
-        gocardless_payment_request_id: billing_request.links.payment_request
+        gocardless_payment_request_id: payment_request_id
       )
       order.tickets.each do |ticket|
-        ticket.update_attributes!(gocardless_payment_request_id: billing_request.links.payment_request)
+        ticket.update_attributes!(gocardless_payment_request_id: payment_request_id)
       end
 
+      return_base = "#{ENV['BASE_URI']}/e/#{event.slug}?payment_request_id=#{payment_request_id}"
       billing_request_flow = client.billing_request_flows.create(
         params: {
-          redirect_uri: URI::DEFAULT_PARSER.escape("#{ENV['BASE_URI']}/e/#{event.slug}?success=true&order_id=#{order.id}"),
-          exit_uri: URI::DEFAULT_PARSER.escape("#{ENV['BASE_URI']}/e/#{event.slug}?cancelled=true"),
+          redirect_uri: URI::DEFAULT_PARSER.escape("#{return_base}&success=true"),
+          exit_uri: URI::DEFAULT_PARSER.escape("#{return_base}&cancelled=true"),
           links: { billing_request: billing_request.id }
         }
       )
