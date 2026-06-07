@@ -57,7 +57,13 @@ module OrganisationMonthlyDonations
     start_date = subscription.start_date
     # puts "#{name} #{email} #{amount} #{currency} #{start_date}"
 
-    account = Account.find_by(email: email.downcase) || Account.create(name: name, email: email)
+    begin
+      account = Account.find_by(email: email.downcase) || Account.create!(name: name, email: email)
+    rescue Mongoid::Errors::Validations => e
+      ErrorReporting.capture_exception(e, context: { email: email, organisation_id: id.to_s, source: 'gocardless' })
+      return
+    end
+
     organisationship = organisationships.find_by(account: account) || organisationships.create(account: account)
 
     send_notification = organisationship.monthly_donation_method.nil?
@@ -123,7 +129,13 @@ module OrganisationMonthlyDonations
     start_date = pledge.created_at
 
     # puts "#{name} #{email} #{amount} #{currency} #{start_date}"
-    account = Account.find_by(email: email.downcase) || Account.create(name: name, email: email)
+    begin
+      account = Account.find_by(email: email.downcase) || Account.create!(name: name, email: email)
+    rescue Mongoid::Errors::Validations => e
+      ErrorReporting.capture_exception(e, context: { email: email, organisation_id: id.to_s, source: 'patreon' })
+      return
+    end
+
     organisationship = organisationships.find_by(account: account) || organisationships.create(account: account)
 
     send_notification = organisationship.monthly_donation_method.nil?
