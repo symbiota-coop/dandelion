@@ -28,6 +28,8 @@
           renderer: function (api, rowIdx, columns) {
             var rows = $.map(columns, function (col) {
               if (!col.hidden) return '';
+              var $data = $('<div>').html(col.data || '');
+              if (!$data.text().trim() && !$data.find('[data-pagelet-url], img, a, button').length) return '';
               return '<tr><td>' + col.title + '</td><td>' + col.data + '</td></tr>';
             }).join('');
             return rows ? $('<table class="table table-sm mb-0 dtr-details"/>').append(rows) : false;

@@ -196,6 +196,9 @@ body table.dataTable td.child .dtr-details tr:nth-of-type(odd) {
 }
 
 @media (max-width: 767px) {
+	body #event_feedbacks a[data-account-username] {
+		display: none;
+	}
 
 	body table.dataTable th.control,
 	body table.dataTable td.control {
@@ -213,14 +216,12 @@ body table.dataTable td.child .dtr-details tr:nth-of-type(odd) {
 
 body table.dataTable.dtr-inline.collapsed>tbody>tr>td:first-child:before,
 body table.dataTable.dtr-inline.collapsed>tbody>tr>th:first-child:before {
-	content: '\e61a';
+	content: '\f285';
 	border: none;
-	font-family: 'themify';
-	speak: none;
+	font-family: 'bootstrap-icons';
+	font-size: 1.125rem;
 	font-style: normal;
 	font-weight: normal;
-	font-variant: normal;
-	text-transform: none;
 	line-height: 1;
 	-webkit-font-smoothing: antialiased;
 	-moz-osx-font-smoothing: grayscale;
@@ -235,14 +236,12 @@ body table.dataTable.dtr-inline.collapsed>tbody>tr>th:first-child:before {
 
 body table.dataTable.dtr-inline.collapsed>tbody>tr.parent>td:first-child:before,
 body table.dataTable.dtr-inline.collapsed>tbody>tr.parent>th:first-child:before {
-	content: '\e622';
+	content: '\f282';
 	border: none;
-	font-family: 'themify';
-	speak: none;
+	font-family: 'bootstrap-icons';
+	font-size: 1.125rem;
 	font-style: normal;
 	font-weight: normal;
-	font-variant: normal;
-	text-transform: none;
 	line-height: 1;
 	-webkit-font-smoothing: antialiased;
 	-moz-osx-font-smoothing: grayscale;
@@ -251,7 +250,6 @@ body table.dataTable.dtr-inline.collapsed>tbody>tr.parent>th:first-child:before 
 	color: $color_inverse;
 	top: 0.5rem;
 	width: 1.875rem;
-	;
 	text-align: center;
 	left: 0;
 }
