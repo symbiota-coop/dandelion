@@ -44,9 +44,9 @@
       <%= partial :'events/success' %>
     <% elsif @gocardless_pending %>
       <div class="card shadow-sm mb-3">
-        <h3 class="card-header bg-primary text-white">Thanks!</h3>
+        <h3 class="card-header bg-primary text-white">Confirming your payment</h3>
         <div class="card-body readable">
-          <p class="mb-0">We're confirming your payment with GoCardless. You'll receive your tickets by email once payment is confirmed.</p>
+          <p class="mb-0">We're confirming your payment with GoCardless... <i class="bi bi-spin bi-slash-lg"></i></p>
         </div>
       </div>
       <script>
