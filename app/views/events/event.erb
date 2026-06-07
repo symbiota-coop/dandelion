@@ -55,7 +55,7 @@
             $.getJSON('/events/<%= @event.id %>/orders/<%= @gocardless_order.id %>/payment_completed', function (data) {
               if (data.payment_completed) { window.location.reload() }
             })
-          }, 10 * 1000)
+          }, 3 * 1000)
         })
       </script>
     <% elsif @gocardless_cancelled %>
