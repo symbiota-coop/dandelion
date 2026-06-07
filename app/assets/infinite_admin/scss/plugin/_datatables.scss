@@ -159,7 +159,56 @@ body table.dataTable.collapsed {
 }
 
 body table.dataTable.collapsed td.child {
-	border-right: 1px solid #e0e0e0;
+	border: none;
+}
+
+body table.dataTable.dtr-inline.collapsed>tbody>tr.child>td:before {
+	content: none !important;
+	display: none;
+}
+
+body table.dataTable td.child .dtr-details,
+body table.dataTable td.child .dtr-details td {
+	border: none;
+}
+
+body table.dataTable td.child .dtr-details td:first-child {
+	width: 1%;
+	white-space: nowrap;
+	padding-right: 1em;
+	font-weight: bold;
+}
+
+body table.dataTable td.child .dtr-details tr,
+body table.dataTable td.child .dtr-details tr:nth-of-type(odd) {
+	background-color: #fff;
+}
+
+@media (min-width: 768px) {
+	body table.dataTable .control {
+		display: none;
+	}
+
+	body #event_feedbacks:not(.dataTable) th:first-child,
+	body #event_feedbacks:not(.dataTable) tbody>tr>td:first-child {
+		display: none;
+	}
+}
+
+@media (max-width: 767px) {
+
+	body table.dataTable th.control,
+	body table.dataTable td.control {
+		width: 1.875rem;
+		min-width: 1.875rem;
+		max-width: 1.875rem;
+		padding-left: 0;
+		padding-right: 0;
+	}
+
+	body table.dataTable.dtr-inline.collapsed tbody td.control {
+		cursor: pointer;
+	}
 }
 
 body table.dataTable.dtr-inline.collapsed>tbody>tr>td:first-child:before,

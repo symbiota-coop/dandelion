@@ -4,6 +4,7 @@ FRONTEND_DEPENDENCIES = {
     'jquery-timeago/1.4.3' => 'jquery.timeago.min.js',
     'flatpickr/4.6.13' => 'flatpickr.min.js flatpickr.min.css',
     'datatables/1.10.16' => 'js/jquery.dataTables.min.js js/dataTables.bootstrap4.min.js css/dataTables.bootstrap4.min.css',
+    'datatables-responsive/2.2.3' => 'dataTables.responsive.min.js',
     'tributejs/3.5.3' => 'tribute.min.js tribute.min.css',
     'select2/4.0.13' => 'js/select2.full.min.js css/select2.min.css',
     'sticky-table-headers/0.1.24' => 'js/jquery.stickytableheaders.min.js',
