@@ -170,13 +170,10 @@ Dandelion::App.controller do
     @order = Order.find(params[:order_id]) || not_found if params[:order_id]
     if params[:payment_request_id]
       gocardless_order = @event.orders.find_by(gocardless_payment_request_id: params[:payment_request_id])
-      if gocardless_order
-        if params[:cancelled]
-          @gocardless_cancelled = true
-        elsif gocardless_order.payment_completed?
+      if gocardless_order && !params[:cancelled]
+        if gocardless_order.payment_completed?
           @order = gocardless_order
         else
-          @gocardless_pending = true
           @gocardless_order = gocardless_order
         end
       end

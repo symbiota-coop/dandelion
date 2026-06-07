@@ -42,7 +42,7 @@
   <div class="col-lg-10">
     <% if @order %>
       <%= partial :'events/success' %>
-    <% elsif @gocardless_pending %>
+    <% elsif @gocardless_order %>
       <div class="card shadow-sm mb-3">
         <h3 class="card-header bg-primary text-white">Confirming your payment</h3>
         <div class="card-body readable">
@@ -58,15 +58,13 @@
           }, 3 * 1000)
         })
       </script>
-    <% elsif @gocardless_cancelled %>
-      <div class="alert alert-warning mb-3">Payment cancelled. You can try booking again below.</div>
     <% elsif @event_image %>
       <a href="/e/<%=@event.slug%><% if params[:cohost] %>?cohost=<%=params[:cohost]%><% end %>"><%= blurred_image_tag(@event_image, width: @event_image_width, height: @event_image_height, full_size: '1920x1920', md_size: '992x992', css_class: 'w-100 mb-3', id: 'event-image') %></a>
     <% end %>
   </div>
 </div>
 
-<% unless @order || @gocardless_pending %>
+<% unless @order || @gocardless_order %>
   <% sidebar = false %>
   <% sidebar = true if @event.sold_out? || @event.purchase_url %>
   <% get_tickets_fixed_bottom_style = 'class="fixed-bottom bg-white p-3 w-100 d-block d-md-none" style="z-index: 1019; box-shadow: 0px -2px 4px 0px rgba(0,0,0,0.3);"' %>
