@@ -130,6 +130,27 @@ class EventCreatorPermissionsTest < ActiveSupport::TestCase
     assert Event.admin?(event, creator)
   end
 
+  test 'event_creator is email viewer when show_emails is false' do
+    org_owner = FactoryBot.create(:account)
+    org = FactoryBot.create(:organisation, account: org_owner)
+    creator = FactoryBot.create(:account)
+    creator.organisationships.create!(organisation: org, event_creator: true, unsubscribed: false)
+    event = FactoryBot.create(:event, organisation: org, account: org_owner, show_emails: false)
+    assert Event.email_viewer?(event, creator)
+  end
+
+  test 'cohost event_creator is email viewer when show_emails is false' do
+    org_owner = FactoryBot.create(:account)
+    org = FactoryBot.create(:organisation, account: org_owner)
+    cohost_owner = FactoryBot.create(:account)
+    cohost = FactoryBot.create(:organisation, account: cohost_owner)
+    creator = FactoryBot.create(:account)
+    creator.organisationships.create!(organisation: cohost, event_creator: true, unsubscribed: false)
+    event = FactoryBot.create(:event, organisation: org, account: org_owner, show_emails: false)
+    event.cohostships.create!(organisation: cohost)
+    assert Event.email_viewer?(event, creator)
+  end
+
   test 'event is invalid for org-wide create when account is only a follower' do
     org_owner = FactoryBot.create(:account)
     org = FactoryBot.create(:organisation, account: org_owner, allow_event_submissions: false)

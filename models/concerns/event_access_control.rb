@@ -38,8 +38,8 @@ module EventAccessControl
     def email_viewer?(event, account, event_admin: nil, organisation_admin: nil)
       account && event && (
         (event.show_emails && (event_admin || (event_admin.nil? && Event.admin?(event, account)))) ||
-          organisation_admin ||
-          (organisation_admin.nil? && Organisation.admin?(event.organisation, account))
+          (event.organisation && Organisation.admin_or_event_creator?(event.organisation, account, organisation_admin: organisation_admin)) ||
+          event.cohosts.any? { |cohost| Organisation.admin_or_event_creator?(cohost, account) }
       )
     end
 
