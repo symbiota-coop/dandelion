@@ -68,8 +68,13 @@ Dandelion::App.controller do
     if params[:duplicate]
       @pmail.to_option = params[:pmail][:to_option]
       duplicated_pmail = @pmail.duplicate!(current_account)
-      flash[:notice] = 'The mail was duplicated.'
-      redirect "/pmails/#{duplicated_pmail.id}/edit?#{@scope}"
+      if duplicated_pmail
+        flash[:notice] = 'The mail was duplicated.'
+        redirect "/pmails/#{duplicated_pmail.id}/edit?#{@scope}"
+      else
+        flash.now[:error] = @pmail.errors.full_messages.join('; ')
+        halt erb(:'pmails/build')
+      end
     end
 
     if @pmail.update_attributes(mass_assigning(params[:pmail], Pmail))

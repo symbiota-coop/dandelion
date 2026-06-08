@@ -15,7 +15,11 @@
   <% elsif pmail.mailable.is_a?(LocalGroup) %>
     Local group: <a href="/o/<%= pmail.mailable.organisation.slug %>/lg/<%= pmail.mailable.slug %>"><%= pmail.mailable.name %></a>
   <% elsif pmail.mailable.is_a?(Event) %>
-    <% if pmail.waitlist %>
+    <% if pmail.ticket_group %>
+      Ticket group <%= pmail.ticket_group.name %> for <a href="/e/<%= pmail.mailable.slug %>"><%= pmail.mailable.name %></a>
+    <% elsif pmail.ticket_group_selected? %>
+      Ticket group [deleted group] for <a href="/e/<%= pmail.mailable.slug %>"><%= pmail.mailable.name %></a>
+    <% elsif pmail.waitlist %>
       Waitlist: <a href="/e/<%= pmail.mailable.slug %>"><%= pmail.mailable.name %></a>
     <% else %>
       Event: <a href="/e/<%= pmail.mailable.slug %>"><%= pmail.mailable.name %></a>
