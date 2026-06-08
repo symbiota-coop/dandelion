@@ -4,7 +4,9 @@
       <tr>
         <th>Gem</th>
         <th>Version</th>
-        <th>Latest</th>
+        <th>Major</th>
+        <th>Minor</th>
+        <th>Patch</th>
         <th>Last updated</th>
         <th class="text-right">Downloads</th>
         <th>Description</th>
@@ -18,19 +20,7 @@
             <a href="https://rubygems.org/gems/<%= gem[:name] %>" target="_blank"><%= gem[:name] %></a>
           </td>
           <td><code><%= gem[:version] %></code></td>
-          <td>
-            <% if gem[:latest_version] %>
-              <% if gem[:version] != gem[:latest_version] %>
-                <code>
-                  <%= gem[:latest_version] %>
-                </code>
-              <% else %>
-                <i class="bi bi-check-lg" />
-              <% end %>
-            <% else %>
-              <i class="bi bi-question-lg" />
-            <% end %>
-          </td>
+          <%= partial 'stats/version_bump_cells', locals: { cells: gem[:version_bump_cells] } %>
           <td data-order="<%= gem[:updated_at]&.to_i || 0 %>">
             <% if gem[:updated_at] %>
               <span title="<%= gem[:updated_at].strftime('%Y-%m-%d %H:%M:%S UTC') %>">
@@ -64,7 +54,7 @@
       paging: false,
       searching: false,
       bInfo: false,
-      order: [[3, 'asc']],
+      order: [[5, 'asc']],
     });
   });
 </script>

@@ -1,0 +1,15 @@
+<% if cells %>
+  <% cells.each do |cell| %>
+    <td>
+      <% if cell == :check %>
+        <i class="bi bi-check-lg" />
+      <% elsif cell %>
+        <code><%= cell %></code>
+      <% end %>
+    </td>
+  <% end %>
+<% else %>
+  <% 3.times do %>
+    <td><i class="bi bi-question-lg" /></td>
+  <% end %>
+<% end %>

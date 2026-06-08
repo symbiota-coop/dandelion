@@ -61,6 +61,40 @@ Dandelion::App.helpers do
     end
   end
 
+  def version_bump_cells(current_version, version_strings)
+    return nil if version_strings.nil? || version_strings.empty?
+
+    current = Gem::Version.new(current_version)
+    versions = version_strings.filter_map do |version|
+      [version, Gem::Version.new(version)]
+    rescue ArgumentError
+      nil
+    end
+    return nil if versions.empty?
+
+    major, minor = current.segments[0], current.segments[1] || 0
+
+    major_bump = versions.select { |_, version| version.segments[0] > major }.max_by(&:last)&.first
+    latest_same_major = versions.select { |_, version| version.segments[0] == major }.max_by(&:last)
+    minor_bump = if latest_same_major && latest_same_major.last > current && (latest_same_major.last.segments[1] || 0) > minor
+                   latest_same_major.first
+                 end
+
+    latest_same_minor = versions.select do |_, version|
+      version.segments[0] == major && (version.segments[1] || 0) == minor
+    end.max_by(&:last)
+    patch_bump = latest_same_minor.first if latest_same_minor && latest_same_minor.last > current
+
+    check = :check
+    return [check, check, check] unless major_bump || minor_bump || patch_bump
+    return [major_bump, nil, nil] if major_bump
+    return [check, minor_bump, nil] if minor_bump
+
+    [check, check, patch_bump]
+  rescue ArgumentError
+    nil
+  end
+
   def fetch_frontend_dependency(base_url, path)
     host = URI.parse(base_url.to_s.sub(/\Agit\+/, ''))&.host&.downcase
     case host
@@ -83,7 +117,7 @@ Dandelion::App.helpers do
     return { name: library_name, version: version, source: 'cdnjs' } unless response.status == 200
 
     data = JSON.parse(response.body)
-    latest_version = data['version']
+    versions = data['versions']
     repo_url = data.dig('repository', 'url')
 
     # Try to get release date from GitHub
@@ -92,7 +126,7 @@ Dandelion::App.helpers do
     {
       name: library_name,
       version: version,
-      latest_version: latest_version,
+      version_bump_cells: version_bump_cells(version, versions),
       release_date: release_date,
       source: 'cdnjs',
       homepage: data['homepage'],
@@ -171,13 +205,12 @@ Dandelion::App.helpers do
     response = Faraday.get("https://rubygems.org/api/v1/gems/#{gem_name}.json")
     if response.status == 200
       data = JSON.parse(response.body)
-      latest_version = data['version']
-      # Get installed version from Gemfile.lock if available
       installed_version = get_installed_gem_version(gem_name)
+      version = installed_version || data['version']
       {
         name: data['name'],
-        version: installed_version || latest_version,
-        latest_version: latest_version,
+        version: version,
+        version_bump_cells: version_bump_cells(version, fetch_rubygems_versions(gem_name)),
         updated_at: Time.parse(data['version_created_at']),
         downloads: data['downloads'],
         homepage: data['homepage_uri'],
@@ -185,10 +218,19 @@ Dandelion::App.helpers do
         info: data['info']&.to_s&.split('.')&.first
       }
     else
-      { name: gem_name, version: nil, latest_version: nil, updated_at: nil, downloads: nil, homepage: nil, source_code: nil, info: nil }
+      { name: gem_name, version: nil, version_bump_cells: nil, updated_at: nil, downloads: nil, homepage: nil, source_code: nil, info: nil }
     end
   rescue StandardError
-    { name: gem_name, version: nil, latest_version: nil, updated_at: nil, downloads: nil, homepage: nil, source_code: nil, info: nil }
+    { name: gem_name, version: nil, version_bump_cells: nil, updated_at: nil, downloads: nil, homepage: nil, source_code: nil, info: nil }
+  end
+
+  def fetch_rubygems_versions(gem_name)
+    response = Faraday.get("https://rubygems.org/api/v1/versions/#{gem_name}.json")
+    return nil unless response.status == 200
+
+    JSON.parse(response.body).reject { |entry| entry['prerelease'] }.map { |entry| entry['number'] }
+  rescue StandardError
+    nil
   end
 
   def get_installed_gem_version(gem_name)

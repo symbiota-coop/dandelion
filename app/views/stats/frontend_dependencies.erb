@@ -5,7 +5,9 @@
         <th>Package</th>
         <th>Version</th>
         <th>Release date</th>
-        <th>Latest</th>
+        <th>Major</th>
+        <th>Minor</th>
+        <th>Patch</th>
         <th>Size</th>
         <th>Description</th>
         <th>Links</th>
@@ -32,19 +34,7 @@
               </span>
             <% end %>
           </td>
-          <td>
-            <% if dep[:latest_version] %>
-              <% if dep[:version] != dep[:latest_version] %>
-                <code>
-                  <%= dep[:latest_version] %>
-                </code>
-              <% else %>
-                <i class="bi bi-check-lg" />
-              <% end %>
-            <% else %>
-              <i class="bi bi-question-lg" />
-            <% end %>
-          </td>
+          <%= partial 'stats/version_bump_cells', locals: { cells: dep[:version_bump_cells] } %>
           <td class="file-size" data-order="0">
             <small class="text-muted">...</small>
           </td>
