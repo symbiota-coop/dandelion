@@ -83,7 +83,7 @@ Dandelion::App.helpers do
     return { name: library_name, version: version, source: 'cdnjs' } unless response.status == 200
 
     data = JSON.parse(response.body)
-    latest_version = data['versions']&.last
+    latest_version = data['version']
     repo_url = data.dig('repository', 'url')
 
     # Try to get release date from GitHub
@@ -122,6 +122,8 @@ Dandelion::App.helpers do
     rescue Octokit::NotFound
       next
     end
+    nil
+  rescue StandardError
     nil
   end
 
