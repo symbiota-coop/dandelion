@@ -66,7 +66,8 @@ module MailgunDeliveryStats
       end
 
       rows = result[:by_provider] || []
-      low = rows.select { |r| r[:delivered_rate_f].present? && r[:delivered_rate_f] < ALERT_THRESHOLD }
+      low = rows.reject { |r| r[:label] == '(unknown provider)' }
+                .select { |r| r[:delivered_rate_f].present? && r[:delivered_rate_f] < ALERT_THRESHOLD }
       return if low.empty?
 
       notify_low_delivery(low)
