@@ -61,7 +61,7 @@
       </p>
     <% end %>
   <% end %>
-  <% if event.organisation.show_sign_in_link_in_ticket_emails && !event.hide_attendees && !event.evergreen? %>
+  <% if event.organisation.show_sign_in_link_in_ticket_emails && !event.hide_attendees && !event.evergreen? && !(defined?(viewing_on_web) && viewing_on_web) %>
     <p>
       <% if !account.has_signed_in? && account.persisted? %>
         <a href="<%= ENV['BASE_URI'] %>/accounts/edit?sign_in_token=%recipient.token%&event_id=<%= event.id %>">Click here to create a profile on Dandelion and connect with others <%= event.recording? ? 'who attended' : 'attending' %> the event.</a>
@@ -82,7 +82,7 @@
   </a>
 </div>
 
-<% if !event.no_tickets_pdf && defined?(pdf_link) %>
+<% if !event.no_tickets_pdf && defined?(viewing_on_web) && viewing_on_web %>
   <a href="/orders/<%=order.id%>.pdf" class="attachment">
     <img class="qr-code" src="<%=ENV['BASE_URI']%>/images/icons/_qr-code.png">
     Download <%= order.tickets.count == 1 ? 'ticket' : 'tickets' %> PDF

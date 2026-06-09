@@ -10,7 +10,7 @@ Dandelion::App.controller do
       header_image_url, = @order.sender_info
 
       tickets_table = EmailHelper.render(:_tickets_table, event: @event, account: account)
-      EmailHelper.html(:tickets, event: @event, order: @order, account: account, tickets_table: tickets_table, header_image_url: header_image_url, pdf_link: true) do |content|
+      EmailHelper.html(:tickets, event: @event, order: @order, account: account, tickets_table: tickets_table, header_image_url: header_image_url, viewing_on_web: true) do |content|
         content.gsub('%recipient.token%', account.sign_in_token)
       end
 
