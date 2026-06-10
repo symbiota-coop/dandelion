@@ -28,7 +28,7 @@
   # Using a simpler aggregation that only works with filtered account IDs
   pipeline = [
     { '$match' => { 
-      'anonymise' => false, 
+      'anonymous' => false,
       'has_public_answers' => true, 
       'rating' => 5,
       'account_id' => { '$in' => eligible_account_ids }
