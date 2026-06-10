@@ -43,7 +43,7 @@ class Organisation
   end
 
   def self.protected_attributes
-    %w[paid_up paid_up_fraction]
+    %w[paid_up paid_up_fraction unsanitized_ok hidden experimental stripe_connect_json stripe_account_json stripe_customer_id card_last4]
   end
 
   def to_param

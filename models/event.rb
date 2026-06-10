@@ -37,6 +37,10 @@ class Event
     true
   end
 
+  def self.protected_attributes
+    %w[raw_description direct_charges trending]
+  end
+
   COPY_FIELDS = %w[
     name location email image
     description extra_info_for_ticket_email
