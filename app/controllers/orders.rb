@@ -11,7 +11,7 @@ Dandelion::App.controller do
 
       tickets_table = EmailHelper.render(:_tickets_table, event: @event, account: account)
       EmailHelper.html(:tickets, event: @event, order: @order, account: account, tickets_table: tickets_table, header_image_url: header_image_url, viewing_on_web: true) do |content|
-        content.gsub('%recipient.token%', account.sign_in_token)
+        content.gsub('%recipient.token%', '')
       end
 
     when :ics
