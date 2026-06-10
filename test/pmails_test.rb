@@ -91,6 +91,6 @@ class PmailsTest < ActiveSupport::TestCase
     login_as(account)
     visit "/events/#{event.id}/pmails"
 
-    assert page.has_content? 'Ticket group: Backstage'
+    assert page.has_content? 'Ticket group Backstage'
   end
 end
