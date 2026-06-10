@@ -66,6 +66,8 @@ Dandelion::App.helpers do
     elsif params[:activity_id] || params[:local_group_id] || params[:event_id]
       associate_account_with_context(@account)
       redirect_to_edit_with_context
+    elsif (return_to = session.delete(:return_to))
+      redirect return_to
     else
       redirect '/accounts/edit'
     end

@@ -52,6 +52,41 @@ class AccountsTest < ActiveSupport::TestCase
   # New Account Creation with Context
   # ═══════════════════════════════════════════════════════════════════════════
 
+  test 'signing up after visiting referral link returns to organisation creation' do
+    referrer = FactoryBot.create(:account, username: 'refsignup', name: 'Signup Referrer', has_signed_in: true)
+    @account = FactoryBot.build_stubbed(:account)
+    @organisation = FactoryBot.build_stubbed(:organisation)
+
+    visit "/invite/#{referrer.id}"
+    fill_signup_form(@account)
+
+    assert page.current_path.include?('/o/new')
+
+    fill_in 'Organisation name', with: @organisation.name
+    fill_in 'URL', with: @organisation.slug
+    click_button 'Save and continue'
+
+    saved_organisation = Organisation.find_by(slug: @organisation.slug)
+    assert_equal referrer.id, saved_organisation.referrer_id
+  end
+
+  test 'return_to is cleared after signup redirect' do
+    referrer = FactoryBot.create(:account, username: 'refclear', has_signed_in: true)
+    @account = FactoryBot.build_stubbed(:account)
+
+    visit "/invite/#{referrer.id}"
+    fill_signup_form(@account)
+    assert page.current_path.include?('/o/new')
+
+    visit '/accounts/sign_out'
+    @account2 = FactoryBot.build_stubbed(:account)
+    visit '/accounts/new'
+    fill_signup_form(@account2)
+
+    assert page.current_path.include?('/accounts/edit')
+    refute page.current_path.include?('/o/new')
+  end
+
   test 'signing up with organisation_id' do
     @organisation = FactoryBot.create(:organisation)
     @account = FactoryBot.build_stubbed(:account)

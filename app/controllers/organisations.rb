@@ -86,6 +86,12 @@ Dandelion::App.controller do
     partial :'accounts/minimal_subscribe', layout: 'minimal'
   end
 
+  get '/invite/:id' do
+    account = Account.find(params[:id]) || not_found
+    session[:organisation_referrer_id] = account.id.to_s
+    redirect '/o/new'
+  end
+
   get '/o/new' do
     sign_in_required!
     @organisation = Organisation.new(mass_assigning(params[:organisation], Organisation))
@@ -97,10 +103,16 @@ Dandelion::App.controller do
     sign_in_required!
     @organisation = Organisation.new(mass_assigning(params[:organisation], Organisation))
     @organisation.account = current_account
+    if (referrer_id = session[:organisation_referrer_id]) &&
+       @organisation.referrer_id.blank? &&
+       !(current_account && referrer_id == current_account.id.to_s)
+      @organisation.referrer_id = referrer_id if Account.find(referrer_id)
+    end
     @organisation.show_details_table_in_ticket_emails = true
     @organisation.show_sign_in_link_in_ticket_emails = true
     @organisation.show_ticketholder_link_in_ticket_emails = true
     if @organisation.save
+      session.delete(:organisation_referrer_id)
       redirect "/o/#{@organisation.slug}/edit?created=1&tab=payments"
     else
       flash.now[:error] = 'There was an error saving the organisation.'

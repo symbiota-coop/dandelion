@@ -11,8 +11,8 @@ Dandelion::App.helpers do
       end
       session[:account_id] = account.id.to_s
       account.generate_sign_in_token!
-      if session[:return_to]
-        redirect session[:return_to]
+      if (return_to = session.delete(:return_to))
+        redirect return_to
       else
         flash.now[:notice] = 'Signed in via a code/link'
       end

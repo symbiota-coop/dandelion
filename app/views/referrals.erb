@@ -5,13 +5,44 @@
     We'll reward you for getting organisations to start using Dandelion!
   </p>
   <p>
-    Newly-created organisations can list you as their referrer (the reason they joined Dandelion) in organisation settings under 'Everything else'.
-    Once an organisation has generated <%= m(Organisation::REFERRAL_REWARD_THRESHOLD, 'EUR') %> in donations to Dandelion, you can claim a <%= m(Organisation::REFERRAL_REWARD_THRESHOLD, 'EUR') %> reward.    
-  </p>
-  <p>
+    Once an organisation has generated <%= m(Organisation::REFERRAL_REWARD_THRESHOLD, 'EUR') %> in donations to Dandelion, you can claim a <%= m(Organisation::REFERRAL_REWARD_THRESHOLD, 'EUR') %> reward.
     You'll see organisations that have listed you as their referrer below, along with a progress bar towards the <%= m(Organisation::REFERRAL_REWARD_THRESHOLD, 'EUR') %> reward.
   </p>
+  <p>
+    Share your referral link below and you'll be automatically credited as the referrer (the reason an organisation joined Dandelion).
+    Alternatively, new organisations can manually select you as their referrer in organisation settings under 'Everything else'.
+  </p>
 </div>
+
+<% referral_link = "#{ENV['BASE_URI']}/invite/#{current_account.id}" %>
+<div class="card mb-4">
+  <div class="card-body">
+    <h5 class="card-title">Your referral link</h5>
+    <div class="input-group">
+      <input type="text" class="form-control" id="organisation-referrer-link" value="<%= referral_link %>" readonly>
+      <div class="input-group-append">
+        <button class="btn btn-outline-secondary copy-referrer-link" type="button" data-url="<%= referral_link %>">
+          <i class="bi bi-clipboard"></i> Copy
+        </button>
+      </div>
+    </div>
+    <div class="mt-3">
+      <%= partial :share, locals: { share_url: referral_link } %>
+    </div>
+  </div>
+</div>
+<script>
+  $(function() {
+    $('.copy-referrer-link').on('click', function() {
+      navigator.clipboard.writeText($(this).data('url')).then(() => {
+        const btn = $(this);
+        const original = btn.html();
+        btn.html('<i class="bi bi-clipboard-check"></i> Copied!');
+        setTimeout(() => btn.html(original), 2000);
+      });
+    });
+  });
+</script>
 
 <% if @organisations.empty? %>
   <%

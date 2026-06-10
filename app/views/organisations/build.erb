@@ -272,7 +272,7 @@
           <%= f.check_box_block :allow_event_submissions %>
           <%= f.check_box_block :hide_ticket_revenue %>
           <% unless @organisation.no_referrer %>
-            <%= f.lookup_block :referrer_id, lookup_url: '/accounts.json', placeholder: 'Search accounts' %>
+            <%= f.lookup_block :referrer_id, lookup_url: '/accounts.json', placeholder: 'Search accounts', selected_link: (%(<a class="d-inline-block mt-1" target="_blank" href="/u/#{@organisation.referrer.username}">View account</a>) if @organisation.referrer) %>
           <% end %>
         </div>
         <% if Padrino.env == :development || @organisation.experimental? %>

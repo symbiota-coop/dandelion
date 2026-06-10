@@ -48,7 +48,7 @@ Dandelion::App.controller do
         account.sign_ins.create(request: request)
         session[:account_id] = account.id.to_s
         flash[:notice] = 'Signed in!'
-        redirect session[:return_to] || '/'
+        redirect session.delete(:return_to) || '/'
       else
         flash.now[:notice] = "<i class=\"#{@provider.icon}\"></i> That #{@provider.display_name} #{@provider.display_name == 'Ethereum' ? 'address' : 'account'} isn't yet connected to a Dandelion account. Let's create a new Dandelion account for you!"
         session['omniauth.auth'] = env['omniauth.auth']
