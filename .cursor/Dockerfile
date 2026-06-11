@@ -3,6 +3,7 @@ FROM ruby:3.4.7-bookworm
 ARG TARGETARCH
 ARG BUNDLER_VERSION=2.4.19
 ARG MONGODB_VERSION=8.2.6
+ARG RENDER_CLI_VERSION=2.20.0
 
 ENV DEBIAN_FRONTEND=noninteractive \
     BUNDLE_PATH=/usr/local/bundle \
@@ -34,6 +35,7 @@ RUN apt-get update -qq && \
       pkg-config \
       sudo \
       tzdata \
+      unzip \
       zlib1g-dev && \
     rm -rf /var/lib/apt/lists/*
 
@@ -58,6 +60,18 @@ RUN gem install bundler -v "${BUNDLER_VERSION}" && \
     chmod 0440 /etc/sudoers.d/cursor && \
     mkdir -p /data/db && \
     chown -R cursor:cursor /data/db /usr/local/bundle
+
+RUN case "$TARGETARCH" in \
+        amd64) render_arch="linux_amd64" ;; \
+        arm64) render_arch="linux_arm64" ;; \
+        *) echo "Unsupported architecture: $TARGETARCH" >&2; exit 1 ;; \
+    esac && \
+    curl -fsSL "https://github.com/render-oss/cli/releases/download/v${RENDER_CLI_VERSION}/cli_${RENDER_CLI_VERSION}_${render_arch}.zip" \
+        -o /tmp/render.zip && \
+    unzip /tmp/render.zip -d /tmp && \
+    mv "/tmp/cli_v${RENDER_CLI_VERSION}" /usr/local/bin/render && \
+    chmod +x /usr/local/bin/render && \
+    rm -rf /tmp/render.zip "/tmp/cli_v${RENDER_CLI_VERSION}"    
 
 WORKDIR /home/cursor
 USER cursor
