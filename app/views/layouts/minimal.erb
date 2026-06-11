@@ -1,12 +1,12 @@
 <!doctype html>
 <html lang="en">
   <%= partial :'layouts/head' %>
-  <body <% if @organisation && @organisation.theme_background_color && !@minimal_subscribe %>style="background-color: <%= @organisation.theme_background_color %>"<% end %>>
+  <body <% if @organisation && @organisation.theme_background_color %>style="background-color: <%= @organisation.theme_background_color %>"<% end %>>
     <% theme_color = @organisation&.theme_color || @account&.theme_color %>
     <% if theme_color && !theme_css_redundant?(theme_color) %>
       <link href="/theme.css?theme_color=<%=CGI.escape(theme_color)%>" rel="stylesheet">
   <% end %>
-  <% if @organisation && @organisation.unsanitized_ok? && @organisation.minimal_head && !@minimal_subscribe %>
+  <% if @organisation && @organisation.unsanitized_ok? && @organisation.minimal_head && !@skip_minimal_head %>
     <%== @organisation.minimal_head %>
   <% end %>
   <% if @account && @account.admin? && @account.minimal_head %>
