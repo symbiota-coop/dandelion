@@ -169,6 +169,7 @@ Dandelion::App.controller do
     end
     @order.send_tickets
     @event.clear_cache
+    new_event.clear_cache
     flash[:notice] = 'The order was transferred.'
     redirect "/events/#{original_event_id}/orders"
   end
