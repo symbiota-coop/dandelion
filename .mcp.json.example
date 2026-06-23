@@ -39,6 +39,17 @@
     "cloudflare-api": {
       "type": "http",
       "url": "https://mcp.cloudflare.com/mcp"
-    }
+    },
+    "mailgun": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "@mailgun/mcp-server"
+      ],
+      "env": {
+        "MAILGUN_API_KEY": "$MAILGUN_API_KEY",
+        "MAILGUN_API_REGION": "$MAILGUN_API_REGION"
+      }
+    }    
   }
 }
