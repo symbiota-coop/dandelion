@@ -45,9 +45,15 @@ Dandelion::App.controller do
     end
   end
 
-  get '/events/my' do
+  get '/events/my', provides: %i[html ics] do
     sign_in_required!
-    erb :'events/my'
+    case content_type
+    when :html
+      erb :'events/my'
+    when :ics
+      events = current_account.upcoming_events.without_heavy_fields.limit(500)
+      cp(:'events/events_ical', locals: { events: events, calendar_name: 'My Dandelion events' }, key: "/events/my.ics?account=#{current_account.id}")
+    end
   end
 
   get '/events/new' do
