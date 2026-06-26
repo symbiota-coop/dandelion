@@ -11,7 +11,7 @@
       <h2 class="mb-0">Upcoming events</h2>
     </div>
     <div class="col-auto">
-      <a data-toggle="tooltip" title="iCal feed" style="font-size: 1rem" class="text-primary" id="ical" target="_blank" href="/events/my.ics?api_key=<%=current_account.api_key%>">
+      <a data-toggle="tooltip" title="iCal feed" style="font-size: 1rem" class="text-primary" id="ical" target="_blank" href="/events/my.ics?ics_key=<%=current_account.ensure_ics_key!%>">
         <i class="bi bi-rss-fill"></i>
       </a>
     </div>

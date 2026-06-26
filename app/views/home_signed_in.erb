@@ -40,7 +40,7 @@
                 <a href="/birthdays">All birthdays &rarr;</a>
               </div>
               <div class="col-auto">
-                <a data-toggle="tooltip" title="iCal feed" style="font-size: 1rem" class="text-primary" id="ical" target="_blank" href="/birthdays.ics?api_key=<%=current_account.api_key%>">
+                <a data-toggle="tooltip" title="iCal feed" style="font-size: 1rem" class="text-primary" id="ical" target="_blank" href="/birthdays.ics?ics_key=<%=current_account.ensure_ics_key!%>">
                   <i class="bi bi-rss-fill"></i>
                 </a>
               </div>

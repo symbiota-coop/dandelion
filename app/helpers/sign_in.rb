@@ -25,7 +25,17 @@ Dandelion::App.helpers do
     if (account = Account.find_by(api_key: params[:api_key]))
       @current_account_via_api_key = account
     elsif !current_account
-      403
+      halt 403
+    end
+  end
+
+  def sign_in_via_ics_key
+    return unless params[:ics_key]
+
+    if (account = Account.find_by(ics_key: params[:ics_key]))
+      @current_account_via_ics_key = account
+    elsif !current_account
+      halt 403
     end
   end
 end

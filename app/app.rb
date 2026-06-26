@@ -192,6 +192,7 @@ module Dandelion
     end
 
     get '/birthdays', provides: [:html, :ics] do
+      sign_in_via_ics_key if content_type == :ics
       sign_in_required!
       case content_type
       when :html

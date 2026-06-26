@@ -11,6 +11,7 @@ module AccountValidation
     validates_uniqueness_of :username
 
     validates_uniqueness_of :sign_in_token
+    validates_uniqueness_of :ics_key, allow_nil: true
 
     before_validation do
       unless username
@@ -24,7 +25,8 @@ module AccountValidation
         end
       end
 
-      self.api_key = SecureRandom.uuid unless api_key
+      self.api_key = SecureRandom.uuid unless api_key.present?
+      self.ics_key = SecureRandom.uuid unless ics_key.present?
 
       self.name = username unless name
       self.name = name.split('@').first if name && name.include?('@')

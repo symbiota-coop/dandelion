@@ -75,6 +75,13 @@ class Account
     "#{Time.now.to_i}-#{generate_password(5)}"
   end
 
+  def ensure_ics_key!
+    return ics_key if ics_key.present?
+
+    set(ics_key: SecureRandom.uuid)
+    ics_key
+  end
+
   def generate_sign_in_token
     loop do
       token = Account.generate_sign_in_token

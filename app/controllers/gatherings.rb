@@ -76,6 +76,7 @@ Dandelion::App.controller do
   end
 
   get '/g/:slug/birthdays', provides: :ics do
+    sign_in_via_ics_key
     @gathering = Gathering.find_by(slug: params[:slug]) || not_found
     @membership = @gathering.memberships.find_by(account: current_account)
     membership_required!

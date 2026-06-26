@@ -46,6 +46,7 @@ Dandelion::App.controller do
   end
 
   get '/events/my', provides: %i[html ics] do
+    sign_in_via_ics_key if content_type == :ics
     sign_in_required!
     case content_type
     when :html

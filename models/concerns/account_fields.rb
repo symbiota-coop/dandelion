@@ -21,6 +21,7 @@ module AccountFields
     field :sign_ins_count, type: Integer
     field :sign_in_token, type: String
     field :api_key, type: String
+    field :ics_key, type: String
     field :last_active, type: Time
     field :last_checked_notifications, type: Time
     field :last_checked_messages, type: Time
