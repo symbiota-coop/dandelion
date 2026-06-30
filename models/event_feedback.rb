@@ -24,6 +24,7 @@ class EventFeedback
 
   before_validation do
     self.has_public_answers = public_answers.present?
+    self.answers = nil unless answers&.any? { |_q, a| a.present? }
   end
 
   after_save do
@@ -137,11 +138,8 @@ class EventFeedback
   end
 
   def self.joined(base_header: '')
-    event_feedbacks = order('created_at desc').and(:answers.ne => nil)
-
-    event_feedbacks.map do |ef|
+    order('created_at desc').and(:answers.ne => nil).map do |ef|
       next unless ef.event
-      next if ef.answers.all? { |_q, a| a.blank? }
 
       "#{base_header}# Feedback on #{ef.event.name}, #{ef.event.when_details(ENV['DEFAULT_TIME_ZONE'])} at #{ef.event.location}\n\n#{ef.answers.map { |q, a| "#{base_header}## #{q}\n#{a}" }.join("\n\n")}"
     end.compact.join("\n\n")

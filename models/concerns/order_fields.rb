@@ -44,6 +44,10 @@ module OrderFields
     field :gc_account_number, type: String
     field :gc_success, type: Mongoid::Boolean
     field :donation_via_modal, type: Mongoid::Boolean
+
+    before_validation do
+      self.answers = nil unless answers&.any? { |_q, a| a.present? }
+    end
   end
 
   def metadata
