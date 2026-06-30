@@ -25,7 +25,7 @@ Dandelion::App.controller do
     event_admins_only!
     event_feedbacks_with_answers = @event.event_feedbacks.and(:answers.ne => nil)
     halt 404 unless event_feedbacks_with_answers.exists?
-    halt 404 unless event_feedbacks_with_answers.count > 5 || Padrino.env == :development
+    halt 404 unless event_feedbacks_with_answers.count >= 5 || Padrino.env == :development
     stash_partial(:'event_feedbacks/report', locals: { feedback: event_feedbacks_with_answers.joined, subject: 'this event', intro: 'Based on the feedback for this event, here are up to 5 possible areas for improvement' }, key: "/events/#{@event.id}/feedback_report")
   end
 

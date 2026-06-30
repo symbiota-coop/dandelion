@@ -9,7 +9,7 @@
 
 <%
   event_feedbacks_with_answers = @event.event_feedbacks.and(:answers.ne => nil)
-  show_feedback_report = event_feedbacks_with_answers.count > 5 || (Padrino.env == :development && event_feedbacks_with_answers.exists?)
+  show_feedback_report = event_feedbacks_with_answers.count >= 5 || (Padrino.env == :development && event_feedbacks_with_answers.exists?)
 %>
 <% if show_feedback_report %>
   <% stash = Stash.find_by(key: "/events/#{@event.id}/feedback_report") %>
