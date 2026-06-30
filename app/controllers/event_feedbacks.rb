@@ -20,6 +20,15 @@ Dandelion::App.controller do
     erb :'local_groups/event_feedbacks'
   end
 
+  get '/events/:id/feedback_report' do
+    @event = Event.find(params[:id]) || not_found
+    event_admins_only!
+    event_feedbacks_with_answers = @event.event_feedbacks.and(:answers.ne => nil)
+    halt 404 unless event_feedbacks_with_answers.exists?
+    halt 404 unless event_feedbacks_with_answers.count > 5 || Padrino.env == :development
+    stash_partial(:'event_feedbacks/report', locals: { feedback: event_feedbacks_with_answers.joined, subject: 'this event', intro: 'Based on the feedback for this event, here are up to 5 possible areas for improvement' }, key: "/events/#{@event.id}/feedback_report")
+  end
+
   get '/events/:id/feedback', provides: %i[html csv] do
     @event = Event.find(params[:id]) || not_found
     event_admins_only!
@@ -35,7 +44,7 @@ Dandelion::App.controller do
   get '/event_feedbacks/report' do
     sign_in_required!
     if request.xhr?
-      cp(:'event_feedbacks/report', key: "/event_feedbacks/#{current_account.id}/report", expires: 7.days.from_now)
+      cp(:'event_feedbacks/report', locals: { feedback: current_account.event_feedbacks_as_facilitator.and(:created_at.gte => 1.year.ago).joined, subject: 'this facilitator', intro: 'Based on feedback from the past year, here are 5 possible areas for improvement' }, key: "/event_feedbacks/#{current_account.id}/report", expires: 7.days.from_now)
     else
       erb :'event_feedbacks/report'
     end

@@ -1,11 +1,11 @@
 <%
-  prompt = %{Suggest up to 5 areas for improvement for this facilitator based on the feedback below.
+  prompt = %{Suggest up to 5 areas for improvement for #{subject} based on the feedback below.
 
 Further instructions (don't mention in your response):
 - Present as a numbered list
 - Address your answer in the second person ('you')
 
-The feedback:\n\n#{current_account.event_feedbacks_as_facilitator.joined(since: 1.year.ago)}}
+The feedback:\n\n#{feedback}}
   content = OpenRouter.chat(prompt).split('1.').last
 %>
-<%== md(%(Based on feedback from the past year, here are 5 possible areas for improvement:\n\n1. #{content})) %>
+<%== md(%(#{intro}:\n\n1. #{content})) %>

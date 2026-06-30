@@ -31,6 +31,7 @@ class EventFeedback
   end
   after_destroy do
     event.clear_cache if event
+    clear_event_feedback_report_stash
   end
 
   def circle
@@ -38,6 +39,7 @@ class EventFeedback
   end
 
   after_create do
+    clear_event_feedback_report_stash
     notifications.create! circle: circle, type: 'left_feedback' unless anonymous
   end
 
@@ -128,9 +130,14 @@ class EventFeedback
   end
   handle_asynchronously :send_destroy_notification
 
-  def self.joined(since: nil, base_header: '')
+  def clear_event_feedback_report_stash
+    return unless event
+
+    Stash.find_by(key: "/events/#{event.id}/feedback_report")&.destroy
+  end
+
+  def self.joined(base_header: '')
     event_feedbacks = order('created_at desc').and(:answers.ne => nil)
-    event_feedbacks = event_feedbacks.and(:created_at.gte => since) if since
 
     event_feedbacks.map do |ef|
       next unless ef.event

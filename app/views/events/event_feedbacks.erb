@@ -1,8 +1,27 @@
 <%= partial :'events/nav', locals: { event: @event } %>
+
 <% if average_rating = @event_feedbacks.average_rating %>
   <p style="font-size: 2em">
     <%= average_rating %><small class="text-muted">/5 from <%= pluralize @event.event_feedbacks.count, 'rating' %></small>
     <% average_rating.round.times do %><i class="bi bi-star-fill"></i><% end %>
   </p>
 <% end %>
+
+<%
+  event_feedbacks_with_answers = @event.event_feedbacks.and(:answers.ne => nil)
+  show_feedback_report = event_feedbacks_with_answers.count > 5 || (Padrino.env == :development && event_feedbacks_with_answers.exists?)
+%>
+<% if show_feedback_report %>
+  <% stash = Stash.find_by(key: "/events/#{@event.id}/feedback_report") %>
+  <div style="font-size: 0.9rem" data-toggle="tooltip" title="AI-generated ✨" <% unless stash %>data-with-placeholder data-pagelet-url="/events/<%= @event.id %>/feedback_report"<% end %>>
+    <% if stash %>
+      <%== stash.value %>
+    <% else %>
+      <% 5.times do %>
+        <div class="flicker mb-3" style="width: <%= rand(10..90) %>%; background: rgba(0,0,0,0.1)">&nbsp;</div>
+      <% end %>
+    <% end %>
+  </div>
+<% end %>
+
 <%= partial :'event_feedbacks/event_feedbacks_table', locals: { event_feedbacks: @event_feedbacks } %>
