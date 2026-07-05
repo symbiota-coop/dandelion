@@ -1,6 +1,6 @@
 Dandelion::App.helpers do
   def sign_in_via_token
-    account = Account.find_by(sign_in_token: params[:sign_in_token])
+    account = Account.find_by(sign_in_token: params[:sign_in_token].to_s)
 
     if account && !account.sign_in_token_expired?
       account.set(failed_sign_in_attempts: 0)
@@ -22,7 +22,7 @@ Dandelion::App.helpers do
   end
 
   def sign_in_via_api_key
-    if (account = Account.find_by(api_key: params[:api_key]))
+    if (account = Account.find_by(api_key: params[:api_key].to_s))
       @current_account_via_api_key = account
     elsif !current_account
       halt 403
@@ -32,7 +32,7 @@ Dandelion::App.helpers do
   def sign_in_via_ics_key
     return unless params[:ics_key]
 
-    if (account = Account.find_by(ics_key: params[:ics_key]))
+    if (account = Account.find_by(ics_key: params[:ics_key].to_s))
       @current_account_via_ics_key = account
     elsif !current_account
       halt 403
