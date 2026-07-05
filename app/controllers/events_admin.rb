@@ -102,17 +102,14 @@ Dandelion::App.controller do
     @event = Event.find(params[:id]) || not_found
     event_admins_only!
 
-    order = @event.orders.new
-    order.account = current_account
-    if (ticket_type = @event.ticket_types.first)
-      order.tickets.new(ticket_type: ticket_type)
-      order.tickets.new(ticket_type: ticket_type)
-    end
     tickets_table = EmailHelper.render(:_tickets_table, event: @event, account: current_account)
     EmailHelper.html(:reminder, event: @event, tickets_table: tickets_table) do |content|
       EmailFields.replace_recipient_variables(
         content,
-        EmailFields.recipient_variables(event: @event, account: current_account, orders: [order])
+        EmailFields.recipient_variables(
+          event: @event,
+          account: current_account
+        )
       )
     end
   end
@@ -126,17 +123,13 @@ Dandelion::App.controller do
   get '/events/:id/feedback_request_email_preview' do
     @event = Event.find(params[:id]) || not_found
     event_admins_only!
-    order = @event.orders.new
-    order.account = current_account
-    if (ticket_type = @event.ticket_types.first)
-      order.tickets.new(ticket_type: ticket_type)
-      order.tickets.new(ticket_type: ticket_type)
-    end
     EmailHelper.html(:feedback, event: @event) do |content|
       EmailFields.replace_recipient_variables(
         content,
-        EmailFields.recipient_variables(event: @event, account: current_account, orders: [order])
-                   .merge('feedback_token' => @event.feedback_preview_token)
+        EmailFields.recipient_variables(
+          event: @event,
+          account: current_account
+        ).merge('feedback_token' => @event.feedback_preview_token)
       )
     end
   end

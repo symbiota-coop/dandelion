@@ -4,8 +4,8 @@ module EmailFields
   MAGIC_TAGS = %w[firstname lastname fullname event_name event_link event_when event_location event_url at_event_location_if_not_online organisation_name ticket_or_tickets tickets_are description_elements key_information_again].freeze
   RECIPIENT_TAGS = %w[firstname lastname fullname event_when ticket_or_tickets tickets_are description_elements].freeze
 
-  def self.recipient_variables(event:, account:, orders:, description_elements: true)
-    recipient_tag_values(event: event, account: account, orders: orders, description_elements: description_elements)
+  def self.recipient_variables(event:, account:, orders: [])
+    recipient_tag_values(event: event, account: account, orders: orders)
       .merge('token' => account&.sign_in_token, 'id' => account&.id&.to_s)
   end
 
@@ -45,18 +45,25 @@ module EmailFields
     end
   end
 
-  def self.recipient_tag_values(event:, account:, orders:, description_elements: true)
-    ticket_count = orders.sum { |o| o.tickets.length }
-
+  def self.recipient_tag_values(event:, account:, orders: [])
     values = {
       'firstname' => account&.firstname || 'there',
       'lastname' => account&.lastname || '',
       'fullname' => account&.name.to_s,
-      'event_when' => event.when_details(account.try(:time_zone)) || '',
-      'ticket_or_tickets' => ticket_count == 1 ? 'Ticket' : 'Tickets',
-      'tickets_are' => ticket_count == 1 ? 'ticket is' : 'tickets are'
+      'event_when' => event.when_details(account.try(:time_zone)) || ''
     }
-    values['description_elements'] = orders.flat_map(&:description_elements).join(', ') if description_elements
+
+    if orders.present?
+      ticket_count = orders.sum { |o| o.tickets.length }
+      values['ticket_or_tickets'] = ticket_count == 1 ? 'Ticket' : 'Tickets'
+      values['tickets_are'] = ticket_count == 1 ? 'ticket is' : 'tickets are'
+      values['description_elements'] = orders.flat_map(&:description_elements).join(', ')
+    else
+      values['ticket_or_tickets'] = ''
+      values['tickets_are'] = ''
+      values['description_elements'] = ''
+    end
+
     values
   end
 
