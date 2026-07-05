@@ -158,17 +158,17 @@ Dandelion::App.controller do
   end
 
   get '/o/:slug/unsubscribe' do
-    @account = current_account || (params[:account_id] && Account.find(params[:account_id])) || sign_in_required!
     @organisation = Organisation.find_by(slug: params[:slug]) || not_found
+    @account = current_account || Account.from_organisation_unsubscribe_token(@organisation, params[:token]) || sign_in_required!
     erb :'organisations/unsubscribe'
   end
 
   post '/o/:slug/unsubscribe' do
-    @account = current_account || (params[:account_id] && Account.find(params[:account_id])) || sign_in_required!
     @organisation = Organisation.find_by(slug: params[:slug]) || not_found
+    @account = current_account || Account.from_organisation_unsubscribe_token(@organisation, params[:token]) || sign_in_required!
     @organisationship = @account.organisationships.find_by(organisation: @organisation) || @account.organisationships.create(organisation: @organisation)
     @organisationship.set_unsubscribed!(true)
-    if params[:account_id]
+    if params[:token]
       @unsubscribed = true
       erb :'organisations/unsubscribe'
     else

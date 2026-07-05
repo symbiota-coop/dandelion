@@ -352,7 +352,8 @@ class Pmail
                                     'token' => account.sign_in_token,
                                     'id' => account.id.to_s,
                                     'username' => account.username,
-                                    'view_or_activate' => (account.has_signed_in? ? 'View your profile' : 'Activate your account')
+                                    'view_or_activate' => (account.has_signed_in? ? 'View your profile' : 'Activate your account'),
+                                    'org_unsubscribe_token' => account.organisation_unsubscribe_token_for(organisation)
                                   })
     end
 

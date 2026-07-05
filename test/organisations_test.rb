@@ -61,4 +61,63 @@ class OrganisationsTest < ActiveSupport::TestCase
     saved_organisation = Organisation.find_by(slug: @organisation.slug)
     assert_nil saved_organisation.referrer_id
   end
+
+  test 'organisation unsubscribe token resolves account for organisation' do
+    @organisation = FactoryBot.create(:organisation)
+    @account = FactoryBot.create(:account)
+    token = @account.organisation_unsubscribe_token_for(@organisation)
+
+    assert_equal @account, Account.from_organisation_unsubscribe_token(@organisation, token)
+  end
+
+  test 'organisation unsubscribe token is scoped to organisation' do
+    @organisation = FactoryBot.create(:organisation)
+    @other_organisation = FactoryBot.create(:organisation)
+    @account = FactoryBot.create(:account)
+    token = @account.organisation_unsubscribe_token_for(@organisation)
+
+    assert_nil Account.from_organisation_unsubscribe_token(@other_organisation, token)
+  end
+
+  test 'organisation unsubscribe rejects arbitrary account_id' do
+    @organisation = FactoryBot.create(:organisation)
+    @victim = FactoryBot.create(:account)
+    @victim.organisationships.create!(organisation: @organisation)
+
+    visit "/o/#{@organisation.slug}/unsubscribe?account_id=#{@victim.id}"
+
+    assert page.has_current_path?('/accounts/new')
+    assert_equal false, @victim.organisationships.find_by(organisation: @organisation).unsubscribed
+  end
+
+  test 'organisation unsubscribe via token is two-click' do
+    @organisation = FactoryBot.create(:organisation)
+    @account = FactoryBot.create(:account, email: 'unsub@example.com')
+    organisationship = @account.organisationships.create!(organisation: @organisation)
+    token = @account.organisation_unsubscribe_token_for(@organisation)
+
+    visit "/o/#{@organisation.slug}/unsubscribe?token=#{token}"
+
+    assert page.has_content?('Are you sure you want to unsubscribe')
+    assert page.has_content?('unsub@example.com')
+    click_button 'Yes, unsubscribe'
+
+    assert page.has_content?('was unsubscribed from')
+    organisationship.reload
+    assert organisationship.unsubscribed
+  end
+
+  test 'signed-in organisation unsubscribe redirects to subscriptions' do
+    @account = FactoryBot.create(:account)
+    @organisation = FactoryBot.create(:organisation, account: @account)
+    organisationship = @account.organisationships.find_by(organisation: @organisation)
+    login_as(@account)
+
+    visit "/o/#{@organisation.slug}/unsubscribe"
+    click_button 'Yes, unsubscribe'
+
+    assert page.has_current_path?('/accounts/subscriptions')
+    organisationship.reload
+    assert organisationship.unsubscribed
+  end
 end

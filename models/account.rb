@@ -127,6 +127,24 @@ class Account
     find_by(id: account_id)
   end
 
+  def organisation_unsubscribe_token_for(organisation)
+    return unless organisation
+
+    TokenVerifier.generate("org_unsubscribe:#{organisation.id}:#{id}")
+  end
+
+  def self.from_organisation_unsubscribe_token(organisation, token)
+    return unless organisation
+
+    data = TokenVerifier.verify(token)
+    return unless data
+
+    prefix, org_id, account_id = data.split(':', 3)
+    return unless prefix == 'org_unsubscribe' && org_id == organisation.id.to_s
+
+    find_by(id: account_id)
+  end
+
   def merge(account_to_destroy)
     # Don't allow merging with self
     return if id == account_to_destroy.id

@@ -5,7 +5,7 @@
 <% else %>
   <% form_tag "/o/#{@organisation.slug}/unsubscribe" do %>
     <p class="lead">Are you sure you want to unsubscribe <%= @account.email %> from <%= @organisation.name %>?</p>
-    <%= hidden_field_tag :account_id, value: @account.id %>
+    <%= hidden_field_tag :token, value: params[:token] if params[:token] %>
     <%= submit_tag "Yes, unsubscribe", class: 'btn btn-primary' %>
   <% end %>
 <% end %>
