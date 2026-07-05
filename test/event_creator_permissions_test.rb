@@ -183,4 +183,43 @@ class EventCreatorPermissionsTest < ActiveSupport::TestCase
     assert_equal '/events', current_path
     assert page.has_content? "don't have permission to create events for this organisation"
   end
+
+  # ─── Event delete authorization ────────────────────────────────────────────
+
+  test 'org event creator can delete their own event' do
+    org_owner = FactoryBot.create(:account)
+    org = FactoryBot.create(:organisation, account: org_owner)
+    creator = FactoryBot.create(:account)
+    creator.organisationships.create!(organisation: org, event_creator: true, unsubscribed: false)
+    event = FactoryBot.create(:event, organisation: org, account: creator, last_saved_by: creator)
+    login_as(creator)
+    visit "/events/#{event.id}/destroy"
+    assert_equal "/o/#{org.slug}/events", current_path
+    assert page.has_content?('The event was deleted')
+    assert event.reload.deleted?
+  end
+
+  test 'org event creator cannot delete another account event' do
+    org_owner = FactoryBot.create(:account)
+    org = FactoryBot.create(:organisation, account: org_owner)
+    creator = FactoryBot.create(:account)
+    creator.organisationships.create!(organisation: org, event_creator: true, unsubscribed: false)
+    event = FactoryBot.create(:event, organisation: org, account: org_owner, last_saved_by: org_owner)
+    login_as(creator)
+    visit "/events/#{event.id}/destroy"
+    refute event.reload.deleted?
+    assert_equal "/e/#{event.slug}", current_path
+  end
+
+  test 'org admin can delete any organisation event' do
+    org_owner = FactoryBot.create(:account)
+    org = FactoryBot.create(:organisation, account: org_owner)
+    creator = FactoryBot.create(:account)
+    creator.organisationships.create!(organisation: org, event_creator: true, unsubscribed: false)
+    event = FactoryBot.create(:event, organisation: org, account: creator, last_saved_by: creator)
+    login_as(org_owner)
+    visit "/events/#{event.id}/destroy"
+    assert_equal "/o/#{org.slug}/events", current_path
+    assert event.reload.deleted?
+  end
 end

@@ -122,6 +122,26 @@ Dandelion::App.helpers do
     kick!(redirect_url: "/e/#{@event.slug}") unless event_admin?
   end
 
+  def can_delete_event?(event = nil, account = current_account)
+    event ||= @event
+    return false unless event && account
+
+    cached_permission(:@can_delete_event_cache, event, account) do
+      if organisation_admin?(event.organisation, account)
+        true
+      else
+        event.account_id == account.id && (
+          organisation_admins_or_event_creators?(event.organisation, account) ||
+          event.cohosts.any? { |cohost| organisation_admins_or_event_creators?(cohost, account) }
+        )
+      end
+    end
+  end
+
+  def can_delete_event_only!
+    kick!(redirect_url: "/e/#{@event.slug}") unless can_delete_event?
+  end
+
   def event_revenue_admin?(event = nil, account = current_account)
     event ||= @event
     cached_permission(:@event_revenue_admin_cache, event, account) do
