@@ -157,14 +157,14 @@ Dandelion::App.controller do
   get '/e/:slug', provides: %i[html ics json jpg], prerender: true do
     session[:via] = params[:via] if params[:via]
     session[:return_to] = request.url
-    @event = Event.without(:embedding).find_by(slug: params[:slug])
+    @event = Event.with_key_includes.without(:embedding).find_by(slug: params[:slug])
     if !@event && params[:slug] =~ /[A-Z]/
-      @event = Event.without(:embedding).find_by(slug: params[:slug].downcase)
+      @event = Event.with_key_includes.without(:embedding).find_by(slug: params[:slug].downcase)
       redirect "/e/#{@event.slug}" if @event
     end
     unless @event
       id = params[:slug]
-      @event = Event.without(:embedding).find(id) || not_found
+      @event = Event.with_key_includes.without(:embedding).find(id) || not_found
       redirect request.url.gsub(id, @event.slug) if @event.slug
     end
 
@@ -216,19 +216,7 @@ Dandelion::App.controller do
         erb :'events/event'
       end
     when :json
-      {
-        name: @event.name,
-        start_date: @event.start_time&.to_date&.to_fs(:db_local),
-        end_date: @event.end_time&.to_date&.to_fs(:db_local),
-        activity: ("#{@event.activity.name} (#{@event.activity_id})" if @event.activity),
-        event_coordinator: ("#{@event.coordinator.name} (#{@event.coordinator_id})" if @event.coordinator),
-        carousel: @event.carousel_name,
-        order_count: @event.orders.complete.count,
-        discounted_ticket_revenue: @event.discounted_ticket_revenue.cents.to_f / 100,
-        organisation_discounted_ticket_revenue: @event.organisation_discounted_ticket_revenue.cents.to_f / 100,
-        donation_revenue: @event.donation_revenue.cents.to_f / 100,
-        organisation_revenue_share: (@event.organisation_revenue_share if @event.revenue_sharer)
-      }.to_json
+      @event.to_public_json
     when :ics
       (cal = @event.ical) ? cal.to_ical : not_found
     when :jpg

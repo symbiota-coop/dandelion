@@ -148,8 +148,8 @@ class EvergreenEventsTest < ActiveSupport::TestCase
     assert_equal 200, last_response.status
     json = JSON.parse(last_response.body)
     assert_equal @event.name, json['name']
-    assert_nil json['start_date']
-    assert_nil json['end_date']
+    assert_nil json['start_time']
+    assert_nil json['end_time']
   end
 
   test 'organisation orders page renders evergreen orders' do
