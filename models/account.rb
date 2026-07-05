@@ -72,7 +72,7 @@ class Account
   end
 
   def self.generate_sign_in_token
-    "#{Time.now.to_i}-#{generate_password(5)}"
+    "#{Time.now.to_i}-#{SecureRandom.hex(16)}"
   end
 
   def ensure_ics_key!
