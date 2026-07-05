@@ -55,9 +55,11 @@ module EventNotifications
 
     event = self
 
-    reminder_subject = (
-      (event.reminder_email_title || event.organisation.reminder_email_title)
-      .gsub('[event_name]', event.name)
+    reminder_subject = EmailFields.replace_magic_tags(
+      event.reminder_email_title || event.organisation.reminder_email_title,
+      event: event,
+      recipient_variables: true,
+      plain_text: true
     )
 
     tickets_table = EmailHelper.render(:_tickets_table, event: event)
@@ -73,13 +75,19 @@ module EventNotifications
     recipients_with_cancel = 0
     recipients_without_cancel = 0
 
+    description_elements = [
+      event.reminder_email_title || event.organisation.reminder_email_title,
+      event.reminder_email_body || event.organisation.reminder_email_body
+    ].compact.any? { |text| text.include?('[description_elements]') }
+
     (account_id == :all ? attendees.and(unsubscribed: false).and(unsubscribed_reminders: false) : attendees.and(unsubscribed: false).and(unsubscribed_reminders: false).and(id: account_id)).each do |account|
-      cancellable_order = event.orders.complete
-                                .and(account: account, :value.in => [nil, 0])
-                                .first
+      attendee_orders = event.orders.complete.and(account: account).to_a
+      cancellable_order = attendee_orders.find { |order| order.value.nil? || order.value.zero? }
 
       when_parts = event.when_details(account.try(:time_zone), with_zone: true).split(', ')
-      recipient_vars = { 'firstname' => account.firstname || 'there', 'token' => account.sign_in_token, 'id' => account.id.to_s, 'when_parts_0' => when_parts[0], 'when_parts_1' => when_parts[1..].join(', ') }
+      recipient_vars = EmailFields.recipient_variables(event: event, account: account, orders: attendee_orders, description_elements: description_elements)
+                                        .merge('when_parts_0' => when_parts[0],
+                                               'when_parts_1' => when_parts[1..].join(', '))
 
       if cancellable_order
         cancel_rsvp_url = "#{ENV['BASE_URI']}/orders/#{cancellable_order.id}/confirm_destroy?sign_in_token=#{account.sign_in_token}"
@@ -146,13 +154,25 @@ module EventNotifications
     batch_message.from ENV['FEEDBACK_EMAIL_FULL']
     batch_message.reply_to(event.email || event.organisation.try(:reply_to))
     batch_message.subject(
-      (event.feedback_email_title || event.organisation.feedback_email_title)
-      .gsub('[event_name]', event.name)
+      EmailFields.replace_magic_tags(
+        event.feedback_email_title || event.organisation.feedback_email_title,
+        event: event,
+        recipient_variables: true,
+        plain_text: true
+      )
     )
     batch_message.body_html EmailHelper.html(:feedback, event: event)
 
+    description_elements = [
+      event.feedback_email_title || event.organisation.feedback_email_title,
+      event.feedback_email_body || event.organisation.feedback_email_body
+    ].compact.any? { |text| text.include?('[description_elements]') }
+
     (account_id == :all ? attendees.and(unsubscribed: false).and(unsubscribed_feedback: false) : attendees.and(unsubscribed: false).and(unsubscribed_feedback: false).and(id: account_id)).each do |account|
-      batch_message.add_recipient(:to, account.email, { 'firstname' => account.firstname || 'there', 'token' => account.sign_in_token, 'id' => account.id.to_s, 'feedback_token' => account.feedback_token_for(event) })
+      attendee_orders = event.orders.complete.and(account: account).to_a
+      batch_message.add_recipient(:to, account.email,
+                                  EmailFields.recipient_variables(event: event, account: account, orders: attendee_orders, description_elements: description_elements)
+                                             .merge('feedback_token' => account.feedback_token_for(event)))
     end
 
     batch_message.finalize if Padrino.env == :production

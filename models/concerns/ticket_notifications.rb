@@ -28,7 +28,15 @@ module TicketNotifications
     order.tickets = [ticket]
     order.account = account
 
-    batch_message.subject(event.ticket_email_title || "Ticket to #{event.name}")
+    batch_message.subject(
+      EmailFields.replace_magic_tags(
+        event.ticket_email_title || "Ticket to #{event.name}",
+        event: event,
+        account: account,
+        orders: [order],
+        plain_text: true
+      )
+    )
 
     header_image_url, from_email = sender_info
 

@@ -207,6 +207,7 @@
               })
             })
           </script>
+          <p>Magic tags: <%== EmailFields::MAGIC_TAGS.map { |t| "<code>[#{t}]</code>" }.join(', ') %></p>
           <%= f.text_block :ticket_email_title %>
           <%= f.wysiwyg_block :ticket_email_greeting %>
           <%= f.text_block :recording_email_title %>

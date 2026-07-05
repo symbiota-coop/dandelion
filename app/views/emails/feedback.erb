@@ -1,10 +1,12 @@
 <div class="main">
   <%= EmailHelper.replace_youtube_oembeds(
-        (event.feedback_email_body || event.organisation.feedback_email_body)
-        .gsub('[firstname]', '%recipient.firstname%')
-        .gsub('[event_name]', event.name)
+        EmailFields.replace_magic_tags(
+          event.feedback_email_body || event.organisation.feedback_email_body,
+          event: event,
+          recipient_variables: true,
+          event_name: "<a href='#{ENV['BASE_URI']}/e/#{event.slug}'>#{event.name}</a>"
+        )
         .gsub('[feedback_url]', "#{ENV['BASE_URI']}/events/#{event.id}/give_feedback?token=%recipient.feedback_token%")
-        .gsub('[organisation_name]', event.organisation.name)
       ) %>
 </div>
 <div class="footer">

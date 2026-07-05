@@ -43,9 +43,13 @@ module OrderNotifications
     account = order.account
 
     batch_message.subject(
-      ((event.recording? ? event.recording_email_title : event.ticket_email_title) || (event.recording? ? event.organisation.recording_email_title : event.organisation.ticket_email_title))
-      .gsub('[ticket_or_tickets]', tickets.count == 1 ? 'Ticket' : 'Tickets')
-      .gsub('[event_name]', event.name)
+      EmailFields.replace_magic_tags(
+        (event.recording? ? event.recording_email_title : event.ticket_email_title) || (event.recording? ? event.organisation.recording_email_title : event.organisation.ticket_email_title),
+        event: event,
+        account: account,
+        orders: [order],
+        plain_text: true
+      )
     )
 
     batch_message.from from_email
