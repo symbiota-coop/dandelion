@@ -26,9 +26,31 @@
             <% else %>
               <%= partial :'accounts/pay', locals: { account: account, source: params[:event_feedback_id] ? "event_feedback:#{params[:event_feedback_id]}" : 'donate', force: true } %>
             <% end %>
+
+            <% if !params[:event_feedback_id] %>
+              <iframe
+            id="circles"
+            src="https://circles.gnosis.io/pilots/kudos-ga?group=dandelion&text=v2&address=0xC067cAd5F4A0c4652866371b723483f83B1ED0aA&theme_color=<%= CGI.escape(@theme_color || '') %>"
+            style="width: 100%; border: 0;"      
+            loading="lazy">
+              </iframe>
+              <script src="//cdnjs.cloudflare.com/ajax/libs/iframe-resizer/4.2.10/iframeResizer.min.js"></script>
+              <script>
+                $(function () {
+                  $('#circles').iFrameResize({log: true, checkOrigin: false, heightCalculationMethod : 'taggedElement'})
+                })
+              </script>
+            <% end %>
           </div>
         </div>
-        <%= partial :badges %>
+
+        <% if params[:event_feedback_id] %>
+          <div class="row justify-content-center">
+            <div class="col-lg-8">
+              <%= partial :badges %>
+            </div>
+          </div>
+        <% end %>
       </div>
     </div>
   <% else %>
