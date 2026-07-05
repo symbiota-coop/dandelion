@@ -3,8 +3,7 @@
         EmailFields.replace_magic_tags(
           event.feedback_email_body || event.organisation.feedback_email_body,
           event: event,
-          recipient_variables: true,
-          event_name: "<a href='#{ENV['BASE_URI']}/e/#{event.slug}'>#{event.name}</a>"
+          recipient_variables: true
         )
         .gsub('[feedback_url]', "#{ENV['BASE_URI']}/events/#{event.id}/give_feedback?token=%recipient.feedback_token%")
       ) %>

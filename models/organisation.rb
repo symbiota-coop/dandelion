@@ -196,7 +196,7 @@ class Organisation
 
   def reminder_email_body_default
     %{<p>Hi [firstname],</p>
-  <p>Just a reminder that [event_link] is coming up soon.</p>
+  <p>Just a reminder that [event_name] is coming up soon.</p>
   <p>
     You should have received a confirmation email with your ticket(s) shortly after purchase. (If you don't see anything in your inbox, please look in your spam folder.)
   </p>

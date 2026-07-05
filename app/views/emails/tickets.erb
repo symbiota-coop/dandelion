@@ -22,8 +22,7 @@
           .then { |html| event.no_tickets_pdf ? html.gsub(/\s*Your \[tickets_are\] attached\.?/, '') : html },
           event: event,
           account: account,
-          orders: [order],
-          event_name: "<a href='#{ENV['BASE_URI']}/e/#{event.slug}'>#{event.name}</a>"
+          orders: [order]
         )
       ) %>
 

@@ -1,7 +1,7 @@
 module EmailFields
   extend ActiveSupport::Concern
 
-  MAGIC_TAGS = %w[firstname lastname fullname event_name event_link event_when event_location event_url at_event_location_if_not_online organisation_name ticket_or_tickets tickets_are description_elements key_information_again].freeze
+  MAGIC_TAGS = %w[firstname lastname fullname event_name event_when event_location event_url at_event_location_if_not_online organisation_name ticket_or_tickets tickets_are description_elements key_information_again].freeze
   RECIPIENT_TAGS = %w[firstname lastname fullname event_when ticket_or_tickets tickets_are description_elements].freeze
 
   def self.recipient_variables(event:, account:, orders: [])
@@ -15,7 +15,7 @@ module EmailFields
     end
   end
 
-  def self.replace_magic_tags(text, event:, account: nil, orders: [], recipient_variables: false, event_name: event.name, plain_text: false)
+  def self.replace_magic_tags(text, event:, account: nil, orders: [], recipient_variables: false, plain_text: false)
     html = text.to_s
 
     if recipient_variables
@@ -26,14 +26,15 @@ module EmailFields
       end
     end
 
+    event_name = plain_text ? event.name : "<a href='#{ENV['BASE_URI']}/e/#{event.slug}'>#{event.name}</a>"
     html = html
            .gsub('[event_name]', event_name)
+           .gsub('[event_link]', event_name) # deprecated: use [event_name]
            .gsub('[organisation_name]', event.organisation.name)
            .gsub('[event_location]', event.location.to_s)
            .gsub('[event_url]', "#{ENV['BASE_URI']}/e/#{event.slug}")
            .gsub(' [at_event_location_if_not_online]', event.online? ? '' : " at #{event.location}")
            .gsub('[at_event_location_if_not_online]', event.online? ? '' : "at #{event.location}")
-           .gsub('[event_link]', "<a href='#{ENV['BASE_URI']}/e/#{event.slug}'>#{event.name}</a>")
            .gsub('[key_information_again]', event.extra_info_for_ticket_email ? "<p>Here's the key information again for your convenience:</p><hr><p>#{event.extra_info_for_ticket_email}</p>" : '')
 
     if plain_text

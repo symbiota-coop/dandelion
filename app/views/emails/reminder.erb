@@ -18,8 +18,7 @@
         EmailFields.replace_magic_tags(
           event.reminder_email_body || event.organisation.reminder_email_body,
           event: event,
-          recipient_variables: true,
-          event_name: "<a href='#{ENV['BASE_URI']}/e/#{event.slug}'>#{event.name}</a>"
+          recipient_variables: true
         )
       ) %>
 
