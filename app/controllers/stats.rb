@@ -12,6 +12,10 @@ Dandelion::App.controller do
     erb :'stats/charts'
   end
 
+  get '/stats/contributions' do
+    erb :'stats/contributions'
+  end
+
   get '/stats/feedback' do
     @event_feedbacks = EventFeedback.includes(:account, event: :organisation).order('created_at desc')
     @event_feedbacks = @event_feedbacks.and(:id.in => search(EventFeedback, @event_feedbacks, params[:q], 25).map(&:id)) if params[:q]

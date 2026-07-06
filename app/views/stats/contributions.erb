@@ -1,0 +1,102 @@
+<%
+  fragment = Fragment.find_by(key: 'monthly_contributions')
+  rows = fragment&.value ? JSON.parse(fragment.value) : []
+  entries = rows.map do |row|
+    breakdown = row[2].is_a?(Hash) ? row[2].transform_values { |value| value.to_i } : {}
+    {
+      month: row[0],
+      total: row[1].to_i,
+      breakdown: breakdown
+    }
+  end
+  data = entries.each_with_object({}) { |entry, memo| memo[entry[:month]] = entry[:total] }
+  breakdown_keys = MonthlyContributionsCalculator::BREAKDOWN_KEYS.dup
+  breakdown_labels = MonthlyContributionsCalculator::BREAKDOWN_LABELS.dup
+  breakdown_colors = MonthlyContributionsCalculator::BREAKDOWN_COLORS.dup
+  has_breakdown = entries.any? { |entry| entry[:breakdown].present? }
+  if has_breakdown && entries.any? { |entry| entry[:breakdown].blank? }
+    breakdown_keys << 'legacy_total'
+    breakdown_labels['legacy_total'] = 'Legacy total'
+    breakdown_colors['legacy_total'] = 'rgba(108, 117, 125, 0.82)'
+  end
+%>
+
+<% if data.any? %>
+  <%
+    current_month_label = "#{Date::MONTHNAMES[Date.today.month]} #{Date.today.year}"
+    current_month_in_data = data.key?(current_month_label)
+    current_month_value = current_month_in_data ? data[current_month_label] : data.values.last
+    days_in_month = Date.new(Date.today.year, Date.today.month, -1).day
+    days_passed = Date.today.day
+    projected_value = current_month_in_data ? (current_month_value.to_f / days_passed * days_in_month).round : current_month_value
+
+    complete_month_values = current_month_in_data ? data.values[0...-1] : data.values
+    trailing_3_values = complete_month_values.last(3)
+    trailing_3_average = trailing_3_values.any? ? (trailing_3_values.sum.to_f / trailing_3_values.length).round : 0
+    best_month = data.max_by { |_month, value| value }
+
+    chart_labels = entries.map { |entry| entry[:month] }
+    chart_actual_values = entries.map { |entry| entry[:total] }
+    chart_breakdown_values = if has_breakdown
+                               breakdown_keys.each_with_object({}) do |key, memo|
+                                 memo[key] = entries.map do |entry|
+                                   key == 'legacy_total' && entry[:breakdown].blank? ? entry[:total] : entry[:breakdown][key].to_i
+                                 end
+                               end
+                             else
+                               { 'total' => chart_actual_values }
+                             end
+    chart_breakdown_labels = has_breakdown ? breakdown_labels : { 'total' => 'Total' }
+    chart_breakdown_colors = has_breakdown ? breakdown_colors : { 'total' => 'rgba(0, 175, 94, 0.92)' }
+    chart_projection_values = entries.map do |entry|
+      entry[:month] == current_month_label ? [projected_value - entry[:total], 0].max : nil
+    end
+    chart_values_for_average = entries.map { |entry| entry[:month] == current_month_label ? projected_value : entry[:total] }
+    chart_average_values = chart_values_for_average.each_with_index.map do |_value, i|
+      next nil if i < 2
+
+      (chart_values_for_average[(i - 2)..i].sum.to_f / 3).round
+    end
+  %>
+
+  <div class="row">
+    <% [
+         ['This month', m(current_month_value, 'GBP'), current_month_in_data ? "Projected #{m(projected_value, 'GBP')}" : data.keys.last],
+         ['3-month average', m(trailing_3_average, 'GBP'), 'Complete months only'],
+         ['Best month', m(best_month[1], 'GBP'), best_month[0]]
+       ].each do |title, value, detail| %>
+      <div class="col-sm-6 col-xl mb-3">
+        <div class="card h-100">
+          <div class="card-body">
+            <p class="text-muted mb-1"><%= title %></p>
+            <p class="h4 mb-1"><%= value %></p>
+            <p class="mb-0"><small><%= detail %></small></p>
+          </div>
+        </div>
+      </div>
+    <% end %>
+  </div>
+
+  <div class="card mb-4">
+    <div class="card-body">
+      <%= partial :'stats/contributions_chart',
+                  locals: {
+                    chart_labels: chart_labels,
+                    chart_breakdown_values: chart_breakdown_values,
+                    chart_breakdown_labels: chart_breakdown_labels,
+                    chart_breakdown_colors: chart_breakdown_colors,
+                    chart_actual_values: chart_actual_values,
+                    chart_projection_values: chart_projection_values,
+                    chart_average_values: chart_average_values
+                  } %>
+    </div>
+  </div>
+
+  <% if fragment.respond_to?(:updated_at) && fragment.updated_at %>
+    <p class="text-muted">
+      Last refreshed <%= timeago fragment.updated_at %>
+    </p>
+  <% end %>
+<% else %>
+  <p class="lead">No monthly contribution data has been calculated yet.</p>
+<% end %>

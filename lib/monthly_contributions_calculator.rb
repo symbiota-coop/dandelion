@@ -1,4 +1,14 @@
 module MonthlyContributionsCalculator
+  BREAKDOWN_KEYS = %w[direct_stripe_charges stripe_connect_application_fees].freeze
+  BREAKDOWN_LABELS = {
+    'direct_stripe_charges' => 'Direct Stripe charges',
+    'stripe_connect_application_fees' => 'Stripe Connect application fees'
+  }.freeze
+  BREAKDOWN_COLORS = {
+    'direct_stripe_charges' => 'rgba(0, 175, 94, 0.92)',
+    'stripe_connect_application_fees' => 'rgba(58, 190, 130, 0.88)'
+  }.freeze
+
   def self.calculate
     setup_stripe
 
@@ -41,10 +51,19 @@ module MonthlyContributionsCalculator
     charges_contrib, charges_stripe_fees = process_charges(start_timestamp, end_timestamp)
     fees_contrib, fees_stripe_fees = process_fees(start_timestamp, end_timestamp)
 
-    monthly_contributions = charges_contrib + fees_contrib - charges_stripe_fees - fees_stripe_fees
+    breakdown = {
+      'direct_stripe_charges' => (charges_contrib - charges_stripe_fees).exchange_to('GBP'),
+      'stripe_connect_application_fees' => (fees_contrib - fees_stripe_fees).exchange_to('GBP')
+    }
+
+    monthly_contributions = breakdown.values.reduce(Money.new(0, 'GBP'), :+)
     monthly_contributions = monthly_contributions.exchange_to('GBP')
 
-    ["#{Date::MONTHNAMES[month.month]} #{month.year}", monthly_contributions.to_i]
+    [
+      "#{Date::MONTHNAMES[month.month]} #{month.year}",
+      monthly_contributions.to_i,
+      breakdown.transform_values(&:to_i)
+    ]
   end
 
   def self.process_charges(start_timestamp, end_timestamp)

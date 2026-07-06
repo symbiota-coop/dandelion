@@ -4,9 +4,6 @@
 <h2>Active organisations</h2>
 <%= cp(:'stats/active_organisations_chart', key: "/stats/charts/organisations", expires: 3.hours.from_now) %>
 
-<h2>Contributions</h2>
-<%= cp(:'stats/contributions_chart', key: "/stats/charts/contributions", expires: 3.hours.from_now) %>
-
 <h2>Orders</h2>
 <%= cp(:chart, locals: { countable: Order.all, months_ago: 24, make_projection: true }, key: "/stats/charts/orders", expires: 3.hours.from_now) %>
 
