@@ -1,6 +1,8 @@
 require File.expand_path("#{File.dirname(__FILE__)}/test_config.rb")
 
 class SearchableFilterTranslationTest < ActiveSupport::TestCase
+  include Capybara::DSL
+
   class CapturingCollection
     attr_reader :pipelines
 
