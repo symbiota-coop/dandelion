@@ -1,8 +1,12 @@
-<% currency = FIAT_CURRENCIES.include?(account.default_currency) ? account.default_currency : ENV['DEFAULT_CURRENCY'] %>
+<% currency = if account
+                FIAT_CURRENCIES.include?(account.default_currency) ? account.default_currency : ENV['DEFAULT_CURRENCY']
+              else
+                ENV['DEFAULT_CURRENCY']
+              end %>
 
-<% if !account.stripe_subscription_id %>
+<% if !account || !account.stripe_subscription_id %>
 
-  <% last_completed_contribution = account.account_contributions.and(payment_completed: true).order('created_at desc').first %>
+  <% last_completed_contribution = account&.account_contributions&.and(payment_completed: true)&.order('created_at desc')&.first %>
   <% if (defined?(force) && force) || !last_completed_contribution || last_completed_contribution.created_at < 1.month.ago %>
     <div class="<%=div_class if defined?(div_class)%>">
 
@@ -63,6 +67,7 @@
             </style>
             <% form_tag '', class: "form-inline mt-2", id: 'pay-form' do %>
               <%= hidden_field_tag :source, value: source %>
+              <%= hidden_field_tag :account_id, value: account&.id %>
               <div class="form-group mb-1 mr-1">
                 <div class="input-group">
                   <div class="input-group-prepend">
@@ -93,7 +98,7 @@
 
               $('#pay-form').submit(function () {
                 $('#pay-form button[data-payment-method-clicked] i').show()
-                $.post('/accounts/<%= account.id %>/pay', $(this).serializeObject(), function (data) {
+                $.post('/accounts/pay', $(this).serializeObject(), function (data) {
                   if (data['session_id']) {
                     var stripe = Stripe('<%= ENV['STRIPE_PK'] %>');
                     stripe.redirectToCheckout({sessionId: data['session_id']})

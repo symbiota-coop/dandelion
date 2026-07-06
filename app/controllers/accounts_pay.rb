@@ -22,38 +22,48 @@ Dandelion::App.controller do
     halt 200
   end
 
-  post '/accounts/:id/pay', provides: :json do
-    @account = Account.find(params[:id])
+  post '/accounts/pay', provides: :json do
     halt 400 unless params[:amount].to_f > 0
+    halt 400 unless params[:payment_method] == 'stripe'
 
-    case params[:payment_method]
-    when 'stripe'
+    account = Account.find(params[:account_id]) if params[:account_id]
 
-      Stripe.api_key = ENV['STRIPE_SK']
-      Stripe.api_version = ENV['STRIPE_API_VERSION']
-      stripe_session_hash = {
-        line_items: [{
-          name: 'Dandelion',
-          description: 'Contribution to Dandelion',
-          amount: (params[:amount].to_f * 100).round,
-          currency: params[:currency],
-          quantity: 1
-        }],
-        customer_email: @account.email,
-        success_url: "#{ENV['BASE_URI']}/donate?thanks=true",
-        cancel_url: "#{ENV['BASE_URI']}/donate",
-        payment_intent_data: {
-          metadata: {
-            de_contribution_type: 'account_donation',
-            de_account_id: @account.id.to_s,
-            de_source: params[:source]
-          }.compact
-        }
+    Stripe.api_key = ENV['STRIPE_SK']
+    Stripe.api_version = ENV['STRIPE_API_VERSION']
+    stripe_session_hash = {
+      line_items: [{
+        name: 'Dandelion',
+        description: 'Contribution to Dandelion',
+        amount: (params[:amount].to_f * 100).round,
+        currency: params[:currency],
+        quantity: 1
+      }],
+      success_url: "#{ENV['BASE_URI']}/donate?thanks=true",
+      cancel_url: "#{ENV['BASE_URI']}/donate",
+      payment_intent_data: {
+        metadata: {
+          de_contribution_type: account ? 'account_donation' : 'guest_donation',
+          de_account_id: account&.id&.to_s,
+          de_source: params[:source]
+        }.compact
       }
-      session = Stripe::Checkout::Session.create(stripe_session_hash)
-      @account.account_contributions.create! source: params[:source], amount: params[:amount].to_f, currency: params[:currency], session_id: session.id, payment_intent: session.payment_intent
-      { session_id: session.id }.to_json
+    }
+    stripe_session_hash[:customer_email] = account.email if account
+    session = Stripe::Checkout::Session.create(stripe_session_hash)
 
+    contribution_attrs = {
+      source: params[:source],
+      amount: params[:amount].to_f,
+      currency: params[:currency],
+      session_id: session.id,
+      payment_intent: session.payment_intent
+    }
+    if account
+      account.account_contributions.create!(contribution_attrs)
+    else
+      AccountContribution.create!(contribution_attrs)
     end
+
+    { session_id: session.id }.to_json
   end
 end

@@ -3,7 +3,7 @@ class AccountContribution
   include Mongoid::Timestamps
   include CoreExtensions
 
-  belongs_to_without_parent_validation :account
+  belongs_to_without_parent_validation :account, optional: true
   belongs_to_without_parent_validation :event, optional: true
   belongs_to_without_parent_validation :event_feedback, optional: true
 
@@ -26,7 +26,8 @@ class AccountContribution
   end
 
   def body_text
-    lines = ["Account: #{ENV['BASE_URI']}/u/#{account.username}"]
+    lines = []
+    lines << "Account: #{ENV['BASE_URI']}/u/#{account.username}" if account
     if event
       lines << "Event name: #{event.name}"
       lines << "Event URL: #{ENV['BASE_URI']}/e/#{event.slug}"
@@ -44,7 +45,12 @@ class AccountContribution
     batch_message = Mailgun::BatchMessage.new(mg_client, ENV['MAILGUN_NOTIFICATIONS_HOST'])
 
     batch_message.from ENV['NOTIFICATIONS_EMAIL_FULL']
-    batch_message.subject "[Account] #{account.name} made a contribution of #{amount} #{currency}"
+    subject = if account
+                "[Account] #{account.name} made a contribution of #{amount} #{currency}"
+              else
+                "[Guest] A contribution of #{amount} #{currency} was made"
+              end
+    batch_message.subject subject
     batch_message.body_text body_text
 
     Account.and(admin: true).each do |account|

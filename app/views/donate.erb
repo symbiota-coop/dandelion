@@ -16,56 +16,42 @@
 
 <% else %>
 
-  <% if account = (current_account || (params[:account_id] && Account.find(params[:account_id]))) %>
-    <div class="row justify-content-center">
-      <div class="col-lg-8">
-        <div class="card my-4">
-          <div class="card-body p-4">
-            <% if account.stripe_subscription_id %>
-              <p class="mb-0">Thanks for making a <a href="https://billing.stripe.com/p/login/14kg1O9HD49fg2kcMM">monthly contribution</a> to Dandelion!</p>
-            <% else %>
-              <%= partial :'accounts/pay', locals: { account: account, source: params[:event_feedback_id] ? "event_feedback:#{params[:event_feedback_id]}" : 'donate', force: true } %>
-            <% end %>
+  <% account = current_account || (params[:account_id] && Account.find(params[:account_id])) %>
+  <div class="row justify-content-center">
+    <div class="col-lg-8">
+      <div class="card my-4">
+        <div class="card-body p-4">
+          <% if account&.stripe_subscription_id %>
+            <p class="mb-0">Thanks for making a <a href="https://billing.stripe.com/p/login/14kg1O9HD49fg2kcMM">monthly contribution</a> to Dandelion!</p>
+          <% else %>
+            <%= partial :'accounts/pay', locals: { account: account, source: params[:event_feedback_id] ? "event_feedback:#{params[:event_feedback_id]}" : 'donate', force: true } %>
+          <% end %>
 
-            <% if !params[:event_feedback_id] %>
-              <iframe
-            id="circles"
-            src="https://circles.gnosis.io/pilots/kudos-ga?group=dandelion&text=v2&address=0xC067cAd5F4A0c4652866371b723483f83B1ED0aA&theme_color=<%= CGI.escape(@theme_color || '') %>"
-            style="width: 100%; border: 0;"      
-            loading="lazy">
-              </iframe>
-              <script src="//cdnjs.cloudflare.com/ajax/libs/iframe-resizer/4.2.10/iframeResizer.min.js"></script>
-              <script>
-                $(function () {
-                  $('#circles').iFrameResize({log: true, checkOrigin: false, heightCalculationMethod : 'taggedElement'})
-                })
-              </script>
-            <% end %>
-          </div>
-        </div>
-
-        <% if params[:event_feedback_id] %>
-          <div class="row justify-content-center">
-            <div class="col-lg-8">
-              <%= partial :badges %>
-            </div>
-          </div>
-        <% end %>
-      </div>
-    </div>
-  <% else %>
-    <div class="row justify-content-center">
-      <div class="col-lg-10">
-        <p class="lead">
-          Dandelion operates on a donation/gift economy basis.
-          <span class="highlight">We rely on your generosity.</span>
-        </p>
-        <p>Donate with your local currency below, or with crypto directly to 0x84a57c709482d44ce49511adac7ed7f1db299455</p>
-        <div class="mt-3">
-          <script src="https://donorbox.org/widget.js" paypalExpress="false"></script><iframe src="https://donorbox.org/embed/dandelion-1" name="donorbox" allowpaymentrequest="" seamless="seamless" frameborder="0" scrolling="no" height="900px" width="100%" style="max-width: 500px; min-width: 250px; max-height:none!important"></iframe>
+          <% if !params[:event_feedback_id] %>
+            <iframe
+          id="circles"
+          src="https://circles.gnosis.io/pilots/kudos-ga?group=dandelion&text=v2&address=0xC067cAd5F4A0c4652866371b723483f83B1ED0aA&theme_color=<%= CGI.escape(@theme_color || '') %>"
+          style="width: 100%; border: 0;"      
+          loading="lazy">
+            </iframe>
+            <script src="//cdnjs.cloudflare.com/ajax/libs/iframe-resizer/4.2.10/iframeResizer.min.js"></script>
+            <script>
+              $(function () {
+                $('#circles').iFrameResize({log: true, checkOrigin: false, heightCalculationMethod : 'taggedElement'})
+              })
+            </script>
+          <% end %>
         </div>
       </div>
+
+      <% if params[:event_feedback_id] %>
+        <div class="row justify-content-center">
+          <div class="col-lg-8">
+            <%= partial :badges %>
+          </div>
+        </div>
+      <% end %>
     </div>
-  <% end %>
+  </div>
 
 <% end %>
