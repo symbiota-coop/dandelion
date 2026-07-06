@@ -8,6 +8,7 @@ module Searchable
   APOSTROPHES = %w[' ’ ‘ ʼ ＇ ′ ´].freeze
   APOSTROPHE_VARIANTS = Regexp.union(APOSTROPHES)
   APOSTROPHE_CHAR_CLASS = "[#{APOSTROPHES.map { |ch| Regexp.escape(ch) }.join}]".freeze
+  RANGE_OPERATORS = %w[$gt $gte $lt $lte].freeze
 
   class_methods do
     def search(query, scope = all, child_scope: nil, limit: nil, build_records: false, phrase_boost: 1, fuzzy_text: false, vector_weight: nil, regex_search: Padrino.env != :production, pipeline_metadata: nil)
@@ -54,44 +55,13 @@ module Searchable
           # between missing fields and fields explicitly set to null
           elsif value.nil?
             remaining_selector[field] = value
-          elsif value.is_a?(Hash)
-            # Handle range operators ($gt, $gte, $lt, $lte)
-            range_filter = nil
-            range_filter_vector = {}
-            value.each do |operator, operand|
-              case operator.to_s
-              when '$gt', '$gte', '$lt', '$lte'
-                range_filter ||= { range: { path: field.to_s } }
-                range_key = operator.to_s.delete_prefix('$')
-                range_filter[:range][range_key.to_sym] = operand
-                range_filter_vector[operator] = operand
-              else
-                # Unsupported operator, move entire field to remaining_selector
-                remaining_selector[field] = value
-                range_filter = nil
-                range_filter_vector = {}
-                break
-              end
-            end
-            # Validate range filter to ensure lower bounds are not greater than upper bounds
-            if range_filter
-              range_values = range_filter[:range]
-              lower_bound = range_values[:gt] || range_values[:gte]
-              upper_bound = range_values[:lt] || range_values[:lte]
-
-              # If both bounds exist and lower bound is greater than or equal to upper bound,
-              # skip this filter to avoid MongoDB error
-              if lower_bound && upper_bound && lower_bound >= upper_bound
-                remaining_selector[field] = value
-              else
-                search_filters << range_filter
-                search_filters_vector << { field => range_filter_vector }
-              end
+          elsif (search_filter = atlas_search_leaf_filter(field, value))
+            search_filters << search_filter
+            if (vector_filter = vector_search_leaf_filter(field, value))
+              search_filters_vector << vector_filter
             end
           else
-            # Simple equality
-            search_filters << { equals: { path: field.to_s, value: value } }
-            search_filters_vector << { field => value }
+            remaining_selector[field] = value
           end
         end
 
@@ -284,20 +254,46 @@ module Searchable
     end
 
     def atlas_search_range_filter(field, value)
+      range_values = search_range_values(value)
+      return nil unless range_values
+
+      { range: { path: field.to_s }.merge(range_values) }
+    end
+
+    def vector_search_leaf_filter(field, value)
+      if value.is_a?(Hash)
+        vector_search_range_filter(field, value)
+      else
+        { field => value }
+      end
+    end
+
+    def vector_search_range_filter(field, value)
+      range_values = search_range_values(value, preserve_operator_keys: true)
+      return nil unless range_values
+
+      { field => range_values }
+    end
+
+    def search_range_values(value, preserve_operator_keys: false)
       return nil if value.empty?
 
       range_values = {}
+      normalized_range_values = {}
       value.each do |operator, operand|
-        return nil unless %w[$gt $gte $lt $lte].include?(operator.to_s)
+        operator_name = operator.to_s
+        return nil unless RANGE_OPERATORS.include?(operator_name)
 
-        range_values[operator.to_s.delete_prefix('$').to_sym] = operand
+        normalized_operator = operator_name.delete_prefix('$').to_sym
+        normalized_range_values[normalized_operator] = operand
+        range_values[preserve_operator_keys ? operator : normalized_operator] = operand
       end
 
-      lower_bound = range_values[:gt] || range_values[:gte]
-      upper_bound = range_values[:lt] || range_values[:lte]
+      lower_bound = normalized_range_values[:gt] || normalized_range_values[:gte]
+      upper_bound = normalized_range_values[:lt] || normalized_range_values[:lte]
       return nil if lower_bound && upper_bound && lower_bound >= upper_bound
 
-      { range: { path: field.to_s }.merge(range_values) }
+      range_values
     end
   end
 end
