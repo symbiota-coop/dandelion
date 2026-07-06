@@ -148,7 +148,7 @@ module EventFields
         hide_attendees: 'Hide the public list of attendees (in any case, individuals must opt in)',
         hide_discussion: 'Hide the private discussion for attendees and facilitators',
         hide_from_carousels: 'Hide the event from carousels',
-        show_emails: 'Allow all event admins to view attendee emails (by default, only organisation admins and organisation event creators see them)',
+        show_emails: 'Allow all event admins to view attendee emails (by default, only organisation admins and event managers see them)',
         opt_in_organisation: 'Allow people to opt in to receive emails from host organisation(s)',
         opt_in_facilitator: "Allow people to opt in to receive emails from any facilitators' personal lists",
         monthly_donors_only: 'Only allow people making a monthly donation to the organisation to purchase tickets',

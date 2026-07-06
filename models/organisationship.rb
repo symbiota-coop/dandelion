@@ -19,7 +19,7 @@ class Organisationship
   field :coordinates, type: Array
   field :notes, type: String
 
-  %w[admin event_creator unsubscribed hide_membership receive_feedback sent_welcome sent_monthly_donation_welcome].each do |b|
+  %w[admin event_manager unsubscribed hide_membership receive_feedback sent_welcome sent_monthly_donation_welcome].each do |b|
     field b.to_sym, type: Boolean
   end
 
@@ -287,7 +287,7 @@ class Organisationship
   end
 
   def self.protected_attributes
-    %w[admin event_creator]
+    %w[admin event_manager]
   end
 
   def self.monthly_donation_methods

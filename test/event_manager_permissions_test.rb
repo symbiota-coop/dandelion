@@ -1,6 +1,6 @@
 require File.expand_path("#{File.dirname(__FILE__)}/test_config.rb")
 
-class EventCreatorPermissionsTest < ActiveSupport::TestCase
+class EventManagerPermissionsTest < ActiveSupport::TestCase
   include Capybara::DSL
 
   # ─── Account#organisations_for_creating_events ─────────────────────────────
@@ -12,11 +12,11 @@ class EventCreatorPermissionsTest < ActiveSupport::TestCase
     assert_includes ids, org.id
   end
 
-  test 'organisations_for_creating_events includes org when account has event_creator on organisationship' do
+  test 'organisations_for_creating_events includes org when account has event_manager on organisationship' do
     org_owner = FactoryBot.create(:account)
     org = FactoryBot.create(:organisation, account: org_owner)
     other = FactoryBot.create(:account)
-    other.organisationships.create!(organisation: org, event_creator: true, unsubscribed: false)
+    other.organisationships.create!(organisation: org, event_manager: true, unsubscribed: false)
     ids = other.organisations_for_creating_events.pluck(:id)
     assert_includes ids, org.id
   end
@@ -62,11 +62,11 @@ class EventCreatorPermissionsTest < ActiveSupport::TestCase
 
   # ─── Organisation.can_create_events_for_organisation? ───────────────────────
 
-  test 'can_create_events_for_organisation? is true for account with event_creator on organisationship' do
+  test 'can_create_events_for_organisation? is true for account with event_manager on organisationship' do
     org_owner = FactoryBot.create(:account)
     org = FactoryBot.create(:organisation, account: org_owner)
     other = FactoryBot.create(:account)
-    other.organisationships.create!(organisation: org, event_creator: true, unsubscribed: false)
+    other.organisationships.create!(organisation: org, event_manager: true, unsubscribed: false)
     assert Organisation.can_create_events_for_organisation?(org, other)
   end
 
@@ -100,55 +100,55 @@ class EventCreatorPermissionsTest < ActiveSupport::TestCase
 
   # ─── Event validation (org-wide, no public submissions) ────────────────────
 
-  test 'event is valid for org-wide create when account has event_creator' do
+  test 'event is valid for org-wide create when account has event_manager' do
     org_owner = FactoryBot.create(:account)
     org = FactoryBot.create(:organisation, account: org_owner, allow_event_submissions: false)
-    creator = FactoryBot.create(:account)
-    creator.organisationships.create!(organisation: org, event_creator: true, unsubscribed: false)
-    event = FactoryBot.build(:event, organisation: org, account: creator, last_saved_by: creator, duplicate: false)
+    manager = FactoryBot.create(:account)
+    manager.organisationships.create!(organisation: org, event_manager: true, unsubscribed: false)
+    event = FactoryBot.build(:event, organisation: org, account: manager, last_saved_by: manager, duplicate: false)
     assert event.valid?, event.errors.full_messages.join(', ')
   end
 
-  test 'event_creator is event admin for organisation event' do
+  test 'event_manager is event admin for organisation event' do
     org_owner = FactoryBot.create(:account)
     org = FactoryBot.create(:organisation, account: org_owner)
-    creator = FactoryBot.create(:account)
-    creator.organisationships.create!(organisation: org, event_creator: true, unsubscribed: false)
+    manager = FactoryBot.create(:account)
+    manager.organisationships.create!(organisation: org, event_manager: true, unsubscribed: false)
     event = FactoryBot.create(:event, organisation: org, account: org_owner)
-    assert Event.admin?(event, creator)
+    assert Event.admin?(event, manager)
   end
 
-  test 'event_creator is event admin for cohosted event' do
+  test 'event_manager is event admin for cohosted event' do
     org_owner = FactoryBot.create(:account)
     org = FactoryBot.create(:organisation, account: org_owner)
     cohost_owner = FactoryBot.create(:account)
     cohost = FactoryBot.create(:organisation, account: cohost_owner)
-    creator = FactoryBot.create(:account)
-    creator.organisationships.create!(organisation: cohost, event_creator: true, unsubscribed: false)
+    manager = FactoryBot.create(:account)
+    manager.organisationships.create!(organisation: cohost, event_manager: true, unsubscribed: false)
     event = FactoryBot.create(:event, organisation: org, account: org_owner)
     event.cohostships.create!(organisation: cohost)
-    assert Event.admin?(event, creator)
+    assert Event.admin?(event, manager)
   end
 
-  test 'event_creator is email viewer when show_emails is false' do
+  test 'event_manager is email viewer when show_emails is false' do
     org_owner = FactoryBot.create(:account)
     org = FactoryBot.create(:organisation, account: org_owner)
-    creator = FactoryBot.create(:account)
-    creator.organisationships.create!(organisation: org, event_creator: true, unsubscribed: false)
+    manager = FactoryBot.create(:account)
+    manager.organisationships.create!(organisation: org, event_manager: true, unsubscribed: false)
     event = FactoryBot.create(:event, organisation: org, account: org_owner, show_emails: false)
-    assert Event.email_viewer?(event, creator)
+    assert Event.email_viewer?(event, manager)
   end
 
-  test 'cohost event_creator is email viewer when show_emails is false' do
+  test 'cohost event_manager is email viewer when show_emails is false' do
     org_owner = FactoryBot.create(:account)
     org = FactoryBot.create(:organisation, account: org_owner)
     cohost_owner = FactoryBot.create(:account)
     cohost = FactoryBot.create(:organisation, account: cohost_owner)
-    creator = FactoryBot.create(:account)
-    creator.organisationships.create!(organisation: cohost, event_creator: true, unsubscribed: false)
+    manager = FactoryBot.create(:account)
+    manager.organisationships.create!(organisation: cohost, event_manager: true, unsubscribed: false)
     event = FactoryBot.create(:event, organisation: org, account: org_owner, show_emails: false)
     event.cohostships.create!(organisation: cohost)
-    assert Event.email_viewer?(event, creator)
+    assert Event.email_viewer?(event, manager)
   end
 
   test 'event is invalid for org-wide create when account is only a follower' do
@@ -163,12 +163,12 @@ class EventCreatorPermissionsTest < ActiveSupport::TestCase
 
   # ─── GET /events/new permission ──────────────────────────────────────────────
 
-  test 'GET /events/new with organisation_id allows event_creator' do
+  test 'GET /events/new with organisation_id allows event_manager' do
     org_owner = FactoryBot.create(:account)
     org = FactoryBot.create(:organisation, account: org_owner, contribution_not_required: true)
-    creator = FactoryBot.create(:account)
-    creator.organisationships.create!(organisation: org, event_creator: true, unsubscribed: false)
-    login_as(creator)
+    manager = FactoryBot.create(:account)
+    manager.organisationships.create!(organisation: org, event_manager: true, unsubscribed: false)
+    login_as(manager)
     visit "/events/new?organisation_id=#{org.id}"
     assert page.has_content?('Event title*')
   end
@@ -186,26 +186,26 @@ class EventCreatorPermissionsTest < ActiveSupport::TestCase
 
   # ─── Event delete authorization ────────────────────────────────────────────
 
-  test 'org event creator can delete their own event' do
+  test 'org event manager can delete their own event' do
     org_owner = FactoryBot.create(:account)
     org = FactoryBot.create(:organisation, account: org_owner)
-    creator = FactoryBot.create(:account)
-    creator.organisationships.create!(organisation: org, event_creator: true, unsubscribed: false)
-    event = FactoryBot.create(:event, organisation: org, account: creator, last_saved_by: creator)
-    login_as(creator)
+    manager = FactoryBot.create(:account)
+    manager.organisationships.create!(organisation: org, event_manager: true, unsubscribed: false)
+    event = FactoryBot.create(:event, organisation: org, account: manager, last_saved_by: manager)
+    login_as(manager)
     visit "/events/#{event.id}/destroy"
     assert_equal "/o/#{org.slug}/events", current_path
     assert page.has_content?('The event was deleted')
     assert event.reload.deleted?
   end
 
-  test 'org event creator cannot delete another account event' do
+  test 'org event manager cannot delete another account event' do
     org_owner = FactoryBot.create(:account)
     org = FactoryBot.create(:organisation, account: org_owner)
-    creator = FactoryBot.create(:account)
-    creator.organisationships.create!(organisation: org, event_creator: true, unsubscribed: false)
+    manager = FactoryBot.create(:account)
+    manager.organisationships.create!(organisation: org, event_manager: true, unsubscribed: false)
     event = FactoryBot.create(:event, organisation: org, account: org_owner, last_saved_by: org_owner)
-    login_as(creator)
+    login_as(manager)
     visit "/events/#{event.id}/destroy"
     refute event.reload.deleted?
     assert_equal "/e/#{event.slug}", current_path
@@ -214,9 +214,9 @@ class EventCreatorPermissionsTest < ActiveSupport::TestCase
   test 'org admin can delete any organisation event' do
     org_owner = FactoryBot.create(:account)
     org = FactoryBot.create(:organisation, account: org_owner)
-    creator = FactoryBot.create(:account)
-    creator.organisationships.create!(organisation: org, event_creator: true, unsubscribed: false)
-    event = FactoryBot.create(:event, organisation: org, account: creator, last_saved_by: creator)
+    manager = FactoryBot.create(:account)
+    manager.organisationships.create!(organisation: org, event_manager: true, unsubscribed: false)
+    event = FactoryBot.create(:event, organisation: org, account: manager, last_saved_by: manager)
     login_as(org_owner)
     visit "/events/#{event.id}/destroy"
     assert_equal "/o/#{org.slug}/events", current_path

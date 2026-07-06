@@ -136,7 +136,7 @@ Dandelion::App.controller do
     organisation_admins_only!
     @organisationship = @organisation.organisationships.find_by(account_id: params[:organisationship][:account_id]) || @organisation.organisationships.create(account_id: params[:organisationship][:account_id])
     if @organisationship.persisted?
-      @organisationship.set(admin: true, event_creator: false)
+      @organisationship.set(admin: true, event_manager: false)
     end
     redirect back
   end
@@ -209,7 +209,7 @@ Dandelion::App.controller do
       excluded_ids = Account.and(organisation_ids_cache: @organisation.id, unsubscribed: true).pluck(:id)
       @organisationships = @organisationships.and(:account_id.nin => excluded_ids) if excluded_ids.any?
     end
-    @organisationships = @organisationships.and(event_creator: true) if params[:event_creator]
+    @organisationships = @organisationships.and(event_manager: true) if params[:event_manager]
     @organisationships = @organisationships.and(admin: true) if params[:admin]
     case content_type
     when :html
@@ -319,22 +319,22 @@ Dandelion::App.controller do
     200
   end
 
-  get '/o/:slug/event_creator/:organisationship_id' do
+  get '/o/:slug/event_manager/:organisationship_id' do
     @organisation = Organisation.find_by(slug: params[:slug]) || not_found
     organisation_admins_only!
     @organisationship = @organisation.organisationships.find(params[:organisationship_id]) || not_found
-    partial :'organisations/event_creator', locals: { organisationship: @organisationship }
+    partial :'organisations/event_manager', locals: { organisationship: @organisationship }
   end
 
-  post '/o/:slug/event_creator/:organisationship_id' do
+  post '/o/:slug/event_manager/:organisationship_id' do
     @organisation = Organisation.find_by(slug: params[:slug]) || not_found
     organisation_admins_only!
     @organisationship = @organisation.organisationships.find(params[:organisationship_id]) || not_found
     unless Organisation.admin?(@organisation, @organisationship.account)
-      if params[:event_creator]
-        @organisationship.set(event_creator: true, admin: false)
+      if params[:event_manager]
+        @organisationship.set(event_manager: true, admin: false)
       else
-        @organisationship.set(event_creator: false)
+        @organisationship.set(event_manager: false)
       end
     end
     200

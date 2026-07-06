@@ -36,7 +36,7 @@
     <% unless defined?(inline) %>
       <%== '</div>' %>
     <% end %>
-  <% elsif current_account && organisation.organisationships.find_by(account: current_account, event_creator: true) %>
+  <% elsif current_account && organisation.organisationships.find_by(account: current_account, event_manager: true) %>
     <% unless defined?(inline) %>
       <%== '<div class="mb-3">' %>
     <% end %>

@@ -38,7 +38,7 @@ module EventValidation
       end
 
       if new_record? && !duplicate
-        org_wide_ok = Organisation.admin_or_event_creator?(organisation, account)
+        org_wide_ok = Organisation.admin_or_event_manager?(organisation, account)
         errors.add(:organisation, "- you don't have permission to create events for this organisation") if !local_group && !activity && !organisation&.allow_event_submissions && !org_wide_ok
         if activity
           activity_ok = Activity.admin?(activity, account) || (organisation && activity.organisation_id == organisation.id && org_wide_ok)
@@ -92,7 +92,7 @@ module EventValidation
       end
       # rubocop:enable Style/CombinableLoops
 
-      can_change_org_event_flags = Organisation.admin_or_event_creator?(organisation, last_saved_by)
+      can_change_org_event_flags = Organisation.admin_or_event_manager?(organisation, last_saved_by)
       {
         featured: false,
         show_emails: false

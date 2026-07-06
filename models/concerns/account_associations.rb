@@ -184,7 +184,7 @@ module AccountAssociations
 
   def organisations_for_creating_events
     org_ids = organisations.pluck(:id)
-    org_ids += organisationships.and('$or' => [{ admin: true }, { event_creator: true }]).pluck(:organisation_id)
+    org_ids += organisationships.and('$or' => [{ admin: true }, { event_manager: true }]).pluck(:organisation_id)
     activity_ids = activityships.and(admin: true).pluck(:activity_id)
     org_ids += activity_ids.empty? ? [] : Activity.and(:id.in => activity_ids).pluck(:organisation_id)
     local_group_ids = local_groupships.and(admin: true).pluck(:local_group_id)

@@ -52,7 +52,7 @@
     timeZoneSuffix: "in #{Time.zone.now.strftime('%Z')} (UTC #{Time.zone.now.formatted_offset}) (your profile's time zone)",
     imageRequiredWidth: @event.organisation.try(:event_image_required_width),
     imageRequiredHeight: @event.organisation.try(:event_image_required_height),
-    isOrgAdmin: !!organisation_admins_or_event_creators?(@event.organisation),
+    isOrgAdmin: !!organisation_admins_or_event_managers?(@event.organisation),
     revenueSharingEnabled: !!@event.organisation.try(:stripe_client_id),
     eventId: @event.id
   }

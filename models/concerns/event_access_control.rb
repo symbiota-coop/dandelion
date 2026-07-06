@@ -9,8 +9,8 @@ module EventAccessControl
           account.admin? ||
           (event.activity && (activity_admin || (activity_admin.nil? && Activity.admin?(event.activity, account)))) ||
           (event.local_group && (local_group_admin || (local_group_admin.nil? && LocalGroup.admin?(event.local_group, account)))) ||
-          (event.organisation && Organisation.admin_or_event_creator?(event.organisation, account, organisation_admin: organisation_admin)) ||
-          event.cohosts.any? { |cohost| Organisation.admin_or_event_creator?(cohost, account) }
+          (event.organisation && Organisation.admin_or_event_manager?(event.organisation, account, organisation_admin: organisation_admin)) ||
+          event.cohosts.any? { |cohost| Organisation.admin_or_event_manager?(cohost, account) }
       )
     end
 
@@ -26,8 +26,8 @@ module EventAccessControl
           event.event_facilitations.find_by(account: account) ||
           (event.activity && (activity_admin || (activity_admin.nil? && Activity.admin?(event.activity, account)))) ||
           (event.local_group && (local_group_admin || (local_group_admin.nil? && LocalGroup.admin?(event.local_group, account)))) ||
-          (event.organisation && Organisation.admin_or_event_creator?(event.organisation, account, organisation_admin: organisation_admin)) ||
-          event.cohosts.any? { |cohost| Organisation.admin_or_event_creator?(cohost, account) }
+          (event.organisation && Organisation.admin_or_event_manager?(event.organisation, account, organisation_admin: organisation_admin)) ||
+          event.cohosts.any? { |cohost| Organisation.admin_or_event_manager?(cohost, account) }
       )
     end
 
@@ -38,8 +38,8 @@ module EventAccessControl
     def email_viewer?(event, account, event_admin: nil, organisation_admin: nil)
       account && event && (
         (event.show_emails && (event_admin || (event_admin.nil? && Event.admin?(event, account)))) ||
-          (event.organisation && Organisation.admin_or_event_creator?(event.organisation, account, organisation_admin: organisation_admin)) ||
-          event.cohosts.any? { |cohost| Organisation.admin_or_event_creator?(cohost, account) }
+          (event.organisation && Organisation.admin_or_event_manager?(event.organisation, account, organisation_admin: organisation_admin)) ||
+          event.cohosts.any? { |cohost| Organisation.admin_or_event_manager?(cohost, account) }
       )
     end
 

@@ -49,15 +49,15 @@ Dandelion::App.helpers do
     kick!(redirect_url: "/o/#{@organisation.slug}") unless organisation_admin?
   end
 
-  def organisation_admins_or_event_creators?(organisation = nil, account = current_account)
+  def organisation_admins_or_event_managers?(organisation = nil, account = current_account)
     organisation ||= @organisation
-    cached_permission(:@organisation_admins_or_event_creators_cache, organisation, account) do
-      Organisation.admin_or_event_creator?(organisation, account)
+    cached_permission(:@organisation_admins_or_event_managers_cache, organisation, account) do
+      Organisation.admin_or_event_manager?(organisation, account)
     end
   end
 
-  def organisation_admins_or_event_creators_only!
-    allowed = organisation_admins_or_event_creators?
+  def organisation_admins_or_event_managers_only!
+    allowed = organisation_admins_or_event_managers?
     kick!(redirect_url: "/o/#{@organisation.slug}") unless allowed
   end
 
@@ -131,8 +131,8 @@ Dandelion::App.helpers do
         true
       else
         event.account_id == account.id && (
-          organisation_admins_or_event_creators?(event.organisation, account) ||
-          event.cohosts.any? { |cohost| organisation_admins_or_event_creators?(cohost, account) }
+          organisation_admins_or_event_managers?(event.organisation, account) ||
+          event.cohosts.any? { |cohost| organisation_admins_or_event_managers?(cohost, account) }
         )
       end
     end

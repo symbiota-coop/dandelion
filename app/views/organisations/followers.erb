@@ -14,7 +14,7 @@
       <%= checkbox 'Connected to Stripe', form_group_class: 'col-12 col-sm-auto' %>
       <%= checkbox 'Subscribed to mailer', form_group_class: 'col-12 col-sm-auto' %>
       <%= checkbox 'Admin', form_group_class: 'col-12 col-sm-auto' %>
-      <%= checkbox 'Event creator', form_group_class: 'col-12 col-sm-auto' %>
+      <%= checkbox 'Event manager', form_group_class: 'col-12 col-sm-auto' %>
       <div class="form-group col-12 col-sm-auto">
         <%= submit_tag 'Search', class: 'btn btn-primary mb-0' %>
       </div>
@@ -58,7 +58,7 @@
         <th>Activities</th>
         <th>Local groups</th>
         <th>Subscribed</th>
-        <th>Event creator</th>
+        <th>Event manager</th>
         <th>Credit balance</th>
         <th>Following since</th>
         <th>Notes</th>
@@ -91,8 +91,8 @@
         </div>
       </td>
       <td>
-        <div data-pagelet-url="/o/<%= @organisation.slug %>/event_creator/<%= organisationship.id %>">
-          <%= partial :'organisations/event_creator', locals: { organisationship: organisationship } %>
+        <div data-pagelet-url="/o/<%= @organisation.slug %>/event_manager/<%= organisationship.id %>">
+          <%= partial :'organisations/event_manager', locals: { organisationship: organisationship } %>
         </div>
       </td>
       <td>
