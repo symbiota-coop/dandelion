@@ -13,22 +13,10 @@ Dandelion::App.controller do
         account_contribution.set(payment_completed: true)
         account_contribution.send_notification
       end
-    when 'customer.subscription.created'
-      subscription = event.data.object
-      Stripe.api_key = ENV['STRIPE_SK']
-      Stripe.api_version = ENV['STRIPE_API_VERSION']
-      customer = Stripe::Customer.retrieve(subscription.customer)
-      email = customer.email
-      if (account = Account.find_by(email: email.downcase))
-        account.set(stripe_subscription_id: subscription.id)
-        account.send_stripe_subscription_created_notification(subscription)
-      end
+    when 'customer.subscription.created', 'customer.subscription.updated'
+      StripeSubscriptionsSync.sync_subscription(event.data.object, notify: event['type'] == 'customer.subscription.created')
     when 'customer.subscription.deleted'
-      subscription = event.data.object
-      if (account = Account.find_by(stripe_subscription_id: subscription.id))
-        account.set(stripe_subscription_id: nil)
-        account.send_stripe_subscription_deleted_notification(subscription)
-      end
+      StripeSubscriptionsSync.clear_subscription(event.data.object, notify: true)
     end
 
     halt 200
