@@ -1,53 +1,103 @@
+<style>
+  .feedback-stars .bi-star-fill {
+    cursor: pointer;
+    font-size: 2.75rem;
+    color: #dee2e6;
+    transition: color 0.12s ease, transform 0.12s ease;
+    margin: 0 0.1rem;
+  }
+
+  .feedback-stars .bi-star-fill.text-warning {
+    color: #f5b041 !important;
+  }
+
+  .feedback-stars .bi-star-fill:hover {
+    transform: scale(1.08);
+  }
+
+  .feedback-rating-panel {
+    background: #f8f9fa;
+    border-radius: 0.5rem;
+  }
+
+  .feedback-question-label {
+    font-size: 1.05rem;
+    font-weight: 600;
+  }
+
+  .feedback-question-answer {
+    font-size: 1rem;
+  }
+</style>
+
 <div class="row justify-content-center">
   <div class="col-12 col-lg-8">
-    <h1>Feedback on <%= @event.summary %></h1>
-    <% if @preview %>
-      <div class="alert alert-warning">This is a preview of the feedback form. Submission is disabled.</div>
-    <% end %>
-    <% form_for @event_feedback, "/events/#{@event.id}/give_feedback" do |f| %>
-      <% if params[:email] %>
-        <%= hidden_field_tag :email, value: params[:email] %>
-      <% elsif params[:token] %>
-        <%= hidden_field_tag :token, value: params[:token] %>
-      <% end %>
-      <%= f.hidden_field :rating %>
-      <script>
-        $(function() {
-          $('.rate .bi-star-fill').hover(function() {
-            $(this).prevAll().addBack().css('color', '#f5b041');
-            $(this).nextAll().css('color', '#bbb');
-          }, function() {
-            var rating  = $('input[name="event_feedback[rating]"]').val();
-            if (rating) {
-              $('.rate .bi-star-fill').css('color', '#bbb');
-              $('.rate .bi-star-fill').slice(0, rating).css('color', '#f5b041');
-            } else {
-              $('.rate .bi-star-fill').css('color', '#bbb');
-            }
-          });
-          $('.rate .bi-star-fill').click(function() {
-            $('input[name="event_feedback[rating]"]').val($(this).index() + 1);
-          });
-          $($('input[name="event_feedback[rating]"]')[0].form).submit(function() {
-            if (!$('input[name="event_feedback[rating]"]').val()) {
-              alert('Please provide a star rating');
-              return false;
-            }
-          });
-        });
-      </script>
-      <div class="rate my-2">
-        <% 1.upto(5) do |i| %>
-          <i class="bi bi-star-fill" style="cursor: pointer; font-size: 50px; color: #bbb"></i>
+    <div class="card shadow-sm my-4">
+      <h3 class="card-header chill">Feedback on <%= @event.summary %></h3>
+      <div class="card-body p-4">
+        <% if @preview %>
+          <div class="alert alert-warning">This is a preview of the feedback form. Submission is disabled.</div>
+        <% end %>
+
+        <% form_for @event_feedback, "/events/#{@event.id}/give_feedback" do |f| %>
+          <% if params[:email] %>
+            <%= hidden_field_tag :email, value: params[:email] %>
+          <% elsif params[:token] %>
+            <%= hidden_field_tag :token, value: params[:token] %>
+          <% end %>
+          <%= f.hidden_field :rating %>
+
+          <div class="feedback-rating-panel text-center py-4 px-3 mb-4">
+            <label class="feedback-question-label d-block mb-1">Your star rating</label>
+            <p class="small text-muted mb-3 mb-sm-4">Your star rating contributes to the host's reputation on Dandelion.</p>
+            <div class="feedback-stars rate" role="radiogroup" aria-label="Star rating">
+              <% 1.upto(5) do |i| %>
+                <i class="bi bi-star-fill" data-rating="<%= i %>" aria-label="<%= i %> out of 5 stars"></i>
+              <% end %>
+            </div>
+          </div>
+
+          <%= partial :'events/feedback_questions' %>
+
+          <div class="border-top pt-4 mt-2">
+            <p class="text-muted small font-weight-bold text-uppercase mb-3" style="letter-spacing: 0.04em;">Privacy</p>
+            <%= checkbox 'Allow this feedback to be quoted publicly', slug: :publicly_visible, checked: true %>
+            <%= checkbox 'Anonymise this feedback', slug: :anonymous %>
+          </div>
+
+          <%= f.submit_block button_text: 'Submit feedback', disabled: @preview %>
         <% end %>
       </div>
-      <style>
-        .feedback-question-label, .feedback-question-answer { font-size: 1.1rem }
-      </style>
-      <%= partial :'events/feedback_questions' %>
-      <%= checkbox 'Allow this feedback to be quoted publicly', slug: :publicly_visible, checked: true %>
-      <%= checkbox 'Anonymise this feedback', slug: :anonymous %>
-      <%= f.submit_block button_text: 'Submit', disabled: @preview %>
-    <% end %>
+    </div>
   </div>
 </div>
+
+<script>
+  $(function() {
+    var $stars = $('.feedback-stars .bi-star-fill');
+    var $rating = $('input[name="event_feedback[rating]"]');
+
+    function paintStars(count) {
+      $stars.each(function(i) {
+        $(this).toggleClass('text-warning', i < count);
+      });
+    }
+
+    $stars.hover(
+      function() { paintStars($(this).data('rating')); },
+      function() { paintStars(parseInt($rating.val(), 10) || 0); }
+    );
+
+    $stars.click(function() {
+      $rating.val($(this).data('rating'));
+      paintStars($(this).data('rating'));
+    });
+
+    $($rating[0].form).submit(function() {
+      if (!$rating.val()) {
+        alert('Please provide a star rating');
+        return false;
+      }
+    });
+  });
+</script>
