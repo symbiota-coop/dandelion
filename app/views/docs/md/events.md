@@ -50,7 +50,7 @@ To let your attendees choose how much to pay for a ticket type:
 
 ## Allowing people to pay in instalments
 
-The best solution for this is to [enable Klarna on your Stripe account](https://docs.stripe.com/payments/klarna). Customers will then be able to pay for the purchase in three or four interest-free payments at checkout.
+The best solution for this is to enable an instalment payment method on your Stripe account, such as [Klarna](https://docs.stripe.com/payments/klarna) or [Clearpay/Afterpay](https://docs.stripe.com/payments/afterpay-clearpay). Customers will then be able to pay for the purchase in instalments at checkout.
 
 Alternatively, you can create a secret ticket type with a quantity equal to the number of instalments and send a link to the attendee. (Make sure you check that they actually end up purchasing all the tickets of this ticket type!)
 
