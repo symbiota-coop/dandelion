@@ -1,17 +1,31 @@
-<h2>Events</h2>
-<%= cp(:chart, locals: { countable: Event.all, months_ago: 24, make_projection: true }, key: "/stats/charts/events", expires: 3.hours.from_now) %>
+<div class="row">
+  <div class="col-lg-6 mb-4">
+    <h2>Events</h2>
+    <%= cp(:chart, locals: { countable: Event.all, months_ago: 24, make_projection: true }, key: "/stats/charts/events", expires: 3.hours.from_now) %>
+  </div>
 
-<h2>Active organisations</h2>
-<%= cp(:'stats/active_organisations_chart', key: "/stats/charts/organisations", expires: 3.hours.from_now) %>
+  <div class="col-lg-6 mb-4">
+    <h2>Active organisations</h2>
+    <%= cp(:'stats/active_organisations_chart', key: "/stats/charts/organisations", expires: 3.hours.from_now) %>
+  </div>
 
-<h2>Orders</h2>
-<%= cp(:chart, locals: { countable: Order.all, months_ago: 24, make_projection: true }, key: "/stats/charts/orders", expires: 3.hours.from_now) %>
+  <div class="col-lg-6 mb-4">
+    <h2>Orders</h2>
+    <%= cp(:chart, locals: { countable: Order.all, months_ago: 24, make_projection: true }, key: "/stats/charts/orders", expires: 3.hours.from_now) %>
+  </div>
 
-<h2>Tickets</h2>
-<%= cp(:chart, locals: { countable: Ticket.all, months_ago: 24, make_projection: true }, key: "/stats/charts/tickets", expires: 3.hours.from_now  ) %>
+  <div class="col-lg-6 mb-4">
+    <h2>Tickets</h2>
+    <%= cp(:chart, locals: { countable: Ticket.all, months_ago: 24, make_projection: true }, key: "/stats/charts/tickets", expires: 3.hours.from_now) %>
+  </div>
 
-<h2>Accounts</h2>
-<%= cp(:chart, locals: { countable: Account.all, months_ago: 24, make_projection: true }, key: "/stats/charts/accounts", expires: 3.hours.from_now) %>
+  <div class="col-lg-6 mb-4">
+    <h2>Accounts</h2>
+    <%= cp(:chart, locals: { countable: Account.all, months_ago: 24, make_projection: true }, key: "/stats/charts/accounts", expires: 3.hours.from_now) %>
+  </div>
 
-<h2>Dominance of leading organisation</h2>
-<%= cp(:'stats/dominance_chart', key: "/stats/charts/dominance", expires: 3.hours.from_now) %>
+  <div class="col-lg-6 mb-4">
+    <h2>Dominance of leading organisation</h2>
+    <%= cp(:'stats/dominance_chart', key: "/stats/charts/dominance", expires: 3.hours.from_now) %>
+  </div>
+</div>
