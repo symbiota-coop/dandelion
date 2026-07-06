@@ -53,7 +53,15 @@ Dandelion::App.controller do
                                                    amount: (@event_boost.total_amount * 100).round,
                                                    currency: @event_boost.currency,
                                                    quantity: 1
-                                                 }]
+                                                 }],
+                                                 payment_intent_data: {
+                                                   metadata: {
+                                                     de_contribution_type: 'event_boost',
+                                                     de_event_id: @event_boost.event_id.to_s,
+                                                     de_event_boost_id: @event_boost.id.to_s,
+                                                     de_account_id: @event_boost.account_id.to_s
+                                                   }
+                                                 }
                                                })
 
     @event_boost.update_attributes!(session_id: session.id, payment_intent: session.payment_intent)

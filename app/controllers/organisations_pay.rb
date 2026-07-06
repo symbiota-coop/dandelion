@@ -96,7 +96,13 @@ Dandelion::App.controller do
         }],
         customer_email: current_account.email,
         success_url: "#{ENV['BASE_URI']}/events/new?organisation_id=#{@organisation.id}",
-        cancel_url: "#{ENV['BASE_URI']}/events/new?organisation_id=#{@organisation.id}"
+        cancel_url: "#{ENV['BASE_URI']}/events/new?organisation_id=#{@organisation.id}",
+        payment_intent_data: {
+          metadata: {
+            de_contribution_type: 'organisation_contribution',
+            de_organisation_id: @organisation.id.to_s
+          }
+        }
       }
       session = Stripe::Checkout::Session.create(stripe_session_hash)
       @organisation.organisation_contributions.create! amount: params[:amount].to_f, currency: params[:currency], session_id: session.id, payment_intent: session.payment_intent

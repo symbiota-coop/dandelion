@@ -98,7 +98,11 @@ module OrganisationAccounting
                                           payment_method: payment_method_id,
                                           automatic_payment_methods: { enabled: true, allow_redirects: 'never' },
                                           off_session: true,
-                                          confirm: true
+                                          confirm: true,
+                                          metadata: {
+                                            de_contribution_type: 'organisation_auto_topup',
+                                            de_organisation_id: id.to_s
+                                          }
                                         })
       organisation_contribution = organisation_contributions.create amount: contribution_remaining.cents.to_f / 100, currency: contribution_remaining.currency, payment_intent: pi.id, payment_completed: true
       organisation_contribution.send_notification

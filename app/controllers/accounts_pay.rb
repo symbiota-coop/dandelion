@@ -41,7 +41,14 @@ Dandelion::App.controller do
         }],
         customer_email: @account.email,
         success_url: "#{ENV['BASE_URI']}/donate?thanks=true",
-        cancel_url: "#{ENV['BASE_URI']}/donate"
+        cancel_url: "#{ENV['BASE_URI']}/donate",
+        payment_intent_data: {
+          metadata: {
+            de_contribution_type: 'account_donation',
+            de_account_id: @account.id.to_s,
+            de_source: params[:source]
+          }.compact
+        }
       }
       session = Stripe::Checkout::Session.create(stripe_session_hash)
       @account.account_contributions.create! source: params[:source], amount: params[:amount].to_f, currency: params[:currency], session_id: session.id, payment_intent: session.payment_intent
