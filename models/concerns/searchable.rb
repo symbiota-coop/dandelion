@@ -40,9 +40,15 @@ module Searchable
         selector = scope.selector
 
         selector.each do |field, value|
-          # Skip top-level MongoDB operators like $or, $and, etc.
+          # Push simple boolean combinations into Atlas Search when every branch has
+          # equivalent Search semantics. Unsupported branches remain in $match.
           if field.to_s.start_with?('$')
-            remaining_selector[field] = value
+            search_filter = atlas_search_filter_for_selector({ field => value }) unless vector_weight&.positive?
+            if search_filter
+              search_filters << search_filter
+            else
+              remaining_selector[field] = value
+            end
           # Skip null checks - Atlas Search equals filter doesn't handle null properly
           # Move them to $match stage instead where MongoDB can properly distinguish
           # between missing fields and fields explicitly set to null
@@ -232,6 +238,66 @@ module Searchable
       return [query] unless query.match?(APOSTROPHE_VARIANTS)
 
       ([query] + APOSTROPHES.map { |ch| query.gsub(APOSTROPHE_VARIANTS, ch) }).uniq
+    end
+
+    def atlas_search_filter_for_selector(selector)
+      return nil unless selector.is_a?(Hash) && selector.any?
+
+      filters = selector.map do |field, value|
+        atlas_search_filter_for_selector_entry(field, value)
+      end
+      return nil if filters.any?(&:nil?)
+
+      filters.length == 1 ? filters.first : { compound: { filter: filters } }
+    end
+
+    def atlas_search_filter_for_selector_entry(field, value)
+      case field.to_s
+      when '$and'
+        atlas_search_compound_filter(value, :filter)
+      when '$or'
+        atlas_search_compound_filter(value, :should)
+      else
+        atlas_search_leaf_filter(field, value)
+      end
+    end
+
+    def atlas_search_compound_filter(branches, clause)
+      return nil unless branches.is_a?(Array) && branches.any?
+
+      filters = branches.map { |branch| atlas_search_filter_for_selector(branch) }
+      return nil if filters.any?(&:nil?)
+
+      compound = { clause => filters }
+      compound[:minimumShouldMatch] = 1 if clause == :should
+      { compound: compound }
+    end
+
+    def atlas_search_leaf_filter(field, value)
+      return nil if value.nil? || field.to_s.start_with?('$')
+
+      if value.is_a?(Hash)
+        atlas_search_range_filter(field, value)
+      else
+        { equals: { path: field.to_s, value: value } }
+      end
+    end
+
+    def atlas_search_range_filter(field, value)
+      return nil if value.empty?
+
+      range_values = {}
+      value.each do |operator, operand|
+        return nil unless %w[$gt $gte $lt $lte].include?(operator.to_s)
+
+        range_values[operator.to_s.delete_prefix('$').to_sym] = operand
+      end
+
+      lower_bound = range_values[:gt] || range_values[:gte]
+      upper_bound = range_values[:lt] || range_values[:lte]
+      return nil if lower_bound && upper_bound && lower_bound >= upper_bound
+
+      { range: { path: field.to_s }.merge(range_values) }
     end
   end
 end
