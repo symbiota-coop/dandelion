@@ -64,11 +64,11 @@ class SearchableFilterTranslationTest < ActiveSupport::TestCase
   private
 
   def search_filter_for(pipeline)
-    pipeline.first.fetch(:"$search").fetch(:compound).fetch(:filter)
+    pipeline.first.fetch(:$search).fetch(:compound).fetch(:filter)
   end
 
   def suffix_match_for(pipeline)
-    pipeline.find { |stage| stage.key?(:"$match") }.fetch(:"$match")
+    pipeline.find { |stage| stage.key?(:$match) }.fetch(:$match)
   end
 
   def equals_filters(node)
