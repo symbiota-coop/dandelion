@@ -100,10 +100,12 @@
 
       <% n = 1; events = [];
       if @event.organisation && !@event.evergreen?
+        future_events_scope = @event.organisation.events_including_cohosted.live.publicly_visible.future
         future_events = if @event.match_phrase
-          @event.organisation.events_including_cohosted.live.publicly_visible.future.and(:id.in => Event.search(@event.match_phrase), :start_time.ne => @event.start_time)
+          matching_event_ids = Event.search(@event.match_phrase, future_events_scope).pluck(:id)
+          future_events_scope.and(:id.in => matching_event_ids, :start_time.ne => @event.start_time)
         else
-          @event.organisation.events_including_cohosted.live.publicly_visible.future.and(:name => @event.name, :location => @event.location, :start_time.ne => @event.start_time)
+          future_events_scope.and(:name => @event.name, :location => @event.location, :start_time.ne => @event.start_time)
         end
         events = ([@event] + future_events).uniq
         n = events.count
