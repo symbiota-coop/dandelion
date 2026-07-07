@@ -1,13 +1,18 @@
 module StripeSubscriptionsSync
-  ACTIVE_STATUSES = %w[active trialing].freeze
+  KEEP_SUBSCRIPTION_STATUSES = %w[active trialing past_due unpaid].freeze
+  CLEAR_SUBSCRIPTION_STATUSES = %w[canceled incomplete_expired].freeze
 
   def self.setup_stripe
     Stripe.api_key = ENV['STRIPE_SK']
     Stripe.api_version = ENV['STRIPE_API_VERSION']
   end
 
-  def self.active?(subscription)
-    ACTIVE_STATUSES.include?(subscription.status)
+  def self.keep_subscription?(subscription)
+    KEEP_SUBSCRIPTION_STATUSES.include?(subscription.status)
+  end
+
+  def self.clear_subscription_status?(subscription)
+    CLEAR_SUBSCRIPTION_STATUSES.include?(subscription.status)
   end
 
   def self.sync_subscription(subscription, notify: false)
@@ -20,11 +25,11 @@ module StripeSubscriptionsSync
     account = Account.find_by(email: email.downcase)
     return unless account
 
-    if active?(subscription)
+    if keep_subscription?(subscription)
       was_subscriber = account.stripe_subscription_id.present?
       account.set(stripe_subscription_id: subscription.id)
       account.send_stripe_subscription_created_notification(subscription) if notify && !was_subscriber
-    elsif account.stripe_subscription_id == subscription.id
+    elsif clear_subscription_status?(subscription) && account.stripe_subscription_id == subscription.id
       account.set(stripe_subscription_id: nil)
       account.send_stripe_subscription_deleted_notification(subscription) if notify
     end
@@ -41,16 +46,18 @@ module StripeSubscriptionsSync
   def self.reconcile
     setup_stripe
 
-    active_subscription_ids = []
+    kept_subscription_ids = []
     email_to_subscription_id = {}
     email_to_subscription_created_at = {}
 
     Stripe::Subscription.list(
-      status: 'active',
+      status: 'all',
       limit: 100,
       expand: ['data.customer']
     ).auto_paging_each do |subscription|
-      active_subscription_ids << subscription.id
+      next unless keep_subscription?(subscription)
+
+      kept_subscription_ids << subscription.id
 
       customer = subscription.customer
       next unless customer.respond_to?(:email) && customer.email
@@ -64,7 +71,7 @@ module StripeSubscriptionsSync
     end
 
     Account.and(:stripe_subscription_id.ne => nil).each do |account|
-      next if active_subscription_ids.include?(account.stripe_subscription_id)
+      next if kept_subscription_ids.include?(account.stripe_subscription_id)
 
       account.set(stripe_subscription_id: nil)
     end
