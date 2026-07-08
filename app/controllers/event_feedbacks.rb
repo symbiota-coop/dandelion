@@ -76,7 +76,7 @@ Dandelion::App.controller do
     @event = @event_feedback.event
     admins_only!
     @event_feedback.destroy!
-    redirect back
+    redirect "/events/#{@event.id}/feedback"
   end
 
   get '/events/:id/give_feedback' do
