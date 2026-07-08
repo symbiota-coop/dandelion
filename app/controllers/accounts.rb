@@ -256,7 +256,9 @@ Dandelion::App.controller do
   end
 
   get '/accounts/:id/feedback_summary_email_preview' do
+    sign_in_required!
     account = Account.find(params[:id]) || not_found
+    kick! unless admin? || account == current_account
     EmailHelper.html(:feedback_summary, account: account)
   end
 
