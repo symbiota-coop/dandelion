@@ -71,6 +71,14 @@ Dandelion::App.controller do
     redirect back
   end
 
+  get '/event_feedbacks/:id/hard_destroy' do
+    @event_feedback = EventFeedback.unscoped.find(params[:id]) || not_found
+    @event = @event_feedback.event
+    admins_only!
+    @event_feedback.destroy!
+    redirect back
+  end
+
   get '/events/:id/give_feedback' do
     @event = Event.find(params[:id]) || not_found
     @preview = @event.valid_feedback_preview_token?(params[:token])

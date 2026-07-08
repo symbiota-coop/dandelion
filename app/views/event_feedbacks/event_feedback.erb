@@ -55,4 +55,14 @@
       <div data-pagelet-url="/event_feedbacks/<%= @event_feedback.id %>/response"></div>
     </td>
   </tr>
+  <% if admin? %>
+    <tr>
+      <th>
+        Delete
+      </th>
+      <td>
+        <a class="btn btn-danger" href="/event_feedbacks/<%= @event_feedback.id %>/hard_destroy" data-confirm="Are you sure you want to permanently delete this feedback? This cannot be undone.">Delete</a>
+      </td>
+    </tr>
+  <% end %>
 </table>
