@@ -144,10 +144,29 @@ $(function () {
     setTotal()
   })
 
+  function updateDonationPercentButtons () {
+    const p = priceWithoutDonation()
+
+    const threshold = config.minimumApplicationFee * 249
+    const isHighPrice = p > threshold
+
+    $('#donation-percent-buttons button').each(function () {
+      const $btn = $(this)
+      const percent = isHighPrice ? $btn.data('percent-high') : $btn.data('percent')
+
+      if (percent) {
+        $btn.text(percent + '%')
+        $btn.data('active-percent', percent)
+      }
+    })
+  }
+
   function setDonationAmount () {
     let p = priceWithoutDonation()
 
-    let dp = $('#donation-percent-buttons button.selected-percent').data('percent')
+    updateDonationPercentButtons()
+
+    let dp = $('#donation-percent-buttons button.selected-percent').data('active-percent')
 
     if (typeof dp !== 'undefined') {
       let donationAmount = parseFloat(p * (dp / 100))
