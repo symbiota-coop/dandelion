@@ -58,7 +58,7 @@ module Dandelion
       Sentry.set_tags(xhr: request.xhr? ? 'true' : 'false')
       if params[:sign_in_token]
         sign_in_via_token
-      elsif params[:api_key]
+      elsif params[:api_key] && request.path.match?(%r{\A/z(/|\.|\z)})
         sign_in_via_api_key
       end
       PageView.create(request: request) if !request.head? && File.extname(request.path).blank? && !request.xhr? && !request.is_crawler? && !request.path.start_with?('/z/')
