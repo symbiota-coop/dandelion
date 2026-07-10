@@ -12,13 +12,13 @@ $(function () {
   const $donationAmount = $('#donation_amount')
 
   function showPurchaseAlert (message) {
-    const $alert = $('#purchase-alert')
-    if ($alert.length) {
-      $alert.text(message).show()
-      $alert[0].scrollIntoView({ block: 'nearest' })
+    if (!config.embedded) {
+      window.alert(message)
       return
     }
-    window.alert(message)
+    const $alert = $('#purchase-alert')
+    $alert.text(message).show()
+    $alert[0].scrollIntoView({ block: 'nearest' })
   }
 
   function currentDonationAmountValue () {
@@ -319,7 +319,9 @@ $(function () {
   })
 
   $('#details form').submit(function () {
-    $('#purchase-alert').hide()
+    if (config.embedded) {
+      $('#purchase-alert').hide()
+    }
 
     if (!$('input[type=hidden][name=payment_method][value=rsvp]').prop('disabled')) {
       setTotal()
