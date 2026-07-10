@@ -2,6 +2,7 @@ Dandelion::App.controller do
   get '/pmails/:pmail_id' do
     pass if params[:pmail_id] == 'new'
     @pmail = Pmail.find(params[:pmail_id]) || not_found
+    headers['Content-Security-Policy'] = "default-src 'none'; img-src 'self' https: http: data:; style-src 'unsafe-inline'; script-src 'none'; object-src 'none'; base-uri 'none'"
     @pmail.html(viewing_on_web: true)
           .gsub('%recipient.firstname%', 'there')
           .gsub('%recipient.view_or_activate%', 'View your profile')

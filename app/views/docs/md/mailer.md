@@ -23,6 +23,6 @@ We offer a free gift of 1 email per month for up to 1000 subscribers.
 
 To create a button like this:
 
-<p class="action"><a href="javascript:;">Apply now</a></p>
+<p class="action"><a href="https://example.com">Apply now</a></p>
 
 Select the 'Paragraph (action)' type, then create a link.
