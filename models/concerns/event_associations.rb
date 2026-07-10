@@ -40,20 +40,10 @@ module EventAssociations
     has_many :notifications, as: :notifiable, dependent: :destroy
 
     has_many :ticket_types, dependent: :destroy
-    accepts_nested_attributes_for :ticket_types, allow_destroy: true, reject_if: lambda { |attributes|
-      return true if %w[name description price quantity].all? { |f| attributes[f].nil? }
-      return true if attributes[:id].present? && attributes[:_destroy].blank? && !TicketType.exists?(attributes[:id])
-
-      false
-    }
+    accepts_nested_attributes_for :ticket_types, allow_destroy: true, reject_if: :reject_ticket_type_nested_attributes?
 
     has_many :ticket_groups, dependent: :destroy
-    accepts_nested_attributes_for :ticket_groups, allow_destroy: true, reject_if: lambda { |attributes|
-      return true if %w[name capacity].all? { |f| attributes[f].nil? }
-      return true if attributes[:id].present? && attributes[:_destroy].blank? && !TicketGroup.exists?(attributes[:id])
-
-      false
-    }
+    accepts_nested_attributes_for :ticket_groups, allow_destroy: true, reject_if: :reject_ticket_group_nested_attributes?
 
     has_many :tickets, dependent: :destroy
     has_many :donations, dependent: :nullify
@@ -142,5 +132,19 @@ module EventAssociations
     a = [account, revenue_sharer, coordinator].compact
     a += event_facilitators
     a.uniq
+  end
+
+  def reject_ticket_type_nested_attributes?(attributes)
+    return true if %w[name description price quantity].all? { |f| attributes[f].nil? }
+    return true if attributes[:id].present? && !ticket_types.where(_id: attributes[:id]).exists?
+
+    false
+  end
+
+  def reject_ticket_group_nested_attributes?(attributes)
+    return true if %w[name capacity].all? { |f| attributes[f].nil? }
+    return true if attributes[:id].present? && !ticket_groups.where(_id: attributes[:id]).exists?
+
+    false
   end
 end
