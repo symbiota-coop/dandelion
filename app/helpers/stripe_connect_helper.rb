@@ -3,7 +3,7 @@ Dandelion::App.helpers do
     state = SecureRandom.hex(32)
     session[:stripe_connect_state] = state
     session[:stripe_connect_organisation_id] = organisation.id.to_s
-    "https://connect.stripe.com/oauth/authorize?response_type=code&client_id=#{CGI.escape(client_id)}&scope=read_write&state=#{state}"
+    "https://connect.stripe.com/oauth/authorize?response_type=code&client_id=#{CGI.escape(client_id.to_s)}&scope=read_write&state=#{state}"
   end
 
   def valid_stripe_connect_oauth_state?(organisation)
