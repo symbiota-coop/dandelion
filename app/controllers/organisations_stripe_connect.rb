@@ -1,7 +1,11 @@
 Dandelion::App.controller do
   get '/organisations/stripe_connect' do
-    @organisation = Organisation.find(params[:state]) || not_found
+    @organisation = Organisation.find(session[:stripe_connect_organisation_id]) || not_found
     organisation_admins_only!
+    unless valid_stripe_connect_oauth_state?(@organisation)
+      flash[:error] = 'Stripe connection failed security check. Please try again.'
+      redirect "/o/#{@organisation.slug}/edit?tab=payments"
+    end
     if params[:error]
       flash[:error] = params[:error_description] || 'Stripe connection was cancelled'
       redirect "/o/#{@organisation.slug}/edit?tab=payments"
@@ -39,6 +43,10 @@ Dandelion::App.controller do
   get '/o/:slug/stripe_connect' do
     sign_in_required!
     @organisation = Organisation.find_by(slug: params[:slug]) || not_found
+    unless valid_stripe_connect_oauth_state?(@organisation)
+      flash[:error] = 'Stripe connection failed security check. Please try again.'
+      redirect "/o/#{@organisation.slug}"
+    end
     @organisationship = current_account.organisationships.find_by(organisation: @organisation) || current_account.organisationships.create(organisation: @organisation)
     if params[:error]
       flash[:error] = params[:error_description] || 'Stripe connection was cancelled'

@@ -7,5 +7,5 @@
 </p>
 
 <p>
-  <a class="btn btn-outline-primary mb-1" href="https://connect.stripe.com/oauth/authorize?response_type=code&client_id=<%= ENV['STRIPE_CLIENT_ID'] %>&scope=read_write&state=<%= @organisation.id %>">Connect Stripe</a>
+  <a class="btn btn-outline-primary mb-1" href="<%= stripe_connect_oauth_url(organisation: @organisation, client_id: ENV['STRIPE_CLIENT_ID']) %>">Connect Stripe</a>
 </p>

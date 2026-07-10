@@ -23,6 +23,6 @@
       </div>
     </div>
   <% elsif current_account %>
-    <a class="btn btn-outline-primary mb-1" href="https://connect.stripe.com/oauth/authorize?response_type=code&client_id=<%= @organisation.stripe_client_id %>&scope=read_write">Connect Stripe</a>
+    <a class="btn btn-outline-primary mb-1" href="<%= stripe_connect_oauth_url(organisation: @organisation, client_id: @organisation.stripe_client_id) %>">Connect Stripe</a>
   <% end %>
 <% end %>
