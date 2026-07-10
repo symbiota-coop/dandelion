@@ -176,7 +176,7 @@ module OrganisationFields
         stripe_client_id: 'Used for automated revenue sharing. <code>Settings</code> > <code>Connect</code> > <code>Live mode client ID</code>. Starts <code>ca_</code>',
         mailgun_api_key: '<code>Settings</code> > <code>API keys</code>',
         mailgun_domain: '<code>Sending</code> > <code>Domains</code> > <code>Add new domain</code>',
-        calendar_import_urls: 'One iCal URL per line. Dandelion will import upcoming events when you save and keep them in sync automatically.',
+        calendar_import_urls: 'One iCal URL per line from Luma, Google Calendar, Outlook, or iCloud. Dandelion imports upcoming events when you save and keeps them in sync.',
         affiliate_credit_percentage: 'When set, attendees receive a personal affiliate link in the order confirmation email. For each order made via the link, the source receives credit towards future events equal to this % of the order value.',
         add_a_donation_to: "Text to display beside the 'Add a donation' field",
         donation_text: "Text to display below the 'Add a donation' field",

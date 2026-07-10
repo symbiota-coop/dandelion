@@ -16,7 +16,7 @@ In your organisation settings, enable **Allow anyone to submit events for review
 
 ## iCal sync
 
-Paste one or more iCal URLs on the **iCal sync** page (organisation dropdown → iCal sync), one per line. Dandelion will import upcoming events for that organisation when you save, and then keep them in sync automatically.
+Paste one or more iCal URLs on the **iCal sync** page (organisation dropdown → iCal sync), one per line. Supported hosts: Luma (`api2.luma.com`), Google Calendar, Outlook, and iCloud. Dandelion will import upcoming events for that organisation when you save, and then keep them in sync automatically.
 
 Imported events use the feed's event URL as their RSVP/ticket button, so people can still register on the original platform while discovering the event on Dandelion.
 

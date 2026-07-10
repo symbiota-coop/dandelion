@@ -32,11 +32,9 @@ module OrganisationValidation
       errors.add(:tax_rate_id, 'must start with txr_') if tax_rate_id && !tax_rate_id.starts_with?('txr_')
 
       calendar_import_urls_a.each do |calendar_import_url|
-        uri = URI.parse(calendar_import_url)
-        valid_scheme = %w[http https webcal].include?(uri.scheme&.downcase)
-        errors.add(:calendar_import_urls, "#{calendar_import_url} is not a valid iCal URL") unless valid_scheme && uri.host.present?
-      rescue URI::InvalidURIError
-        errors.add(:calendar_import_urls, "#{calendar_import_url} is not a valid URL")
+        CalendarImportSync.normalize_feed_url(calendar_import_url)
+      rescue CalendarImportSync::ConfigurationError => e
+        errors.add(:calendar_import_urls, "#{calendar_import_url}: #{e.message}")
       end
 
       if theme_color.present?

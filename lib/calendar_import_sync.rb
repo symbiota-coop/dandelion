@@ -6,6 +6,14 @@ class CalendarImportSync
   class ConfigurationError < StandardError; end
 
   LUMA_PAGE_HOSTS = %w[luma.com lu.ma].freeze
+  ALLOWED_FEED_HOSTS = %w[
+    api2.luma.com
+    calendar.google.com
+    www.google.com
+    outlook.office365.com
+    outlook.live.com
+    calendars.icloud.com
+  ].freeze
   # Luma's og:image uses this segment; we bump dimensions for a sharper stored cover.
   LUMA_OG_CDN_DIMENSIONS_DEFAULT = 'width=800,height=420'.freeze
   LUMA_OG_CDN_DIMENSIONS_IMPORT = 'width=1200,height=630'.freeze
@@ -21,13 +29,17 @@ class CalendarImportSync
 
     case uri.scheme&.downcase
     when 'http', 'https'
-      uri.to_s
+      # keep scheme
     when 'webcal'
       uri.scheme = 'https'
-      uri.to_s
     else
       raise ConfigurationError, 'iCal URL must start with http, https or webcal'
     end
+
+    host = uri.host.to_s.downcase
+    raise ConfigurationError, "iCal host is not allowed (supported: #{ALLOWED_FEED_HOSTS.join(', ')})" unless ALLOWED_FEED_HOSTS.include?(host)
+
+    uri.to_s
   rescue URI::InvalidURIError
     raise ConfigurationError, 'iCal URL must be a valid URL'
   end
@@ -200,7 +212,9 @@ class CalendarImportSync
     if event.image.blank? && source_url && luma_event_page_url?(source_url)
       begin
         response = (@luma_og_html_faraday ||= Faraday.new do |f|
-          f.response :follow_redirects, limit: 5
+          f.response :follow_redirects, limit: 5, callback: lambda { |_response_env, new_request_env|
+            raise ConfigurationError, 'Unexpected redirect host' unless luma_event_page_url?(new_request_env[:url].to_s)
+          }
           f.adapter Faraday.default_adapter
         end).get(source_url) do |req|
           req.headers['Accept'] = 'text/html,application/xhtml+xml'
@@ -216,9 +230,9 @@ class CalendarImportSync
           rescue URI::InvalidURIError
             false
           end
-          og_url = luma_composite || candidates.first
-          if og_url.present?
-            og_url = og_url.gsub(LUMA_OG_CDN_DIMENSIONS_DEFAULT, LUMA_OG_CDN_DIMENSIONS_IMPORT) if luma_composite && og_url.include?(LUMA_OG_CDN_DIMENSIONS_DEFAULT)
+          # Only fetch Luma's own CDN — avoids SSRF via arbitrary og:image URLs.
+          if luma_composite.present?
+            og_url = luma_composite.gsub(LUMA_OG_CDN_DIMENSIONS_DEFAULT, LUMA_OG_CDN_DIMENSIONS_IMPORT)
             event.image_url = og_url
           end
         end

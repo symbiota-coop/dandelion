@@ -3,9 +3,9 @@ require File.expand_path("#{File.dirname(__FILE__)}/test_config.rb")
 class CalendarImportsTest < ActiveSupport::TestCase
   include Capybara::DSL
 
-  ICS_URL_1 = 'https://calendar-one.example.com/events.ics'.freeze
-  ICS_URL_2 = 'https://calendar-two.example.com/events.ics'.freeze
-  WEBCAL_URL_2 = 'webcal://calendar-two.example.com/events.ics'.freeze
+  ICS_URL_1 = 'https://calendar.google.com/calendar/ical/one/basic.ics'.freeze
+  ICS_URL_2 = 'https://calendar.google.com/calendar/ical/two/basic.ics'.freeze
+  WEBCAL_URL_2 = 'webcal://calendar.google.com/calendar/ical/two/basic.ics'.freeze
 
   TEST_ICAL_1 = <<~ICAL.freeze
     BEGIN:VCALENDAR
@@ -40,7 +40,8 @@ class CalendarImportsTest < ActiveSupport::TestCase
   ICAL
 
   LUMA_ICS_URL = 'https://api2.luma.com/ics/get?entity=calendar&id=cal-test'.freeze
-  LUMA_OG_IMAGE_URL = 'https://placehold.co/1200x630.jpg'.freeze
+  LUMA_OG_IMAGE_URL = 'https://og.luma.com/test.jpg?width=1200,height=630'.freeze
+  LUMA_OG_IMAGE_URL_DEFAULT = 'https://og.luma.com/test.jpg?width=800,height=420'.freeze
   LUMA_OG_IMAGE_FIXTURE_PATH = File.expand_path('../app/assets/images/test-event.jpg', __dir__).freeze
 
   LUMA_ICAL_LOCATION_ONLY = <<~ICAL.freeze
@@ -300,7 +301,7 @@ class CalendarImportsTest < ActiveSupport::TestCase
     resolved_page_url = 'https://lu.ma/evt-test'
     fetched_urls = []
     # Wide image for validation; production Luma pages 307 to a short URL then serve og tags
-    html = "<!DOCTYPE html><html><head><meta property=\"og:image\" content=\"#{LUMA_OG_IMAGE_URL}\"></head><body></body></html>"
+    html = "<!DOCTYPE html><html><head><meta property=\"og:image\" content=\"#{LUMA_OG_IMAGE_URL_DEFAULT}\"></head><body></body></html>"
 
     stub_dragonfly_fetch_url(
       { LUMA_OG_IMAGE_URL => LUMA_OG_IMAGE_FIXTURE_PATH },
@@ -333,7 +334,7 @@ class CalendarImportsTest < ActiveSupport::TestCase
     luma_event_url = 'https://luma.com/event/evt-test'
     resolved_page_url = 'https://lu.ma/evt-test'
     fetched_urls = []
-    html = "<!DOCTYPE html><html><head><meta property=\"og:image\" content=\"#{LUMA_OG_IMAGE_URL}\"></head><body></body></html>"
+    html = "<!DOCTYPE html><html><head><meta property=\"og:image\" content=\"#{LUMA_OG_IMAGE_URL_DEFAULT}\"></head><body></body></html>"
 
     stub_dragonfly_fetch_url(
       { LUMA_OG_IMAGE_URL => LUMA_OG_IMAGE_FIXTURE_PATH },
@@ -385,7 +386,7 @@ class CalendarImportsTest < ActiveSupport::TestCase
     organisation = FactoryBot.create(:organisation, account: account, calendar_import_urls: LUMA_ICS_URL)
     luma_event_url = 'https://luma.com/event/evt-inperson'
     fetched_urls = []
-    html = "<!DOCTYPE html><html><head><meta property=\"og:image\" content=\"#{LUMA_OG_IMAGE_URL}\"></head><body></body></html>"
+    html = "<!DOCTYPE html><html><head><meta property=\"og:image\" content=\"#{LUMA_OG_IMAGE_URL_DEFAULT}\"></head><body></body></html>"
     ical = <<~ICAL
       BEGIN:VCALENDAR
       VERSION:2.0
@@ -421,5 +422,13 @@ class CalendarImportsTest < ActiveSupport::TestCase
     assert_equal luma_event_url, event.purchase_url
     assert_equal 'CIC Berlin, Germany', event.location
     assert_equal [LUMA_OG_IMAGE_URL], fetched_urls
+  end
+
+  test 'rejects iCal URLs on hosts outside the allowlist' do
+    account = FactoryBot.create(:account)
+    organisation = FactoryBot.build(:organisation, account: account, calendar_import_urls: 'https://evil.example.com/feed.ics')
+
+    refute organisation.valid?
+    assert organisation.errors[:calendar_import_urls].any? { |message| message.include?('not allowed') }
   end
 end
