@@ -21,6 +21,23 @@ class Post
     # Account Organisation LocalGroup Activity Gathering
   end
 
+  # Mirrors parent-page authorization for private discussions.
+  def self.viewer?(commentable, account, event_participant: nil, activity_admin: nil)
+    return false unless commentable && account
+
+    case commentable
+    when Team, Tactivity, Mapplication
+      gathering = commentable.gathering
+      (membership = gathering.memberships.find_by(account: account)) && membership.confirmed?
+    when Event
+      !commentable.hide_discussion && (event_participant || (event_participant.nil? && Event.participant?(commentable, account)))
+    when ActivityApplication
+      activity_admin || (activity_admin.nil? && Activity.admin?(commentable.activity, account))
+    else
+      false
+    end
+  end
+
   def url
     case commentable
     when Team

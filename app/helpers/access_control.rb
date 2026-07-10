@@ -263,6 +263,22 @@ Dandelion::App.helpers do
     kick! unless comment_admin?
   end
 
+  def commentable_viewer?(commentable = nil, account = current_account)
+    commentable ||= @commentable
+    cached_permission(:@commentable_viewer_cache, commentable, account) do
+      Post.viewer?(
+        commentable,
+        account,
+        event_participant: (event_participant?(commentable, account) if commentable.is_a?(Event)),
+        activity_admin: (activity_admin?(commentable.activity, account) if commentable.is_a?(ActivityApplication))
+      )
+    end
+  end
+
+  def commentable_viewers_only!
+    kick! unless commentable_viewer?
+  end
+
   def can_add_photo_to?(photoable, account = current_account)
     return false unless account && photoable
 
