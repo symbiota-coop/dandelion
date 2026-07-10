@@ -2,6 +2,7 @@ class Comment
   include Mongoid::Document
   include Mongoid::Timestamps
   include CoreExtensions
+  include RejectsActiveContent
 
   extend Dragonfly::Model
 
@@ -187,3 +188,4 @@ class Comment
     }[attr.to_sym] || super
   end
 end
+

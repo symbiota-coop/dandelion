@@ -2,6 +2,7 @@ class Attachment
   include Mongoid::Document
   include Mongoid::Timestamps
   include CoreExtensions
+  include RejectsActiveContent
 
   extend Dragonfly::Model
 
@@ -14,3 +15,4 @@ class Attachment
   validates_presence_of :file
   dragonfly_accessor :file
 end
+

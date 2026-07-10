@@ -2,6 +2,7 @@ class Upload
   include Mongoid::Document
   include Mongoid::Timestamps
   include CoreExtensions
+  include RejectsActiveContent
 
   extend Dragonfly::Model
 
@@ -27,3 +28,4 @@ class Upload
     file_name
   end
 end
+

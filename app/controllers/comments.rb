@@ -66,8 +66,12 @@ Dandelion::App.controller do
     halt 403 unless @comment.account.id == current_account.id
     commentable_viewers_only!
     @comment.file = params[:file]
-    @comment.save!
-    redirect back
+    if @comment.save
+      redirect back
+    else
+      flash[:error] = @comment.errors.full_messages.to_sentence
+      redirect back
+    end
   end
 
   get '/comments/:id/file/destroy' do

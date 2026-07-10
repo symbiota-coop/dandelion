@@ -218,7 +218,10 @@ module Dandelion
 
     post '/upload' do
       sign_in_required!
-      upload = current_account.uploads.create(file: params[:upload])
+      upload = current_account.uploads.new(file: params[:upload])
+      halt 422, { error: { message: 'Only images can be uploaded' } }.to_json unless upload.file&.image?
+      upload.save
+      halt 422, { error: { message: 'Upload failed' } }.to_json unless upload.persisted?
       { default: upload.file.url }.to_json
     end
 
