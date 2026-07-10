@@ -40,20 +40,10 @@ module EventAssociations
     has_many :notifications, as: :notifiable, dependent: :destroy
 
     has_many :ticket_types, dependent: :destroy
-    accepts_nested_attributes_for :ticket_types, allow_destroy: true, reject_if: lambda { |attributes|
-      return true if %w[name description price quantity].all? { |f| attributes[f].nil? }
-      return true if attributes[:id].present? && attributes[:_destroy].blank? && !TicketType.exists?(attributes[:id])
-
-      false
-    }
+    accepts_nested_attributes_for :ticket_types, allow_destroy: true, reject_if: :reject_ticket_type_nested_attributes?
 
     has_many :ticket_groups, dependent: :destroy
-    accepts_nested_attributes_for :ticket_groups, allow_destroy: true, reject_if: lambda { |attributes|
-      return true if %w[name capacity].all? { |f| attributes[f].nil? }
-      return true if attributes[:id].present? && attributes[:_destroy].blank? && !TicketGroup.exists?(attributes[:id])
-
-      false
-    }
+    accepts_nested_attributes_for :ticket_groups, allow_destroy: true, reject_if: :reject_ticket_group_nested_attributes?
 
     has_many :tickets, dependent: :destroy
     has_many :donations, dependent: :nullify
@@ -77,6 +67,22 @@ module EventAssociations
       has_many_through :public_attendees, through: :tickets, conditions: { payment_completed: true, show_attendance: true }
       has_many_through :private_attendees, through: :tickets, conditions: { payment_completed: true, show_attendance: false }
     end
+  end
+
+  def reject_ticket_type_nested_attributes?(attributes)
+    return true if attributes[:id].blank? && %w[name description price quantity].all? { |f| attributes[f].nil? }
+    return false if attributes[:id].blank?
+    return false if ticket_types.and(id: attributes[:id]).exists?
+
+    true
+  end
+
+  def reject_ticket_group_nested_attributes?(attributes)
+    return true if attributes[:id].blank? && %w[name capacity].all? { |f| attributes[f].nil? }
+    return false if attributes[:id].blank?
+    return false if ticket_groups.and(id: attributes[:id]).exists?
+
+    true
   end
 
   def organisationship_for_discount(account)

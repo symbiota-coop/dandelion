@@ -113,11 +113,7 @@ module AccountAssociations
     has_many :discount_codes, dependent: :nullify
 
     has_many :provider_links, dependent: :destroy
-    accepts_nested_attributes_for :provider_links, reject_if: lambda { |attributes|
-      return true if attributes[:id].present? && attributes[:_destroy].blank? && !ProviderLink.exists?(attributes[:id])
-
-      false
-    }
+    accepts_nested_attributes_for :provider_links, reject_if: :reject_provider_link_nested_attributes?
 
     has_many_through :activities_following, class_name: 'Activity', through: :activityships
     has_many_through :local_groups_following, class_name: 'LocalGroup', through: :local_groupships
@@ -133,6 +129,12 @@ module AccountAssociations
       has_many_through :organisations_following
       has_many_through :organisations_monthly_donor, conditions: { :monthly_donation_method.ne => nil }
     end
+  end
+
+  def reject_provider_link_nested_attributes?(attributes)
+    return false if attributes[:id].blank?
+
+    !provider_links.and(id: attributes[:id]).exists?
   end
 
   def event_feedbacks_as_facilitator
