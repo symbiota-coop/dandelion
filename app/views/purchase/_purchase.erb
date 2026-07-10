@@ -185,6 +185,8 @@ end
 
       <%= partial :'purchase/gocardless_details', locals: { f: f } %>
 
+      <div id="purchase-alert" class="alert alert-danger mb-3" style="display: none" role="alert"></div>
+
       <% EventPaymentMethod.all.each do |pm| %>
         <%== payment_button(method: pm.name, label: pm.button_label(@event), outline: pm.outline, visible: pm.visible, condition: pm.available?(@event)) %>
       <% end %>
@@ -229,6 +231,7 @@ end
     networkId: @event.chain.try(:network_id),
     networkName: @event.chain.try(:name),
     signedIn: !!current_account,
+    embedded: !!params[:ticket_form_only],
     recaptchaEnabled: !!ENV['RECAPTCHA_SITE_KEY'],
     timeAgo: (@event.past? && !@event.recording? && !@event.show_after_start_time? ? time_ago_in_words(@event.start_time) : nil)
   }

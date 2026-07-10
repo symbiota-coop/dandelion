@@ -11,6 +11,16 @@ $(function () {
   })()
   const $donationAmount = $('#donation_amount')
 
+  function showPurchaseAlert (message) {
+    const $alert = $('#purchase-alert')
+    if ($alert.length) {
+      $alert.text(message).show()
+      $alert[0].scrollIntoView({ block: 'nearest' })
+      return
+    }
+    window.alert(message)
+  }
+
   function currentDonationAmountValue () {
     return (($donationAmount.val() || '').trim())
   }
@@ -309,6 +319,8 @@ $(function () {
   })
 
   $('#details form').submit(function () {
+    $('#purchase-alert').hide()
+
     if (!$('input[type=hidden][name=payment_method][value=rsvp]').prop('disabled')) {
       setTotal()
     }
@@ -316,7 +328,7 @@ $(function () {
     let halt
     $('input[type=checkbox][data-required]').each(function () {
       if (!$(this).is(':checked')) {
-        alert($(this).next().text().trim() + ' must be checked')
+        showPurchaseAlert($(this).next().text().trim() + ' must be checked')
         halt = true
       }
     })
@@ -330,7 +342,7 @@ $(function () {
       const questionLabel = checkboxGroup.find('label').first().text().trim()
 
       if (!checkboxes.is(':checked')) {
-        alert('Please select at least one option for: ' + questionLabel)
+        showPurchaseAlert('Please select at least one option for: ' + questionLabel)
         checkboxGroup.addClass('has-error')
         checkboxes.first().focus()
         halt = true
@@ -363,7 +375,7 @@ $(function () {
       }
     })
     if (gcFieldsFilled > 0 && gcFieldsEmpty.length > 0) {
-      alert('Please fill in all GoCardless fields')
+      showPurchaseAlert('Please fill in all GoCardless fields')
       $('#' + gcFieldsEmpty[0]).focus()
       return false
     }
@@ -373,27 +385,27 @@ $(function () {
       numberOfTickets += parseInt($(this).val())
     })
     if (numberOfTickets == 0) {
-      alert('Please select at least one ticket')
+      showPurchaseAlert('Please select at least one ticket')
       return false
     }
 
     if (config.placesRemaining) {
       if (numberOfTickets > config.placesRemaining) {
-        alert('Please select a maximum of ' + config.placesRemaining + (config.placesRemaining == 1 ? ' ticket' : ' tickets'))
+        showPurchaseAlert('Please select a maximum of ' + config.placesRemaining + (config.placesRemaining == 1 ? ' ticket' : ' tickets'))
         return false
       }
     }
 
     if ($('#accepted-terms').length > 0 && !$('#accepted-terms').is(':checked')) {
-      alert('You must agree to the terms and conditions to proceed')
+      showPurchaseAlert('You must agree to the terms and conditions to proceed')
       return false
     }
 
-    if (config.timeAgo) {
+    if (config.timeAgo && !config.embedded) {
       if (!confirm('This event started ' + config.timeAgo + ' ago. Press OK to continue, or Cancel to go back.')) { return false }
     }
 
-    if (!config.signedIn) {
+    if (!config.signedIn && !config.embedded) {
       if (!confirm('You entered your email address as ' + $('#account_email').val() + '. Press OK to continue, or Cancel to go back.')) { return false }
     }
 
@@ -404,7 +416,7 @@ $(function () {
       if (phoneValue && phoneValue.trim() !== '') {
         const trimmedPhone = phoneValue.trim()
         if (!trimmedPhone.startsWith('+')) {
-          alert('Please include the + country code in your phone number (e.g. +1234567890)')
+          showPurchaseAlert('Please include the + country code in your phone number (e.g. +1234567890)')
           phoneField.focus()
           return false
         }
