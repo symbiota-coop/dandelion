@@ -431,4 +431,13 @@ class CalendarImportsTest < ActiveSupport::TestCase
     refute organisation.valid?
     assert organisation.errors[:calendar_import_urls].any? { |message| message.include?('not allowed') }
   end
+
+  test 'allows api.luma.com and api2.luma.com iCal hosts' do
+    account = FactoryBot.create(:account)
+
+    %w[api.luma.com api2.luma.com].each do |host|
+      organisation = FactoryBot.build(:organisation, account: account, calendar_import_urls: "https://#{host}/ics/get?entity=calendar&id=cal-test")
+      assert organisation.valid?, "expected #{host} to be allowed"
+    end
+  end
 end

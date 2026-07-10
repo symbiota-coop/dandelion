@@ -6,13 +6,14 @@ class CalendarImportSync
   class ConfigurationError < StandardError; end
 
   LUMA_PAGE_HOSTS = %w[luma.com lu.ma].freeze
-  ALLOWED_FEED_HOSTS = %w[
-    api2.luma.com
-    calendar.google.com
-    www.google.com
-    outlook.office365.com
-    outlook.live.com
-    calendars.icloud.com
+  LUMA_FEED_HOSTS = %w[api.luma.com api2.luma.com].freeze
+  ALLOWED_FEED_HOSTS = [
+    *LUMA_FEED_HOSTS,
+    'calendar.google.com',
+    'www.google.com',
+    'outlook.office365.com',
+    'outlook.live.com',
+    'calendars.icloud.com'
   ].freeze
   # Luma's og:image uses this segment; we bump dimensions for a sharper stored cover.
   LUMA_OG_CDN_DIMENSIONS_DEFAULT = 'width=800,height=420'.freeze
@@ -125,7 +126,7 @@ class CalendarImportSync
 
     luma_calendar_feed = begin
       uri = URI.parse(feed_url)
-      uri.host.to_s.casecmp('api2.luma.com').zero?
+      LUMA_FEED_HOSTS.any? { |host| uri.host.to_s.casecmp(host).zero? }
     rescue URI::InvalidURIError
       false
     end
