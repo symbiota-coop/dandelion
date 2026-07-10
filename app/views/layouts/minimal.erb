@@ -2,7 +2,7 @@
 <html lang="en">
   <%= partial :'layouts/head' %>
   <body <% if @organisation && @organisation.theme_background_color %>style="background-color: <%= @organisation.theme_background_color %>"<% end %>>
-    <% theme_color = @organisation&.theme_color || @account&.theme_color %>
+    <% theme_color = @theme_color || (@event && resolved_event_theme_color(@event)) || @organisation&.theme_color || @account&.theme_color %>
     <% if theme_color && !theme_css_redundant?(theme_color) %>
       <link href="/theme.css?theme_color=<%=CGI.escape(theme_color)%>" rel="stylesheet">
   <% end %>
