@@ -8,6 +8,10 @@ function eventPaymentHandlers (config) {
     },
 
     stripe: function (data) {
+      if (config.embedded && data.session_url) {
+        window.open(data.session_url, '_blank')
+        return
+      }
       const stripe = config.stripeAccount ? Stripe(config.stripePk, { stripeAccount: config.stripeAccount }) : Stripe(config.stripePk)
       stripe.redirectToCheckout({ sessionId: data.session_id })
     },

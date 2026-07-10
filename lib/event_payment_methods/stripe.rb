@@ -52,7 +52,7 @@ class EventPaymentMethod
         ticket.update_attributes!(session_id: session.id, payment_intent: session.payment_intent)
       end
 
-      { session_id: session.id }.to_json
+      { session_id: session.id, session_url: session.url }.to_json
     end
 
     def self.line_items(order:, event:, event_image:, tax_rate_id:)
