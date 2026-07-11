@@ -19,7 +19,7 @@
       <script>
         $(function () {
           setTimeout(function () {
-            window.location = '<%= @event.redirect_url %>'
+            window.location = <%= @event.redirect_url.to_json %>
           }, 3000)
         })
       </script>
