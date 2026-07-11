@@ -1,18 +1,33 @@
 Dandelion::App.helpers do
-  def stripe_connect_oauth_url(organisation:, client_id:)
-    state = SecureRandom.hex(32)
-    session[:stripe_connect_state] = state
-    session[:stripe_connect_organisation_id] = organisation.id.to_s
-    "https://connect.stripe.com/oauth/authorize?response_type=code&client_id=#{CGI.escape(client_id.to_s)}&scope=read_write&state=#{state}"
+  def stripe_connect_oauth_url(organisation:, client_id:, personal: false)
+    state = stripe_connect_oauth_state_for(organisation:, personal:)
+    "https://connect.stripe.com/oauth/authorize?response_type=code&client_id=#{CGI.escape(client_id.to_s)}&scope=read_write&state=#{CGI.escape(state)}"
   end
 
-  def valid_stripe_connect_oauth_state?(organisation)
-    state = session.delete(:stripe_connect_state)
-    organisation_id = session.delete(:stripe_connect_organisation_id)
-    return false unless state.is_a?(String) && params[:state].is_a?(String)
-    return false unless state.bytesize == params[:state].bytesize
-    return false unless organisation_id == organisation.id.to_s
+  def organisation_from_stripe_connect_oauth_state(token, personal: false)
+    data = TokenVerifier.verify(token)
+    return unless data
 
-    ActiveSupport::SecurityUtils.secure_compare(state, params[:state])
+    if personal
+      prefix, org_id, account_id = data.split(':', 3)
+      return unless prefix == 'stripe_connect_personal' && account_id == current_account.id.to_s
+
+      Organisation.find(org_id)
+    else
+      prefix, org_id = data.split(':', 2)
+      return unless prefix == 'stripe_connect_org'
+
+      Organisation.find(org_id)
+    end
+  end
+
+  private
+
+  def stripe_connect_oauth_state_for(organisation:, personal:)
+    if personal
+      TokenVerifier.generate("stripe_connect_personal:#{organisation.id}:#{current_account.id}")
+    else
+      TokenVerifier.generate("stripe_connect_org:#{organisation.id}")
+    end
   end
 end
