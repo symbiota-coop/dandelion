@@ -264,35 +264,41 @@ Dandelion::App.controller do
 
   get '/accounts/:id/following' do
     @account = Account.find(params[:id]) || not_found
+    kick! unless viewable?(@account, :following)
     partial :'accounts/following', locals: { accounts: @account.following, starred: @account.following_starred }
   end
 
   get '/accounts/:id/organisations' do
     @account = Account.find(params[:id]) || not_found
+    kick! unless viewable?(@account, :organisations)
     organisations = Organisation.and(:id.in => @account.organisationships.and(hide_membership: false).pluck(:organisation_id))
     partial :'organisations/blocks', locals: { organisations: organisations }
   end
 
   get '/accounts/:id/local_groups' do
     @account = Account.find(params[:id]) || not_found
+    kick! unless viewable?(@account, :local_groups)
     local_groups = LocalGroup.and(:id.in => @account.local_groupships.and(hide_membership: false).pluck(:local_group_id))
     partial :'local_groups/blocks', locals: { local_groups: local_groups }
   end
 
   get '/accounts/:id/activities' do
     @account = Account.find(params[:id]) || not_found
+    kick! unless viewable?(@account, :activities)
     activities = Activity.and(:id.in => @account.activityships.and(hide_membership: false).pluck(:activity_id))
     partial :'activities/blocks', locals: { activities: activities }
   end
 
   get '/accounts/:id/gatherings' do
     @account = Account.find(params[:id]) || not_found
+    kick! unless viewable?(@account, :gatherings)
     gatherings = Gathering.and(:id.in => @account.memberships.pluck(:gathering_id)).and(listed: true).and(:privacy.ne => 'secret')
     partial :'gatherings/blocks', locals: { gatherings: gatherings }
   end
 
   get '/accounts/:id/followers' do
     @account = Account.find(params[:id]) || not_found
+    kick! unless viewable?(@account, :followers)
     partial :'accounts/following', locals: { accounts: @account.followers }
   end
 
