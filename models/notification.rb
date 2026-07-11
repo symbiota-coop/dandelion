@@ -70,132 +70,136 @@ class Notification
     case type.to_sym
     when :created_gathering
       gathering = notifiable
-      "<strong>#{gathering.account.name}</strong> created the gathering"
+      "#{strong_text(gathering.account.name)} created the gathering"
     when :applied
       mapplication = notifiable
-      "<strong>#{mapplication.account.name}</strong> applied"
+      "#{strong_text(mapplication.account.name)} applied"
     when :joined_gathering
       membership = notifiable
       mapplication = membership.mapplication
       if mapplication
         if mapplication.processed_by
-          "<strong>#{membership.account.name}</strong> was accepted by <strong>#{mapplication.processed_by.name}</strong>"
+          "#{strong_text(membership.account.name)} was accepted by #{strong_text(mapplication.processed_by.name)}"
         else
-          "<strong>#{membership.account.name}</strong> was accepted"
+          "#{strong_text(membership.account.name)} was accepted"
         end
       elsif membership.added_by
-        "<strong>#{membership.account.name}</strong> was added by #{membership.added_by.name}"
+        "#{strong_text(membership.account.name)} was added by #{safe_text(membership.added_by.name)}"
       else
-        "<strong>#{membership.account.name}</strong> joined the gathering"
+        "#{strong_text(membership.account.name)} joined the gathering"
       end
     when :joined_team
       teamship = notifiable
-      "<strong>#{teamship.account.name}</strong> joined the <strong>#{teamship.team.name}</strong> team"
+      "#{strong_text(teamship.account.name)} joined the #{strong_text(teamship.team.name)} team"
     when :created_spend
       spend = notifiable
-      "<strong>#{spend.account.name}</strong> spent #{Money.new(spend.amount * 100, spend.gathering.currency).format(no_cents_if_whole: true)} on <strong>#{Sanitize.fragment(spend.item)}</strong>"
+      amount = Money.new(spend.amount * 100, spend.gathering.currency).format(no_cents_if_whole: true)
+      "#{strong_text(spend.account.name)} spent #{safe_text(amount)} on #{strong_text(spend.item)}"
     when :created_profile
       account = notifiable
-      "<strong>#{account.name}</strong> joined Dandelion!"
+      "#{strong_text(account.name)} joined Dandelion!"
     when :updated_profile
       account = notifiable
-      "<strong>#{account.name}</strong> updated #{account.pronoun} profile"
+      "#{strong_text(account.name)} updated #{safe_text(account.pronoun)} profile"
     when :created_tactivity
       tactivity = notifiable
-      "<strong>#{tactivity.account.name}</strong> proposed the activity <strong>#{tactivity.name}</strong> under <strong>#{tactivity.timetable.name}</strong>"
+      "#{strong_text(tactivity.account.name)} proposed the activity #{strong_text(tactivity.name)} under #{strong_text(tactivity.timetable.name)}"
     when :signed_up_to_a_shift
       shift = notifiable
-      "<strong>#{shift.account.name}</strong> signed up for a <strong>#{shift.rota.name}</strong> shift"
+      "#{strong_text(shift.account.name)} signed up for a #{strong_text(shift.rota.name)} shift"
     when :interested_in_tactivity
       attendance = notifiable
-      "<strong>#{attendance.account.name}</strong> is interested in <strong>#{attendance.tactivity.name}</strong>"
+      "#{strong_text(attendance.account.name)} is interested in #{strong_text(attendance.tactivity.name)}"
     when :created_team
       team = notifiable
-      "<strong>#{team.account.name}</strong> created the team <strong>#{team.name}</strong>"
+      "#{strong_text(team.account.name)} created the team #{strong_text(team.name)}"
     when :created_option
       option = notifiable
-      "<strong>#{option.account.name}</strong> created the option <strong>#{option.name}</strong>"
+      "#{strong_text(option.account.name)} created the option #{strong_text(option.name)}"
     when :created_rota
       rota = notifiable
-      "<strong>#{rota.account.name}</strong> created the rota <strong>#{rota.name}</strong>"
+      "#{strong_text(rota.account.name)} created the rota #{strong_text(rota.name)}"
     when :scheduled_tactivity
       tactivity = notifiable
       if tactivity.scheduled_by
-        "<strong>#{tactivity.scheduled_by.name}</strong> scheduled the activity <strong>#{tactivity.name}</strong>"
+        "#{strong_text(tactivity.scheduled_by.name)} scheduled the activity #{strong_text(tactivity.name)}"
       else
-        "The activity <strong>#{tactivity.name}</strong> was scheduled"
+        "The activity #{strong_text(tactivity.name)} was scheduled"
       end
     when :unscheduled_tactivity
       tactivity = notifiable
       if tactivity.scheduled_by
-        "<strong>#{tactivity.scheduled_by.name}</strong> unscheduled the activity <strong>#{tactivity.name}</strong>"
+        "#{strong_text(tactivity.scheduled_by.name)} unscheduled the activity #{strong_text(tactivity.name)}"
       else
-        "The activity <strong>#{tactivity.name}</strong> was unscheduled"
+        "The activity #{strong_text(tactivity.name)} was unscheduled"
       end
     when :made_admin
       membership = notifiable
-      "<strong>#{membership.account.name}</strong> was made an admin by <strong>#{membership.admin_status_changed_by.name}</strong>"
+      "#{strong_text(membership.account.name)} was made an admin by #{strong_text(membership.admin_status_changed_by.name)}"
     when :unadmined
       membership = notifiable
-      "<strong>#{membership.account.name}</strong> was unadmined by <strong>#{membership.admin_status_changed_by.name}</strong>"
+      "#{strong_text(membership.account.name)} was unadmined by #{strong_text(membership.admin_status_changed_by.name)}"
     when :created_timetable
       timetable = notifiable
-      "<strong>#{timetable.account.name}</strong> created the timetable <strong>#{timetable.name}</strong>"
+      "#{strong_text(timetable.account.name)} created the timetable #{strong_text(timetable.name)}"
     when :commented
       comment = notifiable
       if comment.commentable.is_a?(Mapplication)
-        "<strong>#{comment.account.name}</strong> commented on <strong>#{comment.commentable.account.name}</strong>'s application"
+        "#{strong_text(comment.account.name)} commented on #{strong_text(comment.commentable.account.name)}'s application"
       elsif comment.first_in_post?
-        "<strong>#{comment.account.name}</strong> started a thread <strong>#{comment.commentable.name}/#{comment.post.subject}</strong>"
+        "#{strong_text(comment.account.name)} started a thread #{strong_text("#{comment.commentable.name}/#{comment.post.subject}")}"
       else
-        "<strong>#{comment.account.name}</strong> replied to <strong>#{comment.commentable.name}/#{comment.post.subject}</strong>"
+        "#{strong_text(comment.account.name)} replied to #{strong_text("#{comment.commentable.name}/#{comment.post.subject}")}"
       end
     when :reacted_to_a_comment
       comment_reaction = notifiable
-      "<strong>#{comment_reaction.account.name}</strong> reacted with #{comment_reaction.body == '💚' ? '<i class="text-primary bi bi-heart-fill"></i>' : Sanitize.fragment(comment_reaction.body)} to <strong>#{comment_reaction.comment.account.name}'s</strong> comment in <strong>#{comment_reaction.commentable.name}/#{comment_reaction.comment.post.subject}</strong>"
+      reaction = comment_reaction.body == '💚' ? '<i class="text-primary bi bi-heart-fill"></i>' : safe_text(comment_reaction.body)
+      "#{strong_text(comment_reaction.account.name)} reacted with #{reaction} to #{strong_text("#{comment_reaction.comment.account.name}'s")} comment in #{strong_text("#{comment_reaction.commentable.name}/#{comment_reaction.comment.post.subject}")}"
     when :left_gathering
       account = notifiable
-      "<strong>#{account.name}</strong> is no longer a member"
+      "#{strong_text(account.name)} is no longer a member"
     when :created_payment
       payment = notifiable
-      "<strong>#{payment.account.name}</strong> made a payment of #{Money.new(payment.amount * 100, payment.currency).format(no_cents_if_whole: true)}"
+      amount = Money.new(payment.amount * 100, payment.currency).format(no_cents_if_whole: true)
+      "#{strong_text(payment.account.name)} made a payment of #{safe_text(amount)}"
     when :created_inventory_item
       inventory_item = notifiable
       if inventory_item.account
-        "<strong>#{inventory_item.account.name}</strong> listed the item <strong>#{inventory_item.name}</strong>"
+        "#{strong_text(inventory_item.account.name)} listed the item #{strong_text(inventory_item.name)}"
       else
-        "Someone listed the item <strong>#{inventory_item.name}</strong>"
+        "Someone listed the item #{strong_text(inventory_item.name)}"
       end
     when :mapplication_removed
       account = notifiable
-      "<strong>#{account.name}</strong>'s application was deleted"
+      "#{strong_text(account.name)}'s application was deleted"
     when :created_event, :updated_event
       event = notifiable
       verb = type.to_sym == :created_event ? 'created' : 'updated'
       when_suffix = event.evergreen? ? nil : event.concise_when_details(nil)
-      suffix = when_suffix ? ", #{when_suffix}" : ''
-      "<strong>#{event.organisation.name}</strong> #{verb} the event <strong>#{event.name}</strong>#{suffix}"
+      sentence = "#{strong_text(event.organisation.name)} #{verb} the event #{strong_text(event.name)}"
+      sentence = "#{sentence}, #{safe_text(when_suffix)}" if when_suffix
+      sentence
     when :created_organisation
       organisation = notifiable
       if organisation.account
-        "<strong>#{organisation.account.name}</strong> created the organisation <strong>#{organisation.name}</strong>"
+        "#{strong_text(organisation.account.name)} created the organisation #{strong_text(organisation.name)}"
       else
-        "A new organisation <strong>#{organisation.name}</strong> was created"
+        "A new organisation #{strong_text(organisation.name)} was created"
       end
     when :created_order
       order = notifiable
-      "<strong>#{order.account.name}</strong> is going to <strong>#{order.event.name}</strong>"
+      "#{strong_text(order.account.name)} is going to #{strong_text(order.event.name)}"
     when :left_feedback
       event_feedback = notifiable
       if event_feedback.event
-        "<strong>#{event_feedback.account.name}</strong> left feedback on <strong>#{event_feedback.event.name}</strong>"
+        "#{strong_text(event_feedback.account.name)} left feedback on #{strong_text(event_feedback.event.name)}"
       else
-        "<strong>#{event_feedback.account.name}</strong> left feedback on an event"
+        "#{strong_text(event_feedback.account.name)} left feedback on an event"
       end
     when :starred_event
       account = circle
       event = notifiable
-      "<strong>#{account.name}</strong> starred the event <strong>#{event.name}</strong>"
+      "#{strong_text(account.name)} starred the event #{strong_text(event.name)}"
     end.html_safe
   end
 
@@ -327,5 +331,15 @@ class Notification
     when :starred_event
       'bi-star'
     end
+  end
+
+  private
+
+  def safe_text(text)
+    ERB::Util.html_escape(text.to_s)
+  end
+
+  def strong_text(text)
+    "<strong>#{ERB::Util.html_escape(text.to_s)}</strong>"
   end
 end
