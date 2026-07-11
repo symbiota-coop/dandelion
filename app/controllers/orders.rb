@@ -71,16 +71,22 @@ Dandelion::App.controller do
     redirect back
   end
 
+  # Old ticket emails and notifications link here; keep redirecting to confirm_cancel.
   get '/orders/:id/confirm_destroy' do
+    qs = request.query_string
+    redirect "/orders/#{params[:id]}/confirm_cancel#{qs.present? ? "?#{qs}" : ''}"
+  end
+
+  get '/orders/:id/confirm_cancel' do
     sign_in_required!
     @order = Order.find(params[:id]) || not_found
     @event = @order.event
     halt 403 unless @order.account == current_account
     halt 403 unless @order.value.nil? || @order.value.zero?
-    erb :'orders/confirm_destroy'
+    erb :'orders/confirm_cancel'
   end
 
-  get '/orders/:id/destroy' do
+  post '/orders/:id/destroy' do
     sign_in_required!
     @order = Order.find(params[:id]) || not_found
     halt 403 unless @order.account == current_account

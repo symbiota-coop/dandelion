@@ -150,7 +150,7 @@ Dandelion::App.controller do
     redirect back
   end
 
-  get '/activities/:id/destroy' do
+  post '/activities/:id/destroy' do
     @activity = Activity.find(params[:id]) || not_found
     activity_admins_only!
     @activity.destroy
@@ -239,7 +239,7 @@ Dandelion::App.controller do
     redirect "/activities/#{@activity.id}/followers"
   end
 
-  get '/activityships/:id/destroy' do
+  post '/activityships/:id/destroy' do
     @activityship = Activityship.find(params[:id]) || not_found
     @activity = @activityship.activity
     activity_admins_only!

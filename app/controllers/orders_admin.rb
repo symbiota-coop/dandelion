@@ -181,7 +181,7 @@ Dandelion::App.controller do
     redirect back
   end
 
-  get '/events/:id/orders/:order_id/refund_and_destroy' do
+  post '/events/:id/orders/:order_id/refund_and_destroy' do
     @event = Event.find(params[:id]) || not_found
     event_admins_only!
     order = @event.orders.find(params[:order_id]) || not_found
@@ -189,7 +189,7 @@ Dandelion::App.controller do
     redirect back
   end
 
-  get '/events/:id/orders/:order_id/destroy' do
+  post '/events/:id/orders/:order_id/destroy' do
     @event = Event.find(params[:id]) || not_found
     event_admins_only!
     order = @event.orders.find(params[:order_id]) || not_found
@@ -271,7 +271,7 @@ Dandelion::App.controller do
     200
   end
 
-  get '/events/:id/tickets/:ticket_id/refund_and_destroy' do
+  post '/events/:id/tickets/:ticket_id/refund_and_destroy' do
     @event = Event.find(params[:id]) || not_found
     event_admins_only!
     ticket = @event.tickets.find(params[:ticket_id]) || not_found
@@ -280,7 +280,7 @@ Dandelion::App.controller do
     redirect back
   end
 
-  get '/events/:id/tickets/:ticket_id/destroy' do
+  post '/events/:id/tickets/:ticket_id/destroy' do
     @event = Event.find(params[:id]) || not_found
     event_admins_only!
     ticket = @event.tickets.find(params[:ticket_id]) || not_found

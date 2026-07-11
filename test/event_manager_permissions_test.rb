@@ -193,7 +193,10 @@ class EventManagerPermissionsTest < ActiveSupport::TestCase
     manager.organisationships.create!(organisation: org, event_manager: true, unsubscribed: false)
     event = FactoryBot.create(:event, organisation: org, account: manager, last_saved_by: manager)
     login_as(manager)
-    visit "/events/#{event.id}/destroy"
+    visit "/events/#{event.id}/delete"
+    accept_confirm do
+      click_link 'Delete event and attempt to refund all orders'
+    end
     assert_equal "/o/#{org.slug}/events", current_path
     assert page.has_content?('The event was deleted')
     assert event.reload.deleted?
@@ -206,9 +209,10 @@ class EventManagerPermissionsTest < ActiveSupport::TestCase
     manager.organisationships.create!(organisation: org, event_manager: true, unsubscribed: false)
     event = FactoryBot.create(:event, organisation: org, account: org_owner, last_saved_by: org_owner)
     login_as(manager)
-    visit "/events/#{event.id}/destroy"
+    visit "/events/#{event.id}/delete"
+    assert page.has_content?("Please ask an admin of #{org.name} to delete the event")
+    refute page.has_link?('Delete event and attempt to refund all orders')
     refute event.reload.deleted?
-    assert_equal "/e/#{event.slug}", current_path
   end
 
   test 'org admin can delete any organisation event' do
@@ -218,7 +222,10 @@ class EventManagerPermissionsTest < ActiveSupport::TestCase
     manager.organisationships.create!(organisation: org, event_manager: true, unsubscribed: false)
     event = FactoryBot.create(:event, organisation: org, account: manager, last_saved_by: manager)
     login_as(org_owner)
-    visit "/events/#{event.id}/destroy"
+    visit "/events/#{event.id}/delete"
+    accept_confirm do
+      click_link 'Delete event and attempt to refund all orders'
+    end
     assert_equal "/o/#{org.slug}/events", current_path
     assert event.reload.deleted?
   end

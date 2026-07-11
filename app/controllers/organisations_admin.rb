@@ -187,7 +187,7 @@ Dandelion::App.controller do
     end
   end
 
-  get '/o/:slug/organisation_tiers/:organisation_tier_id/destroy' do
+  post '/o/:slug/organisation_tiers/:organisation_tier_id/destroy' do
     @organisation = Organisation.find_by(slug: params[:slug]) || not_found
     organisation_admins_only!
     @organisation_tier = @organisation.organisation_tiers.find(params[:organisation_tier_id])
@@ -229,7 +229,7 @@ Dandelion::App.controller do
     redirect "/o/#{@organisation.slug}/followers"
   end
 
-  get '/organisationships/:id/destroy' do
+  post '/organisationships/:id/destroy' do
     @organisationship = Organisationship.find(params[:id]) || not_found
     @organisation = @organisationship.organisation
     organisation_admins_only!

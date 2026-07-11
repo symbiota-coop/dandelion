@@ -116,7 +116,7 @@ Dandelion::App.controller do
     200
   end
 
-  get '/verdicts/:id/destroy' do
+  post '/verdicts/:id/destroy' do
     @verdict = Verdict.find(params[:id]) || not_found
     halt unless @verdict.account.id == current_account.id
     @verdict.destroy
@@ -140,7 +140,7 @@ Dandelion::App.controller do
     redirect back
   end
 
-  get '/mapplications/:id/destroy' do
+  post '/mapplications/:id/destroy' do
     @mapplication = Mapplication.find(params[:id]) || not_found
     @gathering = @mapplication.gathering
     @membership = @gathering.memberships.find_by(account: current_account)

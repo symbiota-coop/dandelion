@@ -33,7 +33,7 @@ Dandelion::App.controller do
     erb :'events/delete'
   end
 
-  get '/events/:id/destroy' do
+  post '/events/:id/destroy' do
     @event = Event.find(params[:id]) || not_found
     can_delete_event_only!
     @event.set(refund_deleted_orders: false) if params[:no_refunds]

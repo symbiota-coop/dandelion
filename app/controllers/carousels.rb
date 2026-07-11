@@ -36,7 +36,7 @@ Dandelion::App.controller do
     end
   end
 
-  get '/o/:slug/carousels/:carousel_id/destroy' do
+  post '/o/:slug/carousels/:carousel_id/destroy' do
     @carousel = @carousels.find(params[:carousel_id]) || not_found
     @carousel.destroy
     redirect "/o/#{@organisation.slug}/carousels"

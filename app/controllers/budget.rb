@@ -44,7 +44,7 @@ Dandelion::App.controller do
     end
   end
 
-  get '/g/:slug/spends/:id/destroy' do
+  post '/g/:slug/spends/:id/destroy' do
     @gathering = Gathering.find_by(slug: params[:slug]) || not_found
     @membership = @gathering.memberships.find_by(account: current_account)
     confirmed_membership_required!

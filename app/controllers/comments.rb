@@ -74,7 +74,7 @@ Dandelion::App.controller do
     end
   end
 
-  get '/comments/:id/file/destroy' do
+  post '/comments/:id/file/destroy' do
     sign_in_required!
     @comment = Comment.find(params[:id]) || not_found
     @commentable = @comment.commentable
@@ -85,7 +85,7 @@ Dandelion::App.controller do
     redirect back
   end
 
-  get '/comments/:id/destroy' do
+  post '/comments/:id/destroy' do
     sign_in_required!
     @comment = Comment.find(params[:id]) || not_found
     @commentable = @comment.commentable
@@ -192,7 +192,7 @@ Dandelion::App.controller do
     200
   end
 
-  get '/voptions/:id/destroy' do
+  post '/voptions/:id/destroy' do
     sign_in_required!
     @voption = Voption.find(params[:id]) || not_found
     halt 403 unless @voption.account.id == current_account.id

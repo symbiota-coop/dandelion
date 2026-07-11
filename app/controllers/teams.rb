@@ -64,7 +64,7 @@ Dandelion::App.controller do
     end
   end
 
-  get '/g/:slug/teams/:id/destroy' do
+  post '/g/:slug/teams/:id/destroy' do
     @gathering = Gathering.find_by(slug: params[:slug]) || not_found
     @membership = @gathering.memberships.find_by(account: current_account)
     confirmed_membership_required!
@@ -81,7 +81,7 @@ Dandelion::App.controller do
     redirect back
   end
 
-  get '/teamships/:id/destroy' do
+  post '/teamships/:id/destroy' do
     @teamship = Teamship.find(params[:id]) || not_found
     @gathering = @teamship.team.gathering
     @membership = @gathering.memberships.find_by(account: current_account)

@@ -82,7 +82,7 @@ Dandelion::App.controller do
     end
   end
 
-  get '/g/:slug/rotas/:id/destroy' do
+  post '/g/:slug/rotas/:id/destroy' do
     @gathering = Gathering.find_by(slug: params[:slug]) || not_found
     @membership = @gathering.memberships.find_by(account: current_account)
     gathering_admins_only!
@@ -151,7 +151,7 @@ Dandelion::App.controller do
     end
   end
 
-  get '/roles/:id/destroy' do
+  post '/roles/:id/destroy' do
     @role = Role.find(params[:id]) || not_found
     @gathering = @role.gathering
     @membership = @gathering.memberships.find_by(account: current_account)
@@ -203,7 +203,7 @@ Dandelion::App.controller do
     end
   end
 
-  get '/rslots/:id/destroy' do
+  post '/rslots/:id/destroy' do
     @rslot = Rslot.find(params[:id]) || not_found
     @gathering = @rslot.gathering
     @membership = @gathering.memberships.find_by(account: current_account)
@@ -254,7 +254,7 @@ Dandelion::App.controller do
     end
   end
 
-  get '/shifts/:id/destroy' do
+  post '/shifts/:id/destroy' do
     @shift = Shift.find(params[:id]) || not_found
     @gathering = @shift.rota.gathering
     @membership = @gathering.memberships.find_by(account: current_account)

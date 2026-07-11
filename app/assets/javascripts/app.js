@@ -70,14 +70,31 @@ $(function () {
       }
     })
 
-    $('[data-confirm], [href$="destroy"]').not('[data-confirm-registered]').attr('data-confirm-registered', 'true').each(function () {
-      $(this).click(function () {
+    $('[data-confirm], a[href*="destroy"]').not('[data-confirm-registered]').attr('data-confirm-registered', 'true').each(function () {
+      $(this).click(function (event) {
         $(this).removeClass('no-trigger')
 
         const message = $(this).data('confirm') || 'Are you sure?'
         if (!confirm(message)) {
           $(this).addClass('no-trigger')
           return false
+        }
+
+        // Paths ending in destroy (including hard_destroy, refund_and_destroy) always POST
+        let shouldPost = false
+        if (this.href) {
+          try {
+            const path = new URL(this.href, window.location.origin).pathname
+            if (/destroy$/.test(path)) shouldPost = true
+          } catch (e) {}
+        }
+
+        if (shouldPost) {
+          // pagelet-trigger links are handled by pagelets.js (also via POST)
+          if ($(this).hasClass('pagelet-trigger')) return
+
+          event.preventDefault()
+          $('<form>', { method: 'post', action: this.href }).hide().appendTo(document.body)[0].submit()
         }
       })
     })

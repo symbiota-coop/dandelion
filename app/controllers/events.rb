@@ -138,7 +138,7 @@ Dandelion::App.controller do
     200
   end
 
-  get '/drafts/:id/destroy' do
+  post '/drafts/:id/destroy' do
     sign_in_required!
     draft = current_account.drafts.find(params[:id]) || not_found
     draft.destroy

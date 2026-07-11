@@ -61,7 +61,7 @@ Dandelion::App.controller do
     erb :'event_feedbacks/event_feedback'
   end
 
-  get '/event_feedbacks/:id/destroy' do
+  post '/event_feedbacks/:id/destroy' do
     @event_feedback = EventFeedback.find(params[:id]) || not_found
     @event = @event_feedback.event
     @organisation = @event.organisation
@@ -71,7 +71,7 @@ Dandelion::App.controller do
     redirect back
   end
 
-  get '/event_feedbacks/:id/hard_destroy' do
+  post '/event_feedbacks/:id/hard_destroy' do
     @event_feedback = EventFeedback.unscoped.find(params[:id]) || not_found
     @event = @event_feedback.event
     admins_only!

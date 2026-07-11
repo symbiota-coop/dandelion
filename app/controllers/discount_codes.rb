@@ -90,7 +90,7 @@ Dandelion::App.controller do
     end
   end
 
-  get '/discount_codes/:discount_code_id/destroy' do
+  post '/discount_codes/:discount_code_id/destroy' do
     @discount_code = @discount_codes.find(params[:discount_code_id]) || not_found
     @discount_code.destroy
     if @organisation

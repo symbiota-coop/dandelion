@@ -37,7 +37,7 @@ Dandelion::App.controller do
     end
   end
 
-  get '/events/:event_id/rpayments/:id/destroy' do
+  post '/events/:event_id/rpayments/:id/destroy' do
     @rpayment = @event.rpayments.find(params[:id]) || not_found
     @rpayment.destroy
     redirect back

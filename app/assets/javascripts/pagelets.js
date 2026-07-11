@@ -136,7 +136,15 @@ $(function () {
     const pagelet = $link.closest('[data-pagelet-url]')
     setPageletLoading(pagelet)
 
-    $.get($link.attr('href'), function () {
+    const href = $link.attr('href')
+    let path
+    try {
+      path = new URL(href, window.location.origin).pathname
+    } catch (e) {
+      path = href
+    }
+    const request = /destroy$/.test(path) ? $.post : $.get
+    request(href, function () {
       reloadPagelet(pagelet, function () { postLoad(pagelet) })
     })
 

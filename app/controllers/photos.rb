@@ -17,7 +17,7 @@ Dandelion::App.controller do
     redirect @photo.url
   end
 
-  get '/photos/:id/destroy' do
+  post '/photos/:id/destroy' do
     sign_in_required!
     @photo = Photo.find(params[:id]) || not_found
     halt(403) unless admin? || @photo.account_id == current_account.id

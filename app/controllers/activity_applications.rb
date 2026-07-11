@@ -113,7 +113,7 @@ Dandelion::App.controller do
     200
   end
 
-  get '/activities/:id/activity_applications/:activity_application_id/destroy' do
+  post '/activities/:id/activity_applications/:activity_application_id/destroy' do
     @activity = Activity.find(params[:id]) || not_found
     activity_admins_only!
     @activity_application = @activity.activity_applications.find(params[:activity_application_id]) || not_found

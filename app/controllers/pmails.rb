@@ -120,7 +120,7 @@ Dandelion::App.controller do
     @pmail.html.gsub('%recipient.firstname%', 'there').gsub('%recipient.footer_class%', 'd-none')
   end
 
-  get '/pmails/:pmail_id/destroy' do
+  post '/pmails/:pmail_id/destroy' do
     @pmail = @pmails.find(params[:pmail_id]) || not_found
     halt 403 if @pmail.sent_at
     @pmail.destroy
@@ -141,7 +141,7 @@ Dandelion::App.controller do
     partial :'pmails/attachments'
   end
 
-  get '/pmails/:oid/attachments/:attachment_id/destroy' do
+  post '/pmails/:oid/attachments/:attachment_id/destroy' do
     halt 403 unless @_organisation && params[:oid] == @_organisation.id.to_s
     @organisation = @_organisation
     @organisation.attachments.find(params[:attachment_id]).try(:destroy)

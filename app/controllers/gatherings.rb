@@ -123,7 +123,7 @@ Dandelion::App.controller do
     end
   end
 
-  get '/g/:slug/destroy' do
+  post '/g/:slug/destroy' do
     @gathering = Gathering.find_by(slug: params[:slug]) || not_found
     @membership = @gathering.memberships.find_by(account: current_account)
     gathering_admins_only!

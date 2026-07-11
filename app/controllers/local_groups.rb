@@ -128,7 +128,7 @@ Dandelion::App.controller do
     redirect back
   end
 
-  get '/local_groups/:id/destroy' do
+  post '/local_groups/:id/destroy' do
     @local_group = LocalGroup.find(params[:id]) || not_found
     local_group_admins_only!
     @local_group.destroy
@@ -215,7 +215,7 @@ Dandelion::App.controller do
     redirect "/local_groups/#{@local_group.id}/followers"
   end
 
-  get '/local_groupships/:id/destroy' do
+  post '/local_groupships/:id/destroy' do
     @local_groupship = LocalGroupship.find(params[:id]) || not_found
     @local_group = @local_groupship.local_group
     local_group_admins_only!

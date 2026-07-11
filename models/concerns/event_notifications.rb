@@ -88,7 +88,7 @@ module EventNotifications
                                                'when_parts_1' => when_parts[1..].join(', '))
 
       if cancellable_order
-        cancel_rsvp_url = "#{ENV['BASE_URI']}/orders/#{cancellable_order.id}/confirm_destroy?sign_in_token=#{account.sign_in_token}"
+        cancel_rsvp_url = "#{ENV['BASE_URI']}/orders/#{cancellable_order.id}/confirm_cancel?sign_in_token=#{account.sign_in_token}"
         batch_with_cancel.add_recipient(:to, account.email, recipient_vars.merge('cancel_rsvp_url' => cancel_rsvp_url))
         recipients_with_cancel += 1
       else

@@ -61,7 +61,7 @@ Dandelion::App.controller do
     end
   end
 
-  get '/g/:slug/timetables/:id/destroy' do
+  post '/g/:slug/timetables/:id/destroy' do
     @gathering = Gathering.find_by(slug: params[:slug]) || not_found
     @membership = @gathering.memberships.find_by(account: current_account)
     gathering_admins_only!
@@ -90,7 +90,7 @@ Dandelion::App.controller do
     200
   end
 
-  get '/spaces/:id/destroy' do
+  post '/spaces/:id/destroy' do
     @space = Space.find(params[:id]) || not_found
     @gathering = @space.gathering
     @membership = @gathering.memberships.find_by(account: current_account)
@@ -119,7 +119,7 @@ Dandelion::App.controller do
     200
   end
 
-  get '/tslots/:id/destroy' do
+  post '/tslots/:id/destroy' do
     @tslot = Tslot.find(params[:id]) || not_found
     @gathering = @tslot.gathering
     @membership = @gathering.memberships.find_by(account: current_account)
@@ -174,7 +174,7 @@ Dandelion::App.controller do
     end
   end
 
-  get '/tactivities/:id/destroy' do
+  post '/tactivities/:id/destroy' do
     @tactivity = Tactivity.find(params[:id]) || not_found
     @gathering = @tactivity.gathering
     @membership = @gathering.memberships.find_by(account: current_account)

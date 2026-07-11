@@ -65,7 +65,7 @@ Dandelion::App.controller do
     end
   end
 
-  get '/g/:slug/options/:id/destroy' do
+  post '/g/:slug/options/:id/destroy' do
     @gathering = Gathering.find_by(slug: params[:slug]) || not_found
     @membership = @gathering.memberships.find_by(account: current_account)
     gathering_admins_only!
@@ -82,7 +82,7 @@ Dandelion::App.controller do
     200
   end
 
-  get '/optionships/:id/destroy' do
+  post '/optionships/:id/destroy' do
     @optionship = Optionship.find(params[:id]) || not_found
     @gathering = @optionship.option.gathering
     @membership = @gathering.memberships.find_by(account: current_account)
@@ -125,7 +125,7 @@ Dandelion::App.controller do
     end
   end
 
-  get '/g/:slug/optionships/:id/destroy' do
+  post '/g/:slug/optionships/:id/destroy' do
     @gathering = Gathering.find_by(slug: params[:slug]) || not_found
     @membership = @gathering.memberships.find_by(account: current_account)
     gathering_admins_only!
