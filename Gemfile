@@ -58,6 +58,7 @@ gem 'octokit'
 gem 'ruby-openai'
 gem 'sentry-delayed_job'
 gem 'sentry-ruby'
+gem 'ssrf_filter'
 gem 'yt'
 
 # Payments

@@ -29,5 +29,17 @@ module DIDKit
     rescue StandardError
       nil
     end
+
+    private
+
+    # DIDKit normally fetches handle and did:web documents with Net::HTTP.
+    # Keep those requests on public HTTPS destinations and validate redirects.
+    def get_response(url, _options = {})
+      SsrfFilter.get(url, {
+                       scheme_whitelist: %w[https],
+                       max_redirects: 3,
+                       http_options: { open_timeout: 5, read_timeout: 5 }
+                     })
+    end
   end
 end
