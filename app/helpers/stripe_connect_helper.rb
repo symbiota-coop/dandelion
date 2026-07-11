@@ -1,3 +1,6 @@
+STRIPE_CONNECT_OAUTH_STATE_PURPOSE = 'stripe_connect'
+STRIPE_CONNECT_OAUTH_STATE_EXPIRES_IN = 15.minutes
+
 Dandelion::App.helpers do
   def stripe_connect_oauth_url(organisation:, client_id:, personal: false)
     state = stripe_connect_oauth_state_for(organisation:, personal:)
@@ -5,7 +8,7 @@ Dandelion::App.helpers do
   end
 
   def organisation_from_stripe_connect_oauth_state(token, personal: false)
-    data = TokenVerifier.verify(token)
+    data = TokenVerifier.verify(token, purpose: STRIPE_CONNECT_OAUTH_STATE_PURPOSE)
     return unless data
 
     if personal
@@ -24,10 +27,14 @@ Dandelion::App.helpers do
   private
 
   def stripe_connect_oauth_state_for(organisation:, personal:)
+    options = {
+      expires_in: STRIPE_CONNECT_OAUTH_STATE_EXPIRES_IN,
+      purpose: STRIPE_CONNECT_OAUTH_STATE_PURPOSE
+    }
     if personal
-      TokenVerifier.generate("stripe_connect_personal:#{organisation.id}:#{current_account.id}")
+      TokenVerifier.generate("stripe_connect_personal:#{organisation.id}:#{current_account.id}", **options)
     else
-      TokenVerifier.generate("stripe_connect_org:#{organisation.id}")
+      TokenVerifier.generate("stripe_connect_org:#{organisation.id}", **options)
     end
   end
 end

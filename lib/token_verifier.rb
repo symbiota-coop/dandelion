@@ -1,18 +1,27 @@
 module TokenVerifier
   class << self
-    def generate(data)
+    def generate(data, expires_in: nil, purpose: nil)
       return unless (secret = ENV['SESSION_SECRET'])
 
-      verifier(secret, url_safe: true).generate(data)
+      options = {}
+      options[:expires_in] = expires_in if expires_in
+      options[:purpose] = purpose if purpose
+
+      verifier(secret, url_safe: true).generate(data, **options)
     end
 
-    def verify(token)
+    def verify(token, purpose: nil)
       return unless token && (secret = ENV['SESSION_SECRET'])
 
-      verify_with(verifier(secret, url_safe: true), token) ||
-        verify_with(verifier(secret), token) ||
-        verify_legacy_base64_token(secret, token) ||
-        TokenEncryptor.decrypt(token)
+      if purpose
+        verify_with(verifier(secret, url_safe: true), token, purpose:) ||
+          verify_with(verifier(secret), token, purpose:)
+      else
+        verify_with(verifier(secret, url_safe: true), token) ||
+          verify_with(verifier(secret), token) ||
+          verify_legacy_base64_token(secret, token) ||
+          TokenEncryptor.decrypt(token)
+      end
     rescue ActiveSupport::MessageVerifier::InvalidSignature, ActiveSupport::MessageEncryptor::InvalidMessage, ArgumentError
       nil
     end
@@ -23,8 +32,12 @@ module TokenVerifier
       ActiveSupport::MessageVerifier.new(secret, digest: 'SHA256', **)
     end
 
-    def verify_with(verifier, token)
-      verifier.verified(token)
+    def verify_with(verifier, token, purpose: nil)
+      if purpose
+        verifier.verified(token, purpose:)
+      else
+        verifier.verified(token)
+      end
     rescue ActiveSupport::MessageVerifier::InvalidSignature, ArgumentError
       nil
     end
