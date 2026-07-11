@@ -32,6 +32,14 @@ class Gathering
     self.and(listed: true).and(:privacy.ne => 'secret')
   end
 
+  def self.protected_attributes
+    %w[
+      account_id redirect_home balance processed_via_dandelion membership_count
+      stripe_endpoint_secret paypal_email choose_and_pay_label
+      coordinates has_image image_uid image_width_unmagic image_height_unmagic
+    ]
+  end
+
   def self.spring_clean
     ignore = %i[memberships teams teamships notifications_as_notifiable notifications_as_circle]
     Gathering.and(listed: true).each do |gathering|
@@ -65,6 +73,8 @@ class Gathering
     errors.add(:stripe_sk, 'must start with sk_') if stripe_sk && !stripe_sk.starts_with?('sk_')
     errors.add(:stripe_pk, 'must start with pk_') if stripe_pk && !stripe_pk.starts_with?('pk_')
     errors.add(:stripe_sk, 'must be present if Stripe public key is present') if stripe_pk && !stripe_sk
+
+    self.currency = currency_was if persisted? && currency_changed?
 
     self.listed = false if privacy == 'secret'
     self.balance = 0 if balance.nil?
