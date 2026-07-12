@@ -50,7 +50,7 @@ gem 'airrecord'
 gem 'faraday'
 gem 'faraday-follow_redirects'
 gem 'faraday-retry'
-gem 'ferrum', '~> 0.14.0' # scroll behaviour changed in 0.15
+gem 'ferrum'
 gem 'jwt'
 gem 'maxmind-geoip2'
 gem 'mcp'
