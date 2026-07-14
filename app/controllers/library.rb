@@ -1,7 +1,7 @@
 Dandelion::App.controller do
   get '/books' do
     @title = 'Books'
-    @books = library_books.select { |b| b[:dandelion] == 'true' }.sort_by { |b| -b[:original_publication_year_or_year_published].to_i }
+    @books = library_books.sort_by { |b| -b[:original_publication_year_or_year_published].to_i }
     erb :'books/books'
   end
 
