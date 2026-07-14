@@ -30,7 +30,7 @@ Dandelion::App.helpers do
 
     rows = library_csv('goodreads_library_export').select { |b| dandelion_ids.include?(b[:book_id]) }.map do |b|
       b.merge(
-        slug: b[:book_id],
+        slug: b[:title].parameterize,
         cover_image: "/images/books/#{b[:book_id]}.jpg",
         original_publication_year_or_year_published: b[:original_publication_year] || b[:year_published]
       )
