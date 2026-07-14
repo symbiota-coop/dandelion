@@ -42,7 +42,9 @@ Dandelion::App.helpers do
   def library_films
     return LIBRARY_CACHE[:films] if LIBRARY_CACHE[:films]
 
-    rows = library_csv('films')
+    rows = library_csv('films').map do |f|
+      f.merge(slug: f[:name].parameterize)
+    end
     LIBRARY_CACHE[:films] = rows if rows.any?
     rows
   end
