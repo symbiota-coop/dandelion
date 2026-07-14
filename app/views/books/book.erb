@@ -10,29 +10,29 @@
 <div class="row justify-content-center">
   <div class="col-6 col-lg-3">
 
-    <a target="_blank" href="https://www.goodreads.com/book/show/<%=@book['Book Id']%>">
-      <img src="<%= @book['Cover image'][0]['url'] %>" class="w-100 mb-3">
+    <a target="_blank" href="https://www.goodreads.com/book/show/<%= @book[:book_id] %>">
+      <img src="<%= library_image_url(@book[:cover_image]) %>" class="w-100 mb-3">
     </a>
 
   </div>
   <div class="col-lg-9">
 
     <h2 class="mb-3">
-      <%=@book['Title']%>
+      <%= @book[:title] %>
       <br / >
       <small class="text-muted">
-        by <%=[@book['Author'],@book['Additional Authors']].select { |a| !a.blank? }.to_sentence%></small>
+        by <%= [@book[:author], @book[:additional_authors]].select { |a| !a.blank? }.to_sentence %></small>
     </h2>
 
     <div class="book-summary">
 
       <p>
-        <a target="_blank" href="https://www.goodreads.com/book/show/<%=@book['Book Id']%>">
+        <a target="_blank" href="https://www.goodreads.com/book/show/<%= @book[:book_id] %>">
           Goodreads
         </a>
       </p>
 
-      <%== md(@book['Summary'].split("\n\n")[1..-1].join("\n\n"), hard_wrap: true) %>
+      <%== md(@book[:summary].split("\n\n")[1..-1].join("\n\n"), hard_wrap: true) %>
     </div>
 
   </div>

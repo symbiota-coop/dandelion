@@ -1,11 +1,11 @@
-<% grouped_films = @films.group_by do |film| 
-  year = film['Year']
+<% grouped_films = @films.group_by do |film|
+  year = film[:year].to_i
   if year < 1969
-    'Before 1969'     
-  elsif year < 1989    
-    'Before 1989' 
+    'Before 1969'
+  elsif year < 1989
+    'Before 1989'
   elsif year < 2000
-    'Before 2000'   
+    'Before 2000'
   elsif year < 2010
     '2000s'
   else

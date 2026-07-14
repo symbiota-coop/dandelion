@@ -1,11 +1,11 @@
-<% grouped_books = @books.group_by do |book| 
-  year = book['Original Publication Year or Year Published']
+<% grouped_books = @books.group_by do |book|
+  year = book[:original_publication_year_or_year_published].to_i
   if year < 1969
-    'Before 1969'     
-  elsif year < 1989    
-    'Before 1989' 
+    'Before 1969'
+  elsif year < 1989
+    'Before 1989'
   elsif year < 2000
-    'Before 2000'   
+    'Before 2000'
   elsif year < 2010
     '2000s'
   else

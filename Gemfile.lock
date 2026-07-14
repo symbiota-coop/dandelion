@@ -64,10 +64,6 @@ GEM
       uri (>= 0.13.1)
     addressable (2.9.0)
       public_suffix (>= 2.0.2, < 8.0)
-    airrecord (1.0.12)
-      faraday (>= 1.0, < 3.0)
-      faraday-net_http_persistent
-      net-http-persistent
     anonymous_loader (0.1.2)
       version_gem (~> 1.1, >= 1.1.13)
     ast (2.4.3)
@@ -176,9 +172,6 @@ GEM
       multipart-post (~> 2.0)
     faraday-net_http (3.4.4)
       net-http (~> 0.5)
-    faraday-net_http_persistent (2.3.1)
-      faraday (~> 2.5)
-      net-http-persistent (>= 4.0.4, < 5)
     faraday-retry (2.4.0)
       faraday (~> 2.0)
     ferrum (0.17.2)
@@ -327,8 +320,6 @@ GEM
     mustermann (3.1.1)
     net-http (0.9.1)
       uri (>= 0.11.1)
-    net-http-persistent (4.0.8)
-      connection_pool (>= 2.2.4, < 4)
     net-imap (0.6.4.1)
       date
       net-protocol
@@ -596,7 +587,6 @@ DEPENDENCIES
   activemodel
   activesupport
   addressable
-  airrecord
   bcrypt
   better_html
   capybara

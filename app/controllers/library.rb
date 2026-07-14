@@ -1,34 +1,34 @@
 Dandelion::App.controller do
   get '/books' do
     @title = 'Books'
-    @books = Book.all(sort: { 'Original Publication Year or Year Published' => 'desc' }, filter: '{Dandelion} = 1')
+    @books = library_books.select { |b| b[:dandelion] == 'true' }.sort_by { |b| -b[:original_publication_year_or_year_published].to_i }
     erb :'books/books'
   end
 
   get '/books/:slug', provides: [:html, :jpg] do
-    @book = Book.all(filter: "{Slug} = '#{params[:slug]}'").first || not_found
-    @title = "#{@book['Title']} by #{@book['Author']}"
+    @book = library_books.find { |b| b[:slug] == params[:slug] } || not_found
+    @title = "#{@book[:title]} by #{@book[:author]}"
 
     case content_type
     when :html
-      if @book['Summary'].blank?
-        redirect "https://goodreads.com/book/show/#{@book['Book Id']}"
+      if @book[:summary].blank?
+        redirect "https://goodreads.com/book/show/#{@book[:book_id]}"
       else
         erb :'books/book'
       end
     when :jpg
-      redirect @book['Cover image'][0]['url']
+      redirect library_image_url(@book[:cover_image])
     end
   end
 
   get '/films' do
     @title = 'Films'
-    @films = Film.all(sort: { 'Year' => 'desc' })
+    @films = library_films.sort_by { |f| -f[:year].to_i }
     erb :'films/films'
   end
 
   get '/films/:slug', provides: :jpg do
-    @film = Film.all(filter: "{Slug} = '#{params[:slug]}'").first || not_found
-    redirect @film['Images'].first['url']
+    @film = library_films.find { |f| f[:slug] == params[:slug] } || not_found
+    redirect library_image_url(@film[:image])
   end
 end
