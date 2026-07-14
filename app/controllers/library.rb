@@ -7,15 +7,10 @@ Dandelion::App.controller do
 
   get '/books/:slug', provides: [:html, :jpg] do
     @book = library_books.find { |b| b[:slug] == params[:slug] } || not_found
-    @title = "#{@book[:title]} by #{@book[:author]}"
 
     case content_type
     when :html
-      if @book[:summary].blank?
-        redirect "https://goodreads.com/book/show/#{@book[:book_id]}"
-      else
-        erb :'books/book'
-      end
+      redirect "https://goodreads.com/book/show/#{@book[:book_id]}"
     when :jpg
       redirect library_image_url(@book[:cover_image])
     end
