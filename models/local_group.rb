@@ -56,6 +56,10 @@ class LocalGroup
       g = g['features'].first['geometry']
       self.geometry = g.to_json
     end
+    unless %w[Polygon MultiPolygon].include?(g['type'])
+      errors.add(:geometry, 'must be a GeoJSON Polygon or MultiPolygon')
+      next
+    end
     g['coordinates'].each do |polygon|
       polygons.build coordinates: (g['type'] == 'Polygon' ? [polygon] : polygon)
     end
@@ -104,7 +108,7 @@ class LocalGroup
 
   def self.new_hints
     {
-      geometry: 'Accepts a GeoJSON polygon created via https://geojson.io/ (copy and paste the contents of the box on the right)'
+      geometry: 'Accepts a GeoJSON Polygon or MultiPolygon created via https://geojson.io/ (copy and paste the contents of the box on the right)'
     }
   end
 
