@@ -36,7 +36,7 @@ class LocalGroupsTest < ActiveSupport::TestCase
     refute local_group.update_attributes(geometry: { type: 'Point', coordinates: [-0.12, 51.5] }.to_json)
     assert_includes local_group.errors[:geometry], 'must be a GeoJSON Polygon or MultiPolygon'
 
-    assert_equal original_polygons, local_group.reload.polygons.map { |polygon| [polygon.id, polygon.coordinates] }
+    assert_equal original_polygons, (local_group.reload.polygons.map { |polygon| [polygon.id, polygon.coordinates] })
   end
 
   test 'another validation failure does not delete persisted polygons' do
@@ -47,6 +47,6 @@ class LocalGroupsTest < ActiveSupport::TestCase
 
     refute local_group.update_attributes(slug: another_local_group.slug)
 
-    assert_equal original_polygons, local_group.reload.polygons.map { |polygon| [polygon.id, polygon.coordinates] }
+    assert_equal original_polygons, (local_group.reload.polygons.map { |polygon| [polygon.id, polygon.coordinates] })
   end
 end
