@@ -6,7 +6,7 @@
           Sending completed at <%= @pmail.sent_at %>.
         </p>
       </div>
-      <% if !@pmail.mailable.is_a?(Event) && @pmail.organisation.mailgun_api_key %>
+      <% if @pmail.analytics_available? && @pmail.mailgun_url %>
         <div class="col-auto">
           <a class="btn btn-primary mb-1" target="_blank" href="<%=@pmail.mailgun_url%>">
             <i class="bi bi-bar-chart-line-fill"></i>
@@ -15,7 +15,7 @@
         </div>
       <% end %>
     </div>
-    <% if !@pmail.mailable.is_a?(Event) && @pmail.organisation.mailgun_api_key %>
+    <% if @pmail.analytics_available? %>
       <% if @pmail.metrics %>
         <table class="table">
           <% 

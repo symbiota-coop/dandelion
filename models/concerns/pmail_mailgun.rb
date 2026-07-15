@@ -1,7 +1,29 @@
 module PmailMailgun
   extend ActiveSupport::Concern
 
+  def analytics_available?
+    sent_at && !mailable.is_a?(Event) && (gift? || organisation.mailgun_api_key)
+  end
+
+  def mailgun_credentials
+    if gift?
+      {
+        api_key: ENV['MAILGUN_API_KEY'],
+        api_host: ENV['MAILGUN_REGION'],
+        domain: ENV['MAILGUN_PMAILS_HOST']
+      }
+    else
+      {
+        api_key: organisation.mailgun_api_key,
+        api_host: (organisation.mailgun_region == 'EU' ? 'api.eu.mailgun.net' : 'api.mailgun.net'),
+        domain: organisation.mailgun_domain
+      }
+    end
+  end
+
   def mailgun_url
+    return nil if gift?
+
     base_url = "https://#{organisation.mailgun_region == 'EU' ? 'app.eu.mailgun.com' : 'app.mailgun.com'}/mg/reporting/metrics"
 
     search_metrics = {
@@ -54,11 +76,14 @@ module PmailMailgun
   end
 
   def metrics
-    mg_client = Mailgun::Client.new organisation.mailgun_api_key, (organisation.mailgun_region == 'EU' ? 'api.eu.mailgun.net' : 'api.mailgun.net')
+    credentials = mailgun_credentials
+    return nil unless credentials[:api_key] && credentials[:domain]
+
+    mg_client = Mailgun::Client.new credentials[:api_key], credentials[:api_host]
     tags = Mailgun::Tags.new(mg_client)
 
     begin
-      stats_data = tags.get_tag_stats(organisation.mailgun_domain, id, {
+      stats_data = tags.get_tag_stats(credentials[:domain], id, {
                                         event: %w[accepted delivered failed opened clicked unsubscribed complained stored],
                                         start: sent_at.to_i,
                                         resolution: 'month'

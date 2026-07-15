@@ -19,6 +19,8 @@ We offer a free gift of 1 email per month for up to 1000 subscribers.
 - Change the 'To' field to 'Everyone' or another option
 - Enter a subject and body and follow the steps above to preview and send your mail
 
+After a free gift email is sent, open the message from Mailer to see delivery, open, and click rates.
+
 ## Creating buttons
 
 To create a button like this:
