@@ -163,6 +163,8 @@ module PmailMailgun
 
     sent_count = delivered_total + permanent_failures - suppressions
 
+    return nil if opened_total.zero?
+
     rates = {}
     if sent_count > 0
       rates['delivered_rate'] = (delivered_total.to_f / sent_count * 100).round(2)
