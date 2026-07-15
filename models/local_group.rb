@@ -50,7 +50,6 @@ class LocalGroup
   after_create :add_organisation_members_within
 
   before_validation do
-    polygons.destroy_all
     g = JSON.parse(geometry)
     unless g['coordinates']
       g = g['features'].first['geometry']
@@ -60,9 +59,15 @@ class LocalGroup
       errors.add(:geometry, 'must be a GeoJSON Polygon or MultiPolygon')
       next
     end
-    g['coordinates'].each do |polygon|
-      polygons.build coordinates: (g['type'] == 'Polygon' ? [polygon] : polygon)
+
+    polygon_attributes = g['coordinates'].map do |polygon|
+      { coordinates: (g['type'] == 'Polygon' ? [polygon] : polygon) }
     end
+
+    # Association assignment is queued with the parent save. Unlike clear or
+    # destroy_all, it does not persist the removal of existing polygons when a
+    # validation later rejects the local group update.
+    assign_attributes(polygons: polygon_attributes)
 
     # Ensure polygons were created and are valid
     errors.add(:geometry, 'is invalid - unable to create valid polygons') if geometry.present? && (polygons.empty? || polygons.any? { |p| !p.valid? })
