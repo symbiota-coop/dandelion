@@ -28,7 +28,7 @@
 <div class="mb-3 text-center <%= 'mt-3' if params[:minimal] %>">
   <% @organisation.carousels.and(button: true).order('o asc').each do |carousel| %>
     <%
-      current_carousel_ids = params[:carousel_ids] || []
+      current_carousel_ids = Array(params[:carousel_ids]).map(&:to_s)
       if current_carousel_ids.include?(carousel.id.to_s)
         # Remove this carousel from the list
         new_carousel_ids = current_carousel_ids - [carousel.id.to_s]
@@ -38,14 +38,16 @@
       end
       
       # Build query string preserving other params (not route params)
-      query_params = params.to_h.reject { |k, v| %w[captures format carousel_ids].include?(k) || v == false }
+      query_params = params.to_h.reject { |k, v| %w[captures format carousel_ids].include?(k) || v == false || v.is_a?(Hash) }
       
       # Build the href manually to handle multiple carousel_ids[] properly
       param_strings = []
       query_params.each do |key, value|
-        param_strings << "#{key}=#{CGI.escape(value.to_s)}" if value.present?
+        Array(value).each do |v|
+          param_strings << "#{key}=#{CGI.escape(v.to_s)}" if v.present?
+        end
       end
-      new_carousel_ids.each { |id| param_strings << "carousel_ids[]=#{CGI.escape(id)}" }
+      new_carousel_ids.each { |id| param_strings << "carousel_ids[]=#{CGI.escape(id.to_s)}" }
       
       base_href = param_strings.any? ? "?#{param_strings.join('&')}" : "?"
       
@@ -54,7 +56,7 @@
       %w[minimal near display].each do |param|
         carousel_only_params << "#{param}=#{CGI.escape(query_params[param].to_s)}" if query_params[param].present?
       end
-      new_carousel_ids.each { |id| carousel_only_params << "carousel_ids[]=#{CGI.escape(id)}" }
+      new_carousel_ids.each { |id| carousel_only_params << "carousel_ids[]=#{CGI.escape(id.to_s)}" }
       carousel_only_href = carousel_only_params.any? ? "?#{carousel_only_params.join('&')}" : "?"
     %>
     <button type="button"

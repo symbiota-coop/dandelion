@@ -31,7 +31,13 @@ Dandelion::App.controller do
     carousel = nil
     params[:carousel_ids] = [params[:carousel_id]] if params[:carousel_id]
     if params[:carousel_ids]
-      params[:carousel_ids] = params[:carousel_ids].is_a?(Array) ? params[:carousel_ids] : [params[:carousel_ids]]
+      ids = params[:carousel_ids]
+      ids = case ids
+            when Array then ids
+            when Hash then ids.values
+            else [ids]
+            end
+      params[:carousel_ids] = ids.flat_map { |id| id.is_a?(Hash) ? id.values : [id] }.map(&:to_s).reject(&:blank?)
     end
     if params[:carousel_ids] && params[:carousel_ids].any?
       @events = if params[:carousel_ids].include?('featured')
