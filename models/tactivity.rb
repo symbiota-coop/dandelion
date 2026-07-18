@@ -20,6 +20,10 @@ class Tactivity
   field :image_uid, type: String
   field :has_image, type: Boolean
 
+  def self.protected_attributes
+    %w[timetable_id gathering_id account_id membership_id scheduled_by_id has_image image_uid]
+  end
+
   def self.prewarmed_image_derivative_sizes
     %w[400x400]
   end
@@ -38,7 +42,7 @@ class Tactivity
   has_many :comment_reactions, as: :commentable, dependent: :destroy
 
   before_validation do
-    self.timetable = space.timetable if space
+    self.timetable = space.timetable if space && !timetable
     self.gathering = timetable.gathering if timetable
     self.membership = gathering.memberships.find_by(account: account) if gathering && account && !membership
 
@@ -48,6 +52,11 @@ class Tactivity
 
   validates_presence_of :name
   validates_uniqueness_of :space, scope: :tslot, allow_nil: true
+
+  validate do
+    errors.add(:space, 'must belong to the same timetable') if space && timetable && space.timetable_id != timetable_id
+    errors.add(:tslot, 'must belong to the same timetable') if tslot && timetable && tslot.timetable_id != timetable_id
+  end
 
   has_many :attendances, dependent: :destroy
 

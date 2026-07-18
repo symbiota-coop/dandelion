@@ -20,6 +20,10 @@ class EventFeedback
   field :response, type: String
   field :has_public_answers, type: Boolean
 
+  def self.protected_attributes
+    %w[event_id account_id response public_answers has_public_answers answers]
+  end
+
   validates_uniqueness_of :event, scope: :account, allow_nil: true, conditions: -> { where(deleted_at: nil) }
 
   before_validation do

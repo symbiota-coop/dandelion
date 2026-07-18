@@ -32,6 +32,10 @@ class Pmail
   field :markdown, type: Boolean
   field :gift, type: Boolean
 
+  def self.protected_attributes
+    %w[organisation_id account_id sent_at requested_send_at message_ids gift]
+  end
+
   has_many :pmail_links, dependent: :destroy
 
   def self.mailable_types

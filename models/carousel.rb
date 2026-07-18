@@ -15,6 +15,10 @@ class Carousel
   field :button, type: Boolean
   field :event_ids_cache, type: Array
 
+  def self.protected_attributes
+    %w[organisation_id event_ids_cache]
+  end
+
   validates_presence_of :name
 
   def self.new_hints

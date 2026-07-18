@@ -23,6 +23,10 @@ class Cohostship
   field :has_image, type: Boolean
   field :featured, type: Boolean
 
+  def self.protected_attributes
+    %w[organisation_id event_id has_image image_uid image_width_unmagic image_height_unmagic]
+  end
+
   before_validation do
     if image
       begin

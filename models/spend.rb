@@ -12,6 +12,10 @@ class Spend
   field :amount, type: Integer
   field :reimbursed, type: Boolean
 
+  def self.protected_attributes
+    %w[gathering_id membership_id reimbursed]
+  end
+
   validates_presence_of :item, :amount
 
   before_validation do

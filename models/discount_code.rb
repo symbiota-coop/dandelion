@@ -14,6 +14,10 @@ class DiscountCode
   field :filter, type: String
   field :maximum_uses, type: Integer
 
+  def self.protected_attributes
+    %w[codeable_id codeable_type account_id]
+  end
+
   validates_presence_of :code
   validates_uniqueness_of :code, scope: :codeable
 
