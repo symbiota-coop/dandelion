@@ -49,4 +49,18 @@ class LocalGroupsTest < ActiveSupport::TestCase
 
     assert_equal original_polygons, (local_group.reload.polygons.map { |polygon| [polygon.id, polygon.coordinates] })
   end
+
+  test 'organisation_id and account_id cannot be reassigned on update' do
+    account = FactoryBot.create(:account)
+    other_account = FactoryBot.create(:account)
+    organisation = FactoryBot.create(:organisation, account: account)
+    other_organisation = FactoryBot.create(:organisation, account: other_account)
+    local_group = FactoryBot.create(:local_group, organisation: organisation, account: account)
+
+    local_group.organisation = other_organisation
+    local_group.account = other_account
+    refute local_group.valid?
+    assert_includes local_group.errors[:organisation], 'cannot be changed'
+    assert_includes local_group.errors[:account], 'cannot be changed'
+  end
 end

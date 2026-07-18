@@ -36,6 +36,10 @@ class Activity
   field :feedback_summary_last_refreshed_at, type: Time
   field :slug, type: String
 
+  def self.protected_attributes
+    %w[account_id feedback_summary feedback_summary_last_refreshed_at has_image image_uid]
+  end
+
   def self.search_fields
     %w[name]
   end
@@ -98,6 +102,11 @@ class Activity
   validates_presence_of :name, :slug
   validates_uniqueness_of :slug, scope: :organisation_id
   validates_format_of :slug, with: /\A[a-z0-9-]+\z/
+
+  validate do
+    errors.add(:organisation, 'cannot be changed') if persisted? && organisation_id_changed?
+    errors.add(:account, 'cannot be changed') if persisted? && account_id_changed?
+  end
 
   def self.with_upcoming_events
     self.and(:id.in => Event.future.pluck(:activity_id).compact.uniq)

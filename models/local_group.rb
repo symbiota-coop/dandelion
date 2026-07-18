@@ -18,6 +18,10 @@ class LocalGroup
   field :type, type: String
   field :slug, type: String
 
+  def self.protected_attributes
+    %w[account_id]
+  end
+
   def self.search_fields
     %w[name]
   end
@@ -25,6 +29,11 @@ class LocalGroup
   validates_presence_of :name, :geometry, :slug
   validates_uniqueness_of :slug, scope: :organisation_id
   validates_format_of :slug, with: /\A[a-z0-9-]+\z/
+
+  validate do
+    errors.add(:organisation, 'cannot be changed') if persisted? && organisation_id_changed?
+    errors.add(:account, 'cannot be changed') if persisted? && account_id_changed?
+  end
 
   has_many :discount_codes, class_name: 'DiscountCode', as: :codeable, dependent: :destroy
 

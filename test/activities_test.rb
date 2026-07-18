@@ -26,4 +26,18 @@ class ActivitiesTest < ActiveSupport::TestCase
     assert page.has_content? 'The activity was saved'
     assert page.has_content? name
   end
+
+  test 'organisation_id and account_id cannot be reassigned on update' do
+    account = FactoryBot.create(:account)
+    other_account = FactoryBot.create(:account)
+    organisation = FactoryBot.create(:organisation, account: account)
+    other_organisation = FactoryBot.create(:organisation, account: other_account)
+    activity = FactoryBot.create(:activity, organisation: organisation, account: account)
+
+    activity.organisation = other_organisation
+    activity.account = other_account
+    refute activity.valid?
+    assert_includes activity.errors[:organisation], 'cannot be changed'
+    assert_includes activity.errors[:account], 'cannot be changed'
+  end
 end
