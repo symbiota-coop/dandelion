@@ -57,6 +57,8 @@ module EventValidation
       errors.add(:revenue_share_to_revenue_sharer, 'must be present if a revenue sharer is set') if revenue_sharer && !revenue_share_to_revenue_sharer
       errors.add(:organiser, 'or revenue sharer must be set') if !revenue_sharer && !organiser && organisation && organisation.stripe_client_id
 
+      errors.add(:organisation, 'cannot be changed') if persisted? && organisation_id_changed?
+      errors.add(:account, 'cannot be changed') if persisted? && account_id_changed?
       errors.add(:revenue_sharer, 'cannot be changed as the event has orders') if persisted? && revenue_sharer_id_changed? && orders.any?
       errors.add(:revenue_share_to_revenue_sharer, 'cannot be changed as the event has orders') if persisted? && revenue_share_to_revenue_sharer_changed? && orders.any?
 

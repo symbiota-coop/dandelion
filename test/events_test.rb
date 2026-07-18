@@ -371,4 +371,18 @@ class EventsTest < ActiveSupport::TestCase
     assert_equal '1', answers[q[5]]
     assert_equal '2024-06-01', answers[q[6]]
   end
+
+  test 'organisation_id and account_id cannot be reassigned on update' do
+    account = FactoryBot.create(:account)
+    other_account = FactoryBot.create(:account)
+    organisation = FactoryBot.create(:organisation, account: account)
+    other_organisation = FactoryBot.create(:organisation, account: other_account)
+    event = FactoryBot.create(:event, organisation: organisation, account: account, last_saved_by: account, prices: [0])
+
+    event.organisation = other_organisation
+    event.account = other_account
+    refute event.valid?
+    assert_includes event.errors[:organisation], 'cannot be changed'
+    assert_includes event.errors[:account], 'cannot be changed'
+  end
 end
