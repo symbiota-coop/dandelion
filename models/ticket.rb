@@ -52,9 +52,18 @@ class Ticket
     self.id_string = id.to_s if id && !id_string
 
     self.price = ticket_type.price if !price && !complimentary && ticket_type && ticket_type.price
-    errors.add(:price, 'is too low') if price && ticket_type && ticket_type.range_min && price < ticket_type.range_min
+    variable_price_ticket = ticket_type && (ticket_type.range || ticket_type.price.nil?)
+    if variable_price_ticket && !complimentary
+      if !price&.finite?
+        errors.add(:price, 'must be a number')
+      elsif ticket_type.range
+        self.price = price.clamp(*ticket_type.range)
+      elsif price < 1
+        errors.add(:price, 'is too low')
+      end
+    end
 
-    self.payment_completed = true if complimentary || price.nil? || price == 0
+    self.payment_completed = true if complimentary || price == 0 || (price.nil? && !variable_price_ticket)
 
     self.original_ticket_type_name = ticket_type.name if ticket_type && !original_ticket_type_name
     self.currency = (order.try(:currency) || event.try(:currency)) unless currency
