@@ -20,6 +20,7 @@ class Organisation
   include StripeWebhooks
   include ImportFromCsv
   include ImageWithValidation
+  include HasFacebookPixel
   include Searchable
 
   def self.fs(slug)

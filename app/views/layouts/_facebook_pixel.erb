@@ -1,0 +1,44 @@
+<script type="text/plain" data-cookie-category="marketing">
+  !function (f, b, e, v, n, t, s)
+  {
+    if (f.fbq)
+      return;
+    n = f.fbq = function () {
+      n.callMethod ?
+              n.callMethod.apply(n, arguments) : n.queue.push(arguments)
+    };
+    if (!f._fbq)
+      f._fbq = n;
+    n.push = n;
+    n.loaded = !0;
+    n.version = '2.0';
+    n.queue = [];
+    t = b.createElement(e);
+    t.async = !0;
+    t.src = v;
+    s = b.getElementsByTagName(e)[0];
+    s.parentNode.insertBefore(t, s)
+  }(window, document, 'script',
+          'https://connect.facebook.net/en_US/fbevents.js');
+  <% pixel_ids.each do |pixel_id| %>
+    fbq('init', <%== pixel_id.to_json %>);
+  <% end %>
+
+  fbq('track', 'PageView');
+
+  <% if @event && !track_purchase? %>
+    fbq('track', 'ViewContent', <%== facebook_pixel_view_content_params.to_json %>);
+  <% end %>
+
+  <% if track_purchase? %>
+    (function () {
+      var orderId = <%== purchase_analytics[:order_id].to_json %>;
+      var storageKey = 'fbq_purchase_' + orderId;
+      try {
+        if (window.sessionStorage && sessionStorage.getItem(storageKey)) return;
+        if (window.sessionStorage) sessionStorage.setItem(storageKey, '1');
+      } catch (e) {}
+      fbq('track', 'Purchase', <%== facebook_pixel_purchase_params.to_json %>, {eventID: orderId});
+    })();
+  <% end %>
+</script>

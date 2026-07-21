@@ -15,7 +15,6 @@ module OrganisationFields
     field :has_image, type: Mongoid::Boolean
     field :plausible_analytics_domain, type: String
     field :simple_analytics_domain, type: String
-    field :facebook_pixel_id, type: String
     field :stripe_connect_json, type: String
     field :stripe_account_json, type: String
     field :stripe_client_id, type: String

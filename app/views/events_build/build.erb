@@ -283,7 +283,7 @@
         <%= f.url_block :redirect_url %>
         <%= f.url_block :purchase_url %>
         <%= f.text_block :match_phrase %>
-        <%= f.number_block :facebook_pixel_id %>
+        <%= f.text_block :facebook_pixel_id %>
         <%= f.text_block :oc_slug %>
         <%= f.text_block :tax_rate_id %>
         <% if current_account.memberships.and(admin: true).exists? %>

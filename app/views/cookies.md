@@ -31,7 +31,7 @@ Where an organiser enables analytics, Dandelion may load Plausible Analytics or 
 
 ## Optional Marketing
 
-Where an organiser enables a Meta/Facebook pixel for an event or organisation, Dandelion may load it to measure visits and purchases. This is optional and is only loaded with your consent.
+Where an organiser enables a Meta/Facebook pixel for an event or organisation, Dandelion may load it to measure visits, event views and purchases. This is optional and is only loaded with your consent.
 
 ## Third-Party Services
 

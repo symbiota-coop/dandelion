@@ -6,6 +6,10 @@ Click Organisations > Create an organisation in the sidebar. Provide the basic d
 
 To accept payments for tickets to events created under the organisation, you must add details for Stripe or another payment processor in the Payments tab of your organisation's settings.
 
+## Analytics
+
+In organisation settings under **Analytics**, you can add a Meta/Facebook Pixel ID (digits only). With marketing cookie consent, Dandelion loads the pixel on organisation and event pages, sends `PageView` and `ViewContent` on event pages, and a single `Purchase` after a successful booking. You can also set a pixel on an individual event; if both are set and different, events are sent to both.
+
 ## Mailgun
 
 We offer a free gift of 1 email per month for up to 1000 subscribers. Beyond that, you'll need to link a paid [Mailgun](https://www.mailgun.com/) account. (You can always email attendees of events even without linking a Mailgun account.)

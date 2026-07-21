@@ -32,7 +32,6 @@ module EventFields
     field :redirect_url, type: String
     field :purchase_url, type: String
     field :currency, type: String
-    field :facebook_pixel_id, type: String
     field :time_zone, type: String
     field :questions, type: String
     field :add_a_donation_to, type: String

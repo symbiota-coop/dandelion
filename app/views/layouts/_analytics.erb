@@ -3,73 +3,31 @@
   <script type="text/plain" data-cookie-category="analytics">
     window.plausible = window.plausible || function() { (window.plausible.q = window.plausible.q || []).push(arguments) }
   </script>
-  <% if @order && params[:success] %>
+  <% if track_purchase? %>
     <script type="text/plain" data-cookie-category="analytics">
       plausible('Purchase', {
-        props: {
-          order_id: <%== @order.id.to_s.to_json %>
-        },
+        props: { order_id: <%== purchase_analytics[:order_id].to_json %> },
         revenue: {
-          currency: <%== @order.currency.to_json %>,
-          amount: <%== @order.value.to_json %>
+          currency: <%== purchase_analytics[:currency].to_json %>,
+          amount: <%== purchase_analytics[:value].to_json %>
         }
       });
     </script>
   <% end %>
 <% end %>
 
-
 <% if @organisation && @organisation.simple_analytics_domain %>
   <script type="text/plain" data-cookie-category="analytics">
     window.sa_event=window.sa_event||function(){var a=[].slice.call(arguments);window.sa_event.q?window.sa_event.q.push(a):window.sa_event.q=[a]};
   </script>
   <script type="text/plain" data-cookie-category="analytics" async data-hostname="<%= @organisation.simple_analytics_domain %>" src="https://scripts.simpleanalyticscdn.com/latest.js"></script>
-  <% if @order && params[:success] %>
+  <% if track_purchase? %>
     <script type="text/plain" data-cookie-category="analytics">
-      sa_event('purchase', {
-          order_id: <%== @order.id.to_s.to_json %>,
-          currency: <%== @order.currency.to_json %>,
-          amount: <%== @order.value.to_json %>
-      });
+      sa_event('purchase', <%== simple_analytics_purchase_params.to_json %>);
     </script>
   <% end %>
 <% end %>
 
-
-<% if (@organisation && @organisation.facebook_pixel_id) || (@event && @event.facebook_pixel_id) %>
-  <script type="text/plain" data-cookie-category="marketing">
-    !function (f, b, e, v, n, t, s)
-    {
-      if (f.fbq)
-        return;
-      n = f.fbq = function () {
-        n.callMethod ?
-                n.callMethod.apply(n, arguments) : n.queue.push(arguments)
-      };
-      if (!f._fbq)
-        f._fbq = n;
-      n.push = n;
-      n.loaded = !0;
-      n.version = '2.0';
-      n.queue = [];
-      t = b.createElement(e);
-      t.async = !0;
-      t.src = v;
-      s = b.getElementsByTagName(e)[0];
-      s.parentNode.insertBefore(t, s)
-    }(window, document, 'script',
-            'https://connect.facebook.net/en_US/fbevents.js');
-    <% if @organisation && @organisation.facebook_pixel_id %>
-      fbq('init', '<%= @organisation.facebook_pixel_id %>');
-    <% end %>
-    <% if @event && @event.facebook_pixel_id %>
-      fbq('init', '<%= @event.facebook_pixel_id %>');
-    <% end %>
-
-    fbq('track', 'PageView');
-
-    <% if @order && params[:success] %>
-      fbq('track', 'Purchase', <%== { currency: @order.currency, value: @order.value || 0 }.to_json %>, {eventID: <%== @order.id.to_s.to_json%>});
-    <% end %>
-  </script>
+<% if (pixel_ids = facebook_pixel_ids).any? %>
+  <%= partial :'layouts/facebook_pixel', locals: { pixel_ids: pixel_ids } %>
 <% end %>
