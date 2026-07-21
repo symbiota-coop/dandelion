@@ -173,6 +173,8 @@ To create a discount code, click the dropdown for your event (or organisation, a
 
 If your event sells out, a waitlist will be activated automatically. You can view people on the waitlist by selecting Waitlist in the event dropdown.
 
+If **Send email notifications of orders and waitlist registrations** is turned on, event facilitators are emailed when someone joins the waitlist.
+
 Dandelion automatically emails people on your waitlist if tickets become available again (either by you releasing more tickets, cancelling existing orders, or someone marking a ticket for resale with resales enabled).
 
 You can email your waitlist via Dandelion by going to Mailer in the event dropdown, creating a new message and selecting the waitlist under the To field. Alternatively, you can simply copy and paste the email addresses from the waitlist page into your own email app.
@@ -184,6 +186,8 @@ This is optional and separate from the event-wide waitlist above.
 When **Waitlists for ticket types** is turned on (under **Everything else** while editing your event), people can join a waitlist for each ticket type once that ticket type is sold out, as long as sales for that ticket type are still open (for example its per-ticket-type sales deadline has not passed, and the event is not treating sales as closed).
 
 On the booking form, sold-out ticket types show a **Join waitlist** action for that row.
+
+If **Send email notifications of orders and waitlist registrations** is turned on, event facilitators are emailed when someone joins a ticket type waitlist.
 
 Dandelion automatically emails people on a ticket type waitlist if tickets for that ticket type become available again.
 
