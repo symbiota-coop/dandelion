@@ -38,7 +38,7 @@ class Mapplication
   end
 
   after_destroy do
-    account.notifications_as_notifiable.create! circle: gathering, type: 'mapplication_removed' unless prevent_notifications
+    account.notifications_as_notifiable.create! circle: gathering, type: 'mapplication_removed' if gathering && !gathering.flagged_for_destroy? && !prevent_notifications
   end
 
   def self.pending
