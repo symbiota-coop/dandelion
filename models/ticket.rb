@@ -58,7 +58,7 @@ class Ticket
         errors.add(:price, 'must be a number')
       elsif ticket_type.range
         self.price = price.clamp(*ticket_type.range)
-      elsif price < 1
+      elsif price < 0
         errors.add(:price, 'is too low')
       end
     end
