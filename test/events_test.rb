@@ -116,6 +116,30 @@ class EventsTest < ActiveSupport::TestCase
     assert page.has_button? "Pay £#{format('%.2f', selected_price + donation_amount)}"
   end
 
+  test 'clicking disabled quantity select prompts to drag the slider' do
+    @account = FactoryBot.create(:account)
+    @organisation = FactoryBot.create(:organisation, account: @account)
+    @event = FactoryBot.create(:event, organisation: @organisation, account: @account, last_saved_by: @account, prices: ['10-100'], suggested_donation: 0)
+    visit "/e/#{@event.slug}"
+
+    assert page.has_css?("select[name='quantities[#{@event.ticket_types.first.id}]'][disabled]")
+    accept_alert 'Drag the slider' do
+      find('.quantity-select-container').click
+    end
+  end
+
+  test 'clicking disabled quantity select prompts to set a price' do
+    @account = FactoryBot.create(:account)
+    @organisation = FactoryBot.create(:organisation, account: @account)
+    @event = FactoryBot.create(:event, organisation: @organisation, account: @account, last_saved_by: @account, prices: [nil], suggested_donation: 0)
+    visit "/e/#{@event.slug}"
+
+    assert page.has_css?("select[name='quantities[#{@event.ticket_types.first.id}]'][disabled]")
+    accept_alert 'Set a price first' do
+      find('.quantity-select-container').click
+    end
+  end
+
   test 'booking onto a paid event with a user-set price' do
     @account = FactoryBot.create(:account)
     @organisation = FactoryBot.create(:organisation, account: @account)

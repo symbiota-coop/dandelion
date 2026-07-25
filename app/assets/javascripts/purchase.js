@@ -226,6 +226,22 @@ $(function () {
   })
   setTotal()
 
+  function syncQuantitySelectPointerEvents ($selects) {
+    $selects.each(function () {
+      $(this).css('pointer-events', this.disabled ? 'none' : '')
+    })
+  }
+  syncQuantitySelectPointerEvents($('select[name^=quantities]'))
+  $(document).on('change', 'select[name^=quantities]', function () {
+    syncQuantitySelectPointerEvents($(this))
+  })
+  $(document).on('click', '.quantity-select-container', function () {
+    if ($(this).find('select[name^=quantities]').prop('disabled')) {
+      const message = $(this).closest('tr').find('.select-a-price-first').text().trim()
+      showPurchaseAlert(message)
+    }
+  })
+
   let $ticketTypeWaitlistButton = $()
 
   $(document).on('click', '.join-ticket-type-waitlist', function (e) {
