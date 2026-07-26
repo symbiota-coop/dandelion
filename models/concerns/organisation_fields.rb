@@ -32,6 +32,7 @@ module OrganisationFields
     field :mailgun_api_key, type: String
     field :mailgun_domain, type: String
     field :mailgun_region, type: String
+    field :mailgun_webhook_signing_key, type: String
     field :mailgun_sto, type: Mongoid::Boolean
     field :calendar_import_urls, type: String
     field :calendar_import_last_synced_at, type: Time
@@ -135,6 +136,7 @@ module OrganisationFields
         gocardless_subscriptions: 'Register people with active GoCardless subscriptions as monthly donors',
         patreon_api_key: 'Patreon API key',
         mailgun_api_key: 'Mailgun API key',
+        mailgun_webhook_signing_key: 'Mailgun webhook signing key',
         calendar_import_urls: 'iCal URLs',
         evm_address: 'EVM address',
         collect_location: 'Ask for location of ticket buyers',
@@ -175,6 +177,7 @@ module OrganisationFields
         stripe_client_id: 'Used for automated revenue sharing. <code>Settings</code> > <code>Connect</code> > <code>Live mode client ID</code>. Starts <code>ca_</code>',
         mailgun_api_key: '<code>Settings</code> > <code>API keys</code>',
         mailgun_domain: '<code>Sending</code> > <code>Domains</code> > <code>Add new domain</code>',
+        mailgun_webhook_signing_key: '<code>Settings</code> > <code>Security</code> > <code>HTTP webhook signing key</code>',
         calendar_import_urls: 'One iCal URL per line from Luma, Google Calendar, Outlook, or iCloud. Dandelion imports upcoming events when you save and keeps them in sync.',
         affiliate_credit_percentage: 'When set, attendees receive a personal affiliate link in the order confirmation email. For each order made via the link, the source receives credit towards future events equal to this % of the order value.',
         add_a_donation_to: "Text to display beside the 'Add a donation' field",

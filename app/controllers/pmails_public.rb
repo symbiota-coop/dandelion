@@ -11,14 +11,20 @@ Dandelion::App.controller do
 
   post '/o/:slug/mailgun_webhook' do
     @organisation = Organisation.find_by(slug: params[:slug]) || not_found
+    body = request.body.read
     begin
-      event = JSON.parse(request.body.read)
+      event = JSON.parse(body)
     rescue StandardError
       halt 406
     end
+
+    halt 401 unless @organisation.mailgun_webhook_authentic?(event['signature'])
+
     if (pmail_id = event['event-data']['tags'].try(:first)) && (url = event['event-data']['url'])
       pmail = @organisation.pmails.find(pmail_id) || not_found
       uri = begin; URI(url); rescue StandardError; halt 406; end
+      halt 406 unless uri.is_a?(URI::HTTP) && uri.host.present?
+
       uri_params = Rack::Utils.parse_nested_query(uri.query)
       uri_params.delete('sign_in_token')
       uri.query = uri_params.to_query

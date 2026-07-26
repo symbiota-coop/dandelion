@@ -11,8 +11,11 @@ class PmailLink
   validates_presence_of :url
 
   before_validation do
-    errors.add(:url, 'is invalid') if url && !URI::DEFAULT_PARSER.make_regexp.match(url)
-    errors.add(:url, 'cannot contain sign_in_token') if url && url.include?('sign_in_token=')
+    if url
+      uri = begin; URI.parse(url); rescue StandardError; nil; end
+      errors.add(:url, 'is invalid') unless uri.is_a?(URI::HTTP) && uri.host.present?
+      errors.add(:url, 'cannot contain sign_in_token') if url.include?('sign_in_token=')
+    end
   end
 
   def event

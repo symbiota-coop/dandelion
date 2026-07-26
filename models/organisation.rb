@@ -1,5 +1,6 @@
 class Organisation
   REFERRAL_REWARD_THRESHOLD = Money.new(100_00, 'EUR').freeze
+  MAILGUN_WEBHOOK_MAX_TIMESTAMP_AGE = 15.minutes
 
   include Mongoid::Document
   include Mongoid::Timestamps
@@ -144,6 +145,28 @@ class Organisation
 
   def stripe_webhook_url
     "#{ENV['BASE_URI']}/o/#{slug}/stripe_webhook"
+  end
+
+  def mailgun_webhook_url
+    "#{ENV['BASE_URI']}/o/#{slug}/mailgun_webhook"
+  end
+
+  def mailgun_webhook_authentic?(signature)
+    signing_key = mailgun_webhook_signing_key.presence || ENV['MAILGUN_WEBHOOK_SIGNING_KEY'].presence
+    return false if signing_key.blank? || !signature.is_a?(Hash)
+
+    timestamp = signature['timestamp'].to_s
+    token = signature['token'].to_s
+    provided = signature['signature'].to_s
+    return false if timestamp.blank? || token.blank? || provided.blank?
+
+    age = Time.now.to_i - Integer(timestamp)
+    return false unless age.between?(-1.minute.to_i, MAILGUN_WEBHOOK_MAX_TIMESTAMP_AGE.to_i)
+
+    expected = OpenSSL::HMAC.hexdigest(OpenSSL::Digest.new('SHA256'), signing_key, "#{timestamp}#{token}")
+    ActiveSupport::SecurityUtils.secure_compare(expected, provided)
+  rescue ArgumentError, TypeError
+    false
   end
 
   def sync_calendar_imports

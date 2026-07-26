@@ -16,6 +16,8 @@ We offer a free gift of 1 email per month for up to 1000 subscribers. Beyond tha
 
 After sending a free gift email, open and click rates appear on the sent message page under Mailer. Organisations with their own Mailgun account also get a link through to Mailgun analytics.
 
+For per-link click tracking, configure a Mailgun `Clicked` webhook to your organisation's webhook URL (shown under Mailgun settings) and paste the HTTP webhook signing key from Mailgun's Security settings.
+
 ## Community event submissions
 
 In your organisation settings, enable **Allow anyone to submit events for review** so that any signed-in user can propose a new event under your organisation. Those events are not public until an organisation admin publishes them; admins receive an email when someone submits an event.
