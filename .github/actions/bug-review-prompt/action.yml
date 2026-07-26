@@ -5,6 +5,12 @@ inputs:
   title_prefix:
     description: Issue title prefix (e.g. "[Claude] " or "[Cursor] ")
     required: true
+  git_log_cmd:
+    description: git log command that lists commits in the review window
+    required: true
+  review_window:
+    description: Human-readable description of the review window
+    required: true
 
 outputs:
   text:
@@ -19,8 +25,13 @@ runs:
       shell: bash
       env:
         TITLE_PREFIX: ${{ inputs.title_prefix }}
+        GIT_LOG_CMD: ${{ inputs.git_log_cmd }}
+        REVIEW_WINDOW: ${{ inputs.review_window }}
       run: |
-        PROMPT=$(sed "s|TITLE_PREFIX|${TITLE_PREFIX}|g" .github/prompts/daily-bug-review.md)
+        PROMPT=$(<.github/prompts/daily-bug-review.md)
+        PROMPT=${PROMPT//TITLE_PREFIX/$TITLE_PREFIX}
+        PROMPT=${PROMPT//GIT_LOG_CMD/$GIT_LOG_CMD}
+        PROMPT=${PROMPT//REVIEW_WINDOW/$REVIEW_WINDOW}
         {
           echo 'text<<EOF'
           echo "$PROMPT"

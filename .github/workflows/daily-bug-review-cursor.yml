@@ -17,13 +17,14 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 30
     permissions:
+      actions: read
       contents: read
       issues: write
 
     steps:
       - uses: actions/checkout@v4
         with:
-          fetch-depth: 100
+          fetch-depth: 0
 
       - name: Setup
         id: setup
@@ -35,6 +36,8 @@ jobs:
         uses: ./.github/actions/bug-review-prompt
         with:
           title_prefix: '[Cursor] '
+          git_log_cmd: ${{ steps.setup.outputs.git_log_cmd }}
+          review_window: ${{ steps.setup.outputs.review_window }}
 
       - name: Install Cursor CLI
         if: steps.setup.outputs.has_commits == 'true'

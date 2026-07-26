@@ -1,24 +1,66 @@
 name: Bug review setup
-description: Check for commits in the last 24 hours (requires checkout first)
+description: Resolve review window from last successful run and check for commits (requires checkout first)
 
 outputs:
   has_commits:
     description: Whether there are commits in the review window
     value: ${{ steps.check-commits.outputs.has_commits }}
+  git_log_cmd:
+    description: git log command that lists commits in the review window
+    value: ${{ steps.check-commits.outputs.git_log_cmd }}
+  review_window:
+    description: Human-readable description of the review window
+    value: ${{ steps.check-commits.outputs.review_window }}
 
 runs:
   using: composite
   steps:
-    - name: Check for recent commits
+    - name: Resolve review window and check commits
       id: check-commits
       shell: bash
+      env:
+        GH_TOKEN: ${{ github.token }}
+        CURRENT_RUN_ID: ${{ github.run_id }}
+        WORKFLOW_REF: ${{ github.workflow_ref }}
       run: |
-        COMMITS=$(git log --since='24 hours ago' --oneline --no-merges)
+        set -euo pipefail
+
+        WORKFLOW_FILE=$(basename "${WORKFLOW_REF%%@*}")
+        echo "Workflow file: $WORKFLOW_FILE"
+
+        if ! PREV_SHA=$(gh api \
+          "repos/${GITHUB_REPOSITORY}/actions/workflows/${WORKFLOW_FILE}/runs?status=completed&per_page=30" \
+          --jq "[.workflow_runs[] | select(.conclusion == \"success\" and .id != ${CURRENT_RUN_ID})][0].head_sha // empty"); then
+          echo "Could not query previous workflow runs"
+          PREV_SHA=""
+        fi
+
+        if [ -n "$PREV_SHA" ] && git cat-file -e "${PREV_SHA}^{commit}" 2>/dev/null; then
+          echo "Using previous successful head_sha: $PREV_SHA"
+          GIT_LOG_CMD="git log --oneline --no-merges ${PREV_SHA}..HEAD"
+          REVIEW_WINDOW="commits after the last successful run tip (${PREV_SHA:0:7}..HEAD)"
+          COMMITS=$(git log --oneline --no-merges "${PREV_SHA}..HEAD")
+        else
+          if [ -n "${PREV_SHA:-}" ]; then
+            echo "Previous head_sha ${PREV_SHA} not found in clone; falling back to 24 hours"
+          else
+            echo "No usable previous successful run; falling back to 24 hours"
+          fi
+          GIT_LOG_CMD="git log --since='24 hours ago' --oneline --no-merges"
+          REVIEW_WINDOW="commits from the past 24 hours (fallback: no usable prior successful run)"
+          COMMITS=$(git log --since='24 hours ago' --oneline --no-merges)
+        fi
+
+        {
+          echo "git_log_cmd=${GIT_LOG_CMD}"
+          echo "review_window=${REVIEW_WINDOW}"
+        } >> "$GITHUB_OUTPUT"
+
         if [ -z "$COMMITS" ]; then
-          echo "No commits in the review window"
+          echo "No commits in the review window ($REVIEW_WINDOW)"
           echo "has_commits=false" >> "$GITHUB_OUTPUT"
         else
-          echo "Found commits:"
+          echo "Found commits ($REVIEW_WINDOW):"
           echo "$COMMITS"
           echo "has_commits=true" >> "$GITHUB_OUTPUT"
         fi
