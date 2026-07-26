@@ -5,10 +5,19 @@ Dandelion::App.controller do
   end
 
   post '/whatsapp' do
+    payload = request.body.read
+    signature = request.env['HTTP_X_HUB_SIGNATURE_256'].to_s
+    app_secret = ENV['WHATSAPP_APP_SECRET']
+    halt 403 unless app_secret.present? && signature.start_with?('sha256=')
+
+    expected = OpenSSL::HMAC.hexdigest('sha256', app_secret, payload)
+    provided = signature.delete_prefix('sha256=')
+    halt 403 unless ActiveSupport::SecurityUtils.secure_compare(expected, provided)
+
     token = ENV['WHATSAPP_ACCESS_TOKEN']
     http_client = HTTP.auth("Bearer #{token}")
 
-    body = JSON.parse(request.body.read)
+    body = JSON.parse(payload)
     message = body.dig('entry', 0, 'changes', 0, 'value', 'messages', 0)
     halt 200 unless message && message['type'] == 'audio'
 
@@ -31,6 +40,7 @@ Dandelion::App.controller do
     end
 
     media_id = message['audio']['id']
+    halt 200 unless media_id.to_s.match?(/\A\d+\z/)
 
     # get the media url
     media_url = "https://graph.facebook.com/v21.0/#{media_id}"
