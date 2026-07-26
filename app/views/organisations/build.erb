@@ -240,11 +240,6 @@
           <%= f.text_block :mailgun_api_key %>
           <%= f.text_block :mailgun_domain %>
           <%= f.select_block :mailgun_region %>
-          <p>
-            For per-link click tracking, go to <code>Sending</code> > <code>Webhooks</code> and add a
-            <code>Clicked</code> webhook pointing to
-            <span style="text-decoration: underline dotted"><%= @organisation.mailgun_webhook_url %></span>
-          </p>
           <%= f.text_block :mailgun_webhook_signing_key %>
         </div>
         <div role="tabpanel" class="tab-pane <%= 'active' if params[:tab] == 'analytics'%>" id="tab-analytics">
