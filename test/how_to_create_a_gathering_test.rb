@@ -17,7 +17,7 @@ class HowToCreateAGatheringTest < ActiveSupport::TestCase
       This feature was originally developed to support camps at European Burning Man events, and has since been used for several standalone microburns, along with online-only unconferences.
       Click 'Create a gathering' to get started.
     )
-    within('#sidebar') { click_link 'Create a gathering' }
+    within('#content') { click_link 'Create a gathering' }
     narrate %(Enter the name of the gathering.), lambda {
       fill_in 'Name', with: @gathering.name
     }
