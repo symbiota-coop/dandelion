@@ -105,9 +105,6 @@ $(function () {
 
   // Email labels tweaks
   $('label[for$="_email_greeting"], label[for$="_email_body"]').hide()
-  $('label[for$="_email_title"]').each(function () {
-    $(this).text($(this).text().replace('email subject', 'email'))
-  })
 
   // Questions textareas and autosize
   $('#event_questions').attr('rows', '8')

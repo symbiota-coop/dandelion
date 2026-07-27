@@ -202,9 +202,6 @@
           <script>
             $(function() {
               $('label[for$="_email_greeting"], label[for$="_email_body"]').hide()
-              $('label[for$="_email_title"]').each(function() {
-                $(this).text($(this).text().replace('email subject', 'email'))
-              })
             })
           </script>
           <p>Magic tags: <%== EmailFields::MAGIC_TAGS.map { |t| "<code>[#{t}]</code>" }.join(', ') %></p>
