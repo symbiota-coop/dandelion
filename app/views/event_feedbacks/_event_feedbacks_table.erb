@@ -135,7 +135,7 @@
       <% } if event_feedback.answers %>
     </td>
     <td>
-      <% if event_feedback.event %>
+      <% if event_feedback.event && event_feedback.respondable? %>
         <div data-pagelet-url="/event_feedbacks/<%= event_feedback.id %>/response"></div>
       <% end %>
     </td>

@@ -8,7 +8,7 @@
     </div>
   </div>
 
-  <% if event_feedback.response && (event_feedback.publicly_visible? || !event_feedback.anonymous?) %>
+  <% if event_feedback.response && event_feedback.respondable? %>
     <div class="<% if defined?(mb_class) %><%= mb_class %><% else %>mb-3<% end %> mt-3">
       <em><%=event_feedback.event.organisation.name%> replied</em>
       <p class="mt-1 mb-0 readable read-more">&mdash; <%== Sanitize.fragment(Rinku.auto_link(event_feedback.response.gsub("\n", '<br />')), Sanitize::Config::DANDELION) %></p>

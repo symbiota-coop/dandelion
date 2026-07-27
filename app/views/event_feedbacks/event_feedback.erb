@@ -47,14 +47,16 @@
     </td>
   </tr>
   <% } if @event_feedback.answers %>
-  <tr>
-    <th>
-      Your response
-    </th>
-    <td>
-      <div data-pagelet-url="/event_feedbacks/<%= @event_feedback.id %>/response"></div>
-    </td>
-  </tr>
+  <% if @event_feedback.respondable? %>
+    <tr>
+      <th>
+        Your response
+      </th>
+      <td>
+        <div data-pagelet-url="/event_feedbacks/<%= @event_feedback.id %>/response"></div>
+      </td>
+    </tr>
+  <% end %>
   <% if admin? %>
     <tr>
       <th>

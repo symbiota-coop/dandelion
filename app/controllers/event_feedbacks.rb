@@ -123,7 +123,7 @@ Dandelion::App.controller do
     @event = @event_feedback.event
     event_admins_only!
     @event_feedback.response = params[:response]
-    @event_feedback.save
+    halt 400 unless @event_feedback.save
     @event_feedback.send_response
     200
   end

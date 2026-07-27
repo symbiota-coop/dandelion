@@ -31,6 +31,10 @@ class EventFeedback
     self.answers = nil unless answers&.any? { |_q, a| a.present? }
   end
 
+  validate do
+    errors.add(:response, 'cannot be set when feedback is anonymous and not publicly visible') if response_changed? && response.present? && !respondable?
+  end
+
   after_save do
     event.clear_cache if event
   end
@@ -41,6 +45,10 @@ class EventFeedback
 
   def circle
     account
+  end
+
+  def respondable?
+    publicly_visible? || !anonymous?
   end
 
   after_create do
