@@ -13,15 +13,22 @@ module VideoNarrationHelper
         File.binwrite("#{Capybara.save_path}/#{label}_#{hash}.aac", response)
       end
 
-      save_screenshot("#{label}_before_#{hash}.png") # rubocop:disable Lint/Debugger
+      save_viewport_screenshot("#{label}_before_#{hash}.png")
     end
 
     unless action.nil?
       action.call
-      save_screenshot("#{label}_after_#{hash}.png") if ENV['CREATE_VIDEO'] # rubocop:disable Lint/Debugger
+      save_viewport_screenshot("#{label}_after_#{hash}.png") if ENV['CREATE_VIDEO']
     end
 
     @step += 1 if ENV['CREATE_VIDEO']
+  end
+
+  def save_viewport_screenshot(path)
+    x, y, width, height = evaluate_script(
+      '[window.scrollX, window.scrollY, window.innerWidth, window.innerHeight]'
+    )
+    save_screenshot(path, area: { x: x, y: y, width: width, height: height }) # rubocop:disable Lint/Debugger
   end
 
   def create_video

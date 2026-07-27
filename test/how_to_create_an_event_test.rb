@@ -48,11 +48,13 @@ class HowToCreateAnEventTest < ActiveSupport::TestCase
       fill_in 'event_ticket_types_attributes_0_price_or_range', with: @ticket_type.price_or_range
       fill_in 'event_ticket_types_attributes_0_quantity', with: @ticket_type.quantity
     }
-    narrate %(That'll do for now - click the final tab and then 'Create event'.), lambda {
+    narrate %(That'll do for now - click the final tab.), lambda {
       click_link 'Everything else'
     }
     execute_script %{window.scrollTo(0, document.body.scrollHeight);}
-    click_button 'Create event'
+    narrate %(Then click 'Create event'.), lambda {
+      click_button 'Create event'
+    }
     narrate %(You're done!)
     create_video
   end
