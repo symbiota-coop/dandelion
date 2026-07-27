@@ -13,7 +13,7 @@ module Dandelion
 
     use Sentry::Rack::CaptureExceptions
 
-    use Rack::Session::Cookie, expire_after: 1.year.to_i, secret: ENV['SESSION_SECRET']
+    use Rack::Session::Cookie, expire_after: 1.year.to_i, secret: ENV['SESSION_SECRET'], same_site: :lax
     use Rack::UTF8Sanitizer
     use Rack::CrawlerDetect
     use Rack::Attack
