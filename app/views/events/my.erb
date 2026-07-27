@@ -1,115 +1,118 @@
-<% upcoming_events = current_account.upcoming_events.with_key_includes.paginate(page: params[:upcoming_events_page], per_page: 10) %>
-<% past_events = current_account.previous_events.with_key_includes.paginate(page: params[:past_events_page], per_page: 10) %>
+<% tab = %w[upcoming starred past].include?(params[:tab]) ? params[:tab] : 'upcoming' %>
 
-<% if params[:past_events_page] || params[:upcoming_events_page] %>
-  <p><a href="/events/my">&larr; All your events</a></p>
-<% end %>
-
-<% unless params[:past_events_page] %>
-  <div class="row justify-content-between align-items-center mb-3">
-    <div class="col-auto">
-      <h2 class="mb-0">Upcoming events</h2>
+<div class="row justify-content-between align-items-end mb-3">
+  <div class="col">
+    <div class="nav-wrapper mb-0">
+      <ul class="nav nav-tabs" role="tablist">
+        <li role="presentation" class="nav-item">
+          <a class="nav-link <%= 'active' if tab == 'upcoming' %>" href="/events/my?tab=upcoming">Upcoming</a>
+        </li>
+        <li role="presentation" class="nav-item">
+          <a class="nav-link <%= 'active' if tab == 'starred' %>" href="/events/my?tab=starred">Starred</a>
+        </li>
+        <li role="presentation" class="nav-item">
+          <a class="nav-link <%= 'active' if tab == 'past' %>" href="/events/my?tab=past">Past</a>
+        </li>
+      </ul>
     </div>
-    <div class="col-auto">
+  </div>
+  <% if tab == 'upcoming' %>
+    <div class="col-auto pb-2">
       <a data-toggle="tooltip" title="iCal feed" style="font-size: 1rem" class="text-primary" id="ical" target="_blank" href="/events/my.ics?ics_key=<%=current_account.ensure_ics_key!%>">
         <i class="bi bi-rss-fill"></i>
       </a>
     </div>
-  </div>
-  <% if upcoming_events.exists? %>
-    <%= partial :'events/blocks', locals: { events: upcoming_events } %>
+  <% end %>
+</div>
+
+<% if tab == 'upcoming' %>
+  <% events = current_account.upcoming_events_without_stars.with_key_includes.paginate(page: params[:page], per_page: 10) %>
+  <% if events.exists? %>
+    <%= partial :'events/blocks', locals: { events: events } %>
     <div class="mt-3">
-      <%= will_paginate upcoming_events, param_name: 'upcoming_events_page', page_links: false, renderer: WillPaginate::ViewHelpers::BootstrapRenderer %>
+      <%= will_paginate events, page_links: false, renderer: WillPaginate::ViewHelpers::BootstrapRenderer, params: { 'tab' => 'upcoming' } %>
     </div>
   <% else %>
-    <div class="mb-3">
-      <em>No upcoming events</em>
-    </div>
+    <em>No upcoming events</em>
   <% end %>
-<% end %>
 
-<% unless params[:upcoming_events_page] %>
-  <% if past_events.exists?; events = past_events %>
-    <h2 class="mb-3">Past events</h2>
+<% elsif tab == 'starred' %>
+  <% events = current_account.upcoming_starred_events.with_key_includes.paginate(page: params[:page], per_page: 10) %>
+  <% if events.exists? %>
+    <%= partial :'events/blocks', locals: { events: events } %>
+    <div class="mt-3">
+      <%= will_paginate events, page_links: false, renderer: WillPaginate::ViewHelpers::BootstrapRenderer, params: { 'tab' => 'starred' } %>
+    </div>
+  <% else %>
+    <em>No starred upcoming events</em>
+  <% end %>
 
-    <% if events.exists? %>
-      <div class="mb-3">
-        <div class="row" id="events">
-          <% events.each { |event| next if event.locked? && !event_admin?(event) %>
-          <div class="col-12 <%= block_class if defined?(block_class) %>" id="<%= event.id %>">
-            <div class="mb-4">
+<% elsif tab == 'past' %>
+  <% events = current_account.previous_events_without_stars.with_key_includes.paginate(page: params[:page], per_page: 10) %>
+  <% if events.exists? %>
+    <div class="mb-3">
+      <div class="row" id="events">
+        <% events.each { |event| next if event.locked? && !event_admin?(event) %>
+        <div class="col-12" id="<%= event.id %>">
+          <div class="mb-4">
+            <% image_source = event.image_source(@organisation) %>
+            <div class="row block no-gutters align-items-stretch <% if event.locked? %>event-locked<% end %>">
+              <% if image_source %>
+                <div class="col-lg-6 order-lg-2 mb-2 mb-lg-0 bg-white">
+                  <a target="_parent" href="/e/<%= event.slug %><%= "?cohost=#{@organisation.slug}" if image_source.is_a?(Cohostship) %>"><%= blurred_image_tag(image_source.image, width: image_source.image_width_unmagic, height: image_source.image_height_unmagic) %></a>
+                </div>
+              <% end %>
+              <div class="<% if !image_source %>col-lg-12<% else %>col-lg-6<% end %> order-lg-1">
+                <table style="width: 100%; height: 100%">
+                  <tr>
+                    <td style="vertical-align: top">
+                      <div class="row justify-content-between">
+                        <div class="col ml-1 p-lg-3">
+                          <%= partial :'events/block_main', locals: { event: event, skip_final_ul: true } %>
 
-              <% image_source = event.image_source(@organisation) %>
-              <div class="row block no-gutters align-items-stretch <% if event.locked? %>event-locked<% end %>">
-                <% if image_source %>
-                  <div class="col-lg-6 order-lg-2 mb-2 mb-lg-0 bg-white">
-                    <a target="_parent" href="/e/<%= event.slug %><%= "?cohost=#{@organisation.slug}" if image_source.is_a?(Cohostship) %>"><%= blurred_image_tag(image_source.image, width: image_source.image_width_unmagic, height: image_source.image_height_unmagic) %></a>
-                  </div>
-                <% end %>
-                <div class="<% if !image_source %>col-lg-12<% else %>col-lg-6<% end %> order-lg-1">
-                  <table style="width: 100%; height: 100%">
-                    <tr>
-                      <td style="vertical-align: top">
-                        <div class="row justify-content-between">
-                          <div class="col ml-1 p-lg-3">
-                            <%= partial :'events/block_main', locals: { event: event, skip_final_ul: true } %>
-
-                            <% if event.organisation %>
-                              <% if event.attendees.include?(current_account) %>
-
-                                <li>
-
-                                  <% if (event_feedback = event.event_feedbacks.find_by(account: current_account)) %>
-                                    <div class="mt-1">
-                                      <% if event_feedback.rating %>
-                                        <% event_feedback.rating.times do %><i class="bi bi-star-fill"></i><% end %>
-                                      <% end %>
-
-                                      <% event_feedback.answers.each_with_index { |qa,i| q = qa[0]; a = qa[1] %>
-                                      <% if a %>
-                                        <p class="mt-1">
-                                          <strong>
-                                            <%== Sanitize.fragment(Rinku.auto_link(q), Sanitize::Config::DANDELION) %>
-                                          </strong>
-                                          <br>
-                                          <%== Sanitize.fragment(Rinku.auto_link(a), Sanitize::Config::DANDELION) %>
-                                        </p>
-                                      <% end %>
-                                      <% } if event_feedback.answers %>
-                                    </div>
-                                  <% else %>
-                                    <i data-toggle="tooltip" title="Give feedback" class="bi bi-star"></i>
-                                    <a href="/events/<%=event.id%>/give_feedback">Give feedback</a>
+                          <% if event.organisation && event.attendees.include?(current_account) %>
+                            <li>
+                              <% if (event_feedback = event.event_feedbacks.find_by(account: current_account)) %>
+                                <div class="mt-1">
+                                  <% if event_feedback.rating %>
+                                    <% event_feedback.rating.times do %><i class="bi bi-star-fill"></i><% end %>
                                   <% end %>
-                                </li>
 
+                                  <% event_feedback.answers.each_with_index { |qa,i| q = qa[0]; a = qa[1] %>
+                                  <% if a %>
+                                    <p class="mt-1">
+                                      <strong>
+                                        <%== Sanitize.fragment(Rinku.auto_link(q), Sanitize::Config::DANDELION) %>
+                                      </strong>
+                                      <br>
+                                      <%== Sanitize.fragment(Rinku.auto_link(a), Sanitize::Config::DANDELION) %>
+                                    </p>
+                                  <% end %>
+                                  <% } if event_feedback.answers %>
+                                </div>
+                              <% else %>
+                                <i data-toggle="tooltip" title="Give feedback" class="bi bi-star"></i>
+                                <a href="/events/<%=event.id%>/give_feedback">Give feedback</a>
                               <% end %>
-
-                            <% end %>
-
-                          </ul>
-
-
-                        </div>
+                            </li>
+                          <% end %>
+                        </ul>
                       </div>
-                    </td>
-                  </tr>
-                </table>
-              </div>
+                    </div>
+                  </td>
+                </tr>
+              </table>
             </div>
-
-
           </div>
         </div>
-        <% } %>
       </div>
+      <% } %>
     </div>
-  <% end %>
-
-
-  <div class="mt-3">
-    <%= will_paginate past_events, param_name: 'past_events_page', page_links: false, renderer: WillPaginate::ViewHelpers::BootstrapRenderer %>
   </div>
+  <div class="mt-3">
+    <%= will_paginate events, page_links: false, renderer: WillPaginate::ViewHelpers::BootstrapRenderer, params: { 'tab' => 'past' } %>
+  </div>
+<% else %>
+  <em>No past events</em>
 <% end %>
-
 <% end %>

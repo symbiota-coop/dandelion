@@ -34,8 +34,8 @@
 <% else %>
   <p class="mb-0">
     Nothing upcoming. <a class="browse-events" href="/events">Browse events</a>
-    <% if current_account.previous_events.exists? %>
-      or <a href="/events/my">see your past events &rarr;</a>
+    <% if current_account.previous_events_without_stars.exists? %>
+      or <a href="/events/my?tab=past">see your past events &rarr;</a>
     <% end %>
   </p>
 <% end %>

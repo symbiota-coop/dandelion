@@ -166,22 +166,42 @@ module AccountAssociations
     Message.or({ messenger: self }, { messengee: self })
   end
 
+  def my_event_ids_without_stars
+    tickets.complete.pluck(:event_id) +
+      event_facilitations.pluck(:event_id) +
+      events_coordinating_ids +
+      events_revenue_sharing_ids +
+      events_organising_ids
+  end
+
+  def my_events_without_stars
+    Event.and(has_organisation: true).and(:id.in => my_event_ids_without_stars)
+  end
+
   def my_events
     Event.and(has_organisation: true).and(:id.in =>
-        tickets.complete.pluck(:event_id) +
-        event_facilitations.pluck(:event_id) +
-        events_coordinating_ids +
-        events_revenue_sharing_ids +
-        events_organising_ids +
+        my_event_ids_without_stars +
         event_stars.pluck(:event_id))
+  end
+
+  def starred_events
+    Event.and(has_organisation: true).and(:id.in => event_stars.pluck(:event_id))
   end
 
   def upcoming_events
     my_events.and(evergreen: false).future
   end
 
-  def previous_events
-    my_events.and(evergreen: false).past
+  def upcoming_events_without_stars
+    my_events_without_stars.and(evergreen: false).future
+  end
+
+  def upcoming_starred_events
+    starred_events.and(evergreen: false).future
+  end
+
+  def previous_events_without_stars
+    my_events_without_stars.and(evergreen: false).past
   end
 
   def organisations_for_creating_events
