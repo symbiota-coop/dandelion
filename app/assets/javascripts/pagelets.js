@@ -143,7 +143,7 @@ $(function () {
     } catch (e) {
       path = href
     }
-    const request = /destroy$/.test(path) ? $.post : $.get
+    const request = ($link.data('method') === 'post' || /destroy$/.test(path)) ? $.post : $.get
     request(href, function () {
       reloadPagelet(pagelet, function () { postLoad(pagelet) })
     })

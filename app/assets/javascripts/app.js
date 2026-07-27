@@ -70,33 +70,35 @@ $(function () {
       }
     })
 
-    $('[data-confirm], a[href*="destroy"]').not('[data-confirm-registered]').attr('data-confirm-registered', 'true').each(function () {
-      $(this).click(function (event) {
-        $(this).removeClass('no-trigger')
+    // Confirm dialogs (coordinates with other handlers via .no-trigger)
+    $('[data-confirm], a[href*="destroy"]').not('[data-confirm-registered]').attr('data-confirm-registered', true).click(function () {
+      const $el = $(this)
+      $el.removeClass('no-trigger')
+      const message = $el.data('confirm') || 'Are you sure?'
+      if (!confirm(message)) {
+        $el.addClass('no-trigger')
+        return false
+      }
+    })
 
-        const message = $(this).data('confirm') || 'Are you sure?'
-        if (!confirm(message)) {
-          $(this).addClass('no-trigger')
-          return false
-        }
+    // POST method override (data-method="post", or paths ending in destroy)
+    $('a[data-method="post"], a[href*="destroy"]').not('[data-method-registered]').attr('data-method-registered', true).click(function (event) {
+      const $el = $(this)
+      if ($el.hasClass('no-trigger')) return false
+      // pagelet-trigger links are handled by pagelets.js
+      if ($el.hasClass('pagelet-trigger')) return
 
-        // Paths ending in destroy (including hard_destroy, refund_and_destroy) always POST
-        let shouldPost = false
-        if (this.href) {
-          try {
-            const path = new URL(this.href, window.location.origin).pathname
-            if (/destroy$/.test(path)) shouldPost = true
-          } catch (e) {}
-        }
+      let shouldPost = $el.data('method') === 'post'
+      if (!shouldPost && this.href) {
+        try {
+          const path = new URL(this.href, window.location.origin).pathname
+          if (/destroy$/.test(path)) shouldPost = true
+        } catch (e) {}
+      }
+      if (!shouldPost) return
 
-        if (shouldPost) {
-          // pagelet-trigger links are handled by pagelets.js (also via POST)
-          if ($(this).hasClass('pagelet-trigger')) return
-
-          event.preventDefault()
-          $('<form>', { method: 'post', action: this.href }).hide().appendTo(document.body)[0].submit()
-        }
-      })
+      event.preventDefault()
+      $('<form>', { method: 'post', action: this.href }).hide().appendTo(document.body)[0].submit()
     })
 
     $('form.add-placeholders label[for]').not('[data-placeholders-added]').attr('data-placeholders-added', true).each(function () {
