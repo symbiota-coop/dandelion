@@ -77,7 +77,14 @@ Dandelion::App.controller do
       end
     end
 
+    # will_send_at should only be set when actually scheduling via Send later
+    params[:pmail].delete(:will_send_at) if params[:pmail] && !params[:send_later]
+
     if @pmail.update_attributes(mass_assigning(params[:pmail], Pmail))
+      # Clear orphaned will_send_at left by saving the date without scheduling
+      unless params[:send] || params[:send_later]
+        @pmail.set(will_send_at: nil) if @pmail.will_send_at && !@pmail.delayed_job
+      end
       flash[:notice] = 'The mail was saved. Preview and send using the buttons below.'
       if params[:send_test]
         @pmail.send_batch_message(test_to: Account.and(id: current_account.id))

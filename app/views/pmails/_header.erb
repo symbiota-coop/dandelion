@@ -49,7 +49,7 @@
     <p class="lead">Queued for sending at <%= @pmail.requested_send_at %></p>
   <% else %>
     <%= @hide_alert = true; partial :flash %>
-    <% if @pmail.will_send_at %>
+    <% if @pmail.delayed_job %>
       <p class="lead">Will be sent at <%= @pmail.delayed_job.run_at %></p>
     <% end %>
     <div class="mb-3">
