@@ -93,6 +93,10 @@ Dandelion::App.controller do
         elsif params[:send_later] && @pmail.will_send_at
           @pmail.delay(run_at: @pmail.will_send_at).send_pmail
           flash[:notice] = 'Scheduled!'
+        elsif params[:send_later]
+          flash[:notice] = nil
+          flash[:error] = 'Please choose a date and time to send later.'
+          redirect "/pmails/#{@pmail.id}/edit?#{@scope}"
         end
         if @organisation
           redirect "/o/#{@organisation.slug}/pmails"
