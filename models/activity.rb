@@ -36,6 +36,10 @@ class Activity
   field :feedback_summary_last_refreshed_at, type: Time
   field :slug, type: String
 
+  %w[hide_image hide_location hide_date_of_birth hide_gender].each do |b|
+    field b.to_sym, type: Boolean
+  end
+
   def self.protected_attributes
     %w[account_id feedback_summary feedback_summary_last_refreshed_at has_image image_uid]
   end
@@ -162,7 +166,11 @@ class Activity
     {
       privacy: 'Access',
       email: 'Contact email',
-      slug: 'URL'
+      slug: 'URL',
+      hide_image: "Don't ask for photo",
+      hide_location: "Don't ask for location",
+      hide_date_of_birth: "Don't ask for date of birth",
+      hide_gender: "Don't ask for gender"
     }[attr.to_sym] || super
   end
 

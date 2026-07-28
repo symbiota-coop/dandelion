@@ -30,24 +30,26 @@
       <% end %>
       <% form_for @account, "/activities/#{@activity.id}/apply", id: 'application-form', class: 'mt-3' do |f| %>
         <%= hidden_field_tag :via, value: (session[:via] if session[:via]) %>
-        <script>
-          $(function () {
+        <% unless @activity.hide_location %>
+          <script>
+            $(function () {
 
-            if (typeof google !== 'undefined') {
-              var autocomplete = new google.maps.places.Autocomplete($('#account_location')[0]);
-              $('#account_location').keydown(function (e) {
-                if (e.which == 13 && $('.pac-container:visible').length)
-                  return false;
-              });
-            }
-          })
-        </script>
+              if (typeof google !== 'undefined') {
+                var autocomplete = new google.maps.places.Autocomplete($('#account_location')[0]);
+                $('#account_location').keydown(function (e) {
+                  if (e.which == 13 && $('.pac-container:visible').length)
+                    return false;
+                });
+              }
+            })
+          </script>
+        <% end %>
         <%= f.text_block :name %>
         <%= f.email_block :email %>
-        <%= f.image_block :image %>
-        <%= f.text_block :location %>
-        <%= f.date_block :date_of_birth %>
-        <%= f.select_block :gender %>
+        <%= f.image_block :image unless @activity.hide_image %>
+        <%= f.text_block :location unless @activity.hide_location %>
+        <%= f.date_block :date_of_birth unless @activity.hide_date_of_birth %>
+        <%= f.select_block :gender unless @activity.hide_gender %>
         <%= partial :'questions/questions', locals: { questions: @activity.application_questions } %>
         <%= f.submit_block button_text: 'Apply' %>
       <% end %>

@@ -1,11 +1,16 @@
-function initQuestionsPreview (inputSelector, previewUrl) {
+function initQuestionsPreview (inputSelector, previewUrl, options) {
+  options = options || {}
   const fieldName = inputSelector.replace(/^#\w+?_/, '').replace(/_/g, '-')
   const previewSelector = '#' + fieldName + '-preview'
   const spinnerSelector = '#' + fieldName + '-spinner'
   let timer
   function load () {
     if (!previewUrl) return
-    $(previewSelector).load(previewUrl + '?questions=' + encodeURIComponent($(inputSelector).val()), function () {
+    const params = { questions: $(inputSelector).val() }
+    if (typeof options.extraParams === 'function') {
+      $.extend(params, options.extraParams())
+    }
+    $(previewSelector).load(previewUrl + '?' + $.param(params), function () {
       $(spinnerSelector).hide()
     })
   }
@@ -14,6 +19,12 @@ function initQuestionsPreview (inputSelector, previewUrl) {
     clearTimeout(timer)
     timer = setTimeout(load, 500)
   })
+  if (options.refreshOn) {
+    $(options.refreshOn).on('change', function () {
+      $(spinnerSelector).show()
+      load()
+    })
+  }
   load()
 }
 

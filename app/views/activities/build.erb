@@ -16,7 +16,17 @@
     autosize($('#activity_application_questions')[0])
 
     <% if @activity.persisted? %>
-      initQuestionsPreview('#activity_application_questions', '/activities/<%= @activity.id %>/application_questions')
+      initQuestionsPreview('#activity_application_questions', '/activities/<%= @activity.id %>/application_questions', {
+        extraParams: function () {
+          return {
+            hide_image: $('#activity_hide_image').is(':checked') ? '1' : '0',
+            hide_location: $('#activity_hide_location').is(':checked') ? '1' : '0',
+            hide_date_of_birth: $('#activity_hide_date_of_birth').is(':checked') ? '1' : '0',
+            hide_gender: $('#activity_hide_gender').is(':checked') ? '1' : '0'
+          }
+        },
+        refreshOn: '#activity_hide_image, #activity_hide_location, #activity_hide_date_of_birth, #activity_hide_gender'
+      })
     <% end %>
   })
 </script>
@@ -37,6 +47,10 @@
   </div>
   <div id="application-options" style="display: none">
     <%= partial :'questions/questions_with_preview', locals: { f: f, field_name: :application_questions, help_text: 'Questions to ask applicants.', placeholder: "e.g. Why do you want to join?\n[I have read and agree to the code of conduct]" } %>
+    <%= f.check_box_block :hide_image %>
+    <%= f.check_box_block :hide_location %>
+    <%= f.check_box_block :hide_date_of_birth %>
+    <%= f.check_box_block :hide_gender %>
     <%= f.wysiwyg_block :extra_info_for_application_form %>
     <%= f.wysiwyg_block :thank_you_message %>
     <%= f.wysiwyg_block :extra_info_for_acceptance_email %>

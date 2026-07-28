@@ -292,6 +292,9 @@ Dandelion::App.controller do
   get '/activities/:id/application_questions' do
     @activity = Activity.find(params[:id]) || not_found
     activity_admins_only!
-    partial :'questions/questions', locals: { questions: params[:questions], preview: true }
+    %w[hide_image hide_location hide_date_of_birth hide_gender].each do |field|
+      @activity[field] = %w[1 true on].include?(params[field].to_s) if params.key?(field)
+    end
+    partial :'activity_applications/application_form_preview', locals: { activity: @activity, questions: params[:questions] }
   end
 end
