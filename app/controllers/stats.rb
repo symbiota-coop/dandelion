@@ -292,7 +292,7 @@ Dandelion::App.controller do
 
   get '/raise_job' do
     msg = params[:message] || 'Test job error'
-    Delayed::Job.enqueue TestJob.new(message: msg)
+    Kernel.delay.raise(msg)
     flash[:notice] = 'Test job enqueued - it will fail when the worker processes it'
     redirect back
   end
