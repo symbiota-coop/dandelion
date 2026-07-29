@@ -9,7 +9,7 @@
     <% if comment_admin?(comment) %>
       <span class="float-right">
         <% if !comment.sent_at %>
-          <a title="Send comment" href="/comments/<%= comment.id %>/send"><i class="bi bi-envelope-fill"></i></a>
+          <a data-method="post" title="Send comment" href="/comments/<%= comment.id %>/send"><i class="bi bi-envelope-fill"></i></a>
         <% end %>
       </span>
     <% end %>

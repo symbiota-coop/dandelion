@@ -20,7 +20,7 @@
           <% end %>
           <% if comment_admin?(comment) %>
             <% if !comment.sent_at %>
-              <a title="Send comment" href="/comments/<%= comment.id %>/send"><i class="bi bi-envelope-fill"></i></a>
+              <a data-method="post" title="Send comment" href="/comments/<%= comment.id %>/send"><i class="bi bi-envelope-fill"></i></a>
             <% end %>
           <% end %>
         </span>

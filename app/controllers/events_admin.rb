@@ -283,7 +283,7 @@ Dandelion::App.controller do
     200
   end
 
-  get '/events/:id/resend_feedback_email/:account_id' do
+  post '/events/:id/resend_feedback_email/:account_id' do
     @event = Event.find(params[:id]) || not_found
     event_admins_only!
     @event.send_feedback_requests(params[:account_id])
@@ -291,7 +291,7 @@ Dandelion::App.controller do
     redirect back
   end
 
-  get '/events/:id/resend_all_feedback_emails' do
+  post '/events/:id/resend_all_feedback_emails' do
     @event = Event.find(params[:id]) || not_found
     event_admins_only!
     @event.send_feedback_requests(:all, true)

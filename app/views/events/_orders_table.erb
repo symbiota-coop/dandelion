@@ -82,7 +82,7 @@
         <th>
           Feedback
           <% if @event.started? && @event.organisation && !@event.evergreen? && @event.feedback_questions.present? %>
-            <a data-confirm="<% if @event.finished? %>Resend<% else %>Send<% end %> the feedback email to all eligible attendees?" href="/events/<%= @event.id %>/resend_all_feedback_emails"><i class="bi bi-send"></i></a>
+            <a data-method="post" data-confirm="<% if @event.finished? %>Resend<% else %>Send<% end %> the feedback email to all eligible attendees?" href="/events/<%= @event.id %>/resend_all_feedback_emails"><i class="bi bi-send"></i></a>
           <% end %>
         </th>
       <% end %>
@@ -246,7 +246,7 @@
             <% if order.account.unsubscribed || order.account.unsubscribed_feedback %>
               <span class="text-muted">Unsubscribed from feedback emails</span>
             <% else %>
-              <a href="<%= ENV['BASE_URI'] %>/events/<%= order.event_id %>/resend_feedback_email/<%= order.account_id %>">
+              <a data-method="post" href="/events/<%= order.event_id %>/resend_feedback_email/<%= order.account_id %>">
                 <% if order.event.finished? %>
                   Resend feedback email
                 <% elsif order.event.started? %>
@@ -266,7 +266,7 @@
       <% else %>
         <%= dropdown_nav [
         ['Link to order confirmation', "/orders/#{order.id}"],
-        ['Resend order confirmation', "/orders/#{order.id}/send_tickets"],
+        ['Resend order confirmation', "/orders/#{order.id}/send_tickets", { 'data-method' => 'post' }],
         ['Transfer to another event', "/orders/#{order.id}/transfer"],
         (['Remove and refund order', "/events/#{order.event.id}/orders/#{order.id}/refund_and_destroy"] if order.event.refund_deleted_orders && order.refundable?),
         ['Remove order', "/events/#{order.event.id}/orders/#{order.id}/destroy"],

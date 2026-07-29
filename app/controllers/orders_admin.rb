@@ -132,7 +132,7 @@ Dandelion::App.controller do
     end
   end
 
-  get '/orders/:id/send_tickets' do
+  post '/orders/:id/send_tickets' do
     @order = Order.find(params[:id]) || not_found
     @event = @order.event
     event_admins_only!
@@ -212,7 +212,7 @@ Dandelion::App.controller do
     redirect back
   end
 
-  get '/tickets/:id/send_ticket' do
+  post '/tickets/:id/send_ticket' do
     @ticket = Ticket.find(params[:id]) || not_found
     @event = @ticket.event
     event_admins_only!

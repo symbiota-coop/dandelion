@@ -131,7 +131,7 @@ Dandelion::App.controller do
     200
   end
 
-  get '/comments/:id/send' do
+  post '/comments/:id/send' do
     sign_in_required!
     @comment = Comment.find(params[:id]) || not_found
     @commentable = @comment.commentable
