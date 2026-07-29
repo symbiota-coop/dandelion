@@ -1,3 +1,17 @@
+module ErrorReporting
+  module_function
+
+  def capture_exception(exception, context: nil, tags: nil)
+    return if exception.nil?
+
+    Sentry.with_scope do |scope|
+      scope.set_context('additional', context) if context.present?
+      scope.set_tags(tags) if tags.present?
+      Sentry.capture_exception(exception)
+    end
+  end
+end
+
 Sentry.init do |config|
   config.dsn = ENV['SENTRY_DSN']
   config.environment = ENV['RACK_ENV']
