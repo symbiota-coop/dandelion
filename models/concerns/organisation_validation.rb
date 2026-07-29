@@ -32,8 +32,8 @@ module OrganisationValidation
       errors.add(:tax_rate_id, 'must start with txr_') if tax_rate_id && !tax_rate_id.starts_with?('txr_')
 
       calendar_import_urls_a.each do |calendar_import_url|
-        CalendarImportSync.normalize_feed_url(calendar_import_url)
-      rescue CalendarImportSync::ConfigurationError => e
+        Organisation.normalize_feed_url(calendar_import_url)
+      rescue OrganisationCalendarImports::ConfigurationError => e
         errors.add(:calendar_import_urls, "#{calendar_import_url}: #{e.message}")
       end
 

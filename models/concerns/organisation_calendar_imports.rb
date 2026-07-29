@@ -2,7 +2,9 @@ require 'faraday/follow_redirects'
 require 'mini_magick'
 require 'nokogiri'
 
-class CalendarImportSync
+module OrganisationCalendarImports
+  extend ActiveSupport::Concern
+
   class ConfigurationError < StandardError; end
 
   LUMA_PAGE_HOSTS = %w[luma.com lu.ma].freeze
@@ -22,75 +24,128 @@ class CalendarImportSync
   LUMA_DESCRIPTION_ADDRESS_FOOTER = /\n{1,2}Address:\s*\r?\n[\s\S]*?\r?\nHosted by .+$/m
   LUMA_DESCRIPTION_HOSTED_BY_AFTER_ONLINE_LINK = /\n{1,2}Hosted by .+$/m
 
-  def self.normalize_feed_url(feed_url)
-    raise ConfigurationError, 'Add an iCal URL first' if feed_url.blank?
+  class_methods do
+    def normalize_feed_url(feed_url)
+      raise OrganisationCalendarImports::ConfigurationError, 'Add an iCal URL first' if feed_url.blank?
 
-    uri = URI.parse(feed_url)
-    raise ConfigurationError, 'iCal URL must include a host' if uri.host.blank?
+      uri = URI.parse(feed_url)
+      raise OrganisationCalendarImports::ConfigurationError, 'iCal URL must include a host' if uri.host.blank?
 
-    case uri.scheme&.downcase
-    when 'http', 'https'
-      # keep scheme
-    when 'webcal'
-      uri.scheme = 'https'
-    else
-      raise ConfigurationError, 'iCal URL must start with http, https or webcal'
+      case uri.scheme&.downcase
+      when 'http', 'https'
+        # keep scheme
+      when 'webcal'
+        uri.scheme = 'https'
+      else
+        raise OrganisationCalendarImports::ConfigurationError, 'iCal URL must start with http, https or webcal'
+      end
+
+      host = uri.host.to_s.downcase
+      raise OrganisationCalendarImports::ConfigurationError, "iCal host is not allowed (supported: #{OrganisationCalendarImports::ALLOWED_FEED_HOSTS.join(', ')})" unless OrganisationCalendarImports::ALLOWED_FEED_HOSTS.include?(host)
+
+      uri.to_s
+    rescue URI::InvalidURIError
+      raise OrganisationCalendarImports::ConfigurationError, 'iCal URL must be a valid URL'
     end
 
-    host = uri.host.to_s.downcase
-    raise ConfigurationError, "iCal host is not allowed (supported: #{ALLOWED_FEED_HOSTS.join(', ')})" unless ALLOWED_FEED_HOSTS.include?(host)
+    # X-WR-CALNAME (common) or RFC 7986 NAME (ip_name in icalendar).
+    def calendar_name_from_parsed_calendars(calendars)
+      Array(calendars).each do |cal|
+        raw = cal.x_wr_calname&.first
+        name = unwrap_ical_calendar_property_value(raw)
+        return name if name.present?
+      end
+      Array(calendars).each do |cal|
+        next unless cal.respond_to?(:ip_name)
 
-    uri.to_s
-  rescue URI::InvalidURIError
-    raise ConfigurationError, 'iCal URL must be a valid URL'
-  end
-
-  # X-WR-CALNAME (common) or RFC 7986 NAME (ip_name in icalendar).
-  def self.calendar_name_from_parsed_calendars(calendars)
-    Array(calendars).each do |cal|
-      raw = cal.x_wr_calname&.first
-      name = unwrap_ical_calendar_property_value(raw)
-      return name if name.present?
+        raw = cal.ip_name
+        raw = raw.first if raw.is_a?(Array)
+        name = unwrap_ical_calendar_property_value(raw)
+        return name if name.present?
+      end
+      nil
     end
-    Array(calendars).each do |cal|
-      next unless cal.respond_to?(:ip_name)
 
-      raw = cal.ip_name
-      raw = raw.first if raw.is_a?(Array)
-      name = unwrap_ical_calendar_property_value(raw)
-      return name if name.present?
+    def unwrap_ical_calendar_property_value(value)
+      return if value.nil?
+
+      value = value.value if value.respond_to?(:value)
+      value.to_s.strip.presence
     end
-    nil
+
+    def valid_calendar_body?(body)
+      text = body.to_s
+      text.match?(/BEGIN:VCALENDAR\b/i) && text.match?(/END:VCALENDAR\b/i)
+    end
   end
 
-  def self.unwrap_ical_calendar_property_value(value)
-    return if value.nil?
-
-    value = value.value if value.respond_to?(:value)
-    value.to_s.strip.presence
+  def calendar_import_urls_a
+    calendar_import_urls ? calendar_import_urls.split("\n").map(&:strip).reject(&:blank?) : []
   end
 
-  def self.valid_calendar_body?(body)
-    text = body.to_s
-    text.match?(/BEGIN:VCALENDAR\b/i) && text.match?(/END:VCALENDAR\b/i)
+  def calendar_import_feeds_in_url_order
+    names = (calendar_import_feed_calendar_names || {}).stringify_keys
+    seen = {}
+    calendar_import_urls_a.filter_map do |line|
+      url = Organisation.normalize_feed_url(line)
+      next if seen[url]
+
+      seen[url] = true
+      n = names[url]
+      [url, n] if n.present?
+    rescue OrganisationCalendarImports::ConfigurationError
+      nil
+    end
   end
 
-  def initialize(organisation, feed_url:)
-    @organisation = organisation
-    @feed_url = feed_url
+  def sync_calendar_imports
+    names_by_feed = (calendar_import_feed_calendar_names || {}).stringify_keys
+    normalized_feed_urls = calendar_import_urls_a.filter_map do |u|
+      Organisation.normalize_feed_url(u)
+    rescue OrganisationCalendarImports::ConfigurationError
+      nil
+    end
+
+    results = calendar_import_urls_a.map { |feed_url| sync_calendar_import_feed(feed_url) }
+    errors = results.filter_map { |result| "#{result[:feed_url]}: #{result[:error]}" if result[:error] }
+
+    results.each do |result|
+      next if result[:error].present?
+      next if result[:calendar_name].blank?
+
+      names_by_feed[result[:feed_url].to_s] = result[:calendar_name]
+    end
+    names_by_feed.keep_if { |url, _| normalized_feed_urls.include?(url) }
+
+    set(
+      calendar_import_last_synced_at: Time.now,
+      calendar_import_last_sync_error: errors.any? ? errors.join("\n") : nil,
+      calendar_import_feed_calendar_names: names_by_feed
+    )
+
+    {
+      created: results.sum { |result| result[:created] || 0 },
+      updated: results.sum { |result| result[:updated] || 0 },
+      skipped: results.sum { |result| result[:skipped] || 0 },
+      removed: results.sum { |result| result[:removed] || 0 },
+      feeds: results,
+      errors: errors
+    }
   end
 
-  def sync
-    normalized_feed_url = self.class.normalize_feed_url(feed_url)
+  private
+
+  def sync_calendar_import_feed(feed_url)
+    normalized_feed_url = Organisation.normalize_feed_url(feed_url)
 
     response = Faraday.get(normalized_feed_url)
-    raise ConfigurationError, "iCal feed returned #{response.status}" unless response.success?
-    raise ConfigurationError, 'iCal feed did not return a VCALENDAR payload' unless self.class.valid_calendar_body?(response.body)
+    raise OrganisationCalendarImports::ConfigurationError, "iCal feed returned #{response.status}" unless response.success?
+    raise OrganisationCalendarImports::ConfigurationError, 'iCal feed did not return a VCALENDAR payload' unless Organisation.valid_calendar_body?(response.body)
 
     calendars = Icalendar::Calendar.parse(response.body)
-    calendar_name = self.class.calendar_name_from_parsed_calendars(calendars)
+    calendar_name = Organisation.calendar_name_from_parsed_calendars(calendars)
 
-    @initial_calendar_import = !organisation.events.and(calendar_import_feed_url: normalized_feed_url).exists?
+    @initial_calendar_import = !events.and(calendar_import_feed_url: normalized_feed_url).exists?
 
     created = 0
     updated = 0
@@ -98,7 +153,7 @@ class CalendarImportSync
     @present_import_event_ids = Set.new
 
     calendars.flat_map(&:events).each do |ical_event|
-      case upsert_event(ical_event, feed_url: normalized_feed_url)
+      case upsert_calendar_import_event(ical_event, feed_url: normalized_feed_url)
       when :created
         created += 1
       when :updated
@@ -112,15 +167,11 @@ class CalendarImportSync
 
     { created: created, updated: updated, skipped: skipped, removed: removed, feed_url: normalized_feed_url, calendar_name: calendar_name }
   rescue StandardError => e
-    ErrorReporting.capture_exception(e, context: { organisation_id: organisation.id.to_s, calendar_import_url: feed_url }) unless e.is_a?(ConfigurationError)
+    ErrorReporting.capture_exception(e, context: { organisation_id: id.to_s, calendar_import_url: feed_url }) unless e.is_a?(OrganisationCalendarImports::ConfigurationError)
     { error: e.message, feed_url: feed_url }
   end
 
-  private
-
-  attr_reader :feed_url, :organisation
-
-  def upsert_event(ical_event, feed_url:)
+  def upsert_calendar_import_event(ical_event, feed_url:)
     start_time = property_time(ical_event.dtstart)
     summary = property_text(ical_event.summary)
 
@@ -141,8 +192,8 @@ class CalendarImportSync
     # In-person Luma events often omit URL and put the venue in LOCATION; UID still points at the event page.
     source_url = luma_event_url_from_uid(uid).presence if luma_calendar_feed && source_url.blank?
 
-    event = find_existing_event(feed_url: feed_url, uid: uid, source_url: source_url, summary: summary, start_time: start_time)
-    return unpublish_cancelled_event(event) if property_text(ical_event.status).to_s.casecmp('CANCELLED').zero?
+    event = find_existing_imported_event(feed_url: feed_url, uid: uid, source_url: source_url, summary: summary, start_time: start_time)
+    return unpublish_cancelled_imported_event(event) if property_text(ical_event.status).to_s.casecmp('CANCELLED').zero?
 
     mark_present_imported(event) if event&.persisted?
 
@@ -154,12 +205,12 @@ class CalendarImportSync
     end_time ||= start_time + 1.hour
     end_time = start_time + 1.hour if end_time <= start_time
 
-    event ||= organisation.events.new
+    event ||= events.new
 
     event_was_new = event.new_record?
-    sync_account = organisation.account || organisation.admins.first
+    sync_account = account || admins.first
 
-    event.organisation = organisation
+    event.organisation = self
     event.account ||= sync_account
     event.last_saved_by = sync_account
     event.prevent_notifications = true if @initial_calendar_import
@@ -205,7 +256,7 @@ class CalendarImportSync
       calendar_import_feed_url: feed_url,
       calendar_import_uid: uid,
       calendar_import_source_url: source_url,
-      currency: organisation.currency
+      currency: currency
     }.each do |field, value|
       event.send("#{field}=", value)
     end
@@ -214,7 +265,7 @@ class CalendarImportSync
       begin
         response = (@luma_og_html_faraday ||= Faraday.new do |f|
           f.response :follow_redirects, limit: 5, callback: lambda { |_response_env, new_request_env|
-            raise ConfigurationError, 'Unexpected redirect host' unless luma_event_page_url?(new_request_env[:url].to_s)
+            raise OrganisationCalendarImports::ConfigurationError, 'Unexpected redirect host' unless luma_event_page_url?(new_request_env[:url].to_s)
           }
           f.adapter Faraday.default_adapter
         end).get(source_url) do |req|
@@ -281,7 +332,7 @@ class CalendarImportSync
   end
 
   def destroy_absent_imported_events(normalized_feed_url)
-    scope = organisation.events.and(calendar_import_feed_url: normalized_feed_url)
+    scope = events.and(calendar_import_feed_url: normalized_feed_url)
     keep = @present_import_event_ids.to_a
     to_destroy = keep.empty? ? scope : scope.and(:id.nin => keep)
     count = to_destroy.count
@@ -289,14 +340,14 @@ class CalendarImportSync
     count
   end
 
-  def find_existing_event(feed_url:, uid:, source_url:, summary:, start_time:)
-    event = organisation.events.find_by(calendar_import_feed_url: feed_url, calendar_import_uid: uid) if uid
-    event ||= organisation.events.find_by(calendar_import_feed_url: feed_url, calendar_import_source_url: source_url) if source_url
-    event ||= organisation.events.find_by(calendar_import_feed_url: feed_url, name: summary, start_time: start_time) if summary.present? && start_time
+  def find_existing_imported_event(feed_url:, uid:, source_url:, summary:, start_time:)
+    event = events.find_by(calendar_import_feed_url: feed_url, calendar_import_uid: uid) if uid
+    event ||= events.find_by(calendar_import_feed_url: feed_url, calendar_import_source_url: source_url) if source_url
+    event ||= events.find_by(calendar_import_feed_url: feed_url, name: summary, start_time: start_time) if summary.present? && start_time
     event
   end
 
-  def unpublish_cancelled_event(event)
+  def unpublish_cancelled_imported_event(event)
     return :skipped unless event
 
     event.destroy
@@ -320,7 +371,7 @@ class CalendarImportSync
     when DateTime
       Time.at(value.to_f).utc
     when Date
-      Time.find_zone!(organisation.time_zone || ENV['DEFAULT_TIME_ZONE']).parse(value.to_s)
+      Time.find_zone!(time_zone || ENV['DEFAULT_TIME_ZONE']).parse(value.to_s)
     when ->(v) { v.respond_to?(:to_datetime) }
       Time.at(value.to_datetime.to_f).utc
     when ->(v) { v.respond_to?(:to_time) }
