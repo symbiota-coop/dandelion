@@ -20,6 +20,10 @@ Mongoid.autosave_saves_unchanged_documents = false
 
 Padrino.load!
 
+require_relative 'sentry_config'
+require_relative 'dragonfly_config'
+require_relative 'frontend_dependencies'
+
 OmniAuth.config.allowed_request_methods = [:get]
 OmniAuth.config.logger = Logger.new(IO::NULL)
 
