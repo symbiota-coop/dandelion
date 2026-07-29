@@ -14,9 +14,9 @@ Dandelion::App.controller do
         account_contribution.send_notification
       end
     when 'customer.subscription.created', 'customer.subscription.updated'
-      StripeSubscriptionsSync.sync_subscription(event.data.object, notify: event['type'] == 'customer.subscription.created')
+      Account.sync_subscription(event.data.object, notify: event['type'] == 'customer.subscription.created')
     when 'customer.subscription.deleted'
-      StripeSubscriptionsSync.clear_subscription(event.data.object, notify: true)
+      Account.clear_subscription(event.data.object, notify: true)
     end
 
     halt 200

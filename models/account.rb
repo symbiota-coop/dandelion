@@ -12,6 +12,7 @@ class Account
   include AccountFeedbackSummaries
   include AccountRecommendations
   include AccountAtproto
+  include AccountStripeSubscriptions
   include Geocoded
   include Searchable
 
