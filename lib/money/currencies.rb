@@ -1,3 +1,5 @@
+require_relative 'tokens'
+
 FIAT_CURRENCIES = %w[GBP EUR USD SEK DKK NOK CHF MXN CAD AUD NZD SGD PLN].freeze
 EVM_CURRENCIES = Token.all.map(&:symbol)
 
