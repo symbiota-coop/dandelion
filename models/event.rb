@@ -421,6 +421,8 @@ class Event
       end
     end
     set(ai_tagged: true)
+    populate_tag_names_cache
+    clear_cache
   end
   handle_asynchronously :ai_tag
 
