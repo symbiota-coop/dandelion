@@ -28,7 +28,7 @@
             </div>
             <a class="btn btn-primary mb-1" href="/teamships/<%= teamship.id %>/destroy?team_id=<%= @team.id %>">Leave team</a>
           <% else %>
-            <a class="btn btn-primary mb-1" href="/teamships/create?team_id=<%= @team.id %>">Join</a>
+            <a class="btn btn-primary mb-1" data-method="post" href="/teamships/create?team_id=<%= @team.id %>">Join</a>
           <% end %>
           <a class="btn btn-primary mb-1" href="/g/<%= @gathering.slug %>/teams/<%= @team.id %>/edit">Edit team</a>
         </div>

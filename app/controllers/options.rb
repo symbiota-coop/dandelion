@@ -74,7 +74,7 @@ Dandelion::App.controller do
     redirect "/g/#{@gathering.slug}/options"
   end
 
-  get '/optionships/create' do
+  post '/optionships/create' do
     @option = Option.find(params[:option_id]) || not_found
     @gathering = @option.gathering
     membership_required!

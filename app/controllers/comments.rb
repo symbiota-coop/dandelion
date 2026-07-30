@@ -202,7 +202,7 @@ Dandelion::App.controller do
     200
   end
 
-  get '/subscriptions/create' do
+  post '/subscriptions/create' do
     sign_in_required!
     @post = Post.find(params[:post_id]) || not_found
     @commentable = @post.commentable

@@ -222,7 +222,7 @@ Dandelion::App.controller do
     partial :'rotas/rota_rslot_role', locals: { rota: @rota, rslot: @rslot, role: @role, shift: Shift.includes(:account).find_by(rslot: @rslot, role: @role) }
   end
 
-  get '/shifts/create' do
+  post '/shifts/create' do
     halt 400 unless params[:rota_id]
     @rota = Rota.find(params[:rota_id]) || not_found
     @gathering = @rota.gathering

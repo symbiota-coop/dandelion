@@ -73,7 +73,7 @@ Dandelion::App.controller do
     redirect "/g/#{@gathering.slug}/teams"
   end
 
-  get '/teamships/create' do
+  post '/teamships/create' do
     @team = Team.find(params[:team_id]) || not_found
     @gathering = @team.gathering
     confirmed_membership_required!
