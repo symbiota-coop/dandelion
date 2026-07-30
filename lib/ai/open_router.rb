@@ -1,18 +1,10 @@
 class OpenRouter
   BASE_URL = 'https://openrouter.ai'.freeze
-  INTELLIGENCE_LEVELS = {
-    'standard' => 'google/gemini-3-flash-preview',
-    'smarter' => 'google/gemini-3-flash-preview:thinking'
-  }.freeze
-  MODELS = {
-    'google/gemini-3-flash-preview' => {
-      providers: %w[Google],
-      context_window_size: 1_000_000
-    },
-    'google/gemini-3-flash-preview:thinking' => {
-      providers: %w[Google],
-      context_window_size: 1_000_000
-    }
+  CHAT_DEFAULTS = {
+    model: 'openai/gpt-5.6-luna',
+    providers: %w[OpenAI],
+    context_window_size: 1_000_000,
+    reasoning_effort: 'high'
   }.freeze
 
   class << self
@@ -37,11 +29,7 @@ class OpenRouter
     end
   end
 
-  def chat(prompt, full_response: false, max_tokens: nil, schema: nil, model: INTELLIGENCE_LEVELS['standard'], providers: nil, context_window_size: nil, intelligence: nil, audio: nil, audio_format: 'ogg')
-    model = INTELLIGENCE_LEVELS[intelligence] if intelligence
-    model_config = MODELS[model] || {}
-    providers ||= model_config[:providers]
-    context_window_size ||= model_config[:context_window_size]
+  def chat(prompt, full_response: false, max_tokens: nil, schema: nil, model: CHAT_DEFAULTS[:model], providers: CHAT_DEFAULTS[:providers], context_window_size: CHAT_DEFAULTS[:context_window_size], reasoning_effort: CHAT_DEFAULTS[:reasoning_effort], audio: nil, audio_format: 'ogg')
     prompt = prompt[0..(context_window_size * 4 * 0.66)] unless audio
 
     content = if audio
@@ -55,7 +43,7 @@ class OpenRouter
               end
 
     payload = {
-      model: model.split(':thinking').first,
+      model: model,
       max_tokens: max_tokens,
       messages: [
         {
@@ -70,10 +58,8 @@ class OpenRouter
       payload[:allow_fallbacks] = 'false'
     end
 
-    if model.include?(':thinking')
-      payload[:reasoning] = {
-        enabled: true
-      }
+    if reasoning_effort
+      payload[:reasoning] = { effort: reasoning_effort }
     end
 
     if schema
