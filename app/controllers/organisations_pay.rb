@@ -64,7 +64,7 @@ Dandelion::App.controller do
     redirect "/o/#{@organisation.slug}/contribute"
   end
 
-  get '/organisations/:id/clear_stripe_customer_id' do
+  post '/organisations/:id/clear_stripe_customer_id' do
     @organisation = Organisation.find(params[:id])
     organisation_admins_only!
 

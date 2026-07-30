@@ -79,7 +79,7 @@
 
         <p class="mb-0">
           <% if organisation.stripe_customer_id %>
-            Auto top-up enabled<% if organisation.card_last4 %> using card ending in <%= organisation.card_last4 %><% end %>. <a href="/organisations/<%= organisation.id %>/clear_stripe_customer_id">Click to disable</a>
+            Auto top-up enabled<% if organisation.card_last4 %> using card ending in <%= organisation.card_last4 %><% end %>. <a data-method="post" href="/organisations/<%= organisation.id %>/clear_stripe_customer_id">Click to disable</a>
           <% else %>
             <a href="javascript:;" onclick="
                $.post('/organisations/<%= organisation.id %>/stripe_setup', $(this).serializeObject(), function (data) {

@@ -23,7 +23,7 @@ Dandelion::App.controller do
     end
   end
 
-  get '/o/:slug/atproto/disconnect' do
+  post '/o/:slug/atproto/disconnect' do
     @organisation = Organisation.find_by(slug: params[:slug]) || not_found
     organisation_admins_only!
     @organisation.disconnect_atproto!

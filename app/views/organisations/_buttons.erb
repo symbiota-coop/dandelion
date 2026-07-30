@@ -19,7 +19,7 @@
           Connected to <%= organisationship.stripe_account_name ? "#{organisationship.stripe_account_name}'s Stripe account" : 'Stripe' %>
           (id: <%= organisationship.stripe_user_id %>)
         </big>
-        <a class="btn btn-danger btn-sm" href="/o/<%= @organisation.slug %>/stripe_disconnect">Disconnect</a>
+        <a class="btn btn-danger btn-sm" data-method="post" href="/o/<%= @organisation.slug %>/stripe_disconnect">Disconnect</a>
       </div>
     </div>
   <% elsif current_account %>

@@ -12,7 +12,7 @@
     Connected as
     <a href="<%= @organisation.atproto_profile_url %>" target="_blank">@<%= @organisation.atproto_handle %></a>
   </big>
-  <a class="btn btn-outline-secondary btn-sm mb-3" href="/o/<%= @organisation.slug %>/atproto/disconnect">Disconnect</a>
+  <a class="btn btn-outline-secondary btn-sm mb-3" data-method="post" href="/o/<%= @organisation.slug %>/atproto/disconnect">Disconnect</a>
 <% end %>
 
 <% unless @organisation.atproto_connected? %>
