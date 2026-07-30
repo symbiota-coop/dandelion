@@ -128,15 +128,15 @@
     <% y = [] %>
     <% if membership.admin %>
       <% y << capture do %>
-        <a class="btn btn-outline-primary mb-1" href="/memberships/<%= membership.id %>/unadmin">Unadmin</a>
+        <a class="btn btn-outline-primary mb-1" data-method="post" href="/memberships/<%= membership.id %>/unadmin">Unadmin</a>
       <% end %>
     <% else %>
       <% y << capture do %>
-        <a class="btn btn-outline-primary mb-1" href="/memberships/<%= membership.id %>/make_admin">Make admin</a>
+        <a class="btn btn-outline-primary mb-1" data-method="post" href="/memberships/<%= membership.id %>/make_admin">Make admin</a>
       <% end %>
     <% end %>
     <% y << capture do %>
-      <a class="btn btn-outline-primary mb-1" data-confirm="Are you sure you want to remove this person from the gathering?" href="/memberships/<%= membership.id %>/remove">Remove</a>
+      <a class="btn btn-outline-primary mb-1" data-method="post" data-confirm="Are you sure you want to remove this person from the gathering?" href="/memberships/<%= membership.id %>/remove">Remove</a>
     <% end %>
     <%== y.map(&:strip).join(' ') %>
   </td>

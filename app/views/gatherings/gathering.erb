@@ -34,14 +34,14 @@
         <%= partial :'gatherings/subscribe', locals: { membership: @membership } %>
       </div>
       <% if @membership && @membership.hide_from_sidebar %>
-        <a class="btn btn-outline-primary mb-1" href="/g/<%= @gathering.slug %>/show_in_sidebar">Hidden from sidebar</a>
+        <a class="btn btn-outline-primary mb-1" data-method="post" href="/g/<%= @gathering.slug %>/show_in_sidebar">Hidden from sidebar</a>
       <% else %>
-        <a class="btn btn-primary mb-1" href="/g/<%= @gathering.slug %>/hide_from_sidebar">Showing in sidebar</a>
+        <a class="btn btn-primary mb-1" data-method="post" href="/g/<%= @gathering.slug %>/hide_from_sidebar">Showing in sidebar</a>
       <% end %>
       <% if current_account.memberships.and(admin: true).and(:gathering_id.ne => @gathering.id).exists? %>
         <a class="btn btn-primary mb-1" href="/g/<%= @gathering.slug %>/copy">Copy</a>
       <% end %>
-      <a class="btn btn-primary mb-1" data-confirm="Are you sure you want to leave the gathering?" href="/g/<%= @gathering.slug %>/leave">Leave gathering</a>
+      <a class="btn btn-primary mb-1" data-method="post" data-confirm="Are you sure you want to leave the gathering?" href="/g/<%= @gathering.slug %>/leave">Leave gathering</a>
     </div>
     <% if @membership.admin? or @gathering.photos.exists? %>
       <div class="my-3">

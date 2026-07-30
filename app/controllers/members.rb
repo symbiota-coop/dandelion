@@ -87,7 +87,7 @@ Dandelion::App.controller do
     end
   end
 
-  get '/g/:slug/leave' do
+  post '/g/:slug/leave' do
     @gathering = Gathering.find_by(slug: params[:slug]) || not_found
     @membership = @gathering.memberships.find_by(account: current_account)
     membership_required!
@@ -127,7 +127,7 @@ Dandelion::App.controller do
     redirect back
   end
 
-  get '/memberships/:id/make_admin' do
+  post '/memberships/:id/make_admin' do
     membership = Membership.find(params[:id]) || not_found
     @gathering = membership.gathering
     @membership = @gathering.memberships.find_by(account: current_account)
@@ -140,7 +140,7 @@ Dandelion::App.controller do
     redirect back
   end
 
-  get '/memberships/:id/unadmin' do
+  post '/memberships/:id/unadmin' do
     membership = Membership.find(params[:id]) || not_found
     @gathering = membership.gathering
     @membership = @gathering.memberships.find_by(account: current_account)
@@ -153,7 +153,7 @@ Dandelion::App.controller do
     redirect back
   end
 
-  get '/memberships/:id/remove' do
+  post '/memberships/:id/remove' do
     membership = Membership.find(params[:id]) || not_found
     @gathering = membership.gathering
     @membership = @gathering.memberships.find_by(account: current_account)

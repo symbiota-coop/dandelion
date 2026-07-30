@@ -155,7 +155,7 @@ Dandelion::App.controller do
     request.xhr? ? 200 : redirect('/accounts/subscriptions')
   end
 
-  get '/g/:slug/show_in_sidebar' do
+  post '/g/:slug/show_in_sidebar' do
     @gathering = Gathering.find_by(slug: params[:slug]) || not_found
     @membership = @gathering.memberships.find_by(account: current_account)
     confirmed_membership_required!
@@ -163,7 +163,7 @@ Dandelion::App.controller do
     redirect "/g/#{@gathering.slug}"
   end
 
-  get '/g/:slug/hide_from_sidebar' do
+  post '/g/:slug/hide_from_sidebar' do
     @gathering = Gathering.find_by(slug: params[:slug]) || not_found
     @membership = @gathering.memberships.find_by(account: current_account)
     confirmed_membership_required!
