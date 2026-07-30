@@ -100,9 +100,8 @@ module TicketNotifications
     batch_message = Mailgun::BatchMessage.new(mg_client, ENV['MAILGUN_NOTIFICATIONS_HOST'])
 
     ticket = self
-    order = ticket.order
-    event = order.event
-    account = order.account
+    event = ticket.event
+    account = ticket.account
     batch_message.from ENV['NOTIFICATIONS_EMAIL_FULL']
     batch_message.subject "Refund failed: #{account.name} in #{event.name}"
     provider = ticket.payment_intent ? 'Stripe' : 'GoCardless'
@@ -120,8 +119,7 @@ module TicketNotifications
     batch_message = Mailgun::BatchMessage.new(mg_client, ENV['MAILGUN_NOTIFICATIONS_HOST'])
 
     ticket = self
-    order = ticket.order
-    event = order.event
+    event = ticket.event
     batch_message.from ENV['NOTIFICATIONS_EMAIL_FULL']
     batch_message.subject "Your ticket to #{event.name} was resold"
     batch_message.body_html EmailHelper.html(:ticket_resale_previous_ticketholder, event: event)
@@ -138,9 +136,8 @@ module TicketNotifications
     batch_message = Mailgun::BatchMessage.new(mg_client, ENV['MAILGUN_NOTIFICATIONS_HOST'])
 
     ticket = self
-    order = ticket.order
-    event = order.event
-    account = order.account
+    event = ticket.event
+    account = ticket.account
     batch_message.from ENV['NOTIFICATIONS_EMAIL_FULL']
     batch_message.subject "Ticket resale: #{account.name} in #{event.name}"
     batch_message.body_html EmailHelper.html(:ticket_resale, account: account, event: event, previous_account: previous_account)
@@ -157,9 +154,8 @@ module TicketNotifications
     batch_message = Mailgun::BatchMessage.new(mg_client, ENV['MAILGUN_NOTIFICATIONS_HOST'])
 
     ticket = self
-    order = ticket.order
-    event = order.event
-    account = order.account
+    event = ticket.event
+    account = ticket.account
 
     return unless account && ticket.email
 
