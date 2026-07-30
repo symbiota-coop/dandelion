@@ -174,7 +174,7 @@ Dandelion::App.controller do
     redirect "/events/#{original_event_id}/orders"
   end
 
-  get '/events/:id/orders/clear_answers' do
+  post '/events/:id/orders/clear_answers' do
     @event = Event.find(params[:id]) || not_found
     event_admins_only!
     @event.orders.unscoped.update_all(answers: nil)
@@ -198,14 +198,14 @@ Dandelion::App.controller do
     redirect back
   end
 
-  get '/events/:id/orders/:order_id/restore_and_complete' do
+  post '/events/:id/orders/:order_id/restore_and_complete' do
     @event = Event.find(params[:id]) || not_found
     event_admins_only!
     @event.orders.deleted.find(params[:order_id]).restore_and_complete
     redirect back
   end
 
-  get '/events/:id/tickets/:ticket_id/restore' do
+  post '/events/:id/tickets/:ticket_id/restore' do
     @event = Event.find(params[:id]) || not_found
     event_admins_only!
     @event.tickets.deleted.find(params[:ticket_id]).restore

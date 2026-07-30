@@ -130,7 +130,7 @@
     <td>
       <% if ticket.deleted? %>
         <%= dropdown_nav [
-        ['Restore', "/events/#{@event.id}/tickets/#{ticket.id}/restore"],
+        ['Restore', "/events/#{@event.id}/tickets/#{ticket.id}/restore", { 'data-method' => 'post' }],
       ].compact, button_text: %(Actions <i class="bi bi-caret-down-fill"></i>), container_class: 'btn-group mb-1' %>
       <% else %>
         <%= dropdown_nav [

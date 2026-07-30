@@ -71,7 +71,7 @@
         <th>
           Answers
           <% if orders.unscoped.and(:answers.ne => nil).exists? %>
-            <a data-confirm="Clear the answers for all orders for this event, for data privacy reasons? This cannot be undone." href="/events/<%= @event.id %>/orders/clear_answers"><i class="bi bi-x-lg"></i></a>
+            <a data-method="post" data-confirm="Clear the answers for all orders for this event, for data privacy reasons? This cannot be undone." href="/events/<%= @event.id %>/orders/clear_answers"><i class="bi bi-x-lg"></i></a>
           <% end %>
         </th>
         <th>Updates from organisation?</th>
@@ -261,7 +261,7 @@
     <td nowrap>
       <% if order.deleted? %>
         <%= dropdown_nav [
-        ['Restore and complete', "/events/#{order.event_id}/orders/#{order.id}/restore_and_complete"],
+        ['Restore and complete', "/events/#{order.event_id}/orders/#{order.id}/restore_and_complete", { 'data-method' => 'post' }],
       ].compact, button_text: %(Actions <i class="bi bi-caret-down-fill"></i>), container_class: 'btn-group mb-1' %>
       <% else %>
         <%= dropdown_nav [
