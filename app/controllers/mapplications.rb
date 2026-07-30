@@ -123,7 +123,7 @@ Dandelion::App.controller do
     200
   end
 
-  get '/mapplications/:id/process' do
+  post '/mapplications/:id/process' do
     @mapplication = Mapplication.find(params[:id]) || not_found
     @gathering = @mapplication.gathering
     @membership = @gathering.memberships.find_by(account: current_account)
