@@ -67,11 +67,11 @@ Dandelion::App.helpers do
     )
 
     ticket_form[:quantities].each do |ticket_type_id, quantity|
+      next if quantity.to_i <= 0
+
       ticket_type = @event.ticket_types.find(ticket_type_id) || not_found
       price = if ticket_type.range || ticket_type.price.nil?
-                submitted_price = Float(ticket_form[:prices]&.[](ticket_type_id))
-                raise ArgumentError, 'ticket price must be finite' unless submitted_price.finite?
-
+                submitted_price = Float(ticket_form[:prices]&.[](ticket_type_id), exception: false) || 0
                 ticket_type.range ? submitted_price.clamp(*ticket_type.range) : submitted_price
               end
       quantity.to_i.times do
