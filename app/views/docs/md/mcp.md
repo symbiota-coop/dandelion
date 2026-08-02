@@ -1,4 +1,4 @@
-Dandelion supports the [Model Context Protocol](https://modelcontextprotocol.io/) (MCP), so AI assistants can search and look up Dandelion events, organisations, gatherings, and accounts.
+Dandelion supports the [Model Context Protocol](https://modelcontextprotocol.io/docs/2026-07-28/getting-started/intro) (MCP), so AI assistants can search and look up Dandelion events, organisations, gatherings, and accounts.
 
 ## What AI assistants can do
 

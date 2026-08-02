@@ -185,10 +185,22 @@ module Dandelion
           instructions: 'Tools for querying Dandelion accounts, events, organisations and gatherings.',
           tools: tools
         )
-        transport = ::MCP::Server::Transports::StreamableHTTPTransport.new(s, stateless: true)
-        s.transport = transport
+        ::MCP::Server::Transports::StreamableHTTPTransport.new(
+          s,
+          stateless: true,
+          allowed_hosts: allowed_hosts
+        )
         s
       end
+    end
+
+    def self.allowed_hosts
+      host = begin
+        URI.parse(ENV['BASE_URI'].to_s).host
+      rescue URI::InvalidURIError
+        nil
+      end
+      [host].compact
     end
 
     def self.http_transport

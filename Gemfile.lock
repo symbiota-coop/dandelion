@@ -213,6 +213,7 @@ GEM
     h2c (0.2.1)
       ecdsa (~> 1.2.0)
     haikunator (1.1.1)
+    hana (1.3.7)
     hashie (5.1.0)
       logger
     html_truncator (0.4.2)
@@ -249,9 +250,11 @@ GEM
       reline (>= 0.4.2)
     json (2.21.0)
     json-api-vanilla (1.0.4)
-    json-schema (6.2.0)
-      addressable (~> 2.8)
-      bigdecimal (>= 3.1, < 5)
+    json_schemer (2.5.0)
+      bigdecimal
+      hana (~> 1.3)
+      regexp_parser (~> 2.0)
+      simpleidn (~> 0.2)
     jwt (3.2.0)
       base64
     keccak (1.3.3)
@@ -283,8 +286,8 @@ GEM
       connection_pool (>= 2.2, < 4.0)
       http (>= 4.3, < 6.0)
       maxmind-db (~> 1.4)
-    mcp (0.14.0)
-      json-schema (>= 4.1)
+    mcp (1.1.0)
+      json_schemer (>= 2.4)
     mime-types (3.7.0)
       logger
       mime-types-data (~> 3.2025, >= 3.2025.0507)

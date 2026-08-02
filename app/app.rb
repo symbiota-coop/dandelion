@@ -37,7 +37,7 @@ module Dandelion
       end
       allow do
         origins '*'
-        resource '/mcp', headers: :any, methods: [:get, :post]
+        resource '/mcp', headers: :any, methods: [:get, :post, :delete]
       end
     end
     OmniAuth.config.on_failure = proc { |env|
@@ -326,7 +326,7 @@ module Dandelion
       end
     end
 
-    %w[get post].each do |method|
+    %w[get post delete].each do |method|
       send(method, '/mcp') do
         status, headers, body = Dandelion::MCP.handle_http_request(request)
         [status, headers, body]
