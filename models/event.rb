@@ -380,27 +380,6 @@ class Event
     return if calendar_import_feed_url
     return unless event_tagships(true).empty?
 
-    # tags = nil
-    # 5.times do
-    #   tags = OpenRouter.chat(prompt, schema: {
-    #                            type: 'object',
-    #                            properties: {
-    #                              tags: {
-    #                                type: 'array',
-    #                                description: 'List of tags'
-    #                              }
-    #                            },
-    #                            required: ['tags'],
-    #                            additionalProperties: false
-    #                          })['tags']
-    #   break if tags.all? { |tag| !tag.starts_with?('#') }
-    # end
-    # return unless tags
-
-    # tags.map do |name|
-    #   name.gsub('_', ' ').gsub('-', ' ').downcase
-    # end.each do |name|
-
     prompt = "Provide a list of 5 tags for this event as a comma-separated list. No hashtags. Separate multiple words in a tag with spaces. If the event is a test event, just return some generic tags. Event details: \n\n# #{name}\n\n#{description}"
 
     content = nil

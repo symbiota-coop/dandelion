@@ -253,17 +253,6 @@ class Gathering
 
   def radio_scopes
     []
-
-    #    if ask_for_date_of_birth
-    #      youngest = Account.and(:id.in => memberships.pluck(:account_id)).and(:date_of_birth.ne => nil).order('date_of_birth desc').first
-    #      oldest = Account.and(:id.in => memberships.pluck(:account_id)).and(:date_of_birth.ne => nil).order('date_of_birth asc').first
-    #      if youngest and oldest
-    #        x << [:p, 'all', 'All ages', memberships]
-    #        (youngest.age.to_s[0].to_i).upto(oldest.age.to_s[0].to_i) do |p| p = "#{p}0".to_i;
-    #          x << [:p, p, "People in their #{p}s", memberships.and(:account_id.in => Account.and(:date_of_birth.lte => (Date.current-p.years)).and(:date_of_birth.gt => (Date.current-(p+10).years)).pluck(:id))]
-    #        end
-    #      end
-    #    end
   end
 
   def check_box_scopes
