@@ -4,9 +4,6 @@ Dandelion::App.controller do
     @membership = @gathering.memberships.find_by(account: current_account)
     confirmed_membership_required!
     @memberships = @gathering.memberships
-    @gathering.radio_scopes.select { |k, v, _t, _r| params[k] == v.to_s && params[k] != 'all' }.each do |_k, _v, _t, r|
-      @memberships = @memberships.and(:id.in => r.pluck(:id))
-    end
     @gathering.check_box_scopes.select { |k, _t, _r| params[k] }.each do |_k, _t, r|
       @memberships = @memberships.and(:id.in => r.pluck(:id))
     end

@@ -251,10 +251,6 @@ class Gathering
     end
   end
 
-  def radio_scopes
-    []
-  end
-
   def check_box_scopes
     y = []
 
