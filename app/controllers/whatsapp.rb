@@ -49,76 +49,61 @@ Dandelion::App.controller do
 
     # download the media
     response = http_client.get(media_download_url)
-    # Whisper infers format from the filename; WhatsApp download URLs have no extension.
-    temp_file = Tempfile.new(['whatsapp_media', '.ogg'])
-    temp_file.binmode
-    temp_file.write(response.body)
-    temp_file.rewind
+    audio_bytes = response.body.to_s
 
-    begin
-      # transcribe the audio
-      transcription = OpenAI::Client.new.audio.transcribe(
-        parameters: {
-          model: 'whisper-1',
-          file: temp_file
-        }
-      )
-      text = transcription['text']
-      raise "WhatsApp Whisper transcription failed: #{transcription.inspect}" if text.blank?
+    # transcribe the audio via OpenRouter (Parakeet)
+    text = OpenRouter.transcribe(audio_bytes, format: 'ogg')
+    raise "WhatsApp transcription failed: blank result" if text.blank?
 
-      # clean up the transcript
-      text = OpenRouter.chat("Produce a verbatim version of this transcript, just with filler words removed and paragraph breaks added where appropriate. Do not add any text to the beginning or end.\n\n#{text}")
-      raise 'WhatsApp transcript cleanup returned blank' if text.blank?
+    # clean up the transcript
+    text = OpenRouter.chat("Produce a verbatim version of this transcript, just with filler words removed and paragraph breaks added where appropriate. Do not add any text to the beginning or end.\n\n#{text}")
+    raise 'WhatsApp transcript cleanup returned blank' if text.blank?
 
-      # send the transcription to the user
-      to = message['from']
-      messages_url = "https://graph.facebook.com/v21.0/#{ENV['WHATSAPP_PHONE_NUMBER_ID']}/messages"
+    # send the transcription to the user
+    to = message['from']
+    messages_url = "https://graph.facebook.com/v21.0/#{ENV['WHATSAPP_PHONE_NUMBER_ID']}/messages"
 
-      # split the text into chunks, preferring paragraph boundaries
-      chunks = []
+    # split the text into chunks, preferring paragraph boundaries
+    chunks = []
+    current_chunk = ''
+    text.split(/\n\n+/).each do |paragraph|
+      # paragraph fits in current chunk
+      if current_chunk.empty?
+        current_chunk = paragraph
+      elsif (current_chunk + "\n\n" + paragraph).length <= 2048
+        current_chunk += "\n\n" + paragraph
+      else
+        # start new chunk with this paragraph
+        chunks << current_chunk
+        current_chunk = paragraph
+      end
+
+      # if paragraph itself is too long, split on words
+      next if current_chunk.length <= 2048
+
       current_chunk = ''
-      text.split(/\n\n+/).each do |paragraph|
-        # paragraph fits in current chunk
-        if current_chunk.empty?
-          current_chunk = paragraph
-        elsif (current_chunk + "\n\n" + paragraph).length <= 2048
-          current_chunk += "\n\n" + paragraph
+      paragraph.split(/ +/).each do |word|
+        if (current_chunk + ' ' + word).length <= 2048
+          current_chunk += (current_chunk.empty? ? '' : ' ') + word
         else
-          # start new chunk with this paragraph
           chunks << current_chunk
-          current_chunk = paragraph
-        end
-
-        # if paragraph itself is too long, split on words
-        next if current_chunk.length <= 2048
-
-        current_chunk = ''
-        paragraph.split(/ +/).each do |word|
-          if (current_chunk + ' ' + word).length <= 2048
-            current_chunk += (current_chunk.empty? ? '' : ' ') + word
-          else
-            chunks << current_chunk
-            current_chunk = word
-          end
+          current_chunk = word
         end
       end
-      chunks << current_chunk unless current_chunk.empty?
-      total_chunks = chunks.size
+    end
+    chunks << current_chunk unless current_chunk.empty?
+    total_chunks = chunks.size
 
-      chunks.each_with_index do |chunk, index|
-        payload = {
-          messaging_product: 'whatsapp',
-          to: to,
-          type: 'text',
-          text: {
-            body: total_chunks > 1 ? "#{chunk} (#{index + 1}/#{total_chunks})" : chunk
-          }
+    chunks.each_with_index do |chunk, index|
+      payload = {
+        messaging_product: 'whatsapp',
+        to: to,
+        type: 'text',
+        text: {
+          body: total_chunks > 1 ? "#{chunk} (#{index + 1}/#{total_chunks})" : chunk
         }
-        http_client.post(messages_url, json: payload)
-      end
-    ensure
-      temp_file.close
-      temp_file.unlink
+      }
+      http_client.post(messages_url, json: payload)
     end
 
     200

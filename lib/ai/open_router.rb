@@ -15,6 +15,10 @@ class OpenRouter
     def embedding(input, **)
       new.embedding(input, **)
     end
+
+    def transcribe(audio, **)
+      new.transcribe(audio, **)
+    end
   end
 
   def initialize
@@ -105,12 +109,43 @@ class OpenRouter
     end
   end
 
+  def transcribe(audio, format: 'ogg', model: 'nvidia/parakeet-tdt-0.6b-v3', full_response: false, language: nil, timeout: nil)
+    audio_bytes = if audio.is_a?(String)
+                    audio
+                  else
+                    audio.rewind if audio.respond_to?(:rewind)
+                    audio.read
+                  end
+
+    payload = {
+      model: model,
+      input_audio: {
+        data: Base64.strict_encode64(audio_bytes),
+        format: format
+      }
+    }
+    payload[:language] = language if language
+
+    response = api_post('/api/v1/audio/transcriptions', payload, timeout: timeout)
+
+    if full_response
+      response.body
+    else
+      response.body['text']
+    end
+  end
+
   private
 
   def api_post(endpoint, payload, timeout: nil)
-    operation_name = endpoint.include?('embeddings') ? 'embeddings' : 'chat'
+    operation_name = case endpoint
+                     when /embeddings/ then 'embeddings'
+                     when /transcriptions/ then 'transcriptions'
+                     else 'chat'
+                     end
+    span_op = operation_name == 'embeddings' ? 'gen_ai.embeddings' : 'gen_ai.request'
 
-    Sentry.with_child_span(op: endpoint.include?('embeddings') ? 'gen_ai.embeddings' : 'gen_ai.request', description: "#{operation_name} #{payload[:model]}") do |span|
+    Sentry.with_child_span(op: span_op, description: "#{operation_name} #{payload[:model]}") do |span|
       span&.set_data('gen_ai.operation.name', operation_name)
       span&.set_data('gen_ai.request.model', payload[:model])
       span&.set_data('gen_ai.request.max_tokens', payload[:max_tokens]) if payload[:max_tokens]
