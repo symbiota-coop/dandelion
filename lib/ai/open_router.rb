@@ -91,6 +91,8 @@ class OpenRouter
       break if result
     end
 
+    log_generation(prompt, result, model) if result
+
     result
   end
 
@@ -136,6 +138,38 @@ class OpenRouter
   end
 
   private
+
+  PROMPT_LOG_LIMIT = 10_000
+
+  def log_generation(prompt, result, model)
+    response_text = case result
+                    when String then result
+                    else result.to_json
+                    end
+    OpenRouterGeneration.create(
+      prompt: prompt.to_s[0, PROMPT_LOG_LIMIT],
+      response: response_text,
+      model: model,
+      source: generation_source
+    )
+  rescue StandardError => e
+    ErrorReporting.capture_exception(e)
+  end
+
+  def generation_source
+    loc = caller_locations.find do |l|
+      path = l.absolute_path || l.path
+      next if path.nil? || path.end_with?('open_router.rb')
+
+      path.include?('/app/') || path.include?('/models/') || path.include?('/lib/') || path.include?('/scripts/')
+    end
+    return unless loc
+
+    path = loc.absolute_path || loc.path
+    root = defined?(Padrino) && Padrino.respond_to?(:root) ? Padrino.root.to_s : Dir.pwd
+    relative = path.sub(%r{\A#{Regexp.escape(root)}/?}, '')
+    "#{relative}:#{loc.lineno}"
+  end
 
   def api_post(endpoint, payload, timeout: nil)
     operation_name = case endpoint

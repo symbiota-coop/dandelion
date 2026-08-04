@@ -1,0 +1,31 @@
+<h2>OpenRouter</h2>
+<p class="text-muted">Generated texts from <code>OpenRouter.chat</code>, newest first.</p>
+
+<% if @generations.empty? %>
+  <p class="text-muted">No generations logged yet.</p>
+<% else %>
+  <% @generations.group_by { |g| g.created_at.to_date }.each do |date, day_generations| %>
+    <h6 class="mt-4"><%= date.strftime('%b %d, %Y') %> <span class="text-muted">(<%= day_generations.size %>)</span></h6>
+    <% day_generations.each do |generation| %>
+      <div class="mb-4 p-3 border rounded">
+        <div class="d-flex justify-content-between align-items-baseline mb-2">
+          <div>
+            <code class="small"><%= generation.source || 'unknown' %></code>
+            <% if generation.model %>
+              <span class="text-muted small ml-2"><%= generation.model %></span>
+            <% end %>
+          </div>
+          <span class="text-muted small"><%= generation.created_at.strftime('%H:%M:%S') %></span>
+        </div>
+        <div class="nl2br" style="white-space: pre-wrap"><%= generation.response %></div>
+        <% if generation.prompt.present? %>
+          <details class="mt-2">
+            <summary class="text-muted small">Prompt</summary>
+            <pre class="small mt-2 mb-0" style="white-space: pre-wrap; max-height: 20rem; overflow: auto"><%= generation.prompt %></pre>
+          </details>
+        <% end %>
+      </div>
+    <% end %>
+  <% end %>
+  <%= will_paginate @generations, page_links: false, renderer: WillPaginate::ViewHelpers::BootstrapRenderer %>
+<% end %>

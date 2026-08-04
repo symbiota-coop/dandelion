@@ -51,6 +51,11 @@ Dandelion::App.controller do
     erb :'stats/messages'
   end
 
+  get '/stats/openrouter' do
+    @generations = OpenRouterGeneration.order('created_at desc').paginate(page: params[:page], per_page: 50)
+    erb :'stats/openrouter'
+  end
+
   get '/stats/icons' do
     erb :'stats/icons'
   end
