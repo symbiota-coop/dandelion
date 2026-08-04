@@ -382,7 +382,7 @@ class Event
 
     # tags = nil
     # 5.times do
-    #   tags = OpenRouter.chat(prompt, max_tokens: 256, schema: {
+    #   tags = OpenRouter.chat(prompt, schema: {
     #                            type: 'object',
     #                            properties: {
     #                              tags: {
@@ -405,7 +405,7 @@ class Event
 
     content = nil
     5.times do
-      content = OpenRouter.chat(prompt, max_tokens: 256)
+      content = OpenRouter.chat(prompt)
       break if content && content.include?(', ') && !content.include?('#')
     end
     return unless content && content.include?(', ') && !content.include?('#')

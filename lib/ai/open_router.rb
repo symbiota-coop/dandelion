@@ -33,7 +33,7 @@ class OpenRouter
     end
   end
 
-  def chat(prompt, full_response: false, max_tokens: nil, schema: nil, model: CHAT_DEFAULTS[:model], providers: CHAT_DEFAULTS[:providers], context_window_size: CHAT_DEFAULTS[:context_window_size], reasoning_effort: CHAT_DEFAULTS[:reasoning_effort], audio: nil, audio_format: 'ogg')
+  def chat(prompt, full_response: false, schema: nil, model: CHAT_DEFAULTS[:model], providers: CHAT_DEFAULTS[:providers], context_window_size: CHAT_DEFAULTS[:context_window_size], reasoning_effort: CHAT_DEFAULTS[:reasoning_effort], audio: nil, audio_format: 'ogg')
     prompt = prompt[0..(context_window_size * 4 * 0.66)] unless audio
 
     content = if audio
@@ -48,7 +48,6 @@ class OpenRouter
 
     payload = {
       model: model,
-      max_tokens: max_tokens,
       messages: [
         {
           role: 'user',
@@ -182,7 +181,6 @@ class OpenRouter
     Sentry.with_child_span(op: span_op, description: "#{operation_name} #{payload[:model]}") do |span|
       span&.set_data('gen_ai.operation.name', operation_name)
       span&.set_data('gen_ai.request.model', payload[:model])
-      span&.set_data('gen_ai.request.max_tokens', payload[:max_tokens]) if payload[:max_tokens]
       span&.set_data('url', "#{BASE_URL}#{endpoint}")
       span&.set_data('http.request.method', 'POST')
       span&.set_data('openrouter.endpoint', endpoint)
