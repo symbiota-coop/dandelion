@@ -6,6 +6,7 @@ class OpenRouter
     context_window_size: 1_000_000,
     reasoning_effort: 'high'
   }.freeze
+  PROMPT_LOG_LIMIT = 10_000
 
   class << self
     def chat(prompt, **)
@@ -137,8 +138,6 @@ class OpenRouter
   end
 
   private
-
-  PROMPT_LOG_LIMIT = 10_000
 
   def log_generation(prompt, result, model)
     response_text = case result
