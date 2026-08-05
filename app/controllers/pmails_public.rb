@@ -32,7 +32,10 @@ Dandelion::App.controller do
       url = url[0..-2] if uri_params.empty?
 
       pmail_link = pmail.pmail_links.find_or_create_by(url: url)
-      pmail_link.inc(clicks: 1) if pmail_link.persisted?
+      if pmail_link.persisted?
+        device_type = event.dig('event-data', 'client-info', 'device-type')
+        pmail_link.record_click!(device_type: device_type)
+      end
       halt 200
     else
       halt 406

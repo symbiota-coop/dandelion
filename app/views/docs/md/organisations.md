@@ -16,7 +16,7 @@ We offer a free gift of 1 email per month for up to 1000 subscribers. Beyond tha
 
 After sending a free gift email, open and click rates appear on the sent message page under Mailer. Organisations with their own Mailgun account also get a link through to Mailgun analytics.
 
-For per-link click tracking, configure a Mailgun `Clicked` webhook to your organisation's webhook URL (shown under Mailgun settings) and paste the HTTP webhook signing key from [API security](https://app.mailgun.com/settings/api_security).
+For per-link click tracking (including desktop vs phone), configure a Mailgun `Clicked` webhook to your organisation's webhook URL (shown under Mailgun settings) and paste the HTTP webhook signing key from [API security](https://app.mailgun.com/settings/api_security).
 
 ## Community event submissions
 

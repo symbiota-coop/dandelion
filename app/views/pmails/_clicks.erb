@@ -1,13 +1,19 @@
 <% if @pmail.pmail_links.exists? %>
+  <% pmail_links = @pmail.pmail_links.order('clicks desc').limit(20).to_a %>
+  <% show_device_breakdown = pmail_links.any?(&:device_breakdown?) %>
   <table class="table">
     <thead>
       <tr>
         <th style="width: 1px">Link</th>
         <th>Clicks</th>
+        <% if show_device_breakdown %>
+          <th style="width: 1px; white-space: nowrap">Desktop</th>
+          <th style="width: 1px; white-space: nowrap">Phone</th>
+        <% end %>
       </tr>
     </thead>
     <tbody>
-      <% max_clicks = 0; @pmail.pmail_links.order('clicks desc').limit(20).each_with_index { |link,i| max_clicks = link.clicks if i == 0; w = (link.clicks.to_f/max_clicks)*100; event = link.event; safe_url = link.url.to_s.match?(%r{\Ahttps?://}i) %>
+      <% max_clicks = pmail_links.first.clicks.to_i; pmail_links.each { |link| w = max_clicks.zero? ? 0 : (link.clicks.to_f/max_clicks)*100; event = link.event; safe_url = link.url.to_s.match?(%r{\Ahttps?://}i) %>
       <tr>
         <td>
           <% if safe_url %>
@@ -21,6 +27,15 @@
             <div class="progress-bar" role="progressbar" style="width: <%= "#{w}%" %>;"><%= link.clicks %></div>
           </div>
         </td>
+        <% if show_device_breakdown %>
+          <% if link.device_breakdown? %>
+            <td class="text-muted"><%= link.desktop_clicks.to_i %></td>
+            <td class="text-muted"><%= link.phone_clicks %></td>
+          <% else %>
+            <td class="text-muted">—</td>
+            <td class="text-muted">—</td>
+          <% end %>
+        <% end %>
       </tr>
       <% } %>
     </tbody>
