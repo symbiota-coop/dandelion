@@ -1,1 +1,6 @@
+<% form_tag '', method: 'get', class: 'submitOnChange searchForm form-inline mb-3' do %>
+  <%= checkbox 'Donation to Dandelion', checked: !params[:search] || params[:donation_to_dandelion] %>
+  <%= hidden_field_tag :search, value: 1 %>
+<% end %>
+
 <%= partial :'events/orders_table', locals: { orders: @orders, event_name: true, organisation_name: true, donation_to_dandelion: true, show_emails: true } %>

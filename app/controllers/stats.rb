@@ -25,6 +25,7 @@ Dandelion::App.controller do
 
   get '/stats/orders' do
     @orders = Order.includes(:account, :event, :revenue_sharer, :discount_code).order('created_at desc')
+    @orders = @orders.and(application_fee_paid_to_dandelion: true, :application_fee_amount.gt => 0) if !params[:search] || params[:donation_to_dandelion]
     erb :'stats/orders'
   end
 
