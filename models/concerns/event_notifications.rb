@@ -140,10 +140,23 @@ module EventNotifications
   end
 
   def send_feedback_requests(account_id, force_all = false)
-    return if evergreen?
-    return if feedback_questions.nil?
-    return unless organisation
-    return if sent_feedback_requests_at && account_id == :all && !force_all
+    log_prefix = "send_feedback_requests event=#{id} account_id=#{account_id.inspect} force_all=#{force_all}"
+    if evergreen?
+      puts "#{log_prefix}: skip evergreen"
+      return
+    end
+    if feedback_questions.nil?
+      puts "#{log_prefix}: skip feedback_questions nil"
+      return
+    end
+    unless organisation
+      puts "#{log_prefix}: skip no organisation"
+      return
+    end
+    if sent_feedback_requests_at && account_id == :all && !force_all
+      puts "#{log_prefix}: skip already sent at #{sent_feedback_requests_at}"
+      return
+    end
 
     mg_client = Mailgun::Client.new ENV['MAILGUN_API_KEY'], ENV['MAILGUN_REGION']
     batch_message = Mailgun::BatchMessage.new(mg_client, ENV['MAILGUN_NOTIFICATIONS_HOST'])
@@ -161,16 +174,21 @@ module EventNotifications
     )
     batch_message.body_html EmailHelper.html(:feedback, event: event)
 
-    (account_id == :all ? attendees.and(unsubscribed: false).and(unsubscribed_feedback: false) : attendees.and(unsubscribed: false).and(unsubscribed_feedback: false).and(id: account_id)).each do |account|
+    recipients = account_id == :all ? attendees.and(unsubscribed: false).and(unsubscribed_feedback: false) : attendees.and(unsubscribed: false).and(unsubscribed_feedback: false).and(id: account_id)
+    recipient_count = 0
+    recipients.each do |account|
       batch_message.add_recipient(:to, account.email,
                                   EmailFields.recipient_variables(
                                     event: event,
                                     account: account
                                   ).merge('feedback_token' => account.feedback_token_for(event)))
+      recipient_count += 1
     end
 
+    puts "#{log_prefix}: sending to #{recipient_count} recipient(s)"
     batch_message.finalize if Padrino.env == :production
     set(sent_feedback_requests_at: Time.now) if account_id == :all
+    puts "#{log_prefix}: done sent_feedback_requests_at=#{sent_feedback_requests_at}"
   end
 
   def send_waitlist_tickets_available
