@@ -33,12 +33,8 @@ class PmailLink
     inc(clicks: 1, field => 1)
   end
 
-  def phone_clicks
-    mobile_clicks.to_i + tablet_clicks.to_i
-  end
-
   def device_breakdown?
-    desktop_clicks.to_i.positive? || phone_clicks.positive?
+    desktop_clicks.to_i.positive? || mobile_clicks.to_i.positive? || tablet_clicks.to_i.positive?
   end
 
   def event

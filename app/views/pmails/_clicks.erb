@@ -8,7 +8,8 @@
         <th>Clicks</th>
         <% if show_device_breakdown %>
           <th style="width: 1px; white-space: nowrap">Desktop</th>
-          <th style="width: 1px; white-space: nowrap">Phone</th>
+          <th style="width: 1px; white-space: nowrap">Mobile</th>
+          <th style="width: 1px; white-space: nowrap">Tablet</th>
         <% end %>
       </tr>
     </thead>
@@ -30,8 +31,10 @@
         <% if show_device_breakdown %>
           <% if link.device_breakdown? %>
             <td class="text-muted"><%= link.desktop_clicks.to_i %></td>
-            <td class="text-muted"><%= link.phone_clicks %></td>
+            <td class="text-muted"><%= link.mobile_clicks.to_i %></td>
+            <td class="text-muted"><%= link.tablet_clicks.to_i %></td>
           <% else %>
+            <td class="text-muted">—</td>
             <td class="text-muted">—</td>
             <td class="text-muted">—</td>
           <% end %>
