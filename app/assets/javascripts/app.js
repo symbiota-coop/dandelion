@@ -441,7 +441,7 @@ $(function () {
   $(document).on('submit', 'form:has(.nav-tabs)', function () {
     navTabsFormSubmitting = true
   })
-  $(document).on('focusin', 'form:has(.nav-tabs) :input', function () {
+  $(document).on('focusin', 'form:has(.nav-tabs) :input, form:has(.nav-tabs) .ck-editor__editable', function () {
     navTabsFormTouched = true
   })
 
