@@ -396,6 +396,14 @@ a.ui-button:active,
   font-size: 0.85rem !important
 }
 
+.ck-heading_paragraph_small {
+  font-size: 90% !important
+}
+
+p.small {
+  font-size: 90%
+}
+
 a.text-primary:hover,
 a.text-primary:focus {
   color: $color_primary_hover !important
