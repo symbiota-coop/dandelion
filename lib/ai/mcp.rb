@@ -188,7 +188,8 @@ module Dandelion
         ::MCP::Server::Transports::StreamableHTTPTransport.new(
           s,
           stateless: true,
-          allowed_hosts: allowed_hosts
+          allowed_hosts: allowed_hosts,
+          dns_rebinding_protection: false
         )
         s
       end
