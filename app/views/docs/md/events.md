@@ -213,11 +213,15 @@ Dandelion operates on a donation/gift economy basis. We ask for donations from o
 
 The easiest way to ensure that donations always go to your organisation is to enable auto top-up on the Contribute page.
 
+## Sending confirmation to other ticketholders
+
+By default, only the person who placed the order receives the order confirmation email. Under **Everything else** when editing an event, you can enable **Send order confirmation to other ticketholders**. When that is on, entering a ticketholder email on the order confirmation page (or via Edit ticketholders) also emails that person the order confirmation.
+
 ## Transferring tickets
 
 **Event attendees:** Log in to Dandelion, go to the event page, click 'Edit ticketholders' and enter the name and email address of the person you gifted/sold your ticket to.
 
-The original ticket PDF will still work, so you can simply forward it to the new ticketholder. However, if it's important that the PDF is reissued under the new name, you can get in touch with the event organiser and ask them to 'Resend single ticket' following the instructions below.
+The original ticket PDF will still work, so you can simply forward it to the new ticketholder. If the event has **Send order confirmation to other ticketholders** enabled, they will also receive the order confirmation automatically. Otherwise, if it's important that the PDF is reissued under the new name, you can get in touch with the event organiser and ask them to 'Resend single ticket' following the instructions below.
 
 **Event organisers that have received a request to transfer a ticket:** Click the event dropdown, go to the Tickets page, and select 'Change name or email' in the Actions menu for the ticket(s).
 

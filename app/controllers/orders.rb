@@ -55,9 +55,13 @@ Dandelion::App.controller do
     @event = Event.find(params[:id]) || not_found
     @order = @event.orders.complete.find(params[:order_id]) || not_found
     @ticket = @order.tickets.find(params[:ticket_id]) || not_found
+    previous_email = @ticket.email
     @ticket.email = params[:email]
     @ticket.save
     @ticket.send_email_update_notification unless params[:success].to_i == 1
+    if @event.send_ticketholder_confirmation && @ticket.errors.empty? && @ticket.email.present? && @ticket.email != previous_email && @ticket.email != @order.account&.email
+      @ticket.send_ticket
+    end
     200
   end
 

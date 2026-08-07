@@ -30,6 +30,7 @@ module EventDuplication
       extra_info_for_ticket_email: extra_info_for_ticket_email,
       extra_info_for_recording_email: extra_info_for_recording_email,
       show_emails: show_emails,
+      send_ticketholder_confirmation: send_ticketholder_confirmation,
       opt_in_organisation: opt_in_organisation,
       opt_in_facilitator: opt_in_facilitator,
       locked: true,

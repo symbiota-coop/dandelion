@@ -54,7 +54,9 @@
             <%= @order.tickets.count == 1 ? 'the ticket' : 'tickets' %>
             for someone else, you're welcome to let us know the
             <%= @order.tickets.count == 1 ? 'name and email address of the ticketholder' : 'names and email addresses of ticketholders' %>
-            so they hear about any important updates to the event (we won't use these details for anything else):</strong></p>
+            so they
+            <%= @event.send_ticketholder_confirmation ? 'receive the order confirmation and hear about any important updates' : 'hear about any important updates' %>
+            to the event (we won't use these details for anything else):</strong></p>
         <div class="mb-3">
           <% @order.tickets.each_with_index { |ticket,i| %>
           <div class="alert alert-success ticket">

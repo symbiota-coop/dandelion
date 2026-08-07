@@ -64,7 +64,7 @@ module EventFields
     field :profit_share_to_social_media, type: Integer
     field :stripe_revenue_adjustment, type: Float
 
-    %w[no_discounts hide_deleted_filters hide_attendees hide_discussion refund_deleted_orders monthly_donors_only locked secret show_emails featured opt_in_organisation opt_in_facilitator hide_few_left hide_organisation_footer ask_hear_about send_order_notifications raw_description trending hide_from_carousels no_tickets_pdf enable_resales donations_to_organisation browsable hide_unavailable_tickets hidden_from_homepage blank_price_for_free_tickets ai_tagged sold_out_cache sold_out_due_to_sales_end_cache has_organisation minimal_only direct_charges no_sales_after_end_time always_show_full_ticket_form show_after_start_time has_recording hide_waitlist allow_ticket_type_waitlists evergreen].each do |b|
+    %w[no_discounts hide_deleted_filters hide_attendees hide_discussion refund_deleted_orders monthly_donors_only locked secret show_emails featured opt_in_organisation opt_in_facilitator hide_few_left hide_organisation_footer ask_hear_about send_order_notifications raw_description trending hide_from_carousels no_tickets_pdf send_ticketholder_confirmation enable_resales donations_to_organisation browsable hide_unavailable_tickets hidden_from_homepage blank_price_for_free_tickets ai_tagged sold_out_cache sold_out_due_to_sales_end_cache has_organisation minimal_only direct_charges no_sales_after_end_time always_show_full_ticket_form show_after_start_time has_recording hide_waitlist allow_ticket_type_waitlists evergreen].each do |b|
       field b.to_sym, type: Mongoid::Boolean
     end
   end
@@ -105,6 +105,7 @@ module EventFields
         feedback_hours_after: 'Hours after the event to send the feedback request email',
         oc_slug: 'Open Collective event slug',
         no_tickets_pdf: "Don't include tickets PDF in confirmation email",
+        send_ticketholder_confirmation: 'Send order confirmation to other ticketholders',
         hide_few_left: "Hide 'few tickets left' labels",
         rsvp_button_text: 'RSVP button',
         tax_rate_id: 'Stripe tax rate ID',
@@ -167,6 +168,7 @@ module EventFields
         hide_few_left: "Hide the 'few tickets left' labels at checkout when tickets are running low",
         hide_organisation_footer: 'Hide the organisation footer in the event confirmation email',
         no_tickets_pdf: 'Skip the PDF attachment in the confirmation email',
+        send_ticketholder_confirmation: 'When someone provides a ticketholder email on the order confirmation page, also email that person the order confirmation',
         tax_rate_id: 'Stripe tax rate ID to apply to ticket purchases',
         hide_unavailable_tickets: 'Hide tickets that have sold out or where sales have ended',
         match_phrase: 'Create a dropdown on the event page with future events containing this term',
