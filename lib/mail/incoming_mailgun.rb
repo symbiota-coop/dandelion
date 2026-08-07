@@ -1,5 +1,5 @@
 class EmailReceiver < Incoming::Strategies::Mailgun
-  setup api_key: ENV['MAILGUN_API_KEY']
+  setup api_key: ENV['MAILGUN_WEBHOOK_SIGNING_KEY']
   def receive(mail)
     if mail.html_part
       body = mail.html_part.body

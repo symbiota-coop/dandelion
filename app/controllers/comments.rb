@@ -1,6 +1,8 @@
 Dandelion::App.controller do
   post '/inbound/:id' do
-    mail, _html, plain_text = EmailReceiver.receive(request)
+    received_email = EmailReceiver.receive(request)
+    halt 401 unless received_email
+    mail, _html, plain_text = received_email
     account = Account.find_by(email: mail.from.first) || not_found
     unless account.block_reply_by_email
       @post = Post.find(params[:id]) || not_found
