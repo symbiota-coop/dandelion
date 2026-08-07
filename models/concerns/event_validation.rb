@@ -15,6 +15,7 @@ module EventValidation
         self.end_time = nil
         self.location = 'Online'
         self.reminder_hours_before = nil
+        self.feedback_hours_after = nil
         self.no_tickets_pdf = true
       end
 
@@ -82,6 +83,8 @@ module EventValidation
       errors.add(:suggested_donation, 'cannot be less than the minimum donation') if suggested_donation && minimum_donation && suggested_donation < minimum_donation
       errors.add(:oc_slug, "cannot be set until the organisation's Open Collective slug is set") if oc_slug && organisation && !organisation.oc_slug
       errors.add(:end_time, 'must be after the start time') if end_time && start_time && end_time <= start_time
+      errors.add(:feedback_hours_after, 'cannot be negative') if feedback_hours_after&.negative?
+      errors.add(:feedback_hours_after, "cannot be more than #{Event::MAX_FEEDBACK_HOURS_AFTER}") if feedback_hours_after && feedback_hours_after > Event::MAX_FEEDBACK_HOURS_AFTER
 
       # rubocop:disable Style/CombinableLoops
       Event.profit_share_roles.each do |role|

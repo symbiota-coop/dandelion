@@ -267,6 +267,16 @@
           <% if @event.persisted? %>
             <p style="margin-top: -1rem"><a target="_blank" href="/events/<%=@event.id%>/feedback_request_email">Preview feedback request email &rarr;</a></p>
           <% end %>
+          <div class="evergreen-hide" style="<%= 'display:none' if @event.evergreen? %>">
+            <% if @event.sent_feedback_requests_at %>
+              <div class="form-group">
+                <label><%= Event.human_attribute_name(:feedback_hours_after) %></label>
+                <input type="text" class="form-control" disabled value="<%= "Feedback request sent #{@event.sent_feedback_requests_at}" %>">
+              </div>
+            <% else %>
+              <%= f.number_block :feedback_hours_after %>
+            <% end %>
+          </div>
         </div>
         <% if (@event.persisted? && @event.start_time && @event.past?) || @event.recording_email_title || @event.recording_email_greeting %>
           <div class="mt-5">

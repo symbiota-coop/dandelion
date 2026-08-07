@@ -55,6 +55,7 @@ module EventFields
     field :calendar_import_source_url, type: String
     field :calendar_import_last_synced_at, type: Time
     field :reminder_hours_before, type: Integer
+    field :feedback_hours_after, type: Integer
 
     field :revenue_share_to_revenue_sharer, type: Integer
     field :profit_share_to_organiser, type: Integer
@@ -101,6 +102,7 @@ module EventFields
         gathering_id: 'Add people that buy tickets to this gathering',
         send_order_notifications: 'Send email notifications of orders and waitlist registrations',
         reminder_hours_before: 'Hours before the event to send the reminder email',
+        feedback_hours_after: 'Hours after the event to send the feedback request email',
         oc_slug: 'Open Collective event slug',
         no_tickets_pdf: "Don't include tickets PDF in confirmation email",
         hide_few_left: "Hide 'few tickets left' labels",
@@ -159,6 +161,7 @@ module EventFields
         capacity: 'Caps the total number of tickets issued across all ticket types. Optional',
         send_order_notifications: 'Send email notifications of orders and waitlist registrations to event facilitators',
         reminder_hours_before: 'Number of hours before the event to send the reminder email. Leave blank to skip the reminder.',
+        feedback_hours_after: "Number of hours after the event ends to send the feedback request email (maximum: #{Event::MAX_FEEDBACK_HOURS_AFTER}, or 30 days). Leave blank to send when the event ends.",
         stripe_revenue_adjustment: 'Positive or negative adjustment to the revenue reported by Stripe, e.g. +20 or -10',
         enable_resales: 'Allow ticketholders to resell tickets via the event once a ticket type sells out (experimental)',
         hide_few_left: "Hide the 'few tickets left' labels at checkout when tickets are running low",

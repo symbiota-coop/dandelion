@@ -114,6 +114,19 @@ module EventNotifications
     reminder_time <= from + window
   end
 
+  def feedback_due_within?(window, from = Time.now)
+    return false if evergreen?
+    return false unless feedback_questions.present?
+    return false unless organisation
+    return false unless end_time
+    return false if sent_feedback_requests_at
+
+    feedback_time = end_time + (feedback_hours_after || 0).hours
+    return false if from > feedback_time + window
+
+    feedback_time <= from + window
+  end
+
   def send_star_reminders(account_id)
     return if evergreen?
     return unless organisation

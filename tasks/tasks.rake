@@ -1,12 +1,14 @@
 namespace :hourly do
   task errands: :environment do
+    now = Time.now
     puts 'feedback requests'
-    feedback_window_start = Time.now.beginning_of_hour
-    feedback_window_end = feedback_window_start + 1.hour
-    feedback_events = Event.live.and(:end_time.gt => feedback_window_start, :end_time.lte => feedback_window_end)
-    puts "feedback requests: window #{feedback_window_start}..#{feedback_window_end}, #{feedback_events.count} event(s)"
+    feedback_window_start = now - (Event::MAX_FEEDBACK_HOURS_AFTER + 1).hours
+    feedback_events = Event.live.and(:sent_feedback_requests_at => nil, :end_time.ne => nil, :end_time.lte => now + 1.hour, :end_time.gte => feedback_window_start)
+    puts "feedback requests: checking #{feedback_events.count} event(s) within the supported scheduling window"
     feedback_events.each do |event|
-      puts "feedback requests: enqueueing event=#{event.id} slug=#{event.slug} name=#{event.name.inspect} end_time=#{event.end_time}"
+      next unless event.feedback_due_within?(1.hour, now)
+
+      puts "feedback requests: enqueueing event=#{event.id} slug=#{event.slug} name=#{event.name.inspect} end_time=#{event.end_time} feedback_hours_after=#{event.feedback_hours_after.inspect}"
       event.send_feedback_requests(:all)
     end
     puts 'clean up old temp files'
@@ -26,7 +28,6 @@ namespace :hourly do
     end
     Gathering.and(:evm_address.ne => nil).each(&:check_evm_account)
     puts 'event reminders'
-    now = Time.now
     Event.live.and(:start_time.gt => now, :reminder_hours_before.ne => nil, :sent_reminders_at => nil).each do |event|
       next unless event.reminder_due_within?(1.hour, now)
 

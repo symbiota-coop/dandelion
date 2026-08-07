@@ -83,6 +83,61 @@ class EventsTest < ActiveSupport::TestCase
     refute event.reminder_due_within?(1.hour, now)
   end
 
+  test 'feedback request is due when its send time falls within the next hour' do
+    now = Time.utc(2026, 3, 13, 10, 55, 0)
+    event = Event.new(
+      organisation: FactoryBot.build_stubbed(:organisation),
+      feedback_questions: 'How was it?',
+      end_time: Time.utc(2026, 3, 13, 10, 0, 0),
+      feedback_hours_after: 1
+    )
+
+    assert event.feedback_due_within?(1.hour, now)
+  end
+
+  test 'feedback request with blank hours is due at event end' do
+    now = Time.utc(2026, 3, 13, 9, 55, 0)
+    event = Event.new(
+      organisation: FactoryBot.build_stubbed(:organisation),
+      feedback_questions: 'How was it?',
+      end_time: Time.utc(2026, 3, 13, 10, 0, 0)
+    )
+
+    assert event.feedback_due_within?(1.hour, now)
+  end
+
+  test 'feedback request is not sent once it has already been sent' do
+    now = Time.utc(2026, 3, 13, 10, 55, 0)
+    event = Event.new(
+      organisation: FactoryBot.build_stubbed(:organisation),
+      feedback_questions: 'How was it?',
+      end_time: Time.utc(2026, 3, 13, 10, 0, 0),
+      feedback_hours_after: 1,
+      sent_feedback_requests_at: Time.utc(2026, 3, 13, 10, 0, 0)
+    )
+
+    refute event.feedback_due_within?(1.hour, now)
+  end
+
+  test 'feedback request bulk task does not reschedule very old pending sends' do
+    now = Time.utc(2026, 5, 17, 12, 0, 0)
+    event = Event.new(
+      organisation: FactoryBot.build_stubbed(:organisation),
+      feedback_questions: 'How was it?',
+      end_time: Time.utc(2026, 3, 13, 10, 0, 0),
+      feedback_hours_after: 0
+    )
+
+    refute event.feedback_due_within?(1.hour, now)
+  end
+
+  test 'feedback request delay cannot exceed 30 days' do
+    event = Event.new(feedback_hours_after: Event::MAX_FEEDBACK_HOURS_AFTER + 1)
+    event.valid?
+
+    assert_includes event.errors[:feedback_hours_after], "cannot be more than #{Event::MAX_FEEDBACK_HOURS_AFTER}"
+  end
+
   test 'booking onto a free event' do
     @account = FactoryBot.create(:account)
     @organisation = FactoryBot.create(:organisation, account: @account)

@@ -59,6 +59,7 @@ module EventDuplication
       no_sales_after_end_time: no_sales_after_end_time,
       evergreen: evergreen,
       reminder_hours_before: reminder_hours_before,
+      feedback_hours_after: feedback_hours_after,
       ticket_email_title: ticket_email_title,
       ticket_email_greeting: ticket_email_greeting,
       recording_email_title: recording_email_title,

@@ -42,6 +42,8 @@ class Event
     %w[raw_description direct_charges trending]
   end
 
+  MAX_FEEDBACK_HOURS_AFTER = 30 * 24
+
   COPY_FIELDS = %w[
     name location email image
     description extra_info_for_ticket_email

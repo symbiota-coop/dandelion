@@ -126,11 +126,11 @@ You can see all events under an organisation (including events marked secret or 
 
 ## Reminders
 
-Dandelion sends event attendees a reminder email the day before the start of the event. You can customise the reminder in your organisation or event settings.
+Dandelion can send event attendees a reminder email before the event starts. Set **Hours before the event to send the reminder email** in the event's Emails tab (default: 24). Leave blank to skip the reminder. You can also customise the reminder subject and body in your organisation or event settings.
 
 ## Feedback
 
-Attendees receive an email with a request for feedback on or shortly after the event end time.
+Attendees receive an email with a request for feedback after the event ends. Set **Hours after the event to send the feedback request email** in the event's Emails tab (maximum: 720 hours, or 30 days). Leave blank to send when the event ends.
 
 You can resend these emails by going to the Orders page for your event and clicking 'Resend feedback email' next to an order.
 

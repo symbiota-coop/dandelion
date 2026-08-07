@@ -56,6 +56,7 @@ class EvergreenEventsTest < ActiveSupport::TestCase
                                        evergreen: true, start_time: nil, end_time: nil, location: nil, prices: [0])
     assert_equal 'Online', @event.location
     assert_nil @event.reminder_hours_before
+    assert_nil @event.feedback_hours_after
   end
 
   test 'evergreen event validates without start_time end_time location' do
@@ -135,6 +136,18 @@ class EvergreenEventsTest < ActiveSupport::TestCase
   test 'evergreen event reminder_due_within returns false' do
     @event = Event.new(evergreen: true, name: 'Test', currency: 'GBP', reminder_hours_before: 24)
     refute @event.reminder_due_within?(1.hour)
+  end
+
+  test 'evergreen event feedback_due_within returns false' do
+    @event = Event.new(
+      evergreen: true,
+      name: 'Test',
+      currency: 'GBP',
+      feedback_questions: 'Q?',
+      end_time: 1.day.ago,
+      feedback_hours_after: 1
+    )
+    refute @event.feedback_due_within?(1.hour)
   end
 
   test 'evergreen event json endpoint returns nil dates' do
