@@ -56,6 +56,8 @@ module EventFields
     field :calendar_import_last_synced_at, type: Time
     field :reminder_hours_before, type: Integer
     field :feedback_hours_after, type: Integer
+    field :terms_and_conditions_url, type: String
+    field :terms_and_conditions, type: String
 
     field :revenue_share_to_revenue_sharer, type: Integer
     field :profit_share_to_organiser, type: Integer
@@ -64,13 +66,41 @@ module EventFields
     field :profit_share_to_social_media, type: Integer
     field :stripe_revenue_adjustment, type: Float
 
-    %w[no_discounts hide_deleted_filters hide_attendees hide_discussion refund_deleted_orders monthly_donors_only locked secret show_emails featured opt_in_organisation opt_in_facilitator hide_few_left hide_organisation_footer ask_hear_about send_order_notifications raw_description trending hide_from_carousels no_tickets_pdf send_ticketholder_confirmation enable_resales donations_to_organisation browsable hide_unavailable_tickets hidden_from_homepage blank_price_for_free_tickets ai_tagged sold_out_cache sold_out_due_to_sales_end_cache has_organisation minimal_only direct_charges no_sales_after_end_time always_show_full_ticket_form show_after_start_time has_recording hide_waitlist allow_ticket_type_waitlists evergreen].each do |b|
+    %w[no_discounts hide_deleted_filters hide_attendees hide_discussion refund_deleted_orders monthly_donors_only locked secret show_emails featured opt_in_organisation opt_in_facilitator hide_few_left hide_organisation_footer ask_hear_about send_order_notifications raw_description trending hide_from_carousels no_tickets_pdf send_ticketholder_confirmation enable_resales donations_to_organisation browsable hide_unavailable_tickets hidden_from_homepage blank_price_for_free_tickets ai_tagged sold_out_cache sold_out_due_to_sales_end_cache has_organisation minimal_only direct_charges no_sales_after_end_time always_show_full_ticket_form show_after_start_time has_recording hide_waitlist allow_ticket_type_waitlists evergreen terms_and_conditions_check_box].each do |b|
       field b.to_sym, type: Mongoid::Boolean
     end
   end
 
   def currency_or_default
     FIAT_CURRENCIES.include?(currency) ? currency : ENV['DEFAULT_CURRENCY']
+  end
+
+  def event_terms_and_conditions_override?
+    terms_and_conditions.present? || terms_and_conditions_url.present?
+  end
+
+  def terms_and_conditions_for_purchase
+    if event_terms_and_conditions_override?
+      terms_and_conditions.presence
+    else
+      organisation.try(:terms_and_conditions)
+    end
+  end
+
+  def terms_and_conditions_url_for_purchase
+    if event_terms_and_conditions_override?
+      terms_and_conditions_url.presence
+    else
+      organisation.try(:terms_and_conditions_url)
+    end
+  end
+
+  def terms_and_conditions_check_box_for_purchase
+    if event_terms_and_conditions_override?
+      terms_and_conditions_check_box
+    else
+      organisation.try(:terms_and_conditions_check_box)
+    end
   end
 
   class_methods do
@@ -118,7 +148,10 @@ module EventFields
         no_sales_after_end_time: 'No sales after event ends',
         show_after_start_time: 'Show after start time',
         evergreen: 'Evergreen',
-        update_activity_events: 'Update all future events in this activity with the same key information'
+        update_activity_events: 'Update all future events in this activity with the same key information',
+        terms_and_conditions_url: 'Terms and conditions URL',
+        terms_and_conditions: 'Terms and conditions',
+        terms_and_conditions_check_box: 'Require agreement to terms and conditions'
       }.merge(email_human_attribute_names).merge({
                                                    recording_email_title: 'Order confirmation email subject for the recording of the event',
                                                    recording_email_greeting: 'Order confirmation email greeting for the recording of the event'
@@ -180,7 +213,10 @@ module EventFields
         always_show_full_ticket_form: 'Always show the full ticket form, even if there is only one free ticket type',
         show_after_start_time: 'Keep showing the event in listings after the start time has passed',
         evergreen: 'Mark as evergreen/on-demand, with no dates or location',
-        update_activity_events: "Applies to #{(Event::COPY_FIELDS - %w[last_saved_by]).map { |f| Event.human_attribute_name(f).downcase }.to_sentence(last_word_connector: ' and ')}"
+        update_activity_events: "Applies to #{(Event::COPY_FIELDS - %w[last_saved_by]).map { |f| Event.human_attribute_name(f).downcase }.to_sentence(last_word_connector: ' and ')}",
+        terms_and_conditions_url: "Link to this event's terms and conditions of sale (leave blank to use organisation default)",
+        terms_and_conditions: 'Terms and conditions to display on the ticket purchase page (leave blank to use organisation default)',
+        terms_and_conditions_check_box: 'Require attendees to check a box to confirm they have read and agree to the terms and conditions (applies when event-level terms are set)'
       }.merge(email_hints).merge({
                                    recording_email_title: 'Custom subject line for the order confirmation email for the recording of the event.',
                                    recording_email_greeting: 'Custom greeting for the order confirmation email for the recording of the event.'

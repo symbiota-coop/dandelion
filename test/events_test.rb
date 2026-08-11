@@ -464,4 +464,69 @@ class EventsTest < ActiveSupport::TestCase
     assert_includes event.errors[:organisation], 'cannot be changed'
     assert_includes event.errors[:account], 'cannot be changed'
   end
+
+  test 'falls back to organisation terms and conditions when event has none' do
+    organisation = FactoryBot.build_stubbed(
+      :organisation,
+      terms_and_conditions: 'Org terms',
+      terms_and_conditions_url: 'https://org.example/terms',
+      terms_and_conditions_check_box: true
+    )
+    event = Event.new(organisation: organisation)
+
+    assert_equal 'Org terms', event.terms_and_conditions_for_purchase
+    assert_equal 'https://org.example/terms', event.terms_and_conditions_url_for_purchase
+    assert event.terms_and_conditions_check_box_for_purchase
+  end
+
+  test 'event terms and conditions override organisation defaults' do
+    organisation = FactoryBot.build_stubbed(
+      :organisation,
+      terms_and_conditions: 'Org terms',
+      terms_and_conditions_url: 'https://org.example/terms',
+      terms_and_conditions_check_box: true
+    )
+    event = Event.new(
+      organisation: organisation,
+      terms_and_conditions: 'Event terms',
+      terms_and_conditions_check_box: false
+    )
+
+    assert_equal 'Event terms', event.terms_and_conditions_for_purchase
+    assert_nil event.terms_and_conditions_url_for_purchase
+    refute event.terms_and_conditions_check_box_for_purchase
+  end
+
+  test 'event terms and conditions URL overrides organisation terms text' do
+    organisation = FactoryBot.build_stubbed(
+      :organisation,
+      terms_and_conditions: 'Org terms',
+      terms_and_conditions_url: 'https://org.example/terms',
+      terms_and_conditions_check_box: false
+    )
+    event = Event.new(
+      organisation: organisation,
+      terms_and_conditions_url: 'https://event.example/terms',
+      terms_and_conditions_check_box: true
+    )
+
+    assert_nil event.terms_and_conditions_for_purchase
+    assert_equal 'https://event.example/terms', event.terms_and_conditions_url_for_purchase
+    assert event.terms_and_conditions_check_box_for_purchase
+  end
+
+  test 'event-level terms and conditions are shown at checkout' do
+    @account = FactoryBot.create(:account)
+    @organisation = FactoryBot.create(:organisation, account: @account, terms_and_conditions: 'Organisation terms')
+    @event = FactoryBot.create(
+      :event,
+      organisation: @organisation,
+      account: @account,
+      last_saved_by: @account,
+      prices: [0],
+      terms_and_conditions: 'Event terms'
+    )
+    visit "/e/#{@event.slug}"
+    assert_equal 'Event terms', find('textarea[readonly]').value
+  end
 end
