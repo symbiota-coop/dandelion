@@ -111,6 +111,7 @@ Dandelion::App.controller do
     @organisation.show_details_table_in_ticket_emails = true
     @organisation.show_sign_in_link_in_ticket_emails = true
     @organisation.show_ticketholder_link_in_ticket_emails = true
+    @organisation.collect_phone = true
     if @organisation.save
       session.delete(:organisation_referrer_id)
       redirect "/o/#{@organisation.slug}/edit?created=1&tab=payments"
