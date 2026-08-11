@@ -37,10 +37,10 @@ Dandelion::App.helpers do
     account_hash = {
       name: details_form[:account][:name],
       email: details_form[:account][:email],
-      phone: details_form[:account][:phone],
       postcode: details_form[:account][:postcode],
       country: details_form[:account][:country]
     }
+    account_hash[:phone] = details_form[:account][:phone] if @event.organisation.collect_phone?
 
     account = Account.find_by(email: details_form[:account][:email].downcase)
     account ||= Account.new(account_hash.merge(skip_confirmation_email: true))
