@@ -292,9 +292,6 @@
         <%= f.shorturl_block :slug, stem: "#{ENV['BASE_URI']}/e/" %>
         <%= f.url_block :redirect_url %>
         <%= f.url_block :purchase_url %>
-        <%= f.url_block :terms_and_conditions_url %>
-        <%= f.text_area_block :terms_and_conditions %>
-        <%= f.check_box_block :terms_and_conditions_check_box %>
         <%= f.text_block :match_phrase %>
         <%= f.text_block :facebook_pixel_id %>
         <%= f.text_block :oc_slug %>
@@ -302,6 +299,9 @@
         <% if current_account.memberships.and(admin: true).exists? %>
           <%= f.select_block :gathering_id, options: [''] + current_account.memberships.and(admin: true).map { |m| [m.gathering.name, m.gathering_id] }.sort_by { |a,b| a } %>
         <% end %>
+        <%= f.url_block :terms_and_conditions_url %>
+        <%= f.text_area_block :terms_and_conditions %>
+        <%= f.check_box_block :terms_and_conditions_check_box %>
         <%= f.check_box_block :no_tickets_pdf %>
         <%= f.check_box_block :send_ticketholder_confirmation %>
         <%= f.check_box_block :monthly_donors_only %>

@@ -150,8 +150,7 @@ module EventFields
         evergreen: 'Evergreen',
         update_activity_events: 'Update all future events in this activity with the same key information',
         terms_and_conditions_url: 'Terms and conditions URL',
-        terms_and_conditions: 'Terms and conditions',
-        terms_and_conditions_check_box: 'Require agreement to terms and conditions'
+        terms_and_conditions: 'Terms and conditions'
       }.merge(email_human_attribute_names).merge({
                                                    recording_email_title: 'Order confirmation email subject for the recording of the event',
                                                    recording_email_greeting: 'Order confirmation email greeting for the recording of the event'
