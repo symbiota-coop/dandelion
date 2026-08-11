@@ -44,20 +44,47 @@
       <%= partial :'events/success' %>
     <% elsif @gocardless_order %>
       <div class="card shadow-sm mb-3">
-        <h3 class="card-header bg-primary text-white">Confirming your payment</h3>
-        <div class="card-body readable">
-          <p class="mb-0">We're confirming your payment with GoCardless... <i class="bi bi-spin bi-slash-lg"></i></p>
-        </div>
-      </div>
-      <script>
-        $(function () {
-          setInterval(function () {
-            $.getJSON('/events/<%= @event.id %>/orders/<%= @gocardless_order.id %>/payment_completed', function (data) {
-              if (data.payment_completed) { window.location.reload() }
+        <% if @gocardless_order.gocardless_instalments? %>
+          <h3 class="card-header bg-primary text-white">Setting up your instalment plan</h3>
+          <div class="card-body readable">
+            <% if @gocardless_order.gocardless_instalment_schedule_id %>
+              <p class="mb-0">
+                Your Direct Debit instalment plan is active
+                <% if @gocardless_order.instalment_count && @gocardless_order.amount_demanded %>
+                  (<%= @gocardless_order.instalment_count %>× <%= m (@gocardless_order.amount_demanded / @gocardless_order.instalment_count.to_f), @gocardless_order.currency %> monthly)
+                <% end %>.
+                You'll receive your tickets by email once all payments have cleared.
+              </p>
+            <% else %>
+              <p class="mb-0">We're setting up your GoCardless instalment plan... <i class="bi bi-spin bi-slash-lg"></i></p>
+            <% end %>
+          </div>
+          <% unless @gocardless_order.gocardless_instalment_schedule_id %>
+            <script>
+              $(function () {
+                setInterval(function () {
+                  $.getJSON('/events/<%= @event.id %>/orders/<%= @gocardless_order.id %>/payment_completed', function (data) {
+                    if (data.payment_completed || data.instalment_schedule_created) { window.location.reload() }
+                  })
+                }, 3 * 1000)
+              })
+            </script>
+          <% end %>
+        <% else %>
+          <h3 class="card-header bg-primary text-white">Confirming your payment</h3>
+          <div class="card-body readable">
+            <p class="mb-0">We're confirming your payment with GoCardless... <i class="bi bi-spin bi-slash-lg"></i></p>
+          </div>
+          <script>
+            $(function () {
+              setInterval(function () {
+                $.getJSON('/events/<%= @event.id %>/orders/<%= @gocardless_order.id %>/payment_completed', function (data) {
+                  if (data.payment_completed) { window.location.reload() }
+                })
+              }, 3 * 1000)
             })
-          }, 3 * 1000)
-        })
-      </script>
+          </script>
+        <% end %>
     <% elsif @event_image %>
       <a href="/e/<%=@event.slug%><% if params[:cohost] %>?cohost=<%=params[:cohost]%><% end %>"><%= blurred_image_tag(@event_image, width: @event_image_width, height: @event_image_height, full_size: '1920x1920', md_size: '992x992', css_class: 'w-100 mb-3', id: 'event-image') %></a>
     <% end %>

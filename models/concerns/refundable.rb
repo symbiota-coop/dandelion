@@ -1,6 +1,6 @@
 module Refundable
   def refundable?
-    session_id || gocardless_payment_id
+    session_id || gocardless_payment_id || (respond_to?(:gocardless_instalment_schedule_id) && gocardless_instalment_schedule_id.present?)
   end
 
   def refund_via_stripe(payment_intent:, on_error:, amount: nil, refund_application_fee: false)

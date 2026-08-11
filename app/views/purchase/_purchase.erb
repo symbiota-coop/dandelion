@@ -224,6 +224,8 @@ end
     stripePk: (@event.organisation.stripe_connect_json ? ENV['STRIPE_PK'] : @event.organisation.stripe_pk),
     stripeAccount: @event.revenue_sharer_organisationship && @event.direct_charges ? @event.revenue_sharer_organisationship.stripe_user_id : @event.organisation.stripe_user_id,
     gocardless: !!(@event.organisation.gocardless_instant_bank_pay && @event.organisation.gocardless_access_token),
+    gocardlessInstalments: !!(@event.organisation.gocardless_instalments && @event.organisation.gocardless_access_token),
+    gocardlessInstalmentCount: (@event.organisation.gocardless_instalments ? (@event.organisation.gocardless_instalment_count || 3) : nil),
     organisationOcSlug: @event.organisation.oc_slug,
     ocSlug: @event.oc_slug,
     evmAddress: @event.organisation.evm_address,

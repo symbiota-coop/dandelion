@@ -26,7 +26,12 @@ Dandelion::App.controller do
     @order = @event.orders.find(params[:order_id]) || not_found
     @event.organisation.check_evm_account if @order.evm_secret && @event.organisation.evm_address
     @event.check_oc_event if @order.oc_secret && @event.oc_slug
-    { id: @order.id.to_s, payment_completed: @order.payment_completed }.to_json
+    {
+      id: @order.id.to_s,
+      payment_completed: @order.payment_completed,
+      instalment_schedule_created: @order.gocardless_instalment_schedule_id.present?,
+      gocardless_instalments: @order.gocardless_instalments?
+    }.to_json
   end
 
   get '/events/:id/orders/:order_id/ticketholders/:ticket_id/name' do

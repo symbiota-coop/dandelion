@@ -62,6 +62,12 @@ module OrganisationValidation
       errors.add(:stripe_sk, 'must be present if Stripe public key is present') if stripe_pk && !stripe_sk
 
       errors.add(:gocardless_instant_bank_pay, 'requires GoCardless webhook secret') if gocardless_instant_bank_pay && !gocardless_endpoint_secret
+      errors.add(:gocardless_instalments, 'requires GoCardless access token') if gocardless_instalments && !gocardless_access_token
+      errors.add(:gocardless_instalments, 'requires GoCardless webhook secret') if gocardless_instalments && !gocardless_endpoint_secret
+      if gocardless_instalment_count
+        errors.add(:gocardless_instalment_count, 'must be between 2 and 12') unless gocardless_instalment_count.between?(2, 12)
+      end
+      self.gocardless_instalment_count = 3 if gocardless_instalments && gocardless_instalment_count.nil?
 
       if patreon_api_key.present?
         patreon_host = begin

@@ -137,12 +137,53 @@ class Order
   end
 
   def persist_gocardless_payment_id(payment_id)
-    return if gocardless_payment_id.present? || payment_id.blank?
+    return if payment_id.blank?
+
+    ids = Array(gocardless_payment_ids).map(&:to_s)
+    unless ids.include?(payment_id.to_s)
+      ids << payment_id.to_s
+      set(gocardless_payment_ids: ids)
+    end
+
+    return if gocardless_payment_id.present?
 
     set(gocardless_payment_id: payment_id)
     tickets.each do |ticket|
       ticket.update_attributes!(gocardless_payment_id: payment_id)
     end
+  end
+
+  def gocardless_instalments?
+    instalment_count.present? || gocardless_billing_request_id.present? || gocardless_instalment_schedule_id.present?
+  end
+
+  def record_gocardless_instalment_payment!(payment_id:, amount_major:)
+    return if payment_id.blank?
+    return if payment_completed?
+
+    ids = Array(gocardless_payment_ids).map(&:to_s)
+    return if ids.include?(payment_id.to_s)
+
+    persist_gocardless_payment_id(payment_id)
+    paid = (amount_paid || 0) + amount_major.to_f
+    set(amount_paid: paid.round(2))
+    complete_gocardless_instalments! if amount_demanded && paid >= amount_demanded
+  end
+
+  def complete_gocardless_instalments!
+    return if payment_completed?
+
+    set(amount_paid: amount_demanded) if amount_demanded && (amount_paid.nil? || amount_paid < amount_demanded)
+    payment_completed!
+    send_tickets
+    create_order_notification
+  end
+
+  def create_gocardless_instalment_schedule!
+    EventPaymentMethod::GoCardlessInstalments.create_schedule_for_order!(self)
+  rescue StandardError => e
+    ErrorReporting.capture_exception(e, context: { order_id: id.to_s, billing_request_id: gocardless_billing_request_id })
+    nil
   end
 
   def payment_completed!
@@ -267,7 +308,9 @@ class Order
 
   after_destroy :refund
   def refund
-    return unless event.refund_deleted_orders && !prevent_refund && event.organisation && value && value.positive? && payment_completed && (payment_intent || gocardless_payment_id)
+    return unless event.refund_deleted_orders && !prevent_refund && event.organisation && value && value.positive?
+    return unless payment_completed || (gocardless_instalments? && amount_paid.to_f.positive?)
+    return unless payment_intent || gocardless_payment_id || gocardless_instalment_schedule_id
 
     if payment_intent
       refund_via_stripe(
@@ -275,12 +318,46 @@ class Order
         on_error: ->(error) { notify_of_failed_refund(error) },
         refund_application_fee: application_fee_amount && application_fee_amount > 0
       )
+    elsif gocardless_instalments?
+      cancel_gocardless_instalment_schedule
+      refund_gocardless_instalment_payments
     else
       refund_via_gocardless(
         payment_id: gocardless_payment_id,
         amount: value,
         on_error: ->(error) { notify_of_failed_refund(error) }
       )
+    end
+  end
+
+  def cancel_gocardless_instalment_schedule
+    return if gocardless_instalment_schedule_id.blank?
+
+    client = GoCardlessPro::Client.new(access_token: event.organisation.gocardless_access_token)
+    client.instalment_schedules.cancel(gocardless_instalment_schedule_id)
+  rescue StandardError => e
+    ErrorReporting.capture_exception(e, context: { order_id: id.to_s, instalment_schedule_id: gocardless_instalment_schedule_id })
+  end
+
+  def refund_gocardless_instalment_payments
+    payment_ids = Array(gocardless_payment_ids).presence || Array(gocardless_payment_id)
+    return if payment_ids.blank?
+
+    client = GoCardlessPro::Client.new(access_token: event.organisation.gocardless_access_token)
+    payment_ids.each do |payment_id|
+      payment = client.payments.get(payment_id)
+      amount_remaining = payment.amount.to_i - payment.amount_refunded.to_i
+      next unless amount_remaining.positive?
+
+      client.refunds.create(
+        params: {
+          amount: amount_remaining,
+          total_amount_confirmation: payment.amount_refunded.to_i + amount_remaining,
+          links: { payment: payment_id }
+        }
+      )
+    rescue StandardError => e
+      notify_of_failed_refund(e)
     end
   end
 

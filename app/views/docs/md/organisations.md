@@ -6,6 +6,8 @@ Click Organisations > Create an organisation in the sidebar. Provide the basic d
 
 To accept payments for tickets to events created under the organisation, you must add details for Stripe or another payment processor in the Payments tab of your organisation's settings.
 
+For GoCardless, add an access token and webhook endpoint, then optionally enable Instant Bank Pay and/or instalment schedules. Instalment schedules split ticket orders into equal monthly Direct Debit payments; tickets are emailed only when the full amount has cleared.
+
 ## Analytics
 
 In organisation settings under **Analytics**, you can add a Meta/Facebook Pixel ID (digits only). With marketing cookie consent, Dandelion loads the pixel on organisation and event pages, sends `PageView` and `ViewContent` on event pages, and a single `Purchase` after a successful booking. You can also set a pixel on an individual event; if both are set and different, events are sent to both.

@@ -20,6 +20,10 @@ function eventPaymentHandlers (config) {
       window.location = data.gocardless_billing_request_flow['authorisation_url']
     },
 
+    gocardless_instalments: function (data) {
+      window.location = data.gocardless_billing_request_flow['authorisation_url']
+    },
+
     opencollective: function (data) {
       window.location = 'https://opencollective.com/' + config.organisationOcSlug + '/events/' + config.ocSlug + '/donate?interval=oneTime&amount=' + data.value + '&tags=' + data.oc_secret + '&redirect=' + encodeURIComponent(config.eventUrl + '?success=true&order_id=' + data.order_id)
     },

@@ -27,6 +27,8 @@ module OrganisationFields
     field :gocardless_endpoint_secret, type: String
     field :gocardless_filter, type: String
     field :gocardless_instant_bank_pay, type: Mongoid::Boolean
+    field :gocardless_instalments, type: Mongoid::Boolean
+    field :gocardless_instalment_count, type: Integer
     field :gocardless_subscriptions, type: Mongoid::Boolean
     field :patreon_api_key, type: String
     field :mailgun_api_key, type: String
@@ -133,6 +135,8 @@ module OrganisationFields
         gocardless_access_token: 'GoCardless access token',
         gocardless_endpoint_secret: 'GoCardless webhook secret',
         gocardless_instant_bank_pay: 'Enable GoCardless Instant Bank Pay',
+        gocardless_instalments: 'Enable GoCardless instalment schedules',
+        gocardless_instalment_count: 'Number of monthly instalments',
         gocardless_subscriptions: 'Register people with active GoCardless subscriptions as monthly donors',
         patreon_api_key: 'Patreon API key',
         mailgun_api_key: 'Mailgun API key',
@@ -197,6 +201,8 @@ module OrganisationFields
         hide_ticket_revenue: 'Hide ticket revenue in event stats',
         collect_location: 'Request the location of ticket buyers at checkout',
         tax_rate_id: 'Stripe tax rate ID to apply to ticket purchases',
+        gocardless_instalments: 'Offer Direct Debit instalment plans at checkout. Tickets are emailed only when all instalments have cleared.',
+        gocardless_instalment_count: 'How many equal monthly payments to split the order into (2–12). Default is 3.',
         referrer_id: 'Credit someone for referring you to Dandelion',
         minimal_head: 'Custom CSS/JS to include in the &lt;head&gt; when embedding your events page',
         allow_event_submissions: 'When enabled, any signed-in user can submit an event. Submissions are initially visible only to admins, who receive an email notification.'

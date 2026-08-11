@@ -199,6 +199,7 @@ $(function () {
     $('#balance').val((+b).toFixed(2))
     const $rsvp = $('#details form button[data-payment-method=rsvp]')
     const $stripe = $('#details form button[data-payment-method=stripe]')
+    const $gocardlessInstalments = $('#details form button[data-payment-method=gocardless_instalments]')
     const $paid = $('#details form button[data-payment-method]').not($rsvp)
     const $firstPaidButton = $('#details form button[data-payment-method]').eq(1)
 
@@ -211,11 +212,16 @@ $(function () {
     } else if (b > 0) {
       $('#balance').val((+b).toFixed(2))
       let via_card
-      if (config.gocardless || config.ocSlug || config.evmAddress) { via_card = ' via card' } else { via_card = '' }
+      if (config.gocardless || config.gocardlessInstalments || config.ocSlug || config.evmAddress) { via_card = ' via card' } else { via_card = '' }
       $firstPaidButton.removeClass('btn-outline-primary').addClass('btn-primary')
       $rsvp.hide()
       $paid.show()
       $stripe.find('span').text('Pay ' + config.currencySymbol + (+b).toFixed(2) + via_card)
+      if (config.gocardlessInstalmentCount) {
+        const n = config.gocardlessInstalmentCount
+        const each = ((+b) / n).toFixed(2)
+        $gocardlessInstalments.find('span').text('Pay ' + n + '× ' + config.currencySymbol + each + ' via Direct Debit')
+      }
     }
 
     $('input[type=hidden][name=payment_method]').prop('disabled', true)

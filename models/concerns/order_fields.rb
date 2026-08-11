@@ -14,6 +14,13 @@ module OrderFields
     field :coinbase_checkout_id, type: String
     field :gocardless_payment_request_id, type: String
     field :gocardless_payment_id, type: String
+    field :gocardless_billing_request_id, type: String
+    field :gocardless_mandate_id, type: String
+    field :gocardless_instalment_schedule_id, type: String
+    field :gocardless_payment_ids, type: Array
+    field :amount_demanded, type: Float
+    field :amount_paid, type: Float
+    field :instalment_count, type: Integer
     field :evm_secret, type: String
     field :evm_value, type: BigDecimal
     field :oc_secret, type: String

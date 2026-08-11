@@ -50,22 +50,55 @@ Dandelion::App.controller do
     events.each do |event|
       if event.resource_type == 'subscriptions' && event.action == 'created'
         @organisation.gocardless_subscribe(subscription_id: event.links.subscription)
+      elsif event.resource_type == 'billing_requests' && event.action == 'fulfilled'
+        billing_request_id = event.links.billing_request
+        next unless billing_request_id
+
+        order = @organisation.orders.find_by(gocardless_billing_request_id: billing_request_id, payment_completed: false)
+        order&.create_gocardless_instalment_schedule!
+      elsif event.resource_type == 'instalment_schedules' && event.action == 'completed'
+        schedule_id = event.links.instalment_schedule
+        next unless schedule_id
+
+        if (order = @organisation.orders.find_by(gocardless_instalment_schedule_id: schedule_id, payment_completed: false))
+          order.complete_gocardless_instalments!
+        elsif (order = Order.deleted.find_by(gocardless_instalment_schedule_id: schedule_id, payment_completed: false))
+          begin
+            order.tickets.deleted.each(&:restore)
+            order.donations.deleted.each(&:restore)
+            order.restore
+            order.set(restored: true)
+            order.complete_gocardless_instalments!
+          rescue StandardError => e
+            ErrorReporting.capture_exception(e, context: { gocardless_event_id: event.id })
+          end
+        end
       elsif event.resource_type == 'payments' && event.action == 'confirmed'
         payment_request_id = event.to_h.dig('links', 'payment_request')
         payment_id = event.links.payment
-        next unless payment_request_id
+        instalment_schedule_id = event.links.instalment_schedule
 
-        if (@order = @organisation.orders.find_by(gocardless_payment_request_id: payment_request_id, payment_completed: false))
-          @order.persist_gocardless_payment_id(payment_id)
-          @order.payment_completed!
-          @order.send_tickets
-          @order.create_order_notification
-        elsif (@order = Order.deleted.find_by(gocardless_payment_request_id: payment_request_id, payment_completed: false))
-          begin
+        if instalment_schedule_id && (order = @organisation.orders.find_by(gocardless_instalment_schedule_id: instalment_schedule_id, payment_completed: false))
+          amount_major = begin
+            client = GoCardlessPro::Client.new(access_token: @organisation.gocardless_access_token)
+            client.payments.get(payment_id).amount.to_i / 100.0
+          rescue StandardError
+            0
+          end
+          order.record_gocardless_instalment_payment!(payment_id: payment_id, amount_major: amount_major)
+        elsif payment_request_id
+          if (@order = @organisation.orders.find_by(gocardless_payment_request_id: payment_request_id, payment_completed: false))
             @order.persist_gocardless_payment_id(payment_id)
-            @order.restore_and_complete
-          rescue StandardError => e
-            ErrorReporting.capture_exception(e, context: { gocardless_event_id: event.id })
+            @order.payment_completed!
+            @order.send_tickets
+            @order.create_order_notification
+          elsif (@order = Order.deleted.find_by(gocardless_payment_request_id: payment_request_id, payment_completed: false))
+            begin
+              @order.persist_gocardless_payment_id(payment_id)
+              @order.restore_and_complete
+            rescue StandardError => e
+              ErrorReporting.capture_exception(e, context: { gocardless_event_id: event.id })
+            end
           end
         end
       end

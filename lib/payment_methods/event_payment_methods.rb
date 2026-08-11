@@ -62,6 +62,12 @@ EventPaymentMethod.new('gocardless',
                        event_condition: ->(event) { FIAT_CURRENCIES.include?(event.currency) },
                        process: ->(**kwargs) { EventPaymentMethod::GoCardless.call(**kwargs) })
 
+EventPaymentMethod.new('gocardless_instalments',
+                       label: 'Pay in instalments',
+                       org_condition: ->(org) { org.gocardless_instalments && org.gocardless_access_token },
+                       event_condition: ->(event) { FIAT_CURRENCIES.include?(event.currency) },
+                       process: ->(**kwargs) { EventPaymentMethod::GoCardlessInstalments.call(**kwargs) })
+
 EventPaymentMethod.new('opencollective',
                        label: 'Pay with Open Collective',
                        org_condition: lambda(&:oc_slug),
