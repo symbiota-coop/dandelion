@@ -174,7 +174,7 @@ Dandelion::App.controller do
     kick!(redirect_url: "/o/#{@event.organisation.slug}/events") if @event.locked? && !event_admin?
     halt 200 if request.head?
 
-    @order = Order.find(params[:order_id]) || not_found if params[:order_id]
+    @order = @event.orders.find(params[:order_id]) || not_found if params[:order_id]
     if params[:payment_request_id]
       gocardless_order = @event.orders.find_by(gocardless_payment_request_id: params[:payment_request_id])
       if gocardless_order && !params[:cancelled]
