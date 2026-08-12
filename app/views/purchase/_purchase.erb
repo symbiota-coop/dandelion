@@ -185,8 +185,6 @@ end
 
       <%= partial :'purchase/terms_and_conditions' %>
 
-      <%= partial :'purchase/gocardless_details', locals: { f: f } %>
-
       <div id="purchase-alert" class="alert alert-danger mb-3" style="display: none" role="alert"></div>
 
       <% EventPaymentMethod.all.each do |pm| %>

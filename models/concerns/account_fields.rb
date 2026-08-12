@@ -2,7 +2,7 @@ module AccountFields
   extend ActiveSupport::Concern
 
   included do
-    attr_accessor :password, :postcode, :country, :skip_confirmation_email, :gc_plan_id
+    attr_accessor :password, :postcode, :country, :skip_confirmation_email
 
     field :name, type: String
     field :name_transliterated, type: String
@@ -66,15 +66,7 @@ module AccountFields
         unsubscribed_feedback: 'Opt out of requests for feedback',
         unsubscribed_reminders: 'Opt out of event reminders',
         hidden: 'Make my profile private and visible only to me',
-        hear_about: 'How did you hear about this event?',
-        gc_plan_id: 'Your plan',
-        gc_given_name: 'First name on bank account',
-        gc_family_name: 'Last name on bank account',
-        gc_address_line1: 'Address line 1',
-        gc_city: 'City',
-        gc_postal_code: 'Post code',
-        gc_branch_code: 'Sort code',
-        gc_account_number: 'Account number'
+        hear_about: 'How did you hear about this event?'
       }[attr.to_sym] || super
     end
 

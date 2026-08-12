@@ -34,15 +34,6 @@ module OrderFields
     field :transferred, type: Mongoid::Boolean
     field :restored, type: Mongoid::Boolean
 
-    field :gc_plan_id, type: String
-    field :gc_given_name, type: String
-    field :gc_family_name, type: String
-    field :gc_address_line1, type: String
-    field :gc_city, type: String
-    field :gc_postal_code, type: String
-    field :gc_branch_code, type: String
-    field :gc_account_number, type: String
-    field :gc_success, type: Mongoid::Boolean
     field :donation_via_modal, type: Mongoid::Boolean
 
     before_validation do

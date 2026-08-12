@@ -607,7 +607,6 @@ DEPENDENCIES
   faraday
   faraday-follow_redirects
   faraday-retry
-  ferrum
   geocoder
   gocardless_pro
   haikunator

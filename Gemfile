@@ -49,7 +49,6 @@ end
 gem 'faraday'
 gem 'faraday-follow_redirects'
 gem 'faraday-retry'
-gem 'ferrum'
 gem 'jwt'
 gem 'maxmind-geoip2'
 gem 'mcp'

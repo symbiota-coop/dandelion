@@ -9,8 +9,6 @@ class Order
     const_set(error_class, Class.new(StandardError))
   end
 
-  GOCARDLESS_FIELDS = %i[gc_plan_id gc_given_name gc_family_name gc_address_line1 gc_city gc_postal_code gc_branch_code gc_account_number].freeze
-
   include OrderFields
   include OrderNotifications
   include OrderAccounting
@@ -75,7 +73,6 @@ class Order
         local_groupship.set(unsubscribed: false)
       end
     end
-    sign_up_to_gocardless if gc_plan_id
   end
 
   after_save do
@@ -336,46 +333,6 @@ class Order
 
     notifications.create! circle: circle, type: 'created_order'
   end
-
-  def sign_up_to_gocardless
-    if GOCARDLESS_FIELDS.map { |f| send(f) }.all?(&:present?)
-
-      browser = Ferrum::Browser.new
-      begin
-        browser.go_to("https://pay.gocardless.com/#{gc_plan_id}")
-        sleep 5
-        browser.at_css('#given_name').focus.type(gc_given_name)
-        browser.at_css('#family_name').focus.type(gc_family_name)
-        browser.at_css('#email').focus.type(account.email)
-        # browser.screenshot(path: 'screenshot1.png')
-        browser.css('form button[type=button]').last.scroll_into_view.click
-        sleep 5
-        browser.at_css('#address_line1').focus.type(gc_address_line1)
-        browser.at_css('#city').focus.type(gc_city)
-        browser.at_css('#postal_code').focus.type(gc_postal_code)
-        # browser.screenshot(path: 'screenshot2.png')
-        browser.at_css('form button[type=submit]').scroll_into_view.click
-        sleep 5
-        browser.at_css('#branch_code').focus.type(gc_branch_code)
-        browser.at_css('#account_number').focus.type(gc_account_number)
-        # browser.screenshot(path: 'screenshot3.png')
-        browser.at_css('form button[type=submit]').scroll_into_view.click
-        sleep 5
-        # browser.screenshot(path: 'screenshot4.png')
-        browser.at_css('button[type=submit]').scroll_into_view.click
-        # sleep 5
-        # browser.screenshot(path: 'screenshot5.png')
-        GOCARDLESS_FIELDS.each { |f| set(f => nil) }
-        set(gc_success: true)
-      ensure
-        browser.quit # Clean up Chrome temp files
-      end
-    else
-      GOCARDLESS_FIELDS.each { |f| set(f => nil) }
-      nil
-    end
-  end
-  handle_asynchronously :sign_up_to_gocardless
 
   def self.generate_csv(account:, event: nil)
     orders = self

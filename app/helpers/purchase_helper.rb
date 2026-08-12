@@ -98,7 +98,7 @@ Dandelion::App.helpers do
   def build_order_attributes(ticket_form, details_form)
     account_data = details_form[:account]
     ticket_attrs = %i[cohost affiliate_type affiliate_id discount_code_id]
-    account_attrs = %i[hear_about via gc_plan_id gc_given_name gc_family_name gc_address_line1 gc_city gc_postal_code gc_branch_code gc_account_number http_referrer]
+    account_attrs = %i[hear_about via http_referrer]
 
     attributes = {
       event: @event,
