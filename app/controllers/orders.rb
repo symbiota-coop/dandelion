@@ -32,6 +32,8 @@ Dandelion::App.controller do
   get '/events/:id/orders/:order_id/ticketholders/:ticket_id/name' do
     @event = Event.find(params[:id]) || not_found
     @order = @event.orders.complete.find(params[:order_id]) || not_found
+    require_ticketholder_edit!
+    @ticketholder_edit_token = params[:token].presence || @order.ticketholder_edit_token
     @ticket = @order.tickets.find(params[:ticket_id])
     partial :'events/ticketholder_name', locals: { ticket: @ticket }
   end
@@ -39,6 +41,7 @@ Dandelion::App.controller do
   post '/events/:id/orders/:order_id/ticketholders/:ticket_id/name' do
     @event = Event.find(params[:id]) || not_found
     @order = @event.orders.complete.find(params[:order_id]) || not_found
+    require_ticketholder_edit!
     @ticket = @order.tickets.find(params[:ticket_id]) || not_found
     @ticket.set(name: params[:name])
     200
@@ -47,6 +50,8 @@ Dandelion::App.controller do
   get '/events/:id/orders/:order_id/ticketholders/:ticket_id/email' do
     @event = Event.find(params[:id]) || not_found
     @order = @event.orders.complete.find(params[:order_id]) || not_found
+    require_ticketholder_edit!
+    @ticketholder_edit_token = params[:token].presence || @order.ticketholder_edit_token
     @ticket = @order.tickets.find(params[:ticket_id])
     partial :'events/ticketholder_email', locals: { ticket: @ticket, success: params[:success] }
   end
@@ -54,6 +59,7 @@ Dandelion::App.controller do
   post '/events/:id/orders/:order_id/ticketholders/:ticket_id/email' do
     @event = Event.find(params[:id]) || not_found
     @order = @event.orders.complete.find(params[:order_id]) || not_found
+    require_ticketholder_edit!
     @ticket = @order.tickets.find(params[:ticket_id]) || not_found
     previous_email = @ticket.email
     @ticket.email = params[:email]

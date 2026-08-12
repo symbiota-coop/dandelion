@@ -4,7 +4,7 @@
 function eventPaymentHandlers (config) {
   return {
     rsvp: function (data) {
-      window.location = '?success=true&order_id=' + data.order_id
+      window.location = '?success=true&order_id=' + data.order_id + (data.token ? '&token=' + encodeURIComponent(data.token) : '')
     },
 
     stripe: function (data) {
@@ -21,13 +21,13 @@ function eventPaymentHandlers (config) {
     },
 
     opencollective: function (data) {
-      window.location = 'https://opencollective.com/' + config.organisationOcSlug + '/events/' + config.ocSlug + '/donate?interval=oneTime&amount=' + data.value + '&tags=' + data.oc_secret + '&redirect=' + encodeURIComponent(config.eventUrl + '?success=true&order_id=' + data.order_id)
+      window.location = 'https://opencollective.com/' + config.organisationOcSlug + '/events/' + config.ocSlug + '/donate?interval=oneTime&amount=' + data.value + '&tags=' + data.oc_secret + '&redirect=' + encodeURIComponent(config.eventUrl + '?success=true&order_id=' + data.order_id + (data.token ? '&token=' + encodeURIComponent(data.token) : ''))
     },
 
     evm: function (data) {
       runEvmPaymentFlow(config, data, {
         pollUrl: '/events/' + config.eventId + '/orders/' + data.order_id + '/payment_completed',
-        onComplete: function () { window.location = '?success=true&order_id=' + data.order_id }
+        onComplete: function () { window.location = '?success=true&order_id=' + data.order_id + (data.token ? '&token=' + encodeURIComponent(data.token) : '') }
       })
     }
   }

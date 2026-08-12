@@ -1,3 +1,4 @@
 <% form_tag "/events/#{@event.id}/orders/#{@order.id}/ticketholders/#{ticket.id}/name", id: 'ticketholders', class: 'mb-0' do %>
+  <%= hidden_field_tag :token, value: @ticketholder_edit_token if @ticketholder_edit_token %>
   <%= text_field_tag :name, value: ticket.name, onchange: "showSavedTooltipAndSubmit(this);", class: 'form-control', placeholder: "Name" %>
 <% end %>

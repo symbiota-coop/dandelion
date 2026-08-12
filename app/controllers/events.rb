@@ -185,6 +185,9 @@ Dandelion::App.controller do
         end
       end
     end
+    if @order && can_edit_ticketholders?(@order)
+      @ticketholder_edit_token = params[:token].presence || @order.ticketholder_edit_token
+    end
     @og_desc = when_details(@event) || 'On-demand'
     @title = @event.name
     @organisation = @event.organisation

@@ -44,7 +44,7 @@
     <% end %>
     <% if !event.evergreen? && !event.recording? && event.organisation.show_ticketholder_link_in_ticket_emails %>
       <p>
-        <a href="<%=ENV['BASE_URI']%>/e/<%=event.slug%>?order_id=<%=order.id%>">Visit this page to add details of ticketholders.</a>
+        <a href="<%=ENV['BASE_URI']%>/e/<%=event.slug%>?order_id=<%=order.id%>&token=<%= CGI.escape(order.ticketholder_edit_token) %>">Visit this page to add details of ticketholders.</a>
       </p>
     <% end %>
     <% if event.organisation&.affiliate_credit_percentage && account.persisted? %>
