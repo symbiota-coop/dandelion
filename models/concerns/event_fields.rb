@@ -69,6 +69,9 @@ module EventFields
     %w[no_discounts hide_deleted_filters hide_attendees hide_discussion monthly_donors_only locked secret show_emails featured opt_in_organisation opt_in_facilitator hide_few_left hide_organisation_footer ask_hear_about send_order_notifications raw_description trending hide_from_carousels no_tickets_pdf send_ticketholder_confirmation enable_resales donations_to_organisation browsable hide_unavailable_tickets hidden_from_homepage blank_price_for_free_tickets ai_tagged sold_out_cache sold_out_due_to_sales_end_cache has_organisation minimal_only direct_charges no_sales_after_end_time always_show_full_ticket_form show_after_start_time has_recording hide_waitlist allow_ticket_type_waitlists evergreen terms_and_conditions_check_box].each do |b|
       field b.to_sym, type: Mongoid::Boolean
     end
+
+    # Unused; kept so stale event-edit forms don't raise UnknownAttribute. Remove later.
+    field :refund_deleted_orders, type: Mongoid::Boolean
   end
 
   def currency_or_default
