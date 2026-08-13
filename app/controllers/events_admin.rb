@@ -36,7 +36,7 @@ Dandelion::App.controller do
   post '/events/:id/destroy' do
     @event = Event.find(params[:id]) || not_found
     can_delete_event_only!
-    @event.set(refund_deleted_orders: false) if params[:no_refunds]
+    @event.prevent_order_refunds = true if params[:no_refunds]
     @event.send_destroy_notification(current_account)
     @event.destroy
     flash[:notice] = 'The event was deleted.'

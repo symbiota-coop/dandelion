@@ -264,7 +264,8 @@ class Order
 
   after_destroy :refund
   def refund
-    return unless event.refund_deleted_orders && !prevent_refund && event.organisation && value && value.positive? && payment_completed && (payment_intent || gocardless_payment_id)
+    return if prevent_refund || event.try(:prevent_order_refunds)
+    return unless event && event.organisation && value && value.positive? && payment_completed && (payment_intent || gocardless_payment_id)
 
     if payment_intent
       refund_via_stripe(

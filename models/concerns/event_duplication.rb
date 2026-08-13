@@ -31,7 +31,6 @@ module EventDuplication
       hide_waitlist: hide_waitlist,
       always_show_full_ticket_form: always_show_full_ticket_form,
       blank_price_for_free_tickets: blank_price_for_free_tickets,
-      refund_deleted_orders: refund_deleted_orders,
       monthly_donors_only: monthly_donors_only,
       no_discounts: no_discounts,
       no_tickets_pdf: no_tickets_pdf,

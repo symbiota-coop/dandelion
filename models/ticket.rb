@@ -189,7 +189,7 @@ class Ticket
   end
 
   def refund
-    return unless event.refund_deleted_orders && event.organisation && discounted_price && discounted_price > 0 && payment_completed && (payment_intent || gocardless_payment_id)
+    return unless event && event.organisation && discounted_price && discounted_price > 0 && payment_completed && (payment_intent || gocardless_payment_id)
 
     refund_amount = order ? [discounted_price, order.total].min : discounted_price
     return if refund_amount <= 0

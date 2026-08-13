@@ -4,7 +4,7 @@ module EventFields
   included do
     include EmailFields
 
-    attr_accessor :prevent_notifications, :duplicate, :update_activity_events
+    attr_accessor :prevent_notifications, :duplicate, :update_activity_events, :prevent_order_refunds
 
     field :name, type: String
     field :slug, type: String
@@ -66,7 +66,7 @@ module EventFields
     field :profit_share_to_social_media, type: Integer
     field :stripe_revenue_adjustment, type: Float
 
-    %w[no_discounts hide_deleted_filters hide_attendees hide_discussion refund_deleted_orders monthly_donors_only locked secret show_emails featured opt_in_organisation opt_in_facilitator hide_few_left hide_organisation_footer ask_hear_about send_order_notifications raw_description trending hide_from_carousels no_tickets_pdf send_ticketholder_confirmation enable_resales donations_to_organisation browsable hide_unavailable_tickets hidden_from_homepage blank_price_for_free_tickets ai_tagged sold_out_cache sold_out_due_to_sales_end_cache has_organisation minimal_only direct_charges no_sales_after_end_time always_show_full_ticket_form show_after_start_time has_recording hide_waitlist allow_ticket_type_waitlists evergreen terms_and_conditions_check_box].each do |b|
+    %w[no_discounts hide_deleted_filters hide_attendees hide_discussion monthly_donors_only locked secret show_emails featured opt_in_organisation opt_in_facilitator hide_few_left hide_organisation_footer ask_hear_about send_order_notifications raw_description trending hide_from_carousels no_tickets_pdf send_ticketholder_confirmation enable_resales donations_to_organisation browsable hide_unavailable_tickets hidden_from_homepage blank_price_for_free_tickets ai_tagged sold_out_cache sold_out_due_to_sales_end_cache has_organisation minimal_only direct_charges no_sales_after_end_time always_show_full_ticket_form show_after_start_time has_recording hide_waitlist allow_ticket_type_waitlists evergreen terms_and_conditions_check_box].each do |b|
       field b.to_sym, type: Mongoid::Boolean
     end
   end
@@ -116,7 +116,6 @@ module EventFields
         show_emails: 'Allow all event admins to view email addresses of attendees',
         opt_in_organisation: 'Allow people to opt in to emails from the host organisation(s)',
         opt_in_facilitator: 'Allow people to opt in to emails from facilitators',
-        refund_deleted_orders: 'Refund deleted orders/tickets via Stripe/GoCardless',
         redirect_url: 'Redirect URL after successful payment',
         add_a_donation_to: 'Text beside donation field',
         donation_text: 'Text below donation field',
@@ -187,7 +186,6 @@ module EventFields
         opt_in_facilitator: "Allow people to opt in to receive emails from any facilitators' personal lists",
         monthly_donors_only: 'Only allow people making a monthly donation to the organisation to purchase tickets',
         no_discounts: "Don't apply usual discounts for the organisation's monthly donors",
-        refund_deleted_orders: 'Refund deleted orders/tickets via Stripe/GoCardless, and all orders if the event is deleted',
         redirect_url: 'Optional. By default people will be shown a thank you page on Dandelion.',
         facebook_pixel_id: 'Your Facebook Pixel ID for tracking sales',
         purchase_url: "URL where people can buy tickets (if you're not selling tickets on Dandelion)",

@@ -95,7 +95,6 @@ Dandelion::App.controller do
       @event.currency = @event.organisation.currency
       @event.suggested_donation = 0
       @event.coordinator = current_account
-      @event.refund_deleted_orders = true
       @event.opt_in_organisation = true
       @event.opt_in_facilitator = true unless @event.organisation.name == current_account.name
       @event.ask_hear_about = true
