@@ -121,6 +121,7 @@ class TicketholderEditTest < ActiveSupport::TestCase
 
   test 'ticket email includes the ticketholder edit token' do
     @organisation.set(show_ticketholder_link_in_ticket_emails: true)
+    @event.reload
     html = EmailHelper.render(
       :tickets,
       event: @event,
@@ -128,6 +129,7 @@ class TicketholderEditTest < ActiveSupport::TestCase
       account: @buyer,
       tickets_table: ''
     )
+    assert_includes html, 'Visit this page to add details of ticketholders'
     assert_includes html, CGI.escape(@order.ticketholder_edit_token.to_s)
   end
 end
