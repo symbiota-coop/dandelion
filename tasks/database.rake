@@ -265,4 +265,72 @@ namespace :db do
       puts "📊 Found #{ttl_indexes.length} TTL index(es)\n\n"
     end
   end
+
+  desc 'Restore missing gocardless_payment_id from payment_request_id via GoCardless API (FIX=1 to write)'
+  task restore_gocardless_payment_ids: :environment do
+    fix = ENV['FIX'] == '1'
+
+    puts "\n🔍 Finding completed GoCardless orders missing gocardless_payment_id...\n"
+    puts "⚠️  Mode: #{fix ? '🔧 Restoring payment ids' : '👀 Dry run (set FIX=1 to write)'}\n"
+    puts '=' * 90
+
+    orders = Order.and(
+      :gocardless_payment_request_id.ne => nil,
+      gocardless_payment_id: nil,
+      payment_completed: true
+    )
+    tickets = Ticket.and(
+      :gocardless_payment_request_id.ne => nil,
+      gocardless_payment_id: nil,
+      payment_completed: true
+    )
+
+    puts "Orders: #{orders.count} | Tickets: #{tickets.count}"
+
+    restored_orders = 0
+    failed_orders = 0
+    orders.each do |order|
+      payment_id = order.lookup_gocardless_payment_id_from_request
+      if payment_id.blank?
+        failed_orders += 1
+        puts "❌ Order #{order.id}: could not resolve payment id (request #{order.gocardless_payment_request_id})"
+        next
+      end
+
+      puts "#{fix ? '✅' : '👉'} Order #{order.id}: #{payment_id}"
+      if fix
+        order.persist_gocardless_payment_id(payment_id)
+        restored_orders += 1
+      end
+    end
+
+    restored_tickets = 0
+    failed_tickets = 0
+    tickets.each do |ticket|
+      next if ticket.gocardless_payment_id.present?
+
+      payment_id = ticket.lookup_gocardless_payment_id_from_request
+      if payment_id.blank?
+        failed_tickets += 1
+        puts "❌ Ticket #{ticket.id}: could not resolve payment id (request #{ticket.gocardless_payment_request_id})"
+        next
+      end
+
+      puts "#{fix ? '✅' : '👉'} Ticket #{ticket.id}: #{payment_id}"
+      next unless fix
+
+      if ticket.order
+        ticket.order.persist_gocardless_payment_id(payment_id)
+      else
+        ticket.set(gocardless_payment_id: payment_id)
+      end
+      restored_tickets += 1
+    end
+
+    puts "\n#{'=' * 90}"
+    puts "Orders restored: #{restored_orders} | unresolved: #{failed_orders}"
+    puts "Tickets restored: #{restored_tickets} | unresolved: #{failed_tickets}"
+    puts(fix ? '🎉 Done' : '👉 Run with FIX=1 to persist payment ids')
+    puts
+  end
 end

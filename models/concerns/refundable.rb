@@ -1,6 +1,57 @@
 module Refundable
   def refundable?
-    session_id || gocardless_payment_id
+    payment_intent.present? || session_id.present? || gocardless_payment_id.present? || gocardless_payment_request_id.present?
+  end
+
+  # Re-fetch and persist a GoCardless payment id when it was lost (e.g. a broad
+  # console `$unset` of gc* fields) but the payment request id remains.
+  def ensure_gocardless_payment_id!
+    return gocardless_payment_id if gocardless_payment_id.present?
+    return if gocardless_payment_request_id.blank?
+
+    payment_id = lookup_gocardless_payment_id_from_request
+    return if payment_id.blank?
+
+    if respond_to?(:persist_gocardless_payment_id)
+      persist_gocardless_payment_id(payment_id)
+    elsif respond_to?(:order) && order.respond_to?(:persist_gocardless_payment_id)
+      order.persist_gocardless_payment_id(payment_id)
+      reload if respond_to?(:reload)
+    else
+      set(gocardless_payment_id: payment_id)
+    end
+    gocardless_payment_id.presence || payment_id
+  end
+
+  def lookup_gocardless_payment_id_from_request
+    token = event&.organisation&.gocardless_access_token
+    return if token.blank?
+
+    client = GoCardlessPro::Client.new(access_token: token)
+    params = {
+      resource_type: 'payments',
+      action: 'confirmed'
+    }
+    if respond_to?(:created_at) && created_at
+      params['created_at[gte]'] = (created_at - 1.day).iso8601
+      params['created_at[lte]'] = (created_at + 30.days).iso8601
+    end
+
+    client.events.all(params: params).each do |gc_event|
+      links = gc_event.to_h['links'] || {}
+      next unless links['payment_request'] == gocardless_payment_request_id
+
+      return links['payment'] if links['payment'].present?
+
+      if links['billing_request'].present?
+        billing_request = client.billing_requests.get(links['billing_request'])
+        return billing_request.links.payment_request_payment if billing_request.links.payment_request_payment.present?
+      end
+    end
+    nil
+  rescue StandardError => e
+    ErrorReporting.capture_exception(e)
+    nil
   end
 
   def refund_via_stripe(payment_intent:, on_error:, amount: nil, refund_application_fee: false)

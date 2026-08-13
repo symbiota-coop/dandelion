@@ -264,6 +264,7 @@ class Order
 
   after_destroy :refund
   def refund
+    ensure_gocardless_payment_id! unless payment_intent.present?
     return unless event.refund_deleted_orders && !prevent_refund && event.organisation && value && value.positive? && payment_completed && (payment_intent || gocardless_payment_id)
 
     if payment_intent
