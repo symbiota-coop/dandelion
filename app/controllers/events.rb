@@ -234,6 +234,7 @@ Dandelion::App.controller do
     halt 403 if @event.organisation.banned_emails_a.include?(@account.email)
 
     @order = create_order_with_tickets(params[:ticketForm], params[:detailsForm])
+    remember_ticketholder_edit!(@order)
     pm = if @order.total > 0
            EventPaymentMethod.object(params[:detailsForm][:payment_method].to_s)
          else

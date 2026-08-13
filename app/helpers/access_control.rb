@@ -294,6 +294,25 @@ Dandelion::App.helpers do
     end
   end
 
+  def can_edit_ticketholders?(order = @order)
+    return false unless order
+    return true if current_account && order.account_id == current_account.id
+    return true if order.event && event_admin?(order.event)
+
+    Array(session[:ticketholder_order_ids]).include?(order.id.to_s)
+  end
+
+  def remember_ticketholder_edit!(order)
+    return unless order
+
+    ids = Array(session[:ticketholder_order_ids]).map(&:to_s)
+    session[:ticketholder_order_ids] = (ids + [order.id.to_s]).uniq
+  end
+
+  def require_ticketholder_edit!(order = @order)
+    halt 403 unless can_edit_ticketholders?(order)
+  end
+
   def sign_in_required!(notice: 'Please sign up or sign in to continue', redirect_url: '/accounts/new', notice_type: :notice)
     kick!(notice: notice, redirect_url: redirect_url, notice_type: notice_type) unless current_account
   end

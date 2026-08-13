@@ -27,6 +27,7 @@
 
 
       <% unless @event.evergreen? %>
+        <% if can_edit_ticketholders?(@order) %>
         <script>
           function showSavedTooltipAndSubmit(element) {
             // Create tooltip if it doesn't exist
@@ -79,6 +80,7 @@
           </div>
           <% } %>
         </div>
+        <% end %>
       <% end %>
 
       <% if @event.organisation&.affiliate_credit_percentage %>
