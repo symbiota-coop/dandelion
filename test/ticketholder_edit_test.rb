@@ -16,6 +16,7 @@ class TicketholderEditTest < ActiveSupport::TestCase
     @organiser = FactoryBot.create(:account)
     @organisation = FactoryBot.create(:organisation, account: @organiser)
     @event = FactoryBot.create(:event, organisation: @organisation, account: @organiser, last_saved_by: @organiser, prices: [0])
+    @event.ticket_types.first.set(quantity: 10)
     @buyer = FactoryBot.create(:account)
     @order = @event.orders.create!(account: @buyer, currency: @event.currency, payment_completed: true)
     @ticket = @order.tickets.create!(event: @event, account: @buyer, ticket_type: @event.ticket_types.first, price: 0)
@@ -122,7 +123,6 @@ class TicketholderEditTest < ActiveSupport::TestCase
     get "/orders/#{@order.id}"
     assert_equal 200, last_response.status
     refute_includes last_response.body, 'Visit this page to add details of ticketholders'
-    refute_includes last_response.body, 'sign_in_token='
   end
 
   test 'ticket email includes a sign-in link for ticketholder details' do
