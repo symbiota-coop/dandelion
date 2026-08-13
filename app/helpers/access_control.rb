@@ -294,27 +294,23 @@ Dandelion::App.helpers do
     end
   end
 
-  def ticketholder_edit_token_valid?(order, token = params[:token])
-    return false if token.blank? || order.nil?
-
-    TokenVerifier.verify(token.to_s, purpose: Order::TICKETHOLDER_EDIT_TOKEN_PURPOSE) == order.id.to_s
-  end
-
   def can_edit_ticketholders?(order = @order)
     return false unless order
     return true if current_account && order.account_id == current_account.id
     return true if order.event && event_admin?(order.event)
 
-    ticketholder_edit_token_valid?(order)
+    Array(session[:ticketholder_order_ids]).include?(order.id.to_s)
   end
 
-  def assign_ticketholder_edit_token!(order = @order)
-    @ticketholder_edit_token = params[:token] if ticketholder_edit_token_valid?(order)
+  def remember_ticketholder_edit!(order)
+    return unless order
+
+    ids = Array(session[:ticketholder_order_ids]).map(&:to_s)
+    session[:ticketholder_order_ids] = (ids + [order.id.to_s]).uniq
   end
 
   def require_ticketholder_edit!(order = @order)
     halt 403 unless can_edit_ticketholders?(order)
-    assign_ticketholder_edit_token!(order)
   end
 
   def sign_in_required!(notice: 'Please sign up or sign in to continue', redirect_url: '/accounts/new', notice_type: :notice)

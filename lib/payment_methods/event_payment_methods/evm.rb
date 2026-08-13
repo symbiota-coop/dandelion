@@ -11,7 +11,6 @@ class EventPaymentMethod
         value: order.evm_value,
         wei: (order.evm_value * 1e18.to_d).to_i,
         order_id: order.id.to_s,
-        token: order.ticketholder_edit_token,
         order_expiry: (order.created_at + 1.hour).to_datetime.strftime('%Q')
       }.to_json
     end

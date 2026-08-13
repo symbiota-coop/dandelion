@@ -10,7 +10,6 @@ class EventPaymentMethod
         oc_secret: order.oc_secret,
         value: order.value,
         order_id: order.id.to_s,
-        token: order.ticketholder_edit_token,
         order_expiry: (order.created_at + 1.hour).to_datetime.strftime('%Q')
       }.to_json
     end

@@ -44,7 +44,7 @@
     <% end %>
     <% if !event.evergreen? && !event.recording? && event.organisation.show_ticketholder_link_in_ticket_emails && !(defined?(viewing_on_web) && viewing_on_web) %>
       <p>
-        <a href="<%=ENV['BASE_URI']%>/e/<%=event.slug%>?order_id=<%=order.id%>&token=<%= CGI.escape(order.ticketholder_edit_token.to_s) %>">Visit this page to add details of ticketholders.</a>
+        <a href="<%=ENV['BASE_URI']%>/e/<%=event.slug%>?order_id=<%=order.id%>&sign_in_token=%recipient.token%">Visit this page to add details of ticketholders.</a>
       </p>
     <% end %>
     <% if event.organisation&.affiliate_credit_percentage && account.persisted? %>

@@ -9,8 +9,6 @@ class Order
     const_set(error_class, Class.new(StandardError))
   end
 
-  TICKETHOLDER_EDIT_TOKEN_PURPOSE = 'ticketholder_edit'.freeze
-
   include OrderFields
   include OrderNotifications
   include OrderAccounting
@@ -122,10 +120,6 @@ class Order
 
   def complete?
     payment_completed
-  end
-
-  def ticketholder_edit_token
-    TokenVerifier.generate(id.to_s, purpose: TICKETHOLDER_EDIT_TOKEN_PURPOSE)
   end
 
   def evm_offset
