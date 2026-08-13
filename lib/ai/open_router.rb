@@ -1,10 +1,9 @@
 class OpenRouter
   BASE_URL = 'https://openrouter.ai'.freeze
   CHAT_DEFAULTS = {
-    model: 'openai/gpt-5.6-luna',
-    providers: %w[OpenAI],
+    model: 'google/gemini-3.7-flash',
     context_window_size: 1_000_000,
-    reasoning_effort: 'high'
+    reasoning_effort: 'low'
   }.freeze
   PROMPT_LOG_LIMIT = 10_000
 
@@ -34,7 +33,7 @@ class OpenRouter
     end
   end
 
-  def chat(prompt, full_response: false, schema: nil, model: CHAT_DEFAULTS[:model], providers: CHAT_DEFAULTS[:providers], context_window_size: CHAT_DEFAULTS[:context_window_size], reasoning_effort: CHAT_DEFAULTS[:reasoning_effort], audio: nil, audio_format: 'ogg')
+  def chat(prompt, full_response: false, schema: nil, model: CHAT_DEFAULTS[:model], providers: nil, context_window_size: CHAT_DEFAULTS[:context_window_size], reasoning_effort: CHAT_DEFAULTS[:reasoning_effort], audio: nil, audio_format: 'ogg')
     prompt = prompt[0..(context_window_size * 4 * 0.66)] unless audio
 
     content = if audio
