@@ -67,12 +67,12 @@
             </h4>
             <div class="row">
               <div class="col-6">
-                <div data-pagelet-url="/events/<%=@event.id%>/orders/<%=@order.id%>/ticketholders/<%=ticket.id%>/name?token=<%= CGI.escape(@ticketholder_edit_token.to_s) %>" data-pagelet-no-opacity-change="true">
+                <div data-pagelet-url="/events/<%=@event.id%>/orders/<%=@order.id%>/ticketholders/<%=ticket.id%>/name<%= "?token=#{CGI.escape(@ticketholder_edit_token)}" if @ticketholder_edit_token %>" data-pagelet-no-opacity-change="true">
                   <%= partial :"events/ticketholder_name", locals: { ticket: ticket } %>
                 </div>
               </div>
               <div class="col-6">
-                <div data-pagelet-url="/events/<%=@event.id%>/orders/<%=@order.id%>/ticketholders/<%=ticket.id%>/email?success=<%=params[:success] ? 1 : 0 %>&token=<%= CGI.escape(@ticketholder_edit_token.to_s) %>" data-pagelet-no-opacity-change="true">
+                <div data-pagelet-url="/events/<%=@event.id%>/orders/<%=@order.id%>/ticketholders/<%=ticket.id%>/email?success=<%=params[:success] ? 1 : 0 %><%= "&token=#{CGI.escape(@ticketholder_edit_token)}" if @ticketholder_edit_token %>" data-pagelet-no-opacity-change="true">
                   <%= partial :"events/ticketholder_email", locals: { ticket: ticket, success: (params[:success] ? 1 : 0) } %>
                 </div>
               </div>

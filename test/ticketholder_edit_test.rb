@@ -8,6 +8,7 @@ class TicketholderEditTest < ActiveSupport::TestCase
     Padrino.application
   end
 
+  # Rack::Test has no Capybara session; stub the screenshot helper that test_config teardown calls.
   def save_screenshot(*); end
 
   def setup
@@ -59,6 +60,13 @@ class TicketholderEditTest < ActiveSupport::TestCase
     assert_nil @ticket.reload.name
   end
 
+  test 'guest cannot edit with a token minted for a different purpose' do
+    wrong_purpose_token = TokenVerifier.generate(@order.id.to_s, purpose: 'feedback')
+    post @name_path, name: 'Intruder', token: wrong_purpose_token
+    assert_equal 403, last_response.status
+    assert_nil @ticket.reload.name
+  end
+
   test 'purchaser can edit while signed in without a token' do
     sign_in(@buyer)
     post @name_path, name: 'Buyer Name'
@@ -81,15 +89,45 @@ class TicketholderEditTest < ActiveSupport::TestCase
   end
 
   test 'event page shows ticketholder forms for a guest with a token' do
-    get "/e/#{@event.slug}", order_id: @order.id, token: @order.ticketholder_edit_token
+    token = @order.ticketholder_edit_token
+    get "/e/#{@event.slug}", order_id: @order.id, token: token
     assert_equal 200, last_response.status
     assert_includes last_response.body, 'ticketholders'
-    assert_includes last_response.body, 'token='
+    assert_includes last_response.body, CGI.escape(token)
   end
 
   test 'event page hides ticketholder forms for a guest with only the order id' do
     get "/e/#{@event.slug}", order_id: @order.id
     assert_equal 200, last_response.status
     refute_includes last_response.body, '/ticketholders/'
+    refute_includes last_response.body, @order.ticketholder_edit_token
+  end
+
+  test 'event page does not mint a token for a signed-in purchaser' do
+    sign_in(@buyer)
+    get "/e/#{@event.slug}", order_id: @order.id
+    assert_equal 200, last_response.status
+    assert_includes last_response.body, '/ticketholders/'
+    refute_includes last_response.body, @order.ticketholder_edit_token
+  end
+
+  test 'order confirmation page does not leak the ticketholder edit token' do
+    @organisation.set(show_ticketholder_link_in_ticket_emails: true)
+    get "/orders/#{@order.id}"
+    assert_equal 200, last_response.status
+    refute_includes last_response.body, @order.ticketholder_edit_token
+    refute_includes last_response.body, 'Visit this page to add details of ticketholders'
+  end
+
+  test 'ticket email includes the ticketholder edit token' do
+    @organisation.set(show_ticketholder_link_in_ticket_emails: true)
+    html = EmailHelper.render(
+      :tickets,
+      event: @event,
+      order: @order,
+      account: @buyer,
+      tickets_table: ''
+    )
+    assert_includes html, CGI.escape(@order.ticketholder_edit_token.to_s)
   end
 end

@@ -303,13 +303,18 @@ Dandelion::App.helpers do
   def can_edit_ticketholders?(order = @order)
     return false unless order
     return true if current_account && order.account_id == current_account.id
-    return true if event_admin?(order.event)
+    return true if order.event && event_admin?(order.event)
 
     ticketholder_edit_token_valid?(order)
   end
 
-  def require_ticketholder_edit!
-    halt 403 unless can_edit_ticketholders?(@order)
+  def assign_ticketholder_edit_token!(order = @order)
+    @ticketholder_edit_token = params[:token] if ticketholder_edit_token_valid?(order)
+  end
+
+  def require_ticketholder_edit!(order = @order)
+    halt 403 unless can_edit_ticketholders?(order)
+    assign_ticketholder_edit_token!(order)
   end
 
   def sign_in_required!(notice: 'Please sign up or sign in to continue', redirect_url: '/accounts/new', notice_type: :notice)
