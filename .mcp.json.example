@@ -4,10 +4,6 @@
       "type": "http",
       "url": "https://mcp.sentry.dev/mcp"
     },
-    "dandelion": {
-      "type": "http",
-      "url": "https://dandelion.events/mcp"
-    },
     "render": {
       "type": "http",
       "url": "https://mcp.render.com/mcp",

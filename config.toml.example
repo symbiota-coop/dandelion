@@ -1,9 +1,6 @@
 [mcp_servers.sentry]
 url = "https://mcp.sentry.dev/mcp"
 
-[mcp_servers.dandelion]
-url = "https://dandelion.events/mcp"
-
 [mcp_servers.render]
 url = "https://mcp.render.com/mcp"
 
