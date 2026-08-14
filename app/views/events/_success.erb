@@ -1,4 +1,3 @@
-<% @theme_color ||= resolved_event_theme_color(@event) %>
 <div class="card shadow-sm">
   <h3 class="card-header bg-primary text-white">Thanks for booking onto <%= @event.name %>!</h3>
   <div class="card-body readable">
@@ -101,19 +100,9 @@
           <p class="mb-1">Session <%= event_session.session_number %>: <%= partial :'events/add_to_calendar', locals: { event_session: event_session } %></p>
         <% end %>
       <% end %>
-
-      <iframe
-      id="circles"
-      src="https://circles.gnosis.io/pilots/kudos-ga?group=dandelion&text=v2&address=0xC067cAd5F4A0c4652866371b723483f83B1ED0aA&theme_color=<%= CGI.escape(@theme_color || '') %>"
-      style="width: 100%; border: 0;"      
-      loading="lazy">
-      </iframe>
-      <script src="//cdnjs.cloudflare.com/ajax/libs/iframe-resizer/4.2.10/iframeResizer.min.js"></script>
-      <script>
-        $(function () {
-          $('#circles').iFrameResize({log: true, checkOrigin: false, heightCalculationMethod : 'taggedElement'})
-        })
-      </script>
+      <% if @order.account && !@event.donations_to_dandelion? %>
+        <%= partial :'accounts/pay', locals: {div_class: 'mt-5', source: "event:#{@event.id}", account: @order.account } %>
+      <% end %>
 
     <% end %>
   </div>
