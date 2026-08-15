@@ -69,13 +69,11 @@
           {
             backgroundColor: 'rgba(0, 175, 94, 1)',
             borderColor: 'rgba(0, 175, 94, 1)',
-            borderRadius: 4,
             data: <%== data.values.to_json %>
           },
           {
             backgroundColor: 'rgba(0, 175, 94, 0.5)',
             borderColor: 'rgba(0, 175, 94, 0.5)',
-            borderRadius: 4,
             data: <%== data.size.times.map { |i| i == data.size - 1 ? (defined?(projection) ? projection : nil) : nil }.to_json %>
           }
         ],
