@@ -52,10 +52,11 @@ To let your attendees choose how much to pay for a ticket type:
 
 You can collect ticket payments as a fixed number of monthly Direct Debit instalments via GoCardless.
 
-1. In your organisation settings under Payments, add a GoCardless access token and webhook secret, and check **Enable Instalments**. The webhook endpoint must send **billing request** events (and **payments** if you also use Instant Bank Pay).
-2. Edit the event and, under Everything else, set **GoCardless instalments** to the number of monthly payments (2–24). The field appears once instalments are enabled on the organisation.
+1. In your organisation settings under Payments, add a GoCardless access token and webhook secret, then check **Enable Instalments**.
+2. Set the webhook to send **billing request** events. Include **payments** as well if you also use Instant Bank Pay.
+3. Edit the event and, under Everything else, set **GoCardless instalments** to the number of monthly payments (2–24). This field appears once instalments are enabled on the organisation.
 
-Buyers will see a **Pay in X instalments** button at checkout. **Tickets are emailed once the Direct Debit mandate and payment schedule are set up.** Refunds of collected instalments are arranged in the GoCardless dashboard.
+At checkout, buyers see a **Pay in X instalments** button. Tickets are emailed when the payment schedule is set up (i.e. straight away/not at the final instalment). You can refund collected instalments from the GoCardless dashboard. Note that Dandelion does not cancel orders if later instalments fail — you need to remove orders with unpaid instalments yourself.
 
 You can also enable an instalment payment method on your Stripe account, such as [Klarna](https://docs.stripe.com/payments/klarna) or [Clearpay/Afterpay](https://docs.stripe.com/payments/afterpay-clearpay). Customers will then be able to pay for the purchase in instalments at checkout, and receive tickets immediately.
 
