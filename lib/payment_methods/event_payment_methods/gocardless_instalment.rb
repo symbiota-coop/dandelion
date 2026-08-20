@@ -5,12 +5,14 @@ class EventPaymentMethod
       billing_request = client.billing_requests.create(
         params: {
           mandate_request: {
-            currency: order.currency,
-            description: order.description.truncate(200)
+            description: order.description.truncate(200),
+            currency: order.currency
           }
         }
       )
 
+      # leave 2 lines so layout is same as instant bank pay
+      #
       order.update_attributes!(
         value: order.total.round(2),
         gocardless_billing_request_id: billing_request.id

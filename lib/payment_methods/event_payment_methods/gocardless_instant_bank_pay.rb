@@ -1,13 +1,13 @@
 class EventPaymentMethod
-  module GoCardless
+  module GoCardlessInstantBankPay
     def self.call(order:, event:, **)
       client = GoCardlessPro::Client.new(access_token: event.organisation.gocardless_access_token)
       billing_request = client.billing_requests.create(
         params: {
           payment_request: {
             description: order.description.truncate(200),
-            amount: (order.total * 100).round,
-            currency: order.currency
+            currency: order.currency,
+            amount: (order.total * 100).round
           }
         }
       )

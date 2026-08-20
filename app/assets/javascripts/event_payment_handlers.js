@@ -16,7 +16,7 @@ function eventPaymentHandlers (config) {
       stripe.redirectToCheckout({ sessionId: data.session_id })
     },
 
-    gocardless: function (data) {
+    gocardless_instant: function (data) {
       window.location = data.gocardless_billing_request_flow['authorisation_url']
     },
 
