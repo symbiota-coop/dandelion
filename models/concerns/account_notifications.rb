@@ -31,7 +31,7 @@ module AccountNotifications
     batch_message.subject 'Sign in code for Dandelion'
     batch_message.body_html EmailHelper.html(:sign_in_code)
 
-    batch_message.add_recipient(:to, account.email, { 'firstname' => account.firstname || 'there', 'token' => account.sign_in_token, 'id' => account.id.to_s })
+    batch_message.add_recipient(:to, account.email, { 'firstname' => account.firstname || 'there', 'token' => account.sign_in_token_for_email, 'id' => account.id.to_s })
 
     batch_message.finalize if Padrino.env == :production
   end
@@ -49,7 +49,7 @@ module AccountNotifications
 
     batch_message.add_recipient(:to, account.email, {
                                   'firstname' => account.firstname || 'there',
-                                  'token' => account.sign_in_token,
+                                  'token' => account.sign_in_token_for_email,
                                   'id' => account.id.to_s,
                                   'confirm_or_activate' => (account.has_signed_in? ? 'Click here to confirm your email address:' : "If you'd like to activate your account, click the link below:")
                                 })
@@ -66,7 +66,7 @@ module AccountNotifications
     batch_message.subject "You've activated your Dandelion account"
     batch_message.body_html EmailHelper.html(:activation_notification)
 
-    batch_message.add_recipient(:to, account.email, { 'firstname' => account.firstname || 'there', 'token' => account.sign_in_token, 'id' => account.id.to_s })
+    batch_message.add_recipient(:to, account.email, { 'firstname' => account.firstname || 'there', 'token' => account.sign_in_token_for_email, 'id' => account.id.to_s })
 
     batch_message.finalize if Padrino.env == :production
   end
@@ -81,7 +81,7 @@ module AccountNotifications
     batch_message.body_text "Account: #{ENV['BASE_URI']}/u/#{account.username}"
 
     Account.and(admin: true).each do |account|
-      batch_message.add_recipient(:to, account.email, { 'firstname' => account.firstname || 'there', 'token' => account.sign_in_token, 'id' => account.id.to_s })
+      batch_message.add_recipient(:to, account.email, { 'firstname' => account.firstname || 'there', 'token' => account.sign_in_token_for_email, 'id' => account.id.to_s })
     end
 
     batch_message.finalize if Padrino.env == :production
@@ -97,7 +97,7 @@ module AccountNotifications
     batch_message.body_text "Account: #{ENV['BASE_URI']}/u/#{account.username}"
 
     Account.and(admin: true).each do |account|
-      batch_message.add_recipient(:to, account.email, { 'firstname' => account.firstname || 'there', 'token' => account.sign_in_token, 'id' => account.id.to_s })
+      batch_message.add_recipient(:to, account.email, { 'firstname' => account.firstname || 'there', 'token' => account.sign_in_token_for_email, 'id' => account.id.to_s })
     end
 
     batch_message.finalize if Padrino.env == :production
@@ -112,7 +112,7 @@ module AccountNotifications
     batch_message.subject 'New feedback summary from Dandelion'
     batch_message.body_html EmailHelper.html(:feedback_summary, account: account)
 
-    batch_message.add_recipient(:to, account.email, { 'firstname' => account.firstname || 'there', 'token' => account.sign_in_token, 'id' => account.id.to_s })
+    batch_message.add_recipient(:to, account.email, { 'firstname' => account.firstname || 'there', 'token' => account.sign_in_token_for_email, 'id' => account.id.to_s })
 
     batch_message.finalize if Padrino.env == :production
   end

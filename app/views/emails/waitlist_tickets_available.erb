@@ -5,14 +5,14 @@
     <% ticket_type_waitlist = defined?(ticket_type) && ticket_type %>
     You previously joined the waitlist for
     <% if ticket_type_waitlist %>
-      <%= ticket_type.name %> tickets to <a href="<%= ENV['BASE_URI'] %>/e/<%= event.slug %>"><%=event.name %></a>.
+      <%= ticket_type.name %> tickets to <a href="<%= ENV['BASE_URI'] %>/e/<%= event.slug %>?sign_in_token=%recipient.token%"><%=event.name %></a>.
     <% else %>
-      <a href="<%= ENV['BASE_URI'] %>/e/<%= event.slug %>"><%=event.name %></a>.
+      <a href="<%= ENV['BASE_URI'] %>/e/<%= event.slug %>?sign_in_token=%recipient.token%"><%=event.name %></a>.
     <% end %>
-    Well, good news! Tickets are now available. <a href="<%= ENV['BASE_URI'] %>/e/<%= event.slug %>">Book now before it sells out again</a>.
+    Well, good news! Tickets are now available. <a href="<%= ENV['BASE_URI'] %>/e/<%= event.slug %>?sign_in_token=%recipient.token%">Book now before it sells out again</a>.
   </p>
 
   <p class="action">
-    <a href="<%= ENV['BASE_URI'] %>/e/<%= event.slug %>">Get tickets</a>
+    <a href="<%= ENV['BASE_URI'] %>/e/<%= event.slug %>?sign_in_token=%recipient.token%">Get tickets</a>
   </p>
 </div>

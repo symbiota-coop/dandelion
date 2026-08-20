@@ -83,16 +83,26 @@ class Account
     ics_key
   end
 
-  def generate_sign_in_token
+  def unique_sign_in_token
     loop do
       token = Account.generate_sign_in_token
-      break self.sign_in_token = token unless Account.and(sign_in_token: token).exists?
+      return token unless Account.and(sign_in_token: token).exists?
     end
   end
 
+  def generate_sign_in_token
+    self.sign_in_token = unique_sign_in_token
+  end
+
   def generate_sign_in_token!
-    generate_sign_in_token
-    save!
+    set(sign_in_token: unique_sign_in_token)
+  end
+
+  def sign_in_token_for_email
+    return sign_in_token unless sign_in_token_expired?
+
+    generate_sign_in_token!
+    sign_in_token
   end
 
   def sign_in_token_expired?

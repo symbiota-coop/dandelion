@@ -22,7 +22,7 @@ module EventNotifications
     batch_message.body_html EmailHelper.html(:event_submission, event: event, account: account)
 
     organisation.admins.each do |admin|
-      batch_message.add_recipient(:to, admin.email, { 'firstname' => admin.firstname || 'there', 'token' => admin.sign_in_token, 'id' => admin.id.to_s })
+      batch_message.add_recipient(:to, admin.email, { 'firstname' => admin.firstname || 'there', 'token' => admin.sign_in_token_for_email, 'id' => admin.id.to_s })
     end
 
     batch_message.finalize if Padrino.env == :production
@@ -38,7 +38,7 @@ module EventNotifications
     batch_message.body_html EmailHelper.html(:event_destroyed, destroyed_by: destroyed_by, event: event)
 
     accounts_receiving_feedback.each do |account|
-      batch_message.add_recipient(:to, account.email, { 'firstname' => account.firstname || 'there', 'token' => account.sign_in_token, 'id' => account.id.to_s })
+      batch_message.add_recipient(:to, account.email, { 'firstname' => account.firstname || 'there', 'token' => account.sign_in_token_for_email, 'id' => account.id.to_s })
     end
 
     batch_message.finalize if Padrino.env == :production
@@ -88,7 +88,7 @@ module EventNotifications
                                                'when_parts_1' => when_parts[1..].join(', '))
 
       if cancellable_order
-        cancel_rsvp_url = "#{ENV['BASE_URI']}/orders/#{cancellable_order.id}/confirm_cancel?sign_in_token=#{account.sign_in_token}"
+        cancel_rsvp_url = "#{ENV['BASE_URI']}/orders/#{cancellable_order.id}/confirm_cancel?sign_in_token=#{recipient_vars['token']}"
         batch_with_cancel.add_recipient(:to, account.email, recipient_vars.merge('cancel_rsvp_url' => cancel_rsvp_url))
         recipients_with_cancel += 1
       else
@@ -145,7 +145,7 @@ module EventNotifications
 
     (account_id == :all ? starrers.and(unsubscribed: false).and(unsubscribed_reminders: false) : starrers.and(unsubscribed: false).and(unsubscribed_reminders: false).and(id: account_id)).each do |account|
       when_parts = event.when_details(account.try(:time_zone), with_zone: true).split(', ')
-      batch_message.add_recipient(:to, account.email, { 'firstname' => account.firstname || 'there', 'token' => account.sign_in_token, 'id' => account.id.to_s, 'when_parts_0' => when_parts[0], 'when_parts_1' => when_parts[1..].join(', ') })
+      batch_message.add_recipient(:to, account.email, { 'firstname' => account.firstname || 'there', 'token' => account.sign_in_token_for_email, 'id' => account.id.to_s, 'when_parts_0' => when_parts[0], 'when_parts_1' => when_parts[1..].join(', ') })
     end
 
     batch_message.finalize if Padrino.env == :production
@@ -219,7 +219,7 @@ module EventNotifications
     batch_message.body_html EmailHelper.html(:waitlist_tickets_available, event: event)
 
     waiters.and(unsubscribed: false).each do |account|
-      batch_message.add_recipient(:to, account.email, { 'firstname' => account.firstname || 'there', 'token' => account.sign_in_token, 'id' => account.id.to_s })
+      batch_message.add_recipient(:to, account.email, { 'firstname' => account.firstname || 'there', 'token' => account.sign_in_token_for_email, 'id' => account.id.to_s })
     end
 
     batch_message.finalize if Padrino.env == :production
@@ -244,7 +244,7 @@ module EventNotifications
     batch_message.body_html EmailHelper.html(:waitlist_tickets_available, event: event, ticket_type: ticket_type)
 
     Account.and(:id.in => ticket_type.ticket_type_waitships.pluck(:account_id).compact, unsubscribed: false).each do |account|
-      batch_message.add_recipient(:to, account.email, { 'firstname' => account.firstname || 'there', 'token' => account.sign_in_token, 'id' => account.id.to_s })
+      batch_message.add_recipient(:to, account.email, { 'firstname' => account.firstname || 'there', 'token' => account.sign_in_token_for_email, 'id' => account.id.to_s })
     end
 
     batch_message.finalize if Padrino.env == :production

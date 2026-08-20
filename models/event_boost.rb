@@ -180,7 +180,7 @@ class EventBoost
     ].join("\n")
 
     Account.and(admin: true).each do |admin_account|
-      batch_message.add_recipient(:to, admin_account.email, { 'firstname' => admin_account.firstname || 'there', 'token' => admin_account.sign_in_token, 'id' => admin_account.id.to_s })
+      batch_message.add_recipient(:to, admin_account.email, { 'firstname' => admin_account.firstname || 'there', 'token' => admin_account.sign_in_token_for_email, 'id' => admin_account.id.to_s })
     end
 
     batch_message.finalize if Padrino.env == :production

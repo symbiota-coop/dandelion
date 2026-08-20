@@ -5,12 +5,12 @@ Dandelion::App.helpers do
     if account && !account.sign_in_token_expired?
       account.set(failed_sign_in_attempts: 0)
       account.sign_ins.create(request: request, skip_increment: %w[unsubscribe give_feedback subscriptions].any? { |p| request.path.include?(p) })
+      session[:account_id] = account.id.to_s
+      account.generate_sign_in_token!
       if account.sign_ins_count == 1
         account.set(email_confirmed: true)
         account.send_activation_notification
       end
-      session[:account_id] = account.id.to_s
-      account.generate_sign_in_token!
       if (return_to = session.delete(:return_to))
         redirect return_to
       else

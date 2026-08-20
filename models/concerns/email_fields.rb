@@ -6,7 +6,7 @@ module EmailFields
 
   def self.recipient_variables(event:, account:, orders: [])
     recipient_tag_values(event: event, account: account, orders: orders)
-      .merge('token' => account&.sign_in_token, 'id' => account&.id&.to_s)
+      .merge('token' => account&.sign_in_token_for_email, 'id' => account&.id&.to_s)
   end
 
   def self.replace_recipient_variables(text, variables)

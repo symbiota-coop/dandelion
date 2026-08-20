@@ -47,7 +47,6 @@ Dandelion::App.controller do
   post '/accounts/sign_in_code' do
     @body_class = 'gradient'
     if params[:email] && (@account = Account.find_by(email: params[:email].downcase))
-      @account.generate_sign_in_token!
       @account.send_sign_in_code
       erb :'accounts/requested_sign_in_code'
     elsif params[:code]

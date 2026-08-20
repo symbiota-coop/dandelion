@@ -251,7 +251,7 @@ module Dandelion
       ].join("\n")
 
       Account.and(admin: true).each do |account|
-        batch_message.add_recipient(:to, account.email, { 'firstname' => account.firstname || 'there', 'token' => account.sign_in_token, 'id' => account.id.to_s })
+        batch_message.add_recipient(:to, account.email, { 'firstname' => account.firstname || 'there', 'token' => account.sign_in_token_for_email, 'id' => account.id.to_s })
       end
 
       batch_message.finalize if Padrino.env == :production

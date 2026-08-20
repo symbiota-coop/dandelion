@@ -302,7 +302,6 @@ Dandelion::App.helpers do
     return if current_account
 
     if params[:account_id] && (@account = Account.find(params[:account_id]))
-      @account.generate_sign_in_token!
       @account.send_sign_in_code
       kick!(notice: nil, redirect_url: "/accounts/sign_in_code?account_id=#{params[:account_id]}")
     else

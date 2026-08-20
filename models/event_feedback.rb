@@ -98,7 +98,7 @@ class EventFeedback
     batch_message.body_html EmailHelper.html(:event_feedback, event_feedback: event_feedback, event: event)
 
     event.accounts_receiving_feedback.each do |account|
-      batch_message.add_recipient(:to, account.email, { 'firstname' => account.firstname || 'there', 'token' => account.sign_in_token, 'id' => account.id.to_s })
+      batch_message.add_recipient(:to, account.email, { 'firstname' => account.firstname || 'there', 'token' => account.sign_in_token_for_email, 'id' => account.id.to_s })
     end
 
     batch_message.finalize if Padrino.env == :production
@@ -119,7 +119,7 @@ class EventFeedback
     batch_message.subject "#{event.organisation.name} responded to your feedback on #{event.name}"
     batch_message.body_html EmailHelper.html(:event_feedback_response, event_feedback: event_feedback, event: event)
 
-    batch_message.add_recipient(:to, account.email, { 'firstname' => account.firstname || 'there', 'token' => account.sign_in_token, 'id' => account.id.to_s })
+    batch_message.add_recipient(:to, account.email, { 'firstname' => account.firstname || 'there', 'token' => account.sign_in_token_for_email, 'id' => account.id.to_s })
 
     batch_message.finalize if Padrino.env == :production
   end
@@ -136,7 +136,7 @@ class EventFeedback
     batch_message.body_html EmailHelper.html(:event_feedback_destroyed, event_feedback: event_feedback, event: event, destroyed_by: destroyed_by)
 
     event.accounts_receiving_feedback.each do |account|
-      batch_message.add_recipient(:to, account.email, { 'firstname' => account.firstname || 'there', 'token' => account.sign_in_token, 'id' => account.id.to_s })
+      batch_message.add_recipient(:to, account.email, { 'firstname' => account.firstname || 'there', 'token' => account.sign_in_token_for_email, 'id' => account.id.to_s })
     end
 
     batch_message.finalize if Padrino.env == :production
