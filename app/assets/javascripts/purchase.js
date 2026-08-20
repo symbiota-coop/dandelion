@@ -211,7 +211,7 @@ $(function () {
     } else if (b > 0) {
       $('#balance').val((+b).toFixed(2))
       let via_card
-      if (config.gocardless || config.ocSlug || config.evmAddress) { via_card = ' via card' } else { via_card = '' }
+      if (config.gocardlessInstant || config.ocSlug || config.evmAddress) { via_card = ' via card' } else { via_card = '' }
       $firstPaidButton.removeClass('btn-outline-primary').addClass('btn-primary')
       $rsvp.hide()
       $paid.show()
