@@ -88,25 +88,10 @@ Dandelion::App.controller do
 
     if event['type'] == 'checkout.session.completed'
       session = event['data']['object']
-      if (@order = Order.find_by(session_id: session.id, payment_completed: false))
-        @order.payment_completed!
-        @order.update_destination_payment
-        @order.send_tickets
-        @order.create_order_notification
-        halt 200
-      elsif (@order = Order.deleted.find_by(session_id: session.id, payment_completed: false))
-        begin
-          @order.restore_and_complete
-          # raise Order::Restored
-        rescue StandardError => e
-          ErrorReporting.capture_exception(e, context: { stripe_event_id: event.id })
-          halt 200
-        end
-      else
-        halt 200
-      end
-    else
-      halt 200
+      @order = Order.find_by(session_id: session.id, payment_completed: false)
+      @order ||= Order.deleted.find_by(session_id: session.id, payment_completed: false)
+      @order&.complete_or_restore(error_context: { stripe_event_id: event.id })
     end
+    200
   end
 end

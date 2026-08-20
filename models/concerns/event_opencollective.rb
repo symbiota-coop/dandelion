@@ -63,18 +63,11 @@ module EventOpenCollective
     oc_transactions.each do |currency, amount, secret, tx_created_at|
       next unless secret
 
-      if (@order = orders.find_by(:payment_completed => false, :currency => currency, :value => amount, :oc_secret => secret, :created_at.lt => tx_created_at))
-        @order.payment_completed!
-        @order.send_tickets
-        @order.create_order_notification
-      elsif (@order = orders.deleted.find_by(:payment_completed => false, :currency => currency, :value => amount, :oc_secret => secret, :created_at.lt => tx_created_at))
-        begin
-          @order.restore_and_complete
-          # raise Order::Restored
-        rescue StandardError => e
-          ErrorReporting.capture_exception(e, context: { order_id: @order.id.to_s })
-        end
-      end
+      @order = orders.find_by(:payment_completed => false, :currency => currency, :value => amount, :oc_secret => secret, :created_at.lt => tx_created_at)
+      @order ||= orders.deleted.find_by(:payment_completed => false, :currency => currency, :value => amount, :oc_secret => secret, :created_at.lt => tx_created_at)
+      next unless @order
+
+      @order.complete_or_restore(error_context: { order_id: @order.id.to_s })
     end
   end
 end

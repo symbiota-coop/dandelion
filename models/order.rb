@@ -142,6 +142,38 @@ class Order
     end
   end
 
+  def create_gocardless_instalment_schedule
+    client = GoCardlessPro::Client.new(access_token: event.organisation.gocardless_access_token)
+    billing_request = client.billing_requests.get(gocardless_billing_request_id)
+    mandate_id = billing_request.links.mandate_request_mandate if billing_request&.status == 'fulfilled'
+    raise 'fulfilled billing request did not include a mandate' if mandate_id.blank?
+
+    total_pence = (value * 100).round
+    count = event.gocardless_instalment_count.to_i
+    base = total_pence / count
+    remainder = total_pence % count
+    amounts = Array.new(count) { |i| i.zero? ? base + remainder : base }
+
+    begin
+      client.instalment_schedules.create_with_schedule(
+        params: {
+          name: description.truncate(100),
+          currency: currency,
+          total_amount: total_pence,
+          instalments: {
+            interval_unit: 'monthly',
+            interval: 1,
+            amounts: amounts
+          },
+          links: { mandate: mandate_id }
+        },
+        headers: { 'Idempotency-Key' => "dandelion-order-#{id}-instalment-schedule" }
+      )
+    rescue GoCardlessPro::InvalidStateError => e
+      raise unless e.try(:idempotent_creation_conflict?)
+    end
+  end
+
   def payment_completed!
     set(payment_completed: true)
     tickets.update_all(payment_completed: true)
@@ -159,6 +191,22 @@ class Order
     update_destination_payment
     send_tickets
     create_order_notification
+  end
+
+  def complete_or_restore(error_context: {})
+    restoring = deleted?
+    if restoring
+      restore_and_complete
+    else
+      payment_completed!
+      update_destination_payment
+      send_tickets
+      create_order_notification
+    end
+  rescue StandardError => e
+    raise unless restoring
+
+    ErrorReporting.capture_exception(e, context: error_context)
   end
 
   def description_elements(include_donations: true)

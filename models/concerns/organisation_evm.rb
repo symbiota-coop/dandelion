@@ -3,18 +3,11 @@ module OrganisationEvm
 
   def check_evm_account
     evm_transactions.each do |token, amount|
-      if (@order = orders.find_by(payment_completed: false, currency: token, evm_value: amount))
-        @order.payment_completed!
-        @order.send_tickets
-        @order.create_order_notification
-      elsif (@order = orders.deleted.find_by(payment_completed: false, currency: token, evm_value: amount))
-        begin
-          @order.restore_and_complete
-          # raise Order::Restored
-        rescue StandardError => e
-          ErrorReporting.capture_exception(e, context: { order_id: @order.id.to_s })
-        end
-      end
+      @order = orders.find_by(payment_completed: false, currency: token, evm_value: amount)
+      @order ||= orders.deleted.find_by(payment_completed: false, currency: token, evm_value: amount)
+      next unless @order
+
+      @order.complete_or_restore(error_context: { order_id: @order.id.to_s })
     end
   end
 end
