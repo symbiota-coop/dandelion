@@ -26,6 +26,7 @@ class Ticket
   field :session_id, type: String
   field :payment_intent, type: String
   field :gocardless_payment_request_id, type: String
+  field :gocardless_billing_request_id, type: String
   field :gocardless_payment_id, type: String
   field :show_attendance, type: Boolean
   field :subscribed_discussion, type: Boolean

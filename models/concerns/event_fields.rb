@@ -45,6 +45,7 @@ module EventFields
     field :cap_gbp, type: Float
     field :oc_slug, type: String
     field :tax_rate_id, type: String
+    field :gocardless_instalment_count, type: Integer
     field :match_phrase, type: String
     field :cohosts_ids_cache, type: Array
     field :theme_color, type: String
@@ -141,6 +142,7 @@ module EventFields
         hide_few_left: "Hide 'few tickets left' labels",
         rsvp_button_text: 'RSVP button',
         tax_rate_id: 'Stripe tax rate ID',
+        gocardless_instalment_count: 'GoCardless instalments',
         carousel_text: 'Preview text',
         match_phrase: 'Dropdown match phrase',
         minimal_only: 'Show only in embeds',
@@ -203,6 +205,7 @@ module EventFields
         no_tickets_pdf: 'Skip the PDF attachment in the confirmation email',
         send_ticketholder_confirmation: 'When someone provides a ticketholder email on the order confirmation page, also email that person the order confirmation',
         tax_rate_id: 'Stripe tax rate ID to apply to ticket purchases',
+        gocardless_instalment_count: 'Split the ticket price into this many monthly Direct Debit payments (2–24). Tickets are emailed when the mandate and payment schedule are set up. Leave blank to hide this option.',
         hide_unavailable_tickets: 'Hide tickets that have sold out or where sales have ended',
         match_phrase: 'Create a dropdown on the event page with future events containing this term',
         blank_price_for_free_tickets: 'Show a blank price for free tickets instead of zero',

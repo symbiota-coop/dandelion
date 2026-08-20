@@ -82,6 +82,8 @@ module EventValidation
       errors.add(:capacity, 'must be greater than 0') if capacity && capacity < 1
       errors.add(:suggested_donation, 'cannot be less than the minimum donation') if suggested_donation && minimum_donation && suggested_donation < minimum_donation
       errors.add(:oc_slug, "cannot be set until the organisation's Open Collective slug is set") if oc_slug && organisation && !organisation.oc_slug
+      self.gocardless_instalment_count = nil unless gocardless_instalment_count&.positive?
+      errors.add(:gocardless_instalment_count, 'must be between 2 and 24') if gocardless_instalment_count && (gocardless_instalment_count < 2 || gocardless_instalment_count > 24)
       errors.add(:end_time, 'must be after the start time') if end_time && start_time && end_time <= start_time
       errors.add(:feedback_hours_after, 'cannot be negative') if feedback_hours_after&.negative?
       errors.add(:feedback_hours_after, "cannot be more than #{Event::MAX_FEEDBACK_HOURS_AFTER}") if feedback_hours_after && feedback_hours_after > Event::MAX_FEEDBACK_HOURS_AFTER

@@ -296,6 +296,9 @@
         <%= f.text_block :facebook_pixel_id %>
         <%= f.text_block :oc_slug %>
         <%= f.text_block :tax_rate_id %>
+        <% if @event.organisation.gocardless_instalments || @event.gocardless_instalment_count %>
+          <%= f.number_block :gocardless_instalment_count %>
+        <% end %>
         <% if current_account.memberships.and(admin: true).exists? %>
           <%= f.select_block :gathering_id, options: [''] + current_account.memberships.and(admin: true).map { |m| [m.gathering.name, m.gathering_id] }.sort_by { |a,b| a } %>
         <% end %>

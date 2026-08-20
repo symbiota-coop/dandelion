@@ -27,6 +27,7 @@ module OrganisationFields
     field :gocardless_endpoint_secret, type: String
     field :gocardless_filter, type: String
     field :gocardless_instant_bank_pay, type: Mongoid::Boolean
+    field :gocardless_instalments, type: Mongoid::Boolean
     field :gocardless_subscriptions, type: Mongoid::Boolean
     field :patreon_api_key, type: String
     field :mailgun_api_key, type: String
@@ -134,6 +135,7 @@ module OrganisationFields
         gocardless_access_token: 'GoCardless access token',
         gocardless_endpoint_secret: 'GoCardless webhook secret',
         gocardless_instant_bank_pay: 'Enable GoCardless Instant Bank Pay',
+        gocardless_instalments: 'Enable GoCardless Instalments',
         gocardless_subscriptions: 'Register people with active GoCardless subscriptions as monthly donors',
         patreon_api_key: 'Patreon API key',
         mailgun_api_key: 'Mailgun API key',

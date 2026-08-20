@@ -174,8 +174,12 @@ Dandelion::App.controller do
     halt 200 if request.head?
 
     @order = @event.orders.find(params[:order_id]) || not_found if params[:order_id]
-    if params[:payment_request_id]
-      gocardless_order = @event.orders.find_by(gocardless_payment_request_id: params[:payment_request_id])
+    if params[:payment_request_id] || params[:billing_request_id]
+      gocardless_order = if params[:payment_request_id]
+                           @event.orders.find_by(gocardless_payment_request_id: params[:payment_request_id])
+                         else
+                           @event.orders.find_by(gocardless_billing_request_id: params[:billing_request_id])
+                         end
       if gocardless_order && !params[:cancelled]
         if gocardless_order.payment_completed?
           @order = gocardless_order

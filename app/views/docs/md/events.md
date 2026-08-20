@@ -50,7 +50,14 @@ To let your attendees choose how much to pay for a ticket type:
 
 ## Allowing people to pay in instalments
 
-The best solution for this is to enable an instalment payment method on your Stripe account, such as [Klarna](https://docs.stripe.com/payments/klarna) or [Clearpay/Afterpay](https://docs.stripe.com/payments/afterpay-clearpay). Customers will then be able to pay for the purchase in instalments at checkout.
+You can collect ticket payments as a fixed number of monthly Direct Debit instalments via GoCardless.
+
+1. In your organisation settings under Payments, add a GoCardless access token and webhook secret, and check **Enable Instalments**. The webhook endpoint must send **billing request** events (and **payments** if you also use Instant Bank Pay).
+2. Edit the event and, under Everything else, set **GoCardless instalments** to the number of monthly payments (2–24). The field appears once instalments are enabled on the organisation.
+
+Buyers will see a **Pay in X instalments** button at checkout. **Tickets are emailed once the Direct Debit mandate and payment schedule are set up.** Refunds of collected instalments are arranged in the GoCardless dashboard.
+
+You can also enable an instalment payment method on your Stripe account, such as [Klarna](https://docs.stripe.com/payments/klarna) or [Clearpay/Afterpay](https://docs.stripe.com/payments/afterpay-clearpay). Customers will then be able to pay for the purchase in instalments at checkout, and receive tickets immediately.
 
 Alternatively, you can create a secret ticket type with a quantity equal to the number of instalments and send a link to the attendee. (Make sure you check that they actually end up purchasing all the tickets of this ticket type!)
 
