@@ -100,10 +100,15 @@
           <p class="mb-1">Session <%= event_session.session_number %>: <%= partial :'events/add_to_calendar', locals: { event_session: event_session } %></p>
         <% end %>
       <% end %>
-      <% if @order.account && !@event.donations_to_dandelion? %>
-        <%= partial :'accounts/pay', locals: {div_class: 'mt-5', source: "event:#{@event.id}", account: @order.account } %>
-      <% end %>
 
     <% end %>
   </div>
 </div>
+
+<% if !@event.redirect_url && @order.account && !@event.donations_to_dandelion? %>
+  <div class="card shadow-sm mt-3">
+    <div class="card-body">
+      <%= partial :'accounts/pay', locals: { source: "event:#{@event.id}", account: @order.account } %>
+    </div>
+  </div>
+<% end %>
