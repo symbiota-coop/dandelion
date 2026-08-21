@@ -77,6 +77,7 @@ class Gathering
     self.currency = currency_was if persisted? && currency_changed?
 
     self.listed = false if privacy == 'secret'
+    self.welcome_email = welcome_email_default if welcome_email.nil?
     self.balance = 0 if balance.nil?
     self.invitations_granted = 0 if invitations_granted.nil?
     self.processed_via_dandelion = 0 if processed_via_dandelion.nil?
