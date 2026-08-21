@@ -334,7 +334,15 @@ $(function () {
     $(this).attr('data-payment-method-clicked', true)
   })
 
+  let purchaseSubmitting = false
+  $(window).on('pageshow', function () {
+    purchaseSubmitting = false
+    $('#details form button[data-payment-method]').prop('disabled', false)
+    $('#details form button[data-payment-method-clicked] i').hide()
+  })
   $('#details form').submit(function () {
+    if (purchaseSubmitting) { return false }
+
     if (config.embedded) {
       $('#purchase-alert').hide()
     }
@@ -411,6 +419,8 @@ $(function () {
       }
     }
 
+    purchaseSubmitting = true
+    $('#details form button[data-payment-method]').prop('disabled', true)
     $('#total').val($('#totalDisplay').val())
     $('#details form button[data-payment-method-clicked] i').show()
 
