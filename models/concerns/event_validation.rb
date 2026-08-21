@@ -1,6 +1,12 @@
 module EventValidation
   extend ActiveSupport::Concern
 
+  class_methods do
+    def slug_candidate
+      [*('a'..'z')].sample + [*('0'..'9')].sample + [*('a'..'z'), *('0'..'9')].sample(3).join
+    end
+  end
+
   included do
     validates_presence_of :name, :currency
     validates_presence_of :start_time, :end_time, :location, unless: :evergreen?
@@ -33,8 +39,8 @@ module EventValidation
 
       unless slug
         loop do
-          self.slug = ([*('a'..'z')].sample + [*('0'..'9')].sample + [*('a'..'z'), *('0'..'9')].sample(3).join)
-          break if Event.find_by(slug: slug).nil?
+          self.slug = self.class.slug_candidate
+          break unless Event.unscoped.and(slug: slug).exists?
         end
       end
 

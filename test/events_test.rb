@@ -529,4 +529,34 @@ class EventsTest < ActiveSupport::TestCase
     visit "/e/#{@event.slug}"
     assert_equal 'Event terms', find('textarea[readonly]').value
   end
+
+  test 'slug uniqueness includes deleted events' do
+    account = FactoryBot.create(:account)
+    organisation = FactoryBot.create(:organisation, account: account)
+    event = FactoryBot.create(:event, organisation: organisation, account: account, last_saved_by: account)
+    slug = event.slug
+    event.destroy
+
+    assert_nil Event.find_by(slug: slug)
+    assert Event.unscoped.and(slug: slug).exists?
+
+    clash = FactoryBot.build(:event, organisation: organisation, account: account, last_saved_by: account, slug: slug)
+    refute clash.valid?
+    assert clash.errors[:slug].any?
+  end
+
+  test 'duplicating an event skips slugs belonging to deleted events' do
+    account = FactoryBot.create(:account)
+    organisation = FactoryBot.create(:organisation, account: account)
+    event = FactoryBot.create(:event, organisation: organisation, account: account, last_saved_by: account, prices: [0])
+    deleted = FactoryBot.create(:event, organisation: organisation, account: account, last_saved_by: account, slug: 'a0aaa')
+    deleted.destroy
+
+    candidates = ['a0aaa', 'z9zzz']
+    Event.stub :slug_candidate, -> { candidates.shift } do
+      duplicate = event.duplicate!(account)
+      assert duplicate.persisted?
+      assert_equal 'z9zzz', duplicate.slug
+    end
+  end
 end
