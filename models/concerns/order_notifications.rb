@@ -4,6 +4,35 @@ module OrderNotifications
   included do
     handle_asynchronously :send_notification
     handle_asynchronously :send_tickets
+
+    before_destroy :queue_rsvp_cancelled_notification
+  end
+
+  class_methods do
+    def send_rsvp_cancelled_email(event_id, recipients)
+      event = Event.find(event_id)
+      return unless event&.organisation
+      return if recipients.blank?
+
+      mg_client = Mailgun::Client.new ENV['MAILGUN_API_KEY'], ENV['MAILGUN_REGION']
+      first_email = recipients.first['email']
+      batch_message = Mailgun::BatchMessage.new(mg_client, EmailHelper.mailgun_host(first_email, ENV['MAILGUN_TICKETS_HOST']))
+
+      header_image_url, from_email = Order.new(event: event).sender_info
+      batch_message.subject "Your RSVP to #{event.name} has been cancelled"
+      batch_message.from from_email
+      batch_message.reply_to(event.email || event.organisation.reply_to)
+      batch_message.body_html EmailHelper.html(:rsvp_cancelled, event: event, header_image_url: header_image_url)
+
+      recipients.each do |recipient|
+        vars = { 'firstname' => recipient['firstname'] || 'there' }
+        vars['token'] = recipient['token'] if recipient['token']
+        vars['id'] = recipient['id'] if recipient['id']
+        batch_message.add_recipient(:to, recipient['email'], vars)
+      end
+
+      batch_message.finalize if Padrino.env == :production
+    end
   end
 
   def send_notification
@@ -114,6 +143,44 @@ module OrderNotifications
       span&.set_data('signal.configured', signal_configured?)
       send_signal_order_link
     end if account&.phone.present?
+  end
+
+  def queue_rsvp_cancelled_notification
+    return unless payment_completed
+    return unless value.nil? || value.zero?
+    return unless event && !event.flagged_for_destroy?
+
+    recipients = rsvp_cancelled_recipients
+    return if recipients.empty?
+
+    self.class.delay.send_rsvp_cancelled_email(event.id.to_s, recipients)
+  end
+
+  def rsvp_cancelled_recipients
+    recipients = []
+    if account&.email.present?
+      recipients << {
+        'email' => account.email,
+        'firstname' => account.firstname || 'there',
+        'token' => account.sign_in_token_for_email,
+        'id' => account.id.to_s
+      }
+    end
+
+    if event&.send_ticketholder_confirmation
+      tickets.each do |ticket|
+        email = ticket.email.presence
+        next if email.blank?
+        next if recipients.any? { |recipient| recipient['email'] == email }
+
+        recipients << {
+          'email' => email,
+          'firstname' => ticket.firstname || 'there'
+        }
+      end
+    end
+
+    recipients
   end
 
   def send_signal_order_link
