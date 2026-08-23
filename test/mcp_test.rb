@@ -30,6 +30,28 @@ class McpTest < ActiveSupport::TestCase
     rpc.dig('result', 'content', 0, 'text')
   end
 
+  def create_event_with_order_and_ticket
+    admin = FactoryBot.create(:account)
+    attendee = FactoryBot.create(:account, name: 'Ada Lovelace')
+    organisation = FactoryBot.create(:organisation, account: admin)
+    event = FactoryBot.create(:event, organisation: organisation, account: admin, last_saved_by: admin, prices: [0])
+    order = event.orders.create!(
+      account: attendee,
+      currency: event.currency,
+      value: 0,
+      payment_completed: true,
+      original_description: 'MCP test order',
+      via: 'newsletter'
+    )
+    ticket = event.tickets.create!(
+      account: attendee,
+      order: order,
+      ticket_type: event.ticket_types.first,
+      payment_completed: true
+    )
+    [admin, attendee, event, order, ticket]
+  end
+
   test 'public tools remain available without authentication' do
     rpc = mcp_tool_call('get_trending_events_tool', arguments: { limit: 1 })
 
@@ -75,5 +97,110 @@ class McpTest < ActiveSupport::TestCase
     assert_equal 401, last_response.status
     assert_equal 'Bearer', last_response['WWW-Authenticate']
     assert_equal 'invalid_token', JSON.parse(last_response.body)['error']
+  end
+
+  test 'tools list includes event order and ticket tools' do
+    rpc = mcp_rpc('tools/list')
+    names = rpc.dig('result', 'tools').map { |tool| tool['name'] }
+
+    assert_includes names, 'get_event_orders_tool'
+    assert_includes names, 'get_event_tickets_tool'
+  end
+
+  test 'event order and ticket tools require authentication' do
+    %w[get_event_orders_tool get_event_tickets_tool].each do |name|
+      rpc = mcp_tool_call(name, arguments: { slug: 'example' })
+
+      assert_equal 200, last_response.status
+      assert rpc.dig('result', 'isError')
+      assert_includes tool_text(rpc), 'Authentication required'
+    end
+  end
+
+  test 'event admin can query orders and tickets' do
+    admin, attendee, event, order, ticket = create_event_with_order_and_ticket
+    headers = { 'Authorization' => "Bearer #{admin.api_key}" }
+
+    orders_rpc = mcp_tool_call('get_event_orders_tool', arguments: { slug: event.slug }, headers: headers)
+    orders = JSON.parse(tool_text(orders_rpc))
+
+    assert_equal 200, last_response.status
+    refute orders_rpc.dig('result', 'isError')
+    assert_equal 1, orders.length
+    assert_equal order.id.to_s, orders.first['id']
+    assert_equal attendee.name, orders.first['name']
+    assert_equal attendee.email, orders.first['email']
+    assert_equal 'newsletter', orders.first['via']
+
+    tickets_rpc = mcp_tool_call('get_event_tickets_tool', arguments: { id: event.id.to_s }, headers: headers)
+    tickets = JSON.parse(tool_text(tickets_rpc))
+
+    assert_equal 200, last_response.status
+    refute tickets_rpc.dig('result', 'isError')
+    assert_equal 1, tickets.length
+    assert_equal ticket.id.to_s, tickets.first['id']
+    assert_equal attendee.name, tickets.first['name']
+    assert_equal attendee.email, tickets.first['email']
+    assert_equal event.ticket_types.first.name, tickets.first['ticket_type']
+    assert_equal order.id.to_s, tickets.first['order_id']
+  end
+
+  test 'non-admin cannot query event orders or tickets' do
+    _admin, _attendee, event, = create_event_with_order_and_ticket
+    stranger = FactoryBot.create(:account)
+    headers = { 'Authorization' => "Bearer #{stranger.api_key}" }
+
+    %w[get_event_orders_tool get_event_tickets_tool].each do |name|
+      rpc = mcp_tool_call(name, arguments: { slug: event.slug }, headers: headers)
+
+      assert_equal 200, last_response.status
+      assert rpc.dig('result', 'isError')
+      assert_includes tool_text(rpc), 'You do not have access to this event'
+    end
+  end
+
+  test 'event order and ticket tools require an event slug or id' do
+    admin, = create_event_with_order_and_ticket
+    headers = { 'Authorization' => "Bearer #{admin.api_key}" }
+
+    %w[get_event_orders_tool get_event_tickets_tool].each do |name|
+      rpc = mcp_tool_call(name, headers: headers)
+
+      assert_equal 200, last_response.status
+      assert rpc.dig('result', 'isError')
+      assert_includes tool_text(rpc), 'Provide event slug or id'
+    end
+  end
+
+  test 'event order and ticket tools return not found for unknown events' do
+    admin, = create_event_with_order_and_ticket
+    headers = { 'Authorization' => "Bearer #{admin.api_key}" }
+
+    %w[get_event_orders_tool get_event_tickets_tool].each do |name|
+      rpc = mcp_tool_call(name, arguments: { slug: 'does-not-exist' }, headers: headers)
+
+      assert_equal 200, last_response.status
+      assert rpc.dig('result', 'isError')
+      assert_includes tool_text(rpc), 'Event not found'
+    end
+  end
+
+  test 'event order and ticket tools hide emails from event admins who cannot view them' do
+    org_owner = FactoryBot.create(:account)
+    facilitator = FactoryBot.create(:account)
+    attendee = FactoryBot.create(:account, name: 'Hidden Email')
+    organisation = FactoryBot.create(:organisation, account: org_owner)
+    event = FactoryBot.create(:event, organisation: organisation, account: facilitator, last_saved_by: facilitator, prices: [0], show_emails: false)
+    order = event.orders.create!(account: attendee, currency: event.currency, value: 0, payment_completed: true, original_description: 'MCP privacy test')
+    event.tickets.create!(account: attendee, order: order, ticket_type: event.ticket_types.first, payment_completed: true)
+    headers = { 'Authorization' => "Bearer #{facilitator.api_key}" }
+
+    orders = JSON.parse(tool_text(mcp_tool_call('get_event_orders_tool', arguments: { slug: event.slug }, headers: headers)))
+    tickets = JSON.parse(tool_text(mcp_tool_call('get_event_tickets_tool', arguments: { slug: event.slug }, headers: headers)))
+
+    assert_equal '', orders.first['email']
+    assert_equal attendee.name, orders.first['name']
+    assert_equal '', tickets.first['email']
+    assert_equal attendee.name, tickets.first['name']
   end
 end

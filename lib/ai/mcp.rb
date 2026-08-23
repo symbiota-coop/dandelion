@@ -105,23 +105,113 @@ module Dandelion
       server_context[:current_account]
     end
 
+    def self.tool_text(text, error: false)
+      ::MCP::Tool::Response.new([{ type: 'text', text: text }], error: error)
+    end
+
+    def self.tool_json(payload)
+      tool_text(payload.to_json)
+    end
+
+    def self.tool_error(message)
+      tool_text(message, error: true)
+    end
+
+    def self.clamp_limit(limit)
+      (limit || 20).to_i.clamp(1, 100)
+    end
+
     def self.with_account(server_context)
       account = current_account_from(server_context)
       return yield(account) if account
 
-      ::MCP::Tool::Response.new([{ type: 'text', text: AUTH_REQUIRED_MESSAGE }], error: true)
+      tool_error(AUTH_REQUIRED_MESSAGE)
+    end
+
+    def self.find_event(slug: nil, id: nil)
+      if id.present?
+        Event.unscoped.find(id)
+      elsif slug.present?
+        Event.unscoped.find_by(slug: slug)
+      end
+    end
+
+    def self.with_event_admin(server_context, slug: nil, id: nil)
+      with_account(server_context) do |account|
+        if slug.blank? && id.blank?
+          next tool_error('Provide event slug or id')
+        end
+
+        event = find_event(slug: slug, id: id)
+        next tool_error('Event not found') unless event
+        next tool_error('You do not have access to this event') unless Event.admin?(event, account)
+
+        yield(account, event)
+      end
     end
 
     def self.perform_get_me(server_context: nil)
       with_account(server_context) do |account|
-        result = {
+        tool_json(
           id: account.id.to_s,
           name: account.name,
           username: account.username,
           email: account.email,
           url: "#{ENV['BASE_URI']}/u/#{account.username}"
-        }
-        ::MCP::Tool::Response.new([{ type: 'text', text: result.to_json }])
+        )
+      end
+    end
+
+    def self.order_payload(order, account)
+      email_visible = Order.email_viewer?(order, account)
+      {
+        id: order.id.to_s,
+        name: order.account ? order.account.name : '',
+        firstname: order.account ? order.account.firstname : '',
+        lastname: order.account ? order.account.lastname : '',
+        email: email_visible && order.account ? order.account.email : '',
+        value: order.value,
+        currency: order.currency,
+        opt_in_organisation: order.opt_in_organisation,
+        opt_in_facilitator: order.opt_in_facilitator,
+        hear_about: order.hear_about,
+        via: order.via,
+        answers: order.answers,
+        created_at: order.created_at.iso8601
+      }
+    end
+
+    def self.ticket_payload(ticket, account)
+      email_visible = Ticket.email_viewer?(ticket, account)
+      {
+        id: ticket.id.to_s,
+        name: ticket.account ? ticket.account.name : '',
+        firstname: ticket.account ? ticket.account.firstname : '',
+        lastname: ticket.account ? ticket.account.lastname : '',
+        email: email_visible && ticket.account ? ticket.account.email : '',
+        ordered_for_name: ticket.name,
+        ordered_for_email: email_visible ? ticket.email : '',
+        ticket_type: ticket.ticket_type.try(:name),
+        price: ticket.discounted_price,
+        currency: ticket.currency,
+        checked_in: ticket.checked_in,
+        checked_in_at: ticket.checked_in_at&.iso8601,
+        order_id: ticket.order_id&.to_s,
+        created_at: ticket.created_at.iso8601
+      }
+    end
+
+    def self.perform_get_event_orders(server_context: nil, slug: nil, id: nil, limit: nil)
+      with_event_admin(server_context, slug: slug, id: id) do |account, event|
+        orders = event.orders.complete.includes(:account).order('created_at desc').limit(clamp_limit(limit))
+        tool_json(orders.map { |order| order_payload(order, account) })
+      end
+    end
+
+    def self.perform_get_event_tickets(server_context: nil, slug: nil, id: nil, limit: nil)
+      with_event_admin(server_context, slug: slug, id: id) do |account, event|
+        tickets = event.tickets.complete.includes(:account, :ticket_type, :order).order('created_at desc').limit(clamp_limit(limit))
+        tool_json(tickets.map { |ticket| ticket_payload(ticket, account) })
       end
     end
 
@@ -232,6 +322,36 @@ module Dandelion
           define_singleton_method(:call) do |server_context: {}|
             Dandelion::MCP.perform_get_me(server_context: server_context)
           end
+        end,
+        Class.new(::MCP::Tool) do
+          tool_name 'get_event_orders_tool'
+          title 'Get Event Orders'
+          description 'Get completed orders for a Dandelion event you admin, by slug or ID. Requires a Bearer API key.'
+          input_schema(properties: {
+                         slug: { type: 'string', description: 'Event slug' },
+                         id: { type: 'string', description: 'Event ID' },
+                         limit: { type: 'integer', description: 'Max results (default 20, max 100)' }
+                       })
+          annotations(read_only_hint: true, destructive_hint: false)
+
+          define_singleton_method(:call) do |slug: nil, id: nil, limit: nil, server_context: {}|
+            Dandelion::MCP.perform_get_event_orders(server_context: server_context, slug: slug, id: id, limit: limit)
+          end
+        end,
+        Class.new(::MCP::Tool) do
+          tool_name 'get_event_tickets_tool'
+          title 'Get Event Tickets'
+          description 'Get completed tickets for a Dandelion event you admin, by slug or ID. Requires a Bearer API key.'
+          input_schema(properties: {
+                         slug: { type: 'string', description: 'Event slug' },
+                         id: { type: 'string', description: 'Event ID' },
+                         limit: { type: 'integer', description: 'Max results (default 20, max 100)' }
+                       })
+          annotations(read_only_hint: true, destructive_hint: false)
+
+          define_singleton_method(:call) do |slug: nil, id: nil, limit: nil, server_context: {}|
+            Dandelion::MCP.perform_get_event_tickets(server_context: server_context, slug: slug, id: id, limit: limit)
+          end
         end
       ].freeze
     end
@@ -242,7 +362,7 @@ module Dandelion
           name: 'dandelion',
           title: 'Dandelion',
           version: '1.0.0',
-          instructions: 'Tools for querying Dandelion accounts, events, organisations and gatherings. Authenticated tools such as get_me_tool require a Bearer API key.',
+          instructions: 'Tools for querying Dandelion accounts, events, organisations and gatherings. Authenticated tools such as get_me_tool, get_event_orders_tool and get_event_tickets_tool require a Bearer API key.',
           tools: tools
         )
         def s.server_context

@@ -7,8 +7,9 @@ Dandelion supports the [Model Context Protocol](https://modelcontextprotocol.io/
 - Get trending events
 - Get upcoming events for an organisation
 - Get the authenticated account (requires an API key)
+- Get completed orders and tickets for an event you admin (requires an API key)
 
-All access is read-only.
+All access is read-only. Email addresses are included only when you are allowed to view them.
 
 ## MCP endpoint
 
@@ -20,7 +21,7 @@ https://dandelion.events/mcp
 
 ## Authentication
 
-Public tools work without authentication. Authenticated tools, such as Get Me, require your API key as a Bearer token.
+Public tools work without authentication. Authenticated tools, such as Get Me, Get Event Orders and Get Event Tickets, require your API key as a Bearer token.
 
 You can find your API key on your [profile edit page](/accounts/edit).
 
