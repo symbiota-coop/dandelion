@@ -190,7 +190,8 @@ class McpTest < ActiveSupport::TestCase
     facilitator = FactoryBot.create(:account)
     attendee = FactoryBot.create(:account, name: 'Hidden Email')
     organisation = FactoryBot.create(:organisation, account: org_owner)
-    event = FactoryBot.create(:event, organisation: organisation, account: facilitator, last_saved_by: facilitator, prices: [0], show_emails: false)
+    event = FactoryBot.create(:event, organisation: organisation, account: org_owner, last_saved_by: org_owner, prices: [0], show_emails: false)
+    event.event_facilitations.create!(account: facilitator)
     order = event.orders.create!(account: attendee, currency: event.currency, value: 0, payment_completed: true, original_description: 'MCP privacy test')
     event.tickets.create!(account: attendee, order: order, ticket_type: event.ticket_types.first, payment_completed: true)
     headers = { 'Authorization' => "Bearer #{facilitator.api_key}" }
