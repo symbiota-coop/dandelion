@@ -24,6 +24,9 @@ module Dandelion
       }
     }.freeze
 
+    AUTH_REQUIRED_MESSAGE = 'Authentication required. Provide your API key as a Bearer token.'
+    BEARER_PATTERN = /\ABearer\s+(\S+)\z/i
+
     def self.config_for(model_class)
       MODEL_CONFIGS[model_class.name]
     end
@@ -73,6 +76,53 @@ module Dandelion
       fields_proc = config[:search_fields] || config[:fields]
       result = events.map { |e| fields_proc.call(e) }
       ::MCP::Tool::Response.new([{ type: 'text', text: result.to_json }])
+    end
+
+    def self.account_from_request(rack_request)
+      header = rack_request.get_header('HTTP_AUTHORIZATION')
+      return nil if header.blank?
+
+      match = header.match(BEARER_PATTERN)
+      return :invalid unless match
+
+      Account.find_by(api_key: match[1]) || :invalid
+    end
+
+    def self.unauthorized_response
+      [
+        401,
+        {
+          'Content-Type' => 'application/json',
+          'WWW-Authenticate' => 'Bearer'
+        },
+        [{ error: 'invalid_token', error_description: 'Invalid API key' }.to_json]
+      ]
+    end
+
+    def self.current_account_from(server_context)
+      return unless server_context.respond_to?(:[])
+
+      server_context[:current_account]
+    end
+
+    def self.with_account(server_context)
+      account = current_account_from(server_context)
+      return yield(account) if account
+
+      ::MCP::Tool::Response.new([{ type: 'text', text: AUTH_REQUIRED_MESSAGE }], error: true)
+    end
+
+    def self.perform_get_me(server_context: nil)
+      with_account(server_context) do |account|
+        result = {
+          id: account.id.to_s,
+          name: account.name,
+          username: account.username,
+          email: account.email,
+          url: "#{ENV['BASE_URI']}/u/#{account.username}"
+        }
+        ::MCP::Tool::Response.new([{ type: 'text', text: result.to_json }])
+      end
     end
 
     def self.perform_get_upcoming_organisation_events(slug: nil, id: nil, from: nil, to: nil, limit: nil)
@@ -172,6 +222,16 @@ module Dandelion
           define_singleton_method(:call) do |limit: nil, _server_context: {}|
             Dandelion::MCP.perform_get_trending_events(limit: limit)
           end
+        end,
+        Class.new(::MCP::Tool) do
+          tool_name 'get_me_tool'
+          title 'Get Me'
+          description 'Get the authenticated Dandelion account. Requires a Bearer API key.'
+          annotations(read_only_hint: true, destructive_hint: false)
+
+          define_singleton_method(:call) do |server_context: {}|
+            Dandelion::MCP.perform_get_me(server_context: server_context)
+          end
         end
       ].freeze
     end
@@ -182,9 +242,17 @@ module Dandelion
           name: 'dandelion',
           title: 'Dandelion',
           version: '1.0.0',
-          instructions: 'Tools for querying Dandelion accounts, events, organisations and gatherings.',
+          instructions: 'Tools for querying Dandelion accounts, events, organisations and gatherings. Authenticated tools such as get_me_tool require a Bearer API key.',
           tools: tools
         )
+        def s.server_context
+          Thread.current[:mcp_server_context]
+        end
+
+        def s.server_context=(value)
+          Thread.current[:mcp_server_context] = value
+        end
+
         ::MCP::Server::Transports::StreamableHTTPTransport.new(
           s,
           stateless: true,
@@ -209,7 +277,13 @@ module Dandelion
     end
 
     def self.handle_http_request(rack_request)
+      account = account_from_request(rack_request)
+      return unauthorized_response if account == :invalid
+
+      server.server_context = { current_account: account }
       http_transport.handle_request(rack_request)
+    ensure
+      server.server_context = nil
     end
   end
 end

@@ -6,6 +6,7 @@ Dandelion supports the [Model Context Protocol](https://modelcontextprotocol.io/
 - Look up events, organisations, gatherings and accounts, by slug/username or ID
 - Get trending events
 - Get upcoming events for an organisation
+- Get the authenticated account (requires an API key)
 
 All access is read-only.
 
@@ -15,4 +16,23 @@ Add the Dandelion MCP server to your AI assistant's MCP configuration:
 
 ```
 https://dandelion.events/mcp
+```
+
+## Authentication
+
+Public tools work without authentication. Authenticated tools, such as Get Me, require your API key as a Bearer token.
+
+You can find your API key on your [profile edit page](/accounts/edit).
+
+```json
+{
+  "mcpServers": {
+    "dandelion": {
+      "url": "https://dandelion.events/mcp",
+      "headers": {
+        "Authorization": "Bearer YOUR_API_KEY"
+      }
+    }
+  }
+}
 ```
