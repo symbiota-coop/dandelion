@@ -13,9 +13,10 @@
     var positionStickyIndex = function() {
       var top = headerHeight() + contentOffset()
       $stickyIndex.css('top', top)
-      $stickyIndex.css('max-height', 'calc(100vh - ' + top + 'px)')
+      $stickyIndex.css('height', 'calc(100vh - ' + top + 'px)')
     }
     positionStickyIndex()
+    $(window).on('resize', positionStickyIndex)
 
     var scrollToTarget = function(href) {
       var targetId = (href || '').split('#')[1]
@@ -88,19 +89,25 @@
 <div class="row">
   <div class="col-lg-3 d-none d-lg-block">
     <div class="mr-lg-3" id="sticky-index">
+      <%= partial :'docs/select', locals: { compact: true } %>
       <%= partial :'docs/index' %>
     </div>
   </div>
   <div class="col-lg-9">
     <div class="docs-main">
       <div class="docs-header">
-        <h1><%= @doc_page[:name] %></h1>
+        <h1 class="d-none d-lg-block"><%= @doc_page[:name] %></h1>
+        <div class="d-lg-none docs-header-select">
+          <%= partial :'docs/select' %>
+        </div>
       </div>
 
-      <details class="doc-toc-mobile d-lg-none">
-        <summary>On this page</summary>
-        <%= partial :'docs/index' %>
-      </details>
+      <% if @doc_page[:headings].any? %>
+        <details class="doc-toc-mobile d-lg-none">
+          <summary>On this page</summary>
+          <%= partial :'docs/index' %>
+        </details>
+      <% end %>
 
       <% if @doc_page[:raw_content].present? %>
         <div id="doc-body">

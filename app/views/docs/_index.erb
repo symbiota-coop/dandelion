@@ -1,34 +1,24 @@
-<nav class="doc-index" aria-label="Documentation">
-  <ul class="doc-index-pages">
-    <% @doc_pages.each { |doc_page| active = @doc_page && @doc_page[:slug] == doc_page[:slug] %>
-    <li class="<%= 'is-current-page' if active %>">
-      <a class="doc-index-page<%= ' is-current' if active %>" href="/docs/<%= doc_page[:slug] %>"><%= doc_page[:name] %></a>
-      <% if active && doc_page[:headings].any? %>
-        <ul class="doc-index-headings">
-          <% doc_page[:headings].each do |heading| %>
-            <% h2_text = heading[:text].to_s.gsub('\\', '') %>
-            <% h2_id = h2_text.parameterize %>
-            <li>
-              <a href="/docs/<%= doc_page[:slug] %>#<%= h2_id %>" class="doc-link" data-heading-id="<%= h2_id %>"><%= h2_text %></a>
-              <% if heading[:h3s].any? %>
-                <ul class="doc-index-h3s">
-                  <% heading[:h3s].each do |h3| %>
-                    <% h3_text = h3.to_s.gsub('\\', '') %>
-                    <% h3_id = h3_text.parameterize %>
-                    <li>
-                      <a href="/docs/<%= doc_page[:slug] %>#<%= h3_id %>" class="doc-link" data-heading-id="<%= h3_id %>"><%= h3_text %></a>
-                    </li>
-                  <% end %>
-                </ul>
+<nav class="doc-index" aria-label="On this page">
+  <% if @doc_page && @doc_page[:headings].any? %>
+    <ul class="doc-index-headings">
+      <% @doc_page[:headings].each do |heading| %>
+        <% h2_text = heading[:text].to_s.gsub('\\', '') %>
+        <% h2_id = h2_text.parameterize %>
+        <li>
+          <a href="/docs/<%= @doc_page[:slug] %>#<%= h2_id %>" class="doc-link" data-heading-id="<%= h2_id %>"><%= h2_text %></a>
+          <% if heading[:h3s].any? %>
+            <ul class="doc-index-h3s">
+              <% heading[:h3s].each do |h3| %>
+                <% h3_text = h3.to_s.gsub('\\', '') %>
+                <% h3_id = h3_text.parameterize %>
+                <li>
+                  <a href="/docs/<%= @doc_page[:slug] %>#<%= h3_id %>" class="doc-link" data-heading-id="<%= h3_id %>"><%= h3_text %></a>
+                </li>
               <% end %>
-            </li>
+            </ul>
           <% end %>
-        </ul>
+        </li>
       <% end %>
-    </li>
-    <% } %>
-    <li>
-      <a class="doc-index-page doc-index-external" target="_blank" href="https://deepwiki.com/symbiota-coop/dandelion">Ask on DeepWiki</a>
-    </li>
-  </ul>
+    </ul>
+  <% end %>
 </nav>
