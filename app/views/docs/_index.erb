@@ -1,64 +1,34 @@
-<style>
-  #sticky-index .doc-index-headings::-webkit-scrollbar { width: 8px }
-  #sticky-index .doc-index-headings::-webkit-scrollbar-track { background: #f1f1f1 }
-  #sticky-index .doc-index-headings::-webkit-scrollbar-thumb { background: #ccc; border-radius: 4px }
-</style>
-<script>
-  $(function() {
-    $('.doc-link').on('click', function(e) {
-      e.preventDefault();
-      var href = $(this).attr('href');
-      history.pushState(null, null, href);
-      scrollToTarget(href);
-    });
-
-    function scrollToTarget(href) {
-      var targetId = href.split('#')[1];
-      var $target = $('#' + targetId);
-      var headerHeight = $('#header').outerHeight();
-      $('html, body').animate({
-        scrollTop: $target.offset().top - headerHeight
-      }, 500);
-    }
-
-    $(window).on('popstate', function() {
-      if (window.location.hash) {
-        scrollToTarget(window.location.hash);
-      }
-    });
-
-    if (window.location.hash) {
-      window.scrollTo(0, 0);
-      scrollToTarget(window.location.hash);
-    }
-  });
-</script>
-
-<ul class="list-unstyled" style="font-size: 1.25em">
-  <% @doc_pages.each { |doc_page| active = @doc_page && @doc_page[:slug] == doc_page[:slug] %>
-  <li>
-    <a <% if active %> class="font-weight-bold" <% end %> href="/docs/<%= doc_page[:slug] %>"><%= doc_page[:name] %></a>
-    <% if active %>
-      <ul class="doc-index-headings" style="list-style-type: square; font-size: 85%; max-height: 50vh; overflow-y: auto">
-        <% doc_page[:headings].each do |heading| %>
-          <li>
+<nav class="doc-index" aria-label="Documentation">
+  <ul class="doc-index-pages">
+    <% @doc_pages.each { |doc_page| active = @doc_page && @doc_page[:slug] == doc_page[:slug] %>
+    <li class="<%= 'is-current-page' if active %>">
+      <a class="doc-index-page<%= ' is-current' if active %>" href="/docs/<%= doc_page[:slug] %>"><%= doc_page[:name] %></a>
+      <% if active && doc_page[:headings].any? %>
+        <ul class="doc-index-headings">
+          <% doc_page[:headings].each do |heading| %>
             <% h2_text = heading[:text].to_s.gsub('\\', '') %>
-            <a href="/docs/<%= doc_page[:slug] %>#<%= h2_text.parameterize %>" class="doc-link"><%= h2_text %></a>
-            <% if heading[:h3s].any? %>
-              <ul style="list-style-type: circle; font-size: 90%; padding-left: 0.75em">
-                <% heading[:h3s].each do |h3| %>
-                  <% h3_text = h3.to_s.gsub('\\', '') %>
-                  <li><a href="/docs/<%= doc_page[:slug] %>#<%= h3_text.parameterize %>" class="doc-link"><%= h3_text %></a></li>
-                <% end %>
-              </ul>
-            <% end %>
-          </li>
-        <% end %>
-      </ul>
-    <% end %>
-  </li>
-  <% } %>
-  <li>
-    <a target="_blank" href="https://deepwiki.com/symbiota-coop/dandelion">Ask on DeepWiki &rarr;</a>
-  </li>
-</ul>
+            <% h2_id = h2_text.parameterize %>
+            <li>
+              <a href="/docs/<%= doc_page[:slug] %>#<%= h2_id %>" class="doc-link" data-heading-id="<%= h2_id %>"><%= h2_text %></a>
+              <% if heading[:h3s].any? %>
+                <ul class="doc-index-h3s">
+                  <% heading[:h3s].each do |h3| %>
+                    <% h3_text = h3.to_s.gsub('\\', '') %>
+                    <% h3_id = h3_text.parameterize %>
+                    <li>
+                      <a href="/docs/<%= doc_page[:slug] %>#<%= h3_id %>" class="doc-link" data-heading-id="<%= h3_id %>"><%= h3_text %></a>
+                    </li>
+                  <% end %>
+                </ul>
+              <% end %>
+            </li>
+          <% end %>
+        </ul>
+      <% end %>
+    </li>
+    <% } %>
+    <li>
+      <a class="doc-index-page doc-index-external" target="_blank" href="https://deepwiki.com/symbiota-coop/dandelion">Ask on DeepWiki</a>
+    </li>
+  </ul>
+</nav>

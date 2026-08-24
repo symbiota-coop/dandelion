@@ -4,6 +4,42 @@ Dandelion::App.helpers do
     markdown.render(text)
   end
 
+  def docs_html(html)
+    doc = Nokogiri::HTML.fragment(html)
+
+    doc.css('h2, h3').each do |heading|
+      heading['id'] = heading.text.parameterize
+    end
+
+    doc.css('.raw-html-embed').each do |embed|
+      quotes = []
+      node = embed.next_element
+      while node && node.name == 'blockquote'
+        quotes << node
+        node = node.next_element
+      end
+      next if quotes.empty?
+
+      details = Nokogiri::XML::Node.new('details', embed.document)
+      details['class'] = 'doc-transcript'
+      summary = Nokogiri::XML::Node.new('summary', embed.document)
+      summary.content = 'Show transcript'
+      details.add_child(summary)
+      quotes.first.add_previous_sibling(details)
+      quotes.each { |quote| details.add_child(quote) }
+    end
+
+    doc.css('table').each do |table|
+      table['class'] = ['table', 'table-bordered', table['class']].compact.join(' ')
+      wrapper = Nokogiri::XML::Node.new('div', table.document)
+      wrapper['class'] = 'doc-table-wrap'
+      table.add_previous_sibling(wrapper)
+      wrapper.add_child(table)
+    end
+
+    doc.to_html
+  end
+
   def timeago(time)
     %(<abbr class="timeago" title="#{time.iso8601}">#{time}</abbr>).html_safe
   end
