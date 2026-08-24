@@ -109,16 +109,16 @@
                  a_active_class: '' %>
     </li>
   <% end %>
-  <li class="<%= 'active' if request.path.starts_with?('/docs') %>">
-    <a href="/docs" data-toggle="tooltip" title="How to use Dandelion" data-placement="right">
-      <i class="bi bi-question-circle-fill"></i>
-      <span class="nav-link-text">How to use Dandelion</span>
-    </a>
-  </li>
   <li class="<%= 'active' if request.path == '/books' || request.path == '/films' %>">
     <a href="/books" data-toggle="tooltip" title="Library" data-placement="right">
       <i class="bi bi-book"></i>
       <span class="nav-link-text">Library</span>
+    </a>
+  </li>
+  <li class="<%= 'active' if request.path.starts_with?('/docs') %>">
+    <a href="/docs" data-toggle="tooltip" title="Help" data-placement="right">
+      <i class="bi bi-question-circle-fill"></i>
+      <span class="nav-link-text">Help</span>
     </a>
   </li>
   <li class="<%= 'active' if request.path == '/contact' %>">
