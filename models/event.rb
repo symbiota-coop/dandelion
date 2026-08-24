@@ -335,6 +335,14 @@ class Event
     end
   end
 
+  def admin_list_hash
+    {
+      id: id.to_s,
+      name: "#{name} (#{concise_when_details(nil)})",
+      slug: slug
+    }
+  end
+
   def refresh_sold_out_cache_and_notify_waitlist
     was_sold_out = sold_out_cache.nil? ? sold_out? : sold_out_cache
     now_sold_out = sold_out?

@@ -40,6 +40,16 @@ class Account
     true if privacyable.in?(%i[organisations local_groups activities gatherings])
   end
 
+  def api_hash
+    {
+      id: id.to_s,
+      name: name,
+      username: username,
+      email: email,
+      url: "#{ENV['BASE_URI']}/u/#{username}"
+    }
+  end
+
   def self.permitted_attributes
     %w[
       name username email image remove_image location phone website

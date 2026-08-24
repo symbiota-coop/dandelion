@@ -112,6 +112,26 @@ class Ticket
     account && (!ticket.order || order_email_viewer || (order_email_viewer.nil? && Order.email_viewer?(ticket.order, account)))
   end
 
+  def api_hash(viewer)
+    email_visible = Ticket.email_viewer?(self, viewer)
+    {
+      id: id.to_s,
+      name: account ? account.name : '',
+      firstname: account ? account.firstname : '',
+      lastname: account ? account.lastname : '',
+      email: email_visible && account ? account.email : '',
+      ordered_for_name: name,
+      ordered_for_email: email_visible ? email : '',
+      ticket_type: ticket_type.try(:name),
+      price: discounted_price,
+      currency: currency,
+      checked_in: checked_in,
+      checked_in_at: checked_in_at&.iso8601,
+      order_id: order_id&.to_s,
+      created_at: created_at.iso8601
+    }
+  end
+
   def self.currencies
     CURRENCY_OPTIONS
   end

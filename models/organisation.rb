@@ -112,6 +112,14 @@ class Organisation
     banned_emails ? banned_emails.split("\n").map(&:strip) : []
   end
 
+  def admin_events
+    events_including_cohosted.without_heavy_fields.order('start_time desc')
+  end
+
+  def recent_followers
+    organisationships.only(:account_id, :created_at).includes(:account).and(:created_at.gte => 1.day.ago).order('created_at desc')
+  end
+
   after_create do
     notifications_as_notifiable.create! circle: account, type: 'created_organisation'
 

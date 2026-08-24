@@ -1,7 +1,7 @@
 Dandelion::App.controller do
   before do
     @docs_dir = File.expand_path('app/views/docs/md', Padrino.root)
-    @doc_order = %w[events organisations gatherings mailer zapier mcp].freeze
+    @doc_order = %w[events organisations gatherings mailer integrations].freeze
   end
 
   get '/docs/question' do
@@ -34,6 +34,8 @@ Dandelion::App.controller do
   end
 
   get '/docs/:slug' do
+    redirect '/docs/integrations' if %w[zapier mcp].include?(params[:slug])
+
     path = File.join(@docs_dir, "#{params[:slug]}.md")
     halt 404 unless File.exist?(path) && @doc_order.include?(params[:slug])
 
@@ -53,7 +55,7 @@ Dandelion::App.controller do
       headings
     end
 
-    doc_display_name = ->(slug) { slug.to_s == 'mcp' ? 'MCP' : slug.to_s.humanize }
+    doc_display_name = ->(slug) { slug.to_s == 'integrations' ? 'Zapier & MCP' : slug.to_s.humanize }
     @doc_page = { slug: params[:slug], name: doc_display_name.(params[:slug]), raw_content: raw, html_body: md(raw), headings: extract_headings.call(raw) }
 
     @doc_pages = @doc_order.filter_map do |slug|

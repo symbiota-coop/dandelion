@@ -29,6 +29,17 @@ class Organisationship
     Fragment.and(key: "/organisations/carousel/#{account_id}").destroy_all
   end
 
+  def api_hash
+    {
+      id: id.to_s,
+      name: account.name,
+      firstname: account.firstname,
+      lastname: account.lastname,
+      email: account.email,
+      created_at: created_at.iso8601
+    }
+  end
+
   # Geocoder
   geocoded_by :monthly_donation_postcode
 

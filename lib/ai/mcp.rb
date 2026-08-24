@@ -24,6 +24,9 @@ module Dandelion
       }
     }.freeze
 
+    AUTH_REQUIRED_MESSAGE = 'Authentication required. Provide your API key as a Bearer token.'
+    BEARER_PATTERN = /\ABearer\s+(\S+)\z/i
+
     def self.config_for(model_class)
       MODEL_CONFIGS[model_class.name]
     end
@@ -75,14 +78,132 @@ module Dandelion
       ::MCP::Tool::Response.new([{ type: 'text', text: result.to_json }])
     end
 
+    def self.account_from_request(rack_request)
+      header = rack_request.get_header('HTTP_AUTHORIZATION')
+      return nil if header.blank?
+
+      match = header.match(BEARER_PATTERN)
+      return :invalid unless match
+
+      Account.find_by(api_key: match[1]) || :invalid
+    end
+
+    def self.unauthorized_response
+      [
+        401,
+        {
+          'Content-Type' => 'application/json',
+          'WWW-Authenticate' => 'Bearer'
+        },
+        [{ error: 'invalid_token', error_description: 'Invalid API key' }.to_json]
+      ]
+    end
+
+    def self.current_account_from(server_context)
+      return unless server_context.respond_to?(:[])
+
+      server_context[:current_account]
+    end
+
+    def self.tool_text(text, error: false)
+      ::MCP::Tool::Response.new([{ type: 'text', text: text }], error: error)
+    end
+
+    def self.tool_json(payload)
+      tool_text(payload.to_json)
+    end
+
+    def self.tool_error(message)
+      tool_text(message, error: true)
+    end
+
+    def self.with_account(server_context)
+      account = current_account_from(server_context)
+      return yield(account) if account
+
+      tool_error(AUTH_REQUIRED_MESSAGE)
+    end
+
+    def self.find_event(slug: nil, id: nil)
+      if id.present?
+        Event.find(id)
+      elsif slug.present?
+        Event.find_by(slug: slug)
+      end
+    end
+
+    def self.find_organisation(slug: nil, id: nil)
+      if id.present?
+        Organisation.find(id)
+      elsif slug.present?
+        Organisation.find_by(slug: slug)
+      end
+    end
+
+    def self.with_event_admin(server_context, slug: nil, id: nil)
+      with_account(server_context) do |account|
+        if slug.blank? && id.blank?
+          next tool_error('Provide event slug or id')
+        end
+
+        event = find_event(slug: slug, id: id)
+        next tool_error('Event not found') unless event
+        next tool_error('You do not have access to this event') unless Event.admin?(event, account)
+
+        yield(account, event)
+      end
+    end
+
+    def self.with_organisation_admin(server_context, slug: nil, id: nil)
+      with_account(server_context) do |account|
+        if slug.blank? && id.blank?
+          next tool_error('Provide organisation slug or id')
+        end
+
+        organisation = find_organisation(slug: slug, id: id)
+        next tool_error('Organisation not found') unless organisation
+        next tool_error('You do not have access to this organisation') unless Organisation.admin?(organisation, account)
+
+        yield(account, organisation)
+      end
+    end
+
+    def self.perform_get_me(server_context: nil)
+      with_account(server_context) do |account|
+        tool_json(account.api_hash)
+      end
+    end
+
+    def self.perform_get_organisation_events(server_context: nil, slug: nil, id: nil)
+      with_organisation_admin(server_context, slug: slug, id: id) do |_account, organisation|
+        tool_json(organisation.admin_events.map(&:admin_list_hash))
+      end
+    end
+
+    def self.perform_get_organisation_followers(server_context: nil, slug: nil, id: nil)
+      with_organisation_admin(server_context, slug: slug, id: id) do |_account, organisation|
+        tool_json(organisation.recent_followers.map(&:api_hash))
+      end
+    end
+
+    def self.perform_get_event_orders(server_context: nil, slug: nil, id: nil)
+      with_event_admin(server_context, slug: slug, id: id) do |account, event|
+        orders = event.orders.complete.includes(:account).order('created_at desc')
+        tool_json(orders.map { |order| order.api_hash(account) })
+      end
+    end
+
+    def self.perform_get_event_tickets(server_context: nil, slug: nil, id: nil)
+      with_event_admin(server_context, slug: slug, id: id) do |account, event|
+        tickets = event.tickets.complete.includes(:account, :ticket_type, :order).order('created_at desc')
+        tool_json(tickets.map { |ticket| ticket.api_hash(account) })
+      end
+    end
+
     def self.perform_get_upcoming_organisation_events(slug: nil, id: nil, from: nil, to: nil, limit: nil)
       return ::MCP::Tool::Response.new([{ type: 'text', text: 'Provide organisation slug or id' }], error: true) if slug.blank? && id.blank?
 
-      organisation = if id.present?
-                       Organisation.find(id)
-                     elsif slug.present?
-                       Organisation.find_by(slug: slug)
-                     end
+      organisation = find_organisation(slug: slug, id: id)
 
       return ::MCP::Tool::Response.new([{ type: 'text', text: 'Organisation not found' }], error: true) unless organisation
 
@@ -172,6 +293,72 @@ module Dandelion
           define_singleton_method(:call) do |limit: nil, _server_context: {}|
             Dandelion::MCP.perform_get_trending_events(limit: limit)
           end
+        end,
+        Class.new(::MCP::Tool) do
+          tool_name 'get_me_tool'
+          title 'Get Me'
+          description 'Get the authenticated Dandelion account. Requires a Bearer API key.'
+          annotations(read_only_hint: true, destructive_hint: false)
+
+          define_singleton_method(:call) do |server_context: {}|
+            Dandelion::MCP.perform_get_me(server_context: server_context)
+          end
+        end,
+        Class.new(::MCP::Tool) do
+          tool_name 'get_organisation_events_tool'
+          title 'Get Organisation Events'
+          description 'Get all events hosted or cohosted by an organisation you admin, by slug or ID. Requires a Bearer API key.'
+          input_schema(properties: {
+                         slug: { type: 'string', description: 'Organisation slug' },
+                         id: { type: 'string', description: 'Organisation ID' }
+                       })
+          annotations(read_only_hint: true, destructive_hint: false)
+
+          define_singleton_method(:call) do |slug: nil, id: nil, server_context: {}|
+            Dandelion::MCP.perform_get_organisation_events(server_context: server_context, slug: slug, id: id)
+          end
+        end,
+        Class.new(::MCP::Tool) do
+          tool_name 'get_organisation_followers_tool'
+          title 'Get Organisation Followers'
+          description 'Get organisation followers from the last 24 hours for an organisation you admin, by slug or ID. Requires a Bearer API key.'
+          input_schema(properties: {
+                         slug: { type: 'string', description: 'Organisation slug' },
+                         id: { type: 'string', description: 'Organisation ID' }
+                       })
+          annotations(read_only_hint: true, destructive_hint: false)
+
+          define_singleton_method(:call) do |slug: nil, id: nil, server_context: {}|
+            Dandelion::MCP.perform_get_organisation_followers(server_context: server_context, slug: slug, id: id)
+          end
+        end,
+        Class.new(::MCP::Tool) do
+          tool_name 'get_event_orders_tool'
+          title 'Get Event Orders'
+          description 'Get all completed orders for a Dandelion event you admin, by slug or ID. Requires a Bearer API key.'
+          input_schema(properties: {
+                         slug: { type: 'string', description: 'Event slug' },
+                         id: { type: 'string', description: 'Event ID' }
+                       })
+          annotations(read_only_hint: true, destructive_hint: false)
+
+          define_singleton_method(:call) do |slug: nil, id: nil, server_context: {}|
+            Dandelion::MCP.perform_get_event_orders(server_context: server_context, slug: slug, id: id)
+          end
+        end,
+        Class.new(::MCP::Tool) do
+          tool_name 'get_event_tickets_tool'
+          title 'Get Event Tickets'
+          description 'Get all completed tickets for a Dandelion event you admin, by slug or ID. Requires a Bearer API key.'
+          input_schema(properties: {
+                         slug: { type: 'string', description: 'Event slug' },
+                         id: { type: 'string', description: 'Event ID' }
+                       })
+          annotations(read_only_hint: true, destructive_hint: false)
+
+          define_singleton_method(:call) do |slug: nil, id: nil, server_context: {}|
+            Dandelion::MCP.perform_get_event_tickets(server_context: server_context, slug: slug, id: id)
+          end
         end
       ].freeze
     end
@@ -182,9 +369,17 @@ module Dandelion
           name: 'dandelion',
           title: 'Dandelion',
           version: '1.0.0',
-          instructions: 'Tools for querying Dandelion accounts, events, organisations and gatherings.',
+          instructions: 'Tools for querying Dandelion accounts, events, organisations and gatherings. Authenticated tools such as get_me_tool, get_organisation_events_tool, get_organisation_followers_tool, get_event_orders_tool and get_event_tickets_tool require a Bearer API key.',
           tools: tools
         )
+        def s.server_context
+          Thread.current[:mcp_server_context]
+        end
+
+        def s.server_context=(value)
+          Thread.current[:mcp_server_context] = value
+        end
+
         ::MCP::Server::Transports::StreamableHTTPTransport.new(
           s,
           stateless: true,
@@ -209,7 +404,13 @@ module Dandelion
     end
 
     def self.handle_http_request(rack_request)
+      account = account_from_request(rack_request)
+      return unauthorized_response if account == :invalid
+
+      server.server_context = { current_account: account }
       http_transport.handle_request(rack_request)
+    ensure
+      server.server_context = nil
     end
   end
 end

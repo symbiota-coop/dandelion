@@ -110,6 +110,25 @@ class Order
     )
   end
 
+  def api_hash(viewer)
+    email_visible = Order.email_viewer?(self, viewer)
+    {
+      id: id.to_s,
+      name: account ? account.name : '',
+      firstname: account ? account.firstname : '',
+      lastname: account ? account.lastname : '',
+      email: email_visible && account ? account.email : '',
+      value: value,
+      currency: currency,
+      opt_in_organisation: opt_in_organisation,
+      opt_in_facilitator: opt_in_facilitator,
+      hear_about: hear_about,
+      via: via,
+      answers: answers,
+      created_at: created_at.iso8601
+    }
+  end
+
   def circle
     account
   end
