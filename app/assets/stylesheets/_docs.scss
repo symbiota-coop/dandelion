@@ -127,8 +127,12 @@
     font-family: $header_font_family;
   }
 
+  &[open] summary {
+    margin-bottom: 1rem;
+  }
+
   blockquote {
-    margin: 0.75rem 0 0;
+    margin: 0;
     font-size: 0.95em;
     line-height: 1.45;
   }
