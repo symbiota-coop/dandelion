@@ -66,6 +66,14 @@ class Event
     find_by(slug: slug)
   end
 
+  def self.find_by_slug_or_id(slug: nil, id: nil)
+    if id.present?
+      find(id)
+    elsif slug.present?
+      find_by(slug: slug)
+    end
+  end
+
   def self.publicly_visible
     self.and(secret: false)
   end
@@ -341,6 +349,14 @@ class Event
       name: "#{name} (#{concise_when_details(nil)})",
       slug: slug
     }
+  end
+
+  def admin_orders
+    orders.complete.includes(:account).order('created_at desc')
+  end
+
+  def admin_tickets
+    tickets.complete.includes(:account, :ticket_type, :order).order('created_at desc')
   end
 
   def refresh_sold_out_cache_and_notify_waitlist

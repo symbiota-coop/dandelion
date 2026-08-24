@@ -29,6 +29,14 @@ class Organisation
     find_by(slug: slug)
   end
 
+  def self.find_by_slug_or_id(slug: nil, id: nil)
+    if id.present?
+      find(id)
+    elsif slug.present?
+      find_by(slug: slug)
+    end
+  end
+
   def self.prewarmed_image_derivative_sizes
     %w[200x200 400x400 500x500#]
   end

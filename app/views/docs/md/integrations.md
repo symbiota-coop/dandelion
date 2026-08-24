@@ -11,6 +11,7 @@ The [Dandelion Zapier integration](https://zapier.com/apps/dandelion/) lets you 
 | Trigger | Description | Endpoint |
 |---------|-------------|----------|
 | Order Confirmed | Triggers when someone purchases tickets to your event | `/z/organisation_event_orders` |
+| Ticket Confirmed | Triggers when a ticket is issued for your event | `/z/organisation_event_tickets` |
 | New Follower | Triggers when someone follows your organisation | `/z/organisation_followers` |
 
 Zapier also calls `/z` to identify the signed-in account and `/z/organisation_events` to list events you can pick from.
@@ -76,7 +77,7 @@ Returns the authenticated account.
 
 Returns all events hosted or cohosted by an organisation you admin, most recent first.
 
-- Zapier: `GET /z/organisation_events?organisation_slug=my-organisation`
+- Zapier: `GET /z/organisation_events` with organisation `slug` or `id` (`organisation_slug` / `organisation_id` also work)
 - MCP: `get_organisation_events_tool` with organisation `slug` or `id`
 
 ```json
@@ -93,7 +94,7 @@ Returns all events hosted or cohosted by an organisation you admin, most recent 
 
 Returns new followers from the last 24 hours, most recent first.
 
-- Zapier: `GET /z/organisation_followers?organisation_slug=my-organisation`
+- Zapier: `GET /z/organisation_followers` with organisation `slug` or `id` (`organisation_slug` / `organisation_id` also work)
 - MCP: `get_organisation_followers_tool` with organisation `slug` or `id`
 
 ```json
@@ -113,7 +114,7 @@ Returns new followers from the last 24 hours, most recent first.
 
 Returns all completed orders for an event you admin, most recent first.
 
-- Zapier: `GET /z/organisation_event_orders?organisation_slug=my-organisation&event_id=507f1f77bcf86cd799439012`
+- Zapier: `GET /z/organisation_event_orders` with event `slug` or `id` (`event_slug` / `event_id` also work)
 - MCP: `get_event_orders_tool` with event `slug` or `id`
 
 ```json
@@ -140,8 +141,9 @@ Returns all completed orders for an event you admin, most recent first.
 
 ## Event tickets
 
-Returns all completed tickets for an event you admin, most recent first. MCP only.
+Returns all completed tickets for an event you admin, most recent first.
 
+- Zapier: `GET /z/organisation_event_tickets` with event `slug` or `id` (`event_slug` / `event_id` also work)
 - MCP: `get_event_tickets_tool` with event `slug` or `id`
 
 ```json

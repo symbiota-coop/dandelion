@@ -105,6 +105,20 @@ Dandelion::App.helpers do
     end
   end
 
+  def organisation_from_params
+    Organisation.find_by_slug_or_id(
+      slug: params[:organisation_slug] || params[:slug],
+      id: params[:organisation_id] || params[:id]
+    )
+  end
+
+  def event_from_params
+    Event.find_by_slug_or_id(
+      slug: params[:event_slug] || params[:slug],
+      id: params[:event_id] || params[:id]
+    )
+  end
+
   def view_base_params
     params.to_h.reject { |k, v| %w[captures format search name display].include?(k) || v == false }
   end

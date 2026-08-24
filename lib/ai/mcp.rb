@@ -124,29 +124,13 @@ module Dandelion
       tool_error(AUTH_REQUIRED_MESSAGE)
     end
 
-    def self.find_event(slug: nil, id: nil)
-      if id.present?
-        Event.find(id)
-      elsif slug.present?
-        Event.find_by(slug: slug)
-      end
-    end
-
-    def self.find_organisation(slug: nil, id: nil)
-      if id.present?
-        Organisation.find(id)
-      elsif slug.present?
-        Organisation.find_by(slug: slug)
-      end
-    end
-
     def self.with_event_admin(server_context, slug: nil, id: nil)
       with_account(server_context) do |account|
         if slug.blank? && id.blank?
           next tool_error('Provide event slug or id')
         end
 
-        event = find_event(slug: slug, id: id)
+        event = Event.find_by_slug_or_id(slug: slug, id: id)
         next tool_error('Event not found') unless event
         next tool_error('You do not have access to this event') unless Event.admin?(event, account)
 
@@ -160,7 +144,7 @@ module Dandelion
           next tool_error('Provide organisation slug or id')
         end
 
-        organisation = find_organisation(slug: slug, id: id)
+        organisation = Organisation.find_by_slug_or_id(slug: slug, id: id)
         next tool_error('Organisation not found') unless organisation
         next tool_error('You do not have access to this organisation') unless Organisation.admin?(organisation, account)
 
@@ -188,22 +172,20 @@ module Dandelion
 
     def self.perform_get_event_orders(server_context: nil, slug: nil, id: nil)
       with_event_admin(server_context, slug: slug, id: id) do |account, event|
-        orders = event.orders.complete.includes(:account).order('created_at desc')
-        tool_json(orders.map { |order| order.api_hash(account) })
+        tool_json(event.admin_orders.map { |order| order.api_hash(account) })
       end
     end
 
     def self.perform_get_event_tickets(server_context: nil, slug: nil, id: nil)
       with_event_admin(server_context, slug: slug, id: id) do |account, event|
-        tickets = event.tickets.complete.includes(:account, :ticket_type, :order).order('created_at desc')
-        tool_json(tickets.map { |ticket| ticket.api_hash(account) })
+        tool_json(event.admin_tickets.map { |ticket| ticket.api_hash(account) })
       end
     end
 
     def self.perform_get_upcoming_organisation_events(slug: nil, id: nil, from: nil, to: nil, limit: nil)
       return ::MCP::Tool::Response.new([{ type: 'text', text: 'Provide organisation slug or id' }], error: true) if slug.blank? && id.blank?
 
-      organisation = find_organisation(slug: slug, id: id)
+      organisation = Organisation.find_by_slug_or_id(slug: slug, id: id)
 
       return ::MCP::Tool::Response.new([{ type: 'text', text: 'Organisation not found' }], error: true) unless organisation
 
