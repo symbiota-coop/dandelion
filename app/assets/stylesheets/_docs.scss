@@ -17,12 +17,12 @@
 }
 
 .docs-header-select {
-  .doc-index-select {
+  select.form-control:not([size]):not([multiple]) {
     font-family: $header_font_family;
     font-size: 1.35rem;
     font-weight: bold;
     height: auto;
-    padding: 0.35rem 0.6rem;
+    padding: 0.25rem 0.5rem;
     margin: 0 0 0.5rem;
   }
 }
