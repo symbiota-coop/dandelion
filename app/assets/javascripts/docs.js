@@ -28,11 +28,16 @@
   positionStickyIndex()
   $(window).on('resize', positionStickyIndex)
 
+  var scrollThreshold = function() {
+    var heading = $('#doc-body').find('h1, h2, h3')[0]
+    var margin = heading ? parseFloat(window.getComputedStyle(heading).scrollMarginTop) : 0
+    return (margin || headerHeight() + 12) + 8
+  }
   var updateActiveHeading = function() {
     var headings = $('#doc-body').find('h1, h2, h3')
     if (!headings.length) return
 
-    var threshold = headerHeight() + 12
+    var threshold = scrollThreshold()
     var current = headings[0]
     headings.each(function() {
       if (this.getBoundingClientRect().top - threshold <= 0) current = this
@@ -189,9 +194,14 @@
   })
   $(document).on('click', '.doc-search-result', function() {
     var url = new URL(this.href, location.href)
-    if (url.pathname === location.pathname) {
-      $inputs.val('')
-      stopSearch()
-    }
+    if (url.pathname !== location.pathname) return
+    $inputs.val('')
+    stopSearch()
+    var heading = document.getElementById(decodeURIComponent((url.hash || '').slice(1)))
+    if (!heading) return
+    requestAnimationFrame(function() {
+      heading.scrollIntoView()
+      updateActiveHeading()
+    })
   })
 })()
