@@ -213,9 +213,12 @@ class Organisation
     EventPaymentMethod.all.any? { |pm| pm.org_condition&.call(self) }
   end
 
+  def stripe_connect?
+    stripe_connect_json && !stripe_pk
+  end
+
   def stripe_connect_only?
-    return false unless stripe_connect_json
-    return false if stripe_pk
+    return false unless stripe_connect?
 
     EventPaymentMethod.all.none? do |pm|
       pm.name != 'stripe' && pm.org_condition&.call(self)
@@ -239,7 +242,7 @@ class Organisation
   end
 
   def donations_to_dandelion?
-    stripe_connect_only? && !paid_up
+    stripe_connect? && !paid_up
   end
 
   def stripe_user_id

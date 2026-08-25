@@ -85,7 +85,7 @@ Dandelion::App.helpers do
     end
     raise Order::NoTickets if order.tickets.empty?
 
-    order.donations.create!(event: @event, account: @account, amount: ticket_form[:donation_amount]) if ticket_form[:donation_amount].to_f > 0
+    order.donations.create!(event: @event, account: @account, amount: ticket_form[:donation_amount]) if ticket_form[:donation_amount].to_f > 0 && !ignore_dandelion_donation?(details_form)
 
     order.filter_discounts if order.discount_code && order.discount_code.filter
     order.apply_credit if current_account
@@ -109,14 +109,18 @@ Dandelion::App.helpers do
       opt_in_organisation: account_data[:opt_in_organisation] == '1' || (account_data[:opt_in_organisation].is_a?(Array) && account_data[:opt_in_organisation].include?('1')),
       opt_in_facilitator: account_data[:opt_in_facilitator].is_a?(Array) && account_data[:opt_in_facilitator].include?('1'),
       answers: question_answer_pairs(details_form),
-      application_fee_paid_to_dandelion: !@event.revenue_sharer_organisationship && @event.donations_to_dandelion?,
-      donation_via_modal: ticket_form[:donation_via_modal].to_s == '1'
+      application_fee_paid_to_dandelion: !ignore_dandelion_donation?(details_form) && !@event.revenue_sharer_organisationship && @event.donations_to_dandelion?,
+      donation_via_modal: !ignore_dandelion_donation?(details_form) && ticket_form[:donation_via_modal].to_s == '1'
     }
 
     ticket_attrs.each { |attr| attributes[attr] = ticket_form[attr] }
     account_attrs.each { |attr| attributes[attr] = account_data[attr] }
 
     attributes
+  end
+
+  def ignore_dandelion_donation?(details_form)
+    @event.donations_to_dandelion? && details_form[:payment_method].to_s != 'stripe'
   end
 
 end

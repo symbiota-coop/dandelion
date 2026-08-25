@@ -425,10 +425,18 @@ $(function () {
     $('#details form button[data-payment-method-clicked] i').show()
 
     const handlers = eventPaymentHandlers(config)
-    const method = $('input[type=hidden][name=payment_method]:not(:disabled)').val()
+    let method = $('input[type=hidden][name=payment_method]:not(:disabled)').val()
+    const ticketForm = $('#ticket-types form').serializeObject()
+    if (config.donationsToDandelion && method !== 'stripe') {
+      ticketForm.donation_amount = ''
+      ticketForm.donation_via_modal = '0'
+      if ((priceWithoutDonation() - credit() - fixedDiscount()) <= 0) {
+        method = 'rsvp'
+      }
+    }
 
     $.post('/events/' + config.eventId + '/purchase', {
-      ticketForm: $('#ticket-types form').serializeObject(),
+      ticketForm: ticketForm,
       detailsForm: $('#details form').serializeObject()
     }, function (data) {
       handlers[method](data)
