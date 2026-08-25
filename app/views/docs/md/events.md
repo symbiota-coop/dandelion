@@ -126,7 +126,9 @@ Ticket groups are created on the Tickets tab when editing your event. To assign 
 
 ## Cancelling/deleting an event
 
-Click the event dropdown, and select 'Delete event'.
+Click the event dropdown and select **Delete event**. If the event has orders, email ticketholders first to let them know.
+
+You can then **Delete event and attempt to refund all orders**, or **Delete event without refunding orders** if you have already refunded people (or don't intend to). See [Refunds](#refunds) for refunding individual tickets or orders instead of deleting the event.
 
 ## Where did my secret/locked event go?
 
@@ -234,6 +236,25 @@ The original ticket PDF will still work, so you can simply forward it to the new
 **Event organisers that have received a request to transfer a ticket:** Click the event dropdown, go to the Tickets page, and select 'Change name or email' in the Actions menu for the ticket(s).
 
 If you want to resend the ticket PDF to the new email address, after entering the new email, select 'Resend single ticket' in the Actions menu.
+
+## Refunds
+
+Refunds for Stripe and GoCardless payments can be issued from the event's Tickets or Orders pages. The money goes back to the original payment method.
+
+1. Click the event dropdown and go to **Tickets** or **Orders**.
+2. Open **Actions** next to the ticket or order.
+3. Choose:
+   - **Remove and refund ticket** — refunds that ticket's price and removes it. The rest of the order stays in place.
+   - **Remove and refund order** — refunds the whole payment (including any donation on the order) and removes the order.
+   - **Remove ticket** / **Remove order** — removes without refunding. Use this if you already refunded via Stripe or GoCardless, or the payment was not taken through Stripe/GoCardless.
+
+You'll be asked to confirm. The refund options only appear for Stripe and GoCardless payments. For Open Collective, crypto, complimentary, or cash tickets, remove the ticket or order here and refund via that platform if needed.
+
+If a refund fails, you'll get an email with the error. You can retry from your [Stripe](https://dashboard.stripe.com/refunds) or [GoCardless](https://manage.gocardless.com/) dashboard.
+
+GoCardless instalment payments should be refunded from the GoCardless dashboard (see [Allowing people to pay in instalments](#allowing-people-to-pay-in-instalments)).
+
+Attendees cannot refund themselves. They need to contact you, or [resell the ticket](#ticket-resales) if you have enabled resales.
 
 ## Ticket resales
 
