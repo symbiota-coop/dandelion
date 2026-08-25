@@ -1,9 +1,4 @@
 Dandelion::App.controller do
-  before do
-    @docs_dir = File.expand_path('app/views/docs/md', Padrino.root)
-    @doc_order = %w[events organisations gatherings mailer integrations].freeze
-  end
-
   get '/docs/question' do
     @sent = true
     partial :'docs/question'
@@ -28,44 +23,34 @@ Dandelion::App.controller do
   end
 
   get '/docs' do
-    first = @doc_order.find { |slug| File.exist?(File.join(@docs_dir, "#{slug}.md")) }
-    halt 404 if first.nil?
-    redirect "/docs/#{first}"
+    redirect "/docs/events#{'?' + request.query_string unless request.query_string.empty?}"
   end
 
   get '/docs/:slug' do
     redirect '/docs/integrations' if %w[zapier mcp].include?(params[:slug])
 
-    path = File.join(@docs_dir, "#{params[:slug]}.md")
-    halt 404 unless File.exist?(path) && @doc_order.include?(params[:slug])
+    names = { 'integrations' => 'Zapier & MCP' }
+    pages = %w[events organisations gatherings mailer integrations].filter_map do |slug|
+      path = File.expand_path("app/views/docs/md/#{slug}.md", Padrino.root)
+      next unless File.exist?(path)
 
-    raw = File.read(path)
+      name = names[slug] || slug.humanize
+      page = docs_html(md(File.read(path)), slug: slug, name: name)
+      { slug: slug, name: name, html_body: page[:html], headings: page[:headings], sections: page[:sections] }
+    end
 
-    extract_headings = lambda do |content|
-      headings = []
-      current_h2 = nil
-      content.each_line do |line|
-        if line =~ /^## (.+)$/
-          current_h2 = { text: ::Regexp.last_match(1).strip, h3s: [] }
-          headings << current_h2
-        elsif line =~ /^### (.+)$/ && current_h2
-          current_h2[:h3s] << ::Regexp.last_match(1).strip
-        end
+    @doc_page = pages.find { |page| page[:slug] == params[:slug] }
+    halt 404 unless @doc_page
+
+    @doc_pages = pages.map { |page| page.slice(:slug, :name) }
+    @doc_search_index = pages.each_with_index.flat_map do |page, page_index|
+      page[:sections].map do |section|
+        href = section[:headingId] == page[:slug] ? "/docs/#{page[:slug]}" : "/docs/#{page[:slug]}##{section[:headingId]}"
+        section.merge(slug: page[:slug], pageName: page[:name], pageIndex: page_index, href: href)
       end
-      headings
     end
 
-    doc_display_name = ->(slug) { slug.to_s == 'integrations' ? 'Zapier & MCP' : slug.to_s.humanize }
-    @doc_page = { slug: params[:slug], name: doc_display_name.(params[:slug]), raw_content: raw, html_body: md(raw), headings: extract_headings.call(raw) }
-
-    @doc_pages = @doc_order.filter_map do |slug|
-      p = File.join(@docs_dir, "#{slug}.md")
-      next unless File.exist?(p)
-
-      r = File.read(p)
-      { slug: slug, name: doc_display_name.(slug), headings: extract_headings.call(r) }
-    end
-
+    @title = 'Help'
     erb :'docs/doc_page'
   end
 end

@@ -1,18 +1,14 @@
 <nav class="doc-index" aria-label="On this page">
-  <% if @doc_page && @doc_page[:headings].any? %>
+  <% if @doc_page[:headings].any? %>
     <ul class="doc-index-headings">
       <% @doc_page[:headings].each do |heading| %>
-        <% h2_text = heading[:text].to_s.gsub('\\', '') %>
-        <% h2_id = h2_text.parameterize %>
         <li>
-          <a href="/docs/<%= @doc_page[:slug] %>#<%= h2_id %>" class="doc-link" data-heading-id="<%= h2_id %>"><%= h2_text %></a>
+          <a href="/docs/<%= @doc_page[:slug] %>#<%= heading[:id] %>" class="doc-link" data-heading-id="<%= heading[:id] %>"><%= heading[:text] %></a>
           <% if heading[:h3s].any? %>
             <ul class="doc-index-h3s">
               <% heading[:h3s].each do |h3| %>
-                <% h3_text = h3.to_s.gsub('\\', '') %>
-                <% h3_id = h3_text.parameterize %>
                 <li>
-                  <a href="/docs/<%= @doc_page[:slug] %>#<%= h3_id %>" class="doc-link" data-heading-id="<%= h3_id %>"><%= h3_text %></a>
+                  <a href="/docs/<%= @doc_page[:slug] %>#<%= h3[:id] %>" class="doc-link" data-heading-id="<%= h3[:id] %>"><%= h3[:text] %></a>
                 </li>
               <% end %>
             </ul>

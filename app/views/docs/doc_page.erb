@@ -1,106 +1,24 @@
-<script>
-  $(function() {
-    $('#doc-body pre code').each(function() { hljs.highlightElement(this) })
+<script type="application/json" id="doc-search-index"><%== @doc_search_index.to_json %></script>
+<script src="/javascripts/docs.js?<%= @cachebuster %>"></script>
 
-    var $stickyIndex = $('#sticky-index')
-    var headerHeight = function() {
-      return $('#header').outerHeight() || 0
-    }
-    var contentOffset = function() {
-      return parseInt($('.content').css('paddingTop'), 10) || 0
-    }
-
-    var positionStickyIndex = function() {
-      var top = headerHeight() + contentOffset()
-      $stickyIndex.css('top', top)
-      $stickyIndex.css('height', 'calc(100vh - ' + top + 'px)')
-    }
-    positionStickyIndex()
-    $(window).on('resize', positionStickyIndex)
-
-    var scrollToTarget = function(href) {
-      var targetId = (href || '').split('#')[1]
-      if (!targetId) return
-      var target = document.getElementById(targetId)
-      if (!target) return
-      $('html, body').animate({
-        scrollTop: $(target).offset().top - headerHeight()
-      }, 400)
-    }
-
-    $(document).on('click', '.doc-link', function(e) {
-      e.preventDefault()
-      var href = $(this).attr('href')
-      history.pushState(null, null, href)
-      $(this).closest('details.doc-toc-mobile').removeAttr('open')
-      scrollToTarget(href)
-    })
-
-    $(window).on('popstate', function() {
-      if (window.location.hash) scrollToTarget(window.location.hash)
-    })
-
-    if (window.location.hash) {
-      window.scrollTo(0, 0)
-      scrollToTarget(window.location.hash)
-    }
-
-    var ticking = false
-    var updateActiveHeading = function() {
-      var headings = $('#doc-body h2, #doc-body h3')
-      if (!headings.length) return
-
-      var threshold = headerHeight() + 12
-      var current = headings[0]
-      headings.each(function() {
-        if (this.getBoundingClientRect().top - threshold <= 0) current = this
-      })
-      if (!current || !current.id) return
-
-      var $links = $('.doc-link')
-      $links.removeClass('is-active')
-      var $active = $links.filter('[data-heading-id="' + current.id + '"]')
-      $active.addClass('is-active')
-
-      if ($active.length && $stickyIndex.length) {
-        var container = $stickyIndex[0]
-        var el = $active.filter(function() { return $.contains(container, this) })[0]
-        if (!el) return
-        var scrollParent = el.closest('.doc-index-headings') || container
-        var cr = scrollParent.getBoundingClientRect()
-        var er = el.getBoundingClientRect()
-        if (er.top < cr.top) scrollParent.scrollTop -= (cr.top - er.top + 8)
-        else if (er.bottom > cr.bottom) scrollParent.scrollTop += (er.bottom - cr.bottom + 8)
-      }
-    }
-
-    $(window).on('scroll', function() {
-      if (ticking) return
-      ticking = true
-      window.requestAnimationFrame(function() {
-        updateActiveHeading()
-        ticking = false
-      })
-    })
-    updateActiveHeading()
-  })
-</script>
-
-<div class="row">
+<div class="row" id="docs-layout">
   <div class="col-lg-3 d-none d-lg-block">
     <div class="mr-lg-3" id="sticky-index">
+      <%= partial :'docs/search', locals: { compact: true, input_id: 'doc-search-desktop' } %>
       <%= partial :'docs/select', locals: { compact: true } %>
       <%= partial :'docs/index' %>
     </div>
   </div>
   <div class="col-lg-9">
     <div class="docs-main">
-      <div class="docs-header">
-        <h1 class="d-none d-lg-block"><%= @doc_page[:name] %></h1>
-        <div class="d-lg-none docs-header-select">
+      <div class="d-lg-none docs-header">
+        <%= partial :'docs/search', locals: { input_id: 'doc-search-mobile' } %>
+        <div class="docs-header-select">
           <%= partial :'docs/select' %>
         </div>
       </div>
+
+      <div id="doc-search-results" class="doc-search-results"></div>
 
       <% if @doc_page[:headings].any? %>
         <details class="doc-toc-mobile d-lg-none">
@@ -109,18 +27,17 @@
         </details>
       <% end %>
 
-      <% if @doc_page[:raw_content].present? %>
-        <div id="doc-body">
-          <%== docs_html(@doc_page[:html_body]) %>
-        </div>
-      <% end %>
+      <div id="doc-body">
+        <h1 class="d-none d-lg-block" id="<%= @doc_page[:slug] %>"><%= @doc_page[:name] %></h1>
+        <%== @doc_page[:html_body] %>
+      </div>
 
       <% if current_account %>
-        <div class="mt-4" data-pagelet-url="/docs/question">
+        <div class="mt-4 docs-question" data-pagelet-url="/docs/question">
           <%= partial :'docs/question' %>
         </div>
       <% else %>
-        <p class="lead mt-4">
+        <p class="lead mt-4 docs-question">
           Still need support? <a href="mailto:<%=ENV['CONTACT_EMAIL']%>">Get in touch via email</a>
         </p>
       <% end %>

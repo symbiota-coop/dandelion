@@ -4,11 +4,19 @@ Dandelion::App.helpers do
     markdown.render(text)
   end
 
-  def docs_html(html)
+  def docs_html(html, slug:, name:)
     doc = Nokogiri::HTML.fragment(html)
+    headings = []
+    current = nil
 
-    doc.css('h2, h3').each do |heading|
-      heading['id'] = heading.text.parameterize
+    doc.css('h2, h3').each do |el|
+      el['id'] = el.text.parameterize
+      if el.name == 'h2'
+        current = { id: el['id'], text: el.text.strip, h3s: [] }
+        headings << current
+      elsif current
+        current[:h3s] << { id: el['id'], text: el.text.strip }
+      end
     end
 
     doc.css('.raw-html-embed').each do |embed|
@@ -37,7 +45,22 @@ Dandelion::App.helpers do
       wrapper.add_child(table)
     end
 
-    doc.to_html
+    following_text = lambda do |el|
+      parts = []
+      node = el
+      while node && !(node.element? && %w[h2 h3].include?(node.name))
+        parts << node.text if node.element?
+        node = node.next_sibling
+      end
+      parts.join(' ').gsub(/\s+/, ' ').strip
+    end
+
+    sections = [{ heading: name, headingId: slug, text: following_text.call(doc.children.first) }]
+    doc.css('h2, h3').each do |el|
+      sections << { heading: el.text.strip, headingId: el['id'], text: following_text.call(el.next_sibling) }
+    end
+
+    { html: doc.to_html, headings: headings, sections: sections }
   end
 
   def timeago(time)

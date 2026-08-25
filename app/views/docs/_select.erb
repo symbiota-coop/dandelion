@@ -1,5 +1,5 @@
 <select class="form-control <%= 'form-control-sm' if defined?(compact) && compact %> doc-index-select" aria-label="Documentation page" onchange="if (this.value !== location.pathname) location.href = this.value">
   <% @doc_pages.each do |doc_page| %>
-    <option value="/docs/<%= doc_page[:slug] %>" <%= 'selected' if @doc_page && @doc_page[:slug] == doc_page[:slug] %>><%= doc_page[:name] %></option>
+    <option value="/docs/<%= doc_page[:slug] %>" <%= 'selected' if doc_page[:slug] == @doc_page[:slug] %>><%= doc_page[:name] %></option>
   <% end %>
 </select>
