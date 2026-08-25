@@ -104,10 +104,23 @@ a.text-primary:focus {
 .btn-outline-primary:hover,
 .btn-outline-primary:focus,
 .btn-outline-primary:active,
+.btn-outline-primary:not(:disabled):not(.disabled):active,
+.btn-outline-primary:not(:disabled):not(.disabled).active,
 .show>.btn-outline-primary.dropdown-toggle {
   color: white !important;
   border-color: $theme-color !important;
   background: $theme-color !important;
+}
+
+.btn-outline-primary.disabled,
+.btn-outline-primary:disabled,
+.btn-outline-primary.disabled:hover,
+.btn-outline-primary[disabled]:hover,
+.btn-outline-primary.disabled:focus,
+.btn-outline-primary[disabled]:focus {
+  color: $theme-color !important;
+  background: transparent !important;
+  border-color: $theme-color !important;
 }
 
 // =============================================================================
