@@ -18,6 +18,10 @@ The Cursor image installs Ruby, Bundler, Foreman, MongoDB, Chromium, and ImageMa
 
 You can find documentation at app/views/docs/md. Keep it up to date.
 
+## Browser actions
+
+Always ask for permission before taking browser actions.
+
 ## Files in lib
 
 Files in lib are auto-loaded by Padrino.load!. No explicit require is necessary.
@@ -40,7 +44,7 @@ Please note that Mongo indexes are created directly in the database, and are not
 
 ## Tests
 
-Always ask permission before running tests.
+Always ask for permission before running tests.
 
 Never attempt to run the full test suite.
 
