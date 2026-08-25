@@ -21,6 +21,7 @@
 }
 
 #doc-body {
+
   h1,
   h2,
   h3 {
@@ -62,8 +63,8 @@
     margin-bottom: 0.35rem;
   }
 
-  li > ul,
-  li > ol {
+  li>ul,
+  li>ol {
     margin-top: 0.35rem;
     margin-bottom: 0.35rem;
   }
@@ -275,10 +276,20 @@
 
   .doc-search-input {
     padding-left: 1.85rem;
+
+    &:focus {
+      outline: none;
+      box-shadow: none !important;
+    }
   }
 }
 
+#docs-layout {
+  overflow-anchor: none;
+}
+
 #docs-layout.is-searching {
+
   .doc-index,
   .doc-index-select,
   .doc-toc-mobile,
@@ -297,7 +308,6 @@
 }
 
 .doc-search-count {
-  font-size: 0.9rem;
   color: $placeholder_grey;
   margin-bottom: 0.85rem;
 }

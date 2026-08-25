@@ -1,7 +1,12 @@
 /* global hljs */
 
-$(function() {
-  $('#doc-body pre code').each(function() { hljs.highlightElement(this) })
+(function() {
+  var highlightCode = function() {
+    if (!window.hljs) return
+    $('#doc-body pre code').each(function() { hljs.highlightElement(this) })
+  }
+  if (window.hljs) highlightCode()
+  else $(highlightCode)
 
   var $stickyIndex = $('#sticky-index')
   var $layout = $('#docs-layout')
@@ -136,34 +141,32 @@ $(function() {
     $results.html(html + '</ul>')
   }
 
-  var setSearchQuery = function(q) {
-    var url = new URL(window.location.href)
-    if (q) url.searchParams.set('q', q)
-    else url.searchParams.delete('q')
-    history.replaceState(null, '', url.pathname + url.search + (q ? '' : url.hash))
-  }
-
   var stopSearch = function() {
     $layout.removeClass('is-searching')
     $results.empty()
-    setSearchQuery('')
     updateActiveHeading()
   }
 
-  var runSearch = function(q) {
+  var runSearch = function(q, source) {
     q = (q || '').trim()
-    $inputs.val(q)
-    var terms = parseTerms(q)
-    if (!terms.length) {
+    $inputs.each(function() {
+      if (this !== source && this.value !== q) this.value = q
+    })
+    if (!q) {
       stopSearch()
       return
     }
+    var terms = parseTerms(q)
+    if (terms.length) renderResults(q, terms, searchDocs(terms))
+    else $results.html('<p class="text-muted mb-0">Keep typing to search.</p>')
+    var wasSearching = $layout.hasClass('is-searching')
     $layout.addClass('is-searching')
-    setSearchQuery(q)
-    renderResults(q, terms, searchDocs(terms))
+    if (wasSearching) return
+    window.scrollTo(0, 0)
+    requestAnimationFrame(function() { window.scrollTo(0, 0) })
   }
 
-  $inputs.on('input', function() { runSearch(this.value) })
+  $inputs.on('input', function() { runSearch(this.value, this) })
   $inputs.on('keydown', function(e) {
     if (e.key === 'Escape') {
       $inputs.val('')
@@ -191,7 +194,4 @@ $(function() {
       stopSearch()
     }
   })
-
-  var initialQ = new URL(window.location.href).searchParams.get('q')
-  if (initialQ) runSearch(initialQ)
-})
+})()

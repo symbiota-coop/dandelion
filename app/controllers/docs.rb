@@ -23,7 +23,7 @@ Dandelion::App.controller do
   end
 
   get '/docs' do
-    redirect "/docs/events#{'?' + request.query_string unless request.query_string.empty?}"
+    redirect '/docs/events'
   end
 
   get '/docs/:slug' do
