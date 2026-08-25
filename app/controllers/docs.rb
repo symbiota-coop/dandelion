@@ -50,7 +50,7 @@ Dandelion::App.controller do
       end
     end
 
-    @title = 'Help'
+    @title = 'Docs'
     erb :'docs/doc_page'
   end
 end
