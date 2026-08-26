@@ -95,7 +95,11 @@ class GoCardlessInstalmentTest < ActiveSupport::TestCase
     billing_request = OpenStruct.new(id: 'BRQ123')
     billing_request_flow = OpenStruct.new
     billing_requests = Object.new
-    billing_requests.define_singleton_method(:create) { |_opts| billing_request }
+    brq_params = {}
+    billing_requests.define_singleton_method(:create) do |opts|
+      brq_params.merge!(opts[:params])
+      billing_request
+    end
     billing_request_flows = Object.new
     flow_params = {}
     billing_request_flows.define_singleton_method(:create) do |opts|
@@ -110,6 +114,8 @@ class GoCardlessInstalmentTest < ActiveSupport::TestCase
 
     assert_equal 'BRQ123', order.reload.gocardless_billing_request_id
     assert_equal 'BRQ123', order.tickets.first.reload.gocardless_billing_request_id
+    assert_equal 'bacs', brq_params[:mandate_request][:scheme]
+    assert_equal true, flow_params[:lock_currency]
     assert_includes flow_params[:redirect_uri], 'billing_request_id=BRQ123'
     assert_includes flow_params[:redirect_uri], 'success=true'
     assert_includes flow_params[:exit_uri], 'billing_request_id=BRQ123'

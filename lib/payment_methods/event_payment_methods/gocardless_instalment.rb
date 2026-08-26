@@ -6,8 +6,9 @@ class EventPaymentMethod
         params: {
           mandate_request: {
             description: order.description.truncate(200),
-            currency: order.currency
-          }
+            currency: order.currency,
+            scheme: { 'GBP' => 'bacs', 'EUR' => 'sepa_core' }[order.currency]
+          }.compact
         }
       )
 
@@ -26,6 +27,7 @@ class EventPaymentMethod
         params: {
           redirect_uri: URI::DEFAULT_PARSER.escape("#{return_base}&success=true"),
           exit_uri: URI::DEFAULT_PARSER.escape("#{return_base}&cancelled=true"),
+          lock_currency: true,
           links: { billing_request: billing_request.id }
         }
       )
