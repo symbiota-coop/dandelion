@@ -432,6 +432,8 @@ $(function () {
       ticketForm.donation_via_modal = '0'
       if ((priceWithoutDonation() - credit() - fixedDiscount()) <= 0) {
         method = 'rsvp'
+        $('input[type=hidden][name=payment_method]').prop('disabled', true)
+        $('input[type=hidden][name=payment_method][value=rsvp]').prop('disabled', false)
       }
     }
 
