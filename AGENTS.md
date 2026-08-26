@@ -4,11 +4,12 @@ Dandelion is a Ruby/Mongo app based on the Padrino framework, which is in turn b
 
 The ORM is Mongoid, not ActiveRecord.
 
-## Crucial moments to ask for permission
+## Crucial restrictions
 
-- Always ask for permission before accessing ENV vars on Render.
 - Always ask for permission before taking browser actions.
 - Always ask for permission before running tests.
+- Never attempt to access ENV vars on Render.
+- Never attempt to connect to the production database.
 
 ## Cursor Cloud Agent
 
