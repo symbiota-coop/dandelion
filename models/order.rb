@@ -188,8 +188,12 @@ class Order
         },
         headers: { 'Idempotency-Key' => "dandelion-order-#{id}-instalment-schedule" }
       )
+      true
     rescue GoCardlessPro::InvalidStateError => e
-      raise unless e.try(:idempotent_creation_conflict?)
+      return true if e.try(:idempotent_creation_conflict?)
+      return false if e.message.to_s.include?('cancelled')
+
+      raise
     end
   end
 

@@ -53,7 +53,8 @@ Dandelion::App.controller do
         @order ||= @organisation.orders.deleted.find_by(gocardless_billing_request_id: billing_request_id, payment_completed: false)
         next unless @order
 
-        @order.create_gocardless_instalment_schedule
+        next unless @order.create_gocardless_instalment_schedule
+
         @order.complete_or_restore(error_context: { gocardless_event_id: event.id })
       end
     end
