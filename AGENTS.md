@@ -4,6 +4,12 @@ Dandelion is a Ruby/Mongo app based on the Padrino framework, which is in turn b
 
 The ORM is Mongoid, not ActiveRecord.
 
+## Crucial moments to ask for permission
+
+- Always ask for permission before accessing ENV vars on Render.
+- Always ask for permission before taking browser actions.
+- Always ask for permission before running tests.
+
 ## Cursor Cloud Agent
 
 Cursor Cloud Agent setup lives in `.cursor/environment.json`.
@@ -17,10 +23,6 @@ The Cursor image installs Ruby, Bundler, Foreman, MongoDB, Chromium, and ImageMa
 ## Documentation
 
 You can find documentation at app/views/docs/md. Keep it up to date.
-
-## Browser actions
-
-Always ask for permission before taking browser actions.
 
 ## Files in lib
 
@@ -43,8 +45,6 @@ Use `scope.and` rather than `scope.where`.
 Please note that Mongo indexes are created directly in the database, and are not defined in model files.
 
 ## Tests
-
-Always ask for permission before running tests.
 
 Never attempt to run the full test suite.
 
