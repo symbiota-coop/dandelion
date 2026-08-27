@@ -65,7 +65,7 @@ end
         <%= hidden_field_tag :affiliate_id, value: params[:affiliate_id] %>
 
         <% if @concise_ticket_form %>
-          <%= hidden_field_tag :"quantities[#{free_ticket_type.id}]", value: 1, 'data-ticket-type-id': free_ticket_type.id, 'data-price': 0, 'data-slots': free_ticket_type.slots %>
+          <%= hidden_field_tag :"quantities[#{free_ticket_type.id}]", value: 1, 'data-ticket-type-id': free_ticket_type.id, 'data-ticket-group-id': free_ticket_type.ticket_group_id, 'data-price': 0, 'data-slots': free_ticket_type.slots %>
         <% else %>
           <table class="table">
 

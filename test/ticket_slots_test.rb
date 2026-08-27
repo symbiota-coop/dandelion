@@ -1,8 +1,6 @@
 require File.expand_path("#{File.dirname(__FILE__)}/test_config.rb")
 
 class TicketSlotsTest < ActiveSupport::TestCase
-  include Capybara::DSL
-
   def create_event(**attrs)
     account = FactoryBot.create(:account)
     organisation = FactoryBot.create(:organisation, account: account)
@@ -16,7 +14,7 @@ class TicketSlotsTest < ActiveSupport::TestCase
     assert_equal 1, ticket_type.slots
   end
 
-  test 'nil slots is persisted and treated as 1' do
+  test 'nil slots is saved as 1' do
     event = create_event(prices: [0], capacity: 10)
     ticket_type = event.ticket_types.first
     ticket_type.quantity = 10
