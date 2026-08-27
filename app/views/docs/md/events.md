@@ -295,6 +295,7 @@ Dandelion has a 'boosted event' slot at the top of the event listings. If you'd 
 - Boosts are bought in whole-hour blocks.
 - You choose a start time, a number of hours, and an amount per hour.
 - Overlapping boosts for the same event stack together.
+- You can boost an event even if your organisation has not yet met the suggested contribution. The event will appear in the boosted slot; it still will not appear in the regular public listings until the organisation is paid up or the event has ticket types on Dandelion.
 
 An event's share of the boost pool corresponds to the probability of the event being shown in the boost slot at the top of the unfiltered public events listing (the probability can be higher for filtered listings where the number of relevant events is smaller).
 

@@ -110,7 +110,7 @@ class EventBoost
     ).count
 
     target_currency = event.currency_or_default
-    browse_event_ids = Event.live.publicly_visible.browsable.future(time.to_date).pluck(:id)
+    browse_event_ids = Event.live.publicly_visible.future(time.to_date).pluck(:id)
 
     weights = active_hourly_weights_by_event_id(browse_event_ids, time: time)
     boosts = active_at(time).and(:event_id.in => browse_event_ids).only(:hourly_amount, :currency, :event_id).to_a
@@ -216,7 +216,6 @@ class EventBoost
 
     errors.add(:event, 'must be live') unless event.live?
     errors.add(:event, 'must be publicly visible') unless event.publicly_visible?
-    errors.add(:event, 'must be browsable') unless event.browsable?
   end
 
   def start_time_on_the_hour

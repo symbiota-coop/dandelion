@@ -129,4 +129,39 @@ class EventBoostsTest < ActiveSupport::TestCase
     visit "/o/#{@organisation.slug}/events?minimal=1"
     assert page.has_no_content?('Boosted')
   end
+
+  test 'event can be boosted when organisation is not paid up' do
+    @account = FactoryBot.create(:account)
+    @organisation = FactoryBot.create(:organisation, account: @account)
+    @organisation.set(paid_up: false)
+    @event = FactoryBot.create(:event, organisation: @organisation, account: @account, last_saved_by: @account, name: 'Unpaid org boost event')
+    @event.set_browsable
+    refute @event.reload.browsable?
+
+    event_boost = FactoryBot.build(:event_boost, event: @event, account: @account)
+    assert event_boost.valid?, event_boost.errors.full_messages.join(', ')
+  end
+
+  test 'boosted unpaid event appears in the boost slot but not the regular listing' do
+    @account = FactoryBot.create(:account)
+    @organisation = FactoryBot.create(:organisation, account: @account)
+    @organisation.set(paid_up: false)
+    @event = FactoryBot.create(:event, organisation: @organisation, account: @account, last_saved_by: @account, name: 'Promotion-only boosted event')
+    @event.set_browsable
+    refute @event.reload.browsable?
+
+    FactoryBot.create(:event_boost,
+                      event: @event,
+                      account: @account,
+                      start_time: Time.zone.now.beginning_of_hour,
+                      hours: 2,
+                      hourly_amount: 10)
+
+    visit "/events?organisation_id=#{@organisation.id}"
+
+    assert page.has_content?('Boosted by')
+    assert page.has_content?('Promotion-only boosted event')
+    assert_equal 1, page.text.scan('Promotion-only boosted event').length
+    assert_equal 1, @event.event_boost_impressions.count
+  end
 end
