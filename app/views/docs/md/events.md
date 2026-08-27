@@ -54,7 +54,7 @@ Each ticket type has a **Quantity** (how many of that ticket you want to sell) a
 
 Slots defaults to 1. Set it to:
 
-- **0** for add-on tickets that should not count towards venue capacity, such as a workshop before the main event
+- **0** for add-on tickets that should not count towards venue capacity, such as meals
 - **2** for a couples ticket
 - **1** (the default) for a standard ticket
 
