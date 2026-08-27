@@ -56,7 +56,6 @@ module OrganisationFields
     field :monthly_donations_count, type: String
     field :currency, type: String
     field :affiliate_credit_percentage, type: Integer
-    field :hidden, type: Mongoid::Boolean
     field :welcome_from, type: String
     field :welcome_subject, type: String
     field :welcome_body, type: String

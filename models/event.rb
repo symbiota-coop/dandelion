@@ -283,7 +283,7 @@ class Event
   end
 
   def set_browsable
-    set(browsable: !evergreen? && !minimal_only? && !organisation.hidden && (organisation.paid_up || ticket_types.exists?))
+    set(browsable: !evergreen? && !minimal_only? && (organisation.paid_up || ticket_types.exists?))
   end
 
   # Event uses Mongoid::Paranoia, so destroy is a soft delete.

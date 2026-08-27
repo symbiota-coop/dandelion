@@ -50,12 +50,12 @@ class Organisation
   end
 
   def self.search_scope
-    self.and(hidden: false)
+    all
   end
 
   def self.protected_attributes
     %w[
-      paid_up paid_up_fraction unsanitized_ok hidden experimental
+      paid_up paid_up_fraction unsanitized_ok experimental
       stripe_connect_json stripe_account_json stripe_customer_id card_last4
       account_id reward_claimer_id
       contribution_not_required can_set_contribution fixed_contribution_gbp
@@ -138,7 +138,7 @@ class Organisation
   end
 
   after_save do
-    events.each(&:set_browsable) if saved_change_to_hidden? || saved_change_to_paid_up?
+    events.each(&:set_browsable) if saved_change_to_paid_up?
   end
 
   def stripe_webhook_url
