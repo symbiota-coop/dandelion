@@ -49,7 +49,7 @@
       <div class="input-group-prepend">
         <span class="input-group-text">Slots</span>
       </div>
-      <% slots_tooltip = 'How many places each of these tickets takes from the event and ticket group capacity. Use 0 for add-ons that should not count, or 2 for a couples ticket. Default: 1' %>
+      <% slots_tooltip = 'How many places each of these tickets takes from the event and ticket group capacity. Use 0 for add-ons like meals, or 2 for a couples ticket. Default: 1' %>
       <% slots_options = { class: 'form-control', min: 0, step: 1, 'data-toggle': 'tooltip', title: slots_tooltip } %>
       <% slots_options[:value] = 1 unless form %>
       <%= form_or_tag_field(form, :number_field, :slots, **slots_options) %>
