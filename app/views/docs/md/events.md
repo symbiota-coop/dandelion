@@ -25,7 +25,7 @@ Check out the video below, which does assume you have a [Stripe](https://stripe.
 >
 > Click 'Tickets', and add some ticket types.
 >
-> Fill in the ticket type name, price and capacity.
+> Fill in the ticket type name, price and quantity.
 >
 > That'll do for now - click the final tab and then 'Create event'.
 >
@@ -47,6 +47,18 @@ To let your attendees choose how much to pay for a ticket type:
 
 - Leave the 'Price or range' field of a ticket type blank to allow attendees to pay any amount
 - Enter two numbers separated by a dash to create a slider e.g. 5-50 creates a slider where attendees can choose to pay any amount between £5–50 ($/€/etc)
+
+## Ticket slots and capacity
+
+Each ticket type has a **Quantity** (how many of that ticket you want to sell) and **Slots** (how many places each of those tickets takes from the event's total capacity and any ticket group capacity).
+
+Slots defaults to 1. Set it to:
+
+- **0** for add-on tickets that should not count towards venue capacity, such as a workshop before the main event
+- **2** for a couples ticket
+- **1** (the default) for a standard ticket
+
+If you set a total capacity on the event or on a ticket group, Dandelion uses slots rather than the raw number of tickets sold.
 
 ## Allowing people to pay in instalments
 

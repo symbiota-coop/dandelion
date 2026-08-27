@@ -385,9 +385,36 @@ $(function () {
       return false
     }
 
-    if (config.placesRemaining) {
-      if (numberOfTickets > config.placesRemaining) {
-        showPurchaseAlert('Please select a maximum of ' + config.placesRemaining + (config.placesRemaining == 1 ? ' ticket' : ' tickets'))
+    function slotsForQuantityInput (input) {
+      const qty = parseInt($(input).val(), 10) || 0
+      const perTicket = parseInt($(input).attr('data-slots'), 10)
+      return qty * (Number.isNaN(perTicket) ? 1 : perTicket)
+    }
+
+    if (config.placesRemaining != null) {
+      let slotsSelected = 0
+      $('[name^=quantities]').not(':disabled').each(function () {
+        slotsSelected += slotsForQuantityInput(this)
+      })
+      if (slotsSelected > config.placesRemaining) {
+        showPurchaseAlert('This selection exceeds the event\'s remaining capacity')
+        return false
+      }
+    }
+
+    if (config.ticketGroupPlacesRemaining) {
+      const slotsByGroup = {}
+      $('[name^=quantities]').not(':disabled').each(function () {
+        const groupId = $(this).attr('data-ticket-group-id')
+        if (!groupId) { return }
+        slotsByGroup[groupId] = (slotsByGroup[groupId] || 0) + slotsForQuantityInput(this)
+      })
+      const groupExceeded = Object.keys(slotsByGroup).some(function (groupId) {
+        const remaining = config.ticketGroupPlacesRemaining[groupId]
+        return remaining != null && slotsByGroup[groupId] > remaining
+      })
+      if (groupExceeded) {
+        showPurchaseAlert('This selection exceeds a ticket group\'s remaining capacity')
         return false
       }
     }

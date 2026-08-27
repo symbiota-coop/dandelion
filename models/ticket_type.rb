@@ -18,6 +18,7 @@ class TicketType
   field :minimum_monthly_donation, type: Float
   field :sales_end, type: Time
   field :sold_out_cache, type: Mongoid::Boolean
+  field :slots, type: Integer, default: 1
 
   attr_writer :price_or_range
   attr_accessor :price_or_range_submitted
@@ -58,6 +59,8 @@ class TicketType
     errors.add(:price, 'must not be < 0') if price && price < 0
     errors.add(:quantity, 'must not be < 0') if quantity && quantity < 0
     errors.add(:max_quantity_per_transaction, 'must not be < 0') if max_quantity_per_transaction && max_quantity_per_transaction < 0
+    self.slots = 1 if self[:slots].nil?
+    errors.add(:slots, 'must not be < 0') if self[:slots] && self[:slots] < 0
   end
 
   after_save do
@@ -116,11 +119,22 @@ class TicketType
     (quantity || 0) - tickets.count
   end
 
+  def slots
+    self[:slots].nil? ? 1 : self[:slots]
+  end
+
+  def tickets_from_places(places)
+    return if places.nil?
+    return if slots.zero?
+
+    places / slots
+  end
+
   def wiser_remaining
-    [remaining, ticket_group ? ticket_group.places_remaining : nil, event.places_remaining].compact.min
+    [remaining, tickets_from_places(ticket_group&.places_remaining), tickets_from_places(event&.places_remaining)].compact.min
   end
 
   def number_of_tickets_available_in_single_purchase
-    [remaining, ticket_group ? ticket_group.places_remaining : nil, event.places_remaining, max_quantity_per_transaction || nil].compact.min
+    [remaining, tickets_from_places(ticket_group&.places_remaining), tickets_from_places(event&.places_remaining), max_quantity_per_transaction || nil].compact.min
   end
 end

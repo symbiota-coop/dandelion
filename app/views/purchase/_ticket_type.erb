@@ -110,7 +110,7 @@
       <% end %>
     <% else %>
       <div class="quantity-select-container">
-        <%= select_tag :"quantities[#{ticket_type.id}]", 'data-ticket-type-id': ticket_type.id, 'data-price': ticket_type.price, class: 'form-control w-100', options: (0..[99, availability].min).to_a, value: (params[:quantities][ticket_type.id.to_s] if params[:quantities]), disabled: !ticket_type.price %>
+        <%= select_tag :"quantities[#{ticket_type.id}]", 'data-ticket-type-id': ticket_type.id, 'data-ticket-group-id': ticket_type.ticket_group_id, 'data-price': ticket_type.price, 'data-slots': ticket_type.slots, class: 'form-control w-100', options: (0..[99, availability].min).to_a, value: (params[:quantities][ticket_type.id.to_s] if params[:quantities]), disabled: !ticket_type.price %>
       </div>
     <% end %>
   <% else %>

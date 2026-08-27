@@ -118,6 +118,7 @@ module EventDuplication
         range_min: ticket_type.range_min,
         range_max: ticket_type.range_max,
         quantity: ticket_type.quantity,
+        slots: ticket_type.slots,
         hidden: ticket_type.hidden,
         order: ticket_type.order,
         max_quantity_per_transaction: ticket_type.max_quantity_per_transaction,

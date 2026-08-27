@@ -261,8 +261,12 @@ class Event
       end
   end
 
+  def slots_taken
+    Ticket.slots_taken(tickets.and(made_available_at: nil))
+  end
+
   def places_remaining
-    capacity - tickets.and(made_available_at: nil).count if capacity
+    capacity - slots_taken if capacity
   end
 
   def time_zone_or_default

@@ -65,7 +65,7 @@ end
         <%= hidden_field_tag :affiliate_id, value: params[:affiliate_id] %>
 
         <% if @concise_ticket_form %>
-          <%= hidden_field_tag :"quantities[#{free_ticket_type.id}]", value: 1, 'data-ticket-type-id': free_ticket_type.id, 'data-price': 0 %>
+          <%= hidden_field_tag :"quantities[#{free_ticket_type.id}]", value: 1, 'data-ticket-type-id': free_ticket_type.id, 'data-price': 0, 'data-slots': free_ticket_type.slots %>
         <% else %>
           <table class="table">
 
@@ -218,6 +218,7 @@ end
     eventId: @event.id,
     eventUrl: "#{ENV['BASE_URI']}/e/#{@event.slug}",
     placesRemaining: @event.places_remaining,
+    ticketGroupPlacesRemaining: @event.ticket_groups.each_with_object({}) { |ticket_group, hash| hash[ticket_group.id.to_s] = ticket_group.places_remaining },
     currency: @event.currency,
     currencySymbol: money_symbol(@event.currency),
     minimumApplicationFee: FiatCurrency.minimum_unit_amount(@event.currency),

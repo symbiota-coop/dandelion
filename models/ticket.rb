@@ -136,6 +136,17 @@ class Ticket
     CURRENCY_OPTIONS
   end
 
+  def self.slots_taken(scope = all)
+    type_ids = scope.pluck(:ticket_type_id)
+    return 0 if type_ids.empty?
+
+    counts = type_ids.tally
+    slots_by_id = TicketType.and(:id.in => counts.keys.compact).each_with_object({}) do |ticket_type, hash|
+      hash[ticket_type.id] = ticket_type.slots
+    end
+    counts.sum { |type_id, count| count * (type_id ? slots_by_id.fetch(type_id, 1) : 1) }
+  end
+
   def self.incomplete
     self.and(payment_completed: false)
   end

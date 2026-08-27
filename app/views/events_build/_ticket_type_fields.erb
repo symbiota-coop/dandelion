@@ -34,13 +34,25 @@
     </div>
   </div>
 
+  <div class="col-12 col-lg mb-2">
+    <div class="input-group">
+      <div class="input-group-prepend">
+        <span class="input-group-text">Quantity</span>
+      </div>
+      <% quantity_tooltip = 'Total number of tickets of this type you want to issue' %>
+      <%= form_or_tag_field(form, :number_field, :quantity, class: 'form-control', 'data-toggle': 'tooltip', title: quantity_tooltip, required: true) %>
+    </div>
+  </div>
+
   <div class="col-12 col-lg">
     <div class="input-group">
       <div class="input-group-prepend">
-        <span class="input-group-text">Capacity</span>
+        <span class="input-group-text">Slots</span>
       </div>
-      <% capacity_tooltip = 'Total number of tickets of this type you want to issue' %>
-      <%= form_or_tag_field(form, :number_field, :quantity, class: 'form-control', 'data-toggle': 'tooltip', title: capacity_tooltip, required: true) %>
+      <% slots_tooltip = 'How many places each of these tickets takes from the event and ticket group capacity. Use 0 for add-ons that should not count, or 2 for a couples ticket. Default: 1' %>
+      <% slots_options = { class: 'form-control', min: 0, step: 1, 'data-toggle': 'tooltip', title: slots_tooltip } %>
+      <% slots_options[:value] = 1 unless form %>
+      <%= form_or_tag_field(form, :number_field, :slots, **slots_options) %>
     </div>
   </div>
 </div>

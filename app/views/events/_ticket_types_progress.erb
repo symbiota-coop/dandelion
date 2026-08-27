@@ -6,9 +6,9 @@
     </td>
     <td>
       <a href="/events/<%=@event.id%>/tickets<%= params[:ticket_group_id] == ticket_group.id.to_s ? '' : "?ticket_group_id=#{ticket_group.id}" %>">
-        <%= ticket_group.tickets.count %>/<%= ticket_group.capacity %>
+        <%= ticket_group.slots_taken %>/<%= ticket_group.capacity %>
         <% if ticket_group.capacity > 0 %>
-          <% w = ((ticket_group.tickets.count / ticket_group.capacity.to_f) * 100).round %>
+          <% w = ((ticket_group.slots_taken / ticket_group.capacity.to_f) * 100).round %>
           <div class="progress">
             <div class="progress-bar" role="progressbar" style="width: <%= "#{w}%" %>;"></div>
           </div>

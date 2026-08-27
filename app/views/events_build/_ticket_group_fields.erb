@@ -12,7 +12,8 @@
       <div class="input-group-prepend">
         <span class="input-group-text">Capacity</span>
       </div>
-      <%= form_or_tag_field(form, :number_field, :capacity, class: 'form-control', required: true) %>
+      <% ticket_group_capacity_tooltip = 'Places in this group. Each ticket type can take a different number of slots' %>
+      <%= form_or_tag_field(form, :number_field, :capacity, class: 'form-control', required: true, 'data-toggle': 'tooltip', title: ticket_group_capacity_tooltip) %>
     </div>
   </div>
 </div>

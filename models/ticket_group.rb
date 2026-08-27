@@ -20,7 +20,11 @@ class TicketGroup
     errors.add(:capacity, 'must not be < 0') if capacity && capacity < 0
   end
 
+  def slots_taken
+    Ticket.slots_taken(tickets.and(made_available_at: nil))
+  end
+
   def places_remaining
-    capacity - tickets.and(made_available_at: nil).count
+    capacity - slots_taken
   end
 end
