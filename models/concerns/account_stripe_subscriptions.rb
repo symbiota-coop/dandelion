@@ -5,11 +5,6 @@ module AccountStripeSubscriptions
   CLEAR_SUBSCRIPTION_STATUSES = %w[canceled incomplete_expired].freeze
 
   class_methods do
-    def setup_stripe
-      Stripe.api_key = ENV['STRIPE_SK']
-      Stripe.api_version = ENV['STRIPE_API_VERSION']
-    end
-
     def keep_subscription?(subscription)
       KEEP_SUBSCRIPTION_STATUSES.include?(subscription.status)
     end
@@ -19,9 +14,9 @@ module AccountStripeSubscriptions
     end
 
     def sync_subscription(subscription, notify: false)
-      setup_stripe
+      opts = StripeOpts.call
       customer = subscription.customer
-      customer = Stripe::Customer.retrieve(customer) if customer.is_a?(String)
+      customer = Stripe::Customer.retrieve(customer, opts) if customer.is_a?(String)
       email = customer.email
       return unless email
 
@@ -47,16 +42,15 @@ module AccountStripeSubscriptions
     end
 
     def reconcile_stripe_subscriptions
-      setup_stripe
+      opts = StripeOpts.call
 
       kept_subscription_ids = []
       email_to_subscription_id = {}
       email_to_subscription_created_at = {}
 
       Stripe::Subscription.list(
-        status: 'all',
-        limit: 100,
-        expand: ['data.customer']
+        { status: 'all', limit: 100, expand: ['data.customer'] },
+        opts
       ).auto_paging_each do |subscription|
         next unless keep_subscription?(subscription)
 

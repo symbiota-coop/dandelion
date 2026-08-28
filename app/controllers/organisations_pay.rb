@@ -27,16 +27,13 @@ Dandelion::App.controller do
     @organisation = Organisation.find(params[:id])
     organisation_admins_only!
 
-    Stripe.api_key = ENV['STRIPE_SK']
-    Stripe.api_version = ENV['STRIPE_API_VERSION']
-
     session = Stripe::Checkout::Session.create({
                                                  mode: 'setup',
                                                  currency: @organisation.currency,
                                                  customer_creation: 'always',
                                                  success_url: "#{ENV['BASE_URI']}/organisations/#{@organisation.id}/stripe_setup_complete?session_id={CHECKOUT_SESSION_ID}",
                                                  cancel_url: "#{ENV['BASE_URI']}/events/new?organisation_id=#{@organisation.id}"
-                                               })
+                                               }, StripeOpts.call)
 
     { session_id: session.id }.to_json
   end
@@ -45,12 +42,11 @@ Dandelion::App.controller do
     @organisation = Organisation.find(params[:id])
     organisation_admins_only!
 
-    Stripe.api_key = ENV['STRIPE_SK']
-    Stripe.api_version = ENV['STRIPE_API_VERSION']
+    opts = StripeOpts.call
 
-    session = Stripe::Checkout::Session.retrieve(params[:session_id])
-    setup_intent = Stripe::SetupIntent.retrieve(session.setup_intent)
-    payment_method = Stripe::PaymentMethod.retrieve(setup_intent.payment_method)
+    session = Stripe::Checkout::Session.retrieve(params[:session_id], opts)
+    setup_intent = Stripe::SetupIntent.retrieve(session.setup_intent, opts)
+    payment_method = Stripe::PaymentMethod.retrieve(setup_intent.payment_method, opts)
 
     begin
       @organisation.set(card_last4: payment_method.card&.last4)
@@ -68,9 +64,6 @@ Dandelion::App.controller do
     @organisation = Organisation.find(params[:id])
     organisation_admins_only!
 
-    Stripe.api_key = ENV['STRIPE_SK']
-    Stripe.api_version = ENV['STRIPE_API_VERSION']
-
     @organisation.set(stripe_customer_id: nil)
     redirect "/o/#{@organisation.slug}/contribute"
   end
@@ -83,9 +76,6 @@ Dandelion::App.controller do
 
     case params[:payment_method]
     when 'stripe'
-
-      Stripe.api_key = ENV['STRIPE_SK']
-      Stripe.api_version = ENV['STRIPE_API_VERSION']
       stripe_session_hash = {
         line_items: [{
           name: 'Dandelion',
@@ -104,7 +94,7 @@ Dandelion::App.controller do
           }
         }
       }
-      session = Stripe::Checkout::Session.create(stripe_session_hash)
+      session = Stripe::Checkout::Session.create(stripe_session_hash, StripeOpts.call)
       @organisation.organisation_contributions.create! amount: params[:amount].to_f, currency: params[:currency], session_id: session.id, payment_intent: session.payment_intent
       { session_id: session.id }.to_json
 

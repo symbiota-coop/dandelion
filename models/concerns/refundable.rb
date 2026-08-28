@@ -4,9 +4,11 @@ module Refundable
   end
 
   def refund_via_stripe(payment_intent:, on_error:, amount: nil, refund_application_fee: false)
-    Stripe.api_key = event.organisation.stripe_connect_json ? ENV['STRIPE_SK'] : event.organisation.stripe_sk
-    Stripe.api_version = ENV['STRIPE_API_VERSION']
-    pi = Stripe::PaymentIntent.retrieve payment_intent, { stripe_account: event.organisation.stripe_user_id }.compact
+    opts = StripeOpts.call(
+      api_key: event.organisation.stripe_connect_json ? ENV['STRIPE_SK'] : event.organisation.stripe_sk,
+      stripe_account: event.organisation.stripe_user_id
+    )
+    pi = Stripe::PaymentIntent.retrieve(payment_intent, opts)
 
     if event.revenue_sharer_organisationship
       params = {
@@ -15,16 +17,16 @@ module Refundable
         reverse_transfer: true
       }
       params[:amount] = (amount * 100).to_i if amount
-      Stripe::Refund.create(params)
+      Stripe::Refund.create(params, opts.except(:stripe_account))
     elsif event.organisation.stripe_user_id
       params = { charge: pi.charges.first.id }
       params[:amount] = (amount * 100).to_i if amount
       params[:refund_application_fee] = true if refund_application_fee
-      Stripe::Refund.create(params, { stripe_account: event.organisation.stripe_user_id })
+      Stripe::Refund.create(params, opts)
     else
       params = { charge: pi.charges.first.id }
       params[:amount] = (amount * 100).to_i if amount
-      Stripe::Refund.create(params)
+      Stripe::Refund.create(params, opts)
     end
   rescue Stripe::InvalidRequestError => e
     on_error.call(e) if on_error

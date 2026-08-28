@@ -17,9 +17,7 @@ Dandelion::App.controller do
 
       stripe_connect_json = response.body
       stripe_user_id = JSON.parse(stripe_connect_json).fetch('stripe_user_id')
-      Stripe.api_key = ENV['STRIPE_SK']
-      Stripe.api_version = ENV['STRIPE_API_VERSION']
-      stripe_account_json = Stripe::Account.retrieve(stripe_user_id).to_json
+      stripe_account_json = Stripe::Account.retrieve(stripe_user_id, StripeOpts.call).to_json
       @organisation.set(stripe_connect_json: stripe_connect_json, stripe_account_json: stripe_account_json)
       flash[:notice] = 'Connected!'
     rescue StandardError => e
@@ -59,9 +57,7 @@ Dandelion::App.controller do
 
       stripe_connect_json = response.body
       stripe_user_id = JSON.parse(stripe_connect_json).fetch('stripe_user_id')
-      Stripe.api_key = @organisation.stripe_sk
-      Stripe.api_version = ENV['STRIPE_API_VERSION']
-      stripe_account_json = Stripe::Account.retrieve(stripe_user_id).to_json
+      stripe_account_json = Stripe::Account.retrieve(stripe_user_id, StripeOpts.call(api_key: @organisation.stripe_sk)).to_json
       @organisationship.set(stripe_connect_json: stripe_connect_json, stripe_account_json: stripe_account_json)
       flash[:notice] = "Connected to #{@organisation.name}!"
     rescue StandardError => e

@@ -145,13 +145,6 @@ class Order
     evm_secret.to_d / 1e6
   end
 
-  def stripe_payment_status
-    Stripe.api_key = event.organisation.stripe_connect_json ? ENV['STRIPE_SK'] : event.organisation.stripe_sk
-    Stripe.api_version = ENV['STRIPE_API_VERSION']
-    session = Stripe::Checkout::Session.retrieve(session_id)
-    session.payment_status
-  end
-
   def persist_gocardless_payment_id(payment_id)
     return if gocardless_payment_id.present? || payment_id.blank?
 
@@ -314,18 +307,16 @@ class Order
     return if application_fee_paid_to_dandelion?
 
     begin
-      Stripe.api_key = event.organisation.stripe_sk
-      Stripe.api_version = ENV['STRIPE_API_VERSION']
-      pi = Stripe::PaymentIntent.retrieve payment_intent
-      transfer = Stripe::Transfer.retrieve pi.charges.first.transfer
+      org_opts = StripeOpts.call(api_key: event.organisation.stripe_sk)
+      pi = Stripe::PaymentIntent.retrieve(payment_intent, org_opts)
+      transfer = Stripe::Transfer.retrieve(pi.charges.first.transfer, org_opts)
 
-      Stripe.api_key = JSON.parse(event.revenue_sharer_organisationship.stripe_connect_json)['access_token']
-      Stripe.api_version = ENV['STRIPE_API_VERSION']
-      destination_payment = Stripe::Charge.retrieve transfer.destination_payment
+      sharer_opts = StripeOpts.call(api_key: JSON.parse(event.revenue_sharer_organisationship.stripe_connect_json)['access_token'])
+      destination_payment = Stripe::Charge.retrieve(transfer.destination_payment, sharer_opts)
       Stripe::Charge.update(destination_payment.id, {
                               description: "#{account.name}: #{description}",
                               metadata: metadata
-                            })
+                            }, sharer_opts)
     rescue Stripe::InvalidRequestError => e
       ErrorReporting.capture_exception(e) unless e.message.include?('No such charge') || e.message.include?('No such transfer')
     rescue StandardError => e

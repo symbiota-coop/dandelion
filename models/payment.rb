@@ -52,14 +52,13 @@ class Payment
   def update_metadata
     return unless payment_intent
 
-    Stripe.api_key = gathering.stripe_sk
-    Stripe.api_version = ENV['STRIPE_API_VERSION']
-    pi = Stripe::PaymentIntent.retrieve payment_intent
-    charge = Stripe::Charge.retrieve pi.charges.first.id
+    opts = StripeOpts.call(api_key: gathering.stripe_sk)
+    pi = Stripe::PaymentIntent.retrieve(payment_intent, opts)
+    charge = Stripe::Charge.retrieve(pi.charges.first.id, opts)
     Stripe::Charge.update(charge.id, { metadata: {
                             de_gathering_id: gathering.id,
                             de_account_id: account.id
-                          } })
+                          } }, opts)
   rescue StandardError => e
     ErrorReporting.capture_exception(e)
   end

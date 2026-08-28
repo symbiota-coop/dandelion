@@ -40,9 +40,6 @@ Dandelion::App.controller do
 
     halt 400, { error: @event_boost.errors.full_messages.first }.to_json unless @event_boost.save
 
-    Stripe.api_key = ENV['STRIPE_SK']
-    Stripe.api_version = ENV['STRIPE_API_VERSION']
-
     session = Stripe::Checkout::Session.create({
                                                  customer_email: current_account.email,
                                                  success_url: "#{ENV['BASE_URI']}/events/#{@event.id}/boosts?thanks=1",
@@ -62,7 +59,7 @@ Dandelion::App.controller do
                                                      de_account_id: @event_boost.account_id.to_s
                                                    }
                                                  }
-                                               })
+                                               }, StripeOpts.call)
 
     @event_boost.update_attributes!(session_id: session.id, payment_intent: session.payment_intent)
 

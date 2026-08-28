@@ -74,10 +74,9 @@ module OrganisationAccounting
   end
 
   def stripe_topup
-    Stripe.api_key = ENV['STRIPE_SK']
-    Stripe.api_version = ENV['STRIPE_API_VERSION']
-
     return unless stripe_customer_id
+
+    opts = StripeOpts.call
 
     # Promotion-fee events still appear in contribution totals, but we do not auto-charge them
     cr = auto_topup_contribution_requested
@@ -89,7 +88,7 @@ module OrganisationAccounting
     return if contribution_remaining < Money.new(1 * 100, 'GBP')
 
     # charge customer
-    payment_method_id = Stripe::Customer.list_payment_methods(stripe_customer_id).first.id
+    payment_method_id = Stripe::Customer.list_payment_methods(stripe_customer_id, {}, opts).first.id
     begin
       pi = Stripe::PaymentIntent.create({
                                           amount: contribution_remaining.cents,
@@ -103,7 +102,7 @@ module OrganisationAccounting
                                             de_contribution_type: 'organisation_auto_topup',
                                             de_organisation_id: id.to_s
                                           }
-                                        })
+                                        }, opts)
       organisation_contribution = organisation_contributions.create amount: contribution_remaining.cents.to_f / 100, currency: contribution_remaining.currency, payment_intent: pi.id, payment_completed: true
       organisation_contribution.send_notification
     rescue Stripe::CardError => e

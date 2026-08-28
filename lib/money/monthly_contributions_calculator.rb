@@ -10,8 +10,6 @@ module MonthlyContributionsCalculator
   }.freeze
 
   def self.calculate
-    setup_stripe
-
     d = generate_month_range
     fragment = Fragment.find_or_create_by(key: 'monthly_contributions')
 
@@ -20,8 +18,6 @@ module MonthlyContributionsCalculator
   end
 
   def self.update_current_month
-    setup_stripe
-
     current_month = Date.new(Date.today.year, Date.today.month, 1)
     fragment = Fragment.find_by(key: 'monthly_contributions')
     return unless fragment
@@ -31,11 +27,6 @@ module MonthlyContributionsCalculator
 
     update_month_in_data(existing_data, current_month_data)
     fragment.update_attributes value: existing_data.to_json
-  end
-
-  def self.setup_stripe
-    Stripe.api_key = ENV['STRIPE_SK']
-    Stripe.api_version = ENV['STRIPE_API_VERSION']
   end
 
   def self.generate_month_range
@@ -74,7 +65,7 @@ module MonthlyContributionsCalculator
                                     created: { gte: start_timestamp, lt: end_timestamp },
                                     limit: 100,
                                     expand: ['data.balance_transaction']
-                                  })
+                                  }, StripeOpts.call)
 
     charges.auto_paging_each do |c|
       next unless c.status == 'succeeded'
@@ -99,7 +90,7 @@ module MonthlyContributionsCalculator
                                          created: { gte: start_timestamp, lt: end_timestamp },
                                          limit: 100,
                                          expand: ['data.balance_transaction']
-                                       })
+                                       }, StripeOpts.call)
 
     fees.auto_paging_each do |f|
       next if f.refunded

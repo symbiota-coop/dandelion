@@ -1,8 +1,6 @@
 class GatheringPaymentMethod
   module Stripe
     def self.call(gathering:, membership:, account:, params:)
-      ::Stripe.api_key = gathering.stripe_sk
-      ::Stripe.api_version = ENV['STRIPE_API_VERSION']
       stripe_session_hash = {
         line_items: [{
           name: 'Dandelion',
@@ -20,7 +18,7 @@ class GatheringPaymentMethod
           de_account_id: membership.account.id
         }
       }
-      session = ::Stripe::Checkout::Session.create(stripe_session_hash)
+      session = ::Stripe::Checkout::Session.create(stripe_session_hash, StripeOpts.call(api_key: gathering.stripe_sk))
       membership.payments.create! amount: params[:amount].to_i, currency: gathering.currency, session_id: session.id, payment_intent: session.payment_intent
       { session_id: session.id }.to_json
     end

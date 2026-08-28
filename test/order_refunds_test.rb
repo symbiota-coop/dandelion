@@ -57,4 +57,19 @@ class OrderRefundsTest < ActiveSupport::TestCase
       assert_empty refunds
     end
   end
+
+  test 'connect refunds pass the connected account in request options' do
+    event = create_event
+    event.organisation.set(stripe_connect_json: { 'stripe_user_id' => 'acct_connect' }.to_json)
+    order = create_paid_order(event)
+    captured_opts = nil
+    payment_intent = OpenStruct.new(charges: [OpenStruct.new(id: 'ch_test')])
+    Stripe::PaymentIntent.stub :retrieve, payment_intent do
+      Stripe::Refund.stub :create, proc { |_params, opts| captured_opts = opts } do
+        order.destroy
+      end
+    end
+    assert_equal 'acct_connect', captured_opts[:stripe_account]
+    assert_equal ENV['STRIPE_SK'], captured_opts[:api_key]
+  end
 end

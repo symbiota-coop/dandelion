@@ -37,8 +37,7 @@ class StripeTransaction
 
     puts "transferring transactions for #{organisation.slug} from #{from} to #{to}"
 
-    Stripe.api_key = organisation.stripe_sk
-    Stripe.api_version = ENV['STRIPE_API_VERSION']
+    opts = StripeOpts.call(api_key: organisation.stripe_sk)
 
     run = Stripe::Reporting::ReportRun.create({
                                                 report_type: 'balance_change_from_activity.itemized.1',
@@ -46,12 +45,12 @@ class StripeTransaction
                                                   interval_start: Time.utc(from.year, from.month, from.day).to_i,
                                                   interval_end: Time.utc(to.year, to.month, to.day).to_i
                                                 }
-                                              })
+                                              }, opts)
 
     until run.result
       puts 'sleeping...'
       sleep 5
-      run = Stripe::Reporting::ReportRun.retrieve(run.id)
+      run = Stripe::Reporting::ReportRun.retrieve(run.id, opts)
     end
 
     uri = URI(run.result.url)

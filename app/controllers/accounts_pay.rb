@@ -28,8 +28,6 @@ Dandelion::App.controller do
 
     account = Account.find(params[:account_id]) if params[:account_id]
 
-    Stripe.api_key = ENV['STRIPE_SK']
-    Stripe.api_version = ENV['STRIPE_API_VERSION']
     stripe_session_hash = {
       line_items: [{
         name: 'Dandelion',
@@ -49,7 +47,7 @@ Dandelion::App.controller do
       }
     }
     stripe_session_hash[:customer_email] = account.email if account
-    session = Stripe::Checkout::Session.create(stripe_session_hash)
+    session = Stripe::Checkout::Session.create(stripe_session_hash, StripeOpts.call)
 
     contribution_attrs = {
       source: params[:source],

@@ -44,9 +44,8 @@ class StripeCharge
 
     puts "transferring charges for #{organisation.slug} from #{from} to #{to}"
 
-    Stripe.api_key = organisation.stripe_sk
-    Stripe.api_version = ENV['STRIPE_API_VERSION']
-    charges = Stripe::Charge.list(created: { gte: Time.utc(from.year, from.month, from.day).to_i, lt: Time.utc(to.year, to.month, to.day).to_i })
+    opts = StripeOpts.call(api_key: organisation.stripe_sk)
+    charges = Stripe::Charge.list({ created: { gte: Time.utc(from.year, from.month, from.day).to_i, lt: Time.utc(to.year, to.month, to.day).to_i } }, opts)
 
     charges.auto_paging_each do |charge|
       c = {}

@@ -1,9 +1,6 @@
 class EventPaymentMethod
   module Stripe
     def self.call(order:, event:, account:, details_form:, ticket_form:)
-      ::Stripe.api_key = event.organisation.stripe_connect_json ? ENV['STRIPE_SK'] : event.organisation.stripe_sk
-      ::Stripe.api_version = ENV['STRIPE_API_VERSION']
-
       cohost = ticket_form[:cohost] && Organisation.find_by(slug: ticket_form[:cohost])
       event_image = event.image_source(cohost)&.image
       revenue_sharer_organisationship = event.revenue_sharer_organisationship
@@ -36,11 +33,16 @@ class EventPaymentMethod
       end
       stripe_session_hash.merge!(payment_intent_data: payment_intent_data)
 
-      session = if revenue_sharer_organisationship && event.direct_charges
-                  ::Stripe::Checkout::Session.create(stripe_session_hash, { stripe_account: revenue_sharer_organisationship.stripe_user_id })
-                else
-                  ::Stripe::Checkout::Session.create(stripe_session_hash, event.organisation.stripe_connect_json ? { stripe_account: event.organisation.stripe_user_id } : {})
-                end
+      stripe_account = if revenue_sharer_organisationship && event.direct_charges
+                         revenue_sharer_organisationship.stripe_user_id
+                       elsif event.organisation.stripe_connect_json
+                         event.organisation.stripe_user_id
+                       end
+      opts = StripeOpts.call(
+        api_key: event.organisation.stripe_connect_json ? ENV['STRIPE_SK'] : event.organisation.stripe_sk,
+        stripe_account: stripe_account
+      )
+      session = ::Stripe::Checkout::Session.create(stripe_session_hash, opts)
 
       order.update_attributes!(
         value: order.total.round(2),
