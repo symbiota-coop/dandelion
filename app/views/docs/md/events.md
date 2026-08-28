@@ -112,6 +112,8 @@ There you can also find a link you can share with assistants which allows them t
 
 Go to your event (the main page, not the settings page), click the plus icon next to Facilitators and search for the desired facilitator by name.
 
+Once a facilitator has received feedback on an event, they appear on the [Facilitators](/facilitators) page.
+
 ## Adding co-hosts
 
 Go to your event (the main page, not the settings page), click the plus icon next to Hosted by and search for the desired organisation by name.
