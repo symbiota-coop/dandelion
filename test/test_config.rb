@@ -46,7 +46,7 @@ module ActiveSupport
     end
 
     teardown do
-      save_screenshot unless ENV['CI']
+      save_screenshot if !ENV['CI'] && respond_to?(:save_screenshot)
     end
 
     def reset!

@@ -8,8 +8,6 @@ class McpTest < ActiveSupport::TestCase
     Padrino.application
   end
 
-  def save_screenshot(*); end
-
   def mcp_post(body, headers: {})
     header 'Content-Type', 'application/json'
     header 'Accept', 'application/json, text/event-stream'

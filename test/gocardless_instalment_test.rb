@@ -9,8 +9,6 @@ class GoCardlessInstalmentTest < ActiveSupport::TestCase
     Padrino.application
   end
 
-  def save_screenshot(*); end
-
   def create_event(instalment_count: 3)
     account = FactoryBot.create(:account)
     organisation = FactoryBot.create(

@@ -8,9 +8,6 @@ class AjaxSearchTest < ActiveSupport::TestCase
     Padrino.application
   end
 
-  # No-op since we're using Rack::Test, not Capybara
-  def save_screenshot(*); end
-
   def ajax_search(term = nil, type = nil)
     params = {}
     params[:term] = term if term

@@ -8,8 +8,6 @@ class IcsKeysTest < ActiveSupport::TestCase
     Padrino.application
   end
 
-  def save_screenshot(*); end
-
   test 'accounts get a separate ics key' do
     account = FactoryBot.create(:account)
 
