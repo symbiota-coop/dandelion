@@ -846,6 +846,32 @@ button.bg-warning:focus {
   background: white
 }
 
+// iOS Safari sizes native date inputs to their content (empty fields collapse).
+// Flatpickr uses type=date / .flatpickr-mobile on iPhone. Override Bootstrap's
+// -webkit-appearance: listbox so width: 100% actually applies.
+input[type="date"],
+input[type="datetime-local"],
+input[type="time"],
+input[type="month"] {
+  -webkit-appearance: none;
+  appearance: none;
+}
+
+input[type="date"].form-control,
+input[type="datetime-local"].form-control,
+input.flatpickr-mobile {
+  display: block;
+  width: 100%;
+  min-width: 100%;
+  box-sizing: border-box;
+}
+
+input[type="date"]::-webkit-date-and-time-value,
+input[type="datetime-local"]::-webkit-date-and-time-value {
+  text-align: left;
+  min-height: 1.5em;
+}
+
 .quick-color-btn {
   cursor: pointer;
   transition: transform 0.15s, box-shadow 0.15s;
