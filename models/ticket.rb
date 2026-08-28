@@ -137,10 +137,14 @@ class Ticket
   end
 
   def self.slots_taken(scope = all)
-    type_ids = scope.pluck(:ticket_type_id)
-    return 0 if type_ids.empty?
+    counts = scope.collection.aggregate(
+      [
+        { '$match' => scope.selector },
+        { '$group' => { '_id' => '$ticket_type_id', 'count' => { '$sum' => 1 } } }
+      ]
+    ).each_with_object({}) { |row, hash| hash[row['_id']] = row['count'] }
+    return 0 if counts.empty?
 
-    counts = type_ids.tally
     slots_by_id = TicketType.and(:id.in => counts.keys.compact).each_with_object({}) do |ticket_type, hash|
       hash[ticket_type.id] = ticket_type.slots
     end
