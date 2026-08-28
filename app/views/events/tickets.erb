@@ -3,7 +3,7 @@
   <div class="alert alert-success">View answers to booking questions on the <a href="/events/<%= @event.id %>/orders">Orders</a> page</div>
 <% end %>
 <div class="row">
-  <div class="col">
+  <div class="col theme-gutter">
     <% form_tag '', method: 'get', class: 'submitOnChange searchForm form-inline mb-3', onsubmit: %{
       $('#tickets-table').attr('data-pagelet-url', $('#tickets-table').attr('data-pagelet-url').split('?')[0] + '?' + $(this).serialize());
       $('#tickets-table').load($('#tickets-table').attr('data-pagelet-url'))

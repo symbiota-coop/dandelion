@@ -15,7 +15,7 @@
     <%= partial :'events/ticket_types_progress' %>
   <% end %>
   <div class="row justify-content-between">
-    <div class="col">
+    <div class="col theme-gutter">
       <p><%== pagination_details orders, model: 'Order' %></p>
     </div>
     <div class="col-auto">
@@ -25,7 +25,7 @@
   </div>
 <% elsif @organisation %>
   <div class="row justify-content-between">
-    <div class="col">
+    <div class="col theme-gutter">
       <p><%== pagination_details orders, model: 'Order' %></p>
     </div>
     <div class="col-auto">

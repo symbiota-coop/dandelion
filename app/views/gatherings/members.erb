@@ -32,7 +32,7 @@
   <% end %>
 
   <div class="row justify-content-between">
-    <div class="col">
+    <div class="col theme-gutter">
       <% if (@membership.invitations_remaining > 0 || @membership.admin?) && (!@gathering.member_limit || @gathering.memberships.count < @gathering.member_limit) %>
         <a class="btn btn-primary" href="javascript:;" onclick="$(this).hide().next().show().find('input[name=email]').focus()"><i class="bi bi-plus-lg"></i> Add member</a>
         <% if !@membership.admin? && @membership.invitations_remaining > 0 %>

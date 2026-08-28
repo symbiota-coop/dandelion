@@ -1,29 +1,27 @@
 <% if current_account %>
-  <div class="row justify-content-between mb-3">
-    <div class="col">
-      <% if current_account.location %>
-        <div>
-          <p>Your profile location: <a href="javascript:;" onclick="$(this).parent().parent().hide().next().show().find('input').focus()"><%= current_account.location %></a></p>
-          <% if current_account.number_at_this_location > 50 %>
-            <div class="mt-3 alert alert-warning">There are too many people to display at this location. Please provide something more specific.</div>
-          <% end %>
-        </div>
-      <% end %>
-      <% form_tag '/accounts/update_location', class: 'mb-3', style: ('display: none' if current_account.location) do %>
-        <script>
-          $(function () {
+  <div class="mb-3">
+    <% if current_account.location %>
+      <div>
+        <p>Your profile location: <a href="javascript:;" onclick="$(this).parent().parent().hide().next().show().find('input').focus()"><%= current_account.location %></a></p>
+        <% if current_account.number_at_this_location > 50 %>
+          <div class="mt-3 alert alert-warning">There are too many people to display at this location. Please provide something more specific.</div>
+        <% end %>
+      </div>
+    <% end %>
+    <% form_tag '/accounts/update_location', class: 'mb-3', style: ('display: none' if current_account.location) do %>
+      <script>
+        $(function () {
 
-            if (typeof google !== 'undefined') {
-              var autocomplete = new google.maps.places.Autocomplete($('#location')[0]);
-              google.maps.event.addListener(autocomplete, 'place_changed', function () {
-                $('#location')[0].form.submit()
-              });
-            }
-          })
-        </script>
-        <%= text_field_tag :location, id: 'location', class: 'form-control', placeholder: 'Enter your location' %>
-      <% end %>
-    </div>
+          if (typeof google !== 'undefined') {
+            var autocomplete = new google.maps.places.Autocomplete($('#location')[0]);
+            google.maps.event.addListener(autocomplete, 'place_changed', function () {
+              $('#location')[0].form.submit()
+            });
+          }
+        })
+      </script>
+      <%= text_field_tag :location, id: 'location', class: 'form-control', placeholder: 'Enter your location' %>
+    <% end %>
   </div>
 <% end %>
 <%= partial :'maps/map', locals: { url: '/map' } %>

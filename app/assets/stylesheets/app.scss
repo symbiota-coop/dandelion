@@ -643,6 +643,11 @@ li.reply .widget-chat-message a {
   text-decoration: underline
 }
 
+.theme-gutter {
+  padding-left: 0.375rem;
+  padding-right: 0.375rem;
+}
+
 .no-gutters>.col,
 .no-gutters>[class*=col-] {
   padding-right: 0 !important;
