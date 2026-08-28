@@ -262,7 +262,7 @@ class Event
   end
 
   def slots_taken
-    Ticket.slots_taken(tickets.and(made_available_at: nil))
+    tickets.and(made_available_at: nil).slots_taken
   end
 
   def places_remaining

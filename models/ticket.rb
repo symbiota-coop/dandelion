@@ -136,10 +136,10 @@ class Ticket
     CURRENCY_OPTIONS
   end
 
-  def self.slots_taken(scope = all)
-    counts = scope.collection.aggregate(
+  def self.slots_taken
+    counts = collection.aggregate(
       [
-        { '$match' => scope.selector },
+        { '$match' => criteria.selector },
         { '$group' => { '_id' => '$ticket_type_id', 'count' => { '$sum' => 1 } } }
       ]
     ).each_with_object({}) { |row, hash| hash[row['_id']] = row['count'] }
