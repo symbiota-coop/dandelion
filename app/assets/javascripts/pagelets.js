@@ -71,19 +71,8 @@ $(function () {
   function postLoad (pagelet) {
     setPageletLoaded(pagelet)
     $('.tooltip').remove()
-    $('[data-pagelet-refresh-paused]').removeAttr('data-pagelet-refresh-paused')
+    pagelet.removeAttr('data-pagelet-refresh-paused')
     refreshAlsoPagelet(pagelet)
-  }
-
-  function hasFilesSelected ($form) {
-    const $fileInputs = $form.find('input[type=file]')
-    if ($fileInputs.length === 0) return false
-
-    const fileValues = $fileInputs.map(function () {
-      return $(this).val()
-    }).toArray().join('')
-
-    return fileValues !== ''
   }
 
   // ─────────────────────────────────────────────────────────────
@@ -101,22 +90,11 @@ $(function () {
       return false
     }
 
-    if (hasFilesSelected($form)) {
-      // Handle file uploads with FormData
-      $.ajax({
-        type: 'POST',
-        url: $form.attr('action'),
-        data: new FormData(this),
-        success: function () {
-          reloadPagelet(pagelet, function () { postLoad(pagelet) })
-        }
-      })
-    } else {
-      // Standard form submission
-      $.post($form.attr('action'), $form.serialize(), function () {
-        reloadPagelet(pagelet, function () { postLoad(pagelet) })
-      })
-    }
+    $.post($form.attr('action'), $form.serialize(), function () {
+      reloadPagelet(pagelet, function () { postLoad(pagelet) })
+    }).fail(function () {
+      setPageletLoaded(pagelet)
+    })
 
     return false
   })
@@ -146,6 +124,8 @@ $(function () {
     const request = ($link.data('method') === 'post' || /destroy$/.test(path)) ? $.post : $.get
     request(href, function () {
       reloadPagelet(pagelet, function () { postLoad(pagelet) })
+    }).fail(function () {
+      setPageletLoaded(pagelet)
     })
 
     return false
