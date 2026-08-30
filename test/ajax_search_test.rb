@@ -87,4 +87,15 @@ class AjaxSearchTest < ActiveSupport::TestCase
   test 'ajax search handles nil query' do
     assert ajax_search.empty?
   end
+
+  test 'ajax search returns plain text labels without html' do
+    xss_name = '<img src=x onerror=alert(1)> XSS Account'
+    @account = FactoryBot.create(:account, name: xss_name, has_signed_in: true)
+
+    result = JSON.parse(ajax_search('XSS', 'accounts')).find { |r| r['value'].include?('XSS Account') }
+    assert result
+    assert_equal xss_name, result['label']
+    assert_equal 'bi-person-fill', result['icon']
+    refute_includes result['label'], '<i'
+  end
 end

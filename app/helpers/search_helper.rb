@@ -50,8 +50,9 @@ Dandelion::App.helpers do
       prefix = search_prefix(config_model_class)
       results += items.map do |item|
         {
-          label: %(<i class="bi #{config[:icon]}"></i> #{config[:label_formatter].call(item)}),
-          value: %(#{prefix}:"#{item.name}")
+          label: config[:label_formatter].call(item),
+          value: %(#{prefix}:"#{item.name}"),
+          icon: config[:icon]
         }
       end
     end

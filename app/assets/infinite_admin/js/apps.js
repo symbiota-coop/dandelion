@@ -30,6 +30,20 @@ var generateSlimScroll = function (element) {
 
 /* 02. Handle Header Search Bar
  ------------------------------------------------ */
+var renderSearchAutocompleteItem = function (ul, item) {
+  var $icon = $('<i aria-hidden="true">').addClass('bi').css('margin-right', '0.35em');
+  if (typeof item.icon === 'string' && /^bi-[a-z0-9-]+$/.test(item.icon)) {
+    $icon.addClass(item.icon);
+  }
+  return $('<li>')
+    .append(
+      $('<a>')
+        .attr('data-value', item.value)
+        .append($icon)
+        .append($('<span>').text(item.label || ''))
+    )
+    .appendTo(ul);
+};
 var handleHeaderSearchBar = function () {
   $(document).on('click', '[data-toggle="search-bar"]', function (e) {
     e.preventDefault();
@@ -53,7 +67,6 @@ var handleHeaderSearchBar = function () {
     });
   });
   $('#header-search').autocomplete({
-    html: true,
     source: '/search',
     minLength: 3,
     open: function (event, ui) {
@@ -66,11 +79,7 @@ var handleHeaderSearchBar = function () {
       $('.header-search-bar .right-icon').html('<i class="bi bi-x-lg"></i>')
     },
     create: function () {
-      $(this).data('ui-autocomplete')._renderItem = function (ul, item) {
-        return $('<li>')
-          .append($('<a>').html(item.label).attr('data-value', item.value))
-          .appendTo(ul);
-      };
+      $(this).data('ui-autocomplete')._renderItem = renderSearchAutocompleteItem;
     },
     select: function (event, ui) {
       $('#header-search').closest('form').submit();

@@ -4,9 +4,11 @@
     <script>
       $(function() {
         $('#messages-search').autocomplete({
-          html: true,
           source: '/search?type=accounts',
           minLength: 3,
+          create: function () {
+            $(this).data('ui-autocomplete')._renderItem = renderSearchAutocompleteItem;
+          },
           select: function(event, ui) {
               $('#messages-search').val(ui.item.value);
               $('#messages-search').closest('form').submit();
