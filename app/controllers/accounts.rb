@@ -221,7 +221,7 @@ Dandelion::App.controller do
     else
       @account.feedback_summary!
     end
-    redirect request.referrer ? "#{request.referrer}#feedback" : back
+    redirect back('#feedback')
   end
 
   get '/accounts/:id/feedback_summary/delete' do
@@ -230,7 +230,7 @@ Dandelion::App.controller do
     @account.set(feedback_summary: nil)
     @account.set(feedback_summary_last_refreshed_at: Time.now)
     flash[:notice] = 'Feedback summary removed.'
-    redirect request.referrer ? "#{request.referrer}#feedback" : back
+    redirect back('#feedback')
   end
 
   post '/accounts/:id/reset_password', provides: :json do

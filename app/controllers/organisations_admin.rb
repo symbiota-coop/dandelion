@@ -397,7 +397,7 @@ Dandelion::App.controller do
     else
       @organisation.feedback_summary!
     end
-    redirect request.referrer ? "#{request.referrer}#feedback" : back
+    redirect back('#feedback')
   end
 
   get '/organisations/:id/feedback_summary/delete' do
@@ -406,6 +406,6 @@ Dandelion::App.controller do
     @organisation.set(feedback_summary: nil)
     @organisation.set(feedback_summary_last_refreshed_at: Time.now)
     flash[:notice] = 'Feedback summary removed.'
-    redirect request.referrer ? "#{request.referrer}#feedback" : back
+    redirect back('#feedback')
   end
 end

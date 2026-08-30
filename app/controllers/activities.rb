@@ -44,7 +44,7 @@ Dandelion::App.controller do
     else
       @activity.feedback_summary!
     end
-    redirect request.referrer ? "#{request.referrer}#feedback" : back
+    redirect back('#feedback')
   end
 
   get '/activities/:id/feedback_summary/delete' do
@@ -53,7 +53,7 @@ Dandelion::App.controller do
     @activity.set(feedback_summary: nil)
     @activity.set(feedback_summary_last_refreshed_at: Time.now)
     flash[:notice] = 'Feedback summary removed.'
-    redirect request.referrer ? "#{request.referrer}#feedback" : back
+    redirect back('#feedback')
   end
 
   get '/activities/:id/events/stats' do

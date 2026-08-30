@@ -1,12 +1,38 @@
 Dandelion::App.helpers do
-  def back
-    url = request.referer || '/'
-    uri = URI.parse(url)
+  def back(fragment = nil)
+    uri = internal_redirect_uri(request.referer) || URI.parse('/')
     params = uri.query ? Rack::Utils.parse_query(uri.query) : {}
     params.except!('_')
     params['_'] = Time.now.to_i
     uri.query = Rack::Utils.build_query(params)
+    uri.fragment = fragment.to_s.delete_prefix('#') if fragment
     uri.to_s
+  end
+
+  def internal_redirect_uri(url)
+    return unless url.present?
+
+    uri = URI.parse(url)
+    uri.user = nil
+    uri.password = nil
+    if uri.host
+      return unless %w[http https].include?(uri.scheme)
+      return unless allowed_redirect_hosts.any? { |host| uri.host.casecmp?(host) }
+    else
+      return if uri.scheme
+      return unless uri.path&.start_with?('/')
+    end
+    uri
+  rescue URI::InvalidURIError
+    nil
+  end
+
+  def allowed_redirect_hosts
+    hosts = [request.host]
+    hosts << URI.parse(ENV['BASE_URI']).host if ENV['BASE_URI']
+    hosts.compact
+  rescue URI::InvalidURIError
+    [request.host].compact
   end
 
   def ip_from_cloudflare
