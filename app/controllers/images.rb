@@ -16,6 +16,8 @@ Dandelion::App.controller do
   end
 
   get '/youtube_thumb/:id' do
+    halt 400 unless params[:id] =~ /\A[A-Za-z0-9_-]{11}\z/
+
     # load base image
     begin
       base_image = MiniMagick::Image.open("https://i.ytimg.com/vi/#{params[:id]}/sddefault.jpg")
