@@ -8,7 +8,7 @@ This policy explains how Dandelion handles personal data when you use the Dandel
 
 ## What We Collect
 
-We collect information you give us, such as your name, email address, username, password, profile details, event bookings, applications, answers to event questions, messages, comments, files and support requests. Optional profile fields may include phone number, location, date of birth, gender, sexuality, biography, interests and social links.
+We collect information you give us, such as your name, email address, username, password, profile details, event bookings, applications, answers to event questions, messages, comments, files and support requests. Optional profile fields may include phone number, location, date of birth, gender, biography, interests and social links.
 
 We collect technical information needed to run the service, including IP address, browser and device information, log data, security events, session data and approximate location inferred from your IP address.
 

@@ -100,23 +100,6 @@
       </td>
     </tr>
   <% end %>
-  <% if viewable?(account, :sexuality, viewer_in_network: viewer_in_network) %>
-    <tr>
-      <td>Sexuality</td>
-      <td>
-        <div class="row justify-content-between no-gutters">
-          <div class="col">
-            <%= account.sexuality %>
-          </div>
-          <% if current_account && current_account.id == account.id %>
-            <div class="col-auto">
-              <div data-pagelet-url="/accounts/privacyable/sexuality"></div>
-            </div>
-          <% end %>
-        </div>
-      </td>
-    </tr>
-  <% end %>
   <% if viewable?(account, :location, viewer_in_network: viewer_in_network) && !account.location.match(/[0-9]/) %>
     <tr>
       <td>Location</td>
@@ -128,23 +111,6 @@
           <% if current_account && current_account.id == account.id %>
             <div class="col-auto">
               <div data-pagelet-url="/accounts/privacyable/location"></div>
-            </div>
-          <% end %>
-        </div>
-      </td>
-    </tr>
-  <% end %>
-  <% if viewable?(account, :open_to, viewer_in_network: viewer_in_network) && account.open_to.exists? %>
-    <tr>
-      <td>Open to</td>
-      <td>
-        <div class="row justify-content-between no-gutters">
-          <div class="col">
-            <%== account.open_to.map { |x| %(<span class="text-white label label-primary d-inline-block mb-1 mb-lg-0">#{x.humanize}</span>) }.join(' ') %>
-          </div>
-          <% if current_account && current_account.id == account.id %>
-            <div class="col-auto">
-              <div data-pagelet-url="/accounts/privacyable/open_to"></div>
             </div>
           <% end %>
         </div>
