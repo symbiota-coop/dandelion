@@ -1,11 +1,19 @@
-<% s = Ticket.home_page_stats unless ENV['CREATE_VIDEO'] %>
 <% unless ENV['CREATE_VIDEO'] %>
-<script>
-$(function() {
-  new countUp.CountUp('ticket-count', <%= s[:ticket_count] %>).start();
-  new countUp.CountUp('worth-count', <%= s[:worth_gbp_integer] %>).start();
-})
-</script>
+  <%
+  s = Ticket.home_page_stats
+  country = request.env['HTTP_CF_IPCOUNTRY']
+  country = 'GB' if country == 'UK'
+  currency = ISO3166::Country[country]&.currency_code
+  currency = 'GBP' unless FIAT_CURRENCIES.include?(currency)
+  worth = Money.new(s[:worth_gbp_integer] * 100, 'GBP').exchange_to(currency)
+  worth_integer = Float('%.3g' % worth).to_i
+%>
+  <script>
+    $(function() {
+      new countUp.CountUp('ticket-count', <%= s[:ticket_count] %>).start();
+      new countUp.CountUp('worth-count', <%= worth_integer %>).start();
+    })
+  </script>
 <% end %>
 <img src="/images/tickets.png" style="height: 50px">
 <span class="d-sm-none">
@@ -16,5 +24,5 @@ $(function() {
   <br />
 </span>
 worth
-£<span id="worth-count" style="text-decoration: underline"><%= ENV['CREATE_VIDEO'] ? '5,330,000' : s[:worth_gbp_integer] %></span>+
+<%= ENV['CREATE_VIDEO'] ? '£' : money_symbol(currency) %><span id="worth-count" style="text-decoration: underline"><%= ENV['CREATE_VIDEO'] ? '5,330,000' : worth_integer %></span>+
 sold
