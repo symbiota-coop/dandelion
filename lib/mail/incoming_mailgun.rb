@@ -2,11 +2,21 @@ class EmailReceiver < Incoming::Strategies::Mailgun
   setup api_key: ENV['MAILGUN_WEBHOOK_SIGNING_KEY']
 
   def initialize(request)
-    @envelope_sender = self.class.normalize_envelope_sender(request.params['sender'])
+    @envelope_sender = self.class.authenticated_envelope_sender(request)
     super
   end
 
-  # SMTP envelope sender from the signed Mailgun webhook, not MIME From.
+  # Webhook signing only proves Mailgun sent the request. Trust MAIL FROM only
+  # when Mailgun SPF passed and it matches MIME From.
+  def self.authenticated_envelope_sender(request)
+    sender = normalize_envelope_sender(request.params['sender'])
+    from = normalize_envelope_sender(request.params['from'])
+    return unless sender && from && sender == from
+    return unless spf_pass?(request)
+
+    sender
+  end
+
   def self.normalize_envelope_sender(sender)
     raw = sender.to_s.strip
     return if raw.blank?
@@ -16,6 +26,20 @@ class EmailReceiver < Incoming::Strategies::Mailgun
     return unless EmailAddress.valid?(email)
 
     email
+  end
+
+  def self.spf_pass?(request)
+    mailgun_header(request, 'x-mailgun-spf').to_s.casecmp('pass').zero?
+  end
+
+  def self.mailgun_header(request, name)
+    pairs = JSON.parse(request.params['message-headers'].to_s)
+    return unless pairs.is_a?(Array)
+
+    pair = pairs.find { |entry| entry.is_a?(Array) && entry[0].to_s.downcase == name }
+    pair && pair[1]
+  rescue JSON::ParserError, TypeError
+    nil
   end
 
   def receive(mail)
