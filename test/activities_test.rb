@@ -4,23 +4,21 @@ class ActivitiesTest < ActiveSupport::TestCase
   include Capybara::DSL
 
   test 'creating an activity' do
-    @account = FactoryBot.create(:account)
-    @organisation = FactoryBot.create(:organisation, account: @account)
-    @activity = FactoryBot.build_stubbed(:activity)
+    create_organisation
+    activity = FactoryBot.build_stubbed(:activity)
     login_as(@account)
     visit "/o/#{@organisation.slug}"
     click_link 'Create an activity'
-    fill_in 'Name', with: @activity.name
+    fill_in 'Name', with: activity.name
     click_button 'Create activity'
     assert page.has_content? 'The activity was created'
   end
 
   test 'editing an activity' do
-    @account = FactoryBot.create(:account)
-    @organisation = FactoryBot.create(:organisation, account: @account)
-    @activity = FactoryBot.create(:activity, organisation: @organisation, account: @account)
+    create_organisation
+    activity = FactoryBot.create(:activity, organisation: @organisation)
     login_as(@account)
-    visit "/activities/#{@activity.id}/edit"
+    visit "/activities/#{activity.id}/edit"
     fill_in 'Name', with: (name = FactoryBot.build_stubbed(:activity).name)
     click_button 'Update activity'
     assert page.has_content? 'The activity was saved'
@@ -28,16 +26,7 @@ class ActivitiesTest < ActiveSupport::TestCase
   end
 
   test 'organisation_id and account_id cannot be reassigned on update' do
-    account = FactoryBot.create(:account)
-    other_account = FactoryBot.create(:account)
-    organisation = FactoryBot.create(:organisation, account: account)
-    other_organisation = FactoryBot.create(:organisation, account: other_account)
-    activity = FactoryBot.create(:activity, organisation: organisation, account: account)
-
-    activity.organisation = other_organisation
-    activity.account = other_account
-    refute activity.valid?
-    assert_includes activity.errors[:organisation], 'cannot be changed'
-    assert_includes activity.errors[:account], 'cannot be changed'
+    activity = FactoryBot.create(:activity)
+    assert_cannot_reassign_organisation_or_account(activity)
   end
 end

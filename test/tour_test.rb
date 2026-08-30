@@ -4,8 +4,8 @@ class TourTest < ActiveSupport::TestCase
   include Capybara::DSL
 
   test 'home tour' do
-    @account = FactoryBot.create(:account)
-    login_as(@account)
+    account = FactoryBot.create(:account)
+    login_as(account)
     visit '/?tour=1'
     assert page.has_content? 'Welcome to Dandelion!'
     execute_script %{$('.introjs-nextbutton').click()}
@@ -17,8 +17,7 @@ class TourTest < ActiveSupport::TestCase
   end
 
   test 'organisation tour' do
-    @account = FactoryBot.create(:account)
-    @organisation = FactoryBot.create(:organisation, account: @account)
+    create_organisation
     login_as(@account)
     visit "/o/#{@organisation.slug}/edit?tour=1"
     assert page.has_content? "You've created your first organisation"
@@ -29,9 +28,7 @@ class TourTest < ActiveSupport::TestCase
   end
 
   test 'event tour' do
-    @account = FactoryBot.create(:account)
-    @organisation = FactoryBot.create(:organisation, account: @account)
-    @event = FactoryBot.create(:event, organisation: @organisation, account: @account, last_saved_by: @account)
+    create_event
     login_as(@account)
     visit "/events/#{@event.id}?tour=1"
     assert page.has_content? "You've created your first event"

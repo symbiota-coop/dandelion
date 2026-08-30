@@ -1,31 +1,16 @@
 require File.expand_path("#{File.dirname(__FILE__)}/test_config.rb")
 require 'ostruct'
-require 'rack/test'
 
 class GoCardlessInstalmentTest < ActiveSupport::TestCase
   include Rack::Test::Methods
 
-  def app
-    Padrino.application
-  end
-
-  def create_event(instalment_count: 3)
-    account = FactoryBot.create(:account)
-    organisation = FactoryBot.create(
-      :organisation,
-      account: account,
+  def create_instalment_event(instalment_count: 3)
+    create_organisation(
       gocardless_access_token: 'sandbox_token',
       gocardless_endpoint_secret: 'webhook_secret',
       gocardless_instalments: true
     )
-    FactoryBot.create(
-      :event,
-      organisation: organisation,
-      account: account,
-      last_saved_by: account,
-      prices: [30],
-      gocardless_instalment_count: instalment_count
-    )
+    create_event(prices: [30], gocardless_instalment_count: instalment_count)
   end
 
   def create_instalment_order(event)
@@ -86,9 +71,9 @@ class GoCardlessInstalmentTest < ActiveSupport::TestCase
   end
 
   test 'checkout stores the billing request id' do
-    event = create_event(instalment_count: 4)
-    order = Order.create!(event: event, account: FactoryBot.create(:account), value: 40, currency: event.currency)
-    order.tickets.create!(event: event, account: order.account, ticket_type: event.ticket_types.first, price: 40)
+    create_instalment_event(instalment_count: 4)
+    order = Order.create!(event: @event, account: FactoryBot.create(:account), value: 40, currency: @event.currency)
+    order.tickets.create!(event: @event, account: order.account, ticket_type: @event.ticket_types.first, price: 40)
 
     billing_request = OpenStruct.new(id: 'BRQ123')
     billing_request_flow = OpenStruct.new
@@ -107,7 +92,7 @@ class GoCardlessInstalmentTest < ActiveSupport::TestCase
     client = OpenStruct.new(billing_requests: billing_requests, billing_request_flows: billing_request_flows)
 
     GoCardlessPro::Client.stub :new, client do
-      EventPaymentMethod::GoCardlessInstalment.call(order: order, event: event)
+      EventPaymentMethod::GoCardlessInstalment.call(order: order, event: @event)
     end
 
     assert_equal 'BRQ123', order.reload.gocardless_billing_request_id
@@ -121,11 +106,11 @@ class GoCardlessInstalmentTest < ActiveSupport::TestCase
   end
 
   test 'fulfilled billing request webhook creates the schedule and issues tickets' do
-    event = create_event
-    order = create_instalment_order(event)
+    create_instalment_event
+    order = create_instalment_order(@event)
     client, captured = stub_gocardless_schedule_client
 
-    deliver_webhook(event.organisation, billing_request_event(order.gocardless_billing_request_id), client)
+    deliver_webhook(@organisation, billing_request_event(order.gocardless_billing_request_id), client)
 
     assert_equal [1000, 1000, 1000], captured[:params][:instalments][:amounts]
     assert_equal 'monthly', captured[:params][:instalments][:interval_unit]
@@ -134,13 +119,13 @@ class GoCardlessInstalmentTest < ActiveSupport::TestCase
   end
 
   test 'fulfilled billing request webhook restores a deleted checkout' do
-    event = create_event
-    order = create_instalment_order(event)
+    create_instalment_event
+    order = create_instalment_order(@event)
     billing_request_id = order.gocardless_billing_request_id
     order.destroy
     client, = stub_gocardless_schedule_client
 
-    deliver_webhook(event.organisation, billing_request_event(billing_request_id), client)
+    deliver_webhook(@organisation, billing_request_event(billing_request_id), client)
 
     restored = Order.find(order.id)
     assert restored

@@ -139,8 +139,7 @@ class CalendarImportsTest < ActiveSupport::TestCase
   end
 
   test 'syncing multiple iCal feeds creates events from each feed' do
-    account = FactoryBot.create(:account)
-    organisation = FactoryBot.create(:organisation, account: account, calendar_import_urls: "#{ICS_URL_1}\n#{WEBCAL_URL_2}")
+    organisation = FactoryBot.create(:organisation, calendar_import_urls: "#{ICS_URL_1}\n#{WEBCAL_URL_2}")
 
     stub_faraday(
       ICS_URL_1 => { status: 200, body: TEST_ICAL_1 },
@@ -167,8 +166,7 @@ class CalendarImportsTest < ActiveSupport::TestCase
   end
 
   test 'syncing multiple feeds keeps updates scoped to the correct feed' do
-    account = FactoryBot.create(:account)
-    organisation = FactoryBot.create(:organisation, account: account, calendar_import_urls: "#{ICS_URL_1}\n#{ICS_URL_2}")
+    organisation = FactoryBot.create(:organisation, calendar_import_urls: "#{ICS_URL_1}\n#{ICS_URL_2}")
 
     stub_faraday(
       ICS_URL_1 => { status: 200, body: TEST_ICAL_1 },
@@ -204,8 +202,7 @@ class CalendarImportsTest < ActiveSupport::TestCase
   end
 
   test 'sync stores aggregated errors when one feed fails' do
-    account = FactoryBot.create(:account)
-    organisation = FactoryBot.create(:organisation, account: account, calendar_import_urls: "#{ICS_URL_1}\n#{ICS_URL_2}")
+    organisation = FactoryBot.create(:organisation, calendar_import_urls: "#{ICS_URL_1}\n#{ICS_URL_2}")
 
     stub_faraday(
       ICS_URL_1 => { status: 200, body: TEST_ICAL_1 },
@@ -230,8 +227,7 @@ class CalendarImportsTest < ActiveSupport::TestCase
   INVALID_ICAL_RESPONSE = '<html><body>Sign in first</body></html>'.freeze
 
   test 'syncing when an event drops out of the feed destroys the imported event' do
-    account = FactoryBot.create(:account)
-    organisation = FactoryBot.create(:organisation, account: account, calendar_import_urls: ICS_URL_1)
+    organisation = FactoryBot.create(:organisation, calendar_import_urls: ICS_URL_1)
 
     stub_faraday(ICS_URL_1 => { status: 200, body: TEST_ICAL_1 }) do
       organisation.sync_calendar_imports
@@ -252,8 +248,7 @@ class CalendarImportsTest < ActiveSupport::TestCase
   end
 
   test 'syncing when the feed returns a non-calendar 200 response keeps imported events' do
-    account = FactoryBot.create(:account)
-    organisation = FactoryBot.create(:organisation, account: account, calendar_import_urls: ICS_URL_1)
+    organisation = FactoryBot.create(:organisation, calendar_import_urls: ICS_URL_1)
 
     stub_faraday(ICS_URL_1 => { status: 200, body: TEST_ICAL_1 }) do
       organisation.sync_calendar_imports
@@ -274,8 +269,7 @@ class CalendarImportsTest < ActiveSupport::TestCase
   end
 
   test 'syncing a cancelled iCal event unpublishes the imported event' do
-    account = FactoryBot.create(:account)
-    organisation = FactoryBot.create(:organisation, account: account, calendar_import_urls: ICS_URL_1)
+    organisation = FactoryBot.create(:organisation, calendar_import_urls: ICS_URL_1)
 
     stub_faraday(ICS_URL_1 => { status: 200, body: TEST_ICAL_1 }) do
       organisation.sync_calendar_imports
@@ -295,8 +289,7 @@ class CalendarImportsTest < ActiveSupport::TestCase
   end
 
   test 'Luma iCal uses LOCATION as source URL and fetches og:image when URL property is absent' do
-    account = FactoryBot.create(:account)
-    organisation = FactoryBot.create(:organisation, account: account, calendar_import_urls: LUMA_ICS_URL)
+    organisation = FactoryBot.create(:organisation, calendar_import_urls: LUMA_ICS_URL)
     luma_event_url = 'https://luma.com/event/evt-test'
     resolved_page_url = 'https://lu.ma/evt-test'
     fetched_urls = []
@@ -329,8 +322,7 @@ class CalendarImportsTest < ActiveSupport::TestCase
   test 'Luma iCal reverse-geocodes GEO to a city when LOCATION is a gated Luma URL' do
     GeonamesCityLookup.reset!
 
-    account = FactoryBot.create(:account)
-    organisation = FactoryBot.create(:organisation, account: account, calendar_import_urls: LUMA_ICS_URL)
+    organisation = FactoryBot.create(:organisation, calendar_import_urls: LUMA_ICS_URL)
     luma_event_url = 'https://luma.com/event/evt-test'
     resolved_page_url = 'https://lu.ma/evt-test'
     fetched_urls = []
@@ -358,8 +350,7 @@ class CalendarImportsTest < ActiveSupport::TestCase
   end
 
   test 'Luma iCal keeps plain-text LOCATION when not a URL' do
-    account = FactoryBot.create(:account)
-    organisation = FactoryBot.create(:organisation, account: account, calendar_import_urls: LUMA_ICS_URL)
+    organisation = FactoryBot.create(:organisation, calendar_import_urls: LUMA_ICS_URL)
     ical = <<~ICAL
       BEGIN:VCALENDAR
       VERSION:2.0
@@ -382,8 +373,7 @@ class CalendarImportsTest < ActiveSupport::TestCase
   end
 
   test 'Luma iCal derives purchase URL from evt- UID when URL and LOCATION lack a Luma link' do
-    account = FactoryBot.create(:account)
-    organisation = FactoryBot.create(:organisation, account: account, calendar_import_urls: LUMA_ICS_URL)
+    organisation = FactoryBot.create(:organisation, calendar_import_urls: LUMA_ICS_URL)
     luma_event_url = 'https://luma.com/event/evt-inperson'
     fetched_urls = []
     html = "<!DOCTYPE html><html><head><meta property=\"og:image\" content=\"#{LUMA_OG_IMAGE_URL_DEFAULT}\"></head><body></body></html>"
@@ -425,18 +415,15 @@ class CalendarImportsTest < ActiveSupport::TestCase
   end
 
   test 'rejects iCal URLs on hosts outside the allowlist' do
-    account = FactoryBot.create(:account)
-    organisation = FactoryBot.build(:organisation, account: account, calendar_import_urls: 'https://evil.example.com/feed.ics')
+    organisation = FactoryBot.build(:organisation, calendar_import_urls: 'https://evil.example.com/feed.ics')
 
     refute organisation.valid?
     assert(organisation.errors[:calendar_import_urls].any? { |message| message.include?('not allowed') })
   end
 
   test 'allows api.luma.com and api2.luma.com iCal hosts' do
-    account = FactoryBot.create(:account)
-
     %w[api.luma.com api2.luma.com].each do |host|
-      organisation = FactoryBot.build(:organisation, account: account, calendar_import_urls: "https://#{host}/ics/get?entity=calendar&id=cal-test")
+      organisation = FactoryBot.build(:organisation, calendar_import_urls: "https://#{host}/ics/get?entity=calendar&id=cal-test")
       assert organisation.valid?, "expected #{host} to be allowed"
     end
   end

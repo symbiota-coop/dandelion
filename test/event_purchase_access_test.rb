@@ -1,18 +1,7 @@
 require File.expand_path("#{File.dirname(__FILE__)}/test_config.rb")
-require 'rack/test'
 
 class EventPurchaseAccessTest < ActiveSupport::TestCase
   include Rack::Test::Methods
-
-  def app
-    Padrino.application
-  end
-
-  def sign_in(account)
-    account.generate_sign_in_token!
-    get '/', sign_in_token: account.sign_in_token
-    follow_redirect! while last_response.redirect?
-  end
 
   def post_purchase(event, account)
     ticket_type = event.ticket_types.first
@@ -38,11 +27,11 @@ class EventPurchaseAccessTest < ActiveSupport::TestCase
   test 'purchase is allowed when the event is locked and the buyer is an event admin' do
     create_full_event_hierarchy(event_options: { prices: [0], locked: true })
 
-    sign_in(@org_account)
-    post_purchase(@event, @org_account)
+    rack_login_as(@account)
+    post_purchase(@event, @account)
 
     assert_equal 200, last_response.status
-    assert @event.orders.find_by(account: @org_account)
+    assert @event.orders.find_by(account: @account)
   end
 
   test 'purchase is forbidden when monthly_donors_only and the buyer is not a signed-in donor' do
@@ -52,7 +41,7 @@ class EventPurchaseAccessTest < ActiveSupport::TestCase
     post_purchase(@event, buyer)
     assert_equal 403, last_response.status
 
-    sign_in(buyer)
+    rack_login_as(buyer)
     post_purchase(@event, buyer)
     assert_equal 403, last_response.status
     assert_equal 0, @event.orders.count
@@ -63,7 +52,7 @@ class EventPurchaseAccessTest < ActiveSupport::TestCase
     buyer = FactoryBot.create(:account)
     FactoryBot.create(:organisationship, organisation: @organisation, account: buyer, monthly_donation_method: 'Other')
 
-    sign_in(buyer)
+    rack_login_as(buyer)
     post_purchase(@event, buyer)
 
     assert_equal 200, last_response.status
@@ -78,7 +67,7 @@ class EventPurchaseAccessTest < ActiveSupport::TestCase
     post_purchase(@event, buyer)
     assert_equal 403, last_response.status
 
-    sign_in(buyer)
+    rack_login_as(buyer)
     post_purchase(@event, buyer)
     assert_equal 403, last_response.status
     assert_equal 0, @event.orders.count
@@ -90,7 +79,7 @@ class EventPurchaseAccessTest < ActiveSupport::TestCase
     buyer = FactoryBot.create(:account)
     @activity.activityships.create!(account: buyer)
 
-    sign_in(buyer)
+    rack_login_as(buyer)
     post_purchase(@event, buyer)
 
     assert_equal 200, last_response.status

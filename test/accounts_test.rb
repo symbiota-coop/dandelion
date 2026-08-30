@@ -22,25 +22,25 @@ class AccountsTest < ActiveSupport::TestCase
   # ═══════════════════════════════════════════════════════════════════════════
 
   test 'signing up' do
-    @account = FactoryBot.build_stubbed(:account)
+    account = FactoryBot.build_stubbed(:account)
     visit '/accounts/new'
-    fill_signup_form(@account)
+    fill_signup_form(account)
     assert page.has_content?('Welcome to Dandelion!')
   end
 
   test 'signing in' do
-    @account = FactoryBot.create(:account)
+    account = FactoryBot.create(:account)
     visit '/accounts/sign_in'
-    fill_in 'Email', with: @account.email
-    fill_in 'Password', with: @account.password
+    fill_in 'Email', with: account.email
+    fill_in 'Password', with: account.password
     click_button 'Sign in'
     assert page.has_content?('Signed in')
   end
 
   test 'editing profile' do
-    @account = FactoryBot.create(:account)
-    login_as(@account)
-    click_link @account.name
+    account = FactoryBot.create(:account)
+    login_as(account)
+    click_link account.name
     click_link 'Edit profile'
     fill_in 'Full name', with: (name = FactoryBot.build_stubbed(:account).name)
     click_button 'Save profile'
@@ -54,86 +54,88 @@ class AccountsTest < ActiveSupport::TestCase
 
   test 'signing up after visiting referral link returns to organisation creation' do
     referrer = FactoryBot.create(:account, username: 'refsignup', name: 'Signup Referrer', has_signed_in: true)
-    @account = FactoryBot.build_stubbed(:account)
-    @organisation = FactoryBot.build_stubbed(:organisation)
+    account = FactoryBot.build_stubbed(:account)
+    organisation = FactoryBot.build_stubbed(:organisation)
 
     visit "/invite/#{referrer.id}"
-    fill_signup_form(@account)
+    fill_signup_form(account)
 
     assert page.current_path.include?('/o/new')
 
-    fill_in 'Organisation name', with: @organisation.name
-    fill_in 'URL', with: @organisation.slug
+    fill_in 'Organisation name', with: organisation.name
+    fill_in 'URL', with: organisation.slug
     click_button 'Save and continue'
 
-    saved_organisation = Organisation.find_by(slug: @organisation.slug)
+    saved_organisation = Organisation.find_by(slug: organisation.slug)
     assert_equal referrer.id, saved_organisation.referrer_id
   end
 
   test 'return_to is cleared after signup redirect' do
     referrer = FactoryBot.create(:account, username: 'refclear', has_signed_in: true)
-    @account = FactoryBot.build_stubbed(:account)
+    account = FactoryBot.build_stubbed(:account)
 
     visit "/invite/#{referrer.id}"
-    fill_signup_form(@account)
+    fill_signup_form(account)
     assert page.current_path.include?('/o/new')
 
     visit '/accounts/sign_out'
-    @account2 = FactoryBot.build_stubbed(:account)
+    account2 = FactoryBot.build_stubbed(:account)
     visit '/accounts/new'
-    fill_signup_form(@account2)
+    fill_signup_form(account2)
 
     assert page.current_path.include?('/accounts/edit')
     refute page.current_path.include?('/o/new')
   end
 
   test 'signing up with organisation_id' do
-    @organisation = FactoryBot.create(:organisation)
-    @account = FactoryBot.build_stubbed(:account)
+    create_organisation
+    account = FactoryBot.build_stubbed(:account)
 
     visit "/accounts/new?organisation_id=#{@organisation.id}"
-    fill_signup_form(@account)
+    fill_signup_form(account)
 
     assert_edit_redirect_with_param('organisation_id', @organisation.id)
-    created_account = Account.find_by(email: @account.email.downcase)
+    created_account = Account.find_by(email: account.email.downcase)
     assert_associated(@organisation, created_account, :organisationships)
   end
 
   test 'signing up with activity_id' do
-    @activity = FactoryBot.create(:activity)
-    @account = FactoryBot.build_stubbed(:account)
+    create_organisation
+    activity = FactoryBot.create(:activity, organisation: @organisation)
+    account = FactoryBot.build_stubbed(:account)
 
-    visit "/accounts/new?activity_id=#{@activity.id}"
-    fill_signup_form(@account)
+    visit "/accounts/new?activity_id=#{activity.id}"
+    fill_signup_form(account)
 
-    assert_edit_redirect_with_param('activity_id', @activity.id)
-    created_account = Account.find_by(email: @account.email.downcase)
-    assert_associated(@activity, created_account, :activityships)
-    assert_associated(@activity.organisation, created_account, :organisationships)
+    assert_edit_redirect_with_param('activity_id', activity.id)
+    created_account = Account.find_by(email: account.email.downcase)
+    assert_associated(activity, created_account, :activityships)
+    assert_associated(@organisation, created_account, :organisationships)
   end
 
   test 'signing up with local_group_id' do
-    @local_group = FactoryBot.create(:local_group)
-    @account = FactoryBot.build_stubbed(:account)
+    create_organisation
+    local_group = FactoryBot.create(:local_group, organisation: @organisation)
+    account = FactoryBot.build_stubbed(:account)
 
-    visit "/accounts/new?local_group_id=#{@local_group.id}"
-    fill_signup_form(@account)
+    visit "/accounts/new?local_group_id=#{local_group.id}"
+    fill_signup_form(account)
 
-    assert_edit_redirect_with_param('local_group_id', @local_group.id)
-    created_account = Account.find_by(email: @account.email.downcase)
-    assert_associated(@local_group, created_account, :local_groupships)
-    assert_associated(@local_group.organisation, created_account, :organisationships)
+    assert_edit_redirect_with_param('local_group_id', local_group.id)
+    created_account = Account.find_by(email: account.email.downcase)
+    assert_associated(local_group, created_account, :local_groupships)
+    assert_associated(@organisation, created_account, :organisationships)
   end
 
   test 'signing up with event_id' do
     create_full_event_hierarchy
-    @account = FactoryBot.build_stubbed(:account)
+    account = FactoryBot.build_stubbed(:account)
 
     visit "/accounts/new?event_id=#{@event.id}"
-    fill_signup_form(@account)
+    fill_signup_form(account)
 
     assert_edit_redirect_with_param('event_id', @event.id)
-    created_account = Account.find_by(email: @account.email.downcase)
+    created_account = Account.find_by(email: account.email.downcase)
     assert_associated(@organisation, created_account, :organisationships)
     assert_associated(@activity, created_account, :activityships)
     assert_associated(@local_group, created_account, :local_groupships)
@@ -144,81 +146,83 @@ class AccountsTest < ActiveSupport::TestCase
   # ═══════════════════════════════════════════════════════════════════════════
 
   test 'existing account without context' do
-    @existing_account = FactoryBot.create(:account)
+    existing_account = FactoryBot.create(:account)
 
     visit '/accounts/new'
-    fill_signup_form(FactoryBot.build_stubbed(:account, email: @existing_account.email))
+    fill_signup_form(FactoryBot.build_stubbed(:account, email: existing_account.email))
 
     assert page.has_content?("There's already an account registered under that email address")
     assert_equal '/accounts/sign_in', page.current_path
   end
 
   test 'existing account with organisation_id' do
-    @organisation = FactoryBot.create(:organisation)
-    @existing_account = FactoryBot.create(:account)
+    create_organisation
+    existing_account = FactoryBot.create(:account)
 
     visit "/accounts/new?organisation_id=#{@organisation.id}"
-    fill_signup_form(FactoryBot.build_stubbed(:account, email: @existing_account.email))
+    fill_signup_form(FactoryBot.build_stubbed(:account, email: existing_account.email))
 
     assert page.has_content?("OK, you're on the list!")
-    assert_associated(@organisation, @existing_account, :organisationships)
+    assert_associated(@organisation, existing_account, :organisationships)
   end
 
   test 'existing account with activity_id' do
-    @activity = FactoryBot.create(:activity)
-    @existing_account = FactoryBot.create(:account)
+    create_organisation
+    activity = FactoryBot.create(:activity, organisation: @organisation)
+    existing_account = FactoryBot.create(:account)
 
-    visit "/accounts/new?activity_id=#{@activity.id}"
-    fill_signup_form(FactoryBot.build_stubbed(:account, email: @existing_account.email))
+    visit "/accounts/new?activity_id=#{activity.id}"
+    fill_signup_form(FactoryBot.build_stubbed(:account, email: existing_account.email))
 
     assert page.has_content?("OK, you're on the list!")
-    assert_associated(@activity, @existing_account, :activityships)
-    assert_associated(@activity.organisation, @existing_account, :organisationships)
+    assert_associated(activity, existing_account, :activityships)
+    assert_associated(@organisation, existing_account, :organisationships)
   end
 
   test 'existing account with local_group_id' do
-    @local_group = FactoryBot.create(:local_group)
-    @existing_account = FactoryBot.create(:account)
+    create_organisation
+    local_group = FactoryBot.create(:local_group, organisation: @organisation)
+    existing_account = FactoryBot.create(:account)
 
-    visit "/accounts/new?local_group_id=#{@local_group.id}"
-    fill_signup_form(FactoryBot.build_stubbed(:account, email: @existing_account.email))
+    visit "/accounts/new?local_group_id=#{local_group.id}"
+    fill_signup_form(FactoryBot.build_stubbed(:account, email: existing_account.email))
 
     assert page.has_content?("OK, you're on the list!")
-    assert_associated(@local_group, @existing_account, :local_groupships)
-    assert_associated(@local_group.organisation, @existing_account, :organisationships)
+    assert_associated(local_group, existing_account, :local_groupships)
+    assert_associated(@organisation, existing_account, :organisationships)
   end
 
   test 'existing account with event_id' do
     create_full_event_hierarchy
-    @existing_account = FactoryBot.create(:account)
+    existing_account = FactoryBot.create(:account)
 
     visit "/accounts/new?event_id=#{@event.id}"
-    fill_signup_form(FactoryBot.build_stubbed(:account, email: @existing_account.email))
+    fill_signup_form(FactoryBot.build_stubbed(:account, email: existing_account.email))
 
     assert page.has_content?("OK, you're on the list!")
-    assert_associated(@organisation, @existing_account, :organisationships)
-    assert_associated(@activity, @existing_account, :activityships)
-    assert_associated(@local_group, @existing_account, :local_groupships)
+    assert_associated(@organisation, existing_account, :organisationships)
+    assert_associated(@activity, existing_account, :activityships)
+    assert_associated(@local_group, existing_account, :local_groupships)
   end
 
   test 'existing account with event_id resubscribes unsubscribed accounts' do
     create_full_event_hierarchy
 
     # Create an existing account that's unsubscribed from org, activity, and local_group
-    @existing_account = FactoryBot.create(:account)
-    @organisation.organisationships.find_or_create_by(account: @existing_account).set_unsubscribed!(true)
-    @activity.activityships.find_or_create_by(account: @existing_account).set(unsubscribed: true)
-    @local_group.local_groupships.find_or_create_by(account: @existing_account).set(unsubscribed: true)
+    existing_account = FactoryBot.create(:account)
+    @organisation.organisationships.find_or_create_by(account: existing_account).set_unsubscribed!(true)
+    @activity.activityships.find_or_create_by(account: existing_account).set(unsubscribed: true)
+    @local_group.local_groupships.find_or_create_by(account: existing_account).set(unsubscribed: true)
 
     # Sign up with event_id (which should resubscribe via associate_with_event!)
     visit "/accounts/new?event_id=#{@event.id}"
-    fill_signup_form(FactoryBot.build_stubbed(:account, email: @existing_account.email))
+    fill_signup_form(FactoryBot.build_stubbed(:account, email: existing_account.email))
 
     assert page.has_content?("OK, you're on the list!")
 
     # Verify they're resubscribed
-    assert_equal false, @organisation.organisationships.find_by(account: @existing_account).unsubscribed
-    assert_equal false, @activity.activityships.find_by(account: @existing_account).unsubscribed
-    assert_equal false, @local_group.local_groupships.find_by(account: @existing_account).unsubscribed
+    assert_equal false, @organisation.organisationships.find_by(account: existing_account).unsubscribed
+    assert_equal false, @activity.activityships.find_by(account: existing_account).unsubscribed
+    assert_equal false, @local_group.local_groupships.find_by(account: existing_account).unsubscribed
   end
 end

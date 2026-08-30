@@ -12,31 +12,32 @@ class ActivityApplicationsTest < ActiveSupport::TestCase
     end
   end
 
+  def create_activity_with_questions
+    create_organisation
+    @activity = FactoryBot.create(:activity, organisation: @organisation, application_questions: APPLICATION_QUESTIONS)
+  end
+
   test 'applying to an activity when not logged in' do
-    @account = FactoryBot.create(:account)
-    @organisation = FactoryBot.create(:organisation, account: @account)
-    @activity = FactoryBot.create(:activity, organisation: @organisation, account: @account, application_questions: APPLICATION_QUESTIONS)
-    @applicant = FactoryBot.build_stubbed(:account)
+    create_activity_with_questions
+    applicant = FactoryBot.build_stubbed(:account)
     visit "/activities/#{@activity.id}/apply"
-    fill_in 'Full name', with: @applicant.name
-    fill_in 'Email', with: @applicant.email
+    fill_in 'Full name', with: applicant.name
+    fill_in 'Email', with: applicant.email
     fill_application_answers
     click_button 'Apply'
     assert page.has_content? 'Thanks for applying'
   end
 
   test 'applying to an activity when already a member' do
-    @account = FactoryBot.create(:account)
-    @organisation = FactoryBot.create(:organisation, account: @account)
-    @activity = FactoryBot.create(:activity, organisation: @organisation, account: @account)
+    create_organisation
+    activity = FactoryBot.create(:activity, organisation: @organisation)
     login_as(@account)
-    visit "/activities/#{@activity.id}/apply"
+    visit "/activities/#{activity.id}/apply"
     assert page.has_content? 'Preview of application form'
   end
 
   test 'activity application with questions' do
-    @account = FactoryBot.create(:account)
-    @organisation = FactoryBot.create(:organisation, account: @account)
+    create_organisation
     questions = <<~QUESTIONS.strip
       # Application Form
       - Please fill out all fields
@@ -46,13 +47,12 @@ class ActivityApplicationsTest < ActiveSupport::TestCase
       [I confirm my availability]
       {Preferred start date}
     QUESTIONS
-    @activity = FactoryBot.create(:activity,
-                                  organisation: @organisation,
-                                  account: @account,
-                                  application_questions: questions)
-    @applicant = FactoryBot.create(:account)
-    login_as(@applicant)
-    visit "/activities/#{@activity.id}/apply"
+    activity = FactoryBot.create(:activity,
+                                 organisation: @organisation,
+                                 application_questions: questions)
+    applicant = FactoryBot.create(:account)
+    login_as(applicant)
+    visit "/activities/#{activity.id}/apply"
 
     # Verify header and plain text are displayed
     assert page.has_content?('Application Form')
@@ -69,9 +69,9 @@ class ActivityApplicationsTest < ActiveSupport::TestCase
     click_button 'Apply'
     assert page.has_content?('Thanks for applying')
 
-    application = @activity.activity_applications.last
+    application = activity.activity_applications.last
     answers = application.answers.to_h
-    q = @activity.application_questions_a
+    q = activity.application_questions_a
 
     assert_equal 'I am a motivated individual', answers[q[2]]
     assert_equal 'Intermediate', answers[q[3]]

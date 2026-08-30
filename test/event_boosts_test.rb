@@ -5,9 +5,7 @@ class EventBoostsTest < ActiveSupport::TestCase
   include Capybara::DSL
 
   test 'event admin can view boosts page and pending boost shows checkout ids' do
-    @account = FactoryBot.create(:account)
-    @organisation = FactoryBot.create(:organisation, account: @account)
-    @event = FactoryBot.create(:event, organisation: @organisation, account: @account, last_saved_by: @account, prices: [0])
+    create_event(prices: [0])
 
     login_as(@account)
     visit "/events/#{@event.id}/boosts"
@@ -34,9 +32,7 @@ class EventBoostsTest < ActiveSupport::TestCase
   end
 
   test 'boost payment can be marked complete' do
-    @account = FactoryBot.create(:account)
-    @organisation = FactoryBot.create(:organisation, account: @account)
-    @event = FactoryBot.create(:event, organisation: @organisation, account: @account, last_saved_by: @account, prices: [0])
+    create_event(prices: [0])
 
     login_as(@account)
     visit "/events/#{@event.id}/boosts"
@@ -66,13 +62,11 @@ class EventBoostsTest < ActiveSupport::TestCase
   end
 
   test 'global listing renders boosted slot once on the first page' do
-    @account = FactoryBot.create(:account)
-    @organisation = FactoryBot.create(:organisation, account: @account)
-    @event_1 = FactoryBot.create(:event, organisation: @organisation, account: @account, last_saved_by: @account, name: 'Spotlight listing event', prices: [0])
-    @event_2 = FactoryBot.create(:event, organisation: @organisation, account: @account, last_saved_by: @account, name: 'Regular listing event', prices: [0])
+    create_event(as: :event1, name: 'Spotlight listing event', prices: [0])
+    create_event(as: :event2, name: 'Regular listing event', prices: [0])
 
     FactoryBot.create(:event_boost,
-                      event: @event_1,
+                      event: @event1,
                       account: @account,
                       start_time: Time.zone.now.beginning_of_hour,
                       hours: 2,
@@ -83,25 +77,25 @@ class EventBoostsTest < ActiveSupport::TestCase
     assert page.has_content?('Boosted by')
     assert_equal 1, page.text.scan('Spotlight listing event').length
     assert page.has_content?('Regular listing event')
-    assert_equal 1, @event_1.event_boost_impressions.count
+    assert_equal 1, @event1.event_boost_impressions.count
 
     visit "/events?organisation_id=#{@organisation.id}&page=2"
     assert page.has_no_content?('Boosted by')
   end
 
   test 'public listing ignores incomplete active boosts' do
-    @account = FactoryBot.create(:account)
-    @organisation_1 = FactoryBot.create(:organisation, account: @account, name: 'Visible Org')
-    @organisation_2 = FactoryBot.create(:organisation, account: @account, name: 'Other Org')
-    @event_1 = FactoryBot.create(:event, organisation: @organisation_1, account: @account, last_saved_by: @account, name: 'Org one event', prices: [0])
-    FactoryBot.create(:event, organisation: @organisation_2, account: @account, last_saved_by: @account, name: 'Org two event', prices: [0])
+    account = FactoryBot.create(:account)
+    organisation1 = FactoryBot.create(:organisation, account: account, name: 'Visible Org')
+    organisation2 = FactoryBot.create(:organisation, account: account, name: 'Other Org')
+    event1 = FactoryBot.create(:event, organisation: organisation1, name: 'Org one event', prices: [0])
+    FactoryBot.create(:event, organisation: organisation2, name: 'Org two event', prices: [0])
 
     FactoryBot.create(:event_boost, :pending_payment,
-                      event: @event_1,
-                      account: @account,
+                      event: event1,
+                      account: account,
                       start_time: Time.zone.now.beginning_of_hour,
                       hours: 1,
-                      hourly_amount: EventBoost.minimum_hourly_amount(@event_1.currency_or_default))
+                      hourly_amount: EventBoost.minimum_hourly_amount(event1.currency_or_default))
 
     visit '/events'
 
@@ -111,9 +105,7 @@ class EventBoostsTest < ActiveSupport::TestCase
   end
 
   test 'boost slot is not shown on homepage teasers or minimal embeds' do
-    @account = FactoryBot.create(:account)
-    @organisation = FactoryBot.create(:organisation, account: @account)
-    @event = FactoryBot.create(:event, organisation: @organisation, account: @account, last_saved_by: @account, name: 'Hidden boost slot event', prices: [0])
+    create_event(name: 'Hidden boost slot event', prices: [0])
     @event.set(has_image: true)
 
     FactoryBot.create(:event_boost,
@@ -131,10 +123,9 @@ class EventBoostsTest < ActiveSupport::TestCase
   end
 
   test 'boosted unpaid event appears in the boost slot but not the regular listing' do
-    @account = FactoryBot.create(:account)
-    @organisation = FactoryBot.create(:organisation, account: @account)
+    create_organisation
     @organisation.set(paid_up: false)
-    @event = FactoryBot.create(:event, organisation: @organisation, account: @account, last_saved_by: @account, name: 'Promotion-only boosted event')
+    create_event(name: 'Promotion-only boosted event')
     @event.set_browsable
     refute @event.reload.browsable?
 

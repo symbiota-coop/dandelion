@@ -33,40 +33,34 @@ class WaitlistTest < ActiveSupport::TestCase
 
   test 'waitlist creates organisationship, activityship, and local_groupship' do
     create_full_event_hierarchy(event_options: { prices: [10] })
-    @account = FactoryBot.create(:account)
+    buyer = FactoryBot.create(:account)
 
     # Create waitship directly to test the after_create callback
-    @event.waitships.create(account: @account)
+    @event.waitships.create(account: buyer)
 
     # Verify subscriptions were created
-    assert @organisation.organisationships.find_by(account: @account),
+    assert @organisation.organisationships.find_by(account: buyer),
            'Should create organisationship'
-    assert @activity.activityships.find_by(account: @account),
+    assert @activity.activityships.find_by(account: buyer),
            'Should create activityship for open activity'
-    assert @local_group.local_groupships.find_by(account: @account),
+    assert @local_group.local_groupships.find_by(account: buyer),
            'Should create local_groupship'
   end
 
   test 'waitship removed when ticket payment completed' do
-    @org_account = FactoryBot.create(:account)
-    @organisation = FactoryBot.create(:organisation, account: @org_account)
-    @event = FactoryBot.create(:event,
-                               organisation: @organisation,
-                               account: @org_account,
-                               last_saved_by: @org_account,
-                               prices: [10])
-    @account = FactoryBot.create(:account)
+    create_event(prices: [10])
+    buyer = FactoryBot.create(:account)
 
     # Add user to waitlist (bypass callbacks by using save without validation)
-    waitship = Waitship.new(account: @account, event: @event)
+    waitship = Waitship.new(account: buyer, event: @event)
     waitship.save(validate: false)
-    assert @event.waitships.find_by(account: @account), 'Waitship should exist initially'
+    assert @event.waitships.find_by(account: buyer), 'Waitship should exist initially'
 
     # Create a ticket directly
     ticket_type = @event.ticket_types.first
     ticket = Ticket.create!(
       event: @event,
-      account: @account,
+      account: buyer,
       ticket_type: ticket_type,
       price: 10
     )
@@ -75,27 +69,20 @@ class WaitlistTest < ActiveSupport::TestCase
     ticket.payment_completed!
 
     # Waitship should be removed
-    assert_nil @event.reload.waitships.find_by(account: @account),
+    assert_nil @event.reload.waitships.find_by(account: buyer),
                'Waitship should be removed after ticket payment completed'
   end
 
   test 'cannot join waitlist twice' do
-    @org_account = FactoryBot.create(:account)
-    @organisation = FactoryBot.create(:organisation, account: @org_account)
-    @event = FactoryBot.create(:event,
-                               organisation: @organisation,
-                               account: @org_account,
-                               last_saved_by: @org_account,
-                               prices: [10])
-
-    @account = FactoryBot.create(:account)
+    create_event(prices: [10])
+    buyer = FactoryBot.create(:account)
 
     # Create first waitship
-    waitship1 = Waitship.create!(account: @account, event: @event)
+    waitship1 = Waitship.create!(account: buyer, event: @event)
     assert waitship1.persisted?, 'First waitship should be created'
 
     # Try to create duplicate via model
-    waitship2 = Waitship.new(account: @account, event: @event)
+    waitship2 = Waitship.new(account: buyer, event: @event)
     assert_not waitship2.valid?, "Duplicate waitship should not be valid. Errors: #{waitship2.errors.full_messages}"
     # Mongoid puts uniqueness errors on the field name (account_id)
     assert waitship2.errors[:account_id].present? || waitship2.errors[:account].present?,
@@ -103,25 +90,18 @@ class WaitlistTest < ActiveSupport::TestCase
   end
 
   test 'waitlist with activity having non-open privacy does not create activityship' do
-    @org_account = FactoryBot.create(:account)
-    @organisation = FactoryBot.create(:organisation, account: @org_account)
-    @activity = FactoryBot.create(:activity, organisation: @organisation, account: @org_account, privacy: 'secret')
-    @event = FactoryBot.create(:event,
-                               organisation: @organisation,
-                               activity: @activity,
-                               account: @org_account,
-                               last_saved_by: @org_account,
-                               prices: [10])
-
-    @account = FactoryBot.create(:account)
-    @event.waitships.create(account: @account)
+    create_organisation
+    activity = FactoryBot.create(:activity, organisation: @organisation, privacy: 'secret')
+    create_event(activity: activity, prices: [10])
+    buyer = FactoryBot.create(:account)
+    @event.waitships.create(account: buyer)
 
     # Should NOT create activityship for non-open activity
-    assert_nil @activity.activityships.find_by(account: @account),
+    assert_nil activity.activityships.find_by(account: buyer),
                'Should not create activityship for secret activity'
 
     # Should still create organisationship
-    assert @organisation.organisationships.find_by(account: @account),
+    assert @organisation.organisationships.find_by(account: buyer),
            'Should still create organisationship'
   end
 end

@@ -23,7 +23,7 @@ FactoryBot.define do
     sequence(:name) { |n| "Activity #{n}" }
     sequence(:slug) { |n| "activity-#{n}" }
     organisation
-    account
+    account { organisation.account }
 
     after(:create) do |activity|
       activity.activityships.find_or_create_by(account: activity.account).set(admin: true) if activity.account
@@ -72,7 +72,7 @@ FactoryBot.define do
       })
     end
     organisation
-    account
+    account { organisation.account }
 
     after(:create) do |local_group|
       local_group.local_groupships.find_or_create_by(account: local_group.account).set(admin: true) if local_group.account
@@ -98,6 +98,10 @@ FactoryBot.define do
     enable_inventory { true }
     enable_budget { true }
     account
+
+    trait :public do
+      privacy { 'public' }
+    end
   end
 
   factory :ticket_type do
@@ -115,12 +119,20 @@ FactoryBot.define do
     location { '111 28, Sweden' }
     currency { 'GBP' }
     organisation
-    account
-    last_saved_by factory: :account
+    account { organisation.account }
+    last_saved_by { account }
 
     transient do
       prices { [] }
     end
+
+    trait :evergreen do
+      evergreen { true }
+      start_time { nil }
+      end_time { nil }
+      location { nil }
+    end
+
     after(:create) do |event, evaluator|
       evaluator.prices.each do |price|
         create(:ticket_type, event: event, price_or_range: price)
@@ -154,6 +166,6 @@ FactoryBot.define do
     sequence(:from) { |n| "Account #{n} <account#{n}@#{ENV['DOMAIN']}>" }
     sequence(:body) { |n| "Body text #{n}" }
     organisation
-    account
+    account { organisation.account }
   end
 end

@@ -10,6 +10,7 @@ require 'factory_bot'
 require 'minitest/autorun'
 require 'minitest/mock'
 require 'minitest/rg'
+require 'rack/test'
 
 Capybara.app = Padrino.application
 Capybara.server_port = ENV['PORT']
@@ -62,27 +63,56 @@ module ActiveSupport
       visit "/?sign_in_token=#{account.sign_in_token}"
     end
 
-    def create_full_event_hierarchy(options = {})
-      @org_account = FactoryBot.create(:account)
-      @organisation = FactoryBot.create(:organisation, account: @org_account, **options.fetch(:organisation_options, {}))
-      @activity = FactoryBot.create(:activity, organisation: @organisation, account: @org_account, privacy: 'open')
-      @local_group = FactoryBot.create(:local_group, organisation: @organisation, account: @org_account)
+    def app
+      Padrino.application
+    end
 
-      event_attrs = {
-        organisation: @organisation,
-        account: @org_account,
-        last_saved_by: @org_account,
-        **options.fetch(:event_options, {})
-      }
+    def rack_login_as(account)
+      account.generate_sign_in_token!
+      get '/', sign_in_token: account.sign_in_token
+      follow_redirect! while last_response.redirect?
+    end
+
+    # Helpers set @account/@organisation/@event/@gathering. Inline FactoryBot/Event.new uses locals.
+    def create_organisation(*traits, **attrs)
+      @account ||= FactoryBot.create(:account)
+      @organisation = FactoryBot.create(:organisation, *traits, account: @account, **attrs)
+    end
+
+    def create_event(*traits, as: :event, **attrs)
+      create_organisation unless @organisation
+      instance_variable_set(:"@#{as}", FactoryBot.create(:event, *traits, organisation: @organisation, **attrs))
+    end
+
+    def create_gathering(*traits, **attrs)
+      @account ||= FactoryBot.create(:account)
+      @gathering = FactoryBot.create(:gathering, *traits, account: @account, **attrs)
+    end
+
+    def create_full_event_hierarchy(options = {})
+      create_organisation(**options.fetch(:organisation_options, {}))
+      @activity = FactoryBot.create(:activity, organisation: @organisation, privacy: 'open')
+      @local_group = FactoryBot.create(:local_group, organisation: @organisation)
+
+      event_attrs = options.fetch(:event_options, {}).dup
       event_attrs[:activity] = @activity unless options[:skip_activity]
       event_attrs[:local_group] = @local_group unless options[:skip_local_group]
-
-      @event = FactoryBot.create(:event, **event_attrs)
+      create_event(**event_attrs)
     end
 
     def assert_associated(entity, account, association_name)
       assert entity.send(association_name).find_by(account: account),
              "Expected #{account.email} to be associated with #{entity.class.name} '#{entity.try(:name) || entity.id}'"
+    end
+
+    def assert_cannot_reassign_organisation_or_account(record)
+      other_account = FactoryBot.create(:account)
+      other_organisation = FactoryBot.create(:organisation, account: other_account)
+      record.organisation = other_organisation
+      record.account = other_account
+      refute record.valid?
+      assert_includes record.errors[:organisation], 'cannot be changed'
+      assert_includes record.errors[:account], 'cannot be changed'
     end
   end
 end

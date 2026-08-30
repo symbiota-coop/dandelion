@@ -3,54 +3,45 @@ require File.expand_path("#{File.dirname(__FILE__)}/test_config.rb")
 class EventsTest < ActiveSupport::TestCase
   include Capybara::DSL
 
+  def fill_event_create_form(event, ticket_type)
+    fill_in 'Event title*', with: event.name
+    execute_script %{$('#event_start_time').val('#{event.start_time.to_fs(:db_local)}')}
+    execute_script %{$('#event_end_time').val('#{event.end_time.to_fs(:db_local)}')}
+    fill_in 'Location', with: event.location if event.location
+    click_link 'Tickets'
+    execute_script %{$("a:contains('Add ticket type')").click()}
+    fill_in 'event_ticket_types_attributes_0_name', with: ticket_type.name
+    fill_in 'event_ticket_types_attributes_0_price_or_range', with: ticket_type.price_or_range
+    fill_in 'event_ticket_types_attributes_0_quantity', with: ticket_type.quantity
+    click_link 'Everything else'
+  end
+
   test 'creating an event' do
-    @account = FactoryBot.create(:account)
-    @organisation = FactoryBot.create(:organisation, account: @account)
-    @event = FactoryBot.build_stubbed(:event)
-    @ticket_type = FactoryBot.build_stubbed(:ticket_type)
+    create_organisation
+    event = FactoryBot.build_stubbed(:event)
+    ticket_type = FactoryBot.build_stubbed(:ticket_type)
     login_as(@account)
     visit "/o/#{@organisation.slug}"
     click_link 'Create an event'
-    fill_in 'Event title*', with: @event.name
-    execute_script %{$('#event_start_time').val('#{@event.start_time.to_fs(:db_local)}')}
-    execute_script %{$('#event_end_time').val('#{@event.end_time.to_fs(:db_local)}')}
-    fill_in 'Location', with: @event.location
-    click_link 'Tickets'
-    execute_script %{$("a:contains('Add ticket type')").click()}
-    fill_in 'event_ticket_types_attributes_0_name', with: @ticket_type.name
-    fill_in 'event_ticket_types_attributes_0_price_or_range', with: @ticket_type.price_or_range
-    fill_in 'event_ticket_types_attributes_0_quantity', with: @ticket_type.quantity
-    click_link 'Everything else'
+    fill_event_create_form(event, ticket_type)
     click_button 'Create event'
     assert page.has_content? 'Add to calendar'
   end
 
   test 'creating an event with a range' do
-    @account = FactoryBot.create(:account)
-    @organisation = FactoryBot.create(:organisation, account: @account)
-    @event = FactoryBot.build_stubbed(:event)
-    @ticket_type = FactoryBot.build_stubbed(:ticket_type, price_or_range: '10-100')
+    create_organisation
+    event = FactoryBot.build_stubbed(:event)
+    ticket_type = FactoryBot.build_stubbed(:ticket_type, price_or_range: '10-100')
     login_as(@account)
     visit "/o/#{@organisation.slug}"
     click_link 'Create an event'
-    fill_in 'Event title*', with: @event.name
-    execute_script %{$('#event_start_time').val('#{@event.start_time.to_fs(:db_local)}')}
-    execute_script %{$('#event_end_time').val('#{@event.end_time.to_fs(:db_local)}')}
-    fill_in 'Location', with: @event.location
-    click_link 'Tickets'
-    execute_script %{$("a:contains('Add ticket type')").click()}
-    fill_in 'event_ticket_types_attributes_0_name', with: @ticket_type.name
-    fill_in 'event_ticket_types_attributes_0_price_or_range', with: @ticket_type.price_or_range
-    fill_in 'event_ticket_types_attributes_0_quantity', with: @ticket_type.quantity
-    click_link 'Everything else'
+    fill_event_create_form(event, ticket_type)
     click_button 'Create event'
     assert page.has_content? 'Drag the slider'
   end
 
   test 'editing an event' do
-    @account = FactoryBot.create(:account)
-    @organisation = FactoryBot.create(:organisation, account: @account)
-    @event = FactoryBot.create(:event, organisation: @organisation, account: @account, last_saved_by: @account, prices: [0])
+    create_event(prices: [0])
     login_as(@account)
     visit "/e/#{@event.slug}/edit"
     fill_in 'Event title*', with: (name = FactoryBot.build_stubbed(:event).name)
@@ -129,9 +120,7 @@ class EventsTest < ActiveSupport::TestCase
   end
 
   test 'booking onto a paid event' do
-    @account = FactoryBot.create(:account)
-    @organisation = FactoryBot.create(:organisation, account: @account)
-    @event = FactoryBot.create(:event, organisation: @organisation, account: @account, last_saved_by: @account, prices: [(ticket_price = 10)], suggested_donation: 0)
+    create_event(prices: [(ticket_price = 10)], suggested_donation: 0)
     login_as(@account)
     visit "/e/#{@event.slug}"
     select 1, from: "quantities[#{@event.ticket_types.first.id}]"
@@ -140,9 +129,7 @@ class EventsTest < ActiveSupport::TestCase
   end
 
   test 'booking onto a paid event with a range' do
-    @account = FactoryBot.create(:account)
-    @organisation = FactoryBot.create(:organisation, account: @account)
-    @event = FactoryBot.create(:event, organisation: @organisation, account: @account, last_saved_by: @account, prices: ['10-100'], suggested_donation: 0)
+    create_event(prices: ['10-100'], suggested_donation: 0)
     login_as(@account)
     visit "/e/#{@event.slug}"
     execute_script %{$("[name='prices[#{@event.ticket_types.first.id}]']").val(#{selected_price = 50})[0].oninput()}
@@ -151,9 +138,7 @@ class EventsTest < ActiveSupport::TestCase
   end
 
   test 'clicking disabled quantity select prompts to drag the slider' do
-    @account = FactoryBot.create(:account)
-    @organisation = FactoryBot.create(:organisation, account: @account)
-    @event = FactoryBot.create(:event, organisation: @organisation, account: @account, last_saved_by: @account, prices: ['10-100'], suggested_donation: 0)
+    create_event(prices: ['10-100'], suggested_donation: 0)
     visit "/e/#{@event.slug}"
 
     assert page.has_css?("select[name='quantities[#{@event.ticket_types.first.id}]'][disabled]")
@@ -163,9 +148,7 @@ class EventsTest < ActiveSupport::TestCase
   end
 
   test 'clicking disabled quantity select prompts to set a price' do
-    @account = FactoryBot.create(:account)
-    @organisation = FactoryBot.create(:organisation, account: @account)
-    @event = FactoryBot.create(:event, organisation: @organisation, account: @account, last_saved_by: @account, prices: [nil], suggested_donation: 0)
+    create_event(prices: [nil], suggested_donation: 0)
     visit "/e/#{@event.slug}"
 
     assert page.has_css?("select[name='quantities[#{@event.ticket_types.first.id}]'][disabled]")
@@ -175,9 +158,7 @@ class EventsTest < ActiveSupport::TestCase
   end
 
   test 'booking onto a paid event with a user-set price' do
-    @account = FactoryBot.create(:account)
-    @organisation = FactoryBot.create(:organisation, account: @account)
-    @event = FactoryBot.create(:event, organisation: @organisation, account: @account, last_saved_by: @account, prices: [nil], suggested_donation: 0)
+    create_event(prices: [nil], suggested_donation: 0)
     login_as(@account)
     visit "/e/#{@event.slug}"
     fill_in "prices[#{@event.ticket_types.first.id}]", with: (selected_price = 50)
@@ -186,15 +167,13 @@ class EventsTest < ActiveSupport::TestCase
   end
 
   test 'discount codes preserve quantities and prices' do
-    @account = FactoryBot.create(:account)
-    @organisation = FactoryBot.create(:organisation, account: @account)
-    @event = FactoryBot.create(:event, organisation: @organisation, account: @account, last_saved_by: @account, prices: [(price_0 = 10), '10-100', nil], suggested_donation: 0, questions: "q0\n[q1]\nq2")
-    @discount_code = FactoryBot.create(:discount_code, codeable: @event, code: (code = 'DISCOUNT10'), percentage_discount: (percentage_discount = 10))
+    create_event(prices: [(price0 = 10), '10-100', nil], suggested_donation: 0, questions: "q0\n[q1]\nq2")
+    FactoryBot.create(:discount_code, codeable: @event, code: (code = 'DISCOUNT10'), percentage_discount: (percentage_discount = 10))
     login_as(@account)
     visit "/e/#{@event.slug}"
     select 1, from: "quantities[#{@event.ticket_types[0].id}]"
-    execute_script %{$("[name='prices[#{@event.ticket_types[1].id}]']").val(#{price_1 = 50})[0].oninput()}
-    fill_in "prices[#{@event.ticket_types[2].id}]", with: (price_2 = 50)
+    execute_script %{$("[name='prices[#{@event.ticket_types[1].id}]']").val(#{price1 = 50})[0].oninput()}
+    fill_in "prices[#{@event.ticket_types[2].id}]", with: (price2 = 50)
     execute_script %{$("[name='prices[#{@event.ticket_types[2].id}]']")[0].oninput()}
     fill_in 'donation_amount', with: (donation_amount = 5)
     fill_in 'answers[0]', with: 'a0'
@@ -202,13 +181,13 @@ class EventsTest < ActiveSupport::TestCase
     fill_in 'discount_code', with: code
     click_button 'Apply'
     assert_equal find_field("quantities[#{@event.ticket_types[0].id}]").value, '1'
-    assert_equal find_field("prices[#{@event.ticket_types[1].id}]").value, price_1.to_s
-    assert_equal find_field("prices[#{@event.ticket_types[2].id}]").value, price_2.to_s
+    assert_equal find_field("prices[#{@event.ticket_types[1].id}]").value, price1.to_s
+    assert_equal find_field("prices[#{@event.ticket_types[2].id}]").value, price2.to_s
     assert_equal find_field('donation_amount').value, donation_amount.to_s
     assert_equal find_field('answers[0]').value, 'a0'
     assert_equal find_field('answers[2]').value, 'a2'
     assert_equal find_field('discount_code_display', disabled: true).value, code
-    assert page.has_button? "Pay £#{format('%.2f', ((price_0 + price_1 + price_2) * (100 - percentage_discount).to_f / 100) + donation_amount)}"
+    assert page.has_button? "Pay £#{format('%.2f', ((price0 + price1 + price2) * (100 - percentage_discount).to_f / 100) + donation_amount)}"
   end
 
   # ═══════════════════════════════════════════════════════════════════════════
@@ -217,9 +196,9 @@ class EventsTest < ActiveSupport::TestCase
 
   test 'new user booking ticket to free event gets subscribed to org, activity, and local_group' do
     create_full_event_hierarchy(event_options: { prices: [0], opt_in_organisation: true })
-    @account = FactoryBot.create(:account)
+    buyer = FactoryBot.create(:account)
 
-    login_as(@account)
+    login_as(buyer)
     visit "/e/#{@event.slug}"
     assert page.has_content? 'Register for free'
 
@@ -230,28 +209,22 @@ class EventsTest < ActiveSupport::TestCase
     assert page.has_content? 'Thanks for booking'
 
     # Verify account is associated and subscribed
-    assert_associated(@organisation, @account, :organisationships)
-    assert_associated(@activity, @account, :activityships)
-    assert_associated(@local_group, @account, :local_groupships)
+    assert_associated(@organisation, buyer, :organisationships)
+    assert_associated(@activity, buyer, :activityships)
+    assert_associated(@local_group, buyer, :local_groupships)
 
     # Verify they're subscribed (not unsubscribed)
-    assert_equal false, @organisation.organisationships.find_by(account: @account).unsubscribed
-    assert_equal false, @activity.activityships.find_by(account: @account).unsubscribed
-    assert_equal false, @local_group.local_groupships.find_by(account: @account).unsubscribed
+    assert_equal false, @organisation.organisationships.find_by(account: buyer).unsubscribed
+    assert_equal false, @activity.activityships.find_by(account: buyer).unsubscribed
+    assert_equal false, @local_group.local_groupships.find_by(account: buyer).unsubscribed
   end
 
   test 'collect_location with postcode in local_group area subscribes user to local_group' do
-    @org_account = FactoryBot.create(:account)
-    @organisation = FactoryBot.create(:organisation, account: @org_account, collect_location: true)
+    create_organisation(collect_location: true)
     # Local group with Gamla Stan polygon (from factory)
-    @local_group = FactoryBot.create(:local_group, organisation: @organisation, account: @org_account)
+    local_group = FactoryBot.create(:local_group, organisation: @organisation)
     # Event WITHOUT local_group - we want to test geo-based local_groupship creation
-    @event = FactoryBot.create(:event,
-                               organisation: @organisation,
-                               account: @org_account,
-                               last_saved_by: @org_account,
-                               prices: [0],
-                               opt_in_organisation: true)
+    create_event(prices: [0], opt_in_organisation: true)
 
     visit "/e/#{@event.slug}"
     assert page.has_content? 'Register for free'
@@ -284,7 +257,7 @@ class EventsTest < ActiveSupport::TestCase
 
     # Verify user is auto-subscribed to local_group based on their geocoded location
     # (organisationship.after_create creates local_groupship when account coordinates are within polygon)
-    local_groupship = @local_group.local_groupships.find_by(account: new_account)
+    local_groupship = local_group.local_groupships.find_by(account: new_account)
     assert local_groupship, 'User with coordinates in Gamla Stan should be subscribed to local_group'
   end
 
@@ -292,13 +265,13 @@ class EventsTest < ActiveSupport::TestCase
     create_full_event_hierarchy(event_options: { prices: [0], opt_in_organisation: true })
 
     # Create an existing account that's unsubscribed from org, activity, and local_group
-    @account = FactoryBot.create(:account)
-    @organisation.organisationships.find_or_create_by(account: @account).set_unsubscribed!(true)
-    @activity.activityships.find_or_create_by(account: @account).set(unsubscribed: true)
-    @local_group.local_groupships.find_or_create_by(account: @account).set(unsubscribed: true)
+    buyer = FactoryBot.create(:account)
+    @organisation.organisationships.find_or_create_by(account: buyer).set_unsubscribed!(true)
+    @activity.activityships.find_or_create_by(account: buyer).set(unsubscribed: true)
+    @local_group.local_groupships.find_or_create_by(account: buyer).set_unsubscribed!(true)
 
     # Book ticket with opt-in (existing members have hidden field set to 1 automatically)
-    login_as(@account)
+    login_as(buyer)
     visit "/e/#{@event.slug}"
     assert page.has_content? 'Register for free'
 
@@ -308,33 +281,32 @@ class EventsTest < ActiveSupport::TestCase
     assert page.has_content? 'Thanks for booking'
 
     # Verify they're resubscribed
-    assert_equal false, @organisation.organisationships.find_by(account: @account).unsubscribed
-    assert_equal false, @activity.activityships.find_by(account: @account).unsubscribed
-    assert_equal false, @local_group.local_groupships.find_by(account: @account).unsubscribed
+    assert_equal false, @organisation.organisationships.find_by(account: buyer).unsubscribed
+    assert_equal false, @activity.activityships.find_by(account: buyer).unsubscribed
+    assert_equal false, @local_group.local_groupships.find_by(account: buyer).unsubscribed
   end
 
   test 'public event submission creates draft and notifies admins' do
     Delayed::Job.delete_all if defined?(Delayed::Job)
-    @admin_account = FactoryBot.create(:account)
-    @organisation = FactoryBot.create(:organisation, account: @admin_account, allow_event_submissions: true)
-    @submitter_account = FactoryBot.create(:account)
-    @event = FactoryBot.build_stubbed(:event)
+    create_organisation(allow_event_submissions: true)
+    submitter = FactoryBot.create(:account)
+    event = FactoryBot.build_stubbed(:event)
 
-    login_as(@submitter_account)
+    login_as(submitter)
     visit "/o/#{@organisation.slug}/events"
     assert page.has_link?('Submit an event for review'), 'Non-admin should see submit button when org allows public submissions'
 
     click_link 'Submit an event for review'
-    fill_in 'Event title*', with: @event.name
-    execute_script %{$('#event_start_time').val('#{@event.start_time.to_fs(:db_local)}')}
-    execute_script %{$('#event_end_time').val('#{@event.end_time.to_fs(:db_local)}')}
+    fill_in 'Event title*', with: event.name
+    execute_script %{$('#event_start_time').val('#{event.start_time.to_fs(:db_local)}')}
+    execute_script %{$('#event_end_time').val('#{event.end_time.to_fs(:db_local)}')}
     click_link 'Everything else'
     click_button 'Create event'
 
-    created_event = Event.find_by(name: @event.name)
+    created_event = Event.find_by(name: event.name)
     assert created_event, 'Event should be created'
     assert created_event.locked?, 'Event should be locked when submitted by non-admin'
-    assert_equal @submitter_account.id, created_event.account_id, 'Event should be attributed to submitter'
+    assert_equal submitter.id, created_event.account_id, 'Event should be attributed to submitter'
     assert_equal 0, created_event.notifications.and(type: 'created_event').count, 'Locked submission should not create a public event notification'
     assert_equal 1, Delayed::Job.and(handler: /send_public_submission_notification/).count, 'Submission email should be queued'
 
@@ -345,22 +317,16 @@ class EventsTest < ActiveSupport::TestCase
   end
 
   test 'event admin can lock but only lock admin can unlock' do
-    @org_admin = FactoryBot.create(:account)
-    @organisation = FactoryBot.create(:organisation, account: @org_admin, allow_event_submissions: true)
-    @coordinator = FactoryBot.create(:account)
-    @event = FactoryBot.create(:event,
-                               organisation: @organisation,
-                               account: @org_admin,
-                               coordinator: @coordinator,
-                               last_saved_by: @org_admin,
-                               locked: false,
-                               prices: [0])
+    create_organisation(allow_event_submissions: true)
+    org_admin = @account
+    coordinator = FactoryBot.create(:account)
+    create_event(coordinator: coordinator, locked: false, prices: [0])
 
-    assert Event.admin?(@event, @coordinator), 'Coordinator should be event admin'
-    refute Event.lock_admin?(@event, @coordinator), 'Coordinator should not be lock admin'
+    assert Event.admin?(@event, coordinator), 'Coordinator should be event admin'
+    refute Event.lock_admin?(@event, coordinator), 'Coordinator should not be lock admin'
 
     # Event admin (coordinator) can lock an unlocked event
-    login_as(@coordinator)
+    login_as(coordinator)
     visit "/e/#{@event.slug}/edit"
     assert page.has_css?('label[for="event_locked"]'), 'Event admin should see locked checkbox when event is unlocked'
     find('label[for="event_locked"]').click
@@ -374,7 +340,7 @@ class EventsTest < ActiveSupport::TestCase
     assert page.has_content?('submitted for review'), 'Non-lock-admin should see unlock message'
 
     # Lock admin (org admin) can unlock
-    login_as(@org_admin)
+    login_as(org_admin)
     visit "/e/#{@event.slug}/edit"
     assert page.has_css?('label[for="event_locked"]'), 'Lock admin should see locked checkbox'
     find('label[for="event_locked"]').click
@@ -384,8 +350,6 @@ class EventsTest < ActiveSupport::TestCase
   end
 
   test 'event with questions' do
-    @account = FactoryBot.create(:account)
-    @organisation = FactoryBot.create(:organisation, account: @account)
     questions = <<~QUESTIONS.strip
       # Registration Details
       - Please fill out all fields
@@ -395,12 +359,7 @@ class EventsTest < ActiveSupport::TestCase
       [I have read the event guidelines]
       {Arrival date}
     QUESTIONS
-    @event = FactoryBot.create(:event,
-                               organisation: @organisation,
-                               account: @account,
-                               last_saved_by: @account,
-                               prices: [0],
-                               questions: questions)
+    create_event(prices: [0], questions: questions)
     login_as(@account)
     visit "/e/#{@event.slug}"
 
@@ -431,17 +390,8 @@ class EventsTest < ActiveSupport::TestCase
   end
 
   test 'organisation_id and account_id cannot be reassigned on update' do
-    account = FactoryBot.create(:account)
-    other_account = FactoryBot.create(:account)
-    organisation = FactoryBot.create(:organisation, account: account)
-    other_organisation = FactoryBot.create(:organisation, account: other_account)
-    event = FactoryBot.create(:event, organisation: organisation, account: account, last_saved_by: account, prices: [0])
-
-    event.organisation = other_organisation
-    event.account = other_account
-    refute event.valid?
-    assert_includes event.errors[:organisation], 'cannot be changed'
-    assert_includes event.errors[:account], 'cannot be changed'
+    create_event(prices: [0])
+    assert_cannot_reassign_organisation_or_account(@event)
   end
 
   test 'falls back to organisation terms and conditions when event has none' do
@@ -495,24 +445,14 @@ class EventsTest < ActiveSupport::TestCase
   end
 
   test 'event-level terms and conditions are shown at checkout' do
-    @account = FactoryBot.create(:account)
-    @organisation = FactoryBot.create(:organisation, account: @account, terms_and_conditions: 'Organisation terms')
-    @event = FactoryBot.create(
-      :event,
-      organisation: @organisation,
-      account: @account,
-      last_saved_by: @account,
-      prices: [0],
-      terms_and_conditions: 'Event terms'
-    )
+    create_organisation(terms_and_conditions: 'Organisation terms')
+    create_event(prices: [0], terms_and_conditions: 'Event terms')
     visit "/e/#{@event.slug}"
     assert_equal 'Event terms', find('textarea[readonly]').value
   end
 
   test 'redirect_url must be a valid http or https URL' do
-    account = FactoryBot.create(:account)
-    organisation = FactoryBot.create(:organisation, account: account)
-    event = FactoryBot.build(:event, organisation: organisation, account: account, last_saved_by: account)
+    event = FactoryBot.build(:event)
 
     event.redirect_url = 'https://example.com/thanks'
     assert event.valid?
@@ -532,40 +472,34 @@ class EventsTest < ActiveSupport::TestCase
   end
 
   test 'safe_redirect_url ignores stored javascript URLs' do
-    account = FactoryBot.create(:account)
-    organisation = FactoryBot.create(:organisation, account: account)
-    event = FactoryBot.create(:event, organisation: organisation, account: account, last_saved_by: account)
-    event.set(redirect_url: 'javascript:alert(1)')
+    create_event
+    @event.set(redirect_url: 'javascript:alert(1)')
 
-    assert_nil event.reload.safe_redirect_url
-    assert_equal 'https://example.org/thanks', event.tap { |e| e.redirect_url = 'https://example.org/thanks' }.safe_redirect_url
+    assert_nil @event.reload.safe_redirect_url
+    assert_equal 'https://example.org/thanks', @event.tap { |e| e.redirect_url = 'https://example.org/thanks' }.safe_redirect_url
   end
 
   test 'slug uniqueness includes deleted events' do
-    account = FactoryBot.create(:account)
-    organisation = FactoryBot.create(:organisation, account: account)
-    event = FactoryBot.create(:event, organisation: organisation, account: account, last_saved_by: account)
-    slug = event.slug
-    event.destroy
+    create_event
+    slug = @event.slug
+    @event.destroy
 
     assert_nil Event.find_by(slug: slug)
     assert Event.unscoped.and(slug: slug).exists?
 
-    clash = FactoryBot.build(:event, organisation: organisation, account: account, last_saved_by: account, slug: slug)
+    clash = FactoryBot.build(:event, organisation: @organisation, slug: slug)
     refute clash.valid?
     assert clash.errors[:slug].any?
   end
 
   test 'duplicating an event skips slugs belonging to deleted events' do
-    account = FactoryBot.create(:account)
-    organisation = FactoryBot.create(:organisation, account: account)
-    event = FactoryBot.create(:event, organisation: organisation, account: account, last_saved_by: account, prices: [0])
-    deleted = FactoryBot.create(:event, organisation: organisation, account: account, last_saved_by: account, slug: 'a0aaa')
-    deleted.destroy
+    create_event(as: :event1, prices: [0])
+    create_event(as: :event2, slug: 'a0aaa')
+    @event2.destroy
 
     candidates = ['a0aaa', 'z9zzz']
     Event.stub :slug_candidate, -> { candidates.shift } do
-      duplicate = event.duplicate!(account)
+      duplicate = @event1.duplicate!(@account)
       assert duplicate.persisted?
       assert_equal 'z9zzz', duplicate.slug
     end

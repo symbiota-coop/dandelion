@@ -53,6 +53,8 @@ IMPORTANT: Use the following command structure to test a single file: `foreman r
 
 On Codex, run this outside the sandbox.
 
+`@` instance variables come from helpers (`create_organisation`, `create_event`, `create_gathering`, `create_full_event_hierarchy`, and file-local setup methods). Anything created inline in a test is a local. Use `create_event(as: :event1)` when a test needs more than one event.
+
 ## Dependencies
 
 Ruby gems: 

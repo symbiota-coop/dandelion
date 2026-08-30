@@ -4,14 +4,14 @@ class GatheringsTest < ActiveSupport::TestCase
   include Capybara::DSL
 
   test 'creating a gathering' do
-    @account = FactoryBot.create(:account)
-    @gathering = FactoryBot.build_stubbed(:gathering)
-    login_as(@account)
+    account = FactoryBot.create(:account)
+    gathering = FactoryBot.build_stubbed(:gathering)
+    login_as(account)
     click_link 'Gatherings'
     click_link 'All gatherings'
     within('#content') { click_link 'Create a gathering' }
-    fill_in 'Name', with: @gathering.name
-    fill_in 'URL', with: @gathering.slug
+    fill_in 'Name', with: gathering.name
+    fill_in 'URL', with: gathering.slug
     click_link 'Next'
     click_link 'Next'
     click_link 'Next'
@@ -21,8 +21,7 @@ class GatheringsTest < ActiveSupport::TestCase
   end
 
   test 'editing a gathering' do
-    @account = FactoryBot.create(:account)
-    @gathering = FactoryBot.create(:gathering, account: @account)
+    create_gathering
     login_as(@account)
     visit "/g/#{@gathering.slug}/edit"
     fill_in 'Name', with: (name = FactoryBot.build_stubbed(:gathering).name)
@@ -32,8 +31,7 @@ class GatheringsTest < ActiveSupport::TestCase
   end
 
   test 'copying a gathering without another admin destination redirects safely' do
-    @account = FactoryBot.create(:account)
-    @gathering = FactoryBot.create(:gathering, account: @account)
+    create_gathering
     login_as(@account)
 
     visit "/g/#{@gathering.slug}"

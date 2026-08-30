@@ -1,12 +1,7 @@
 require File.expand_path("#{File.dirname(__FILE__)}/test_config.rb")
-require 'rack/test'
 
 class IcsKeysTest < ActiveSupport::TestCase
   include Rack::Test::Methods
-
-  def app
-    Padrino.application
-  end
 
   test 'ics key grants access to birthdays ics but not birthdays html' do
     account = FactoryBot.create(:account)
@@ -23,16 +18,15 @@ class IcsKeysTest < ActiveSupport::TestCase
   end
 
   test 'ics key grants access to my events ics but not my events html' do
-    account = FactoryBot.create(:account)
-    organisation = FactoryBot.create(:organisation, account: account)
-    event = FactoryBot.create(:event, organisation: organisation, account: account, last_saved_by: account, coordinator: account)
+    create_organisation
+    create_event(coordinator: @account)
 
-    get "/events/my.ics?ics_key=#{account.ics_key}"
+    get "/events/my.ics?ics_key=#{@account.ics_key}"
     assert_equal 200, last_response.status
     assert_includes last_response.body, 'BEGIN:VCALENDAR'
-    assert_includes last_response.body, event.name
+    assert_includes last_response.body, @event.name
 
-    get "/events/my?ics_key=#{account.ics_key}"
+    get "/events/my?ics_key=#{@account.ics_key}"
     assert_equal 302, last_response.status
   end
 
