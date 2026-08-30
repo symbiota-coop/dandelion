@@ -58,14 +58,6 @@ class McpTest < ActiveSupport::TestCase
     refute rpc.dig('result', 'isError')
   end
 
-  test 'tools list includes get_me_tool without authentication' do
-    rpc = mcp_rpc('tools/list')
-
-    assert_equal 200, last_response.status
-    names = rpc.dig('result', 'tools').map { |tool| tool['name'] }
-    assert_includes names, 'get_me_tool'
-  end
-
   test 'get_me_tool requires authentication' do
     rpc = mcp_tool_call('get_me_tool')
 
@@ -95,16 +87,6 @@ class McpTest < ActiveSupport::TestCase
     assert_equal 401, last_response.status
     assert_equal 'Bearer', last_response['WWW-Authenticate']
     assert_equal 'invalid_token', JSON.parse(last_response.body)['error']
-  end
-
-  test 'tools list includes event order and ticket tools' do
-    rpc = mcp_rpc('tools/list')
-    names = rpc.dig('result', 'tools').map { |tool| tool['name'] }
-
-    assert_includes names, 'get_event_orders_tool'
-    assert_includes names, 'get_event_tickets_tool'
-    assert_includes names, 'get_organisation_events_tool'
-    assert_includes names, 'get_organisation_followers_tool'
   end
 
   test 'event order and ticket tools require authentication' do

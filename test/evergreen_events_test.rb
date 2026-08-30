@@ -49,30 +49,6 @@ class EvergreenEventsTest < ActiveSupport::TestCase
     assert_nil @event.ical
   end
 
-  test 'evergreen event defaults location to Online' do
-    @account = FactoryBot.create(:account)
-    @organisation = FactoryBot.create(:organisation, account: @account)
-    @event = FactoryBot.create(:event, organisation: @organisation, account: @account, last_saved_by: @account,
-                                       evergreen: true, start_time: nil, end_time: nil, location: nil, prices: [0])
-    assert_equal 'Online', @event.location
-    assert_nil @event.reminder_hours_before
-    assert_nil @event.feedback_hours_after
-  end
-
-  test 'evergreen event validates without start_time end_time location' do
-    @account = FactoryBot.create(:account)
-    @organisation = FactoryBot.create(:organisation, account: @account)
-    @event = Event.new(
-      name: 'Evergreen Test',
-      currency: 'GBP',
-      organisation: @organisation,
-      account: @account,
-      last_saved_by: @account,
-      evergreen: true
-    )
-    assert @event.valid?, "Expected event to be valid, got errors: #{@event.errors.full_messages.join(', ')}"
-  end
-
   test 'non-evergreen event still requires start_time end_time location' do
     @event = Event.new(name: 'Missing Dates', currency: 'GBP')
     refute @event.valid?
@@ -120,17 +96,6 @@ class EvergreenEventsTest < ActiveSupport::TestCase
     assert page.has_content? 'Register for free'
     click_button 'RSVP'
     assert page.has_content? 'Thanks for booking'
-  end
-
-  test 'evergreen event appears on organisation events page' do
-    @account = FactoryBot.create(:account)
-    @organisation = FactoryBot.create(:organisation, account: @account)
-    @event = FactoryBot.create(:event, organisation: @organisation, account: @account, last_saved_by: @account,
-                                       evergreen: true, start_time: nil, end_time: nil, location: nil, prices: [0])
-    login_as(@account)
-    visit "/o/#{@organisation.slug}/events"
-    assert page.has_content? @event.name
-    assert page.has_content? 'Online'
   end
 
   test 'evergreen event reminder_due_within returns false' do

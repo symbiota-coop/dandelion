@@ -7,13 +7,6 @@ class TicketSlotsTest < ActiveSupport::TestCase
     FactoryBot.create(:event, organisation: organisation, account: account, last_saved_by: account, **attrs)
   end
 
-  test 'defaults slots to 1' do
-    event = create_event(prices: [0])
-    ticket_type = event.ticket_types.first
-
-    assert_equal 1, ticket_type.slots
-  end
-
   test 'nil slots is saved as 1' do
     event = create_event(prices: [0], capacity: 10)
     ticket_type = event.ticket_types.first

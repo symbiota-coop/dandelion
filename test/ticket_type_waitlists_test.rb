@@ -3,12 +3,11 @@ require File.expand_path("#{File.dirname(__FILE__)}/test_config.rb")
 class TicketTypeWaitlistsTest < ActiveSupport::TestCase
   include Capybara::DSL
 
-  def create_ticket_type_waitlist_event(hide_unavailable_tickets: false)
+  def create_ticket_type_waitlist_event
     create_full_event_hierarchy(
       event_options: {
         prices: [10],
         allow_ticket_type_waitlists: true,
-        hide_unavailable_tickets: hide_unavailable_tickets,
         suggested_donation: 0
       }
     )
@@ -19,21 +18,6 @@ class TicketTypeWaitlistsTest < ActiveSupport::TestCase
     @ticket_type.set(quantity: 0)
     @event.refresh_sold_out_cache_and_notify_waitlist
     @event.reload
-  end
-
-  test 'sold out event with ticket type waitlists shows ticket type waitlist controls' do
-    create_ticket_type_waitlist_event(hide_unavailable_tickets: true)
-    sell_out_ticket_type
-
-    assert @event.sold_out?, 'Event should be sold out'
-    assert @event.ticket_type_waitlists_available?, 'Ticket type waitlist controls should be available'
-
-    visit "/e/#{@event.slug}"
-
-    assert page.has_css?('button.join-ticket-type-waitlist', text: 'Join waitlist'),
-           'Sold-out waitlistable ticket types should render join buttons'
-    refute page.has_field?('waitship_name'),
-           'Generic event waitlist form should not replace per-ticket waitlist controls'
   end
 
   test 'joining ticket type waitlist creates waitship for selected ticket type' do

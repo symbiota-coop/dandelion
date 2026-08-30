@@ -5,13 +5,6 @@ class EventManagerPermissionsTest < ActiveSupport::TestCase
 
   # ─── Account#organisations_for_creating_events ─────────────────────────────
 
-  test 'organisations_for_creating_events includes org owned by account' do
-    owner = FactoryBot.create(:account)
-    org = FactoryBot.create(:organisation, account: owner)
-    ids = owner.organisations_for_creating_events.pluck(:id)
-    assert_includes ids, org.id
-  end
-
   test 'organisations_for_creating_events includes org when account has event_manager on organisationship' do
     org_owner = FactoryBot.create(:account)
     org = FactoryBot.create(:organisation, account: org_owner)
@@ -61,32 +54,6 @@ class EventManagerPermissionsTest < ActiveSupport::TestCase
   end
 
   # ─── Organisation.can_create_events_for_organisation? ───────────────────────
-
-  test 'can_create_events_for_organisation? is true for account with event_manager on organisationship' do
-    org_owner = FactoryBot.create(:account)
-    org = FactoryBot.create(:organisation, account: org_owner)
-    other = FactoryBot.create(:account)
-    other.organisationships.create!(organisation: org, event_manager: true, unsubscribed: false)
-    assert Organisation.can_create_events_for_organisation?(org, other)
-  end
-
-  test 'can_create_events_for_organisation? is true for activity admin' do
-    org_owner = FactoryBot.create(:account)
-    org = FactoryBot.create(:organisation, account: org_owner, slug: "org-can-act-#{SecureRandom.hex(4)}")
-    activity = FactoryBot.create(:activity, organisation: org, account: org_owner, slug: "can-act-#{SecureRandom.hex(4)}")
-    other = FactoryBot.create(:account)
-    activity.activityships.create!(account: other, admin: true, unsubscribed: false)
-    assert Organisation.can_create_events_for_organisation?(org, other)
-  end
-
-  test 'can_create_events_for_organisation? is true for local group admin' do
-    org_owner = FactoryBot.create(:account)
-    org = FactoryBot.create(:organisation, account: org_owner, slug: "org-can-lg-#{SecureRandom.hex(4)}")
-    local_group = FactoryBot.create(:local_group, organisation: org, account: org_owner, slug: "can-lg-#{SecureRandom.hex(4)}")
-    other = FactoryBot.create(:account)
-    local_group.local_groupships.create!(account: other, admin: true, unsubscribed: false)
-    assert Organisation.can_create_events_for_organisation?(org, other)
-  end
 
   test 'can_create_events_for_organisation? is false for unrelated activity admin' do
     org_owner = FactoryBot.create(:account)

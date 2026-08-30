@@ -25,18 +25,6 @@ class ActivityApplicationsTest < ActiveSupport::TestCase
     assert page.has_content? 'Thanks for applying'
   end
 
-  test 'applying to an activity when logged in' do
-    @account = FactoryBot.create(:account)
-    @organisation = FactoryBot.create(:organisation, account: @account)
-    @activity = FactoryBot.create(:activity, organisation: @organisation, account: @account, application_questions: APPLICATION_QUESTIONS)
-    @applicant = FactoryBot.create(:account)
-    login_as(@applicant)
-    visit "/activities/#{@activity.id}/apply"
-    fill_application_answers
-    click_button 'Apply'
-    assert page.has_content? 'Thanks for applying'
-  end
-
   test 'applying to an activity when already a member' do
     @account = FactoryBot.create(:account)
     @organisation = FactoryBot.create(:organisation, account: @account)

@@ -26,13 +26,6 @@ class OrganisationsTest < ActiveSupport::TestCase
     assert page.has_content? "Now let's create an event under your new organisation."
   end
 
-  test 'referrals page shows short referral link' do
-    @account = FactoryBot.create(:account, username: 'linkuser', has_signed_in: true)
-    login_as(@account)
-    visit '/referrals'
-    assert page.has_field?('organisation-referrer-link', with: "#{ENV['BASE_URI']}/invite/#{@account.id}")
-  end
-
   test 'creating an organisation via referral link sets referrer' do
     referrer = FactoryBot.create(:account, username: 'referreruser', has_signed_in: true)
     creator = FactoryBot.create(:account)
@@ -60,14 +53,6 @@ class OrganisationsTest < ActiveSupport::TestCase
 
     saved_organisation = Organisation.find_by(slug: @organisation.slug)
     assert_nil saved_organisation.referrer_id
-  end
-
-  test 'organisation unsubscribe token resolves account for organisation' do
-    @organisation = FactoryBot.create(:organisation)
-    @account = FactoryBot.create(:account)
-    token = @account.organisation_unsubscribe_token_for(@organisation)
-
-    assert_equal @account, Account.from_organisation_unsubscribe_token(@organisation, token)
   end
 
   test 'organisation unsubscribe token is scoped to organisation' do

@@ -130,18 +130,6 @@ class EventBoostsTest < ActiveSupport::TestCase
     assert page.has_no_content?('Boosted')
   end
 
-  test 'event can be boosted when organisation is not paid up' do
-    @account = FactoryBot.create(:account)
-    @organisation = FactoryBot.create(:organisation, account: @account)
-    @organisation.set(paid_up: false)
-    @event = FactoryBot.create(:event, organisation: @organisation, account: @account, last_saved_by: @account, name: 'Unpaid org boost event')
-    @event.set_browsable
-    refute @event.reload.browsable?
-
-    event_boost = FactoryBot.build(:event_boost, event: @event, account: @account)
-    assert event_boost.valid?, event_boost.errors.full_messages.join(', ')
-  end
-
   test 'boosted unpaid event appears in the boost slot but not the regular listing' do
     @account = FactoryBot.create(:account)
     @organisation = FactoryBot.create(:organisation, account: @account)

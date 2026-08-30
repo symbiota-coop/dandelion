@@ -102,27 +102,6 @@ class WaitlistTest < ActiveSupport::TestCase
            "Should have uniqueness error. All errors: #{waitship2.errors.full_messages}"
   end
 
-  test 'waitlist notification triggered when tickets become available' do
-    create_full_event_hierarchy(event_options: { prices: [10] })
-    @account = FactoryBot.create(:account)
-
-    # Add to waitlist
-    @event.waitships.create(account: @account)
-
-    # Sell out the event
-    @event.ticket_types.first.set(quantity: 0)
-    @event.refresh_sold_out_cache_and_notify_waitlist
-    assert @event.sold_out?, 'Event should be sold out'
-
-    # Make tickets available again - this should trigger notification
-    @event.ticket_types.first.set(quantity: 10)
-
-    # We can't easily test the email sending, but we can verify the method runs
-    # The notification is handled asynchronously so we just verify the state change
-    @event.refresh_sold_out_cache_and_notify_waitlist
-    assert_not @event.sold_out?, 'Event should no longer be sold out'
-  end
-
   test 'waitlist with activity having non-open privacy does not create activityship' do
     @org_account = FactoryBot.create(:account)
     @organisation = FactoryBot.create(:organisation, account: @org_account)

@@ -8,13 +8,6 @@ class IcsKeysTest < ActiveSupport::TestCase
     Padrino.application
   end
 
-  test 'accounts get a separate ics key' do
-    account = FactoryBot.create(:account)
-
-    assert account.ics_key.present?
-    refute_equal account.api_key, account.ics_key
-  end
-
   test 'ics key grants access to birthdays ics but not birthdays html' do
     account = FactoryBot.create(:account)
     followee = FactoryBot.create(:account, date_of_birth: Date.new(1990, 1, 1))

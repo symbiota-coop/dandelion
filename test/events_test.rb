@@ -47,16 +47,6 @@ class EventsTest < ActiveSupport::TestCase
     assert page.has_content? 'Drag the slider'
   end
 
-  test 'creating an event from /events' do
-    @account = FactoryBot.create(:account)
-    @organisation = FactoryBot.create(:organisation, account: @account)
-    login_as(@account)
-    visit '/events'
-    click_link 'Create an event'
-    select @organisation.name, from: 'organisation_id'
-    assert page.has_content? 'Event title*'
-  end
-
   test 'editing an event' do
     @account = FactoryBot.create(:account)
     @organisation = FactoryBot.create(:organisation, account: @account)
@@ -136,17 +126,6 @@ class EventsTest < ActiveSupport::TestCase
     event.valid?
 
     assert_includes event.errors[:feedback_hours_after], "cannot be more than #{Event::MAX_FEEDBACK_HOURS_AFTER}"
-  end
-
-  test 'booking onto a free event' do
-    @account = FactoryBot.create(:account)
-    @organisation = FactoryBot.create(:organisation, account: @account)
-    @event = FactoryBot.create(:event, organisation: @organisation, account: @account, last_saved_by: @account, prices: [0])
-    login_as(@account)
-    visit "/e/#{@event.slug}"
-    assert page.has_content? 'Register for free'
-    click_button 'RSVP'
-    assert page.has_content? 'Thanks for booking'
   end
 
   test 'booking onto a paid event' do

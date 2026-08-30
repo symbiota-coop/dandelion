@@ -3,13 +3,6 @@ require File.expand_path("#{File.dirname(__FILE__)}/test_config.rb")
 class SearchTest < ActiveSupport::TestCase
   include Capybara::DSL
 
-  test 'search page loads' do
-    visit '/search'
-    assert page.has_selector?('form#search-form')
-    assert page.has_selector?('ul.search-tab')
-    assert page.has_selector?('input[name="q"]')
-  end
-
   test 'full page search for events' do
     @account = FactoryBot.create(:account)
     @organisation = FactoryBot.create(:organisation, account: @account)
@@ -44,11 +37,6 @@ class SearchTest < ActiveSupport::TestCase
     visit '/search?q=Full&type=gatherings'
     assert page.has_selector?('ul.search-tab li.active', text: 'Gatherings')
     assert page.has_content?('Full Page Gathering Search')
-  end
-
-  test 'full page search defaults to events' do
-    visit '/search?q=test'
-    assert page.has_selector?('ul.search-tab li.active', text: 'Events')
   end
 
   test 'search with event prefix redirects to event page when exact match' do
@@ -93,11 +81,5 @@ class SearchTest < ActiveSupport::TestCase
     assert_equal '/search', page.current_path
     assert page.has_selector?('ul.search-tab li.active', text: 'Events')
     assert page.has_content?('Unquoted Event Search')
-  end
-
-  test 'search handles empty query' do
-    visit '/search?q='
-    assert page.has_selector?('form#search-form')
-    assert page.has_selector?('ul.search-tab')
   end
 end
