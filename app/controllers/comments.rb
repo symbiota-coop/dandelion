@@ -2,10 +2,15 @@ Dandelion::App.controller do
   post '/inbound/:id' do
     received_email = EmailReceiver.receive(request)
     halt 401 unless received_email
-    mail, _html, plain_text = received_email
-    account = Account.find_by(email: mail.from.first) || not_found
+    _mail, _html, plain_text, envelope_sender = received_email
+    halt 401 unless envelope_sender
+
+    @post = Post.find(params[:id]) || not_found
+    @commentable = @post.commentable
+    account = Account.find_by(email: envelope_sender) || not_found
+    halt 403 unless commentable_viewer?(@commentable, account)
+
     unless account.block_reply_by_email
-      @post = Post.find(params[:id]) || not_found
       @post.comments.create account: account, body: plain_text, via_email: true
     end
     200

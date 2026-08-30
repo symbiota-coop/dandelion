@@ -1,5 +1,23 @@
 class EmailReceiver < Incoming::Strategies::Mailgun
   setup api_key: ENV['MAILGUN_WEBHOOK_SIGNING_KEY']
+
+  def initialize(request)
+    @envelope_sender = self.class.normalize_envelope_sender(request.params['sender'])
+    super
+  end
+
+  # SMTP envelope sender from the signed Mailgun webhook, not MIME From.
+  def self.normalize_envelope_sender(sender)
+    raw = sender.to_s.strip
+    return if raw.blank?
+
+    email = raw[/<([^>]+)>/, 1] || raw
+    email = email.downcase.strip
+    return unless EmailAddress.valid?(email)
+
+    email
+  end
+
   def receive(mail)
     if mail.html_part
       body = mail.html_part.body
@@ -35,6 +53,6 @@ class EmailReceiver < Incoming::Strategies::Mailgun
 
     plain_text = Premailer.new(html, with_html_string: true, adapter: 'nokogiri', input_encoding: 'UTF-8').to_plain_text
 
-    [mail, html, plain_text]
+    [mail, html, plain_text, @envelope_sender]
   end
 end
