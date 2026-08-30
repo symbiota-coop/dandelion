@@ -12,12 +12,12 @@
 <% unless params[:search] %>
   <div class="mb-3">
     <% popular_locations = Location.order('events_count desc').to_a %>
-    <% show_more_limit = @location ? popular_locations.size : 15 %>
-    <span class="d-inline-block mb-1">Popular locations:</span>
+    <% show_more_limit = @location ? popular_locations.size : 10 %>
+    <span class="d-inline-block mb-1" style="font-size: 0.9rem">Popular locations:</span>
     <span class="popular-locations-container">
       <% popular_locations.each_with_index do |location, index| %>
         <span class="location-item <%= 'd-none' if index >= show_more_limit %>">
-          <a class="regular btn mb-1 <% if @location && @location == location %> btn-primary <% else %> btn-outline-primary <% end %> btn-xs" href="/locations/<%= location.name %>"><%= location.name %></a>
+          <a class="label d-inline-block mb-1 <% if @location && @location == location %> label-primary text-white <% else %> label-outline-primary <% end %>" style="font-size: 0.9rem; font-weight: 500" href="/locations/<%= location.name %>"><%= location.name %></a>
         </span>
       <% end %>
       <% if popular_locations.size > show_more_limit %>
