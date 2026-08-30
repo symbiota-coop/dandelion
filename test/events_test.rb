@@ -268,7 +268,7 @@ class EventsTest < ActiveSupport::TestCase
     buyer = FactoryBot.create(:account)
     @organisation.organisationships.find_or_create_by(account: buyer).set_unsubscribed!(true)
     @activity.activityships.find_or_create_by(account: buyer).set(unsubscribed: true)
-    @local_group.local_groupships.find_or_create_by(account: buyer).set_unsubscribed!(true)
+    @local_group.local_groupships.find_or_create_by(account: buyer).set(unsubscribed: true)
 
     # Book ticket with opt-in (existing members have hidden field set to 1 automatically)
     login_as(buyer)
@@ -452,7 +452,8 @@ class EventsTest < ActiveSupport::TestCase
   end
 
   test 'redirect_url must be a valid http or https URL' do
-    event = FactoryBot.build(:event)
+    create_organisation
+    event = FactoryBot.build(:event, organisation: @organisation)
 
     event.redirect_url = 'https://example.com/thanks'
     assert event.valid?

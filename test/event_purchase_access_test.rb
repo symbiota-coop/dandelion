@@ -50,7 +50,7 @@ class EventPurchaseAccessTest < ActiveSupport::TestCase
   test 'purchase is allowed when monthly_donors_only and the buyer is a signed-in donor' do
     create_full_event_hierarchy(event_options: { prices: [0], monthly_donors_only: true })
     buyer = FactoryBot.create(:account)
-    FactoryBot.create(:organisationship, organisation: @organisation, account: buyer, monthly_donation_method: 'Other')
+    FactoryBot.create(:organisationship, organisation: @organisation, account: buyer, monthly_donation_method: 'Other', monthly_donation_amount: 1)
 
     rack_login_as(buyer)
     post_purchase(@event, buyer)
