@@ -49,6 +49,14 @@ class DiscountCode
     event.all_discount_codes.include?(self)
   end
 
+  def exhausted?(excluding: nil)
+    return false unless maximum_uses
+
+    used = orders
+    used = used.and(:id.ne => excluding.id) if excluding&.persisted?
+    used.count >= maximum_uses
+  end
+
   def self.fixed_discount_currencies
     CURRENCY_OPTIONS
   end

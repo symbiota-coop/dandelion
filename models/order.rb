@@ -38,6 +38,7 @@ class Order
   before_validation do
     self.evm_value = value.to_d + evm_offset if evm_secret && !evm_value
     self.discount_code = nil if discount_code && !discount_code.applies_to?(event)
+    self.discount_code = nil if discount_code&.exhausted?(excluding: self)
     self.percentage_discount = discount_code.percentage_discount if discount_code && discount_code.percentage_discount
     if !percentage_discount && !event.no_discounts && (organisationship_for_discount = event.organisationship_for_discount(account))
       self.percentage_discount_monthly_donor = organisationship_for_discount.monthly_donor_discount
