@@ -23,7 +23,7 @@ Dandelion::App.helpers do
 
   def visitor_currency
     currency = visitor_country&.currency_code
-    FIAT_CURRENCIES.include?(currency) ? currency : 'GBP'
+    FIAT_CURRENCIES.include?(currency) ? currency : ENV['DEFAULT_CURRENCY']
   end
 
   def preferred_currency(account = current_account)

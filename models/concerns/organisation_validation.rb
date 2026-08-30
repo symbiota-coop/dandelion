@@ -14,7 +14,7 @@ module OrganisationValidation
       end
 
       self.paid_up = true if new_record?
-      self.currency = 'GBP' unless currency
+      self.currency = ENV['DEFAULT_CURRENCY'] unless currency
       %w[ticket_email_title ticket_email_greeting recording_email_title recording_email_greeting reminder_email_title reminder_email_body feedback_email_title feedback_email_body].each do |f|
         send("#{f}=", send("#{f}_default")) unless send(f)
       end
