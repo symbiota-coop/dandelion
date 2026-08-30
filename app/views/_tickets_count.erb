@@ -1,10 +1,7 @@
 <% unless ENV['CREATE_VIDEO'] %>
   <%
   s = Ticket.home_page_stats
-  country = request.env['HTTP_CF_IPCOUNTRY']
-  country = 'GB' if country == 'UK'
-  currency = ISO3166::Country[country]&.currency_code
-  currency = 'GBP' unless FIAT_CURRENCIES.include?(currency)
+  currency = visitor_currency
   worth = Money.new(s[:worth_gbp_integer] * 100, 'GBP').exchange_to(currency)
   worth_integer = Float('%.3g' % worth).to_i
 %>

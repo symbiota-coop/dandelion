@@ -72,6 +72,7 @@ Dandelion::App.controller do
   get '/accounts/new' do
     @body_class = 'gradient'
     @account = Account.new
+    @account.default_currency ||= visitor_currency
     load_context
     erb :'accounts/new'
   end
@@ -79,6 +80,7 @@ Dandelion::App.controller do
   post '/accounts/new' do
     @account = Account.new(mass_assigning(params[:account], Account))
     @account.password = Account.generate_password # not used
+    @account.default_currency ||= visitor_currency
     load_context
 
     validate_recaptcha unless params[:recaptcha_skip_secret] == ENV['RECAPTCHA_SKIP_SECRET']
@@ -99,6 +101,7 @@ Dandelion::App.controller do
   get '/accounts/edit' do
     sign_in_code_required!
     @account = current_account
+    @account.default_currency ||= visitor_currency
     if params[:organisation_id]
       @organisation = Organisation.find(params[:organisation_id])
     elsif params[:activity_id]

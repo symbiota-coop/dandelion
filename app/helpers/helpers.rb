@@ -13,6 +13,27 @@ Dandelion::App.helpers do
     request.env['HTTP_CF_CONNECTING_IP'] || request.env['HTTP_X_FORWARDED_FOR']
   end
 
+  def visitor_country
+    ISO3166::Country[request.env['HTTP_CF_IPCOUNTRY']]
+  end
+
+  def visitor_country_name
+    visitor_country&.iso_short_name
+  end
+
+  def visitor_currency
+    currency = visitor_country&.currency_code
+    FIAT_CURRENCIES.include?(currency) ? currency : 'GBP'
+  end
+
+  def preferred_currency(account = current_account)
+    if account && FIAT_CURRENCIES.include?(account.default_currency)
+      account.default_currency
+    else
+      visitor_currency
+    end
+  end
+
   def current_account
     @current_account ||= @current_account_via_api_key || @current_account_via_ics_key || (Account.find(session[:account_id]) if session[:account_id])
   end

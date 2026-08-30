@@ -1,8 +1,4 @@
-<% currency = if account
-                FIAT_CURRENCIES.include?(account.default_currency) ? account.default_currency : ENV['DEFAULT_CURRENCY']
-              else
-                ENV['DEFAULT_CURRENCY']
-              end %>
+<% currency = preferred_currency(account) %>
 
 <% if !account || !account.stripe_subscription_id %>
 

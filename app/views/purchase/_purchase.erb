@@ -135,7 +135,7 @@ end
         $('#account_name').attr('required', 'required')
       })
     </script>
-    <% form_for (@account = current_account || Account.new(country: 'United Kingdom of Great Britain and Northern Ireland')), '' do |f| %>
+    <% form_for (@account = current_account || Account.new(country: visitor_country_name)), '' do |f| %>
       <% if current_account %>
         <p class="lead">Signed in as <%= current_account.name %> (<%= current_account.email %>)</p>
         <%= f.hidden_field :name %>

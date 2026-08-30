@@ -96,6 +96,7 @@ Dandelion::App.controller do
     sign_in_required!
     @organisation = Organisation.new(mass_assigning(params[:organisation], Organisation))
     @organisation.account = current_account
+    @organisation.currency ||= preferred_currency
     erb :'organisations/build'
   end
 
@@ -103,6 +104,7 @@ Dandelion::App.controller do
     sign_in_required!
     @organisation = Organisation.new(mass_assigning(params[:organisation], Organisation))
     @organisation.account = current_account
+    @organisation.currency ||= preferred_currency
     if (referrer_id = session[:organisation_referrer_id]) &&
        @organisation.referrer_id.blank? &&
        !(current_account && referrer_id == current_account.id.to_s)

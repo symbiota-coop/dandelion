@@ -2,6 +2,8 @@
 
 Click Organisations > Create an organisation in the sidebar. Provide the basic details for the organisation and click Save and continue. You will then notice a new dropdown for your organisation containing further admin options at the top of the main window.
 
+The organisation currency defaults to your local currency and can be changed in the Payments tab.
+
 ## Payments
 
 To accept payments for tickets to events created under the organisation, you must add details for Stripe or another payment processor in the Payments tab of your organisation's settings.

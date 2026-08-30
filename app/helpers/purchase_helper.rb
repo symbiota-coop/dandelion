@@ -43,7 +43,7 @@ Dandelion::App.helpers do
     account_hash[:phone] = details_form[:account][:phone] if @event.organisation.collect_phone?
 
     account = Account.find_by(email: details_form[:account][:email].downcase)
-    account ||= Account.new(account_hash.merge(skip_confirmation_email: true))
+    account ||= Account.new(account_hash.merge(skip_confirmation_email: true, default_currency: visitor_currency))
 
     if account.persisted?
       # Only the account owner may merge checkout fields into an existing profile.
