@@ -333,6 +333,7 @@ Dandelion::App.controller do
 
   get '/events/:id/attendees' do
     @event = Event.find(params[:id]) || not_found
+    not_found if @event.hide_attendees? && !event_admin?
     partial :'events/attendees'
   end
 
