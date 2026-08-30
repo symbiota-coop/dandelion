@@ -1,37 +1,5 @@
-<% if @event.monthly_donors_only && !monthly_donor_for_event? %>
-  <div class="card shadow-sm">
-    <h3 class="card-header bg-primary text-white"><%= @event.select_tickets_title || 'Select tickets' %></h3>
-    <div class="card-body">
-      <p class="lead mb-0">
-        <% if current_account %>
-          You must be a monthly donor to
-        <% else %>
-          You must be signed in and a monthly donor to
-        <% end %>
-        <a href="/o/<%= @event.organisation.slug %>"><%= @event.organisation.name %></a> to book tickets to this event.
-        <% if !current_account %><a href="/accounts/sign_in">Sign in</a> &middot;<% end %>
-        <% if @event.organisation.become_a_member_url %>
-          <a href="<%= @event.organisation.become_a_member_url %>">Become a Member</a>
-        <% end %>
-      </p>
-    </div>
-  </div>
-<% elsif @event.activity && @event.activity.privacy != 'open' && !activity_member_for_event? %>
-  <div class="card shadow-sm">
-    <h3 class="card-header bg-primary text-white"><%= @event.select_tickets_title || 'Select tickets' %></h3>
-    <div class="card-body">
-      <p class="lead mb-0">
-        <% if current_account %>
-          You must be a member of the
-        <% else %>
-          You must be signed in and a member of the
-        <% end %>
-        <a href="/o/<%= @event.activity.organisation.slug %>/a/<%= @event.activity.slug %>"><%= @event.activity.name %></a> activity to book tickets to this event.
-        <% if !current_account %><a href="/accounts/sign_in">Sign in</a> &middot; <% end %>
-        <a href="/activities/<%= @event.activity_id %>/apply">Apply</a>
-      </p>
-    </div>
-  </div>
+<% if !can_purchase_event_tickets? %>
+  <%= partial :'purchase/purchase_gate' %>
 <% else %>
 <style>
   #totalDisplay, #credit, #fixed-discount, #balance {
