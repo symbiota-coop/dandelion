@@ -530,6 +530,38 @@ class EventsTest < ActiveSupport::TestCase
     assert_equal 'Event terms', find('textarea[readonly]').value
   end
 
+  test 'redirect_url must be a valid http or https URL' do
+    account = FactoryBot.create(:account)
+    organisation = FactoryBot.create(:organisation, account: account)
+    event = FactoryBot.build(:event, organisation: organisation, account: account, last_saved_by: account)
+
+    event.redirect_url = 'https://example.com/thanks'
+    assert event.valid?
+
+    event.redirect_url = 'http://example.com/thanks'
+    assert event.valid?
+
+    event.redirect_url = 'javascript:alert(document.cookie)'
+    refute event.valid?
+    assert_includes event.errors[:redirect_url], 'must be a valid http or https URL'
+
+    event.redirect_url = 'data:text/html,<script>alert(1)</script>'
+    refute event.valid?
+
+    event.redirect_url = nil
+    assert event.valid?
+  end
+
+  test 'safe_redirect_url ignores stored javascript URLs' do
+    account = FactoryBot.create(:account)
+    organisation = FactoryBot.create(:organisation, account: account)
+    event = FactoryBot.create(:event, organisation: organisation, account: account, last_saved_by: account)
+    event.set(redirect_url: 'javascript:alert(1)')
+
+    assert_nil event.reload.safe_redirect_url
+    assert_equal 'https://example.org/thanks', event.tap { |e| e.redirect_url = 'https://example.org/thanks' }.safe_redirect_url
+  end
+
   test 'slug uniqueness includes deleted events' do
     account = FactoryBot.create(:account)
     organisation = FactoryBot.create(:organisation, account: account)

@@ -27,6 +27,8 @@ module EventValidation
 
       self.name = name.strip if name
       self.purchase_url = purchase_url.strip if purchase_url
+      self.redirect_url = redirect_url.strip.presence if redirect_url
+      errors.add(:redirect_url, 'must be a valid http or https URL') if redirect_url && !safe_redirect_url
       self.suggested_donation = suggested_donation.round(2) if suggested_donation
       self.minimum_donation = nil unless suggested_donation
       self.minimum_donation = minimum_donation.round(2) if minimum_donation
@@ -156,6 +158,17 @@ module EventValidation
     end
 
     handle_asynchronously :update_embedding_with_retries
+  end
+
+  def safe_redirect_url
+    return unless redirect_url.present?
+
+    uri = begin
+      URI.parse(redirect_url)
+    rescue URI::InvalidURIError, ArgumentError
+      nil
+    end
+    redirect_url if uri.is_a?(URI::HTTP) && uri.host.present?
   end
 
   def update_embedding_with_retries

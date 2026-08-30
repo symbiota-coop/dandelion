@@ -191,7 +191,7 @@ module EventFields
         opt_in_facilitator: "Allow people to opt in to receive emails from any facilitators' personal lists",
         monthly_donors_only: 'Only allow people making a monthly donation to the organisation to purchase tickets',
         no_discounts: "Don't apply usual discounts for the organisation's monthly donors",
-        redirect_url: 'Optional. By default people will be shown a thank you page on Dandelion.',
+        redirect_url: 'Optional http(s) URL. By default people will be shown a thank you page on Dandelion.',
         facebook_pixel_id: 'Your Facebook Pixel ID for tracking sales',
         purchase_url: "URL where people can buy tickets (if you're not selling tickets on Dandelion)",
         capacity: 'Caps the total number of places across all ticket types. Each ticket type can take a different number of slots. Optional',

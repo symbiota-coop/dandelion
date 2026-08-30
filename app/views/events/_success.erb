@@ -13,12 +13,12 @@
       We've also sent the confirmation via email. If you don't see anything in your inbox, please check your spam folder.
     </p>
 
-    <% if @event.redirect_url %>
-      <p>Redirecting you to <a href="<%= @event.redirect_url %>"><%= @event.redirect_url %></a>&hellip; <i class="bi bi-spin bi-slash-lg"></i></p>
+    <% if (redirect_url = @event.safe_redirect_url) %>
+      <p>Redirecting you to <a href="<%= redirect_url %>"><%= redirect_url %></a>&hellip; <i class="bi bi-spin bi-slash-lg"></i></p>
       <script>
         $(function () {
           setTimeout(function () {
-            window.location = <%== @event.redirect_url.to_json %>
+            window.location = <%== redirect_url.to_json %>
           }, 3000)
         })
       </script>
