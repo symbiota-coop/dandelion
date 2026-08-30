@@ -2,6 +2,7 @@ require File.expand_path("#{File.dirname(__FILE__)}/test_config.rb")
 
 class EventsTest < ActiveSupport::TestCase
   include Capybara::DSL
+  include Rack::Test::Methods
 
   def fill_event_create_form(event, ticket_type)
     fill_in 'Event title*', with: event.name
@@ -14,6 +15,37 @@ class EventsTest < ActiveSupport::TestCase
     fill_in 'event_ticket_types_attributes_0_price_or_range', with: ticket_type.price_or_range
     fill_in 'event_ticket_types_attributes_0_quantity', with: ticket_type.quantity
     click_link 'Everything else'
+  end
+
+  def post_purchase(event, account)
+    ticket_type = event.ticket_types.first
+    header 'Accept', 'application/json'
+    post "/events/#{event.id}/purchase",
+         ticketForm: { quantities: { ticket_type.id.to_s => '1' } },
+         detailsForm: {
+           payment_method: 'rsvp',
+           account: { name: account.name, email: account.email }
+         }
+  end
+
+  def add_member(org, **attrs)
+    account = FactoryBot.create(:account)
+    account.organisationships.create!(organisation: org, unsubscribed: false, **attrs)
+    account
+  end
+
+  def add_event_manager(org)
+    add_member(org, event_manager: true)
+  end
+
+  def create_evergreen_event(**attrs)
+    create_event(:evergreen, prices: [0], **attrs)
+  end
+
+  def create_evergreen_order
+    @attendee = FactoryBot.create(:account)
+    create_evergreen_event
+    @order = @event.orders.create!(account: @attendee, currency: @event.currency, value: 0, payment_completed: true, original_description: 'Manual test order')
   end
 
   test 'creating an event' do
@@ -504,5 +536,389 @@ class EventsTest < ActiveSupport::TestCase
       assert duplicate.persisted?
       assert_equal 'z9zzz', duplicate.slug
     end
+  end
+
+  # ═══════════════════════════════════════════════════════════════════════════
+  # Purchase access
+  # ═══════════════════════════════════════════════════════════════════════════
+
+  test 'purchase is forbidden when the event is locked and the buyer cannot view the page' do
+    create_full_event_hierarchy(event_options: { prices: [0], locked: true })
+    buyer = FactoryBot.create(:account)
+
+    post_purchase(@event, buyer)
+
+    assert_equal 403, last_response.status
+    assert_equal 0, @event.orders.count
+  end
+
+  test 'purchase is allowed when the event is locked and the buyer is an event admin' do
+    create_full_event_hierarchy(event_options: { prices: [0], locked: true })
+
+    rack_login_as(@account)
+    post_purchase(@event, @account)
+
+    assert_equal 200, last_response.status
+    assert @event.orders.find_by(account: @account)
+  end
+
+  test 'purchase is forbidden when monthly_donors_only and the buyer is not a signed-in donor' do
+    create_full_event_hierarchy(event_options: { prices: [0], monthly_donors_only: true })
+    buyer = FactoryBot.create(:account)
+
+    post_purchase(@event, buyer)
+    assert_equal 403, last_response.status
+
+    rack_login_as(buyer)
+    post_purchase(@event, buyer)
+    assert_equal 403, last_response.status
+    assert_equal 0, @event.orders.count
+  end
+
+  test 'purchase is allowed when monthly_donors_only and the buyer is a signed-in donor' do
+    create_full_event_hierarchy(event_options: { prices: [0], monthly_donors_only: true })
+    buyer = FactoryBot.create(:account)
+    FactoryBot.create(:organisationship, organisation: @organisation, account: buyer, monthly_donation_method: 'Other', monthly_donation_amount: 1)
+
+    rack_login_as(buyer)
+    post_purchase(@event, buyer)
+
+    assert_equal 200, last_response.status
+    assert @event.orders.find_by(account: buyer)
+  end
+
+  test 'purchase is forbidden when the activity is closed and the buyer is not a member' do
+    create_full_event_hierarchy(event_options: { prices: [0] })
+    @activity.set(privacy: 'closed')
+    buyer = FactoryBot.create(:account)
+
+    post_purchase(@event, buyer)
+    assert_equal 403, last_response.status
+
+    rack_login_as(buyer)
+    post_purchase(@event, buyer)
+    assert_equal 403, last_response.status
+    assert_equal 0, @event.orders.count
+  end
+
+  test 'purchase is allowed when the activity is closed and the buyer is a signed-in member' do
+    create_full_event_hierarchy(event_options: { prices: [0] })
+    @activity.set(privacy: 'closed')
+    buyer = FactoryBot.create(:account)
+    @activity.activityships.create!(account: buyer)
+
+    rack_login_as(buyer)
+    post_purchase(@event, buyer)
+
+    assert_equal 200, last_response.status
+    assert @event.orders.find_by(account: buyer)
+  end
+
+  test 'purchase remains allowed for an open unlocked event' do
+    create_full_event_hierarchy(event_options: { prices: [0] })
+    buyer = FactoryBot.create(:account)
+
+    post_purchase(@event, buyer)
+
+    assert_equal 200, last_response.status
+    assert @event.orders.find_by(account: buyer)
+  end
+
+  test 'ticket_form_only does not render the purchase form when the buyer cannot purchase' do
+    create_full_event_hierarchy(event_options: { prices: [0], monthly_donors_only: true })
+
+    get "/e/#{@event.slug}", ticket_form_only: 1
+
+    assert_equal 200, last_response.status
+    refute_includes last_response.body, 'id="select-tickets"'
+    assert_includes last_response.body, 'monthly donor'
+  end
+
+  # ═══════════════════════════════════════════════════════════════════════════
+  # Event manager permissions
+  # ═══════════════════════════════════════════════════════════════════════════
+
+  test 'organisations_for_creating_events includes org when account has event_manager on organisationship' do
+    org = FactoryBot.create(:organisation)
+    other = add_event_manager(org)
+    assert_includes other.organisations_for_creating_events.pluck(:id), org.id
+  end
+
+  test 'organisations_for_creating_events includes org when account is org admin on organisationship' do
+    org = FactoryBot.create(:organisation)
+    other = add_member(org, admin: true)
+    assert_includes other.organisations_for_creating_events.pluck(:id), org.id
+  end
+
+  test 'organisations_for_creating_events does not include org for plain follower only' do
+    org = FactoryBot.create(:organisation)
+    follower = add_member(org)
+    refute_includes follower.organisations_for_creating_events.pluck(:id), org.id
+  end
+
+  test 'organisations_for_creating_events includes org from activity admin' do
+    org = FactoryBot.create(:organisation)
+    activity = FactoryBot.create(:activity, organisation: org)
+    other = FactoryBot.create(:account)
+    activity.activityships.create!(account: other, admin: true, unsubscribed: false)
+    assert_includes other.organisations_for_creating_events.pluck(:id), org.id
+  end
+
+  test 'organisations_for_creating_events includes org from local group admin' do
+    org = FactoryBot.create(:organisation)
+    local_group = FactoryBot.create(:local_group, organisation: org)
+    other = FactoryBot.create(:account)
+    local_group.local_groupships.create!(account: other, admin: true, unsubscribed: false)
+    assert_includes other.organisations_for_creating_events.pluck(:id), org.id
+  end
+
+  test 'can_create_events_for_organisation? is false for unrelated activity admin' do
+    org = FactoryBot.create(:organisation)
+    other_org = FactoryBot.create(:organisation, account: org.account)
+    activity = FactoryBot.create(:activity, organisation: other_org)
+    other = FactoryBot.create(:account)
+    activity.activityships.create!(account: other, admin: true, unsubscribed: false)
+    refute Organisation.can_create_events_for_organisation?(org, other)
+  end
+
+  test 'event is valid for org-wide create when account has event_manager' do
+    org = FactoryBot.create(:organisation, allow_event_submissions: false)
+    manager = add_event_manager(org)
+    event = FactoryBot.build(:event, organisation: org, account: manager, last_saved_by: manager, duplicate: false)
+    assert event.valid?, event.errors.full_messages.join(', ')
+  end
+
+  test 'event_manager is event admin for organisation event' do
+    org = FactoryBot.create(:organisation)
+    manager = add_event_manager(org)
+    event = FactoryBot.create(:event, organisation: org)
+    assert Event.admin?(event, manager)
+  end
+
+  test 'event_manager is event admin for cohosted event' do
+    org = FactoryBot.create(:organisation)
+    cohost = FactoryBot.create(:organisation)
+    manager = add_event_manager(cohost)
+    event = FactoryBot.create(:event, organisation: org)
+    event.cohostships.create!(organisation: cohost)
+    assert Event.admin?(event, manager)
+  end
+
+  test 'event_manager is email viewer when show_emails is false' do
+    org = FactoryBot.create(:organisation)
+    manager = add_event_manager(org)
+    event = FactoryBot.create(:event, organisation: org, show_emails: false)
+    assert Event.email_viewer?(event, manager)
+  end
+
+  test 'cohost event_manager is email viewer when show_emails is false' do
+    org = FactoryBot.create(:organisation)
+    cohost = FactoryBot.create(:organisation)
+    manager = add_event_manager(cohost)
+    event = FactoryBot.create(:event, organisation: org, show_emails: false)
+    event.cohostships.create!(organisation: cohost)
+    assert Event.email_viewer?(event, manager)
+  end
+
+  test 'event is invalid for org-wide create when account is only a follower' do
+    org = FactoryBot.create(:organisation, allow_event_submissions: false)
+    follower = add_member(org)
+    event = FactoryBot.build(:event, organisation: org, account: follower, last_saved_by: follower, duplicate: false)
+    refute event.valid?
+    assert_includes event.errors[:organisation], "- you don't have permission to create events for this organisation"
+  end
+
+  test 'GET /events/new with organisation_id allows event_manager' do
+    org = FactoryBot.create(:organisation, contribution_not_required: true)
+    manager = add_event_manager(org)
+    login_as(manager)
+    visit "/events/new?organisation_id=#{org.id}"
+    assert page.has_content?('Event title*')
+  end
+
+  test 'GET /events/new with organisation_id redirects for plain follower' do
+    org = FactoryBot.create(:organisation, contribution_not_required: true)
+    follower = add_member(org)
+    login_as(follower)
+    visit "/events/new?organisation_id=#{org.id}"
+    assert_equal '/events', current_path
+    assert page.has_content? "don't have permission to create events for this organisation"
+  end
+
+  test 'org event manager can delete their own event' do
+    org = FactoryBot.create(:organisation)
+    manager = add_event_manager(org)
+    event = FactoryBot.create(:event, organisation: org, account: manager, last_saved_by: manager)
+    login_as(manager)
+    visit "/events/#{event.id}/delete"
+    accept_confirm do
+      click_link 'Delete event and attempt to refund all orders'
+    end
+    assert_equal "/o/#{org.slug}/events", current_path
+    assert page.has_content?('The event was deleted')
+    assert event.reload.deleted?
+  end
+
+  test 'org event manager cannot delete another account event' do
+    org = FactoryBot.create(:organisation)
+    manager = add_event_manager(org)
+    event = FactoryBot.create(:event, organisation: org)
+    login_as(manager)
+    visit "/events/#{event.id}/delete"
+    assert page.has_content?("Please ask an admin of #{org.name} to delete the event")
+    refute page.has_link?('Delete event and attempt to refund all orders')
+    refute event.reload.deleted?
+  end
+
+  test 'org admin can delete any organisation event' do
+    org = FactoryBot.create(:organisation)
+    manager = add_event_manager(org)
+    event = FactoryBot.create(:event, organisation: org, account: manager, last_saved_by: manager)
+    login_as(org.account)
+    visit "/events/#{event.id}/delete"
+    accept_confirm do
+      click_link 'Delete event and attempt to refund all orders'
+    end
+    assert_equal "/o/#{org.slug}/events", current_path
+    assert event.reload.deleted?
+  end
+
+  # ═══════════════════════════════════════════════════════════════════════════
+  # Evergreen events
+  # ═══════════════════════════════════════════════════════════════════════════
+
+  test 'creating an evergreen event without dates' do
+    create_organisation
+    ticket_type = FactoryBot.build_stubbed(:ticket_type)
+    login_as(@account)
+    visit "/o/#{@organisation.slug}"
+    click_link 'Create an event'
+    fill_in 'Event title*', with: 'On-demand Ruby Course'
+    click_link 'Mark as evergreen/on-demand, with no dates or location'
+    click_link 'Tickets'
+    execute_script %{$("a:contains('Add ticket type')").click()}
+    fill_in 'event_ticket_types_attributes_0_name', with: ticket_type.name
+    fill_in 'event_ticket_types_attributes_0_price_or_range', with: ticket_type.price_or_range
+    fill_in 'event_ticket_types_attributes_0_quantity', with: ticket_type.quantity
+    click_link 'Everything else'
+    click_button 'Create event'
+    refute page.has_content? 'Add to calendar'
+  end
+
+  test 'evergreen event appears in future scope' do
+    create_evergreen_event
+    assert_includes Event.future_current_evergreen.pluck(:id), @event.id
+    refute_includes Event.past.pluck(:id), @event.id
+    refute_includes Event.finished.pluck(:id), @event.id
+  end
+
+  test 'evergreen event instance methods return correct values' do
+    event = Event.new(evergreen: true, name: 'Test', currency: 'GBP')
+    assert event.future?
+    refute event.past?
+    refute event.started?
+    refute event.finished?
+    assert_nil event.when_details('UTC')
+    assert_nil event.concise_when_details('UTC')
+    assert_nil event.ical
+  end
+
+  test 'non-evergreen event still requires start_time end_time location' do
+    event = Event.new(name: 'Missing Dates', currency: 'GBP')
+    refute event.valid?
+    assert event.errors[:start_time].any?
+    assert event.errors[:end_time].any?
+    assert event.errors[:location].any?
+  end
+
+  test 'evergreen event prevents duplicate names within same organisation' do
+    create_evergreen_event(name: 'My Course')
+    duplicate = Event.new(
+      name: 'My Course',
+      currency: 'GBP',
+      organisation: @organisation,
+      account: @account,
+      last_saved_by: @account,
+      evergreen: true
+    )
+    refute duplicate.valid?
+    assert duplicate.errors[:name].any?
+  end
+
+  test 'duplicating an evergreen event preserves the flag' do
+    create_evergreen_event
+    duplicate = @event.duplicate!(@account)
+    assert duplicate.evergreen?
+    assert_nil duplicate.start_time
+    assert_nil duplicate.end_time
+  end
+
+  test 'booking onto a free evergreen event' do
+    create_evergreen_event
+    login_as(@account)
+    visit "/e/#{@event.slug}"
+    assert page.has_content? 'Online'
+    assert page.has_content? 'Register for free'
+    click_button 'RSVP'
+    assert page.has_content? 'Thanks for booking'
+  end
+
+  test 'evergreen event reminder_due_within returns false' do
+    event = Event.new(evergreen: true, name: 'Test', currency: 'GBP', reminder_hours_before: 24)
+    refute event.reminder_due_within?(1.hour)
+  end
+
+  test 'evergreen event feedback_due_within returns false' do
+    event = Event.new(
+      evergreen: true,
+      name: 'Test',
+      currency: 'GBP',
+      feedback_questions: 'Q?',
+      end_time: 1.day.ago,
+      feedback_hours_after: 1
+    )
+    refute event.feedback_due_within?(1.hour)
+  end
+
+  test 'evergreen event json endpoint returns nil dates' do
+    create_evergreen_event
+
+    get "/e/#{@event.slug}.json"
+
+    assert_equal 200, last_response.status
+    json = JSON.parse(last_response.body)
+    assert_equal @event.name, json['name']
+    assert_nil json['start_time']
+    assert_nil json['end_time']
+  end
+
+  test 'organisation orders page renders evergreen orders' do
+    create_evergreen_order
+
+    login_as(@account)
+    visit "/o/#{@organisation.slug}/orders"
+
+    assert page.has_content? @event.name
+    assert page.has_content? @attendee.name
+  end
+
+  test 'evergreen event calendar endpoints return not found' do
+    create_evergreen_order
+
+    get "/e/#{@event.slug}.ics"
+    assert_equal 404, last_response.status
+    get "/orders/#{@order.id}.ics"
+    assert_equal 404, last_response.status
+  end
+
+  test 'converting a scheduled event to evergreen wipes start time, end time, and location' do
+    create_event(location: 'London', prices: [0])
+    assert @event.start_time
+    assert @event.end_time
+    @event.update!(evergreen: true)
+    @event.reload
+    assert_nil @event.start_time
+    assert_nil @event.end_time
+    assert_equal 'Online', @event.location
   end
 end

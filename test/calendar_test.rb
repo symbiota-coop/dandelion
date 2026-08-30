@@ -1,7 +1,8 @@
 require File.expand_path("#{File.dirname(__FILE__)}/test_config.rb")
 
-class CalendarImportsTest < ActiveSupport::TestCase
+class CalendarTest < ActiveSupport::TestCase
   include Capybara::DSL
+  include Rack::Test::Methods
 
   ICS_URL_1 = 'https://calendar.google.com/calendar/ical/one/basic.ics'.freeze
   ICS_URL_2 = 'https://calendar.google.com/calendar/ical/two/basic.ics'.freeze
@@ -426,5 +427,49 @@ class CalendarImportsTest < ActiveSupport::TestCase
       organisation = FactoryBot.build(:organisation, calendar_import_urls: "https://#{host}/ics/get?entity=calendar&id=cal-test")
       assert organisation.valid?, "expected #{host} to be allowed"
     end
+  end
+
+  # ═══════════════════════════════════════════════════════════════════════════
+  # ICS keys
+  # ═══════════════════════════════════════════════════════════════════════════
+
+  test 'ics key grants access to birthdays ics but not birthdays html' do
+    account = FactoryBot.create(:account)
+    followee = FactoryBot.create(:account, date_of_birth: Date.new(1990, 1, 1))
+    Follow.create!(follower: account, followee: followee)
+
+    get "/birthdays.ics?ics_key=#{account.ics_key}"
+    assert_equal 200, last_response.status
+    assert_includes last_response.body, 'BEGIN:VCALENDAR'
+    assert_includes last_response.body, followee.name
+
+    get "/birthdays?ics_key=#{account.ics_key}"
+    assert_equal 302, last_response.status
+  end
+
+  test 'ics key grants access to my events ics but not my events html' do
+    create_organisation
+    create_event(coordinator: @account)
+
+    get "/events/my.ics?ics_key=#{@account.ics_key}"
+    assert_equal 200, last_response.status
+    assert_includes last_response.body, 'BEGIN:VCALENDAR'
+    assert_includes last_response.body, @event.name
+
+    get "/events/my?ics_key=#{@account.ics_key}"
+    assert_equal 302, last_response.status
+  end
+
+  test 'ics key grants access to gathering birthdays only for a member' do
+    account = FactoryBot.create(:account)
+    non_member = FactoryBot.create(:account)
+    gathering = FactoryBot.create(:gathering, account: account)
+
+    get "/g/#{gathering.slug}/birthdays.ics?ics_key=#{account.ics_key}"
+    assert_equal 200, last_response.status
+    assert_includes last_response.body, 'BEGIN:VCALENDAR'
+
+    get "/g/#{gathering.slug}/birthdays.ics?ics_key=#{non_member.ics_key}"
+    assert_equal 302, last_response.status
   end
 end
