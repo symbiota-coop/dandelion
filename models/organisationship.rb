@@ -67,7 +67,7 @@ class Organisationship
     creditings.each do |crediting|
       credits << [Money.new(crediting.amount * 100, crediting.currency), "on #{crediting.created_at} by #{crediting.account.name}"]
     end
-    account.orders_as_affiliate.and(:payment_completed => true, :event_id.in => organisation.events.pluck(:id)).each do |order|
+    account.orders_as_affiliate.and(:payment_completed => true, :event_id.in => organisation.events.pluck(:id), :account_id.ne => account.id).each do |order|
       credits << [Money.new(order.event.organisation&.affiliate_credit_percentage.to_f / 100 * (order.value || 0) * 100, order.currency), "for #{order.account ? order.account.name : 'deleted account'}'s order to #{order.event.name} at #{order.created_at}"] if order.event.organisation&.affiliate_credit_percentage
     end
     if description_hash

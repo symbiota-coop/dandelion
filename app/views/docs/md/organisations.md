@@ -40,7 +40,7 @@ Enable affiliate credits to reward attendees for referring others to your events
 
 1. Go to your organisation settings and set 'Order reward %' (e.g. 10%)
 2. Attendees will now receive a personal affiliate link in their order confirmation email
-3. For each order made via that link, the referrer earns credit equal to the set percentage of the order value
+3. For each order made via that link, the referrer earns credit equal to the set percentage of the order value. You cannot earn credit on your own orders.
 4. Credit is automatically applied at checkout when the referrer purchases tickets to future events
 
 **For attendees:** If you have credit, your balance is shown on the organisation page. Click it to see a breakdown of credits earned and used.
