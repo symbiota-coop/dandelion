@@ -234,6 +234,7 @@ Dandelion::App.controller do
 
   post '/events/:id/purchase', provides: :json do
     @event = Event.find(params[:id]) || not_found
+    halt 403 unless can_purchase_event_tickets?
     @account = find_or_create_account_for_purchase(params[:detailsForm])
     halt 403 if @event.organisation.banned_emails_a.include?(@account.email)
 

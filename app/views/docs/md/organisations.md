@@ -34,6 +34,8 @@ Imported events use the feed's event URL as their RSVP/ticket button, so people 
 
 Provide a GoCardless access token and/or Patreon API key, and people with active subscriptions will be recognised as monthly donors/members of the organisation.
 
+You can restrict an event to monthly donors by checking **Only allow people making a monthly donation to the organisation to purchase tickets**. Signed-in monthly donors can then buy tickets; others cannot.
+
 ## Affiliate credits
 
 Enable affiliate credits to reward attendees for referring others to your events.

@@ -1,4 +1,21 @@
 Dandelion::App.helpers do
+  def monthly_donor_for_event?(event = @event, account = current_account)
+    account && event.organisation.organisationships.find_by(:account => account, :monthly_donation_method.ne => nil)
+  end
+
+  def activity_member_for_event?(event = @event, account = current_account)
+    event.activity && account && event.activity.activityships.find_by(account: account)
+  end
+
+  def can_purchase_event_tickets?(event = @event, account = current_account)
+    return false unless event
+    return false if event.locked? && !event_admin?(event, account)
+    return false if event.monthly_donors_only && !monthly_donor_for_event?(event, account)
+    return false if event.activity && event.activity.privacy != 'open' && !activity_member_for_event?(event, account)
+
+    true
+  end
+
   def currency_input_row(label:, field_name:, field_id:, value: nil)
     input = number_field_tag field_name, value: value, id: field_id, class: 'form-control', disabled: true
     <<-HTML

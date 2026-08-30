@@ -148,6 +148,8 @@ You can then **Delete event and attempt to refund all orders**, or **Delete even
 
 You can see all events under an organisation (including events marked secret or locked) by clicking the organisation dropdown and going to **Event stats**.
 
+Locked events are hidden from the public. Anyone who can view the event page (event admins) can still purchase tickets, so you can test checkout before unlocking.
+
 ## Reminders
 
 Dandelion can send event attendees a reminder email before the event starts. Set **Hours before the event to send the reminder email** in the event's Emails tab (default: 24). Leave blank to skip the reminder. You can also customise the reminder subject and body in your organisation or event settings.
@@ -286,7 +288,7 @@ You can make it so people must first be accepted to an Activity before being abl
 
 Click your organisation dropdown and select 'Activities' then 'Create an activity'. Under 'Access', select 'People must apply to join' and enter some application questions (answers in textboxes).
 
-Edit your event(s) and assign them to this new activity. Now, people will have to apply and be accepted to the activity before they can purchase tickets to the event(s).
+Edit your event(s) and assign them to this new activity. Now, people will have to apply and be accepted to the activity before they can purchase tickets to the event(s). This is enforced when tickets are bought, not only on the event page.
 
 You'll be notified via email when people apply.
 
