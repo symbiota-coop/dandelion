@@ -6,7 +6,7 @@ class LocalGroupsTest < ActiveSupport::TestCase
   test 'creating a local group' do
     create_organisation
     local_group = FactoryBot.build_stubbed(:local_group)
-    login_as(@account)
+    sign_in(@account)
     visit "/o/#{@organisation.slug}"
     click_link 'Create a local group'
     fill_in 'Name', with: local_group.name
@@ -18,7 +18,7 @@ class LocalGroupsTest < ActiveSupport::TestCase
   test 'editing a local group' do
     create_organisation
     local_group = FactoryBot.create(:local_group, organisation: @organisation)
-    login_as(@account)
+    sign_in(@account)
     visit "/local_groups/#{local_group.id}/edit"
     fill_in 'Name', with: (name = FactoryBot.build_stubbed(:local_group).name)
     click_button 'Update local group'

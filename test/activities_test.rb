@@ -20,7 +20,7 @@ class ActivitiesTest < ActiveSupport::TestCase
   test 'creating an activity' do
     create_organisation
     activity = FactoryBot.build_stubbed(:activity)
-    login_as(@account)
+    sign_in(@account)
     visit "/o/#{@organisation.slug}"
     click_link 'Create an activity'
     fill_in 'Name', with: activity.name
@@ -31,7 +31,7 @@ class ActivitiesTest < ActiveSupport::TestCase
   test 'editing an activity' do
     create_organisation
     activity = FactoryBot.create(:activity, organisation: @organisation)
-    login_as(@account)
+    sign_in(@account)
     visit "/activities/#{activity.id}/edit"
     fill_in 'Name', with: (name = FactoryBot.build_stubbed(:activity).name)
     click_button 'Update activity'
@@ -62,7 +62,7 @@ class ActivitiesTest < ActiveSupport::TestCase
   test 'applying to an activity when already a member' do
     create_organisation
     activity = FactoryBot.create(:activity, organisation: @organisation)
-    login_as(@account)
+    sign_in(@account)
     visit "/activities/#{activity.id}/apply"
     assert page.has_content? 'Preview of application form'
   end
@@ -82,7 +82,7 @@ class ActivitiesTest < ActiveSupport::TestCase
                                  organisation: @organisation,
                                  application_questions: questions)
     applicant = FactoryBot.create(:account)
-    login_as(applicant)
+    sign_in(applicant)
     visit "/activities/#{activity.id}/apply"
 
     # Verify header and plain text are displayed

@@ -7,7 +7,7 @@ class EventBoostsTest < ActiveSupport::TestCase
   test 'event admin can view boosts page and pending boost shows checkout ids' do
     create_event(prices: [0])
 
-    login_as(@account)
+    sign_in(@account)
     visit "/events/#{@event.id}/boosts"
 
     assert page.has_content?('Boost this event')
@@ -34,7 +34,7 @@ class EventBoostsTest < ActiveSupport::TestCase
   test 'boost payment can be marked complete' do
     create_event(prices: [0])
 
-    login_as(@account)
+    sign_in(@account)
     visit "/events/#{@event.id}/boosts"
 
     start_time = (Time.zone.now.beginning_of_hour + 2.hours).strftime('%Y-%m-%d %H:%M')

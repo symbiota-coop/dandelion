@@ -39,7 +39,7 @@ class AccountsTest < ActiveSupport::TestCase
 
   test 'editing profile' do
     account = FactoryBot.create(:account)
-    login_as(account)
+    sign_in(account)
     click_link account.name
     click_link 'Edit profile'
     fill_in 'Full name', with: (name = FactoryBot.build_stubbed(:account).name)

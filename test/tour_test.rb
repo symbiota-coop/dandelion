@@ -5,7 +5,7 @@ class TourTest < ActiveSupport::TestCase
 
   test 'home tour' do
     account = FactoryBot.create(:account)
-    login_as(account)
+    sign_in(account)
     visit '/?tour=1'
     assert page.has_content? 'Welcome to Dandelion!'
     execute_script %{$('.introjs-nextbutton').click()}
@@ -18,7 +18,7 @@ class TourTest < ActiveSupport::TestCase
 
   test 'organisation tour' do
     create_organisation
-    login_as(@account)
+    sign_in(@account)
     visit "/o/#{@organisation.slug}/edit?tour=1"
     assert page.has_content? "You've created your first organisation"
     execute_script %{$('.introjs-nextbutton').click()}
@@ -29,7 +29,7 @@ class TourTest < ActiveSupport::TestCase
 
   test 'event tour' do
     create_event
-    login_as(@account)
+    sign_in(@account)
     visit "/events/#{@event.id}?tour=1"
     assert page.has_content? "You've created your first event"
     execute_script %{$('.introjs-nextbutton').click()}

@@ -30,7 +30,7 @@ class EventsTest < ActiveSupport::TestCase
     create_organisation
     event = FactoryBot.build_stubbed(:event)
     ticket_type = FactoryBot.build_stubbed(:ticket_type)
-    login_as(@account)
+    sign_in(@account)
     visit "/o/#{@organisation.slug}"
     click_link 'Create an event'
     fill_event_create_form(event, ticket_type)
@@ -42,7 +42,7 @@ class EventsTest < ActiveSupport::TestCase
     create_organisation
     event = FactoryBot.build_stubbed(:event)
     ticket_type = FactoryBot.build_stubbed(:ticket_type, price_or_range: '10-100')
-    login_as(@account)
+    sign_in(@account)
     visit "/o/#{@organisation.slug}"
     click_link 'Create an event'
     fill_event_create_form(event, ticket_type)
@@ -52,7 +52,7 @@ class EventsTest < ActiveSupport::TestCase
 
   test 'editing an event' do
     create_event(prices: [0])
-    login_as(@account)
+    sign_in(@account)
     visit "/e/#{@event.slug}/edit"
     fill_in 'Event title*', with: (name = FactoryBot.build_stubbed(:event).name)
     click_button 'Update event'
@@ -66,7 +66,7 @@ class EventsTest < ActiveSupport::TestCase
     submitter = FactoryBot.create(:account)
     event = FactoryBot.build_stubbed(:event)
 
-    login_as(submitter)
+    sign_in(submitter)
     visit "/o/#{@organisation.slug}/events"
     assert page.has_link?('Submit an event for review'), 'Non-admin should see submit button when org allows public submissions'
 
@@ -100,7 +100,7 @@ class EventsTest < ActiveSupport::TestCase
     refute Event.lock_admin?(@event, coordinator), 'Coordinator should not be lock admin'
 
     # Event admin (coordinator) can lock an unlocked event
-    login_as(coordinator)
+    sign_in(coordinator)
     visit "/e/#{@event.slug}/edit"
     assert page.has_css?('label[for="event_locked"]'), 'Event admin should see locked checkbox when event is unlocked'
     find('label[for="event_locked"]').click
@@ -114,7 +114,7 @@ class EventsTest < ActiveSupport::TestCase
     assert page.has_content?('submitted for review'), 'Non-lock-admin should see unlock message'
 
     # Lock admin (org admin) can unlock
-    login_as(org_admin)
+    sign_in(org_admin)
     visit "/e/#{@event.slug}/edit"
     assert page.has_css?('label[for="event_locked"]'), 'Lock admin should see locked checkbox'
     find('label[for="event_locked"]').click
@@ -220,7 +220,7 @@ class EventsTest < ActiveSupport::TestCase
   test 'GET /events/new with organisation_id allows event_manager' do
     org = FactoryBot.create(:organisation, contribution_not_required: true)
     manager = add_event_manager(org)
-    login_as(manager)
+    sign_in(manager)
     visit "/events/new?organisation_id=#{org.id}"
     assert page.has_content?('Event title*')
   end
@@ -228,7 +228,7 @@ class EventsTest < ActiveSupport::TestCase
   test 'GET /events/new with organisation_id redirects for plain follower' do
     org = FactoryBot.create(:organisation, contribution_not_required: true)
     follower = add_member(org)
-    login_as(follower)
+    sign_in(follower)
     visit "/events/new?organisation_id=#{org.id}"
     assert_equal '/events', current_path
     assert page.has_content? "don't have permission to create events for this organisation"
@@ -238,7 +238,7 @@ class EventsTest < ActiveSupport::TestCase
     org = FactoryBot.create(:organisation)
     manager = add_event_manager(org)
     event = FactoryBot.create(:event, organisation: org, account: manager, last_saved_by: manager)
-    login_as(manager)
+    sign_in(manager)
     visit "/events/#{event.id}/delete"
     accept_confirm do
       click_link 'Delete event and attempt to refund all orders'
@@ -252,7 +252,7 @@ class EventsTest < ActiveSupport::TestCase
     org = FactoryBot.create(:organisation)
     manager = add_event_manager(org)
     event = FactoryBot.create(:event, organisation: org)
-    login_as(manager)
+    sign_in(manager)
     visit "/events/#{event.id}/delete"
     assert page.has_content?("Please ask an admin of #{org.name} to delete the event")
     refute page.has_link?('Delete event and attempt to refund all orders')
@@ -263,7 +263,7 @@ class EventsTest < ActiveSupport::TestCase
     org = FactoryBot.create(:organisation)
     manager = add_event_manager(org)
     event = FactoryBot.create(:event, organisation: org, account: manager, last_saved_by: manager)
-    login_as(org.account)
+    sign_in(org.account)
     visit "/events/#{event.id}/delete"
     accept_confirm do
       click_link 'Delete event and attempt to refund all orders'

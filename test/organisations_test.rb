@@ -6,7 +6,7 @@ class OrganisationsTest < ActiveSupport::TestCase
   test 'creating an organisation' do
     account = FactoryBot.create(:account)
     organisation = FactoryBot.build_stubbed(:organisation)
-    login_as(account)
+    sign_in(account)
     click_link 'Organisations'
     click_link 'All organisations'
     within('#content') { click_link 'Create an organisation' }
@@ -18,7 +18,7 @@ class OrganisationsTest < ActiveSupport::TestCase
 
   test 'editing an organisation' do
     create_organisation
-    login_as(@account)
+    sign_in(@account)
     visit "/o/#{@organisation.slug}/edit"
     fill_in 'Organisation name', with: FactoryBot.build_stubbed(:organisation).name
     click_button 'Update organisation'
@@ -30,7 +30,7 @@ class OrganisationsTest < ActiveSupport::TestCase
     creator = FactoryBot.create(:account)
     organisation = FactoryBot.build_stubbed(:organisation)
 
-    login_as(creator)
+    sign_in(creator)
     visit "/invite/#{referrer.id}"
     fill_in 'Organisation name', with: organisation.name
     fill_in 'URL', with: organisation.slug
@@ -44,7 +44,7 @@ class OrganisationsTest < ActiveSupport::TestCase
     account = FactoryBot.create(:account, username: 'selfref', has_signed_in: true)
     organisation = FactoryBot.build_stubbed(:organisation)
 
-    login_as(account)
+    sign_in(account)
     visit "/invite/#{account.id}"
     fill_in 'Organisation name', with: organisation.name
     fill_in 'URL', with: organisation.slug
@@ -94,7 +94,7 @@ class OrganisationsTest < ActiveSupport::TestCase
   test 'signed-in organisation unsubscribe redirects to subscriptions' do
     create_organisation
     organisationship = @account.organisationships.find_by(organisation: @organisation)
-    login_as(@account)
+    sign_in(@account)
 
     visit "/o/#{@organisation.slug}/unsubscribe"
     click_button 'Yes, unsubscribe'

@@ -17,7 +17,7 @@ class EvergreenEventsTest < ActiveSupport::TestCase
   test 'creating an evergreen event without dates' do
     create_organisation
     ticket_type = FactoryBot.build_stubbed(:ticket_type)
-    login_as(@account)
+    sign_in(@account)
     visit "/o/#{@organisation.slug}"
     click_link 'Create an event'
     fill_in 'Event title*', with: 'On-demand Ruby Course'
@@ -82,7 +82,7 @@ class EvergreenEventsTest < ActiveSupport::TestCase
 
   test 'booking onto a free evergreen event' do
     create_evergreen_event
-    login_as(@account)
+    sign_in(@account)
     visit "/e/#{@event.slug}"
     assert page.has_content? 'Online'
     assert page.has_content? 'Register for free'
@@ -122,7 +122,7 @@ class EvergreenEventsTest < ActiveSupport::TestCase
   test 'organisation orders page renders evergreen orders' do
     create_evergreen_order
 
-    login_as(@account)
+    sign_in(@account)
     visit "/o/#{@organisation.slug}/orders"
 
     assert page.has_content? @event.name

@@ -9,7 +9,7 @@ class HowToCreateAGatheringTest < ActiveSupport::TestCase
     @account1 = FactoryBot.create(:account, name: 'Maria Sabina', email: 'maria@symbiota.coop')
     @account2 = FactoryBot.create(:account, name: 'David Bohm', email: 'david@symbiota.coop')
     @gathering = FactoryBot.build_stubbed(:gathering, name: 'Garden Gathering', slug: 'garden-gathering')
-    login_as(@account1)
+    sign_in(@account1)
     click_link 'Gatherings'
     click_link 'All gatherings'
     narrate %(

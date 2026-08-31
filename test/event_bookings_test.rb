@@ -17,7 +17,7 @@ class EventBookingsTest < ActiveSupport::TestCase
 
   test 'booking onto a paid event' do
     create_event(prices: [(ticket_price = 10)], suggested_donation: 0)
-    login_as(@account)
+    sign_in(@account)
     visit "/e/#{@event.slug}"
     select 1, from: "quantities[#{@event.ticket_types.first.id}]"
     fill_in 'donation_amount', with: (donation_amount = 5)
@@ -26,7 +26,7 @@ class EventBookingsTest < ActiveSupport::TestCase
 
   test 'booking onto a paid event with a range' do
     create_event(prices: ['10-100'], suggested_donation: 0)
-    login_as(@account)
+    sign_in(@account)
     visit "/e/#{@event.slug}"
     execute_script %{$("[name='prices[#{@event.ticket_types.first.id}]']").val(#{selected_price = 50})[0].oninput()}
     fill_in 'donation_amount', with: (donation_amount = 5)
@@ -55,7 +55,7 @@ class EventBookingsTest < ActiveSupport::TestCase
 
   test 'booking onto a paid event with a user-set price' do
     create_event(prices: [nil], suggested_donation: 0)
-    login_as(@account)
+    sign_in(@account)
     visit "/e/#{@event.slug}"
     fill_in "prices[#{@event.ticket_types.first.id}]", with: (selected_price = 50)
     fill_in 'donation_amount', with: (donation_amount = 5)
@@ -65,7 +65,7 @@ class EventBookingsTest < ActiveSupport::TestCase
   test 'discount codes preserve quantities and prices' do
     create_event(prices: [(price0 = 10), '10-100', nil], suggested_donation: 0, questions: "q0\n[q1]\nq2")
     FactoryBot.create(:discount_code, codeable: @event, code: (code = 'DISCOUNT10'), percentage_discount: (percentage_discount = 10))
-    login_as(@account)
+    sign_in(@account)
     visit "/e/#{@event.slug}"
     select 1, from: "quantities[#{@event.ticket_types[0].id}]"
     execute_script %{$("[name='prices[#{@event.ticket_types[1].id}]']").val(#{price1 = 50})[0].oninput()}
@@ -97,7 +97,7 @@ class EventBookingsTest < ActiveSupport::TestCase
       {Arrival date}
     QUESTIONS
     create_event(prices: [0], questions: questions)
-    login_as(@account)
+    sign_in(@account)
     visit "/e/#{@event.slug}"
 
     # Verify header and plain text are displayed
@@ -195,7 +195,7 @@ class EventBookingsTest < ActiveSupport::TestCase
     create_full_event_hierarchy(event_options: { prices: [0], opt_in_organisation: true })
     buyer = FactoryBot.create(:account)
 
-    login_as(buyer)
+    sign_in(buyer)
     visit "/e/#{@event.slug}"
     assert page.has_content? 'Register for free'
 
@@ -268,7 +268,7 @@ class EventBookingsTest < ActiveSupport::TestCase
     @local_group.local_groupships.find_or_create_by(account: buyer).set(unsubscribed: true)
 
     # Book ticket with opt-in (existing members have hidden field set to 1 automatically)
-    login_as(buyer)
+    sign_in(buyer)
     visit "/e/#{@event.slug}"
     assert page.has_content? 'Register for free'
 
@@ -300,7 +300,7 @@ class EventBookingsTest < ActiveSupport::TestCase
   test 'purchase is allowed when the event is locked and the buyer is an event admin' do
     create_full_event_hierarchy(event_options: { prices: [0], locked: true })
 
-    rack_login_as(@account)
+    sign_in_with_rack(@account)
     post_purchase(@event, @account)
 
     assert_equal 200, last_response.status
@@ -314,7 +314,7 @@ class EventBookingsTest < ActiveSupport::TestCase
     post_purchase(@event, buyer)
     assert_equal 403, last_response.status
 
-    rack_login_as(buyer)
+    sign_in_with_rack(buyer)
     post_purchase(@event, buyer)
     assert_equal 403, last_response.status
     assert_equal 0, @event.orders.count
@@ -325,7 +325,7 @@ class EventBookingsTest < ActiveSupport::TestCase
     buyer = FactoryBot.create(:account)
     FactoryBot.create(:organisationship, organisation: @organisation, account: buyer, monthly_donation_method: 'Other', monthly_donation_amount: 1)
 
-    rack_login_as(buyer)
+    sign_in_with_rack(buyer)
     post_purchase(@event, buyer)
 
     assert_equal 200, last_response.status
@@ -340,7 +340,7 @@ class EventBookingsTest < ActiveSupport::TestCase
     post_purchase(@event, buyer)
     assert_equal 403, last_response.status
 
-    rack_login_as(buyer)
+    sign_in_with_rack(buyer)
     post_purchase(@event, buyer)
     assert_equal 403, last_response.status
     assert_equal 0, @event.orders.count
@@ -352,7 +352,7 @@ class EventBookingsTest < ActiveSupport::TestCase
     buyer = FactoryBot.create(:account)
     @activity.activityships.create!(account: buyer)
 
-    rack_login_as(buyer)
+    sign_in_with_rack(buyer)
     post_purchase(@event, buyer)
 
     assert_equal 200, last_response.status

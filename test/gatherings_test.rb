@@ -6,7 +6,7 @@ class GatheringsTest < ActiveSupport::TestCase
   test 'creating a gathering' do
     account = FactoryBot.create(:account)
     gathering = FactoryBot.build_stubbed(:gathering)
-    login_as(account)
+    sign_in(account)
     click_link 'Gatherings'
     click_link 'All gatherings'
     within('#content') { click_link 'Create a gathering' }
@@ -22,7 +22,7 @@ class GatheringsTest < ActiveSupport::TestCase
 
   test 'editing a gathering' do
     create_gathering
-    login_as(@account)
+    sign_in(@account)
     visit "/g/#{@gathering.slug}/edit"
     fill_in 'Name', with: (name = FactoryBot.build_stubbed(:gathering).name)
     click_button 'Update gathering'
@@ -32,7 +32,7 @@ class GatheringsTest < ActiveSupport::TestCase
 
   test 'copying a gathering without another admin destination redirects safely' do
     create_gathering
-    login_as(@account)
+    sign_in(@account)
 
     visit "/g/#{@gathering.slug}"
     assert page.has_no_link? 'Copy'

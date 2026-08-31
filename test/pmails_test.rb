@@ -6,7 +6,7 @@ class PmailsTest < ActiveSupport::TestCase
   test 'creating a pmail' do
     create_organisation
     pmail = FactoryBot.build_stubbed(:pmail)
-    login_as(@account)
+    sign_in(@account)
     visit "/o/#{@organisation.slug}/pmails"
     click_link 'New message'
     fill_in 'Subject', with: pmail.subject
@@ -18,7 +18,7 @@ class PmailsTest < ActiveSupport::TestCase
   test 'editing a pmail' do
     create_organisation
     pmail = FactoryBot.create(:pmail, organisation: @organisation, everyone: true)
-    login_as(@account)
+    sign_in(@account)
     visit "/o/#{@organisation.slug}/pmails"
     click_link 'Edit'
     fill_in 'Subject', with: (subject = FactoryBot.build_stubbed(:pmail).subject)
@@ -58,7 +58,7 @@ class PmailsTest < ActiveSupport::TestCase
     assert_equal pmail_count, Pmail.count
     assert_includes pmail.errors.full_messages, 'This mail cannot be duplicated because its ticket group no longer exists.'
 
-    login_as(@account)
+    sign_in(@account)
     visit "/pmails/#{pmail.id}/edit?event_id=#{@event.id}"
     pmail_count = Pmail.count
     click_button 'Duplicate'
@@ -82,7 +82,7 @@ class PmailsTest < ActiveSupport::TestCase
     ticket_group = @event.ticket_groups.create!(name: 'Backstage', capacity: 10)
     FactoryBot.create(:pmail, organisation: @organisation, to_option: "ticket_group:#{ticket_group.id}")
 
-    login_as(@account)
+    sign_in(@account)
     visit "/events/#{@event.id}/pmails"
 
     assert page.has_content? 'Ticket group Backstage'

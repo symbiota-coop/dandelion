@@ -58,7 +58,7 @@ module ActiveSupport
       end
     end
 
-    def login_as(account)
+    def sign_in(account)
       account.generate_sign_in_token!
       visit "/?sign_in_token=#{account.sign_in_token}"
     end
@@ -67,7 +67,7 @@ module ActiveSupport
       Padrino.application
     end
 
-    def rack_login_as(account)
+    def sign_in_with_rack(account)
       account.generate_sign_in_token!
       get '/', sign_in_token: account.sign_in_token
       follow_redirect! while last_response.redirect?
