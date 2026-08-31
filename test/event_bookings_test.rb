@@ -4,11 +4,11 @@ class EventBookingsTest < ActiveSupport::TestCase
   include Capybara::DSL
   include Rack::Test::Methods
 
-  def post_purchase(event, account)
+  def post_purchase(event, account, quantity: 1)
     ticket_type = event.ticket_types.first
     header 'Accept', 'application/json'
     post "/events/#{event.id}/purchase",
-         ticketForm: { quantities: { ticket_type.id.to_s => '1' } },
+         ticketForm: { quantities: { ticket_type.id.to_s => quantity.to_s } },
          detailsForm: {
            payment_method: 'rsvp',
            account: { name: account.name, email: account.email }
@@ -367,6 +367,29 @@ class EventBookingsTest < ActiveSupport::TestCase
 
     assert_equal 200, last_response.status
     assert @event.orders.find_by(account: buyer)
+  end
+
+  test 'purchase is rejected when quantity exceeds max_quantity_per_transaction' do
+    create_event(prices: [0])
+    @event.ticket_types.first.set(quantity: 10, max_quantity_per_transaction: 1)
+    buyer = FactoryBot.create(:account)
+
+    post_purchase(@event, buyer, quantity: 2)
+
+    assert_equal 400, last_response.status
+    assert_equal 0, @event.orders.count
+    assert_equal 0, @event.tickets.count
+  end
+
+  test 'purchase is allowed up to max_quantity_per_transaction' do
+    create_event(prices: [0])
+    @event.ticket_types.first.set(quantity: 10, max_quantity_per_transaction: 2)
+    buyer = FactoryBot.create(:account)
+
+    post_purchase(@event, buyer, quantity: 2)
+
+    assert_equal 200, last_response.status
+    assert_equal 2, @event.orders.find_by(account: buyer).tickets.count
   end
 
   # ═══════════════════════════════════════════════════════════════════════════

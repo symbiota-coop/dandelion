@@ -51,18 +51,23 @@ Dandelion::App.controller do
     )
 
     ticket_form[:quantities].each do |ticket_type_id, quantity|
-      next if quantity.to_i <= 0
+      quantity = quantity.to_i
+      next if quantity <= 0
 
       ticket_type = @event.ticket_types.find(ticket_type_id)
       unless ticket_type
         @order.destroy
         not_found
       end
+      if quantity > ticket_type.number_of_tickets_available_in_single_purchase
+        @order.destroy
+        halt 400
+      end
       price = if ticket_type.range || ticket_type.price.nil?
                 submitted_price = Float(ticket_form[:prices]&.[](ticket_type_id), exception: false) || 0
                 ticket_type.range ? submitted_price.clamp(*ticket_type.range) : submitted_price
               end
-      quantity.to_i.times do
+      quantity.times do
         @order.tickets.create!(
           event: @event,
           account: @account,
