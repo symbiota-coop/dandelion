@@ -1,28 +1,24 @@
 <% if !comment.comment_reactions.find_by(account: current_account) %>
-  <a data-toggle="tooltip" title="React" class="btn btn-sm btn-outline-primary" href="javascript:;" onclick="$(this).tooltip('hide').hide().next().css('display', 'inline')">
+  <a data-toggle="tooltip" title="React" class="btn btn-sm btn-outline-primary" href="javascript:;" onclick="$(this).tooltip('hide').hide().next().css('display', 'inline-flex')">
     <i class="bi bi-heart-fill"></i>
   </a>
   <% form_tag "/comments/#{comment.id}/react", class: 'form-inline', style: 'display: none;' do %>
-    <div class="row">
-      <div class="col-auto">
-        <div style="position: relative; top: 5px">
-          <% %w[💚 👍 🙏 👀 🙌 🎉].each { |e| %>
-          <a class="btn btn-sm btn-outline-light" href="javascript:;" onclick="$(this).closest('form').find('input').val($(this).html().includes('bi-heart-fill') ? '💚' : $(this).text()).closest('form').submit()">
-            <% if e == "💚" %>
-              <i class="text-primary bi bi-heart-fill"></i>
-            <% else %>
-              <%= e %>
-            <% end %>
-          </a>
-          <% } %>
-        </div>
+    <div class="d-flex align-items-center">
+      <div>
+        <% %w[💚 👍 🙏 👀 🙌 🎉].each { |e| %>
+        <a class="btn btn-sm btn-outline-light" href="javascript:;" onclick="$(this).closest('form').find('input').val($(this).html().includes('bi-heart-fill') ? '💚' : $(this).text()).closest('form').submit()">
+          <% if e == "💚" %>
+            <i class="text-primary bi bi-heart-fill"></i>
+          <% else %>
+            <%= e %>
+          <% end %>
+        </a>
+        <% } %>
       </div>
-      <div class="col-auto">
-        <div class="input-group mb-1" style="width: 8rem;">
-          <%= text_field_tag :body, class: 'form-control form-control-sm d-inline', placeholder: 'word/emoji' %>
-          <div class="input-group-append">
-            <button class="btn btn-primary" style="height: 1.875rem" type="submit"><i style="position: relative; left: -1px; top: -1px" class="bi bi-send-fill"></i></button>
-          </div>
+      <div class="input-group ml-2" style="width: 8rem; height: 1.875rem;">
+        <%= text_field_tag :body, class: 'form-control form-control-sm py-0', placeholder: 'word/emoji' %>
+        <div class="input-group-append" style="height: 1.875rem">
+          <button class="btn btn-primary d-flex align-items-center justify-content-center py-0" style="height: 1.875rem" type="submit"><i class="bi bi-send-fill"></i></button>
         </div>
       </div>
     </div>
