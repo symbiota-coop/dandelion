@@ -117,7 +117,7 @@ class Organisation
   end
 
   def banned_emails_a
-    banned_emails ? banned_emails.split("\n").map(&:strip) : []
+    banned_emails ? banned_emails.split("\n").map { |email| email.strip.downcase }.reject(&:empty?) : []
   end
 
   def admin_events

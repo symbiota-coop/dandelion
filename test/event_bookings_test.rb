@@ -369,6 +369,42 @@ class EventBookingsTest < ActiveSupport::TestCase
     assert @event.orders.find_by(account: buyer)
   end
 
+  # ═══════════════════════════════════════════════════════════════════════════
+  # Credit
+  # ═══════════════════════════════════════════════════════════════════════════
+
+  def grant_credit(account, amount:)
+    organisationship = @organisation.organisationships.find_or_create_by(account: account)
+    organisationship.creditings.create!(account: @account, amount: amount, currency: @event.currency)
+  end
+
+  test "purchase applies credit when the signed-in buyer is the order account" do
+    create_event(prices: [10], suggested_donation: 0)
+    buyer = FactoryBot.create(:account)
+    grant_credit(buyer, amount: 10)
+
+    sign_in_with_rack(buyer)
+    post_purchase(@event, buyer)
+
+    assert_equal 200, last_response.status
+    order = @event.orders.find_by(account: buyer)
+    assert_equal 10, order.credit_applied
+  end
+
+  test "purchase does not apply another account's credit when signed in as someone else" do
+    create_event(prices: [10], suggested_donation: 0)
+    victim = FactoryBot.create(:account)
+    attacker = FactoryBot.create(:account)
+    grant_credit(victim, amount: 10)
+
+    sign_in_with_rack(attacker)
+    post_purchase(@event, victim)
+
+    assert_equal 400, last_response.status
+    order = @event.orders.unscoped.find_by(account: victim)
+    assert_nil order&.credit_applied
+  end
+
   test 'ticket_form_only does not render the purchase form when the buyer cannot purchase' do
     create_full_event_hierarchy(event_options: { prices: [0], monthly_donors_only: true })
 

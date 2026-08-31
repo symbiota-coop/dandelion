@@ -76,7 +76,8 @@ Dandelion::App.controller do
     @order.donations.create!(event: @event, account: @account, amount: ticket_form[:donation_amount]) if ticket_form[:donation_amount].to_f > 0 && !ignore_dandelion_donation?(details_form)
 
     @order.filter_discounts if @order.discount_code && @order.discount_code.filter
-    @order.apply_credit if current_account
+    # Credit belongs to the order account; only apply it if that account is signed in.
+    @order.apply_credit if current_account && current_account.id == @account.id
     @order.apply_fixed_discount
     @order.set(original_description: @order.description)
 
