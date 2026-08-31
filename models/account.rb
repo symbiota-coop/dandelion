@@ -54,11 +54,10 @@ class Account
     %w[
       name username email image remove_image location phone website
       postcode country
-      date_of_birth gender sexuality bio dietary_requirements
+      date_of_birth gender bio dietary_requirements
       default_currency
       hidden
       unsubscribed unsubscribed_messages unsubscribed_feedback unsubscribed_reminders
-      open_to_new_friends open_to_short_term_dating open_to_long_term_dating open_to_open_relating
       updated_profile
     ]
   end
@@ -220,11 +219,6 @@ class Account
     return false if blocked_from_messaging
 
     email_confirmed && (can_message || live_player?)
-  end
-
-  def open_to
-    o = Account.open_to.select { |x| send("open_to_#{x}") }
-    o.empty? ? nil : o
   end
 
   def image_thumb_or_gravatar_url

@@ -11,7 +11,6 @@ module AccountFields
     field :username, type: String
     field :website, type: String
     field :gender, type: String
-    field :sexuality, type: String
     field :date_of_birth, type: Date
     field :dietary_requirements, type: String
     field :time_zone, type: String
@@ -46,7 +45,7 @@ module AccountFields
     field :sent_first_event_email, type: Time
     field :event_feedbacks_as_facilitator_count, type: Integer
     field :event_tag_names, type: Array
-    %w[email_confirmed updated_profile admin unsubscribed unsubscribed_messages unsubscribed_feedback unsubscribed_reminders open_to_new_friends open_to_short_term_dating open_to_long_term_dating open_to_open_relating block_reply_by_email hidden seen_intro_tour can_reset_passwords has_signed_in].each do |b|
+    %w[email_confirmed updated_profile admin unsubscribed unsubscribed_messages unsubscribed_feedback unsubscribed_reminders block_reply_by_email hidden seen_intro_tour can_reset_passwords has_signed_in].each do |b|
       field b.to_sym, type: Mongoid::Boolean
     end
 
@@ -93,27 +92,8 @@ module AccountFields
       [''] + ISO3166::Country.all.sort
     end
 
-    def open_to
-      %w[new_friends short_term_dating long_term_dating open_relating]
-    end
-
     def privacyables
-      %w[email location phone website date_of_birth gender sexuality bio open_to last_active organisations local_groups activities gatherings following followers]
-    end
-
-    def sexualities
-      [''] + %(Straight
-  Gay
-  Bisexual
-  Asexual
-  Demisexual
-  Heteroflexible
-  Homoflexible
-  Lesbian
-  Pansexual
-  Queer
-  Questioning
-  Sapiosexual).split("\n").map(&:strip)
+      %w[email location phone website date_of_birth gender bio last_active organisations local_groups activities gatherings following followers]
     end
 
     def genders
