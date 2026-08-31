@@ -35,7 +35,6 @@ Dandelion::App.controller do
     Gathering.enablable.each do |x|
       @gathering.send("enable_#{x}=", true) unless x == 'shift_worth'
     end
-    @gathering.listed = true
     @gathering.enable_partial_payments = true
     erb :'gatherings/build'
   end
