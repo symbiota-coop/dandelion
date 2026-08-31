@@ -6,9 +6,6 @@ Style/SymbolArray:
   MinSize: 3
 Style/HashSyntax:
   EnforcedShorthandSyntax: never 
-Naming/VariableName:
-  Exclude:
-    - 'app/controllers/purchase.rb'
 
 Metrics:
   Enabled: false
