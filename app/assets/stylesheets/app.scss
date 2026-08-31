@@ -610,6 +610,15 @@ textarea[id=comment_body] {
   overflow: hidden;
 }
 
+.comment-grey .btn-outline-light,
+.comment-grey .btn-outline-light:hover {
+  border-color: #adb5bd;
+}
+
+.comment-grey .border-light {
+  border-color: #adb5bd !important;
+}
+
 textarea[id=verdict_reason] {
   height: 6em;
 }
