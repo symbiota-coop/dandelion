@@ -227,13 +227,10 @@ Dandelion::App.controller do
 
   post '/events/:id/cohostships/new' do
     @event = Event.find(params[:id]) || not_found
+    event_admins_only!
     if params[:cohostship] && params[:cohostship][:organisation_id]
       @organisation = Organisation.find(params[:cohostship][:organisation_id]) || not_found
-      if @organisation.restrict_cohosting?
-        organisation_admins_or_event_managers_only!
-      else
-        event_admins_only!
-      end
+      organisation_admins_or_event_managers_only! if @organisation.restrict_cohosting?
       @event.cohostships.create(organisation: @organisation)
     end
     redirect back

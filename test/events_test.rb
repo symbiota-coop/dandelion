@@ -2,6 +2,7 @@ require File.expand_path("#{File.dirname(__FILE__)}/test_config.rb")
 
 class EventsTest < ActiveSupport::TestCase
   include Capybara::DSL
+  include Rack::Test::Methods
 
   def fill_event_create_form(event, ticket_type)
     fill_in 'Event title*', with: event.name
@@ -191,6 +192,55 @@ class EventsTest < ActiveSupport::TestCase
     event = FactoryBot.create(:event, organisation: org)
     event.cohostships.create!(organisation: cohost)
     assert Event.admin?(event, manager)
+  end
+
+  test 'org admin cannot cohost another org event even when restrict_cohosting is set' do
+    create_event
+    attacker_org = FactoryBot.create(:organisation, restrict_cohosting: true)
+    attacker = attacker_org.account
+
+    sign_in_with_rack(attacker)
+    post "/events/#{@event.id}/cohostships/new", cohostship: { organisation_id: attacker_org.id }
+
+    assert last_response.redirect?
+    assert_includes last_response.location, "/e/#{@event.slug}"
+    refute @event.cohostships.find_by(organisation: attacker_org)
+    refute Event.admin?(@event.reload, attacker)
+  end
+
+  test 'event admin can add an unrestricted org as cohost' do
+    create_event
+    cohost = FactoryBot.create(:organisation)
+
+    sign_in_with_rack(@account)
+    post "/events/#{@event.id}/cohostships/new", cohostship: { organisation_id: cohost.id }
+
+    assert last_response.redirect?
+    assert @event.cohostships.find_by(organisation: cohost)
+  end
+
+  test 'event admin cannot add a restricted org they do not admin' do
+    create_event
+    restricted = FactoryBot.create(:organisation, restrict_cohosting: true)
+
+    sign_in_with_rack(@account)
+    post "/events/#{@event.id}/cohostships/new", cohostship: { organisation_id: restricted.id }
+
+    assert last_response.redirect?
+    assert_includes last_response.location, "/o/#{restricted.slug}"
+    refute @event.cohostships.find_by(organisation: restricted)
+  end
+
+  test 'event admin can add a restricted org they also admin' do
+    create_event
+    restricted = FactoryBot.create(:organisation, restrict_cohosting: true)
+    restricted.organisationships.create!(account: @account, admin: true)
+
+    sign_in_with_rack(@account)
+    post "/events/#{@event.id}/cohostships/new", cohostship: { organisation_id: restricted.id }
+
+    assert last_response.redirect?
+    assert @event.cohostships.find_by(organisation: restricted)
   end
 
   test 'event_manager is email viewer when show_emails is false' do
