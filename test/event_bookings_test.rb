@@ -4,11 +4,12 @@ class EventBookingsTest < ActiveSupport::TestCase
   include Capybara::DSL
   include Rack::Test::Methods
 
-  def post_purchase(event, account, quantity: 1)
+  def post_purchase(event, account, quantity: 1, quantities: nil)
     ticket_type = event.ticket_types.first
+    quantities ||= { ticket_type.id.to_s => quantity.to_s }
     header 'Accept', 'application/json'
     post "/events/#{event.id}/purchase",
-         ticketForm: { quantities: { ticket_type.id.to_s => quantity.to_s } },
+         ticketForm: { quantities: quantities },
          detailsForm: {
            payment_method: 'rsvp',
            account: { name: account.name, email: account.email }
@@ -387,6 +388,47 @@ class EventBookingsTest < ActiveSupport::TestCase
     buyer = FactoryBot.create(:account)
 
     post_purchase(@event, buyer, quantity: 2)
+
+    assert_equal 200, last_response.status
+    assert_equal 2, @event.orders.find_by(account: buyer).tickets.count
+  end
+
+  test 'purchase aggregates equivalent ticket type IDs before checking the quantity limit' do
+    create_event(prices: [0])
+    ticket_type = @event.ticket_types.first
+    ticket_type.set(quantity: 10, max_quantity_per_transaction: 1)
+    buyer = FactoryBot.create(:account)
+    ticket_type_id = ticket_type.id.to_s
+
+    post_purchase(
+      @event,
+      buyer,
+      quantities: {
+        ticket_type_id => '1',
+        ticket_type_id.upcase => '1'
+      }
+    )
+
+    assert_equal 400, last_response.status
+    assert_equal 0, @event.orders.count
+    assert_equal 0, @event.tickets.count
+  end
+
+  test 'purchase allows equivalent ticket type IDs up to the initial availability' do
+    create_event(prices: [0])
+    ticket_type = @event.ticket_types.first
+    ticket_type.set(quantity: 2)
+    buyer = FactoryBot.create(:account)
+    ticket_type_id = ticket_type.id.to_s
+
+    post_purchase(
+      @event,
+      buyer,
+      quantities: {
+        ticket_type_id => '1',
+        ticket_type_id.upcase => '1'
+      }
+    )
 
     assert_equal 200, last_response.status
     assert_equal 2, @event.orders.find_by(account: buyer).tickets.count

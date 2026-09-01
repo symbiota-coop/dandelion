@@ -50,6 +50,8 @@ Dandelion::App.controller do
       http_referrer: account_data[:http_referrer]
     )
 
+    purchased = Hash.new(0)
+    available = {}
     ticket_form[:quantities].each do |ticket_type_id, quantity|
       quantity = quantity.to_i
       next if quantity <= 0
@@ -59,7 +61,9 @@ Dandelion::App.controller do
         @order.destroy
         not_found
       end
-      if quantity > ticket_type.number_of_tickets_available_in_single_purchase
+      purchased[ticket_type.id] += quantity
+      available[ticket_type.id] ||= ticket_type.number_of_tickets_available_in_single_purchase
+      if purchased[ticket_type.id] > available[ticket_type.id]
         @order.destroy
         halt 400
       end
