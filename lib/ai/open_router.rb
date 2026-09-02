@@ -1,7 +1,7 @@
 class OpenRouter
   BASE_URL = 'https://openrouter.ai'.freeze
   CHAT_DEFAULTS = {
-    model: 'google/gemini-3.7-flash',
+    model: 'google/gemini-flash-latest',
     context_window_size: 1_000_000,
     reasoning_effort: 'low'
   }.freeze
@@ -61,9 +61,7 @@ class OpenRouter
       payload[:allow_fallbacks] = 'false'
     end
 
-    if reasoning_effort
-      payload[:reasoning] = { effort: reasoning_effort }
-    end
+    payload[:reasoning] = { effort: reasoning_effort } if reasoning_effort
 
     if schema
       payload[:response_format] = {
