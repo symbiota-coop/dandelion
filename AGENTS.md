@@ -1,6 +1,6 @@
 # Dandelion
 
-Dandelion is a Ruby/Mongo app based on the Padrino framework, which is in turn based on Sinatra. (It is NOT a Rails app.)
+Dandelion (canonical install https://dandelion.events) is a Ruby/Mongo app based on the Padrino framework, which is in turn based on Sinatra. (It is NOT a Rails app.)
 
 The ORM is Mongoid, not ActiveRecord.
 
