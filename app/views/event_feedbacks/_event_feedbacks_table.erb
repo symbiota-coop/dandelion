@@ -124,7 +124,7 @@
             <%== Sanitize.fragment(Rinku.auto_link(q), Sanitize::Config::DANDELION) %>
           </strong>
           <br>
-          <%== Sanitize.fragment(Rinku.auto_link(a), Sanitize::Config::DANDELION) %>
+          <%== Sanitize.fragment(Rinku.auto_link(a.gsub("\n", '<br />')), Sanitize::Config::DANDELION) %>
           <% if event_feedback.publicly_visible? %>
             <div class="my-3">
               <div data-pagelet-url="/event_feedbacks/<%= event_feedback.id %>/public_answers/<%= i %>"></div>
