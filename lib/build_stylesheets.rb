@@ -1,5 +1,7 @@
 stylesheets_dir = Padrino.root('app', 'assets', 'stylesheets')
 Dir.glob(File.join(stylesheets_dir, '*.scss')).each do |scss_file|
+  next if File.basename(scss_file).start_with?('_')
+
   css_file = scss_file.gsub('.scss', '.css')
   begin
     scss_content = File.read(scss_file)
