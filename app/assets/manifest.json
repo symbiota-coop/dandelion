@@ -5,7 +5,8 @@
   "description": "Find and host events and co-created gatherings",
   "start_url": "/",
   "scope": "/",
-  "display": "standalone",
+  "display": "browser",
+  "display_override": ["minimal-ui"],
   "theme_color": "#ffffff",
   "background_color": "#ffffff",
   "icons": [
