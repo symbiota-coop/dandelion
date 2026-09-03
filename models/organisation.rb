@@ -14,7 +14,7 @@ class Organisation
   include OrganisationMonthlyDonations
   include OrganisationEvm
   include OrganisationValidation
-  include OrganisationFeedbackSummaries
+  include FeedbackSummaries
   include OrganisationAtproto
   include OrganisationCalendarImports
   include Geocoded
@@ -51,6 +51,22 @@ class Organisation
 
   def self.search_scope
     all
+  end
+
+  def self.feedback_summaries_scope
+    Organisation.all
+  end
+
+  def feedback_summaries_source
+    event_feedbacks
+  end
+
+  def feedback_summary_log_label
+    name
+  end
+
+  def feedback_summary_prompt
+    "Provide a one-paragraph summary of the feedback on the events of this organisation, #{name}. Focus on the positives. The feedback:\n\n#{event_feedbacks.joined}"
   end
 
   def self.protected_attributes

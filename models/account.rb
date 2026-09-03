@@ -9,7 +9,7 @@ class Account
   include AccountAssociations
   include AccountValidation
   include AccountNotifications
-  include AccountFeedbackSummaries
+  include FeedbackSummaries
   include AccountRecommendations
   include AccountAtproto
   include AccountStripeSubscriptions
@@ -34,6 +34,22 @@ class Account
 
   def self.publicly_visible
     self.and(has_signed_in: true, hidden: false)
+  end
+
+  def self.feedback_summaries_scope
+    Account.and(:id.in => EventFacilitation.and(:event_id.in => Event.past.pluck(:id)).pluck(:account_id))
+  end
+
+  def feedback_summaries_source
+    event_feedbacks_as_facilitator
+  end
+
+  def feedback_summary_log_label
+    username
+  end
+
+  def feedback_summary_prompt
+    "Provide a one-paragraph summary of the feedback on this facilitator, #{name}. Focus on their strengths and what they do well. The feedback:\n\n#{event_feedbacks_as_facilitator.joined}"
   end
 
   def self.sensitive?(privacyable)

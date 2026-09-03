@@ -4,7 +4,7 @@ class Activity
   include CoreExtensions
 
   extend Dragonfly::Model
-  include ActivityFeedbackSummaries
+  include FeedbackSummaries
   include ImportFromCsv
   include SendFollowersCsv
   include ImageWithValidation
@@ -46,6 +46,22 @@ class Activity
 
   def self.search_fields
     %w[name]
+  end
+
+  def self.feedback_summaries_scope
+    Activity.and(:id.in => EventFeedback.pluck(:activity_id))
+  end
+
+  def feedback_summaries_source
+    event_feedbacks
+  end
+
+  def feedback_summary_log_label
+    "#{organisation.name}: #{name}"
+  end
+
+  def feedback_summary_prompt
+    "Provide a one-paragraph summary of the feedback on this activity (family of events), #{name}, hosted by #{organisation.name}. Focus on the positives. The feedback:\n\n#{event_feedbacks.joined}"
   end
 
   def self.new_hints
