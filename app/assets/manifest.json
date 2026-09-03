@@ -1,0 +1,43 @@
+{
+  "id": "/",
+  "name": "Dandelion",
+  "short_name": "Dandelion",
+  "description": "Find and host events and co-created gatherings",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "theme_color": "#ffffff",
+  "background_color": "#ffffff",
+  "icons": [
+    {
+      "src": "/images/logos/black-on-white-sq-192.png",
+      "type": "image/png",
+      "sizes": "192x192",
+      "purpose": "any"
+    },
+    {
+      "src": "/images/logos/black-on-white-sq-512.png",
+      "type": "image/png",
+      "sizes": "512x512",
+      "purpose": "any"
+    },
+    {
+      "src": "/images/logos/black-on-white-sq-1024.png",
+      "type": "image/png",
+      "sizes": "1024x1024",
+      "purpose": "any"
+    },
+    {
+      "src": "/images/logos/black-on-white-sq-192-maskable.png",
+      "type": "image/png",
+      "sizes": "192x192",
+      "purpose": "maskable"
+    },
+    {
+      "src": "/images/logos/black-on-white-sq-512-maskable.png",
+      "type": "image/png",
+      "sizes": "512x512",
+      "purpose": "maskable"
+    }
+  ]
+}
