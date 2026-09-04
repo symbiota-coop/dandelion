@@ -19,7 +19,7 @@
       <div style="display: none">
         <% form_tag destroy_url, class: 'add-block bg-white shadow-sm p-3 mt-2 mb-3 rounded' do |f| %>
           <%= select_tag :account_id, options: accounts.map { |account| ["#{account.name} (#{account.username})", account.id] }, class: 'form-control mb-1' %>
-          <%= submit_tag "Remove #{role}", class: 'btn btn-danger' %>
+          <%= submit_tag "Remove #{role}", class: 'btn btn-danger', 'data-confirm' => "Are you sure you want to remove this #{role}?" %>
         <% end %>
       </div>
     <% end %>
