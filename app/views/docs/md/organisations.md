@@ -4,6 +4,45 @@ Click Organisations > Create an organisation in the sidebar. Provide the basic d
 
 The organisation currency defaults to your local currency and can be changed in the Payments tab.
 
+## Roles and privileges
+
+Three roles control who can manage an organisation and its events.
+
+**Organisation admin** — full control of the organisation. Add admins from the organisation page (plus icon next to Admins).
+
+**Event manager** — can create and edit events across the organisation, without access to organisation settings, followers, or the organisation mailer. Toggle this on the Followers page.
+
+**Event admin** — can edit a specific event, handle tickets and orders, check people in, email attendees, and so on. You become an event admin by creating the event, being added as a facilitator, or being set as its organiser, coordinator, or revenue sharer.
+
+Organisation admins and event managers of the host organisation (or a co-host) are automatically event admins of every event. Admins of an activity or local group are event admins of events in that activity or local group.
+
+A facilitator becomes an event admin of that event. Adding someone as a facilitator also lists them on the event page, emails them when orders and waitlist registrations come in (if those notifications are on), lets attendees opt in to their personal email list, and — once they have received feedback — includes them on the [Facilitators](/facilitators) page.
+
+| | Organisation admin | Event manager | Event admin |
+| --- | --- | --- | --- |
+| Edit organisation settings | Yes | — | — |
+| Manage followers, credits and bans | Yes | — | — |
+| Add or remove organisation admins | Yes | — | — |
+| Grant event manager | Yes | — | — |
+| Organisation mailer | Yes | — | — |
+| Organisation-wide orders and discount codes | Yes | — | — |
+| Activities, local groups, carousels and tiers | Yes | — | — |
+| Delete the organisation | Yes | — | — |
+| Delete events | Any | Ones they created | — |
+| Create events | Yes | Yes | — |
+| Event stats for all organisation events | Yes | Yes | — |
+| Feature events / change who can see emails | Yes | Yes | — |
+| Publish locked or submitted events | Yes | Yes | — |
+| Edit events | All | All | Only events they're an admin of |
+| Email attendees of an event | Yes | Yes | Yes |
+| Check people in | Yes | Yes | Yes |
+| See attendee emails | Always | Always | If enabled on the event |
+| Add or remove facilitators | Yes | Yes | Yes |
+
+By default, only organisation admins and event managers can see attendee email addresses. Turn on **Allow all event admins to view attendee emails** on an event if other event admins should see them too.
+
+You can also share a [check-in scanner link](/docs/events#checking-people-in) with assistants so they can check people in without becoming event admins.
+
 ## Payments
 
 To accept payments for tickets to events created under the organisation, you must add details for Stripe or another payment processor in the Payments tab of your organisation's settings.
@@ -22,7 +61,7 @@ For per-link click tracking (including desktop/mobile/tablet), configure a Mailg
 
 ## Community event submissions
 
-In your organisation settings, enable **Allow anyone to submit events for review** so that any signed-in user can propose a new event under your organisation. Those events are not public until an organisation admin publishes them; admins receive an email when someone submits an event.
+In your organisation settings, enable **Allow anyone to submit events for review** so that any signed-in user can propose a new event under your organisation. Those events are not public until an organisation admin or event manager publishes them; organisation admins receive an email when someone submits an event.
 
 ## iCal sync
 

@@ -112,6 +112,8 @@ There you can also find a link you can share with assistants which allows them t
 
 Go to your event (the main page, not the settings page), click the plus icon next to Facilitators and search for the desired facilitator by name.
 
+A facilitator becomes an event admin of that event: they can edit it, handle tickets and orders, check people in, and email attendees. They do not get organisation-wide access. See [Roles and privileges](/docs/organisations#roles-and-privileges) for the full comparison.
+
 Once a facilitator has received feedback on an event, they appear on the [Facilitators](/facilitators) page.
 
 ## Adding co-hosts
