@@ -238,6 +238,51 @@ class TicketTypesTest < ActiveSupport::TestCase
     refute addon.reload.sold_out?
   end
 
+  test 'creating a ticket refreshes remaining and sold_out? on the same event' do
+    create_event(prices: [0], capacity: 1)
+    ticket_type = @event.ticket_types.first
+    ticket_type.set(quantity: 1)
+
+    assert_equal 1, ticket_type.remaining
+    refute @event.sold_out?
+
+    ticket_type.tickets.create!(event: @event, payment_completed: true)
+
+    assert_equal 0, ticket_type.remaining
+    assert @event.sold_out?
+    refute @event.ticket_type_waitlists_available?
+  end
+
+  test 'restoring a ticket refreshes remaining and sold_out? on the same event' do
+    create_event(prices: [0], capacity: 1)
+    ticket_type = @event.ticket_types.first
+    ticket_type.set(quantity: 1)
+    ticket = ticket_type.tickets.create!(event: @event, payment_completed: true)
+    ticket.destroy
+
+    assert_equal 1, ticket_type.remaining
+    refute @event.sold_out?
+
+    ticket.restore
+
+    assert_equal 0, ticket_type.remaining
+    assert @event.sold_out?
+  end
+
+  test 'destroying a ticket type refreshes sold_out? on the same event' do
+    create_event(prices: [0, 0])
+    sold_out_type, available_type = @event.ticket_types.to_a
+    sold_out_type.set(quantity: 1)
+    available_type.set(quantity: 1)
+    sold_out_type.tickets.create!(event: @event, payment_completed: true)
+
+    refute @event.sold_out?
+
+    available_type.destroy
+
+    assert @event.sold_out?
+  end
+
   test 'duplicating an event copies ticket type slots' do
     create_event(prices: [0])
     @event.ticket_types.first.set(slots: 2)

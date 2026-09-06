@@ -261,8 +261,24 @@ class Event
       end
   end
 
+  # Memoised per instance so that remaining, group capacity, event capacity,
+  # sold_out? and waitlist state share a single grouped count query.
+  # Reset via reset_ticket_counts whenever a ticket changes.
+  def ticket_counts
+    @ticket_counts ||= tickets.and(made_available_at: nil).counts_by_type
+  end
+
+  def reset_ticket_counts
+    remove_instance_variable(:@ticket_counts) if defined?(@ticket_counts)
+  end
+
   def slots_taken
-    tickets.and(made_available_at: nil).slots_taken
+    ticket_counts.sum do |type_id, count|
+      next count unless type_id
+
+      ticket_type = ticket_types.detect { |tt| tt.id == type_id }
+      count * (ticket_type ? ticket_type.slots : 1)
+    end
   end
 
   def places_remaining
@@ -364,6 +380,7 @@ class Event
   end
 
   def refresh_sold_out_cache_and_notify_waitlist
+    reset_ticket_counts
     was_sold_out = sold_out_cache.nil? ? sold_out? : sold_out_cache
     now_sold_out = sold_out?
     clear_cache

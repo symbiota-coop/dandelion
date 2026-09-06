@@ -168,8 +168,9 @@ Dandelion::App.controller do
       donation.set(event_id: new_event.id)
     end
     @order.send_tickets
-    @event.clear_cache
-    new_event.clear_cache
+    # set bypasses Ticket callbacks, so refresh both events' sold-out caches explicitly
+    @event.refresh_sold_out_cache_and_notify_waitlist
+    new_event.refresh_sold_out_cache_and_notify_waitlist
     flash[:notice] = 'The order was transferred.'
     redirect "/events/#{original_event_id}/orders"
   end
@@ -268,6 +269,8 @@ Dandelion::App.controller do
     @event = @ticket.event
     event_admins_only!
     @ticket.set(ticket_type_id: params[:ticket_type_id])
+    # set bypasses Ticket callbacks, so refresh the event's sold-out caches explicitly
+    @event.refresh_sold_out_cache_and_notify_waitlist
     200
   end
 

@@ -107,6 +107,9 @@ class Ticket
   after_destroy do
     event.refresh_sold_out_cache_and_notify_waitlist if event && !event.flagged_for_destroy?
   end
+  after_restore do
+    event.refresh_sold_out_cache_and_notify_waitlist if event && !event.flagged_for_destroy?
+  end
 
   def self.email_viewer?(ticket, account, order_email_viewer: nil)
     account && (!ticket.order || order_email_viewer || (order_email_viewer.nil? && Order.email_viewer?(ticket.order, account)))
@@ -136,13 +139,17 @@ class Ticket
     CURRENCY_OPTIONS
   end
 
-  def self.slots_taken
-    counts = collection.aggregate(
+  def self.counts_by_type
+    collection.aggregate(
       [
         { '$match' => criteria.selector },
         { '$group' => { '_id' => '$ticket_type_id', 'count' => { '$sum' => 1 } } }
       ]
-    ).each_with_object({}) { |row, hash| hash[row['_id']] = row['count'] }
+    ).each_with_object(Hash.new(0)) { |row, hash| hash[row['_id']] = row['count'] }
+  end
+
+  def self.slots_taken
+    counts = counts_by_type
     return 0 if counts.empty?
 
     slots_by_id = TicketType.and(:id.in => counts.keys.compact).each_with_object({}) do |ticket_type, hash|

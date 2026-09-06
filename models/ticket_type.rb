@@ -71,6 +71,7 @@ class TicketType
   end
   after_destroy do
     if event && !event.flagged_for_destroy?
+      event.reset_ticket_counts
       event.clear_cache
       event.set(sold_out_cache: event.sold_out?)
       event.set(sold_out_due_to_sales_end_cache: event.sold_out_due_to_sales_end?)
@@ -112,7 +113,7 @@ class TicketType
   end
 
   def remaining
-    (quantity || 0) - tickets.and(made_available_at: nil).count
+    (quantity || 0) - (event ? event.ticket_counts[id] : tickets.and(made_available_at: nil).count)
   end
 
   def remaining_including_made_available
@@ -130,11 +131,21 @@ class TicketType
     places / slots
   end
 
+  # Resolve the ticket group through the event so it shares the event's
+  # memoised ticket counts rather than lazily loading a separate Event instance.
+  def ticket_group_places_remaining
+    return unless ticket_group_id
+
+    group = event.ticket_groups.detect { |ticket_group| ticket_group.id == ticket_group_id } if event
+    group ||= ticket_group
+    group&.places_remaining
+  end
+
   def wiser_remaining
-    [remaining, tickets_from_places(ticket_group&.places_remaining), tickets_from_places(event&.places_remaining)].compact.min
+    [remaining, tickets_from_places(ticket_group_places_remaining), tickets_from_places(event&.places_remaining)].compact.min
   end
 
   def number_of_tickets_available_in_single_purchase
-    [remaining, tickets_from_places(ticket_group&.places_remaining), tickets_from_places(event&.places_remaining), max_quantity_per_transaction || nil].compact.min
+    [remaining, tickets_from_places(ticket_group_places_remaining), tickets_from_places(event&.places_remaining), max_quantity_per_transaction || nil].compact.min
   end
 end

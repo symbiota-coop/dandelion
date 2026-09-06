@@ -21,7 +21,15 @@ class TicketGroup
   end
 
   def slots_taken
-    tickets.and(made_available_at: nil).slots_taken
+    return tickets.and(made_available_at: nil).slots_taken unless event
+
+    type_ids = event.ticket_types.select { |ticket_type| ticket_type.ticket_group_id == id }.map(&:id)
+    event.ticket_counts.sum do |type_id, count|
+      next 0 unless type_ids.include?(type_id)
+
+      ticket_type = event.ticket_types.detect { |tt| tt.id == type_id }
+      count * (ticket_type ? ticket_type.slots : 1)
+    end
   end
 
   def places_remaining
