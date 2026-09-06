@@ -10,6 +10,7 @@ The ORM is Mongoid, not ActiveRecord.
 - Always ask for permission before running tests.
 - Never attempt to access ENV vars on Render.
 - Never attempt to write to the production database.
+- Do not search, open, or reference my past conversations unless I explicitly ask.
 
 ## Cursor Cloud Agent
 
