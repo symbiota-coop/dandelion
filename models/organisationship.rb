@@ -124,13 +124,7 @@ class Organisationship
   end
 
   after_destroy do
-    account.set(organisation_ids_cache: (account.organisation_ids_cache || []) - [organisation.id])
-    account.set(organisation_ids_public_cache: (account.organisation_ids_public_cache || []) - [organisation.id])
-    # Update account's subscribed/unsubscribed organisation caches
-    account.set(subscribed_organisation_ids_cache: (account.subscribed_organisation_ids_cache || []) - [organisation.id])
-    account.set(unsubscribed_organisation_ids_cache: (account.unsubscribed_organisation_ids_cache || []) - [organisation.id])
-    # Refresh organisations IDs in notification cache
-    account.account_notification_cache&.refresh_organisations_ids!
+    account&.rebuild_organisation_caches!
   end
 
   after_save do
@@ -295,6 +289,28 @@ class Organisationship
 
   def monthly_donor_discount
     organisation_tier.try(:discount) || 0
+  end
+
+  def self.dedupe_duplicates!(account: nil, preferred_ids: [])
+    pipeline = []
+    pipeline << { '$match' => { 'account_id' => account.id } } if account
+    pipeline += [
+      { '$group' => { '_id' => { 'account_id' => '$account_id', 'organisation_id' => '$organisation_id' }, 'ids' => { '$push' => '$_id' }, 'count' => { '$sum' => 1 } } },
+      { '$match' => { 'count' => { '$gt' => 1 } } }
+    ]
+    collection.aggregate(pipeline).each do |group|
+      records = self.and(:id.in => group['ids']).order('created_at asc').to_a
+      survivor = records.find { |record| preferred_ids.include?(record.id) } || records.first
+      records.delete(survivor)
+      records.each do |victim|
+        # The survivor's attributes intentionally win, including donation, Stripe,
+        # subscription, and privacy fields; only privileges are combined.
+        # Creditings belonging to duplicate records are intentionally destroyed.
+        survivor.set(admin: true) if victim.admin
+        survivor.set(event_manager: true) if victim.event_manager
+        victim.destroy
+      end
+    end
   end
 
   def self.protected_attributes

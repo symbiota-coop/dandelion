@@ -1,19 +1,19 @@
 namespace :db do
-  desc 'Find accounts where organisation cache fields are out of sync (FIX=1 to repair)'
+  desc 'Find accounts where organisation caches are out of sync or organisationships are duplicated (FIX=1 to repair)'
   task organisation_cache_sync: :environment do
     fix = ENV['FIX'] == '1'
 
     puts "\n🔍 Checking organisation cache sync for all accounts...\n"
-    puts "⚠️  Mode: #{fix ? '🔧 FIXING out of sync caches' : '👀 Dry run (set FIX=1 to repair)'}\n"
+    puts "⚠️  Mode: #{fix ? '🔧 FIXING out of sync caches and duplicate organisationships' : '👀 Dry run (set FIX=1 to repair)'}\n"
     puts '=' * 90
 
     puts '📊 Aggregating organisationships...'
     out_of_sync = Account.check_organisation_cache_sync(fix: fix)
 
     if out_of_sync.empty?
-      puts "\n✅ All accounts have synced organisation caches.\n\n"
+      puts "\n✅ All accounts have synced organisation caches and no duplicate organisationships.\n\n"
     else
-      puts "\n📋 Accounts with out of sync caches:\n"
+      puts "\n📋 Accounts with out of sync caches or duplicate organisationships:\n"
       puts '-' * 90
 
       out_of_sync.each do |entry|
@@ -32,8 +32,8 @@ namespace :db do
       end
 
       puts "\n#{'=' * 90}"
-      puts "📊 Found #{out_of_sync.length} account(s) with out of sync caches"
-      puts(fix ? '🎉 All caches have been repaired!' : '👉 Run with FIX=1 to repair them')
+      puts "📊 Found #{out_of_sync.length} account(s) with out of sync caches or duplicate organisationships"
+      puts(fix ? '🎉 All caches and duplicates have been repaired!' : '👉 Run with FIX=1 to repair them')
       puts
     end
   end

@@ -3,6 +3,18 @@ require File.expand_path("#{File.dirname(__FILE__)}/test_config.rb")
 class OrganisationsTest < ActiveSupport::TestCase
   include Capybara::DSL
 
+  def insert_organisationship_without_callbacks(account:, organisation:, **attrs)
+    Organisationship.collection.insert_one(
+      {
+        account_id: account.id,
+        organisation_id: organisation.id,
+        created_at: Time.now.utc,
+        updated_at: Time.now.utc,
+        unsubscribed: false
+      }.merge(attrs)
+    )
+  end
+
   test 'creating an organisation' do
     account = FactoryBot.create(:account)
     organisation = FactoryBot.build_stubbed(:organisation)
@@ -102,5 +114,83 @@ class OrganisationsTest < ActiveSupport::TestCase
     assert page.has_current_path?('/accounts/subscriptions')
     organisationship.reload
     assert organisationship.unsubscribed
+  end
+
+  test 'organisation cache sync reports duplicate organisationship rows' do
+    create_organisation
+    member = FactoryBot.create(:account)
+    member.organisationships.create!(organisation: @organisation)
+    insert_organisationship_without_callbacks(account: member, organisation: @organisation)
+
+    out_of_sync = Account.check_organisation_cache_sync
+    entry = out_of_sync.find { |e| e[:account].id == member.id }
+    assert entry
+    assert_includes entry[:mismatches], 'duplicate_organisationships'
+    assert_equal [{ organisation_id: @organisation.id.to_s, count: 2 }], entry[:duplicates]
+    assert_equal 2, Organisationship.and(account: member, organisation: @organisation).count
+  end
+
+  test 'destroying a duplicate organisationship keeps the organisation in the cache' do
+    create_organisation
+    member = FactoryBot.create(:account)
+    existing = member.organisationships.create!(organisation: @organisation)
+    insert_organisationship_without_callbacks(account: member, organisation: @organisation)
+    duplicate = Organisationship.and(account: member, organisation: @organisation, :id.ne => existing.id).first
+
+    duplicate.destroy
+    member.reload
+    assert_includes member.organisation_ids_cache.map(&:to_s), @organisation.id.to_s
+    assert_equal 1, member.organisationships.and(organisation: @organisation).count
+  end
+
+  test 'organisation cache sync fix dedupes and backfills missing organisation ids' do
+    create_organisation
+    other = FactoryBot.create(:organisation)
+    member = FactoryBot.create(:account)
+    member.organisationships.create!(organisation: @organisation)
+    insert_organisationship_without_callbacks(account: member, organisation: @organisation)
+    insert_organisationship_without_callbacks(account: member, organisation: other)
+
+    Account.check_organisation_cache_sync(fix: true)
+    member.reload
+
+    assert_equal 1, Organisationship.and(account: member, organisation: @organisation).count
+    assert_equal 1, Organisationship.and(account: member, organisation: other).count
+    cached = member.organisation_ids_cache.map(&:to_s)
+    assert_includes cached, @organisation.id.to_s
+    assert_includes cached, other.id.to_s
+    assert_includes member.subscribed_organisation_ids_cache.map(&:to_s), other.id.to_s
+  end
+
+  test 'organisation cache sync fix keeps privileges when deduping' do
+    create_organisation
+    member = FactoryBot.create(:account)
+    existing = member.organisationships.create!(organisation: @organisation)
+    insert_organisationship_without_callbacks(account: member, organisation: @organisation, admin: true, event_manager: true)
+
+    Account.check_organisation_cache_sync(fix: true)
+    existing.reload
+
+    assert_equal 1, Organisationship.and(account: member, organisation: @organisation).count
+    assert existing.admin
+    assert existing.event_manager
+  end
+
+  test 'organisation cache sync fix repairs subscribe state drift' do
+    create_organisation
+    member = FactoryBot.create(:account)
+    member.organisationships.create!(organisation: @organisation)
+    member.set(
+      subscribed_organisation_ids_cache: [],
+      unsubscribed_organisation_ids_cache: [@organisation.id]
+    )
+
+    out_of_sync = Account.check_organisation_cache_sync
+    assert(out_of_sync.any? { |entry| entry[:account].id == member.id && entry[:mismatches].include?('subscribed_organisation_ids_cache') })
+
+    Account.check_organisation_cache_sync(fix: true)
+    member.reload
+    assert_includes member.subscribed_organisation_ids_cache.map(&:to_s), @organisation.id.to_s
+    assert_empty member.unsubscribed_organisation_ids_cache || []
   end
 end

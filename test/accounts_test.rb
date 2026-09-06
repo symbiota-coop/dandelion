@@ -225,4 +225,30 @@ class AccountsTest < ActiveSupport::TestCase
     assert_equal false, @activity.activityships.find_by(account: existing_account).unsubscribed
     assert_equal false, @local_group.local_groupships.find_by(account: existing_account).unsubscribed
   end
+
+  test 'merging accounts transfers organisationships and rebuilds caches' do
+    survivor = FactoryBot.create(:account)
+    victim = FactoryBot.create(:account)
+    org_a = FactoryBot.create(:organisation)
+    org_b = FactoryBot.create(:organisation)
+
+    victim_organisationship = victim.organisationships.create!(organisation: org_a)
+    victim_organisationship.set(admin: true)
+    survivor_organisationship = survivor.organisationships.create!(organisation: org_a)
+    victim.organisationships.create!(organisation: org_b)
+
+    survivor.merge(victim)
+    survivor.reload
+    surviving_organisationship = survivor.organisationships.find_by(organisation: org_a)
+
+    assert_nil Account.find(victim.id)
+    assert_equal 1, survivor.organisationships.and(organisation: org_a).count
+    assert_equal 1, survivor.organisationships.and(organisation: org_b).count
+    assert_equal survivor_organisationship.id, surviving_organisationship.id
+    assert surviving_organisationship.admin
+    cached = survivor.organisation_ids_cache.map(&:to_s)
+    assert_includes cached, org_a.id.to_s
+    assert_includes cached, org_b.id.to_s
+    assert_includes survivor.subscribed_organisation_ids_cache.map(&:to_s), org_b.id.to_s
+  end
 end

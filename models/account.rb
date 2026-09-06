@@ -181,9 +181,11 @@ class Account
     find_by(id: account_id)
   end
 
-  def merge(account_to_destroy)
+  def merge(victim)
     # Don't allow merging with self
-    return if id == account_to_destroy.id
+    return if id == victim.id
+
+    preferred_organisationship_ids = organisationships.pluck(:id)
 
     # Transfer all has_many associations using reflection
     self.class.reflect_on_all_associations(:has_many).each do |association|
@@ -201,22 +203,37 @@ class Account
         # Update the polymorphic association
         klass = association.klass
         if klass.respond_to?(:unscoped)
-          klass.unscoped.and(type_key => account_to_destroy.class.name, id_key => account_to_destroy.id)
+          klass.unscoped.and(type_key => victim.class.name, id_key => victim.id)
                .update_all(id_key => id)
         end
         next
       end
 
       # Get the target collection and update foreign keys
-      target_collection = account_to_destroy.send(association.name)
+      target_collection = victim.send(association.name)
       target_collection.update_all(foreign_key => id) if target_collection.respond_to?(:update_all)
     end
 
-    # Delete the other account
-    account_to_destroy.destroy
+    Organisationship.dedupe_duplicates!(account: self, preferred_ids: preferred_organisationship_ids)
+    rebuild_organisation_caches!
+
+    # Reload so dependent: :destroy does not delete associations already transferred
+    victim.reload
+    victim.destroy
 
     # Return self for method chaining
     self
+  end
+
+  def rebuild_organisation_caches!
+    rels = organisationships
+    set(
+      organisation_ids_cache: rels.pluck(:organisation_id).uniq,
+      organisation_ids_public_cache: rels.and(:hide_membership.ne => true).pluck(:organisation_id).uniq,
+      subscribed_organisation_ids_cache: rels.and(:unsubscribed.ne => true).pluck(:organisation_id).uniq,
+      unsubscribed_organisation_ids_cache: rels.and(unsubscribed: true).pluck(:organisation_id).uniq
+    )
+    account_notification_cache&.refresh_organisations_ids!
   end
 
   def publicly_visible?
@@ -418,44 +435,55 @@ class Account
       Account.in(id: batch_ids).each do |account|
         expected = expected_caches[account.id] || {}
 
-        expected_org_ids = (expected['org_ids'] || []).map(&:to_s).sort
-        expected_public_ids = (expected['public_ids'] || []).map(&:to_s).sort
-        expected_subscribed_ids = (expected['subscribed_ids'] || []).map(&:to_s).sort
-        expected_unsubscribed_ids = (expected['unsubscribed_ids'] || []).map(&:to_s).sort
+        raw_org_ids = (expected['org_ids'] || []).map(&:to_s)
+        expected_org_ids = raw_org_ids.uniq.sort
+        expected_public_ids = (expected['public_ids'] || []).map(&:to_s).uniq.sort
+        expected_subscribed_ids = (expected['subscribed_ids'] || []).map(&:to_s).uniq.sort
+        expected_unsubscribed_ids = (expected['unsubscribed_ids'] || []).map(&:to_s).uniq.sort
 
         current_org_ids = (account.organisation_ids_cache || []).map(&:to_s).sort
         current_public_ids = (account.organisation_ids_public_cache || []).map(&:to_s).sort
         current_subscribed_ids = (account.subscribed_organisation_ids_cache || []).map(&:to_s).sort
         current_unsubscribed_ids = (account.unsubscribed_organisation_ids_cache || []).map(&:to_s).sort
 
+        duplicates = raw_org_ids.tally.select { |_, count| count > 1 }.sort.map do |organisation_id, count|
+          { organisation_id: organisation_id, count: count }
+        end
+
         mismatches = []
         mismatches << 'organisation_ids_cache' if current_org_ids != expected_org_ids
         mismatches << 'organisation_ids_public_cache' if current_public_ids != expected_public_ids
         mismatches << 'subscribed_organisation_ids_cache' if current_subscribed_ids != expected_subscribed_ids
         mismatches << 'unsubscribed_organisation_ids_cache' if current_unsubscribed_ids != expected_unsubscribed_ids
+        mismatches << 'duplicate_organisationships' if duplicates.any?
 
         next if mismatches.empty?
+
+        details = {
+          organisation_ids_cache: { current: current_org_ids, expected: expected_org_ids },
+          organisation_ids_public_cache: { current: current_public_ids, expected: expected_public_ids },
+          subscribed_organisation_ids_cache: { current: current_subscribed_ids, expected: expected_subscribed_ids },
+          unsubscribed_organisation_ids_cache: { current: current_unsubscribed_ids, expected: expected_unsubscribed_ids }
+        }
+        if duplicates.any?
+          details[:duplicate_organisationships] = {
+            current: duplicates.map { |d| "#{d[:organisation_id]} (#{d[:count]} rows)" },
+            expected: duplicates.map { |d| "#{d[:organisation_id]} (1 row)" }
+          }
+        end
 
         out_of_sync << {
           account: account,
           mismatches: mismatches,
-          details: {
-            organisation_ids_cache: { current: current_org_ids, expected: expected_org_ids },
-            organisation_ids_public_cache: { current: current_public_ids, expected: expected_public_ids },
-            subscribed_organisation_ids_cache: { current: current_subscribed_ids, expected: expected_subscribed_ids },
-            unsubscribed_organisation_ids_cache: { current: current_unsubscribed_ids, expected: expected_unsubscribed_ids }
-          }
+          duplicates: duplicates,
+          details: details
         }
-
-        next unless fix
-
-        account.set(
-          organisation_ids_cache: expected_org_ids.map { |id| BSON::ObjectId.from_string(id) },
-          organisation_ids_public_cache: expected_public_ids.map { |id| BSON::ObjectId.from_string(id) },
-          subscribed_organisation_ids_cache: expected_subscribed_ids.map { |id| BSON::ObjectId.from_string(id) },
-          unsubscribed_organisation_ids_cache: expected_unsubscribed_ids.map { |id| BSON::ObjectId.from_string(id) }
-        )
       end
+    end
+
+    if fix
+      Organisationship.dedupe_duplicates!
+      out_of_sync.each { |entry| entry[:account].rebuild_organisation_caches! }
     end
 
     out_of_sync
