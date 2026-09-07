@@ -2,6 +2,7 @@ module MailgunDeliveryStats
   METRICS = %w[delivered_count bounced_count delivered_rate].freeze
 
   MIN_DELIVERIES = 10
+  MIN_BOUNCES = 3
   ALERT_THRESHOLD = 0.95
   ALERT_PERIOD = 24
 
@@ -67,7 +68,7 @@ module MailgunDeliveryStats
 
       rows = result[:by_provider] || []
       low = rows.reject { |r| r[:label] == '(unknown provider)' }
-                .select { |r| r[:delivered_rate_f].present? && r[:delivered_rate_f] < ALERT_THRESHOLD }
+                .select { |r| r[:bounced_count] >= MIN_BOUNCES && r[:delivered_rate_f].present? && r[:delivered_rate_f] < ALERT_THRESHOLD }
       return if low.empty?
 
       notify_low_delivery(low)
