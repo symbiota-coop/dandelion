@@ -282,7 +282,7 @@ Check 'enable resales' under 'Everything else' when editing an event to enable r
 
 Attendees mark a ticket for resale by logging in to Dandelion, visiting the event page and selecting 'Mark for resale' next to a ticket.
 
-This makes one more of that ticket type available. If someone then purchases a ticket of this type, the original ticketholder gets a refund, the new buyer gets a fresh ticket, and everyone gets an email notification.
+This makes one more of that ticket type available. If the type is sold out and someone then purchases a ticket of this type, the original ticketholder gets a refund, the new buyer gets a fresh ticket, and everyone gets an email notification.
 
 If the original ticket was paid by GoCardless instalments (or another method Dandelion cannot refund automatically), organisers and Dandelion admins are emailed that a refund is required. Refund collected instalments and cancel the remaining schedule from the GoCardless dashboard.
 
