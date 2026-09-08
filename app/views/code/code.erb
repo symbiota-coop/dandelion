@@ -1,7 +1,5 @@
 <p class="lead">Dandelion is a <a href="https://fair.io/">fair source</a> project. <a target="_blank" href="https://github.com/symbiota-coop/dandelion">View the code on Github</a></p>
 
-<%= partial :'code/network' %>
-
 <% 
 client = Octokit::Client.new(access_token: ENV['GITHUB_ACCESS_TOKEN'])
 
@@ -39,6 +37,7 @@ end
               <td data-toggle="tooltip" title="AI-generated summary ✨">
                 <%== md(
                 Sanitize.fragment(commit.commit.message, Sanitize::Config::DANDELION)
+                .gsub(/^Co-authored-by: Cursor.*$/i, '')
                 .gsub('\\', '\\\\')
                 .gsub('_', '\_')
                 .gsub(/\p{Emoji_Presentation}|\p{Extended_Pictographic}/u, '<br />\0')
@@ -58,3 +57,5 @@ end
 <div class="text-center mb-5">
   <%= will_paginate commits, page_links: false, renderer: WillPaginate::ViewHelpers::BootstrapRenderer %>
 </div>
+
+<%= partial :'code/network' %>
