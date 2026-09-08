@@ -45,10 +45,11 @@ class AccountContribution
     batch_message = Mailgun::BatchMessage.new(mg_client, ENV['MAILGUN_NOTIFICATIONS_HOST'])
 
     batch_message.from ENV['NOTIFICATIONS_EMAIL_FULL']
+    formatted_amount = Money.new(amount * 100, currency).format(no_cents_if_whole: true)
     subject = if account
-                "[Account] #{account.name} made a contribution of #{amount} #{currency}"
+                "[Account] #{account.name} made a contribution of #{formatted_amount}"
               else
-                "[Guest] A contribution of #{amount} #{currency} was made"
+                "[Guest] A contribution of #{formatted_amount} was made"
               end
     batch_message.subject subject
     batch_message.body_text body_text

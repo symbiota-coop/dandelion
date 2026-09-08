@@ -5,4 +5,15 @@
     purchased a resale ticket for the event <a href="<%= ENV['BASE_URI'] %>/e/<%=event.slug%>"><%= event.name %></a>
     from <%= previous_account.name %> (<a href="mailto:<%=previous_account.email%>"><%=previous_account.email%></a>).
   </p>
+  <% if defined?(requires_manual_refund) && requires_manual_refund %>
+    <p>
+      Dandelion could not refund this ticket automatically<% if refund_amount && currency %> (<%= Money.new(refund_amount * 100, currency).format(no_cents_if_whole: true) %>)<% end %>.
+      <% if gocardless_instalment %>
+        It was paid by GoCardless instalments, so please refund any collected payments and cancel remaining instalments from the
+        <a href="https://manage.gocardless.com/">GoCardless dashboard</a>.
+      <% else %>
+        Please refund the original ticketholder separately.
+      <% end %>
+    </p>
+  <% end %>
 </div>

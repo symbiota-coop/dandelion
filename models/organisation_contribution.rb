@@ -27,7 +27,7 @@ class OrganisationContribution
     batch_message = Mailgun::BatchMessage.new(mg_client, ENV['MAILGUN_NOTIFICATIONS_HOST'])
 
     batch_message.from ENV['NOTIFICATIONS_EMAIL_FULL']
-    batch_message.subject "[Organisation] #{organisation.name} made a contribution of #{amount} #{currency}"
+    batch_message.subject "[Organisation] #{organisation.name} made a contribution of #{Money.new(amount * 100, currency).format(no_cents_if_whole: true)}"
     batch_message.body_text "#{ENV['BASE_URI']}/o/#{organisation.slug}"
 
     Account.and(admin: true).each do |account|

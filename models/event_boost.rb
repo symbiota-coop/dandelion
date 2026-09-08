@@ -174,8 +174,8 @@ class EventBoost
       "Start time: #{event_boost.start_time.iso8601}",
       "Currency: #{event_boost.currency}",
       "Hours: #{event_boost.hours}",
-      "Hourly amount: #{event_boost.hourly_amount}",
-      "Total amount: #{event_boost.total_amount}",
+      "Hourly amount: #{Money.new((event_boost.hourly_amount * 100).round, event_boost.currency).format(no_cents_if_whole: true)}",
+      "Total amount: #{Money.new((event_boost.total_amount * 100).round, event_boost.currency).format(no_cents_if_whole: true)}",
       "Boosts URL: #{ENV['BASE_URI']}/events/#{event.id}/boosts"
     ].join("\n")
 

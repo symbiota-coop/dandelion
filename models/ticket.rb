@@ -91,10 +91,20 @@ class Ticket
   def payment_completed!
     if event.enable_resales? && ticket_type.remaining_including_made_available < 0 && (resold_ticket = ticket_type.tickets.and(:made_available_at.ne => nil).order('made_available_at asc').first)
       resold_account = resold_ticket.account
+      requires_manual_refund = resold_ticket.requires_manual_refund?
+      gocardless_instalment = resold_ticket.gocardless_billing_request_id.present?
+      refund_amount = resold_ticket.discounted_price
+      refund_currency = resold_ticket.currency
       resold_ticket.refund
       resold_ticket.destroy
       send_resale_notification_to_previous_ticketholder(resold_account)
-      send_resale_notification_to_organiser(resold_account)
+      send_resale_notification_to_organiser(
+        resold_account,
+        requires_manual_refund: requires_manual_refund,
+        gocardless_instalment: gocardless_instalment,
+        refund_amount: refund_amount,
+        currency: refund_currency
+      )
     end
     event.waitships.find_by(account: account).try(:destroy)
     ticket_type.ticket_type_waitships.find_by(account: account).try(:destroy) if ticket_type && account
@@ -229,6 +239,10 @@ class Ticket
 
   def circle
     account
+  end
+
+  def requires_manual_refund?
+    discounted_price && discounted_price > 0 && payment_completed && payment_intent.blank? && gocardless_payment_id.blank?
   end
 
   def refund

@@ -68,7 +68,7 @@ You can collect ticket payments as a fixed number of monthly Direct Debit instal
 2. Set the webhook to send **billing request** events. Include **payments** as well if you also use Instant Bank Pay.
 3. Edit the event and, under Everything else, set **GoCardless instalments** to the number of monthly payments (2–24). This field appears once instalments are enabled on the organisation.
 
-At checkout, buyers see a **Pay in X instalments** button. They need a bank account in the event currency (a UK account for GBP events). Tickets are emailed when the payment schedule is set up (i.e. straight away/not at the final instalment). You can refund collected instalments from the GoCardless dashboard. Note that Dandelion does not cancel orders if later instalments fail — you need to remove orders with unpaid instalments yourself.
+At checkout, buyers see a **Pay in X instalments** button. They need a bank account in the event currency (a UK account for GBP events). Tickets are emailed when the payment schedule is set up (i.e. straight away/not at the final instalment). You can refund collected instalments from the GoCardless dashboard. Note that Dandelion does not cancel orders if later instalments fail — you need to remove orders with unpaid instalments yourself. If a ticket paid this way is later resold, Dandelion emails you that a refund is required (see [Ticket resales](#ticket-resales)).
 
 You can also enable an instalment payment method on your Stripe account, such as [Klarna](https://docs.stripe.com/payments/klarna) or [Clearpay/Afterpay](https://docs.stripe.com/payments/afterpay-clearpay). Customers will then be able to pay for the purchase in instalments at checkout, and receive tickets immediately.
 
@@ -283,6 +283,8 @@ Check 'enable resales' under 'Everything else' when editing an event to enable r
 Attendees mark a ticket for resale by logging in to Dandelion, visiting the event page and selecting 'Mark for resale' next to a ticket.
 
 This makes one more of that ticket type available. If someone then purchases a ticket of this type, the original ticketholder gets a refund, the new buyer gets a fresh ticket, and everyone gets an email notification.
+
+If the original ticket was paid by GoCardless instalments (or another method Dandelion cannot refund automatically), organisers and Dandelion admins are emailed that a refund is required. Refund collected instalments and cancel the remaining schedule from the GoCardless dashboard.
 
 ## Gating events with an application form
 

@@ -35,6 +35,86 @@ class TicketTypesTest < ActiveSupport::TestCase
     assert_equal 0, ticket_type.remaining_including_made_available
   end
 
+  test 'instalment tickets require a manual refund' do
+    create_event(prices: [30], enable_resales: true)
+    ticket_type = @event.ticket_types.first
+    ticket = ticket_type.tickets.create!(
+      event: @event,
+      account: FactoryBot.create(:account),
+      payment_completed: true,
+      price: 30,
+      gocardless_billing_request_id: 'BRQ123'
+    )
+
+    assert ticket.requires_manual_refund?
+  end
+
+  test 'stripe tickets do not require a manual refund' do
+    create_event(prices: [30], enable_resales: true)
+    ticket_type = @event.ticket_types.first
+    ticket = ticket_type.tickets.create!(
+      event: @event,
+      account: FactoryBot.create(:account),
+      payment_completed: true,
+      price: 30,
+      payment_intent: 'pi_123'
+    )
+
+    refute ticket.requires_manual_refund?
+  end
+
+  test 'reselling an instalment ticket tells organisers a refund is required' do
+    create_event(prices: [30], enable_resales: true)
+    ticket_type = @event.ticket_types.first
+    ticket_type.set(quantity: 1)
+    original = ticket_type.tickets.create!(
+      event: @event,
+      account: FactoryBot.create(:account),
+      payment_completed: true,
+      price: 30,
+      gocardless_billing_request_id: 'BRQ123',
+      made_available_at: Time.now
+    )
+    new_ticket = ticket_type.tickets.create!(
+      event: @event,
+      account: FactoryBot.create(:account),
+      payment_completed: false,
+      price: 30
+    )
+
+    captured = nil
+    new_ticket.stub :send_resale_notification_to_previous_ticketholder, true do
+      new_ticket.stub :send_resale_notification_to_organiser, proc { |previous_account, **kwargs| captured = [previous_account, kwargs] } do
+        new_ticket.payment_completed!
+      end
+    end
+
+    assert original.reload.deleted?
+    assert_equal original.account, captured[0]
+    assert captured[1][:requires_manual_refund]
+    assert captured[1][:gocardless_instalment]
+    assert_equal 30, captured[1][:refund_amount]
+    assert_equal 'GBP', captured[1][:currency]
+  end
+
+  test 'resale email mentions a GoCardless instalment refund' do
+    create_event(prices: [30], enable_resales: true)
+    previous_account = FactoryBot.create(:account)
+    html = EmailHelper.html(
+      :ticket_resale,
+      account: FactoryBot.create(:account),
+      event: @event,
+      previous_account: previous_account,
+      requires_manual_refund: true,
+      gocardless_instalment: true,
+      refund_amount: 30.0,
+      currency: 'GBP'
+    )
+
+    assert_includes html, 'could not refund this ticket automatically (£30).'
+    assert_includes html, 'GoCardless instalments'
+  end
+
   test 'sold_out? when quantity is exhausted' do
     create_event(prices: [0])
     ticket_type = @event.ticket_types.first

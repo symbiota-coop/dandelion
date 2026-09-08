@@ -131,7 +131,7 @@ module TicketNotifications
     batch_message.finalize if Padrino.env == :production
   end
 
-  def send_resale_notification_to_organiser(previous_account)
+  def send_resale_notification_to_organiser(previous_account, requires_manual_refund: false, gocardless_instalment: false, refund_amount: nil, currency: nil)
     mg_client = Mailgun::Client.new ENV['MAILGUN_API_KEY'], ENV['MAILGUN_REGION']
     batch_message = Mailgun::BatchMessage.new(mg_client, ENV['MAILGUN_NOTIFICATIONS_HOST'])
 
@@ -139,10 +139,30 @@ module TicketNotifications
     event = ticket.event
     account = ticket.account
     batch_message.from ENV['NOTIFICATIONS_EMAIL_FULL']
-    batch_message.subject "Ticket resale: #{account.name} in #{event.name}"
-    batch_message.body_html EmailHelper.html(:ticket_resale, account: account, event: event, previous_account: previous_account)
+    batch_message.subject(
+      if requires_manual_refund
+        "Ticket resale (refund required): #{account.name} in #{event.name}"
+      else
+        "Ticket resale: #{account.name} in #{event.name}"
+      end
+    )
+    batch_message.body_html EmailHelper.html(
+      :ticket_resale,
+      account: account,
+      event: event,
+      previous_account: previous_account,
+      requires_manual_refund: requires_manual_refund,
+      gocardless_instalment: gocardless_instalment,
+      refund_amount: refund_amount,
+      currency: currency
+    )
 
-    event.event_facilitators.each do |account|
+    recipients = if requires_manual_refund
+                   (event.contacts + Account.and(admin: true)).uniq
+                 else
+                   event.event_facilitators
+                 end
+    recipients.each do |account|
       batch_message.add_recipient(:to, account.email, { 'firstname' => account.firstname || 'there', 'token' => account.sign_in_token_for_email, 'id' => account.id.to_s })
     end
 
