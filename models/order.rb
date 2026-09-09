@@ -230,8 +230,10 @@ class Order
 
   def description_elements(include_donations: true)
     d = []
-    TicketType.and(:id.in => tickets.pluck(:ticket_type_id)).each do |ticket_type|
-      d << "#{"#{ticket_type.name} " if ticket_type}#{Money.new(ticket_type.price * 100, currency).format(no_cents_if_whole: true) if ticket_type.price}x#{tickets.and(ticket_type: ticket_type).count}"
+    tickets.group_by { |ticket| [ticket.ticket_type_id, ticket.price] }.each do |(_ticket_type_id, price), group|
+      ticket_type = group.first.ticket_type
+      formatted_price = Money.new(price * 100, currency).format(no_cents_if_whole: true) if price
+      d << "#{"#{ticket_type.name} " if ticket_type}#{formatted_price}x#{group.count}"
     end
 
     d << "#{percentage_discount}% discount" if percentage_discount
