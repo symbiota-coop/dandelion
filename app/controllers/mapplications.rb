@@ -41,7 +41,7 @@ Dandelion::App.controller do
       validate_recaptcha
 
       redirect back unless params[:account] && params[:account][:email]
-      unless (@account = Account.find_by(email: params[:account][:email].downcase))
+      unless (@account = Account.find_by(email: params[:account][:email].downcase.strip))
         @account = Account.new(mass_assigning(params[:account], Account))
         @account.password = Account.generate_password # not used
         unless @account.save

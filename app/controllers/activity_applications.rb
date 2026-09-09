@@ -10,7 +10,7 @@ Dandelion::App.controller do
   post '/activities/:id/apply' do
     @activity = Activity.find(params[:id]) || not_found
 
-    if (account = Account.find_by(email: params[:account][:email].downcase))
+    if (account = Account.find_by(email: params[:account][:email].downcase.strip))
       @account = account
       unless save_or_update_account_from_email_form(@account, params[:account])
         flash.now[:error] = 'There was a problem saving the application'

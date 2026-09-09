@@ -60,7 +60,7 @@ Dandelion::App.controller do
       validate_recaptcha
 
       redirect back unless params[:account] && params[:account][:email]
-      if (@account = Account.find_by(email: params[:account][:email].downcase))
+      if (@account = Account.find_by(email: params[:account][:email].downcase.strip))
         kick! notice: 'Sign in to continue'
       else
         @account = Account.new(mass_assigning(params[:account], Account))
@@ -108,7 +108,7 @@ Dandelion::App.controller do
       redirect back
     end
 
-    unless (@account = Account.find_by(email: params[:email].downcase))
+    unless (@account = Account.find_by(email: params[:email].downcase.strip))
       @account = Account.new(name: params[:email].split('@').first, email: params[:email], password: Account.generate_password)
       unless @account.save
         flash[:error] = '<strong>Oops.</strong> Some errors prevented the account from being saved.'

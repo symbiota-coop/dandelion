@@ -58,7 +58,7 @@ module OrganisationMonthlyDonations
     # puts "#{name} #{email} #{amount} #{currency} #{start_date}"
 
     begin
-      account = Account.find_by(email: email.downcase) || Account.create!(name: name, email: email)
+      account = Account.find_by(email: email.downcase.strip) || Account.create!(name: name, email: email)
     rescue Mongoid::Errors::Validations => e
       ErrorReporting.capture_exception(e, context: { email: email, organisation_id: id.to_s, source: 'gocardless' })
       return
@@ -130,7 +130,7 @@ module OrganisationMonthlyDonations
 
     # puts "#{name} #{email} #{amount} #{currency} #{start_date}"
     begin
-      account = Account.find_by(email: email.downcase) || Account.create!(name: name, email: email)
+      account = Account.find_by(email: email.downcase.strip) || Account.create!(name: name, email: email)
     rescue Mongoid::Errors::Validations => e
       ErrorReporting.capture_exception(e, context: { email: email, organisation_id: id.to_s, source: 'patreon' })
       return

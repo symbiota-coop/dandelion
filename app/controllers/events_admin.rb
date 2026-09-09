@@ -138,7 +138,7 @@ Dandelion::App.controller do
     event_admins_only!
 
     account_hash = { name: params[:ticket][:name], email: params[:ticket][:email] }
-    @account = if account_hash[:email] && (account = Account.find_by(email: account_hash[:email].downcase))
+    @account = if account_hash[:email] && (account = Account.find_by(email: account_hash[:email].downcase.strip))
                  account
                else
                  Account.new(mass_assigning(account_hash, Account))

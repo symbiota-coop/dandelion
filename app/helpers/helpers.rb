@@ -190,7 +190,7 @@ Dandelion::App.helpers do
 
   def resolve_feedback_account!
     @account = if admin? && params[:email]
-                 Account.find_by(email: params[:email].downcase)
+                 Account.find_by(email: params[:email].downcase.strip)
                elsif params[:token]
                  Account.from_feedback_token(@event, params[:token])
                else

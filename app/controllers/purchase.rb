@@ -13,7 +13,7 @@ Dandelion::App.controller do
     }
     account_hash[:phone] = account_data[:phone] if @event.organisation.collect_phone?
 
-    @account = Account.find_by(email: account_data[:email].downcase)
+    @account = Account.find_by(email: account_data[:email].downcase.strip)
     @account ||= Account.new(account_hash.merge(skip_confirmation_email: true, default_currency: visitor_currency))
 
     if @account.persisted?

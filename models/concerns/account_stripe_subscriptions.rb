@@ -20,7 +20,7 @@ module AccountStripeSubscriptions
       email = customer.email
       return unless email
 
-      account = Account.find_by(email: email.downcase)
+      account = Account.find_by(email: email.downcase.strip)
       return unless account
 
       if keep_subscription?(subscription)

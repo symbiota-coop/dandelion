@@ -46,7 +46,7 @@ Dandelion::App.controller do
 
   post '/accounts/sign_in_code' do
     @body_class = 'gradient'
-    if params[:email] && (@account = Account.find_by(email: params[:email].downcase))
+    if params[:email] && (@account = Account.find_by(email: params[:email].downcase.strip))
       @account.send_sign_in_code
       erb :'accounts/requested_sign_in_code'
     elsif params[:code]
@@ -88,7 +88,7 @@ Dandelion::App.controller do
 
     if @account.save
       handle_successful_account_creation
-    elsif @account.email && (existing_account = Account.find_by(email: @account.email.downcase))
+    elsif @account.email && (existing_account = Account.find_by(email: @account.email.downcase.strip))
       handle_existing_account(existing_account)
     elsif params[:recaptcha_skip_secret]
       400

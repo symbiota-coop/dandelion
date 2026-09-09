@@ -109,7 +109,7 @@ Dandelion::App.controller do
       redirect back
     end
 
-    unless (@account = Account.find_by(email: params[:email].downcase))
+    unless (@account = Account.find_by(email: params[:email].downcase.strip))
       @account = Account.new(name: params[:email].split('@').first, email: params[:email], password: Account.generate_password)
       unless @account.save
         flash[:error] = '<strong>Oops.</strong> Some errors prevented the account from being saved.'

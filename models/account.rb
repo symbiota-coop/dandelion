@@ -368,7 +368,7 @@ class Account
   end
 
   def self.authenticate(email, password)
-    return unless email.present? && (account = find_by(email: email.downcase))
+    return unless email.present? && (account = find_by(email: email.downcase.strip))
 
     if account.failed_sign_in_attempts && account.failed_sign_in_attempts >= 99
       nil

@@ -25,7 +25,7 @@ module ImportFromCsv
     CSV.parse(csv, headers: true, header_converters: [:downcase, :symbol]).each do |row|
       email = row[:email]
       account_hash = { name: row[:name], email: row[:email], password: Account.generate_password }
-      account = Account.find_by(email: email.downcase)
+      account = Account.find_by(email: email.downcase.strip)
       account ||= Account.new(account_hash)
       begin
         account.save! unless account.persisted?

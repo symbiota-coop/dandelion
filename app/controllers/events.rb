@@ -246,7 +246,7 @@ Dandelion::App.controller do
 
     email = params[:email]
     account_hash = { name: params[:name], email: params[:email] }
-    account = if (existing = Account.find_by(email: email.try(:downcase)))
+    account = if (existing = Account.find_by(email: email&.downcase&.strip))
                 existing
               else
                 Account.new(account_hash)
@@ -269,7 +269,7 @@ Dandelion::App.controller do
 
     email = params[:waitship][:email]
     account_hash = { name: params[:waitship][:name], email: params[:waitship][:email] }
-    @account = if (account = Account.find_by(email: email.try(:downcase)))
+    @account = if (account = Account.find_by(email: email&.downcase&.strip))
                  account
                else
                  Account.new(account_hash)
