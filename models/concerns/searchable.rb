@@ -4,6 +4,8 @@ module Searchable
   # Hard cap on vector-enhanced search; beyond this we run text-only Atlas Search instead.
   VECTOR_EMBEDDING_TIMEOUT_SECONDS = 1.0
   VECTOR_AGGREGATE_MAX_TIME_MS = 1_000
+  # Atlas Search (mongot) timeout. Distinct from MongoDB MaxTimeMSExpired (code 50).
+  MONGOT_TIMEOUT_CODE = 65_160
 
   APOSTROPHES = %w[' ’ ‘ ʼ ＇ ′ ´].freeze
   APOSTROPHE_VARIANTS = Regexp.union(APOSTROPHES)
@@ -166,7 +168,7 @@ module Searchable
                   .aggregate(fusion_stages + suffix_stages, max_time_ms: VECTOR_AGGREGATE_MAX_TIME_MS)
                   .to_a
               rescue Mongo::Error::OperationFailure => e
-                raise unless e.max_time_ms_expired?
+                raise unless atlas_search_timeout?(e)
 
                 text_fallback = true
                 collection.aggregate(text_stages + suffix_stages).to_a
@@ -202,6 +204,10 @@ module Searchable
 
     def search_fields
       raise NotImplementedError, "#{self} must implement search_fields class method"
+    end
+
+    def atlas_search_timeout?(error)
+      error.max_time_ms_expired? || error.code == MONGOT_TIMEOUT_CODE
     end
 
     def apostrophe_variants(query)

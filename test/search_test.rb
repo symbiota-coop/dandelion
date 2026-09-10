@@ -5,14 +5,21 @@ class SearchTest < ActiveSupport::TestCase
   include Rack::Test::Methods
 
   class CapturingCollection
-    attr_reader :pipelines
+    attr_reader :pipelines, :kwargs_list
 
-    def initialize
+    def initialize(error: nil)
       @pipelines = []
+      @kwargs_list = []
+      @error = error
+      @calls = 0
     end
 
-    def aggregate(pipeline, **_kwargs)
+    def aggregate(pipeline, **kwargs)
       @pipelines << pipeline
+      @kwargs_list << kwargs
+      @calls += 1
+      raise @error if @error && @calls == 1
+
       []
     end
   end
@@ -77,6 +84,18 @@ class SearchTest < ActiveSupport::TestCase
 
   def stringify_keys(hash)
     hash.transform_keys(&:to_s)
+  end
+
+  def operation_failure(code:, code_name:, message: 'operation exceeded time limit')
+    Mongo::Error::OperationFailure.new(message, nil, code: code, code_name: code_name)
+  end
+
+  def search_with_vector_stub(collection, query: 'Sound')
+    OpenRouter.stub(:embedding, [0.1, 0.2, 0.3]) do
+      Event.stub(:collection, collection) do
+        Event.search(query, Event.unscoped, regex_search: false, vector_weight: 0.5)
+      end
+    end
   end
 
   test 'full page search for events' do
@@ -260,5 +279,45 @@ class SearchTest < ActiveSupport::TestCase
 
     refute_includes equals_filters(filter), ['organisation_id', organisation_id]
     assert suffix_match.keys.map(&:to_s).include?('$or')
+  end
+
+  test 'falls back to text search when mongot times out' do
+    collection = CapturingCollection.new(
+      error: operation_failure(code: 65_160, code_name: 'Location65160', message: 'remote error from mongot: operation exceeded time limit')
+    )
+
+    results = search_with_vector_stub(collection)
+
+    assert_equal 2, collection.pipelines.length
+    assert collection.pipelines.first.first.key?(:$rankFusion)
+    assert collection.pipelines.last.first.key?(:$search)
+    assert_equal 1000, collection.kwargs_list.first[:max_time_ms]
+    assert_equal [], results
+  end
+
+  test 'falls back to text search when maxTimeMS expires' do
+    collection = CapturingCollection.new(
+      error: operation_failure(code: 50, code_name: 'MaxTimeMSExpired')
+    )
+
+    results = search_with_vector_stub(collection)
+
+    assert_equal 2, collection.pipelines.length
+    assert collection.pipelines.first.first.key?(:$rankFusion)
+    assert collection.pipelines.last.first.key?(:$search)
+    assert_equal [], results
+  end
+
+  test 'reraises unexpected atlas search operation failures' do
+    collection = CapturingCollection.new(
+      error: operation_failure(code: 96, code_name: 'OperationNotSupportedInTransaction')
+    )
+
+    error = assert_raises(Mongo::Error::OperationFailure) do
+      search_with_vector_stub(collection)
+    end
+
+    assert_equal 96, error.code
+    assert_equal 1, collection.pipelines.length
   end
 end
