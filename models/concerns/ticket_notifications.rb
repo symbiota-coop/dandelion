@@ -114,7 +114,7 @@ module TicketNotifications
     batch_message.finalize if Padrino.env == :production
   end
 
-  def send_resale_notification_to_previous_ticketholder(previous_account)
+  def send_resale_notification_to_previous_ticketholder(previous_account, requires_manual_refund: false, gocardless_instalment: false)
     mg_client = Mailgun::Client.new ENV['MAILGUN_API_KEY'], ENV['MAILGUN_REGION']
     batch_message = Mailgun::BatchMessage.new(mg_client, ENV['MAILGUN_NOTIFICATIONS_HOST'])
 
@@ -122,7 +122,12 @@ module TicketNotifications
     event = ticket.event
     batch_message.from ENV['NOTIFICATIONS_EMAIL_FULL']
     batch_message.subject "Your ticket to #{event.name} was resold"
-    batch_message.body_html EmailHelper.html(:ticket_resale_previous_ticketholder, event: event)
+    batch_message.body_html EmailHelper.html(
+      :ticket_resale_previous_ticketholder,
+      event: event,
+      requires_manual_refund: requires_manual_refund,
+      gocardless_instalment: gocardless_instalment
+    )
 
     [previous_account].each do |account|
       batch_message.add_recipient(:to, account.email, { 'firstname' => account.firstname || 'there', 'token' => account.sign_in_token_for_email, 'id' => account.id.to_s })

@@ -2,6 +2,13 @@
   <p>Hi %recipient.firstname%,</p>
   <p>
     Your ticket to <a href="<%= ENV['BASE_URI'] %>/e/<%=event.slug%>"><%= event.name %></a> was resold.
-    You should receive a refund shortly.
+    <% if defined?(requires_manual_refund) && requires_manual_refund %>
+      The organiser has been notified and will process your refund.
+      <% if defined?(gocardless_instalment) && gocardless_instalment %>
+        Because you paid by GoCardless instalments, they will also need to refund any payments already collected and cancel remaining instalments.
+      <% end %>
+    <% else %>
+      You should receive a refund shortly.
+    <% end %>
   </p>
 </div>

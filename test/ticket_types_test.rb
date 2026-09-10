@@ -82,19 +82,23 @@ class TicketTypesTest < ActiveSupport::TestCase
       price: 30
     )
 
-    captured = nil
-    new_ticket.stub :send_resale_notification_to_previous_ticketholder, true do
-      new_ticket.stub :send_resale_notification_to_organiser, proc { |previous_account, **kwargs| captured = [previous_account, kwargs] } do
+    previous_captured = nil
+    organiser_captured = nil
+    new_ticket.stub :send_resale_notification_to_previous_ticketholder, proc { |previous_account, **kwargs| previous_captured = [previous_account, kwargs] } do
+      new_ticket.stub :send_resale_notification_to_organiser, proc { |previous_account, **kwargs| organiser_captured = [previous_account, kwargs] } do
         new_ticket.payment_completed!
       end
     end
 
     assert original.reload.deleted?
-    assert_equal original.account, captured[0]
-    assert captured[1][:requires_manual_refund]
-    assert captured[1][:gocardless_instalment]
-    assert_equal 30, captured[1][:refund_amount]
-    assert_equal 'GBP', captured[1][:currency]
+    assert_equal original.account, previous_captured[0]
+    assert previous_captured[1][:requires_manual_refund]
+    assert previous_captured[1][:gocardless_instalment]
+    assert_equal original.account, organiser_captured[0]
+    assert organiser_captured[1][:requires_manual_refund]
+    assert organiser_captured[1][:gocardless_instalment]
+    assert_equal 30, organiser_captured[1][:refund_amount]
+    assert_equal 'GBP', organiser_captured[1][:currency]
   end
 
   test 'resale email mentions a GoCardless instalment refund' do
@@ -113,6 +117,46 @@ class TicketTypesTest < ActiveSupport::TestCase
 
     assert_includes html, 'could not refund this ticket automatically (£30).'
     assert_includes html, 'GoCardless instalments'
+  end
+
+  test 'previous ticketholder resale email does not promise an automatic refund for instalments' do
+    create_event(prices: [30], enable_resales: true)
+    html = EmailHelper.html(
+      :ticket_resale_previous_ticketholder,
+      event: @event,
+      requires_manual_refund: true,
+      gocardless_instalment: true
+    )
+
+    refute_includes html, 'refund shortly'
+    assert_includes html, 'organiser has been notified and will process your refund'
+    assert_includes html, 'GoCardless instalments'
+  end
+
+  test 'previous ticketholder resale email does not promise an automatic refund when a manual refund is required' do
+    create_event(prices: [30], enable_resales: true)
+    html = EmailHelper.html(
+      :ticket_resale_previous_ticketholder,
+      event: @event,
+      requires_manual_refund: true,
+      gocardless_instalment: false
+    )
+
+    refute_includes html, 'refund shortly'
+    assert_includes html, 'organiser has been notified and will process your refund'
+    refute_includes html, 'GoCardless instalments'
+  end
+
+  test 'previous ticketholder resale email promises a refund when one can be issued automatically' do
+    create_event(prices: [30], enable_resales: true)
+    html = EmailHelper.html(
+      :ticket_resale_previous_ticketholder,
+      event: @event,
+      requires_manual_refund: false
+    )
+
+    assert_includes html, 'You should receive a refund shortly.'
+    refute_includes html, 'organiser has been notified'
   end
 
   test 'sold_out? when quantity is exhausted' do

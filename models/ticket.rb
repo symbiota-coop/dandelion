@@ -97,7 +97,11 @@ class Ticket
       refund_currency = resold_ticket.currency
       resold_ticket.refund
       resold_ticket.destroy
-      send_resale_notification_to_previous_ticketholder(resold_account)
+      send_resale_notification_to_previous_ticketholder(
+        resold_account,
+        requires_manual_refund: requires_manual_refund,
+        gocardless_instalment: gocardless_instalment
+      )
       send_resale_notification_to_organiser(
         resold_account,
         requires_manual_refund: requires_manual_refund,
