@@ -176,6 +176,36 @@ class OrganisationsTest < ActiveSupport::TestCase
     assert existing.event_manager
   end
 
+  test 'organisation cache sync fix preserves creditings and stripe connect when deduping' do
+    create_organisation(currency: 'GBP')
+    member = FactoryBot.create(:account)
+    stripe_connect_json = { 'stripe_user_id' => 'acct_duplicate' }.to_json
+    existing = member.organisationships.create!(organisation: @organisation)
+    insert_organisationship_without_callbacks(
+      account: member,
+      organisation: @organisation,
+      stripe_connect_json: stripe_connect_json,
+      stripe_account_json: { 'display_name' => 'Duplicate Connect' }.to_json,
+      monthly_donation_method: 'Other',
+      monthly_donation_amount: 10.0,
+      monthly_donation_currency: 'GBP'
+    )
+    duplicate = Organisationship.and(account: member, organisation: @organisation, :id.ne => existing.id).first
+    crediting = duplicate.creditings.create!(account: member, amount: 25, currency: 'GBP')
+
+    Account.check_organisation_cache_sync(fix: true)
+    existing.reload
+
+    assert_equal 1, Organisationship.and(account: member, organisation: @organisation).count
+    assert_equal [crediting.id], existing.creditings.pluck(:id)
+    assert_equal 25, existing.creditings.first.amount
+    assert_equal stripe_connect_json, existing.stripe_connect_json
+    assert_includes existing.stripe_account_json, 'Duplicate Connect'
+    assert_equal 'Other', existing.monthly_donation_method
+    assert_equal 10.0, existing.monthly_donation_amount
+    assert_equal Money.new(2500, 'GBP'), existing.credit_granted
+  end
+
   test 'organisation cache sync fix repairs subscribe state drift' do
     create_organisation
     member = FactoryBot.create(:account)

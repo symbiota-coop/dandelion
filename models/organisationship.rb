@@ -291,6 +291,32 @@ class Organisationship
     organisation_tier.try(:discount) || 0
   end
 
+  def absorb_duplicate!(victim)
+    set(admin: true) if victim.admin
+    set(event_manager: true) if victim.event_manager
+
+    attrs = {}
+    attrs['notes'] = victim.notes if notes.blank? && victim.notes.present?
+
+    if stripe_connect_json.blank? && victim.stripe_connect_json.present?
+      attrs['stripe_connect_json'] = victim.stripe_connect_json
+      attrs['stripe_account_json'] = victim.stripe_account_json
+    end
+
+    if monthly_donation_method.blank? && victim.monthly_donation_method.present?
+      %w[
+        monthly_donation_method monthly_donation_amount monthly_donation_currency
+        monthly_donation_start_date monthly_donation_postcode monthly_donation_annual
+        coordinates sent_monthly_donation_welcome
+      ].each do |field|
+        attrs[field] = victim[field]
+      end
+    end
+
+    set(attrs) if attrs.any?
+    Crediting.and(organisationship_id: victim.id).update_all(organisationship_id: id)
+  end
+
   def self.dedupe_duplicates!(account: nil, preferred_ids: [])
     pipeline = []
     pipeline << { '$match' => { 'account_id' => account.id } } if account
@@ -303,11 +329,7 @@ class Organisationship
       survivor = records.find { |record| preferred_ids.include?(record.id) } || records.first
       records.delete(survivor)
       records.each do |victim|
-        # The survivor's attributes intentionally win, including donation, Stripe,
-        # subscription, and privacy fields; only privileges are combined.
-        # Creditings belonging to duplicate records are intentionally destroyed.
-        survivor.set(admin: true) if victim.admin
-        survivor.set(event_manager: true) if victim.event_manager
+        survivor.absorb_duplicate!(victim)
         victim.destroy
       end
     end

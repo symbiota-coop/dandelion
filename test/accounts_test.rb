@@ -251,4 +251,57 @@ class AccountsTest < ActiveSupport::TestCase
     assert_includes cached, org_b.id.to_s
     assert_includes survivor.subscribed_organisation_ids_cache.map(&:to_s), org_b.id.to_s
   end
+
+  test 'merging accounts preserves creditings, stripe connect, and monthly donation from the victim organisationship' do
+    survivor = FactoryBot.create(:account)
+    victim = FactoryBot.create(:account)
+    org = FactoryBot.create(:organisation, currency: 'GBP')
+    stripe_connect_json = { 'stripe_user_id' => 'acct_victim' }.to_json
+    stripe_account_json = { 'display_name' => 'Victim Connect' }.to_json
+
+    survivor_organisationship = survivor.organisationships.create!(organisation: org)
+    survivor_organisationship.creditings.create!(account: survivor, amount: 10, currency: 'GBP')
+    victim_organisationship = victim.organisationships.create!(organisation: org)
+    victim_organisationship.set(
+      stripe_connect_json: stripe_connect_json,
+      stripe_account_json: stripe_account_json,
+      monthly_donation_method: 'GoCardless',
+      monthly_donation_amount: 15.0,
+      monthly_donation_currency: 'GBP'
+    )
+    victim_crediting = victim_organisationship.creditings.create!(account: victim, amount: 40, currency: 'GBP')
+
+    survivor.merge(victim)
+    surviving_organisationship = survivor.reload.organisationships.find_by(organisation: org)
+
+    assert_equal survivor_organisationship.id, surviving_organisationship.id
+    assert_equal 1, survivor.organisationships.and(organisation: org).count
+    assert_equal [10, 40], surviving_organisationship.creditings.order('amount asc').pluck(:amount)
+    assert_equal victim_crediting.id, surviving_organisationship.creditings.find(victim_crediting.id).id
+    assert_equal stripe_connect_json, surviving_organisationship.stripe_connect_json
+    assert_equal stripe_account_json, surviving_organisationship.stripe_account_json
+    assert_equal 'GoCardless', surviving_organisationship.monthly_donation_method
+    assert_equal 15.0, surviving_organisationship.monthly_donation_amount
+    assert_equal 'GBP', surviving_organisationship.monthly_donation_currency
+    assert_equal Money.new(5000, 'GBP'), surviving_organisationship.credit_granted
+  end
+
+  test 'merging accounts keeps the survivor stripe connect when both memberships have it' do
+    survivor = FactoryBot.create(:account)
+    victim = FactoryBot.create(:account)
+    org = FactoryBot.create(:organisation)
+    survivor_stripe = { 'stripe_user_id' => 'acct_survivor' }.to_json
+    victim_stripe = { 'stripe_user_id' => 'acct_victim' }.to_json
+
+    survivor_organisationship = survivor.organisationships.create!(organisation: org)
+    survivor_organisationship.set(stripe_connect_json: survivor_stripe)
+    victim_organisationship = victim.organisationships.create!(organisation: org)
+    victim_organisationship.set(stripe_connect_json: victim_stripe)
+
+    survivor.merge(victim)
+    surviving_organisationship = survivor.reload.organisationships.find_by(organisation: org)
+
+    assert_equal survivor_organisationship.id, surviving_organisationship.id
+    assert_equal survivor_stripe, surviving_organisationship.stripe_connect_json
+  end
 end
