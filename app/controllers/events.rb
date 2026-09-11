@@ -173,7 +173,9 @@ Dandelion::App.controller do
     session[:return_to] = "/e/#{@event.slug}" unless current_account
     halt 200 if request.head?
 
-    @order = @event.orders.find(params[:order_id]) || not_found if params[:order_id]
+    if params[:order_id]
+      @order = @event.orders.find_by_id_or_token(params[:order_id]) || not_found
+    end
     if params[:payment_request_id] || params[:billing_request_id]
       gocardless_order = if params[:payment_request_id]
                            @event.orders.find_by(gocardless_payment_request_id: params[:payment_request_id])
@@ -188,10 +190,15 @@ Dandelion::App.controller do
         end
       end
     end
+    if @order && params[:success] && !@order.payment_completed? && @event.oc_slug
+      @event.check_oc_event
+      @order = @event.orders.find_by_id_or_token(params[:order_id]) if params[:order_id]
+    end
+    headers['Referrer-Policy'] = 'no-referrer' if @order || @gocardless_order
+    @order = nil unless @order&.payment_completed?
     @og_desc = when_details(@event) || 'On-demand'
     @title = @event.name
     @organisation = @event.organisation
-    @event.check_oc_event if @order && params[:success] && !@order.payment_completed && @event.oc_slug
     cohost = params[:cohost] && Organisation.find_by(slug: params[:cohost])
     image_source = @event.image_source(cohost)
     if image_source

@@ -30,12 +30,33 @@ class Order
 
   validates_uniqueness_of :session_id, :payment_intent, :coinbase_checkout_id, allow_nil: true
   validates_uniqueness_of :evm_secret, scope: :evm_value, allow_nil: true
+  validates_uniqueness_of :token, allow_nil: true
 
   def self.protected_attributes
-    %w[payment_completed]
+    %w[payment_completed token]
+  end
+
+  def self.random_token
+    SecureRandom.urlsafe_base64(24)
+  end
+
+  # Looks up an order by its token. Orders that predate tokens (and so were
+  # only ever linked to by Mongo id) can still be looked up by id, but orders
+  # that have a token are deliberately not reachable by their id.
+  def self.find_by_id_or_token(id_or_token)
+    return if id_or_token.blank?
+
+    if (order = find_by(token: id_or_token))
+      order
+    elsif id_or_token.to_s.match?(/\A[0-9a-fA-F]{24}\z/) && (order = find(id_or_token)) && order.token.blank?
+      order
+    end
   end
 
   before_validation do
+    # Only mint on create so later saves do not backfill tokens onto legacy
+    # orders (those stay reachable by Mongo id).
+    mint_token if new_record? && token.blank?
     self.evm_value = value.to_d + evm_offset if evm_secret && !evm_value
     self.discount_code = nil if discount_code && !discount_code.applies_to?(event)
     self.discount_code = nil if discount_code&.exhausted?(excluding: self)
@@ -146,6 +167,22 @@ class Order
 
   def evm_offset
     evm_secret.to_d / 1e6
+  end
+
+  def mint_token
+    loop do
+      generated = self.class.random_token
+      unless Order.and(token: generated).exists?
+        self.token = generated
+        break
+      end
+    end
+  end
+
+  # Orders created before tokens were introduced fall back to their Mongo id,
+  # which /orders/:id still accepts via find_by_id_or_token.
+  def public_id
+    token.presence || id.to_s
   end
 
   def persist_gocardless_payment_id(payment_id)

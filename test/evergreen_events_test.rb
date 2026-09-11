@@ -134,7 +134,7 @@ class EvergreenEventsTest < ActiveSupport::TestCase
 
     get "/e/#{@event.slug}.ics"
     assert_equal 404, last_response.status
-    get "/orders/#{@order.id}.ics"
+    get "/orders/#{@order.public_id}.ics"
     assert_equal 404, last_response.status
   end
 

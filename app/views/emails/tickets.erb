@@ -44,7 +44,7 @@
     <% end %>
     <% if !event.evergreen? && !event.recording? && event.organisation.show_ticketholder_link_in_ticket_emails %>
       <p>
-        <a href="<%=ENV['BASE_URI']%>/e/<%=event.slug%>?order_id=<%=order.id%>">Visit this page to add details of ticketholders.</a>
+        <a href="<%=ENV['BASE_URI']%>/e/<%=event.slug%>?order_id=<%=order.public_id%>">Visit this page to add details of ticketholders.</a>
       </p>
     <% end %>
     <% if event.organisation&.affiliate_credit_percentage && account.persisted? %>
@@ -78,7 +78,7 @@
 </div>
 
 <% if !event.no_tickets_pdf && defined?(viewing_on_web) && viewing_on_web %>
-  <a href="/orders/<%=order.id%>.pdf" class="attachment">
+  <a href="/orders/<%=order.public_id%>.pdf" class="attachment">
     <img class="qr-code" src="<%=ENV['BASE_URI']%>/images/icons/_qr-code.png">
     Download <%= order.tickets.count == 1 ? 'ticket' : 'tickets' %> PDF
   </a>

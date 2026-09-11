@@ -1,8 +1,9 @@
 Dandelion::App.controller do
   get '/orders/:id', provides: %i[html pdf ics] do
-    @order = Order.complete.find(params[:id]) || not_found
+    @order = Order.complete.find_by_id_or_token(params[:id]) || not_found
     @event = @order.event
     account = @order.account || not_found
+    headers['Referrer-Policy'] = 'no-referrer'
 
     case content_type
     when :html
@@ -24,38 +25,42 @@ Dandelion::App.controller do
 
   get '/events/:id/orders/:order_id/payment_completed', provides: :json do
     @event = Event.find(params[:id]) || not_found
-    @order = @event.orders.find(params[:order_id]) || not_found
+    @order = @event.orders.find_by_id_or_token(params[:order_id]) || not_found
     @event.organisation.check_evm_account if @order.evm_secret && @event.organisation.evm_address
     @event.check_oc_event if @order.oc_secret && @event.oc_slug
-    { id: @order.id.to_s, payment_completed: @order.payment_completed }.to_json
+    { payment_completed: @order.payment_completed }.to_json
   end
 
   get '/events/:id/orders/:order_id/ticketholders/:ticket_id/name' do
     @event = Event.find(params[:id]) || not_found
-    @order = @event.orders.complete.find(params[:order_id]) || not_found
-    @ticket = @order.tickets.find(params[:ticket_id])
+    @order = @event.orders.complete.find_by_id_or_token(params[:order_id]) || not_found
+    @ticket = @order.tickets.find(params[:ticket_id]) || not_found
+    headers['Referrer-Policy'] = 'no-referrer'
     partial :'events/ticketholder_name', locals: { ticket: @ticket }
   end
 
   post '/events/:id/orders/:order_id/ticketholders/:ticket_id/name' do
     @event = Event.find(params[:id]) || not_found
-    @order = @event.orders.complete.find(params[:order_id]) || not_found
+    @order = @event.orders.complete.find_by_id_or_token(params[:order_id]) || not_found
     @ticket = @order.tickets.find(params[:ticket_id]) || not_found
+    headers['Referrer-Policy'] = 'no-referrer'
     @ticket.set(name: params[:name])
     200
   end
 
   get '/events/:id/orders/:order_id/ticketholders/:ticket_id/email' do
     @event = Event.find(params[:id]) || not_found
-    @order = @event.orders.complete.find(params[:order_id]) || not_found
-    @ticket = @order.tickets.find(params[:ticket_id])
+    @order = @event.orders.complete.find_by_id_or_token(params[:order_id]) || not_found
+    @ticket = @order.tickets.find(params[:ticket_id]) || not_found
+    headers['Referrer-Policy'] = 'no-referrer'
     partial :'events/ticketholder_email', locals: { ticket: @ticket, success: params[:success] }
   end
 
   post '/events/:id/orders/:order_id/ticketholders/:ticket_id/email' do
     @event = Event.find(params[:id]) || not_found
-    @order = @event.orders.complete.find(params[:order_id]) || not_found
+    @order = @event.orders.complete.find_by_id_or_token(params[:order_id]) || not_found
     @ticket = @order.tickets.find(params[:ticket_id]) || not_found
+    headers['Referrer-Policy'] = 'no-referrer'
     previous_email = @ticket.email
     @ticket.email = params[:email]
     @ticket.save

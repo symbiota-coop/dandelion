@@ -5,11 +5,11 @@
   <% end %>
 
   <span style="white-space: nowrap">
-    <a target="_blank" href="/orders/<%= order.id %>">View confirmation email</a>
+    <a target="_blank" href="/orders/<%= order.public_id %>">View confirmation email</a>
     &middot;
   </span>
   <span style="white-space: nowrap">
-    <a href="/e/<%= event.slug %>?order_id=<%= order.id %>">Edit ticketholders</a>
+    <a href="/e/<%= event.slug %>?order_id=<%= order.public_id %>">Edit ticketholders</a>
     <% if order.value.nil? || order.value.zero? %>
       &middot;
     <% end %>

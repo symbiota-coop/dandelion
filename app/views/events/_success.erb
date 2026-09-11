@@ -3,7 +3,7 @@
   <div class="card-body readable">
 
     <p>
-      <a target="_blank" href="/orders/<%=@order.id%>" class="btn btn-outline-primary">
+      <a target="_blank" href="/orders/<%=@order.public_id%>" class="btn btn-outline-primary">
         View confirmation <% unless @event.no_tickets_pdf? %>and <%= @order.tickets.count == 1 ? 'ticket' : 'tickets' %><% end %>
         <i class="bi bi-qr-code"></i>
       </a>
@@ -65,12 +65,12 @@
             </h4>
             <div class="row">
               <div class="col-6">
-                <div data-pagelet-url="/events/<%=@event.id%>/orders/<%=@order.id%>/ticketholders/<%=ticket.id%>/name" data-pagelet-no-opacity-change="true">
+                <div data-pagelet-url="/events/<%=@event.id%>/orders/<%=@order.public_id%>/ticketholders/<%=ticket.id%>/name" data-pagelet-no-opacity-change="true">
                   <%= partial :"events/ticketholder_name", locals: { ticket: ticket } %>
                 </div>
               </div>
               <div class="col-6">
-                <div data-pagelet-url="/events/<%=@event.id%>/orders/<%=@order.id%>/ticketholders/<%=ticket.id%>/email?success=<%=params[:success] ? 1 : 0 %>" data-pagelet-no-opacity-change="true">
+                <div data-pagelet-url="/events/<%=@event.id%>/orders/<%=@order.public_id%>/ticketholders/<%=ticket.id%>/email?success=<%=params[:success] ? 1 : 0 %>" data-pagelet-no-opacity-change="true">
                   <%= partial :"events/ticketholder_email", locals: { ticket: ticket, success: (params[:success] ? 1 : 0) } %>
                 </div>
               </div>

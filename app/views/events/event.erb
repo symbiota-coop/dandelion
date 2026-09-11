@@ -52,7 +52,7 @@
       <script>
         $(function () {
           setInterval(function () {
-            $.getJSON('/events/<%= @event.id %>/orders/<%= @gocardless_order.id %>/payment_completed', function (data) {
+            $.getJSON('/events/<%= @event.id %>/orders/<%= @gocardless_order.public_id %>/payment_completed', function (data) {
               if (data.payment_completed) { window.location.reload() }
             })
           }, 3 * 1000)

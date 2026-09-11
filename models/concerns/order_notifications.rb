@@ -187,7 +187,7 @@ module OrderNotifications
     return unless signal_configured?
     return unless account&.phone.present?
 
-    order_url = "#{ENV['BASE_URI']}/orders/#{id}"
+    order_url = "#{ENV['BASE_URI']}/orders/#{public_id}"
     wd = event.when_details(account.try(:time_zone))
     when_text = wd ? ", #{wd.split(' (UTC')[0]}" : ''
     message = "Thanks for booking onto #{event.name}#{when_text}!\n\nView your order confirmation at #{order_url}"

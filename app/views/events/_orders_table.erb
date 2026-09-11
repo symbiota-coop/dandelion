@@ -267,7 +267,7 @@
       ].compact, button_text: %(Actions <i class="bi bi-caret-down-fill"></i>), container_class: 'btn-group mb-1' %>
       <% else %>
         <%= dropdown_nav [
-        ['Link to order confirmation', "/orders/#{order.id}"],
+        ['Link to order confirmation', "/orders/#{order.public_id}"],
         ['Resend order confirmation', "/orders/#{order.id}/send_tickets", { 'data-method' => 'post' }],
         ['Transfer to another event', "/orders/#{order.id}/transfer"],
         (['Remove and refund order', "/events/#{order.event.id}/orders/#{order.id}/refund_and_destroy"] if order.refundable?),

@@ -35,6 +35,7 @@ module OrderFields
     field :transferred, type: Mongoid::Boolean
     field :restored, type: Mongoid::Boolean
 
+    field :token, type: String
     field :donation_via_modal, type: Mongoid::Boolean
 
     before_validation do

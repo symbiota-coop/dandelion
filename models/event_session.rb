@@ -87,7 +87,7 @@ class EventSession
       e.dtend = (event_session.start_time.to_date == event_session.end_time.to_date ? event_session.end_time.utc.strftime('%Y%m%dT%H%M%SZ') : nil)
       e.transp = (event_session.start_time.to_date == event_session.end_time.to_date ? 'OPAQUE' : 'TRANSPARENT')
       e.location = event.location
-      e.description = order ? %(#{ENV['BASE_URI']}/orders/#{order.id}) : %(#{ENV['BASE_URI']}/events/#{event.id})
+      e.description = order ? %(#{ENV['BASE_URI']}/orders/#{order.public_id}) : %(#{ENV['BASE_URI']}/events/#{event.id})
       e.organizer = event.email
       e.uid = event_session.id.to_s
       if order

@@ -405,7 +405,7 @@ class Event
       e.dtend = (event.start_time.to_date == event.end_time.to_date ? event.end_time.utc.strftime('%Y%m%dT%H%M%SZ') : nil)
       e.transp = (event.start_time.to_date == event.end_time.to_date ? 'OPAQUE' : 'TRANSPARENT')
       e.location = event.location
-      e.description = order ? %(#{ENV['BASE_URI']}/orders/#{order.id}) : %(#{ENV['BASE_URI']}/events/#{event.id})
+      e.description = order ? %(#{ENV['BASE_URI']}/orders/#{order.public_id}) : %(#{ENV['BASE_URI']}/events/#{event.id})
       e.organizer = event.email
       e.uid = event.id.to_s
       if order
