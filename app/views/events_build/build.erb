@@ -343,21 +343,19 @@
       <% end %>
       <% if @event.organisation.stripe_client_id %>
         <div role="tabpanel" class="tab-pane" id="tab-revenue">
-          <%= f.lookup_block :revenue_sharer_id, lookup_url: '/accounts.json', placeholder: 'Search accounts', selected_link: (%(<a class="d-inline-block mt-1" target="_blank" href="/u/#{@event.revenue_sharer.username}">View account</a>) if @event.revenue_sharer_id) %>
+          <% revenue_fields_disabled = !event_revenue_admin? %>
+          <%= f.lookup_block :revenue_sharer_id, lookup_url: '/accounts.json', placeholder: 'Search accounts', disabled: revenue_fields_disabled, selected_link: (%(<a class="d-inline-block mt-1" target="_blank" href="/u/#{@event.revenue_sharer.username}">View account</a>) if @event.revenue_sharer_id) %>
+          <div id="revenue-share">
+            <%= f.text_block :revenue_share_to_revenue_sharer, disabled: revenue_fields_disabled %>
+          </div>
+          <%= f.number_block :profit_share_to_organiser, disabled: revenue_fields_disabled %>
+          <%= f.number_block :profit_share_to_coordinator, disabled: revenue_fields_disabled %>
+          <%= f.number_block :profit_share_to_category_steward, disabled: revenue_fields_disabled %>
+          <%= f.number_block :profit_share_to_social_media, disabled: revenue_fields_disabled %>
 
-          <% if event_revenue_admin? %>
-            <div id="revenue-share">
-              <%= f.text_block :revenue_share_to_revenue_sharer %>
-            </div>
-            <%= f.number_block :profit_share_to_organiser %>
-            <%= f.number_block :profit_share_to_coordinator %>
-            <%= f.number_block :profit_share_to_category_steward %>
-            <%= f.number_block :profit_share_to_social_media %>
+          <%= f.number_block :profit_share_to_organisation, disabled: true %>
 
-            <%= f.number_block :profit_share_to_organisation, disabled: true %>
-
-            <%= f.number_block :stripe_revenue_adjustment %>
-          <% end %>
+          <%= f.number_block :stripe_revenue_adjustment, disabled: revenue_fields_disabled %>
           <%= f.text_area_block :notes %>
 
 

@@ -60,6 +60,17 @@ module EventValidation
 
       errors.add(:update_activity_events, "- you don't have permission to update all events in this activity") if update_activity_events.to_s == '1' && !can_bulk_update_activity_events?
 
+      actor = last_saved_by || account
+      unless duplicate || Event.revenue_admin?(self, actor)
+        errors.add(:revenue_sharer, '- you cannot change this setting') if revenue_sharer_id_changed?
+        errors.add(:revenue_share_to_revenue_sharer, '- you cannot change this setting') if revenue_share_to_revenue_sharer_changed?
+        errors.add(:stripe_revenue_adjustment, '- you cannot change this setting') if stripe_revenue_adjustment_changed?
+        Event.profit_share_roles.each do |role|
+          attr = :"profit_share_to_#{role}"
+          errors.add(attr, '- you cannot change this setting') if send("#{attr}_changed?")
+        end
+      end
+
       self.stripe_revenue_adjustment = 0 unless stripe_revenue_adjustment
       self.revenue_share_to_revenue_sharer = 0 unless revenue_share_to_revenue_sharer
       self.revenue_share_to_revenue_sharer = 0 unless revenue_sharer

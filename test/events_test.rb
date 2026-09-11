@@ -403,6 +403,102 @@ class EventsTest < ActiveSupport::TestCase
     end
   end
 
+  test 'event facilitator cannot change revenue share fields' do
+    create_organisation(stripe_client_id: 'ca_test')
+    create_event(prices: [0])
+    facilitator = FactoryBot.create(:account)
+    @event.event_facilitations.create!(account: facilitator)
+    facilitator.organisationships.create!(
+      organisation: @organisation,
+      stripe_connect_json: { 'stripe_user_id' => 'acct_facilitator' }.to_json
+    )
+
+    sign_in_with_rack(facilitator)
+    hijack = {
+      organiser_id: '',
+      revenue_sharer_id: facilitator.id.to_s,
+      revenue_share_to_revenue_sharer: '100',
+      profit_share_to_organiser: '50',
+      stripe_revenue_adjustment: '20'
+    }
+    [
+      hijack,
+      hijack.merge(last_saved_by_id: @account.id),
+      hijack.merge(duplicate: '1'),
+      hijack.merge(last_saved_by_id: @account.id, duplicate: '1')
+    ].each do |event_params|
+      if event_params.keys.intersect?(%i[last_saved_by_id duplicate])
+        error = assert_raises(RuntimeError) { post "/e/#{@event.slug}/edit", event: event_params }
+        assert_match(/are protected/, error.message)
+      else
+        post "/e/#{@event.slug}/edit", event: event_params
+        refute last_response.redirect?
+      end
+      @event.reload
+      assert_nil @event.revenue_sharer_id, "revenue_sharer set for #{event_params.keys}"
+      assert_equal 0, @event.revenue_share_to_revenue_sharer
+      assert_equal 0, @event.profit_share_to_organiser
+      assert_equal 0, @event.stripe_revenue_adjustment
+    end
+
+    post "/e/#{@event.slug}/edit", event: { name: 'Still editable' }
+    assert last_response.redirect?
+    assert_equal 'Still editable', @event.reload.name
+  end
+
+  test 'organisation admin can change revenue share fields' do
+    create_organisation(stripe_client_id: 'ca_test')
+    create_event(prices: [0])
+    sharer = FactoryBot.create(:account)
+    sharer.organisationships.create!(
+      organisation: @organisation,
+      stripe_connect_json: { 'stripe_user_id' => 'acct_sharer' }.to_json
+    )
+
+    sign_in_with_rack(@account)
+    post "/e/#{@event.slug}/edit", event: {
+      organiser_id: '',
+      revenue_sharer_id: sharer.id.to_s,
+      revenue_share_to_revenue_sharer: '100'
+    }
+
+    assert last_response.redirect?, last_response.body
+    @event.reload
+    assert_equal sharer.id, @event.revenue_sharer_id
+    assert_equal 100, @event.revenue_share_to_revenue_sharer
+    assert_nil @event.organiser_id
+  end
+
+  test 'non-revenue-admin cannot set a revenue sharer on create' do
+    create_organisation(stripe_client_id: 'ca_test', allow_event_submissions: true)
+    submitter = FactoryBot.create(:account)
+    submitter.organisationships.create!(
+      organisation: @organisation,
+      stripe_connect_json: { 'stripe_user_id' => 'acct_submitter' }.to_json
+    )
+
+    event = Event.new(
+      name: 'Submitted',
+      start_time: 1.month.from_now,
+      end_time: 1.month.from_now + 1.day,
+      location: 'Online',
+      currency: 'GBP',
+      organisation: @organisation,
+      account: submitter,
+      last_saved_by: submitter,
+      revenue_sharer: submitter,
+      revenue_share_to_revenue_sharer: 100
+    )
+    refute event.save
+    assert_includes event.errors[:revenue_sharer], '- you cannot change this setting'
+    assert_includes event.errors[:revenue_share_to_revenue_sharer], '- you cannot change this setting'
+
+    event.revenue_sharer = nil
+    event.revenue_share_to_revenue_sharer = nil
+    assert event.save, event.errors.full_messages.join(', ')
+    assert_equal submitter.id, event.organiser_id
+  end
+
   test 'ticket email strips event-handler attributes from editor HTML' do
     create_event(
       prices: [0],
