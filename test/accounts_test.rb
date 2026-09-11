@@ -70,6 +70,32 @@ class AccountsTest < ActiveSupport::TestCase
     assert_equal referrer.id, saved_organisation.referrer_id
   end
 
+  test 'email sign in token stays on the linked event instead of a previous return_to' do
+    create_event(as: :event1)
+    create_event(as: :event2)
+    account = FactoryBot.create(:account)
+
+    visit "/e/#{@event1.slug}"
+    account.generate_sign_in_token!
+    visit "/e/#{@event2.slug}?sign_in_token=#{account.sign_in_token}"
+
+    assert page.current_path.include?("/e/#{@event2.slug}"),
+           "Expected to stay on #{@event2.slug}, got #{page.current_path}"
+    refute page.current_path.include?(@event1.slug)
+  end
+
+  test 'sign in token on homepage still honours return_to from an event page' do
+    create_event
+    account = FactoryBot.create(:account)
+
+    visit "/e/#{@event.slug}"
+    account.generate_sign_in_token!
+    visit "/?sign_in_token=#{account.sign_in_token}"
+
+    assert page.current_path.include?("/e/#{@event.slug}"),
+           "Expected to return to #{@event.slug}, got #{page.current_path}"
+  end
+
   test 'return_to is cleared after signup redirect' do
     referrer = FactoryBot.create(:account, username: 'refclear', has_signed_in: true)
     account = FactoryBot.build_stubbed(:account)

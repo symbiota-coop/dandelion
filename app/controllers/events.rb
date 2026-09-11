@@ -155,7 +155,6 @@ Dandelion::App.controller do
 
   get '/e/:slug', provides: %i[html ics json jpg], prerender: true do
     session[:via] = params[:via] if params[:via]
-    session[:return_to] = request.url
     @event = Event.with_key_includes.without(:embedding).find_by(slug: params[:slug])
     if !@event && params[:slug] =~ /[A-Z]/
       @event = Event.with_key_includes.without(:embedding).find_by(slug: params[:slug].downcase)
@@ -171,6 +170,7 @@ Dandelion::App.controller do
 
     kick! unless @event.organisation
     kick!(redirect_url: "/o/#{@event.organisation.slug}/events") if @event.locked? && !event_admin?
+    session[:return_to] = "/e/#{@event.slug}" unless current_account
     halt 200 if request.head?
 
     @order = @event.orders.find(params[:order_id]) || not_found if params[:order_id]

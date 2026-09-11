@@ -11,14 +11,19 @@ Dandelion::App.helpers do
         account.set(email_confirmed: true)
         account.send_activation_notification
       end
-      if (return_to = session.delete(:return_to))
+      if sign_in_token_landing_path? && (return_to = session.delete(:return_to))
         redirect return_to
       else
+        session.delete(:return_to)
         flash.now[:notice] = 'Signed in via a code/link'
       end
     elsif !current_account
       kick! notice: "That sign in code/link isn't valid any longer. Please request a new one."
     end
+  end
+
+  def sign_in_token_landing_path?
+    ['/', '/accounts/sign_in', '/accounts/sign_in_code'].include?(request.path)
   end
 
   def sign_in_via_api_key
