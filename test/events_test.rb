@@ -378,6 +378,44 @@ class EventsTest < ActiveSupport::TestCase
     assert_equal 'Keep me', other.reload.name
   end
 
+  test 'event facilitator cannot enable show_emails or featured' do
+    create_event(prices: [0], show_emails: false, featured: false)
+    facilitator = FactoryBot.create(:account)
+    @event.event_facilitations.create!(account: facilitator)
+
+    sign_in_with_rack(facilitator)
+    [
+      { show_emails: '1', featured: '1' },
+      { show_emails: '1', featured: '1', last_saved_by_id: @account.id },
+      { show_emails: '1', featured: '1', duplicate: '1' },
+      { show_emails: '1', featured: '1', last_saved_by_id: @account.id, duplicate: '1' }
+    ].each do |event_params|
+      if event_params.keys.intersect?(%i[last_saved_by_id duplicate])
+        error = assert_raises(RuntimeError) { post "/e/#{@event.slug}/edit", event: event_params }
+        assert_match(/are protected/, error.message)
+      else
+        post "/e/#{@event.slug}/edit", event: event_params
+        refute last_response.redirect?
+      end
+      @event.reload
+      refute @event.show_emails, "show_emails changed for #{event_params.keys}"
+      refute @event.featured, "featured changed for #{event_params.keys}"
+    end
+  end
+
+  test 'organisation admin can enable show_emails and featured' do
+    create_event(prices: [0], show_emails: false, featured: false)
+
+    sign_in_with_rack(@account)
+    post "/e/#{@event.slug}/edit", event: { show_emails: '1', featured: '1' }
+
+    assert last_response.redirect?
+    @event.reload
+    assert @event.show_emails
+    assert @event.featured
+    assert_equal @account.id, @event.last_saved_by_id
+  end
+
   test 'org event manager can assign an activity and bulk update its events' do
     create_full_event_hierarchy
     manager = add_event_manager(@organisation)
