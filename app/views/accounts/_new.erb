@@ -19,6 +19,9 @@
   <% if params[:list_an_event] %>
     <%= hidden_field_tag :list_an_event, value: true %>
   <% end %>
+  <% if env['omniauth.auth'] || session['omniauth.auth'] %>
+    <%= hidden_field_tag :omniauth_signup, value: '1' %>
+  <% end %>
   <% %w{organisation activity local_group event}.each { |r| if instance_variable_get("@#{r}") %>
   <%= hidden_field_tag :"#{r}_id", value: instance_variable_get("@#{r}").id %>
 <% end; } %>

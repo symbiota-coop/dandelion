@@ -2,6 +2,7 @@ require File.expand_path("#{File.dirname(__FILE__)}/test_config.rb")
 
 class AccountsTest < ActiveSupport::TestCase
   include Capybara::DSL
+  include Rack::Test::Methods
 
   def fill_signup_form(account)
     fill_in 'Full name', with: account.name
@@ -329,5 +330,76 @@ class AccountsTest < ActiveSupport::TestCase
 
     assert_equal survivor_organisationship.id, surviving_organisationship.id
     assert_equal survivor_stripe, surviving_organisationship.stripe_connect_json
+  end
+
+  test 'leftover omniauth session is not linked on a later signup' do
+    start_omniauth_signup
+    later = FactoryBot.build_stubbed(:account)
+    post_new_account(later)
+
+    created = Account.find_by(email: later.email.downcase)
+    assert created
+    assert_equal 0, created.provider_links.count
+  end
+
+  test 'omniauth signup form links the provider' do
+    start_omniauth_signup
+    later = FactoryBot.build_stubbed(:account)
+    post_new_account(later, omniauth_signup: '1')
+
+    created = Account.find_by(email: later.email.downcase)
+    assert created
+    link = created.provider_links.find_by(provider: 'Google')
+    assert link
+    assert_equal 'google-uid-1', link.provider_uid
+  end
+
+  test 'omniauth session is kept across failed signup validation' do
+    start_omniauth_signup
+    post_new_account(FactoryBot.build_stubbed(:account, name: '', email: ''), omniauth_signup: '1')
+
+    later = FactoryBot.build_stubbed(:account)
+    post_new_account(later, omniauth_signup: '1')
+
+    created = Account.find_by(email: later.email.downcase)
+    assert created
+    assert created.provider_links.find_by(provider: 'Google', provider_uid: 'google-uid-1')
+  end
+
+  test 'omniauth leftover is cleared when signup email already exists' do
+    existing = FactoryBot.create(:account)
+    start_omniauth_signup
+    post_new_account(FactoryBot.build_stubbed(:account, email: existing.email), omniauth_signup: '1')
+
+    later = FactoryBot.build_stubbed(:account)
+    post_new_account(later)
+
+    created = Account.find_by(email: later.email.downcase)
+    assert created
+    assert_equal 0, created.provider_links.count
+  end
+
+  private
+
+  def start_omniauth_signup
+    clear_cookies
+    OmniAuth.config.test_mode = true
+    OmniAuth.config.mock_auth[:google_oauth2] = OmniAuth::AuthHash.new(
+      provider: 'google_oauth2',
+      uid: 'google-uid-1',
+      info: { name: 'Alice Example', email: 'alice-oauth@example.com' }
+    )
+    get '/auth/google_oauth2'
+    follow_redirect! while last_response.redirect?
+  ensure
+    OmniAuth.config.test_mode = false
+    OmniAuth.config.mock_auth[:google_oauth2] = nil
+  end
+
+  def post_new_account(account, extra = {})
+    post '/accounts/new', {
+      account: { name: account.name, email: account.email, location: account.location },
+      recaptcha_skip_secret: ENV['RECAPTCHA_SKIP_SECRET']
+    }.merge(extra)
   end
 end

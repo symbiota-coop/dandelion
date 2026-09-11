@@ -84,11 +84,15 @@ Dandelion::App.controller do
     load_context
 
     validate_recaptcha unless params[:recaptcha_skip_secret] == ENV['RECAPTCHA_SKIP_SECRET']
-    link_omniauth_provider(@account) if session['omniauth.auth']
+    link_omniauth_provider(@account) if session['omniauth.auth'] && params[:omniauth_signup]
 
-    if @account.save
+    saved = @account.save
+    existing_account = !saved && @account.email && Account.find_by(email: @account.email.downcase.strip)
+    session.delete('omniauth.auth') if saved || existing_account || !params[:omniauth_signup]
+
+    if saved
       handle_successful_account_creation
-    elsif @account.email && (existing_account = Account.find_by(email: @account.email.downcase.strip))
+    elsif existing_account
       handle_existing_account(existing_account)
     elsif params[:recaptcha_skip_secret]
       400
