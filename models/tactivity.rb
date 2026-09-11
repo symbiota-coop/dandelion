@@ -21,7 +21,11 @@ class Tactivity
   field :has_image, type: Boolean
 
   def self.protected_attributes
-    %w[timetable_id gathering_id account_id membership_id scheduled_by_id has_image image_uid image_url]
+    %w[has_image image_uid image_url]
+  end
+
+  def self.assignable_foreign_keys
+    %w[space_id tslot_id]
   end
 
   def self.prewarmed_image_derivative_sizes

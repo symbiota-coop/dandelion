@@ -87,4 +87,30 @@ class PmailsTest < ActiveSupport::TestCase
 
     assert page.has_content? 'Ticket group Backstage'
   end
+
+  test 'pmail exclusions must belong to its organisation' do
+    create_organisation
+    other_organisation = FactoryBot.create(:organisation)
+    pmail = FactoryBot.build(
+      :pmail,
+      organisation: @organisation,
+      event: FactoryBot.create(:event, organisation: other_organisation),
+      activity: FactoryBot.create(:activity, organisation: other_organisation),
+      local_group: FactoryBot.create(:local_group, organisation: other_organisation)
+    )
+
+    refute pmail.valid?
+    assert_includes pmail.errors[:event], 'must belong to the same organisation'
+    assert_includes pmail.errors[:activity], 'must belong to the same organisation'
+    assert_includes pmail.errors[:local_group], 'must belong to the same organisation'
+  end
+
+  test 'pmail can exclude a cohosted event' do
+    create_organisation
+    event = FactoryBot.create(:event)
+    event.cohostships.create!(organisation: @organisation)
+    pmail = FactoryBot.build(:pmail, organisation: @organisation, event: event)
+
+    assert pmail.valid?, pmail.errors.full_messages.to_sentence
+  end
 end

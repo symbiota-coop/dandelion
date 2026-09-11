@@ -594,4 +594,46 @@ class EventsTest < ActiveSupport::TestCase
 
     assert_includes event.errors[:feedback_hours_after], "cannot be more than #{Event::MAX_FEEDBACK_HOURS_AFTER}"
   end
+
+  test 'event gathering must be administered by the last saver' do
+    create_event
+    other_account = FactoryBot.create(:account)
+    other_gathering = FactoryBot.create(:gathering, account: other_account)
+    @event.gathering = other_gathering
+    @event.last_saved_by = @account
+
+    refute @event.valid?
+    assert_includes @event.errors[:gathering], "- you don't have permission to add attendees to this gathering"
+  end
+
+  test 'event session create rejects event_id from params' do
+    create_event(prices: [0])
+    other_event = FactoryBot.create(:event)
+
+    sign_in_with_rack(@account)
+    post "/events/#{@event.id}/event_sessions/new", event_session: {
+      start_time: (@event.start_time + 1.hour).iso8601,
+      end_time: (@event.end_time - 1.hour).iso8601,
+      event_id: other_event.id
+    }
+
+    assert_equal 1, @event.event_sessions.count
+    assert_equal 0, other_event.event_sessions.count
+  end
+
+  test 'rpayment edit rejects event_id from params' do
+    create_event(prices: [0])
+    other_event = FactoryBot.create(:event)
+    rpayment = @event.rpayments.create!(account: @account, amount: 10, currency: @event.currency, role: Rpayment.roles.first)
+
+    sign_in_with_rack(@account)
+    post "/events/#{@event.id}/rpayments/#{rpayment.id}/edit", rpayment: {
+      amount: 10,
+      currency: @event.currency,
+      role: rpayment.role,
+      event_id: other_event.id
+    }
+
+    assert_equal @event.id, rpayment.reload.event_id
+  end
 end

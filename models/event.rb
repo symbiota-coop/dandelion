@@ -42,6 +42,10 @@ class Event
     %w[raw_description direct_charges trending last_saved_by last_saved_by_id duplicate image_url]
   end
 
+  def self.assignable_foreign_keys
+    %w[coordinator_id organiser_id activity_id local_group_id gathering_id revenue_sharer_id]
+  end
+
   MAX_FEEDBACK_HOURS_AFTER = 30 * 24
 
   COPY_FIELDS = %w[

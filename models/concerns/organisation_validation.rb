@@ -30,6 +30,7 @@ module OrganisationValidation
       errors.add(:event_image_required_height, 'must be greater than 0') if event_image_required_height && event_image_required_height <= 0
 
       errors.add(:tax_rate_id, 'must start with txr_') if tax_rate_id && !tax_rate_id.starts_with?('txr_')
+      self.referrer_id = nil if referrer_id && account_id && referrer_id == account_id
 
       calendar_import_urls_a.each do |calendar_import_url|
         Organisation.normalize_feed_url(calendar_import_url)

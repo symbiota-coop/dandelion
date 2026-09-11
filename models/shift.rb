@@ -10,12 +10,27 @@ class Shift
   belongs_to_without_parent_validation :account, optional: true
   belongs_to_without_parent_validation :membership, optional: true
 
+  def self.assignable_foreign_keys
+    %w[account_id role_id rslot_id]
+  end
+
   validates_uniqueness_of :rslot, scope: :role
 
   before_validation do
-    self.rota = role.rota if role
-    self.gathering = rota.gathering if rota
-    self.membership = gathering.memberships.find_by(account: account) if gathering && account && !membership
+    self.rota = role.rota if role && !rota
+    self.gathering = rota.gathering if rota && !gathering
+    if gathering && account && (membership&.account_id != account_id || membership&.gathering_id != gathering_id)
+      self.membership = gathering.memberships.find_by(account: account)
+    elsif !account
+      self.membership = nil
+    end
+  end
+
+  validates_same_parent :role, via: :rota
+  validates_same_parent :rslot, via: :rota
+
+  validate do
+    errors.add(:account, 'must be a member of the same gathering') if account && gathering && membership&.gathering_id != gathering_id
   end
 
   has_many :notifications, as: :notifiable, dependent: :destroy

@@ -9,10 +9,10 @@ Dandelion::App.controller do
   end
 
   post '/local_groups/new' do
-    @local_group = LocalGroup.new(mass_assigning(params[:local_group], LocalGroup))
-    @local_group.account = current_account
-    @organisation = @local_group.organisation
+    @organisation = Organisation.find(params.dig(:local_group, :organisation_id)) || not_found
     organisation_admins_only!
+    @local_group = @organisation.local_groups.new(mass_assigning(params[:local_group], LocalGroup))
+    @local_group.account = current_account
     if @local_group.save
       flash[:notice] = 'The local group was created.'
       redirect "/local_groups/#{@local_group.id}"

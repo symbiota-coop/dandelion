@@ -2,6 +2,7 @@ require File.expand_path("#{File.dirname(__FILE__)}/test_config.rb")
 
 class OrganisationsTest < ActiveSupport::TestCase
   include Capybara::DSL
+  include Rack::Test::Methods
 
   def insert_organisationship_without_callbacks(account:, organisation:, **attrs)
     Organisationship.collection.insert_one(
@@ -63,6 +64,18 @@ class OrganisationsTest < ActiveSupport::TestCase
     click_button 'Save and continue'
 
     saved_organisation = Organisation.find_by(slug: organisation.slug)
+    assert_nil saved_organisation.referrer_id
+  end
+
+  test 'organisation creator cannot set themselves as referrer via params' do
+    account = FactoryBot.create(:account)
+    organisation = FactoryBot.build_stubbed(:organisation)
+
+    sign_in_with_rack(account)
+    post '/o/new', organisation: { name: organisation.name, slug: organisation.slug, referrer_id: account.id }
+
+    saved_organisation = Organisation.find_by(slug: organisation.slug)
+    assert saved_organisation
     assert_nil saved_organisation.referrer_id
   end
 
@@ -222,5 +235,16 @@ class OrganisationsTest < ActiveSupport::TestCase
     member.reload
     assert_includes member.subscribed_organisation_ids_cache.map(&:to_s), @organisation.id.to_s
     assert_empty member.unsubscribed_organisation_ids_cache || []
+  end
+
+  test 'organisation tier edit rejects organisation_id from params' do
+    create_organisation
+    organisation_tier = @organisation.organisation_tiers.create!(name: 'Gold', threshold: 100, discount: 10)
+    other_organisation = FactoryBot.create(:organisation)
+
+    sign_in_with_rack(@account)
+    post "/o/#{@organisation.slug}/organisation_tiers/#{organisation_tier.id}/edit", organisation_tier: { name: 'Gold', threshold: 100, discount: 10, organisation_id: other_organisation.id }
+
+    assert_equal @organisation.id, organisation_tier.reload.organisation_id
   end
 end

@@ -106,6 +106,7 @@ Dandelion::App.controller do
   post '/events/new' do
     sign_in_required!
     @event = Event.new(mass_assigning(params[:event], Event))
+    @event.organisation_id = params.dig(:event, :organisation_id)
     unless @event.organisation
       flash[:error] = 'There was an error saving the event'
       if current_account.organisations_for_creating_events.empty?

@@ -86,7 +86,14 @@ Dandelion::App.helpers do
   end
 
   def mass_assigning(params, model)
-    params ||= {}
+    params = (params || {}).dup
+    allowed = model.assignable_foreign_keys.map(&:to_s)
+    allowed += model.permitted_attributes.map(&:to_s) if model.respond_to?(:permitted_attributes)
+    allowed += model.protected_attributes.map(&:to_s) if model.respond_to?(:protected_attributes) # let these through so they raise below
+    foreign_keys = model.relations.values.grep(Mongoid::Association::Referenced::BelongsTo).flat_map do |rel|
+      [rel.name, rel.foreign_key, (rel.inverse_type if rel.polymorphic?)].compact.map(&:to_s)
+    end
+    params.reject! { |k, _| foreign_keys.include?(k.to_s) && !allowed.include?(k.to_s) }
     if model.respond_to?(:permitted_attributes)
       permitted = model.permitted_attributes.map(&:to_s)
       unpermitted = params.keys.reject { |k| permitted.include?(k.to_s) }

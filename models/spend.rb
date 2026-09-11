@@ -13,14 +13,20 @@ class Spend
   field :reimbursed, type: Boolean
 
   def self.protected_attributes
-    %w[gathering_id membership_id reimbursed]
+    %w[reimbursed]
+  end
+
+  def self.assignable_foreign_keys
+    %w[team_id account_id]
   end
 
   validates_presence_of :item, :amount
 
   before_validation do
-    self.membership = gathering.memberships.find_by(account: account) if gathering && account && !membership
+    self.membership = gathering.memberships.find_by(account: account) if gathering && account && membership&.account_id != account_id
   end
+
+  validates_same_parent :team, via: :gathering
 
   has_many :notifications, as: :notifiable, dependent: :destroy
   after_create do

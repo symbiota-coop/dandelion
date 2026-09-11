@@ -36,6 +36,10 @@ class Pmail
     %w[organisation_id account_id sent_at requested_send_at message_ids gift]
   end
 
+  def self.assignable_foreign_keys
+    %w[event_id activity_id local_group_id]
+  end
+
   has_many :pmail_links, dependent: :destroy
 
   def self.mailable_types
@@ -48,6 +52,13 @@ class Pmail
 
   validates_presence_of :from, :subject, :body
   validates_format_of :from, with: %r{\A\s*([\p{L}\d\s]+?)\s*<([\w.!#$%&â€™*+/=?^_`{|}~-]+@[\w-]+(?:\.[\w-]+)+)>\s*\Z}
+
+  validates_same_parent :activity, via: :organisation
+  validates_same_parent :local_group, via: :organisation
+
+  validate do
+    errors.add(:event, 'must belong to the same organisation') if event && organisation && event.organisation_id != organisation_id && !Array(event.cohosts_ids_cache).include?(organisation_id)
+  end
 
   attr_accessor :file, :to_option
 

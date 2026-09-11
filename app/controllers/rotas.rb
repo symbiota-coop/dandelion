@@ -104,7 +104,10 @@ Dandelion::App.controller do
     @membership = @gathering.memberships.find_by(account: current_account)
     gathering_admins_only!
     @rota = @gathering.rotas.find(params[:id]) || not_found
-    @rota.shifts.create(mass_assigning(params[:shift], Shift))
+    shift_params = (params[:shift] || {}).dup
+    role = @rota.roles.find(shift_params.delete(:role_id)) || not_found
+    rslot = @rota.rslots.find(shift_params.delete(:rslot_id)) || not_found
+    @rota.shifts.create(mass_assigning(shift_params, Shift).merge(role: role, rslot: rslot))
     redirect "/g/#{params[:slug]}/rotas/#{params[:id]}"
   end
 
@@ -227,7 +230,9 @@ Dandelion::App.controller do
     @rota = Rota.find(params[:rota_id]) || not_found
     @gathering = @rota.gathering
     confirmed_membership_required!
-    Shift.create(account: (params[:na] ? nil : current_account), rota_id: params[:rota_id], rslot_id: params[:rslot_id], role_id: params[:role_id])
+    role = @rota.roles.find(params[:role_id]) || not_found
+    rslot = @rota.rslots.find(params[:rslot_id]) || not_found
+    Shift.create(account: (params[:na] ? nil : current_account), rota: @rota, rslot: rslot, role: role)
     200
   end
 
@@ -246,7 +251,9 @@ Dandelion::App.controller do
     @membership = @gathering.memberships.find_by(account: current_account)
     confirmed_membership_required!
     halt unless (@shift.account && (@shift.account_id == current_account.id)) || @membership.admin?
-    if @shift.update_attributes(mass_assigning(params[:shift], Shift))
+    shift_params = (params[:shift] || {}).dup
+    shift_params.delete(:account_id) unless @membership.admin?
+    if @shift.update_attributes(mass_assigning(shift_params, Shift))
       redirect "/g/#{@gathering.slug}/rotas/#{@shift.rota_id}"
     else
       flash.now[:error] = 'There was an error saving the shift'

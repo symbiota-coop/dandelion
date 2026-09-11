@@ -82,6 +82,10 @@ class Organisation
     ]
   end
 
+  def self.assignable_foreign_keys
+    %w[referrer_id]
+  end
+
   def to_param
     slug
   end

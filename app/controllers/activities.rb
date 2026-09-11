@@ -9,10 +9,10 @@ Dandelion::App.controller do
   end
 
   post '/activities/new' do
-    @activity = Activity.new(mass_assigning(params[:activity], Activity))
-    @activity.account = current_account
-    @organisation = @activity.organisation
+    @organisation = Organisation.find(params.dig(:activity, :organisation_id)) || not_found
     organisation_admins_only!
+    @activity = @organisation.activities.new(mass_assigning(params[:activity], Activity))
+    @activity.account = current_account
     if @activity.save
       flash[:notice] = 'The activity was created.'
       redirect "/activities/#{@activity.id}"

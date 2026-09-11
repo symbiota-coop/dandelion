@@ -12,11 +12,17 @@ class InventoryItem
   field :name, type: String
   field :description, type: String
 
+  def self.assignable_foreign_keys
+    %w[team_id]
+  end
+
   validates_presence_of :name, :gathering, :account, :membership
 
   before_validation do
     self.membership = gathering.memberships.find_by(account: account) if gathering && account && !membership
   end
+
+  validates_same_parent :team, via: :gathering
 
   has_many :notifications, as: :notifiable, dependent: :destroy
   after_create do
