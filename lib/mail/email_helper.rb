@@ -4,6 +4,7 @@ module EmailHelper
   def self.replace_youtube_oembeds(html)
     return html unless html
 
+    html = Sanitize.fragment(html, Sanitize::Config::DANDELION)
     html
       .gsub(%r{<oembed url="https://(?:youtu\.be/|www\.youtube\.com/watch\?v=)(\w+)"></oembed>}) do
         video_id = ::Regexp.last_match(1)

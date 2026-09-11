@@ -6,6 +6,7 @@ Dandelion::App.controller do
 
     case content_type
     when :html
+      headers['Content-Security-Policy'] = "default-src 'none'; img-src 'self' https: http: data:; style-src 'unsafe-inline'; script-src 'none'; object-src 'none'; base-uri 'none'"
       @title = "Order confirmation for #{@event.name}"
       header_image_url, = @order.sender_info
 

@@ -403,6 +403,21 @@ class EventsTest < ActiveSupport::TestCase
     end
   end
 
+  test 'ticket email strips event-handler attributes from editor HTML' do
+    create_event(
+      prices: [0],
+      extra_info_for_ticket_email: '<img src=x onerror=alert(1)><p>Zoom link</p>',
+      ticket_email_greeting: '<p>Hello</p><img src=x onerror=alert(1)>'
+    )
+    order = @event.orders.new(account: @account)
+    html = EmailHelper.html(:tickets, event: @event, order: order, account: @account, tickets_table: '', header_image_url: nil)
+
+    refute_match(/onerror/i, html)
+    refute_includes html, 'alert(1)'
+    assert_includes html, 'Zoom link'
+    assert_includes html, 'Hello'
+  end
+
   test 'organisation admin can enable show_emails and featured' do
     create_event(prices: [0], show_emails: false, featured: false)
 

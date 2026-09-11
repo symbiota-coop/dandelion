@@ -79,6 +79,7 @@ Dandelion::App.controller do
   get '/events/:id/ticket_email_preview' do
     @event = Event.find(params[:id]) || not_found
     event_admins_only!
+    headers['Content-Security-Policy'] = "default-src 'none'; img-src 'self' https: http: data:; style-src 'unsafe-inline'; script-src 'none'; object-src 'none'; base-uri 'none'"
     order = @event.orders.new
     order.tickets.new(ticket_type: @event.ticket_types.first)
     order.tickets.new(ticket_type: @event.ticket_types.first)
