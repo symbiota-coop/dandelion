@@ -36,7 +36,7 @@ class Gathering
     %w[
       account_id redirect_home balance processed_via_dandelion membership_count
       stripe_endpoint_secret paypal_email choose_and_pay_label
-      coordinates has_image image_uid image_width_unmagic image_height_unmagic
+      coordinates has_image image_uid image_url image_width_unmagic image_height_unmagic
     ]
   end
 

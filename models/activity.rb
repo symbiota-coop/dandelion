@@ -41,7 +41,7 @@ class Activity
   end
 
   def self.protected_attributes
-    %w[account_id feedback_summary feedback_summary_last_refreshed_at has_image image_uid]
+    %w[account_id feedback_summary feedback_summary_last_refreshed_at has_image image_uid image_url]
   end
 
   def self.search_fields

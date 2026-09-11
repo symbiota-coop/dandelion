@@ -21,7 +21,7 @@ class Comment
   end
 
   def self.protected_attributes
-    %w[force sent_at file_uid]
+    %w[force sent_at file_uid file_url]
   end
 
   attr_accessor :via_email

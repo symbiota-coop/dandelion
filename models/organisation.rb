@@ -78,6 +78,7 @@ class Organisation
       contribution_requested_gbp_cache contribution_paid_gbp_cache
       followers_count subscribed_accounts_count monthly_donors_count monthly_donations_count
       feedback_summary feedback_summary_last_refreshed_at
+      image_url
     ]
   end
 

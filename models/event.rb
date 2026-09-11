@@ -39,7 +39,7 @@ class Event
   end
 
   def self.protected_attributes
-    %w[raw_description direct_charges trending last_saved_by_id]
+    %w[raw_description direct_charges trending last_saved_by_id image_url]
   end
 
   MAX_FEEDBACK_HOURS_AFTER = 30 * 24
