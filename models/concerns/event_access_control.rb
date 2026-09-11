@@ -1,6 +1,24 @@
 module EventAccessControl
   extend ActiveSupport::Concern
 
+  def can_assign_activity?(account)
+    return false unless activity && account
+
+    Activity.admin?(activity, account) ||
+      (organisation && activity.organisation_id == organisation.id && Organisation.admin_or_event_manager?(organisation, account))
+  end
+
+  def can_assign_local_group?(account)
+    return false unless local_group && account
+
+    LocalGroup.admin?(local_group, account) ||
+      (organisation && local_group.organisation_id == organisation.id && Organisation.admin_or_event_manager?(organisation, account))
+  end
+
+  def can_bulk_update_activity_events?(account = last_saved_by)
+    can_assign_activity?(account)
+  end
+
   class_methods do
     def revenue_admin?(event, account, activity_admin: nil, local_group_admin: nil, organisation_admin: nil)
       account &&

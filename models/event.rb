@@ -39,7 +39,7 @@ class Event
   end
 
   def self.protected_attributes
-    %w[raw_description direct_charges trending]
+    %w[raw_description direct_charges trending last_saved_by_id]
   end
 
   MAX_FEEDBACK_HOURS_AFTER = 30 * 24
@@ -51,8 +51,10 @@ class Event
     last_saved_by
   ].freeze
 
-  after_save :bulk_update_activity_events, if: -> { activity && update_activity_events.to_s == '1' }
+  after_save :bulk_update_activity_events, if: -> { update_activity_events.to_s == '1' && can_bulk_update_activity_events? }
   def bulk_update_activity_events
+    return unless can_bulk_update_activity_events?
+
     activity.events.future.and(:id.ne => id).each do |event|
       COPY_FIELDS.each { |f| event.send("#{f}=", send(f)) }
       event.save!

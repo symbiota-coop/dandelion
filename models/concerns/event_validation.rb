@@ -46,18 +46,18 @@ module EventValidation
         end
       end
 
-      if new_record? && !duplicate
-        org_wide_ok = Organisation.admin_or_event_manager?(organisation, account)
-        errors.add(:organisation, "- you don't have permission to create events for this organisation") if !local_group && !activity && !organisation&.allow_event_submissions && !org_wide_ok
-        if activity
-          activity_ok = Activity.admin?(activity, account) || (organisation && activity.organisation_id == organisation.id && org_wide_ok)
-          errors.add(:activity, "- you don't have permission to create events for this activity") unless activity_ok
-        end
-        if local_group
-          local_group_ok = LocalGroup.admin?(local_group, account) || (organisation && local_group.organisation_id == organisation.id && org_wide_ok)
-          errors.add(:local_group, "- you don't have permission to create events for this local group") unless local_group_ok
-        end
+      errors.add(:activity, 'must belong to this organisation') if activity && organisation && activity.organisation_id != organisation.id && (new_record? || activity_id_changed?)
+      errors.add(:local_group, 'must belong to this organisation') if local_group && organisation && local_group.organisation_id != organisation.id && (new_record? || local_group_id_changed?)
+
+      if !duplicate && (new_record? || activity_id_changed? || local_group_id_changed?)
+        actor = new_record? ? account : last_saved_by
+        org_wide_ok = Organisation.admin_or_event_manager?(organisation, actor)
+        errors.add(:organisation, "- you don't have permission to create events for this organisation") if new_record? && !local_group && !activity && !organisation&.allow_event_submissions && !org_wide_ok
+        errors.add(:activity, "- you don't have permission to create events for this activity") if activity && (new_record? || activity_id_changed?) && !can_assign_activity?(actor)
+        errors.add(:local_group, "- you don't have permission to create events for this local group") if local_group && (new_record? || local_group_id_changed?) && !can_assign_local_group?(actor)
       end
+
+      errors.add(:update_activity_events, "- you don't have permission to update all events in this activity") if update_activity_events.to_s == '1' && !can_bulk_update_activity_events?
 
       self.stripe_revenue_adjustment = 0 unless stripe_revenue_adjustment
       self.revenue_share_to_revenue_sharer = 0 unless revenue_share_to_revenue_sharer

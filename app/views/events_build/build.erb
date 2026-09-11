@@ -318,7 +318,7 @@
         <%= f.check_box_block :show_emails %>
         <%= f.check_box_block :opt_in_organisation %>
         <%= f.check_box_block :opt_in_facilitator %>
-        <% if @event.activity %>
+        <% if @event.activity && @event.can_bulk_update_activity_events?(current_account) %>
           <%= f.check_box_block :update_activity_events %>
         <% end %>
         <% if !@event.organisation.stripe_client_id %>

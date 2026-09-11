@@ -327,6 +327,93 @@ class EventsTest < ActiveSupport::TestCase
     assert_cannot_reassign_organisation_or_account(@event)
   end
 
+  test 'activity and local group must belong to the event organisation' do
+    create_event
+    other_org = FactoryBot.create(:organisation)
+    foreign_activity = FactoryBot.create(:activity, organisation: other_org)
+    foreign_local_group = FactoryBot.create(:local_group, organisation: other_org)
+
+    @event.activity = foreign_activity
+    @event.last_saved_by = @account
+    refute @event.valid?
+    assert_includes @event.errors[:activity], 'must belong to this organisation'
+
+    @event.reload
+    @event.local_group = foreign_local_group
+    @event.last_saved_by = @account
+    refute @event.valid?
+    assert_includes @event.errors[:local_group], 'must belong to this organisation'
+  end
+
+  test 'event facilitator cannot assign an activity they do not admin' do
+    create_full_event_hierarchy
+    other_activity = FactoryBot.create(:activity, organisation: @organisation)
+    facilitator = FactoryBot.create(:account)
+    @event.event_facilitations.create!(account: facilitator)
+
+    @event.activity = other_activity
+    @event.last_saved_by = facilitator
+    refute @event.valid?
+    assert_includes @event.errors[:activity], "- you don't have permission to create events for this activity"
+  end
+
+  test 'event facilitator cannot bulk update other activity events' do
+    create_full_event_hierarchy
+    other = FactoryBot.create(:event, organisation: @organisation, activity: @activity, name: 'Keep me')
+    facilitator = FactoryBot.create(:account)
+    @event.event_facilitations.create!(account: facilitator)
+
+    refute @event.can_bulk_update_activity_events?(facilitator)
+
+    @event.name = 'Overwrite'
+    @event.update_activity_events = '1'
+    @event.last_saved_by = facilitator
+    refute @event.valid?
+    assert_includes @event.errors[:update_activity_events], "- you don't have permission to update all events in this activity"
+
+    @event.update_activity_events = nil
+    assert @event.save
+    @event.update_activity_events = '1'
+    @event.bulk_update_activity_events_without_delay
+    assert_equal 'Keep me', other.reload.name
+  end
+
+  test 'org event manager can assign an activity and bulk update its events' do
+    create_full_event_hierarchy
+    manager = add_event_manager(@organisation)
+    other_activity = FactoryBot.create(:activity, organisation: @organisation)
+    other = FactoryBot.create(:event, organisation: @organisation, activity: other_activity, name: 'Old name')
+
+    @event.activity = other_activity
+    @event.last_saved_by = manager
+    assert @event.valid?, @event.errors.full_messages.join(', ')
+    assert @event.can_bulk_update_activity_events?(manager)
+
+    @event.name = 'Manager copy'
+    @event.update_activity_events = '1'
+    assert @event.save
+    @event.bulk_update_activity_events_without_delay
+    assert_equal 'Manager copy', other.reload.name
+  end
+
+  test 'activity admin can bulk update future activity events' do
+    create_full_event_hierarchy
+    other = FactoryBot.create(:event, organisation: @organisation, activity: @activity, name: 'Old name', extra_info_for_ticket_email: 'old zoom')
+
+    assert @event.can_bulk_update_activity_events?(@account)
+
+    @event.name = 'Shared title'
+    @event.extra_info_for_ticket_email = 'new zoom'
+    @event.update_activity_events = '1'
+    @event.last_saved_by = @account
+    assert @event.save
+    @event.bulk_update_activity_events_without_delay
+
+    other.reload
+    assert_equal 'Shared title', other.name
+    assert_equal 'new zoom', other.extra_info_for_ticket_email
+  end
+
   test 'redirect_url must be a valid http or https URL' do
     create_organisation
     event = FactoryBot.build(:event, organisation: @organisation)
