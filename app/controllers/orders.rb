@@ -1,6 +1,6 @@
 Dandelion::App.controller do
   get '/orders/:id', provides: %i[html pdf ics] do
-    @order = Order.find(params[:id]) || not_found
+    @order = Order.complete.find(params[:id]) || not_found
     @event = @order.event
     account = @order.account || not_found
 
