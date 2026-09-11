@@ -36,10 +36,6 @@ class Order
     %w[payment_completed token]
   end
 
-  def self.random_token
-    SecureRandom.urlsafe_base64(24)
-  end
-
   # Looks up an order by its token. Orders that predate tokens (and so were
   # only ever linked to by Mongo id) can still be looked up by id, but orders
   # that have a token are deliberately not reachable by their id.
@@ -171,7 +167,7 @@ class Order
 
   def mint_token
     loop do
-      generated = self.class.random_token
+      generated = SecureRandom.uuid
       unless Order.and(token: generated).exists?
         self.token = generated
         break

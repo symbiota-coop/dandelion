@@ -44,7 +44,7 @@ class OrdersTest < ActiveSupport::TestCase
 
     assert @order.token.present?
     refute_equal @order.id.to_s, @order.token
-    refute_match(/\A[0-9a-fA-F]{24}\z/, @order.token)
+    assert_match(/\A\h{8}-\h{4}-4\h{3}-[89ab]\h{3}-\h{12}\z/, @order.token)
   end
 
   def make_legacy_order
