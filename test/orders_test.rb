@@ -151,15 +151,28 @@ class OrdersTest < ActiveSupport::TestCase
     assert_includes last_response.body, "/orders/#{@order.id}"
   end
 
-  test 'event page does not show the success card for an incomplete order' do
+  test 'event page shows the pending card instead of the success card for an incomplete order' do
     create_complete_order
-    @order.set(payment_completed: false)
+    @order.set(payment_completed: false, oc_secret: 'ocsecret')
 
     get "/e/#{@event.slug}?order_id=#{@order.token}&success=true"
     assert_equal 200, last_response.status
     refute_includes last_response.body, 'Thanks for booking'
-    refute_includes last_response.body, "/orders/#{@order.token}"
+    assert_includes last_response.body, 'confirming your payment with Open Collective'
+    assert_includes last_response.body, "/orders/#{@order.token}/payment_completed"
+    refute_includes last_response.body, %(href="/orders/#{@order.token}")
     assert_equal 'no-referrer', referrer_policy
+  end
+
+  test 'event page shows neither card for an incomplete order without a payment return' do
+    create_complete_order
+    @order.set(payment_completed: false)
+
+    get "/e/#{@event.slug}?order_id=#{@order.token}"
+    assert_equal 200, last_response.status
+    refute_includes last_response.body, 'Thanks for booking'
+    refute_includes last_response.body, 'Confirming your payment'
+    refute_includes last_response.body, "/orders/#{@order.token}"
   end
 
   test 'event page sets referrer policy when the order is shown via GoCardless return' do

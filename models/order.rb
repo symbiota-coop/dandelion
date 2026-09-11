@@ -44,7 +44,7 @@ class Order
   # only ever linked to by Mongo id) can still be looked up by id, but orders
   # that have a token are deliberately not reachable by their id.
   def self.find_by_id_or_token(id_or_token)
-    return if id_or_token.blank?
+    return unless id_or_token.is_a?(String) && id_or_token.present?
 
     if (order = find_by(token: id_or_token))
       order

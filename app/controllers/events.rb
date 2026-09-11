@@ -176,26 +176,26 @@ Dandelion::App.controller do
     if params[:order_id]
       @order = @event.orders.find_by_id_or_token(params[:order_id]) || not_found
     end
-    if params[:payment_request_id] || params[:billing_request_id]
+    if (params[:payment_request_id] || params[:billing_request_id]) && !params[:cancelled]
       gocardless_order = if params[:payment_request_id]
                            @event.orders.find_by(gocardless_payment_request_id: params[:payment_request_id])
                          else
                            @event.orders.find_by(gocardless_billing_request_id: params[:billing_request_id])
                          end
-      if gocardless_order && !params[:cancelled]
-        if gocardless_order.payment_completed?
-          @order = gocardless_order
-        else
-          @gocardless_order = gocardless_order
-        end
-      end
+      @order = gocardless_order if gocardless_order
     end
     if @order && params[:success] && !@order.payment_completed? && @event.oc_slug
       @event.check_oc_event
-      @order = @event.orders.find_by_id_or_token(params[:order_id]) if params[:order_id]
+      @order.reload
     end
-    headers['Referrer-Policy'] = 'no-referrer' if @order || @gocardless_order
-    @order = nil unless @order&.payment_completed?
+    headers['Referrer-Policy'] = 'no-referrer' if @order
+    unless @order&.payment_completed?
+      # Returned from a payment provider (Stripe, GoCardless, Open Collective)
+      # before the payment has been confirmed: show the pending card, which polls
+      # /payment_completed, rather than the success card or the ticket form.
+      @pending_order = @order if @order && (params[:success] || params[:payment_request_id] || params[:billing_request_id])
+      @order = nil
+    end
     @og_desc = when_details(@event) || 'On-demand'
     @title = @event.name
     @organisation = @event.organisation

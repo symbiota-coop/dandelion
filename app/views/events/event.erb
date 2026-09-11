@@ -42,17 +42,21 @@
   <div class="col-lg-10">
     <% if @order %>
       <%= partial :'events/success' %>
-    <% elsif @gocardless_order %>
+    <% elsif @pending_order %>
+      <% payment_provider = if @pending_order.gocardless_payment_request_id || @pending_order.gocardless_billing_request_id then 'GoCardless'
+                            elsif @pending_order.oc_secret then 'Open Collective'
+                            elsif @pending_order.session_id then 'Stripe'
+                            end %>
       <div class="card shadow-sm mb-3">
         <h3 class="card-header bg-primary text-white">Confirming your payment</h3>
         <div class="card-body readable">
-          <p class="mb-0">We're confirming your payment with GoCardless... <i class="bi bi-spin bi-slash-lg"></i></p>
+          <p class="mb-0">We're confirming your payment<%= " with #{payment_provider}" if payment_provider %>... <i class="bi bi-spin bi-slash-lg"></i></p>
         </div>
       </div>
       <script>
         $(function () {
           setInterval(function () {
-            $.getJSON('/events/<%= @event.id %>/orders/<%= @gocardless_order.public_id %>/payment_completed', function (data) {
+            $.getJSON('/events/<%= @event.id %>/orders/<%= @pending_order.public_id %>/payment_completed', function (data) {
               if (data.payment_completed) { window.location.reload() }
             })
           }, 3 * 1000)
@@ -64,7 +68,7 @@
   </div>
 </div>
 
-<% unless @order || @gocardless_order %>
+<% unless @order || @pending_order %>
   <% sidebar = false %>
   <% sidebar = true if @event.sold_out? || @event.purchase_url %>
   <% get_tickets_fixed_bottom_style = 'class="fixed-bottom bg-white p-3 w-100 d-block d-md-none" style="z-index: 1019; box-shadow: 0px -2px 4px 0px rgba(0,0,0,0.3);"' %>
