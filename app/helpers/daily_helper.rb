@@ -7,7 +7,7 @@ Dandelion::App.helpers do
       <div class="article">
         <h2 class="article-title">#{title}</h2>
         <div class="article-content">
-          #{md(generate_events_summary(prompt_prefix, events, use_feedback: use_feedback))}
+          #{Sanitize.fragment(md(generate_events_summary(prompt_prefix, events, use_feedback: use_feedback)), Sanitize::Config::DANDELION)}
         </div>
       </div>
     HTML

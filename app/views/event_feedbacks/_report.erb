@@ -8,4 +8,4 @@ Further instructions (don't mention in your response):
 The feedback:\n\n#{feedback}}
   content = OpenRouter.chat(prompt).split('1.').last
 %>
-<%== md(%(#{intro}:\n\n1. #{content})) %>
+<%== Sanitize.fragment(md(%(#{intro}:\n\n1. #{content})), Sanitize::Config::DANDELION) %>
