@@ -96,7 +96,9 @@
   <div class="container">
     <div class="tab-content mt-3">
       <div role="tabpanel" class="tab-pane active" id="tab-basics">
-        <%= f.hidden_field :organisation_id, value: @event.organisation_id %>
+        <% if @event.new_record? %>
+          <%= f.hidden_field :organisation_id, value: @event.organisation_id %>
+        <% end %>
         <%= f.text_block :name %>
         <div <% unless @event.evergreen? %>style="display: none;"<% end %>>
           <%= f.check_box_block :evergreen %>

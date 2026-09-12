@@ -36,6 +36,7 @@ class TicketType
   has_many :photos, as: :photoable, dependent: :destroy
 
   validates_presence_of :name, :quantity
+  validates_same_parent :ticket_group, via: :event
 
   before_validation do
     if @price_or_range_submitted

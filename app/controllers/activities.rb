@@ -9,7 +9,8 @@ Dandelion::App.controller do
   end
 
   post '/activities/new' do
-    @organisation = Organisation.find(params.dig(:activity, :organisation_id)) || not_found
+    organisation_id = params.dig(:activity, :organisation_id)
+    @organisation = (Organisation.find(organisation_id) if organisation_id) || not_found
     organisation_admins_only!
     @activity = @organisation.activities.new(mass_assigning(params[:activity], Activity))
     @activity.account = current_account

@@ -44,7 +44,7 @@ class Order
 
     if (order = find_by(token: id_or_token))
       order
-    elsif id_or_token.to_s.match?(/\A[0-9a-fA-F]{24}\z/) && (order = find(id_or_token)) && order.token.blank?
+    elsif id_or_token.match?(/\A[0-9a-fA-F]{24}\z/) && (order = find(id_or_token)) && order.token.blank?
       order
     end
   end

@@ -105,8 +105,10 @@ Dandelion::App.controller do
     gathering_admins_only!
     @rota = @gathering.rotas.find(params[:id]) || not_found
     shift_params = (params[:shift] || {}).dup
-    role = @rota.roles.find(shift_params.delete(:role_id)) || not_found
-    rslot = @rota.rslots.find(shift_params.delete(:rslot_id)) || not_found
+    role_id = shift_params.delete(:role_id)
+    rslot_id = shift_params.delete(:rslot_id)
+    role = (@rota.roles.find(role_id) if role_id) || not_found
+    rslot = (@rota.rslots.find(rslot_id) if rslot_id) || not_found
     @rota.shifts.create(mass_assigning(shift_params, Shift).merge(role: role, rslot: rslot))
     redirect "/g/#{params[:slug]}/rotas/#{params[:id]}"
   end
@@ -230,8 +232,8 @@ Dandelion::App.controller do
     @rota = Rota.find(params[:rota_id]) || not_found
     @gathering = @rota.gathering
     confirmed_membership_required!
-    role = @rota.roles.find(params[:role_id]) || not_found
-    rslot = @rota.rslots.find(params[:rslot_id]) || not_found
+    role = (@rota.roles.find(params[:role_id]) if params[:role_id]) || not_found
+    rslot = (@rota.rslots.find(params[:rslot_id]) if params[:rslot_id]) || not_found
     Shift.create(account: (params[:na] ? nil : current_account), rota: @rota, rslot: rslot, role: role)
     200
   end

@@ -9,7 +9,8 @@ Dandelion::App.controller do
   end
 
   post '/local_groups/new' do
-    @organisation = Organisation.find(params.dig(:local_group, :organisation_id)) || not_found
+    organisation_id = params.dig(:local_group, :organisation_id)
+    @organisation = (Organisation.find(organisation_id) if organisation_id) || not_found
     organisation_admins_only!
     @local_group = @organisation.local_groups.new(mass_assigning(params[:local_group], LocalGroup))
     @local_group.account = current_account

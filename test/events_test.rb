@@ -514,6 +514,31 @@ class EventsTest < ActiveSupport::TestCase
     assert_includes html, 'Hello'
   end
 
+  test 'nested ticket type cannot reference another event ticket group' do
+    create_event(prices: [0])
+    own_group = @event.ticket_groups.create!(name: 'Own', capacity: 10)
+    other_organisation = FactoryBot.create(:organisation, account: FactoryBot.create(:account))
+    other_event = FactoryBot.create(:event, organisation: other_organisation, prices: [0])
+    other_group = other_event.ticket_groups.create!(name: 'Backstage', capacity: 10)
+    ticket_type = @event.ticket_types.first
+
+    sign_in_with_rack(@account)
+    post "/e/#{@event.slug}/edit", event: {
+      ticket_types_attributes: { '0' => { id: ticket_type.id.to_s, name: ticket_type.name, quantity: ticket_type.quantity.to_s, ticket_group_id: other_group.id.to_s } }
+    }
+
+    refute last_response.redirect?
+    assert_nil ticket_type.reload.ticket_group_id
+    assert_empty other_group.tickets
+
+    post "/e/#{@event.slug}/edit", event: {
+      ticket_types_attributes: { '0' => { id: ticket_type.id.to_s, name: ticket_type.name, quantity: ticket_type.quantity.to_s, ticket_group_id: own_group.id.to_s } }
+    }
+
+    assert last_response.redirect?, last_response.body
+    assert_equal own_group.id, ticket_type.reload.ticket_group_id
+  end
+
   test 'organisation admin can enable show_emails and featured' do
     create_event(prices: [0], show_emails: false, featured: false)
 

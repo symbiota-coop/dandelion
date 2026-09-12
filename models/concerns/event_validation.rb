@@ -62,12 +62,17 @@ module EventValidation
 
       actor = last_saved_by || account
       unless duplicate || Event.revenue_admin?(self, actor)
+        # nil and 0 are equivalent for the numeric fields (they are normalised to 0
+        # further down), so re-validating the same object must not count that as a change.
+        revenue_setting_changed = lambda do |attr|
+          send("#{attr}_changed?") && !(send("#{attr}_was").to_f.zero? && send(attr).to_f.zero?)
+        end
         errors.add(:revenue_sharer, '- you cannot change this setting') if revenue_sharer_id_changed?
-        errors.add(:revenue_share_to_revenue_sharer, '- you cannot change this setting') if revenue_share_to_revenue_sharer_changed?
-        errors.add(:stripe_revenue_adjustment, '- you cannot change this setting') if stripe_revenue_adjustment_changed?
+        errors.add(:revenue_share_to_revenue_sharer, '- you cannot change this setting') if revenue_setting_changed.call(:revenue_share_to_revenue_sharer)
+        errors.add(:stripe_revenue_adjustment, '- you cannot change this setting') if revenue_setting_changed.call(:stripe_revenue_adjustment)
         Event.profit_share_roles.each do |role|
           attr = :"profit_share_to_#{role}"
-          errors.add(attr, '- you cannot change this setting') if send("#{attr}_changed?")
+          errors.add(attr, '- you cannot change this setting') if revenue_setting_changed.call(attr)
         end
       end
 
