@@ -54,7 +54,10 @@ module ActiveSupport
       Capybara.reset_sessions!
       Dir.glob(Padrino.root('models', '*.rb')).each do |f|
         model = f.split('/').last.split('.').first.camelize.constantize
-        model.delete_all if model.respond_to?(:delete_all)
+        next unless model.respond_to?(:delete_all)
+
+        # Paranoia models scope delete_all to non-deleted rows; purge soft-deleted rows too
+        (model.respond_to?(:unscoped) ? model.unscoped : model).delete_all
       end
     end
 
