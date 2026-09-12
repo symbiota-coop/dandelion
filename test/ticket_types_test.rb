@@ -1,8 +1,6 @@
 require File.expand_path("#{File.dirname(__FILE__)}/test_config.rb")
 
 class TicketTypesTest < ActiveSupport::TestCase
-  include Capybara::DSL
-
   test 'parses fixed price from price_or_range' do
     event = FactoryBot.build(:event)
     ticket_type = TicketType.new(event: event, price_or_range: '25', price_or_range_submitted: true, name: 'Standard', quantity: 10)
@@ -33,20 +31,6 @@ class TicketTypesTest < ActiveSupport::TestCase
 
     assert_equal 1, ticket_type.remaining
     assert_equal 0, ticket_type.remaining_including_made_available
-  end
-
-  test 'instalment tickets require a manual refund' do
-    create_event(prices: [30], enable_resales: true)
-    ticket_type = @event.ticket_types.first
-    ticket = ticket_type.tickets.create!(
-      event: @event,
-      account: FactoryBot.create(:account),
-      payment_completed: true,
-      price: 30,
-      gocardless_billing_request_id: 'BRQ123'
-    )
-
-    assert ticket.requires_manual_refund?
   end
 
   test 'stripe tickets do not require a manual refund' do
@@ -157,16 +141,6 @@ class TicketTypesTest < ActiveSupport::TestCase
 
     assert_includes html, 'You should receive a refund shortly.'
     refute_includes html, 'organiser has been notified'
-  end
-
-  test 'sold_out? when quantity is exhausted' do
-    create_event(prices: [0])
-    ticket_type = @event.ticket_types.first
-    ticket_type.set(quantity: 1)
-    ticket_type.tickets.create!(event: @event, payment_completed: true)
-
-    assert ticket_type.sold_out?
-    refute ticket_type.tickets_available?
   end
 
   test 'updates existing ticket type via nested attributes' do

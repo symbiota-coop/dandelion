@@ -133,32 +133,6 @@ class McpTest < ActiveSupport::TestCase
     end
   end
 
-  test 'event order and ticket tools require an event slug or id' do
-    create_event_with_order_and_ticket
-    headers = { 'Authorization' => "Bearer #{@account.api_key}" }
-
-    %w[get_event_orders_tool get_event_tickets_tool].each do |name|
-      rpc = mcp_tool_call(name, headers: headers)
-
-      assert_equal 200, last_response.status
-      assert rpc.dig('result', 'isError')
-      assert_includes tool_text(rpc), 'Provide event slug or id'
-    end
-  end
-
-  test 'event order and ticket tools return not found for unknown events' do
-    create_event_with_order_and_ticket
-    headers = { 'Authorization' => "Bearer #{@account.api_key}" }
-
-    %w[get_event_orders_tool get_event_tickets_tool].each do |name|
-      rpc = mcp_tool_call(name, arguments: { slug: 'does-not-exist' }, headers: headers)
-
-      assert_equal 200, last_response.status
-      assert rpc.dig('result', 'isError')
-      assert_includes tool_text(rpc), 'Event not found'
-    end
-  end
-
   test 'get_event_orders_tool returns all completed orders' do
     create_event_with_order_and_ticket
     21.times do

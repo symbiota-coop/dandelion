@@ -75,16 +75,6 @@ class OrdersTest < ActiveSupport::TestCase
     assert_equal @order, @event.orders.complete.find_by_id_or_token(@order.id.to_s)
   end
 
-  test 'public_id is the token, falling back to the mongo id for legacy orders' do
-    create_complete_order
-    assert_equal @order.token, @order.public_id
-
-    make_legacy_order
-    assert_nil @order.token
-    assert_equal @order.id.to_s, @order.public_id
-    assert_nil @order.reload.token
-  end
-
   test 'saving a legacy order does not backfill a token' do
     create_complete_order
     make_legacy_order

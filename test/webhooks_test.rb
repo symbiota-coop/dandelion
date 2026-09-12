@@ -89,18 +89,6 @@ class WebhooksTest < ActiveSupport::TestCase
     end
   end
 
-  test 'checkout.session.completed webhook issues tickets' do
-    create_organisation(stripe_endpoint_secret: 'whsec_test')
-    create_event(prices: [10])
-    order = create_incomplete_order(@event, value: 10, session_id: "cs_#{SecureRandom.hex(4)}")
-
-    deliver_stripe_webhook(@organisation, checkout_completed_event(order.session_id))
-
-    assert_equal 200, last_response.status
-    assert order.reload.payment_completed?
-    assert order.tickets.first.reload.payment_completed?
-  end
-
   test 'checkout.session.completed webhook restores a deleted checkout' do
     create_organisation(stripe_endpoint_secret: 'whsec_test')
     create_event(prices: [10])

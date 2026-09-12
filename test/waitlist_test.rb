@@ -42,26 +42,12 @@ class WaitlistTest < ActiveSupport::TestCase
     # Should redirect with success message
     assert current_url.include?('added_to_waitlist=true'), 'Should redirect with waitlist confirmation'
 
-    # Verify waitship was created
     waitlist_account = Account.find_by(email: 'waitlist@example.com')
     assert waitlist_account.present?, 'Account should be created'
     assert @event.waitships.find_by(account: waitlist_account), 'Waitship should exist'
-  end
-
-  test 'waitlist creates organisationship, activityship, and local_groupship' do
-    create_full_event_hierarchy(event_options: { prices: [10] })
-    buyer = FactoryBot.create(:account)
-
-    # Create waitship directly to test the after_create callback
-    @event.waitships.create(account: buyer)
-
-    # Verify subscriptions were created
-    assert @organisation.organisationships.find_by(account: buyer),
-           'Should create organisationship'
-    assert @activity.activityships.find_by(account: buyer),
-           'Should create activityship for open activity'
-    assert @local_group.local_groupships.find_by(account: buyer),
-           'Should create local_groupship'
+    assert_associated(@organisation, waitlist_account, :organisationships)
+    assert_associated(@activity, waitlist_account, :activityships)
+    assert_associated(@local_group, waitlist_account, :local_groupships)
   end
 
   test 'waitship removed when ticket payment completed' do
@@ -94,14 +80,11 @@ class WaitlistTest < ActiveSupport::TestCase
     create_event(prices: [10])
     buyer = FactoryBot.create(:account)
 
-    # Create first waitship
     waitship1 = Waitship.create!(account: buyer, event: @event)
     assert waitship1.persisted?, 'First waitship should be created'
 
-    # Try to create duplicate via model
     waitship2 = Waitship.new(account: buyer, event: @event)
     assert_not waitship2.valid?, "Duplicate waitship should not be valid. Errors: #{waitship2.errors.full_messages}"
-    # Mongoid puts uniqueness errors on the field name (account_id)
     assert waitship2.errors[:account_id].present? || waitship2.errors[:account].present?,
            "Should have uniqueness error. All errors: #{waitship2.errors.full_messages}"
   end
