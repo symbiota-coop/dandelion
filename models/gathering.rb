@@ -115,7 +115,7 @@ class Gathering
     end
     if enable_teams
       general = teams.create! name: 'General', account: account, prevent_notifications: true
-      general.teamships.create! account: account, prevent_notifications: true
+      general.teamships.create! account: account, gathering: self, prevent_notifications: true
     end
   end
 

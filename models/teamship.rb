@@ -21,7 +21,6 @@ class Teamship
   end
 
   before_validation do
-    self.gathering = team.gathering if team && !gathering
     self.membership = gathering.memberships.find_by(account: account) if gathering && account && membership&.account_id != account_id
   end
 

@@ -14,7 +14,7 @@ Dandelion::App.controller do
     @team = @gathering.teams.build(mass_assigning(params[:team], Team))
     @team.account = current_account
     if @team.save
-      @team.teamships.create(account: current_account)
+      @team.teamships.create(account: current_account, gathering: @gathering)
       redirect "/g/#{@gathering.slug}/teams/#{@team.id}"
     else
       erb :'teams/build'
@@ -77,7 +77,7 @@ Dandelion::App.controller do
     @team = Team.find(params[:team_id]) || not_found
     @gathering = @team.gathering
     confirmed_membership_required!
-    Teamship.create(account: current_account, team_id: params[:team_id])
+    Teamship.create(account: current_account, team: @team, gathering: @gathering)
     redirect back
   end
 

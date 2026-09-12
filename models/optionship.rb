@@ -15,7 +15,6 @@ class Optionship
   validates_uniqueness_of :account, scope: :option
 
   before_validation do
-    self.gathering = option.gathering if option && !gathering
     self.membership = gathering.memberships.find_by(account: account) if gathering && account && membership&.account_id != account_id
     errors.add(:option, 'is full') if option && option.capacity && (option.optionships.count == option.capacity)
   end

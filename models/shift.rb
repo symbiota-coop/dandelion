@@ -17,7 +17,6 @@ class Shift
   validates_uniqueness_of :rslot, scope: :role
 
   before_validation do
-    self.rota = role.rota if role && !rota
     self.gathering = rota.gathering if rota && !gathering
     if gathering && account && (membership&.account_id != account_id || membership&.gathering_id != gathering_id)
       self.membership = gathering.memberships.find_by(account: account)
