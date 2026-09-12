@@ -42,7 +42,7 @@ A facilitator becomes an event admin of that event. Adding someone as a facilita
 
 By default, only organisation admins and event managers can see attendee email addresses. Turn on **Allow all event admins to view attendee emails** on an event if other event admins should see them too.
 
-Revenue sharer, ticket-revenue split, and profit-share fields can also be changed by admins of the event's activity, local group, or a co-host organisation. Other event admins (facilitators, organisers, coordinators, revenue sharers, and the event creator) cannot change them.
+Revenue sharer, ticket-revenue split, and profit-share fields can also be changed by admins of the event's activity or local group. Other event admins (facilitators, organisers, coordinators, revenue sharers, the event creator, and admins of co-host organisations) cannot change them.
 
 You can also share a [check-in scanner link](/docs/events#checking-people-in) with assistants so they can check people in without becoming event admins.
 

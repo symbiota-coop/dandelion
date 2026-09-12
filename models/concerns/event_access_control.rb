@@ -20,16 +20,24 @@ module EventAccessControl
   end
 
   class_methods do
-    def revenue_admin?(event, account, activity_admin: nil, local_group_admin: nil, organisation_admin: nil)
+    # Who may change an event's revenue sharer and profit-share settings.
+    # Unlike revenue_admin?, cohost admins are excluded: any event admin can
+    # add an organisation they control as a cohost, so trusting cohosts here
+    # would let them redirect the host organisation's ticket revenue.
+    def revenue_settings_admin?(event, account, activity_admin: nil, local_group_admin: nil, organisation_admin: nil)
       account &&
         event &&
         (
           account.admin? ||
           (event.activity && (activity_admin || (activity_admin.nil? && Activity.admin?(event.activity, account)))) ||
           (event.local_group && (local_group_admin || (local_group_admin.nil? && LocalGroup.admin?(event.local_group, account)))) ||
-          (event.organisation && Organisation.admin_or_event_manager?(event.organisation, account, organisation_admin: organisation_admin)) ||
-          event.cohosts.any? { |cohost| Organisation.admin_or_event_manager?(cohost, account) }
-      )
+          (event.organisation && Organisation.admin_or_event_manager?(event.organisation, account, organisation_admin: organisation_admin))
+        )
+    end
+
+    def revenue_admin?(event, account, activity_admin: nil, local_group_admin: nil, organisation_admin: nil)
+      revenue_settings_admin?(event, account, activity_admin: activity_admin, local_group_admin: local_group_admin, organisation_admin: organisation_admin) ||
+        (account && event && event.cohosts.any? { |cohost| Organisation.admin_or_event_manager?(cohost, account) })
     end
 
     def admin?(event, account, activity_admin: nil, local_group_admin: nil, organisation_admin: nil)

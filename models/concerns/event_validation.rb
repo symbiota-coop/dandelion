@@ -60,20 +60,22 @@ module EventValidation
 
       errors.add(:update_activity_events, "- you don't have permission to update all events in this activity") if update_activity_events.to_s == '1' && !can_bulk_update_activity_events?
 
-      actor = last_saved_by || account
-      unless duplicate || Event.revenue_admin?(self, actor)
-        # nil and 0 are equivalent for the numeric fields (they are normalised to 0
-        # further down), so re-validating the same object must not count that as a change.
-        revenue_setting_changed = lambda do |attr|
-          send("#{attr}_changed?") && !(send("#{attr}_was").to_f.zero? && send(attr).to_f.zero?)
-        end
-        errors.add(:revenue_sharer, '- you cannot change this setting') if revenue_sharer_id_changed?
-        errors.add(:revenue_share_to_revenue_sharer, '- you cannot change this setting') if revenue_setting_changed.call(:revenue_share_to_revenue_sharer)
-        errors.add(:stripe_revenue_adjustment, '- you cannot change this setting') if revenue_setting_changed.call(:stripe_revenue_adjustment)
-        Event.profit_share_roles.each do |role|
-          attr = :"profit_share_to_#{role}"
-          errors.add(attr, '- you cannot change this setting') if revenue_setting_changed.call(attr)
-        end
+      # nil and 0 are equivalent for the numeric fields (they are normalised to 0
+      # further down), so re-validating the same object must not count that as a change.
+      revenue_setting_changed = lambda do |attr|
+        send("#{attr}_changed?") && !(send("#{attr}_was").to_f.zero? && send(attr).to_f.zero?)
+      end
+      changed_revenue_settings = []
+      changed_revenue_settings << :revenue_sharer if revenue_sharer_id_changed?
+      changed_revenue_settings << :revenue_share_to_revenue_sharer if revenue_setting_changed.call(:revenue_share_to_revenue_sharer)
+      changed_revenue_settings << :stripe_revenue_adjustment if revenue_setting_changed.call(:stripe_revenue_adjustment)
+      Event.profit_share_roles.each do |role|
+        attr = :"profit_share_to_#{role}"
+        changed_revenue_settings << attr if revenue_setting_changed.call(attr)
+      end
+      # Cohost admins deliberately don't count here (see Event.revenue_settings_admin?).
+      if changed_revenue_settings.any? && !duplicate && !Event.revenue_settings_admin?(self, last_saved_by || account)
+        changed_revenue_settings.each { |attr| errors.add(attr, '- you cannot change this setting') }
       end
 
       self.stripe_revenue_adjustment = 0 unless stripe_revenue_adjustment

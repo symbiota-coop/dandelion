@@ -446,6 +446,35 @@ class EventsTest < ActiveSupport::TestCase
     assert_equal 'Still editable', @event.reload.name
   end
 
+  test 'cohost admin cannot change revenue share fields by adding their own organisation as cohost' do
+    create_organisation(stripe_client_id: 'ca_test')
+    create_event(prices: [0])
+    facilitator = FactoryBot.create(:account)
+    @event.event_facilitations.create!(account: facilitator)
+    facilitator.organisationships.create!(
+      organisation: @organisation,
+      stripe_connect_json: { 'stripe_user_id' => 'acct_facilitator' }.to_json
+    )
+    attacker_organisation = FactoryBot.create(:organisation, account: facilitator)
+
+    sign_in_with_rack(facilitator)
+    post "/events/#{@event.id}/cohostships/new", cohostship: { organisation_id: attacker_organisation.id.to_s }
+    assert @event.cohostships.find_by(organisation: attacker_organisation)
+    assert Event.revenue_admin?(@event.reload, facilitator)
+    refute Event.revenue_settings_admin?(@event, facilitator)
+
+    post "/e/#{@event.slug}/edit", event: {
+      organiser_id: '',
+      revenue_sharer_id: facilitator.id.to_s,
+      revenue_share_to_revenue_sharer: '100'
+    }
+
+    refute last_response.redirect?
+    @event.reload
+    assert_nil @event.revenue_sharer_id
+    assert_equal 0, @event.revenue_share_to_revenue_sharer
+  end
+
   test 'organisation admin can change revenue share fields' do
     create_organisation(stripe_client_id: 'ca_test')
     create_event(prices: [0])
