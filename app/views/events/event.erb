@@ -43,14 +43,10 @@
     <% if @order %>
       <%= partial :'events/success' %>
     <% elsif @pending_order %>
-      <% payment_provider = if @pending_order.gocardless_payment_request_id || @pending_order.gocardless_billing_request_id then 'GoCardless'
-                            elsif @pending_order.oc_secret then 'Open Collective'
-                            elsif @pending_order.session_id then 'Stripe'
-                            end %>
       <div class="card shadow-sm mb-3">
         <h3 class="card-header bg-primary text-white">Confirming your payment</h3>
         <div class="card-body readable">
-          <p class="mb-0">We're confirming your payment<%= " with #{payment_provider}" if payment_provider %>... <i class="bi bi-spin bi-slash-lg"></i></p>
+          <p class="mb-0">We're confirming your payment<%= " with #{@pending_order.payment_provider}" if @pending_order.payment_provider %>... <i class="bi bi-spin bi-slash-lg"></i></p>
         </div>
       </div>
       <script>

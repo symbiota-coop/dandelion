@@ -161,6 +161,16 @@ class Order
     payment_completed
   end
 
+  def payment_provider
+    if gocardless_payment_request_id || gocardless_billing_request_id
+      'GoCardless'
+    elsif oc_secret
+      'Open Collective'
+    elsif session_id
+      'Stripe'
+    end
+  end
+
   def evm_offset
     evm_secret.to_d / 1e6
   end
