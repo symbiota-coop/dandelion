@@ -21,7 +21,7 @@ module Dandelion
     use OmniAuth::Builder do
       provider :account
       provider :google_oauth2, ENV['GOOGLE_CLIENT_ID'], ENV['GOOGLE_CLIENT_SECRET'], { image_size: 400 }
-      provider :ethereum, { custom_title: 'Sign in with Ethereum' }
+      provider :ethereum
       provider :atproto,
                "#{ENV['BASE_URI']}/atproto/oauth-client-metadata.json",
                nil,

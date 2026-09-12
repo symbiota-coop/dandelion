@@ -379,7 +379,125 @@ class AccountsTest < ActiveSupport::TestCase
     assert_equal 0, created.provider_links.count
   end
 
+  # ═══════════════════════════════════════════════════════════════════════════
+  # Sign-In with Ethereum (EIP-4361)
+  # ═══════════════════════════════════════════════════════════════════════════
+
+  test 'siwe request phase renders a message bound to this site' do
+    clear_cookies
+    get '/auth/ethereum'
+    template = siwe_template_from(last_response)
+
+    assert_includes template, "127.0.0.1:#{ENV['PORT']} wants you to sign in with your Ethereum account:"
+    assert_includes template, "URI: #{ENV['BASE_URI']}/auth/ethereum/callback"
+    assert_match(/^Nonce: [A-Za-z0-9]{17}$/, template)
+    assert_includes template, 'Expiration Time:'
+  end
+
+  test 'siwe signs in an account whose wallet is linked, matching the address case-insensitively' do
+    key = OpenSSL::PKey::EC.generate('secp256k1')
+    address = siwe_address(key)
+    account = FactoryBot.create(:account)
+    account.provider_links.create!(provider: 'Ethereum', provider_uid: address.downcase, omniauth_hash: { 'uid' => address.downcase })
+
+    message, signature = siwe_start_and_sign(key)
+    post '/auth/ethereum/callback', siwe_message: message, siwe_signature: signature
+
+    assert last_response.redirect?
+    assert_equal '/', URI(last_response.location).path
+    assert_equal 1, account.reload.sign_ins.count
+  end
+
+  test 'siwe offers signup with a checksummed uid for an unknown wallet' do
+    key = OpenSSL::PKey::EC.generate('secp256k1')
+    message, signature = siwe_start_and_sign(key)
+    post '/auth/ethereum/callback', siwe_message: message, siwe_signature: signature
+
+    assert last_response.ok?
+    assert_includes last_response.body, "isn't yet connected to a Dandelion account"
+    assert_equal siwe_address(key), last_request.session['omniauth.auth']['uid']
+  end
+
+  test 'siwe rejects a replayed signature' do
+    key = OpenSSL::PKey::EC.generate('secp256k1')
+    message, signature = siwe_start_and_sign(key)
+    post '/auth/ethereum/callback', siwe_message: message, siwe_signature: signature
+    assert last_response.ok?
+
+    post '/auth/ethereum/callback', siwe_message: message, siwe_signature: signature
+    assert_siwe_failure 'missing_nonce'
+  end
+
+  test 'siwe rejects a callback via GET' do
+    key = OpenSSL::PKey::EC.generate('secp256k1')
+    message, signature = siwe_start_and_sign(key)
+    get '/auth/ethereum/callback', siwe_message: message, siwe_signature: signature
+    assert_siwe_failure 'invalid_request'
+
+    post '/auth/ethereum/callback', siwe_message: message, siwe_signature: signature
+    assert_siwe_failure 'missing_nonce'
+  end
+
+  test 'siwe rejects a message signed for a different nonce or domain' do
+    key = OpenSSL::PKey::EC.generate('secp256k1')
+    message, = siwe_start_and_sign(key)
+
+    forged = message.sub(/^Nonce: .*$/, "Nonce: #{Siwe.generate_nonce}")
+    post '/auth/ethereum/callback', siwe_message: forged, siwe_signature: siwe_sign(key, forged)
+    assert_siwe_failure 'nonce_mismatch'
+
+    message, = siwe_start_and_sign(key)
+    forged = message.sub(/\A[^ ]+/, 'evil.example')
+    post '/auth/ethereum/callback', siwe_message: forged, siwe_signature: siwe_sign(key, forged)
+    assert_siwe_failure 'domain_mismatch'
+  end
+
+  test 'siwe rejects a signature from a different wallet' do
+    key = OpenSSL::PKey::EC.generate('secp256k1')
+    other_key = OpenSSL::PKey::EC.generate('secp256k1')
+    message, = siwe_start_and_sign(key)
+    post '/auth/ethereum/callback', siwe_message: message, siwe_signature: siwe_sign(other_key, message)
+    assert_siwe_failure 'invalid_signature'
+  end
+
   private
+
+  def siwe_template_from(response)
+    assert response.ok?
+    match = response.body.match(/id="siwe_template" name="siwe_template" value="([^"]*)"/)
+    assert match, 'siwe_template input not found'
+    CGI.unescapeHTML(match[1])
+  end
+
+  def siwe_start_and_sign(key)
+    clear_cookies
+    get '/auth/ethereum'
+    message = siwe_template_from(last_response).sub(OmniAuth::Strategies::Ethereum::ADDRESS_PLACEHOLDER, siwe_address(key).downcase)
+    [message, siwe_sign(key, message)]
+  end
+
+  def siwe_address(key)
+    public_key = key.public_key.to_octet_string(:uncompressed)
+    Siwe::Crypto.checksum_address("0x#{Siwe::Crypto.keccak256(public_key.byteslice(1, 64)).byteslice(-20, 20).unpack1('H*')}")
+  end
+
+  def siwe_sign(key, message)
+    digest = Siwe::Crypto.eip191_hash(message)
+    r, s = OpenSSL::ASN1.decode(key.dsa_sign_asn1(digest)).value.map { |v| v.value.to_i }
+    address = siwe_address(key)
+    [27, 28].each do |v|
+      signature = "0x#{r.to_s(16).rjust(64, '0')}#{s.to_s(16).rjust(64, '0')}#{v.to_s(16)}"
+      return signature if Siwe::Crypto.recover_address(message, signature) == address
+    end
+    flunk 'could not produce a recoverable signature'
+  end
+
+  def assert_siwe_failure(reason)
+    assert last_response.redirect?, "expected a redirect to /auth/failure, got #{last_response.status}"
+    location = URI(last_response.location)
+    assert_equal '/auth/failure', location.path
+    assert_includes Rack::Utils.parse_query(location.query)['message'], reason
+  end
 
   def start_omniauth_signup
     clear_cookies

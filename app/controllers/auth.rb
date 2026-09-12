@@ -29,7 +29,7 @@ Dandelion::App.controller do
                   rescue StandardError
                     nil
                   end
-                  provider_uid ? ProviderLink.find_by(provider: @provider.display_name, provider_uid: provider_uid).try(:account) : nil
+                  ProviderLink.find_for(@provider.display_name, provider_uid).try(:account)
                 end
       if current_account && env['omniauth.auth']['provider'] != 'account' # already signed in; attempt to connect
         if account # someone's already connected

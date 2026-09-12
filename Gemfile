@@ -29,8 +29,8 @@ gem 'zstd-ruby'
 gem 'bcrypt'
 gem 'omniauth'
 gem 'omniauth-atproto'
-gem 'omniauth-ethereum', github: 'q9f/omniauth-ethereum.rb'
 gem 'omniauth-google-oauth2'
+gem 'siwe-rb', require: 'siwe'
 
 # Validation and testing
 gem 'better_html'
