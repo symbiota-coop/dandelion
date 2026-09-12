@@ -38,6 +38,10 @@ class TicketType
   validates_presence_of :name, :quantity
   validates_same_parent :ticket_group, via: :event
 
+  validate do
+    errors.add(:event, 'cannot be changed') if persisted? && event_id_changed?
+  end
+
   before_validation do
     if @price_or_range_submitted
       self.price = nil

@@ -568,6 +568,24 @@ class EventsTest < ActiveSupport::TestCase
     assert_equal own_group.id, ticket_type.reload.ticket_group_id
   end
 
+  test 'nested ticket types and groups cannot be moved to another event' do
+    create_event(prices: [0])
+    own_group = @event.ticket_groups.create!(name: 'Own', capacity: 10)
+    other_organisation = FactoryBot.create(:organisation, account: FactoryBot.create(:account))
+    other_event = FactoryBot.create(:event, organisation: other_organisation, prices: [0])
+    ticket_type = @event.ticket_types.first
+
+    sign_in_with_rack(@account)
+    post "/e/#{@event.slug}/edit", event: {
+      ticket_types_attributes: { '0' => { id: ticket_type.id.to_s, name: ticket_type.name, quantity: ticket_type.quantity.to_s, event_id: other_event.id.to_s } },
+      ticket_groups_attributes: { '0' => { id: own_group.id.to_s, name: own_group.name, capacity: own_group.capacity.to_s, event_id: other_event.id.to_s } }
+    }
+
+    refute last_response.redirect?
+    assert_equal @event.id, ticket_type.reload.event_id
+    assert_equal @event.id, own_group.reload.event_id
+  end
+
   test 'organisation admin can enable show_emails and featured' do
     create_event(prices: [0], show_emails: false, featured: false)
 

@@ -16,6 +16,10 @@ class TicketGroup
 
   validates_presence_of :name, :capacity
 
+  validate do
+    errors.add(:event, 'cannot be changed') if persisted? && event_id_changed?
+  end
+
   before_validation do
     errors.add(:capacity, 'must not be < 0') if capacity && capacity < 0
   end
