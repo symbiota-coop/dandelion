@@ -436,6 +436,21 @@ class EventsTest < ActiveSupport::TestCase
     assert_empty Array(@event.carousel_ids)
   end
 
+  test 'refresh_carousel_ids! keeps existing ids when rebuilding fails' do
+    create_event
+    tag = FactoryBot.create(:event_tag)
+    carousel = FactoryBot.create(:carousel, organisation: @organisation)
+    tag_carousel(carousel, tag)
+    tag_event(@event, tag)
+    Event.refresh_carousel_ids!
+
+    Carousel.stub(:each, proc { raise 'refresh failed' }) do
+      assert_raises(RuntimeError) { Event.refresh_carousel_ids! }
+    end
+
+    assert_equal [carousel.id], @event.reload.carousel_ids
+  end
+
   test 'organisation events json listing filters by stored carousel ids' do
     create_event(as: :matching)
     create_event(as: :other)

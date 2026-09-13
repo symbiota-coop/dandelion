@@ -131,7 +131,7 @@ Dandelion::App.controller do
       @cohost = Organisation.find(params[:cohost_id])
       @events = @events.and(:id.in => @cohost.cohosted_events.pluck(:id))
     end
-    if params[:carousel_id]
+    if params[:carousel_id] && !params[:deleted]
       @events = if params[:carousel_id] == 'featured'
                   @events.and(featured: true)
                 else

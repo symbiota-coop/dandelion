@@ -3,25 +3,29 @@ module EventCarouselIds
 
   class_methods do
     def refresh_carousel_ids!
+      carousel_ids = Carousel.pluck(:id)
       Event.collection.update_many(
-        { 'carousel_ids' => { '$exists' => true, '$ne' => [] } },
-        { '$set' => { 'carousel_ids' => [] } }
+        { 'deleted_at' => nil, 'carousel_ids' => { '$exists' => true, '$ne' => [] } },
+        { '$pull' => { 'carousel_ids' => { '$nin' => carousel_ids } } }
       )
 
       Carousel.each do |carousel|
         tag_ids = carousel.event_tag_ids
-        next if tag_ids.empty? || !carousel.organisation
-
         event_ids = EventTagship.and(:event_tag_id.in => tag_ids).only(:event_id).pluck(:event_id)
-        next if event_ids.empty?
-
-        ids = carousel.organisation.events_including_cohosted.and(:id.in => event_ids).pluck(:id)
-        next if ids.empty?
+        ids = if carousel.organisation && event_ids.any?
+                carousel.organisation.events_including_cohosted.and(:id.in => event_ids).pluck(:id)
+              else
+                []
+              end
 
         Event.collection.update_many(
-          { '_id' => { '$in' => ids } },
-          { '$addToSet' => { 'carousel_ids' => carousel.id } }
+          { 'deleted_at' => nil, 'carousel_ids' => carousel.id, '_id' => { '$nin' => ids } },
+          { '$pull' => { 'carousel_ids' => carousel.id } }
         )
+        Event.collection.update_many(
+          { 'deleted_at' => nil, '_id' => { '$in' => ids } },
+          { '$addToSet' => { 'carousel_ids' => carousel.id } }
+        ) if ids.any?
       end
     end
   end
