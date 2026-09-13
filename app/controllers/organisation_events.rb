@@ -29,7 +29,6 @@ Dandelion::App.controller do
     @events = @events.and(local_group_id: params[:local_group_id]) if params[:local_group_id]
     @events = @events.and(activity_id: params[:activity_id]) if params[:activity_id]
     carousel = nil
-    params[:carousel_ids] = [params[:carousel_id]] if params[:carousel_id]
     if params[:carousel_ids]
       ids = params[:carousel_ids]
       ids = case ids

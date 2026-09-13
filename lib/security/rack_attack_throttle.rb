@@ -16,6 +16,9 @@ BLOCKED_IP_RANGE = 'blocked ip range'.freeze
 bot_request = ->(request) { request.user_agent && BOT_USER_AGENT_PATTERNS.any? { |pattern| request.user_agent.downcase.include?(pattern) } }
 blocked_path = ->(request) { BLOCKED_PATH_PATTERNS.any? { |pattern| request.path.match?(pattern) } }
 throttled_path = ->(request) { THROTTLED_PATH_PATTERNS.any? { |pattern| request.path.match?(pattern) } }
+filtered_listing = lambda do |request|
+  request.params['q'] || request.params['search'] || request.params['carousel_ids']
+end
 invalid_xhr_header = lambda do |request|
   xhr = request.env['HTTP_X_REQUESTED_WITH']
   xhr && xhr != 'XMLHttpRequest' && xhr.match?(INVALID_XHR_HEADER_CHARS)
@@ -38,11 +41,11 @@ Rack::Attack.blocklist(INVALID_XHR_HEADER) do |request|
 end
 
 Rack::Attack.blocklist(BLOCK_BOTS_USING_SEARCH) do |request|
-  blocked_path.call(request) && (request.params['q'] || request.params['search']) && bot_request.call(request)
+  blocked_path.call(request) && filtered_listing.call(request) && bot_request.call(request)
 end
 
 Rack::Attack.blocklist(JS_CHALLENGE) do |request|
-  blocked_path.call(request) && (request.params['q'] || request.params['search']) && request.referer.nil?
+  blocked_path.call(request) && filtered_listing.call(request) && request.referer.nil?
 end
 
 Rack::Attack.blocklisted_responder = lambda do |request|
