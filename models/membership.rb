@@ -64,6 +64,7 @@ class Membership
 
     account = self.account
     gathering = self.gathering
+    safe_gathering_name = ERB::Util.html_escape(EmailHelper.strip_recipient_secrets(gathering.name))
 
     sign_in_details = if account.has_signed_in?
                         %(<a href="#{ENV['BASE_URI']}/g/#{gathering.slug}?sign_in_token=%recipient.token%">Sign in to get involved with the co-creation!</a>)
@@ -75,10 +76,9 @@ class Membership
     batch_message.subject "You're now a member of #{gathering.name}"
     batch_message.body_html(
       EmailHelper.html(content: gathering.welcome_email || gathering.welcome_email_default) do |content|
-        EmailHelper.replace_youtube_oembeds(
-          content.gsub('%gathering.name%', gathering.name)
-                 .gsub('%sign_in_details%', sign_in_details)
-        )
+        EmailHelper.replace_youtube_oembeds(content)
+                   .gsub('%gathering.name%', safe_gathering_name)
+                   .gsub('%sign_in_details%', sign_in_details)
       end
     )
 

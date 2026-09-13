@@ -1,10 +1,14 @@
 module EmailHelper
   MICROSOFT_DOMAINS = %w[hotmail msn outlook live].freeze
 
+  def self.strip_recipient_secrets(text)
+    text.to_s.gsub(/%recipient\.(?:token|org_unsubscribe_token|feedback_token|cancel_rsvp_url)%/i, '')
+  end
+
   def self.replace_youtube_oembeds(html)
     return html unless html
 
-    html = Sanitize.fragment(html, Sanitize::Config::DANDELION)
+    html = strip_recipient_secrets(Sanitize.fragment(html, Sanitize::Config::DANDELION))
     html
       .gsub(%r{<oembed url="https://(?:youtu\.be/|www\.youtube\.com/watch\?v=)(\w+)"></oembed>}) do
         video_id = ::Regexp.last_match(1)

@@ -5,8 +5,7 @@
           event: event,
           recipient_variables: true
         )
-        .gsub('[feedback_url]', "#{ENV['BASE_URI']}/events/#{event.id}/give_feedback?token=%recipient.feedback_token%")
-      ) %>
+      ).gsub('[feedback_url]', "#{ENV['BASE_URI']}/events/#{event.id}/give_feedback?token=%recipient.feedback_token%") %>
 </div>
 <div class="footer">
   <a href="<%= ENV['BASE_URI'] %>/accounts/subscriptions?sign_in_token=%recipient.token%">Opt out of requests for feedback</a>

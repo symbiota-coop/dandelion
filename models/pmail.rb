@@ -364,7 +364,6 @@ class Pmail
 
       batch_message.add_recipient(:to, account.email, {
                                     'firstname' => account.firstname || 'there',
-                                    'token' => account.sign_in_token,
                                     'id' => account.id.to_s,
                                     'username' => account.username,
                                     'view_or_activate' => (account.has_signed_in? ? 'View your profile' : 'Activate your account'),

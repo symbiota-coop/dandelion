@@ -20,7 +20,7 @@
   </head>
   <body>
     <div class="tagline">
-      <%= pmail.preview_text %>
+      <%= ERB::Util.html_escape(EmailHelper.strip_recipient_secrets(pmail.preview_text)) %>
     </div>
     <div class="header-image-container">
       <% if pmail.organisation.image %>
@@ -45,12 +45,14 @@
     <div class="container">
       <div class="main">
         <% if pmail.markdown? %>
-          <%= Sanitize.fragment(
-                Redcarpet::Markdown.new(Redcarpet::Render::HTML.new(hard_wrap: true), autolink: true, tables: true).render(pmail.body),
-                Sanitize::Config::DANDELION
+          <%= EmailHelper.strip_recipient_secrets(
+                Sanitize.fragment(
+                  Redcarpet::Markdown.new(Redcarpet::Render::HTML.new(hard_wrap: true), autolink: true, tables: true).render(pmail.body),
+                  Sanitize::Config::DANDELION
+                )
               ) %>
         <% else %>
-          <%= EmailHelper.replace_youtube_oembeds(Sanitize.fragment(pmail.body, Sanitize::Config::DANDELION)) %>
+          <%= EmailHelper.replace_youtube_oembeds(pmail.body) %>
         <% end %>
       </div>
     </div>
