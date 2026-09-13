@@ -39,7 +39,8 @@ module OmniAuth
         return fail!(:invalid_request) unless request.post?
         return fail!(:missing_nonce) unless nonce
 
-        message = Siwe::Message.parse(request.params['siwe_message'].to_s)
+        # Browsers submit textarea/input newlines as CRLF; EIP-4361 messages are signed with LF
+        message = Siwe::Message.parse(request.params['siwe_message'].to_s.gsub("\r\n", "\n").delete("\r"))
         message.verify!(
           signature: request.params['siwe_signature'].to_s,
           domain: domain,

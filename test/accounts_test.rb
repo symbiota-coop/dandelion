@@ -418,6 +418,15 @@ class AccountsTest < ActiveSupport::TestCase
     assert_equal siwe_address(key), last_request.session['omniauth.auth']['uid']
   end
 
+  test 'siwe accepts a browser form payload with CRLF newlines' do
+    key = OpenSSL::PKey::EC.generate('secp256k1')
+    message, signature = siwe_start_and_sign(key)
+    post '/auth/ethereum/callback', siwe_message: message.gsub("\n", "\r\n"), siwe_signature: signature
+
+    assert last_response.ok?
+    assert_includes last_response.body, "isn't yet connected to a Dandelion account"
+  end
+
   test 'siwe rejects a replayed signature' do
     key = OpenSSL::PKey::EC.generate('secp256k1')
     message, signature = siwe_start_and_sign(key)
