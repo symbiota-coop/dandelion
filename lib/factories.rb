@@ -161,6 +161,15 @@ FactoryBot.define do
     end
   end
 
+  factory :event_tag do
+    sequence(:name) { |n| "tag-#{n}" }
+  end
+
+  factory :carousel do
+    sequence(:name) { |n| "Carousel #{n}" }
+    organisation
+  end
+
   factory :pmail do
     sequence(:subject) { |n| "Subject #{n}" }
     sequence(:from) { |n| "Account #{n} <account#{n}@#{ENV['DOMAIN']}>" }

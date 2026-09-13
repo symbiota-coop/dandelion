@@ -42,7 +42,7 @@ Dandelion::App.controller do
       @events = if params[:carousel_ids].include?('featured')
                   @events.and(featured: true)
                 else
-                  @events.and(:id.in => Carousel.event_ids_for_carousel_ids(params[:carousel_ids]))
+                  @events.and(:carousel_ids.in => @organisation.carousels.and(:id.in => params[:carousel_ids]).pluck(:id))
                 end
     end
     @events = apply_online_in_person_filter(@events)
@@ -135,8 +135,8 @@ Dandelion::App.controller do
       @events = if params[:carousel_id] == 'featured'
                   @events.and(featured: true)
                 else
-                  carousel = Carousel.find(params[:carousel_id]) || not_found
-                  @events.and(:id.in => carousel.event_ids_cache)
+                  carousel = @organisation.carousels.find(params[:carousel_id]) || not_found
+                  @events.and(carousel_ids: carousel.id)
                 end
     end
     if params[:discrepancy]

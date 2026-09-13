@@ -48,6 +48,7 @@ module EventFields
     field :gocardless_instalment_count, type: Integer
     field :match_phrase, type: String
     field :cohosts_ids_cache, type: Array
+    field :carousel_ids, type: Array
     field :theme_color, type: String
     field :embedding, type: Array
     field :atproto_uri, type: String

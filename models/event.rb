@@ -17,6 +17,7 @@ class Event
   include EventValidation
   include EventAccessControl
   include EventAtproto
+  include EventCarouselIds
   include Geocoded
   include Taggable
 
@@ -39,7 +40,7 @@ class Event
   end
 
   def self.protected_attributes
-    %w[raw_description direct_charges trending last_saved_by last_saved_by_id duplicate image_url]
+    %w[raw_description direct_charges trending last_saved_by last_saved_by_id duplicate image_url carousel_ids]
   end
 
   def self.assignable_foreign_keys
