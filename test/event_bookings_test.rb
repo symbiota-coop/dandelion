@@ -4,11 +4,12 @@ class EventBookingsTest < ActiveSupport::TestCase
   include Capybara::DSL
   include Rack::Test::Methods
 
-  def post_purchase(event, account, quantity: 1, quantities: nil)
+  def post_purchase(event, account, quantity: 1, quantities: nil, confirmed_duplicate: false)
     ticket_type = event.ticket_types.first
     quantities ||= { ticket_type.id.to_s => quantity.to_s }
     header 'Accept', 'application/json'
     post "/events/#{event.id}/purchase",
+         confirmed_duplicate: (confirmed_duplicate ? '1' : ''),
          ticketForm: { quantities: quantities },
          detailsForm: {
            payment_method: 'rsvp',
@@ -435,6 +436,56 @@ class EventBookingsTest < ActiveSupport::TestCase
   end
 
   # ═══════════════════════════════════════════════════════════════════════════
+  # Duplicate ticket warning
+  # ═══════════════════════════════════════════════════════════════════════════
+
+  test 'purchase warns when the account already holds a ticket' do
+    create_event(prices: [0])
+    buyer = FactoryBot.create(:account)
+
+    post_purchase(@event, buyer)
+    assert_equal 200, last_response.status
+
+    post_purchase(@event, buyer)
+    assert_equal 409, last_response.status
+    assert JSON.parse(last_response.body)['duplicate']
+    assert_equal 1, @event.orders.count
+  end
+
+  test 'purchase proceeds when confirmed_duplicate is set' do
+    create_event(prices: [0])
+    buyer = FactoryBot.create(:account)
+
+    post_purchase(@event, buyer)
+    post_purchase(@event, buyer, confirmed_duplicate: true)
+
+    assert_equal 200, last_response.status
+    assert_equal 2, @event.orders.count
+  end
+
+  test 'purchase warns when a ticket was already ordered for that email' do
+    create_event(prices: [0])
+    buyer = FactoryBot.create(:account)
+
+    post_purchase(@event, FactoryBot.create(:account))
+    @event.tickets.last.set(email: buyer.email)
+
+    post_purchase(@event, buyer)
+    assert_equal 409, last_response.status
+  end
+
+  test "purchase does not warn when the account's earlier ticket was reassigned to someone else" do
+    create_event(prices: [0])
+    buyer = FactoryBot.create(:account)
+
+    post_purchase(@event, buyer)
+    @event.tickets.last.set(email: 'friend@example.com')
+
+    post_purchase(@event, buyer)
+    assert_equal 200, last_response.status
+  end
+
+  # ═══════════════════════════════════════════════════════════════════════════
   # Credit
   # ═══════════════════════════════════════════════════════════════════════════
 
@@ -443,7 +494,7 @@ class EventBookingsTest < ActiveSupport::TestCase
     organisationship.creditings.create!(account: @account, amount: amount, currency: @event.currency)
   end
 
-  test "purchase applies credit when the signed-in buyer is the order account" do
+  test 'purchase applies credit when the signed-in buyer is the order account' do
     create_event(prices: [10], suggested_donation: 0)
     buyer = FactoryBot.create(:account)
     grant_credit(buyer, amount: 10)

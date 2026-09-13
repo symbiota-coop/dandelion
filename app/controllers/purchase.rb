@@ -30,6 +30,15 @@ Dandelion::App.controller do
     end
     halt 403 if @event.organisation.banned_emails_a.include?(@account.email)
 
+    if params[:confirmed_duplicate] != '1' && @event.tickets.complete.and(
+      '$or' => [
+        { account_id: @account.id, :email.in => [nil, @account.email] },
+        { email: @account.email }
+      ]
+    ).exists?
+      halt 409, { duplicate: true, error: "A ticket to #{@event.name} has already been booked for #{@account.email}." }.to_json
+    end
+
     @order = Order.create!(
       event: @event,
       account: @account,

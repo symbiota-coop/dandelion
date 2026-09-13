@@ -335,6 +335,10 @@ $(function () {
   })
 
   let purchaseSubmitting = false
+  let embeddedDuplicateConfirmed = false
+  $('#account_email').on('input', function () {
+    embeddedDuplicateConfirmed = false
+  })
   $(window).on('pageshow', function () {
     purchaseSubmitting = false
     $('#details form button[data-payment-method]').prop('disabled', false)
@@ -464,15 +468,37 @@ $(function () {
       }
     }
 
-    $.post('/events/' + config.eventId + '/purchase', {
-      ticketForm: ticketForm,
-      detailsForm: $('#details form').serializeObject()
-    }, function (data) {
-      handlers[method](data)
-    }).fail(function () {
-      $('#select-tickets, #details').hide()
-      $('#card-error').show()
-    })
+    const postPurchase = function (confirmedDuplicate) {
+      $.post('/events/' + config.eventId + '/purchase', {
+        ticketForm: ticketForm,
+        detailsForm: $('#details form').serializeObject(),
+        confirmed_duplicate: confirmedDuplicate ? '1' : ''
+      }, function (data) {
+        handlers[method](data)
+      }).fail(function (xhr) {
+        let json = {}
+        try { json = xhr.responseJSON || JSON.parse(xhr.responseText || '{}') || {} } catch (err) { }
+        if (json.duplicate && !confirmedDuplicate) {
+          purchaseSubmitting = false
+          $('#details form button[data-payment-method]').prop('disabled', false)
+          $('#details form button[data-payment-method-clicked] i').hide()
+          const message = json.error || 'A ticket to this event has already been booked for this email address.'
+          if (config.embedded) {
+            embeddedDuplicateConfirmed = true
+            showPurchaseAlert(message + ' Press the button again to get another ticket anyway.')
+          } else if (confirm(message + ' Press OK to get another ticket anyway, or Cancel to go back.')) {
+            purchaseSubmitting = true
+            $('#details form button[data-payment-method]').prop('disabled', true)
+            $('#details form button[data-payment-method-clicked] i').show()
+            postPurchase(true)
+          }
+          return
+        }
+        $('#select-tickets, #details').hide()
+        $('#card-error').show()
+      })
+    }
+    postPurchase(embeddedDuplicateConfirmed)
 
     return false
   })
