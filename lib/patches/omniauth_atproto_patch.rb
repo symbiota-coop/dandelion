@@ -1,16 +1,24 @@
 # Custom setup proc for omniauth-atproto that supports GET requests
 # The original gem only checks rack.request.form_hash (POST), this adds query string parsing
 module AtprotoSetup
+  SESSION_DID_KEY = 'atproto_did'
+
   def self.setup_proc
     lambda do |env|
       session = env['rack.session']
+      strategy = env['omniauth.strategy']
+      on_callback = strategy.respond_to?(:on_callback_path?) && strategy.on_callback_path?
 
-      # Check form_hash (POST) first, then parse query string (GET)
-      handle = env['rack.request.form_hash']&.dig('handle')
-      unless handle
-        query_string = env['QUERY_STRING'] || ''
-        query_params = Rack::Utils.parse_query(query_string)
-        handle = query_params['handle']
+      # Bind identity at request time only. A handle on the callback must not
+      # replace the DID/AS discovered from the handle the user entered.
+      handle = nil
+      unless on_callback
+        handle = env['rack.request.form_hash']&.dig('handle')
+        unless handle
+          query_string = env['QUERY_STRING'] || ''
+          query_params = Rack::Utils.parse_query(query_string)
+          handle = query_params['handle']
+        end
       end
 
       if handle
@@ -19,28 +27,43 @@ module AtprotoSetup
           did = resolver.resolve_handle(handle)
 
           unless did
-            return env['omniauth.strategy'].fail!(:unknown_handle,
-                                                  OmniAuth::Error.new(
-                                                    'Handle parameter did not resolve to a did'
-                                                  ))
+            return strategy.fail!(:unknown_handle,
+                                  OmniAuth::Error.new(
+                                    'Handle parameter did not resolve to a did'
+                                  ))
           end
 
+          session[SESSION_DID_KEY] = did
           endpoint = resolver.resolve_did(did).pds_endpoint
           auth_server = OmniAuth::Strategies::Atproto.get_authorization_server(endpoint)
           session['authorization_info'] = authorization_info = OmniAuth::Strategies::Atproto.get_authorization_data(auth_server)
         rescue SsrfFilter::Error => e
-          return env['omniauth.strategy'].fail!(:invalid_auth_server,
-                                                OmniAuth::Error.new(e.message))
+          return strategy.fail!(:invalid_auth_server,
+                                OmniAuth::Error.new(e.message))
         end
       end
 
+      if on_callback && session[SESSION_DID_KEY].blank?
+        return strategy.fail!(:missing_did,
+                              OmniAuth::Error.new(
+                                'Missing resolved DID for this login'
+                              ))
+      end
+
       if authorization_info ||= session.delete('authorization_info')
-        env['omniauth.strategy'].options['client_options']['site'] = authorization_info['issuer']
-        env['omniauth.strategy'].options['client_options']['authorize_url'] =
+        strategy.options['client_options']['site'] = authorization_info['issuer']
+        strategy.options['client_options']['authorize_url'] =
           authorization_info['authorization_endpoint']
-        env['omniauth.strategy'].options['client_options']['token_url'] = authorization_info['token_endpoint']
+        strategy.options['client_options']['token_url'] = authorization_info['token_endpoint']
       end
     end
+  end
+
+  def self.token_did_matches?(session, auth)
+    expected = session.delete(SESSION_DID_KEY)
+    expected ||= session.delete(SESSION_DID_KEY.to_sym)
+    actual = auth&.dig('info', 'did')
+    expected.present? && actual.present? && expected == actual
   end
 end
 

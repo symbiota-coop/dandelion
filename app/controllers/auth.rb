@@ -12,6 +12,9 @@ Dandelion::App.controller do
 
   %w[get post].each do |method|
     send(method, '/auth/:provider/callback') do
+      if env['omniauth.auth']['provider'] == 'atproto'
+        redirect '/auth/failure' unless AtprotoSetup.token_did_matches?(session, env['omniauth.auth'])
+      end
       account = if env['omniauth.auth']['provider'] == 'account'
                   Account.find(env['omniauth.auth']['uid'])
                 else
