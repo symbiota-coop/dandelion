@@ -5,7 +5,7 @@ client = Octokit::Client.new(access_token: ENV['GITHUB_ACCESS_TOKEN'])
 
 repo = "symbiota-coop/dandelion"
 
-page = (params[:page] || 1).to_i
+page = [(params[:page] || 1).to_i, 1].max
 per_page = 20
 
 # Fetch only the commits needed for this page (GitHub does the pagination)
