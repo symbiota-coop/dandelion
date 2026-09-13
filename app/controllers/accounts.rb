@@ -70,6 +70,7 @@ Dandelion::App.controller do
   end
 
   get '/accounts/new' do
+    session.delete('omniauth.auth')
     @body_class = 'gradient'
     @account = Account.new
     @account.default_currency ||= visitor_currency

@@ -342,6 +342,20 @@ class AccountsTest < ActiveSupport::TestCase
     assert_equal 0, created.provider_links.count
   end
 
+  test 'abandoned omniauth session is not linked after a later visit to signup' do
+    start_omniauth_signup
+    get '/accounts/new'
+    assert_nil last_request.session['omniauth.auth']
+    refute_includes last_response.body, 'name="omniauth_signup"'
+
+    later = FactoryBot.build_stubbed(:account)
+    post_new_account(later)
+
+    created = Account.find_by(email: later.email.downcase)
+    assert created
+    assert_equal 0, created.provider_links.count
+  end
+
   test 'omniauth signup form links the provider' do
     start_omniauth_signup
     later = FactoryBot.build_stubbed(:account)
