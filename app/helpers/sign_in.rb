@@ -3,6 +3,8 @@ Dandelion::App.helpers do
     account = Account.find_by(sign_in_token: params[:sign_in_token].to_s)
 
     if account && !account.sign_in_token_expired?
+      return if session[:account_id] && session[:account_id] != account.id.to_s
+
       account.set(failed_sign_in_attempts: 0)
       account.sign_ins.create(request: request, skip_increment: %w[unsubscribe give_feedback subscriptions].any? { |p| request.path.include?(p) })
       session[:account_id] = account.id.to_s

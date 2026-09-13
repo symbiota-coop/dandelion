@@ -10,6 +10,8 @@ module OmniAuth
       end
 
       def callback_phase
+        return fail!(:invalid_request) unless request.post?
+
         if account
           super
         else

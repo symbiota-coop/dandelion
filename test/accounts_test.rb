@@ -38,6 +38,43 @@ class AccountsTest < ActiveSupport::TestCase
     assert page.has_content?('Signed in')
   end
 
+  test 'password callback rejects GET' do
+    account = FactoryBot.create(:account)
+
+    get '/auth/account/callback', email: account.email, password: account.password
+
+    assert last_response.redirect?, "expected a redirect to /auth/failure, got #{last_response.status}"
+    location = URI(last_response.location)
+    assert_equal '/auth/failure', location.path
+    assert_includes Rack::Utils.parse_query(location.query)['message'], 'invalid_request'
+    assert_equal 0, account.reload.sign_ins.count
+  end
+
+  test 'password callback signs in via POST' do
+    account = FactoryBot.create(:account)
+
+    post '/auth/account/callback', email: account.email, password: account.password
+
+    assert last_response.redirect?
+    assert_equal '/', URI(last_response.location).path
+    assert_equal 1, account.reload.sign_ins.count
+  end
+
+  test 'sign in token does not replace an existing session' do
+    victim = FactoryBot.create(:account)
+    attacker = FactoryBot.create(:account)
+    sign_in_with_rack(victim)
+    attacker.generate_sign_in_token!
+    token = attacker.sign_in_token
+
+    get '/', sign_in_token: token
+    follow_redirect! while last_response.redirect?
+
+    assert_equal victim.id.to_s, last_request.session[:account_id]
+    assert_equal token, attacker.reload.sign_in_token
+    assert_equal 0, attacker.sign_ins.count
+  end
+
   test 'editing profile' do
     account = FactoryBot.create(:account)
     sign_in(account)
