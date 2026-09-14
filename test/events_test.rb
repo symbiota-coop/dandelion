@@ -159,6 +159,16 @@ class EventsTest < ActiveSupport::TestCase
     assert_includes html, 'sign_in_token=%recipient.token%'
   end
 
+  test 'names cannot keep a mailgun recipient token' do
+    create_event(name: 'Workshop %recipient.token%', prices: [0])
+    @account.update!(name: 'Ada %recipient.token%')
+    @organisation.update!(name: 'Org %recipient.token%')
+
+    assert_equal 'Workshop', @event.name
+    assert_equal 'Ada', @account.name
+    assert_equal 'Org', @organisation.name
+  end
+
   test 'nested ticket type cannot reference another event ticket group' do
     create_event(prices: [0])
     own_group = @event.ticket_groups.create!(name: 'Own', capacity: 10)

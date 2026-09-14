@@ -6,7 +6,7 @@
         Your <%= event.evergreen? ? 'link' : (order.tickets.length == 1 ? 'ticket' : 'tickets') %> to
       </span>
       <br />
-      <%= ERB::Util.html_escape(EmailHelper.strip_recipient_secrets(event.name)) %>
+      <%= event.name %>
     </h2>
     <hr />
 
