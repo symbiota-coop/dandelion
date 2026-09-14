@@ -49,7 +49,7 @@
 
           <div class="feedback-rating-panel text-center py-4 px-3 mb-4">
             <label class="feedback-question-label d-block mb-1">Your star rating</label>
-            <p class="small text-muted mb-3">Your star rating contributes to the host's reputation on Dandelion.</p>
+            <p class="small text-muted mb-3">Your star rating is always public and contributes towards the host's average.</p>
             <div class="feedback-stars rate" role="radiogroup" aria-label="Star rating">
               <% 1.upto(5) do |i| %>
                 <i class="bi bi-star-fill" data-rating="<%= i %>" aria-label="<%= i %> out of 5 stars"></i>
@@ -61,7 +61,7 @@
 
           <div class="border-top pt-4 mt-2">
             <p class="text-muted small font-weight-bold text-uppercase mb-3" style="letter-spacing: 0.04em;">Privacy</p>
-            <%= checkbox 'Allow this feedback to be quoted publicly', slug: :publicly_visible, checked: true %>
+            <%= checkbox 'Allow written answers to be quoted publicly', slug: :publicly_visible, checked: true %>
             <%= checkbox 'Anonymise this feedback', slug: :anonymous %>
           </div>
 
