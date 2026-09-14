@@ -56,8 +56,12 @@ class EventFeedback
     notifications.create! circle: circle, type: 'left_feedback' unless anonymous
   end
 
+  def self.rated
+    self.and(:deleted_at => nil, :rating.ne => nil)
+  end
+
   def self.average_rating
-    ratings = self.and(:deleted_at => nil, :rating.ne => nil).pluck(:rating)
+    ratings = rated.pluck(:rating)
     return if ratings.empty?
 
     ratings = ratings.map(&:to_i)
