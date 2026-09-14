@@ -199,6 +199,7 @@ class EventBookingsTest < ActiveSupport::TestCase
 
     sign_in(buyer)
     visit "/e/#{@event.slug}"
+    assert page.has_content?("Signed in as #{buyer.name}")
     assert page.has_content? 'Register for free'
 
     # Click the label to check the custom-styled checkbox (actual input is hidden via CSS)
@@ -272,6 +273,7 @@ class EventBookingsTest < ActiveSupport::TestCase
     # Book ticket with opt-in (existing members have hidden field set to 1 automatically)
     sign_in(buyer)
     visit "/e/#{@event.slug}"
+    assert page.has_content?("Signed in as #{buyer.name}")
     assert page.has_content? 'Register for free'
 
     # For existing members, opt_in_organisation is automatically set via hidden field

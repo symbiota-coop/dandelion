@@ -75,6 +75,20 @@ class AccountsTest < ActiveSupport::TestCase
     assert_equal 0, attacker.sign_ins.count
   end
 
+  test 'sign in token works when session account_id is stale' do
+    stale_id = FactoryBot.create(:account).id
+    buyer = FactoryBot.create(:account)
+    sign_in_with_rack(Account.find(stale_id))
+    Account.find(stale_id).delete
+    buyer.generate_sign_in_token!
+
+    get '/', sign_in_token: buyer.sign_in_token
+    follow_redirect! while last_response.redirect?
+
+    assert_equal buyer.id.to_s, last_request.session[:account_id]
+    assert_equal 1, buyer.reload.sign_ins.count
+  end
+
   test 'editing profile' do
     account = FactoryBot.create(:account)
     sign_in(account)

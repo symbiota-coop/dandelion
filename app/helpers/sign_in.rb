@@ -3,11 +3,14 @@ Dandelion::App.helpers do
     account = Account.find_by(sign_in_token: params[:sign_in_token].to_s)
 
     if account && !account.sign_in_token_expired?
-      return if session[:account_id] && session[:account_id] != account.id.to_s
+      # Block account switching only when the session still resolves to a
+      # different live account. A stale account_id must not block the link.
+      return if current_account && current_account.id != account.id
 
       account.set(failed_sign_in_attempts: 0)
       account.sign_ins.create(request: request, skip_increment: %w[unsubscribe give_feedback subscriptions].any? { |p| request.path.include?(p) })
       session[:account_id] = account.id.to_s
+      @current_account = account
       account.generate_sign_in_token!
       if account.sign_ins_count == 1
         account.set(email_confirmed: true)
