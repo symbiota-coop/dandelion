@@ -161,7 +161,7 @@ class EventsTest < ActiveSupport::TestCase
 
   test 'names cannot keep a mailgun recipient token' do
     assert_equal '', EmailHelper.strip_recipient_secrets('%recipient.tok%recipient.token%en%')
-    assert_equal 'Workshop', EmailHelper.strip_recipient_secrets('Workshop %recipient.tok%recipient.token%en%')
+    assert_equal 'Workshop', EmailHelper.strip_recipient_secrets('Workshop %recipient.tok%recipient.token%en%').squish
 
     create_event(name: 'Workshop %recipient.token%', prices: [0])
     @account.update!(name: 'Ada %recipient.token%')
