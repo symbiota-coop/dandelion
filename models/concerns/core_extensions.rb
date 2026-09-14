@@ -275,7 +275,13 @@ module CoreExtensions
       value = send(field)
       next unless value.present?
 
-      sanitized_value = EmailHelper.strip_recipient_secrets(Nokogiri::HTML.fragment(value.to_s).text).squish
+      sanitized_value = value.to_s
+      loop do
+        candidate = EmailHelper.strip_recipient_secrets(Nokogiri::HTML.fragment(sanitized_value).text).squish
+        break if candidate == sanitized_value
+
+        sanitized_value = candidate
+      end
       next if sanitized_value == value.to_s
 
       send("#{field}=", sanitized_value)

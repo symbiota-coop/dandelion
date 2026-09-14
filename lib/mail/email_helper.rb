@@ -1,8 +1,11 @@
 module EmailHelper
   MICROSOFT_DOMAINS = %w[hotmail msn outlook live].freeze
+  RECIPIENT_SECRET = /%recipient\.(?:token|org_unsubscribe_token|feedback_token|cancel_rsvp_url)%/i
 
   def self.strip_recipient_secrets(text)
-    text.to_s.gsub(/%recipient\.(?:token|org_unsubscribe_token|feedback_token|cancel_rsvp_url)%/i, '')
+    s = text.to_s
+    s = s.gsub(RECIPIENT_SECRET, '') while s.match?(RECIPIENT_SECRET)
+    s
   end
 
   def self.replace_youtube_oembeds(html)
