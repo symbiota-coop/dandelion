@@ -90,7 +90,7 @@ If your organisation has an [Open Collective](https://opencollective.com/) accou
 2. Create an event on Open Collective under your organisation
 3. Edit your Dandelion event and enter the Open Collective event slug under Everything else
 
-Ticket buyers will then see a 'Pay with Open Collective' option at checkout.
+Ticket buyers will then see a 'Pay with Open Collective' option at checkout. Dandelion only confirms the booking once Open Collective marks the contribution as paid.
 
 ## Get email notifications of orders
 
