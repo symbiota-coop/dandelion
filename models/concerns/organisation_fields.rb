@@ -194,6 +194,8 @@ module OrganisationFields
         banned_emails: 'One per line',
         event_image_required_width: 'Required width for event images in px',
         event_image_required_height: 'Required height for event images in px',
+        gocardless_instant_bank_pay: 'Shown at checkout for GBP and EUR events only (UK and supported Eurozone countries)',
+        gocardless_instalments: 'Shown at checkout for GBP and EUR events only. Set the number of instalments on each event.',
         evm_address: 'Ethereum-compatible wallet address for receiving tokens via EVM networks',
         restrict_cohosting: 'When checked, only this organisation\'s admins and event managers can add it as a co-host of events',
         oc_slug: 'Open Collective organisation slug',

@@ -59,14 +59,14 @@ EventPaymentMethod.new('stripe',
 EventPaymentMethod.new('gocardless_instant',
                        label: 'Pay with GoCardless',
                        org_condition: ->(org) { org.gocardless_instant_bank_pay && org.gocardless_access_token },
-                       event_condition: ->(event) { FIAT_CURRENCIES.include?(event.currency) },
+                       event_condition: ->(event) { GOCARDLESS_CURRENCIES.include?(event.currency) },
                        process: ->(**kwargs) { EventPaymentMethod::GoCardlessInstantBankPay.call(**kwargs) })
 
 EventPaymentMethod.new('gocardless_instalment',
                        label: ->(event) { "Pay in #{event.gocardless_instalment_count} monthly instalments" },
                        org_condition: ->(org) { org.gocardless_instalments && org.gocardless_access_token },
                        event_condition: ->(event) {
-                         event.gocardless_instalment_count.to_i >= 2 && FIAT_CURRENCIES.include?(event.currency)
+                         event.gocardless_instalment_count.to_i >= 2 && GOCARDLESS_CURRENCIES.include?(event.currency)
                        },
                        process: ->(**kwargs) { EventPaymentMethod::GoCardlessInstalment.call(**kwargs) })
 

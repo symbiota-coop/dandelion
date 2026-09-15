@@ -198,6 +198,17 @@ class WebhooksTest < ActiveSupport::TestCase
     end
   end
 
+  test 'instant bank pay is only available for GBP and EUR events' do
+    create_instant_event
+    pm = EventPaymentMethod.object('gocardless_instant')
+
+    assert pm.available?(@event)
+    @event.set(currency: 'EUR')
+    assert pm.available?(@event)
+    @event.set(currency: 'SEK')
+    refute pm.available?(@event)
+  end
+
   test 'instant bank pay checkout stores the payment request id' do
     create_instant_event
     order = create_incomplete_order(@event, value: 10)
@@ -288,6 +299,17 @@ class WebhooksTest < ActiveSupport::TestCase
       links: OpenStruct.new(billing_request: billing_request_id),
       id: 'EV123'
     )
+  end
+
+  test 'instalments are only available for GBP and EUR events' do
+    create_instalment_event
+    pm = EventPaymentMethod.object('gocardless_instalment')
+
+    assert pm.available?(@event)
+    @event.set(currency: 'EUR')
+    assert pm.available?(@event)
+    @event.set(currency: 'SEK')
+    refute pm.available?(@event)
   end
 
   test 'instalment checkout stores the billing request id' do

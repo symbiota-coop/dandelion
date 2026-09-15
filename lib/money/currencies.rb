@@ -1,6 +1,8 @@
 require_relative 'tokens'
 
 FIAT_CURRENCIES = %w[GBP EUR USD SEK DKK NOK CHF MXN CAD AUD NZD SGD PLN].freeze
+# Instant Bank Pay and Direct Debit via GoCardless are UK/Eurozone only.
+GOCARDLESS_CURRENCIES = %w[GBP EUR].freeze
 EVM_CURRENCIES = Token.all.map(&:symbol)
 
 module FiatCurrency

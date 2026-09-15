@@ -125,6 +125,11 @@ Dandelion::App.controller do
     @order.notify_of_failed_purchase(e, provider: 'GoCardless')
     @order.destroy
     halt 400
+  rescue GoCardlessPro::ValidationError => e
+    # Unsupported currency/amount or other request validation — not a broken token
+    @order.notify_of_failed_purchase(e, provider: 'GoCardless')
+    @order.destroy
+    halt 400
   rescue StandardError => e
     ctx = {}
     ctx[:order_id] = @order.id.to_s if @order
