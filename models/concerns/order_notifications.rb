@@ -169,7 +169,7 @@ module OrderNotifications
 
     if event&.send_ticketholder_confirmation
       tickets.each do |ticket|
-        email = ticket.email.presence
+        email = ticket.email
         next if email.blank?
         next if recipients.any? { |recipient| recipient['email'] == email }
 

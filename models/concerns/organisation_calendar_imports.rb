@@ -70,7 +70,8 @@ module OrganisationCalendarImports
       return if value.nil?
 
       value = value.value if value.respond_to?(:value)
-      value.to_s.strip.presence
+      stripped = value.to_s.strip
+      stripped if stripped.present?
     end
 
     def valid_calendar_body?(body)
@@ -182,15 +183,19 @@ module OrganisationCalendarImports
       false
     end
 
-    url = property_text(ical_event.url).presence
-    location_text = property_text(ical_event.location).presence
+    url = property_text(ical_event.url)
+    location_text = property_text(ical_event.location)
     description_text = property_text(ical_event.description)
-    uid = property_text(ical_event.uid).presence
+    uid = property_text(ical_event.uid)
+    uid = nil if uid.blank?
 
-    source_url = url
+    source_url = url if url.present?
     source_url ||= location_text if luma_event_page_url?(location_text)
     # In-person Luma events often omit URL and put the venue in LOCATION; UID still points at the event page.
-    source_url = luma_event_url_from_uid(uid).presence if luma_calendar_feed && source_url.blank?
+    if luma_calendar_feed && source_url.blank?
+      from_uid = luma_event_url_from_uid(uid)
+      source_url = from_uid if from_uid.present?
+    end
 
     event = find_existing_imported_event(feed_url: feed_url, uid: uid, source_url: source_url, summary: summary, start_time: start_time)
     return unpublish_cancelled_imported_event(event) if property_text(ical_event.status).to_s.casecmp('CANCELLED').zero?
@@ -234,7 +239,7 @@ module OrganisationCalendarImports
     import_location = if luma_calendar_feed && location_text_is_http_url
                         luma_ical_geo_lat_lon(ical_event).present? ? luma_location_label_from_ical_geo(ical_event) : 'Online'
                       else
-                        location_text.presence || 'Online'
+                        location_text.present? ? location_text : 'Online'
                       end
 
     import_description =
@@ -401,7 +406,8 @@ module OrganisationCalendarImports
     lat, lon = luma_ical_geo_lat_lon(ical_event)
     return 'In person' unless lat && lon
 
-    GeonamesCityLookup.nearest_city_name(lat, lon).presence || 'In person'
+    city = GeonamesCityLookup.nearest_city_name(lat, lon)
+    city.present? ? city : 'In person'
   rescue StandardError
     'In person'
   end

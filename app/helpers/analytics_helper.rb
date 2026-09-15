@@ -35,7 +35,7 @@ Dandelion::App.helpers do
     ticket_type_ids = @order.tickets.map { |t| t.ticket_type_id&.to_s }.compact.uniq
     purchase_analytics.merge(
       content_type: 'product',
-      content_ids: ticket_type_ids.presence || [@order.event_id.to_s],
+      content_ids: ticket_type_ids.present? ? ticket_type_ids : [@order.event_id.to_s],
       content_name: @order.event.try(:name),
       num_items: @order.tickets.count
     ).except(:order_id).compact

@@ -128,7 +128,7 @@ Dandelion::App.controller do
   rescue StandardError => e
     ctx = {}
     ctx[:order_id] = @order.id.to_s if @order
-    ErrorReporting.capture_exception(e, context: ctx.presence)
+    ErrorReporting.capture_exception(e, context: (ctx if ctx.present?))
     @order.try(:destroy)
     halt 400
   end

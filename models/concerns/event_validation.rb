@@ -27,7 +27,8 @@ module EventValidation
 
       self.name = name.strip if name
       self.purchase_url = purchase_url.strip if purchase_url
-      self.redirect_url = redirect_url.strip.presence if redirect_url
+      self.redirect_url = redirect_url.strip if redirect_url
+      self.redirect_url = nil if redirect_url.blank?
       errors.add(:redirect_url, 'must be a valid http or https URL') if redirect_url && !safe_redirect_url
       self.suggested_donation = suggested_donation.round(2) if suggested_donation
       self.minimum_donation = nil unless suggested_donation

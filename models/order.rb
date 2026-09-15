@@ -188,7 +188,7 @@ class Order
   # Orders created before tokens were introduced fall back to their Mongo id,
   # which /orders/:id still accepts via find_by_id_or_token.
   def public_id
-    token.presence || id.to_s
+    token.present? ? token : id.to_s
   end
 
   def persist_gocardless_payment_id(payment_id)

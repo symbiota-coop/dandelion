@@ -97,7 +97,7 @@ module EventAtproto
       }
     end
 
-    locations.presence
+    locations if locations.present?
   end
 
   # Build URIs array with event link and optional external links

@@ -6,10 +6,7 @@ Dandelion::App.helpers do
       # Block switching only when the session id still belongs to a different
       # live account. Look up from the DB so a memoized or deleted current_account
       # cannot hide a stale cookie.
-      session_account_id = session[:account_id].presence
-      if session_account_id && session_account_id != account.id.to_s
-        return if Account.find(session_account_id)
-      end
+      return if session[:account_id].present? && session[:account_id] != account.id.to_s && Account.find(session[:account_id])
 
       account.set(failed_sign_in_attempts: 0)
       account.sign_ins.create(request: request, skip_increment: %w[unsubscribe give_feedback subscriptions].any? { |p| request.path.include?(p) })

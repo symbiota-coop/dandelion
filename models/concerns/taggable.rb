@@ -43,7 +43,7 @@ module Taggable
       end
 
       define_method(:tag_names_for_form) do
-        tag_names.presence || send(taggable_config[:tagships]).map(&taggable_config[:tag_name_method])
+        tag_names.present? ? tag_names : send(taggable_config[:tagships]).map(&taggable_config[:tag_name_method])
       end
 
       define_method(:populate_tag_names_cache) do

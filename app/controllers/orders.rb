@@ -103,7 +103,7 @@ Dandelion::App.controller do
     halt 403 unless @order.value.nil? || @order.value.zero?
     @order.prevent_refund = true
     @order.destroy
-    if params[:from_confirm].present?
+    if params[:from_confirm]
       redirect "/e/#{@order.event.slug}"
     else
       redirect back

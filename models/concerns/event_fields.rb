@@ -86,7 +86,7 @@ module EventFields
 
   def terms_and_conditions_for_purchase
     if event_terms_and_conditions_override?
-      terms_and_conditions.presence
+      terms_and_conditions if terms_and_conditions.present?
     else
       organisation.try(:terms_and_conditions)
     end
@@ -94,7 +94,7 @@ module EventFields
 
   def terms_and_conditions_url_for_purchase
     if event_terms_and_conditions_override?
-      terms_and_conditions_url.presence
+      terms_and_conditions_url if terms_and_conditions_url.present?
     else
       organisation.try(:terms_and_conditions_url)
     end

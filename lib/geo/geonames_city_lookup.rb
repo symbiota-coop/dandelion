@@ -41,7 +41,8 @@ class GeonamesCityLookup
         [score, -km]
       end
 
-      best_row[:name].to_s.strip.presence
+      name = best_row[:name].to_s.strip
+      name if name.present?
     rescue StandardError
       nil
     end

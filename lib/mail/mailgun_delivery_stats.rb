@@ -10,7 +10,7 @@ module MailgunDeliveryStats
     def fetch(period: '24')
       api_key = ENV['MAILGUN_API_KEY']
       api_host = ENV['MAILGUN_REGION']
-      domain = ENV['MAILGUN_TICKETS_HOST'].presence
+      domain = ENV['MAILGUN_TICKETS_HOST']
 
       return { error: 'MAILGUN_API_KEY is not set' } if api_key.blank?
       return { error: 'MAILGUN_TICKETS_HOST is not set' } if domain.blank?
@@ -79,7 +79,9 @@ module MailgunDeliveryStats
     def provider_rows(items)
       (items || []).map do |item|
         dim = item['dimensions']&.find { |d| d['dimension'] == 'recipient_provider' }
-        label = dim&.dig('display_value').to_s.strip.presence || dim&.dig('value').to_s.strip.presence
+        display = dim&.dig('display_value').to_s.strip
+        raw = dim&.dig('value').to_s.strip
+        label = display.present? ? display : raw
         label = '(unknown provider)' if label.blank?
         m = item['metrics'] || {}
 

@@ -23,4 +23,4 @@
 
 <% end %>
 
-<%= partial :chat_card, locals: { title: "#{organisation.name}'s files", show_chat: params[:file_q].present?, content: content } %>
+<%= partial :chat_card, locals: { title: "#{organisation.name}'s files", show_chat: params[:file_q], content: content } %>

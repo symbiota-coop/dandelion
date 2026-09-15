@@ -171,7 +171,7 @@ class Organisation
   end
 
   def mailgun_webhook_authentic?(signature)
-    signing_key = mailgun_webhook_signing_key.presence || ENV['MAILGUN_WEBHOOK_SIGNING_KEY'].presence
+    signing_key = mailgun_webhook_signing_key.present? ? mailgun_webhook_signing_key : ENV['MAILGUN_WEBHOOK_SIGNING_KEY']
     return false if signing_key.blank? || !signature.is_a?(Hash)
 
     timestamp = signature['timestamp'].to_s

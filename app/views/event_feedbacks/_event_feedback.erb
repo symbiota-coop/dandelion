@@ -1,4 +1,4 @@
-<% qas = event_feedback.public_answers ? event_feedback.public_answers.map { |q, a| a unless a.blank? }.compact : [] %>
+<% qas = event_feedback.public_answers ? event_feedback.public_answers.map { |q, a| a if a.present? }.compact : [] %>
 
 <% if !qas.empty? %>
   <div class="row no-gutters <% if defined?(mt_class) %><%= mt_class %><% end %> <% if defined?(mb_class) %><%= mb_class %><% else %>mb-3<% end %>">
