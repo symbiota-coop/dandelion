@@ -1,0 +1,14 @@
+User-agent: *
+Allow: /
+Disallow: /search
+Disallow: /notifications
+Disallow: /accounts/sign_in
+Disallow: /accounts/sign_in_code
+Disallow: /accounts/new
+Disallow: /accounts/edit
+Disallow: /accounts/subscriptions
+Disallow: /accounts/providers
+Disallow: /accounts/delete
+Disallow: /accounts/unsubscribe
+Disallow: /z
+Disallow: /mcp
