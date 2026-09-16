@@ -276,6 +276,63 @@ class OrdersTest < ActiveSupport::TestCase
     end
   end
 
+  test 'successful refund emails the buyer a confirmation' do
+    create_event(prices: [10])
+    order = create_paid_order(@event)
+    captured = nil
+    with_stubbed_stripe_refunds do
+      order.stub :notify_of_refund, proc { |amount:| captured = amount } do
+        order.destroy
+      end
+    end
+    assert_equal 10, captured
+  end
+
+  test 'failed refund does not email the buyer a confirmation' do
+    create_event(prices: [10])
+    order = create_paid_order(@event)
+    notified = false
+    EventPaymentMethod::Stripe.stub :refund, proc { |_record, on_error:, **|
+      on_error.call(StandardError.new('already refunded'))
+      true
+    } do
+      order.stub :notify_of_refund, proc { notified = true } do
+        order.stub :notify_of_failed_refund, proc {} do
+          order.destroy
+        end
+      end
+    end
+    refute notified
+  end
+
+  test 'refunding a ticket emails the buyer a confirmation' do
+    create_event(prices: [10])
+    ticket = @event.ticket_types.first.tickets.create!(
+      event: @event,
+      account: FactoryBot.create(:account),
+      payment_completed: true,
+      price: 10,
+      payment_intent: 'pi_ticket'
+    )
+    captured = nil
+    with_stubbed_stripe_refunds do
+      ticket.stub :notify_of_refund, proc { |amount:| captured = amount } do
+        ticket.refund
+      end
+    end
+    assert_equal 10, captured
+  end
+
+  test 'refund confirmation email includes the amount' do
+    create_event(prices: [10])
+    html = EmailHelper.html(:refund, event: @event, amount: '£10', provider: 'Stripe', header_image_url: nil)
+
+    assert_includes html, 'A refund of £10 has been issued'
+    assert_includes html, @event.name
+    assert_includes html, 'via Stripe'
+    assert_includes html, 'original payment method'
+  end
+
   test 'connect refunds pass the connected account in request options' do
     create_event(prices: [10])
     @event.organisation.set(stripe_connect_json: { 'stripe_user_id' => 'acct_connect' }.to_json)

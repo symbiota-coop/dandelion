@@ -292,7 +292,7 @@ Refunds for Stripe, GoCardless, Mollie, and PayPal payments can be issued from t
 
 You'll be asked to confirm. The refund options only appear for Stripe, GoCardless, Mollie, and PayPal payments. For Open Collective, crypto, complimentary, or cash tickets, remove the ticket or order here and refund via that platform if needed.
 
-If a refund fails, you'll get an email with the error. You can retry from your [Stripe](https://dashboard.stripe.com/refunds), [GoCardless](https://manage.gocardless.com/), [Mollie](https://my.mollie.com/dashboard/payments), or [PayPal](https://www.paypal.com/activity) dashboard.
+The attendee is emailed a confirmation when the refund succeeds. If a refund fails, you'll get an email with the error. You can retry from your [Stripe](https://dashboard.stripe.com/refunds), [GoCardless](https://manage.gocardless.com/), [Mollie](https://my.mollie.com/dashboard/payments), or [PayPal](https://www.paypal.com/activity) dashboard.
 
 GoCardless instalment payments should be refunded from the GoCardless dashboard (see [Allowing people to pay in instalments](#allowing-people-to-pay-in-instalments)).
 
@@ -306,7 +306,7 @@ Check 'enable resales' under 'Everything else' when editing an event to enable r
 
 Attendees mark a ticket for resale by logging in to Dandelion, visiting the event page and selecting 'Mark for resale' next to a ticket.
 
-This makes one more of that ticket type available. If the type is sold out and someone then purchases a ticket of this type, the original ticketholder gets a refund, the new buyer gets a fresh ticket, and everyone gets an email notification.
+This makes one more of that ticket type available. If the type is sold out and someone then purchases a ticket of this type, the original ticketholder gets a refund and a confirmation email, the new buyer gets a fresh ticket, and everyone gets an email notification.
 
 If the original ticket was paid by GoCardless instalments (or another method Dandelion cannot refund automatically), organisers and Dandelion admins are emailed that a refund is required, and the original ticketholder is told the organiser will process the refund (not that they will receive one automatically). Refund collected instalments and cancel the remaining schedule from the GoCardless dashboard.
 

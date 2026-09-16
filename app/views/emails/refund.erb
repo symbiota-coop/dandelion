@@ -1,0 +1,17 @@
+<div class="main">
+  <p>Hi %recipient.firstname%,</p>
+  <p>
+    A refund of <%= amount %> has been issued for <a href="<%= ENV['BASE_URI'] %>/e/<%= event.slug %>"><%= event.name %></a> via <%= provider %>.
+  </p>
+  <p>
+    The money will be returned to your original payment method. It can take a few days to appear on your statement.
+  </p>
+  <p class="action">
+    <a href="<%= ENV['BASE_URI'] %>/e/<%= event.slug %>">View event</a>
+  </p>
+</div>
+<div class="footer">
+  <a href="<%= ENV['BASE_URI'] %>">
+    <img class="footer-logo" src="<%= ENV['BASE_URI'] %>/images/logos/logo-text.png">
+  </a>
+</div>
