@@ -142,10 +142,32 @@
           <%= f.select_block :currency %>
           <%= partial :'organisations/payments/stripe', locals: { f: f } %>
           <%= partial :'organisations/payments/gocardless', locals: { f: f } %>
+          <%= partial :'organisations/payments/opencollective', locals: { f: f } %>
           <%= partial :'organisations/payments/mollie', locals: { f: f } %>
           <%= partial :'organisations/payments/paypal', locals: { f: f } %>
-          <%= partial :'organisations/payments/opencollective', locals: { f: f } %>
-          <%= partial :'organisations/payments/experimental', locals: { f: f } %>
+          <%= partial :'organisations/payments/evm', locals: { f: f } %>
+          <%= partial :'organisations/payments/patreon', locals: { f: f } %>
+          <p id="payment-setup-links"></p>
+          <script>
+            $(function () {
+              $('#tab-payments .card[id^="payment-"]').each(function () {
+                var card = $(this)
+                var filled = card.find('input:not([type=hidden]), textarea, select').filter(function () {
+                  return $(this).is(':checkbox') ? this.checked : $(this).val()
+                }).length
+                if (filled) return
+                card.hide()
+                $('#payment-setup-links').append(
+                  $('<a href="javascript:;" class="d-inline-block mr-3 mb-1">').text('Set up ' + card.find('h4').text()).click(function () {
+                    card.show()
+                    $(window).scrollTop(card.offset().top - $('#header').height() - 36)
+                    $(this).remove()
+                  })
+                )
+              })
+              if (!$('#payment-setup-links a').length) $('#payment-setup-links').remove()
+            })
+          </script>
         </div>
         <div role="tabpanel" class="tab-pane <%= 'active' if params[:tab] == 'emails'%>" id="tab-emails">
           <script>
@@ -209,6 +231,7 @@
           <%= f.wysiwyg_block :event_footer %>
           <%= f.text_block :add_a_donation_to %>
           <%= f.text_block :donation_text %>
+          <%= f.text_block :tax_rate_id %>
           <%= f.number_block :event_image_required_width %>
           <%= f.number_block :event_image_required_height %>
           <%= f.url_block :become_a_member_url %>

@@ -48,11 +48,11 @@ You can also share a [check-in scanner link](/docs/events#checking-people-in) wi
 
 ## Payments
 
-To accept payments for tickets to events created under the organisation, you must add details for Stripe or another payment processor in the Payments tab of your organisation's settings.
+To accept payments for tickets to events created under the organisation, you must add details for Stripe or another payment processor in the Payments tab of your organisation's settings. Stripe is shown by default; click **Set up** for GoCardless, Open Collective, Mollie, PayPal, Crypto, or Patreon.
 
-[Mollie](https://www.mollie.com/) is available for fiat-currency events. Add your live API key from **Developers > API keys** in the Mollie Dashboard. Buyers are sent to Mollie's hosted checkout with the payment methods enabled on your website profile (iDEAL, cards, Bancontact, and so on).
+[Mollie](https://www.mollie.com/) is available for fiat-currency events. Click **Set up Mollie** and add your live API key from **Developers > API keys** in the Mollie Dashboard. Buyers are sent to Mollie's hosted checkout with the payment methods enabled on your website profile (iDEAL, cards, Bancontact, and so on).
 
-[PayPal](https://www.paypal.com/) is available for fiat-currency events. Add your live client ID and secret from [Apps & Credentials](https://developer.paypal.com/dashboard/applications/live), and register the webhook URL shown on the Payments tab for **Checkout order approved** and **Payment capture completed**.
+[PayPal](https://www.paypal.com/) is available for fiat-currency events. Click **Set up PayPal**, add your live client ID and secret from [Apps & Credentials](https://developer.paypal.com/dashboard/applications/live), and register the webhook URL shown on the Payments tab for **Checkout order approved** and **Payment capture completed**.
 
 GoCardless Instant Bank Pay and instalments are only offered at checkout for **GBP** and **EUR** events (UK and supported Eurozone countries). For other currencies, use Stripe, Mollie, PayPal, or another processor.
 
@@ -80,7 +80,7 @@ Imported events use the feed's event URL as their RSVP/ticket button, so people 
 
 ## Recognising monthly donors
 
-Provide a GoCardless access token and/or Patreon API key, and people with active subscriptions will be recognised as monthly donors/members of the organisation.
+On the Payments tab, click **Set up GoCardless** and/or **Set up Patreon** and provide a GoCardless access token and/or Patreon API key. People with active subscriptions will be recognised as monthly donors/members of the organisation.
 
 You can restrict an event to monthly donors by checking **Only allow people making a monthly donation to the organisation to purchase tickets**. Signed-in monthly donors can then buy tickets; others cannot.
 

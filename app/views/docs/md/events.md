@@ -64,7 +64,7 @@ If you set a total capacity on the event or on a ticket group, Dandelion uses sl
 
 You can collect ticket payments as a fixed number of monthly Direct Debit instalments via GoCardless.
 
-1. In your organisation settings under Payments, add a GoCardless access token and webhook secret, then check **Enable Instalments**.
+1. In your organisation settings under Payments, click **Set up GoCardless**, add an access token and webhook secret, then check **Enable Instalments**.
 2. Set the webhook to send **billing request** events. Include **payments** as well if you also use Instant Bank Pay.
 3. Edit the event and, under Everything else, set **GoCardless instalments** to the number of monthly payments (2–24). This field appears once instalments are enabled on the organisation.
 
@@ -76,7 +76,7 @@ Alternatively, you can create a secret ticket type with a quantity equal to the 
 
 ## Including sales taxes (VAT/MOMS)
 
-First, [add a tax rate on Stripe](https://dashboard.stripe.com/tax-rates) (for the UK, VAT/20%/Inclusive; for Sweden, VAT/25%/Inclusive – leave Region blank to apply to all purchases). Then copy the tax rate ID, and enter it in your event settings under Everything else (or in your organisation settings under Payments to apply to all events in the organisation).
+First, [add a tax rate on Stripe](https://dashboard.stripe.com/tax-rates) (for the UK, VAT/20%/Inclusive; for Sweden, VAT/25%/Inclusive – leave Region blank to apply to all purchases). Then copy the tax rate ID, and enter it in your event settings under Everything else (or in your organisation settings under Everything else to apply to all events in the organisation).
 
 ## Sending payment receipts
 
@@ -86,7 +86,7 @@ To enable automated receipts for Stripe payments, toggle 'Successful payments' o
 
 If your organisation has an [Open Collective](https://opencollective.com/) account, you can accept payments through it:
 
-1. Go to the Payments tab in your organisation's settings and enter your Open Collective organisation slug (e.g. if your Open Collective URL is `https://opencollective.com/mystica`, the slug is `mystica`)
+1. Go to the Payments tab in your organisation's settings, click **Set up Open Collective**, and enter your Open Collective organisation slug (e.g. if your Open Collective URL is `https://opencollective.com/mystica`, the slug is `mystica`)
 2. Create an event on Open Collective under your organisation
 3. Edit your Dandelion event and enter the Open Collective event slug under Everything else
 
@@ -96,7 +96,7 @@ Ticket buyers will then see a 'Pay with Open Collective' option at checkout. Dan
 
 If your organisation has a [Mollie](https://www.mollie.com/) account, you can accept payments through it:
 
-1. Go to the Payments tab in your organisation's settings
+1. Go to the Payments tab in your organisation's settings and click **Set up Mollie**
 2. Paste your live API key from [Developers > API keys](https://my.mollie.com/dashboard/developers/api-keys) in the Mollie Dashboard
 3. Enable the payment methods you want on your [website profile](https://my.mollie.com/dashboard/settings/profiles)
 
@@ -106,7 +106,7 @@ Ticket buyers will then see a **Pay with Mollie** button at checkout on fiat-cur
 
 If your organisation has a [PayPal](https://www.paypal.com/) business account, you can accept payments through it:
 
-1. Go to the Payments tab in your organisation's settings
+1. Go to the Payments tab in your organisation's settings and click **Set up PayPal**
 2. Create an app under [Apps & Credentials](https://developer.paypal.com/dashboard/applications/live) in the PayPal Developer Dashboard and paste the live client ID and secret
 3. Add a webhook for your organisation's PayPal webhook URL (shown on the Payments tab) with **Checkout order approved** and **Payment capture completed**
 
