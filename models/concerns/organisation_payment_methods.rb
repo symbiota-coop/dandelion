@@ -101,7 +101,7 @@ module OrganisationPaymentMethods
         mollie_api_key: '<code>Developers</code> > <code>API keys</code>. Starts <code>live_</code>. Dandelion sends a webhook URL with each payment, so you do not need to add a webhook in the Mollie Dashboard.',
         paypal_client_id: '<code>Apps & Credentials</code> > your app > <code>Client ID</code>',
         paypal_secret: '<code>Apps & Credentials</code> > your app > <code>Secret</code>',
-        paypal_sandbox: 'Use PayPal sandbox credentials and the sandbox API. Live payments will not be taken.',
+        paypal_sandbox: 'Use the sandbox API. You must paste sandbox client ID and secret from the Sandbox tab of Apps & Credentials — live credentials will fail.',
         gocardless_instant_bank_pay: 'Shown at checkout for GBP and EUR events only (UK and supported Eurozone countries)',
         gocardless_instalments: 'Shown at checkout for GBP and EUR events only. Set the number of instalments on each event.',
         evm_address: 'Ethereum-compatible wallet address for receiving tokens via EVM networks',

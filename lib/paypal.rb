@@ -45,6 +45,26 @@ class Paypal
     def approved?(order)
       order['status'] == 'APPROVED'
     end
+
+    def error_message(body, status: nil)
+      summary = nil
+      details = nil
+      if body.is_a?(Hash)
+        summary = body['message'].presence || body['name'].presence || body['error_description'].presence || body['error'].presence
+        details = Array(body['details']).map { |d| d['description'] || d['issue'] }.compact.presence
+        details = details.join('; ') if details
+      elsif body.present?
+        summary = body.to_s.truncate(200)
+      end
+      summary ||= 'PayPal request failed'
+      message = [summary, details].compact.join(': ')
+      message += " (HTTP #{status})" if status
+      message
+    end
+
+    def token_cache
+      @token_cache ||= {}
+    end
   end
 
   def initialize(client_id:, secret:, sandbox: false)
@@ -117,6 +137,10 @@ class Paypal
     raise_for_status(response)
     response.body
   rescue Faraday::Error => e
+    if e.response
+      body = e.response_body
+      raise RequestError.new(self.class.error_message(body, status: e.response_status), status: e.response_status, body: body)
+    end
     raise RequestError.new(e.message, status: e.response_status)
   end
 
@@ -124,13 +148,7 @@ class Paypal
     return if response.success?
 
     body = response.body
-    message = if body.is_a?(Hash)
-                details = Array(body['details']).map { |d| d['description'] || d['issue'] }.compact
-                [body['message'] || body['name'] || 'PayPal request failed', details.join('; ').presence].compact.join(': ')
-              else
-                'PayPal request failed'
-              end
-    raise RequestError.new(message, status: response.status, body: body)
+    raise RequestError.new(self.class.error_message(body, status: response.status), status: response.status, body: body)
   end
 
   def api_connection
@@ -184,13 +202,5 @@ class Paypal
 
   def token_cache
     self.class.token_cache
-  end
-
-  def self.token_cache
-    @token_cache ||= {}
-  end
-
-  def self.reset_token_cache!
-    @token_cache = {}
   end
 end

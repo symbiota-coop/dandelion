@@ -555,6 +555,19 @@ class WebhooksTest < ActiveSupport::TestCase
          }
   end
 
+  test 'paypal error message includes oauth fields' do
+    assert_equal 'Client Authentication failed (HTTP 401)',
+                 Paypal.error_message({ 'error' => 'invalid_client', 'error_description' => 'Client Authentication failed' }, status: 401)
+  end
+
+  test 'paypal error message includes order details' do
+    assert_equal 'Request is not well-formed: Invalid description (HTTP 400)',
+                 Paypal.error_message(
+                   { 'name' => 'INVALID_REQUEST', 'message' => 'Request is not well-formed', 'details' => [{ 'description' => 'Invalid description' }] },
+                   status: 400
+                 )
+  end
+
   test 'organisation with paypal credentials has a payment method' do
     create_organisation(stripe_pk: nil, stripe_sk: nil, paypal_client_id: 'paypal_client', paypal_secret: 'paypal_secret')
     assert @organisation.payment_method?
