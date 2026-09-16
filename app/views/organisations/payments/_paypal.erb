@@ -1,0 +1,21 @@
+<div class="card mb-3">
+  <div class="card-header text-white bg-primary">
+    <h4 class="my-0">PayPal</h4>
+  </div>
+  <div class="card-body pb-0">
+    <p>
+      Create an app under <code>Apps & Credentials</code> in the
+      <a href="https://developer.paypal.com/dashboard/applications/live">PayPal Developer Dashboard</a>
+      and copy the live client ID and secret.
+      <br />
+      Add a webhook for
+      <span style="text-decoration: underline dotted"><%=ENV['BASE_URI']%>/o/<%= @organisation.slug %>/paypal_webhook</span>
+      with <code>CHECKOUT.ORDER.APPROVED</code> and <code>PAYMENT.CAPTURE.COMPLETED</code>.
+    </p>
+    <%= f.text_block :paypal_client_id %>
+    <%= f.text_block :paypal_secret %>
+    <% if admin? %>
+      <%= f.check_box_block :paypal_sandbox %>
+    <% end %>
+  </div>
+</div>

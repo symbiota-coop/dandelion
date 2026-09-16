@@ -1,0 +1,20 @@
+<div class="card mb-3">
+  <div class="card-header text-white bg-primary">
+    <h4 class="my-0">GoCardless</h4>
+  </div>
+  <div class="card-body pb-0">
+    <p>
+      Go to <code>Developers</code> > <code>Create</code> > <code>Access token</code> and create an access token with <code>Read-write access</code>
+      <br />
+      Go to <code>Developers</code> > <code>Create</code> > <code>Webhook endpoint</code> and add
+      <span style="text-decoration: underline dotted"><%=ENV['BASE_URI']%>/o/<%= @organisation.slug %>/gocardless_webhook</span>
+      <br />
+      (We recommending leaving <code>Secret (optional)</code> blank then copying the auto-generated secret on the next screen)
+    </p>
+    <%= f.text_block :gocardless_access_token %>
+    <%= f.text_block :gocardless_endpoint_secret %>
+    <%= f.check_box_block :gocardless_instant_bank_pay %>
+    <%= f.check_box_block :gocardless_instalments %>
+    <%= f.check_box_block :gocardless_subscriptions %>
+  </div>
+</div>
