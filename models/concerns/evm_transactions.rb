@@ -15,10 +15,8 @@ module EvmTransactions
 
       # Blockscout v2
       [
-        "https://optimism.blockscout.com/api/v2/addresses/#{evm_address}/token-transfers",
         "https://gnosis.blockscout.com/api/v2/addresses/#{evm_address}/token-transfers",
         "https://base.blockscout.com/api/v2/addresses/#{evm_address}/token-transfers",
-        "https://arbitrum.blockscout.com/api/v2/addresses/#{evm_address}/token-transfers",
         "https://celo.blockscout.com/api/v2/addresses/#{evm_address}/token-transfers"
       ].each do |url|
         puts url
