@@ -6,6 +6,7 @@ class Ticket
   include Mongoid::Paranoia
   include Refundable
   include TicketNotifications
+  include TicketPaymentMethods
 
   belongs_to_without_parent_validation :event
   belongs_to_without_parent_validation :account, optional: true
@@ -23,14 +24,6 @@ class Ticket
   field :percentage_discount, type: Integer
   field :percentage_discount_monthly_donor, type: Integer
   field :organisation_revenue_share, type: Float
-  field :session_id, type: String
-  field :payment_intent, type: String
-  field :gocardless_payment_request_id, type: String
-  field :gocardless_billing_request_id, type: String
-  field :gocardless_payment_id, type: String
-  field :mollie_payment_id, type: String
-  field :paypal_order_id, type: String
-  field :paypal_capture_id, type: String
   field :show_attendance, type: Boolean
   field :subscribed_discussion, type: Boolean
   field :checked_in, type: Boolean

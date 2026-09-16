@@ -3,7 +3,6 @@ module OrganisationFields
 
   included do
     include EmailFields
-    include OrganisationPaymentMethods
 
     field :name, type: String
     field :slug, type: String

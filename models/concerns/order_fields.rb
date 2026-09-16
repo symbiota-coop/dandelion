@@ -8,19 +8,6 @@ module OrderFields
     field :original_description, type: String
     field :percentage_discount, type: Integer
     field :percentage_discount_monthly_donor, type: Integer
-    field :session_id, type: String
-    field :payment_intent, type: String
-    field :transfer_id, type: String
-    field :coinbase_checkout_id, type: String
-    field :gocardless_payment_request_id, type: String
-    field :gocardless_payment_id, type: String
-    field :gocardless_billing_request_id, type: String
-    field :mollie_payment_id, type: String
-    field :paypal_order_id, type: String
-    field :paypal_capture_id, type: String
-    field :evm_secret, type: String
-    field :evm_value, type: BigDecimal
-    field :oc_secret, type: String
     field :payment_completed, type: Mongoid::Boolean
     field :application_fee_amount, type: Float
     field :application_fee_paid_to_dandelion, type: Mongoid::Boolean

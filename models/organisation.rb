@@ -8,6 +8,7 @@ class Organisation
 
   extend Dragonfly::Model
   include OrganisationFields
+  include OrganisationPaymentMethods
   include OrganisationAssociations
   include OrganisationAccounting
   include OrganisationAccessControl

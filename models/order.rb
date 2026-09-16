@@ -10,6 +10,7 @@ class Order
   end
 
   include OrderFields
+  include OrderPaymentMethods
   include OrderNotifications
   include OrderAccounting
   include Refundable
@@ -28,8 +29,6 @@ class Order
 
   has_many :notifications, as: :notifiable, dependent: :destroy
 
-  validates_uniqueness_of :session_id, :payment_intent, :coinbase_checkout_id, :mollie_payment_id, :paypal_order_id, allow_nil: true
-  validates_uniqueness_of :evm_secret, scope: :evm_value, allow_nil: true
   validates_uniqueness_of :token, allow_nil: true
 
   def self.protected_attributes
@@ -53,7 +52,6 @@ class Order
     # Only mint on create so later saves do not backfill tokens onto legacy
     # orders (those stay reachable by Mongo id).
     mint_token if new_record? && token.blank?
-    self.evm_value = value.to_d + evm_offset if evm_secret && !evm_value
     self.discount_code = nil if discount_code && !discount_code.applies_to?(event)
     self.discount_code = nil if discount_code&.exhausted?(excluding: self)
     self.percentage_discount = discount_code.percentage_discount if discount_code && discount_code.percentage_discount
@@ -165,10 +163,6 @@ class Order
     EventPaymentMethod.for_record(self)&.provider_name
   end
 
-  def evm_offset
-    evm_secret.to_d / 1e6
-  end
-
   def mint_token
     loop do
       generated = SecureRandom.uuid
@@ -183,60 +177,6 @@ class Order
   # which /orders/:id still accepts via find_by_id_or_token.
   def public_id
     token.present? ? token : id.to_s
-  end
-
-  def persist_gocardless_payment_id(payment_id)
-    return if gocardless_payment_id.present? || payment_id.blank?
-
-    set(gocardless_payment_id: payment_id)
-    tickets.each do |ticket|
-      ticket.update_attributes!(gocardless_payment_id: payment_id)
-    end
-  end
-
-  def persist_paypal_capture_id(capture_id)
-    return if paypal_capture_id.present? || capture_id.blank?
-
-    set(paypal_capture_id: capture_id)
-    tickets.each do |ticket|
-      ticket.update_attributes!(paypal_capture_id: capture_id)
-    end
-  end
-
-  def create_gocardless_instalment_schedule
-    client = GoCardlessPro::Client.new(access_token: event.organisation.gocardless_access_token)
-    billing_request = client.billing_requests.get(gocardless_billing_request_id)
-    mandate_id = billing_request.links.mandate_request_mandate if billing_request&.status == 'fulfilled'
-    raise 'fulfilled billing request did not include a mandate' if mandate_id.blank?
-
-    total_pence = (value * 100).round
-    count = event.gocardless_instalment_count.to_i
-    base = total_pence / count
-    remainder = total_pence % count
-    amounts = Array.new(count) { |i| i.zero? ? base + remainder : base }
-
-    begin
-      client.instalment_schedules.create_with_schedule(
-        params: {
-          name: description.truncate(100),
-          currency: currency,
-          total_amount: total_pence,
-          instalments: {
-            interval_unit: 'monthly',
-            interval: 1,
-            amounts: amounts
-          },
-          links: { mandate: mandate_id }
-        },
-        headers: { 'Idempotency-Key' => "dandelion-order-#{id}-instalment-schedule" }
-      )
-      true
-    rescue GoCardlessPro::InvalidStateError => e
-      return true if e.try(:idempotent_creation_conflict?)
-      return false if e.message.to_s.include?('cancelled')
-
-      raise
-    end
   end
 
   def payment_completed!
