@@ -104,7 +104,7 @@ module OrganisationPaymentMethods
         paypal_sandbox: 'Use the sandbox API. You must paste sandbox client ID and secret from the Sandbox tab of Apps & Credentials — live credentials will fail.',
         gocardless_instant_bank_pay: 'Shown at checkout for GBP and EUR events only (UK and supported Eurozone countries)',
         gocardless_instalments: 'Shown at checkout for GBP and EUR events only. Set the number of instalments on each event.',
-        evm_address: 'Ethereum-compatible wallet address for receiving tokens via EVM networks',
+        evm_address: 'Ethereum-compatible wallet address for receiving tokens via Gnosis, Celo or Base',
         oc_slug: 'Open Collective organisation slug',
         tax_rate_id: 'Stripe tax rate ID to apply to ticket purchases'
       }

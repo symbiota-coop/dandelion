@@ -253,7 +253,7 @@ Dandelion does not take any money from ticket sales. Your chosen payment process
 - [PayPal fees](https://www.paypal.com/uk/business/paypal-business-fees)
 - [Open Collective fees](https://opencollective.com/)
 
-Alternatively, you can accept completely fee-free crypto payments via Gnosis, Celo or Base.
+Alternatively, you can accept completely fee-free crypto payments via Gnosis, Celo or Base. Go to the Payments tab in your organisation's settings, click **Set up Crypto**, and enter an Ethereum-compatible wallet address.
 
 ## About the suggested donation
 
