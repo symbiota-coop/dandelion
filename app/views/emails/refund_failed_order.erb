@@ -4,7 +4,7 @@
     We tried to refund the order of <%= account.name %> (<a href="mailto:<%=account.email%>"><%=account.email%></a>) for the event <a href="<%= ENV['BASE_URI'] %>/e/<%=event.slug%>"><%= event.name %></a> via <%= provider %>, but we received an error:
   </p>
   <blockquote>
-    <%= Rinku.auto_link(error.message) %>
+    <%== Rinku.auto_link(h(error.message)) %>
   </blockquote>
   <p>
     You can attempt the refund again via your <%= provider %> dashboard.

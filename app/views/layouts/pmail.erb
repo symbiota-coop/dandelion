@@ -12,15 +12,15 @@
       }
     </style>
     <style>
-      <%= File.read(Padrino.root('app/assets/stylesheets/email.css')) %>
+      <%== File.read(Padrino.root('app/assets/stylesheets/email.css')) %>
 
       <% email_theme_color = pmail.organisation.theme_color || '#00AF5E' %>
-      <%= EmailHelper.theme_css(email_theme_color) %>
+      <%== EmailHelper.theme_css(email_theme_color) %>
     </style>
   </head>
   <body>
     <div class="tagline">
-      <%= ERB::Util.html_escape(EmailHelper.strip_recipient_secrets(pmail.preview_text)) %>
+      <%= EmailHelper.strip_recipient_secrets(pmail.preview_text) %>
     </div>
     <div class="header-image-container">
       <% if pmail.organisation.image %>
@@ -45,14 +45,14 @@
     <div class="container">
       <div class="main">
         <% if pmail.markdown? %>
-          <%= EmailHelper.strip_recipient_secrets(
+          <%== EmailHelper.strip_recipient_secrets(
                 Sanitize.fragment(
                   Redcarpet::Markdown.new(Redcarpet::Render::HTML.new(hard_wrap: true), autolink: true, tables: true).render(pmail.body),
                   Sanitize::Config::DANDELION
                 )
               ) %>
         <% else %>
-          <%= EmailHelper.replace_youtube_oembeds(pmail.body) %>
+          <%== EmailHelper.replace_youtube_oembeds(pmail.body) %>
         <% end %>
       </div>
     </div>

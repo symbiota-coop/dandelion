@@ -17,24 +17,25 @@ module EmailFields
 
   def self.replace_magic_tags(text, event:, account: nil, orders: [], recipient_variables: false, plain_text: false)
     html = text.to_s
+    h = ->(value) { ERB::Util.html_escape(value.to_s) } # text is HTML (plain_text is derived from it below)
 
     if recipient_variables
       RECIPIENT_TAGS.each { |key| html = html.gsub("[#{key}]", "%recipient.#{key}%") }
     else
       recipient_tag_values(event: event, account: account, orders: orders).each do |key, value|
-        html = html.gsub("[#{key}]", value.to_s)
+        html = html.gsub("[#{key}]", h.call(value))
       end
     end
 
-    event_name = plain_text ? event.name : "<a href='#{ENV['BASE_URI']}/e/#{event.slug}'>#{event.name}</a>"
+    event_name = plain_text ? h.call(event.name) : "<a href='#{ENV['BASE_URI']}/e/#{event.slug}'>#{h.call(event.name)}</a>"
     html = html
            .gsub('[event_name]', event_name)
            .gsub('[event_link]', event_name) # deprecated: use [event_name]
-           .gsub('[organisation_name]', event.organisation.name)
-           .gsub('[event_location]', event.location.to_s)
+           .gsub('[organisation_name]', h.call(event.organisation.name))
+           .gsub('[event_location]', h.call(event.location))
            .gsub('[event_url]', "#{ENV['BASE_URI']}/e/#{event.slug}")
-           .gsub(' [at_event_location_if_not_online]', event.online? ? '' : " at #{event.location}")
-           .gsub('[at_event_location_if_not_online]', event.online? ? '' : "at #{event.location}")
+           .gsub(' [at_event_location_if_not_online]', event.online? ? '' : " at #{h.call(event.location)}")
+           .gsub('[at_event_location_if_not_online]', event.online? ? '' : "at #{h.call(event.location)}")
            .gsub('[key_information_again]', event.extra_info_for_ticket_email ? "<p>Here's the key information again for your convenience:</p><hr><p>#{event.extra_info_for_ticket_email}</p>" : '')
 
     if plain_text

@@ -275,7 +275,9 @@ module CoreExtensions
       value = send(field)
       next unless value.present?
 
-      sanitized_value = EmailHelper.strip_recipient_secrets(Nokogiri::HTML.fragment(value.to_s).text).squish
+      # Angle brackets are dropped outright: these values reach Mailgun as %recipient.*% variables,
+      # which are substituted into HTML after rendering with no escaping step.
+      sanitized_value = EmailHelper.strip_recipient_secrets(Nokogiri::HTML.fragment(value.to_s).text).delete('<>').squish
       next if sanitized_value == value.to_s
 
       send("#{field}=", sanitized_value)

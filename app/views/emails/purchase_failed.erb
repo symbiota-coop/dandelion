@@ -4,7 +4,7 @@
     We received an error<%= " from #{provider}" if provider %> when <%= account.name %> (<a href="mailto:<%=account.email%>"><%=account.email%></a>) attempted to purchase ticket(s) for the event <a href="<%= ENV['BASE_URI'] %>/e/<%=event.slug%>"><%= event.name %></a>:
   </p>
   <blockquote>
-    <%= Rinku.auto_link(error.message) %>
+    <%== Rinku.auto_link(h(error.message)) %>
   </blockquote>
   <% unless help == false %>
     <% if event.locked? %>

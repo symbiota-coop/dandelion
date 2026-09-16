@@ -16,14 +16,17 @@ module EmailHelper
       .gsub(%r{<oembed url="https://(?:youtu\.be/|www\.youtube\.com/watch\?v=)(\w+)"></oembed>}) do
         video_id = ::Regexp.last_match(1)
         begin
-          title = Yt::Video.new(id: video_id).title
+          title = ERB::Util.html_escape(strip_recipient_secrets(Yt::Video.new(id: video_id).title))
           %(<div><a href="https://www.youtube.com/watch?v=#{video_id}"><img src="#{ENV['BASE_URI']}/youtube_thumb/#{video_id}"></a><span>#{title}</span></div>)
         rescue Yt::Errors::NoItems
           %(<div><a href="https://www.youtube.com/watch?v=#{video_id}">link to private YouTube video</a></div>)
         end
       end
-      .gsub(/<figure([^>]*)>/, '<div\1>').gsub('</figure>', '</div>')
-                                         .gsub(/<figcaption([^>]*)>/, '<span\1>').gsub('</figcaption>', '</span>')
+      .gsub(/<figure([^>]*)>/, '<div\1>')
+      .gsub('</figure>', '</div>')
+      .gsub(/<figcaption([^>]*)>/, '<span\1>')
+      .gsub('</figcaption>', '</span>')
+      .html_safe
   end
 
   def self.mailgun_host(email, default_host)
@@ -42,9 +45,22 @@ module EmailHelper
       end
     end
 
-    def get_binding
-      binding
+    def h(text)
+      ERB::Util.html_escape(text)
     end
+
+    def nl2br(text)
+      h(text).gsub("\n", '<br />').html_safe
+    end
+  end
+
+  # Email templates render through the same SafeBuffer-aware Erubi engine Padrino uses for web views:
+  # <%= %> escapes anything that isn't html_safe, <%== %> emits raw HTML.
+  # Escaping at output is what keeps user-supplied text (names, subjects, answers) inert
+  # once Premailer/Nokogiri re-parses the body, regardless of how the text was stored.
+  def self.render_erb(path, context)
+    src = Padrino::Rendering::SafeErubi.new(File.read(path), bufval: 'SafeBuffer.new', bufvar: '@_out_buf').src
+    context.instance_eval(src, path)
   end
 
   def self.theme_css(color)
@@ -58,8 +74,7 @@ module EmailHelper
   end
 
   def self.render(template_name, **locals)
-    context = TemplateContext.new(locals)
-    ERB.new(File.read(Padrino.root("app/views/emails/#{template_name}.erb"))).result(context.get_binding)
+    render_erb(Padrino.root("app/views/emails/#{template_name}.erb"), TemplateContext.new(locals))
   end
 
   def self.send_to_founder(subject:, body_text: nil, body_html: nil, reply_to: nil)
@@ -89,7 +104,7 @@ module EmailHelper
     context = TemplateContext.new(locals.merge(content: content))
 
     Premailer.new(
-      ERB.new(File.read(Padrino.root("app/views/layouts/#{layout}.erb"))).result(context.get_binding),
+      render_erb(Padrino.root("app/views/layouts/#{layout}.erb"), context).to_str,
       with_html_string: true,
       adapter: 'nokogiri',
       input_encoding: 'UTF-8'

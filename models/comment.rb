@@ -45,9 +45,9 @@ class Comment
   def body_with_additions
     return unless body
 
-    b = body
+    b = ERB::Util.html_escape(body).to_str
     b = b.gsub("\n", '<br />')
-    b.gsub(/\[@([\w\s'-.]+)\]\(@(\w+)\)/, "<a href=\"#{ENV['BASE_URI']}/u/\\2\">\\1</a>")
+    b.gsub(/\[@((?:[\w\s'-.]|&#39;)+)\]\(@(\w+)\)/, "<a href=\"#{ENV['BASE_URI']}/u/\\2\">\\1</a>").html_safe
   end
 
   has_many :notifications, as: :notifiable, dependent: :destroy
@@ -93,14 +93,15 @@ class Comment
   end
 
   def description
+    name = ERB::Util.html_escape(account.name)
     if commentable.is_a?(Mapplication)
-      "<strong>#{account.name}</strong> commented on <strong>#{commentable.account.name}</strong>'s application"
+      "<strong>#{name}</strong> commented on <strong>#{ERB::Util.html_escape(commentable.account.name)}</strong>'s application"
     elsif post.comments.count == 1
-      "<strong>#{account.name}</strong> started a thread"
+      "<strong>#{name}</strong> started a thread"
     elsif first_real_comment?
-      "<strong>#{account.name}</strong> commented"
+      "<strong>#{name}</strong> commented"
     else
-      "<strong>#{account.name}</strong> replied"
+      "<strong>#{name}</strong> replied"
     end.html_safe
   end
 

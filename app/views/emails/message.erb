@@ -3,7 +3,7 @@
     <strong><%= messenger.name %></strong> sent you a message via Dandelion.
   </p>
   <blockquote>
-    <%= message.body.gsub("\n", '<br />') %>
+    <%= nl2br(message.body) %>
   </blockquote>
   <p><a href="<%= ENV['BASE_URI'] %>/messages/<%= messenger.id %>">View message history</a></p>
 </div>

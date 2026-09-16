@@ -10,10 +10,10 @@
       <% if !defined?(header_image_url) %>
         body { padding-top: 1em }
       <% end %>
-      <%= File.read(Padrino.root('app/assets/stylesheets/email.css')) %>
+      <%== File.read(Padrino.root('app/assets/stylesheets/email.css')) %>
 
       <% email_theme_color = (defined?(event) && event.theme_color_or_organisation_theme_color) || '#00AF5E' %>
-      <%= EmailHelper.theme_css(email_theme_color) %>
+      <%== EmailHelper.theme_css(email_theme_color) %>
     </style>
   </head>
   <body>
@@ -23,7 +23,7 @@
       </div>
     <% end %>
     <div class="container">
-      <%= content %>
+      <%== content %>
     </div>
   </body>
 </html>

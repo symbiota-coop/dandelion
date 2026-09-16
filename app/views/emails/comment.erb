@@ -23,7 +23,7 @@
   <% end %>
   <% close_divs = ''; comment.post.comments.order_by(:created_at.desc)[1..].each { |comment| next if comment.body.nil? %>
   <p>On <%= comment.created_at %>, <%= comment.account.name %> wrote:</p>
-  <%= '<div style="border-left: 1px solid #ccc; margin-left: 1em; padding-left: 1em">' %>
+  <%== '<div style="border-left: 1px solid #ccc; margin-left: 1em; padding-left: 1em">' %>
   <p><%= comment.body_with_additions %></p>
   <% if comment.file %>
     <p>
@@ -36,7 +36,7 @@
   <% end %>
   <% close_divs << '</div>' %>
   <% } %>
-  <%= close_divs %>
+  <%== close_divs %>
   <p>To continue the conversation, <a href="<%= comment.post.url %>?sign_in_token=%recipient.token%">view the post</a> or reply to this email.</p>
 </div>
 <div class="footer">
