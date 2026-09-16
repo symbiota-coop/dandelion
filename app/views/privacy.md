@@ -12,7 +12,7 @@ We collect information you give us, such as your name, email address, username, 
 
 We collect technical information needed to run the service, including IP address, browser and device information, log data, security events, session data and approximate location inferred from your IP address.
 
-We receive payment and booking information from payment processors and event organisers. Card details are handled by payment processors such as Stripe and Mollie and are not stored by Dandelion.
+We receive payment and booking information from payment processors and event organisers. Card details are handled by payment processors such as Stripe, Mollie and PayPal and are not stored by Dandelion.
 
 ## How We Use Your Information
 

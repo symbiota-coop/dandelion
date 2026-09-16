@@ -161,6 +161,23 @@ EventPaymentMethod.new('mollie',
                          }
                        })
 
+EventPaymentMethod.new('paypal',
+                       label: 'Pay with PayPal',
+                       provider_name: 'PayPal',
+                       badge_class: 'bg-paypal',
+                       identity_fields: %i[paypal_order_id paypal_capture_id],
+                       payment_id_field: :paypal_capture_id,
+                       org_condition: ->(org) { org.paypal_client_id && org.paypal_secret },
+                       event_condition: ->(event) { FIAT_CURRENCIES.include?(event.currency) },
+                       dashboard_help: 'Also, make sure you have added the webhook URL in your PayPal app.',
+                       process: ->(**kwargs) { EventPaymentMethod::Paypal.call(**kwargs) },
+                       refund: ->(record, **kwargs) { EventPaymentMethod::Paypal.refund(record, **kwargs) },
+                       purchase_errors: {
+                         Paypal::RequestError => lambda { |e|
+                           [401, 403].include?(e.status.to_i) ? :lock : :notify
+                         }
+                       })
+
 EventPaymentMethod.new('gocardless_instant',
                        label: 'Pay with GoCardless',
                        provider_name: 'GoCardless',

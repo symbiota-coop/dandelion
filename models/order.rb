@@ -28,7 +28,7 @@ class Order
 
   has_many :notifications, as: :notifiable, dependent: :destroy
 
-  validates_uniqueness_of :session_id, :payment_intent, :coinbase_checkout_id, :mollie_payment_id, allow_nil: true
+  validates_uniqueness_of :session_id, :payment_intent, :coinbase_checkout_id, :mollie_payment_id, :paypal_order_id, allow_nil: true
   validates_uniqueness_of :evm_secret, scope: :evm_value, allow_nil: true
   validates_uniqueness_of :token, allow_nil: true
 
@@ -191,6 +191,15 @@ class Order
     set(gocardless_payment_id: payment_id)
     tickets.each do |ticket|
       ticket.update_attributes!(gocardless_payment_id: payment_id)
+    end
+  end
+
+  def persist_paypal_capture_id(capture_id)
+    return if paypal_capture_id.present? || capture_id.blank?
+
+    set(paypal_capture_id: capture_id)
+    tickets.each do |ticket|
+      ticket.update_attributes!(paypal_capture_id: capture_id)
     end
   end
 

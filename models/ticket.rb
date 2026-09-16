@@ -29,6 +29,8 @@ class Ticket
   field :gocardless_billing_request_id, type: String
   field :gocardless_payment_id, type: String
   field :mollie_payment_id, type: String
+  field :paypal_order_id, type: String
+  field :paypal_capture_id, type: String
   field :show_attendance, type: Boolean
   field :subscribed_discussion, type: Boolean
   field :checked_in, type: Boolean

@@ -191,7 +191,7 @@ Dandelion::App.controller do
     end
     headers['Referrer-Policy'] = 'no-referrer' if @order
     unless @order&.payment_completed?
-      # Returned from a payment provider (Stripe, GoCardless, Mollie, Open Collective)
+      # Returned from a payment provider (Stripe, GoCardless, Mollie, PayPal, Open Collective)
       # before the payment has been confirmed: show the pending card, which polls
       # /payment_completed, rather than the success card or the ticket form.
       @pending_order = @order if @order && (params[:success] || params[:payment_request_id] || params[:billing_request_id])

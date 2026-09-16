@@ -501,4 +501,181 @@ class WebhooksTest < ActiveSupport::TestCase
     assert_equal 200, last_response.status
     refute order.reload.payment_completed?
   end
+
+  # ═══════════════════════════════════════════════════════════════════════════
+  # PayPal
+  # ═══════════════════════════════════════════════════════════════════════════
+
+  def create_paypal_event
+    create_organisation(paypal_client_id: 'paypal_client', paypal_secret: 'paypal_secret')
+    create_event(prices: [10])
+  end
+
+  def stub_paypal_order(id: 'PAYPAL-ORDER', approve_url: 'https://www.paypal.com/checkoutnow?token=test', status: 'CREATED', capture_id: nil)
+    {
+      'id' => id,
+      'status' => status,
+      'links' => [{ 'rel' => 'payer-action', 'href' => approve_url }],
+      'purchase_units' => [{
+        'payments' => {
+          'captures' => capture_id ? [{ 'id' => capture_id, 'status' => 'COMPLETED' }] : []
+        }
+      }]
+    }
+  end
+
+  def stub_paypal_client(create: nil, get: nil, capture: nil)
+    client = Object.new
+    client.define_singleton_method(:create_order) { |**| create }
+    client.define_singleton_method(:get_order) { |_| get.respond_to?(:call) ? get.call : get }
+    client.define_singleton_method(:capture_order) { |*| capture.respond_to?(:call) ? capture.call : capture }
+    client
+  end
+
+  def deliver_paypal_webhook(organisation, event_type:, order_id: nil, capture_id: nil)
+    resource = { 'id' => order_id }
+    if event_type == 'PAYMENT.CAPTURE.COMPLETED'
+      resource = {
+        'id' => capture_id || 'CAPTURE',
+        'supplementary_data' => { 'related_ids' => { 'order_id' => order_id } }
+      }
+    end
+    header 'Content-Type', 'application/json'
+    post "/o/#{organisation.slug}/paypal_webhook", { event_type: event_type, resource: resource }.to_json
+  end
+
+  def post_paypal_purchase(event, account)
+    ticket_type = event.ticket_types.first
+    header 'Accept', 'application/json'
+    post "/events/#{event.id}/purchase",
+         ticketForm: { quantities: { ticket_type.id.to_s => '1' } },
+         detailsForm: {
+           payment_method: 'paypal',
+           account: { name: account.name, email: account.email }
+         }
+  end
+
+  test 'organisation with paypal credentials has a payment method' do
+    create_organisation(stripe_pk: nil, stripe_sk: nil, paypal_client_id: 'paypal_client', paypal_secret: 'paypal_secret')
+    assert @organisation.payment_method?
+  end
+
+  test 'paypal client id and secret must be set together' do
+    organisation = FactoryBot.build(:organisation, stripe_pk: nil, stripe_sk: nil, paypal_client_id: 'paypal_client')
+    refute organisation.valid?
+    assert_includes organisation.errors[:paypal_secret], 'must be present if PayPal client ID is present'
+  end
+
+  test 'paypal is available for fiat-currency events when credentials are set' do
+    create_paypal_event
+    pm = EventPaymentMethod.object('paypal')
+
+    assert pm.available?(@event)
+    @event.set(currency: 'EUR')
+    assert pm.available?(@event)
+    @event.set(currency: 'SEK')
+    assert pm.available?(@event)
+    @organisation.unset(:paypal_secret)
+    @event.organisation.reload
+    refute pm.available?(@event)
+  end
+
+  test 'paypal checkout stores the order id' do
+    create_paypal_event
+    order = create_incomplete_order(@event, value: 10)
+    created = stub_paypal_order
+    captured = {}
+    client = stub_paypal_client(create: created)
+    client.define_singleton_method(:create_order) do |**attrs|
+      captured.replace(attrs)
+      created
+    end
+
+    Paypal.stub :new, client do
+      EventPaymentMethod::Paypal.call(order: order, event: @event)
+    end
+
+    assert_equal 'PAYPAL-ORDER', order.reload.paypal_order_id
+    assert_equal 'PAYPAL-ORDER', order.tickets.first.reload.paypal_order_id
+    assert_equal 10, captured[:amount]
+    assert_equal 'GBP', captured[:currency]
+    assert_includes captured[:return_url], "order_id=#{order.public_id}"
+    assert_includes captured[:return_url], 'success=true'
+    assert_includes captured[:cancel_url], 'cancelled=true'
+    assert_equal order.id.to_s, captured[:custom_id]
+  end
+
+  test 'paypal purchase creates an incomplete order then webhook issues the ticket' do
+    create_paypal_event
+    buyer = FactoryBot.create(:account)
+    created = stub_paypal_order
+    approved = stub_paypal_order(status: 'APPROVED')
+    captured = stub_paypal_order(status: 'COMPLETED', capture_id: 'CAPTURE')
+    client = stub_paypal_client(create: created, get: approved, capture: captured)
+
+    Paypal.stub :new, client do
+      post_paypal_purchase(@event, buyer)
+    end
+
+    assert_equal 200, last_response.status
+    body = JSON.parse(last_response.body)
+    assert_equal created.dig('links', 0, 'href'), body['redirect_url']
+
+    order = @event.orders.find_by(paypal_order_id: created['id'])
+    assert order
+    refute order.payment_completed?
+    refute order.tickets.first.payment_completed?
+
+    Paypal.stub :new, client do
+      deliver_paypal_webhook(@organisation, event_type: 'CHECKOUT.ORDER.APPROVED', order_id: created['id'])
+    end
+
+    assert_equal 200, last_response.status
+    assert order.reload.payment_completed?
+    assert order.tickets.first.reload.payment_completed?
+    assert_equal 'CAPTURE', order.paypal_capture_id
+    assert_equal 'CAPTURE', order.tickets.first.paypal_capture_id
+  end
+
+  test 'paid paypal webhook restores a deleted checkout' do
+    create_paypal_event
+    order = create_incomplete_order(@event, paypal_order_id: "PAYPAL-#{SecureRandom.hex(4)}")
+    paypal_order_id = order.paypal_order_id
+    order.destroy
+    client = stub_paypal_client(get: stub_paypal_order(id: paypal_order_id, status: 'COMPLETED', capture_id: 'CAPTURE'))
+
+    Paypal.stub :new, client do
+      deliver_paypal_webhook(@organisation, event_type: 'PAYMENT.CAPTURE.COMPLETED', order_id: paypal_order_id)
+    end
+
+    restored = Order.find(order.id)
+    assert restored
+    assert restored.payment_completed?
+    assert restored.tickets.first
+    assert restored.tickets.first.payment_completed?
+    assert_equal 'CAPTURE', restored.paypal_capture_id
+  end
+
+  test 'paypal webhook for an unknown order id does not call PayPal' do
+    create_paypal_event
+
+    Paypal.stub :new, ->(*) { raise 'Paypal.new should not be called' } do
+      deliver_paypal_webhook(@organisation, event_type: 'CHECKOUT.ORDER.APPROVED', order_id: 'PAYPAL-unknown')
+    end
+
+    assert_equal 200, last_response.status
+  end
+
+  test 'unapproved paypal webhook does not complete the order' do
+    create_paypal_event
+    order = create_incomplete_order(@event, paypal_order_id: "PAYPAL-#{SecureRandom.hex(4)}")
+    client = stub_paypal_client(get: stub_paypal_order(id: order.paypal_order_id, status: 'PAYER_ACTION_REQUIRED'))
+
+    Paypal.stub :new, client do
+      deliver_paypal_webhook(@organisation, event_type: 'CHECKOUT.ORDER.APPROVED', order_id: order.paypal_order_id)
+    end
+
+    assert_equal 200, last_response.status
+    refute order.reload.payment_completed?
+  end
 end

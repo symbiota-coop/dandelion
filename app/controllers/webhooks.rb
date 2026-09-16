@@ -83,4 +83,30 @@ Dandelion::App.controller do
     ErrorReporting.capture_exception(e)
     halt 200
   end
+
+  post '/o/:slug/paypal_webhook' do
+    @organisation = Organisation.find_by(slug: params[:slug]) || not_found
+    halt 200 unless @organisation.paypal_client_id && @organisation.paypal_secret
+
+    payload = begin
+      JSON.parse(request.body.read)
+    rescue JSON::ParserError
+      halt 200
+    end
+
+    paypal_order_id = EventPaymentMethod::Paypal.order_id_from_webhook(payload)
+    halt 200 if paypal_order_id.blank?
+
+    # PayPal webhooks are verified by fetching the order: look up first so we
+    # do not call PayPal (or report to Sentry) for every unknown id.
+    @order = @organisation.orders.find_by(paypal_order_id: paypal_order_id, payment_completed: false)
+    @order ||= @organisation.orders.deleted.find_by(paypal_order_id: paypal_order_id, payment_completed: false)
+    halt 200 unless @order
+
+    EventPaymentMethod::Paypal.complete_if_paid(@order)
+    200
+  rescue Paypal::RequestError => e
+    ErrorReporting.capture_exception(e)
+    halt 200
+  end
 end

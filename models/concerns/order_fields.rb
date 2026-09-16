@@ -16,6 +16,8 @@ module OrderFields
     field :gocardless_payment_id, type: String
     field :gocardless_billing_request_id, type: String
     field :mollie_payment_id, type: String
+    field :paypal_order_id, type: String
+    field :paypal_capture_id, type: String
     field :evm_secret, type: String
     field :evm_value, type: BigDecimal
     field :oc_secret, type: String

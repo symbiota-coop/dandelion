@@ -17,6 +17,11 @@ module OrganisationPaymentMethods
     # Mollie
     field :mollie_api_key, type: String
 
+    # PayPal
+    field :paypal_client_id, type: String
+    field :paypal_secret, type: String
+    field :paypal_sandbox, type: Mongoid::Boolean
+
     # GoCardless: Instant Bank Pay, instalments, and monthly-donor subscriptions
     field :gocardless_access_token, type: String
     field :gocardless_endpoint_secret, type: String
@@ -35,7 +40,7 @@ module OrganisationPaymentMethods
     validates_format_of :stripe_pk, with: /\A[a-z0-9_]+\z/i, allow_nil: true
 
     before_validation do
-      %w[mollie_api_key gocardless_access_token gocardless_endpoint_secret evm_address oc_slug].each do |f|
+      %w[mollie_api_key paypal_client_id paypal_secret gocardless_access_token gocardless_endpoint_secret evm_address oc_slug].each do |f|
         send("#{f}=", send(f).strip) if send(f)
       end
 
@@ -54,6 +59,12 @@ module OrganisationPaymentMethods
         errors.add(:mollie_api_key, 'must start with live_')
       end
 
+      errors.add(:paypal_secret, 'must be present if PayPal client ID is present') if paypal_client_id && !paypal_secret
+      errors.add(:paypal_client_id, 'must be present if PayPal secret is present') if paypal_secret && !paypal_client_id
+      if Padrino.env == :production && account && !account.admin? && paypal_sandbox
+        errors.add(:paypal_sandbox, 'cannot be used in production')
+      end
+
       errors.add(:gocardless_instant_bank_pay, 'requires GoCardless webhook secret') if gocardless_instant_bank_pay && !gocardless_endpoint_secret
       errors.add(:gocardless_instalments, 'requires GoCardless webhook secret') if gocardless_instalments && !gocardless_endpoint_secret
     end
@@ -67,6 +78,9 @@ module OrganisationPaymentMethods
         stripe_pk: 'Stripe public key',
         stripe_sk: 'Stripe secret key',
         mollie_api_key: 'Mollie API key',
+        paypal_client_id: 'PayPal client ID',
+        paypal_secret: 'PayPal secret',
+        paypal_sandbox: 'Use PayPal sandbox',
         gocardless_access_token: 'GoCardless access token',
         gocardless_endpoint_secret: 'GoCardless webhook secret',
         gocardless_instant_bank_pay: 'Enable GoCardless Instant Bank Pay',
@@ -85,6 +99,9 @@ module OrganisationPaymentMethods
         stripe_endpoint_secret: '<code>Developers</code> > <code>Webhooks</code> > <code>Signing secret</code>. Starts <code>whsec_</code>',
         stripe_client_id: 'Used for automated revenue sharing. <code>Settings</code> > <code>Connect</code> > <code>Live mode client ID</code>. Starts <code>ca_</code>',
         mollie_api_key: '<code>Developers</code> > <code>API keys</code>. Starts <code>live_</code>. Dandelion sends a webhook URL with each payment, so you do not need to add a webhook in the Mollie Dashboard.',
+        paypal_client_id: '<code>Apps & Credentials</code> > your app > <code>Client ID</code>',
+        paypal_secret: '<code>Apps & Credentials</code> > your app > <code>Secret</code>',
+        paypal_sandbox: 'Use PayPal sandbox credentials and the sandbox API. Live payments will not be taken.',
         gocardless_instant_bank_pay: 'Shown at checkout for GBP and EUR events only (UK and supported Eurozone countries)',
         gocardless_instalments: 'Shown at checkout for GBP and EUR events only. Set the number of instalments on each event.',
         evm_address: 'Ethereum-compatible wallet address for receiving tokens via EVM networks',
