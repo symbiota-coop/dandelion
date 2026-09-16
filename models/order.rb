@@ -28,7 +28,7 @@ class Order
 
   has_many :notifications, as: :notifiable, dependent: :destroy
 
-  validates_uniqueness_of :session_id, :payment_intent, :coinbase_checkout_id, allow_nil: true
+  validates_uniqueness_of :session_id, :payment_intent, :coinbase_checkout_id, :mollie_payment_id, allow_nil: true
   validates_uniqueness_of :evm_secret, scope: :evm_value, allow_nil: true
   validates_uniqueness_of :token, allow_nil: true
 
@@ -162,11 +162,13 @@ class Order
   end
 
   def payment_provider
-    if gocardless_payment_request_id || gocardless_billing_request_id
+    if gocardless_payment_request_id || gocardless_billing_request_id || gocardless_payment_id
       'GoCardless'
+    elsif mollie_payment_id
+      'Mollie'
     elsif oc_secret
       'Open Collective'
-    elsif session_id
+    elsif session_id || payment_intent
       'Stripe'
     end
   end
@@ -375,7 +377,7 @@ class Order
   after_destroy :refund
   def refund
     return if prevent_refund || event.try(:prevent_order_refunds)
-    return unless event && event.organisation && value && value.positive? && payment_completed && (payment_intent || gocardless_payment_id)
+    return unless event && event.organisation && value && value.positive? && payment_completed && (payment_intent || gocardless_payment_id || mollie_payment_id)
 
     if payment_intent
       refund_via_stripe(
@@ -383,10 +385,17 @@ class Order
         on_error: ->(error) { notify_of_failed_refund(error) },
         refund_application_fee: application_fee_amount && application_fee_amount > 0
       )
-    else
+    elsif gocardless_payment_id
       refund_via_gocardless(
         payment_id: gocardless_payment_id,
         amount: value,
+        on_error: ->(error) { notify_of_failed_refund(error) }
+      )
+    else
+      refund_via_mollie(
+        payment_id: mollie_payment_id,
+        amount: value,
+        currency: currency,
         on_error: ->(error) { notify_of_failed_refund(error) }
       )
     end

@@ -16,6 +16,14 @@ function eventPaymentHandlers (config) {
       stripe.redirectToCheckout({ sessionId: data.session_id })
     },
 
+    mollie: function (data) {
+      if (config.embedded && data.checkout_url) {
+        window.open(data.checkout_url, '_blank')
+        return
+      }
+      window.location = data.checkout_url
+    },
+
     gocardless_instant: function (data) {
       window.location = data.gocardless_billing_request_flow['authorisation_url']
     },

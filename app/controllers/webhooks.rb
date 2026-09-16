@@ -60,4 +60,27 @@ Dandelion::App.controller do
     end
     200
   end
+
+  post '/o/:slug/mollie_webhook' do
+    @organisation = Organisation.find_by(slug: params[:slug]) || not_found
+    halt 200 unless @organisation.mollie_api_key
+
+    payment_id = params[:id]
+    halt 200 if payment_id.blank?
+
+    # Mollie webhooks are unsigned, so look up the order first: this avoids an
+    # authenticated Mollie API call (and a Sentry report) for every unknown id.
+    @order = @organisation.orders.find_by(mollie_payment_id: payment_id, payment_completed: false)
+    @order ||= @organisation.orders.deleted.find_by(mollie_payment_id: payment_id, payment_completed: false)
+    halt 200 unless @order
+
+    payment = Mollie::Payment.get(payment_id, api_key: @organisation.mollie_api_key)
+    halt 200 unless payment&.paid?
+
+    @order.complete_or_restore(error_context: { mollie_payment_id: payment.id })
+    200
+  rescue Mollie::RequestError => e
+    ErrorReporting.capture_exception(e)
+    halt 200
+  end
 end

@@ -92,6 +92,16 @@ If your organisation has an [Open Collective](https://opencollective.com/) accou
 
 Ticket buyers will then see a 'Pay with Open Collective' option at checkout. Dandelion only confirms the booking once Open Collective marks the contribution as paid.
 
+## Taking payments with Mollie
+
+If your organisation has a [Mollie](https://www.mollie.com/) account, you can accept payments through it:
+
+1. Go to the Payments tab in your organisation's settings
+2. Paste your live API key from [Developers > API keys](https://my.mollie.com/dashboard/developers/api-keys) in the Mollie Dashboard
+3. Enable the payment methods you want on your [website profile](https://my.mollie.com/dashboard/settings/profiles)
+
+Ticket buyers will then see a **Pay with Mollie** button at checkout on fiat-currency events. They are sent to Mollie's hosted checkout (iDEAL, cards, Bancontact, and other methods you have enabled). Dandelion confirms the booking when Mollie marks the payment as paid.
+
 ## Get email notifications of orders
 
 Make sure the 'Send email notifications of orders' checkbox is checked in the first tab 'Basics' when creating/editing your event.
@@ -229,6 +239,7 @@ Dandelion does not take any money from ticket sales. Your chosen payment process
 
 - [Stripe fees](https://stripe.com/gb/pricing) and [Stripe payout times](https://support.stripe.com/questions/common-questions-about-payout-schedules?locale=en-GB) (You may be able to change from weekly payouts to daily payouts [here](https://dashboard.stripe.com/settings/payouts))
 - [GoCardless fees](https://gocardless.com/pricing/)
+- [Mollie fees](https://www.mollie.com/pricing)
 - [Open Collective fees](https://opencollective.com/)
 
 Alternatively, you can accept completely fee-free crypto payments via Gnosis, Celo, Optimism or Base.
@@ -259,18 +270,18 @@ If you want to resend the ticket PDF to the new email address, after entering th
 
 ## Refunds
 
-Refunds for Stripe and GoCardless payments can be issued from the event's Tickets or Orders pages. The money goes back to the original payment method.
+Refunds for Stripe, GoCardless, and Mollie payments can be issued from the event's Tickets or Orders pages. The money goes back to the original payment method.
 
 1. Click the event dropdown and go to **Tickets** or **Orders**.
 2. Open **Actions** next to the ticket or order.
 3. Choose:
    - **Remove and refund ticket** — refunds that ticket's price and removes it. The rest of the order stays in place.
    - **Remove and refund order** — refunds the whole payment (including any donation on the order) and removes the order.
-   - **Remove ticket** / **Remove order** — removes without refunding. Use this if you already refunded via Stripe or GoCardless, or the payment was not taken through Stripe/GoCardless.
+   - **Remove ticket** / **Remove order** — removes without refunding. Use this if you already refunded via Stripe, GoCardless, or Mollie, or the payment was not taken through those processors.
 
-You'll be asked to confirm. The refund options only appear for Stripe and GoCardless payments. For Open Collective, crypto, complimentary, or cash tickets, remove the ticket or order here and refund via that platform if needed.
+You'll be asked to confirm. The refund options only appear for Stripe, GoCardless, and Mollie payments. For Open Collective, crypto, complimentary, or cash tickets, remove the ticket or order here and refund via that platform if needed.
 
-If a refund fails, you'll get an email with the error. You can retry from your [Stripe](https://dashboard.stripe.com/refunds) or [GoCardless](https://manage.gocardless.com/) dashboard.
+If a refund fails, you'll get an email with the error. You can retry from your [Stripe](https://dashboard.stripe.com/refunds), [GoCardless](https://manage.gocardless.com/), or [Mollie](https://my.mollie.com/dashboard/payments) dashboard.
 
 GoCardless instalment payments should be refunded from the GoCardless dashboard (see [Allowing people to pay in instalments](#allowing-people-to-pay-in-instalments)).
 

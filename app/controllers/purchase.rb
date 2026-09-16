@@ -130,6 +130,14 @@ Dandelion::App.controller do
     @order.notify_of_failed_purchase(e, provider: 'GoCardless')
     @order.destroy
     halt 400
+  rescue Mollie::RequestError => e
+    if [401, 403].include?(e.status.to_i)
+      @order.event.set(locked: true)
+      @order.event.delete_atproto
+    end
+    @order.notify_of_failed_purchase(e, provider: 'Mollie')
+    @order.destroy
+    halt 400
   rescue StandardError => e
     ctx = {}
     ctx[:order_id] = @order.id.to_s if @order

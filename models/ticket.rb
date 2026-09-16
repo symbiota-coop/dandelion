@@ -28,6 +28,7 @@ class Ticket
   field :gocardless_payment_request_id, type: String
   field :gocardless_billing_request_id, type: String
   field :gocardless_payment_id, type: String
+  field :mollie_payment_id, type: String
   field :show_attendance, type: Boolean
   field :subscribed_discussion, type: Boolean
   field :checked_in, type: Boolean
@@ -246,11 +247,11 @@ class Ticket
   end
 
   def requires_manual_refund?
-    discounted_price && discounted_price > 0 && payment_completed && payment_intent.blank? && gocardless_payment_id.blank?
+    discounted_price && discounted_price > 0 && payment_completed && payment_intent.blank? && gocardless_payment_id.blank? && mollie_payment_id.blank?
   end
 
   def refund
-    return unless event && event.organisation && discounted_price && discounted_price > 0 && payment_completed && (payment_intent || gocardless_payment_id)
+    return unless event && event.organisation && discounted_price && discounted_price > 0 && payment_completed && (payment_intent || gocardless_payment_id || mollie_payment_id)
 
     refund_amount = order ? [discounted_price, order.total].min : discounted_price
     return if refund_amount <= 0
@@ -261,10 +262,17 @@ class Ticket
         amount: refund_amount,
         on_error: ->(error) { notify_of_failed_refund(error) }
       )
-    else
+    elsif gocardless_payment_id
       refund_via_gocardless(
         payment_id: gocardless_payment_id,
         amount: refund_amount,
+        on_error: ->(error) { notify_of_failed_refund(error) }
+      )
+    else
+      refund_via_mollie(
+        payment_id: mollie_payment_id,
+        amount: refund_amount,
+        currency: currency,
         on_error: ->(error) { notify_of_failed_refund(error) }
       )
     end

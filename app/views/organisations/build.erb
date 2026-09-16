@@ -169,6 +169,23 @@
           </div>
           <div class="card mb-3">
             <div class="card-header text-white bg-primary">
+              <h4 class="my-0">Mollie</h4>
+            </div>
+            <div class="card-body pb-0">
+              <p>
+                Go to <code>Developers</code> > <code>API keys</code> in your
+                <a href="https://my.mollie.com/dashboard/developers/api-keys">Mollie Dashboard</a>
+                and copy the live API key.
+                <br />
+                Enable the payment methods you want on your
+                <a href="https://my.mollie.com/dashboard/settings/profiles">website profile</a>
+                — buyers will see Mollie's hosted checkout with those methods.
+              </p>
+              <%= f.text_block :mollie_api_key %>
+            </div>
+          </div>
+          <div class="card mb-3">
+            <div class="card-header text-white bg-primary">
               <h4 class="my-0">GoCardless</h4>
             </div>
             <div class="card-body pb-0">

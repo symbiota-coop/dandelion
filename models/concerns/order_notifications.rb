@@ -222,7 +222,7 @@ module OrderNotifications
     account = order.account
     batch_message.from ENV['NOTIFICATIONS_EMAIL_FULL']
     batch_message.subject "Refund failed: #{account.name} in #{event.name}"
-    provider = order.payment_intent ? 'Stripe' : 'GoCardless'
+    provider = order.refund_provider
     batch_message.body_html EmailHelper.html(:refund_failed_order, account: account, event: event, error: error, provider: provider)
 
     (event.contacts + Account.and(admin: true)).uniq.each do |account|

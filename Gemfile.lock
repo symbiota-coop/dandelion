@@ -272,6 +272,9 @@ GEM
     minitest-mock (5.27.0)
     minitest-rg (5.4.0)
       minitest (>= 5.0, < 7)
+    mollie-api-ruby (4.19.0)
+      bigdecimal (>= 3.1.8, < 5.0)
+      ostruct (~> 0.6.0)
     moneta (1.6.0)
     money (7.0.2)
       bigdecimal
@@ -587,6 +590,7 @@ DEPENDENCIES
   mini_magick
   minitest-mock
   minitest-rg
+  mollie-api-ruby
   money
   mongoid
   mongoid_paranoia

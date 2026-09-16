@@ -104,7 +104,7 @@ module TicketNotifications
     account = ticket.account
     batch_message.from ENV['NOTIFICATIONS_EMAIL_FULL']
     batch_message.subject "Refund failed: #{account.name} in #{event.name}"
-    provider = ticket.payment_intent ? 'Stripe' : 'GoCardless'
+    provider = ticket.refund_provider
     batch_message.body_html EmailHelper.html(:refund_failed_ticket, account: account, event: event, error: error, provider: provider)
 
     (event.contacts + Account.and(admin: true)).uniq.each do |account|

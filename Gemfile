@@ -61,6 +61,7 @@ gem 'yt'
 
 # Payments
 gem 'gocardless_pro'
+gem 'mollie-api-ruby'
 gem 'money'
 gem 'patreon'
 gem 'stripe'

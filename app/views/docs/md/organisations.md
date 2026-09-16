@@ -50,7 +50,9 @@ You can also share a [check-in scanner link](/docs/events#checking-people-in) wi
 
 To accept payments for tickets to events created under the organisation, you must add details for Stripe or another payment processor in the Payments tab of your organisation's settings.
 
-GoCardless Instant Bank Pay and instalments are only offered at checkout for **GBP** and **EUR** events (UK and supported Eurozone countries). For other currencies, use Stripe or another processor.
+[Mollie](https://www.mollie.com/) is available for fiat-currency events. Add your live API key from **Developers > API keys** in the Mollie Dashboard. Buyers are sent to Mollie's hosted checkout with the payment methods enabled on your website profile (iDEAL, cards, Bancontact, and so on).
+
+GoCardless Instant Bank Pay and instalments are only offered at checkout for **GBP** and **EUR** events (UK and supported Eurozone countries). For other currencies, use Stripe, Mollie, or another processor.
 
 ## Analytics
 

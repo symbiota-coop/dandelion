@@ -1,6 +1,18 @@
 module Refundable
   def refundable?
-    session_id || gocardless_payment_id
+    session_id || gocardless_payment_id || mollie_payment_id
+  end
+
+  def refund_provider
+    if payment_intent
+      'Stripe'
+    elsif try(:gocardless_payment_id).present?
+      'GoCardless'
+    elsif try(:mollie_payment_id).present?
+      'Mollie'
+    else
+      'Stripe'
+    end
   end
 
   def refund_via_stripe(payment_intent:, on_error:, amount: nil, refund_application_fee: false)
@@ -48,6 +60,19 @@ module Refundable
           payment: payment_id
         }
       }
+    )
+  rescue StandardError => e
+    on_error.call(e) if on_error
+    true
+  end
+
+  def refund_via_mollie(payment_id:, amount:, currency:, on_error:)
+    return if payment_id.blank?
+
+    Mollie::Payment::Refund.create(
+      payment_id: payment_id,
+      amount: EventPaymentMethod::Mollie.amount_hash(amount, currency),
+      api_key: event.organisation.mollie_api_key
     )
   rescue StandardError => e
     on_error.call(e) if on_error

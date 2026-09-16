@@ -56,6 +56,12 @@ EventPaymentMethod.new('stripe',
                        event_condition: ->(event) { FIAT_CURRENCIES.include?(event.currency) },
                        process: ->(**kwargs) { EventPaymentMethod::Stripe.call(**kwargs) })
 
+EventPaymentMethod.new('mollie',
+                       label: 'Pay with Mollie',
+                       org_condition: ->(org) { org.mollie_api_key },
+                       event_condition: ->(event) { FIAT_CURRENCIES.include?(event.currency) },
+                       process: ->(**kwargs) { EventPaymentMethod::Mollie.call(**kwargs) })
+
 EventPaymentMethod.new('gocardless_instant',
                        label: 'Pay with GoCardless',
                        org_condition: ->(org) { org.gocardless_instant_bank_pay && org.gocardless_access_token },

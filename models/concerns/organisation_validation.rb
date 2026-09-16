@@ -9,7 +9,7 @@ module OrganisationValidation
     validates_format_of :stripe_pk, with: /\A[a-z0-9_]+\z/i, allow_nil: true
 
     before_validation do
-      %w[name gocardless_access_token gocardless_endpoint_secret patreon_api_key mailgun_api_key mailgun_webhook_signing_key calendar_import_urls evm_address oc_slug].each do |f|
+      %w[name mollie_api_key gocardless_access_token gocardless_endpoint_secret patreon_api_key mailgun_api_key mailgun_webhook_signing_key calendar_import_urls evm_address oc_slug].each do |f|
         send("#{f}=", send(f).strip) if send(f)
       end
 
@@ -61,6 +61,13 @@ module OrganisationValidation
         errors.add(:stripe_pk, 'must start with pk_live_') if stripe_pk && !stripe_pk.starts_with?('pk_live_')
       end
       errors.add(:stripe_sk, 'must be present if Stripe public key is present') if stripe_pk && !stripe_sk
+
+      if mollie_api_key.present? && !mollie_api_key.match?(/\A(live|test)_[A-Za-z0-9]+\z/)
+        errors.add(:mollie_api_key, 'must start with live_ or test_')
+      end
+      if Padrino.env == :production && account && !account.admin? && mollie_api_key && !mollie_api_key.starts_with?('live_')
+        errors.add(:mollie_api_key, 'must start with live_')
+      end
 
       errors.add(:gocardless_instant_bank_pay, 'requires GoCardless webhook secret') if gocardless_instant_bank_pay && !gocardless_endpoint_secret
       errors.add(:gocardless_instalments, 'requires GoCardless webhook secret') if gocardless_instalments && !gocardless_endpoint_secret

@@ -23,6 +23,7 @@ module OrganisationFields
     field :stripe_sk, type: String
     field :stripe_customer_id, type: String
     field :card_last4, type: String
+    field :mollie_api_key, type: String
     field :gocardless_access_token, type: String
     field :gocardless_endpoint_secret, type: String
     field :gocardless_filter, type: String
@@ -131,6 +132,7 @@ module OrganisationFields
         stripe_endpoint_secret: 'Stripe endpoint secret',
         stripe_pk: 'Stripe public key',
         stripe_sk: 'Stripe secret key',
+        mollie_api_key: 'Mollie API key',
         gocardless_access_token: 'GoCardless access token',
         gocardless_endpoint_secret: 'GoCardless webhook secret',
         gocardless_instant_bank_pay: 'Enable GoCardless Instant Bank Pay',
@@ -194,6 +196,7 @@ module OrganisationFields
         banned_emails: 'One per line',
         event_image_required_width: 'Required width for event images in px',
         event_image_required_height: 'Required height for event images in px',
+        mollie_api_key: '<code>Developers</code> > <code>API keys</code>. Starts <code>live_</code>. Dandelion sends a webhook URL with each payment, so you do not need to add a webhook in the Mollie Dashboard.',
         gocardless_instant_bank_pay: 'Shown at checkout for GBP and EUR events only (UK and supported Eurozone countries)',
         gocardless_instalments: 'Shown at checkout for GBP and EUR events only. Set the number of instalments on each event.',
         evm_address: 'Ethereum-compatible wallet address for receiving tokens via EVM networks',

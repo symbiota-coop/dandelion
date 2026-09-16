@@ -228,6 +228,7 @@ end
     stripePk: (@event.organisation.stripe_connect_json ? ENV['STRIPE_PK'] : @event.organisation.stripe_pk),
     stripeAccount: @event.revenue_sharer_organisationship && @event.direct_charges ? @event.revenue_sharer_organisationship.stripe_user_id : @event.organisation.stripe_user_id,
     gocardlessInstant: !!EventPaymentMethod.object('gocardless_instant')&.available?(@event),
+    mollie: !!EventPaymentMethod.object('mollie')&.available?(@event),
     organisationOcSlug: @event.organisation.oc_slug,
     ocSlug: @event.oc_slug,
     evmAddress: @event.organisation.evm_address,
