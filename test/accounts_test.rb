@@ -75,6 +75,44 @@ class AccountsTest < ActiveSupport::TestCase
     assert_equal 0, attacker.sign_ins.count
   end
 
+  test 'email confirmation link confirms the address' do
+    account = FactoryBot.create(:account, email_confirmed: false)
+    account.generate_sign_in_token!
+    token = account.sign_in_token
+
+    get "/confirm_email/#{token}"
+    follow_redirect! while last_response.redirect?
+
+    assert account.reload.email_confirmed
+    assert_equal account.id.to_s, last_request.session[:account_id]
+    assert_includes last_response.body, 'Your email address was confirmed'
+  end
+
+  test 'email confirmation link confirms an already signed-in account' do
+    account = FactoryBot.create(:account, email_confirmed: false)
+    sign_in_with_rack(account)
+    account.set(email_confirmed: false)
+    token = account.reload.sign_in_token
+
+    get "/confirm_email/#{token}"
+    follow_redirect! while last_response.redirect?
+
+    assert account.reload.email_confirmed
+    assert_includes last_response.body, 'Your email address was confirmed'
+  end
+
+  test 'email confirmation link rejects a token that does not match the signed-in account' do
+    account = FactoryBot.create(:account, email_confirmed: false)
+    sign_in_with_rack(account)
+    account.set(email_confirmed: false)
+
+    get '/confirm_email/not-a-real-token'
+    follow_redirect! while last_response.redirect?
+
+    refute account.reload.email_confirmed
+    assert_includes last_response.body, "That confirmation link isn't valid"
+  end
+
   test 'sign in token works when session account_id is stale' do
     stale_id = FactoryBot.create(:account).id
     buyer = FactoryBot.create(:account)

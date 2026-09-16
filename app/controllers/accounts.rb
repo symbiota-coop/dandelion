@@ -22,7 +22,7 @@ Dandelion::App.controller do
 
   get '/confirm_email/:sign_in_token' do
     sign_in_required!
-    if params[:sign_in_token] && ActiveSupport::SecurityUtils.secure_compare(params[:sign_in_token], current_account.sign_in_token.to_s)
+    if @signed_in_via_token
       current_account.set(email_confirmed: true)
       flash[:notice] = 'Your email address was confirmed.'
       redirect '/accounts/edit'

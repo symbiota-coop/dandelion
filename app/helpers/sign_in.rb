@@ -12,6 +12,7 @@ Dandelion::App.helpers do
       account.sign_ins.create(request: request, skip_increment: %w[unsubscribe give_feedback subscriptions].any? { |p| request.path.include?(p) })
       session[:account_id] = account.id.to_s
       @current_account = account
+      @signed_in_via_token = true
       account.generate_sign_in_token!
       if account.sign_ins_count == 1
         account.set(email_confirmed: true)
