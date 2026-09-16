@@ -330,7 +330,7 @@ class OrdersTest < ActiveSupport::TestCase
     assert_includes html, 'A refund of £10 has been issued'
     assert_includes html, @event.name
     assert_includes html, 'via Stripe'
-    assert_includes html, 'original payment method'
+    assert_includes html, 'few days to appear on your statement'
   end
 
   test 'connect refunds pass the connected account in request options' do
