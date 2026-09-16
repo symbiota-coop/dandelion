@@ -19,6 +19,12 @@
       Ticket group <%= pmail.ticket_group.name %> for <a href="/e/<%= pmail.mailable.slug %>"><%= pmail.mailable.name %></a>
     <% elsif pmail.ticket_group_selected? %>
       Ticket group [deleted group] for <a href="/e/<%= pmail.mailable.slug %>"><%= pmail.mailable.name %></a>
+    <% elsif pmail.ticket_type %>
+      Ticket type waitlist <%= pmail.ticket_type.name %> for <a href="/e/<%= pmail.mailable.slug %>"><%= pmail.mailable.name %></a>
+    <% elsif pmail.ticket_type_id %>
+      Ticket type waitlist [deleted ticket type] for <a href="/e/<%= pmail.mailable.slug %>"><%= pmail.mailable.name %></a>
+    <% elsif pmail.ticket_type_waitlist %>
+      Ticket type waitlists: <a href="/e/<%= pmail.mailable.slug %>"><%= pmail.mailable.name %></a>
     <% elsif pmail.waitlist %>
       Waitlist: <a href="/e/<%= pmail.mailable.slug %>"><%= pmail.mailable.name %></a>
     <% else %>

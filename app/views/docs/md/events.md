@@ -221,6 +221,8 @@ Dandelion automatically emails people on a ticket type waitlist if tickets for t
 
 To see who joined: choose **Ticket type waitlists** in the event dropdown (the item appears once at least one person has joined). From there you can filter by ticket type and copy email addresses for outreach.
 
+You can also email ticket type waitlists via Dandelion by going to Mailer in the event dropdown, creating a new message and selecting **Ticket type waitlists** (everyone waiting on any ticket type) or a specific ticket type waitlist under the To field.
+
 ## Fees and payouts
 
 Dandelion does not take any money from ticket sales. Your chosen payment processor, however, likely charges a fee. Read more on:

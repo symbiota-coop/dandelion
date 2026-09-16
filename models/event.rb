@@ -268,6 +268,11 @@ class Event
       end
   end
 
+  def ticket_type_waiters(ticket_type_id: nil)
+    type_ids = ticket_type_id ? [ticket_type_id] : ticket_type_ids
+    Account.and(:id.in => TicketTypeWaitship.and(:ticket_type_id.in => type_ids).pluck(:account_id).compact.uniq)
+  end
+
   # Memoised per instance so that remaining, group capacity, event capacity,
   # sold_out? and waitlist state share a single grouped count query.
   # Reset via reset_ticket_counts whenever a ticket changes.

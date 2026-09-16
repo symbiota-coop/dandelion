@@ -8,7 +8,7 @@
 ## Emailing a waitlist for an event
 
 - Click the event dropdown, select Mailer, and click 'New message'
-- Change the 'To' field to 'Waitlist'
+- Change the 'To' field to 'Waitlist' for the event-wide waitlist, 'Ticket type waitlists' for everyone waiting on any ticket type, or a specific ticket type waitlist
 - Enter a subject and body and follow the steps above to preview and send your mail
 
 ## Emailing your organisation

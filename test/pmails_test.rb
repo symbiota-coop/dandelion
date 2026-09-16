@@ -88,6 +88,105 @@ class PmailsTest < ActiveSupport::TestCase
     assert page.has_content? 'Ticket group Backstage'
   end
 
+  test 'ticket type waitlist pmails target waiters for a ticket type or all ticket types' do
+    create_event(allow_ticket_type_waitlists: true)
+    weekend = FactoryBot.create(:ticket_type, event: @event, quantity: 0, name: 'Weekend')
+    day = FactoryBot.create(:ticket_type, event: @event, quantity: 0, name: 'Day')
+    weekend_waiter = FactoryBot.create(:account)
+    day_waiter = FactoryBot.create(:account)
+    both_waiter = FactoryBot.create(:account)
+    event_waiter = FactoryBot.create(:account)
+    TicketTypeWaitship.create!(ticket_type: weekend, account: weekend_waiter)
+    TicketTypeWaitship.create!(ticket_type: day, account: day_waiter)
+    TicketTypeWaitship.create!(ticket_type: weekend, account: both_waiter)
+    TicketTypeWaitship.create!(ticket_type: day, account: both_waiter)
+    @event.waitships.create!(account: event_waiter)
+
+    waitlist_pmail = FactoryBot.create(:pmail, organisation: @organisation, account: @account, to_option: "waitlist:#{@event.id}")
+    assert_equal [event_waiter.id], waitlist_pmail.to.pluck(:id)
+
+    weekend_pmail = FactoryBot.create(:pmail, organisation: @organisation, account: @account, to_option: "ticket_type_waitlist:#{weekend.id}")
+    assert_equal [weekend_waiter.id, both_waiter.id].sort, weekend_pmail.to.pluck(:id).sort
+    assert_equal 2, weekend_pmail.send_count
+    assert_equal "on the Weekend waitlist for #{@organisation.name}'s event #{@event.name}", weekend_pmail.reason
+
+    all_pmail = FactoryBot.create(:pmail, organisation: @organisation, account: @account, to_option: "all_ticket_type_waitlists:#{@event.id}")
+    assert_equal [weekend_waiter.id, day_waiter.id, both_waiter.id].sort, all_pmail.to.pluck(:id).sort
+    assert_equal 3, all_pmail.send_count
+    assert_equal "on a ticket type waitlist for #{@organisation.name}'s event #{@event.name}", all_pmail.reason
+  end
+
+  test 'ticket type waitlist pmail does not fall back to event recipients when ticket type is deleted' do
+    create_event(allow_ticket_type_waitlists: true)
+    ticket_type = FactoryBot.create(:ticket_type, event: @event, quantity: 0, name: 'Weekend')
+    other_ticket_type = FactoryBot.create(:ticket_type, event: @event, quantity: 0, name: 'Day')
+    waiter = FactoryBot.create(:account)
+    other_waiter = FactoryBot.create(:account)
+    TicketTypeWaitship.create!(ticket_type: ticket_type, account: waiter)
+    TicketTypeWaitship.create!(ticket_type: other_ticket_type, account: other_waiter)
+    pmail = FactoryBot.create(:pmail, organisation: @organisation, account: @account, to_option: "ticket_type_waitlist:#{ticket_type.id}")
+    ticket_type_id = ticket_type.id
+
+    assert_equal [waiter.id], pmail.to.pluck(:id)
+    assert_equal 1, pmail.send_count
+
+    ticket_type.destroy
+    pmail.reload
+
+    assert_equal "ticket_type_waitlist:#{ticket_type_id}", pmail.to_selected
+    assert_empty pmail.to.pluck(:id)
+    assert_equal 0, pmail.send_count
+
+    pmail.to_option = "ticket_type_waitlist:#{ticket_type_id}"
+    pmail_count = Pmail.count
+    assert_nil pmail.duplicate!(@account)
+    assert_equal pmail_count, Pmail.count
+    assert_includes pmail.errors.full_messages, 'This mail cannot be duplicated because its ticket type no longer exists.'
+
+    sign_in(@account)
+    visit "/pmails/#{pmail.id}/edit?event_id=#{@event.id}"
+    pmail_count = Pmail.count
+    click_button 'Duplicate'
+
+    assert page.has_content? 'This mail cannot be duplicated because its ticket type no longer exists.'
+    assert_equal pmail_count, Pmail.count
+
+    visit "/pmails/#{pmail.id}/edit?event_id=#{@event.id}"
+    fill_in 'Subject', with: 'Still a deleted ticket type waitlist'
+    click_button 'Save'
+
+    assert page.has_content? 'The mail was saved'
+    pmail.reload
+    assert_equal 'Still a deleted ticket type waitlist', pmail.subject
+    assert_equal "ticket_type_waitlist:#{ticket_type_id}", pmail.to_selected
+    assert_empty pmail.to.pluck(:id)
+  end
+
+  test 'ticket type waitlist pmail is labelled in the pmail list' do
+    create_event(allow_ticket_type_waitlists: true)
+    ticket_type = FactoryBot.create(:ticket_type, event: @event, quantity: 0, name: 'Weekend')
+    FactoryBot.create(:pmail, organisation: @organisation, to_option: "ticket_type_waitlist:#{ticket_type.id}")
+    FactoryBot.create(:pmail, organisation: @organisation, to_option: "all_ticket_type_waitlists:#{@event.id}")
+
+    sign_in(@account)
+    visit "/events/#{@event.id}/pmails"
+
+    assert page.has_content? 'Ticket type waitlist Weekend'
+    assert page.has_content? 'Ticket type waitlists:'
+  end
+
+  test 'event pmail to options include ticket type waitlists when enabled' do
+    create_event(allow_ticket_type_waitlists: true)
+    ticket_type = FactoryBot.create(:ticket_type, event: @event, quantity: 1, name: 'Weekend')
+
+    sign_in(@account)
+    visit "/pmails/new?event_id=#{@event.id}"
+
+    assert page.has_css?("option[value='all_ticket_type_waitlists:#{@event.id}']")
+    assert page.has_css?("option[value='ticket_type_waitlist:#{ticket_type.id}']")
+    assert page.has_css?("option[value='waitlist:#{@event.id}']")
+  end
+
   test 'pmail exclusions must belong to its organisation' do
     create_organisation
     other_organisation = FactoryBot.create(:organisation)

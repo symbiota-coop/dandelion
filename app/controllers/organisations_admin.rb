@@ -274,7 +274,7 @@ Dandelion::App.controller do
     when 'facilitators'
       @pmails = @pmails.and(facilitators: true)
     when 'waitlist'
-      @pmails = @pmails.and(waitlist: true)
+      @pmails = @pmails.and(:$or => [{ waitlist: true }, { ticket_type_waitlist: true }, { ticket_type_id: { :$ne => nil } }])
     when 'activity'
       @pmails = @pmails.and(mailable_type: 'Activity')
     when 'activity_tag'

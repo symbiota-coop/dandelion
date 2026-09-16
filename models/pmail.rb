@@ -14,6 +14,7 @@ class Pmail
   belongs_to_without_parent_validation :activity, optional: true, inverse_of: :pmails_as_exclusion # Exclude people attending upcoming events in an activity
   belongs_to_without_parent_validation :local_group, optional: true, inverse_of: :pmails_as_exclusion # Exclude people in a local group
   belongs_to_without_parent_validation :ticket_group, optional: true
+  belongs_to_without_parent_validation :ticket_type, optional: true
 
   field :from, type: String
   field :subject, type: String
@@ -23,6 +24,7 @@ class Pmail
   field :not_monthly_donors, type: Boolean
   field :facilitators, type: Boolean
   field :waitlist, type: Boolean
+  field :ticket_type_waitlist, type: Boolean
   field :body, type: String
   field :message_ids, type: String
   field :will_send_at, type: Time
@@ -70,6 +72,7 @@ class Pmail
 
     if to_option
       previous_ticket_group_id = ticket_group_id
+      previous_ticket_type_id = ticket_type_id
       previous_mailable_type = mailable_type
       previous_mailable_id = mailable_id
 
@@ -78,7 +81,9 @@ class Pmail
       self.not_monthly_donors = false
       self.facilitators = false
       self.waitlist = false
+      self.ticket_type_waitlist = false
       self.ticket_group = nil
+      self.ticket_type = nil
       self.mailable = nil
       to_option_id = to_option.split(':').last
 
@@ -101,6 +106,11 @@ class Pmail
       elsif to_option.starts_with?('waitlist:')
         assign_mailable_from_to_option(organisation&.events&.find(to_option_id))
         self.waitlist = true if mailable
+      elsif to_option.starts_with?('all_ticket_type_waitlists:')
+        assign_mailable_from_to_option(organisation&.events&.find(to_option_id))
+        self.ticket_type_waitlist = true if mailable
+      elsif to_option.starts_with?('ticket_type_waitlist:')
+        assign_ticket_type_waitlist_from_to_option(to_option_id, previous_ticket_type_id, previous_mailable_type, previous_mailable_id)
       elsif to_option.starts_with?('ticket_group:')
         assign_ticket_group_from_to_option(to_option_id, previous_ticket_group_id, previous_mailable_type, previous_mailable_id)
       else
@@ -133,6 +143,22 @@ class Pmail
     end
   end
 
+  def assign_ticket_type_waitlist_from_to_option(to_option_id, previous_ticket_type_id, previous_mailable_type, previous_mailable_id)
+    selected_ticket_type = TicketType.find(to_option_id)
+    if selected_ticket_type && organisation&.events&.find(selected_ticket_type.event_id)
+      self.ticket_type = selected_ticket_type
+      self.mailable_type = 'Event'
+      self.mailable_id = selected_ticket_type.event_id
+    elsif persisted? && previous_ticket_type_id && previous_ticket_type_id.to_s == to_option_id &&
+          previous_mailable_type == 'Event' && organisation&.events&.find(previous_mailable_id)
+      self.ticket_type_id = previous_ticket_type_id
+      self.mailable_type = previous_mailable_type
+      self.mailable_id = previous_mailable_id
+    else
+      errors.add(:to_option, 'is invalid')
+    end
+  end
+
   def to_selected
     if everyone
       'everyone'
@@ -150,6 +176,10 @@ class Pmail
       "local_group:#{mailable_id}"
     elsif ticket_group_selected?
       "ticket_group:#{ticket_group_id}"
+    elsif ticket_type_id
+      "ticket_type_waitlist:#{ticket_type_id}"
+    elsif ticket_type_waitlist
+      "all_ticket_type_waitlists:#{mailable_id}"
     elsif mailable.is_a?(Event)
       waitlist ? "waitlist:#{mailable_id}" : "event:#{mailable_id}"
     end
@@ -174,6 +204,10 @@ class Pmail
       "in the #{ticket_group.name} ticket group for #{organisation.name}'s event #{mailable.name}"
     elsif ticket_group_selected? && mailable.is_a?(Event)
       "in a ticket group for #{organisation.name}'s event #{mailable.name}"
+    elsif ticket_type
+      "on the #{ticket_type.name} waitlist for #{organisation.name}'s event #{mailable.name}"
+    elsif ticket_type_waitlist_selected? && mailable.is_a?(Event)
+      "on a ticket type waitlist for #{organisation.name}'s event #{mailable.name}"
     elsif mailable.is_a?(Event)
       waitlist ? "on the waitlist for #{organisation.name}'s event #{mailable.name}" : "attending #{organisation.name}'s event #{mailable.name}"
     end
@@ -190,6 +224,8 @@ class Pmail
           organisation.facilitators
         elsif mailable.is_a?(Event) && ticket_group_selected?
           Account.and(:id.in => ticket_group ? ticket_group.tickets.complete.pluck(:account_id).compact : [])
+        elsif mailable.is_a?(Event) && ticket_type_waitlist_selected?
+          ticket_type_waitlist_accounts
         elsif mailable
           mailable.is_a?(Event) && waitlist ? mailable.waiters : mailable.subscribed_members
         end
@@ -215,6 +251,22 @@ class Pmail
     !!ticket_group_id
   end
 
+  def ticket_type_waitlist_selected?
+    ticket_type_waitlist || !!ticket_type_id
+  end
+
+  def ticket_type_waitlist_accounts
+    if ticket_type_id
+      return Account.and(:id.in => []) unless ticket_type && mailable.is_a?(Event)
+
+      mailable.ticket_type_waiters(ticket_type_id: ticket_type_id)
+    elsif ticket_type_waitlist && mailable.is_a?(Event)
+      mailable.ticket_type_waiters
+    else
+      Account.and(:id.in => [])
+    end
+  end
+
   def event_tickets_with_email
     tickets = if ticket_group_selected?
                 ticket_group ? ticket_group.tickets : Ticket.and(:id.in => [])
@@ -231,7 +283,7 @@ class Pmail
   end
 
   def send_count
-    if mailable.is_a?(Event) && !waitlist
+    if mailable.is_a?(Event) && !waitlist && !ticket_type_waitlist_selected?
       event_emails.count
     else
       to_with_unsubscribes.count
@@ -348,7 +400,7 @@ class Pmail
       accounts = test_to
     else
       accounts = to_with_unsubscribes
-      if mailable.is_a?(Event) && !waitlist
+      if mailable.is_a?(Event) && !waitlist && !ticket_type_waitlist_selected?
         emails = to_with_unsubscribes.pluck(:email)
         event_tickets_with_email.reject { |ticket| emails.include?(ticket.email) }.each do |ticket|
           batch_message.add_recipient(:to, ticket.email, {
@@ -398,6 +450,10 @@ class Pmail
       errors.add(:base, 'This mail cannot be duplicated because its ticket group no longer exists.')
       return nil
     end
+    if duplicate_to_option&.starts_with?('ticket_type_waitlist:') && !valid_ticket_type_waitlist_to_option?(duplicate_to_option)
+      errors.add(:base, 'This mail cannot be duplicated because its ticket type no longer exists.')
+      return nil
+    end
 
     attributes = {
       to_option: duplicate_to_option,
@@ -419,6 +475,11 @@ class Pmail
   def valid_ticket_group_to_option?(to_option)
     ticket_group = TicketGroup.find(to_option.split(':').last)
     ticket_group && organisation&.events&.find(ticket_group.event_id)
+  end
+
+  def valid_ticket_type_waitlist_to_option?(to_option)
+    ticket_type = TicketType.find(to_option.split(':').last)
+    ticket_type && organisation&.events&.find(ticket_type.event_id)
   end
 
   def self.new_hints
