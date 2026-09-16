@@ -453,7 +453,7 @@ class WebhooksTest < ActiveSupport::TestCase
 
     assert_equal 200, last_response.status
     body = JSON.parse(last_response.body)
-    assert_equal payment.checkout_url, body['checkout_url']
+    assert_equal payment.checkout_url, body['redirect_url']
 
     order = @event.orders.find_by(mollie_payment_id: payment.id)
     assert order

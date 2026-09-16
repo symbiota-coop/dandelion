@@ -247,34 +247,15 @@ class Ticket
   end
 
   def requires_manual_refund?
-    discounted_price && discounted_price > 0 && payment_completed && payment_intent.blank? && gocardless_payment_id.blank? && mollie_payment_id.blank?
+    discounted_price && discounted_price > 0 && payment_completed && !refundable?
   end
 
   def refund
-    return unless event && event.organisation && discounted_price && discounted_price > 0 && payment_completed && (payment_intent || gocardless_payment_id || mollie_payment_id)
+    return unless event && event.organisation && discounted_price && discounted_price > 0 && payment_completed && refundable?
 
     refund_amount = order ? [discounted_price, order.total].min : discounted_price
     return if refund_amount <= 0
 
-    if payment_intent
-      refund_via_stripe(
-        payment_intent: payment_intent,
-        amount: refund_amount,
-        on_error: ->(error) { notify_of_failed_refund(error) }
-      )
-    elsif gocardless_payment_id
-      refund_via_gocardless(
-        payment_id: gocardless_payment_id,
-        amount: refund_amount,
-        on_error: ->(error) { notify_of_failed_refund(error) }
-      )
-    else
-      refund_via_mollie(
-        payment_id: mollie_payment_id,
-        amount: refund_amount,
-        currency: currency,
-        on_error: ->(error) { notify_of_failed_refund(error) }
-      )
-    end
+    refund_payment(amount: refund_amount)
   end
 end

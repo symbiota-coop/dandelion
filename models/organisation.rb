@@ -242,7 +242,7 @@ class Organisation
     return false unless stripe_connect?
 
     EventPaymentMethod.all.none? do |pm|
-      pm.name != 'stripe' && pm.org_condition&.call(self)
+      !pm.card && !pm.complimentary && pm.org_condition&.call(self)
     end
   end
 

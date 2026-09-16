@@ -198,9 +198,12 @@ $(function () {
     $('#totalDisplay').val((+p).toFixed(2))
     $('#balance').val((+b).toFixed(2))
     const $rsvp = $('#details form button[data-payment-method=rsvp]')
-    const $stripe = $('#details form button[data-payment-method=stripe]')
     const $paid = $('#details form button[data-payment-method]').not($rsvp)
     const $firstPaidButton = $('#details form button[data-payment-method]').eq(1)
+    const cardMethods = config.cardMethods || []
+    const $card = $(cardMethods.map(function (name) {
+      return '#details form button[data-payment-method=' + name + ']'
+    }).join(', '))
 
     if (p == 0) {
       $rsvp.show()
@@ -210,12 +213,12 @@ $(function () {
       $paid.hide()
     } else if (b > 0) {
       $('#balance').val((+b).toFixed(2))
-      let via_card
-      if (config.gocardlessInstant || config.ocSlug || config.evmAddress || config.mollie) { via_card = ' via card' } else { via_card = '' }
+      let viaCardSuffix
+      if (config.nonCardPaymentAvailable) { viaCardSuffix = ' via card' } else { viaCardSuffix = '' }
       $firstPaidButton.removeClass('btn-outline-primary').addClass('btn-primary')
       $rsvp.hide()
       $paid.show()
-      $stripe.find('span').text('Pay ' + config.currencySymbol + (+b).toFixed(2) + via_card)
+      $card.find('span').text('Pay ' + config.currencySymbol + (+b).toFixed(2) + viaCardSuffix)
     }
 
     $('input[type=hidden][name=payment_method]').prop('disabled', true)
@@ -458,7 +461,7 @@ $(function () {
     const handlers = eventPaymentHandlers(config)
     let method = $('input[type=hidden][name=payment_method]:not(:disabled)').val()
     const ticketForm = $('#ticket-types form').serializeObject()
-    if (config.donationsToDandelion && method !== 'stripe') {
+    if (config.donationsToDandelion && !(config.platformDonationMethods || []).includes(method)) {
       ticketForm.donation_amount = ''
       ticketForm.donation_via_modal = '0'
       if ((priceWithoutDonation() - credit() - fixedDiscount()) <= 0) {
@@ -474,7 +477,7 @@ $(function () {
         detailsForm: $('#details form').serializeObject(),
         confirmed_duplicate: confirmedDuplicate ? '1' : ''
       }, function (data) {
-        handlers[method](data)
+        (handlers[method] || handlers.default)(data)
       }).fail(function (xhr) {
         let json = {}
         try { json = xhr.responseJSON || JSON.parse(xhr.responseText || '{}') || {} } catch (err) { }

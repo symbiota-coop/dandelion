@@ -195,7 +195,7 @@ module OrderNotifications
     send_signal_message(account.phone, message)
   end
 
-  def notify_of_failed_purchase(error, provider: 'Stripe')
+  def notify_of_failed_purchase(error, provider: nil, help: nil)
     mg_client = Mailgun::Client.new ENV['MAILGUN_API_KEY'], ENV['MAILGUN_REGION']
     batch_message = Mailgun::BatchMessage.new(mg_client, ENV['MAILGUN_NOTIFICATIONS_HOST'])
 
@@ -203,8 +203,8 @@ module OrderNotifications
     event = order.event
     account = order.account
     batch_message.from ENV['NOTIFICATIONS_EMAIL_FULL']
-    batch_message.subject "#{provider} error on #{event.name}"
-    batch_message.body_html EmailHelper.html(:purchase_failed, account: account, event: event, error: error, provider: provider)
+    batch_message.subject "#{provider || 'Payment'} error on #{event.name}"
+    batch_message.body_html EmailHelper.html(:purchase_failed, account: account, event: event, error: error, provider: provider, help: help)
 
     (event.organisation.admins_receiving_feedback + Account.and(admin: true)).uniq.each do |account|
       batch_message.add_recipient(:to, account.email, { 'firstname' => account.firstname || 'there', 'token' => account.sign_in_token_for_email, 'id' => account.id.to_s })

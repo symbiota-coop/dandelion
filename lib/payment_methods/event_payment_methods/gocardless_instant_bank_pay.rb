@@ -30,7 +30,31 @@ class EventPaymentMethod
         }
       )
 
-      { gocardless_billing_request_flow: billing_request_flow }.to_json
+      { redirect_url: billing_request_flow.authorisation_url }.to_json
+    end
+
+    def self.refund(record, on_error:, amount: nil, **)
+      payment_id = record.gocardless_payment_id
+      return if payment_id.blank?
+
+      amount ||= record.try(:value)
+
+      client = GoCardlessPro::Client.new(access_token: record.event.organisation.gocardless_access_token)
+      refund_amount = (amount * 100).to_i
+      payment = client.payments.get(payment_id)
+
+      client.refunds.create(
+        params: {
+          amount: refund_amount,
+          total_amount_confirmation: payment.amount_refunded + refund_amount,
+          links: {
+            payment: payment_id
+          }
+        }
+      )
+    rescue StandardError => e
+      on_error.call(e) if on_error
+      true
     end
   end
 end

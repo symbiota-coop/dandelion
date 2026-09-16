@@ -1,0 +1,3 @@
+<% if (badge = EventPaymentMethod.badge_for(record)) %>
+  <span class="label label-default <%= badge[:class] %> mr-1"><%= badge[:text] %></span>
+<% end %>

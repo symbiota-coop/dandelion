@@ -22,12 +22,26 @@ class EventPaymentMethod
         ticket.update_attributes!(mollie_payment_id: payment.id)
       end
 
-      { checkout_url: payment.checkout_url }.to_json
+      { redirect_url: payment.checkout_url }.to_json
     end
 
     def self.amount_hash(total, currency)
       cents = (total.to_d * 100).round
       { value: format('%.2f', cents / 100.0), currency: currency }
+    end
+
+    def self.refund(record, on_error:, amount: nil, **)
+      return if record.mollie_payment_id.blank?
+
+      amount ||= record.try(:value)
+      ::Mollie::Payment::Refund.create(
+        payment_id: record.mollie_payment_id,
+        amount: amount_hash(amount, record.currency),
+        api_key: record.event.organisation.mollie_api_key
+      )
+    rescue StandardError => e
+      on_error.call(e) if on_error
+      true
     end
   end
 end

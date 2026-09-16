@@ -227,8 +227,7 @@ end
     minimumApplicationFee: FiatCurrency.minimum_unit_amount(@event.currency),
     stripePk: (@event.organisation.stripe_connect_json ? ENV['STRIPE_PK'] : @event.organisation.stripe_pk),
     stripeAccount: @event.revenue_sharer_organisationship && @event.direct_charges ? @event.revenue_sharer_organisationship.stripe_user_id : @event.organisation.stripe_user_id,
-    gocardlessInstant: !!EventPaymentMethod.object('gocardless_instant')&.available?(@event),
-    mollie: !!EventPaymentMethod.object('mollie')&.available?(@event),
+    nonCardPaymentAvailable: EventPaymentMethod.non_card_payment_available?(@event),
     organisationOcSlug: @event.organisation.oc_slug,
     ocSlug: @event.oc_slug,
     evmAddress: @event.organisation.evm_address,
@@ -238,6 +237,8 @@ end
     signedIn: !!current_account,
     embedded: !!params[:ticket_form_only],
     donationsToDandelion: !!@event.donations_to_dandelion?,
+    platformDonationMethods: EventPaymentMethod.platform_donation_names,
+    cardMethods: EventPaymentMethod.all.select(&:card).map(&:name),
     recaptchaEnabled: !!ENV['RECAPTCHA_SITE_KEY'],
     timeAgo: (@event.past? && !@event.recording? && !@event.show_after_start_time? ? time_ago_in_words(@event.start_time) : nil)
   }

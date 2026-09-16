@@ -32,7 +32,7 @@ class EventPaymentMethod
         }
       )
 
-      { gocardless_billing_request_flow: billing_request_flow }.to_json
+      { redirect_url: billing_request_flow.authorisation_url }.to_json
     end
   end
 end

@@ -1,5 +1,13 @@
 /* global Stripe, runEvmPaymentFlow */
 
+function redirectToCheckout (config, url) {
+  if (config.embedded && url) {
+    window.open(url, '_blank')
+    return
+  }
+  window.location = url
+}
+
 // eslint-disable-next-line no-unused-vars
 function eventPaymentHandlers (config) {
   return {
@@ -16,22 +24,6 @@ function eventPaymentHandlers (config) {
       stripe.redirectToCheckout({ sessionId: data.session_id })
     },
 
-    mollie: function (data) {
-      if (config.embedded && data.checkout_url) {
-        window.open(data.checkout_url, '_blank')
-        return
-      }
-      window.location = data.checkout_url
-    },
-
-    gocardless_instant: function (data) {
-      window.location = data.gocardless_billing_request_flow['authorisation_url']
-    },
-
-    gocardless_instalment: function (data) {
-      window.location = data.gocardless_billing_request_flow['authorisation_url']
-    },
-
     opencollective: function (data) {
       window.location = 'https://opencollective.com/' + config.organisationOcSlug + '/events/' + config.ocSlug + '/donate?interval=oneTime&amount=' + data.value + '&tags=' + data.oc_secret + '&redirect=' + encodeURIComponent(config.eventUrl + '?success=true&order_id=' + data.order_id)
     },
@@ -41,6 +33,10 @@ function eventPaymentHandlers (config) {
         pollUrl: '/events/' + config.eventId + '/orders/' + data.order_id + '/payment_completed',
         onComplete: function () { window.location = '?success=true&order_id=' + data.order_id }
       })
+    },
+
+    default: function (data) {
+      redirectToCheckout(config, data.redirect_url)
     }
   }
 }

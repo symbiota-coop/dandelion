@@ -109,36 +109,18 @@ Dandelion::App.controller do
     raise Order::PaymentMethodNotFound unless pm&.available?(@event)
 
     pm.process_payment(order: @order, event: @event, account: @account, details_form: details_form, ticket_form: ticket_form)
-  rescue Stripe::InvalidRequestError => e
-    # Don't lock the event if the error is simply that the value is not high enough
-    unless e.message&.include?('must add up to at least')
-      @order.event.set(locked: true)
-      @order.event.delete_atproto
-    end
-    @order.notify_of_failed_purchase(e)
-    @order.destroy
-    halt 400
-  rescue GoCardlessPro::InvalidApiUsageError => e
-    # Credential or permission issue on the organisation's GoCardless token (not an app bug)
-    @order.event.set(locked: true)
-    @order.event.delete_atproto
-    @order.notify_of_failed_purchase(e, provider: 'GoCardless')
-    @order.destroy
-    halt 400
-  rescue GoCardlessPro::ValidationError => e
-    # Unsupported currency/amount or other request validation — not a broken token
-    @order.notify_of_failed_purchase(e, provider: 'GoCardless')
-    @order.destroy
-    halt 400
-  rescue Mollie::RequestError => e
-    if [401, 403].include?(e.status.to_i)
-      @order.event.set(locked: true)
-      @order.event.delete_atproto
-    end
-    @order.notify_of_failed_purchase(e, provider: 'Mollie')
-    @order.destroy
-    halt 400
   rescue StandardError => e
+    info = EventPaymentMethod.purchase_error_for(e)
+    if info && @order
+      if info[:action] == :lock
+        @order.event.set(locked: true)
+        @order.event.delete_atproto
+      end
+      @order.notify_of_failed_purchase(e, provider: info[:provider], help: info[:help])
+      @order.destroy
+      halt 400
+    end
+
     ctx = {}
     ctx[:order_id] = @order.id.to_s if @order
     ErrorReporting.capture_exception(e, context: (ctx if ctx.present?))

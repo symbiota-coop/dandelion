@@ -1,81 +1,25 @@
 module Refundable
+  def payment_method
+    EventPaymentMethod.for_record(self)
+  end
+
   def refundable?
-    session_id || gocardless_payment_id || mollie_payment_id
+    pm = payment_method
+    pm&.refund && pm.payment_id(self).present?
   end
 
   def refund_provider
-    if payment_intent
-      'Stripe'
-    elsif try(:gocardless_payment_id).present?
-      'GoCardless'
-    elsif try(:mollie_payment_id).present?
-      'Mollie'
-    else
-      'Stripe'
-    end
+    payment_method&.provider_name
   end
 
-  def refund_via_stripe(payment_intent:, on_error:, amount: nil, refund_application_fee: false)
-    opts = StripeOpts.call(
-      api_key: event.organisation.stripe_connect_json ? ENV['STRIPE_SK'] : event.organisation.stripe_sk,
-      stripe_account: event.organisation.stripe_user_id
+  def refund_payment(amount: nil, **)
+    pm = payment_method or return
+
+    pm.refund.call(
+      self,
+      amount: amount,
+      on_error: ->(error) { notify_of_failed_refund(error) },
+      **
     )
-    pi = Stripe::PaymentIntent.retrieve(payment_intent, opts)
-
-    if event.revenue_sharer_organisationship
-      params = {
-        charge: pi.charges.first.id,
-        refund_application_fee: true,
-        reverse_transfer: true
-      }
-      params[:amount] = (amount * 100).to_i if amount
-      Stripe::Refund.create(params, opts.except(:stripe_account))
-    elsif event.organisation.stripe_user_id
-      params = { charge: pi.charges.first.id }
-      params[:amount] = (amount * 100).to_i if amount
-      params[:refund_application_fee] = true if refund_application_fee
-      Stripe::Refund.create(params, opts)
-    else
-      params = { charge: pi.charges.first.id }
-      params[:amount] = (amount * 100).to_i if amount
-      Stripe::Refund.create(params, opts)
-    end
-  rescue Stripe::InvalidRequestError => e
-    on_error.call(e) if on_error
-    true
-  end
-
-  def refund_via_gocardless(payment_id:, amount:, on_error:)
-    return if payment_id.blank?
-
-    client = GoCardlessPro::Client.new(access_token: event.organisation.gocardless_access_token)
-    refund_amount = (amount * 100).to_i
-    payment = client.payments.get(payment_id)
-
-    client.refunds.create(
-      params: {
-        amount: refund_amount,
-        total_amount_confirmation: payment.amount_refunded + refund_amount,
-        links: {
-          payment: payment_id
-        }
-      }
-    )
-  rescue StandardError => e
-    on_error.call(e) if on_error
-    true
-  end
-
-  def refund_via_mollie(payment_id:, amount:, currency:, on_error:)
-    return if payment_id.blank?
-
-    Mollie::Payment::Refund.create(
-      payment_id: payment_id,
-      amount: EventPaymentMethod::Mollie.amount_hash(amount, currency),
-      api_key: event.organisation.mollie_api_key
-    )
-  rescue StandardError => e
-    on_error.call(e) if on_error
-    true
   end
 end
