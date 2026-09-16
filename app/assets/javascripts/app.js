@@ -429,12 +429,34 @@ $(function () {
     $('.search.well .checkbox-inline input[type="checkbox"]').not('[data-search-checkbox-registered]').attr('data-search-checkbox-registered', true).on('change', function () {
       $(this).closest('.checkbox-inline').toggleClass('checked', this.checked);
     });
+
+    showTabFromHash()
   }
 
   $(document).ajaxComplete(function () {
     ajaxCompleted()
   })
   ajaxCompleted()
+
+  function showTabFromHash () {
+    const hash = window.location.hash
+    if (!hash) return
+    const $link = $('a[data-toggle="tab"]').filter(function () {
+      return this.hash === hash
+    })
+    if ($link.length && !$link.hasClass('active')) {
+      $link.tab('show')
+    }
+  }
+
+  $(document).on('shown.bs.tab', 'a[data-toggle="tab"]', function (e) {
+    const hash = e.target.hash
+    if (hash && window.location.hash !== hash) {
+      history.replaceState(null, '', hash)
+    }
+  })
+
+  $(window).on('hashchange', showTabFromHash)
 
   let navTabsFormSubmitting = false
   let navTabsFormTouched = false

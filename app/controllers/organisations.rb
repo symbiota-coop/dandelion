@@ -116,7 +116,7 @@ Dandelion::App.controller do
     @organisation.collect_phone = true
     if @organisation.save
       session.delete(:organisation_referrer_id)
-      redirect "/o/#{@organisation.slug}/edit?created=1&tab=payments"
+      redirect "/o/#{@organisation.slug}/edit?created=1#tab-payments"
     else
       flash.now[:error] = 'There was an error saving the organisation.'
       erb :'organisations/build'

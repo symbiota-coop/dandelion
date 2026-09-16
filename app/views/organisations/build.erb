@@ -82,14 +82,14 @@
   <% if @organisation.persisted? %>
     <div class="nav-wrapper">
       <ul id="organisation-build-nav" class="nav nav-tabs" role="tablist">
-        <li role="presentation" class="nav-item"><a class="nav-link <%= 'active' if !params[:tab] || params[:tab] == 'basics'%>" href="#tab-basics" role="tab" data-toggle="tab">Basics</a></li>
-        <li role="presentation" class="nav-item"><a class="nav-link <%= 'active' if params[:tab] == 'payments'%>" href="#tab-payments" role="tab" data-toggle="tab">Payments</a></li>
-        <li role="presentation" class="nav-item"><a class="nav-link <%= 'active' if params[:tab] == 'emails'%>" href="#tab-emails" role="tab" data-toggle="tab">Emails</a></li>
-        <li role="presentation" class="nav-item"><a class="nav-link <%= 'active' if params[:tab] == 'mailgun'%>" href="#tab-mailgun" role="tab" data-toggle="tab">Mailgun</a></li>
-        <li role="presentation" class="nav-item"><a class="nav-link <%= 'active' if params[:tab] == 'analytics'%>" href="#tab-analytics" role="tab" data-toggle="tab">Analytics</a></li>
-        <li role="presentation" class="nav-item"><a class="nav-link <%= 'active' if params[:tab] == 'everything-else'%>" href="#tab-everything-else" role="tab" data-toggle="tab">Everything else</a></li>
+        <li role="presentation" class="nav-item"><a class="nav-link active" href="#tab-basics" role="tab" data-toggle="tab">Basics</a></li>
+        <li role="presentation" class="nav-item"><a class="nav-link" href="#tab-payments" role="tab" data-toggle="tab">Payments</a></li>
+        <li role="presentation" class="nav-item"><a class="nav-link" href="#tab-emails" role="tab" data-toggle="tab">Emails</a></li>
+        <li role="presentation" class="nav-item"><a class="nav-link" href="#tab-mailgun" role="tab" data-toggle="tab">Mailgun</a></li>
+        <li role="presentation" class="nav-item"><a class="nav-link" href="#tab-analytics" role="tab" data-toggle="tab">Analytics</a></li>
+        <li role="presentation" class="nav-item"><a class="nav-link" href="#tab-everything-else" role="tab" data-toggle="tab">Everything else</a></li>
         <% if Padrino.env == :development || @organisation.experimental? %>
-          <li role="presentation" class="nav-item"><a class="nav-link <%= 'active' if params[:tab] == 'experimental'%>" href="#tab-experimental" role="tab" data-toggle="tab">Experimental</a></li>
+          <li role="presentation" class="nav-item"><a class="nav-link" href="#tab-experimental" role="tab" data-toggle="tab">Experimental</a></li>
         <% end %>
       </ul>
     </div>
@@ -114,7 +114,7 @@
     <% end %>
 
     <div class="tab-content <%= 'mt-3' if @organisation.persisted? %>">
-      <div role="tabpanel" class="tab-pane <%= 'active' if !params[:tab] || params[:tab] == 'basics'%>" id="tab-basics">
+      <div role="tabpanel" class="tab-pane active" id="tab-basics">
         <%= f.text_block :name %>
         <div class="slugify">
           <%= f.shorturl_block :slug, stem: "#{ENV['BASE_URI']}/o/" %>
@@ -127,7 +127,7 @@
         <% end %>
       </div>
       <% if @organisation.persisted? %>
-        <div role="tabpanel" class="tab-pane <%= 'active' if params[:tab] == 'payments'%>" id="tab-payments">
+        <div role="tabpanel" class="tab-pane" id="tab-payments">
           <% if params[:created] %>
             <div class="alert alert-success">
               <p class="m-0">To accept payments, now add details for Stripe or another payment processor.</p>
@@ -169,7 +169,7 @@
             })
           </script>
         </div>
-        <div role="tabpanel" class="tab-pane <%= 'active' if params[:tab] == 'emails'%>" id="tab-emails">
+        <div role="tabpanel" class="tab-pane" id="tab-emails">
           <script>
             $(function() {
               $('label[for$="_email_greeting"], label[for$="_email_body"]').hide()
@@ -191,7 +191,7 @@
           <%= f.check_box_block :show_sign_in_link_in_ticket_emails %>
           <%= f.check_box_block :send_ticket_emails_from_organisation %>
         </div>
-        <div role="tabpanel" class="tab-pane <%= 'active' if params[:tab] == 'mailgun'%>" id="tab-mailgun">
+        <div role="tabpanel" class="tab-pane" id="tab-mailgun">
           <% if !@organisation.mailgun_enabled? %>
             <div class="alert alert-warning">
               <p>
@@ -210,12 +210,12 @@
           <%= f.select_block :mailgun_region %>
           <%= f.text_block :mailgun_webhook_signing_key %>
         </div>
-        <div role="tabpanel" class="tab-pane <%= 'active' if params[:tab] == 'analytics'%>" id="tab-analytics">
+        <div role="tabpanel" class="tab-pane" id="tab-analytics">
           <%= f.text_block :plausible_analytics_domain %>
           <%= f.text_block :simple_analytics_domain %>
           <%= f.text_block :facebook_pixel_id %>
         </div>
-        <div role="tabpanel" class="tab-pane <%= 'active' if params[:tab] == 'everything-else'%>" id="tab-everything-else">
+        <div role="tabpanel" class="tab-pane" id="tab-everything-else">
           <%= f.color_block :theme_color %>
           <%= partial :'quick_theme_colors', locals: { input_name: 'organisation[theme_color]' } %>
           <div class="form-group">
@@ -248,7 +248,7 @@
           <% end %>
         </div>
         <% if Padrino.env == :development || @organisation.experimental? %>
-          <div role="tabpanel" class="tab-pane <%= 'active' if params[:tab] == 'experimental'%>" id="tab-experimental">
+          <div role="tabpanel" class="tab-pane" id="tab-experimental">
             <%= f.text_block :stripe_pk %>
             <%= f.text_block :stripe_sk %>
             <%= f.text_block :stripe_client_id %>

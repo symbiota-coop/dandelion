@@ -232,7 +232,7 @@
       <div role="tabpanel" class="tab-pane" id="tab-emails">
         <div class="alert alert-success">
           <p class="mb-0">
-            Leaving a field blank will mean the email uses the value from the <a target="_blank" href="/o/<%=@event.organisation.slug%>/edit?tab=emails">organisation's email settings</a> instead.
+            Leaving a field blank will mean the email uses the value from the <a target="_blank" href="/o/<%=@event.organisation.slug%>/edit#tab-emails">organisation's email settings</a> instead.
           </p>
         </div>
         <p>Magic tags: <%== EmailFields::MAGIC_TAGS.map { |t| "<code>[#{t}]</code>" }.join(', ') %></p>

@@ -4,7 +4,7 @@ Dandelion::App.controller do
     organisation_admins_only!
     if params[:error]
       flash[:error] = params[:error_description] || 'Stripe connection was cancelled'
-      redirect "/o/#{@organisation.slug}/edit?tab=payments"
+      redirect "/o/#{@organisation.slug}/edit#tab-payments"
     end
     begin
       response = Faraday.new { |f| f.request :url_encoded }.post(
@@ -24,14 +24,14 @@ Dandelion::App.controller do
       ErrorReporting.capture_exception(e)
       flash[:error] = 'There was an error connecting your organisation'
     end
-    redirect "/o/#{@organisation.slug}/edit?tab=payments"
+    redirect "/o/#{@organisation.slug}/edit#tab-payments"
   end
 
   post '/organisations/stripe_disconnect' do
     @organisation = Organisation.find(params[:organisation_id]) || not_found
     organisation_admins_only!
     @organisation.set(stripe_connect_json: nil)
-    redirect "/o/#{@organisation.slug}/edit?tab=payments"
+    redirect "/o/#{@organisation.slug}/edit#tab-payments"
   end
 
   get '/o/:slug/stripe_connect' do
