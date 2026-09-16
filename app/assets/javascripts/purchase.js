@@ -213,12 +213,10 @@ $(function () {
       $paid.hide()
     } else if (b > 0) {
       $('#balance').val((+b).toFixed(2))
-      let viaCardSuffix
-      if (config.nonCardPaymentAvailable) { viaCardSuffix = ' via card' } else { viaCardSuffix = '' }
       $firstPaidButton.removeClass('btn-outline-primary').addClass('btn-primary')
       $rsvp.hide()
       $paid.show()
-      $card.find('span').text('Pay ' + config.currencySymbol + (+b).toFixed(2) + viaCardSuffix)
+      $card.find('span').text('Pay ' + config.currencySymbol + (+b).toFixed(2) + ' via card')
     }
 
     $('input[type=hidden][name=payment_method]').prop('disabled', true)

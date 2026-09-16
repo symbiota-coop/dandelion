@@ -54,10 +54,6 @@ class EventPaymentMethod
     nil
   end
 
-  def self.non_card_payment_available?(event)
-    all.any? { |pm| !pm.card && !pm.complimentary && pm.available?(event) }
-  end
-
   def self.platform_donation_names
     all.select(&:platform_donations).map(&:name)
   end
