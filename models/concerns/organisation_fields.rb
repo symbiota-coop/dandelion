@@ -3,6 +3,7 @@ module OrganisationFields
 
   included do
     include EmailFields
+    include OrganisationPaymentMethods
 
     field :name, type: String
     field :slug, type: String
@@ -15,21 +16,6 @@ module OrganisationFields
     field :has_image, type: Mongoid::Boolean
     field :plausible_analytics_domain, type: String
     field :simple_analytics_domain, type: String
-    field :stripe_connect_json, type: String
-    field :stripe_account_json, type: String
-    field :stripe_client_id, type: String
-    field :stripe_endpoint_secret, type: String
-    field :stripe_pk, type: String
-    field :stripe_sk, type: String
-    field :stripe_customer_id, type: String
-    field :card_last4, type: String
-    field :mollie_api_key, type: String
-    field :gocardless_access_token, type: String
-    field :gocardless_endpoint_secret, type: String
-    field :gocardless_filter, type: String
-    field :gocardless_instant_bank_pay, type: Mongoid::Boolean
-    field :gocardless_instalments, type: Mongoid::Boolean
-    field :gocardless_subscriptions, type: Mongoid::Boolean
     field :patreon_api_key, type: String
     field :mailgun_api_key, type: String
     field :mailgun_domain, type: String
@@ -63,7 +49,6 @@ module OrganisationFields
     field :monthly_donation_welcome_from, type: String
     field :monthly_donation_welcome_subject, type: String
     field :monthly_donation_welcome_body, type: String
-    field :evm_address, type: String
     field :add_a_donation_to, type: String
     field :donation_text, type: String
     field :become_a_member_url, type: String
@@ -92,13 +77,10 @@ module OrganisationFields
     field :terms_and_conditions, type: String
     field :terms_and_conditions_check_box, type: Mongoid::Boolean
     field :require_organiser_or_revenue_sharer, type: Mongoid::Boolean
-    field :oc_slug, type: String
     field :hide_ticket_revenue, type: Mongoid::Boolean
     field :allow_iframes, type: Mongoid::Boolean
     field :time_zone, type: String
-    field :billing_address_collection, type: Mongoid::Boolean
     field :fixed_contribution_gbp, type: Float
-    field :tax_rate_id, type: String
     field :feedback_summary, type: String
     field :feedback_summary_last_refreshed_at, type: Time
     field :use_event_slugs_in_order_descriptions, type: Mongoid::Boolean
@@ -128,21 +110,10 @@ module OrganisationFields
         plausible_analytics_domain: 'Plausible Analytics domain',
         simple_analytics_domain: 'Simple Analytics domain',
         facebook_pixel_id: 'Facebook Pixel ID',
-        stripe_client_id: 'Stripe client ID',
-        stripe_endpoint_secret: 'Stripe endpoint secret',
-        stripe_pk: 'Stripe public key',
-        stripe_sk: 'Stripe secret key',
-        mollie_api_key: 'Mollie API key',
-        gocardless_access_token: 'GoCardless access token',
-        gocardless_endpoint_secret: 'GoCardless webhook secret',
-        gocardless_instant_bank_pay: 'Enable GoCardless Instant Bank Pay',
-        gocardless_instalments: 'Enable GoCardless Instalments',
-        gocardless_subscriptions: 'Register people with active GoCardless subscriptions as monthly donors',
         patreon_api_key: 'Patreon API key',
         mailgun_api_key: 'Mailgun API key',
         mailgun_webhook_signing_key: 'Mailgun webhook signing key',
         calendar_import_urls: 'iCal URLs',
-        evm_address: 'EVM address',
         collect_location: 'Ask for location of ticket buyers',
         collect_phone: 'Ask for phone number of ticket buyers',
         reply_to: 'Reply address for ticket emails',
@@ -163,23 +134,17 @@ module OrganisationFields
         event_image_required_width: 'Event image width',
         event_image_required_height: 'Event image height',
         restrict_cohosting: 'Restrict cohosting to admins and event managers',
-        oc_slug: 'Open Collective slug',
-        tax_rate_id: 'Stripe tax rate ID',
         atproto_handle: 'Bluesky/ATProto handle',
         atproto_app_password: 'Bluesky/ATProto app password',
         affiliate_credit_percentage: 'Order reward %',
         allow_event_submissions: 'Allow anyone to submit events for review'
-      }.merge(email_human_attribute_names)[attr.to_sym] || super
+      }.merge(email_human_attribute_names).merge(payment_human_attribute_names)[attr.to_sym] || super
     end
 
     def new_hints
       {
         slug: 'Lowercase letters, numbers and dashes only (no spaces)',
         image: 'Square images look best',
-        stripe_pk: '<code>Developers</code> > <code>API keys</code> > <code>Publishable key</code>. Starts <code>pk_live_</code>',
-        stripe_sk: '<code>Developers</code> > <code>API keys</code> > <code>Secret key</code>. Starts <code>sk_live_</code>',
-        stripe_endpoint_secret: '<code>Developers</code> > <code>Webhooks</code> > <code>Signing secret</code>. Starts <code>whsec_</code>',
-        stripe_client_id: 'Used for automated revenue sharing. <code>Settings</code> > <code>Connect</code> > <code>Live mode client ID</code>. Starts <code>ca_</code>',
         mailgun_api_key: '<code>Settings</code> > <code>API security</code> > <code>Mailgun API keys</code>',
         mailgun_domain: '<code>Sending</code> > <code>Domains</code> > <code>Add new domain</code>',
         mailgun_webhook_signing_key: '<code>Settings</code> > <code>API security</code> > <code>HTTP webhook signing key</code>',
@@ -196,20 +161,14 @@ module OrganisationFields
         banned_emails: 'One per line',
         event_image_required_width: 'Required width for event images in px',
         event_image_required_height: 'Required height for event images in px',
-        mollie_api_key: '<code>Developers</code> > <code>API keys</code>. Starts <code>live_</code>. Dandelion sends a webhook URL with each payment, so you do not need to add a webhook in the Mollie Dashboard.',
-        gocardless_instant_bank_pay: 'Shown at checkout for GBP and EUR events only (UK and supported Eurozone countries)',
-        gocardless_instalments: 'Shown at checkout for GBP and EUR events only. Set the number of instalments on each event.',
-        evm_address: 'Ethereum-compatible wallet address for receiving tokens via EVM networks',
         restrict_cohosting: 'When checked, only this organisation\'s admins and event managers can add it as a co-host of events',
-        oc_slug: 'Open Collective organisation slug',
         hide_ticket_revenue: 'Hide ticket revenue in event stats',
         collect_location: 'Request the location of ticket buyers at checkout',
         collect_phone: 'Request the phone number of ticket buyers at checkout',
-        tax_rate_id: 'Stripe tax rate ID to apply to ticket purchases',
         referrer_id: 'Credit someone for referring you to Dandelion',
         minimal_head: 'Custom CSS/JS to include in the &lt;head&gt; when embedding your events page',
         allow_event_submissions: 'When enabled, any signed-in user can submit an event. Submissions are initially visible only to admins, who receive an email notification.'
-      }.merge(email_hints)
+      }.merge(email_hints).merge(payment_hints)
     end
 
     def edit_hints
