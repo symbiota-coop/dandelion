@@ -45,9 +45,11 @@ Please note that Mongo indexes are created directly in the database, and are not
 
 ## Tests
 
-Never attempt to run the full test suite.
+You can use the following command structure to test a single file: `foreman run -e .env.test bundle exec ruby -I test test/$1_test.rb`
 
-IMPORTANT: Use the following command structure to test a single file: `foreman run -e .env.test bundle exec ruby -I test test/$1_test.rb`
+To run only certain tests in a file, add `-n /pattern/` (matches the method name, with spaces as underscores) e.g. `foreman run -e .env.test bundle exec ruby -I test test/$1_test.rb -n /youtube_titles/`
+
+Your default posture should be to just run added/modified tests and any other clearly relevant tests, unless the change is substantial, in which case it may be appropriate to run whole files. Never attempt to run the full test suite.
 
 On Codex, run this outside the sandbox.
 
