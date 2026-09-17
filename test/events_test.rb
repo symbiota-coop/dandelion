@@ -193,6 +193,29 @@ class EventsTest < ActiveSupport::TestCase
     assert_equal 'Ada', @account.firstname
   end
 
+  test 'json-ld cannot close the script tag' do
+    create_event(prices: [0], description: '<p>Welcome</p>')
+    # location/website are not name-sanitised; description text is HTML-decoded
+    @event.set(location: '</script><img src="https://attacker.example/x">')
+    @event.set(description: '<p>&lt;/script&gt;<img src="https://attacker.example/x"></p>')
+    @organisation.set(website: 'https://example.com/</script><img src="https://attacker.example/x">')
+    @event.reload
+    @organisation.reload
+
+    get "/e/#{@event.slug}"
+    assert last_response.ok?
+
+    json_ld = last_response.body[%r{<script type="application/ld\+json">\s*(.*?)\s*</script>}m, 1]
+    assert json_ld, 'expected JSON-LD block'
+    refute_includes json_ld, '</script>'
+    assert_includes json_ld, '\u003c/script\u003e'
+
+    parsed = JSON.parse(json_ld)
+    assert_equal @event.location, parsed.dig('location', 'name')
+    assert_equal @event.organisation.website, parsed.dig('organizer', 'url')
+    assert_equal '</script>', parsed['description']
+  end
+
   test 'names are escaped in emails' do
     create_event(prices: [0])
     # Bypass sanitisation: output escaping must hold even for a stored name containing live markup
