@@ -1,4 +1,5 @@
 require File.expand_path("#{File.dirname(__FILE__)}/test_config.rb")
+require 'ostruct'
 
 class OrganisationsTest < ActiveSupport::TestCase
   include Capybara::DSL
@@ -246,5 +247,36 @@ class OrganisationsTest < ActiveSupport::TestCase
     post "/o/#{@organisation.slug}/organisation_tiers/#{organisation_tier.id}/edit", organisation_tier: { name: 'Gold', threshold: 100, discount: 10, organisation_id: other_organisation.id }
 
     assert_equal @organisation.id, organisation_tier.reload.organisation_id
+  end
+
+  test 'stripe setup session is bound to the organisation' do
+    create_organisation
+    sign_in_with_rack(@account)
+
+    captured = nil
+    Stripe::Checkout::Session.stub :create, proc { |params, _opts|
+      captured = params
+      OpenStruct.new(id: 'cs_setup')
+    } do
+      header 'Accept', 'application/json'
+      post "/organisations/#{@organisation.id}/stripe_setup"
+    end
+
+    assert_equal 200, last_response.status
+    assert_equal @organisation.id.to_s, captured[:client_reference_id]
+  end
+
+  test 'stripe setup complete rejects a session created for another organisation' do
+    create_organisation
+    other = FactoryBot.create(:organisation, account: @account)
+    sign_in_with_rack(@account)
+
+    session = OpenStruct.new(mode: 'setup', client_reference_id: other.id.to_s, customer: 'cus_other')
+    Stripe::Checkout::Session.stub :retrieve, session do
+      get "/organisations/#{@organisation.id}/stripe_setup_complete", session_id: 'cs_other'
+    end
+
+    assert_equal 400, last_response.status
+    assert_nil @organisation.reload.stripe_customer_id
   end
 end

@@ -31,6 +31,7 @@ Dandelion::App.controller do
                                                  mode: 'setup',
                                                  currency: @organisation.currency,
                                                  customer_creation: 'always',
+                                                 client_reference_id: @organisation.id.to_s,
                                                  success_url: "#{ENV['BASE_URI']}/organisations/#{@organisation.id}/stripe_setup_complete?session_id={CHECKOUT_SESSION_ID}",
                                                  cancel_url: "#{ENV['BASE_URI']}/events/new?organisation_id=#{@organisation.id}"
                                                }, StripeOpts.call)
@@ -45,6 +46,8 @@ Dandelion::App.controller do
     opts = StripeOpts.call
 
     session = Stripe::Checkout::Session.retrieve(params[:session_id], opts)
+    halt 400 unless session.mode == 'setup' && session.client_reference_id == @organisation.id.to_s
+
     setup_intent = Stripe::SetupIntent.retrieve(session.setup_intent, opts)
     payment_method = Stripe::PaymentMethod.retrieve(setup_intent.payment_method, opts)
 
