@@ -389,5 +389,161 @@ class TicketTypesTest < ActiveSupport::TestCase
 
     assert_equal 2, duplicate.ticket_types.first.slots
   end
+
+  # ═══════════════════════════════════════════════════════════════════════════
+  # Quantity formula in description
+  # ═══════════════════════════════════════════════════════════════════════════
+
+  def create_role_balance_event(follower_description: '[=Leader*1.1:15]', follower_quantity: 80)
+    create_event(prices: [0])
+    @leader = @event.ticket_types.first
+    @leader.set(name: 'Leader', quantity: 50)
+    @follower = FactoryBot.create(
+      :ticket_type,
+      event: @event,
+      name: 'Follower',
+      quantity: follower_quantity,
+      description: follower_description
+    )
+    @event.reload
+    @leader = @event.ticket_types.detect { |ticket_type| ticket_type.name == 'Leader' }
+    @follower = @event.ticket_types.detect { |ticket_type| ticket_type.name == 'Follower' }
+  end
+
+  test 'public_description strips a valid quantity formula' do
+    ticket_type = TicketType.new(description: 'For followers only [=Leader*1.1:15]')
+
+    assert_equal 'For followers only', ticket_type.public_description
+  end
+
+  test 'public_description is blank when the description is only a formula' do
+    ticket_type = TicketType.new(description: '[=Leader*1.1:15]')
+
+    assert_nil ticket_type.public_description
+  end
+
+  test 'public_description keeps invalid formula-like text' do
+    ticket_type = TicketType.new(description: 'See notes [=Leader]')
+
+    assert_equal 'See notes [=Leader]', ticket_type.public_description
+    assert_nil ticket_type.quantity_formula
+  end
+
+  test 'quantity formula requires a non-whitespace name' do
+    ticket_type = TicketType.new(name: 'Follower', quantity: 80, description: '[= *1.1:15]')
+
+    assert_nil ticket_type.quantity_formula
+    assert_equal 80, ticket_type.effective_quantity
+    assert_equal '[= *1.1:15]', ticket_type.public_description
+  end
+
+  test 'quantity formula rejects a non-finite multiplier' do
+    ticket_type = TicketType.new(name: 'Follower', quantity: 80, description: "[=Leader*#{'9' * 400}:15]")
+
+    assert_nil ticket_type.quantity_formula
+    assert_equal 80, ticket_type.effective_quantity
+    assert_equal "[=Leader*#{'9' * 400}:15]", ticket_type.public_description
+  end
+
+  test 'quantity formula uses the minimum when no matching tickets have sold' do
+    create_role_balance_event
+
+    assert_equal 15, @follower.effective_quantity
+    assert_equal 15, @follower.remaining
+    refute @follower.sold_out?
+  end
+
+  test 'quantity formula releases more tickets as matching types sell' do
+    create_role_balance_event
+    20.times { @leader.tickets.create!(event: @event, payment_completed: true) }
+    @event.reload
+    @follower = @event.ticket_types.detect { |ticket_type| ticket_type.name == 'Follower' }
+
+    assert_equal 22, @follower.effective_quantity
+    assert_equal 22, @follower.remaining
+  end
+
+  test 'quantity formula never exceeds the ticket type quantity' do
+    create_role_balance_event(follower_quantity: 18)
+    20.times { @leader.tickets.create!(event: @event, payment_completed: true) }
+    @event.reload
+    @follower = @event.ticket_types.detect { |ticket_type| ticket_type.name == 'Follower' }
+
+    assert_equal 18, @follower.effective_quantity
+    assert_equal 18, @follower.remaining
+  end
+
+  test 'quantity formula without a minimum starts at zero' do
+    create_role_balance_event(follower_description: '[=Leader*1.1]')
+
+    assert_equal 0, @follower.effective_quantity
+    assert_equal 0, @follower.remaining
+    assert @follower.sold_out?
+  end
+
+  test 'quantity formula sums all other types whose names include the token' do
+    create_role_balance_event
+    early = FactoryBot.create(:ticket_type, event: @event, name: 'Leader early bird', quantity: 20)
+    3.times { @leader.tickets.create!(event: @event, payment_completed: true) }
+    7.times { early.tickets.create!(event: @event, payment_completed: true) }
+    @event.reload
+    @follower = @event.ticket_types.detect { |ticket_type| ticket_type.name == 'Follower' }
+
+    assert_equal 15, @follower.effective_quantity
+
+    10.times { early.tickets.create!(event: @event, payment_completed: true) }
+    @event.reload
+    @follower = @event.ticket_types.detect { |ticket_type| ticket_type.name == 'Follower' }
+
+    assert_equal 22, @follower.effective_quantity
+  end
+
+  test 'quantity formula does not count the type it is written on' do
+    create_event(prices: [0])
+    ticket_type = @event.ticket_types.first
+    ticket_type.set(name: 'Leader', quantity: 10)
+    5.times { ticket_type.tickets.create!(event: @event, payment_completed: true) }
+    ticket_type.set(description: '[=Leader*1.1:0]')
+
+    assert_equal 0, ticket_type.effective_quantity
+    assert_equal(-5, ticket_type.remaining)
+  end
+
+  test 'invalid quantity formula leaves quantity unchanged' do
+    create_role_balance_event(follower_description: 'Bring shoes [=Leader]')
+
+    assert_equal 80, @follower.effective_quantity
+    assert_equal 80, @follower.remaining
+    assert_equal 'Bring shoes [=Leader]', @follower.public_description
+  end
+
+  test 'quantity formula accepts spaces inside the suffix' do
+    create_role_balance_event(follower_description: '[=Leader * 1.1 : 15]')
+
+    assert_equal({ name: 'Leader', multiplier: 1.1, min: 15 }, @follower.quantity_formula)
+    assert_equal 15, @follower.effective_quantity
+  end
+
+  test 'selling a linked ticket type can unsell-out a formula ticket type' do
+    create_role_balance_event(follower_description: '[=Leader*1.1]', follower_quantity: 10)
+    assert @follower.sold_out?
+
+    @leader.tickets.create!(event: @event, payment_completed: true)
+    @event.reload
+    @follower = @event.ticket_types.detect { |ticket_type| ticket_type.name == 'Follower' }
+
+    refute @follower.sold_out?
+    assert_equal 1, @follower.remaining
+    refute @follower.sold_out_cache
+  end
+
+  test 'duplicating an event copies a quantity formula description' do
+    create_role_balance_event
+    duplicate = @event.duplicate!(@account)
+    follower = duplicate.ticket_types.detect { |ticket_type| ticket_type.name == 'Follower' }
+
+    assert_equal '[=Leader*1.1:15]', follower.description
+    assert_equal 15, follower.effective_quantity
+  end
 end
 

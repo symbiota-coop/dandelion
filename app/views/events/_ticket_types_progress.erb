@@ -34,9 +34,10 @@
       <% end %>
     </td>
     <td>
-      <% w = ((ticket_type.tickets.count / ticket_type.quantity.to_f) * 100).round %>
+      <% cap = ticket_type.effective_quantity %>
+      <% w = cap.to_i > 0 ? ((ticket_type.tickets.count / cap.to_f) * 100).round : 0 %>
       <a href="/events/<%=@event.id%>/tickets<%= params[:ticket_type_id] == ticket_type.id.to_s ? '' : "?ticket_type_id=#{ticket_type.id}" %>">
-        <%= ticket_type.tickets.count %>/<%= ticket_type.quantity %>
+        <%= ticket_type.tickets.count %>/<%= cap %>
         <div class="progress">
           <div class="progress-bar" role="progressbar" style="width: <%= "#{w}%" %>;"></div>
         </div>

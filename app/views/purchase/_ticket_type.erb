@@ -132,8 +132,8 @@
 <tr>
   <td style="border: 0; padding-top: 0" class="text-muted ticket-type-description" colspan="3">
     <div class="<% if !ticket_type.price && !ticket_type.range %>mt-3<% end %>">
-      <% if ticket_type.description %>
-        <%== Sanitize.fragment(Rinku.auto_link(md(ticket_type.description)), Sanitize::Config::DANDELION) %>
+      <% if ticket_type.public_description %>
+        <%== Sanitize.fragment(Rinku.auto_link(md(ticket_type.public_description)), Sanitize::Config::DANDELION) %>
       <% end %>
     </div>
   </td>

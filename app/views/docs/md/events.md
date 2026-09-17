@@ -64,6 +64,24 @@ Slots defaults to 1. Set it to:
 
 If you set a total capacity on the event or on a ticket group, Dandelion uses slots rather than the raw number of tickets sold.
 
+### Role balance (linked ticket type quantity)
+
+To release tickets of one type based on sales of another, put a formula at the end of the ticket type **Description**:
+
+```
+[=Leader*1.1:15]
+```
+
+That means: sell at most `max(matching tickets sold × 1.1, 15)`, and never more than this type's Quantity.
+
+- `Leader` is matched as a case-insensitive substring of other ticket type names on the same event (not this type). Sold counts of all matches are added together.
+- `1.1` is the multiplier. `:15` is an optional minimum to release even if nothing matching has sold yet.
+- The formula is stripped from the description buyers see.
+
+Example: ticket types named `Leader` and `Follower`, with the follower description `[=Leader*1.1:15]` and quantity 80. Up to 15 follower tickets are available immediately; more are released as leader tickets sell, up to 80.
+
+If you have several follower types each with the same formula, each gets its own cap. Put them in a ticket group if they should share a pool.
+
 ## Allowing people to pay in instalments
 
 You can collect ticket payments as a fixed number of monthly Direct Debit instalments via GoCardless.

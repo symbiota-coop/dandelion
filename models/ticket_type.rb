@@ -20,6 +20,19 @@ class TicketType
   field :sold_out_cache, type: Mongoid::Boolean
   field :slots, type: Integer, default: 1
 
+  # e.g. "For followers only [=Leader*1.1:15]"
+  QUANTITY_FORMULA = /
+    \s*
+    \[
+      \s*=\s*
+      ([^*\]]*?\S[^*\]]*?)
+      \s*\*\s*
+      (\d+(?:\.\d+)?)
+      (?:\s*:\s*(\d+))?
+    \s*\]
+    \s*\z
+  /x
+
   attr_writer :price_or_range
   attr_accessor :price_or_range_submitted
 
@@ -117,12 +130,39 @@ class TicketType
     false
   end
 
+  def public_description
+    return description unless quantity_formula
+
+    text = description.to_s.sub(QUANTITY_FORMULA, '').strip
+    text unless text.empty?
+  end
+
+  def quantity_formula
+    return unless (match = QUANTITY_FORMULA.match(description.to_s))
+
+    name = match[1].strip
+    return if name.empty?
+
+    multiplier = match[2].to_f
+    return unless multiplier.finite?
+
+    { name: name, multiplier: multiplier, min: match[3] ? match[3].to_i : 0 }
+  end
+
+  def effective_quantity
+    formula = quantity_formula
+    return quantity unless formula
+
+    released = [(quantity_formula_linked_sold * formula[:multiplier]).round(6).floor, formula[:min]].max
+    [quantity, released].compact.min
+  end
+
   def remaining
-    (quantity || 0) - (event ? event.ticket_counts[id] : tickets.and(made_available_at: nil).count)
+    (effective_quantity || 0) - sold_count
   end
 
   def remaining_including_made_available
-    (quantity || 0) - tickets.count
+    (effective_quantity || 0) - tickets.count
   end
 
   def slots
@@ -152,5 +192,24 @@ class TicketType
 
   def number_of_tickets_available_in_single_purchase
     [remaining, tickets_from_places(ticket_group_places_remaining), tickets_from_places(event&.places_remaining), max_quantity_per_transaction || nil].compact.min
+  end
+
+  private
+
+  def sold_count
+    event ? event.ticket_counts[id] : tickets.and(made_available_at: nil).count
+  end
+
+  def quantity_formula_linked_sold
+    formula = quantity_formula
+    return 0 unless formula && event
+
+    needle = formula[:name].downcase
+    event.ticket_types.to_a.sum do |other|
+      next 0 if other.id == id
+      next 0 unless other.name.to_s.downcase.include?(needle)
+
+      event.ticket_counts[other.id]
+    end
   end
 end
