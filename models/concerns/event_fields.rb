@@ -41,6 +41,7 @@ module EventFields
     field :select_tickets_outro, type: String
     field :select_tickets_title, type: String
     field :rsvp_button_text, type: String
+    field :thank_you_text, type: String
     field :fixed_contribution_gbp, type: Float
     field :cap_gbp, type: Float
     field :oc_slug, type: String
@@ -142,6 +143,7 @@ module EventFields
         send_ticketholder_confirmation: 'Send order confirmation to other ticketholders',
         hide_few_left: "Hide 'few tickets left' labels",
         rsvp_button_text: 'RSVP button',
+        thank_you_text: 'Thank you text',
         tax_rate_id: 'Stripe tax rate ID',
         gocardless_instalment_count: 'GoCardless instalments',
         carousel_text: 'Preview text',
@@ -177,6 +179,7 @@ module EventFields
         select_tickets_intro: 'Text to show at the top of the Select Tickets panel',
         select_tickets_outro: 'Text to show at the bottom of the Select Tickets panel',
         rsvp_button_text: 'Title of the RSVP button for free tickets',
+        thank_you_text: 'Shown on the thank you page after a successful booking',
         ask_hear_about: 'Ask people how they heard about the event on the order form',
         suggested_donation: 'If this is blank, the donation field will not be shown',
         extra_info_for_ticket_email: 'This is the place to enter Zoom links, directions to the venue, etc.',

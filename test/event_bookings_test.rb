@@ -129,6 +129,19 @@ class EventBookingsTest < ActiveSupport::TestCase
   end
 
   # ═══════════════════════════════════════════════════════════════════════════
+  # Thank you page
+  # ═══════════════════════════════════════════════════════════════════════════
+
+  test 'custom thank you text is shown after booking' do
+    create_event(prices: [0], thank_you_text: '<p>See you at the circle</p>')
+    sign_in(@account)
+    visit "/e/#{@event.slug}"
+    click_button 'RSVP'
+    assert page.has_content? 'Thanks for booking'
+    assert page.has_content? 'See you at the circle'
+  end
+
+  # ═══════════════════════════════════════════════════════════════════════════
   # Terms
   # ═══════════════════════════════════════════════════════════════════════════
 

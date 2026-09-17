@@ -41,6 +41,10 @@ Events in Dandelion must be created under an Organisation. (See [Organisations](
 - Click the organisation dropdown at the top of the main window and select Create an event
 - Provide the required details and click Create event. You will then notice a new dropdown containing further admin options for your event at the top of the main window.
 
+## Customising the thank you page
+
+After someone books, they see a thank you page on Dandelion (unless you've set a redirect URL under **Everything else**). Under **Appearance**, you can add **Thank you text** to show a custom message on that page—for example a welcome note or a link to a community group. Leave it blank to keep the default thank you page.
+
 ## Let attendees choose how much to pay
 
 To let your attendees choose how much to pay for a ticket type:
