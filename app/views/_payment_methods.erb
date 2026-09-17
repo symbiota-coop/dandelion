@@ -9,10 +9,10 @@
 </style>
 <% {
   'gocardless.png' => ['https://gocardless.com/', 'order-1 order-md-1'],
-  'mollie.png' => ['https://www.mollie.com/', 'order-3 order-md-2'],
+  'mollie.png' => ['https://www.mollie.com/', 'order-4 order-md-2'],
   'stripe.png' => ['https://stripe.com/', 'order-2 order-md-3'],
-  'paypal.png' => ['https://www.paypal.com/', 'order-4 order-md-4'],
-  'opencollective.png' => ['https://opencollective.com/', 'order-5 order-md-5']
+  'paypal.png' => ['https://www.paypal.com/', 'order-5 order-md-4'],
+  'opencollective.png' => ['https://opencollective.com/', 'order-3 order-md-5']
 }.each do |k, (v, order)| %>
   <div class="col-4 col-md mb-3 mb-md-0 <%= order %>">
     <a href="<%= v %>"><img class="<%= k.split('.').first %> w-100" src="/images/payment_methods/<%= k %>" /></a>
