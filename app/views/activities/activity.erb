@@ -74,6 +74,14 @@
           </td>
         </tr>
       <% end %>
+      <% unless @activity.privacy == 'secret' %>
+        <tr>
+          <td>QR code</td>
+          <td>
+            <a target="_blank" href="/qr.png?url=<%= "#{ENV['BASE_URI']}/o/#{@activity.organisation.slug}/a/#{@activity.slug}" %>"><img src="/qr.png?url=<%= "#{ENV['BASE_URI']}/o/#{@activity.organisation.slug}/a/#{@activity.slug}" %>" style="width: 50px"></a>
+          </td>
+        </tr>
+      <% end %>
     </table>
   </div>
 </div>
