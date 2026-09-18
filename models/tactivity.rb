@@ -52,15 +52,13 @@ class Tactivity
 
     self.space = nil if tslot.nil?
     self.tslot = nil if space.nil?
+
+    errors.add(:space, 'must belong to the same timetable') if space && timetable && space.timetable_id != timetable_id
+    errors.add(:tslot, 'must belong to the same timetable') if tslot && timetable && tslot.timetable_id != timetable_id
   end
 
   validates_presence_of :name
   validates_uniqueness_of :space, scope: :tslot, allow_nil: true
-
-  validate do
-    errors.add(:space, 'must belong to the same timetable') if space && timetable && space.timetable_id != timetable_id
-    errors.add(:tslot, 'must belong to the same timetable') if tslot && timetable && tslot.timetable_id != timetable_id
-  end
 
   has_many :attendances, dependent: :destroy
 

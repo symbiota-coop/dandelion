@@ -144,10 +144,11 @@ class EventPaymentMethod
     text ||= provider_name if badge_class || badge_background
     return if text.blank?
 
-    style = [
+    parts = [
       ("background: #{badge_background} !important" if badge_background),
       ("color: #{badge_color} !important" if badge_color)
-    ].compact.join('; ').presence
+    ].compact
+    style = parts.join('; ') if parts.any?
 
     { class: badge_background ? nil : (badge_class || 'bg-secondary'), style: style, text: text }
   end

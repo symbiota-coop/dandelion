@@ -123,7 +123,7 @@ class Activity
   validates_uniqueness_of :slug, scope: :organisation_id
   validates_format_of :slug, with: /\A[a-z0-9-]+\z/
 
-  validate do
+  before_validation do
     errors.add(:organisation, 'cannot be changed') if persisted? && organisation_id_changed?
     errors.add(:account, 'cannot be changed') if persisted? && account_id_changed?
   end

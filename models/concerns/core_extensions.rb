@@ -39,7 +39,7 @@ module CoreExtensions
     end
 
     def validates_same_parent(child, via:)
-      validate do
+      before_validation do
         errors.add(child, "must belong to the same #{via}") if send(child) && send(via) && send(child).send("#{via}_id") != send("#{via}_id")
       end
     end

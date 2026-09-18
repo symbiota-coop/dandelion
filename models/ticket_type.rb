@@ -51,10 +51,6 @@ class TicketType
   validates_presence_of :name, :quantity
   validates_same_parent :ticket_group, via: :event
 
-  validate do
-    errors.add(:event, 'cannot be changed') if persisted? && event_id_changed?
-  end
-
   before_validation do
     if @price_or_range_submitted
       self.price = nil
@@ -70,14 +66,15 @@ class TicketType
         end
       end
     end
+    self.slots = 1 if self[:slots].nil?
 
+    errors.add(:event, 'cannot be changed') if persisted? && event_id_changed?
     errors.add(:range_min, 'must not be < 0') if range_min && range_min < 0
     errors.add(:range_max, 'must not be < 0') if range_max && range_max < 0
     errors.add(:range_max, 'must be > range min') if range_min && range_max && range_max <= range_min
     errors.add(:price, 'must not be < 0') if price && price < 0
     errors.add(:quantity, 'must not be < 0') if quantity && quantity < 0
     errors.add(:max_quantity_per_transaction, 'must not be < 0') if max_quantity_per_transaction && max_quantity_per_transaction < 0
-    self.slots = 1 if self[:slots].nil?
     errors.add(:slots, 'must not be < 0') if self[:slots] && self[:slots] < 0
   end
 

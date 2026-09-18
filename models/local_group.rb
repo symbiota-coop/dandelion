@@ -30,11 +30,6 @@ class LocalGroup
   validates_uniqueness_of :slug, scope: :organisation_id
   validates_format_of :slug, with: /\A[a-z0-9-]+\z/
 
-  validate do
-    errors.add(:organisation, 'cannot be changed') if persisted? && organisation_id_changed?
-    errors.add(:account, 'cannot be changed') if persisted? && account_id_changed?
-  end
-
   has_many :discount_codes, class_name: 'DiscountCode', as: :codeable, dependent: :destroy
 
   has_many :events, dependent: :nullify
@@ -59,6 +54,9 @@ class LocalGroup
   after_create :add_organisation_members_within
 
   before_validation do
+    errors.add(:organisation, 'cannot be changed') if persisted? && organisation_id_changed?
+    errors.add(:account, 'cannot be changed') if persisted? && account_id_changed?
+
     g = JSON.parse(geometry)
     unless g['coordinates']
       g = g['features'].first['geometry']

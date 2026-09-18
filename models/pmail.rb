@@ -58,15 +58,9 @@ class Pmail
   validates_same_parent :activity, via: :organisation
   validates_same_parent :local_group, via: :organisation
 
-  validate do
-    errors.add(:event, 'must belong to the same organisation') if event && organisation && event.organisation_id != organisation_id && !Array(event.cohosts_ids_cache).include?(organisation_id)
-  end
-
   attr_accessor :file, :to_option
 
   before_validation do
-    errors.add(:link_params, 'cannot contain spaces') if link_params && link_params.include?(' ')
-
     self.will_send_at = nil if will_send_at && will_send_at < Time.now
     self.will_send_at = nil if mailable.is_a?(Event) || !organisation.mailgun_api_key
 
@@ -117,6 +111,9 @@ class Pmail
         errors.add(:to_option, 'is invalid')
       end
     end
+
+    errors.add(:event, 'must belong to the same organisation') if event && organisation && event.organisation_id != organisation_id && !Array(event.cohosts_ids_cache).include?(organisation_id)
+    errors.add(:link_params, 'cannot contain spaces') if link_params && link_params.include?(' ')
   end
 
   def assign_mailable_from_to_option(selected_mailable)

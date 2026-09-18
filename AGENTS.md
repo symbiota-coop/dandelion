@@ -36,6 +36,12 @@ It also runs `blanks_to_nils!` on `params` so we can just do `if params[:x]` (no
 ## House style
 
 - Do not use `.presence`
+- Use `validates_presence_of`, not `validates :name, presence: true`
+- Use `belongs_to_without_parent_validation`, not Mongoid `belongs_to` (its parent check fails when the parent is only in memory)
+- Use `has_many_through` for join collections, not `has_many :x, through:` (Mongoid has no `through`)
+- Query filters are class methods that return `self.and(...)` so they chain (`Event.live.future`). Do not use `scope :live, -> { ... }`
+- Controllers are `Dandelion::App.controller` blocks with `erb` / `partial` / `cp` — no `before_action`, strong params, or `render`
+- Put field cleanup and `errors.add` in `before_validation`, not `validate do`
 
 ## Mongo
 

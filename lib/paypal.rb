@@ -50,9 +50,9 @@ class Paypal
       summary = nil
       details = nil
       if body.is_a?(Hash)
-        summary = body['message'].presence || body['name'].presence || body['error_description'].presence || body['error'].presence
-        details = Array(body['details']).map { |d| d['description'] || d['issue'] }.compact.presence
-        details = details.join('; ') if details
+        summary = [body['message'], body['name'], body['error_description'], body['error']].reject(&:blank?).first
+        details = Array(body['details']).map { |d| d['description'] || d['issue'] }.compact
+        details = details.join('; ') if details.any?
       elsif body.present?
         summary = body.to_s.truncate(200)
       end
@@ -75,6 +75,9 @@ class Paypal
   end
 
   def create_order(amount:, currency:, description:, return_url:, cancel_url:, custom_id:, brand_name: nil, request_id: nil)
+    brand_name = brand_name.to_s.truncate(127)
+    brand_name = nil if brand_name.blank?
+
     post(
       '/v2/checkout/orders',
       {
@@ -91,7 +94,7 @@ class Paypal
               cancel_url: cancel_url,
               user_action: 'PAY_NOW',
               shipping_preference: 'NO_SHIPPING',
-              brand_name: brand_name.to_s.truncate(127).presence
+              brand_name: brand_name
             }.compact
           }
         }

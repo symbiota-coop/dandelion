@@ -29,9 +29,6 @@ class EventFeedback
   before_validation do
     self.has_public_answers = public_answers.present?
     self.answers = nil unless answers&.any? { |_q, a| a.present? }
-  end
-
-  validate do
     errors.add(:response, 'cannot be set when feedback is anonymous and not publicly visible') if response_changed? && response.present? && !respondable?
   end
 
