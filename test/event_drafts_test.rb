@@ -78,6 +78,35 @@ class EventDraftsTest < ActiveSupport::TestCase
     assert page.has_css?('#event_ticket_types_attributes_1_name')
   end
 
+  test 'reloading a draft restores checkboxes' do
+    create_organisation
+    draft = create_event_draft(extra: { evergreen: '1', secret: '1', ask_hear_about: '0' })
+    sign_in(@account)
+    visit "/events/new?organisation_id=#{@organisation.id}&draft_id=#{draft.id}"
+
+    assert find('#event_evergreen', visible: :all).checked?
+    assert find('#event_secret', visible: :all).checked?
+    click_link 'Questions'
+    refute find('#event_ask_hear_about', visible: :all).checked?
+  end
+
+  test 'adding a ticket type after removing an earlier one uses a new index' do
+    create_organisation
+    draft = create_event_draft
+    sign_in(@account)
+    visit "/events/new?organisation_id=#{@organisation.id}&draft_id=#{draft.id}"
+    click_link 'Tickets'
+    click_link 'Add ticket type'
+    fill_in 'event_ticket_types_attributes_1_name', with: 'Saturday Full Day'
+    first('#ticket_types .remove-ticket-type').click
+    click_link 'Add ticket type'
+
+    assert page.has_css?('#event_ticket_types_attributes_1_name')
+    assert page.has_css?('#event_ticket_types_attributes_2_name')
+    assert_equal 2, page.all('#ticket_types .ticket_type').count
+    assert_equal 'Saturday Full Day', find('#event_ticket_types_attributes_1_name').value
+  end
+
   test 'creating an event from a restored draft keeps ticket types' do
     create_organisation
     event = FactoryBot.build_stubbed(:event)

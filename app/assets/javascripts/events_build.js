@@ -53,13 +53,32 @@ $(function () {
     return fieldPresent(attrs.name) || fieldPresent(attrs.capacity)
   }
 
+  function checkboxChecked (value) {
+    if (Array.isArray(value)) return value.some(checkboxChecked)
+    return value === true || value === '1' || value === 'on' || value === 'true'
+  }
+
   function setDraftFieldValue ($el, value) {
-    if ($el.is(':checkbox')) {
-      $el.prop('checked', value === true || value === '1' || value === 'on' || value === 'true')
-      return
-    }
-    if (!fieldPresent(value)) return
-    $el.val(value)
+    $el.each(function () {
+      const $field = $(this)
+      if ($field.is(':checkbox')) {
+        $field.prop('checked', checkboxChecked(value))
+        return
+      }
+      if ($field.attr('type') === 'hidden' && $el.filter(':checkbox').length) return
+      if (Array.isArray(value) || !fieldPresent(value) || typeof value === 'object') return
+      $field.val(value)
+    })
+  }
+
+  function nextNestedIndex ($container, rowSelector) {
+    let max = -1
+    $container.find(rowSelector).each(function () {
+      const name = $(this).find('[name]').first().attr('name') || ''
+      const match = name.match(/\[(\d+)\]/)
+      if (match) max = Math.max(max, Number(match[1]))
+    })
+    return max + 1
   }
 
   function initDatetimepickers ($scope) {
@@ -79,7 +98,7 @@ $(function () {
     const template = document.getElementById(options.templateId)
     if (!$container.length || !template) return null
 
-    const index = $container.find(options.rowSelector).length
+    const index = nextNestedIndex($container, options.rowSelector)
     const clone = $(template.content.cloneNode(true))
     const $row = clone.find(options.rowSelector)
     const attrs = options.attrs || {}
@@ -155,9 +174,10 @@ $(function () {
 
     // Set regular form values
     $.each(draft, function (key, value) {
-      if (fieldPresent(value) && typeof value !== 'object') {
-        $(form).find('[name="event[' + key + ']"]').val(value)
-      }
+      if (value && typeof value === 'object' && !Array.isArray(value)) return
+      const $fields = $(form).find('[name="event[' + key + ']"]')
+      if (!$fields.length) return
+      setDraftFieldValue($fields, value)
     })
 
     nestedAttributeList(draft.ticket_groups_attributes).forEach(function (attrs) {
@@ -285,6 +305,7 @@ $(function () {
   // Evergreen toggle
   $('#event_evergreen').change(function () {
     if ($(this).is(':checked')) {
+      $(this).closest('.checkbox').parent().show()
       $('#time-fields, .evergreen-hide').hide()
       $('#event_start_time, #event_end_time, #event_location').removeAttr('required')
       $('#event_location').val('')
@@ -311,7 +332,6 @@ $(function () {
       .on('click', function (e) {
         $(this).hide()
         $evergreen.prop('checked', true).trigger('change')
-        $evergreen.closest('.checkbox').parent().show()
       })
   }
 
