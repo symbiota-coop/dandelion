@@ -1,6 +1,6 @@
 # Cookie Policy
 
-Last updated: 4 May 2026
+Last updated: 18 September 2026
 
 This policy explains how Dandelion uses cookies and similar technologies. For more about how we handle personal data, read our <a href="/privacy">Privacy Policy</a>.
 
@@ -31,7 +31,7 @@ Where an organiser enables analytics, Dandelion may load Plausible Analytics or 
 
 ## Optional Marketing
 
-Where an organiser enables a Meta/Facebook pixel for an event or organisation, Dandelion may load it to measure visits, event views and purchases. This is optional and is only loaded with your consent.
+Where an organiser enables a Meta/Facebook pixel or Google Ads conversion tag for an event or organisation, Dandelion may load it to measure visits, event views and purchases. This is optional and is only loaded with your consent.
 
 ## Third-Party Services
 

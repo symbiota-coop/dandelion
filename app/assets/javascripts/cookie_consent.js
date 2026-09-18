@@ -36,8 +36,17 @@ function initCookieConsent () {
 
   function clearDeclinedCookies (consent) {
     if (!consent.marketing) {
-      expireCookie('_fbp')
-      expireCookie('_fbc')
+      marketingCookies().forEach(expireCookie)
+    }
+  }
+
+  function marketingCookies () {
+    const el = document.getElementById('cookie-consent')
+    if (!el || !el.getAttribute('data-marketing-cookies')) return []
+    try {
+      return JSON.parse(el.getAttribute('data-marketing-cookies'))
+    } catch (e) {
+      return []
     }
   }
 

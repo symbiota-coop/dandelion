@@ -58,7 +58,11 @@ GoCardless Instant Bank Pay and instalments are only offered at checkout for **G
 
 ## Analytics
 
-In organisation settings under **Analytics**, you can add a Meta/Facebook Pixel ID (digits only). With marketing cookie consent, Dandelion loads the pixel on organisation and event pages, sends `PageView` and `ViewContent` on event pages, and a single `Purchase` after a successful booking. You can also set a pixel on an individual event; if both are set and different, events are sent to both.
+In organisation settings under **Analytics**, you can add a Meta/Facebook Pixel ID (digits only) and a Google Ads conversion ID and label. With marketing cookie consent, Dandelion loads those tags on organisation and event pages.
+
+The Meta pixel sends `PageView` and `ViewContent` on event pages, and a single `Purchase` after a successful booking. The Google Ads tag loads on those same pages and fires a single conversion after a successful booking (value, currency, and a unique order ID, so it isn't double-counted). If you enable **Google Ads Enhanced Conversions**, the purchase also sends the buyer's hashed email and phone (when we have them) so Google can match the conversion more accurately.
+
+You can also set these on an individual event; if both organisation and event values are set and different, events are sent to both.
 
 ## Mailgun
 

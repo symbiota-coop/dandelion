@@ -1,0 +1,15 @@
+<script type="text/plain" data-cookie-category="analytics" defer data-domain="<%= @organisation.plausible_analytics_domain %>" src="https://plausible.io/js/script.pageview-props.revenue.tagged-events.js"></script>
+<script type="text/plain" data-cookie-category="analytics">
+  window.plausible = window.plausible || function() { (window.plausible.q = window.plausible.q || []).push(arguments) }
+</script>
+<% if track_purchase? %>
+  <script type="text/plain" data-cookie-category="analytics">
+    plausible('Purchase', {
+      props: { order_id: <%== purchase_analytics[:order_id].to_json %> },
+      revenue: {
+        currency: <%== purchase_analytics[:currency].to_json %>,
+        amount: <%== purchase_analytics[:value].to_json %>
+      }
+    });
+  </script>
+<% end %>

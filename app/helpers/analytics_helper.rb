@@ -16,11 +16,7 @@ Dandelion::App.helpers do
   end
 
   def facebook_pixel_ids
-    @facebook_pixel_ids ||= [@organisation&.facebook_pixel_id, @event&.facebook_pixel_id]
-      .compact
-      .map { |id| id.to_s.strip }
-      .select { |id| id.match?(/\A\d+\z/) }
-      .uniq
+    @facebook_pixel_ids ||= AnalyticsProvider.facebook_pixel_ids(organisation: @organisation, event: @event)
   end
 
   def facebook_pixel_view_content_params
@@ -39,5 +35,31 @@ Dandelion::App.helpers do
       content_name: @order.event.try(:name),
       num_items: @order.tickets.count
     ).except(:order_id).compact
+  end
+
+  def google_ads_conversions
+    @google_ads_conversions ||= AnalyticsProvider.google_ads_conversions(organisation: @organisation, event: @event)
+  end
+
+  def google_ads_enhanced_conversions?
+    google_ads_conversions.any? { |conversion| conversion[:enhanced] }
+  end
+
+  def google_ads_user_data
+    account = @order&.account
+    return {} unless account
+
+    data = {}
+    data[:email] = account.email if account.email
+    data[:phone_number] = account.phone if account.phone
+    data
+  end
+
+  def google_ads_purchase_params
+    {
+      value: purchase_analytics[:value],
+      currency: purchase_analytics[:currency],
+      transaction_id: purchase_analytics[:order_id]
+    }
   end
 end

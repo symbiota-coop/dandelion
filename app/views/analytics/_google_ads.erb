@@ -1,0 +1,35 @@
+<% conversions = google_ads_conversions %>
+<% first_id = conversions.first[:id] %>
+<script type="text/plain" data-cookie-category="marketing" async src="https://www.googletagmanager.com/gtag/js?id=AW-<%= first_id %>"></script>
+<script type="text/plain" data-cookie-category="marketing">
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  <% conversions.each do |conversion| %>
+    <% config_id = "AW-#{conversion[:id]}" %>
+    <% if conversion[:enhanced] %>
+      gtag('config', <%== config_id.to_json %>, {allow_enhanced_conversions: true});
+    <% else %>
+      gtag('config', <%== config_id.to_json %>);
+    <% end %>
+  <% end %>
+
+  <% if track_purchase? %>
+    (function () {
+      var orderId = <%== purchase_analytics[:order_id].to_json %>;
+      var storageKey = 'gtag_purchase_' + orderId;
+      try {
+        if (window.sessionStorage && sessionStorage.getItem(storageKey)) return;
+        if (window.sessionStorage) sessionStorage.setItem(storageKey, '1');
+      } catch (e) {}
+      <% if google_ads_enhanced_conversions? && (user_data = google_ads_user_data).any? %>
+        gtag('set', 'user_data', <%== user_data.to_json %>);
+      <% end %>
+      var params = <%== google_ads_purchase_params.to_json %>;
+      <% conversions.each do |conversion| %>
+        <% next unless conversion[:label] %>
+        gtag('event', 'conversion', Object.assign({}, params, {send_to: <%== "AW-#{conversion[:id]}/#{conversion[:label]}".to_json %>}));
+      <% end %>
+    })();
+  <% end %>
+</script>

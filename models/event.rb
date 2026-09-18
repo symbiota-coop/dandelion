@@ -23,7 +23,7 @@ class Event
 
   taggable tagships: :event_tagships, tag_class: EventTag
   include ImageWithValidation
-  include HasFacebookPixel
+  include AnalyticsProviders
   include Searchable
 
   # Key associations for `public_data`, event cards (`events/blocks`), etc.

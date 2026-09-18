@@ -20,7 +20,7 @@
     s.parentNode.insertBefore(t, s)
   }(window, document, 'script',
           'https://connect.facebook.net/en_US/fbevents.js');
-  <% pixel_ids.each do |pixel_id| %>
+  <% facebook_pixel_ids.each do |pixel_id| %>
     fbq('init', <%== pixel_id.to_json %>);
   <% end %>
 

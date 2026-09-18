@@ -108,7 +108,6 @@ module OrganisationFields
         extra_info_for_ticket_email: 'Extra info for order confirmation email',
         plausible_analytics_domain: 'Plausible Analytics domain',
         simple_analytics_domain: 'Simple Analytics domain',
-        facebook_pixel_id: 'Facebook Pixel ID',
         patreon_api_key: 'Patreon API key',
         mailgun_api_key: 'Mailgun API key',
         mailgun_webhook_signing_key: 'Mailgun webhook signing key',
@@ -137,7 +136,7 @@ module OrganisationFields
         atproto_app_password: 'Bluesky/ATProto app password',
         affiliate_credit_percentage: 'Order reward %',
         allow_event_submissions: 'Allow anyone to submit events for review'
-      }.merge(email_human_attribute_names).merge(payment_human_attribute_names)[attr.to_sym] || super
+      }.merge(email_human_attribute_names).merge(payment_human_attribute_names).merge(analytics_human_attribute_names)[attr.to_sym] || super
     end
 
     def new_hints
@@ -167,7 +166,7 @@ module OrganisationFields
         referrer_id: 'Credit someone for referring you to Dandelion',
         minimal_head: 'Custom CSS/JS to include in the &lt;head&gt; when embedding your events page',
         allow_event_submissions: 'When enabled, any signed-in user can submit an event. Submissions are initially visible only to admins, who receive an email notification.'
-      }.merge(email_hints).merge(payment_hints)
+      }.merge(email_hints).merge(payment_hints).merge(analytics_hints)
     end
 
     def edit_hints

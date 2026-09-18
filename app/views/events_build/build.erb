@@ -302,6 +302,9 @@
         <%= f.url_block :purchase_url %>
         <%= f.text_block :match_phrase %>
         <%= f.text_block :facebook_pixel_id %>
+        <%= f.text_block :google_ads_conversion_id %>
+        <%= f.text_block :google_ads_conversion_label %>
+        <%= f.check_box_block :google_ads_enhanced_conversions %>
         <%= f.text_block :oc_slug %>
         <%= f.text_block :tax_rate_id %>
         <% if @event.organisation.gocardless_instalments || @event.gocardless_instalment_count %>

@@ -47,6 +47,8 @@ While you are creating an event, Dandelion autosaves a draft. If you leave and c
 
 After someone books, they see a thank you page on Dandelion (unless you've set a redirect URL under **Everything else**). Under **Appearance**, you can add **Thank you text** to show a custom message on that page—for example a welcome note or a link to a community group. Leave it blank to keep the default thank you page.
 
+Meta and Google Ads purchase conversions also fire on this page (see [Organisations](/docs/organisations#analytics)). You can also set a pixel or Google Ads conversion on an individual event under **Everything else**; if both organisation and event values are set and different, events are sent to both.
+
 ## Let attendees choose how much to pay
 
 To let your attendees choose how much to pay for a ticket type:

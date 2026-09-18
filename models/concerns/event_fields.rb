@@ -118,7 +118,6 @@ module EventFields
         email: 'Contact email',
         questions: 'Further questions to ask on the order form',
         facebook_event_url: 'Facebook event URL',
-        facebook_pixel_id: 'Facebook Pixel ID',
         show_emails: 'Allow all event admins to view email addresses of attendees',
         opt_in_organisation: 'Allow people to opt in to emails from the host organisation(s)',
         opt_in_facilitator: 'Allow people to opt in to emails from facilitators',
@@ -161,7 +160,7 @@ module EventFields
       }.merge(email_human_attribute_names).merge({
                                                    recording_email_title: 'Order confirmation email subject for the recording of the event',
                                                    recording_email_greeting: 'Order confirmation email greeting for the recording of the event'
-                                                 })[attr.to_sym] || super
+                                                 }).merge(analytics_human_attribute_names)[attr.to_sym] || super
     end
 
     def new_hints
@@ -196,7 +195,6 @@ module EventFields
         monthly_donors_only: 'Only allow people making a monthly donation to the organisation to purchase tickets',
         no_discounts: "Don't apply usual discounts for the organisation's monthly donors",
         redirect_url: 'Optional http(s) URL. By default people will be shown a thank you page on Dandelion.',
-        facebook_pixel_id: 'Your Facebook Pixel ID for tracking sales',
         purchase_url: "URL where people can buy tickets (if you're not selling tickets on Dandelion)",
         capacity: 'Caps the total number of places across all ticket types. Each ticket type can take a different number of slots. Optional',
         send_order_notifications: 'Send email notifications of orders and waitlist registrations to event facilitators',
@@ -227,7 +225,7 @@ module EventFields
       }.merge(email_hints).merge({
                                    recording_email_title: 'Custom subject line for the order confirmation email for the recording of the event.',
                                    recording_email_greeting: 'Custom greeting for the order confirmation email for the recording of the event.'
-                                 })
+                                 }).merge(analytics_hints)
     end
 
     def edit_hints
