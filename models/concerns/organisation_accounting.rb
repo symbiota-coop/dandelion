@@ -10,9 +10,9 @@ module OrganisationAccounting
   end
 
   def contribution_reminder
-    return false if contribution_not_required
+    return false if contribution_not_required || paid_up
 
-    !paid_up && payment_method?
+    EventPaymentMethod.contribution_reminder?(self)
   end
 
   def contribution_requested(exclude_promotion_fees: false)

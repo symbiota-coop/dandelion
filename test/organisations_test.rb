@@ -249,6 +249,31 @@ class OrganisationsTest < ActiveSupport::TestCase
     assert_equal @organisation.id, organisation_tier.reload.organisation_id
   end
 
+  test 'contribution reminder skips Dandelion Stripe Connect' do
+    create_organisation(stripe_pk: nil, stripe_sk: nil, stripe_connect_json: { 'stripe_user_id' => 'acct_connect' }.to_json)
+    @organisation.set(paid_up: false)
+
+    refute @organisation.contribution_reminder
+    assert @organisation.payment_method?
+    assert_nil EventPaymentMethod.contribution_reminder_label(@organisation)
+  end
+
+  test 'contribution reminder asks unpaid stripe_client_id orgs' do
+    create_organisation(stripe_client_id: 'ca_test')
+    @organisation.set(paid_up: false)
+
+    assert @organisation.contribution_reminder
+    assert_equal 'Stripe Connect', EventPaymentMethod.contribution_reminder_label(@organisation)
+  end
+
+  test 'contribution reminder asks unpaid Mollie orgs' do
+    create_organisation(stripe_pk: nil, stripe_sk: nil, mollie_api_key: 'test_molliekey')
+    @organisation.set(paid_up: false)
+
+    assert @organisation.contribution_reminder
+    assert_equal 'Mollie', EventPaymentMethod.contribution_reminder_label(@organisation)
+  end
+
   test 'stripe setup session is bound to the organisation' do
     create_organisation
     sign_in_with_rack(@account)

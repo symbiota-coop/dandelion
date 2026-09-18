@@ -15,15 +15,7 @@
         <% if organisation.contribution_reminder %>
           <mark>
             You're using
-            <% if organisation.stripe_client_id %>
-              Stripe Connect,
-            <% elsif organisation.gocardless_instant_bank_pay %>
-              GoCardless Instant Bank Pay,
-            <% elsif organisation.oc_slug %>
-              Open Collective,
-            <% else %>
-              a special payment feature,
-            <% end %>
+            <%= EventPaymentMethod.contribution_reminder_label(organisation) || 'a special payment feature' %>,
             which means we can't collect donations for Dandelion at checkout.
             Please will you donate on behalf of your organisation instead,
             to help us remain donation-based and ad-free?

@@ -8,7 +8,7 @@ class EventPaymentMethod
   attr_accessor :name, :label, :outline, :visible, :event_condition, :org_condition, :process, :partial,
                 :provider_name, :badge_class, :badge_background, :badge_color, :badge_text, :identity_fields,
                 :payment_id_field, :refund, :purchase_errors, :card, :complimentary, :platform_donations,
-                :dashboard_help
+                :dashboard_help, :contribution_reminder
 
   def initialize(name, options = {})
     @name = name
@@ -33,6 +33,8 @@ class EventPaymentMethod
     @complimentary = options.fetch(:complimentary, false)
     @platform_donations = options.fetch(:platform_donations, false)
     @dashboard_help = options[:dashboard_help]
+    @contribution_reminder = options[:contribution_reminder]
+    @contribution_reminder_label = options[:contribution_reminder_label]
     self.class.all << self
   end
 
@@ -52,6 +54,22 @@ class EventPaymentMethod
       return badge if badge
     end
     nil
+  end
+
+  def self.contribution_reminder?(org)
+    all.any? { |pm| pm.contribution_reminder?(org) }
+  end
+
+  def self.contribution_reminder_label(org)
+    all.each do |pm|
+      next unless pm.contribution_reminder?(org)
+      return pm.contribution_reminder_label
+    end
+    nil
+  end
+
+  def contribution_reminder_label
+    @contribution_reminder_label || provider_name
   end
 
   def self.platform_donation_names
@@ -80,6 +98,23 @@ class EventPaymentMethod
     return false if org_condition && !org_condition.call(event.organisation)
 
     event_condition.call(event)
+  end
+
+  def contribution_reminder?(org)
+    condition = contribution_reminder_condition
+    return false unless condition
+
+    condition.call(org)
+  end
+
+  def contribution_reminder_condition
+    explicit = contribution_reminder
+    return explicit if explicit.respond_to?(:call)
+    return org_condition if explicit == true
+    return if explicit == false
+    return org_condition if !platform_donations && !complimentary && org_condition
+
+    nil
   end
 
   def button_label(event)
@@ -137,6 +172,8 @@ EventPaymentMethod.new('stripe',
                        outline: false,
                        card: true,
                        platform_donations: true,
+                       contribution_reminder: ->(org) { org.stripe_client_id },
+                       contribution_reminder_label: 'Stripe Connect',
                        provider_name: 'Stripe',
                        identity_fields: %i[session_id payment_intent],
                        payment_id_field: :payment_intent,
@@ -187,6 +224,7 @@ EventPaymentMethod.new('paypal',
 EventPaymentMethod.new('gocardless_instant',
                        label: 'Pay with GoCardless',
                        provider_name: 'GoCardless',
+                       contribution_reminder_label: 'GoCardless Instant Bank Pay',
                        badge_background: '#1C1B18',
                        badge_color: '#F1F252',
                        identity_fields: %i[gocardless_payment_request_id gocardless_payment_id],
@@ -204,6 +242,7 @@ EventPaymentMethod.new('gocardless_instant',
 EventPaymentMethod.new('gocardless_instalment',
                        label: ->(event) { "Pay in #{event.gocardless_instalment_count} monthly instalments" },
                        provider_name: 'GoCardless',
+                       contribution_reminder_label: 'GoCardless instalments',
                        badge_background: '#1C1B18',
                        badge_color: '#F1F252',
                        badge_text: 'GoCardless instalments',
