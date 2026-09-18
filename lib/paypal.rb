@@ -57,7 +57,7 @@ class Paypal
         summary = body.to_s.truncate(200)
       end
       summary ||= 'PayPal request failed'
-      message = [summary, details].compact.join(': ')
+      message = [summary, details].reject(&:blank?).join(': ')
       message += " (HTTP #{status})" if status
       message
     end
