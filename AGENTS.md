@@ -19,25 +19,6 @@ The Cursor image installs Ruby, Bundler, Foreman, MongoDB, Chromium, and ImageMa
 - Run `foreman start -e .env web` to start the web process
 - Login with `SEED_ACCOUNT_EMAIL` and `SEED_ACCOUNT_PASSWORD` in `.env`
 
-## Documentation
-
-You can find documentation at app/views/docs/md. Keep it up to date.
-
-## Files in lib
-
-Files in lib are auto-loaded by Padrino.load!. No explicit require is necessary.
-
-## ActivateTools
-
-The `activate_tools` gem defines the `_block` helpers like `text_block`, `wysiwyg_block` etc.
-
-It also runs `blanks_to_nils!` on `params` so we can just do `if params[:x]` (no need for `if params[:x].present?`).
-
-## House style
-
-- Do not use `.presence`
-- Controllers are `Dandelion::App.controller` blocks with `erb` / `partial` / `cp` — no `before_action`, strong params, or `render`
-
 ## Mongo
 
 - We set `Mongoid.raise_not_found_error = false` in `boot.rb` so `Model.find(id)` returns `nil` for invalid ids
@@ -59,6 +40,14 @@ To run only certain tests in a file, add `-n /pattern/` (matches the method name
 Your default posture should be to just run added/modified tests and any other clearly relevant tests, unless the change is substantial, in which case it may be appropriate to run whole files. Never attempt to run the full test suite.
 
 `@` instance variables come from helpers (`create_organisation`, `create_event`, `create_gathering`, `create_full_event_hierarchy`, and file-local setup methods). Anything created inline in a test is a local. Use `create_event(as: :event1)` when a test needs more than one event.
+
+## Everything else
+
+- You can find documentation at app/views/docs/md. Keep it up to date.
+- Files in lib are auto-loaded by Padrino.load!. No explicit require is necessary.
+- The `activate_tools` gem defines the `_block` helpers like `text_block`, `wysiwyg_block` etc. It also runs `blanks_to_nils!` on `params` so we can just do `if params[:x]` (no need for `if params[:x].present?`).
+- Do not use `.presence`
+- Controllers are `Dandelion::App.controller` blocks with `erb` / `partial` / `cp` — no `before_action`, strong params, or `render`
 
 ## Dependencies
 
