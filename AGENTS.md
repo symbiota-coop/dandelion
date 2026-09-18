@@ -31,7 +31,11 @@ Files in lib are auto-loaded by Padrino.load!. No explicit require is necessary.
 
 The `activate_tools` gem defines the `_block` helpers like `text_block`, `wysiwyg_block` etc.
 
-It also runs `blanks_to_nils!` on `params` so we can just do `if params[:x]` (no need for `if params[:x].present?`)
+It also runs `blanks_to_nils!` on `params` so we can just do `if params[:x]` (no need for `if params[:x].present?`).
+
+## House style
+
+- Do not use `.presence`
 
 ## Mongo
 

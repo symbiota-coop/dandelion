@@ -68,34 +68,6 @@
             $("input[name$='[order]']", this).val(i)
           })
         })
-
-        $('#ticket_types_add').click(function () {
-          var c = $('.ticket_type').length
-          var template = document.getElementById('ticket_type_template')
-          var clone = $(template.content.cloneNode(true))
-          var d = clone.find('.ticket_type')
-
-          d.find('[data-field]').each(function () {
-            var field = $(this).data('field')
-            $(this).attr('name', 'event[ticket_types_attributes][' + c + '][' + field + ']')
-            $(this).attr('id', 'event_ticket_types_attributes_' + c + '_' + field)
-          })
-
-          d.appendTo('#ticket_types')
-
-          if (typeof $.currencySymbol !== 'undefined') {
-            d.find('.money-symbol').text($.currencySymbol($('#event_currency').val()))
-          }
-
-          d.find('[data-toggle="tooltip"]').tooltip()
-
-          d.find('.datetimepicker').flatpickr({
-            altInput: true,
-            altFormat: 'J F Y, H:i',
-            enableTime: true,
-            time_24hr: true
-          })
-        })
       })
     </script>
   </div>

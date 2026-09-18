@@ -22,16 +22,153 @@ $(function () {
     }
   }
 
-  // Load draft into form fields (including datetime and wysiwyg)
+  function fieldPresent (value) {
+    return value !== undefined && value !== null && value !== ''
+  }
+
+  function nestedAttributeList (value) {
+    if (!value) return []
+    if (Array.isArray(value)) return value
+    if (typeof value === 'object') {
+      return Object.keys(value).sort(function (a, b) {
+        return Number(a) - Number(b)
+      }).map(function (key) { return value[key] })
+    }
+    return []
+  }
+
+  function destroyedNestedAttrs (attrs) {
+    return !attrs || attrs._destroy === '1' || attrs._destroy === true || attrs._destroy === 'true'
+  }
+
+  function ticketTypeAttrsPresent (attrs) {
+    if (destroyedNestedAttrs(attrs)) return false
+    return ['name', 'description', 'price', 'quantity', 'price_or_range'].some(function (field) {
+      return fieldPresent(attrs[field])
+    })
+  }
+
+  function ticketGroupAttrsPresent (attrs) {
+    if (destroyedNestedAttrs(attrs)) return false
+    return fieldPresent(attrs.name) || fieldPresent(attrs.capacity)
+  }
+
+  function setDraftFieldValue ($el, value) {
+    if ($el.is(':checkbox')) {
+      $el.prop('checked', value === true || value === '1' || value === 'on' || value === 'true')
+      return
+    }
+    if (!fieldPresent(value)) return
+    $el.val(value)
+  }
+
+  function initDatetimepickers ($scope) {
+    $scope.find('.datetimepicker').each(function () {
+      if (this._flatpickr) return
+      $(this).flatpickr({
+        altInput: true,
+        altFormat: 'J F Y, H:i',
+        enableTime: true,
+        time_24hr: true
+      })
+    })
+  }
+
+  function addNestedFromTemplate (options) {
+    const $container = $(options.containerSelector)
+    const template = document.getElementById(options.templateId)
+    if (!$container.length || !template) return null
+
+    const index = $container.find(options.rowSelector).length
+    const clone = $(template.content.cloneNode(true))
+    const $row = clone.find(options.rowSelector)
+    const attrs = options.attrs || {}
+
+    $row.find('[data-field]').each(function () {
+      const field = $(this).data('field')
+      $(this).attr('name', options.namePrefix + '[' + index + '][' + field + ']')
+      $(this).attr('id', options.idPrefix + index + '_' + field)
+      if (Object.prototype.hasOwnProperty.call(attrs, field)) {
+        setDraftFieldValue($(this), attrs[field])
+      }
+    })
+
+    $row.appendTo($container)
+
+    if (typeof $.currencySymbol !== 'undefined') {
+      $row.find('.money-symbol').text($.currencySymbol($('#event_currency').val()))
+    }
+    $row.find('[data-toggle="tooltip"]').tooltip()
+    initDatetimepickers($row)
+    return $row
+  }
+
+  function addTicketType (attrs) {
+    return addNestedFromTemplate({
+      templateId: 'ticket_type_template',
+      containerSelector: '#ticket_types',
+      namePrefix: 'event[ticket_types_attributes]',
+      idPrefix: 'event_ticket_types_attributes_',
+      rowSelector: '.ticket_type',
+      attrs: attrs
+    })
+  }
+
+  function addTicketGroup (attrs) {
+    return addNestedFromTemplate({
+      templateId: 'ticket_group_template',
+      containerSelector: '#ticket_groups',
+      namePrefix: 'event[ticket_groups_attributes]',
+      idPrefix: 'event_ticket_groups_attributes_',
+      rowSelector: '.ticket_group',
+      attrs: attrs
+    })
+  }
+
+  function updateDraftId (draftId) {
+    if (!draftId) return
+    config.draftId = draftId
+    $('#draft_id').val(draftId)
+    try {
+      const url = new URL(window.location.href)
+      url.searchParams.set('draft_id', draftId)
+      if (config.organisationId && !url.searchParams.get('organisation_id')) {
+        url.searchParams.set('organisation_id', config.organisationId)
+      }
+      window.history.replaceState({}, '', url)
+    } catch (e) { }
+  }
+
+  $('#ticket_types_add').on('click', function () {
+    addTicketType()
+  })
+
+  $('#ticket_groups_add').on('click', function () {
+    $('#ticket_groups_save').show()
+    addTicketGroup()
+  })
+
+  // Load draft into form fields (including datetime, wysiwyg, ticket types and groups)
   if (config.draft) {
     const draft = config.draft
     const form = $('#build-event')[0]
 
     // Set regular form values
     $.each(draft, function (key, value) {
-      if (value) {
+      if (fieldPresent(value) && typeof value !== 'object') {
         $(form).find('[name="event[' + key + ']"]').val(value)
       }
+    })
+
+    nestedAttributeList(draft.ticket_groups_attributes).forEach(function (attrs) {
+      if (ticketGroupAttrsPresent(attrs)) {
+        $('#ticket_groups_save').show()
+        addTicketGroup(attrs)
+      }
+    })
+
+    nestedAttributeList(draft.ticket_types_attributes).forEach(function (attrs) {
+      if (ticketTypeAttrsPresent(attrs)) addTicketType(attrs)
     })
 
     // Set flatpickrs for datetime fields
@@ -41,6 +178,7 @@ $(function () {
       if (fieldName) {
         const match = fieldName.match(/event\[(.+)\]/)
         if (match && draft[match[1]]) {
+          if (this._flatpickr) return
           field.flatpickr({
             altInput: true,
             altFormat: 'J F Y, H:i',
@@ -76,11 +214,13 @@ $(function () {
 
   // Autosave draft + Next buttons on new record
   if (config.newRecord) {
-    const draftInterval = setInterval(function () {
-      if ($('#event_name').val().length > 0) {
-        $.post('/events/draft', $('#build-event').serializeObject())
-      }
-    }, 10 * 1000)
+    const saveDraft = function () {
+      if ($('#event_name').val().length === 0) return
+      $.post('/events/draft', $('#build-event').serializeObject(), function (data) {
+        if (data && data.draft_id) updateDraftId(data.draft_id)
+      }, 'json')
+    }
+    const draftInterval = setInterval(saveDraft, 10 * 1000)
     $('#build-event').submit(function () {
       clearInterval(draftInterval)
     })

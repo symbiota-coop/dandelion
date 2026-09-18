@@ -134,8 +134,24 @@ Dandelion::App.controller do
 
   post '/events/draft' do
     sign_in_required!
-    current_account.drafts.create(model: 'Event', name: params[:event][:name], url: request.referer, json: params[:event].to_json)
-    200
+    halt 400 unless params[:event] && params[:event][:name]
+
+    attrs = {
+      model: 'Event',
+      name: params[:event][:name],
+      url: request.referer || "#{ENV['BASE_URI']}/events/new",
+      json: params[:event].to_json
+    }
+    draft = current_account.drafts.find(params[:draft_id]) if params[:draft_id]
+    if draft
+      halt 400 unless draft.update_attributes(attrs)
+    else
+      draft = current_account.drafts.create(attrs)
+      halt 400 unless draft.persisted?
+    end
+
+    content_type :json
+    { draft_id: draft.id.to_s }.to_json
   end
 
   post '/drafts/:id/destroy' do

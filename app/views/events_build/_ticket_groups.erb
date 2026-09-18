@@ -41,26 +41,5 @@
       <em>Save the event to add tickets to these ticket groups.</em>
     </p>
 
-    <script>
-      $(function () {
-        $('#ticket_groups_add').click(function () {
-          $('#ticket_groups_save').show()
-          var c = $('.ticket_group').length
-          var template = document.getElementById('ticket_group_template')
-          var clone = $(template.content.cloneNode(true))
-          var d = clone.find('.ticket_group')
-
-          d.find('[data-field]').each(function () {
-            var field = $(this).data('field')
-            $(this).attr('name', 'event[ticket_groups_attributes][' + c + '][' + field + ']')
-            $(this).attr('id', 'event_ticket_groups_attributes_' + c + '_' + field)
-          })
-
-          d.appendTo('#ticket_groups')
-
-          d.find('[data-toggle="tooltip"]').tooltip()
-        })
-      })
-    </script>
   </div>
 </div>

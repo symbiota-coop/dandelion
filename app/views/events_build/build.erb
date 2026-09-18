@@ -48,6 +48,8 @@
   events_build_config = {
     showIntro: !!(params[:tour] || (!ENV['SKIP_TOURS'] && params[:new_org] && !params[:draft_id])),
     draft: (@draft ? JSON.parse(@draft.json) : nil),
+    draftId: @draft&.id.to_s,
+    organisationId: @event.organisation_id.to_s,
     newRecord: @event.new_record?,
     timeZoneSuffix: "in #{Time.zone.now.strftime('%Z')} (UTC #{Time.zone.now.formatted_offset}) (your profile's time zone)",
     imageRequiredWidth: @event.organisation.try(:event_image_required_width),
@@ -75,6 +77,9 @@
 <% end %>
 
 <% form_for @event, @event.new_record ? '/events/new' : "/e/#{@edit_slug || @event.slug}/edit", id: 'build-event' do |f| %>
+  <% if @event.new_record? %>
+    <%= hidden_field_tag :draft_id, value: @draft&.id, id: 'draft_id' %>
+  <% end %>
   <div class="nav-wrapper">
     <ul id="event-build-nav" class="nav nav-tabs" role="tablist">
       <li role="presentation" class="nav-item"><a class="nav-link active" href="#tab-basics" role="tab" data-toggle="tab">Basics</a></li>
