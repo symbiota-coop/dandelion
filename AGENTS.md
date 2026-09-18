@@ -36,22 +36,19 @@ It also runs `blanks_to_nils!` on `params` so we can just do `if params[:x]` (no
 ## House style
 
 - Do not use `.presence`
-- Use `validates_presence_of`, not `validates :name, presence: true`
-- Use `belongs_to_without_parent_validation`, not Mongoid `belongs_to` (its parent check fails when the parent is only in memory)
-- Use `has_many_through` for join collections, not `has_many :x, through:` (Mongoid has no `through`)
-- Query filters are class methods that return `self.and(...)` so they chain (`Event.live.future`). Do not use `scope :live, -> { ... }`
 - Controllers are `Dandelion::App.controller` blocks with `erb` / `partial` / `cp` — no `before_action`, strong params, or `render`
-- Put field cleanup and `errors.add` in `before_validation`, not `validate do`
 
 ## Mongo
 
-We set `Mongoid.raise_not_found_error = false` in `boot.rb` so `Model.find(id)` returns `nil` for invalid ids.
-
-Nil booleans are converted to false using `after_initialize :convert_nil_booleans_to_false` and `before_validation :convert_nil_booleans_to_false`.
-
-Use `scope.and` rather than `scope.where`.
-
-Please note that Mongo indexes are created directly in the database, and are not defined in model files.
+- We set `Mongoid.raise_not_found_error = false` in `boot.rb` so `Model.find(id)` returns `nil` for invalid ids
+- Nil booleans are converted to false using `after_initialize :convert_nil_booleans_to_false` and `before_validation :convert_nil_booleans_to_false`
+- Use `validates_presence_of`, not `validates :name, presence: true`
+- Put field cleanup and `errors.add` in `before_validation`, not `validate do`
+- Use `belongs_to_without_parent_validation`, not Mongoid `belongs_to` (its parent check fails when the parent is only in memory)
+- Use `has_many_through` for join collections, not `has_many :x, through:` (Mongoid has no `through`)
+- Query filters are class methods that return `self.and(...)` so they chain (`Event.live.future`). Do not use `scope :live, -> { ... }`
+- Use `scope.and` rather than `scope.where`
+- Mongo indexes are created directly in the database, and are not defined in model files
 
 ## Tests
 
