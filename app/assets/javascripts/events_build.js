@@ -1,4 +1,4 @@
-/* global introJs, autosize, google */
+/* global introJs, autosize, google, initQuestionsPreview */
 
 $(function () {
   // Load config from JSON script tag or window fallback
@@ -37,25 +37,14 @@ $(function () {
     return []
   }
 
-  function destroyedNestedAttrs (attrs) {
-    return !attrs || attrs._destroy === '1' || attrs._destroy === true || attrs._destroy === 'true'
-  }
-
-  function ticketTypeAttrsPresent (attrs) {
-    if (destroyedNestedAttrs(attrs)) return false
-    return ['name', 'description', 'price', 'quantity', 'price_or_range'].some(function (field) {
-      return fieldPresent(attrs[field])
-    })
-  }
-
-  function ticketGroupAttrsPresent (attrs) {
-    if (destroyedNestedAttrs(attrs)) return false
-    return fieldPresent(attrs.name) || fieldPresent(attrs.capacity)
-  }
-
   function checkboxChecked (value) {
     if (Array.isArray(value)) return value.some(checkboxChecked)
     return value === true || value === '1' || value === 'on' || value === 'true'
+  }
+
+  function nestedAttrsPresent (attrs, fields) {
+    if (!attrs || checkboxChecked(attrs._destroy)) return false
+    return fields.some(function (field) { return fieldPresent(attrs[field]) })
   }
 
   function setDraftFieldValue ($el, value) {
@@ -82,7 +71,7 @@ $(function () {
   }
 
   function initDatetimepickers ($scope) {
-    $scope.find('.datetimepicker').each(function () {
+    $scope.find('.datetimepicker').not('.flatpickr-registered').addClass('flatpickr-registered').each(function () {
       if (this._flatpickr) return
       $(this).flatpickr({
         altInput: true,
@@ -122,26 +111,31 @@ $(function () {
     return $row
   }
 
-  function addTicketType (attrs) {
-    return addNestedFromTemplate({
+  const nestedCollections = {
+    ticket_types: {
+      key: 'ticket_types_attributes',
+      fields: ['name', 'description', 'price', 'quantity', 'price_or_range'],
       templateId: 'ticket_type_template',
       containerSelector: '#ticket_types',
       namePrefix: 'event[ticket_types_attributes]',
       idPrefix: 'event_ticket_types_attributes_',
-      rowSelector: '.ticket_type',
-      attrs: attrs
-    })
-  }
-
-  function addTicketGroup (attrs) {
-    return addNestedFromTemplate({
+      rowSelector: '.ticket_type'
+    },
+    ticket_groups: {
+      key: 'ticket_groups_attributes',
+      fields: ['name', 'capacity'],
       templateId: 'ticket_group_template',
       containerSelector: '#ticket_groups',
       namePrefix: 'event[ticket_groups_attributes]',
       idPrefix: 'event_ticket_groups_attributes_',
       rowSelector: '.ticket_group',
-      attrs: attrs
-    })
+      afterAdd: function () { $('#ticket_groups_save').show() }
+    }
+  }
+
+  function addNestedCollection (collection, attrs) {
+    if (collection.afterAdd) collection.afterAdd()
+    return addNestedFromTemplate($.extend({ attrs: attrs }, collection))
   }
 
   function updateDraftId (draftId) {
@@ -159,12 +153,11 @@ $(function () {
   }
 
   $('#ticket_types_add').on('click', function () {
-    addTicketType()
+    addNestedCollection(nestedCollections.ticket_types)
   })
 
   $('#ticket_groups_add').on('click', function () {
-    $('#ticket_groups_save').show()
-    addTicketGroup()
+    addNestedCollection(nestedCollections.ticket_groups)
   })
 
   // Load draft into form fields (including datetime, wysiwyg, ticket types and groups)
@@ -180,34 +173,13 @@ $(function () {
       setDraftFieldValue($fields, value)
     })
 
-    nestedAttributeList(draft.ticket_groups_attributes).forEach(function (attrs) {
-      if (ticketGroupAttrsPresent(attrs)) {
-        $('#ticket_groups_save').show()
-        addTicketGroup(attrs)
-      }
+    $.each(nestedCollections, function (_, collection) {
+      nestedAttributeList(draft[collection.key]).forEach(function (attrs) {
+        if (nestedAttrsPresent(attrs, collection.fields)) addNestedCollection(collection, attrs)
+      })
     })
 
-    nestedAttributeList(draft.ticket_types_attributes).forEach(function (attrs) {
-      if (ticketTypeAttrsPresent(attrs)) addTicketType(attrs)
-    })
-
-    // Set flatpickrs for datetime fields
-    $(form).find('input.datetimepicker').each(function () {
-      const field = $(this)
-      const fieldName = field.attr('name')
-      if (fieldName) {
-        const match = fieldName.match(/event\[(.+)\]/)
-        if (match && draft[match[1]]) {
-          if (this._flatpickr) return
-          field.flatpickr({
-            altInput: true,
-            altFormat: 'J F Y, H:i',
-            enableTime: true,
-            time_24hr: true
-          })
-        }
-      }
-    })
+    initDatetimepickers($(form))
 
     // Set CKEditor content when editors report readiness.
     const hydratedEditors = new WeakSet()
@@ -267,25 +239,26 @@ $(function () {
   $('label[for$="_email_greeting"], label[for$="_email_body"]').hide()
 
   // Questions textareas and autosize
-  $('#event_questions').attr('rows', '8')
-  $('#event_feedback_questions').attr('rows', '8')
-  $('#event_notes').attr('rows', '2')
-  $('#event_terms_and_conditions').attr('rows', '2')
-  if (typeof autosize !== 'undefined') {
-    if ($('#event_questions')[0]) autosize($('#event_questions')[0])
-    if ($('#event_feedback_questions')[0]) autosize($('#event_feedback_questions')[0])
-    if ($('#event_notes')[0]) autosize($('#event_notes')[0])
-    if ($('#event_terms_and_conditions')[0]) autosize($('#event_terms_and_conditions')[0])
-  }
+  const autosizeFields = [
+    ['#event_questions', 8],
+    ['#event_feedback_questions', 8],
+    ['#event_notes', 2],
+    ['#event_terms_and_conditions', 2]
+  ]
+  autosizeFields.forEach(function (pair) {
+    const el = $(pair[0])[0]
+    if (el) $(el).attr('rows', pair[1])
+    if (el && typeof autosize !== 'undefined') autosize(el)
+  })
 
   // Validate on tab change and keep textareas sized
   $('#event-build-nav a[data-toggle="tab"]').on('show.bs.tab', function (e) {
     setTimeout(function () {
-      if (typeof autosize !== 'undefined') {
-        if ($('#event_questions')[0]) autosize.update($('#event_questions')[0])
-        if ($('#event_feedback_questions')[0]) autosize.update($('#event_feedback_questions')[0])
-        if ($('#event_terms_and_conditions')[0]) autosize.update($('#event_terms_and_conditions')[0])
-      }
+      if (typeof autosize === 'undefined') return
+      ;['#event_questions', '#event_feedback_questions', '#event_terms_and_conditions'].forEach(function (sel) {
+        const el = $(sel)[0]
+        if (el) autosize.update(el)
+      })
     }, 0)
 
     const form = $('#event-build-nav').closest('form')[0]
@@ -320,8 +293,7 @@ $(function () {
 
   // Timezone hint (start_time <small> matches gem: sibling of hidden #event_start_time inside the field wrapper)
   if (config.timeZoneSuffix) {
-    $('#event_start_time').siblings('small').text(config.timeZoneSuffix)
-    $('#event_end_time').siblings('small').text(config.timeZoneSuffix)
+    $('#event_start_time, #event_end_time').siblings('small').text(config.timeZoneSuffix)
   }
 
   const $evergreen = $('#event_evergreen')
