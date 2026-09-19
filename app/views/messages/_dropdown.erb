@@ -6,7 +6,7 @@
   <% } %>
   <li class="text-center"><a href="/messages">All messages <i class="bi bi-arrow-right"></i></a></li>
 </ul>
-<% if current_account.unread_messages? %>
+<% if current_account.unchecked_messages? %>
   <script>
     $(function () {
       $('#messages-a').addClass('with-label')

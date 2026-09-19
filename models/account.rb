@@ -274,7 +274,7 @@ class Account
     (n = notifications.order('created_at desc').first) && (!last_checked_notifications || (n.created_at > last_checked_notifications))
   end
 
-  def unread_messages?
+  def unchecked_messages?
     (m = messages_as_messengee.order('created_at desc').first) && (!last_checked_messages || m.created_at > last_checked_messages)
   end
 
