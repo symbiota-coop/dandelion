@@ -42,10 +42,12 @@ class Cohostship
 
   after_create do
     event.set(cohosts_ids_cache: ((event.cohosts_ids_cache || []) + [organisation.id]).uniq)
+    event.sync_carousel_ids!
   end
 
   after_destroy do
     event.set(cohosts_ids_cache: (event.cohosts_ids_cache || []) - [organisation.id])
+    event.sync_carousel_ids! unless event.flagged_for_destroy?
   end
 
   validates_uniqueness_of :event, scope: :organisation

@@ -466,20 +466,17 @@ class EventsTest < ActiveSupport::TestCase
     assert_equal @event.id, rpayment.reload.event_id
   end
 
-  test 'refresh_carousel_ids! stores matching organisation carousel ids' do
+  test 'tagging an event stores matching organisation carousel ids' do
     create_event
     tag = FactoryBot.create(:event_tag)
     carousel = FactoryBot.create(:carousel, organisation: @organisation)
     tag_carousel(carousel, tag)
     tag_event(@event, tag)
-    assert_empty Array(@event.carousel_ids)
 
-    Event.refresh_carousel_ids!
-    @event.reload
     assert_equal [carousel.id], @event.carousel_ids
   end
 
-  test 'refresh_carousel_ids! does not store another organisation carousel with the same tag' do
+  test 'tagging an event does not store another organisation carousel with the same tag' do
     create_event
     other_organisation = FactoryBot.create(:organisation)
     tag = FactoryBot.create(:event_tag)
@@ -487,47 +484,39 @@ class EventsTest < ActiveSupport::TestCase
     tag_carousel(other_carousel, tag)
     tag_event(@event, tag)
 
-    Event.refresh_carousel_ids!
-    @event.reload
     assert_empty Array(@event.carousel_ids)
   end
 
-  test 'refresh_carousel_ids! adds cohost organisation carousel ids' do
+  test 'cohosting an event adds the cohost organisation carousel ids' do
     create_event
     cohost = FactoryBot.create(:organisation)
     tag = FactoryBot.create(:event_tag)
     carousel = FactoryBot.create(:carousel, organisation: cohost)
     tag_carousel(carousel, tag)
     tag_event(@event, tag)
-    @event.cohostships.create!(organisation: cohost)
+    assert_empty Array(@event.carousel_ids)
 
-    Event.refresh_carousel_ids!
+    @event.cohostships.create!(organisation: cohost)
     @event.reload
     assert_equal [carousel.id], @event.carousel_ids
   end
 
-  test 'refresh_carousel_ids! clears ids after a tag or carouselship is removed' do
+  test 'removing a tag or carouselship clears carousel ids' do
     create_event
     tag = FactoryBot.create(:event_tag)
     carousel = FactoryBot.create(:carousel, organisation: @organisation)
     tag_carousel(carousel, tag)
     tag_event(@event, tag)
-    Event.refresh_carousel_ids!
-    @event.reload
     assert_equal [carousel.id], @event.carousel_ids
 
     @event.event_tagships.find_by(event_tag: tag).destroy
-    Event.refresh_carousel_ids!
     @event.reload
     assert_empty Array(@event.carousel_ids)
 
     tag_event(@event, tag)
-    Event.refresh_carousel_ids!
-    @event.reload
     assert_equal [carousel.id], @event.carousel_ids
 
     carousel.carouselships.find_by(event_tag: tag).destroy
-    Event.refresh_carousel_ids!
     @event.reload
     assert_empty Array(@event.carousel_ids)
   end
@@ -538,26 +527,10 @@ class EventsTest < ActiveSupport::TestCase
     carousel = FactoryBot.create(:carousel, organisation: @organisation)
     tag_carousel(carousel, tag)
     tag_event(@event, tag)
-    Event.refresh_carousel_ids!
     carousel.destroy
     @event.reload
 
     assert_empty Array(@event.carousel_ids)
-  end
-
-  test 'refresh_carousel_ids! keeps existing ids when rebuilding fails' do
-    create_event
-    tag = FactoryBot.create(:event_tag)
-    carousel = FactoryBot.create(:carousel, organisation: @organisation)
-    tag_carousel(carousel, tag)
-    tag_event(@event, tag)
-    Event.refresh_carousel_ids!
-
-    Carousel.stub(:each, proc { raise 'refresh failed' }) do
-      assert_raises(RuntimeError) { Event.refresh_carousel_ids! }
-    end
-
-    assert_equal [carousel.id], @event.reload.carousel_ids
   end
 
   test 'organisation events json listing filters by stored carousel ids' do
@@ -567,7 +540,6 @@ class EventsTest < ActiveSupport::TestCase
     carousel = FactoryBot.create(:carousel, organisation: @organisation)
     tag_carousel(carousel, tag)
     tag_event(@matching, tag)
-    Event.refresh_carousel_ids!
 
     header 'Referer', "http://example.org/o/#{@organisation.slug}/events"
     get "/o/#{@organisation.slug}/events.json", carousel_ids: [carousel.id.to_s]
@@ -582,7 +554,6 @@ class EventsTest < ActiveSupport::TestCase
     carousel = FactoryBot.create(:carousel, organisation: @organisation)
     tag_carousel(carousel, tag)
     tag_event(@event, tag)
-    Event.refresh_carousel_ids!
     other_carousel = FactoryBot.create(:carousel, organisation: FactoryBot.create(:organisation))
 
     header 'Referer', "http://example.org/o/#{@organisation.slug}/events"

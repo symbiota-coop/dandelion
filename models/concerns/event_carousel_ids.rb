@@ -1,26 +1,16 @@
 module EventCarouselIds
   extend ActiveSupport::Concern
 
-  class_methods do
-    def refresh_carousel_ids!
-      Carousel.each do |carousel|
-        tag_ids = carousel.event_tag_ids
-        event_ids = EventTagship.and(:event_tag_id.in => tag_ids).only(:event_id).pluck(:event_id)
-        ids = if carousel.organisation && event_ids.any?
-                carousel.organisation.events_including_cohosted.and(:id.in => event_ids).pluck(:id)
-              else
-                []
-              end
+  def sync_carousel_ids!
+    return if flagged_for_destroy?
 
-        Event.collection.update_many(
-          { 'deleted_at' => nil, 'carousel_ids' => carousel.id, '_id' => { '$nin' => ids } },
-          { '$pull' => { 'carousel_ids' => carousel.id } }
-        )
-        Event.collection.update_many(
-          { 'deleted_at' => nil, '_id' => { '$in' => ids } },
-          { '$addToSet' => { 'carousel_ids' => carousel.id } }
-        ) if ids.any?
-      end
-    end
+    org_ids = [organisation_id, *(cohosts_ids_cache || [])].compact
+    tag_ids = EventTagship.and(event_id: id).pluck(:event_tag_id)
+    ids = if org_ids.any? && tag_ids.any?
+            Carousel.and(:organisation_id.in => org_ids, :id.in => Carouselship.and(:event_tag_id.in => tag_ids).pluck(:carousel_id)).pluck(:id)
+          else
+            []
+          end
+    set(carousel_ids: ids)
   end
 end

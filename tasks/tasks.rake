@@ -39,8 +39,6 @@ namespace :hourly do
 
       organisation.sync_calendar_imports
     end
-    puts 'refresh event carousel ids'
-    Event.refresh_carousel_ids!
     puts 'autoblock ASNs'
     Asn.autoblock
   end
