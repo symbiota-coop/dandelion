@@ -24,6 +24,7 @@ class EventsTest < ActiveSupport::TestCase
 
   def tag_carousel(carousel, tag)
     carousel.carouselships.create!(event_tag: tag)
+    carousel.sync_tagged_event_carousel_ids_without_delay(tag.id)
     carousel
   end
 
@@ -545,6 +546,7 @@ class EventsTest < ActiveSupport::TestCase
     assert_equal [carousel.id], @event.carousel_ids
 
     carousel.carouselships.find_by(event_tag: tag).destroy
+    carousel.sync_tagged_event_carousel_ids_without_delay(tag.id)
     @event.reload
     assert_empty Array(@event.carousel_ids)
   end

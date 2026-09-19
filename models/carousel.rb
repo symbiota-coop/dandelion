@@ -51,6 +51,16 @@ class Carousel
     self.weeks = 8 unless weeks
   end
 
+  def sync_tagged_event_carousel_ids(event_tag_id)
+    return unless organisation && event_tag_id
+
+    event_ids = EventTagship.and(event_tag_id: event_tag_id).pluck(:event_id)
+    return if event_ids.empty?
+
+    organisation.events_including_cohosted.and(:id.in => event_ids).each(&:sync_carousel_ids!)
+  end
+  handle_asynchronously :sync_tagged_event_carousel_ids
+
   def events(minimal: false)
     future_events = organisation.events_including_cohosted.live.publicly_visible.future_current_evergreen.and(:start_time.lt => weeks.weeks.from_now).and(hide_from_carousels: false).and(has_image: true).and(carousel_ids: id)
     past_events = organisation.events_including_cohosted.live.publicly_visible.past.and(has_recording: true).and(hide_from_carousels: false).and(has_image: true).and(carousel_ids: id)
