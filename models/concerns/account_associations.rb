@@ -166,6 +166,21 @@ module AccountAssociations
     Message.or({ messenger: self }, { messengee: self })
   end
 
+  def conversations(limit: nil)
+    seen = []
+    latest = []
+    messages.includes(:messenger, :messengee).order('created_at desc').each do |message|
+      other = message.other_party(self)
+      next unless other
+      next if seen.include?(other.id)
+
+      seen << other.id
+      latest << message
+      break if limit && latest.length == limit
+    end
+    latest
+  end
+
   def my_event_ids_without_stars
     tickets.complete.pluck(:event_id) +
       event_facilitations.pluck(:event_id) +

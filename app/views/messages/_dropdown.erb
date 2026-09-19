@@ -1,15 +1,8 @@
-<% messenger_ids = [] %>
-<% m = 0 %>
 <ul class="dropdown-menu dropdown-lg no-padding">
-  <% current_account.messages.order('created_at desc').each_with_index { |message,i| %>
-  <% account = (current_account.id == message.messenger_id ? message.messengee : message.messenger) # the other person %>
-  <% next if messenger_ids.include?(account.id) %>
-  <% m += 1 %>
+  <% current_account.conversations(limit: 5).each { |message| %>
   <li class="notification">
     <%= partial :'messages/preview', locals: { message: message } %>
   </li>
-  <% messenger_ids << account.id %>
-  <% break if m == 5 %>
   <% } %>
   <li class="text-center"><a href="/messages">All messages <i class="bi bi-arrow-right"></i></a></li>
 </ul>

@@ -20,6 +20,13 @@ class Message
   validates_presence_of :body
   validate :messenger_send_rate_limit, on: :create
 
+  def self.between(a, b)
+    self.and('$or' => [
+      { messenger: a, messengee: b },
+      { messenger: b, messengee: a }
+    ])
+  end
+
   def self.read?(messenger, messengee)
     messages = Message.and(messenger: messenger, messengee: messengee).order('created_at desc')
     message = messages.first
@@ -29,6 +36,10 @@ class Message
 
   def self.unread?(messenger, messengee)
     !read?(messenger, messengee)
+  end
+
+  def other_party(account)
+    account.id == messenger_id ? messengee : messenger
   end
 
   after_create :send_email

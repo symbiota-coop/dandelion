@@ -1,15 +1,10 @@
-<% dm = 10; m = params[:m] ? params[:m].to_i : dm; messenger_ids = []; broke = nil %>
-<% current_account.messages.includes(:messenger, :messengee).order('created_at desc').each { |message| %>
-<% account = (current_account.id == message.messenger_id ? message.messengee : message.messenger) # the other person %>
-<% next if messenger_ids.include?(account.id) %>
-<%= partial :'messages/preview', locals: { message: message, klass: "p-2 d-block #{'active' if @account && account.id == @account.id}" } %>
-<% messenger_ids << account.id
-    if messenger_ids.length == m
-      broke = true
-    break
-    end
-    } %>
-<% if broke %>
+<% dm = 10; m = params[:m] ? params[:m].to_i : dm %>
+<% conversations = current_account.conversations(limit: m) %>
+<% conversations.each { |message| %>
+<% account = message.other_party(current_account) %>
+<%= partial :'messages/preview', locals: { message: message, klass: "p-2 d-block #{'active' if @account && account && account.id == @account.id}" } %>
+<% } %>
+<% if conversations.length == m %>
   <div class="text-center mt-1 pagination d-block">
     <a href="/messages/index?m=<%= m + dm %>">More</a>
   </div>

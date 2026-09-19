@@ -1,4 +1,4 @@
-<% messages = Message.or({ messenger: current_account, messengee_id: @account }, { messenger: @account, messengee_id: current_account }).order('created_at asc') %>
+<% messages = Message.between(current_account, @account).order('created_at asc') %>
 <% message_receipt = MessageReceipt.find_by(messenger: current_account, messengee: @account) %>
 <div id="messengee" class="media mb-3">
   <%= partial :'accounts/square', locals: { account: @account, style: 'display: block; width: 64px' } %>

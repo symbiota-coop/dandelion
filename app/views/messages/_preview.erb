@@ -1,4 +1,4 @@
-<% account = (current_account.id == message.messenger_id ? message.messengee : message.messenger) # the other person %>
+<% account = message.other_party(current_account) %>
 <div class="media">
   <%= partial :'accounts/square', locals: { account: account, content: (account.last_active ? "Active #{time_ago_in_words account.last_active} ago" : 'Never logged in'), style: 'display: block; width: 32px' } %>
   <div class="media-body ml-3">
