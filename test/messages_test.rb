@@ -79,7 +79,7 @@ class MessagesTest < ActiveSupport::TestCase
 
     conversations = @account.conversations
     assert_equal [latest_with_account2.id, latest_with_account1.id], conversations.map(&:id)
-    assert_equal [account2.id, @account1.id], conversations.map { |message| message.other_party(@account).id }
+    assert_equal [account2.id, @account1.id], (conversations.map { |message| message.other_party(@account).id })
     refute_includes conversations.map(&:id), older.id
     assert_equal [latest_with_account2.id], @account.conversations(limit: 1).map(&:id)
   end
