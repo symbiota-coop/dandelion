@@ -40,6 +40,13 @@ class Carousel
   has_many :carouselships, dependent: :destroy
   has_many_through :event_tags, through: :carouselships
 
+  after_destroy do
+    Event.collection.update_many(
+      { 'deleted_at' => nil, 'carousel_ids' => id },
+      { '$pull' => { 'carousel_ids' => id } }
+    )
+  end
+
   before_validation do
     self.weeks = 8 unless weeks
   end

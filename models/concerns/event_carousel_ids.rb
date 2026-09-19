@@ -3,12 +3,6 @@ module EventCarouselIds
 
   class_methods do
     def refresh_carousel_ids!
-      carousel_ids = Carousel.pluck(:id)
-      Event.collection.update_many(
-        { 'deleted_at' => nil, 'carousel_ids' => { '$exists' => true, '$ne' => [] } },
-        { '$pull' => { 'carousel_ids' => { '$nin' => carousel_ids } } }
-      )
-
       Carousel.each do |carousel|
         tag_ids = carousel.event_tag_ids
         event_ids = EventTagship.and(:event_tag_id.in => tag_ids).only(:event_id).pluck(:event_id)

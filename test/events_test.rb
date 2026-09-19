@@ -532,7 +532,7 @@ class EventsTest < ActiveSupport::TestCase
     assert_empty Array(@event.carousel_ids)
   end
 
-  test 'refresh_carousel_ids! clears ids after a carousel is destroyed' do
+  test 'destroying a carousel clears its id from events' do
     create_event
     tag = FactoryBot.create(:event_tag)
     carousel = FactoryBot.create(:carousel, organisation: @organisation)
@@ -540,7 +540,6 @@ class EventsTest < ActiveSupport::TestCase
     tag_event(@event, tag)
     Event.refresh_carousel_ids!
     carousel.destroy
-    Event.refresh_carousel_ids!
     @event.reload
 
     assert_empty Array(@event.carousel_ids)
