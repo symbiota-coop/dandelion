@@ -723,6 +723,20 @@ li.reply .widget-chat-message a {
   visibility: hidden;
 }
 
+#thread-scroll .widget-chat-content {
+  padding-right: 2rem;
+}
+
+#thread-scroll .reply .widget-chat-content {
+  padding-right: 0;
+  padding-left: 2rem;
+}
+
+#thread-scroll .widget-chat-message {
+  max-width: 100%;
+  overflow-wrap: anywhere;
+}
+
 .message-compose {
   display: flex;
   align-items: flex-end;
