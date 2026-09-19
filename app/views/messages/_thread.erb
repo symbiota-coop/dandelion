@@ -8,32 +8,8 @@
 </div>
 <div id="thread-scroll" class="thread-scroll-prepin" data-pagelet-stamp="<%= [messages.last&.id, messages.count, message_receipt&.received_at&.to_i].join('-') %>" data-pagelet-pin-bottom>
   <ul class="widget-chat p-1">
-    <% messages.each_with_index { |message,i| %>
-    <% if message.messenger_id == @account.id %>
-      <li>
-        <div class="widget-chat-media">
-          <%= partial :'accounts/square', locals: { account: @account, style: 'display: block; width: 64px' } %>
-        </div>
-        <div class="widget-chat-content">
-          <div class="linkify compact-urls widget-chat-message last" data-toggle="tooltip" title="<%= message.created_at %>">
-            <%== Sanitize.fragment(Rinku.auto_link(message.body.gsub("\n", '<br />')), Sanitize::Config::DANDELION) %>
-          </div>
-        </div>
-      </li>
-    <% else %>
-      <li class="reply">
-        <div class="widget-chat-content">
-          <div class="linkify compact-urls widget-chat-message last" data-toggle="tooltip" title="<%= message.created_at %>">
-            <%== Sanitize.fragment(Rinku.auto_link(message.body.gsub("\n", '<br />')), Sanitize::Config::DANDELION) %>
-          </div>
-          <% if i == messages.count-1 && message_receipt && message_receipt.received_at > message.created_at %>
-            <div class="widget-chat-status">
-              <b>Read</b> <%= timeago(message_receipt.received_at) %>
-            </div>
-          <% end %>
-        </div>
-      </li>
-    <% end %>
+    <% messages.each_with_index { |message, i| %>
+      <%= partial :'messages/bubble', locals: { message: message, message_receipt: message_receipt, last: i == messages.count - 1 } %>
     <% } %>
   </ul>
 </div>

@@ -63,6 +63,10 @@ Dandelion::App.helpers do
     { html: doc.to_html, headings: headings, sections: sections }
   end
 
+  def message_html(message)
+    Sanitize.fragment(Rinku.auto_link(message.body.gsub("\n", '<br />')), Sanitize::Config::DANDELION)
+  end
+
   def timeago(time)
     %(<abbr class="timeago" title="#{time.iso8601}">#{time}</abbr>).html_safe
   end

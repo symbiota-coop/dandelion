@@ -1,0 +1,18 @@
+<% incoming = message.messenger_id == @account.id %>
+<li class="<%= 'reply' unless incoming %>">
+  <% if incoming %>
+    <div class="widget-chat-media">
+      <%= partial :'accounts/square', locals: { account: @account, style: 'display: block; width: 64px' } %>
+    </div>
+  <% end %>
+  <div class="widget-chat-content">
+    <div class="linkify compact-urls widget-chat-message last" data-toggle="tooltip" title="<%= message.created_at %>">
+      <%== message_html(message) %>
+    </div>
+    <% if !incoming && last && message_receipt && message_receipt.received_at > message.created_at %>
+      <div class="widget-chat-status">
+        <b>Read</b> <%= timeago(message_receipt.received_at) %>
+      </div>
+    <% end %>
+  </div>
+</li>
