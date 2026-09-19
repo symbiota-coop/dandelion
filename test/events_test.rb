@@ -476,6 +476,18 @@ class EventsTest < ActiveSupport::TestCase
     assert_equal [carousel.id], @event.carousel_ids
   end
 
+  test 'tagging a carousel stores matching event carousel ids' do
+    create_event
+    tag = FactoryBot.create(:event_tag)
+    carousel = FactoryBot.create(:carousel, organisation: @organisation)
+    tag_event(@event, tag)
+    assert_empty Array(@event.carousel_ids)
+
+    tag_carousel(carousel, tag)
+    @event.reload
+    assert_equal [carousel.id], @event.carousel_ids
+  end
+
   test 'tagging an event does not store another organisation carousel with the same tag' do
     create_event
     other_organisation = FactoryBot.create(:organisation)
@@ -499,6 +511,22 @@ class EventsTest < ActiveSupport::TestCase
     @event.cohostships.create!(organisation: cohost)
     @event.reload
     assert_equal [carousel.id], @event.carousel_ids
+  end
+
+  test 'removing a cohost clears the cohost organisation carousel ids' do
+    create_event
+    cohost = FactoryBot.create(:organisation)
+    tag = FactoryBot.create(:event_tag)
+    carousel = FactoryBot.create(:carousel, organisation: cohost)
+    tag_carousel(carousel, tag)
+    tag_event(@event, tag)
+    @event.cohostships.create!(organisation: cohost)
+    @event.reload
+    assert_equal [carousel.id], @event.carousel_ids
+
+    @event.cohostships.find_by(organisation: cohost).destroy
+    @event.reload
+    assert_empty Array(@event.carousel_ids)
   end
 
   test 'removing a tag or carouselship clears carousel ids' do
