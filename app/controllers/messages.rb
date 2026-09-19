@@ -21,7 +21,7 @@ Dandelion::App.controller do
       flash[:notice] = "You can't message yourself"
       redirect '/messages'
     end
-    MessageReceipt.find_or_create_by(messenger: @account, messengee: current_account).set(received_at: Time.now)
+    MessageReceipt.mark_read!(messenger: @account, messengee: current_account)
     if request.xhr?
       partial :'messages/thread'
     else
