@@ -167,18 +167,30 @@ module AccountAssociations
   end
 
   def conversations(limit: nil)
-    seen = []
-    latest = []
-    messages.includes(:messenger, :messengee).order('created_at desc').each do |message|
-      other = message.other_party(self)
-      next unless other
-      next if seen.include?(other.id)
+    pipeline = [
+      { '$match' => { '$or' => [{ 'messenger_id' => id }, { 'messengee_id' => id }] } },
+      { '$addFields' => {
+        'other_id' => {
+          '$cond' => [{ '$eq' => ['$messenger_id', id] }, '$messengee_id', '$messenger_id']
+        }
+      } },
+      { '$match' => { 'other_id' => { '$ne' => nil } } },
+      { '$sort' => { 'created_at' => -1 } },
+      { '$group' => { '_id' => '$other_id', 'id' => { '$first' => '$_id' }, 'created_at' => { '$first' => '$created_at' } } },
+      { '$sort' => { 'created_at' => -1 } }
+    ]
+    pipeline << { '$limit' => limit } if limit
 
-      seen << other.id
-      latest << message
-      break if limit && latest.length == limit
+    ids = Message.collection.aggregate(pipeline).map { |doc| doc['id'] }
+    return [] if ids.empty?
+
+    by_id = Message.and(:id.in => ids).includes(:messenger, :messengee).index_by { |message| message.id.to_s }
+    ids.filter_map do |message_id|
+      message = by_id[message_id.to_s]
+      next unless message && message.other_party(self)
+
+      message
     end
-    latest
   end
 
   def my_event_ids_without_stars
