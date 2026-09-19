@@ -19,9 +19,9 @@ $(function () {
       $('[data-pagelet-refresh][data-pagelet-refresh-registered]').each(function () {
         const pagelet = $(this)
         if (!pagelet[0].hasAttribute('data-pagelet-refresh-paused') && $.contains(document, pagelet[0])) {
-          reloadPagelet(pagelet, function () {
+          reloadPagelet(pagelet, function (changed) {
             bindRefreshPauseForPagelet(pagelet)
-            refreshAlsoPagelet(pagelet)
+            if (changed) refreshAlsoPagelet(pagelet)
           })
         }
       })
@@ -52,10 +52,13 @@ $(function () {
 
   function refreshAlsoPagelet (pagelet) {
     const alsoUrl = pagelet.attr('data-pagelet-also')
-    if (alsoUrl) {
-      const alsoPagelet = $('[data-pagelet-url="' + alsoUrl + '"]')
-      alsoPagelet.load(alsoPagelet.attr('data-pagelet-url'))
-    }
+    if (!alsoUrl) return
+    alsoUrl.split(',').forEach(function (url) {
+      url = url.trim()
+      if (!url) return
+      const alsoPagelet = $('[data-pagelet-url="' + url + '"]')
+      if (alsoPagelet.length) reloadPagelet(alsoPagelet)
+    })
   }
 
   function bindRefreshPauseForPagelet (pagelet) {
@@ -64,8 +67,42 @@ $(function () {
     })
   }
 
+  function pageletAttrRoot ($root, attr) {
+    return $root.find('[' + attr + ']').addBack('[' + attr + ']')
+  }
+
   function reloadPagelet (pagelet, callback) {
-    pagelet.load(pagelet.attr('data-pagelet-url'), callback)
+    const url = pagelet.attr('data-pagelet-url')
+    const preserve = pageletAttrRoot(pagelet, 'data-pagelet-stamp').length ||
+      pageletAttrRoot(pagelet, 'data-pagelet-pin-bottom').length
+
+    if (!preserve) {
+      pagelet.load(url, function () {
+        if (callback) callback(true)
+      })
+      return
+    }
+
+    $.get(url, function (html) {
+      const incoming = $('<div>').append($.parseHTML(html, document, false))
+      const incomingStamp = pageletAttrRoot(incoming, 'data-pagelet-stamp').attr('data-pagelet-stamp')
+      const currentStamp = pageletAttrRoot(pagelet, 'data-pagelet-stamp').attr('data-pagelet-stamp')
+
+      if (incomingStamp && incomingStamp === currentStamp) {
+        if (callback) callback(false)
+        return
+      }
+
+      const scroller = pageletAttrRoot(pagelet, 'data-pagelet-pin-bottom')[0]
+      const nearBottom = !scroller || (scroller.scrollHeight - scroller.scrollTop - scroller.clientHeight) < 48
+      const scrollTop = scroller ? scroller.scrollTop : 0
+
+      pagelet.empty().append(incoming.contents())
+
+      const next = pageletAttrRoot(pagelet, 'data-pagelet-pin-bottom')[0]
+      if (next) next.scrollTop = nearBottom ? next.scrollHeight : scrollTop
+      if (callback) callback(true)
+    })
   }
 
   function postLoad (pagelet) {
@@ -182,9 +219,9 @@ $(function () {
         }
 
         if (!pagelet[0].hasAttribute('data-pagelet-refresh-paused')) {
-          reloadPagelet(pagelet, function () {
+          reloadPagelet(pagelet, function (changed) {
             bindRefreshPauseForPagelet(pagelet)
-            refreshAlsoPagelet(pagelet)
+            if (changed) refreshAlsoPagelet(pagelet)
           })
         }
       }

@@ -685,6 +685,56 @@ li.reply .widget-chat-message a {
   text-decoration: underline
 }
 
+.message-thread-layout {
+  position: sticky;
+  top: var(--fixed-header-height, 3.75rem);
+}
+
+.message-thread-layout-open {
+  display: flex;
+  flex-direction: column;
+  height: calc(100vh - var(--fixed-header-height, 3.75rem) - var(--content-padding-top, 1.5625rem) - var(--content-padding-bottom, 1.5625rem));
+  height: calc(100dvh - var(--fixed-header-height, 3.75rem) - var(--content-padding-top, 1.5625rem) - var(--content-padding-bottom, 1.5625rem));
+}
+
+.message-thread-layout-open > .message-thread {
+  display: flex;
+  flex-direction: column;
+  flex: 1 1 auto;
+  min-height: 0;
+}
+
+.message-thread-layout-open > #message-send,
+.message-thread-layout-open #messengee,
+.message-thread-layout-open > .message-thread-breadcrumbs {
+  flex-shrink: 0;
+}
+
+#thread-scroll {
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow-x: hidden;
+  overflow-y: auto;
+  padding-left: 0.5rem;
+  padding-right: 0.5rem;
+}
+
+.message-compose {
+  display: flex;
+  align-items: flex-end;
+  gap: 0.5rem;
+}
+
+#message-body {
+  flex: 1 1 auto;
+  min-height: 2.125rem;
+  resize: none;
+}
+
+.message-compose .btn {
+  height: 2.125rem;
+}
+
 .theme-gutter {
   padding-left: 0.375rem;
   padding-right: 0.375rem;

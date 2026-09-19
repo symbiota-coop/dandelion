@@ -3,40 +3,30 @@
 <% elsif !current_account.able_to_message %>
   <p class="lead">You must <a href="/accounts/edit">confirm your email address</a> and <a href="/donate">donate to Dandelion</a>, join a gathering or attend an event before messaging.</p>
 <% else %>
-  <% form_tag "/messages/#{@account.id}/send", id: 'compose', class: 'mt-3', style: 'position: relative' do %>
-    <%= text_area_tag :body, id: 'message-body', placeholder: 'Type a message...', class: 'form-control', style: 'padding-bottom: 40px' %>
-    <button class="btn btn-primary btn-sm" type="submit" style="position: absolute; bottom: 5px; right: 5px"><i class="bi bi-send-fill"></i></button>
+  <% form_tag "/messages/#{@account.id}/send", id: 'compose', class: 'message-compose mt-3' do %>
+    <%= text_area_tag :body, id: 'message-body', placeholder: 'Type a message...', class: 'form-control', rows: 1 %>
+    <button class="btn btn-primary btn-sm" type="submit"><i class="bi bi-send-fill"></i></button>
   <% end %>
 <% end %>
 
 <script>
-  function slimHeight() {
-    return $(window).height() - $('#header').outerHeight(true) - ($(window).width() > 992 ? 2 : 3)*parseFloat($('#content').css('paddingTop')) - $('#message-breadcrumbs').outerHeight(true) - $('#messengee').outerHeight(true) - $('#message-send').outerHeight(true)
-  }
-
-  $('#thread-scroll').height(slimHeight())
-
-  function doSlimscroll() {
-    $('#thread-scroll').slimScroll({
-      height: slimHeight(),
-      start: 'bottom',
-      wheelStep: ($(window).width() > 992 ? 10 : 100)
-    })
-  }
-
   $(function () {
     autosize($('#message-body'));
 
-    doSlimscroll()
+    scrollMessageThreadToBottom()
 
     $('#message-body').on('autosize:resized', function () {
-      doSlimscroll()
-    })
-    $(window).resize(function () {
-      doSlimscroll()
+      scrollMessageThreadToBottom()
     })
 
-    if ($(window).width() > 992)
+    $('#message-body').on('keydown', function (e) {
+      if (e.key !== 'Enter' || e.shiftKey) return
+      e.preventDefault()
+      if (!$.trim(this.value)) return
+      $(this).closest('form').submit()
+    })
+
+    if ($(window).width() > 992 || <%= request.xhr? ? 'true' : 'false' %>)
       $('#message-body').focus()
   })
 </script>

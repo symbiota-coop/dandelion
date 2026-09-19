@@ -1,3 +1,9 @@
+function scrollMessageThreadToBottom () {
+  const thread = document.getElementById('thread-scroll')
+  if (!thread) return
+  thread.scrollTop = thread.scrollHeight
+}
+
 function initQuestionsPreview (inputSelector, previewUrl, options) {
   options = options || {}
   const fieldName = inputSelector.replace(/^#\w+?_/, '').replace(/_/g, '-')
@@ -39,6 +45,13 @@ $(function () {
   function syncFixedHeaderHeight () {
     const headerHeight = fixedHeaderHeight()
     document.documentElement.style.setProperty('--fixed-header-height', headerHeight + 'px')
+
+    const content = document.getElementById('content')
+    if (content) {
+      const contentStyle = getComputedStyle(content)
+      document.documentElement.style.setProperty('--content-padding-top', contentStyle.paddingTop)
+      document.documentElement.style.setProperty('--content-padding-bottom', contentStyle.paddingBottom)
+    }
 
     wysiwygEditors.forEach(function (editor) {
       if (editor.ui && editor.ui.view && editor.ui.view.stickyPanel) {

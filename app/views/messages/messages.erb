@@ -22,24 +22,24 @@
       <%= text_field_tag :q, placeholder: 'Search for someone', id: 'messages-search', class: 'form-control' %>
     <% end %>
 
-    <div data-pagelet-scroll="false" data-pagelet-url="/messages/index">
+    <div data-pagelet-scroll="false" data-pagelet-url="/messages/index" data-pagelet-refresh="10">
       <%= partial :'messages/index' %>
     </div>
   </div>
   <div id="thread-panel" class="col-lg-9">
-    <div style="position: sticky; top: 3.75rem">
+    <div class="message-thread-layout<%= ' message-thread-layout-open' if @account %>">
       <% if @account %>
-        <div class="d-block d-lg-none">
+        <div class="message-thread-breadcrumbs d-block d-lg-none">
           <ul id="message-breadcrumbs" class="breadcrumb">
             <li class="breadcrumb-item"><a href="javascript:;" onclick="$('#thread-panel').hide();
                 $('#preview-panel').removeClass('d-none')">Messages</a></li>
             <li class="breadcrumb-item active"><%= @account.name %></li>
           </ul>
         </div>
-        <div data-pagelet-url="/messages/<%= @account.id %>" data-pagelet-refresh="10" data-pagelet-also="/messages/index">
+        <div class="message-thread" data-pagelet-url="/messages/<%= @account.id %>" data-pagelet-refresh="10" data-pagelet-also="/messages/index">
           <%= partial :'messages/thread' %>
         </div>
-        <div id="message-send" data-pagelet-url="/messages/<%= @account.id %>/send" data-pagelet-also="/messages/<%= @account.id %>">
+        <div id="message-send" data-pagelet-url="/messages/<%= @account.id %>/send" data-pagelet-also="/messages/<%= @account.id %>,/messages/index">
           <%= partial :'messages/send' %>
         </div>
       <% elsif current_account.messages.empty? %>
