@@ -6,7 +6,7 @@
     <h4 class="my-0"><a class="text-dark" href="/u/<%= @account.username %>"><%= @account.name %></a></h4>
   </div>
 </div>
-<div id="thread-scroll" data-pagelet-stamp="<%= [messages.last&.id, messages.count, message_receipt&.received_at&.to_i].join('-') %>" data-pagelet-pin-bottom>
+<div id="thread-scroll" class="thread-scroll-prepin" data-pagelet-stamp="<%= [messages.last&.id, messages.count, message_receipt&.received_at&.to_i].join('-') %>" data-pagelet-pin-bottom>
   <ul class="widget-chat p-1">
     <% messages.each_with_index { |message,i| %>
     <% if message.messenger_id == @account.id %>

@@ -719,6 +719,10 @@ li.reply .widget-chat-message a {
   padding-right: 0.5rem;
 }
 
+#thread-scroll.thread-scroll-prepin {
+  visibility: hidden;
+}
+
 .message-compose {
   display: flex;
   align-items: flex-end;

@@ -97,6 +97,7 @@ $(function () {
       const nearBottom = !scroller || (scroller.scrollHeight - scroller.scrollTop - scroller.clientHeight) < 48
       const scrollTop = scroller ? scroller.scrollTop : 0
 
+      pageletAttrRoot(incoming, 'data-pagelet-pin-bottom').removeClass('thread-scroll-prepin')
       pagelet.empty().append(incoming.contents())
 
       const next = pageletAttrRoot(pagelet, 'data-pagelet-pin-bottom')[0]
