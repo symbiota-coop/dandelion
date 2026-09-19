@@ -177,6 +177,13 @@ module AccountAssociations
       { '$match' => { 'other_id' => { '$ne' => nil } } },
       { '$sort' => { 'created_at' => -1 } },
       { '$group' => { '_id' => '$other_id', 'id' => { '$first' => '$_id' }, 'created_at' => { '$first' => '$created_at' } } },
+      { '$lookup' => {
+        'from' => Account.collection.name,
+        'localField' => '_id',
+        'foreignField' => '_id',
+        'as' => 'other'
+      } },
+      { '$match' => { 'other' => { '$ne' => [] } } },
       { '$sort' => { 'created_at' => -1 } }
     ]
     pipeline << { '$limit' => limit } if limit
