@@ -50,13 +50,31 @@ $(function () {
     }
   }
 
+  function pageletPath (url) {
+    if (!url) return ''
+    try {
+      return new URL(url, window.location.origin).pathname
+    } catch (e) {
+      return String(url).split('?')[0]
+    }
+  }
+
+  function findPageletsByUrl (url) {
+    const exact = $('[data-pagelet-url="' + url + '"]')
+    if (exact.length) return exact
+    const path = pageletPath(url)
+    return $('[data-pagelet-url]').filter(function () {
+      return pageletPath($(this).attr('data-pagelet-url')) === path
+    })
+  }
+
   function refreshAlsoPagelet (pagelet) {
     const alsoUrl = pagelet.attr('data-pagelet-also')
     if (!alsoUrl) return
     alsoUrl.split(',').forEach(function (url) {
       url = url.trim()
       if (!url) return
-      const alsoPagelet = $('[data-pagelet-url="' + url + '"]')
+      const alsoPagelet = findPageletsByUrl(url)
       if (alsoPagelet.length) reloadPagelet(alsoPagelet)
     })
   }
@@ -177,14 +195,12 @@ $(function () {
 
     const $link = $(this)
     const pagelet = $link.closest('[data-pagelet-url]')
+    const href = $link.attr('href')
 
+    pagelet.attr('data-pagelet-url', href)
     setPageletLoading(pagelet)
 
-    if (pagelet.attr('data-pagelet-refresh')) {
-      pagelet.attr('data-pagelet-refresh-paused', 'true')
-    }
-
-    pagelet.load($link.attr('href'), function () {
+    pagelet.load(href, function () {
       setPageletLoaded(pagelet)
       $('.tooltip').remove()
 
