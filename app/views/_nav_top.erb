@@ -53,23 +53,15 @@
       </a>
     </li>
     <li class="dropdown">
-      <a id="notifications-a" href="javascript:;" data-toggle="dropdown" class="dropdown-toggle navbar-icon" onclick="$(this).removeClass('with-label');
-          $.post('/checked_notifications')">
+      <a id="notifications-a" href="javascript:;" data-toggle="dropdown" data-mobile-modal="Notifications" data-check-url="/checked_notifications" class="dropdown-toggle navbar-icon">
         <i class="bi bi-bell"></i>
       </a>
-      <style>
-        #notifications .bi-spin { display: none }
-      </style>
       <div id="notifications" data-pagelet-url="/notifications" data-pagelet-refresh="60"></div>
     </li>
     <li class="dropdown">
-      <a id="messages-a" href="javascript:;" data-toggle="dropdown" class="dropdown-toggle navbar-icon" onclick="$(this).removeClass('with-label');
-          $.post('/checked_messages')">
+      <a id="messages-a" href="javascript:;" data-toggle="dropdown" data-mobile-modal="Messages" data-check-url="/checked_messages" class="dropdown-toggle navbar-icon">
         <i class="bi bi-chat-left"></i>
       </a>
-      <style>
-        #messages .bi-spin { display: none }
-      </style>
       <div id="messages" data-pagelet-url="/messages" data-pagelet-refresh="60">
         <%= cp(:'messages/dropdown', key: "/messages?account_id=#{current_account.id}", expires: 1.minute.from_now) %>
       </div>

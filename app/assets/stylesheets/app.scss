@@ -454,7 +454,40 @@ mark,
 .dropdown-menu>li.notification .notification-title,
 .dropdown-menu>li.notification .notification-desc {
   white-space: normal;
+  overflow: visible;
+  text-overflow: unset;
   line-height: 1.35
+}
+
+.navbar [data-pagelet-url] .bi-spin {
+  display: none
+}
+
+.nav-dropdown-modal .modal-content {
+  overflow: hidden;
+}
+
+.nav-dropdown-modal .dropdown-menu {
+  display: block;
+  position: static;
+  float: none;
+  width: auto;
+  margin: 0 !important;
+  border: 0;
+  box-shadow: none;
+  border-radius: 0;
+
+  &:before,
+  &:after {
+    display: none
+  }
+}
+
+@media (max-width: 767px) {
+  .nav-dropdown-modal .modal-dialog {
+    margin: 0.5rem;
+    max-width: none
+  }
 }
 
 

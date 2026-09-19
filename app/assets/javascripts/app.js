@@ -449,6 +449,33 @@ $(function () {
     }
   }
 
+  $(document).on('click', '[data-check-url]', function () {
+    $(this).removeClass('with-label')
+    $.post($(this).attr('data-check-url'))
+  })
+
+  $(document).on('show.bs.dropdown', '.dropdown', function (e) {
+    const $toggle = $(e.relatedTarget)
+    const title = $toggle.attr('data-mobile-modal')
+    if (!title || $(window).width() >= 768) return
+
+    e.preventDefault()
+
+    const $source = $toggle.siblings('[data-pagelet-url]')
+    const $list = $source.children('ul').clone()
+    const $modal = $('#nav-dropdown-modal')
+    const $body = $modal.find('.modal-body')
+
+    $modal.find('.modal-title').text(title)
+    if ($list.length) {
+      $body.empty().append($list)
+    } else {
+      $body.html('<div class="text-center p-4"><i class="bi bi-spin bi-slash-lg"></i></div>')
+        .load($source.attr('data-pagelet-url'))
+    }
+    $modal.modal('show')
+  })
+
   $(document).on('shown.bs.tab', 'a[data-toggle="tab"]', function (e) {
     const hash = e.target.hash
     if (hash && window.location.hash !== hash) {
