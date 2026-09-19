@@ -153,17 +153,17 @@ module AccountAssociations
       cache.reload
     end
 
-    Notification.or(
+    Notification.and('$or' => [
       { :circle_type => 'Gathering', :circle_id.in => cache.gathering_ids },
       { :circle_type => 'Account', :circle_id.in => cache.account_ids },
       { :circle_type => 'Activity', :circle_id.in => cache.activity_ids },
       { :circle_type => 'LocalGroup', :circle_id.in => cache.local_group_ids },
       { :circle_type => 'Organisation', :circle_id.in => cache.organisations_ids }
-    )
+    ])
   end
 
   def messages
-    Message.or({ messenger: self }, { messengee: self })
+    Message.and('$or' => [{ messenger: self }, { messengee: self }])
   end
 
   def conversations(limit: nil)

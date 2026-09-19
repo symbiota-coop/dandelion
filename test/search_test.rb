@@ -241,7 +241,7 @@ class SearchTest < ActiveSupport::TestCase
     organisation_id = BSON::ObjectId.new
     from = Time.utc(2026, 7, 4, 23)
     scope = Event.unscoped
-                 .or({ organisation_id: organisation_id }, { cohosts_ids_cache: organisation_id })
+                 .and('$or' => [{ organisation_id: organisation_id }, { cohosts_ids_cache: organisation_id }])
                  .and(deleted_at: nil)
                  .and(secret: false)
                  .future_current_evergreen(from)
@@ -268,7 +268,7 @@ class SearchTest < ActiveSupport::TestCase
   test 'leaves unsupported or branch in post search match' do
     collection = CapturingCollection.new
     organisation_id = BSON::ObjectId.new
-    scope = Event.unscoped.or({ organisation_id: organisation_id }, { deleted_at: nil })
+    scope = Event.unscoped.and('$or' => [{ organisation_id: organisation_id }, { deleted_at: nil }])
 
     Event.stub(:collection, collection) do
       Event.search('Sound', scope, regex_search: false)

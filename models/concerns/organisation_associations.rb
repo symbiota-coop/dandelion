@@ -75,7 +75,7 @@ module OrganisationAssociations
   end
 
   def events_including_cohosted
-    Event.unscoped.or({ organisation_id: id }, { cohosts_ids_cache: id }).and(deleted_at: nil)
+    Event.unscoped.and('$or' => [{ organisation_id: id }, { cohosts_ids_cache: id }]).and(deleted_at: nil)
   end
 
   def featured_events

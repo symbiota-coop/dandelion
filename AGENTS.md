@@ -28,6 +28,7 @@ The Cursor image installs Ruby, Bundler, Foreman, MongoDB, Chromium, and ImageMa
 - Use `belongs_to_without_parent_validation`, not Mongoid `belongs_to` (its parent check fails when the parent is only in memory)
 - Use `has_many_through` for join collections, not `has_many :x, through:` (Mongoid has no `through`)
 - Query filters are class methods that return `self.and(...)` so they chain (`Event.live.future`). Do not use `scope :live, -> { ... }`
+- Never use Mongoid `.or` — it ORs against whatever is already in the selector (`Event.live.or(featured: true)` means live or featured). Use `self.and('$or' => [...])` so the OR is just another AND-ed filter (`Event.live.and('$or' => [...])` means live and (this or that))
 - Use `scope.and` rather than `scope.where`
 - Mongo indexes are created directly in the database, and are not defined in model files
 

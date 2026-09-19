@@ -138,7 +138,7 @@ class Event
   end
 
   def page_views_count
-    PageView.or({ path: "/e/#{slug}" }, { path: "/events/#{id}" }).count
+    PageView.and('$or' => [{ path: "/e/#{slug}" }, { path: "/events/#{id}" }]).count
   end
 
   def donations_to_dandelion?

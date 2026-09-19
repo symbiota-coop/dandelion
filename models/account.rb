@@ -90,11 +90,11 @@ class Account
   end
 
   def self.recommendable
-    Account.or(
+    Account.and('$or' => [
       { :id.in => Ticket.distinct(:account_id).compact },
       { :id.in => EventFacilitation.distinct(:account_id).compact },
       { :id.in => Membership.distinct(:account_id).compact }
-    ).and(:last_active.gt => 1.year.ago)
+    ]).and(:last_active.gt => 1.year.ago)
   end
 
   def self.generate_sign_in_token
@@ -421,12 +421,12 @@ class Account
                                                             ]).to_a.to_h { |doc| [doc['_id'], doc] }
 
     # Get accounts that either have organisationships OR have stale cache fields
-    account_ids_with_caches = Account.or(
+    account_ids_with_caches = Account.and('$or' => [
       { :organisation_ids_cache.ne => nil },
       { :organisation_ids_public_cache.ne => nil },
       { :subscribed_organisation_ids_cache.ne => nil },
       { :unsubscribed_organisation_ids_cache.ne => nil }
-    ).pluck(:id)
+    ]).pluck(:id)
 
     relevant_account_ids = (expected_caches.keys + account_ids_with_caches).uniq
 
