@@ -452,6 +452,13 @@ $(function () {
   })
   ajaxCompleted()
 
+  $(document).on('keydown', '.docs-deepwiki .ask-box textarea', function (e) {
+    if (e.key !== 'Enter' || e.shiftKey) return
+    e.preventDefault()
+    if (!$.trim(this.value)) return
+    $(this).closest('form').submit()
+  })
+
   function showTabFromHash () {
     const hash = window.location.hash
     if (!hash) return

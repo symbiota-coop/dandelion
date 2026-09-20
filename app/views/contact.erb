@@ -10,14 +10,31 @@
         <strong><mark>If your question relates to a specific organisation</mark></strong>, please contact the organisation.<br>
         <strong><mark>For example, if your question relates to the Psychedelic Society</mark></strong>, please contact <a href="mailto:enquiries@psychedelicsociety.org.uk">enquiries@psychedelicsociety.org.uk</a><br>
       </p>
-      <p><small>
-          If you have a question related to the Dandelion platform itself (for example, you require technical assistance),
-          you can email us at <a href="mailto:<%=ENV['CONTACT_EMAIL']%>"><%=ENV['CONTACT_EMAIL']%></a>. 
-          Please include links to any relevant events.         
-        </small></p>
-      <p><small>
-          Technically-adept users can also <a href="https://deepwiki.com/symbiota-coop/dandelion">Ask Devin on our DeepWiki</a>.
-        </small></p>
+      <p>
+        If you have a question related to the Dandelion platform itself (for example, you require technical assistance):
+      </p>
+      <h3>Explore our docs</h3>
+      <p>
+        We have <a href="/docs">searchable docs</a> covering events, organisations, gatherings and more.
+      </p>
+      <%= partial :'docs/support' %>
+
+      <hr>
+
+      <p class="contact-socials" style="font-size: 1.5rem">
+        <% [
+          ['https://bsky.app/profile/dandelion.events', 'bluesky', 'Bluesky'],
+          ['https://www.youtube.com/@dandelion.events.321', 'youtube', 'YouTube'],
+          ['https://open.spotify.com/show/3pHYC5Zgh8jTFBBfd69LN7', 'spotify', 'Spotify'],
+          ['https://dandeliondotevents.substack.com/', 'substack', 'Substack'],
+          ['https://www.instagram.com/dandelion.events_/', 'instagram', 'Instagram'],
+          ['https://github.com/symbiota-coop/dandelion', 'github', 'Github']
+        ].each do |url, icon, label| %>
+          <a href="<%= url %>" target="_blank" class="mr-3" data-toggle="tooltip" title="<%= label %>" aria-label="<%= label %>">
+            <i class="bi bi-<%= icon %>"></i>
+          </a>
+        <% end %>
+      </p>
       <p>
         <a href="/terms">Read our terms and conditions</a>
         <br />
@@ -26,25 +43,6 @@
         <a href="/cookies">Read our cookie policy</a>
         <br />
         <a href="javascript:;" class="cookie-consent-preferences">Cookie preferences</a>
-      </p>
-
-      <h2>Connect with us</h2>
-
-      <p>
-        <% [
-          ['https://bsky.app/profile/dandelion.events', 'bluesky', 'Bluesky'],
-          ['https://www.youtube.com/@dandelion.events.321', 'youtube', 'YouTube'],
-          ['https://open.spotify.com/show/3pHYC5Zgh8jTFBBfd69LN7', 'spotify', 'Spotify'],
-          ['https://dandeliondotevents.substack.com/', 'substack', 'Substack'],
-          ['https://www.instagram.com/dandelion.events_/', 'instagram', 'Instagram'],
-          ['https://github.com/symbiota-coop/dandelion', 'github', 'Github']
-        ].each_with_index do |(url, icon, label), i| %>
-          <%= '<span class="mx-1">&middot;</span>'.html_safe if i > 0 %>
-          <a href="<%= url %>" target="_blank">
-            <i class="bi bi-<%= icon %>"></i>
-            <span class="nav-link-text"><%= label %></span>
-          </a>
-        <% end %>
       </p>
 
     </div>

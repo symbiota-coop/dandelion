@@ -1,0 +1,17 @@
+<h3>Get an instant answer from AI</h3>
+<p>
+  Answers come from
+  <a target="_blank" rel="noopener noreferrer" href="<%= Deepwiki::WIKI_URL %>">our DeepWiki</a>.
+</p>
+<%= partial :'docs/deepwiki' %>
+
+<h3>Get an answer from a human</h3>
+<p>
+  You can email us at <a href="mailto:<%= ENV['CONTACT_EMAIL'] %>"><%= ENV['CONTACT_EMAIL'] %></a><% if current_account %> or write in the box below<% end %>.
+  Please include links to any relevant events.
+</p>
+<% if current_account %>
+  <div data-pagelet-url="/docs/question">
+    <%= partial :'docs/question' %>
+  </div>
+<% end %>

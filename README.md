@@ -2,7 +2,7 @@
 
 <img src="https://github.com/symbiota-coop/dandelion/actions/workflows/ruby.yml/badge.svg">
 
-<a href="https://deepwiki.com/symbiota-coop/dandelion"><img src="https://deepwiki.com/badge.svg" alt="Ask DeepWiki"></a>
+[![Ask DeepWiki](https://deepwiki.com/badge.svg)](https://deepwiki.com/symbiota-coop/dandelion)
 
 Check out the canonical install at https://dandelion.events \
 Created by [Stephen Reid](https://stephenreid.net) \

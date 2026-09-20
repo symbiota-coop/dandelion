@@ -1,4 +1,6 @@
-<script type="application/json" id="doc-search-index"><%== @doc_search_index.to_json %></script>
+<script type="application/json" id="doc-search-index">
+  <%== @doc_search_index.to_json %>
+</script>
 
 <div class="row" id="docs-layout">
   <div class="col-lg-3 d-none d-lg-block">
@@ -31,15 +33,10 @@
         <%== @doc_page[:html_body] %>
       </div>
 
-      <% if current_account %>
-        <div class="mt-4 docs-question" data-pagelet-url="/docs/question">
-          <%= partial :'docs/question' %>
-        </div>
-      <% else %>
-        <p class="lead mt-4 docs-question">
-          Still need support? <a href="mailto:<%=ENV['CONTACT_EMAIL']%>">Get in touch via email</a>
-        </p>
-      <% end %>
+      <div class="mt-4 docs-question">
+        <h2>Still need support?</h2>
+        <%= partial :'docs/support' %>
+      </div>
     </div>
   </div>
 </div>

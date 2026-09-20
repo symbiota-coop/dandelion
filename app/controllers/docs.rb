@@ -4,6 +4,36 @@ Dandelion::App.controller do
     partial :'docs/question'
   end
 
+  post '/docs/deepwiki' do
+    @result = Deepwiki.ask(params[:q], page: params[:wiki])
+    redirect "/docs/ask/#{@result.query_id}" if @result
+
+    @title = 'Ask DeepWiki'
+    @deepwiki_error = true
+    erb :'docs/ask'
+  end
+
+  get '/docs/ask/:query_id/answer.json' do
+    halt 404 unless Deepwiki.query_id?(params[:query_id])
+    @result = Deepwiki.fetch(params[:query_id]) || Deepwiki.pending(params[:query_id])
+
+    content_type :json
+    {
+      html: deepwiki_answer_html(@result.markdown),
+      done: @result.done?,
+      failed: @result.failed?,
+      source_url: @result.source_url
+    }.to_json
+  end
+
+  get '/docs/ask/:query_id' do
+    halt 404 unless Deepwiki.query_id?(params[:query_id])
+    @result = Deepwiki.fetch(params[:query_id]) || Deepwiki.pending(params[:query_id])
+
+    @title = [@result.question, 'Ask DeepWiki'].reject(&:empty?).first
+    erb :'docs/ask'
+  end
+
   post '/docs/question' do
     sign_in_required!
     halt 400 unless params[:question]

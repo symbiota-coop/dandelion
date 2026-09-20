@@ -671,6 +671,12 @@ textarea[id=verdict_reason] {
   border-radius: 0.25rem
 }
 
+.contact-socials a,
+.contact-socials a:hover,
+.contact-socials a:focus {
+  text-decoration: none;
+}
+
 .alert button.close {
   font-size: 1rem
 }

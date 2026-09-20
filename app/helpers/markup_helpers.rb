@@ -1,4 +1,26 @@
 Dandelion::App.helpers do
+  def deepwiki_answer_html(markdown)
+    return '' if markdown.to_s.strip.empty?
+
+    html = md(markdown)
+    doc = Nokogiri::HTML.fragment(Sanitize.fragment(html, Sanitize::Config::DANDELION))
+    doc.css('table').each do |table|
+      table['class'] = ['table', 'table-bordered', table['class']].compact.join(' ')
+      wrapper = Nokogiri::XML::Node.new('div', table.document)
+      wrapper['class'] = 'doc-table-wrap'
+      table.add_previous_sibling(wrapper)
+      wrapper.add_child(table)
+    end
+    doc.css('a[href]').each do |a|
+      href = a['href'].to_s
+      next unless href.start_with?('http://', 'https://')
+
+      a['target'] = '_blank'
+      a['rel'] = 'noopener noreferrer'
+    end
+    doc.to_html
+  end
+
   def md(text, hard_wrap: false)
     markdown = Redcarpet::Markdown.new(hard_wrap ? Redcarpet::Render::HTML.new(hard_wrap: true) : Redcarpet::Render::HTML, autolink: true, tables: true, fenced_code_blocks: true)
     markdown.render(text)

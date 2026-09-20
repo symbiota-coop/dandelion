@@ -1,0 +1,37 @@
+<div class="docs-main docs-ask">
+  <% if @deepwiki_error %>
+    <div class="alert alert-danger">
+      We couldn't start that question just now. Please try again, or
+      <a target="_blank" rel="noopener noreferrer" href="<%= Deepwiki::WIKI_URL %>">ask on DeepWiki</a>.
+    </div>
+    <%= partial :'docs/deepwiki' %>
+  <% else %>
+    <h1 class="docs-deepwiki-question"><%= @title %></h1>
+
+    <div
+      id="deepwiki-answer"
+      data-deepwiki-stream="/docs/ask/<%= @result.query_id %>/answer.json"
+      <% if @result.finished? %>data-deepwiki-done="true"<% end %>
+    >
+      <%= partial :'docs/deepwiki_answer' %>
+    </div>
+
+    <div class="docs-deepwiki-source<%= ' d-none' unless @result.finished? && !@result.failed? %>" id="deepwiki-source">
+      <p>
+        <a target="_blank" rel="noopener noreferrer" href="<%= @result.source_url %>">
+          View this answer on DeepWiki
+        </a>
+      </p>
+      <hr>
+    </div>
+
+    <div class="<%= 'd-none' unless @result.finished? %>" id="deepwiki-ask">
+      <p>
+        Ask another question. Answers come from
+        <a target="_blank" rel="noopener noreferrer" href="<%= Deepwiki::WIKI_URL %>">our DeepWiki</a>.
+      </p>
+      <%= partial :'docs/deepwiki' %>
+    </div>
+    <script src="/javascripts/docs_ask.js?<%= @cachebuster %>"></script>
+  <% end %>
+</div>
