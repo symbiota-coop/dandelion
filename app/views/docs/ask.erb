@@ -39,12 +39,6 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/marked/15.0.7/marked.min.js"></script>
     <script src="/javascripts/docs_ask.js?<%= @cachebuster %>"></script>
   <% else %>
-    <h1>Ask DeepWiki</h1>
-    <p>
-      Answers come from
-      <a target="_blank" rel="noopener noreferrer" href="https://deepwiki.com/symbiota-coop/dandelion">our DeepWiki</a>.
-    </p>
-    <%= partial :'docs/deepwiki' %>
-    <%= partial :'docs/support', locals: { skip_ai: true } %>
+    <%= partial :'docs/support' %>
   <% end %>
 </div>
