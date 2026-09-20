@@ -12,6 +12,7 @@ class Deepwiki
     Answer in product terms: what to click and what happens.
     Never mention file names, file paths, partials, models, routes, helpers, class names, or line numbers.
     Do not include a Notes section.
+    Do not include a "Wiki pages you might want to explore" section.
   TEXT
 
   Result = Struct.new(:query_id, :question, :markdown, :state, :error, keyword_init: true) do
@@ -153,6 +154,7 @@ class Deepwiki
     markdown = Array(items).filter_map { |item| item['data'] if item['type'] == 'chunk' }.join
     separate_lists(
       markdown.sub(/\A\s*## Answer\s*/i, '')
+              .sub(/\n*Wiki pages you might want to explore:.*\z/im, '')
               .gsub(%r{\]\(/wiki/([^)#]+)(?:\#([^)]+))?\)}x) { "](#{HOST}/#{[Regexp.last_match(1), Regexp.last_match(2)].compact.join('/')})" }
               .gsub('](/symbiota-coop/', "](#{HOST}/symbiota-coop/")
               .gsub(%r{\[([^\]]+?) \(#{Regexp.escape(REPO)}\)\]}, '[\1]')

@@ -30,6 +30,7 @@ class DeepwikiTest < ActiveSupport::TestCase
         assert_equal 'ada.deepwiki_public', body['source']
         assert_includes body['user_query'], 'How do events work on Dandelion?'
         assert_includes body['user_query'], 'Never mention file names'
+        assert_includes body['user_query'], 'Wiki pages you might want to explore'
         assert_equal '', body['additional_context']
         refute_includes result.question, 'relevant_context'
         assert_equal QUERY_ID, body['query_id']
@@ -64,7 +65,7 @@ class DeepwikiTest < ActiveSupport::TestCase
         'response' => [
           { 'type' => 'chunk', 'data' => "## Answer\n\nTicket types set the price.\n" },
           { 'type' => 'reference', 'data' => { 'file_path' => 'models/ticket_type.rb' } },
-          { 'type' => 'chunk', 'data' => "See [Glossary (symbiota-coop/dandelion)](/wiki/symbiota-coop/dandelion#12).\n\nWiki pages you might want to explore:\n- [Carousels and Featured Events (symbiota-coop/dandelion)](/wiki/symbiota-coop/dandelion#6.4)\n" },
+          { 'type' => 'chunk', 'data' => "See [Glossary (symbiota-coop/dandelion)](/wiki/symbiota-coop/dandelion#12).\nThey can be:\n- Free\n- Paid\n\nWiki pages you might want to explore:\n- [Carousels and Featured Events (symbiota-coop/dandelion)](/wiki/symbiota-coop/dandelion#6.4)\n" },
           { 'type' => 'done' }
         ]
       }]
@@ -75,7 +76,9 @@ class DeepwikiTest < ActiveSupport::TestCase
       assert_includes result.markdown, 'Ticket types set the price.'
       refute_includes result.markdown, '## Answer'
       assert_includes result.markdown, '[Glossary](https://deepwiki.com/symbiota-coop/dandelion/12)'
-      assert_includes result.markdown, "Wiki pages you might want to explore:\n\n- [Carousels and Featured Events]"
+      assert_includes result.markdown, "They can be:\n\n- Free"
+      refute_includes result.markdown, 'Wiki pages you might want to explore'
+      refute_includes result.markdown, 'Carousels and Featured Events'
     end
   end
 
