@@ -247,7 +247,7 @@
           name: 'ask_question',
           arguments: {
             repoName: REPO,
-            question: '<relevant_context>' + USER_FOCUS + '</relevant_context>' + question
+            question: question + '\n\n' + USER_FOCUS
           }
         }
       })
