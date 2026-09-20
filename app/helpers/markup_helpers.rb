@@ -1,4 +1,11 @@
 Dandelion::App.helpers do
+  def deepwiki_pending(query_id)
+    pending = session[:deepwiki_pending]
+    return unless pending.is_a?(Hash) && pending['query_id'] == query_id
+
+    pending
+  end
+
   def deepwiki_answer_html(markdown)
     return '' if markdown.to_s.strip.empty?
 

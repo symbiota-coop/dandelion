@@ -37,8 +37,28 @@ class Deepwiki
       query_id.to_s.match?(QUERY_ID)
     end
 
-    def ask(question)
-      new.ask(question)
+    def normalize_question(question)
+      question = question.to_s.strip
+      return if question.empty?
+
+      question[0, QUESTION_LIMIT]
+    end
+
+    def query_id_for(question)
+      slug = question.to_s.parameterize.tr('_', '-').squeeze('-')[0, 30].to_s.sub(/\A-+/, '').sub(/-+\z/, '')
+      slug = 'question' if slug.empty?
+      "#{slug}_#{SecureRandom.uuid}"
+    end
+
+    def start(question)
+      question = normalize_question(question)
+      return unless question
+
+      pending(query_id_for(question), question: question)
+    end
+
+    def ask(question, query_id: nil)
+      new.ask(question, query_id: query_id)
     end
 
     def fetch(query_id)
@@ -56,12 +76,12 @@ class Deepwiki
     end
   end
 
-  def ask(question)
-    question = question.to_s.strip
-    return if question.empty?
+  def ask(question, query_id: nil)
+    question = self.class.normalize_question(question)
+    return unless question
+    return if query_id && !self.class.query_id?(query_id)
 
-    question = question[0, QUESTION_LIMIT]
-    query_id = query_id_for(question)
+    query_id ||= self.class.query_id_for(question)
     response = connection.post('/ada/query') do |req|
       req.body = {
         mode: MODE,
@@ -147,11 +167,5 @@ class Deepwiki
 
       part.gsub(/^(?!#{list})(\S.*)\n(?=#{list})/, "\\1\n\n")
     end.join
-  end
-
-  def query_id_for(question)
-    slug = question.parameterize.tr('_', '-').squeeze('-')[0, 30].to_s.sub(/\A-+/, '').sub(/-+\z/, '')
-    slug = 'question' if slug.empty?
-    "#{slug}_#{SecureRandom.uuid}"
   end
 end

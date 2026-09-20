@@ -5,10 +5,23 @@ class DeepwikiTest < ActiveSupport::TestCase
 
   QUERY_ID = 'how-do-events-work-on-dandelio_11111111-2222-3333-4444-555555555555'
 
+  test 'Deepwiki.start builds a pending result without calling the API' do
+    SecureRandom.stub :uuid, '11111111-2222-3333-4444-555555555555' do
+      stub_deepwiki do |requests|
+        result = Deepwiki.start('How do events work on Dandelion?')
+
+        assert_equal 0, requests.length
+        assert_equal QUERY_ID, result.query_id
+        assert_equal 'How do events work on Dandelion?', result.question
+        assert_equal 'pending', result.state
+      end
+    end
+  end
+
   test 'Deepwiki.ask posts the question and returns a pending result' do
     SecureRandom.stub :uuid, '11111111-2222-3333-4444-555555555555' do
       stub_deepwiki do |requests|
-        result = Deepwiki.ask('How do events work on Dandelion?')
+        result = Deepwiki.ask('How do events work on Dandelion?', query_id: QUERY_ID)
 
         assert_equal 1, requests.length
         body = requests.first
@@ -31,6 +44,14 @@ class DeepwikiTest < ActiveSupport::TestCase
   test 'Deepwiki.ask returns nil when the API fails' do
     stub_deepwiki(post_status: 500) do
       assert_nil Deepwiki.ask('How do events work?')
+    end
+  end
+
+  test 'Deepwiki.ask returns nil for a blank question' do
+    stub_deepwiki do |requests|
+      assert_nil Deepwiki.ask('   ')
+      assert_nil Deepwiki.ask(nil)
+      assert_equal 0, requests.length
     end
   end
 
@@ -95,15 +116,61 @@ class DeepwikiTest < ActiveSupport::TestCase
     end
   end
 
-  test 'GET /docs/ask/:query_id stays pending when DeepWiki fetch fails' do
+  test 'POST /docs/deepwiki redirects to a pending page without calling DeepWiki' do
     SecureRandom.stub :uuid, '11111111-2222-3333-4444-555555555555' do
-      stub_deepwiki(get_status: 500) do
+      stub_deepwiki do |requests|
         post '/docs/deepwiki', q: 'How do events work on Dandelion?'
+        assert last_response.redirect?
+        assert_includes last_response.headers['Location'], "/docs/ask/#{QUERY_ID}"
+        assert_equal 0, requests.length
+
         follow_redirect!
         assert last_response.ok?
-        assert_includes last_response.body, 'Ask DeepWiki'
+        assert_includes last_response.body, 'How do events work on Dandelion?'
         assert_includes last_response.body, "/docs/ask/#{QUERY_ID}/answer.json"
+        assert_includes last_response.body, 'flicker'
+        assert_equal 0, requests.length
       end
+    end
+  end
+
+  test 'GET /docs/ask/:query_id/answer.json starts the DeepWiki question after submit' do
+    SecureRandom.stub :uuid, '11111111-2222-3333-4444-555555555555' do
+      stub_deepwiki do |requests|
+        post '/docs/deepwiki', q: 'How do events work on Dandelion?'
+        follow_redirect!
+        get "/docs/ask/#{QUERY_ID}/answer.json"
+
+        assert last_response.ok?
+        assert_equal 1, requests.length
+        assert_equal QUERY_ID, requests.first['query_id']
+        assert_includes requests.first['user_query'], 'How do events work on Dandelion?'
+      end
+    end
+  end
+
+  test 'GET /docs/ask/:query_id/answer.json fails when DeepWiki cannot start the question' do
+    SecureRandom.stub :uuid, '11111111-2222-3333-4444-555555555555' do
+      stub_deepwiki(post_status: 500) do
+        post '/docs/deepwiki', q: 'How do events work on Dandelion?'
+        follow_redirect!
+        get "/docs/ask/#{QUERY_ID}/answer.json"
+
+        assert last_response.ok?
+        json = JSON.parse(last_response.body)
+        assert json['failed']
+        refute json['done']
+        assert_equal "https://deepwiki.com/search/#{QUERY_ID}?mode=fast", json['source_url']
+      end
+    end
+  end
+
+  test 'GET /docs/ask/:query_id stays pending when DeepWiki fetch fails' do
+    stub_deepwiki(get_status: 500) do
+      get "/docs/ask/#{QUERY_ID}"
+      assert last_response.ok?
+      assert_includes last_response.body, 'Ask DeepWiki'
+      assert_includes last_response.body, "/docs/ask/#{QUERY_ID}/answer.json"
     end
   end
 

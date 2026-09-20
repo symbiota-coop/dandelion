@@ -5,8 +5,11 @@ Dandelion::App.controller do
   end
 
   post '/docs/deepwiki' do
-    @result = Deepwiki.ask(params[:q])
-    redirect "/docs/ask/#{@result.query_id}" if @result
+    @result = Deepwiki.start(params[:q])
+    if @result
+      session[:deepwiki_pending] = { 'query_id' => @result.query_id, 'question' => @result.question }
+      redirect "/docs/ask/#{@result.query_id}"
+    end
 
     @title = 'Ask DeepWiki'
     @deepwiki_error = true
@@ -14,6 +17,21 @@ Dandelion::App.controller do
   end
 
   get '/docs/ask/:query_id/answer.json' do
+    halt 404 unless Deepwiki.query_id?(params[:query_id])
+
+    if (pending = deepwiki_pending(params[:query_id])) && !pending['asked']
+      session[:deepwiki_pending] = pending.merge('asked' => true)
+      unless Deepwiki.ask(pending['question'], query_id: params[:query_id])
+        content_type :json
+        halt 200, {
+          html: '',
+          done: false,
+          failed: true,
+          source_url: Deepwiki.pending(params[:query_id], question: pending['question']).source_url
+        }.to_json
+      end
+    end
+
     halt 404 unless (@result = Deepwiki.result(params[:query_id]))
 
     content_type :json
@@ -26,7 +44,13 @@ Dandelion::App.controller do
   end
 
   get '/docs/ask/:query_id' do
-    halt 404 unless (@result = Deepwiki.result(params[:query_id]))
+    halt 404 unless Deepwiki.query_id?(params[:query_id])
+
+    if (pending = deepwiki_pending(params[:query_id]))
+      @result = Deepwiki.pending(params[:query_id], question: pending['question'])
+    else
+      halt 404 unless (@result = Deepwiki.result(params[:query_id]))
+    end
 
     @title = @result.question.empty? ? 'Ask DeepWiki' : @result.question
     erb :'docs/ask'
