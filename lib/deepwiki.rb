@@ -150,7 +150,7 @@ class Deepwiki
   end
 
   def query_id_for(question)
-    slug = question.parameterize[0, 30].to_s.sub(/-+\z/, '')
+    slug = question.parameterize.tr('_', '-').squeeze('-')[0, 30].to_s.sub(/\A-+/, '').sub(/-+\z/, '')
     slug = 'question' if slug.empty?
     "#{slug}_#{SecureRandom.uuid}"
   end

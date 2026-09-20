@@ -28,6 +28,20 @@ class DeepwikiTest < ActiveSupport::TestCase
     end
   end
 
+  test 'Deepwiki.ask slugifies underscores so the query id is valid' do
+    SecureRandom.stub :uuid, '11111111-2222-3333-4444-555555555555' do
+      stub_deepwiki do
+        result = Deepwiki.ask('What is webhook_url?')
+        assert_equal 'what-is-webhook-url_11111111-2222-3333-4444-555555555555', result.query_id
+        assert Deepwiki.query_id?(result.query_id)
+
+        result = Deepwiki.ask('___')
+        assert_equal 'question_11111111-2222-3333-4444-555555555555', result.query_id
+        assert Deepwiki.query_id?(result.query_id)
+      end
+    end
+  end
+
   test 'Deepwiki.ask returns nil when the API fails' do
     stub_deepwiki(post_status: 500) do
       assert_nil Deepwiki.ask('How do events work?')
