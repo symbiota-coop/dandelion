@@ -15,9 +15,10 @@ class DeepwikiTest < ActiveSupport::TestCase
         assert_equal 'fast', body['mode']
         assert_equal ['symbiota-coop/dandelion'], body['repo_names']
         assert_equal 'ada.deepwiki_public', body['source']
-        assert_equal 'How do events work on Dandelion?', body['user_query']
-        refute_includes body['user_query'], 'organiser or attendee'
-        assert_includes body['additional_context'], 'organiser or attendee'
+        assert_includes body['user_query'], 'How do events work on Dandelion?'
+        assert_includes body['user_query'], 'Never mention file names'
+        assert_equal '', body['additional_context']
+        refute_includes result.question, 'relevant_context'
         assert_equal QUERY_ID, body['query_id']
         assert_equal QUERY_ID, result.query_id
         assert_equal 'How do events work on Dandelion?', result.question

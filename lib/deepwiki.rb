@@ -8,9 +8,9 @@ class Deepwiki
   QUESTION_LIMIT = 2_000
   QUERY_ID = /\A[a-z0-9-]{1,80}_[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}\z/i
   USER_FOCUS = <<~TEXT.freeze
-    Answer for a Dandelion organiser or attendee, not a developer.
-    Explain what to click and what happens in the product.
-    Do not cite file paths or line numbers.
+    This question is from a Dandelion organiser or attendee using the product, not a developer reading the code.
+    Answer in product terms: what to click and what happens.
+    Never mention file names, file paths, partials, models, routes, helpers, class names, or line numbers.
     Do not include a Notes section.
   TEXT
 
@@ -65,10 +65,10 @@ class Deepwiki
     response = connection.post('/ada/query') do |req|
       req.body = {
         mode: MODE,
-        user_query: question,
+        user_query: wrapped_query(question),
         keywords: [],
         repo_names: [REPO],
-        additional_context: USER_FOCUS,
+        additional_context: '',
         query_id: query_id,
         use_notes: false,
         generate_summary: false,
@@ -119,6 +119,10 @@ class Deepwiki
       f.options.open_timeout = 5
       f.adapter Faraday.default_adapter
     end
+  end
+
+  def wrapped_query(question)
+    "<relevant_context>#{USER_FOCUS.squish}</relevant_context>#{question}"
   end
 
   def unwrap_question(user_query)
