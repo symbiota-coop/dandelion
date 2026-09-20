@@ -1,8 +1,8 @@
 <div class="docs-deepwiki mb-3">
-  <% form_tag '/docs/deepwiki', class: 'no-trigger' do %>
+  <% form_tag '/docs/ask', method: :get, class: 'no-trigger' do %>
     <div class="ask-box">
       <label class="sr-only" for="deepwiki-question">Ask a question about Dandelion</label>
-      <%= text_area_tag :q, id: 'deepwiki-question', class: 'form-control autosize', rows: 2, placeholder: 'How do I boost an event?', required: true %>
+      <%= text_area_tag :q, id: 'deepwiki-question', class: 'form-control autosize', rows: 2, placeholder: 'How do I boost an event?', required: true, maxlength: Deepwiki::QUESTION_LIMIT %>
       <div class="ask-box-actions">
         <button type="submit" class="btn btn-primary btn-sm" aria-label="Ask a question about Dandelion">
           <i class="bi bi-arrow-right" aria-hidden="true"></i>
