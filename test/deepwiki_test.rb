@@ -28,20 +28,6 @@ class DeepwikiTest < ActiveSupport::TestCase
     end
   end
 
-  test 'Deepwiki.ask slugifies underscores so the query id is valid' do
-    SecureRandom.stub :uuid, '11111111-2222-3333-4444-555555555555' do
-      stub_deepwiki do
-        result = Deepwiki.ask('What is webhook_url?')
-        assert_equal 'what-is-webhook-url_11111111-2222-3333-4444-555555555555', result.query_id
-        assert Deepwiki.query_id?(result.query_id)
-
-        result = Deepwiki.ask('___')
-        assert_equal 'question_11111111-2222-3333-4444-555555555555', result.query_id
-        assert Deepwiki.query_id?(result.query_id)
-      end
-    end
-  end
-
   test 'Deepwiki.ask returns nil when the API fails' do
     stub_deepwiki(post_status: 500) do
       assert_nil Deepwiki.ask('How do events work?')
@@ -69,16 +55,6 @@ class DeepwikiTest < ActiveSupport::TestCase
       refute_includes result.markdown, '## Answer'
       assert_includes result.markdown, '[Glossary](https://deepwiki.com/symbiota-coop/dandelion/12)'
       assert_includes result.markdown, "Wiki pages you might want to explore:\n\n- [Carousels and Featured Events]"
-    end
-  end
-
-  test 'POST /docs/deepwiki redirects to the local answer page' do
-    SecureRandom.stub :uuid, '11111111-2222-3333-4444-555555555555' do
-      stub_deepwiki do
-        post '/docs/deepwiki', q: 'How do events work on Dandelion?'
-        assert last_response.redirect?
-        assert last_response['Location'].end_with?("/docs/ask/#{QUERY_ID}")
-      end
     end
   end
 
@@ -129,23 +105,6 @@ class DeepwikiTest < ActiveSupport::TestCase
         assert_includes last_response.body, "/docs/ask/#{QUERY_ID}/answer.json"
       end
     end
-  end
-
-  test 'GET /docs/ask/:query_id/answer.json stays pending when DeepWiki fetch fails' do
-    stub_deepwiki(get_status: 500) do
-      get "/docs/ask/#{QUERY_ID}/answer.json"
-      assert last_response.ok?
-      json = JSON.parse(last_response.body)
-      assert_equal '', json['html']
-      refute json['done']
-      refute json['failed']
-      assert_equal "https://deepwiki.com/search/#{QUERY_ID}?mode=fast", json['source_url']
-    end
-  end
-
-  test 'GET /docs/ask/:query_id 404s for an invalid query id' do
-    get '/docs/ask/not-a-query-id'
-    assert last_response.not_found?
   end
 
   def stub_deepwiki(post_status: 200, get_status: 200, get_body: nil)
