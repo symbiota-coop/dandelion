@@ -1,39 +1,50 @@
 <div class="docs-main docs-ask">
-  <% if @deepwiki_error %>
-    <div class="alert alert-danger">
-      We couldn't start that question just now. Please try again, or
-      <a target="_blank" rel="noopener noreferrer" href="<%= Deepwiki::WIKI_URL %>">ask on DeepWiki</a>.
-    </div>
-    <%= partial :'docs/deepwiki' %>
-    <%= partial :'docs/support', locals: { skip_ai: true } %>
-  <% else %>
-    <h1><%= @title %></h1>
+  <% if @question %>
+    <h1><%= @question %></h1>
 
     <div
       id="deepwiki-answer"
-      data-deepwiki-stream="/docs/ask/<%= @result.query_id %>/answer.json"
-      <% if @result.finished? %>data-deepwiki-done="true"<% end %>
+      data-deepwiki-question="<%= @question %>"
+      data-deepwiki-mcp="https://mcp.deepwiki.com/mcp"
     >
-      <%= partial :'docs/deepwiki_answer' %>
+      <% 3.times do %>
+        <div class="flicker mb-3" style="width: <%= rand(55..95) %>%; background: rgba(0,0,0,0.1)">&nbsp;</div>
+      <% end %>
     </div>
+    <noscript>
+      <div class="alert alert-warning">
+        JavaScript is needed to answer here.
+        <a target="_blank" rel="noopener noreferrer" href="https://deepwiki.com/symbiota-coop/dandelion">Ask on DeepWiki</a>.
+      </div>
+    </noscript>
 
-    <div class="docs-deepwiki-source<%= ' d-none' unless @result.done? %>" id="deepwiki-source">
+    <div class="docs-deepwiki-source d-none" id="deepwiki-source">
       <p>
-        <a target="_blank" rel="noopener noreferrer" href="<%= @result.source_url %>">
+        <a target="_blank" rel="noopener noreferrer" href="https://deepwiki.com/symbiota-coop/dandelion">
           View this answer on DeepWiki
         </a>
       </p>
       <hr>
     </div>
 
-    <div class="<%= 'd-none' unless @result.finished? %>" id="deepwiki-ask">
+    <div class="d-none" id="deepwiki-ask">
       <p>
         Ask another question. Answers come from
-        <a target="_blank" rel="noopener noreferrer" href="<%= Deepwiki::WIKI_URL %>">our DeepWiki</a>.
+        <a target="_blank" rel="noopener noreferrer" href="https://deepwiki.com/symbiota-coop/dandelion">our DeepWiki</a>.
       </p>
       <%= partial :'docs/deepwiki' %>
       <%= partial :'docs/support', locals: { skip_ai: true } %>
     </div>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/dompurify/3.2.6/purify.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/marked/15.0.7/marked.min.js"></script>
     <script src="/javascripts/docs_ask.js?<%= @cachebuster %>"></script>
+  <% else %>
+    <h1>Ask DeepWiki</h1>
+    <p>
+      Answers come from
+      <a target="_blank" rel="noopener noreferrer" href="https://deepwiki.com/symbiota-coop/dandelion">our DeepWiki</a>.
+    </p>
+    <%= partial :'docs/deepwiki' %>
+    <%= partial :'docs/support', locals: { skip_ai: true } %>
   <% end %>
 </div>
