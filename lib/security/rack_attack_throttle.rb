@@ -16,6 +16,9 @@ BLOCKED_IP_RANGE = 'blocked ip range'.freeze
 bot_request = ->(request) { request.user_agent && BOT_USER_AGENT_PATTERNS.any? { |pattern| request.user_agent.downcase.include?(pattern) } }
 blocked_path = ->(request) { BLOCKED_PATH_PATTERNS.any? { |pattern| request.path.match?(pattern) } }
 throttled_path = ->(request) { THROTTLED_PATH_PATTERNS.any? { |pattern| request.path.match?(pattern) } }
+deepwiki_question = ->(request) { request.post? && request.path == '/docs/deepwiki' }
+deepwiki_fetch = ->(request) { request.get? && request.path.match?(%r{\A/docs/ask/[^/]+(?:/answer\.json)?\z}) }
+signed_in = ->(request) { request.session[:account_id].present? }
 filtered_listing = lambda do |request|
   request.params['q'] || request.params['search'] || request.params['carousel_ids']
 end
@@ -66,3 +69,21 @@ end
 Rack::Attack.throttle('throttle bots', limit: 1, period: 1.hour) do |request|
   "#{request.user_agent}:#{request.path}" if throttled_path.call(request) && bot_request.call(request)
 end
+
+throttle_deepwiki = lambda do |name, match, guests:, accounts:|
+  guest_limit, guest_period = guests
+  account_limit, account_period = accounts
+
+  Rack::Attack.throttle("deepwiki #{name} globally", limit: guest_limit, period: guest_period) do |request|
+    'global' if match.call(request) && !signed_in.call(request)
+  end
+
+  Rack::Attack.throttle("deepwiki #{name} signed in", limit: account_limit, period: account_period) do |request|
+    request.session[:account_id] if match.call(request)
+  end
+end
+
+throttle_deepwiki.call('questions', deepwiki_question, guests: [15, 1.minute], accounts: [30, 1.minute])
+throttle_deepwiki.call('question volume', deepwiki_question, guests: [100, 1.hour], accounts: [200, 1.hour])
+throttle_deepwiki.call('fetch burst', deepwiki_fetch, guests: [50, 5.seconds], accounts: [100, 5.seconds])
+throttle_deepwiki.call('fetch volume', deepwiki_fetch, guests: [600, 1.minute], accounts: [1200, 1.minute])

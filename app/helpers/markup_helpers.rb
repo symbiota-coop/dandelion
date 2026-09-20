@@ -1,4 +1,26 @@
 Dandelion::App.helpers do
+  def deepwiki_pending(query_id)
+    pending = session[:deepwiki_pending]
+    return unless pending.is_a?(Hash) && pending['query_id'] == query_id
+
+    pending
+  end
+
+  def deepwiki_answer_html(markdown)
+    return '' if markdown.to_s.strip.empty?
+
+    doc = Nokogiri::HTML.fragment(Sanitize.fragment(md(markdown), Sanitize::Config::DANDELION))
+    wrap_doc_tables(doc)
+    doc.css('a[href]').each do |a|
+      href = a['href'].to_s
+      next unless href.start_with?('http://', 'https://')
+
+      a['target'] = '_blank'
+      a['rel'] = 'noopener noreferrer'
+    end
+    doc.to_html
+  end
+
   def wrap_doc_tables(doc)
     doc.css('table').each do |table|
       table['class'] = ['table', 'table-bordered', table['class']].compact.join(' ')

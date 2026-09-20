@@ -5,56 +5,204 @@ class DeepwikiTest < ActiveSupport::TestCase
 
   QUERY_ID = 'how-do-events-work-on-dandelio_11111111-2222-3333-4444-555555555555'
 
-  test 'Deepwiki.normalize_question strips and truncates' do
-    assert_nil Deepwiki.normalize_question('   ')
-    assert_nil Deepwiki.normalize_question(nil)
-    assert_equal 'How do events work?', Deepwiki.normalize_question('  How do events work?  ')
-    assert_equal 'a' * Deepwiki::QUESTION_LIMIT, Deepwiki.normalize_question('a' * (Deepwiki::QUESTION_LIMIT + 10))
+  test 'Deepwiki.start builds a pending result without calling the API' do
+    SecureRandom.stub :uuid, '11111111-2222-3333-4444-555555555555' do
+      stub_deepwiki do |requests|
+        result = Deepwiki.start('How do events work on Dandelion?')
+
+        assert_equal 0, requests.length
+        assert_equal QUERY_ID, result.query_id
+        assert_equal 'How do events work on Dandelion?', result.question
+        assert_equal 'pending', result.state
+      end
+    end
   end
 
-  test 'Deepwiki.query_id? accepts DeepWiki search ids' do
-    assert Deepwiki.query_id?(QUERY_ID)
-    refute Deepwiki.query_id?('ask')
-    refute Deepwiki.query_id?('not-a-query')
+  test 'Deepwiki.ask posts the question and returns a pending result' do
+    SecureRandom.stub :uuid, '11111111-2222-3333-4444-555555555555' do
+      stub_deepwiki do |requests|
+        result = Deepwiki.ask('How do events work on Dandelion?', query_id: QUERY_ID)
+
+        assert_equal 1, requests.length
+        body = requests.first
+        assert_equal 'fast', body['mode']
+        assert_equal ['symbiota-coop/dandelion'], body['repo_names']
+        assert_equal 'ada.deepwiki_public', body['source']
+        assert_includes body['user_query'], 'How do events work on Dandelion?'
+        assert_includes body['user_query'], 'Never mention file names'
+        assert_includes body['user_query'], 'Wiki pages you might want to explore'
+        assert_equal '', body['additional_context']
+        refute_includes result.question, 'relevant_context'
+        assert_equal QUERY_ID, body['query_id']
+        assert_equal QUERY_ID, result.query_id
+        assert_equal 'How do events work on Dandelion?', result.question
+        assert_equal 'pending', result.state
+        assert_equal "https://deepwiki.com/search/#{QUERY_ID}?mode=fast", result.source_url
+      end
+    end
   end
 
-  test 'GET /docs/ask renders a question for the browser to send to DeepWiki' do
-    get '/docs/ask', q: 'How do events work on Dandelion?'
-    assert last_response.ok?
-    assert_includes last_response.body, 'How do events work on Dandelion?'
-    assert_includes last_response.body, 'data-deepwiki-question="How do events work on Dandelion?"'
-    assert_includes last_response.body, 'https://mcp.deepwiki.com/mcp'
-    assert_includes last_response.body, '/javascripts/docs_ask.js'
-    assert_includes last_response.body, 'flicker'
-    refute_includes last_response.body, '/docs/deepwiki'
-    refute_includes last_response.body, 'answer.json'
+  test 'Deepwiki.ask returns nil when the API fails' do
+    stub_deepwiki(post_status: 500) do
+      assert_nil Deepwiki.ask('How do events work?')
+    end
   end
 
-  test 'GET /docs/ask without a question shows the form' do
-    get '/docs/ask'
-    assert last_response.ok?
-    assert_includes last_response.body, 'Ask DeepWiki'
-    assert_includes last_response.body, 'action="/docs/ask"'
-    assert_includes last_response.body, 'method="get"'
-    refute_includes last_response.body, 'data-deepwiki-question'
+  test 'Deepwiki.ask returns nil for a blank question' do
+    stub_deepwiki do |requests|
+      assert_nil Deepwiki.ask('   ')
+      assert_nil Deepwiki.ask(nil)
+      assert_equal 0, requests.length
+    end
   end
 
-  test 'GET /docs/events includes the client-side DeepWiki form' do
-    get '/docs/events'
-    assert last_response.ok?
-    assert_includes last_response.body, 'action="/docs/ask"'
-    assert_includes last_response.body, 'method="get"'
-    assert_includes last_response.body, 'our DeepWiki'
+  test 'Deepwiki.fetch unwraps the question and joins answer chunks' do
+    stub_deepwiki(get_body: {
+      'queries' => [{
+        'user_query' => '<relevant_context>This query was sent from the Dandelion docs page: Events.</relevant_context>How do ticket types work?',
+        'state' => 'done',
+        'error' => nil,
+        'response' => [
+          { 'type' => 'chunk', 'data' => "## Answer\n\nTicket types set the price.\n" },
+          { 'type' => 'reference', 'data' => { 'file_path' => 'models/ticket_type.rb' } },
+          { 'type' => 'chunk', 'data' => "See [Glossary (symbiota-coop/dandelion)](/wiki/symbiota-coop/dandelion#12).\nThey can be:\n- Free\n- Paid\n\nWiki pages you might want to explore:\n- [Carousels and Featured Events (symbiota-coop/dandelion)](/wiki/symbiota-coop/dandelion#6.4)\n" },
+          { 'type' => 'done' }
+        ]
+      }]
+    }) do
+      result = Deepwiki.fetch(QUERY_ID)
+      assert_equal 'How do ticket types work?', result.question
+      assert result.done?
+      assert_includes result.markdown, 'Ticket types set the price.'
+      refute_includes result.markdown, '## Answer'
+      assert_includes result.markdown, '[Glossary](https://deepwiki.com/symbiota-coop/dandelion/12)'
+      assert_includes result.markdown, "They can be:\n\n- Free"
+      refute_includes result.markdown, 'Wiki pages you might want to explore'
+      refute_includes result.markdown, 'Carousels and Featured Events'
+    end
   end
 
-  test 'GET /docs/ask/:query_id redirects to the DeepWiki search page' do
-    get "/docs/ask/#{QUERY_ID}"
-    assert last_response.redirect?
-    assert_equal "https://deepwiki.com/search/#{QUERY_ID}?mode=fast", last_response.headers['Location']
+  test 'GET /docs/ask/:query_id/answer.json streams the rendered answer' do
+    stub_deepwiki(get_body: {
+      'queries' => [{
+        'user_query' => 'How do events work?',
+        'state' => 'pending',
+        'error' => nil,
+        'response' => [{ 'type' => 'chunk', 'data' => 'Events live under organisations.' }]
+      }]
+    }) do
+      get "/docs/ask/#{QUERY_ID}/answer.json"
+      assert last_response.ok?
+      json = JSON.parse(last_response.body)
+      assert_includes json['html'], 'Events live under organisations.'
+      refute json['done']
+      refute json['failed']
+      assert_equal "https://deepwiki.com/search/#{QUERY_ID}?mode=fast", json['source_url']
+    end
   end
 
-  test 'GET /docs/ask/:query_id 404s for an invalid id' do
-    get '/docs/ask/not-a-query'
-    assert last_response.not_found?
+  test 'GET /docs/ask/:query_id renders the question and DeepWiki link' do
+    stub_deepwiki(get_body: {
+      'queries' => [{
+        'user_query' => 'How do events work?',
+        'state' => 'done',
+        'error' => nil,
+        'response' => [{ 'type' => 'chunk', 'data' => 'Events live under organisations.' }]
+      }]
+    }) do
+      get "/docs/ask/#{QUERY_ID}"
+      assert last_response.ok?
+      assert_includes last_response.body, 'How do events work?'
+      assert_includes last_response.body, 'Events live under organisations.'
+      assert_includes last_response.body, "https://deepwiki.com/search/#{QUERY_ID}?mode=fast"
+      assert_includes last_response.body, 'View this answer on DeepWiki'
+    end
+  end
+
+  test 'POST /docs/deepwiki redirects to a pending page without calling DeepWiki' do
+    SecureRandom.stub :uuid, '11111111-2222-3333-4444-555555555555' do
+      stub_deepwiki do |requests|
+        post '/docs/deepwiki', q: 'How do events work on Dandelion?'
+        assert last_response.redirect?
+        assert_includes last_response.headers['Location'], "/docs/ask/#{QUERY_ID}"
+        assert_equal 0, requests.length
+
+        follow_redirect!
+        assert last_response.ok?
+        assert_includes last_response.body, 'How do events work on Dandelion?'
+        assert_includes last_response.body, "/docs/ask/#{QUERY_ID}/answer.json"
+        assert_includes last_response.body, 'flicker'
+        assert_equal 0, requests.length
+      end
+    end
+  end
+
+  test 'GET /docs/ask/:query_id/answer.json starts the DeepWiki question after submit' do
+    SecureRandom.stub :uuid, '11111111-2222-3333-4444-555555555555' do
+      stub_deepwiki do |requests|
+        post '/docs/deepwiki', q: 'How do events work on Dandelion?'
+        follow_redirect!
+        get "/docs/ask/#{QUERY_ID}/answer.json"
+
+        assert last_response.ok?
+        assert_equal 1, requests.length
+        assert_equal QUERY_ID, requests.first['query_id']
+        assert_includes requests.first['user_query'], 'How do events work on Dandelion?'
+      end
+    end
+  end
+
+  test 'GET /docs/ask/:query_id/answer.json fails when DeepWiki cannot start the question' do
+    SecureRandom.stub :uuid, '11111111-2222-3333-4444-555555555555' do
+      stub_deepwiki(post_status: 500) do
+        post '/docs/deepwiki', q: 'How do events work on Dandelion?'
+        follow_redirect!
+        get "/docs/ask/#{QUERY_ID}/answer.json"
+
+        assert last_response.ok?
+        json = JSON.parse(last_response.body)
+        assert json['failed']
+        refute json['done']
+        assert_equal "https://deepwiki.com/search/#{QUERY_ID}?mode=fast", json['source_url']
+      end
+    end
+  end
+
+  test 'GET /docs/ask/:query_id stays pending when DeepWiki fetch fails' do
+    stub_deepwiki(get_status: 500) do
+      get "/docs/ask/#{QUERY_ID}"
+      assert last_response.ok?
+      assert_includes last_response.body, 'Ask DeepWiki'
+      assert_includes last_response.body, "/docs/ask/#{QUERY_ID}/answer.json"
+    end
+  end
+
+  def stub_deepwiki(post_status: 200, get_status: 200, get_body: nil)
+    requests = []
+    get_body ||= {
+      'queries' => [{
+        'user_query' => 'How do events work?',
+        'state' => 'pending',
+        'error' => nil,
+        'response' => []
+      }]
+    }
+
+    connection_builder = lambda do |*args, **kwargs, &block|
+      Faraday::Connection.new(*args, **kwargs) do |f|
+        block&.call(f)
+        f.adapter :test do |stub|
+          stub.post('/ada/query') do |env|
+            requests << JSON.parse(env.body)
+            [post_status, { 'Content-Type' => 'application/json' }, '{"status":"success"}']
+          end
+          stub.get(%r{\A/ada/query/}) do
+            [get_status, { 'Content-Type' => 'application/json' }, get_body.to_json]
+          end
+        end
+      end
+    end
+
+    Faraday.stub(:new, connection_builder) { yield requests }
   end
 end

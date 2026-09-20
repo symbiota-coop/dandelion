@@ -41,7 +41,7 @@
 
 <% unless ENV['CREATE_VIDEO'] %>
   <script>
-    window.paceOptions = { ajax: { trackWebSockets: false, ignoreURLs: [/mcp\.deepwiki\.com/] }, restartOnPushState: false };
+    window.paceOptions = { ajax: { trackWebSockets: false, ignoreURLs: [/answer\.json/] }, restartOnPushState: false };
   </script>
   <script src="/infinite_admin/plugins/loader/pace/pace.min.js" defer></script>
 <% end %>

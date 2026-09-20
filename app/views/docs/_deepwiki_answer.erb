@@ -1,0 +1,17 @@
+<% if @result.failed? %>
+  <div class="alert alert-danger">
+    DeepWiki couldn't finish this answer.
+    <a target="_blank" rel="noopener noreferrer" href="<%= @result.source_url %>">Try it on DeepWiki</a>.
+  </div>
+<% else %>
+  <% unless @result.markdown.empty? %>
+    <div class="docs-deepwiki-answer">
+      <%== deepwiki_answer_html(@result.markdown) %>
+    </div>
+  <% end %>
+  <% unless @result.finished? %>
+    <% 3.times do %>
+      <div class="flicker mb-3" style="width: <%= rand(55..95) %>%; background: rgba(0,0,0,0.1)">&nbsp;</div>
+    <% end %>
+  <% end %>
+<% end %>
