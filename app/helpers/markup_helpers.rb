@@ -2,15 +2,8 @@ Dandelion::App.helpers do
   def deepwiki_answer_html(markdown)
     return '' if markdown.to_s.strip.empty?
 
-    html = md(markdown)
-    doc = Nokogiri::HTML.fragment(Sanitize.fragment(html, Sanitize::Config::DANDELION))
-    doc.css('table').each do |table|
-      table['class'] = ['table', 'table-bordered', table['class']].compact.join(' ')
-      wrapper = Nokogiri::XML::Node.new('div', table.document)
-      wrapper['class'] = 'doc-table-wrap'
-      table.add_previous_sibling(wrapper)
-      wrapper.add_child(table)
-    end
+    doc = Nokogiri::HTML.fragment(Sanitize.fragment(md(markdown), Sanitize::Config::DANDELION))
+    wrap_doc_tables(doc)
     doc.css('a[href]').each do |a|
       href = a['href'].to_s
       next unless href.start_with?('http://', 'https://')
@@ -19,6 +12,16 @@ Dandelion::App.helpers do
       a['rel'] = 'noopener noreferrer'
     end
     doc.to_html
+  end
+
+  def wrap_doc_tables(doc)
+    doc.css('table').each do |table|
+      table['class'] = ['table', 'table-bordered', table['class']].compact.join(' ')
+      wrapper = Nokogiri::XML::Node.new('div', table.document)
+      wrapper['class'] = 'doc-table-wrap'
+      table.add_previous_sibling(wrapper)
+      wrapper.add_child(table)
+    end
   end
 
   def md(text, hard_wrap: false)
@@ -59,13 +62,7 @@ Dandelion::App.helpers do
       quotes.each { |quote| details.add_child(quote) }
     end
 
-    doc.css('table').each do |table|
-      table['class'] = ['table', 'table-bordered', table['class']].compact.join(' ')
-      wrapper = Nokogiri::XML::Node.new('div', table.document)
-      wrapper['class'] = 'doc-table-wrap'
-      table.add_previous_sibling(wrapper)
-      wrapper.add_child(table)
-    end
+    wrap_doc_tables(doc)
 
     following_text = lambda do |el|
       parts = []

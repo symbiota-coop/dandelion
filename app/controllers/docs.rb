@@ -5,7 +5,7 @@ Dandelion::App.controller do
   end
 
   post '/docs/deepwiki' do
-    @result = Deepwiki.ask(params[:q], page: params[:wiki])
+    @result = Deepwiki.ask(params[:q])
     redirect "/docs/ask/#{@result.query_id}" if @result
 
     @title = 'Ask DeepWiki'
@@ -14,8 +14,7 @@ Dandelion::App.controller do
   end
 
   get '/docs/ask/:query_id/answer.json' do
-    halt 404 unless Deepwiki.query_id?(params[:query_id])
-    @result = Deepwiki.fetch(params[:query_id]) || Deepwiki.pending(params[:query_id])
+    halt 404 unless (@result = Deepwiki.result(params[:query_id]))
 
     content_type :json
     {
@@ -27,10 +26,9 @@ Dandelion::App.controller do
   end
 
   get '/docs/ask/:query_id' do
-    halt 404 unless Deepwiki.query_id?(params[:query_id])
-    @result = Deepwiki.fetch(params[:query_id]) || Deepwiki.pending(params[:query_id])
+    halt 404 unless (@result = Deepwiki.result(params[:query_id]))
 
-    @title = [@result.question, 'Ask DeepWiki'].reject(&:empty?).first
+    @title = @result.question.empty? ? 'Ask DeepWiki' : @result.question
     erb :'docs/ask'
   end
 

@@ -1,18 +1,12 @@
 class Deepwiki
   REPO = 'symbiota-coop/dandelion'
   API_HOST = 'https://api.devin.ai'
-  RESULT_URL = 'https://deepwiki.com/search'
-  WIKI_URL = "https://deepwiki.com/#{REPO}"
+  HOST = 'https://deepwiki.com'
+  RESULT_URL = "#{HOST}/search"
+  WIKI_URL = "#{HOST}/#{REPO}"
   MODE = 'fast'
   QUESTION_LIMIT = 2_000
   QUERY_ID = /\A[a-z0-9-]{1,80}_[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}\z/i
-  PAGES = {
-    'events' => 'Events',
-    'organisations' => 'Organisations',
-    'gatherings' => 'Gatherings',
-    'mailer' => 'Mailer',
-    'integrations' => 'Zapier & MCP'
-  }.freeze
   USER_FOCUS = <<~TEXT.freeze
     Answer for a Dandelion organiser or attendee, not a developer.
     Explain what to click and what happens in the product.
@@ -43,8 +37,8 @@ class Deepwiki
       query_id.to_s.match?(QUERY_ID)
     end
 
-    def ask(question, page: nil)
-      new.ask(question, page: page)
+    def ask(question)
+      new.ask(question)
     end
 
     def fetch(query_id)
@@ -54,20 +48,24 @@ class Deepwiki
     def pending(query_id, question: nil)
       Result.new(query_id: query_id, question: question.to_s, markdown: '', state: 'pending')
     end
+
+    def result(query_id)
+      return unless query_id?(query_id)
+
+      fetch(query_id) || pending(query_id)
+    end
   end
 
-  def ask(question, page: nil)
+  def ask(question)
     question = question.to_s.strip
     return if question.empty?
 
     question = question[0, QUESTION_LIMIT]
     query_id = query_id_for(question)
     response = connection.post('/ada/query') do |req|
-      req.headers['Origin'] = 'https://deepwiki.com'
-      req.headers['Referer'] = 'https://deepwiki.com/'
       req.body = {
         mode: MODE,
-        user_query: wrapped_query(question, page),
+        user_query: question,
         keywords: [],
         repo_names: [REPO],
         additional_context: USER_FOCUS,
@@ -89,10 +87,7 @@ class Deepwiki
   def fetch(query_id)
     return unless self.class.query_id?(query_id)
 
-    response = connection.get("/ada/query/#{query_id}") do |req|
-      req.headers['Origin'] = 'https://deepwiki.com'
-      req.headers['Referer'] = 'https://deepwiki.com/'
-    end
+    response = connection.get("/ada/query/#{query_id}")
     return unless response.success?
 
     data = response.body
@@ -116,20 +111,14 @@ class Deepwiki
 
   def connection
     Faraday.new(url: API_HOST) do |f|
+      f.headers['Origin'] = HOST
+      f.headers['Referer'] = "#{HOST}/"
       f.request :json
       f.response :json, content_type: /json/
       f.options.timeout = 10
       f.options.open_timeout = 5
       f.adapter Faraday.default_adapter
     end
-  end
-
-  def wrapped_query(question, page)
-    "<relevant_context>This query was sent from the Dandelion docs page: #{page_title(page)}.</relevant_context>#{question}"
-  end
-
-  def page_title(page)
-    PAGES[page.to_s.strip.downcase] || 'Overview'
   end
 
   def unwrap_question(user_query)
@@ -140,13 +129,9 @@ class Deepwiki
     markdown = Array(items).filter_map { |item| item['data'] if item['type'] == 'chunk' }.join
     separate_lists(
       markdown.sub(/\A\s*## Answer\s*/i, '')
-              .gsub(%r{\]\(/wiki/([^)#]+)(?:\#([^)]+))?\)}x) do
-                path = Regexp.last_match(1)
-                section = Regexp.last_match(2)
-                section ? "](https://deepwiki.com/#{path}/#{section})" : "](https://deepwiki.com/#{path})"
-              end
-              .gsub('](/symbiota-coop/', '](https://deepwiki.com/symbiota-coop/')
-              .gsub(%r{\[([^\]]+?) \(symbiota-coop/dandelion\)\]}, '[\1]')
+              .gsub(%r{\]\(/wiki/([^)#]+)(?:\#([^)]+))?\)}x) { "](#{HOST}/#{[Regexp.last_match(1), Regexp.last_match(2)].compact.join('/')})" }
+              .gsub('](/symbiota-coop/', "](#{HOST}/symbiota-coop/")
+              .gsub(%r{\[([^\]]+?) \(#{Regexp.escape(REPO)}\)\]}, '[\1]')
               .gsub(/ +([.,;:])/, '\1')
     )
   end
@@ -161,7 +146,7 @@ class Deepwiki
   end
 
   def query_id_for(question)
-    slug = question.downcase.gsub(/[^a-z0-9\s]/, '').gsub(/\s+/, '-')[0, 30].to_s.sub(/-+\z/, '')
+    slug = question.parameterize[0, 30].to_s.sub(/-+\z/, '')
     slug = 'question' if slug.empty?
     "#{slug}_#{SecureRandom.uuid}"
   end

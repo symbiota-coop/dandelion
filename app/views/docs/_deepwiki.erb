@@ -1,8 +1,5 @@
 <div class="docs-deepwiki mb-3">
   <% form_tag '/docs/deepwiki', class: 'no-trigger' do %>
-    <% if @doc_page %>
-      <%= hidden_field_tag :wiki, value: @doc_page[:slug] %>
-    <% end %>
     <div class="ask-box">
       <label class="sr-only" for="deepwiki-question">Ask a question about Dandelion</label>
       <%= text_area_tag :q, id: 'deepwiki-question', class: 'form-control autosize', rows: 2, placeholder: 'How do I boost an event?', required: true %>

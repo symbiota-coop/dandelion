@@ -24,15 +24,23 @@
     return el ? (el.textContent || '').length : 0
   }
 
-  function htmlTextLength (html) {
+  function parseHtml (html) {
     var div = document.createElement('div')
     div.innerHTML = html || ''
-    return textLength(div)
+    return div
+  }
+
+  function eachChild (node, fn) {
+    var children = Array.prototype.slice.call(node.childNodes)
+    for (var i = 0; i < children.length; i++) fn(children[i])
+  }
+
+  function htmlTextLength (html) {
+    return textLength(parseHtml(html))
   }
 
   function htmlUpTo (html, maxChars) {
-    var div = document.createElement('div')
-    div.innerHTML = html || ''
+    var div = parseHtml(html)
     var left = maxChars
 
     var walk = function (node) {
@@ -45,13 +53,10 @@
         left -= node.data.length
         return
       }
-      if (node.nodeType !== 1) return
-      var children = Array.prototype.slice.call(node.childNodes)
-      for (var i = 0; i < children.length; i++) walk(children[i])
+      if (node.nodeType === 1) eachChild(node, walk)
     }
 
-    var children = Array.prototype.slice.call(div.childNodes)
-    for (var i = 0; i < children.length; i++) walk(children[i])
+    eachChild(div, walk)
     return div.innerHTML
   }
 
@@ -120,13 +125,8 @@
     $.getJSON(url).done(function (data) {
       if (failed) return
 
-      failed = !!data.failed
+      if (data.failed) return fail()
       done = !!data.done
-      if (failed) {
-        render()
-        stop()
-        return
-      }
       if (data.html && data.html !== targetHtml) {
         targetHtml = data.html
         targetChars = htmlTextLength(targetHtml)
@@ -144,7 +144,7 @@
     tickTimer = null
     timeoutTimer = null
     root.setAttribute('data-deepwiki-done', 'true')
-    if (done && !failed) $('#deepwiki-source').removeClass('d-none')
+    if (done) $('#deepwiki-source').removeClass('d-none')
     $('#deepwiki-ask').removeClass('d-none')
   }
 

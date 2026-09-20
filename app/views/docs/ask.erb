@@ -5,8 +5,9 @@
       <a target="_blank" rel="noopener noreferrer" href="<%= Deepwiki::WIKI_URL %>">ask on DeepWiki</a>.
     </div>
     <%= partial :'docs/deepwiki' %>
+    <%= partial :'docs/support', locals: { skip_ai: true } %>
   <% else %>
-    <h1 class="docs-deepwiki-question"><%= @title %></h1>
+    <h1><%= @title %></h1>
 
     <div
       id="deepwiki-answer"
@@ -16,7 +17,7 @@
       <%= partial :'docs/deepwiki_answer' %>
     </div>
 
-    <div class="docs-deepwiki-source<%= ' d-none' unless @result.finished? && !@result.failed? %>" id="deepwiki-source">
+    <div class="docs-deepwiki-source<%= ' d-none' unless @result.done? %>" id="deepwiki-source">
       <p>
         <a target="_blank" rel="noopener noreferrer" href="<%= @result.source_url %>">
           View this answer on DeepWiki
@@ -31,6 +32,7 @@
         <a target="_blank" rel="noopener noreferrer" href="<%= Deepwiki::WIKI_URL %>">our DeepWiki</a>.
       </p>
       <%= partial :'docs/deepwiki' %>
+      <%= partial :'docs/support', locals: { skip_ai: true } %>
     </div>
     <script src="/javascripts/docs_ask.js?<%= @cachebuster %>"></script>
   <% end %>

@@ -1,9 +1,11 @@
+<% unless defined?(skip_ai) && skip_ai %>
 <h3>Get an instant answer from AI</h3>
 <p>
   Answers come from
   <a target="_blank" rel="noopener noreferrer" href="<%= Deepwiki::WIKI_URL %>">our DeepWiki</a>.
 </p>
 <%= partial :'docs/deepwiki' %>
+<% end %>
 
 <h3>Get an answer from a human</h3>
 <p>
