@@ -7,9 +7,10 @@
       data-deepwiki-question="<%= @question %>"
       data-deepwiki-mcp="https://mcp.deepwiki.com/mcp"
     >
-      <% 3.times do %>
-        <div class="flicker mb-3" style="width: <%= rand(55..95) %>%; background: rgba(0,0,0,0.1)">&nbsp;</div>
-      <% end %>
+      <div class="docs-ask-status text-muted" role="status" aria-live="polite" aria-busy="true">
+        <span class="sr-only">Finding an answer</span>
+        <span class="docs-ask-status-word" aria-hidden="true">Thinking...</span>
+      </div>
     </div>
     <noscript>
       <div class="alert alert-warning">

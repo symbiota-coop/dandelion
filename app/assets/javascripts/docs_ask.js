@@ -3,6 +3,38 @@
 (function () {
   var TICK_MS = 30
   var TIMEOUT_MS = 120000
+  var VERB_MS = 3000
+  var FADE_MS = 1000
+  // https://gist.github.com/TeamDman/c7ef26ca8f2b64b2770681438a65e830
+  var VERBS = [
+    'Accomplishing', 'Actioning', 'Actualizing', 'Architecting', 'Baking', 'Beaming', "Beboppin'",
+    'Befuddling', 'Billowing', 'Blanching', 'Bloviating', 'Boogieing', 'Boondoggling', 'Booping',
+    'Bootstrapping', 'Brewing', 'Bunning', 'Burrowing', 'Calculating', 'Canoodling', 'Caramelizing',
+    'Cascading', 'Catapulting', 'Cerebrating', 'Channeling', 'Channelling', 'Choreographing', 'Churning',
+    'Clauding', 'Coalescing', 'Cogitating', 'Combobulating', 'Composing', 'Computing', 'Concocting',
+    'Considering', 'Contemplating', 'Cooking', 'Crafting', 'Creating', 'Crunching', 'Crystallizing',
+    'Cultivating', 'Deciphering', 'Deliberating', 'Determining', 'Dilly-dallying', 'Discombobulating',
+    'Doing', 'Doodling', 'Drizzling', 'Ebbing', 'Effecting', 'Elucidating', 'Embellishing', 'Enchanting',
+    'Envisioning', 'Evaporating', 'Fermenting', 'Fiddle-faddling', 'Finagling', 'Flambéing',
+    'Flibbertigibbeting', 'Flowing', 'Flummoxing', 'Fluttering', 'Forging', 'Forming', 'Frolicking',
+    'Frosting', 'Gallivanting', 'Galloping', 'Garnishing', 'Generating', 'Gesticulating', 'Germinating',
+    'Gitifying', 'Grooving', 'Gusting', 'Harmonizing', 'Hashing', 'Hatching', 'Herding', 'Honking',
+    'Hullaballooing', 'Hyperspacing', 'Ideating', 'Imagining', 'Improvising', 'Incubating', 'Inferring',
+    'Infusing', 'Ionizing', 'Jitterbugging', 'Julienning', 'Kneading', 'Leavening', 'Levitating',
+    'Lollygagging', 'Manifesting', 'Marinating', 'Meandering', 'Metamorphosing', 'Misting', 'Moonwalking',
+    'Moseying', 'Mulling', 'Mustering', 'Musing', 'Nebulizing', 'Nesting', 'Newspapering', 'Noodling',
+    'Nucleating', 'Orbiting', 'Orchestrating', 'Osmosing', 'Perambulating', 'Percolating', 'Perusing',
+    'Philosophising', 'Photosynthesizing', 'Pollinating', 'Pondering', 'Pontificating', 'Pouncing',
+    'Precipitating', 'Prestidigitating', 'Processing', 'Proofing', 'Propagating', 'Puttering', 'Puzzling',
+    'Quantumizing', 'Razzle-dazzling', 'Razzmatazzing', 'Recombobulating', 'Reticulating', 'Roosting',
+    'Ruminating', 'Sautéing', 'Scampering', 'Schlepping', 'Scurrying', 'Seasoning', 'Shenaniganing',
+    'Shimmying', 'Simmering', 'Skedaddling', 'Sketching', 'Slithering', 'Smooshing', 'Sock-hopping',
+    'Spelunking', 'Spinning', 'Sprouting', 'Stewing', 'Sublimating', 'Swirling', 'Swooping', 'Symbioting',
+    'Synthesizing', 'Tempering', 'Thinking', 'Thundering', 'Tinkering', 'Tomfoolering', 'Topsy-turvying',
+    'Transfiguring', 'Transmuting', 'Twisting', 'Undulating', 'Unfurling', 'Unravelling', 'Vibing',
+    'Waddling', 'Wandering', 'Warping', 'Whatchamacalliting', 'Whirlpooling', 'Whirring', 'Whisking',
+    'Wibbling', 'Working', 'Wrangling', 'Zesting', 'Zigzagging'
+  ]
   var REPO = 'symbiota-coop/dandelion'
   var HOST = 'https://deepwiki.com'
   var WIKI_URL = HOST + '/' + REPO
@@ -23,6 +55,8 @@
   var failed = false
   var tickTimer = null
   var timeoutTimer = null
+  var verbTimer = null
+  var fadeTimer = null
 
   function textLength (el) {
     return el ? (el.textContent || '').length : 0
@@ -173,14 +207,46 @@
     return ''
   }
 
+  function pickVerb (current) {
+    var verb
+    do {
+      verb = VERBS[Math.floor(Math.random() * VERBS.length)] + '...'
+    } while (VERBS.length > 1 && verb === current)
+    return verb
+  }
+
+  function stopVerbs () {
+    if (verbTimer) window.clearInterval(verbTimer)
+    if (fadeTimer) window.clearTimeout(fadeTimer)
+    verbTimer = null
+    fadeTimer = null
+  }
+
+  function startVerbs () {
+    var el = root.querySelector('.docs-ask-status-word')
+    if (!el) return
+    el.textContent = pickVerb(el.textContent)
+    if (reduceMotion) return
+    verbTimer = window.setInterval(function () {
+      el.classList.add('is-fading')
+      fadeTimer = window.setTimeout(function () {
+        if (!el.parentNode) return
+        el.textContent = pickVerb(el.textContent)
+        el.classList.remove('is-fading')
+      }, FADE_MS)
+    }, VERB_MS)
+  }
+
   function render () {
     if (failed) {
+      stopVerbs()
       var href = sourceUrl()
       root.innerHTML = '<div class="alert alert-danger">DeepWiki couldn\'t finish this answer. <a target="_blank" rel="noopener noreferrer" href="' + href + '">Try it on DeepWiki</a>.</div>'
       return
     }
     if (!targetHtml) return
 
+    stopVerbs()
     var html = (done && shownChars >= targetChars) || reduceMotion ? targetHtml : htmlUpTo(targetHtml, shownChars)
     root.innerHTML = '<div class="docs-deepwiki-answer">' + html + '</div>'
   }
@@ -220,6 +286,7 @@
     if (timeoutTimer) window.clearTimeout(timeoutTimer)
     tickTimer = null
     timeoutTimer = null
+    stopVerbs()
     if (done) $('#deepwiki-source').removeClass('d-none')
     $('#deepwiki-ask').removeClass('d-none')
   }
@@ -266,5 +333,6 @@
 
   tickTimer = window.setInterval(step, TICK_MS)
   timeoutTimer = window.setTimeout(fail, TIMEOUT_MS)
+  startVerbs()
   ask()
 })()

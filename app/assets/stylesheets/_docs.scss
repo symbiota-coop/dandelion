@@ -298,6 +298,20 @@
   margin-left: auto;
   margin-right: auto;
 
+  .docs-ask-status {
+    min-height: 1.5em;
+  }
+
+  .docs-ask-status-word {
+    display: inline-block;
+    opacity: 1;
+    transition: opacity 1s ease;
+  }
+
+  .docs-ask-status-word.is-fading {
+    opacity: 0;
+  }
+
   .docs-deepwiki-source {
     margin-top: 1.5rem;
 
@@ -308,6 +322,12 @@
     hr {
       margin: 1.5rem 0;
     }
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .docs-ask .docs-ask-status-word {
+    transition: none;
   }
 }
 
