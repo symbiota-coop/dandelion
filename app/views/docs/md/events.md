@@ -236,7 +236,7 @@ Evergreen events are different from **recordings of dated live events** (see abo
 
 Click the dropdown for your event (/activity/local group/organisation), and select Feedback.
 
-- **If someone allows their written answers to be quoted publicly** and the form has a single question, an extract is suggested (AI picks one or two sentences from longer answers). You can edit it in the box, or click **Show an extract** if none has appeared yet.
+- **If someone allows their written answers to be quoted publicly** and the form has a single question, an extract is suggested (AI picks one or two sentences, or nothing if the answer is not suitable to quote). You can edit it in the box, or click **Show an extract** if none has appeared yet.
 - **If a piece of feedback has no extract control,** it means the person that submitted the feedback doesn't want it shown publicly.
 
 ## Discount codes

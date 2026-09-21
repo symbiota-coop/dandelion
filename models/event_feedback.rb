@@ -171,9 +171,6 @@ class EventFeedback
   handle_asynchronously :generate_public_answers
 
   def public_answer_extract(answer)
-    sentences = answer.strip.split(/(?<=[.!?])\s+/).map(&:strip).reject(&:blank?)
-    return answer.strip if sentences.length <= 2
-
     candidate = OpenRouter.chat(%(Pick one or two sentences from the feedback below to quote publicly.
 
 Further instructions (don't mention in your response):
