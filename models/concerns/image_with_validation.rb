@@ -1,10 +1,15 @@
 module ImageWithValidation
   extend ActiveSupport::Concern
 
+  MAX_IMAGE_BYTES = 20 * 1024 * 1024
+
   included do
     dragonfly_accessor :image do
       after_assign do |attachment|
-        if attachment.image?
+        if attachment.size.to_i > MAX_IMAGE_BYTES
+          @image_too_large = true
+          attachment.assign(nil)
+        elsif attachment.image?
           if attachment.format != 'jpeg'
             attachment.convert('-format jpeg')
             attachment.name = "#{SecureRandom.uuid}.jpeg"
@@ -20,6 +25,7 @@ module ImageWithValidation
     handle_asynchronously :warm_image_derivatives
 
     before_validation :validate_image_format
+    before_validation :validate_image_size
     before_validation :set_has_image
   end
 
@@ -63,6 +69,10 @@ module ImageWithValidation
 
   def set_has_image
     self.has_image = image.present?
+  end
+
+  def validate_image_size
+    errors.add(:image, 'must be smaller than 20 MB') if @image_too_large
   end
 
   def validate_image_format
