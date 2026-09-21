@@ -162,6 +162,9 @@ class EventFeedback
     extract = public_answer_extract(a)
     return unless extract.present?
 
+    reload
+    return if public_answers.present?
+
     self.public_answers = [[q, extract]]
     save
   end
