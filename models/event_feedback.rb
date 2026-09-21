@@ -86,6 +86,7 @@ class EventFeedback
   end
 
   after_create :send_feedback
+  after_create :generate_public_answers, if: -> { publicly_visible? && answers&.length == 1 }
   def send_feedback
     return unless event
 
@@ -148,6 +149,48 @@ class EventFeedback
     return unless event
 
     Stash.find_by(key: "/events/#{event.id}/feedback_report")&.destroy
+  end
+
+  def generate_public_answers
+    return unless publicly_visible?
+    return if public_answers.present?
+    return unless answers&.length == 1
+
+    q, a = answers.first
+    return unless a.present?
+
+    extract = public_answer_extract(a)
+    return unless extract.present?
+
+    self.public_answers = [[q, extract]]
+    save
+  end
+  handle_asynchronously :generate_public_answers
+
+  def public_answer_extract(answer)
+    sentences = answer.strip.split(/(?<=[.!?])\s+/).map(&:strip).reject(&:blank?)
+    return answer.strip if sentences.length <= 2
+
+    candidate = OpenRouter.chat(%(Pick one or two sentences from the feedback below to quote publicly.
+
+Further instructions (don't mention in your response):
+- Copy the sentences verbatim
+- Do not add quotation marks or any other text
+- Prefer the most vivid, specific, or complimentary sentences
+- If nothing is suitable to quote publicly, return nothing
+
+The feedback:
+
+#{answer})).to_s.strip.gsub(/\A["“”']+|["“”']+\z/, '').strip
+    return unless candidate.present?
+
+    normalised_answer = normalised_public_text(answer)
+    from_answer = candidate.split(/(?<=[.!?])\s+/).map(&:strip).reject(&:blank?).all? { |sentence| normalised_answer.include?(normalised_public_text(sentence)) }
+    candidate if from_answer
+  end
+
+  def normalised_public_text(text)
+    text.to_s.downcase.gsub(/\s+/, ' ').strip
   end
 
   def self.joined(base_header: '')
