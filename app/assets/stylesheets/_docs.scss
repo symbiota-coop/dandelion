@@ -316,23 +316,26 @@
 }
 
 .ask-box {
+  display: flex;
+  align-items: flex-end;
   border: 1px solid #ddd;
   border-radius: 0.5rem;
-  overflow: hidden;
+  padding: 0.2rem;
 
   textarea.form-control {
+    flex: 1;
+    min-width: 0;
     border: 0;
     background: transparent;
     resize: none;
     box-shadow: none !important;
+    font-size: $body_font_size;
+    line-height: 1.5;
+    padding: 0.3125rem 0.5rem;
   }
 
   .ask-box-actions {
-    display: flex;
-    justify-content: flex-end;
-    padding: 0.35rem 0.5rem 0.5rem;
-    border-top: 1px solid #eee;
-    background: #F9F8FA;
+    flex-shrink: 0;
   }
 }
 

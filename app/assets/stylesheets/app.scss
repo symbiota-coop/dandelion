@@ -743,22 +743,6 @@ li.reply .widget-chat-message a {
   overflow-wrap: anywhere;
 }
 
-.message-compose {
-  display: flex;
-  align-items: flex-end;
-  gap: 0.5rem;
-}
-
-#message-body {
-  flex: 1 1 auto;
-  min-height: 2.125rem;
-  resize: none;
-}
-
-.message-compose .btn {
-  height: 2.125rem;
-}
-
 .theme-gutter {
   padding-left: 0.375rem;
   padding-right: 0.375rem;

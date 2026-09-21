@@ -3,16 +3,21 @@
 <% elsif !current_account.able_to_message %>
   <p class="lead">You must <a href="/accounts/edit">confirm your email address</a> and <a href="/donate">donate to Dandelion</a>, join a gathering or attend an event before messaging.</p>
 <% else %>
-  <% form_tag "/messages/#{@account.id}/send", id: 'compose', class: 'message-compose mt-3' do %>
-    <%= text_area_tag :body, id: 'message-body', placeholder: 'Type a message...', class: 'form-control', rows: 1 %>
-    <button class="btn btn-primary btn-sm" type="submit"><i class="bi bi-send-fill"></i></button>
+  <% form_tag "/messages/#{@account.id}/send", id: 'compose', class: 'mt-3' do %>
+    <div class="ask-box">
+      <label class="sr-only" for="message-body">Type a message</label>
+      <%= text_area_tag :body, id: 'message-body', placeholder: 'Type a message...', class: 'form-control autosize', rows: 1 %>
+      <div class="ask-box-actions">
+        <button class="btn btn-primary btn-sm" type="submit" aria-label="Send">
+          <i class="bi bi-arrow-right" aria-hidden="true"></i>
+        </button>
+      </div>
+    </div>
   <% end %>
 <% end %>
 
 <script>
   $(function () {
-    autosize($('#message-body'));
-
     scrollMessageThreadToBottom()
 
     $('#message-body').on('autosize:resized', function () {
