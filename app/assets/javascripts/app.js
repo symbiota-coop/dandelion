@@ -110,8 +110,8 @@ $(function () {
     $('a[data-method="post"], a[href*="destroy"]').not('[data-method-registered]').attr('data-method-registered', true).click(function (event) {
       const $el = $(this)
       if ($el.hasClass('no-trigger')) return false
-      // pagelet-trigger links are handled by pagelets.js
-      if ($el.hasClass('pagelet-trigger')) return
+      // pagelet-trigger links inside a pagelet are handled by pagelets.js
+      if ($el.hasClass('pagelet-trigger') && $el.closest('[data-pagelet-url]').length) return
 
       let shouldPost = $el.data('method') === 'post'
       if (!shouldPost && this.href) {
