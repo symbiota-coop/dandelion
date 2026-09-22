@@ -28,9 +28,9 @@
       <%== y.map(&:strip).join('') %>
     </div>
     <% if @tactivity.attendances.find_by(account: current_account) %>
-      <a class="btn btn-primary" href="/tactivities/<%= @tactivity.id %>/unattend">No longer interested</a>
+      <a class="btn btn-primary" data-method="post" href="/tactivities/<%= @tactivity.id %>/unattend">No longer interested</a>
     <% else %>
-      <a class="btn btn-primary" href="/tactivities/<%= @tactivity.id %>/attend">Interested</a>
+      <a class="btn btn-primary" data-method="post" href="/tactivities/<%= @tactivity.id %>/attend">Interested</a>
     <% end %>
   </div>
 </div>

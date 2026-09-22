@@ -123,7 +123,7 @@ Dandelion::App.controller do
     partial :'teams/subscribe', locals: { teamship: @teamship }
   end
 
-  get '/teamships/:id/set_subscribe' do
+  post '/teamships/:id/set_subscribe' do
     @teamship = Teamship.find(params[:id]) || not_found
     @team = @teamship.team
     @gathering = @teamship.team.gathering

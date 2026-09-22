@@ -138,7 +138,7 @@ Dandelion::App.controller do
     partial :'gatherings/subscribe', locals: { membership: @membership }
   end
 
-  get '/g/:slug/set_subscribe' do
+  post '/g/:slug/set_subscribe' do
     @gathering = Gathering.find_by(slug: params[:slug]) || not_found
     @membership = @gathering.memberships.find_by(account: current_account)
     confirmed_membership_required!

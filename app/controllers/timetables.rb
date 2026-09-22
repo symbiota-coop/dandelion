@@ -198,7 +198,7 @@ Dandelion::App.controller do
     200
   end
 
-  get '/tactivities/:id/unschedule' do
+  post '/tactivities/:id/unschedule' do
     @tactivity = Tactivity.find(params[:id]) || not_found
     @gathering = @tactivity.gathering
     @membership = @gathering.memberships.find_by(account: current_account)
@@ -225,7 +225,7 @@ Dandelion::App.controller do
     partial :'timetables/attendees', locals: { tactivity: @tactivity }
   end
 
-  get '/tactivities/:id/attend' do
+  post '/tactivities/:id/attend' do
     @tactivity = Tactivity.find(params[:id]) || not_found
     @gathering = @tactivity.gathering
     @membership = @gathering.memberships.find_by(account: current_account)
@@ -234,7 +234,7 @@ Dandelion::App.controller do
     request.xhr? ? 200 : redirect(back)
   end
 
-  get '/tactivities/:id/unattend' do
+  post '/tactivities/:id/unattend' do
     @tactivity = Tactivity.find(params[:id]) || not_found
     @gathering = @tactivity.gathering
     @membership = @gathering.memberships.find_by(account: current_account)
