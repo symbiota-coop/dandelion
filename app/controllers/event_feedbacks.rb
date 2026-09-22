@@ -98,7 +98,10 @@ Dandelion::App.controller do
     @event_feedback.publicly_visible = params[:publicly_visible]
     @event_feedback.anonymous = params[:anonymous]
     @event_feedback.answers = question_answer_pairs(params)
-    @event_feedback.save
+    unless @event_feedback.save
+      flash[:error] = @event_feedback.errors.full_messages.to_sentence
+      redirect back
+    end
     flash[:notice] = 'Thanks for your feedback!'
 
     last_completed_contribution = @event_feedback.account.account_contributions.and(payment_completed: true).order('created_at desc').first

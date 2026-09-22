@@ -24,7 +24,7 @@ class EventFeedback
     %w[event_id account_id response public_answers has_public_answers answers]
   end
 
-  validates_uniqueness_of :event, scope: :account, allow_nil: true, conditions: -> { where(deleted_at: nil) }
+  validates_uniqueness_of :event, scope: :account, allow_nil: true, conditions: -> { where(deleted_at: nil) }, message: 'already has your feedback'
 
   before_validation do
     self.has_public_answers = public_answers.present?
