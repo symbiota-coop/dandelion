@@ -142,6 +142,16 @@ Dandelion::App.controller do
   get '/o/:slug/organisationship' do
     sign_in_required!
     @organisation = Organisation.find_by(slug: params[:slug]) || not_found
+    if request.xhr?
+      partial :'organisations/organisationship', locals: { organisation: @organisation, membership_toggle: params[:membership_toggle], create_event: params[:create_event], btn_class: params[:btn_class] }
+    else
+      redirect "/o/#{@organisation.slug}"
+    end
+  end
+
+  post '/o/:slug/organisationship' do
+    sign_in_required!
+    @organisation = Organisation.find_by(slug: params[:slug]) || not_found
     case params[:f]
     when 'not_following'
       organisationship = current_account.organisationships.find_by(organisation: @organisation)
@@ -153,11 +163,7 @@ Dandelion::App.controller do
       organisationship = current_account.organisationships.find_by(organisation: @organisation) || current_account.organisationships.create(organisation: @organisation)
       organisationship.set_unsubscribed!(false)
     end
-    if request.xhr?
-      partial :'organisations/organisationship', locals: { organisation: @organisation, membership_toggle: params[:membership_toggle], create_event: params[:create_event], btn_class: params[:btn_class] }
-    else
-      redirect "/o/#{@organisation.slug}"
-    end
+    request.xhr? ? 200 : redirect("/o/#{@organisation.slug}")
   end
 
   get '/o/:slug/unsubscribe' do

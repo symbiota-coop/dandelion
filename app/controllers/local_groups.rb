@@ -154,6 +154,12 @@ Dandelion::App.controller do
   get '/local_groups/:id/local_groupship' do
     sign_in_required!
     @local_group = LocalGroup.find(params[:id]) || not_found
+    request.xhr? ? (partial :'activities_and_local_groups/resourceship', locals: { resource: @local_group, resourceship_name: 'local_groupship', resource_path: "/local_groups/#{@local_group.id}", membership_toggle: params[:membership_toggle], btn_class: params[:btn_class] }) : redirect("/local_groups/#{@local_group.id}")
+  end
+
+  post '/local_groups/:id/local_groupship' do
+    sign_in_required!
+    @local_group = LocalGroup.find(params[:id]) || not_found
     case params[:f]
     when 'not_following'
       local_groupship = current_account.local_groupships.find_by(local_group: @local_group)
@@ -165,7 +171,7 @@ Dandelion::App.controller do
       local_groupship = current_account.local_groupships.find_by(local_group: @local_group) || current_account.local_groupships.create(local_group: @local_group)
       local_groupship.set(unsubscribed: false)
     end
-    request.xhr? ? (partial :'activities_and_local_groups/resourceship', locals: { resource: @local_group, resourceship_name: 'local_groupship', resource_path: "/local_groups/#{@local_group.id}", membership_toggle: params[:membership_toggle], btn_class: params[:btn_class] }) : redirect("/local_groups/#{@local_group.id}")
+    request.xhr? ? 200 : redirect("/local_groups/#{@local_group.id}")
   end
 
   post '/local_groups/:id/hide_membership' do

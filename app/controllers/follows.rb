@@ -11,6 +11,12 @@ Dandelion::App.controller do
   get '/follow/:id' do
     sign_in_required!
     @account = Account.find(params[:id]) || not_found
+    request.xhr? ? (partial :'accounts/follow', locals: { account: @account, btn_class: params[:btn_class] }) : redirect("/u/#{@account.username}")
+  end
+
+  post '/follow/:id' do
+    sign_in_required!
+    @account = Account.find(params[:id]) || not_found
     case params[:f]
     when 'not_following'
       current_account.follows_as_follower.find_by(followee: @account).try(:destroy)
@@ -21,7 +27,7 @@ Dandelion::App.controller do
       follow = current_account.follows_as_follower.find_by(followee: @account) || current_account.follows_as_follower.create(followee: @account)
       follow.set(unsubscribed: false)
     end
-    request.xhr? ? (partial :'accounts/follow', locals: { account: @account, btn_class: params[:btn_class] }) : redirect("/u/#{@account.username}")
+    request.xhr? ? 200 : redirect("/u/#{@account.username}")
   end
 
   get '/follow/starred/:id' do

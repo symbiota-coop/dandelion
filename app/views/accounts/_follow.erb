@@ -19,7 +19,7 @@
         #  'follow_and_subscribe' => 'Follow with email updates <i class="bi bi-envelope-fill"></i>'
        } %>
     <% if current_state == 'not_following' %>
-      <a class="pagelet-trigger d-block d-lg-inline-block w-100 w-lg-auto mb-1 btn btn-outline-primary <%= btn_class if defined?(btn_class) %>" href="/follow/<%= account.id %>?f=follow_and_subscribe">Follow</a>
+      <a class="pagelet-trigger d-block d-lg-inline-block w-100 w-lg-auto mb-1 btn btn-outline-primary <%= btn_class if defined?(btn_class) %>" data-method="post" href="/follow/<%= account.id %>?f=follow_and_subscribe">Follow</a>
     <% else %>
       <div class="dropdown d-block d-lg-inline-block">
         <button class="d-block d-lg-inline-block w-100 w-lg-auto mb-1 btn <%= btn_class if defined?(btn_class) %> <%= current_state == 'not_following' ? 'btn-outline-primary' : 'btn-primary' %> dropdown-toggle" type="button" data-toggle="dropdown">
@@ -27,7 +27,7 @@
         </button>
         <div class="dropdown-menu">
           <% action_options.invert.reject { |text, value| value == current_state }.each { |text,value| %>
-          <a class="pagelet-trigger dropdown-item" href="/follow/<%= account.id %>?f=<%= value %>"><%== text %></a>
+          <a class="pagelet-trigger dropdown-item" data-method="post" href="/follow/<%= account.id %>?f=<%= value %>"><%== text %></a>
           <% } %>
         </div>
       </div>

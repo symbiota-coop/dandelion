@@ -176,6 +176,12 @@ Dandelion::App.controller do
   get '/activities/:id/activityship' do
     sign_in_required!
     @activity = Activity.find(params[:id]) || not_found
+    request.xhr? ? (partial :'activities_and_local_groups/resourceship', locals: { resource: @activity, resourceship_name: 'activityship', resource_path: "/activities/#{@activity.id}", membership_toggle: params[:membership_toggle], btn_class: params[:btn_class] }) : redirect("/activities/#{@activity.id}")
+  end
+
+  post '/activities/:id/activityship' do
+    sign_in_required!
+    @activity = Activity.find(params[:id]) || not_found
     if (activityship = current_account.activityships.find_by(activity: @activity)) || @activity.privacy == 'open'
       case params[:f]
       when 'not_following'
@@ -189,7 +195,7 @@ Dandelion::App.controller do
         activityship.set(unsubscribed: false)
       end
     end
-    request.xhr? ? (partial :'activities_and_local_groups/resourceship', locals: { resource: @activity, resourceship_name: 'activityship', resource_path: "/activities/#{@activity.id}", membership_toggle: params[:membership_toggle], btn_class: params[:btn_class] }) : redirect("/activities/#{@activity.id}")
+    request.xhr? ? 200 : redirect("/activities/#{@activity.id}")
   end
 
   post '/activities/:id/hide_membership' do

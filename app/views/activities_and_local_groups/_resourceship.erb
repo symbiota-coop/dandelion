@@ -20,7 +20,7 @@
      action_options.delete('not_following') if resourceship && resourceship.admin? %>
   <% if resourceship || !resource.respond_to?(:privacy) || resource.privacy == 'open' %>
     <% if current_state == 'not_following' %>
-      <a class="pagelet-trigger btn btn-outline-primary <%= btn_class if defined?(btn_class) %>" href="<%=resource_path%>/<%=resourceship_name%>?f=follow_and_subscribe">Follow</a>
+      <a class="pagelet-trigger btn btn-outline-primary <%= btn_class if defined?(btn_class) %>" data-method="post" href="<%=resource_path%>/<%=resourceship_name%>?f=follow_and_subscribe">Follow</a>
     <% else %>
       <div class="dropdown d-inline-block">
         <button class="btn mb-1 <%= btn_class if defined?(btn_class) %> <%= current_state == 'not_following' ? 'btn-outline-primary' : 'btn-primary' %> dropdown-toggle" type="button" data-toggle="dropdown">
@@ -28,7 +28,7 @@
         </button>
         <div class="dropdown-menu">
           <% action_options.invert.each { |text,value| %>
-          <a class="pagelet-trigger dropdown-item" href="<%=resource_path%>/<%=resourceship_name%>?f=<%= value %>"><%== text %></a>
+          <a class="pagelet-trigger dropdown-item" data-method="post" href="<%=resource_path%>/<%=resourceship_name%>?f=<%= value %>"><%== text %></a>
           <% } %>
         </div>
       </div>
