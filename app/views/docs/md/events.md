@@ -238,6 +238,7 @@ Click the dropdown for your event (/activity/local group/organisation), and sele
 
 - **If someone allows their written answers to be quoted publicly** and the form has a single question, an extract is suggested (AI picks one or two sentences, or nothing if the answer is not suitable to quote). You can edit it in the box, or click **Show an extract** if none has appeared yet.
 - **If a piece of feedback has no extract control,** it means the person that submitted the feedback doesn't want it shown publicly.
+- **If you delete a piece of feedback,** it disappears from admin lists. On public pages it stays listed as Removed, with the reviewer's name and date.
 
 ## Discount codes
 

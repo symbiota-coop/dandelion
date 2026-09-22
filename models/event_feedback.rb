@@ -76,7 +76,7 @@ class EventFeedback
     event_tags_by_id = EventTag.pluck(:id, :name).to_h
     Account.and(:id.in => EventFacilitation.pluck(:account_id)).each do |account|
       # puts account.username
-      account.set(event_feedbacks_as_facilitator_count: account.unscoped_event_feedbacks_as_facilitator.count)
+      account.set(event_feedbacks_as_facilitator_count: account.unscoped_event_feedbacks_as_facilitator.rated.count)
       events = Event.past.and(:id.in => account.event_facilitations.pluck(:event_id))
       event_tag_ids = EventTagship.and(:event_id.in => events.pluck(:id)).pluck(:event_tag_id)
       tag_frequency = event_tag_ids.group_by(&:itself).transform_values(&:count)
