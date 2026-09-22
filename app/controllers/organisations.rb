@@ -195,7 +195,7 @@ Dandelion::App.controller do
     @organisation.monthly_donations_count.to_s
   end
 
-  get '/o/:slug/show_membership/:f' do
+  post '/o/:slug/show_membership/:f' do
     sign_in_required!
     @organisation = Organisation.find_by(slug: params[:slug]) || not_found
     @organisationship = @organisation.organisationships.find_by(account: current_account) || not_found

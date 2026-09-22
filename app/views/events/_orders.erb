@@ -30,9 +30,9 @@
       <% if event.enable_resales? %>
         &middot;
         <% if ticket.made_available_at %>
-          <a href="/tickets/<%= ticket.id %>/toggle_resale">Remove from resale</a>
+          <a data-method="post" href="/tickets/<%= ticket.id %>/toggle_resale">Remove from resale</a>
         <% else %>
-          <a href="/tickets/<%= ticket.id %>/toggle_resale">Mark for resale</a>
+          <a data-method="post" href="/tickets/<%= ticket.id %>/toggle_resale">Mark for resale</a>
         <% end %>
       <% end %>
     </li>

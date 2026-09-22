@@ -71,7 +71,7 @@ Dandelion::App.controller do
     200
   end
 
-  get '/tickets/:id/toggle_resale' do
+  post '/tickets/:id/toggle_resale' do
     sign_in_required!
     @ticket = Ticket.find(params[:id]) || not_found
     halt 403 unless @ticket.account == current_account

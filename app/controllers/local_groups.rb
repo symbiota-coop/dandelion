@@ -105,7 +105,7 @@ Dandelion::App.controller do
     redirect back
   end
 
-  get '/local_groups/:id/receive_feedback/:f' do
+  post '/local_groups/:id/receive_feedback/:f' do
     @local_group = LocalGroup.find(params[:id]) || not_found
     local_group_admins_only!
     @local_groupship = @local_group.local_groupships.find_by(account: current_account) || not_found
@@ -168,7 +168,7 @@ Dandelion::App.controller do
     request.xhr? ? (partial :'activities_and_local_groups/resourceship', locals: { resource: @local_group, resourceship_name: 'local_groupship', resource_path: "/local_groups/#{@local_group.id}", membership_toggle: params[:membership_toggle], btn_class: params[:btn_class] }) : redirect("/local_groups/#{@local_group.id}")
   end
 
-  get '/local_groups/:id/hide_membership' do
+  post '/local_groups/:id/hide_membership' do
     sign_in_required!
     @local_group = LocalGroup.find(params[:id]) || not_found
     @local_groupship = @local_group.local_groupships.find_by(account: current_account) || not_found
@@ -176,7 +176,7 @@ Dandelion::App.controller do
     redirect back
   end
 
-  get '/local_groups/:id/show_membership' do
+  post '/local_groups/:id/show_membership' do
     sign_in_required!
     @local_group = LocalGroup.find(params[:id]) || not_found
     @local_groupship = @local_group.local_groupships.find_by(account: current_account) || not_found

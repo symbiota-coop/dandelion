@@ -27,10 +27,10 @@ others_count = no_image_accounts.count + (@event.tickets.complete.and(:email.ne 
   </div>
   <% if (current_account && ticket = @event.tickets.complete.find_by(account: current_account)) %>
     <% if @event.tickets.complete.and(account: current_account).all? { |ticket| ticket.show_attendance? } %>
-      <a class="pagelet-trigger mb-1" href="/events/<%= @event.id %>/hide_attendance">Hide attendance</a>
+      <a class="pagelet-trigger mb-1" data-method="post" href="/events/<%= @event.id %>/hide_attendance">Hide attendance</a>
     <% else %>
       <% if current_account.image %>
-        <a class="pagelet-trigger mb-1" href="/events/<%= @event.id %>/show_attendance">Show your attendance</a>
+        <a class="pagelet-trigger mb-1" data-method="post" href="/events/<%= @event.id %>/show_attendance">Show your attendance</a>
       <% else %>
         <a href="/accounts/edit" onclick="alert('Please first upload a profile photo');">Show your attendance</a>
       <% end %>

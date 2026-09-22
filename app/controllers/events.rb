@@ -320,14 +320,14 @@ Dandelion::App.controller do
     partial :'events/attendees'
   end
 
-  get '/events/:id/hide_attendance' do
+  post '/events/:id/hide_attendance' do
     sign_in_required!
     @event = Event.find(params[:id]) || not_found
     @event.tickets.complete.and(account: current_account).update_all(show_attendance: nil)
     200
   end
 
-  get '/events/:id/show_attendance' do
+  post '/events/:id/show_attendance' do
     sign_in_required!
     @event = Event.find(params[:id]) || not_found
     @event.tickets.complete.and(account: current_account).update_all(show_attendance: true)
@@ -340,7 +340,7 @@ Dandelion::App.controller do
     partial :'events/subscribe_discussion'
   end
 
-  get '/events/:id/set_subscribe_discussion' do
+  post '/events/:id/set_subscribe_discussion' do
     sign_in_required!
     @event = Event.find(params[:id]) || not_found
     @event.tickets.complete.and(account: current_account).update_all(subscribed_discussion: true)
@@ -361,14 +361,14 @@ Dandelion::App.controller do
     partial :'events/star', locals: { event: @event, event_star: @event_star, block_edit: params[:block_edit] }
   end
 
-  get '/events/:id/do_star' do
+  post '/events/:id/do_star' do
     sign_in_required!
     @event = Event.find(params[:id]) || not_found
     @event.event_stars.create(account: current_account)
     200
   end
 
-  get '/events/:id/unstar' do
+  post '/events/:id/unstar' do
     sign_in_required!
     @event = Event.find(params[:id]) || not_found
     @event_star = @event.event_stars.find_by(account: current_account)

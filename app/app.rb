@@ -231,7 +231,7 @@ module Dandelion
       erb :referrals
     end
 
-    get '/referrals/:id/claim' do
+    post '/referrals/:id/claim' do
       sign_in_required!
       @organisation = current_account.organisations_as_referrer.find(params[:id]) || not_found
       revenue = @organisation.referral_revenue

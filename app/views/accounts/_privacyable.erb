@@ -9,13 +9,13 @@
     <% end %>
   </a>
   <div class="dropdown-menu">
-    <a class="dropdown-item pagelet-trigger" href="/accounts/set_privacyable/<%= p %>" onclick="$(this).attr('href', $(this).attr('href') + '?level=Only me')">
+    <a class="dropdown-item pagelet-trigger" data-method="post" href="/accounts/set_privacyable/<%= p %>?level=Only%20me">
       <i class="bi bi-lock"></i> Only me
     </a>
-    <a class="dropdown-item pagelet-trigger" href="/accounts/set_privacyable/<%= p %>" onclick="$(this).attr('href', $(this).attr('href') + '?level=People I follow')">
+    <a class="dropdown-item pagelet-trigger" data-method="post" href="/accounts/set_privacyable/<%= p %>?level=People%20I%20follow">
       <i class="bi bi-people-fill"></i> People I follow
     </a>
-    <a class="dropdown-item pagelet-trigger" href="/accounts/set_privacyable/<%= p %>" onclick="$(this).attr('href', $(this).attr('href') + '?level=Public')">
+    <a class="dropdown-item pagelet-trigger" data-method="post" href="/accounts/set_privacyable/<%= p %>?level=Public">
       <i class="bi bi-globe-europe-africa"></i> Public
     </a>
   </div>

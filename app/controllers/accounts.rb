@@ -13,7 +13,7 @@ Dandelion::App.controller do
     end
   end
 
-  get '/confirm_email' do
+  post '/confirm_email' do
     sign_in_required!
     current_account.send_confirmation_email
     flash[:notice] = 'Please click the link in the email to confirm your email address.'
@@ -195,7 +195,7 @@ Dandelion::App.controller do
     partial :'accounts/privacyable', locals: { p: params[:p] }
   end
 
-  get '/accounts/set_privacyable/:p' do
+  post '/accounts/set_privacyable/:p' do
     sign_in_required!
     @account = current_account
     halt 403 unless Account.privacyables.include?(params[:p])
@@ -203,7 +203,7 @@ Dandelion::App.controller do
     200
   end
 
-  get '/accounts/unhide' do
+  post '/accounts/unhide' do
     sign_in_required!
     current_account.set(hidden: false)
     unless current_account.has_signed_in?
@@ -218,7 +218,7 @@ Dandelion::App.controller do
     redirect "/u/#{@account.username}"
   end
 
-  get '/accounts/:id/feedback_summary' do
+  post '/accounts/:id/feedback_summary' do
     @account = Account.find(params[:id]) || not_found
     kick! unless admin? || (current_account && @account == current_account)
     if !admin? && @account.feedback_summary_last_refreshed_at && @account.feedback_summary_last_refreshed_at > 24.hours.ago
@@ -229,7 +229,7 @@ Dandelion::App.controller do
     redirect back('#feedback')
   end
 
-  get '/accounts/:id/feedback_summary/delete' do
+  post '/accounts/:id/feedback_summary/delete' do
     @account = Account.find(params[:id]) || not_found
     kick! unless admin? || (current_account && @account == current_account)
     @account.set(feedback_summary: nil)
@@ -309,21 +309,7 @@ Dandelion::App.controller do
     partial :'accounts/following', locals: { accounts: @account.followers }
   end
 
-  get '/accounts/use_image/:provider' do
-    sign_in_required!
-    @provider = Provider.object(params[:provider])
-    @account = current_account
-    @account.image_url = @provider.image.call(@account.provider_links.find_by(provider: @provider.display_name).omniauth_hash)
-    if @account.save
-      flash[:notice] = "<i class=\"#{@provider.icon}\"></i> Grabbed your picture!"
-      redirect '/accounts/edit'
-    else
-      flash.now[:error] = '<strong>Hmm.</strong> There was a problem grabbing your picture.'
-      erb :'accounts/edit'
-    end
-  end
-
-  get '/accounts/disconnect/:provider' do
+  post '/accounts/disconnect/:provider' do
     sign_in_required!
     @provider = Provider.object(params[:provider])
     @account = current_account

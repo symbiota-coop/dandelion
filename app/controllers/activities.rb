@@ -37,7 +37,7 @@ Dandelion::App.controller do
     erb :'activities/activity'
   end
 
-  get '/activities/:id/feedback_summary' do
+  post '/activities/:id/feedback_summary' do
     @activity = Activity.find(params[:id]) || not_found
     activity_admins_only!
     if !admin? && @activity.feedback_summary_last_refreshed_at && @activity.feedback_summary_last_refreshed_at > 24.hours.ago
@@ -48,7 +48,7 @@ Dandelion::App.controller do
     redirect back('#feedback')
   end
 
-  get '/activities/:id/feedback_summary/delete' do
+  post '/activities/:id/feedback_summary/delete' do
     @activity = Activity.find(params[:id]) || not_found
     activity_admins_only!
     @activity.set(feedback_summary: nil)
@@ -127,7 +127,7 @@ Dandelion::App.controller do
     redirect back
   end
 
-  get '/activities/:id/receive_feedback/:f' do
+  post '/activities/:id/receive_feedback/:f' do
     @activity = Activity.find(params[:id]) || not_found
     activity_admins_only!
     @activityship = @activity.activityships.find_by(account: current_account) || not_found
@@ -192,7 +192,7 @@ Dandelion::App.controller do
     request.xhr? ? (partial :'activities_and_local_groups/resourceship', locals: { resource: @activity, resourceship_name: 'activityship', resource_path: "/activities/#{@activity.id}", membership_toggle: params[:membership_toggle], btn_class: params[:btn_class] }) : redirect("/activities/#{@activity.id}")
   end
 
-  get '/activities/:id/hide_membership' do
+  post '/activities/:id/hide_membership' do
     sign_in_required!
     @activity = Activity.find(params[:id]) || not_found
     @activityship = @activity.activityships.find_by(account: current_account) || not_found
@@ -200,7 +200,7 @@ Dandelion::App.controller do
     redirect back
   end
 
-  get '/activities/:id/show_membership' do
+  post '/activities/:id/show_membership' do
     sign_in_required!
     @activity = Activity.find(params[:id]) || not_found
     @activityship = @activity.activityships.find_by(account: current_account) || not_found

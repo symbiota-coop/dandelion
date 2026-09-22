@@ -296,7 +296,7 @@ Dandelion::App.controller do
     end
   end
 
-  get '/o/:slug/receive_feedback/:f' do
+  post '/o/:slug/receive_feedback/:f' do
     @organisation = Organisation.find_by(slug: params[:slug]) || not_found
     organisation_admins_only!
     @organisationship = @organisation.organisationships.find_by(account: current_account) || not_found
@@ -389,7 +389,7 @@ Dandelion::App.controller do
     200
   end
 
-  get '/organisations/:id/feedback_summary' do
+  post '/organisations/:id/feedback_summary' do
     @organisation = Organisation.find(params[:id]) || not_found
     organisation_admins_only!
     if !admin? && @organisation.feedback_summary_last_refreshed_at && @organisation.feedback_summary_last_refreshed_at > 24.hours.ago
@@ -400,7 +400,7 @@ Dandelion::App.controller do
     redirect back('#feedback')
   end
 
-  get '/organisations/:id/feedback_summary/delete' do
+  post '/organisations/:id/feedback_summary/delete' do
     @organisation = Organisation.find(params[:id]) || not_found
     organisation_admins_only!
     @organisation.set(feedback_summary: nil)
