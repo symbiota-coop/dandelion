@@ -106,7 +106,7 @@ Dandelion::App.controller do
     else
       @comment.destroy
     end
-    redirect(back)
+    request.xhr? ? 200 : redirect(back)
   end
 
   get '/comments/:id/reactions' do

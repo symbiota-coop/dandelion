@@ -270,6 +270,6 @@ Dandelion::App.controller do
     confirmed_membership_required!
     halt unless (@shift.account && (@shift.account_id == current_account.id)) || @membership.admin?
     @shift.destroy
-    redirect "/g/#{@gathering.slug}/rotas/#{@shift.rota_id}"
+    request.xhr? ? 200 : redirect("/g/#{@gathering.slug}/rotas/#{@shift.rota_id}")
   end
 end
