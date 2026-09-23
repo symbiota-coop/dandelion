@@ -4,6 +4,14 @@
     <img src="https://github.com/symbiota-coop/dandelion/actions/workflows/ruby.yml/badge.svg">
   </a>
 </li>
+<% if (commit = ENV['RENDER_GIT_COMMIT']) %>
+  <li>
+    <a target="_blank" href="https://github.com/symbiota-coop/dandelion/commit/<%= commit %>" data-toggle="tooltip" title="Running commit <%= commit[0..6] %>" data-placement="right">
+      <i class="bi bi-git"></i>
+      <span class="nav-link-text"><span class="badge badge-secondary"><%= commit[0..6] %></span></span>
+    </a>
+  </li>
+<% end %>
 <% [
   ['Orders', 'orders', 'cart-fill'],
   ['Feedback', 'feedback', 'chat-left-quote'],
