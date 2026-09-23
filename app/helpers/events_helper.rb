@@ -1,4 +1,14 @@
 Dandelion::App.helpers do
+  def duplicate_event_prerequisites!
+    organisation = @event.organisation
+    if Padrino.env == :production && !organisation.stripe_client_id && organisation.stripe_sk && !organisation.stripe_connect_json
+      @organisation = organisation
+      halt erb(:'events/stripe_connect')
+    elsif organisation.contribution_reminder && params[:contribution_skipped].blank?
+      redirect "/o/#{organisation.slug}/contribute?return_to=#{CGI.escape("/events/#{@event.id}/duplicate")}"
+    end
+  end
+
   def filter_events_by_search_and_tags(events)
     q_ids = []
     q_ids += Event.search(params[:q], events).pluck(:id) if params[:q]

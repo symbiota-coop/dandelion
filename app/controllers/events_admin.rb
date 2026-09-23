@@ -59,15 +59,16 @@ Dandelion::App.controller do
   get '/events/:id/duplicate' do
     @event = Event.find(params[:id]) || not_found
     event_admins_only!
-    if Padrino.env == :production && !@event.organisation.stripe_client_id && @event.organisation.stripe_sk && !@event.organisation.stripe_connect_json
-      @organisation = @event.organisation
-      erb :'events/stripe_connect'
-    elsif @event.organisation.contribution_reminder && params[:contribution_skipped].blank?
-      redirect "/o/#{@event.organisation.slug}/contribute?return_to=#{CGI.escape(request.fullpath)}"
-    else
-      duplicated_event = @event.duplicate!(current_account)
-      redirect "/e/#{duplicated_event.slug}/edit?duplicated=1"
-    end
+    duplicate_event_prerequisites!
+    erb :'events/duplicate'
+  end
+
+  post '/events/:id/duplicate' do
+    @event = Event.find(params[:id]) || not_found
+    event_admins_only!
+    duplicate_event_prerequisites!
+    duplicated_event = @event.duplicate!(current_account)
+    redirect "/e/#{duplicated_event.slug}/edit?duplicated=1"
   end
 
   get '/events/:id/ticket_email' do

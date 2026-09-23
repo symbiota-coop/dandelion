@@ -1,0 +1,5 @@
+<%= partial :'events/nav', locals: { event: @event } %>
+
+<div class="text-center">
+  <p><a class="d-block d-lg-inline btn btn-primary" data-method="post" href="/events/<%= @event.id %>/duplicate<%= '?contribution_skipped=1' if params[:contribution_skipped] %>">Duplicate event</a></p>
+</div>
