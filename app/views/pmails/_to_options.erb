@@ -9,7 +9,7 @@ if @event || @pmail.mailable.is_a?(Event)
   to_options << ["Waitlist for #{event.name} (#{when_details(event)})", "waitlist:#{event.id}"]
   show_ticket_type_waitlists = event.allow_ticket_type_waitlists? ||
                                TicketTypeWaitship.and(:ticket_type_id.in => event.ticket_type_ids).exists? ||
-                               @pmail.ticket_type_waitlist_selected?
+                               %w[all_ticket_type_waitlists ticket_type_waitlist].include?(@pmail.recipient_kind)
   if show_ticket_type_waitlists
     to_options << ["Ticket type waitlists for #{event.name} (#{when_details(event)})", "all_ticket_type_waitlists:#{event.id}"]
     event.ticket_types.order('name asc').each do |ticket_type|
@@ -19,10 +19,10 @@ if @event || @pmail.mailable.is_a?(Event)
   event.ticket_groups.each do |ticket_group|
     to_options << ["Ticket group #{ticket_group.name} for #{event.name} (#{when_details(event)})", "ticket_group:#{ticket_group.id}"]
   end
-  if @pmail.ticket_group_selected? && !to_options.any? { |_label, value| value == selected_to_option }
+  if @pmail.recipient_kind == 'ticket_group' && !to_options.any? { |_label, value| value == selected_to_option }
     to_options << ["Ticket group [deleted group] for #{event.name} (#{when_details(event)})", selected_to_option]
   end
-  if @pmail.ticket_type_id && !to_options.any? { |_label, value| value == selected_to_option }
+  if @pmail.recipient_kind == 'ticket_type_waitlist' && !to_options.any? { |_label, value| value == selected_to_option }
     to_options << ["Ticket type waitlist [deleted ticket type] for #{event.name} (#{when_details(event)})", selected_to_option]
   end
 elsif @organisation

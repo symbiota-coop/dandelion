@@ -64,6 +64,7 @@ Dandelion::App.controller do
 
   post '/pmails/:pmail_id/edit' do
     @pmail = @pmails.find(params[:pmail_id]) || not_found
+    @pmail.editor = current_account
 
     if params[:duplicate]
       @pmail.to_option = params[:pmail][:to_option]

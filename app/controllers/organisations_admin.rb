@@ -265,24 +265,12 @@ Dandelion::App.controller do
     @pmails = @organisation.pmails
     @pmails = @pmails.and(:id.in => Pmail.search(params[:q], @pmails).pluck(:id)) if params[:q]
     case params[:to]
-    when 'everyone'
-      @pmails = @pmails.and(everyone: true)
-    when 'monthly_donors'
-      @pmails = @pmails.and(monthly_donors: true)
-    when 'not_monthly_donors'
-      @pmails = @pmails.and(not_monthly_donors: true)
-    when 'facilitators'
-      @pmails = @pmails.and(facilitators: true)
+    when *Pmail.organisation_wide_recipient_kinds
+      @pmails = @pmails.and(recipient_kind: params[:to])
     when 'waitlist'
-      @pmails = @pmails.and(:$or => [{ waitlist: true }, { ticket_type_waitlist: true }, { ticket_type_id: { :$ne => nil } }])
-    when 'activity'
-      @pmails = @pmails.and(mailable_type: 'Activity')
-    when 'activity_tag'
-      @pmails = @pmails.and(mailable_type: 'ActivityTag')
-    when 'local_group'
-      @pmails = @pmails.and(mailable_type: 'LocalGroup')
-    when 'event'
-      @pmails = @pmails.and(mailable_type: 'Event')
+      @pmails = @pmails.and(:recipient_kind.in => Pmail.waitlist_recipient_kinds)
+    when 'activity', 'activity_tag', 'local_group', 'event'
+      @pmails = @pmails.and(mailable_type: params[:to].camelize)
     end
     @scope = "organisation_id=#{@organisation.id}"
     case content_type

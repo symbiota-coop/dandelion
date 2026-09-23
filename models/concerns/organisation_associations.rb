@@ -63,7 +63,7 @@ module OrganisationAssociations
   end
 
   def news
-    pmails.and(mailable: nil, monthly_donors: false, facilitators: false).and(:sent_at.ne => nil).order('sent_at desc')
+    pmails.and(:recipient_kind.in => %w[everyone not_monthly_donors]).and(:sent_at.ne => nil).order('sent_at desc')
   end
 
   def cohosts

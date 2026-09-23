@@ -17,7 +17,7 @@ class PmailsTest < ActiveSupport::TestCase
 
   test 'editing a pmail' do
     create_organisation
-    pmail = FactoryBot.create(:pmail, organisation: @organisation, everyone: true)
+    pmail = FactoryBot.create(:pmail, organisation: @organisation, recipient_kind: 'everyone')
     sign_in(@account)
     visit "/o/#{@organisation.slug}/pmails"
     click_link 'Edit'
@@ -26,6 +26,67 @@ class PmailsTest < ActiveSupport::TestCase
     assert page.has_content? 'The mail was saved'
     visit "/pmails/#{pmail.id}/preview?organisation_id=#{@organisation.id}"
     assert page.has_title? subject
+  end
+
+  test 'organisation pmail list can be filtered by recipients' do
+    create_event(allow_ticket_type_waitlists: true)
+    activity = FactoryBot.create(:activity, organisation: @organisation)
+    ticket_type = FactoryBot.create(:ticket_type, event: @event, quantity: 0)
+    ticket_group = @event.ticket_groups.create!(name: 'Backstage', capacity: 10)
+    to_options = {
+      'To everyone' => 'everyone',
+      'To monthly donors' => 'monthly_donors',
+      'To facilitators' => 'facilitators',
+      'To activity' => "activity:#{activity.id}",
+      'To event' => "event:#{@event.id}",
+      'To waitlist' => "waitlist:#{@event.id}",
+      'To ticket type waitlist' => "ticket_type_waitlist:#{ticket_type.id}",
+      'To ticket group' => "ticket_group:#{ticket_group.id}"
+    }
+    to_options.each do |subject, to_option|
+      FactoryBot.create(:pmail, organisation: @organisation, account: @account, subject: subject, to_option: to_option)
+    end
+
+    expected = {
+      'everyone' => ['To everyone'],
+      'monthly_donors' => ['To monthly donors'],
+      'facilitators' => ['To facilitators'],
+      'activity' => ['To activity'],
+      'waitlist' => ['To waitlist', 'To ticket type waitlist'],
+      'event' => ['To event', 'To waitlist', 'To ticket type waitlist', 'To ticket group']
+    }
+
+    sign_in(@account)
+    expected.each do |to, subjects|
+      visit "/o/#{@organisation.slug}/pmails?to=#{to}"
+      to_options.each_key do |subject|
+        if subjects.include?(subject)
+          assert page.has_link?(subject, exact: true), "#{to} should include #{subject}"
+        else
+          assert page.has_no_link?(subject, exact: true), "#{to} should not include #{subject}"
+        end
+      end
+    end
+  end
+
+  test 'event admins cannot target recipients they do not administer' do
+    create_event
+    create_event(as: :event2)
+    organiser = FactoryBot.create(:account)
+    @event.set(organiser_id: organiser.id)
+    pmail = FactoryBot.create(:pmail, organisation: @organisation, account: @account, to_option: "event:#{@event.id}")
+    pmail.editor = organiser
+
+    %w[everyone monthly_donors not_monthly_donors facilitators].each do |to_option|
+      pmail.to_option = to_option
+      assert_not pmail.valid?, to_option
+    end
+    pmail.to_option = "event:#{@event2.id}"
+    assert_not pmail.valid?
+    pmail.to_option = "event:#{@event.id}"
+    assert pmail.valid?
+
+    assert_includes Pmail.protected_attributes, 'recipient_kind'
   end
 
   test 'ticket group pmail does not fall back to event recipients when group is deleted' do
@@ -209,7 +270,7 @@ class PmailsTest < ActiveSupport::TestCase
     pmail = FactoryBot.create(
       :pmail,
       organisation: @organisation,
-      everyone: true,
+      recipient_kind: 'everyone',
       preview_text: '<img src="https://attacker.example/%recipient.org_unsubscribe_token%">',
       body: '<p>Hi %recipient.firstname%</p><img src="https://attacker.example/%recipient.token%">'
     )

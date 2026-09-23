@@ -1,36 +1,31 @@
-<% if pmail.everyone %>
+<% case pmail.recipient_kind
+   when 'everyone' %>
   Everyone in <%= pmail.organisation.name %>
-<% elsif pmail.monthly_donors %>
+<% when 'monthly_donors' %>
   Monthly donors
-<% elsif pmail.not_monthly_donors %>
+<% when 'not_monthly_donors' %>
   People who aren't monthly donors
-<% elsif pmail.facilitators %>
+<% when 'facilitators' %>
   Facilitators
-<% elsif pmail.mailable %>
-  <% if pmail.mailable.is_a?(Activity) %>
-    Activity: <a href="/o/<%= pmail.mailable.organisation.slug %>/a/<%= pmail.mailable.slug %>"><%= pmail.mailable.name %></a>
-  <% elsif pmail.mailable.is_a?(ActivityTag) %>
-    Activity tag:
-    <span class="text-white label label-primary d-inline-block mb-1"><%= pmail.mailable.name %></span>
-  <% elsif pmail.mailable.is_a?(LocalGroup) %>
-    Local group: <a href="/o/<%= pmail.mailable.organisation.slug %>/lg/<%= pmail.mailable.slug %>"><%= pmail.mailable.name %></a>
-  <% elsif pmail.mailable.is_a?(Event) %>
-    <% if pmail.ticket_group %>
-      Ticket group <%= pmail.ticket_group.name %> for <a href="/e/<%= pmail.mailable.slug %>"><%= pmail.mailable.name %></a>
-    <% elsif pmail.ticket_group_selected? %>
-      Ticket group [deleted group] for <a href="/e/<%= pmail.mailable.slug %>"><%= pmail.mailable.name %></a>
-    <% elsif pmail.ticket_type %>
-      Ticket type waitlist <%= pmail.ticket_type.name %> for <a href="/e/<%= pmail.mailable.slug %>"><%= pmail.mailable.name %></a>
-    <% elsif pmail.ticket_type_id %>
-      Ticket type waitlist [deleted ticket type] for <a href="/e/<%= pmail.mailable.slug %>"><%= pmail.mailable.name %></a>
-    <% elsif pmail.ticket_type_waitlist %>
-      Ticket type waitlists: <a href="/e/<%= pmail.mailable.slug %>"><%= pmail.mailable.name %></a>
-    <% elsif pmail.waitlist %>
-      Waitlist: <a href="/e/<%= pmail.mailable.slug %>"><%= pmail.mailable.name %></a>
-    <% else %>
-      Event: <a href="/e/<%= pmail.mailable.slug %>"><%= pmail.mailable.name %></a>
-    <% end %>
-    <br />
-    <small><%= concise_when_details(pmail.mailable) %></small>
-  <% end %>
+<% when 'activity' %>
+  Activity: <a href="/o/<%= pmail.mailable.organisation.slug %>/a/<%= pmail.mailable.slug %>"><%= pmail.mailable.name %></a>
+<% when 'activity_tag' %>
+  Activity tag:
+  <span class="text-white label label-primary d-inline-block mb-1"><%= pmail.mailable.name %></span>
+<% when 'local_group' %>
+  Local group: <a href="/o/<%= pmail.mailable.organisation.slug %>/lg/<%= pmail.mailable.slug %>"><%= pmail.mailable.name %></a>
+<% when 'ticket_group' %>
+  Ticket group <%= pmail.ticket_group ? pmail.ticket_group.name : '[deleted group]' %> for <a href="/e/<%= pmail.mailable.slug %>"><%= pmail.mailable.name %></a>
+<% when 'ticket_type_waitlist' %>
+  Ticket type waitlist <%= pmail.ticket_type ? pmail.ticket_type.name : '[deleted ticket type]' %> for <a href="/e/<%= pmail.mailable.slug %>"><%= pmail.mailable.name %></a>
+<% when 'all_ticket_type_waitlists' %>
+  Ticket type waitlists: <a href="/e/<%= pmail.mailable.slug %>"><%= pmail.mailable.name %></a>
+<% when 'waitlist' %>
+  Waitlist: <a href="/e/<%= pmail.mailable.slug %>"><%= pmail.mailable.name %></a>
+<% when 'event' %>
+  Event: <a href="/e/<%= pmail.mailable.slug %>"><%= pmail.mailable.name %></a>
+<% end %>
+<% if pmail.event_recipients? %>
+  <br />
+  <small><%= concise_when_details(pmail.mailable) %></small>
 <% end %>
