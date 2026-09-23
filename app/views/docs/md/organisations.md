@@ -50,9 +50,7 @@ You can also share a [check-in scanner link](/docs/events#checking-people-in) wi
 
 To accept payments for tickets to events created under the organisation, you must add details for Stripe or another payment processor in the Payments tab of your organisation's settings. Stripe is shown by default; click **Set up** for GoCardless, Open Collective, Mollie, PayPal, Crypto, or Patreon.
 
-[Mollie](https://www.mollie.com/) is available for fiat-currency events. Click **Set up Mollie** and add your live API key from **Developers > API keys** in the Mollie Dashboard. Buyers are sent to Mollie's hosted checkout with the payment methods enabled on your website profile (iDEAL, cards, Bancontact, and so on).
-
-[PayPal](https://www.paypal.com/) is available for fiat-currency events. Click **Set up PayPal**, add your live client ID and secret from [Apps & Credentials](https://developer.paypal.com/dashboard/applications/live), and register the webhook URL shown on the Payments tab for **Checkout order approved** and **Payment capture completed**.
+See [Mollie](/docs/events#taking-payments-with-mollie), [PayPal](/docs/events#taking-payments-with-paypal) and [Open Collective](/docs/events#taking-payments-with-open-collective) for setup steps.
 
 GoCardless Instant Bank Pay and instalments are only offered at checkout for **GBP** and **EUR** events (UK and supported Eurozone countries). For other currencies, use Stripe, Mollie, PayPal, or another processor.
 
