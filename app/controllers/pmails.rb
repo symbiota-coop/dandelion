@@ -129,6 +129,7 @@ Dandelion::App.controller do
 
   get '/pmails/:pmail_id/preview' do
     @pmail = @pmails.find(params[:pmail_id]) || not_found
+    email_html_csp!
     @pmail.html.gsub('%recipient.firstname%', 'there').gsub('%recipient.footer_class%', 'd-none')
   end
 

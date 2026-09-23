@@ -85,6 +85,11 @@ Dandelion::App.helpers do
     end
   end
 
+  # For rendering user-authored email HTML on our own domain
+  def email_html_csp!
+    headers['Content-Security-Policy'] = "default-src 'none'; img-src 'self' https: http: data:; style-src 'unsafe-inline'; script-src 'none'; object-src 'none'; base-uri 'none'"
+  end
+
   def mass_assigning(params, model)
     params = (params || {}).dup
     allowed = model.assignable_foreign_keys.map(&:to_s)

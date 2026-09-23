@@ -28,6 +28,15 @@ class PmailsTest < ActiveSupport::TestCase
     assert page.has_title? subject
   end
 
+  test 'pmail preview blocks scripts' do
+    create_organisation
+    pmail = FactoryBot.create(:pmail, organisation: @organisation, recipient_kind: 'everyone', body: '<p>Hi</p><script>document.title = "pwned"</script>')
+    sign_in(@account)
+    visit "/pmails/#{pmail.id}/preview?organisation_id=#{@organisation.id}"
+    assert_includes page.response_headers.transform_keys(&:downcase)['content-security-policy'], "script-src 'none'"
+    refute page.has_title? 'pwned'
+  end
+
   test 'organisation pmail list can be filtered by recipients' do
     create_event(allow_ticket_type_waitlists: true)
     activity = FactoryBot.create(:activity, organisation: @organisation)
