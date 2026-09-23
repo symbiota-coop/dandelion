@@ -1,4 +1,14 @@
 <script>
+  function eventStatsZeroColumns() {
+    return $("#event_stats thead th[data-hide-if-zero]").toArray().map(function(th) {
+      return $(th).index()
+    }).filter(function(index) {
+      return !$('#event_stats tbody tr').toArray().some(function(tr) {
+        return $(tr).children().eq(index).is('[data-nonzero]')
+      })
+    })
+  }
+
   $(function() {
     var scrollTimeout;  // Timeout variable to detect end of scrolling
 
@@ -56,18 +66,19 @@
                 $('tfoot th').eq(index).html(sum);
             });
           })
-          $($("#event_stats th[data-hide-if-zero]").get().reverse()).each(function() {
-            var index = $("#event_stats thead th").index(this);
-            var nonzero = $('#event_stats tbody tr').toArray().some(function(tr) {
-              return $('td:eq('+index+')', tr).is('[data-nonzero]')
-            })
-            if (!nonzero)
-              $('#event_stats').DataTable().column(index).visible(false)
-          })
+          $('#event_stats').DataTable().columns(eventStatsZeroColumns()).visible(false)
           $('#event_stats').DataTable().draw();
         }
       })
 
+    })
+  </script>
+<% else %>
+  <script>
+    $(function () {
+      eventStatsZeroColumns().forEach(function(index) {
+        $('#event_stats tr').each(function() { $(this).children().eq(index).hide() })
+      })
     })
   </script>
 <% end %>
