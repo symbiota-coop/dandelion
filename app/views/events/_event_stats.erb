@@ -56,6 +56,14 @@
                 $('tfoot th').eq(index).html(sum);
             });
           })
+          $($("#event_stats th[data-hide-if-zero]").get().reverse()).each(function() {
+            var index = $("#event_stats thead th").index(this);
+            var nonzero = $('#event_stats tbody tr').toArray().some(function(tr) {
+              return $('td:eq('+index+')', tr).is('[data-nonzero]')
+            })
+            if (!nonzero)
+              $('#event_stats').DataTable().column(index).visible(false)
+          })
           $('#event_stats').DataTable().draw();
         }
       })
@@ -93,7 +101,7 @@
         <th data-money>Profit</th>
         <th data-money>Profit less donations, before allocations</th>
         <% Event.profit_share_roles.each do |role| %>
-          <th data-money>Allocated to <%= role.gsub('_',' ') %></th>
+          <th data-money<% if %w[category_steward social_media].include?(role) %> data-hide-if-zero<% end %>>Allocated to <%= role.gsub('_',' ') %></th>
         <% end %>
         <th data-money>Profit less donations, after allocations</th>
         <th data-money>Profit including donations, after allocations</th>
