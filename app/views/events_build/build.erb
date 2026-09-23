@@ -361,6 +361,11 @@
           </div>
           <%= f.number_block :profit_share_to_organiser, disabled: revenue_fields_disabled %>
           <%= f.number_block :profit_share_to_coordinator, disabled: revenue_fields_disabled %>
+          <% %w[category_steward social_media].each do |role| %>
+            <% if @event.send("profit_share_to_#{role}").to_f != 0 %>
+              <%= f.number_block :"profit_share_to_#{role}", disabled: revenue_fields_disabled %>
+            <% end %>
+          <% end %>
           <%= f.number_block :profit_share_to_organisation, disabled: true %>
 
           <%= f.number_block :stripe_revenue_adjustment, disabled: revenue_fields_disabled %>
