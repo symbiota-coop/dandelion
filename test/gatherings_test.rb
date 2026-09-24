@@ -185,6 +185,21 @@ class GatheringsTest < ActiveSupport::TestCase
     assert_nil Follow.find_by(follower: added, followee: joiner)
   end
 
+  test 'applications submitted while signed out for an existing account do not make the account follow members' do
+    create_gathering
+    admin = @account
+    @gathering.set(privacy: 'closed')
+    victim = FactoryBot.create(:account)
+
+    post "/g/#{@gathering.slug}/apply", account: { name: 'Anyone', email: victim.email }
+
+    mapplication = @gathering.mapplications.find_by(account: victim)
+    assert mapplication.submitted_signed_out
+    mapplication.accept
+    assert @gathering.memberships.find_by(account: victim).added_without_applying
+    assert_nil Follow.find_by(follower: victim, followee: admin)
+  end
+
   test 'members added by someone else after applying follow existing members' do
     create_gathering
     admin = @account

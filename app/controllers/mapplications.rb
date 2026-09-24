@@ -41,7 +41,9 @@ Dandelion::App.controller do
       validate_recaptcha
 
       redirect back unless params[:account] && params[:account][:email]
-      unless (@account = Account.find_by(email: params[:account][:email].downcase.strip))
+      if (@account = Account.find_by(email: params[:account][:email].downcase.strip))
+        submitted_signed_out = true
+      else
         @account = Account.new(mass_assigning(params[:account], Account))
         @account.password = Account.generate_password # not used
         unless @account.save
@@ -58,7 +60,7 @@ Dandelion::App.controller do
       flash[:notice] = "You've already applied to that gathering"
       redirect back
     else
-      @mapplication = @gathering.mapplications.build account: @account, status: 'pending', answers: question_answer_pairs(params)
+      @mapplication = @gathering.mapplications.build account: @account, status: 'pending', answers: question_answer_pairs(params), submitted_signed_out: submitted_signed_out
       if @mapplication.save
         if @mapplication.acceptable? && @mapplication.meets_threshold
           @mapplication.accept

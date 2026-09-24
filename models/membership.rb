@@ -32,7 +32,8 @@ class Membership
 
   before_create do
     # Stored rather than derived from added_by_id, which is nullified if the adder deletes their account
-    self.added_without_applying = added_by_id && !mapplication_id && !gathering.mapplications.and(account_id: account_id).exists? ? true : false
+    # Applications submitted while signed out for an existing account don't count as the account holder applying
+    self.added_without_applying = (added_by_id || mapplication&.submitted_signed_out) && !gathering.mapplications.and(account_id: account_id, :submitted_signed_out.ne => true).exists? ? true : false
   end
 
   attr_accessor :prevent_notifications

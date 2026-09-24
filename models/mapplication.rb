@@ -9,6 +9,7 @@ class Mapplication
 
   field :status, type: String
   field :answers, type: Array
+  field :submitted_signed_out, type: Boolean
 
 
   has_many :verdicts, dependent: :destroy
