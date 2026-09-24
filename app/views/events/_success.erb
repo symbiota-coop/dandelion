@@ -71,12 +71,12 @@
             </h4>
             <div class="row">
               <div class="col-6">
-                <div data-pagelet-url="/events/<%=@event.id%>/orders/<%=@order.public_id%>/ticketholders/<%=ticket.id%>/name" data-pagelet-no-opacity-change="true">
+                <div data-pagelet-url="/events/<%=@event.id%>/orders/<%=@order.public_id%>/ticketholders/<%=ticket.public_id%>/name" data-pagelet-no-opacity-change="true">
                   <%= partial :"events/ticketholder_name", locals: { ticket: ticket } %>
                 </div>
               </div>
               <div class="col-6">
-                <div data-pagelet-url="/events/<%=@event.id%>/orders/<%=@order.public_id%>/ticketholders/<%=ticket.id%>/email?success=<%=params[:success] ? 1 : 0 %>" data-pagelet-no-opacity-change="true">
+                <div data-pagelet-url="/events/<%=@event.id%>/orders/<%=@order.public_id%>/ticketholders/<%=ticket.public_id%>/email?success=<%=params[:success] ? 1 : 0 %>" data-pagelet-no-opacity-change="true">
                   <%= partial :"events/ticketholder_email", locals: { ticket: ticket, success: (params[:success] ? 1 : 0) } %>
                 </div>
               </div>

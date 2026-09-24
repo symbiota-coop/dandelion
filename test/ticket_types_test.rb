@@ -1,6 +1,44 @@
 require File.expand_path("#{File.dirname(__FILE__)}/test_config.rb")
 
 class TicketTypesTest < ActiveSupport::TestCase
+  include Rack::Test::Methods
+
+  test 'creating a ticket type generates a secret token' do
+    create_event(prices: [0])
+    ticket_type = @event.ticket_types.first
+
+    assert_equal ticket_type.token, ticket_type.public_id
+    assert_match(/\A\h{8}-\h{4}-4\h{3}-[89ab]\h{3}-\h{12}\z/, ticket_type.token)
+  end
+
+  test 'saving a legacy ticket type does not backfill a token' do
+    create_event(prices: [0])
+    ticket_type = @event.ticket_types.first
+    ticket_type.unset(:token)
+    ticket_type.reload
+    ticket_type.update_attributes!(name: 'Renamed')
+
+    assert_nil ticket_type.reload.token
+    assert_equal ticket_type.id.to_s, ticket_type.public_id
+  end
+
+  test 'secret ticket types are revealed by token, or by mongo id only if legacy' do
+    create_event(prices: [0])
+    ticket_type = @event.ticket_types.create!(name: 'Secret squirrel', price: 0, quantity: 10, hidden: true)
+
+    get "/e/#{@event.slug}"
+    refute_includes last_response.body, 'Secret squirrel'
+
+    get "/e/#{@event.slug}?ticket_type_id=#{ticket_type.id}"
+    refute_includes last_response.body, 'Secret squirrel'
+
+    get "/e/#{@event.slug}?ticket_type_id=#{ticket_type.token}"
+    assert_includes last_response.body, 'Secret squirrel'
+
+    ticket_type.unset(:token)
+    get "/e/#{@event.slug}?ticket_type_id=#{ticket_type.id}"
+    assert_includes last_response.body, 'Secret squirrel'
+  end
   test 'parses fixed price from price_or_range' do
     event = FactoryBot.build(:event)
     ticket_type = TicketType.new(event: event, price_or_range: '25', price_or_range_submitted: true, name: 'Standard', quantity: 10)

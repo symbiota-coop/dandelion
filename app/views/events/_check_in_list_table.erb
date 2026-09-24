@@ -50,15 +50,15 @@
       <%= ticket.ticket_type.try(:name) %>
     </td>
     <td nowrap>
-      <abbr title="<%= ticket.id %>" data-toggle="tooltip">
-        <%= ticket.id.to_s[0..3] %>&hellip;<%= ticket.id.to_s[-4..-1] %>
+      <abbr title="<%= ticket.public_id %>" data-toggle="tooltip">
+        <%= ticket.public_id[0..3] %>&hellip;<%= ticket.public_id[-4..-1] %>
       </abbr>
     </td>
     <td data-sort="<%= ticket.created_at.iso8601 %>">
       <%= ticket.created_at %>
     </td>
     <td>
-      <div data-pagelet-url="/events/<%= @event.id %>/check_in_toggle/<%= ticket.id %>">
+      <div data-pagelet-url="/events/<%= @event.id %>/check_in_toggle/<%= ticket.public_id %>">
         <%= partial :'events/check_in_toggle', locals: { ticket: ticket } %>
       </div>
     </td>

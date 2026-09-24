@@ -192,8 +192,37 @@ class OrdersTest < ActiveSupport::TestCase
     @ticket = @order.tickets.create!(event: @event, account: @attendee, ticket_type: @event.ticket_types.first, price: 0)
   end
 
-  def ticketholder_path(order_ref, action)
-    "/events/#{@event.id}/orders/#{order_ref}/ticketholders/#{@ticket.id}/#{action}"
+  def ticketholder_path(order_ref, action, ticket_ref: @ticket.public_id)
+    "/events/#{@event.id}/orders/#{order_ref}/ticketholders/#{ticket_ref}/#{action}"
+  end
+
+  test 'creating a ticket generates a secret token' do
+    create_complete_order_with_ticket
+
+    assert_equal @ticket.token, @ticket.public_id
+    assert_match(/\A\h{8}-\h{4}-4\h{3}-[89ab]\h{3}-\h{12}\z/, @ticket.token)
+  end
+
+  test 'ticketholder details of tokenised tickets cannot be edited with the ticket mongo id' do
+    create_complete_order_with_ticket
+
+    get ticketholder_path(@order.token, 'name', ticket_ref: @ticket.id)
+    assert_equal 404, last_response.status
+
+    post ticketholder_path(@order.token, 'name', ticket_ref: @ticket.id), name: 'Attacker'
+    assert_equal 404, last_response.status
+    assert_nil @ticket.reload.name
+  end
+
+  test 'ticketholder details of legacy tickets can be edited with the ticket mongo id' do
+    create_complete_order_with_ticket
+    @ticket.unset(:token)
+    @ticket.reload
+    assert_equal @ticket.id.to_s, @ticket.public_id
+
+    post ticketholder_path(@order.token, 'name', ticket_ref: @ticket.id), name: 'Legacy Name'
+    assert_equal 200, last_response.status
+    assert_equal 'Legacy Name', @ticket.reload.name
   end
 
   test 'ticketholder details can be edited with the order token' do
@@ -237,6 +266,24 @@ class OrdersTest < ActiveSupport::TestCase
     post ticketholder_path(@order.id, 'email'), email: 'attacker@example.com', success: 1
     assert_equal 404, last_response.status
     assert_nil @ticket.reload.email
+  end
+
+  test 'check-in accepts the ticket token from the QR code, and legacy ticket mongo ids' do
+    create_complete_order_with_ticket
+    secret = OpenSSL::HMAC.hexdigest('SHA256', ENV['SESSION_SECRET'], "check_in:#{@event.id}")[0, 32]
+
+    post "/events/#{@event.id}/check_in/#{@ticket.token}", checked_in: true, secret: secret
+    assert_equal 200, last_response.status
+    assert @ticket.reload.checked_in
+
+    post "/events/#{@event.id}/check_in/#{@ticket.id}", secret: secret
+    assert_equal 403, last_response.status
+    assert @ticket.reload.checked_in
+
+    @ticket.unset(:token)
+    post "/events/#{@event.id}/check_in/#{@ticket.id}", secret: secret
+    assert_equal 200, last_response.status
+    refute @ticket.reload.checked_in
   end
 
   test 'ticketholder routes return 404 for an unknown ticket' do

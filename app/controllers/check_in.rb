@@ -22,12 +22,12 @@ Dandelion::App.controller do
   end
 
   get '/events/:id/check_in_toggle/:ticket_id' do
-    ticket = @event.tickets.complete.find(params[:ticket_id])
+    ticket = @event.tickets.complete.find_by_id_or_token(params[:ticket_id])
     partial :'events/check_in_toggle', locals: { ticket: ticket }
   end
 
   post '/events/:id/check_in/:ticket_id' do
-    ticket = @event.tickets.complete.find(params[:ticket_id])
+    ticket = @event.tickets.complete.find_by_id_or_token(params[:ticket_id])
     if !ticket
       403
     elsif params[:checked_in] && ticket.checked_in
@@ -62,6 +62,7 @@ Dandelion::App.controller do
     if params[:q]
       @tickets = @tickets.and(:id.in =>
           @tickets.and(id_string: /#{Regexp.escape(params[:q])}/i).pluck(:id) +
+          @tickets.and(token: /#{Regexp.escape(params[:q])}/i).pluck(:id) +
           @tickets.and(name: /#{Regexp.escape(params[:q])}/i).pluck(:id) +
           @tickets.and(email: /#{Regexp.escape(params[:q])}/i).pluck(:id) +
           @tickets.and(:account_id.in => Account.search(params[:q], child_scope: @tickets, regex_search: true).pluck(:id)).pluck(:id))

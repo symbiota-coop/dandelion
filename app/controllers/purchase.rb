@@ -66,7 +66,8 @@ Dandelion::App.controller do
       next if quantity <= 0
 
       ticket_type = @event.ticket_types.find(ticket_type_id)
-      unless ticket_type
+      # Hidden ticket types can only be bought via their secret link
+      if !ticket_type || (ticket_type.hidden && ticket_form[:ticket_type_id] != ticket_type.public_id)
         @order.destroy
         not_found
       end

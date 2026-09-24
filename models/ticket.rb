@@ -7,6 +7,7 @@ class Ticket
   include Refundable
   include TicketNotifications
   include TicketPaymentMethods
+  include PublicToken
 
   belongs_to_without_parent_validation :event
   belongs_to_without_parent_validation :account, optional: true
@@ -36,7 +37,7 @@ class Ticket
   field :original_ticket_type_name, type: String
 
   def self.protected_attributes
-    %w[payment_completed]
+    %w[payment_completed token]
   end
 
   before_validation do

@@ -24,6 +24,7 @@ end
 @concise_ticket_form = !@event.always_show_full_ticket_form? &&
   @event.ticket_types.count == 1 &&
   (free_ticket_type = @event.ticket_types.first) &&
+  (!free_ticket_type.hidden || params[:ticket_type_id] == free_ticket_type.public_id) &&
   free_ticket_type.price &&
   free_ticket_type.price.zero? &&
   free_ticket_type.number_of_tickets_available_in_single_purchase > 0 &&
@@ -66,6 +67,7 @@ end
         <%= hidden_field_tag :cohost, value: params[:cohost] %>
         <%= hidden_field_tag :affiliate_type, value: params[:affiliate_type] %>
         <%= hidden_field_tag :affiliate_id, value: params[:affiliate_id] %>
+        <%= hidden_field_tag :ticket_type_id, value: params[:ticket_type_id] %>
 
         <% if @concise_ticket_form %>
           <%= hidden_field_tag :"quantities[#{free_ticket_type.id}]", value: 1, 'data-ticket-type-id': free_ticket_type.id, 'data-ticket-group-id': free_ticket_type.ticket_group_id, 'data-price': 0, 'data-slots': free_ticket_type.slots %>
@@ -76,7 +78,7 @@ end
             <% @previous_ticket_group = 'Other tickets' %>
 
             <% @event.ticket_types.order('order asc, price desc').each_with_index { |ticket_type,i| %>
-            <% next if ticket_type.hidden && params[:ticket_type_id] != ticket_type.id.to_s; %>
+            <% next if ticket_type.hidden && params[:ticket_type_id] != ticket_type.public_id; %>
             <% next if discount_code && discount_code.filter && !discount_code.filter.downcase.split(',').map(&:strip).any? { |filter| ticket_type.name.downcase.include?(filter) } %>
             <% ticket_type_availability = ticket_type.number_of_tickets_available_in_single_purchase %>
             <% ticket_type_sales_closed = ticket_type.sales_ended? || @event.sales_closed_due_to_event_end? %>

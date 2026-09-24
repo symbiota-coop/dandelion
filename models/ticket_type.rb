@@ -2,6 +2,7 @@ class TicketType
   include Mongoid::Document
   include Mongoid::Timestamps
   include CoreExtensions
+  include PublicToken
 
   belongs_to_without_parent_validation :event
   belongs_to_without_parent_validation :ticket_group, optional: true
@@ -32,6 +33,10 @@ class TicketType
     \s*\]
     \s*\z
   /x
+
+  def self.protected_attributes
+    %w[token]
+  end
 
   attr_writer :price_or_range
   attr_accessor :price_or_range_submitted

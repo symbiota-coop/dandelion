@@ -17,6 +17,38 @@ class EventBookingsTest < ActiveSupport::TestCase
          }
   end
 
+  test 'hidden ticket types can only be bought with their secret link' do
+    create_event(prices: [0])
+    hidden = @event.ticket_types.create!(name: 'Secret', price: 0, quantity: 10, hidden: true)
+    buyer = FactoryBot.create(:account)
+    purchase = lambda do |ticket_type_id|
+      header 'Accept', 'application/json'
+      post "/events/#{@event.id}/purchase",
+           ticketForm: { quantities: { hidden.id.to_s => '1' }, ticket_type_id: ticket_type_id },
+           detailsForm: { payment_method: 'rsvp', account: { name: buyer.name, email: buyer.email } }
+    end
+
+    purchase.call(nil)
+    assert_equal 404, last_response.status
+    purchase.call(hidden.id.to_s)
+    assert_equal 404, last_response.status
+    assert_equal 0, hidden.tickets.count
+    assert_equal 0, @event.orders.count
+
+    purchase.call(hidden.token)
+    assert_equal 200, last_response.status
+    assert_equal 1, hidden.tickets.count
+
+    hidden.unset(:token)
+    header 'Accept', 'application/json'
+    post "/events/#{@event.id}/purchase",
+         confirmed_duplicate: '1',
+         ticketForm: { quantities: { hidden.id.to_s => '1' }, ticket_type_id: hidden.id.to_s },
+         detailsForm: { payment_method: 'rsvp', account: { name: buyer.name, email: buyer.email } }
+    assert_equal 200, last_response.status
+    assert_equal 2, hidden.tickets.count
+  end
+
   test 'booking onto a paid event' do
     create_event(prices: [(ticket_price = 10)], suggested_donation: 0)
     sign_in(@account)

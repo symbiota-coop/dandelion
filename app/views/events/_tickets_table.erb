@@ -89,8 +89,8 @@
       <%= partial :'events/ticket_type', locals: { ticket: ticket } %>
     </td>
     <td nowrap>
-      <abbr title="<%= ticket.id %>" data-toggle="tooltip">
-        <%= ticket.id.to_s[0..3] %>&hellip;<%= ticket.id.to_s[-4..-1] %>
+      <abbr title="<%= ticket.public_id %>" data-toggle="tooltip">
+        <%= ticket.public_id[0..3] %>&hellip;<%= ticket.public_id[-4..-1] %>
       </abbr>
     </td>
     <td data-sort="<%= ticket.discounted_price %>" data-pagelet-url="/tickets/<%= ticket.id %>/price">
@@ -100,7 +100,7 @@
       <%= ticket.created_at %>
     </td>
     <td>
-      <div data-pagelet-url="/events/<%= @event.id %>/check_in_toggle/<%= ticket.id %>">
+      <div data-pagelet-url="/events/<%= @event.id %>/check_in_toggle/<%= ticket.public_id %>">
         <%= partial :'events/check_in_toggle', locals: { ticket: ticket } %>
       </div>
     </td>

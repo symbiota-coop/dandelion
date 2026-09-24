@@ -10,6 +10,7 @@ class Order
   end
 
   include OrderFields
+  include PublicToken
   include OrderPaymentMethods
   include OrderNotifications
   include OrderAccounting
@@ -29,29 +30,11 @@ class Order
 
   has_many :notifications, as: :notifiable, dependent: :destroy
 
-  validates_uniqueness_of :token, allow_nil: true
-
   def self.protected_attributes
     %w[payment_completed token]
   end
 
-  # Looks up an order by its token. Orders that predate tokens (and so were
-  # only ever linked to by Mongo id) can still be looked up by id, but orders
-  # that have a token are deliberately not reachable by their id.
-  def self.find_by_id_or_token(id_or_token)
-    return unless id_or_token.is_a?(String) && id_or_token.present?
-
-    if (order = find_by(token: id_or_token))
-      order
-    elsif id_or_token.match?(/\A[0-9a-fA-F]{24}\z/) && (order = find(id_or_token)) && order.token.blank?
-      order
-    end
-  end
-
   before_validation do
-    # Only mint on create so later saves do not backfill tokens onto legacy
-    # orders (those stay reachable by Mongo id).
-    mint_token if new_record? && token.blank?
     self.discount_code = nil if discount_code && !discount_code.applies_to?(event)
     self.discount_code = nil if discount_code&.exhausted?(excluding: self)
     self.percentage_discount = discount_code.percentage_discount if discount_code && discount_code.percentage_discount
@@ -161,22 +144,6 @@ class Order
 
   def payment_provider
     EventPaymentMethod.for_record(self)&.provider_name
-  end
-
-  def mint_token
-    loop do
-      generated = SecureRandom.uuid
-      unless Order.and(token: generated).exists?
-        self.token = generated
-        break
-      end
-    end
-  end
-
-  # Orders created before tokens were introduced fall back to their Mongo id,
-  # which /orders/:id still accepts via find_by_id_or_token.
-  def public_id
-    token.present? ? token : id.to_s
   end
 
   def payment_completed!
@@ -343,7 +310,7 @@ class Order
           pdf.text order.event.when_details(order.account.try(:time_zone)), align: :center, size: 14
           pdf.move_down 0.5 * cm
           pdf.indent((width / 2) - (qr_size / 2) - margin) do
-            pdf.print_qr_code ticket.id.to_s, extent: qr_size
+            pdf.print_qr_code ticket.public_id, extent: qr_size
           end
           pdf.move_down 0.5 * cm
           pdf.text order.account.name, align: :center, size: 14
@@ -352,7 +319,7 @@ class Order
             pdf.text "#{ticket.ticket_type.name}, #{Money.new((ticket.discounted_price || 0) * 100, ticket.currency).format(no_cents_if_whole: true)}", align: :center, size: 14
           end
           pdf.move_down 0.5 * cm
-          pdf.text ticket.id.to_s, align: :center, size: 10
+          pdf.text ticket.public_id, align: :center, size: 10
         end
       end
       document

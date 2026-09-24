@@ -34,7 +34,7 @@ Dandelion::App.controller do
   get '/events/:id/orders/:order_id/ticketholders/:ticket_id/name' do
     @event = Event.find(params[:id]) || not_found
     @order = @event.orders.complete.find_by_id_or_token(params[:order_id]) || not_found
-    @ticket = @order.tickets.find(params[:ticket_id]) || not_found
+    @ticket = @order.tickets.find_by_id_or_token(params[:ticket_id]) || not_found
     headers['Referrer-Policy'] = 'no-referrer'
     partial :'events/ticketholder_name', locals: { ticket: @ticket }
   end
@@ -42,7 +42,7 @@ Dandelion::App.controller do
   post '/events/:id/orders/:order_id/ticketholders/:ticket_id/name' do
     @event = Event.find(params[:id]) || not_found
     @order = @event.orders.complete.find_by_id_or_token(params[:order_id]) || not_found
-    @ticket = @order.tickets.find(params[:ticket_id]) || not_found
+    @ticket = @order.tickets.find_by_id_or_token(params[:ticket_id]) || not_found
     headers['Referrer-Policy'] = 'no-referrer'
     @ticket.set(name: params[:name])
     200
@@ -51,7 +51,7 @@ Dandelion::App.controller do
   get '/events/:id/orders/:order_id/ticketholders/:ticket_id/email' do
     @event = Event.find(params[:id]) || not_found
     @order = @event.orders.complete.find_by_id_or_token(params[:order_id]) || not_found
-    @ticket = @order.tickets.find(params[:ticket_id]) || not_found
+    @ticket = @order.tickets.find_by_id_or_token(params[:ticket_id]) || not_found
     headers['Referrer-Policy'] = 'no-referrer'
     partial :'events/ticketholder_email', locals: { ticket: @ticket, success: params[:success] }
   end
@@ -59,7 +59,7 @@ Dandelion::App.controller do
   post '/events/:id/orders/:order_id/ticketholders/:ticket_id/email' do
     @event = Event.find(params[:id]) || not_found
     @order = @event.orders.complete.find_by_id_or_token(params[:order_id]) || not_found
-    @ticket = @order.tickets.find(params[:ticket_id]) || not_found
+    @ticket = @order.tickets.find_by_id_or_token(params[:ticket_id]) || not_found
     headers['Referrer-Policy'] = 'no-referrer'
     previous_email = @ticket.email
     @ticket.email = params[:email]

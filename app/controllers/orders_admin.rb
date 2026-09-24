@@ -79,6 +79,7 @@ Dandelion::App.controller do
     if params[:q]
       @tickets = @tickets.and(:id.in =>
         @tickets.and(id_string: /#{Regexp.escape(params[:q])}/i).pluck(:id) +
+        @tickets.and(token: /#{Regexp.escape(params[:q])}/i).pluck(:id) +
         @tickets.and(name: /#{Regexp.escape(params[:q])}/i).pluck(:id) +
         @tickets.and(email: /#{Regexp.escape(params[:q])}/i).pluck(:id) +
         @tickets.and(:account_id.in => Account.search(params[:q], child_scope: @tickets, regex_search: true).pluck(:id)).pluck(:id))
