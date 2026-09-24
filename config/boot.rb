@@ -18,6 +18,11 @@ Mongoid.load!("#{PADRINO_ROOT}/config/mongoid.yml")
 Mongoid.raise_not_found_error = false
 Mongoid.autosave_saves_unchanged_documents = false
 
+# Padrino loads each glob shallow-first, so models/*.rb would run before
+# models/concerns and every model would NameError on CoreExtensions and reload.
+models_glob = Padrino.dependency_paths.index { |path| path.end_with?('/models/**/*.rb') }
+Padrino.dependency_paths.insert(models_glob, "#{Padrino.root}/models/concerns/**/*.rb")
+
 Padrino.load!
 
 require_relative 'sentry_config'
