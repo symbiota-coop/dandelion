@@ -20,7 +20,7 @@
       <%= partial :'organisations/add', locals: {
           role: 'co-host',
           organisations: @event.cohosts.order('name asc'),
-          add_and_remove: event_admin?,
+          add_and_remove: event_revenue_settings_admin?,
           new_object: Cohostship.new,
           new_url: "/events/#{@event.id}/cohostships/new",
           destroy_url: "/events/#{@event.id}/cohostships/destroy"

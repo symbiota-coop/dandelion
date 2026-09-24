@@ -44,9 +44,11 @@
       <% end %>
     </td>
     <td class="no-buttons">
+      <% if organisation_admins_or_event_managers?(organisation) %>
       <% form_for cohostship, "/events/#{@event.id}/cohostships/#{cohostship.id}" do |f| %>
         <%= f.check_box_block :featured %>
         <%= f.submit_block %>
+      <% end %>
       <% end %>
     </td>
   </tr>

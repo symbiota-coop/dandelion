@@ -230,6 +230,9 @@ Dandelion::App.controller do
   post '/events/:id/cohostships/new' do
     @event = Event.find(params[:id]) || not_found
     event_admins_only!
+    # Cohost admins become event admins, so only accounts trusted by the host
+    # organisation may add cohosts (otherwise anyone could add their own organisation)
+    kick!(redirect_url: "/e/#{@event.slug}") unless event_revenue_settings_admin?
     if params[:cohostship] && params[:cohostship][:organisation_id]
       @organisation = Organisation.find(params[:cohostship][:organisation_id]) || not_found
       organisation_admins_or_event_managers_only! if @organisation.restrict_cohosting?
@@ -241,6 +244,7 @@ Dandelion::App.controller do
   post '/events/:id/cohostships/destroy' do
     @event = Event.find(params[:id]) || not_found
     event_admins_only!
+    kick!(redirect_url: "/e/#{@event.slug}") unless event_revenue_settings_admin?
     @event.cohostships.find_by(organisation_id: params[:organisation_id]).try(:destroy)
     redirect back
   end
@@ -254,7 +258,9 @@ Dandelion::App.controller do
   post '/events/:id/cohostships/:cohostship_id' do
     @event = Event.find(params[:id]) || not_found
     event_admins_only!
-    @cohostship = @event.cohostships.find(params[:cohostship_id])
+    @cohostship = @event.cohostships.find(params[:cohostship_id]) || not_found
+    # Featuring places the event in the cohost organisation's carousels
+    params[:cohostship].delete(:featured) if params[:cohostship] && !organisation_admins_or_event_managers?(@cohostship.organisation)
     if @cohostship.update_attributes(mass_assigning(params[:cohostship], Cohostship))
       redirect "/events/#{@event.id}/cohosts"
     else

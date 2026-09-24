@@ -332,33 +332,49 @@ class EventPermissionsTest < ActiveSupport::TestCase
     assert_equal 'Still editable', @event.reload.name
   end
 
-  test 'cohost admin cannot change revenue share fields by adding their own organisation as cohost' do
-    create_organisation(stripe_client_id: 'ca_test')
-    create_event(prices: [0])
+  test 'facilitator cannot add their own organisation as cohost' do
+    create_event
     facilitator = FactoryBot.create(:account)
     @event.event_facilitations.create!(account: facilitator)
-    facilitator.organisationships.create!(
-      organisation: @organisation,
-      stripe_connect_json: { 'stripe_user_id' => 'acct_facilitator' }.to_json
-    )
     attacker_organisation = FactoryBot.create(:organisation, account: facilitator)
 
     sign_in_with_rack(facilitator)
     post "/events/#{@event.id}/cohostships/new", cohostship: { organisation_id: attacker_organisation.id.to_s }
-    assert @event.cohostships.find_by(organisation: attacker_organisation)
-    assert Event.revenue_admin?(@event.reload, facilitator)
-    refute Event.revenue_settings_admin?(@event, facilitator)
 
-    post "/e/#{@event.slug}/edit", event: {
-      organiser_id: '',
-      revenue_sharer_id: facilitator.id.to_s,
-      revenue_share_to_revenue_sharer: '100'
-    }
+    assert last_response.redirect?
+    refute @event.cohostships.find_by(organisation: attacker_organisation)
+    refute Event.revenue_admin?(@event.reload, facilitator)
+    refute Event.email_viewer?(@event, facilitator)
+  end
 
-    refute last_response.redirect?
-    @event.reload
-    assert_nil @event.revenue_sharer_id
-    assert_equal 0, @event.revenue_share_to_revenue_sharer
+  test 'facilitator cannot remove a cohost' do
+    create_event
+    cohost = FactoryBot.create(:organisation)
+    @event.cohostships.create!(organisation: cohost)
+    facilitator = FactoryBot.create(:account)
+    @event.event_facilitations.create!(account: facilitator)
+
+    sign_in_with_rack(facilitator)
+    post "/events/#{@event.id}/cohostships/destroy", organisation_id: cohost.id.to_s
+
+    assert last_response.redirect?
+    assert @event.cohostships.find_by(organisation: cohost)
+  end
+
+  test 'event admin cannot feature event in a cohost carousel they do not manage' do
+    create_event
+    cohost = FactoryBot.create(:organisation)
+    cohostship = @event.cohostships.create!(organisation: cohost)
+    facilitator = FactoryBot.create(:account)
+    @event.event_facilitations.create!(account: facilitator)
+
+    sign_in_with_rack(facilitator)
+    post "/events/#{@event.id}/cohostships/#{cohostship.id}", cohostship: { featured: '1' }
+    refute cohostship.reload.featured
+
+    sign_in_with_rack(cohost.account)
+    post "/events/#{@event.id}/cohostships/#{cohostship.id}", cohostship: { featured: '1' }
+    assert cohostship.reload.featured
   end
 
   test 'organisation admin can change revenue share fields' do

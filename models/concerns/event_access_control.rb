@@ -21,9 +21,9 @@ module EventAccessControl
 
   class_methods do
     # Who may change an event's revenue sharer and profit-share settings.
-    # Unlike revenue_admin?, cohost admins are excluded: any event admin can
-    # add an organisation they control as a cohost, so trusting cohosts here
-    # would let them redirect the host organisation's ticket revenue.
+    # Unlike revenue_admin?, cohost admins are excluded: cohosts are not trusted
+    # by the host organisation, so trusting them here would let them redirect
+    # the host organisation's ticket revenue. This is also who may add cohosts.
     def revenue_settings_admin?(event, account, activity_admin: nil, local_group_admin: nil, organisation_admin: nil)
       account &&
         event &&

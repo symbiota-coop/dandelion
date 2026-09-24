@@ -166,6 +166,8 @@ Once a facilitator has received feedback on an event, they appear on the [Facili
 
 Go to your event (the main page, not the settings page), click the plus icon next to Hosted by and search for the desired organisation by name.
 
+Because admins and event managers of a co-host organisation become event admins, only admins and event managers of the host organisation, or admins of the event's activity or local group, can add or remove co-hosts. Only admins and event managers of a co-host organisation can feature the event in that organisation's carousels.
+
 ## Emailing attendees
 
 - Click the event dropdown, select Mailer, and click New message.
