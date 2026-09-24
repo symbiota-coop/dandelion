@@ -16,7 +16,7 @@ class Membership
   field :shift_points_required, type: Float
   field :answers, type: Array
 
-  %w[admin unsubscribed hide_from_sidebar].each do |b|
+  %w[admin unsubscribed hide_from_sidebar added_without_applying].each do |b|
     field b.to_sym, type: Boolean
   end
 
@@ -30,17 +30,23 @@ class Membership
     self.requested_contribution = 0 if requested_contribution.nil?
   end
 
+  before_create do
+    # Stored rather than derived from added_by_id, which is nullified if the adder deletes their account
+    self.added_without_applying = added_by_id && !mapplication_id && !gathering.mapplications.and(account_id: account_id).exists? ? true : false
+  end
+
   attr_accessor :prevent_notifications
 
   has_many :notifications, as: :notifiable, dependent: :destroy
   after_create do
     notifications.create! circle: circle, type: 'joined_gathering' unless prevent_notifications
     gathering.set(membership_count: gathering.memberships.count)
-    gathering.members.each do |member|
-      next if member.id == account.id
+    # Only follow on a member's behalf if they chose to join, since following grants access to 'People I follow' details
+    gathering.memberships.each do |membership|
+      next if membership.account_id == account_id
 
-      Follow.create follower: member, followee: account, unsubscribed: true
-      Follow.create follower: account, followee: member, unsubscribed: true
+      Follow.create follower: membership.account, followee: account, unsubscribed: true unless membership.added_without_applying
+      Follow.create follower: account, followee: membership.account, unsubscribed: true unless added_without_applying
     end
     if (general = gathering.teams.find_by(name: 'General'))
       general.teamships.create! account: account, gathering: gathering, prevent_notifications: true

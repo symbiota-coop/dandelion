@@ -170,6 +170,45 @@ class GatheringsTest < ActiveSupport::TestCase
     assert_equal member_membership.id, spend.membership_id
   end
 
+  test 'members added by someone else do not follow existing members' do
+    create_gathering
+    admin = @account
+    added = FactoryBot.create(:account)
+    @gathering.memberships.create! account: added, added_by: admin
+    assert Follow.find_by(follower: admin, followee: added)
+    assert_nil Follow.find_by(follower: added, followee: admin)
+
+    joiner = FactoryBot.create(:account)
+    @gathering.memberships.create! account: joiner
+    assert Follow.find_by(follower: joiner, followee: admin)
+    assert Follow.find_by(follower: admin, followee: joiner)
+    assert_nil Follow.find_by(follower: added, followee: joiner)
+  end
+
+  test 'members added by someone else after applying follow existing members' do
+    create_gathering
+    admin = @account
+    applicant = FactoryBot.create(:account)
+    @gathering.mapplications.create! account: applicant, status: 'pending'
+    @gathering.memberships.create! account: applicant, added_by: admin
+    assert Follow.find_by(follower: applicant, followee: admin)
+    assert Follow.find_by(follower: admin, followee: applicant)
+  end
+
+  test 'members added by someone else still do not follow new members after the adder deletes their account' do
+    create_gathering
+    adder = FactoryBot.create(:account)
+    @gathering.memberships.create! account: adder
+    added = FactoryBot.create(:account)
+    @gathering.memberships.create! account: added, added_by: adder
+    adder.destroy
+    assert_nil @gathering.memberships.find_by(account: added).added_by_id
+
+    joiner = FactoryBot.create(:account)
+    @gathering.memberships.create! account: joiner
+    assert_nil Follow.find_by(follower: added, followee: joiner)
+  end
+
   test 'gathering welcome email cannot exfiltrate a sign-in token via an image' do
     create_gathering
     @gathering.set(
