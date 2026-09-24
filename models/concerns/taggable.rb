@@ -9,12 +9,13 @@ module Taggable
 
       after_save :update_tags
 
-      tag_name_method = :"#{tag_class.name.underscore}_name"
+      tag_class_name = tag_class.is_a?(Module) ? tag_class.name : tag_class.to_s
+      tag_name_method = :"#{tag_class_name.underscore}_name"
 
       define_method(:taggable_config) do
         {
           tagships: tagships,
-          tag_class: tag_class,
+          tag_class: tag_class_name.constantize,
           tag_name_method: tag_name_method
         }
       end

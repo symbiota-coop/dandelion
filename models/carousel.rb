@@ -4,7 +4,7 @@ class Carousel
   include CoreExtensions
   include Taggable
 
-  taggable tagships: :carouselships, tag_class: EventTag
+  taggable tagships: :carouselships, tag_class: 'EventTag'
 
   belongs_to_without_parent_validation :organisation
 

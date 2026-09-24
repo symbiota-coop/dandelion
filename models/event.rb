@@ -21,7 +21,7 @@ class Event
   include Geocoded
   include Taggable
 
-  taggable tagships: :event_tagships, tag_class: EventTag
+  taggable tagships: :event_tagships, tag_class: 'EventTag'
   include ImageWithValidation
   include AnalyticsProviders
   include Searchable
