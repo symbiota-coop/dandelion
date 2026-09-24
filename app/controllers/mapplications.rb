@@ -33,6 +33,7 @@ Dandelion::App.controller do
 
   post '/g/:slug/apply' do
     @gathering = Gathering.find_by(slug: params[:slug]) || not_found
+    halt 403 if @gathering.privacy == 'secret'
 
     if current_account
       @account = current_account
