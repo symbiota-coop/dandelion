@@ -163,8 +163,9 @@ Dandelion::App.controller do
       @event = Event.find(params[:event_id])
     end
 
-    @account.password = params[:account].delete('password')
-    if @account.update_attributes(mass_assigning(params[:account], Account))
+    account_params = params[:account]
+    @account.password = account_params.delete('password') if account_params.is_a?(Hash)
+    if account_params.is_a?(Hash) && @account.update_attributes(mass_assigning(account_params, Account))
       flash[:notice] = '<strong>Awesome!</strong> Your account was updated successfully.'
       @account.notifications_as_notifiable.and(type: 'updated_profile').destroy_all
       @account.notifications_as_notifiable.create! circle: @account, type: 'updated_profile'
