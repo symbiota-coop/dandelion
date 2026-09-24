@@ -23,6 +23,24 @@ Mongoid.autosave_saves_unchanged_documents = false
 models_glob = Padrino.dependency_paths.index { |path| path.end_with?('/models/**/*.rb') }
 Padrino.dependency_paths.insert(models_glob, "#{Padrino.root}/models/concerns/**/*.rb")
 
+# safe_load snapshots every class in the process around each require so development
+# can reload a file. Test and production never reload, and the snapshots dominate boot.
+unless Padrino.env == :development
+  module Padrino
+    module Reloader
+      class << self
+        def safe_load(file, options = {})
+          file = figure_path(file)
+          return unless options[:force] || file_changed?(file)
+
+          require(file)
+          update_modification_time(file)
+        end
+      end
+    end
+  end
+end
+
 Padrino.load!
 
 require_relative 'sentry_config'
