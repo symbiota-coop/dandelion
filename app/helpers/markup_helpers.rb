@@ -71,6 +71,23 @@ Dandelion::App.helpers do
     Sanitize.fragment(Rinku.auto_link(message.body.gsub("\n", '<br />')), Sanitize::Config::DANDELION)
   end
 
+  def truncate_chars(text, max = 40)
+    text = text.to_s
+    return text if text.length <= max
+
+    words = text.scan(/[[:space:]]*[[:graph:]]+/)
+    kept = +''
+    if words.size > 1
+      words.each do |word|
+        break if kept.length + word.length > max
+
+        kept << word
+      end
+    end
+    kept = text[0, max] if kept.empty?
+    "#{kept.sub(/[[:space:].,:;!?]+\z/, '')}…"
+  end
+
   def timeago(time)
     %(<abbr class="timeago" title="#{time.iso8601}">#{time}</abbr>).html_safe
   end
@@ -133,33 +150,33 @@ Dandelion::App.helpers do
 
   def quick_colors(count: 13, saturation_start: 80, saturation_end: 95, lightness: 50, primary: '#00AF5E')
     step = 360.0 / count
-    base_hue = Chroma.paint(primary).hsl.h.round
+    base_hue = ColorMath.hsl(primary).h.round
     colors = (0...count).map do |i|
       next primary if i == 0
 
       saturation = saturation_start + ((saturation_end - saturation_start) * i.to_f / (count - 1))
-      Chroma.paint("hsl(#{(base_hue + (i * step)) % 360}, #{saturation.round}%, #{lightness}%)").to_hex
+      ColorMath.hex_from_hsl((base_hue + (i * step)) % 360, saturation.round, lightness)
     end
     colors.reject.with_index { |_, i| i == 1 }[0..-4]
   end
 
   def clamp_color(hex, min_contrast: 2, min_lightness: 0.25)
-    hsl = Chroma.paint(hex).hsl
-    if LuminosityContrast.ratio(hex.delete('#'), 'fff') < min_contrast
+    hsl = ColorMath.hsl(hex)
+    if ColorMath.contrast_ratio(hex.delete('#'), 'fff') < min_contrast
       low = 0.0
       high = hsl.l
       7.times do
         mid = (low + high) / 2.0
-        test_hex = Chroma.paint("hsl(#{hsl.h}, #{(hsl.s * 100).round}%, #{(mid * 100).round}%)").to_hex
-        if LuminosityContrast.ratio(test_hex.delete('#'), 'fff') >= min_contrast
+        test_hex = ColorMath.hex_from_hsl(hsl.h, (hsl.s * 100).round, (mid * 100).round)
+        if ColorMath.contrast_ratio(test_hex.delete('#'), 'fff') >= min_contrast
           low = mid
         else
           high = mid
         end
       end
-      Chroma.paint("hsl(#{hsl.h}, #{(hsl.s * 100).round}%, #{(low * 100).round}%)").to_hex
+      ColorMath.hex_from_hsl(hsl.h, (hsl.s * 100).round, (low * 100).round)
     elsif hsl.l < min_lightness
-      Chroma.paint("hsl(#{hsl.h}, #{(hsl.s * 100).round}%, #{(min_lightness * 100).round}%)").to_hex
+      ColorMath.hex_from_hsl(hsl.h, (hsl.s * 100).round, (min_lightness * 100).round)
     else
       hex
     end

@@ -15,7 +15,7 @@ module AccountValidation
 
     before_validation do
       unless username
-        u = Haikunator.haikunate(0).underscore
+        u = HaikuName.generate
         if Account.find_by(username: u)
           n = 1
           n += 1 while Account.find_by(username: "#{u}_#{n}")

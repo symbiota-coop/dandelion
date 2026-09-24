@@ -5,7 +5,7 @@
     <a class="<%= klass if defined?(klass) %> message-preview text-dark <% if account.id == message.messenger_id && Message.unread?(account, current_account) %> unread <% end %>" style="text-decoration: none" href="/messages/<%= account.id %>">
       <h5 class="my-0"><%= account.name %></h5>
       <p class="text-muted mb-1">
-        <%= HTML_Truncator.truncate(message.body, 40, length_in_chars: true) %>
+        <%= truncate_chars(message.body) %>
       </p>
       <p class="mb-0 mr-1 text-right text-muted">
         <small>
