@@ -48,6 +48,7 @@ Dandelion::App.controller do
     @body_class = 'gradient'
     if params[:email] && (@account = Account.find_by(email: params[:email].downcase.strip))
       @account.send_sign_in_code
+      @show_email = true
       erb :'accounts/requested_sign_in_code'
     elsif params[:code]
       redirect "/?sign_in_token=#{params[:code].strip}"
