@@ -194,6 +194,15 @@ class EventsTest < ActiveSupport::TestCase
     assert_equal 'Ada', @account.firstname
   end
 
+  test 'rsvp button text is escaped on the event page' do
+    create_event(prices: [0], rsvp_button_text: '<img src=x onerror=alert(1)>')
+
+    get "/e/#{@event.slug}"
+    assert last_response.ok?
+    refute_match(%r{<img[^>]*onerror}, last_response.body)
+    assert_includes last_response.body, '&lt;img src=x onerror=alert(1)&gt;'
+  end
+
   test 'json-ld cannot close the script tag' do
     create_event(prices: [0], description: '<p>Welcome</p>')
     # location/website are not name-sanitised; description text is HTML-decoded

@@ -41,6 +41,8 @@ Dandelion::App.helpers do
     style = visible ? '' : 'display: none'
     btn_class = outline ? 'btn btn-outline-primary btn-block mb-1' : 'btn btn-primary btn-block mb-1'
     hidden_input = hidden_field_tag :payment_method, value: method, disabled: true
+    label = ERB::Util.html_escape(label)
+    method = ERB::Util.html_escape(method)
     <<-HTML
       <button style="#{style}" class="#{btn_class}" type="submit" data-payment-method="#{method}">
         <span>#{label}</span>
