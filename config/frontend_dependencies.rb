@@ -1,22 +1,18 @@
 FRONTEND_DEPENDENCIES = {
   'https://cdnjs.cloudflare.com/ajax/libs/' => {
     'jqueryui/1.13.2' => 'jquery-ui.min.js themes/base/jquery-ui.min.css',
-    'jquery-timeago/1.4.3' => 'jquery.timeago.min.js',
     'flatpickr/4.6.13' => 'flatpickr.min.js flatpickr.min.css',
     'datatables/1.10.16' => 'js/jquery.dataTables.min.js js/dataTables.bootstrap4.min.js css/dataTables.bootstrap4.min.css',
     'datatables-responsive/2.2.3' => 'dataTables.responsive.min.js',
     'tributejs/3.5.3' => 'tribute.min.js tribute.min.css',
     'select2/4.0.13' => 'js/select2.full.min.js css/select2.min.css',
-    'sticky-table-headers/0.1.24' => 'js/jquery.stickytableheaders.min.js',
     'iframe-resizer/4.2.10' => 'iframeResizer.contentWindow.min.js',
     'slick-carousel/1.8.1' => 'slick.min.js slick.min.css slick-theme.min.css',
     'Chart.js/3.5.1' => 'chart.js',
     'intro.js/6.0.0' => 'intro.min.js introjs.min.css',
     'qrcodejs/1.0.0' => 'qrcode.min.js',
     'masonry/4.0.0' => 'masonry.pkgd.min.js',
-    'TypeWatch/3.0.2' => 'jquery.typewatch.min.js',
     'bootstrap-icons/1.13.1' => 'font/bootstrap-icons.min.css',
-    'typed.js/2.0.10' => 'typed.min.js',
     'fullcalendar/6.1.19' => 'index.global.min.js',
     'chartjs-plugin-datalabels/2.0.0' => 'chartjs-plugin-datalabels.min.js',
     'highlight.js/11.9.0' => 'highlight.min.js styles/atom-one-dark.min.css'
@@ -30,7 +26,7 @@ FRONTEND_DEPENDENCIES = {
     'symbiota-coop/ckeditor5-dandelion/e9616f73489fd5d4fb2b143ed5d1e17e6fd467f0' => 'build/ckeditor.js'
   },
   '/javascripts/' => {
-    'ext' => 'autosize.js countUp.umd.js jquery-deparam.js linkify.min.js linkify-jquery.min.js',
+    'ext' => 'jquery-deparam.js linkify.min.js linkify-jquery.min.js',
     nil => 'pagelets.js jquery.lookup.js map.js currencySymbol.js serializeObject.js cookie_consent.js app.js'
   }
 }

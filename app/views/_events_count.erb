@@ -1,9 +1,6 @@
 <script>
   $(function() {
-    var c = new countUp.CountUp('events-count',
-      <%=@events.count%>
-    );
-    c.start();
+    countUp('events-count', <%= @events.count %>);
   })
 </script>
 <span id="events-count">0</span> upcoming events

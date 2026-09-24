@@ -7,8 +7,8 @@
 %>
   <script>
     $(function() {
-      new countUp.CountUp('ticket-count', <%= s[:ticket_count] %>).start();
-      new countUp.CountUp('worth-count', <%= worth_integer %>).start();
+      countUp('ticket-count', <%= s[:ticket_count] %>);
+      countUp('worth-count', <%= worth_integer %>);
     })
   </script>
 <% end %>

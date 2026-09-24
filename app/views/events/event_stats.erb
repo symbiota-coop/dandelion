@@ -107,10 +107,4 @@
     <% end %>
   </div>
 </div>
-<script>
-  $(function () {
-    if ($(window).width() > 992)
-      $('#event_stats').stickyTableHeaders({zIndex: 9999})
-  })
-</script>
 <%= partial :'events/event_stats', locals: { events: @events, organisation: organisation } %>

@@ -1,3 +1,92 @@
+function timeagoPhrase (iso) {
+  const date = new Date(iso)
+  if (isNaN(date.getTime())) return null
+  const seconds = Math.round((date.getTime() - Date.now()) / 1000)
+  const future = seconds > 0
+  const s = Math.abs(seconds)
+  const minutes = s / 60
+  const hours = minutes / 60
+  const days = hours / 24
+  const years = days / 365
+  let phrase
+  if (s < 45) phrase = 'less than a minute'
+  else if (s < 90) phrase = 'about a minute'
+  else if (minutes < 45) phrase = Math.round(minutes) + ' minutes'
+  else if (minutes < 90) phrase = 'about an hour'
+  else if (hours < 24) phrase = 'about ' + Math.round(hours) + ' hours'
+  else if (hours < 42) phrase = 'a day'
+  else if (days < 30) phrase = Math.round(days) + ' days'
+  else if (days < 45) phrase = 'about a month'
+  else if (days < 365) phrase = Math.round(days / 30) + ' months'
+  else if (years < 1.5) phrase = 'about a year'
+  else phrase = Math.round(years) + ' years'
+  return future ? phrase + ' from now' : phrase + ' ago'
+}
+
+function refreshTimeagos () {
+  $('abbr.timeago').each(function () {
+    const phrase = timeagoPhrase(this.getAttribute('title'))
+    if (phrase) this.textContent = phrase
+  })
+}
+
+function autosize (textarea) {
+  if (!textarea || textarea.nodeName !== 'TEXTAREA') return
+  function resize () {
+    const previous = textarea.style.height
+    textarea.style.height = '0'
+    const border = textarea.offsetHeight - textarea.clientHeight
+    const next = (textarea.scrollHeight + border) + 'px'
+    textarea.style.height = next
+    if (previous !== next) textarea.dispatchEvent(new Event('autosize:resized', { bubbles: true }))
+  }
+  if (!textarea.dataset.autosizeBound) {
+    textarea.dataset.autosizeBound = '1'
+    textarea.style.overflowY = 'hidden'
+    textarea.addEventListener('input', resize)
+  }
+  resize()
+}
+autosize.update = autosize
+
+function countUp (id, end) {
+  const el = document.getElementById(id)
+  if (!el) return
+  const target = Number(end) || 0
+  const started = performance.now()
+  function frame (now) {
+    const t = Math.min(1, (now - started) / 2000)
+    const value = Math.round(target * (1 - Math.pow(1 - t, 3)))
+    el.textContent = value.toLocaleString('en-US')
+    if (t < 1) requestAnimationFrame(frame)
+  }
+  requestAnimationFrame(frame)
+}
+
+function typewriter (selector, strings) {
+  const el = document.querySelector(selector)
+  if (!el || !strings || !strings.length) return
+  let index = 0
+  let length = 0
+  let deleting = false
+  function tick () {
+    const word = strings[index]
+    length += deleting ? -1 : 1
+    el.textContent = word.slice(0, length)
+    let delay = 50
+    if (!deleting && length === word.length) {
+      deleting = true
+      delay = 700
+    } else if (deleting && length === 0) {
+      deleting = false
+      index = (index + 1) % strings.length
+      delay = 200
+    }
+    setTimeout(tick, delay)
+  }
+  tick()
+}
+
 function scrollMessageThreadToBottom () {
   const thread = document.getElementById('thread-scroll')
   if (!thread) return
@@ -63,6 +152,7 @@ $(function () {
 
   syncFixedHeaderHeight()
   $(window).on('resize', syncFixedHeaderHeight)
+  setInterval(refreshTimeagos, 60000)
 
   function ajaxCompleted () {
 
@@ -198,7 +288,7 @@ $(function () {
       }
     )
 
-    $('abbr.timeago').not('[data-timeago-done]').attr('data-timeago-done', true).timeago()
+    refreshTimeagos()
 
     $('[data-account-username]').not('#modal [data-account-username]').not('[data-modalized]').attr('data-modalized', true).click(function () {
       $('#modal .modal-content').load('/u/' + $(this).attr('data-account-username'), function () {
@@ -359,7 +449,11 @@ $(function () {
       })
     })
 
-    $('input.typeWatch').not('[data-typewatch-initialized]').attr('data-typewatch-initialized', true).typeWatch({ wait: 500, callback: function () { $(this.form).submit() } })
+    $('input.typeWatch').not('[data-typewatch-initialized]').attr('data-typewatch-initialized', true).on('input', function () {
+      const input = this
+      clearTimeout(input.typeWatchTimer)
+      input.typeWatchTimer = setTimeout(function () { $(input.form).submit() }, 500)
+    })
 
     $('form.submitOnChange').not('[data-submit-on-change-initialized]').attr('data-submit-on-change-initialized', true).each(function () {
       $('select, .flatpickr-input, input[type=checkbox], input[type=month]', this).change(function () {

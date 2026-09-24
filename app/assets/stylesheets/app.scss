@@ -315,6 +315,15 @@ table.dataTable.table-sm>thead>tr>th {
   background: white
 }
 
+@media (min-width: 993px) {
+  #event_stats thead th {
+    position: sticky;
+    top: var(--fixed-header-height, 0);
+    z-index: 2;
+    background: #fff;
+  }
+}
+
 .select2-choices {
   box-shadow: none !important;
 }
