@@ -21,6 +21,8 @@ app/assets/stylesheets/event_details.css
 app/assets/stylesheets/event_details.css.map
 app/assets/stylesheets/variables.css
 app/assets/stylesheets/variables.css.map
+app/assets/stylesheets/bootstrap.css
+app/assets/stylesheets/bootstrap.css.map
 capybara
 node_modules
 *.js.map

@@ -48,6 +48,7 @@ Always ask permission before running tests. Your default posture should be to su
 - Files in lib are auto-loaded by Padrino.load!. No explicit require is necessary.
 - The `activate_tools` gem defines the `_block` helpers like `text_block`, `wysiwyg_block` etc. It also runs `blanks_to_nils!` on `params` so we can just do `if params[:x]` (no need for `if params[:x].present?`).
 - Do not use `.presence`
+- Never edit `vendor/bootstrap`. Customise Bootstrap in `app/assets/stylesheets/bootstrap.scss`
 - Controllers are `Dandelion::App.controller` blocks with `erb` / `partial` / `cp` — no `before_action`, strong params, or `render`
 
 ## Dependencies

@@ -1,0 +1,27 @@
+// Bootstrap's own SCSS in vendor/bootstrap is unmodified
+@import "variables";
+
+// variables.scss sets $badge_font_size for app.scss, and Sass treats _ and - as the same
+$badge-font-size: 75%;
+
+$blue: $color_primary;
+$gray-800: $body_text;
+$font-family-sans-serif: "Plus Jakarta Sans", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
+$font-weight-normal: 500;
+$lead-font-weight: inherit;
+
+@import "../../../vendor/bootstrap/scss/bootstrap";
+
+h1 > span, h2 > span, h3 > span,
+.h1 > span, .h2 > span, .h3 > span {
+  line-height: 1.255;
+}
+
+h4, h5, h6,
+.h4, .h5, .h6 {
+  line-height: 1.33;
+}
+
+.nav-tabs .nav-link {
+  margin-bottom: -3px;
+}
