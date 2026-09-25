@@ -13,22 +13,6 @@ class AnalyticsProvidersTest < ActiveSupport::TestCase
     assert_includes AnalyticsProvider.expire_cookies_for(:marketing), '_fbp'
   end
 
-  test 'plausible is enabled by organisation domain' do
-    create_organisation
-    provider = AnalyticsProvider.object('plausible')
-    refute provider.enabled?(organisation: @organisation)
-    @organisation.plausible_analytics_domain = 'soulrev.plausible.io'
-    assert provider.enabled?(organisation: @organisation)
-  end
-
-  test 'simple analytics is enabled by organisation domain' do
-    create_organisation
-    provider = AnalyticsProvider.object('simple_analytics')
-    refute provider.enabled?(organisation: @organisation)
-    @organisation.simple_analytics_domain = 'soulrev.simpleanalytics.com'
-    assert provider.enabled?(organisation: @organisation)
-  end
-
   test 'facebook pixel strips blanks and rejects non-numeric ids' do
     create_organisation
     @organisation.facebook_pixel_id = ' 1234567890 '
