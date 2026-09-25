@@ -1,0 +1,54 @@
+{
+  "$schema": "https://opencode.ai/config.json",
+  "mcp": {
+    "sentry": {
+      "type": "remote",
+      "url": "https://mcp.sentry.dev/mcp"
+    },
+    "render": {
+      "type": "remote",
+      "url": "https://mcp.render.com/mcp",
+      "headers": {
+        "Authorization": "Bearer {env:RENDER_AUTH_TOKEN}"
+      }
+    },
+    "mongodb": {
+      "type": "local",
+      "command": [
+        "npx",
+        "-y",
+        "mongodb-mcp-server",
+        "--connectionString",
+        "{env:MONGODB_CONNECTION_STRING}",
+        "--readOnly"
+      ]
+    },
+    "stripe": {
+      "type": "remote",
+      "url": "https://mcp.stripe.com"
+    },
+    "github": {
+      "type": "remote",
+      "url": "https://api.githubcopilot.com/mcp/",
+      "headers": {
+        "Authorization": "Bearer {env:GITHUB_PAT}"
+      }
+    },
+    "cloudflare-api": {
+      "type": "remote",
+      "url": "https://mcp.cloudflare.com/mcp"
+    },
+    "mailgun": {
+      "type": "local",
+      "command": [
+        "npx",
+        "-y",
+        "@mailgun/mcp-server"
+      ],
+      "environment": {
+        "MAILGUN_API_KEY": "{env:MAILGUN_API_KEY}",
+        "MAILGUN_API_REGION": "{env:MAILGUN_API_REGION}"
+      }
+    }
+  }
+}
