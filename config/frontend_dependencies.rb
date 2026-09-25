@@ -17,7 +17,8 @@ FRONTEND_DEPENDENCIES = {
     'TypeWatch/3.0.2' => 'jquery.typewatch.min.js',
     'bootstrap-icons/1.13.1' => 'font/bootstrap-icons.min.css',
     'typed.js/2.0.10' => 'typed.min.js',
-    'chartjs-plugin-datalabels/2.0.0' => 'chartjs-plugin-datalabels.min.js'
+    'chartjs-plugin-datalabels/2.0.0' => 'chartjs-plugin-datalabels.min.js',
+    'animate.css/3.7.2' => 'animate.min.css'
   },
   'https://rawcdn.githack.com/' => {
     'mahnunchik/markerclustererplus/736b0e3a7d916fbeb2ee5007494f17a5329b11a8' => 'src/markerclusterer.js',
@@ -25,7 +26,8 @@ FRONTEND_DEPENDENCIES = {
     'scottgonzalez/jquery-ui-extensions/fb7fd7df3d70e0288394f07bfe78262b548c30d6' => 'src/autocomplete/jquery.ui.autocomplete.html.js',
     'mdbassit/Coloris/a00946eb69780d2ba3b906c3f4535b03f987cc05' => 'dist/coloris.min.js dist/coloris.min.css',
     'ttskch/select2-bootstrap4-theme/a556a9d7cb2d7254b6e95cc8ec1ebceaa5ed8ddc' => 'dist/select2-bootstrap4.min.css',
-    'symbiota-coop/ckeditor5-dandelion/e9616f73489fd5d4fb2b143ed5d1e17e6fd467f0' => 'build/ckeditor.js'
+    'symbiota-coop/ckeditor5-dandelion/e9616f73489fd5d4fb2b143ed5d1e17e6fd467f0' => 'build/ckeditor.js',
+    'lykmapipo/themify-icons/9600186b24a7242f0e1e0a186983e6253301bb5d' => 'css/themify-icons.css'
   },
   '/javascripts/' => {
     'ext' => 'autosize.js countUp.umd.js jquery-deparam.js linkify.min.js linkify-jquery.min.js',
