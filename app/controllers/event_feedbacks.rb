@@ -106,7 +106,7 @@ Dandelion::App.controller do
 
     last_completed_contribution = @event_feedback.account.account_contributions.and(payment_completed: true).order('created_at desc').first
     if !last_completed_contribution || last_completed_contribution.created_at < 1.month.ago
-      redirect "/donate?event_feedback_id=#{@event_feedback.id}&account_id=#{@event_feedback.account_id}"
+      redirect "/donate?event_feedback_id=#{@event_feedback.id}"
     elsif @event.organisation.events_including_cohosted.live.publicly_visible.future_current_evergreen.exists?
       redirect "/o/#{@event.organisation.slug}/events?gave_feedback=1"
     else

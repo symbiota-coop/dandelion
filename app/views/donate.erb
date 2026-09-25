@@ -16,7 +16,7 @@
 
 <% else %>
 
-  <% account = current_account || (params[:account_id] && Account.find(params[:account_id])) %>
+  <% account = current_account %>
   <div class="row justify-content-center">
     <div class="col-lg-8">
       <div class="card my-4">

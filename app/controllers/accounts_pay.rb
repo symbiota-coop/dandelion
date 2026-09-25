@@ -26,7 +26,7 @@ Dandelion::App.controller do
     halt 400 unless params[:amount].to_f > 0
     halt 400 unless params[:payment_method] == 'stripe'
 
-    account = Account.find(params[:account_id]) if params[:account_id]
+    account = current_account if current_account && params[:account_id] == current_account.id.to_s
 
     stripe_session_hash = {
       line_items: [{
