@@ -394,6 +394,11 @@ class WebhooksTest < ActiveSupport::TestCase
          }
   end
 
+  test 'organisation with a mollie api key has a payment method' do
+    create_organisation(stripe_pk: nil, stripe_sk: nil, mollie_api_key: 'test_molliekey')
+    assert @organisation.payment_method?
+  end
+
   test 'mollie api key must look like a live or test key' do
     organisation = FactoryBot.build(:organisation, stripe_pk: nil, stripe_sk: nil, mollie_api_key: 'not-a-key')
     refute organisation.valid?
@@ -561,6 +566,11 @@ class WebhooksTest < ActiveSupport::TestCase
                    { 'name' => 'INVALID_REQUEST', 'message' => 'Request is not well-formed', 'details' => [{ 'description' => 'Invalid description' }] },
                    status: 400
                  )
+  end
+
+  test 'organisation with paypal credentials has a payment method' do
+    create_organisation(stripe_pk: nil, stripe_sk: nil, paypal_client_id: 'paypal_client', paypal_secret: 'paypal_secret')
+    assert @organisation.payment_method?
   end
 
   test 'paypal client id and secret must be set together' do

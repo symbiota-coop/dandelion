@@ -50,6 +50,14 @@ class EvergreenEventsTest < ActiveSupport::TestCase
     assert_nil event.ical
   end
 
+  test 'non-evergreen event still requires start_time end_time location' do
+    event = Event.new(name: 'Missing Dates', currency: 'GBP')
+    refute event.valid?
+    assert event.errors[:start_time].any?
+    assert event.errors[:end_time].any?
+    assert event.errors[:location].any?
+  end
+
   test 'evergreen event prevents duplicate names within same organisation' do
     create_evergreen_event(name: 'My Course')
     duplicate = Event.new(

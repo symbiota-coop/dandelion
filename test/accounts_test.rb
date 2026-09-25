@@ -308,6 +308,19 @@ class AccountsTest < ActiveSupport::TestCase
     assert_associated(@organisation, existing_account, :organisationships)
   end
 
+  test 'existing account with event_id' do
+    create_full_event_hierarchy
+    existing_account = FactoryBot.create(:account)
+
+    visit "/accounts/new?event_id=#{@event.id}"
+    fill_signup_form(FactoryBot.build_stubbed(:account, email: existing_account.email))
+
+    assert page.has_content?("OK, you're on the list!")
+    assert_associated(@organisation, existing_account, :organisationships)
+    assert_associated(@activity, existing_account, :activityships)
+    assert_associated(@local_group, existing_account, :local_groupships)
+  end
+
   test 'existing account with event_id resubscribes unsubscribed accounts' do
     create_full_event_hierarchy
 
