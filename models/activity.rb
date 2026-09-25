@@ -11,7 +11,7 @@ class Activity
   include Searchable
   include Taggable
 
-  taggable tagships: :activity_tagships, tag_class: ActivityTag
+  taggable tagships: :activity_tagships, tag: :activity_tag
 
   def self.prewarmed_image_derivative_sizes
     %w[200x200 400x400 500x500#]

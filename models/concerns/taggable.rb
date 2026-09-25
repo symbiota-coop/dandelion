@@ -2,20 +2,21 @@ module Taggable
   extend ActiveSupport::Concern
 
   class_methods do
-    def taggable(tagships:, tag_class:)
+    def taggable(tagships:, tag:)
       field :tag_names_cache, type: Array
 
       attr_accessor :tag_names, :update_tag_names
 
       after_save :update_tags
 
-      tag_name_method = :"#{tag_class.name.underscore}_name"
+      tag_association = tag
 
       define_method(:taggable_config) do
         {
           tagships: tagships,
-          tag_class: tag_class,
-          tag_name_method: tag_name_method
+          tag: tag_association,
+          tag_class: tag_association.to_s.camelize.constantize,
+          tag_name_method: :"#{tag_association}_name"
         }
       end
 
@@ -31,12 +32,12 @@ module Taggable
 
         tags_to_remove.each do |name|
           tag = taggable_config[:tag_class].find_by(name: name)
-          send(taggable_config[:tagships]).find_by(taggable_config[:tag_class].name.underscore => tag)&.destroy
+          send(taggable_config[:tagships]).find_by(taggable_config[:tag] => tag)&.destroy
         end
 
         tags_to_add.each do |name|
           tag = taggable_config[:tag_class].find_or_create_by(name: name)
-          send(taggable_config[:tagships]).create(taggable_config[:tag_class].name.underscore => tag) if tag.persisted?
+          send(taggable_config[:tagships]).create(taggable_config[:tag] => tag) if tag.persisted?
         end
 
         set(tag_names_cache: send(taggable_config[:tagships], true).map(&taggable_config[:tag_name_method]))
