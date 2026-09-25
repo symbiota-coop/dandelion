@@ -1,6 +1,5 @@
 Dandelion::App.helpers do
-  def link_omniauth_provider(account)
-    omniauth_data = request.env['omniauth.auth'] || session['omniauth.auth']
+  def link_omniauth_provider(account, omniauth_data = request.env['omniauth.auth'] || session['omniauth.auth'])
     return unless omniauth_data
 
     provider = Provider.object(omniauth_data['provider'])

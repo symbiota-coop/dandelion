@@ -34,19 +34,16 @@ Dandelion::App.controller do
                   end
                   ProviderLink.find_for(@provider.display_name, provider_uid).try(:account)
                 end
-      if current_account && env['omniauth.auth']['provider'] != 'account' # already signed in; attempt to connect
+      if current_account && env['omniauth.auth']['provider'] != 'account' # already signed in; ask before connecting
         if account # someone's already connected
           flash[:error] = "Someone's already connected to that account!"
-        else # connect; Account never reaches here
-          link_omniauth_provider(current_account)
-          # current_account.image_url = @provider.image.call(env['omniauth.auth']) unless current_account.image
-          if current_account.save
-            flash[:notice] = "<i class=\"#{@provider.icon}\"></i> Connected!"
-          else
-            flash[:error] = 'There was an error connecting the account'
-          end
+          redirect '/accounts/providers'
         end
-        redirect '/accounts/providers'
+        # The OAuth flow can be started by a cross-site GET, so linking waits for a same-origin POST
+        session['omniauth.connect'] = env['omniauth.auth']
+        @account = current_account
+        @nickname = @provider.nickname.call(env['omniauth.auth'])
+        erb :'accounts/confirm_provider'
       elsif account # not signed in
         account.sign_ins.create(request: request)
         session[:account_id] = account.id.to_s
@@ -63,5 +60,28 @@ Dandelion::App.controller do
         erb :'accounts/new'
       end
     end
+  end
+
+  post '/accounts/providers/confirm' do
+    sign_in_required!
+    omniauth_data = session.delete('omniauth.connect') || redirect('/accounts/providers')
+    @provider = Provider.object(omniauth_data['provider']) || redirect('/accounts/providers')
+    provider_uid = omniauth_data['uid'] || omniauth_data.dig('info', 'did')
+    if ProviderLink.find_for(@provider.display_name, provider_uid)
+      flash[:error] = "Someone's already connected to that account!"
+    else
+      link_omniauth_provider(current_account, omniauth_data)
+      if current_account.save
+        flash[:notice] = "<i class=\"#{@provider.icon}\"></i> Connected!"
+      else
+        flash[:error] = 'There was an error connecting the account'
+      end
+    end
+    redirect '/accounts/providers'
+  end
+
+  post '/accounts/providers/cancel' do
+    session.delete('omniauth.connect')
+    redirect '/accounts/providers'
   end
 end

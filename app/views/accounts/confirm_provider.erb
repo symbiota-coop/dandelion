@@ -1,0 +1,15 @@
+<%= partial :'accounts/nav' %>
+<div class="container">
+  <p>
+    Connect the <%= @provider.display_name %> account <strong><%= @nickname %></strong>
+    to your Dandelion account (<%= @account.email %>)? Anyone who can sign in to that <%= @provider.display_name %> account will be able to sign in to your Dandelion account.
+  </p>
+  <div class="d-flex">
+    <% form_tag '/accounts/providers/confirm', class: 'mr-2' do %>
+      <button type="submit" class="btn btn-primary"><i class="<%= @provider.icon %>"></i> Connect</button>
+    <% end %>
+    <% form_tag '/accounts/providers/cancel' do %>
+      <button type="submit" class="btn btn-outline-secondary">Cancel</button>
+    <% end %>
+  </div>
+</div>

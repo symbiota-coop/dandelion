@@ -421,6 +421,26 @@ class AccountsTest < ActiveSupport::TestCase
     assert_equal survivor_stripe, surviving_organisationship.stripe_connect_json
   end
 
+  test 'connecting a provider while signed in waits for confirmation' do
+    account = FactoryBot.create(:account)
+    sign_in_via_rack(account)
+    omniauth_callback_as(uid: 'google-uid-connect')
+    assert_includes last_response.body, '/accounts/providers/confirm'
+    assert_empty account.reload.provider_links
+
+    post '/accounts/providers/confirm'
+    assert_equal ['google-uid-connect'], account.reload.provider_links.map(&:provider_uid)
+  end
+
+  test 'cancelling a provider connection links nothing' do
+    account = FactoryBot.create(:account)
+    sign_in_via_rack(account)
+    omniauth_callback_as(uid: 'google-uid-cancel')
+    post '/accounts/providers/cancel'
+    post '/accounts/providers/confirm'
+    assert_empty account.reload.provider_links
+  end
+
   test 'leftover omniauth session is not linked on a later signup' do
     start_omniauth_signup
     later = FactoryBot.build_stubbed(:account)
@@ -609,6 +629,23 @@ class AccountsTest < ActiveSupport::TestCase
     location = URI(last_response.location)
     assert_equal '/auth/failure', location.path
     assert_includes Rack::Utils.parse_query(location.query)['message'], reason
+  end
+
+  def sign_in_via_rack(account)
+    clear_cookies
+    post '/auth/account/callback', email: account.email, password: account.password
+  end
+
+  def omniauth_callback_as(uid:)
+    OmniAuth.config.test_mode = true
+    OmniAuth.config.mock_auth[:google_oauth2] = OmniAuth::AuthHash.new(
+      provider: 'google_oauth2', uid: uid, info: { name: 'Alice Example', email: 'alice-oauth@example.com' }
+    )
+    get '/auth/google_oauth2'
+    follow_redirect! while last_response.redirect?
+  ensure
+    OmniAuth.config.test_mode = false
+    OmniAuth.config.mock_auth[:google_oauth2] = nil
   end
 
   def start_omniauth_signup
