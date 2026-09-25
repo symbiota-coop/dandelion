@@ -101,7 +101,7 @@ class TicketType
   end
 
   def sales_ended?
-    sales_end && Time.now > sales_end
+    sales_end.present? && Time.now > sales_end
   end
 
   def sold_out?
@@ -119,7 +119,7 @@ class TicketType
   def refresh_sold_out_cache_and_notify_waitlist
     was_sold_out = sold_out_cache.nil? ? sold_out? : sold_out_cache
     now_sold_out = sold_out?
-    set(sold_out_cache: now_sold_out)
+    set(sold_out_cache: now_sold_out) unless sold_out_cache == now_sold_out
     event.send_ticket_type_waitlist_tickets_available(id) if was_sold_out && !now_sold_out && event
   end
 

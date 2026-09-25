@@ -199,7 +199,7 @@ class TicketTypesTest < ActiveSupport::TestCase
     assert_equal 5, ticket_type.quantity
   end
 
-  test 'refreshing after nested ticket type saves loads the event once per refresh' do
+  test 'refreshing after nested ticket type saves loads the event once per refresh and skips unchanged writes' do
     create_event(prices: [0, 0, 0])
     event = Event.find(@event.id)
     attributes = event.ticket_types.each_with_index.to_h do |ticket_type, i|
@@ -220,8 +220,10 @@ class TicketTypesTest < ActiveSupport::TestCase
     assert event.update_attributes(ticket_types_attributes: attributes)
 
     event_reads = commands.count { |c| c['find'] == 'events' }
+    sold_out_cache_writes = commands.count { |c| c['update'] == 'ticket_types' && c['updates'].first['u'].fetch('$set', {}).key?('sold_out_cache') }
     assert_equal 3, refreshes
     assert_operator event_reads, :<=, refreshes
+    assert_equal 0, sold_out_cache_writes
   ensure
     Mongoid.default_client.unsubscribe(Mongo::Monitoring::COMMAND, subscriber) if subscriber
   end
