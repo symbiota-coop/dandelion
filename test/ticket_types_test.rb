@@ -301,6 +301,25 @@ class TicketTypesTest < ActiveSupport::TestCase
     assert @event.reload.sold_out_cache
   end
 
+  test 'saving unchanged ticket groups via nested attributes does not refresh the event' do
+    create_event(prices: [0])
+    changed_group = @event.ticket_groups.create!(name: 'Changed', capacity: 5)
+    unchanged_group = @event.ticket_groups.create!(name: 'Unchanged', capacity: 5)
+    event = Event.find(@event.id)
+    refreshes = 0
+    event.define_singleton_method(:refresh_sold_out_cache_and_notify_waitlist) do
+      refreshes += 1
+      super()
+    end
+
+    assert event.update_attributes(ticket_groups_attributes: {
+                                     '0' => { 'id' => changed_group.id.to_s, 'name' => 'Renamed' },
+                                     '1' => { 'id' => unchanged_group.id.to_s, 'name' => unchanged_group.name }
+                                   })
+
+    assert_equal 1, refreshes
+  end
+
   test 'accepts slots via nested attributes' do
     create_event(prices: [0])
     ticket_type = @event.ticket_types.first
