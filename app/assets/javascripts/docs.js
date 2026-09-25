@@ -1,12 +1,7 @@
 /* global hljs */
 
 (function() {
-  var highlightCode = function() {
-    if (!window.hljs) return
-    $('#doc-body pre code').each(function() { hljs.highlightElement(this) })
-  }
-  if (window.hljs) highlightCode()
-  else $(highlightCode)
+  $('#doc-body pre code').each(function() { hljs.highlightElement(this) })
 
   var $stickyIndex = $('#sticky-index')
   var $layout = $('#docs-layout')
