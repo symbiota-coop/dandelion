@@ -8,6 +8,21 @@ module EmailHelper
     s
   end
 
+  # Mailgun substitutes %recipient.x% anywhere in a batch message, and Premailer/Nokogiri decode &#37; back to %,
+  # so user text gets a zero-width non-joiner after each % that isn't a %XX URL escape
+  def self.defuse_recipient_variables(text)
+    text.to_s.gsub(/%(?![0-9A-Fa-f]{2})/, "%\u200C")
+  end
+
+  class SafeBuffer < ::SafeBuffer
+    private
+
+    def html_escape_interpolated_argument(arg)
+      escaped = super
+      arg.html_safe? ? escaped : EmailHelper.defuse_recipient_variables(escaped)
+    end
+  end
+
   def self.replace_youtube_oembeds(html)
     return html unless html
 
@@ -46,7 +61,7 @@ module EmailHelper
     end
 
     def h(text)
-      ERB::Util.html_escape(text)
+      EmailHelper.defuse_recipient_variables(ERB::Util.html_escape(text)).html_safe
     end
 
     def nl2br(text)
@@ -59,7 +74,7 @@ module EmailHelper
   # Escaping at output is what keeps user-supplied text (names, subjects, answers) inert
   # once Premailer/Nokogiri re-parses the body, regardless of how the text was stored.
   def self.render_erb(path, context)
-    src = Padrino::Rendering::SafeErubi.new(File.read(path), bufval: 'SafeBuffer.new', bufvar: '@_out_buf').src
+    src = Padrino::Rendering::SafeErubi.new(File.read(path), bufval: 'EmailHelper::SafeBuffer.new', bufvar: '@_out_buf').src
     context.instance_eval(src, path)
   end
 

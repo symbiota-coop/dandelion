@@ -290,6 +290,18 @@ class PmailsTest < ActiveSupport::TestCase
     assert_includes html, '%recipient.firstname%'
   end
 
+  test 'email templates defuse recipient variables in escaped output' do
+    Tempfile.create(['email', '.erb']) do |file|
+      file.write('<p><%= name %></p><p><%== raw %></p>')
+      file.flush
+      context = EmailHelper::TemplateContext.new(name: 'Hi %recipient.firstname% 50%20', raw: '%recipient.firstname%')
+      html = EmailHelper.render_erb(file.path, context)
+
+      assert_includes html, "<p>Hi %\u200Crecipient.firstname%\u200C 50%20</p>"
+      assert_includes html, '<p>%recipient.firstname%</p>'
+    end
+  end
+
   test 'pmail can exclude a cohosted event' do
     create_organisation
     event = FactoryBot.create(:event)
