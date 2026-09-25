@@ -20,7 +20,7 @@ Mongoid.autosave_saves_unchanged_documents = false
 
 # Padrino loads each glob shallow-first, so models/*.rb would run before
 # models/concerns and every model would NameError on CoreExtensions and reload.
-models_glob = Padrino.dependency_paths.index { |path| path.end_with?('/models/**/*.rb') }
+models_glob = Padrino.dependency_paths.index("#{Padrino.root}/models/**/*.rb") || Padrino.dependency_paths.length
 Padrino.dependency_paths.insert(models_glob, "#{Padrino.root}/models/concerns/**/*.rb")
 
 # safe_load snapshots every class in the process around each require so development
