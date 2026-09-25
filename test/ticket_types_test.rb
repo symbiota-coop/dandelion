@@ -228,6 +228,24 @@ class TicketTypesTest < ActiveSupport::TestCase
     Mongoid.default_client.unsubscribe(Mongo::Monitoring::COMMAND, subscriber) if subscriber
   end
 
+  test 'saving unchanged ticket types via nested attributes does not refresh the event' do
+    create_event(prices: [0, 0])
+    event = Event.find(@event.id)
+    changed_type, unchanged_type = event.ticket_types.to_a
+    refreshes = 0
+    event.define_singleton_method(:refresh_sold_out_cache_and_notify_waitlist) do
+      refreshes += 1
+      super()
+    end
+
+    assert event.update_attributes(ticket_types_attributes: {
+                                     '0' => { 'id' => changed_type.id.to_s, 'name' => 'Renamed' },
+                                     '1' => { 'id' => unchanged_type.id.to_s, 'name' => unchanged_type.name }
+                                   })
+
+    assert_equal 1, refreshes
+  end
+
   test 'ticket type sold-out caches ignore unsaved event edits when the event is invalid' do
     create_event(prices: [0], capacity: 10)
     ticket_type = @event.ticket_types.first

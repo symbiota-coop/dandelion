@@ -84,7 +84,8 @@ class TicketType
   end
 
   after_save do
-    if event
+    # Nested attributes save every ticket type on the event form, changed or not
+    if event && previous_changes.any?
       event.refresh_sold_out_cache_and_notify_waitlist
       event.set_browsable
     end
