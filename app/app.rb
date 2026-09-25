@@ -13,7 +13,8 @@ module Dandelion
 
     use Sentry::Rack::CaptureExceptions
 
-    use Rack::Session::Cookie, expire_after: 1.year.to_i, secret: ENV['SESSION_SECRET'], same_site: :lax
+    # Via :sessions (not `use`) so the session sits inside Rack::Protection and its origin checks can drop it
+    set :sessions, expire_after: 1.year.to_i, same_site: :lax, secure: Padrino.env == :production
     use Rack::UTF8Sanitizer
     use Rack::CrawlerDetect
     use Rack::Attack
