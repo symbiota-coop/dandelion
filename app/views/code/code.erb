@@ -37,7 +37,7 @@ end
               <td data-toggle="tooltip" title="AI-generated summary ✨">
                 <%== md(
                 Sanitize.fragment(commit.commit.message, Sanitize::Config::DANDELION)
-                .gsub(/^Co-authored-by: Cursor.*$/i, '')
+                .gsub(/^Co-authored-by:.*$/i, '')
                 .gsub('\\', '\\\\')
                 .gsub('_', '\_')
                 .gsub(/\p{Emoji_Presentation}|\p{Extended_Pictographic}/u, '<br />\0')
