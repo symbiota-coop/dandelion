@@ -90,10 +90,11 @@
         <%= number_field_tag :donation_amount, id: 'donation_amount', class: 'form-control', style: 'width: 5em', value: donation_value, min: (@event.minimum_donation || 0) %>
       </div>
       <% donation_text = @event.donation_text || @event.organisation.donation_text %>
+      <% donation_text_unsanitized_ok = Padrino.env == :development || (!@event.donation_text && @event.organisation.unsanitized_ok?) %>
       <% donation_text_line_breaks = donation_text && %w[<br> <br /> <br/> <p>].any? { |pattern| donation_text.include?(pattern) } %>
       <% if donation_text && !donation_text_line_breaks %>
-        <% if (Padrino.env == :development || @organisation.unsanitized_ok?) %>
-          <%== @event.donation_text || @event.organisation.donation_text %>
+        <% if donation_text_unsanitized_ok %>
+          <%== donation_text %>
         <% else %>
           <%== Sanitize.fragment(donation_text, Sanitize::Config::DANDELION) %>
         <% end %>
@@ -103,7 +104,7 @@
   <% if donation_text && donation_text_line_breaks %>
     <tr>
       <td colspan="3" style="border-top: none">
-        <% if (Padrino.env == :development || @organisation.unsanitized_ok?) %>
+        <% if donation_text_unsanitized_ok %>
           <%== donation_text %>
         <% else %>
           <%== Sanitize.fragment(donation_text, Sanitize::Config::DANDELION) %>
