@@ -72,6 +72,11 @@ module Dandelion
     end
 
     after do
+      unless @embeddable
+        response['X-Frame-Options'] = 'SAMEORIGIN'
+        response['Content-Security-Policy'] ||= "frame-ancestors 'self'"
+      end
+
       route = request.route_obj
       next unless route
 
