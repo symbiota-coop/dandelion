@@ -91,10 +91,7 @@ class TicketType
   end
   after_destroy do
     if event && !event.flagged_for_destroy?
-      event.reset_ticket_counts
-      event.clear_cache
-      event.set(sold_out_cache: event.sold_out?)
-      event.set(sold_out_due_to_sales_end_cache: event.sold_out_due_to_sales_end?)
+      event.refresh_sold_out_cache_and_notify_waitlist
       event.set_browsable
     end
   end

@@ -21,6 +21,9 @@ class TicketGroup
     errors.add(:capacity, 'must not be < 0') if capacity && capacity < 0
   end
 
+  after_save { event.refresh_sold_out_cache_and_notify_waitlist if event }
+  after_destroy { event.refresh_sold_out_cache_and_notify_waitlist if event && !event.flagged_for_destroy? }
+
   def slots_taken
     return tickets.and(made_available_at: nil).slots_taken unless event
 

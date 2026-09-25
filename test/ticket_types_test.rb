@@ -199,6 +199,88 @@ class TicketTypesTest < ActiveSupport::TestCase
     assert_equal 5, ticket_type.quantity
   end
 
+  test 'refreshing after nested ticket type saves loads the event once per refresh' do
+    create_event(prices: [0, 0, 0])
+    event = Event.find(@event.id)
+    attributes = event.ticket_types.each_with_index.to_h do |ticket_type, i|
+      [i.to_s, { 'id' => ticket_type.id.to_s, 'name' => "Pass #{i}" }]
+    end
+    refreshes = 0
+    event.define_singleton_method(:refresh_sold_out_cache_and_notify_waitlist) do
+      refreshes += 1
+      super()
+    end
+    commands = []
+    subscriber = Object.new
+    subscriber.define_singleton_method(:started) { |e| commands << e.command }
+    subscriber.define_singleton_method(:succeeded) { |_| nil }
+    subscriber.define_singleton_method(:failed) { |_| nil }
+    Mongoid.default_client.subscribe(Mongo::Monitoring::COMMAND, subscriber)
+
+    assert event.update_attributes(ticket_types_attributes: attributes)
+
+    event_reads = commands.count { |c| c['find'] == 'events' }
+    assert_equal 3, refreshes
+    assert_operator event_reads, :<=, refreshes
+  ensure
+    Mongoid.default_client.unsubscribe(Mongo::Monitoring::COMMAND, subscriber) if subscriber
+  end
+
+  test 'ticket type sold-out caches ignore unsaved event edits when the event is invalid' do
+    create_event(prices: [0], capacity: 10)
+    ticket_type = @event.ticket_types.first
+    ticket_type.set(quantity: 5)
+
+    event = Event.find(@event.id)
+    refute event.update_attributes(name: nil, capacity: 0, ticket_types_attributes: {
+                                     '0' => { 'id' => ticket_type.id.to_s, 'name' => 'Renamed' }
+                                   })
+
+    assert_equal 'Renamed', ticket_type.reload.name
+    refute ticket_type.sold_out_cache
+  end
+
+  test 'nested ticket type changes still refresh sold-out caches when the event is invalid' do
+    create_event(prices: [0])
+    ticket_type = @event.ticket_types.first
+    ticket_type.set(quantity: 1)
+    ticket_type.tickets.create!(event: @event, payment_completed: true)
+    assert ticket_type.reload.sold_out_cache
+
+    event = Event.find(@event.id)
+    refute event.update_attributes(name: nil, ticket_types_attributes: {
+                                     '0' => { 'id' => ticket_type.id.to_s, 'quantity' => 2 }
+                                   })
+
+    refute ticket_type.reload.sold_out_cache
+  end
+
+  test 'changing event capacity refreshes sold-out caches' do
+    create_event(prices: [0])
+    ticket_type = @event.ticket_types.first
+    ticket_type.tickets.create!(event: @event, payment_completed: true)
+    refute @event.reload.sold_out_cache
+
+    assert @event.update_attributes(capacity: 1)
+
+    assert @event.reload.sold_out_cache
+    assert ticket_type.reload.sold_out_cache
+  end
+
+  test 'changing ticket group capacity refreshes sold-out caches' do
+    create_event(prices: [0])
+    ticket_group = @event.ticket_groups.create!(name: 'Group', capacity: 5)
+    ticket_type = @event.ticket_types.first
+    ticket_type.update_attributes!(ticket_group: ticket_group)
+    ticket_type.tickets.create!(event: @event, payment_completed: true)
+    refute ticket_type.reload.sold_out_cache
+
+    ticket_group.update_attributes!(capacity: 1)
+
+    assert ticket_type.reload.sold_out_cache
+    assert @event.reload.sold_out_cache
+  end
+
   test 'accepts slots via nested attributes' do
     create_event(prices: [0])
     ticket_type = @event.ticket_types.first

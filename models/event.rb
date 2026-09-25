@@ -393,13 +393,15 @@ class Event
 
   def refresh_sold_out_cache_and_notify_waitlist
     reset_ticket_counts
-    was_sold_out = sold_out_cache.nil? ? sold_out? : sold_out_cache
-    now_sold_out = sold_out?
+    # Nested ticket types save on assignment, before this event is validated,
+    # so compute from the saved event rather than any unsaved edits here.
+    return unless (saved_event = Event.find(id))
+
+    was_sold_out = sold_out_cache.nil? ? saved_event.sold_out? : sold_out_cache
+    now_sold_out = saved_event.sold_out?
     clear_cache
-    set(sold_out_cache: now_sold_out)
-    set(sold_out_due_to_sales_end_cache: sold_out_due_to_sales_end?)
-    # Nested ticket type autosave can leave association target documents frozen.
-    TicketType.and(event_id: id).each(&:refresh_sold_out_cache_and_notify_waitlist)
+    set(sold_out_cache: now_sold_out, sold_out_due_to_sales_end_cache: saved_event.sold_out_due_to_sales_end?)
+    saved_event.ticket_types.each(&:refresh_sold_out_cache_and_notify_waitlist)
     send_waitlist_tickets_available if was_sold_out && !now_sold_out
   end
 
