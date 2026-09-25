@@ -284,7 +284,7 @@ Dandelion does not take any money from ticket sales. Your chosen payment process
 
 Alternatively, you can accept completely fee-free crypto payments via Gnosis, Celo or Base. Go to the Payments tab in your organisation's settings, click **Set up Crypto**, and enter an Ethereum-compatible wallet address.
 
-## About the suggested donation
+## About the suggested contribution
 
 Dandelion operates on a donation/gift economy basis. We ask for donations from organisations, and from ticket purchasers at checkout.
 
