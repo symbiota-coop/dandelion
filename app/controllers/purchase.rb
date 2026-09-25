@@ -86,11 +86,16 @@ Dandelion::App.controller do
           event: @event,
           account: @account,
           ticket_type: ticket_type,
-          price: price
+          price: price,
+          skip_event_refresh: true
         )
       end
+      # Count these tickets when checking availability for the next ticket type
+      @event.reset_ticket_counts
     end
     raise Order::NoTickets if @order.tickets.empty?
+
+    @event.refresh_sold_out_cache_and_notify_waitlist
 
     @order.donations.create!(event: @event, account: @account, amount: ticket_form[:donation_amount]) if ticket_form[:donation_amount].to_f > 0 && !ignore_dandelion_donation?(details_form)
 

@@ -226,7 +226,7 @@ class Event
   end
 
   def sales_closed_due_to_event_end?
-    no_sales_after_end_time? && end_time && Time.now > end_time
+    no_sales_after_end_time? && end_time.present? && Time.now > end_time
   end
 
   def publicly_visible?

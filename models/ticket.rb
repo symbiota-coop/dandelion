@@ -15,7 +15,7 @@ class Ticket
   belongs_to_without_parent_validation :ticket_type, optional: true
   has_many :notifications, as: :notifiable, dependent: :destroy
 
-  attr_accessor :complimentary, :prevent_notifications
+  attr_accessor :complimentary, :prevent_notifications, :skip_event_refresh
 
   field :price, type: Float
   field :discounted_price, type: Float
@@ -113,7 +113,8 @@ class Ticket
   end
 
   after_save do
-    event.refresh_sold_out_cache_and_notify_waitlist if event && !event.flagged_for_destroy?
+    # Purchases create several tickets and refresh the event once afterwards
+    event.refresh_sold_out_cache_and_notify_waitlist if event && !event.flagged_for_destroy? && !skip_event_refresh
   end
   after_destroy do
     event.refresh_sold_out_cache_and_notify_waitlist if event && !event.flagged_for_destroy?
