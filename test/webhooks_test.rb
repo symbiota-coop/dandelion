@@ -817,4 +817,86 @@ class WebhooksTest < ActiveSupport::TestCase
       @organisation.create_paypal_webhook_if_necessary
     end
   end
+
+  # ═══════════════════════════════════════════════════════════════════════════
+  # WhatsApp verification
+  # ═══════════════════════════════════════════════════════════════════════════
+
+  def with_whatsapp_verify_token(value)
+    previous = ENV['WHATSAPP_VERIFY_TOKEN']
+    ENV['WHATSAPP_VERIFY_TOKEN'] = value
+    yield
+  ensure
+    ENV['WHATSAPP_VERIFY_TOKEN'] = previous
+  end
+
+  test 'whatsapp verification is refused when no verify token is configured' do
+    with_whatsapp_verify_token(nil) do
+      get '/whatsapp', 'hub.challenge' => '<script>alert(1)</script>'
+    end
+    assert_equal 403, last_response.status
+    refute_includes last_response.body, '<script>'
+  end
+
+  test 'whatsapp verification is refused with the wrong verify token' do
+    with_whatsapp_verify_token('right-token') do
+      get '/whatsapp', 'hub.verify_token' => 'wrong-token', 'hub.challenge' => '123'
+    end
+    assert_equal 403, last_response.status
+  end
+
+  test 'whatsapp verification echoes the challenge as plain text' do
+    with_whatsapp_verify_token('right-token') do
+      get '/whatsapp', 'hub.verify_token' => 'right-token', 'hub.challenge' => '<b>123</b>'
+    end
+    assert_equal 200, last_response.status
+    assert_equal '<b>123</b>', last_response.body
+    assert_match %r{\Atext/plain}, last_response.content_type
+  end
+
+  # ═══════════════════════════════════════════════════════════════════════════
+  # Premailer <link> tags
+  # ═══════════════════════════════════════════════════════════════════════════
+
+  def with_local_stylesheet
+    file = Tempfile.new(['premailer', '.css'])
+    file.write('p { font-family: LOCAL_FILE_CONTENTS !important }')
+    file.close
+    yield %(<link rel="stylesheet" href="#{file.path}">)
+  ensure
+    file&.unlink
+  end
+
+  test 'email html does not read stylesheets linked from the content' do
+    with_local_stylesheet do |link|
+      html = EmailHelper.html(content: "#{link}<p>hi</p>")
+      refute_includes html, 'LOCAL_FILE_CONTENTS'
+    end
+  end
+
+  test 'inbound email html does not read stylesheets linked from the message' do
+    with_local_stylesheet do |link|
+      mail = Mail.new do
+        html_part do
+          content_type 'text/html; charset=UTF-8'
+          body "<html><head>#{link}</head><body><p>hi</p></body></html>"
+        end
+      end
+      _mail, html, = EmailReceiver.allocate.receive(mail)
+      refute_includes html, 'LOCAL_FILE_CONTENTS'
+    end
+  end
+
+  test 'plain text email fields do not read linked stylesheets' do
+    create_event
+    options = nil
+    new_premailer = Premailer.method(:new)
+    Premailer.stub :new, lambda { |html, **opts|
+      options = opts
+      new_premailer.call(html, **opts)
+    } do
+      EmailFields.replace_magic_tags('<link rel="stylesheet" href="/dev/zero">Ticket to [event_name]', event: @event, plain_text: true)
+    end
+    assert_equal false, options[:include_link_tags]
+  end
 end
