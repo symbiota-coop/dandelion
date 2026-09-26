@@ -1,7 +1,7 @@
 Dandelion::App.controller do
   before do
     @event = (params[:slug] ? Event.find_by(slug: params[:slug]) : Event.find(params[:id])) || not_found
-    @check_in_secret = OpenSSL::HMAC.hexdigest('SHA256', ENV['SESSION_SECRET'], "check_in:#{@event.id}")[0, 32]
+    @check_in_secret = OpenSSL::HMAC.hexdigest('SHA256', ENV['CHECK_IN_SECRET'], "check_in:#{@event.id}")[0, 32]
     @check_in_url = "#{ENV['BASE_URI']}/e/#{@event.slug}/check_in?secret=#{@check_in_secret}"
     unless event_admin?
       provided = params[:secret] || session[:"check_in_secret_#{@event.id}"]

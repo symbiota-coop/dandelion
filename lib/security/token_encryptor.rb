@@ -1,13 +1,17 @@
 module TokenEncryptor
   class << self
+    def secret
+      ENV['TOKEN_ENCRYPTOR_SECRET']
+    end
+
     def encrypt(data)
-      return unless (secret = ENV['SESSION_SECRET'])
+      return unless (secret = self.secret)
 
       encryptor(secret, url_safe: true).encrypt_and_sign(data)
     end
 
     def decrypt(token)
-      return unless token && (secret = ENV['SESSION_SECRET'])
+      return unless token && (secret = self.secret)
 
       decrypt_with(encryptor(secret, url_safe: true), token) ||
         decrypt_with(encryptor(secret), token) ||

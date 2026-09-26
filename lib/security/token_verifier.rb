@@ -1,7 +1,11 @@
 module TokenVerifier
   class << self
+    def secret
+      ENV['TOKEN_VERIFIER_SECRET']
+    end
+
     def generate(data, expires_in: nil, purpose: nil)
-      return unless (secret = ENV['SESSION_SECRET'])
+      return unless (secret = self.secret)
 
       options = {}
       options[:expires_in] = expires_in if expires_in
@@ -11,7 +15,7 @@ module TokenVerifier
     end
 
     def verify(token, purpose: nil)
-      return unless token && (secret = ENV['SESSION_SECRET'])
+      return unless token && (secret = self.secret)
 
       if purpose
         verify_with(verifier(secret, url_safe: true), token, purpose:) ||

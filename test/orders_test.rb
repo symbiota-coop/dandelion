@@ -270,7 +270,7 @@ class OrdersTest < ActiveSupport::TestCase
 
   test 'check-in accepts the ticket token from the QR code, and legacy ticket mongo ids' do
     create_complete_order_with_ticket
-    secret = OpenSSL::HMAC.hexdigest('SHA256', ENV['SESSION_SECRET'], "check_in:#{@event.id}")[0, 32]
+    secret = OpenSSL::HMAC.hexdigest('SHA256', ENV['CHECK_IN_SECRET'], "check_in:#{@event.id}")[0, 32]
 
     post "/events/#{@event.id}/check_in/#{@ticket.token}", checked_in: true, secret: secret
     assert_equal 200, last_response.status
