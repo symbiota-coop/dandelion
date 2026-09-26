@@ -767,4 +767,54 @@ class WebhooksTest < ActiveSupport::TestCase
     refute order.reload.payment_completed?
     assert_includes last_response.body, 'Confirming your payment'
   end
+
+  test 'create_paypal_webhook_if_necessary registers the webhook in production' do
+    create_paypal_event
+    created = {}
+    client = stub_paypal_client
+    client.define_singleton_method(:list_webhooks) { { 'webhooks' => [] } }
+    client.define_singleton_method(:create_webhook) do |**attrs|
+      created.replace(attrs)
+      { 'id' => 'WH' }
+    end
+
+    Padrino.stub :env, :production do
+      Paypal.stub :new, client do
+        @organisation.create_paypal_webhook_if_necessary
+      end
+    end
+
+    assert_equal "#{ENV['BASE_URI']}/o/#{@organisation.slug}/paypal_webhook", created[:url]
+  end
+
+  test 'create_paypal_webhook_if_necessary does not create the webhook when it already exists' do
+    create_paypal_event
+    created = false
+    url = @organisation.paypal_webhook_url
+    client = stub_paypal_client
+    client.define_singleton_method(:list_webhooks) do
+      { 'webhooks' => [{
+        'id' => 'WH',
+        'url' => url,
+        'event_types' => Paypal::WEBHOOK_EVENT_TYPES.map { |name| { 'name' => name } }
+      }] }
+    end
+    client.define_singleton_method(:create_webhook) { |*| created = true }
+
+    Padrino.stub :env, :production do
+      Paypal.stub :new, client do
+        @organisation.create_paypal_webhook_if_necessary
+      end
+    end
+
+    refute created
+  end
+
+  test 'create_paypal_webhook_if_necessary does not call PayPal outside production' do
+    create_paypal_event
+
+    Paypal.stub :new, ->(*) { raise 'Paypal.new should not be called' } do
+      @organisation.create_paypal_webhook_if_necessary
+    end
+  end
 end

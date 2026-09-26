@@ -213,7 +213,6 @@ EventPaymentMethod.new('paypal',
                        payment_id_field: :paypal_capture_id,
                        org_condition: ->(org) { org.paypal_client_id && org.paypal_secret },
                        event_condition: ->(event) { FIAT_CURRENCIES.include?(event.currency) },
-                       dashboard_help: 'Also add the webhook URL in your PayPal app so bookings complete if the buyer does not return to Dandelion.',
                        process: ->(**kwargs) { EventPaymentMethod::Paypal.call(**kwargs) },
                        refund: ->(record, **kwargs) { EventPaymentMethod::Paypal.refund(record, **kwargs) },
                        purchase_errors: {

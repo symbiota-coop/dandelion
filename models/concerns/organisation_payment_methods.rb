@@ -99,7 +99,7 @@ module OrganisationPaymentMethods
         stripe_endpoint_secret: '<code>Developers</code> > <code>Webhooks</code> > <code>Signing secret</code>. Starts <code>whsec_</code>',
         stripe_client_id: 'Used for automated revenue sharing. <code>Settings</code> > <code>Connect</code> > <code>Live mode client ID</code>. Starts <code>ca_</code>',
         mollie_api_key: '<code>Developers</code> > <code>API keys</code>. Starts <code>live_</code>. Dandelion sends a webhook URL with each payment, so you do not need to add a webhook in the Mollie Dashboard.',
-        paypal_client_id: '<code>Apps & Credentials</code> > your app > <code>Client ID</code>',
+        paypal_client_id: '<code>Apps & Credentials</code> > your app > <code>Client ID</code>. Dandelion registers the webhook when you save.',
         paypal_secret: '<code>Apps & Credentials</code> > your app > <code>Secret</code>',
         paypal_sandbox: 'Use the sandbox API. You must paste sandbox client ID and secret from the Sandbox tab of Apps & Credentials — live credentials will fail.',
         gocardless_instant_bank_pay: 'Shown at checkout for GBP and EUR events only (UK and supported Eurozone countries)',

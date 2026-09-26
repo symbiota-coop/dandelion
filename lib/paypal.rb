@@ -2,6 +2,7 @@ class Paypal
   LIVE_HOST = 'https://api-m.paypal.com'
   SANDBOX_HOST = 'https://api-m.sandbox.paypal.com'
   TOKEN_EXPIRY_SKEW = 60
+  WEBHOOK_EVENT_TYPES = %w[CHECKOUT.ORDER.APPROVED PAYMENT.CAPTURE.COMPLETED].freeze
 
   class RequestError < StandardError
     attr_reader :status, :body
@@ -122,6 +123,24 @@ class Paypal
     )
   end
 
+  def list_webhooks
+    get('/v1/notifications/webhooks')
+  end
+
+  def create_webhook(url:, event_types: WEBHOOK_EVENT_TYPES)
+    post(
+      '/v1/notifications/webhooks',
+      { url: url, event_types: event_types.map { |name| { name: name } } }
+    )
+  end
+
+  def update_webhook_event_types(id, event_types)
+    patch(
+      "/v1/notifications/webhooks/#{id}",
+      [{ op: 'replace', path: '/event_types', value: event_types.map { |name| { name: name } } }]
+    )
+  end
+
   private
 
   def get(path)
@@ -130,6 +149,10 @@ class Paypal
 
   def post(path, body, headers: {})
     request(:post, path, body: body, headers: headers)
+  end
+
+  def patch(path, body)
+    request(:patch, path, body: body)
   end
 
   def request(method, path, body: nil, headers: {})

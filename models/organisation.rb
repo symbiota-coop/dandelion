@@ -21,6 +21,7 @@ class Organisation
   include Geocoded
   include EvmTransactions
   include StripeWebhooks
+  include PaypalWebhooks
   include ImportFromCsv
   include ImageWithValidation
   include AnalyticsProviders
