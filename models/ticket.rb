@@ -178,6 +178,18 @@ class Ticket
     self.and(payment_completed: true)
   end
 
+  # Row-level read policy: your own tickets, tickets in orders you placed, plus completed tickets for events you administer
+  def self.readable_by(account)
+    return none unless account
+    return all if account.admin?
+
+    self.and('$or' => [
+               { account_id: account.id },
+               { order_id: { '$in' => Order.and(account_id: account.id).pluck(:id) } },
+               { payment_completed: true, event_id: { '$in' => Event.administered_by(account).pluck(:id) } }
+             ])
+  end
+
   def self.discounted
     self.and(:id.in => self.and(:percentage_discount.ne => nil).pluck(:id) + self.and(:percentage_discount_monthly_donor.ne => nil).pluck(:id))
   end

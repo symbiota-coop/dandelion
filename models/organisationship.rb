@@ -29,6 +29,17 @@ class Organisationship
     Fragment.and(key: "/organisations/carousel/#{account_id}").destroy_all
   end
 
+  # Row-level read policy: your own organisationships, plus those of organisations you administer
+  def self.readable_by(account)
+    return none unless account
+    return all if account.admin?
+
+    self.and('$or' => [
+               { account_id: account.id },
+               { organisation_id: { '$in' => Organisation.administered_by(account).pluck(:id) } }
+             ])
+  end
+
   def api_hash
     {
       id: id.to_s,

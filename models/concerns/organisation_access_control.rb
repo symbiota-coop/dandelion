@@ -18,6 +18,11 @@ module OrganisationAccessControl
       self.and(:id.in => Organisationship.and(account_id: account.id, admin: true).pluck(:organisation_id))
     end
 
+    # Row-level read policy
+    def readable_by(_account)
+      all
+    end
+
     def admin_or_event_manager?(organisation, account, organisation_admin: nil)
       organisation_admin ||
         (organisation_admin.nil? && admin?(organisation, account)) ||

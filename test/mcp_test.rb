@@ -249,25 +249,25 @@ class McpTest < ActiveSupport::TestCase
     resources = JSON.parse(tool_text(rpc))
 
     refute rpc.dig('result', 'isError')
-    assert_includes resources.map { |r| r['name'] }, 'admin_orders'
+    assert_includes resources.map { |r| r['name'] }, 'orders'
   end
 
   test 'query_resource_tool and count_resource_tool apply filters within scope' do
     create_event_with_order_and_ticket
     headers = { 'Authorization' => "Bearer #{@account.api_key}" }
 
-    rpc = mcp_tool_call('query_resource_tool', arguments: { resource: 'admin_orders', filter: { event_id: @event.id.to_s }, fields: %w[email value] }, headers: headers)
+    rpc = mcp_tool_call('query_resource_tool', arguments: { resource: 'orders', filter: { event_id: @event.id.to_s }, fields: %w[email value] }, headers: headers)
     payload = JSON.parse(tool_text(rpc))
 
     refute rpc.dig('result', 'isError')
     assert_equal([@order.id.to_s], payload['data'].map { |o| o['id'] })
     assert_equal @attendee.email, payload['data'].first['email']
 
-    count = JSON.parse(tool_text(mcp_tool_call('count_resource_tool', arguments: { resource: 'admin_tickets', filter: { order_id: @order.id.to_s } }, headers: headers)))
+    count = JSON.parse(tool_text(mcp_tool_call('count_resource_tool', arguments: { resource: 'tickets', filter: { order_id: @order.id.to_s } }, headers: headers)))
     assert_equal 1, count['count']
 
     stranger = FactoryBot.create(:account)
-    stranger_rpc = mcp_tool_call('query_resource_tool', arguments: { resource: 'admin_orders' }, headers: { 'Authorization' => "Bearer #{stranger.api_key}" })
+    stranger_rpc = mcp_tool_call('query_resource_tool', arguments: { resource: 'orders' }, headers: { 'Authorization' => "Bearer #{stranger.api_key}" })
     assert_empty JSON.parse(tool_text(stranger_rpc))['data']
   end
 

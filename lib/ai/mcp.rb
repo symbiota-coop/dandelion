@@ -376,7 +376,7 @@ module Dandelion
                       "Allowed operators: #{(Dandelion::API::LOGICAL_OPERATORS + Dandelion::API::FIELD_OPERATORS).join(', ')}. " \
                       'Use list_resources_tool to see resources and fields. Requires a Bearer API key.'
           input_schema(properties: {
-                         resource: { type: 'string', description: 'Resource name, e.g. events, my_orders, admin_tickets' },
+                         resource: { type: 'string', description: 'Resource name, e.g. events, orders, tickets' },
                          filter: { type: 'object', description: 'MongoDB-style filter on filterable fields' },
                          fields: { type: 'array', items: { type: 'string' }, description: 'Fields to return (default all readable fields)' },
                          sort: { type: 'object', description: 'Sort, e.g. {"start_time": 1}. Default newest first' },
@@ -394,7 +394,7 @@ module Dandelion
           title 'Count Resource'
           description 'Count records in a resource matching a MongoDB-style filter. Requires a Bearer API key.'
           input_schema(properties: {
-                         resource: { type: 'string', description: 'Resource name, e.g. events, my_orders, admin_tickets' },
+                         resource: { type: 'string', description: 'Resource name, e.g. events, orders, tickets' },
                          filter: { type: 'object', description: 'MongoDB-style filter on filterable fields' }
                        }, required: [:resource])
           annotations(read_only_hint: true, destructive_hint: false)

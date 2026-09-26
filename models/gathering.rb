@@ -32,6 +32,14 @@ class Gathering
     self.and(listed: true).and(:privacy.ne => 'secret')
   end
 
+  # Row-level read policy: listed, non-secret gatherings, plus gatherings you are a member of
+  def self.readable_by(account)
+    return search_scope unless account
+    return all if account.admin?
+
+    self.and('$or' => [{ listed: true, privacy: { '$ne' => 'secret' } }, { _id: { '$in' => Membership.and(account_id: account.id).pluck(:gathering_id) } }])
+  end
+
   def self.protected_attributes
     %w[
       account_id redirect_home balance processed_via_dandelion membership_count

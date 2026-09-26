@@ -36,6 +36,14 @@ class Account
     self.and(has_signed_in: true, hidden: false)
   end
 
+  # Row-level read policy: public accounts, plus your own
+  def self.readable_by(account)
+    return publicly_visible unless account
+    return all if account.admin?
+
+    self.and('$or' => [{ has_signed_in: true, hidden: false }, { _id: account.id }])
+  end
+
   def self.feedback_summaries_scope
     Account.and(:id.in => EventFacilitation.and(:event_id.in => Event.past.pluck(:id)).pluck(:account_id))
   end

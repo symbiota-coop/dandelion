@@ -130,7 +130,7 @@ module Dandelion
         filter ||= {}
         raise Error, 'filter must be an object' unless filter.is_a?(Hash)
 
-        scope = definition[:scope].call(account)
+        scope = model.readable_by(account)
         scope = scope.without(*definition[:exclude]) if definition[:exclude]
         scope = scope.includes(*definition[:includes]) if definition[:includes]
         scope = scope.and('$and' => [translate_filter(filter.deep_stringify_keys)]) if filter.any?

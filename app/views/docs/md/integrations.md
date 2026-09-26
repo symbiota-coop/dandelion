@@ -69,22 +69,19 @@ Requests without a key get HTTP 401. Signing in on the website does not authenti
 
 ### Resources
 
-You query named resources, not raw collections. Each resource only returns the records and fields you are allowed to see.
+Each resource is a collection. Rows are filtered by a per-collection read policy (like row-level security in Postgres), so you only ever see records you are allowed to see, and every field returned is one you are allowed to read.
 
-| Resource | Records |
-|----------|---------|
-| `events` | Public events (not secret, not locked) |
-| `organisations` | Organisations |
-| `gatherings` | Listed, non-secret gatherings |
-| `accounts` | Public accounts (name and username only, no email) |
-| `my_orders` | Your own orders |
-| `my_tickets` | Your own tickets |
-| `admin_events` | Events you administer, including secret and locked events |
-| `admin_orders` | Completed orders for events you administer |
-| `admin_tickets` | Completed tickets for events you administer |
-| `organisation_followers` | Followers of organisations you administer |
+| Resource | Rows you can read |
+|----------|-------------------|
+| `events` | Public events, plus events you administer (including secret and locked events) |
+| `organisations` | All organisations |
+| `gatherings` | Listed, non-secret gatherings, plus gatherings you are a member of |
+| `accounts` | Public accounts, plus your own (name and username only, never email) |
+| `orders` | Your own orders, plus completed orders for events you administer |
+| `tickets` | Your own tickets, tickets in orders you placed, plus completed tickets for events you administer |
+| `organisationships` | Organisations you follow, plus the followers of organisations you administer |
 
-`GET /api/resources` lists every resource with its readable `fields` and its `filterable_fields`. Some readable fields, such as `url`, `email` or `answers`, cannot be used in filters or sorts. Emails in `admin_orders` and `admin_tickets` follow the same privacy rules as the rest of Dandelion, so they may be empty.
+`GET /api/resources` lists every resource with its readable `fields` and its `filterable_fields`. Some readable fields, such as `url`, `email` or `answers`, cannot be used in filters or sorts, because whether you can see them depends on the row. Emails in `orders` and `tickets` follow the same privacy rules as the rest of Dandelion, so they may be empty.
 
 ### Endpoints
 
@@ -108,7 +105,7 @@ You query named resources, not raw collections. Each resource only returns the r
 `count` takes only `filter`.
 
 ```
-curl -X POST https://dandelion.events/api/admin_orders/find \
+curl -X POST https://dandelion.events/api/orders/find \
   -H "Authorization: Bearer YOUR_API_KEY" \
   -H "Content-Type: application/json" \
   -d '{"filter": {"event_id": "507f1f77bcf86cd799439012", "created_at": {"$gte": "2024-01-01"}}, "fields": ["name", "email", "value"], "limit": 50}'
@@ -116,7 +113,7 @@ curl -X POST https://dandelion.events/api/admin_orders/find \
 
 ```json
 {
-  "resource": "admin_orders",
+  "resource": "orders",
   "data": [
     {
       "id": "507f1f77bcf86cd799439015",
