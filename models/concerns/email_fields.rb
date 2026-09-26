@@ -39,7 +39,8 @@ module EmailFields
            .gsub('[key_information_again]', event.extra_info_for_ticket_email ? "<p>Here's the key information again for your convenience:</p><hr><p>#{event.extra_info_for_ticket_email}</p>" : '')
 
     if plain_text
-      Premailer.new(html, with_html_string: true, adapter: 'nokogiri', input_encoding: 'UTF-8')
+      # include_link_tags: false, otherwise Premailer reads <link href> paths off disk (e.g. /dev/zero)
+      Premailer.new(html, with_html_string: true, adapter: 'nokogiri', input_encoding: 'UTF-8', include_link_tags: false)
                 .to_plain_text
                 .squish
     else

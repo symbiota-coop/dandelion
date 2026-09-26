@@ -61,7 +61,8 @@ class EmailReceiver < Incoming::Strategies::Mailgun
     html = html.gsub('<o:p>', '')
     html = html.gsub(%r{</o:p>}, '')
     begin
-      html = Premailer.new(html, with_html_string: true, adapter: 'nokogiri', input_encoding: 'UTF-8').to_inline_css
+      # include_link_tags: false, otherwise Premailer reads <link href> paths off disk (e.g. /dev/zero)
+      html = Premailer.new(html, with_html_string: true, adapter: 'nokogiri', input_encoding: 'UTF-8', include_link_tags: false).to_inline_css
     rescue StandardError => e
       ErrorReporting.capture_exception(e)
     end
@@ -75,7 +76,7 @@ class EmailReceiver < Incoming::Strategies::Mailgun
     html.search('.gmail_extra').remove
     html = html.search('body').inner_html
 
-    plain_text = Premailer.new(html, with_html_string: true, adapter: 'nokogiri', input_encoding: 'UTF-8').to_plain_text
+    plain_text = Premailer.new(html, with_html_string: true, adapter: 'nokogiri', input_encoding: 'UTF-8', include_link_tags: false).to_plain_text
 
     [mail, html, plain_text, @envelope_sender]
   end

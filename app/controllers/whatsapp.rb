@@ -1,7 +1,9 @@
 Dandelion::App.controller do
   get '/whatsapp' do
-    halt 403 unless params[:'hub.verify_token'] == ENV['WHATSAPP_VERIFY_TOKEN']
-    params[:'hub.challenge']
+    verify_token = ENV['WHATSAPP_VERIFY_TOKEN']
+    halt 403 unless verify_token.present? && ActiveSupport::SecurityUtils.secure_compare(params[:'hub.verify_token'].to_s, verify_token)
+    content_type 'text/plain'
+    params[:'hub.challenge'].to_s
   end
 
   post '/whatsapp' do

@@ -122,7 +122,8 @@ module EmailHelper
       render_erb(Padrino.root("app/views/layouts/#{layout}.erb"), context).to_str,
       with_html_string: true,
       adapter: 'nokogiri',
-      input_encoding: 'UTF-8'
+      input_encoding: 'UTF-8',
+      include_link_tags: false # otherwise Premailer reads <link href> paths off disk (e.g. /dev/zero)
     ).to_inline_css
   end
 end
