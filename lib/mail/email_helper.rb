@@ -14,10 +14,18 @@ module EmailHelper
     text.to_s.gsub(/%(?![0-9A-Fa-f]{2})/, "%\u200C")
   end
 
+  # ::SafeBuffer is Padrino::SafeBuffer when Padrino loads before ActiveSupport's output_safety (as it currently does),
+  # whose #concat calls html_escape_interpolated_argument. If the load order changes it becomes ActiveSupport::SafeBuffer,
+  # whose #concat (8.1+) calls implicit_html_escape_interpolated_argument instead, so both are overridden. See issue #249
   class SafeBuffer < ::SafeBuffer
     private
 
     def html_escape_interpolated_argument(arg)
+      escaped = super
+      arg.html_safe? ? escaped : EmailHelper.defuse_recipient_variables(escaped)
+    end
+
+    def implicit_html_escape_interpolated_argument(arg)
       escaped = super
       arg.html_safe? ? escaped : EmailHelper.defuse_recipient_variables(escaped)
     end
