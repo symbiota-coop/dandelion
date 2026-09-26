@@ -205,6 +205,14 @@ Dandelion::App.controller do
       @event.check_oc_event
       @order.reload
     end
+    if @order && params[:success] && !@order.payment_completed? && @order.paypal_order_id
+      begin
+        EventPaymentMethod::Paypal.complete_if_paid(@order)
+        @order.reload
+      rescue Paypal::RequestError => e
+        ErrorReporting.capture_exception(e)
+      end
+    end
     headers['Referrer-Policy'] = 'no-referrer' if @order
     unless @order&.payment_completed?
       # Returned from a payment provider

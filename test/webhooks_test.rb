@@ -703,4 +703,68 @@ class WebhooksTest < ActiveSupport::TestCase
     assert_equal 200, last_response.status
     refute order.reload.payment_completed?
   end
+
+  test 'paypal return to success page captures and completes the order' do
+    create_paypal_event
+    order = create_incomplete_order(@event, paypal_order_id: "PAYPAL-#{SecureRandom.hex(4)}")
+    approved = stub_paypal_order(id: order.paypal_order_id, status: 'APPROVED')
+    captured = stub_paypal_order(id: order.paypal_order_id, status: 'COMPLETED', capture_id: 'CAPTURE')
+    client = stub_paypal_client(get: approved, capture: captured)
+
+    Paypal.stub :new, client do
+      get "/e/#{@event.slug}?success=true&order_id=#{order.public_id}"
+    end
+
+    assert_equal 200, last_response.status
+    assert order.reload.payment_completed?
+    assert_equal 'CAPTURE', order.paypal_capture_id
+    assert_includes last_response.body, 'Thanks for booking'
+    refute_includes last_response.body, 'Confirming your payment'
+  end
+
+  test 'paypal return to success page does not complete an unapproved order' do
+    create_paypal_event
+    order = create_incomplete_order(@event, paypal_order_id: "PAYPAL-#{SecureRandom.hex(4)}")
+    client = stub_paypal_client(get: stub_paypal_order(id: order.paypal_order_id, status: 'PAYER_ACTION_REQUIRED'))
+
+    Paypal.stub :new, client do
+      get "/e/#{@event.slug}?success=true&order_id=#{order.public_id}"
+    end
+
+    assert_equal 200, last_response.status
+    refute order.reload.payment_completed?
+    assert_includes last_response.body, 'Confirming your payment'
+    refute_includes last_response.body, 'Thanks for booking'
+  end
+
+  test 'paypal payment_completed poll captures an approved order' do
+    create_paypal_event
+    order = create_incomplete_order(@event, paypal_order_id: "PAYPAL-#{SecureRandom.hex(4)}")
+    approved = stub_paypal_order(id: order.paypal_order_id, status: 'APPROVED')
+    captured = stub_paypal_order(id: order.paypal_order_id, status: 'COMPLETED', capture_id: 'CAPTURE')
+    client = stub_paypal_client(get: approved, capture: captured)
+
+    Paypal.stub :new, client do
+      get "/events/#{@event.id}/orders/#{order.public_id}/payment_completed"
+    end
+
+    assert_equal 200, last_response.status
+    assert JSON.parse(last_response.body)['payment_completed']
+    assert order.reload.payment_completed?
+    assert_equal 'CAPTURE', order.paypal_capture_id
+  end
+
+  test 'paypal return to success page still shows the pending card if PayPal errors' do
+    create_paypal_event
+    order = create_incomplete_order(@event, paypal_order_id: "PAYPAL-#{SecureRandom.hex(4)}")
+    client = stub_paypal_client(get: -> { raise Paypal::RequestError.new('PayPal request failed', status: 500) })
+
+    Paypal.stub :new, client do
+      get "/e/#{@event.slug}?success=true&order_id=#{order.public_id}"
+    end
+
+    assert_equal 200, last_response.status
+    refute order.reload.payment_completed?
+    assert_includes last_response.body, 'Confirming your payment'
+  end
 end

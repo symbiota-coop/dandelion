@@ -10,7 +10,8 @@
       <br />
       Add a webhook for
       <span style="text-decoration: underline dotted"><%=ENV['BASE_URI']%>/o/<%= @organisation.slug %>/paypal_webhook</span>
-      with <code>CHECKOUT.ORDER.APPROVED</code> and <code>PAYMENT.CAPTURE.COMPLETED</code>.
+      with <code>CHECKOUT.ORDER.APPROVED</code> and <code>PAYMENT.CAPTURE.COMPLETED</code>
+      so bookings still complete if the buyer does not return to Dandelion.
     </p>
     <%= f.text_block :paypal_client_id %>
     <%= f.text_block :paypal_secret %>

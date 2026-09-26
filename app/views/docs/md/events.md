@@ -134,9 +134,9 @@ If your organisation has a [PayPal](https://www.paypal.com/) business account, y
 
 1. Go to the Payments tab in your organisation's settings and click **Set up PayPal**
 2. Create an app under [Apps & Credentials](https://developer.paypal.com/dashboard/applications/live) in the PayPal Developer Dashboard and paste the live client ID and secret
-3. Add a webhook for your organisation's PayPal webhook URL (shown on the Payments tab) with **Checkout order approved** and **Payment capture completed**
+3. Add a webhook for your organisation's PayPal webhook URL (shown on the Payments tab) with **Checkout order approved** and **Payment capture completed**. The webhook is a backup: Dandelion also captures when the buyer returns from PayPal.
 
-Ticket buyers will then see a **Pay with PayPal** button at checkout on fiat-currency events. They are sent to PayPal to approve the payment. Dandelion captures the payment and confirms the booking when PayPal marks it as completed.
+Ticket buyers will then see a **Pay with PayPal** button at checkout on fiat-currency events. They are sent to PayPal to approve the payment. Dandelion captures the payment and confirms the booking when they return to the event page, or when PayPal sends a webhook.
 
 ## Get email notifications of orders
 

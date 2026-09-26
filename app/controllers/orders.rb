@@ -28,6 +28,14 @@ Dandelion::App.controller do
     @order = @event.orders.find_by_id_or_token(params[:order_id]) || not_found
     @event.organisation.check_evm_account if @order.evm_secret && @event.organisation.evm_address
     @event.check_oc_event if @order.oc_secret && @event.oc_slug
+    if @order.paypal_order_id && !@order.payment_completed?
+      begin
+        EventPaymentMethod::Paypal.complete_if_paid(@order)
+        @order.reload
+      rescue Paypal::RequestError => e
+        ErrorReporting.capture_exception(e)
+      end
+    end
     { payment_completed: @order.payment_completed }.to_json
   end
 
@@ -65,9 +73,7 @@ Dandelion::App.controller do
     @ticket.email = params[:email]
     @ticket.save
     @ticket.send_email_update_notification unless params[:success].to_i == 1
-    if @event.send_ticketholder_confirmation && @ticket.errors.empty? && @ticket.email.present? && @ticket.email != previous_email && @ticket.email != @order.account&.email
-      @ticket.send_ticket
-    end
+    @ticket.send_ticket if @event.send_ticketholder_confirmation && @ticket.errors.empty? && @ticket.email.present? && @ticket.email != previous_email && @ticket.email != @order.account&.email
     200
   end
 
@@ -84,7 +90,7 @@ Dandelion::App.controller do
   # Old ticket emails and notifications link here; keep redirecting to confirm_cancel.
   get '/orders/:id/confirm_destroy' do
     qs = request.query_string
-    redirect "/orders/#{params[:id]}/confirm_cancel#{qs.present? ? "?#{qs}" : ''}"
+    redirect "/orders/#{params[:id]}/confirm_cancel#{"?#{qs}" if qs.present?}"
   end
 
   get '/orders/:id/confirm_cancel' do
