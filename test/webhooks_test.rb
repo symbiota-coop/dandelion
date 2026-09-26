@@ -48,14 +48,26 @@ class WebhooksTest < ActiveSupport::TestCase
   # Stripe
   # ═══════════════════════════════════════════════════════════════════════════
 
-  def checkout_completed_event(session_id)
+  def checkout_completed_event(session_id, type: 'checkout.session.completed', payment_status: 'paid')
     Stripe::Event.construct_from(
       {
         id: 'evt_test',
-        type: 'checkout.session.completed',
-        data: { object: { id: session_id } }
+        type: type,
+        data: { object: { id: session_id, payment_status: payment_status } }
       }
     )
+  end
+
+  test 'checkout.session.completed with unpaid status does not complete the order until async payment succeeds' do
+    create_organisation(stripe_endpoint_secret: 'whsec_test')
+    create_event(prices: [10])
+    order = create_incomplete_order(@event, value: 10, session_id: "cs_#{SecureRandom.hex(4)}")
+
+    deliver_stripe_webhook(@organisation, checkout_completed_event(order.session_id, payment_status: 'unpaid'))
+    refute order.reload.payment_completed?
+
+    deliver_stripe_webhook(@organisation, checkout_completed_event(order.session_id, type: 'checkout.session.async_payment_succeeded'))
+    assert order.reload.payment_completed?
   end
 
   def deliver_stripe_webhook(organisation, stripe_event)

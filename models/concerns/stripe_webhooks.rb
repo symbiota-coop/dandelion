@@ -30,13 +30,15 @@ module StripeWebhooks
 
     opts = StripeOpts.call(api_key: stripe_sk)
 
-    return if stripe_webhooks.find { |w| w['url'] == stripe_webhook_url }
+    if (existing = stripe_webhooks.find { |w| w['url'] == stripe_webhook_url })
+      missing_events = StripeCheckout::PAID_EVENT_TYPES - existing['enabled_events']
+      Stripe::WebhookEndpoint.update(existing.id, { enabled_events: existing['enabled_events'] + missing_events }, opts) if missing_events.any? && !existing['enabled_events'].include?('*')
+      return
+    end
 
     w = Stripe::WebhookEndpoint.create({
                                          url: stripe_webhook_url,
-                                         enabled_events: [
-                                           'checkout.session.completed'
-                                         ]
+                                         enabled_events: StripeCheckout::PAID_EVENT_TYPES
                                        }, opts)
     set(stripe_endpoint_secret: w['secret'])
   rescue Stripe::AuthenticationError

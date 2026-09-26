@@ -83,8 +83,7 @@ Dandelion::App.controller do
       halt 200
     end
 
-    if stripe_event['type'] == 'checkout.session.completed'
-      session = stripe_event['data']['object']
+    if (session = StripeCheckout.paid_session(stripe_event))
       if (event_boost = EventBoost.find_by(session_id: session.id, payment_completed: false))
         event_boost.set(payment_completed: true)
         event_boost.send_admin_notification

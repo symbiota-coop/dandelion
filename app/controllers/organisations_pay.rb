@@ -12,8 +12,7 @@ Dandelion::App.controller do
       payload, sig_header, ENV['STRIPE_ENDPOINT_SECRET_ORGANISATIONS']
     )
 
-    if event['type'] == 'checkout.session.completed'
-      session = event['data']['object']
+    if (session = StripeCheckout.paid_session(event))
       if (organisation_contribution = OrganisationContribution.find_by(session_id: session.id, payment_completed: false))
         organisation_contribution.payment_completed = true
         organisation_contribution.save

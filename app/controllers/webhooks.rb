@@ -14,8 +14,7 @@ Dandelion::App.controller do
       halt 200
     end
 
-    if event['type'] == 'checkout.session.completed'
-      session = event['data']['object']
+    if (session = StripeCheckout.paid_session(event))
       @order = @organisation.orders.find_by(session_id: session.id, payment_completed: false)
       @order ||= @organisation.orders.deleted.find_by(session_id: session.id, payment_completed: false)
       @order&.complete_or_restore(error_context: { stripe_event_id: event.id })

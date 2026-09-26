@@ -12,8 +12,7 @@ Dandelion::App.controller do
       halt 200
     end
 
-    if event['type'] == 'checkout.session.completed'
-      session = event['data']['object']
+    if (session = StripeCheckout.paid_session(event))
       if (payment = @gathering.payments.find_by(session_id: session.id, payment_completed: false))
         begin
           payment.payment_completed!
