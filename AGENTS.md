@@ -9,11 +9,12 @@ The ORM is Mongoid, not ActiveRecord.
 - Never attempt to access ENV vars on Render.
 - Never attempt to write to the production database.
 
-## Cursor Cloud Agent
+## Cloud agents (Cursor, Claude Code)
 
-Cursor Cloud Agent setup lives in `.cursor/environment.json`.
+Shared setup lives in `script/agent-env/`: `system-deps.sh` (apt packages, MongoDB), `install.sh` (bundle install, `.env` files) and `start-services.sh` (starts MongoDB).
 
-The Cursor image installs Ruby, Bundler, Foreman, MongoDB, Chromium, and ImageMagick. The start command runs MongoDB.
+- Cursor: `.cursor/environment.json` and `.cursor/Dockerfile`
+- Claude Code on the web: a `SessionStart` hook in `.claude/settings.json` runs `.claude/remote-setup.sh`
 
 - Run `foreman run bundle exec rake db:seed` to seed the database
 - Run `foreman start -e .env web` to start the web process

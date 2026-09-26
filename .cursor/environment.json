@@ -5,8 +5,8 @@
     "dockerfile": "Dockerfile",
     "context": ".."
   },
-  "install": "bash .cursor/install.sh",
-  "start": "bash .cursor/start-services.sh",
+  "install": "bash script/agent-env/install.sh",
+  "start": "bash script/agent-env/start-services.sh",
   "ports": [
     {
       "port": 3000

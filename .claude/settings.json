@@ -1,0 +1,15 @@
+{
+  "hooks": {
+    "SessionStart": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash \"$CLAUDE_PROJECT_DIR\"/.claude/remote-setup.sh",
+            "timeout": 900
+          }
+        ]
+      }
+    ]
+  }
+}
