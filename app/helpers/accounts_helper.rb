@@ -14,6 +14,12 @@ Dandelion::App.helpers do
     )
   end
 
+  # Fails closed: an unset RECAPTCHA_SKIP_SECRET must not match a missing param (nil == nil)
+  def recaptcha_skip_secret_valid?
+    skip_secret = ENV['RECAPTCHA_SKIP_SECRET']
+    skip_secret.present? && ActiveSupport::SecurityUtils.secure_compare(params[:recaptcha_skip_secret].to_s, skip_secret)
+  end
+
   def validate_recaptcha(json: false)
     return unless ENV['RECAPTCHA_SECRET_KEY']
 

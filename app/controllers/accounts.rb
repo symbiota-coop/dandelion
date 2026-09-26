@@ -85,7 +85,7 @@ Dandelion::App.controller do
     @account.default_currency ||= visitor_currency
     load_context
 
-    validate_recaptcha unless params[:recaptcha_skip_secret] == ENV['RECAPTCHA_SKIP_SECRET']
+    validate_recaptcha unless recaptcha_skip_secret_valid?
     link_omniauth_provider(@account) if session['omniauth.auth'] && params[:omniauth_signup]
 
     saved = @account.save

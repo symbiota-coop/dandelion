@@ -1,4 +1,5 @@
 require File.expand_path("#{File.dirname(__FILE__)}/test_config.rb")
+require 'ostruct'
 
 class AccountsTest < ActiveSupport::TestCase
   include Capybara::DSL
@@ -646,6 +647,48 @@ class AccountsTest < ActiveSupport::TestCase
   ensure
     OmniAuth.config.test_mode = false
     OmniAuth.config.mock_auth[:google_oauth2] = nil
+  end
+
+  test 'signup checks recaptcha when no skip secret is configured' do
+    later = FactoryBot.build_stubbed(:account)
+    verify_calls = with_recaptcha(skip_secret: nil) { post_new_account(later) }
+
+    assert_equal 1, verify_calls.length
+    assert_nil Account.find_by(email: later.email.downcase)
+  end
+
+  test 'signup checks recaptcha when the skip secret is wrong' do
+    later = FactoryBot.build_stubbed(:account)
+    verify_calls = with_recaptcha(skip_secret: 'right-secret') { post_new_account(later, recaptcha_skip_secret: 'wrong-secret') }
+
+    assert_equal 1, verify_calls.length
+    assert_nil Account.find_by(email: later.email.downcase)
+  end
+
+  test 'signup skips recaptcha with the right skip secret' do
+    later = FactoryBot.build_stubbed(:account)
+    verify_calls = with_recaptcha(skip_secret: 'right-secret') { post_new_account(later, recaptcha_skip_secret: 'right-secret') }
+
+    assert_empty verify_calls
+    assert Account.find_by(email: later.email.downcase)
+  end
+
+  # Configures recaptcha with a verifier that always fails, and returns the verify calls made
+  def with_recaptcha(skip_secret:, &)
+    env = { 'RECAPTCHA_SECRET_KEY' => 'recaptcha-secret', 'RECAPTCHA_VERIFY_URL' => 'https://recaptcha.test/verify', 'RECAPTCHA_SKIP_SECRET' => skip_secret }
+    previous = env.keys.to_h { |key| [key, ENV[key]] }
+    env.each { |key, value| ENV[key] = value }
+
+    verify_calls = []
+    verifier = Object.new
+    verifier.define_singleton_method(:post) do |url, body|
+      verify_calls << [url, body]
+      OpenStruct.new(body: { success: false }.to_json)
+    end
+    Faraday.stub(:new, verifier, &)
+    verify_calls
+  ensure
+    previous.each { |key, value| ENV[key] = value }
   end
 
   def start_omniauth_signup
