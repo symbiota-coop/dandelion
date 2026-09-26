@@ -10,6 +10,14 @@ module OrganisationAccessControl
         )
     end
 
+    # Query counterpart of admin?: every organisation the account can administer
+    def administered_by(account)
+      return none unless account
+      return all if account.admin?
+
+      self.and(:id.in => Organisationship.and(account_id: account.id, admin: true).pluck(:organisation_id))
+    end
+
     def admin_or_event_manager?(organisation, account, organisation_admin: nil)
       organisation_admin ||
         (organisation_admin.nil? && admin?(organisation, account)) ||

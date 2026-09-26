@@ -66,3 +66,10 @@ end
 Rack::Attack.throttle('throttle bots', limit: 1, period: 1.hour) do |request|
   "#{request.user_agent}:#{request.path}" if throttled_path.call(request) && bot_request.call(request)
 end
+
+Rack::Attack.throttle('api requests', limit: 120, period: 1.minute) do |request|
+  next unless request.path.start_with?('/api/')
+
+  authorization = request.env['HTTP_AUTHORIZATION']
+  authorization ? Digest::SHA256.hexdigest(authorization) : real_ip.call(request)
+end

@@ -25,7 +25,6 @@ module Dandelion
     }.freeze
 
     AUTH_REQUIRED_MESSAGE = 'Authentication required. Provide your API key as a Bearer token.'
-    BEARER_PATTERN = /\ABearer\s+(\S+)\z/i
 
     def self.config_for(model_class)
       MODEL_CONFIGS[model_class.name]
@@ -79,13 +78,7 @@ module Dandelion
     end
 
     def self.account_from_request(rack_request)
-      header = rack_request.get_header('HTTP_AUTHORIZATION')
-      return nil if header.blank?
-
-      match = header.match(BEARER_PATTERN)
-      return :invalid unless match
-
-      Account.find_by(api_key: match[1]) || :invalid
+      Dandelion::API.account_from_request(rack_request)
     end
 
     def self.unauthorized_response
@@ -149,6 +142,30 @@ module Dandelion
         next tool_error('You do not have access to this organisation') unless Organisation.admin?(organisation, account)
 
         yield(account, organisation)
+      end
+    end
+
+    def self.with_api_errors
+      tool_json(yield)
+    rescue Dandelion::API::Error => e
+      tool_error(e.message)
+    end
+
+    def self.perform_list_resources(server_context: nil)
+      with_account(server_context) do |_account|
+        tool_json(Dandelion::API.describe)
+      end
+    end
+
+    def self.perform_query_resource(resource:, server_context: nil, **query)
+      with_account(server_context) do |account|
+        with_api_errors { Dandelion::API.find(account, resource, **query) }
+      end
+    end
+
+    def self.perform_count_resource(resource:, server_context: nil, filter: nil)
+      with_account(server_context) do |account|
+        with_api_errors { Dandelion::API.count(account, resource, filter: filter) }
       end
     end
 
@@ -341,6 +358,50 @@ module Dandelion
           define_singleton_method(:call) do |slug: nil, id: nil, server_context: {}|
             Dandelion::MCP.perform_get_event_tickets(server_context: server_context, slug: slug, id: id)
           end
+        end,
+        Class.new(::MCP::Tool) do
+          tool_name 'list_resources_tool'
+          title 'List Resources'
+          description 'List the resources you can query with query_resource_tool and count_resource_tool, with their readable and filterable fields. Requires a Bearer API key.'
+          annotations(read_only_hint: true, destructive_hint: false)
+
+          define_singleton_method(:call) do |server_context: {}|
+            Dandelion::MCP.perform_list_resources(server_context: server_context)
+          end
+        end,
+        Class.new(::MCP::Tool) do
+          tool_name 'query_resource_tool'
+          title 'Query Resource'
+          description 'Query a resource with a MongoDB-style filter, e.g. {"start_time": {"$gte": "2026-01-01"}, "organisation_id": "..."}. ' \
+                      "Allowed operators: #{(Dandelion::API::LOGICAL_OPERATORS + Dandelion::API::FIELD_OPERATORS).join(', ')}. " \
+                      'Use list_resources_tool to see resources and fields. Requires a Bearer API key.'
+          input_schema(properties: {
+                         resource: { type: 'string', description: 'Resource name, e.g. events, my_orders, admin_tickets' },
+                         filter: { type: 'object', description: 'MongoDB-style filter on filterable fields' },
+                         fields: { type: 'array', items: { type: 'string' }, description: 'Fields to return (default all readable fields)' },
+                         sort: { type: 'object', description: 'Sort, e.g. {"start_time": 1}. Default newest first' },
+                         limit: { type: 'integer', description: "Max results (default #{Dandelion::API::DEFAULT_LIMIT}, max #{Dandelion::API::MAX_LIMIT})" },
+                         skip: { type: 'integer', description: 'Number of results to skip, for paging' }
+                       }, required: [:resource])
+          annotations(read_only_hint: true, destructive_hint: false)
+
+          define_singleton_method(:call) do |resource:, filter: nil, fields: nil, sort: nil, limit: nil, skip: nil, server_context: {}|
+            Dandelion::MCP.perform_query_resource(resource: resource, filter: filter, fields: fields, sort: sort, limit: limit, skip: skip, server_context: server_context)
+          end
+        end,
+        Class.new(::MCP::Tool) do
+          tool_name 'count_resource_tool'
+          title 'Count Resource'
+          description 'Count records in a resource matching a MongoDB-style filter. Requires a Bearer API key.'
+          input_schema(properties: {
+                         resource: { type: 'string', description: 'Resource name, e.g. events, my_orders, admin_tickets' },
+                         filter: { type: 'object', description: 'MongoDB-style filter on filterable fields' }
+                       }, required: [:resource])
+          annotations(read_only_hint: true, destructive_hint: false)
+
+          define_singleton_method(:call) do |resource:, filter: nil, server_context: {}|
+            Dandelion::MCP.perform_count_resource(resource: resource, filter: filter, server_context: server_context)
+          end
         end
       ].freeze
     end
@@ -351,7 +412,7 @@ module Dandelion
           name: 'dandelion',
           title: 'Dandelion',
           version: '1.0.0',
-          instructions: 'Tools for querying Dandelion accounts, events, organisations and gatherings. Authenticated tools such as get_me_tool, get_organisation_events_tool, get_organisation_followers_tool, get_event_orders_tool and get_event_tickets_tool require a Bearer API key.',
+          instructions: 'Tools for querying Dandelion accounts, events, organisations and gatherings. Authenticated tools such as get_me_tool, get_organisation_events_tool, get_organisation_followers_tool, get_event_orders_tool, get_event_tickets_tool, list_resources_tool, query_resource_tool and count_resource_tool require a Bearer API key.',
           tools: tools
         )
         def s.server_context

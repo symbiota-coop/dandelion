@@ -40,6 +40,10 @@ module Dandelion
         origins '*'
         resource '/mcp', headers: :any, methods: [:get, :post, :delete]
       end
+      allow do
+        origins '*'
+        resource '/api/*', headers: :any, methods: [:get, :post]
+      end
     end
     OmniAuth.config.on_failure = proc { |env|
       OmniAuth::FailureEndpoint.new(env).redirect_to_failure
@@ -50,7 +54,7 @@ module Dandelion
     set :protection, except: :frame_options
 
     before do
-      next if request.path == '/mcp'
+      next if request.path == '/mcp' || request.path.start_with?('/api/')
 
       @cachebuster = Padrino.env == :development ? SecureRandom.uuid : ENV['RENDER_GIT_COMMIT']
       redirect "#{ENV['BASE_URI']}#{request.fullpath}" if ENV['REDIRECT_BASE'] && ENV['BASE_URI'] && (ENV['BASE_URI'] != "#{request.scheme}://#{request.env['HTTP_HOST']}")

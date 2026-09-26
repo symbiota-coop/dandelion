@@ -232,4 +232,51 @@ class McpTest < ActiveSupport::TestCase
     assert_equal '', tickets.first['email']
     assert_equal attendee.name, tickets.first['name']
   end
+
+  test 'resource tools require authentication' do
+    { 'list_resources_tool' => {}, 'query_resource_tool' => { resource: 'events' }, 'count_resource_tool' => { resource: 'events' } }.each do |name, arguments|
+      rpc = mcp_tool_call(name, arguments: arguments)
+
+      assert rpc.dig('result', 'isError'), "Expected #{name} to require authentication"
+      assert_includes tool_text(rpc), 'Authentication required'
+    end
+  end
+
+  test 'list_resources_tool lists resources' do
+    account = FactoryBot.create(:account)
+
+    rpc = mcp_tool_call('list_resources_tool', headers: { 'Authorization' => "Bearer #{account.api_key}" })
+    resources = JSON.parse(tool_text(rpc))
+
+    refute rpc.dig('result', 'isError')
+    assert_includes resources.map { |r| r['name'] }, 'admin_orders'
+  end
+
+  test 'query_resource_tool and count_resource_tool apply filters within scope' do
+    create_event_with_order_and_ticket
+    headers = { 'Authorization' => "Bearer #{@account.api_key}" }
+
+    rpc = mcp_tool_call('query_resource_tool', arguments: { resource: 'admin_orders', filter: { event_id: @event.id.to_s }, fields: %w[email value] }, headers: headers)
+    payload = JSON.parse(tool_text(rpc))
+
+    refute rpc.dig('result', 'isError')
+    assert_equal([@order.id.to_s], payload['data'].map { |o| o['id'] })
+    assert_equal @attendee.email, payload['data'].first['email']
+
+    count = JSON.parse(tool_text(mcp_tool_call('count_resource_tool', arguments: { resource: 'admin_tickets', filter: { order_id: @order.id.to_s } }, headers: headers)))
+    assert_equal 1, count['count']
+
+    stranger = FactoryBot.create(:account)
+    stranger_rpc = mcp_tool_call('query_resource_tool', arguments: { resource: 'admin_orders' }, headers: { 'Authorization' => "Bearer #{stranger.api_key}" })
+    assert_empty JSON.parse(tool_text(stranger_rpc))['data']
+  end
+
+  test 'query_resource_tool reports invalid queries as tool errors' do
+    account = FactoryBot.create(:account)
+
+    rpc = mcp_tool_call('query_resource_tool', arguments: { resource: 'events', filter: { '$where' => 'true' } }, headers: { 'Authorization' => "Bearer #{account.api_key}" })
+
+    assert rpc.dig('result', 'isError')
+    assert_includes tool_text(rpc), '$where'
+  end
 end

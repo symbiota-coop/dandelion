@@ -57,6 +57,29 @@ module EventAccessControl
       )
     end
 
+    # Query counterpart of admin?: every event the account can administer
+    def administered_by(account)
+      return none unless account
+      return all if account.admin?
+
+      admin_organisation_ids = Organisationship.and(account_id: account.id, admin: true).pluck(:organisation_id)
+      manager_organisation_ids = admin_organisation_ids + Organisationship.and(account_id: account.id, event_manager: true).pluck(:organisation_id)
+      activity_ids = Activityship.and(account_id: account.id, admin: true).pluck(:activity_id) + Activity.and(:organisation_id.in => admin_organisation_ids).pluck(:id)
+      local_group_ids = LocalGroupship.and(account_id: account.id, admin: true).pluck(:local_group_id) + LocalGroup.and(:organisation_id.in => admin_organisation_ids).pluck(:id)
+      event_ids = EventFacilitation.and(account_id: account.id).pluck(:event_id) + Cohostship.and(:organisation_id.in => manager_organisation_ids).pluck(:event_id)
+
+      self.and('$or' => [
+                 { account_id: account.id },
+                 { revenue_sharer_id: account.id },
+                 { organiser_id: account.id },
+                 { coordinator_id: account.id },
+                 { _id: { '$in' => event_ids } },
+                 { activity_id: { '$in' => activity_ids } },
+                 { local_group_id: { '$in' => local_group_ids } },
+                 { organisation_id: { '$in' => manager_organisation_ids } }
+               ])
+    end
+
     def participant?(event, account, event_admin: nil)
       (account && event.tickets.complete.find_by(account: account)) || event_admin || (event_admin.nil? && Event.admin?(event, account))
     end
