@@ -1,7 +1,7 @@
 class OpenRouter
   BASE_URL = 'https://openrouter.ai'.freeze
   CHAT_DEFAULTS = {
-    model: '~google/gemini-flash-latest',
+    model: 'google/gemini-3.8-flash',
     context_window_size: 1_000_000,
     reasoning_effort: 'low'
   }.freeze
