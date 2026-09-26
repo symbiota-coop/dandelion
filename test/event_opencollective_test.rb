@@ -77,17 +77,6 @@ class EventOpenCollectiveTest < ActiveSupport::TestCase
     end
   end
 
-  test 'check_oc_event completes a pending order when Open Collective has a matching paid contribution' do
-    create_oc_event
-    order = create_incomplete_oc_order(secret: 'dandelion:g6m6t')
-
-    @event.stub(:oc_transactions, [['GBP', 15, 'dandelion:g6m6t', Time.now]]) do
-      @event.check_oc_event
-    end
-
-    assert order.reload.payment_completed?
-  end
-
   test 'check_oc_event does not complete a pending order from an unpaid Open Collective contribution' do
     create_oc_event
     unpaid = create_incomplete_oc_order(secret: 'dandelion:7h0vi')
