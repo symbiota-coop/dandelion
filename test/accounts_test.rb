@@ -679,13 +679,21 @@ class AccountsTest < ActiveSupport::TestCase
     previous = env.keys.to_h { |key| [key, ENV[key]] }
     env.each { |key, value| ENV[key] = value }
 
+    # Real connections (Mailgun uses Faraday too), with only posts to the verify URL intercepted
+    verify_url = env['RECAPTCHA_VERIFY_URL']
     verify_calls = []
-    verifier = Object.new
-    verifier.define_singleton_method(:post) do |url, body|
-      verify_calls << [url, body]
-      OpenStruct.new(body: { success: false }.to_json)
+    faraday_new = Faraday.method(:new)
+    stubbed_new = lambda do |*args, **kwargs, &block|
+      connection = faraday_new.call(*args, **kwargs, &block)
+      connection.define_singleton_method(:post) do |url = nil, body = nil, headers = nil, &post_block|
+        return super(url, body, headers, &post_block) unless url == verify_url
+
+        verify_calls << [url, body]
+        OpenStruct.new(body: { success: false }.to_json)
+      end
+      connection
     end
-    Faraday.stub(:new, verifier, &)
+    Faraday.stub(:new, stubbed_new, &)
     verify_calls
   ensure
     previous.each { |key, value| ENV[key] = value }
