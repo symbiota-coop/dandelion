@@ -34,7 +34,7 @@ end
                   <%= commit.sha[0..6] %>
                 </a>
               </td>
-              <td data-toggle="tooltip" title="AI-generated summary ✨">
+              <td>
                 <%== md(
                 Sanitize.fragment(commit.commit.message, Sanitize::Config::DANDELION)
                 .gsub(/^Co-authored-by:.*$/i, '')
