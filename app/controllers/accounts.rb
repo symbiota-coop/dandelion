@@ -269,6 +269,7 @@ Dandelion::App.controller do
     sign_in_required!
     account = Account.find(params[:id]) || not_found
     kick! unless admin? || account == current_account
+    email_html_csp!
     EmailHelper.html(:feedback_summary, account: account)
   end
 

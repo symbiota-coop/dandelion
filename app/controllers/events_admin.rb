@@ -102,6 +102,7 @@ Dandelion::App.controller do
   get '/events/:id/reminder_email_preview' do
     @event = Event.find(params[:id]) || not_found
     event_admins_only!
+    email_html_csp!
 
     tickets_table = EmailHelper.render(:_tickets_table, event: @event, account: current_account)
     EmailHelper.html(:reminder, event: @event, tickets_table: tickets_table) do |content|
@@ -124,6 +125,7 @@ Dandelion::App.controller do
   get '/events/:id/feedback_request_email_preview' do
     @event = Event.find(params[:id]) || not_found
     event_admins_only!
+    email_html_csp!
     EmailHelper.html(:feedback, event: @event) do |content|
       EmailFields.replace_recipient_variables(
         content,
