@@ -37,6 +37,25 @@ class PmailsTest < ActiveSupport::TestCase
     refute page.has_title? 'pwned'
   end
 
+  test 'sent pmails are viewable by token but not by id' do
+    create_organisation
+    pmail = FactoryBot.create(:pmail, organisation: @organisation, recipient_kind: 'everyone')
+    pmail.set(sent_at: Time.now)
+    assert pmail.token.present?
+    visit "/pmails/#{pmail.token}"
+    assert page.has_title? pmail.subject
+    visit "/pmails/#{pmail.id}"
+    refute page.has_title? pmail.subject
+  end
+
+  test 'legacy pmails without a token are still viewable by id' do
+    create_organisation
+    pmail = FactoryBot.create(:pmail, organisation: @organisation, recipient_kind: 'everyone')
+    pmail.set(sent_at: Time.now, token: nil)
+    visit "/pmails/#{pmail.id}"
+    assert page.has_title? pmail.subject
+  end
+
   test 'organisation pmail list can be filtered by recipients' do
     create_event(allow_ticket_type_waitlists: true)
     activity = FactoryBot.create(:activity, organisation: @organisation)

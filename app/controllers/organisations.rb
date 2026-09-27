@@ -77,7 +77,7 @@ Dandelion::App.controller do
   get '/o/:slug/news/latest' do
     @organisation = Organisation.find_by(slug: params[:slug]) || Organisation.find(params[:slug]) || not_found
     @pmails = @organisation.news
-    redirect "/pmails/#{@pmails.first.id}"
+    redirect "/pmails/#{@pmails.first.public_id}"
   end
 
   get '/o/:slug/subscribe' do

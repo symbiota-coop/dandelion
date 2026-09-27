@@ -38,7 +38,7 @@
     <div class="preview">
       <% unless defined?(viewing_on_web) && viewing_on_web %>
         <small>
-          <a href="<%= ENV['BASE_URI'] %>/pmails/<%= pmail.id %>">Read and share this email in your browser</a>
+          <a href="<%= ENV['BASE_URI'] %>/pmails/<%= pmail.public_id %>">Read and share this email in your browser</a>
         </small>
       <% end %>
     </div>
