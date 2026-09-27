@@ -27,6 +27,32 @@ class OrdersTest < ActiveSupport::TestCase
     )
   end
 
+  def create_incomplete_order
+    create_event(prices: [10])
+    order = @event.orders.create!(
+      account: FactoryBot.create(:account),
+      currency: @event.currency,
+      value: 10,
+      payment_completed: false
+    )
+    order.tickets.create!(
+      event: @event,
+      account: order.account,
+      ticket_type: @event.ticket_types.first,
+      price: 10
+    )
+    order
+  end
+
+  def stub_completion_side_effects(order)
+    counts = { tickets: 0, notifications: 0 }
+    order.stub :send_tickets, proc { counts[:tickets] += 1 } do
+      order.stub :create_order_notification, proc { counts[:notifications] += 1 } do
+        yield counts
+      end
+    end
+  end
+
   def with_stubbed_stripe_refunds
     refunds = []
     payment_intent = OpenStruct.new(charges: [OpenStruct.new(id: 'ch_test')])
@@ -393,5 +419,30 @@ class OrdersTest < ActiveSupport::TestCase
     end
     assert_equal 'acct_connect', captured_opts[:stripe_account]
     assert_equal ENV['STRIPE_SK'], captured_opts[:api_key]
+  end
+
+  # Concurrent completion claims
+
+  test 'complete_or_restore completes an order only once' do
+    order = create_incomplete_order
+
+    stub_completion_side_effects(order) do |counts|
+      order.complete_or_restore
+      order.complete_or_restore
+      assert_equal 1, counts[:tickets]
+      assert_equal 1, counts[:notifications]
+    end
+
+    assert order.reload.payment_completed?
+  end
+
+  test 'complete_or_restore clears completing_at after an exception' do
+    order = create_incomplete_order
+    order.stub :payment_completed!, proc { raise 'boom' } do
+      assert_raises(RuntimeError) { order.complete_or_restore }
+    end
+
+    assert_nil order.reload.completing_at
+    refute order.payment_completed?
   end
 end

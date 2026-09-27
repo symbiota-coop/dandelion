@@ -31,7 +31,7 @@ class Order
   has_many :notifications, as: :notifiable, dependent: :destroy
 
   def self.protected_attributes
-    %w[payment_completed token]
+    %w[payment_completed completing_at token]
   end
 
   before_validation do
@@ -166,6 +166,13 @@ class Order
   end
 
   def complete_or_restore(error_context: {})
+    # Atomically claim the order so concurrent callers (webhook, return URL, poll) only complete it once.
+    # If the process dies after this claim, completing_at stays set and retries are blocked. We handle that by human intervention.
+    return unless Order.collection.find_one_and_update(
+      { _id: id, payment_completed: { '$ne' => true }, completing_at: nil },
+      { '$set' => { completing_at: Time.now } }
+    )
+
     restoring = deleted?
     if restoring
       restore_and_complete
@@ -176,6 +183,7 @@ class Order
       create_order_notification
     end
   rescue StandardError => e
+    Order.collection.update_one({ _id: id }, { '$unset' => { completing_at: true } })
     raise unless restoring
 
     ErrorReporting.capture_exception(e, context: error_context)

@@ -24,6 +24,7 @@ module OrderFields
     field :answers, type: Array
     field :transferred, type: Mongoid::Boolean
     field :restored, type: Mongoid::Boolean
+    field :completing_at, type: Time
 
     field :donation_via_modal, type: Mongoid::Boolean
 
