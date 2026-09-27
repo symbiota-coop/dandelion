@@ -1,0 +1,57 @@
+table.event-details td {
+  vertical-align: middle;
+  font-size: 1.1em;
+}
+
+table.event-details td:first-child {
+  font-size: 1.1em;
+  min-width: 3.25em;
+  width: 1px;
+}
+
+.event-detail {
+  vertical-align: middle;
+  display: inline-block;
+  text-align: center;
+  border: 0.13em solid rgba(0, 175, 94, 0.5);
+  border-radius: 0.25em;
+  width: 2.5em;
+  height: 2.5em;
+  color: #666;
+  background: white;
+  line-height: 1;
+}
+
+.event-detail-separator {
+  font-size: 0.2em !important
+}
+
+.event-detail img {
+  width: 1.5em;
+  margin-top: 0.5em;
+  opacity: 0.5
+}
+
+span.event-detail.calendar-date {
+  cursor: default;
+}
+
+.event-detail.calendar-date .month {
+  display: block;
+  text-transform: uppercase;
+  background-color: rgba(0, 175, 94, 0.3);
+  border-bottom: 0.13em solid rgba(0, 175, 94, 0.5);
+
+}
+
+.event-detail.calendar-date .month .month-text {
+  display: block;
+  font-size: 0.65em;
+  padding: 0.225em;
+}
+
+.event-detail.calendar-date .day {
+  display: block;
+  padding-top: 0.25em;
+  font-size: 1em;
+}
