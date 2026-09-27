@@ -11,17 +11,22 @@ clear_bundler_git_checkouts() {
   rm -rf "${BUNDLE_PATH:-/usr/local/bundle}"/ruby/*/bundler/gems/* 2>/dev/null || true
 }
 
-clear_bundler_git_checkouts
-
-for attempt in 1 2 3; do
-  if bundle install; then
-    break
-  fi
-  if [ "$attempt" -eq 3 ]; then
-    exit 1
-  fi
+# Skip the reinstall (and the git cache wipe) when everything is already installed
+if bundle check >/dev/null 2>&1; then
+  echo "Gems already installed"
+else
   clear_bundler_git_checkouts
-done
+
+  for attempt in 1 2 3; do
+    if bundle install; then
+      break
+    fi
+    if [ "$attempt" -eq 3 ]; then
+      exit 1
+    fi
+    clear_bundler_git_checkouts
+  done
+fi
 
 if [ ! -f .env ]; then
   cp .env.example .env
