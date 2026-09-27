@@ -2,6 +2,7 @@ class Pmail
   include Mongoid::Document
   include Mongoid::Timestamps
   include CoreExtensions
+  include PublicToken
 
   include PmailMailgun
   include Searchable
@@ -367,7 +368,7 @@ class Pmail
     accounts.each do |account|
       next unless account.phone.present?
 
-      pmail_url = "#{ENV['BASE_URI']}/pmails/#{id}"
+      pmail_url = "#{ENV['BASE_URI']}/pmails/#{public_id}"
       message = "New message about #{mailable.name}\n\nView the message '#{subject}' at #{pmail_url}"
 
       send_signal_message(account.phone, message)

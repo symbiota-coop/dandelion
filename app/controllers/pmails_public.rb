@@ -1,7 +1,7 @@
 Dandelion::App.controller do
   get '/pmails/:pmail_id' do
     pass if params[:pmail_id] == 'new'
-    @pmail = Pmail.find(params[:pmail_id]) || not_found
+    @pmail = Pmail.find_by_id_or_token(params[:pmail_id]) || not_found
     not_found unless @pmail.sent_at
     email_html_csp!
     @pmail.html(viewing_on_web: true)

@@ -28,7 +28,7 @@
             <ul class="list-unstyled">
               <% pmails.each { |pmail| %>
               <li>
-                <a target="_blank" href="<%= "/pmails/#{pmail.id}" %>"><%= pmail.subject %></a>
+                <a target="_blank" href="<%= "/pmails/#{pmail.public_id}" %>"><%= pmail.subject %></a>
                 <%= timeago(pmail.sent_at) %>
               </li>
               <% } %>
