@@ -13,11 +13,11 @@ The ORM is Mongoid, not ActiveRecord.
 
 Shared setup lives in `script/agent-env/`: `system-deps.sh` (apt packages, MongoDB), `install.sh` (bundle install, `.env` files) and `start-services.sh` (starts MongoDB).
 
-- Cursor: `.cursor/environment.json` and `.cursor/Dockerfile`
+- Cursor: `.cursor/environment.json` and `.cursor/Dockerfile`. After boot, `start` forks Mongo; a `web` terminal keeps `foreman start -e .env web` running (Puma on port 3000, logs in that session).
 - Claude Code on the web: a `SessionStart` hook in `.claude/settings.json` runs `.claude/remote-setup.sh`
 
 - Run `foreman run bundle exec rake db:seed` to seed the database
-- Run `foreman start -e .env web` to start the web process
+- Run `foreman start -e .env web` to start the web process if it is not already running
 - Login with `SEED_ACCOUNT_EMAIL` and `SEED_ACCOUNT_PASSWORD` in `.env`
 
 ## Mongo

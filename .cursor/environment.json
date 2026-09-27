@@ -7,6 +7,13 @@
   },
   "install": "bash script/agent-env/install.sh",
   "start": "bash script/agent-env/start-services.sh",
+  "terminals": [
+    {
+      "name": "web",
+      "command": "foreman start -e .env web",
+      "description": "Dandelion Puma on port 3000"
+    }
+  ],
   "ports": [
     {
       "port": 3000
