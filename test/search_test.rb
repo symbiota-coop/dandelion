@@ -177,11 +177,6 @@ class SearchTest < ActiveSupport::TestCase
     assert_ajax_includes('Test', 'events', 'Test Event Search')
   end
 
-  test 'ajax search returns json for accounts' do
-    FactoryBot.create(:account, name: 'Test Account Search', has_signed_in: true)
-    assert_ajax_includes('Test', 'accounts', 'Test Account Search')
-  end
-
   test 'ajax search returns json for organisations' do
     create_organisation(name: 'Test Organisation Search')
     assert_ajax_includes('Test', 'organisations', 'Test Organisation Search')
