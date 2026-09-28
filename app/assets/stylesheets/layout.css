@@ -3,6 +3,10 @@
  * Originally derived from the Infinite Admin theme, pruned to the rules Dandelion uses.
  */
 
+/* ==========================================================================
+   Pace loader
+   ========================================================================== */
+
 .pace {
   pointer-events: none;
   -webkit-user-select: none;
@@ -52,10 +56,8 @@
 @keyframes pace-spinner {
   0% {
     transform: rotate(0deg);
-    transform: rotate(0deg);
   }
   100% {
-    transform: rotate(360deg);
     transform: rotate(360deg);
   }
 }
@@ -65,6 +67,10 @@
     top: 6.5625rem;
   }
 }
+
+/* ==========================================================================
+   Header
+   ========================================================================== */
 
 .header.navbar {
   border: none;
@@ -93,7 +99,6 @@
 }
 
 .navbar-nav {
-  display: flex;
   flex-direction: row;
 }
 
@@ -185,7 +190,6 @@
 .navbar .navbar-user-img i {
   display: block;
   text-align: center;
-  line-height: 1.75rem;
   height: 1.75rem;
   width: 1.75rem;
   font-size: 1.5rem;
@@ -230,6 +234,10 @@
   line-height: 1.25rem;
   min-height: 2.8125rem;
 }
+
+/* ==========================================================================
+   Header search bar
+   ========================================================================== */
 
 .header-search-bar {
   position: absolute;
@@ -332,6 +340,10 @@
     top: -2.75rem;
   }
 }
+
+/* ==========================================================================
+   Navbar toggle and mobile header
+   ========================================================================== */
 
 .navbar-toggle,
 .navbar-toggle:hover,
@@ -487,6 +499,10 @@
     color: #000;
   }
 }
+
+/* ==========================================================================
+   Sidebar
+   ========================================================================== */
 
 .sidebar {
   background: #fff;
@@ -667,6 +683,10 @@
   text-decoration: none;
 }
 
+/* ==========================================================================
+   Sidebar floating submenu (minified)
+   ========================================================================== */
+
 .float-sub-menu {
   position: fixed;
   width: 14.375rem;
@@ -767,6 +787,10 @@
   }
 }
 
+/* ==========================================================================
+   Sidebar minify button
+   ========================================================================== */
+
 .sidebar .sidebar-minify-btn {
   position: absolute;
   right: 0;
@@ -814,6 +838,10 @@
   }
 }
 
+/* ==========================================================================
+   Content
+   ========================================================================== */
+
 .content {
   margin-left: 14.375rem;
   padding: 1.5625rem;
@@ -830,6 +858,10 @@
     height: auto;
   }
 }
+
+/* ==========================================================================
+   Footer
+   ========================================================================== */
 
 .footer {
   position: absolute;
@@ -851,6 +883,10 @@
     display: none;
   }
 }
+
+/* ==========================================================================
+   Alerts
+   ========================================================================== */
 
 .alert {
   padding: 0.625rem;
@@ -896,17 +932,15 @@
   color: #e2342a;
 }
 
+/* ==========================================================================
+   Badges
+   ========================================================================== */
+
 .badge {
   background: #8a8a8f;
-  color: #fff;
-  display: inline-block;
   min-width: 0.625rem;
   padding: 0.1875rem 0.4375rem;
-  font-weight: 700;
-  line-height: 1;
   color: #fff;
-  text-align: center;
-  white-space: nowrap;
   vertical-align: middle;
   background-color: #777;
   font-size: 0.75rem;
@@ -1023,6 +1057,10 @@
   background: #333;
 }
 
+/* ==========================================================================
+   Breadcrumb
+   ========================================================================== */
+
 .breadcrumb {
   font-weight: bold;
   font-size: 0.693rem;
@@ -1031,6 +1069,10 @@
   background: none;
   border-radius: 0;
 }
+
+/* ==========================================================================
+   Buttons
+   ========================================================================== */
 
 .btn {
   font-size: 0.875rem;
@@ -1196,6 +1238,10 @@ fieldset[disabled] .btn-danger:hover,
   border: none;
 }
 
+/* ==========================================================================
+   Carets
+   ========================================================================== */
+
 .caret {
   border-color: transparent;
   font-family: "themify";
@@ -1222,6 +1268,10 @@ fieldset[disabled] .btn-danger:hover,
 .dropdown-toggle:after {
   display: none;
 }
+
+/* ==========================================================================
+   Checkboxes
+   ========================================================================== */
 
 .checkbox {
   position: relative;
@@ -1340,6 +1390,10 @@ input[type=radio][disabled] + label {
   border-color: #e2342a;
 }
 
+/* ==========================================================================
+   Input groups
+   ========================================================================== */
+
 .input-group-addon {
   line-height: 1.3333;
   font-size: 0.875rem;
@@ -1351,16 +1405,16 @@ input[type=radio][disabled] + label {
   color: #e2342a;
 }
 
+/* ==========================================================================
+   Dropdowns
+   ========================================================================== */
+
 .dropdown-menu {
   border-color: rgba(0, 0, 0, 0.05);
   float: none;
-  left: 0;
   right: auto;
   margin-top: 0;
-  padding: 0.5rem 0;
   font-size: 0.825rem;
-  position: absolute;
-  display: none;
   border-radius: 0.5rem;
   box-shadow: 0 0.125rem 0.375rem 1px rgba(0, 0, 0, 0.1);
 }
@@ -1470,6 +1524,10 @@ input[type=radio][disabled] + label {
   position: absolute;
 }
 
+/* ==========================================================================
+   Dropdown notifications
+   ========================================================================== */
+
 .dropdown-menu > li.notification a {
   display: block;
   padding: 0.625rem 0 0.625rem 0.9375rem !important;
@@ -1536,6 +1594,10 @@ input[type=radio][disabled] + label {
   margin: 0;
 }
 
+/* ==========================================================================
+   Forms
+   ========================================================================== */
+
 .form-control {
   border-color: #C8C7CC;
   color: #000;
@@ -1598,7 +1660,6 @@ select.form-control-sm:not([size]):not([multiple]) {
 }
 
 label {
-  display: inline-block;
   max-width: 100%;
   margin-bottom: 0.3125rem;
   font-weight: 700;
@@ -1607,6 +1668,10 @@ label {
 hr {
   border-color: #C8C7CC;
 }
+
+/* ==========================================================================
+   Labels
+   ========================================================================== */
 
 .label {
   display: inline;
@@ -1711,6 +1776,10 @@ hr {
   background: #333;
 }
 
+/* ==========================================================================
+   List groups
+   ========================================================================== */
+
 .list-group-item.active,
 .list-group-item.active:focus,
 .list-group-item.active:hover {
@@ -1738,6 +1807,10 @@ button.list-group-item:hover {
   color: #8a8a8f;
 }
 
+/* ==========================================================================
+   Mark and media
+   ========================================================================== */
+
 mark {
   background: #FFCC00;
 }
@@ -1753,6 +1826,10 @@ mark {
 .media > .pull-right {
   padding-left: 0.625rem;
 }
+
+/* ==========================================================================
+   Modals
+   ========================================================================== */
 
 .close {
   text-shadow: none;
@@ -1774,6 +1851,10 @@ mark {
     max-width: 37.5rem;
   }
 }
+
+/* ==========================================================================
+   Nav tabs and pills
+   ========================================================================== */
 
 .nav-tabs {
   border-bottom: 1px solid #dadade;
@@ -1828,6 +1909,10 @@ mark {
   background: #00af5e;
 }
 
+/* ==========================================================================
+   Page header
+   ========================================================================== */
+
 .page-header {
   color: #000;
   padding: 0;
@@ -1838,11 +1923,14 @@ mark {
 }
 
 .page-header small {
-  color: #467BF3;
   font-size: 0.825rem;
   color: #777;
   font-weight: normal;
 }
+
+/* ==========================================================================
+   Pagination
+   ========================================================================== */
 
 .pagination > .active > a,
 .pagination > .active > a:focus,
@@ -1888,6 +1976,10 @@ mark {
   color: #8a8a8f;
 }
 
+/* ==========================================================================
+   Misc components (spin, collapse, popover, progress, row)
+   ========================================================================== */
+
 @keyframes spin {
   0% {
     transform: rotate(0deg);
@@ -1924,6 +2016,10 @@ mark {
   padding-left: 0.375rem;
   padding-right: 0.375rem;
 }
+
+/* ==========================================================================
+   Switcher
+   ========================================================================== */
 
 .switcher {
   display: inline-block;
@@ -1975,6 +2071,10 @@ mark {
   left: 1.25rem;
 }
 
+/* ==========================================================================
+   Tables
+   ========================================================================== */
+
 table {
   border-spacing: 0;
 }
@@ -2021,6 +2121,10 @@ table {
   background: #eee;
 }
 
+/* ==========================================================================
+   Tooltips, icons and wells
+   ========================================================================== */
+
 .tooltip {
   font-size: 0.825rem;
 }
@@ -2039,6 +2143,10 @@ table {
   border-radius: 0.25rem;
   box-shadow: none;
 }
+
+/* ==========================================================================
+   jQuery UI autocomplete
+   ========================================================================== */
 
 .ui-autocomplete {
   border: none !important;
@@ -2079,6 +2187,10 @@ table {
 .ui-menu .ui-menu-item .ui-menu-item-wrapper.ui-state-active {
   margin: 0;
 }
+
+/* ==========================================================================
+   DataTables
+   ========================================================================== */
 
 body table.dataTable {
   margin: 0.625rem 0 !important;
@@ -2270,6 +2382,10 @@ body table.dataTable tbody > tr > .selected {
   }
 }
 
+/* ==========================================================================
+   Chat widget
+   ========================================================================== */
+
 .widget-chat {
   list-style-type: none;
   margin: 0;
@@ -2363,6 +2479,10 @@ body table.dataTable tbody > tr > .selected {
   left: auto;
   right: -0.4375rem;
 }
+
+/* ==========================================================================
+   Search page
+   ========================================================================== */
 
 .search-input {
   position: relative;
@@ -2492,6 +2612,10 @@ body table.dataTable tbody > tr > .selected {
   }
 }
 
+/* ==========================================================================
+   Sidebar active item
+   ========================================================================== */
+
 .sidebar .nav > li.active > a,
 .sidebar .nav > li.active > a:hover,
 .sidebar .nav > li.active > a:focus,
@@ -2501,11 +2625,12 @@ body table.dataTable tbody > tr > .selected {
 .navbar .with-label:before,
 .pace .pace-progress {
   color: #fff !important;
-  background: #fd7514 !important;
-  background: -moz-linear-gradient(-45deg, #fd7514 0%, #efe707 100%) !important;
-  background: -webkit-linear-gradient(-45deg, #fd7514 0%, #efe707 100%) !important;
   background: linear-gradient(135deg, #fd7514 0%, #efe707 100%) !important;
 }
+
+/* ==========================================================================
+   Base: html, body and typography
+   ========================================================================== */
 
 html {
   font-size: 17px;
@@ -2537,8 +2662,6 @@ body {
   background: #eaeaea;
   font-size: 0.825rem;
   line-height: 1.45;
-  color: #212529;
-  font-weight: 500;
 }
 
 #page-container {
@@ -2552,7 +2675,6 @@ body {
 }
 
 a {
-  color: #00af5e;
   transition: color 0.2s cubic-bezier(0.3, 0.5, 0.6, 1);
 }
 
@@ -2606,6 +2728,10 @@ strong {
   font-weight: bold;
 }
 
+/* ==========================================================================
+   Utilities
+   ========================================================================== */
+
 .bg-danger {
   background: #FF3B30 !important;
   color: #fff !important;
@@ -2631,10 +2757,6 @@ strong {
   color: #000 !important;
 }
 
-.text-nowrap {
-  white-space: nowrap !important;
-}
-
 .pull-left {
   float: left !important;
 }
@@ -2647,16 +2769,8 @@ strong {
   color: #8A8A8F !important;
 }
 
-.text-primary {
-  color: #00af5e !important;
-}
-
 .text-warning {
   color: #FF9500 !important;
-}
-
-.text-white {
-  color: #fff !important;
 }
 
 .fade.in {
@@ -2672,6 +2786,10 @@ strong {
     display: none !important;
   }
 }
+
+/* ==========================================================================
+   Sidebar scroll container
+   ========================================================================== */
 
 .sidebar-scroll {
   height: 100%;
