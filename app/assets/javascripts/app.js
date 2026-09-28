@@ -534,6 +534,11 @@ $(function () {
     $('.pace-inactive').hide() // hide spinner as user leaves page so it doesn't show when pressing back button    
   })
 
+  // Keep dropdowns open when clicking inside them
+  $(document).on('click', '[data-dropdown-close="false"]', function (e) {
+    e.stopPropagation()
+  })
+
   if (typeof Pace !== 'undefined') {
     Pace.stop()
   }
