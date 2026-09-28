@@ -7,7 +7,6 @@ gem 'padrino'
 gem 'puma'
 gem 'rack'
 gem 'rake'
-gem 'sass'
 gem 'sinatra'
 
 # Admin

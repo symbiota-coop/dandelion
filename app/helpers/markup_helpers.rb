@@ -143,6 +143,21 @@ Dandelion::App.helpers do
     colors.reject.with_index { |_, i| i == 1 }[0..-4]
   end
 
+  # The :root block of custom properties that theme.css reads its colours from
+  def theme_css_variables(hex)
+    color = Chroma.paint(hex)
+    rgb = color.rgb
+    <<~CSS.strip
+      :root {
+        --theme-color: #{color.to_hex};
+        --theme-color-rgb: #{rgb.r.round}, #{rgb.g.round}, #{rgb.b.round};
+        --theme-color-light: #{color.lighten(6.66).to_hex};
+        --theme-color-dark: #{color.darken(6.66).to_hex};
+        --theme-color-darker: #{color.darken(10).to_hex};
+      }
+    CSS
+  end
+
   def clamp_color(hex, min_contrast: 2, min_lightness: 0.25)
     hsl = Chroma.paint(hex).hsl
     if LuminosityContrast.ratio(hex.delete('#'), 'fff') < min_contrast

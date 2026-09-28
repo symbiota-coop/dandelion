@@ -6,11 +6,6 @@ module Dandelion
     helpers Activate::ParamHelpers
     helpers Activate::NavigationHelpers
 
-    require 'sass/plugin/rack'
-    Sass::Plugin.options[:template_location] = Padrino.root('app', 'assets', 'stylesheets')
-    Sass::Plugin.options[:css_location] = Padrino.root('app', 'assets', 'stylesheets')
-    use Sass::Plugin::Rack
-
     use Sentry::Rack::CaptureExceptions
 
     # Via :sessions (not `use`) so the session sits inside Rack::Protection and its origin checks can drop it
@@ -341,16 +336,16 @@ module Dandelion
 
     get '/theme.css' do
       content_type 'text/css'
-      scss_content = File.read(Padrino.root('app/assets/stylesheets/theme.scss'))
+      css = File.read(Padrino.root('app/assets/stylesheets/theme.css'))
       if (theme_color = params[:theme_color])
         theme_color = "##{theme_color}" unless theme_color.start_with?('#')
         # Validate hex color format: # followed by 3 or 6 hexadecimal characters
         if theme_color.match?(/\A#[0-9A-Fa-f]{3}\z|\A#[0-9A-Fa-f]{6}\z/)
           theme_color = clamp_color(theme_color)
-          scss_content.sub!(/\$theme-color:.*?;/, "$theme-color: #{theme_color};")
+          css = css.sub(/:root \{.*?\}/m, theme_css_variables(theme_color))
         end
       end
-      Sass::Engine.new(scss_content, syntax: :scss).render
+      css
     end
   end
 end
