@@ -22,9 +22,9 @@
       <td>
         <%=m event.contribution_gbp, currency%>
         <% if event.promotion_fee? %>
-          <span class="label label-primary">Promotion fee</span>
+          <span class="badge badge-primary">Promotion fee</span>
         <% elsif event.cap && event.contribution_gbp == event.cap %>
-          <span class="label label-primary">Capped</span>
+          <span class="badge badge-primary">Capped</span>
         <% end %>
       </td>
     </tr>

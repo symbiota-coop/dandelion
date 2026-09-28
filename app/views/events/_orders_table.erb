@@ -146,7 +146,7 @@
         <% end %>)
       <% end %>
       <% if order.transferred? %>
-        <span class="label label-default">Transferred</span>
+        <span class="badge badge-default">Transferred</span>
       <% end %>
       <% if order.credit_applied %>
         <span class="label label-default"><%= m order.credit_applied, order.currency %> credit applied</span>
@@ -178,7 +178,7 @@
     <% if defined?(donation_to_dandelion) %>
       <td>
         <% if order.application_fee_paid_to_dandelion? && order.donation_revenue > 0 %>
-          <%= m order.donation_revenue, order.currency %> <% if order.donation_via_modal? %><span class="label label-default">via modal</span><% end %>
+          <%= m order.donation_revenue, order.currency %> <% if order.donation_via_modal? %><span class="badge badge-default">via modal</span><% end %>
         <% end %>
       </td>
     <% end %>

@@ -149,11 +149,11 @@ class EventBoost
   end
 
   def status(time = Time.current)
-    return { 'Pending payment' => 'label-default' } unless complete?
-    return { 'Active now' => 'label-primary' } if active?(time)
-    return { 'Upcoming' => 'label-primary' } if start_time && start_time > time
+    return { 'Pending payment' => 'badge-default' } unless complete?
+    return { 'Active now' => 'badge-primary' } if active?(time)
+    return { 'Upcoming' => 'badge-primary' } if start_time && start_time > time
 
-    { 'Ended' => 'label-default' }
+    { 'Ended' => 'badge-default' }
   end
 
   def send_admin_notification

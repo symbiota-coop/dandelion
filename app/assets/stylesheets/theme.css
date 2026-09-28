@@ -184,7 +184,8 @@ p.action a:hover {
   background: var(--theme-color-dark) !important;
 }
 
-.label-outline-primary {
+.label-outline-primary,
+.badge-outline-primary {
   color: var(--theme-color);
   border-color: var(--theme-color);
 }

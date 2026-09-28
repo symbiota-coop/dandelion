@@ -58,9 +58,9 @@
       <% end %>
       <% if option.capacity %>
         <% if option.full? %>
-          <span class="label label-danger">Full</span>
+          <span class="badge badge-danger">Full</span>
         <% else %>
-          <span class="label label-outline-primary">Available</span>
+          <span class="badge badge-outline-primary">Available</span>
         <% end %>
       <% end %>
     </td>
@@ -69,7 +69,7 @@
         <a class="pagelet-trigger btn btn-outline-primary" href="/optionships/<%= optionship.id %>/destroy">Leave</a>
       <% elsif !option.full? %>
         <% if option.by_invitation %>
-          <span class="label label-default">By invitation</span>
+          <span class="badge badge-default">By invitation</span>
         <% else %>
           <a class="pagelet-trigger btn btn-primary" data-method="post" onclick="window.scrollTo(0, 0)" href="/optionships/create?option_id=<%= option.id %>">Join</a>
         <% end %>

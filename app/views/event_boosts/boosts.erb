@@ -203,7 +203,7 @@
           <td><%= m event_boost.total_amount, event_boost.currency %></td>
           <td>
             <% text, label_class = event_boost.status.first %>
-            <span class="label <%= label_class %>"><%= text %></span>
+            <span class="badge <%= label_class %>"><%= text %></span>
           </td>
           <td>
             <%= event_boost.created_at %>

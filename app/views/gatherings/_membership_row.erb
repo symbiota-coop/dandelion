@@ -37,7 +37,7 @@
   <%= membership.created_at %>
 <% end %>
 <% if mapplication %>
-  <span title="Accepted at <%= mapplication.verdicts.proposers.count + mapplication.verdicts.supporters.count %> <%= @gathering.vouchers %>" class="label label-primary d-inline-block mb-1"><%= mapplication.verdicts.proposers.count + mapplication.verdicts.supporters.count %></span>
+  <span title="Accepted at <%= mapplication.verdicts.proposers.count + mapplication.verdicts.supporters.count %> <%= @gathering.vouchers %>" class="badge badge-primary d-inline-block mb-1"><%= mapplication.verdicts.proposers.count + mapplication.verdicts.supporters.count %></span>
 <% end %>
 </td>
 <% if @gathering.democratic_threshold %>

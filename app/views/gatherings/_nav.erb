@@ -6,8 +6,8 @@
   <%= ul_nav [
         ['Home', "/g/#{gathering.slug}"],
         (['Settings', "/g/#{gathering.slug}/edit"] if membership.admin),
-        [%(Members <span class="label label-inverse">#{gathering.member_limit ? %(#{gathering.memberships.count}/#{gathering.member_limit}) : gathering.memberships.count}</span>), "/g/#{gathering.slug}/members"],
-        ([%(Applications #{%(<span class="label label-inverse">#{gathering.mapplications.pending.count}</span>) if gathering.mapplications.pending.count.positive?}), "/g/#{gathering.slug}/applications"] if (gathering.privacy == 'closed') || gathering.mapplications.and(:status.ne => 'accepted').count.positive?),
+        [%(Members <span class="badge badge-inverse">#{gathering.member_limit ? %(#{gathering.memberships.count}/#{gathering.member_limit}) : gathering.memberships.count}</span>), "/g/#{gathering.slug}/members"],
+        ([%(Applications #{%(<span class="badge badge-inverse">#{gathering.mapplications.pending.count}</span>) if gathering.mapplications.pending.count.positive?}), "/g/#{gathering.slug}/applications"] if (gathering.privacy == 'closed') || gathering.mapplications.and(:status.ne => 'accepted').count.positive?),
         ([
           %(
             #{@gathering.choose_and_pay_label || 'Choose & Pay'}

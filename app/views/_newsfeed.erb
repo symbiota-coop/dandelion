@@ -17,7 +17,7 @@
               <% end %>
             </a>
             <% if notification.type.to_sym == :applied; mapplication = notification.notifiable %>
-              <span class="float-right label label-<%= mapplication.label %>"><%= mapplication.status.capitalize %></span>
+              <span class="float-right badge badge-<%= mapplication.label %>"><%= mapplication.status.capitalize %></span>
             <% end %>
             <% if notification.type.to_sym == :left_feedback; event_feedback = notification.notifiable %>
               <% if event_feedback.event %>
