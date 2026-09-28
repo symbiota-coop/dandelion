@@ -5,28 +5,15 @@ $(function () {
     return $('#page-container').hasClass('page-sidebar-minified')
   }
 
-  // Sidebar submenus
-  $('.sidebar .nav > .has-sub > a').click(function () {
-    if (sidebarMinified()) return
-    const target = $(this).next('.sub-menu')
-    $('.sidebar .nav > li.has-sub > .sub-menu').not(target).slideUp(250, function () {
-      $(this).closest('li').removeClass('expand')
-    })
-    target.slideToggle(250, function () {
-      $(this).closest('li').toggleClass('expand')
-    })
+  // Sidebar submenus are Bootstrap collapses: one open at a time, and none while minified (they float out on hover instead)
+  $('#sidebar').on('show.bs.collapse', '.sub-menu', function (e) {
+    if (sidebarMinified()) return e.preventDefault()
+    $('#sidebar .sub-menu.show').not(this).collapse('hide')
   })
 
-  $('.sidebar .nav > .has-sub .sub-menu li.has-sub > a').click(function () {
-    if (sidebarMinified()) return
-    $(this).next('.sub-menu').slideToggle(250)
-  })
-
-  // Mobile sidebar toggle
-  $(document).on('click', '[data-click="sidebar-toggled"]', function (e) {
-    e.preventDefault()
-    $('#page-container').toggleClass('page-sidebar-toggled')
-    $(this).toggleClass('active', $('#page-container').hasClass('page-sidebar-toggled'))
+  // On mobile the sidebar is a Bootstrap offcanvas, and the menu button turns into a cross while it's open
+  $('#sidebar').on('show.bs.offcanvas hide.bs.offcanvas', function (e) {
+    $('.navbar-toggle').toggleClass('active', e.type === 'show')
   })
 
   // Sidebar minify
@@ -70,13 +57,6 @@ $(function () {
     clearTimeout(floatSubMenuTimeout)
   })
   $(document).on('mouseout', '.float-sub-menu', removeFloatSubMenuLater)
-
-  $(document).on('click', '.float-sub-menu li.has-sub > a', function () {
-    $(this).next('.sub-menu').slideToggle(250, function () {
-      const menu = $('.float-sub-menu')
-      positionFloatSubMenu(menu, menu.attr('data-offset-top'), menu.height() + 20)
-    })
-  })
 
   $('.sidebar .nav > li.has-sub > a').hover(function () {
     if (!sidebarMinified()) return

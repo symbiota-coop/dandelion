@@ -277,7 +277,7 @@ $(function () {
   // Evergreen toggle
   $('#event_evergreen').change(function () {
     if ($(this).is(':checked')) {
-      $(this).closest('.checkbox').parent().show()
+      $(this).closest('.form-check').parent().show()
       $('#time-fields, .evergreen-hide').hide()
       $('#event_start_time, #event_end_time, #event_location').removeAttr('required')
       $('#event_location').val('')

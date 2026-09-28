@@ -2260,31 +2260,31 @@ textarea.form-control-lg {
 .form-check {
   display: block;
   min-height: 1.5rem;
-  padding-left: 1.5em;
-  margin-bottom: 0.125rem;
+  padding-left: 1.8em;
+  margin-bottom: 0.5rem;
 }
 .form-check .form-check-input {
   float: left;
-  margin-left: -1.5em;
+  margin-left: -1.8em;
 }
 
 .form-check-reverse {
-  padding-right: 1.5em;
+  padding-right: 1.8em;
   padding-left: 0;
   text-align: right;
 }
 .form-check-reverse .form-check-input {
   float: right;
-  margin-right: -1.5em;
+  margin-right: -1.8em;
   margin-left: 0;
 }
 
 .form-check-input {
   --bs-form-check-bg: var(--bs-body-bg);
   flex-shrink: 0;
-  width: 1em;
-  height: 1em;
-  margin-top: 0.25em;
+  width: 1.3em;
+  height: 1.3em;
+  margin-top: 0.1em;
   vertical-align: top;
   appearance: none;
   background-color: var(--bs-form-check-bg);
@@ -2292,11 +2292,11 @@ textarea.form-control-lg {
   background-repeat: no-repeat;
   background-position: center;
   background-size: contain;
-  border: var(--bs-border-width) solid var(--bs-border-color);
+  border: 1px solid #C8C7CC;
   print-color-adjust: exact;
 }
 .form-check-input[type=checkbox] {
-  border-radius: 0.25em;
+  border-radius: 0.25rem;
 }
 .form-check-input[type=radio] {
   border-radius: 50%;

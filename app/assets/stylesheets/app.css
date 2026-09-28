@@ -576,11 +576,6 @@
   bottom: 0;
 }
 
-.page-sidebar-toggled .sidebar {
-  left: 0;
-  right: 0;
-}
-
 .sidebar .nav {
   list-style-type: none;
   margin: 0;
@@ -620,7 +615,6 @@
 }
 
 .sidebar .nav > li.has-sub .sub-menu {
-  display: none;
   list-style-type: none;
   margin: 0;
   padding: 0.3125rem 0;
@@ -636,15 +630,6 @@
 .sidebar .nav > li.has-sub > .sub-menu {
   margin-left: 2.5625rem;
   font-size: 0.825rem;
-}
-
-.sidebar .nav .sub-menu li.has-sub .sub-menu {
-  margin-left: 1.875rem;
-}
-
-.sidebar .nav > li.has-sub.active > .sub-menu,
-.sidebar .nav .sub-menu li.has-sub.active .sub-menu {
-  display: block;
 }
 
 .sidebar .nav > li.has-sub .sub-menu > li.active > a,
@@ -699,7 +684,7 @@
   color: #fff;
 }
 
-.sidebar.sidebar-inverse .nav > li.expand > a,
+.sidebar.sidebar-inverse .nav > li > a[aria-expanded="true"],
 .sidebar.sidebar-inverse .nav > li > a:hover,
 .sidebar.sidebar-inverse .nav > li > a:focus,
 .sidebar.sidebar-inverse .nav > li > a:active {
@@ -748,36 +733,19 @@
   z-index: 99
 }
 
-.float-sub-menu > li > a,
-.float-sub-menu .sub-menu > li > a {
+.float-sub-menu > li > a {
   color: #999;
   display: block;
   padding: 0.3125rem 0.9375rem;
   line-height: 1.25rem;
 }
 
-.float-sub-menu li.has-sub .sub-menu {
-  list-style-type: none;
-  margin: 0 0 0 1.875rem;
-  padding: 0.3125rem 0;
-}
-
 .float-sub-menu li.active > a,
 .float-sub-menu > li > a:hover,
 .float-sub-menu > li > a:focus,
-.float-sub-menu > li > a:active,
-.float-sub-menu li.has-sub .sub-menu > li > a:hover,
-.float-sub-menu li.has-sub .sub-menu > li > a:focus,
-.float-sub-menu li.has-sub .sub-menu > li > a:active {
+.float-sub-menu > li > a:active {
   color: #fff;
   text-decoration: none;
-}
-
-.float-sub-menu .sub-menu {
-  display: none;
-  list-style-type: none;
-  margin: 0;
-  padding: 0.3125rem 0;
 }
 
 @media (min-width: 768px) {
@@ -825,15 +793,13 @@
   }
 }
 
-@media (max-width: 767px) {
-  .sidebar {
-    width: auto;
-    left: -100%;
-    right: 100%;
+/* On mobile the sidebar is a Bootstrap offcanvas, filling the screen below the header */
+@media (max-width: 767.98px) {
+  #sidebar {
+    --bs-offcanvas-width: 100%;
+    --bs-offcanvas-zindex: 1020;
     top: 2.75rem;
-    bottom: 2.75rem;
-    z-index: 1020;
-    transition: all 0.2s ease;
+    border-right: 0;
   }
 }
 
@@ -1272,99 +1238,17 @@ body.greyed #content {
    Checkboxes
    ========================================================================== */
 
-.checkbox {
-  position: relative;
-  display: block;
-  margin-top: 0.625rem;
-  margin-bottom: 0.625rem;
-}
-
-.checkbox label,
-.checkbox-inline label {
-  min-height: 1rem;
-  padding-left: 1.5625rem;
-}
-
-.checkbox input[type=checkbox],
-.checkbox-inline input[type=checkbox] {
-  display: none;
-}
-
-.checkbox-inline {
-  padding-left: 0;
-  position: relative;
-  display: inline-block;
-  vertical-align: middle;
+.form-check-input,
+.form-check-label {
   cursor: pointer;
 }
 
-.checkbox input + label,
-.checkbox-inline input + label {
-  position: relative;
-}
-
-.checkbox + .checkbox {
-  margin-top: -0.3125rem;
-}
-
-.checkbox-inline + .checkbox-inline {
-  margin-top: 0;
-  margin-left: 0.625rem;
-}
-
-.checkbox input + label:before,
-.checkbox-inline input + label:before {
-  content: "";
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 1.125rem;
-  height: 1.125rem;
-  background: #fff;
-  border: 1px solid #C8C7CC;
-  transition: all 0.2s linear;
-  border-radius: 0.25rem;
-}
-
-.checkbox input:checked + label:after,
-.checkbox-inline input:checked + label:after {
-  content: "\f633";
-  position: absolute;
-  left: 0;
-  top: 0;
-  width: 1.125rem;
-  height: 1.125rem;
-  padding-right: 1px;
-  text-align: center;
-  line-height: 1.125rem;
-  font-family: "bootstrap-icons";
-  font-style: normal;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  color: #fff;
-}
-
-.checkbox input:checked + label:before,
-.checkbox-inline input:checked + label:before {
-  background: var(--theme-color);
-  border-color: var(--theme-color);
-}
-
-fieldset[disabled] input[type=checkbox] + label,
-fieldset[disabled] input[type=radio] + label,
-input[type=checkbox].disabled + label,
-input[type=checkbox][disabled] + label,
-input[type=radio].disabled + label,
-input[type=radio][disabled] + label {
-  cursor: not-allowed;
-  opacity: 0.5;
-}
-
-.has-error .checkbox,
-.has-error .checkbox-inline,
-.has-error.checkbox label,
-.has-error.checkbox-inline label {
+.has-error .form-check-label {
   color: #e2342a;
+}
+
+.has-error .form-check-input:not(:checked) {
+  border-color: #e2342a;
 }
 
 .has-error .form-control {
@@ -1375,15 +1259,6 @@ input[type=radio][disabled] + label {
 .has-error .form-control:focus {
   border-color: #b92a21;
   box-shadow: 0 0 0 0.125rem rgba(226, 52, 42, 0.35);
-}
-
-.has-error .checkbox input:not(:checked) + label:before,
-.has-error .checkbox-inline input:not(:checked) + label:before {
-  border-color: #e2342a;
-}
-
-.checkbox-inline label {
-  cursor: pointer;
 }
 
 /* ==========================================================================
@@ -1770,10 +1645,6 @@ input[type="datetime-local"]::-webkit-date-and-time-value {
   margin-right: 0.25rem
 }
 
-.searchForm .checkbox-inline label {
-  font-weight: bold
-}
-
 @media(max-width: 575px) {
   .searchForm {
     display: block
@@ -1784,7 +1655,7 @@ input[type="datetime-local"]::-webkit-date-and-time-value {
     margin-bottom: 1rem;
   }
 
-  .searchForm .checkbox-inline {
+  .searchForm .form-check {
     margin-top: 0.5rem;
   }
 }
@@ -2020,10 +1891,6 @@ ul.pagination {
   }
 }
 
-.collapse {
-  display: none;
-}
-
 .progress-bar {
   background: var(--theme-color);
   box-shadow: none;
@@ -2080,57 +1947,20 @@ ul.pagination {
 }
 
 /* ==========================================================================
-   Switcher
+   Switches
    ========================================================================== */
 
-.switcher {
-  display: inline-block;
-}
-
-.switcher label {
-  display: block;
+/* Label-less switches, a little bigger than Bootstrap's */
+.form-switch {
+  padding-left: 0;
   margin: 0;
+}
+
+.form-switch .form-check-input {
+  float: none;
   width: 2.625rem;
   height: 1.5rem;
-  position: relative;
-}
-
-.switcher label:before {
-  content: "";
-  display: block;
-  width: 2.625rem;
-  height: 1.5rem;
-  background: #EFEFF4;
-  border: 0.125rem solid #f1f1f1;
-  border-radius: 2.5rem;
-  transition: all 0.2s linear;
-}
-
-.switcher label:after {
-  content: "";
-  height: 1.25rem;
-  width: 1.25rem;
-  position: absolute;
-  left: 0.125rem;
-  top: 0.125rem;
-  background: #fff;
-  border-radius: 2.5rem;
-  box-shadow: 0 0.125rem 0.125rem rgba(0, 0, 0, 0.5);
-  transition: all 0.1s linear;
-}
-
-.switcher input {
-  display: none;
-}
-
-.switcher input:checked + label:before {
-  content: "";
-  background: var(--theme-color);
-  border: 0.125rem solid var(--theme-color);
-}
-
-.switcher input:checked + label:after {
-  left: 1.25rem;
+  margin: 0;
 }
 
 /* ==========================================================================
@@ -2557,25 +2387,19 @@ table.dataTable.table-sm>thead>tr>th {
   box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075) !important;
 }
 
-.search .checkbox-inline label {
-  cursor: pointer
+.search .form-check-inline {
+  background-color: white;
+  padding: 0.3rem 0.3rem 0.2rem calc(1.8em + 0.3rem);
+  border-radius: 0.25rem;
 }
 
-.search .checkbox-inline.checked {
-  border: 1px solid var(--theme-color);
+.search .form-check-inline:has(:checked) {
+  box-shadow: inset 0 0 0 1px var(--theme-color);
 }
 
 .search-result-list>li {
   border-top: 0;
   border-bottom: 2px solid #ddd
-}
-
-.search .checkbox-inline {
-  cursor: auto;
-  background-color: white;
-  padding: 0.3rem;
-  padding-bottom: 0.2rem;
-  border-radius: 0.25rem
 }
 
 /* ==========================================================================
@@ -2604,7 +2428,7 @@ table.dataTable.table-sm>thead>tr>th {
 .sidebar.sidebar-inverse .nav>li.active>a,
 .sidebar.sidebar-inverse .nav>li.active>a:hover,
 .sidebar.sidebar-inverse .nav>li.active>a:focus,
-.sidebar.sidebar-inverse .nav>li.expand>a,
+.sidebar.sidebar-inverse .nav>li>a[aria-expanded="true"],
 .sidebar.sidebar-inverse .nav>li>a:hover,
 .sidebar.sidebar-inverse .nav>li>a:focus,
 .sidebar.sidebar-inverse .nav>li>a:active,

@@ -19,7 +19,7 @@
             <a href="/" class="navbar-brand">
               <img style="max-height: 1.75rem; position: relative; top: -0.25rem" src="/images/logos/white-on-transparent.png">
             </a>
-            <button type="button" class="navbar-toggle" data-click="sidebar-toggled">
+            <button type="button" class="navbar-toggle" data-bs-toggle="offcanvas" data-bs-target="#sidebar" aria-controls="sidebar" aria-label="Menu">
               <span class="icon-bar"></span>
               <span class="icon-bar"></span>
             </button>
@@ -46,7 +46,7 @@
       </div>
       <!-- END #header -->
       <!-- BEGIN #sidebar -->
-      <div id="sidebar" class="sidebar sidebar-inverse">
+      <div id="sidebar" class="sidebar sidebar-inverse offcanvas-md offcanvas-start" tabindex="-1" data-bs-backdrop="false">
         <!-- BEGIN scrollbar -->
         <div class="sidebar-scroll">
           <%= partial :nav %>
@@ -61,7 +61,7 @@
         <!-- END scrollbar -->
         <!-- BEGIN sidebar-minify-btn -->
         <a onclick="$.post('/sidebar', {minified: $('#page-container').hasClass('page-sidebar-minified') ? false : true});
-            $('#sidebar ul.nav li a[data-bs-toggle]').tooltip($('#page-container').hasClass('page-sidebar-minified') ? 'disable' : 'enable')
+            $('#sidebar ul.nav li a[data-bs-toggle=tooltip]').tooltip($('#page-container').hasClass('page-sidebar-minified') ? 'disable' : 'enable')
            " href="#" class="sidebar-minify-btn" data-click="sidebar-minify"><i class="bi bi-arrow-left"></i></a>
         <!-- END sidebar-minify-btn -->
       </div>

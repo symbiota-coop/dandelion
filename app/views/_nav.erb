@@ -1,22 +1,22 @@
 <script>
   $(function () {
 
-    // On body: inside the sidebar's scroll container they get clipped, or flip left over the icon and flicker
-    $('#sidebar ul.nav li a[data-bs-toggle]').tooltip({ container: 'body' }).tooltip($('#page-container').hasClass('page-sidebar-minified') ? 'enable' : 'disable')
+    // Only when the sidebar is minified
+    $('#sidebar ul.nav li a[data-bs-toggle="tooltip"]').tooltip($('#page-container').hasClass('page-sidebar-minified') ? 'enable' : 'disable')
 
     if ($(window).width() < 992)
-      $('#sidebar ul.nav li a[data-bs-toggle]').tooltip('disable')
+      $('#sidebar ul.nav li a[data-bs-toggle="tooltip"]').tooltip('disable')
   })
 </script>
 <ul class="nav">
   <% if current_account %>
     <li class="d-md-none has-sub">
-      <a href="javascript:;">
+      <a href="#sidebar-account" data-bs-toggle="collapse" role="button" aria-expanded="false">
         <b class="caret caret-right float-end"></b>
         <i class="bi bi-person-fill"></i>
         <span><%= current_account.name %></span>
       </a>
-      <%= partial :nav_profile, locals: { ul_class: 'sub-menu' } %>
+      <%= partial :nav_profile, locals: { ul_class: 'sub-menu collapse', ul_id: 'sidebar-account' } %>
     </li>
   <% end %>
   <li class="<%= 'active' if request.path == '/' %>">
@@ -59,8 +59,9 @@
       </a>
     </li>
   <% else %>
-    <li class="has-sub <%= 'active' if ['/organisations', '/o/'].any? { |path| request.path.starts_with?(path) } %>">
-      <a href="javascript:;">
+    <% active = ['/organisations', '/o/'].any? { |path| request.path.starts_with?(path) } %>
+    <li class="has-sub <%= 'active' if active %>">
+      <a href="#sidebar-organisations" data-bs-toggle="collapse" role="button" aria-expanded="<%= active %>">
         <b class="caret caret-right float-end"></b>
         <i class="bi bi-flag-fill"></i>
         <span>Organisations</span>
@@ -71,7 +72,8 @@
           ] +
         Organisation.and(:id.in => current_account.organisationships.pluck(:organisation_id) + (@organisation && @organisation.persisted? ? [@organisation.id] : [])).sort_by(&:name).map { |organisation| [organisation.name, "/o/#{organisation.slug}"] }
                  ),
-                 ul_class: 'sub-menu',
+                 ul_class: "sub-menu collapse #{'show' if active}",
+                 ul_id: 'sidebar-organisations',
                  li_class: '',
                  li_active_class: 'active',
                  a_class: '',
@@ -92,8 +94,9 @@
       </a>
     </li>
   <% else %>
-    <li class="has-sub <%= 'active' if ['/gatherings', '/g/'].any? { |path| request.path.starts_with?(path) } %>">
-      <a href="javascript:;">
+    <% active = ['/gatherings', '/g/'].any? { |path| request.path.starts_with?(path) } %>
+    <li class="has-sub <%= 'active' if active %>">
+      <a href="#sidebar-gatherings" data-bs-toggle="collapse" role="button" aria-expanded="<%= active %>">
         <b class="caret caret-right float-end"></b>
         <i class="bi bi-moon-fill"></i>
         <span>Gatherings</span>
@@ -103,7 +106,8 @@
             ['All gatherings', '/gatherings']
           ] +
         current_account.memberships.includes(:gathering).select { |membership| membership.gathering == @gathering or !membership.hide_from_sidebar }.sort_by { |membership| membership.gathering.name }.map { |membership| [membership.gathering.name, "/g/#{membership.gathering.slug}"] }),
-                 ul_class: 'sub-menu',
+                 ul_class: "sub-menu collapse #{'show' if active}",
+                 ul_id: 'sidebar-gatherings',
                  li_class: '',
                  li_active_class: 'active',
                  a_class: '',

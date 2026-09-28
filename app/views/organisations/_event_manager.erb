@@ -2,9 +2,8 @@
   <i class="bi bi-key-fill" title="Admin" data-bs-toggle="tooltip"></i>
 <% else %>
   <% form_tag "/o/#{@organisation.slug}/event_manager/#{organisationship.id}" do %>
-    <div class="switcher">
-      <%= check_box_tag :event_manager, id: "organisationship-event-manager-#{organisationship.id}", class: 'form-check-input', checked: organisationship.event_manager == true, onclick: '$(this.form).submit()' %>
-      <label for="<%= "organisationship-event-manager-#{organisationship.id}" %>"></label>
+    <div class="form-check form-switch">
+      <%= check_box_tag :event_manager, id: "organisationship-event-manager-#{organisationship.id}", class: 'form-check-input', 'aria-label': 'Event manager', checked: organisationship.event_manager == true, onclick: '$(this.form).submit()' %>
     </div>
   <% end %>
 <% end %>

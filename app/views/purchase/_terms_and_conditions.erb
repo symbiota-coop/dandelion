@@ -5,9 +5,9 @@
   <p class="mb-1 fw-bold">Terms and conditions</p>
   <textarea class="form-control mb-2" style="height: 8em" readonly><%=terms%></textarea>
   <% if require_check_box %>
-    <div class="checkbox-inline mb-1">
-      <%= check_box_tag :accepted_terms, id: 'accepted-terms' %>
-      <label for="accepted-terms">
+    <div class="form-check mb-1">
+      <%= check_box_tag :accepted_terms, id: 'accepted-terms', class: 'form-check-input' %>
+      <label class="form-check-label" for="accepted-terms">
         I agree to the terms and conditions
       </label>
     </div>
@@ -27,9 +27,9 @@
     </small>
   </p>
   <% if require_check_box %>
-    <div class="checkbox-inline mb-1">
-      <%= check_box_tag :accepted_terms, id: 'accepted-terms' %>
-      <label for="accepted-terms">
+    <div class="form-check mb-1">
+      <%= check_box_tag :accepted_terms, id: 'accepted-terms', class: 'form-check-input' %>
+      <label class="form-check-label" for="accepted-terms">
         I agree to the terms and conditions
       </label>
     </div>

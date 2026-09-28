@@ -382,7 +382,7 @@ $(function () {
     })
 
     $('.labelize').not('[data-labelize-initialized]').attr('data-labelize-initialized', true).each(function () {
-      $('div.checkbox', this).each(function () {
+      $('div.form-check', this).each(function () {
         const div = this
         $(div).hide()
         const button = $('<a href="javascript:;" class="d-inline-block mb-1 me-1"><span class="label label-outline-primary">' + $(this).find('label').text() + '</span></a>').insertAfter(this)
@@ -453,10 +453,6 @@ $(function () {
         }
       })
     })
-
-    $('.search .checkbox-inline input[type="checkbox"]').not('[data-search-checkbox-registered]').attr('data-search-checkbox-registered', true).on('change', function () {
-      $(this).closest('.checkbox-inline').toggleClass('checked', this.checked);
-    });
 
     showTabFromHash()
   }
@@ -530,10 +526,8 @@ $(function () {
   })
 
   $(window).on('beforeunload', function (e) {
-    if ($('#page-container').hasClass('page-sidebar-toggled') && $(window).width() < 768) {
-      $('#page-container').removeClass('page-sidebar-toggled');
-      $('[data-click="sidebar-toggled"]').removeClass('active');
-    }
+    const sidebar = bootstrap.Offcanvas.getInstance('#sidebar')
+    if (sidebar) sidebar.hide()
     $('.pace-inactive').show() // start spinner as user starts navigating away from page
 
     if (!navTabsFormSubmitting && navTabsFormTouched && $('form:has(.nav-tabs)').length) {

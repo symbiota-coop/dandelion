@@ -172,18 +172,18 @@ end
           <%= f.hidden_field :opt_in_organisation, value: 1 %>
         <% else %>
           <div id="opt-in-organisation">
-            <div class="checkbox">
+            <div class="form-check">
               <%= f.check_box :opt_in_organisation, class: 'form-check-input' %>
-              <label for="account_opt_in_organisation" class="">Get email updates from <%== @event.organisation_and_cohosts.map { |organisation| Sanitize.fragment(organisation.name) }.to_sentence(last_word_connector: ' and ') %></label>
+              <label for="account_opt_in_organisation" class="form-check-label">Get email updates from <%== @event.organisation_and_cohosts.map { |organisation| Sanitize.fragment(organisation.name) }.to_sentence(last_word_connector: ' and ') %></label>
             </div>
           </div>
         <% end %>
       <% end %>
       <% if @event.opt_in_facilitator && @event.event_facilitators.exists? %>
         <div id="opt-in-facilitator">
-          <div class="checkbox">
+          <div class="form-check">
             <%= f.check_box :opt_in_facilitator, class: 'form-check-input' %>
-            <label for="account_opt_in_facilitator" class="">Get email updates from <%= @event.event_facilitators.map(&:firstname).to_sentence(last_word_connector: ' and ') %></label>
+            <label for="account_opt_in_facilitator" class="form-check-label">Get email updates from <%= @event.event_facilitators.map(&:firstname).to_sentence(last_word_connector: ' and ') %></label>
           </div>
         </div>
       <% end %>

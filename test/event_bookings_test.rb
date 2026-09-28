@@ -247,7 +247,7 @@ class EventBookingsTest < ActiveSupport::TestCase
     assert page.has_content?("Signed in as #{buyer.name}")
     assert page.has_content? 'Register for free'
 
-    # Click the label to check the custom-styled checkbox (actual input is hidden via CSS)
+    # Click the label to check the box, as people do
     find('label[for="account_opt_in_organisation"]').click
 
     click_button 'RSVP'
