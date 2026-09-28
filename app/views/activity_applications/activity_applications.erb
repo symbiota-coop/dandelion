@@ -1,5 +1,5 @@
 <%= partial :'activities/nav', locals: { activity: @activity } %>
-<div class="search well">
+<div class="search bg-light border rounded p-3 pb-lg-0 mb-3">
 
   <% form_tag '', method: 'get', class: 'submitOnChange searchForm mb-3' do %>
     <%= hidden_field_tag :order, value: params[:order] %>

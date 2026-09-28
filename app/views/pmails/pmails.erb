@@ -22,7 +22,7 @@
 <% end %>
 
 <% if @organisation && @organisation.pmails.exists? %>
-  <div class="search well mt-3">
+  <div class="search bg-light border rounded p-3 pb-lg-0 mb-3 mt-3">
     <% form_tag '', method: 'get', class: 'submitOnChange searchForm mb-3' do %>
       <%= hidden_field_tag :order, value: params[:order] %>
       <div class="form-row align-items-end">

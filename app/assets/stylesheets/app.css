@@ -1591,18 +1591,11 @@ figure.table figure.image {
   }
 }
 
-.search.well {
+.search {
   box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075) !important;
 }
 
-@media(min-width: 992px) {
-  .search.well {
-    padding-top: 1.0875rem;
-    padding-bottom: 0;
-  }
-}
-
-.search.well .checkbox-inline {
+.search .checkbox-inline {
   cursor: auto;
   background-color: white;
   padding: 0.3rem;
@@ -1610,16 +1603,16 @@ figure.table figure.image {
   border-radius: 0.25rem
 }
 
-.search.well .checkbox-inline label {
+.search .checkbox-inline label {
   cursor: pointer
 }
 
-.search.well .checkbox-inline.checked {
+.search .checkbox-inline.checked {
   border: 1px solid var(--color-primary);
 }
 
 @media(min-width: 576px) {
-  .search.well input[type=submit] {
+  .search input[type=submit] {
     margin: 0 !important
   }
 }

@@ -30,7 +30,7 @@ blockquote {
  * =============================================================================
  */
 
-.search.well .checkbox-inline.checked {
+.search .checkbox-inline.checked {
   border-color: var(--theme-color);
 }
 

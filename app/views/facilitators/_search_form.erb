@@ -12,7 +12,7 @@
   <%= partial :'events/toggle_search_well' %>
 <% end %>
 
-<div class="search well" style="<%= 'display: none;' if params[:display].in?(['map', 'calendar']) %>">
+<div class="search bg-light border rounded p-3 pb-lg-0 mb-3" style="<%= 'display: none;' if params[:display].in?(['map', 'calendar']) %>">
 
   <% form_tag '/facilitators', method: 'get', class: 'submitOnChange searchForm mb-3', id: 'facilitators-search-form' do %>
     <%= hidden_field_tag :display, value: params[:display] %>

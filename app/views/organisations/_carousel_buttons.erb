@@ -1,6 +1,6 @@
 <script>
   function navigateCarousel(button) {
-    var searchWell = $('.search.well');
+    var searchWell = $('.search');
     var isSearchWellVisible = searchWell.is(':visible');
     var href = isSearchWellVisible
       ? button.getAttribute('data-full-href')
@@ -10,7 +10,7 @@
 
   // Preserve all query parameters if search well is visible
   $(function() {
-    var searchWell = $('.search.well');
+    var searchWell = $('.search');
     var form = $('#local-group-form').last();
 
     if (searchWell.length && searchWell.is(':visible')) {

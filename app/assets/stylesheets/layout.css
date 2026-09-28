@@ -203,11 +203,6 @@
   margin-left: 0.5rem;
 }
 
-.navbar .navbar-user-img.pull-right + span {
-  margin-left: 0;
-  margin-right: 0.5rem;
-}
-
 .navbar .navbar-user-img img {
   max-width: 100%;
   max-height: 100%;
@@ -948,8 +943,7 @@
 }
 
 .btn-primary .badge,
-.list-group-item.active > .badge,
-.nav-pills > .active > a > .badge {
+.list-group-item.active > .badge {
   color: #00af5e;
 }
 
@@ -1094,56 +1088,6 @@
   padding: 0.625rem 1rem;
   line-height: 1.3333333;
   border-radius: 0.25rem;
-}
-
-.btn-default,
-.btn-default.disabled.focus,
-.btn-default.disabled:focus,
-.btn-default.disabled:hover,
-.btn-default[disabled].focus,
-.btn-default[disabled]:focus,
-.btn-default[disabled]:hover,
-fieldset[disabled] .btn-default.focus,
-fieldset[disabled] .btn-default:focus,
-fieldset[disabled] .btn-default:hover,
-.btn-default.active,
-.btn-default:active,
-.open > .dropdown-toggle.btn-default {
-  border-color: #dfdfe0;
-  color: #212121;
-  background: linear-gradient(135deg, #fff 0%, #fff 50%, white 100%);
-  border: none;
-}
-
-.btn-default:hover,
-.btn-default:focus,
-.btn-default:active,
-.btn-default.active.focus,
-.btn-default.active:focus,
-.btn-default.active:hover,
-.btn-default:active.focus,
-.btn-default:active:focus,
-.btn-default:active:hover,
-.open > .dropdown-toggle.btn-default.focus,
-.open > .dropdown-toggle.btn-default:focus,
-.open > .dropdown-toggle.btn-default:hover {
-  border-color: #dfdfe0;
-  background: linear-gradient(135deg, #f3f3f3 0%, #f3f3f3 50%, white 100%);
-  color: #000;
-  border: none;
-}
-
-.btn-default:not([disabled]):not(.disabled).active,
-.btn-default:not([disabled]):not(.disabled):active,
-.show > .btn-default.dropdown-toggle {
-  background: linear-gradient(135deg, #f3f3f3 0%, #f3f3f3 50%, white 100%);
-  border-color: #dfdfe0;
-  box-shadow: 0 0 0 0.2rem fade(#fff, 50%);
-  border: none;
-}
-
-.btn-default.active {
-  background: #fff;
 }
 
 .btn-primary,
@@ -1469,12 +1413,6 @@ input[type=radio][disabled] + label {
   border-radius: 8px;
 }
 
-.pull-right .dropdown-menu:before,
-.pull-right .dropdown-menu:after {
-  left: auto;
-  right: 1.25rem;
-}
-
 .navbar .dropdown-menu {
   left: 50%;
   margin-left: -5rem;
@@ -1613,10 +1551,6 @@ input[type=radio][disabled] + label {
   box-shadow: 0 0 0 0.125rem rgba(102, 175, 233, 0.6);
 }
 
-.form-control.input-lg {
-  font-size: 1rem;
-}
-
 select.form-control:not([size]):not([multiple]) {
   border-color: #C8C7CC;
   color: #000;
@@ -1630,15 +1564,6 @@ textarea.form-control,
 select[multiple],
 select[size] {
   height: auto;
-}
-
-.input-lg,
-select.input-lg:not([size]):not([multiple]) {
-  font-size: 1rem;
-  height: 2.875rem;
-  padding: 0.625rem 1rem;
-  line-height: 1.3333333;
-  border-radius: 0.375rem;
 }
 
 .form-control-sm,
@@ -1819,14 +1744,6 @@ mark {
   margin-top: 0.9375rem;
 }
 
-.media > .pull-left {
-  padding-right: 0.625rem;
-}
-
-.media > .pull-right {
-  padding-left: 0.625rem;
-}
-
 /* ==========================================================================
    Modals
    ========================================================================== */
@@ -1901,12 +1818,6 @@ mark {
 .nav .open > a:focus,
 .nav .open > a:hover {
   border-color: #00af5e;
-}
-
-.nav-pills > li.active > a,
-.nav-pills > li.active > a:focus,
-.nav-pills > li.active > a:hover {
-  background: #00af5e;
 }
 
 /* ==========================================================================
@@ -1987,10 +1898,6 @@ mark {
   100% {
     transform: rotate(360deg);
   }
-}
-
-.collapse.in {
-  display: block;
 }
 
 .collapse {
@@ -2122,7 +2029,7 @@ table {
 }
 
 /* ==========================================================================
-   Tooltips, icons and wells
+   Tooltips and icons
    ========================================================================== */
 
 .tooltip {
@@ -2132,16 +2039,6 @@ table {
 [class^=ti-],
 [class*=" ti-"] {
   position: relative;
-}
-
-.well {
-  background: #f5f5f5;
-  border: 1px solid #dadade;
-  min-height: 1.25rem;
-  padding: 1.1875rem;
-  margin-bottom: 1.25rem;
-  border-radius: 0.25rem;
-  box-shadow: none;
 }
 
 /* ==========================================================================
@@ -2373,13 +2270,6 @@ body table.dataTable tbody > tr > .selected {
 body table.dataTable tbody > tr.selected td,
 body table.dataTable tbody > tr > .selected {
   border-color: #00af5e;
-}
-
-@media (max-width: 767px) {
-  body .dataTables_wrapper > .row .pull-right {
-    float: none !important;
-    margin: 0 !important;
-  }
 }
 
 /* ==========================================================================
@@ -2757,34 +2647,12 @@ strong {
   color: #000 !important;
 }
 
-.pull-left {
-  float: left !important;
-}
-
-.pull-right {
-  float: right !important;
-}
-
 .text-muted {
   color: #8A8A8F !important;
 }
 
 .text-warning {
   color: #FF9500 !important;
-}
-
-.fade.in {
-  opacity: 1;
-}
-
-.hide {
-  display: none !important;
-}
-
-@media (max-width: 767px) {
-  .hidden-xs {
-    display: none !important;
-  }
 }
 
 /* ==========================================================================

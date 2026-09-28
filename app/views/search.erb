@@ -1,7 +1,7 @@
 <form action="/search" id="search-form">
   <div class="search-input <% if @type == 'events' %>mb-1<% end %>">
     <a href="javascript:;" onclick="$(this).next().val('').focus()" class="search-close">×</a>
-    <input name="q" type="text" class="form-control input-lg" value="<%= @q %>">
+    <input name="q" type="text" class="form-control form-control-lg" value="<%= @q %>">
   </div>
   <% if @type == 'events' %>
     <p class="mb-3">

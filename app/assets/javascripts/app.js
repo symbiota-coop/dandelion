@@ -440,7 +440,7 @@ $(function () {
       })
     })
 
-    $('.search.well .checkbox-inline input[type="checkbox"]').not('[data-search-checkbox-registered]').attr('data-search-checkbox-registered', true).on('change', function () {
+    $('.search .checkbox-inline input[type="checkbox"]').not('[data-search-checkbox-registered]').attr('data-search-checkbox-registered', true).on('change', function () {
       $(this).closest('.checkbox-inline').toggleClass('checked', this.checked);
     });
 
