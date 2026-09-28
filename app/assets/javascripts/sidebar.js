@@ -97,7 +97,7 @@ $(function () {
     if (!menu.length) {
       menu = $('<ul class="float-sub-menu"></ul>').appendTo('body')
     }
-    menu.html(html).attr('data-offset-top', top).css({ left: 60, right: 'auto' })
+    menu.html(html).attr('data-offset-top', top).css({ left: $('#sidebar').outerWidth(), right: 'auto' })
     positionFloatSubMenu(menu, top, subMenu.height() + 20)
   }, removeFloatSubMenuLater)
 })
