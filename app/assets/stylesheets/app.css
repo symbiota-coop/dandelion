@@ -33,12 +33,20 @@
 }
 
 :root {
-  --color-primary: #00af5e;
-  --color-primary-light: #00d170;
-  --color-primary-hover: #00a257;
-  --color-link-hover: #00a257;
-  --color-primary-transparent-1: rgba(0, 175, 94, 0.1);
-  --color-primary-transparent-3: rgba(0, 175, 94, 0.3);
+  /* The primary colour. /theme.css replaces these for organisations and events with their own colour */
+  --theme-color: #00af5e;
+  --theme-color-rgb: 0, 175, 94;
+  --theme-color-light: #00d170;
+  --theme-color-hover: #00a257;
+  --theme-color-hover-light: #00c469;
+  --theme-color-dark: #008d4c;
+  --theme-color-darker: #007c43;
+  /* so Bootstrap follows it too */
+  --bs-primary: var(--theme-color);
+  --bs-primary-rgb: var(--theme-color-rgb);
+  --bs-link-color: var(--theme-color);
+  --bs-link-color-rgb: var(--theme-color-rgb);
+  --bs-focus-ring-color: rgba(var(--theme-color-rgb), 0.25);
   --color-theme-transparent: rgba(251, 174, 59, 0.5);
   --color-highlight-1: #4400B9;
   --color-highlight-1-light-1: #ebdfff;
@@ -53,6 +61,7 @@
   --body-font-family: "Plus Jakarta Sans", sans-serif;
   --header-font-family: "Hanken Grotesk", "Plus Jakarta Sans", sans-serif;
   --body-font-size: 0.825rem;
+  accent-color: var(--theme-color);
 }
 
 /* ==========================================================================
@@ -1013,16 +1022,16 @@ body.greyed #content {
 }
 
 .alert-success {
-  color: #00af5e;
+  color: var(--theme-color);
   background: linear-gradient(135deg, #E6F8EF 0%, #E6F8EF 50%, #aae7c9 100%) !important;
 }
 
 .alert-success.alert-dismissable {
-  border: 1px solid #00af5e;
+  border: 1px solid var(--theme-color);
 }
 
 .alert-success a {
-  color: #00af5e;
+  color: var(--theme-color);
 }
 
 .alert-warning {
@@ -1071,7 +1080,7 @@ body.greyed #content {
 }
 
 .btn-primary .badge {
-  color: #00af5e;
+  color: var(--theme-color);
 }
 
 .badge-default {
@@ -1084,12 +1093,12 @@ body.greyed #content {
 }
 
 .badge-primary {
-  background: linear-gradient(135deg, #00af5e 0%, #00af5e 50%, #00d170 100%) !important;
+  background: linear-gradient(135deg, var(--theme-color) 0%, var(--theme-color) 50%, var(--theme-color-light) 100%) !important;
 }
 
 .badge-primary[href]:focus,
 .badge-primary[href]:hover {
-  background: #00a257;
+  background: var(--theme-color-hover);
 }
 
 .badge-success {
@@ -1189,96 +1198,82 @@ body.greyed #content {
   border-radius: 0.25rem;
 }
 
+/* Primary and danger buttons are gradients, to a lighter colour, over Bootstrap's --bs-btn-* colours */
+.btn-primary {
+  --bs-btn-bg: var(--theme-color);
+  --bs-btn-border-color: var(--theme-color);
+  --bs-btn-hover-bg: var(--theme-color-hover);
+  --bs-btn-hover-border-color: var(--theme-color-hover);
+  --bs-btn-active-bg: var(--theme-color-hover);
+  --bs-btn-active-border-color: var(--theme-color-hover);
+  --bs-btn-disabled-bg: var(--theme-color);
+  --bs-btn-disabled-border-color: var(--theme-color);
+  --bs-btn-focus-shadow-rgb: var(--theme-color-rgb);
+  --btn-gradient-end: var(--theme-color-light);
+  --btn-hover-gradient-end: var(--theme-color-hover-light);
+}
+
+.btn-danger {
+  --bs-btn-bg: #FF3B30;
+  --bs-btn-border-color: #FF3B30;
+  --bs-btn-hover-bg: #e4352b;
+  --bs-btn-hover-border-color: #e4352b;
+  --bs-btn-active-bg: #e4352b;
+  --bs-btn-active-border-color: #e4352b;
+  --bs-btn-disabled-bg: #FF3B30;
+  --bs-btn-disabled-border-color: #FF3B30;
+  --bs-btn-focus-shadow-rgb: 255, 59, 48;
+  --btn-gradient-end: #ff5b52;
+  --btn-hover-gradient-end: #e85249;
+}
+
 .btn-primary,
-.btn-primary.disabled.focus,
-.btn-primary.disabled:focus,
-.btn-primary.disabled:hover,
-.btn-primary[disabled].focus,
-.btn-primary[disabled]:focus,
-.btn-primary[disabled]:hover,
-fieldset[disabled] .btn-primary.focus,
-fieldset[disabled] .btn-primary:focus,
-fieldset[disabled] .btn-primary:hover,
-.btn-primary.active,
-.btn-primary:active,
-.open > .dropdown-toggle.btn-primary {
-  border-color: #00af5e;
-  color: #fff;
-  background: linear-gradient(135deg, #00af5e 0%, #00af5e 50%, #00d170 100%);
+.btn-danger {
   border: none;
+  background-image: linear-gradient(135deg, var(--bs-btn-bg) 0%, var(--bs-btn-bg) 50%, var(--btn-gradient-end) 100%);
 }
 
-.btn-primary:hover,
-.btn-primary:focus,
-.btn-primary:active,
-.btn-primary.active.focus,
-.btn-primary.active:focus,
-.btn-primary.active:hover,
-.btn-primary:active.focus,
-.btn-primary:active:focus,
-.btn-primary:active:hover,
-.open > .dropdown-toggle.btn-primary.focus,
-.open > .dropdown-toggle.btn-primary:focus,
-.open > .dropdown-toggle.btn-primary:hover {
-  border-color: #00a257;
-  background: linear-gradient(135deg, #00a257 0%, #00a257 50%, #00c469 100%);
-  color: #fff;
-  border: none;
+.btn-primary:is(:hover, :focus, :active, .active, .show),
+.btn-danger:is(:hover, :focus, :active, .active, .show) {
+  background-image: linear-gradient(135deg, var(--bs-btn-hover-bg) 0%, var(--bs-btn-hover-bg) 50%, var(--btn-hover-gradient-end) 100%);
 }
 
-.btn-primary:not([disabled]):not(.disabled).active,
-.btn-primary:not([disabled]):not(.disabled):active,
-.btn-primary.dropdown-toggle.show {
-  background: linear-gradient(135deg, #00a257 0%, #00a257 50%, #00c469 100%);
-  border-color: #00a257;
-  box-shadow: 0 0 0 0.2rem fade(#00af5e, 50%);
-  border: none;
+.btn-outline-primary {
+  --bs-btn-color: var(--theme-color);
+  --bs-btn-border-color: var(--theme-color);
+  --bs-btn-hover-bg: var(--theme-color);
+  --bs-btn-hover-border-color: var(--theme-color);
+  --bs-btn-active-bg: var(--theme-color);
+  --bs-btn-active-border-color: var(--theme-color);
+  --bs-btn-disabled-color: var(--theme-color);
+  --bs-btn-disabled-border-color: var(--theme-color);
+  --bs-btn-focus-shadow-rgb: var(--theme-color-rgb);
 }
 
-.btn-danger,
-.btn-danger.disabled.focus,
-.btn-danger.disabled:focus,
-.btn-danger.disabled:hover,
-.btn-danger[disabled].focus,
-.btn-danger[disabled]:focus,
-.btn-danger[disabled]:hover,
-fieldset[disabled] .btn-danger.focus,
-fieldset[disabled] .btn-danger:focus,
-fieldset[disabled] .btn-danger:hover,
-.btn-danger.active,
-.btn-danger:active,
-.open > .dropdown-toggle.btn-danger {
-  border-color: #FF3B30;
-  color: #fff;
-  background: linear-gradient(135deg, #FF3B30 0%, #FF3B30 50%, #ff5b52 100%);
-  border: none;
+/* Bootstrap components that use the primary colour */
+.nav-pills {
+  --bs-nav-pills-link-active-bg: var(--theme-color);
 }
 
-.btn-danger:hover,
-.btn-danger:focus,
-.btn-danger:active,
-.btn-danger.active.focus,
-.btn-danger.active:focus,
-.btn-danger.active:hover,
-.btn-danger:active.focus,
-.btn-danger:active:focus,
-.btn-danger:active:hover,
-.open > .dropdown-toggle.btn-danger.focus,
-.open > .dropdown-toggle.btn-danger:focus,
-.open > .dropdown-toggle.btn-danger:hover {
-  border-color: #e4352b;
-  background: linear-gradient(135deg, #e4352b 0%, #e4352b 50%, #e85249 100%);
-  color: #fff;
-  border: none;
+.dropdown-menu {
+  --bs-dropdown-link-active-bg: var(--theme-color);
 }
 
-.btn-danger:not([disabled]):not(.disabled).active,
-.btn-danger:not([disabled]):not(.disabled):active,
-.btn-danger.dropdown-toggle.show {
-  background: linear-gradient(135deg, #e4352b 0%, #e4352b 50%, #e85249 100%);
-  border-color: #e4352b;
-  box-shadow: 0 0 0 0.2rem fade(#FF3B30, 50%);
-  border: none;
+.pagination {
+  --bs-pagination-color: var(--theme-color);
+  --bs-pagination-hover-color: var(--theme-color-hover);
+  --bs-pagination-focus-color: var(--theme-color-hover);
+  --bs-pagination-active-bg: var(--theme-color);
+  --bs-pagination-active-border-color: var(--theme-color);
+}
+
+.progress {
+  --bs-progress-bar-bg: var(--theme-color);
+}
+
+.form-check-input:checked {
+  background-color: var(--theme-color);
+  border-color: var(--theme-color);
 }
 
 .comment-grey .btn-outline-light,
@@ -1434,8 +1429,8 @@ fieldset[disabled] .btn-danger:hover,
 
 .checkbox input:checked + label:before,
 .checkbox-inline input:checked + label:before {
-  background: #00af5e;
-  border-color: #00af5e;
+  background: var(--theme-color);
+  border-color: var(--theme-color);
 }
 
 fieldset[disabled] input[type=checkbox] + label,
@@ -1565,7 +1560,7 @@ input[type=radio][disabled] + label {
 .dropdown-menu > .active > a,
 .dropdown-menu > .active > a:focus,
 .dropdown-menu > .active > a:hover {
-  background: #00af5e;
+  background: var(--theme-color);
   color: #fff;
 }
 
@@ -1721,7 +1716,7 @@ input[type=radio][disabled] + label {
 
 .form-control:focus,
 .form-select:focus {
-  border-color: #00af5e;
+  border-color: var(--theme-color);
   outline: none;
   box-shadow: 0 0 0 0.125rem rgba(102, 175, 233, 0.6);
 }
@@ -1949,8 +1944,8 @@ input[type="datetime-local"]::-webkit-date-and-time-value {
 }
 
 .secret-ticket-checkbox:checked {
-  background: var(--color-primary);
-  border-color: var(--color-primary);
+  background: var(--theme-color);
+  border-color: var(--theme-color);
 }
 
 .secret-ticket-checkbox:checked::after {
@@ -1963,8 +1958,8 @@ input[type="datetime-local"]::-webkit-date-and-time-value {
 }
 
 .secret-ticket-checkbox:checked:focus {
-  border-color: var(--color-primary);
-  box-shadow: 0 0 0 0.2rem rgba(0, 175, 94, 0.25);
+  border-color: var(--theme-color);
+  box-shadow: 0 0 0 0.2rem rgba(var(--theme-color-rgb), 0.25);
 }
 
 label.remove-file input,
@@ -2005,12 +2000,12 @@ label.remove-image input {
 }
 
 .label-primary {
-  background: linear-gradient(135deg, #00af5e 0%, #00af5e 50%, #00d170 100%) !important;
+  background: linear-gradient(135deg, var(--theme-color) 0%, var(--theme-color) 50%, var(--theme-color-light) 100%) !important;
 }
 
 .label-primary[href]:focus,
 .label-primary[href]:hover {
-  background: #00a257;
+  background: var(--theme-color-hover);
 }
 
 .label-danger {
@@ -2046,8 +2041,8 @@ label.remove-image input {
 
 .label-outline-primary,
 .badge-outline-primary {
-  color: var(--color-primary);
-  border: 1px solid var(--color-primary);
+  color: var(--theme-color);
+  border: 1px solid var(--theme-color);
 }
 
 div.block-title .label {
@@ -2128,7 +2123,7 @@ mark {
 .nav .open > a,
 .nav .open > a:focus,
 .nav .open > a:hover {
-  border-color: #00af5e;
+  border-color: var(--theme-color);
 }
 
 .nav-tabs .nav-link {
@@ -2224,7 +2219,7 @@ ul.pagination {
 }
 
 .progress-bar {
-  background: #00af5e;
+  background: var(--theme-color);
   box-shadow: none;
 }
 
@@ -2239,7 +2234,7 @@ ul.pagination {
 }
 
 .progress {
-  background-color: var(--color-primary-transparent-3);
+  background-color: rgba(var(--theme-color-rgb), 0.3);
 }
 
 .row.block.g-0.align-items-stretch {
@@ -2324,8 +2319,8 @@ ul.pagination {
 
 .switcher input:checked + label:before {
   content: "";
-  background: #00af5e;
-  border: 0.125rem solid #00af5e;
+  background: var(--theme-color);
+  border: 0.125rem solid var(--theme-color);
 }
 
 .switcher input:checked + label:after {
@@ -2518,7 +2513,7 @@ body table.dataTable thead .sorting_asc:after {
 
 body table.dataTable th.focus,
 table.dataTable td.focus {
-  outline: 0.125rem solid #00af5e;
+  outline: 0.125rem solid var(--theme-color);
 }
 
 body table.dataTable.collapsed {
@@ -2620,14 +2615,14 @@ body table.dataTable.dtr-inline.collapsed > tbody > tr.parent > th:first-child:b
 
 body table.dataTable tbody > tr.selected,
 body table.dataTable tbody > tr > .selected {
-  background-color: #00af5e;
-  outline: 0.125rem solid #00af5e;
+  background-color: var(--theme-color);
+  outline: 0.125rem solid var(--theme-color);
   outline-offset: -1px;
 }
 
 body table.dataTable tbody > tr.selected td,
 body table.dataTable tbody > tr > .selected {
-  border-color: #00af5e;
+  border-color: var(--theme-color);
 }
 
 table.dataTable.table-sm>thead>tr>th {
@@ -2782,7 +2777,7 @@ table.dataTable.table-sm>thead>tr>th {
 }
 
 .search .checkbox-inline.checked {
-  border: 1px solid var(--color-primary);
+  border: 1px solid var(--theme-color);
 }
 
 .search-result-list>li {
@@ -2885,7 +2880,7 @@ a {
 
 a:focus,
 a:hover {
-  color: #00a257;
+  color: var(--theme-color-hover);
   outline: none;
 }
 
@@ -3001,7 +2996,7 @@ body[contenteditable] {
 
 .subtle.active,
 .subtle:hover {
-  color: var(--color-primary) !important
+  color: var(--theme-color) !important
 }
 
 h4.block-title,
@@ -3039,7 +3034,7 @@ small.form-text {
 }
 
 .bg-primary {
-  background: #00af5e !important;
+  background: var(--theme-color) !important;
   color: #fff !important;
 }
 
@@ -3058,7 +3053,7 @@ small.form-text {
 
 .bg-primary.text-white,
 .progress-bar {
-  background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-primary) 50%, var(--color-primary-light) 100%) !important;
+  background: linear-gradient(135deg, var(--theme-color) 0%, var(--theme-color) 50%, var(--theme-color-light) 100%) !important;
   border: none !important;
 }
 
@@ -3067,7 +3062,7 @@ a.bg-primary:focus,
 button.bg-primary:hover,
 button.bg-primary:focus,
 .bg-primary-hover {
-  background-color: var(--color-primary-hover) !important
+  background-color: var(--theme-color-hover) !important
 }
 
 a.bg-warning:hover,
@@ -3144,8 +3139,8 @@ button.bg-warning:focus {
 .flatpickr-day.selected.nextMonthDay,
 .flatpickr-day.startRange.nextMonthDay,
 .flatpickr-day.endRange.nextMonthDay {
-  background: var(--color-primary);
-  border-color: var(--color-primary)
+  background: var(--theme-color);
+  border-color: var(--theme-color)
 }
 
 /* ==========================================================================
@@ -3411,7 +3406,7 @@ label.remove-image {
 
 a.text-primary:hover,
 a.text-primary:focus {
-  color: var(--color-primary-hover) !important
+  color: var(--theme-color-hover) !important
 }
 
 /* ==========================================================================
@@ -3453,7 +3448,7 @@ table.event-details td {
 }
 
 .event-detail:hover {
-  background-color: var(--color-primary);
+  background-color: var(--theme-color);
 }
 
 .event-detail:hover img {
@@ -3497,8 +3492,8 @@ table.event-details td {
 
 .newsfeed-icon {
   font-size: 16px;
-  color: var(--color-primary);
-  background-color: var(--color-primary-transparent-1);
+  color: var(--theme-color);
+  background-color: rgba(var(--theme-color-rgb), 0.1);
   width: 2.25em;
   height: 2.25em;
 }
@@ -3605,7 +3600,7 @@ div.wysiwyg figcaption {
 blockquote {
   margin-bottom: 1rem;
   font-size: 1rem;
-  border-left: 0.25rem solid rgba(0, 175, 94, 0.33) !important;
+  border-left: 0.25rem solid rgba(var(--theme-color-rgb), 0.33) !important;
   padding-left: 1rem;
   font-style: italic;
 }
@@ -3918,7 +3913,7 @@ p.action {
 
 p.action a {
   display: inline-block;
-  background: var(--color-primary) !important;
+  background: var(--theme-color) !important;
   color: white;
   text-decoration: none;
   padding: 10px;
@@ -3926,7 +3921,7 @@ p.action a {
 }
 
 p.action a:hover {
-  background: var(--color-primary-hover) !important;
+  background: var(--theme-color-hover) !important;
 }
 
 .icon-list {

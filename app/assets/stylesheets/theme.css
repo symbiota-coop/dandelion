@@ -1,276 +1,18 @@
 /*
  * Served by /theme.css, which replaces this :root block with the requested theme colour
- * (see theme_css_variables in app/helpers/markup_helpers.rb)
+ * (see theme_css_variables in app/helpers/markup_helpers.rb). app.css and Bootstrap read these
+ * variables, so most things follow the theme without rules here: this file only holds the places
+ * where a themed page looks different from the default green one.
  */
 :root {
   --theme-color: #00af5e;
   --theme-color-rgb: 0, 175, 94;
   --theme-color-light: #00d170;
+  --theme-color-hover: #00a257;
+  --theme-color-hover-light: #00c469;
   --theme-color-dark: #008d4c;
   --theme-color-darker: #007c43;
 }
-
-.bg-primary,
-.bg-primary.text-white {
-  background: linear-gradient(135deg, var(--theme-color) 0%, var(--theme-color) 50%, var(--theme-color-light) 100%) !important;
-}
-
-.text-primary {
-  color: var(--theme-color) !important;
-}
-
-.ck-content blockquote,
-blockquote {
-  border-left: 0.25rem solid rgba(var(--theme-color-rgb), 0.33) !important;
-}
-
-/*
- * =============================================================================
- * SEARCH COMPONENTS
- * =============================================================================
- */
-
-.search .checkbox-inline.checked {
-  border-color: var(--theme-color);
-}
-
-/*
- * =============================================================================
- * LINKS AND NAVIGATION
- * =============================================================================
- */
-
-a {
-  color: var(--theme-color);
-}
-
-a:hover,
-a:focus,
-a:active {
-  color: var(--theme-color-dark);
-}
-
-.nav-pills .nav-link.active,
-.nav-pills .show>.nav-link {
-  background: var(--theme-color);
-}
-
-.dropdown-item.active,
-.dropdown-item:active {
-  background: var(--theme-color);
-}
-
-.dropdown-menu>.active>a,
-.dropdown-menu>.active>a:focus,
-.dropdown-menu>.active>a:hover {
-  background: var(--theme-color);
-}
-
-.nav .open>a,
-.nav .open>a:focus,
-.nav .open>a:hover {
-  border-color: var(--theme-color);
-}
-
-a.text-primary:hover,
-a.text-primary:focus {
-  color: var(--theme-color-dark) !important;
-}
-
-/*
- * =============================================================================
- * BUTTONS
- * =============================================================================
- */
-
-.btn {
-  box-shadow: none !important;
-  transition: none !important;
-}
-
-.btn-primary {
-  background: linear-gradient(135deg, var(--theme-color) 0%, var(--theme-color) 50%, var(--theme-color-light) 100%);
-  border-color: var(--theme-color);
-}
-
-.btn-primary:hover,
-.btn-primary:focus,
-.btn-primary:active,
-.btn-primary.dropdown-toggle.show {
-  background: var(--theme-color-dark) !important;
-}
-
-.btn-primary.disabled,
-.btn-primary:disabled,
-.btn-primary.disabled:hover,
-.btn-primary[disabled]:hover,
-.btn-primary.disabled:focus,
-.btn-primary[disabled]:focus {
-  color: #fff;
-  background: var(--theme-color) !important;
-  border-color: var(--theme-color) !important;
-}
-
-.btn-outline-primary {
-  color: var(--theme-color);
-  border-color: var(--theme-color);
-}
-
-.btn-outline-primary:hover,
-.btn-outline-primary:focus,
-.btn-outline-primary:active,
-.btn-outline-primary:not(:disabled):not(.disabled):active,
-.btn-outline-primary:not(:disabled):not(.disabled).active,
-.btn-outline-primary.dropdown-toggle.show {
-  color: white !important;
-  border-color: var(--theme-color) !important;
-  background: var(--theme-color) !important;
-}
-
-.btn-outline-primary.disabled,
-.btn-outline-primary:disabled,
-.btn-outline-primary.disabled:hover,
-.btn-outline-primary[disabled]:hover,
-.btn-outline-primary.disabled:focus,
-.btn-outline-primary[disabled]:focus {
-  color: var(--theme-color) !important;
-  background: transparent !important;
-  border-color: var(--theme-color) !important;
-}
-
-/*
- * =============================================================================
- * ACTION LINKS
- * =============================================================================
- */
-
-p.action {
-  text-align: center;
-}
-
-p.action a {
-  background: var(--theme-color) !important;
-}
-
-p.action a:hover {
-  background: var(--theme-color-dark) !important;
-}
-
-/*
- * =============================================================================
- * LABELS AND BADGES
- * =============================================================================
- */
-
-.badge-primary,
-.badge-primary[href] {
-  background: linear-gradient(135deg, var(--theme-color) 0%, var(--theme-color) 50%, var(--theme-color-light) 100%) !important;
-}
-
-.badge-primary[href]:hover,
-.badge-primary[href]:focus,
-.badge-primary[href]:active {
-  background: var(--theme-color-dark) !important;
-}
-
-.label-primary,
-.label-primary[href] {
-  background: linear-gradient(135deg, var(--theme-color) 0%, var(--theme-color) 50%, var(--theme-color-light) 100%) !important;
-}
-
-.label-primary[href]:hover,
-.label-primary[href]:focus,
-.label-primary[href]:active {
-  background: var(--theme-color-dark) !important;
-}
-
-.label-outline-primary,
-.badge-outline-primary {
-  color: var(--theme-color);
-  border-color: var(--theme-color);
-}
-
-/*
- * =============================================================================
- * PAGINATION
- * =============================================================================
- */
-
-.page-item.active .page-link {
-  background: var(--theme-color);
-  border-color: var(--theme-color);
-}
-
-.page-link:focus {
-  box-shadow: none;
-}
-
-/*
- * =============================================================================
- * FORM CONTROLS
- * =============================================================================
- */
-
-.form-control,
-.form-select {
-  box-shadow: none !important;
-}
-
-.form-control:focus,
-.form-select:focus {
-  border-color: var(--theme-color);
-}
-
-.form-check-input:checked {
-  background-color: var(--theme-color);
-  border-color: var(--theme-color);
-}
-
-.checkbox input:checked+label:before,
-.checkbox-inline input:checked+label:before {
-  background: var(--theme-color);
-  border-color: var(--theme-color);
-}
-
-/* Native range controls (e.g. pay-what-you-will ticket slider on purchase with minimal layout) */
-.form-range {
-  accent-color: var(--theme-color);
-}
-
-input[type="checkbox"] {
-  accent-color: var(--theme-color);
-}
-
-.secret-ticket-checkbox:checked {
-  background: var(--theme-color);
-  border-color: var(--theme-color);
-}
-
-.secret-ticket-checkbox:focus {
-  border-color: #ced4da;
-  box-shadow: none;
-}
-
-.secret-ticket-checkbox:checked:focus {
-  border-color: var(--theme-color);
-  box-shadow: 0 0 0 0.2rem rgba(var(--theme-color-rgb), 0.25);
-}
-
-/* Bootstrap utility (e.g. comment reaction borders) */
-.border-primary {
-  border-color: var(--theme-color) !important;
-}
-
-.switcher input:checked+label:before {
-  background: var(--theme-color);
-  border-color: var(--theme-color);
-}
-
-/*
- * =============================================================================
- * CALENDAR AND EVENTS
- * =============================================================================
- */
 
 #calendar a.fc-event {
   color: var(--theme-color) !important;
@@ -281,47 +23,9 @@ input[type="checkbox"] {
   border-color: rgba(var(--theme-color-rgb), 0.5);
 }
 
-.event-detail:hover {
-  background: var(--theme-color);
-}
-
 .event-detail.calendar-date .month {
   background: rgba(var(--theme-color-rgb), 0.3);
 }
-
-/*
- * =============================================================================
- * DATE PICKER
- * =============================================================================
- */
-
-.flatpickr-day.selected,
-.flatpickr-day.startRange,
-.flatpickr-day.endRange,
-.flatpickr-day.selected.inRange,
-.flatpickr-day.startRange.inRange,
-.flatpickr-day.endRange.inRange,
-.flatpickr-day.selected:focus,
-.flatpickr-day.startRange:focus,
-.flatpickr-day.endRange:focus,
-.flatpickr-day.selected:hover,
-.flatpickr-day.startRange:hover,
-.flatpickr-day.endRange:hover,
-.flatpickr-day.selected.prevMonthDay,
-.flatpickr-day.startRange.prevMonthDay,
-.flatpickr-day.endRange.prevMonthDay,
-.flatpickr-day.selected.nextMonthDay,
-.flatpickr-day.startRange.nextMonthDay,
-.flatpickr-day.endRange.nextMonthDay {
-  background: var(--theme-color);
-  border-color: var(--theme-color);
-}
-
-/*
- * =============================================================================
- * ALERTS
- * =============================================================================
- */
 
 .alert.alert-success {
   background-color: #fff !important;
@@ -337,27 +41,6 @@ input[type="checkbox"] {
   color: var(--theme-color-darker);
 }
 
-/*
- * =============================================================================
- * PROGRESS
- * =============================================================================
- */
-
-.progress {
-  background: rgba(var(--theme-color-rgb), 0.1);
-}
-
-.progress-bar {
-  background: var(--theme-color) !important;
-  border-radius: 0;
-}
-
-/*
- * =============================================================================
- * AI WELL
- * =============================================================================
- */
-
 .ai-well {
   background: linear-gradient(135deg,
       rgba(var(--theme-color-rgb), 0.175) 0%,
@@ -366,12 +49,6 @@ input[type="checkbox"] {
   padding: 1rem;
   border-radius: 0.5rem;
 }
-
-/*
- * =============================================================================
- * MAP CONTAINER
- * =============================================================================
- */
 
 #map-container,
 #map-canvas {

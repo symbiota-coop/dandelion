@@ -91,13 +91,13 @@
 
 #doc-body a,
 .docs-deepwiki-answer a {
-  color: var(--color-primary);
+  color: var(--theme-color);
 }
 
 #doc-body a:hover, #doc-body a:focus,
 .docs-deepwiki-answer a:hover,
 .docs-deepwiki-answer a:focus {
-  color: var(--color-link-hover);
+  color: var(--theme-color-hover);
 }
 
 #doc-body p.action a,
@@ -151,16 +151,16 @@
 
 .doc-transcript {
   margin: 0.5rem 0 1.25rem;
-  border: 1px solid var(--color-primary-transparent-3);
+  border: 1px solid rgba(var(--theme-color-rgb), 0.3);
   border-radius: 0.4rem;
-  background: var(--color-primary-transparent-1);
+  background: rgba(var(--theme-color-rgb), 0.1);
   padding: 0.55rem 0.85rem;
 }
 
 .doc-transcript summary {
   cursor: pointer;
   font-size: 0.9rem;
-  color: var(--color-primary);
+  color: var(--theme-color);
   font-family: var(--header-font-family);
 }
 
@@ -235,12 +235,12 @@
 }
 
 .doc-link:hover, .doc-link:focus {
-  color: var(--color-primary);
+  color: var(--theme-color);
   text-decoration: none;
 }
 
 .doc-link.is-active {
-  border-left-color: var(--color-primary);
+  border-left-color: var(--theme-color);
   color: var(--body-text);
 }
 
@@ -392,7 +392,7 @@
 }
 
 .doc-search-result:hover .doc-search-heading, .doc-search-result:focus .doc-search-heading {
-  color: var(--color-primary);
+  color: var(--theme-color);
 }
 
 .doc-search-page {

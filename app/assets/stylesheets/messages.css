@@ -74,7 +74,7 @@
 }
 
 .reply .widget-chat-message {
-  background: #00af5e;
+  background: var(--theme-color);
   color: #fff;
 }
 
@@ -92,8 +92,8 @@
   border: 0.3125rem solid transparent;
   border-top-width: 0.25rem;
   border-left-width: 0.625rem;
-  border-top-color: #00af5e;
-  border-left-color: #00af5e;
+  border-top-color: var(--theme-color);
+  border-left-color: var(--theme-color);
   left: auto;
   right: -0.4375rem;
 }
