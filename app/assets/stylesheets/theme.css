@@ -224,8 +224,7 @@ p.action a:hover {
   border-color: var(--theme-color);
 }
 
-.radio input:checked+label:before,
-.radio-inline input:checked+label:before {
+.radio input:checked+label:before {
   background: var(--theme-color);
   border-color: var(--theme-color);
 }
@@ -331,7 +330,6 @@ input[type="checkbox"] {
   border-color: var(--theme-color-darker);
 }
 
-.alert.alert-success .alert-link,
 .alert.alert-success a {
   color: var(--theme-color-darker);
 }
