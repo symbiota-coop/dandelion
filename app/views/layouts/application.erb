@@ -51,6 +51,13 @@
         <div class="sidebar-scroll">
           <%= partial :nav %>
         </div>
+        <script>
+          // Restore before first paint so the sidebar doesn't visibly jump
+          try {
+            var sidebarScrollPosition = localStorage.getItem('sidebarScrollPosition')
+            if (sidebarScrollPosition) document.currentScript.previousElementSibling.scrollTop = parseInt(sidebarScrollPosition)
+          } catch (e) {}
+        </script>
         <!-- END scrollbar -->
         <!-- BEGIN sidebar-minify-btn -->
         <a onclick="$.post('/sidebar', {minified: $('#page-container').hasClass('page-sidebar-minified') ? false : true});

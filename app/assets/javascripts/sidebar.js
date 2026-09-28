@@ -37,14 +37,8 @@ $(function () {
 
   // Remember sidebar scroll position
   if (!isMobile) {
-    const sidebarScroll = $('.sidebar .sidebar-scroll')
-    try {
-      const position = localStorage.getItem('sidebarScrollPosition')
-      if (position) sidebarScroll.scrollTop(parseInt(position))
-    } catch (e) {
-      // storage unavailable
-    }
-    sidebarScroll.on('scroll', function () {
+    // Restored by an inline script in application.erb, before first paint
+    $('.sidebar .sidebar-scroll').on('scroll', function () {
       try {
         localStorage.setItem('sidebarScrollPosition', $(this).scrollTop())
       } catch (e) {
