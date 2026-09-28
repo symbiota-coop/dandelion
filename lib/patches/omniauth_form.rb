@@ -6,7 +6,6 @@ module OmniAuth
       [
         %(<meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" name="viewport">),
         %(<link rel="stylesheet" href="/stylesheets/bootstrap.css">),
-        %(<link rel="stylesheet" href="/stylesheets/event_details.css">),
         %(<link rel="stylesheet" href="/stylesheets/app.css">),
         %(<link rel="stylesheet" href="/stylesheets/sign_in_with_ethereum.css">),
         %(<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>),
