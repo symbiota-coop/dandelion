@@ -1083,17 +1083,6 @@ body.greyed #content {
   background: #737377;
 }
 
-.badge-light {
-  color: #000;
-  background: linear-gradient(135deg, #f8f9fa 0%, #f8f9fa 50%, white 100%) !important;
-}
-
-.badge-light[href]:focus,
-.badge-light[href]:hover {
-  background: #f8f9fa;
-  color: #000;
-}
-
 .badge-primary {
   background: linear-gradient(135deg, #00af5e 0%, #00af5e 50%, #00d170 100%) !important;
 }
@@ -1139,24 +1128,6 @@ body.greyed #content {
   background: #e4352b;
 }
 
-.badge-purple {
-  background: linear-gradient(135deg, #5856D6 0%, #5856D6 50%, #7371dd 100%) !important;
-}
-
-.badge-purple[href]:focus,
-.badge-purple[href]:hover {
-  background: #4c4bb7;
-}
-
-.badge-pink {
-  background: linear-gradient(135deg, #FF2D55 0%, #FF2D55 50%, #ff4f70 100%) !important;
-}
-
-.badge-pink[href]:focus,
-.badge-pink[href]:hover {
-  background: #de2649;
-}
-
 .badge-yellow {
   background: linear-gradient(135deg, #FFCC00 0%, #FFCC00 50%, #ffd322 100%) !important;
 }
@@ -1166,15 +1137,12 @@ body.greyed #content {
   background: #e6b801;
 }
 
-.badge-inverse,
-.badge-dark {
+.badge-inverse {
   background: linear-gradient(135deg, #000 0%, #000 50%, #111111 100%) !important;
 }
 
 .badge-inverse[href]:focus,
-.badge-inverse[href]:hover,
-.badge-dark[href]:focus,
-.badge-dark[href]:hover {
+.badge-inverse[href]:hover {
   background: #333;
 }
 
@@ -1727,6 +1695,15 @@ input[type=radio][disabled] + label {
   margin: 0;
 }
 
+.dropdown-menu>li.notification .notification-info,
+.dropdown-menu>li.notification .notification-title,
+.dropdown-menu>li.notification .notification-desc {
+  white-space: normal;
+  overflow: visible;
+  text-overflow: unset;
+  line-height: 1.35
+}
+
 /* ==========================================================================
    Message previews (nav dropdown and /messages list)
    ========================================================================== */
@@ -1983,33 +1960,6 @@ label.remove-image input {
   background: #00a257;
 }
 
-.label-success {
-  background: linear-gradient(135deg, #4CD964 0%, #4CD964 50%, #68df7c 100%) !important;
-}
-
-.label-success[href]:focus,
-.label-success[href]:hover {
-  background: #45c35a;
-}
-
-.label-info {
-  background: linear-gradient(135deg, #5AC8FA 0%, #5AC8FA 50%, #7bd3fb 100%) !important;
-}
-
-.label-info[href]:focus,
-.label-info[href]:hover {
-  background: #50b3e0;
-}
-
-.label-warning {
-  background: linear-gradient(135deg, #FF9500 0%, #FF9500 50%, #ffa322 100%) !important;
-}
-
-.label-warning[href]:focus,
-.label-warning[href]:hover {
-  background: #e68701;
-}
-
 .label-danger {
   background: linear-gradient(135deg, #FF3B30 0%, #FF3B30 50%, #ff5b52 100%) !important;
 }
@@ -2017,24 +1967,6 @@ label.remove-image input {
 .label-danger[href]:focus,
 .label-danger[href]:hover {
   background: #e4352b;
-}
-
-.label-purple {
-  background: linear-gradient(135deg, #5856D6 0%, #5856D6 50%, #7371dd 100%) !important;
-}
-
-.label-purple[href]:focus,
-.label-purple[href]:hover {
-  background: #4c4bb7;
-}
-
-.label-pink {
-  background: linear-gradient(135deg, #FF2D55 0%, #FF2D55 50%, #ff4f70 100%) !important;
-}
-
-.label-pink[href]:focus,
-.label-pink[href]:hover {
-  background: #de2649;
 }
 
 .label-yellow {
@@ -2053,10 +1985,6 @@ label.remove-image input {
 .label-inverse[href]:focus,
 .label-inverse[href]:hover {
   background: #333;
-}
-
-.label-ai {
-  background: #752DB9
 }
 
 .label-stripe {
@@ -2298,6 +2226,16 @@ ul.pagination {
 .bi-spin {
   display: inline-block;
   animation: spin 2s linear infinite;
+}
+
+.progress-bar {
+  border-radius: 0;
+}
+
+.no-gutters>.col,
+.no-gutters>[class*=col-] {
+  padding-right: 0 !important;
+  padding-left: 0 !important;
 }
 
 /* ==========================================================================
@@ -2812,6 +2750,14 @@ table.dataTable.table-sm>thead>tr>th {
   border-bottom: 2px solid #ddd
 }
 
+.search .checkbox-inline {
+  cursor: auto;
+  background-color: white;
+  padding: 0.3rem;
+  padding-bottom: 0.2rem;
+  border-radius: 0.25rem
+}
+
 /* ==========================================================================
    Sidebar active item
    ========================================================================== */
@@ -2826,6 +2772,25 @@ table.dataTable.table-sm>thead>tr>th {
 .pace .pace-progress {
   color: #fff !important;
   background: linear-gradient(135deg, #fd7514 0%, #efe707 100%) !important;
+}
+
+.navbar-xs-justified {
+  border: 0 !important
+}
+
+.sidebar .nav>li.active>a,
+.sidebar .nav>li.active>a:hover,
+.sidebar .nav>li.active>a:focus,
+.sidebar.sidebar-inverse .nav>li.active>a,
+.sidebar.sidebar-inverse .nav>li.active>a:hover,
+.sidebar.sidebar-inverse .nav>li.active>a:focus,
+.sidebar.sidebar-inverse .nav>li.expand>a,
+.sidebar.sidebar-inverse .nav>li>a:hover,
+.sidebar.sidebar-inverse .nav>li>a:focus,
+.sidebar.sidebar-inverse .nav>li>a:active,
+.navbar .with-label:before,
+.pace .pace-progress {
+  border-radius: 5px;
 }
 
 /* ==========================================================================
@@ -3088,42 +3053,6 @@ button.bg-warning:focus {
 }
 
 /* ==========================================================================
-   Header (overrides)
-   ========================================================================== */
-
-.navbar-xs-justified {
-  border: 0 !important
-}
-
-.sidebar .nav>li.active>a,
-.sidebar .nav>li.active>a:hover,
-.sidebar .nav>li.active>a:focus,
-.sidebar.sidebar-inverse .nav>li.active>a,
-.sidebar.sidebar-inverse .nav>li.active>a:hover,
-.sidebar.sidebar-inverse .nav>li.active>a:focus,
-.sidebar.sidebar-inverse .nav>li.expand>a,
-.sidebar.sidebar-inverse .nav>li>a:hover,
-.sidebar.sidebar-inverse .nav>li>a:focus,
-.sidebar.sidebar-inverse .nav>li>a:active,
-.navbar .with-label:before,
-.pace .pace-progress {
-  border-radius: 5px;
-}
-
-/* ==========================================================================
-   Dropdowns (overrides)
-   ========================================================================== */
-
-.dropdown-menu>li.notification .notification-info,
-.dropdown-menu>li.notification .notification-title,
-.dropdown-menu>li.notification .notification-desc {
-  white-space: normal;
-  overflow: visible;
-  text-overflow: unset;
-  line-height: 1.35
-}
-
-/* ==========================================================================
    Select2
    ========================================================================== */
 
@@ -3330,14 +3259,6 @@ label.remove-image {
 }
 
 /* ==========================================================================
-   Misc components (spin, collapse, progress, row) (overrides)
-   ========================================================================== */
-
-.progress-bar {
-  border-radius: 0;
-}
-
-/* ==========================================================================
    Ask boxes (docs, contact page, messages)
    ========================================================================== */
 
@@ -3367,16 +3288,6 @@ label.remove-image {
 
 .ask-box .ask-box-actions {
   flex-shrink: 0;
-}
-
-/* ==========================================================================
-   Misc components (spin, collapse, progress, row) (overrides)
-   ========================================================================== */
-
-.no-gutters>.col,
-.no-gutters>[class*=col-] {
-  padding-right: 0 !important;
-  padding-left: 0 !important;
 }
 
 /* ==========================================================================
@@ -3414,18 +3325,6 @@ label.remove-image {
     background: #aaa;
     border-radius: 4px;
   }
-}
-
-/* ==========================================================================
-   Search page (overrides)
-   ========================================================================== */
-
-.search .checkbox-inline {
-  cursor: auto;
-  background-color: white;
-  padding: 0.3rem;
-  padding-bottom: 0.2rem;
-  border-radius: 0.25rem
 }
 
 /* ==========================================================================
